@@ -50,7 +50,7 @@ func (c *BasePriceComponent) GetFilters() []Filter {
 func (c *BasePriceComponent) CalculateHourlyCost(price decimal.Decimal) decimal.Decimal {
 	var cost decimal.Decimal
 	if c.priceMapping.CalculateCost != nil {
-		cost = c.priceMapping.CalculateCost(price, c.resource.RawValues())
+		cost = c.priceMapping.CalculateCost(price, c.resource)
 	} else {
 		cost = price
 	}

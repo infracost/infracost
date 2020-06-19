@@ -29,7 +29,7 @@ type PriceMapping struct {
 	DefaultFilters []Filter
 	ValueMappings  []ValueMapping
 	ShouldSkip     func(values map[string]interface{}) bool
-	CalculateCost  func(price decimal.Decimal, values map[string]interface{}) decimal.Decimal
+	CalculateCost  func(price decimal.Decimal, resource Resource) decimal.Decimal
 }
 
 func (p *PriceMapping) GetFilters(values map[string]interface{}) []Filter {

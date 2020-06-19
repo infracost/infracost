@@ -20,9 +20,9 @@ var EbsVolumeGB = &base.PriceMapping{
 		{FromKey: "type", ToKey: "volumeApiName"},
 	},
 
-	CalculateCost: func(price decimal.Decimal, values map[string]interface{}) decimal.Decimal {
+	CalculateCost: func(price decimal.Decimal, resource base.Resource) decimal.Decimal {
 		size := decimal.NewFromInt(int64(8))
-		if sizeStr, ok := values["size"]; ok {
+		if sizeStr, ok := resource.RawValues()["size"]; ok {
 			size, _ = decimal.NewFromString(fmt.Sprintf("%v", sizeStr))
 		}
 		return price.Mul(size)
@@ -47,8 +47,8 @@ var EbsVolumeIOPS = &base.PriceMapping{
 		return values["type"] != "io1"
 	},
 
-	CalculateCost: func(price decimal.Decimal, values map[string]interface{}) decimal.Decimal {
-		iops, _ := decimal.NewFromString(fmt.Sprintf("%v", values["iops"]))
+	CalculateCost: func(price decimal.Decimal, resource base.Resource) decimal.Decimal {
+		iops, _ := decimal.NewFromString(fmt.Sprintf("%v", resource.RawValues()["iops"]))
 		return price.Mul(iops)
 	},
 }
@@ -57,5 +57,47 @@ var EbsVolume = &base.ResourceMapping{
 	PriceMappings: map[string]*base.PriceMapping{
 		"GB":   EbsVolumeGB,
 		"IOPS": EbsVolumeIOPS,
+	},
+}
+
+var EbsSnapshotGB = &base.PriceMapping{
+	TimeUnit: "month",
+
+	DefaultFilters: []base.Filter{
+		{Key: "servicecode", Value: "AmazonEC2"},
+		{Key: "productFamily", Value: "Storage Snapshot"},
+	},
+
+	CalculateCost: func(price decimal.Decimal, resource base.Resource) decimal.Decimal {
+		size := decimal.NewFromInt(int64(8))
+		if sizeStr, ok := resource.References()["volume_id"].RawValues()["size"]; ok {
+			size, _ = decimal.NewFromString(fmt.Sprintf("%v", sizeStr))
+		}
+		return price.Mul(size)
+	},
+}
+
+var EbsSnapshot = &base.ResourceMapping{
+	PriceMappings: map[string]*base.PriceMapping{
+		"GB": EbsSnapshotGB,
+	},
+}
+
+var EbsSnapshotCopyGB = &base.PriceMapping{
+	TimeUnit:       EbsSnapshotGB.TimeUnit,
+	DefaultFilters: EbsSnapshotGB.DefaultFilters,
+
+	CalculateCost: func(price decimal.Decimal, resource base.Resource) decimal.Decimal {
+		size := decimal.NewFromInt(int64(8))
+		if sizeStr, ok := resource.References()["source_snapshot_id"].References()["volume_id"].RawValues()["size"]; ok {
+			size, _ = decimal.NewFromString(fmt.Sprintf("%v", sizeStr))
+		}
+		return price.Mul(size)
+	},
+}
+
+var EbsSnapshotCopy = &base.ResourceMapping{
+	PriceMappings: map[string]*base.PriceMapping{
+		"GB": EbsSnapshotCopyGB,
 	},
 }

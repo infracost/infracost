@@ -8,9 +8,9 @@ import (
 type Resource interface {
 	Address() string
 	RawValues() map[string]interface{}
-	References() map[string]*Resource
+	References() map[string]Resource
 	GetFilters() []Filter
-	AddReferences(address string, reference *Resource)
+	AddReferences(address string, reference Resource)
 	SubResources() []Resource
 	PriceComponents() []PriceComponent
 }
@@ -18,7 +18,7 @@ type Resource interface {
 type BaseResource struct {
 	address         string
 	rawValues       map[string]interface{}
-	references      map[string]*Resource
+	references      map[string]Resource
 	resourceMapping *ResourceMapping
 	subResources    []Resource
 	priceComponents []PriceComponent
@@ -30,7 +30,7 @@ func NewBaseResource(address string, rawValues map[string]interface{}, resourceM
 		address:         address,
 		rawValues:       rawValues,
 		resourceMapping: resourceMapping,
-		references:      map[string]*Resource{},
+		references:      map[string]Resource{},
 		providerFilters: providerFilters,
 	}
 
@@ -75,7 +75,7 @@ func (r *BaseResource) RawValues() map[string]interface{} {
 	return r.rawValues
 }
 
-func (r *BaseResource) References() map[string]*Resource {
+func (r *BaseResource) References() map[string]Resource {
 	return r.references
 }
 
@@ -83,7 +83,7 @@ func (r *BaseResource) GetFilters() []Filter {
 	return r.providerFilters
 }
 
-func (r *BaseResource) AddReferences(address string, reference *Resource) {
+func (r *BaseResource) AddReferences(address string, reference Resource) {
 	r.references[address] = reference
 }
 

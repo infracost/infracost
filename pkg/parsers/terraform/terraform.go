@@ -25,6 +25,10 @@ func GetResourceMapping(resourceType string) *base.ResourceMapping {
 		return aws.Ec2Instance
 	case "aws_ebs_volume":
 		return aws.EbsVolume
+	case "aws_ebs_snapshot":
+		return aws.EbsSnapshot
+	case "aws_ebs_snapshot_copy":
+		return aws.EbsSnapshotCopy
 	}
 	return nil
 }
@@ -79,7 +83,7 @@ func addReferences(r base.Resource, resourceConfig gjson.Result, resourceMap map
 			}
 		}
 		if resource, ok := resourceMap[refAddr]; ok {
-			r.AddReferences(refAddr, &resource)
+			r.AddReferences(key.String(), resource)
 		}
 		return true
 	})
