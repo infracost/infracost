@@ -23,6 +23,8 @@ func GetResourceMapping(resourceType string) *base.ResourceMapping {
 	switch resourceType {
 	case "aws_instance":
 		return aws.Ec2Instance
+	case "aws_ebs_volume":
+		return aws.EbsVolume
 	}
 	return nil
 }

@@ -14,11 +14,6 @@ type GraphQLQuery struct {
 	Variables map[string]interface{} `json:"variables"`
 }
 
-type QueryResult struct {
-	PriceComponent PriceComponent
-	Result         gjson.Result
-}
-
 func BuildQuery(filters []Filter) GraphQLQuery {
 	variables := map[string]interface{}{}
 	variables["filter"] = map[string]interface{}{}

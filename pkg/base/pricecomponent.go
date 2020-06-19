@@ -6,6 +6,7 @@ import (
 
 type PriceComponent interface {
 	Name() string
+	Resource() Resource
 	ShouldSkip() bool
 	GetFilters() []Filter
 	CalculateHourlyCost(decimal.Decimal) decimal.Decimal
@@ -31,6 +32,10 @@ func (c *BasePriceComponent) Name() string {
 	return c.name
 }
 
+func (c *BasePriceComponent) Resource() Resource {
+	return c.resource
+}
+
 func (c *BasePriceComponent) ShouldSkip() bool {
 	if c.priceMapping.ShouldSkip != nil {
 		return c.priceMapping.ShouldSkip(c.resource.RawValues())
@@ -45,17 +50,17 @@ func (c *BasePriceComponent) GetFilters() []Filter {
 func (c *BasePriceComponent) CalculateHourlyCost(price decimal.Decimal) decimal.Decimal {
 	var cost decimal.Decimal
 	if c.priceMapping.CalculateCost != nil {
-		cost = c.priceMapping.CalculateCost(price)
+		cost = c.priceMapping.CalculateCost(price, c.resource.RawValues())
 	} else {
 		cost = price
 	}
 
-	timeUnitSecs := map[string]int64{
-		"hour":  60 * 60,
-		"month": 60 * 60 * 730,
+	timeUnitSecs := map[string]decimal.Decimal{
+		"hour":  decimal.NewFromInt(int64(60 * 60)),
+		"month": decimal.NewFromInt(int64(60 * 60 * 730)),
 	}
-	timeUnitMultiplier := timeUnitSecs["hour"] / timeUnitSecs[c.priceMapping.TimeUnit]
+	timeUnitMultiplier := timeUnitSecs["hour"].Div(timeUnitSecs[c.priceMapping.TimeUnit])
 
-	hourlyCost := cost.Mul(decimal.NewFromInt(timeUnitMultiplier))
+	hourlyCost := cost.Mul(timeUnitMultiplier)
 	return hourlyCost
 }

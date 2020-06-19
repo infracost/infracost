@@ -14,29 +14,37 @@ type PriceComponentCostJSON struct {
 }
 
 type ResourceCostBreakdownJSON struct {
-	Resource  string                   `json:"resource"`
-	Breakdown []PriceComponentCostJSON `json:"breakdown"`
+	Resource     string                      `json:"resource"`
+	Breakdown    []PriceComponentCostJSON    `json:"breakdown"`
+	SubResources []ResourceCostBreakdownJSON `json:"subresources,omitempty"`
+}
+
+func createJSONObj(breakdown base.ResourceCostBreakdown) ResourceCostBreakdownJSON {
+	priceComponentCostJSONs := make([]PriceComponentCostJSON, 0, len(breakdown.PriceComponentCosts))
+	for _, priceComponentCost := range breakdown.PriceComponentCosts {
+		priceComponentCostJSONs = append(priceComponentCostJSONs, PriceComponentCostJSON{
+			PriceComponent: priceComponentCost.PriceComponent.Name(),
+			HourlyCost:     priceComponentCost.HourlyCost.Round(6),
+			MonthlyCost:    priceComponentCost.MonthlyCost.Round(6),
+		})
+	}
+
+	subResourcesCostBreakdownJSONs := make([]ResourceCostBreakdownJSON, 0, len(breakdown.SubResourceCosts))
+	for _, subResourceBreakdown := range breakdown.SubResourceCosts {
+		subResourcesCostBreakdownJSONs = append(subResourcesCostBreakdownJSONs, createJSONObj(subResourceBreakdown))
+	}
+
+	return ResourceCostBreakdownJSON{
+		Resource:     breakdown.Resource.Address(),
+		Breakdown:    priceComponentCostJSONs,
+		SubResources: subResourcesCostBreakdownJSONs,
+	}
 }
 
 func ToJSON(resourceCostBreakdowns []base.ResourceCostBreakdown) ([]byte, error) {
-	jsonObj := make([]ResourceCostBreakdownJSON, 0, len(resourceCostBreakdowns))
-
+	jsonObjs := make([]ResourceCostBreakdownJSON, 0, len(resourceCostBreakdowns))
 	for _, breakdown := range resourceCostBreakdowns {
-		priceComponentCostJSONs := make([]PriceComponentCostJSON, 0, len(breakdown.PriceComponentCosts))
-		for _, priceComponentCost := range breakdown.PriceComponentCosts {
-			priceComponentCostJSONs = append(priceComponentCostJSONs, PriceComponentCostJSON{
-				PriceComponent: priceComponentCost.PriceComponent.Name(),
-				HourlyCost:     priceComponentCost.HourlyCost,
-				MonthlyCost:    priceComponentCost.MonthlyCost,
-			})
-		}
-
-		breakdownJSON := ResourceCostBreakdownJSON{
-			Resource:  breakdown.Resource.Address(),
-			Breakdown: priceComponentCostJSONs,
-		}
-		jsonObj = append(jsonObj, breakdownJSON)
+		jsonObjs = append(jsonObjs, createJSONObj(breakdown))
 	}
-
-	return json.Marshal(jsonObj)
+	return json.Marshal(jsonObjs)
 }

@@ -1,17 +1,23 @@
 package aws
 
-import "plancosts/pkg/base"
+import (
+	"plancosts/pkg/base"
+)
 
-var BlockDeviceGB = &base.PriceMapping{
-	TimeUnit: "hour",
+var Ec2BlockDeviceGB = &base.PriceMapping{
+	TimeUnit:       EbsVolumeGB.TimeUnit,
+	DefaultFilters: EbsVolumeGB.DefaultFilters,
+	CalculateCost:  EbsVolumeGB.CalculateCost,
 
 	ValueMappings: []base.ValueMapping{
 		{FromKey: "volume_type", ToKey: "volumeApiName"},
 	},
 }
 
-var BlockDeviceIOPS = &base.PriceMapping{
-	TimeUnit: "hour",
+var Ec2BlockDeviceIOPS = &base.PriceMapping{
+	TimeUnit:       EbsVolumeIOPS.TimeUnit,
+	DefaultFilters: EbsVolumeIOPS.DefaultFilters,
+	CalculateCost:  EbsVolumeIOPS.CalculateCost,
 
 	ValueMappings: []base.ValueMapping{
 		{FromKey: "volume_type", ToKey: "volumeApiName"},
@@ -22,10 +28,10 @@ var BlockDeviceIOPS = &base.PriceMapping{
 	},
 }
 
-var BlockDevice = &base.ResourceMapping{
+var Ec2BlockDevice = &base.ResourceMapping{
 	PriceMappings: map[string]*base.PriceMapping{
-		"GB":   BlockDeviceGB,
-		"IOPS": BlockDeviceIOPS,
+		"GB":   Ec2BlockDeviceGB,
+		"IOPS": Ec2BlockDeviceIOPS,
 	},
 }
 
@@ -53,7 +59,7 @@ var Ec2Instance = &base.ResourceMapping{
 	},
 
 	SubResourceMappings: map[string]*base.ResourceMapping{
-		"root_block_device": BlockDevice,
-		"ebs_block_device":  BlockDevice,
+		"root_block_device": Ec2BlockDevice,
+		"ebs_block_device":  Ec2BlockDevice,
 	},
 }
