@@ -143,6 +143,10 @@ func GetCostBreakdowns(resources []Resource) ([]ResourceCostBreakdown, error) {
 	costBreakdowns := make([]ResourceCostBreakdown, 0, len(resources))
 
 	for _, resource := range resources {
+		if resource.NonCostable() {
+			continue
+		}
+
 		costBreakdown, err := GetCostBreakdown(resource)
 		if err != nil {
 			return costBreakdowns, err

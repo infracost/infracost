@@ -44,7 +44,7 @@ func (c *BasePriceComponent) ShouldSkip() bool {
 }
 
 func (c *BasePriceComponent) GetFilters() []Filter {
-	return MergeFilters(c.resource.GetFilters(), c.priceMapping.GetFilters(c.resource.RawValues()))
+	return MergeFilters(c.resource.GetFilters(), c.priceMapping.GetFilters(c.resource))
 }
 
 func (c *BasePriceComponent) CalculateHourlyCost(price decimal.Decimal) decimal.Decimal {
@@ -62,5 +62,8 @@ func (c *BasePriceComponent) CalculateHourlyCost(price decimal.Decimal) decimal.
 	timeUnitMultiplier := timeUnitSecs["hour"].Div(timeUnitSecs[c.priceMapping.TimeUnit])
 
 	hourlyCost := cost.Mul(timeUnitMultiplier)
+
+	hourlyCost = c.Resource().AdjustCost(hourlyCost)
+
 	return hourlyCost
 }

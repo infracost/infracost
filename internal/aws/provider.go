@@ -35,3 +35,7 @@ func GetDefaultFilters(region string) []base.Filter {
 		{Key: "location", Value: regionMapping[region]},
 	}
 }
+
+var DefaultResourceMapping = &base.ResourceMapping{
+	NonCostable: true,
+}

@@ -22,8 +22,8 @@ var EbsVolumeGB = &base.PriceMapping{
 
 	CalculateCost: func(price decimal.Decimal, resource base.Resource) decimal.Decimal {
 		size := decimal.NewFromInt(int64(8))
-		if sizeStr, ok := resource.RawValues()["size"]; ok {
-			size, _ = decimal.NewFromString(fmt.Sprintf("%v", sizeStr))
+		if sizeVal, ok := resource.RawValues()["size"]; ok {
+			size = decimal.NewFromFloat(sizeVal.(float64))
 		}
 		return price.Mul(size)
 	},
@@ -48,7 +48,10 @@ var EbsVolumeIOPS = &base.PriceMapping{
 	},
 
 	CalculateCost: func(price decimal.Decimal, resource base.Resource) decimal.Decimal {
-		iops, _ := decimal.NewFromString(fmt.Sprintf("%v", resource.RawValues()["iops"]))
+		iops := decimal.NewFromInt(int64(0))
+		if iopsVal, ok := resource.RawValues()["iops"]; ok {
+			iops = decimal.NewFromFloat(iopsVal.(float64))
+		}
 		return price.Mul(iops)
 	},
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetProviderFilters(provider string, region string) []base.Filter {
+func getProviderFilters(provider string, region string) []base.Filter {
 	switch provider {
 	case "aws":
 		return aws.GetDefaultFilters(region)
@@ -19,7 +19,7 @@ func GetProviderFilters(provider string, region string) []base.Filter {
 	return []base.Filter{}
 }
 
-func GetResourceMapping(resourceType string) *base.ResourceMapping {
+func getResourceMapping(resourceType string, rawValues map[string]interface{}) *base.ResourceMapping {
 	switch resourceType {
 	case "aws_instance":
 		return aws.Ec2Instance
@@ -29,8 +29,14 @@ func GetResourceMapping(resourceType string) *base.ResourceMapping {
 		return aws.EbsSnapshot
 	case "aws_ebs_snapshot_copy":
 		return aws.EbsSnapshotCopy
+	case "aws_autoscaling_group":
+		if len(rawValues["launch_template"].([]interface{})) > 0 {
+			return aws.AutoscalingGroupLaunchTemplate
+		}
+		return aws.AutoscalingGroupLaunchConfiguration
+	default:
+		return aws.DefaultResourceMapping
 	}
-	return nil
 }
 
 func ParsePlanFile(filePath string) ([]base.Resource, error) {
@@ -44,14 +50,14 @@ func ParsePlanFile(filePath string) ([]base.Resource, error) {
 	planFileBytes, _ := ioutil.ReadAll(planFile)
 
 	terraformRegion := gjson.GetBytes(planFileBytes, "configuration.provider_config.aws.expressions.region.constant_value").String()
-	providerFilters := GetProviderFilters("aws", terraformRegion)
+	providerFilters := getProviderFilters("aws", terraformRegion)
 
 	terraformResources := gjson.GetBytes(planFileBytes, "planned_values.root_module.resources")
 	for _, terraformResource := range terraformResources.Array() {
 		address := terraformResource.Get("address").String()
 		resourceType := terraformResource.Get("type").String()
 		rawValues := terraformResource.Get("values").Value().(map[string]interface{})
-		if resourceMapping := GetResourceMapping(resourceType); resourceMapping != nil {
+		if resourceMapping := getResourceMapping(resourceType, rawValues); resourceMapping != nil {
 			resource := base.NewBaseResource(address, rawValues, resourceMapping, providerFilters)
 			resourceMap[address] = resource
 		}
@@ -61,6 +67,7 @@ func ParsePlanFile(filePath string) ([]base.Resource, error) {
 		query := fmt.Sprintf(`configuration.root_module.resources.#(address="%s")`, resource.Address())
 		terraformResourceConfig := gjson.GetBytes(planFileBytes, query)
 		addReferences(resource, terraformResourceConfig, resourceMap)
+		resource.AddSubResources()
 	}
 
 	resources := make([]base.Resource, 0, len(resourceMap))
