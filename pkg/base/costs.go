@@ -25,78 +25,13 @@ type PriceComponentQueryMap struct {
 	Query          GraphQLQuery
 }
 
-type priceComponentQueryResult struct {
-	PriceComponent PriceComponent
-	QueryResult    gjson.Result
-}
-
 type queryKey struct {
 	Resource       Resource
 	PriceComponent PriceComponent
 }
 
-// Batch all the queries for this resource so we can use one GraphQL call
-// Use queryKeys to keep track of which query maps to which sub-resource and price component
-func batchQueries(resource Resource) ([]queryKey, []GraphQLQuery) {
-	queryKeys := make([]queryKey, 0)
-	queries := make([]GraphQLQuery, 0)
-
-	for _, priceComponent := range resource.PriceComponents() {
-		if priceComponent.ShouldSkip() {
-			continue
-		}
-
-		queryKeys = append(queryKeys, queryKey{resource, priceComponent})
-		queries = append(queries, BuildQuery(priceComponent.GetFilters()))
-	}
-
-	for _, subResource := range resource.SubResources() {
-		for _, priceComponent := range subResource.PriceComponents() {
-			if priceComponent.ShouldSkip() {
-				continue
-			}
-
-			queryKeys = append(queryKeys, queryKey{subResource, priceComponent})
-			queries = append(queries, BuildQuery(priceComponent.GetFilters()))
-		}
-	}
-
-	return queryKeys, queries
-}
-
-// Unpack the query results into the top-level resource results and any subresource results
-func unpackQueryResults(resource Resource, queryKeys []queryKey, queryResults []gjson.Result) ([]priceComponentQueryResult, map[*Resource][]priceComponentQueryResult) {
-	resourceResults := make([]priceComponentQueryResult, 0)
-	subResourceResults := make(map[*Resource][]priceComponentQueryResult, 0)
-
-	for i, queryResult := range queryResults {
-		queryResource := queryKeys[i].Resource
-		priceComponent := queryKeys[i].PriceComponent
-
-		result := priceComponentQueryResult{
-			priceComponent,
-			queryResult,
-		}
-
-		if queryResource == resource {
-			resourceResults = append(resourceResults, result)
-		} else {
-			if _, ok := subResourceResults[&queryResource]; !ok {
-				subResourceResults[&queryResource] = make([]priceComponentQueryResult, 0)
-			}
-
-			subResourceResults[&queryResource] = append(subResourceResults[&queryResource], result)
-		}
-	}
-
-	return resourceResults, subResourceResults
-}
-
 func createPriceComponentCost(priceComponent PriceComponent, queryResult gjson.Result) PriceComponentCost {
-	priceStr := queryResult.Get("data.products.0.onDemandPricing.0.priceDimensions.0.pricePerUnit.USD").String()
-	price, _ := decimal.NewFromString(priceStr)
-
-	hourlyCost := priceComponent.CalculateHourlyCost(price)
+	hourlyCost := priceComponent.HourlyCost()
 
 	return PriceComponentCost{
 		PriceComponent: priceComponent,
@@ -105,29 +40,28 @@ func createPriceComponentCost(priceComponent PriceComponent, queryResult gjson.R
 	}
 }
 
-func GetCostBreakdown(resource Resource) (ResourceCostBreakdown, error) {
-	queryKeys, queries := batchQueries(resource)
+func setPriceComponentPrice(priceComponent PriceComponent, queryResult gjson.Result) {
+	priceStr := queryResult.Get("data.products.0.onDemandPricing.0.priceDimensions.0.pricePerUnit.USD").String()
+	price, _ := decimal.NewFromString(priceStr)
+	priceComponent.SetPrice(price)
+}
 
-	queryResults, err := GetQueryResults(queries)
-	if err != nil {
-		return ResourceCostBreakdown{}, err
+func getCostBreakdown(resource Resource, results ResourceQueryResultMap) ResourceCostBreakdown {
+	priceComponentCosts := make([]PriceComponentCost, 0, len(resource.PriceComponents()))
+	for _, priceComponent := range resource.PriceComponents() {
+		result := results[&resource][&priceComponent]
+		priceComponentCosts = append(priceComponentCosts, createPriceComponentCost(priceComponent, result))
 	}
 
-	resourceResults, subResourceResults := unpackQueryResults(resource, queryKeys, queryResults)
-
-	priceComponentCosts := make([]PriceComponentCost, 0, len(resourceResults))
-	for _, result := range resourceResults {
-		priceComponentCosts = append(priceComponentCosts, createPriceComponentCost(result.PriceComponent, result.QueryResult))
-	}
-
-	subResourceCosts := make([]ResourceCostBreakdown, 0, len(subResourceResults))
-	for subResource, results := range subResourceResults {
-		subResourcePriceComponentCosts := make([]PriceComponentCost, 0, len(results))
-		for _, result := range results {
-			subResourcePriceComponentCosts = append(subResourcePriceComponentCosts, createPriceComponentCost(result.PriceComponent, result.QueryResult))
+	subResourceCosts := make([]ResourceCostBreakdown, 0, len(resource.SubResources()))
+	for _, subResource := range resource.SubResources() {
+		subResourcePriceComponentCosts := make([]PriceComponentCost, 0, len(subResource.PriceComponents()))
+		for _, priceComponent := range subResource.PriceComponents() {
+			result := results[&subResource][&priceComponent]
+			subResourcePriceComponentCosts = append(subResourcePriceComponentCosts, createPriceComponentCost(priceComponent, result))
 		}
 		subResourceCosts = append(subResourceCosts, ResourceCostBreakdown{
-			Resource:            *subResource,
+			Resource:            subResource,
 			PriceComponentCosts: subResourcePriceComponentCosts,
 		})
 	}
@@ -136,22 +70,32 @@ func GetCostBreakdown(resource Resource) (ResourceCostBreakdown, error) {
 		Resource:            resource,
 		PriceComponentCosts: priceComponentCosts,
 		SubResourceCosts:    subResourceCosts,
-	}, nil
+	}
 }
 
-func GetCostBreakdowns(resources []Resource) ([]ResourceCostBreakdown, error) {
+func GenerateCostBreakdowns(resources []Resource) ([]ResourceCostBreakdown, error) {
 	costBreakdowns := make([]ResourceCostBreakdown, 0, len(resources))
 
+	results := make(map[*Resource]ResourceQueryResultMap, len(resources))
 	for _, resource := range resources {
-		if resource.NonCostable() {
-			continue
-		}
-
-		costBreakdown, err := GetCostBreakdown(resource)
+		resourceResults, err := RunQueries(resource)
 		if err != nil {
 			return costBreakdowns, err
 		}
-		costBreakdowns = append(costBreakdowns, costBreakdown)
+		results[&resource] = resourceResults
+
+		for _, priceComponentResults := range resourceResults {
+			for priceComponent, result := range priceComponentResults {
+				setPriceComponentPrice(*priceComponent, result)
+			}
+		}
+	}
+
+	for _, resource := range resources {
+		if !resource.HasCost() {
+			continue
+		}
+		costBreakdowns = append(costBreakdowns, getCostBreakdown(resource, results[&resource]))
 	}
 
 	return costBreakdowns, nil

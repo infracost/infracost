@@ -29,7 +29,7 @@ func main() {
 				return err
 			}
 
-			resourceCostBreakdowns, err := base.GetCostBreakdowns(resources)
+			resourceCostBreakdowns, err := base.GenerateCostBreakdowns(resources)
 			if err != nil {
 				return err
 			}
