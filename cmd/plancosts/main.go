@@ -22,6 +22,11 @@ func main() {
 				Usage:    "Path to Terraform Plan JSON",
 				Required: true,
 			},
+			&cli.StringFlag{
+				Name:  "output, o",
+				Usage: "Output (json|table)",
+				Value: "table",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			resources, err := terraform.ParsePlanFile(c.String("plan"))
@@ -34,11 +39,23 @@ func main() {
 				return err
 			}
 
-			jsonBytes, err := outputs.ToJSON(resourceCostBreakdowns)
+			var output []byte
+			switch c.String("output") {
+			case "table":
+				output, err = outputs.ToTable(resourceCostBreakdowns)
+				break
+			case "json":
+				output, err = outputs.ToJSON(resourceCostBreakdowns)
+				break
+			default:
+				cli.ShowAppHelp(c)
+				return nil
+			}
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(jsonBytes))
+
+			fmt.Println(string(output))
 
 			return nil
 		},
