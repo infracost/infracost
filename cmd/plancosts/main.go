@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"plancosts/pkg/base"
-	"plancosts/pkg/outputs"
+	"plancosts/pkg/output"
 	"plancosts/pkg/parsers/terraform"
 
 	"github.com/urfave/cli/v2"
@@ -39,12 +39,12 @@ func main() {
 				return err
 			}
 
-			var output []byte
+			var out []byte
 			switch c.String("output") {
 			case "table":
-				output, err = outputs.ToTable(resourceCostBreakdowns)
+				out, err = output.ToTable(resourceCostBreakdowns)
 			case "json":
-				output, err = outputs.ToJSON(resourceCostBreakdowns)
+				out, err = output.ToJSON(resourceCostBreakdowns)
 			default:
 				err = cli.ShowAppHelp(c)
 			}
@@ -52,7 +52,7 @@ func main() {
 				return err
 			}
 
-			fmt.Println(string(output))
+			fmt.Println(string(out))
 
 			return nil
 		},
