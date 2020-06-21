@@ -1,6 +1,9 @@
 package config
 
 import (
+	"log"
+	"os"
+
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
@@ -16,25 +19,38 @@ func (c *ConfigSpec) SetLogger(logger *logrus.Logger) {
 	c.Logger = logger
 }
 
+func fileExists(path string) bool {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
+}
+
 // loadConfig loads the config struct from environment variables
-func loadConfig() (*ConfigSpec, error) {
+func loadConfig() *ConfigSpec {
 	var config ConfigSpec
 	var err error
 
-	err = godotenv.Load(".env.local")
-	if err != nil {
-		return nil, err
+	if fileExists(".env.local") {
+		err = godotenv.Load(".env.local")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
-	err = godotenv.Load()
-	if err != nil {
-		return nil, err
+
+	if fileExists(".env") {
+		err = godotenv.Load()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	err = envconfig.Process("", &config)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
-	return &config, nil
+	return &config
 }
 
-var Config, _ = loadConfig()
+var Config = loadConfig()
