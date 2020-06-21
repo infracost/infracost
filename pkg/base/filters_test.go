@@ -2,8 +2,9 @@ package base
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestMappedValue(t *testing.T) {
@@ -12,13 +13,13 @@ func TestMappedValue(t *testing.T) {
 
 	valueMapping = &ValueMapping{"from", "to", nil}
 	result = valueMapping.MappedValue("val")
-	if (result != "val") {
+	if result != "val" {
 		t.Error("got wrong mapped value")
 	}
 
 	valueMapping = &ValueMapping{"from", "to", func(fromVal interface{}) string { return fmt.Sprintf("%s.mapped", fromVal) }}
 	result = valueMapping.MappedValue("val")
-	if (result != "val.mapped") {
+	if result != "val.mapped" {
 		t.Error("got wrong mapped value when a function is used")
 	}
 }
@@ -42,8 +43,8 @@ func TestMergeFilters(t *testing.T) {
 		{Key: "key3", Value: "val3"},
 	}
 
-	if (!reflect.DeepEqual(result, expected)) {
-		t.Error("did not get the expected output", result)
+	if !cmp.Equal(SortFiltersByKey(result), SortFiltersByKey(expected)) {
+		t.Error("got unexpected output", result)
 	}
 }
 
@@ -66,7 +67,7 @@ func TestMapFilters(t *testing.T) {
 		{Key: "toKey2", Value: "val2.mapped"},
 	}
 
-	if (!reflect.DeepEqual(result, expected)) {
-		t.Error("did not get the expected output", result)
+	if !cmp.Equal(SortFiltersByKey(result), SortFiltersByKey(expected)) {
+		t.Error("got unexpected output", result)
 	}
 }

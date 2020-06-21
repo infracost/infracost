@@ -1,6 +1,9 @@
 package base
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 type Filter struct {
 	Key       string `json:"key"`
@@ -63,4 +66,12 @@ func MapFilters(valueMappings []ValueMapping, values map[string]interface{}) []F
 		}
 	}
 	return mappedFilters
+}
+
+func SortFiltersByKey(filters []Filter) []Filter {
+	copied := append([]Filter{}, filters...)
+	sort.Slice(copied, func(i, j int) bool {
+		return copied[i].Key < copied[j].Key
+	})
+	return copied
 }

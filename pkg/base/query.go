@@ -19,7 +19,21 @@ type GraphQLQuery struct {
 
 type ResourceQueryResultMap map[*Resource]map[*PriceComponent]gjson.Result
 
-func BuildQuery(filters []Filter) GraphQLQuery {
+type QueryRunner interface {
+	RunQueries(resource Resource) (ResourceQueryResultMap, error)
+}
+
+type GraphQLQueryRunner struct {
+	endpoint string
+}
+
+func NewGraphQLQueryRunner(endpoint string) *GraphQLQueryRunner {
+	return &GraphQLQueryRunner{
+		endpoint: endpoint,
+	}
+}
+
+func (r *GraphQLQueryRunner) buildQuery(filters []Filter) GraphQLQuery {
 	variables := map[string]interface{}{}
 	variables["filter"] = map[string]interface{}{}
 	variables["filter"].(map[string]interface{})["attributes"] = filters
@@ -43,7 +57,7 @@ func BuildQuery(filters []Filter) GraphQLQuery {
 	return GraphQLQuery{query, variables}
 }
 
-func GetQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
+func (r *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
 	results := make([]gjson.Result, 0, len(queries))
 
 	queriesBody, err := json.Marshal(queries)
@@ -52,7 +66,7 @@ func GetQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
 	}
 
 	client := http.Client{}
-	resp, err := client.Post(config.Config.PriceListApiEndpoint, "application/json", bytes.NewBuffer([]byte(queriesBody)))
+	resp, err := client.Post(r.endpoint, "application/json", bytes.NewBuffer([]byte(queriesBody)))
 	if err != nil {
 		return results, err
 	}
@@ -68,21 +82,9 @@ func GetQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
 	return results, nil
 }
 
-func RunQueries(resource Resource) (ResourceQueryResultMap, error) {
-	queryKeys, queries := batchQueries(resource)
-
-	log.Infof("Getting pricing details from %s for %s", config.Config.PriceListApiEndpoint, resource.Address())
-	queryResults, err := GetQueryResults(queries)
-	if err != nil {
-		return ResourceQueryResultMap{}, err
-	}
-
-	return unpackQueryResults(queryKeys, queryResults), nil
-}
-
 // Batch all the queries for this resource so we can use one GraphQL call
 // Use queryKeys to keep track of which query maps to which sub-resource and price component
-func batchQueries(resource Resource) ([]queryKey, []GraphQLQuery) {
+func (r *GraphQLQueryRunner) batchQueries(resource Resource) ([]queryKey, []GraphQLQuery) {
 	queryKeys := make([]queryKey, 0)
 	queries := make([]GraphQLQuery, 0)
 
@@ -91,7 +93,7 @@ func batchQueries(resource Resource) ([]queryKey, []GraphQLQuery) {
 			continue
 		}
 		queryKeys = append(queryKeys, queryKey{resource, priceComponent})
-		queries = append(queries, BuildQuery(priceComponent.Filters()))
+		queries = append(queries, r.buildQuery(priceComponent.Filters()))
 	}
 
 	for _, subResource := range resource.SubResources() {
@@ -100,7 +102,7 @@ func batchQueries(resource Resource) ([]queryKey, []GraphQLQuery) {
 				continue
 			}
 			queryKeys = append(queryKeys, queryKey{subResource, priceComponent})
-			queries = append(queries, BuildQuery(priceComponent.Filters()))
+			queries = append(queries, r.buildQuery(priceComponent.Filters()))
 		}
 	}
 
@@ -108,7 +110,7 @@ func batchQueries(resource Resource) ([]queryKey, []GraphQLQuery) {
 }
 
 // Unpack the query results into a map so we can find by resource and price component
-func unpackQueryResults(queryKeys []queryKey, queryResults []gjson.Result) ResourceQueryResultMap {
+func (r *GraphQLQueryRunner) unpackQueryResults(queryKeys []queryKey, queryResults []gjson.Result) ResourceQueryResultMap {
 	resourceResults := make(ResourceQueryResultMap)
 
 	for i, queryResult := range queryResults {
@@ -122,4 +124,16 @@ func unpackQueryResults(queryKeys []queryKey, queryResults []gjson.Result) Resou
 	}
 
 	return resourceResults
+}
+
+func (r *GraphQLQueryRunner) RunQueries(resource Resource) (ResourceQueryResultMap, error) {
+	queryKeys, queries := r.batchQueries(resource)
+
+	log.Infof("Getting pricing details from %s for %s", config.Config.PriceListApiEndpoint, resource.Address())
+	queryResults, err := r.getQueryResults(queries)
+	if err != nil {
+		return ResourceQueryResultMap{}, err
+	}
+
+	return r.unpackQueryResults(queryKeys, queryResults), nil
 }

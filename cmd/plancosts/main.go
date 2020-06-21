@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"plancosts/pkg/base"
+	"plancosts/pkg/config"
 	"plancosts/pkg/output"
 	"plancosts/pkg/parsers/terraform"
 
@@ -91,7 +92,8 @@ func main() {
 				return err
 			}
 
-			resourceCostBreakdowns, err := base.GenerateCostBreakdowns(resources)
+			q := base.NewGraphQLQueryRunner(config.Config.PriceListApiEndpoint)
+			resourceCostBreakdowns, err := base.GenerateCostBreakdowns(q, resources)
 			if err != nil {
 				return err
 			}

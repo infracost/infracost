@@ -73,12 +73,12 @@ func getCostBreakdown(resource Resource, results ResourceQueryResultMap) Resourc
 	}
 }
 
-func GenerateCostBreakdowns(resources []Resource) ([]ResourceCostBreakdown, error) {
+func GenerateCostBreakdowns(q QueryRunner, resources []Resource) ([]ResourceCostBreakdown, error) {
 	costBreakdowns := make([]ResourceCostBreakdown, 0, len(resources))
 
 	results := make(map[*Resource]ResourceQueryResultMap, len(resources))
 	for _, resource := range resources {
-		resourceResults, err := RunQueries(resource)
+		resourceResults, err := q.RunQueries(resource)
 		if err != nil {
 			return costBreakdowns, err
 		}
