@@ -42,8 +42,8 @@ func (c *WrappedPriceComponent) Filters() []base.Filter {
 
 type AutoscaledResource struct {
 	*BaseAwsResource
-	scaledResource         ScaledResource
-	wrappedResource        AwsResource
+	scaledResource  ScaledResource
+	wrappedResource AwsResource
 }
 
 func NewWrappedResource(address string, scaledResource ScaledResource, wrappedResource AwsResource) *AutoscaledResource {

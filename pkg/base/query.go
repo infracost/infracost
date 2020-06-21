@@ -8,6 +8,7 @@ import (
 
 	"plancosts/pkg/config"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -70,6 +71,7 @@ func GetQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
 func RunQueries(resource Resource) (ResourceQueryResultMap, error) {
 	queryKeys, queries := batchQueries(resource)
 
+	log.Infof("Getting pricing details from %s for %s", config.Config.PriceListApiEndpoint, resource.Address())
 	queryResults, err := GetQueryResults(queries)
 	if err != nil {
 		return ResourceQueryResultMap{}, err

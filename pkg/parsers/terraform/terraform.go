@@ -1,13 +1,18 @@
 package terraform
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 
 	"plancosts/internal/terraform/aws"
 	"plancosts/pkg/base"
 
+	"github.com/fatih/color"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -33,18 +38,77 @@ func createResource(resourceType string, address string, rawValues map[string]in
 	return nil
 }
 
-func ParsePlanFile(filePath string) ([]base.Resource, error) {
-	resourceMap := make(map[string]base.Resource)
+type TerraformOptions struct {
+	TerraformDir string
+}
 
-	planFile, err := os.Open(filePath)
+func terraformCommand(options *TerraformOptions, args ...string) ([]byte, error) {
+	cmd := exec.Command("terraform", args...)
+	log.Info(color.HiYellowString("Running command: %s", cmd.String()))
+	cmd.Dir = options.TerraformDir
+
+	var outbuf bytes.Buffer
+	mw := io.MultiWriter(log.StandardLogger().WriterLevel(log.DebugLevel), &outbuf)
+	cmd.Stdout = mw
+	cmd.Stderr = log.StandardLogger().WriterLevel(log.ErrorLevel)
+	err := cmd.Run()
+	return outbuf.Bytes(), err
+}
+
+func LoadPlanJSON(path string) ([]byte, error) {
+	planFile, err := os.Open(path)
 	if err != nil {
-		return []base.Resource{}, err
+		return []byte{}, err
 	}
 	defer planFile.Close()
-	planFileBytes, _ := ioutil.ReadAll(planFile)
+	out, err := ioutil.ReadAll(planFile)
+	if err != nil {
+		return []byte{}, err
+	}
+	return out, nil
+}
 
-	providerConfig := gjson.GetBytes(planFileBytes, "configuration.provider_config")
-	terraformResources := gjson.GetBytes(planFileBytes, "planned_values.root_module.resources")
+func GeneratePlanJSON(projectPath string, planPath string) ([]byte, error) {
+	var err error
+
+	opts := &TerraformOptions{
+		TerraformDir: projectPath,
+	}
+
+	if planPath == "" {
+		_, err = terraformCommand(opts, "init")
+		if err != nil {
+			return []byte{}, err
+		}
+
+		planfile, err := ioutil.TempFile(os.TempDir(), "tfplan")
+		if err != nil {
+			return []byte{}, err
+		}
+		defer os.Remove(planfile.Name())
+
+		_, err = terraformCommand(opts, "plan", "-input=false", "-lock=false", fmt.Sprintf("-out=%s", planfile.Name()))
+		if err != nil {
+			return []byte{}, err
+		}
+
+		planPath = planfile.Name()
+	}
+
+	out, err := terraformCommand(opts, "show", "-json", planPath)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return out, nil
+}
+
+func ParsePlanJSON(planJSON []byte) ([]base.Resource, error) {
+	resourceMap := make(map[string]base.Resource)
+
+	providerConfig := gjson.GetBytes(planJSON, "configuration.provider_config")
+	terraformResources := gjson.GetBytes(planJSON, "planned_values.root_module.resources")
+
 	for _, terraformResource := range terraformResources.Array() {
 		address := terraformResource.Get("address").String()
 		resourceType := terraformResource.Get("type").String()
@@ -57,7 +121,7 @@ func ParsePlanFile(filePath string) ([]base.Resource, error) {
 
 	for _, resource := range resourceMap {
 		query := fmt.Sprintf(`configuration.root_module.resources.#(address="%s")`, resource.Address())
-		terraformResourceConfig := gjson.GetBytes(planFileBytes, query)
+		terraformResourceConfig := gjson.GetBytes(planJSON, query)
 		addReferences(resource, terraformResourceConfig, resourceMap)
 	}
 
