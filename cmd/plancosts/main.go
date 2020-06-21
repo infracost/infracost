@@ -55,19 +55,19 @@ func main() {
 			log.SetLevel(logLevel)
 
 			if c.String("tfplan-json") != "" && c.String("tfplan") != "" {
-				color.Red("Please only provide one of either a Terraform Plan JSON file (tfplan-json) or a Terraform Plan file (tfplan)")
+				color.HiRed("Please only provide one of either a Terraform Plan JSON file (tfplan-json) or a Terraform Plan file (tfplan)")
 				_ = cli.ShowAppHelp(c)
 				os.Exit(1)
 			}
 
 			if c.String("tfplan") != "" && c.String("tfpath") == "" {
-				color.Red("Please provide a path to the Terrafrom project (tfpath) if providing a Terraform Plan file (tfplan)\n\n")
+				color.HiRed("Please provide a path to the Terrafrom project (tfpath) if providing a Terraform Plan file (tfplan)\n\n")
 				_ = cli.ShowAppHelp(c)
 				os.Exit(1)
 			}
 
 			if c.String("tfplan-json") == "" && c.String("tfpath") == "" {
-				color.Red("Please provide either the path to the Terrafrom project (tfpath) or a Terraform Plan JSON file (tfplan-json)")
+				color.HiRed("Please provide either the path to the Terrafrom project (tfpath) or a Terraform Plan JSON file (tfplan-json)")
 				_ = cli.ShowAppHelp(c)
 				os.Exit(1)
 			}
