@@ -1,4 +1,4 @@
-package aws_terraform
+package aws
 
 import (
 	"fmt"
@@ -44,7 +44,6 @@ type AutoscaledResource struct {
 	*BaseAwsResource
 	scaledResource         ScaledResource
 	wrappedResource        AwsResource
-	wrappedPriceComponents []base.PriceComponent
 }
 
 func NewWrappedResource(address string, scaledResource ScaledResource, wrappedResource AwsResource) *AutoscaledResource {

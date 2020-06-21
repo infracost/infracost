@@ -1,4 +1,4 @@
-package aws_terraform
+package aws
 
 import (
 	"fmt"
@@ -127,16 +127,16 @@ func NewEc2Instance(address string, region string, rawValues map[string]interfac
 	}
 
 	subResources := make([]base.Resource, 0)
-	root_block_devices := r.RawValues()["root_block_device"].([]interface{})
-	if len(root_block_devices) > 0 {
+	rootBlockDevices := r.RawValues()["root_block_device"].([]interface{})
+	if len(rootBlockDevices) > 0 {
 		address := fmt.Sprintf("%s.root_block_device", r.Address())
-		subResources = append(subResources, NewEc2BlockDevice(address, r.region, root_block_devices[0].(map[string]interface{})))
+		subResources = append(subResources, NewEc2BlockDevice(address, r.region, rootBlockDevices[0].(map[string]interface{})))
 	}
 
-	ebs_block_devices := r.RawValues()["ebs_block_device"].([]interface{})
-	for i, ebs_block_device := range ebs_block_devices {
+	ebsBlockDevices := r.RawValues()["ebs_block_device"].([]interface{})
+	for i, ebsBlockDevice := range ebsBlockDevices {
 		address := fmt.Sprintf("%s.ebs_block_device[%d]", r.Address(), i)
-		subResources = append(subResources, NewEc2BlockDevice(address, r.region, ebs_block_device.(map[string]interface{})))
+		subResources = append(subResources, NewEc2BlockDevice(address, r.region, ebsBlockDevice.(map[string]interface{})))
 	}
 	r.BaseAwsResource.subResources = subResources
 

@@ -1,4 +1,4 @@
-package aws_terraform
+package aws
 
 import (
 	"plancosts/pkg/base"

@@ -43,13 +43,10 @@ func main() {
 			switch c.String("output") {
 			case "table":
 				output, err = outputs.ToTable(resourceCostBreakdowns)
-				break
 			case "json":
 				output, err = outputs.ToJSON(resourceCostBreakdowns)
-				break
 			default:
-				cli.ShowAppHelp(c)
-				return nil
+				err = cli.ShowAppHelp(c)
 			}
 			if err != nil {
 				return err

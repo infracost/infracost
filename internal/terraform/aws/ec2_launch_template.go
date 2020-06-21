@@ -1,16 +1,16 @@
-package aws_terraform
+package aws
 
 import (
 	"fmt"
 	"plancosts/pkg/base"
 )
 
-type Ec2LaunchConfigurationHours struct {
+type Ec2LaunchTemplateHours struct {
 	*BaseAwsPriceComponent
 }
 
-func NewEc2LaunchConfigurationHours(name string, resource *Ec2LaunchConfiguration) *Ec2LaunchConfigurationHours {
-	c := &Ec2LaunchConfigurationHours{
+func NewEc2LaunchTemplateHours(name string, resource *Ec2LaunchTemplate) *Ec2LaunchTemplateHours {
+	c := &Ec2LaunchTemplateHours{
 		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "hour"),
 	}
 
@@ -25,31 +25,29 @@ func NewEc2LaunchConfigurationHours(name string, resource *Ec2LaunchConfiguratio
 
 	c.valueMappings = []base.ValueMapping{
 		{FromKey: "instance_type", ToKey: "instanceType"},
-		{FromKey: "placement_tenancy", ToKey: "tenancy"},
 	}
 
 	return c
 }
 
-type Ec2LaunchConfiguration struct {
+type Ec2LaunchTemplate struct {
 	*BaseAwsResource
 }
 
-func NewEc2LaunchConfiguration(address string, region string, rawValues map[string]interface{}) *Ec2LaunchConfiguration {
-	r := &Ec2LaunchConfiguration{
+func NewEc2LaunchTemplate(address string, region string, rawValues map[string]interface{}) *Ec2LaunchTemplate {
+	r := &Ec2LaunchTemplate{
 		NewBaseAwsResource(address, region, rawValues),
 	}
-
 	r.BaseAwsResource.priceComponents = []base.PriceComponent{
-		NewEc2LaunchConfigurationHours("Instance hours", r),
+		NewEc2LaunchTemplateHours("Instance hours", r),
 	}
 
 	subResources := make([]base.Resource, 0)
-	block_device_mappings := r.rawValues["block_device_mappings"]
-	if block_device_mappings != nil {
-		for i, block_device_mapping := range block_device_mappings.([]interface{}) {
+	blockDeviceMappings := r.rawValues["block_device_mappings"]
+	if blockDeviceMappings != nil {
+		for i, blockDeviceMapping := range blockDeviceMappings.([]interface{}) {
 			address := fmt.Sprintf("%s.block_device_mappings[%d]", r.Address(), i)
-			rawValues := block_device_mapping.(map[string]interface{})["ebs"].([]interface{})[0].(map[string]interface{})
+			rawValues := blockDeviceMapping.(map[string]interface{})["ebs"].([]interface{})[0].(map[string]interface{})
 			subResources = append(subResources, NewEc2BlockDevice(address, r.region, rawValues))
 		}
 	}
@@ -57,7 +55,6 @@ func NewEc2LaunchConfiguration(address string, region string, rawValues map[stri
 
 	return r
 }
-
-func (r *Ec2LaunchConfiguration) HasCost() bool {
+func (r *Ec2LaunchTemplate) HasCost() bool {
 	return false
 }

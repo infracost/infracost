@@ -60,9 +60,7 @@ func GetQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
 		return results, err
 	}
 
-	for _, result := range gjson.ParseBytes(body).Array() {
-		results = append(results, result)
-	}
+	results = append(results, gjson.ParseBytes(body).Array()...)
 
 	return results, nil
 }
@@ -107,14 +105,14 @@ func batchQueries(resource Resource) ([]queryKey, []GraphQLQuery) {
 
 // Unpack the query results into a map so we can find by resource and price component
 func unpackQueryResults(queryKeys []queryKey, queryResults []gjson.Result) ResourceQueryResultMap {
-	resourceResults := make(ResourceQueryResultMap, 0)
+	resourceResults := make(ResourceQueryResultMap)
 
 	for i, queryResult := range queryResults {
 		resource := queryKeys[i].Resource
 		priceComponent := queryKeys[i].PriceComponent
 
 		if _, ok := resourceResults[&resource]; !ok {
-			resourceResults[&resource] = make(map[*PriceComponent]gjson.Result, 0)
+			resourceResults[&resource] = make(map[*PriceComponent]gjson.Result)
 		}
 		resourceResults[&resource][&priceComponent] = queryResult
 	}

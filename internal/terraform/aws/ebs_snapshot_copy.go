@@ -1,4 +1,4 @@
-package aws_terraform
+package aws
 
 import (
 	"plancosts/pkg/base"
@@ -6,12 +6,12 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type EbsSnapshotGB struct {
+type EbsSnapshotCopyGB struct {
 	*BaseAwsPriceComponent
 }
 
-func NewEbsSnapshotGB(name string, resource *EbsSnapshot) *EbsSnapshotGB {
-	c := &EbsSnapshotGB{
+func NewEbsSnapshotCopyGB(name string, resource *EbsSnapshotCopy) *EbsSnapshotCopyGB {
+	c := &EbsSnapshotCopyGB{
 		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "month"),
 	}
 
@@ -23,10 +23,10 @@ func NewEbsSnapshotGB(name string, resource *EbsSnapshot) *EbsSnapshotGB {
 	return c
 }
 
-func (c *EbsSnapshotGB) HourlyCost() decimal.Decimal {
+func (c *EbsSnapshotCopyGB) HourlyCost() decimal.Decimal {
 	hourlyCost := c.BaseAwsPriceComponent.HourlyCost()
 	size := decimal.NewFromInt(int64(DefaultVolumeSize))
-	volumeGBPriceComponent := base.GetPriceComponent(c.AwsResource().References()["volume_id"], "GB")
+	volumeGBPriceComponent := base.GetPriceComponent(c.AwsResource().References()["source_snapshot_id"].References()["volume_id"], "GB")
 	if volumeGBPriceComponent == nil {
 		sizeVal := volumeGBPriceComponent.(*EbsVolumeGB).AwsResource().RawValues()["size"]
 		if sizeVal != nil {
@@ -36,16 +36,16 @@ func (c *EbsSnapshotGB) HourlyCost() decimal.Decimal {
 	return hourlyCost.Mul(size)
 }
 
-type EbsSnapshot struct {
+type EbsSnapshotCopy struct {
 	*BaseAwsResource
 }
 
-func NewEbsSnapshot(address string, region string, rawValues map[string]interface{}) *EbsSnapshot {
-	r := &EbsSnapshot{
+func NewEbsSnapshotCopy(address string, region string, rawValues map[string]interface{}) *EbsSnapshotCopy {
+	r := &EbsSnapshotCopy{
 		BaseAwsResource: NewBaseAwsResource(address, region, rawValues),
 	}
 	r.BaseAwsResource.priceComponents = []base.PriceComponent{
-		NewEbsSnapshotGB("GB", r),
+		NewEbsSnapshotCopyGB("GB", r),
 	}
 	return r
 }

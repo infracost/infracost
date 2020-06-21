@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"plancosts/internal/aws_terraform"
+	"plancosts/internal/terraform/aws"
 	"plancosts/pkg/base"
 
 	"github.com/tidwall/gjson"
@@ -16,25 +16,25 @@ func createResource(resourceType string, address string, rawValues map[string]in
 
 	switch resourceType {
 	case "aws_instance":
-		return aws_terraform.NewEc2Instance(address, awsRegion, rawValues)
+		return aws.NewEc2Instance(address, awsRegion, rawValues)
 	case "aws_ebs_volume":
-		return aws_terraform.NewEbsVolume(address, awsRegion, rawValues)
+		return aws.NewEbsVolume(address, awsRegion, rawValues)
 	case "aws_ebs_snapshot":
-		return aws_terraform.NewEbsSnapshot(address, awsRegion, rawValues)
+		return aws.NewEbsSnapshot(address, awsRegion, rawValues)
 	case "aws_ebs_snapshot_copy":
-		return aws_terraform.NewEbsSnapshotCopy(address, awsRegion, rawValues)
+		return aws.NewEbsSnapshotCopy(address, awsRegion, rawValues)
 	case "aws_launch_configuration":
-		return aws_terraform.NewEc2LaunchConfiguration(address, awsRegion, rawValues)
+		return aws.NewEc2LaunchConfiguration(address, awsRegion, rawValues)
 	case "aws_launch_template":
-		return aws_terraform.NewEc2LaunchTemplate(address, awsRegion, rawValues)
+		return aws.NewEc2LaunchTemplate(address, awsRegion, rawValues)
 	case "aws_autoscaling_group":
-		return aws_terraform.NewEc2AutoscalingGroup(address, awsRegion, rawValues)
+		return aws.NewEc2AutoscalingGroup(address, awsRegion, rawValues)
 	}
 	return nil
 }
 
 func ParsePlanFile(filePath string) ([]base.Resource, error) {
-	resourceMap := make(map[string]base.Resource, 0)
+	resourceMap := make(map[string]base.Resource)
 
 	planFile, err := os.Open(filePath)
 	if err != nil {
