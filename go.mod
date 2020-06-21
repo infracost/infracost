@@ -3,6 +3,8 @@ module plancosts
 go 1.14
 
 require (
+	github.com/joho/godotenv v1.3.0
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/shopspring/decimal v1.2.0
 	github.com/tidwall/gjson v1.6.0

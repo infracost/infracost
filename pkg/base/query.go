@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"plancosts/pkg/config"
+
 	"github.com/tidwall/gjson"
 )
 
@@ -49,7 +51,7 @@ func GetQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
 	}
 
 	client := http.Client{}
-	resp, err := client.Post("http://localhost:4000", "application/json", bytes.NewBuffer([]byte(queriesBody)))
+	resp, err := client.Post(config.Config.PriceListApiEndpoint, "application/json", bytes.NewBuffer([]byte(queriesBody)))
 	if err != nil {
 		return results, err
 	}
