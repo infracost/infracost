@@ -8,6 +8,8 @@ Currently this supports the following On-Demand pricing for the following AWS re
  * `aws_ebs_snapshot`
  * `aws_ebs_snapshot_copy`
  * `aws_autoscaling_group`
+ * `aws_elb`
+ * `aws_lb`
 
 This does not supports estimates for any costs that are not specified in the Terraform configuration, e.g. S3 storage costs, data out costs, etc.
 

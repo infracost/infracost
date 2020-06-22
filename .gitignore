@@ -9,3 +9,6 @@
 
 # Local env settings
 .env.local
+
+# Terraform artifacts
+.terraform
