@@ -42,17 +42,17 @@ You can also deploy the price list API yourself and specify it by setting the `P
 
 Generate a cost breakdown from a Terraform directory:
 ```sh
-plancosts --tfdir examples/terraform-example
+plancosts --tfdir examples/terraform
 ```
 
 Output the cost breakdown in JSON format:
 ```sh
-plancosts --tfdir examples/terraform-example --output json
+plancosts --tfdir examples/terraform --output json
 ```
 
 Generate a cost breakdown from a Terraform plan JSON file:
 ```sh
-terraform plan -out plan.save examples/terraform-example
+terraform plan -out plan.save examples/terraform
 terraform show -json plan.save > plan.json
 
 plancosts --tfplan-json plan.json
@@ -60,9 +60,9 @@ plancosts --tfplan-json plan.json
 
 Generate a cost breakdown from a Terraform plan file:
 ```sh
-terraform plan -out plan.save examples/terraform-example
+terraform plan -out plan.save examples/terraform
 
-plancosts --tfplan plan.save --tfdir examples/terraform-example
+plancosts --tfplan plan.save --tfdir examples/terraform
 ```
 
 ## Development
