@@ -44,7 +44,7 @@ type TerraformOptions struct {
 
 func terraformCommand(options *TerraformOptions, args ...string) ([]byte, error) {
 	cmd := exec.Command("terraform", args...)
-	log.Info(color.HiYellowString("Running command: %s", cmd.String()))
+	log.Info(color.HiGreenString("Running command: %s", cmd.String()))
 	cmd.Dir = options.TerraformDir
 
 	var outbuf bytes.Buffer
