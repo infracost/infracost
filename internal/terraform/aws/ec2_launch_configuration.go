@@ -45,13 +45,16 @@ func NewEc2LaunchConfiguration(address string, region string, rawValues map[stri
 	}
 
 	subResources := make([]base.Resource, 0)
-	blockDeviceMappings := r.rawValues["block_device_mappings"]
-	if blockDeviceMappings != nil {
-		for i, blockDeviceMapping := range blockDeviceMappings.([]interface{}) {
-			address := fmt.Sprintf("%s.block_device_mappings[%d]", r.Address(), i)
-			rawValues := blockDeviceMapping.(map[string]interface{})["ebs"].([]interface{})[0].(map[string]interface{})
-			subResources = append(subResources, NewEc2BlockDevice(address, r.region, rawValues))
-		}
+	rootBlockDevices := r.RawValues()["root_block_device"].([]interface{})
+	if len(rootBlockDevices) > 0 {
+		address := fmt.Sprintf("%s.root_block_device", r.Address())
+		subResources = append(subResources, NewEc2BlockDevice(address, r.region, rootBlockDevices[0].(map[string]interface{})))
+	}
+
+	ebsBlockDevices := r.RawValues()["ebs_block_device"].([]interface{})
+	for i, ebsBlockDevice := range ebsBlockDevices {
+		address := fmt.Sprintf("%s.ebs_block_device[%d]", r.Address(), i)
+		subResources = append(subResources, NewEc2BlockDevice(address, r.region, ebsBlockDevice.(map[string]interface{})))
 	}
 	r.BaseAwsResource.subResources = subResources
 
