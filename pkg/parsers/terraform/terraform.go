@@ -68,11 +68,11 @@ func LoadPlanJSON(path string) ([]byte, error) {
 	return out, nil
 }
 
-func GeneratePlanJSON(projectPath string, planPath string) ([]byte, error) {
+func GeneratePlanJSON(tfdir string, planPath string) ([]byte, error) {
 	var err error
 
 	opts := &TerraformOptions{
-		TerraformDir: projectPath,
+		TerraformDir: tfdir,
 	}
 
 	if planPath == "" {

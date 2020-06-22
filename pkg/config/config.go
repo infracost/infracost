@@ -11,8 +11,8 @@ import (
 
 // ConfigSpec contains mapping of environment variable names to config values
 type ConfigSpec struct {
-	Logger               *logrus.Logger
-	PriceListApiEndpoint string `envconfig:"PLAN_COSTS_PRICE_LIST_API_ENDPOINT"  required:"true"  default:"http://localhost:4000/graphql"`
+	Logger *logrus.Logger
+	ApiUrl string `envconfig:"PLANCOSTS_API_URL"  required:"true"  default:"http://localhost:4000"`
 }
 
 func (c *ConfigSpec) SetLogger(logger *logrus.Logger) {

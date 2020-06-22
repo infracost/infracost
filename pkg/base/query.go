@@ -129,7 +129,7 @@ func (r *GraphQLQueryRunner) unpackQueryResults(queryKeys []queryKey, queryResul
 func (r *GraphQLQueryRunner) RunQueries(resource Resource) (ResourceQueryResultMap, error) {
 	queryKeys, queries := r.batchQueries(resource)
 
-	log.Infof("Getting pricing details from %s for %s", config.Config.PriceListApiEndpoint, resource.Address())
+	log.Debugf("Getting pricing details from %s for %s", config.Config.ApiUrl, resource.Address())
 	queryResults, err := r.getQueryResults(queries)
 	if err != nil {
 		return ResourceQueryResultMap{}, err
