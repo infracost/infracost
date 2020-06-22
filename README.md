@@ -10,6 +10,7 @@ Currently this supports the following On-Demand pricing for the following AWS re
  * `aws_autoscaling_group`
  * `aws_elb`
  * `aws_lb`
+ * `aws_nat_gateway`
 
 This does not supports estimates for any costs that are not specified in the Terraform configuration, e.g. S3 storage costs, data out costs, etc.
 
@@ -27,6 +28,7 @@ This is an early stage project, pull requests to add resources/fix bugs are welc
 
 To download the latest release:
 
+TODO: add release
 ```
 curl --silent --location "https://github.com/aliscott/eksctl/plancosts/latest/download/plancosts_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/plancosts /usr/local/bin
@@ -66,17 +68,17 @@ plancosts --tfplan plan.save --tfdir examples/terraform-example
 ## Development
 
 Install dependencies
-```
+```sh
 make deps
 ```
 
 Run the code
-```
+```sh
 make run ARGS="--tfdir <Terraform Dir>"
 ```
 
 Run tests:
-```
+```sh
 make test
 ```
 

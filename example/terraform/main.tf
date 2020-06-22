@@ -121,3 +121,12 @@ resource "aws_alb" "alb1" {
 resource "aws_lb" "nlb1" {
   load_balancer_type = "network"
 }
+
+resource "aws_eip" "nat1" {
+  vpc = true
+}
+
+resource "aws_nat_gateway" "nat" {
+  allocation_id = aws_eip.nat1.id
+  subnet_id     = tolist(data.aws_subnet_ids.all.ids)[0]
+}

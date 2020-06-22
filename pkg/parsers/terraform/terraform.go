@@ -40,6 +40,8 @@ func createResource(resourceType string, address string, rawValues map[string]in
 		return aws.NewElb(address, awsRegion, rawValues, false)
 	case "aws_alb": // alias for aws_lb
 		return aws.NewElb(address, awsRegion, rawValues, false)
+	case "aws_nat_gateway": // alias for aws_lb
+		return aws.NewNatGateway(address, awsRegion, rawValues)
 	}
 	return nil
 }
