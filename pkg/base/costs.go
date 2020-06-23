@@ -45,11 +45,11 @@ func setPriceComponentPrice(priceComponent PriceComponent, queryResult gjson.Res
 	products := queryResult.Get("data.products").Array()
 	var price decimal.Decimal
 	if len(products) == 0 {
-		log.Warnf("No prices found for %s, using 0.00", priceComponent.Resource().Address())
+		log.Warnf("No prices found for %s %s, using 0.00", priceComponent.Resource().Address(), priceComponent.Name())
 		price = decimal.Zero
 	} else {
 		if len(products) > 1 {
-			log.Warnf("Multiple prices found for %s, using the first price", priceComponent.Resource().Address())
+			log.Warnf("Multiple prices found for %s %s, using the first price", priceComponent.Resource().Address(), priceComponent.Name())
 		}
 		priceStr := products[0].Get("onDemandPricing.0.priceDimensions.0.pricePerUnit.USD").String()
 		price, _ = decimal.NewFromString(priceStr)

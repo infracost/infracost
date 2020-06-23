@@ -105,6 +105,34 @@ resource "aws_autoscaling_group" "lt1" {
   }
 }
 
+resource "aws_db_instance" "db_mysql" {
+  allocated_storage    = 20
+  storage_type         = "standard"
+  engine               = "mysql"
+  instance_class       = "db.t2.micro"
+}
+
+resource "aws_db_instance" "db_postgresql" {
+  allocated_storage    = 20
+  engine               = "PostgreSQL"
+  instance_class       = "db.t2.small"
+}
+
+resource "aws_db_instance" "db_postgresql_iops" {
+  allocated_storage    = 20
+  engine               = "PostgreSQL"
+  instance_class       = "db.t2.small"
+  storage_type         = "io1"
+  iops                 = 400
+}
+
+resource "aws_db_instance" "db_sqlserver" {
+  allocated_storage    = 20
+  engine               = "sqlserver-se"
+  multi_az             = true
+  instance_class       = "db.t3.xlarge"
+}
+
 resource "aws_elb" "elb1" {
   listener {
     instance_port     = 80

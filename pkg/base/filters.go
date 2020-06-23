@@ -45,24 +45,16 @@ func MergeFilters(filtersets ...[]Filter) []Filter {
 func MapFilters(valueMappings []ValueMapping, values map[string]interface{}) []Filter {
 	mappedFilters := []Filter{}
 	for fromKey, fromVal := range values {
-		var valueMapping *ValueMapping
 		for _, v := range valueMappings {
 			if v.FromKey == fromKey {
-				valueMapping = &v
-				break
+				toVal := v.MappedValue(fromVal)
+				if toVal != "" {
+					mappedFilters = append(mappedFilters, Filter{
+						Key:   v.ToKey,
+						Value: toVal,
+					})
+				}
 			}
-		}
-
-		if valueMapping == nil {
-			continue
-		}
-
-		toVal := valueMapping.MappedValue(fromVal)
-		if toVal != "" {
-			mappedFilters = append(mappedFilters, Filter{
-				Key:   valueMapping.ToKey,
-				Value: toVal,
-			})
 		}
 	}
 	return mappedFilters

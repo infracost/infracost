@@ -34,6 +34,8 @@ func createResource(resourceType string, address string, rawValues map[string]in
 		return aws.NewEc2LaunchTemplate(address, awsRegion, rawValues)
 	case "aws_autoscaling_group":
 		return aws.NewEc2AutoscalingGroup(address, awsRegion, rawValues)
+	case "aws_db_instance":
+		return aws.NewRdsInstance(address, awsRegion, rawValues)
 	case "aws_elb":
 		return aws.NewElb(address, awsRegion, rawValues, true) // is classic
 	case "aws_lb":

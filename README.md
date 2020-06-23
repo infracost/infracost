@@ -8,6 +8,7 @@ Currently this supports the following On-Demand pricing for the following AWS re
  * `aws_ebs_snapshot`
  * `aws_ebs_snapshot_copy`
  * `aws_autoscaling_group`
+ * `aws_db_instance`
  * `aws_elb`
  * `aws_lb`
  * `aws_nat_gateway`
@@ -36,7 +37,7 @@ sudo mv /tmp/plancosts /usr/local/bin
 
 ## Usage
 
-By default prices are retrieved from a [<TODO link to price list API repo>] deployed at <TODO once deployed>. This is running on minimal infrastructure so is not guaranteed to always be available.
+By default prices are retrieved from a [<TODO link to price list API repo>] deployed at [https://aws-prices-graphql.alistair.scot/graphql](https://aws-prices-graphql.alistair.scot/graphql). This is running on minimal infrastructure so is not guaranteed to always be available.
 
 You can also deploy the price list API yourself and specify it by setting the `PLANCOSTS_API_URL` env variable or passing the `--api-url` option.
 
