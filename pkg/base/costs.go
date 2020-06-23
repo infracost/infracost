@@ -2,6 +2,7 @@ package base
 
 import (
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -41,8 +42,18 @@ func createPriceComponentCost(priceComponent PriceComponent, queryResult gjson.R
 }
 
 func setPriceComponentPrice(priceComponent PriceComponent, queryResult gjson.Result) {
-	priceStr := queryResult.Get("data.products.0.onDemandPricing.0.priceDimensions.0.pricePerUnit.USD").String()
-	price, _ := decimal.NewFromString(priceStr)
+	products := queryResult.Get("data.products").Array()
+	var price decimal.Decimal
+	if len(products) == 0 {
+		log.Warnf("No prices found for %s, using 0.00", priceComponent.Resource().Address())
+		price = decimal.Zero
+	} else {
+		if len(products) > 1 {
+			log.Warnf("Multiple prices found for %s, using the first price", priceComponent.Resource().Address())
+		}
+		priceStr := products[0].Get("onDemandPricing.0.priceDimensions.0.pricePerUnit.USD").String()
+		price, _ = decimal.NewFromString(priceStr)
+	}
 	priceComponent.SetPrice(price)
 }
 

@@ -18,6 +18,7 @@ func NewEbsSnapshotGB(name string, resource *EbsSnapshot) *EbsSnapshotGB {
 	c.defaultFilters = []base.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "Storage Snapshot"},
+		{Key: "usagetype", Value: "EBS:SnapshotUsage"},
 	}
 
 	return c
