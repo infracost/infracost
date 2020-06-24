@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 
 	"infracost/internal/terraform/aws"
 	"infracost/pkg/base"
@@ -17,7 +18,19 @@ import (
 )
 
 func createResource(resourceType string, address string, rawValues map[string]interface{}, providerConfig gjson.Result) base.Resource {
-	awsRegion := providerConfig.Get("aws.expressions.region.constant_value").String()
+	awsRegion := "us-east-1" // Use as fallback
+
+	// Find region from terraform provider config
+	awsRegionConfig := providerConfig.Get("aws.expressions.region.constant_value").String()
+	if awsRegionConfig != "" {
+		awsRegion = awsRegionConfig
+	}
+
+	// Override the region with the region from the arn if it
+	arn := rawValues["arn"]
+	if arn != nil {
+		awsRegion = strings.Split(arn.(string), ":")[3]
+	}
 
 	switch resourceType {
 	case "aws_instance":
