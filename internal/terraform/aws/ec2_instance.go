@@ -108,7 +108,16 @@ func NewEc2InstanceHours(name string, resource *Ec2Instance) *Ec2InstanceHours {
 
 	c.valueMappings = []base.ValueMapping{
 		{FromKey: "instance_type", ToKey: "instanceType"},
-		{FromKey: "tenancy", ToKey: "tenancy"},
+		{
+			FromKey: "tenancy",
+			ToKey:   "tenancy",
+			ToValueFn: func(fromValue interface{}) string {
+				if fmt.Sprintf("%v", fromValue) == "dedicated" {
+					return "Dedicated"
+				}
+				return "Shared"
+			},
+		},
 	}
 
 	return c

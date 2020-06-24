@@ -25,7 +25,16 @@ func NewEc2LaunchConfigurationHours(name string, resource *Ec2LaunchConfiguratio
 
 	c.valueMappings = []base.ValueMapping{
 		{FromKey: "instance_type", ToKey: "instanceType"},
-		{FromKey: "placement_tenancy", ToKey: "tenancy"},
+		{
+			FromKey: "placement_tenancy",
+			ToKey:   "tenancy",
+			ToValueFn: func(fromValue interface{}) string {
+				if fmt.Sprintf("%v", fromValue) == "dedicated" {
+					return "Dedicated"
+				}
+				return "Shared"
+			},
+		},
 	}
 
 	return c
