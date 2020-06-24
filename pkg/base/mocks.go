@@ -13,7 +13,6 @@ type testPriceComponent struct {
 	filters    []Filter
 	price      decimal.Decimal
 	hourlyCost decimal.Decimal
-	skipQuery  bool
 }
 
 func (c *testPriceComponent) Name() string {
@@ -34,10 +33,6 @@ func (c *testPriceComponent) SetPrice(price decimal.Decimal) {
 
 func (c *testPriceComponent) HourlyCost() decimal.Decimal {
 	return c.hourlyCost
-}
-
-func (c *testPriceComponent) SkipQuery() bool {
-	return c.skipQuery
 }
 
 type testResource struct {
@@ -91,9 +86,6 @@ func (r *testQueryRunner) RunQueries(resource Resource) (ResourceQueryResultMap,
 	results := make(map[*Resource]map[*PriceComponent]gjson.Result)
 
 	for _, priceComponent := range resource.PriceComponents() {
-		if priceComponent.SkipQuery() {
-			continue
-		}
 		if _, ok := results[&resource]; !ok {
 			results[&resource] = make(map[*PriceComponent]gjson.Result)
 		}
@@ -102,9 +94,6 @@ func (r *testQueryRunner) RunQueries(resource Resource) (ResourceQueryResultMap,
 
 	for _, subResource := range resource.SubResources() {
 		for _, priceComponent := range subResource.PriceComponents() {
-			if priceComponent.SkipQuery() {
-				continue
-			}
 			if _, ok := results[&resource]; !ok {
 				results[&resource] = make(map[*PriceComponent]gjson.Result)
 			}

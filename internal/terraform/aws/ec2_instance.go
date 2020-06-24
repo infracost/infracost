@@ -133,7 +133,7 @@ func NewEc2Instance(address string, region string, rawValues map[string]interfac
 		subResources = append(subResources, NewEc2BlockDevice(address, r.region, rootBlockDevices[0].(map[string]interface{})))
 	}
 
-	if (r.RawValues()["ebs_block_device"] != nil) {
+	if r.RawValues()["ebs_block_device"] != nil {
 		ebsBlockDevices := r.RawValues()["ebs_block_device"].([]interface{})
 		for i, ebsBlockDevice := range ebsBlockDevices {
 			address := fmt.Sprintf("%s.ebs_block_device[%d]", r.Address(), i)

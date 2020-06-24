@@ -8,7 +8,6 @@ type PriceComponent interface {
 	Filters() []Filter
 	SetPrice(price decimal.Decimal)
 	HourlyCost() decimal.Decimal
-	SkipQuery() bool
 }
 
 type Resource interface {

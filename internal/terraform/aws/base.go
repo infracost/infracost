@@ -108,10 +108,6 @@ func (c *BaseAwsPriceComponent) HourlyCost() decimal.Decimal {
 	return c.price.Mul(timeUnitMultiplier)
 }
 
-func (c *BaseAwsPriceComponent) SkipQuery() bool {
-	return false
-}
-
 type BaseAwsResource struct {
 	address         string
 	rawValues       map[string]interface{}
