@@ -55,7 +55,7 @@ infracost --tfdir examples/terraform/plan.json
 To generate the plan JSON file you can run:
 ```
 terraform plan -out plan.save examples/terraform
-terraform show -json plan.save > plan.json
+terraform show -json plan.save > examples/terraform/plan.json
 ```
 
 Generate a cost breakdown from a Terraform directory:
