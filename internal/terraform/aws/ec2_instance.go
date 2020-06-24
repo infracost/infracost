@@ -136,17 +136,19 @@ func NewEc2Instance(address string, region string, rawValues map[string]interfac
 	}
 
 	subResources := make([]base.Resource, 0)
-	rootBlockDevices := r.RawValues()["root_block_device"].([]interface{})
-	if len(rootBlockDevices) > 0 {
-		address := fmt.Sprintf("%s.root_block_device", r.Address())
-		subResources = append(subResources, NewEc2BlockDevice(address, r.region, rootBlockDevices[0].(map[string]interface{})))
+	subResourceAddress := fmt.Sprintf("%s.root_block_device", r.Address())
+	if r.RawValues()["root_block_device"] != nil {
+		rootBlockDevices := r.RawValues()["root_block_device"].([]interface{})
+		subResources = append(subResources, NewEc2BlockDevice(subResourceAddress, r.region, rootBlockDevices[0].(map[string]interface{})))
+	} else {
+		subResources = append(subResources, NewEc2BlockDevice(subResourceAddress, r.region, make(map[string]interface{})))
 	}
 
 	if r.RawValues()["ebs_block_device"] != nil {
 		ebsBlockDevices := r.RawValues()["ebs_block_device"].([]interface{})
 		for i, ebsBlockDevice := range ebsBlockDevices {
-			address := fmt.Sprintf("%s.ebs_block_device[%d]", r.Address(), i)
-			subResources = append(subResources, NewEc2BlockDevice(address, r.region, ebsBlockDevice.(map[string]interface{})))
+			subResourceAddress := fmt.Sprintf("%s.ebs_block_device[%d]", r.Address(), i)
+			subResources = append(subResources, NewEc2BlockDevice(subResourceAddress, r.region, ebsBlockDevice.(map[string]interface{})))
 		}
 	}
 
