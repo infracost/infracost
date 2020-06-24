@@ -15,9 +15,10 @@ Currently this supports the following On-Demand pricing for the following AWS re
  * `aws_lb`
  * `aws_nat_gateway`
 
-This does not supports estimates for:
+This does not yet support estimates for:
   * any costs that are not specified in the Terraform configuration, e.g. S3 storage costs, data out costs.
   * Non-Linux EC2 instances such as Windows and RHEL, a lookup is needed to find the OS of AMIs.
+  * Any non On-Demand pricing, such as Reserved Instances, Spot Instances.
 
 This is an early stage project, pull requests to add resources/fix bugs are welcome.
 
