@@ -2,34 +2,7 @@
 
 Get cost hourly and monthly estimates for a Terraform project. Helps you quickly see the cost breakdown and compare different deployment options upfront.
 
-```
-$ infracost --tfdir examples/small_terraform
-INFO Running command: /usr/local/bin/terraform init
-INFO Running command: /usr/local/bin/terraform plan -input=false -lock=false -out=/tmp/tfplan511348398
-INFO Running command: /usr/local/bin/terraform show -json /tmp/tfplan511348398
-
-  NAME                             HOURLY COST  MONTHLY COST
-
-  aws_instance.web_app
-  ├─ Instance hours                     0.0104        7.5920
-  └─ root_block_device GB               0.0021        1.5000
-  Total                                 0.0125        9.0920
-
-  aws_ebs_volume.storage_option_1
-  ├─ GB                                 0.0026        1.8750
-  └─ IOPS                               0.0089        6.5000
-  Total                                 0.0115        8.3750
-
-  aws_ebs_volume.storage_option_2
-  └─ GB                                 0.0010        0.7500
-  Total                                 0.0010        0.7500
-
-  aws_nat_gateway.nat
-  └─ Hours                              0.0450       32.8500
-  Total                                 0.0450       32.8500
-
-  OVERALL TOTAL                         0.0700       51.0670
-```
+![Example screenshot](examples/screenshot.png)
 
 Currently this supports the following On-Demand pricing for the following AWS resources:
  * `aws_instance`
