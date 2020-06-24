@@ -1,4 +1,4 @@
-BINARY := infracost
+MakefileBINARY := infracost
 ENTRYPOINT := cmd/infracost/main.go
 
 .PHONY: deps run build windows linux darwin build_all clean test fmt lint
@@ -23,9 +23,15 @@ darwin:
 
 build_all: build windows linux darwin
 
+release: build_all
+	cd build; tar -czf $(BINARY)-windows-amd64.tar.gz $(BINARY)-windows-amd64
+	cd build; tar -czf $(BINARY)-linux-amd64.tar.gz $(BINARY)-linux-amd64
+	cd build; tar -czf $(BINARY)-darwin-amd64.tar.gz $(BINARY)-darwin-amd64
+
 clean:
 	go clean
 	rm -rf build/$(BINARY)*
+	rm -rf release/$(BINARY)*
 
 test:
 	go test ./... -v
