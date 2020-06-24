@@ -31,12 +31,11 @@ This is an early stage project, pull requests to add resources/fix bugs are welc
 
 ## Installation
 
-To download the latest release:
+To download and install the latest release:
 
-TODO: add release
-```
-curl --silent --location "https://github.com/aliscott/infracost/latest/download/infracost_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-sudo mv /tmp/infracost /usr/local/bin
+```sh
+curl --silent --location "https://github.com/aliscott/infracost/releases/latest/download/infracost-$(uname -s)-amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/infracost-$(uname -s)-amd64 /usr/local/bin/infracost
 ```
 
 ## Usage
@@ -74,12 +73,12 @@ infracost --tfplan plan.save --tfdir examples/terraform
 
 ## Development
 
-Install dependencies
+Install dependencies:
 ```sh
 make deps
 ```
 
-Run the code
+Run the code:
 ```sh
 make run ARGS="--tfdir <Terraform Dir>"
 ```
@@ -87,6 +86,11 @@ make run ARGS="--tfdir <Terraform Dir>"
 Run tests:
 ```sh
 make test
+```
+
+Build:
+```sh
+make build
 ```
 
 ## Contributing
