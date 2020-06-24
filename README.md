@@ -44,7 +44,7 @@ Currently this supports the following On-Demand pricing for the following AWS re
 
 This does not supports estimates for:
   * any costs that are not specified in the Terraform configuration, e.g. S3 storage costs, data out costs.
-  * Windows EC2 instances, Linux is assumed as a lookup is needed to find the OS of AMIs.
+  * Non-Linux EC2 instances such as Windows and RHEL, a lookup is needed to find the OS of AMIs.
 
 This is an early stage project, pull requests to add resources/fix bugs are welcome.
 
@@ -87,7 +87,7 @@ Generate a cost breakdown from a Terraform plan JSON file:
 terraform plan -out plan.save examples/terraform
 terraform show -json plan.save > plan.json
 
-plancosts --tfplan-json plan.json
+plancosts --tfjson plan.json
 ```
 
 Generate a cost breakdown from a Terraform plan file:

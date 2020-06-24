@@ -26,7 +26,7 @@ func main() {
 		EnableBashCompletion: true,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:      "tfplan-json",
+				Name:      "tfjson",
 				Usage:     "Path to Terraform Plan JSON file",
 				TakesFile: true,
 			},
@@ -76,8 +76,8 @@ func main() {
 				config.Config.ApiUrl = c.String("api-url")
 			}
 
-			if c.String("tfplan-json") != "" && c.String("tfplan") != "" {
-				color.HiRed("Please only provide one of either a Terraform Plan JSON file (tfplan-json) or a Terraform Plan file (tfplan)")
+			if c.String("tfjson") != "" && c.String("tfplan") != "" {
+				color.HiRed("Please only provide one of either a Terraform Plan JSON file (tfjson) or a Terraform Plan file (tfplan)")
 				_ = cli.ShowAppHelp(c)
 				os.Exit(1)
 			}
@@ -88,15 +88,15 @@ func main() {
 				os.Exit(1)
 			}
 
-			if c.String("tfplan-json") == "" && c.String("tfdir") == "" {
-				color.HiRed("Please provide either the path to the Terrafrom project (tfdir) or a Terraform Plan JSON file (tfplan-json)")
+			if c.String("tfjson") == "" && c.String("tfdir") == "" {
+				color.HiRed("Please provide either the path to the Terrafrom project (tfdir) or a Terraform Plan JSON file (tfjson)")
 				_ = cli.ShowAppHelp(c)
 				os.Exit(1)
 			}
 
 			var err error
-			if c.String("tfplan-json") != "" {
-				planJSON, err = terraform.LoadPlanJSON(c.String("tfplan-json"))
+			if c.String("tfjson") != "" {
+				planJSON, err = terraform.LoadPlanJSON(c.String("tfjson"))
 				if err != nil {
 					return err
 				}
