@@ -62,7 +62,7 @@ To download the latest release:
 
 TODO: add release
 ```
-curl --silent --location "https://github.com/aliscott/eksctl/infracost/latest/download/infracost_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+curl --silent --location "https://github.com/aliscott/infracost/latest/download/infracost_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/infracost /usr/local/bin
 ```
 
