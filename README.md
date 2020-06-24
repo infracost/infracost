@@ -2,7 +2,7 @@
 
 Get cost hourly and monthly estimates for a Terraform project. Helps you quickly see the cost breakdown and compare different deployment options upfront.
 
-![Example screenshot](examples/screenshot.png | width=440)
+<img src="examples/screenshot.png" width=557 alt="Example screenshot" />
 
 Currently this supports the following On-Demand pricing for the following AWS resources:
  * `aws_instance`
