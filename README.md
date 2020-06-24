@@ -47,28 +47,24 @@ You can run `infracost` in your terraform directories without worrying about any
 
 You can also deploy the price list API yourself and specify it by setting the `infracost_API_URL` env variable or passing the `--api-url` option.
 
+Generate a cost breakdown from a Terraform plan JSON file:
+```sh
+infracost --tfdir examples/terraform/plan.json
+```
+
+To generate the plan JSON file you can run:
+```
+terraform plan -out plan.save examples/terraform
+terraform show -json plan.save > plan.json
+```
+
 Generate a cost breakdown from a Terraform directory:
 ```sh
 infracost --tfdir examples/terraform
 ```
 
-Output the cost breakdown in JSON format:
-```sh
-infracost --tfdir examples/terraform --output json
-```
-
-Generate a cost breakdown from a Terraform plan JSON file:
-```sh
-terraform plan -out plan.save examples/terraform
-terraform show -json plan.save > plan.json
-
-infracost --tfjson plan.json
-```
-
 Generate a cost breakdown from a Terraform plan file:
 ```sh
-terraform plan -out plan.save examples/terraform
-
 infracost --tfplan plan.save --tfdir examples/terraform
 ```
 
