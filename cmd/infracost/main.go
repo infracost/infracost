@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"plancosts/pkg/base"
-	"plancosts/pkg/config"
-	"plancosts/pkg/output"
-	"plancosts/pkg/parsers/terraform"
+	"infracost/pkg/base"
+	"infracost/pkg/config"
+	"infracost/pkg/output"
+	"infracost/pkg/parsers/terraform"
 
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
@@ -21,7 +21,7 @@ func main() {
 	})
 
 	app := &cli.App{
-		Name:                 "plancosts",
+		Name:                 "infracost",
 		Usage:                "Generate cost reports from Terraform plans",
 		EnableBashCompletion: true,
 		Flags: []cli.Flag{

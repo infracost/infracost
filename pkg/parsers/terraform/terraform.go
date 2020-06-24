@@ -8,8 +8,8 @@ import (
 	"os"
 	"os/exec"
 
-	"plancosts/internal/terraform/aws"
-	"plancosts/pkg/base"
+	"infracost/internal/terraform/aws"
+	"infracost/pkg/base"
 
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"

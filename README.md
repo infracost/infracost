@@ -1,9 +1,9 @@
-# plancosts
+# infracost
 
 Get cost hourly and monthly estimates for a Terraform project. Helps you quickly see the cost breakdown and compare different deployment options upfront.
 
 ```
-$ plancosts --tfdir examples/small_terraform
+$ infracost --tfdir examples/small_terraform
 INFO Running command: /usr/local/bin/terraform init
 INFO Running command: /usr/local/bin/terraform plan -input=false -lock=false -out=/tmp/tfplan511348398
 INFO Running command: /usr/local/bin/terraform show -json /tmp/tfplan511348398
@@ -62,24 +62,24 @@ To download the latest release:
 
 TODO: add release
 ```
-curl --silent --location "https://github.com/aliscott/eksctl/plancosts/latest/download/plancosts_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-sudo mv /tmp/plancosts /usr/local/bin
+curl --silent --location "https://github.com/aliscott/eksctl/infracost/latest/download/infracost_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/infracost /usr/local/bin
 ```
 
 ## Usage
 
 By default prices are retrieved from a [<TODO link to price list API repo>] deployed at [https://aws-prices-graphql.alistair.scot/graphql](https://aws-prices-graphql.alistair.scot/graphql). This is running on minimal infrastructure so is not guaranteed to always be available.
 
-You can also deploy the price list API yourself and specify it by setting the `PLANCOSTS_API_URL` env variable or passing the `--api-url` option.
+You can also deploy the price list API yourself and specify it by setting the `infracost_API_URL` env variable or passing the `--api-url` option.
 
 Generate a cost breakdown from a Terraform directory:
 ```sh
-plancosts --tfdir examples/terraform
+infracost --tfdir examples/terraform
 ```
 
 Output the cost breakdown in JSON format:
 ```sh
-plancosts --tfdir examples/terraform --output json
+infracost --tfdir examples/terraform --output json
 ```
 
 Generate a cost breakdown from a Terraform plan JSON file:
@@ -87,14 +87,14 @@ Generate a cost breakdown from a Terraform plan JSON file:
 terraform plan -out plan.save examples/terraform
 terraform show -json plan.save > plan.json
 
-plancosts --tfjson plan.json
+infracost --tfjson plan.json
 ```
 
 Generate a cost breakdown from a Terraform plan file:
 ```sh
 terraform plan -out plan.save examples/terraform
 
-plancosts --tfplan plan.save --tfdir examples/terraform
+infracost --tfplan plan.save --tfdir examples/terraform
 ```
 
 ## Development

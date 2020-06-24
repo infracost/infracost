@@ -2,7 +2,7 @@ package aws
 
 import (
 	"fmt"
-	"plancosts/pkg/base"
+	"infracost/pkg/base"
 
 	"github.com/shopspring/decimal"
 )

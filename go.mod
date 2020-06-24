@@ -1,4 +1,4 @@
-module plancosts
+module infracost
 
 go 1.14
 

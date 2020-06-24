@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"plancosts/pkg/base"
+	"infracost/pkg/base"
 	"strings"
 
 	"github.com/olekukonko/tablewriter"

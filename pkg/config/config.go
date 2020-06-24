@@ -12,7 +12,7 @@ import (
 // ConfigSpec contains mapping of environment variable names to config values
 type ConfigSpec struct {
 	Logger *logrus.Logger
-	ApiUrl string `envconfig:"PLANCOSTS_API_URL"  required:"true"  default:"https://aws-prices-graphql.alistair.scot"`
+	ApiUrl string `envconfig:"INFRACOST_API_URL"  required:"true"  default:"https://aws-prices-graphql.alistair.scot"`
 }
 
 func (c *ConfigSpec) SetLogger(logger *logrus.Logger) {

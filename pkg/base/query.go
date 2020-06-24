@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"plancosts/pkg/config"
+	"infracost/pkg/config"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"

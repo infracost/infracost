@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"plancosts/pkg/base"
+	"infracost/pkg/base"
 )
 
 type NatGatewayHours struct {

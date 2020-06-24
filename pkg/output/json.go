@@ -2,7 +2,7 @@ package output
 
 import (
 	"encoding/json"
-	"plancosts/pkg/base"
+	"infracost/pkg/base"
 
 	"github.com/shopspring/decimal"
 )
