@@ -41,7 +41,9 @@ sudo mv /tmp/infracost /usr/local/bin
 
 ## Usage
 
-By default prices are retrieved from a [<TODO link to price list API repo>] deployed at [https://aws-prices-graphql.alistair.scot/graphql](https://aws-prices-graphql.alistair.scot/graphql). This is running on minimal infrastructure so is not guaranteed to always be available.
+Prices are retrieved from the Github project [<TODO link to price list API repo>]. There is a demo version of that service deployed at [https://aws-prices-graphql.alistair.scot/graphql](https://aws-prices-graphql.alistair.scot/graphql), which `infracost` uses by default. This is running on minimal infrastructure so is not guaranteed to always be available.
+
+You can run `infracost` in your terraform directories without worrying about any security or privacy issues as no terraform secrets/tags/IDs etc are sent to the pricing service (only generic price-related attributes are used). Also, do not be alarmed by seeing the `terraform init` in output, no changes are made to your terraform or cloud resources.
 
 You can also deploy the price list API yourself and specify it by setting the `infracost_API_URL` env variable or passing the `--api-url` option.
 
