@@ -1,6 +1,8 @@
 package base
 
-import "github.com/shopspring/decimal"
+import (
+	"github.com/shopspring/decimal"
+)
 
 type PriceComponent interface {
 	Name() string

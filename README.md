@@ -49,7 +49,7 @@ You can also deploy the price list API yourself and specify it by setting the `i
 
 Generate a cost breakdown from a Terraform plan JSON file:
 ```sh
-infracost --tfdir examples/terraform/plan.json
+infracost --tfjson examples/terraform/plan.json
 ```
 
 To generate the plan JSON file you can run:
@@ -66,6 +66,11 @@ infracost --tfdir examples/terraform
 Generate a cost breakdown from a Terraform plan file:
 ```sh
 infracost --tfplan plan.save --tfdir examples/terraform
+```
+
+To change the path to your `terraform` binary you can set the `TERRAFORM_BINARY` env variable:
+```sh
+TERRAFORM_BINARY=~/bin/terraform_0.13 infracost --tfdir examples/terraform_0.13
 ```
 
 ## Development
