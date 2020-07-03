@@ -31,7 +31,7 @@ jobs:
         fi
 
     - name: Run golangci-lint
-      run: make lint
+      uses: golangci/golangci-lint-action@v1.2.1
 
     - name: Test
       run: make test
