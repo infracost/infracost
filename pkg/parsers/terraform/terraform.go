@@ -67,7 +67,12 @@ type TerraformOptions struct {
 }
 
 func terraformCommand(options *TerraformOptions, args ...string) ([]byte, error) {
-	cmd := exec.Command("terraform", args...)
+	terraformBinary := os.Getenv("TERRAFORM_BINARY")
+	if terraformBinary == "" {
+		terraformBinary = "terraform"
+	}
+
+	cmd := exec.Command(terraformBinary, args...)
 	log.Info(color.HiGreenString("Running command: %s", cmd.String()))
 	cmd.Dir = options.TerraformDir
 

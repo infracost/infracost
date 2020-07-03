@@ -68,6 +68,11 @@ Generate a cost breakdown from a Terraform plan file:
 infracost --tfplan plan.save --tfdir examples/terraform
 ```
 
+To change the path to your `terraform` binary you can set the `TERRAFORM_BINARY` env variable:
+```sh
+TERRAFORM_BINARY=~/bin/terraform_0.13 infracost --tfdir examples/terraform_0.13
+```
+
 ## Development
 
 Install dependencies:
