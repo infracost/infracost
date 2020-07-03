@@ -1,4 +1,4 @@
-MakefileBINARY := infracost
+BINARY := infracost
 ENTRYPOINT := cmd/infracost/main.go
 
 .PHONY: deps run build windows linux darwin build_all clean test fmt lint
