@@ -30,12 +30,9 @@ jobs:
             dep ensure
         fi
 
-    - name: Build
-      run: go build -v .
-
     - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v1.2.1
+      uses: make lint
 
     - name: Test
-      run: go test -v .
+      run: make test
       
