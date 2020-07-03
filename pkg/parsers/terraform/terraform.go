@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"infracost/internal/terraform/aws"
@@ -126,26 +127,33 @@ func GeneratePlanJSON(tfdir string, planPath string) ([]byte, error) {
 	return out, nil
 }
 
-func ParsePlanJSON(planJSON []byte) ([]base.Resource, error) {
+func ParsePlanJSON(j []byte) ([]base.Resource, error) {
+	planJSON := gjson.ParseBytes(j)
+	providerConfig := planJSON.Get("configuration.provider_config")
+	plannedValuesJSON := planJSON.Get("planned_values.root_module")
+	configurationJSON := planJSON.Get("configuration.root_module")
+
+	return parseModule(planJSON, providerConfig, plannedValuesJSON, configurationJSON)
+}
+
+func parseModule(planJSON gjson.Result, providerConfig gjson.Result, plannedValuesJSON gjson.Result, configurationJSON gjson.Result) ([]base.Resource, error) {
 	resourceMap := make(map[string]base.Resource)
+	moduleAddr := plannedValuesJSON.Get("address").String()
+	terraformResources := plannedValuesJSON.Get("resources").Array()
 
-	providerConfig := gjson.GetBytes(planJSON, "configuration.provider_config")
-	terraformResources := gjson.GetBytes(planJSON, "planned_values.root_module.resources")
-
-	for _, terraformResource := range terraformResources.Array() {
+	for _, terraformResource := range terraformResources {
 		address := terraformResource.Get("address").String()
 		resourceType := terraformResource.Get("type").String()
 		rawValues := terraformResource.Get("values").Value().(map[string]interface{})
 		resource := createResource(resourceType, address, rawValues, providerConfig)
 		if resource != nil {
-			resourceMap[address] = resource
+			resourceMap[getInternalName(resource.Address(), moduleAddr)] = resource
 		}
 	}
 
 	for _, resource := range resourceMap {
-		query := fmt.Sprintf(`configuration.root_module.resources.#(address="%s")`, resource.Address())
-		terraformResourceConfig := gjson.GetBytes(planJSON, query)
-		addReferences(resource, terraformResourceConfig, resourceMap)
+		resourceJSON := configurationJSON.Get(fmt.Sprintf(`resources.#(address="%s")`, getInternalName(resource.Address(), moduleAddr)))
+		addReferences(resource, resourceJSON, resourceMap)
 	}
 
 	resources := make([]base.Resource, 0, len(resourceMap))
@@ -153,11 +161,37 @@ func ParsePlanJSON(planJSON []byte) ([]base.Resource, error) {
 		resources = append(resources, resource)
 	}
 
+	for _, pvJSON := range plannedValuesJSON.Get("child_modules").Array() {
+		moduleName := parseModuleName(pvJSON.Get("address").String())
+		cJSON := configurationJSON.Get(fmt.Sprintf("module_calls.%s.module", moduleName))
+		moduleResources, err := parseModule(planJSON, providerConfig, pvJSON, cJSON)
+		if err != nil {
+			return resources, err
+		}
+		resources = append(resources, moduleResources...)
+	}
+
 	return resources, nil
 }
 
-func addReferences(r base.Resource, resourceConfig gjson.Result, resourceMap map[string]base.Resource) {
-	gjson.Get(resourceConfig.String(), "expressions").ForEach(func(key gjson.Result, value gjson.Result) bool {
+func getInternalName(resourceAddr string, moduleAddr string) string {
+	return strings.TrimPrefix(resourceAddr, moduleAddr+".")
+}
+
+func parseModuleName(moduleAddr string) string {
+	if moduleAddr == "" {
+		return "root_module"
+	}
+	r := regexp.MustCompile("module.([^[]+)")
+	match := r.FindStringSubmatch(moduleAddr)
+	if len(match) <= 1 {
+		return ""
+	}
+	return match[1]
+}
+
+func addReferences(r base.Resource, resourceJSON gjson.Result, resourceMap map[string]base.Resource) {
+	gjson.Get(resourceJSON.String(), "expressions").ForEach(func(key gjson.Result, value gjson.Result) bool {
 		var refAddr string
 		if value.Get("references").Exists() {
 			refAddr = value.Get("references").Array()[0].String()
