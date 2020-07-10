@@ -11,8 +11,9 @@ import (
 
 // ConfigSpec contains mapping of environment variable names to config values
 type ConfigSpec struct {
-	Logger *logrus.Logger
-	ApiUrl string `envconfig:"INFRACOST_API_URL"  required:"true"  default:"https://aws-prices-graphql.alistair.scot"`
+	Logger  *logrus.Logger
+	NoColor bool
+	ApiUrl  string `envconfig:"INFRACOST_API_URL"  required:"true"  default:"https://aws-prices-graphql.alistair.scot"`
 }
 
 func (c *ConfigSpec) SetLogger(logger *logrus.Logger) {
@@ -31,6 +32,8 @@ func fileExists(path string) bool {
 func loadConfig() *ConfigSpec {
 	var config ConfigSpec
 	var err error
+
+	config.NoColor = false
 
 	if fileExists(".env.local") {
 		err = godotenv.Load(".env.local")

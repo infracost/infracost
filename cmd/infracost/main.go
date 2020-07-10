@@ -15,10 +15,11 @@ import (
 )
 
 func main() {
-	log.SetFormatter(&log.TextFormatter{
+	formatter := &log.TextFormatter{
 		DisableTimestamp:       true,
 		DisableLevelTruncation: true,
-	})
+	}
+	log.SetFormatter(formatter)
 
 	app := &cli.App{
 		Name:                 "infracost",
@@ -52,6 +53,11 @@ func main() {
 				Usage:   "Output (json|table)",
 				Value:   "table",
 			},
+			&cli.BoolFlag{
+				Name:  "no-color",
+				Usage: "Turn off colored output",
+				Value: false,
+			},
 			&cli.StringFlag{
 				Name:  "api-url",
 				Usage: "Price List API URL",
@@ -65,6 +71,12 @@ func main() {
 		},
 		Action: func(c *cli.Context) error {
 			var planJSON []byte
+
+			if c.Bool("no-color") {
+				config.Config.NoColor = true
+				formatter.DisableColors = true
+				color.NoColor = true
+			}
 
 			logLevel := log.InfoLevel
 			if c.Bool("verbose") {

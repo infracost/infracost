@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"infracost/pkg/base"
 	"strings"
+
+	"infracost/pkg/base"
+	"infracost/pkg/config"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/shopspring/decimal"
@@ -50,6 +52,15 @@ func ToTable(resourceCostBreakdowns []base.ResourceCostBreakdown) ([]byte, error
 	overallTotalHourly := decimal.Zero
 	overallTotalMonthly := decimal.Zero
 
+	color := []tablewriter.Colors{
+		tablewriter.Colors{tablewriter.FgHiBlackColor},
+		tablewriter.Colors{tablewriter.FgHiBlackColor},
+		tablewriter.Colors{tablewriter.FgHiBlackColor},
+	}
+	if config.Config.NoColor {
+		color = nil
+	}
+
 	for _, breakdown := range resourceCostBreakdowns {
 		table.Append([]string{breakdown.Resource.Address(), "", ""})
 
@@ -69,11 +80,7 @@ func ToTable(resourceCostBreakdowns []base.ResourceCostBreakdown) ([]byte, error
 				formatDecimal(priceComponentCost.HourlyCost, "%.4f"),
 				formatDecimal(priceComponentCost.MonthlyCost, "%.4f"),
 			}
-			table.Rich(row, []tablewriter.Colors{
-				tablewriter.Colors{tablewriter.FgHiBlackColor},
-				tablewriter.Colors{tablewriter.FgHiBlackColor},
-				tablewriter.Colors{tablewriter.FgHiBlackColor},
-			})
+			table.Rich(row, color)
 		}
 
 		for _, subResourceBreakdown := range breakdown.SubResourceCosts {
@@ -93,11 +100,7 @@ func ToTable(resourceCostBreakdowns []base.ResourceCostBreakdown) ([]byte, error
 					formatDecimal(priceComponentCost.HourlyCost, "%.4f"),
 					formatDecimal(priceComponentCost.MonthlyCost, "%.4f"),
 				}
-				table.Rich(row, []tablewriter.Colors{
-					tablewriter.Colors{tablewriter.FgHiBlackColor},
-					tablewriter.Colors{tablewriter.FgHiBlackColor},
-					tablewriter.Colors{tablewriter.FgHiBlackColor},
-				})
+				table.Rich(row, color)
 			}
 		}
 
