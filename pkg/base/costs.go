@@ -4,6 +4,7 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+	"sort"
 )
 
 var HoursInMonth = 730
@@ -108,6 +109,10 @@ func GenerateCostBreakdowns(q QueryRunner, resources []Resource) ([]ResourceCost
 		}
 		costBreakdowns = append(costBreakdowns, getCostBreakdown(resource, results[&resource]))
 	}
+
+	sort.Slice(costBreakdowns, func(i, j int) bool {
+		return costBreakdowns[i].Resource.Address() < costBreakdowns[j].Resource.Address()
+	})
 
 	return costBreakdowns, nil
 }
