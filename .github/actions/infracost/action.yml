@@ -1,0 +1,13 @@
+name: 'Run infracost'
+inputs:
+  file_prefix:
+    description: 'The file prefix used to save the infracost output'
+    required: true
+outputs:
+  monthly_cost:
+    description: 'The monthly cost estimate'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.file_prefix }}
