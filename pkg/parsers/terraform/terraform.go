@@ -12,6 +12,7 @@ import (
 
 	"infracost/internal/terraform/aws"
 	"infracost/pkg/base"
+	"infracost/pkg/config"
 
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
@@ -73,7 +74,11 @@ func terraformCommand(options *TerraformOptions, args ...string) ([]byte, error)
 	}
 
 	cmd := exec.Command(terraformBinary, args...)
-	log.Info(color.HiGreenString("Running command: %s", cmd.String()))
+	if config.Config.NoColor {
+		log.Infof("Running command: %s", cmd.String())
+	} else {
+		log.Info(color.HiGreenString("Running command: %s", cmd.String()))
+	}
 	cmd.Dir = options.TerraformDir
 
 	var outbuf bytes.Buffer

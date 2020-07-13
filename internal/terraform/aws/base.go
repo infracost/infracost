@@ -1,9 +1,9 @@
 package aws
 
 import (
-	"infracost/pkg/base"
-
 	"github.com/shopspring/decimal"
+	"infracost/pkg/base"
+	"sort"
 )
 
 var DefaultVolumeSize = 8
@@ -141,10 +141,16 @@ func (r *BaseAwsResource) RawValues() map[string]interface{} {
 }
 
 func (r *BaseAwsResource) SubResources() []base.Resource {
+	sort.Slice(r.subResources, func(i, j int) bool {
+		return r.subResources[i].Address() < r.subResources[j].Address()
+	})
 	return r.subResources
 }
 
 func (r *BaseAwsResource) PriceComponents() []base.PriceComponent {
+	sort.Slice(r.priceComponents, func(i, j int) bool {
+		return r.priceComponents[i].Name() < r.priceComponents[j].Name()
+	})
 	return r.priceComponents
 }
 
