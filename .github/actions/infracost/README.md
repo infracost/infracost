@@ -1,6 +1,6 @@
-# Infracost GitHub action
+# infracost GitHub action
 
-This action runs infracost on the provided terraform directory. It can be used to automatically add PR comment showing the cost estimate `diff` between a pull request and the master branch whenever a `.tf` file changes.
+This action runs [infracost](https://github.com/aliscott/infracost) on the provided terraform directory. It can be used to automatically add PR comment showing the cost estimate `diff` between a pull request and the master branch whenever a `.tf` file changes.
 
 <img src="../../../examples/diff_screenshot.png" width=557 alt="Example screenshot" />
 
