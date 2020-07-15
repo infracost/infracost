@@ -4,9 +4,9 @@ Get cost hourly and monthly estimates for a Terraform project. Helps you quickly
 
 <img src="examples/screenshot.png" width=557 alt="Example infracost output" />
 
-The [infracost GitHub action](https://github.com/aliscott/infracost-gh-action) can be used to automatically add PR comment showing the cost estimate `diff` between a pull request and the master branch whenever a `.tf` file changes.
+The [infracost GitHub action](https://github.com/aliscott/infracost-gh-action) can be used to automatically add a PR comment showing the cost estimate `diff` between a pull request and the master branch whenever a `.tf` file changes.
 
-<img src="examples/diff_screenshot.png" width=557 alt="Example infracost diff usage" />
+<img src="https://raw.githubusercontent.com/aliscott/infracost-gh-action/master/diff_screenshot.png" width=557 alt="Example infracost diff usage" />
 
 Currently this supports the following On-Demand pricing for the following AWS resources:
  * `aws_instance`
