@@ -1,9 +1,9 @@
 package terraform
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -82,8 +82,7 @@ func terraformCommand(options *TerraformOptions, args ...string) ([]byte, error)
 	cmd.Dir = options.TerraformDir
 
 	var outbuf bytes.Buffer
-	mw := io.MultiWriter(log.StandardLogger().WriterLevel(log.DebugLevel), &outbuf)
-	cmd.Stdout = mw
+	cmd.Stdout = bufio.NewWriter(&outbuf)
 	cmd.Stderr = log.StandardLogger().WriterLevel(log.ErrorLevel)
 	err := cmd.Run()
 	return outbuf.Bytes(), err
