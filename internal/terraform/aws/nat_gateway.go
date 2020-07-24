@@ -4,34 +4,17 @@ import (
 	"infracost/pkg/base"
 )
 
-type NatGatewayHours struct {
-	*BaseAwsPriceComponent
-}
+func NewNatGateway(address string, region string, rawValues map[string]interface{}) base.Resource {
+	r := base.NewBaseResource(address, rawValues, true)
 
-func NewNatGatewayHours(name string, resource *NatGateway) *NatGatewayHours {
-	c := &NatGatewayHours{
-		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "hour"),
-	}
-
-	c.defaultFilters = []base.Filter{
+	hours := base.NewBasePriceComponent("Hours", r, "hour", "hour")
+	hours.AddFilters(regionFilters(region))
+	hours.AddFilters([]base.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "NAT Gateway"},
 		{Key: "usagetype", Value: "/NatGateway-Hours/", Operation: "REGEX"},
-	}
+	})
+	r.AddPriceComponent(hours)
 
-	return c
-}
-
-type NatGateway struct {
-	*BaseAwsResource
-}
-
-func NewNatGateway(address string, region string, rawValues map[string]interface{}) *NatGateway {
-	r := &NatGateway{
-		BaseAwsResource: NewBaseAwsResource(address, region, rawValues),
-	}
-	r.BaseAwsResource.priceComponents = []base.PriceComponent{
-		NewNatGatewayHours("Hours", r),
-	}
 	return r
 }

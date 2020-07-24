@@ -9,6 +9,8 @@ import (
 
 type PriceComponentCostJSON struct {
 	PriceComponent string          `json:"priceComponent"`
+	Quantity       decimal.Decimal `json:"quantity"`
+	Unit           string `json:"unit"`
 	HourlyCost     decimal.Decimal `json:"hourlyCost"`
 	MonthlyCost    decimal.Decimal `json:"monthlyCost"`
 }
@@ -24,6 +26,8 @@ func createJSONObj(breakdown base.ResourceCostBreakdown) ResourceCostBreakdownJS
 	for _, priceComponentCost := range breakdown.PriceComponentCosts {
 		priceComponentCostJSONs = append(priceComponentCostJSONs, PriceComponentCostJSON{
 			PriceComponent: priceComponentCost.PriceComponent.Name(),
+			Quantity:       priceComponentCost.PriceComponent.Quantity().Round(6),
+			Unit:           priceComponentCost.PriceComponent.Unit(),
 			HourlyCost:     priceComponentCost.HourlyCost.Round(6),
 			MonthlyCost:    priceComponentCost.MonthlyCost.Round(6),
 		})

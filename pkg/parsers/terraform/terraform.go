@@ -44,9 +44,9 @@ func createResource(resourceType string, address string, rawValues map[string]in
 	case "aws_ebs_snapshot_copy":
 		return aws.NewEbsSnapshotCopy(address, awsRegion, rawValues)
 	case "aws_launch_configuration":
-		return aws.NewEc2LaunchConfiguration(address, awsRegion, rawValues)
+		return aws.NewEc2LaunchConfiguration(address, awsRegion, rawValues, false) // has no cost
 	case "aws_launch_template":
-		return aws.NewEc2LaunchTemplate(address, awsRegion, rawValues)
+		return aws.NewEc2LaunchTemplate(address, awsRegion, rawValues, false) // has no cost
 	case "aws_autoscaling_group":
 		return aws.NewEc2AutoscalingGroup(address, awsRegion, rawValues)
 	case "aws_db_instance":
@@ -142,7 +142,8 @@ func ParsePlanJSON(j []byte) ([]base.Resource, error) {
 	plannedValuesJSON := planJSON.Get("planned_values.root_module")
 	configurationJSON := planJSON.Get("configuration.root_module")
 
-	return parseModule(planJSON, providerConfig, plannedValuesJSON, configurationJSON)
+	resources, err := parseModule(planJSON, providerConfig, plannedValuesJSON, configurationJSON)
+	return resources, err
 }
 
 func parseModule(planJSON gjson.Result, providerConfig gjson.Result, plannedValuesJSON gjson.Result, configurationJSON gjson.Result) ([]base.Resource, error) {
@@ -204,20 +205,24 @@ func parseModuleName(moduleAddr string) string {
 	return match[1]
 }
 
+func addReferencesHelper(r base.Resource, key string, valueJSON gjson.Result, resourceMap map[string]base.Resource) {
+	var refAddr string
+	if valueJSON.Get("references").Exists() {
+		refAddr = valueJSON.Get("references").Array()[0].String()
+	} else if len(valueJSON.Array()) > 0 && valueJSON.Get("0.id.references").Exists() {
+		refAddr = valueJSON.Get("0.id.references").Array()[0].String()
+	}
+
+	if resource, ok := resourceMap[refAddr]; ok {
+		r.AddReference(key, resource)
+	} else if valueJSON.Type.String() == "JSON" {
+		valueJSON.ForEach(func(k gjson.Result, v gjson.Result) bool {
+			addReferencesHelper(r, k.String(), v, resourceMap)
+			return true
+		})
+	}
+}
+
 func addReferences(r base.Resource, resourceJSON gjson.Result, resourceMap map[string]base.Resource) {
-	gjson.Get(resourceJSON.String(), "expressions").ForEach(func(key gjson.Result, value gjson.Result) bool {
-		var refAddr string
-		if value.Get("references").Exists() {
-			refAddr = value.Get("references").Array()[0].String()
-		} else if len(value.Array()) > 0 {
-			idVal := value.Array()[0].Get("id")
-			if idVal.Get("references").Exists() {
-				refAddr = idVal.Get("references").Array()[0].String()
-			}
-		}
-		if resource, ok := resourceMap[refAddr]; ok {
-			r.AddReference(key.String(), resource)
-		}
-		return true
-	})
+	addReferencesHelper(r, "expressions", resourceJSON.Get("expressions"), resourceMap)
 }

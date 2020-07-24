@@ -5,56 +5,41 @@ import (
 	"infracost/pkg/base"
 )
 
-type Ec2LaunchTemplateHours struct {
-	*BaseAwsPriceComponent
-}
+func NewEc2LaunchTemplate(address string, region string, rawValues map[string]interface{}, hasCost bool) base.Resource {
+	r := base.NewBaseResource(address, rawValues, hasCost)
 
-func NewEc2LaunchTemplateHours(name string, resource *Ec2LaunchTemplate) *Ec2LaunchTemplateHours {
-	c := &Ec2LaunchTemplateHours{
-		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "hour"),
-	}
+	instanceType := rawValues["instance_type"].(string)
 
-	c.defaultFilters = []base.Filter{
+	hours := base.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour")
+	hours.AddFilters(regionFilters(region))
+	hours.AddFilters([]base.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "Compute Instance"},
 		{Key: "operatingSystem", Value: "Linux"},
 		{Key: "preInstalledSw", Value: "NA"},
 		{Key: "capacitystatus", Value: "Used"},
 		{Key: "tenancy", Value: "Shared"},
-	}
+		{Key: "instanceType", Value: instanceType},
+	})
+	r.AddPriceComponent(hours)
 
-	c.valueMappings = []base.ValueMapping{
-		{FromKey: "instance_type", ToKey: "instanceType"},
+	rootBlockDeviceRawValues := make(map[string]interface{})
+	if r := base.ToGJSON(rawValues).Get("root_block_device.0"); r.Exists() {
+		rootBlockDeviceRawValues = r.Value().(map[string]interface{})
 	}
+	rootBlockDeviceAddress := fmt.Sprintf("%s.root_block_device", address)
+	rootBlockDevice := newEc2BlockDevice(rootBlockDeviceAddress, region, rootBlockDeviceRawValues)
+	r.AddSubResource(rootBlockDevice)
 
-	return c
-}
-
-type Ec2LaunchTemplate struct {
-	*BaseAwsResource
-}
-
-func NewEc2LaunchTemplate(address string, region string, rawValues map[string]interface{}) *Ec2LaunchTemplate {
-	r := &Ec2LaunchTemplate{
-		NewBaseAwsResource(address, region, rawValues),
+	blockDeviceMappingsRawValues := make([]interface{}, 0)
+	if r := base.ToGJSON(rawValues).Get("block_device_mappings.#.ebs|@flatten"); r.Exists() {
+		blockDeviceMappingsRawValues = r.Value().([]interface{})
 	}
-	r.BaseAwsResource.priceComponents = []base.PriceComponent{
-		NewEc2LaunchTemplateHours("Instance hours", r),
+	for i, blockDeviceMappingRawValues := range blockDeviceMappingsRawValues {
+		blockDeviceMappingAddress := fmt.Sprintf("%s.block_device_mappings[%d]", r.Address(), i)
+		blockDeviceMapping := newEc2BlockDevice(blockDeviceMappingAddress, region, blockDeviceMappingRawValues.(map[string]interface{}))
+		r.AddSubResource(blockDeviceMapping)
 	}
-
-	subResources := make([]base.Resource, 0)
-	blockDeviceMappings := r.rawValues["block_device_mappings"]
-	if blockDeviceMappings != nil {
-		for i, blockDeviceMapping := range blockDeviceMappings.([]interface{}) {
-			address := fmt.Sprintf("%s.block_device_mappings[%d]", r.Address(), i)
-			rawValues := blockDeviceMapping.(map[string]interface{})["ebs"].([]interface{})[0].(map[string]interface{})
-			subResources = append(subResources, NewEc2BlockDevice(address, r.region, rawValues))
-		}
-	}
-	r.BaseAwsResource.subResources = subResources
 
 	return r
-}
-func (r *Ec2LaunchTemplate) HasCost() bool {
-	return false
 }

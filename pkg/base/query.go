@@ -93,7 +93,7 @@ func (r *GraphQLQueryRunner) batchQueries(resource Resource) ([]queryKey, []Grap
 		queries = append(queries, r.buildQuery(priceComponent.Filters()))
 	}
 
-	for _, subResource := range resource.SubResources() {
+	for _, subResource := range FlattenSubResources(resource) {
 		for _, priceComponent := range subResource.PriceComponents() {
 			queryKeys = append(queryKeys, queryKey{subResource, priceComponent})
 			queries = append(queries, r.buildQuery(priceComponent.Filters()))

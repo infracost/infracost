@@ -6,47 +6,38 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type EbsSnapshotCopyGB struct {
-	*BaseAwsPriceComponent
-}
+func ebsSnapshotCopyGbQuantity(resource base.Resource) decimal.Decimal {
+	quantity := decimal.NewFromInt(int64(DefaultVolumeSize))
 
-func NewEbsSnapshotCopyGB(name string, resource *EbsSnapshotCopy) *EbsSnapshotCopyGB {
-	c := &EbsSnapshotCopyGB{
-		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "month"),
+	sourceSnapshot := resource.References()["source_snapshot_id"]
+	if sourceSnapshot == nil {
+		return quantity
 	}
 
-	c.defaultFilters = []base.Filter{
+	volume := sourceSnapshot.References()["volume_id"]
+	if volume == nil {
+		return quantity
+	}
+
+	sizeVal := volume.RawValues()["size"]
+	if sizeVal != nil {
+		quantity = decimal.NewFromFloat(sizeVal.(float64))
+	}
+	return quantity
+}
+
+func NewEbsSnapshotCopy(address string, region string, rawValues map[string]interface{}) base.Resource {
+	r := base.NewBaseResource(address, rawValues, true)
+
+	gb := base.NewBasePriceComponent("GB", r, "GB/month", "month")
+	gb.AddFilters(regionFilters(region))
+	gb.AddFilters([]base.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "Storage Snapshot"},
 		{Key: "usagetype", Value: "/EBS:SnapshotUsage$/", Operation: "REGEX"},
-	}
+	})
+	gb.SetQuantityMultiplierFunc(ebsSnapshotCopyGbQuantity)
+	r.AddPriceComponent(gb)
 
-	return c
-}
-
-func (c *EbsSnapshotCopyGB) HourlyCost() decimal.Decimal {
-	hourlyCost := c.BaseAwsPriceComponent.HourlyCost()
-	size := decimal.NewFromInt(int64(DefaultVolumeSize))
-	volumeGBPriceComponent := base.GetPriceComponent(c.AwsResource().References()["source_snapshot_id"].References()["volume_id"], "GB")
-	if volumeGBPriceComponent == nil {
-		sizeVal := volumeGBPriceComponent.(*EbsVolumeGB).AwsResource().RawValues()["size"]
-		if sizeVal != nil {
-			size = decimal.NewFromFloat(sizeVal.(float64))
-		}
-	}
-	return hourlyCost.Mul(size)
-}
-
-type EbsSnapshotCopy struct {
-	*BaseAwsResource
-}
-
-func NewEbsSnapshotCopy(address string, region string, rawValues map[string]interface{}) *EbsSnapshotCopy {
-	r := &EbsSnapshotCopy{
-		BaseAwsResource: NewBaseAwsResource(address, region, rawValues),
-	}
-	r.BaseAwsResource.priceComponents = []base.PriceComponent{
-		NewEbsSnapshotCopyGB("GB", r),
-	}
 	return r
 }

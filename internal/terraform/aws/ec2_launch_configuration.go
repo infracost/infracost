@@ -5,76 +5,44 @@ import (
 	"infracost/pkg/base"
 )
 
-type Ec2LaunchConfigurationHours struct {
-	*BaseAwsPriceComponent
-}
+func NewEc2LaunchConfiguration(address string, region string, rawValues map[string]interface{}, hasCost bool) base.Resource {
+	r := base.NewBaseResource(address, rawValues, hasCost)
 
-func NewEc2LaunchConfigurationHours(name string, resource *Ec2LaunchConfiguration) *Ec2LaunchConfigurationHours {
-	c := &Ec2LaunchConfigurationHours{
-		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "hour"),
+	instanceType := rawValues["instance_type"].(string)
+	tenancy := "Shared"
+	if rawValues["placement_tenancy"] != nil && rawValues["placement_tenancy"].(string) == "dedicated" {
+		tenancy = "Dedicated"
 	}
 
-	c.defaultFilters = []base.Filter{
+	hours := base.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour")
+	hours.AddFilters(regionFilters(region))
+	hours.AddFilters([]base.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "Compute Instance"},
 		{Key: "operatingSystem", Value: "Linux"},
 		{Key: "preInstalledSw", Value: "NA"},
 		{Key: "capacitystatus", Value: "Used"},
-		{Key: "tenancy", Value: "Shared"},
+		{Key: "tenancy", Value: tenancy},
+		{Key: "instanceType", Value: instanceType},
+	})
+	r.AddPriceComponent(hours)
+
+	rootBlockDeviceRawValues := make(map[string]interface{})
+	if r := base.ToGJSON(rawValues).Get("root_block_device.0"); r.Exists() {
+		rootBlockDeviceRawValues = r.Value().(map[string]interface{})
 	}
+	rootBlockDeviceAddress := fmt.Sprintf("%s.root_block_device", address)
+	rootBlockDevice := newEc2BlockDevice(rootBlockDeviceAddress, region, rootBlockDeviceRawValues)
+	r.AddSubResource(rootBlockDevice)
 
-	c.valueMappings = []base.ValueMapping{
-		{FromKey: "instance_type", ToKey: "instanceType"},
-		{
-			FromKey: "placement_tenancy",
-			ToKey:   "tenancy",
-			ToValueFn: func(fromValue interface{}) string {
-				if fmt.Sprintf("%v", fromValue) == "dedicated" {
-					return "Dedicated"
-				}
-				return "Shared"
-			},
-		},
-	}
-
-	return c
-}
-
-type Ec2LaunchConfiguration struct {
-	*BaseAwsResource
-}
-
-func NewEc2LaunchConfiguration(address string, region string, rawValues map[string]interface{}) *Ec2LaunchConfiguration {
-	r := &Ec2LaunchConfiguration{
-		NewBaseAwsResource(address, region, rawValues),
-	}
-
-	r.BaseAwsResource.priceComponents = []base.PriceComponent{
-		NewEc2LaunchConfigurationHours("Instance hours", r),
-	}
-
-	subResources := make([]base.Resource, 0)
-	subResourceAddress := fmt.Sprintf("%s.root_block_device", r.Address())
-	if r.RawValues()["root_block_device"] != nil {
-		rootBlockDevices := r.RawValues()["root_block_device"].([]interface{})
-		subResources = append(subResources, NewEc2BlockDevice(subResourceAddress, r.region, rootBlockDevices[0].(map[string]interface{})))
-	} else {
-		subResources = append(subResources, NewEc2BlockDevice(subResourceAddress, r.region, make(map[string]interface{})))
-	}
-
-	if r.RawValues()["ebs_block_device"] != nil {
-		ebsBlockDevices := r.RawValues()["ebs_block_device"].([]interface{})
-		for i, ebsBlockDevice := range ebsBlockDevices {
-			subResourceAddress := fmt.Sprintf("%s.ebs_block_device[%d]", r.Address(), i)
-			subResources = append(subResources, NewEc2BlockDevice(subResourceAddress, r.region, ebsBlockDevice.(map[string]interface{})))
+	if rawValues["ebs_block_device"] != nil {
+		ebsBlockDevicesRawValues := rawValues["ebs_block_device"].([]interface{})
+		for i, ebsBlockDeviceRawValues := range ebsBlockDevicesRawValues {
+			ebsBlockDeviceAddress := fmt.Sprintf("%s.ebs_block_device[%d]", r.Address(), i)
+			ebsBlockDevice := newEc2BlockDevice(ebsBlockDeviceAddress, region, ebsBlockDeviceRawValues.(map[string]interface{}))
+			r.AddSubResource(ebsBlockDevice)
 		}
 	}
 
-	r.BaseAwsResource.subResources = subResources
-
 	return r
-}
-
-func (r *Ec2LaunchConfiguration) HasCost() bool {
-	return false
 }

@@ -1,58 +1,29 @@
 package aws
 
 import (
-	"fmt"
 	"infracost/pkg/base"
 )
 
-type ElbHours struct {
-	*BaseAwsPriceComponent
-}
+func NewElb(address string, region string, rawValues map[string]interface{}, isClassic bool) base.Resource {
+	r := base.NewBaseResource(address, rawValues, true)
 
-func NewElbHours(name string, resource *Elb, isClassic bool) *ElbHours {
-	c := &ElbHours{
-		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "hour"),
-	}
-
-	defaultProductFamily := "Load Balancer"
+	productFamily := "Load Balancer"
 	if !isClassic {
-		defaultProductFamily = "Load Balancer-Application"
-	}
-
-	c.defaultFilters = []base.Filter{
-		{Key: "servicecode", Value: "AWSELB"},
-		{Key: "productFamily", Value: defaultProductFamily},
-		{Key: "usagetype", Value: "/LoadBalancerUsage/", Operation: "REGEX"},
-	}
-
-	if !isClassic {
-		c.valueMappings = []base.ValueMapping{
-			{
-				FromKey: "load_balancer_type",
-				ToKey:   "productFamily",
-				ToValueFn: func(fromValue interface{}) string {
-					if fmt.Sprintf("%v", fromValue) == "network" {
-						return "Load Balancer-Network"
-					}
-					return "Load Balancer-Application"
-				},
-			},
+		if rawValues["load_balancer_type"] != nil && rawValues["load_balancer_type"].(string) == "network" {
+			productFamily = "Load Balancer-Network"
+		} else {
+			productFamily = "Load Balancer-Application"
 		}
 	}
 
-	return c
-}
+	hours := base.NewBasePriceComponent("Hours", r, "hour", "hour")
+	hours.AddFilters(regionFilters(region))
+	hours.AddFilters([]base.Filter{
+		{Key: "servicecode", Value: "AWSELB"},
+		{Key: "usagetype", Value: "/LoadBalancerUsage/", Operation: "REGEX"},
+		{Key: "productFamily", Value: productFamily},
+	})
+	r.AddPriceComponent(hours)
 
-type Elb struct {
-	*BaseAwsResource
-}
-
-func NewElb(address string, region string, rawValues map[string]interface{}, isClassic bool) *Elb {
-	r := &Elb{
-		BaseAwsResource: NewBaseAwsResource(address, region, rawValues),
-	}
-	r.BaseAwsResource.priceComponents = []base.PriceComponent{
-		NewElbHours("Hours", r, isClassic),
-	}
 	return r
 }

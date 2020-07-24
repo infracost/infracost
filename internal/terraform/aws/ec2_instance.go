@@ -7,152 +7,100 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type Ec2BlockDeviceGB struct {
-	*BaseAwsPriceComponent
-}
+func ec2BlockDeviceGbQuantity(resource base.Resource) decimal.Decimal {
+	quantity := decimal.NewFromInt(int64(DefaultVolumeSize))
 
-func NewEc2BlockDeviceGB(name string, resource *Ec2BlockDevice) *Ec2BlockDeviceGB {
-	c := &Ec2BlockDeviceGB{
-		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "month"),
+	sizeVal := resource.RawValues()["volume_size"]
+	if sizeVal != nil {
+		quantity = decimal.NewFromFloat(sizeVal.(float64))
 	}
 
-	c.defaultFilters = []base.Filter{
+	return quantity
+}
+
+func ec2BlockDeviceIopsQuantity(resource base.Resource) decimal.Decimal {
+	quantity := decimal.Zero
+
+	iopsVal := resource.RawValues()["iops"]
+	if iopsVal != nil {
+		quantity = decimal.NewFromFloat(iopsVal.(float64))
+	}
+
+	return quantity
+}
+
+func newEc2BlockDevice(address string, region string, rawValues map[string]interface{}) base.Resource {
+	r := base.NewBaseResource(address, rawValues, true)
+
+	volumeApiName := "gp2"
+	if rawValues["volume_type"] != nil {
+		volumeApiName = rawValues["volume_type"].(string)
+	}
+
+	gb := base.NewBasePriceComponent("GB", r, "GB/month", "month")
+	gb.AddFilters(regionFilters(region))
+	gb.AddFilters([]base.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "Storage"},
-		{Key: "volumeApiName", Value: "gp2"},
+		{Key: "volumeApiName", Value: volumeApiName},
+	})
+	gb.SetQuantityMultiplierFunc(ec2BlockDeviceGbQuantity)
+	r.AddPriceComponent(gb)
+
+	if volumeApiName == "io1" {
+		iops := base.NewBasePriceComponent("IOPS", r, "IOPS/month", "month")
+		iops.AddFilters(regionFilters(region))
+		iops.AddFilters([]base.Filter{
+			{Key: "servicecode", Value: "AmazonEC2"},
+			{Key: "productFamily", Value: "System Operation"},
+			{Key: "usagetype", Value: "/EBS:VolumeP-IOPS.piops/", Operation: "REGEX"},
+			{Key: "volumeApiName", Value: volumeApiName},
+		})
+		iops.SetQuantityMultiplierFunc(ec2BlockDeviceIopsQuantity)
+		r.AddPriceComponent(iops)
 	}
 
-	c.valueMappings = []base.ValueMapping{
-		{FromKey: "volume_type", ToKey: "volumeApiName"},
-	}
-
-	return c
-}
-
-func (c *Ec2BlockDeviceGB) HourlyCost() decimal.Decimal {
-	hourlyCost := c.BaseAwsPriceComponent.HourlyCost()
-	size := decimal.NewFromInt(int64(DefaultVolumeSize))
-	if c.AwsResource().RawValues()["volume_size"] != nil {
-		size = decimal.NewFromFloat(c.AwsResource().RawValues()["volume_size"].(float64))
-	}
-	return hourlyCost.Mul(size)
-}
-
-type Ec2BlockDeviceIOPS struct {
-	*BaseAwsPriceComponent
-}
-
-func NewEc2BlockDeviceIOPS(name string, resource *Ec2BlockDevice) *Ec2BlockDeviceIOPS {
-	c := &Ec2BlockDeviceIOPS{
-		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "month"),
-	}
-
-	c.defaultFilters = []base.Filter{
-		{Key: "servicecode", Value: "AmazonEC2"},
-		{Key: "productFamily", Value: "System Operation"},
-		{Key: "usagetype", Value: "/EBS:VolumeP-IOPS.piops/", Operation: "REGEX"},
-		{Key: "volumeApiName", Value: "gp2"},
-	}
-
-	c.valueMappings = []base.ValueMapping{
-		{FromKey: "volume_type", ToKey: "volumeApiName"},
-	}
-
-	return c
-}
-
-func (c *Ec2BlockDeviceIOPS) HourlyCost() decimal.Decimal {
-	hourlyCost := c.BaseAwsPriceComponent.HourlyCost()
-	iops := decimal.NewFromInt(int64(0))
-	if c.AwsResource().RawValues()["iops"] != nil {
-		iops = decimal.NewFromFloat(c.AwsResource().RawValues()["iops"].(float64))
-	}
-	return hourlyCost.Mul(iops)
-}
-
-type Ec2BlockDevice struct {
-	*BaseAwsResource
-}
-
-func NewEc2BlockDevice(address string, region string, rawValues map[string]interface{}) *Ec2BlockDevice {
-	r := &Ec2BlockDevice{
-		BaseAwsResource: NewBaseAwsResource(address, region, rawValues),
-	}
-	priceComponents := []base.PriceComponent{
-		NewEc2BlockDeviceGB("GB", r),
-	}
-	if r.RawValues()["volume_type"] == "io1" {
-		priceComponents = append(priceComponents, NewEc2BlockDeviceIOPS("IOPS", r))
-	}
-	r.BaseAwsResource.priceComponents = priceComponents
 	return r
 }
 
-type Ec2InstanceHours struct {
-	*BaseAwsPriceComponent
-}
+func NewEc2Instance(address string, region string, rawValues map[string]interface{}) base.Resource {
+	r := base.NewBaseResource(address, rawValues, true)
 
-func NewEc2InstanceHours(name string, resource *Ec2Instance) *Ec2InstanceHours {
-	c := &Ec2InstanceHours{
-		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "hour"),
+	instanceType := rawValues["instance_type"].(string)
+	tenancy := "Shared"
+	if rawValues["tenancy"] != nil && rawValues["tenancy"].(string) == "dedicated" {
+		tenancy = "Dedicated"
 	}
 
-	c.defaultFilters = []base.Filter{
+	hours := base.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour")
+	hours.AddFilters(regionFilters(region))
+	hours.AddFilters([]base.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "Compute Instance"},
 		{Key: "operatingSystem", Value: "Linux"},
 		{Key: "preInstalledSw", Value: "NA"},
 		{Key: "capacitystatus", Value: "Used"},
-		{Key: "tenancy", Value: "Shared"},
-	}
+		{Key: "tenancy", Value: tenancy},
+		{Key: "instanceType", Value: instanceType},
+	})
+	r.AddPriceComponent(hours)
 
-	c.valueMappings = []base.ValueMapping{
-		{FromKey: "instance_type", ToKey: "instanceType"},
-		{
-			FromKey: "tenancy",
-			ToKey:   "tenancy",
-			ToValueFn: func(fromValue interface{}) string {
-				if fmt.Sprintf("%v", fromValue) == "dedicated" {
-					return "Dedicated"
-				}
-				return "Shared"
-			},
-		},
+	rootBlockDeviceRawValues := make(map[string]interface{})
+	if r := base.ToGJSON(rawValues).Get("root_block_device.0"); r.Exists() {
+		rootBlockDeviceRawValues = r.Value().(map[string]interface{})
 	}
-
-	return c
-}
-
-type Ec2Instance struct {
-	*BaseAwsResource
-}
-
-func NewEc2Instance(address string, region string, rawValues map[string]interface{}) *Ec2Instance {
-	r := &Ec2Instance{
-		NewBaseAwsResource(address, region, rawValues),
-	}
-	r.BaseAwsResource.priceComponents = []base.PriceComponent{
-		NewEc2InstanceHours("Instance hours", r),
-	}
-
-	subResources := make([]base.Resource, 0)
-	subResourceAddress := fmt.Sprintf("%s.root_block_device", r.Address())
-	if r.RawValues()["root_block_device"] != nil {
-		rootBlockDevices := r.RawValues()["root_block_device"].([]interface{})
-		subResources = append(subResources, NewEc2BlockDevice(subResourceAddress, r.region, rootBlockDevices[0].(map[string]interface{})))
-	} else {
-		subResources = append(subResources, NewEc2BlockDevice(subResourceAddress, r.region, make(map[string]interface{})))
-	}
+	rootBlockDeviceAddress := fmt.Sprintf("%s.root_block_device", address)
+	rootBlockDevice := newEc2BlockDevice(rootBlockDeviceAddress, region, rootBlockDeviceRawValues)
+	r.AddSubResource(rootBlockDevice)
 
 	if r.RawValues()["ebs_block_device"] != nil {
-		ebsBlockDevices := r.RawValues()["ebs_block_device"].([]interface{})
-		for i, ebsBlockDevice := range ebsBlockDevices {
-			subResourceAddress := fmt.Sprintf("%s.ebs_block_device[%d]", r.Address(), i)
-			subResources = append(subResources, NewEc2BlockDevice(subResourceAddress, r.region, ebsBlockDevice.(map[string]interface{})))
+		ebsBlockDevicesRawValues := rawValues["ebs_block_device"].([]interface{})
+		for i, ebsBlockDeviceRawValues := range ebsBlockDevicesRawValues {
+			ebsBlockDeviceAddress := fmt.Sprintf("%s.ebs_block_device[%d]", r.Address(), i)
+			ebsBlockDevice := newEc2BlockDevice(ebsBlockDeviceAddress, region, ebsBlockDeviceRawValues.(map[string]interface{}))
+			r.AddSubResource(ebsBlockDevice)
 		}
 	}
-
-	r.BaseAwsResource.subResources = subResources
 
 	return r
 }

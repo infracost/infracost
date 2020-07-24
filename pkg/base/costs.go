@@ -1,10 +1,11 @@
 package base
 
 import (
+	"sort"
+
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
-	"sort"
 )
 
 var HoursInMonth = 730
@@ -42,15 +43,15 @@ func createPriceComponentCost(priceComponent PriceComponent, queryResult gjson.R
 	}
 }
 
-func setPriceComponentPrice(priceComponent PriceComponent, queryResult gjson.Result) {
+func setPriceComponentPrice(resource Resource, priceComponent PriceComponent, queryResult gjson.Result) {
 	products := queryResult.Get("data.products").Array()
 	var price decimal.Decimal
 	if len(products) == 0 {
-		log.Warnf("No prices found for %s %s, using 0.00", priceComponent.Resource().Address(), priceComponent.Name())
+		log.Warnf("No prices found for %s %s, using 0.00", resource.Address(), priceComponent.Name())
 		price = decimal.Zero
 	} else {
 		if len(products) > 1 {
-			log.Warnf("Multiple prices found for %s %s, using the first price", priceComponent.Resource().Address(), priceComponent.Name())
+			log.Warnf("Multiple prices found for %s %s, using the first price", resource.Address(), priceComponent.Name())
 		}
 		priceStr := products[0].Get("onDemandPricing.0.priceDimensions.0.pricePerUnit.USD").String()
 		price, _ = decimal.NewFromString(priceStr)
@@ -67,15 +68,7 @@ func getCostBreakdown(resource Resource, results ResourceQueryResultMap) Resourc
 
 	subResourceCosts := make([]ResourceCostBreakdown, 0, len(resource.SubResources()))
 	for _, subResource := range resource.SubResources() {
-		subResourcePriceComponentCosts := make([]PriceComponentCost, 0, len(subResource.PriceComponents()))
-		for _, priceComponent := range subResource.PriceComponents() {
-			result := results[&subResource][&priceComponent]
-			subResourcePriceComponentCosts = append(subResourcePriceComponentCosts, createPriceComponentCost(priceComponent, result))
-		}
-		subResourceCosts = append(subResourceCosts, ResourceCostBreakdown{
-			Resource:            subResource,
-			PriceComponentCosts: subResourcePriceComponentCosts,
-		})
+		subResourceCosts = append(subResourceCosts, getCostBreakdown(subResource, results))
 	}
 
 	return ResourceCostBreakdown{
@@ -90,6 +83,9 @@ func GenerateCostBreakdowns(q QueryRunner, resources []Resource) ([]ResourceCost
 
 	results := make(map[*Resource]ResourceQueryResultMap, len(resources))
 	for _, resource := range resources {
+		if !resource.HasCost() {
+			continue
+		}
 		resourceResults, err := q.RunQueries(resource)
 		if err != nil {
 			return costBreakdowns, err
@@ -98,7 +94,7 @@ func GenerateCostBreakdowns(q QueryRunner, resources []Resource) ([]ResourceCost
 
 		for _, priceComponentResults := range resourceResults {
 			for priceComponent, result := range priceComponentResults {
-				setPriceComponentPrice(*priceComponent, result)
+				setPriceComponentPrice(resource, *priceComponent, result)
 			}
 		}
 	}

@@ -158,3 +158,27 @@ resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat1.id
   subnet_id     = tolist(data.aws_subnet_ids.all.ids)[0]
 }
+
+resource "aws_autoscaling_group" "mixed-instance-lt1" {
+  desired_capacity   = 4
+  max_size           = 5
+  min_size           = 1
+
+  mixed_instances_policy {
+    launch_template {
+      launch_template_specification {
+        launch_template_id = aws_launch_template.lt1.id
+      }
+
+      override {
+        instance_type     = "t3.medium"
+        weighted_capacity = "3"
+      }
+
+      override {
+        instance_type     = "t3.large"
+        weighted_capacity = "2"
+      }
+    }
+  }
+}
