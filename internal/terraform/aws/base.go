@@ -1,9 +1,7 @@
 package aws
 
 import (
-	"github.com/shopspring/decimal"
 	"infracost/pkg/base"
-	"sort"
 )
 
 var DefaultVolumeSize = 8
@@ -35,133 +33,9 @@ var regionMapping = map[string]string{
 	"af-south-1":     "Africa (Cape Town)",
 }
 
-type AwsResource interface {
-	base.Resource
-	Region() string
-	RawValues() map[string]interface{}
-}
-
-type AwsPriceComponent interface {
-	base.PriceComponent
-	AwsResource() AwsResource
-	TimeUnit() string
-}
-
-type BaseAwsPriceComponent struct {
-	name           string
-	resource       AwsResource
-	timeUnit       string
-	regionFilters  []base.Filter
-	defaultFilters []base.Filter
-	valueMappings  []base.ValueMapping
-	price          decimal.Decimal
-}
-
-func NewBaseAwsPriceComponent(name string, resource AwsResource, timeUnit string) *BaseAwsPriceComponent {
-	c := &BaseAwsPriceComponent{
-		name:     name,
-		resource: resource,
-		timeUnit: timeUnit,
-		regionFilters: []base.Filter{
-			{Key: "locationType", Value: "AWS Region"},
-			{Key: "location", Value: regionMapping[resource.Region()]},
-		},
-		defaultFilters: []base.Filter{},
-		valueMappings:  []base.ValueMapping{},
-		price:          decimal.Zero,
+func regionFilters(region string) []base.Filter {
+	return []base.Filter{
+		{Key: "locationType", Value: "AWS Region"},
+		{Key: "location", Value: regionMapping[region]},
 	}
-
-	return c
-}
-
-func (c *BaseAwsPriceComponent) AwsResource() AwsResource {
-	return c.resource
-}
-
-func (c *BaseAwsPriceComponent) TimeUnit() string {
-	return c.timeUnit
-}
-
-func (c *BaseAwsPriceComponent) Name() string {
-	return c.name
-}
-
-func (c *BaseAwsPriceComponent) Resource() base.Resource {
-	return c.resource
-}
-
-func (c *BaseAwsPriceComponent) Filters() []base.Filter {
-	filters := base.MapFilters(c.valueMappings, c.resource.RawValues())
-	return base.MergeFilters(c.regionFilters, c.defaultFilters, filters)
-}
-
-func (c *BaseAwsPriceComponent) SetPrice(price decimal.Decimal) {
-	c.price = price
-}
-
-func (c *BaseAwsPriceComponent) HourlyCost() decimal.Decimal {
-	timeUnitSecs := map[string]decimal.Decimal{
-		"hour":  decimal.NewFromInt(int64(60 * 60)),
-		"month": decimal.NewFromInt(int64(60 * 60 * 730)),
-	}
-	timeUnitMultiplier := timeUnitSecs["hour"].Div(timeUnitSecs[c.timeUnit])
-	return c.price.Mul(timeUnitMultiplier)
-}
-
-type BaseAwsResource struct {
-	address         string
-	rawValues       map[string]interface{}
-	region          string
-	references      map[string]base.Resource
-	subResources    []base.Resource
-	priceComponents []base.PriceComponent
-}
-
-func NewBaseAwsResource(address string, region string, rawValues map[string]interface{}) *BaseAwsResource {
-	r := &BaseAwsResource{
-		address:    address,
-		region:     region,
-		rawValues:  rawValues,
-		references: map[string]base.Resource{},
-	}
-
-	return r
-}
-
-func (r *BaseAwsResource) Address() string {
-	return r.address
-}
-
-func (r *BaseAwsResource) Region() string {
-	return r.region
-}
-
-func (r *BaseAwsResource) RawValues() map[string]interface{} {
-	return r.rawValues
-}
-
-func (r *BaseAwsResource) SubResources() []base.Resource {
-	sort.Slice(r.subResources, func(i, j int) bool {
-		return r.subResources[i].Address() < r.subResources[j].Address()
-	})
-	return r.subResources
-}
-
-func (r *BaseAwsResource) PriceComponents() []base.PriceComponent {
-	sort.Slice(r.priceComponents, func(i, j int) bool {
-		return r.priceComponents[i].Name() < r.priceComponents[j].Name()
-	})
-	return r.priceComponents
-}
-
-func (r *BaseAwsResource) References() map[string]base.Resource {
-	return r.references
-}
-
-func (r *BaseAwsResource) AddReference(name string, resource base.Resource) {
-	r.references[name] = resource
-}
-
-func (r *BaseAwsResource) HasCost() bool {
-	return true
 }

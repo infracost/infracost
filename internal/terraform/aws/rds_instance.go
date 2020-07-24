@@ -1,181 +1,126 @@
 package aws
 
 import (
+	"fmt"
 	"infracost/pkg/base"
 
 	"github.com/shopspring/decimal"
 )
 
-var multiAzMapping = base.ValueMapping{
-	FromKey: "multi_az",
-	ToKey:   "deploymentOption",
-	ToValueFn: func(fromVal interface{}) string {
-		if fromVal.(bool) {
-			return "Multi-AZ"
+func rdsInstanceGbQuantity(resource base.Resource) decimal.Decimal {
+	quantity := decimal.Zero
+
+	sizeVal := resource.RawValues()["allocated_storage"]
+	if sizeVal != nil {
+		quantity = decimal.NewFromFloat(sizeVal.(float64))
+	}
+
+	return quantity
+}
+
+func rdsInstanceIopsQuantity(resource base.Resource) decimal.Decimal {
+	quantity := decimal.Zero
+
+	iopsVal := resource.RawValues()["iops"]
+	if iopsVal != nil {
+		quantity = decimal.NewFromFloat(iopsVal.(float64))
+	}
+
+	return quantity
+}
+
+func NewRdsInstance(address string, region string, rawValues map[string]interface{}) base.Resource {
+	r := base.NewBaseResource(address, rawValues, true)
+
+	deploymentOption := "Single-AZ"
+	if rawValues["multi_az"] != nil && rawValues["multi_az"].(bool) {
+		deploymentOption = "Multi-AZ"
+	}
+
+	instanceType := rawValues["instance_class"].(string)
+
+	var databaseEngine string
+	switch rawValues["engine"].(string) {
+	case "postgresql":
+		databaseEngine = "PostgreSQL"
+	case "mysql":
+		databaseEngine = "MySQL"
+	case "mariadb":
+		databaseEngine = "MariaDB"
+	case "aurora", "aurora-mysql":
+		databaseEngine = "Aurora MySQL"
+	case "aurora-postgresql":
+		databaseEngine = "Aurora PostgreSQL"
+	case "oracle-se", "oracle-se1", "oracle-se2", "oracle-ee":
+		databaseEngine = "Oracle"
+	case "sqlserver-ex", "sqlserver-web", "sqlserver-se", "sqlserver-ee":
+		databaseEngine = "SQL Server"
+	}
+
+	var databaseEdition string
+	switch rawValues["engine"].(string) {
+	case "oracle-se", "sqlserver-se":
+		databaseEdition = "Standard"
+	case "oracle-se1":
+		databaseEdition = "Standard One"
+	case "oracle-se2":
+		databaseEdition = "Standard 2"
+	case "oracle-ee", "sqlserver-ee":
+		databaseEdition = "Enterprise"
+	case "sqlserver-ex":
+		databaseEdition = "Express"
+	case "sqlserver-web":
+		databaseEdition = "Web"
+	}
+
+	volumeType := "General Purpose"
+	if rawValues["storage_ty[e"] != nil {
+		switch rawValues["storage_type"].(string) {
+		case "standard":
+			volumeType = "Magnetic"
+		case "io1":
+			volumeType = "Provisioned IOPS"
 		}
-		return "Single-AZ"
-	},
-}
-
-type RdsStorageIOPS struct {
-	*BaseAwsPriceComponent
-}
-
-func NewRdsStorageIOPS(name string, resource *RdsInstance) *RdsStorageIOPS {
-	c := &RdsStorageIOPS{
-		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "month"),
 	}
 
-	c.defaultFilters = []base.Filter{
-		{Key: "servicecode", Value: "AmazonRDS"},
-		{Key: "productFamily", Value: "Provisioned IOPS"},
-		{Key: "deploymentOption", Value: "Single-AZ"},
-	}
-
-	c.valueMappings = []base.ValueMapping{multiAzMapping}
-
-	return c
-}
-
-func (c *RdsStorageIOPS) HourlyCost() decimal.Decimal {
-	hourlyCost := c.BaseAwsPriceComponent.HourlyCost()
-	size := decimal.NewFromInt(int64(0))
-	if c.AwsResource().RawValues()["iops"] != nil {
-		size = decimal.NewFromFloat(c.AwsResource().RawValues()["iops"].(float64))
-	}
-	return hourlyCost.Mul(size)
-}
-
-type RdsStorageGB struct {
-	*BaseAwsPriceComponent
-}
-
-func NewRdsStorageGB(name string, resource *RdsInstance) *RdsStorageGB {
-	c := &RdsStorageGB{
-		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "month"),
-	}
-
-	c.defaultFilters = []base.Filter{
-		{Key: "servicecode", Value: "AmazonRDS"},
-		{Key: "productFamily", Value: "Database Storage"},
-		{Key: "deploymentOption", Value: "Single-AZ"},
-		{Key: "volumeType", Value: "General Purpose"},
-	}
-
-	c.valueMappings = []base.ValueMapping{
-		{
-			FromKey: "storage_type",
-			ToKey:   "volumeType",
-			ToValueFn: func(fromVal interface{}) string {
-				switch fromVal.(string) {
-				case "standard":
-					return "Magnetic"
-				case "io1":
-					return "Provisioned IOPS"
-				}
-				return "General Purpose"
-			},
-		},
-		multiAzMapping,
-	}
-
-	return c
-}
-
-func (c *RdsStorageGB) HourlyCost() decimal.Decimal {
-	hourlyCost := c.BaseAwsPriceComponent.HourlyCost()
-	size := decimal.NewFromInt(int64(0))
-	if c.AwsResource().RawValues()["allocated_storage"] != nil {
-		size = decimal.NewFromFloat(c.AwsResource().RawValues()["allocated_storage"].(float64))
-	}
-	if c.AwsResource().RawValues()["max_allocated_storage"] != nil {
-		size = decimal.NewFromFloat(c.AwsResource().RawValues()["max_allocated_storage"].(float64))
-	}
-	return hourlyCost.Mul(size)
-}
-
-type RdsInstanceHours struct {
-	*BaseAwsPriceComponent
-}
-
-func NewRdsInstanceHours(name string, resource *RdsInstance) *RdsInstanceHours {
-	c := &RdsInstanceHours{
-		NewBaseAwsPriceComponent(name, resource.BaseAwsResource, "hour"),
-	}
-
-	c.defaultFilters = []base.Filter{
+	hours := base.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour")
+	hours.AddFilters(regionFilters(region))
+	hours.AddFilters([]base.Filter{
 		{Key: "servicecode", Value: "AmazonRDS"},
 		{Key: "productFamily", Value: "Database Instance"},
-		{Key: "deploymentOption", Value: "Single-AZ"},
+		{Key: "deploymentOption", Value: deploymentOption},
+		{Key: "instanceType", Value: instanceType},
+		{Key: "databaseEngine", Value: databaseEngine},
+	})
+	if databaseEdition != "" {
+		hours.AddFilters([]base.Filter{
+			{Key: "databaseEdition", Value: databaseEdition},
+		})
+	}
+	r.AddPriceComponent(hours)
+
+	gb := base.NewBasePriceComponent("GB", r, "GB/month", "month")
+	gb.AddFilters(regionFilters(region))
+	gb.AddFilters([]base.Filter{
+		{Key: "servicecode", Value: "AmazonRDS"},
+		{Key: "productFamily", Value: "Database Storage"},
+		{Key: "deploymentOption", Value: deploymentOption},
+		{Key: "volumeType", Value: volumeType},
+	})
+	gb.SetQuantityMultiplierFunc(rdsInstanceGbQuantity)
+	r.AddPriceComponent(gb)
+
+	if volumeType == "io1" {
+		iops := base.NewBasePriceComponent("IOPS", r, "IOPS/month", "month")
+		iops.AddFilters(regionFilters(region))
+		iops.AddFilters([]base.Filter{
+			{Key: "servicecode", Value: "AmazonRDS"},
+			{Key: "productFamily", Value: "Provisioned IOPS"},
+			{Key: "deploymentOption", Value: deploymentOption},
+		})
+		iops.SetQuantityMultiplierFunc(rdsInstanceIopsQuantity)
+		r.AddPriceComponent(iops)
 	}
 
-	c.valueMappings = []base.ValueMapping{
-		{FromKey: "instance_class", ToKey: "instanceType"},
-		{
-			FromKey: "engine",
-			ToKey:   "databaseEngine",
-			ToValueFn: func(fromVal interface{}) string {
-				switch fromVal.(string) {
-				case "postgresql":
-					return "PostgreSQL"
-				case "mysql":
-					return "MySQL"
-				case "mariadb":
-					return "MariaDB"
-				case "aurora", "aurora-mysql":
-					return "Aurora MySQL"
-				case "aurora-postgresql":
-					return "Aurora PostgreSQL"
-				case "oracle-se", "oracle-se1", "oracle-se2", "oracle-ee":
-					return "Oracle"
-				case "sqlserver-ex", "sqlserver-web", "sqlserver-se", "sqlserver-ee":
-					return "SQL Server"
-				}
-				return ""
-			},
-		},
-		{
-			FromKey: "engine",
-			ToKey:   "databaseEdition",
-			ToValueFn: func(fromVal interface{}) string {
-				switch fromVal.(string) {
-				case "oracle-se", "sqlserver-se":
-					return "Standard"
-				case "oracle-se1":
-					return "Standard One"
-				case "oracle-se2":
-					return "Standard 2"
-				case "oracle-ee", "sqlserver-ee":
-					return "Enterprise"
-				case "sqlserver-ex":
-					return "Express"
-				case "sqlserver-web":
-					return "Web"
-				}
-				return ""
-			},
-		},
-		multiAzMapping,
-	}
-
-	return c
-}
-
-type RdsInstance struct {
-	*BaseAwsResource
-}
-
-func NewRdsInstance(address string, region string, rawValues map[string]interface{}) *RdsInstance {
-	r := &RdsInstance{
-		NewBaseAwsResource(address, region, rawValues),
-	}
-	priceComponents := []base.PriceComponent{
-		NewRdsInstanceHours("Instance hours", r),
-		NewRdsStorageGB("GB", r),
-	}
-	if r.RawValues()["storage_type"] == "io1" {
-		priceComponents = append(priceComponents, NewRdsStorageIOPS("IOPS", r))
-	}
-	r.BaseAwsResource.priceComponents = priceComponents
 	return r
 }

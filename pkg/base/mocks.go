@@ -9,7 +9,6 @@ import (
 
 type testPriceComponent struct {
 	name       string
-	resource   Resource
 	filters    []Filter
 	price      decimal.Decimal
 	hourlyCost decimal.Decimal
@@ -19,12 +18,12 @@ func (c *testPriceComponent) Name() string {
 	return c.name
 }
 
-func (c *testPriceComponent) Resource() Resource {
-	return c.resource
-}
-
 func (c *testPriceComponent) Filters() []Filter {
 	return c.filters
+}
+
+func (c *testPriceComponent) Price() decimal.Decimal {
+	return c.price
 }
 
 func (c *testPriceComponent) SetPrice(price decimal.Decimal) {

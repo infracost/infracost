@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"infracost/pkg/base"
@@ -16,7 +17,7 @@ import (
 func getLineItemCount(breakdown base.ResourceCostBreakdown) int {
 	count := len(breakdown.PriceComponentCosts)
 
-	for _, subResourceBreakdown := range breakdown.SubResourceCosts {
+	for _, subResourceBreakdown := range flattenSubResourceBreakdowns(breakdown.SubResourceCosts) {
 		count += len(subResourceBreakdown.PriceComponentCosts)
 	}
 
@@ -35,27 +36,45 @@ func formatDecimal(d decimal.Decimal, format string) string {
 	return fmt.Sprintf(format, f)
 }
 
+func formatQuantity(quantity decimal.Decimal) string {
+	f, _ := quantity.Float64()
+	return strconv.FormatFloat(f, 'f', -1, 64)
+}
+
+func flattenSubResourceBreakdowns(breakdowns []base.ResourceCostBreakdown) []base.ResourceCostBreakdown {
+	flattenedBreakdowns := make([]base.ResourceCostBreakdown, 0)
+	for _, breakdown := range breakdowns {
+		flattenedBreakdowns = append(flattenedBreakdowns, breakdown)
+		if len(breakdown.SubResourceCosts) > 0 {
+			flattenedBreakdowns = append(flattenedBreakdowns, breakdown.SubResourceCosts...)
+		}
+	}
+	return flattenedBreakdowns
+}
+
 func ToTable(resourceCostBreakdowns []base.ResourceCostBreakdown) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
 	table := tablewriter.NewWriter(bufw)
-	table.SetHeader([]string{"NAME", "HOURLY COST", "MONTHLY COST"})
+	table.SetHeader([]string{"NAME", "QUANTITY", "UNIT", "HOURLY COST", "MONTHLY COST"})
 	table.SetBorder(false)
 	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 	table.SetAutoWrapText(false)
 	table.SetCenterSeparator("")
 	table.SetColumnSeparator("")
 	table.SetRowSeparator("")
-	table.SetColumnAlignment([]int{tablewriter.ALIGN_LEFT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_RIGHT})
+	table.SetColumnAlignment([]int{tablewriter.ALIGN_LEFT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_RIGHT})
 
 	overallTotalHourly := decimal.Zero
 	overallTotalMonthly := decimal.Zero
 
 	color := []tablewriter.Colors{
-		tablewriter.Colors{tablewriter.FgHiBlackColor},
-		tablewriter.Colors{tablewriter.FgHiBlackColor},
-		tablewriter.Colors{tablewriter.FgHiBlackColor},
+		{tablewriter.FgHiBlackColor},
+		{tablewriter.FgHiBlackColor},
+		{tablewriter.FgHiBlackColor},
+		{tablewriter.FgHiBlackColor},
+		{tablewriter.FgHiBlackColor},
 	}
 	if config.Config.NoColor {
 		color = nil
@@ -77,13 +96,15 @@ func ToTable(resourceCostBreakdowns []base.ResourceCostBreakdown) ([]byte, error
 
 			row := []string{
 				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), priceComponentCost.PriceComponent.Name()),
+				formatQuantity(priceComponentCost.PriceComponent.Quantity()),
+				priceComponentCost.PriceComponent.Unit(),
 				formatDecimal(priceComponentCost.HourlyCost, "%.4f"),
 				formatDecimal(priceComponentCost.MonthlyCost, "%.4f"),
 			}
 			table.Rich(row, color)
 		}
 
-		for _, subResourceBreakdown := range breakdown.SubResourceCosts {
+		for _, subResourceBreakdown := range flattenSubResourceBreakdowns(breakdown.SubResourceCosts) {
 			for _, priceComponentCost := range subResourceBreakdown.PriceComponentCosts {
 				lineItem++
 
@@ -97,6 +118,8 @@ func ToTable(resourceCostBreakdowns []base.ResourceCostBreakdown) ([]byte, error
 				)
 				row := []string{
 					fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), label),
+					formatQuantity(priceComponentCost.PriceComponent.Quantity()),
+					priceComponentCost.PriceComponent.Unit(),
 					formatDecimal(priceComponentCost.HourlyCost, "%.4f"),
 					formatDecimal(priceComponentCost.MonthlyCost, "%.4f"),
 				}
@@ -106,6 +129,8 @@ func ToTable(resourceCostBreakdowns []base.ResourceCostBreakdown) ([]byte, error
 
 		table.Append([]string{
 			"Total",
+			"",
+			"",
 			formatDecimal(totalHourly, "%.4f"),
 			formatDecimal(totalMonthly, "%.4f"),
 		})
@@ -117,6 +142,8 @@ func ToTable(resourceCostBreakdowns []base.ResourceCostBreakdown) ([]byte, error
 
 	table.Append([]string{
 		"OVERALL TOTAL",
+		"",
+		"",
 		formatDecimal(overallTotalHourly, "%.4f"),
 		formatDecimal(overallTotalMonthly, "%.4f"),
 	})
