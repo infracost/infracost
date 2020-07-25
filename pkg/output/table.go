@@ -7,14 +7,14 @@ import (
 	"strconv"
 	"strings"
 
-	"infracost/pkg/base"
 	"infracost/pkg/config"
+	"infracost/pkg/costs"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/shopspring/decimal"
 )
 
-func getLineItemCount(breakdown base.ResourceCostBreakdown) int {
+func getLineItemCount(breakdown costs.ResourceCostBreakdown) int {
 	count := len(breakdown.PriceComponentCosts)
 
 	for _, subResourceBreakdown := range flattenSubResourceBreakdowns(breakdown.SubResourceCosts) {
@@ -41,8 +41,8 @@ func formatQuantity(quantity decimal.Decimal) string {
 	return strconv.FormatFloat(f, 'f', -1, 64)
 }
 
-func flattenSubResourceBreakdowns(breakdowns []base.ResourceCostBreakdown) []base.ResourceCostBreakdown {
-	flattenedBreakdowns := make([]base.ResourceCostBreakdown, 0)
+func flattenSubResourceBreakdowns(breakdowns []costs.ResourceCostBreakdown) []costs.ResourceCostBreakdown {
+	flattenedBreakdowns := make([]costs.ResourceCostBreakdown, 0)
 	for _, breakdown := range breakdowns {
 		flattenedBreakdowns = append(flattenedBreakdowns, breakdown)
 		if len(breakdown.SubResourceCosts) > 0 {
@@ -52,7 +52,7 @@ func flattenSubResourceBreakdowns(breakdowns []base.ResourceCostBreakdown) []bas
 	return flattenedBreakdowns
 }
 
-func ToTable(resourceCostBreakdowns []base.ResourceCostBreakdown) ([]byte, error) {
+func ToTable(resourceCostBreakdowns []costs.ResourceCostBreakdown) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 

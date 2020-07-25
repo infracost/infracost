@@ -1,4 +1,4 @@
-package base
+package costs
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"infracost/pkg/config"
+	"infracost/pkg/resource"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -17,10 +18,10 @@ type GraphQLQuery struct {
 	Variables map[string]interface{} `json:"variables"`
 }
 
-type ResourceQueryResultMap map[*Resource]map[*PriceComponent]gjson.Result
+type ResourceQueryResultMap map[*resource.Resource]map[*resource.PriceComponent]gjson.Result
 
 type QueryRunner interface {
-	RunQueries(resource Resource) (ResourceQueryResultMap, error)
+	RunQueries(r resource.Resource) (ResourceQueryResultMap, error)
 }
 
 type GraphQLQueryRunner struct {
@@ -33,7 +34,7 @@ func NewGraphQLQueryRunner(endpoint string) *GraphQLQueryRunner {
 	}
 }
 
-func (r *GraphQLQueryRunner) buildQuery(filters []Filter) GraphQLQuery {
+func (q *GraphQLQueryRunner) buildQuery(filters []resource.Filter) GraphQLQuery {
 	variables := map[string]interface{}{}
 	variables["filter"] = map[string]interface{}{}
 	variables["filter"].(map[string]interface{})["attributes"] = filters
@@ -57,7 +58,7 @@ func (r *GraphQLQueryRunner) buildQuery(filters []Filter) GraphQLQuery {
 	return GraphQLQuery{query, variables}
 }
 
-func (r *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
+func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
 	results := make([]gjson.Result, 0, len(queries))
 
 	queriesBody, err := json.Marshal(queries)
@@ -66,7 +67,7 @@ func (r *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 	}
 
 	client := http.Client{}
-	resp, err := client.Post(r.endpoint, "application/json", bytes.NewBuffer([]byte(queriesBody)))
+	resp, err := client.Post(q.endpoint, "application/json", bytes.NewBuffer([]byte(queriesBody)))
 	if err != nil {
 		return results, err
 	}
@@ -84,19 +85,19 @@ func (r *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 
 // Batch all the queries for this resource so we can use one GraphQL call
 // Use queryKeys to keep track of which query maps to which sub-resource and price component
-func (r *GraphQLQueryRunner) batchQueries(resource Resource) ([]queryKey, []GraphQLQuery) {
+func (q *GraphQLQueryRunner) batchQueries(r resource.Resource) ([]queryKey, []GraphQLQuery) {
 	queryKeys := make([]queryKey, 0)
 	queries := make([]GraphQLQuery, 0)
 
-	for _, priceComponent := range resource.PriceComponents() {
-		queryKeys = append(queryKeys, queryKey{resource, priceComponent})
-		queries = append(queries, r.buildQuery(priceComponent.Filters()))
+	for _, priceComponent := range r.PriceComponents() {
+		queryKeys = append(queryKeys, queryKey{r, priceComponent})
+		queries = append(queries, q.buildQuery(priceComponent.Filters()))
 	}
 
-	for _, subResource := range FlattenSubResources(resource) {
+	for _, subResource := range resource.FlattenSubResources(r) {
 		for _, priceComponent := range subResource.PriceComponents() {
 			queryKeys = append(queryKeys, queryKey{subResource, priceComponent})
-			queries = append(queries, r.buildQuery(priceComponent.Filters()))
+			queries = append(queries, q.buildQuery(priceComponent.Filters()))
 		}
 	}
 
@@ -104,30 +105,30 @@ func (r *GraphQLQueryRunner) batchQueries(resource Resource) ([]queryKey, []Grap
 }
 
 // Unpack the query results into a map so we can find by resource and price component
-func (r *GraphQLQueryRunner) unpackQueryResults(queryKeys []queryKey, queryResults []gjson.Result) ResourceQueryResultMap {
+func (q *GraphQLQueryRunner) unpackQueryResults(queryKeys []queryKey, queryResults []gjson.Result) ResourceQueryResultMap {
 	resourceResults := make(ResourceQueryResultMap)
 
 	for i, queryResult := range queryResults {
-		resource := queryKeys[i].Resource
+		r := queryKeys[i].Resource
 		priceComponent := queryKeys[i].PriceComponent
 
-		if _, ok := resourceResults[&resource]; !ok {
-			resourceResults[&resource] = make(map[*PriceComponent]gjson.Result)
+		if _, ok := resourceResults[&r]; !ok {
+			resourceResults[&r] = make(map[*resource.PriceComponent]gjson.Result)
 		}
-		resourceResults[&resource][&priceComponent] = queryResult
+		resourceResults[&r][&priceComponent] = queryResult
 	}
 
 	return resourceResults
 }
 
-func (r *GraphQLQueryRunner) RunQueries(resource Resource) (ResourceQueryResultMap, error) {
-	queryKeys, queries := r.batchQueries(resource)
+func (q *GraphQLQueryRunner) RunQueries(r resource.Resource) (ResourceQueryResultMap, error) {
+	queryKeys, queries := q.batchQueries(r)
 
-	log.Debugf("Getting pricing details from %s for %s", config.Config.ApiUrl, resource.Address())
-	queryResults, err := r.getQueryResults(queries)
+	log.Debugf("Getting pricing details from %s for %s", config.Config.ApiUrl, r.Address())
+	queryResults, err := q.getQueryResults(queries)
 	if err != nil {
 		return ResourceQueryResultMap{}, err
 	}
 
-	return r.unpackQueryResults(queryKeys, queryResults), nil
+	return q.unpackQueryResults(queryKeys, queryResults), nil
 }

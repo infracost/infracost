@@ -1,8 +1,6 @@
 package aws
 
-import (
-	"infracost/pkg/base"
-)
+import "infracost/pkg/resource"
 
 var DefaultVolumeSize = 8
 
@@ -33,8 +31,8 @@ var regionMapping = map[string]string{
 	"af-south-1":     "Africa (Cape Town)",
 }
 
-func regionFilters(region string) []base.Filter {
-	return []base.Filter{
+func regionFilters(region string) []resource.Filter {
+	return []resource.Filter{
 		{Key: "locationType", Value: "AWS Region"},
 		{Key: "location", Value: regionMapping[region]},
 	}

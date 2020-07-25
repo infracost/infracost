@@ -1,6 +1,7 @@
-package base
+package costs
 
 import (
+	"infracost/pkg/resource"
 	"sort"
 
 	"github.com/shopspring/decimal"
@@ -11,29 +12,29 @@ import (
 var HoursInMonth = 730
 
 type PriceComponentCost struct {
-	PriceComponent PriceComponent
+	PriceComponent resource.PriceComponent
 	HourlyCost     decimal.Decimal
 	MonthlyCost    decimal.Decimal
 }
 
 type ResourceCostBreakdown struct {
-	Resource            Resource
+	Resource            resource.Resource
 	PriceComponentCosts []PriceComponentCost
 	SubResourceCosts    []ResourceCostBreakdown
 }
 
 type PriceComponentQueryMap struct {
-	Resource       Resource
-	PriceComponent PriceComponent
+	Resource       resource.Resource
+	PriceComponent resource.PriceComponent
 	Query          GraphQLQuery
 }
 
 type queryKey struct {
-	Resource       Resource
-	PriceComponent PriceComponent
+	Resource       resource.Resource
+	PriceComponent resource.PriceComponent
 }
 
-func createPriceComponentCost(priceComponent PriceComponent, queryResult gjson.Result) PriceComponentCost {
+func createPriceComponentCost(priceComponent resource.PriceComponent, queryResult gjson.Result) PriceComponentCost {
 	hourlyCost := priceComponent.HourlyCost()
 
 	return PriceComponentCost{
@@ -43,15 +44,15 @@ func createPriceComponentCost(priceComponent PriceComponent, queryResult gjson.R
 	}
 }
 
-func setPriceComponentPrice(resource Resource, priceComponent PriceComponent, queryResult gjson.Result) {
+func setPriceComponentPrice(r resource.Resource, priceComponent resource.PriceComponent, queryResult gjson.Result) {
 	products := queryResult.Get("data.products").Array()
 	var price decimal.Decimal
 	if len(products) == 0 {
-		log.Warnf("No prices found for %s %s, using 0.00", resource.Address(), priceComponent.Name())
+		log.Warnf("No prices found for %s %s, using 0.00", r.Address(), priceComponent.Name())
 		price = decimal.Zero
 	} else {
 		if len(products) > 1 {
-			log.Warnf("Multiple prices found for %s %s, using the first price", resource.Address(), priceComponent.Name())
+			log.Warnf("Multiple prices found for %s %s, using the first price", r.Address(), priceComponent.Name())
 		}
 		priceStr := products[0].Get("onDemandPricing.0.priceDimensions.0.pricePerUnit.USD").String()
 		price, _ = decimal.NewFromString(priceStr)
@@ -59,51 +60,51 @@ func setPriceComponentPrice(resource Resource, priceComponent PriceComponent, qu
 	priceComponent.SetPrice(price)
 }
 
-func getCostBreakdown(resource Resource, results ResourceQueryResultMap) ResourceCostBreakdown {
-	priceComponentCosts := make([]PriceComponentCost, 0, len(resource.PriceComponents()))
-	for _, priceComponent := range resource.PriceComponents() {
-		result := results[&resource][&priceComponent]
+func getCostBreakdown(r resource.Resource, results ResourceQueryResultMap) ResourceCostBreakdown {
+	priceComponentCosts := make([]PriceComponentCost, 0, len(r.PriceComponents()))
+	for _, priceComponent := range r.PriceComponents() {
+		result := results[&r][&priceComponent]
 		priceComponentCosts = append(priceComponentCosts, createPriceComponentCost(priceComponent, result))
 	}
 
-	subResourceCosts := make([]ResourceCostBreakdown, 0, len(resource.SubResources()))
-	for _, subResource := range resource.SubResources() {
+	subResourceCosts := make([]ResourceCostBreakdown, 0, len(r.SubResources()))
+	for _, subResource := range r.SubResources() {
 		subResourceCosts = append(subResourceCosts, getCostBreakdown(subResource, results))
 	}
 
 	return ResourceCostBreakdown{
-		Resource:            resource,
+		Resource:            r,
 		PriceComponentCosts: priceComponentCosts,
 		SubResourceCosts:    subResourceCosts,
 	}
 }
 
-func GenerateCostBreakdowns(q QueryRunner, resources []Resource) ([]ResourceCostBreakdown, error) {
+func GenerateCostBreakdowns(q QueryRunner, resources []resource.Resource) ([]ResourceCostBreakdown, error) {
 	costBreakdowns := make([]ResourceCostBreakdown, 0, len(resources))
 
-	results := make(map[*Resource]ResourceQueryResultMap, len(resources))
-	for _, resource := range resources {
-		if !resource.HasCost() {
+	results := make(map[*resource.Resource]ResourceQueryResultMap, len(resources))
+	for _, r := range resources {
+		if !r.HasCost() {
 			continue
 		}
-		resourceResults, err := q.RunQueries(resource)
+		resourceResults, err := q.RunQueries(r)
 		if err != nil {
 			return costBreakdowns, err
 		}
-		results[&resource] = resourceResults
+		results[&r] = resourceResults
 
 		for _, priceComponentResults := range resourceResults {
 			for priceComponent, result := range priceComponentResults {
-				setPriceComponentPrice(resource, *priceComponent, result)
+				setPriceComponentPrice(r, *priceComponent, result)
 			}
 		}
 	}
 
-	for _, resource := range resources {
-		if !resource.HasCost() {
+	for _, r := range resources {
+		if !r.HasCost() {
 			continue
 		}
-		costBreakdowns = append(costBreakdowns, getCostBreakdown(resource, results[&resource]))
+		costBreakdowns = append(costBreakdowns, getCostBreakdown(r, results[&r]))
 	}
 
 	sort.Slice(costBreakdowns, func(i, j int) bool {

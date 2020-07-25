@@ -2,12 +2,12 @@ package aws
 
 import (
 	"fmt"
-	"infracost/pkg/base"
+	"infracost/pkg/resource"
 
 	"github.com/shopspring/decimal"
 )
 
-func ec2BlockDeviceGbQuantity(resource base.Resource) decimal.Decimal {
+func ec2BlockDeviceGbQuantity(resource resource.Resource) decimal.Decimal {
 	quantity := decimal.NewFromInt(int64(DefaultVolumeSize))
 
 	sizeVal := resource.RawValues()["volume_size"]
@@ -18,7 +18,7 @@ func ec2BlockDeviceGbQuantity(resource base.Resource) decimal.Decimal {
 	return quantity
 }
 
-func ec2BlockDeviceIopsQuantity(resource base.Resource) decimal.Decimal {
+func ec2BlockDeviceIopsQuantity(resource resource.Resource) decimal.Decimal {
 	quantity := decimal.Zero
 
 	iopsVal := resource.RawValues()["iops"]
@@ -29,17 +29,17 @@ func ec2BlockDeviceIopsQuantity(resource base.Resource) decimal.Decimal {
 	return quantity
 }
 
-func newEc2BlockDevice(address string, region string, rawValues map[string]interface{}) base.Resource {
-	r := base.NewBaseResource(address, rawValues, true)
+func newEc2BlockDevice(address string, region string, rawValues map[string]interface{}) resource.Resource {
+	r := resource.NewBaseResource(address, rawValues, true)
 
 	volumeApiName := "gp2"
 	if rawValues["volume_type"] != nil {
 		volumeApiName = rawValues["volume_type"].(string)
 	}
 
-	gb := base.NewBasePriceComponent("GB", r, "GB/month", "month")
+	gb := resource.NewBasePriceComponent("GB", r, "GB/month", "month")
 	gb.AddFilters(regionFilters(region))
-	gb.AddFilters([]base.Filter{
+	gb.AddFilters([]resource.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "Storage"},
 		{Key: "volumeApiName", Value: volumeApiName},
@@ -48,9 +48,9 @@ func newEc2BlockDevice(address string, region string, rawValues map[string]inter
 	r.AddPriceComponent(gb)
 
 	if volumeApiName == "io1" {
-		iops := base.NewBasePriceComponent("IOPS", r, "IOPS/month", "month")
+		iops := resource.NewBasePriceComponent("IOPS", r, "IOPS/month", "month")
 		iops.AddFilters(regionFilters(region))
-		iops.AddFilters([]base.Filter{
+		iops.AddFilters([]resource.Filter{
 			{Key: "servicecode", Value: "AmazonEC2"},
 			{Key: "productFamily", Value: "System Operation"},
 			{Key: "usagetype", Value: "/EBS:VolumeP-IOPS.piops/", Operation: "REGEX"},
@@ -63,8 +63,8 @@ func newEc2BlockDevice(address string, region string, rawValues map[string]inter
 	return r
 }
 
-func NewEc2Instance(address string, region string, rawValues map[string]interface{}) base.Resource {
-	r := base.NewBaseResource(address, rawValues, true)
+func NewEc2Instance(address string, region string, rawValues map[string]interface{}) resource.Resource {
+	r := resource.NewBaseResource(address, rawValues, true)
 
 	instanceType := rawValues["instance_type"].(string)
 	tenancy := "Shared"
@@ -72,9 +72,9 @@ func NewEc2Instance(address string, region string, rawValues map[string]interfac
 		tenancy = "Dedicated"
 	}
 
-	hours := base.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour")
+	hours := resource.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour")
 	hours.AddFilters(regionFilters(region))
-	hours.AddFilters([]base.Filter{
+	hours.AddFilters([]resource.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "Compute Instance"},
 		{Key: "operatingSystem", Value: "Linux"},
@@ -86,7 +86,7 @@ func NewEc2Instance(address string, region string, rawValues map[string]interfac
 	r.AddPriceComponent(hours)
 
 	rootBlockDeviceRawValues := make(map[string]interface{})
-	if r := base.ToGJSON(rawValues).Get("root_block_device.0"); r.Exists() {
+	if r := resource.ToGJSON(rawValues).Get("root_block_device.0"); r.Exists() {
 		rootBlockDeviceRawValues = r.Value().(map[string]interface{})
 	}
 	rootBlockDeviceAddress := fmt.Sprintf("%s.root_block_device", address)

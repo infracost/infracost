@@ -1,11 +1,11 @@
 package aws
 
 import (
-	"infracost/pkg/base"
+	"infracost/pkg/resource"
 )
 
-func NewElb(address string, region string, rawValues map[string]interface{}, isClassic bool) base.Resource {
-	r := base.NewBaseResource(address, rawValues, true)
+func NewElb(address string, region string, rawValues map[string]interface{}, isClassic bool) resource.Resource {
+	r := resource.NewBaseResource(address, rawValues, true)
 
 	productFamily := "Load Balancer"
 	if !isClassic {
@@ -16,9 +16,9 @@ func NewElb(address string, region string, rawValues map[string]interface{}, isC
 		}
 	}
 
-	hours := base.NewBasePriceComponent("Hours", r, "hour", "hour")
+	hours := resource.NewBasePriceComponent("Hours", r, "hour", "hour")
 	hours.AddFilters(regionFilters(region))
-	hours.AddFilters([]base.Filter{
+	hours.AddFilters([]resource.Filter{
 		{Key: "servicecode", Value: "AWSELB"},
 		{Key: "usagetype", Value: "/LoadBalancerUsage/", Operation: "REGEX"},
 		{Key: "productFamily", Value: productFamily},
