@@ -2,7 +2,7 @@ package output
 
 import (
 	"encoding/json"
-	"infracost/pkg/base"
+	"infracost/pkg/costs"
 
 	"github.com/shopspring/decimal"
 )
@@ -10,7 +10,7 @@ import (
 type PriceComponentCostJSON struct {
 	PriceComponent string          `json:"priceComponent"`
 	Quantity       decimal.Decimal `json:"quantity"`
-	Unit           string `json:"unit"`
+	Unit           string          `json:"unit"`
 	HourlyCost     decimal.Decimal `json:"hourlyCost"`
 	MonthlyCost    decimal.Decimal `json:"monthlyCost"`
 }
@@ -21,7 +21,7 @@ type ResourceCostBreakdownJSON struct {
 	SubResources []ResourceCostBreakdownJSON `json:"subresources,omitempty"`
 }
 
-func createJSONObj(breakdown base.ResourceCostBreakdown) ResourceCostBreakdownJSON {
+func createJSONObj(breakdown costs.ResourceCostBreakdown) ResourceCostBreakdownJSON {
 	priceComponentCostJSONs := make([]PriceComponentCostJSON, 0, len(breakdown.PriceComponentCosts))
 	for _, priceComponentCost := range breakdown.PriceComponentCosts {
 		priceComponentCostJSONs = append(priceComponentCostJSONs, PriceComponentCostJSON{
@@ -45,7 +45,7 @@ func createJSONObj(breakdown base.ResourceCostBreakdown) ResourceCostBreakdownJS
 	}
 }
 
-func ToJSON(resourceCostBreakdowns []base.ResourceCostBreakdown) ([]byte, error) {
+func ToJSON(resourceCostBreakdowns []costs.ResourceCostBreakdown) ([]byte, error) {
 	jsonObjs := make([]ResourceCostBreakdownJSON, 0, len(resourceCostBreakdowns))
 	for _, breakdown := range resourceCostBreakdowns {
 		jsonObjs = append(jsonObjs, createJSONObj(breakdown))

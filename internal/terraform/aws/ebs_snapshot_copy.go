@@ -1,12 +1,12 @@
 package aws
 
 import (
-	"infracost/pkg/base"
+	"infracost/pkg/resource"
 
 	"github.com/shopspring/decimal"
 )
 
-func ebsSnapshotCopyGbQuantity(resource base.Resource) decimal.Decimal {
+func ebsSnapshotCopyGbQuantity(resource resource.Resource) decimal.Decimal {
 	quantity := decimal.NewFromInt(int64(DefaultVolumeSize))
 
 	sourceSnapshot := resource.References()["source_snapshot_id"]
@@ -26,12 +26,12 @@ func ebsSnapshotCopyGbQuantity(resource base.Resource) decimal.Decimal {
 	return quantity
 }
 
-func NewEbsSnapshotCopy(address string, region string, rawValues map[string]interface{}) base.Resource {
-	r := base.NewBaseResource(address, rawValues, true)
+func NewEbsSnapshotCopy(address string, region string, rawValues map[string]interface{}) resource.Resource {
+	r := resource.NewBaseResource(address, rawValues, true)
 
-	gb := base.NewBasePriceComponent("GB", r, "GB/month", "month")
+	gb := resource.NewBasePriceComponent("GB", r, "GB/month", "month")
 	gb.AddFilters(regionFilters(region))
-	gb.AddFilters([]base.Filter{
+	gb.AddFilters([]resource.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "Storage Snapshot"},
 		{Key: "usagetype", Value: "/EBS:SnapshotUsage$/", Operation: "REGEX"},

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"infracost/pkg/base"
 	"infracost/pkg/config"
+	"infracost/pkg/costs"
 	"infracost/pkg/output"
 	"infracost/pkg/parsers/terraform"
 
@@ -125,8 +125,8 @@ func main() {
 				return err
 			}
 
-			q := base.NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
-			resourceCostBreakdowns, err := base.GenerateCostBreakdowns(q, resources)
+			q := costs.NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
+			resourceCostBreakdowns, err := costs.GenerateCostBreakdowns(q, resources)
 			if err != nil {
 				return err
 			}

@@ -1,4 +1,4 @@
-package base
+package resource
 
 import (
 	"encoding/json"
@@ -11,6 +11,12 @@ import (
 var timeUnitSecs = map[string]decimal.Decimal{
 	"hour":  decimal.NewFromInt(int64(60 * 60)),
 	"month": decimal.NewFromInt(int64(60 * 60 * 730)),
+}
+
+type Filter struct {
+	Key       string `json:"key"`
+	Value     string `json:"value"`
+	Operation string `json:"operation,omitempty"`
 }
 
 type PriceComponent interface {

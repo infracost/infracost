@@ -1,12 +1,12 @@
 package aws
 
 import (
-	"infracost/pkg/base"
+	"infracost/pkg/resource"
 
 	"github.com/shopspring/decimal"
 )
 
-func ebsVolumeGbQuantity(resource base.Resource) decimal.Decimal {
+func ebsVolumeGbQuantity(resource resource.Resource) decimal.Decimal {
 	quantity := decimal.NewFromInt(int64(DefaultVolumeSize))
 
 	sizeVal := resource.RawValues()["size"]
@@ -17,7 +17,7 @@ func ebsVolumeGbQuantity(resource base.Resource) decimal.Decimal {
 	return quantity
 }
 
-func ebsVolumeIopsQuantity(resource base.Resource) decimal.Decimal {
+func ebsVolumeIopsQuantity(resource resource.Resource) decimal.Decimal {
 	quantity := decimal.Zero
 
 	iopsVal := resource.RawValues()["iops"]
@@ -28,17 +28,17 @@ func ebsVolumeIopsQuantity(resource base.Resource) decimal.Decimal {
 	return quantity
 }
 
-func NewEbsVolume(address string, region string, rawValues map[string]interface{}) base.Resource {
-	r := base.NewBaseResource(address, rawValues, true)
+func NewEbsVolume(address string, region string, rawValues map[string]interface{}) resource.Resource {
+	r := resource.NewBaseResource(address, rawValues, true)
 
 	volumeApiName := "gp2"
 	if rawValues["type"] != nil {
 		volumeApiName = rawValues["type"].(string)
 	}
 
-	gb := base.NewBasePriceComponent("GB", r, "GB/month", "month")
+	gb := resource.NewBasePriceComponent("GB", r, "GB/month", "month")
 	gb.AddFilters(regionFilters(region))
-	gb.AddFilters([]base.Filter{
+	gb.AddFilters([]resource.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "Storage"},
 		{Key: "volumeApiName", Value: volumeApiName},
@@ -47,9 +47,9 @@ func NewEbsVolume(address string, region string, rawValues map[string]interface{
 	r.AddPriceComponent(gb)
 
 	if volumeApiName == "io1" {
-		iops := base.NewBasePriceComponent("IOPS", r, "IOPS/month", "month")
+		iops := resource.NewBasePriceComponent("IOPS", r, "IOPS/month", "month")
 		iops.AddFilters(regionFilters(region))
-		iops.AddFilters([]base.Filter{
+		iops.AddFilters([]resource.Filter{
 			{Key: "servicecode", Value: "AmazonEC2"},
 			{Key: "productFamily", Value: "System Operation"},
 			{Key: "usagetype", Value: "/EBS:VolumeP-IOPS.piops/", Operation: "REGEX"},

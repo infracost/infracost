@@ -2,38 +2,38 @@ package aws
 
 import (
 	"fmt"
-	"infracost/pkg/base"
+	"infracost/pkg/resource"
 	"math"
 	"strconv"
 )
 
 type Ec2AutoscalingGroupResource struct {
-	*base.BaseResource
+	*resource.BaseResource
 	region string
 }
 
-func NewEc2AutoscalingGroup(address string, region string, rawValues map[string]interface{}) base.Resource {
+func NewEc2AutoscalingGroup(address string, region string, rawValues map[string]interface{}) resource.Resource {
 	r := &Ec2AutoscalingGroupResource{
-		base.NewBaseResource(address, rawValues, true),
+		resource.NewBaseResource(address, rawValues, true),
 		region,
 	}
 	return r
 }
 
-func (r *Ec2AutoscalingGroupResource) AddReference(name string, resource base.Resource) {
-	r.BaseResource.AddReference(name, resource)
+func (r *Ec2AutoscalingGroupResource) AddReference(name string, refResource resource.Resource) {
+	r.BaseResource.AddReference(name, r)
 
 	capacity := int(r.RawValues()["desired_capacity"].(float64))
-	address := fmt.Sprintf("%s.%s", r.Address(), resource.Address())
+	address := fmt.Sprintf("%s.%s", r.Address(), refResource.Address())
 
 	if name == "launch_configuration" || name == "launch_configuration_id" {
-		launchConfiguration := NewEc2LaunchConfiguration(address, r.region, resource.RawValues(), true)
+		launchConfiguration := NewEc2LaunchConfiguration(address, r.region, refResource.RawValues(), true)
 		launchConfiguration.SetResourceCount(capacity)
 		r.AddSubResource(launchConfiguration)
 
 	} else if name == "launch_template" || name == "launch_template_id" {
 		var overrides []interface{}
-		overridesVal := base.ToGJSON(r.RawValues()).Get("mixed_instances_policy.0.launch_template.0.override").Value()
+		overridesVal := resource.ToGJSON(refResource.RawValues()).Get("mixed_instances_policy.0.launch_template.0.override").Value()
 		if overridesVal != nil {
 			overrides = overridesVal.([]interface{})
 		}
@@ -46,7 +46,7 @@ func (r *Ec2AutoscalingGroupResource) AddReference(name string, resource base.Re
 			count := int(math.Ceil(float64(capacity) / float64(weightedCapacity)))
 
 			rawValues := make(map[string]interface{})
-			for k, v := range resource.RawValues() {
+			for k, v := range refResource.RawValues() {
 				rawValues[k] = v
 			}
 			rawValues["instance_type"] = instanceType
@@ -55,7 +55,7 @@ func (r *Ec2AutoscalingGroupResource) AddReference(name string, resource base.Re
 			r.AddSubResource(launchTemplate)
 
 		} else {
-			launchTemplate := NewEc2LaunchTemplate(address, r.region, resource.RawValues(), true)
+			launchTemplate := NewEc2LaunchTemplate(address, r.region, refResource.RawValues(), true)
 			launchTemplate.SetResourceCount(capacity)
 			r.AddSubResource(launchTemplate)
 		}

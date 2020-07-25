@@ -2,12 +2,12 @@ package aws
 
 import (
 	"fmt"
-	"infracost/pkg/base"
+	"infracost/pkg/resource"
 
 	"github.com/shopspring/decimal"
 )
 
-func rdsInstanceGbQuantity(resource base.Resource) decimal.Decimal {
+func rdsInstanceGbQuantity(resource resource.Resource) decimal.Decimal {
 	quantity := decimal.Zero
 
 	sizeVal := resource.RawValues()["allocated_storage"]
@@ -18,7 +18,7 @@ func rdsInstanceGbQuantity(resource base.Resource) decimal.Decimal {
 	return quantity
 }
 
-func rdsInstanceIopsQuantity(resource base.Resource) decimal.Decimal {
+func rdsInstanceIopsQuantity(resource resource.Resource) decimal.Decimal {
 	quantity := decimal.Zero
 
 	iopsVal := resource.RawValues()["iops"]
@@ -29,8 +29,8 @@ func rdsInstanceIopsQuantity(resource base.Resource) decimal.Decimal {
 	return quantity
 }
 
-func NewRdsInstance(address string, region string, rawValues map[string]interface{}) base.Resource {
-	r := base.NewBaseResource(address, rawValues, true)
+func NewRdsInstance(address string, region string, rawValues map[string]interface{}) resource.Resource {
+	r := resource.NewBaseResource(address, rawValues, true)
 
 	deploymentOption := "Single-AZ"
 	if rawValues["multi_az"] != nil && rawValues["multi_az"].(bool) {
@@ -83,9 +83,9 @@ func NewRdsInstance(address string, region string, rawValues map[string]interfac
 		}
 	}
 
-	hours := base.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour")
+	hours := resource.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour")
 	hours.AddFilters(regionFilters(region))
-	hours.AddFilters([]base.Filter{
+	hours.AddFilters([]resource.Filter{
 		{Key: "servicecode", Value: "AmazonRDS"},
 		{Key: "productFamily", Value: "Database Instance"},
 		{Key: "deploymentOption", Value: deploymentOption},
@@ -93,15 +93,15 @@ func NewRdsInstance(address string, region string, rawValues map[string]interfac
 		{Key: "databaseEngine", Value: databaseEngine},
 	})
 	if databaseEdition != "" {
-		hours.AddFilters([]base.Filter{
+		hours.AddFilters([]resource.Filter{
 			{Key: "databaseEdition", Value: databaseEdition},
 		})
 	}
 	r.AddPriceComponent(hours)
 
-	gb := base.NewBasePriceComponent("GB", r, "GB/month", "month")
+	gb := resource.NewBasePriceComponent("GB", r, "GB/month", "month")
 	gb.AddFilters(regionFilters(region))
-	gb.AddFilters([]base.Filter{
+	gb.AddFilters([]resource.Filter{
 		{Key: "servicecode", Value: "AmazonRDS"},
 		{Key: "productFamily", Value: "Database Storage"},
 		{Key: "deploymentOption", Value: deploymentOption},
@@ -111,9 +111,9 @@ func NewRdsInstance(address string, region string, rawValues map[string]interfac
 	r.AddPriceComponent(gb)
 
 	if volumeType == "io1" {
-		iops := base.NewBasePriceComponent("IOPS", r, "IOPS/month", "month")
+		iops := resource.NewBasePriceComponent("IOPS", r, "IOPS/month", "month")
 		iops.AddFilters(regionFilters(region))
-		iops.AddFilters([]base.Filter{
+		iops.AddFilters([]resource.Filter{
 			{Key: "servicecode", Value: "AmazonRDS"},
 			{Key: "productFamily", Value: "Provisioned IOPS"},
 			{Key: "deploymentOption", Value: deploymentOption},

@@ -1,15 +1,15 @@
 package aws
 
 import (
-	"infracost/pkg/base"
+	"infracost/pkg/resource"
 )
 
-func NewNatGateway(address string, region string, rawValues map[string]interface{}) base.Resource {
-	r := base.NewBaseResource(address, rawValues, true)
+func NewNatGateway(address string, region string, rawValues map[string]interface{}) resource.Resource {
+	r := resource.NewBaseResource(address, rawValues, true)
 
-	hours := base.NewBasePriceComponent("Hours", r, "hour", "hour")
+	hours := resource.NewBasePriceComponent("Hours", r, "hour", "hour")
 	hours.AddFilters(regionFilters(region))
-	hours.AddFilters([]base.Filter{
+	hours.AddFilters([]resource.Filter{
 		{Key: "servicecode", Value: "AmazonEC2"},
 		{Key: "productFamily", Value: "NAT Gateway"},
 		{Key: "usagetype", Value: "/NatGateway-Hours/", Operation: "REGEX"},

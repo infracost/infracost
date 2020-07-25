@@ -11,15 +11,15 @@ import (
 	"strings"
 
 	"infracost/internal/terraform/aws"
-	"infracost/pkg/base"
 	"infracost/pkg/config"
+	"infracost/pkg/resource"
 
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
-func createResource(resourceType string, address string, rawValues map[string]interface{}, providerConfig gjson.Result) base.Resource {
+func createResource(resourceType string, address string, rawValues map[string]interface{}, providerConfig gjson.Result) resource.Resource {
 	awsRegion := "us-east-1" // Use as fallback
 
 	// Find region from terraform provider config
@@ -136,7 +136,7 @@ func GeneratePlanJSON(tfdir string, planPath string) ([]byte, error) {
 	return out, nil
 }
 
-func ParsePlanJSON(j []byte) ([]base.Resource, error) {
+func ParsePlanJSON(j []byte) ([]resource.Resource, error) {
 	planJSON := gjson.ParseBytes(j)
 	providerConfig := planJSON.Get("configuration.provider_config")
 	plannedValuesJSON := planJSON.Get("planned_values.root_module")
@@ -146,8 +146,8 @@ func ParsePlanJSON(j []byte) ([]base.Resource, error) {
 	return resources, err
 }
 
-func parseModule(planJSON gjson.Result, providerConfig gjson.Result, plannedValuesJSON gjson.Result, configurationJSON gjson.Result) ([]base.Resource, error) {
-	resourceMap := make(map[string]base.Resource)
+func parseModule(planJSON gjson.Result, providerConfig gjson.Result, plannedValuesJSON gjson.Result, configurationJSON gjson.Result) ([]resource.Resource, error) {
+	resourceMap := make(map[string]resource.Resource)
 	moduleAddr := plannedValuesJSON.Get("address").String()
 	terraformResources := plannedValuesJSON.Get("resources").Array()
 
@@ -171,7 +171,7 @@ func parseModule(planJSON gjson.Result, providerConfig gjson.Result, plannedValu
 		addReferences(resource, resourceJSON, resourceMap)
 	}
 
-	resources := make([]base.Resource, 0, len(resourceMap))
+	resources := make([]resource.Resource, 0, len(resourceMap))
 	for _, resource := range resourceMap {
 		resources = append(resources, resource)
 	}
@@ -205,7 +205,7 @@ func parseModuleName(moduleAddr string) string {
 	return match[1]
 }
 
-func addReferencesHelper(r base.Resource, key string, valueJSON gjson.Result, resourceMap map[string]base.Resource) {
+func addReferencesHelper(r resource.Resource, key string, valueJSON gjson.Result, resourceMap map[string]resource.Resource) {
 	var refAddr string
 	if valueJSON.Get("references").Exists() {
 		refAddr = valueJSON.Get("references").Array()[0].String()
@@ -223,6 +223,6 @@ func addReferencesHelper(r base.Resource, key string, valueJSON gjson.Result, re
 	}
 }
 
-func addReferences(r base.Resource, resourceJSON gjson.Result, resourceMap map[string]base.Resource) {
+func addReferences(r resource.Resource, resourceJSON gjson.Result, resourceMap map[string]resource.Resource) {
 	addReferencesHelper(r, "expressions", resourceJSON.Get("expressions"), resourceMap)
 }
