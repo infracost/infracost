@@ -18,7 +18,7 @@ type GraphQLQuery struct {
 	Variables map[string]interface{} `json:"variables"`
 }
 
-type ResourceQueryResultMap map[*resource.Resource]map[*resource.PriceComponent]gjson.Result
+type ResourceQueryResultMap map[resource.Resource]map[resource.PriceComponent]gjson.Result
 
 type QueryRunner interface {
 	RunQueries(r resource.Resource) (ResourceQueryResultMap, error)
@@ -112,10 +112,10 @@ func (q *GraphQLQueryRunner) unpackQueryResults(queryKeys []queryKey, queryResul
 		r := queryKeys[i].Resource
 		priceComponent := queryKeys[i].PriceComponent
 
-		if _, ok := resourceResults[&r]; !ok {
-			resourceResults[&r] = make(map[*resource.PriceComponent]gjson.Result)
+		if _, ok := resourceResults[r]; !ok {
+			resourceResults[r] = make(map[resource.PriceComponent]gjson.Result)
 		}
-		resourceResults[&r][&priceComponent] = queryResult
+		resourceResults[r][priceComponent] = queryResult
 	}
 
 	return resourceResults
