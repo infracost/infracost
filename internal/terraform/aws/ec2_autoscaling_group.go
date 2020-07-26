@@ -33,7 +33,7 @@ func (r *Ec2AutoscalingGroupResource) AddReference(name string, refResource reso
 
 	} else if name == "launch_template" || name == "launch_template_id" {
 		var overrides []interface{}
-		overridesVal := resource.ToGJSON(refResource.RawValues()).Get("mixed_instances_policy.0.launch_template.0.override").Value()
+		overridesVal := resource.ToGJSON(r.RawValues()).Get("mixed_instances_policy.0.launch_template.0.override").Value()
 		if overridesVal != nil {
 			overrides = overridesVal.([]interface{})
 		}
@@ -42,7 +42,10 @@ func (r *Ec2AutoscalingGroupResource) AddReference(name string, refResource reso
 			// Just use the first override for now, since that will be the highest priority
 			override := overrides[0].(map[string]interface{})
 			instanceType := override["instance_type"].(string)
-			weightedCapacity, _ := strconv.Atoi(override["weighted_capacity"].(string))
+			weightedCapacity := 1
+			if override["weighted_capacity"] != nil {
+				weightedCapacity, _ = strconv.Atoi(override["weighted_capacity"].(string))
+			}
 			count := int(math.Ceil(float64(capacity) / float64(weightedCapacity)))
 
 			rawValues := make(map[string]interface{})
