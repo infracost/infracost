@@ -121,8 +121,8 @@ func (c *BasePriceComponent) SetPrice(price decimal.Decimal) {
 }
 
 func (c *BasePriceComponent) HourlyCost() decimal.Decimal {
-	monthToHourMultiplier := timeUnitSecs["hour"].Div(timeUnitSecs["month"])
-	return c.price.Mul(c.Quantity()).Mul(monthToHourMultiplier)
+	monthToHourDivisor := timeUnitSecs["month"].Div(timeUnitSecs["hour"])
+	return c.price.Mul(c.Quantity()).Div(monthToHourDivisor)
 }
 
 type BaseResource struct {

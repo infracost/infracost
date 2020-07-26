@@ -63,7 +63,7 @@ func setPriceComponentPrice(r resource.Resource, priceComponent resource.PriceCo
 func getCostBreakdown(r resource.Resource, results ResourceQueryResultMap) ResourceCostBreakdown {
 	priceComponentCosts := make([]PriceComponentCost, 0, len(r.PriceComponents()))
 	for _, priceComponent := range r.PriceComponents() {
-		result := results[&r][&priceComponent]
+		result := results[r][priceComponent]
 		priceComponentCosts = append(priceComponentCosts, createPriceComponentCost(priceComponent, result))
 	}
 
@@ -95,7 +95,7 @@ func GenerateCostBreakdowns(q QueryRunner, resources []resource.Resource) ([]Res
 
 		for _, priceComponentResults := range resourceResults {
 			for priceComponent, result := range priceComponentResults {
-				setPriceComponentPrice(r, *priceComponent, result)
+				setPriceComponentPrice(r, priceComponent, result)
 			}
 		}
 	}
