@@ -167,7 +167,7 @@ func parseModule(planJSON gjson.Result, providerConfig gjson.Result, plannedValu
 	}
 
 	for _, resource := range resourceMap {
-		resourceJSON := configurationJSON.Get(fmt.Sprintf(`resources.#(address="%s")`, getInternalName(resource.Address(), moduleAddr)))
+		resourceJSON := configurationJSON.Get(fmt.Sprintf(`resources.#(address="%s")`, stripResourceArrayPart(getInternalName(resource.Address(), moduleAddr))))
 		addReferences(resource, resourceJSON, resourceMap)
 	}
 
@@ -191,6 +191,15 @@ func parseModule(planJSON gjson.Result, providerConfig gjson.Result, plannedValu
 
 func getInternalName(resourceAddr string, moduleAddr string) string {
 	return strings.TrimPrefix(resourceAddr, moduleAddr+".")
+}
+
+func stripResourceArrayPart(addr string) string {
+	r := regexp.MustCompile("([^[]+)")
+	match := r.FindStringSubmatch(addr)
+	if len(match) <= 1 {
+		return ""
+	}
+	return match[1]
 }
 
 func parseModuleName(moduleAddr string) string {

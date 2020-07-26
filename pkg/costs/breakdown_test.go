@@ -1,7 +1,6 @@
 package costs
 
 import (
-	"fmt"
 	"infracost/pkg/resource"
 	"testing"
 
@@ -86,7 +85,6 @@ func TestGenerateCostBreakdowns(t *testing.T) {
 	if err != nil {
 		t.Error("received error", err)
 	}
-	fmt.Println(cmp.Diff(expected, result, cmp.AllowUnexported(resource.BaseResource{}, resource.BasePriceComponent{})))
 
 	if !cmp.Equal(result, expected, cmp.AllowUnexported(resource.BaseResource{}, resource.BasePriceComponent{})) {
 		t.Error("got unexpected output", result)
