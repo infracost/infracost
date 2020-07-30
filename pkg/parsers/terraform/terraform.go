@@ -153,7 +153,12 @@ func parseModule(planJSON gjson.Result, providerConfig gjson.Result, plannedValu
 	for _, terraformResource := range terraformResources {
 		address := terraformResource.Get("address").String()
 		resourceType := terraformResource.Get("type").String()
-		rawValues := terraformResource.Get("values").Value().(map[string]interface{})
+		var rawValues map[string]interface{}
+		if terraformResource.Get("values").Value() != nil {
+			rawValues = terraformResource.Get("values").Value().(map[string]interface{})
+		} else {
+			rawValues = make(map[string]interface{})
+		}
 		resource := createResource(resourceType, address, rawValues, providerConfig)
 		if resource != nil {
 			resourceMap[getInternalName(resource.Address(), moduleAddr)] = resource

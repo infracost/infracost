@@ -40,7 +40,7 @@ To download and install the latest release:
 
 ```sh
 curl --silent --location "https://github.com/aliscott/infracost/releases/latest/download/infracost-$(uname -s)-amd64.tar.gz" | tar xz -C /tmp
-sudo mv /tmp/infracost-$(uname -s)-amd64 /usr/local/bin/infracost
+sudo mv /tmp/infracost-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64 /usr/local/bin/infracost
 ```
 
 ## Usage
