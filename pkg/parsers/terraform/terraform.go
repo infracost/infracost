@@ -44,9 +44,9 @@ func createResource(resourceType string, address string, rawValues map[string]in
 	case "aws_ebs_snapshot_copy":
 		return aws.NewEbsSnapshotCopy(address, awsRegion, rawValues)
 	case "aws_launch_configuration":
-		return aws.NewEc2LaunchConfiguration(address, awsRegion, rawValues, false) // has no cost
+		return resource.NewBaseResource(address, rawValues, false) // has no cost
 	case "aws_launch_template":
-		return aws.NewEc2LaunchTemplate(address, awsRegion, rawValues, false) // has no cost
+		return resource.NewBaseResource(address, rawValues, false) // has no cost
 	case "aws_autoscaling_group":
 		return aws.NewEc2AutoscalingGroup(address, awsRegion, rawValues)
 	case "aws_db_instance":
