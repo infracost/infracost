@@ -29,13 +29,16 @@ func ebsSnapshotCopyGbQuantity(resource resource.Resource) decimal.Decimal {
 func NewEbsSnapshotCopy(address string, region string, rawValues map[string]interface{}) resource.Resource {
 	r := resource.NewBaseResource(address, rawValues, true)
 
-	gb := resource.NewBasePriceComponent("GB", r, "GB/month", "month")
-	gb.AddFilters(regionFilters(region))
-	gb.AddFilters([]resource.Filter{
-		{Key: "servicecode", Value: "AmazonEC2"},
-		{Key: "productFamily", Value: "Storage Snapshot"},
-		{Key: "usagetype", Value: "/EBS:SnapshotUsage$/", Operation: "REGEX"},
-	})
+	gbProductFilter := &resource.ProductFilter{
+		VendorName:    strPtr("aws"),
+		Region:        strPtr(region),
+		Service:       strPtr("AmazonEC2"),
+		ProductFamily: strPtr("Storage Snapshot"),
+		AttributeFilters: &[]resource.AttributeFilter{
+			{Key: "usagetype", ValueRegex: strPtr("/EBS:SnapshotUsage$/")},
+		},
+	}
+	gb := resource.NewBasePriceComponent("GB", r, "GB/month", "month", gbProductFilter, nil)
 	gb.SetQuantityMultiplierFunc(ebsSnapshotCopyGbQuantity)
 	r.AddPriceComponent(gb)
 

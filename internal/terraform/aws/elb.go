@@ -16,13 +16,16 @@ func NewElb(address string, region string, rawValues map[string]interface{}, isC
 		}
 	}
 
-	hours := resource.NewBasePriceComponent("Hours", r, "hour", "hour")
-	hours.AddFilters(regionFilters(region))
-	hours.AddFilters([]resource.Filter{
-		{Key: "servicecode", Value: "AWSELB"},
-		{Key: "usagetype", Value: "/LoadBalancerUsage/", Operation: "REGEX"},
-		{Key: "productFamily", Value: productFamily},
-	})
+	hoursProductFilter := &resource.ProductFilter{
+		VendorName:    strPtr("aws"),
+		Region:        strPtr(region),
+		Service:       strPtr("AWSELB"),
+		ProductFamily: strPtr(productFamily),
+		AttributeFilters: &[]resource.AttributeFilter{
+			{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
+		},
+	}
+	hours := resource.NewBasePriceComponent("Hours", r, "hour", "hour", hoursProductFilter, nil)
 	r.AddPriceComponent(hours)
 
 	return r

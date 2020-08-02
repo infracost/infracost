@@ -14,7 +14,7 @@ type testQueryRunner struct {
 
 func generateResultForPrice(price decimal.Decimal) gjson.Result {
 	f, _ := price.Float64()
-	return gjson.Parse(fmt.Sprintf(`{"data": {"products": [{"onDemandPricing": [{ "priceDimensions": [{"unit": "Hrs","pricePerUnit": {"USD": "%f"}}]}]}]}}`, f))
+	return gjson.Parse(fmt.Sprintf(`{"data": {"products": [{"prices": [{"USD": "%f"}]}]}}`, f))
 }
 
 func (q *testQueryRunner) getPrice(resource resource.Resource, priceComponent resource.PriceComponent) decimal.Decimal {

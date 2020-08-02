@@ -83,41 +83,50 @@ func NewRdsInstance(address string, region string, rawValues map[string]interfac
 		}
 	}
 
-	hours := resource.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour")
-	hours.AddFilters(regionFilters(region))
-	hours.AddFilters([]resource.Filter{
-		{Key: "servicecode", Value: "AmazonRDS"},
-		{Key: "productFamily", Value: "Database Instance"},
-		{Key: "deploymentOption", Value: deploymentOption},
-		{Key: "instanceType", Value: instanceType},
-		{Key: "databaseEngine", Value: databaseEngine},
-	})
+	var databaseEditionValue *string
 	if databaseEdition != "" {
-		hours.AddFilters([]resource.Filter{
-			{Key: "databaseEdition", Value: databaseEdition},
-		})
+		databaseEditionValue = strPtr(databaseEdition)
 	}
+	hoursProductFilter := &resource.ProductFilter{
+		VendorName:    strPtr("aws"),
+		Region:        strPtr(region),
+		Service:       strPtr("AmazonRDS"),
+		ProductFamily: strPtr("Database Instance"),
+		AttributeFilters: &[]resource.AttributeFilter{
+			{Key: "instanceType", Value: strPtr(instanceType)},
+			{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+			{Key: "databaseEngine", Value: strPtr(databaseEngine)},
+			{Key: "databaseEdition", Value: databaseEditionValue},
+		},
+	}
+	hours := resource.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour", hoursProductFilter, nil)
 	r.AddPriceComponent(hours)
 
-	gb := resource.NewBasePriceComponent("GB", r, "GB/month", "month")
-	gb.AddFilters(regionFilters(region))
-	gb.AddFilters([]resource.Filter{
-		{Key: "servicecode", Value: "AmazonRDS"},
-		{Key: "productFamily", Value: "Database Storage"},
-		{Key: "deploymentOption", Value: deploymentOption},
-		{Key: "volumeType", Value: volumeType},
-	})
+	gbProductFilter := &resource.ProductFilter{
+		VendorName:    strPtr("aws"),
+		Region:        strPtr(region),
+		Service:       strPtr("AmazonRDS"),
+		ProductFamily: strPtr("Database Storage"),
+		AttributeFilters: &[]resource.AttributeFilter{
+			{Key: "volumeType", Value: strPtr(volumeType)},
+			{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+		},
+	}
+	gb := resource.NewBasePriceComponent("GB", r, "GB/month", "month", gbProductFilter, nil)
 	gb.SetQuantityMultiplierFunc(rdsInstanceGbQuantity)
 	r.AddPriceComponent(gb)
 
 	if volumeType == "io1" {
-		iops := resource.NewBasePriceComponent("IOPS", r, "IOPS/month", "month")
-		iops.AddFilters(regionFilters(region))
-		iops.AddFilters([]resource.Filter{
-			{Key: "servicecode", Value: "AmazonRDS"},
-			{Key: "productFamily", Value: "Provisioned IOPS"},
-			{Key: "deploymentOption", Value: deploymentOption},
-		})
+		iopsProductFilter := &resource.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonRDS"),
+			ProductFamily: strPtr("Provisioned IOPS"),
+			AttributeFilters: &[]resource.AttributeFilter{
+				{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+			},
+		}
+		iops := resource.NewBasePriceComponent("IOPS", r, "IOPS/month", "month", iopsProductFilter, nil)
 		iops.SetQuantityMultiplierFunc(rdsInstanceIopsQuantity)
 		r.AddPriceComponent(iops)
 	}

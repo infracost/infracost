@@ -14,17 +14,23 @@ func NewEc2LaunchConfiguration(address string, region string, rawValues map[stri
 		tenancy = "Dedicated"
 	}
 
-	hours := resource.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour")
-	hours.AddFilters(regionFilters(region))
-	hours.AddFilters([]resource.Filter{
-		{Key: "servicecode", Value: "AmazonEC2"},
-		{Key: "productFamily", Value: "Compute Instance"},
-		{Key: "operatingSystem", Value: "Linux"},
-		{Key: "preInstalledSw", Value: "NA"},
-		{Key: "capacitystatus", Value: "Used"},
-		{Key: "tenancy", Value: tenancy},
-		{Key: "instanceType", Value: instanceType},
-	})
+	hoursProductFilter := &resource.ProductFilter{
+		VendorName:    strPtr("aws"),
+		Region:        strPtr(region),
+		Service:       strPtr("AmazonEC2"),
+		ProductFamily: strPtr("Compute Instance"),
+		AttributeFilters: &[]resource.AttributeFilter{
+			{Key: "instanceType", Value: strPtr(instanceType)},
+			{Key: "tenancy", Value: strPtr(tenancy)},
+			{Key: "operatingSystem", Value: strPtr("Linux")},
+			{Key: "preInstalledSw", Value: strPtr("NA")},
+			{Key: "capacitystatus", Value: strPtr("Used")},
+		},
+	}
+	hoursPriceFilter := &resource.PriceFilter{
+		PurchaseOption: strPtr("on_demand"),
+	}
+	hours := resource.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour", hoursProductFilter, hoursPriceFilter)
 	r.AddPriceComponent(hours)
 
 	rootBlockDeviceRawValues := make(map[string]interface{})

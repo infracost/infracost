@@ -34,23 +34,16 @@ func NewGraphQLQueryRunner(endpoint string) *GraphQLQueryRunner {
 	}
 }
 
-func (q *GraphQLQueryRunner) buildQuery(filters []resource.Filter) GraphQLQuery {
+func (q *GraphQLQueryRunner) buildQuery(productFilter *resource.ProductFilter, priceFilter *resource.PriceFilter) GraphQLQuery {
 	variables := map[string]interface{}{}
-	variables["filter"] = map[string]interface{}{}
-	variables["filter"].(map[string]interface{})["attributes"] = filters
+	variables["productFilter"] = productFilter
+	variables["priceFilter"] = priceFilter
 
 	query := `
-		query($filter: ProductFilter!) {
-			products(
-				filter: $filter,
-			) {
-				onDemandPricing {
-					priceDimensions {
-						unit
-						pricePerUnit {
-							USD
-						}
-					}
+		query($productFilter: ProductFilter!, $priceFilter: PriceFilter) {
+			products(filter: $productFilter) {
+				prices(filter: $priceFilter) {
+					USD
 				}
 			}
 		}
@@ -91,13 +84,13 @@ func (q *GraphQLQueryRunner) batchQueries(r resource.Resource) ([]queryKey, []Gr
 
 	for _, priceComponent := range r.PriceComponents() {
 		queryKeys = append(queryKeys, queryKey{r, priceComponent})
-		queries = append(queries, q.buildQuery(priceComponent.Filters()))
+		queries = append(queries, q.buildQuery(priceComponent.ProductFilter(), priceComponent.PriceFilter()))
 	}
 
 	for _, subResource := range resource.FlattenSubResources(r) {
 		for _, priceComponent := range subResource.PriceComponents() {
 			queryKeys = append(queryKeys, queryKey{subResource, priceComponent})
-			queries = append(queries, q.buildQuery(priceComponent.Filters()))
+			queries = append(queries, q.buildQuery(priceComponent.ProductFilter(), priceComponent.PriceFilter()))
 		}
 	}
 

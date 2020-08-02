@@ -13,16 +13,36 @@ var timeUnitSecs = map[string]decimal.Decimal{
 	"month": decimal.NewFromInt(int64(60 * 60 * 730)),
 }
 
-type Filter struct {
-	Key       string `json:"key"`
-	Value     string `json:"value"`
-	Operation string `json:"operation,omitempty"`
+type AttributeFilter struct {
+	Key        string  `json:"key"`
+	Value      *string `json:"value,omitempty"`
+	ValueRegex *string `json:"value_regex,omitempty"`
+}
+
+type ProductFilter struct {
+	VendorName       *string            `json:"vendorName,omitempty"`
+	Service          *string            `json:"service,omitempty"`
+	ProductFamily    *string            `json:"productFamily,omitempty"`
+	Region           *string            `json:"region,omitempty"`
+	Sku              *string            `json:"sku,omitempty"`
+	AttributeFilters *[]AttributeFilter `json:"attributeFilters,omitempty"`
+}
+
+type PriceFilter struct {
+	PurchaseOption     *string `json:"purchaseOption,omitempty"`
+	Unit               *string `json:"unit,omitempty"`
+	Description        *string `json:"description,omitempty"`
+	DescriptionRegex   *string `json:"descriptionRegex,omitempty"`
+	TermLength         *string `json:"termLength,omitempty"`
+	TermPurchaseOption *string `json:"termPurchaseOption,omitempty"`
+	TermOfferingClass  *string `json:"termOfferingClass,omitempty"`
 }
 
 type PriceComponent interface {
 	Name() string
 	Unit() string
-	Filters() []Filter
+	ProductFilter() *ProductFilter
+	PriceFilter() *PriceFilter
 	Quantity() decimal.Decimal
 	Price() decimal.Decimal
 	SetPrice(price decimal.Decimal)
@@ -64,19 +84,21 @@ type BasePriceComponent struct {
 	resource               Resource
 	timeUnit               string
 	unit                   string
-	filters                []Filter
+	productFilter          *ProductFilter
+	priceFilter            *PriceFilter
 	quantityMultiplierFunc func(resource Resource) decimal.Decimal
 	price                  decimal.Decimal
 }
 
-func NewBasePriceComponent(name string, resource Resource, unit string, timeUnit string) *BasePriceComponent {
+func NewBasePriceComponent(name string, resource Resource, unit string, timeUnit string, productFilter *ProductFilter, priceFilter *PriceFilter) *BasePriceComponent {
 	return &BasePriceComponent{
-		name:     name,
-		resource: resource,
-		timeUnit: timeUnit,
-		unit:     unit,
-		filters:  []Filter{},
-		price:    decimal.Zero,
+		name:          name,
+		resource:      resource,
+		timeUnit:      timeUnit,
+		unit:          unit,
+		productFilter: productFilter,
+		priceFilter:   priceFilter,
+		price:         decimal.Zero,
 	}
 }
 
@@ -87,13 +109,20 @@ func (c *BasePriceComponent) Name() string {
 func (c *BasePriceComponent) Unit() string {
 	return c.unit
 }
-
-func (c *BasePriceComponent) Filters() []Filter {
-	return c.filters
+func (c *BasePriceComponent) ProductFilter() *ProductFilter {
+	return c.productFilter
 }
 
-func (c *BasePriceComponent) AddFilters(filters []Filter) {
-	c.filters = append(c.filters, filters...)
+func (c *BasePriceComponent) PriceFilter() *PriceFilter {
+	return c.priceFilter
+}
+
+func (c *BasePriceComponent) SetProductFilter(productFilter *ProductFilter) {
+	c.productFilter = productFilter
+}
+
+func (c *BasePriceComponent) SetPriceFilter(priceFilter *PriceFilter) {
+	c.priceFilter = priceFilter
 }
 
 func (c *BasePriceComponent) Quantity() decimal.Decimal {
@@ -105,7 +134,7 @@ func (c *BasePriceComponent) Quantity() decimal.Decimal {
 	timeUnitMultiplier := timeUnitSecs["month"].Div(timeUnitSecs[c.timeUnit])
 	resourceCount := decimal.NewFromInt(int64(c.resource.ResourceCount()))
 
-	return quantity.Mul(timeUnitMultiplier).Mul(resourceCount)
+	return quantity.Mul(timeUnitMultiplier).Mul(resourceCount).Round(6)
 }
 
 func (c *BasePriceComponent) SetQuantityMultiplierFunc(f func(resource Resource) decimal.Decimal) {
