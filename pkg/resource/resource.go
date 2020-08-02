@@ -218,6 +218,9 @@ func (r *BaseResource) ResourceCount() int {
 
 func (r *BaseResource) SetResourceCount(resourceCount int) {
 	r.resourceCount = resourceCount
+	for _, subResource := range r.SubResources() {
+		subResource.SetResourceCount(resourceCount)
+	}
 }
 
 func (r *BaseResource) HasCost() bool {
