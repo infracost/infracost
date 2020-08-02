@@ -74,7 +74,9 @@ func NewRdsInstance(address string, region string, rawValues map[string]interfac
 	}
 
 	volumeType := "General Purpose"
-	if rawValues["storage_ty[e"] != nil {
+	if rawValues["storage_type"] == nil && rawValues["iops"] != nil {
+		volumeType = "Provisioned IOPS"
+	}	else if rawValues["storage_type"] != nil {
 		switch rawValues["storage_type"].(string) {
 		case "standard":
 			volumeType = "Magnetic"
@@ -116,7 +118,7 @@ func NewRdsInstance(address string, region string, rawValues map[string]interfac
 	gb.SetQuantityMultiplierFunc(rdsInstanceGbQuantity)
 	r.AddPriceComponent(gb)
 
-	if volumeType == "io1" {
+	if volumeType == "Provisioned IOPS" {
 		iopsProductFilter := &resource.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
