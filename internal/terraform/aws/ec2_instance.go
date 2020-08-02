@@ -37,25 +37,31 @@ func newEc2BlockDevice(address string, region string, rawValues map[string]inter
 		volumeApiName = rawValues["volume_type"].(string)
 	}
 
-	gb := resource.NewBasePriceComponent("GB", r, "GB/month", "month")
-	gb.AddFilters(regionFilters(region))
-	gb.AddFilters([]resource.Filter{
-		{Key: "servicecode", Value: "AmazonEC2"},
-		{Key: "productFamily", Value: "Storage"},
-		{Key: "volumeApiName", Value: volumeApiName},
-	})
+	gbProductFilter := &resource.ProductFilter{
+		VendorName:    strPtr("aws"),
+		Region:        strPtr(region),
+		Service:       strPtr("AmazonEC2"),
+		ProductFamily: strPtr("Storage"),
+		AttributeFilters: &[]resource.AttributeFilter{
+			{Key: "volumeApiName", Value: strPtr(volumeApiName)},
+		},
+	}
+	gb := resource.NewBasePriceComponent("GB", r, "GB/month", "month", gbProductFilter, nil)
 	gb.SetQuantityMultiplierFunc(ec2BlockDeviceGbQuantity)
 	r.AddPriceComponent(gb)
 
 	if volumeApiName == "io1" {
-		iops := resource.NewBasePriceComponent("IOPS", r, "IOPS/month", "month")
-		iops.AddFilters(regionFilters(region))
-		iops.AddFilters([]resource.Filter{
-			{Key: "servicecode", Value: "AmazonEC2"},
-			{Key: "productFamily", Value: "System Operation"},
-			{Key: "usagetype", Value: "/EBS:VolumeP-IOPS.piops/", Operation: "REGEX"},
-			{Key: "volumeApiName", Value: volumeApiName},
-		})
+		iopsProductFilter := &resource.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonEC2"),
+			ProductFamily: strPtr("System Operation"),
+			AttributeFilters: &[]resource.AttributeFilter{
+				{Key: "volumeApiName", Value: strPtr(volumeApiName)},
+				{Key: "usagetype", ValueRegex: strPtr("/EBS:VolumeP-IOPS.piops/")},
+			},
+		}
+		iops := resource.NewBasePriceComponent("IOPS", r, "IOPS/month", "month", iopsProductFilter, nil)
 		iops.SetQuantityMultiplierFunc(ec2BlockDeviceIopsQuantity)
 		r.AddPriceComponent(iops)
 	}
@@ -72,17 +78,23 @@ func NewEc2Instance(address string, region string, rawValues map[string]interfac
 		tenancy = "Dedicated"
 	}
 
-	hours := resource.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour")
-	hours.AddFilters(regionFilters(region))
-	hours.AddFilters([]resource.Filter{
-		{Key: "servicecode", Value: "AmazonEC2"},
-		{Key: "productFamily", Value: "Compute Instance"},
-		{Key: "operatingSystem", Value: "Linux"},
-		{Key: "preInstalledSw", Value: "NA"},
-		{Key: "capacitystatus", Value: "Used"},
-		{Key: "tenancy", Value: tenancy},
-		{Key: "instanceType", Value: instanceType},
-	})
+	hoursProductFilter := &resource.ProductFilter{
+		VendorName:    strPtr("aws"),
+		Region:        strPtr(region),
+		Service:       strPtr("AmazonEC2"),
+		ProductFamily: strPtr("Compute Instance"),
+		AttributeFilters: &[]resource.AttributeFilter{
+			{Key: "instanceType", Value: strPtr(instanceType)},
+			{Key: "tenancy", Value: strPtr(tenancy)},
+			{Key: "operatingSystem", Value: strPtr("Linux")},
+			{Key: "preInstalledSw", Value: strPtr("NA")},
+			{Key: "capacitystatus", Value: strPtr("Used")},
+		},
+	}
+	hoursPriceFilter := &resource.PriceFilter{
+		PurchaseOption: strPtr("on_demand"),
+	}
+	hours := resource.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour", hoursProductFilter, hoursPriceFilter)
 	r.AddPriceComponent(hours)
 
 	rootBlockDeviceRawValues := make(map[string]interface{})

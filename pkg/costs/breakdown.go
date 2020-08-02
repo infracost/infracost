@@ -54,7 +54,7 @@ func setPriceComponentPrice(r resource.Resource, priceComponent resource.PriceCo
 		if len(products) > 1 {
 			log.Warnf("Multiple prices found for %s %s, using the first price", r.Address(), priceComponent.Name())
 		}
-		priceStr := products[0].Get("onDemandPricing.0.priceDimensions.0.pricePerUnit.USD").String()
+		priceStr := products[0].Get("prices.0.USD").String()
 		price, _ = decimal.NewFromString(priceStr)
 	}
 	priceComponent.SetPrice(price)

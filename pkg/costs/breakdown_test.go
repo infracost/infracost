@@ -14,16 +14,16 @@ func TestGenerateCostBreakdowns(t *testing.T) {
 	r1.AddSubResource(r1sr1)
 	r2 := resource.NewBaseResource("r2", map[string]interface{}{}, true)
 
-	r1pc1 := resource.NewBasePriceComponent("r1pc1", r1, "r1pc1 unit", "hour")
+	r1pc1 := resource.NewBasePriceComponent("r1pc1", r1, "r1pc1 unit", "hour", nil, nil)
 	r1.AddPriceComponent(r1pc1)
 
-	sr1pc1 := resource.NewBasePriceComponent("sr1pc1", r1sr1, "sr1pc1 unit", "hour")
+	sr1pc1 := resource.NewBasePriceComponent("sr1pc1", r1sr1, "sr1pc1 unit", "hour", nil, nil)
 	r1sr1.AddPriceComponent(sr1pc1)
 
-	r2pc1 := resource.NewBasePriceComponent("r2pc1", r2, "r2pc1 unit", "hour")
+	r2pc1 := resource.NewBasePriceComponent("r2pc1", r2, "r2pc1 unit", "hour", nil, nil)
 	r2.AddPriceComponent(r2pc1)
 
-	r2pc2 := resource.NewBasePriceComponent("r2pc2", r2, "r2pc2 unit", "hour")
+	r2pc2 := resource.NewBasePriceComponent("r2pc2", r2, "r2pc2 unit", "hour", nil, nil)
 	r2.AddPriceComponent(r2pc2)
 
 	priceOverrides := make(map[resource.Resource]map[resource.PriceComponent]decimal.Decimal)

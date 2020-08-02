@@ -7,13 +7,16 @@ import (
 func NewNatGateway(address string, region string, rawValues map[string]interface{}) resource.Resource {
 	r := resource.NewBaseResource(address, rawValues, true)
 
-	hours := resource.NewBasePriceComponent("Hours", r, "hour", "hour")
-	hours.AddFilters(regionFilters(region))
-	hours.AddFilters([]resource.Filter{
-		{Key: "servicecode", Value: "AmazonEC2"},
-		{Key: "productFamily", Value: "NAT Gateway"},
-		{Key: "usagetype", Value: "/NatGateway-Hours/", Operation: "REGEX"},
-	})
+	hoursProductFilter := &resource.ProductFilter{
+		VendorName:    strPtr("aws"),
+		Region:        strPtr(region),
+		Service:       strPtr("AmazonEC2"),
+		ProductFamily: strPtr("NAT Gateway"),
+		AttributeFilters: &[]resource.AttributeFilter{
+			{Key: "usagetype", ValueRegex: strPtr("/NatGateway-Hours/")},
+		},
+	}
+	hours := resource.NewBasePriceComponent("Hours", r, "hour", "hour", hoursProductFilter, nil)
 	r.AddPriceComponent(hours)
 
 	return r

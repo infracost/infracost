@@ -31,8 +31,8 @@ func TestFlattenSubResources(t *testing.T) {
 
 func TestBasePriceComponentQuantity(t *testing.T) {
 	r1 := NewBaseResource("r1", map[string]interface{}{}, true)
-	monthlyPc := NewBasePriceComponent("monthlyPc", r1, "unit", "month")
-	hourlyPc := NewBasePriceComponent("hourlyPc", r1, "unit", "hour")
+	monthlyPc := NewBasePriceComponent("monthlyPc", r1, "unit", "month", nil, nil)
+	hourlyPc := NewBasePriceComponent("hourlyPc", r1, "unit", "hour", nil, nil)
 
 	result := monthlyPc.Quantity()
 	if !cmp.Equal(result, decimal.NewFromInt(int64(1))) {
@@ -62,8 +62,8 @@ func TestBasePriceComponentQuantity(t *testing.T) {
 
 func TestBasePriceComponentHourlyCost(t *testing.T) {
 	r1 := NewBaseResource("r1", map[string]interface{}{}, true)
-	monthlyPc := NewBasePriceComponent("monthlyPc", r1, "unit", "month")
-	hourlyPc := NewBasePriceComponent("hourlyPc", r1, "unit", "hour")
+	monthlyPc := NewBasePriceComponent("monthlyPc", r1, "unit", "month", nil, nil)
+	hourlyPc := NewBasePriceComponent("hourlyPc", r1, "unit", "hour", nil, nil)
 
 	result := hourlyPc.HourlyCost()
 	if !cmp.Equal(result, decimal.Zero) {
@@ -108,9 +108,9 @@ func TestBestResourceSubResources(t *testing.T) {
 
 func TestBestResourcePriceComponents(t *testing.T) {
 	r1 := NewBaseResource("r1", map[string]interface{}{}, true)
-	pc1 := NewBasePriceComponent("charlie", r1, "unit", "month")
-	pc2 := NewBasePriceComponent("alpha", r1, "unit", "month")
-	pc3 := NewBasePriceComponent("bravo", r1, "unit", "month")
+	pc1 := NewBasePriceComponent("charlie", r1, "unit", "month", nil, nil)
+	pc2 := NewBasePriceComponent("alpha", r1, "unit", "month", nil, nil)
+	pc3 := NewBasePriceComponent("bravo", r1, "unit", "month", nil, nil)
 
 	r1.AddPriceComponent(pc1)
 	r1.AddPriceComponent(pc2)
