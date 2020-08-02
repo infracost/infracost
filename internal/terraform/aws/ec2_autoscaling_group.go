@@ -32,35 +32,51 @@ func (r *Ec2AutoscalingGroupResource) AddReference(name string, refResource reso
 		r.AddSubResource(launchConfiguration)
 
 	} else if name == "launch_template" || name == "launch_template_id" {
-		var overrides []interface{}
-		overridesVal := resource.ToGJSON(r.RawValues()).Get("mixed_instances_policy.0.launch_template.0.override").Value()
-		if overridesVal != nil {
-			overrides = overridesVal.([]interface{})
+		instanceType, count := r.GetInstanceTypeAndCount(refResource, capacity)
+		rawValues := make(map[string]interface{})
+		for k, v := range refResource.RawValues() {
+			rawValues[k] = v
+		}
+		rawValues["instance_type"] = instanceType
+
+		instanceDistributionResult := resource.ToGJSON(r.RawValues()).Get("mixed_instances_policy.0.instances_distribution.0")
+
+		onDemandCount := 0
+		if instanceDistributionResult.Get("on_demand_base_capacity").Exists() {
+			onDemandCount = int(instanceDistributionResult.Get("on_demand_base_capacity").Int())
 		}
 
-		if len(overrides) > 0 {
-			// Just use the first override for now, since that will be the highest priority
-			override := overrides[0].(map[string]interface{})
-			instanceType := override["instance_type"].(string)
-			weightedCapacity := 1
-			if override["weighted_capacity"] != nil {
-				weightedCapacity, _ = strconv.Atoi(override["weighted_capacity"].(string))
-			}
-			count := int(math.Ceil(float64(capacity) / float64(weightedCapacity)))
-
-			rawValues := make(map[string]interface{})
-			for k, v := range refResource.RawValues() {
-				rawValues[k] = v
-			}
-			rawValues["instance_type"] = instanceType
-			launchTemplate := NewEc2LaunchTemplate(address, r.region, rawValues, true)
-			launchTemplate.SetResourceCount(count)
-			r.AddSubResource(launchTemplate)
-
-		} else {
-			launchTemplate := NewEc2LaunchTemplate(address, r.region, refResource.RawValues(), true)
-			launchTemplate.SetResourceCount(capacity)
-			r.AddSubResource(launchTemplate)
+		onDemandPerc := 100
+		if instanceDistributionResult.Get("on_demand_percentage_above_base_capacity").Exists() {
+			onDemandPerc = int(instanceDistributionResult.Get("on_demand_percentage_above_base_capacity").Int())
 		}
+
+		launchTemplate := NewEc2LaunchTemplate(address, r.region, rawValues, onDemandCount, onDemandPerc)
+		launchTemplate.SetResourceCount(count)
+		r.AddSubResource(launchTemplate)
 	}
+}
+
+func (r *Ec2AutoscalingGroupResource) GetInstanceTypeAndCount(refResource resource.Resource, capacity int) (string, int) {
+	count := capacity
+	instanceType := refResource.RawValues()["instance_type"].(string)
+
+	var overrides []interface{}
+	overridesVal := resource.ToGJSON(r.RawValues()).Get("mixed_instances_policy.0.launch_template.0.override").Value()
+	if overridesVal != nil {
+		overrides = overridesVal.([]interface{})
+	}
+
+	if len(overrides) > 0 {
+		// Just use the first override for now, since that will be the highest priority
+		override := overrides[0].(map[string]interface{})
+		instanceType = override["instance_type"].(string)
+		weightedCapacity := 1
+		if override["weighted_capacity"] != nil {
+			weightedCapacity, _ = strconv.Atoi(override["weighted_capacity"].(string))
+		}
+		count = int(math.Ceil(float64(capacity) / float64(weightedCapacity)))
+	}
+
+	return instanceType, count
 }

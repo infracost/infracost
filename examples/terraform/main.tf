@@ -105,6 +105,35 @@ resource "aws_autoscaling_group" "lt1" {
   }
 }
 
+resource "aws_autoscaling_group" "mixed-instance-lt1" {
+  desired_capacity   = 6
+  max_size           = 10
+  min_size           = 1
+
+  mixed_instances_policy {
+    launch_template {
+      launch_template_specification {
+        launch_template_id = aws_launch_template.lt1.id
+      }
+
+      override {
+        instance_type     = "t3.medium"
+        weighted_capacity = "2"
+      }
+
+      override {
+        instance_type     = "t3.large"
+        weighted_capacity = "4"
+      }
+    }
+
+    instances_distribution {
+      on_demand_base_capacity = 1
+      on_demand_percentage_above_base_capacity = 50
+    }
+  }
+}
+
 resource "aws_db_instance" "db_mysql" {
   allocated_storage    = 20
   storage_type         = "standard"
@@ -157,28 +186,4 @@ resource "aws_eip" "nat1" {
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat1.id
   subnet_id     = tolist(data.aws_subnet_ids.all.ids)[0]
-}
-
-resource "aws_autoscaling_group" "mixed-instance-lt1" {
-  desired_capacity   = 4
-  max_size           = 5
-  min_size           = 1
-
-  mixed_instances_policy {
-    launch_template {
-      launch_template_specification {
-        launch_template_id = aws_launch_template.lt1.id
-      }
-
-      override {
-        instance_type     = "t3.medium"
-        weighted_capacity = "3"
-      }
-
-      override {
-        instance_type     = "t3.large"
-        weighted_capacity = "2"
-      }
-    }
-  }
 }
