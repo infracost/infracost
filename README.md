@@ -8,7 +8,7 @@ The [infracost GitHub action](https://github.com/marketplace/actions/run-infraco
 
 <img src="https://raw.githubusercontent.com/aliscott/infracost-gh-action/master/screenshot.png" width=557 alt="Example infracost diff usage" />
 
-Currently this supports the following On-Demand pricing for the following AWS resources:
+Currently this supports the following on-Demand and Spot pricing for the following AWS resources:
  * `aws_instance`
  * `aws_ebs_volume`
  * `aws_ebs_snapshot`
@@ -22,7 +22,7 @@ Currently this supports the following On-Demand pricing for the following AWS re
 This does not yet support estimates for:
   * any costs that are not specified in the Terraform configuration, e.g. S3 storage costs, data out costs.
   * Non-Linux EC2 instances such as Windows and RHEL, a lookup is needed to find the OS of AMIs.
-  * Any non On-Demand pricing, such as Reserved Instances, Spot Instances.
+  * Any non On-Demand pricing, such as Reserved Instances.
 
 This is an early stage project, pull requests to add resources/fix bugs are welcome.
 
@@ -45,7 +45,7 @@ sudo mv /tmp/infracost-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64 /usr/local
 
 ## Usage
 
-Prices are retrieved using [https://github.com/aliscott/cloud-pricing-api](https://github.com/aliscott/cloud-pricing-api). There is a demo version of that service deployed at [https://pricing.infracost.io/graphql](https://pricing.infracost.io/graphql), which `infracost` uses by default. This is running on minimal infrastructure so is not guaranteed to always be available.
+Prices are retrieved using [https://github.com/aliscott/cloud-pricing-api](https://github.com/aliscott/cloud-pricing-api). There is a demo version of that service deployed at [https://pricing.infracost.io/graphql](https://pricing.infracost.io/graphql), which `infracost` uses by default. This is running on minimal infrastructure so is not guaranteed to always be available. On this service, spot prices are refreshed once per hour.
 
 You can run `infracost` in your terraform directories without worrying about security or privacy issues as no terraform secrets/tags/IDs etc are sent to the pricing service (only generic price-related attributes are used). Also, do not be alarmed by seeing the `terraform init` in output, no changes are made to your terraform or cloud resources. As a security precaution, read-only AWS IAM creds can be used.
 
