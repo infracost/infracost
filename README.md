@@ -45,7 +45,7 @@ sudo mv /tmp/infracost-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64 /usr/local
 
 ## Usage
 
-Prices are retrieved using [https://github.com/aliscott/aws-prices-graphql](https://github.com/aliscott/aws-prices-graphql). There is a demo version of that service deployed at [https://aws-prices-graphql.alistair.scot/graphql](https://aws-prices-graphql.alistair.scot/graphql), which `infracost` uses by default. This is running on minimal infrastructure so is not guaranteed to always be available.
+Prices are retrieved using [https://github.com/aliscott/cloud-pricing-api](https://github.com/aliscott/cloud-pricing-api). There is a demo version of that service deployed at [https://pricing.infracost.io/graphql](https://pricing.infracost.io/graphql), which `infracost` uses by default. This is running on minimal infrastructure so is not guaranteed to always be available.
 
 You can run `infracost` in your terraform directories without worrying about security or privacy issues as no terraform secrets/tags/IDs etc are sent to the pricing service (only generic price-related attributes are used). Also, do not be alarmed by seeing the `terraform init` in output, no changes are made to your terraform or cloud resources. As a security precaution, read-only AWS IAM creds can be used.
 
