@@ -13,7 +13,7 @@ import (
 type ConfigSpec struct {
 	Logger  *logrus.Logger
 	NoColor bool
-	ApiUrl  string `envconfig:"INFRACOST_API_URL"  required:"true"  default:"https://aws-prices-graphql.alistair.scot"`
+	ApiUrl  string `envconfig:"INFRACOST_API_URL"  required:"true"  default:"https://pricing.infracost.io"`
 }
 
 func (c *ConfigSpec) SetLogger(logger *logrus.Logger) {
