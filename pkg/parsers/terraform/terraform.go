@@ -77,7 +77,7 @@ func terraformCommand(options *TerraformOptions, args ...string) ([]byte, error)
 	if config.Config.NoColor {
 		log.Infof("Running command: %s", cmd.String())
 	} else {
-		log.Info(color.HiGreenString("Running command: %s", cmd.String()))
+		log.Info(color.HiBlackString("Running command: %s", cmd.String()))
 	}
 	cmd.Dir = options.TerraformDir
 
