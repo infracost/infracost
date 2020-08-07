@@ -76,7 +76,7 @@ func NewRdsInstance(address string, region string, rawValues map[string]interfac
 	volumeType := "General Purpose"
 	if rawValues["storage_type"] == nil && rawValues["iops"] != nil {
 		volumeType = "Provisioned IOPS"
-	}	else if rawValues["storage_type"] != nil {
+	} else if rawValues["storage_type"] != nil {
 		switch rawValues["storage_type"].(string) {
 		case "standard":
 			volumeType = "Magnetic"
