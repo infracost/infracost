@@ -19,6 +19,9 @@ func ec2LaunchTemplateHoursQuantityFactory(r resource.Resource, purchaseOption s
 		if purchaseOption == "spot" {
 			purchaseOptionCount = spotCount
 		}
+		if purchaseOptionCount == 0 || r.ResourceCount() == 0 {
+			return decimal.NewFromInt(0)
+		}
 		return decimal.NewFromInt(int64(purchaseOptionCount)).Div(decimal.NewFromInt(int64(r.ResourceCount())))
 	}
 }
