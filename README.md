@@ -1,10 +1,10 @@
-# infracost
+# Infracost
 
 Get cost hourly and monthly estimates for a Terraform project. Helps you quickly see the cost breakdown and compare different deployment options upfront.
 
 <img src="examples/screenshot.png" width=557 alt="Example infracost output" />
 
-The [infracost GitHub action](https://github.com/marketplace/actions/run-infracost) can be used to automatically add a PR comment showing the cost estimate `diff` between a pull request and the master branch whenever a `.tf` file changes.
+The [Infracost GitHub action](https://github.com/marketplace/actions/run-infracost) can be used to automatically add a PR comment showing the cost estimate `diff` between a pull request and the master branch whenever a `.tf` file changes.
 
 <img src="https://raw.githubusercontent.com/aliscott/infracost-gh-action/master/screenshot.png" width=557 alt="Example infracost diff usage" />
 
