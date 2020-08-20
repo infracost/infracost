@@ -64,7 +64,7 @@ func NewRdsInstance(address string, region string, rawValues map[string]interfac
 	case "oracle-se1":
 		databaseEdition = "Standard One"
 	case "oracle-se2":
-		databaseEdition = "Standard 2"
+		databaseEdition = "Standard Two"
 	case "oracle-ee", "sqlserver-ee":
 		databaseEdition = "Enterprise"
 	case "sqlserver-ex":
