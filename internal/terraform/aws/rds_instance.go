@@ -41,7 +41,7 @@ func NewRdsInstance(address string, region string, rawValues map[string]interfac
 
 	var databaseEngine string
 	switch rawValues["engine"].(string) {
-	case "postgresql":
+	case "postgres":
 		databaseEngine = "PostgreSQL"
 	case "mysql":
 		databaseEngine = "MySQL"
