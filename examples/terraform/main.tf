@@ -143,13 +143,13 @@ resource "aws_db_instance" "db_mysql" {
 
 resource "aws_db_instance" "db_postgresql" {
   allocated_storage    = 20
-  engine               = "PostgreSQL"
+  engine               = "postgres"
   instance_class       = "db.t2.small"
 }
 
 resource "aws_db_instance" "db_postgresql_iops" {
   allocated_storage    = 20
-  engine               = "PostgreSQL"
+  engine               = "postgres"
   instance_class       = "db.t2.small"
   storage_type         = "io1"
   iops                 = 400
