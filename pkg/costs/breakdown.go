@@ -17,10 +17,19 @@ type PriceComponentCost struct {
 	MonthlyCost    decimal.Decimal
 }
 
+type PriceRangeComponentCost struct {
+	PriceComponent resource.PriceRangeComponent
+	MaxHourlyCost  decimal.Decimal
+	MinHourlyCost  decimal.Decimal
+	MaxMonthlyCost decimal.Decimal
+	MinMonthlyCost decimal.Decimal
+}
+
 type ResourceCostBreakdown struct {
-	Resource            resource.Resource
-	PriceComponentCosts []PriceComponentCost
-	SubResourceCosts    []ResourceCostBreakdown
+	Resource                 resource.Resource
+	PriceComponentCosts      []PriceComponentCost
+	PriceRangeComponentCosts []PriceRangeComponentCost
+	SubResourceCosts         []ResourceCostBreakdown
 }
 
 type PriceComponentQueryMap struct {
@@ -41,6 +50,18 @@ func createPriceComponentCost(priceComponent resource.PriceComponent, queryResul
 		PriceComponent: priceComponent,
 		HourlyCost:     hourlyCost,
 		MonthlyCost:    hourlyCost.Mul(decimal.NewFromInt(int64(HoursInMonth))).Round(6),
+	}
+}
+
+func createPriceRangeComponentCost(priceRangeComponent resource.PriceRangeComponent, queryResult gjson.Result) PriceRangeComponentCost {
+	hourlyCost := priceRangeComponent.HourlyCost()
+
+	return PriceRangeComponentCost{
+		PriceComponent: priceRangeComponent,
+		MaxHourlyCost:  hourlyCost.Max,
+		MinHourlyCost:  hourlyCost.Min,
+		MaxMonthlyCost: hourlyCost.Max.Mul(decimal.NewFromInt(int64(HoursInMonth))).Round(6),
+		MinMonthlyCost: hourlyCost.Min.Mul(decimal.NewFromInt(int64(HoursInMonth))).Round(6),
 	}
 }
 
@@ -67,15 +88,25 @@ func getCostBreakdown(r resource.Resource, results ResourceQueryResultMap) Resou
 		priceComponentCosts = append(priceComponentCosts, createPriceComponentCost(priceComponent, result))
 	}
 
+	priceRangeComponentCosts := make([]PriceRangeComponentCost, 0, len(r.PriceRangeComponents()))
+	for _, priceRangeComponent := range r.PriceRangeComponents() {
+		// Hopefully this is no needed
+		// result := results[r][priceRangeComponent]
+		// fmt.Printf("%+v\n", priceRangeComponent)
+		result := gjson.Result{}
+		priceRangeComponentCosts = append(priceRangeComponentCosts, createPriceRangeComponentCost(priceRangeComponent, result))
+	}
+
 	subResourceCosts := make([]ResourceCostBreakdown, 0, len(r.SubResources()))
 	for _, subResource := range r.SubResources() {
 		subResourceCosts = append(subResourceCosts, getCostBreakdown(subResource, results))
 	}
 
 	return ResourceCostBreakdown{
-		Resource:            r,
-		PriceComponentCosts: priceComponentCosts,
-		SubResourceCosts:    subResourceCosts,
+		Resource:                 r,
+		PriceComponentCosts:      priceComponentCosts,
+		PriceRangeComponentCosts: priceRangeComponentCosts,
+		SubResourceCosts:         subResourceCosts,
 	}
 }
 

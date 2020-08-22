@@ -15,7 +15,7 @@ import (
 )
 
 func getLineItemCount(breakdown costs.ResourceCostBreakdown) int {
-	count := len(breakdown.PriceComponentCosts)
+	count := len(breakdown.PriceComponentCosts) + len(breakdown.PriceRangeComponentCosts)
 
 	for _, subResourceBreakdown := range flattenSubResourceBreakdowns(breakdown.SubResourceCosts) {
 		count += len(subResourceBreakdown.PriceComponentCosts)
@@ -100,6 +100,25 @@ func ToTable(resourceCostBreakdowns []costs.ResourceCostBreakdown) ([]byte, erro
 				priceComponentCost.PriceComponent.Unit(),
 				formatDecimal(priceComponentCost.HourlyCost, "%.4f"),
 				formatDecimal(priceComponentCost.MonthlyCost, "%.4f"),
+			}
+			table.Rich(row, color)
+		}
+
+		for _, priceRangeComponentCost := range breakdown.PriceRangeComponentCosts {
+			lineItem++
+
+			maxHourly := formatDecimal(priceRangeComponentCost.MaxHourlyCost, "%.4f")
+			minHourly := formatDecimal(priceRangeComponentCost.MinHourlyCost, "%.4f")
+
+			maxMonthly := formatDecimal(priceRangeComponentCost.MaxMonthlyCost, "%.4f")
+			minMonthly := formatDecimal(priceRangeComponentCost.MinMonthlyCost, "%.4f")
+
+			row := []string{
+				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), priceRangeComponentCost.PriceComponent.Name()),
+				formatQuantity(priceRangeComponentCost.PriceComponent.Quantity()),
+				priceRangeComponentCost.PriceComponent.Unit(),
+				fmt.Sprintf("%s - %s", minHourly, maxHourly),
+				fmt.Sprintf("%s - %s", minMonthly, maxMonthly),
 			}
 			table.Rich(row, color)
 		}
