@@ -1,5 +1,5 @@
 resource "aws_instance" "instance1" {
-  ami           = data.aws_ami.ubuntu.id
+  ami           = var.aws_ami_id
   instance_type = "t3.micro"
 
   root_block_device {
@@ -32,13 +32,13 @@ resource "aws_instance" "instance1" {
 }
 
 resource "aws_ebs_volume" "standard" {
-  availability_zone = data.aws_availability_zones.available.names[0]
+  availability_zone = var.availability_zone_names[0]
   size              = 15
   type              = "standard"
 }
 
 resource "aws_ebs_volume" "io1" {
-  availability_zone = data.aws_availability_zones.available.names[0]
+  availability_zone = var.availability_zone_names[0]
   type              = "io1"
   size              = 10
   iops              = 500
@@ -54,7 +54,7 @@ resource "aws_ebs_snapshot_copy" "standard" {
 }
 
 resource "aws_launch_configuration" "lc1" {
-  image_id      = data.aws_ami.ubuntu.id
+  image_id      = var.aws_ami_id
   instance_type = "t3.small"
 
   root_block_device {
@@ -75,7 +75,7 @@ resource "aws_autoscaling_group" "lc1" {
 }
 
 resource "aws_launch_template" "lt1" {
-  image_id      = data.aws_ami.ubuntu.id
+  image_id      = var.aws_ami_id
   instance_type = "t3.small"
 
   block_device_mappings {
@@ -185,5 +185,5 @@ resource "aws_eip" "nat1" {
 
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat1.id
-  subnet_id     = tolist(data.aws_subnet_ids.all.ids)[0]
+  subnet_id     = var.aws_subnet_ids[0]
 }
