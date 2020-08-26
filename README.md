@@ -89,9 +89,14 @@ Run the code:
 make run ARGS="--tfdir <Terraform Dir>"
 ```
 
-Run tests:
+Run all tests:
 ```sh
 make test
+```
+
+Exclude integration tests:
+```sh
+make test ARGS="-v -short"
 ```
 
 Build:

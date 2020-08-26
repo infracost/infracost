@@ -43,6 +43,7 @@ func (q *GraphQLQueryRunner) buildQuery(productFilter *resource.ProductFilter, p
 		query($productFilter: ProductFilter!, $priceFilter: PriceFilter) {
 			products(filter: $productFilter) {
 				prices(filter: $priceFilter) {
+					priceHash
 					USD
 				}
 			}
