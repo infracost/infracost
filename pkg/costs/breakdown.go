@@ -13,6 +13,7 @@ var HoursInMonth = 730
 
 type PriceComponentCost struct {
 	PriceComponent resource.PriceComponent
+	PriceHash      string
 	HourlyCost     decimal.Decimal
 	MonthlyCost    decimal.Decimal
 }
@@ -37,27 +38,43 @@ type queryKey struct {
 func createPriceComponentCost(priceComponent resource.PriceComponent, queryResult gjson.Result) PriceComponentCost {
 	hourlyCost := priceComponent.HourlyCost()
 
+	priceHash := queryResult.Get("data.products.0.prices.0.priceHash").String()
+
 	return PriceComponentCost{
 		PriceComponent: priceComponent,
+		PriceHash:      priceHash,
 		HourlyCost:     hourlyCost,
 		MonthlyCost:    hourlyCost.Mul(decimal.NewFromInt(int64(HoursInMonth))).Round(6),
 	}
 }
 
 func setPriceComponentPrice(r resource.Resource, priceComponent resource.PriceComponent, queryResult gjson.Result) {
+	var priceVal decimal.Decimal
+
 	products := queryResult.Get("data.products").Array()
-	var price decimal.Decimal
 	if len(products) == 0 {
-		log.Warnf("No prices found for %s %s, using 0.00", r.Address(), priceComponent.Name())
-		price = decimal.Zero
-	} else {
-		if len(products) > 1 {
-			log.Warnf("Multiple prices found for %s %s, using the first price", r.Address(), priceComponent.Name())
-		}
-		priceStr := products[0].Get("prices.0.USD").String()
-		price, _ = decimal.NewFromString(priceStr)
+		log.Warnf("No products found for %s %s, using 0.00", r.Address(), priceComponent.Name())
+		priceVal = decimal.Zero
+		priceComponent.SetPrice(priceVal)
+		return
 	}
-	priceComponent.SetPrice(price)
+	if len(products) > 1 {
+		log.Warnf("Multiple products found for %s %s, using the first product", r.Address(), priceComponent.Name())
+	}
+
+	prices := products[0].Get("prices").Array()
+	if len(prices) == 0 {
+		log.Warnf("No prices found for %s %s, using 0.00", r.Address(), priceComponent.Name())
+		priceVal = decimal.Zero
+		priceComponent.SetPrice(priceVal)
+		return
+	}
+	if len(prices) > 1 {
+		log.Warnf("Multiple prices found for %s %s, using the first price", r.Address(), priceComponent.Name())
+	}
+
+	priceVal, _ = decimal.NewFromString(prices[0].Get("USD").String())
+	priceComponent.SetPrice(priceVal)
 }
 
 func getCostBreakdown(r resource.Resource, results ResourceQueryResultMap) ResourceCostBreakdown {
@@ -82,7 +99,7 @@ func getCostBreakdown(r resource.Resource, results ResourceQueryResultMap) Resou
 func GenerateCostBreakdowns(q QueryRunner, resources []resource.Resource) ([]ResourceCostBreakdown, error) {
 	costBreakdowns := make([]ResourceCostBreakdown, 0, len(resources))
 
-	results := make(map[*resource.Resource]ResourceQueryResultMap, len(resources))
+	results := make(map[resource.Resource]ResourceQueryResultMap, len(resources))
 	for _, r := range resources {
 		if !r.HasCost() {
 			continue
@@ -91,7 +108,7 @@ func GenerateCostBreakdowns(q QueryRunner, resources []resource.Resource) ([]Res
 		if err != nil {
 			return costBreakdowns, err
 		}
-		results[&r] = resourceResults
+		results[r] = resourceResults
 
 		for _, priceComponentResults := range resourceResults {
 			for priceComponent, result := range priceComponentResults {
@@ -104,7 +121,7 @@ func GenerateCostBreakdowns(q QueryRunner, resources []resource.Resource) ([]Res
 		if !r.HasCost() {
 			continue
 		}
-		costBreakdowns = append(costBreakdowns, getCostBreakdown(r, results[&r]))
+		costBreakdowns = append(costBreakdowns, getCostBreakdown(r, results[r]))
 	}
 
 	sort.Slice(costBreakdowns, func(i, j int) bool {
