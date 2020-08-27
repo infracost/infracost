@@ -200,7 +200,7 @@ resource "aws_rds_cluster" "rds_cluster_mysql2" {
   preferred_backup_window = "07:00-09:00"
 }
 
-resource "aws_rds_cluster" "rd_cluster_mulitmaster" {
+resource "aws_rds_cluster" "rds_cluster_mulitmaster" {
   cluster_identifier   = "example"
   db_subnet_group_name = aws_db_subnet_group.example.name
   engine_mode          = "multimaster"
