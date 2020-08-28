@@ -24,7 +24,7 @@ func NewDynamoDBGlobalTable(address string, region string, rawValues map[string]
 		PurchaseOption:   strPtr("on_demand"),
 		DescriptionRegex: strPtr("/beyond the free tier/"),
 	}
-	rwcu := resource.NewBasePriceComponent("Replicated write capacity unit (rWCU)", r, "hour", "hour", hoursProductFilter, hoursPriceFilter)
+	rwcu := resource.NewBasePriceComponent("Replicated write capacity unit (rWCU)", r, "rWCU/hour", "hour", hoursProductFilter, hoursPriceFilter)
 	rwcu.SetQuantityMultiplierFunc(dynamoDBWCUQuantity)
 	r.AddPriceComponent(rwcu)
 
@@ -75,7 +75,7 @@ func NewDynamoDBTable(address string, region string, rawValues map[string]interf
 		PurchaseOption:   strPtr("on_demand"),
 		DescriptionRegex: strPtr("/beyond the free tier/"),
 	}
-	wcu := resource.NewBasePriceComponent("Write capacity unit (WCU)", r, "hour", "hour", hoursProductFilter, hoursPriceFilter)
+	wcu := resource.NewBasePriceComponent("Write capacity unit (WCU)", r, "WCU/hour", "hour", hoursProductFilter, hoursPriceFilter)
 	wcu.SetQuantityMultiplierFunc(dynamoDBWCUQuantity)
 	r.AddPriceComponent(wcu)
 
@@ -93,7 +93,7 @@ func NewDynamoDBTable(address string, region string, rawValues map[string]interf
 		PurchaseOption:   strPtr("on_demand"),
 		DescriptionRegex: strPtr("/beyond the free tier/"),
 	}
-	rcu := resource.NewBasePriceComponent("Read capacity unit (RCU)", r, "hour", "hour", hoursProductFilter, hoursPriceFilter)
+	rcu := resource.NewBasePriceComponent("Read capacity unit (RCU)", r, "RCU/hour", "hour", hoursProductFilter, hoursPriceFilter)
 	rcu.SetQuantityMultiplierFunc(dynamoDBRCUQuantity)
 	r.AddPriceComponent(rcu)
 
