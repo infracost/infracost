@@ -14,3 +14,7 @@
 
 # Terraform artifacts
 .terraform
+
+#script generated files
+scripts/tmp-*
+scripts/index.json
