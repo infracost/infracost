@@ -19,7 +19,7 @@ Currently this supports the following on-Demand and Spot pricing for the followi
  * `aws_lb`
  * `aws_nat_gateway`
 
- It also supports provisioned pricing for the following ASW resources:
+ It also supports provisioned pricing for the following AWS resources:
  * `aws_dynamodb_table` 
 
 This does not yet support estimates for:
