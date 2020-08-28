@@ -214,3 +214,41 @@ resource "aws_dynamodb_table" "dynamodb-table" {
     region_name = "us-west-1"
   }
 }
+
+resource "aws_ecs_cluster" "ecs1" {
+  name               = "ecs1"
+  capacity_providers = ["FARGATE"]
+}
+
+resource "aws_ecs_task_definition" "ecs_task1" {
+  requires_compatibilities = ["FARGATE"]
+  family                   = "ecs_task1"
+  memory                   = "2 GB"
+  cpu                      = "1 vCPU"
+
+  inference_accelerator {
+    device_name = "device1"
+    device_type = "eia2.medium"
+  }
+
+  container_definitions = <<TASK_DEFINITION
+  [
+    {
+        "command": ["sleep", "10"],
+        "entryPoint": ["/"],
+        "essential": true,
+        "image": "alpine",
+        "name": "alpine",
+        "network_mode": "none"
+    }
+  ]
+  TASK_DEFINITION
+}
+
+resource "aws_ecs_service" "ecs_fargate1" {
+  name            = "ecs_fargate1"
+  launch_type     = "FARGATE"
+  cluster         = aws_ecs_cluster.ecs1.id
+  task_definition = aws_ecs_task_definition.ecs_task1.arn
+  desired_count   = 2
+}
