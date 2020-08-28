@@ -1,5 +1,7 @@
 # Infracost
 
+<a href="https://discord.gg/Cu9ftEg"><img alt="Discord Chat" src="https://img.shields.io/discord/746703155953270794.svg"></a>
+
 Get cost hourly and monthly estimates for a Terraform project. Helps you quickly see the cost breakdown and compare different deployment options upfront.
 
 <img src="examples/screenshot.png" width=557 alt="Example infracost output" />
