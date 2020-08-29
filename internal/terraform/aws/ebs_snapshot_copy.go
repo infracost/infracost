@@ -6,10 +6,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func ebsSnapshotCopyGbQuantity(resource resource.Resource) decimal.Decimal {
+func ebsSnapshotCopyGbQuantity(r resource.Resource) decimal.Decimal {
 	quantity := decimal.NewFromInt(int64(DefaultVolumeSize))
 
-	sourceSnapshot := resource.References()["source_snapshot_id"]
+	sourceSnapshot := r.References()["source_snapshot_id"]
 	if sourceSnapshot == nil {
 		return quantity
 	}
