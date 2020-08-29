@@ -32,7 +32,7 @@ type PriceFilter struct {
 	PurchaseOption     *string `json:"purchaseOption,omitempty"`
 	Unit               *string `json:"unit,omitempty"`
 	Description        *string `json:"description,omitempty"`
-	DescriptionRegex   *string `json:"descriptionRegex,omitempty"`
+	DescriptionRegex   *string `json:"description_regex,omitempty"`
 	TermLength         *string `json:"termLength,omitempty"`
 	TermPurchaseOption *string `json:"termPurchaseOption,omitempty"`
 	TermOfferingClass  *string `json:"termOfferingClass,omitempty"`

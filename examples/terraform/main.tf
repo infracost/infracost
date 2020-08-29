@@ -187,3 +187,30 @@ resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat1.id
   subnet_id     = var.aws_subnet_ids[0]
 }
+
+resource "aws_dynamodb_table" "dynamodb-table" {
+  name           = "GameScores"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 30
+  write_capacity = 20
+  hash_key       = "UserId"
+  range_key      = "GameTitle"
+
+  attribute {
+    name = "UserId"
+    type = "S"
+  }
+
+  attribute {
+    name = "GameTitle"
+    type = "S"
+  }
+
+  replica {
+    region_name = "us-east-2"
+  }
+
+  replica {
+    region_name = "us-west-1"
+  }
+}
