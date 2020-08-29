@@ -25,7 +25,7 @@ func NewElb(address string, region string, rawValues map[string]interface{}, isC
 			{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
 		},
 	}
-	hours := resource.NewBasePriceComponent("Hours", r, "hour", "hour", hoursProductFilter, nil)
+	hours := resource.NewBasePriceComponent("hours", r, "hour", "hour", hoursProductFilter, nil)
 	r.AddPriceComponent(hours)
 
 	return r

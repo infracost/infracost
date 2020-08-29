@@ -3,6 +3,8 @@ package config
 import (
 	"log"
 	"os"
+	"path/filepath"
+	"runtime"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -20,6 +22,11 @@ func (c *ConfigSpec) SetLogger(logger *logrus.Logger) {
 	c.Logger = logger
 }
 
+func rootDir() string {
+	_, b, _, _ := runtime.Caller(0)
+	return filepath.Join(filepath.Dir(b), "../..")
+}
+
 func fileExists(path string) bool {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {
@@ -35,8 +42,9 @@ func loadConfig() *ConfigSpec {
 
 	config.NoColor = false
 
-	if fileExists(".env.local") {
-		err = godotenv.Load(".env.local")
+	envLocalPath := filepath.Join(rootDir(), ".env.local")
+	if fileExists(envLocalPath) {
+		err = godotenv.Load(envLocalPath)
 		if err != nil {
 			log.Fatal(err)
 		}
