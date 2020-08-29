@@ -232,16 +232,16 @@ resource "aws_ecs_task_definition" "ecs_task1" {
   }
 
   container_definitions = <<TASK_DEFINITION
-  [
-    {
-        "command": ["sleep", "10"],
-        "entryPoint": ["/"],
-        "essential": true,
-        "image": "alpine",
-        "name": "alpine",
-        "network_mode": "none"
-    }
-  ]
+    [
+        {
+            "command": ["sleep", "10"],
+            "entryPoint": ["/"],
+            "essential": true,
+            "image": "alpine",
+            "name": "alpine",
+            "network_mode": "none"
+        }
+    ]
   TASK_DEFINITION
 }
 

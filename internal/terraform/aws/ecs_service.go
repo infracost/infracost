@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"infracost/pkg/resource"
 	"regexp"
+	"strings"
 
 	"github.com/shopspring/decimal"
 )
@@ -15,11 +16,12 @@ type EcsServiceResource struct {
 
 func convertResourceString(rawValue string) decimal.Decimal {
 	var quantity decimal.Decimal
-	reg := regexp.MustCompile(`(?i)\s*(vcpu|gb)\s*`)
-	if reg.MatchString(rawValue) {
-		quantity, _ = decimal.NewFromString(reg.ReplaceAllString(rawValue, ""))
+	noSpaceString := strings.ReplaceAll(rawValue, " ", "")
+	reg := regexp.MustCompile(`(?i)vcpu|gb`)
+	if reg.MatchString(noSpaceString) {
+		quantity, _ = decimal.NewFromString(reg.ReplaceAllString(noSpaceString, ""))
 	} else {
-		quantity, _ = decimal.NewFromString(rawValue)
+		quantity, _ = decimal.NewFromString(noSpaceString)
 		quantity = quantity.Div(decimal.NewFromInt(1024))
 	}
 	return quantity
