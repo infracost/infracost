@@ -12,10 +12,11 @@ import (
 var HoursInMonth = 730
 
 type PriceComponentCost struct {
-	PriceComponent resource.PriceComponent
-	PriceHash      string
-	HourlyCost     decimal.Decimal
-	MonthlyCost    decimal.Decimal
+	PriceComponent      resource.PriceComponent
+	PriceHash           string
+	HourlyCost          decimal.Decimal
+	MonthlyCost         decimal.Decimal
+	CostOverridingLabel string
 }
 
 type ResourceCostBreakdown struct {
@@ -41,10 +42,11 @@ func createPriceComponentCost(priceComponent resource.PriceComponent, queryResul
 	priceHash := queryResult.Get("data.products.0.prices.0.priceHash").String()
 
 	return PriceComponentCost{
-		PriceComponent: priceComponent,
-		PriceHash:      priceHash,
-		HourlyCost:     hourlyCost,
-		MonthlyCost:    hourlyCost.Mul(decimal.NewFromInt(int64(HoursInMonth))).Round(6),
+		PriceComponent:      priceComponent,
+		PriceHash:           priceHash,
+		HourlyCost:          hourlyCost,
+		MonthlyCost:         hourlyCost.Mul(decimal.NewFromInt(int64(HoursInMonth))).Round(6),
+		CostOverridingLabel: priceComponent.PriceOverrideLabel(),
 	}
 }
 

@@ -47,6 +47,7 @@ type PriceComponent interface {
 	Price() decimal.Decimal
 	SetPrice(price decimal.Decimal)
 	HourlyCost() decimal.Decimal
+	PriceOverrideLabel() string
 }
 
 type Resource interface {
@@ -88,17 +89,19 @@ type BasePriceComponent struct {
 	priceFilter            *PriceFilter
 	quantityMultiplierFunc func(resource Resource) decimal.Decimal
 	price                  decimal.Decimal
+	priceOverrideLabel     string
 }
 
 func NewBasePriceComponent(name string, resource Resource, unit string, timeUnit string, productFilter *ProductFilter, priceFilter *PriceFilter) *BasePriceComponent {
 	return &BasePriceComponent{
-		name:          name,
-		resource:      resource,
-		timeUnit:      timeUnit,
-		unit:          unit,
-		productFilter: productFilter,
-		priceFilter:   priceFilter,
-		price:         decimal.Zero,
+		name:               name,
+		resource:           resource,
+		timeUnit:           timeUnit,
+		unit:               unit,
+		productFilter:      productFilter,
+		priceFilter:        priceFilter,
+		price:              decimal.Zero,
+		priceOverrideLabel: "",
 	}
 }
 
@@ -152,6 +155,14 @@ func (c *BasePriceComponent) SetPrice(price decimal.Decimal) {
 func (c *BasePriceComponent) HourlyCost() decimal.Decimal {
 	monthToHourDivisor := timeUnitSecs["month"].Div(timeUnitSecs["hour"])
 	return c.price.Mul(c.Quantity()).Div(monthToHourDivisor)
+}
+
+func (c *BasePriceComponent) SetPriceOverrideLabel(priceOverrideLabel string) {
+	c.priceOverrideLabel = priceOverrideLabel
+}
+
+func (c *BasePriceComponent) PriceOverrideLabel() string {
+	return c.priceOverrideLabel
 }
 
 type BaseResource struct {

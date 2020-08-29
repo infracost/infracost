@@ -94,12 +94,22 @@ func ToTable(resourceCostBreakdowns []costs.ResourceCostBreakdown) ([]byte, erro
 			totalHourly = totalHourly.Add(priceComponentCost.HourlyCost)
 			totalMonthly = totalMonthly.Add(priceComponentCost.MonthlyCost)
 
+			hourlyCost := formatDecimal(priceComponentCost.HourlyCost, "%.4f")
+			if len(priceComponentCost.CostOverridingLabel) > 0 {
+				hourlyCost = priceComponentCost.CostOverridingLabel
+			}
+
+			monthlyCost := formatDecimal(priceComponentCost.MonthlyCost, "%.4f")
+			if len(priceComponentCost.CostOverridingLabel) > 0 {
+				monthlyCost = priceComponentCost.CostOverridingLabel
+			}
+
 			row := []string{
 				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), priceComponentCost.PriceComponent.Name()),
 				formatQuantity(priceComponentCost.PriceComponent.Quantity()),
 				priceComponentCost.PriceComponent.Unit(),
-				formatDecimal(priceComponentCost.HourlyCost, "%.4f"),
-				formatDecimal(priceComponentCost.MonthlyCost, "%.4f"),
+				hourlyCost,
+				monthlyCost,
 			}
 			table.Rich(row, color)
 		}
