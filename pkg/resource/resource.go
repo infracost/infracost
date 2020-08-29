@@ -49,26 +49,13 @@ type PriceComponent interface {
 	HourlyCost() decimal.Decimal
 }
 
-type PriceRangeComponent interface {
-	Name() string
-	Unit() string
-	ProductFilter() *ProductFilter
-	PriceFilter() *PriceFilter
-	Quantity() decimal.Decimal
-	PriceRange() *PriceRange
-	SetPriceRange(priceRange *PriceRange)
-	HourlyCost() *PriceRange
-}
-
 type Resource interface {
 	Address() string
 	RawValues() map[string]interface{}
 	SubResources() []Resource
 	AddSubResource(Resource)
 	PriceComponents() []PriceComponent
-	PriceRangeComponents() []PriceRangeComponent
 	AddPriceComponent(PriceComponent)
-	AddPriceRangeComponent(PriceRangeComponent)
 	References() map[string]Resource
 	AddReference(name string, resource Resource)
 	ResourceCount() int
@@ -103,22 +90,6 @@ type BasePriceComponent struct {
 	price                  decimal.Decimal
 }
 
-type PriceRange struct {
-	Max decimal.Decimal
-	Min decimal.Decimal
-}
-
-type BasePriceRangeComponent struct {
-	name                   string
-	resource               Resource
-	timeUnit               string
-	unit                   string
-	productFilter          *ProductFilter
-	priceFilter            *PriceFilter
-	quantityMultiplierFunc func(resource Resource) decimal.Decimal
-	priceRange             *PriceRange
-}
-
 func NewBasePriceComponent(name string, resource Resource, unit string, timeUnit string, productFilter *ProductFilter, priceFilter *PriceFilter) *BasePriceComponent {
 	return &BasePriceComponent{
 		name:          name,
@@ -128,23 +99,6 @@ func NewBasePriceComponent(name string, resource Resource, unit string, timeUnit
 		productFilter: productFilter,
 		priceFilter:   priceFilter,
 		price:         decimal.Zero,
-	}
-}
-
-func NewBasePriceRangeComponent(name string, resource Resource, unit string, timeUnit string, productFilter *ProductFilter, priceFilter *PriceFilter) *BasePriceRangeComponent {
-	priceRange := &PriceRange{
-		Max: decimal.Zero,
-		Min: decimal.Zero,
-	}
-
-	return &BasePriceRangeComponent{
-		name:          name,
-		resource:      resource,
-		timeUnit:      timeUnit,
-		unit:          unit,
-		productFilter: productFilter,
-		priceFilter:   priceFilter,
-		priceRange:    priceRange,
 	}
 }
 
@@ -200,67 +154,14 @@ func (c *BasePriceComponent) HourlyCost() decimal.Decimal {
 	return c.price.Mul(c.Quantity()).Div(monthToHourDivisor)
 }
 
-func (c *BasePriceRangeComponent) Name() string {
-	return c.name
-}
-
-func (c *BasePriceRangeComponent) Unit() string {
-	return c.unit
-}
-func (c *BasePriceRangeComponent) ProductFilter() *ProductFilter {
-	return c.productFilter
-}
-
-func (c *BasePriceRangeComponent) PriceFilter() *PriceFilter {
-	return c.priceFilter
-}
-
-func (c *BasePriceRangeComponent) SetProductFilter(productFilter *ProductFilter) {
-	c.productFilter = productFilter
-}
-
-func (c *BasePriceRangeComponent) SetPriceFilter(priceFilter *PriceFilter) {
-	c.priceFilter = priceFilter
-}
-
-func (c *BasePriceRangeComponent) Quantity() decimal.Decimal {
-	quantity := decimal.NewFromInt(int64(1))
-	if c.quantityMultiplierFunc != nil {
-		quantity = quantity.Mul(c.quantityMultiplierFunc(c.resource))
-	}
-
-	timeUnitMultiplier := timeUnitSecs["month"].Div(timeUnitSecs[c.timeUnit])
-	resourceCount := decimal.NewFromInt(int64(c.resource.ResourceCount()))
-
-	return quantity.Mul(timeUnitMultiplier).Mul(resourceCount).Round(6)
-}
-
-func (c *BasePriceRangeComponent) SetQuantityMultiplierFunc(f func(resource Resource) decimal.Decimal) {
-	c.quantityMultiplierFunc = f
-}
-
-func (c *BasePriceRangeComponent) PriceRange() *PriceRange {
-	return c.priceRange
-}
-
-func (c *BasePriceRangeComponent) SetPriceRange(priceRange *PriceRange) {
-	c.priceRange = priceRange
-}
-
-func (c *BasePriceRangeComponent) HourlyCost() *PriceRange {
-
-	return c.priceRange
-}
-
 type BaseResource struct {
-	address              string
-	rawValues            map[string]interface{}
-	hasCost              bool
-	references           map[string]Resource
-	resourceCount        int
-	subResources         []Resource
-	priceComponents      []PriceComponent
-	priceRangeComponents []PriceRangeComponent
+	address         string
+	rawValues       map[string]interface{}
+	hasCost         bool
+	references      map[string]Resource
+	resourceCount   int
+	subResources    []Resource
+	priceComponents []PriceComponent
 }
 
 func NewBaseResource(address string, rawValues map[string]interface{}, hasCost bool) *BaseResource {
@@ -299,19 +200,8 @@ func (r *BaseResource) PriceComponents() []PriceComponent {
 	return r.priceComponents
 }
 
-func (r *BaseResource) PriceRangeComponents() []PriceRangeComponent {
-	sort.Slice(r.priceRangeComponents, func(i, j int) bool {
-		return r.priceRangeComponents[i].Name() < r.priceRangeComponents[j].Name()
-	})
-	return r.priceRangeComponents
-}
-
 func (r *BaseResource) AddPriceComponent(priceComponent PriceComponent) {
 	r.priceComponents = append(r.priceComponents, priceComponent)
-}
-
-func (r *BaseResource) AddPriceRangeComponent(priceRangeComponent PriceRangeComponent) {
-	r.priceRangeComponents = append(r.priceRangeComponents, priceRangeComponent)
 }
 
 func (r *BaseResource) References() map[string]Resource {
