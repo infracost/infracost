@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"infracost/pkg/config"
 	"infracost/pkg/costs"
-	"infracost/pkg/parsers/terraform"
+	"infracost/pkg/terraform"
 	"io/ioutil"
 	"path/filepath"
 

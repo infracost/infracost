@@ -7,7 +7,7 @@ import (
 	"infracost/pkg/config"
 	"infracost/pkg/costs"
 	"infracost/pkg/output"
-	"infracost/pkg/parsers/terraform"
+	"infracost/pkg/terraform"
 
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
