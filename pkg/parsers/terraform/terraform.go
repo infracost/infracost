@@ -61,6 +61,8 @@ func createResource(resourceType string, address string, rawValues map[string]in
 		return aws.NewNatGateway(address, awsRegion, rawValues)
 	case "aws_rds_cluster_instance":
 		return aws.NewRDSClusterInstance(address, awsRegion, rawValues)
+	case "aws_lambda_function":
+		return aws.NewLambdaFunction(address, awsRegion, rawValues)
 	case "aws_dynamodb_table":
 		return aws.NewDynamoDBTable(address, awsRegion, rawValues)
 	case "aws_ecs_cluster":
