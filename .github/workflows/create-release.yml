@@ -27,7 +27,7 @@ jobs:
           draft: false
           prerelease: false
       - name: Upload Release Asset Linux
-        id: upload-release-asset
+        id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,7 +37,7 @@ jobs:
           asset_name: infracost-linux-amd64.tar.gz
           asset_content_type: application/gzip
       - name: Upload Release Asset Windows
-        id: upload-release-asset
+        id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -47,7 +47,7 @@ jobs:
           asset_name: infracost-windows-amd64.tar.gz
           asset_content_type: application/gzip
       - name: Upload Release Asset MacOS
-        id: upload-release-asset
+        id: upload-release-asset-darwin
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
