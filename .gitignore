@@ -13,7 +13,7 @@
 .env.local
 
 # Terraform artifacts
-.terraform
+**/.terraform/**
 
 #script generated files
 scripts/tmp-*
