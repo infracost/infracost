@@ -59,6 +59,8 @@ func createResource(resourceType string, address string, rawValues map[string]in
 		return aws.NewElb(address, awsRegion, rawValues, false)
 	case "aws_nat_gateway":
 		return aws.NewNatGateway(address, awsRegion, rawValues)
+	case "aws_lambda_function":
+		return aws.NewLambdaFunction(address, awsRegion, rawValues)
 	case "aws_dynamodb_table":
 		return aws.NewDynamoDBTable(address, awsRegion, rawValues)
 	case "aws_ecs_cluster":
