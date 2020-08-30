@@ -204,6 +204,7 @@ resource "aws_rds_cluster" "default" {
   database_name      = "mydb"
   master_username    = "foo"
   master_password    = "barbut8chars"
+}
 
 resource "aws_dynamodb_table" "dynamodb-table" {
   name           = "GameScores"

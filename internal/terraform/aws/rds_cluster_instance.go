@@ -3,8 +3,6 @@ package aws
 import (
 	"fmt"
 	"infracost/pkg/resource"
-
-	"github.com/shopspring/decimal"
 )
 
 func NewRDSClusterInstance(address string, region string, rawValues map[string]interface{}) resource.Resource {
@@ -13,11 +11,12 @@ func NewRDSClusterInstance(address string, region string, rawValues map[string]i
 
 	instanceType := rawValues["instance_class"].(string)
 
+    var databaseEngine string
 	switch rawValues["engine"].(string) {
-	case "aurora", "aurora-mysql", nil:
-		databaseEngine := "Aurora MySQL"
+	case "aurora", "aurora-mysql", "":
+		databaseEngine = "Aurora MySQL"
 	case "aurora-postgresql":
-		databaseEngine := "Aurora PostgreSQL"
+		databaseEngine = "Aurora PostgreSQL"
 	}
 
 	hoursProductFilter := &resource.ProductFilter{
@@ -32,7 +31,7 @@ func NewRDSClusterInstance(address string, region string, rawValues map[string]i
 	}
 
 	hoursPriceFilter := &resource.PriceFilter{
-		purchaseOption: strPtr("on_demand"),
+		PurchaseOption: strPtr("on_demand"),
 	}
 	hours := resource.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour", hoursProductFilter, hoursPriceFilter)
 	r.AddPriceComponent(hours)
