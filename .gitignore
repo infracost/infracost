@@ -14,6 +14,8 @@
 
 # Terraform artifacts
 **/.terraform/**
+examples/*/plan.save
+examples/*/plan.json
 
 #script generated files
 scripts/tmp-*
