@@ -4,7 +4,7 @@ import (
 	"infracost/pkg/resource"
 )
 
-func NewRDSClusterInstance(address string, region string, rawValues map[string]interface{}) resource.Resource {
+func NewRdsClusterInstance(address string, region string, rawValues map[string]interface{}) resource.Resource {
 	r := resource.NewBaseResource(address, rawValues, true)
 
 	instanceType := rawValues["instance_class"].(string)
