@@ -7,7 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestIntegration(r, n, tf, priceHash string) func(t *testing.T) {
+func NewTestIntegration(r, n, priceHash, tf string) func(t *testing.T) {
 	return func(t *testing.T) {
 		if testing.Short() {
 			t.Skip("skipping test in short mode")
