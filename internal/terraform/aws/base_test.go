@@ -29,7 +29,7 @@ func NewTestIntegration(t *testing.T, r, n, name, priceHash, tf string) {
 		t.Error("got unexpected price hashes", priceHashResults)
 	}
 
-	priceComponentCost := testutil.PriceComponentCostFor(resourceCostBreakdowns, rn, "hours")
+	priceComponentCost := testutil.PriceComponentCostFor(resourceCostBreakdowns, rn, name)
 	if !cmp.Equal(priceComponentCost.HourlyCost, priceComponentCost.PriceComponent.Price()) {
 		t.Error("got unexpected cost", n, "hours")
 	}
