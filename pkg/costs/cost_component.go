@@ -6,12 +6,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-var hourToMonthMultiplier = decimal.NewFromInt(730)
-
 type CostComponent struct {
 	schemaCostComponent *schema.CostComponent
-	hourlyCost          decimal.Decimal
-	monthlyCost         decimal.Decimal
+	price               decimal.Decimal
+	priceHash           string
 }
 
 func NewCostComponent(schemaCostComponent *schema.CostComponent) *CostComponent {
@@ -49,9 +47,17 @@ func (r *CostComponent) MonthlyQuantity() decimal.Decimal {
 }
 
 func (c *CostComponent) HourlyCost() decimal.Decimal {
-	return c.hourlyCost
+	return c.price.Mul(c.HourlyQuantity())
 }
 
 func (c *CostComponent) MonthlyCost() decimal.Decimal {
-	return c.monthlyCost
+	return c.price.Mul(c.MonthlyQuantity())
+}
+
+func (c *CostComponent) SetPrice(price decimal.Decimal) {
+	c.price = price
+}
+
+func (c *CostComponent) SetPriceHash(priceHash string) {
+	c.priceHash = priceHash
 }

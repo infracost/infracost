@@ -10,6 +10,11 @@ provider "aws" {
 
 data "aws_region" "current" {}
 
+variable "aws_ami_id" {
+  type    = string
+  default = "fake1"
+}
+
 module "network" {
   source   = "./network"
   for_each = toset(list("subnet-module-1", "subnet-module-2"))
@@ -30,4 +35,37 @@ resource "aws_eip" "root_nat_eip" {
 resource "aws_nat_gateway" "root_nat" {
   subnet_id     = "subnet-root"
   allocation_id = aws_eip.root_nat_eip.id
+}
+
+resource "aws_instance" "instance1" {
+  ami           = var.aws_ami_id
+  instance_type = "t3.micro"
+
+  root_block_device {
+    volume_size = 10
+  }
+
+  ebs_block_device {
+    device_name = "xvdf"
+    volume_size = 10
+  }
+
+  ebs_block_device {
+    device_name = "xvdg"
+    volume_type = "standard"
+    volume_size = 20
+  }
+
+  ebs_block_device {
+    device_name = "xvdh"
+    volume_type = "sc1"
+    volume_size = 30
+  }
+
+  ebs_block_device {
+    device_name = "xvdi"
+    volume_type = "io1"
+    volume_size = 40
+    iops        = 1000
+  }
 }

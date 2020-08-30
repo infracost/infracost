@@ -92,7 +92,7 @@ func ToTable(resources []*costs.Resource) ([]byte, error) {
 				lineItem++
 
 				row := []string{
-					fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), subResource.Name()),
+					fmt.Sprintf("%s %s %s", getTreePrefix(lineItem, lineItemCount), subResource.Name(), costComponent.Name()),
 					formatQuantity(costComponent.MonthlyQuantity()),
 					costComponent.Unit(),
 					formatDecimal(costComponent.HourlyCost(), "%.4f"),

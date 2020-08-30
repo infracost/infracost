@@ -44,6 +44,9 @@ func AwsInstance(d *schema.ResourceData) *schema.Resource {
 						{Key: "capacitystatus", Value: strPtr("Used")},
 					},
 				},
+				PriceFilter: &schema.PriceFilter{
+					PurchaseOption: strPtr("on_demand"),
+				},
 			},
 		},
 	}
@@ -80,6 +83,7 @@ func ebsBlockDevice(name string, d gjson.Result, region string) *schema.Resource
 
 	costComponents := []*schema.CostComponent{
 		{
+			Name:            "Storage",
 			Unit:            "GB/months",
 			MonthlyQuantity: &gbVal,
 			ProductFilter: &schema.ProductFilter{
@@ -96,6 +100,7 @@ func ebsBlockDevice(name string, d gjson.Result, region string) *schema.Resource
 
 	if volumeApiName == "io1" {
 		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            "IOPS",
 			Unit:            "IOPS/months",
 			MonthlyQuantity: &iopsVal,
 			ProductFilter: &schema.ProductFilter{
