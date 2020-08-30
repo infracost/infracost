@@ -120,23 +120,28 @@ func main() {
 				}
 			}
 
-			resources, err := terraform.ParsePlanJSON(planJSON)
-			if err != nil {
-				return err
-			}
+			terraform.ParsePlanJSON(planJSON)
+			schemaResources := terraform.ParsePlanJSON(planJSON)
 
 			q := costs.NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
-			resourceCostBreakdowns, err := costs.GenerateCostBreakdowns(q, resources)
-			if err != nil {
-				return err
+
+			costResources := make([]*costs.Resource, 0, len(schemaResources))
+			for _, schemaResource := range schemaResources {
+				costResource := costs.NewResource(schemaResource)
+				err := costResource.CalculateCosts(q)
+				if err != nil {
+					return err
+				}
+				costResources = append(costResources, costResource)
 			}
 
 			var out []byte
 			switch c.String("output") {
 			case "table":
-				out, err = output.ToTable(resourceCostBreakdowns)
-			case "json":
-				out, err = output.ToJSON(resourceCostBreakdowns)
+				out, err = output.ToTable(costResources)
+			// TODO
+			// case "json":
+			// 	out, err = output.ToJSON(costResources)
 			default:
 				err = cli.ShowAppHelp(c)
 			}

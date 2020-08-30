@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"infracost/pkg/config"
 	"infracost/pkg/costs"
@@ -14,11 +13,11 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func getLineItemCount(breakdown costs.ResourceCostBreakdown) int {
-	count := len(breakdown.PriceComponentCosts)
+func getLineItemCount(resource *costs.Resource) int {
+	count := len(resource.CostComponents)
 
-	for _, subResourceBreakdown := range flattenSubResourceBreakdowns(breakdown.SubResourceCosts) {
-		count += len(subResourceBreakdown.PriceComponentCosts)
+	for _, subResource := range resource.FlattenedSubResources() {
+		count += len(subResource.CostComponents)
 	}
 
 	return count
@@ -41,18 +40,7 @@ func formatQuantity(quantity decimal.Decimal) string {
 	return strconv.FormatFloat(f, 'f', -1, 64)
 }
 
-func flattenSubResourceBreakdowns(breakdowns []costs.ResourceCostBreakdown) []costs.ResourceCostBreakdown {
-	flattenedBreakdowns := make([]costs.ResourceCostBreakdown, 0)
-	for _, breakdown := range breakdowns {
-		flattenedBreakdowns = append(flattenedBreakdowns, breakdown)
-		if len(breakdown.SubResourceCosts) > 0 {
-			flattenedBreakdowns = append(flattenedBreakdowns, breakdown.SubResourceCosts...)
-		}
-	}
-	return flattenedBreakdowns
-}
-
-func ToTable(resourceCostBreakdowns []costs.ResourceCostBreakdown) ([]byte, error) {
+func ToTable(resources []*costs.Resource) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -80,48 +68,35 @@ func ToTable(resourceCostBreakdowns []costs.ResourceCostBreakdown) ([]byte, erro
 		color = nil
 	}
 
-	for _, breakdown := range resourceCostBreakdowns {
-		table.Append([]string{breakdown.Resource.Address(), "", ""})
+	for _, resource := range resources {
+		table.Append([]string{resource.Name(), "", ""})
 
-		lineItemCount := getLineItemCount(breakdown)
+		lineItemCount := getLineItemCount(resource)
 		lineItem := 0
-		totalHourly := decimal.Zero
-		totalMonthly := decimal.Zero
 
-		for _, priceComponentCost := range breakdown.PriceComponentCosts {
+		for _, costComponent := range resource.CostComponents {
 			lineItem++
 
-			totalHourly = totalHourly.Add(priceComponentCost.HourlyCost)
-			totalMonthly = totalMonthly.Add(priceComponentCost.MonthlyCost)
-
 			row := []string{
-				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), priceComponentCost.PriceComponent.Name()),
-				formatQuantity(priceComponentCost.PriceComponent.Quantity()),
-				priceComponentCost.PriceComponent.Unit(),
-				formatDecimal(priceComponentCost.HourlyCost, "%.4f"),
-				formatDecimal(priceComponentCost.MonthlyCost, "%.4f"),
+				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), costComponent.Name()),
+				formatQuantity(costComponent.MonthlyQuantity()),
+				costComponent.Unit(),
+				formatDecimal(costComponent.HourlyCost(), "%.4f"),
+				formatDecimal(costComponent.MonthlyCost(), "%.4f"),
 			}
 			table.Rich(row, color)
 		}
 
-		for _, subResourceBreakdown := range flattenSubResourceBreakdowns(breakdown.SubResourceCosts) {
-			for _, priceComponentCost := range subResourceBreakdown.PriceComponentCosts {
+		for _, subResource := range resource.FlattenedSubResources() {
+			for _, costComponent := range subResource.CostComponents {
 				lineItem++
 
-				totalHourly = totalHourly.Add(priceComponentCost.HourlyCost)
-				totalMonthly = totalMonthly.Add(priceComponentCost.MonthlyCost)
-
-				prefixToRemove := fmt.Sprintf("%s.", breakdown.Resource.Address())
-				label := fmt.Sprintf("%s %s",
-					strings.TrimPrefix(subResourceBreakdown.Resource.Address(), prefixToRemove),
-					priceComponentCost.PriceComponent.Name(),
-				)
 				row := []string{
-					fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), label),
-					formatQuantity(priceComponentCost.PriceComponent.Quantity()),
-					priceComponentCost.PriceComponent.Unit(),
-					formatDecimal(priceComponentCost.HourlyCost, "%.4f"),
-					formatDecimal(priceComponentCost.MonthlyCost, "%.4f"),
+					fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), subResource.Name()),
+					formatQuantity(costComponent.MonthlyQuantity()),
+					costComponent.Unit(),
+					formatDecimal(costComponent.HourlyCost(), "%.4f"),
+					formatDecimal(costComponent.MonthlyCost(), "%.4f"),
 				}
 				table.Rich(row, color)
 			}
@@ -131,13 +106,13 @@ func ToTable(resourceCostBreakdowns []costs.ResourceCostBreakdown) ([]byte, erro
 			"Total",
 			"",
 			"",
-			formatDecimal(totalHourly, "%.4f"),
-			formatDecimal(totalMonthly, "%.4f"),
+			formatDecimal(resource.HourlyCost(), "%.4f"),
+			formatDecimal(resource.MonthlyCost(), "%.4f"),
 		})
 		table.Append([]string{"", "", ""})
 
-		overallTotalHourly = overallTotalHourly.Add(totalHourly)
-		overallTotalMonthly = overallTotalMonthly.Add(totalMonthly)
+		overallTotalHourly = overallTotalHourly.Add(resource.HourlyCost())
+		overallTotalMonthly = overallTotalMonthly.Add(resource.MonthlyCost())
 	}
 
 	table.Append([]string{

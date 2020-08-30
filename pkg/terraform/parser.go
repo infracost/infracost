@@ -1,16 +1,78 @@
 package terraform
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"infracost/internal/terraform/aws"
-	"infracost/pkg/resource"
+	"infracost/pkg/schema"
 
 	"github.com/tidwall/gjson"
 )
 
-func createResource(resourceType string, address string, rawValues map[string]interface{}, providerConfig gjson.Result) resource.Resource {
+func createResource(resourceData *schema.ResourceData) *schema.Resource {
+	switch resourceData.Type {
+	case "aws_instance":
+		return aws.AwsInstance(resourceData)
+	case "aws_nat_gateway":
+		return aws.AwsNatGateway(resourceData)
+	}
+	return nil
+}
+
+func ParsePlanJSON(j []byte) []*schema.Resource {
+	planJSON := gjson.ParseBytes(j)
+	providerConfig := planJSON.Get("configuration.provider_config")
+	plannedValuesJSON := planJSON.Get("planned_values.root_module")
+	configurationJSON := planJSON.Get("configuration.root_module")
+
+	resources := make([]*schema.Resource, 0)
+
+	resourceDataMap := parseResourceData(planJSON, providerConfig, plannedValuesJSON)
+	parseReferences(resourceDataMap, configurationJSON)
+
+	for _, resourceData := range resourceDataMap {
+		resource := createResource(resourceData)
+		if resource != nil {
+			resources = append(resources, resource)
+		}
+	}
+
+	return resources
+}
+
+func parseResourceData(planJSON gjson.Result, providerConfig gjson.Result, plannedValuesJSON gjson.Result) map[string]*schema.ResourceData {
+	defaultAwsRegion := parseAwsRegion(providerConfig)
+
+	resourceDataMap := make(map[string]*schema.ResourceData)
+
+	for _, terraformResource := range plannedValuesJSON.Get("resources").Array() {
+		address := terraformResource.Get("address").String()
+		resourceType := terraformResource.Get("type").String()
+		rawValues := terraformResource.Get("values")
+
+		// Override the region with the region from the arn if it
+		awsRegion := defaultAwsRegion
+		if rawValues.Get("arn").Exists() {
+			awsRegion = strings.Split(rawValues.Get("arn").String(), ":")[3]
+		}
+		rawValues = addRawValue(rawValues, "region", awsRegion)
+
+		resourceDataMap[address] = schema.NewResourceData(resourceType, address, rawValues)
+	}
+
+	// Recursively add any resources for child modules
+	for _, modulePlannedValueJSON := range plannedValuesJSON.Get("child_modules").Array() {
+		moduleResourceDataMap := parseResourceData(planJSON, providerConfig, modulePlannedValueJSON)
+		for address, resourceData := range moduleResourceDataMap {
+			resourceDataMap[address] = resourceData
+		}
+	}
+	return resourceDataMap
+}
+
+func parseAwsRegion(providerConfig gjson.Result) string {
 	awsRegion := "us-east-1" // Use as fallback
 
 	// Find region from terraform provider config
@@ -19,125 +81,38 @@ func createResource(resourceType string, address string, rawValues map[string]in
 		awsRegion = awsRegionConfig
 	}
 
-	// Override the region with the region from the arn if it
-	arn := rawValues["arn"]
-	if arn != nil {
-		awsRegion = strings.Split(arn.(string), ":")[3]
-	}
-
-	switch resourceType {
-	// case "aws_instance":
-	// 	return aws.NewEc2Instance(address, awsRegion, rawValues)
-	// case "aws_ebs_volume":
-	// 	return aws.NewEbsVolume(address, awsRegion, rawValues)
-	// case "aws_ebs_snapshot":
-	// 	return aws.NewEbsSnapshot(address, awsRegion, rawValues)
-	// case "aws_ebs_snapshot_copy":
-	// 	return aws.NewEbsSnapshotCopy(address, awsRegion, rawValues)
-	// case "aws_launch_configuration":
-	// 	return resource.NewBaseResource(address, rawValues, false) // has no cost
-	// case "aws_launch_template":
-	// 	return resource.NewBaseResource(address, rawValues, false) // has no cost
-	// case "aws_autoscaling_group":
-	// 	return aws.NewEc2AutoscalingGroup(address, awsRegion, rawValues)
-	// case "aws_db_instance":
-	// 	return aws.NewRdsInstance(address, awsRegion, rawValues)
-	// case "aws_elb":
-	// 	return aws.NewElb(address, awsRegion, rawValues, true) // is classic
-	// case "aws_lb":
-	// 	return aws.NewElb(address, awsRegion, rawValues, false)
-	// case "aws_alb": // alias for aws_lb
-	// 	return aws.NewElb(address, awsRegion, rawValues, false)
-	case "aws_nat_gateway":
-		return aws.NewNatGateway(address, awsRegion, rawValues)
-		// case "aws_dynamodb_table":
-		// 	return aws.NewDynamoDBTable(address, awsRegion, rawValues)
-	}
-	return nil
+	return awsRegion
 }
 
-func ParsePlanJSON(j []byte) ([]resource.Resource, error) {
-	planJSON := gjson.ParseBytes(j)
-	providerConfig := planJSON.Get("configuration.provider_config")
-	plannedValuesJSON := planJSON.Get("planned_values.root_module")
-	configurationJSON := planJSON.Get("configuration.root_module")
-
-	resources := make([]resource.Resource, 0)
-
-	resourceMap, err := generateResourceMap(planJSON, providerConfig, plannedValuesJSON)
-	if err != nil {
-		return resources, err
-	}
-
-	err = addReferences(resourceMap, configurationJSON)
-	if err != nil {
-		return resources, err
-	}
-
-	for _, r := range resourceMap {
-		resources = append(resources, r)
-	}
-
-	// TODO
-	// err = setupCostComponents(resources)
-	return resources, err
+func addRawValue(rawValues gjson.Result, key string, value interface{}) gjson.Result {
+	var unmarshalledJSON map[string]interface{}
+	json.Unmarshal([]byte(rawValues.Raw), &unmarshalledJSON)
+	unmarshalledJSON[key] = value
+	marshalledJSON, _ := json.Marshal(unmarshalledJSON)
+	return gjson.ParseBytes(marshalledJSON)
 }
 
-func generateResourceMap(planJSON gjson.Result, providerConfig gjson.Result, plannedValuesJSON gjson.Result) (map[string]resource.Resource, error) {
-	resourceMap := make(map[string]resource.Resource)
-	terraformResources := plannedValuesJSON.Get("resources").Array()
-
-	// Find and create all resources in this module and store in a map
-	for _, terraformResource := range terraformResources {
-		address := terraformResource.Get("address").String()
-		resourceType := terraformResource.Get("type").String()
-		var rawValues map[string]interface{}
-		if terraformResource.Get("values").Value() != nil {
-			rawValues = terraformResource.Get("values").Value().(map[string]interface{})
-		} else {
-			rawValues = make(map[string]interface{})
-		}
-		r := createResource(resourceType, address, rawValues, providerConfig)
-		if r != nil {
-			resourceMap[address] = r
-		}
-	}
-
-	// Recursively add any resources for child modules
-	for _, pvJSON := range plannedValuesJSON.Get("child_modules").Array() {
-		moduleResources, err := generateResourceMap(planJSON, providerConfig, pvJSON)
-		if err != nil {
-			return resourceMap, err
-		}
-		for address, r := range moduleResources {
-			resourceMap[address] = r
-		}
-	}
-	return resourceMap, nil
-}
-
-func addReferences(resourceMap map[string]resource.Resource, configurationJSON gjson.Result) error {
-	for address, r := range resourceMap {
+func parseReferences(resourceDataMap map[string]*schema.ResourceData, configurationJSON gjson.Result) {
+	for address, resourceData := range resourceDataMap {
 		resourceConfigJSON := getConfigurationJSONForResourceAddress(configurationJSON, address)
 
 		var refAddressesMap = make(map[string][]string)
 		for attribute, attributeJSON := range resourceConfigJSON.Get("expressions").Map() {
-			getReferenceAddresses(r, attribute, attributeJSON, &refAddressesMap)
+			getReferenceAddresses(resourceData, attribute, attributeJSON, &refAddressesMap)
 		}
 
 		for attribute, refAddresses := range refAddressesMap {
 			for _, refAddress := range refAddresses {
 				fullRefAddress := fmt.Sprintf("%s.%s", addressModulePart(address), refAddress)
-				if refResource, ok := resourceMap[fullRefAddress]; ok {
-					r.AddReference(attribute, refResource)
+				if refResourceData, ok := resourceDataMap[fullRefAddress]; ok {
+					resourceData.AddReference(attribute, refResourceData)
 				}
 			}
 		}
 	}
-	return nil
 }
 
-func getReferenceAddresses(r resource.Resource, attribute string, attributeJSON gjson.Result, refAddressesMap *map[string][]string) {
+func getReferenceAddresses(resourceData *schema.ResourceData, attribute string, attributeJSON gjson.Result, refAddressesMap *map[string][]string) {
 	if attributeJSON.Get("references").Exists() {
 		for _, ref := range attributeJSON.Get("references").Array() {
 			if _, ok := (*refAddressesMap)[attribute]; !ok {
@@ -147,11 +122,11 @@ func getReferenceAddresses(r resource.Resource, attribute string, attributeJSON 
 		}
 	} else if attributeJSON.IsArray() {
 		for i, attributeJSONItem := range attributeJSON.Array() {
-			getReferenceAddresses(r, fmt.Sprintf("%s.%d", attribute, i), attributeJSONItem, refAddressesMap)
+			getReferenceAddresses(resourceData, fmt.Sprintf("%s.%d", attribute, i), attributeJSONItem, refAddressesMap)
 		}
 	} else if attributeJSON.Type.String() == "JSON" {
 		attributeJSON.ForEach(func(childAttribute gjson.Result, childAttributeJSON gjson.Result) bool {
-			getReferenceAddresses(r, fmt.Sprintf("%s.%s", attribute, childAttribute), childAttributeJSON, refAddressesMap)
+			getReferenceAddresses(resourceData, fmt.Sprintf("%s.%s", attribute, childAttribute), childAttributeJSON, refAddressesMap)
 			return true
 		})
 	}

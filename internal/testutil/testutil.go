@@ -42,10 +42,7 @@ func RunTFCostBreakdown(resourceTf string) ([]costs.ResourceCostBreakdown, error
 		return []costs.ResourceCostBreakdown{}, err
 	}
 
-	resources, err := terraform.ParsePlanJSON(planJSON)
-	if err != nil {
-		return []costs.ResourceCostBreakdown{}, err
-	}
+	resources := terraform.ParsePlanJSON(planJSON)
 
 	q := costs.NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
 	return costs.GenerateCostBreakdowns(q, resources)

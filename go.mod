@@ -13,4 +13,5 @@ require (
 	github.com/tidwall/gjson v1.6.0
 	github.com/urfave/cli/v2 v2.2.0
 	golang.org/x/sys v0.0.0-20200620081246-981b61492c35 // indirect
+	google.golang.org/appengine v1.6.6
 )
