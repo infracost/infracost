@@ -20,6 +20,7 @@ Currently this supports the following On-Demand and Spot pricing for the followi
  * `aws_elb`
  * `aws_lb`
  * `aws_nat_gateway`
+ * `aws_rds_cluster`
  * `aws_rds_cluster_instance`
  * `aws_ecs_service` (Fargate On-Demand only)
 
