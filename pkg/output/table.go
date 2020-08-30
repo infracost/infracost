@@ -7,13 +7,13 @@ import (
 	"strconv"
 
 	"infracost/pkg/config"
-	"infracost/pkg/costs"
+	"infracost/pkg/schema"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/shopspring/decimal"
 )
 
-func getLineItemCount(resource *costs.Resource) int {
+func getLineItemCount(resource *schema.Resource) int {
 	count := len(resource.CostComponents)
 
 	for _, subResource := range resource.FlattenedSubResources() {
@@ -40,12 +40,12 @@ func formatQuantity(quantity decimal.Decimal) string {
 	return strconv.FormatFloat(f, 'f', -1, 64)
 }
 
-func ToTable(resources []*costs.Resource) ([]byte, error) {
+func ToTable(resources []*schema.Resource) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
 	table := tablewriter.NewWriter(bufw)
-	table.SetHeader([]string{"NAME", "QUANTITY", "UNIT", "HOURLY COST", "MONTHLY COST"})
+	table.SetHeader([]string{"NAME", "MONTHLY QUANTITY", "UNIT", "HOURLY COST", "MONTHLY COST"})
 	table.SetBorder(false)
 	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
 	table.SetAutoWrapText(false)
@@ -69,7 +69,7 @@ func ToTable(resources []*costs.Resource) ([]byte, error) {
 	}
 
 	for _, resource := range resources {
-		table.Append([]string{resource.Name(), "", ""})
+		table.Append([]string{resource.Name, "", ""})
 
 		lineItemCount := getLineItemCount(resource)
 		lineItem := 0
@@ -78,9 +78,9 @@ func ToTable(resources []*costs.Resource) ([]byte, error) {
 			lineItem++
 
 			row := []string{
-				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), costComponent.Name()),
-				formatQuantity(costComponent.MonthlyQuantity()),
-				costComponent.Unit(),
+				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), costComponent.Name),
+				formatQuantity(*costComponent.MonthlyQuantity),
+				costComponent.Unit,
 				formatDecimal(costComponent.HourlyCost(), "%.4f"),
 				formatDecimal(costComponent.MonthlyCost(), "%.4f"),
 			}
@@ -92,9 +92,9 @@ func ToTable(resources []*costs.Resource) ([]byte, error) {
 				lineItem++
 
 				row := []string{
-					fmt.Sprintf("%s %s %s", getTreePrefix(lineItem, lineItemCount), subResource.Name(), costComponent.Name()),
-					formatQuantity(costComponent.MonthlyQuantity()),
-					costComponent.Unit(),
+					fmt.Sprintf("%s %s (%s)", getTreePrefix(lineItem, lineItemCount), costComponent.Name, subResource.Name),
+					formatQuantity(*costComponent.MonthlyQuantity),
+					costComponent.Unit,
 					formatDecimal(costComponent.HourlyCost(), "%.4f"),
 					formatDecimal(costComponent.MonthlyCost(), "%.4f"),
 				}

@@ -28,7 +28,7 @@ func AwsInstance(d *schema.ResourceData) *schema.Resource {
 		SubResources: subResources,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           "Instance hours",
+				Name:           fmt.Sprintf("Compute (%s)", instanceType),
 				Unit:           "hours",
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
@@ -84,7 +84,7 @@ func ebsBlockDevice(name string, d gjson.Result, region string) *schema.Resource
 	costComponents := []*schema.CostComponent{
 		{
 			Name:            "Storage",
-			Unit:            "GB/months",
+			Unit:            "GB-months",
 			MonthlyQuantity: &gbVal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -100,8 +100,8 @@ func ebsBlockDevice(name string, d gjson.Result, region string) *schema.Resource
 
 	if volumeApiName == "io1" {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "IOPS",
-			Unit:            "IOPS/months",
+			Name:            "Storage IOPS",
+			Unit:            "IOPS-months",
 			MonthlyQuantity: &iopsVal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

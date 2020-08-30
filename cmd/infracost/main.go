@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"infracost/pkg/config"
-	"infracost/pkg/costs"
-	"infracost/pkg/output"
 	"infracost/internal/providers/terraform"
+	"infracost/pkg/config"
+	"infracost/pkg/output"
+	"infracost/pkg/prices"
 
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
@@ -94,27 +94,25 @@ func main() {
 				os.Exit(1)
 			}
 
-			schemaResources, err := provider.LoadResources()
+			resources, err := provider.LoadResources()
 			if err != nil {
 				return err
 			}
 
-			q := costs.NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
+			q := prices.NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
 
-			costResources := make([]*costs.Resource, 0, len(schemaResources))
-			for _, schemaResource := range schemaResources {
-				costResource := costs.NewResource(schemaResource)
-				err := costResource.CalculateCosts(q)
+			for _, resource := range resources {
+				err := prices.GetPrices(resource, q)
 				if err != nil {
 					return err
 				}
-				costResources = append(costResources, costResource)
+				resource.CalculateCosts()
 			}
 
 			var out []byte
 			switch c.String("output") {
 			case "table":
-				out, err = output.ToTable(costResources)
+				out, err = output.ToTable(resources)
 			// TODO
 			// case "json":
 			// 	out, err = output.ToJSON(costResources)

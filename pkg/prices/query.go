@@ -1,4 +1,4 @@
-package costs
+package prices
 
 import (
 	"bytes"
@@ -14,8 +14,8 @@ import (
 )
 
 type queryKey struct {
-	Resource      *Resource
-	CostComponent *CostComponent
+	Resource      *schema.Resource
+	CostComponent *schema.CostComponent
 }
 
 type queryResult struct {
@@ -29,7 +29,7 @@ type GraphQLQuery struct {
 }
 
 type QueryRunner interface {
-	RunQueries(resource *Resource) ([]queryResult, error)
+	RunQueries(resource *schema.Resource) ([]queryResult, error)
 }
 
 type GraphQLQueryRunner struct {
@@ -42,10 +42,10 @@ func NewGraphQLQueryRunner(endpoint string) *GraphQLQueryRunner {
 	}
 }
 
-func (q *GraphQLQueryRunner) RunQueries(resource *Resource) ([]queryResult, error) {
+func (q *GraphQLQueryRunner) RunQueries(resource *schema.Resource) ([]queryResult, error) {
 	queryKeys, queries := q.batchQueries(resource)
 
-	log.Debugf("Getting pricing details from %s for %s", config.Config.ApiUrl, resource.Name())
+	log.Debugf("Getting pricing details from %s for %s", config.Config.ApiUrl, resource.Name)
 	results, err := q.getQueryResults(queries)
 	if err != nil {
 		return []queryResult{}, err
@@ -99,19 +99,19 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 
 // Batch all the queries for this resource so we can use one GraphQL call
 // Use queryKeys to keep track of which query maps to which sub-resource and price component
-func (q *GraphQLQueryRunner) batchQueries(resource *Resource) ([]queryKey, []GraphQLQuery) {
+func (q *GraphQLQueryRunner) batchQueries(resource *schema.Resource) ([]queryKey, []GraphQLQuery) {
 	queryKeys := make([]queryKey, 0)
 	queries := make([]GraphQLQuery, 0)
 
 	for _, costComponent := range resource.CostComponents {
 		queryKeys = append(queryKeys, queryKey{resource, costComponent})
-		queries = append(queries, q.buildQuery(costComponent.schemaCostComponent.ProductFilter, costComponent.schemaCostComponent.PriceFilter))
+		queries = append(queries, q.buildQuery(costComponent.ProductFilter, costComponent.PriceFilter))
 	}
 
 	for _, subResource := range resource.FlattenedSubResources() {
 		for _, costComponent := range subResource.CostComponents {
 			queryKeys = append(queryKeys, queryKey{subResource, costComponent})
-			queries = append(queries, q.buildQuery(costComponent.schemaCostComponent.ProductFilter, costComponent.schemaCostComponent.PriceFilter))
+			queries = append(queries, q.buildQuery(costComponent.ProductFilter, costComponent.PriceFilter))
 		}
 	}
 

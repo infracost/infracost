@@ -13,7 +13,7 @@ import (
 type terraformProvider struct {
 	jsonFile string
 	planFile string
-	dir string
+	dir      string
 }
 
 func Provider() schema.Provider {
@@ -59,7 +59,6 @@ func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
 	schemaResources := parsePlanJSON(planJSON)
 	return schemaResources, nil
 }
-
 
 func loadPlanJSON(path string) ([]byte, error) {
 	planFile, err := os.Open(path)

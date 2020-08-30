@@ -13,7 +13,7 @@ func AwsNatGateway(d *schema.ResourceData) *schema.Resource {
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           "Hours",
+				Name:           "Per NAT Gateway",
 				Unit:           "hours",
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{

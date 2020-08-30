@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"infracost/pkg/schema"
 	"infracost/internal/providers/terraform/aws"
+	"infracost/pkg/schema"
 
 	"github.com/tidwall/gjson"
 )

@@ -5,33 +5,49 @@ import "github.com/shopspring/decimal"
 type CostComponent struct {
 	Name            string
 	Unit            string
-	HourlyQuantity  *decimal.Decimal
-	MonthlyQuantity *decimal.Decimal
 	ProductFilter   *ProductFilter
 	PriceFilter     *PriceFilter
+	HourlyQuantity  *decimal.Decimal
+	MonthlyQuantity *decimal.Decimal
+	price           decimal.Decimal
+	priceHash       string
+	hourlyCost      decimal.Decimal
+	monthlyCost     decimal.Decimal
 }
 
-type ProductFilter struct {
-	VendorName       *string            `json:"vendorName,omitempty"`
-	Service          *string            `json:"service,omitempty"`
-	ProductFamily    *string            `json:"productFamily,omitempty"`
-	Region           *string            `json:"region,omitempty"`
-	Sku              *string            `json:"sku,omitempty"`
-	AttributeFilters *[]AttributeFilter `json:"attributeFilters,omitempty"`
+func (c *CostComponent) CalculateCosts() {
+	c.fillQuantities()
+	c.hourlyCost = c.price.Mul(*c.HourlyQuantity)
+	c.monthlyCost = c.price.Mul(*c.MonthlyQuantity)
 }
 
-type PriceFilter struct {
-	PurchaseOption     *string `json:"purchaseOption,omitempty"`
-	Unit               *string `json:"unit,omitempty"`
-	Description        *string `json:"description,omitempty"`
-	DescriptionRegex   *string `json:"descriptionRegex,omitempty"`
-	TermLength         *string `json:"termLength,omitempty"`
-	TermPurchaseOption *string `json:"termPurchaseOption,omitempty"`
-	TermOfferingClass  *string `json:"termOfferingClass,omitempty"`
+func decimalPtr(d decimal.Decimal) *decimal.Decimal {
+	return &d
 }
 
-type AttributeFilter struct {
-	Key        string  `json:"key"`
-	Value      *string `json:"value,omitempty"`
-	ValueRegex *string `json:"value_regex,omitempty"`
+func (c *CostComponent) fillQuantities() {
+	if c.HourlyQuantity == nil && c.MonthlyQuantity == nil {
+		c.HourlyQuantity = decimalPtr(decimal.Zero)
+		c.MonthlyQuantity = decimalPtr(decimal.Zero)
+	} else if c.HourlyQuantity == nil {
+		c.HourlyQuantity = decimalPtr(c.MonthlyQuantity.Div(hourToMonthMultiplier))
+	} else if c.MonthlyQuantity == nil {
+		c.MonthlyQuantity = decimalPtr(c.HourlyQuantity.Mul(hourToMonthMultiplier))
+	}
+}
+
+func (c *CostComponent) HourlyCost() decimal.Decimal {
+	return c.hourlyCost
+}
+
+func (c *CostComponent) MonthlyCost() decimal.Decimal {
+	return c.monthlyCost
+}
+
+func (c *CostComponent) SetPrice(price decimal.Decimal) {
+	c.price = price
+}
+
+func (c *CostComponent) SetPriceHash(priceHash string) {
+	c.priceHash = priceHash
 }
