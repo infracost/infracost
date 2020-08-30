@@ -188,7 +188,6 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = var.aws_subnet_ids[0]
 }
 
-
 resource "aws_rds_cluster_instance" "cluster_instances" {
   count              = 2
   identifier         = "aurora-cluster-demo-${count.index}"
