@@ -71,12 +71,12 @@ func ebsBlockDevice(name string, d gjson.Result, region string) *schema.Resource
 		volumeApiName = d.Get("volume_type").String()
 	}
 
-	gbVal := decimal.NewFromInt(int64(DefaultVolumeSize))
+	gbVal := decimal.NewFromInt(int64(defaultVolumeSize))
 	if d.Get("volume_size").Exists() {
 		gbVal = decimal.NewFromFloat(d.Get("volume_size").Float())
 	}
 
-	iopsVal := decimal.NewFromInt(int64(DefaultVolumeSize))
+	iopsVal := decimal.NewFromInt(int64(defaultVolumeSize))
 	if d.Get("iops").Exists() {
 		iopsVal = decimal.NewFromFloat(d.Get("iops").Float())
 	}

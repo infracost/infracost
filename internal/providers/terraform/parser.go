@@ -3,10 +3,11 @@ package terraform
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 
-	"infracost/internal/terraform/aws"
 	"infracost/pkg/schema"
+	"infracost/internal/providers/terraform/aws"
 
 	"github.com/tidwall/gjson"
 )
@@ -21,7 +22,7 @@ func createResource(resourceData *schema.ResourceData) *schema.Resource {
 	return nil
 }
 
-func ParsePlanJSON(j []byte) []*schema.Resource {
+func parsePlanJSON(j []byte) []*schema.Resource {
 	planJSON := gjson.ParseBytes(j)
 	providerConfig := planJSON.Get("configuration.provider_config")
 	plannedValuesJSON := planJSON.Get("planned_values.root_module")
@@ -148,4 +149,37 @@ func getConfigurationJSONForModulePath(configurationJSON gjson.Result, moduleNam
 	moduleKey := strings.Join(moduleKeyParts, ".")
 
 	return configurationJSON.Get(moduleKey)
+}
+
+func addressResourcePart(address string) string {
+	addressParts := strings.Split(address, ".")
+	resourceParts := addressParts[len(addressParts)-2:]
+	return strings.Join(resourceParts, ".")
+}
+
+func addressModulePart(address string) string {
+	addressParts := strings.Split(address, ".")
+	moduleParts := addressParts[:len(addressParts)-2]
+	return strings.Join(moduleParts, ".")
+}
+
+func addressModuleNames(address string) []string {
+	r := regexp.MustCompile(`module\.([^\[]*)`)
+	matches := r.FindAllStringSubmatch(addressModulePart(address), -1)
+
+	moduleNames := make([]string, 0, len(matches))
+	for _, match := range matches {
+		moduleNames = append(moduleNames, match[1])
+	}
+
+	return moduleNames
+}
+
+func stripAddressArray(address string) string {
+	addressParts := strings.Split(address, ".")
+	resourceParts := addressParts[len(addressParts)-2:]
+
+	r := regexp.MustCompile(`([^\[]+)`)
+	match := r.FindStringSubmatch(strings.Join(resourceParts, "."))
+	return match[1]
 }

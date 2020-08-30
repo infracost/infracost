@@ -7,7 +7,7 @@ import (
 	"infracost/pkg/config"
 	"infracost/pkg/costs"
 	"infracost/pkg/output"
-	"infracost/pkg/terraform"
+	"infracost/internal/providers/terraform"
 
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
@@ -70,8 +70,6 @@ func main() {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			var planJSON []byte
-
 			if c.Bool("no-color") {
 				config.Config.NoColor = true
 				formatter.DisableColors = true
@@ -88,40 +86,18 @@ func main() {
 				config.Config.ApiUrl = c.String("api-url")
 			}
 
-			if c.String("tfjson") != "" && c.String("tfplan") != "" {
-				color.HiRed("Please only provide one of either a Terraform Plan JSON file (tfjson) or a Terraform Plan file (tfplan)")
+			provider := terraform.Provider()
+			err := provider.ProcessArgs(c)
+			if err != nil {
+				color.HiRed(err.Error())
 				_ = cli.ShowAppHelp(c)
 				os.Exit(1)
 			}
 
-			if c.String("tfplan") != "" && c.String("tfdir") == "" {
-				color.HiRed("Please provide a path to the Terrafrom project (tfdir) if providing a Terraform Plan file (tfplan)\n\n")
-				_ = cli.ShowAppHelp(c)
-				os.Exit(1)
+			schemaResources, err := provider.LoadResources()
+			if err != nil {
+				return err
 			}
-
-			if c.String("tfjson") == "" && c.String("tfdir") == "" {
-				color.HiRed("Please provide either the path to the Terrafrom project (tfdir) or a Terraform Plan JSON file (tfjson)")
-				_ = cli.ShowAppHelp(c)
-				os.Exit(1)
-			}
-
-			var err error
-			if c.String("tfjson") != "" {
-				planJSON, err = terraform.LoadPlanJSON(c.String("tfjson"))
-				if err != nil {
-					return err
-				}
-			} else {
-				planFile := c.String("tfplan")
-				planJSON, err = terraform.GeneratePlanJSON(c.String("tfdir"), planFile)
-				if err != nil {
-					return err
-				}
-			}
-
-			terraform.ParsePlanJSON(planJSON)
-			schemaResources := terraform.ParsePlanJSON(planJSON)
 
 			q := costs.NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
 

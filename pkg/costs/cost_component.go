@@ -18,32 +18,32 @@ func NewCostComponent(schemaCostComponent *schema.CostComponent) *CostComponent 
 	}
 }
 
-func (r *CostComponent) Name() string {
-	return r.schemaCostComponent.Name
+func (c *CostComponent) Name() string {
+	return c.schemaCostComponent.Name
 }
 
-func (r *CostComponent) Unit() string {
-	return r.schemaCostComponent.Unit
+func (c *CostComponent) Unit() string {
+	return c.schemaCostComponent.Unit
 }
 
-func (r *CostComponent) HourlyQuantity() decimal.Decimal {
-	if r.schemaCostComponent.HourlyQuantity == nil {
-		if r.schemaCostComponent.MonthlyQuantity == nil {
+func (c *CostComponent) HourlyQuantity() decimal.Decimal {
+	if c.schemaCostComponent.HourlyQuantity == nil {
+		if c.schemaCostComponent.MonthlyQuantity == nil {
 			return decimal.Zero
 		}
-		return r.schemaCostComponent.MonthlyQuantity.Div(hourToMonthMultiplier)
+		return c.schemaCostComponent.MonthlyQuantity.Div(hourToMonthMultiplier)
 	}
-	return *r.schemaCostComponent.HourlyQuantity
+	return *c.schemaCostComponent.HourlyQuantity
 }
 
-func (r *CostComponent) MonthlyQuantity() decimal.Decimal {
-	if r.schemaCostComponent.MonthlyQuantity == nil {
-		if r.schemaCostComponent.HourlyQuantity == nil {
+func (c *CostComponent) MonthlyQuantity() decimal.Decimal {
+	if c.schemaCostComponent.MonthlyQuantity == nil {
+		if c.schemaCostComponent.HourlyQuantity == nil {
 			return decimal.Zero
 		}
-		return r.schemaCostComponent.HourlyQuantity.Mul(hourToMonthMultiplier)
+		return c.schemaCostComponent.HourlyQuantity.Mul(hourToMonthMultiplier)
 	}
-	return *r.schemaCostComponent.MonthlyQuantity
+	return *c.schemaCostComponent.MonthlyQuantity
 }
 
 func (c *CostComponent) HourlyCost() decimal.Decimal {
