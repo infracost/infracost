@@ -57,10 +57,18 @@ func createResource(resourceType string, address string, rawValues map[string]in
 		return aws.NewElb(address, awsRegion, rawValues, false)
 	case "aws_alb": // alias for aws_lb
 		return aws.NewElb(address, awsRegion, rawValues, false)
-	case "aws_nat_gateway": // alias for aws_lb
+	case "aws_nat_gateway":
 		return aws.NewNatGateway(address, awsRegion, rawValues)
 	case "aws_rds_cluster_instance":
 		return aws.NewRDSClusterInstance(address, awsRegion, rawValues)
+	case "aws_dynamodb_table":
+		return aws.NewDynamoDBTable(address, awsRegion, rawValues)
+	case "aws_ecs_cluster":
+		return resource.NewBaseResource(address, rawValues, false) // has no cost
+	case "aws_ecs_task_definition":
+		return resource.NewBaseResource(address, rawValues, false) // has no cost
+	case "aws_ecs_service":
+		return aws.NewEcsService(address, awsRegion, rawValues)
 	}
 	return nil
 }

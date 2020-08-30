@@ -1,5 +1,7 @@
 # Infracost
 
+<a href="https://discord.gg/Cu9ftEg"><img alt="Discord Chat" src="https://img.shields.io/discord/746703155953270794.svg"></a>
+
 Get cost hourly and monthly estimates for a Terraform project. Helps you quickly see the cost breakdown and compare different deployment options upfront.
 
 <img src="examples/screenshot.png" width=557 alt="Example infracost output" />
@@ -8,7 +10,7 @@ The [Infracost GitHub action](https://github.com/marketplace/actions/run-infraco
 
 <img src="https://raw.githubusercontent.com/aliscott/infracost-gh-action/master/screenshot.png" width=557 alt="Example infracost diff usage" />
 
-Currently this supports the following on-Demand and Spot pricing for the following AWS resources:
+Currently this supports the following On-Demand and Spot pricing for the following AWS resources:
  * `aws_instance`
  * `aws_ebs_volume`
  * `aws_ebs_snapshot`
@@ -19,6 +21,11 @@ Currently this supports the following on-Demand and Spot pricing for the followi
  * `aws_lb`
  * `aws_nat_gateway`
  * `aws_rds_cluster_instance`
+ * `aws_ecs_service` (Fargate On-Demand only)
+
+ It also supports provisioned pricing for the following AWS resources:
+ * `aws_dynamodb_table` 
+
 
 This does not yet support estimates for:
   * any costs that are not specified in the Terraform configuration, e.g. S3 storage costs, data out costs.
