@@ -18,7 +18,7 @@ Currently this supports the following on-Demand and Spot pricing for the followi
  * `aws_elb`
  * `aws_lb`
  * `aws_nat_gateway`
- * `aws_rds_cluster`
+ * `aws_rds_cluster_instance`
 
 This does not yet support estimates for:
   * any costs that are not specified in the Terraform configuration, e.g. S3 storage costs, data out costs.
