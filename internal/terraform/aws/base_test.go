@@ -7,7 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func NewTestIntegration(t *testing.T, r, n, priceHash, tf string) {
+func NewTestIntegration(t *testing.T, r, n, name, priceHash, tf string) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -20,7 +20,7 @@ func NewTestIntegration(t *testing.T, r, n, priceHash, tf string) {
 	}
 
 	expectedPriceHashes := [][]string{
-		{rn, "hours", priceHash},
+		{rn, name, priceHash},
 	}
 
 	priceHashResults := testutil.ExtractPriceHashes(resourceCostBreakdowns)

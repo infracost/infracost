@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"fmt"
 	"infracost/pkg/resource"
 )
 
@@ -32,7 +31,7 @@ func NewRDSClusterInstance(address string, region string, rawValues map[string]i
 	hoursPriceFilter := &resource.PriceFilter{
 		PurchaseOption: strPtr("on_demand"),
 	}
-	hours := resource.NewBasePriceComponent(fmt.Sprintf("instance hours (%s)", instanceType), r, "hour", "hour", hoursProductFilter, hoursPriceFilter)
+	hours := resource.NewBasePriceComponent("instance hours", r, "hour", "hour", hoursProductFilter, hoursPriceFilter)
 	r.AddPriceComponent(hours)
 
 	return r
