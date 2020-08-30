@@ -8,10 +8,9 @@ import (
 func NewRDSClusterInstance(address string, region string, rawValues map[string]interface{}) resource.Resource {
 	r := resource.NewBaseResource(address, rawValues, true)
 
-
 	instanceType := rawValues["instance_class"].(string)
 
-    var databaseEngine string
+	var databaseEngine string
 	switch rawValues["engine"].(string) {
 	case "aurora", "aurora-mysql", "":
 		databaseEngine = "Aurora MySQL"
