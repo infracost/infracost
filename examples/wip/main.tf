@@ -1,3 +1,17 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+    }
+    infracost = {
+      source = "infracost.io/infracost/infracost"
+      version = "0.0.1"
+    }
+  }
+}
+
+
+
 provider "aws" {
   region                      = "us-east-1"
   s3_force_path_style         = true
@@ -7,6 +21,8 @@ provider "aws" {
   access_key                  = "mock_access_key"
   secret_key                  = "mock_secret_key"
 }
+
+provider "infracost" {}
 
 data "aws_region" "current" {}
 
@@ -35,6 +51,14 @@ resource "aws_eip" "root_nat_eip" {
 resource "aws_nat_gateway" "root_nat" {
   subnet_id     = "subnet-root"
   allocation_id = aws_eip.root_nat_eip.id
+}
+
+resource "infracost_aws_nat_gateway" "root_nat" {
+  resources = [aws_nat_gateway.root_nat.id]
+
+  gb_data_processed_monthly {
+    value = 100
+  }
 }
 
 resource "aws_instance" "instance1" {
