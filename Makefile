@@ -34,7 +34,7 @@ clean:
 	rm -rf release/$(BINARY)*
 
 test:
-	go test ./... $(or $(ARGS), -v)
+	go test ./... $(or $(ARGS), -v -cover)
 
 fmt:
 	go fmt ./...

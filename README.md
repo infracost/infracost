@@ -11,19 +11,21 @@ The [Infracost GitHub action](https://github.com/marketplace/actions/run-infraco
 <img src="https://raw.githubusercontent.com/aliscott/infracost-gh-action/master/screenshot.png" width=557 alt="Example infracost diff usage" />
 
 Currently this supports the following On-Demand and Spot pricing for the following AWS resources:
- * `aws_instance`
- * `aws_ebs_volume`
- * `aws_ebs_snapshot`
- * `aws_ebs_snapshot_copy`
- * `aws_autoscaling_group`
- * `aws_db_instance`
- * `aws_elb`
- * `aws_lb`
- * `aws_nat_gateway`
- * `aws_ecs_service` (Fargate On-Demand only)
+* `aws_autoscaling_group`
+* `aws_db_instance`
+* `aws_ebs_snapshot_copy`
+* `aws_ebs_snapshot`
+* `aws_ebs_volume`
+* `aws_ecs_service` (Fargate On-Demand only)
+* `aws_elb`
+* `aws_instance`
+* `aws_lb`
+* `aws_nat_gateway`
+* `aws_rds_cluster_instance`
+* `aws_rds_cluster`
 
- It also supports provisioned pricing for the following AWS resources:
- * `aws_dynamodb_table` 
+It also supports provisioned pricing for the following AWS resources:
+* `aws_dynamodb_table`
 
 This does not yet support estimates for:
   * any costs that are not specified in the Terraform configuration, e.g. S3 storage costs, data out costs.
