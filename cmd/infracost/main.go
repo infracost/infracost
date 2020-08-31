@@ -110,9 +110,8 @@ func main() {
 			switch c.String("output") {
 			case "table":
 				out, err = output.ToTable(resources)
-			// TODO
-			// case "json":
-			// 	out, err = output.ToJSON(costResources)
+			case "json":
+				out, err = output.ToJSON(resources)
 			default:
 				err = cli.ShowAppHelp(c)
 			}
