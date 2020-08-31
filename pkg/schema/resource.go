@@ -16,6 +16,12 @@ type Resource struct {
 	monthlyCost    decimal.Decimal
 }
 
+func CalculateCosts(resources []*Resource) {
+	for _, resource := range resources {
+		resource.CalculateCosts()
+	}
+}
+
 func (r *Resource) CalculateCosts() {
 	hourlyCost := decimal.Zero
 
