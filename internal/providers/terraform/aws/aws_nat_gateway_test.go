@@ -41,4 +41,31 @@ func TestAwsNatGateway(t *testing.T) {
 	testutil.CheckCost(t, "aws_nat_gateway.nat", costComponent, "monthly", decimal.Zero)
 }
 
+func TestAwsNatGateway_usage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
 
+	tf := `
+		resource "aws_nat_gateway" "nat" {
+			allocation_id = "eip-12345678"
+			subnet_id     = "subnet-12345678"
+		}
+		
+		resource "infracost_aws_nat_gateway" "nat" {
+			resources = [aws_nat_gateway.nat.id]
+
+			gb_data_processed_monthly {
+				value = 100
+			}
+		}
+		`
+
+	resources, err := tftest.RunCostCalculation(tf)
+	if err != nil {
+		t.Error(err)
+	}
+
+	costComponent := testutil.FindCostComponent(resources, "aws_nat_gateway.nat", "Per GB data processed")
+	testutil.CheckCost(t, "aws_nat_gateway.nat", costComponent, "monthly", costComponent.Price().Mul(decimal.NewFromInt(100)))
+}

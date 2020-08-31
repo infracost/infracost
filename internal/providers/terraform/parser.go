@@ -11,7 +11,8 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-var infracostProviderName = "infracost.io/infracost/infracost"
+// These show differently in the plan JSON for Terraform 0.12 and 0.13
+var infracostProviderNames = []string{"infracost", "infracost.io/infracost/infracost"}
 
 func createResource(resourceData *schema.ResourceData, usageData *schema.ResourceData) *schema.Resource {
 	resourceRegistry := getResourceRegistry()
@@ -90,7 +91,7 @@ func parseAwsRegion(providerConfig gjson.Result) string {
 
 func addRawValue(rawValues gjson.Result, key string, value interface{}) gjson.Result {
 	var unmarshalledJSON map[string]interface{}
-	json.Unmarshal([]byte(rawValues.Raw), &unmarshalledJSON)
+	_ = json.Unmarshal([]byte(rawValues.Raw), &unmarshalledJSON)
 	unmarshalledJSON[key] = value
 	marshalledJSON, _ := json.Marshal(unmarshalledJSON)
 	return gjson.ParseBytes(marshalledJSON)
@@ -99,7 +100,7 @@ func addRawValue(rawValues gjson.Result, key string, value interface{}) gjson.Re
 func buildUsageResourceDataMap(resourceDataMap map[string]*schema.ResourceData) map[string]*schema.ResourceData {
 	usageResourceDataMap := make(map[string]*schema.ResourceData)
 	for _, resourceData := range resourceDataMap {
-		if resourceData.ProviderName == infracostProviderName {
+		if isInfracostResource(resourceData) {
 			for _, refResourceData := range resourceData.References("resources") {
 				usageResourceDataMap[refResourceData.Address] = resourceData
 			}
@@ -111,7 +112,7 @@ func buildUsageResourceDataMap(resourceDataMap map[string]*schema.ResourceData) 
 func stripInfracostResources(resourceDataMap map[string]*schema.ResourceData) map[string]*schema.ResourceData {
 	newResourceDataMap := make(map[string]*schema.ResourceData)
 	for address, resourceData := range resourceDataMap {
-		if resourceData.ProviderName != infracostProviderName {
+		if !isInfracostResource(resourceData) {
 			newResourceDataMap[address] = resourceData
 		}
 	}
@@ -178,6 +179,15 @@ func getConfigurationJSONForModulePath(configurationJSON gjson.Result, moduleNam
 		moduleKey := strings.Join(moduleKeyParts, ".")
 		return configurationJSON.Get(moduleKey)
 	}
+}
+
+func isInfracostResource(resourceData *schema.ResourceData) bool {
+	for _, providerName := range infracostProviderNames {
+		if resourceData.ProviderName == providerName {
+			return true
+		}
+	}
+	return false
 }
 
 func addressResourcePart(address string) string {

@@ -14,6 +14,17 @@ import (
 )
 
 var tfProviders = `
+	terraform {
+		required_providers {
+			aws = {
+				source  = "hashicorp/aws"
+			}
+			infracost = {
+				source = "infracost.io/infracost/infracost"
+			}
+		}
+	}
+
 	provider "aws" {
 		region                      = "us-east-1"
 		s3_force_path_style         = true
@@ -23,10 +34,12 @@ var tfProviders = `
 		access_key                  = "mock_access_key"
 		secret_key                  = "mock_secret_key"
 	}
+
+	provider "infracost" {}
 `
 
 type TerraformFile struct {
-	Path string
+	Path     string
 	Contents string
 }
 
@@ -39,7 +52,10 @@ func RunCostCalculation(tf string) ([]*schema.Resource, error) {
 	if err != nil {
 		return resources, err
 	}
-	prices.PopulatePrices(resources)
+	err = prices.PopulatePrices(resources)
+	if err != nil {
+		return resources, err
+	}
 	schema.CalculateCosts(resources)
 	return resources, nil
 }
@@ -47,7 +63,7 @@ func RunCostCalculation(tf string) ([]*schema.Resource, error) {
 func LoadResources(tf string) ([]*schema.Resource, error) {
 	terraformFiles := []*TerraformFile{
 		{
-			Path: "main.tf",
+			Path:     "main.tf",
 			Contents: WithProviders(tf),
 		},
 	}
@@ -73,7 +89,6 @@ func LoadResourcesForProject(terraformFiles []*TerraformFile) ([]*schema.Resourc
 
 	return provider.LoadResources()
 }
-
 
 func writeToTmpDir(terraformFiles []*TerraformFile) (string, error) {
 	// Create temporary directory and output terraform code

@@ -19,9 +19,7 @@ func AwsInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resourc
 
 	subResources := make([]*schema.Resource, 0)
 	subResources = append(subResources, rootBlockDevice(d.Get("root_block_device.0"), region))
-	for _, ebsBlockDevice := range ebsBlockDevices(d.Get("ebs_block_device"), region) {
-		subResources = append(subResources, ebsBlockDevice)
-	}
+	subResources = append(subResources, ebsBlockDevices(d.Get("ebs_block_device"), region)...)
 
 	return &schema.Resource{
 		Name:         d.Address,
