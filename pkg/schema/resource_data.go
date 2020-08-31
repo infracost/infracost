@@ -1,17 +1,21 @@
 package schema
 
-import "github.com/tidwall/gjson"
+import (
+	"github.com/tidwall/gjson"
+)
 
 type ResourceData struct {
 	Type          string
+	ProviderName  string
 	Address       string
 	rawValues     gjson.Result
 	referencesMap map[string][]*ResourceData
 }
 
-func NewResourceData(resourceType string, address string, rawValues gjson.Result) *ResourceData {
+func NewResourceData(resourceType string, providerName string, address string, rawValues gjson.Result) *ResourceData {
 	return &ResourceData{
 		Type:          resourceType,
+		ProviderName:  providerName,
 		Address:       address,
 		rawValues:     rawValues,
 		referencesMap: make(map[string][]*ResourceData),

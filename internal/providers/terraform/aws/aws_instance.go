@@ -8,7 +8,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func AwsInstance(d *schema.ResourceData) *schema.Resource {
+func AwsInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 	instanceType := d.Get("instance_type").String()
 
