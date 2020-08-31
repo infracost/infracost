@@ -10,7 +10,6 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-
 func PopulatePrices(resources []*schema.Resource) error {
 	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
 
@@ -23,7 +22,6 @@ func PopulatePrices(resources []*schema.Resource) error {
 
 	return nil
 }
-
 
 func GetPrices(resource *schema.Resource, q QueryRunner) error {
 	queryResult, err := q.RunQueries(resource)

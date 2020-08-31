@@ -50,10 +50,10 @@ func TestAwsInstance(t *testing.T) {
 			}
 		}`
 
-		resources, err := tftest.RunCostCalculation(tf)
-		if err != nil {
-			t.Error(err)
-		}
+	resources, err := tftest.RunCostCalculation(tf)
+	if err != nil {
+		t.Error(err)
+	}
 
 	expectedPriceHashes := [][]string{
 		{"aws_instance.instance1", "Compute (m3.medium)", "666e02bbe686f6950fd8a47a55e83a75-d2c98780d7b6e36641b521f1f8145c6f"},

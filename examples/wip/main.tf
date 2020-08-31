@@ -10,8 +10,6 @@ terraform {
   }
 }
 
-
-
 provider "aws" {
   region                      = "us-east-1"
   s3_force_path_style         = true

@@ -99,7 +99,10 @@ func main() {
 			if err != nil {
 				return err
 			}
-			prices.PopulatePrices(resources)
+			err = prices.PopulatePrices(resources)
+			if err != nil {
+				return err
+			}
 			schema.CalculateCosts(resources)
 
 			var out []byte
