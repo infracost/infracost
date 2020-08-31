@@ -24,7 +24,11 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
+<<<<<<< HEAD
           draft: false
+=======
+          draft: true
+>>>>>>> 1d456c43999a04c06b579d89b38c8bdd96689322
           prerelease: false
       - name: Upload Release Asset Linux
         id: upload-release-asset-linux
