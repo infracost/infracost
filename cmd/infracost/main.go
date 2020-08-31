@@ -104,6 +104,7 @@ func main() {
 				return err
 			}
 			schema.CalculateCosts(resources)
+			schema.SortResources(resources)
 
 			var out []byte
 			switch c.String("output") {

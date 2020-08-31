@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"sort"
+
 	"github.com/shopspring/decimal"
 )
 
@@ -56,4 +58,18 @@ func (r *Resource) FlattenedSubResources() []*Resource {
 		}
 	}
 	return subResources
+}
+
+func SortResources(resources []*Resource) {
+	sort.Slice(resources, func(i, j int) bool {
+		return resources[i].Name < resources[j].Name
+	})
+
+	for _, resource := range resources {
+		SortResources(resource.SubResources)
+
+		sort.Slice(resource.CostComponents, func(i, j int) bool {
+			return resource.CostComponents[i].Name < resource.CostComponents[j].Name
+		})
+	}
 }
