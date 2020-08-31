@@ -1,10 +1,6 @@
 # Scripts
 
-For adding a new resource to supported resources, you have to create a productFilter which uniquely identifies the product (a unique productHash). For this end, you need to add service, product family and attribute key values to filter the products.
-
-But for a new terraform resource, the exact available values for filtering the query is unknown. If you use graphQL to query the resources, you would receive duplicate values for each query, and can not easily identify the available options for each key. Although it is possible to use deduplicators such as [graphql-deduplicator](https://github.com/gajus/graphql-deduplicator) to modify the backend schema, but it is also possible to easily remove the duplicates from the received response in the client side with jq tool.
-
-These scripts use [graphqurl](https://github.com/hasura/graphqurl) and jq, to ease determining the productFilter which uniquely identifies the product.
+When adding a new resource to infracost, a `productFilter` has to be added that uniquely identifies the product (a unique `productHash`) for pricing purposes. The filter needs a `service`, `productFamily` and `attribute` key/values to filter the prices. Because cloud prices have many parameter values to determine a price on a per-region or product type basis, querying for prices can look odd as many parameter values are duplicated. These scripts help find the correct price by using [graphqurl](https://github.com/hasura/graphqurl) and `jq` to determe the `productFilter` that uniquely identifies the product.
 
 ## Usage
 
@@ -13,7 +9,7 @@ These scripts use [graphqurl](https://github.com/hasura/graphqurl) and jq, to ea
 source requrements.sh
 ```
 
-* Identify the `service` name with searching some keywords for the resource name in the json file downloaded from aws api. The reason we do not query the graphQL API, is that it only returns a limited number of responses, and as there are LOTS of products in aws, our desired resource service name might not be included in the returned responses (try with `AmazonRDS` and you'll see).
+* Identify the `service` name by searching some keywords for the resource name in the json file downloaded from the AWS API. The reason we do not query the graphQL API, is that it only returns a limited number of responses, and as there are lots of products in AWS, our desired resource service name might not be included in the returned responses (try with `AmazonRDS` and you'll see).
 
 ```sh
 ./1.service.sh <key-word> ## e.g. rds
