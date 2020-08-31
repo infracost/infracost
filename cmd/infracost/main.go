@@ -8,6 +8,7 @@ import (
 	"infracost/pkg/config"
 	"infracost/pkg/output"
 	"infracost/pkg/prices"
+	"infracost/pkg/schema"
 
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
@@ -98,16 +99,8 @@ func main() {
 			if err != nil {
 				return err
 			}
-
-			q := prices.NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
-
-			for _, resource := range resources {
-				err := prices.GetPrices(resource, q)
-				if err != nil {
-					return err
-				}
-				resource.CalculateCosts()
-			}
+			prices.PopulatePrices(resources)
+			schema.CalculateCosts(resources)
 
 			var out []byte
 			switch c.String("output") {

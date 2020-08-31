@@ -1,6 +1,8 @@
 package schema
 
-import "github.com/shopspring/decimal"
+import (
+	"github.com/shopspring/decimal"
+)
 
 type CostComponent struct {
 	Name            string
@@ -48,6 +50,14 @@ func (c *CostComponent) SetPrice(price decimal.Decimal) {
 	c.price = price
 }
 
+func (c *CostComponent) Price() decimal.Decimal {
+	return c.price
+}
+
 func (c *CostComponent) SetPriceHash(priceHash string) {
 	c.priceHash = priceHash
+}
+
+func (c *CostComponent) PriceHash() string {
+	return c.priceHash
 }

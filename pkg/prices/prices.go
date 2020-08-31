@@ -1,12 +1,29 @@
 package prices
 
 import (
+	"fmt"
+	"infracost/pkg/config"
 	"infracost/pkg/schema"
 
 	"github.com/prometheus/common/log"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 )
+
+
+func PopulatePrices(resources []*schema.Resource) error {
+	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
+
+	for _, resource := range resources {
+		err := GetPrices(resource, q)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 
 func GetPrices(resource *schema.Resource, q QueryRunner) error {
 	queryResult, err := q.RunQueries(resource)
