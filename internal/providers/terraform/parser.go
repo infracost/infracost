@@ -6,18 +6,15 @@ import (
 	"regexp"
 	"strings"
 
-	"infracost/internal/providers/terraform/aws"
 	"infracost/pkg/schema"
 
 	"github.com/tidwall/gjson"
 )
 
 func createResource(resourceData *schema.ResourceData) *schema.Resource {
-	switch resourceData.Type {
-	case "aws_instance":
-		return aws.AwsInstance(resourceData)
-	case "aws_nat_gateway":
-		return aws.AwsNatGateway(resourceData)
+	resourceRegistry := getResourceRegistry()
+	if rFunc, ok := (*resourceRegistry)[resourceData.Type]; ok {
+		return rFunc(resourceData)
 	}
 	return nil
 }
