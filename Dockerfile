@@ -21,7 +21,6 @@ RUN unzip terraform*.zip && \
 WORKDIR /app
 COPY . .
 RUN make deps
-RUN make test
 RUN make build
 
 # Application
