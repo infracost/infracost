@@ -17,11 +17,11 @@ func AwsInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resourc
 	return &schema.Resource{
 		Name:           d.Address,
 		SubResources:   subResources,
-		CostComponents: []*schema.CostComponent{computeCostComponent(d, region)},
+		CostComponents: []*schema.CostComponent{computeCostComponent(d, region, "on_demand")},
 	}
 }
 
-func computeCostComponent(d *schema.ResourceData, region string) *schema.CostComponent {
+func computeCostComponent(d *schema.ResourceData, region string, purchaseOption string) *schema.CostComponent {
 	instanceType := d.Get("instance_type").String()
 
 	tenancy := "Shared"
@@ -29,8 +29,13 @@ func computeCostComponent(d *schema.ResourceData, region string) *schema.CostCom
 		tenancy = "Dedicated"
 	}
 
+	purchaseOptionLabel := map[string]string{
+		"on_demand": "on-demand",
+		"spot":      "spot",
+	}[purchaseOption]
+
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Compute (%s)", instanceType),
+		Name:           fmt.Sprintf("Compute (%s, %s)", purchaseOptionLabel, instanceType),
 		Unit:           "hours",
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
@@ -47,7 +52,7 @@ func computeCostComponent(d *schema.ResourceData, region string) *schema.CostCom
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("on_demand"),
+			PurchaseOption: &purchaseOption,
 		},
 	}
 }
