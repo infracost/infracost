@@ -6,65 +6,94 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/shopspring/decimal"
 )
 
-var PriceHashResultSort = cmpopts.SortSlices(func(x, y []string) bool {
-	return fmt.Sprintf("%s %s", x[0], x[1]) < fmt.Sprintf("%s %s", y[0], y[1])
-})
+type CostCheckFunc func(*testing.T, *schema.CostComponent)
 
-func CheckPriceHashes(t *testing.T, resources []*schema.Resource, expectedPriceHashes [][]string) {
-	priceHashResults := ExtractPriceHashes(resources)
-	if !cmp.Equal(priceHashResults, expectedPriceHashes, PriceHashResultSort) {
-		t.Error("Got unexpected price hashes", priceHashResults)
+type ResourceCheck struct {
+	Name                string
+	CostComponentChecks []CostComponentCheck
+	SubResourceChecks   []ResourceCheck
+}
+
+type CostComponentCheck struct {
+	Name             string
+	PriceHash        string
+	HourlyCostCheck  CostCheckFunc
+	MonthlyCostCheck CostCheckFunc
+}
+
+func HourlyPriceMultiplierCheck(multiplier decimal.Decimal) CostCheckFunc {
+	return func(t *testing.T, costComponent *schema.CostComponent) {
+		expected := costComponent.Price().Mul(multiplier)
+		if !cmp.Equal(costComponent.HourlyCost(), expected) {
+			t.Errorf("Unexpected hourly cost for %s (expected: %s, got: %s)", costComponent.Name, formatDecimal(expected, "%.4f"), formatDecimal(costComponent.HourlyCost(), "%.4f"))
+		}
 	}
 }
 
-func CheckCost(t *testing.T, resourceName string, costComponent *schema.CostComponent, costTimeUnit string, expectedCost decimal.Decimal) {
-	var actualCost decimal.Decimal
-	if costTimeUnit == "hourly" {
-		actualCost = costComponent.HourlyCost()
-	} else if costTimeUnit == "monthly" {
-		actualCost = costComponent.MonthlyCost()
-	} else {
-		t.Error("Got unexpected costTimeUnit, expecting 'hourly' or 'monthly'")
-	}
-
-	if !cmp.Equal(actualCost, expectedCost) {
-		t.Errorf("Got unexpected cost for %s -> %s: %s", resourceName, costComponent.Name, formatDecimal(actualCost, "%.4f"))
+func MonthlyPriceMultiplierCheck(multiplier decimal.Decimal) CostCheckFunc {
+	return func(t *testing.T, costComponent *schema.CostComponent) {
+		expected := costComponent.Price().Mul(multiplier)
+		if !cmp.Equal(costComponent.MonthlyCost(), expected) {
+			t.Errorf("Unexpected monthly cost for %s (expected: %s, got: %s)", costComponent.Name, formatDecimal(expected, "%.4f"), formatDecimal(costComponent.MonthlyCost(), "%.4f"))
+		}
 	}
 }
 
-func ExtractPriceHashes(resources []*schema.Resource) [][]string {
-	priceHashes := [][]string{}
+func TestResource(t *testing.T, resources []*schema.Resource, resourceCheck ResourceCheck) {
+	found, resource := findResource(resources, resourceCheck.Name)
+	if !found {
+		t.Errorf("No resource matched for name %s", resourceCheck.Name)
+		return
+	}
 
+	for _, costComponentCheck := range resourceCheck.CostComponentChecks {
+		TestCostComponent(t, resource.CostComponents, costComponentCheck)
+	}
+
+	for _, subResourceCheck := range resourceCheck.SubResourceChecks {
+		TestResource(t, resource.SubResources, subResourceCheck)
+	}
+}
+
+func TestCostComponent(t *testing.T, costComponents []*schema.CostComponent, costComponentCheck CostComponentCheck) {
+	found, costComponent := findCostComponent(costComponents, costComponentCheck.Name)
+	if !found {
+		t.Errorf("No cost componenet matched for name %s", costComponentCheck.Name)
+		return
+	}
+
+	if !cmp.Equal(costComponent.PriceHash(), costComponentCheck.PriceHash) {
+		t.Errorf("Unexpected cost component price hash for %s (expected: %s, got: %s)", costComponent.Name, costComponentCheck.PriceHash, costComponent.PriceHash())
+	}
+
+	if costComponentCheck.HourlyCostCheck != nil {
+		costComponentCheck.HourlyCostCheck(t, costComponent)
+	}
+
+	if costComponentCheck.MonthlyCostCheck != nil {
+		costComponentCheck.MonthlyCostCheck(t, costComponent)
+	}
+}
+
+func findResource(resources []*schema.Resource, name string) (bool, *schema.Resource) {
 	for _, resource := range resources {
-		for _, costComponent := range resource.CostComponents {
-			priceHashes = append(priceHashes, []string{resource.Name, costComponent.Name, costComponent.PriceHash()})
+		if resource.Name == name {
+			return true, resource
 		}
-
-		priceHashes = append(priceHashes, ExtractPriceHashes(resource.SubResources)...)
 	}
-
-	return priceHashes
+	return false, nil
 }
 
-func FindCostComponent(resources []*schema.Resource, resourceName string, costComponentName string) *schema.CostComponent {
-	for _, resource := range resources {
-		for _, costComponent := range resource.CostComponents {
-			if resource.Name == resourceName && costComponent.Name == costComponentName {
-				return costComponent
-			}
-		}
-
-		costComponent := FindCostComponent(resource.SubResources, resourceName, costComponentName)
-		if costComponent != nil {
-			return costComponent
+func findCostComponent(costComponents []*schema.CostComponent, name string) (bool, *schema.CostComponent) {
+	for _, costComponent := range costComponents {
+		if costComponent.Name == name {
+			return true, costComponent
 		}
 	}
-
-	return nil
+	return false, nil
 }
 
 func formatDecimal(d decimal.Decimal, format string) string {

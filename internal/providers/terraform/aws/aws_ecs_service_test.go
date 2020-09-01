@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"infracost/internal/providers/terraform/tftest"
-	"infracost/pkg/schema"
 	"infracost/pkg/testutil"
 
 	"github.com/shopspring/decimal"
@@ -53,26 +52,28 @@ func TestEcsService(t *testing.T) {
 		}
 	`
 
-	resources, err := tftest.RunCostCalculation(tf)
-	if err != nil {
-		t.Error(err)
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_ecs_service.ecs_fargate1",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Per GB per hour",
+					PriceHash:       "8b1ff12686a4c3b2a332da524a724590-1fb365d8a0bc1f462690ec9d444f380c",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(4)),
+				},
+				{
+					Name:            "Per vCPU per hour",
+					PriceHash:       "0c294936ec8abdbfcbb4dfe26cf52afd-1fb365d8a0bc1f462690ec9d444f380c",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
+				},
+				{
+					Name:            "Inference accelerator (eia2.medium)",
+					PriceHash:       "498a3aadc034dfaf873005fdd3f56bbf-1fb365d8a0bc1f462690ec9d444f380c",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
+				},
+			},
+		},
 	}
 
-	expectedPriceHashes := [][]string{
-		{"aws_ecs_service.ecs_fargate1", "Per GB per hour", "8b1ff12686a4c3b2a332da524a724590-1fb365d8a0bc1f462690ec9d444f380c"},
-		{"aws_ecs_service.ecs_fargate1", "Per vCPU per hour", "0c294936ec8abdbfcbb4dfe26cf52afd-1fb365d8a0bc1f462690ec9d444f380c"},
-		{"aws_ecs_service.ecs_fargate1", "Inference accelerator (eia2.medium)", "498a3aadc034dfaf873005fdd3f56bbf-1fb365d8a0bc1f462690ec9d444f380c"},
-	}
-	testutil.CheckPriceHashes(t, resources, expectedPriceHashes)
-
-	var costComponent *schema.CostComponent
-
-	costComponent = testutil.FindCostComponent(resources, "aws_ecs_service.ecs_fargate1", "Per GB per hour")
-	testutil.CheckCost(t, "aws_ecs_service.ecs_fargate1", costComponent, "hourly", costComponent.Price().Mul(decimal.NewFromInt(4)))
-
-	costComponent = testutil.FindCostComponent(resources, "aws_ecs_service.ecs_fargate1", "Per vCPU per hour")
-	testutil.CheckCost(t, "aws_ecs_service.ecs_fargate1", costComponent, "hourly", costComponent.Price().Mul(decimal.NewFromInt(2)))
-
-	costComponent = testutil.FindCostComponent(resources, "aws_ecs_service.ecs_fargate1", "Inference accelerator (eia2.medium)")
-	testutil.CheckCost(t, "aws_ecs_service.ecs_fargate1", costComponent, "hourly", costComponent.Price().Mul(decimal.NewFromInt(2)))
+	tftest.ResourceTests(t, tf, resourceChecks)
 }

@@ -16,7 +16,10 @@ func AwsEcsService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 	}
 
 	region := d.Get("region").String()
-	desiredCount := d.Get("desired_count").Int()
+	desiredCount := int64(0)
+	if d.Get("desired_count").Exists() {
+		desiredCount = d.Get("desired_count").Int()
+	}
 	taskDefinition := d.References("task_definition")[0]
 	memory := convertResourceString(taskDefinition.Get("memory").String())
 	cpu := convertResourceString(taskDefinition.Get("cpu").String())
