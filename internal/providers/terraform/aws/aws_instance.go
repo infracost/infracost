@@ -10,6 +10,18 @@ import (
 
 func AwsInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
+	subResources := make([]*schema.Resource, 0)
+	subResources = append(subResources, rootBlockDevice(d.Get("root_block_device.0"), region))
+	subResources = append(subResources, ebsBlockDevices(d.Get("ebs_block_device"), region)...)
+
+	return &schema.Resource{
+		Name:           d.Address,
+		SubResources:   subResources,
+		CostComponents: []*schema.CostComponent{computeCostComponent(d, region)},
+	}
+}
+
+func computeCostComponent(d *schema.ResourceData, region string) *schema.CostComponent {
 	instanceType := d.Get("instance_type").String()
 
 	tenancy := "Shared"
@@ -17,35 +29,25 @@ func AwsInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resourc
 		tenancy = "Dedicated"
 	}
 
-	subResources := make([]*schema.Resource, 0)
-	subResources = append(subResources, rootBlockDevice(d.Get("root_block_device.0"), region))
-	subResources = append(subResources, ebsBlockDevices(d.Get("ebs_block_device"), region)...)
-
-	return &schema.Resource{
-		Name:         d.Address,
-		SubResources: subResources,
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:           fmt.Sprintf("Compute (%s)", instanceType),
-				Unit:           "hours",
-				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AmazonEC2"),
-					ProductFamily: strPtr("Compute Instance"),
-					AttributeFilters: &[]schema.AttributeFilter{
-						{Key: "instanceType", Value: strPtr(instanceType)},
-						{Key: "tenancy", Value: strPtr(tenancy)},
-						{Key: "operatingSystem", Value: strPtr("Linux")},
-						{Key: "preInstalledSw", Value: strPtr("NA")},
-						{Key: "capacitystatus", Value: strPtr("Used")},
-					},
-				},
-				PriceFilter: &schema.PriceFilter{
-					PurchaseOption: strPtr("on_demand"),
-				},
+	return &schema.CostComponent{
+		Name:           fmt.Sprintf("Compute (%s)", instanceType),
+		Unit:           "hours",
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonEC2"),
+			ProductFamily: strPtr("Compute Instance"),
+			AttributeFilters: &[]schema.AttributeFilter{
+				{Key: "instanceType", Value: strPtr(instanceType)},
+				{Key: "tenancy", Value: strPtr(tenancy)},
+				{Key: "operatingSystem", Value: strPtr("Linux")},
+				{Key: "preInstalledSw", Value: strPtr("NA")},
+				{Key: "capacitystatus", Value: strPtr("Used")},
 			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
 		},
 	}
 }

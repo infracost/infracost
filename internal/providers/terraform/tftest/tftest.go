@@ -6,9 +6,11 @@ import (
 	"infracost/internal/providers/terraform"
 	"infracost/pkg/prices"
 	"infracost/pkg/schema"
+	"infracost/pkg/testutil"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"testing"
 
 	"github.com/urfave/cli/v2"
 )
@@ -38,7 +40,11 @@ var tfProviders = `
 	provider "infracost" {}
 `
 
-type TerraformFile struct {
+type Project struct {
+	Files []File
+}
+
+type File struct {
 	Path     string
 	Contents string
 }
@@ -47,8 +53,32 @@ func WithProviders(tf string) string {
 	return fmt.Sprintf("%s%s", tfProviders, tf)
 }
 
-func RunCostCalculation(tf string) ([]*schema.Resource, error) {
-	resources, err := LoadResources(tf)
+func ResourceTests(t *testing.T, tf string, resourceChecks []testutil.ResourceCheck) {
+	project := Project{
+		Files: []File{
+			{
+				Path:     "main.tf",
+				Contents: WithProviders(tf),
+			},
+		},
+	}
+
+	ResourceTestsForProject(t, project, resourceChecks)
+}
+
+func ResourceTestsForProject(t *testing.T, project Project, resourceChecks []testutil.ResourceCheck) {
+	resources, err := RunCostCalculations(project)
+	if err != nil {
+		t.Error(err)
+	}
+
+	for _, resourceCheck := range resourceChecks {
+		testutil.TestResource(t, resources, resourceCheck)
+	}
+}
+
+func RunCostCalculations(project Project) ([]*schema.Resource, error) {
+	resources, err := loadResources(project)
 	if err != nil {
 		return resources, err
 	}
@@ -60,19 +90,8 @@ func RunCostCalculation(tf string) ([]*schema.Resource, error) {
 	return resources, nil
 }
 
-func LoadResources(tf string) ([]*schema.Resource, error) {
-	terraformFiles := []*TerraformFile{
-		{
-			Path:     "main.tf",
-			Contents: WithProviders(tf),
-		},
-	}
-
-	return LoadResourcesForProject(terraformFiles)
-}
-
-func LoadResourcesForProject(terraformFiles []*TerraformFile) ([]*schema.Resource, error) {
-	tfdir, err := writeToTmpDir(terraformFiles)
+func loadResources(project Project) ([]*schema.Resource, error) {
+	tfdir, err := writeToTmpDir(project)
 	if err != nil {
 		return nil, err
 	}
@@ -90,14 +109,14 @@ func LoadResourcesForProject(terraformFiles []*TerraformFile) ([]*schema.Resourc
 	return provider.LoadResources()
 }
 
-func writeToTmpDir(terraformFiles []*TerraformFile) (string, error) {
+func writeToTmpDir(project Project) (string, error) {
 	// Create temporary directory and output terraform code
 	tmpDir, err := ioutil.TempDir("", "")
 	if err != nil {
 		return tmpDir, err
 	}
 
-	for _, terraformFile := range terraformFiles {
+	for _, terraformFile := range project.Files {
 		fullPath := filepath.Join(tmpDir, terraformFile.Path)
 		dir := filepath.Dir(fullPath)
 
