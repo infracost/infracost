@@ -11,7 +11,6 @@ ENV GOOS linux
 
 # Install Packages
 RUN wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${ARCH}_amd64.zip
-RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.30.0
 RUN apt-get update && apt-get -y install zip -y
 RUN unzip terraform*.zip && \
     mv terraform /usr/local/bin && \
