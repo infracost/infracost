@@ -61,7 +61,7 @@ func TestResource(t *testing.T, resources []*schema.Resource, resourceCheck Reso
 func TestCostComponent(t *testing.T, costComponents []*schema.CostComponent, costComponentCheck CostComponentCheck) {
 	found, costComponent := findCostComponent(costComponents, costComponentCheck.Name)
 	if !found {
-		t.Errorf("No cost componenet matched for name %s", costComponentCheck.Name)
+		t.Errorf("No cost component matched for name %s", costComponentCheck.Name)
 		return
 	}
 

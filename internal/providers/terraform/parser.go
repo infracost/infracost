@@ -1,7 +1,6 @@
 package terraform
 
 import (
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -62,7 +61,7 @@ func parseResourceData(planJSON gjson.Result, providerConfig gjson.Result, plann
 		if rawValues.Get("arn").Exists() {
 			awsRegion = strings.Split(rawValues.Get("arn").String(), ":")[3]
 		}
-		rawValues = addRawValue(rawValues, "region", awsRegion)
+		rawValues = schema.AddRawValue(rawValues, "region", awsRegion)
 
 		resourceDataMap[address] = schema.NewResourceData(resourceType, providerName, address, rawValues)
 	}
@@ -87,14 +86,6 @@ func parseAwsRegion(providerConfig gjson.Result) string {
 	}
 
 	return awsRegion
-}
-
-func addRawValue(rawValues gjson.Result, key string, value interface{}) gjson.Result {
-	var unmarshalledJSON map[string]interface{}
-	_ = json.Unmarshal([]byte(rawValues.Raw), &unmarshalledJSON)
-	unmarshalledJSON[key] = value
-	marshalledJSON, _ := json.Marshal(unmarshalledJSON)
-	return gjson.ParseBytes(marshalledJSON)
 }
 
 func buildUsageResourceDataMap(resourceDataMap map[string]*schema.ResourceData) map[string]*schema.ResourceData {
