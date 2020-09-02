@@ -3,8 +3,8 @@ package aws
 import "infracost/pkg/schema"
 
 var ResourceRegistry map[string]schema.ResourceFunc = map[string]schema.ResourceFunc{
-	"aws_instance":          AwsInstance,
-	"aws_nat_gateway":       AwsNatGateway,
-	"aws_ecs_service":       AwsEcsService,
-	"aws_autoscaling_group": AwsAutoscalingGroup,
+	"aws_autoscaling_group": NewAutoscalingGroup,
+	"aws_ecs_service":       NewEcsService,
+	"aws_instance":          NewInstance,
+	"aws_nat_gateway":       NewNatGateway,
 }

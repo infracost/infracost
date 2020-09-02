@@ -9,7 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func TestAwsInstance(t *testing.T) {
+func TestInstance(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

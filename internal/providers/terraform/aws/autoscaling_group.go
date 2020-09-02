@@ -8,7 +8,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func AwsAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 	desiredCapacity := decimal.NewFromInt(d.Get("desired_capacity").Int())
 
@@ -19,14 +19,14 @@ func AwsAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema
 	mixedInstanceLaunchTemplateRef := d.References("mixed_instances_policy.0.launch_template.0.launch_template_specification.0.launch_template_id")
 
 	if len(launchConfigurationRef) > 0 {
-		launchConfiguration := awsLaunchConfiguration(launchConfigurationRef[0].Address, launchConfigurationRef[0], region)
+		launchConfiguration := newLaunchConfiguration(launchConfigurationRef[0].Address, launchConfigurationRef[0], region)
 		multiplyQuantities(launchConfiguration, desiredCapacity)
 		subResources = append(subResources, launchConfiguration)
 	} else if len(launchTemplateRef) > 0 {
-		subResources = append(subResources, awsLaunchTemplate(launchTemplateRef[0].Address, launchTemplateRef[0], region, desiredCapacity, decimal.Zero))
+		subResources = append(subResources, newLaunchTemplate(launchTemplateRef[0].Address, launchTemplateRef[0], region, desiredCapacity, decimal.Zero))
 	} else if len(mixedInstanceLaunchTemplateRef) > 0 {
 		mixedInstancesPolicy := d.Get("mixed_instances_policy.0")
-		subResources = append(subResources, mixedInstancesAwsLaunchTemplate(mixedInstanceLaunchTemplateRef[0].Address, mixedInstanceLaunchTemplateRef[0], region, desiredCapacity, mixedInstancesPolicy))
+		subResources = append(subResources, newMixedInstancesAwsLaunchTemplate(mixedInstanceLaunchTemplateRef[0].Address, mixedInstanceLaunchTemplateRef[0], region, desiredCapacity, mixedInstancesPolicy))
 	}
 
 	return &schema.Resource{
@@ -35,12 +35,12 @@ func AwsAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema
 	}
 }
 
-func awsLaunchConfiguration(name string, d *schema.ResourceData, region string) *schema.Resource {
+func newLaunchConfiguration(name string, d *schema.ResourceData, region string) *schema.Resource {
 	compute := computeCostComponent(d, region, "on_demand")
 
 	subResources := make([]*schema.Resource, 0)
-	subResources = append(subResources, rootBlockDevice(d.Get("root_block_device.0"), region))
-	subResources = append(subResources, ebsBlockDevices(d.Get("ebs_block_device"), region)...)
+	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))
+	subResources = append(subResources, newEbsBlockDevices(d.Get("ebs_block_device"), region)...)
 
 	return &schema.Resource{
 		Name:           name,
@@ -49,7 +49,7 @@ func awsLaunchConfiguration(name string, d *schema.ResourceData, region string) 
 	}
 }
 
-func awsLaunchTemplate(name string, d *schema.ResourceData, region string, onDemandCount decimal.Decimal, spotCount decimal.Decimal) *schema.Resource {
+func newLaunchTemplate(name string, d *schema.ResourceData, region string, onDemandCount decimal.Decimal, spotCount decimal.Decimal) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	if onDemandCount.GreaterThan(decimal.Zero) {
 		onDemandCompute := computeCostComponent(d, region, "on_demand")
@@ -66,15 +66,15 @@ func awsLaunchTemplate(name string, d *schema.ResourceData, region string, onDem
 	subResources := make([]*schema.Resource, 0)
 
 	totalCount := onDemandCount.Add(spotCount)
-	subResource := rootBlockDevice(d.Get("root_block_device.0"), region)
-	multiplyQuantities(subResource, totalCount)
-	subResources = append(subResources, subResource)
+	rootBlockDevice := newRootBlockDevice(d.Get("root_block_device.0"), region)
+	multiplyQuantities(rootBlockDevice, totalCount)
+	subResources = append(subResources, rootBlockDevice)
 
 	for i, blockDeviceMappingData := range d.Get("block_device_mappings.#.ebs|@flatten").Array() {
 		name := fmt.Sprintf("block_device_mapping[%d]", i)
-		subResource := ebsBlockDevice(name, blockDeviceMappingData, region)
-		multiplyQuantities(subResource, totalCount)
-		subResources = append(subResources, subResource)
+		ebsBlockDevice := newEbsBlockDevice(name, blockDeviceMappingData, region)
+		multiplyQuantities(ebsBlockDevice, totalCount)
+		subResources = append(subResources, ebsBlockDevice)
 	}
 
 	return &schema.Resource{
@@ -84,7 +84,7 @@ func awsLaunchTemplate(name string, d *schema.ResourceData, region string, onDem
 	}
 }
 
-func mixedInstancesAwsLaunchTemplate(name string, d *schema.ResourceData, region string, desiredCapacity decimal.Decimal, mixedInstancePolicyData gjson.Result) *schema.Resource {
+func newMixedInstancesAwsLaunchTemplate(name string, d *schema.ResourceData, region string, desiredCapacity decimal.Decimal, mixedInstancePolicyData gjson.Result) *schema.Resource {
 	overrideInstanceType, totalCount := getInstanceTypeAndCount(mixedInstancePolicyData, desiredCapacity)
 	if overrideInstanceType != "" {
 		d.Set("instance_type", overrideInstanceType)
@@ -92,7 +92,7 @@ func mixedInstancesAwsLaunchTemplate(name string, d *schema.ResourceData, region
 
 	onDemandCount, spotCount := calculateOnDemandAndSpotCounts(mixedInstancePolicyData, totalCount)
 
-	return awsLaunchTemplate(name, d, region, onDemandCount, spotCount)
+	return newLaunchTemplate(name, d, region, onDemandCount, spotCount)
 }
 
 func getInstanceTypeAndCount(mixedInstancePolicyData gjson.Result, capacity decimal.Decimal) (string, decimal.Decimal) {
