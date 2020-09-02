@@ -5,8 +5,8 @@ import (
 	"infracost/pkg/config"
 	"infracost/pkg/schema"
 
-	"github.com/prometheus/common/log"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
