@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"encoding/json"
+
 	"github.com/tidwall/gjson"
 )
 
@@ -35,4 +37,16 @@ func (d *ResourceData) AddReference(key string, reference *ResourceData) {
 		d.referencesMap[key] = make([]*ResourceData, 0)
 	}
 	d.referencesMap[key] = append(d.referencesMap[key], reference)
+}
+
+func (d *ResourceData) Set(key string, value interface{}) {
+	d.rawValues = AddRawValue(d.rawValues, key, value)
+}
+
+func AddRawValue(rawValues gjson.Result, key string, value interface{}) gjson.Result {
+	var unmarshalledJSON map[string]interface{}
+	_ = json.Unmarshal([]byte(rawValues.Raw), &unmarshalledJSON)
+	unmarshalledJSON[key] = value
+	marshalledJSON, _ := json.Marshal(unmarshalledJSON)
+	return gjson.ParseBytes(marshalledJSON)
 }

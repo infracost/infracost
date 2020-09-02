@@ -6,7 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func AwsNatGateway(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewNatGateway(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
 	gbDataProcessed := decimal.Zero

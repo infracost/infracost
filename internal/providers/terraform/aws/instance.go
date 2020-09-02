@@ -8,20 +8,20 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func AwsInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 	subResources := make([]*schema.Resource, 0)
-	subResources = append(subResources, rootBlockDevice(d.Get("root_block_device.0"), region))
-	subResources = append(subResources, ebsBlockDevices(d.Get("ebs_block_device"), region)...)
+	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))
+	subResources = append(subResources, newEbsBlockDevices(d.Get("ebs_block_device"), region)...)
 
 	return &schema.Resource{
 		Name:           d.Address,
 		SubResources:   subResources,
-		CostComponents: []*schema.CostComponent{computeCostComponent(d, region)},
+		CostComponents: []*schema.CostComponent{computeCostComponent(d, region, "on_demand")},
 	}
 }
 
-func computeCostComponent(d *schema.ResourceData, region string) *schema.CostComponent {
+func computeCostComponent(d *schema.ResourceData, region string, purchaseOption string) *schema.CostComponent {
 	instanceType := d.Get("instance_type").String()
 
 	tenancy := "Shared"
@@ -29,8 +29,13 @@ func computeCostComponent(d *schema.ResourceData, region string) *schema.CostCom
 		tenancy = "Dedicated"
 	}
 
+	purchaseOptionLabel := map[string]string{
+		"on_demand": "on-demand",
+		"spot":      "spot",
+	}[purchaseOption]
+
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Compute (%s)", instanceType),
+		Name:           fmt.Sprintf("Compute (%s, %s)", purchaseOptionLabel, instanceType),
 		Unit:           "hours",
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
@@ -47,25 +52,25 @@ func computeCostComponent(d *schema.ResourceData, region string) *schema.CostCom
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("on_demand"),
+			PurchaseOption: &purchaseOption,
 		},
 	}
 }
 
-func rootBlockDevice(d gjson.Result, region string) *schema.Resource {
-	return ebsBlockDevice("root_block_device", d, region)
+func newRootBlockDevice(d gjson.Result, region string) *schema.Resource {
+	return newEbsBlockDevice("root_block_device", d, region)
 }
 
-func ebsBlockDevices(d gjson.Result, region string) []*schema.Resource {
+func newEbsBlockDevices(d gjson.Result, region string) []*schema.Resource {
 	resources := make([]*schema.Resource, 0)
 	for i, data := range d.Array() {
 		name := fmt.Sprintf("ebs_block_device[%d]", i)
-		resources = append(resources, ebsBlockDevice(name, data, region))
+		resources = append(resources, newEbsBlockDevice(name, data, region))
 	}
 	return resources
 }
 
-func ebsBlockDevice(name string, d gjson.Result, region string) *schema.Resource {
+func newEbsBlockDevice(name string, d gjson.Result, region string) *schema.Resource {
 	volumeApiName := "gp2"
 	if d.Get("volume_type").Exists() {
 		volumeApiName = d.Get("volume_type").String()

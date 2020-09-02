@@ -7,11 +7,13 @@ import (
 	"strings"
 
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 )
 
-func AwsEcsService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewEcsService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	launchType := d.Get("launch_type").String()
 	if launchType != "FARGATE" {
+		log.Warn("Unsupported launch type for aws_ecs_service. Currently only FARGATE is supported")
 		return nil
 	}
 
