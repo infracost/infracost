@@ -8,10 +8,10 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
 ## Table of Contents
 
-See [docs](https://docs.infracost.io) for detailed usage options, supported resources and more information.
+**Checkout the [docs site](https://docs.infracost.io) for detailed usage options, supported resources and more information.**
 
 * [Installation](#installation)
-* [Usage](#basic_usage)
+* [Usage](#basic-usage)
 * [Development](#development)
 * [Contributing](#contributing)
 
@@ -30,6 +30,8 @@ Generate a cost breakdown from a Terraform directory:
 ```sh
 infracost --tfdir examples/small_terraform
 ```
+
+Check the [docs site](https://docs.infracost.io) for more details.
 
 The [Infracost GitHub action](https://github.com/marketplace/actions/run-infracost) can be used to automatically add a PR comment showing the cost estimate `diff` between a pull request and the master branch whenever Terraform files change.
 
