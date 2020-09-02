@@ -7,7 +7,7 @@
 
 Infracost shows hourly and monthly cost estimates for a Terraform project. This helps developers, DevOps et al. quickly see the cost breakdown and compare different deployment options upfront.
 
-<img src="https://raw.githubusercontent.com/infracost/infracost/master/examples/screenshot.png" width=557 alt="Example infracost output" />
+<img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/screenshot.png" width=600 alt="Example infracost output" />
 
 ## Table of Contents
 
