@@ -9,7 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func EcsService(t *testing.T) {
+func TestEcsService(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
