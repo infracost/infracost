@@ -77,7 +77,7 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 	}
 
 	for _, resource := range resources {
-		table.Append([]string{resource.Name, "", ""})
+		table.Append([]string{resource.Name, "", "", "", "", ""})
 
 		lineItemCount := getLineItemCount(resource)
 		lineItem := 0
@@ -120,7 +120,7 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 			formatDecimal(resource.HourlyCost(), "%.4f"),
 			formatDecimal(resource.MonthlyCost(), "%.4f"),
 		})
-		table.Append([]string{"", "", ""})
+		table.Append([]string{"", "", "", "", "", ""})
 
 		overallTotalHourly = overallTotalHourly.Add(resource.HourlyCost())
 		overallTotalMonthly = overallTotalMonthly.Add(resource.MonthlyCost())
