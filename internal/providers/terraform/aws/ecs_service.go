@@ -9,7 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func AwsEcsService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewEcsService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	launchType := d.Get("launch_type").String()
 	if launchType != "FARGATE" {
 		return nil

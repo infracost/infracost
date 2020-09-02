@@ -9,7 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func TestAwsAutoscalingGroup_launchConfiguration(t *testing.T) {
+func TestAutoscalingGroup_launchConfiguration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -79,7 +79,7 @@ func TestAwsAutoscalingGroup_launchConfiguration(t *testing.T) {
 	tftest.ResourceTests(t, tf, resourceChecks)
 }
 
-func TestAwsAutoscalingGroup_launchTemplate(t *testing.T) {
+func TestAutoscalingGroup_launchTemplate(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -174,7 +174,7 @@ func TestAwsAutoscalingGroup_launchTemplate(t *testing.T) {
 	tftest.ResourceTests(t, tf, resourceChecks)
 }
 
-func TestAwsAutoscalingGroup_mixedInstanceLaunchTemplate(t *testing.T) {
+func TestAutoscalingGroup_mixedInstanceLaunchTemplate(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -252,7 +252,7 @@ func TestAwsAutoscalingGroup_mixedInstanceLaunchTemplate(t *testing.T) {
 	tftest.ResourceTests(t, tf, resourceChecks)
 }
 
-func TestAwsAutoscalingGroup_mixedInstanceLaunchTemplateDynamic(t *testing.T) {
+func TestAutoscalingGroup_mixedInstanceLaunchTemplateDynamic(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
