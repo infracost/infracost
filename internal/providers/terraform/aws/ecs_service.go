@@ -36,7 +36,7 @@ func NewECSService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonECS"),
 				ProductFamily: strPtr("Compute"),
-				AttributeFilters: &[]schema.AttributeFilter{
+				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/Fargate-GB-Hours/")},
 				},
 			},
@@ -50,7 +50,7 @@ func NewECSService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonECS"),
 				ProductFamily: strPtr("Compute"),
-				AttributeFilters: &[]schema.AttributeFilter{
+				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/Fargate-vCPU-Hours:perCPU/")},
 				},
 			},
@@ -68,7 +68,7 @@ func NewECSService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonEI"),
 				ProductFamily: strPtr("Elastic Inference"),
-				AttributeFilters: &[]schema.AttributeFilter{
+				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", deviceType))},
 				},
 			},

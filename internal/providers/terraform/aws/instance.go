@@ -43,7 +43,7 @@ func computeCostComponent(d *schema.ResourceData, region string, purchaseOption 
 			Region:        strPtr(region),
 			Service:       strPtr("AmazonEC2"),
 			ProductFamily: strPtr("Compute Instance"),
-			AttributeFilters: &[]schema.AttributeFilter{
+			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "instanceType", Value: strPtr(instanceType)},
 				{Key: "tenancy", Value: strPtr(tenancy)},
 				{Key: "operatingSystem", Value: strPtr("Linux")},

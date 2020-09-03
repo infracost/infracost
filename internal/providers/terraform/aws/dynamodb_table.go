@@ -45,7 +45,7 @@ func wcuCostComponent(d *schema.ResourceData) *schema.CostComponent {
 			Region:        strPtr(region),
 			Service:       strPtr("AmazonDynamoDB"),
 			ProductFamily: strPtr("Provisioned IOPS"),
-			AttributeFilters: &[]schema.AttributeFilter{
+			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "group", Value: strPtr("DDB-WriteUnits")},
 			},
 		},
@@ -67,7 +67,7 @@ func rcuCostComponent(d *schema.ResourceData) *schema.CostComponent {
 			Region:        strPtr(region),
 			Service:       strPtr("AmazonDynamoDB"),
 			ProductFamily: strPtr("Provisioned IOPS"),
-			AttributeFilters: &[]schema.AttributeFilter{
+			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "group", Value: strPtr("DDB-ReadUnits")},
 			},
 		},
@@ -105,7 +105,7 @@ func newDynamoDBGlobalTable(name string, d gjson.Result, region string, capacity
 					Region:        strPtr(region),
 					Service:       strPtr("AmazonDynamoDB"),
 					ProductFamily: strPtr("DDB-Operation-ReplicatedWrite"),
-					AttributeFilters: &[]schema.AttributeFilter{
+					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "group", Value: strPtr("DDB-ReplicatedWriteUnits")},
 					},
 				},
