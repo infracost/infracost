@@ -76,22 +76,20 @@ func main() {
 				color.NoColor = true
 			}
 
-			logLevel := log.WarnLevel
 			if c.String("log-level") != "" {
 				switch c.String("log-level") {
 				case "TRACE":
-					logLevel = log.TraceLevel
+					log.SetLevel(log.TraceLevel)
 				case "DEBUG":
-					logLevel = log.DebugLevel
+					log.SetLevel(log.DebugLevel)
 				case "INFO":
-					logLevel = log.InfoLevel
+					log.SetLevel(log.InfoLevel)
 				case "WARN":
-					logLevel = log.WarnLevel
+					log.SetLevel(log.WarnLevel)
 				case "ERROR":
-					logLevel = log.ErrorLevel
+					log.SetLevel(log.ErrorLevel)
 				}
 			}
-			log.SetLevel(logLevel)
 
 			if c.String("api-url") != "" {
 				config.Config.ApiUrl = c.String("api-url")
