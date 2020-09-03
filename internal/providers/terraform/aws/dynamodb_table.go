@@ -4,6 +4,7 @@ import (
 	"infracost/pkg/schema"
 
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -14,6 +15,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	// Check billing mode
 	billingMode := d.Get("billing_mode").String()
 	if billingMode != "PROVISIONED" {
+		log.Warnf("No support for on-demand dynamoDB for %s", address)
 		return nil
 	}
 
