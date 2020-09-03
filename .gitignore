@@ -13,4 +13,10 @@
 .env.local
 
 # Terraform artifacts
-.terraform
+**/.terraform/**
+examples/*/plan.save
+examples/*/plan.json
+
+#script generated files
+scripts/tmp-*
+scripts/index.json

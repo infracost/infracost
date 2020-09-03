@@ -1,81 +1,44 @@
-# Infracost
+<img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/logo.svg" width=320 alt="Infracost logo" />
 
-Get cost hourly and monthly estimates for a Terraform project. Helps you quickly see the cost breakdown and compare different deployment options upfront.
+<a href="https://docs.infracost.io"><img alt="Docs" src="https://img.shields.io/badge/docs-blue"/></a>
+<a href="https://discord.gg/Cu9ftEg"><img alt="Discord Chat" src="https://img.shields.io/discord/746703155953270794.svg"/></a>
+<a href="https://github.com/infracost/infracost/actions?query=workflow%3AGo+branch%3Amaster"><img alt="Build Status" src="https://img.shields.io/github/workflow/status/infracost/infracost/Go/master"/></a>
+<a href="https://hub.docker.com/r/infracost/infracost/tags"><img alt="Docker Image" src="https://img.shields.io/docker/cloud/build/infracost/infracost"/></a>
 
-<img src="examples/screenshot.png" width=557 alt="Example infracost output" />
+Infracost shows hourly and monthly cost estimates for a Terraform project. This helps developers, DevOps et al. quickly see the cost breakdown and compare different deployment options upfront.
 
-The [Infracost GitHub action](https://github.com/marketplace/actions/run-infracost) can be used to automatically add a PR comment showing the cost estimate `diff` between a pull request and the master branch whenever a `.tf` file changes.
-
-<img src="https://raw.githubusercontent.com/aliscott/infracost-gh-action/master/screenshot.png" width=557 alt="Example infracost diff usage" />
-
-Currently this supports the following on-Demand and Spot pricing for the following AWS resources:
- * `aws_instance`
- * `aws_ebs_volume`
- * `aws_ebs_snapshot`
- * `aws_ebs_snapshot_copy`
- * `aws_autoscaling_group`
- * `aws_db_instance`
- * `aws_elb`
- * `aws_lb`
- * `aws_nat_gateway`
-
-This does not yet support estimates for:
-  * any costs that are not specified in the Terraform configuration, e.g. S3 storage costs, data out costs.
-  * Non-Linux EC2 instances such as Windows and RHEL, a lookup is needed to find the OS of AMIs.
-  * Any non On-Demand pricing, such as Reserved Instances.
-
-This is an early stage project, pull requests to add resources/fix bugs are welcome.
+<img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/screenshot.png" width=600 alt="Example Infracost output" />
 
 ## Table of Contents
 
+**Checkout the [docs site](https://docs.infracost.io) for detailed usage options, supported resources and more information.**
+
 * [Installation](#installation)
-* [Usage](#usage)
+* [Usage](#basic-usage)
 * [Development](#development)
 * [Contributing](#contributing)
-* [License](#license)
 
 ## Installation
 
 To download and install the latest release:
 
 ```sh
-curl --silent --location "https://github.com/aliscott/infracost/releases/latest/download/infracost-$(uname -s)-amd64.tar.gz" | tar xz -C /tmp
+curl --silent --location "https://github.com/infracost/infracost/releases/latest/download/infracost-$(uname -s)-amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/infracost-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64 /usr/local/bin/infracost
 ```
 
-## Usage
-
-Prices are retrieved using [https://github.com/aliscott/cloud-pricing-api](https://github.com/aliscott/cloud-pricing-api). There is a demo version of that service deployed at [https://pricing.infracost.io/graphql](https://pricing.infracost.io/graphql), which `infracost` uses by default. This is running on minimal infrastructure so is not guaranteed to always be available. On this service, spot prices are refreshed once per hour.
-
-You can run `infracost` in your terraform directories without worrying about security or privacy issues as no terraform secrets/tags/IDs etc are sent to the pricing service (only generic price-related attributes are used). Also, do not be alarmed by seeing the `terraform init` in output, no changes are made to your terraform or cloud resources. As a security precaution, read-only AWS IAM creds can be used.
-
-You can also deploy the price list API yourself and specify it by setting the `infracost_API_URL` env variable or passing the `--api-url` option.
-
-Generate a cost breakdown from a Terraform plan JSON file:
-```sh
-infracost --tfjson examples/terraform/plan.json
-```
-
-To generate the plan JSON file you can run:
-```
-terraform plan -out plan.save examples/terraform
-terraform show -json plan.save > examples/terraform/plan.json
-```
+## Basic usage
 
 Generate a cost breakdown from a Terraform directory:
 ```sh
-infracost --tfdir examples/terraform
+infracost --tfdir examples/small_terraform
 ```
 
-Generate a cost breakdown from a Terraform plan file:
-```sh
-infracost --tfplan plan.save --tfdir examples/terraform
-```
+Check the [docs site](https://docs.infracost.io) for more details.
 
-To change the path to your `terraform` binary you can set the `TERRAFORM_BINARY` env variable:
-```sh
-TERRAFORM_BINARY=~/bin/terraform_0.13 infracost --tfdir examples/terraform_0.13
-```
+The [Infracost GitHub action](https://github.com/marketplace/actions/run-infracost) can be used to automatically add a PR comment showing the cost estimate `diff` between a pull request and the master branch whenever Terraform files change.
+
+<img src="https://raw.githubusercontent.com/infracost/infracost-gh-action/master/screenshot.png" width=600 alt="Example infracost diff usage" />
 
 ## Development
 

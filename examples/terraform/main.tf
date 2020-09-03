@@ -187,3 +187,85 @@ resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat1.id
   subnet_id     = var.aws_subnet_ids[0]
 }
+
+resource "aws_rds_cluster_instance" "cluster_instances" {
+  count              = 2
+  identifier         = "aurora-cluster-demo-${count.index}"
+  cluster_identifier = aws_rds_cluster.default.id
+  instance_class     = "db.r4.large"
+  engine             = aws_rds_cluster.default.engine
+  engine_version     = aws_rds_cluster.default.engine_version
+}
+
+resource "aws_rds_cluster" "default" {
+  cluster_identifier = "aurora-cluster-demo"
+  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  database_name      = "mydb"
+  master_username    = "foo"
+  master_password    = "barbut8chars"
+}
+
+resource "aws_dynamodb_table" "dynamodb-table" {
+  name           = "GameScores"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 30
+  write_capacity = 20
+  hash_key       = "UserId"
+  range_key      = "GameTitle"
+
+  attribute {
+    name = "UserId"
+    type = "S"
+  }
+
+  attribute {
+    name = "GameTitle"
+    type = "S"
+  }
+
+  replica {
+    region_name = "us-east-2"
+  }
+
+  replica {
+    region_name = "us-west-1"
+  }
+}
+
+resource "aws_ecs_cluster" "ecs1" {
+  name               = "ecs1"
+  capacity_providers = ["FARGATE"]
+}
+
+resource "aws_ecs_task_definition" "ecs_task1" {
+  requires_compatibilities = ["FARGATE"]
+  family                   = "ecs_task1"
+  memory                   = "2 GB"
+  cpu                      = "1 vCPU"
+
+  inference_accelerator {
+    device_name = "device1"
+    device_type = "eia2.medium"
+  }
+
+  container_definitions = <<TASK_DEFINITION
+    [
+        {
+            "command": ["sleep", "10"],
+            "entryPoint": ["/"],
+            "essential": true,
+            "image": "alpine",
+            "name": "alpine",
+            "network_mode": "none"
+        }
+    ]
+  TASK_DEFINITION
+}
+
+resource "aws_ecs_service" "ecs_fargate1" {
+  name            = "ecs_fargate1"
+  launch_type     = "FARGATE"
+  cluster         = aws_ecs_cluster.ecs1.id
+  task_definition = aws_ecs_task_definition.ecs_task1.arn
+  desired_count   = 2
+}
