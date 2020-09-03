@@ -18,10 +18,6 @@ type ConfigSpec struct {
 	ApiUrl  string `envconfig:"INFRACOST_API_URL"  required:"true"  default:"https://pricing.infracost.io"`
 }
 
-func (c *ConfigSpec) SetLogger(logger *logrus.Logger) {
-	c.Logger = logger
-}
-
 func rootDir() string {
 	_, b, _, _ := runtime.Caller(0)
 	return filepath.Join(filepath.Dir(b), "../..")
@@ -61,6 +57,9 @@ func loadConfig() *ConfigSpec {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	logrus.SetLevel(logrus.WarnLevel)
+
 	return &config
 }
 
