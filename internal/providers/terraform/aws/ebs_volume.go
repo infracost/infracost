@@ -6,7 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func NewEbsVolume(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewEBSVolume(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
 	volumeApiName := "gp2"
@@ -15,8 +15,8 @@ func NewEbsVolume(d *schema.ResourceData, u *schema.ResourceData) *schema.Resour
 	}
 
 	gbVal := decimal.NewFromInt(int64(defaultVolumeSize))
-	if d.Get("volume_size").Exists() {
-		gbVal = decimal.NewFromFloat(d.Get("volume_size").Float())
+	if d.Get("size").Exists() {
+		gbVal = decimal.NewFromFloat(d.Get("size").Float())
 	}
 
 	iopsVal := decimal.NewFromInt(int64(defaultVolumeSize))

@@ -15,7 +15,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	// Check billing mode
 	billingMode := d.Get("billing_mode").String()
 	if billingMode != "PROVISIONED" {
-		log.Warnf("No support for on-demand dynamoDB for %s", address)
+		log.Warnf("Skipping resource %s. Infracost currently only supports the PROVISIONED billing mode for AWS DynamoDB tables", d.Address)
 		return nil
 	}
 

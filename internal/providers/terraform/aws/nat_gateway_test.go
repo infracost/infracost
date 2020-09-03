@@ -9,7 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func TestNatGateway(t *testing.T) {
+func TestNATGateway(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -41,7 +41,7 @@ func TestNatGateway(t *testing.T) {
 	tftest.ResourceTests(t, tf, resourceChecks)
 }
 
-func TestAwsNatGateway_usage(t *testing.T) {
+func TestAwsNATGateway_usage(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

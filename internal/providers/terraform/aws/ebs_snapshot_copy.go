@@ -6,7 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func NewEbsSnapshotCopy(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewEBSSnapshotCopy(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
 	gbVal := decimal.NewFromInt(int64(defaultVolumeSize))
@@ -16,7 +16,7 @@ func NewEbsSnapshotCopy(d *schema.ResourceData, u *schema.ResourceData) *schema.
 		volumeRefs := sourceSnapshotRefs[0].References("volume_id")
 		if len(volumeRefs) > 0 {
 			if volumeRefs[0].Get("size").Exists() {
-				gbVal = decimal.NewFromFloat(d.Get("size").Float())
+				gbVal = decimal.NewFromFloat(volumeRefs[0].Get("size").Float())
 			}
 		}
 	}
