@@ -5,6 +5,7 @@ import "infracost/pkg/schema"
 var ResourceRegistry map[string]schema.ResourceFunc = map[string]schema.ResourceFunc{
 	"aws_alb":               NewLB, // alias for aws_lb
 	"aws_autoscaling_group": NewAutoscalingGroup,
+	"aws_db_instance":       NewDBInstance,
 	"aws_dynamodb_table":    NewDynamoDBTable,
 	"aws_ebs_snapshot":      NewEBSSnapshot,
 	"aws_ebs_snapshot_copy": NewEBSSnapshotCopy,

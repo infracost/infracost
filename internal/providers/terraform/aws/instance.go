@@ -81,7 +81,7 @@ func newEbsBlockDevice(name string, d gjson.Result, region string) *schema.Resou
 		gbVal = decimal.NewFromFloat(d.Get("volume_size").Float())
 	}
 
-	iopsVal := decimal.NewFromInt(int64(defaultVolumeSize))
+	iopsVal := decimal.Zero
 	if d.Get("iops").Exists() {
 		iopsVal = decimal.NewFromFloat(d.Get("iops").Float())
 	}
