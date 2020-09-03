@@ -6,7 +6,7 @@ type ProductFilter struct {
 	ProductFamily    *string            `json:"productFamily,omitempty"`
 	Region           *string            `json:"region,omitempty"`
 	Sku              *string            `json:"sku,omitempty"`
-	AttributeFilters *[]AttributeFilter `json:"attributeFilters,omitempty"`
+	AttributeFilters []*AttributeFilter `json:"attributeFilters,omitempty"`
 }
 
 type PriceFilter struct {

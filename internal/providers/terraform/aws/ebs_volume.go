@@ -41,7 +41,7 @@ func ebsVolumeCostComponents(region string, volumeApiName string, gbVal decimal.
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonEC2"),
 				ProductFamily: strPtr("Storage"),
-				AttributeFilters: &[]schema.AttributeFilter{
+				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "volumeApiName", Value: strPtr(volumeApiName)},
 				},
 			},
@@ -58,7 +58,7 @@ func ebsVolumeCostComponents(region string, volumeApiName string, gbVal decimal.
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonEC2"),
 				ProductFamily: strPtr("System Operation"),
-				AttributeFilters: &[]schema.AttributeFilter{
+				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "volumeApiName", Value: strPtr(volumeApiName)},
 					{Key: "usagetype", ValueRegex: strPtr("/EBS:VolumeP-IOPS.piops/")},
 				},

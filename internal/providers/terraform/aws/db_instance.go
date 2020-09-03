@@ -82,19 +82,19 @@ func NewDBInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 		iopsVal = decimal.NewFromFloat(d.Get("iops").Float())
 	}
 
-	instanceAttributeFilters := []schema.AttributeFilter{
+	instanceAttributeFilters := []*schema.AttributeFilter{
 		{Key: "instanceType", Value: strPtr(instanceType)},
 		{Key: "deploymentOption", Value: strPtr(deploymentOption)},
 		{Key: "databaseEngine", Value: databaseEngine},
 	}
 	if databaseEdition != nil {
-		instanceAttributeFilters = append(instanceAttributeFilters, schema.AttributeFilter{
+		instanceAttributeFilters = append(instanceAttributeFilters, &schema.AttributeFilter{
 			Key:   "databaseEdition",
 			Value: databaseEdition,
 		})
 	}
 	if licenseModel != nil {
-		instanceAttributeFilters = append(instanceAttributeFilters, schema.AttributeFilter{
+		instanceAttributeFilters = append(instanceAttributeFilters, &schema.AttributeFilter{
 			Key:   "licenseModel",
 			Value: licenseModel,
 		})
@@ -110,7 +110,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 				Region:           strPtr(region),
 				Service:          strPtr("AmazonRDS"),
 				ProductFamily:    strPtr("Database Instance"),
-				AttributeFilters: &instanceAttributeFilters,
+				AttributeFilters: instanceAttributeFilters,
 			},
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("on_demand"),
@@ -125,7 +125,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("Database Storage"),
-				AttributeFilters: &[]schema.AttributeFilter{
+				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "volumeType", Value: strPtr(volumeType)},
 					{Key: "deploymentOption", Value: strPtr(deploymentOption)},
 				},
@@ -143,7 +143,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("Provisioned IOPS"),
-				AttributeFilters: &[]schema.AttributeFilter{
+				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "deploymentOption", Value: strPtr(deploymentOption)},
 				},
 			},

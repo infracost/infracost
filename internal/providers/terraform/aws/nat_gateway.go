@@ -26,7 +26,7 @@ func NewNATGateway(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 					Region:        strPtr(region),
 					Service:       strPtr("AmazonEC2"),
 					ProductFamily: strPtr("NAT Gateway"),
-					AttributeFilters: &[]schema.AttributeFilter{
+					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "usagetype", ValueRegex: strPtr("/NatGateway-Hours/")},
 					},
 				},
@@ -40,7 +40,7 @@ func NewNATGateway(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 					Region:        strPtr(region),
 					Service:       strPtr("AmazonEC2"),
 					ProductFamily: strPtr("NAT Gateway"),
-					AttributeFilters: &[]schema.AttributeFilter{
+					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "usagetype", ValueRegex: strPtr("/NatGateway-Bytes/")},
 					},
 				},

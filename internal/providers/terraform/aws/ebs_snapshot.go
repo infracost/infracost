@@ -35,7 +35,7 @@ func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.C
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonEC2"),
 				ProductFamily: strPtr("Storage Snapshot"),
-				AttributeFilters: &[]schema.AttributeFilter{
+				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/EBS:SnapshotUsage$/")},
 				},
 			},

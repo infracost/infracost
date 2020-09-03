@@ -32,7 +32,7 @@ func newLBResource(d *schema.ResourceData, u *schema.ResourceData, productFamily
 					Region:        strPtr(region),
 					Service:       strPtr("AWSELB"),
 					ProductFamily: strPtr(productFamily),
-					AttributeFilters: &[]schema.AttributeFilter{
+					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
 					},
 				},
