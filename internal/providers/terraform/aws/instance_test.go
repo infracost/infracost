@@ -9,7 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func TestAwsInstance(t *testing.T) {
+func TestInstance(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -53,7 +53,7 @@ func TestAwsInstance(t *testing.T) {
 			Name: "aws_instance.instance1",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Compute (m3.medium)",
+					Name:            "Compute (on-demand, m3.medium)",
 					PriceHash:       "666e02bbe686f6950fd8a47a55e83a75-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},

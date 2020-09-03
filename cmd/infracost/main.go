@@ -42,16 +42,15 @@ func main() {
 				Usage:     "Path to the Terraform project directory",
 				TakesFile: true,
 			},
-			&cli.BoolFlag{
-				Name:    "verbose",
-				Aliases: []string{"v"},
-				Usage:   "Verbosity",
-				Value:   false,
+			&cli.StringFlag{
+				Name:  "log-level",
+				Usage: "Log level (TRACE, DEBUG, INFO, WARN, ERROR)",
+				Value: "WARN",
 			},
 			&cli.StringFlag{
 				Name:    "output",
 				Aliases: []string{"o"},
-				Usage:   "Output (json|table)",
+				Usage:   "Output (json, table)",
 				Value:   "table",
 			},
 			&cli.BoolFlag{
@@ -77,9 +76,20 @@ func main() {
 				color.NoColor = true
 			}
 
-			logLevel := log.InfoLevel
-			if c.Bool("verbose") {
-				logLevel = log.DebugLevel
+			logLevel := log.WarnLevel
+			if c.String("log-level") != "" {
+				switch c.String("log-level") {
+				case "TRACE":
+					logLevel = log.TraceLevel
+				case "DEBUG":
+					logLevel = log.DebugLevel
+				case "INFO":
+					logLevel = log.InfoLevel
+				case "WARN":
+					logLevel = log.WarnLevel
+				case "ERROR":
+					logLevel = log.ErrorLevel
+				}
 			}
 			log.SetLevel(logLevel)
 
