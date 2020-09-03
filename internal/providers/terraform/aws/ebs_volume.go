@@ -19,7 +19,7 @@ func NewEBSVolume(d *schema.ResourceData, u *schema.ResourceData) *schema.Resour
 		gbVal = decimal.NewFromFloat(d.Get("size").Float())
 	}
 
-	iopsVal := decimal.NewFromInt(int64(defaultVolumeSize))
+	iopsVal := decimal.Zero
 	if d.Get("iops").Exists() {
 		iopsVal = decimal.NewFromFloat(d.Get("iops").Float())
 	}
