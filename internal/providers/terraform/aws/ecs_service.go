@@ -10,10 +10,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func NewEcsService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewECSService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	launchType := d.Get("launch_type").String()
 	if launchType != "FARGATE" {
-		log.Warn("Unsupported launch type for aws_ecs_service. Currently only FARGATE is supported")
+		log.Warnf("Skipping resource %s. Infracost currently only supports the FARGATE launch type for AWS ECS Services", d.Address)
 		return nil
 	}
 
