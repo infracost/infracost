@@ -41,7 +41,7 @@ func TestNATGateway(t *testing.T) {
 	tftest.ResourceTests(t, tf, resourceChecks)
 }
 
-func TestAwsNATGateway_usage(t *testing.T) {
+func TestNATGateway_usage(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -55,7 +55,7 @@ func TestAwsNATGateway_usage(t *testing.T) {
 		resource "infracost_aws_nat_gateway" "nat" {
 			resources = [aws_nat_gateway.nat.id]
 
-			gb_data_processed_monthly {
+			monthly_gb_data_processed {
 				value = 100
 			}
 		}

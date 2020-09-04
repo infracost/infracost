@@ -13,6 +13,7 @@ var ResourceRegistry map[string]schema.ResourceFunc = map[string]schema.Resource
 	"aws_ecs_service":          NewECSService,
 	"aws_elb":                  NewELB,
 	"aws_instance":             NewInstance,
+	"aws_lambda_function":      NewLambdaFunction,
 	"aws_lb":                   NewLB,
 	"aws_nat_gateway":          NewNATGateway,
 	"aws_rds_cluster_instance": NewRDSClusterInstance,

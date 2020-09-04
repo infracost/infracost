@@ -10,8 +10,8 @@ func NewNATGateway(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 	region := d.Get("region").String()
 
 	gbDataProcessed := decimal.Zero
-	if u != nil && u.Get("gb_data_processed_monthly.0.value").Exists() {
-		gbDataProcessed = decimal.NewFromFloat(u.Get("gb_data_processed_monthly.0.value").Float())
+	if u != nil && u.Get("monthly_gb_data_processed.0.value").Exists() {
+		gbDataProcessed = decimal.NewFromFloat(u.Get("monthly_gb_data_processed.0.value").Float())
 	}
 
 	return &schema.Resource{
