@@ -19,12 +19,12 @@ func NewLambdaFunction(d *schema.ResourceData, u *schema.ResourceData) *schema.R
 		memorySize = decimal.NewFromInt(d.Get("memory_size").Int())
 	}
 
-	requestDuration := decimal.Zero
-	if u != nil && u.Get("request_duration.0.value").Exists() {
-		requestDuration = decimal.NewFromFloat(u.Get("request_duration.0.value").Float())
+	averageRequestDuration := decimal.Zero
+	if u != nil && u.Get("average_request_duration.0.value").Exists() {
+		averageRequestDuration = decimal.NewFromFloat(u.Get("average_request_duration.0.value").Float())
 	}
 
-	gbSeconds := calculateGBSeconds(memorySize, requestDuration, monthlyRequests)
+	gbSeconds := calculateGBSeconds(memorySize, averageRequestDuration, monthlyRequests)
 
 	return &schema.Resource{
 		Name: d.Address,
@@ -63,8 +63,8 @@ func NewLambdaFunction(d *schema.ResourceData, u *schema.ResourceData) *schema.R
 	}
 }
 
-func calculateGBSeconds(memorySize decimal.Decimal, requestDuration decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
+func calculateGBSeconds(memorySize decimal.Decimal, averageRequestDuration decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
 	gb := memorySize.Div(decimal.NewFromInt(1024))
-	seconds := requestDuration.Div(decimal.NewFromInt(100)).Ceil().Mul(decimal.NewFromFloat(0.1)) // Round up to closest 100ms and convert to seconds
+	seconds := averageRequestDuration.Div(decimal.NewFromInt(100)).Ceil().Mul(decimal.NewFromFloat(0.1)) // Round up to closest 100ms and convert to seconds
 	return monthlyRequests.Mul(gb).Mul(seconds)
 }

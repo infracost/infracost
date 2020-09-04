@@ -55,7 +55,7 @@ resource "aws_lambda_function" "lambda" {
 #     value = 100000
 #   }
 
-#   request_duration {
+#   average_request_duration {
 #     value = 350
 #   }
 # }

@@ -71,7 +71,7 @@ func TestLambdaFunction_usage(t *testing.T) {
 				value = 100000
 			}
 
-			request_duration {
+			average_request_duration {
 				value = 350
 			}
 		}`
