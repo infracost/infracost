@@ -31,7 +31,7 @@ sudo mv /tmp/infracost-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64 /usr/local
 
 Generate a cost breakdown from a Terraform directory:
 ```sh
-infracost --tfdir examples/small_terraform
+infracost --tfdir examples/terraform
 ```
 
 Check the [docs site](https://docs.infracost.io) for more details.
