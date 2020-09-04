@@ -30,9 +30,13 @@ func getTreePrefix(lineItem int, lineItemCount int) string {
 	return "├─"
 }
 
-func formatDecimal(d decimal.Decimal, format string) string {
+func formatCost(d decimal.Decimal) string {
 	f, _ := d.Float64()
-	return fmt.Sprintf(format, f)
+	if f < 0.00005 && f != 0 {
+		return fmt.Sprintf("%.g", f)
+	} else {
+		return fmt.Sprintf("%.4f", f)
+	}
 }
 
 func formatQuantity(quantity decimal.Decimal) string {
@@ -89,9 +93,9 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), costComponent.Name),
 				formatQuantity(*costComponent.MonthlyQuantity),
 				costComponent.Unit,
-				formatDecimal(costComponent.Price(), "%.4f"),
-				formatDecimal(costComponent.HourlyCost(), "%.4f"),
-				formatDecimal(costComponent.MonthlyCost(), "%.4f"),
+				formatCost(costComponent.Price()),
+				formatCost(costComponent.HourlyCost()),
+				formatCost(costComponent.MonthlyCost()),
 			}
 			table.Rich(row, color)
 		}
@@ -104,9 +108,9 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 					fmt.Sprintf("%s %s (%s)", getTreePrefix(lineItem, lineItemCount), costComponent.Name, subResource.Name),
 					formatQuantity(*costComponent.MonthlyQuantity),
 					costComponent.Unit,
-					formatDecimal(costComponent.Price(), "%.4f"),
-					formatDecimal(costComponent.HourlyCost(), "%.4f"),
-					formatDecimal(costComponent.MonthlyCost(), "%.4f"),
+					formatCost(costComponent.Price()),
+					formatCost(costComponent.HourlyCost()),
+					formatCost(costComponent.MonthlyCost()),
 				}
 				table.Rich(row, color)
 			}
@@ -117,8 +121,8 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 			"",
 			"",
 			"",
-			formatDecimal(resource.HourlyCost(), "%.4f"),
-			formatDecimal(resource.MonthlyCost(), "%.4f"),
+			formatCost(resource.HourlyCost()),
+			formatCost(resource.MonthlyCost()),
 		})
 		table.Append([]string{"", "", "", "", "", ""})
 
@@ -131,8 +135,8 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 		"",
 		"",
 		"",
-		formatDecimal(overallTotalHourly, "%.4f"),
-		formatDecimal(overallTotalMonthly, "%.4f"),
+		formatCost(overallTotalHourly),
+		formatCost(overallTotalMonthly),
 	})
 
 	table.Render()
