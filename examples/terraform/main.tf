@@ -38,7 +38,6 @@ resource "aws_nat_gateway" "nat" {
 #   }
 # }
 
-
 resource "aws_lambda_function" "lambda" {
   function_name = "lambda_function_name"
   role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
