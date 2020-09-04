@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"infracost/internal/providers/terraform"
 	"infracost/pkg/config"
@@ -10,6 +11,7 @@ import (
 	"infracost/pkg/prices"
 	"infracost/pkg/schema"
 
+	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -103,6 +105,13 @@ func main() {
 				os.Exit(1)
 			}
 
+			s := spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
+			if !c.Bool("no-color") {
+				_ = s.Color("fgHiGreen", "bold")
+			}
+			s.Suffix = " Calculating costs…"
+			s.Start()
+
 			resources, err := provider.LoadResources()
 			if err != nil {
 				return err
@@ -126,6 +135,7 @@ func main() {
 			if err != nil {
 				return err
 			}
+			s.Stop()
 
 			fmt.Println(string(out))
 
