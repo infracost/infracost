@@ -11,6 +11,7 @@ if [ ! -z ${2+x} ]; then
   install_path=${2}
 fi
 
+# This isn't needed, but can be set if you hit rate limiting
 if [ ! -z $GITHUB_ACCESS_TOKEN} ]; then
   github_headers="-H 'Authorization: token ${GITHUB_ACCESS_TOKEN}'"
 fi
