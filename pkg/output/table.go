@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"infracost/pkg/config"
-	"infracost/pkg/schema"
+	"github.com/infracost/infracost/pkg/config"
+	"github.com/infracost/infracost/pkg/schema"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/shopspring/decimal"

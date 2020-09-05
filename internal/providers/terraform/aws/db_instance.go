@@ -1,8 +1,9 @@
 package aws
 
 import (
-	"infracost/pkg/schema"
 	"strings"
+
+	"github.com/infracost/infracost/pkg/schema"
 
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"

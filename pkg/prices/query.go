@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"infracost/pkg/config"
-	"infracost/pkg/schema"
+	"github.com/infracost/infracost/pkg/config"
+	"github.com/infracost/infracost/pkg/schema"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"

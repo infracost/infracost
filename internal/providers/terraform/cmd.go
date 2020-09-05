@@ -3,9 +3,10 @@ package terraform
 import (
 	"bufio"
 	"bytes"
-	"infracost/pkg/config"
 	"os"
 	"os/exec"
+
+	"github.com/infracost/infracost/pkg/config"
 
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"

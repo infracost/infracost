@@ -1,6 +1,6 @@
 package aws
 
-import "infracost/pkg/schema"
+import "github.com/infracost/infracost/pkg/schema"
 
 var ResourceRegistry map[string]schema.ResourceFunc = map[string]schema.ResourceFunc{
 	"aws_alb":                  NewLB, // alias for aws_lb

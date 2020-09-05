@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"infracost/pkg/schema"
+	"github.com/infracost/infracost/pkg/schema"
 
 	"github.com/tidwall/gjson"
 )

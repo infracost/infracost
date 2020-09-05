@@ -2,8 +2,9 @@ package testutil
 
 import (
 	"fmt"
-	"infracost/pkg/schema"
 	"testing"
+
+	"github.com/infracost/infracost/pkg/schema"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/shopspring/decimal"

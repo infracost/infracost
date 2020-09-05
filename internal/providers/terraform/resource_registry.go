@@ -1,9 +1,11 @@
 package terraform
 
 import (
-	"infracost/internal/providers/terraform/aws"
-	"infracost/pkg/schema"
 	"sync"
+
+	"github.com/infracost/infracost/pkg/schema"
+
+	"github.com/infracost/infracost/internal/providers/terraform/aws"
 )
 
 type resourceRegistrySingleton map[string]schema.ResourceFunc

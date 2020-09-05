@@ -2,7 +2,8 @@ package output
 
 import (
 	"encoding/json"
-	"infracost/pkg/schema"
+
+	"github.com/infracost/infracost/pkg/schema"
 )
 
 type costComponentJSON struct {

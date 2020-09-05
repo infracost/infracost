@@ -3,14 +3,16 @@ package tftest
 import (
 	"flag"
 	"fmt"
-	"infracost/internal/providers/terraform"
-	"infracost/pkg/prices"
-	"infracost/pkg/schema"
-	"infracost/pkg/testutil"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/infracost/infracost/pkg/prices"
+	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/pkg/testutil"
+
+	"github.com/infracost/infracost/internal/providers/terraform"
 
 	"github.com/urfave/cli/v2"
 )
