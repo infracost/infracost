@@ -5,11 +5,12 @@ import (
 	"os"
 	"time"
 
-	"infracost/internal/providers/terraform"
-	"infracost/pkg/config"
-	"infracost/pkg/output"
-	"infracost/pkg/prices"
-	"infracost/pkg/schema"
+	"github.com/infracost/infracost/pkg/config"
+	"github.com/infracost/infracost/pkg/output"
+	"github.com/infracost/infracost/pkg/prices"
+	"github.com/infracost/infracost/pkg/schema"
+
+	"github.com/infracost/infracost/internal/providers/terraform"
 
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"

@@ -2,7 +2,8 @@ package aws
 
 import (
 	"fmt"
-	"infracost/pkg/schema"
+
+	"github.com/infracost/infracost/pkg/schema"
 
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"

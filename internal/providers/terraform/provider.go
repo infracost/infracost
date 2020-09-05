@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"infracost/pkg/schema"
+	"github.com/infracost/infracost/pkg/schema"
 
 	"github.com/urfave/cli/v2"
 )

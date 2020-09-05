@@ -2,9 +2,10 @@ package aws
 
 import (
 	"fmt"
-	"infracost/pkg/schema"
 	"regexp"
 	"strings"
+
+	"github.com/infracost/infracost/pkg/schema"
 
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"

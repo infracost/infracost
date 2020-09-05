@@ -1,6 +1,6 @@
 package aws
 
-import "infracost/pkg/schema"
+import "github.com/infracost/infracost/pkg/schema"
 
 func NewELB(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	productFamily := "Load Balancer"
