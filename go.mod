@@ -1,4 +1,4 @@
-module infracost
+module github.com/infracost/infracost
 
 go 1.14
 
