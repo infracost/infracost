@@ -22,13 +22,13 @@ build:
 	go build -i -v -o build/$(BINARY) $(ENTRYPOINT)
 
 windows:
-	env GOOS=windows GOARCH=amd64 go build -i -v -o build/$(BINARY)-windows-amd64 $(ENTRYPOINT)
+	env GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -i -v -o build/$(BINARY)-windows-amd64 $(ENTRYPOINT)
 
 linux:
-	env GOOS=linux GOARCH=amd64 go build -i -v -o build/$(BINARY)-linux-amd64 $(ENTRYPOINT)
+	env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -i -v -o build/$(BINARY)-linux-amd64 $(ENTRYPOINT)
 
 darwin:
-	env GOOS=darwin GOARCH=amd64 go build -i -v -o build/$(BINARY)-darwin-amd64 $(ENTRYPOINT)
+	env GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -i -v -o build/$(BINARY)-darwin-amd64 $(ENTRYPOINT)
 
 build_all: build windows linux darwin
 
