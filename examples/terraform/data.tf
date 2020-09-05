@@ -1,4 +1,16 @@
 # https://github.com/localstack/localstack could also be used to speed-up dev/test
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+    }
+    # TODO Enable once we have released terraform-provider-infracost
+    # infracost = {
+    #   source = "infracost.io/infracost/infracost"
+    # }
+  }
+}
+
 provider "aws" {
   region                      = "us-east-1"
   s3_force_path_style         = true
@@ -8,6 +20,9 @@ provider "aws" {
   access_key                  = "mock_access_key"
   secret_key                  = "mock_secret_key"
 }
+
+# TODO Enable once we have released terraform-provider-infracost
+# provider "infracost" {}
 
 data "aws_region" "current" {}
 
