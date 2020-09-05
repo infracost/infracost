@@ -1,7 +1,16 @@
 BINARY := infracost
 ENTRYPOINT := cmd/infracost/main.go
+TERRAFORM_PROVIDER_INFRACOST_VERSION := latest
 
-.PHONY: deps run build windows linux darwin build_all clean test fmt lint
+ifndef $(GOOS)
+	GOOS=$(shell go env GOOS)
+endif
+
+ifndef $(GOARCH)
+	GOARCH=$(shell go env GOARCH)
+endif
+
+.PHONY: deps run build windows linux darwin build_all release install_provider clean test fmt lint
 
 deps:
 	go mod download
@@ -28,10 +37,12 @@ release: build_all
 	cd build; tar -czf $(BINARY)-linux-amd64.tar.gz $(BINARY)-linux-amd64
 	cd build; tar -czf $(BINARY)-darwin-amd64.tar.gz $(BINARY)-darwin-amd64
 
+install_provider:
+	scripts/install_provider.sh $(TERRAFORM_PROVIDER_INFRACOST_VERSION)
+
 clean:
 	go clean
 	rm -rf build/$(BINARY)*
-	rm -rf release/$(BINARY)*
 
 test:
 	go test ./... $(or $(ARGS), -v -cover)

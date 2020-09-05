@@ -6,7 +6,7 @@ When adding a new resource to infracost, a `productFilter` has to be added that 
 
 * On MacOS prepare the requirements with 
 ```sh
-source requrements.sh
+source requirements.sh
 ```
 
 * Identify the `service` name by searching some keywords for the resource name in the json file downloaded from the AWS API. The reason we do not query the graphQL API, is that it only returns a limited number of responses, and as there are lots of products in AWS, our desired resource service name might not be included in the returned responses (try with `AmazonRDS` and you'll see).

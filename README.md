@@ -31,7 +31,7 @@ sudo mv /tmp/infracost-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64 /usr/local
 
 Generate a cost breakdown from a Terraform directory:
 ```sh
-infracost --tfdir examples/small_terraform
+infracost --tfdir examples/terraform
 ```
 
 Check the [docs site](https://docs.infracost.io) for more details.
@@ -42,9 +42,14 @@ The [Infracost GitHub action](https://github.com/marketplace/actions/run-infraco
 
 ## Development
 
-Install dependencies:
+Install Go dependencies:
 ```sh
 make deps
+```
+
+Install latest version of terraform-provider-infracost. If you want to use a local development version see [#using-a-local-version-of-terraform-provider-infracost](#using-a-local-version-of-terraform-provider-infracost)
+```sh
+make install_provider
 ```
 
 Run the code:
@@ -66,6 +71,17 @@ Build:
 ```sh
 make build
 ```
+
+### Using a local version of terraform-provider-infracost
+
+To use a local development version of terraform-provider-infracost
+
+1. Fork/clone the [terraform-provider-infracost repository](https://github.com/infracost/terraform-provider-infracost)
+
+2. Inside the directory that you cloned the repository run the following to install the local version in your `~/.terraform.d/plugins` directory:
+  ```sh
+  make install
+  ```
 
 ## Contributing
 

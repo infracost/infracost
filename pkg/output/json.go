@@ -2,53 +2,59 @@ package output
 
 import (
 	"encoding/json"
-	"infracost/pkg/costs"
-
-	"github.com/shopspring/decimal"
+	"infracost/pkg/schema"
 )
 
-type PriceComponentCostJSON struct {
-	PriceComponent string          `json:"priceComponent"`
-	Quantity       decimal.Decimal `json:"quantity"`
-	Unit           string          `json:"unit"`
-	HourlyCost     decimal.Decimal `json:"hourlyCost"`
-	MonthlyCost    decimal.Decimal `json:"monthlyCost"`
+type costComponentJSON struct {
+	Name            string `json:"name"`
+	Unit            string `json:"unit"`
+	HourlyQuantity  string `json:"hourlyQuantity"`
+	MonthlyQuantity string `json:"monthlyQuantity"`
+	Price           string `json:"price"`
+	HourlyCost      string `json:"hourlyCost"`
+	MonthlyCost     string `json:"monthlyCost"`
 }
 
-type ResourceCostBreakdownJSON struct {
-	Resource     string                      `json:"resource"`
-	Breakdown    []PriceComponentCostJSON    `json:"breakdown"`
-	SubResources []ResourceCostBreakdownJSON `json:"subresources,omitempty"`
+type resourceJSON struct {
+	Name           string              `json:"name"`
+	HourlyCost     string              `json:"hourlyCost"`
+	MonthlyCost    string              `json:"monthlyCost"`
+	CostComponents []costComponentJSON `json:"costComponents,omitempty"`
+	SubResources   []resourceJSON      `json:"subresources,omitempty"`
 }
 
-func createJSONObj(breakdown costs.ResourceCostBreakdown) ResourceCostBreakdownJSON {
-	priceComponentCostJSONs := make([]PriceComponentCostJSON, 0, len(breakdown.PriceComponentCosts))
-	for _, priceComponentCost := range breakdown.PriceComponentCosts {
-		priceComponentCostJSONs = append(priceComponentCostJSONs, PriceComponentCostJSON{
-			PriceComponent: priceComponentCost.PriceComponent.Name(),
-			Quantity:       priceComponentCost.PriceComponent.Quantity().Round(6),
-			Unit:           priceComponentCost.PriceComponent.Unit(),
-			HourlyCost:     priceComponentCost.HourlyCost.Round(6),
-			MonthlyCost:    priceComponentCost.MonthlyCost.Round(6),
+func newResourceJSON(resource *schema.Resource) resourceJSON {
+	costComponentJSONs := make([]costComponentJSON, 0, len(resource.CostComponents))
+	for _, costComponent := range resource.CostComponents {
+		costComponentJSONs = append(costComponentJSONs, costComponentJSON{
+			Name:            costComponent.Name,
+			Unit:            costComponent.Unit,
+			HourlyQuantity:  costComponent.HourlyQuantity.String(),
+			MonthlyQuantity: costComponent.MonthlyQuantity.String(),
+			Price:           costComponent.Price().String(),
+			HourlyCost:      costComponent.HourlyCost().String(),
+			MonthlyCost:     costComponent.MonthlyCost().String(),
 		})
 	}
 
-	subResourcesCostBreakdownJSONs := make([]ResourceCostBreakdownJSON, 0, len(breakdown.SubResourceCosts))
-	for _, subResourceBreakdown := range breakdown.SubResourceCosts {
-		subResourcesCostBreakdownJSONs = append(subResourcesCostBreakdownJSONs, createJSONObj(subResourceBreakdown))
+	subResourceJSONs := make([]resourceJSON, 0, len(resource.SubResources))
+	for _, subResource := range resource.SubResources {
+		subResourceJSONs = append(subResourceJSONs, newResourceJSON(subResource))
 	}
 
-	return ResourceCostBreakdownJSON{
-		Resource:     breakdown.Resource.Address(),
-		Breakdown:    priceComponentCostJSONs,
-		SubResources: subResourcesCostBreakdownJSONs,
+	return resourceJSON{
+		Name:           resource.Name,
+		HourlyCost:     resource.HourlyCost().String(),
+		MonthlyCost:    resource.MonthlyCost().String(),
+		CostComponents: costComponentJSONs,
+		SubResources:   subResourceJSONs,
 	}
 }
 
-func ToJSON(resourceCostBreakdowns []costs.ResourceCostBreakdown) ([]byte, error) {
-	jsonObjs := make([]ResourceCostBreakdownJSON, 0, len(resourceCostBreakdowns))
-	for _, breakdown := range resourceCostBreakdowns {
-		jsonObjs = append(jsonObjs, createJSONObj(breakdown))
+func ToJSON(resources []*schema.Resource) ([]byte, error) {
+	resourceJSONs := make([]resourceJSON, 0, len(resources))
+	for _, resource := range resources {
+		resourceJSONs = append(resourceJSONs, newResourceJSON(resource))
 	}
-	return json.Marshal(jsonObjs)
+	return json.Marshal(resourceJSONs)
 }
