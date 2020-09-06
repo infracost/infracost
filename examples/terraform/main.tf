@@ -30,7 +30,7 @@ resource "aws_nat_gateway" "nat" {
 }
 
 # TODO Enable once we have released terraform-provider-infracost
-# resource "infracost_aws_nat_gateway" "nat" {
+# data "infracost_aws_nat_gateway" "nat" {
 #   resources = [aws_nat_gateway.nat.id]
 
 #   monthly_gb_data_processed {
@@ -47,7 +47,7 @@ resource "aws_lambda_function" "lambda" {
 }
 
 # TODO Enable once we have released terraform-provider-infracost
-# resource "infracost_aws_lambda_function" "lambda" {
+# data "infracost_aws_lambda_function" "lambda" {
 #   resources = [aws_lambda_function.lambda.id]
 
 #   monthly_requests {
