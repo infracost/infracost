@@ -3,12 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
-	"infracost/pkg/config"
-	"infracost/pkg/costs"
-	"infracost/pkg/output"
-	"infracost/pkg/parsers/terraform"
+	"github.com/infracost/infracost/pkg/config"
+	"github.com/infracost/infracost/pkg/output"
+	"github.com/infracost/infracost/pkg/prices"
+	"github.com/infracost/infracost/pkg/schema"
 
+	"github.com/infracost/infracost/internal/providers/terraform"
+
+	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -41,16 +45,15 @@ func main() {
 				Usage:     "Path to the Terraform project directory",
 				TakesFile: true,
 			},
-			&cli.BoolFlag{
-				Name:    "verbose",
-				Aliases: []string{"v"},
-				Usage:   "Verbosity",
-				Value:   false,
+			&cli.StringFlag{
+				Name:  "log-level",
+				Usage: "Log level (TRACE, DEBUG, INFO, WARN, ERROR)",
+				Value: "WARN",
 			},
 			&cli.StringFlag{
 				Name:    "output",
 				Aliases: []string{"o"},
-				Usage:   "Output (json|table)",
+				Usage:   "Output (json, table)",
 				Value:   "table",
 			},
 			&cli.BoolFlag{
@@ -70,79 +73,70 @@ func main() {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			var planJSON []byte
-
 			if c.Bool("no-color") {
 				config.Config.NoColor = true
 				formatter.DisableColors = true
 				color.NoColor = true
 			}
 
-			logLevel := log.InfoLevel
-			if c.Bool("verbose") {
-				logLevel = log.DebugLevel
+			if c.String("log-level") != "" {
+				switch c.String("log-level") {
+				case "TRACE":
+					log.SetLevel(log.TraceLevel)
+				case "DEBUG":
+					log.SetLevel(log.DebugLevel)
+				case "INFO":
+					log.SetLevel(log.InfoLevel)
+				case "WARN":
+					log.SetLevel(log.WarnLevel)
+				case "ERROR":
+					log.SetLevel(log.ErrorLevel)
+				}
 			}
-			log.SetLevel(logLevel)
 
 			if c.String("api-url") != "" {
 				config.Config.ApiUrl = c.String("api-url")
 			}
 
-			if c.String("tfjson") != "" && c.String("tfplan") != "" {
-				color.HiRed("Please only provide one of either a Terraform Plan JSON file (tfjson) or a Terraform Plan file (tfplan)")
+			provider := terraform.Provider()
+			err := provider.ProcessArgs(c)
+			if err != nil {
+				color.HiRed(err.Error())
 				_ = cli.ShowAppHelp(c)
 				os.Exit(1)
 			}
 
-			if c.String("tfplan") != "" && c.String("tfdir") == "" {
-				color.HiRed("Please provide a path to the Terrafrom project (tfdir) if providing a Terraform Plan file (tfplan)\n\n")
-				_ = cli.ShowAppHelp(c)
-				os.Exit(1)
+			s := spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
+			if !c.Bool("no-color") {
+				_ = s.Color("fgHiGreen", "bold")
 			}
+			s.Suffix = " Calculating costs…"
+			s.Start()
 
-			if c.String("tfjson") == "" && c.String("tfdir") == "" {
-				color.HiRed("Please provide either the path to the Terrafrom project (tfdir) or a Terraform Plan JSON file (tfjson)")
-				_ = cli.ShowAppHelp(c)
-				os.Exit(1)
-			}
-
-			var err error
-			if c.String("tfjson") != "" {
-				planJSON, err = terraform.LoadPlanJSON(c.String("tfjson"))
-				if err != nil {
-					return err
-				}
-			} else {
-				planFile := c.String("tfplan")
-				planJSON, err = terraform.GeneratePlanJSON(c.String("tfdir"), planFile)
-				if err != nil {
-					return err
-				}
-			}
-
-			resources, err := terraform.ParsePlanJSON(planJSON)
+			resources, err := provider.LoadResources()
 			if err != nil {
 				return err
 			}
-
-			q := costs.NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
-			resourceCostBreakdowns, err := costs.GenerateCostBreakdowns(q, resources)
+			err = prices.PopulatePrices(resources)
 			if err != nil {
 				return err
 			}
+			schema.CalculateCosts(resources)
+			schema.SortResources(resources)
 
 			var out []byte
 			switch c.String("output") {
 			case "table":
-				out, err = output.ToTable(resourceCostBreakdowns)
+				out, err = output.ToTable(resources)
 			case "json":
-				out, err = output.ToJSON(resourceCostBreakdowns)
+				out, err = output.ToJSON(resources)
 			default:
 				err = cli.ShowAppHelp(c)
 			}
 			if err != nil {
 				return err
 			}
+			s.Stop()
 
 			fmt.Println(string(out))
 
