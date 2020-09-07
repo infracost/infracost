@@ -3,6 +3,7 @@ package terraform
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/infracost/infracost/pkg/schema"
@@ -114,14 +115,24 @@ func parseReferences(resourceDataMap map[string]*schema.ResourceData, configurat
 	for address, resourceData := range resourceDataMap {
 		resourceConfigJSON := getConfigurationJSONForResourceAddress(configurationJSON, address)
 
-		var refAddressesMap = make(map[string][]string)
+		var referencesMap = make(map[string][]string)
 		for attribute, attributeJSON := range resourceConfigJSON.Get("expressions").Map() {
-			getReferenceAddresses(resourceData, attribute, attributeJSON, &refAddressesMap)
+			getReferences(resourceData, attribute, attributeJSON, &referencesMap)
 		}
 
-		for attribute, refAddresses := range refAddressesMap {
-			for _, refAddress := range refAddresses {
-				fullRefAddress := fmt.Sprintf("%s%s", addressModulePart(address), refAddress)
+		resourceCountIndex := addressCountIndex(address)
+
+		for attribute, references := range referencesMap {
+			referenceHasCount := containsString(references, "count.index")
+			for _, reference := range references {
+				if reference == "count.index" {
+					continue
+				}
+				arrayPart := ""
+				if referenceHasCount {
+					arrayPart = fmt.Sprintf("[%d]", resourceCountIndex)
+				}
+				fullRefAddress := fmt.Sprintf("%s%s%s", addressModulePart(address), reference, arrayPart)
 				if refResourceData, ok := resourceDataMap[fullRefAddress]; ok {
 					resourceData.AddReference(attribute, refResourceData)
 				}
@@ -130,21 +141,21 @@ func parseReferences(resourceDataMap map[string]*schema.ResourceData, configurat
 	}
 }
 
-func getReferenceAddresses(resourceData *schema.ResourceData, attribute string, attributeJSON gjson.Result, refAddressesMap *map[string][]string) {
+func getReferences(resourceData *schema.ResourceData, attribute string, attributeJSON gjson.Result, referencesMap *map[string][]string) {
 	if attributeJSON.Get("references").Exists() {
 		for _, ref := range attributeJSON.Get("references").Array() {
-			if _, ok := (*refAddressesMap)[attribute]; !ok {
-				(*refAddressesMap)[attribute] = make([]string, 0, 1)
+			if _, ok := (*referencesMap)[attribute]; !ok {
+				(*referencesMap)[attribute] = make([]string, 0, 1)
 			}
-			(*refAddressesMap)[attribute] = append((*refAddressesMap)[attribute], ref.String())
+			(*referencesMap)[attribute] = append((*referencesMap)[attribute], ref.String())
 		}
 	} else if attributeJSON.IsArray() {
 		for i, attributeJSONItem := range attributeJSON.Array() {
-			getReferenceAddresses(resourceData, fmt.Sprintf("%s.%d", attribute, i), attributeJSONItem, refAddressesMap)
+			getReferences(resourceData, fmt.Sprintf("%s.%d", attribute, i), attributeJSONItem, referencesMap)
 		}
 	} else if attributeJSON.Type.String() == "JSON" {
 		attributeJSON.ForEach(func(childAttribute gjson.Result, childAttributeJSON gjson.Result) bool {
-			getReferenceAddresses(resourceData, fmt.Sprintf("%s.%s", attribute, childAttribute), childAttributeJSON, refAddressesMap)
+			getReferences(resourceData, fmt.Sprintf("%s.%s", attribute, childAttribute), childAttributeJSON, referencesMap)
 			return true
 		})
 	}
@@ -153,7 +164,7 @@ func getReferenceAddresses(resourceData *schema.ResourceData, attribute string, 
 func getConfigurationJSONForResourceAddress(configurationJSON gjson.Result, address string) gjson.Result {
 	moduleNames := addressModuleNames(address)
 	moduleConfigJSON := getConfigurationJSONForModulePath(configurationJSON, moduleNames)
-	resourceKey := fmt.Sprintf(`resources.#(address="%s")`, stripAddressArray(addressResourcePart(address)))
+	resourceKey := fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(address)))
 	return moduleConfigJSON.Get(resourceKey)
 }
 
@@ -219,8 +230,27 @@ func addressModuleNames(address string) []string {
 	return moduleNames
 }
 
-func stripAddressArray(address string) string {
+func addressCountIndex(address string) int {
+	r := regexp.MustCompile(`\[(\d+)\]`)
+	match := r.FindStringSubmatch(address)
+	if len(match) > 0 {
+		i, _ := strconv.Atoi(match[1])
+		return i
+	}
+	return -1
+}
+
+func removeAddressArrayPart(address string) string {
 	r := regexp.MustCompile(`([^\[]+)`)
 	match := r.FindStringSubmatch(addressResourcePart(address))
 	return match[1]
+}
+
+func containsString(arr []string, s string) bool {
+	for _, item := range arr {
+		if item == s {
+			return true
+		}
+	}
+	return false
 }
