@@ -36,6 +36,9 @@ func NewRDSClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *sche
 						{Key: "databaseEngine", Value: databaseEngine},
 					},
 				},
+				PriceFilter: &schema.PriceFilter{
+					PurchaseOption: strPtr("on_demand"),
+				},
 			},
 		},
 	}
