@@ -35,6 +35,9 @@ zip=$(ls ${tmp_dir} | grep "terraform-provider-infracost.*\.zip")
 unzip -od ${tmp_dir} ${tmp_dir}/${zip} && rm ${tmp_dir}/${zip}
 binary=$(ls ${tmp_dir} | grep "terraform-provider-infracost")
 
+# Strip any v prefix from the version
+version=${version#"v"}
+
 # If the install path isn't set then use the default Terraform plugin install paths
 if [ -z ${install_path+x} ]; then
   plugin_root_path=${HOME}/.terraform.d/plugins
