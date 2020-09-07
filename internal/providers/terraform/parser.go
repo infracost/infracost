@@ -183,13 +183,23 @@ func isInfracostResource(resourceData *schema.ResourceData) bool {
 
 func addressResourcePart(address string) string {
 	addressParts := strings.Split(address, ".")
-	resourceParts := addressParts[len(addressParts)-2:]
+	var resourceParts []string
+	if len(addressParts) >= 3 && addressParts[len(addressParts)-3] == "data" {
+		resourceParts = addressParts[len(addressParts)-3:]
+	} else {
+		resourceParts = addressParts[len(addressParts)-2:]
+	}
 	return strings.Join(resourceParts, ".")
 }
 
 func addressModulePart(address string) string {
 	addressParts := strings.Split(address, ".")
-	moduleParts := addressParts[:len(addressParts)-2]
+	var moduleParts []string
+	if len(addressParts) >= 3 && addressParts[len(addressParts)-3] == "data" {
+		moduleParts = addressParts[:len(addressParts)-3]
+	} else {
+		moduleParts = addressParts[:len(addressParts)-2]
+	}
 	if len(moduleParts) == 0 {
 		return ""
 	} else {
@@ -210,10 +220,7 @@ func addressModuleNames(address string) []string {
 }
 
 func stripAddressArray(address string) string {
-	addressParts := strings.Split(address, ".")
-	resourceParts := addressParts[len(addressParts)-2:]
-
 	r := regexp.MustCompile(`([^\[]+)`)
-	match := r.FindStringSubmatch(strings.Join(resourceParts, "."))
+	match := r.FindStringSubmatch(addressResourcePart(address))
 	return match[1]
 }

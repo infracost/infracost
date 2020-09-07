@@ -1,6 +1,6 @@
-<img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/logo.svg" width=320 alt="Infracost logo" />
+<a href="https://www.infracost.io"><img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/logo.svg" width=320 alt="Infracost logo" /></a>
 
-<a href="https://docs.infracost.io"><img alt="Docs" src="https://img.shields.io/badge/docs-blue"/></a>
+<a href="https://www.infracost.io/docs/"><img alt="Docs" src="https://img.shields.io/badge/docs-blue"/></a>
 <a href="https://discord.gg/Cu9ftEg"><img alt="Discord Chat" src="https://img.shields.io/discord/746703155953270794.svg"/></a>
 <a href="https://github.com/infracost/infracost/actions?query=workflow%3AGo+branch%3Amaster"><img alt="Build Status" src="https://img.shields.io/github/workflow/status/infracost/infracost/Go/master"/></a>
 <a href="https://hub.docker.com/r/infracost/infracost/tags"><img alt="Docker Image" src="https://img.shields.io/docker/cloud/build/infracost/infracost"/></a>
@@ -11,7 +11,7 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
 ## Table of Contents
 
-**Checkout the [docs site](https://docs.infracost.io) for detailed usage options, supported resources and more information.**
+**Checkout the [docs site](https://www.infracost.io/docs/) for detailed usage options, supported resources and more information.**
 
 * [Installation](#installation)
 * [Usage](#basic-usage)
@@ -34,7 +34,7 @@ Generate a cost breakdown from a Terraform directory:
 infracost --tfdir examples/terraform
 ```
 
-Check the [docs site](https://docs.infracost.io) for more details.
+Check the [docs site](https://www.infracost.io/docs/) for more details.
 
 The [Infracost GitHub action](https://github.com/marketplace/actions/run-infracost) can be used to automatically add a PR comment showing the cost estimate `diff` between a pull request and the master branch whenever Terraform files change.
 
