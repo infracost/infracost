@@ -53,7 +53,7 @@ func TestNATGateway_usage(t *testing.T) {
 			subnet_id     = "subnet-12345678"
 		}
 		
-		resource "infracost_aws_nat_gateway" "nat" {
+		data "infracost_aws_nat_gateway" "nat" {
 			resources = [aws_nat_gateway.nat.id]
 
 			monthly_gb_data_processed {

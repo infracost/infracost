@@ -65,7 +65,7 @@ func TestLambdaFunction_usage(t *testing.T) {
 			memory_size   = 512
 		}
 		
-		resource "infracost_aws_lambda_function" "lambda" {
+		data "infracost_aws_lambda_function" "lambda" {
 		  resources = [aws_lambda_function.lambda.id, aws_lambda_function.lambda_512_mem.id]
 
 			monthly_requests {
