@@ -20,21 +20,25 @@ When adding a new resource to infracost, a `productFilter` has to be added that 
 
 ## Usage
 
-* Find the `service` name by searching for a keyword for a name in the JSON file downloaded in the setup step. The reason we do not query the pricing service graphQL API is that it only returns a limited number of responses, and as there are lots of products in AWS, our desired resource service name might not be included in the returned responses.
+* List all available AWS `service` names, or find a `service` name by searching for a keyword or acronym in the JSON file downloaded in the setup step. AWS use many acronyms so be sure to search for those too, e.g. "ES" returns "AmazonES" for ElasticSearch. The reason we do not query the pricing service graphQL API is that it only returns a limited number of responses, and as there are lots of products in AWS, our desired service name might not be included in the returned responses.
+
+  List all available AWS service names:
 
   ```sh
-  ./1_find_services.sh <key-word>
+  ./1_find_services.sh
+  ```
+
+  Search for service name using a keyword/acronym:
+
+  ```sh
+  ./1_find_services.sh <keyword>
   ```
 
   For example, running `./1_find_services.sh rds` returns:
 
-    ```
-    "AmazonRDS" : {
-      "offerCode" : "AmazonRDS",
-      "versionIndexUrl" : "/offers/v1.0/aws/AmazonRDS/index.json",
-      "currentVersionUrl" : "/offers/v1.0/aws/AmazonRDS/current/index.json",
-      "currentRegionIndexUrl" : "/offers/v1.0/aws/AmazonRDS/current/region_index.json"
-    ```
+  ```sh
+  "offerCode" : "AmazonRDS",
+  ```
 
 * Find the desired `productFamily` using the `service` name found in the previous step:
 
@@ -87,3 +91,66 @@ When adding a new resource to infracost, a `productFilter` has to be added that 
     "PostgreSQL"
     "SQL Server"
     ```
+
+* When writing integration tests, a `PriceHash` is used to match the price of a cost component so the tests continue to pass even if the actual price value changes. To find a `PriceHash`, browse to [https://pricing.infracost.io/graphql](https://pricing.infracost.io/graphql) and use the following query/variables:
+
+  * query:
+
+  ```gql
+  query($productFilter: ProductFilter!, $priceFilter: PriceFilter) {
+    products(filter: $productFilter) {
+      prices(filter: $priceFilter) {
+        priceHash
+        USD
+      }
+    }
+  }
+  ```
+
+  * variables (edit as required):
+
+  ```gql
+  {
+    "priceFilter": {
+      "purchaseOption": "on_demand"
+    },
+    "productFilter": {
+      "service": "AmazonRDS",
+      "productFamily": "Database Instance",
+      "region": "us-east-1",
+      "attributeFilters": [
+        {
+          "key": "instanceType",
+          "value": "db.t3.medium"
+        },
+        {
+          "key": "databaseEngine",
+          "value": "MariaDB"
+        },
+        {
+          "key": "deploymentOption",
+          "value": "Single-AZ"
+        }
+      ]
+    }
+  }
+  ```
+
+  The above returns the following result, which you can manually verify by browsing to the AWS pricing page for the above product/filters. For example, [https://aws.amazon.com/rds/mariadb/pricing/](https://aws.amazon.com/rds/mariadb/pricing/) shows the hourly price as $0.068, which matches the following JSON:
+
+  ```json
+  {
+    "data": {
+      "products": [
+        {
+          "prices": [
+            {
+              "priceHash": "72dd84252654545b6f19c2e553efecde-d2c98780d7b6e36641b521f1f8145c6f",
+              "USD": "0.0680000000"
+            }
+          ]
+        }
+      ]
+    }
+  }
+  ```
