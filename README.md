@@ -87,6 +87,8 @@ To use a local development version of terraform-provider-infracost
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+Join our chat, we are a friendly bunch and happy to help you get started :) https://discord.gg/Cu9ftEg
+
 ## License
 
 [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0/)
