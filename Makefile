@@ -3,7 +3,7 @@ ENTRYPOINT := cmd/infracost/main.go
 TERRAFORM_PROVIDER_INFRACOST_VERSION := latest
 VERSION := $(shell scripts/get_version.sh HEAD)
 LD_FLAGS := -ldflags="-X 'github.com/infracost/infracost/pkg/version.Version=$(VERSION)'"
-BUILD_FLAGS := "$(LD_FLAGS) -i -v -o"
+BUILD_FLAGS := $(LD_FLAGS) -i -v -o
 
 ifndef $(GOOS)
 	GOOS=$(shell go env GOOS)
