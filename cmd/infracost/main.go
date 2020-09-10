@@ -18,13 +18,16 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func main() {
-	formatter := &log.TextFormatter{
-		DisableTimestamp:       true,
-		DisableLevelTruncation: true,
-	}
-	log.SetFormatter(formatter)
+var logFormatter log.TextFormatter = log.TextFormatter{
+	DisableTimestamp:       true,
+	DisableLevelTruncation: true,
+}
 
+func init() {
+	log.SetFormatter(&logFormatter)
+}
+
+func main() {
 	app := &cli.App{
 		Name:                 "infracost",
 		Usage:                "Generate cost reports from Terraform plans",
@@ -73,11 +76,11 @@ func main() {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			if c.Bool("no-color") {
-				config.Config.NoColor = true
-				formatter.DisableColors = true
-				color.NoColor = true
-			}
+			logFormatter.DisableColors = c.Bool("no-color")
+			log.SetFormatter(&logFormatter)
+
+			config.Config.NoColor = c.Bool("no-color")
+			color.NoColor = c.Bool("no-color")
 
 			if c.String("log-level") != "" {
 				switch c.String("log-level") {
