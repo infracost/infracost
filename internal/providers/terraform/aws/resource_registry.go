@@ -17,4 +17,5 @@ var ResourceRegistry map[string]schema.ResourceFunc = map[string]schema.Resource
 	"aws_lb":                   NewLB,
 	"aws_nat_gateway":          NewNATGateway,
 	"aws_rds_cluster_instance": NewRDSClusterInstance,
+	"aws_elasticsearch_domain": NewElasticsearchDomain,
 }
