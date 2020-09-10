@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/infracost/infracost/pkg/schema"
+	"github.com/pkg/errors"
 
 	"github.com/urfave/cli/v2"
 )
@@ -27,11 +28,11 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 	p.dir = c.String("tfdir")
 
 	if p.jsonFile != "" && p.planFile != "" {
-		return fmt.Errorf("Please only provide one of either a Terraform Plan JSON file (tfjson) or a Terraform Plan file (tfplan)")
+		return errors.New("Please provide either a Terraform Plan JSON file (tfjson) or a Terraform Plan file (tfplan)")
 	}
 
 	if p.planFile != "" && p.dir == "" {
-		return fmt.Errorf("Please provide a path to the Terrafrom project (tfdir) if providing a Terraform Plan file (tfplan)\n\n")
+		return errors.New("Please provide a path to the Terraform project (tfdir) if providing a Terraform Plan file (tfplan)")
 	}
 
 	return nil
@@ -43,14 +44,12 @@ func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
 
 	if p.jsonFile != "" {
 		planJSON, err = loadPlanJSON(p.jsonFile)
-		if err != nil {
-			return []*schema.Resource{}, err
-		}
 	} else {
 		planJSON, err = generatePlanJSON(p.dir, p.planFile)
-		if err != nil {
-			return []*schema.Resource{}, err
-		}
+	}
+
+	if err != nil {
+		return []*schema.Resource{}, errors.Wrap(err, "error loading resources")
 	}
 
 	schemaResources := parsePlanJSON(planJSON)
@@ -60,13 +59,15 @@ func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
 func loadPlanJSON(path string) ([]byte, error) {
 	planFile, err := os.Open(path)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, errors.Wrapf(err, "error opening file '%v'", path)
 	}
 	defer planFile.Close()
+
 	out, err := ioutil.ReadAll(planFile)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, errors.Wrapf(err, "error reading file '%v'", path)
 	}
+
 	return out, nil
 }
 
@@ -80,18 +81,18 @@ func generatePlanJSON(tfdir string, planPath string) ([]byte, error) {
 	if planPath == "" {
 		_, err = terraformCmd(opts, "init")
 		if err != nil {
-			return []byte{}, err
+			return []byte{}, errors.Wrap(err, "error initializing terraform working directory")
 		}
 
 		planfile, err := ioutil.TempFile(os.TempDir(), "tfplan")
 		if err != nil {
-			return []byte{}, err
+			return []byte{}, errors.Wrap(err, "error creating temporary file 'tfplan'")
 		}
 		defer os.Remove(planfile.Name())
 
 		_, err = terraformCmd(opts, "plan", "-input=false", "-lock=false", fmt.Sprintf("-out=%s", planfile.Name()))
 		if err != nil {
-			return []byte{}, err
+			return []byte{}, errors.Wrap(err, "error generating terraform execution plan")
 		}
 
 		planPath = planfile.Name()
@@ -99,7 +100,7 @@ func generatePlanJSON(tfdir string, planPath string) ([]byte, error) {
 
 	out, err := terraformCmd(opts, "show", "-json", planPath)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, errors.Wrap(err, "error inspecting terraform plan")
 	}
 
 	return out, nil
