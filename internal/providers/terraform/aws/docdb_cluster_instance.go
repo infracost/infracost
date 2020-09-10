@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/pkg/schema"
-
 	"github.com/shopspring/decimal"
 )
 
