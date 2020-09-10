@@ -51,7 +51,7 @@ func main() {
 			&cli.StringFlag{
 				Name:  "log-level",
 				Usage: "Log level (TRACE, DEBUG, INFO, WARN, ERROR)",
-				Value: "WARN",
+				Value: "INFO",
 			},
 			&cli.StringFlag{
 				Name:    "output",
@@ -82,20 +82,18 @@ func main() {
 			config.Config.NoColor = c.Bool("no-color")
 			color.NoColor = c.Bool("no-color")
 
-			if c.String("log-level") != "" {
-				switch c.String("log-level") {
+			switch strings.ToUpper(c.String("log-level")) {
 				case "TRACE":
 					log.SetLevel(log.TraceLevel)
 				case "DEBUG":
 					log.SetLevel(log.DebugLevel)
-				case "INFO":
-					log.SetLevel(log.InfoLevel)
 				case "WARN":
 					log.SetLevel(log.WarnLevel)
 				case "ERROR":
 					log.SetLevel(log.ErrorLevel)
+			default:
+				log.SetLevel(log.InfoLevel)
 				}
-			}
 
 			if c.String("api-url") != "" {
 				config.Config.ApiUrl = c.String("api-url")
