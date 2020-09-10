@@ -34,10 +34,6 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 		return fmt.Errorf("Please provide a path to the Terrafrom project (tfdir) if providing a Terraform Plan file (tfplan)\n\n")
 	}
 
-	if p.jsonFile == "" && p.dir == "" {
-		return fmt.Errorf("Please provide either the path to the Terrafrom project (tfdir) or a Terraform Plan JSON file (tfjson)")
-	}
-
 	return nil
 }
 
