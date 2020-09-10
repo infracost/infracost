@@ -46,6 +46,9 @@ func (d *ResourceData) Set(key string, value interface{}) {
 func AddRawValue(rawValues gjson.Result, key string, value interface{}) gjson.Result {
 	var unmarshalledJSON map[string]interface{}
 	_ = json.Unmarshal([]byte(rawValues.Raw), &unmarshalledJSON)
+	if unmarshalledJSON == nil {
+		unmarshalledJSON = make(map[string]interface{})
+	}
 	unmarshalledJSON[key] = value
 	marshalledJSON, _ := json.Marshal(unmarshalledJSON)
 	return gjson.ParseBytes(marshalledJSON)

@@ -1,6 +1,9 @@
 BINARY := infracost
 ENTRYPOINT := cmd/infracost/main.go
 TERRAFORM_PROVIDER_INFRACOST_VERSION := latest
+VERSION := $(shell scripts/get_version.sh HEAD)
+LD_FLAGS := -ldflags="-X 'github.com/infracost/infracost/pkg/version.Version=$(VERSION)'"
+BUILD_FLAGS := $(LD_FLAGS) -i -v -o
 
 ifndef $(GOOS)
 	GOOS=$(shell go env GOOS)
@@ -16,19 +19,19 @@ deps:
 	go mod download
 
 run:
-	go run $(ENTRYPOINT) $(ARGS)
+	INFRACOST_ENV=dev go run $(LD_FLAGS) $(ENTRYPOINT) $(ARGS)
 
 build:
-	go build -i -v -o build/$(BINARY) $(ENTRYPOINT)
+	CGO_ENABLED=0 go build $(BUILD_FLAGS) build/$(BINARY) $(ENTRYPOINT)
 
 windows:
-	env GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -i -v -o build/$(BINARY)-windows-amd64 $(ENTRYPOINT)
+	env GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build $(BUILD_FLAGS) build/$(BINARY)-windows-amd64 $(ENTRYPOINT)
 
 linux:
-	env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -i -v -o build/$(BINARY)-linux-amd64 $(ENTRYPOINT)
+	env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(BUILD_FLAGS) build/$(BINARY)-linux-amd64 $(ENTRYPOINT)
 
 darwin:
-	env GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -i -v -o build/$(BINARY)-darwin-amd64 $(ENTRYPOINT)
+	env GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build $(BUILD_FLAGS) build/$(BINARY)-darwin-amd64 $(ENTRYPOINT)
 
 build_all: build windows linux darwin
 
@@ -45,7 +48,7 @@ clean:
 	rm -rf build/$(BINARY)*
 
 test:
-	go test ./... $(or $(ARGS), -v -cover)
+	go test $(LD_FLAGS) ./... $(or $(ARGS), -v -cover)
 
 fmt:
 	go fmt ./...
