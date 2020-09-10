@@ -102,7 +102,7 @@ func loadResources(project Project) ([]*schema.Resource, error) {
 	flags.String("tfdir", tfdir, "")
 	c := cli.NewContext(nil, flags, nil)
 
-	provider := terraform.Provider()
+	provider := terraform.New()
 	err = provider.ProcessArgs(c)
 	if err != nil {
 		return nil, err

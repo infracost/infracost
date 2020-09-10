@@ -16,7 +16,8 @@ type terraformProvider struct {
 	dir      string
 }
 
-func Provider() schema.Provider {
+// New returns new Terraform Provider
+func New() schema.Provider {
 	return &terraformProvider{}
 }
 
