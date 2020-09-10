@@ -24,8 +24,10 @@ func TestElasticsearchDomain(t *testing.T) {
 			instance_count = 3
 		}
 	
-		snapshot_options {
-			automated_snapshot_start_hour = 23
+		ebs_options {
+			ebs_enabled = true
+			volume_size = 400
+			volume_type = "gp2"
 		}
 	}`
 
@@ -34,9 +36,14 @@ func TestElasticsearchDomain(t *testing.T) {
 			Name: "aws_elasticsearch_domain.example",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Per instance hour (example-domain)",
+					Name:            "Per instance(x3) hour (example-domain)",
 					PriceHash:       "723ac33bae3b8e0751276af954e89a54-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
+				},
+				{
+					Name:            "Storage",
+					PriceHash:       "6a8fe5ca25013b67bddcebe1786ad246-ee3dd7e4624338037ca6fea0933a662f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(400)),
 				},
 			},
 		},
