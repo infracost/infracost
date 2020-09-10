@@ -193,14 +193,13 @@ func isInfracostResource(resourceData *schema.ResourceData) bool {
 }
 
 func addressResourcePart(address string) string {
-	addressParts := strings.Split(address, ".")
-	var resourceParts []string
-	if len(addressParts) >= 3 && addressParts[len(addressParts)-3] == "data" {
-		resourceParts = addressParts[len(addressParts)-3:]
-	} else {
-		resourceParts = addressParts[len(addressParts)-2:]
+	p := strings.Split(address, ".")
+
+	if len(p) >= 3 && p[len(p)-3] == "data" {
+		return strings.Join(p[len(p)-3:], ".")
 	}
-	return strings.Join(resourceParts, ".")
+
+	return strings.Join(p[len(p)-2:], ".")
 }
 
 func addressModulePart(address string) string {
