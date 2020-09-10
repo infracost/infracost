@@ -10,8 +10,9 @@ import (
 func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 
 	domainName := d.Get("domain_name").String()
-	clusterConfig := d.Get("cluster_config")
-	instanceType := clusterConfig.Array()[0].Get("instance_type").String()
+	clusterConfig := d.Get("cluster_config").Array()[0]
+	instanceType := clusterConfig.Get("instance_type").String()
+	instanceCount := clusterConfig.Get("instance_count").Int()
 	region := d.Get("region").String()
 
 	return &schema.Resource{
@@ -20,7 +21,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 			{
 				Name:           fmt.Sprintf("Per instance hour (%s)", domainName),
 				Unit:           "hours",
-				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+				HourlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(region),
