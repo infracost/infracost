@@ -60,6 +60,27 @@ func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
 	return schemaResources, nil
 }
 
+func (p *terraformProvider) PostProcessResources(resources []*schema.Resource) error {
+	for _, resource := range resources {
+		removeNilReferences(resource)
+	}
+	return nil
+}
+
+func removeNilReferences(resource *schema.Resource) {
+	costComponents := make([]*schema.CostComponent, 0)
+	for _, costComponent := range resource.CostComponents {
+		if costComponent == nil {
+			continue
+		}
+		costComponents = append(costComponents, costComponent)
+	}
+	resource.CostComponents = costComponents
+	for _, subResource := range resource.SubResources {
+		removeNilReferences(subResource)
+	}
+}
+
 func loadPlanJSON(path string) ([]byte, error) {
 	planFile, err := os.Open(path)
 	if err != nil {
