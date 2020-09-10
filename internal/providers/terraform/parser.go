@@ -81,9 +81,9 @@ func parseAwsRegion(providerConfig gjson.Result) string {
 	awsRegion := "us-east-1" // Use as fallback
 
 	// Find region from terraform provider config
-	awsRegionConfig := providerConfig.Get("aws.expressions.region.constant_value").String()
-	if awsRegionConfig != "" {
-		awsRegion = awsRegionConfig
+	awsRegion := providerConfig.Get("aws.expressions.region.constant_value").String()
+	if awsRegion == "" {
+		awsRegion = "us-east-1"
 	}
 
 	return awsRegion
