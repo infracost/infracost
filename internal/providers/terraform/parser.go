@@ -221,6 +221,9 @@ func addressModulePart(address string) string {
 func addressModuleNames(address string) []string {
 	r := regexp.MustCompile(`module\.([^\[]*)`)
 	matches := r.FindAllStringSubmatch(addressModulePart(address), -1)
+	if matches == nil {
+		return []string{}
+	}
 
 	moduleNames := make([]string, 0, len(matches))
 	for _, match := range matches {
