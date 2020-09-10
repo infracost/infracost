@@ -117,6 +117,10 @@ func main() {
 			if err != nil {
 				return err
 			}
+			err = provider.PostProcessResources(resources)
+			if err != nil {
+				return err
+			}
 			err = prices.PopulatePrices(resources)
 			if err != nil {
 				return err
