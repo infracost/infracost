@@ -9,18 +9,16 @@ import (
 
 func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 
-	// domain_name := d.Get("domain_name").String()
+	domainName := d.Get("domain_name").String()
 	clusterConfig := d.Get("cluster_config")
-	fmt.Printf("%v\n\n\n", clusterConfig)
 	instanceType := clusterConfig.Array()[0].Get("instance_type").String()
-	fmt.Printf("instanceType: %v", instanceType)
 	region := d.Get("region").String()
 
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           "Per instance hour",
+				Name:           fmt.Sprintf("Per instance hour (%s)", domainName),
 				Unit:           "hours",
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
@@ -32,6 +30,9 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 						{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
 						{Key: "instanceType", Value: &instanceType},
 					},
+				},
+				PriceFilter: &schema.PriceFilter{
+					PurchaseOption: strPtr("on_demand"),
 				},
 			},
 		},

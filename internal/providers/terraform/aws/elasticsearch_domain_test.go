@@ -16,11 +16,11 @@ func TestElasticsearchDomain(t *testing.T) {
 
 	tf := `
 	resource "aws_elasticsearch_domain" "example" {
-		domain_name           = "example"
+		domain_name           = "example domain"
 		elasticsearch_version = "1.5"
 	
 		cluster_config {
-			instance_type = "r4.large.elasticsearch"
+			instance_type = "c4.2xlarge.elasticsearch"
 		}
 	
 		snapshot_options {
@@ -34,7 +34,7 @@ func TestElasticsearchDomain(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:            "Per instance hour",
-					PriceHash:       "198711d36612c57d6f59597e84be3977-d2c98780d7b6e36641b521f1f8145c6f",
+					PriceHash:       "723ac33bae3b8e0751276af954e89a54-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 			},
