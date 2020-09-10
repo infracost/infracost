@@ -18,5 +18,5 @@ examples/*/plan.save
 examples/*/plan.json
 
 #script generated files
-scripts/tmp-*
-scripts/index.json
+scripts/price_explorer/tmp-*
+scripts/price_explorer/index.json
