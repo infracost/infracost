@@ -40,7 +40,7 @@ func main() {
 			},
 			&cli.StringFlag{
 				Name:      "tfplan",
-				Usage:     "Path to Terraform Plan file. Requires tfdir to also be set",
+				Usage:     "Path to Terraform Plan file. Requires 'tfdir' to be set",
 				TakesFile: true,
 			},
 			&cli.StringFlag{
@@ -56,7 +56,7 @@ func main() {
 			&cli.StringFlag{
 				Name:    "output",
 				Aliases: []string{"o"},
-				Usage:   "Output (json, table)",
+				Usage:   "Output format (json, table)",
 				Value:   "table",
 			},
 			&cli.BoolFlag{
