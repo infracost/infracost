@@ -71,15 +71,13 @@ func loadPlanJSON(path string) ([]byte, error) {
 	return out, nil
 }
 
-func generatePlanJSON(tfdir string, planPath string) ([]byte, error) {
-	var err error
-
+func generatePlanJSON(dir string, path string) ([]byte, error) {
 	opts := &cmdOptions{
-		TerraformDir: tfdir,
+		TerraformDir: dir,
 	}
 
-	if planPath == "" {
-		_, err = terraformCmd(opts, "init")
+	if path == "" {
+		_, err := terraformCmd(opts, "init")
 		if err != nil {
 			return []byte{}, errors.Wrap(err, "error initializing terraform working directory")
 		}
@@ -95,10 +93,10 @@ func generatePlanJSON(tfdir string, planPath string) ([]byte, error) {
 			return []byte{}, errors.Wrap(err, "error generating terraform execution plan")
 		}
 
-		planPath = planfile.Name()
+		path = planfile.Name()
 	}
 
-	out, err := terraformCmd(opts, "show", "-json", planPath)
+	out, err := terraformCmd(opts, "show", "-json", path)
 	if err != nil {
 		return []byte{}, errors.Wrap(err, "error inspecting terraform plan")
 	}
