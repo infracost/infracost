@@ -48,7 +48,7 @@ clean:
 	rm -rf build/$(BINARY)*
 
 test:
-	go test $(LD_FLAGS) ./... $(or $(ARGS), -v -cover)
+	go test -timeout 15m $(LD_FLAGS) ./... $(or $(ARGS), -v -cover)
 
 fmt:
 	go fmt ./...
