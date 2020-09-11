@@ -42,7 +42,7 @@ func TestElasticsearchDomain(t *testing.T) {
 			Name: "aws_elasticsearch_domain.example",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Instance",
+					Name:            "Instance on-demand, (c4.2xlarge.elasticsearch)",
 					PriceHash:       "723ac33bae3b8e0751276af954e89a54-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
@@ -52,12 +52,12 @@ func TestElasticsearchDomain(t *testing.T) {
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(400)),
 				},
 				{
-					Name:            "Dedicated Master Instance",
+					Name:            "Dedicated Master Instance on-demand, (c4.8xlarge.elasticsearch)",
 					PriceHash:       "b20c99773f71f7ee11b388cd07f574c8-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "Ultrawarm Instance",
+					Name:            "Ultrawarm Instance on-demand, (ultrawarm1.medium.elasticsearch)",
 					PriceHash:       "86652ba1616710d216a8484a2ad025a5-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 				},
@@ -90,7 +90,7 @@ func TestElasticsearchDomain(t *testing.T) {
 			Name: "aws_elasticsearch_domain.example",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Instance",
+					Name:            "Instance on-demand, (c4.2xlarge.elasticsearch)",
 					PriceHash:       "723ac33bae3b8e0751276af954e89a54-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
@@ -132,7 +132,7 @@ func TestElasticsearchDomain(t *testing.T) {
 			Name: "aws_elasticsearch_domain.example",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Instance",
+					Name:            "Instance on-demand, (c4.2xlarge.elasticsearch)",
 					PriceHash:       "723ac33bae3b8e0751276af954e89a54-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
