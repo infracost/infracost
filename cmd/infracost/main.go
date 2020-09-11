@@ -9,6 +9,7 @@ import (
 	"github.com/infracost/infracost/pkg/output"
 	"github.com/infracost/infracost/pkg/prices"
 	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/pkg/version"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 
@@ -65,6 +66,11 @@ func main() {
 				Name:  "api-url",
 				Usage: "Price List API URL",
 			},
+			&cli.BoolFlag{
+				Name:  "version",
+				Usage: "Prints the version of infracost and terraform",
+				Value: false,
+			},
 		},
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
 			log.Error(err)
@@ -73,6 +79,11 @@ func main() {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
+			if c.Bool("version") {
+				fmt.Println("Infracost", version.Version)
+				err := terraform.TerraformVersion()
+				return err
+			}
 			if c.Bool("no-color") {
 				config.Config.NoColor = true
 				formatter.DisableColors = true
