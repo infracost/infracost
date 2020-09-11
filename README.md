@@ -9,14 +9,16 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
 <img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/screenshot.png" width=600 alt="Example Infracost output" />
 
-## Table of Contents
+## Table of Contents <!-- omit in toc -->
 
 **Checkout the [docs site](https://www.infracost.io/docs/) for detailed usage options, supported resources and more information.**
 
-* [Installation](#installation)
-* [Usage](#basic-usage)
-* [Development](#development)
-* [Contributing](#contributing)
+- [Installation](#installation)
+  - [Install via `brew`](#install-via-brew)
+- [Basic usage](#basic-usage)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
@@ -25,6 +27,14 @@ To download and install the latest release:
 ```sh
 curl --silent --location "https://github.com/infracost/infracost/releases/latest/download/infracost-$(uname -s)-amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/infracost-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64 /usr/local/bin/infracost
+```
+
+### Install via `brew`
+
+[Homebrew](https://brew.sh/) users can install by:
+
+```sh
+$ brew install infracost
 ```
 
 ## Basic usage
