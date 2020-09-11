@@ -23,8 +23,11 @@ func TestElasticsearchDomain(t *testing.T) {
 			instance_type = "c4.2xlarge.elasticsearch"
 			instance_count = 3
 			dedicated_master_enabled = true
-			dedicated_master_type = "c4.2xlarge.elasticsearch"
+			dedicated_master_type = "c4.8xlarge.elasticsearch"
 			dedicated_master_count = 1
+			warm_enabled = true
+			warm_count = 2
+			warm_type = "ultrawarm1.medium.elasticsearch"
 		}
 
 		ebs_options {
@@ -50,8 +53,13 @@ func TestElasticsearchDomain(t *testing.T) {
 				},
 				{
 					Name:            "Dedicated Master Instance",
-					PriceHash:       "723ac33bae3b8e0751276af954e89a54-d2c98780d7b6e36641b521f1f8145c6f",
+					PriceHash:       "b20c99773f71f7ee11b388cd07f574c8-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:            "Ultrawarm Instance",
+					PriceHash:       "86652ba1616710d216a8484a2ad025a5-d2c98780d7b6e36641b521f1f8145c6f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 				},
 			},
 		},

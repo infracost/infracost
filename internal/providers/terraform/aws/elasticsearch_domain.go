@@ -14,6 +14,9 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 	dedicatedMasterEnabled := clusterConfig.Get("dedicated_master_enabled").Bool()
 	dedicatedMasterType := clusterConfig.Get("dedicated_master_type").String()
 	dedicatedMasterCount := clusterConfig.Get("dedicated_master_count").Int()
+	ultrawarmEnabled := clusterConfig.Get("warm_enabled").Bool()
+	ultrawarmType := clusterConfig.Get("warm_type").String()
+	ultrawarmCount := clusterConfig.Get("warm_count").Int()
 
 	ebsOptions := d.Get("ebs_options").Array()[0]
 
@@ -86,7 +89,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 		},
 	}
 
-	if ebsType == "io1" || ebsType == "io2" {
+	if ebsType == "io1" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Storage IOPS",
 			Unit:            "IOPS-months",
@@ -120,6 +123,27 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
 					{Key: "instanceType", Value: &dedicatedMasterType},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: strPtr("on_demand"),
+			},
+		})
+	}
+
+	if ultrawarmEnabled {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:           "Ultrawarm Instance",
+			Unit:           "hours",
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(ultrawarmCount)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonES"),
+				ProductFamily: strPtr("Elastic Search Instance"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
+					{Key: "instanceType", Value: &ultrawarmType},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
