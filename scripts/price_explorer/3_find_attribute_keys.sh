@@ -28,6 +28,6 @@ if [ $N_files -ne 1 ]; then
 
   diff -U1 <( echo "$f" ) <( echo "$s" ) | grep -v "__typename" | grep -v "/dev/fd/"
 else
-  echo "Only 1 Match product found"
+  echo "Only 1 match product found"
 fi
 
