@@ -18,7 +18,12 @@ query {
 
 N_files=$(echo $attribs | wc -w)
 
-if [ $N_files -ne 1 ]; then
+if [ $N_files -eq 0 ]; then
+  echo "No match product found"
+elif [ $N_files -eq 1 ]; then
+  echo "Only 1 match product found"
+  echo ProductHash: $(echo $attribs | cut -d' ' -f1 | base64 --decode | jq '.productHash')
+else
   echo -e "\n#####################################\n"
   echo Found $N_files different products
   echo -e "------------------\n"
@@ -27,7 +32,5 @@ if [ $N_files -ne 1 ]; then
   s=$(echo $attribs | cut -d' ' -f2 | base64 --decode | jq '.attributes ')
 
   diff -U1 <( echo "$f" ) <( echo "$s" ) | grep -v "__typename" | grep -v "/dev/fd/"
-else
-  echo "Only 1 match product found"
 fi
 
