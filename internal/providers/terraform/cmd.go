@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/infracost/infracost/pkg/config"
 
@@ -44,8 +45,9 @@ func TerraformVersion() error {
 		terraformBinary = "terraform"
 	}
 	out, err := exec.Command(terraformBinary, "-version").Output()
+	firstLine := string(out)[0:strings.Index(string(out), "\n")]
 	if err == nil {
-		fmt.Printf("%s", out)
+		fmt.Println(firstLine)
 	}
 
 	return err
