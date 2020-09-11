@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 attribs=$(
 gq https://pricing.infracost.io/graphql -q "
 query {
@@ -13,18 +13,21 @@ query {
     	productHash
     	attributes { key , value }
     }
-}" | jq -r '.data.products[] | @base64' | head -2
+}" | jq -r '.data.products[] | @base64'
 )
 
-i=0
-for x in $attribs; do
-    echo $x | base64 --decode | jq '.attributes | map ({ (.key): .value} ) | add' | jq ".$3"  | tee tmp-$i >/dev/null
-    i=$(expr $i + 1)
-done
-echo Found $i different products
-echo "\n#####################################\n"
+N_files=$(echo $attribs | wc -w)
 
-if [ $i -ne 1 ]; then
-     diff -U1 tmp-0 tmp-1 | grep -v "__typename"
+if [ $N_files -ne 1 ]; then
+  echo -e "\n#####################################\n"
+  echo Found $N_files different products
+  echo -e "------------------\n"
+
+  f=$(echo $attribs | cut -d' ' -f1 | base64 --decode | jq '.attributes ')
+  s=$(echo $attribs | cut -d' ' -f2 | base64 --decode | jq '.attributes ')
+
+  diff -U1 <( echo "$f" ) <( echo "$s" ) | grep -v "__typename" | grep -v "/dev/fd/"
+else
+  echo "Only 1 Match product found"
 fi
 
