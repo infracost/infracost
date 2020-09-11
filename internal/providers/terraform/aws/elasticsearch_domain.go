@@ -45,7 +45,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           "Per instance hour",
+			Name:           "Instance",
 			Unit:           "hours",
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
 			ProductFilter: &schema.ProductFilter{
