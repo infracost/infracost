@@ -11,8 +11,8 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Res
 	vcpuVal := desiredSize.Mul(decimal.NewFromInt(1))              // TODO find flavor
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, hoursCostComponent(d, vcpuVal))
-	costComponents = append(costComponents, vcpuCostComponent(d))
+	costComponents = append(costComponents, hoursCostComponent(d))
+	costComponents = append(costComponents, vcpuCostComponent(d, vcpuVal))
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -20,12 +20,12 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Res
 	}
 }
 
-func hoursCostComponent(d *schema.ResourceData, vcpuVal decimal.Decimal) *schema.CostComponent {
+func hoursCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
 	return &schema.CostComponent{
 		Name:           "EKS Cluster",
 		Unit:           "hours",
-		HourlyQuantity: decimalPtr(vcpuVal),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -41,12 +41,12 @@ func hoursCostComponent(d *schema.ResourceData, vcpuVal decimal.Decimal) *schema
 	}
 }
 
-func vcpuCostComponent(d *schema.ResourceData) *schema.CostComponent {
+func vcpuCostComponent(d *schema.ResourceData, vcpuVal decimal.Decimal) *schema.CostComponent {
 	region := d.Get("region").String()
 	return &schema.CostComponent{
 		Name:           "EKS Cluster",
 		Unit:           "vCPU-hours",
-		HourlyQuantity: &allocatedStorageVal,
+		HourlyQuantity: decimalPtr(vcpuVal),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
