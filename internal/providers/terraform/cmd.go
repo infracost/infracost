@@ -3,6 +3,7 @@ package terraform
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -35,4 +36,17 @@ func terraformCmd(options *cmdOptions, args ...string) ([]byte, error) {
 	cmd.Stderr = log.StandardLogger().WriterLevel(log.ErrorLevel)
 	err := cmd.Run()
 	return outbuf.Bytes(), err
+}
+
+func TerraformVersion() error {
+	terraformBinary := os.Getenv("TERRAFORM_BINARY")
+	if terraformBinary == "" {
+		terraformBinary = "terraform"
+	}
+	out, err := exec.Command(terraformBinary, "-version").Output()
+	if err == nil {
+		fmt.Printf("%s", out)
+	}
+
+	return err
 }
