@@ -22,6 +22,9 @@ func TestElasticsearchDomain(t *testing.T) {
 		cluster_config {
 			instance_type = "c4.2xlarge.elasticsearch"
 			instance_count = 3
+			dedicated_master_enabled = true
+			dedicated_master_type = "c4.2xlarge.elasticsearch"
+			dedicated_master_count = 1
 		}
 
 		ebs_options {
@@ -44,6 +47,11 @@ func TestElasticsearchDomain(t *testing.T) {
 					Name:            "Storage",
 					PriceHash:       "6a8fe5ca25013b67bddcebe1786ad246-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(400)),
+				},
+				{
+					Name:            "Dedicated Master Instance",
+					PriceHash:       "723ac33bae3b8e0751276af954e89a54-d2c98780d7b6e36641b521f1f8145c6f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 			},
 		},

@@ -11,6 +11,10 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 	clusterConfig := d.Get("cluster_config").Array()[0]
 	instanceType := clusterConfig.Get("instance_type").String()
 	instanceCount := clusterConfig.Get("instance_count").Int()
+	dedicatedMasterEnabled := clusterConfig.Get("dedicated_master_enabled").Bool()
+	dedicatedMasterType := clusterConfig.Get("dedicated_master_type").String()
+	dedicatedMasterCount := clusterConfig.Get("dedicated_master_count").Int()
+
 	ebsOptions := d.Get("ebs_options").Array()[0]
 
 	ebsTypeMap := map[string]string{
@@ -95,6 +99,27 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ES:PIOPS/")},
 					{Key: "storageMedia", Value: strPtr("PIOPS")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: strPtr("on_demand"),
+			},
+		})
+	}
+
+	if dedicatedMasterEnabled {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:           "Dedicated Master Instance",
+			Unit:           "hours",
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(dedicatedMasterCount)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonES"),
+				ProductFamily: strPtr("Elastic Search Instance"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
+					{Key: "instanceType", Value: &dedicatedMasterType},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
