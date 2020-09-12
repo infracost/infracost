@@ -247,11 +247,12 @@ func removeAddressArrayPart(address string) string {
 	return match[1]
 }
 
-func containsString(arr []string, s string) bool {
-	for _, item := range arr {
-		if item == s {
+func containsString(a []string, s string) bool {
+	for _, i := range a {
+		if i == s {
 			return true
 		}
 	}
+
 	return false
 }
