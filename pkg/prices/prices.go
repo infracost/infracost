@@ -11,12 +11,12 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func PopulatePrices(resources []*schema.Resource) error {
+func PopulatePrices(r []*schema.Resource) error {
 	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
 
-	for _, resource := range resources {
-		if err := GetPrices(resource, q); err != nil {
-			return err
+	for _, res := range r {
+		if err := GetPrices(res, q); err != nil {
+			return errors.Wrapf(err, "error retrieving price for resource: '%v'", res.Name)
 		}
 	}
 
