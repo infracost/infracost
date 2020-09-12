@@ -39,16 +39,12 @@ func terraformCmd(options *cmdOptions, args ...string) ([]byte, error) {
 	return outbuf.Bytes(), err
 }
 
-func TerraformVersion() error {
+func TerraformVersion() (string, error) {
 	terraformBinary := os.Getenv("TERRAFORM_BINARY")
 	if terraformBinary == "" {
 		terraformBinary = "terraform"
 	}
 	out, err := exec.Command(terraformBinary, "-version").Output()
-	firstLine := string(out)[0:strings.Index(string(out), "\n")]
-	if err == nil {
-		fmt.Println(firstLine)
-	}
-
-	return err
+	return strings.SplitN(string(out), "\n", 2)[0], err
+}
 }
