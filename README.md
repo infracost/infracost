@@ -1,7 +1,7 @@
 <a href="https://www.infracost.io"><img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/logo.svg" width=320 alt="Infracost logo" /></a>
 
 <a href="https://www.infracost.io/docs/"><img alt="Docs" src="https://img.shields.io/badge/docs-blue"/></a>
-<a href="https://discord.gg/Cu9ftEg"><img alt="Discord Chat" src="https://img.shields.io/discord/746703155953270794.svg"/></a>
+<a href="https://discord.gg/rXCTaH3"><img alt="Discord Chat" src="https://img.shields.io/discord/746703155953270794.svg"/></a>
 <a href="https://github.com/infracost/infracost/actions?query=workflow%3AGo+branch%3Amaster"><img alt="Build Status" src="https://img.shields.io/github/workflow/status/infracost/infracost/Go/master"/></a>
 <a href="https://hub.docker.com/r/infracost/infracost/tags"><img alt="Docker Image" src="https://img.shields.io/docker/cloud/build/infracost/infracost"/></a>
 
@@ -9,14 +9,16 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
 <img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/screenshot.png" width=600 alt="Example Infracost output" />
 
-## Table of Contents
+## Table of Contents <!-- omit in toc -->
 
 **Checkout the [docs site](https://www.infracost.io/docs/) for detailed usage options, supported resources and more information.**
 
-* [Installation](#installation)
-* [Usage](#basic-usage)
-* [Development](#development)
-* [Contributing](#contributing)
+- [Installation](#installation)
+  - [Install via `brew`](#install-via-brew)
+- [Basic usage](#basic-usage)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
@@ -25,6 +27,14 @@ To download and install the latest release:
 ```sh
 curl --silent --location "https://github.com/infracost/infracost/releases/latest/download/infracost-$(uname -s)-amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/infracost-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64 /usr/local/bin/infracost
+```
+
+### Install via `brew`
+
+[Homebrew](https://brew.sh/) users can install by:
+
+```sh
+$ brew install infracost
 ```
 
 ## Basic usage
@@ -87,7 +97,7 @@ To use a local development version of terraform-provider-infracost
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-Join our chat, we are a friendly bunch and happy to help you get started :) https://discord.gg/Cu9ftEg
+Join our chat, we are a friendly bunch and happy to help you get started :) https://discord.gg/rXCTaH3
 
 ## License
 

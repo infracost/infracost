@@ -3,12 +3,16 @@ package prices
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/pkg/errors"
+	"github.com/infracost/infracost/pkg/version"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -83,8 +87,16 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 		return results, errors.Wrap(err, "error marshaling queries")
 	}
 
+	req, err := http.NewRequest("POST", q.endpoint, bytes.NewBuffer([]byte(queriesBody)))
+	if err != nil {
+		return results, err
+	}
+
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("User-Agent", getUserAgent())
+
 	client := http.Client{}
-	resp, err := client.Post(q.endpoint, "application/json", bytes.NewBuffer([]byte(queriesBody)))
+	resp, err := client.Do(req)
 	if err != nil {
 		return results, errors.Wrap(err, "error contacting api")
 	}
@@ -132,4 +144,32 @@ func (q *GraphQLQueryRunner) zipQueryResults(k []queryKey, r []gjson.Result) []q
 	}
 
 	return res
+}
+
+func getUserAgent() string {
+	userAgent := "infracost"
+	if version.Version != "" {
+		userAgent += fmt.Sprintf("-%s", version.Version)
+
+	}
+	infracostEnv := getInfracostEnv()
+
+	if infracostEnv != "" {
+		userAgent += fmt.Sprintf(" (%s)", infracostEnv)
+	}
+
+	return userAgent
+}
+
+func getInfracostEnv() string {
+	if os.Getenv("INFRACOST_ENV") == "test" || isTesting() {
+		return "test"
+	} else if os.Getenv("INFRACOST_ENV") == "dev" {
+		return "dev"
+	}
+	return ""
+}
+
+func isTesting() bool {
+	return strings.HasSuffix(os.Args[0], ".test")
 }
