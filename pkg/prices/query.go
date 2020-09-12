@@ -54,10 +54,10 @@ func (q *GraphQLQueryRunner) RunQueries(resource *schema.Resource) ([]queryResul
 	return q.zipQueryResults(queryKeys, results), nil
 }
 
-func (q *GraphQLQueryRunner) buildQuery(productFilter *schema.ProductFilter, priceFilter *schema.PriceFilter) GraphQLQuery {
-	variables := map[string]interface{}{}
-	variables["productFilter"] = productFilter
-	variables["priceFilter"] = priceFilter
+func (q *GraphQLQueryRunner) buildQuery(product *schema.ProductFilter, price *schema.PriceFilter) GraphQLQuery {
+	v := map[string]interface{}{}
+	v["productFilter"] = product
+	v["priceFilter"] = price
 
 	query := `
 		query($productFilter: ProductFilter!, $priceFilter: PriceFilter) {
@@ -69,7 +69,8 @@ func (q *GraphQLQueryRunner) buildQuery(productFilter *schema.ProductFilter, pri
 			}
 		}
 	`
-	return GraphQLQuery{query, variables}
+
+	return GraphQLQuery{query, v}
 }
 
 func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
