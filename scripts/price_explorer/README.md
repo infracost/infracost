@@ -50,9 +50,9 @@ When adding a new resource to infracost, a `productFilter` has to be added that 
 
     ```sh
     {
-      "Aurora Global Database": "Product",
-      "CPU Credits": "Product",
-      "Database Instance": "Product"
+      "Aurora Global Database",
+      "CPU Credits",
+      "Database Instance"
     }
     ```
 
@@ -65,11 +65,18 @@ When adding a new resource to infracost, a `productFilter` has to be added that 
   For example, running `./3_find_attribute_keys.sh AmazonRDS "Database Instance"` returns the following abbreviated output, which shows there are different `instanceType` and `databaseEngine` attribute:
 
     ```sh
-    -  "instanceType": "db.m3.large",
-    +  "instanceType": "db.r4.4xlarge",
+     Found 1000 different products
+    ------------------
+    
+    @@ -18,3 +18,3 @@
+         "key": "instanceType",
+    -    "value": "db.m3.large",
+    +    "value": "db.r4.4xlarge",
+    @@ -28,3 +28,3 @@
+         "key": "databaseEngine",
+    -    "value": "MySQL",
+    +    "value": "MariaDB",
     ...
-    -  "databaseEngine": "Oracle",
-    +  "databaseEngine": "MariaDB",
     ```
 
 * Identify desired `attributes` value using the `service` name, `productFamily` and `attribute key` found in previous steps:
