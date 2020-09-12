@@ -5,6 +5,7 @@ import (
 
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/schema"
+	"github.com/pkg/errors"
 
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"

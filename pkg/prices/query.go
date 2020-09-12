@@ -8,6 +8,7 @@ import (
 
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/schema"
+	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
