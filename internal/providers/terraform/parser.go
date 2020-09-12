@@ -46,35 +46,35 @@ func parsePlanJSON(j []byte) []*schema.Resource {
 	return resources
 }
 
-func parseResourceData(planJSON gjson.Result, providerConfig gjson.Result, plannedValuesJSON gjson.Result) map[string]*schema.ResourceData {
-	defaultAwsRegion := parseAwsRegion(providerConfig)
+func parseResourceData(plan, provider, values gjson.Result) map[string]*schema.ResourceData {
+	defaultRegion := parseAwsRegion(provider)
 
-	resourceDataMap := make(map[string]*schema.ResourceData)
+	resources := make(map[string]*schema.ResourceData)
 
-	for _, terraformResource := range plannedValuesJSON.Get("resources").Array() {
-		resourceType := terraformResource.Get("type").String()
-		providerName := terraformResource.Get("provider_name").String()
-		address := terraformResource.Get("address").String()
-		rawValues := terraformResource.Get("values")
+	for _, r := range values.Get("resources").Array() {
+		t := r.Get("type").String()
+		n := r.Get("provider_name").String()
+		a := r.Get("address").String()
+		v := r.Get("values")
 
-		// Override the region with the region from the arn if it
-		awsRegion := defaultAwsRegion
-		if rawValues.Get("arn").Exists() {
-			awsRegion = strings.Split(rawValues.Get("arn").String(), ":")[3]
+		// Override the region with the region from the arn if exists
+		region := defaultRegion
+		if v.Get("arn").Exists() {
+			region = strings.Split(v.Get("arn").String(), ":")[3]
 		}
-		rawValues = schema.AddRawValue(rawValues, "region", awsRegion)
+		v = schema.AddRawValue(v, "region", region)
 
-		resourceDataMap[address] = schema.NewResourceData(resourceType, providerName, address, rawValues)
+		resources[a] = schema.NewResourceData(t, n, a, v)
 	}
 
 	// Recursively add any resources for child modules
-	for _, modulePlannedValueJSON := range plannedValuesJSON.Get("child_modules").Array() {
-		moduleResourceDataMap := parseResourceData(planJSON, providerConfig, modulePlannedValueJSON)
-		for address, resourceData := range moduleResourceDataMap {
-			resourceDataMap[address] = resourceData
+	for _, m := range values.Get("child_modules").Array() {
+		resources := parseResourceData(plan, provider, m)
+		for address, d := range resources {
+			resources[address] = d
 		}
 	}
-	return resourceDataMap
+	return resources
 }
 
 func parseAwsRegion(providerConfig gjson.Result) string {
