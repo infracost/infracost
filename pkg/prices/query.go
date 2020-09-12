@@ -99,23 +99,23 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 
 // Batch all the queries for this resource so we can use one GraphQL call
 // Use queryKeys to keep track of which query maps to which sub-resource and price component
-func (q *GraphQLQueryRunner) batchQueries(resource *schema.Resource) ([]queryKey, []GraphQLQuery) {
-	queryKeys := make([]queryKey, 0)
+func (q *GraphQLQueryRunner) batchQueries(r *schema.Resource) ([]queryKey, []GraphQLQuery) {
+	keys := make([]queryKey, 0)
 	queries := make([]GraphQLQuery, 0)
 
-	for _, costComponent := range resource.CostComponents {
-		queryKeys = append(queryKeys, queryKey{resource, costComponent})
-		queries = append(queries, q.buildQuery(costComponent.ProductFilter, costComponent.PriceFilter))
+	for _, c := range r.CostComponents {
+		keys = append(keys, queryKey{r, c})
+		queries = append(queries, q.buildQuery(c.ProductFilter, c.PriceFilter))
 	}
 
-	for _, subResource := range resource.FlattenedSubResources() {
-		for _, costComponent := range subResource.CostComponents {
-			queryKeys = append(queryKeys, queryKey{subResource, costComponent})
-			queries = append(queries, q.buildQuery(costComponent.ProductFilter, costComponent.PriceFilter))
+	for _, r := range r.FlattenedSubResources() {
+		for _, c := range r.CostComponents {
+			keys = append(keys, queryKey{r, c})
+			queries = append(queries, q.buildQuery(c.ProductFilter, c.PriceFilter))
 		}
 	}
 
-	return queryKeys, queries
+	return keys, queries
 }
 
 func (q *GraphQLQueryRunner) zipQueryResults(queryKeys []queryKey, results []gjson.Result) []queryResult {
