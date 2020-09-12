@@ -81,16 +81,16 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 		color = nil
 	}
 
-	for _, res := range resources {
-		t.Append([]string{res.Name, "", "", "", "", ""})
+	for _, r := range resources {
+		t.Append([]string{r.Name, "", "", "", "", ""})
 
-		lineItemCount := getLineItemCount(res)
+		lineItemCount := getLineItemCount(r)
 		lineItem := 0
 
-		for _, c := range res.CostComponents {
+		for _, c := range r.CostComponents {
 			lineItem++
 
-			r := []string{
+			row := []string{
 				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), c.Name),
 				formatQuantity(*c.MonthlyQuantity),
 				c.Unit,
@@ -98,14 +98,14 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 				formatCost(c.HourlyCost()),
 				formatCost(c.MonthlyCost()),
 			}
-			t.Rich(r, color)
+			t.Rich(row, color)
 		}
 
-		for _, s := range res.FlattenedSubResources() {
+		for _, s := range r.FlattenedSubResources() {
 			for _, c := range s.CostComponents {
 				lineItem++
 
-				r := []string{
+				row := []string{
 					fmt.Sprintf("%s %s (%s)", getTreePrefix(lineItem, lineItemCount), c.Name, s.Name),
 					formatQuantity(*c.MonthlyQuantity),
 					c.Unit,
@@ -113,7 +113,7 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 					formatCost(c.HourlyCost()),
 					formatCost(c.MonthlyCost()),
 				}
-				t.Rich(r, color)
+				t.Rich(row, color)
 			}
 		}
 
@@ -122,13 +122,13 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 			"",
 			"",
 			"",
-			formatCost(res.HourlyCost()),
-			formatCost(res.MonthlyCost()),
+			formatCost(r.HourlyCost()),
+			formatCost(r.MonthlyCost()),
 		})
 		t.Append([]string{"", "", "", "", "", ""})
 
-		overallTotalHourly = overallTotalHourly.Add(res.HourlyCost())
-		overallTotalMonthly = overallTotalMonthly.Add(res.MonthlyCost())
+		overallTotalHourly = overallTotalHourly.Add(r.HourlyCost())
+		overallTotalMonthly = overallTotalMonthly.Add(r.MonthlyCost())
 	}
 
 	t.Append([]string{

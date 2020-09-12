@@ -24,9 +24,9 @@ type resourceJSON struct {
 	SubResources   []resourceJSON      `json:"subresources,omitempty"`
 }
 
-func newResourceJSON(resource *schema.Resource) resourceJSON {
-	comps := make([]costComponentJSON, 0, len(resource.CostComponents))
-	for _, c := range resource.CostComponents {
+func newResourceJSON(r *schema.Resource) resourceJSON {
+	comps := make([]costComponentJSON, 0, len(r.CostComponents))
+	for _, c := range r.CostComponents {
 		comps = append(comps, costComponentJSON{
 			Name:            c.Name,
 			Unit:            c.Unit,
@@ -38,26 +38,26 @@ func newResourceJSON(resource *schema.Resource) resourceJSON {
 		})
 	}
 
-	res := make([]resourceJSON, 0, len(resource.SubResources))
-	for _, r := range resource.SubResources {
-		res = append(res, newResourceJSON(r))
+	subresources := make([]resourceJSON, 0, len(r.SubResources))
+	for _, s := range r.SubResources {
+		subresources = append(subresources, newResourceJSON(s))
 	}
 
 	return resourceJSON{
-		Name:           resource.Name,
-		HourlyCost:     resource.HourlyCost().String(),
-		MonthlyCost:    resource.MonthlyCost().String(),
+		Name:           r.Name,
+		HourlyCost:     r.HourlyCost().String(),
+		MonthlyCost:    r.MonthlyCost().String(),
 		CostComponents: comps,
-		SubResources:   res,
+		SubResources:   subresources,
 	}
 }
 
-func ToJSON(r []*schema.Resource) ([]byte, error) {
-	s := make([]resourceJSON, 0, len(r))
+func ToJSON(resources []*schema.Resource) ([]byte, error) {
+	arr := make([]resourceJSON, 0, len(resources))
 
-	for _, res := range r {
-		s = append(s, newResourceJSON(res))
+	for _, r := range resources {
+		arr = append(arr, newResourceJSON(r))
 	}
 
-	return json.Marshal(s)
+	return json.Marshal(arr)
 }
