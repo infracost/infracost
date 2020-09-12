@@ -114,8 +114,8 @@ func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result)
 		resConf := getConfigurationJSONForResourceAddress(conf, adrs)
 
 		var refsMap = make(map[string][]string)
-		for attribute, attributeJSON := range resConf.Get("expressions").Map() {
-			getReferences(res, attribute, attributeJSON, &refsMap)
+		for a, j := range resConf.Get("expressions").Map() {
+			getReferences(res, a, j, &refsMap)
 		}
 
 		for attr, refs := range refsMap {
@@ -131,8 +131,8 @@ func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result)
 					refAdrs = fmt.Sprintf("%s%s", addressModulePart(adrs), ref)
 				}
 
-				if refResourceData, ok := resData[refAdrs]; ok {
-					res.AddReference(attr, refResourceData)
+				if refData, ok := resData[refAdrs]; ok {
+					res.AddReference(attr, refData)
 				}
 			}
 		}
