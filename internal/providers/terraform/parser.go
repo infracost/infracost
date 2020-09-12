@@ -200,19 +200,23 @@ func addressResourcePart(address string) string {
 	return strings.Join(p[len(p)-2:], ".")
 }
 
+// addressModulePart parses a resource address and returns module prefix.
+// For example: `module.name1.module.name2.resource` will return `module.name1.module.name2.`
 func addressModulePart(address string) string {
-	addressParts := strings.Split(address, ".")
-	var moduleParts []string
-	if len(addressParts) >= 3 && addressParts[len(addressParts)-3] == "data" {
-		moduleParts = addressParts[:len(addressParts)-3]
+	ap := strings.Split(address, ".")
+	mp := make([]string, 0)
+
+	if len(ap) >= 3 && ap[len(ap)-3] == "data" {
+		mp = ap[:len(ap)-3]
 	} else {
-		moduleParts = addressParts[:len(addressParts)-2]
+		mp = ap[:len(ap)-2]
 	}
-	if len(moduleParts) == 0 {
+
+	if len(mp) == 0 {
 		return ""
-	} else {
-		return fmt.Sprintf("%s.", strings.Join(moduleParts, "."))
 	}
+
+	return fmt.Sprintf("%s.", strings.Join(mp, "."))
 }
 
 func addressModuleNames(address string) []string {
