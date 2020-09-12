@@ -27,6 +27,7 @@ func getTreePrefix(lineItem int, lineItemCount int) string {
 	if lineItem == lineItemCount {
 		return "└─"
 	}
+
 	return "├─"
 }
 
