@@ -87,16 +87,18 @@ func parseAwsRegion(providerConfig gjson.Result) string {
 	return awsRegion
 }
 
-func buildUsageResourceDataMap(resourceDataMap map[string]*schema.ResourceData) map[string]*schema.ResourceData {
-	usageResourceDataMap := make(map[string]*schema.ResourceData)
-	for _, resourceData := range resourceDataMap {
-		if isInfracostResource(resourceData) {
-			for _, refResourceData := range resourceData.References("resources") {
-				usageResourceDataMap[refResourceData.Address] = resourceData
+func buildUsageResourceDataMap(resData map[string]*schema.ResourceData) map[string]*schema.ResourceData {
+	u := make(map[string]*schema.ResourceData)
+
+	for _, r := range resData {
+		if isInfracostResource(r) {
+			for _, ref := range r.References("resources") {
+				u[ref.Address] = r
 			}
 		}
 	}
-	return usageResourceDataMap
+
+	return u
 }
 
 func stripInfracostResources(resourceDataMap map[string]*schema.ResourceData) map[string]*schema.ResourceData {
