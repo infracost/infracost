@@ -81,7 +81,8 @@ func main() {
 		Action: func(c *cli.Context) error {
 			if c.Bool("version") {
 				fmt.Println("Infracost", version.Version)
-				err := terraform.TerraformVersion()
+				v, err := terraform.TerraformVersion()
+				fmt.Println(v)
 				return err
 			}
 			if c.Bool("no-color") {

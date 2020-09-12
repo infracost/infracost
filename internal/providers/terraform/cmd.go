@@ -3,7 +3,6 @@ package terraform
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -46,5 +45,4 @@ func TerraformVersion() (string, error) {
 	}
 	out, err := exec.Command(terraformBinary, "-version").Output()
 	return strings.SplitN(string(out), "\n", 2)[0], err
-}
 }
