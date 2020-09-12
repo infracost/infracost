@@ -82,18 +82,18 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 			return []byte{}, errors.Wrap(err, "error initializing terraform working directory")
 		}
 
-		planfile, err := ioutil.TempFile(os.TempDir(), "tfplan")
+		f, err := ioutil.TempFile(os.TempDir(), "tfplan")
 		if err != nil {
 			return []byte{}, errors.Wrap(err, "error creating temporary file 'tfplan'")
 		}
-		defer os.Remove(planfile.Name())
+		defer os.Remove(f.Name())
 
-		_, err = terraformCmd(opts, "plan", "-input=false", "-lock=false", fmt.Sprintf("-out=%s", planfile.Name()))
+		_, err = terraformCmd(opts, "plan", "-input=false", "-lock=false", fmt.Sprintf("-out=%s", f.Name()))
 		if err != nil {
 			return []byte{}, errors.Wrap(err, "error generating terraform execution plan")
 		}
 
-		path = planfile.Name()
+		path = f.Name()
 	}
 
 	out, err := terraformCmd(opts, "show", "-json", path)
