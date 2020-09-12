@@ -145,6 +145,7 @@ func getReferences(resourceData *schema.ResourceData, attribute string, attribut
 			if _, ok := (*referencesMap)[attribute]; !ok {
 				(*referencesMap)[attribute] = make([]string, 0, 1)
 			}
+
 			(*referencesMap)[attribute] = append((*referencesMap)[attribute], ref.String())
 		}
 	} else if attributeJSON.IsArray() {
@@ -154,9 +155,16 @@ func getReferences(resourceData *schema.ResourceData, attribute string, attribut
 	} else if attributeJSON.Type.String() == "JSON" {
 		attributeJSON.ForEach(func(childAttribute gjson.Result, childAttributeJSON gjson.Result) bool {
 			getReferences(resourceData, fmt.Sprintf("%s.%s", attribute, childAttribute), childAttributeJSON, referencesMap)
+
 			return true
 		})
 	}
+}
+
+func getConfigurationJSONForResourceAddress(conf gjson.Result, address string) gjson.Result {
+	c := getConfigurationJSONForModulePath(conf, getModuleNames(address))
+
+	return c.Get(fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(address))))
 }
 
 func getConfigurationJSONForModulePath(conf gjson.Result, names []string) gjson.Result {
