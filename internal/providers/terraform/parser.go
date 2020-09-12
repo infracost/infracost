@@ -221,19 +221,19 @@ func addressModulePart(address string) string {
 	return fmt.Sprintf("%s.", strings.Join(mp, "."))
 }
 
-func addressModuleNames(address string) []string {
+func getModuleNames(address string) []string {
 	r := regexp.MustCompile(`module\.([^\[]*)`)
 	matches := r.FindAllStringSubmatch(addressModulePart(address), -1)
 	if matches == nil {
 		return []string{}
 	}
 
-	moduleNames := make([]string, 0, len(matches))
+	n := make([]string, 0, len(matches))
 	for _, match := range matches {
-		moduleNames = append(moduleNames, match[1])
+		n = append(n, match[1])
 	}
 
-	return moduleNames
+	return n
 }
 
 func addressCountIndex(address string) int {
