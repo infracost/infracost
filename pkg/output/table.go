@@ -13,14 +13,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func getLineItemCount(resource *schema.Resource) int {
-	count := len(resource.CostComponents)
+func getLineItemCount(r *schema.Resource) int {
+	c := len(r.CostComponents)
 
-	for _, subResource := range resource.FlattenedSubResources() {
-		count += len(subResource.CostComponents)
+	for _, s := range r.FlattenedSubResources() {
+		c += len(s.CostComponents)
 	}
 
-	return count
+	return c
 }
 
 func getTreePrefix(lineItem int, lineItemCount int) string {
