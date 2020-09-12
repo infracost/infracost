@@ -23,14 +23,14 @@ func PopulatePrices(resources []*schema.Resource) error {
 	return nil
 }
 
-func GetPrices(resource *schema.Resource, q QueryRunner) error {
-	queryResult, err := q.RunQueries(resource)
+func GetPrices(r *schema.Resource, q QueryRunner) error {
+	res, err := q.RunQueries(r)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error running a query")
 	}
 
-	for _, queryResult := range queryResult {
-		setCostComponentPrice(queryResult.Resource, queryResult.CostComponent, queryResult.Result)
+	for _, qr := range res {
+		setCostComponentPrice(qr.Resource, qr.CostComponent, qr.Result)
 	}
 
 	return nil
