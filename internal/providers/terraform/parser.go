@@ -235,6 +235,7 @@ func addressCountIndex(address string) int {
 func removeAddressArrayPart(address string) string {
 	r := regexp.MustCompile(`([^\[]+)`)
 	match := r.FindStringSubmatch(addressResourcePart(address))
+
 	return match[1]
 }
 
