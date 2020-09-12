@@ -42,16 +42,17 @@ func NewGraphQLQueryRunner(endpoint string) *GraphQLQueryRunner {
 	}
 }
 
-func (q *GraphQLQueryRunner) RunQueries(resource *schema.Resource) ([]queryResult, error) {
-	queryKeys, queries := q.batchQueries(resource)
+func (q *GraphQLQueryRunner) RunQueries(r *schema.Resource) ([]queryResult, error) {
+	keys, queries := q.batchQueries(r)
 
-	log.Debugf("Getting pricing details from %s for %s", config.Config.ApiUrl, resource.Name)
+	log.Debugf("Getting pricing details from %s for %s", config.Config.ApiUrl, r.Name)
+
 	results, err := q.getQueryResults(queries)
 	if err != nil {
 		return []queryResult{}, err
 	}
 
-	return q.zipQueryResults(queryKeys, results), nil
+	return q.zipQueryResults(keys, results), nil
 }
 
 func (q *GraphQLQueryRunner) buildQuery(product *schema.ProductFilter, price *schema.PriceFilter) GraphQLQuery {
