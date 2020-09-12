@@ -39,21 +39,20 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 }
 
 func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
-	var planJSON []byte
+	var plan []byte
 	var err error
 
 	if p.jsonFile != "" {
-		planJSON, err = loadPlanJSON(p.jsonFile)
+		plan, err = loadPlanJSON(p.jsonFile)
 	} else {
-		planJSON, err = generatePlanJSON(p.dir, p.planFile)
+		plan, err = generatePlanJSON(p.dir, p.planFile)
 	}
 
 	if err != nil {
 		return []*schema.Resource{}, errors.Wrap(err, "error loading resources")
 	}
 
-	schemaResources := parsePlanJSON(planJSON)
-	return schemaResources, nil
+	return parsePlanJSON(plan), nil
 }
 
 func loadPlanJSON(path string) ([]byte, error) {
