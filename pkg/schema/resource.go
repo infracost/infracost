@@ -50,14 +50,17 @@ func (r *Resource) MonthlyCost() decimal.Decimal {
 }
 
 func (r *Resource) FlattenedSubResources() []*Resource {
-	subResources := make([]*Resource, 0, len(r.SubResources))
-	for _, subResource := range r.SubResources {
-		subResources = append(subResources, subResource)
-		if len(subResource.SubResources) > 0 {
-			subResources = append(subResources, subResource.FlattenedSubResources()...)
+	res := make([]*Resource, 0, len(r.SubResources))
+
+	for _, s := range r.SubResources {
+		res = append(res, s)
+
+		if len(s.SubResources) > 0 {
+			res = append(res, s.FlattenedSubResources()...)
 		}
 	}
-	return subResources
+
+	return res
 }
 
 func SortResources(resources []*Resource) {
