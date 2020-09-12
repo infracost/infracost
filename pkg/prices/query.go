@@ -120,15 +120,15 @@ func (q *GraphQLQueryRunner) batchQueries(r *schema.Resource) ([]queryKey, []Gra
 	return keys, queries
 }
 
-func (q *GraphQLQueryRunner) zipQueryResults(queryKeys []queryKey, results []gjson.Result) []queryResult {
-	queryResults := make([]queryResult, 0, len(queryKeys))
+func (q *GraphQLQueryRunner) zipQueryResults(k []queryKey, r []gjson.Result) []queryResult {
+	res := make([]queryResult, 0, len(k))
 
-	for i, queryKey := range queryKeys {
-		queryResults = append(queryResults, queryResult{
-			queryKey: queryKey,
-			Result:   results[i],
+	for i, k := range k {
+		res = append(res, queryResult{
+			queryKey: k,
+			Result:   r[i],
 		})
 	}
 
-	return queryResults
+	return res
 }
