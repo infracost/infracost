@@ -232,11 +232,14 @@ func addressModuleNames(address string) []string {
 
 func addressCountIndex(address string) int {
 	r := regexp.MustCompile(`\[(\d+)\]`)
-	match := r.FindStringSubmatch(address)
-	if len(match) > 0 {
-		i, _ := strconv.Atoi(match[1])
+	m := r.FindStringSubmatch(address)
+
+	if len(m) > 0 {
+		i, _ := strconv.Atoi(m[1]) // TODO: unhandled error
+
 		return i
 	}
+
 	return -1
 }
 
