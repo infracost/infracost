@@ -27,6 +27,13 @@ func init() {
 	log.SetFormatter(&logFormatter)
 }
 
+func customError(c *cli.Context, msg string) error {
+	color.HiRed(fmt.Sprintf("%v\n", msg))
+	_ = cli.ShowAppHelp(c)
+
+	return fmt.Errorf("")
+}
+
 func main() {
 	app := &cli.App{
 		Name:                 "infracost",
@@ -70,10 +77,7 @@ func main() {
 			},
 		},
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
-			log.Error(err)
-			_ = cli.ShowAppHelp(c)
-			os.Exit(1)
-			return nil
+			return customError(c, err.Error())
 		},
 		Action: func(c *cli.Context) error {
 			logFormatter.DisableColors = c.Bool("no-color")
@@ -99,12 +103,9 @@ func main() {
 				config.Config.ApiUrl = c.String("api-url")
 			}
 
-			provider := terraform.Provider()
-			err := provider.ProcessArgs(c)
-			if err != nil {
-				color.HiRed(err.Error())
-				_ = cli.ShowAppHelp(c)
-				os.Exit(1)
+			provider := terraform.New()
+			if err := provider.ProcessArgs(c); err != nil {
+				return customError(c, err.Error())
 			}
 
 			s := spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
