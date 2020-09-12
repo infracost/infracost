@@ -16,9 +16,11 @@ var infracostProviderNames = []string{"infracost", "infracost.io/infracost/infra
 
 func createResource(resourceData *schema.ResourceData, usageData *schema.ResourceData) *schema.Resource {
 	resourceRegistry := getResourceRegistry()
+
 	if rFunc, ok := (*resourceRegistry)[resourceData.Type]; ok {
 		return rFunc(resourceData, usageData)
 	}
+
 	return nil
 }
 
