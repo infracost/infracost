@@ -34,9 +34,9 @@ func formatCost(d decimal.Decimal) string {
 	f, _ := d.Float64()
 	if f < 0.00005 && f != 0 {
 		return fmt.Sprintf("%.g", f)
-	} else {
-		return fmt.Sprintf("%.4f", f)
 	}
+
+	return fmt.Sprintf("%.4f", f)
 }
 
 func formatQuantity(quantity decimal.Decimal) string {
