@@ -36,32 +36,37 @@ func GetPrices(r *schema.Resource, q QueryRunner) error {
 	return nil
 }
 
-func setCostComponentPrice(resource *schema.Resource, costComponent *schema.CostComponent, result gjson.Result) {
-	var priceVal decimal.Decimal
+func setCostComponentPrice(r *schema.Resource, c *schema.CostComponent, res gjson.Result) {
+	var p decimal.Decimal
 
-	products := result.Get("data.products").Array()
+	products := res.Get("data.products").Array()
 	if len(products) == 0 {
-		log.Warnf("No products found for %s %s, using 0.00", resource.Name, costComponent.Name)
-		priceVal = decimal.Zero
-		costComponent.SetPrice(priceVal)
+		log.Warnf("No products found for %s %s, using 0.00", r.Name, c.Name)
+		c.SetPrice(decimal.Zero)
 		return
 	}
 	if len(products) > 1 {
-		log.Warnf("Multiple products found for %s %s, using the first product", resource.Name, costComponent.Name)
+		log.Warnf("Multiple products found for %s %s, using the first product", r.Name, c.Name)
 	}
 
 	prices := products[0].Get("prices").Array()
 	if len(prices) == 0 {
-		log.Warnf("No prices found for %s %s, using 0.00", resource.Name, costComponent.Name)
-		priceVal = decimal.Zero
-		costComponent.SetPrice(priceVal)
+		log.Warnf("No prices found for %s %s, using 0.00", r.Name, c.Name)
+		c.SetPrice(decimal.Zero)
 		return
 	}
 	if len(prices) > 1 {
-		log.Warnf("Multiple prices found for %s %s, using the first price", resource.Name, costComponent.Name)
+		log.Warnf("Multiple prices found for %s %s, using the first price", r.Name, c.Name)
 	}
 
-	priceVal, _ = decimal.NewFromString(prices[0].Get("USD").String())
-	costComponent.SetPrice(priceVal)
-	costComponent.SetPriceHash(prices[0].Get("priceHash").String())
+	var err error
+	p, err = decimal.NewFromString(prices[0].Get("USD").String())
+	if err != nil {
+		log.Warnf("Error converting price (using 0.00) '%v':", prices[0].Get("USD").String(), err.Error())
+		c.SetPrice(decimal.Zero)
+		return
+	}
+
+	c.SetPrice(p)
+	c.SetPriceHash(prices[0].Get("priceHash").String())
 }
