@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/output"
 	"github.com/infracost/infracost/pkg/prices"
 	"github.com/infracost/infracost/pkg/schema"
+	"github.com/pkg/errors"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 
