@@ -26,5 +26,6 @@ func getResourceRegistry() *resourceRegistrySingleton {
 		}
 
 	})
+	
 	return &resourceRegistry
 }
