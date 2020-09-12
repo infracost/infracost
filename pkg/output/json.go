@@ -25,30 +25,30 @@ type resourceJSON struct {
 }
 
 func newResourceJSON(resource *schema.Resource) resourceJSON {
-	costComponentJSONs := make([]costComponentJSON, 0, len(resource.CostComponents))
-	for _, costComponent := range resource.CostComponents {
-		costComponentJSONs = append(costComponentJSONs, costComponentJSON{
-			Name:            costComponent.Name,
-			Unit:            costComponent.Unit,
-			HourlyQuantity:  costComponent.HourlyQuantity.String(),
-			MonthlyQuantity: costComponent.MonthlyQuantity.String(),
-			Price:           costComponent.Price().String(),
-			HourlyCost:      costComponent.HourlyCost().String(),
-			MonthlyCost:     costComponent.MonthlyCost().String(),
+	comps := make([]costComponentJSON, 0, len(resource.CostComponents))
+	for _, c := range resource.CostComponents {
+		comps = append(comps, costComponentJSON{
+			Name:            c.Name,
+			Unit:            c.Unit,
+			HourlyQuantity:  c.HourlyQuantity.String(),
+			MonthlyQuantity: c.MonthlyQuantity.String(),
+			Price:           c.Price().String(),
+			HourlyCost:      c.HourlyCost().String(),
+			MonthlyCost:     c.MonthlyCost().String(),
 		})
 	}
 
-	subResourceJSONs := make([]resourceJSON, 0, len(resource.SubResources))
-	for _, subResource := range resource.SubResources {
-		subResourceJSONs = append(subResourceJSONs, newResourceJSON(subResource))
+	res := make([]resourceJSON, 0, len(resource.SubResources))
+	for _, r := range resource.SubResources {
+		res = append(res, newResourceJSON(r))
 	}
 
 	return resourceJSON{
 		Name:           resource.Name,
 		HourlyCost:     resource.HourlyCost().String(),
 		MonthlyCost:    resource.MonthlyCost().String(),
-		CostComponents: costComponentJSONs,
-		SubResources:   subResourceJSONs,
+		CostComponents: comps,
+		SubResources:   res,
 	}
 }
 
