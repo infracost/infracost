@@ -190,6 +190,8 @@ func isInfracostResource(resourceData *schema.ResourceData) bool {
 	return false
 }
 
+// addressResourcePart parses a resource address and returns resource suffix (without the module prefix).
+// For example: `module.name1.module.name2.resource` will return `name2.resource`
 func addressResourcePart(address string) string {
 	p := strings.Split(address, ".")
 
