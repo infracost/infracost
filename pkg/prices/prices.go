@@ -15,8 +15,7 @@ func PopulatePrices(resources []*schema.Resource) error {
 	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
 
 	for _, resource := range resources {
-		err := GetPrices(resource, q)
-		if err != nil {
+		if err := GetPrices(resource, q); err != nil {
 			return err
 		}
 	}
