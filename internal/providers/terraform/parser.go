@@ -109,30 +109,30 @@ func stripInfracostResources(resourceDataMap map[string]*schema.ResourceData) ma
 	return newResourceDataMap
 }
 
-func parseReferences(resourceDataMap map[string]*schema.ResourceData, configurationJSON gjson.Result) {
-	for address, resourceData := range resourceDataMap {
-		resourceConfigJSON := getConfigurationJSONForResourceAddress(configurationJSON, address)
+func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {
+	for adrs, res := range resData {
+		resConf := getConfigurationJSONForResourceAddress(conf, adrs)
 
-		var referencesMap = make(map[string][]string)
-		for attribute, attributeJSON := range resourceConfigJSON.Get("expressions").Map() {
-			getReferences(resourceData, attribute, attributeJSON, &referencesMap)
+		var refsMap = make(map[string][]string)
+		for attribute, attributeJSON := range resConf.Get("expressions").Map() {
+			getReferences(res, attribute, attributeJSON, &refsMap)
 		}
 
-		resourceCountIndex := addressCountIndex(address)
-
-		for attribute, references := range referencesMap {
-			referenceHasCount := containsString(references, "count.index")
-			for _, reference := range references {
-				if reference == "count.index" {
+		for attr, refs := range refsMap {
+			for _, ref := range refs {
+				if ref == "count.index" {
 					continue
 				}
-				arrayPart := ""
-				if referenceHasCount {
-					arrayPart = fmt.Sprintf("[%d]", resourceCountIndex)
+
+				var refAdrs string
+				if containsString(refs, "count.index") {
+					refAdrs = fmt.Sprintf("%s%s[%d]", addressModulePart(adrs), ref, addressCountIndex(adrs))
+				} else {
+					refAdrs = fmt.Sprintf("%s%s", addressModulePart(adrs), ref)
 				}
-				fullRefAddress := fmt.Sprintf("%s%s%s", addressModulePart(address), reference, arrayPart)
-				if refResourceData, ok := resourceDataMap[fullRefAddress]; ok {
-					resourceData.AddReference(attribute, refResourceData)
+
+				if refResourceData, ok := resData[refAdrs]; ok {
+					res.AddReference(attr, refResourceData)
 				}
 			}
 		}
