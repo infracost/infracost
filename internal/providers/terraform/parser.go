@@ -139,22 +139,22 @@ func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result)
 	}
 }
 
-func getReferences(resourceData *schema.ResourceData, attribute string, attributeJSON gjson.Result, referencesMap *map[string][]string) {
-	if attributeJSON.Get("references").Exists() {
-		for _, ref := range attributeJSON.Get("references").Array() {
-			if _, ok := (*referencesMap)[attribute]; !ok {
-				(*referencesMap)[attribute] = make([]string, 0, 1)
+func getReferences(resData *schema.ResourceData, attr string, attrJSON gjson.Result, refs *map[string][]string) {
+	if attrJSON.Get("references").Exists() {
+		for _, ref := range attrJSON.Get("references").Array() {
+			if _, ok := (*refs)[attr]; !ok {
+				(*refs)[attr] = make([]string, 0, 1)
 			}
 
-			(*referencesMap)[attribute] = append((*referencesMap)[attribute], ref.String())
+			(*refs)[attr] = append((*refs)[attr], ref.String())
 		}
-	} else if attributeJSON.IsArray() {
-		for i, attributeJSONItem := range attributeJSON.Array() {
-			getReferences(resourceData, fmt.Sprintf("%s.%d", attribute, i), attributeJSONItem, referencesMap)
+	} else if attrJSON.IsArray() {
+		for i, attributeJSONItem := range attrJSON.Array() {
+			getReferences(resData, fmt.Sprintf("%s.%d", attr, i), attributeJSONItem, refs)
 		}
-	} else if attributeJSON.Type.String() == "JSON" {
-		attributeJSON.ForEach(func(childAttribute gjson.Result, childAttributeJSON gjson.Result) bool {
-			getReferences(resourceData, fmt.Sprintf("%s.%s", attribute, childAttribute), childAttributeJSON, referencesMap)
+	} else if attrJSON.Type.String() == "JSON" {
+		attrJSON.ForEach(func(childAttribute gjson.Result, childAttributeJSON gjson.Result) bool {
+			getReferences(resData, fmt.Sprintf("%s.%s", attr, childAttribute), childAttributeJSON, refs)
 
 			return true
 		})
