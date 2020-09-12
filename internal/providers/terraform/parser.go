@@ -159,26 +159,18 @@ func getReferences(resourceData *schema.ResourceData, attribute string, attribut
 	}
 }
 
-func getConfigurationJSONForResourceAddress(configurationJSON gjson.Result, address string) gjson.Result {
-	moduleNames := addressModuleNames(address)
-	moduleConfigJSON := getConfigurationJSONForModulePath(configurationJSON, moduleNames)
-	resourceKey := fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(address)))
-	return moduleConfigJSON.Get(resourceKey)
-}
+func getConfigurationJSONForModulePath(conf gjson.Result, names []string) gjson.Result {
+	if len(names) == 0 {
+		return conf
+	}
 
-func getConfigurationJSONForModulePath(configurationJSON gjson.Result, moduleNames []string) gjson.Result {
 	// Build up the gjson search key
-	moduleKeyParts := make([]string, 0, len(moduleNames))
-	for _, moduleName := range moduleNames {
-		moduleKeyParts = append(moduleKeyParts, fmt.Sprintf("module_calls.%s.module", moduleName))
+	p := make([]string, 0, len(names))
+	for _, n := range names {
+		p = append(p, fmt.Sprintf("module_calls.%s.module", n))
 	}
 
-	if len(moduleKeyParts) == 0 {
-		return configurationJSON
-	} else {
-		moduleKey := strings.Join(moduleKeyParts, ".")
-		return configurationJSON.Get(moduleKey)
-	}
+	return conf.Get(strings.Join(p, "."))
 }
 
 func isInfracostResource(resourceData *schema.ResourceData) bool {
