@@ -18,27 +18,27 @@ type Resource struct {
 	monthlyCost    decimal.Decimal
 }
 
-func CalculateCosts(resources []*Resource) {
-	for _, resource := range resources {
-		resource.CalculateCosts()
+func CalculateCosts(r []*Resource) {
+	for _, res := range r {
+		res.CalculateCosts()
 	}
 }
 
 func (r *Resource) CalculateCosts() {
-	hourlyCost := decimal.Zero
+	h := decimal.Zero
 
-	for _, costComponent := range r.CostComponents {
-		costComponent.CalculateCosts()
-		hourlyCost = hourlyCost.Add(costComponent.HourlyCost())
+	for _, c := range r.CostComponents {
+		c.CalculateCosts()
+		h = h.Add(c.HourlyCost())
 	}
 
-	for _, subResource := range r.SubResources {
-		subResource.CalculateCosts()
-		hourlyCost = hourlyCost.Add(subResource.HourlyCost())
+	for _, r := range r.SubResources {
+		r.CalculateCosts()
+		h = h.Add(r.HourlyCost())
 	}
 
-	r.hourlyCost = hourlyCost
-	r.monthlyCost = hourlyCost.Mul(hourToMonthMultiplier)
+	r.hourlyCost = h
+	r.monthlyCost = h.Mul(hourToMonthMultiplier)
 }
 
 func (r *Resource) HourlyCost() decimal.Decimal {
@@ -63,16 +63,16 @@ func (r *Resource) FlattenedSubResources() []*Resource {
 	return res
 }
 
-func SortResources(resources []*Resource) {
-	sort.Slice(resources, func(i, j int) bool {
-		return resources[i].Name < resources[j].Name
+func SortResources(r []*Resource) {
+	sort.Slice(r, func(i, j int) bool {
+		return r[i].Name < r[j].Name
 	})
 
-	for _, resource := range resources {
-		SortResources(resource.SubResources)
+	for _, res := range r {
+		SortResources(res.SubResources)
 
-		sort.Slice(resource.CostComponents, func(i, j int) bool {
-			return resource.CostComponents[i].Name < resource.CostComponents[j].Name
+		sort.Slice(res.CostComponents, func(i, j int) bool {
+			return res.CostComponents[i].Name < res.CostComponents[j].Name
 		})
 	}
 }
