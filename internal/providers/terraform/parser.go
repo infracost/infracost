@@ -101,14 +101,16 @@ func buildUsageResourceDataMap(resData map[string]*schema.ResourceData) map[stri
 	return u
 }
 
-func stripInfracostResources(resourceDataMap map[string]*schema.ResourceData) map[string]*schema.ResourceData {
-	newResourceDataMap := make(map[string]*schema.ResourceData)
-	for address, resourceData := range resourceDataMap {
-		if !isInfracostResource(resourceData) {
-			newResourceDataMap[address] = resourceData
+func stripInfracostResources(resData map[string]*schema.ResourceData) map[string]*schema.ResourceData {
+	n := make(map[string]*schema.ResourceData)
+
+	for a, d := range resData {
+		if !isInfracostResource(d) {
+			n[a] = d
 		}
 	}
-	return newResourceDataMap
+
+	return n
 }
 
 func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {
