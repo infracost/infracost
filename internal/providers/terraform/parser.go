@@ -181,12 +181,13 @@ func getConfigurationJSONForModulePath(conf gjson.Result, names []string) gjson.
 	return conf.Get(strings.Join(p, "."))
 }
 
-func isInfracostResource(resourceData *schema.ResourceData) bool {
-	for _, providerName := range infracostProviderNames {
-		if resourceData.ProviderName == providerName {
+func isInfracostResource(res *schema.ResourceData) bool {
+	for _, p := range infracostProviderNames {
+		if res.ProviderName == p {
 			return true
 		}
 	}
+
 	return false
 }
 
