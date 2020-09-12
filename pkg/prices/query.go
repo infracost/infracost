@@ -78,19 +78,19 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 
 	queriesBody, err := json.Marshal(queries)
 	if err != nil {
-		return results, err
+		return results, errors.Wrap(err, "error marshaling queries")
 	}
 
 	client := http.Client{}
 	resp, err := client.Post(q.endpoint, "application/json", bytes.NewBuffer([]byte(queriesBody)))
 	if err != nil {
-		return results, err
+		return results, errors.Wrap(err, "error contacting api")
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return results, err
+		return results, errors.Wrap(err, "error reading api response")
 	}
 
 	results = append(results, gjson.ParseBytes(body).Array()...)
