@@ -116,28 +116,30 @@ func main() {
 
 			resources, err := provider.LoadResources()
 			if err != nil {
-				return err
+				return errors.Wrap(err, "error loading resources")
 			}
-			err = prices.PopulatePrices(resources)
-			if err != nil {
-				return err
+
+			if err := prices.PopulatePrices(resources); err != nil {
+				return errors.Wrap(err, "error retrieving prices")
 			}
+
 			schema.CalculateCosts(resources)
+
 			schema.SortResources(resources)
 
 			var out []byte
-			switch c.String("output") {
-			case "table":
-				out, err = output.ToTable(resources)
+			switch strings.ToLower(c.String("output")) {
 			case "json":
 				out, err = output.ToJSON(resources)
 			default:
-				err = cli.ShowAppHelp(c)
+				out, err = output.ToTable(resources)
 			}
-			if err != nil {
-				return err
-			}
+
 			s.Stop()
+
+			if err != nil {
+				return errors.Wrap(err, "output error")
+			}
 
 			fmt.Println(string(out))
 
