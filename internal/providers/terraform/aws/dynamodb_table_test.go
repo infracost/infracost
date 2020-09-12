@@ -10,17 +10,15 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func TestNewDynamoDBTable(t *testing.T) {
+func TestNewDynamoDBTableOnDemand(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
 	tf := `
-	resource "aws_dynamodb_table" "dynamodb-table" {
+	resource "aws_dynamodb_table" "my_dynamodb_table" {
 		name           = "GameScores"
-		billing_mode   = "PROVISIONED"
-		read_capacity  = 30
-		write_capacity = 20
+		billing_mode   = "PAY_PER_REQUEST"
 		hash_key       = "UserId"
 		range_key      = "GameTitle"
 	  
@@ -41,11 +39,78 @@ func TestNewDynamoDBTable(t *testing.T) {
 		replica {
 		  region_name = "us-west-1"
 		}
+	}
+	  
+	data "infracost_aws_dynamodb_table" "my_dynamodb_table" {
+		resources = list(aws_dynamodb_table.my_dynamodb_table.id,)
+	
+		monthly_write_request_units {
+			value = 3000000
+		}
+		monthly_read_request_units {
+			value = 8000000
+		}
+	}
+	  `
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_dynamodb_table.my_dynamodb_table",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Write request unit (WRU)",
+					PriceHash:       "075760076246f7bf5a2b46546e49cb31-418b228ac00af0f32e1843fecbc3d141",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(3000000)),
+				},
+				{
+					Name:            "Read request unit (RRU)",
+					PriceHash:       "641aa07510d472901906f3e97cee96c4-668942c2f9f9b475e74de593d4c32257",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(8000000)),
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, resourceChecks)
+
+}
+
+func TestNewDynamoDBTableProvisioned(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+	resource "aws_dynamodb_table" "my_dynamodb_table" {
+		name           = "GameScores"
+		billing_mode   = "PROVISIONED"
+		read_capacity  = 30
+		write_capacity = 20
+		hash_key       = "UserId"
+		range_key      = "GameTitle"
+	  
+		attribute {
+		  name = "UserId"
+		  type = "S"
+		}
+	  
+		attribute {
+		  name = "GameTitle"
+		  type = "S"
+		}
+
+		replica {
+		  region_name = "us-east-2"
+		}
+	
+		replica {
+		  region_name = "us-west-1"
+		}
 	  }`
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
-			Name: "aws_dynamodb_table.dynamodb-table",
+			Name: "aws_dynamodb_table.my_dynamodb_table",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:            "Write capacity unit (WCU)",

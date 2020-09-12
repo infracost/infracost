@@ -12,20 +12,46 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
 
-	// Check billing mode
 	billingMode := d.Get("billing_mode").String()
-	if billingMode != "PROVISIONED" {
-		log.Warnf("Skipping resource %s. Infracost currently only supports the PROVISIONED billing mode for AWS DynamoDB tables", d.Address)
-		return nil
-	}
 
 	// Write capacity units (WCU)
-	costComponents = append(costComponents, wcuCostComponent(d))
+	if billingMode == "PROVISIONED" && d.Get("write_capacity").Exists() {
+		if billingMode != "PROVISIONED" {
+			log.Warnf("Skipping %s for %s. This attribute is only available for provisioned pricing.", "write_capacity", d.Address)
+		} else {
+			costComponents = append(costComponents, wcuCostComponent(d))
+		}
+	}
 	// Read capacity units (RCU)
-	costComponents = append(costComponents, rcuCostComponent(d))
+	if billingMode == "PROVISIONED" && d.Get("read_capacity").Exists() {
+		if billingMode != "PROVISIONED" {
+			log.Warnf("Skipping %s for %s. This attribute is only available for provisioned pricing.", "read_capacity", d.Address)
+		} else {
+			costComponents = append(costComponents, rcuCostComponent(d))
+		}
+	}
 
 	// Global tables (replica)
 	subResources = append(subResources, globalTables(d)...)
+
+	// Infracost usage data
+
+	// Write request units (WRU)
+	if u != nil && u.Get("monthly_write_request_units").Exists() {
+		if billingMode == "PROVISIONED" {
+			log.Warnf("Skipping %s usage data for %s. This usage data is only available for on-demand pricing.", "monthly_write_request_units", d.Address)
+		} else {
+			costComponents = append(costComponents, wruCostComponent(d, u))
+		}
+	}
+	// Read request units (RRU)
+	if u != nil && u.Get("monthly_read_request_units").Exists() {
+		if billingMode == "PROVISIONED" {
+			log.Warnf("Skipping %s usage data for %s. This usage data is only available for on-demand pricing.", "monthly_read_request_units", d.Address)
+		} else {
+			costComponents = append(costComponents, rruCostComponent(d, u))
+		}
+	}
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -114,6 +140,48 @@ func newDynamoDBGlobalTable(name string, d gjson.Result, region string, capacity
 					DescriptionRegex: strPtr("/beyond the free tier/"),
 				},
 			},
+		},
+	}
+}
+
+func wruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
+	region := d.Get("region").String()
+	return &schema.CostComponent{
+		Name:            "Write request unit (WRU)",
+		Unit:            "WRU",
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_write_request_units.0.value").Int())),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonDynamoDB"),
+			ProductFamily: strPtr("Amazon DynamoDB PayPerRequest Throughput"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "group", Value: strPtr("DDB-WriteUnits")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func rruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
+	region := d.Get("region").String()
+	return &schema.CostComponent{
+		Name:            "Read request unit (RRU)",
+		Unit:            "RRU",
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_read_request_units.0.value").Int())),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonDynamoDB"),
+			ProductFamily: strPtr("Amazon DynamoDB PayPerRequest Throughput"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "group", Value: strPtr("DDB-ReadUnits")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
 		},
 	}
 }
