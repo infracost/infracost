@@ -78,8 +78,6 @@ func parseResourceData(plan, provider, values gjson.Result) map[string]*schema.R
 }
 
 func parseAwsRegion(providerConfig gjson.Result) string {
-	awsRegion := "us-east-1" // Use as fallback
-
 	// Find region from terraform provider config
 	awsRegion := providerConfig.Get("aws.expressions.region.constant_value").String()
 	if awsRegion == "" {
