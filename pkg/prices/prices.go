@@ -63,7 +63,7 @@ func setCostComponentPrice(r *schema.Resource, c *schema.CostComponent, res gjso
 	var err error
 	p, err = decimal.NewFromString(prices[0].Get("USD").String())
 	if err != nil {
-		log.Warnf("Error converting price (using 0.00) '%v':", prices[0].Get("USD").String(), err.Error())
+		log.Warnf("Error converting price (using 0.00) '%v': %s", prices[0].Get("USD").String(), err.Error())
 		c.SetPrice(decimal.Zero)
 		return
 	}

@@ -211,7 +211,7 @@ func addressResourcePart(address string) string {
 // For example: `module.name1.module.name2.resource` will return `module.name1.module.name2.`
 func addressModulePart(address string) string {
 	ap := strings.Split(address, ".")
-	mp := make([]string, 0)
+	var mp []string
 
 	if len(ap) >= 3 && ap[len(ap)-3] == "data" {
 		mp = ap[:len(ap)-3]

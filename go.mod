@@ -6,7 +6,6 @@ require (
 	github.com/briandowns/spinner v1.11.1
 	github.com/fatih/color v1.9.0
 	github.com/google/go-cmp v0.5.2
-	github.com/infracost/infracost v0.5.1
 	github.com/joho/godotenv v1.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/olekukonko/tablewriter v0.0.4
