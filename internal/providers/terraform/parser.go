@@ -25,23 +25,21 @@ func createResource(resourceData *schema.ResourceData, usageData *schema.Resourc
 }
 
 func parsePlanJSON(j []byte) []*schema.Resource {
-	planJSON := gjson.ParseBytes(j)
-	providerConfig := planJSON.Get("configuration.provider_config")
-	plannedValuesJSON := planJSON.Get("planned_values.root_module")
-	configurationJSON := planJSON.Get("configuration.root_module")
+	p := gjson.ParseBytes(j)
+	pc := p.Get("configuration.provider_config")
+	v := p.Get("planned_values.root_module")
+	c := p.Get("configuration.root_module")
 
 	resources := make([]*schema.Resource, 0)
 
-	resourceDataMap := parseResourceData(planJSON, providerConfig, plannedValuesJSON)
-	parseReferences(resourceDataMap, configurationJSON)
-	usageResourceDataMap := buildUsageResourceDataMap(resourceDataMap)
-	resourceDataMap = stripInfracostResources(resourceDataMap)
+	resData := parseResourceData(p, pc, v)
+	parseReferences(resData, c)
+	resUsage := buildUsageResourceDataMap(resData)
+	resData = stripInfracostResources(resData)
 
-	for _, resourceData := range resourceDataMap {
-		usageResourceData := usageResourceDataMap[resourceData.Address]
-		resource := createResource(resourceData, usageResourceData)
-		if resource != nil {
-			resources = append(resources, resource)
+	for _, res := range resData {
+		if r := createResource(res, resUsage[res.Address]); r != nil {
+			resources = append(resources, r)
 		}
 	}
 
