@@ -57,13 +57,13 @@ func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
 }
 
 func loadPlanJSON(path string) ([]byte, error) {
-	planFile, err := os.Open(path)
+	f, err := os.Open(path)
 	if err != nil {
 		return []byte{}, errors.Wrapf(err, "error opening file '%v'", path)
 	}
-	defer planFile.Close()
+	defer f.Close()
 
-	out, err := ioutil.ReadAll(planFile)
+	out, err := ioutil.ReadAll(f)
 	if err != nil {
 		return []byte{}, errors.Wrapf(err, "error reading file '%v'", path)
 	}
