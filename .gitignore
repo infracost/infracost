@@ -1,4 +1,9 @@
-.DS_Store
+# IDE
+.vscode/
+.idea/
+
+# OS
+**/.DS_Store
 
 # Build artifacts
 /build
@@ -9,8 +14,9 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Local env settings
+# Local
 .env.local
+vendor/
 
 # Terraform artifacts
 **/.terraform/**
