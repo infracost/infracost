@@ -52,10 +52,12 @@ func newResourceJSON(resource *schema.Resource) resourceJSON {
 	}
 }
 
-func ToJSON(resources []*schema.Resource) ([]byte, error) {
-	resourceJSONs := make([]resourceJSON, 0, len(resources))
-	for _, resource := range resources {
-		resourceJSONs = append(resourceJSONs, newResourceJSON(resource))
+func ToJSON(r []*schema.Resource) ([]byte, error) {
+	s := make([]resourceJSON, 0, len(r))
+
+	for _, res := range r {
+		s = append(s, newResourceJSON(res))
 	}
-	return json.Marshal(resourceJSONs)
+
+	return json.Marshal(s)
 }
