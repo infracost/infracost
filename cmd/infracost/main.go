@@ -11,6 +11,7 @@ import (
 	"github.com/infracost/infracost/pkg/prices"
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/pkg/errors"
+	"github.com/infracost/infracost/pkg/version"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 
@@ -77,16 +78,29 @@ func main() {
 				Name:  "api-url",
 				Usage: "Price List API URL",
 			},
+			&cli.BoolFlag{
+				Name:  "version",
+				Usage: "Prints the version of infracost and terraform",
+				Value: false,
+			},
 		},
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
 			return customError(c, err.Error())
 		},
 		Action: func(c *cli.Context) error {
+
 			logFormatter.DisableColors = c.Bool("no-color")
 			log.SetFormatter(&logFormatter)
 
 			config.Config.NoColor = c.Bool("no-color")
 			color.NoColor = c.Bool("no-color")
+
+			if c.Bool("version") {
+				fmt.Println("Infracost", version.Version)
+				v, err := terraform.TerraformVersion()
+				fmt.Println(v)
+				return err
+			}
 
 			switch strings.ToUpper(c.String("log-level")) {
 			case "TRACE":

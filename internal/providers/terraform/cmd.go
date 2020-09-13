@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/infracost/infracost/pkg/config"
 
@@ -35,4 +36,13 @@ func terraformCmd(options *cmdOptions, args ...string) ([]byte, error) {
 	cmd.Stderr = log.StandardLogger().WriterLevel(log.ErrorLevel)
 	err := cmd.Run()
 	return outbuf.Bytes(), err
+}
+
+func TerraformVersion() (string, error) {
+	terraformBinary := os.Getenv("TERRAFORM_BINARY")
+	if terraformBinary == "" {
+		terraformBinary = "terraform"
+	}
+	out, err := exec.Command(terraformBinary, "-version").Output()
+	return strings.SplitN(string(out), "\n", 2)[0], err
 }
