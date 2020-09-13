@@ -60,7 +60,7 @@ func main() {
 			&cli.StringFlag{
 				Name:  "log-level",
 				Usage: "Log level (TRACE, DEBUG, INFO, WARN, ERROR)",
-				Value: "INFO",
+				Value: "WARN",
 			},
 			&cli.StringFlag{
 				Name:    "output",
