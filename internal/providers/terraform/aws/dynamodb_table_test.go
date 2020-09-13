@@ -100,6 +100,28 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(230)),
 				},
 			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name: "us-east-2",
+					CostComponentChecks: []testutil.CostComponentCheck{
+						{
+							Name:            "Replicated write request unit (rWRU)",
+							PriceHash:       "bd1c30b527edcc061037142f79c06955-cf867fc796b8147fa126205baed2922c",
+							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(3000000)),
+						},
+					},
+				},
+				{
+					Name: "us-west-1",
+					CostComponentChecks: []testutil.CostComponentCheck{
+						{
+							Name:            "Replicated write request unit (rWRU)",
+							PriceHash:       "67f1a3e0472747acf74cd5e925422fbb-cf867fc796b8147fa126205baed2922c",
+							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(3000000)),
+						},
+					},
+				},
+			},
 		},
 	}
 

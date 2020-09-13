@@ -31,9 +31,6 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 		}
 	}
 
-	// Global tables (replica)
-	subResources = append(subResources, globalTables(d)...)
-
 	// Infracost usage data
 
 	// Write request units (WRU)
@@ -52,6 +49,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 			costComponents = append(costComponents, rruCostComponent(d, u))
 		}
 	}
+
 	// Data storage
 	if u != nil && u.Get("monthly_gb_data_storage").Exists() {
 		costComponents = append(costComponents, dataStorageCostComponent(d, u))
@@ -68,6 +66,9 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	if u != nil && u.Get("monthly_gb_restore").Exists() {
 		costComponents = append(costComponents, restoreCostComponent(d, u))
 	}
+
+	// Global tables (replica)
+	subResources = append(subResources, globalTables(d, u)...)
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -120,20 +121,27 @@ func rcuCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	}
 }
 
-func globalTables(d *schema.ResourceData) []*schema.Resource {
+func globalTables(d *schema.ResourceData, u *schema.ResourceData) []*schema.Resource {
 	resources := make([]*schema.Resource, 0)
+	billingMode := d.Get("billing_mode").String()
 	if d.Get("replica").Exists() {
 		for _, data := range d.Get("replica").Array() {
 			region := data.Get("region_name").String()
 			name := region
-			capacity := d.Get("write_capacity").Int()
-			resources = append(resources, newDynamoDBGlobalTable(name, data, region, capacity))
+			var capacity int64
+			if billingMode == "PROVISIONED" && d.Get("write_capacity").Exists() {
+				capacity = d.Get("write_capacity").Int()
+				resources = append(resources, newProvisionedDynamoDBGlobalTable(name, data, region, capacity))
+			} else if billingMode == "PAY_PER_REQUEST" && u.Get("monthly_write_request_units").Exists() {
+				capacity = u.Get("monthly_write_request_units.0.value").Int()
+				resources = append(resources, newOnDemandDynamoDBGlobalTable(name, data, region, capacity))
+			}
 		}
 	}
 	return resources
 }
 
-func newDynamoDBGlobalTable(name string, d gjson.Result, region string, capacity int64) *schema.Resource {
+func newProvisionedDynamoDBGlobalTable(name string, d gjson.Result, region string, capacity int64) *schema.Resource {
 	return &schema.Resource{
 		Name: name,
 		CostComponents: []*schema.CostComponent{
@@ -154,6 +162,29 @@ func newDynamoDBGlobalTable(name string, d gjson.Result, region string, capacity
 				PriceFilter: &schema.PriceFilter{
 					PurchaseOption:   strPtr("on_demand"),
 					DescriptionRegex: strPtr("/beyond the free tier/"),
+				},
+			},
+		},
+	}
+}
+
+func newOnDemandDynamoDBGlobalTable(name string, d gjson.Result, region string, capacity int64) *schema.Resource {
+	return &schema.Resource{
+		Name: name,
+		CostComponents: []*schema.CostComponent{
+			// Replicated write capacity units (rWCU)
+			{
+				Name:            "Replicated write request unit (rWRU)",
+				Unit:            "rWRU",
+				MonthlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("aws"),
+					Region:        strPtr(region),
+					Service:       strPtr("AmazonDynamoDB"),
+					ProductFamily: strPtr("Amazon DynamoDB PayPerRequest Throughput"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "group", Value: strPtr("DDB-ReplicatedWriteUnits")},
+					},
 				},
 			},
 		},
