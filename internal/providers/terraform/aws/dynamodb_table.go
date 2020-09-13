@@ -67,6 +67,11 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 		costComponents = append(costComponents, restoreCostComponent(d, u))
 	}
 
+	// Stream reads
+	if u != nil && u.Get("monthly_streams_read_request_units").Exists() {
+		costComponents = append(costComponents, streamCostComponent(d, u))
+	}
+
 	// Global tables (replica)
 	subResources = append(subResources, globalTables(d, u)...)
 
@@ -299,6 +304,27 @@ func restoreCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schem
 			Region:        strPtr(region),
 			Service:       strPtr("AmazonDynamoDB"),
 			ProductFamily: strPtr("Amazon DynamoDB Restore Data Size"),
+		},
+	}
+}
+
+func streamCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
+	region := d.Get("region").String()
+	return &schema.CostComponent{
+		Name:            "Streams read request unit",
+		Unit:            "Read request units",
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_streams_read_request_units.0.value").Int())),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonDynamoDB"),
+			ProductFamily: strPtr("API Request"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "group", ValueRegex: strPtr("/DDB-StreamsReadRequests/")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			DescriptionRegex: strPtr("/beyond free tier/"),
 		},
 	}
 }

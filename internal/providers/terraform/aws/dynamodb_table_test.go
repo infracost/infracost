@@ -62,6 +62,9 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 		monthly_gb_restore {
 			value = 230
 		}
+		monthly_streams_read_request_units {
+			value = 2000000
+		}
 	}
 	  `
 
@@ -98,6 +101,11 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 					Name:            "Restore data size",
 					PriceHash:       "38fc5fdbec6f4ef5e3bdf6967dbe1cb2-b1ae3861dc57e2db217fa83a7420374f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(230)),
+				},
+				{
+					Name:            "Streams read request unit",
+					PriceHash:       "070bce0aa726427d947f5215eecd3f6f-4a9dfd3965ffcbab75845ead7a27fd47",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2000000)),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
