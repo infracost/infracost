@@ -56,6 +56,18 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	if u != nil && u.Get("monthly_gb_data_storage").Exists() {
 		costComponents = append(costComponents, dataStorageCostComponent(d, u))
 	}
+	// Continuous backups (PITR)
+	if u != nil && u.Get("monthly_gb_continuous_backup_storage").Exists() {
+		costComponents = append(costComponents, continuousBackupCostComponent(d, u))
+	}
+	// OnDemand backups
+	if u != nil && u.Get("monthly_gb_on_demand_backup_storage").Exists() {
+		costComponents = append(costComponents, onDemandBackupCostComponent(d, u))
+	}
+	// Restoring tables
+	if u != nil && u.Get("monthly_gb_restore").Exists() {
+		costComponents = append(costComponents, restoreCostComponent(d, u))
+	}
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -208,6 +220,54 @@ func dataStorageCostComponent(d *schema.ResourceData, u *schema.ResourceData) *s
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption:   strPtr("on_demand"),
 			DescriptionRegex: strPtr("/storage used beyond first/"),
+		},
+	}
+}
+
+func continuousBackupCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
+	region := d.Get("region").String()
+	return &schema.CostComponent{
+		Name:            "Continuous backup (PITR) storage",
+		Unit:            "GB-months",
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_continuous_backup_storage.0.value").Int())),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonDynamoDB"),
+			ProductFamily: strPtr("Database Storage"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/TimedPITRStorage-ByteHrs/")},
+			},
+		},
+	}
+}
+
+func onDemandBackupCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
+	region := d.Get("region").String()
+	return &schema.CostComponent{
+		Name:            "On-demand backup storage",
+		Unit:            "GB-months",
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_on_demand_backup_storage.0.value").Int())),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonDynamoDB"),
+			ProductFamily: strPtr("Amazon DynamoDB On-Demand Backup Storage"),
+		},
+	}
+}
+
+func restoreCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
+	region := d.Get("region").String()
+	return &schema.CostComponent{
+		Name:            "Restore data size",
+		Unit:            "GB",
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_restore.0.value").Int())),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonDynamoDB"),
+			ProductFamily: strPtr("Amazon DynamoDB Restore Data Size"),
 		},
 	}
 }

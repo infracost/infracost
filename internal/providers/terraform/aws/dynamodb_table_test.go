@@ -53,6 +53,15 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 		monthly_gb_data_storage {
 		 	value = 230
 		}
+		monthly_gb_continuous_backup_storage {
+			value = 2300
+		}
+		monthly_gb_on_demand_backup_storage {
+			value = 460
+		}
+		monthly_gb_restore {
+			value = 230
+		}
 	}
 	  `
 
@@ -73,6 +82,21 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 				{
 					Name:            "Data storage",
 					PriceHash:       "a9781acb5ee117e6c50ab836dd7285b5-ee3dd7e4624338037ca6fea0933a662f",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(230)),
+				},
+				{
+					Name:            "Continuous backup (PITR) storage",
+					PriceHash:       "b4ed90c18b808ffff191ffbc16090c8e-ee3dd7e4624338037ca6fea0933a66",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2300)),
+				},
+				{
+					Name:            "On-demand backup storage",
+					PriceHash:       "0e228653f3f9c663398e91a605c911bd-8753f776c1e737f1a5548191571abc76",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(460)),
+				},
+				{
+					Name:            "Restore data size",
+					PriceHash:       "38fc5fdbec6f4ef5e3bdf6967dbe1cb2-b1ae3861dc57e2db217fa83a7420374f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(230)),
 				},
 			},
