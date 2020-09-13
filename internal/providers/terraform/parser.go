@@ -14,243 +14,258 @@ import (
 // These show differently in the plan JSON for Terraform 0.12 and 0.13
 var infracostProviderNames = []string{"infracost", "infracost.io/infracost/infracost"}
 
-func createResource(resourceData *schema.ResourceData, usageData *schema.ResourceData) *schema.Resource {
-	resourceRegistry := getResourceRegistry()
-	if rFunc, ok := (*resourceRegistry)[resourceData.Type]; ok {
-		return rFunc(resourceData, usageData)
+func createResource(r *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+	registry := getResourceRegistry()
+
+	if rFunc, ok := (*registry)[r.Type]; ok {
+		return rFunc(r, u)
 	}
+
 	return nil
 }
 
 func parsePlanJSON(j []byte) []*schema.Resource {
-	planJSON := gjson.ParseBytes(j)
-	providerConfig := planJSON.Get("configuration.provider_config")
-	plannedValuesJSON := planJSON.Get("planned_values.root_module")
-	configurationJSON := planJSON.Get("configuration.root_module")
+	p := gjson.ParseBytes(j)
+	providerConf := p.Get("configuration.provider_config")
+	planVals := p.Get("planned_values.root_module")
+	conf := p.Get("configuration.root_module")
 
 	resources := make([]*schema.Resource, 0)
 
-	resourceDataMap := parseResourceData(planJSON, providerConfig, plannedValuesJSON)
-	parseReferences(resourceDataMap, configurationJSON)
-	usageResourceDataMap := buildUsageResourceDataMap(resourceDataMap)
-	resourceDataMap = stripInfracostResources(resourceDataMap)
+	resData := parseResourceData(p, providerConf, planVals)
+	parseReferences(resData, conf)
+	resUsage := buildUsageResourceDataMap(resData)
+	resData = stripInfracostResources(resData)
 
-	for _, resourceData := range resourceDataMap {
-		usageResourceData := usageResourceDataMap[resourceData.Address]
-		resource := createResource(resourceData, usageResourceData)
-		if resource != nil {
-			resources = append(resources, resource)
+	for _, r := range resData {
+		if res := createResource(r, resUsage[r.Address]); res != nil {
+			resources = append(resources, res)
 		}
 	}
 
 	return resources
 }
 
-func parseResourceData(planJSON gjson.Result, providerConfig gjson.Result, plannedValuesJSON gjson.Result) map[string]*schema.ResourceData {
-	defaultAwsRegion := parseAwsRegion(providerConfig)
+func parseResourceData(plan, provider, planVals gjson.Result) map[string]*schema.ResourceData {
+	defaultRegion := parseAwsRegion(provider)
 
-	resourceDataMap := make(map[string]*schema.ResourceData)
+	resources := make(map[string]*schema.ResourceData)
 
-	for _, terraformResource := range plannedValuesJSON.Get("resources").Array() {
-		resourceType := terraformResource.Get("type").String()
-		providerName := terraformResource.Get("provider_name").String()
-		address := terraformResource.Get("address").String()
-		rawValues := terraformResource.Get("values")
+	for _, r := range planVals.Get("resources").Array() {
+		t := r.Get("type").String()
+		provider := r.Get("provider_name").String()
+		addr := r.Get("address").String()
+		v := r.Get("values")
 
-		// Override the region with the region from the arn if it
-		awsRegion := defaultAwsRegion
-		if rawValues.Get("arn").Exists() {
-			awsRegion = strings.Split(rawValues.Get("arn").String(), ":")[3]
+		// Override the region with the region from the arn if exists
+		region := defaultRegion
+		if v.Get("arn").Exists() {
+			region = strings.Split(v.Get("arn").String(), ":")[3]
 		}
-		rawValues = schema.AddRawValue(rawValues, "region", awsRegion)
+		v = schema.AddRawValue(v, "region", region)
 
-		resourceDataMap[address] = schema.NewResourceData(resourceType, providerName, address, rawValues)
+		resources[addr] = schema.NewResourceData(t, provider, addr, v)
 	}
 
 	// Recursively add any resources for child modules
-	for _, modulePlannedValueJSON := range plannedValuesJSON.Get("child_modules").Array() {
-		moduleResourceDataMap := parseResourceData(planJSON, providerConfig, modulePlannedValueJSON)
-		for address, resourceData := range moduleResourceDataMap {
-			resourceDataMap[address] = resourceData
+	for _, m := range planVals.Get("child_modules").Array() {
+		for addr, d := range parseResourceData(plan, provider, m) {
+			resources[addr] = d
 		}
 	}
-	return resourceDataMap
+	return resources
 }
 
 func parseAwsRegion(providerConfig gjson.Result) string {
-	awsRegion := "us-east-1" // Use as fallback
-
 	// Find region from terraform provider config
-	awsRegionConfig := providerConfig.Get("aws.expressions.region.constant_value").String()
-	if awsRegionConfig != "" {
-		awsRegion = awsRegionConfig
+	region := providerConfig.Get("aws.expressions.region.constant_value").String()
+	if region == "" {
+		region = "us-east-1"
 	}
 
-	return awsRegion
+	return region
 }
 
-func buildUsageResourceDataMap(resourceDataMap map[string]*schema.ResourceData) map[string]*schema.ResourceData {
-	usageResourceDataMap := make(map[string]*schema.ResourceData)
-	for _, resourceData := range resourceDataMap {
-		if isInfracostResource(resourceData) {
-			for _, refResourceData := range resourceData.References("resources") {
-				usageResourceDataMap[refResourceData.Address] = resourceData
+func buildUsageResourceDataMap(resData map[string]*schema.ResourceData) map[string]*schema.ResourceData {
+	u := make(map[string]*schema.ResourceData)
+
+	for _, r := range resData {
+		if isInfracostResource(r) {
+			for _, ref := range r.References("resources") {
+				u[ref.Address] = r
 			}
 		}
 	}
-	return usageResourceDataMap
+
+	return u
 }
 
-func stripInfracostResources(resourceDataMap map[string]*schema.ResourceData) map[string]*schema.ResourceData {
-	newResourceDataMap := make(map[string]*schema.ResourceData)
-	for address, resourceData := range resourceDataMap {
-		if !isInfracostResource(resourceData) {
-			newResourceDataMap[address] = resourceData
+func stripInfracostResources(resData map[string]*schema.ResourceData) map[string]*schema.ResourceData {
+	n := make(map[string]*schema.ResourceData)
+
+	for addr, d := range resData {
+		if !isInfracostResource(d) {
+			n[addr] = d
 		}
 	}
-	return newResourceDataMap
+
+	return n
 }
 
-func parseReferences(resourceDataMap map[string]*schema.ResourceData, configurationJSON gjson.Result) {
-	for address, resourceData := range resourceDataMap {
-		resourceConfigJSON := getConfigurationJSONForResourceAddress(configurationJSON, address)
+func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {
+	for addr, res := range resData {
+		resConf := getConfigurationJSONForResourceAddress(conf, addr)
 
-		var referencesMap = make(map[string][]string)
-		for attribute, attributeJSON := range resourceConfigJSON.Get("expressions").Map() {
-			getReferences(resourceData, attribute, attributeJSON, &referencesMap)
+		var refsMap = make(map[string][]string)
+		for attr, j := range resConf.Get("expressions").Map() {
+			getReferences(res, attr, j, &refsMap)
 		}
 
-		resourceCountIndex := addressCountIndex(address)
-
-		for attribute, references := range referencesMap {
-			referenceHasCount := containsString(references, "count.index")
-			for _, reference := range references {
-				if reference == "count.index" {
+		for attr, refs := range refsMap {
+			for _, ref := range refs {
+				if ref == "count.index" {
 					continue
 				}
-				arrayPart := ""
-				if referenceHasCount {
-					arrayPart = fmt.Sprintf("[%d]", resourceCountIndex)
+
+				var refAddr string
+				if containsString(refs, "count.index") {
+					refAddr = fmt.Sprintf("%s%s[%d]", addressModulePart(addr), ref, addressCountIndex(addr))
+				} else {
+					refAddr = fmt.Sprintf("%s%s", addressModulePart(addr), ref)
 				}
-				fullRefAddress := fmt.Sprintf("%s%s%s", addressModulePart(address), reference, arrayPart)
-				if refResourceData, ok := resourceDataMap[fullRefAddress]; ok {
-					resourceData.AddReference(attribute, refResourceData)
+
+				if refData, ok := resData[refAddr]; ok {
+					res.AddReference(attr, refData)
 				}
 			}
 		}
 	}
 }
 
-func getReferences(resourceData *schema.ResourceData, attribute string, attributeJSON gjson.Result, referencesMap *map[string][]string) {
-	if attributeJSON.Get("references").Exists() {
-		for _, ref := range attributeJSON.Get("references").Array() {
-			if _, ok := (*referencesMap)[attribute]; !ok {
-				(*referencesMap)[attribute] = make([]string, 0, 1)
+func getReferences(resData *schema.ResourceData, attr string, j gjson.Result, refs *map[string][]string) {
+	if j.Get("references").Exists() {
+		for _, ref := range j.Get("references").Array() {
+			if _, ok := (*refs)[attr]; !ok {
+				(*refs)[attr] = make([]string, 0, 1)
 			}
-			(*referencesMap)[attribute] = append((*referencesMap)[attribute], ref.String())
+
+			(*refs)[attr] = append((*refs)[attr], ref.String())
 		}
-	} else if attributeJSON.IsArray() {
-		for i, attributeJSONItem := range attributeJSON.Array() {
-			getReferences(resourceData, fmt.Sprintf("%s.%d", attribute, i), attributeJSONItem, referencesMap)
+	} else if j.IsArray() {
+		for i, attributeJSONItem := range j.Array() {
+			getReferences(resData, fmt.Sprintf("%s.%d", attr, i), attributeJSONItem, refs)
 		}
-	} else if attributeJSON.Type.String() == "JSON" {
-		attributeJSON.ForEach(func(childAttribute gjson.Result, childAttributeJSON gjson.Result) bool {
-			getReferences(resourceData, fmt.Sprintf("%s.%s", attribute, childAttribute), childAttributeJSON, referencesMap)
+	} else if j.Type.String() == "JSON" {
+		j.ForEach(func(childAttribute gjson.Result, childAttributeJSON gjson.Result) bool {
+			getReferences(resData, fmt.Sprintf("%s.%s", attr, childAttribute), childAttributeJSON, refs)
+
 			return true
 		})
 	}
 }
 
-func getConfigurationJSONForResourceAddress(configurationJSON gjson.Result, address string) gjson.Result {
-	moduleNames := addressModuleNames(address)
-	moduleConfigJSON := getConfigurationJSONForModulePath(configurationJSON, moduleNames)
-	resourceKey := fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(address)))
-	return moduleConfigJSON.Get(resourceKey)
+func getConfigurationJSONForResourceAddress(conf gjson.Result, addr string) gjson.Result {
+	c := getConfigurationJSONForModulePath(conf, getModuleNames(addr))
+
+	return c.Get(fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(addr))))
 }
 
-func getConfigurationJSONForModulePath(configurationJSON gjson.Result, moduleNames []string) gjson.Result {
+func getConfigurationJSONForModulePath(conf gjson.Result, names []string) gjson.Result {
+	if len(names) == 0 {
+		return conf
+	}
+
 	// Build up the gjson search key
-	moduleKeyParts := make([]string, 0, len(moduleNames))
-	for _, moduleName := range moduleNames {
-		moduleKeyParts = append(moduleKeyParts, fmt.Sprintf("module_calls.%s.module", moduleName))
+	p := make([]string, 0, len(names))
+	for _, n := range names {
+		p = append(p, fmt.Sprintf("module_calls.%s.module", n))
 	}
 
-	if len(moduleKeyParts) == 0 {
-		return configurationJSON
-	} else {
-		moduleKey := strings.Join(moduleKeyParts, ".")
-		return configurationJSON.Get(moduleKey)
-	}
+	return conf.Get(strings.Join(p, "."))
 }
 
-func isInfracostResource(resourceData *schema.ResourceData) bool {
-	for _, providerName := range infracostProviderNames {
-		if resourceData.ProviderName == providerName {
+func isInfracostResource(res *schema.ResourceData) bool {
+	for _, p := range infracostProviderNames {
+		if res.ProviderName == p {
 			return true
 		}
 	}
+
 	return false
 }
 
-func addressResourcePart(address string) string {
-	addressParts := strings.Split(address, ".")
-	var resourceParts []string
-	if len(addressParts) >= 3 && addressParts[len(addressParts)-3] == "data" {
-		resourceParts = addressParts[len(addressParts)-3:]
-	} else {
-		resourceParts = addressParts[len(addressParts)-2:]
+// addressResourcePart parses a resource addr and returns resource suffix (without the module prefix).
+// For example: `module.name1.module.name2.resource` will return `name2.resource`
+func addressResourcePart(addr string) string {
+	p := strings.Split(addr, ".")
+
+	if len(p) >= 3 && p[len(p)-3] == "data" {
+		return strings.Join(p[len(p)-3:], ".")
 	}
-	return strings.Join(resourceParts, ".")
+
+	return strings.Join(p[len(p)-2:], ".")
 }
 
-func addressModulePart(address string) string {
-	addressParts := strings.Split(address, ".")
-	var moduleParts []string
-	if len(addressParts) >= 3 && addressParts[len(addressParts)-3] == "data" {
-		moduleParts = addressParts[:len(addressParts)-3]
+// addressModulePart parses a resource addr and returns module prefix.
+// For example: `module.name1.module.name2.resource` will return `module.name1.module.name2.`
+func addressModulePart(addr string) string {
+	ap := strings.Split(addr, ".")
+	var mp []string
+
+	if len(ap) >= 3 && ap[len(ap)-3] == "data" {
+		mp = ap[:len(ap)-3]
 	} else {
-		moduleParts = addressParts[:len(addressParts)-2]
+		mp = ap[:len(ap)-2]
 	}
-	if len(moduleParts) == 0 {
+
+	if len(mp) == 0 {
 		return ""
-	} else {
-		return fmt.Sprintf("%s.", strings.Join(moduleParts, "."))
 	}
+
+	return fmt.Sprintf("%s.", strings.Join(mp, "."))
 }
 
-func addressModuleNames(address string) []string {
+func getModuleNames(addr string) []string {
 	r := regexp.MustCompile(`module\.([^\[]*)`)
-	matches := r.FindAllStringSubmatch(addressModulePart(address), -1)
-
-	moduleNames := make([]string, 0, len(matches))
-	for _, match := range matches {
-		moduleNames = append(moduleNames, match[1])
+	matches := r.FindAllStringSubmatch(addressModulePart(addr), -1)
+	if matches == nil {
+		return []string{}
 	}
 
-	return moduleNames
+	n := make([]string, 0, len(matches))
+	for _, m := range matches {
+		n = append(n, m[1])
+	}
+
+	return n
 }
 
-func addressCountIndex(address string) int {
+func addressCountIndex(addr string) int {
 	r := regexp.MustCompile(`\[(\d+)\]`)
-	match := r.FindStringSubmatch(address)
-	if len(match) > 0 {
-		i, _ := strconv.Atoi(match[1])
+	m := r.FindStringSubmatch(addr)
+
+	if len(m) > 0 {
+		i, _ := strconv.Atoi(m[1]) // TODO: unhandled error
+
 		return i
 	}
+
 	return -1
 }
 
-func removeAddressArrayPart(address string) string {
+func removeAddressArrayPart(addr string) string {
 	r := regexp.MustCompile(`([^\[]+)`)
-	match := r.FindStringSubmatch(addressResourcePart(address))
-	return match[1]
+	m := r.FindStringSubmatch(addressResourcePart(addr))
+
+	return m[1]
 }
 
-func containsString(arr []string, s string) bool {
-	for _, item := range arr {
-		if item == s {
+func containsString(a []string, s string) bool {
+	for _, i := range a {
+		if i == s {
 			return true
 		}
 	}
+
 	return false
 }

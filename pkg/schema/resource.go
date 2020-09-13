@@ -19,26 +19,26 @@ type Resource struct {
 }
 
 func CalculateCosts(resources []*Resource) {
-	for _, resource := range resources {
-		resource.CalculateCosts()
+	for _, r := range resources {
+		r.CalculateCosts()
 	}
 }
 
 func (r *Resource) CalculateCosts() {
-	hourlyCost := decimal.Zero
+	h := decimal.Zero
 
-	for _, costComponent := range r.CostComponents {
-		costComponent.CalculateCosts()
-		hourlyCost = hourlyCost.Add(costComponent.HourlyCost())
+	for _, c := range r.CostComponents {
+		c.CalculateCosts()
+		h = h.Add(c.HourlyCost())
 	}
 
-	for _, subResource := range r.SubResources {
-		subResource.CalculateCosts()
-		hourlyCost = hourlyCost.Add(subResource.HourlyCost())
+	for _, s := range r.SubResources {
+		s.CalculateCosts()
+		h = h.Add(s.HourlyCost())
 	}
 
-	r.hourlyCost = hourlyCost
-	r.monthlyCost = hourlyCost.Mul(hourToMonthMultiplier)
+	r.hourlyCost = h
+	r.monthlyCost = h.Mul(hourToMonthMultiplier)
 }
 
 func (r *Resource) HourlyCost() decimal.Decimal {
@@ -50,14 +50,17 @@ func (r *Resource) MonthlyCost() decimal.Decimal {
 }
 
 func (r *Resource) FlattenedSubResources() []*Resource {
-	subResources := make([]*Resource, 0, len(r.SubResources))
-	for _, subResource := range r.SubResources {
-		subResources = append(subResources, subResource)
-		if len(subResource.SubResources) > 0 {
-			subResources = append(subResources, subResource.FlattenedSubResources()...)
+	resources := make([]*Resource, 0, len(r.SubResources))
+
+	for _, s := range r.SubResources {
+		resources = append(resources, s)
+
+		if len(s.SubResources) > 0 {
+			resources = append(resources, s.FlattenedSubResources()...)
 		}
 	}
-	return subResources
+
+	return resources
 }
 
 func SortResources(resources []*Resource) {
@@ -65,11 +68,11 @@ func SortResources(resources []*Resource) {
 		return resources[i].Name < resources[j].Name
 	})
 
-	for _, resource := range resources {
-		SortResources(resource.SubResources)
+	for _, r := range resources {
+		SortResources(r.SubResources)
 
-		sort.Slice(resource.CostComponents, func(i, j int) bool {
-			return resource.CostComponents[i].Name < resource.CostComponents[j].Name
+		sort.Slice(r.CostComponents, func(i, j int) bool {
+			return r.CostComponents[i].Name < r.CostComponents[j].Name
 		})
 	}
 }
