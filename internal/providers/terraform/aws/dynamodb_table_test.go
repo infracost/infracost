@@ -50,6 +50,9 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 		monthly_read_request_units {
 			value = 8000000
 		}
+		monthly_gb_data_storage {
+		 	value = 230
+		}
 	}
 	  `
 
@@ -66,6 +69,11 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 					Name:            "Read request unit (RRU)",
 					PriceHash:       "641aa07510d472901906f3e97cee96c4-668942c2f9f9b475e74de593d4c32257",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(8000000)),
+				},
+				{
+					Name:            "Data storage",
+					PriceHash:       "a9781acb5ee117e6c50ab836dd7285b5-ee3dd7e4624338037ca6fea0933a662f",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(230)),
 				},
 			},
 		},

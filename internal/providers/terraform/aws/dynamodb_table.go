@@ -52,6 +52,10 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 			costComponents = append(costComponents, rruCostComponent(d, u))
 		}
 	}
+	// Data storage
+	if u != nil && u.Get("monthly_gb_data_storage").Exists() {
+		costComponents = append(costComponents, dataStorageCostComponent(d, u))
+	}
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -182,6 +186,28 @@ func rruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.Co
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func dataStorageCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
+	region := d.Get("region").String()
+	return &schema.CostComponent{
+		Name:            "Data storage",
+		Unit:            "GB-months",
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_data_storage.0.value").Int())),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonDynamoDB"),
+			ProductFamily: strPtr("Database Storage"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/TimedStorage-ByteHrs/")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption:   strPtr("on_demand"),
+			DescriptionRegex: strPtr("/storage used beyond first/"),
 		},
 	}
 }
