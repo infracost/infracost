@@ -86,7 +86,7 @@ func wcuCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
 	return &schema.CostComponent{
 		Name:           "Write capacity unit (WCU)",
-		Unit:           "WCU/hours",
+		Unit:           "WCU-hours",
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(d.Get("write_capacity").Int())),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -108,7 +108,7 @@ func rcuCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
 	return &schema.CostComponent{
 		Name:           "Read capacity unit (RCU)",
-		Unit:           "RCU/hours",
+		Unit:           "RCU-hours",
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(d.Get("read_capacity").Int())),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -153,7 +153,7 @@ func newProvisionedDynamoDBGlobalTable(name string, d gjson.Result, region strin
 			// Replicated write capacity units (rWCU)
 			{
 				Name:           "Replicated write capacity unit (rWCU)",
-				Unit:           "rWCU/hours",
+				Unit:           "rWCU-hours",
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -180,7 +180,7 @@ func newOnDemandDynamoDBGlobalTable(name string, d gjson.Result, region string, 
 			// Replicated write capacity units (rWCU)
 			{
 				Name:            "Replicated write request unit (rWRU)",
-				Unit:            "rWRU",
+				Unit:            "rWRU-months",
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -200,7 +200,7 @@ func wruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.Co
 	region := d.Get("region").String()
 	return &schema.CostComponent{
 		Name:            "Write request unit (WRU)",
-		Unit:            "WRU",
+		Unit:            "WRU-months",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_write_request_units.0.value").Int())),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -221,7 +221,7 @@ func rruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.Co
 	region := d.Get("region").String()
 	return &schema.CostComponent{
 		Name:            "Read request unit (RRU)",
-		Unit:            "RRU",
+		Unit:            "RRU-months",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_read_request_units.0.value").Int())),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -297,7 +297,7 @@ func restoreCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schem
 	region := d.Get("region").String()
 	return &schema.CostComponent{
 		Name:            "Restore data size",
-		Unit:            "GB",
+		Unit:            "GB-months",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_restore.0.value").Int())),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -311,8 +311,8 @@ func restoreCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schem
 func streamCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
 	return &schema.CostComponent{
-		Name:            "Streams read request unit",
-		Unit:            "Read request units",
+		Name:            "Streams read request unit (sRRU)",
+		Unit:            "sRRU-months",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_streams_read_request_units.0.value").Int())),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

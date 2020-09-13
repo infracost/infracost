@@ -89,7 +89,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 				},
 				{
 					Name:            "Continuous backup (PITR) storage",
-					PriceHash:       "b4ed90c18b808ffff191ffbc16090c8e-ee3dd7e4624338037ca6fea0933a66",
+					PriceHash:       "b4ed90c18b808ffff191ffbc16090c8e-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2300)),
 				},
 				{
@@ -103,8 +103,8 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(230)),
 				},
 				{
-					Name:            "Streams read request unit",
-					PriceHash:       "070bce0aa726427d947f5215eecd3f6f-4a9dfd3965ffcbab75845ead7a27fd47",
+					Name:            "Streams read request unit (sRRU)",
+					PriceHash:       "dd063861f705295d00a801050a700b3e-4a9dfd3965ffcbab75845ead7a27fd47",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2000000)),
 				},
 			},
