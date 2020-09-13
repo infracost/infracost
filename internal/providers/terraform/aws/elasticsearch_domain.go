@@ -54,7 +54,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Instance on-demand, (%s)", instanceType),
+			Name:           fmt.Sprintf("Instance (on-demand, %s)", instanceType),
 			Unit:           "hours",
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
 			ProductFilter: &schema.ProductFilter{
@@ -114,7 +114,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 
 	if dedicatedMasterEnabled {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:           fmt.Sprintf("Dedicated Master Instance on-demand, (%s)", dedicatedMasterType),
+			Name:           fmt.Sprintf("Dedicated Master Instance (on-demand, %s)", dedicatedMasterType),
 			Unit:           "hours",
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(dedicatedMasterCount)),
 			ProductFilter: &schema.ProductFilter{
@@ -135,7 +135,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 
 	if ultrawarmEnabled {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:           fmt.Sprintf("Ultrawarm Instance on-demand, (%s)", ultrawarmType),
+			Name:           fmt.Sprintf("Ultrawarm Instance (on-demand, %s)", ultrawarmType),
 			Unit:           "hours",
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(ultrawarmCount)),
 			ProductFilter: &schema.ProductFilter{
