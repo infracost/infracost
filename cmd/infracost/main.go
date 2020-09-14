@@ -153,7 +153,7 @@ func main() {
 	}
 }
 
-func get_cwd() string {
+func getcwd() string {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Warn(err)
