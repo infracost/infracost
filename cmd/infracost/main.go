@@ -44,7 +44,7 @@ func main() {
 				Name:        "tfdir",
 				Usage:       "Path to the Terraform project directory",
 				TakesFile:   true,
-				Value:       get_cwd(),
+				Value:       getcwd(),
 				DefaultText: "current working directory",
 			},
 			&cli.StringFlag{
