@@ -85,7 +85,7 @@ To use a local development version of terraform-provider-infracost
 
 ## Contributing
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Pull requests are welcome! For more info, see the [CONTRIBUTING](CONTRIBUTING.md) file. For major changes, please open an issue first to discuss what you would like to change.
 
 Join our chat, we are a friendly bunch and happy to help you get started :) https://discord.gg/rXCTaH3
 
