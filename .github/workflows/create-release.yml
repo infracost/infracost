@@ -35,7 +35,7 @@ jobs:
             ./build/infracost-darwin-amd64.tar.gz
 
       - name: Update Homebrew formula
-      uses: dawidd6/action-homebrew-bump-formula@v3
-      with:
-        token: ${{secrets.HOMEBREW_RELEASE_TOKEN}}
-        formula: infracost
+        uses: dawidd6/action-homebrew-bump-formula@v3
+        with:
+          token: ${{secrets.HOMEBREW_RELEASE_TOKEN}}
+          formula: infracost
