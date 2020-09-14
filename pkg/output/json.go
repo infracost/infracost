@@ -24,38 +24,40 @@ type resourceJSON struct {
 	SubResources   []resourceJSON      `json:"subresources,omitempty"`
 }
 
-func newResourceJSON(resource *schema.Resource) resourceJSON {
-	costComponentJSONs := make([]costComponentJSON, 0, len(resource.CostComponents))
-	for _, costComponent := range resource.CostComponents {
-		costComponentJSONs = append(costComponentJSONs, costComponentJSON{
-			Name:            costComponent.Name,
-			Unit:            costComponent.Unit,
-			HourlyQuantity:  costComponent.HourlyQuantity.String(),
-			MonthlyQuantity: costComponent.MonthlyQuantity.String(),
-			Price:           costComponent.Price().String(),
-			HourlyCost:      costComponent.HourlyCost().String(),
-			MonthlyCost:     costComponent.MonthlyCost().String(),
+func newResourceJSON(r *schema.Resource) resourceJSON {
+	comps := make([]costComponentJSON, 0, len(r.CostComponents))
+	for _, c := range r.CostComponents {
+		comps = append(comps, costComponentJSON{
+			Name:            c.Name,
+			Unit:            c.Unit,
+			HourlyQuantity:  c.HourlyQuantity.String(),
+			MonthlyQuantity: c.MonthlyQuantity.String(),
+			Price:           c.Price().String(),
+			HourlyCost:      c.HourlyCost().String(),
+			MonthlyCost:     c.MonthlyCost().String(),
 		})
 	}
 
-	subResourceJSONs := make([]resourceJSON, 0, len(resource.SubResources))
-	for _, subResource := range resource.SubResources {
-		subResourceJSONs = append(subResourceJSONs, newResourceJSON(subResource))
+	subresources := make([]resourceJSON, 0, len(r.SubResources))
+	for _, s := range r.SubResources {
+		subresources = append(subresources, newResourceJSON(s))
 	}
 
 	return resourceJSON{
-		Name:           resource.Name,
-		HourlyCost:     resource.HourlyCost().String(),
-		MonthlyCost:    resource.MonthlyCost().String(),
-		CostComponents: costComponentJSONs,
-		SubResources:   subResourceJSONs,
+		Name:           r.Name,
+		HourlyCost:     r.HourlyCost().String(),
+		MonthlyCost:    r.MonthlyCost().String(),
+		CostComponents: comps,
+		SubResources:   subresources,
 	}
 }
 
 func ToJSON(resources []*schema.Resource) ([]byte, error) {
-	resourceJSONs := make([]resourceJSON, 0, len(resources))
-	for _, resource := range resources {
-		resourceJSONs = append(resourceJSONs, newResourceJSON(resource))
+	arr := make([]resourceJSON, 0, len(resources))
+
+	for _, r := range resources {
+		arr = append(arr, newResourceJSON(r))
 	}
-	return json.Marshal(resourceJSONs)
+
+	return json.Marshal(arr)
 }

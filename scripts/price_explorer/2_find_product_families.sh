@@ -1,4 +1,5 @@
 #!/bin/sh
+echo "List of Product Families for $1:"
 gq https://pricing.infracost.io/graphql -q "
 query {
     products (
@@ -10,4 +11,4 @@ query {
   ){
         productFamily
     }
-}" | jq '.data.products | map ({ (.productFamily): .__typename} ) | add'
+}" | jq '.data.products | map ({ (.productFamily): .__typename} ) | add' | jq "keys"

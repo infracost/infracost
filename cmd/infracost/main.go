@@ -3,12 +3,15 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/output"
 	"github.com/infracost/infracost/pkg/prices"
 	"github.com/infracost/infracost/pkg/schema"
+	"github.com/pkg/errors"
+	"github.com/infracost/infracost/pkg/version"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 
@@ -18,13 +21,23 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func main() {
-	formatter := &log.TextFormatter{
-		DisableTimestamp:       true,
-		DisableLevelTruncation: true,
-	}
-	log.SetFormatter(formatter)
+var logFormatter log.TextFormatter = log.TextFormatter{
+	DisableTimestamp:       true,
+	DisableLevelTruncation: true,
+}
 
+func init() {
+	log.SetFormatter(&logFormatter)
+}
+
+func customError(c *cli.Context, msg string) error {
+	color.HiRed(fmt.Sprintf("%v\n", msg))
+	_ = cli.ShowAppHelp(c)
+
+	return fmt.Errorf("")
+}
+
+func main() {
 	app := &cli.App{
 		Name:                 "infracost",
 		Usage:                "Generate cost reports from Terraform plans",
@@ -37,7 +50,7 @@ func main() {
 			},
 			&cli.StringFlag{
 				Name:      "tfplan",
-				Usage:     "Path to Terraform Plan file. Requires tfdir to also be set",
+				Usage:     "Path to Terraform Plan file. Requires 'tfdir' to be set",
 				TakesFile: true,
 			},
 			&cli.StringFlag{
@@ -53,7 +66,7 @@ func main() {
 			&cli.StringFlag{
 				Name:    "output",
 				Aliases: []string{"o"},
-				Usage:   "Output (json, table)",
+				Usage:   "Output format (json, table)",
 				Value:   "table",
 			},
 			&cli.BoolFlag{
@@ -65,45 +78,50 @@ func main() {
 				Name:  "api-url",
 				Usage: "Price List API URL",
 			},
+			&cli.BoolFlag{
+				Name:  "version",
+				Usage: "Prints the version of infracost and terraform",
+				Value: false,
+			},
 		},
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
-			log.Error(err)
-			_ = cli.ShowAppHelp(c)
-			os.Exit(1)
-			return nil
+			return customError(c, err.Error())
 		},
 		Action: func(c *cli.Context) error {
-			if c.Bool("no-color") {
-				config.Config.NoColor = true
-				formatter.DisableColors = true
-				color.NoColor = true
+
+			logFormatter.DisableColors = c.Bool("no-color")
+			log.SetFormatter(&logFormatter)
+
+			config.Config.NoColor = c.Bool("no-color")
+			color.NoColor = c.Bool("no-color")
+
+			if c.Bool("version") {
+				fmt.Println("Infracost", version.Version)
+				v, err := terraform.TerraformVersion()
+				fmt.Println(v)
+				return err
 			}
 
-			if c.String("log-level") != "" {
-				switch c.String("log-level") {
-				case "TRACE":
-					log.SetLevel(log.TraceLevel)
-				case "DEBUG":
-					log.SetLevel(log.DebugLevel)
-				case "INFO":
-					log.SetLevel(log.InfoLevel)
-				case "WARN":
-					log.SetLevel(log.WarnLevel)
-				case "ERROR":
-					log.SetLevel(log.ErrorLevel)
-				}
+			switch strings.ToUpper(c.String("log-level")) {
+			case "TRACE":
+				log.SetLevel(log.TraceLevel)
+			case "DEBUG":
+				log.SetLevel(log.DebugLevel)
+			case "WARN":
+				log.SetLevel(log.WarnLevel)
+			case "ERROR":
+				log.SetLevel(log.ErrorLevel)
+			default:
+				log.SetLevel(log.InfoLevel)
 			}
 
 			if c.String("api-url") != "" {
 				config.Config.ApiUrl = c.String("api-url")
 			}
 
-			provider := terraform.Provider()
-			err := provider.ProcessArgs(c)
-			if err != nil {
-				color.HiRed(err.Error())
-				_ = cli.ShowAppHelp(c)
-				os.Exit(1)
+			provider := terraform.New()
+			if err := provider.ProcessArgs(c); err != nil {
+				return customError(c, err.Error())
 			}
 
 			s := spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
@@ -115,28 +133,30 @@ func main() {
 
 			resources, err := provider.LoadResources()
 			if err != nil {
-				return err
+				return errors.Wrap(err, "error loading resources")
 			}
-			err = prices.PopulatePrices(resources)
-			if err != nil {
-				return err
+
+			if err := prices.PopulatePrices(resources); err != nil {
+				return errors.Wrap(err, "error retrieving prices")
 			}
+
 			schema.CalculateCosts(resources)
+
 			schema.SortResources(resources)
 
 			var out []byte
-			switch c.String("output") {
-			case "table":
-				out, err = output.ToTable(resources)
+			switch strings.ToLower(c.String("output")) {
 			case "json":
 				out, err = output.ToJSON(resources)
 			default:
-				err = cli.ShowAppHelp(c)
+				out, err = output.ToTable(resources)
 			}
-			if err != nil {
-				return err
-			}
+
 			s.Stop()
+
+			if err != nil {
+				return errors.Wrap(err, "output error")
+			}
 
 			fmt.Println(string(out))
 
@@ -144,9 +164,7 @@ func main() {
 		},
 	}
 
-	err := app.Run(os.Args)
-	if err != nil {
-		log.Error(err)
-		os.Exit(1)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
 	}
 }

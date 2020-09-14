@@ -12,6 +12,7 @@ import (
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/infracost/infracost/pkg/version"
+	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -46,22 +47,23 @@ func NewGraphQLQueryRunner(endpoint string) *GraphQLQueryRunner {
 	}
 }
 
-func (q *GraphQLQueryRunner) RunQueries(resource *schema.Resource) ([]queryResult, error) {
-	queryKeys, queries := q.batchQueries(resource)
+func (q *GraphQLQueryRunner) RunQueries(r *schema.Resource) ([]queryResult, error) {
+	keys, queries := q.batchQueries(r)
 
-	log.Debugf("Getting pricing details from %s for %s", config.Config.ApiUrl, resource.Name)
+	log.Debugf("Getting pricing details from %s for %s", config.Config.ApiUrl, r.Name)
+
 	results, err := q.getQueryResults(queries)
 	if err != nil {
 		return []queryResult{}, err
 	}
 
-	return q.zipQueryResults(queryKeys, results), nil
+	return q.zipQueryResults(keys, results), nil
 }
 
-func (q *GraphQLQueryRunner) buildQuery(productFilter *schema.ProductFilter, priceFilter *schema.PriceFilter) GraphQLQuery {
-	variables := map[string]interface{}{}
-	variables["productFilter"] = productFilter
-	variables["priceFilter"] = priceFilter
+func (q *GraphQLQueryRunner) buildQuery(product *schema.ProductFilter, price *schema.PriceFilter) GraphQLQuery {
+	v := map[string]interface{}{}
+	v["productFilter"] = product
+	v["priceFilter"] = price
 
 	query := `
 		query($productFilter: ProductFilter!, $priceFilter: PriceFilter) {
@@ -73,7 +75,8 @@ func (q *GraphQLQueryRunner) buildQuery(productFilter *schema.ProductFilter, pri
 			}
 		}
 	`
-	return GraphQLQuery{query, variables}
+
+	return GraphQLQuery{query, v}
 }
 
 func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
@@ -81,7 +84,7 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 
 	queriesBody, err := json.Marshal(queries)
 	if err != nil {
-		return results, err
+		return results, errors.Wrap(err, "error marshaling queries")
 	}
 
 	req, err := http.NewRequest("POST", q.endpoint, bytes.NewBuffer([]byte(queriesBody)))
@@ -95,13 +98,13 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return results, err
+		return results, errors.Wrap(err, "error contacting api")
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return results, err
+		return results, errors.Wrap(err, "error reading api response")
 	}
 
 	results = append(results, gjson.ParseBytes(body).Array()...)
@@ -111,36 +114,36 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 
 // Batch all the queries for this resource so we can use one GraphQL call
 // Use queryKeys to keep track of which query maps to which sub-resource and price component
-func (q *GraphQLQueryRunner) batchQueries(resource *schema.Resource) ([]queryKey, []GraphQLQuery) {
-	queryKeys := make([]queryKey, 0)
+func (q *GraphQLQueryRunner) batchQueries(r *schema.Resource) ([]queryKey, []GraphQLQuery) {
+	keys := make([]queryKey, 0)
 	queries := make([]GraphQLQuery, 0)
 
-	for _, costComponent := range resource.CostComponents {
-		queryKeys = append(queryKeys, queryKey{resource, costComponent})
-		queries = append(queries, q.buildQuery(costComponent.ProductFilter, costComponent.PriceFilter))
+	for _, c := range r.CostComponents {
+		keys = append(keys, queryKey{r, c})
+		queries = append(queries, q.buildQuery(c.ProductFilter, c.PriceFilter))
 	}
 
-	for _, subResource := range resource.FlattenedSubResources() {
-		for _, costComponent := range subResource.CostComponents {
-			queryKeys = append(queryKeys, queryKey{subResource, costComponent})
-			queries = append(queries, q.buildQuery(costComponent.ProductFilter, costComponent.PriceFilter))
+	for _, r := range r.FlattenedSubResources() {
+		for _, c := range r.CostComponents {
+			keys = append(keys, queryKey{r, c})
+			queries = append(queries, q.buildQuery(c.ProductFilter, c.PriceFilter))
 		}
 	}
 
-	return queryKeys, queries
+	return keys, queries
 }
 
-func (q *GraphQLQueryRunner) zipQueryResults(queryKeys []queryKey, results []gjson.Result) []queryResult {
-	queryResults := make([]queryResult, 0, len(queryKeys))
+func (q *GraphQLQueryRunner) zipQueryResults(k []queryKey, r []gjson.Result) []queryResult {
+	res := make([]queryResult, 0, len(k))
 
-	for i, queryKey := range queryKeys {
-		queryResults = append(queryResults, queryResult{
-			queryKey: queryKey,
-			Result:   results[i],
+	for i, k := range k {
+		res = append(res, queryResult{
+			queryKey: k,
+			Result:   r[i],
 		})
 	}
 
-	return queryResults
+	return res
 }
 
 func getUserAgent() string {

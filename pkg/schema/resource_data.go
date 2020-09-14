@@ -43,13 +43,17 @@ func (d *ResourceData) Set(key string, value interface{}) {
 	d.rawValues = AddRawValue(d.rawValues, key, value)
 }
 
-func AddRawValue(rawValues gjson.Result, key string, value interface{}) gjson.Result {
-	var unmarshalledJSON map[string]interface{}
-	_ = json.Unmarshal([]byte(rawValues.Raw), &unmarshalledJSON)
-	if unmarshalledJSON == nil {
-		unmarshalledJSON = make(map[string]interface{})
+func AddRawValue(r gjson.Result, key string, v interface{}) gjson.Result {
+	j := make(map[string]interface{})
+
+	_ = json.Unmarshal([]byte(r.Raw), &j) // TODO: unhandled error
+	if j == nil {
+		j = make(map[string]interface{})
 	}
-	unmarshalledJSON[key] = value
-	marshalledJSON, _ := json.Marshal(unmarshalledJSON)
-	return gjson.ParseBytes(marshalledJSON)
+
+	j[key] = v
+
+	mj, _ := json.Marshal(j) // TODO: unhandled error
+
+	return gjson.ParseBytes(mj)
 }

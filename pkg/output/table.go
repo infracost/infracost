@@ -13,20 +13,21 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func getLineItemCount(resource *schema.Resource) int {
-	count := len(resource.CostComponents)
+func getLineItemCount(r *schema.Resource) int {
+	c := len(r.CostComponents)
 
-	for _, subResource := range resource.FlattenedSubResources() {
-		count += len(subResource.CostComponents)
+	for _, s := range r.FlattenedSubResources() {
+		c += len(s.CostComponents)
 	}
 
-	return count
+	return c
 }
 
 func getTreePrefix(lineItem int, lineItemCount int) string {
 	if lineItem == lineItemCount {
 		return "└─"
 	}
+
 	return "├─"
 }
 
@@ -34,9 +35,9 @@ func formatCost(d decimal.Decimal) string {
 	f, _ := d.Float64()
 	if f < 0.00005 && f != 0 {
 		return fmt.Sprintf("%.g", f)
-	} else {
-		return fmt.Sprintf("%.4f", f)
 	}
+
+	return fmt.Sprintf("%.4f", f)
 }
 
 func formatQuantity(quantity decimal.Decimal) string {
@@ -48,15 +49,15 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
-	table := tablewriter.NewWriter(bufw)
-	table.SetHeader([]string{"NAME", "MONTHLY QTY", "UNIT", "PRICE", "HOURLY COST", "MONTHLY COST"})
-	table.SetBorder(false)
-	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
-	table.SetAutoWrapText(false)
-	table.SetCenterSeparator("")
-	table.SetColumnSeparator("")
-	table.SetRowSeparator("")
-	table.SetColumnAlignment([]int{
+	t := tablewriter.NewWriter(bufw)
+	t.SetHeader([]string{"NAME", "MONTHLY QTY", "UNIT", "PRICE", "HOURLY COST", "MONTHLY COST"})
+	t.SetBorder(false)
+	t.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+	t.SetAutoWrapText(false)
+	t.SetCenterSeparator("")
+	t.SetColumnSeparator("")
+	t.SetRowSeparator("")
+	t.SetColumnAlignment([]int{
 		tablewriter.ALIGN_LEFT,  // name
 		tablewriter.ALIGN_RIGHT, // monthly quantity
 		tablewriter.ALIGN_LEFT,  // unit
@@ -80,57 +81,57 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 		color = nil
 	}
 
-	for _, resource := range resources {
-		table.Append([]string{resource.Name, "", "", "", "", ""})
+	for _, r := range resources {
+		t.Append([]string{r.Name, "", "", "", "", ""})
 
-		lineItemCount := getLineItemCount(resource)
+		lineItemCount := getLineItemCount(r)
 		lineItem := 0
 
-		for _, costComponent := range resource.CostComponents {
+		for _, c := range r.CostComponents {
 			lineItem++
 
 			row := []string{
-				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), costComponent.Name),
-				formatQuantity(*costComponent.MonthlyQuantity),
-				costComponent.Unit,
-				formatCost(costComponent.Price()),
-				formatCost(costComponent.HourlyCost()),
-				formatCost(costComponent.MonthlyCost()),
+				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), c.Name),
+				formatQuantity(*c.MonthlyQuantity),
+				c.Unit,
+				formatCost(c.Price()),
+				formatCost(c.HourlyCost()),
+				formatCost(c.MonthlyCost()),
 			}
-			table.Rich(row, color)
+			t.Rich(row, color)
 		}
 
-		for _, subResource := range resource.FlattenedSubResources() {
-			for _, costComponent := range subResource.CostComponents {
+		for _, s := range r.FlattenedSubResources() {
+			for _, c := range s.CostComponents {
 				lineItem++
 
 				row := []string{
-					fmt.Sprintf("%s %s (%s)", getTreePrefix(lineItem, lineItemCount), costComponent.Name, subResource.Name),
-					formatQuantity(*costComponent.MonthlyQuantity),
-					costComponent.Unit,
-					formatCost(costComponent.Price()),
-					formatCost(costComponent.HourlyCost()),
-					formatCost(costComponent.MonthlyCost()),
+					fmt.Sprintf("%s %s (%s)", getTreePrefix(lineItem, lineItemCount), c.Name, s.Name),
+					formatQuantity(*c.MonthlyQuantity),
+					c.Unit,
+					formatCost(c.Price()),
+					formatCost(c.HourlyCost()),
+					formatCost(c.MonthlyCost()),
 				}
-				table.Rich(row, color)
+				t.Rich(row, color)
 			}
 		}
 
-		table.Append([]string{
+		t.Append([]string{
 			"Total",
 			"",
 			"",
 			"",
-			formatCost(resource.HourlyCost()),
-			formatCost(resource.MonthlyCost()),
+			formatCost(r.HourlyCost()),
+			formatCost(r.MonthlyCost()),
 		})
-		table.Append([]string{"", "", "", "", "", ""})
+		t.Append([]string{"", "", "", "", "", ""})
 
-		overallTotalHourly = overallTotalHourly.Add(resource.HourlyCost())
-		overallTotalMonthly = overallTotalMonthly.Add(resource.MonthlyCost())
+		overallTotalHourly = overallTotalHourly.Add(r.HourlyCost())
+		overallTotalMonthly = overallTotalMonthly.Add(r.MonthlyCost())
 	}
 
-	table.Append([]string{
+	t.Append([]string{
 		"OVERALL TOTAL",
 		"",
 		"",
@@ -139,7 +140,7 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 		formatCost(overallTotalMonthly),
 	})
 
-	table.Render()
+	t.Render()
 
 	bufw.Flush()
 	return buf.Bytes(), nil
