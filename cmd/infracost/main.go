@@ -54,9 +54,11 @@ func main() {
 				TakesFile: true,
 			},
 			&cli.StringFlag{
-				Name:      "tfdir",
-				Usage:     "Path to the Terraform project directory",
-				TakesFile: true,
+				Name:        "tfdir",
+				Usage:       "Path to the Terraform project directory",
+				TakesFile:   true,
+				Value:       getcwd(),
+				DefaultText: "current working directory",
 			},
 			&cli.StringFlag{
 				Name:  "log-level",
@@ -167,4 +169,14 @@ func main() {
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func getcwd() string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Warn(err)
+		cwd = ""
+	}
+
+	return cwd
 }
