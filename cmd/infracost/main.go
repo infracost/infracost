@@ -157,7 +157,7 @@ func getcwd() string {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Warn(err)
-		cwd = "UNKNOWN"
+		cwd = ""
 	}
 
 	return cwd
