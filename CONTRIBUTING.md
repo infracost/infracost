@@ -63,7 +63,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - units: use plural, e.g. hours, requests, GB-months. For a "unit per something", use singular per time unit, e.g. use GB/month, not GB/months.
 
-- purchase options: if applicable, include "on_demand" in brackets after the cost component name, e.g. `Database instance (on demand`
+- purchase options: if applicable, include "on-demand" in brackets after the cost component name, e.g. `Database instance (on-demand`
 
 - instance type: if applicable, include it in brackets as the 2nd argument, after the cost component name, e.g. `Database instance (on-demand, db.t3.medium)`
 
