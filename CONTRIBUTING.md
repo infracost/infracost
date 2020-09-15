@@ -15,6 +15,7 @@ When adding your first resource, we recommend you look at one of the existing re
 We distinguish the **price** of a resource from its **cost**. Price is the per-unit price advertised by a cloud vendor. The cost of a resource is calculated by multiplying its price by its usage. For example, an EC2 instance might be priced at $0.02 per hour, and if run for 10 hours (its usage), it'll cost $2.00. When adding resources to Infracost, we can always show their price, but if the resource has a usage-based cost component, we can't show its cost. To solve this problem, new resources in Infracost go through two levels of support:
 
 1. Level 1 support: you can add all price components for the resource, even ones that are usage-based, so the price column in the table output is always populated. The hourly and monthly cost for these components will show $0.0000 as illustrated in the following output for AWS Lambda. Once this is done, please send a pull-request to this repo so someone can review/merge it. Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
+
   ```
   NAME                              MONTHLY QTY  UNIT         PRICE   HOURLY COST  MONTHLY COST
 
@@ -26,7 +27,7 @@ We distinguish the **price** of a resource from its **cost**. Price is the per-u
 
 2. The [Infracost Terraform provider](https://github.com/infracost/terraform-provider-infracost) can be updated to add support for usage-based cost components for the new resource. This enables users to add a new data block into their Terraform file to provide usage estimates as shown below. We recommend reviewing one of the existing resources in the `terraform-provider-infracost` repo to see how it works. Once that's done, please open a pull request against the `terraform-provider-infracost` repo, and one against the `infracost` repo that uses your Terraform provider change to populate the cost fields.
 
-  ```
+  ```hcl
   # Use the infracost provider to get cost estimates for Lambda requests and duration
   data "infracost_aws_lambda_function" "lambda" {
     resources = [aws_lambda_function.lambda.id]
@@ -39,8 +40,11 @@ We distinguish the **price** of a resource from its **cost**. Price is the per-u
       value = 350
     }
   }
-
-  # Infracost output shows the hourly/monthly cost columns populated with non-zero values:
+  ```
+  
+  Infracost output shows the hourly/monthly cost columns populated with non-zero values:
+  
+  ```
   NAME                              MONTHLY QTY  UNIT         PRICE   HOURLY COST  MONTHLY COST
 
   aws_lambda_function.lambda
