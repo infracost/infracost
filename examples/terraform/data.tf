@@ -2,12 +2,11 @@
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
+      source = "hashicorp/aws"
     }
     # Install terraform-provider-infracost
     infracost = {
       source = "infracost/infracost"
-      version = "0.0.3"
     }
   }
 }
