@@ -51,10 +51,35 @@ data "infracost_aws_lambda_function" "lambda" {
   resources = [aws_lambda_function.lambda.id]
 
   monthly_requests {
-    value = 100000
+    value = 100000000
   }
 
   average_request_duration {
-    value = 350
+    value = 250
+  }
+}
+
+resource "aws_dynamodb_table" "my_dynamodb_table" {
+  name           = "GameScores"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "UserId"
+  range_key      = "GameTitle"
+  
+  attribute {
+    name = "UserId"
+    type = "S"
+  }
+  
+  attribute {
+    name = "GameTitle"
+    type = "S"
+  }
+  
+  replica {
+    region_name = "us-east-2"
+  }
+  
+  replica {
+    region_name = "us-west-1"
   }
 }
