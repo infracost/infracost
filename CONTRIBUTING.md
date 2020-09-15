@@ -65,7 +65,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - purchase options: if applicable, include "on_demand" in brackets after the cost component name, e.g. `Database instance (on demand`
 
-- instance type: if applicable, include it in brackets as the 2nd argument, after the cost component name, e.g. `Database instance (on demand, db.t3.medium)`
+- instance type: if applicable, include it in brackets as the 2nd argument, after the cost component name, e.g. `Database instance (on-demand, db.t3.medium)`
 
 - storage type: if applicable, include the storage type in brackets in lower case, e.g. `General purpose storage (gp2)`.
 
