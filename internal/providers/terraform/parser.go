@@ -12,7 +12,7 @@ import (
 )
 
 // These show differently in the plan JSON for Terraform 0.12 and 0.13
-var infracostProviderNames = []string{"infracost", "infracost.io/infracost/infracost"}
+var infracostProviderNames = []string{"infracost", "registry.terraform.io/infracost/infracost"}
 
 func createResource(r *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	registry := getResourceRegistry()
