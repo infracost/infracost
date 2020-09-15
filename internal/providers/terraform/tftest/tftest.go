@@ -24,7 +24,7 @@ var tfProviders = `
 				source  = "hashicorp/aws"
 			}
 			infracost = {
-				source = "infracost.io/infracost/infracost"
+				source = "infracost/infracost"
 			}
 		}
 	}
