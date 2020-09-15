@@ -2,7 +2,7 @@
 
 The general process for contributing to Infracost is:
 1. Check the existing Issues and Projects to see if there is something you'd like to work on. The issue labels should help you to find a good first issue or new resources that others have already requested/+1'd.
-2. Create a new issue if there's no issue for what you want to work on. Please put as much as details as you think is necessary, the use-case context is specially helpful if you'd like to receive good feedback.
+2. Create a new issue if there's no issue for what you want to work on. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback.
 3. Send a pull request with the proposed change (don't forget to run `make lint` and `make fmt` first). Please include unit and integration tests where applicable. We're trialing [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) in case you'd like to use those too.
 4. We'll review your change and provide feedback.
 
