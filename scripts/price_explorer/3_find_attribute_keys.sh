@@ -1,6 +1,6 @@
 #!/bin/bash
 attribs=$(
-gq https://pricing.infracost.io/graphql -q "
+gq https://pricing.api.infracost.io/graphql -q "
 query {
     products (
     filter: {

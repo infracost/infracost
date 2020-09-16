@@ -6,17 +6,20 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"strings"
 
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/schema"
-	"github.com/infracost/infracost/pkg/version"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
+
+var InvalidAPIKeyError = errors.New("Invalid API key")
+
+type pricingAPIErrorResponse struct {
+	Error string `json:"error"`
+}
 
 type queryKey struct {
 	Resource      *schema.Resource
@@ -50,7 +53,7 @@ func NewGraphQLQueryRunner(endpoint string) *GraphQLQueryRunner {
 func (q *GraphQLQueryRunner) RunQueries(r *schema.Resource) ([]queryResult, error) {
 	keys, queries := q.batchQueries(r)
 
-	log.Debugf("Getting pricing details from %s for %s", config.Config.ApiUrl, r.Name)
+	log.Debugf("Getting pricing details from %s for %s", config.Config.PricingAPIEndpoint, r.Name)
 
 	results, err := q.getQueryResults(queries)
 	if err != nil {
@@ -84,7 +87,7 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 
 	queriesBody, err := json.Marshal(queries)
 	if err != nil {
-		return results, errors.Wrap(err, "error marshaling queries")
+		return results, errors.Wrap(err, "error marshalling queries")
 	}
 
 	req, err := http.NewRequest("POST", q.endpoint, bytes.NewBuffer([]byte(queriesBody)))
@@ -93,7 +96,8 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 	}
 
 	req.Header.Set("content-type", "application/json")
-	req.Header.Set("User-Agent", getUserAgent())
+	req.Header.Set("User-Agent", config.GetUserAgent())
+	req.Header.Set("X-Api-Key", config.Config.ApiKey)
 
 	client := http.Client{}
 	resp, err := client.Do(req)
@@ -105,6 +109,17 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return results, errors.Wrap(err, "error reading api response")
+	}
+	if resp.StatusCode != 200 {
+		var r pricingAPIErrorResponse
+		err = json.Unmarshal(body, &r)
+		if err != nil {
+			return results, fmt.Errorf("error unmarshalling api response error")
+		}
+		if r.Error == "Invalid API key" {
+			return results, InvalidAPIKeyError
+		}
+		return results, fmt.Errorf(r.Error)
 	}
 
 	results = append(results, gjson.ParseBytes(body).Array()...)
@@ -144,32 +159,4 @@ func (q *GraphQLQueryRunner) zipQueryResults(k []queryKey, r []gjson.Result) []q
 	}
 
 	return res
-}
-
-func getUserAgent() string {
-	userAgent := "infracost"
-	if version.Version != "" {
-		userAgent += fmt.Sprintf("-%s", version.Version)
-
-	}
-	infracostEnv := getInfracostEnv()
-
-	if infracostEnv != "" {
-		userAgent += fmt.Sprintf(" (%s)", infracostEnv)
-	}
-
-	return userAgent
-}
-
-func getInfracostEnv() string {
-	if os.Getenv("INFRACOST_ENV") == "test" || isTesting() {
-		return "test"
-	} else if os.Getenv("INFRACOST_ENV") == "dev" {
-		return "dev"
-	}
-	return ""
-}
-
-func isTesting() bool {
-	return strings.HasSuffix(os.Args[0], ".test")
 }

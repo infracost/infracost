@@ -1,6 +1,6 @@
 #!/bin/sh
 echo "List of Product Families for $1:"
-gq https://pricing.infracost.io/graphql -q "
+gq https://pricing.api.infracost.io/graphql -q "
 query {
     products (
     filter: {

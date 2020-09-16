@@ -21,12 +21,31 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
 ## Installation
 
-To download and install the latest release:
+1. Download and install the latest Infracost release
 
-```sh
-curl --silent --location "https://github.com/infracost/infracost/releases/latest/download/infracost-$(uname -s)-amd64.tar.gz" | tar xz -C /tmp
-sudo mv /tmp/infracost-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64 /usr/local/bin/infracost
-```
+    Linux:
+    ```sh
+    curl --silent --location "https://github.com/infracost/infracost/releases/latest/download/infracost-linux-amd64.tar.gz" | tar xz -C /tmp
+    sudo mv /tmp/infracost-linux-amd64 /usr/local/bin/infracost
+    ```
+
+    Mac OSX:
+    ```sh
+    brew install infracost
+    ```
+
+2.	Use our free hosted API for cloud prices by registering for an API key:
+    ```sh
+    infracost register
+    ```
+
+    Alternatively you can run your [own pricing API](https://github.com/infracost/cloud-pricing-api) and set the `INFRACOST_PRICING_API_ENDPOINT` environment variable to point to it.
+
+3. Set the `INFRACOST_API_KEY` environment variable to your API key, e.g.:
+    ```sh
+    export INFRACOST_API_KEY=XXXXX
+    ```
+    Or persist it in your .zshrc or .bashrc file.
 
 ## Basic usage
 
@@ -51,6 +70,19 @@ make deps
 Install latest version of terraform-provider-infracost. If you want to use a local development version see [#using-a-local-version-of-terraform-provider-infracost](#using-a-local-version-of-terraform-provider-infracost)
 ```sh
 make install_provider
+```
+
+Get an API key.
+```sh
+make run ARGS="register"
+```
+Alternatively checkout and run the [cloud-pricing-api](https://github.com/infracost/cloud-pricing-api) and set the `INFRACOST_PRICING_API_ENDPOINT` environment variable to point to it.
+
+Add the API key to your `.env.local` file:
+```
+cat <<EOF >> .env.local
+INFRACOST_API_KEY=XXX
+EOF
 ```
 
 Run the code:
