@@ -1,4 +1,5 @@
-<a href="https://www.infracost.io"><img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/logo.svg" width=320 alt="Infracost logo" /></a>
+<a href="https://www.infracost.io"><img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/logo.svg" width=320 alt="Infracost logo" /></a> &nbsp;
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Get%20cost%20estimates%20for%20cloud%20infrastructure%20in%20pull%20requests!&url=https://infracost.io&hashtags=cloud,cost,aws,IaC,terraform)
 
 <a href="https://www.infracost.io/docs/"><img alt="Docs" src="https://img.shields.io/badge/docs-blue"/></a>
 <a href="https://discord.gg/rXCTaH3"><img alt="Discord Chat" src="https://img.shields.io/discord/746703155953270794.svg"/></a>
