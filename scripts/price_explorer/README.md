@@ -119,7 +119,7 @@ When adding a new resource to infracost, a `productFilter` has to be added that 
       usagetype=Multi-AZUsage:db.m6g.4xl
       ```
 
-* When writing integration tests, a `PriceHash` is used to match the price of a cost component so the tests continue to pass even if the actual price value changes. To find a `PriceHash`, browse to [https://pricing.infracost.io/graphql](https://pricing.infracost.io/graphql) and use the following query/variables:
+* When writing integration tests, a `PriceHash` is used to match the price of a cost component so the tests continue to pass even if the actual price value changes. To find a `PriceHash`, browse to [https://pricing.api.infracost.io/graphql](https://pricing.api.infracost.io/graphql) and use the following query/variables:
 
   * query:
 

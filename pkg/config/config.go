@@ -1,12 +1,15 @@
 package config
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
+	"github.com/infracost/infracost/pkg/version"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
@@ -14,9 +17,12 @@ import (
 
 // ConfigSpec contains mapping of environment variable names to config values
 type ConfigSpec struct {
-	NoColor  bool
-	ApiUrl   string `envconfig:"INFRACOST_API_URL"  required:"true"  default:"https://pricing.infracost.io"`
-	LogLevel string `envconfig:"INFRACOST_LOG_LEVEL"  required:"false"`
+	NoColor                   bool
+	LogLevel                  string `envconfig:"INFRACOST_LOG_LEVEL"  required:"false"`
+	DefaultPricingAPIEndpoint string `envconfig:"DEFAULT_INFRACOST_PRICING_API_ENDPOINT" default:"https://pricing.api.infracost.io"`
+	PricingAPIEndpoint        string `envconfig:"INFRACOST_PRICING_API_ENDPOINT" required:"true" default:"https://pricing.api.infracost.io"`
+	DashboardAPIEndpoint      string `envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT" required:"true" default:"https://dashboard.api.infracost.io"`
+	ApiKey                    string `envconfig:"INFRACOST_API_KEY"`
 }
 
 func (c *ConfigSpec) SetLogLevel(l string) error {
@@ -103,6 +109,40 @@ func loadConfig() *ConfigSpec {
 	}
 
 	return &config
+}
+
+func GetUserAgent() string {
+	userAgent := "infracost"
+	if version.Version != "" {
+		userAgent += fmt.Sprintf("-%s", version.Version)
+
+	}
+	infracostEnv := getInfracostEnv()
+
+	if infracostEnv != "" {
+		userAgent += fmt.Sprintf(" (%s)", infracostEnv)
+	}
+
+	return userAgent
+}
+
+func getInfracostEnv() string {
+	if os.Getenv("INFRACOST_ENV") == "test" || isTesting() {
+		return "test"
+	} else if os.Getenv("INFRACOST_ENV") == "dev" {
+		return "dev"
+	} else if strings.ToLower(os.Getenv("GITHUB_ACTIONS")) == "true" {
+		return "github_actions"
+	} else if strings.ToLower(os.Getenv("GITLAB_CI")) == "true" {
+		return "gitlab_ci"
+	} else if strings.ToLower(os.Getenv("CIRCLECI")) == "true" {
+		return "circleci"
+	}
+	return ""
+}
+
+func isTesting() bool {
+	return strings.HasSuffix(os.Args[0], ".test")
 }
 
 var Config = loadConfig()

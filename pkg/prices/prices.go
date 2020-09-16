@@ -13,9 +13,12 @@ import (
 )
 
 func PopulatePrices(resources []*schema.Resource) error {
-	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
+	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.PricingAPIEndpoint))
 
 	for _, r := range resources {
+		if r.IsSkipped {
+			continue
+		}
 		if err := GetPrices(r, q); err != nil {
 			return errors.Wrapf(err, "error retrieving price for resource: '%v'", r.Name)
 		}
