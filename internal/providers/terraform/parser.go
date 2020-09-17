@@ -9,6 +9,7 @@ import (
 	"github.com/infracost/infracost/pkg/schema"
 
 	"github.com/tidwall/gjson"
+	log "github.com/sirupsen/logrus"
 )
 
 // These show differently in the plan JSON for Terraform 0.12 and 0.13
@@ -123,18 +124,37 @@ func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result)
 
 		for attr, refs := range refsMap {
 			for _, ref := range refs {
-				if ref == "count.index" {
+				if ref == "count.index" || strings.HasPrefix(ref, "var.") {
 					continue
 				}
 
-				var refAddr string
-				if containsString(refs, "count.index") {
-					refAddr = fmt.Sprintf("%s%s[%d]", addressModulePart(addr), ref, addressCountIndex(addr))
-				} else {
-					refAddr = fmt.Sprintf("%s%s", addressModulePart(addr), ref)
+				var refData *schema.ResourceData
+				ok := false
+				m := addressModulePart(addr)
+				refAddr := fmt.Sprintf("%s%s", m, ref)
+
+				// see if there's a resource that's an exact match on the address
+				refData, ok = resData[refAddr]
+
+				// if there's a count ref value then try with the array index of the count ref
+				if !ok && containsString(refs, "count.index") {
+					a := fmt.Sprintf("%s[%d]", refAddr, addressCountIndex(addr))	
+					refData, ok = resData[a]
+					if ok {
+						log.Debugf("reference specifies a count: using resource %s for %s.%s", a, addr, attr)
+					}
 				}
 
-				if refData, ok := resData[refAddr]; ok {
+				// if still not found, see if there's a matching resource with an [0] array part
+				if !ok {
+					a := fmt.Sprintf("%s[0]", refAddr)
+					refData, ok = resData[a]
+					if ok {
+						log.Debugf("reference does not specify a count: using resource %s for for %s.%s", a, addr, attr)
+					}
+				}
+
+				if ok {
 					res.AddReference(attr, refData)
 				}
 			}
@@ -226,7 +246,7 @@ func addressModulePart(addr string) string {
 }
 
 func getModuleNames(addr string) []string {
-	r := regexp.MustCompile(`module\.([^\[]*)`)
+	r := regexp.MustCompile(`module\.([^\.\[]*)`)
 	matches := r.FindAllStringSubmatch(addressModulePart(addr), -1)
 	if matches == nil {
 		return []string{}
