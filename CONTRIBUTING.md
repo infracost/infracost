@@ -1,7 +1,7 @@
 # Contributing to Infracost
 
 The general process for contributing to Infracost is:
-1. Check the existing Issues and Projects to see if there is something you'd like to work on. The issue labels should help you to find a good first issue or new resources that others have already requested/+1'd.
+1. Check this [Project](https://github.com/infracost/infracost/projects/1) to see if there is something you'd like to work on; these are the ones we'd like to focus on in the near future. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check; the issue labels should help you to find a good first issue, or new resources that others have already requested/+1'd.
 2. Create a new issue if there's no issue for what you want to work on. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback.
 3. Send a pull request with the proposed change (don't forget to run `make lint` and `make fmt` first). Please include unit and integration tests where applicable. We're trialing [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) in case you'd like to use those too.
 4. We'll review your change and provide feedback.
@@ -25,7 +25,7 @@ We distinguish the **price** of a resource from its **cost**. Price is the per-u
   Total                                                                    0.0000        0.0000
   ```
 
-2. The [Infracost Terraform provider](https://github.com/infracost/terraform-provider-infracost) can be updated to add support for usage-based cost components for the new resource. This enables users to add a new data block into their Terraform file to provide usage estimates as shown below. We recommend reviewing one of the existing resources in the `terraform-provider-infracost` repo to see how it works. Once that's done, please open a pull request against the `terraform-provider-infracost` repo, and one against the `infracost` repo that uses your Terraform provider change to populate the cost fields.
+2. The [Infracost Terraform provider](https://github.com/infracost/terraform-provider-infracost) can be updated to add support for usage-based cost components for the new resource. This enables users to add a new data block into their Terraform file to provide usage estimates as shown below. We recommend reviewing one of the existing resources in the `terraform-provider-infracost` repo to see how it works. Once that's done, please open a pull request against the `terraform-provider-infracost` repo, and one against the `infracost` repo that uses your Terraform provider change to populate the cost fields. **Note** that we're still gathering feedback about the Infracost Terraform provider and we might change approach. We recommend that you create an issue if you'd like to work on this so we can guide you through other options that we might want to consider.
 
   ```hcl
   # Use the infracost provider to get cost estimates for Lambda requests and duration
@@ -76,3 +76,5 @@ The following notes are general guidelines, please leave a comment in your pull 
 - upper/lower case: cost componet names should start with a capital letter and use capital letters for acronyms, for example, `General purpose storage (gp2)` and `Provisioned IOPS storage`.
 
 - unnecessary words: drop the following words from cost component names if the cloud vendor's pricing webpage shows them: "Rate" "Volumes", "SSD", "HDD"
+
+- brackets: only use 1 set of brackets after a component name, e.g. `Database instance (on-demand, db.t3.medium)` and not `Database instance (on-demand) (db.t3.medium)`
