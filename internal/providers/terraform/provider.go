@@ -102,3 +102,19 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 
 	return out, nil
 }
+
+func ShowSkippedResources(resources []*schema.Resource, showDetails bool) {
+	skippedCount := 0
+	unSupportedCount := 0
+	for _, r := range resources {
+		if r.IsSkipped {
+			skippedCount++
+			unSupportedCount++
+			if showDetails {
+				fmt.Printf("Skipped %s | This resource is not currently supported.\n", r.Name)
+			}
+		}
+	}
+	message := "%d out of %d resources were skipped, %d aren't supported in Infracost yet (https://www.infracost.io/docs/supported_resources), re-run with --show-skipped to see the list.\n"
+	fmt.Printf(message, skippedCount, len(resources), unSupportedCount)
+}

@@ -167,6 +167,8 @@ func main() {
 
 			fmt.Println(string(out))
 
+			terraform.ShowSkippedResources(resources, c.Bool("show-skipped"))
+
 			return nil
 		},
 	}
