@@ -56,6 +56,9 @@ func ToJSON(resources []*schema.Resource) ([]byte, error) {
 	arr := make([]resourceJSON, 0, len(resources))
 
 	for _, r := range resources {
+		if r.IsSkipped {
+			continue
+		}
 		arr = append(arr, newResourceJSON(r))
 	}
 

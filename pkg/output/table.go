@@ -82,6 +82,9 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 	}
 
 	for _, r := range resources {
+		if r.IsSkipped {
+			continue
+		}
 		t.Append([]string{r.Name, "", "", "", "", ""})
 
 		lineItemCount := getLineItemCount(r)
