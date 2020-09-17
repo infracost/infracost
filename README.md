@@ -1,4 +1,4 @@
-<a href="https://www.infracost.io"><img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/logo.svg" width=320 alt="Infracost logo" /></a> &nbsp;
+<a href="https://www.infracost.io"><img src="https://raw.githubusercontent.com/infracost/infracost/master/assets/logo.svg" width=320 alt="Infracost logo" /></a>
 
 <a href="https://www.infracost.io/docs/"><img alt="Docs" src="https://img.shields.io/badge/docs-blue"/></a>
 <a href="https://discord.gg/rXCTaH3"><img alt="Discord Chat" src="https://img.shields.io/discord/746703155953270794.svg"/></a>
