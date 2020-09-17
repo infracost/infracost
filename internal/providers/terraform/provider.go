@@ -106,10 +106,15 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 func ShowSkippedResources(resources []*schema.Resource, showDetails bool) {
 	skippedCount := 0
 	unSupportedCount := 0
+	freeCount := 0
 	for _, r := range resources {
 		if r.IsSkipped {
 			skippedCount++
-			unSupportedCount++
+			if r.IsFree() {
+				freeCount++
+			} else {
+				unSupportedCount++
+			}
 			if showDetails {
 				message := fmt.Sprintf("Skipped %s", r.Name)
 				if r.SkipMessage != "" {
@@ -119,6 +124,6 @@ func ShowSkippedResources(resources []*schema.Resource, showDetails bool) {
 			}
 		}
 	}
-	message := "%d out of %d resources were skipped, %d aren't supported in Infracost yet (https://www.infracost.io/docs/supported_resources), re-run with --show-skipped to see the list.\n"
-	fmt.Printf(message, skippedCount, len(resources), unSupportedCount)
+	message := "%d out of %d resources were skipped, %d are free, and %d aren't supported in Infracost yet(https://www.infracost.io/docs/supported_resources), re-run with --show-skipped to see the list.\n"
+	fmt.Printf(message, skippedCount, len(resources), freeCount, unSupportedCount)
 }
