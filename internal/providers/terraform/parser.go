@@ -23,8 +23,9 @@ func createResource(r *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 	}
 
 	return &schema.Resource{
-		Name:      r.Address,
-		IsSkipped: true,
+		Name:        r.Address,
+		IsSkipped:   true,
+		SkipMessage: "This resource is not currently supported",
 	}
 }
 

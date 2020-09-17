@@ -111,7 +111,11 @@ func ShowSkippedResources(resources []*schema.Resource, showDetails bool) {
 			skippedCount++
 			unSupportedCount++
 			if showDetails {
-				fmt.Printf("Skipped %s | This resource is not currently supported.\n", r.Name)
+				message := fmt.Sprintf("Skipped %s", r.Name)
+				if r.SkipMessage != "" {
+					message += fmt.Sprintf(" | %s.", r.SkipMessage)
+				}
+				fmt.Printf("%s\n", message)
 			}
 		}
 	}

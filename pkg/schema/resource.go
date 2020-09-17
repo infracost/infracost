@@ -17,6 +17,7 @@ type Resource struct {
 	hourlyCost     decimal.Decimal
 	monthlyCost    decimal.Decimal
 	IsSkipped      bool
+	SkipMessage    string
 }
 
 func CalculateCosts(resources []*Resource) {
