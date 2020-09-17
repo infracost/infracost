@@ -45,3 +45,6 @@ jobs:
 
     - name: Test
       run: make test
+
+    - name: Test example works ok
+      run: make run ARGS="--tfdir examples/terraform"
