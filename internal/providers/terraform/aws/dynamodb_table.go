@@ -137,7 +137,7 @@ func globalTables(d *schema.ResourceData, u *schema.ResourceData) []*schema.Reso
 			if billingMode == "PROVISIONED" && d.Get("write_capacity").Exists() {
 				capacity = d.Get("write_capacity").Int()
 				resources = append(resources, newProvisionedDynamoDBGlobalTable(name, data, region, capacity))
-			} else if billingMode == "PAY_PER_REQUEST" && u.Get("monthly_write_request_units").Exists() {
+			} else if billingMode == "PAY_PER_REQUEST" && u != nil && u.Get("monthly_write_request_units").Exists() {
 				capacity = u.Get("monthly_write_request_units.0.value").Int()
 				resources = append(resources, newOnDemandDynamoDBGlobalTable(name, data, region, capacity))
 			}
