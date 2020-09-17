@@ -17,7 +17,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	// Write capacity units (WCU)
 	if billingMode == "PROVISIONED" && d.Get("write_capacity").Exists() {
 		if billingMode != "PROVISIONED" {
-			log.Warnf("Skipping %s for %s. This attribute is only available for provisioned pricing.", "write_capacity", d.Address)
+			log.Debugf("Skipping %s for %s. This attribute is only available for provisioned pricing.", "write_capacity", d.Address)
 		} else {
 			costComponents = append(costComponents, wcuCostComponent(d))
 		}
@@ -25,7 +25,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	// Read capacity units (RCU)
 	if billingMode == "PROVISIONED" && d.Get("read_capacity").Exists() {
 		if billingMode != "PROVISIONED" {
-			log.Warnf("Skipping %s for %s. This attribute is only available for provisioned pricing.", "read_capacity", d.Address)
+			log.Debugf("Skipping %s for %s. This attribute is only available for provisioned pricing.", "read_capacity", d.Address)
 		} else {
 			costComponents = append(costComponents, rcuCostComponent(d))
 		}
@@ -36,7 +36,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	// Write request units (WRU)
 	if u != nil && u.Get("monthly_write_request_units").Exists() {
 		if billingMode == "PROVISIONED" {
-			log.Warnf("Skipping %s usage data for %s. This usage data is only available for on-demand pricing.", "monthly_write_request_units", d.Address)
+			log.Debugf("Skipping %s usage data for %s. This usage data is only available for on-demand pricing.", "monthly_write_request_units", d.Address)
 		} else {
 			costComponents = append(costComponents, wruCostComponent(d, u))
 		}
@@ -44,7 +44,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	// Read request units (RRU)
 	if u != nil && u.Get("monthly_read_request_units").Exists() {
 		if billingMode == "PROVISIONED" {
-			log.Warnf("Skipping %s usage data for %s. This usage data is only available for on-demand pricing.", "monthly_read_request_units", d.Address)
+			log.Debugf("Skipping %s usage data for %s. This usage data is only available for on-demand pricing.", "monthly_read_request_units", d.Address)
 		} else {
 			costComponents = append(costComponents, rruCostComponent(d, u))
 		}
@@ -137,7 +137,7 @@ func globalTables(d *schema.ResourceData, u *schema.ResourceData) []*schema.Reso
 			if billingMode == "PROVISIONED" && d.Get("write_capacity").Exists() {
 				capacity = d.Get("write_capacity").Int()
 				resources = append(resources, newProvisionedDynamoDBGlobalTable(name, data, region, capacity))
-			} else if billingMode == "PAY_PER_REQUEST" && u.Get("monthly_write_request_units").Exists() {
+			} else if billingMode == "PAY_PER_REQUEST" && u != nil && u.Get("monthly_write_request_units").Exists() {
 				capacity = u.Get("monthly_write_request_units.0.value").Int()
 				resources = append(resources, newOnDemandDynamoDBGlobalTable(name, data, region, capacity))
 			}
