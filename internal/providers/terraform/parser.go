@@ -19,7 +19,12 @@ func createResource(r *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 	registry := getResourceRegistry()
 
 	if rFunc, ok := (*registry)[r.Type]; ok {
-		return rFunc(r, u)
+		r := rFunc(r, u)
+		if r.IsFree() {
+			r.IsSkipped = true
+			r.SkipMessage = "This resource is free"
+		}
+		return r
 	}
 
 	return &schema.Resource{
