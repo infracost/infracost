@@ -124,6 +124,12 @@ func ShowSkippedResources(resources []*schema.Resource, showDetails bool) {
 			}
 		}
 	}
-	message := "%d out of %d resources were skipped, %d are free, and %d aren't supported in Infracost yet(https://www.infracost.io/docs/supported_resources), re-run with --show-skipped to see the list.\n"
-	fmt.Printf(message, skippedCount, len(resources), freeCount, unSupportedCount)
+	message := "%d out of %d resources couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)"
+	if showDetails {
+		message += ".\n"
+	} else {
+		message += ", re-run with --show-skipped to see the list.\n"
+	}
+	fmt.Printf(message, unSupportedCount, len(resources))
+	fmt.Println("We're continually adding new resources, please create an issue if you'd like us to prioritize your list.")
 }
