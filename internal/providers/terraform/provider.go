@@ -122,6 +122,9 @@ func ShowSkippedResources(resources []*schema.Resource, showDetails bool) {
 			}
 		}
 	}
+	if unSupportedCount == 0 {
+		return
+	}
 	message := "%d out of %d resources couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)"
 	if showDetails {
 		message += ".\n"
