@@ -107,6 +107,7 @@ func ShowSkippedResources(resources []*schema.Resource, showDetails bool) {
 	skippedCount := 0
 	unSupportedCount := 0
 	freeCount := 0
+	unSupportedTypeCount := make(map[string]int)
 	for _, r := range resources {
 		if r.IsSkipped {
 			skippedCount++
@@ -114,13 +115,10 @@ func ShowSkippedResources(resources []*schema.Resource, showDetails bool) {
 				freeCount++
 			} else {
 				unSupportedCount++
-			}
-			if showDetails && !r.IsFree() {
-				message := fmt.Sprintf("Skipped %s", r.Name)
-				if r.SkipMessage != "" {
-					message += fmt.Sprintf(" | %s.", r.SkipMessage)
+				if _, ok := unSupportedTypeCount[r.ResourceType]; !ok {
+					unSupportedTypeCount[r.ResourceType] = 0
 				}
-				fmt.Printf("%s\n", message)
+				unSupportedTypeCount[r.ResourceType]++
 			}
 		}
 	}
@@ -131,5 +129,10 @@ func ShowSkippedResources(resources []*schema.Resource, showDetails bool) {
 		message += ", re-run with --show-skipped to see the list.\n"
 	}
 	fmt.Printf(message, unSupportedCount, len(resources))
+	if showDetails {
+		for rType, count := range unSupportedTypeCount {
+			fmt.Printf("%d x %s \n", count, rType)
+		}
+	}
 	fmt.Println("We're continually adding new resources, please create an issue if you'd like us to prioritize your list.")
 }
