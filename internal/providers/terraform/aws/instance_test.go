@@ -121,3 +121,64 @@ func TestInstance(t *testing.T) {
 
 	tftest.ResourceTests(t, tf, resourceChecks)
 }
+
+func TestInstance_ebsOptimized(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_instance" "instance1" {
+			ami           = "fake_ami"
+			instance_type = "m3.large"
+			ebs_optimized = true
+		}
+
+		resource "aws_instance" "instance2" {
+			ami           = "fake_ami"
+			instance_type = "r3.xlarge"
+			ebs_optimized = true
+		}`
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_instance.instance1",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Compute (on-demand, m3.large)",
+					PriceHash:       "1abac89a8296443758727a2728579a2a-d2c98780d7b6e36641b521f1f8145c6f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.instance2",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Compute (on-demand, r3.xlarge)",
+					PriceHash:       "5fc0daede99fac3cce64d575979d7233-d2c98780d7b6e36641b521f1f8145c6f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:            "EBS-Optimized Usage",
+					PriceHash:       "7f4fb9da921a628aedfbe150d930e255-d2c98780d7b6e36641b521f1f8145c6f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, resourceChecks)
+}

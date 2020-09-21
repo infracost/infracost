@@ -26,11 +26,11 @@ func NewInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resourc
 	return &schema.Resource{
 		Name:           d.Address,
 		SubResources:   subResources,
-		CostComponents: []*schema.CostComponent{computeCostComponent(d, region, "on_demand")},
+		CostComponents: computeCostComponents(d, region, "on_demand"),
 	}
 }
 
-func computeCostComponent(d *schema.ResourceData, region string, purchaseOption string) *schema.CostComponent {
+func computeCostComponents(d *schema.ResourceData, region string, purchaseOption string) []*schema.CostComponent {
 	instanceType := d.Get("instance_type").String()
 
 	tenancy := "Shared"
@@ -43,27 +43,50 @@ func computeCostComponent(d *schema.ResourceData, region string, purchaseOption 
 		"spot":      "spot",
 	}[purchaseOption]
 
-	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Compute (%s, %s)", purchaseOptionLabel, instanceType),
-		Unit:           "hours",
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr("AmazonEC2"),
-			ProductFamily: strPtr("Compute Instance"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "instanceType", Value: strPtr(instanceType)},
-				{Key: "tenancy", Value: strPtr(tenancy)},
-				{Key: "operatingSystem", Value: strPtr("Linux")},
-				{Key: "preInstalledSw", Value: strPtr("NA")},
-				{Key: "capacitystatus", Value: strPtr("Used")},
+	costComponents := []*schema.CostComponent{
+		{
+			Name:           fmt.Sprintf("Compute (%s, %s)", purchaseOptionLabel, instanceType),
+			Unit:           "hours",
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEC2"),
+				ProductFamily: strPtr("Compute Instance"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "instanceType", Value: strPtr(instanceType)},
+					{Key: "tenancy", Value: strPtr(tenancy)},
+					{Key: "operatingSystem", Value: strPtr("Linux")},
+					{Key: "preInstalledSw", Value: strPtr("NA")},
+					{Key: "capacitystatus", Value: strPtr("Used")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: &purchaseOption,
 			},
 		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: &purchaseOption,
-		},
 	}
+
+	if d.Get("ebs_optimized").Bool() {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:                 "EBS-Optimized Usage",
+			Unit:                 "hours",
+			HourlyQuantity:       decimalPtr(decimal.NewFromInt(1)),
+			IgnoreIfMissingPrice: true,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEC2"),
+				ProductFamily: strPtr("Compute Instance"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "instanceType", Value: strPtr(instanceType)},
+					{Key: "usagetype", ValueRegex: strPtr("/EBSOptimized/")},
+				},
+			},
+		})
+	}
+
+	return costComponents
 }
 
 func newRootBlockDevice(d gjson.Result, region string) *schema.Resource {
