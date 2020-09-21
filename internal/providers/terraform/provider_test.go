@@ -29,7 +29,8 @@ func TestLoadResources_rootModule(t *testing.T) {
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
-			Name: "aws_nat_gateway.nat1",
+			Name:      "aws_nat_gateway.nat1",
+			SkipCheck: true,
 		},
 	}
 
@@ -78,10 +79,12 @@ func TestLoadResources_nestedModule(t *testing.T) {
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
-			Name: "module.module1.aws_nat_gateway.nat1",
+			Name:      "module.module1.aws_nat_gateway.nat1",
+			SkipCheck: true,
 		},
 		{
-			Name: "module.module1.module.module2.aws_nat_gateway.nat2",
+			Name:      "module.module1.module.module2.aws_nat_gateway.nat2",
+			SkipCheck: true,
 		},
 	}
 

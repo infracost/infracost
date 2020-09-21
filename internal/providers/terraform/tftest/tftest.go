@@ -55,7 +55,7 @@ func WithProviders(tf string) string {
 	return fmt.Sprintf("%s%s", tfProviders, tf)
 }
 
-func ResourceTests(t *testing.T, tf string, resourceChecks []testutil.ResourceCheck) {
+func ResourceTests(t *testing.T, tf string, checks []testutil.ResourceCheck) {
 	project := Project{
 		Files: []File{
 			{
@@ -65,18 +65,16 @@ func ResourceTests(t *testing.T, tf string, resourceChecks []testutil.ResourceCh
 		},
 	}
 
-	ResourceTestsForProject(t, project, resourceChecks)
+	ResourceTestsForProject(t, project, checks)
 }
 
-func ResourceTestsForProject(t *testing.T, project Project, resourceChecks []testutil.ResourceCheck) {
+func ResourceTestsForProject(t *testing.T, project Project, checks []testutil.ResourceCheck) {
 	resources, err := RunCostCalculations(project)
 	if err != nil {
 		t.Error(err)
 	}
 
-	for _, resourceCheck := range resourceChecks {
-		testutil.TestResource(t, resources, resourceCheck)
-	}
+	testutil.TestResources(t, resources, checks)
 }
 
 func RunCostCalculations(project Project) ([]*schema.Resource, error) {

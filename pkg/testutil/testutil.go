@@ -14,6 +14,7 @@ type CostCheckFunc func(*testing.T, *schema.CostComponent)
 
 type ResourceCheck struct {
 	Name                string
+	SkipCheck           bool
 	CostComponentChecks []CostComponentCheck
 	SubResourceChecks   []ResourceCheck
 }
@@ -21,6 +22,7 @@ type ResourceCheck struct {
 type CostComponentCheck struct {
 	Name             string
 	PriceHash        string
+	SkipCheck        bool
 	HourlyCostCheck  CostCheckFunc
 	MonthlyCostCheck CostCheckFunc
 }
@@ -43,39 +45,64 @@ func MonthlyPriceMultiplierCheck(multiplier decimal.Decimal) CostCheckFunc {
 	}
 }
 
-func TestResource(t *testing.T, resources []*schema.Resource, resourceCheck ResourceCheck) {
-	found, resource := findResource(resources, resourceCheck.Name)
-	if !found {
-		t.Errorf("No resource matched for name %s", resourceCheck.Name)
-		return
+func TestResources(t *testing.T, resources []*schema.Resource, checks []ResourceCheck) {
+	foundResources := make(map[*schema.Resource]bool)
+
+	for _, check := range checks {
+		found, r := findResource(resources, check.Name)
+		if !found {
+			t.Errorf("No resource matched for name %s", check.Name)
+			continue
+		}
+		foundResources[r] = true
+
+		if check.SkipCheck {
+			continue
+		}
+
+		TestCostComponents(t, r.CostComponents, check.CostComponentChecks)
+		TestResources(t, r.SubResources, check.SubResourceChecks)
 	}
 
-	for _, costComponentCheck := range resourceCheck.CostComponentChecks {
-		TestCostComponent(t, resource.CostComponents, costComponentCheck)
-	}
-
-	for _, subResourceCheck := range resourceCheck.SubResourceChecks {
-		TestResource(t, resource.SubResources, subResourceCheck)
+	for _, r := range resources {
+		if m, ok := foundResources[r]; !ok || !m {
+			t.Errorf("Unexpected resource %s", r.Name)
+		}
 	}
 }
 
-func TestCostComponent(t *testing.T, costComponents []*schema.CostComponent, costComponentCheck CostComponentCheck) {
-	found, costComponent := findCostComponent(costComponents, costComponentCheck.Name)
-	if !found {
-		t.Errorf("No cost component matched for name %s", costComponentCheck.Name)
-		return
+func TestCostComponents(t *testing.T, costComponents []*schema.CostComponent, checks []CostComponentCheck) {
+	foundCostComponents := make(map[*schema.CostComponent]bool)
+
+	for _, check := range checks {
+		found, c := findCostComponent(costComponents, check.Name)
+		if !found {
+			t.Errorf("No cost component matched for name %s", check.Name)
+			continue
+		}
+		foundCostComponents[c] = true
+
+		if check.SkipCheck {
+			continue
+		}
+
+		if !cmp.Equal(c.PriceHash(), check.PriceHash) {
+			t.Errorf("Unexpected cost component price hash for %s (expected: %s, got: %s)", c.Name, check.PriceHash, c.PriceHash())
+		}
+
+		if check.HourlyCostCheck != nil {
+			check.HourlyCostCheck(t, c)
+		}
+
+		if check.MonthlyCostCheck != nil {
+			check.MonthlyCostCheck(t, c)
+		}
 	}
 
-	if !cmp.Equal(costComponent.PriceHash(), costComponentCheck.PriceHash) {
-		t.Errorf("Unexpected cost component price hash for %s (expected: %s, got: %s)", costComponent.Name, costComponentCheck.PriceHash, costComponent.PriceHash())
-	}
-
-	if costComponentCheck.HourlyCostCheck != nil {
-		costComponentCheck.HourlyCostCheck(t, costComponent)
-	}
-
-	if costComponentCheck.MonthlyCostCheck != nil {
-		costComponentCheck.MonthlyCostCheck(t, costComponent)
+	for _, c := range costComponents {
+		if m, ok := foundCostComponents[c]; !ok || !m {
+			t.Errorf("Unexpected cost component %s", c.Name)
+		}
 	}
 }
 
