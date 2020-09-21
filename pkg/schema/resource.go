@@ -81,7 +81,5 @@ func SortResources(resources []*Resource) {
 }
 
 func (r *Resource) IsFree() bool {
-	// FIXME: Remove after https://github.com/infracost/infracost/issues/121 is done.
-	return false
 	return len(r.CostComponents) == 0
 }
