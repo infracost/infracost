@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/infracost/infracost/pkg/schema"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -18,6 +19,11 @@ func GetInstanceRegistryItem() *schema.RegistryItem {
 }
 
 func NewInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+	if d.Get("tenancy").Exists() && d.Get("tenancy").String() == "host" {
+		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances", d.Address)
+		return nil
+	}
+
 	region := d.Get("region").String()
 	subResources := make([]*schema.Resource, 0)
 	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))

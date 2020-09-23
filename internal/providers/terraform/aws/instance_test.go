@@ -182,3 +182,20 @@ func TestInstance_ebsOptimized(t *testing.T) {
 
 	tftest.ResourceTests(t, tf, resourceChecks)
 }
+
+func TestInstance_hostTenancy(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_instance" "instance1" {
+			ami           = "fake_ami"
+			instance_type = "m3.medium"
+			tenancy       = "host"
+		}`
+
+	resourceChecks := []testutil.ResourceCheck{}
+
+	tftest.ResourceTests(t, tf, resourceChecks)
+}
