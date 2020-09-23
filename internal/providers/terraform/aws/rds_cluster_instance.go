@@ -6,6 +6,13 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func GetRDSClusterInstanceRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_rds_cluster_instance",
+		RFunc: NewRDSClusterInstance,
+	}
+}
+
 func NewRDSClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 

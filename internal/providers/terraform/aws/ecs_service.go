@@ -11,6 +11,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func GetECSServiceRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_ecs_service",
+		Notes: []string{"Fargate on-demand only."},
+		RFunc: NewECSService,
+	}
+}
+
 func NewECSService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	launchType := d.Get("launch_type").String()
 	if launchType != "FARGATE" {
