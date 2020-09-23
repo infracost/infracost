@@ -154,9 +154,9 @@ func main() {
 			var out []byte
 			switch strings.ToLower(c.String("output")) {
 			case "json":
-				out, err = output.ToJSON(resources)
+				out, err = output.ToJSON(resources, c)
 			default:
-				out, err = output.ToTable(resources)
+				out, err = output.ToTable(resources, c)
 			}
 
 			s.Stop()
@@ -166,8 +166,6 @@ func main() {
 			}
 
 			fmt.Println(string(out))
-
-			terraform.ShowSkippedResources(resources, c.Bool("show-skipped"))
 
 			return nil
 		},
