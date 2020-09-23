@@ -13,38 +13,6 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func getLineItemCount(r *schema.Resource) int {
-	c := len(r.CostComponents)
-
-	for _, s := range r.FlattenedSubResources() {
-		c += len(s.CostComponents)
-	}
-
-	return c
-}
-
-func getTreePrefix(lineItem int, lineItemCount int) string {
-	if lineItem == lineItemCount {
-		return "└─"
-	}
-
-	return "├─"
-}
-
-func formatCost(d decimal.Decimal) string {
-	f, _ := d.Float64()
-	if f < 0.00005 && f != 0 {
-		return fmt.Sprintf("%.g", f)
-	}
-
-	return fmt.Sprintf("%.4f", f)
-}
-
-func formatQuantity(quantity decimal.Decimal) string {
-	f, _ := quantity.Float64()
-	return strconv.FormatFloat(f, 'f', -1, 64)
-}
-
 func ToTable(resources []*schema.Resource) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
@@ -69,53 +37,11 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 	overallTotalHourly := decimal.Zero
 	overallTotalMonthly := decimal.Zero
 
-	color := []tablewriter.Colors{
-		{tablewriter.FgHiBlackColor},
-		{tablewriter.FgHiBlackColor},
-		{tablewriter.FgHiBlackColor},
-		{tablewriter.FgHiBlackColor},
-		{tablewriter.FgHiBlackColor},
-		{tablewriter.FgHiBlackColor},
-	}
-	if config.Config.NoColor {
-		color = nil
-	}
-
 	for _, r := range resources {
 		t.Append([]string{r.Name, "", "", "", "", ""})
 
-		lineItemCount := getLineItemCount(r)
-		lineItem := 0
-
-		for _, c := range r.CostComponents {
-			lineItem++
-
-			row := []string{
-				fmt.Sprintf("%s %s", getTreePrefix(lineItem, lineItemCount), c.Name),
-				formatQuantity(*c.MonthlyQuantity),
-				c.Unit,
-				formatCost(c.Price()),
-				formatCost(c.HourlyCost()),
-				formatCost(c.MonthlyCost()),
-			}
-			t.Rich(row, color)
-		}
-
-		for _, s := range r.FlattenedSubResources() {
-			for _, c := range s.CostComponents {
-				lineItem++
-
-				row := []string{
-					fmt.Sprintf("%s %s (%s)", getTreePrefix(lineItem, lineItemCount), c.Name, s.Name),
-					formatQuantity(*c.MonthlyQuantity),
-					c.Unit,
-					formatCost(c.Price()),
-					formatCost(c.HourlyCost()),
-					formatCost(c.MonthlyCost()),
-				}
-				t.Rich(row, color)
-			}
-		}
+		buildCostComponentRows(t, r.CostComponents, "", len(r.SubResources) > 0)
+		buildSubResourceRows(t, r.SubResources, "")
 
 		t.Append([]string{
 			"Total",
@@ -144,4 +70,71 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 
 	bufw.Flush()
 	return buf.Bytes(), nil
+}
+
+func buildSubResourceRows(t *tablewriter.Table, subresources []*schema.Resource, prefix string) {
+	color := []tablewriter.Colors{
+		{tablewriter.FgHiBlackColor},
+	}
+	if config.Config.NoColor {
+		color = nil
+	}
+
+	for i, r := range subresources {
+		labelPrefix := prefix + "├─"
+		nextPrefix := prefix + "│  "
+		if i == len(subresources)-1 {
+			labelPrefix = prefix + "└─"
+			nextPrefix = prefix + "   "
+		}
+
+		t.Rich([]string{fmt.Sprintf("%s %s", labelPrefix, r.Name)}, color)
+
+		buildCostComponentRows(t, r.CostComponents, nextPrefix, len(r.SubResources) > 0)
+		buildSubResourceRows(t, r.SubResources, nextPrefix)
+	}
+}
+
+func buildCostComponentRows(t *tablewriter.Table, costComponents []*schema.CostComponent, prefix string, hasSubResources bool) {
+	color := []tablewriter.Colors{
+		{tablewriter.FgHiBlackColor},
+		{tablewriter.FgHiBlackColor},
+		{tablewriter.FgHiBlackColor},
+		{tablewriter.FgHiBlackColor},
+		{tablewriter.FgHiBlackColor},
+		{tablewriter.FgHiBlackColor},
+	}
+	if config.Config.NoColor {
+		color = nil
+	}
+
+	for i, c := range costComponents {
+		labelPrefix := prefix + "├─"
+		if !hasSubResources && i == len(costComponents)-1 {
+			labelPrefix = prefix + "└─"
+		}
+
+		t.Rich([]string{
+			fmt.Sprintf("%s %s", labelPrefix, c.Name),
+			formatQuantity(*c.MonthlyQuantity),
+			c.Unit,
+			formatCost(c.Price()),
+			formatCost(c.HourlyCost()),
+			formatCost(c.MonthlyCost()),
+		}, color)
+	}
+}
+
+func formatCost(d decimal.Decimal) string {
+	f, _ := d.Float64()
+	if f < 0.00005 && f != 0 {
+		return fmt.Sprintf("%.g", f)
+	}
+
+	return fmt.Sprintf("%.4f", f)
+}
+
+func formatQuantity(quantity decimal.Decimal) string {
+	f, _ := quantity.Float64()
+	return strconv.FormatFloat(f, 'f', -1, 64)
 }
