@@ -45,7 +45,7 @@ func TestAutoscalingGroup_launchConfiguration(t *testing.T) {
 					Name: "aws_launch_configuration.lc1",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Compute (on-demand, t3.small)",
+							Name:            "Linux/UNIX Usage (on-demand, t3.small)",
 							PriceHash:       "ed297854a1dd56ba7b6e2b958de7ac53-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 						},
@@ -125,7 +125,7 @@ func TestAutoscalingGroup_launchTemplate(t *testing.T) {
 					Name: "aws_launch_template.lt1",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Compute (on-demand, t3.medium)",
+							Name:            "Linux/UNIX Usage (on-demand, t3.medium)",
 							PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 						},
@@ -223,12 +223,12 @@ func TestAutoscalingGroup_mixedInstanceLaunchTemplate(t *testing.T) {
 					Name: "aws_launch_template.lt1",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Compute (on-demand, t3.large)",
+							Name:            "Linux/UNIX Usage (on-demand, t3.large)",
 							PriceHash:       "3a45cd05e73384099c2ff360bdb74b74-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 						},
 						{
-							Name:            "Compute (spot, t3.large)",
+							Name:            "Linux/UNIX Usage (spot, t3.large)",
 							PriceHash:       "3a45cd05e73384099c2ff360bdb74b74-803d7f1cd2f621429b63f791730e7935",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 						},
@@ -299,12 +299,12 @@ func TestAutoscalingGroup_mixedInstanceLaunchTemplateDynamic(t *testing.T) {
 					Name: "aws_launch_template.lt1",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Compute (on-demand, t3.large)",
+							Name:            "Linux/UNIX Usage (on-demand, t3.large)",
 							PriceHash:       "3a45cd05e73384099c2ff360bdb74b74-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 						},
 						{
-							Name:            "Compute (spot, t3.large)",
+							Name:            "Linux/UNIX Usage (spot, t3.large)",
 							PriceHash:       "3a45cd05e73384099c2ff360bdb74b74-803d7f1cd2f621429b63f791730e7935",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 						},

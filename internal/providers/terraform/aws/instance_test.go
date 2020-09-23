@@ -54,7 +54,7 @@ func TestInstance(t *testing.T) {
 			Name: "aws_instance.instance1",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Compute (on-demand, m3.medium)",
+					Name:            "Linux/UNIX Usage (on-demand, m3.medium)",
 					PriceHash:       "666e02bbe686f6950fd8a47a55e83a75-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -145,7 +145,7 @@ func TestInstance_ebsOptimized(t *testing.T) {
 			Name: "aws_instance.instance1",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Compute (on-demand, m3.large)",
+					Name:            "Linux/UNIX Usage (on-demand, m3.large)",
 					PriceHash:       "1abac89a8296443758727a2728579a2a-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -161,7 +161,7 @@ func TestInstance_ebsOptimized(t *testing.T) {
 			Name: "aws_instance.instance2",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Compute (on-demand, r3.xlarge)",
+					Name:            "Linux/UNIX Usage (on-demand, r3.xlarge)",
 					PriceHash:       "5fc0daede99fac3cce64d575979d7233-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},

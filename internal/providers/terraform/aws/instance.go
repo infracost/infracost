@@ -45,7 +45,7 @@ func computeCostComponents(d *schema.ResourceData, region string, purchaseOption
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Compute (%s, %s)", purchaseOptionLabel, instanceType),
+			Name:           fmt.Sprintf("Linux/UNIX Usage (%s, %s)", purchaseOptionLabel, instanceType),
 			Unit:           "hours",
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
