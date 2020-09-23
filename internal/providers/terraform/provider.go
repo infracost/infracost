@@ -103,7 +103,7 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 	return out, nil
 }
 
-func ShowSkippedResources(resources []*schema.Resource, showDetails bool) {
+func CountSkippedResources(resources []*schema.Resource) (map[string]int, int, int, int) {
 	skippedCount := 0
 	unSupportedCount := 0
 	freeCount := 0
@@ -111,31 +111,13 @@ func ShowSkippedResources(resources []*schema.Resource, showDetails bool) {
 	for _, r := range resources {
 		if r.IsSkipped {
 			skippedCount++
-			if r.IsFree() {
-				freeCount++
-			} else {
-				unSupportedCount++
-				if _, ok := unSupportedTypeCount[r.ResourceType]; !ok {
-					unSupportedTypeCount[r.ResourceType] = 0
-				}
-				unSupportedTypeCount[r.ResourceType]++
+			// FIXME: Count free resources when https://github.com/infracost/infracost/issues/121 is done
+			unSupportedCount++
+			if _, ok := unSupportedTypeCount[r.ResourceType]; !ok {
+				unSupportedTypeCount[r.ResourceType] = 0
 			}
+			unSupportedTypeCount[r.ResourceType]++
 		}
 	}
-	if unSupportedCount == 0 {
-		return
-	}
-	message := "%d out of %d resources couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)"
-	if showDetails {
-		message += ".\n"
-	} else {
-		message += ", re-run with --show-skipped to see the list.\n"
-	}
-	fmt.Printf(message, unSupportedCount, len(resources))
-	if showDetails {
-		for rType, count := range unSupportedTypeCount {
-			fmt.Printf("%d x %s \n", count, rType)
-		}
-	}
-	fmt.Println("We're continually adding new resources, please create an issue if you'd like us to prioritize your list.")
+	return unSupportedTypeCount, skippedCount, unSupportedCount, freeCount
 }
