@@ -19,6 +19,7 @@ import (
 
 var tfProviders = `
 	terraform {
+		plugin_cache_dir = ".test_cache/terraform_plugins"
 		required_providers {
 			aws = {
 				source  = "hashicorp/aws"

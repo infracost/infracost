@@ -3,6 +3,7 @@ package terraform
 import (
 	"bufio"
 	"bytes"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -16,6 +17,8 @@ import (
 type cmdOptions struct {
 	TerraformDir string
 }
+
+var terraformLogger = log.StandardLogger().WithField("binary", "terraform")
 
 func terraformCmd(options *cmdOptions, args ...string) ([]byte, error) {
 	terraformBinary := os.Getenv("TERRAFORM_BINARY")
@@ -32,9 +35,12 @@ func terraformCmd(options *cmdOptions, args ...string) ([]byte, error) {
 	cmd.Dir = options.TerraformDir
 
 	var outbuf bytes.Buffer
-	cmd.Stdout = bufio.NewWriter(&outbuf)
+	b := bufio.NewWriter(&outbuf)
+	cmd.Stdout = io.MultiWriter(b, terraformLogger.WriterLevel(log.DebugLevel))
 	cmd.Stderr = log.StandardLogger().WriterLevel(log.ErrorLevel)
 	err := cmd.Run()
+
+	b.Flush()
 	return outbuf.Bytes(), err
 }
 
