@@ -76,7 +76,7 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 	}
 
 	if path == "" {
-		_, err := terraformCmd(opts, "init")
+		_, err := terraformCmd(opts, "init", "-no-color")
 		if err != nil {
 			return []byte{}, errors.Wrap(err, "error initializing terraform working directory")
 		}
@@ -87,7 +87,7 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 		}
 		defer os.Remove(f.Name())
 
-		_, err = terraformCmd(opts, "plan", "-input=false", "-lock=false", fmt.Sprintf("-out=%s", f.Name()))
+		_, err = terraformCmd(opts, "plan", "-input=false", "-lock=false", "-no-color", fmt.Sprintf("-out=%s", f.Name()))
 		if err != nil {
 			return []byte{}, errors.Wrap(err, "error generating terraform execution plan")
 		}

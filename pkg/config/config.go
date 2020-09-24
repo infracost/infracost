@@ -51,7 +51,7 @@ func LogSortingFunc(keys []string) {
 	}
 }
 
-func rootDir() string {
+func RootDir() string {
 	_, b, _, _ := runtime.Caller(0)
 	return filepath.Join(filepath.Dir(b), "../..")
 }
@@ -71,7 +71,7 @@ func loadConfig() *ConfigSpec {
 
 	config.NoColor = false
 
-	envLocalPath := filepath.Join(rootDir(), ".env.local")
+	envLocalPath := filepath.Join(RootDir(), ".env.local")
 	if fileExists(envLocalPath) {
 		err = godotenv.Load(envLocalPath)
 		if err != nil {

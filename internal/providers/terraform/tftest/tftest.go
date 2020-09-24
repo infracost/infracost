@@ -8,9 +8,11 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/prices"
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/infracost/infracost/pkg/testutil"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 
@@ -19,7 +21,6 @@ import (
 
 var tfProviders = `
 	terraform {
-		plugin_cache_dir = ".test_cache/terraform_plugins"
 		required_providers {
 			aws = {
 				source  = "hashicorp/aws"
@@ -42,6 +43,8 @@ var tfProviders = `
 
 	provider "infracost" {}
 `
+
+var pluginCache = filepath.Join(config.RootDir(), ".test_cache/terraform_plugins")
 
 type Project struct {
 	Files []File
@@ -92,6 +95,13 @@ func RunCostCalculations(project Project) ([]*schema.Resource, error) {
 }
 
 func loadResources(project Project) ([]*schema.Resource, error) {
+	err := os.MkdirAll(pluginCache, os.ModePerm)
+	if err != nil {
+		log.Errorf("Error creating plugin cache directory: %s", err.Error())
+	} else {
+		os.Setenv("TF_PLUGIN_CACHE_DIR", pluginCache)
+	}
+
 	tfdir, err := writeToTmpDir(project)
 	if err != nil {
 		return nil, err
