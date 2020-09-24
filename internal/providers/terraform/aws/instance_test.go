@@ -199,3 +199,161 @@ func TestInstance_hostTenancy(t *testing.T) {
 
 	tftest.ResourceTests(t, tf, resourceChecks)
 }
+
+func TestInstance_cpuCredits(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_instance" "t3_default" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+
+		resource "aws_instance" "t3_unlimited" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+			credit_specification {
+				cpu_credits = "unlimited"
+			}
+		}
+
+		resource "aws_instance" "t3_standard" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+			credit_specification {
+				cpu_credits = "standard"
+			}
+		}
+
+		resource "aws_instance" "t2_default" {
+			ami           = "fake_ami"
+			instance_type = "t2.medium"
+		}
+
+		resource "aws_instance" "t2_unlimited" {
+			ami           = "fake_ami"
+			instance_type = "t2.medium"
+			credit_specification {
+				cpu_credits = "unlimited"
+			}
+		}
+
+		resource "aws_instance" "t2_standard" {
+			ami           = "fake_ami"
+			instance_type = "t2.medium"
+			credit_specification {
+				cpu_credits = "standard"
+			}
+		}`
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_instance.t3_default",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:      "Linux/UNIX Usage (on-demand, t3.medium)",
+					SkipCheck: true,
+				},
+				{
+					Name:      "CPU Credits",
+					PriceHash: "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.t3_unlimited",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:      "Linux/UNIX Usage (on-demand, t3.medium)",
+					SkipCheck: true,
+				},
+				{
+					Name:            "CPU Credits",
+					PriceHash:       "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.Zero),
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.t3_standard",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:      "Linux/UNIX Usage (on-demand, t3.medium)",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.t2_default",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:      "Linux/UNIX Usage (on-demand, t2.medium)",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.t2_unlimited",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:      "Linux/UNIX Usage (on-demand, t2.medium)",
+					SkipCheck: true,
+				},
+				{
+					Name:            "CPU Credits",
+					PriceHash:       "4aaa3d22a88b57f7997e91888f867be9-e8e892be2fbd1c8f42fd6761ad8977d8",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.Zero),
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.t2_standard",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:      "Linux/UNIX Usage (on-demand, t2.medium)",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, resourceChecks)
+}

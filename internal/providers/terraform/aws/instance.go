@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/pkg/schema"
 	log "github.com/sirupsen/logrus"
@@ -87,6 +88,31 @@ func computeCostComponents(d *schema.ResourceData, region string, purchaseOption
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "instanceType", Value: strPtr(instanceType)},
 					{Key: "usagetype", ValueRegex: strPtr("/EBSOptimized/")},
+				},
+			},
+		})
+	}
+
+	cpuCredits := d.Get("credit_specification.0.cpu_credits").String()
+	if cpuCredits == "" && (strings.HasPrefix(instanceType, "t3.") || strings.HasPrefix(instanceType, "t4g.")) {
+		cpuCredits = "unlimited"
+	}
+
+	if cpuCredits == "unlimited" {
+		prefix := strings.SplitN(instanceType, ".", 2)[0]
+
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:           "CPU Credits",
+			Unit:           "vCPU-hours",
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(0)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEC2"),
+				ProductFamily: strPtr("CPU Credits"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "operatingSystem", Value: strPtr("Linux")},
+					{Key: "usagetype", Value: strPtr(fmt.Sprintf("CPUCredits:%s", prefix))},
 				},
 			},
 		})
