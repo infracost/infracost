@@ -105,29 +105,29 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 
 func CountSkippedResources(resources []*schema.Resource) (map[string]int, int, int, int) {
 	skippedCount := 0
-	unSupportedCount := 0
+	unsupportedCount := 0
 	freeCount := 0
-	unSupportedTypeCount := make(map[string]int)
+	unsupportedTypeCount := make(map[string]int)
 	for _, r := range resources {
 		if r.IsSkipped {
 			skippedCount++
 			// FIXME: Count free resources when https://github.com/infracost/infracost/issues/121 is done
-			unSupportedCount++
-			if _, ok := unSupportedTypeCount[r.ResourceType]; !ok {
-				unSupportedTypeCount[r.ResourceType] = 0
+			unsupportedCount++
+			if _, ok := unsupportedTypeCount[r.ResourceType]; !ok {
+				unsupportedTypeCount[r.ResourceType] = 0
 			}
-			unSupportedTypeCount[r.ResourceType]++
+			unsupportedTypeCount[r.ResourceType]++
 		}
 	}
-	return unSupportedTypeCount, skippedCount, unSupportedCount, freeCount
+	return unsupportedTypeCount, skippedCount, unsupportedCount, freeCount
 }
 
 func SkippedResourcesMessage(resources []*schema.Resource, showDetails bool) string {
-	unSupportedTypeCount, _, unSupportedCount, _ := CountSkippedResources(resources)
-	if unSupportedCount == 0 {
+	unsupportedTypeCount, _, unsupportedCount, _ := CountSkippedResources(resources)
+	if unsupportedCount == 0 {
 		return ""
 	}
-	message := fmt.Sprintf("%d out of %d resources couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)", unSupportedCount, len(resources))
+	message := fmt.Sprintf("%d out of %d resources couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)", unsupportedCount, len(resources))
 	if showDetails {
 		message += ".\n"
 	} else {
@@ -135,7 +135,7 @@ func SkippedResourcesMessage(resources []*schema.Resource, showDetails bool) str
 	}
 	message += "We're continually adding new resources, please create an issue if you'd like us to prioritize your list.\n"
 	if showDetails {
-		for rType, count := range unSupportedTypeCount {
+		for rType, count := range unsupportedTypeCount {
 			message += fmt.Sprintf("%d x %s\n", count, rType)
 		}
 	}
