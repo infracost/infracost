@@ -36,12 +36,13 @@ linux:
 darwin:
 	env GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build $(BUILD_FLAGS) build/$(BINARY)-darwin-amd64 $(ENTRYPOINT)
 
-build_all: build windows linux darwin
+build_all: build windows linux darwin docs
 
 release: build_all
 	cd build; tar -czf $(BINARY)-windows-amd64.tar.gz $(BINARY)-windows-amd64
 	cd build; tar -czf $(BINARY)-linux-amd64.tar.gz $(BINARY)-linux-amd64
 	cd build; tar -czf $(BINARY)-darwin-amd64.tar.gz $(BINARY)-darwin-amd64
+	cd docs/generated; tar -czvf docs.tar.gz *.md
 
 install_provider:
 	scripts/install_provider.sh $(TERRAFORM_PROVIDER_INFRACOST_VERSION)
