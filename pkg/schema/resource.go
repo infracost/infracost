@@ -79,7 +79,3 @@ func SortResources(resources []*Resource) {
 		})
 	}
 }
-
-func (r *Resource) IsFree() bool {
-	return len(r.CostComponents) == 0
-}

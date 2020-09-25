@@ -103,15 +103,13 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 	return out, nil
 }
 
-func CountSkippedResources(resources []*schema.Resource) (map[string]int, int, int, int) {
+func CountSkippedResources(resources []*schema.Resource) (map[string]int, int, int) {
 	skippedCount := 0
 	unsupportedCount := 0
-	freeCount := 0
 	unsupportedTypeCount := make(map[string]int)
 	for _, r := range resources {
 		if r.IsSkipped {
 			skippedCount++
-			// FIXME: Count free resources when https://github.com/infracost/infracost/issues/121 is done
 			unsupportedCount++
 			if _, ok := unsupportedTypeCount[r.ResourceType]; !ok {
 				unsupportedTypeCount[r.ResourceType] = 0
@@ -119,11 +117,11 @@ func CountSkippedResources(resources []*schema.Resource) (map[string]int, int, i
 			unsupportedTypeCount[r.ResourceType]++
 		}
 	}
-	return unsupportedTypeCount, skippedCount, unsupportedCount, freeCount
+	return unsupportedTypeCount, skippedCount, unsupportedCount
 }
 
 func SkippedResourcesMessage(resources []*schema.Resource, showDetails bool) string {
-	unsupportedTypeCount, _, unsupportedCount, _ := CountSkippedResources(resources)
+	unsupportedTypeCount, _, unsupportedCount := CountSkippedResources(resources)
 	if unsupportedCount == 0 {
 		return ""
 	}
