@@ -1,9 +1,12 @@
 BINARY := infracost
 ENTRYPOINT := cmd/infracost/main.go
+GEN_DOCS_ENTRYPOINT := cmd/infracost-generate-docs/main.go
 TERRAFORM_PROVIDER_INFRACOST_VERSION := latest
 VERSION := $(shell scripts/get_version.sh HEAD)
 LD_FLAGS := -ldflags="-X 'github.com/infracost/infracost/pkg/version.Version=$(VERSION)'"
 BUILD_FLAGS := $(LD_FLAGS) -i -v -o
+DOCS_TEMPLATES_PATH := docs/templates
+DOCS_OUTPUT_PATH := docs/generated
 
 ifndef $(GOOS)
 	GOOS=$(shell go env GOOS)
@@ -13,7 +16,7 @@ ifndef $(GOARCH)
 	GOARCH=$(shell go env GOARCH)
 endif
 
-.PHONY: deps run build windows linux darwin build_all release install_provider clean test fmt lint
+.PHONY: deps run build windows linux darwin build_all release install_provider clean test fmt lint docs
 
 deps:
 	go mod download
@@ -55,3 +58,6 @@ fmt:
 
 lint:
 	golangci-lint run
+
+docs:
+	go run $(GEN_DOCS_ENTRYPOINT) --input $(DOCS_TEMPLATES_PATH) --output $(DOCS_OUTPUT_PATH)
