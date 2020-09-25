@@ -6,6 +6,13 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func GetEBSSnapshotCopyRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_ebs_snapshot_copy",
+		RFunc: NewEBSSnapshotCopy,
+	}
+}
+
 func NewEBSSnapshotCopy(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 

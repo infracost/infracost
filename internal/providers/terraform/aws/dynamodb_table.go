@@ -8,6 +8,14 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_dynamodb_table",
+		Notes: []string{"DAX is not yet supported."},
+		RFunc: NewDynamoDBTable,
+	}
+}
+
 func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
