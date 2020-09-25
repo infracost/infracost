@@ -7,9 +7,6 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/infracost/infracost/internal/docs"
-	"github.com/infracost/infracost/internal/providers/terraform"
-	"github.com/infracost/infracost/pkg/config"
-	"github.com/infracost/infracost/pkg/version"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -59,34 +56,12 @@ func main() {
 				Usage: "Log level (TRACE, DEBUG, INFO, WARN, ERROR)",
 				Value: "WARN",
 			},
-			&cli.BoolFlag{
-				Name:  "no-color",
-				Usage: "Turn off colored output",
-				Value: false,
-			},
-			&cli.BoolFlag{
-				Name:  "version",
-				Usage: "Prints the version of infracost and terraform",
-				Value: false,
-			},
 		},
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
 			return customError(c, err.Error())
 		},
 		Action: func(c *cli.Context) error {
-
-			logFormatter.DisableColors = c.Bool("no-color")
 			log.SetFormatter(&logFormatter)
-
-			config.Config.NoColor = c.Bool("no-color")
-			color.NoColor = c.Bool("no-color")
-
-			if c.Bool("version") {
-				fmt.Println("Infracost", version.Version)
-				v, err := terraform.TerraformVersion()
-				fmt.Println(v)
-				return err
-			}
 
 			switch strings.ToUpper(c.String("log-level")) {
 			case "TRACE":
