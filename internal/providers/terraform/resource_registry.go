@@ -15,7 +15,7 @@ var (
 	once                sync.Once
 )
 
-func getResourceRegistryMap() *resourceRegistryMapSingleton {
+func GetResourceRegistryMap() *resourceRegistryMapSingleton {
 	once.Do(func() {
 		resourceRegistryMap = make(resourceRegistryMapSingleton)
 		// Merge all resource registries

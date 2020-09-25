@@ -16,7 +16,7 @@ import (
 var infracostProviderNames = []string{"infracost", "registry.terraform.io/infracost/infracost"}
 
 func createResource(r *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
-	registryMap := getResourceRegistryMap()
+	registryMap := GetResourceRegistryMap()
 
 	if registryItem, ok := (*registryMap)[r.Type]; ok {
 		return registryItem.RFunc(r, u)
