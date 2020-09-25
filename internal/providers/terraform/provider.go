@@ -121,3 +121,23 @@ func CountSkippedResources(resources []*schema.Resource) (map[string]int, int, i
 	}
 	return unSupportedTypeCount, skippedCount, unSupportedCount, freeCount
 }
+
+func SkippedResourcesMessage(resources []*schema.Resource, showDetails bool) string {
+	unSupportedTypeCount, _, unSupportedCount, _ := CountSkippedResources(resources)
+	if unSupportedCount == 0 {
+		return ""
+	}
+	message := fmt.Sprintf("%d out of %d resources couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)", unSupportedCount, len(resources))
+	if showDetails {
+		message += ".\n"
+	} else {
+		message += ", re-run with --show-skipped to see the list.\n"
+	}
+	message += "We're continually adding new resources, please create an issue if you'd like us to prioritize your list.\n"
+	if showDetails {
+		for rType, count := range unSupportedTypeCount {
+			message += fmt.Sprintf("%d x %s\n", count, rType)
+		}
+	}
+	return message
+}

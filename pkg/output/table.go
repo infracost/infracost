@@ -15,26 +15,6 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func showSkippedResourcesTable(resources []*schema.Resource, showDetails bool, bufw *bufio.Writer) {
-	unSupportedTypeCount, _, unSupportedCount, _ := terraform.CountSkippedResources(resources)
-	if unSupportedCount == 0 {
-		return
-	}
-	message := fmt.Sprintf("\n%d out of %d resources couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)", unSupportedCount, len(resources))
-	if showDetails {
-		message += ".\n"
-	} else {
-		message += ", re-run with --show-skipped to see the list.\n"
-	}
-	message += "We're continually adding new resources, please create an issue if you'd like us to prioritize your list.\n"
-	if showDetails {
-		for rType, count := range unSupportedTypeCount {
-			message += fmt.Sprintf("%d x %s\n", count, rType)
-		}
-	}
-	bufw.WriteString(message)
-}
-
 func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
@@ -93,7 +73,10 @@ func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 
 	t.Render()
 
-	showSkippedResourcesTable(resources, c.Bool("show-skipped"), bufw)
+	skippedResourcesMessage := terraform.SkippedResourcesMessage(resources, c.Bool("show-skipped"))
+	if skippedResourcesMessage != "" {
+		bufw.WriteString(skippedResourcesMessage)
+	}
 
 	bufw.Flush()
 	return buf.Bytes(), nil

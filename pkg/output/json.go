@@ -2,7 +2,6 @@ package output
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/pkg/schema"
@@ -59,26 +58,6 @@ func newResourceJSON(r *schema.Resource) resourceJSON {
 	}
 }
 
-func showSkippedResourcesJSON(resources []*schema.Resource, showDetails bool) []string {
-	unSupportedTypeCount, _, unSupportedCount, _ := terraform.CountSkippedResources(resources)
-	if unSupportedCount == 0 {
-		return nil
-	}
-	message := fmt.Sprintf("\n%d out of %d resources couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)", unSupportedCount, len(resources))
-	if showDetails {
-		message += ".\n"
-	} else {
-		message += ", re-run with --show-skipped to see the list.\n"
-	}
-	message += "We're continually adding new resources, please create an issue if you'd like us to prioritize your list.\n"
-	if showDetails {
-		for rType, count := range unSupportedTypeCount {
-			message += fmt.Sprintf("%d x %s\n", count, rType)
-		}
-	}
-	return []string{message}
-}
-
 func ToJSON(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 	arr := make([]resourceJSON, 0, len(resources))
 
@@ -93,7 +72,10 @@ func ToJSON(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 		Resources: &arr,
 	}
 
-	out.Warnings = append(out.Warnings, showSkippedResourcesJSON(resources, c.Bool("show-skipped"))...)
+	skippedResourcesMessage := terraform.SkippedResourcesMessage(resources, c.Bool("show-skipped"))
+	if skippedResourcesMessage != "" {
+		out.Warnings = append(out.Warnings, skippedResourcesMessage)
+	}
 
 	return json.Marshal(out)
 }
