@@ -40,8 +40,8 @@ func getcwd() string {
 func main() {
 
 	app := &cli.App{
-		Name:                 "infracost",
-		Usage:                "Generate cost reports from Terraform plans",
+		Name:                 "infracost-geneate-docs",
+		Usage:                "Generate infracost documentations",
 		EnableBashCompletion: true,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
