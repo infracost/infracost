@@ -6,6 +6,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func GetLambdaFunctionRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_lambda_function",
+		Notes: []string{"Provisioned concurrency is not yet supported."},
+		RFunc: NewLambdaFunction,
+	}
+}
+
 func NewLambdaFunction(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 

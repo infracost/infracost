@@ -9,6 +9,13 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_autoscaling_group",
+		RFunc: NewAutoscalingGroup,
+	}
+}
+
 func NewAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 	desiredCapacity := decimal.NewFromInt(d.Get("desired_capacity").Int())

@@ -9,6 +9,14 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+func GetInstanceRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_instance",
+		Notes: []string{"Non-Linux EC2 instances such as Windows and RHEL are not supported, a lookup is needed to find the OS of AMIs."},
+		RFunc: NewInstance,
+	}
+}
+
 func NewInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 	subResources := make([]*schema.Resource, 0)

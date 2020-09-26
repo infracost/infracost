@@ -8,6 +8,13 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func GetDocDBClusterInstanceRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_docdb_cluster_instance",
+		RFunc: NewDocDBClusterInstance,
+	}
+}
+
 func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
