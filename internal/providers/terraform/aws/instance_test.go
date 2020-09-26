@@ -54,7 +54,7 @@ func TestInstance(t *testing.T) {
 			Name: "aws_instance.instance1",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX Usage (on-demand, m3.medium)",
+					Name:            "Linux/UNIX usage (on-demand, m3.medium)",
 					PriceHash:       "666e02bbe686f6950fd8a47a55e83a75-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -145,7 +145,7 @@ func TestInstance_ebsOptimized(t *testing.T) {
 			Name: "aws_instance.instance1",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX Usage (on-demand, m3.large)",
+					Name:            "Linux/UNIX usage (on-demand, m3.large)",
 					PriceHash:       "1abac89a8296443758727a2728579a2a-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -161,12 +161,12 @@ func TestInstance_ebsOptimized(t *testing.T) {
 			Name: "aws_instance.instance2",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX Usage (on-demand, r3.xlarge)",
+					Name:            "Linux/UNIX usage (on-demand, r3.xlarge)",
 					PriceHash:       "5fc0daede99fac3cce64d575979d7233-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "EBS-Optimized Usage",
+					Name:            "EBS-Optimized usage",
 					PriceHash:       "7f4fb9da921a628aedfbe150d930e255-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -253,11 +253,11 @@ func TestInstance_cpuCredits(t *testing.T) {
 			Name: "aws_instance.t3_default",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Linux/UNIX Usage (on-demand, t3.medium)",
+					Name:      "Linux/UNIX usage (on-demand, t3.medium)",
 					SkipCheck: true,
 				},
 				{
-					Name:      "CPU Credits",
+					Name:      "CPU credits",
 					PriceHash: "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
 				},
 			},
@@ -272,11 +272,11 @@ func TestInstance_cpuCredits(t *testing.T) {
 			Name: "aws_instance.t3_unlimited",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Linux/UNIX Usage (on-demand, t3.medium)",
+					Name:      "Linux/UNIX usage (on-demand, t3.medium)",
 					SkipCheck: true,
 				},
 				{
-					Name:            "CPU Credits",
+					Name:            "CPU credits",
 					PriceHash:       "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.Zero),
 				},
@@ -292,7 +292,7 @@ func TestInstance_cpuCredits(t *testing.T) {
 			Name: "aws_instance.t3_standard",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Linux/UNIX Usage (on-demand, t3.medium)",
+					Name:      "Linux/UNIX usage (on-demand, t3.medium)",
 					SkipCheck: true,
 				},
 			},
@@ -307,7 +307,7 @@ func TestInstance_cpuCredits(t *testing.T) {
 			Name: "aws_instance.t2_default",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Linux/UNIX Usage (on-demand, t2.medium)",
+					Name:      "Linux/UNIX usage (on-demand, t2.medium)",
 					SkipCheck: true,
 				},
 			},
@@ -322,11 +322,11 @@ func TestInstance_cpuCredits(t *testing.T) {
 			Name: "aws_instance.t2_unlimited",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Linux/UNIX Usage (on-demand, t2.medium)",
+					Name:      "Linux/UNIX usage (on-demand, t2.medium)",
 					SkipCheck: true,
 				},
 				{
-					Name:            "CPU Credits",
+					Name:            "CPU credits",
 					PriceHash:       "4aaa3d22a88b57f7997e91888f867be9-e8e892be2fbd1c8f42fd6761ad8977d8",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.Zero),
 				},
@@ -342,7 +342,7 @@ func TestInstance_cpuCredits(t *testing.T) {
 			Name: "aws_instance.t2_standard",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Linux/UNIX Usage (on-demand, t2.medium)",
+					Name:      "Linux/UNIX usage (on-demand, t2.medium)",
 					SkipCheck: true,
 				},
 			},

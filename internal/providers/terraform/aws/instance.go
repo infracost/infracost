@@ -52,7 +52,7 @@ func computeCostComponents(d *schema.ResourceData, region string, purchaseOption
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Linux/UNIX Usage (%s, %s)", purchaseOptionLabel, instanceType),
+			Name:           fmt.Sprintf("Linux/UNIX usage (%s, %s)", purchaseOptionLabel, instanceType),
 			Unit:           "hours",
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
@@ -76,7 +76,7 @@ func computeCostComponents(d *schema.ResourceData, region string, purchaseOption
 
 	if d.Get("ebs_optimized").Bool() {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:                 "EBS-Optimized Usage",
+			Name:                 "EBS-Optimized usage",
 			Unit:                 "hours",
 			HourlyQuantity:       decimalPtr(decimal.NewFromInt(1)),
 			IgnoreIfMissingPrice: true,
@@ -102,7 +102,7 @@ func computeCostComponents(d *schema.ResourceData, region string, purchaseOption
 		prefix := strings.SplitN(instanceType, ".", 2)[0]
 
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:           "CPU Credits",
+			Name:           "CPU credits",
 			Unit:           "vCPU-hours",
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(0)),
 			ProductFilter: &schema.ProductFilter{

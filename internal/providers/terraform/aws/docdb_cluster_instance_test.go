@@ -24,7 +24,7 @@ func TestNewDocDBClusterInstance(t *testing.T) {
 			Name: "aws_docdb_cluster_instance.db",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Database Instance (on_demand, db.t3.medium)",
+					Name:            "Database instance (on-demand, db.t3.medium)",
 					PriceHash:       "b21c3c7708229fb149bff23b4cfe6833-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -39,12 +39,12 @@ func TestNewDocDBClusterInstance(t *testing.T) {
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 				{
-					Name:            "Backup Storage",
+					Name:            "Backup storage",
 					PriceHash:       "b508a58e978730edb23511dd40ad77d6-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 				{
-					Name:            "CPU Credits",
+					Name:            "CPU credits",
 					PriceHash:       "f6d2bda62e25c6eb08020075859e5a97-e8e892be2fbd1c8f42fd6761ad8977d8",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},

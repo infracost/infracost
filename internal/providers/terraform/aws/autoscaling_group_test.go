@@ -45,7 +45,7 @@ func TestAutoscalingGroup_launchConfiguration(t *testing.T) {
 					Name: "aws_launch_configuration.lc1",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX Usage (on-demand, t2.medium)",
+							Name:            "Linux/UNIX usage (on-demand, t2.medium)",
 							PriceHash:       "250382a8c0da495d6048e6fc57e526bc-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 						},
@@ -125,7 +125,7 @@ func TestAutoscalingGroup_launchTemplate(t *testing.T) {
 					Name: "aws_launch_template.lt1",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX Usage (on-demand, t2.medium)",
+							Name:            "Linux/UNIX usage (on-demand, t2.medium)",
 							PriceHash:       "250382a8c0da495d6048e6fc57e526bc-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 						},
@@ -223,12 +223,12 @@ func TestAutoscalingGroup_mixedInstanceLaunchTemplate(t *testing.T) {
 					Name: "aws_launch_template.lt1",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX Usage (on-demand, t2.large)",
+							Name:            "Linux/UNIX usage (on-demand, t2.large)",
 							PriceHash:       "3aa92af51438c0eba9dc1c62539adf5b-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 						},
 						{
-							Name:            "Linux/UNIX Usage (spot, t2.large)",
+							Name:            "Linux/UNIX usage (spot, t2.large)",
 							PriceHash:       "3aa92af51438c0eba9dc1c62539adf5b-803d7f1cd2f621429b63f791730e7935",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 						},
@@ -299,12 +299,12 @@ func TestAutoscalingGroup_mixedInstanceLaunchTemplateDynamic(t *testing.T) {
 					Name: "aws_launch_template.lt1",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX Usage (on-demand, t2.large)",
+							Name:            "Linux/UNIX usage (on-demand, t2.large)",
 							PriceHash:       "3aa92af51438c0eba9dc1c62539adf5b-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 						},
 						{
-							Name:            "Linux/UNIX Usage (spot, t2.large)",
+							Name:            "Linux/UNIX usage (spot, t2.large)",
 							PriceHash:       "3aa92af51438c0eba9dc1c62539adf5b-803d7f1cd2f621429b63f791730e7935",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 						},
