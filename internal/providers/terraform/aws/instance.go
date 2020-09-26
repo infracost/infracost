@@ -13,8 +13,12 @@ import (
 
 func GetInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_instance",
-		Notes: []string{"Non-Linux EC2 instances such as Windows and RHEL are not supported, a lookup is needed to find the OS of AMIs."},
+		Name: "aws_instance",
+		Notes: []string{
+			"Costs associated with non-standard Linux AMIs, such as Windows and RHEL are not supported.",
+			"EC2 Detailed Monitoring is not supported.",
+			"If a root volume is not specified then an 8Gi gp2 volume is assumed.",
+		},
 		RFunc: NewInstance,
 	}
 }
