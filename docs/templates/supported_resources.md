@@ -11,7 +11,7 @@ Support for the following is not currently included:
 
 | Terraform resource           | Notes |
 | ---                          | ---   |
-{{ range $key, $value := . }}| `{{ $key }} {{ range $alias := $value.Aliases }}/ {{ $alias }} {{ end }} ` | {{ range $note := $value.Notes }} {{ $note }} {{ end }} |
+{{ range $key, $value := . }}| `{{ $key }}` | {{ range $note := $value.Notes }} {{ $note }} {{ end }} |
 {{ end }}
 
 ## The resource I want isn't supported

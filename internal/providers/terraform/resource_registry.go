@@ -23,9 +23,6 @@ func GetResourceRegistryMap() *resourceRegistryMapSingleton {
 		// AWS
 		for _, registryItem := range aws.ResourceRegistry {
 			resourceRegistryMap[registryItem.Name] = registryItem
-			for _, alias := range registryItem.Aliases {
-				resourceRegistryMap[alias] = registryItem
-			}
 		}
 
 	})

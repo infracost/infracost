@@ -8,9 +8,14 @@ import (
 
 func GetLBRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:    "aws_lb",
-		Aliases: []string{"aws_alb"},
-		RFunc:   NewLB,
+		Name:  "aws_lb",
+		RFunc: NewLB,
+	}
+}
+func GetALBRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_alb",
+		RFunc: NewLB,
 	}
 }
 
