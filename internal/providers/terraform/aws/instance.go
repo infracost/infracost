@@ -11,12 +11,14 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+var defaultEC2InstanceMetricCount = 7
+
 func GetInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name: "aws_instance",
 		Notes: []string{
 			"Costs associated with non-standard Linux AMIs, such as Windows and RHEL are not supported.",
-			"EC2 Detailed Monitoring is not supported.",
+			"EC2 detailed monitoring assumes the standard 7 metrics and the lowest tier of prices for CloudWatch.",
 			"If a root volume is not specified then an 8Gi gp2 volume is assumed.",
 		},
 		RFunc: NewInstance,
@@ -93,6 +95,24 @@ func computeCostComponents(d *schema.ResourceData, region string, purchaseOption
 					{Key: "instanceType", Value: strPtr(instanceType)},
 					{Key: "usagetype", ValueRegex: strPtr("/EBSOptimized/")},
 				},
+			},
+		})
+	}
+
+	if d.Get("monitoring").Bool() {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:                 "EC2 detailed monitoring",
+			Unit:                 "metrics",
+			MonthlyQuantity:      decimalPtr(decimal.NewFromInt(int64(defaultEC2InstanceMetricCount))),
+			IgnoreIfMissingPrice: true,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonCloudWatch"),
+				ProductFamily: strPtr("Metric"),
+			},
+			PriceFilter: &schema.PriceFilter{
+				StartUsageAmount: strPtr("0"),
 			},
 		})
 	}

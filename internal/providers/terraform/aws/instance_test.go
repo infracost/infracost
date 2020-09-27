@@ -361,3 +361,42 @@ func TestInstance_cpuCredits(t *testing.T) {
 
 	tftest.ResourceTests(t, tf, resourceChecks)
 }
+
+func TestInstance_ec2DetailedMonitoring(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_instance" "instance1" {
+			ami           = "fake_ami"
+			instance_type = "m3.large"
+			ebs_optimized = true
+			monitoring    = true
+		}`
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_instance.instance1",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:      "Linux/UNIX usage (on-demand, m3.large)",
+					SkipCheck: true,
+				},
+				{
+					Name:            "EC2 detailed monitoring",
+					PriceHash:       "df2e2141bd6d5e2b758fa0617157ff46-fd21869c4f4d79599eea951b2b7353e6",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(7)),
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, resourceChecks)
+}

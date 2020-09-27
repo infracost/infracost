@@ -14,6 +14,8 @@ type PriceFilter struct {
 	Unit               *string `json:"unit,omitempty"`
 	Description        *string `json:"description,omitempty"`
 	DescriptionRegex   *string `json:"description_regex,omitempty"`
+	StartUsageAmount   *string `json:"startUsageAmount,omitempty"`
+	EndUsageAmount     *string `json:"endUsageAmount,omitempty"`
 	TermLength         *string `json:"termLength,omitempty"`
 	TermPurchaseOption *string `json:"termPurchaseOption,omitempty"`
 	TermOfferingClass  *string `json:"termOfferingClass,omitempty"`
