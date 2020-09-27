@@ -90,6 +90,11 @@ func (q *GraphQLQueryRunner) buildQuery(product *schema.ProductFilter, price *sc
 func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Result, error) {
 	results := make([]gjson.Result, 0, len(queries))
 
+	if len(queries) == 0 {
+		log.Debug("skipping GraphQL request as no queries have been specified")
+		return results, nil
+	}
+
 	queriesBody, err := json.Marshal(queries)
 	if err != nil {
 		return results, errors.Wrap(err, "error marshalling queries")
