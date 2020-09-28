@@ -4,6 +4,8 @@ import "github.com/infracost/infracost/pkg/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAutoscalingGroupRegistryItem(),
+	GetLaunchConfigurationRegistryItem(),
+	GetLaunchTemplateRegistryItem(),
 	GetDBInstanceRegistryItem(),
 	GetDocDBClusterInstanceRegistryItem(),
 	GetDynamoDBTableRegistryItem(),
@@ -11,6 +13,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetEBSSnapshotRegistryItem(),
 	GetEBSVolumeRegistryItem(),
 	GetECSServiceRegistryItem(),
+	GetECSClusterRegistryItem(),
+	GetECSTaskDefinitionRegistryItem(),
 	GetElasticsearchDomainRegistryItem(),
 	GetELBRegistryItem(),
 	GetInstanceRegistryItem(),
@@ -19,4 +23,5 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetALBRegistryItem(),
 	GetNATGatewayRegistryItem(),
 	GetRDSClusterInstanceRegistryItem(),
+	GetRDSClusterRegistryItem(),
 }

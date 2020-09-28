@@ -13,6 +13,13 @@ func GetRDSClusterInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
+func GetRDSClusterRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:   "aws_rds_cluster",
+		NoCost: true,
+	}
+}
+
 func NewRDSClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
