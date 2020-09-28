@@ -58,28 +58,3 @@ data "infracost_aws_lambda_function" "lambda" {
     value = 250
   }
 }
-
-resource "aws_dynamodb_table" "my_dynamodb_table" {
-  name           = "GameScores"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "UserId"
-  range_key      = "GameTitle"
-  
-  attribute {
-    name = "UserId"
-    type = "S"
-  }
-  
-  attribute {
-    name = "GameTitle"
-    type = "S"
-  }
-  
-  replica {
-    region_name = "us-east-2"
-  }
-  
-  replica {
-    region_name = "us-west-1"
-  }
-}
