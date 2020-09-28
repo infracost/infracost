@@ -6,14 +6,16 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/schema"
+	"github.com/urfave/cli/v2"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/shopspring/decimal"
 )
 
-func ToTable(resources []*schema.Resource) ([]byte, error) {
+func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -38,6 +40,9 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 	overallTotalMonthly := decimal.Zero
 
 	for _, r := range resources {
+		if r.IsSkipped {
+			continue
+		}
 		t.Append([]string{r.Name, "", "", "", "", ""})
 
 		buildCostComponentRows(t, r.CostComponents, "", len(r.SubResources) > 0)
@@ -67,6 +72,14 @@ func ToTable(resources []*schema.Resource) ([]byte, error) {
 	})
 
 	t.Render()
+
+	skippedResourcesMessage := terraform.SkippedResourcesMessage(resources, c.Bool("show-skipped"))
+	if skippedResourcesMessage != "" {
+		_, err := bufw.WriteString(skippedResourcesMessage)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	bufw.Flush()
 	return buf.Bytes(), nil

@@ -85,6 +85,11 @@ func main() {
 				Usage: "Prints the version of infracost and terraform",
 				Value: false,
 			},
+			&cli.BoolFlag{
+				Name:  "show-skipped",
+				Usage: "Prints the list of free and unsupported resources",
+				Value: false,
+			},
 		},
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
 			return customError(c, err.Error())
@@ -149,9 +154,9 @@ func main() {
 			var out []byte
 			switch strings.ToLower(c.String("output")) {
 			case "json":
-				out, err = output.ToJSON(resources)
+				out, err = output.ToJSON(resources, c)
 			default:
-				out, err = output.ToTable(resources)
+				out, err = output.ToTable(resources, c)
 			}
 
 			s.Stop()

@@ -3,9 +3,15 @@ package output
 import (
 	"encoding/json"
 
+	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/pkg/schema"
+	"github.com/urfave/cli/v2"
 )
 
+type outputJSON struct {
+	Resources *[]resourceJSON `json:"resources"`
+	Warnings  []string        `json:"warnings"`
+}
 type costComponentJSON struct {
 	Name            string `json:"name"`
 	Unit            string `json:"unit"`
@@ -52,12 +58,24 @@ func newResourceJSON(r *schema.Resource) resourceJSON {
 	}
 }
 
-func ToJSON(resources []*schema.Resource) ([]byte, error) {
+func ToJSON(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 	arr := make([]resourceJSON, 0, len(resources))
 
 	for _, r := range resources {
+		if r.IsSkipped {
+			continue
+		}
 		arr = append(arr, newResourceJSON(r))
 	}
 
-	return json.Marshal(arr)
+	out := outputJSON{
+		Resources: &arr,
+	}
+
+	skippedResourcesMessage := terraform.SkippedResourcesMessage(resources, c.Bool("show-skipped"))
+	if skippedResourcesMessage != "" {
+		out.Warnings = append(out.Warnings, skippedResourcesMessage)
+	}
+
+	return json.Marshal(out)
 }

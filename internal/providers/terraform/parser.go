@@ -19,10 +19,17 @@ func createResource(r *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 	registryMap := GetResourceRegistryMap()
 
 	if registryItem, ok := (*registryMap)[r.Type]; ok {
-		return registryItem.RFunc(r, u)
+		res := registryItem.RFunc(r, u)
+    res.ResourceType = r.Type
+		return res
 	}
 
-	return nil
+	return &schema.Resource{
+		Name:         r.Address,
+		ResourceType: r.Type,
+		IsSkipped:    true,
+		SkipMessage:  "This resource is not currently supported",
+	}
 }
 
 func parsePlanJSON(j []byte) []*schema.Resource {
