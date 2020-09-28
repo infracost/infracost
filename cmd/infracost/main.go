@@ -28,6 +28,8 @@ func customError(c *cli.Context, msg string) error {
 	return fmt.Errorf("")
 }
 
+var calcSpinner *spinner.Spinner
+
 func main() {
 	app := &cli.App{
 		Name:                 "infracost",
@@ -110,14 +112,14 @@ func main() {
 				return customError(c, err.Error())
 			}
 
-			s := spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
+			calcSpinner = spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
 
 			if !config.Config.IsLogging() {
-				s.Suffix = " Calculating costs…"
+				calcSpinner.Suffix = " Calculating costs…"
 				if !c.Bool("no-color") {
-					_ = s.Color("fgHiGreen", "bold")
+					_ = calcSpinner.Color("fgHiGreen", "bold")
 				}
-				s.Start()
+				calcSpinner.Start()
 			} else {
 				log.Info("Calculating costs…")
 			}
@@ -143,7 +145,7 @@ func main() {
 				out, err = output.ToTable(resources, c)
 			}
 
-			s.Stop()
+			calcSpinner.Stop()
 
 			if err != nil {
 				return errors.Wrap(err, "output error")
@@ -156,7 +158,11 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		if calcSpinner != nil {
+			calcSpinner.Stop()
+		}
+		color.HiRed(fmt.Sprintf("%v\n", err.Error()))
+		os.Exit(1)
 	}
 }
 
