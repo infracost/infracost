@@ -20,8 +20,10 @@ func createResource(r *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 
 	if registryItem, ok := (*registryMap)[r.Type]; ok {
 		res := registryItem.RFunc(r, u)
-    res.ResourceType = r.Type
-		return res
+		if res != nil {
+			res.ResourceType = r.Type
+			return res
+		}
 	}
 
 	return &schema.Resource{

@@ -75,7 +75,7 @@ func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 
 	skippedResourcesMessage := terraform.SkippedResourcesMessage(resources, c.Bool("show-skipped"))
 	if skippedResourcesMessage != "" {
-		_, err := bufw.WriteString(skippedResourcesMessage)
+		_, err := bufw.WriteString(fmt.Sprintf("\n%s", skippedResourcesMessage))
 		if err != nil {
 			return nil, err
 		}

@@ -195,7 +195,11 @@ func TestInstance_hostTenancy(t *testing.T) {
 			tenancy       = "host"
 		}`
 
-	resourceChecks := []testutil.ResourceCheck{}
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_instance.instance1",
+		},
+	}
 
 	tftest.ResourceTests(t, tf, resourceChecks)
 }
