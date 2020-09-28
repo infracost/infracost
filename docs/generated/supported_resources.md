@@ -11,22 +11,22 @@ Support for the following is not currently included:
 
 | Terraform resource           | Notes |
 | ---                          | ---   |
-| `aws_alb / aws_alb  ` |  |
-| `aws_autoscaling_group  ` |  |
-| `aws_db_instance  ` |  |
-| `aws_docdb_cluster_instance  ` |  |
-| `aws_dynamodb_table  ` |  DAX is not yet supported.  |
-| `aws_ebs_snapshot  ` |  |
-| `aws_ebs_snapshot_copy  ` |  |
-| `aws_ebs_volume  ` |  |
-| `aws_ecs_service  ` |  Only supports Fargate on-demand.  |
-| `aws_elasticsearch_domain  ` |  |
-| `aws_elb  ` |  |
-| `aws_instance  ` |  Non-Linux EC2 instances such as Windows and RHEL are not supported, a lookup is needed to find the OS of AMIs.  |
-| `aws_lambda_function  ` |  Provisioned concurrency is not yet supported.  |
-| `aws_lb / aws_alb  ` |  |
-| `aws_nat_gateway  ` |  |
-| `aws_rds_cluster_instance  ` |  |
+| `aws_alb` |  |
+| `aws_autoscaling_group` |  |
+| `aws_db_instance` |  |
+| `aws_docdb_cluster_instance` |  |
+| `aws_dynamodb_table` |  DAX is not yet supported.  |
+| `aws_ebs_snapshot` |  |
+| `aws_ebs_snapshot_copy` |  |
+| `aws_ebs_volume` |  |
+| `aws_ecs_service` |  Only supports Fargate on-demand.  |
+| `aws_elasticsearch_domain` |  |
+| `aws_elb` |  |
+| `aws_instance` |  Non-Linux EC2 instances such as Windows and RHEL are not supported, a lookup is needed to find the OS of AMIs.  |
+| `aws_lambda_function` |  Provisioned concurrency is not yet supported.  |
+| `aws_lb` |  |
+| `aws_nat_gateway` |  |
+| `aws_rds_cluster_instance` |  |
 
 
 ## The resource I want isn't supported
