@@ -32,7 +32,7 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add --force docs/generated
-        git commit -m "Generate docs"
+        git diff --staged --quiet docs/generated || git commit -m "Generate docs"
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:

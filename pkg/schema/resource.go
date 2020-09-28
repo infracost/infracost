@@ -66,6 +66,16 @@ func (r *Resource) FlattenedSubResources() []*Resource {
 	return resources
 }
 
+func (r *Resource) RemoveCostComponent(costComponent *CostComponent) {
+	n := make([]*CostComponent, 0, len(r.CostComponents)-1)
+	for _, c := range r.CostComponents {
+		if c != costComponent {
+			n = append(n, c)
+		}
+	}
+	r.CostComponents = n
+}
+
 func SortResources(resources []*Resource) {
 	sort.Slice(resources, func(i, j int) bool {
 		return resources[i].Name < resources[j].Name

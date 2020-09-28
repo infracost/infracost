@@ -5,16 +5,17 @@ import (
 )
 
 type CostComponent struct {
-	Name            string
-	Unit            string
-	ProductFilter   *ProductFilter
-	PriceFilter     *PriceFilter
-	HourlyQuantity  *decimal.Decimal
-	MonthlyQuantity *decimal.Decimal
-	price           decimal.Decimal
-	priceHash       string
-	hourlyCost      decimal.Decimal
-	monthlyCost     decimal.Decimal
+	Name                 string
+	Unit                 string
+	IgnoreIfMissingPrice bool
+	ProductFilter        *ProductFilter
+	PriceFilter          *PriceFilter
+	HourlyQuantity       *decimal.Decimal
+	MonthlyQuantity      *decimal.Decimal
+	price                decimal.Decimal
+	priceHash            string
+	hourlyCost           decimal.Decimal
+	monthlyCost          decimal.Decimal
 }
 
 func (c *CostComponent) CalculateCosts() {

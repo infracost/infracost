@@ -3,19 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/fatih/color"
 	"github.com/infracost/infracost/internal/docs"
+	"github.com/infracost/infracost/pkg/config"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
-
-var logFormatter log.TextFormatter = log.TextFormatter{
-	DisableTimestamp:       true,
-	DisableLevelTruncation: true,
-}
 
 func customError(c *cli.Context, msg string) error {
 	color.HiRed(fmt.Sprintf("%v\n", msg))
@@ -53,27 +48,17 @@ func main() {
 			},
 			&cli.StringFlag{
 				Name:  "log-level",
-				Usage: "Log level (TRACE, DEBUG, INFO, WARN, ERROR)",
-				Value: "WARN",
+				Usage: "Log level (trace, debug, info, warn, error, fatal)",
+				Value: "info",
 			},
 		},
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
 			return customError(c, err.Error())
 		},
 		Action: func(c *cli.Context) error {
-			log.SetFormatter(&logFormatter)
-
-			switch strings.ToUpper(c.String("log-level")) {
-			case "TRACE":
-				log.SetLevel(log.TraceLevel)
-			case "DEBUG":
-				log.SetLevel(log.DebugLevel)
-			case "WARN":
-				log.SetLevel(log.WarnLevel)
-			case "ERROR":
-				log.SetLevel(log.ErrorLevel)
-			default:
-				log.SetLevel(log.InfoLevel)
+			err := config.Config.SetLogLevel(c.String("log-level"))
+			if err != nil {
+				return customError(c, err.Error())
 			}
 
 			templatesPath := c.String("input")
@@ -86,7 +71,7 @@ func main() {
 				outputPath = getcwd() + "/docs/generated"
 			}
 
-			err := docs.GenerateDocs(templatesPath, outputPath)
+			err = docs.GenerateDocs(templatesPath, outputPath)
 			if err != nil {
 				return errors.Wrap(err, "")
 			}

@@ -27,6 +27,10 @@ func TestEBSSnapshot(t *testing.T) {
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
+			Name:      "aws_ebs_volume.gp2",
+			SkipCheck: true,
+		},
+		{
 			Name: "aws_ebs_snapshot.gp2",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{

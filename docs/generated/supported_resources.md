@@ -15,15 +15,15 @@ Support for the following is not currently included:
 | `aws_autoscaling_group` |  |
 | `aws_db_instance` |  |
 | `aws_docdb_cluster_instance` |  |
-| `aws_dynamodb_table` |  DAX is not yet supported.  |
+| `aws_dynamodb_table` |  DAX is not yet supported.<br />  |
 | `aws_ebs_snapshot` |  |
 | `aws_ebs_snapshot_copy` |  |
 | `aws_ebs_volume` |  |
-| `aws_ecs_service` |  Only supports Fargate on-demand.  |
+| `aws_ecs_service` |  Only supports Fargate on-demand.<br />  |
 | `aws_elasticsearch_domain` |  |
 | `aws_elb` |  |
-| `aws_instance` |  Non-Linux EC2 instances such as Windows and RHEL are not supported, a lookup is needed to find the OS of AMIs.  |
-| `aws_lambda_function` |  Provisioned concurrency is not yet supported.  |
+| `aws_instance` |  Costs associated with non-standard Linux AMIs, such as Windows and RHEL are not supported.<br />  EC2 Detailed Monitoring is not supported.<br />  If a root volume is not specified then an 8Gi gp2 volume is assumed.<br />  |
+| `aws_lambda_function` |  Provisioned concurrency is not yet supported.<br />  |
 | `aws_lb` |  |
 | `aws_nat_gateway` |  |
 | `aws_rds_cluster_instance` |  |

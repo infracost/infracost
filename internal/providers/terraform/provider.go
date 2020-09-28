@@ -76,7 +76,7 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 	}
 
 	if path == "" {
-		_, err := terraformCmd(opts, "init")
+		_, err := terraformCmd(opts, "init", "-no-color")
 		if err != nil {
 			return []byte{}, errors.Wrap(err, "error initializing terraform working directory")
 		}
@@ -87,7 +87,7 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 		}
 		defer os.Remove(f.Name())
 
-		_, err = terraformCmd(opts, "plan", "-input=false", "-lock=false", fmt.Sprintf("-out=%s", f.Name()))
+		_, err = terraformCmd(opts, "plan", "-input=false", "-lock=false", "-no-color", fmt.Sprintf("-out=%s", f.Name()))
 		if err != nil {
 			return []byte{}, errors.Wrap(err, "error generating terraform execution plan")
 		}
@@ -131,10 +131,10 @@ func SkippedResourcesMessage(resources []*schema.Resource, showDetails bool) str
 	} else {
 		message += ", re-run with --show-skipped to see the list.\n"
 	}
-	message += "We're continually adding new resources, please create an issue if you'd like us to prioritize your list.\n"
+	message += "We're continually adding new resources, please create an issue if you'd like us to prioritize your list."
 	if showDetails {
 		for rType, count := range unsupportedTypeCount {
-			message += fmt.Sprintf("%d x %s\n", count, rType)
+			message += fmt.Sprintf("\n%d x %s", count, rType)
 		}
 	}
 	return message

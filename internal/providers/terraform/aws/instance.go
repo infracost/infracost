@@ -2,8 +2,10 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/pkg/schema"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -11,13 +13,22 @@ import (
 
 func GetInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_instance",
-		Notes: []string{"Non-Linux EC2 instances such as Windows and RHEL are not supported, a lookup is needed to find the OS of AMIs."},
+		Name: "aws_instance",
+		Notes: []string{
+			"Costs associated with non-standard Linux AMIs, such as Windows and RHEL are not supported.",
+			"EC2 Detailed Monitoring is not supported.",
+			"If a root volume is not specified then an 8Gi gp2 volume is assumed.",
+		},
 		RFunc: NewInstance,
 	}
 }
 
 func NewInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+	if d.Get("tenancy").Exists() && d.Get("tenancy").String() == "host" {
+		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances", d.Address)
+		return nil
+	}
+
 	region := d.Get("region").String()
 	subResources := make([]*schema.Resource, 0)
 	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))
@@ -26,11 +37,11 @@ func NewInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resourc
 	return &schema.Resource{
 		Name:           d.Address,
 		SubResources:   subResources,
-		CostComponents: []*schema.CostComponent{computeCostComponent(d, region, "on_demand")},
+		CostComponents: computeCostComponents(d, region, "on_demand"),
 	}
 }
 
-func computeCostComponent(d *schema.ResourceData, region string, purchaseOption string) *schema.CostComponent {
+func computeCostComponents(d *schema.ResourceData, region string, purchaseOption string) []*schema.CostComponent {
 	instanceType := d.Get("instance_type").String()
 
 	tenancy := "Shared"
@@ -43,27 +54,75 @@ func computeCostComponent(d *schema.ResourceData, region string, purchaseOption 
 		"spot":      "spot",
 	}[purchaseOption]
 
-	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Compute (%s, %s)", purchaseOptionLabel, instanceType),
-		Unit:           "hours",
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr("AmazonEC2"),
-			ProductFamily: strPtr("Compute Instance"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "instanceType", Value: strPtr(instanceType)},
-				{Key: "tenancy", Value: strPtr(tenancy)},
-				{Key: "operatingSystem", Value: strPtr("Linux")},
-				{Key: "preInstalledSw", Value: strPtr("NA")},
-				{Key: "capacitystatus", Value: strPtr("Used")},
+	costComponents := []*schema.CostComponent{
+		{
+			Name:           fmt.Sprintf("Linux/UNIX usage (%s, %s)", purchaseOptionLabel, instanceType),
+			Unit:           "hours",
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEC2"),
+				ProductFamily: strPtr("Compute Instance"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "instanceType", Value: strPtr(instanceType)},
+					{Key: "tenancy", Value: strPtr(tenancy)},
+					{Key: "operatingSystem", Value: strPtr("Linux")},
+					{Key: "preInstalledSw", Value: strPtr("NA")},
+					{Key: "capacitystatus", Value: strPtr("Used")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: &purchaseOption,
 			},
 		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: &purchaseOption,
-		},
 	}
+
+	if d.Get("ebs_optimized").Bool() {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:                 "EBS-Optimized usage",
+			Unit:                 "hours",
+			HourlyQuantity:       decimalPtr(decimal.NewFromInt(1)),
+			IgnoreIfMissingPrice: true,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEC2"),
+				ProductFamily: strPtr("Compute Instance"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "instanceType", Value: strPtr(instanceType)},
+					{Key: "usagetype", ValueRegex: strPtr("/EBSOptimized/")},
+				},
+			},
+		})
+	}
+
+	cpuCredits := d.Get("credit_specification.0.cpu_credits").String()
+	if cpuCredits == "" && (strings.HasPrefix(instanceType, "t3.") || strings.HasPrefix(instanceType, "t4g.")) {
+		cpuCredits = "unlimited"
+	}
+
+	if cpuCredits == "unlimited" {
+		prefix := strings.SplitN(instanceType, ".", 2)[0]
+
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:           "CPU credits",
+			Unit:           "vCPU-hours",
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(0)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEC2"),
+				ProductFamily: strPtr("CPU Credits"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "operatingSystem", Value: strPtr("Linux")},
+					{Key: "usagetype", Value: strPtr(fmt.Sprintf("CPUCredits:%s", prefix))},
+				},
+			},
+		})
+	}
+
+	return costComponents
 }
 
 func newRootBlockDevice(d gjson.Result, region string) *schema.Resource {

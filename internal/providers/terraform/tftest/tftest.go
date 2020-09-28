@@ -8,9 +8,11 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/prices"
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/infracost/infracost/pkg/testutil"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 
@@ -42,6 +44,8 @@ var tfProviders = `
 	provider "infracost" {}
 `
 
+var pluginCache = filepath.Join(config.RootDir(), ".test_cache/terraform_plugins")
+
 type Project struct {
 	Files []File
 }
@@ -55,7 +59,7 @@ func WithProviders(tf string) string {
 	return fmt.Sprintf("%s%s", tfProviders, tf)
 }
 
-func ResourceTests(t *testing.T, tf string, resourceChecks []testutil.ResourceCheck) {
+func ResourceTests(t *testing.T, tf string, checks []testutil.ResourceCheck) {
 	project := Project{
 		Files: []File{
 			{
@@ -65,18 +69,16 @@ func ResourceTests(t *testing.T, tf string, resourceChecks []testutil.ResourceCh
 		},
 	}
 
-	ResourceTestsForProject(t, project, resourceChecks)
+	ResourceTestsForProject(t, project, checks)
 }
 
-func ResourceTestsForProject(t *testing.T, project Project, resourceChecks []testutil.ResourceCheck) {
+func ResourceTestsForProject(t *testing.T, project Project, checks []testutil.ResourceCheck) {
 	resources, err := RunCostCalculations(project)
 	if err != nil {
 		t.Error(err)
 	}
 
-	for _, resourceCheck := range resourceChecks {
-		testutil.TestResource(t, resources, resourceCheck)
-	}
+	testutil.TestResources(t, resources, checks)
 }
 
 func RunCostCalculations(project Project) ([]*schema.Resource, error) {
@@ -93,6 +95,13 @@ func RunCostCalculations(project Project) ([]*schema.Resource, error) {
 }
 
 func loadResources(project Project) ([]*schema.Resource, error) {
+	err := os.MkdirAll(pluginCache, os.ModePerm)
+	if err != nil {
+		log.Errorf("Error creating plugin cache directory: %s", err.Error())
+	} else {
+		os.Setenv("TF_PLUGIN_CACHE_DIR", pluginCache)
+	}
+
 	tfdir, err := writeToTmpDir(project)
 	if err != nil {
 		return nil, err

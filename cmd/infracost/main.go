@@ -21,15 +21,6 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var logFormatter log.TextFormatter = log.TextFormatter{
-	DisableTimestamp:       true,
-	DisableLevelTruncation: true,
-}
-
-func init() {
-	log.SetFormatter(&logFormatter)
-}
-
 func customError(c *cli.Context, msg string) error {
 	color.HiRed(fmt.Sprintf("%v\n", msg))
 	_ = cli.ShowAppHelp(c)
@@ -62,8 +53,8 @@ func main() {
 			},
 			&cli.StringFlag{
 				Name:  "log-level",
-				Usage: "Log level (TRACE, DEBUG, INFO, WARN, ERROR)",
-				Value: "WARN",
+				Usage: "Log level (trace, debug, info, warn, error, fatal)",
+				Value: "",
 			},
 			&cli.StringFlag{
 				Name:    "output",
@@ -95,10 +86,6 @@ func main() {
 			return customError(c, err.Error())
 		},
 		Action: func(c *cli.Context) error {
-
-			logFormatter.DisableColors = c.Bool("no-color")
-			log.SetFormatter(&logFormatter)
-
 			config.Config.NoColor = c.Bool("no-color")
 			color.NoColor = c.Bool("no-color")
 
@@ -109,17 +96,9 @@ func main() {
 				return err
 			}
 
-			switch strings.ToUpper(c.String("log-level")) {
-			case "TRACE":
-				log.SetLevel(log.TraceLevel)
-			case "DEBUG":
-				log.SetLevel(log.DebugLevel)
-			case "WARN":
-				log.SetLevel(log.WarnLevel)
-			case "ERROR":
-				log.SetLevel(log.ErrorLevel)
-			default:
-				log.SetLevel(log.InfoLevel)
+			err := config.Config.SetLogLevel(c.String("log-level"))
+			if err != nil {
+				return customError(c, err.Error())
 			}
 
 			if c.String("api-url") != "" {
@@ -132,11 +111,16 @@ func main() {
 			}
 
 			s := spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
-			if !c.Bool("no-color") {
-				_ = s.Color("fgHiGreen", "bold")
+
+			if !config.Config.IsLogging() {
+				s.Suffix = " Calculating costs…"
+				if !c.Bool("no-color") {
+					_ = s.Color("fgHiGreen", "bold")
+				}
+				s.Start()
+			} else {
+				log.Info("Calculating costs…")
 			}
-			s.Suffix = " Calculating costs…"
-			s.Start()
 
 			resources, err := provider.LoadResources()
 			if err != nil {
