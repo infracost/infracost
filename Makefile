@@ -4,6 +4,8 @@ TERRAFORM_PROVIDER_INFRACOST_VERSION := latest
 VERSION := $(shell scripts/get_version.sh HEAD)
 LD_FLAGS := -ldflags="-X 'github.com/infracost/infracost/pkg/version.Version=$(VERSION)'"
 BUILD_FLAGS := $(LD_FLAGS) -i -v
+
+GENERATE_DOCS_PKG := github.com/infracost/infracost/cmd/generate-docs
 DOCS_TEMPLATES_PATH := docs/templates
 DOCS_OUTPUT_PATH := docs/generated
 
@@ -63,4 +65,4 @@ lint:
 	golangci-lint run
 
 docs:
-	go run $(GEN_DOCS_ENTRYPOINT) --input $(DOCS_TEMPLATES_PATH) --output $(DOCS_OUTPUT_PATH)
+	go run $(GENERATE_DOCS_PKG) --input $(DOCS_TEMPLATES_PATH) --output $(DOCS_OUTPUT_PATH)
