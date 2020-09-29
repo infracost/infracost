@@ -53,6 +53,11 @@ func NewGraphQLQueryRunner(endpoint string) *GraphQLQueryRunner {
 func (q *GraphQLQueryRunner) RunQueries(r *schema.Resource) ([]queryResult, error) {
 	keys, queries := q.batchQueries(r)
 
+	if len(queries) == 0 {
+		log.Debugf("Skipping getting pricing details for %s since there are no queries to run", r.Name)
+		return []queryResult{}, nil
+	}
+
 	log.Debugf("Getting pricing details from %s for %s", config.Config.PricingAPIEndpoint, r.Name)
 
 	results, err := q.getQueryResults(queries)
