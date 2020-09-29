@@ -12,9 +12,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func customError(c *cli.Context, msg string) error {
+func customError(c *cli.Context, msg string, showHelp bool) error {
 	color.HiRed(fmt.Sprintf("%v\n", msg))
-	_ = cli.ShowAppHelp(c)
+	if showHelp {
+		_ = cli.ShowAppHelp(c)
+	}
 
 	return fmt.Errorf("")
 }
@@ -46,19 +48,14 @@ func main() {
 				Usage:     "Path to output of docs",
 				TakesFile: true,
 			},
-			&cli.StringFlag{
-				Name:  "log-level",
-				Usage: "Log level (trace, debug, info, warn, error, fatal)",
-				Value: "info",
-			},
 		},
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
-			return customError(c, err.Error())
+			return customError(c, err.Error(), true)
 		},
 		Action: func(c *cli.Context) error {
 			err := config.Config.SetLogLevel(c.String("log-level"))
 			if err != nil {
-				return customError(c, err.Error())
+				return customError(c, err.Error(), true)
 			}
 
 			templatesPath := c.String("input")

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/briandowns/spinner"
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -29,18 +28,9 @@ var calcSpinner *spinner.Spinner
 func handleGlobalFlags(c *cli.Context) error {
 	config.Config.NoColor = c.Bool("no-color")
 	color.NoColor = c.Bool("no-color")
-
-	switch strings.ToUpper(c.String("log-level")) {
-	case "TRACE":
-		log.SetLevel(log.TraceLevel)
-	case "DEBUG":
-		log.SetLevel(log.DebugLevel)
-	case "WARN":
-		log.SetLevel(log.WarnLevel)
-	case "ERROR":
-		log.SetLevel(log.ErrorLevel)
-	default:
-		log.SetLevel(log.InfoLevel)
+	err := config.Config.SetLogLevel(c.String("log-level"))
+	if err != nil {
+		return customError(c, err.Error(), true)
 	}
 
 	if c.String("pricing-api-endpoint") != "" {
