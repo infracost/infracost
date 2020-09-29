@@ -13,9 +13,12 @@ import (
 )
 
 func PopulatePrices(resources []*schema.Resource) error {
-	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.ApiUrl))
+	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.PricingAPIEndpoint))
 
 	for _, r := range resources {
+		if r.IsSkipped {
+			continue
+		}
 		if err := GetPrices(r, q); err != nil {
 			return errors.Wrapf(err, "error retrieving price for resource: '%v'", r.Name)
 		}
@@ -42,6 +45,12 @@ func setCostComponentPrice(r *schema.Resource, c *schema.CostComponent, res gjso
 
 	products := res.Get("data.products").Array()
 	if len(products) == 0 {
+		if c.IgnoreIfMissingPrice {
+			log.Debugf("No products found for %s %s, ignoring since IgnoreIfMissingPrice is set.", r.Name, c.Name)
+			r.RemoveCostComponent(c)
+			return
+		}
+
 		log.Warnf("No products found for %s %s, using 0.00", r.Name, c.Name)
 		c.SetPrice(decimal.Zero)
 		return
@@ -52,6 +61,12 @@ func setCostComponentPrice(r *schema.Resource, c *schema.CostComponent, res gjso
 
 	prices := products[0].Get("prices").Array()
 	if len(prices) == 0 {
+		if c.IgnoreIfMissingPrice {
+			log.Debugf("No prices found for %s %s, ignoring since IgnoreIfMissingPrice is set.", r.Name, c.Name)
+			r.RemoveCostComponent(c)
+			return
+		}
+
 		log.Warnf("No prices found for %s %s, using 0.00", r.Name, c.Name)
 		c.SetPrice(decimal.Zero)
 		return

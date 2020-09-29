@@ -9,6 +9,27 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_autoscaling_group",
+		RFunc: NewAutoscalingGroup,
+	}
+}
+
+func GetLaunchConfigurationRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:   "aws_launch_configuration",
+		NoCost: true,
+	}
+}
+
+func GetLaunchTemplateRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:   "aws_launch_template",
+		NoCost: true,
+	}
+}
+
 func NewAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 	desiredCapacity := decimal.NewFromInt(d.Get("desired_capacity").Int())
@@ -37,8 +58,6 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema
 }
 
 func newLaunchConfiguration(name string, d *schema.ResourceData, region string) *schema.Resource {
-	compute := computeCostComponent(d, region, "on_demand")
-
 	subResources := make([]*schema.Resource, 0)
 	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))
 	subResources = append(subResources, newEbsBlockDevices(d.Get("ebs_block_device"), region)...)
@@ -46,22 +65,27 @@ func newLaunchConfiguration(name string, d *schema.ResourceData, region string) 
 	return &schema.Resource{
 		Name:           name,
 		SubResources:   subResources,
-		CostComponents: []*schema.CostComponent{compute},
+		CostComponents: computeCostComponents(d, region, "on_demand"),
 	}
 }
 
 func newLaunchTemplate(name string, d *schema.ResourceData, region string, onDemandCount decimal.Decimal, spotCount decimal.Decimal) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
+
 	if onDemandCount.GreaterThan(decimal.Zero) {
-		onDemandCompute := computeCostComponent(d, region, "on_demand")
-		onDemandCompute.HourlyQuantity = decimalPtr(onDemandCompute.HourlyQuantity.Mul(onDemandCount))
-		costComponents = append(costComponents, onDemandCompute)
+		cs := computeCostComponents(d, region, "on_demand")
+		for _, c := range cs {
+			c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(onDemandCount))
+		}
+		costComponents = append(costComponents, cs...)
 	}
 
 	if spotCount.GreaterThan(decimal.Zero) {
-		spotCompute := computeCostComponent(d, region, "spot")
-		spotCompute.HourlyQuantity = decimalPtr(spotCompute.HourlyQuantity.Mul(spotCount))
-		costComponents = append(costComponents, spotCompute)
+		cs := computeCostComponents(d, region, "spot")
+		for _, c := range cs {
+			c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(spotCount))
+		}
+		costComponents = append(costComponents, cs...)
 	}
 
 	subResources := make([]*schema.Resource, 0)

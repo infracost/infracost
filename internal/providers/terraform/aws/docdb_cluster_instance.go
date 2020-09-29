@@ -8,6 +8,13 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func GetDocDBClusterInstanceRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_docdb_cluster_instance",
+		RFunc: NewDocDBClusterInstance,
+	}
+}
+
 func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
@@ -15,7 +22,7 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *sc
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Database Instance (%s, %s)", "on_demand", instanceType),
+			Name:           fmt.Sprintf("Database instance (%s, %s)", "on-demand", instanceType),
 			Unit:           "hours",
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
@@ -61,7 +68,7 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *sc
 			},
 		},
 		{
-			Name: "Backup Storage",
+			Name: "Backup storage",
 			Unit: "GB-months",
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -77,7 +84,7 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *sc
 
 	if strings.HasPrefix(instanceType, "db.t3.") {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name: "CPU Credits",
+			Name: "CPU credits",
 			Unit: "vCPU-hours",
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

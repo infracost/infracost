@@ -11,6 +11,28 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func GetECSServiceRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_ecs_service",
+		Notes: []string{"Only supports Fargate on-demand."},
+		RFunc: NewECSService,
+	}
+}
+
+func GetECSClusterRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:   "aws_ecs_cluster",
+		NoCost: true,
+	}
+}
+
+func GetECSTaskDefinitionRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:   "aws_ecs_task_definition",
+		NoCost: true,
+	}
+}
+
 func NewECSService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	launchType := d.Get("launch_type").String()
 	if launchType != "FARGATE" {

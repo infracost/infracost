@@ -6,6 +6,13 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func GetEBSVolumeRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_ebs_volume",
+		RFunc: NewEBSVolume,
+	}
+}
+
 func NewEBSVolume(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 

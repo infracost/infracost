@@ -45,3 +45,10 @@ jobs:
 
     - name: Test
       run: make test
+      env:
+        INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+
+    - name: Test example works ok
+      run: make run ARGS="--tfdir examples/terraform"
+      env:
+        INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}

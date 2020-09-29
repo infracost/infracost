@@ -6,6 +6,19 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func GetLBRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_lb",
+		RFunc: NewLB,
+	}
+}
+func GetALBRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_alb",
+		RFunc: NewLB,
+	}
+}
+
 func NewLB(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	costComponentName := "Per Application Load Balancer"
 	productFamily := "Load Balancer-Application"

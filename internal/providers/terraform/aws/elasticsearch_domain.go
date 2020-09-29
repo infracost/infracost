@@ -7,6 +7,13 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func GetElasticsearchDomainRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_elasticsearch_domain",
+		RFunc: NewElasticsearchDomain,
+	}
+}
+
 func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 
 	region := d.Get("region").String()

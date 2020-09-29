@@ -76,7 +76,7 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 	}
 
 	if path == "" {
-		_, err := terraformCmd(opts, "init")
+		_, err := terraformCmd(opts, "init", "-no-color")
 		if err != nil {
 			return []byte{}, errors.Wrap(err, "error initializing terraform working directory")
 		}
@@ -87,7 +87,7 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 		}
 		defer os.Remove(f.Name())
 
-		_, err = terraformCmd(opts, "plan", "-input=false", "-lock=false", fmt.Sprintf("-out=%s", f.Name()))
+		_, err = terraformCmd(opts, "plan", "-input=false", "-lock=false", "-no-color", fmt.Sprintf("-out=%s", f.Name()))
 		if err != nil {
 			return []byte{}, errors.Wrap(err, "error generating terraform execution plan")
 		}
@@ -101,4 +101,41 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 	}
 
 	return out, nil
+}
+
+func CountSkippedResources(resources []*schema.Resource) (map[string]int, int, int) {
+	skippedCount := 0
+	unsupportedCount := 0
+	unsupportedTypeCount := make(map[string]int)
+	for _, r := range resources {
+		if r.IsSkipped {
+			skippedCount++
+			unsupportedCount++
+			if _, ok := unsupportedTypeCount[r.ResourceType]; !ok {
+				unsupportedTypeCount[r.ResourceType] = 0
+			}
+			unsupportedTypeCount[r.ResourceType]++
+		}
+	}
+	return unsupportedTypeCount, skippedCount, unsupportedCount
+}
+
+func SkippedResourcesMessage(resources []*schema.Resource, showDetails bool) string {
+	unsupportedTypeCount, _, unsupportedCount := CountSkippedResources(resources)
+	if unsupportedCount == 0 {
+		return ""
+	}
+	message := fmt.Sprintf("%d out of %d resources couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)", unsupportedCount, len(resources))
+	if showDetails {
+		message += ".\n"
+	} else {
+		message += ", re-run with --show-skipped to see the list.\n"
+	}
+	message += "We're continually adding new resources, please create an issue if you'd like us to prioritize your list."
+	if showDetails {
+		for rType, count := range unsupportedTypeCount {
+			message += fmt.Sprintf("\n%d x %s", count, rType)
+		}
+	}
+	return message
 }

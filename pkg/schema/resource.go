@@ -16,6 +16,9 @@ type Resource struct {
 	SubResources   []*Resource
 	hourlyCost     decimal.Decimal
 	monthlyCost    decimal.Decimal
+	IsSkipped      bool
+	SkipMessage    string
+	ResourceType   string
 }
 
 func CalculateCosts(resources []*Resource) {
@@ -61,6 +64,16 @@ func (r *Resource) FlattenedSubResources() []*Resource {
 	}
 
 	return resources
+}
+
+func (r *Resource) RemoveCostComponent(costComponent *CostComponent) {
+	n := make([]*CostComponent, 0, len(r.CostComponents)-1)
+	for _, c := range r.CostComponents {
+		if c != costComponent {
+			n = append(n, c)
+		}
+	}
+	r.CostComponents = n
 }
 
 func SortResources(resources []*Resource) {

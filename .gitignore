@@ -23,6 +23,12 @@ vendor/
 examples/*/plan.save
 examples/*/plan.json
 
+# Test artifacts
+.test_cache
+
 #script generated files
 scripts/price_explorer/tmp-*
 scripts/price_explorer/index.json
+
+# Generated docs
+docs/generated/

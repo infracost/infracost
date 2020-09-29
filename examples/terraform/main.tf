@@ -29,14 +29,14 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = var.aws_subnet_ids[0]
 }
 
-# TODO Enable once we have released terraform-provider-infracost
-# data "infracost_aws_nat_gateway" "nat" {
-#   resources = [aws_nat_gateway.nat.id]
+# Use the infracost provider to get cost estimates for NAT Gateway data processing 
+data "infracost_aws_nat_gateway" "nat" {
+  resources = [aws_nat_gateway.nat.id]
 
-#   monthly_gb_data_processed {
-#     value = 100
-#   }
-# }
+  monthly_gb_data_processed {
+    value = 100
+  }
+}
 
 resource "aws_lambda_function" "lambda" {
   function_name = "lambda_function_name"
@@ -46,15 +46,15 @@ resource "aws_lambda_function" "lambda" {
   memory_size   = 512
 }
 
-# TODO Enable once we have released terraform-provider-infracost
-# data "infracost_aws_lambda_function" "lambda" {
-#   resources = [aws_lambda_function.lambda.id]
+# Use the infracost provider to get cost estimates for Lambda requests and duration
+data "infracost_aws_lambda_function" "lambda" {
+  resources = [aws_lambda_function.lambda.id]
 
-#   monthly_requests {
-#     value = 100000
-#   }
+  monthly_requests {
+    value = 100000000
+  }
 
-#   average_request_duration {
-#     value = 350
-#   }
-# }
+  average_request_duration {
+    value = 250
+  }
+}

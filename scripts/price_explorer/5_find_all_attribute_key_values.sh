@@ -1,5 +1,4 @@
-#!/bin/sh
-attribs=$(
+#!/bin/bash
 gq https://pricing.api.infracost.io/graphql -q "
 query {
     products (
@@ -13,7 +12,4 @@ query {
     	productHash
     	attributes { key , value }
     }
-}" | jq -r --arg k1 "$3" '.data.products[].attributes[] | select(.key==$k1)' | jq '.value'
-)
-
-echo "$attribs" | sort | uniq
+}" | jq -rn '[inputs] | map(.data.products[].attributes) | flatten | map(.key+"="+.value) | unique | join("\n")'
