@@ -2,16 +2,19 @@ package aws
 
 import (
 	"github.com/infracost/infracost/pkg/schema"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
 func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_dynamodb_table",
-		Notes: []string{"DAX is not yet supported."},
+		Name: "aws_dynamodb_table",
+		Notes: []string{
+			"Provisioned capacity mode only.",
+			"DAX is not yet supported.",
+		},
 		RFunc: NewDynamoDBTable,
 	}
 }
@@ -21,41 +24,29 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	subResources := make([]*schema.Resource, 0)
 
 	billingMode := d.Get("billing_mode").String()
+	if billingMode != "PROVISIONED" {
+		log.Warnf("Skipping resource %s. Infracost currently does not support on-demand DynamoDB.", d.Address)
+		return nil
+	}
 
 	// Write capacity units (WCU)
-	if billingMode == "PROVISIONED" && d.Get("write_capacity").Exists() {
-		if billingMode != "PROVISIONED" {
-			log.Debugf("Skipping %s for %s. This attribute is only available for provisioned pricing.", "write_capacity", d.Address)
-		} else {
-			costComponents = append(costComponents, wcuCostComponent(d))
-		}
+	if billingMode == "PROVISIONED" {
+		costComponents = append(costComponents, wcuCostComponent(d))
 	}
 	// Read capacity units (RCU)
-	if billingMode == "PROVISIONED" && d.Get("read_capacity").Exists() {
-		if billingMode != "PROVISIONED" {
-			log.Debugf("Skipping %s for %s. This attribute is only available for provisioned pricing.", "read_capacity", d.Address)
-		} else {
-			costComponents = append(costComponents, rcuCostComponent(d))
-		}
+	if billingMode == "PROVISIONED" {
+		costComponents = append(costComponents, rcuCostComponent(d))
 	}
 
 	// Infracost usage data
 
 	// Write request units (WRU)
-	if u != nil && u.Get("monthly_write_request_units").Exists() {
-		if billingMode == "PROVISIONED" {
-			log.Debugf("Skipping %s usage data for %s. This usage data is only available for on-demand pricing.", "monthly_write_request_units", d.Address)
-		} else {
-			costComponents = append(costComponents, wruCostComponent(d, u))
-		}
+	if billingMode == "PAY_PER_REQUEST" {
+		costComponents = append(costComponents, wruCostComponent(d, u))
 	}
 	// Read request units (RRU)
-	if u != nil && u.Get("monthly_read_request_units").Exists() {
-		if billingMode == "PROVISIONED" {
-			log.Debugf("Skipping %s usage data for %s. This usage data is only available for on-demand pricing.", "monthly_read_request_units", d.Address)
-		} else {
-			costComponents = append(costComponents, rruCostComponent(d, u))
-		}
+	if billingMode == "PAY_PER_REQUEST" {
+		costComponents = append(costComponents, rruCostComponent(d, u))
 	}
 
 	// Data storage
@@ -142,11 +133,13 @@ func globalTables(d *schema.ResourceData, u *schema.ResourceData) []*schema.Reso
 			region := data.Get("region_name").String()
 			name := region
 			var capacity int64
-			if billingMode == "PROVISIONED" && d.Get("write_capacity").Exists() {
+			if billingMode == "PROVISIONED" {
 				capacity = d.Get("write_capacity").Int()
 				resources = append(resources, newProvisionedDynamoDBGlobalTable(name, data, region, capacity))
-			} else if billingMode == "PAY_PER_REQUEST" && u != nil && u.Get("monthly_write_request_units").Exists() {
-				capacity = u.Get("monthly_write_request_units.0.value").Int()
+			} else if billingMode == "PAY_PER_REQUEST" {
+				if u != nil && u.Get("monthly_write_request_units").Exists() {
+					capacity = u.Get("monthly_write_request_units.0.value").Int()
+				}
 				resources = append(resources, newOnDemandDynamoDBGlobalTable(name, data, region, capacity))
 			}
 		}
@@ -206,10 +199,14 @@ func newOnDemandDynamoDBGlobalTable(name string, d gjson.Result, region string, 
 
 func wruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
+	var quantity int64 = 0
+	if u != nil && u.Get("monthly_write_request_units").Exists() {
+		quantity = u.Get("monthly_write_request_units").Int()
+	}
 	return &schema.CostComponent{
 		Name:            "Write request unit (WRU)",
 		Unit:            "WRU-months",
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_write_request_units.0.value").Int())),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -227,10 +224,14 @@ func wruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.Co
 
 func rruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
+	var quantity int64 = 0
+	if u != nil && u.Get("monthly_read_request_units.0.value").Exists() {
+		quantity = u.Get("monthly_read_request_units.0.value").Int()
+	}
 	return &schema.CostComponent{
 		Name:            "Read request unit (RRU)",
 		Unit:            "RRU-months",
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_read_request_units.0.value").Int())),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
