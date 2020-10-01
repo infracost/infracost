@@ -8,6 +8,82 @@ The general process for contributing to Infracost is:
 
 ## Adding new resources
 
+### Quickstart AWS
+
+_Make sure to get familiar with the pricing model of you resource first._ To begin add a new file in `internal/providers/terraform/aws/` as well as an accompanying test file.
+
+```
+package aws
+
+import (
+	"fmt"
+
+	"github.com/infracost/infracost/pkg/schema"
+	"github.com/shopspring/decimal"
+)
+
+func GetMyResourceRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_my_resource",
+		RFunc: NewMyResource,
+	}
+}
+
+func NewMyResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+
+	region := d.Get("region").String()
+  instanceCount := 1
+
+	ebsOptions := d.Get("ebs_options").Array()[0]
+
+	costComponents := []*schema.CostComponent{
+		{
+			Name:           fmt.Sprintf("Instance (on-demand, %s)", "my_instance_type"),
+			Unit:           "hours",
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonES"),
+				ProductFamily: strPtr("My AWS Resource family"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr("/Some Usage type/")},
+					{Key: "instanceType", Value: strPtr("Some instance type")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: strPtr("on_demand"),
+			},
+		},
+	}
+
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: costComponents,
+	}
+}
+```
+
+Next append the resource to the registry in `internal/providers/terraform/aws/resource_registry.go`.
+
+```
+package aws
+
+import "github.com/infracost/infracost/pkg/schema"
+
+var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
+	...,
+  GetMyResourceRegistryItem(),
+}
+
+```
+
+Finally create a terraform file to test your resource and run:
+
+```
+make run ARGS="--tfdir my_new_terraform/"
+```
+
 ### Overview
 
 When adding your first resource, we recommend you look at one of the existing resources to see how it's done, for example, check the [nat_gateway.go](internal/providers/terraform/aws/nat_gateway.go) resource. You can then review the [price_explorer](scripts/price_explorer/README.md) scripts that help you find various pricing service filters, and something called a "priceHash" that you need for writing integration tests.
