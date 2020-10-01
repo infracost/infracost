@@ -31,7 +31,8 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
     Mac OSX:
     ```sh
-    brew install infracost
+    curl --silent --location "https://github.com/infracost/infracost/releases/latest/download/infracost-darwin-amd64.tar.gz" | tar xz -C /tmp
+    sudo mv /tmp/infracost-darwin-amd64 /usr/local/bin/infracost
     ```
 
 2.	Use our free hosted API for cloud prices by registering for an API key:
