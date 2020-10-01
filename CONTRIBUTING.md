@@ -12,7 +12,7 @@ The general process for contributing to Infracost is:
 
 _Make sure to get familiar with the pricing model of you resource first._ To begin add a new file in `internal/providers/terraform/aws/` as well as an accompanying test file.
 
-```
+```go
 package aws
 
 import (
@@ -32,9 +32,7 @@ func GetMyResourceRegistryItem() *schema.RegistryItem {
 func NewMyResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 
 	region := d.Get("region").String()
-  instanceCount := 1
-
-	ebsOptions := d.Get("ebs_options").Array()[0]
+        instanceCount := 1
 
 	costComponents := []*schema.CostComponent{
 		{
@@ -66,7 +64,7 @@ func NewMyResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 
 Next append the resource to the registry in `internal/providers/terraform/aws/resource_registry.go`.
 
-```
+```go
 package aws
 
 import "github.com/infracost/infracost/pkg/schema"
