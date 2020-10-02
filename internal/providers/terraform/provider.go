@@ -71,14 +71,14 @@ func loadPlanJSON(path string) ([]byte, error) {
 }
 
 func generatePlanJSON(dir string, path string) ([]byte, error) {
-	opts := &cmdOptions{
+	opts := &CmdOptions{
 		TerraformDir: dir,
 	}
 
 	if path == "" {
-		_, err := terraformCmd(opts, "init", "-no-color")
+		_, err := TerraformCmd(opts, "init", "-no-color")
 		if err != nil {
-			return []byte{}, errors.Wrap(err, "error initializing terraform working directory")
+			return []byte{}, errors.Wrap(err, "error initializing Terraform working directory")
 		}
 
 		f, err := ioutil.TempFile(os.TempDir(), "tfplan")
@@ -87,17 +87,17 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 		}
 		defer os.Remove(f.Name())
 
-		_, err = terraformCmd(opts, "plan", "-input=false", "-lock=false", "-no-color", fmt.Sprintf("-out=%s", f.Name()))
+		_, err = TerraformCmd(opts, "plan", "-input=false", "-lock=false", "-no-color", fmt.Sprintf("-out=%s", f.Name()))
 		if err != nil {
-			return []byte{}, errors.Wrap(err, "error generating terraform execution plan")
+			return []byte{}, errors.Wrap(err, "error generating Terraform execution plan")
 		}
 
 		path = f.Name()
 	}
 
-	out, err := terraformCmd(opts, "show", "-json", path)
+	out, err := TerraformCmd(opts, "show", "-json", path)
 	if err != nil {
-		return []byte{}, errors.Wrap(err, "error inspecting terraform plan")
+		return []byte{}, errors.Wrap(err, "error inspecting Terraform plan")
 	}
 
 	return out, nil
