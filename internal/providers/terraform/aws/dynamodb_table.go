@@ -2,7 +2,6 @@ package aws
 
 import (
 	"github.com/infracost/infracost/pkg/schema"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -12,7 +11,6 @@ func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name: "aws_dynamodb_table",
 		Notes: []string{
-			"Provisioned capacity mode only.",
 			"DAX is not yet supported.",
 		},
 		RFunc: NewDynamoDBTable,
@@ -24,52 +22,35 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	subResources := make([]*schema.Resource, 0)
 
 	billingMode := d.Get("billing_mode").String()
-	if billingMode != "PROVISIONED" {
-		log.Warnf("Skipping resource %s. Infracost currently does not support on-demand DynamoDB.", d.Address)
-		return nil
-	}
 
-	// Write capacity units (WCU)
 	if billingMode == "PROVISIONED" {
+		// Write capacity units (WCU)
 		costComponents = append(costComponents, wcuCostComponent(d))
-	}
-	// Read capacity units (RCU)
-	if billingMode == "PROVISIONED" {
+		// Read capacity units (RCU)
 		costComponents = append(costComponents, rcuCostComponent(d))
 	}
 
 	// Infracost usage data
 
-	// Write request units (WRU)
 	if billingMode == "PAY_PER_REQUEST" {
+		// Write request units (WRU)
 		costComponents = append(costComponents, wruCostComponent(d, u))
-	}
-	// Read request units (RRU)
-	if billingMode == "PAY_PER_REQUEST" {
+		// Read request units (RRU)
 		costComponents = append(costComponents, rruCostComponent(d, u))
+
 	}
 
 	// Data storage
-	if u != nil && u.Get("monthly_gb_data_storage").Exists() {
-		costComponents = append(costComponents, dataStorageCostComponent(d, u))
-	}
+	costComponents = append(costComponents, dataStorageCostComponent(d, u))
 	// Continuous backups (PITR)
-	if u != nil && u.Get("monthly_gb_continuous_backup_storage").Exists() {
-		costComponents = append(costComponents, continuousBackupCostComponent(d, u))
-	}
+	costComponents = append(costComponents, continuousBackupCostComponent(d, u))
 	// OnDemand backups
-	if u != nil && u.Get("monthly_gb_on_demand_backup_storage").Exists() {
-		costComponents = append(costComponents, onDemandBackupCostComponent(d, u))
-	}
+	costComponents = append(costComponents, onDemandBackupCostComponent(d, u))
 	// Restoring tables
-	if u != nil && u.Get("monthly_gb_restore").Exists() {
-		costComponents = append(costComponents, restoreCostComponent(d, u))
-	}
+	costComponents = append(costComponents, restoreCostComponent(d, u))
 
 	// Stream reads
-	if u != nil && u.Get("monthly_streams_read_request_units").Exists() {
-		costComponents = append(costComponents, streamCostComponent(d, u))
-	}
+	costComponents = append(costComponents, streamCostComponent(d, u))
 
 	// Global tables (replica)
 	subResources = append(subResources, globalTables(d, u)...)
@@ -83,10 +64,14 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 
 func wcuCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
+	var quantity int64
+	if d.Get("write_capacity").Exists() {
+		quantity = d.Get("write_capacity").Int()
+	}
 	return &schema.CostComponent{
 		Name:           "Write capacity unit (WCU)",
 		Unit:           "WCU-hours",
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(d.Get("write_capacity").Int())),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -105,10 +90,14 @@ func wcuCostComponent(d *schema.ResourceData) *schema.CostComponent {
 
 func rcuCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
+	var quantity int64
+	if d.Get("read_capacity").Exists() {
+		quantity = d.Get("read_capacity").Int()
+	}
 	return &schema.CostComponent{
 		Name:           "Read capacity unit (RCU)",
 		Unit:           "RCU-hours",
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(d.Get("read_capacity").Int())),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -178,10 +167,10 @@ func newOnDemandDynamoDBGlobalTable(name string, d gjson.Result, region string, 
 	return &schema.Resource{
 		Name: name,
 		CostComponents: []*schema.CostComponent{
-			// Replicated write capacity units (rWCU)
+			// Replicated write capacity units (rWRU)
 			{
 				Name:            "Replicated write request unit (rWRU)",
-				Unit:            "rWRU-months",
+				Unit:            "rWRU-hours",
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -199,13 +188,13 @@ func newOnDemandDynamoDBGlobalTable(name string, d gjson.Result, region string, 
 
 func wruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
-	var quantity int64 = 0
+	var quantity int64
 	if u != nil && u.Get("monthly_write_request_units").Exists() {
 		quantity = u.Get("monthly_write_request_units").Int()
 	}
 	return &schema.CostComponent{
 		Name:            "Write request unit (WRU)",
-		Unit:            "WRU-months",
+		Unit:            "WRUs",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -224,13 +213,13 @@ func wruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.Co
 
 func rruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
-	var quantity int64 = 0
+	var quantity int64
 	if u != nil && u.Get("monthly_read_request_units.0.value").Exists() {
 		quantity = u.Get("monthly_read_request_units.0.value").Int()
 	}
 	return &schema.CostComponent{
 		Name:            "Read request unit (RRU)",
-		Unit:            "RRU-months",
+		Unit:            "RRUs",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -249,10 +238,14 @@ func rruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.Co
 
 func dataStorageCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
+	var quantity int64
+	if u != nil && u.Get("monthly_gb_data_storage.0.value").Exists() {
+		quantity = u.Get("monthly_gb_data_storage.0.value").Int()
+	}
 	return &schema.CostComponent{
 		Name:            "Data storage",
 		Unit:            "GB-months",
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_data_storage.0.value").Int())),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -271,10 +264,14 @@ func dataStorageCostComponent(d *schema.ResourceData, u *schema.ResourceData) *s
 
 func continuousBackupCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
+	var quantity int64
+	if u != nil && u.Get("monthly_gb_continuous_backup_storage.0.value").Exists() {
+		quantity = u.Get("monthly_gb_continuous_backup_storage.0.value").Int()
+	}
 	return &schema.CostComponent{
 		Name:            "Continuous backup (PITR) storage",
 		Unit:            "GB-months",
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_continuous_backup_storage.0.value").Int())),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -289,10 +286,14 @@ func continuousBackupCostComponent(d *schema.ResourceData, u *schema.ResourceDat
 
 func onDemandBackupCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
+	var quantity int64
+	if u != nil && u.Get("monthly_gb_on_demand_backup_storage.0.value").Exists() {
+		quantity = u.Get("monthly_gb_on_demand_backup_storage.0.value").Int()
+	}
 	return &schema.CostComponent{
 		Name:            "On-demand backup storage",
 		Unit:            "GB-months",
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_on_demand_backup_storage.0.value").Int())),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -304,10 +305,14 @@ func onDemandBackupCostComponent(d *schema.ResourceData, u *schema.ResourceData)
 
 func restoreCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
+	var quantity int64
+	if u != nil && u.Get("monthly_gb_restore.0.value").Exists() {
+		quantity = u.Get("monthly_gb_restore.0.value").Int()
+	}
 	return &schema.CostComponent{
 		Name:            "Restore data size",
-		Unit:            "GB-months",
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_restore.0.value").Int())),
+		Unit:            "GB",
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -319,10 +324,14 @@ func restoreCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schem
 
 func streamCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
+	var quantity int64
+	if u != nil && u.Get("monthly_streams_read_request_units.0.value").Exists() {
+		quantity = u.Get("monthly_streams_read_request_units.0.value").Int()
+	}
 	return &schema.CostComponent{
 		Name:            "Streams read request unit (sRRU)",
-		Unit:            "sRRU-months",
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(u.Get("monthly_streams_read_request_units.0.value").Int())),
+		Unit:            "sRRUs",
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
