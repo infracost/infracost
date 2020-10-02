@@ -60,6 +60,12 @@ The [Infracost GitHub action](https://github.com/marketplace/actions/run-infraco
 
 <img src="https://raw.githubusercontent.com/infracost/infracost-gh-action/master/screenshot.png" width=600 alt="Example infracost diff usage" />
 
+### Docker
+Replace the `--tf-dir` value with your infra's path, or git clone this repository to check the examples 
+```
+docker run --rm -v $PWD/:/code/ infracost/infracost:latest --tf-dir /code/examples/small_terraform
+```
+
 ## Development
 
 Install Go dependencies:
