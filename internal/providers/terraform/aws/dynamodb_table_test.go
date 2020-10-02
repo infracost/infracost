@@ -184,6 +184,26 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 					PriceHash:       "30812d4142a0a73eb1efbd902581679f-bd107312a4bed8ba719b7dc8dcfdaf95",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(30)),
 				},
+				{
+					Name:      "Data storage",
+					SkipCheck: true,
+				},
+				{
+					Name:      "Continuous backup (PITR) storage",
+					SkipCheck: true,
+				},
+				{
+					Name:      "On-demand backup storage",
+					SkipCheck: true,
+				},
+				{
+					Name:      "Restore data size",
+					SkipCheck: true,
+				},
+				{
+					Name:      "Streams read request unit (sRRU)",
+					SkipCheck: true,
+				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
 				{

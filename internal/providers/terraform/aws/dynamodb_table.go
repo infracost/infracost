@@ -190,7 +190,7 @@ func wruCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.Co
 	region := d.Get("region").String()
 	var quantity int64
 	if u != nil && u.Get("monthly_write_request_units").Exists() {
-		quantity = u.Get("monthly_write_request_units").Int()
+		quantity = u.Get("monthly_write_request_units.0.value").Int()
 	}
 	return &schema.CostComponent{
 		Name:            "Write request unit (WRU)",
