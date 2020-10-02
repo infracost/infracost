@@ -14,13 +14,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type cmdOptions struct {
+type CmdOptions struct {
 	TerraformDir string
 }
 
 var terraformLogger = log.StandardLogger().WithField("binary", "terraform")
 
-func terraformCmd(options *cmdOptions, args ...string) ([]byte, error) {
+func TerraformCmd(options *CmdOptions, args ...string) ([]byte, error) {
 	terraformBinary := os.Getenv("TERRAFORM_BINARY")
 	if terraformBinary == "" {
 		terraformBinary = "terraform"
