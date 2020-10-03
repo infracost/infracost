@@ -95,7 +95,7 @@ func generatePlanJSON(dir string, path string) ([]byte, error) {
 		path = f.Name()
 	}
 
-	out, err := TerraformCmd(opts, "show", "-json", path)
+	out, err := TerraformCmd(opts, "show", "-no-color", "-json", path)
 	if err != nil {
 		return []byte{}, errors.Wrap(err, "error inspecting Terraform plan")
 	}

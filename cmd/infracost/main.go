@@ -28,9 +28,12 @@ var calcSpinner *spinner.Spinner
 func handleGlobalFlags(c *cli.Context) error {
 	config.Config.NoColor = c.Bool("no-color")
 	color.NoColor = c.Bool("no-color")
-	err := config.Config.SetLogLevel(c.String("log-level"))
-	if err != nil {
-		return customError(c, err.Error(), true)
+
+	if c.IsSet("log-level") {
+		err := config.Config.SetLogLevel(c.String("log-level"))
+		if err != nil {
+			return customError(c, err.Error(), true)
+		}
 	}
 
 	if c.String("pricing-api-endpoint") != "" {
