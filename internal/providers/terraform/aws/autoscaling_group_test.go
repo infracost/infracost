@@ -60,7 +60,7 @@ func TestAutoscalingGroup_launchConfiguration(t *testing.T) {
 							Name: "root_block_device",
 							CostComponentChecks: []testutil.CostComponentCheck{
 								{
-									Name:             "Storage",
+									Name:             "General Purpose SSD storage (gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 								},
@@ -70,7 +70,7 @@ func TestAutoscalingGroup_launchConfiguration(t *testing.T) {
 							Name: "ebs_block_device[0]",
 							CostComponentChecks: []testutil.CostComponentCheck{
 								{
-									Name:             "Storage",
+									Name:             "General Purpose SSD storage (gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 								},
@@ -353,7 +353,7 @@ func TestAutoscalingGroup_launchTemplate(t *testing.T) {
 							Name: "root_block_device",
 							CostComponentChecks: []testutil.CostComponentCheck{
 								{
-									Name:             "Storage",
+									Name:             "General Purpose SSD storage (gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(16)),
 								},
@@ -363,7 +363,7 @@ func TestAutoscalingGroup_launchTemplate(t *testing.T) {
 							Name: "block_device_mapping[0]",
 							CostComponentChecks: []testutil.CostComponentCheck{
 								{
-									Name:             "Storage",
+									Name:             "General Purpose SSD storage (gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 								},
@@ -373,12 +373,12 @@ func TestAutoscalingGroup_launchTemplate(t *testing.T) {
 							Name: "block_device_mapping[1]",
 							CostComponentChecks: []testutil.CostComponentCheck{
 								{
-									Name:            "Storage",
+									Name:            "Provisioned IOPS SSD storage (io1)",
 									PriceHash:       "99450513de8c131ee2151e1b319d8143-ee3dd7e4624338037ca6fea0933a662f",
 									HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40)),
 								},
 								{
-									Name:            "Storage IOPS",
+									Name:            "Provisioned IOPS",
 									PriceHash:       "d5c5e1fb9b8ded55c336f6ae87aa2c3b-9c483347596633f8cf3ab7fdd5502b78",
 									HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(400)),
 								},
@@ -791,7 +791,7 @@ func TestAutoscalingGroup_mixedInstanceLaunchTemplate(t *testing.T) {
 							Name: "root_block_device",
 							CostComponentChecks: []testutil.CostComponentCheck{
 								{
-									Name:             "Storage",
+									Name:             "General Purpose SSD storage (gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(24)),
 								},
@@ -867,7 +867,7 @@ func TestAutoscalingGroup_mixedInstanceLaunchTemplateDynamic(t *testing.T) {
 							Name: "root_block_device",
 							CostComponentChecks: []testutil.CostComponentCheck{
 								{
-									Name:             "Storage",
+									Name:             "General Purpose SSD storage (gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(24)),
 								},

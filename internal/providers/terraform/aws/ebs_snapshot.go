@@ -34,7 +34,7 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.CostComponent {
 	return []*schema.CostComponent{
 		{
-			Name:            "Storage",
+			Name:            "EBS snapshot storage",
 			Unit:            "GB-months",
 			MonthlyQuantity: &gbVal,
 			ProductFilter: &schema.ProductFilter{
@@ -44,6 +44,62 @@ func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.C
 				ProductFamily: strPtr("Storage Snapshot"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/EBS:SnapshotUsage$/")},
+				},
+			},
+		},
+		{
+			Name:           "Fast snapshot restore",
+			Unit:           "DSU-hours",
+			HourlyQuantity: decimalPtr(decimal.Zero),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEC2"),
+				ProductFamily: strPtr("Fast Snapshot Restore"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr("/EBS:FastSnapshotRestore$/")},
+				},
+			},
+		},
+		{
+			Name:           "ListChangedBlocks & ListSnapshotBlocks API requests",
+			Unit:           "requests",
+			HourlyQuantity: decimalPtr(decimal.Zero),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEC2"),
+				ProductFamily: strPtr("EBS direct API Requests"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr("/EBS:directAPI.snapshot.List$/")},
+				},
+			},
+		},
+		{
+			Name:           "GetSnapshotBlock API requests",
+			Unit:           "SnapshotAPIUnits",
+			HourlyQuantity: decimalPtr(decimal.Zero),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEC2"),
+				ProductFamily: strPtr("EBS direct API Requests"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr("/EBS:directAPI.snapshot.Get$/")},
+				},
+			},
+		},
+		{
+			Name:           "PutSnapshotBlock API requests",
+			Unit:           "SnapshotAPIUnits",
+			HourlyQuantity: decimalPtr(decimal.Zero),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEC2"),
+				ProductFamily: strPtr("EBS direct API Requests"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr("/EBS:directAPI.snapshot.Put$/")},
 				},
 			},
 		},
