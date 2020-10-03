@@ -12,7 +12,7 @@ Support for the following is not currently included:
 | Terraform resource           | Notes |
 | ---                          | ---   |
 | `aws_alb` |  |
-| `aws_autoscaling_group` |  |
+| `aws_autoscaling_group` |  See aws_instance<br />  |
 | `aws_db_instance` |  |
 | `aws_docdb_cluster_instance` |  |
 | `aws_dynamodb_table` |  DAX is not yet supported.<br />  |
