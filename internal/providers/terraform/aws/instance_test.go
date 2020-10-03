@@ -261,8 +261,9 @@ func TestInstance_cpuCredits(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:      "CPU credits",
-					PriceHash: "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
+					Name:             "CPU credits",
+					PriceHash:        "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
@@ -280,9 +281,9 @@ func TestInstance_cpuCredits(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:            "CPU credits",
-					PriceHash:       "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "CPU credits",
+					PriceHash:        "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
@@ -330,9 +331,9 @@ func TestInstance_cpuCredits(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:            "CPU credits",
-					PriceHash:       "4aaa3d22a88b57f7997e91888f867be9-e8e892be2fbd1c8f42fd6761ad8977d8",
-					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "CPU credits",
+					PriceHash:        "4aaa3d22a88b57f7997e91888f867be9-e8e892be2fbd1c8f42fd6761ad8977d8",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
