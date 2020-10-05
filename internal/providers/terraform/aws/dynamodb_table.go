@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/pkg/schema"
 
 	"github.com/shopspring/decimal"
@@ -120,7 +122,7 @@ func globalTables(d *schema.ResourceData, u *schema.ResourceData) []*schema.Reso
 	if d.Get("replica").Exists() {
 		for _, data := range d.Get("replica").Array() {
 			region := data.Get("region_name").String()
-			name := region
+			name := fmt.Sprintf("Global table (%s)", region)
 			var capacity int64
 			if billingMode == "PROVISIONED" {
 				capacity = d.Get("write_capacity").Int()
@@ -269,7 +271,7 @@ func continuousBackupCostComponent(d *schema.ResourceData, u *schema.ResourceDat
 		quantity = u.Get("monthly_gb_continuous_backup_storage.0.value").Int()
 	}
 	return &schema.CostComponent{
-		Name:            "Continuous backup (PITR) storage",
+		Name:            "Continuous backup storage (PITR)",
 		Unit:            "GB-months",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
