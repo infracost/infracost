@@ -110,7 +110,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
 				{
-					Name: "us-east-2",
+					Name: "Global table (us-east-2)",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
 							Name:            "Replicated write request unit (rWRU)",
@@ -120,7 +120,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 					},
 				},
 				{
-					Name: "us-west-1",
+					Name: "Global table (us-west-1)",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
 							Name:            "Replicated write request unit (rWRU)",
@@ -207,7 +207,7 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
 				{
-					Name: "us-east-2",
+					Name: "Global table (us-east-2)",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
 							Name:            "Replicated write capacity unit (rWCU)",
@@ -217,7 +217,7 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 					},
 				},
 				{
-					Name: "us-west-1",
+					Name: "Global table (us-west-1)",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
 							Name:            "Replicated write capacity unit (rWCU)",
