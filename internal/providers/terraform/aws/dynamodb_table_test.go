@@ -88,7 +88,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(230)),
 				},
 				{
-					Name:            "Continuous backup (PITR) storage",
+					Name:            "Continuous backup storage (PITR)",
 					PriceHash:       "b4ed90c18b808ffff191ffbc16090c8e-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2300)),
 				},
@@ -110,7 +110,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
 				{
-					Name: "us-east-2",
+					Name: "Global table (us-east-2)",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
 							Name:            "Replicated write request unit (rWRU)",
@@ -120,7 +120,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 					},
 				},
 				{
-					Name: "us-west-1",
+					Name: "Global table (us-west-1)",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
 							Name:            "Replicated write request unit (rWRU)",
@@ -184,10 +184,30 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 					PriceHash:       "30812d4142a0a73eb1efbd902581679f-bd107312a4bed8ba719b7dc8dcfdaf95",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(30)),
 				},
+				{
+					Name:      "Data storage",
+					SkipCheck: true,
+				},
+				{
+					Name:      "Continuous backup storage (PITR)",
+					SkipCheck: true,
+				},
+				{
+					Name:      "On-demand backup storage",
+					SkipCheck: true,
+				},
+				{
+					Name:      "Restore data size",
+					SkipCheck: true,
+				},
+				{
+					Name:      "Streams read request unit (sRRU)",
+					SkipCheck: true,
+				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
 				{
-					Name: "us-east-2",
+					Name: "Global table (us-east-2)",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
 							Name:            "Replicated write capacity unit (rWCU)",
@@ -197,7 +217,7 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 					},
 				},
 				{
-					Name: "us-west-1",
+					Name: "Global table (us-west-1)",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
 							Name:            "Replicated write capacity unit (rWCU)",
