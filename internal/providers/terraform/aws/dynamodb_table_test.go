@@ -88,7 +88,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(230)),
 				},
 				{
-					Name:            "Continuous backup (PITR) storage",
+					Name:            "Continuous backup storage (PITR)",
 					PriceHash:       "b4ed90c18b808ffff191ffbc16090c8e-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2300)),
 				},
@@ -189,7 +189,7 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:      "Continuous backup (PITR) storage",
+					Name:      "Continuous backup storage (PITR)",
 					SkipCheck: true,
 				},
 				{
