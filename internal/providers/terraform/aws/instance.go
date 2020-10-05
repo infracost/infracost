@@ -95,7 +95,7 @@ func ebsOptimizedCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	instanceType := d.Get("instance_type").String()
 
 	return &schema.CostComponent{
-		Name:                 "EBS-Optimized usage",
+		Name:                 "EBS-optimized usage",
 		Unit:                 "hours",
 		HourlyQuantity:       decimalPtr(decimal.NewFromInt(1)),
 		IgnoreIfMissingPrice: true,
