@@ -12,7 +12,7 @@ import (
 
 func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_autoscaling_group",
+		Name: "aws_autoscaling_group",
 		Notes: []string{
 			"See aws_instance",
 		},

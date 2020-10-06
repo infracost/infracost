@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/briandowns/spinner"
 	"github.com/infracost/infracost/internal/providers/terraform"
+	"github.com/infracost/infracost/internal/spin"
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/version"
 
@@ -14,16 +14,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func customError(c *cli.Context, msg string, showHelp bool) error {
-	color.HiRed(fmt.Sprintf("%v\n", msg))
-	if showHelp {
-		_ = cli.ShowAppHelp(c)
-	}
-
-	return fmt.Errorf("")
+func usageError(c *cli.Context, msg string) {
+	fmt.Fprintln(os.Stderr, color.HiRedString(msg)+"\n")
+	c.App.Writer = os.Stderr
+	cli.ShowAppHelpAndExit(c, 1)
 }
 
-var calcSpinner *spinner.Spinner
+var spinner *spin.Spinner
 
 func handleGlobalFlags(c *cli.Context) error {
 	config.Config.NoColor = c.Bool("no-color")
@@ -32,7 +29,7 @@ func handleGlobalFlags(c *cli.Context) error {
 	if c.IsSet("log-level") {
 		err := config.Config.SetLogLevel(c.String("log-level"))
 		if err != nil {
-			return customError(c, err.Error(), true)
+			usageError(c, err.Error())
 		}
 	}
 
@@ -46,9 +43,10 @@ func handleGlobalFlags(c *cli.Context) error {
 func checkApiKey() bool {
 	infracostApiKey := config.Config.ApiKey
 	if config.Config.PricingAPIEndpoint == config.Config.DefaultPricingAPIEndpoint && infracostApiKey == "" {
-		color.Yellow("No INFRACOST_API_KEY environment variable is set.")
-		c := color.New(color.Bold, color.FgHiWhite)
-		fmt.Printf("We run a free hosted API for cloud prices, to get an API key run `%s`\n", c.Sprint("infracost register"))
+		red := color.New(color.FgHiRed)
+		bold := color.New(color.Bold, color.FgHiWhite)
+		fmt.Fprintln(os.Stderr, red.Sprint("No INFRACOST_API_KEY environment variable is set."))
+		fmt.Fprintln(os.Stderr, red.Sprintf("We run a free hosted API for cloud prices, to get an API key run"), bold.Sprint("`infracost register`\n"))
 		return false
 	}
 	return true
@@ -106,7 +104,8 @@ Example:
 			},
 		}, defaultCmd.Flags...),
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
-			return customError(c, err.Error(), true)
+			usageError(c, err.Error())
+			return nil
 		},
 		Before:   handleGlobalFlags,
 		Commands: []*cli.Command{registerCmd()},
@@ -114,11 +113,11 @@ Example:
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		if calcSpinner != nil {
-			calcSpinner.Stop()
+		if spinner != nil {
+			spinner.Fail()
 		}
 		if err.Error() != "" {
-			color.HiRed(fmt.Sprintf("%v\n", err.Error()))
+			fmt.Fprintln(os.Stderr, color.HiRedString(err.Error()))
 		}
 		os.Exit(1)
 	}

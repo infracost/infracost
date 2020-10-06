@@ -72,7 +72,7 @@ func InstallPlugins() error {
 
 	tfdir, err := CreateProject(project)
 	if err != nil {
-		return errors.Wrap(err, "error creating Terraform project")
+		return errors.Wrap(err, "Error creating Terraform project")
 	}
 
 	opts := &terraform.CmdOptions{
@@ -81,7 +81,7 @@ func InstallPlugins() error {
 
 	_, err = terraform.TerraformCmd(opts, "init", "-no-color")
 	if err != nil {
-		return errors.Wrap(err, "error initializing Terraform working directory")
+		return errors.Wrap(err, "Error initializing Terraform working directory")
 	}
 
 	return nil

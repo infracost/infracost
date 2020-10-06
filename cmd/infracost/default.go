@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
-	"github.com/briandowns/spinner"
+	"github.com/fatih/color"
 	"github.com/infracost/infracost/internal/providers/terraform"
-	"github.com/infracost/infracost/pkg/config"
+	"github.com/infracost/infracost/internal/spin"
 	"github.com/infracost/infracost/pkg/output"
 	"github.com/infracost/infracost/pkg/prices"
 	"github.com/infracost/infracost/pkg/schema"
@@ -51,39 +50,31 @@ func defaultCmd() *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			if !checkApiKey() {
-				return fmt.Errorf("")
+				os.Exit(1)
 			}
 
 			provider := terraform.New()
 			if err := provider.ProcessArgs(c); err != nil {
-				return customError(c, err.Error(), false)
-			}
-
-			calcSpinner = spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
-
-			if !config.Config.IsLogging() {
-				calcSpinner.Suffix = " Calculating costs…"
-				if !c.Bool("no-color") {
-					_ = calcSpinner.Color("fgHiGreen", "bold")
-				}
-				calcSpinner.Start()
-			} else {
-				log.Info("Calculating costs…")
+				usageError(c, err.Error())
 			}
 
 			resources, err := provider.LoadResources()
 			if err != nil {
-				return errors.Wrap(err, "error loading resources")
+				return err
 			}
 
+			spinner = spin.NewSpinner("Calculating costs")
+
 			if err := prices.PopulatePrices(resources); err != nil {
+				spinner.Fail()
 				if e := unwrapped(err); errors.Is(e, prices.InvalidAPIKeyError) {
-					calcSpinner.Stop()
-					ret := customError(c, e.Error(), false)
-					fmt.Println("Please check your INFRACOST_API_KEY environment variable. If you continue having issues please email hello@infracost.io")
-					return ret
+					red := color.New(color.FgHiRed)
+					bold := color.New(color.Bold, color.FgHiWhite)
+					fmt.Fprintln(os.Stderr, red.Sprint(e.Error()))
+					fmt.Fprintln(os.Stderr, red.Sprint("Please check your"), bold.Sprint("INFRACOST_API_KEY"), red.Sprint("environment variable. If you continue having issues please email hello@infracost.io"))
+					os.Exit(1)
 				}
-				return errors.Wrap(err, "error retrieving prices")
+				return err
 			}
 
 			schema.CalculateCosts(resources)
@@ -98,13 +89,14 @@ func defaultCmd() *cli.Command {
 				out, err = output.ToTable(resources, c)
 			}
 
-			calcSpinner.Stop()
-
 			if err != nil {
-				return errors.Wrap(err, "output error")
+				spinner.Fail()
+				return errors.Wrap(err, "Error generating output")
 			}
 
-			fmt.Println(string(out))
+			spinner.Success()
+
+			fmt.Printf("\n%s\n", string(out))
 
 			return nil
 		},
