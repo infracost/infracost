@@ -3,14 +3,15 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime/debug"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/spin"
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/version"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/fatih/color"
-	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
@@ -40,6 +41,17 @@ func handleGlobalFlags(c *cli.Context) error {
 	return nil
 }
 
+func versionOutput(app *cli.App) string {
+	s := fmt.Sprintf("Infracost %s", app.Version)
+	v, err := terraform.TerraformVersion()
+	if err != nil {
+		log.Warnf("error determining Terraform version")
+	} else {
+		s += fmt.Sprintf("\n%s", v)
+	}
+	return s
+}
+
 func checkApiKey() bool {
 	infracostApiKey := config.Config.ApiKey
 	if config.Config.PricingAPIEndpoint == config.Config.DefaultPricingAPIEndpoint && infracostApiKey == "" {
@@ -61,13 +73,7 @@ func main() {
 	}
 
 	cli.VersionPrinter = func(c *cli.Context) {
-		fmt.Println("Infracost", c.App.Version)
-		v, err := terraform.TerraformVersion()
-		if err != nil {
-			log.Warnf("error determining Terraform version")
-		} else {
-			fmt.Println(v)
-		}
+		fmt.Println(versionOutput(c.App))
 	}
 
 	app := &cli.App{
@@ -112,6 +118,16 @@ Example:
 		Action:   defaultCmd.Action,
 	}
 
+	defer func() {
+		if err := recover(); err != nil {
+			red := color.New(color.FgHiRed)
+			bold := color.New(color.Bold, color.FgHiWhite)
+			fmt.Fprintln(os.Stderr, red.Sprint("An unexpected error occurred\n"))
+			fmt.Fprintf(os.Stderr, "%s\n%s\n", err, string(debug.Stack()))
+			fmt.Fprintf(os.Stderr, "Environment:\n%s\n", versionOutput(app))
+			fmt.Fprintln(os.Stderr, red.Sprint("\nPlease copy the above output and create a new issue at"), bold.Sprint("https://github.com/infracost/infracost/issues/new"))
+		}
+	}()
 	if err := app.Run(os.Args); err != nil {
 		if spinner != nil {
 			spinner.Fail()
