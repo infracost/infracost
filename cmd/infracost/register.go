@@ -101,11 +101,11 @@ func createApiKey(name string, email string) (*createAPIKeyResponse, error) {
 	d := map[string]string{"name": name, "email": email}
 	j, err := json.Marshal(d)
 	if err != nil {
-		return nil, errors.Wrap(err, "error generating API key request body")
+		return nil, errors.Wrap(err, "Error generating API key request")
 	}
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(j)))
 	if err != nil {
-		return nil, errors.Wrap(err, "error sending API key request")
+		return nil, errors.Wrap(err, "Error generating API key request")
 	}
 
 	req.Header.Set("content-type", "application/json")
@@ -114,18 +114,18 @@ func createApiKey(name string, email string) (*createAPIKeyResponse, error) {
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "error contacting api")
+		return nil, errors.Wrap(err, "Error sending API key request")
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.Wrap(err, "error reading API key response")
+		return nil, errors.Wrap(err, "Invalid reponse from API")
 	}
 	var r createAPIKeyResponse
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		return nil, errors.Wrap(err, "error parsing API key response")
+		return nil, errors.Wrap(err, "Invalid reponse from API")
 	}
 
 	return &r, nil

@@ -3,7 +3,6 @@ package prices
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -97,12 +96,12 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 
 	queriesBody, err := json.Marshal(queries)
 	if err != nil {
-		return results, errors.Wrap(err, "error marshalling queries")
+		return results, errors.Wrap(err, "Error generating request for pricing API")
 	}
 
 	req, err := http.NewRequest("POST", q.endpoint, bytes.NewBuffer([]byte(queriesBody)))
 	if err != nil {
-		return results, err
+		return results, errors.Wrap(err, "Error generating request for pricing API")
 	}
 
 	req.Header.Set("content-type", "application/json")
@@ -112,24 +111,24 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return results, errors.Wrap(err, "error contacting api")
+		return results, errors.Wrap(err, "Error sending request to pricing API")
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return results, errors.Wrap(err, "error reading api response")
+		return results, errors.Wrap(err, "Invalid response from pricing API")
 	}
 	if resp.StatusCode != 200 {
 		var r pricingAPIErrorResponse
 		err = json.Unmarshal(body, &r)
 		if err != nil {
-			return results, fmt.Errorf("error unmarshalling api response error")
+			return results, errors.Wrap(err, "Invalid response from pricing API")
 		}
 		if r.Error == "Invalid API key" {
 			return results, InvalidAPIKeyError
 		}
-		return results, fmt.Errorf(r.Error)
+		return results, errors.Wrap(err, "Received error from pricing API")
 	}
 
 	results = append(results, gjson.ParseBytes(body).Array()...)

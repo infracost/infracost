@@ -4,7 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
+	"path/filepath"
+	"regexp"
+	"strings"
 
+	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/spin"
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/pkg/errors"
 
@@ -39,103 +45,123 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 }
 
 func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
-	var plan []byte
-	var err error
-
-	if p.jsonFile != "" {
-		plan, err = loadPlanJSON(p.jsonFile)
-	} else {
-		plan, err = generatePlanJSON(p.dir, p.planFile)
-	}
-
+	err := p.preChecks()
 	if err != nil {
-		return []*schema.Resource{}, errors.Wrap(err, "error loading resources")
+		return []*schema.Resource{}, err
 	}
 
-	return parsePlanJSON(plan), nil
+	plan, err := p.loadPlanJSON()
+	if err != nil {
+		return []*schema.Resource{}, err
+	}
+
+	resources, err := parsePlanJSON(plan)
+	if err != nil {
+		return resources, errors.Wrap(err, "Error parsing plan JSON")
+	}
+
+	return resources, nil
 }
 
-func loadPlanJSON(path string) ([]byte, error) {
-	f, err := os.Open(path)
+func (p *terraformProvider) preChecks() error {
+	if p.jsonFile == "" {
+		_, err := exec.LookPath(terraformBinary())
+		if err != nil {
+			return errors.Errorf("Could not find terraform binary \"%s\" in path.\nYou can set a custom terraform binary using the environment variable TERRAFORM_BINARY.", terraformBinary())
+		}
+
+		if !p.inTerraformDir() {
+			return errors.Errorf("Directory \"%s\" does not have any .tf files.\nYou can pass a path to a Terraform directory using the --tfdir option.", p.dir)
+		}
+	}
+	return nil
+}
+
+func (p *terraformProvider) loadPlanJSON() ([]byte, error) {
+	if p.jsonFile == "" {
+		return p.generatePlanJSON()
+	}
+
+	f, err := os.Open(p.jsonFile)
 	if err != nil {
-		return []byte{}, errors.Wrapf(err, "error opening file '%v'", path)
+		return []byte{}, errors.Wrapf(err, "Error reading plan file")
 	}
 	defer f.Close()
 
 	out, err := ioutil.ReadAll(f)
 	if err != nil {
-		return []byte{}, errors.Wrapf(err, "error reading file '%v'", path)
+		return []byte{}, errors.Wrapf(err, "Error reading plan file")
 	}
 
 	return out, nil
 }
 
-func generatePlanJSON(dir string, path string) ([]byte, error) {
+func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 	opts := &CmdOptions{
-		TerraformDir: dir,
+		TerraformDir: p.dir,
 	}
 
-	if path == "" {
+	if p.planFile == "" {
+		spinner := spin.NewSpinner("Running terraform init")
 		_, err := TerraformCmd(opts, "init", "-no-color")
 		if err != nil {
-			return []byte{}, errors.Wrap(err, "error initializing Terraform working directory")
+			spinner.Fail()
+			terraformError(err)
+			return []byte{}, errors.Wrap(err, "Error running terraform init")
 		}
+		spinner.Success()
 
+		spinner = spin.NewSpinner("Running terraform plan")
 		f, err := ioutil.TempFile(os.TempDir(), "tfplan")
 		if err != nil {
-			return []byte{}, errors.Wrap(err, "error creating temporary file 'tfplan'")
+			spinner.Fail()
+			return []byte{}, errors.Wrap(err, "Error creating temporary file 'tfplan'")
 		}
 		defer os.Remove(f.Name())
 
 		_, err = TerraformCmd(opts, "plan", "-input=false", "-lock=false", "-no-color", fmt.Sprintf("-out=%s", f.Name()))
 		if err != nil {
-			return []byte{}, errors.Wrap(err, "error generating Terraform execution plan")
+			spinner.Fail()
+			terraformError(err)
+			return []byte{}, errors.Wrap(err, "Error running terraform plan")
 		}
+		spinner.Success()
 
-		path = f.Name()
+		p.planFile = f.Name()
 	}
 
-	out, err := TerraformCmd(opts, "show", "-no-color", "-json", path)
+	spinner := spin.NewSpinner("Running terraform show")
+	out, err := TerraformCmd(opts, "show", "-no-color", "-json", p.planFile)
 	if err != nil {
-		return []byte{}, errors.Wrap(err, "error inspecting Terraform plan")
+		spinner.Fail()
+		terraformError(err)
+		return []byte{}, errors.Wrap(err, "Error running terraform show")
 	}
+	spinner.Success()
 
 	return out, nil
 }
 
-func CountSkippedResources(resources []*schema.Resource) (map[string]int, int, int) {
-	skippedCount := 0
-	unsupportedCount := 0
-	unsupportedTypeCount := make(map[string]int)
-	for _, r := range resources {
-		if r.IsSkipped {
-			skippedCount++
-			unsupportedCount++
-			if _, ok := unsupportedTypeCount[r.ResourceType]; !ok {
-				unsupportedTypeCount[r.ResourceType] = 0
-			}
-			unsupportedTypeCount[r.ResourceType]++
-		}
-	}
-	return unsupportedTypeCount, skippedCount, unsupportedCount
+func (p *terraformProvider) inTerraformDir() bool {
+	matches, err := filepath.Glob(filepath.Join(p.dir, "*.tf"))
+	return matches != nil && err == nil
 }
 
-func SkippedResourcesMessage(resources []*schema.Resource, showDetails bool) string {
-	unsupportedTypeCount, _, unsupportedCount := CountSkippedResources(resources)
-	if unsupportedCount == 0 {
-		return ""
+func terraformError(err error) {
+	if terr, ok := err.(*TerraformCmdError); ok {
+		fmt.Fprintln(os.Stderr, indent(color.HiRedString("Terraform command failed with:"), "  "))
+		fmt.Fprintln(os.Stderr, indent(color.HiRedString(stripBlankLines(string(terr.Stderr))), "    "))
 	}
-	message := fmt.Sprintf("%d out of %d resources couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)", unsupportedCount, len(resources))
-	if showDetails {
-		message += ".\n"
-	} else {
-		message += ", re-run with --show-skipped to see the list.\n"
+}
+
+func indent(s, indent string) string {
+	result := ""
+	for _, j := range strings.Split(strings.TrimRight(s, "\n"), "\n") {
+		result += indent + j + "\n"
 	}
-	message += "We're continually adding new resources, please create an issue if you'd like us to prioritize your list."
-	if showDetails {
-		for rType, count := range unsupportedTypeCount {
-			message += fmt.Sprintf("\n%d x %s", count, rType)
-		}
-	}
-	return message
+	return result
+}
+
+func stripBlankLines(s string) string {
+	return regexp.MustCompile(`[\t\r\n]+`).ReplaceAllString(strings.TrimSpace(s), "\n")
 }

@@ -5,7 +5,6 @@ import (
 
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/schema"
-	"github.com/pkg/errors"
 
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -20,7 +19,7 @@ func PopulatePrices(resources []*schema.Resource) error {
 			continue
 		}
 		if err := GetPrices(r, q); err != nil {
-			return errors.Wrapf(err, "error retrieving price for resource: '%v'", r.Name)
+			return err
 		}
 	}
 
@@ -30,7 +29,7 @@ func PopulatePrices(resources []*schema.Resource) error {
 func GetPrices(r *schema.Resource, q QueryRunner) error {
 	results, err := q.RunQueries(r)
 	if err != nil {
-		return errors.Wrap(err, "error running a query")
+		return err
 	}
 
 	for _, r := range results {

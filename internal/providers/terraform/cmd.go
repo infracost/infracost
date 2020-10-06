@@ -17,13 +17,27 @@ type CmdOptions struct {
 	TerraformDir string
 }
 
-func TerraformCmd(options *CmdOptions, args ...string) ([]byte, error) {
+type TerraformCmdError struct {
+	err    error
+	Stderr []byte
+}
+
+func (e *TerraformCmdError) Error() string {
+	return e.err.Error()
+}
+
+func terraformBinary() string {
 	terraformBinary := os.Getenv("TERRAFORM_BINARY")
 	if terraformBinary == "" {
 		terraformBinary = "terraform"
 	}
+	return terraformBinary
+}
 
-	cmd := exec.Command(terraformBinary, args...)
+func TerraformCmd(options *CmdOptions, args ...string) ([]byte, error) {
+	os.Setenv("TF_IN_AUTOMATION", "true")
+
+	cmd := exec.Command(terraformBinary(), args...)
 	log.Infof("Running command: %s", cmd.String())
 	cmd.Dir = options.TerraformDir
 
@@ -38,14 +52,24 @@ func TerraformCmd(options *CmdOptions, args ...string) ([]byte, error) {
 	}
 
 	var outbuf bytes.Buffer
-	b := bufio.NewWriter(&outbuf)
-	cmd.Stdout = io.MultiWriter(b, terraformLogWriter)
-	cmd.Stderr = logWriter
+	outw := bufio.NewWriter(&outbuf)
+	var errbuf bytes.Buffer
+	errw := bufio.NewWriter(&errbuf)
+
+	cmd.Stdout = io.MultiWriter(outw, terraformLogWriter)
+	cmd.Stderr = io.MultiWriter(errw, logWriter)
 	err := cmd.Run()
 
-	b.Flush()
+	outw.Flush()
+	errw.Flush()
 	terraformLogWriter.Flush()
-	return outbuf.Bytes(), err
+	logWriter.Flush()
+
+	if err != nil {
+		return outbuf.Bytes(), &TerraformCmdError{err, errbuf.Bytes()}
+	}
+
+	return outbuf.Bytes(), nil
 }
 
 func TerraformVersion() (string, error) {

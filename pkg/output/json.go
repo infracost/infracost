@@ -3,7 +3,6 @@ package output
 import (
 	"encoding/json"
 
-	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/urfave/cli/v2"
 )
@@ -72,9 +71,9 @@ func ToJSON(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 		Resources: &arr,
 	}
 
-	skippedResourcesMessage := terraform.SkippedResourcesMessage(resources, c.Bool("show-skipped"))
-	if skippedResourcesMessage != "" {
-		out.Warnings = append(out.Warnings, skippedResourcesMessage)
+	msg := skippedResourcesMessage(resources, c.Bool("show-skipped"))
+	if msg != "" {
+		out.Warnings = append(out.Warnings, msg)
 	}
 
 	return json.Marshal(out)
