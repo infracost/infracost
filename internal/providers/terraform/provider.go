@@ -13,9 +13,12 @@ import (
 	"github.com/infracost/infracost/internal/spin"
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/pkg/errors"
+	"golang.org/x/mod/semver"
 
 	"github.com/urfave/cli/v2"
 )
+
+var minTerraformVer = "v0.12"
 
 type terraformProvider struct {
 	jsonFile string
@@ -45,11 +48,6 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 }
 
 func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
-	err := p.preChecks()
-	if err != nil {
-		return []*schema.Resource{}, err
-	}
-
 	plan, err := p.loadPlanJSON()
 	if err != nil {
 		return []*schema.Resource{}, err
@@ -61,20 +59,6 @@ func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
 	}
 
 	return resources, nil
-}
-
-func (p *terraformProvider) preChecks() error {
-	if p.jsonFile == "" {
-		_, err := exec.LookPath(terraformBinary())
-		if err != nil {
-			return errors.Errorf("Could not find terraform binary \"%s\" in path.\nYou can set a custom terraform binary using the environment variable TERRAFORM_BINARY.", terraformBinary())
-		}
-
-		if !p.inTerraformDir() {
-			return errors.Errorf("Directory \"%s\" does not have any .tf files.\nYou can pass a path to a Terraform directory using the --tfdir option.", p.dir)
-		}
-	}
-	return nil
 }
 
 func (p *terraformProvider) loadPlanJSON() ([]byte, error) {
@@ -97,6 +81,11 @@ func (p *terraformProvider) loadPlanJSON() ([]byte, error) {
 }
 
 func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
+	err := p.terraformPreChecks()
+	if err != nil {
+		return []byte{}, err
+	}
+
 	opts := &CmdOptions{
 		TerraformDir: p.dir,
 	}
@@ -140,6 +129,42 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 	spinner.Success()
 
 	return out, nil
+}
+
+func (p *terraformProvider) terraformPreChecks() error {
+	if p.jsonFile == "" {
+		_, err := exec.LookPath(terraformBinary())
+		if err != nil {
+			return errors.Errorf("Could not find Terraform binary \"%s\" in path.\nYou can set a custom Terraform binary using the environment variable TERRAFORM_BINARY.", terraformBinary())
+		}
+
+		if v, ok := checkTerraformVersion(); !ok {
+			return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
+		}
+
+		if !p.inTerraformDir() {
+			return errors.Errorf("Directory \"%s\" does not have any .tf files.\nYou can pass a path to a Terraform directory using the --tfdir option.", p.dir)
+		}
+	}
+	return nil
+}
+
+func checkTerraformVersion() (string, bool) {
+	out, err := TerraformVersion()
+	if err != nil {
+		// If we encounter any errors here we just return true
+		// since it might be caused by a custom Terraform binary
+		return "", true
+	}
+	p := strings.Split(out, " ")
+	v := p[len(p)-1]
+
+	// Allow any non-terraform binaries, e.g. terragrunt
+	if !strings.HasPrefix(out, "Terraform ") {
+		return v, true
+	}
+
+	return v, semver.Compare(v, minTerraformVer) >= 0
 }
 
 func (p *terraformProvider) inTerraformDir() bool {

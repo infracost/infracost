@@ -15,4 +15,5 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/tidwall/gjson v1.6.1
 	github.com/urfave/cli/v2 v2.2.0
+	golang.org/x/mod v0.3.0
 )
