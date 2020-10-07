@@ -37,6 +37,10 @@ func defaultCmd() *cli.Command {
 				DefaultText: "current working directory",
 			},
 			&cli.StringFlag{
+				Name:  "tfflags",
+				Usage: "Arguments to pass to the 'terraform plan' command",
+			},
+			&cli.StringFlag{
 				Name:    "output",
 				Aliases: []string{"o"},
 				Usage:   "Output format (json, table)",
