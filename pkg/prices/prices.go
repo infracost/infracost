@@ -1,9 +1,6 @@
 package prices
 
 import (
-	"fmt"
-
-	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/schema"
 
 	"github.com/shopspring/decimal"
@@ -12,15 +9,20 @@ import (
 )
 
 func PopulatePrices(resources []*schema.Resource) error {
-	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", config.Config.PricingAPIEndpoint))
+	q := NewGraphQLQueryRunner()
 
+	hasSkipped := false
 	for _, r := range resources {
 		if r.IsSkipped {
-			continue
+			hasSkipped = true
 		}
 		if err := GetPrices(r, q); err != nil {
 			return err
 		}
+	}
+
+	if hasSkipped {
+		q.ReportMissingPrices(resources)
 	}
 
 	return nil

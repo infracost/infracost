@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/pkg/errors"
@@ -40,6 +41,12 @@ type queryResult struct {
 	Result gjson.Result
 }
 
+type skippedResourcesJSON struct {
+	SkippedTypeCounts map[string]int `json:"skippedTypeCounts"`
+	SkippedTotal      int            `json:"skippedTotal"`
+	Total             int            `json:"total"`
+}
+
 type GraphQLQuery struct {
 	Query     string                 `json:"query"`
 	Variables map[string]interface{} `json:"variables"`
@@ -50,16 +57,22 @@ type QueryRunner interface {
 }
 
 type GraphQLQueryRunner struct {
-	endpoint string
+	baseURL         string
+	graphQLEndpoint string
+	traceId         string
 }
 
-func NewGraphQLQueryRunner(endpoint string) *GraphQLQueryRunner {
+func NewGraphQLQueryRunner() *GraphQLQueryRunner {
+	baseURL := config.Config.PricingAPIEndpoint
 	return &GraphQLQueryRunner{
-		endpoint: endpoint,
+		baseURL:         baseURL,
+		graphQLEndpoint: fmt.Sprintf("%s/graphql", baseURL),
 	}
 }
 
 func (q *GraphQLQueryRunner) RunQueries(r *schema.Resource) ([]queryResult, error) {
+	q.traceId = uuid.New().String()
+
 	keys, queries := q.batchQueries(r)
 
 	if len(queries) == 0 {
@@ -109,14 +122,12 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 		return results, errors.Wrap(err, "Error generating request for pricing API")
 	}
 
-	req, err := http.NewRequest("POST", q.endpoint, bytes.NewBuffer([]byte(queriesBody)))
+	req, err := http.NewRequest("POST", q.graphQLEndpoint, bytes.NewBuffer([]byte(queriesBody)))
 	if err != nil {
 		return results, errors.Wrap(err, "Error generating request for pricing API")
 	}
 
-	req.Header.Set("content-type", "application/json")
-	req.Header.Set("User-Agent", config.GetUserAgent())
-	req.Header.Set("X-Api-Key", config.Config.ApiKey)
+	q.addHeaders(req)
 
 	client := http.Client{}
 	resp, err := client.Do(req)
@@ -138,12 +149,56 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 		if r.Error == "Invalid API key" {
 			return results, InvalidAPIKeyError
 		}
-		return results, &PricingAPIError{err, "Received error from pricing API"}
+		return results, &PricingAPIError{errors.New(r.Error), "Received error from pricing API"}
 	}
 
 	results = append(results, gjson.ParseBytes(body).Array()...)
 
 	return results, nil
+}
+
+func (q *GraphQLQueryRunner) ReportMissingPrices(resources []*schema.Resource) {
+	if q.baseURL != config.Config.DefaultPricingAPIEndpoint {
+		// skip for non-default pricing API endpoints
+		return
+	}
+
+	url := fmt.Sprintf("%s/report", q.baseURL)
+
+	skippedTypeCounts, skippedTotal := schema.CountSkippedResources(resources)
+	j := skippedResourcesJSON{skippedTypeCounts, skippedTotal, len(resources)}
+	body, err := json.Marshal(j)
+	if err != nil {
+		log.Debugf("Unable to generate missing prices request: %v", err)
+		return
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(body)))
+	if err != nil {
+		log.Debugf("Unable to generate missing prices request: %v", err)
+		return
+	}
+
+	q.addHeaders(req)
+
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Debugf("Unable to send missing prices request: %v", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		log.Debugf("Unexpected response sending missing prices request: %d", resp.StatusCode)
+	}
+}
+
+func (q *GraphQLQueryRunner) addHeaders(req *http.Request) {
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("User-Agent", config.GetUserAgent())
+	req.Header.Set("X-Api-Key", config.Config.ApiKey)
+	req.Header.Set("X-Trace-Id", q.traceId)
 }
 
 // Batch all the queries for this resource so we can use one GraphQL call
