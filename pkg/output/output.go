@@ -17,7 +17,7 @@ func skippedResourcesMessage(resources []*schema.Resource, showDetails bool) str
 	} else {
 		message += ", re-run with --show-skipped to see the list.\n"
 	}
-	message += "We're continually adding new resources, please create an issue if you'd like us to prioritize your list."
+	message += "We're continually adding new resources, please email hello@infracost.io if you'd like us to prioritize your list."
 	if showDetails {
 		for rType, count := range unsupportedTypeCount {
 			message += fmt.Sprintf("\n%d x %s", count, rType)

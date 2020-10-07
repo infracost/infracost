@@ -21,17 +21,17 @@ func defaultCmd() *cli.Command {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:      "tfjson",
-				Usage:     "Path to Terraform Plan JSON file",
+				Usage:     "Path to Terraform plan JSON file",
 				TakesFile: true,
 			},
 			&cli.StringFlag{
 				Name:      "tfplan",
-				Usage:     "Path to Terraform Plan file. Requires 'tfdir' to be set",
+				Usage:     "Path to Terraform plan file relative to 'tfdir'. Requires 'tfdir' to be set",
 				TakesFile: true,
 			},
 			&cli.StringFlag{
 				Name:        "tfdir",
-				Usage:       "Path to the Terraform project directory",
+				Usage:       "Path to the Terraform code directory",
 				TakesFile:   true,
 				Value:       getcwd(),
 				DefaultText: "current working directory",
@@ -71,11 +71,16 @@ func defaultCmd() *cli.Command {
 
 			if err := prices.PopulatePrices(resources); err != nil {
 				spinner.Fail()
+				red := color.New(color.FgHiRed)
+				bold := color.New(color.Bold, color.FgHiWhite)
 				if e := unwrapped(err); errors.Is(e, prices.InvalidAPIKeyError) {
-					red := color.New(color.FgHiRed)
-					bold := color.New(color.Bold, color.FgHiWhite)
 					fmt.Fprintln(os.Stderr, red.Sprint(e.Error()))
 					fmt.Fprintln(os.Stderr, red.Sprint("Please check your"), bold.Sprint("INFRACOST_API_KEY"), red.Sprint("environment variable. If you continue having issues please email hello@infracost.io"))
+					os.Exit(1)
+				}
+				if e, ok := err.(*prices.PricingAPIError); ok {
+					fmt.Fprintln(os.Stderr, red.Sprint(e.Error()))
+					fmt.Fprintln(os.Stderr, red.Sprint("We have been notified of this issue."))
 					os.Exit(1)
 				}
 				return err
