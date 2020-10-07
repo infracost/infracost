@@ -50,7 +50,9 @@ jobs:
         INFRACOST_LOG_LEVEL: info
 
     - name: Test example works ok
-      run: "make run --silent ARGS='--tfdir examples/terraform --output json' | jq"
+      run: |
+        make run --silent ARGS="--tfdir examples/terraform --output json" > out.json
+        jq '' out.json
       env:
         INFRACOST_API_KEY: "00000000000000000000000000000000"
         INFRACOST_LOG_LEVEL: info
