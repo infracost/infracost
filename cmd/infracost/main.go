@@ -82,14 +82,14 @@ func main() {
 		UsageText: `infracost [global options] command [command options] [arguments...]
 
 Example:
-	# Run infracost with a terraform directory
-	infracost --tfdir /path/to/code
+	# Run infracost with a Terraform directory and var file
+	infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tf"
 
-	# Run infracost with a JSON terraform plan file
-	infracost --tfjson /path/to/plan/file
+	# Run infracost with a JSON Terraform plan file
+	infracost --tfjson /path/to/plan.json
 
-	# Run infracost with a terraform directory and a plan file in it
-	infracost --tfdir /path/to/code --tfplan plan_file`,
+	# Run infracost with a Terraform directory and a plan file in it
+	infracost --tfdir /path/to/code --tfplan plan.save`,
 		EnableBashCompletion: true,
 		Version:              version.Version,
 		Flags: append([]cli.Flag{
@@ -120,6 +120,9 @@ Example:
 
 	defer func() {
 		if err := recover(); err != nil {
+			if spinner != nil {
+				spinner.Fail()
+			}
 			red := color.New(color.FgHiRed)
 			bold := color.New(color.Bold, color.FgHiWhite)
 			fmt.Fprintln(os.Stderr, red.Sprint("An unexpected error occurred\n"))

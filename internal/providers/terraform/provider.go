@@ -59,7 +59,7 @@ func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
 
 	resources, err := parsePlanJSON(plan)
 	if err != nil {
-		return resources, errors.Wrap(err, "Error parsing plan JSON")
+		return resources, errors.Wrap(err, "Error parsing Terraform plan JSON")
 	}
 
 	return resources, nil
@@ -72,13 +72,13 @@ func (p *terraformProvider) loadPlanJSON() ([]byte, error) {
 
 	f, err := os.Open(p.jsonFile)
 	if err != nil {
-		return []byte{}, errors.Wrapf(err, "Error reading plan file")
+		return []byte{}, errors.Wrapf(err, "Error reading Terraform plan file")
 	}
 	defer f.Close()
 
 	out, err := ioutil.ReadAll(f)
 	if err != nil {
-		return []byte{}, errors.Wrapf(err, "Error reading plan file")
+		return []byte{}, errors.Wrapf(err, "Error reading Terraform plan file")
 	}
 
 	return out, nil
@@ -150,7 +150,7 @@ func (p *terraformProvider) terraformPreChecks() error {
 	if p.jsonFile == "" {
 		_, err := exec.LookPath(terraformBinary())
 		if err != nil {
-			return errors.Errorf("Could not find Terraform binary \"%s\" in path.\nYou can set a custom Terraform binary using the environment variable TERRAFORM_BINARY.", terraformBinary())
+			return errors.Errorf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary using the environment variable TERRAFORM_BINARY.", terraformBinary())
 		}
 
 		if v, ok := checkTerraformVersion(); !ok {
@@ -158,7 +158,7 @@ func (p *terraformProvider) terraformPreChecks() error {
 		}
 
 		if !p.inTerraformDir() {
-			return errors.Errorf("Directory \"%s\" does not have any .tf files.\nYou can pass a path to a Terraform directory using the --tfdir option.", p.dir)
+			return errors.Errorf("Directory \"%s\" does not have any .tf files.\nSet the Terraform directory path using the --tfdir option.", p.dir)
 		}
 	}
 	return nil
@@ -204,12 +204,16 @@ func terraformError(err error) {
 		stderr := stripBlankLines(string(e.Stderr))
 		fmt.Fprintln(os.Stderr, indent(color.HiRedString(stderr), "    "))
 		if strings.HasPrefix(stderr, "Error: No value for required variable") {
-			fmt.Fprintln(os.Stderr, color.HiRedString("You can pass any Terraform args using the --tfflags option."))
+			fmt.Fprintln(os.Stderr, color.HiRedString("Pass Terraform flags using the --tfflags option."))
 			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tf\"\n"))
 		}
 		if strings.HasPrefix(stderr, "Error: Failed to read variables file") {
-			fmt.Fprintln(os.Stderr, color.HiRedString("You should specify the -var-file flag as a path relative to your Terraform directory."))
+			fmt.Fprintln(os.Stderr, color.HiRedString("Specify the -var-file flag as a path relative to your Terraform directory."))
 			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tf\"\n"))
+		}
+		if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a state or plan file.") {
+			fmt.Fprintln(os.Stderr, color.HiRedString("Specify the --tfplan flag as a path relative to your Terraform directory."))
+			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfplan=plan.save\n"))
 		}
 	}
 }

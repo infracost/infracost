@@ -3,6 +3,7 @@ package prices
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -15,6 +16,15 @@ import (
 )
 
 var InvalidAPIKeyError = errors.New("Invalid API key")
+
+type PricingAPIError struct {
+	err error
+	msg string
+}
+
+func (e *PricingAPIError) Error() string {
+	return fmt.Sprintf("%s: %v", e.msg, e.err.Error())
+}
 
 type pricingAPIErrorResponse struct {
 	Error string `json:"error"`
@@ -117,18 +127,18 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return results, errors.Wrap(err, "Invalid response from pricing API")
+		return results, &PricingAPIError{err, "Invalid response from pricing API"}
 	}
 	if resp.StatusCode != 200 {
 		var r pricingAPIErrorResponse
 		err = json.Unmarshal(body, &r)
 		if err != nil {
-			return results, errors.Wrap(err, "Invalid response from pricing API")
+			return results, &PricingAPIError{err, "Invalid response from pricing API"}
 		}
 		if r.Error == "Invalid API key" {
 			return results, InvalidAPIKeyError
 		}
-		return results, errors.Wrap(err, "Received error from pricing API")
+		return results, &PricingAPIError{err, "Received error from pricing API"}
 	}
 
 	results = append(results, gjson.ParseBytes(body).Array()...)
