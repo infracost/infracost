@@ -78,8 +78,8 @@ func storageCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("General Purpose Storage (SSD - %s family)", instanceFamily),
-		Unit:            "hours",
+		Name:            "General purpose storage (gp2)",
+		Unit:            "GB-months",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(storageSize)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
