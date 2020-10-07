@@ -51,7 +51,7 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
 Generate a cost breakdown from a Terraform directory:
 ```sh
-infracost --tfdir examples/terraform
+infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tf"
 ```
 
 Check the [docs site](https://www.infracost.io/docs/) for more details.
@@ -87,7 +87,7 @@ EOF
 
 Run the code:
 ```sh
-make run ARGS="--tfdir <Terraform Dir>"
+make run ARGS="--tfdir examples/terraform"
 ```
 
 Run all tests:
