@@ -14,6 +14,7 @@ import (
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/kballard/go-shellquote"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/mod/semver"
 
 	"github.com/urfave/cli/v2"
@@ -93,15 +94,19 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 		TerraformDir: p.dir,
 	}
 
+	var spinner *spin.Spinner
+
 	if p.planFile == "" {
-		spinner := spin.NewSpinner("Running terraform init")
-		_, err := TerraformCmd(opts, "init", "-no-color")
-		if err != nil {
-			spinner.Fail()
-			terraformError(err)
-			return []byte{}, errors.Wrap(err, "Error running terraform init")
+		if !p.isTerraformInitRun() {
+			spinner = spin.NewSpinner("Running terraform init")
+			_, err := TerraformCmd(opts, "init", "-no-color")
+			if err != nil {
+				spinner.Fail()
+				terraformError(err)
+				return []byte{}, errors.Wrap(err, "Error running terraform init")
+			}
+			spinner.Success()
 		}
-		spinner.Success()
 
 		spinner = spin.NewSpinner("Running terraform plan")
 		f, err := ioutil.TempFile(os.TempDir(), "tfplan")
@@ -129,7 +134,7 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 		p.planFile = f.Name()
 	}
 
-	spinner := spin.NewSpinner("Running terraform show")
+	spinner = spin.NewSpinner("Running terraform show")
 	out, err := TerraformCmd(opts, "show", "-no-color", "-json", p.planFile)
 	if err != nil {
 		spinner.Fail()
@@ -180,6 +185,17 @@ func checkTerraformVersion() (string, bool) {
 func (p *terraformProvider) inTerraformDir() bool {
 	matches, err := filepath.Glob(filepath.Join(p.dir, "*.tf"))
 	return matches != nil && err == nil
+}
+
+func (p *terraformProvider) isTerraformInitRun() bool {
+	_, err := os.Stat(filepath.Join(p.dir, ".terraform"))
+	if err != nil {
+		if !os.IsNotExist(err) {
+			log.Errorf("error checking if .terraform directory exists: %v", err)
+		}
+		return false
+	}
+	return true
 }
 
 func terraformError(err error) {
