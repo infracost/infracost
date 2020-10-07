@@ -12,6 +12,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/infracost/infracost/internal/spin"
 	"github.com/infracost/infracost/pkg/schema"
+	"github.com/kballard/go-shellquote"
 	"github.com/pkg/errors"
 	"golang.org/x/mod/semver"
 
@@ -21,9 +22,10 @@ import (
 var minTerraformVer = "v0.12"
 
 type terraformProvider struct {
-	jsonFile string
-	planFile string
-	dir      string
+	jsonFile  string
+	planFile  string
+	dir       string
+	planFlags string
 }
 
 // New returns new Terraform Provider
@@ -35,6 +37,7 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 	p.jsonFile = c.String("tfjson")
 	p.planFile = c.String("tfplan")
 	p.dir = c.String("tfdir")
+	p.planFlags = c.String("tfflags")
 
 	if p.jsonFile != "" && p.planFile != "" {
 		return errors.New("Please provide either a Terraform Plan JSON file (tfjson) or a Terraform Plan file (tfplan)")
@@ -108,7 +111,14 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 		}
 		defer os.Remove(f.Name())
 
-		_, err = TerraformCmd(opts, "plan", "-input=false", "-lock=false", "-no-color", fmt.Sprintf("-out=%s", f.Name()))
+		flags, err := shellquote.Split(p.planFlags)
+		if err != nil {
+			return []byte{}, errors.Wrap(err, "Error parsing terraform plan flags")
+		}
+		args := []string{"plan", "-input=false", "-lock=false", "-no-color"}
+		args = append(args, flags...)
+		args = append(args, fmt.Sprintf("-out=%s", f.Name()))
+		_, err = TerraformCmd(opts, args...)
 		if err != nil {
 			spinner.Fail()
 			terraformError(err)
@@ -173,9 +183,18 @@ func (p *terraformProvider) inTerraformDir() bool {
 }
 
 func terraformError(err error) {
-	if terr, ok := err.(*TerraformCmdError); ok {
+	if e, ok := err.(*TerraformCmdError); ok {
 		fmt.Fprintln(os.Stderr, indent(color.HiRedString("Terraform command failed with:"), "  "))
-		fmt.Fprintln(os.Stderr, indent(color.HiRedString(stripBlankLines(string(terr.Stderr))), "    "))
+		stderr := stripBlankLines(string(e.Stderr))
+		fmt.Fprintln(os.Stderr, indent(color.HiRedString(stderr), "    "))
+		if strings.HasPrefix(stderr, "Error: No value for required variable") {
+			fmt.Fprintln(os.Stderr, color.HiRedString("You can pass any Terraform args using the --tfflags option."))
+			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tf\"\n"))
+		}
+		if strings.HasPrefix(stderr, "Error: Failed to read variables file") {
+			fmt.Fprintln(os.Stderr, color.HiRedString("You should specify the -var-file flag as a path relative to your Terraform directory."))
+			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tf\"\n"))
+		}
 	}
 }
 

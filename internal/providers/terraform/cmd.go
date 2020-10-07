@@ -34,12 +34,12 @@ func terraformBinary() string {
 	return terraformBinary
 }
 
-func TerraformCmd(options *CmdOptions, args ...string) ([]byte, error) {
+func TerraformCmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	os.Setenv("TF_IN_AUTOMATION", "true")
 
 	cmd := exec.Command(terraformBinary(), args...)
 	log.Infof("Running command: %s", cmd.String())
-	cmd.Dir = options.TerraformDir
+	cmd.Dir = opts.TerraformDir
 
 	logWriter := &cmdLogWriter{
 		logger: log.StandardLogger(),
