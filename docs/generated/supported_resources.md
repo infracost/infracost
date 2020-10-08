@@ -14,6 +14,7 @@ Support for the following is not currently included:
 | `aws_alb` |  |
 | `aws_autoscaling_group` |  See aws_instance<br />  |
 | `aws_db_instance` |  |
+| `aws_dms_replication_instance` |  |
 | `aws_docdb_cluster_instance` |  |
 | `aws_dynamodb_table` |  DAX is not yet supported.<br />  |
 | `aws_ebs_snapshot` |  |
