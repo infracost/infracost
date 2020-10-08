@@ -46,6 +46,14 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
     export INFRACOST_API_KEY=XXXXX
     ```
     Or persist it in your .zshrc or .bashrc file.
+    
+### Docker
+
+A docker image is available:
+
+```
+docker pull infracost/infracost
+```
 
 ## Basic usage
 
