@@ -43,7 +43,7 @@ func TestECSService(t *testing.T) {
 			]
 			TASK_DEFINITION
 		}
-	
+
 		resource "aws_ecs_service" "ecs_fargate1" {
 			name            = "ecs_fargate1"
 			launch_type     = "FARGATE"
@@ -71,6 +71,49 @@ func TestECSService(t *testing.T) {
 					Name:            "Inference accelerator (eia2.medium)",
 					PriceHash:       "498a3aadc034dfaf873005fdd3f56bbf-1fb365d8a0bc1f462690ec9d444f380c",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, resourceChecks)
+}
+
+func TestECSService_externalDeployment(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_ecs_cluster" "ecs1" {
+			name               = "ecs1"
+			capacity_providers = ["FARGATE"]
+		}
+
+		resource "aws_ecs_service" "ecs_fargate1" {
+			name        = "ecs_fargate1"
+			launch_type = "FARGATE"
+			cluster     = aws_ecs_cluster.ecs1.id
+
+			deployment_controller {
+				type = "EXTERNAL"
+			}
+		}
+	`
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_ecs_service.ecs_fargate1",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Per GB per hour",
+					PriceHash:       "8b1ff12686a4c3b2a332da524a724590-1fb365d8a0bc1f462690ec9d444f380c",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.Zero),
+				},
+				{
+					Name:            "Per vCPU per hour",
+					PriceHash:       "0c294936ec8abdbfcbb4dfe26cf52afd-1fb365d8a0bc1f462690ec9d444f380c",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.Zero),
 				},
 			},
 		},
