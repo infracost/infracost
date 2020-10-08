@@ -1,7 +1,7 @@
 FROM golang:1.15 as builder
 
 ARG ARCH=linux
-ARG TERRAFORM_VERSION=0.12.25
+ARG TERRAFORM_VERSION=0.13.4
 ARG TERRAFORM_PROVIDER_INFRACOST_VERSION=latest
 
 # Set Environment Variables
@@ -27,9 +27,10 @@ RUN make build
 
 # Application
 FROM alpine:3.12 as app
-ARG TERRAFORM_VERSION=0.12.25
-RUN apk --no-cache add ca-certificates terraform=${TERRAFORM_VERSION}-r0
+ARG TERRAFORM_VERSION=0.13.4
+RUN apk --no-cache add ca-certificates
 WORKDIR /root/
+COPY --from=builder /usr/local/bin/terraform* /usr/bin/
 COPY --from=builder /usr/local/bin/terraform-provider-infracost* /usr/bin/
 COPY --from=builder /app/build/infracost /usr/local/bin/infracost
 RUN chmod +x /usr/local/bin/infracost
