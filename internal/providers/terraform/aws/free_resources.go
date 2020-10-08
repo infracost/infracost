@@ -4,6 +4,8 @@ import "github.com/infracost/infracost/pkg/schema"
 
 var (
 	freeResourcesList []string = []string{
+		"null_resource",
+
 		// IAM aws_iam_* resources
 		"aws_iam_access_key",
 		"aws_iam_account_alias",
@@ -38,6 +40,10 @@ var (
 		"aws_iam_role",
 		"aws_iam_server_certificate",
 		"aws_iam_user",
+
+		// VPS aws_security_group_* resources
+		"aws_security_group",
+		"aws_security_group_rule",
 	}
 )
 
@@ -47,6 +53,7 @@ func GetFreeResources() []*schema.RegistryItem {
 		freeResources = append(freeResources, &schema.RegistryItem{
 			Name:   resourceName,
 			NoCost: true,
+			Notes:  []string{"Free resource."},
 		})
 	}
 	return freeResources
