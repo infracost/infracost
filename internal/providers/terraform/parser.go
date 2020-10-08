@@ -21,7 +21,13 @@ func createResource(r *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 
 	if registryItem, ok := (*registryMap)[r.Type]; ok {
 		if registryItem.NoCost {
-			return nil
+			return &schema.Resource{
+				Name:         r.Address,
+				ResourceType: r.Type,
+				IsSkipped:    true,
+				NoCost:       true,
+				SkipMessage:  "This resource is free",
+			}
 		}
 
 		res := registryItem.RFunc(r, u)

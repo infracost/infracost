@@ -17,6 +17,7 @@ type Resource struct {
 	hourlyCost     decimal.Decimal
 	monthlyCost    decimal.Decimal
 	IsSkipped      bool
+	NoCost         bool
 	SkipMessage    string
 	ResourceType   string
 }
@@ -94,7 +95,7 @@ func CountSkippedResources(resources []*Resource) (map[string]int, int) {
 	total := 0
 	typeCounts := make(map[string]int)
 	for _, r := range resources {
-		if r.IsSkipped {
+		if r.IsSkipped && !r.NoCost {
 			total++
 			if _, ok := typeCounts[r.ResourceType]; !ok {
 				typeCounts[r.ResourceType] = 0
