@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/infracost/infracost/pkg/config"
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"

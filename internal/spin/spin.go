@@ -7,7 +7,7 @@ import (
 
 	spinnerpkg "github.com/briandowns/spinner"
 	"github.com/fatih/color"
-	"github.com/infracost/infracost/pkg/config"
+	"github.com/infracost/infracost/internal/config"
 	log "github.com/sirupsen/logrus"
 )
 

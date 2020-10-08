@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/infracost/infracost/pkg/testutil"
+	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 

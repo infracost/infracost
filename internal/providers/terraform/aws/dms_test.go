@@ -3,7 +3,7 @@ package aws_test
 import (
 	"testing"
 
-	"github.com/infracost/infracost/pkg/testutil"
+	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 
@@ -28,11 +28,11 @@ func TestNewNewDMSReplicationInstanceSingleLowStorage(t *testing.T) {
 		publicly_accessible          = true
 		replication_instance_class   = "dms.t2.micro"
 		replication_instance_id      = "test-dms-replication-instance-tf"
-	  
+
 		tags = {
 		  Name = "test"
 		}
-	  
+
 		vpc_security_group_ids = [
 		  "sg-12345678",
 		]
@@ -79,11 +79,11 @@ func TestNewNewDMSReplicationInstanceMultiHighStorage(t *testing.T) {
 		publicly_accessible          = true
 		replication_instance_class   = "dms.t2.micro"
 		replication_instance_id      = "test-dms-replication-instance-tf"
-	  
+
 		tags = {
 		  Name = "test"
 		}
-	  
+
 		vpc_security_group_ids = [
 		  "sg-12345678",
 		]

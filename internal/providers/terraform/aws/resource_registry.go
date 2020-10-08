@@ -1,6 +1,6 @@
 package aws
 
-import "github.com/infracost/infracost/pkg/schema"
+import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAutoscalingGroupRegistryItem(),

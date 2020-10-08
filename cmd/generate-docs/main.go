@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/docs"
-	"github.com/infracost/infracost/pkg/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )

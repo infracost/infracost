@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"

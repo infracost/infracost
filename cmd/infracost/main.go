@@ -5,10 +5,10 @@ import (
 	"os"
 	"runtime/debug"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/spin"
-	"github.com/infracost/infracost/pkg/config"
-	"github.com/infracost/infracost/pkg/version"
+	"github.com/infracost/infracost/internal/version"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/fatih/color"

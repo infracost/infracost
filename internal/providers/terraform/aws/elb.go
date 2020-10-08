@@ -1,6 +1,6 @@
 package aws
 
-import "github.com/infracost/infracost/pkg/schema"
+import "github.com/infracost/infracost/internal/schema"
 
 func GetELBRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{

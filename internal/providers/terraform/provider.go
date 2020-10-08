@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/spin"
-	"github.com/infracost/infracost/pkg/schema"
 	"github.com/kballard/go-shellquote"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/infracost/infracost/pkg/config"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
