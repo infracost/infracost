@@ -89,3 +89,18 @@ func SortResources(resources []*Resource) {
 		})
 	}
 }
+
+func CountSkippedResources(resources []*Resource) (map[string]int, int) {
+	total := 0
+	typeCounts := make(map[string]int)
+	for _, r := range resources {
+		if r.IsSkipped {
+			total++
+			if _, ok := typeCounts[r.ResourceType]; !ok {
+				typeCounts[r.ResourceType] = 0
+			}
+			typeCounts[r.ResourceType]++
+		}
+	}
+	return typeCounts, total
+}

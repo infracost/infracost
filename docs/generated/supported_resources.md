@@ -12,8 +12,9 @@ Support for the following is not currently included:
 | Terraform resource           | Notes |
 | ---                          | ---   |
 | `aws_alb` |  |
-| `aws_autoscaling_group` |  |
+| `aws_autoscaling_group` |  See aws_instance<br />  |
 | `aws_db_instance` |  |
+| `aws_dms_replication_instance` |  |
 | `aws_docdb_cluster_instance` |  |
 | `aws_dynamodb_table` |  DAX is not yet supported.<br />  |
 | `aws_ebs_snapshot` |  |
@@ -24,7 +25,7 @@ Support for the following is not currently included:
 | `aws_ecs_task_definition` |  |
 | `aws_elasticsearch_domain` |  |
 | `aws_elb` |  |
-| `aws_instance` |  Costs associated with non-standard Linux AMIs, such as Windows and RHEL are not supported.<br />  EC2 Detailed Monitoring is not supported.<br />  If a root volume is not specified then an 8Gi gp2 volume is assumed.<br />  |
+| `aws_instance` |  Costs associated with non-standard Linux AMIs, such as Windows and RHEL are not supported.<br />  EC2 detailed monitoring assumes the standard 7 metrics and the lowest tier of prices for CloudWatch.<br />  If a root volume is not specified then an 8Gi gp2 volume is assumed.<br />  |
 | `aws_lambda_function` |  Provisioned concurrency is not yet supported.<br />  |
 | `aws_launch_configuration` |  |
 | `aws_launch_template` |  |

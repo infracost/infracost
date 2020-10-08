@@ -64,7 +64,7 @@ func TestInstance(t *testing.T) {
 					Name: "root_block_device",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Storage",
+							Name:            "General Purpose SSD storage (gp2)",
 							PriceHash:       "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
 						},
@@ -74,7 +74,7 @@ func TestInstance(t *testing.T) {
 					Name: "ebs_block_device[0]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Storage",
+							Name:            "General Purpose SSD storage (gp2)",
 							PriceHash:       "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
 						},
@@ -84,9 +84,14 @@ func TestInstance(t *testing.T) {
 					Name: "ebs_block_device[1]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Storage",
+							Name:            "Magnetic storage",
 							PriceHash:       "0ed17ed1777b7be91f5b5ce79916d8d8-ee3dd7e4624338037ca6fea0933a662f",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
+						},
+						{
+							Name:             "I/O requests",
+							PriceHash:        "3085cb7cbdb1e1f570812e7400f8dbc6-5be345988e7c9a0759c5cf8365868ee4",
+							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 						},
 					},
 				},
@@ -94,7 +99,7 @@ func TestInstance(t *testing.T) {
 					Name: "ebs_block_device[2]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Storage",
+							Name:            "Cold HDD storage (sc1)",
 							PriceHash:       "3122df29367c2460c76537cccf0eadb5-ee3dd7e4624338037ca6fea0933a662f",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(30)),
 						},
@@ -104,12 +109,12 @@ func TestInstance(t *testing.T) {
 					Name: "ebs_block_device[3]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Storage",
+							Name:            "Provisioned IOPS SSD storage (io1)",
 							PriceHash:       "99450513de8c131ee2151e1b319d8143-ee3dd7e4624338037ca6fea0933a662f",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40)),
 						},
 						{
-							Name:            "Storage IOPS",
+							Name:            "Provisioned IOPS",
 							PriceHash:       "d5c5e1fb9b8ded55c336f6ae87aa2c3b-9c483347596633f8cf3ab7fdd5502b78",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1000)),
 						},
@@ -166,7 +171,7 @@ func TestInstance_ebsOptimized(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "EBS-Optimized usage",
+					Name:            "EBS-optimized usage",
 					PriceHash:       "7f4fb9da921a628aedfbe150d930e255-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -261,8 +266,9 @@ func TestInstance_cpuCredits(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:      "CPU credits",
-					PriceHash: "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
+					Name:             "CPU credits",
+					PriceHash:        "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
@@ -280,9 +286,9 @@ func TestInstance_cpuCredits(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:            "CPU credits",
-					PriceHash:       "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "CPU credits",
+					PriceHash:        "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
@@ -330,9 +336,9 @@ func TestInstance_cpuCredits(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:            "CPU credits",
-					PriceHash:       "4aaa3d22a88b57f7997e91888f867be9-e8e892be2fbd1c8f42fd6761ad8977d8",
-					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "CPU credits",
+					PriceHash:        "4aaa3d22a88b57f7997e91888f867be9-e8e892be2fbd1c8f42fd6761ad8977d8",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
@@ -348,6 +354,45 @@ func TestInstance_cpuCredits(t *testing.T) {
 				{
 					Name:      "Linux/UNIX usage (on-demand, t2.medium)",
 					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, resourceChecks)
+}
+
+func TestInstance_ec2DetailedMonitoring(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_instance" "instance1" {
+			ami           = "fake_ami"
+			instance_type = "m3.large"
+			ebs_optimized = true
+			monitoring    = true
+		}`
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_instance.instance1",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:      "Linux/UNIX usage (on-demand, m3.large)",
+					SkipCheck: true,
+				},
+				{
+					Name:            "EC2 detailed monitoring",
+					PriceHash:       "df2e2141bd6d5e2b758fa0617157ff46-fd21869c4f4d79599eea951b2b7353e6",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(7)),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{

@@ -7,16 +7,13 @@ import (
 	"github.com/fatih/color"
 	"github.com/infracost/infracost/internal/docs"
 	"github.com/infracost/infracost/pkg/config"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
-func customError(c *cli.Context, msg string) error {
+func usageError(c *cli.Context, msg string) {
 	color.HiRed(fmt.Sprintf("%v\n", msg))
-	_ = cli.ShowAppHelp(c)
-
-	return fmt.Errorf("")
+	cli.ShowAppHelpAndExit(c, 1)
 }
 
 func getcwd() string {
@@ -46,19 +43,15 @@ func main() {
 				Usage:     "Path to output of docs",
 				TakesFile: true,
 			},
-			&cli.StringFlag{
-				Name:  "log-level",
-				Usage: "Log level (trace, debug, info, warn, error, fatal)",
-				Value: "info",
-			},
 		},
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
-			return customError(c, err.Error())
+			usageError(c, err.Error())
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			err := config.Config.SetLogLevel(c.String("log-level"))
 			if err != nil {
-				return customError(c, err.Error())
+				usageError(c, err.Error())
 			}
 
 			templatesPath := c.String("input")
@@ -71,12 +64,7 @@ func main() {
 				outputPath = getcwd() + "/docs/generated"
 			}
 
-			err = docs.GenerateDocs(templatesPath, outputPath)
-			if err != nil {
-				return errors.Wrap(err, "")
-			}
-
-			return nil
+			return docs.GenerateDocs(templatesPath, outputPath)
 
 		},
 	}

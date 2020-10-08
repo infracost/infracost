@@ -1,4 +1,5 @@
 .*
+!.git
 !.env
 Dockerfile
 build/

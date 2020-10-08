@@ -12,6 +12,7 @@ import (
 	"github.com/infracost/infracost/pkg/prices"
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/infracost/infracost/pkg/testutil"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -59,6 +60,33 @@ func WithProviders(tf string) string {
 	return fmt.Sprintf("%s%s", tfProviders, tf)
 }
 
+func InstallPlugins() error {
+	project := Project{
+		Files: []File{
+			{
+				Path:     "init.tf",
+				Contents: WithProviders(""),
+			},
+		},
+	}
+
+	tfdir, err := CreateProject(project)
+	if err != nil {
+		return errors.Wrap(err, "Error creating Terraform project")
+	}
+
+	opts := &terraform.CmdOptions{
+		TerraformDir: tfdir,
+	}
+
+	_, err = terraform.TerraformCmd(opts, "init", "-no-color")
+	if err != nil {
+		return errors.Wrap(err, "Error initializing Terraform working directory")
+	}
+
+	return nil
+}
+
 func ResourceTests(t *testing.T, tf string, checks []testutil.ResourceCheck) {
 	project := Project{
 		Files: []File{
@@ -94,7 +122,7 @@ func RunCostCalculations(project Project) ([]*schema.Resource, error) {
 	return resources, nil
 }
 
-func loadResources(project Project) ([]*schema.Resource, error) {
+func CreateProject(project Project) (string, error) {
 	err := os.MkdirAll(pluginCache, os.ModePerm)
 	if err != nil {
 		log.Errorf("Error creating plugin cache directory: %s", err.Error())
@@ -102,7 +130,11 @@ func loadResources(project Project) ([]*schema.Resource, error) {
 		os.Setenv("TF_PLUGIN_CACHE_DIR", pluginCache)
 	}
 
-	tfdir, err := writeToTmpDir(project)
+	return writeToTmpDir(project)
+}
+
+func loadResources(project Project) ([]*schema.Resource, error) {
+	tfdir, err := CreateProject(project)
 	if err != nil {
 		return nil, err
 	}

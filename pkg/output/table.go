@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/schema"
 	"github.com/urfave/cli/v2"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 )
 
 func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
@@ -73,11 +73,12 @@ func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 
 	t.Render()
 
-	skippedResourcesMessage := terraform.SkippedResourcesMessage(resources, c.Bool("show-skipped"))
-	if skippedResourcesMessage != "" {
-		_, err := bufw.WriteString(fmt.Sprintf("\n%s", skippedResourcesMessage))
+	msg := skippedResourcesMessage(resources, c.Bool("show-skipped"))
+	if msg != "" {
+		_, err := bufw.WriteString(fmt.Sprintf("\n%s", msg))
 		if err != nil {
-			return nil, err
+			// The error here would just mean the output is shortened, so no need to return an error to the user in this case
+			log.Errorf("Error writing skipped resources message: %v", err.Error())
 		}
 	}
 

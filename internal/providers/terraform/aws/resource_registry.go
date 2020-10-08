@@ -7,6 +7,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetLaunchConfigurationRegistryItem(),
 	GetLaunchTemplateRegistryItem(),
 	GetDBInstanceRegistryItem(),
+	GetDMSRegistryItem(),
 	GetDocDBClusterInstanceRegistryItem(),
 	GetDynamoDBTableRegistryItem(),
 	GetEBSSnapshotCopyRegistryItem(),

@@ -25,13 +25,24 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
     Linux:
     ```sh
-    curl --silent --location "https://github.com/infracost/infracost/releases/latest/download/infracost-linux-amd64.tar.gz" | tar xz -C /tmp
+    curl -s -L https://github.com/infracost/infracost/releases/latest/download/infracost-linux-amd64.tar.gz | tar xz -C /tmp && \
     sudo mv /tmp/infracost-linux-amd64 /usr/local/bin/infracost
     ```
 
-    Mac OSX:
+    macOS (Homebrew):
     ```sh
     brew install infracost
+    ```
+
+    macOS (manual):
+    ```sh
+    curl -s -L https://github.com/infracost/infracost/releases/latest/download/infracost-darwin-amd64.tar.gz | tar xz -C /tmp && \
+    sudo mv /tmp/infracost-darwin-amd64 /usr/local/bin/infracost
+    ```
+
+    Docker:
+    ```sh
+    docker pull infracost/infracost
     ```
 
 2.	Use our free hosted API for cloud prices by registering for an API key:
@@ -51,7 +62,7 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
 Generate a cost breakdown from a Terraform directory:
 ```sh
-infracost --tfdir examples/terraform
+infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tf"
 ```
 
 Check the [docs site](https://www.infracost.io/docs/) for more details.
@@ -87,7 +98,7 @@ EOF
 
 Run the code:
 ```sh
-make run ARGS="--tfdir <Terraform Dir>"
+make run ARGS="--tfdir examples/terraform"
 ```
 
 Run all tests:

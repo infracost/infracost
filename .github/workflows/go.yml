@@ -46,9 +46,13 @@ jobs:
     - name: Test
       run: make test
       env:
-        INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+        INFRACOST_API_KEY: "00000000000000000000000000000000"
+        INFRACOST_LOG_LEVEL: info
 
     - name: Test example works ok
-      run: make run ARGS="--tfdir examples/terraform"
+      run: |
+        make run --silent ARGS="--tfdir examples/terraform --output json" > out.json
+        jq '' out.json
       env:
-        INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+        INFRACOST_API_KEY: "00000000000000000000000000000000"
+        INFRACOST_LOG_LEVEL: info

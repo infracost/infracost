@@ -3,44 +3,35 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
+	"runtime/debug"
 
-	"github.com/briandowns/spinner"
 	"github.com/infracost/infracost/internal/providers/terraform"
+	"github.com/infracost/infracost/internal/spin"
 	"github.com/infracost/infracost/pkg/config"
 	"github.com/infracost/infracost/pkg/version"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/fatih/color"
-	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
-func customError(c *cli.Context, msg string, showHelp bool) error {
-	color.HiRed(fmt.Sprintf("%v\n", msg))
-	if showHelp {
-		_ = cli.ShowAppHelp(c)
-	}
-
-	return fmt.Errorf("")
+func usageError(c *cli.Context, msg string) {
+	fmt.Fprintln(os.Stderr, color.HiRedString(msg)+"\n")
+	c.App.Writer = os.Stderr
+	cli.ShowAppHelpAndExit(c, 1)
 }
 
-var calcSpinner *spinner.Spinner
+var spinner *spin.Spinner
 
 func handleGlobalFlags(c *cli.Context) error {
 	config.Config.NoColor = c.Bool("no-color")
 	color.NoColor = c.Bool("no-color")
 
-	switch strings.ToUpper(c.String("log-level")) {
-	case "TRACE":
-		log.SetLevel(log.TraceLevel)
-	case "DEBUG":
-		log.SetLevel(log.DebugLevel)
-	case "WARN":
-		log.SetLevel(log.WarnLevel)
-	case "ERROR":
-		log.SetLevel(log.ErrorLevel)
-	default:
-		log.SetLevel(log.InfoLevel)
+	if c.IsSet("log-level") {
+		err := config.Config.SetLogLevel(c.String("log-level"))
+		if err != nil {
+			usageError(c, err.Error())
+		}
 	}
 
 	if c.String("pricing-api-endpoint") != "" {
@@ -50,12 +41,24 @@ func handleGlobalFlags(c *cli.Context) error {
 	return nil
 }
 
+func versionOutput(app *cli.App) string {
+	s := fmt.Sprintf("Infracost %s", app.Version)
+	v, err := terraform.TerraformVersion()
+	if err != nil {
+		log.Warnf("error determining Terraform version")
+	} else {
+		s += fmt.Sprintf("\n%s", v)
+	}
+	return s
+}
+
 func checkApiKey() bool {
 	infracostApiKey := config.Config.ApiKey
 	if config.Config.PricingAPIEndpoint == config.Config.DefaultPricingAPIEndpoint && infracostApiKey == "" {
-		color.Yellow("No INFRACOST_API_KEY environment variable is set.")
-		c := color.New(color.Bold, color.FgHiWhite)
-		fmt.Printf("We run a free hosted API for cloud prices, to get an API key run `%s`\n", c.Sprint("infracost register"))
+		red := color.New(color.FgHiRed)
+		bold := color.New(color.Bold, color.FgHiWhite)
+		fmt.Fprintln(os.Stderr, red.Sprint("No INFRACOST_API_KEY environment variable is set."))
+		fmt.Fprintln(os.Stderr, red.Sprintf("We run a free hosted API for cloud prices, to get an API key run"), bold.Sprint("`infracost register`\n"))
 		return false
 	}
 	return true
@@ -70,18 +73,23 @@ func main() {
 	}
 
 	cli.VersionPrinter = func(c *cli.Context) {
-		fmt.Println("Infracost", c.App.Version)
-		v, err := terraform.TerraformVersion()
-		if err != nil {
-			log.Warnf("error determining Terraform version")
-		} else {
-			fmt.Println(v)
-		}
+		fmt.Println(versionOutput(c.App))
 	}
 
 	app := &cli.App{
-		Name:                 "infracost",
-		Usage:                "Generate cost reports from Terraform plans",
+		Name:  "infracost",
+		Usage: "Generate cost reports from Terraform plans",
+		UsageText: `infracost [global options] command [command options] [arguments...]
+
+Example:
+	# Run infracost with a Terraform directory and var file
+	infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tf"
+
+	# Run infracost with a JSON Terraform plan file
+	infracost --tfjson /path/to/plan.json
+
+	# Run infracost with a Terraform directory and a plan file in it
+	infracost --tfdir /path/to/code --tfplan plan.save`,
 		EnableBashCompletion: true,
 		Version:              version.Version,
 		Flags: append([]cli.Flag{
@@ -102,19 +110,33 @@ func main() {
 			},
 		}, defaultCmd.Flags...),
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
-			return customError(c, err.Error(), true)
+			usageError(c, err.Error())
+			return nil
 		},
 		Before:   handleGlobalFlags,
 		Commands: []*cli.Command{registerCmd()},
 		Action:   defaultCmd.Action,
 	}
 
+	defer func() {
+		if err := recover(); err != nil {
+			if spinner != nil {
+				spinner.Fail()
+			}
+			red := color.New(color.FgHiRed)
+			bold := color.New(color.Bold, color.FgHiWhite)
+			fmt.Fprintln(os.Stderr, red.Sprint("An unexpected error occurred\n"))
+			fmt.Fprintf(os.Stderr, "%s\n%s\n", err, string(debug.Stack()))
+			fmt.Fprintf(os.Stderr, "Environment:\n%s\n", versionOutput(app))
+			fmt.Fprintln(os.Stderr, red.Sprint("\nPlease copy the above output and create a new issue at"), bold.Sprint("https://github.com/infracost/infracost/issues/new"))
+		}
+	}()
 	if err := app.Run(os.Args); err != nil {
-		if calcSpinner != nil {
-			calcSpinner.Stop()
+		if spinner != nil {
+			spinner.Fail()
 		}
 		if err.Error() != "" {
-			color.HiRed(fmt.Sprintf("%v\n", err.Error()))
+			fmt.Fprintln(os.Stderr, color.HiRedString(err.Error()))
 		}
 		os.Exit(1)
 	}

@@ -18,6 +18,12 @@ When adding a new resource to infracost, a `productFilter` has to be added that 
   wget https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/index.json
   ```
 
+3. Set the INFRACOST_API_KEY env variable:
+
+  ```
+  export INFRACOST_API_KEY=my_api_key_here
+  ```
+
 ## Usage
 
 * List all available AWS `service` names, or find a `service` name by searching for a keyword or acronym in the JSON file downloaded in the setup step. AWS use many acronyms so be sure to search for those too, e.g. "ES" returns "AmazonES" for ElasticSearch. The reason we do not query the pricing service graphQL API is that it only returns a limited number of responses, and as there are lots of products in AWS, our desired service name might not be included in the returned responses.
@@ -119,7 +125,11 @@ When adding a new resource to infracost, a `productFilter` has to be added that 
       usagetype=Multi-AZUsage:db.m6g.4xl
       ```
 
-* When writing integration tests, a `PriceHash` is used to match the price of a cost component so the tests continue to pass even if the actual price value changes. To find a `PriceHash`, browse to [https://pricing.api.infracost.io/graphql](https://pricing.api.infracost.io/graphql) and use the following query/variables:
+* When writing integration tests, a `PriceHash` is used to match the price of a cost component so the tests continue to pass even if the actual price value changes. To find a `PriceHash`:
+
+  1. Install the [modheader](https://bewisse.com/modheader/) browser extension so you can set custom HTTP headers in your browser.
+  2. Use the modheader browser extension to set `x-api-key` to your Infracost API key.
+  3. Browse to [https://pricing.api.infracost.io/graphql](https://pricing.api.infracost.io/graphql) and use the following query with your desired variable values:
 
   * query:
 

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/pkg/schema"
+	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -38,13 +39,17 @@ func createResource(r *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 	}
 }
 
-func parsePlanJSON(j []byte) []*schema.Resource {
+func parsePlanJSON(j []byte) ([]*schema.Resource, error) {
+	resources := make([]*schema.Resource, 0)
+
+	if !gjson.ValidBytes(j) {
+		return resources, errors.New("invalid JSON")
+	}
+
 	p := gjson.ParseBytes(j)
 	providerConf := p.Get("configuration.provider_config")
 	planVals := p.Get("planned_values.root_module")
 	conf := p.Get("configuration.root_module")
-
-	resources := make([]*schema.Resource, 0)
 
 	resData := parseResourceData(p, providerConf, planVals)
 	parseReferences(resData, conf)
@@ -57,7 +62,7 @@ func parsePlanJSON(j []byte) []*schema.Resource {
 		}
 	}
 
-	return resources
+	return resources, nil
 }
 
 func parseResourceData(plan, provider, planVals gjson.Result) map[string]*schema.ResourceData {
