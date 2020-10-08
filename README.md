@@ -43,6 +43,10 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
     Docker:
     ```sh
     docker pull infracost/infracost
+    docker run --rm -e INFRACOST_API_KEY=... \
+      -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+      -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+      -v $PWD/:/code/ infracost/infracost --tfdir /code/
     ```
 
 2.	Use our free hosted API for cloud prices by registering for an API key:
