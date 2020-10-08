@@ -3,7 +3,7 @@ package aws_test
 import (
 	"testing"
 
-	"github.com/infracost/infracost/pkg/testutil"
+	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 
@@ -64,7 +64,7 @@ func TestLambdaFunction_usage(t *testing.T) {
 			runtime       = "nodejs12.x"
 			memory_size   = 512
 		}
-		
+
 		data "infracost_aws_lambda_function" "lambda" {
 		  resources = [aws_lambda_function.lambda.id, aws_lambda_function.lambda_512_mem.id]
 

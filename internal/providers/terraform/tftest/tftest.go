@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/infracost/infracost/pkg/config"
-	"github.com/infracost/infracost/pkg/prices"
-	"github.com/infracost/infracost/pkg/schema"
-	"github.com/infracost/infracost/pkg/testutil"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/prices"
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/testutil"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 

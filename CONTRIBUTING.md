@@ -18,7 +18,7 @@ package aws
 import (
 	"fmt"
 
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
 
@@ -67,7 +67,7 @@ Next append the resource to the registry in `internal/providers/terraform/aws/re
 ```go
 package aws
 
-import "github.com/infracost/infracost/pkg/schema"
+import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	...,
@@ -115,9 +115,9 @@ We distinguish the **price** of a resource from its **cost**. Price is the per-u
     }
   }
   ```
-  
+
   Infracost output shows the hourly/monthly cost columns populated with non-zero values:
-  
+
   ```
   NAME                              MONTHLY QTY  UNIT         PRICE   HOURLY COST  MONTHLY COST
 

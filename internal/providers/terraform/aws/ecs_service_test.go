@@ -3,7 +3,7 @@ package aws_test
 import (
 	"testing"
 
-	"github.com/infracost/infracost/pkg/testutil"
+	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 
@@ -43,7 +43,7 @@ func TestECSService(t *testing.T) {
 			]
 			TASK_DEFINITION
 		}
-	
+
 		resource "aws_ecs_service" "ecs_fargate1" {
 			name            = "ecs_fargate1"
 			launch_type     = "FARGATE"

@@ -3,7 +3,7 @@ package aws_test
 import (
 	"testing"
 
-	"github.com/infracost/infracost/pkg/testutil"
+	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 
@@ -52,7 +52,7 @@ func TestNATGateway_usage(t *testing.T) {
 			allocation_id = "eip-12345678"
 			subnet_id     = "subnet-12345678"
 		}
-		
+
 		data "infracost_aws_nat_gateway" "nat" {
 			resources = [aws_nat_gateway.nat.id]
 

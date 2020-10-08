@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/infracost/infracost/pkg/version"
+	"github.com/infracost/infracost/internal/version"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"

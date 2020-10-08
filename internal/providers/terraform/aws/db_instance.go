@@ -3,7 +3,7 @@ package aws
 import (
 	"strings"
 
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"

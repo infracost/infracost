@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/infracost/infracost/pkg/config"
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/urfave/cli/v2"
 
 	"github.com/olekukonko/tablewriter"

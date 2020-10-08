@@ -3,7 +3,7 @@ package aws_test
 import (
 	"testing"
 
-	"github.com/infracost/infracost/pkg/testutil"
+	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 
@@ -19,7 +19,7 @@ func TestLB(t *testing.T) {
 		resource "aws_lb" "lb1" {
 			load_balancer_type = "application"
 		}
-		
+
 		resource "aws_alb" "alb1" {
 		}
 

@@ -2,7 +2,7 @@ BINARY := infracost
 PKG := github.com/infracost/infracost/cmd/infracost
 TERRAFORM_PROVIDER_INFRACOST_VERSION := latest
 VERSION := $(shell scripts/get_version.sh HEAD)
-LD_FLAGS := -ldflags="-X 'github.com/infracost/infracost/pkg/version.Version=$(VERSION)'"
+LD_FLAGS := -ldflags="-X 'github.com/infracost/infracost/internal/version.Version=$(VERSION)'"
 BUILD_FLAGS := $(LD_FLAGS) -i -v
 
 GENERATE_DOCS_PKG := github.com/infracost/infracost/cmd/generate-docs
