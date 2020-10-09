@@ -61,7 +61,7 @@ func startUpdateCheck() error {
 
 func versionOutput(app *cli.App) string {
 	s := fmt.Sprintf("Infracost %s", app.Version)
-	v, err := terraform.TerraformVersion()
+	v, err := terraform.Version()
 
 	if err != nil {
 		log.Warnf("error determining Terraform version")
