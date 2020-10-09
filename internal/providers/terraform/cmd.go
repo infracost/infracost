@@ -16,12 +16,12 @@ type CmdOptions struct {
 	TerraformDir string
 }
 
-type TerraformCmdError struct {
+type CmdError struct {
 	err    error
 	Stderr []byte
 }
 
-func (e *TerraformCmdError) Error() string {
+func (e *CmdError) Error() string {
 	return e.err.Error()
 }
 
@@ -33,7 +33,7 @@ func terraformBinary() string {
 	return terraformBinary
 }
 
-func TerraformCmd(opts *CmdOptions, args ...string) ([]byte, error) {
+func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	os.Setenv("TF_IN_AUTOMATION", "true")
 
 	exe := terraformBinary()
@@ -66,13 +66,13 @@ func TerraformCmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	logWriter.Flush()
 
 	if err != nil {
-		return outbuf.Bytes(), &TerraformCmdError{err, errbuf.Bytes()}
+		return outbuf.Bytes(), &CmdError{err, errbuf.Bytes()}
 	}
 
 	return outbuf.Bytes(), nil
 }
 
-func TerraformVersion() (string, error) {
+func Version() (string, error) {
 	exe := terraformBinary()
 	out, err := exec.Command(exe, "-version").Output()
 	return strings.SplitN(string(out), "\n", 2)[0], err

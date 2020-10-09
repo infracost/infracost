@@ -15,8 +15,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// ConfigSpec contains mapping of environment variable names to config values.
-type ConfigSpec struct {
+// Spec contains mapping of environment variable names to config values
+type Spec struct {
 	NoColor                   bool
 	LogLevel                  string `envconfig:"INFRACOST_LOG_LEVEL"  required:"false"`
 	DefaultPricingAPIEndpoint string `envconfig:"DEFAULT_INFRACOST_PRICING_API_ENDPOINT" default:"https://pricing.api.infracost.io"`
@@ -25,7 +25,7 @@ type ConfigSpec struct {
 	APIKey                    string `envconfig:"INFRACOST_API_KEY"`
 }
 
-func (c *ConfigSpec) SetLogLevel(l string) error {
+func (c *Spec) SetLogLevel(l string) error {
 	c.LogLevel = l
 
 	// Disable logging if no log level is set
@@ -43,7 +43,7 @@ func (c *ConfigSpec) SetLogLevel(l string) error {
 	return nil
 }
 
-func (c *ConfigSpec) IsLogging() bool {
+func (c *Spec) IsLogging() bool {
 	return c.LogLevel != ""
 }
 
@@ -71,8 +71,8 @@ func fileExists(path string) bool {
 }
 
 // loadConfig loads the config struct from environment variables.
-func loadConfig() *ConfigSpec {
-	var config ConfigSpec
+func loadConfig() *Spec {
+	var config Spec
 	var err error
 
 	config.NoColor = false

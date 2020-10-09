@@ -99,7 +99,7 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 	if p.planFile == "" {
 		if !p.isTerraformInitRun() {
 			spinner = spin.NewSpinner("Running terraform init")
-			_, err := TerraformCmd(opts, "init", "-no-color")
+			_, err := Cmd(opts, "init", "-no-color")
 			if err != nil {
 				spinner.Fail()
 				terraformError(err)
@@ -123,7 +123,7 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 		args := []string{"plan", "-input=false", "-lock=false", "-no-color"}
 		args = append(args, flags...)
 		args = append(args, fmt.Sprintf("-out=%s", f.Name()))
-		_, err = TerraformCmd(opts, args...)
+		_, err = Cmd(opts, args...)
 		if err != nil {
 			spinner.Fail()
 			terraformError(err)
@@ -135,7 +135,7 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 	}
 
 	spinner = spin.NewSpinner("Running terraform show")
-	out, err := TerraformCmd(opts, "show", "-no-color", "-json", p.planFile)
+	out, err := Cmd(opts, "show", "-no-color", "-json", p.planFile)
 	if err != nil {
 		spinner.Fail()
 		terraformError(err)
@@ -153,7 +153,7 @@ func (p *terraformProvider) terraformPreChecks() error {
 			return errors.Errorf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary using the environment variable TERRAFORM_BINARY.", terraformBinary())
 		}
 
-		if v, ok := checkTerraformVersion(); !ok {
+		if v, ok := checkVersion(); !ok {
 			return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
 		}
 
@@ -164,8 +164,8 @@ func (p *terraformProvider) terraformPreChecks() error {
 	return nil
 }
 
-func checkTerraformVersion() (string, bool) {
-	out, err := TerraformVersion()
+func checkVersion() (string, bool) {
+	out, err := Version()
 	if err != nil {
 		// If we encounter any errors here we just return true
 		// since it might be caused by a custom Terraform binary
@@ -199,7 +199,7 @@ func (p *terraformProvider) isTerraformInitRun() bool {
 }
 
 func terraformError(err error) {
-	if e, ok := err.(*TerraformCmdError); ok {
+	if e, ok := err.(*CmdError); ok {
 		stderr := stripBlankLines(string(e.Stderr))
 
 		msg := fmt.Sprintf("\n  Terraform command failed with:\n%s\n", indent(stderr, "    "))
