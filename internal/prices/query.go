@@ -16,7 +16,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-var InvalidAPIKeyError = errors.New("Invalid API key")
+var ErrInvalidAPIKey = errors.New("Invalid API key")
 
 type PricingAPIError struct {
 	err error
@@ -59,7 +59,7 @@ type QueryRunner interface {
 type GraphQLQueryRunner struct {
 	baseURL         string
 	graphQLEndpoint string
-	traceId         string
+	traceID         string
 }
 
 func NewGraphQLQueryRunner() *GraphQLQueryRunner {
@@ -71,7 +71,7 @@ func NewGraphQLQueryRunner() *GraphQLQueryRunner {
 }
 
 func (q *GraphQLQueryRunner) RunQueries(r *schema.Resource) ([]queryResult, error) {
-	q.traceId = uuid.New().String()
+	q.traceID = uuid.New().String()
 
 	keys, queries := q.batchQueries(r)
 
@@ -147,7 +147,7 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 			return results, &PricingAPIError{err, "Invalid response from pricing API"}
 		}
 		if r.Error == "Invalid API key" {
-			return results, InvalidAPIKeyError
+			return results, ErrInvalidAPIKey
 		}
 		return results, &PricingAPIError{errors.New(r.Error), "Received error from pricing API"}
 	}
@@ -197,8 +197,8 @@ func (q *GraphQLQueryRunner) ReportMissingPrices(resources []*schema.Resource) {
 func (q *GraphQLQueryRunner) addHeaders(req *http.Request) {
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("User-Agent", config.GetUserAgent())
-	req.Header.Set("X-Api-Key", config.Config.ApiKey)
-	req.Header.Set("X-Trace-Id", q.traceId)
+	req.Header.Set("X-Api-Key", config.Config.APIKey)
+	req.Header.Set("X-Trace-Id", q.traceID)
 }
 
 // Batch all the queries for this resource so we can use one GraphQL call

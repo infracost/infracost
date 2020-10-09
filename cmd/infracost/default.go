@@ -53,7 +53,7 @@ func defaultCmd() *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			if err := checkApiKey(); err != nil {
+			if err := checkAPIKey(); err != nil {
 				return err
 			}
 
@@ -75,7 +75,7 @@ func defaultCmd() *cli.Command {
 				red := color.New(color.FgHiRed)
 				bold := color.New(color.Bold, color.FgHiWhite)
 
-				if e := unwrapped(err); errors.Is(e, prices.InvalidAPIKeyError) {
+				if e := unwrapped(err); errors.Is(e, prices.ErrInvalidAPIKey) {
 					return errors.New(fmt.Sprintf("%v\n%s %s %s",
 						e.Error(),
 						red.Sprint("Please check your"),
