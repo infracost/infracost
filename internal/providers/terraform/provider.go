@@ -200,30 +200,33 @@ func (p *terraformProvider) isTerraformInitRun() bool {
 
 func terraformError(err error) {
 	if e, ok := err.(*TerraformCmdError); ok {
-		fmt.Fprintln(os.Stderr, indent(color.HiRedString("Terraform command failed with:"), "  "))
 		stderr := stripBlankLines(string(e.Stderr))
-		fmt.Fprintln(os.Stderr, indent(color.HiRedString(stderr), "    "))
+
+		msg := fmt.Sprintf("\n  Terraform command failed with:\n%s\n", indent(stderr, "    "))
+
 		if strings.HasPrefix(stderr, "Error: No value for required variable") {
-			fmt.Fprintln(os.Stderr, color.HiRedString("Pass Terraform flags using the --tfflags option."))
-			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"))
+			msg += "\nPass Terraform flags using the --tfflags option.\n"
+			msg += "For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"
 		}
 		if strings.HasPrefix(stderr, "Error: Failed to read variables file") {
-			fmt.Fprintln(os.Stderr, color.HiRedString("Specify the -var-file flag as a path relative to your Terraform directory."))
-			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"))
+			msg += "\nSpecify the -var-file flag as a path relative to your Terraform directory.\n"
+			msg += "For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"
 		}
 		if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a state or plan file.") {
-			fmt.Fprintln(os.Stderr, color.HiRedString("Specify the --tfplan flag as a path relative to your Terraform directory."))
-			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfplan=plan.save\n"))
+			msg += "\nSpecify the --tfplan flag as a path relative to your Terraform directory.\n"
+			msg += "For example: infracost --tfdir=path/to/terraform --tfplan=plan.save\n"
 		}
+
+		fmt.Fprintln(os.Stderr, color.HiRedString(msg))
 	}
 }
 
 func indent(s, indent string) string {
-	result := ""
-	for _, j := range strings.Split(strings.TrimRight(s, "\n"), "\n") {
-		result += indent + j + "\n"
+	lines := make([]string, 0)
+	for _, j := range strings.Split(s, "\n") {
+		lines = append(lines, indent+j)
 	}
-	return result
+	return strings.Join(lines, "\n")
 }
 
 func stripBlankLines(s string) string {

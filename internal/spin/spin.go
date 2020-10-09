@@ -60,6 +60,6 @@ func (s *Spinner) Success() {
 	if config.Config.IsLogging() {
 		log.Infof("completed: %s", s.msg)
 	} else {
-		fmt.Fprintln(os.Stderr, color.HiGreenString("  ✔ %s", s.msg))
+		fmt.Fprintln(os.Stderr, color.GreenString("  ✔ %s", s.msg))
 	}
 }

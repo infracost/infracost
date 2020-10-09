@@ -9,12 +9,9 @@ GENERATE_DOCS_PKG := github.com/infracost/infracost/cmd/generate-docs
 DOCS_TEMPLATES_PATH := docs/templates
 DOCS_OUTPUT_PATH := docs/generated
 
-ifndef $(GOOS)
-	GOOS=$(shell go env GOOS)
-endif
-
-ifndef $(GOARCH)
-	GOARCH=$(shell go env GOARCH)
+DEV_ENV := dev
+ifdef INFRACOST_ENV
+	DEV_ENV := $(INFRACOST_ENV)
 endif
 
 .PHONY: deps run build windows linux darwin build_all install release install_provider clean test fmt lint docs
@@ -23,7 +20,7 @@ deps:
 	go mod download
 
 run:
-	INFRACOST_ENV=dev go run $(LD_FLAGS) $(PKG) $(ARGS)
+	env INFRACOST_ENV=$(DEV_ENV) go run $(LD_FLAGS) $(PKG) $(ARGS)
 
 build:
 	CGO_ENABLED=0 go build $(BUILD_FLAGS) -o build/$(BINARY) $(PKG)

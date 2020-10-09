@@ -127,22 +127,30 @@ func GetUserAgent() string {
 }
 
 func getInfracostEnv() string {
-	if os.Getenv("INFRACOST_ENV") == "test" || isTesting() {
+	if IsTest() {
 		return "test"
-	} else if os.Getenv("INFRACOST_ENV") == "dev" {
+	} else if IsDev() {
 		return "dev"
-	} else if strings.ToLower(os.Getenv("GITHUB_ACTIONS")) == "true" {
+	} else if IsTruthy(os.Getenv("GITHUB_ACTIONS")) {
 		return "github_actions"
-	} else if strings.ToLower(os.Getenv("GITLAB_CI")) == "true" {
+	} else if IsTruthy(os.Getenv("GITLAB_CI")) {
 		return "gitlab_ci"
-	} else if strings.ToLower(os.Getenv("CIRCLECI")) == "true" {
+	} else if IsTruthy(os.Getenv("CIRCLECI")) {
 		return "circleci"
 	}
 	return ""
 }
 
-func isTesting() bool {
-	return strings.HasSuffix(os.Args[0], ".test")
+func IsTest() bool {
+	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
+}
+
+func IsDev() bool {
+	return os.Getenv("INFRACOST_ENV") == "dev"
+}
+
+func IsTruthy(s string) bool {
+	return s == "1" || strings.EqualFold(s, "true")
 }
 
 var Config = loadConfig()
