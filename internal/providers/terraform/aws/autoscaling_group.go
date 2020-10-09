@@ -263,10 +263,10 @@ func calculateOnDemandAndSpotCounts(mixedInstancePolicyData gjson.Result, totalC
 func multiplyQuantities(resource *schema.Resource, multiplier decimal.Decimal) {
 	for _, costComponent := range resource.CostComponents {
 		if costComponent.HourlyQuantity != nil {
-			costComponent.HourlyQuantity = decimalPtr((*costComponent.HourlyQuantity).Mul(multiplier))
+			costComponent.HourlyQuantity = decimalPtr(costComponent.HourlyQuantity.Mul(multiplier))
 		}
 		if costComponent.MonthlyQuantity != nil {
-			costComponent.MonthlyQuantity = decimalPtr((*costComponent.MonthlyQuantity).Mul(multiplier))
+			costComponent.MonthlyQuantity = decimalPtr(costComponent.MonthlyQuantity.Mul(multiplier))
 		}
 	}
 

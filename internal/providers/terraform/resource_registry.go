@@ -8,16 +8,16 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/aws"
 )
 
-type resourceRegistryMapSingleton map[string]*schema.RegistryItem
+type ResourceRegistryMap map[string]*schema.RegistryItem
 
 var (
-	resourceRegistryMap resourceRegistryMapSingleton
+	resourceRegistryMap ResourceRegistryMap
 	once                sync.Once
 )
 
-func GetResourceRegistryMap() *resourceRegistryMapSingleton {
+func GetResourceRegistryMap() *ResourceRegistryMap {
 	once.Do(func() {
-		resourceRegistryMap = make(resourceRegistryMapSingleton)
+		resourceRegistryMap = make(ResourceRegistryMap)
 		// Merge all resource registries
 
 		// AWS

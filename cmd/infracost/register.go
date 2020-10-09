@@ -103,7 +103,7 @@ func createAPIKey(name string, email string) (*createAPIKeyResponse, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "Error generating API key request")
 	}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(j)))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(j))
 	if err != nil {
 		return nil, errors.Wrap(err, "Error generating API key request")
 	}

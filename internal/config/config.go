@@ -15,7 +15,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// ConfigSpec contains mapping of environment variable names to config values
+// ConfigSpec contains mapping of environment variable names to config values.
 type ConfigSpec struct {
 	NoColor                   bool
 	LogLevel                  string `envconfig:"INFRACOST_LOG_LEVEL"  required:"false"`
@@ -70,7 +70,7 @@ func fileExists(path string) bool {
 	return !info.IsDir()
 }
 
-// loadConfig loads the config struct from environment variables
+// loadConfig loads the config struct from environment variables.
 func loadConfig() *ConfigSpec {
 	var config ConfigSpec
 	var err error

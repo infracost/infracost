@@ -29,7 +29,7 @@ type terraformProvider struct {
 	planFlags string
 }
 
-// New returns new Terraform Provider
+// New returns new Terraform Provider.
 func New() schema.Provider {
 	return &terraformProvider{}
 }

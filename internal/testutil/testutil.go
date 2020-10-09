@@ -31,7 +31,7 @@ func HourlyPriceMultiplierCheck(multiplier decimal.Decimal) CostCheckFunc {
 	return func(t *testing.T, costComponent *schema.CostComponent) {
 		expected := costComponent.Price().Mul(multiplier)
 		if !cmp.Equal(costComponent.HourlyCost(), expected) {
-			t.Errorf("Unexpected hourly cost for %s (expected: %s, got: %s)", costComponent.Name, formatDecimal(expected, "%.4f"), formatDecimal(costComponent.HourlyCost(), "%.4f"))
+			t.Errorf("Unexpected hourly cost for %s (expected: %s, got: %s)", costComponent.Name, formatAmount(expected), formatAmount(costComponent.HourlyCost()))
 		}
 	}
 }
@@ -40,7 +40,7 @@ func MonthlyPriceMultiplierCheck(multiplier decimal.Decimal) CostCheckFunc {
 	return func(t *testing.T, costComponent *schema.CostComponent) {
 		expected := costComponent.Price().Mul(multiplier)
 		if !cmp.Equal(costComponent.MonthlyCost(), expected) {
-			t.Errorf("Unexpected monthly cost for %s (expected: %s, got: %s)", costComponent.Name, formatDecimal(expected, "%.4f"), formatDecimal(costComponent.MonthlyCost(), "%.4f"))
+			t.Errorf("Unexpected monthly cost for %s (expected: %s, got: %s)", costComponent.Name, formatAmount(expected), formatAmount(costComponent.MonthlyCost()))
 		}
 	}
 }
@@ -124,7 +124,7 @@ func findCostComponent(costComponents []*schema.CostComponent, name string) (boo
 	return false, nil
 }
 
-func formatDecimal(d decimal.Decimal, format string) string {
+func formatAmount(d decimal.Decimal) string {
 	f, _ := d.Float64()
-	return fmt.Sprintf(format, f)
+	return fmt.Sprintf("%.4f", f)
 }
