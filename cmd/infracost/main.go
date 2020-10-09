@@ -83,7 +83,7 @@ func main() {
 
 Example:
 	# Run infracost with a Terraform directory and var file
-	infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tf"
+	infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
 
 	# Run infracost with a JSON Terraform plan file
 	infracost --tfjson /path/to/plan.json
