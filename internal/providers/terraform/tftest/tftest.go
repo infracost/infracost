@@ -170,7 +170,7 @@ func writeToTmpDir(project Project) (string, error) {
 			}
 		}
 
-		err = ioutil.WriteFile(fullPath, []byte(terraformFile.Contents), 0644)
+		err = ioutil.WriteFile(fullPath, []byte(terraformFile.Contents), 0600)
 		if err != nil {
 			return tmpDir, err
 		}

@@ -6,7 +6,6 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
-	"github.com/tidwall/gjson"
 )
 
 func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
@@ -125,19 +124,19 @@ func globalTables(d *schema.ResourceData, u *schema.ResourceData) []*schema.Reso
 			var capacity int64
 			if billingMode == "PROVISIONED" {
 				capacity = d.Get("write_capacity").Int()
-				resources = append(resources, newProvisionedDynamoDBGlobalTable(name, data, region, capacity))
+				resources = append(resources, newProvisionedDynamoDBGlobalTable(name, region, capacity))
 			} else if billingMode == "PAY_PER_REQUEST" {
 				if u != nil && u.Get("monthly_write_request_units").Exists() {
 					capacity = u.Get("monthly_write_request_units.0.value").Int()
 				}
-				resources = append(resources, newOnDemandDynamoDBGlobalTable(name, data, region, capacity))
+				resources = append(resources, newOnDemandDynamoDBGlobalTable(name, region, capacity))
 			}
 		}
 	}
 	return resources
 }
 
-func newProvisionedDynamoDBGlobalTable(name string, d gjson.Result, region string, capacity int64) *schema.Resource {
+func newProvisionedDynamoDBGlobalTable(name string, region string, capacity int64) *schema.Resource {
 	return &schema.Resource{
 		Name: name,
 		CostComponents: []*schema.CostComponent{
@@ -164,7 +163,7 @@ func newProvisionedDynamoDBGlobalTable(name string, d gjson.Result, region strin
 	}
 }
 
-func newOnDemandDynamoDBGlobalTable(name string, d gjson.Result, region string, capacity int64) *schema.Resource {
+func newOnDemandDynamoDBGlobalTable(name string, region string, capacity int64) *schema.Resource {
 	return &schema.Resource{
 		Name: name,
 		CostComponents: []*schema.CostComponent{

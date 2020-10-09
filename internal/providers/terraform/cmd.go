@@ -9,7 +9,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -37,7 +36,8 @@ func terraformBinary() string {
 func TerraformCmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	os.Setenv("TF_IN_AUTOMATION", "true")
 
-	cmd := exec.Command(terraformBinary(), args...)
+	exe := terraformBinary()
+	cmd := exec.Command(exe, args...)
 	log.Infof("Running command: %s", cmd.String())
 	cmd.Dir = opts.TerraformDir
 
@@ -73,23 +73,20 @@ func TerraformCmd(opts *CmdOptions, args ...string) ([]byte, error) {
 }
 
 func TerraformVersion() (string, error) {
-	terraformBinary := os.Getenv("TERRAFORM_BINARY")
-	if terraformBinary == "" {
-		terraformBinary = "terraform"
-	}
-	out, err := exec.Command(terraformBinary, "-version").Output()
+	exe := terraformBinary()
+	out, err := exec.Command(exe, "-version").Output()
 	return strings.SplitN(string(out), "\n", 2)[0], err
 }
 
 type cmdLogger interface {
-	Log(level logrus.Level, args ...interface{})
+	Log(level log.Level, args ...interface{})
 }
 
 // Adapted from https://github.com/sirupsen/logrus/issues/564#issuecomment-345471558
-// Needed to ensure we can log large Terraform output lines
+// Needed to ensure we can log large Terraform output lines.
 type cmdLogWriter struct {
 	logger cmdLogger
-	level  logrus.Level
+	level  log.Level
 	buf    bytes.Buffer
 	mu     sync.Mutex
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// These show differently in the plan JSON for Terraform 0.12 and 0.13
+// These show differently in the plan JSON for Terraform 0.12 and 0.13.
 var infracostProviderNames = []string{"infracost", "registry.terraform.io/infracost/infracost"}
 
 func createResource(r *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
@@ -233,7 +233,7 @@ func isInfracostResource(res *schema.ResourceData) bool {
 }
 
 // addressResourcePart parses a resource addr and returns resource suffix (without the module prefix).
-// For example: `module.name1.module.name2.resource` will return `name2.resource`
+// For example: `module.name1.module.name2.resource` will return `name2.resource`.
 func addressResourcePart(addr string) string {
 	p := strings.Split(addr, ".")
 
@@ -245,7 +245,7 @@ func addressResourcePart(addr string) string {
 }
 
 // addressModulePart parses a resource addr and returns module prefix.
-// For example: `module.name1.module.name2.resource` will return `module.name1.module.name2.`
+// For example: `module.name1.module.name2.resource` will return `module.name1.module.name2.`.
 func addressModulePart(addr string) string {
 	ap := strings.Split(addr, ".")
 	var mp []string
