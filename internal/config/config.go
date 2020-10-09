@@ -115,7 +115,6 @@ func GetUserAgent() string {
 	userAgent := "infracost"
 	if version.Version != "" {
 		userAgent += fmt.Sprintf("-%s", version.Version)
-
 	}
 	infracostEnv := getInfracostEnv()
 

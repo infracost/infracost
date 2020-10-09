@@ -53,7 +53,6 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema
 		}
 		multiplyQuantities(lc, desiredCapacity)
 		subResources = append(subResources, lc)
-
 	} else if len(launchTemplateRef) > 0 {
 		onDemandCount := desiredCapacity
 		spotCount := decimal.Zero
@@ -68,7 +67,6 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema
 			return nil
 		}
 		subResources = append(subResources, lt)
-
 	} else if len(mixedInstanceLaunchTemplateRef) > 0 {
 		mixedInstancesPolicy := d.Get("mixed_instances_policy.0")
 		lt := newMixedInstancesAwsLaunchTemplate(mixedInstanceLaunchTemplateRef[0].Address, mixedInstanceLaunchTemplateRef[0], region, desiredCapacity, mixedInstancesPolicy)

@@ -39,7 +39,6 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 		costComponents = append(costComponents, wruCostComponent(d, u))
 		// Read request units (RRU)
 		costComponents = append(costComponents, rruCostComponent(d, u))
-
 	}
 
 	// Data storage
