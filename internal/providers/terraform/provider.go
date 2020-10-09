@@ -205,11 +205,11 @@ func terraformError(err error) {
 		fmt.Fprintln(os.Stderr, indent(color.HiRedString(stderr), "    "))
 		if strings.HasPrefix(stderr, "Error: No value for required variable") {
 			fmt.Fprintln(os.Stderr, color.HiRedString("Pass Terraform flags using the --tfflags option."))
-			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tf\"\n"))
+			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"))
 		}
 		if strings.HasPrefix(stderr, "Error: Failed to read variables file") {
 			fmt.Fprintln(os.Stderr, color.HiRedString("Specify the -var-file flag as a path relative to your Terraform directory."))
-			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tf\"\n"))
+			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"))
 		}
 		if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a state or plan file.") {
 			fmt.Fprintln(os.Stderr, color.HiRedString("Specify the --tfplan flag as a path relative to your Terraform directory."))
