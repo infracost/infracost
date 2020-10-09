@@ -158,7 +158,7 @@ Example:
 			bold := color.New(color.Bold, color.FgHiWhite)
 
 			msg := fmt.Sprintf("\n%s\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
-				red.Sprint("An unexpected error occured"),
+				red.Sprint("An unexpected error occurred"),
 				err,
 				string(debug.Stack()),
 				versionOutput(app),

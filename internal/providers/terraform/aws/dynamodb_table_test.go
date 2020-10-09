@@ -134,7 +134,6 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 	}
 
 	tftest.ResourceTests(t, tf, resourceChecks)
-
 }
 
 func TestNewDynamoDBTableProvisioned(t *testing.T) {
@@ -231,5 +230,4 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 	}
 
 	tftest.ResourceTests(t, tf, resourceChecks)
-
 }

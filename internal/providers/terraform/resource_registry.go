@@ -24,7 +24,6 @@ func GetResourceRegistryMap() *resourceRegistryMapSingleton {
 		for _, registryItem := range aws.ResourceRegistry {
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
-
 	})
 
 	return &resourceRegistryMap

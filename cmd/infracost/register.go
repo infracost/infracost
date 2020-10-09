@@ -120,12 +120,12 @@ func createAPIKey(name string, email string) (*createAPIKeyResponse, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.Wrap(err, "Invalid reponse from API")
+		return nil, errors.Wrap(err, "Invalid response from API")
 	}
 	var r createAPIKeyResponse
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		return nil, errors.Wrap(err, "Invalid reponse from API")
+		return nil, errors.Wrap(err, "Invalid response from API")
 	}
 
 	return &r, nil

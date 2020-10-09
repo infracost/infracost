@@ -58,7 +58,6 @@ func TestNewNewDMSReplicationInstanceSingleLowStorage(t *testing.T) {
 	}
 
 	tftest.ResourceTests(t, tf, resourceChecks)
-
 }
 
 func TestNewNewDMSReplicationInstanceMultiHighStorage(t *testing.T) {
@@ -109,5 +108,4 @@ func TestNewNewDMSReplicationInstanceMultiHighStorage(t *testing.T) {
 	}
 
 	tftest.ResourceTests(t, tf, resourceChecks)
-
 }
