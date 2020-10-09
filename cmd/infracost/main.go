@@ -72,9 +72,9 @@ func versionOutput(app *cli.App) string {
 	return s
 }
 
-func checkApiKey() error {
-	infracostApiKey := config.Config.ApiKey
-	if config.Config.PricingAPIEndpoint == config.Config.DefaultPricingAPIEndpoint && infracostApiKey == "" {
+func checkAPIKey() error {
+	infracostAPIKey := config.Config.APIKey
+	if config.Config.PricingAPIEndpoint == config.Config.DefaultPricingAPIEndpoint && infracostAPIKey == "" {
 		red := color.New(color.FgHiRed)
 		bold := color.New(color.Bold, color.FgHiWhite)
 

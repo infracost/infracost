@@ -22,7 +22,7 @@ type ConfigSpec struct {
 	DefaultPricingAPIEndpoint string `envconfig:"DEFAULT_INFRACOST_PRICING_API_ENDPOINT" default:"https://pricing.api.infracost.io"`
 	PricingAPIEndpoint        string `envconfig:"INFRACOST_PRICING_API_ENDPOINT" required:"true" default:"https://pricing.api.infracost.io"`
 	DashboardAPIEndpoint      string `envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT" required:"true" default:"https://dashboard.api.infracost.io"`
-	ApiKey                    string `envconfig:"INFRACOST_API_KEY"`
+	APIKey                    string `envconfig:"INFRACOST_API_KEY"`
 }
 
 func (c *ConfigSpec) SetLogLevel(l string) error {

@@ -39,7 +39,7 @@ func registerCmd() *cli.Command {
 				return nil
 			}
 
-			r, err := createApiKey(name, email)
+			r, err := createAPIKey(name, email)
 			if err != nil {
 				return err
 			}
@@ -96,7 +96,7 @@ func promptForEmail() (string, error) {
 	return email, err
 }
 
-func createApiKey(name string, email string) (*createAPIKeyResponse, error) {
+func createAPIKey(name string, email string) (*createAPIKeyResponse, error) {
 	url := fmt.Sprintf("%s/apiKeys?source=cli-register", config.Config.DashboardAPIEndpoint)
 	d := map[string]string{"name": name, "email": email}
 	j, err := json.Marshal(d)
