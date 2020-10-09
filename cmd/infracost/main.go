@@ -4,24 +4,28 @@ import (
 	"fmt"
 	"os"
 	"runtime/debug"
+	"strings"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/spin"
+	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/fatih/color"
 	"github.com/urfave/cli/v2"
 )
 
+var spinner *spin.Spinner
+var updateMessageChan chan *update.Info
+
 func usageError(c *cli.Context, msg string) {
 	fmt.Fprintln(os.Stderr, color.HiRedString(msg)+"\n")
 	c.App.Writer = os.Stderr
 	cli.ShowAppHelpAndExit(c, 1)
 }
-
-var spinner *spin.Spinner
 
 func handleGlobalFlags(c *cli.Context) error {
 	config.Config.NoColor = c.Bool("no-color")
@@ -41,27 +45,47 @@ func handleGlobalFlags(c *cli.Context) error {
 	return nil
 }
 
+func startUpdateCheck() error {
+	updateMessageChan = make(chan *update.Info)
+	go func() {
+		updateInfo, err := update.CheckForUpdate()
+		if err != nil {
+			log.Debugf("error checking for update: %v", err)
+		}
+		updateMessageChan <- updateInfo
+		close(updateMessageChan)
+	}()
+
+	return nil
+}
+
 func versionOutput(app *cli.App) string {
 	s := fmt.Sprintf("Infracost %s", app.Version)
 	v, err := terraform.TerraformVersion()
+
 	if err != nil {
 		log.Warnf("error determining Terraform version")
 	} else {
 		s += fmt.Sprintf("\n%s", v)
 	}
+
 	return s
 }
 
-func checkApiKey() bool {
+func checkApiKey() error {
 	infracostApiKey := config.Config.ApiKey
 	if config.Config.PricingAPIEndpoint == config.Config.DefaultPricingAPIEndpoint && infracostApiKey == "" {
 		red := color.New(color.FgHiRed)
 		bold := color.New(color.Bold, color.FgHiWhite)
-		fmt.Fprintln(os.Stderr, red.Sprint("No INFRACOST_API_KEY environment variable is set."))
-		fmt.Fprintln(os.Stderr, red.Sprintf("We run a free hosted API for cloud prices, to get an API key run"), bold.Sprint("`infracost register`\n"))
-		return false
+
+		return errors.New(fmt.Sprintf("%s\n%s %s",
+			red.Sprint("No INFRACOST_API_KEY environment variable is set."),
+			red.Sprintf("We run a free hosted API for cloud prices, to get an API key run"),
+			bold.Sprint("`infracost register`"),
+		))
 	}
-	return true
+
+	return nil
 }
 
 func main() {
@@ -113,7 +137,13 @@ Example:
 			usageError(c, err.Error())
 			return nil
 		},
-		Before:   handleGlobalFlags,
+		Before: func(c *cli.Context) error {
+			err := handleGlobalFlags(c)
+			if err != nil {
+				return err
+			}
+			return startUpdateCheck()
+		},
 		Commands: []*cli.Command{registerCmd()},
 		Action:   defaultCmd.Action,
 	}
@@ -123,21 +153,54 @@ Example:
 			if spinner != nil {
 				spinner.Fail()
 			}
+
 			red := color.New(color.FgHiRed)
 			bold := color.New(color.Bold, color.FgHiWhite)
-			fmt.Fprintln(os.Stderr, red.Sprint("An unexpected error occurred\n"))
-			fmt.Fprintf(os.Stderr, "%s\n%s\n", err, string(debug.Stack()))
-			fmt.Fprintf(os.Stderr, "Environment:\n%s\n", versionOutput(app))
-			fmt.Fprintln(os.Stderr, red.Sprint("\nPlease copy the above output and create a new issue at"), bold.Sprint("https://github.com/infracost/infracost/issues/new"))
+
+			msg := fmt.Sprintf("\n%s\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
+				red.Sprint("An unexpected error occured"),
+				err,
+				string(debug.Stack()),
+				versionOutput(app),
+				red.Sprint("Please copy the above output and create a new issue at"),
+				bold.Sprint("https://github.com/infracost/infracost/issues/new"),
+			)
+			fmt.Fprint(os.Stderr, msg)
 		}
 	}()
-	if err := app.Run(os.Args); err != nil {
+
+	err := app.Run(os.Args)
+	if err != nil {
 		if spinner != nil {
 			spinner.Fail()
 		}
+
 		if err.Error() != "" {
-			fmt.Fprintln(os.Stderr, color.HiRedString(err.Error()))
+			fmt.Fprintf(os.Stderr, "%s\n", color.HiRedString(err.Error()))
 		}
+	}
+
+	updateInfo := <-updateMessageChan
+	if updateInfo != nil {
+		msg := fmt.Sprintf("\n%s %s → %s\n%s\n",
+			color.YellowString("A new version of Infracost is available:"),
+			color.CyanString(version.Version),
+			color.CyanString(updateInfo.LatestVersion),
+			indent(color.YellowString(updateInfo.Cmd), "  "),
+		)
+		fmt.Fprint(os.Stderr, msg)
+	}
+
+	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func indent(s, indent string) string {
+	lines := make([]string, 0)
+	for _, j := range strings.Split(s, "\n") {
+		lines = append(lines, indent+j)
+	}
+
+	return strings.Join(lines, "\n")
 }
