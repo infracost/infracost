@@ -38,7 +38,7 @@ func defaultCmd() *cli.Command {
 			},
 			&cli.StringFlag{
 				Name:  "tfflags",
-				Usage: "Arguments to pass to the 'terraform plan' command",
+				Usage: "Flags to pass to the 'terraform plan' command",
 			},
 			&cli.StringFlag{
 				Name:    "output",
