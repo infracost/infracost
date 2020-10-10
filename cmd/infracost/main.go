@@ -20,6 +20,7 @@ import (
 
 var spinner *spin.Spinner
 var updateMessageChan chan *update.Info
+var waitForUpdateCheck bool
 
 func usageError(c *cli.Context, msg string) {
 	fmt.Fprintln(os.Stderr, color.HiRedString(msg)+"\n")
@@ -46,7 +47,7 @@ func handleGlobalFlags(c *cli.Context) error {
 }
 
 func startUpdateCheck() error {
-	updateMessageChan = make(chan *update.Info)
+	waitForUpdateCheck = true
 	go func() {
 		updateInfo, err := update.CheckForUpdate()
 		if err != nil {
@@ -99,6 +100,8 @@ func main() {
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Println(versionOutput(c.App))
 	}
+
+	updateMessageChan = make(chan *update.Info)
 
 	app := &cli.App{
 		Name:  "infracost",
@@ -180,6 +183,9 @@ Example:
 		}
 	}
 
+	if !waitForUpdateCheck {
+		close(updateMessageChan)
+	}
 	updateInfo := <-updateMessageChan
 	if updateInfo != nil {
 		msg := fmt.Sprintf("\n%s %s → %s\n%s\n",
