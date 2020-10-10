@@ -44,6 +44,13 @@ var (
 		// VPS aws_security_group_* resources
 		"aws_security_group",
 		"aws_security_group_rule",
+
+		// Others
+		"aws_launch_configuration",
+		"aws_launch_template",
+		"aws_ecs_cluster",
+		"aws_ecs_task_definition",
+		"aws_rds_cluster",
 	}
 )
 
@@ -51,9 +58,9 @@ func GetFreeResources() []*schema.RegistryItem {
 	freeResources := make([]*schema.RegistryItem, 0)
 	for _, resourceName := range freeResourcesList {
 		freeResources = append(freeResources, &schema.RegistryItem{
-			Name:   resourceName,
+			Name:    resourceName,
 			NoPrice: true,
-			Notes:  []string{"Free resource."},
+			Notes:   []string{"Free resource."},
 		})
 	}
 	return freeResources
