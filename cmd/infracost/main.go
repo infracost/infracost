@@ -184,9 +184,6 @@ Example:
 		fmt.Fprint(os.Stderr, msg)
 	}
 
-	if err != nil {
-		os.Exit(1)
-	}
 }
 
 func indent(s, indent string) string {

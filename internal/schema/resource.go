@@ -17,7 +17,7 @@ type Resource struct {
 	hourlyCost     decimal.Decimal
 	monthlyCost    decimal.Decimal
 	IsSkipped      bool
-	NoPrice         bool
+	NoPrice        bool
 	SkipMessage    string
 	ResourceType   string
 }
