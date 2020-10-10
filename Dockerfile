@@ -33,4 +33,3 @@ COPY --from=builder /usr/bin/terraform* /usr/bin/
 COPY --from=builder /app/build/infracost /usr/bin/
 RUN chmod +x /usr/bin/infracost
 ENTRYPOINT [ "infracost" ]
-CMD [ "--help" ]
