@@ -52,7 +52,7 @@ func GetFreeResources() []*schema.RegistryItem {
 	for _, resourceName := range freeResourcesList {
 		freeResources = append(freeResources, &schema.RegistryItem{
 			Name:   resourceName,
-			NoCost: true,
+			NoPrice: true,
 			Notes:  []string{"Free resource."},
 		})
 	}

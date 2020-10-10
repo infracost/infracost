@@ -16,7 +16,7 @@ func GetRDSClusterInstanceRegistryItem() *schema.RegistryItem {
 func GetRDSClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:   "aws_rds_cluster",
-		NoCost: true,
+		NoPrice: true,
 	}
 }
 

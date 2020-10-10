@@ -22,14 +22,14 @@ func GetECSServiceRegistryItem() *schema.RegistryItem {
 func GetECSClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:   "aws_ecs_cluster",
-		NoCost: true,
+		NoPrice: true,
 	}
 }
 
 func GetECSTaskDefinitionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:   "aws_ecs_task_definition",
-		NoCost: true,
+		NoPrice: true,
 	}
 }
 

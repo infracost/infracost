@@ -23,14 +23,14 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 func GetLaunchConfigurationRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:   "aws_launch_configuration",
-		NoCost: true,
+		NoPrice: true,
 	}
 }
 
 func GetLaunchTemplateRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:   "aws_launch_template",
-		NoCost: true,
+		NoPrice: true,
 	}
 }
 
