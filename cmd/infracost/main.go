@@ -19,8 +19,6 @@ import (
 )
 
 var spinner *spin.Spinner
-var updateMessageChan chan *update.Info
-var waitForUpdateCheck bool
 
 func usageError(c *cli.Context, msg string) {
 	fmt.Fprintln(os.Stderr, color.HiRedString(msg)+"\n")
@@ -46,18 +44,15 @@ func handleGlobalFlags(c *cli.Context) error {
 	return nil
 }
 
-func startUpdateCheck() error {
-	waitForUpdateCheck = true
+func startUpdateCheck(c chan *update.Info) {
 	go func() {
 		updateInfo, err := update.CheckForUpdate()
 		if err != nil {
 			log.Debugf("error checking for update: %v", err)
 		}
-		updateMessageChan <- updateInfo
-		close(updateMessageChan)
+		c <- updateInfo
+		close(c)
 	}()
-
-	return nil
 }
 
 func versionOutput(app *cli.App) string {
@@ -101,7 +96,8 @@ func main() {
 		fmt.Println(versionOutput(c.App))
 	}
 
-	updateMessageChan = make(chan *update.Info)
+	updateMessageChan := make(chan *update.Info)
+	startUpdateCheck(updateMessageChan)
 
 	app := &cli.App{
 		Name:  "infracost",
@@ -140,13 +136,7 @@ Example:
 			usageError(c, err.Error())
 			return nil
 		},
-		Before: func(c *cli.Context) error {
-			err := handleGlobalFlags(c)
-			if err != nil {
-				return err
-			}
-			return startUpdateCheck()
-		},
+		Before:   handleGlobalFlags,
 		Commands: []*cli.Command{registerCmd()},
 		Action:   defaultCmd.Action,
 	}
@@ -183,9 +173,6 @@ Example:
 		}
 	}
 
-	if !waitForUpdateCheck {
-		close(updateMessageChan)
-	}
 	updateInfo := <-updateMessageChan
 	if updateInfo != nil {
 		msg := fmt.Sprintf("\n%s %s → %s\n%s\n",
