@@ -11,8 +11,8 @@ Support for the following is not currently included:
 
 | Terraform resource           | Notes |
 | ---                          | ---   |
-{{ range $key, $value := . }}| `{{ $key }}` | {{ range $note := $value.Notes }} {{ $note }}<br /> {{ end }} |
-{{ end }}
+{{ range $key, $value := . }}{{ if not .NoPrice}}| `{{ $key }}` | {{ range $note := $value.Notes }} {{ $note }}<br /> {{ end }} |
+{{ end }}{{ end }}
 
 ## The resource I want isn't supported
 
