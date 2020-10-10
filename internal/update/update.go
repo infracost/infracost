@@ -88,7 +88,7 @@ func CheckForUpdate() (*Info, error) {
 }
 
 func skipUpdateCheck() bool {
-	return config.IsTruthy(os.Getenv("SKIP_INFRACOST_UPDATE_CHECK")) || config.IsTest() || config.IsDev()
+	return config.IsTruthy(os.Getenv("INFRACOST_SKIP_UPDATE_CHECK")) || config.IsTest() || config.IsDev()
 }
 
 func isBrewInstall() (bool, error) {
