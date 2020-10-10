@@ -23,7 +23,7 @@ RUN scripts/install_provider.sh ${TERRAFORM_PROVIDER_INFRACOST_VERSION} /usr/bin
 # Build Application
 COPY . .
 RUN make deps
-RUN make build
+RUN NO_DIRTY=true make build
 
 # Application
 FROM alpine:3.12 as app
