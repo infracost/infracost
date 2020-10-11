@@ -141,8 +141,21 @@ Example:
 		Action:   defaultCmd.Action,
 	}
 
+	var appErr error
+
 	defer func() {
-		if err := recover(); err != nil {
+		if appErr != nil {
+			if spinner != nil {
+				spinner.Fail()
+			}
+
+			if appErr.Error() != "" {
+				fmt.Fprintf(os.Stderr, "%s\n", color.HiRedString(appErr.Error()))
+			}
+		}
+
+		unexpectedErr := recover()
+		if unexpectedErr != nil {
 			if spinner != nil {
 				spinner.Fail()
 			}
@@ -152,7 +165,7 @@ Example:
 
 			msg := fmt.Sprintf("\n%s\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
 				red.Sprint("An unexpected error occurred"),
-				err,
+				unexpectedErr,
 				string(debug.Stack()),
 				versionOutput(app),
 				red.Sprint("Please copy the above output and create a new issue at"),
@@ -160,33 +173,24 @@ Example:
 			)
 			fmt.Fprint(os.Stderr, msg)
 		}
+
+		updateInfo := <-updateMessageChan
+		if updateInfo != nil {
+			msg := fmt.Sprintf("\n%s %s → %s\n%s\n",
+				color.YellowString("A new version of Infracost is available:"),
+				color.CyanString(version.Version),
+				color.CyanString(updateInfo.LatestVersion),
+				indent(color.YellowString(updateInfo.Cmd), "  "),
+			)
+			fmt.Fprint(os.Stderr, msg)
+		}
+
+		if appErr != nil || unexpectedErr != nil {
+			os.Exit(1)
+		}
 	}()
 
-	err := app.Run(os.Args)
-	if err != nil {
-		if spinner != nil {
-			spinner.Fail()
-		}
-
-		if err.Error() != "" {
-			fmt.Fprintf(os.Stderr, "%s\n", color.HiRedString(err.Error()))
-		}
-	}
-
-	updateInfo := <-updateMessageChan
-	if updateInfo != nil {
-		msg := fmt.Sprintf("\n%s %s → %s\n%s\n",
-			color.YellowString("A new version of Infracost is available:"),
-			color.CyanString(version.Version),
-			color.CyanString(updateInfo.LatestVersion),
-			indent(color.YellowString(updateInfo.Cmd), "  "),
-		)
-		fmt.Fprint(os.Stderr, msg)
-	}
-
-	if err != nil {
-		os.Exit(1)
-	}
+	appErr = app.Run(os.Args)
 }
 
 func indent(s, indent string) string {

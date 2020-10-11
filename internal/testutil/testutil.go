@@ -65,6 +65,9 @@ func TestResources(t *testing.T, resources []*schema.Resource, checks []Resource
 	}
 
 	for _, r := range resources {
+		if r.NoPrice {
+			continue
+		}
 		if m, ok := foundResources[r]; !ok || !m {
 			t.Errorf("Unexpected resource %s", r.Name)
 		}

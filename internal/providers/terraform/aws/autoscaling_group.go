@@ -20,20 +20,6 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func GetLaunchConfigurationRegistryItem() *schema.RegistryItem {
-	return &schema.RegistryItem{
-		Name:   "aws_launch_configuration",
-		NoCost: true,
-	}
-}
-
-func GetLaunchTemplateRegistryItem() *schema.RegistryItem {
-	return &schema.RegistryItem{
-		Name:   "aws_launch_template",
-		NoCost: true,
-	}
-}
-
 func NewAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 	desiredCapacity := decimal.NewFromInt(d.Get("desired_capacity").Int())

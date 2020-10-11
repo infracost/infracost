@@ -24,6 +24,10 @@ func GetResourceRegistryMap() *ResourceRegistryMap {
 		for _, registryItem := range aws.ResourceRegistry {
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
+		for _, registryItem := range aws.GetFreeResources() {
+			resourceRegistryMap[registryItem.Name] = registryItem
+		}
+
 	})
 
 	return &resourceRegistryMap
