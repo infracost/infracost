@@ -19,6 +19,7 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 * [Development](#development)
 * [Contributing](#contributing)
 
+<!-- NOTE: When updated also update https://github.com/infracost/docs/blob/master/docs/getting_started.md#installation with the same content -->
 ## Installation
 
 1. Download and install the latest Infracost release
