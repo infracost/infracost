@@ -220,7 +220,12 @@ func getInstanceTypeAndCount(mixedInstancePolicyData gjson.Result, capacity deci
 		if override.Get("weighted_capacity").Exists() && override.Get("weighted_capacity").Type != gjson.Null {
 			weightedCapacity = decimal.NewFromInt(override.Get("weighted_capacity").Int())
 		}
-		count = capacity.Div(weightedCapacity).Ceil()
+
+		if weightedCapacity.Equals(decimal.Zero) {
+			count = decimal.Zero
+		} else {
+			count = capacity.Div(weightedCapacity).Ceil()
+		}
 	}
 
 	return instanceType, count
