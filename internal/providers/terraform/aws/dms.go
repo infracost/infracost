@@ -27,7 +27,7 @@ func getInstanceFamily(d *schema.ResourceData) string {
 }
 
 func instanceCostComponent(d *schema.ResourceData) *schema.CostComponent {
-	region := d.Get("region").String()
+	region := d.Get("availability_zone").String()
 	instanceType := getInstanceType(d)
 	availabilityZone := "Single"
 	if d.Get("multi_az").Bool() {
@@ -51,7 +51,7 @@ func instanceCostComponent(d *schema.ResourceData) *schema.CostComponent {
 }
 
 func storageCostComponent(d *schema.ResourceData) *schema.CostComponent {
-	region := d.Get("region").String()
+	region := d.Get("availability_zone").String()
 	instanceFamily := getInstanceFamily(d)
 	availabilityZone := "Single"
 	if d.Get("multi_az").Bool() {
