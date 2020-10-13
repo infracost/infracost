@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/providers/terraform"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/spin"
-	"github.com/infracost/infracost/pkg/output"
-	"github.com/infracost/infracost/pkg/prices"
-	"github.com/infracost/infracost/pkg/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -38,7 +38,7 @@ func defaultCmd() *cli.Command {
 			},
 			&cli.StringFlag{
 				Name:  "tfflags",
-				Usage: "Arguments to pass to the 'terraform plan' command",
+				Usage: "Flags to pass to the 'terraform plan' command",
 			},
 			&cli.StringFlag{
 				Name:    "output",
@@ -53,8 +53,8 @@ func defaultCmd() *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			if !checkApiKey() {
-				os.Exit(1)
+			if err := checkAPIKey(); err != nil {
+				return err
 			}
 
 			provider := terraform.New()
@@ -71,18 +71,23 @@ func defaultCmd() *cli.Command {
 
 			if err := prices.PopulatePrices(resources); err != nil {
 				spinner.Fail()
+
 				red := color.New(color.FgHiRed)
 				bold := color.New(color.Bold, color.FgHiWhite)
-				if e := unwrapped(err); errors.Is(e, prices.InvalidAPIKeyError) {
-					fmt.Fprintln(os.Stderr, red.Sprint(e.Error()))
-					fmt.Fprintln(os.Stderr, red.Sprint("Please check your"), bold.Sprint("INFRACOST_API_KEY"), red.Sprint("environment variable. If you continue having issues please email hello@infracost.io"))
-					os.Exit(1)
+
+				if e := unwrapped(err); errors.Is(e, prices.ErrInvalidAPIKey) {
+					return errors.New(fmt.Sprintf("%v\n%s %s %s",
+						e.Error(),
+						red.Sprint("Please check your"),
+						bold.Sprint("INFRACOST_API_KEY"),
+						red.Sprint("environment variable. If you continue having issues please email hello@infracost.io"),
+					))
 				}
+
 				if e, ok := err.(*prices.PricingAPIError); ok {
-					fmt.Fprintln(os.Stderr, red.Sprint(e.Error()))
-					fmt.Fprintln(os.Stderr, red.Sprint("We have been notified of this issue."))
-					os.Exit(1)
+					return errors.New(fmt.Sprintf("%v\n%s", e.Error(), "We have been notified of this issue."))
 				}
+
 				return err
 			}
 
@@ -116,6 +121,7 @@ func getcwd() string {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Warn(err)
+
 		cwd = ""
 	}
 
@@ -127,5 +133,6 @@ func unwrapped(err error) error {
 	for errors.Unwrap(e) != nil {
 		e = errors.Unwrap(e)
 	}
+
 	return e
 }

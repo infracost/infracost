@@ -3,7 +3,7 @@ package output
 import (
 	"fmt"
 
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func skippedResourcesMessage(resources []*schema.Resource, showDetails bool) string {

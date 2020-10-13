@@ -3,7 +3,7 @@ package aws
 import (
 	"fmt"
 
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
 
@@ -15,7 +15,6 @@ func GetElasticsearchDomainRegistryItem() *schema.RegistryItem {
 }
 
 func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
-
 	region := d.Get("region").String()
 	clusterConfig := d.Get("cluster_config").Array()[0]
 	instanceType := clusterConfig.Get("instance_type").String()

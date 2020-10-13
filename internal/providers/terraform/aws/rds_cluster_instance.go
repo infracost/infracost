@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
 )
@@ -10,13 +10,6 @@ func GetRDSClusterInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_rds_cluster_instance",
 		RFunc: NewRDSClusterInstance,
-	}
-}
-
-func GetRDSClusterRegistryItem() *schema.RegistryItem {
-	return &schema.RegistryItem{
-		Name:   "aws_rds_cluster",
-		NoCost: true,
 	}
 }
 

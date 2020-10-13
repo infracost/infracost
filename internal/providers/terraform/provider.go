@@ -10,11 +10,10 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/spin"
-	"github.com/infracost/infracost/pkg/schema"
 	"github.com/kballard/go-shellquote"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/mod/semver"
 
 	"github.com/urfave/cli/v2"
@@ -29,7 +28,7 @@ type terraformProvider struct {
 	planFlags string
 }
 
-// New returns new Terraform Provider
+// New returns new Terraform Provider.
 func New() schema.Provider {
 	return &terraformProvider{}
 }
@@ -97,16 +96,14 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 	var spinner *spin.Spinner
 
 	if p.planFile == "" {
-		if !p.isTerraformInitRun() {
-			spinner = spin.NewSpinner("Running terraform init")
-			_, err := TerraformCmd(opts, "init", "-no-color")
-			if err != nil {
-				spinner.Fail()
-				terraformError(err)
-				return []byte{}, errors.Wrap(err, "Error running terraform init")
-			}
-			spinner.Success()
+		spinner = spin.NewSpinner("Running terraform init")
+		_, err := Cmd(opts, "init", "-no-color")
+		if err != nil {
+			spinner.Fail()
+			terraformError(err)
+			return []byte{}, errors.Wrap(err, "Error running terraform init")
 		}
+		spinner.Success()
 
 		spinner = spin.NewSpinner("Running terraform plan")
 		f, err := ioutil.TempFile(os.TempDir(), "tfplan")
@@ -123,7 +120,7 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 		args := []string{"plan", "-input=false", "-lock=false", "-no-color"}
 		args = append(args, flags...)
 		args = append(args, fmt.Sprintf("-out=%s", f.Name()))
-		_, err = TerraformCmd(opts, args...)
+		_, err = Cmd(opts, args...)
 		if err != nil {
 			spinner.Fail()
 			terraformError(err)
@@ -135,7 +132,7 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 	}
 
 	spinner = spin.NewSpinner("Running terraform show")
-	out, err := TerraformCmd(opts, "show", "-no-color", "-json", p.planFile)
+	out, err := Cmd(opts, "show", "-no-color", "-json", p.planFile)
 	if err != nil {
 		spinner.Fail()
 		terraformError(err)
@@ -153,7 +150,7 @@ func (p *terraformProvider) terraformPreChecks() error {
 			return errors.Errorf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary using the environment variable TERRAFORM_BINARY.", terraformBinary())
 		}
 
-		if v, ok := checkTerraformVersion(); !ok {
+		if v, ok := checkVersion(); !ok {
 			return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
 		}
 
@@ -164,8 +161,8 @@ func (p *terraformProvider) terraformPreChecks() error {
 	return nil
 }
 
-func checkTerraformVersion() (string, bool) {
-	out, err := TerraformVersion()
+func checkVersion() (string, bool) {
+	out, err := Version()
 	if err != nil {
 		// If we encounter any errors here we just return true
 		// since it might be caused by a custom Terraform binary
@@ -187,43 +184,35 @@ func (p *terraformProvider) inTerraformDir() bool {
 	return matches != nil && err == nil
 }
 
-func (p *terraformProvider) isTerraformInitRun() bool {
-	_, err := os.Stat(filepath.Join(p.dir, ".terraform"))
-	if err != nil {
-		if !os.IsNotExist(err) {
-			log.Errorf("error checking if .terraform directory exists: %v", err)
-		}
-		return false
-	}
-	return true
-}
-
 func terraformError(err error) {
-	if e, ok := err.(*TerraformCmdError); ok {
-		fmt.Fprintln(os.Stderr, indent(color.HiRedString("Terraform command failed with:"), "  "))
+	if e, ok := err.(*CmdError); ok {
 		stderr := stripBlankLines(string(e.Stderr))
-		fmt.Fprintln(os.Stderr, indent(color.HiRedString(stderr), "    "))
+
+		msg := fmt.Sprintf("\n  Terraform command failed with:\n%s\n", indent(stderr, "    "))
+
 		if strings.HasPrefix(stderr, "Error: No value for required variable") {
-			fmt.Fprintln(os.Stderr, color.HiRedString("Pass Terraform flags using the --tfflags option."))
-			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tf\"\n"))
+			msg += "\nPass Terraform flags using the --tfflags option.\n"
+			msg += "For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"
 		}
 		if strings.HasPrefix(stderr, "Error: Failed to read variables file") {
-			fmt.Fprintln(os.Stderr, color.HiRedString("Specify the -var-file flag as a path relative to your Terraform directory."))
-			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tf\"\n"))
+			msg += "\nSpecify the -var-file flag as a path relative to your Terraform directory.\n"
+			msg += "For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"
 		}
 		if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a state or plan file.") {
-			fmt.Fprintln(os.Stderr, color.HiRedString("Specify the --tfplan flag as a path relative to your Terraform directory."))
-			fmt.Fprintln(os.Stderr, color.HiRedString("For example: infracost --tfdir=path/to/terraform --tfplan=plan.save\n"))
+			msg += "\nSpecify the --tfplan flag as a path relative to your Terraform directory.\n"
+			msg += "For example: infracost --tfdir=path/to/terraform --tfplan=plan.save\n"
 		}
+
+		fmt.Fprintln(os.Stderr, color.HiRedString(msg))
 	}
 }
 
 func indent(s, indent string) string {
-	result := ""
-	for _, j := range strings.Split(strings.TrimRight(s, "\n"), "\n") {
-		result += indent + j + "\n"
+	lines := make([]string, 0)
+	for _, j := range strings.Split(s, "\n") {
+		lines = append(lines, indent+j)
 	}
-	return result
+	return strings.Join(lines, "\n")
 }
 
 func stripBlankLines(s string) string {

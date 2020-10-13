@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -16,20 +16,6 @@ func GetECSServiceRegistryItem() *schema.RegistryItem {
 		Name:  "aws_ecs_service",
 		Notes: []string{"Only supports Fargate on-demand."},
 		RFunc: NewECSService,
-	}
-}
-
-func GetECSClusterRegistryItem() *schema.RegistryItem {
-	return &schema.RegistryItem{
-		Name:   "aws_ecs_cluster",
-		NoCost: true,
-	}
-}
-
-func GetECSTaskDefinitionRegistryItem() *schema.RegistryItem {
-	return &schema.RegistryItem{
-		Name:   "aws_ecs_task_definition",
-		NoCost: true,
 	}
 }
 

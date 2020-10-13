@@ -3,7 +3,7 @@ package aws_test
 import (
 	"testing"
 
-	"github.com/infracost/infracost/pkg/testutil"
+	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 
@@ -21,29 +21,29 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 		billing_mode   = "PAY_PER_REQUEST"
 		hash_key       = "UserId"
 		range_key      = "GameTitle"
-	  
+
 		attribute {
 		  name = "UserId"
 		  type = "S"
 		}
-	  
+
 		attribute {
 		  name = "GameTitle"
 		  type = "S"
 		}
-	  
+
 		replica {
 		  region_name = "us-east-2"
 		}
-	  
+
 		replica {
 		  region_name = "us-west-1"
 		}
 	}
-	  
+
 	data "infracost_aws_dynamodb_table" "my_dynamodb_table" {
 		resources = list(aws_dynamodb_table.my_dynamodb_table.id,)
-	
+
 		monthly_write_request_units {
 			value = 3000000
 		}
@@ -134,7 +134,6 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 	}
 
 	tftest.ResourceTests(t, tf, resourceChecks)
-
 }
 
 func TestNewDynamoDBTableProvisioned(t *testing.T) {
@@ -150,12 +149,12 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 		write_capacity = 20
 		hash_key       = "UserId"
 		range_key      = "GameTitle"
-	  
+
 		attribute {
 		  name = "UserId"
 		  type = "S"
 		}
-	  
+
 		attribute {
 		  name = "GameTitle"
 		  type = "S"
@@ -164,7 +163,7 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 		replica {
 		  region_name = "us-east-2"
 		}
-	
+
 		replica {
 		  region_name = "us-west-1"
 		}
@@ -231,5 +230,4 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 	}
 
 	tftest.ResourceTests(t, tf, resourceChecks)
-
 }

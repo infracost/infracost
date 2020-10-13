@@ -1,11 +1,9 @@
 package aws
 
-import "github.com/infracost/infracost/pkg/schema"
+import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAutoscalingGroupRegistryItem(),
-	GetLaunchConfigurationRegistryItem(),
-	GetLaunchTemplateRegistryItem(),
 	GetDBInstanceRegistryItem(),
 	GetDMSRegistryItem(),
 	GetDocDBClusterInstanceRegistryItem(),
@@ -14,8 +12,6 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetEBSSnapshotRegistryItem(),
 	GetEBSVolumeRegistryItem(),
 	GetECSServiceRegistryItem(),
-	GetECSClusterRegistryItem(),
-	GetECSTaskDefinitionRegistryItem(),
 	GetElasticsearchDomainRegistryItem(),
 	GetELBRegistryItem(),
 	GetInstanceRegistryItem(),
@@ -24,5 +20,4 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetALBRegistryItem(),
 	GetNATGatewayRegistryItem(),
 	GetRDSClusterInstanceRegistryItem(),
-	GetRDSClusterRegistryItem(),
 }

@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/infracost/infracost/pkg/config"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
@@ -39,7 +39,7 @@ func registerCmd() *cli.Command {
 				return nil
 			}
 
-			r, err := createApiKey(name, email)
+			r, err := createAPIKey(name, email)
 			if err != nil {
 				return err
 			}
@@ -96,14 +96,14 @@ func promptForEmail() (string, error) {
 	return email, err
 }
 
-func createApiKey(name string, email string) (*createAPIKeyResponse, error) {
+func createAPIKey(name string, email string) (*createAPIKeyResponse, error) {
 	url := fmt.Sprintf("%s/apiKeys?source=cli-register", config.Config.DashboardAPIEndpoint)
 	d := map[string]string{"name": name, "email": email}
 	j, err := json.Marshal(d)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error generating API key request")
 	}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(j)))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(j))
 	if err != nil {
 		return nil, errors.Wrap(err, "Error generating API key request")
 	}
@@ -120,12 +120,12 @@ func createApiKey(name string, email string) (*createAPIKeyResponse, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.Wrap(err, "Invalid reponse from API")
+		return nil, errors.Wrap(err, "Invalid response from API")
 	}
 	var r createAPIKeyResponse
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		return nil, errors.Wrap(err, "Invalid reponse from API")
+		return nil, errors.Wrap(err, "Invalid response from API")
 	}
 
 	return &r, nil

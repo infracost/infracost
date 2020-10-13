@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/shopspring/decimal"

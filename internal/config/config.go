@@ -9,23 +9,23 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/infracost/infracost/pkg/version"
+	"github.com/infracost/infracost/internal/version"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 )
 
-// ConfigSpec contains mapping of environment variable names to config values
-type ConfigSpec struct {
+// Spec contains mapping of environment variable names to config values
+type Spec struct {
 	NoColor                   bool
 	LogLevel                  string `envconfig:"INFRACOST_LOG_LEVEL"  required:"false"`
 	DefaultPricingAPIEndpoint string `envconfig:"DEFAULT_INFRACOST_PRICING_API_ENDPOINT" default:"https://pricing.api.infracost.io"`
 	PricingAPIEndpoint        string `envconfig:"INFRACOST_PRICING_API_ENDPOINT" required:"true" default:"https://pricing.api.infracost.io"`
 	DashboardAPIEndpoint      string `envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT" required:"true" default:"https://dashboard.api.infracost.io"`
-	ApiKey                    string `envconfig:"INFRACOST_API_KEY"`
+	APIKey                    string `envconfig:"INFRACOST_API_KEY"`
 }
 
-func (c *ConfigSpec) SetLogLevel(l string) error {
+func (c *Spec) SetLogLevel(l string) error {
 	c.LogLevel = l
 
 	// Disable logging if no log level is set
@@ -43,7 +43,7 @@ func (c *ConfigSpec) SetLogLevel(l string) error {
 	return nil
 }
 
-func (c *ConfigSpec) IsLogging() bool {
+func (c *Spec) IsLogging() bool {
 	return c.LogLevel != ""
 }
 
@@ -70,9 +70,9 @@ func fileExists(path string) bool {
 	return !info.IsDir()
 }
 
-// loadConfig loads the config struct from environment variables
-func loadConfig() *ConfigSpec {
-	var config ConfigSpec
+// loadConfig loads the config struct from environment variables.
+func loadConfig() *Spec {
+	var config Spec
 	var err error
 
 	config.NoColor = false
@@ -115,7 +115,6 @@ func GetUserAgent() string {
 	userAgent := "infracost"
 	if version.Version != "" {
 		userAgent += fmt.Sprintf("-%s", version.Version)
-
 	}
 	infracostEnv := getInfracostEnv()
 
@@ -127,22 +126,30 @@ func GetUserAgent() string {
 }
 
 func getInfracostEnv() string {
-	if os.Getenv("INFRACOST_ENV") == "test" || isTesting() {
+	if IsTest() {
 		return "test"
-	} else if os.Getenv("INFRACOST_ENV") == "dev" {
+	} else if IsDev() {
 		return "dev"
-	} else if strings.ToLower(os.Getenv("GITHUB_ACTIONS")) == "true" {
+	} else if IsTruthy(os.Getenv("GITHUB_ACTIONS")) {
 		return "github_actions"
-	} else if strings.ToLower(os.Getenv("GITLAB_CI")) == "true" {
+	} else if IsTruthy(os.Getenv("GITLAB_CI")) {
 		return "gitlab_ci"
-	} else if strings.ToLower(os.Getenv("CIRCLECI")) == "true" {
+	} else if IsTruthy(os.Getenv("CIRCLECI")) {
 		return "circleci"
 	}
 	return ""
 }
 
-func isTesting() bool {
-	return strings.HasSuffix(os.Args[0], ".test")
+func IsTest() bool {
+	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
+}
+
+func IsDev() bool {
+	return os.Getenv("INFRACOST_ENV") == "dev"
+}
+
+func IsTruthy(s string) bool {
+	return s == "1" || strings.EqualFold(s, "true")
 }
 
 var Config = loadConfig()

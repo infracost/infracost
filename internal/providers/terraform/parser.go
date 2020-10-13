@@ -6,22 +6,28 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
-// These show differently in the plan JSON for Terraform 0.12 and 0.13
+// These show differently in the plan JSON for Terraform 0.12 and 0.13.
 var infracostProviderNames = []string{"infracost", "registry.terraform.io/infracost/infracost"}
 
 func createResource(r *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	registryMap := GetResourceRegistryMap()
 
 	if registryItem, ok := (*registryMap)[r.Type]; ok {
-		if registryItem.NoCost {
-			return nil
+		if registryItem.NoPrice {
+			return &schema.Resource{
+				Name:         r.Address,
+				ResourceType: r.Type,
+				IsSkipped:    true,
+				NoPrice:      true,
+				SkipMessage:  "This resource is free",
+			}
 		}
 
 		res := registryItem.RFunc(r, u)
@@ -233,7 +239,7 @@ func isInfracostResource(res *schema.ResourceData) bool {
 }
 
 // addressResourcePart parses a resource addr and returns resource suffix (without the module prefix).
-// For example: `module.name1.module.name2.resource` will return `name2.resource`
+// For example: `module.name1.module.name2.resource` will return `name2.resource`.
 func addressResourcePart(addr string) string {
 	p := strings.Split(addr, ".")
 
@@ -245,7 +251,7 @@ func addressResourcePart(addr string) string {
 }
 
 // addressModulePart parses a resource addr and returns module prefix.
-// For example: `module.name1.module.name2.resource` will return `module.name1.module.name2.`
+// For example: `module.name1.module.name2.resource` will return `module.name1.module.name2.`.
 func addressModulePart(addr string) string {
 	ap := strings.Split(addr, ".")
 	var mp []string

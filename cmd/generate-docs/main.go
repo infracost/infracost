@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/docs"
-	"github.com/infracost/infracost/pkg/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -27,7 +27,6 @@ func getcwd() string {
 }
 
 func main() {
-
 	app := &cli.App{
 		Name:                 "infracost-geneate-docs",
 		Usage:                "Generate infracost documentations",
@@ -65,12 +64,10 @@ func main() {
 			}
 
 			return docs.GenerateDocs(templatesPath, outputPath)
-
 		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
-
 }

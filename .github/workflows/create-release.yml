@@ -1,9 +1,7 @@
 on:
   push:
-    # Sequence of patterns matched against refs/tags
     tags:
-      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
-
+      - "v*"
 name: Upload Release Asset
 
 jobs:
@@ -14,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build project # This would actually build your project, using zip for an example artifact
+      - name: Build project
         run: |
           make release
 
@@ -34,6 +32,15 @@ jobs:
             ./build/infracost-windows-amd64.tar.gz
             ./build/infracost-darwin-amd64.tar.gz
             ./docs/generated/docs.tar.gz
+
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_ORG }}/${{ secrets.DOCKER_REPOSITORY }}
+          tags: latest
+          tag_with_ref: true
 
       - name: Update Homebrew formula
         uses: dawidd6/action-homebrew-bump-formula@v3

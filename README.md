@@ -19,6 +19,7 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 * [Development](#development)
 * [Contributing](#contributing)
 
+<!-- NOTE: When updated also update https://github.com/infracost/docs/blob/master/docs/getting_started.md#installation with the same content -->
 ## Installation
 
 1. Download and install the latest Infracost release
@@ -43,6 +44,12 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
     Docker:
     ```sh
     docker pull infracost/infracost
+    docker run --rm \
+      -e INFRACOST_API_KEY=see_following_steps_on_how_to_get_this \
+      -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+      -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+      -v $PWD/:/code/ infracost/infracost --tfdir /code/
+      # add other required flags for infracost or envs for Terraform
     ```
 
 2.	Use our free hosted API for cloud prices by registering for an API key:
@@ -62,7 +69,7 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
 Generate a cost breakdown from a Terraform directory:
 ```sh
-infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tf"
+infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
 ```
 
 Check the [docs site](https://www.infracost.io/docs/) for more details.

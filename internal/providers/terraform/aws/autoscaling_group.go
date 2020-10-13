@@ -3,7 +3,7 @@ package aws
 import (
 	"fmt"
 
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/shopspring/decimal"
@@ -17,20 +17,6 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 			"See aws_instance",
 		},
 		RFunc: NewAutoscalingGroup,
-	}
-}
-
-func GetLaunchConfigurationRegistryItem() *schema.RegistryItem {
-	return &schema.RegistryItem{
-		Name:   "aws_launch_configuration",
-		NoCost: true,
-	}
-}
-
-func GetLaunchTemplateRegistryItem() *schema.RegistryItem {
-	return &schema.RegistryItem{
-		Name:   "aws_launch_template",
-		NoCost: true,
 	}
 }
 
@@ -53,7 +39,6 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema
 		}
 		multiplyQuantities(lc, desiredCapacity)
 		subResources = append(subResources, lc)
-
 	} else if len(launchTemplateRef) > 0 {
 		onDemandCount := desiredCapacity
 		spotCount := decimal.Zero
@@ -68,7 +53,6 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema
 			return nil
 		}
 		subResources = append(subResources, lt)
-
 	} else if len(mixedInstanceLaunchTemplateRef) > 0 {
 		mixedInstancesPolicy := d.Get("mixed_instances_policy.0")
 		lt := newMixedInstancesAwsLaunchTemplate(mixedInstanceLaunchTemplateRef[0].Address, mixedInstanceLaunchTemplateRef[0], region, desiredCapacity, mixedInstancesPolicy)
@@ -236,7 +220,12 @@ func getInstanceTypeAndCount(mixedInstancePolicyData gjson.Result, capacity deci
 		if override.Get("weighted_capacity").Exists() && override.Get("weighted_capacity").Type != gjson.Null {
 			weightedCapacity = decimal.NewFromInt(override.Get("weighted_capacity").Int())
 		}
-		count = capacity.Div(weightedCapacity).Ceil()
+
+		if weightedCapacity.Equals(decimal.Zero) {
+			count = decimal.Zero
+		} else {
+			count = capacity.Div(weightedCapacity).Ceil()
+		}
 	}
 
 	return instanceType, count
@@ -265,10 +254,10 @@ func calculateOnDemandAndSpotCounts(mixedInstancePolicyData gjson.Result, totalC
 func multiplyQuantities(resource *schema.Resource, multiplier decimal.Decimal) {
 	for _, costComponent := range resource.CostComponents {
 		if costComponent.HourlyQuantity != nil {
-			costComponent.HourlyQuantity = decimalPtr((*costComponent.HourlyQuantity).Mul(multiplier))
+			costComponent.HourlyQuantity = decimalPtr(costComponent.HourlyQuantity.Mul(multiplier))
 		}
 		if costComponent.MonthlyQuantity != nil {
-			costComponent.MonthlyQuantity = decimalPtr((*costComponent.MonthlyQuantity).Mul(multiplier))
+			costComponent.MonthlyQuantity = decimalPtr(costComponent.MonthlyQuantity.Mul(multiplier))
 		}
 	}
 

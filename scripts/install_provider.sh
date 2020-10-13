@@ -41,7 +41,7 @@ version=${version#"v"}
 # If the install path isn't set then use the default Terraform plugin install paths
 if [ -z ${install_path+x} ]; then
   plugin_root_path=${HOME}/.terraform.d/plugins
-  install_path=${plugin_root_path}/infracost.io/infracost/infracost/${version}/${goos}_${goarch}
+  install_path=${plugin_root_path}/registry.terraform.io/infracost/infracost/${version}/${goos}_${goarch}
 
   mkdir -p ${install_path}
   mv ${tmp_dir}/${binary} ${install_path}/${binary}

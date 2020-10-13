@@ -4,24 +4,27 @@ import (
 	"fmt"
 	"os"
 	"runtime/debug"
+	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/spin"
-	"github.com/infracost/infracost/pkg/config"
-	"github.com/infracost/infracost/pkg/version"
+	"github.com/infracost/infracost/internal/update"
+	"github.com/infracost/infracost/internal/version"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/fatih/color"
 	"github.com/urfave/cli/v2"
 )
 
+var spinner *spin.Spinner
+
 func usageError(c *cli.Context, msg string) {
 	fmt.Fprintln(os.Stderr, color.HiRedString(msg)+"\n")
 	c.App.Writer = os.Stderr
 	cli.ShowAppHelpAndExit(c, 1)
 }
-
-var spinner *spin.Spinner
 
 func handleGlobalFlags(c *cli.Context) error {
 	config.Config.NoColor = c.Bool("no-color")
@@ -41,27 +44,44 @@ func handleGlobalFlags(c *cli.Context) error {
 	return nil
 }
 
+func startUpdateCheck(c chan *update.Info) {
+	go func() {
+		updateInfo, err := update.CheckForUpdate()
+		if err != nil {
+			log.Debugf("error checking for update: %v", err)
+		}
+		c <- updateInfo
+		close(c)
+	}()
+}
+
 func versionOutput(app *cli.App) string {
 	s := fmt.Sprintf("Infracost %s", app.Version)
-	v, err := terraform.TerraformVersion()
+	v, err := terraform.Version()
+
 	if err != nil {
 		log.Warnf("error determining Terraform version")
 	} else {
 		s += fmt.Sprintf("\n%s", v)
 	}
+
 	return s
 }
 
-func checkApiKey() bool {
-	infracostApiKey := config.Config.ApiKey
-	if config.Config.PricingAPIEndpoint == config.Config.DefaultPricingAPIEndpoint && infracostApiKey == "" {
+func checkAPIKey() error {
+	infracostAPIKey := config.Config.APIKey
+	if config.Config.PricingAPIEndpoint == config.Config.DefaultPricingAPIEndpoint && infracostAPIKey == "" {
 		red := color.New(color.FgHiRed)
 		bold := color.New(color.Bold, color.FgHiWhite)
-		fmt.Fprintln(os.Stderr, red.Sprint("No INFRACOST_API_KEY environment variable is set."))
-		fmt.Fprintln(os.Stderr, red.Sprintf("We run a free hosted API for cloud prices, to get an API key run"), bold.Sprint("`infracost register`\n"))
-		return false
+
+		return errors.New(fmt.Sprintf("%s\n%s %s",
+			red.Sprint("No INFRACOST_API_KEY environment variable is set."),
+			red.Sprintf("We run a free hosted API for cloud prices, to get an API key run"),
+			bold.Sprint("`infracost register`"),
+		))
 	}
-	return true
+
+	return nil
 }
 
 func main() {
@@ -76,6 +96,9 @@ func main() {
 		fmt.Println(versionOutput(c.App))
 	}
 
+	updateMessageChan := make(chan *update.Info)
+	startUpdateCheck(updateMessageChan)
+
 	app := &cli.App{
 		Name:  "infracost",
 		Usage: "Generate cost reports from Terraform plans",
@@ -83,7 +106,7 @@ func main() {
 
 Example:
 	# Run infracost with a Terraform directory and var file
-	infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tf"
+	infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
 
 	# Run infracost with a JSON Terraform plan file
 	infracost --tfjson /path/to/plan.json
@@ -118,26 +141,63 @@ Example:
 		Action:   defaultCmd.Action,
 	}
 
+	var appErr error
+
 	defer func() {
-		if err := recover(); err != nil {
+		if appErr != nil {
 			if spinner != nil {
 				spinner.Fail()
 			}
+
+			if appErr.Error() != "" {
+				fmt.Fprintf(os.Stderr, "%s\n", color.HiRedString(appErr.Error()))
+			}
+		}
+
+		unexpectedErr := recover()
+		if unexpectedErr != nil {
+			if spinner != nil {
+				spinner.Fail()
+			}
+
 			red := color.New(color.FgHiRed)
 			bold := color.New(color.Bold, color.FgHiWhite)
-			fmt.Fprintln(os.Stderr, red.Sprint("An unexpected error occurred\n"))
-			fmt.Fprintf(os.Stderr, "%s\n%s\n", err, string(debug.Stack()))
-			fmt.Fprintf(os.Stderr, "Environment:\n%s\n", versionOutput(app))
-			fmt.Fprintln(os.Stderr, red.Sprint("\nPlease copy the above output and create a new issue at"), bold.Sprint("https://github.com/infracost/infracost/issues/new"))
+
+			msg := fmt.Sprintf("\n%s\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
+				red.Sprint("An unexpected error occurred"),
+				unexpectedErr,
+				string(debug.Stack()),
+				versionOutput(app),
+				red.Sprint("Please copy the above output and create a new issue at"),
+				bold.Sprint("https://github.com/infracost/infracost/issues/new"),
+			)
+			fmt.Fprint(os.Stderr, msg)
+		}
+
+		updateInfo := <-updateMessageChan
+		if updateInfo != nil {
+			msg := fmt.Sprintf("\n%s %s → %s\n%s\n",
+				color.YellowString("A new version of Infracost is available:"),
+				color.CyanString(version.Version),
+				color.CyanString(updateInfo.LatestVersion),
+				indent(color.YellowString(updateInfo.Cmd), "  "),
+			)
+			fmt.Fprint(os.Stderr, msg)
+		}
+
+		if appErr != nil || unexpectedErr != nil {
+			os.Exit(1)
 		}
 	}()
-	if err := app.Run(os.Args); err != nil {
-		if spinner != nil {
-			spinner.Fail()
-		}
-		if err.Error() != "" {
-			fmt.Fprintln(os.Stderr, color.HiRedString(err.Error()))
-		}
-		os.Exit(1)
+
+	appErr = app.Run(os.Args)
+}
+
+func indent(s, indent string) string {
+	lines := make([]string, 0)
+	for _, j := range strings.Split(s, "\n") {
+		lines = append(lines, indent+j)
 	}
+
+	return strings.Join(lines, "\n")
 }

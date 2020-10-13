@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/infracost/infracost/pkg/config"
-	"github.com/infracost/infracost/pkg/prices"
-	"github.com/infracost/infracost/pkg/schema"
-	"github.com/infracost/infracost/pkg/testutil"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/prices"
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/testutil"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
@@ -79,7 +79,7 @@ func InstallPlugins() error {
 		TerraformDir: tfdir,
 	}
 
-	_, err = terraform.TerraformCmd(opts, "init", "-no-color")
+	_, err = terraform.Cmd(opts, "init", "-no-color")
 	if err != nil {
 		return errors.Wrap(err, "Error initializing Terraform working directory")
 	}
@@ -170,7 +170,7 @@ func writeToTmpDir(project Project) (string, error) {
 			}
 		}
 
-		err = ioutil.WriteFile(fullPath, []byte(terraformFile.Contents), 0644)
+		err = ioutil.WriteFile(fullPath, []byte(terraformFile.Contents), 0600)
 		if err != nil {
 			return tmpDir, err
 		}

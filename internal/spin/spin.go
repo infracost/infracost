@@ -7,7 +7,7 @@ import (
 
 	spinnerpkg "github.com/briandowns/spinner"
 	"github.com/fatih/color"
-	"github.com/infracost/infracost/pkg/config"
+	"github.com/infracost/infracost/internal/config"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -60,6 +60,6 @@ func (s *Spinner) Success() {
 	if config.Config.IsLogging() {
 		log.Infof("completed: %s", s.msg)
 	} else {
-		fmt.Fprintln(os.Stderr, color.HiGreenString("  ✔ %s", s.msg))
+		fmt.Fprintln(os.Stderr, color.GreenString("  ✔ %s", s.msg))
 	}
 }

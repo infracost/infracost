@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/shopspring/decimal"
@@ -31,7 +31,7 @@ func HourlyPriceMultiplierCheck(multiplier decimal.Decimal) CostCheckFunc {
 	return func(t *testing.T, costComponent *schema.CostComponent) {
 		expected := costComponent.Price().Mul(multiplier)
 		if !cmp.Equal(costComponent.HourlyCost(), expected) {
-			t.Errorf("Unexpected hourly cost for %s (expected: %s, got: %s)", costComponent.Name, formatDecimal(expected, "%.4f"), formatDecimal(costComponent.HourlyCost(), "%.4f"))
+			t.Errorf("Unexpected hourly cost for %s (expected: %s, got: %s)", costComponent.Name, formatAmount(expected), formatAmount(costComponent.HourlyCost()))
 		}
 	}
 }
@@ -40,7 +40,7 @@ func MonthlyPriceMultiplierCheck(multiplier decimal.Decimal) CostCheckFunc {
 	return func(t *testing.T, costComponent *schema.CostComponent) {
 		expected := costComponent.Price().Mul(multiplier)
 		if !cmp.Equal(costComponent.MonthlyCost(), expected) {
-			t.Errorf("Unexpected monthly cost for %s (expected: %s, got: %s)", costComponent.Name, formatDecimal(expected, "%.4f"), formatDecimal(costComponent.MonthlyCost(), "%.4f"))
+			t.Errorf("Unexpected monthly cost for %s (expected: %s, got: %s)", costComponent.Name, formatAmount(expected), formatAmount(costComponent.MonthlyCost()))
 		}
 	}
 }
@@ -65,6 +65,9 @@ func TestResources(t *testing.T, resources []*schema.Resource, checks []Resource
 	}
 
 	for _, r := range resources {
+		if r.NoPrice {
+			continue
+		}
 		if m, ok := foundResources[r]; !ok || !m {
 			t.Errorf("Unexpected resource %s", r.Name)
 		}
@@ -124,7 +127,7 @@ func findCostComponent(costComponents []*schema.CostComponent, name string) (boo
 	return false, nil
 }
 
-func formatDecimal(d decimal.Decimal, format string) string {
+func formatAmount(d decimal.Decimal) string {
 	f, _ := d.Float64()
-	return fmt.Sprintf(format, f)
+	return fmt.Sprintf("%.4f", f)
 }

@@ -8,15 +8,15 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/infracost/infracost/pkg/config"
-	"github.com/infracost/infracost/pkg/schema"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
-var InvalidAPIKeyError = errors.New("Invalid API key")
+var ErrInvalidAPIKey = errors.New("Invalid API key")
 
 type PricingAPIError struct {
 	err error
@@ -36,7 +36,7 @@ type queryKey struct {
 	CostComponent *schema.CostComponent
 }
 
-type queryResult struct {
+type QueryResult struct {
 	queryKey
 	Result gjson.Result
 }
@@ -53,13 +53,13 @@ type GraphQLQuery struct {
 }
 
 type QueryRunner interface {
-	RunQueries(resource *schema.Resource) ([]queryResult, error)
+	RunQueries(resource *schema.Resource) ([]QueryResult, error)
 }
 
 type GraphQLQueryRunner struct {
 	baseURL         string
 	graphQLEndpoint string
-	traceId         string
+	traceID         string
 }
 
 func NewGraphQLQueryRunner() *GraphQLQueryRunner {
@@ -70,21 +70,21 @@ func NewGraphQLQueryRunner() *GraphQLQueryRunner {
 	}
 }
 
-func (q *GraphQLQueryRunner) RunQueries(r *schema.Resource) ([]queryResult, error) {
-	q.traceId = uuid.New().String()
+func (q *GraphQLQueryRunner) RunQueries(r *schema.Resource) ([]QueryResult, error) {
+	q.traceID = uuid.New().String()
 
 	keys, queries := q.batchQueries(r)
 
 	if len(queries) == 0 {
 		log.Debugf("Skipping getting pricing details for %s since there are no queries to run", r.Name)
-		return []queryResult{}, nil
+		return []QueryResult{}, nil
 	}
 
 	log.Debugf("Getting pricing details from %s for %s", config.Config.PricingAPIEndpoint, r.Name)
 
 	results, err := q.getQueryResults(queries)
 	if err != nil {
-		return []queryResult{}, err
+		return []QueryResult{}, err
 	}
 
 	return q.zipQueryResults(keys, results), nil
@@ -122,7 +122,7 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 		return results, errors.Wrap(err, "Error generating request for pricing API")
 	}
 
-	req, err := http.NewRequest("POST", q.graphQLEndpoint, bytes.NewBuffer([]byte(queriesBody)))
+	req, err := http.NewRequest("POST", q.graphQLEndpoint, bytes.NewBuffer(queriesBody))
 	if err != nil {
 		return results, errors.Wrap(err, "Error generating request for pricing API")
 	}
@@ -147,7 +147,7 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 			return results, &PricingAPIError{err, "Invalid response from pricing API"}
 		}
 		if r.Error == "Invalid API key" {
-			return results, InvalidAPIKeyError
+			return results, ErrInvalidAPIKey
 		}
 		return results, &PricingAPIError{errors.New(r.Error), "Received error from pricing API"}
 	}
@@ -173,7 +173,7 @@ func (q *GraphQLQueryRunner) ReportMissingPrices(resources []*schema.Resource) {
 		return
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(body)))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	if err != nil {
 		log.Debugf("Unable to generate missing prices request: %v", err)
 		return
@@ -197,12 +197,12 @@ func (q *GraphQLQueryRunner) ReportMissingPrices(resources []*schema.Resource) {
 func (q *GraphQLQueryRunner) addHeaders(req *http.Request) {
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("User-Agent", config.GetUserAgent())
-	req.Header.Set("X-Api-Key", config.Config.ApiKey)
-	req.Header.Set("X-Trace-Id", q.traceId)
+	req.Header.Set("X-Api-Key", config.Config.APIKey)
+	req.Header.Set("X-Trace-Id", q.traceID)
 }
 
-// Batch all the queries for this resource so we can use one GraphQL call
-// Use queryKeys to keep track of which query maps to which sub-resource and price component
+// Batch all the queries for this resource so we can use one GraphQL call.
+// Use queryKeys to keep track of which query maps to which sub-resource and price component.
 func (q *GraphQLQueryRunner) batchQueries(r *schema.Resource) ([]queryKey, []GraphQLQuery) {
 	keys := make([]queryKey, 0)
 	queries := make([]GraphQLQuery, 0)
@@ -222,11 +222,11 @@ func (q *GraphQLQueryRunner) batchQueries(r *schema.Resource) ([]queryKey, []Gra
 	return keys, queries
 }
 
-func (q *GraphQLQueryRunner) zipQueryResults(k []queryKey, r []gjson.Result) []queryResult {
-	res := make([]queryResult, 0, len(k))
+func (q *GraphQLQueryRunner) zipQueryResults(k []queryKey, r []gjson.Result) []QueryResult {
+	res := make([]QueryResult, 0, len(k))
 
 	for i, k := range k {
-		res = append(res, queryResult{
+		res = append(res, QueryResult{
 			queryKey: k,
 			Result:   r[i],
 		})
