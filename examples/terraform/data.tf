@@ -7,6 +7,7 @@ terraform {
     # Install terraform-provider-infracost
     infracost = {
       source = "infracost/infracost"
+      version = ">= 0.0.5"
     }
   }
 }
