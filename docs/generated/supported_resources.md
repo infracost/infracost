@@ -28,6 +28,7 @@ Support for the following is not currently included:
 | `aws_lb` |  |
 | `aws_nat_gateway` |  |
 | `aws_rds_cluster_instance` |  |
+| `aws_sqs_queue` |  |
 
 
 ## The resource I want isn't supported

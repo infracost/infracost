@@ -58,3 +58,26 @@ data "infracost_aws_lambda_function" "lambda" {
     value = 250
   }
 }
+
+resource "aws_sqs_queue" "standard" {
+  name = "standard_queue"
+  fifo_queue = false
+}
+
+resource "aws_sqs_queue" "fifo" {
+  name = "fifo_queue"
+  fifo_queue = true
+}
+
+# Use the infracost provider to get cost estimates for SQS requests.
+data "infracost_aws_sqs_queue" "queue" {
+  resources = [aws_sqs_queue.standard.id, aws_sqs_queue.fifo.id]
+
+  monthly_requests {
+    value = 1000000
+  }
+
+  request_size {
+    value = 64
+  }
+}
