@@ -20,4 +20,5 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetALBRegistryItem(),
 	GetNATGatewayRegistryItem(),
 	GetRDSClusterInstanceRegistryItem(),
+	GetSQSQueueRegistryItem(),
 }
