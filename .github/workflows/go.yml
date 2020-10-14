@@ -26,17 +26,6 @@ jobs:
       run: |
         go get -v -t -d ./...
 
-    - name: Check out terraform-provider-infracost@master
-      uses: actions/checkout@v2
-      with:
-        repository: infracost/terraform-provider-infracost
-        ref: refs/heads/master
-        path: terraform-provider-infracost
-
-    - name: Install terraform-provider-infracost
-      run: sudo make install
-      working-directory: terraform-provider-infracost
-
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v1.2.1
       with:
