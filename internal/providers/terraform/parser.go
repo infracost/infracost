@@ -56,8 +56,9 @@ func parsePlanJSON(j []byte) ([]*schema.Resource, error) {
 	providerConf := p.Get("configuration.provider_config")
 	planVals := p.Get("planned_values.root_module")
 	conf := p.Get("configuration.root_module")
+	vars := p.Get("variables")
 
-	resData := parseResourceData(providerConf, planVals, conf)
+	resData := parseResourceData(providerConf, planVals, conf, vars)
 	parseReferences(resData, conf)
 	resUsage := buildUsageResourceDataMap(resData)
 	resData = stripInfracostResources(resData)
@@ -71,8 +72,8 @@ func parsePlanJSON(j []byte) ([]*schema.Resource, error) {
 	return resources, nil
 }
 
-func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result) map[string]*schema.ResourceData {
-	defaultRegion := parseProviderRegion(providerConf, "aws")
+func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, vars gjson.Result) map[string]*schema.ResourceData {
+	defaultRegion := parseProviderRegion(providerConf, "aws", vars)
 	if defaultRegion == "" {
 		defaultRegion = "us-east-1"
 	}
@@ -92,7 +93,7 @@ func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result) m
 
 		providerKey := parseProviderKey(resConf)
 		if providerKey != "aws" && providerKey != "" {
-			provRegion := parseProviderRegion(providerConf, providerKey)
+			provRegion := parseProviderRegion(providerConf, providerKey, vars)
 			// Note: if the provider is passed to a module using a different alias
 			// then there's no way to detect this so we just have to fallback to
 			// the default provider
@@ -113,7 +114,7 @@ func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result) m
 
 	// Recursively add any resources for child modules
 	for _, m := range planVals.Get("child_modules").Array() {
-		for addr, d := range parseResourceData(providerConf, m, conf) {
+		for addr, d := range parseResourceData(providerConf, m, conf, vars) {
 			resources[addr] = d
 		}
 	}
@@ -128,8 +129,23 @@ func parseProviderKey(resConf gjson.Result) string {
 	return p[len(p)-1]
 }
 
-func parseProviderRegion(providerConfig gjson.Result, providerKey string) string {
-	return providerConfig.Get(fmt.Sprintf("%s.expressions.region.constant_value", gjsonEscape(providerKey))).String()
+func parseProviderRegion(providerConfig gjson.Result, providerKey string, vars gjson.Result) string {
+	// Try to get constant value
+	region := providerConfig.Get(fmt.Sprintf("%s.expressions.region.constant_value", gjsonEscape(providerKey))).String()
+	if region == "" {
+		// Try to get reference
+		referenceName := providerConfig.Get(fmt.Sprintf("%s.expressions.region.references.0", gjsonEscape(providerKey))).String()
+		splittedReference := strings.Split(referenceName, ".")
+		if splittedReference[0] == "var" {
+			// Get the region from variables
+			variableName := strings.Join(splittedReference[1:], ".")
+			region = vars.Get(fmt.Sprintf("%s.value", variableName)).String()
+		}
+	}
+	if region == "" {
+		log.Error("Failed to identify region")
+	}
+	return region
 }
 
 func buildUsageResourceDataMap(resData map[string]*schema.ResourceData) map[string]*schema.ResourceData {
