@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -76,11 +77,14 @@ func defaultCmd() *cli.Command {
 				bold := color.New(color.Bold, color.FgHiWhite)
 
 				if e := unwrapped(err); errors.Is(e, prices.ErrInvalidAPIKey) {
-					return errors.New(fmt.Sprintf("%v\n%s %s %s",
+					return errors.New(fmt.Sprintf("%v\n%s %s %s %s %s\n%s",
 						e.Error(),
 						red.Sprint("Please check your"),
+						bold.Sprint(config.ConfigFilePath()),
+						red.Sprint("file or"),
 						bold.Sprint("INFRACOST_API_KEY"),
-						red.Sprint("environment variable. If you continue having issues please email hello@infracost.io"),
+						red.Sprint("environment variable."),
+						red.Sprint("If you continue having issues please email hello@infracost.io"),
 					))
 				}
 

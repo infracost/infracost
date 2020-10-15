@@ -17,7 +17,8 @@ import (
 )
 
 type createAPIKeyResponse struct {
-	Error string `json:"error"`
+	APIKey string `json:"apiKey"`
+	Error  string `json:"error"`
 }
 
 func registerCmd() *cli.Command {
@@ -50,8 +51,54 @@ func registerCmd() *cli.Command {
 				return nil
 			}
 
-			color.Green("Thank you %s!", name)
-			color.Green("Your API key has been sent to %s\n", email)
+			conf, err := config.ReadConfigFileIfExists()
+			if err != nil {
+				return err
+			}
+
+			fmt.Printf("\nThank you %s!\nYour API key is: %s\nA copy of your API key has been emailed to %s\n", name, r.APIKey, email)
+
+			green := color.New(color.FgGreen)
+			bold := color.New(color.Bold, color.FgHiWhite)
+
+			msg := fmt.Sprintf("\n%s\n%s %s %s\n",
+				green.Sprintf("Your API key has been saved to %s", config.ConfigFilePath()),
+				green.Sprint("You can now run"),
+				bold.Sprint("`infracost`"),
+				green.Sprint("in your Terraform code directory."),
+			)
+
+			saveAPIKey := true
+
+			if conf.APIKey != "" {
+				fmt.Printf("\nYou already have an Infracost API key saved in %s\n", config.ConfigFilePath())
+				confirm, err := promptOverwriteAPIKey()
+				if err != nil {
+					return err
+				}
+
+				if !confirm {
+					saveAPIKey = false
+					msg = fmt.Sprintf("\n%s\n%s %s %s\n",
+						green.Sprint("You can use this API key by setting the INFRACOST_API_KEY environment variable."),
+						green.Sprint("You can then run"),
+						bold.Sprint("`infracost`"),
+						green.Sprint("in your Terraform code directory."),
+					)
+				}
+			}
+
+			if saveAPIKey {
+				conf.APIKey = r.APIKey
+
+				err = config.WriteConfigFile(conf)
+				if err != nil {
+					return err
+				}
+			}
+
+			fmt.Print(msg)
+
 			return nil
 		},
 	}
@@ -70,6 +117,7 @@ func promptForName() (string, error) {
 	}
 	name, err := p.Run()
 	name = strings.TrimSpace(name)
+
 	return name, err
 }
 
@@ -93,16 +141,37 @@ func promptForEmail() (string, error) {
 	}
 	email, err := p.Run()
 	email = strings.TrimSpace(email)
+
 	return email, err
+}
+
+func promptOverwriteAPIKey() (bool, error) {
+	p := promptui.Prompt{
+		Label:     "Would you like to overwrite your existing saved API key",
+		IsConfirm: true,
+	}
+
+	_, err := p.Run()
+	if err != nil {
+		if errors.Is(err, promptui.ErrAbort) {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
 }
 
 func createAPIKey(name string, email string) (*createAPIKeyResponse, error) {
 	url := fmt.Sprintf("%s/apiKeys?source=cli-register", config.Config.DashboardAPIEndpoint)
 	d := map[string]string{"name": name, "email": email}
+
 	j, err := json.Marshal(d)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error generating API key request")
 	}
+
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(j))
 	if err != nil {
 		return nil, errors.Wrap(err, "Error generating API key request")
@@ -113,6 +182,7 @@ func createAPIKey(name string, email string) (*createAPIKeyResponse, error) {
 
 	client := http.Client{}
 	resp, err := client.Do(req)
+
 	if err != nil {
 		return nil, errors.Wrap(err, "Error sending API key request")
 	}
@@ -122,7 +192,9 @@ func createAPIKey(name string, email string) (*createAPIKeyResponse, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "Invalid response from API")
 	}
+
 	var r createAPIKeyResponse
+
 	err = json.Unmarshal(body, &r)
 	if err != nil {
 		return nil, errors.Wrap(err, "Invalid response from API")
