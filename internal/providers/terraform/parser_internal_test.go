@@ -79,7 +79,7 @@ func TestParseResourceData(t *testing.T) {
 				"alias": "europe",
 				"expressions": {
 					"region": {
-						"constant_value": "eu-west-2"
+						"references": ["var.reg_var"]
 					}
 				}
 			},
@@ -193,7 +193,11 @@ func TestParseResourceData(t *testing.T) {
 
 	vars := gjson.Result{
 		Type: gjson.JSON,
-		Raw:  "{}",
+		Raw: `{
+				"reg_var": {
+					"value": "eu-west-2"
+				}
+			}`,
 	}
 
 	expected := map[string]*schema.ResourceData{
