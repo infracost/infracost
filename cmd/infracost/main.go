@@ -27,8 +27,10 @@ func usageError(c *cli.Context, msg string) {
 }
 
 func handleGlobalFlags(c *cli.Context) error {
-	config.Config.NoColor = c.Bool("no-color")
-	color.NoColor = c.Bool("no-color")
+	if c.IsSet("no-color") {
+		config.Config.NoColor = c.Bool("no-color")
+	}
+	color.NoColor = config.Config.NoColor
 
 	if c.IsSet("log-level") {
 		err := config.Config.SetLogLevel(c.String("log-level"))
@@ -119,17 +121,14 @@ Example:
 			&cli.StringFlag{
 				Name:  "log-level",
 				Usage: "Log level (trace, debug, info, warn, error, fatal)",
-				Value: "",
 			},
 			&cli.BoolFlag{
 				Name:  "no-color",
 				Usage: "Turn off colored output",
-				Value: false,
 			},
 			&cli.StringFlag{
 				Name:  "pricing-api-endpoint",
 				Usage: "Specify an alternate price list API URL",
-				Value: config.Config.PricingAPIEndpoint,
 			},
 		}, defaultCmd.Flags...),
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
@@ -150,7 +149,7 @@ Example:
 			}
 
 			if appErr.Error() != "" {
-				fmt.Fprintf(os.Stderr, "%s\n", color.HiRedString(appErr.Error()))
+				fmt.Fprintf(os.Stderr, "\n%s\n", color.HiRedString(appErr.Error()))
 			}
 		}
 
