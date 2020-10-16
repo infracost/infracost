@@ -134,16 +134,16 @@ func parseProviderRegion(providerConfig gjson.Result, providerKey string, vars g
 	region := providerConfig.Get(fmt.Sprintf("%s.expressions.region.constant_value", gjsonEscape(providerKey))).String()
 	if region == "" {
 		// Try to get reference
-		referenceName := providerConfig.Get(fmt.Sprintf("%s.expressions.region.references.0", gjsonEscape(providerKey))).String()
-		splittedReference := strings.Split(referenceName, ".")
-		if splittedReference[0] == "var" {
+		refName := providerConfig.Get(fmt.Sprintf("%s.expressions.region.references.0", gjsonEscape(providerKey))).String()
+		splitRef := strings.Split(refName, ".")
+		if splitRef[0] == "var" {
 			// Get the region from variables
-			variableName := strings.Join(splittedReference[1:], ".")
-			region = vars.Get(fmt.Sprintf("%s.value", variableName)).String()
+			varName := strings.Join(splitRef[1:], ".")
+			varContent := vars.Get(fmt.Sprintf("%s.value", varName))
+			if !varContent.IsObject() && !varContent.IsArray() {
+				region = varContent.String()
+			}
 		}
-	}
-	if region == "" {
-		log.Error("Failed to identify region")
 	}
 	return region
 }
