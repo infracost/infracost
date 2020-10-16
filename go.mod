@@ -5,7 +5,6 @@ go 1.15
 require (
 	github.com/briandowns/spinner v1.11.1
 	github.com/fatih/color v1.9.0
-	github.com/google/go-cmp v0.5.2
 	github.com/google/uuid v1.1.2
 	github.com/joho/godotenv v1.3.0
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
