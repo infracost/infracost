@@ -149,7 +149,7 @@ Example:
 			}
 
 			if appErr.Error() != "" {
-				fmt.Fprintf(os.Stderr, "\n%s\n", color.HiRedString(appErr.Error()))
+				fmt.Fprintf(os.Stderr, "%s\n", color.HiRedString(appErr.Error()))
 			}
 		}
 
