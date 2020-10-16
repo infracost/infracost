@@ -191,6 +191,11 @@ func TestParseResourceData(t *testing.T) {
 		}`,
 	}
 
+	vars := gjson.Result{
+		Type: gjson.JSON,
+		Raw:  "{}",
+	}
+
 	expected := map[string]*schema.ResourceData{
 		"aws_instance.instance1": {
 			Address:      "aws_instance.instance1",
@@ -221,7 +226,7 @@ func TestParseResourceData(t *testing.T) {
 		"module.module1.aws_nat_gateway.nat2": "eu-west-2",
 	}
 
-	actual := parseResourceData(providerConf, planVals, conf)
+	actual := parseResourceData(providerConf, planVals, conf, vars)
 
 	for k, v := range actual {
 		assert.Equal(t, expected[k].Address, v.Address)
