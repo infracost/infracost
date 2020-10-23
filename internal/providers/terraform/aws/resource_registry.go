@@ -17,6 +17,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetInstanceRegistryItem(),
 	GetLambdaFunctionRegistryItem(),
 	GetLBRegistryItem(),
+	GetLightsailInstanceRegistryItem(),
 	GetALBRegistryItem(),
 	GetNATGatewayRegistryItem(),
 	GetRDSClusterInstanceRegistryItem(),
