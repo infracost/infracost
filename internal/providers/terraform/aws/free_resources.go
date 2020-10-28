@@ -58,6 +58,9 @@ var (
 		"aws_iam_server_certificate",
 		"aws_iam_user",
 
+		// Route53
+		"aws_route53_zone_association",
+
 		// VPC
 		"aws_customer_gateway",
 		"aws_default_network_acl",

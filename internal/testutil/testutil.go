@@ -45,6 +45,9 @@ func TestResources(t *testing.T, resources []*schema.Resource, checks []Resource
 	for _, check := range checks {
 		found, r := findResource(resources, check.Name)
 		assert.True(t, found, fmt.Sprintf("resource %s not found", check.Name))
+		if !found {
+			continue
+		}
 
 		foundResources[r] = true
 
@@ -72,6 +75,9 @@ func TestCostComponents(t *testing.T, costComponents []*schema.CostComponent, ch
 	for _, check := range checks {
 		found, c := findCostComponent(costComponents, check.Name)
 		assert.True(t, found, fmt.Sprintf("cost component %s not found", check.Name))
+		if !found {
+			continue
+		}
 
 		foundCostComponents[c] = true
 
