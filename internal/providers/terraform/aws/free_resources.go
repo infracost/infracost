@@ -98,6 +98,25 @@ var (
 		"aws_vpn_gateway_attachment",
 		"aws_vpn_gateway_route_propagation",
 
+		// Elastic Load Balancing
+		"aws_alb_listener",
+		"aws_alb_listener_certificate",
+		"aws_alb_listener_rule",
+		"aws_alb_target_group",
+		"aws_alb_target_group_attachment",
+		"aws_lb_listener",
+		"aws_lb_listener_certificate",
+		"aws_lb_listener_rule",
+		"aws_lb_target_group",
+		"aws_lb_target_group_attachment",
+		"aws_app_cookie_stickiness_policy",
+		"aws_elb_attachment",
+		"aws_lb_cookie_stickiness_policy",
+		"aws_lb_ssl_negotiation_policy",
+		"aws_load_balancer_backend_server_policy",
+		"aws_load_balancer_listener_policy",
+		"aws_load_balancer_policy",
+
 		// Others
 		"aws_launch_configuration",
 		"aws_launch_template",
