@@ -14,7 +14,8 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name: "aws_autoscaling_group",
 		Notes: []string{
-			"See aws_instance",
+			"S3 replication time control data transfer is not supported by Terraform.",
+			"S3 batch operations are not supported by Terraform.",
 		},
 		RFunc: NewAutoscalingGroup,
 	}

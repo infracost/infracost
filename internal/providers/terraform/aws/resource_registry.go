@@ -23,5 +23,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetRDSClusterInstanceRegistryItem(),
 	GetRoute53RecordRegistryItem(),
 	GetRoute53ZoneRegistryItem(),
+	GetS3BucketRegistryItem(),
+	GetS3BucketAnalyticsConfigurationRegistryItem(),
+	GetS3BucketInventoryRegistryItem(),
 	GetSQSQueueRegistryItem(),
 }
