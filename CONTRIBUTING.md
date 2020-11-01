@@ -141,7 +141,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - count: do not include the count in the Infracost name. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
 
-- units: use plural, e.g. hours, requests, GB-months. For a "unit per something", use singular per time unit, e.g. use GB/month, not GB/months.
+- units: use plural, e.g. hours, requests, GB-months. For a "unit per something", use singular per time unit, e.g. use GB-month, not GB-months.
 
 - purchase options: if applicable, include "on-demand" in brackets after the cost component name, e.g. `Database instance (on-demand`
 
