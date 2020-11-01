@@ -39,8 +39,8 @@ func NewNATGateway(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 				},
 			},
 			{
-				Name:            "Per GB data processed",
-				Unit:            "GB/month",
+				Name:            "Data processed",
+				Unit:            "GBs",
 				MonthlyQuantity: &gbDataProcessed,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

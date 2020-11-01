@@ -311,7 +311,7 @@ func restoreCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schem
 	}
 	return &schema.CostComponent{
 		Name:            "Restore data size",
-		Unit:            "GB",
+		Unit:            "GBs",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
