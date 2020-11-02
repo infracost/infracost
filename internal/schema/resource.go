@@ -90,14 +90,6 @@ func SortResources(resources []*Resource) {
 	sort.Slice(resources, func(i, j int) bool {
 		return resources[i].Name < resources[j].Name
 	})
-
-	for _, r := range resources {
-		SortResources(r.SubResources)
-
-		sort.Slice(r.CostComponents, func(i, j int) bool {
-			return r.CostComponents[i].Name < r.CostComponents[j].Name
-		})
-	}
 }
 
 func GenerateResourceSummary(resources []*Resource) *ResourceSummary {
