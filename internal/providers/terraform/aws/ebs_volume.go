@@ -58,6 +58,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 		{
 			Name:            name,
 			Unit:            "GB-months",
+			UnitMultiplier:  1,
 			MonthlyQuantity: &gbVal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -75,6 +76,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Provisioned IOPS",
 			Unit:            "IOPS-months",
+			UnitMultiplier:  1,
 			MonthlyQuantity: &iopsVal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -91,9 +93,9 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 
 	if volumeAPIName == "standard" {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "I/O requests",
-			Unit:            "Per request",
-			MonthlyQuantity: decimalPtr(decimal.Zero),
+			Name:           "I/O requests",
+			Unit:           "request",
+			UnitMultiplier: 1000000,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),

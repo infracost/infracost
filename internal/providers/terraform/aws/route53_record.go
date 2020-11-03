@@ -2,8 +2,6 @@ package aws
 
 import (
 	"github.com/infracost/infracost/internal/schema"
-
-	"github.com/shopspring/decimal"
 )
 
 func GetRoute53RecordRegistryItem() *schema.RegistryItem {
@@ -36,7 +34,7 @@ func NewRoute53Record(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 			{
 				Name:           usageName,
 				Unit:           "queries",
-				HourlyQuantity: decimalPtr(decimal.Zero),
+				UnitMultiplier: 1000000,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Service:       strPtr("AmazonRoute53"),

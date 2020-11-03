@@ -6,8 +6,6 @@ import (
 	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
-
-	"github.com/shopspring/decimal"
 )
 
 func TestRoute53Record(t *testing.T) {
@@ -98,9 +96,9 @@ func TestRoute53Record(t *testing.T) {
 			Name: "aws_route53_record.standard",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Standard queries",
-					PriceHash:       "c07c948553cc6492cc58c7b53b8dfdf2-ce48854e53280eca3824bf5039878612",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "Standard queries",
+					PriceHash:        "c07c948553cc6492cc58c7b53b8dfdf2-ce48854e53280eca3824bf5039878612",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},
@@ -108,9 +106,9 @@ func TestRoute53Record(t *testing.T) {
 			Name: "aws_route53_record.geo",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Geo DNS queries",
-					PriceHash:       "1565af203c9c0e9a59815a64b9c484d0-ce48854e53280eca3824bf5039878612",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "Geo DNS queries",
+					PriceHash:        "1565af203c9c0e9a59815a64b9c484d0-ce48854e53280eca3824bf5039878612",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},
@@ -118,9 +116,9 @@ func TestRoute53Record(t *testing.T) {
 			Name: "aws_route53_record.latency",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Latency based routing queries",
-					PriceHash:       "82e2ac0a19cdd4c54fea556c3f8c3892-ce48854e53280eca3824bf5039878612",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "Latency based routing queries",
+					PriceHash:        "82e2ac0a19cdd4c54fea556c3f8c3892-ce48854e53280eca3824bf5039878612",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},
@@ -128,9 +126,9 @@ func TestRoute53Record(t *testing.T) {
 			Name: "aws_route53_record.alias2",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Standard queries",
-					PriceHash:       "c07c948553cc6492cc58c7b53b8dfdf2-ce48854e53280eca3824bf5039878612",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "Standard queries",
+					PriceHash:        "c07c948553cc6492cc58c7b53b8dfdf2-ce48854e53280eca3824bf5039878612",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},

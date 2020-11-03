@@ -62,6 +62,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 		{
 			Name:           fmt.Sprintf("Instance (on-demand, %s)", instanceType),
 			Unit:           "hours",
+			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -80,6 +81,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 		{
 			Name:            "Storage",
 			Unit:            "GB-months",
+			UnitMultiplier:  1,
 			MonthlyQuantity: &gbVal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -101,6 +103,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Storage IOPS",
 			Unit:            "IOPS-months",
+			UnitMultiplier:  1,
 			MonthlyQuantity: &iopsVal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -122,6 +125,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           fmt.Sprintf("Dedicated Master Instance (on-demand, %s)", dedicatedMasterType),
 			Unit:           "hours",
+			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(dedicatedMasterCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -143,6 +147,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *sch
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           fmt.Sprintf("Ultrawarm Instance (on-demand, %s)", ultrawarmType),
 			Unit:           "hours",
+			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(ultrawarmCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

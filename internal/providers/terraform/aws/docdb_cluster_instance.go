@@ -24,6 +24,7 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *sc
 		{
 			Name:           fmt.Sprintf("Database instance (%s, %s)", "on-demand", instanceType),
 			Unit:           "hours",
+			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -39,8 +40,9 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *sc
 			},
 		},
 		{
-			Name: "Storage",
-			Unit: "GB-months",
+			Name:           "Storage",
+			Unit:           "GB-months",
+			UnitMultiplier: 1,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -55,8 +57,9 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *sc
 			},
 		},
 		{
-			Name: "I/O",
-			Unit: "requests",
+			Name:           "I/O",
+			Unit:           "requests",
+			UnitMultiplier: 1000000,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -68,8 +71,9 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *sc
 			},
 		},
 		{
-			Name: "Backup storage",
-			Unit: "GB-months",
+			Name:           "Backup storage",
+			Unit:           "GB-months",
+			UnitMultiplier: 1,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -84,8 +88,9 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *sc
 
 	if strings.HasPrefix(instanceType, "db.t3.") {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name: "CPU credits",
-			Unit: "vCPU-hours",
+			Name:           "CPU credits",
+			Unit:           "vCPU-hours",
+			UnitMultiplier: 1,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),

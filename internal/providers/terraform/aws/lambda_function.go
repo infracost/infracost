@@ -17,22 +17,23 @@ func GetLambdaFunctionRegistryItem() *schema.RegistryItem {
 func NewLambdaFunction(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
-	monthlyRequests := decimal.Zero
-	if u != nil && u.Get("monthly_requests.0.value").Exists() {
-		monthlyRequests = decimal.NewFromFloat(u.Get("monthly_requests.0.value").Float())
-	}
-
 	memorySize := decimal.NewFromInt(128)
 	if d.Get("memory_size").Exists() {
 		memorySize = decimal.NewFromInt(d.Get("memory_size").Int())
 	}
 
-	averageRequestDuration := decimal.Zero
+	averageRequestDuration := decimal.NewFromInt(100)
 	if u != nil && u.Get("average_request_duration.0.value").Exists() {
 		averageRequestDuration = decimal.NewFromFloat(u.Get("average_request_duration.0.value").Float())
 	}
 
-	gbSeconds := calculateGBSeconds(memorySize, averageRequestDuration, monthlyRequests)
+	var monthlyRequests *decimal.Decimal
+	var gbSeconds *decimal.Decimal
+
+	if u != nil && u.Get("monthly_requests.0.value").Exists() {
+		monthlyRequests = decimalPtr(decimal.NewFromFloat(u.Get("monthly_requests.0.value").Float()))
+		gbSeconds = decimalPtr(calculateGBSeconds(memorySize, averageRequestDuration, *monthlyRequests))
+	}
 
 	return &schema.Resource{
 		Name: d.Address,
@@ -40,7 +41,8 @@ func NewLambdaFunction(d *schema.ResourceData, u *schema.ResourceData) *schema.R
 			{
 				Name:            "Requests",
 				Unit:            "requests",
-				MonthlyQuantity: &monthlyRequests,
+				UnitMultiplier:  1000000,
+				MonthlyQuantity: monthlyRequests,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(region),
@@ -55,7 +57,8 @@ func NewLambdaFunction(d *schema.ResourceData, u *schema.ResourceData) *schema.R
 			{
 				Name:            "Duration",
 				Unit:            "GB-seconds",
-				MonthlyQuantity: &gbSeconds,
+				UnitMultiplier:  1,
+				MonthlyQuantity: gbSeconds,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(region),

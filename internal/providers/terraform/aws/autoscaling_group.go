@@ -126,57 +126,55 @@ func newLaunchTemplate(name string, d *schema.ResourceData, region string, onDem
 
 	if d.Get("ebs_optimized").Bool() {
 		c := ebsOptimizedCostComponent(d)
-		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(totalCount))
 		costComponents = append(costComponents, c)
 	}
 
 	if d.Get("elastic_inference_accelerator.0.type").Exists() {
 		c := elasticInferenceAcceleratorCostComponent(d)
-		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(totalCount))
 		costComponents = append(costComponents, c)
 	}
 
 	if d.Get("monitoring.0.enabled").Bool() {
 		c := detailedMonitoringCostComponent(d)
-		c.MonthlyQuantity = decimalPtr(c.MonthlyQuantity.Mul(totalCount))
 		costComponents = append(costComponents, c)
 	}
 
 	c := cpuCreditsCostComponent(d)
 	if c != nil {
-		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(totalCount))
-		costComponents = append(costComponents, c)
-	}
-
-	if onDemandCount.GreaterThan(decimal.Zero) {
-		c := computeCostComponent(d, "on_demand", tenancy)
-		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(onDemandCount))
-		costComponents = append(costComponents, c)
-	}
-
-	if spotCount.GreaterThan(decimal.Zero) {
-		c := computeCostComponent(d, "spot", tenancy)
-		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(spotCount))
 		costComponents = append(costComponents, c)
 	}
 
 	subResources := make([]*schema.Resource, 0)
 	rootBlockDevice := newRootBlockDevice(d.Get("root_block_device.0"), region)
-	multiplyQuantities(rootBlockDevice, totalCount)
 	subResources = append(subResources, rootBlockDevice)
 
 	for i, blockDeviceMappingData := range d.Get("block_device_mappings.#.ebs|@flatten").Array() {
 		name := fmt.Sprintf("block_device_mapping[%d]", i)
 		ebsBlockDevice := newEbsBlockDevice(name, blockDeviceMappingData, region)
-		multiplyQuantities(ebsBlockDevice, totalCount)
 		subResources = append(subResources, ebsBlockDevice)
 	}
 
-	return &schema.Resource{
+	r := &schema.Resource{
 		Name:           name,
 		SubResources:   subResources,
 		CostComponents: costComponents,
 	}
+
+	multiplyQuantities(r, totalCount)
+
+	if spotCount.GreaterThan(decimal.Zero) {
+		c := computeCostComponent(d, "spot", tenancy)
+		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(spotCount))
+		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
+	}
+
+	if onDemandCount.GreaterThan(decimal.Zero) {
+		c := computeCostComponent(d, "on_demand", tenancy)
+		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(onDemandCount))
+		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
+	}
+
+	return r
 }
 
 func newMixedInstancesAwsLaunchTemplate(name string, d *schema.ResourceData, region string, desiredCapacity decimal.Decimal, mixedInstancePolicyData gjson.Result) *schema.Resource {
@@ -197,6 +195,7 @@ func elasticInferenceAcceleratorCostComponent(d *schema.ResourceData) *schema.Co
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Inference accelerator (%s)", deviceType),
 		Unit:           "hours",
+		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
