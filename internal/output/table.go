@@ -67,7 +67,7 @@ func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 	}
 
 	t.Append([]string{
-		"OVERALL TOTAL",
+		"OVERALL TOTAL (USD)",
 		"",
 		"",
 		"",
