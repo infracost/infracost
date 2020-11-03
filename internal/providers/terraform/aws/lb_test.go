@@ -37,8 +37,8 @@ func TestLB(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "Load balancer capacity units",
-					PriceHash:       "5e46c73490aa808461d404c240a93a46-61920ce57954036e90af0b70fee47683",
+					Name:             "Load balancer capacity units",
+					PriceHash:        "5e46c73490aa808461d404c240a93a46-61920ce57954036e90af0b70fee47683",
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
@@ -52,8 +52,8 @@ func TestLB(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "Load balancer capacity units",
-					PriceHash:       "5e46c73490aa808461d404c240a93a46-61920ce57954036e90af0b70fee47683",
+					Name:             "Load balancer capacity units",
+					PriceHash:        "5e46c73490aa808461d404c240a93a46-61920ce57954036e90af0b70fee47683",
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
@@ -67,8 +67,8 @@ func TestLB(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "Load balancer capacity units",
-					PriceHash:       "fdf585c47c7b32f80c2290b91e06eed9-61920ce57954036e90af0b70fee47683",
+					Name:             "Load balancer capacity units",
+					PriceHash:        "fdf585c47c7b32f80c2290b91e06eed9-61920ce57954036e90af0b70fee47683",
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
