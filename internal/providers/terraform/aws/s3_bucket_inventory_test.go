@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/infracost/infracost/internal/testutil"
-	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
@@ -55,7 +54,7 @@ func TestS3BucketInventoryConfiguration(t *testing.T) {
 				{
 					Name:             "Objects listed",
 					PriceHash:        "aa0cc6c33dc5c333d4d8c7333505aadb-262e24dae0e085b444e6d3d16fd79991",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},

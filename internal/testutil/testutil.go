@@ -29,13 +29,19 @@ type CostComponentCheck struct {
 
 func HourlyPriceMultiplierCheck(multiplier decimal.Decimal) CostCheckFunc {
 	return func(t *testing.T, c *schema.CostComponent) {
-		assert.Equal(t, formatAmount(c.Price().Mul(multiplier)), formatAmount(c.HourlyCost()), fmt.Sprintf("unexpected hourly cost for %s", c.Name))
+		assert.Equal(t, formatAmount(c.Price().Mul(multiplier)), formatCost(c.HourlyCost), fmt.Sprintf("unexpected hourly cost for %s", c.Name))
 	}
 }
 
 func MonthlyPriceMultiplierCheck(multiplier decimal.Decimal) CostCheckFunc {
 	return func(t *testing.T, c *schema.CostComponent) {
-		assert.Equal(t, formatAmount(c.Price().Mul(multiplier)), formatAmount(c.MonthlyCost()), fmt.Sprintf("unexpected monthly cost for %s", c.Name))
+		assert.Equal(t, formatAmount(c.Price().Mul(multiplier)), formatCost(c.MonthlyCost), fmt.Sprintf("unexpected monthly cost for %s", c.Name))
+	}
+}
+
+func NilMonthlyCostCheck() CostCheckFunc {
+	return func(t *testing.T, c *schema.CostComponent) {
+		assert.Nil(t, c.MonthlyCost, fmt.Sprintf("unexpected monthly cost for %s", c.Name))
 	}
 }
 
@@ -125,4 +131,11 @@ func findCostComponent(costComponents []*schema.CostComponent, name string) (boo
 func formatAmount(d decimal.Decimal) string {
 	f, _ := d.Float64()
 	return fmt.Sprintf("%.4f", f)
+}
+
+func formatCost(d *decimal.Decimal) string {
+	if d == nil {
+		return "-"
+	}
+	return formatAmount(*d)
 }

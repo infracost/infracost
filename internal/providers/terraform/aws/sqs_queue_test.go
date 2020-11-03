@@ -26,9 +26,9 @@ func TestSQSQueueFunction(t *testing.T) {
 			Name: "aws_sqs_queue.standard",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Requests",
-					PriceHash:       "4544b62fe649690f32a140f29a64d503-4a9dfd3965ffcbab75845ead7a27fd47",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "Requests",
+					PriceHash:        "4544b62fe649690f32a140f29a64d503-4a9dfd3965ffcbab75845ead7a27fd47",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},
@@ -52,7 +52,7 @@ func TestSQSQueue_usage(t *testing.T) {
             name = "my-standard-queue"
             fifo_queue = false
 		}
-		
+
         data "infracost_aws_sqs_queue" "queue" {
             resources = [aws_sqs_queue.fifo.id, aws_sqs_queue.standard.id]
 

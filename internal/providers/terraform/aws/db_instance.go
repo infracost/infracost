@@ -112,6 +112,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 		{
 			Name:           "Database instance",
 			Unit:           "hours",
+			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:       strPtr("aws"),
@@ -127,6 +128,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 		{
 			Name:            "Database storage",
 			Unit:            "GB-months",
+			UnitMultiplier:  1,
 			MonthlyQuantity: &allocatedStorageVal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -145,6 +147,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Database storage IOPS",
 			Unit:            "IOPS-months",
+			UnitMultiplier:  1,
 			MonthlyQuantity: &iopsVal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

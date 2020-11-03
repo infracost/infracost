@@ -38,6 +38,7 @@ func NewMyResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 		{
 			Name:           fmt.Sprintf("Instance (on-demand, %s)", "my_instance_type"),
 			Unit:           "hours",
+			UnitMultiplier:  1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

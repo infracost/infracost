@@ -2,8 +2,6 @@ package aws
 
 import (
 	"github.com/infracost/infracost/internal/schema"
-
-	"github.com/shopspring/decimal"
 )
 
 func GetS3BucketInventoryRegistryItem() *schema.RegistryItem {
@@ -20,9 +18,9 @@ func NewS3BucketInventory(d *schema.ResourceData, u *schema.ResourceData) *schem
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:            "Objects listed",
-				Unit:            "objects",
-				MonthlyQuantity: decimalPtr(decimal.NewFromInt(0)),
+				Name:           "Objects listed",
+				Unit:           "objects",
+				UnitMultiplier: 1000000,
 				ProductFilter: &schema.ProductFilter{
 					VendorName: strPtr("aws"),
 					Region:     strPtr(region),

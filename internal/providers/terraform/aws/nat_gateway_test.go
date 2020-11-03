@@ -33,7 +33,7 @@ func TestNATGateway(t *testing.T) {
 				{
 					Name:            "Data processed",
 					PriceHash:       "96ea6ef0b38f7b8b243f50e02dfa8fa8-b1ae3861dc57e2db217fa83a7420374f",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					HourlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},

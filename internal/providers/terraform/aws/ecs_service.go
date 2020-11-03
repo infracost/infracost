@@ -48,6 +48,7 @@ func NewECSService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 		{
 			Name:           "Per GB per hour",
 			Unit:           "GB-hours",
+			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredCount).Mul(memory)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -62,6 +63,7 @@ func NewECSService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 		{
 			Name:           "Per vCPU per hour",
 			Unit:           "CPU-hours",
+			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredCount).Mul(cpu)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -80,6 +82,7 @@ func NewECSService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           fmt.Sprintf("Inference accelerator (%s)", deviceType),
 			Unit:           "hours",
+			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

@@ -35,9 +35,9 @@ func TestELB(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "Data processed",
-					PriceHash:       "9f5711b4fbd9ab67449d919bce31d7e8-b1ae3861dc57e2db217fa83a7420374f",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "Data processed",
+					PriceHash:        "9f5711b4fbd9ab67449d919bce31d7e8-b1ae3861dc57e2db217fa83a7420374f",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},
