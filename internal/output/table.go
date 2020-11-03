@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"strconv"
 
+	"github.com/dustin/go-humanize"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/urfave/cli/v2"
@@ -149,7 +149,7 @@ func formatAmount(d decimal.Decimal) string {
 		return fmt.Sprintf("%.g", f)
 	}
 
-	return fmt.Sprintf("%.4f", f)
+	return humanize.FormatFloat("#,###.####", f)
 }
 
 func formatCost(d *decimal.Decimal) string {
@@ -164,5 +164,5 @@ func formatQuantity(q *decimal.Decimal) string {
 		return "-"
 	}
 	f, _ := q.Float64()
-	return strconv.FormatFloat(f, 'f', -1, 64)
+	return humanize.CommafWithDigits(f, 4)
 }
