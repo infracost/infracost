@@ -45,7 +45,8 @@ func newLBResource(d *schema.ResourceData, productFamily string, costComponentNa
 				Service:       strPtr("AWSELB"),
 				ProductFamily: strPtr(productFamily),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", Value: strPtr("LoadBalancerUsage")},
+					{Key: "locationType", Value: strPtr("AWS Region")},
+					{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
 				},
 			},
 		},
@@ -53,8 +54,8 @@ func newLBResource(d *schema.ResourceData, productFamily string, costComponentNa
 
 	if productFamily == "Load Balancer" {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name: "Data processed",
-			Unit: "GB",
+			Name:           "Data processed",
+			Unit:           "GB",
 			UnitMultiplier: 1,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -62,7 +63,7 @@ func newLBResource(d *schema.ResourceData, productFamily string, costComponentNa
 				Service:       strPtr("AWSELB"),
 				ProductFamily: strPtr(productFamily),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", Value: strPtr("DataProcessing-Bytes")},
+					{Key: "usagetype", ValueRegex: strPtr("/DataProcessing-Bytes/")},
 				},
 			},
 		})
@@ -70,8 +71,8 @@ func newLBResource(d *schema.ResourceData, productFamily string, costComponentNa
 
 	if productFamily == "Load Balancer-Application" || productFamily == "Load Balancer-Network" {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name: "Load balancer capacity units",
-			Unit: "LCU-hours",
+			Name:           "Load balancer capacity units",
+			Unit:           "LCU-hours",
 			UnitMultiplier: 1,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -79,7 +80,8 @@ func newLBResource(d *schema.ResourceData, productFamily string, costComponentNa
 				Service:       strPtr("AWSELB"),
 				ProductFamily: strPtr(productFamily),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", Value: strPtr("LCUUsage")},
+					{Key: "locationType", Value: strPtr("AWS Region")},
+					{Key: "usagetype", ValueRegex: strPtr("/LCUUsage/")},
 				},
 			},
 		})
