@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -12,7 +13,17 @@ func skippedResourcesMessage(resources []*schema.Resource, showDetails bool) str
 		return ""
 	}
 
-	message := fmt.Sprintf("%d out of %d resources couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)", summary.TotalUnsupported, len(resources))
+	supportedTypeCount := 0
+	for rType := range summary.UnsupportedCounts {
+		if strings.HasPrefix(rType, "aws_") {
+			supportedTypeCount++
+		}
+	}
+
+	message := fmt.Sprintf("%d resource types couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)", supportedTypeCount)
+	if supportedTypeCount == 1 {
+		message = "1 resource type couldn't be estimated as Infracost doesn't support it yet (https://www.infracost.io/docs/supported_resources)"
+	}
 
 	if showDetails {
 		message += ".\n"
@@ -24,7 +35,9 @@ func skippedResourcesMessage(resources []*schema.Resource, showDetails bool) str
 
 	if showDetails {
 		for rType, count := range summary.UnsupportedCounts {
-			message += fmt.Sprintf("\n%d x %s", count, rType)
+			if strings.HasPrefix(rType, "aws_") {
+				message += fmt.Sprintf("\n%d x %s", count, rType)
+			}
 		}
 	}
 
