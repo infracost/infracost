@@ -12,7 +12,7 @@ Support for the following is not currently included:
 | Terraform resource           | Notes |
 | ---                          | ---   |
 | `aws_alb` |  |
-| `aws_autoscaling_group` |  S3 replication time control data transfer is not supported by Terraform.<br />  S3 batch operations is not supported by Terraform.<br />  |
+| `aws_autoscaling_group` |  S3 replication time control data transfer is not supported by Terraform.<br />  S3 batch operations are not supported by Terraform.<br />  |
 | `aws_db_instance` |  |
 | `aws_dms_replication_instance` |  |
 | `aws_docdb_cluster_instance` |  |
