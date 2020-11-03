@@ -57,9 +57,15 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
     infracost register
     ```
 
-    Alternatively you can run your [own pricing API](https://github.com/infracost/cloud-pricing-api) and set the `INFRACOST_PRICING_API_ENDPOINT` environment variable to point to it.
+    The `INFRACOST_API_KEY` environment variable can be used to set the API key in CI systems.
+    If you prefer, you can run your own [pricing API](https://www.infracost.io/docs/faq/#can-i-run-my-own-pricing-api).
 
-    The `INFRACOST_API_KEY` environment variable can be used to set to the API key in CI systems.
+3.  Run `infracost` using our example Terraform project to see how it works. You can also play with the `main.tf` file in the example:
+
+    ```sh
+    git clone https://github.com/infracost/example-terraform.git
+    infracost --tfdir example-terraform
+    ```
 
 ## Basic usage
 
