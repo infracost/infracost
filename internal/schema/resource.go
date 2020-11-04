@@ -14,12 +14,21 @@ type Resource struct {
 	Name           string
 	CostComponents []*CostComponent
 	SubResources   []*Resource
-	hourlyCost     decimal.Decimal
-	monthlyCost    decimal.Decimal
+	HourlyCost     *decimal.Decimal
+	MonthlyCost    *decimal.Decimal
 	IsSkipped      bool
 	NoPrice        bool
 	SkipMessage    string
 	ResourceType   string
+}
+
+type ResourceSummary struct {
+	SupportedCounts   map[string]int `json:"supportedCounts"`
+	UnsupportedCounts map[string]int `json:"unsupportedCounts"`
+	TotalSupported    int            `json:"totalSupported"`
+	TotalUnsupported  int            `json:"totalUnsupported"`
+	TotalNoPrice      int            `json:"totalNoPrice"`
+	Total             int            `json:"total"`
 }
 
 func CalculateCosts(resources []*Resource) {
@@ -30,27 +39,30 @@ func CalculateCosts(resources []*Resource) {
 
 func (r *Resource) CalculateCosts() {
 	h := decimal.Zero
+	hasCost := false
 
 	for _, c := range r.CostComponents {
 		c.CalculateCosts()
-		h = h.Add(c.HourlyCost())
+		if c.HourlyCost == nil {
+			continue
+		}
+		hasCost = true
+		h = h.Add(*c.HourlyCost)
 	}
 
 	for _, s := range r.SubResources {
 		s.CalculateCosts()
-		h = h.Add(s.HourlyCost())
+		if s.HourlyCost == nil {
+			continue
+		}
+		hasCost = true
+		h = h.Add(*s.HourlyCost)
 	}
 
-	r.hourlyCost = h
-	r.monthlyCost = h.Mul(hourToMonthMultiplier)
-}
-
-func (r *Resource) HourlyCost() decimal.Decimal {
-	return r.hourlyCost
-}
-
-func (r *Resource) MonthlyCost() decimal.Decimal {
-	return r.monthlyCost
+	if hasCost {
+		r.HourlyCost = &h
+		r.MonthlyCost = decimalPtr(h.Mul(hourToMonthMultiplier))
+	}
 }
 
 func (r *Resource) FlattenedSubResources() []*Resource {
@@ -81,27 +93,43 @@ func SortResources(resources []*Resource) {
 	sort.Slice(resources, func(i, j int) bool {
 		return resources[i].Name < resources[j].Name
 	})
+}
+
+func GenerateResourceSummary(resources []*Resource) *ResourceSummary {
+	supportedCounts := make(map[string]int)
+	unsupportedCounts := make(map[string]int)
+	totalSupported := 0
+	totalUnsupported := 0
+	totalNoPrice := 0
 
 	for _, r := range resources {
-		SortResources(r.SubResources)
+		if r.NoPrice {
+			totalNoPrice++
+		} else if r.IsSkipped {
+			totalUnsupported++
+			if _, ok := unsupportedCounts[r.ResourceType]; !ok {
+				unsupportedCounts[r.ResourceType] = 0
+			}
+			unsupportedCounts[r.ResourceType]++
+		} else {
+			totalSupported++
+			if _, ok := supportedCounts[r.ResourceType]; !ok {
+				supportedCounts[r.ResourceType] = 0
+			}
+			supportedCounts[r.ResourceType]++
+		}
+	}
 
-		sort.Slice(r.CostComponents, func(i, j int) bool {
-			return r.CostComponents[i].Name < r.CostComponents[j].Name
-		})
+	return &ResourceSummary{
+		SupportedCounts:   supportedCounts,
+		UnsupportedCounts: unsupportedCounts,
+		TotalSupported:    totalSupported,
+		TotalUnsupported:  totalUnsupported,
+		TotalNoPrice:      totalNoPrice,
+		Total:             len(resources),
 	}
 }
 
-func CountSkippedResources(resources []*Resource) (map[string]int, int) {
-	total := 0
-	typeCounts := make(map[string]int)
-	for _, r := range resources {
-		if r.IsSkipped && !r.NoPrice {
-			total++
-			if _, ok := typeCounts[r.ResourceType]; !ok {
-				typeCounts[r.ResourceType] = 0
-			}
-			typeCounts[r.ResourceType]++
-		}
-	}
-	return typeCounts, total
+func decimalPtr(d decimal.Decimal) *decimal.Decimal {
+	return &d
 }

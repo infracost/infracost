@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/mitchellh/go-homedir"
+	"gopkg.in/yaml.v2"
 )
 
 type StateFile struct {
@@ -14,30 +15,72 @@ type StateFile struct {
 	LatestReleaseCheckedAt string `json:"latestReleaseCheckedAt"`
 }
 
-func ReadStateFile() (*StateFile, error) {
-	var s *StateFile
-
-	data, err := ioutil.ReadFile(stateFile())
-	if err != nil {
-		return s, err
+func ReadConfigFileIfExists() (ConfigSpec, error) {
+	data, err := ioutil.ReadFile(ConfigFilePath())
+	if os.IsNotExist(err) {
+		return ConfigSpec{}, nil
+	} else if err != nil {
+		return ConfigSpec{}, err
 	}
 
+	var c ConfigSpec
+
+	err = yaml.Unmarshal(data, &c)
+
+	return c, err
+}
+
+func WriteConfigFile(c ConfigSpec) error {
+	data, err := yaml.Marshal(c)
+	if err != nil {
+		return err
+	}
+
+	err = os.MkdirAll(path.Dir(ConfigFilePath()), 0700)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(ConfigFilePath(), data, 0600)
+}
+
+func mergeConfigFileIfExists(c *ConfigSpec) error {
+	data, err := ioutil.ReadFile(ConfigFilePath())
+	if os.IsNotExist(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	return yaml.Unmarshal(data, c)
+}
+
+func ReadStateFileIfNotExists() (StateFile, error) {
+	data, err := ioutil.ReadFile(StateFilePath())
+	if os.IsNotExist(err) {
+		return StateFile{}, nil
+	} else if err != nil {
+		return StateFile{}, err
+	}
+
+	var s StateFile
 	err = json.Unmarshal(data, &s)
+
 	return s, err
 }
 
-func WriteStateFile(s *StateFile) error {
+func WriteStateFile(s StateFile) error {
 	data, err := json.Marshal(s)
 	if err != nil {
 		return err
 	}
 
-	err = os.MkdirAll(path.Dir(stateFile()), 0700)
+	err = os.MkdirAll(path.Dir(StateFilePath()), 0700)
 	if err != nil {
 		return err
 	}
 
-	return ioutil.WriteFile(stateFile(), data, 0600)
+	return ioutil.WriteFile(StateFilePath(), data, 0600)
 }
 
 func configDir() string {
@@ -45,6 +88,10 @@ func configDir() string {
 	return dir
 }
 
-func stateFile() string {
+func ConfigFilePath() string { // nolint:golint
+	return path.Join(configDir(), "config.yml")
+}
+
+func StateFilePath() string {
 	return path.Join(configDir(), ".state.json")
 }

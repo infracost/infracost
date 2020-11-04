@@ -1,6 +1,8 @@
 package prices
 
 import (
+	"sync"
+
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -11,19 +13,26 @@ import (
 func PopulatePrices(resources []*schema.Resource) error {
 	q := NewGraphQLQueryRunner()
 
-	hasSkipped := false
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+		q.ReportSummary(resources)
+	}()
+
 	for _, r := range resources {
 		if r.IsSkipped {
-			hasSkipped = true
+			continue
 		}
+
 		if err := GetPrices(r, q); err != nil {
 			return err
 		}
 	}
 
-	if hasSkipped {
-		q.ReportMissingPrices(resources)
-	}
+	wg.Wait()
 
 	return nil
 }

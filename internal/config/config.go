@@ -16,16 +16,33 @@ import (
 )
 
 // Spec contains mapping of environment variable names to config values
-type Spec struct {
-	NoColor                   bool
-	LogLevel                  string `envconfig:"INFRACOST_LOG_LEVEL"  required:"false"`
-	DefaultPricingAPIEndpoint string `envconfig:"DEFAULT_INFRACOST_PRICING_API_ENDPOINT" default:"https://pricing.api.infracost.io"`
-	PricingAPIEndpoint        string `envconfig:"INFRACOST_PRICING_API_ENDPOINT" required:"true" default:"https://pricing.api.infracost.io"`
-	DashboardAPIEndpoint      string `envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT" required:"true" default:"https://dashboard.api.infracost.io"`
-	APIKey                    string `envconfig:"INFRACOST_API_KEY"`
+type ConfigSpec struct { // nolint:golint
+	NoColor                   bool   `yaml:"no_color,omitempty"`
+	LogLevel                  string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
+	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
+	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
+	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
+	APIKey                    string `yaml:"api_key,omitempty" envconfig:"INFRACOST_API_KEY"`
 }
 
-func (c *Spec) SetLogLevel(l string) error {
+var Config *ConfigSpec
+
+func init() {
+	log.SetFlags(0)
+
+	Config = loadConfig()
+}
+
+func defaultConfigSpec() ConfigSpec {
+	return ConfigSpec{
+		NoColor:                   false,
+		DefaultPricingAPIEndpoint: "https://pricing.api.infracost.io",
+		PricingAPIEndpoint:        "https://pricing.api.infracost.io",
+		DashboardAPIEndpoint:      "https://dashboard.api.infracost.io",
+	}
+}
+
+func (c ConfigSpec) SetLogLevel(l string) error {
 	c.LogLevel = l
 
 	// Disable logging if no log level is set
@@ -33,17 +50,20 @@ func (c *Spec) SetLogLevel(l string) error {
 		logrus.SetOutput(ioutil.Discard)
 		return nil
 	}
+
 	logrus.SetOutput(os.Stderr)
 
 	level, err := logrus.ParseLevel(c.LogLevel)
 	if err != nil {
 		return err
 	}
+
 	logrus.SetLevel(level)
+
 	return nil
 }
 
-func (c *Spec) IsLogging() bool {
+func (c ConfigSpec) IsLogging() bool {
 	return c.LogLevel != ""
 }
 
@@ -67,15 +87,25 @@ func fileExists(path string) bool {
 	if os.IsNotExist(err) {
 		return false
 	}
+
 	return !info.IsDir()
 }
 
-// loadConfig loads the config struct from environment variables.
-func loadConfig() *Spec {
-	var config Spec
-	var err error
+// loadConfig loads the config spec from the config file and environment variables.
+// Config is loaded in the following order, with any later ones overriding the previous ones:
+//   * Default values
+//   * Config file
+//   * .env
+//   * .env.local
+//   * ENV variables
+//   * Any command line flags (e.g. --log-level)
+func loadConfig() *ConfigSpec {
+	config := defaultConfigSpec()
 
-	config.NoColor = false
+	err := mergeConfigFileIfExists(&config)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	envLocalPath := filepath.Join(RootDir(), ".env.local")
 	if fileExists(envLocalPath) {
@@ -113,11 +143,12 @@ func loadConfig() *Spec {
 
 func GetUserAgent() string {
 	userAgent := "infracost"
+
 	if version.Version != "" {
 		userAgent += fmt.Sprintf("-%s", version.Version)
 	}
-	infracostEnv := getInfracostEnv()
 
+	infracostEnv := getInfracostEnv()
 	if infracostEnv != "" {
 		userAgent += fmt.Sprintf(" (%s)", infracostEnv)
 	}
@@ -137,6 +168,7 @@ func getInfracostEnv() string {
 	} else if IsTruthy(os.Getenv("CIRCLECI")) {
 		return "circleci"
 	}
+
 	return ""
 }
 
@@ -151,5 +183,3 @@ func IsDev() bool {
 func IsTruthy(s string) bool {
 	return s == "1" || strings.EqualFold(s, "true")
 }
-
-var Config = loadConfig()

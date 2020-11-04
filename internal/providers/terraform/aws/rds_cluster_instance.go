@@ -32,6 +32,7 @@ func NewRDSClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *sche
 			{
 				Name:           "Database instance",
 				Unit:           "hours",
+				UnitMultiplier: 1,
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

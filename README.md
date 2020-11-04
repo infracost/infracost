@@ -45,7 +45,7 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
     ```sh
     docker pull infracost/infracost
     docker run --rm \
-      -e INFRACOST_API_KEY=see_following_steps_on_how_to_get_this \
+      -e INFRACOST_API_KEY=see_following_step_on_how_to_get_this \
       -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
       -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
       -v $PWD/:/code/ infracost/infracost --tfdir /code/
@@ -57,13 +57,15 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
     infracost register
     ```
 
-    Alternatively you can run your [own pricing API](https://github.com/infracost/cloud-pricing-api) and set the `INFRACOST_PRICING_API_ENDPOINT` environment variable to point to it.
+    The `INFRACOST_API_KEY` environment variable can be used to set the API key in CI systems.
+    If you prefer, you can run your own [pricing API](https://www.infracost.io/docs/faq/#can-i-run-my-own-pricing-api).
 
-3. Set the `INFRACOST_API_KEY` environment variable to your API key, e.g.:
+3.  Run `infracost` using our example Terraform project to see how it works. You can also play with the `main.tf` file in the example:
+
     ```sh
-    export INFRACOST_API_KEY=XXXXX
+    git clone https://github.com/infracost/example-terraform.git
+    infracost --tfdir example-terraform
     ```
-    Or persist it in your .zshrc or .bashrc file.
 
 ## Basic usage
 

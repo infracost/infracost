@@ -36,6 +36,7 @@ func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.C
 		{
 			Name:            "EBS snapshot storage",
 			Unit:            "GB-months",
+			UnitMultiplier:  1,
 			MonthlyQuantity: &gbVal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -50,7 +51,7 @@ func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.C
 		{
 			Name:           "Fast snapshot restore",
 			Unit:           "DSU-hours",
-			HourlyQuantity: decimalPtr(decimal.Zero),
+			UnitMultiplier: 1,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -64,7 +65,7 @@ func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.C
 		{
 			Name:           "ListChangedBlocks & ListSnapshotBlocks API requests",
 			Unit:           "requests",
-			HourlyQuantity: decimalPtr(decimal.Zero),
+			UnitMultiplier: 1000,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -78,7 +79,7 @@ func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.C
 		{
 			Name:           "GetSnapshotBlock API requests",
 			Unit:           "SnapshotAPIUnits",
-			HourlyQuantity: decimalPtr(decimal.Zero),
+			UnitMultiplier: 1000,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -92,7 +93,7 @@ func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.C
 		{
 			Name:           "PutSnapshotBlock API requests",
 			Unit:           "SnapshotAPIUnits",
-			HourlyQuantity: decimalPtr(decimal.Zero),
+			UnitMultiplier: 1000,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),

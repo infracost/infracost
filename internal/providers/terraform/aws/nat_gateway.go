@@ -16,9 +16,9 @@ func GetNATGatewayRegistryItem() *schema.RegistryItem {
 func NewNATGateway(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
-	gbDataProcessed := decimal.Zero
+	var gbDataProcessed *decimal.Decimal
 	if u != nil && u.Get("monthly_gb_data_processed.0.value").Exists() {
-		gbDataProcessed = decimal.NewFromFloat(u.Get("monthly_gb_data_processed.0.value").Float())
+		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed.0.value").Float()))
 	}
 
 	return &schema.Resource{
@@ -27,6 +27,7 @@ func NewNATGateway(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 			{
 				Name:           "Per NAT gateway",
 				Unit:           "hours",
+				UnitMultiplier: 1,
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -39,9 +40,10 @@ func NewNATGateway(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 				},
 			},
 			{
-				Name:            "Per GB data processed",
-				Unit:            "GB/month",
-				MonthlyQuantity: &gbDataProcessed,
+				Name:            "Data processed",
+				Unit:            "GB",
+				UnitMultiplier:  1,
+				MonthlyQuantity: gbDataProcessed,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(region),

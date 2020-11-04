@@ -11,6 +11,6 @@ func GetELBRegistryItem() *schema.RegistryItem {
 
 func NewELB(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	productFamily := "Load Balancer"
-	costComponentName := "Per Classic Load Balancer"
+	costComponentName := "Per classic load balancer"
 	return newLBResource(d, productFamily, costComponentName)
 }

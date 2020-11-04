@@ -28,14 +28,14 @@ func TestLambdaFunction(t *testing.T) {
 			Name: "aws_lambda_function.lambda",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Requests",
-					PriceHash:       "134034e58c7ef3bbaf513831c3a0161b-4a9dfd3965ffcbab75845ead7a27fd47",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "Requests",
+					PriceHash:        "134034e58c7ef3bbaf513831c3a0161b-4a9dfd3965ffcbab75845ead7a27fd47",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 				{
-					Name:            "Duration",
-					PriceHash:       "a562fdf216894a62109f5b642a702f37-1786dd5ddb52682e127baa00bfaa4c48",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "Duration",
+					PriceHash:        "a562fdf216894a62109f5b642a702f37-1786dd5ddb52682e127baa00bfaa4c48",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},

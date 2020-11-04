@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"strconv"
 
+	"github.com/dustin/go-humanize"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/urfave/cli/v2"
@@ -53,22 +53,26 @@ func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 			"",
 			"",
 			"",
-			formatCost(r.HourlyCost()),
-			formatCost(r.MonthlyCost()),
+			formatCost(r.HourlyCost),
+			formatCost(r.MonthlyCost),
 		})
 		t.Append([]string{"", "", "", "", "", ""})
 
-		overallTotalHourly = overallTotalHourly.Add(r.HourlyCost())
-		overallTotalMonthly = overallTotalMonthly.Add(r.MonthlyCost())
+		if r.HourlyCost != nil {
+			overallTotalHourly = overallTotalHourly.Add(*r.HourlyCost)
+		}
+		if r.MonthlyCost != nil {
+			overallTotalMonthly = overallTotalMonthly.Add(*r.MonthlyCost)
+		}
 	}
 
 	t.Append([]string{
-		"OVERALL TOTAL",
+		"OVERALL TOTAL (USD)",
 		"",
 		"",
 		"",
-		formatCost(overallTotalHourly),
-		formatCost(overallTotalMonthly),
+		formatAmount(overallTotalHourly),
+		formatAmount(overallTotalMonthly),
 	})
 
 	t.Render()
@@ -130,25 +134,35 @@ func buildCostComponentRows(t *tablewriter.Table, costComponents []*schema.CostC
 
 		t.Rich([]string{
 			fmt.Sprintf("%s %s", labelPrefix, c.Name),
-			formatQuantity(*c.MonthlyQuantity),
-			c.Unit,
-			formatCost(c.Price()),
-			formatCost(c.HourlyCost()),
-			formatCost(c.MonthlyCost()),
+			formatQuantity(c.UnitMultiplierMonthlyQuantity()),
+			c.UnitWithMultiplier(),
+			formatAmount(c.UnitMultiplierPrice()),
+			formatCost(c.HourlyCost),
+			formatCost(c.MonthlyCost),
 		}, color)
 	}
 }
 
-func formatCost(d decimal.Decimal) string {
+func formatAmount(d decimal.Decimal) string {
 	f, _ := d.Float64()
 	if f < 0.00005 && f != 0 {
 		return fmt.Sprintf("%.g", f)
 	}
 
-	return fmt.Sprintf("%.4f", f)
+	return humanize.FormatFloat("#,###.####", f)
 }
 
-func formatQuantity(quantity decimal.Decimal) string {
-	f, _ := quantity.Float64()
-	return strconv.FormatFloat(f, 'f', -1, 64)
+func formatCost(d *decimal.Decimal) string {
+	if d == nil {
+		return "-"
+	}
+	return formatAmount(*d)
+}
+
+func formatQuantity(q *decimal.Decimal) string {
+	if q == nil {
+		return "-"
+	}
+	f, _ := q.Float64()
+	return humanize.CommafWithDigits(f, 4)
 }

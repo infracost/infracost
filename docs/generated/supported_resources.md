@@ -12,7 +12,7 @@ Support for the following is not currently included:
 | Terraform resource           | Notes |
 | ---                          | ---   |
 | `aws_alb` |  |
-| `aws_autoscaling_group` |  See aws_instance<br />  |
+| `aws_autoscaling_group` |  S3 replication time control data transfer is not supported by Terraform.<br />  S3 batch operations are not supported by Terraform.<br />  |
 | `aws_db_instance` |  |
 | `aws_dms_replication_instance` |  |
 | `aws_docdb_cluster_instance` |  |
@@ -26,8 +26,15 @@ Support for the following is not currently included:
 | `aws_instance` |  Costs associated with non-standard Linux AMIs, such as Windows and RHEL are not supported.<br />  EC2 detailed monitoring assumes the standard 7 metrics and the lowest tier of prices for CloudWatch.<br />  If a root volume is not specified then an 8Gi gp2 volume is assumed.<br />  |
 | `aws_lambda_function` |  Provisioned concurrency is not yet supported.<br />  |
 | `aws_lb` |  |
+| `aws_lightsail_instance` |  |
 | `aws_nat_gateway` |  |
 | `aws_rds_cluster_instance` |  |
+| `aws_route53_record` |  |
+| `aws_route53_zone` |  |
+| `aws_s3_bucket` |  |
+| `aws_s3_bucket_analytics_configuration` |  |
+| `aws_s3_bucket_inventory` |  |
+| `aws_sqs_queue` |  |
 
 
 ## The resource I want isn't supported

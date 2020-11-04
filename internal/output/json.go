@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/shopspring/decimal"
 	"github.com/urfave/cli/v2"
 )
 
@@ -12,19 +13,19 @@ type outputJSON struct {
 	Warnings  []string        `json:"warnings"`
 }
 type costComponentJSON struct {
-	Name            string `json:"name"`
-	Unit            string `json:"unit"`
-	HourlyQuantity  string `json:"hourlyQuantity"`
-	MonthlyQuantity string `json:"monthlyQuantity"`
-	Price           string `json:"price"`
-	HourlyCost      string `json:"hourlyCost"`
-	MonthlyCost     string `json:"monthlyCost"`
+	Name            string  `json:"name"`
+	Unit            string  `json:"unit"`
+	HourlyQuantity  *string `json:"hourlyQuantity"`
+	MonthlyQuantity *string `json:"monthlyQuantity"`
+	Price           string  `json:"price"`
+	HourlyCost      *string `json:"hourlyCost"`
+	MonthlyCost     *string `json:"monthlyCost"`
 }
 
 type resourceJSON struct {
 	Name           string              `json:"name"`
-	HourlyCost     string              `json:"hourlyCost"`
-	MonthlyCost    string              `json:"monthlyCost"`
+	HourlyCost     *string             `json:"hourlyCost"`
+	MonthlyCost    *string             `json:"monthlyCost"`
 	CostComponents []costComponentJSON `json:"costComponents,omitempty"`
 	SubResources   []resourceJSON      `json:"subresources,omitempty"`
 }
@@ -32,14 +33,15 @@ type resourceJSON struct {
 func newResourceJSON(r *schema.Resource) resourceJSON {
 	comps := make([]costComponentJSON, 0, len(r.CostComponents))
 	for _, c := range r.CostComponents {
+
 		comps = append(comps, costComponentJSON{
 			Name:            c.Name,
-			Unit:            c.Unit,
-			HourlyQuantity:  c.HourlyQuantity.String(),
-			MonthlyQuantity: c.MonthlyQuantity.String(),
-			Price:           c.Price().String(),
-			HourlyCost:      c.HourlyCost().String(),
-			MonthlyCost:     c.MonthlyCost().String(),
+			Unit:            c.UnitWithMultiplier(),
+			HourlyQuantity:  strOrNil(c.UnitMultiplierHourlyQuantity()),
+			MonthlyQuantity: strOrNil(c.UnitMultiplierMonthlyQuantity()),
+			Price:           c.UnitMultiplierPrice().String(),
+			HourlyCost:      strOrNil(c.HourlyCost),
+			MonthlyCost:     strOrNil(c.MonthlyCost),
 		})
 	}
 
@@ -50,8 +52,8 @@ func newResourceJSON(r *schema.Resource) resourceJSON {
 
 	return resourceJSON{
 		Name:           r.Name,
-		HourlyCost:     r.HourlyCost().String(),
-		MonthlyCost:    r.MonthlyCost().String(),
+		HourlyCost:     strOrNil(r.HourlyCost),
+		MonthlyCost:    strOrNil(r.MonthlyCost),
 		CostComponents: comps,
 		SubResources:   subresources,
 	}
@@ -77,4 +79,12 @@ func ToJSON(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 	}
 
 	return json.Marshal(out)
+}
+
+func strOrNil(d *decimal.Decimal) *string {
+	if d == nil {
+		return nil
+	}
+	s := d.String()
+	return &s
 }

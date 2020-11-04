@@ -30,9 +30,14 @@ func TestELB(t *testing.T) {
 			Name: "aws_elb.elb1",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Per Classic Load Balancer",
+					Name:            "Per classic load balancer",
 					PriceHash:       "52de45f6e7bf85e2d047a2d9674d9eb2-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:             "Data processed",
+					PriceHash:        "9f5711b4fbd9ab67449d919bce31d7e8-b1ae3861dc57e2db217fa83a7420374f",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},

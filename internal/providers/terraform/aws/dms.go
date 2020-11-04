@@ -37,6 +37,7 @@ func instanceCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Instance (%s)", instanceType),
 		Unit:           "hours",
+		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -80,6 +81,7 @@ func storageCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "General purpose storage (gp2)",
 		Unit:            "GB-months",
+		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(storageSize)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),

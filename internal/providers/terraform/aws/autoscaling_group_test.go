@@ -282,7 +282,7 @@ func TestAutoscalingGroup_launchConfiguration_cpuCredits(t *testing.T) {
 						{
 							Name:             "CPU credits",
 							PriceHash:        "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+							MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 						},
 					},
 					SubResourceChecks: []testutil.ResourceCheck{
@@ -711,7 +711,7 @@ func TestAutoscalingGroup_launchTemplate_cpuCredits(t *testing.T) {
 						{
 							Name:             "CPU credits",
 							PriceHash:        "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+							MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 						},
 					},
 					SubResourceChecks: []testutil.ResourceCheck{

@@ -41,12 +41,6 @@ type QueryResult struct {
 	Result gjson.Result
 }
 
-type skippedResourcesJSON struct {
-	SkippedTypeCounts map[string]int `json:"skippedTypeCounts"`
-	SkippedTotal      int            `json:"skippedTotal"`
-	Total             int            `json:"total"`
-}
-
 type GraphQLQuery struct {
 	Query     string                 `json:"query"`
 	Variables map[string]interface{} `json:"variables"`
@@ -157,7 +151,7 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 	return results, nil
 }
 
-func (q *GraphQLQueryRunner) ReportMissingPrices(resources []*schema.Resource) {
+func (q *GraphQLQueryRunner) ReportSummary(resources []*schema.Resource) {
 	if q.baseURL != config.Config.DefaultPricingAPIEndpoint {
 		// skip for non-default pricing API endpoints
 		return
@@ -165,17 +159,23 @@ func (q *GraphQLQueryRunner) ReportMissingPrices(resources []*schema.Resource) {
 
 	url := fmt.Sprintf("%s/report", q.baseURL)
 
-	skippedTypeCounts, skippedTotal := schema.CountSkippedResources(resources)
-	j := skippedResourcesJSON{skippedTypeCounts, skippedTotal, len(resources)}
+	summary := schema.GenerateResourceSummary(resources)
+
+	j := struct {
+		ResourceSummary *schema.ResourceSummary `json:"resourceSummary"`
+	}{
+		ResourceSummary: summary,
+	}
+
 	body, err := json.Marshal(j)
 	if err != nil {
-		log.Debugf("Unable to generate missing prices request: %v", err)
+		log.Debugf("Unable to generate summary request: %v", err)
 		return
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	if err != nil {
-		log.Debugf("Unable to generate missing prices request: %v", err)
+		log.Debugf("Unable to generate summary request: %v", err)
 		return
 	}
 
@@ -184,13 +184,13 @@ func (q *GraphQLQueryRunner) ReportMissingPrices(resources []*schema.Resource) {
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Debugf("Unable to send missing prices request: %v", err)
+		log.Debugf("Unable to send summary request: %v", err)
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		log.Debugf("Unexpected response sending missing prices request: %d", resp.StatusCode)
+		log.Debugf("Unexpected response sending summary request: %d", resp.StatusCode)
 	}
 }
 

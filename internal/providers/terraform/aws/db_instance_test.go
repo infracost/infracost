@@ -62,9 +62,9 @@ func TestDBInstance(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				singleAzInstanceCheck,
 				{
-					Name:            "Database storage",
-					PriceHash:       "b7b7cfbe7ec1bded9a474fff7123b34f-ee3dd7e4624338037ca6fea0933a662f",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "Database storage",
+					PriceHash:        "b7b7cfbe7ec1bded9a474fff7123b34f-ee3dd7e4624338037ca6fea0933a662f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 			},
 		},
@@ -73,9 +73,9 @@ func TestDBInstance(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				singleAzInstanceCheck,
 				{
-					Name:            "Database storage",
-					PriceHash:       "b7b7cfbe7ec1bded9a474fff7123b34f-ee3dd7e4624338037ca6fea0933a662f",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
+					Name:             "Database storage",
+					PriceHash:        "b7b7cfbe7ec1bded9a474fff7123b34f-ee3dd7e4624338037ca6fea0933a662f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 				},
 			},
 		},
@@ -88,9 +88,9 @@ func TestDBInstance(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "Database storage",
-					PriceHash:       "2ec5ef73cbd5ca537c967fff828f39fe-ee3dd7e4624338037ca6fea0933a662f",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(30)),
+					Name:             "Database storage",
+					PriceHash:        "2ec5ef73cbd5ca537c967fff828f39fe-ee3dd7e4624338037ca6fea0933a662f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(30)),
 				},
 			},
 		},
@@ -170,9 +170,9 @@ func TestDBInstance_allEngines(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "Database storage",
-					PriceHash:       "b7b7cfbe7ec1bded9a474fff7123b34f-ee3dd7e4624338037ca6fea0933a662f",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "Database storage",
+					PriceHash:        "b7b7cfbe7ec1bded9a474fff7123b34f-ee3dd7e4624338037ca6fea0933a662f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 			},
 		})
@@ -203,9 +203,9 @@ func TestDBInstance_byol(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "Database storage",
-					PriceHash:       "b7b7cfbe7ec1bded9a474fff7123b34f-ee3dd7e4624338037ca6fea0933a662f",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					Name:             "Database storage",
+					PriceHash:        "b7b7cfbe7ec1bded9a474fff7123b34f-ee3dd7e4624338037ca6fea0933a662f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 			},
 		},

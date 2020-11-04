@@ -75,7 +75,7 @@ func TestEBSVolume(t *testing.T) {
 				{
 					Name:             "I/O requests",
 					PriceHash:        "3085cb7cbdb1e1f570812e7400f8dbc6-5be345988e7c9a0759c5cf8365868ee4",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},

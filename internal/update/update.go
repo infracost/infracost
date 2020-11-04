@@ -32,7 +32,12 @@ func CheckForUpdate() (*Info, error) {
 
 	var cmd string
 
-	cachedRelease, err := getCachedLatestVersion()
+	state, err := config.ReadStateFileIfNotExists()
+	if err != nil {
+		log.Debugf("error reading state file: %v", err)
+	}
+
+	cachedRelease, err := checkCachedLatestVersion(state)
 	if err != nil {
 		log.Debugf("error getting cached latest version: %v", err)
 	}
@@ -71,7 +76,7 @@ func CheckForUpdate() (*Info, error) {
 	}
 
 	if cachedRelease == "" {
-		err := saveCachedLatestVersion(latestVersion)
+		err := saveCachedLatestVersion(state, latestVersion)
 		if err != nil {
 			log.Debugf("error saving cached latest version: %v", err)
 		}
@@ -178,13 +183,12 @@ func getLatestGitHubVersion() (string, error) {
 	return parsedResp.TagName, nil
 }
 
-func getCachedLatestVersion() (string, error) {
-	stateFile, err := config.ReadStateFile()
-	if err != nil {
-		return "", err
+func checkCachedLatestVersion(state config.StateFile) (string, error) {
+	if state.LatestReleaseCheckedAt == "" {
+		return "", nil
 	}
 
-	checkedAt, err := time.Parse(time.RFC3339, stateFile.LatestReleaseCheckedAt)
+	checkedAt, err := time.Parse(time.RFC3339, state.LatestReleaseCheckedAt)
 	if err != nil {
 		return "", err
 	}
@@ -193,14 +197,12 @@ func getCachedLatestVersion() (string, error) {
 		return "", nil
 	}
 
-	return stateFile.LatestReleaseVersion, nil
+	return state.LatestReleaseVersion, nil
 }
 
-func saveCachedLatestVersion(latestVersion string) error {
-	stateFile := &config.StateFile{
-		LatestReleaseVersion:   latestVersion,
-		LatestReleaseCheckedAt: time.Now().Format(time.RFC3339),
-	}
+func saveCachedLatestVersion(state config.StateFile, latestVersion string) error {
+	state.LatestReleaseVersion = latestVersion
+	state.LatestReleaseCheckedAt = time.Now().Format(time.RFC3339)
 
-	return config.WriteStateFile(stateFile)
+	return config.WriteStateFile(state)
 }

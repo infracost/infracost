@@ -20,10 +20,10 @@ func GetALBRegistryItem() *schema.RegistryItem {
 }
 
 func NewLB(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
-	costComponentName := "Per Application Load Balancer"
+	costComponentName := "Per application load balancer"
 	productFamily := "Load Balancer-Application"
 	if d.Get("load_balancer_type").String() == "network" {
-		costComponentName = "Per Network Load Balancer"
+		costComponentName = "Per network load balancer"
 		productFamily = "Load Balancer-Network"
 	}
 
@@ -33,23 +33,62 @@ func NewLB(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 func newLBResource(d *schema.ResourceData, productFamily string, costComponentName string) *schema.Resource {
 	region := d.Get("region").String()
 
-	return &schema.Resource{
-		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:           costComponentName,
-				Unit:           "hours",
-				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AWSELB"),
-					ProductFamily: strPtr(productFamily),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
-					},
+	costComponents := []*schema.CostComponent{
+		{
+			Name:           costComponentName,
+			Unit:           "hours",
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			UnitMultiplier: 1,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AWSELB"),
+				ProductFamily: strPtr(productFamily),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "locationType", Value: strPtr("AWS Region")},
+					{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
 				},
 			},
 		},
+	}
+
+	if productFamily == "Load Balancer" {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:           "Data processed",
+			Unit:           "GB",
+			UnitMultiplier: 1,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AWSELB"),
+				ProductFamily: strPtr(productFamily),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr("/DataProcessing-Bytes/")},
+				},
+			},
+		})
+	}
+
+	if productFamily == "Load Balancer-Application" || productFamily == "Load Balancer-Network" {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:           "Load balancer capacity units",
+			Unit:           "LCU-hours",
+			UnitMultiplier: 1,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AWSELB"),
+				ProductFamily: strPtr(productFamily),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "locationType", Value: strPtr("AWS Region")},
+					{Key: "usagetype", ValueRegex: strPtr("/LCUUsage/")},
+				},
+			},
+		})
+	}
+
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: costComponents,
 	}
 }

@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/shopspring/decimal"
 )
 
@@ -28,20 +28,20 @@ type CostComponentCheck struct {
 }
 
 func HourlyPriceMultiplierCheck(multiplier decimal.Decimal) CostCheckFunc {
-	return func(t *testing.T, costComponent *schema.CostComponent) {
-		expected := costComponent.Price().Mul(multiplier)
-		if !cmp.Equal(costComponent.HourlyCost(), expected) {
-			t.Errorf("Unexpected hourly cost for %s (expected: %s, got: %s)", costComponent.Name, formatAmount(expected), formatAmount(costComponent.HourlyCost()))
-		}
+	return func(t *testing.T, c *schema.CostComponent) {
+		assert.Equal(t, formatAmount(c.Price().Mul(multiplier)), formatCost(c.HourlyCost), fmt.Sprintf("unexpected hourly cost for %s", c.Name))
 	}
 }
 
 func MonthlyPriceMultiplierCheck(multiplier decimal.Decimal) CostCheckFunc {
-	return func(t *testing.T, costComponent *schema.CostComponent) {
-		expected := costComponent.Price().Mul(multiplier)
-		if !cmp.Equal(costComponent.MonthlyCost(), expected) {
-			t.Errorf("Unexpected monthly cost for %s (expected: %s, got: %s)", costComponent.Name, formatAmount(expected), formatAmount(costComponent.MonthlyCost()))
-		}
+	return func(t *testing.T, c *schema.CostComponent) {
+		assert.Equal(t, formatAmount(c.Price().Mul(multiplier)), formatCost(c.MonthlyCost), fmt.Sprintf("unexpected monthly cost for %s", c.Name))
+	}
+}
+
+func NilMonthlyCostCheck() CostCheckFunc {
+	return func(t *testing.T, c *schema.CostComponent) {
+		assert.Nil(t, c.MonthlyCost, fmt.Sprintf("unexpected monthly cost for %s", c.Name))
 	}
 }
 
@@ -50,10 +50,11 @@ func TestResources(t *testing.T, resources []*schema.Resource, checks []Resource
 
 	for _, check := range checks {
 		found, r := findResource(resources, check.Name)
+		assert.True(t, found, fmt.Sprintf("resource %s not found", check.Name))
 		if !found {
-			t.Errorf("No resource matched for name %s", check.Name)
 			continue
 		}
+
 		foundResources[r] = true
 
 		if check.SkipCheck {
@@ -68,9 +69,9 @@ func TestResources(t *testing.T, resources []*schema.Resource, checks []Resource
 		if r.NoPrice {
 			continue
 		}
-		if m, ok := foundResources[r]; !ok || !m {
-			t.Errorf("Unexpected resource %s", r.Name)
-		}
+
+		m, ok := foundResources[r]
+		assert.True(t, ok && m, fmt.Sprintf("unexpected resource %s", r.Name))
 	}
 }
 
@@ -79,19 +80,18 @@ func TestCostComponents(t *testing.T, costComponents []*schema.CostComponent, ch
 
 	for _, check := range checks {
 		found, c := findCostComponent(costComponents, check.Name)
+		assert.True(t, found, fmt.Sprintf("cost component %s not found", check.Name))
 		if !found {
-			t.Errorf("No cost component matched for name %s", check.Name)
 			continue
 		}
+
 		foundCostComponents[c] = true
 
 		if check.SkipCheck {
 			continue
 		}
 
-		if !cmp.Equal(c.PriceHash(), check.PriceHash) {
-			t.Errorf("Unexpected cost component price hash for %s (expected: %s, got: %s)", c.Name, check.PriceHash, c.PriceHash())
-		}
+		assert.Equal(t, check.PriceHash, c.PriceHash(), fmt.Sprintf("unexpected price hash for %s", c.Name))
 
 		if check.HourlyCostCheck != nil {
 			check.HourlyCostCheck(t, c)
@@ -103,9 +103,8 @@ func TestCostComponents(t *testing.T, costComponents []*schema.CostComponent, ch
 	}
 
 	for _, c := range costComponents {
-		if m, ok := foundCostComponents[c]; !ok || !m {
-			t.Errorf("Unexpected cost component %s", c.Name)
-		}
+		m, ok := foundCostComponents[c]
+		assert.True(t, ok && m, fmt.Sprintf("unexpected cost component %s", c.Name))
 	}
 }
 
@@ -115,6 +114,7 @@ func findResource(resources []*schema.Resource, name string) (bool, *schema.Reso
 			return true, resource
 		}
 	}
+
 	return false, nil
 }
 
@@ -124,10 +124,18 @@ func findCostComponent(costComponents []*schema.CostComponent, name string) (boo
 			return true, costComponent
 		}
 	}
+
 	return false, nil
 }
 
 func formatAmount(d decimal.Decimal) string {
 	f, _ := d.Float64()
 	return fmt.Sprintf("%.4f", f)
+}
+
+func formatCost(d *decimal.Decimal) string {
+	if d == nil {
+		return "-"
+	}
+	return formatAmount(*d)
 }

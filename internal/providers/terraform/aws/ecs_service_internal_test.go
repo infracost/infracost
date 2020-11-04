@@ -3,8 +3,8 @@ package aws
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/shopspring/decimal"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestConvertResourceString(t *testing.T) {
@@ -32,8 +32,6 @@ func TestConvertResourceString(t *testing.T) {
 
 	for _, test := range tests {
 		actual := convertResourceString(test.inputStr)
-		if !cmp.Equal(actual, test.expected) {
-			t.Errorf("Conversion of '%s' failed, got: %s, expected: %s", test.inputStr, actual, test.expected)
-		}
+		assert.Equal(t, test.expected.String(), actual.String())
 	}
 }

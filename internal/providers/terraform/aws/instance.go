@@ -70,6 +70,7 @@ func computeCostComponent(d *schema.ResourceData, purchaseOption string, tenancy
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Linux/UNIX usage (%s, %s)", purchaseOptionLabel, instanceType),
 		Unit:           "hours",
+		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -97,6 +98,7 @@ func ebsOptimizedCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:                 "EBS-optimized usage",
 		Unit:                 "hours",
+		UnitMultiplier:       1,
 		HourlyQuantity:       decimalPtr(decimal.NewFromInt(1)),
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
@@ -118,6 +120,7 @@ func detailedMonitoringCostComponent(d *schema.ResourceData) *schema.CostCompone
 	return &schema.CostComponent{
 		Name:                 "EC2 detailed monitoring",
 		Unit:                 "metrics",
+		UnitMultiplier:       1,
 		MonthlyQuantity:      decimalPtr(decimal.NewFromInt(int64(defaultEC2InstanceMetricCount))),
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
@@ -150,7 +153,7 @@ func cpuCreditsCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "CPU credits",
 		Unit:           "vCPU-hours",
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(0)),
+		UnitMultiplier: 1,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
