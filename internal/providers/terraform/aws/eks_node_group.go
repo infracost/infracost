@@ -31,6 +31,7 @@ func hoursCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "EKS Cluster",
 		Unit:           "hours",
+		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -52,6 +53,7 @@ func vcpuCostComponent(d *schema.ResourceData, vcpuVal decimal.Decimal) *schema.
 	return &schema.CostComponent{
 		Name:           "EKS Cluster",
 		Unit:           "vCPU-hours",
+		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(vcpuVal),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
