@@ -13,12 +13,15 @@ func GetNewEKSNodeGroupItem() *schema.RegistryItem {
 }
 
 func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
-	desiredSize := decimal.NewFromInt(d.Get("desired_size").Int()) // TODO in block
-	vcpuVal := desiredSize.Mul(decimal.NewFromInt(1))              // TODO find flavor
+	region := d.Get("region").String()
+	scalingConfig := d.Get("scaling_config").Array()[0]
+	desiredSize := decimal.NewFromInt(scalingConfig.Get("desired_size").Int())
+	vcpuVal := desiredSize.Mul(decimal.NewFromInt(1))
+
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, hoursCostComponent(d))
-	costComponents = append(costComponents, vcpuCostComponent(d, vcpuVal))
+	costComponents = append(costComponents, hoursCostComponent(d, region))
+	costComponents = append(costComponents, vcpuCostComponent(d, vcpuVal, region))
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -26,10 +29,9 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Res
 	}
 }
 
-func hoursCostComponent(d *schema.ResourceData) *schema.CostComponent {
-	region := d.Get("region").String()
+func hoursCostComponent(d *schema.ResourceData, region string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           "EKS Cluster",
+		Name:           "EKS Cluster memory charges",
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -48,11 +50,10 @@ func hoursCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	}
 }
 
-func vcpuCostComponent(d *schema.ResourceData, vcpuVal decimal.Decimal) *schema.CostComponent {
-	region := d.Get("region").String()
+func vcpuCostComponent(d *schema.ResourceData, vcpuVal decimal.Decimal, region string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           "EKS Cluster",
-		Unit:           "vCPU-hours",
+		Name:           "EKS Cluster CPU charges",
+		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(vcpuVal),
 		ProductFilter: &schema.ProductFilter{
