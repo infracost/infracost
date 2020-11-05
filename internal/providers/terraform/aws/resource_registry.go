@@ -12,6 +12,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetEBSSnapshotRegistryItem(),
 	GetEBSVolumeRegistryItem(),
 	GetECSServiceRegistryItem(),
+	GetEIPRegistryItem(),
 	GetElasticsearchDomainRegistryItem(),
 	GetELBRegistryItem(),
 	GetInstanceRegistryItem(),
