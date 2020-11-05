@@ -8,13 +8,26 @@ import (
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
-
 	log "github.com/sirupsen/logrus"
+
 	"github.com/tidwall/gjson"
 )
 
 // These show differently in the plan JSON for Terraform 0.12 and 0.13.
 var infracostProviderNames = []string{"infracost", "registry.terraform.io/infracost/infracost"}
+
+// ARN attribute mapping for resources that don't have a standard 'arn' attribute
+var arnAttributeMap = map[string]string{
+	"cloudwatch_dashboard":     "dashboard_arn",
+	"db_snapshot":              "db_snapshot_arn",
+	"db_cluster_snapshot":      "db_cluster_snapshot_arn",
+	"neptune_cluster_snapshot": "db_cluster_snapshot_arn",
+	"docdb_cluster_snapshot":   "db_cluster_snapshot_arn",
+	"dms_certificate":          "certificate_arn",
+	"dms_endpoint":             "endpoint_arn",
+	"dms_replication_instance": "replication_instance_arn",
+	"dms_replication_task":     "replication_task_arn",
+}
 
 func createResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	registryMap := GetResourceRegistryMap()
@@ -45,7 +58,7 @@ func createResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 	}
 }
 
-func parsePlanJSON(j []byte) ([]*schema.Resource, error) {
+func parseJSON(j []byte) ([]*schema.Resource, error) {
 	resources := make([]*schema.Resource, 0)
 
 	if !gjson.ValidBytes(j) {
@@ -54,14 +67,18 @@ func parsePlanJSON(j []byte) ([]*schema.Resource, error) {
 
 	p := gjson.ParseBytes(j)
 	providerConf := p.Get("configuration.provider_config")
-	planVals := p.Get("planned_values.root_module")
 	conf := p.Get("configuration.root_module")
 	vars := p.Get("variables")
 
-	resData := parseResourceData(providerConf, planVals, conf, vars)
+	vals := p.Get("planned_values.root_module")
+	if !vals.Exists() {
+		vals = p.Get("values.root_module")
+	}
+
+	resData := parseResourceData(providerConf, vals, conf, vars)
 	parseReferences(resData, conf)
 	resUsage := buildUsageResourceDataMap(resData)
-	resData = stripInfracostResources(resData)
+	resData = stripDataResources(resData)
 
 	for _, r := range resData {
 		if res := createResource(r, resUsage[r.Address]); res != nil {
@@ -73,10 +90,8 @@ func parsePlanJSON(j []byte) ([]*schema.Resource, error) {
 }
 
 func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, vars gjson.Result) map[string]*schema.ResourceData {
-	defaultRegion := parseProviderRegion(providerConf, "aws", vars)
-	if defaultRegion == "" {
-		defaultRegion = "us-east-1"
-	}
+	defaultRegion := "us-east-1"
+	defaultProviderRegion := parseProviderRegion(providerConf, "aws", vars)
 
 	resources := make(map[string]*schema.ResourceData)
 
@@ -86,25 +101,37 @@ func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, v
 		addr := r.Get("address").String()
 		v := r.Get("values")
 
-		region := defaultRegion
+		var region string
 
-		// Override the region with the provider alias's region if exists
-		resConf := getConfJSON(conf, addr)
+		// Try getting the region from the ARN
+		arnAttr, ok := arnAttributeMap[t]
+		if !ok {
+			arnAttr = "arn"
+		}
 
-		providerKey := parseProviderKey(resConf)
-		if providerKey != "aws" && providerKey != "" {
-			provRegion := parseProviderRegion(providerConf, providerKey, vars)
-			// Note: if the provider is passed to a module using a different alias
-			// then there's no way to detect this so we just have to fallback to
-			// the default provider
-			if provRegion != "" {
-				region = provRegion
+		if v.Get(arnAttr).Exists() {
+			region = strings.Split(v.Get(arnAttr).String(), ":")[3]
+		}
+
+		// Try getting the region from the provider conf
+		if region == "" {
+			resConf := getConfJSON(conf, addr)
+			providerKey := parseProviderKey(resConf)
+
+			if providerKey == "aws" {
+				region = defaultProviderRegion
+			} else if providerKey != "" {
+				region = parseProviderRegion(providerConf, providerKey, vars)
+				// Note: if the provider is passed to a module using a different alias
+				// then there's no way to detect this so we just have to fallback to
+				// the default provider
 			}
 		}
 
-		// Override the region with the region from the arn if exists
-		if v.Get("arn").Exists() {
-			region = strings.Split(v.Get("arn").String(), ":")[3]
+		// Fallback to default region
+		if region == "" {
+			log.Debugf("Falling back to default region (%s) for %s", defaultRegion, addr)
+			region = defaultRegion
 		}
 
 		v = schema.AddRawValue(v, "region", region)
@@ -136,25 +163,28 @@ func parseProviderRegion(providerConfig gjson.Result, providerKey string, vars g
 		// Try to get reference
 		refName := providerConfig.Get(fmt.Sprintf("%s.expressions.region.references.0", gjsonEscape(providerKey))).String()
 		splitRef := strings.Split(refName, ".")
+
 		if splitRef[0] == "var" {
 			// Get the region from variables
 			varName := strings.Join(splitRef[1:], ".")
 			varContent := vars.Get(fmt.Sprintf("%s.value", varName))
+
 			if !varContent.IsObject() && !varContent.IsArray() {
 				region = varContent.String()
 			}
 		}
 	}
+
 	return region
 }
 
 func buildUsageResourceDataMap(resData map[string]*schema.ResourceData) map[string]*schema.ResourceData {
 	u := make(map[string]*schema.ResourceData)
 
-	for _, r := range resData {
-		if isInfracostResource(r) {
-			for _, ref := range r.References("resources") {
-				u[ref.Address] = r
+	for _, d := range resData {
+		if isInfracostResource(d) {
+			for _, ref := range d.References("resources") {
+				u[ref.Address] = d
 			}
 		}
 	}
@@ -162,11 +192,11 @@ func buildUsageResourceDataMap(resData map[string]*schema.ResourceData) map[stri
 	return u
 }
 
-func stripInfracostResources(resData map[string]*schema.ResourceData) map[string]*schema.ResourceData {
+func stripDataResources(resData map[string]*schema.ResourceData) map[string]*schema.ResourceData {
 	n := make(map[string]*schema.ResourceData)
 
 	for addr, d := range resData {
-		if !isInfracostResource(d) {
+		if !strings.HasPrefix(d.Address, "data.") {
 			n[addr] = d
 		}
 	}
@@ -175,82 +205,101 @@ func stripInfracostResources(resData map[string]*schema.ResourceData) map[string
 }
 
 func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {
-	for addr, res := range resData {
-		resConf := getConfJSON(conf, addr)
+	registryMap := GetResourceRegistryMap()
 
-		var refsMap = make(map[string][]string)
+	// Create a map of id -> resource data so we can lookup references
+	idMap := make(map[string]*schema.ResourceData)
+	for _, d := range resData {
+		idMap[d.Get("id").String()] = d
+	}
 
-		for attr, j := range resConf.Get("expressions").Map() {
-			getReferences(res, attr, j, &refsMap)
+	for _, d := range resData {
+		var refAttrs []string
+
+		if isInfracostResource(d) {
+			refAttrs = []string{"resources"}
+		} else {
+			item, ok := (*registryMap)[d.Type]
+			if ok {
+				refAttrs = item.ReferenceAttributes
+			}
 		}
 
-		for attr, refs := range refsMap {
-			for _, ref := range refs {
-				if ref == "count.index" || strings.HasPrefix(ref, "var.") {
-					continue
-				}
+		for _, attr := range refAttrs {
+			found := parseConfReferences(resData, conf, d, attr)
 
-				var refData *schema.ResourceData
+			if found {
+				continue
+			}
 
-				m := addressModulePart(addr)
-				refAddr := fmt.Sprintf("%s%s", m, ref)
-
-				// see if there's a resource that's an exact match on the address
-				refData, ok := resData[refAddr]
-
-				// if there's a count ref value then try with the array index of the count ref
-				if !ok && containsString(refs, "count.index") {
-					a := fmt.Sprintf("%s[%d]", refAddr, addressCountIndex(addr))
-					refData, ok = resData[a]
-
-					if ok {
-						log.Debugf("reference specifies a count: using resource %s for %s.%s", a, addr, attr)
-					}
-				}
-
-				// if still not found, see if there's a matching resource with an [0] array part
-				if !ok {
-					a := fmt.Sprintf("%s[0]", refAddr)
-					refData, ok = resData[a]
-
-					if ok {
-						log.Debugf("reference does not specify a count: using resource %s for for %s.%s", a, addr, attr)
-					}
-				}
-
+			// Get any values for the fields and check if they map to IDs of any resources
+			for _, refID := range d.Get(attr).Array() {
+				refData, ok := idMap[refID.String()]
 				if ok {
-					res.AddReference(attr, refData)
+					d.AddReference(attr, refData)
 				}
 			}
 		}
 	}
 }
 
-func getReferences(resData *schema.ResourceData, attr string, j gjson.Result, refs *map[string][]string) {
-	if j.Get("references").Exists() {
-		for _, ref := range j.Get("references").Array() {
-			if _, ok := (*refs)[attr]; !ok {
-				(*refs)[attr] = make([]string, 0, 1)
-			}
+func parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string) bool {
+	// Check if there's a reference in the conf
+	resConf := getConfJSON(conf, d.Address)
+	refResults := resConf.Get("expressions").Get(attr).Get("references").Array()
+	refs := make([]string, 0, len(refResults))
 
-			(*refs)[attr] = append((*refs)[attr], ref.String())
-		}
-	} else if j.IsArray() {
-		for i, attributeJSONItem := range j.Array() {
-			getReferences(resData, fmt.Sprintf("%s.%d", attr, i), attributeJSONItem, refs)
-		}
-	} else if j.Type.String() == "JSON" {
-		j.ForEach(func(childAttribute gjson.Result, childAttributeJSON gjson.Result) bool {
-			getReferences(resData, fmt.Sprintf("%s.%s", attr, childAttribute), childAttributeJSON, refs)
-
-			return true
-		})
+	for _, refR := range refResults {
+		refs = append(refs, refR.String())
 	}
+
+	found := false
+
+	for _, ref := range refs {
+		if ref == "count.index" || strings.HasPrefix(ref, "var.") {
+			continue
+		}
+
+		var refData *schema.ResourceData
+
+		m := addressModulePart(d.Address)
+		refAddr := fmt.Sprintf("%s%s", m, ref)
+
+		// see if there's a resource that's an exact match on the address
+		refData, ok := resData[refAddr]
+
+		// if there's a count ref value then try with the array index of the count ref
+		if !ok && containsString(refs, "count.index") {
+			a := fmt.Sprintf("%s[%d]", refAddr, addressCountIndex(d.Address))
+			refData, ok = resData[a]
+
+			if ok {
+				log.Debugf("reference specifies a count: using resource %s for %s.%s", a, d.Address, attr)
+			}
+		}
+
+		// if still not found, see if there's a matching resource with an [0] array part
+		if !ok {
+			a := fmt.Sprintf("%s[0]", refAddr)
+			refData, ok = resData[a]
+
+			if ok {
+				log.Debugf("reference does not specify a count: using resource %s for for %s.%s", a, d.Address, attr)
+			}
+		}
+
+		if ok {
+			found = true
+
+			d.AddReference(attr, refData)
+		}
+	}
+
+	return found
 }
 
 func getConfJSON(conf gjson.Result, addr string) gjson.Result {
 	c := getModuleConfJSON(conf, getModuleNames(addr))
-
 	return c.Get(fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(addr))))
 }
 

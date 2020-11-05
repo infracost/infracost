@@ -6,8 +6,9 @@ import (
 
 func GetRoute53RecordRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_route53_record",
-		RFunc: NewRoute53Record,
+		Name:                "aws_route53_record",
+		RFunc:               NewRoute53Record,
+		ReferenceAttributes: []string{"alias.0.name"},
 	}
 }
 

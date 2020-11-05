@@ -14,6 +14,11 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_autoscaling_group",
 		RFunc: NewAutoscalingGroup,
+		ReferenceAttributes: []string{
+			"launch_configuration",
+			"launch_template.0.id",
+			"mixed_instances_policy.0.launch_template.0.launch_template_specification.0.launch_template_id",
+		},
 	}
 }
 
