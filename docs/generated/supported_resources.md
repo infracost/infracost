@@ -21,6 +21,7 @@ Support for the following is not currently included:
 | `aws_ebs_snapshot_copy` |  |
 | `aws_ebs_volume` |  |
 | `aws_ecs_service` |  Only supports Fargate on-demand.<br />  |
+| `aws_eip` |  |
 | `aws_elasticsearch_domain` |  |
 | `aws_elb` |  |
 | `aws_instance` |  Costs associated with non-standard Linux AMIs, such as Windows and RHEL are not supported.<br />  EC2 detailed monitoring assumes the standard 7 metrics and the lowest tier of prices for CloudWatch.<br />  If a root volume is not specified then an 8Gi gp2 volume is assumed.<br />  |
