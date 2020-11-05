@@ -130,12 +130,13 @@ var (
 		"aws_load_balancer_listener_policy",
 		"aws_load_balancer_policy",
 
-		// Others
-		"aws_launch_configuration",
-		"aws_launch_template",
+		// Others (sorted alphabetically)
+		"aws_rds_cluster",
 		"aws_ecs_cluster",
 		"aws_ecs_task_definition",
-		"aws_rds_cluster",
+		"aws_eip_association",
+		"aws_launch_configuration",
+		"aws_launch_template",
 	}
 )
 
