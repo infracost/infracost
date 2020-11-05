@@ -239,3 +239,101 @@ func TestParseResourceData(t *testing.T) {
 		assert.Equal(t, expectedRegions[k], v.Get("region").String())
 	}
 }
+
+func TestParseReferences_plan(t *testing.T) {
+	vol1 := schema.NewResourceData(
+		"aws_ebs_volume",
+		"aws",
+		"aws_ebs_volume.volume1",
+		gjson.Result{
+			Type: gjson.JSON,
+			Raw:  `{}`,
+		},
+	)
+
+	snap1 := schema.NewResourceData(
+		"aws_ebs_snapshot",
+		"aws",
+		"aws_ebs_snapshot.snapshot1",
+		gjson.Result{
+			Type: gjson.JSON,
+			Raw:  `{}`,
+		},
+	)
+
+	resData := map[string]*schema.ResourceData{
+		vol1.Address:  vol1,
+		snap1.Address: snap1,
+	}
+
+	conf := gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
+			"resources": [
+				{
+					"address": "aws_ebs_volume.volume1",
+					"mode": "managed",
+          "type": "aws_ebs_volume",
+          "name": "volume1",
+          "provider_config_key": "aws",
+          "expressions": {}
+				},
+				{
+					"address": "aws_ebs_snapshot.snapshot1",
+					"mode": "managed",
+          "type": "aws_ebs_snapshot",
+          "name": "snapshot1",
+          "provider_config_key": "aws",
+          "expressions": {
+            "volume_id": {
+              "references": [
+                "aws_ebs_volume.volume1"
+              ]
+            }
+					}
+				}
+			],
+		}`,
+	}
+
+	parseReferences(resData, conf)
+
+	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
+}
+
+func TestParseReferences_state(t *testing.T) {
+	vol1 := schema.NewResourceData(
+		"aws_ebs_volume",
+		"aws",
+		"aws_ebs_volume.volume1",
+		gjson.Result{
+			Type: gjson.JSON,
+			Raw: `{
+				"id": "vol-12345"
+			}`,
+		},
+	)
+
+	snap1 := schema.NewResourceData(
+		"aws_ebs_snapshot",
+		"aws",
+		"aws_ebs_snapshot.snapshot1",
+		gjson.Result{
+			Type: gjson.JSON,
+			Raw: `{
+				"volume_id": "vol-12345"
+			}`,
+		},
+	)
+
+	resData := map[string]*schema.ResourceData{
+		vol1.Address:  vol1,
+		snap1.Address: snap1,
+	}
+
+	conf := gjson.Result{}
+
+	parseReferences(resData, conf)
+
+	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
+}

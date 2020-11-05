@@ -22,9 +22,10 @@ import (
 var minTerraformVer = "v0.12"
 
 type terraformProvider struct {
+	dir       string
 	jsonFile  string
 	planFile  string
-	dir       string
+	useState  bool
 	planFlags string
 }
 
@@ -34,9 +35,10 @@ func New() schema.Provider {
 }
 
 func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
+	p.dir = c.String("tfdir")
 	p.jsonFile = c.String("tfjson")
 	p.planFile = c.String("tfplan")
-	p.dir = c.String("tfdir")
+	p.useState = c.Bool("use-tfstate")
 	p.planFlags = c.String("tfflags")
 
 	if p.jsonFile != "" && p.planFile != "" {
@@ -51,14 +53,23 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 }
 
 func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
-	plan, err := p.loadPlanJSON()
+	var resources []*schema.Resource
+
+	var j []byte
+	var err error
+
+	if p.useState {
+		j, err = p.generateStateJSON()
+	} else {
+		j, err = p.loadPlanJSON()
+	}
 	if err != nil {
 		return []*schema.Resource{}, err
 	}
 
-	resources, err := parsePlanJSON(plan)
+	resources, err = parseJSON(j)
 	if err != nil {
-		return resources, errors.Wrap(err, "Error parsing Terraform plan JSON")
+		return resources, errors.Wrap(err, "Error parsing Terraform JSON")
 	}
 
 	return resources, nil
@@ -79,6 +90,28 @@ func (p *terraformProvider) loadPlanJSON() ([]byte, error) {
 	if err != nil {
 		return []byte{}, errors.Wrapf(err, "Error reading Terraform plan file")
 	}
+
+	return out, nil
+}
+
+func (p *terraformProvider) generateStateJSON() ([]byte, error) {
+	err := p.terraformPreChecks()
+	if err != nil {
+		return []byte{}, err
+	}
+
+	opts := &CmdOptions{
+		TerraformDir: p.dir,
+	}
+
+	spinner := spin.NewSpinner("Running terraform show")
+	out, err := Cmd(opts, "show", "-no-color", "-json")
+	if err != nil {
+		spinner.Fail()
+		terraformError(err)
+		return []byte{}, errors.Wrap(err, "Error running terraform show")
+	}
+	spinner.Success()
 
 	return out, nil
 }

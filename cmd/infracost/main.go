@@ -110,11 +110,11 @@ Example:
 	# Run infracost with a Terraform directory and var file
 	infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
 
-	# Run infracost with a JSON Terraform plan file
-	infracost --tfjson /path/to/plan.json
+	# Run infracost against a Terraform state
+	infracost --tfdir /path/to/code --use-tfstate
 
-	# Run infracost with a Terraform directory and a plan file in it
-	infracost --tfdir /path/to/code --tfplan plan.save`,
+	# Run infracost with a JSON Terraform plan file
+	infracost --tfjson /path/to/plan.json`,
 		EnableBashCompletion: true,
 		Version:              version.Version,
 		Flags: append([]cli.Flag{
