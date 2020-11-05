@@ -45,10 +45,6 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 		return errors.New("Please provide either a Terraform Plan JSON file (tfjson) or a Terraform Plan file (tfplan)")
 	}
 
-	if p.planFile != "" && p.dir == "" {
-		return errors.New("Please provide a path to the Terraform project (tfdir) if providing a Terraform Plan file (tfplan)")
-	}
-
 	return nil
 }
 
