@@ -161,7 +161,7 @@ func cpuCreditsCostComponent(d *schema.ResourceData) *schema.CostComponent {
 			ProductFamily: strPtr("CPU Credits"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "operatingSystem", Value: strPtr("Linux")},
-				{Key: "usagetype", Value: strPtr(fmt.Sprintf("CPUCredits:%s", prefix))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/CPUCredits:%s/", prefix))},
 			},
 		},
 	}
