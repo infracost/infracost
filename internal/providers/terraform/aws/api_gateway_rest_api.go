@@ -25,7 +25,7 @@ func NewApiGatewayRestApi(d *schema.ResourceData, u *schema.ResourceData) *schem
     monthlyRequests := decimal.Zero
 
     if u != nil && u.Get("monthly_requests.0.value").Exists() {
-        monthlyRequests = decimal.NewFromFloat(u.Get("monthly_requests.0.value").Float())
+        monthlyRequests = decimal.NewFromInt(u.Get("monthly_requests.0.value").Int())
     }
 
     apiRequestQuantities := calculateApiRequests(monthlyRequests, apiTierRequests)
@@ -146,7 +146,7 @@ func calculateApiRequests(requests decimal.Decimal, tiers map[string]decimal.Dec
     if requests.GreaterThanOrEqual(apiTierThreeLimit) {
         tiers["tierThree"]= apiTierThreeLimit
     } else {
-        tiers["tierThree"] = requests.Sub(apiTierTwoLimit.Add(apiTierTwoLimit))
+        tiers["tierThree"] = requests.Sub(apiTierTwoLimit.Add(apiTierOneLimit))
         return tiers
     }
 
