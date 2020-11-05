@@ -38,6 +38,10 @@ func NewEBSVolume(d *schema.ResourceData, u *schema.ResourceData) *schema.Resour
 }
 
 func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.Decimal, iopsVal decimal.Decimal) []*schema.CostComponent {
+	if volumeAPIName == "" {
+		volumeAPIName = "gp2"
+	}
+
 	var name string
 	switch volumeAPIName {
 	case "standard":
