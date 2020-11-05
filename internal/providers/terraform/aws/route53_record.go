@@ -14,7 +14,8 @@ func GetRoute53RecordRegistryItem() *schema.RegistryItem {
 func NewRoute53Record(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	if d.Get("alias.0").Exists() && d.References("alias.0.name")[0].Type != "aws_route53_record" {
 		return &schema.Resource{
-			NoPrice: true,
+			NoPrice:   true,
+			IsSkipped: true,
 		}
 	}
 
