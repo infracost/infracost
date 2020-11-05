@@ -20,10 +20,10 @@ func GetALBRegistryItem() *schema.RegistryItem {
 }
 
 func NewLB(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
-	costComponentName := "Per application load balancer"
+	costComponentName := "Application load balancer"
 	productFamily := "Load Balancer-Application"
 	if d.Get("load_balancer_type").String() == "network" {
-		costComponentName = "Per network load balancer"
+		costComponentName = "Network load balancer"
 		productFamily = "Load Balancer-Network"
 	}
 

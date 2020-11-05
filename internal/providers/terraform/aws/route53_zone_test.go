@@ -26,7 +26,7 @@ func TestRoute53Zone(t *testing.T) {
 			Name: "aws_route53_zone.zone1",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Per hosted zone",
+					Name:            "Hosted zone",
 					PriceHash:       "11a88b17c107a718b150e048d21ce5ac-48bca87a3e73bd3aa593065935882019",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
