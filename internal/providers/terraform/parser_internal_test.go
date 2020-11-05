@@ -35,7 +35,7 @@ func TestCreateResource(t *testing.T) {
 				ResourceType: "null_resource",
 				IsSkipped:    true,
 				NoPrice:      true,
-				SkipMessage:  "This resource is free",
+				SkipMessage:  "Free resource.",
 			},
 		},
 		{

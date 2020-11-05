@@ -26,7 +26,7 @@ func createResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 				ResourceType: d.Type,
 				IsSkipped:    true,
 				NoPrice:      true,
-				SkipMessage:  "This resource is free",
+				SkipMessage:  "Free resource.",
 			}
 		}
 
