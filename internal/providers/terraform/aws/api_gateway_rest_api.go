@@ -122,7 +122,6 @@ func NewApiGatewayRestApi(d *schema.ResourceData, u *schema.ResourceData) *schem
 }
 
 func calculateApiRequests(requests decimal.Decimal, tiers map[string]decimal.Decimal) map[string]decimal.Decimal {
-
     // API gateway charging tiers
     apiTierOneLimit   := decimal.NewFromInt(333000000)
     apiTierTwoLimit   := decimal.NewFromInt(667000000)
