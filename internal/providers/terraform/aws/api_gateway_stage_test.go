@@ -37,7 +37,7 @@ func TestApiGatewayStage(t *testing.T) {
             Name: "aws_api_gateway_stage.cache-1",
             CostComponentChecks: []testutil.CostComponentCheck{
                 {
-                    Name:            "Cache Memory Size 0.5(GB)",
+                    Name:            "Cache memory size 0.5(GB)",
                     PriceHash:       "13dde350db747bc0cf6b3afb92d76111-d2c98780d7b6e36641b521f1f8145c6f",
                     HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
                 },
@@ -47,7 +47,7 @@ func TestApiGatewayStage(t *testing.T) {
             Name: "aws_api_gateway_stage.cache-2",
             CostComponentChecks: []testutil.CostComponentCheck{
                 {
-                    Name:            "Cache Memory Size 237(GB)",
+                    Name:            "Cache memory size 237(GB)",
                     PriceHash:       "3cbf2c573f7429f90a9acf3a34662d4a-d2c98780d7b6e36641b521f1f8145c6f",
                     HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
                 },
