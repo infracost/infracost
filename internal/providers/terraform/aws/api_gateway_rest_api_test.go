@@ -15,8 +15,8 @@ func TestApiGatewayRestApi(t *testing.T) {
 	tf := `
         resource "aws_api_gateway_rest_api" "api" {
           name              = "rest-api-gateway"
-          description       = "Rest API Gateway"  
-		}`
+          description       = "Rest API Gateway"
+        }`
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
