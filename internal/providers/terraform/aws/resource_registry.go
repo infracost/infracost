@@ -4,6 +4,7 @@ import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetApiGatewayRestApiRegistryItem(),
+	GetApiGatewayStageRegistryItem(),
 	GetAutoscalingGroupRegistryItem(),
 	GetDBInstanceRegistryItem(),
 	GetDMSRegistryItem(),

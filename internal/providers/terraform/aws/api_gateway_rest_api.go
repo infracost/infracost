@@ -39,7 +39,7 @@ func NewApiGatewayRestApi(d *schema.ResourceData, u *schema.ResourceData) *schem
         Name: d.Address,
         CostComponents: []*schema.CostComponent{
             {
-                Name:            "First 333 Million Requests",
+                Name:            "Requests (first 333M)",
                 Unit:            "requests",
                 MonthlyQuantity: &tierOne,
                 ProductFilter: &schema.ProductFilter{
@@ -59,7 +59,7 @@ func NewApiGatewayRestApi(d *schema.ResourceData, u *schema.ResourceData) *schem
                 },
             },
             {
-                Name:            "Next 667 Million Requests",
+                Name:            "Requests (next 667M)",
                 Unit:            "requests",
                 MonthlyQuantity: &tierTwo,
                 ProductFilter: &schema.ProductFilter{
@@ -79,7 +79,7 @@ func NewApiGatewayRestApi(d *schema.ResourceData, u *schema.ResourceData) *schem
                 },
             },
             {
-                Name:            "Next 19 Billion Requests",
+                Name:            "Requests (next 19B)",
                 Unit:            "requests",
                 MonthlyQuantity: &tierThree,
                 ProductFilter: &schema.ProductFilter{
@@ -99,7 +99,7 @@ func NewApiGatewayRestApi(d *schema.ResourceData, u *schema.ResourceData) *schem
                 },
             },
             {
-                Name:            "Over 20 Billion Requests",
+                Name:            "Requests (over 20B)",
                 Unit:            "requests",
                 MonthlyQuantity: &tierFour,
                 ProductFilter: &schema.ProductFilter{
@@ -124,10 +124,10 @@ func NewApiGatewayRestApi(d *schema.ResourceData, u *schema.ResourceData) *schem
 func calculateApiRequests(requests decimal.Decimal, tiers map[string]decimal.Decimal) map[string]decimal.Decimal {
 
     // API gateway charging tiers
-    apiTierOneLimit := decimal.NewFromInt(333000000)
-    apiTierTwoLimit := decimal.NewFromInt(667000000)
+    apiTierOneLimit   := decimal.NewFromInt(333000000)
+    apiTierTwoLimit   := decimal.NewFromInt(667000000)
     apiTierThreeLimit := decimal.NewFromInt(20000000000)
-    apiTierFourLimit := decimal.NewFromInt(21000000000)
+    apiTierFourLimit  := decimal.NewFromInt(21000000000)
 
     if requests.GreaterThanOrEqual(apiTierOneLimit) {
         tiers["tierOne"] = apiTierOneLimit
