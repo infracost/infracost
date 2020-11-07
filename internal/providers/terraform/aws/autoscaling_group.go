@@ -12,12 +12,13 @@ import (
 
 func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name: "aws_autoscaling_group",
-		Notes: []string{
-			"S3 replication time control data transfer is not supported by Terraform.",
-			"S3 batch operations are not supported by Terraform.",
-		},
+		Name:  "aws_autoscaling_group",
 		RFunc: NewAutoscalingGroup,
+		ReferenceAttributes: []string{
+			"launch_configuration",
+			"launch_template.0.id",
+			"mixed_instances_policy.0.launch_template.0.launch_template_specification.0.launch_template_id",
+		},
 	}
 }
 

@@ -48,6 +48,7 @@ data "infracost_aws_lambda_function" "hello_world" {
   average_request_duration { value = 250 } # <<<<< Try changing this to 100 (milliseconds) to compare costs
 }
 
-resource "aws_eip" "nat_eip" {
-  vpc = true
+# Example non-supported resource
+resource "aws_simpledb_domain" "users" {
+  name = "users"
 }

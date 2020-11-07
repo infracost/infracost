@@ -25,7 +25,7 @@ func NewNATGateway(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           "Per NAT gateway",
+				Name:           "NAT gateway",
 				Unit:           "hours",
 				UnitMultiplier: 1,
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),

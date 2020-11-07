@@ -27,8 +27,13 @@ func defaultCmd() *cli.Command {
 			},
 			&cli.StringFlag{
 				Name:      "tfplan",
-				Usage:     "Path to Terraform plan file relative to 'tfdir'. Requires 'tfdir' to be set",
+				Usage:     "Path to Terraform plan file relative to 'tfdir'",
 				TakesFile: true,
+			},
+			&cli.BoolFlag{
+				Name:  "use-tfstate",
+				Usage: "Use Terraform state instead of generating a plan",
+				Value: false,
 			},
 			&cli.StringFlag{
 				Name:        "tfdir",
