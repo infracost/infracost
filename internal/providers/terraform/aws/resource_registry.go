@@ -28,4 +28,6 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetS3BucketInventoryRegistryItem(),
 	GetSQSQueueRegistryItem(),
 	GetNewEKSNodeGroupItem(),
+	GetNewEKSFargateProfileItem(),
+	GetNewEKSClusterItem(),
 }

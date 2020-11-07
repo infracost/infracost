@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -13,15 +15,8 @@ func GetNewEKSNodeGroupItem() *schema.RegistryItem {
 }
 
 func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
-	region := d.Get("region").String()
-	scalingConfig := d.Get("scaling_config").Array()[0]
-	desiredSize := decimal.NewFromInt(scalingConfig.Get("desired_size").Int())
-	vcpuVal := desiredSize.Mul(decimal.NewFromInt(1))
-
 	costComponents := make([]*schema.CostComponent, 0)
-
-	costComponents = append(costComponents, hoursCostComponent(d, region))
-	costComponents = append(costComponents, vcpuCostComponent(d, vcpuVal, region))
+	costComponents = append(costComponents, eksComputeCostComponent(d))
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -29,40 +24,31 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Res
 	}
 }
 
-func hoursCostComponent(d *schema.ResourceData, region string) *schema.CostComponent {
+func eksComputeCostComponent(d *schema.ResourceData) *schema.CostComponent {
+	region := d.Get("region").String()
+	scalingConfig := d.Get("scaling_config").Array()[0]
+	desiredSize := int(scalingConfig.Get("desired_size").Int())
+	instanceType := "t3.medium"
+	if d.Get("instance_type").Exists() {
+		instanceType = d.Get("instance_type").String()
+	}
+	purchaseOptionLabel := "on-demand"
+
 	return &schema.CostComponent{
-		Name:           "EKS Cluster memory charges",
+		Name:           fmt.Sprintf("Linux/UNIX usage (%s, %s)", purchaseOptionLabel, instanceType),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: desiredSize,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
-			Service:       strPtr("AmazonEKS"),
-			ProductFamily: strPtr("Compute"),
+			Service:       strPtr("AmazonEC2"),
+			ProductFamily: strPtr("Compute Instance"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("USE1-AmazonEKS-Hours:perCluster")},
-			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("on_demand"),
-		},
-	}
-}
-
-func vcpuCostComponent(d *schema.ResourceData, vcpuVal decimal.Decimal, region string) *schema.CostComponent {
-	return &schema.CostComponent{
-		Name:           "EKS Cluster CPU charges",
-		Unit:           "hours",
-		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(vcpuVal),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr("AmazonEKS"),
-			ProductFamily: strPtr("Compute"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("USE1-Fargate-vCPU-Hours:perCPU")},
+				{Key: "instanceType", Value: strPtr(instanceType)},
+				{Key: "operatingSystem", Value: strPtr("Linux")},
+				{Key: "preInstalledSw", Value: strPtr("NA")},
+				{Key: "capacitystatus", Value: strPtr("Used")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
