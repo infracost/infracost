@@ -26,7 +26,7 @@ func TestNATGateway(t *testing.T) {
 			Name: "aws_nat_gateway.nat",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Per NAT gateway",
+					Name:            "NAT gateway",
 					PriceHash:       "6e137a9da0718f0ec80fb60866730ba9-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -67,7 +67,7 @@ func TestNATGateway_usage(t *testing.T) {
 			Name: "aws_nat_gateway.nat",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Per NAT gateway",
+					Name:            "NAT gateway",
 					PriceHash:       "6e137a9da0718f0ec80fb60866730ba9-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},

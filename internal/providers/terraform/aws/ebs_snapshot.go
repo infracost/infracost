@@ -8,8 +8,9 @@ import (
 
 func GetEBSSnapshotRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_ebs_snapshot",
-		RFunc: NewEBSSnapshot,
+		Name:                "aws_ebs_snapshot",
+		RFunc:               NewEBSSnapshot,
+		ReferenceAttributes: []string{"volume_id"},
 	}
 }
 

@@ -10,6 +10,10 @@ func GetEBSSnapshotCopyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_ebs_snapshot_copy",
 		RFunc: NewEBSSnapshotCopy,
+		ReferenceAttributes: []string{
+			"volume_id",
+			"source_snapshot_id",
+		},
 	}
 }
 

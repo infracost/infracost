@@ -13,9 +13,10 @@ import (
 
 func GetECSServiceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_ecs_service",
-		Notes: []string{"Only supports Fargate on-demand."},
-		RFunc: NewECSService,
+		Name:                "aws_ecs_service",
+		Notes:               []string{"Only supports Fargate on-demand."},
+		RFunc:               NewECSService,
+		ReferenceAttributes: []string{"task_definition"},
 	}
 }
 

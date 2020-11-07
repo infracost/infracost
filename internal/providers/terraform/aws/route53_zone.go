@@ -18,7 +18,7 @@ func NewRoute53Zone(d *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:            "Per hosted zone",
+				Name:            "Hosted zone",
 				Unit:            "months",
 				UnitMultiplier:  1,
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
