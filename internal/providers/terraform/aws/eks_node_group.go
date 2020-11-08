@@ -12,6 +12,9 @@ func GetNewEKSNodeGroupItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_eks_node_group",
 		RFunc: NewEKSNodeGroup,
+		ReferenceAttributes: []string{
+			"launch_template.0.id",
+		},
 	}
 }
 
@@ -25,17 +28,38 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Res
 		instanceType = d.Get("instance_types").Array()[0].String()
 	}
 
+	launchTemplateRef := d.References("launch_template.0.id")
+
 	costComponents := make([]*schema.CostComponent, 0)
-	costComponents = append(costComponents, eksComputeCostComponent(d, region, desiredSize, instanceType))
-	eksCPUCreditsCostComponent := eksCPUCreditsCostComponent(d, region, desiredSize, instanceType)
-	if eksCPUCreditsCostComponent != nil {
-		costComponents = append(costComponents, eksCPUCreditsCostComponent)
+	subResources := make([]*schema.Resource, 0)
+
+	if len(launchTemplateRef) > 0 {
+		onDemandCount := decimal.NewFromInt(desiredSize)
+		spotCount := decimal.Zero
+		if launchTemplateRef[0].Get("instance_market_options.0.market_type").String() == "spot" {
+			onDemandCount = decimal.Zero
+			spotCount = decimal.NewFromInt(desiredSize)
+		}
+		lt := newLaunchTemplate(launchTemplateRef[0].Address, launchTemplateRef[0], region, onDemandCount, spotCount)
+
+		// AutoscalingGroup should show as not supported LaunchTemplate is not supported
+		if lt == nil {
+			return nil
+		}
+		subResources = append(subResources, lt)
+	} else {
+		costComponents = append(costComponents, eksComputeCostComponent(d, region, desiredSize, instanceType))
+		eksCPUCreditsCostComponent := eksCPUCreditsCostComponent(d, region, desiredSize, instanceType)
+		if eksCPUCreditsCostComponent != nil {
+			costComponents = append(costComponents, eksCPUCreditsCostComponent)
+		}
+		costComponents = append(costComponents, newEksRootBlockDevice(d))
 	}
-	costComponents = append(costComponents, newEksRootBlockDevice(d))
 
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
+		SubResources:   subResources,
 	}
 }
 
