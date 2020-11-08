@@ -58,7 +58,7 @@ func vcpuCostComponent(d *schema.ResourceData, region string) *schema.CostCompon
 			Service:       strPtr("AmazonEKS"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("USE1-Fargate-vCPU-Hours:perCPU")},
+				{Key: "usagetype", ValueRegex: strPtr("/Fargate-vCPU-Hours:perCPU/")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
