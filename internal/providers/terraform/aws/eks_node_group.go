@@ -17,6 +17,7 @@ func GetNewEKSNodeGroupItem() *schema.RegistryItem {
 func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	costComponents = append(costComponents, eksComputeCostComponent(d))
+	costComponents = append(costComponents, newEksRootBlockDevice(d))
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -55,4 +56,22 @@ func eksComputeCostComponent(d *schema.ResourceData) *schema.CostComponent {
 			PurchaseOption: strPtr("on_demand"),
 		},
 	}
+}
+
+func newEksRootBlockDevice(d *schema.ResourceData) *schema.CostComponent {
+	region := d.Get("region").String()
+	return newEksEbsBlockDevice("root_block_device", d, region)
+}
+
+func newEksEbsBlockDevice(name string, d *schema.ResourceData, region string) *schema.CostComponent {
+	volumeAPIName := "gp2"
+
+	gbVal := decimal.NewFromInt(int64(defaultVolumeSize))
+	if d.Get("disk_size").Exists() {
+		gbVal = decimal.NewFromFloat(d.Get("disk_size").Float())
+	}
+
+	iopsVal := decimal.Zero
+
+	return ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal)[0]
 }
