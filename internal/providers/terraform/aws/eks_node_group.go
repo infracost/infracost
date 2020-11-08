@@ -28,7 +28,7 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Res
 func eksComputeCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("region").String()
 	scalingConfig := d.Get("scaling_config").Array()[0]
-	desiredSize := int(scalingConfig.Get("desired_size").Int())
+	desiredSize := scalingConfig.Get("desired_size").Int()
 	instanceType := "t3.medium"
 	if d.Get("instance_type").Exists() {
 		instanceType = d.Get("instance_type").String()
@@ -49,6 +49,7 @@ func eksComputeCostComponent(d *schema.ResourceData) *schema.CostComponent {
 				{Key: "instanceType", Value: strPtr(instanceType)},
 				{Key: "operatingSystem", Value: strPtr("Linux")},
 				{Key: "preInstalledSw", Value: strPtr("NA")},
+				{Key: "tenancy", Value: strPtr("Shared")},
 				{Key: "capacitystatus", Value: strPtr("Used")},
 			},
 		},
