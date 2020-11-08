@@ -37,7 +37,7 @@ func clusterHoursCostComponent(d *schema.ResourceData, region string) *schema.Co
 			Service:       strPtr("AmazonEKS"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("USE1-AmazonEKS-Hours:perCluster")},
+				{Key: "usagetype", ValueRegex: strPtr("/AmazonEKS-Hours:perCluster/")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
