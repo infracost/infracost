@@ -35,89 +35,104 @@ func NewApiGatewayRestApi(d *schema.ResourceData, u *schema.ResourceData) *schem
     tierThree := apiRequestQuantities["tierThree"]
     tierFour  := apiRequestQuantities["tierFour"]
 
-    return &schema.Resource{
-        Name: d.Address,
-        CostComponents: []*schema.CostComponent{
-            {
-                Name:            "Requests (first 333M)",
-                Unit:            "requests",
-                MonthlyQuantity: &tierOne,
-                ProductFilter: &schema.ProductFilter{
-                    VendorName:    strPtr("aws"),
-                    Region:        strPtr(region),
-                    Service:       strPtr("AmazonApiGateway"),
-                    ProductFamily: strPtr("API Calls"),
-                    AttributeFilters: []*schema.AttributeFilter{
-                        {Key: "description", Value: strPtr("API calls received")},
-                        {Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-                        {Key: "operation", Value: strPtr("ApiGatewayRequest")},
-                    },
-                },
-                PriceFilter: &schema.PriceFilter{
-                    StartUsageAmount: strPtr("0"),
-                    EndUsageAmount: strPtr("333000000"),
+    costComponents := []*schema.CostComponent{
+        {
+            Name:            "Requests (first 333M)",
+            Unit:            "requests",
+            UnitMultiplier: 1000000,
+            MonthlyQuantity: &tierOne,
+            ProductFilter: &schema.ProductFilter{
+                VendorName:    strPtr("aws"),
+                Region:        strPtr(region),
+                Service:       strPtr("AmazonApiGateway"),
+                ProductFamily: strPtr("API Calls"),
+                AttributeFilters: []*schema.AttributeFilter{
+                    {Key: "description", Value: strPtr("API calls received")},
+                    {Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
+                    {Key: "operation", Value: strPtr("ApiGatewayRequest")},
                 },
             },
-            {
-                Name:            "Requests (next 667M)",
-                Unit:            "requests",
-                MonthlyQuantity: &tierTwo,
-                ProductFilter: &schema.ProductFilter{
-                    VendorName:    strPtr("aws"),
-                    Region:        strPtr(region),
-                    Service:       strPtr("AmazonApiGateway"),
-                    ProductFamily: strPtr("API Calls"),
-                    AttributeFilters: []*schema.AttributeFilter{
-                        {Key: "description", Value: strPtr("API calls received")},
-                        {Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-                        {Key: "operation", Value: strPtr("ApiGatewayRequest")},
-                    },
-                },
-                PriceFilter: &schema.PriceFilter{
-                    StartUsageAmount: strPtr("333000000"),
-                    EndUsageAmount: strPtr("1000000000"),
-                },
-            },
-            {
-                Name:            "Requests (next 19B)",
-                Unit:            "requests",
-                MonthlyQuantity: &tierThree,
-                ProductFilter: &schema.ProductFilter{
-                    VendorName:    strPtr("aws"),
-                    Region:        strPtr(region),
-                    Service:       strPtr("AmazonApiGateway"),
-                    ProductFamily: strPtr("API Calls"),
-                    AttributeFilters: []*schema.AttributeFilter{
-                        {Key: "description", Value: strPtr("API calls received")},
-                        {Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-                        {Key: "operation", Value: strPtr("ApiGatewayRequest")},
-                    },
-                },
-                PriceFilter: &schema.PriceFilter{
-                    StartUsageAmount: strPtr("1000000000"),
-                    EndUsageAmount: strPtr("20000000000"),
-                },
-            },
-            {
-                Name:            "Requests (over 20B)",
-                Unit:            "requests",
-                MonthlyQuantity: &tierFour,
-                ProductFilter: &schema.ProductFilter{
-                    VendorName:    strPtr("aws"),
-                    Region:        strPtr(region),
-                    Service:       strPtr("AmazonApiGateway"),
-                    ProductFamily: strPtr("API Calls"),
-                    AttributeFilters: []*schema.AttributeFilter{
-                        {Key: "description", Value: strPtr("API calls received")},
-                        {Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-                        {Key: "operation", Value: strPtr("ApiGatewayRequest")},
-                    },
-                },
-                PriceFilter: &schema.PriceFilter{
-                    StartUsageAmount: strPtr("20000000000"),
-                },
+            PriceFilter: &schema.PriceFilter{
+                StartUsageAmount: strPtr("0"),
+                EndUsageAmount: strPtr("333000000"),
             },
         },
+    }
+
+    if tierTwo.GreaterThan(decimal.NewFromInt(0)) {
+        costComponents = append(costComponents, &schema.CostComponent{
+            Name:            "Requests (next 667M)",
+            Unit:            "requests",
+            UnitMultiplier: 10000000,
+            MonthlyQuantity: &tierTwo,
+            ProductFilter: &schema.ProductFilter{
+                VendorName:    strPtr("aws"),
+                Region:        strPtr(region),
+                Service:       strPtr("AmazonApiGateway"),
+                ProductFamily: strPtr("API Calls"),
+                AttributeFilters: []*schema.AttributeFilter{
+                    {Key: "description", Value: strPtr("API calls received")},
+                    {Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
+                    {Key: "operation", Value: strPtr("ApiGatewayRequest")},
+                },
+            },
+            PriceFilter: &schema.PriceFilter{
+                StartUsageAmount: strPtr("333000000"),
+                EndUsageAmount: strPtr("1000000000"),
+            },
+        })
+    }
+
+    if tierThree.GreaterThan(decimal.NewFromInt(0)) {
+        costComponents = append(costComponents, &schema.CostComponent{
+            Name:            "Requests (next 19B)",
+            Unit:            "requests",
+            UnitMultiplier: 10000000,
+            MonthlyQuantity: &tierThree,
+            ProductFilter: &schema.ProductFilter{
+                VendorName:    strPtr("aws"),
+                Region:        strPtr(region),
+                Service:       strPtr("AmazonApiGateway"),
+                ProductFamily: strPtr("API Calls"),
+                AttributeFilters: []*schema.AttributeFilter{
+                    {Key: "description", Value: strPtr("API calls received")},
+                    {Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
+                    {Key: "operation", Value: strPtr("ApiGatewayRequest")},
+                },
+            },
+            PriceFilter: &schema.PriceFilter{
+                StartUsageAmount: strPtr("1000000000"),
+                EndUsageAmount: strPtr("20000000000"),
+            },
+        })
+    }
+
+    if tierFour.GreaterThan(decimal.NewFromInt(0)){
+        costComponents = append(costComponents, &schema.CostComponent{
+            Name:            "Requests (over 20B)",
+            Unit:            "requests",
+            UnitMultiplier: 10000000,
+            MonthlyQuantity: &tierFour,
+            ProductFilter: &schema.ProductFilter{
+                VendorName:    strPtr("aws"),
+                Region:        strPtr(region),
+                Service:       strPtr("AmazonApiGateway"),
+                ProductFamily: strPtr("API Calls"),
+                AttributeFilters: []*schema.AttributeFilter{
+                    {Key: "description", Value: strPtr("API calls received")},
+                    {Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
+                    {Key: "operation", Value: strPtr("ApiGatewayRequest")},
+                },
+            },
+            PriceFilter: &schema.PriceFilter{
+                StartUsageAmount: strPtr("20000000000"),
+            },
+        })
+    }
+
+    return &schema.Resource{
+        Name: d.Address,
+        CostComponents: costComponents,
     }
 }
 

@@ -27,21 +27,6 @@ func TestApiGatewayRestApi(t *testing.T) {
 					PriceHash:        "30915f094424efbda95c09ab4ee17a0b-aa6df30af0b50817c2072570cdf45eb9",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
-				{
-					Name:             "Requests (next 667M)",
-					PriceHash:        "30915f094424efbda95c09ab4ee17a0b-aa6df30af0b50817c2072570cdf45eb9",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
-				},
-				{
-					Name:             "Requests (next 19B)",
-					PriceHash:        "30915f094424efbda95c09ab4ee17a0b-aa6df30af0b50817c2072570cdf45eb9",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
-				},
-				{
-					Name:             "Requests (Over 20B)",
-					PriceHash:        "30915f094424efbda95c09ab4ee17a0b-aa6df30af0b50817c2072570cdf45eb9",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
-				},
 			},
 		},
 	}
