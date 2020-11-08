@@ -37,7 +37,7 @@ func memoryCostComponent(d *schema.ResourceData, region string) *schema.CostComp
 			Service:       strPtr("AmazonEKS"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("USE1-AmazonEKS-Hours:perCluster")},
+				{Key: "usagetype", ValueRegex: strPtr("/Fargate-GB-Hours/")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
