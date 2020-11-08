@@ -27,7 +27,7 @@ func NewEKSCluster(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 
 func clusterHoursCostComponent(d *schema.ResourceData, region string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           "EKS Cluster",
+		Name:           "EKS cluster",
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
