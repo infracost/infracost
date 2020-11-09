@@ -28,7 +28,7 @@ func TestApiGatewayv2Api(t *testing.T) {
 			Name: "aws_apigatewayv2_api.http",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Requests (first 300m)",
+					Name:             "Requests (first 300M)",
 					PriceHash:        "af24853fd5a2d7b09b6c998c68aae0fb-4a9dfd3965ffcbab75845ead7a27fd47",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
