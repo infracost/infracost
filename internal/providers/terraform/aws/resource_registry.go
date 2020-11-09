@@ -3,7 +3,9 @@ package aws
 import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
-	GetAPIGatewayv2ApiRegistryItem(),
+	GetAPIGatewayRestAPIRegistryItem(),
+	GetAPIGatewayStageRegistryItem(),
+  GetAPIGatewayv2ApiRegistryItem(),
 	GetAutoscalingGroupRegistryItem(),
 	GetDBInstanceRegistryItem(),
 	GetDMSRegistryItem(),
