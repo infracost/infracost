@@ -130,6 +130,28 @@ var (
 		"aws_load_balancer_listener_policy",
 		"aws_load_balancer_policy",
 
+		// API Gateway Rest APIs
+		"aws_api_gateway_account",
+		"aws_api_gateway_api_key",
+		"aws_api_gateway_authorizer",
+		"aws_api_gateway_base_path_mapping",
+		"aws_api_gateway_client_certificate",
+		"aws_api_gateway_deployment",
+		"aws_api_gateway_documentation_part",
+		"aws_api_gateway_documentation_version",
+		"aws_api_gateway_domain_name",
+		"aws_api_gateway_response",
+		"aws_api_gateway_integration",
+		"aws_api_gateway_method",
+		"aws_api_gateway_method_response",
+		"aws_api_gateway_method_settings",
+		"aws_api_gateway_model",
+		"aws_api_gateway_request_validator",
+		"aws_api_gateway_resource",
+		"aws_api_gateway_usage_plan",
+		"aws_api_gateway_usage_plan_key",
+		"aws_api_gateway_vpc_link",
+
 		// Others (sorted alphabetically)
 		"aws_rds_cluster",
 		"aws_ecs_cluster",
