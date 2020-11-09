@@ -42,6 +42,11 @@ func TestApiGatewayv2Api(t *testing.T) {
 					PriceHash:        "a05bc87146da4c5fb7e1f26842932733-9feb253daec90eea89ff2b27827298c1",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
+				{
+					Name:             "Connection duration",
+					PriceHash:        "7d0a09a4b1594a4ea3302640bd5ab41c-a62d9273fef0987b8d1b9a67a508acdc",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+				},
 			},
 		},
 	}
