@@ -37,7 +37,7 @@ func NewApiGatewayv2Api(d *schema.ResourceData, u *schema.ResourceData) *schema.
 func httpApiCostComponent(d *schema.ResourceData, u *schema.ResourceData) []*schema.CostComponent {
 	region := d.Get("region").String()
 	monthlyRequests := decimal.Zero
-	requestSize := decimal.NewFromInt(0)
+	requestSize := decimal.NewFromInt(512)
 
 	billableRequestSize := decimal.NewFromInt(512)
 
@@ -54,23 +54,24 @@ func httpApiCostComponent(d *schema.ResourceData, u *schema.ResourceData) []*sch
 		monthlyRequests = decimal.NewFromInt(u.Get("monthly_requests.0.value").Int())
 	}
 
-	if u != nil && u.Get("request_size.0.value").Exists() {
-		requestSize = decimal.NewFromInt(u.Get("request_size.0.value").Int())
+	if u != nil && u.Get("average_request_size.0.value").Exists() {
+		requestSize = decimal.NewFromInt(u.Get("average_request_size.0.value").Int())
 	}
 
 	if requestSize.GreaterThan(billableRequestSize) {
 		monthlyRequests = calculateBillableRequests(requestSize, billableRequestSize, monthlyRequests)
 	}
 
-	apiRequestQuantities := calculateApiRequests(monthlyRequests, apiTierRequests, apiTierOneLimit, apiTierTwoLimit)
+	apiRequestQuantities := calculateApiV2Requests(monthlyRequests, apiTierRequests, apiTierOneLimit, apiTierTwoLimit)
 
 	apiTierOne := apiRequestQuantities["apiRequestTierOne"]
 	apiTierTwo := apiRequestQuantities["apiRequestTierTwo"]
 
-	return []*schema.CostComponent{
+	CostComponent := []*schema.CostComponent{
 		{
 			Name:            "Requests (first 300m)",
 			Unit:            "requests",
+			UnitMultiplier: 1000000,
 			MonthlyQuantity: &apiTierOne,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -80,16 +81,19 @@ func httpApiCostComponent(d *schema.ResourceData, u *schema.ResourceData) []*sch
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "description", Value: strPtr("HTTP API Requests")},
 					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayHttpRequest/")},
-					{Key: "operation", Value: strPtr("ApiGatewayHttpApi")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
 				StartUsageAmount: strPtr("0"),
 			},
 		},
-		{
+	}
+
+	if apiTierTwo.GreaterThan(decimal.NewFromInt(0)) {
+		CostComponent = append(CostComponent, &schema.CostComponent{
 			Name:            "Requests (over 300m)",
 			Unit:            "requests",
+			UnitMultiplier: 1000000,
 			MonthlyQuantity: &apiTierTwo,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -99,20 +103,21 @@ func httpApiCostComponent(d *schema.ResourceData, u *schema.ResourceData) []*sch
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "description", Value: strPtr("HTTP API Requests")},
 					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayHttpRequest/")},
-					{Key: "operation", Value: strPtr("ApiGatewayHttpApi")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
 				StartUsageAmount: strPtr("300000000"),
 			},
-		},
+		})
 	}
+
+	return CostComponent
 }
 
 func websocketApiCostComponent(d *schema.ResourceData, u *schema.ResourceData) []*schema.CostComponent {
 	region := d.Get("region").String()
 	monthlyMessages := decimal.Zero
-	messageSize := decimal.NewFromInt(0)
+	messageSize := decimal.NewFromInt(32)
 
 	billableRequestSize := decimal.NewFromInt(32)
 
@@ -137,15 +142,16 @@ func websocketApiCostComponent(d *schema.ResourceData, u *schema.ResourceData) [
 		monthlyMessages = calculateBillableRequests(messageSize, billableRequestSize, monthlyMessages)
 	}
 
-	apiRequestQuantities := calculateApiRequests(monthlyMessages, apiTierRequests, apiTierOneLimt, apiTierTwoLimit)
+	apiRequestQuantities := calculateApiV2Requests(monthlyMessages, apiTierRequests, apiTierOneLimt, apiTierTwoLimit)
 
 	apiTierOne := apiRequestQuantities["apiRequestTierOne"]
 	apiTierTwo := apiRequestQuantities["apiRequestTierTwo"]
 
-	return []*schema.CostComponent{
+	costComponent := []*schema.CostComponent {
 		{
-			Name:            "Requests (first 1B message transfers)",
-			Unit:            "requests",
+			Name:            "Messages (first 1B)",
+			Unit:            "messages",
+			UnitMultiplier: 1000000,
 			MonthlyQuantity: &apiTierOne,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -153,7 +159,6 @@ func websocketApiCostComponent(d *schema.ResourceData, u *schema.ResourceData) [
 				Service:       strPtr("AmazonApiGateway"),
 				ProductFamily: strPtr("WebSocket"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr("WebSocket Messages")},
 					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayMessage/")},
 				},
 			},
@@ -161,9 +166,13 @@ func websocketApiCostComponent(d *schema.ResourceData, u *schema.ResourceData) [
 				StartUsageAmount: strPtr("0"),
 			},
 		},
-		{
-			Name:            "Requests (over 1B message transfers)",
-			Unit:            "requests",
+	}
+
+	if apiTierTwo.GreaterThan(decimal.NewFromInt(0)) {
+		costComponent = append(costComponent, &schema.CostComponent{
+			Name:            "Messages (over 1B)",
+			Unit:            "messages",
+			UnitMultiplier: 1000000,
 			MonthlyQuantity: &apiTierTwo,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -171,19 +180,20 @@ func websocketApiCostComponent(d *schema.ResourceData, u *schema.ResourceData) [
 				Service:       strPtr("AmazonApiGateway"),
 				ProductFamily: strPtr("WebSocket"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr("WebSocket Messages")},
 					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayMessage/")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
 				StartUsageAmount: strPtr("1000000000"),
 			},
-		},
+		})
 	}
+
+	return costComponent
 
 }
 
-func calculateApiRequests(requests decimal.Decimal, apiRequestTiers map[string]decimal.Decimal, apiTierOneLimit decimal.Decimal, apiTierTwoLimit decimal.Decimal) map[string]decimal.Decimal {
+func calculateApiV2Requests(requests decimal.Decimal, apiRequestTiers map[string]decimal.Decimal, apiTierOneLimit decimal.Decimal, apiTierTwoLimit decimal.Decimal) map[string]decimal.Decimal {
 
 	if requests.GreaterThanOrEqual(apiTierOneLimit) {
 		apiRequestTiers["apiRequestTierOne"] = apiTierOneLimit
@@ -205,5 +215,3 @@ func calculateApiRequests(requests decimal.Decimal, apiRequestTiers map[string]d
 func calculateBillableRequests(requestSize decimal.Decimal, billableRequestSize decimal.Decimal, requests decimal.Decimal) decimal.Decimal {
 	return requests.Mul(requestSize.Div(billableRequestSize).Ceil())
 }
-
-

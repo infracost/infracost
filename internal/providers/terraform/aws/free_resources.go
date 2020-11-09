@@ -130,6 +130,19 @@ var (
 		"aws_load_balancer_listener_policy",
 		"aws_load_balancer_policy",
 
+		// API Gateway v2 HTTP & Websocket API.
+		"aws_apigatewayv2_api_mapping",
+		"aws_apigatewayv2_authorizer",
+		"aws_apigatewayv2_deployment",
+		"aws_apigatewayv2_domain_name",
+		"aws_apigatewayv2_integration",
+		"aws_apigatewayv2_integration_response",
+		"aws_apigatewayv2_model",
+		"aws_apigatewayv2_route",
+		"aws_apigatewayv2_route_response",
+		"aws_apigatewayv2_stage",
+		"aws_apigatewayv2_vpc_link",
+
 		// Others (sorted alphabetically)
 		"aws_rds_cluster",
 		"aws_ecs_cluster",
