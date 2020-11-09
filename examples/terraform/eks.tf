@@ -98,7 +98,7 @@ resource "aws_launch_template" "foo" {
     market_type = "spot"
   }
 
-  instance_type = "t2.micro"
+  instance_type = "m5.xlarge"
 
   kernel_id = "test"
 
