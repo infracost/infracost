@@ -124,6 +124,7 @@ func newEksRootBlockDevice(d *schema.ResourceData) *schema.CostComponent {
 
 func newEksEbsBlockDevice(name string, d *schema.ResourceData, region string) *schema.CostComponent {
 	volumeAPIName := "gp2"
+	defaultVolumeSize := 20
 
 	gbVal := decimal.NewFromInt(int64(defaultVolumeSize))
 	if d.Get("disk_size").Exists() {
