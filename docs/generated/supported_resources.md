@@ -12,6 +12,8 @@ Support for the following is not currently included:
 | Terraform resource           | Notes |
 | ---                          | ---   |
 | `aws_alb` |  |
+| `aws_api_gateway_rest_api` |  |
+| `aws_api_gateway_stage` |  |
 | `aws_autoscaling_group` |  |
 | `aws_db_instance` |  |
 | `aws_dms_replication_instance` |  |
