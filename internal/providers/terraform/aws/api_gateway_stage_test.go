@@ -1,21 +1,21 @@
 package aws_test
 
 import (
-    "testing"
+	"testing"
 
-    "github.com/infracost/infracost/internal/testutil"
+	"github.com/infracost/infracost/internal/testutil"
 
-    "github.com/infracost/infracost/internal/providers/terraform/tftest"
+	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 
-    "github.com/shopspring/decimal"
+	"github.com/shopspring/decimal"
 )
 
 func TestApiGatewayStage(t *testing.T) {
-    if testing.Short() {
-        t.Skip("skipping test in short mode")
-    }
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
 
-    tf := `
+	tf := `
         resource "aws_api_gateway_stage" "cache-1" {
             rest_api_id           = "api-id-1"
             stage_name            = "cache-stage-1"
@@ -32,28 +32,28 @@ func TestApiGatewayStage(t *testing.T) {
             cache_cluster_size    = 237
         }`
 
-    resourceChecks := []testutil.ResourceCheck{
-        {
-            Name: "aws_api_gateway_stage.cache-1",
-            CostComponentChecks: []testutil.CostComponentCheck{
-                {
-                    Name:            "Cache memory size 0.5(GB)",
-                    PriceHash:       "13dde350db747bc0cf6b3afb92d76111-d2c98780d7b6e36641b521f1f8145c6f",
-                    HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-                },
-            },
-        },
-        {
-            Name: "aws_api_gateway_stage.cache-2",
-            CostComponentChecks: []testutil.CostComponentCheck{
-                {
-                    Name:            "Cache memory size 237(GB)",
-                    PriceHash:       "3cbf2c573f7429f90a9acf3a34662d4a-d2c98780d7b6e36641b521f1f8145c6f",
-                    HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-                },
-            },
-        },
-    }
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_api_gateway_stage.cache-1",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Cache memory size 0.5(GB)",
+					PriceHash:       "13dde350db747bc0cf6b3afb92d76111-d2c98780d7b6e36641b521f1f8145c6f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+			},
+		},
+		{
+			Name: "aws_api_gateway_stage.cache-2",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Cache memory size 237(GB)",
+					PriceHash:       "3cbf2c573f7429f90a9acf3a34662d4a-d2c98780d7b6e36641b521f1f8145c6f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+			},
+		},
+	}
 
-    tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, resourceChecks)
 }
