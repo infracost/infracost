@@ -26,7 +26,7 @@ func NewAPIGatewayStage(d *schema.ResourceData, u *schema.ResourceData) *schema.
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           fmt.Sprintf("Cache memory %s", cacheMemorySize),
+				Name:           fmt.Sprintf("Cache memory (%s GB)", cacheMemorySize),
 				Unit:           "hours",
 				UnitMultiplier: 1,
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),

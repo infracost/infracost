@@ -47,9 +47,7 @@ func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.ResourceData) *schem
 				Service:       strPtr("AmazonApiGateway"),
 				ProductFamily: strPtr("API Calls"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr("API calls received")},
 					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-					{Key: "operation", Value: strPtr("ApiGatewayRequest")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -71,9 +69,7 @@ func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.ResourceData) *schem
 				Service:       strPtr("AmazonApiGateway"),
 				ProductFamily: strPtr("API Calls"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr("API calls received")},
 					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-					{Key: "operation", Value: strPtr("ApiGatewayRequest")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -95,9 +91,7 @@ func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.ResourceData) *schem
 				Service:       strPtr("AmazonApiGateway"),
 				ProductFamily: strPtr("API Calls"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr("API calls received")},
 					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-					{Key: "operation", Value: strPtr("ApiGatewayRequest")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -119,9 +113,7 @@ func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.ResourceData) *schem
 				Service:       strPtr("AmazonApiGateway"),
 				ProductFamily: strPtr("API Calls"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr("API calls received")},
 					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-					{Key: "operation", Value: strPtr("ApiGatewayRequest")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
