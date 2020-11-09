@@ -143,7 +143,7 @@ var (
 		"aws_apigatewayv2_stage",
 		"aws_apigatewayv2_vpc_link",
 
-    // API Gateway Rest APIs
+		// API Gateway Rest APIs
 		"aws_api_gateway_account",
 		"aws_api_gateway_api_key",
 		"aws_api_gateway_authorizer",
