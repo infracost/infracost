@@ -7,10 +7,7 @@ import (
 
 func GetAPIGatewayv2ApiRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name: "aws_apigatewayv2_api",
-		Notes: []string{
-			"WebSocket Connection minutes is not yet supported",
-		},
+		Name:  "aws_apigatewayv2_api",
 		RFunc: NewAPIGatewayv2Api,
 	}
 }
@@ -117,6 +114,8 @@ func websocketAPICostComponent(d *schema.ResourceData, u *schema.ResourceData) [
 	monthlyMessages := decimal.Zero
 	messageSize := decimal.NewFromInt(32)
 
+	monthlyConnectionMinutes := decimal.Zero
+
 	billableRequestSize := decimal.NewFromInt(32)
 
 	var apiTierRequests = map[string]decimal.Decimal{
@@ -162,6 +161,21 @@ func websocketAPICostComponent(d *schema.ResourceData, u *schema.ResourceData) [
 			},
 			PriceFilter: &schema.PriceFilter{
 				StartUsageAmount: strPtr("0"),
+			},
+		},
+		{
+			Name:            "Connection duration",
+			Unit:            "minutes",
+			UnitMultiplier:  1000000,
+			MonthlyQuantity: &monthlyConnectionMinutes,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonApiGateway"),
+				ProductFamily: strPtr("WebSocket"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayMinute/")},
+				},
 			},
 		},
 	}
