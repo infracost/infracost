@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 
 	"github.com/infracost/infracost/internal/config"
@@ -27,6 +28,9 @@ var tfProviders = `
 			aws = {
 				source  = "hashicorp/aws"
 			}
+			google = {
+				source  = "hashicorp/google"
+			}
 			infracost = {
 				source = "infracost/infracost"
 			}
@@ -43,10 +47,18 @@ var tfProviders = `
 		secret_key                  = "mock_secret_key"
 	}
 
+	provider "google" {
+		credentials = "{\"type\":\"service_account\"}"
+		region = "us-central1"
+	}
+
 	provider "infracost" {}
 `
 
-var pluginCache = filepath.Join(config.RootDir(), ".test_cache/terraform_plugins")
+var (
+	pluginCache = filepath.Join(config.RootDir(), ".test_cache/terraform_plugins")
+	once        sync.Once
+)
 
 type Project struct {
 	Files []File
@@ -61,7 +73,21 @@ func WithProviders(tf string) string {
 	return fmt.Sprintf("%s%s", tfProviders, tf)
 }
 
-func InstallPlugins() error {
+func EnsurePluginsInstalled() {
+	flag.Parse()
+	if !testing.Short() {
+		once.Do(func() {
+			// Ensure plugins are installed and cached
+			err := installPlugins()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		})
+	}
+}
+
+func installPlugins() error {
 	project := Project{
 		Files: []File{
 			{
@@ -86,9 +112,6 @@ func InstallPlugins() error {
 	opts := &terraform.CmdOptions{
 		TerraformDir: tfdir,
 	}
-
-	fmt.Println(tfdir)
-	fmt.Println(pluginCache)
 
 	_, err = terraform.Cmd(opts, "init", "-no-color")
 	if err != nil {
