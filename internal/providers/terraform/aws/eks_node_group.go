@@ -14,6 +14,7 @@ func GetNewEKSNodeGroupItem() *schema.RegistryItem {
 		RFunc: NewEKSNodeGroup,
 		ReferenceAttributes: []string{
 			"launch_template.0.id",
+			"launch_template.0.name",
 		},
 	}
 }
@@ -27,11 +28,17 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Res
 		// Only a single type is expected https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_node_group#instance_types
 		instanceType = d.Get("instance_types").Array()[0].String()
 	}
-
-	launchTemplateRef := d.References("launch_template.0.id")
-
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
+
+	launchTemplateRefId := d.References("launch_template.0.id")
+	launchTemplateRefName := d.References("launch_template.0.name")
+	launchTemplateRef := []*schema.ResourceData{}
+	if len(launchTemplateRefId) > 0 {
+		launchTemplateRef = launchTemplateRefId
+	} else if len(launchTemplateRefName) > 0 {
+		launchTemplateRef = launchTemplateRefName
+	}
 
 	if len(launchTemplateRef) > 0 {
 		onDemandCount := decimal.NewFromInt(desiredSize)
