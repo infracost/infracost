@@ -31,11 +31,11 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Res
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
 
-	launchTemplateRefId := d.References("launch_template.0.id")
+	launchTemplateRefID := d.References("launch_template.0.id")
 	launchTemplateRefName := d.References("launch_template.0.name")
 	launchTemplateRef := []*schema.ResourceData{}
-	if len(launchTemplateRefId) > 0 {
-		launchTemplateRef = launchTemplateRefId
+	if len(launchTemplateRefID) > 0 {
+		launchTemplateRef = launchTemplateRefID
 	} else if len(launchTemplateRefName) > 0 {
 		launchTemplateRef = launchTemplateRefName
 	}
