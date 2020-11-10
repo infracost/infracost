@@ -144,6 +144,10 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - units: use plural, e.g. hours, requests, GB-months, GB (already plural). For a "unit per something", use singular per time unit, e.g. use Per GB per hour.
 
+- unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 unless the price is for a large number, e.g. set it to `1000000` if the price should be shown "per 1M requests" in the output.
+
+- tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)".
+
 - purchase options: if applicable, include "on-demand" in brackets after the cost component name, e.g. `Database instance (on-demand`
 
 - instance type: if applicable, include it in brackets as the 2nd argument, after the cost component name, e.g. `Database instance (on-demand, db.t3.medium)`
