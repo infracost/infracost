@@ -101,6 +101,7 @@ var (
 		"aws_ecs_task_definition",
 		"aws_eip_association",
 		"aws_elasticsearch_domain_policy",
+		"aws_key_pair",
 		"aws_lambda_function_event_invoke_config",
 		"aws_launch_configuration",
 		"aws_launch_template",
