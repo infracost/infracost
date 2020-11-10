@@ -12,12 +12,13 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
 ## Table of Contents
 
-**Checkout the [docs site](https://www.infracost.io/docs/) for detailed usage options, supported resources and more information.**
+**Checkout the [docs site](https://www.infracost.io/docs/) for additional usage options.**
 
 * [Installation](#installation)
 * [Usage](#basic-usage)
+* [Supported resources](https://www.infracost.io/docs/supported_resources/)
 * [Development](#development)
-* [Contributing](#contributing)
+* [Contributing (we can pay too)](#contributing)
 
 <!-- NOTE: When updated also update https://github.com/infracost/docs/blob/master/docs/getting_started.md#installation with the same content -->
 ## Installation
@@ -140,7 +141,9 @@ To use a local development version of terraform-provider-infracost
 
 Pull requests are welcome! For more info, see the [CONTRIBUTING](CONTRIBUTING.md) file. For major changes, please open an issue first to discuss what you would like to change.
 
-Join our chat, we are a friendly bunch and happy to help you get started :) https://discord.gg/rXCTaH3
+[Join our Discord chat](https://discord.gg/rXCTaH3), we are a friendly bunch and happy to help you get started :)
+
+We're looking for people to help us add new AWS and Google resources and are willing to pay for that. Please direct-message alikhajeh1 on our Discord chat to find out more!
 
 ## License
 
