@@ -15,6 +15,10 @@ import (
 
 // These show differently in the plan JSON for Terraform 0.12 and 0.13.
 var infracostProviderNames = []string{"infracost", "registry.terraform.io/infracost/infracost"}
+var defaultProviderRegions = map[string]string{
+	"aws":    "us-east-1",
+	"google": "us-central1",
+}
 
 // ARN attribute mapping for resources that don't have a standard 'arn' attribute
 var arnAttributeMap = map[string]string{
@@ -90,9 +94,6 @@ func parseJSON(j []byte) ([]*schema.Resource, error) {
 }
 
 func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, vars gjson.Result) map[string]*schema.ResourceData {
-	defaultRegion := "us-east-1"
-	defaultProviderRegion := parseProviderRegion(providerConf, "aws", vars)
-
 	resources := make(map[string]*schema.ResourceData)
 
 	for _, r := range planVals.Get("resources").Array() {
@@ -101,37 +102,14 @@ func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, v
 		addr := r.Get("address").String()
 		v := r.Get("values")
 
-		var region string
+		resConf := getConfJSON(conf, addr)
 
 		// Try getting the region from the ARN
-		arnAttr, ok := arnAttributeMap[t]
-		if !ok {
-			arnAttr = "arn"
-		}
+		region := resourceRegion(t, v)
 
-		if v.Get(arnAttr).Exists() {
-			region = strings.Split(v.Get(arnAttr).String(), ":")[3]
-		}
-
-		// Try getting the region from the provider conf
+		// Otherwise use region from the provider conf
 		if region == "" {
-			resConf := getConfJSON(conf, addr)
-			providerKey := parseProviderKey(resConf)
-
-			if providerKey == "aws" {
-				region = defaultProviderRegion
-			} else if providerKey != "" {
-				region = parseProviderRegion(providerConf, providerKey, vars)
-				// Note: if the provider is passed to a module using a different alias
-				// then there's no way to detect this so we just have to fallback to
-				// the default provider
-			}
-		}
-
-		// Fallback to default region
-		if region == "" {
-			log.Debugf("Falling back to default region (%s) for %s", defaultRegion, addr)
-			region = defaultRegion
+			region = providerRegion(providerConf, vars, t, resConf)
 		}
 
 		v = schema.AddRawValue(v, "region", region)
@@ -149,6 +127,49 @@ func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, v
 	return resources
 }
 
+func resourceRegion(resourceType string, v gjson.Result) string {
+	providerPrefix := strings.Split(resourceType, "_")[0]
+	if providerPrefix != "aws" {
+		return ""
+	}
+
+	arnAttr, ok := arnAttributeMap[resourceType]
+	if !ok {
+		arnAttr = "arn"
+	}
+
+	if !v.Get(arnAttr).Exists() {
+		return ""
+	}
+
+	return strings.Split(v.Get(arnAttr).String(), ":")[3]
+}
+
+func providerRegion(providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
+	var region string
+
+	providerKey := parseProviderKey(resConf)
+	if providerKey != "" {
+		region = parseRegion(providerConf, vars, providerKey)
+		// Note: if the provider is passed to a module using a different alias
+		// then there's no way to detect this so we just have to fallback to
+		// the default provider
+	}
+
+	if region == "" {
+		// Try to get the provider key from the first part of the resource
+		providerPrefix := strings.Split(resourceType, "_")[0]
+		region = parseRegion(providerConf, vars, providerPrefix)
+
+		if region == "" {
+			region = defaultProviderRegions[providerPrefix]
+			log.Debugf("Falling back to default region (%s) for %s", region, resConf.Get("address").String())
+		}
+	}
+
+	return region
+}
+
 func parseProviderKey(resConf gjson.Result) string {
 	v := resConf.Get("provider_config_key").String()
 	p := strings.Split(v, ":")
@@ -156,12 +177,12 @@ func parseProviderKey(resConf gjson.Result) string {
 	return p[len(p)-1]
 }
 
-func parseProviderRegion(providerConfig gjson.Result, providerKey string, vars gjson.Result) string {
+func parseRegion(providerConf gjson.Result, vars gjson.Result, providerKey string) string {
 	// Try to get constant value
-	region := providerConfig.Get(fmt.Sprintf("%s.expressions.region.constant_value", gjsonEscape(providerKey))).String()
+	region := providerConf.Get(fmt.Sprintf("%s.expressions.region.constant_value", gjsonEscape(providerKey))).String()
 	if region == "" {
 		// Try to get reference
-		refName := providerConfig.Get(fmt.Sprintf("%s.expressions.region.references.0", gjsonEscape(providerKey))).String()
+		refName := providerConf.Get(fmt.Sprintf("%s.expressions.region.references.0", gjsonEscape(providerKey))).String()
 		splitRef := strings.Split(refName, ".")
 
 		if splitRef[0] == "var" {

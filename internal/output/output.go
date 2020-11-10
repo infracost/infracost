@@ -2,8 +2,8 @@ package output
 
 import (
 	"fmt"
-	"strings"
 
+	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -15,7 +15,7 @@ func skippedResourcesMessage(resources []*schema.Resource, showDetails bool) str
 
 	supportedTypeCount := 0
 	for rType := range summary.UnsupportedCounts {
-		if strings.HasPrefix(rType, "aws_") {
+		if terraform.HasSupportedProvider(rType) {
 			supportedTypeCount++
 		}
 	}
@@ -35,7 +35,7 @@ func skippedResourcesMessage(resources []*schema.Resource, showDetails bool) str
 
 	if showDetails {
 		for rType, count := range summary.UnsupportedCounts {
-			if strings.HasPrefix(rType, "aws_") {
+			if terraform.HasSupportedProvider(rType) {
 				message += fmt.Sprintf("\n%d x %s", count, rType)
 			}
 		}

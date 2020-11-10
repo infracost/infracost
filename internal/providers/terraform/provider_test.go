@@ -1,8 +1,6 @@
 package terraform_test
 
 import (
-	"flag"
-	"fmt"
 	"os"
 	"testing"
 
@@ -12,16 +10,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	flag.Parse()
-	if !testing.Short() {
-		// Ensure plugins are installed and cached
-		err := tftest.InstallPlugins()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	}
-
+	tftest.EnsurePluginsInstalled()
 	code := m.Run()
 	os.Exit(code)
 }

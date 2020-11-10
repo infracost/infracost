@@ -39,29 +39,38 @@ func CalculateCosts(resources []*Resource) {
 
 func (r *Resource) CalculateCosts() {
 	h := decimal.Zero
+	m := decimal.Zero
 	hasCost := false
 
 	for _, c := range r.CostComponents {
 		c.CalculateCosts()
-		if c.HourlyCost == nil {
-			continue
+		if c.HourlyCost != nil || c.MonthlyCost != nil {
+			hasCost = true
 		}
-		hasCost = true
-		h = h.Add(*c.HourlyCost)
+		if c.HourlyCost != nil {
+			h = h.Add(*c.HourlyCost)
+		}
+		if c.MonthlyCost != nil {
+			m = m.Add(*c.MonthlyCost)
+		}
 	}
 
 	for _, s := range r.SubResources {
 		s.CalculateCosts()
-		if s.HourlyCost == nil {
-			continue
+		if s.HourlyCost != nil || s.MonthlyCost != nil {
+			hasCost = true
 		}
-		hasCost = true
-		h = h.Add(*s.HourlyCost)
+		if s.HourlyCost != nil {
+			h = h.Add(*s.HourlyCost)
+		}
+		if s.MonthlyCost != nil {
+			m = m.Add(*s.MonthlyCost)
+		}
 	}
 
 	if hasCost {
 		r.HourlyCost = &h
-		r.MonthlyCost = decimalPtr(h.Mul(hourToMonthMultiplier))
+		r.MonthlyCost = &m
 	}
 }
 

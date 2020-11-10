@@ -1,4 +1,4 @@
-package aws_test
+package google_test
 
 import (
 	"os"

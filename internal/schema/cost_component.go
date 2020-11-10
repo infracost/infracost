@@ -17,6 +17,7 @@ type CostComponent struct {
 	PriceFilter          *PriceFilter
 	HourlyQuantity       *decimal.Decimal
 	MonthlyQuantity      *decimal.Decimal
+	MonthlyDiscountPerc  float64
 	price                decimal.Decimal
 	priceHash            string
 	HourlyCost           *decimal.Decimal
@@ -29,7 +30,8 @@ func (c *CostComponent) CalculateCosts() {
 		c.HourlyCost = decimalPtr(c.price.Mul(*c.HourlyQuantity))
 	}
 	if c.MonthlyQuantity != nil {
-		c.MonthlyCost = decimalPtr(c.price.Mul(*c.MonthlyQuantity))
+		discountMul := decimal.NewFromFloat(1.0 - c.MonthlyDiscountPerc)
+		c.MonthlyCost = decimalPtr(c.price.Mul(*c.MonthlyQuantity).Mul(discountMul))
 	}
 }
 
