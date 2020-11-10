@@ -38,7 +38,7 @@ Support for the following is not currently included:
 | `aws_rds_cluster_instance` |  |
 | `aws_route53_record` |  |
 | `aws_route53_zone` |  |
-| `aws_s3_bucket` |  S3 replication time control data transfer is not supported by Terraform.<br />  S3 batch operations are not supported by Terraform.<br />  |
+| `aws_s3_bucket` |  S3 replication time control data transfer, and batch operations are not supported by Terraform.<br />  |
 | `aws_s3_bucket_analytics_configuration` |  |
 | `aws_s3_bucket_inventory` |  |
 | `aws_sqs_queue` |  |
