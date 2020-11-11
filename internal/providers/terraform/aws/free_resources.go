@@ -130,6 +130,11 @@ var (
 		"aws_load_balancer_listener_policy",
 		"aws_load_balancer_policy",
 
+		// Elasticache
+		"aws_elasticache_parameter_group",
+		"aws_elasticache_security_group",
+		"aws_elasticache_subnet_group",
+
 		// API Gateway v2 HTTP & Websocket API.
 		"aws_apigatewayv2_api_mapping",
 		"aws_apigatewayv2_authorizer",

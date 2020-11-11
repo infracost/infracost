@@ -16,6 +16,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetEBSVolumeRegistryItem(),
 	GetECSServiceRegistryItem(),
 	GetEIPRegistryItem(),
+	GetElastiCacheClusterItem(),
+	GetElastiCacheReplicationGroupItem(),
 	GetElasticsearchDomainRegistryItem(),
 	GetELBRegistryItem(),
 	GetInstanceRegistryItem(),
