@@ -25,6 +25,9 @@ Support for the following is not currently included:
 | `aws_ebs_volume` |  |
 | `aws_ecs_service` |  Only supports Fargate on-demand.<br />  |
 | `aws_eip` |  |
+| `aws_eks_cluster` |  |
+| `aws_eks_fargate_profile` |  |
+| `aws_eks_node_group` |  |
 | `aws_elasticsearch_domain` |  |
 | `aws_elb` |  |
 | `aws_instance` |  Costs associated with non-standard Linux AMIs, such as Windows and RHEL are not supported.<br />  EC2 detailed monitoring assumes the standard 7 metrics and the lowest tier of prices for CloudWatch.<br />  If a root volume is not specified then an 8Gi gp2 volume is assumed.<br />  |
@@ -35,7 +38,7 @@ Support for the following is not currently included:
 | `aws_rds_cluster_instance` |  |
 | `aws_route53_record` |  |
 | `aws_route53_zone` |  |
-| `aws_s3_bucket` |  S3 replication time control data transfer is not supported by Terraform.<br />  S3 batch operations are not supported by Terraform.<br />  |
+| `aws_s3_bucket` |  S3 replication time control data transfer, and batch operations are not supported by Terraform.<br />  |
 | `aws_s3_bucket_analytics_configuration` |  |
 | `aws_s3_bucket_inventory` |  |
 | `aws_sqs_queue` |  |

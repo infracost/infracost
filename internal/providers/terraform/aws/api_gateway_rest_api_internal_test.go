@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"testing"
+
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCalcApiRequests(t *testing.T) {

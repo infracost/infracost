@@ -126,7 +126,7 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 
 	if p.planFile == "" {
 		spinner = spin.NewSpinner("Running terraform init")
-		_, err := Cmd(opts, "init", "-no-color")
+		_, err := Cmd(opts, "init", "-input=false", "-no-color")
 		if err != nil {
 			spinner.Fail()
 			terraformError(err)
