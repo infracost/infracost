@@ -35,7 +35,7 @@ func NewMskCluster(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 					Service:       strPtr("AmazonMSK"),
 					ProductFamily: strPtr("Managed Streaming for Apache Kafka (MSK)"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", instanceType))},
+						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", instanceType))},
 						{Key: "locationType", Value: strPtr("AWS Region")},
 					},
 				},
