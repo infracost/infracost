@@ -42,7 +42,7 @@ func TestMSKCluster(t *testing.T) {
 			Name: "aws_msk_cluster.cluster-2-nodes",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Instance (Kafka.t3.small)",
+					Name:             "Instance (kafka.t3.small)",
 					PriceHash:        "7384559214ca7695916562cfcdf52adf-1fb365d8a0bc1f462690ec9d444f380c",
 					MonthlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 				},
