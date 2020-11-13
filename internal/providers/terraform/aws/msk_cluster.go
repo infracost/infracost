@@ -18,7 +18,7 @@ func NewMskCluster(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 	region := d.Get("region").String()
 
 	brokerNodes := decimal.NewFromInt(d.Get("number_of_broker_nodes").Int())
-	instanceType := strings.ReplaceAll(d.Get("broker_node_group_info.0.instance_type").String(), "kafka", "Kafka")
+	instanceType := d.Get("broker_node_group_info.0.instance_type").String()
 	ebsVolumeSize := decimal.NewFromInt(d.Get("broker_node_group_info.0.ebs_volume_size").Int()).Mul(brokerNodes)
 
 	return &schema.Resource{
