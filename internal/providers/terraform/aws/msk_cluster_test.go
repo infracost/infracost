@@ -42,12 +42,12 @@ func TestMSKCluster(t *testing.T) {
 			Name: "aws_msk_cluster.cluster-2-nodes",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "MSK (broker instance, kafka.t3.small)",
+					Name:             "Instance (Kafka.t3.small)",
 					PriceHash:        "7384559214ca7695916562cfcdf52adf-1fb365d8a0bc1f462690ec9d444f380c",
 					MonthlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 				},
 				{
-					Name:             "MSK storage",
+					Name:             "Storage",
 					PriceHash:        "c051f24392b78290de9613ef486ba264-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1000)),
 				},
@@ -56,12 +56,12 @@ func TestMSKCluster(t *testing.T) {
 			Name: "aws_msk_cluster.cluster-4-nodes",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "MSK (broker instance, kafka.m5.24xlarge)",
+					Name:             "Instance (Kafka.m5.24xlarge)",
 					PriceHash:        "9cc7cb79c34e4c7812d98da6dcdc8411-1fb365d8a0bc1f462690ec9d444f380c",
 					MonthlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(4)),
 				},
 				{
-					Name:             "MSK storage",
+					Name:             "Storage",
 					PriceHash:        "c051f24392b78290de9613ef486ba264-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(4000)),
 				},

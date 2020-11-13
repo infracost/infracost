@@ -18,14 +18,14 @@ func NewMskCluster(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 	region := d.Get("region").String()
 
 	brokerNodes := decimal.NewFromInt(d.Get("number_of_broker_nodes").Int())
-	brokerInstance := d.Get("broker_node_group_info.0.instance_type").String()
+	instanceType := strings.ReplaceAll(d.Get("broker_node_group_info.0.instance_type").String(), "kafka", "Kafka")
 	ebsVolumeSize := decimal.NewFromInt(d.Get("broker_node_group_info.0.ebs_volume_size").Int()).Mul(brokerNodes)
 
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           fmt.Sprintf("MSK (broker instance, %s)", brokerInstance),
+				Name:           fmt.Sprintf("Instance (%s)", instanceType),
 				Unit:           "hours",
 				UnitMultiplier: 1,
 				HourlyQuantity: &brokerNodes,
@@ -35,12 +35,13 @@ func NewMskCluster(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 					Service:       strPtr("AmazonMSK"),
 					ProductFamily: strPtr("Managed Streaming for Apache Kafka (MSK)"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "computeFamily", ValueRegex: strPtr(fmt.Sprintf("/%s/", strings.SplitN(brokerInstance, ".", 2)[1]))},
+						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", instanceType))},
+						{Key: "locationType", Value: strPtr("AWS Region")},
 					},
 				},
 			},
 			{
-				Name:            "MSK storage",
+				Name:            "Storage",
 				Unit:            "GB-months",
 				UnitMultiplier:  1,
 				MonthlyQuantity: decimalPtr(ebsVolumeSize),
