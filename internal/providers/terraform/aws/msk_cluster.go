@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	"strings"
 )
 
 func GetMSKClusterRegistryItem() *schema.RegistryItem {
