@@ -70,7 +70,7 @@ func NewElastiCacheReplicationGroup(d *schema.ResourceData, u *schema.ResourceDa
 		},
 	}
 
-	if cacheEngine == "redis" && snapShotRetentionLimit.GreaterThan(decimal.NewFromInt(0)) {
+	if cacheEngine == "redis" && snapShotRetentionLimit.GreaterThan(decimal.NewFromInt(1)) {
 		backupRetention = snapShotRetentionLimit.Sub(decimal.NewFromInt(1))
 
 		if u != nil && u.Get("monthly_backup_storage").Exists() {

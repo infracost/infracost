@@ -40,7 +40,7 @@ func TestElastiCacheReplicationGroup(t *testing.T) {
     resource "aws_elasticache_replication_group" "non-cluster-snapshot" {
         replication_group_description = "This Replication Group"
         replication_group_id = "tf-rep-group-3"
-        snapshot_retention_limit = 1
+        snapshot_retention_limit = 2
 
         engine = "redis"
 
