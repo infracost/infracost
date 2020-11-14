@@ -48,7 +48,8 @@ func TestElastiCacheReplicationGroup(t *testing.T) {
         node_type = "cache.m6g.12xlarge"
         number_cache_clusters = 3
     }
-`
+	`
+
 	resourceChecks := []testutil.ResourceCheck{
 		{
 			Name: "aws_elasticache_replication_group.cluster",

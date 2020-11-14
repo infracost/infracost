@@ -1,10 +1,11 @@
 package aws_test
 
 import (
+	"testing"
+
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 	"github.com/infracost/infracost/internal/testutil"
 	"github.com/shopspring/decimal"
-	"testing"
 )
 
 func TestElastiCacheCluster(t *testing.T) {
@@ -37,8 +38,8 @@ func TestElastiCacheCluster(t *testing.T) {
         parameter_group_name = "default.redis3.2"
         snapshot_retention_limit = 2
     }
+	`
 
-`
 	resourceChecks := []testutil.ResourceCheck{
 		{
 			Name: "aws_elasticache_cluster.memcached",
