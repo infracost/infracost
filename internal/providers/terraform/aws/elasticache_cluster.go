@@ -78,7 +78,7 @@ func NewElastiCacheCluster(d *schema.ResourceData, u *schema.ResourceData) *sche
 		}
 
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Backup Storage",
+			Name:            "Backup storage",
 			Unit:            "GB-months",
 			UnitMultiplier:  1,
 			MonthlyQuantity: &monthlyBackupStorageTotal,

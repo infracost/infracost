@@ -35,7 +35,7 @@ func TestElastiCacheCluster(t *testing.T) {
         node_type = "cache.m6g.12xlarge"
         num_cache_nodes = 1
         parameter_group_name = "default.redis3.2"
-        snapshot_retention_limit = 1
+        snapshot_retention_limit = 2
     }
 
 `
