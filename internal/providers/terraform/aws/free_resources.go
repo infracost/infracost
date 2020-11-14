@@ -59,6 +59,11 @@ var (
 		"aws_load_balancer_listener_policy",
 		"aws_load_balancer_policy",
 
+		// AWS Elasticache
+		"aws_elasticache_parameter_group",
+		"aws_elasticache_security_group",
+		"aws_elasticache_subnet_group",
+
 		// AWS IAM aws_iam_* resources
 		"aws_iam_access_key",
 		"aws_iam_account_alias",
