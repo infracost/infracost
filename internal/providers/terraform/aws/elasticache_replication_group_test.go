@@ -78,7 +78,7 @@ func TestElastiCacheReplicationGroup(t *testing.T) {
 					MonthlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
 				{
-					Name:             "Elasticache snapshot storage",
+					Name:             "Backup storage",
 					PriceHash:        "5a1365e07213003f7a7b9deaa791b017-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(0)),
 				},

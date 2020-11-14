@@ -10,8 +10,9 @@ import (
 
 func GetElastiCacheClusterItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_elasticache_cluster",
-		RFunc: NewElastiCacheCluster,
+		Name:                "aws_elasticache_cluster",
+		RFunc:               NewElastiCacheCluster,
+		ReferenceAttributes: []string{"replication_group_id"},
 	}
 }
 
@@ -22,9 +23,9 @@ func NewElastiCacheCluster(d *schema.ResourceData, u *schema.ResourceData) *sche
 	var cacheNodes int64
 	var cacheEngine string
 
-	snapShotRetentionLimit := decimal.Zero
-	backupRetention := decimal.Zero
-	monthlyBackupStorageTotal := decimal.Zero
+	var snapShotRetentionLimit decimal.Decimal
+	var backupRetention decimal.Decimal
+	var monthlyBackupStorageTotal decimal.Decimal
 
 	if d.Get("node_type").Exists() {
 		cacheNodes = d.Get("num_cache_nodes").Int()
@@ -32,14 +33,17 @@ func NewElastiCacheCluster(d *schema.ResourceData, u *schema.ResourceData) *sche
 		cacheEngine = d.Get("engine").String()
 	}
 
-	if cacheEngine == "redis" && d.Get("snapshot_retention_limit").Exists() {
+	if d.Get("snapshot_retention_limit").Exists() {
 		snapShotRetentionLimit = decimal.NewFromInt(d.Get("snapshot_retention_limit").Int())
-		backupRetention = snapShotRetentionLimit.Sub(decimal.NewFromInt(1))
 	}
 
-	if u != nil && u.Get("monthly_backup_storage").Exists() {
-		snapshotSize := decimal.NewFromInt(u.Get("snapshot_storage_size.0.value").Int())
-		monthlyBackupStorageTotal = snapshotSize.Mul(backupRetention)
+	replicationGroupID := d.References("replication_group_id")
+
+	if len(replicationGroupID) > 0 {
+		return &schema.Resource{
+			NoPrice:   true,
+			IsSkipped: true,
+		}
 	}
 
 	costComponents := []*schema.CostComponent{
@@ -55,6 +59,7 @@ func NewElastiCacheCluster(d *schema.ResourceData, u *schema.ResourceData) *sche
 				ProductFamily: strPtr("Cache Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "instanceType", Value: strPtr(nodeType)},
+					{Key: "locationType", Value: strPtr("AWS Region")},
 					{Key: "cacheEngine", Value: strPtr(strings.Title(cacheEngine))},
 				},
 			},
@@ -64,9 +69,16 @@ func NewElastiCacheCluster(d *schema.ResourceData, u *schema.ResourceData) *sche
 		},
 	}
 
-	if snapShotRetentionLimit.GreaterThan(decimal.NewFromInt(0)) {
+	if cacheEngine == "redis" && snapShotRetentionLimit.GreaterThan(decimal.NewFromInt(1)) {
+		backupRetention = snapShotRetentionLimit.Sub(decimal.NewFromInt(1))
+
+		if u != nil && u.Get("backup_storage").Exists() {
+			snapshotSize := decimal.NewFromInt(u.Get("snapshot_storage_size.0.value").Int())
+			monthlyBackupStorageTotal = snapshotSize.Mul(backupRetention)
+		}
+
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Elasticache snapshot storage",
+			Name:            "Backup Storage",
 			Unit:            "GB-months",
 			UnitMultiplier:  1,
 			MonthlyQuantity: &monthlyBackupStorageTotal,

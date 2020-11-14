@@ -37,6 +37,7 @@ func TestElastiCacheCluster(t *testing.T) {
         parameter_group_name = "default.redis3.2"
         snapshot_retention_limit = 1
     }
+
 `
 	resourceChecks := []testutil.ResourceCheck{
 		{
@@ -67,7 +68,7 @@ func TestElastiCacheCluster(t *testing.T) {
 					MonthlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Elasticache snapshot storage",
+					Name:             "Backup storage",
 					PriceHash:        "5a1365e07213003f7a7b9deaa791b017-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(0)),
 				},

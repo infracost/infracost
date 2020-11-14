@@ -23,9 +23,9 @@ func NewElastiCacheReplicationGroup(d *schema.ResourceData, u *schema.ResourceDa
 	var cacheNodes decimal.Decimal
 	var cacheEngine string
 
-	snapShotRetentionLimit := decimal.Zero
-	backupRetention := decimal.Zero
-	monthlyBackupStorageTotal := decimal.Zero
+	var snapShotRetentionLimit decimal.Decimal
+	var backupRetention decimal.Decimal
+	var monthlyBackupStorageTotal decimal.Decimal
 
 	if d.Get("engine").Exists() {
 		cacheEngine = d.Get("engine").String()
@@ -33,14 +33,8 @@ func NewElastiCacheReplicationGroup(d *schema.ResourceData, u *schema.ResourceDa
 		cacheEngine = "redis"
 	}
 
-	if cacheEngine == "redis" && d.Get("snapshot_retention_limit").Exists() {
+	if d.Get("snapshot_retention_limit").Exists() {
 		snapShotRetentionLimit = decimal.NewFromInt(d.Get("snapshot_retention_limit").Int())
-		backupRetention = snapShotRetentionLimit.Sub(decimal.NewFromInt(1))
-	}
-
-	if u != nil && u.Get("monthly_backup_storage").Exists() {
-		snapshotSize := decimal.NewFromInt(u.Get("snapshot_storage_size.0.value").Int())
-		monthlyBackupStorageTotal = snapshotSize.Mul(backupRetention)
 	}
 
 	if d.Get("cluster_mode").Exists() {
@@ -76,9 +70,16 @@ func NewElastiCacheReplicationGroup(d *schema.ResourceData, u *schema.ResourceDa
 		},
 	}
 
-	if snapShotRetentionLimit.GreaterThan(decimal.NewFromInt(0)) {
+	if cacheEngine == "redis" && snapShotRetentionLimit.GreaterThan(decimal.NewFromInt(0)) {
+		backupRetention = snapShotRetentionLimit.Sub(decimal.NewFromInt(1))
+
+		if u != nil && u.Get("monthly_backup_storage").Exists() {
+			snapshotSize := decimal.NewFromInt(u.Get("snapshot_storage_size.0.value").Int())
+			monthlyBackupStorageTotal = snapshotSize.Mul(backupRetention)
+		}
+
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Elasticache snapshot storage",
+			Name:            "Backup storage",
 			Unit:            "GB-months",
 			UnitMultiplier:  1,
 			MonthlyQuantity: &monthlyBackupStorageTotal,
