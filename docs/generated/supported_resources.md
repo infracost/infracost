@@ -34,6 +34,7 @@ Support for the following is not currently included:
 | `aws_lambda_function` |  Provisioned concurrency is not yet supported.<br />  |
 | `aws_lb` |  |
 | `aws_lightsail_instance` |  |
+| `aws_msk_cluster` |  |
 | `aws_nat_gateway` |  |
 | `aws_rds_cluster_instance` |  |
 | `aws_route53_record` |  |

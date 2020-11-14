@@ -114,6 +114,7 @@ var (
 		"aws_lightsail_key_pair",
 		"aws_lightsail_static_ip",
 		"aws_lightsail_static_ip_attachment",
+		"aws_msk_configuration",
 		"aws_rds_cluster",
 		"aws_rds_cluster_endpoint",
 		"aws_rds_cluster_parameter_group",
