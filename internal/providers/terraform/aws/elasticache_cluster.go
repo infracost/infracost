@@ -2,8 +2,9 @@ package aws
 
 import (
 	"fmt"
-	"github.com/infracost/infracost/internal/schema"
 	"strings"
+
+	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
 )
@@ -17,28 +18,11 @@ func GetElastiCacheClusterItem() *schema.RegistryItem {
 }
 
 func NewElastiCacheCluster(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
-	region := d.Get("region").String()
-
-	var nodeType string
-	var cacheNodes int64
-	var cacheEngine string
-
-	var snapShotRetentionLimit decimal.Decimal
-	var backupRetention decimal.Decimal
-	var monthlyBackupStorageTotal decimal.Decimal
-
-	if d.Get("node_type").Exists() {
-		cacheNodes = d.Get("num_cache_nodes").Int()
-		nodeType = d.Get("node_type").String()
-		cacheEngine = d.Get("engine").String()
-	}
-
-	if d.Get("snapshot_retention_limit").Exists() {
-		snapShotRetentionLimit = decimal.NewFromInt(d.Get("snapshot_retention_limit").Int())
-	}
+	var nodeType, cacheEngine string
+	var cacheNodes decimal.Decimal
 
 	replicationGroupID := d.References("replication_group_id")
-
+	// If replicationGroupID is set, show costs in aws_elasticache_replication_group and not in this resource
 	if len(replicationGroupID) > 0 {
 		return &schema.Resource{
 			NoPrice:   true,
@@ -46,12 +30,26 @@ func NewElastiCacheCluster(d *schema.ResourceData, u *schema.ResourceData) *sche
 		}
 	}
 
+	nodeType = d.Get("node_type").String()
+	cacheEngine = d.Get("engine").String()
+	cacheNodes = decimal.NewFromInt(d.Get("num_cache_nodes").Int())
+	return newElasticacheResource(d, u, nodeType, cacheNodes, cacheEngine)
+}
+
+func newElasticacheResource(d *schema.ResourceData, u *schema.ResourceData, nodeType string, cacheNodes decimal.Decimal, cacheEngine string) *schema.Resource {
+	region := d.Get("region").String()
+	var backupRetention, monthlyBackupStorageTotal, snapShotRetentionLimit decimal.Decimal
+
+	if d.Get("snapshot_retention_limit").Exists() {
+		snapShotRetentionLimit = decimal.NewFromInt(d.Get("snapshot_retention_limit").Int())
+	}
+
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           fmt.Sprintf("Elasticache (on-demand, %s)", nodeType),
 			Unit:           "hours",
 			UnitMultiplier: 1,
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(cacheNodes)),
+			HourlyQuantity: decimalPtr(cacheNodes),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
