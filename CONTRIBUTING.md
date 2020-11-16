@@ -63,7 +63,7 @@ func NewMyResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Resou
 }
 ```
 
-Next append the resource to the registry in `internal/providers/terraform/aws/resource_registry.go`.
+Next append the resource to the registry in `internal/providers/terraform/aws/registry.go`.
 
 ```go
 package aws
