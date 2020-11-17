@@ -80,6 +80,7 @@ var (
 		"aws_iam_policy",
 		"aws_iam_policy",
 		"aws_iam_policy_attachment",
+		"aws_iam_policy_document", // a data source that should be excluded
 		"aws_iam_role",
 		"aws_iam_role",
 		"aws_iam_role_policy",
@@ -98,6 +99,7 @@ var (
 
 		// AWS Others
 		"aws_db_instance_role_association",
+		"aws_db_parameter_group",
 		"aws_db_subnet_group",
 		"aws_dms_replication_subnet_group",
 		"aws_dms_replication_task",
@@ -120,6 +122,7 @@ var (
 		"aws_rds_cluster_parameter_group",
 		"aws_route53_zone_association",
 		"aws_sqs_queue_policy",
+		"aws_volume_attachment",
 
 		// AWS S3
 		"aws_s3_access_point",
