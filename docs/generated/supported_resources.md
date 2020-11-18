@@ -45,7 +45,10 @@ Support for the following is not currently included:
 | `aws_s3_bucket_analytics_configuration` |  |
 | `aws_s3_bucket_inventory` |  |
 | `aws_sqs_queue` |  |
-| `google_compute_instance` |  Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.<br />  Custom machine types are not support<br />  |
+| `google_compute_disk` |  |
+| `google_compute_image` |  |
+| `google_compute_instance` |  Sustained use discounts are applied to monthly costs, but not to hourly costs.<br />  Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.<br />  Custom machine types are not supported.<br />  Sole-tenant VMs are not supported.<br />  |
+| `google_compute_snapshot` |  |
 
 
 ## The resource I want isn't supported
