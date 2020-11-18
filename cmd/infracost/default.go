@@ -54,7 +54,7 @@ func defaultCmd() *cli.Command {
 			},
 			&cli.BoolFlag{
 				Name:  "show-skipped",
-				Usage: "Prints the list of free and unsupported resources",
+				Usage: "Show unsupported resources, some of which might be free",
 				Value: false,
 			},
 		},
