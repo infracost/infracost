@@ -217,7 +217,7 @@ func stripDataResources(resData map[string]*schema.ResourceData) map[string]*sch
 	n := make(map[string]*schema.ResourceData)
 
 	for addr, d := range resData {
-		if !strings.HasPrefix(d.Address, "data.") {
+		if !strings.HasPrefix(addressResourcePart(d.Address), "data.") {
 			n[addr] = d
 		}
 	}
