@@ -15,10 +15,10 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 **Checkout the [docs site](https://www.infracost.io/docs/) for additional usage options.**
 
 * [Installation](#installation)
-* [Usage](#basic-usage)
-* [Supported resources](https://www.infracost.io/docs/supported_resources/)
+* [Usage](#usage-methods)
+* [Supported clouds and resources](https://www.infracost.io/docs/supported_resources/)
 * [Development](#development)
-* [Contributing (we can pay too)](#contributing)
+* [Contributing (we'll pay you!)](#contributing)
 
 <!-- NOTE: When updated also update https://github.com/infracost/docs/blob/master/docs/getting_started.md#installation with the same content -->
 ## Installation
@@ -70,14 +70,12 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
 ## Basic usage
 
-Generate a cost breakdown from a Terraform directory:
-```sh
-infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
-```
+There are [4 usage methods](https://www.infracost.io/docs/#usage-methods) for Infracost depending on your use-case. The following is the default method. Point to the Terraform directory using `--tfdir` and pass any required Terraform flags using `--tfflags`. Internally Infracost runs Terraform `init`, `plan` and `show`; `init` requires cloud credentials to be set, e.g. via the usual `AWS_ACCESS_KEY_ID` environment variables. This method works with remote state too.
+  ```sh
+  infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
+  ```
 
-Check the [docs site](https://www.infracost.io/docs/) for more details.
-
-The [Infracost GitHub action](https://github.com/marketplace/actions/run-infracost) can be used to automatically add a PR comment showing the cost estimate `diff` between a pull request and the master branch whenever Terraform files change.
+The [Infracost GitHub Action](https://www.infracost.io/docs/integrations#github-action) or [GitLab CI template](https://www.infracost.io/docs/integrations#gitlab-ci) can be used to automatically add a PR comment showing the cost estimate `diff` between a pull/merge request and the master branch.
 
 <img src="https://raw.githubusercontent.com/infracost/infracost-gh-action/master/screenshot.png" width=600 alt="Example infracost diff usage" />
 
@@ -88,7 +86,7 @@ Install Go dependencies:
 make deps
 ```
 
-Install latest version of terraform-provider-infracost. If you want to use a local development version see [#using-a-local-version-of-terraform-provider-infracost](#using-a-local-version-of-terraform-provider-infracost)
+Install latest version of terraform-provider-infracost. If you want to use a local development version, see [this](#using-a-local-version-of-terraform-provider-infracost)
 ```sh
 make install_provider
 ```
