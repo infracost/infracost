@@ -176,7 +176,7 @@ func TestComputeInstance(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 0.7)),
 				},
 				{
-					Name:             "Standard provisioned storage",
+					Name:             "Standard provisioned storage (pd-standard)",
 					PriceHash:        "4e58b7b536714dfce35b3050caa6034b-af6a951f170fc579633ad2c8f86a9dca",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
 				},
@@ -190,7 +190,7 @@ func TestComputeInstance(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:             "SSD provisioned storage",
+					Name:             "SSD provisioned storage (pd-ssd)",
 					PriceHash:        "7317191236b3f20b4e8122bddb65e5cf-57bc5d148491a8381abaccb21ca6b4e9",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40)),
 				},
@@ -206,7 +206,7 @@ func TestComputeInstance(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(730)),
 				},
 				{
-					Name:      "Standard provisioned storage",
+					Name:      "Standard provisioned storage (pd-standard)",
 					SkipCheck: true,
 				},
 			},
@@ -219,7 +219,7 @@ func TestComputeInstance(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:      "Standard provisioned storage",
+					Name:      "Standard provisioned storage (pd-standard)",
 					SkipCheck: true,
 				},
 				{
@@ -237,7 +237,7 @@ func TestComputeInstance(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:      "Standard provisioned storage",
+					Name:      "Standard provisioned storage (pd-standard)",
 					SkipCheck: true,
 				},
 				{
@@ -255,7 +255,7 @@ func TestComputeInstance(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:      "Standard provisioned storage",
+					Name:      "Standard provisioned storage (pd-standard)",
 					SkipCheck: true,
 				},
 				{
@@ -274,7 +274,7 @@ func TestComputeInstance(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:      "Standard provisioned storage",
+					Name:      "Standard provisioned storage (pd-standard)",
 					SkipCheck: true,
 				},
 				{

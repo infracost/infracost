@@ -34,14 +34,14 @@ func NewComputeDisk(d *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 
 func computeDisk(region string, diskType string, size *decimal.Decimal) *schema.CostComponent {
 	diskTypeDesc := "/^Storage PD Capacity/"
-	diskTypeLabel := "Standard provisioned storage"
+	diskTypeLabel := "Standard provisioned storage (pd-standard)"
 	switch diskType {
 	case "pd-balanced":
 		diskTypeDesc = "/^Balanced PD Capacity/"
-		diskTypeLabel = "Balanced provisioned storage"
+		diskTypeLabel = "Balanced provisioned storage (pd-balanced)"
 	case "pd-ssd":
 		diskTypeDesc = "/^SSD backed PD Capacity/"
-		diskTypeLabel = "SSD provisioned storage"
+		diskTypeLabel = "SSD provisioned storage (pd-ssd)"
 	}
 
 	return &schema.CostComponent{

@@ -82,7 +82,7 @@ func TestComputeDisk(t *testing.T) {
 			Name: "google_compute_disk.standard_default",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Standard provisioned storage",
+					Name:             "Standard provisioned storage (pd-standard)",
 					PriceHash:        "4e58b7b536714dfce35b3050caa6034b-af6a951f170fc579633ad2c8f86a9dca",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(500)),
 				},
@@ -92,7 +92,7 @@ func TestComputeDisk(t *testing.T) {
 			Name: "google_compute_disk.ssd_default",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "SSD provisioned storage",
+					Name:             "SSD provisioned storage (pd-ssd)",
 					PriceHash:        "7317191236b3f20b4e8122bddb65e5cf-57bc5d148491a8381abaccb21ca6b4e9",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(100)),
 				},
@@ -102,7 +102,7 @@ func TestComputeDisk(t *testing.T) {
 			Name: "google_compute_disk.size",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Standard provisioned storage",
+					Name:             "Standard provisioned storage (pd-standard)",
 					PriceHash:        "4e58b7b536714dfce35b3050caa6034b-af6a951f170fc579633ad2c8f86a9dca",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 				},
@@ -116,7 +116,7 @@ func TestComputeDisk(t *testing.T) {
 			Name: "google_compute_disk.image_disk_size",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Standard provisioned storage",
+					Name:             "Standard provisioned storage (pd-standard)",
 					PriceHash:        "4e58b7b536714dfce35b3050caa6034b-af6a951f170fc579633ad2c8f86a9dca",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(30)),
 				},
@@ -130,7 +130,7 @@ func TestComputeDisk(t *testing.T) {
 			Name: "google_compute_disk.image_source_image",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Standard provisioned storage",
+					Name:             "Standard provisioned storage (pd-standard)",
 					PriceHash:        "4e58b7b536714dfce35b3050caa6034b-af6a951f170fc579633ad2c8f86a9dca",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(30)),
 				},
@@ -148,7 +148,7 @@ func TestComputeDisk(t *testing.T) {
 			Name: "google_compute_disk.image_source_snapshot",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Standard provisioned storage",
+					Name:             "Standard provisioned storage (pd-standard)",
 					PriceHash:        "4e58b7b536714dfce35b3050caa6034b-af6a951f170fc579633ad2c8f86a9dca",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 				},
@@ -158,7 +158,7 @@ func TestComputeDisk(t *testing.T) {
 			Name: "google_compute_disk.snapshot_source_disk",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Standard provisioned storage",
+					Name:             "Standard provisioned storage (pd-standard)",
 					PriceHash:        "4e58b7b536714dfce35b3050caa6034b-af6a951f170fc579633ad2c8f86a9dca",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 				},
