@@ -139,6 +139,21 @@ func GenerateResourceSummary(resources []*Resource) *ResourceSummary {
 	}
 }
 
+func MultiplyQuantities(resource *Resource, multiplier decimal.Decimal) {
+	for _, costComponent := range resource.CostComponents {
+		if costComponent.HourlyQuantity != nil {
+			costComponent.HourlyQuantity = decimalPtr(costComponent.HourlyQuantity.Mul(multiplier))
+		}
+		if costComponent.MonthlyQuantity != nil {
+			costComponent.MonthlyQuantity = decimalPtr(costComponent.MonthlyQuantity.Mul(multiplier))
+		}
+	}
+
+	for _, subResource := range resource.SubResources {
+		MultiplyQuantities(subResource, multiplier)
+	}
+}
+
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
