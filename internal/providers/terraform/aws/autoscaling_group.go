@@ -47,7 +47,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.ResourceData) *schema
 		if lc == nil {
 			return nil
 		}
-		multiplyQuantities(lc, desiredCapacity)
+		schema.MultiplyQuantities(lc, desiredCapacity)
 		subResources = append(subResources, lc)
 	} else if len(launchTemplateRef) > 0 {
 		onDemandCount := desiredCapacity
@@ -169,7 +169,7 @@ func newLaunchTemplate(name string, d *schema.ResourceData, region string, onDem
 		CostComponents: costComponents,
 	}
 
-	multiplyQuantities(r, totalCount)
+	schema.MultiplyQuantities(r, totalCount)
 
 	if spotCount.GreaterThan(decimal.Zero) {
 		c := computeCostComponent(d, "spot", tenancy)
@@ -258,19 +258,4 @@ func calculateOnDemandAndSpotCounts(mixedInstancePolicyData gjson.Result, totalC
 	spotCount := totalCount.Sub(onDemandCount)
 
 	return onDemandCount, spotCount
-}
-
-func multiplyQuantities(resource *schema.Resource, multiplier decimal.Decimal) {
-	for _, costComponent := range resource.CostComponents {
-		if costComponent.HourlyQuantity != nil {
-			costComponent.HourlyQuantity = decimalPtr(costComponent.HourlyQuantity.Mul(multiplier))
-		}
-		if costComponent.MonthlyQuantity != nil {
-			costComponent.MonthlyQuantity = decimalPtr(costComponent.MonthlyQuantity.Mul(multiplier))
-		}
-	}
-
-	for _, subResource := range resource.SubResources {
-		multiplyQuantities(subResource, multiplier)
-	}
 }
