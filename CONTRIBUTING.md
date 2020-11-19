@@ -1,16 +1,16 @@
 # Contributing to Infracost
 
-The general process for contributing to Infracost is:
-1. Check this [Project](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the ones we'd like to focus on in the near future. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check; the issue labels should help you to find a good first issue, or new resources that others have already requested/liked.
+The overall process for contributing to Infracost is:
+1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check; the issue labels should help you to find a good first issue, or new resources that others have already requested/liked.
 2. Create a new issue if there's no issue for what you want to work on. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback.
-3. Send a pull request with the proposed change (don't forget to run `make lint` and `make fmt` first). Please include unit and integration tests where applicable. We're trialing [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) in case you'd like to use those too.
+3. Send a pull request with the proposed change (don't forget to run `make lint` and `make fmt` first). Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 4. We'll review your change and provide feedback.
 
 ## Adding new resources
 
 ### Quickstart AWS
 
-_Make sure to get familiar with the pricing model of you resource first._ To begin add a new file in `internal/providers/terraform/aws/` as well as an accompanying test file.
+_Make sure to get familiar with the pricing model of the resource first by reading the cloud vendors pricing page._ To begin, add a new file in `internal/providers/terraform/aws/` as well as an accompanying test file.
 
 ```go
 package aws
@@ -77,7 +77,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 ```
 
-Finally create a terraform file to test your resource and run:
+Finally create a temporary terraform file to test your resource and run (no need to commit that):
 
 ```
 make run ARGS="--tfdir my_new_terraform/"
@@ -90,7 +90,9 @@ When adding your first resource, we recommend you look at one of the existing re
 We distinguish the **price** of a resource from its **cost**. Price is the per-unit price advertised by a cloud vendor. The cost of a resource is calculated by multiplying its price by its usage. For example, an EC2 instance might be priced at $0.02 per hour, and if run for 100 hours (its usage), it'll cost $2.00. When adding resources to Infracost, we can always show their price, but if the resource has a usage-based cost component, we can't show its cost. To solve this problem, new resources in Infracost go through two levels of support:
 
 #### Level 1 support
-You can add all price components for the resource, even ones that are usage-based, so the price column in the table output is always populated. The hourly and monthly cost for these components will show `-` as illustrated in the following output for AWS Lambda. Once this is done, please send a pull-request to this repo so someone can review/merge it. Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
+You can add all price components for the resource, even ones that are usage-based, so the price column in the table output is always populated. The hourly and monthly cost for these components will show `-` as illustrated in the following output for AWS Lambda. Once this is done, please send a pull-request to this repo so someone can review/merge it. Try to re-use relevant costComponents from other resources where applicable, e.g. notice how the `newElasticacheResource` function is used in [aws_elasticache_cluster](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/elasticache_cluster.go) and [aws_elasticache_replication_group](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/elasticache_replication_group.go).
+
+Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
 
   ```
   NAME                                        MONTHLY QTY  UNIT         PRICE   HOURLY COST  MONTHLY COST
