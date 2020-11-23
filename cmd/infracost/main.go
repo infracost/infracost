@@ -106,7 +106,7 @@ func main() {
 		Usage: "Generate cost reports from Terraform plans",
 		UsageText: `infracost [global options] command [command options] [arguments...]
 
-Example:
+EXAMPLES:
 	# Run infracost with a Terraform directory and var file
 	infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
 
@@ -136,7 +136,7 @@ Example:
 			return nil
 		},
 		Before:   handleGlobalFlags,
-		Commands: []*cli.Command{registerCmd()},
+		Commands: []*cli.Command{registerCmd(), reportCmd()},
 		Action:   defaultCmd.Action,
 	}
 

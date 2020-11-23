@@ -104,12 +104,18 @@ func defaultCmd() *cli.Command {
 
 			schema.SortResources(resources)
 
-			var out []byte
+			r := output.ToOutputFormat(resources, c)
+			var (
+				b   []byte
+				out string
+			)
 			switch strings.ToLower(c.String("output")) {
 			case "json":
-				out, err = output.ToJSON(resources, c)
+				b, err = output.ToJSON(r)
+				out = string(b)
 			default:
-				out, err = output.ToTable(resources, c)
+				b, err = output.ToTable(r)
+				out = fmt.Sprintf("\n%s", string(b))
 			}
 
 			if err != nil {
@@ -119,7 +125,7 @@ func defaultCmd() *cli.Command {
 
 			spinner.Success()
 
-			fmt.Printf("\n%s\n", string(out))
+			fmt.Printf("%s\n", out)
 
 			return nil
 		},
