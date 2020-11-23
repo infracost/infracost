@@ -20,10 +20,7 @@ EXAMPLES:
 	# Run with multiple infracost JSON files
 	infracost report out1.json out2.json
 
-	# Using a glob pattern
-	infracost report out*.json
-
-	# Merge multiple JSON files
+	# Merge multiple JSON files into a single JSON output
 	infracost report --output json out1.json out2.json`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
