@@ -7,15 +7,13 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/schema"
-	"github.com/urfave/cli/v2"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
 
-func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
+func ToTable(out Root) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -39,10 +37,7 @@ func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 	overallTotalHourly := decimal.Zero
 	overallTotalMonthly := decimal.Zero
 
-	for _, r := range resources {
-		if r.IsSkipped {
-			continue
-		}
+	for _, r := range out.Resources {
 		t.Append([]string{r.Name, "", "", "", "", ""})
 
 		buildCostComponentRows(t, r.CostComponents, "", len(r.SubResources) > 0)
@@ -77,12 +72,13 @@ func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 
 	t.Render()
 
-	msg := skippedResourcesMessage(resources, c.Bool("show-skipped"))
-	if msg != "" {
-		_, err := bufw.WriteString(fmt.Sprintf("\n%s", msg))
-		if err != nil {
-			// The error here would just mean the output is shortened, so no need to return an error to the user in this case
-			log.Errorf("Error writing skipped resources message: %v", err.Error())
+	if len(out.Warnings) > 0 {
+		for _, w := range out.Warnings {
+			_, err := bufw.WriteString(fmt.Sprintf("\n%s", w))
+			if err != nil {
+				// The error here would just mean the output is shortened, so no need to return an error to the user in this case
+				log.Errorf("Error writing warning message: %v", err.Error())
+			}
 		}
 	}
 
@@ -90,7 +86,7 @@ func ToTable(resources []*schema.Resource, c *cli.Context) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func buildSubResourceRows(t *tablewriter.Table, subresources []*schema.Resource, prefix string) {
+func buildSubResourceRows(t *tablewriter.Table, subresources []Resource, prefix string) {
 	color := []tablewriter.Colors{
 		{tablewriter.FgHiBlackColor},
 	}
@@ -113,7 +109,7 @@ func buildSubResourceRows(t *tablewriter.Table, subresources []*schema.Resource,
 	}
 }
 
-func buildCostComponentRows(t *tablewriter.Table, costComponents []*schema.CostComponent, prefix string, hasSubResources bool) {
+func buildCostComponentRows(t *tablewriter.Table, costComponents []CostComponent, prefix string, hasSubResources bool) {
 	color := []tablewriter.Colors{
 		{tablewriter.FgHiBlackColor},
 		{tablewriter.FgHiBlackColor},
@@ -134,9 +130,9 @@ func buildCostComponentRows(t *tablewriter.Table, costComponents []*schema.CostC
 
 		t.Rich([]string{
 			fmt.Sprintf("%s %s", labelPrefix, c.Name),
-			formatQuantity(c.UnitMultiplierMonthlyQuantity()),
-			c.UnitWithMultiplier(),
-			formatAmount(c.UnitMultiplierPrice()),
+			formatQuantity(c.MonthlyQuantity),
+			c.Unit,
+			formatAmount(c.Price),
 			formatCost(c.HourlyCost),
 			formatCost(c.MonthlyCost),
 		}, color)
