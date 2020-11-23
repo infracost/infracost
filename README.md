@@ -65,7 +65,7 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
     ```sh
     git clone https://github.com/infracost/example-terraform.git
-    infracost --tfdir example-terraform
+    infracost --tfdir example-terraform/aws
     ```
 
 ## Basic usage
