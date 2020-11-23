@@ -7,6 +7,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAPIGatewayStageRegistryItem(),
 	GetAPIGatewayv2ApiRegistryItem(),
 	GetAutoscalingGroupRegistryItem(),
+	GetCloudwatchDashboardRegistryItem(),
+	GetCloudwatchMetricAlarmRegistryItem(),
 	GetDBInstanceRegistryItem(),
 	GetDMSRegistryItem(),
 	GetDocDBClusterInstanceRegistryItem(),
@@ -75,6 +77,15 @@ var FreeResources []string = []string{
 	"aws_apigatewayv2_route_response",
 	"aws_apigatewayv2_stage",
 	"aws_apigatewayv2_vpc_link",
+
+	// AWS Cloudwatch
+	"aws_cloudwatch_log_destination",
+	"aws_cloudwatch_log_destination_policy",
+	"aws_cloudwatch_log_group",
+	"aws_cloudwatch_log_metric_filter",
+	"aws_cloudwatch_log_resource_policy",
+	"aws_cloudwatch_log_stream",
+	"aws_cloudwatch_log_subscription_filter",
 
 	// AWS Elastic Load Balancing
 	"aws_alb_listener",
