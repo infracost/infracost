@@ -68,16 +68,16 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) == 1 ]; th
 
   if [ ! -z "$GITHUB_ACTIONS" ]; then
     echo "Posting comment to GitHub"
-    cat diff_infracost.txt | curl -sL -X POST -d @- \
+    cat diff_infracost.txt | curl -L -X POST -d @- \
         -H "Content-Type: application/json" \
         -H "Authorization: token $GITHUB_TOKEN" \
-        "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments" > /dev/null
+        "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
   elif [ ! -z "$GITLAB_CI" ]; then
     echo "Posting comment to GitLab"
-    cat diff_infracost.txt | curl -sL -X POST -d @- \
+    cat diff_infracost.txt | curl -L -X POST -d @- \
         -H "Content-Type: application/json" \
         -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
-        "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes" > /dev/null
+        "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes"
   elif [ ! -z "$CIRCLECI" ]; then
     echo "CircleCI integration: coming soon!"
   fi
