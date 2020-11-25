@@ -57,7 +57,7 @@ func cloudWatchMetricQuery(d *schema.ResourceData, region string, costComponentU
 
 	for _, metric := range d.Get("metric_query.#.metric").Array() {
 		if len(metric.Array()) > 0 {
-			metricCount += 1
+			metricCount++
 		}
 	}
 
