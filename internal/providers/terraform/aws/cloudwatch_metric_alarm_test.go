@@ -148,7 +148,7 @@ func TestCloudWatchMetricAlarm(t *testing.T) {
 				{
 					Name:             "Standard resolution",
 					PriceHash:        "a84a546af7ac086f8ba1e9e80712d14e-062aaa56dee17578c258c2b52f349952",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 				},
 			},
 		},

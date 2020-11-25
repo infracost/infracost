@@ -18,9 +18,9 @@ func NewCloudwatchMetricAlarm(d *schema.ResourceData, u *schema.ResourceData) *s
 	costComponents := make([]*schema.CostComponent, 0)
 
 	if len(d.Get("metric_query").Array()) > 0 {
-		costComponents = append(costComponents, cloudWatchMetricQuery(d, region))
+		costComponents = append(costComponents, cloudWatchMetricQuery(d, region, "alarm metrics"))
 	} else {
-		costComponents = append(costComponents, cloudWatchMetricName(d, region))
+		costComponents = append(costComponents, cloudWatchMetricName(d, region, "alarm metrics"))
 	}
 
 	return &schema.Resource{
@@ -29,10 +29,10 @@ func NewCloudwatchMetricAlarm(d *schema.ResourceData, u *schema.ResourceData) *s
 	}
 }
 
-func cloudwatchMetricAlarmCostComponent(name string, region string, alarmType string, quantity decimal.Decimal) *schema.CostComponent {
+func cloudwatchMetricAlarmCostComponent(name string, unit string, region string, alarmType string, quantity decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "alarm",
+		Unit:            unit,
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(quantity),
 		ProductFilter: &schema.ProductFilter{
@@ -47,22 +47,30 @@ func cloudwatchMetricAlarmCostComponent(name string, region string, alarmType st
 	}
 }
 
-func cloudWatchMetricQuery(d *schema.ResourceData, region string) *schema.CostComponent {
+func cloudWatchMetricQuery(d *schema.ResourceData, region string, costComponentUnit string) *schema.CostComponent {
 	var quantity decimal.Decimal
 	var name string
 	var alarmType string
-
 	var anomalyDetection string
 
-	quantity = decimal.NewFromInt(1)
+	metricCount := 0
+
+	for _, metric := range d.Get("metric_query.#.metric").Array() {
+		if len(metric.Array()) > 0 {
+			metricCount += 1
+		}
+	}
+
+	quantity = decimal.NewFromInt(int64(metricCount))
 
 	if checkAnomlyDetection(d) {
-		quantity = decimal.NewFromInt(3)
+		quantity = quantity.Mul(decimal.NewFromInt(3))
 		anomalyDetection = " anomaly detection"
+		costComponentUnit = "alarms"
 	}
 
 	for _, query := range d.Get("metric_query").Array() {
-		if !query.Get("metric").Exists() {
+		if len(query.Get("metric").Array()) == 0 {
 			continue
 		}
 
@@ -76,7 +84,7 @@ func cloudWatchMetricQuery(d *schema.ResourceData, region string) *schema.CostCo
 					alarmType = "High Resolution"
 				}
 
-				return cloudwatchMetricAlarmCostComponent(name, region, alarmType, quantity)
+				return cloudwatchMetricAlarmCostComponent(name, costComponentUnit, region, alarmType, quantity)
 			}
 		}
 	}
@@ -84,7 +92,7 @@ func cloudWatchMetricQuery(d *schema.ResourceData, region string) *schema.CostCo
 	return nil
 }
 
-func cloudWatchMetricName(d *schema.ResourceData, region string) *schema.CostComponent {
+func cloudWatchMetricName(d *schema.ResourceData, region string, costComponentUnit string) *schema.CostComponent {
 	var name string
 	var alarmType string
 
@@ -96,7 +104,7 @@ func cloudWatchMetricName(d *schema.ResourceData, region string) *schema.CostCom
 		alarmType = "High Resolution"
 	}
 
-	return cloudwatchMetricAlarmCostComponent(name, region, alarmType, decimal.NewFromInt(1))
+	return cloudwatchMetricAlarmCostComponent(name, costComponentUnit, region, alarmType, decimal.NewFromInt(1))
 }
 
 func calcMetricResolution(metricPeriod decimal.Decimal) bool {
