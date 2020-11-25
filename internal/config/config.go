@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/infracost/infracost/internal/version"
@@ -167,6 +168,21 @@ func getInfracostEnv() string {
 		return "gitlab_ci"
 	} else if IsTruthy(os.Getenv("CIRCLECI")) {
 		return "circleci"
+	} else {
+		envKeys := os.Environ()
+		sort.Strings(envKeys)
+		for _, k := range envKeys {
+			if strings.HasPrefix(k, "ATLANTIS_") {
+				return "atlantis"
+			} else if strings.HasPrefix(k, "BITBUCKET_") {
+				return "bitbucket"
+			} else if strings.HasPrefix(k, "JENKINS_") {
+				return "jenkins"
+			}
+		}
+		if IsTruthy(os.Getenv("CI")) {
+			return "ci"
+		}
 	}
 
 	return ""
