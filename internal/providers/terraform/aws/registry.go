@@ -8,6 +8,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAPIGatewayv2ApiRegistryItem(),
 	GetAutoscalingGroupRegistryItem(),
 	GetCloudwatchDashboardRegistryItem(),
+	GetCloudwatchLogGroupItem(),
 	GetCloudwatchMetricAlarmRegistryItem(),
 	GetDBInstanceRegistryItem(),
 	GetDMSRegistryItem(),
@@ -81,7 +82,6 @@ var FreeResources []string = []string{
 	// AWS Cloudwatch
 	"aws_cloudwatch_log_destination",
 	"aws_cloudwatch_log_destination_policy",
-	"aws_cloudwatch_log_group",
 	"aws_cloudwatch_log_metric_filter",
 	"aws_cloudwatch_log_resource_policy",
 	"aws_cloudwatch_log_stream",
