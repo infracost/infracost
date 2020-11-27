@@ -17,25 +17,18 @@ func NewCloudwatchLogGroup(d *schema.ResourceData, u *schema.ResourceData) *sche
 
 	var gbDataIngestion *decimal.Decimal
 	var gbDataStorage *decimal.Decimal
-	var gbDataAnalyzed *decimal.Decimal
-	var gbDataAnalyzedQueries int64
+	var gbDataScanned *decimal.Decimal
 
-	if u != nil && u.Get("data_ingestion.0.value").Exists() {
-		gbDataIngestion = decimalPtr(decimal.NewFromFloat(u.Get("data_ingestion.0.value").Float()))
+	if u != nil && u.Get("monthly_gb_data_ingestion.0.value").Exists() {
+		gbDataIngestion = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_ingestion.0.value").Float()))
 	}
 
-	if u != nil && u.Get("data_storage.0.value").Exists() {
-		gbDataStorage = decimalPtr(decimal.NewFromFloat(u.Get("data_storage.0.value").Float()))
+	if u != nil && u.Get("monthly_gb_data_storage.0.value").Exists() {
+		gbDataStorage = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_storage.0.value").Float()))
 	}
 
-	if u != nil && u.Get("data_analyzed.0.value").Exists() {
-		gbDataAnalyzed = decimalPtr(decimal.NewFromFloat(u.Get("data_analyzed.0.value").Float()))
-	}
-
-	gbDataAnalyzedQueries = 1
-
-	if u != nil && u.Get("data_queries.0.value").Exists() {
-		gbDataAnalyzedQueries = u.Get("data_queries.0.value").Int()
+	if u != nil && u.Get("monthly_gb_data_scanned.0.value").Exists() {
+		gbDataScanned = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_scanned.0.value").Float()))
 	}
 
 	return &schema.Resource{
@@ -74,8 +67,8 @@ func NewCloudwatchLogGroup(d *schema.ResourceData, u *schema.ResourceData) *sche
 			{
 				Name:            "Insights queries data scanned",
 				Unit:            "GB",
-				UnitMultiplier:  int(gbDataAnalyzedQueries),
-				MonthlyQuantity: gbDataAnalyzed,
+				UnitMultiplier:  1,
+				MonthlyQuantity: gbDataScanned,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(region),
