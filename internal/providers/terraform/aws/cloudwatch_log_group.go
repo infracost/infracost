@@ -15,81 +15,77 @@ func GetCloudwatchLogGroupItem() *schema.RegistryItem {
 func NewCloudwatchLogGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
-	var gbDataAnalzyedQueries int64
-
-	gbDataIngestion := decimal.NewFromInt(0)
-	gbDataStorage := decimal.NewFromInt(0)
-	gbDataAnalzyed := decimal.NewFromInt(0)
+	var gbDataIngestion *decimal.Decimal
+	var gbDataStorage *decimal.Decimal
+	var gbDataAnalyzed *decimal.Decimal
+	var gbDataAnalyzedQueries int64
 
 	if u != nil && u.Get("data_ingestion.0.value").Exists() {
-		gbDataIngestion = decimal.NewFromInt(u.Get("data_ingestion.0.value").Int())
+		gbDataIngestion = decimalPtr(decimal.NewFromFloat(u.Get("data_ingestion.0.value").Float()))
 	}
 
 	if u != nil && u.Get("data_storage.0.value").Exists() {
-		gbDataStorage = decimal.NewFromInt(u.Get("data_storage.0.value").Int())
+		gbDataStorage = decimalPtr(decimal.NewFromFloat(u.Get("data_storage.0.value").Float()))
 	}
 
 	if u != nil && u.Get("data_analyzed.0.value").Exists() {
-		gbDataAnalzyed = decimal.NewFromInt(u.Get("data_analyzed.0.value").Int())
+		gbDataAnalyzed = decimalPtr(decimal.NewFromFloat(u.Get("data_analyzed.0.value").Float()))
 	}
+
+	gbDataAnalyzedQueries = 1
 
 	if u != nil && u.Get("data_queries.0.value").Exists() {
-		gbDataAnalzyedQueries = u.Get("data_queries.0.value").Int()
-	}
-
-	costComponents := []*schema.CostComponent{
-		{
-			Name:            "Collect (Data Ingestion)",
-			Unit:            "GB",
-			UnitMultiplier:  1,
-			MonthlyQuantity: decimalPtr(gbDataIngestion),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonCloudWatch"),
-				ProductFamily: strPtr("Data Payload"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/-DataProcessing-Bytes/")},
-				},
-			},
-		},
-		{
-			Name:            "Store (Archival)",
-			Unit:            "GB",
-			UnitMultiplier:  1,
-			MonthlyQuantity: decimalPtr(gbDataStorage),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonCloudWatch"),
-				ProductFamily: strPtr("Storage Snapshot"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/-TimedStorage-ByteHrs/")},
-				},
-			},
-		},
-	}
-
-	if gbDataAnalzyedQueries > 0 && gbDataAnalzyed.GreaterThan(decimal.NewFromInt(0)) {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Analyze (Logs insights queries)",
-			Unit:            "GB-scanned",
-			UnitMultiplier:  int(gbDataAnalzyedQueries),
-			MonthlyQuantity: decimalPtr(gbDataAnalzyed),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonCloudWatch"),
-				ProductFamily: strPtr("Data Payload"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/-DataScanned-Bytes/")},
-				},
-			},
-		})
+		gbDataAnalyzedQueries = u.Get("data_queries.0.value").Int()
 	}
 
 	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
+		Name: d.Address,
+		CostComponents: []*schema.CostComponent{
+			{
+				Name:            "Data ingestion",
+				Unit:            "GB",
+				UnitMultiplier:  1,
+				MonthlyQuantity: gbDataIngestion,
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("aws"),
+					Region:        strPtr(region),
+					Service:       strPtr("AmazonCloudWatch"),
+					ProductFamily: strPtr("Data Payload"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "usagetype", ValueRegex: strPtr("/-DataProcessing-Bytes/")},
+					},
+				},
+			},
+			{
+				Name:            "Archival Storage",
+				Unit:            "GB",
+				UnitMultiplier:  1,
+				MonthlyQuantity: gbDataStorage,
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("aws"),
+					Region:        strPtr(region),
+					Service:       strPtr("AmazonCloudWatch"),
+					ProductFamily: strPtr("Storage Snapshot"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "usagetype", ValueRegex: strPtr("/-TimedStorage-ByteHrs/")},
+					},
+				},
+			},
+			{
+				Name:            "Insights queries data scanned",
+				Unit:            "GB",
+				UnitMultiplier:  int(gbDataAnalyzedQueries),
+				MonthlyQuantity: gbDataAnalyzed,
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("aws"),
+					Region:        strPtr(region),
+					Service:       strPtr("AmazonCloudWatch"),
+					ProductFamily: strPtr("Data Payload"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "usagetype", ValueRegex: strPtr("/-DataScanned-Bytes/")},
+					},
+				},
+			},
+		},
 	}
 }
