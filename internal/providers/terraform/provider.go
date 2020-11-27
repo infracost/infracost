@@ -184,7 +184,7 @@ func (p *terraformProvider) terraformPreChecks() error {
 		}
 
 		if !p.inTerraformDir() {
-			return errors.Errorf("Directory \"%s\" does not have any .tf files.\nSet the Terraform directory path using the --tfdir option.", p.dir)
+			return errors.Errorf("Directory \"%s\" does not have any Terraform files.\nSet the Terraform directory path using the --tfdir option.", p.dir)
 		}
 	}
 	return nil
@@ -209,8 +209,13 @@ func checkVersion() (string, bool) {
 }
 
 func (p *terraformProvider) inTerraformDir() bool {
-	matches, err := filepath.Glob(filepath.Join(p.dir, "*.tf"))
-	return matches != nil && err == nil
+	for _, ext := range []string{"tf", "hcl", "hcl.json"} {
+		matches, err := filepath.Glob(filepath.Join(p.dir, fmt.Sprintf("*.%s", ext)))
+		if matches != nil && err == nil {
+			return true
+		}
+	}
+	return false
 }
 
 func terraformError(err error) {
