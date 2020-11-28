@@ -16,6 +16,9 @@ Support for the following is not currently included:
 | `aws_api_gateway_stage` |  |
 | `aws_apigatewayv2_api` |  |
 | `aws_autoscaling_group` |  |
+| `aws_cloudwatch_dashboard` |  |
+| `aws_cloudwatch_log_group` |  |
+| `aws_cloudwatch_metric_alarm` |  |
 | `aws_db_instance` |  |
 | `aws_dms_replication_instance` |  |
 | `aws_docdb_cluster_instance` |  |
