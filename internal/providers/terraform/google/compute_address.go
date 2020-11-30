@@ -36,7 +36,6 @@ func NewComputeAddress(d *schema.ResourceData, u *schema.ResourceData) *schema.R
 }
 
 func computeAddress(region string) *schema.CostComponent {
-	region = "global"
 	return &schema.CostComponent{
 		Name:           "Static and ephemeral IP addresses in use on standard VM instances",
 		Unit:           "hours",
@@ -44,7 +43,7 @@ func computeAddress(region string) *schema.CostComponent {
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
-			Region:        strPtr(region),
+			Region:        strPtr("global"),
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{
