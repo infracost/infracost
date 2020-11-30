@@ -118,7 +118,7 @@ func eksCPUCreditsCostComponent(d *schema.ResourceData, region string, desiredSi
 			ProductFamily: strPtr("CPU Credits"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "operatingSystem", Value: strPtr("Linux")},
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/CPUCredits:%s/", prefix))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/CPUCredits:%s$/", prefix))},
 			},
 		},
 	}

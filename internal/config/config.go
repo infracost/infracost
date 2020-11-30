@@ -178,6 +178,8 @@ func getInfracostEnv() string {
 				return "bitbucket"
 			} else if strings.HasPrefix(k, "JENKINS_") {
 				return "jenkins"
+			} else if strings.HasPrefix(k, "CONCOURSE_") {
+				return "concourse"
 			}
 		}
 		if IsTruthy(os.Getenv("CI")) {
