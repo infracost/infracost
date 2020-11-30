@@ -7,6 +7,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetComputeImageRegistryItem(),
 	GetComputeSnapshotRegistryItem(),
 	GetComputeInstanceRegistryItem(),
+	GetComputeAddressRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
