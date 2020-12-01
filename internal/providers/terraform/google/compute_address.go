@@ -2,7 +2,6 @@ package google
 
 import (
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 func GetComputeAddressRegistryItem() *schema.RegistryItem {
@@ -30,17 +29,21 @@ func NewComputeAddress(d *schema.ResourceData, u *schema.ResourceData) *schema.R
 	}
 
 	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: []*schema.CostComponent{computeAddress(region)},
+		Name: d.Address,
+		CostComponents: []*schema.CostComponent{
+			standardVMComputeAddress(region),
+			preemptibleVMComputeAddress(region),
+			unusedVMComputeAddress(region),
+		},
 	}
 }
 
-func computeAddress(region string) *schema.CostComponent {
+func standardVMComputeAddress(region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "Static and ephemeral IP addresses in use on standard VM instances",
 		Unit:           "hours",
 		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		HourlyQuantity: nil,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
 			Region:        strPtr("global"),
@@ -48,6 +51,48 @@ func computeAddress(region string) *schema.CostComponent {
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "description", Value: strPtr("External IP Charge on a Standard VM")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			EndUsageAmount: strPtr(""), // use the non-free tier
+		},
+	}
+}
+
+func preemptibleVMComputeAddress(region string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:           "Static and ephemeral IP addresses in use on preemptible VM instances",
+		Unit:           "hours",
+		UnitMultiplier: 1,
+		HourlyQuantity: nil,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("gcp"),
+			Region:        strPtr("global"),
+			Service:       strPtr("Compute Engine"),
+			ProductFamily: strPtr("Network"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "description", Value: strPtr("External IP Charge on a Preemptible VM")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			EndUsageAmount: strPtr(""), // use the non-free tier
+		},
+	}
+}
+
+func unusedVMComputeAddress(region string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:           "Static IP address (assigned but unused)",
+		Unit:           "hours",
+		UnitMultiplier: 1,
+		HourlyQuantity: nil,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("gcp"),
+			Region:        strPtr(region),
+			Service:       strPtr("Compute Engine"),
+			ProductFamily: strPtr("Network"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "description", Value: strPtr("Static Ip Charge")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

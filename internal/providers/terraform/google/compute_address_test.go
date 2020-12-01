@@ -5,7 +5,6 @@ import (
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 	"github.com/infracost/infracost/internal/testutil"
-	"github.com/shopspring/decimal"
 )
 
 func TestComputeAddress(t *testing.T) {
@@ -27,9 +26,16 @@ func TestComputeAddress(t *testing.T) {
 			Name: "google_compute_address.static",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Static and ephemeral IP addresses in use on standard VM instances",
-					PriceHash:        "63d43e05c6de193d46ac984c5d047c4e-92a41b8ee8a64d671e700c781c365c10",
-					MonthlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+					Name:      "Static and ephemeral IP addresses in use on standard VM instances",
+					PriceHash: "63d43e05c6de193d46ac984c5d047c4e-92a41b8ee8a64d671e700c781c365c10",
+				},
+				{
+					Name:      "Static and ephemeral IP addresses in use on preemptible VM instances",
+					PriceHash: "2ec0a063efa9b4e610e5205f9441dc4d-ef2cadbde566a742ff14834f883bcb8a",
+				},
+				{
+					Name:      "Static IP address (assigned but unused)",
+					PriceHash: "2aa962ad3e313d7a01f2ea2b98a3cb40-d7883856ef5a8d377f6fc8b3df05ea7e",
 				},
 			},
 		},
