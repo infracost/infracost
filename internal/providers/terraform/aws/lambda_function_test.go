@@ -91,7 +91,7 @@ func TestLambdaFunction_usage(t *testing.T) {
 				{
 					Name:            "Duration",
 					PriceHash:       "a562fdf216894a62109f5b642a702f37-1786dd5ddb52682e127baa00bfaa4c48",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100000.0 * (128.0 / 1024.0) * 0.4)),
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100000.0 * (128.0 / 1024.0) * 0.35)),
 				},
 			},
 		},
@@ -102,7 +102,7 @@ func TestLambdaFunction_usage(t *testing.T) {
 				{
 					Name:            "Duration",
 					PriceHash:       "a562fdf216894a62109f5b642a702f37-1786dd5ddb52682e127baa00bfaa4c48",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100000.0 * (512.0 / 1024.0) * 0.4)),
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100000.0 * (512.0 / 1024.0) * 0.35)),
 				},
 			},
 		},
