@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"time"
 
+	"github.com/dustin/go-humanize"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -12,9 +14,13 @@ import (
 )
 
 type Root struct {
-	Resources []Resource `json:"resources"`
-	Warnings  []string   `json:"warnings"`
+	Resources        []Resource       `json:"resources"`
+	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
+	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
+	TimeGenerated    time.Time        `json:"timeGenerated"`
+	Warnings         []string         `json:"warnings"`
 }
+
 type CostComponent struct {
 	Name            string           `json:"name"`
 	Unit            string           `json:"unit"`
@@ -65,15 +71,36 @@ func outputResource(r *schema.Resource) Resource {
 func ToOutputFormat(resources []*schema.Resource, c *cli.Context) Root {
 	arr := make([]Resource, 0, len(resources))
 
+	var totalHourlyCost *decimal.Decimal
+	var totalMonthlyCost *decimal.Decimal
+
 	for _, r := range resources {
 		if r.IsSkipped {
 			continue
 		}
 		arr = append(arr, outputResource(r))
+
+		if r.HourlyCost != nil {
+			if totalHourlyCost == nil {
+				totalHourlyCost = decimalPtr(decimal.Zero)
+			}
+
+			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*r.HourlyCost))
+		}
+		if r.MonthlyCost != nil {
+			if totalMonthlyCost == nil {
+				totalMonthlyCost = decimalPtr(decimal.Zero)
+			}
+
+			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*r.MonthlyCost))
+		}
 	}
 
 	out := Root{
-		Resources: arr,
+		Resources:        arr,
+		TotalHourlyCost:  totalHourlyCost,
+		TotalMonthlyCost: totalMonthlyCost,
+		TimeGenerated:    time.Now(),
 	}
 
 	msg := skippedResourcesMessage(resources, c.Bool("show-skipped"))
@@ -93,11 +120,33 @@ func Load(data []byte) (Root, error) {
 func Combine(outs ...Root) Root {
 	var combined Root
 
+	var totalHourlyCost *decimal.Decimal
+	var totalMonthlyCost *decimal.Decimal
+
 	for _, o := range outs {
 		combined.Resources = append(combined.Resources, o.Resources...)
+
+		if o.TotalHourlyCost != nil {
+			if totalHourlyCost == nil {
+				totalHourlyCost = decimalPtr(decimal.Zero)
+			}
+
+			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*o.TotalHourlyCost))
+		}
+		if o.TotalMonthlyCost != nil {
+			if totalMonthlyCost == nil {
+				totalMonthlyCost = decimalPtr(decimal.Zero)
+			}
+
+			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*o.TotalMonthlyCost))
+		}
 	}
 
 	sortResources(combined)
+
+	combined.TotalHourlyCost = totalHourlyCost
+	combined.TotalMonthlyCost = totalMonthlyCost
+	combined.TimeGenerated = time.Now()
 
 	return combined
 }
@@ -143,4 +192,32 @@ func skippedResourcesMessage(resources []*schema.Resource, showDetails bool) str
 	}
 
 	return message
+}
+
+func formatAmount(d decimal.Decimal) string {
+	f, _ := d.Float64()
+	if f < 0.00005 && f != 0 {
+		return fmt.Sprintf("%.g", f)
+	}
+
+	return humanize.FormatFloat("#,###.####", f)
+}
+
+func formatCost(d *decimal.Decimal) string {
+	if d == nil {
+		return "-"
+	}
+	return formatAmount(*d)
+}
+
+func formatQuantity(q *decimal.Decimal) string {
+	if q == nil {
+		return "-"
+	}
+	f, _ := q.Float64()
+	return humanize.CommafWithDigits(f, 4)
+}
+
+func decimalPtr(d decimal.Decimal) *decimal.Decimal {
+	return &d
 }

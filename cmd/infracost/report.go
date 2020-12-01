@@ -26,7 +26,7 @@ EXAMPLES:
 			&cli.StringFlag{
 				Name:    "output",
 				Aliases: []string{"o"},
-				Usage:   "Output format (json, table)",
+				Usage:   "Output format (json, table, html)",
 				Value:   "table",
 			},
 		},
@@ -61,6 +61,8 @@ EXAMPLES:
 			switch strings.ToLower(c.String("output")) {
 			case "json":
 				b, err = output.ToJSON(combined)
+			case "html":
+				b, err = output.ToHTML(combined)
 			default:
 				b, err = output.ToTable(combined)
 			}

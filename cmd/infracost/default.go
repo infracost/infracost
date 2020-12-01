@@ -49,7 +49,7 @@ func defaultCmd() *cli.Command {
 			&cli.StringFlag{
 				Name:    "output",
 				Aliases: []string{"o"},
-				Usage:   "Output format (json, table)",
+				Usage:   "Output format (json, table, html)",
 				Value:   "table",
 			},
 			&cli.BoolFlag{
@@ -112,6 +112,9 @@ func defaultCmd() *cli.Command {
 			switch strings.ToLower(c.String("output")) {
 			case "json":
 				b, err = output.ToJSON(r)
+				out = string(b)
+			case "html":
+				b, err = output.ToHTML(r)
 				out = string(b)
 			default:
 				b, err = output.ToTable(r)
