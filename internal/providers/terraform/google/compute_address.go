@@ -12,6 +12,14 @@ func GetComputeAddressRegistryItem() *schema.RegistryItem {
 	}
 }
 
+func GetComputeGlobalAddressRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:                "google_compute_global_address",
+		RFunc:               NewComputeAddress,
+		ReferenceAttributes: []string{},
+	}
+}
+
 func NewComputeAddress(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
@@ -20,7 +28,7 @@ func NewComputeAddress(d *schema.ResourceData, u *schema.ResourceData) *schema.R
 		region = zoneToRegion(zone)
 	}
 	addressType := d.Get("address_type").String()
-	if addressType != "EXTERNAL" {
+	if addressType == "INTERNAL" {
 		return &schema.Resource{
 			Name:      d.Address,
 			NoPrice:   true,
@@ -40,7 +48,7 @@ func NewComputeAddress(d *schema.ResourceData, u *schema.ResourceData) *schema.R
 
 func standardVMComputeAddress(region string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           "Static and ephemeral IP addresses in use on standard VM instances",
+		Name:           "IP address (if used by standard VM)",
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: nil,
@@ -61,7 +69,7 @@ func standardVMComputeAddress(region string) *schema.CostComponent {
 
 func preemptibleVMComputeAddress(region string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           "Static and ephemeral IP addresses in use on preemptible VM instances",
+		Name:           "IP address (if used by preemptible VM)",
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: nil,
@@ -82,7 +90,7 @@ func preemptibleVMComputeAddress(region string) *schema.CostComponent {
 
 func unusedVMComputeAddress(region string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           "Static IP address (assigned but unused)",
+		Name:           "IP address (if unused)",
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: nil,
