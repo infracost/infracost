@@ -7,6 +7,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetComputeImageRegistryItem(),
 	GetComputeSnapshotRegistryItem(),
 	GetComputeInstanceRegistryItem(),
+	GetComputeAddressRegistryItem(),
+	GetComputeGlobalAddressRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -61,10 +63,6 @@ var FreeResources []string = []string{
 // VM instance (https://cloud.google.com/compute/vm-instance-pricing):
 // google_compute_instance_from_machine_image
 // google_compute_instance_from_template
-//
-// IP addresses (https://cloud.google.com/vpc/network-pricing#ipaddress):
-// google_compute_address
-// google_compute_global_address
 //
 // Node groups and autoscaling:
 // google_compute_autoscaler
