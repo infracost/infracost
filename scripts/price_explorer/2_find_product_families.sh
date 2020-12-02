@@ -11,4 +11,4 @@ query {
   ){
         productFamily
     }
-}" | jq '.data.products | map ({ (.productFamily): .__typename} ) | add' | jq "keys"
+}" | jq '.data.products[].productFamily' | sort | uniq
