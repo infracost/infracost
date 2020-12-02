@@ -24,7 +24,7 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1
 	github.com/tidwall/gjson v1.6.3
-	github.com/urfave/cli/v2 v2.2.0
+	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/mod v0.3.0
 	gopkg.in/yaml.v2 v2.4.0
 )
