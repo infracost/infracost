@@ -5,11 +5,9 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/dustin/go-humanize"
 	"github.com/infracost/infracost/internal/config"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -34,9 +32,6 @@ func ToTable(out Root) ([]byte, error) {
 		tablewriter.ALIGN_RIGHT, // monthly cost
 	})
 
-	overallTotalHourly := decimal.Zero
-	overallTotalMonthly := decimal.Zero
-
 	for _, r := range out.Resources {
 		t.Append([]string{r.Name, "", "", "", "", ""})
 
@@ -52,13 +47,6 @@ func ToTable(out Root) ([]byte, error) {
 			formatCost(r.MonthlyCost),
 		})
 		t.Append([]string{"", "", "", "", "", ""})
-
-		if r.HourlyCost != nil {
-			overallTotalHourly = overallTotalHourly.Add(*r.HourlyCost)
-		}
-		if r.MonthlyCost != nil {
-			overallTotalMonthly = overallTotalMonthly.Add(*r.MonthlyCost)
-		}
 	}
 
 	t.Append([]string{
@@ -66,8 +54,8 @@ func ToTable(out Root) ([]byte, error) {
 		"",
 		"",
 		"",
-		formatAmount(overallTotalHourly),
-		formatAmount(overallTotalMonthly),
+		formatCost(out.TotalHourlyCost),
+		formatCost(out.TotalMonthlyCost),
 	})
 
 	t.Render()
@@ -137,28 +125,4 @@ func buildCostComponentRows(t *tablewriter.Table, costComponents []CostComponent
 			formatCost(c.MonthlyCost),
 		}, color)
 	}
-}
-
-func formatAmount(d decimal.Decimal) string {
-	f, _ := d.Float64()
-	if f < 0.00005 && f != 0 {
-		return fmt.Sprintf("%.g", f)
-	}
-
-	return humanize.FormatFloat("#,###.####", f)
-}
-
-func formatCost(d *decimal.Decimal) string {
-	if d == nil {
-		return "-"
-	}
-	return formatAmount(*d)
-}
-
-func formatQuantity(q *decimal.Decimal) string {
-	if q == nil {
-		return "-"
-	}
-	f, _ := q.Float64()
-	return humanize.CommafWithDigits(f, 4)
 }
