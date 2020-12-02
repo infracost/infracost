@@ -23,10 +23,6 @@ func GetComputeGlobalAddressRegistryItem() *schema.RegistryItem {
 func NewComputeAddress(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
-	zone := d.Get("zone").String()
-	if zone != "" {
-		region = zoneToRegion(zone)
-	}
 	addressType := d.Get("address_type").String()
 	if addressType == "INTERNAL" {
 		return &schema.Resource{
@@ -39,14 +35,14 @@ func NewComputeAddress(d *schema.ResourceData, u *schema.ResourceData) *schema.R
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
-			standardVMComputeAddress(region),
-			preemptibleVMComputeAddress(region),
+			standardVMComputeAddress(),
+			preemptibleVMComputeAddress(),
 			unusedVMComputeAddress(region),
 		},
 	}
 }
 
-func standardVMComputeAddress(region string) *schema.CostComponent {
+func standardVMComputeAddress() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "IP address (if used by standard VM)",
 		Unit:           "hours",
@@ -67,7 +63,7 @@ func standardVMComputeAddress(region string) *schema.CostComponent {
 	}
 }
 
-func preemptibleVMComputeAddress(region string) *schema.CostComponent {
+func preemptibleVMComputeAddress() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "IP address (if used by preemptible VM)",
 		Unit:           "hours",
