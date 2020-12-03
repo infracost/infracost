@@ -23,12 +23,12 @@ func ToHTML(out Root) ([]byte, error) {
 		"formatCost":     formatCost,
 		"formatQuantity": formatQuantity,
 	})
-	tmpl, err := tmpl.ParseFiles("internal/output/output.html")
+	tmpl, err := tmpl.Parse(HTMLTemplate)
 	if err != nil {
 		return []byte{}, err
 	}
 
-	err = tmpl.ExecuteTemplate(bufw, "output.html", out)
+	err = tmpl.Execute(bufw, out)
 	if err != nil {
 		return []byte{}, err
 	}
