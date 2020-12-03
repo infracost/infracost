@@ -1,3 +1,6 @@
+package output
+
+var HTMLTemplate = `
 {{define "style"}}
 body {
   margin: 0;
@@ -158,4 +161,4 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       </tbody>
     </table>
   </body>
-</html>
+</html>`
