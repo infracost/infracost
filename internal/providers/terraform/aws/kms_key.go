@@ -5,7 +5,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func GetKMSKeyRegistryItem() *schema.RegistryItem {
+func GetNewKMSKeyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_kms_key",
 		RFunc: NewKMSKey,
