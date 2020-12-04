@@ -40,6 +40,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetNewEKSNodeGroupItem(),
 	GetNewEKSFargateProfileItem(),
 	GetNewEKSClusterItem(),
+	GetKMSKeyRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
