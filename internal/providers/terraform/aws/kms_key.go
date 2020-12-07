@@ -22,7 +22,7 @@ func NewKMSKey(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource 
 			Name:            "Customer master key",
 			Unit:            "months",
 			UnitMultiplier:  1,
-			MonthlyQuantity: decimalPtr(decimal.NewFromInt(cmkCount)),
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
