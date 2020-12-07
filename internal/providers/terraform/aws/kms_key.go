@@ -28,7 +28,8 @@ func NewKMSKey(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource 
 				Service:       strPtr("awskms"),
 				ProductFamily: strPtr("Encryption Key"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/-KMS-Keys/")},
+					{Key: "locationType", Value: strPtr("AWS Region")},
+					{Key: "usagetype", ValueRegex: strPtr("/KMS-Keys/")},
 				},
 			},
 		},
