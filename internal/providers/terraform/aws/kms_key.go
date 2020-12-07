@@ -35,8 +35,32 @@ func NewKMSKey(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource 
 		},
 	}
 
+	costComponents = append(costComponents, requestPriceComponent("Requests", region, "All"))
+	costComponents = append(costComponents, requestPriceComponent("Requests (RSA 2048)", region, "Asymmetric-RSA_2048"))
+	costComponents = append(costComponents, requestPriceComponent("Requests (ECC GenerateDataKeyPair)", region, "GenerateDatakeyPair-ECC"))
+	costComponents = append(costComponents, requestPriceComponent("Requests (Asymmetric)", region, "Asymmetric"))
+	costComponents = append(costComponents, requestPriceComponent("Requests (RSA GenerateDataKeyPair)", region, "GenerateDatakeyPair-RSA"))
+
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
+	}
+}
+
+func requestPriceComponent(name string, region string, group string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:           name,
+		Unit:           "requests",
+		UnitMultiplier: 10000,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Region:     strPtr(region),
+			Service:    strPtr("awskms"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "group", ValueRegex: strPtr("/" + group + "/")},
+				{Key: "locationType", Value: strPtr("AWS Region")},
+				{Key: "usagetype", ValueRegex: strPtr("/KMS-Requests/")},
+			},
+		},
 	}
 }
