@@ -19,7 +19,7 @@ func NewKMSKey(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource 
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:            "CMK",
+			Name:            "Customer master key",
 			Unit:            "months",
 			UnitMultiplier:  1,
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(cmkCount)),
