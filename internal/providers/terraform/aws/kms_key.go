@@ -15,6 +15,7 @@ func GetNewKMSKeyRegistryItem() *schema.RegistryItem {
 func NewKMSKey(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 
 	region := d.Get("region").String()
+	spec := d.Get("customer_master_key_spec").String()
 
 	costComponents := []*schema.CostComponent{
 		{
@@ -35,16 +36,35 @@ func NewKMSKey(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource 
 		},
 	}
 
-	costComponents = append(costComponents, requestPriceComponent("Requests", region, "All"))
-	costComponents = append(costComponents, requestPriceComponent("Requests (RSA 2048)", region, "Asymmetric-RSA_2048"))
-	costComponents = append(costComponents, requestPriceComponent("Requests (ECC GenerateDataKeyPair)", region, "GenerateDatakeyPair-ECC"))
-	costComponents = append(costComponents, requestPriceComponent("Requests (Asymmetric)", region, "Asymmetric"))
-	costComponents = append(costComponents, requestPriceComponent("Requests (RSA GenerateDataKeyPair)", region, "GenerateDatakeyPair-RSA"))
+	costComponents = appendRequestComponentsForSpec(costComponents, spec, region)
 
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
+}
+
+func appendRequestComponentsForSpec(costComponents []*schema.CostComponent, spec string, region string) []*schema.CostComponent {
+
+	switch spec {
+	case "RSA_2048":
+		costComponents = append(costComponents, requestPriceComponent("Requests (RSA 2048)", region, "Asymmetric-RSA_2048"))
+		return costComponents
+	case
+		"RSA_3072",
+		"RSA_4096",
+		"ECC_NIST_P256",
+		"ECC_NIST_P384",
+		"ECC_NIST_P521",
+		"ECC_SECG_P256K1":
+		costComponents = append(costComponents, requestPriceComponent("Requests (Asymmetric)", region, "Asymmetric"))
+		return costComponents
+	}
+
+	costComponents = append(costComponents, requestPriceComponent("Requests", region, "All"))
+	costComponents = append(costComponents, requestPriceComponent("Requests (ECC GenerateDataKeyPair)", region, "GenerateDatakeyPair-ECC"))
+	costComponents = append(costComponents, requestPriceComponent("Requests (RSA GenerateDataKeyPair)", region, "GenerateDatakeyPair-ECC"))
+	return costComponents
 }
 
 func requestPriceComponent(name string, region string, group string) *schema.CostComponent {
