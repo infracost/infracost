@@ -48,3 +48,35 @@ func TestKMSKey(t *testing.T) {
 
 	tftest.ResourceTests(t, tf, resourceChecks)
 }
+
+func TestKMSKey_RSA_2048(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_kms_key" "kms" {
+			customer_master_key_spec = "RSA_2048"
+		}
+		`
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_kms_key.kms",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:             "Customer master key",
+					PriceHash:        "27f4c0ac50728e0b52e2eca6fae6c35b-8a6f8acec9da6fca443941d0cf1bfbef",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:             "Requests (RSA 2048)",
+					PriceHash:        "cf7b71f1cff51c5b2963048440c65ddc-4a9dfd3965ffcbab75845ead7a27fd47",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, resourceChecks)
+}
