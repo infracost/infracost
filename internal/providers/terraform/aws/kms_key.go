@@ -15,7 +15,6 @@ func GetNewKMSKeyRegistryItem() *schema.RegistryItem {
 func NewKMSKey(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 
 	region := d.Get("region").String()
-	cmkCount := int64(1)
 
 	costComponents := []*schema.CostComponent{
 		{
