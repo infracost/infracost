@@ -63,7 +63,7 @@ func appendRequestComponentsForSpec(costComponents []*schema.CostComponent, spec
 
 	costComponents = append(costComponents, requestPriceComponent("Requests", region, "All"))
 	costComponents = append(costComponents, requestPriceComponent("ECC GenerateDataKeyPair requests", region, "GenerateDatakeyPair-ECC"))
-	costComponents = append(costComponents, requestPriceComponent("Requests (RSA GenerateDataKeyPair)", region, "GenerateDatakeyPair-ECC"))
+	costComponents = append(costComponents, requestPriceComponent("RSA GenerateDataKeyPair requests", region, "GenerateDatakeyPair-ECC"))
 	return costComponents
 }
 
