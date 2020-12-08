@@ -57,7 +57,7 @@ func appendRequestComponentsForSpec(costComponents []*schema.CostComponent, spec
 		"ECC_NIST_P384",
 		"ECC_NIST_P521",
 		"ECC_SECG_P256K1":
-		costComponents = append(costComponents, requestPriceComponent("Requests (Asymmetric)", region, "Asymmetric"))
+		costComponents = append(costComponents, requestPriceComponent("Requests (asymmetric)", region, "Asymmetric"))
 		return costComponents
 	}
 
