@@ -33,12 +33,12 @@ func TestKMSKey(t *testing.T) {
 					MonthlyCostCheck: nil,
 				},
 				{
-					Name:             "Requests (ECC GenerateDataKeyPair)",
+					Name:             "ECC GenerateDataKeyPair requests",
 					PriceHash:        "b283328d4a57675972284045c9343af0-4a9dfd3965ffcbab75845ead7a27fd47",
 					MonthlyCostCheck: nil,
 				},
 				{
-					Name:             "Requests (RSA GenerateDataKeyPair)",
+					Name:             "RSA GenerateDataKeyPair requests",
 					PriceHash:        "b283328d4a57675972284045c9343af0-4a9dfd3965ffcbab75845ead7a27fd47",
 					MonthlyCostCheck: nil,
 				},
@@ -102,7 +102,7 @@ func TestKMSKey_Asymmetric(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Requests (Asymmetric)",
+					Name:             "Requests (asymmetric)",
 					PriceHash:        "e6c7bc01771a8886348e2727083eab1b-4a9dfd3965ffcbab75845ead7a27fd47",
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
