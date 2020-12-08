@@ -41,6 +41,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetNewEKSFargateProfileItem(),
 	GetNewEKSClusterItem(),
 	GetNewKMSKeyRegistryItem(),
+	GetNewKMSExternalKeyRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -147,7 +148,6 @@ var FreeResources []string = []string{
 	// AWS KMS
 	"aws_kms_alias",
 	"aws_kms_ciphertext",
-	"aws_kms_external_key",
 	"aws_kms_grant",
 
 	// AWS Others
