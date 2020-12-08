@@ -144,6 +144,12 @@ var FreeResources []string = []string{
 	"aws_iam_user_policy_attachment",
 	"aws_iam_user_ssh_key",
 
+	// AWS KMS
+	"aws_kms_alias",
+	"aws_kms_ciphertext",
+	"aws_kms_external_key",
+	"aws_kms_grant",
+
 	// AWS Others
 	"aws_db_instance_role_association",
 	"aws_db_parameter_group",
@@ -180,12 +186,6 @@ var FreeResources []string = []string{
 	"aws_s3_bucket_ownership_controls",
 	"aws_s3_bucket_policy",
 	"aws_s3_bucket_public_access_block",
-
-	// AWS KMS
-	"aws_kms_alias",
-	"aws_kms_ciphertext",
-	"aws_kms_external_key",
-	"aws_kms_grant",
 
 	// AWS VPC
 	"aws_customer_gateway",
