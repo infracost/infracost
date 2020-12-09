@@ -40,6 +40,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetNewEKSNodeGroupItem(),
 	GetNewEKSFargateProfileItem(),
 	GetNewEKSClusterItem(),
+	GetNewKMSKeyRegistryItem(),
+	GetNewKMSExternalKeyRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -142,6 +144,11 @@ var FreeResources []string = []string{
 	"aws_iam_user_policy",
 	"aws_iam_user_policy_attachment",
 	"aws_iam_user_ssh_key",
+
+	// AWS KMS
+	"aws_kms_alias",
+	"aws_kms_ciphertext",
+	"aws_kms_grant",
 
 	// AWS Others
 	"aws_db_instance_role_association",
