@@ -1,5 +1,5 @@
 blank_issues_enabled: true
 contact_links:
-  - name: Infracost community chat
-    url: https://discord.gg/rXCTaH3
-    about: If you prefer to chat, you can questions here.
+  - name: Community Slack channel
+    url: https://www.infracost.io/community-chat
+    about: Use this if you prefer to chat.
