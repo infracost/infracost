@@ -24,7 +24,7 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Res
 	scalingConfig := d.Get("scaling_config").Array()[0]
 	desiredSize := scalingConfig.Get("desired_size").Int()
 	instanceType := "t3.medium"
-	if d.Get("instance_types").Exists() {
+	if len(d.Get("instance_types").Array()) > 0 {
 		// Only a single type is expected https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_node_group#instance_types
 		instanceType = d.Get("instance_types").Array()[0].String()
 	}
