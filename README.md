@@ -16,6 +16,7 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
 
 * [Installation](#installation)
 * [Usage](#usage-methods)
+* [CI/CD integrations](https://www.infracost.io/docs/integrations)
 * [Supported clouds and resources](https://www.infracost.io/docs/supported_resources/)
 * [Development](#development)
 * [Contributing (we'll pay you!)](#contributing)
@@ -75,7 +76,7 @@ There are [4 usage methods](https://www.infracost.io/docs/#usage-methods) for In
   infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
   ```
 
-The [Infracost GitHub Action](https://www.infracost.io/docs/integrations#github-action) or [GitLab CI template](https://www.infracost.io/docs/integrations#gitlab-ci) can be used to automatically add a PR comment showing the cost estimate `diff` between a pull/merge request and the master branch.
+The [Infracost GitHub Action](https://www.infracost.io/docs/integrations#github-action), [GitLab CI template](https://www.infracost.io/docs/integrations#gitlab-ci) or [CircleCI Orb](https://www.infracost.io/docs/integrations#circleci) can be used to automatically add a PR comment showing the cost estimate `diff` between a pull/merge request and the master branch.
 
 <img src="https://raw.githubusercontent.com/infracost/infracost-gh-action/master/screenshot.png" width=600 alt="Example infracost diff usage" />
 
