@@ -15,7 +15,7 @@ func TestSNSTopicSubscriptionFunction(t *testing.T) {
 
 	tf := `
         resource "aws_sns_topic_subscription" "http" {
-          endpoint = "some-dummy-outpoint"
+          endpoint = "some-dummy-endpoint"
           protocol = "http"
           topic_arn = "aws_sns_topic.topic.arn"
         }
