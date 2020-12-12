@@ -33,6 +33,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetS3BucketRegistryItem(),
 	GetS3BucketAnalyticsConfigurationRegistryItem(),
 	GetS3BucketInventoryRegistryItem(),
+	GetSNSTopicRegistryItem(),
+	GetSNSTopicSubscriptionRegistryItem(),
 	GetSQSQueueRegistryItem(),
 	GetNewEKSNodeGroupItem(),
 	GetNewEKSFargateProfileItem(),
