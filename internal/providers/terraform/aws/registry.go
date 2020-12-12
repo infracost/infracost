@@ -171,6 +171,11 @@ var FreeResources []string = []string{
 	"aws_s3_bucket_policy",
 	"aws_s3_bucket_public_access_block",
 
+	// AWS SNS
+	"aws_sns_platform_application",
+	"aws_sns_sms_preferences",
+	"aws_sns_topic_policy",
+
 	// AWS VPC
 	"aws_customer_gateway",
 	"aws_default_network_acl",
