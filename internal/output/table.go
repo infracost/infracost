@@ -6,12 +6,12 @@ import (
 	"fmt"
 
 	"github.com/infracost/infracost/internal/config"
-
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
 )
 
-func ToTable(out Root) ([]byte, error) {
+func ToTable(out Root, c *cli.Context) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -60,13 +60,12 @@ func ToTable(out Root) ([]byte, error) {
 
 	t.Render()
 
-	if len(out.Warnings) > 0 {
-		for _, w := range out.Warnings {
-			_, err := bufw.WriteString(fmt.Sprintf("\n%s", w))
-			if err != nil {
-				// The error here would just mean the output is shortened, so no need to return an error to the user in this case
-				log.Errorf("Error writing warning message: %v", err.Error())
-			}
+	msg := out.unsupportedResourcesMessage(c.Bool("show-skipped"))
+	if msg != "" {
+		_, err := bufw.WriteString(fmt.Sprintf("\n%s", msg))
+		if err != nil {
+			// The error here would just mean the output is shortened, so no need to return an error to the user in this case
+			log.Errorf("Error writing unsupported resources message: %v", err.Error())
 		}
 	}
 

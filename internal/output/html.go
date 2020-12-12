@@ -5,11 +5,13 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"strings"
 
 	"github.com/Masterminds/sprig"
+	"github.com/urfave/cli/v2"
 )
 
-func ToHTML(out Root) ([]byte, error) {
+func ToHTML(out Root, c *cli.Context) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -18,6 +20,11 @@ func ToHTML(out Root) ([]byte, error) {
 	tmpl.Funcs(template.FuncMap{
 		"safeHTML": func(s interface{}) template.HTML {
 			return template.HTML(fmt.Sprint(s)) // nolint:gosec
+		},
+		"replaceNewLines": func(s string) template.HTML {
+			safe := template.HTMLEscapeString(s)
+			safe = strings.ReplaceAll(safe, "\n", "<br />")
+			return template.HTML(safe) // nolint:gosec
 		},
 		"formatAmount":   formatAmount,
 		"formatCost":     formatCost,
@@ -28,7 +35,12 @@ func ToHTML(out Root) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	err = tmpl.Execute(bufw, out)
+	unsupportedResourcesMessage := out.unsupportedResourcesMessage(c.Bool("show-skipped"))
+
+	err = tmpl.Execute(bufw, struct {
+		Root                        Root
+		UnsupportedResourcesMessage string
+	}{out, unsupportedResourcesMessage})
 	if err != nil {
 		return []byte{}, err
 	}
