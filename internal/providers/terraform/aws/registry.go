@@ -17,6 +17,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetEBSSnapshotCopyRegistryItem(),
 	GetEBSSnapshotRegistryItem(),
 	GetEBSVolumeRegistryItem(),
+	GetEC2ClientVPNEndpointRegistryItem(),
+	GetEC2ClientVPNNetworkAssociationRegistryItem(),
 	GetECSServiceRegistryItem(),
 	GetEIPRegistryItem(),
 	GetElastiCacheClusterItem(),
@@ -42,6 +44,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetNewEKSClusterItem(),
 	GetNewKMSKeyRegistryItem(),
 	GetNewKMSExternalKeyRegistryItem(),
+	GetVPNConnectionRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
