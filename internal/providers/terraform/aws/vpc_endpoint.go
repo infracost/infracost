@@ -1,0 +1,59 @@
+package aws
+
+import (
+	"github.com/infracost/infracost/internal/schema"
+
+	"github.com/shopspring/decimal"
+)
+
+func GetVpcEndpointRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_vpc_endpoint",
+		RFunc: NewVpcEndpoint,
+	}
+}
+
+func NewVpcEndpoint(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+	region := d.Get("region").String()
+
+	var gbDataProcessed *decimal.Decimal
+	if u != nil && u.Get("monthly_gb_data_processed.0.value").Exists() {
+		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed.0.value").Float()))
+	}
+
+	return &schema.Resource{
+		Name: d.Address,
+		CostComponents: []*schema.CostComponent{
+			{
+				Name:           "VPC endpoint",
+				Unit:           "hours",
+				UnitMultiplier: 1,
+				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("aws"),
+					Region:        strPtr(region),
+					Service:       strPtr("AmazonVPC"),
+					ProductFamily: strPtr("VpcEndpoint"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "usagetype", ValueRegex: strPtr("/VpcEndpoint-Hours/")},
+					},
+				},
+			},
+			{
+				Name:            "Data processed",
+				Unit:            "GB",
+				UnitMultiplier:  1,
+				MonthlyQuantity: gbDataProcessed,
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("aws"),
+					Region:        strPtr(region),
+					Service:       strPtr("AmazonVPC"),
+					ProductFamily: strPtr("VpcEndpoint"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "usagetype", ValueRegex: strPtr("/VpcEndpoint-Bytes/")},
+					},
+				},
+			},
+		},
+	}
+}
