@@ -92,6 +92,10 @@ var FreeResources []string = []string{
 	"aws_cloudwatch_log_stream",
 	"aws_cloudwatch_log_subscription_filter",
 
+	// AWS EC2
+	"aws_ec2_client_vpn_authorization_rule",
+	"aws_ec2_client_vpn_route",
+
 	// AWS Elastic Load Balancing
 	"aws_alb_listener",
 	"aws_alb_listener_certificate",
