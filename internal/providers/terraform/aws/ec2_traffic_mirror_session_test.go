@@ -19,9 +19,9 @@ func TestEC2TrafficMirrorSession(t *testing.T) {
 		resource "aws_ec2_traffic_mirror_session" "session" {
 			description = "traffic mirror session"
 			network_interface_id = "eni-1234567"
-            traffic_mirror_filter_id = "a-traffic-filter-id"
-            traffic_mirror_target_id = "a-traffic-target-id"
-            session_number = "1"
+			traffic_mirror_filter_id = "a-traffic-filter-id"
+			traffic_mirror_target_id = "a-traffic-target-id"
+			session_number = "1"
 		}`
 
 	resourceChecks := []testutil.ResourceCheck{
