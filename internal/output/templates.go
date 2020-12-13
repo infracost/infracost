@@ -33,6 +33,10 @@ a {
   width: 8rem;
 }
 
+.warnings {
+  margin-top: 1.5rem;
+}
+
 table {
   border-collapse: collapse;
   border: 1px solid #6b7280;
@@ -131,7 +135,7 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
         </li>
         <li>
           <span class="label">Time generated:</span>
-          <span class="value">{{.TimeGenerated | date "2006-01-02 15:04:05 MST"}}</span>
+          <span class="value">{{.Root.TimeGenerated | date "2006-01-02 15:04:05 MST"}}</span>
         </li>
       </ul>
     </div>
@@ -146,7 +150,7 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
         <th class="monthly-cost">Monthly cost</th>
       </thead>
       <tbody>
-        {{range .Resources}}
+        {{range .Root.Resources}}
           {{template "resourceRows" dict "Resource" . "Indent" 0}}
         {{end}}
         <tr class="spacer"><td colspan="6"></td></tr>
@@ -155,10 +159,14 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
           <td class="monthly-quantity"></td>
           <td class="unit"></td>
           <td class="price"></td>
-          <td class="hourly-cost">{{.TotalHourlyCost | formatCost}}</td>
-          <td class="monthly-cost">{{.TotalMonthlyCost | formatCost}}</td>
+          <td class="hourly-cost">{{.Root.TotalHourlyCost | formatCost}}</td>
+          <td class="monthly-cost">{{.Root.TotalMonthlyCost | formatCost}}</td>
         </tr>
       </tbody>
     </table>
+
+    <div class="warnings">
+      <p>{{.UnsupportedResourcesMessage | replaceNewLines}}</p>
+    </div>
   </body>
 </html>`

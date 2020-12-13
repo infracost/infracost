@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 
@@ -159,10 +160,12 @@ func (q *GraphQLQueryRunner) ReportSummary(resources []*schema.Resource) {
 
 	url := fmt.Sprintf("%s/report", q.baseURL)
 
-	summary := schema.GenerateResourceSummary(resources)
+	summary := output.BuildResourceSummary(resources, output.ResourceSummaryOptions{
+		IncludeUnsupportedProviders: true,
+	})
 
 	j := struct {
-		ResourceSummary *schema.ResourceSummary `json:"resourceSummary"`
+		ResourceSummary *output.ResourceSummary `json:"resourceSummary"`
 	}{
 		ResourceSummary: summary,
 	}
