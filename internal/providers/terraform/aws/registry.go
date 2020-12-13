@@ -17,6 +17,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetEBSSnapshotCopyRegistryItem(),
 	GetEBSSnapshotRegistryItem(),
 	GetEBSVolumeRegistryItem(),
+	GetEC2TrafficMirroSessionRegistryItem(),
 	GetECSServiceRegistryItem(),
 	GetEIPRegistryItem(),
 	GetElastiCacheClusterItem(),
@@ -80,6 +81,11 @@ var FreeResources []string = []string{
 	"aws_apigatewayv2_route_response",
 	"aws_apigatewayv2_stage",
 	"aws_apigatewayv2_vpc_link",
+
+	// AWS EC2,
+	"aws_ec2_traffic_mirror_filter",
+	"aws_ec2_traffic_mirror_filter_rule",
+	"aws_ec2_traffic_mirror_target",
 
 	// AWS Cloudwatch
 	"aws_cloudwatch_log_destination",
