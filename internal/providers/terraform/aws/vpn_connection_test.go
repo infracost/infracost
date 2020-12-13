@@ -17,10 +17,10 @@ func TestVPNConnection(t *testing.T) {
 
 	tf := `
 		resource "aws_vpn_connection" "vpn" {
-            customer_gateway_id = "dummy-customer-gateway-id"
-            type = "ipsec.1"
+		  customer_gateway_id = "dummy-customer-gateway-id"
+		  type = "ipsec.1"
 		}
-		`
+	`
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
