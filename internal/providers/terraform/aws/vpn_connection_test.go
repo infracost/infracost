@@ -20,6 +20,13 @@ func TestVPNConnection(t *testing.T) {
 		  customer_gateway_id = "dummy-customer-gateway-id"
 		  type = "ipsec.1"
 		}
+
+		resource "aws_vpn_connection" "transit" {
+		  customer_gateway_id = "dummy-customer-gateway-id"
+		  type = "ipsec.1"
+          transit_gateway_id = "dummy-transit-gateway-id"
+		}
+
 	`
 
 	resourceChecks := []testutil.ResourceCheck{
@@ -29,6 +36,21 @@ func TestVPNConnection(t *testing.T) {
 				{
 					Name:            "VPN connection",
 					PriceHash:       "d6a295a59eda6edcea3cdca5a42fafde-d2c98780d7b6e36641b521f1f8145c6f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+			},
+		},
+		{
+			Name: "aws_vpn_connection.transit",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "VPN connection",
+					PriceHash:       "d6a295a59eda6edcea3cdca5a42fafde-d2c98780d7b6e36641b521f1f8145c6f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:            "Transit gateway site-to-site VPN attachment",
+					PriceHash:       "06c7c9a81b26b38beacc29df55e1498b-e79b72b3223a1bd297a26b680a122624",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 			},
