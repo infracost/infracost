@@ -41,7 +41,6 @@ func CustomerMasterKeyCostComponent(region string) *schema.CostComponent {
 			Service:       strPtr("awskms"),
 			ProductFamily: strPtr("Encryption Key"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "locationType", Value: strPtr("AWS Region")},
 				{Key: "usagetype", ValueRegex: strPtr("/KMS-Keys/")},
 			},
 		},
@@ -65,7 +64,7 @@ func appendRequestComponentsForSpec(costComponents []*schema.CostComponent, spec
 		return costComponents
 	}
 
-	costComponents = append(costComponents, requestPriceComponent("Requests", region, "All"))
+	costComponents = append(costComponents, requestPriceComponent("Requests", region, "/KMS-Requests$/"))
 	costComponents = append(costComponents, requestPriceComponent("ECC GenerateDataKeyPair requests", region, "/KMS-Requests-GenerateDatakeyPair-ECC/"))
 	costComponents = append(costComponents, requestPriceComponent("RSA GenerateDataKeyPair requests", region, "/KMS-Requests-GenerateDatakeyPair-ECC/"))
 	return costComponents
