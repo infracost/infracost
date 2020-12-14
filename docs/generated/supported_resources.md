@@ -53,6 +53,7 @@ Support for the following is not currently included:
 | `aws_sns_topic` |  |
 | `aws_sns_topic_subscription` |  SMS and mobile push not yet supported.<br />  |
 | `aws_sqs_queue` |  |
+| `aws_vpc_endpoint` |  |
 | `google_compute_address` |  |
 | `google_compute_disk` |  |
 | `google_compute_global_address` |  |
