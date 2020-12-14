@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func ToHTML(out Root, c *cli.Context) ([]byte, error) {
+func ToHTML(out Root, opts Options, c *cli.Context) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -40,7 +40,8 @@ func ToHTML(out Root, c *cli.Context) ([]byte, error) {
 	err = tmpl.Execute(bufw, struct {
 		Root                        Root
 		UnsupportedResourcesMessage string
-	}{out, unsupportedResourcesMessage})
+		Options                     Options
+	}{out, unsupportedResourcesMessage, opts})
 	if err != nil {
 		return []byte{}, err
 	}

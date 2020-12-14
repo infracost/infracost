@@ -51,6 +51,10 @@ td.monthly-quantity, td.price, td.hourly-cost, td.monthly-cost {
   text-align: right;
 }
 
+tr.group {
+  background-color: #e0e7ff;
+}
+
 tr.resource {
   background-color: #e5e7eb;
 }
@@ -77,6 +81,19 @@ tr.total td {
 
 {{define "faviconBase64"}}
 iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAABIUExURUdwTBwgLBsgKxwgKyAgLBsgLBwgLBwgLBwgLBwgLBwgLBggKBsgLBwgLRwgKxsgLBAgICAgMBsgKh0gLR0gKhkgLRwgLBwgLEksIvsAAAAXdFJOUwBg36AgkO9wQMCAINDfsOAQEJBQMFB/w99K+AAAAXlJREFUWMPtl8mShCAQRNkLZBOXqf//0zkY0xMIKIQxlwnz2HY+u60lkZBXr9oSFHhw3iMiovLOhAX03Oed98UprIoF2O7cYPBajOu23S4KO8Ro4+4Se1VFWIYD+nroR+RnwKAfEXK/HvWjywHTMAD/HQCeAh5XgbhRwLmbhR/zy3KH+Gd+QlL/NPrGThC8y27o1S6820hKVu6efZRW2YKoAMdXrc0BRUnItk7SmBgPX4yGS1jT7+6YToDKgrmQZVgAkNtuPyisAHoRMzDEAuB+ynPH0D97X7dG0S17I8DmDcInNfz5atZAyiyw600cJCG2nS4863MvCv7QPqn4CaH9oyRT/U/2IZQUF8+Y3zEMpGZ3HRXcIDQgysk1NQeIkIl9eiBpkMG4eBQtRhc40OKHQ7HWmR2ZB6jkgoL+cTL1XGC0y655OxcuT0D5KaqZC5+1Uz3Amc5ccGECrcXx7GchNAUe1JsLF7lARnPhXpVcoGt632Je/ZW+AXMOiOq93TlOAAAAAElFTkSuQmCC
+{{end}}
+
+{{define "groupRow"}}
+  <tr class="group">
+  <td>
+    {{.GroupLabel}}: {{.Group}}
+  </td>
+  <td class="monthly-quantity"></td>
+  <td class="unit"></td>
+  <td class="price"></td>
+  <td class="hourly-cost"></td>
+  <td class="monthly-cost"></td>
+  </tr>
 {{end}}
 
 {{define "resourceRows"}}
@@ -150,8 +167,16 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
         <th class="monthly-cost">Monthly cost</th>
       </thead>
       <tbody>
+        {{$groupLabel := .Options.GroupLabel}}
+        {{$groupKey := .Options.GroupKey}}
+        {{$prevGroup := ""}}
         {{range .Root.Resources}}
+          {{$group := index .Metadata $groupKey}}
+          {{if ne $group $prevGroup}}
+            {{template "groupRow" dict "GroupLabel" $groupLabel "Group" $group}}
+          {{end}}
           {{template "resourceRows" dict "Resource" . "Indent" 0}}
+          {{$prevGroup = $group}}
         {{end}}
         <tr class="spacer"><td colspan="6"></td></tr>
         <tr class="total">
