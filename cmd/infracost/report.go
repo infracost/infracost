@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/fatih/color"
@@ -49,7 +50,7 @@ EXAMPLES:
 				files = append(files, c.Args().Get(i))
 			}
 
-			jsons := make([]output.Root, 0, len(files))
+			inputs := make([]output.ReportInput, 0, len(files))
 			for _, f := range files {
 				data, err := ioutil.ReadFile(f)
 				if err != nil {
@@ -61,10 +62,16 @@ EXAMPLES:
 					return errors.Wrap(err, "Error parsing JSON file")
 				}
 
-				jsons = append(jsons, j)
+				inputs = append(inputs, output.ReportInput{
+					Metadata: map[string]string{
+						"filename": path.Base(f),
+					},
+					Root: j,
+				})
 			}
 
-			combined := output.Combine(jsons...)
+			opts := output.Options{GroupKey: "filename", GroupLabel: "File"}
+			combined := output.Combine(inputs, opts)
 
 			var (
 				b   []byte
@@ -74,7 +81,7 @@ EXAMPLES:
 			case "json":
 				b, err = output.ToJSON(combined)
 			case "html":
-				b, err = output.ToHTML(combined, c)
+				b, err = output.ToHTML(combined, opts, c)
 			default:
 				b, err = output.ToTable(combined, c)
 			}

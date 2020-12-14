@@ -31,11 +31,12 @@ type CostComponent struct {
 }
 
 type Resource struct {
-	Name           string           `json:"name"`
-	HourlyCost     *decimal.Decimal `json:"hourlyCost"`
-	MonthlyCost    *decimal.Decimal `json:"monthlyCost"`
-	CostComponents []CostComponent  `json:"costComponents,omitempty"`
-	SubResources   []Resource       `json:"subresources,omitempty"`
+	Name           string            `json:"name"`
+	Metadata       map[string]string `json:"metadata"`
+	HourlyCost     *decimal.Decimal  `json:"hourlyCost"`
+	MonthlyCost    *decimal.Decimal  `json:"monthlyCost"`
+	CostComponents []CostComponent   `json:"costComponents,omitempty"`
+	SubResources   []Resource        `json:"subresources,omitempty"`
 }
 
 type ResourceSummary struct {
@@ -50,6 +51,16 @@ type ResourceSummary struct {
 type ResourceSummaryOptions struct {
 	IncludeUnsupportedProviders bool
 	OnlyFields                  []string
+}
+
+type Options struct {
+	GroupLabel string
+	GroupKey   string
+}
+
+type ReportInput struct {
+	Metadata map[string]string
+	Root     Root
 }
 
 func outputResource(r *schema.Resource) Resource {
@@ -128,36 +139,45 @@ func Load(data []byte) (Root, error) {
 	return out, err
 }
 
-func Combine(outs ...Root) Root {
+func Combine(inputs []ReportInput, opts Options) Root {
 	var combined Root
 
 	var totalHourlyCost *decimal.Decimal
 	var totalMonthlyCost *decimal.Decimal
-	summaries := make([]*ResourceSummary, 0, len(outs))
+	summaries := make([]*ResourceSummary, 0, len(inputs))
 
-	for _, o := range outs {
+	for _, input := range inputs {
 
-		combined.Resources = append(combined.Resources, o.Resources...)
+		for _, r := range input.Root.Resources {
+			for k, v := range input.Metadata {
+				if r.Metadata == nil {
+					r.Metadata = make(map[string]string)
+				}
+				r.Metadata[k] = v
+			}
 
-		if o.TotalHourlyCost != nil {
+			combined.Resources = append(combined.Resources, r)
+		}
+
+		if input.Root.TotalHourlyCost != nil {
 			if totalHourlyCost == nil {
 				totalHourlyCost = decimalPtr(decimal.Zero)
 			}
 
-			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*o.TotalHourlyCost))
+			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*input.Root.TotalHourlyCost))
 		}
-		if o.TotalMonthlyCost != nil {
+		if input.Root.TotalMonthlyCost != nil {
 			if totalMonthlyCost == nil {
 				totalMonthlyCost = decimalPtr(decimal.Zero)
 			}
 
-			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*o.TotalMonthlyCost))
+			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*input.Root.TotalMonthlyCost))
 		}
 
-		summaries = append(summaries, o.ResourceSummary)
+		summaries = append(summaries, input.Root.ResourceSummary)
 	}
 
-	combined.sortResources()
+	combined.sortResources(opts.GroupKey)
 
 	combined.TotalHourlyCost = totalHourlyCost
 	combined.TotalMonthlyCost = totalMonthlyCost
@@ -167,9 +187,12 @@ func Combine(outs ...Root) Root {
 	return combined
 }
 
-func (r *Root) sortResources() {
+func (r *Root) sortResources(groupKey string) {
 	sort.Slice(r.Resources, func(i, j int) bool {
-		return r.Resources[i].Name < r.Resources[j].Name
+		if r.Resources[i].Metadata[groupKey] == r.Resources[j].Metadata[groupKey] {
+			return r.Resources[i].Name < r.Resources[j].Name
+		}
+		return r.Resources[i].Metadata[groupKey] < r.Resources[j].Metadata[groupKey]
 	})
 }
 
@@ -190,7 +213,7 @@ func (r *Root) unsupportedResourcesMessage(showSkipped bool) string {
 		showSkippedMsg = ""
 	}
 
-	msg := fmt.Sprintf("%d %s %s.\n%s",
+	msg := fmt.Sprintf("%d %s%s.\n%s",
 		unsupportedTypeCount,
 		unsupportedMsg,
 		showSkippedMsg,

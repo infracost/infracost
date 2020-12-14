@@ -109,6 +109,7 @@ func defaultCmd() *cli.Command {
 
 			schema.SortResources(resources)
 
+			opts := output.Options{}
 			r := output.ToOutputFormat(resources)
 			var (
 				b   []byte
@@ -119,7 +120,7 @@ func defaultCmd() *cli.Command {
 				b, err = output.ToJSON(r)
 				out = string(b)
 			case "html":
-				b, err = output.ToHTML(r, c)
+				b, err = output.ToHTML(r, opts, c)
 				out = string(b)
 			default:
 				b, err = output.ToTable(r, c)
