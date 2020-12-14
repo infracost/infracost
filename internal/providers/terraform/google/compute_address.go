@@ -58,7 +58,7 @@ func standardVMComputeAddress() *schema.CostComponent {
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			EndUsageAmount: strPtr(""), // use the non-free tier
+			StartUsageAmount: strPtr("744"), // use the non-free tier
 		},
 	}
 }
