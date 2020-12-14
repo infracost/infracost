@@ -89,11 +89,6 @@ var FreeResources []string = []string{
 	"aws_apigatewayv2_stage",
 	"aws_apigatewayv2_vpc_link",
 
-	// AWS EC2,
-	"aws_ec2_traffic_mirror_filter",
-	"aws_ec2_traffic_mirror_filter_rule",
-	"aws_ec2_traffic_mirror_target",
-
 	// AWS Cloudwatch
 	"aws_cloudwatch_log_destination",
 	"aws_cloudwatch_log_destination_policy",
@@ -102,11 +97,7 @@ var FreeResources []string = []string{
 	"aws_cloudwatch_log_stream",
 	"aws_cloudwatch_log_subscription_filter",
 
-	// AWS EC2
-	"aws_ec2_client_vpn_authorization_rule",
-	"aws_ec2_client_vpn_route",
-
-  // AWS ECR
+	// AWS ECR
 	"aws_ecr_lifecycle_policy",
 	"aws_ecr_repository_policy",
 
@@ -221,6 +212,11 @@ var FreeResources []string = []string{
 	"aws_default_subnet",
 	"aws_default_vpc",
 	"aws_default_vpc_dhcp_options",
+	"aws_ec2_client_vpn_authorization_rule",
+	"aws_ec2_client_vpn_route",
+	"aws_ec2_traffic_mirror_filter",
+	"aws_ec2_traffic_mirror_filter_rule",
+	"aws_ec2_traffic_mirror_target",
 	"aws_egress_only_internet_gateway",
 	"aws_flow_log",
 	"aws_internet_gateway",
