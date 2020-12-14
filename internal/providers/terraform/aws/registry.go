@@ -17,6 +17,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetEBSSnapshotCopyRegistryItem(),
 	GetEBSSnapshotRegistryItem(),
 	GetEBSVolumeRegistryItem(),
+	GetECRRegistryItem(),
 	GetECSServiceRegistryItem(),
 	GetEIPRegistryItem(),
 	GetElastiCacheClusterItem(),
@@ -90,6 +91,10 @@ var FreeResources []string = []string{
 	"aws_cloudwatch_log_resource_policy",
 	"aws_cloudwatch_log_stream",
 	"aws_cloudwatch_log_subscription_filter",
+
+	// AWS ECR
+	"aws_ecr_lifecycle_policy",
+	"aws_ecr_repository_policy",
 
 	// AWS Elastic Load Balancing
 	"aws_alb_listener",
