@@ -26,6 +26,7 @@ Support for the following is not currently included:
 | `aws_ebs_snapshot` |  |
 | `aws_ebs_snapshot_copy` |  |
 | `aws_ebs_volume` |  |
+| `aws_ecr_repository` |  |
 | `aws_ecs_service` |  Only supports Fargate on-demand.<br />  |
 | `aws_eip` |  |
 | `aws_eks_cluster` |  |
@@ -49,7 +50,10 @@ Support for the following is not currently included:
 | `aws_s3_bucket` |  S3 replication time control data transfer, and batch operations are not supported by Terraform.<br />  |
 | `aws_s3_bucket_analytics_configuration` |  |
 | `aws_s3_bucket_inventory` |  |
+| `aws_sns_topic` |  |
+| `aws_sns_topic_subscription` |  SMS and mobile push not yet supported.<br />  |
 | `aws_sqs_queue` |  |
+| `aws_vpc_endpoint` |  |
 | `google_compute_address` |  |
 | `google_compute_disk` |  |
 | `google_compute_global_address` |  |

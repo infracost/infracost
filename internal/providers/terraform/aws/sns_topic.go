@@ -6,33 +6,25 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func GetSQSQueueRegistryItem() *schema.RegistryItem {
+func GetSNSTopicRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_sqs_queue",
-		RFunc: NewSqsQueue,
+		Name:  "aws_sns_topic",
+		RFunc: NewSnsTopic,
 	}
 }
 
-func NewSqsQueue(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewSnsTopic(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
-
-	var queueType string
-
-	if d.Get("fifo_queue").Bool() {
-		queueType = "FIFO (first-in, first-out)"
-	} else {
-		queueType = "Standard"
-	}
 
 	requestSize := decimal.NewFromInt(64)
 	if u != nil && u.Get("request_size.0.value").Exists() {
-		requestSize = decimal.NewFromInt(u.Get("request_size.0.value").Int())
+		requestSize = decimal.NewFromFloat(u.Get("request_size.0.value").Float())
 	}
 
 	var requests *decimal.Decimal
 
 	if u != nil && u.Get("monthly_requests.0.value").Exists() {
-		monthlyRequests := decimal.NewFromFloat(u.Get("monthly_requests.0.value").Float())
+		monthlyRequests := decimal.NewFromInt(u.Get("monthly_requests.0.value").Int())
 		requests = decimalPtr(calculateRequests(requestSize, monthlyRequests))
 	}
 
@@ -47,17 +39,13 @@ func NewSqsQueue(d *schema.ResourceData, u *schema.ResourceData) *schema.Resourc
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(region),
-					Service:       strPtr("AWSQueueService"),
+					Service:       strPtr("AmazonSNS"),
 					ProductFamily: strPtr("API Request"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "queueType", Value: strPtr(queueType)},
-					},
+				},
+				PriceFilter: &schema.PriceFilter{
+					StartUsageAmount: strPtr("1000000"),
 				},
 			},
 		},
 	}
-}
-
-func calculateRequests(requestSize decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
-	return requestSize.Div(decimal.NewFromInt(64)).Ceil().Mul(monthlyRequests)
 }

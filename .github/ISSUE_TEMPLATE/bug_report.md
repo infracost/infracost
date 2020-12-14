@@ -7,25 +7,16 @@ assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Description**
+What's the issue? What did you expect to happen?
 
-**To Reproduce**
+**How did it happen?**
 Steps to reproduce the behavior:
 1. Create a terraform folder with `main.tf` containing...
 2. Run `infracost --tfdir...`
-3. See error
+3. Notice the error saying `blah`
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
-
-**Versions (please complete the following information):**
+**Which version did it happen in (run `infracost --version`):**
  - Infracost: [e.g. v0.7.5]
  - Terraform: [e.g. v0.13.4]
  - Platform: [e.g. macOS, Linux, Windows, Docker]
-
-**Logs/screenshots**
-If applicable, run `infracost` with `--log-level=debug` and include any relevant logs. Please remove all sensitive/confidential information from the logs.
-
-**Additional context**
-Add any other context about the problem here.
