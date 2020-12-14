@@ -33,7 +33,7 @@ func NewVPNConnection(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 
 	if d.Get("transit_gateway_id").String() != "" {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:           "Transit gateway site-to-site VPN attachment",
+			Name:           "Transit gateway attachment",
 			Unit:           "hours",
 			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),

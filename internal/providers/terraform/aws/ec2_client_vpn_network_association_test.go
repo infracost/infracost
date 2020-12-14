@@ -27,7 +27,7 @@ func TestNewEC2ClientVPNNetworkAssociation(t *testing.T) {
 			Name: "aws_ec2_client_vpn_network_association.association",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Client VPN endpoint association",
+					Name:            "Endpoint association",
 					PriceHash:       "5198e2e87cbf2ce28b70fdb48e9563a2-e7eda77c4cf52b2a5e814c7059c2e4c8",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},

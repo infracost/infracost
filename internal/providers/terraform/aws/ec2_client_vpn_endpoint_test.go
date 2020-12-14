@@ -39,7 +39,7 @@ func TestNewEC2ClientVPNEndpoint(t *testing.T) {
 			Name: "aws_ec2_client_vpn_endpoint.endpoint",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Client VPN connection",
+					Name:            "Connection",
 					PriceHash:       "93f6288b5e21fd07774f34d5d18e449e-e7eda77c4cf52b2a5e814c7059c2e4c8",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},

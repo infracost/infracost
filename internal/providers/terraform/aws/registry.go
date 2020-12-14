@@ -249,6 +249,7 @@ var FreeResources []string = []string{
 	"aws_vpn_gateway_attachment",
 	"aws_vpn_gateway_route_propagation",
 
+
 	// Hashicorp
 	"null_resource",
 	"local_file",

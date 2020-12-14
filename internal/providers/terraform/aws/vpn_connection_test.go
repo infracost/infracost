@@ -49,7 +49,7 @@ func TestVPNConnection(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "Transit gateway site-to-site VPN attachment",
+					Name:            "Transit gateway attachment",
 					PriceHash:       "06c7c9a81b26b38beacc29df55e1498b-e79b72b3223a1bd297a26b680a122624",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},

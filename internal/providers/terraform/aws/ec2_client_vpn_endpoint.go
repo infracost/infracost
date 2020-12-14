@@ -20,7 +20,7 @@ func NewEC2ClientVPNEndpoint(d *schema.ResourceData, u *schema.ResourceData) *sc
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           "Client VPN connection",
+				Name:           "Connection",
 				Unit:           "hours",
 				UnitMultiplier: 1,
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
