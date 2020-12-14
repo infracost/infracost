@@ -49,6 +49,8 @@ Support for the following is not currently included:
 | `aws_s3_bucket` |  S3 replication time control data transfer, and batch operations are not supported by Terraform.<br />  |
 | `aws_s3_bucket_analytics_configuration` |  |
 | `aws_s3_bucket_inventory` |  |
+| `aws_sns_topic` |  |
+| `aws_sns_topic_subscription` |  SMS and mobile push not yet supported.<br />  |
 | `aws_sqs_queue` |  |
 | `google_compute_address` |  |
 | `google_compute_disk` |  |
