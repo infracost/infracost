@@ -53,6 +53,11 @@ func TestVPNConnection(t *testing.T) {
 					PriceHash:       "06c7c9a81b26b38beacc29df55e1498b-e79b72b3223a1bd297a26b680a122624",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
+				{
+					Name:            "Data processed",
+					PriceHash:       "95f72006c31014fa4bade15b4903e2c5-dcaa14181f6c95f2f4f3e4ccf3fee63a",
+					HourlyCostCheck: testutil.NilMonthlyCostCheck(),
+				},
 			},
 		},
 	}

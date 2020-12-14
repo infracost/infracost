@@ -16,6 +16,8 @@ func GetVPNConnectionRegistryItem() *schema.RegistryItem {
 func NewVPNConnection(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
 	region := d.Get("region").String()
 
+	var gbDataProcessed *decimal.Decimal
+
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           "VPN connection",
@@ -43,6 +45,26 @@ func NewVPNConnection(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 				Service:    strPtr("AmazonVPC"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/TransitGateway-Hours/")},
+					{Key: "operation", Value: strPtr("TransitGatewayVPN")},
+				},
+			},
+		})
+
+		if u != nil && u.Get("monthly_gb_data_processed.0.value").Exists() {
+			gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed.0.value").Float()))
+		}
+
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            "Data processed",
+			Unit:            "GB",
+			UnitMultiplier:  1,
+			MonthlyQuantity: gbDataProcessed,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Region:     strPtr(region),
+				Service:    strPtr("AmazonVPC"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr("/TransitGateway-Bytes/")},
 					{Key: "operation", Value: strPtr("TransitGatewayVPN")},
 				},
 			},
