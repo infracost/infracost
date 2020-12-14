@@ -17,6 +17,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetEBSSnapshotCopyRegistryItem(),
 	GetEBSSnapshotRegistryItem(),
 	GetEBSVolumeRegistryItem(),
+	GetEC2ClientVPNEndpointRegistryItem(),
+	GetEC2ClientVPNNetworkAssociationRegistryItem(),
 	GetEC2TrafficMirroSessionRegistryItem(),
 	GetECRRegistryItem(),
 	GetECSServiceRegistryItem(),
@@ -46,6 +48,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetNewEKSClusterItem(),
 	GetNewKMSKeyRegistryItem(),
 	GetNewKMSExternalKeyRegistryItem(),
+	GetVPNConnectionRegistryItem(),
 	GetVpcEndpointRegistryItem(),
 }
 
@@ -85,11 +88,6 @@ var FreeResources []string = []string{
 	"aws_apigatewayv2_route_response",
 	"aws_apigatewayv2_stage",
 	"aws_apigatewayv2_vpc_link",
-
-	// AWS EC2,
-	"aws_ec2_traffic_mirror_filter",
-	"aws_ec2_traffic_mirror_filter_rule",
-	"aws_ec2_traffic_mirror_target",
 
 	// AWS Cloudwatch
 	"aws_cloudwatch_log_destination",
@@ -214,6 +212,11 @@ var FreeResources []string = []string{
 	"aws_default_subnet",
 	"aws_default_vpc",
 	"aws_default_vpc_dhcp_options",
+	"aws_ec2_client_vpn_authorization_rule",
+	"aws_ec2_client_vpn_route",
+	"aws_ec2_traffic_mirror_filter",
+	"aws_ec2_traffic_mirror_filter_rule",
+	"aws_ec2_traffic_mirror_target",
 	"aws_egress_only_internet_gateway",
 	"aws_flow_log",
 	"aws_internet_gateway",
