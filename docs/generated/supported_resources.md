@@ -26,6 +26,8 @@ Support for the following is not currently included:
 | `aws_ebs_snapshot` |  |
 | `aws_ebs_snapshot_copy` |  |
 | `aws_ebs_volume` |  |
+| `aws_ec2_client_vpn_endpoint` |  |
+| `aws_ec2_client_vpn_network_association` |  |
 | `aws_ec2_traffic_mirror_session` |  |
 | `aws_ecr_repository` |  |
 | `aws_ecs_service` |  Only supports Fargate on-demand.<br />  |
@@ -55,6 +57,7 @@ Support for the following is not currently included:
 | `aws_sns_topic_subscription` |  SMS and mobile push not yet supported.<br />  |
 | `aws_sqs_queue` |  |
 | `aws_vpc_endpoint` |  |
+| `aws_vpn_connection` |  |
 | `google_compute_address` |  |
 | `google_compute_disk` |  |
 | `google_compute_global_address` |  |
