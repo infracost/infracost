@@ -48,7 +48,7 @@ func TestVpcEndpoint(t *testing.T) {
 			Name: "aws_vpc_endpoint.gateway_loadbalancer",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "VPC GatewayLoadBalancer endpoint",
+					Name:            "GatewayLoadBalancer endpoint",
 					PriceHash:       "223b69fb3326be912fd0d30333e8dc50-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
