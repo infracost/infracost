@@ -19,6 +19,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetEBSVolumeRegistryItem(),
 	GetEC2ClientVPNEndpointRegistryItem(),
 	GetEC2ClientVPNNetworkAssociationRegistryItem(),
+	GetEC2TrafficMirroSessionRegistryItem(),
+	GetECRRegistryItem(),
 	GetECSServiceRegistryItem(),
 	GetEIPRegistryItem(),
 	GetElastiCacheClusterItem(),
@@ -38,6 +40,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetS3BucketRegistryItem(),
 	GetS3BucketAnalyticsConfigurationRegistryItem(),
 	GetS3BucketInventoryRegistryItem(),
+	GetSNSTopicRegistryItem(),
+	GetSNSTopicSubscriptionRegistryItem(),
 	GetSQSQueueRegistryItem(),
 	GetNewEKSNodeGroupItem(),
 	GetNewEKSFargateProfileItem(),
@@ -45,6 +49,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetNewKMSKeyRegistryItem(),
 	GetNewKMSExternalKeyRegistryItem(),
 	GetVPNConnectionRegistryItem(),
+	GetVpcEndpointRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -84,6 +89,11 @@ var FreeResources []string = []string{
 	"aws_apigatewayv2_stage",
 	"aws_apigatewayv2_vpc_link",
 
+	// AWS EC2,
+	"aws_ec2_traffic_mirror_filter",
+	"aws_ec2_traffic_mirror_filter_rule",
+	"aws_ec2_traffic_mirror_target",
+
 	// AWS Cloudwatch
 	"aws_cloudwatch_log_destination",
 	"aws_cloudwatch_log_destination_policy",
@@ -95,6 +105,10 @@ var FreeResources []string = []string{
 	// AWS EC2
 	"aws_ec2_client_vpn_authorization_rule",
 	"aws_ec2_client_vpn_route",
+
+  // AWS ECR
+	"aws_ecr_lifecycle_policy",
+	"aws_ecr_repository_policy",
 
 	// AWS Elastic Load Balancing
 	"aws_alb_listener",
@@ -193,6 +207,11 @@ var FreeResources []string = []string{
 	"aws_s3_bucket_ownership_controls",
 	"aws_s3_bucket_policy",
 	"aws_s3_bucket_public_access_block",
+
+	// AWS SNS
+	"aws_sns_platform_application",
+	"aws_sns_sms_preferences",
+	"aws_sns_topic_policy",
 
 	// AWS VPC
 	"aws_customer_gateway",

@@ -54,13 +54,18 @@ func defaultCmd() *cli.Command {
 			},
 			&cli.BoolFlag{
 				Name:  "show-skipped",
-				Usage: "Show unsupported resources, some of which might be free",
+				Usage: "Show unsupported resources, some of which might be free (only for table and HTML output)",
 				Value: false,
 			},
 		},
 		Action: func(c *cli.Context) error {
 			if err := checkAPIKey(); err != nil {
 				return err
+			}
+
+			if c.String("output") == "json" && c.Bool("show-skipped") {
+				msg := color.YellowString("The --show-skipped option is not needed with JSON output as that always includes them\n")
+				fmt.Fprint(os.Stderr, msg)
 			}
 
 			provider := terraform.New()
@@ -104,7 +109,8 @@ func defaultCmd() *cli.Command {
 
 			schema.SortResources(resources)
 
-			r := output.ToOutputFormat(resources, c)
+			opts := output.Options{}
+			r := output.ToOutputFormat(resources)
 			var (
 				b   []byte
 				out string
@@ -114,10 +120,10 @@ func defaultCmd() *cli.Command {
 				b, err = output.ToJSON(r)
 				out = string(b)
 			case "html":
-				b, err = output.ToHTML(r)
+				b, err = output.ToHTML(r, opts, c)
 				out = string(b)
 			default:
-				b, err = output.ToTable(r)
+				b, err = output.ToTable(r, c)
 				out = fmt.Sprintf("\n%s", string(b))
 			}
 

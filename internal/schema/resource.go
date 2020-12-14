@@ -22,15 +22,6 @@ type Resource struct {
 	ResourceType   string
 }
 
-type ResourceSummary struct {
-	SupportedCounts   map[string]int `json:"supportedCounts"`
-	UnsupportedCounts map[string]int `json:"unsupportedCounts"`
-	TotalSupported    int            `json:"totalSupported"`
-	TotalUnsupported  int            `json:"totalUnsupported"`
-	TotalNoPrice      int            `json:"totalNoPrice"`
-	Total             int            `json:"total"`
-}
-
 func CalculateCosts(resources []*Resource) {
 	for _, r := range resources {
 		r.CalculateCosts()
@@ -102,41 +93,6 @@ func SortResources(resources []*Resource) {
 	sort.Slice(resources, func(i, j int) bool {
 		return resources[i].Name < resources[j].Name
 	})
-}
-
-func GenerateResourceSummary(resources []*Resource) *ResourceSummary {
-	supportedCounts := make(map[string]int)
-	unsupportedCounts := make(map[string]int)
-	totalSupported := 0
-	totalUnsupported := 0
-	totalNoPrice := 0
-
-	for _, r := range resources {
-		if r.NoPrice {
-			totalNoPrice++
-		} else if r.IsSkipped {
-			totalUnsupported++
-			if _, ok := unsupportedCounts[r.ResourceType]; !ok {
-				unsupportedCounts[r.ResourceType] = 0
-			}
-			unsupportedCounts[r.ResourceType]++
-		} else {
-			totalSupported++
-			if _, ok := supportedCounts[r.ResourceType]; !ok {
-				supportedCounts[r.ResourceType] = 0
-			}
-			supportedCounts[r.ResourceType]++
-		}
-	}
-
-	return &ResourceSummary{
-		SupportedCounts:   supportedCounts,
-		UnsupportedCounts: unsupportedCounts,
-		TotalSupported:    totalSupported,
-		TotalUnsupported:  totalUnsupported,
-		TotalNoPrice:      totalNoPrice,
-		Total:             len(resources),
-	}
 }
 
 func MultiplyQuantities(resource *Resource, multiplier decimal.Decimal) {
