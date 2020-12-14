@@ -45,6 +45,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetNewEKSClusterItem(),
 	GetNewKMSKeyRegistryItem(),
 	GetNewKMSExternalKeyRegistryItem(),
+	GetVpcEndpointRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
