@@ -12,7 +12,7 @@ func GetSNSTopicSubscriptionRegistryItem() *schema.RegistryItem {
 		Name:  "aws_sns_topic_subscription",
 		RFunc: NewSnsTopicSubscription,
 		Notes: []string{
-			"SMS & Mobile push not yet supported.",
+			"SMS and mobile push not yet supported.",
 		},
 	}
 }
