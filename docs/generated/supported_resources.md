@@ -26,6 +26,7 @@ Support for the following is not currently included:
 | `aws_ebs_snapshot` |  |
 | `aws_ebs_snapshot_copy` |  |
 | `aws_ebs_volume` |  |
+| `aws_ec2_traffic_mirror_session` |  |
 | `aws_ecr_repository` |  |
 | `aws_ecs_service` |  Only supports Fargate on-demand.<br />  |
 | `aws_eip` |  |
