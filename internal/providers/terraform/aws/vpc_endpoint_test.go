@@ -33,7 +33,7 @@ func TestVpcEndpoint(t *testing.T) {
 			Name: "aws_vpc_endpoint.interface",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "VPC Interface endpoint",
+					Name:            "Interface endpoint",
 					PriceHash:       "ef7fb85cbd68a47968dd294f49ed3517-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
