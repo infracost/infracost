@@ -24,6 +24,7 @@ type ConfigSpec struct { // nolint:golint
 	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
+	TerraformCloudAPIToken    string `yaml:"terraform_cloud_api_token,omitempty" envconfig:"TERRAFORM_CLOUD_API_TOKEN"`
 }
 
 var Config *ConfigSpec
