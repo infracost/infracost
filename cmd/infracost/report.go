@@ -20,21 +20,24 @@ func reportCmd() *cli.Command {
 		UsageText: `infracost report [command options] [JSON paths...]
 
 EXAMPLES:
-	# Run with multiple infracost JSON files
-	infracost report out1.json out2.json
+	# Create report from multiple infracost JSON files
+	infracost report out1.json out2.json out3.json
 
-	# Merge multiple JSON files into a single JSON output
-	infracost report --output json out1.json out2.json`,
+	# Create HTML report from multiple infracost JSON files
+	infracost report --output html out*.json > report.html
+
+	# Merge multiple infracost JSON files
+	infracost report --output json out*.json`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "output",
 				Aliases: []string{"o"},
-				Usage:   "Output format (json, table, html)",
+				Usage:   "Output format: json, table, html",
 				Value:   "table",
 			},
 			&cli.BoolFlag{
 				Name:  "show-skipped",
-				Usage: "Show unsupported resources, some of which might be free (only for table and HTML output)",
+				Usage: "Show unsupported resources, some of which might be free. Only for table and HTML output",
 				Value: false,
 			},
 		},

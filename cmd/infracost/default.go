@@ -49,12 +49,12 @@ func defaultCmd() *cli.Command {
 			&cli.StringFlag{
 				Name:    "output",
 				Aliases: []string{"o"},
-				Usage:   "Output format (json, table, html)",
+				Usage:   "Output format: json, table, html",
 				Value:   "table",
 			},
 			&cli.BoolFlag{
 				Name:  "show-skipped",
-				Usage: "Show unsupported resources, some of which might be free (only for table and HTML output)",
+				Usage: "Show unsupported resources, some of which might be free. Only for table and HTML output",
 				Value: false,
 			},
 		},
