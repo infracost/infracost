@@ -50,7 +50,7 @@ func cloudAPIToken(host string) string {
 		return config.Config.TerraformCloudAPIToken
 	}
 
-	log.Debug("No TERRAFORM_CLOUD_API_TOKEN environment variable set, checking Terraform credential file for matching API token")
+	log.Debug("No TERRAFORM_CLOUD_API_TOKEN environment variable set, checking Terraform credentials file for matching API token")
 
 	// If the TF_CLI_CONFIG_FILE env variable is set then we shouldn't use the
 	// default Terraform credentials file. In the future we may want to support
