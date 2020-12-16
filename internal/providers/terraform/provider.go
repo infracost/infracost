@@ -228,7 +228,7 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 
 	// If the plan returns this error then Terraform is configured with remote execution mode
 	if err != nil && strings.HasPrefix(extractStderr(err), "Error: Saving a generated plan is currently not supported") {
-		log.Infof("Local plan failed, Terraform is configured with remote execution mode")
+		log.Info("Local plan failed, Terraform is configured with remote execution mode")
 		planJSON, err = runRemotePlan(opts, args)
 	}
 
@@ -243,8 +243,8 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 				red.Sprint("Please set your"),
 				bold.Sprint("TERRAFORM_CLOUD_API_TOKEN"),
 				red.Sprint("environment variable."),
-				"It looks like you are using Terraform Cloud's remote execution mode.",
-				"You can create a Team or User API Token in the Terraform Cloud dashboard.",
+				"It seems like Terraform Cloud's Remote Execution Mode is being used.",
+				"Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable.",
 			)
 			fmt.Fprintln(os.Stderr, msg)
 		} else if errors.Is(err, ErrInvalidCloudAPIToken) {
@@ -252,8 +252,8 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 				red.Sprint("Please check your"),
 				bold.Sprint("TERRAFORM_CLOUD_API_TOKEN"),
 				red.Sprint("environment variable."),
-				"It looks like you are using Terraform Cloud's remote execution mode.",
-				"You can create a Team or User API Token in the Terraform Cloud dashboard.",
+				"It seems like Terraform Cloud's Remote Execution Mode is being used.",
+				"Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable.",
 			)
 			fmt.Fprintln(os.Stderr, msg)
 		} else {
@@ -273,7 +273,7 @@ func runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
 
 	stdout, err := Cmd(opts, args...)
 	if err != nil {
-		return []byte{}, errors.Wrap(err, "Error running remote terraform plan")
+		return []byte{}, err
 	}
 
 	r := regexp.MustCompile(`To view this run in a browser, visit:\n(.*)`)
@@ -339,6 +339,12 @@ func terraformError(err error) {
 
 	msg := fmt.Sprintf("\n  Terraform command failed with:\n%s\n", indent(stderr, "    "))
 
+	if strings.HasPrefix(stderr, "Error: Failed to select workspace") {
+		msg += "\nRun `terraform workspace select your_workspace` first or set the TF_WORKSPACE environment variable.\n"
+	}
+	if strings.HasPrefix(stderr, "Error: Required token could not be found") {
+		msg += "\nRun `terraform login` first or set the TF_CLI_CONFIG_FILE environment variable to the absolute path.\n"
+	}
 	if strings.HasPrefix(stderr, "Error: No value for required variable") {
 		msg += "\nPass Terraform flags using the --tfflags option.\n"
 		msg += "For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"
