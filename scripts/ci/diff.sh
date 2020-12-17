@@ -8,7 +8,7 @@ tfflags=${5:-$tfflags}
 percentage_threshold=${6:-$percentage_threshold}
 pricing_api_endpoint=${7:-$pricing_api_endpoint}
 
-infracost_cmd="infracost --no-color --log-level warn"
+infracost_cmd="infracost --no-color"
 if [ ! -z "$tfjson" ]; then
   infracost_cmd="$infracost_cmd --tfjson $tfjson"
 fi

@@ -22,6 +22,7 @@ vendor/
 **/.terraform/**
 examples/*/plan.save
 examples/*/plan.json
+examples/*/.terraform.lock.hcl
 
 # Test artifacts
 .test_cache
