@@ -10,14 +10,22 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/hashicorp/hcl2/gohcl"
+	"github.com/hashicorp/hcl2/hclparse"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
-var ErrMissingCloudAPIToken = errors.New("No Terraform Cloud API Token is set")
-var ErrInvalidCloudAPIToken = errors.New("Invalid Terraform Cloud API Token")
+var ErrMissingCloudToken = errors.New("No Terraform Cloud API Token is set")
+var ErrInvalidCloudToken = errors.New("Invalid Terraform Cloud API Token")
+
+type terraformConfig struct {
+	Credentials map[string]struct {
+		Token string
+	}
+}
 
 func cloudAPI(host string, path string, token string) ([]byte, error) {
 	client := &http.Client{}
@@ -37,7 +45,7 @@ func cloudAPI(host string, path string, token string) ([]byte, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 401 {
-		return []byte{}, ErrInvalidCloudAPIToken
+		return []byte{}, ErrInvalidCloudToken
 	} else if resp.StatusCode != 200 {
 		return []byte{}, errors.Errorf("invalid response from Terraform remote: %s", resp.Status)
 	}
@@ -45,67 +53,118 @@ func cloudAPI(host string, path string, token string) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func cloudAPIToken(host string) string {
-	if config.Config.TerraformCloudAPIToken != "" {
-		return config.Config.TerraformCloudAPIToken
+func cloudToken(host string) string {
+	if config.Config.TerraformCloudToken != "" {
+		return config.Config.TerraformCloudToken
 	}
 
-	log.Debug("No TERRAFORM_CLOUD_API_TOKEN environment variable set, checking Terraform credentials file for matching API token")
-
-	// If the TF_CLI_CONFIG_FILE env variable is set then we shouldn't use the
-	// default Terraform credentials file. In the future we may want to support
-	// reading the credentials from here as well.
 	if os.Getenv("TF_CLI_CONFIG_FILE") != "" {
-		log.Debug("TF_CLI_CONFIG_FILE is set, not checking the default credentials file")
-		return ""
-	}
-
-	credFile := credFile()
-	data, err := ioutil.ReadFile(credFile)
-	if err != nil {
-		log.Debugf("Error reading Terraform credentials file %s: %v", credFile, err)
-		return ""
-	}
-
-	var parsedCredData struct {
-		Credentials map[string]struct {
-			Token string
+		log.Debugf("TF_CLI_CONFIG_FILE is set, checking %s for Terraform Cloud credentials", os.Getenv("TF_CLI_CONFIG_FILE"))
+		token, err := credFromHCL(os.Getenv("TF_CLI_CONFIG_FILE"), host)
+		if err != nil {
+			log.Debugf("Error reading Terraform config file %s: %v", os.Getenv("TF_CLI_CONFIG_FILE"), err)
+		}
+		if token != "" {
+			return token
 		}
 	}
-	err = json.Unmarshal(data, &parsedCredData)
-	if err != nil {
-		log.Debugf("Error parsing Terraform credentials file %s: %v", credFile, err)
-		return ""
+
+	credFile := defaultCredFile()
+	if _, err := os.Stat(credFile); err == nil {
+		log.Debugf("Checking %s for Terraform Cloud credentials", credFile)
+		token, err := credFromJSON(credFile, host)
+		if err != nil {
+			log.Debugf("Error reading Terraform credentials file %s: %v", credFile, err)
+		}
+		if token != "" {
+			return token
+		}
 	}
 
-	if hostCredentials, ok := parsedCredData.Credentials[host]; ok {
-		return hostCredentials.Token
+	confFile := defaultConfFile()
+	if _, err := os.Stat(confFile); err == nil {
+		log.Debugf("Checking %s for Terraform Cloud credentials", confFile)
+		token, err := credFromHCL(confFile, host)
+		if err != nil {
+			log.Debugf("Error reading Terraform config file %s: %v", confFile, err)
+		}
+		if token != "" {
+			return token
+		}
 	}
 
 	return ""
 }
 
-func checkCloudAPITokenSet() bool {
-	if config.Config.TerraformCloudAPIToken != "" {
+func credFromHCL(filename string, host string) (string, error) {
+	parser := hclparse.NewParser()
+	f, parseDiags := parser.ParseHCLFile(filename)
+	if parseDiags.HasErrors() {
+		return "", parseDiags
+	}
+
+	var conf terraformConfig
+	decodeDiags := gohcl.DecodeBody(f.Body, nil, &conf)
+	if decodeDiags.HasErrors() {
+		return "", parseDiags
+	}
+
+	if hostCred, ok := conf.Credentials[host]; ok {
+		return hostCred.Token, nil
+	}
+
+	return "", nil
+}
+
+func credFromJSON(filename, host string) (string, error) {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return "", err
+	}
+
+	var conf terraformConfig
+	err = json.Unmarshal(data, &conf)
+	if err != nil {
+		return "", err
+	}
+
+	if hostCred, ok := conf.Credentials[host]; ok {
+		return hostCred.Token, nil
+	}
+
+	return "", nil
+}
+
+func checkConfigSet() bool {
+	if config.Config.TerraformCloudToken != "" {
 		return true
 	}
 
-	// If the TF_CLI_CONFIG_FILE env variable is set then we shouldn't use the
-	// default Terraform credentials file. In the future we may want to support
-	// reading the credentials from here as well.
 	if os.Getenv("TF_CLI_CONFIG_FILE") != "" {
-		log.Debug("TF_CLI_CONFIG_FILE is set, not checking the default credentials file")
-		return false
+		return true
 	}
 
-	if _, err := os.Stat(credFile()); err == nil {
+	if _, err := os.Stat(defaultConfFile()); err == nil {
+		return true
+	}
+
+	if _, err := os.Stat(defaultCredFile()); err == nil {
 		return true
 	}
 
 	return false
 }
 
-func credFile() string {
+func defaultConfFile() string {
+	if runtime.GOOS == "windows" {
+		return filepath.Join(os.Getenv("APPDATA"), "terraform.rc")
+	}
+
+	p, _ := homedir.Expand("~/.terraform.rc")
+	return p
+}
+
+func defaultCredFile() string {
 	var dir string
 	if runtime.GOOS == "windows" {
 		dir = filepath.Join(os.Getenv("APPDATA"), "terraform.d")

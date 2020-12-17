@@ -99,20 +99,15 @@ func (p *terraformProvider) generateStateJSON() ([]byte, error) {
 		return []byte{}, err
 	}
 
-	opts := &CmdOptions{
-		TerraformDir: p.dir,
-	}
-
-	spinner := spin.NewSpinner("Running terraform show")
-	out, err := Cmd(opts, "show", "-no-color", "-json")
+	opts, err := p.setupOpts()
 	if err != nil {
-		spinner.Fail()
-		terraformError(err)
-		return []byte{}, errors.Wrap(err, "Error running terraform show")
+		return []byte{}, err
 	}
-	spinner.Success()
+	if opts.TerraformConfigFile != "" {
+		defer os.Remove(opts.TerraformConfigFile)
+	}
 
-	return out, nil
+	return runShow(opts, p.planFile)
 }
 
 func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
@@ -121,8 +116,12 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 		return []byte{}, err
 	}
 
-	opts := &CmdOptions{
-		TerraformDir: p.dir,
+	opts, err := p.setupOpts()
+	if err != nil {
+		return []byte{}, err
+	}
+	if opts.TerraformConfigFile != "" {
+		defer os.Remove(opts.TerraformConfigFile)
 	}
 
 	if p.planFile == "" {
@@ -145,6 +144,21 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 	}
 
 	return runShow(opts, p.planFile)
+}
+
+func (p *terraformProvider) setupOpts() (*CmdOptions, error) {
+	opts := &CmdOptions{
+		TerraformDir: p.dir,
+	}
+
+	configFile, err := CreateConfigFile(p.dir)
+	if err != nil {
+		return opts, err
+	}
+
+	opts.TerraformConfigFile = configFile
+
+	return opts, nil
 }
 
 func (p *terraformProvider) terraformPreChecks() error {
@@ -238,7 +252,7 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 		red := color.New(color.FgHiRed)
 		bold := color.New(color.Bold, color.FgHiWhite)
 
-		if errors.Is(err, ErrMissingCloudAPIToken) {
+		if errors.Is(err, ErrMissingCloudToken) {
 			msg := fmt.Sprintf("\n%s %s %s\n%s\n%s\n",
 				red.Sprint("Please set your"),
 				bold.Sprint("TERRAFORM_CLOUD_API_TOKEN"),
@@ -247,7 +261,7 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 				"Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable.",
 			)
 			fmt.Fprintln(os.Stderr, msg)
-		} else if errors.Is(err, ErrInvalidCloudAPIToken) {
+		} else if errors.Is(err, ErrInvalidCloudToken) {
 			msg := fmt.Sprintf("\n%s %s %s\n%s\n%s\n",
 				red.Sprint("Please check your"),
 				bold.Sprint("TERRAFORM_CLOUD_API_TOKEN"),
@@ -267,8 +281,8 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 }
 
 func runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
-	if !checkCloudAPITokenSet() {
-		return []byte{}, ErrMissingCloudAPIToken
+	if !checkConfigSet() {
+		return []byte{}, ErrMissingCloudToken
 	}
 
 	stdout, err := Cmd(opts, args...)
@@ -290,10 +304,9 @@ func runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
 	s := strings.Split(u.Path, "/")
 	runID := s[len(s)-1]
 
-	token :=
-		cloudAPIToken(host)
+	token := cloudToken(host)
 	if token == "" {
-		return []byte{}, ErrMissingCloudAPIToken
+		return []byte{}, ErrMissingCloudToken
 	}
 
 	body, err := cloudAPI(host, fmt.Sprintf("/api/v2/runs/%s/plan", runID), token)
@@ -343,7 +356,7 @@ func terraformError(err error) {
 		msg += "\nRun `terraform workspace select your_workspace` first or set the TF_WORKSPACE environment variable.\n"
 	}
 	if strings.HasPrefix(stderr, "Error: Required token could not be found") {
-		msg += "\nRun `terraform login` first or set the TF_CLI_CONFIG_FILE environment variable to the absolute path.\n"
+		msg += "\nRun `terraform login` first or set the TF_CLI_CONFIG_FILE environment variable to the ABSOLUTE path.\n"
 	}
 	if strings.HasPrefix(stderr, "Error: No value for required variable") {
 		msg += "\nPass Terraform flags using the --tfflags option.\n"
