@@ -16,6 +16,8 @@ func NewEC2TransitGatewayPeeringAttachment(d *schema.ResourceData, u *schema.Res
 
 	return &schema.Resource{
 		Name: d.Address,
-		CostComponents: transitGatewayCostComponent(region, "TransitGatewayPeering", nil),
+		CostComponents: []*schema.CostComponent {
+			transitGatewayAttachmentCostComponent(region, "TransitGatewayPeering"),
+		},
 	}
 }

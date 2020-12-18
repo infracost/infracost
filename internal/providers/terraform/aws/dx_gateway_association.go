@@ -24,6 +24,9 @@ func NewDXGatewayAssociation(d *schema.ResourceData, u *schema.ResourceData) *sc
 
 	return &schema.Resource{
 		Name: d.Address,
-		CostComponents: transitGatewayCostComponent(region, "TransitGatewayDirectConnect", gbDataProcessed),
+		CostComponents: []*schema.CostComponent{
+			transitGatewayDataProcessingCostComponent(region, "TransitGatewayDirectConnect", gbDataProcessed),
+			transitGatewayAttachmentCostComponent(region, "TransitGatewayDirectConnect"),
+		},
 	}
 }
