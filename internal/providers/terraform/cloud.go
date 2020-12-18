@@ -160,7 +160,7 @@ func defaultConfFile() string {
 		return filepath.Join(os.Getenv("APPDATA"), "terraform.rc")
 	}
 
-	p, _ := homedir.Expand("~/.terraform.rc")
+	p, _ := homedir.Expand("~/.terraformrc")
 	return p
 }
 
