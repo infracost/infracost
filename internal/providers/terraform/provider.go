@@ -255,7 +255,7 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 		if errors.Is(err, ErrMissingCloudToken) {
 			msg := fmt.Sprintf("\n%s %s %s\n%s\n%s\n",
 				red.Sprint("Please set your"),
-				bold.Sprint("TERRAFORM_CLOUD_API_TOKEN"),
+				bold.Sprint("TERRAFORM_CLOUD_TOKEN"),
 				red.Sprint("environment variable."),
 				"It seems like Terraform Cloud's Remote Execution Mode is being used.",
 				"Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable.",
@@ -264,7 +264,7 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 		} else if errors.Is(err, ErrInvalidCloudToken) {
 			msg := fmt.Sprintf("\n%s %s %s\n%s\n%s\n",
 				red.Sprint("Please check your"),
-				bold.Sprint("TERRAFORM_CLOUD_API_TOKEN"),
+				bold.Sprint("TERRAFORM_CLOUD_TOKEN"),
 				red.Sprint("environment variable."),
 				"It seems like Terraform Cloud's Remote Execution Mode is being used.",
 				"Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable.",

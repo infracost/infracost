@@ -18,8 +18,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var ErrMissingCloudToken = errors.New("No Terraform Cloud API Token is set")
-var ErrInvalidCloudToken = errors.New("Invalid Terraform Cloud API Token")
+var ErrMissingCloudToken = errors.New("No Terraform Cloud Token is set")
+var ErrInvalidCloudToken = errors.New("Invalid Terraform Cloud Token")
 
 type terraformConfig struct {
 	Credentials map[string]struct {
