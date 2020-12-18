@@ -89,10 +89,20 @@ var FreeResources []string = []string{
 	"aws_apigatewayv2_stage",
 	"aws_apigatewayv2_vpc_link",
 
+	// AWS DX Transit.
+	"aws_dx_gateway",
+	"aws_dx_gateway_association_proposal",
+
 	// AWS EC2,
 	"aws_ec2_traffic_mirror_filter",
 	"aws_ec2_traffic_mirror_filter_rule",
 	"aws_ec2_traffic_mirror_target",
+	"aws_ec2_transit_gateway",
+	"aws_ec2_transit_gateway_route",
+	"aws_ec2_transit_gateway_route_table",
+	"aws_ec2_transit_gateway_route_table_association",
+	"aws_ec2_transit_gateway_route_table_propagation",
+	"aws_ec2_transit_gateway_vpc_attachment_accepter",
 
 	// AWS Cloudwatch
 	"aws_cloudwatch_log_destination",
