@@ -30,7 +30,7 @@ func TestComputeAddress(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:      "IP address (if used by standard VM)",
-					PriceHash: "63d43e05c6de193d46ac984c5d047c4e-92a41b8ee8a64d671e700c781c365c10",
+					PriceHash: "63d43e05c6de193d46ac984c5d047c4e-75ba4eb307fdd3d2d30cb3abe7436559",
 				},
 				{
 					Name:      "IP address (if used by preemptible VM)",
@@ -47,7 +47,7 @@ func TestComputeAddress(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:      "IP address (if used by standard VM)",
-					PriceHash: "63d43e05c6de193d46ac984c5d047c4e-92a41b8ee8a64d671e700c781c365c10",
+					PriceHash: "63d43e05c6de193d46ac984c5d047c4e-75ba4eb307fdd3d2d30cb3abe7436559",
 				},
 				{
 					Name:      "IP address (if used by preemptible VM)",

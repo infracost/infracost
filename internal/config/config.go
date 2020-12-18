@@ -20,10 +20,12 @@ import (
 type ConfigSpec struct { // nolint:golint
 	NoColor                   bool   `yaml:"no_color,omitempty"`
 	LogLevel                  string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
-	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
-	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
-	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 	APIKey                    string `yaml:"api_key,omitempty" envconfig:"INFRACOST_API_KEY"`
+	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
+	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
+	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
+	TerraformCloudHost        string `yaml:"terraform_cloud_host,omitempty" envconfig:"TERRAFORM_CLOUD_HOST"`
+	TerraformCloudToken       string `yaml:"terraform_cloud_token,omitempty" envconfig:"TERRAFORM_CLOUD_TOKEN"`
 }
 
 var Config *ConfigSpec
@@ -43,7 +45,7 @@ func defaultConfigSpec() ConfigSpec {
 	}
 }
 
-func (c ConfigSpec) SetLogLevel(l string) error {
+func (c *ConfigSpec) SetLogLevel(l string) error {
 	c.LogLevel = l
 
 	// Disable logging if no log level is set
@@ -64,7 +66,7 @@ func (c ConfigSpec) SetLogLevel(l string) error {
 	return nil
 }
 
-func (c ConfigSpec) IsLogging() bool {
+func (c *ConfigSpec) IsLogging() bool {
 	return c.LogLevel != ""
 }
 

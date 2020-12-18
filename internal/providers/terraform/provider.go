@@ -1,8 +1,10 @@
 package terraform
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -16,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/mod/semver"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
@@ -96,20 +99,15 @@ func (p *terraformProvider) generateStateJSON() ([]byte, error) {
 		return []byte{}, err
 	}
 
-	opts := &CmdOptions{
-		TerraformDir: p.dir,
-	}
-
-	spinner := spin.NewSpinner("Running terraform show")
-	out, err := Cmd(opts, "show", "-no-color", "-json")
+	opts, err := p.setupOpts()
 	if err != nil {
-		spinner.Fail()
-		terraformError(err)
-		return []byte{}, errors.Wrap(err, "Error running terraform show")
+		return []byte{}, err
 	}
-	spinner.Success()
+	if opts.TerraformConfigFile != "" {
+		defer os.Remove(opts.TerraformConfigFile)
+	}
 
-	return out, nil
+	return runShow(opts, p.planFile)
 }
 
 func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
@@ -118,58 +116,49 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 		return []byte{}, err
 	}
 
+	opts, err := p.setupOpts()
+	if err != nil {
+		return []byte{}, err
+	}
+	if opts.TerraformConfigFile != "" {
+		defer os.Remove(opts.TerraformConfigFile)
+	}
+
+	if p.planFile == "" {
+		err := runInit(opts)
+		if err != nil {
+			return []byte{}, err
+		}
+
+		var planJSON []byte
+		p.planFile, planJSON, err = runPlan(opts, p.planFlags)
+		defer os.Remove(p.planFile)
+
+		if err != nil {
+			return []byte{}, err
+		}
+
+		if len(planJSON) > 0 {
+			return planJSON, nil
+		}
+	}
+
+	return runShow(opts, p.planFile)
+}
+
+func (p *terraformProvider) setupOpts() (*CmdOptions, error) {
 	opts := &CmdOptions{
 		TerraformDir: p.dir,
 	}
 
-	var spinner *spin.Spinner
-
-	if p.planFile == "" {
-		spinner = spin.NewSpinner("Running terraform init")
-		_, err := Cmd(opts, "init", "-input=false", "-no-color")
-		if err != nil {
-			spinner.Fail()
-			terraformError(err)
-			return []byte{}, errors.Wrap(err, "Error running terraform init")
-		}
-		spinner.Success()
-
-		spinner = spin.NewSpinner("Running terraform plan")
-		f, err := ioutil.TempFile(os.TempDir(), "tfplan")
-		if err != nil {
-			spinner.Fail()
-			return []byte{}, errors.Wrap(err, "Error creating temporary file 'tfplan'")
-		}
-		defer os.Remove(f.Name())
-
-		flags, err := shellquote.Split(p.planFlags)
-		if err != nil {
-			return []byte{}, errors.Wrap(err, "Error parsing terraform plan flags")
-		}
-		args := []string{"plan", "-input=false", "-lock=false", "-no-color"}
-		args = append(args, flags...)
-		args = append(args, fmt.Sprintf("-out=%s", f.Name()))
-		_, err = Cmd(opts, args...)
-		if err != nil {
-			spinner.Fail()
-			terraformError(err)
-			return []byte{}, errors.Wrap(err, "Error running terraform plan")
-		}
-		spinner.Success()
-
-		p.planFile = f.Name()
-	}
-
-	spinner = spin.NewSpinner("Running terraform show")
-	out, err := Cmd(opts, "show", "-no-color", "-json", p.planFile)
+	configFile, err := CreateConfigFile(p.dir)
 	if err != nil {
-		spinner.Fail()
-		terraformError(err)
-		return []byte{}, errors.Wrap(err, "Error running terraform show")
+		return opts, err
 	}
-	spinner.Success()
 
-	return out, nil
+	opts.TerraformConfigFile = configFile
+
+	return opts, nil
 }
 
 func (p *terraformProvider) terraformPreChecks() error {
@@ -218,27 +207,178 @@ func (p *terraformProvider) inTerraformDir() bool {
 	return false
 }
 
-func terraformError(err error) {
-	if e, ok := err.(*CmdError); ok {
-		stderr := stripBlankLines(string(e.Stderr))
+func runInit(opts *CmdOptions) error {
+	spinner := spin.NewSpinner("Running terraform init")
 
-		msg := fmt.Sprintf("\n  Terraform command failed with:\n%s\n", indent(stderr, "    "))
-
-		if strings.HasPrefix(stderr, "Error: No value for required variable") {
-			msg += "\nPass Terraform flags using the --tfflags option.\n"
-			msg += "For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"
-		}
-		if strings.HasPrefix(stderr, "Error: Failed to read variables file") {
-			msg += "\nSpecify the -var-file flag as a path relative to your Terraform directory.\n"
-			msg += "For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"
-		}
-		if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a state or plan file.") {
-			msg += "\nSpecify the --tfplan flag as a path relative to your Terraform directory.\n"
-			msg += "For example: infracost --tfdir=path/to/terraform --tfplan=plan.save\n"
-		}
-
-		fmt.Fprintln(os.Stderr, color.HiRedString(msg))
+	_, err := Cmd(opts, "init", "-input=false", "-no-color")
+	if err != nil {
+		spinner.Fail()
+		terraformError(err)
+		return errors.Wrap(err, "Error running terraform init")
 	}
+
+	spinner.Success()
+	return nil
+}
+
+func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
+	spinner := spin.NewSpinner("Running terraform plan")
+	var planJSON []byte
+
+	f, err := ioutil.TempFile(os.TempDir(), "tfplan")
+	if err != nil {
+		spinner.Fail()
+		return "", planJSON, errors.Wrap(err, "Error creating temporary file 'tfplan'")
+	}
+
+	flags, err := shellquote.Split(planFlags)
+	if err != nil {
+		return "", planJSON, errors.Wrap(err, "Error parsing terraform plan flags")
+	}
+
+	args := []string{"plan", "-input=false", "-lock=false", "-no-color"}
+	args = append(args, flags...)
+	_, err = Cmd(opts, append(args, fmt.Sprintf("-out=%s", f.Name()))...)
+
+	// If the plan returns this error then Terraform is configured with remote execution mode
+	if err != nil && strings.HasPrefix(extractStderr(err), "Error: Saving a generated plan is currently not supported") {
+		log.Info("Continuing with Terraform Remote Execution Mode")
+		planJSON, err = runRemotePlan(opts, args)
+	}
+
+	if err != nil {
+		spinner.Fail()
+
+		red := color.New(color.FgHiRed)
+		bold := color.New(color.Bold, color.FgHiWhite)
+
+		if errors.Is(err, ErrMissingCloudToken) {
+			msg := fmt.Sprintf("\n%s %s %s\n%s\n%s\n",
+				red.Sprint("Please set your"),
+				bold.Sprint("TERRAFORM_CLOUD_TOKEN"),
+				red.Sprint("environment variable."),
+				"It seems like Terraform Cloud's Remote Execution Mode is being used.",
+				"Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable.",
+			)
+			fmt.Fprintln(os.Stderr, msg)
+		} else if errors.Is(err, ErrInvalidCloudToken) {
+			msg := fmt.Sprintf("\n%s %s %s\n%s\n%s\n",
+				red.Sprint("Please check your"),
+				bold.Sprint("TERRAFORM_CLOUD_TOKEN"),
+				red.Sprint("environment variable."),
+				"It seems like Terraform Cloud's Remote Execution Mode is being used.",
+				"Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable.",
+			)
+			fmt.Fprintln(os.Stderr, msg)
+		} else {
+			terraformError(err)
+		}
+		return "", planJSON, errors.Wrap(err, "Error running terraform plan")
+	}
+	spinner.Success()
+
+	return f.Name(), planJSON, nil
+}
+
+func runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
+	if !checkConfigSet() {
+		return []byte{}, ErrMissingCloudToken
+	}
+
+	stdout, err := Cmd(opts, args...)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	r := regexp.MustCompile(`To view this run in a browser, visit:\n(.*)`)
+	matches := r.FindAllStringSubmatch(string(stdout), 1)
+	if len(matches) == 0 || len(matches[0]) <= 1 {
+		return []byte{}, errors.New("Could not parse the remote run URL")
+	}
+
+	u, err := url.Parse(matches[0][1])
+	if err != nil {
+		return []byte{}, err
+	}
+	host := u.Host
+	s := strings.Split(u.Path, "/")
+	runID := s[len(s)-1]
+
+	token := cloudToken(host)
+	if token == "" {
+		return []byte{}, ErrMissingCloudToken
+	}
+
+	body, err := cloudAPI(host, fmt.Sprintf("/api/v2/runs/%s/plan", runID), token)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	var parsedResp struct {
+		Data struct {
+			Links map[string]string
+		}
+	}
+	if json.Unmarshal(body, &parsedResp) != nil {
+		return []byte{}, err
+	}
+
+	jsonPath, ok := parsedResp.Data.Links["json-output"]
+	if !ok || jsonPath == "" {
+		return []byte{}, errors.New("Could not parse path to plan JSON from remote")
+	}
+	return cloudAPI(host, jsonPath, token)
+}
+
+func runShow(opts *CmdOptions, planFile string) ([]byte, error) {
+	spinner := spin.NewSpinner("Running terraform show")
+
+	out, err := Cmd(opts, "show", "-no-color", "-json", planFile)
+	if err != nil {
+		spinner.Fail()
+		terraformError(err)
+		return []byte{}, errors.Wrap(err, "Error running terraform show")
+	}
+	spinner.Success()
+
+	return out, nil
+}
+
+func terraformError(err error) {
+	stderr := extractStderr(err)
+	if stderr == "" {
+		return
+	}
+
+	msg := fmt.Sprintf("\n  Terraform command failed with:\n%s\n", indent(stderr, "    "))
+
+	if strings.HasPrefix(stderr, "Error: Failed to select workspace") {
+		msg += "\nRun `terraform workspace select your_workspace` first or set the TF_WORKSPACE environment variable.\n"
+	}
+	if strings.HasPrefix(stderr, "Error: Required token could not be found") {
+		msg += "\nRun `terraform login` first or set the TF_CLI_CONFIG_FILE environment variable to the ABSOLUTE path.\n"
+	}
+	if strings.HasPrefix(stderr, "Error: No value for required variable") {
+		msg += "\nPass Terraform flags using the --tfflags option.\n"
+		msg += "For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"
+	}
+	if strings.HasPrefix(stderr, "Error: Failed to read variables file") {
+		msg += "\nSpecify the -var-file flag as a path relative to your Terraform directory.\n"
+		msg += "For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"
+	}
+	if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a state or plan file.") {
+		msg += "\nSpecify the --tfplan flag as a path relative to your Terraform directory.\n"
+		msg += "For example: infracost --tfdir=path/to/terraform --tfplan=plan.save\n"
+	}
+
+	fmt.Fprintln(os.Stderr, color.HiRedString(msg))
+}
+
+func extractStderr(err error) string {
+	if e, ok := err.(*CmdError); ok {
+		return stripBlankLines(string(e.Stderr))
+	}
+	return ""
 }
 
 func indent(s, indent string) string {

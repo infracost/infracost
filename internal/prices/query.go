@@ -124,7 +124,7 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 
 	q.addHeaders(req)
 
-	client := http.Client{}
+	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		return results, errors.Wrap(err, "Error sending request to pricing API")
@@ -184,7 +184,7 @@ func (q *GraphQLQueryRunner) ReportSummary(resources []*schema.Resource) {
 
 	q.addHeaders(req)
 
-	client := http.Client{}
+	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Debugf("Unable to send summary request: %v", err)

@@ -78,7 +78,7 @@ func checkAPIKey() error {
 
 		return errors.New(fmt.Sprintf("%s\n%s %s",
 			red.Sprint("No INFRACOST_API_KEY environment variable is set."),
-			red.Sprintf("We run a free hosted API for cloud prices, to get an API key run"),
+			red.Sprintf("We run a free hosted Cloud Pricing API, to get an API key run"),
 			bold.Sprint("`infracost register`"),
 		))
 	}

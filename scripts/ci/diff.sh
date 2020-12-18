@@ -8,7 +8,9 @@ tfflags=${5:-$tfflags}
 percentage_threshold=${6:-$percentage_threshold}
 pricing_api_endpoint=${7:-$pricing_api_endpoint}
 
-infracost_cmd="infracost --no-color --log-level warn"
+INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
+
+infracost_cmd="infracost --no-color"
 if [ ! -z "$tfjson" ]; then
   infracost_cmd="$infracost_cmd --tfjson $tfjson"
 fi
@@ -75,7 +77,10 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; the
   BITBUCKET_API_URL=${BITBUCKET_API_URL:-https://api.bitbucket.org}
 
   if [ ! -z "$GITHUB_ACTIONS" ]; then
-    echo "Posting comment to GitHub"
+    if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
+      GITHUB_SHA=$(cat $GITHUB_EVENT_PATH | jq -r .pull_request.head.sha)
+    fi  
+    echo "Posting comment to GitHub commit $GITHUB_SHA"
     cat diff_infracost.txt | curl -L -X POST -d @- \
         -H "Content-Type: application/json" \
         -H "Authorization: token $GITHUB_TOKEN" \
@@ -90,14 +95,14 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; the
 
   elif [ ! -z "$CIRCLECI" ]; then
     if echo $CIRCLE_REPOSITORY_URL | grep -Eiq github; then
-      echo "Posting comment from CircleCI to GitHub"
+      echo "Posting comment from CircleCI to GitHub commit $CIRCLE_SHA1"
       cat diff_infracost.txt | curl -L -X POST -d @- \
           -H "Content-Type: application/json" \
           -H "Authorization: token $GITHUB_TOKEN" \
           "$GITHUB_API_URL/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commits/$CIRCLE_SHA1/comments"
 
     elif echo $CIRCLE_REPOSITORY_URL | grep -Eiq bitbucket; then
-      echo "Posting comment from CircleCI to BitBucket"
+      echo "Posting comment from CircleCI to BitBucket commit $CIRCLE_SHA1"
       # BitBucket comments require a different JSON format and don't support HTML 
       jq -Mnc --arg change_word $change_word \
               --arg absolute_percent_diff $(printf '%.1f\n' $absolute_percent_diff) \
