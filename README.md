@@ -54,7 +54,7 @@ Infracost shows hourly and monthly cost estimates for a Terraform project. This 
       # add other required flags for infracost or envs for Terraform
     ```
 
-2.	Use our free hosted API for cloud prices by registering for an API key:
+2.	Use our free hosted Cloud Pricing API by registering for an API key:
     ```sh
     infracost register
     ```
