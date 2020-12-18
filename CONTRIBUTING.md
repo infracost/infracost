@@ -6,6 +6,58 @@ The overall process for contributing to Infracost is:
 3. Send a pull request with the proposed change (don't forget to run `make lint` and `make fmt` first). Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 4. We'll review your change and provide feedback.
 
+## Development
+
+Install Go dependencies:
+```sh
+make deps
+```
+
+Install latest version of terraform-provider-infracost. If you want to use a local development version, see [this](#using-a-local-version-of-terraform-provider-infracost)
+```sh
+make install_provider
+```
+
+Get an API key.
+```sh
+make run ARGS="register"
+```
+Alternatively checkout and run the [cloud-pricing-api](https://github.com/infracost/cloud-pricing-api) and set the `INFRACOST_PRICING_API_ENDPOINT` environment variable to point to it.
+
+Add the API key to your `.env.local` file:
+```
+cat <<EOF >> .env.local
+INFRACOST_API_KEY=XXX
+EOF
+```
+
+Run the code:
+```sh
+make run ARGS="--tfdir examples/terraform"
+```
+
+Run all tests:
+```sh
+make test
+```
+
+Exclude integration tests:
+```sh
+make test ARGS="-v -short"
+```
+
+Build:
+```sh
+make build
+```
+
+If you want to work on the [terraform-provider-infracost repository](https://github.com/infracost/terraform-provider-infracost), you can install the local version in your `~/.terraform.d/plugins` directory by:
+```sh
+# fork/clone the repo
+cd terraform-provider-infracost
+make install
+```
+
 ## Adding new resources
 
 ### Quickstart AWS
@@ -83,7 +135,7 @@ Finally create a temporary terraform file to test your resource and run (no need
 make run ARGS="--tfdir my_new_terraform/"
 ```
 
-### Overview
+### Detailed notes
 
 When adding your first resource, we recommend you look at one of the existing resources to see how it's done, for example, check the [nat_gateway.go](internal/providers/terraform/aws/nat_gateway.go) resource. You can then review the [price_explorer](scripts/price_explorer/README.md) scripts that help you find various pricing service filters, and something called a "priceHash" that you need for writing integration tests.
 
