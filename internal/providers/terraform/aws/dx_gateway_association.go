@@ -18,7 +18,7 @@ func NewDXGatewayAssociation(d *schema.ResourceData, u *schema.ResourceData) *sc
 
 	var gbDataProcessed *decimal.Decimal
 
-	if u != nil && u.Get("monthly_gb_data_processed.0.value").Exists(){
+	if u != nil && u.Get("monthly_gb_data_processed.0.value").Exists() {
 		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed.0.value").Float()))
 	}
 
