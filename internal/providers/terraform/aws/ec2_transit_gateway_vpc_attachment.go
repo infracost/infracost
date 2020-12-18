@@ -25,8 +25,8 @@ func NewEC2TransitGatewayVpcAttachment(d *schema.ResourceData, u *schema.Resourc
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
-			transitGatewayAttachmentCostComponent(region, "VPC"),
-			transitGatewayDataProcessingCostComponent(region, "VPC", gbDataProcessed),
+			transitGatewayAttachmentCostComponent(region, "TransitGatewayVPC"),
+			transitGatewayDataProcessingCostComponent(region, "TransitGatewayVPC", gbDataProcessed),
 		},
 	}
 }
