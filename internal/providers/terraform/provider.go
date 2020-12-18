@@ -242,7 +242,7 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 
 	// If the plan returns this error then Terraform is configured with remote execution mode
 	if err != nil && strings.HasPrefix(extractStderr(err), "Error: Saving a generated plan is currently not supported") {
-		log.Info("Local plan failed, Terraform is configured with remote execution mode")
+		log.Info("Continuing with Terraform Remote Execution Mode")
 		planJSON, err = runRemotePlan(opts, args)
 	}
 

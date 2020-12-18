@@ -51,7 +51,7 @@ func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	cmd.Dir = opts.TerraformDir
 
 	logWriter := &cmdLogWriter{
-		logger: log.StandardLogger(),
+		logger: log.StandardLogger().WithField("binary", "terraform"),
 		level:  log.ErrorLevel,
 	}
 
