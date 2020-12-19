@@ -23,8 +23,9 @@ Infracost shows cloud cost estimates for Terraform projects. It helps developers
     Linux/macOS manual:
     ```sh
     os=$(uname | tr '[:upper:]' '[:lower:]') && \
-    curl -s -L https://github.com/infracost/infracost/releases/latest/download/infracost-$os-amd64.tar.gz | tar xz -C /tmp && \
-    sudo mv /tmp/infracost-$os-amd64 /usr/local/bin/infracost
+    arch=$(uname -m | tr '[:upper:]' '[:lower:]' | sed -e s/x86_64/amd64/)
+    curl -s -L https://github.com/infracost/infracost/releases/latest/download/infracost-$os-$arch.tar.gz | tar xz -C /tmp && \
+    sudo mv /tmp/infracost-$os-$arch /usr/local/bin/infracost
     ```
 
     Docker and Windows users see [here](https://www.infracost.io/docs/#installation).
