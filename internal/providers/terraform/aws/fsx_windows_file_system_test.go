@@ -51,17 +51,17 @@ func TestFSXWindowsFS(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:            "Throughput capacity (Multi-AZ)",
-					PriceHash:       "73198d547f5abe1f94b63bced66fb5b7-8191dc82cee9b89717087e447a40abbd",
+					PriceHash:       "a00444235ae54a8904f3ffea4f5b29a5-8191dc82cee9b89717087e447a40abbd",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1024)),
 				},
 				{
 					Name:             "Storage (Multi-AZ - HDD)",
-					PriceHash:        "b71f728d01d84b4b0feb2ab70c58c58d-ee3dd7e4624338037ca6fea0933a662f",
+					PriceHash:        "29e5f3a5b6dd932d64cbf54b8f49a171-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(300)),
 				},
 				{
 					Name:      "Backup Storage (Multi-AZ)",
-					PriceHash: "a34f7034871d3dff9109cb011c2c97bb-ee3dd7e4624338037ca6fea0933a662f",
+					PriceHash: "ada7c588be151a5d6fc9a9a8753b0fe1-ee3dd7e4624338037ca6fea0933a662f",
 				},
 			},
 		},
