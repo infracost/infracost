@@ -98,7 +98,7 @@ func backupStorageCapacity(region string, isMultiAZ bool) *schema.CostComponent 
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "deploymentOption", Value: strPtr(deploymentOption)},
-				{Key: "usagetype", ValueRegex: strPtr("BackupUsage")},
+				{Key: "usagetype", ValueRegex: strPtr("/BackupUsage/")},
 			},
 		},
 	}
