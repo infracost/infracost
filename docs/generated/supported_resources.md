@@ -22,6 +22,7 @@ Support for the following is not currently included:
 | `aws_db_instance` |  |
 | `aws_dms_replication_instance` |  |
 | `aws_docdb_cluster_instance` |  |
+| `aws_dx_gateway_association` |  |
 | `aws_dynamodb_table` |  DAX is not yet supported.<br />  |
 | `aws_ebs_snapshot` |  |
 | `aws_ebs_snapshot_copy` |  |
@@ -29,6 +30,8 @@ Support for the following is not currently included:
 | `aws_ec2_client_vpn_endpoint` |  |
 | `aws_ec2_client_vpn_network_association` |  |
 | `aws_ec2_traffic_mirror_session` |  |
+| `aws_ec2_transit_gateway_peering_attachment` |  |
+| `aws_ec2_transit_gateway_vpc_attachment` |  |
 | `aws_ecr_repository` |  |
 | `aws_ecs_service` |  Only supports Fargate on-demand.<br />  |
 | `aws_eip` |  |
