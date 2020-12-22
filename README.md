@@ -12,7 +12,7 @@ Infracost shows cloud cost estimates for a Terraform project. It helps developer
 
 ## Installation
 
-1. Download and install the latest Infracost release
+1. Assuming you have [Terraform](https://www.terraform.io/downloads.html) installed, install the latest Infracost release:
 
     macOS Homebrew:
     ```sh
@@ -21,7 +21,7 @@ Infracost shows cloud cost estimates for a Terraform project. It helps developer
 
     Linux/macOS manual:
     ```sh
-    os=$(uname | tr [:upper:] [:lower:])
+    os=$(uname | tr '[:upper:]' '[:lower:]') && \
     curl -s -L https://github.com/infracost/infracost/releases/latest/download/infracost-$os-amd64.tar.gz | tar xz -C /tmp && \
     sudo mv /tmp/infracost-$os-amd64 /usr/local/bin/infracost
     ```
@@ -39,11 +39,11 @@ Infracost shows cloud cost estimates for a Terraform project. It helps developer
     ```sh
     git clone https://github.com/infracost/example-terraform.git
     cd example-terraform
+    # You can play with `aws/main.tf` and re-run infracost to compare costs
     infracost --tfdir aws
-    # You can play with `main.tf` and re-run infracost to compare costs
     ```
 
-Please **watch** this repo for new releases as we add new cloud resources every week or so.
+Please **watch/star** this repo as we add new cloud resources every week or so.
 
 ## Basic usage
 
