@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"sync"
 
 	"github.com/infracost/infracost/internal/config"
@@ -30,14 +29,6 @@ func (e *CmdError) Error() string {
 	return e.err.Error()
 }
 
-func terraformBinary() string {
-	terraformBinary := os.Getenv("TERRAFORM_BINARY")
-	if terraformBinary == "" {
-		terraformBinary = "terraform"
-	}
-	return terraformBinary
-}
-
 func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	os.Setenv("TF_IN_AUTOMATION", "true")
 
@@ -45,7 +36,7 @@ func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 		os.Setenv("TF_CLI_CONFIG_FILE", opts.TerraformConfigFile)
 	}
 
-	exe := terraformBinary()
+	exe := config.Environment.TerraformBinary
 	cmd := exec.Command(exe, args...)
 	log.Infof("Running command: %s", cmd.String())
 	cmd.Dir = opts.TerraformDir
@@ -79,12 +70,6 @@ func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	}
 
 	return outbuf.Bytes(), nil
-}
-
-func Version() (string, error) {
-	exe := terraformBinary()
-	out, err := exec.Command(exe, "-version").Output()
-	return strings.SplitN(string(out), "\n", 2)[0], err
 }
 
 type cmdLogger interface {

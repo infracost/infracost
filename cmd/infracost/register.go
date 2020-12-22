@@ -177,8 +177,7 @@ func createAPIKey(name string, email string) (*createAPIKeyResponse, error) {
 		return nil, errors.Wrap(err, "Error generating API key request")
 	}
 
-	req.Header.Set("content-type", "application/json")
-	req.Header.Set("User-Agent", config.GetUserAgent())
+	config.AddNoAuthHeaders(req)
 
 	client := http.Client{}
 	resp, err := client.Do(req)

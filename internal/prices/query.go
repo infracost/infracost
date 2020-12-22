@@ -7,9 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 
@@ -54,7 +52,6 @@ type QueryRunner interface {
 type GraphQLQueryRunner struct {
 	baseURL         string
 	graphQLEndpoint string
-	traceID         string
 }
 
 func NewGraphQLQueryRunner() *GraphQLQueryRunner {
@@ -66,8 +63,6 @@ func NewGraphQLQueryRunner() *GraphQLQueryRunner {
 }
 
 func (q *GraphQLQueryRunner) RunQueries(r *schema.Resource) ([]QueryResult, error) {
-	q.traceID = uuid.New().String()
-
 	keys, queries := q.batchQueries(r)
 
 	if len(queries) == 0 {
@@ -122,7 +117,7 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 		return results, errors.Wrap(err, "Error generating request for pricing API")
 	}
 
-	q.addHeaders(req)
+	config.AddAuthHeaders(req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -150,58 +145,6 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 	results = append(results, gjson.ParseBytes(body).Array()...)
 
 	return results, nil
-}
-
-func (q *GraphQLQueryRunner) ReportSummary(resources []*schema.Resource) {
-	if q.baseURL != config.Config.DefaultPricingAPIEndpoint {
-		// skip for non-default pricing API endpoints
-		return
-	}
-
-	url := fmt.Sprintf("%s/report", q.baseURL)
-
-	summary := output.BuildResourceSummary(resources, output.ResourceSummaryOptions{
-		IncludeUnsupportedProviders: true,
-	})
-
-	j := struct {
-		ResourceSummary *output.ResourceSummary `json:"resourceSummary"`
-	}{
-		ResourceSummary: summary,
-	}
-
-	body, err := json.Marshal(j)
-	if err != nil {
-		log.Debugf("Unable to generate summary request: %v", err)
-		return
-	}
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
-	if err != nil {
-		log.Debugf("Unable to generate summary request: %v", err)
-		return
-	}
-
-	q.addHeaders(req)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Debugf("Unable to send summary request: %v", err)
-		return
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		log.Debugf("Unexpected response sending summary request: %d", resp.StatusCode)
-	}
-}
-
-func (q *GraphQLQueryRunner) addHeaders(req *http.Request) {
-	req.Header.Set("content-type", "application/json")
-	req.Header.Set("User-Agent", config.GetUserAgent())
-	req.Header.Set("X-Api-Key", config.Config.APIKey)
-	req.Header.Set("X-Trace-Id", q.traceID)
 }
 
 // Batch all the queries for this resource so we can use one GraphQL call.

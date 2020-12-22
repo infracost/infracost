@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/spin"
 	"github.com/kballard/go-shellquote"
@@ -163,9 +164,9 @@ func (p *terraformProvider) setupOpts() (*CmdOptions, error) {
 
 func (p *terraformProvider) terraformPreChecks() error {
 	if p.jsonFile == "" {
-		_, err := exec.LookPath(terraformBinary())
+		_, err := exec.LookPath(config.Environment.TerraformBinary)
 		if err != nil {
-			return errors.Errorf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary using the environment variable TERRAFORM_BINARY.", terraformBinary())
+			return errors.Errorf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary using the environment variable TERRAFORM_BINARY.", config.Environment.TerraformBinary)
 		}
 
 		if v, ok := checkVersion(); !ok {
@@ -180,17 +181,10 @@ func (p *terraformProvider) terraformPreChecks() error {
 }
 
 func checkVersion() (string, bool) {
-	out, err := Version()
-	if err != nil {
-		// If we encounter any errors here we just return true
-		// since it might be caused by a custom Terraform binary
-		return "", true
-	}
-	p := strings.Split(out, " ")
-	v := p[len(p)-1]
+	v := config.Environment.TerraformVersion
 
 	// Allow any non-terraform binaries, e.g. terragrunt
-	if !strings.HasPrefix(out, "Terraform ") {
+	if !strings.HasPrefix(config.Environment.TerraformFullVersion, "Terraform ") {
 		return v, true
 	}
 
@@ -243,6 +237,7 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 	// If the plan returns this error then Terraform is configured with remote execution mode
 	if err != nil && strings.HasPrefix(extractStderr(err), "Error: Saving a generated plan is currently not supported") {
 		log.Info("Continuing with Terraform Remote Execution Mode")
+		config.Environment.TerraformRemoteExecutionModeEnabled = true
 		planJSON, err = runRemotePlan(opts, args)
 	}
 

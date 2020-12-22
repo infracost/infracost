@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"runtime/debug"
 	"strings"
 
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/providers/terraform"
+	"github.com/infracost/infracost/internal/events"
 	"github.com/infracost/infracost/internal/spin"
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
@@ -59,11 +60,9 @@ func startUpdateCheck(c chan *update.Info) {
 
 func versionOutput(app *cli.App) string {
 	s := fmt.Sprintf("Infracost %s", app.Version)
-	v, err := terraform.Version()
+	v := config.Environment.TerraformVersion
 
-	if err != nil {
-		log.Warnf("error determining Terraform version")
-	} else {
+	if v != "" {
 		s += fmt.Sprintf("\n%s", v)
 	}
 
@@ -151,6 +150,8 @@ EXAMPLES:
 			if appErr.Error() != "" {
 				fmt.Fprintf(os.Stderr, "%s\n", color.HiRedString(appErr.Error()))
 			}
+
+			events.SendReport("error", stripColor(appErr.Error()))
 		}
 
 		unexpectedErr := recover()
@@ -161,16 +162,19 @@ EXAMPLES:
 
 			red := color.New(color.FgHiRed)
 			bold := color.New(color.Bold, color.FgHiWhite)
+			stack := string(debug.Stack())
 
 			msg := fmt.Sprintf("\n%s\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
 				red.Sprint("An unexpected error occurred"),
 				unexpectedErr,
-				string(debug.Stack()),
+				stack,
 				versionOutput(app),
 				red.Sprint("Please copy the above output and create a new issue at"),
 				bold.Sprint("https://github.com/infracost/infracost/issues/new"),
 			)
 			fmt.Fprint(os.Stderr, msg)
+
+			events.SendReport("error", fmt.Sprintf("%s\n%s", unexpectedErr, stack))
 		}
 
 		updateInfo := <-updateMessageChan
@@ -199,4 +203,10 @@ func indent(s, indent string) string {
 	}
 
 	return strings.Join(lines, "\n")
+}
+
+func stripColor(str string) string {
+	ansi := "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))"
+	re := regexp.MustCompile(ansi)
+	return re.ReplaceAllString(str, "")
 }
