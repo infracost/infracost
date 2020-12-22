@@ -203,9 +203,9 @@ func (r *Root) unsupportedResourcesMessage(showSkipped bool) string {
 
 	unsupportedTypeCount := len(*r.ResourceSummary.UnsupportedCounts)
 
-	unsupportedMsg := "resource types couldn't be estimated as Infracost doesn't support them yet (https://www.infracost.io/docs/supported_resources)"
+	unsupportedMsg := "resource types couldn't be estimated as Infracost doesn't support them yet"
 	if unsupportedTypeCount == 1 {
-		unsupportedMsg = "resource type couldn't be estimated as Infracost doesn't support it yet (https://www.infracost.io/docs/supported_resources)"
+		unsupportedMsg = "resource type couldn't be estimated as Infracost doesn't support it yet"
 	}
 
 	showSkippedMsg := ", re-run with --show-skipped to see the list"
@@ -217,7 +217,7 @@ func (r *Root) unsupportedResourcesMessage(showSkipped bool) string {
 		unsupportedTypeCount,
 		unsupportedMsg,
 		showSkippedMsg,
-		"We're continually adding new resources, please email hello@infracost.io if you'd like us to prioritize your list.",
+		"Please watch/star https://github.com/infracost/infracost as we add new cloud resources every week or so.",
 	)
 
 	if showSkipped {
