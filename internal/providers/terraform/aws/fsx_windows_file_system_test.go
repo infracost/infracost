@@ -50,17 +50,17 @@ func TestFSXWindowsFS(t *testing.T) {
 			Name: "aws_fsx_windows_file_system.example",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Throughput capacity (Multi-AZ)",
+					Name:            "Throughput capacity",
 					PriceHash:       "a00444235ae54a8904f3ffea4f5b29a5-8191dc82cee9b89717087e447a40abbd",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1024)),
 				},
 				{
-					Name:             "Storage (Multi-AZ - HDD)",
+					Name:             "HDD storage",
 					PriceHash:        "29e5f3a5b6dd932d64cbf54b8f49a171-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(300)),
 				},
 				{
-					Name:      "Backup Storage (Multi-AZ)",
+					Name:      "Backup storage",
 					PriceHash: "ada7c588be151a5d6fc9a9a8753b0fe1-ee3dd7e4624338037ca6fea0933a662f",
 				},
 			},

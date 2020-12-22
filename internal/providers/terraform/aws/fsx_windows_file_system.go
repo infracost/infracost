@@ -11,6 +11,7 @@ import (
 func GetFSXWindowsFSRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_fsx_windows_file_system",
+		Notes: []string{"Data deduplication is not supported by Terraform."},
 		RFunc: NewFSXWindowsFS,
 	}
 }
@@ -42,7 +43,7 @@ func storageCapacity(region string, isMultiAZ, isHDD bool, storageSize *decimal.
 		storageType = "HDD"
 	}
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Storage (%v - %v)", deploymentOption, storageType),
+		Name:            fmt.Sprintf("%v storage", storageType),
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: storageSize,
@@ -65,8 +66,8 @@ func throughputCapacity(region string, isMultiAZ bool, throughput *decimal.Decim
 		deploymentOption = "Multi-AZ"
 	}
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Throughput capacity (%v)", deploymentOption),
-		Unit:            "GB-months",
+		Name:            "Throughput capacity",
+		Unit:            "MBps-months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: throughput,
 		ProductFilter: &schema.ProductFilter{
@@ -87,7 +88,7 @@ func backupStorageCapacity(region string, isMultiAZ bool) *schema.CostComponent 
 		deploymentOption = "Multi-AZ"
 	}
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Backup Storage (%v)", deploymentOption),
+		Name:            "Backup storage",
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: nil,
