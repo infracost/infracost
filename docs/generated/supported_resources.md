@@ -42,6 +42,7 @@ Support for the following is not currently included:
 | `aws_elasticache_replication_group` |  |
 | `aws_elasticsearch_domain` |  |
 | `aws_elb` |  |
+| `aws_fsx_windows_file_system` |  Data deduplication is not supported by Terraform.<br />  |
 | `aws_instance` |  Costs associated with non-standard Linux AMIs, such as Windows and RHEL are not supported.<br />  EC2 detailed monitoring assumes the standard 7 metrics and the lowest tier of prices for CloudWatch.<br />  If a root volume is not specified then an 8Gi gp2 volume is assumed.<br />  |
 | `aws_kms_external_key` |  |
 | `aws_kms_key` |  |
