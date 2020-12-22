@@ -1,13 +1,12 @@
-terraform {
-  required_providers {
-    aws = { source = "hashicorp/aws" }
-    # Install the optional terraform-provider-infracost to enable estimation of usage-based resources such as Lambda
-    infracost = {
-      source = "infracost/infracost"
-      version = ">= 0.0.5"
-    }
-  }
-}
+# Terraform 0.13+ users can use the optional terraform-provider-infracost to enable estimation of usage-based resources such as Lambda
+# terraform {
+#   required_providers {
+#     aws = { source = "hashicorp/aws" }
+#     infracost = { source = "infracost/infracost" }
+#   }
+# }
+# provider "infracost" {}
+
 provider "aws" {
   region                      = "us-east-1"
   skip_credentials_validation = true
@@ -15,7 +14,6 @@ provider "aws" {
   access_key                  = "mock_access_key"
   secret_key                  = "mock_secret_key"
 }
-provider "infracost" {}
 
 resource "aws_instance" "web_app" {
   ami           = "ami-674cbc1e"
@@ -42,11 +40,11 @@ resource "aws_lambda_function" "hello_world" {
 }
 
 # Get cost estimates for Lambda requests and duration
-data "infracost_aws_lambda_function" "hello_world" {
-  resources = [aws_lambda_function.hello_world.id]
-  monthly_requests { value = 100000000 }
-  average_request_duration { value = 250 } # <<<<< Try changing this to 100 (milliseconds) to compare costs
-}
+# data "infracost_aws_lambda_function" "hello_world" {
+#   resources = [aws_lambda_function.hello_world.id]
+#   monthly_requests { value = 100000000 }
+#   average_request_duration { value = 250 } # <<<<< Try changing this to 100 (milliseconds) to compare costs
+# }
 
 # Example non-supported resource
 resource "aws_simpledb_domain" "users" {
