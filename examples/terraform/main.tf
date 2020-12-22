@@ -37,14 +37,14 @@ resource "aws_lambda_function" "hello_world" {
 
 ## NOTE: Terraform 0.13+ users can use the optional terraform-provider-infracost to enable estimation
 ##       of usage-based resources such as Lambda
-# terraform {
-#   required_providers {
-#     infracost = { source = "infracost/infracost" }
-#   }
-# }
-# provider "infracost" {}
-# data "infracost_aws_lambda_function" "hello_world" {
-#   resources = [aws_lambda_function.hello_world.id]
-#   monthly_requests { value = 100000000 }
-#   average_request_duration { value = 250 } # <<<<< Try changing this to 100 (milliseconds) to compare costs
-# }
+terraform {
+  required_providers {
+    infracost = { source = "infracost/infracost" }
+  }
+}
+provider "infracost" {}
+data "infracost_aws_lambda_function" "hello_world" {
+  resources = [aws_lambda_function.hello_world.id]
+  monthly_requests { value = 100000000 }
+  average_request_duration { value = 250 } # <<<<< Try changing this to 100 (milliseconds) to compare costs
+}
