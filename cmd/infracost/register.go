@@ -56,7 +56,7 @@ func registerCmd() *cli.Command {
 				return err
 			}
 
-			fmt.Printf("\nThank you %s!\nYour API key is: %s\nA copy of your API key has been emailed to %s\n", name, r.APIKey, email)
+			fmt.Printf("\nThank you %s!\nYour API key is: %s (also emailed to you)\n", name, r.APIKey)
 
 			green := color.New(color.FgGreen)
 			bold := color.New(color.Bold, color.FgHiWhite)
@@ -80,8 +80,8 @@ func registerCmd() *cli.Command {
 				if !confirm {
 					saveAPIKey = false
 					msg = fmt.Sprintf("\n%s\n%s %s %s\n",
-						green.Sprint("You can use this API key by setting the INFRACOST_API_KEY environment variable."),
-						green.Sprint("You can then run"),
+						green.Sprint("Setting the INFRACOST_API_KEY environment variable overrides the key from config.yml."),
+						green.Sprint("You can now run"),
 						bold.Sprint("`infracost`"),
 						green.Sprint("in your Terraform code directory."),
 					)

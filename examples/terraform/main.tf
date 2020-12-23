@@ -36,7 +36,7 @@ resource "aws_lambda_function" "hello_world" {
 }
 
 ## NOTE: Terraform 0.13+ users can use the optional terraform-provider-infracost to enable estimation
-##       of usage-based resources such as Lambda
+##       of usage-based resources such as Lambda. See https://www.infracost.io/docs/usage_based_resources
 terraform {
   required_providers {
     infracost = { source = "infracost/infracost" }

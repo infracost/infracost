@@ -78,7 +78,7 @@ func defaultCmd() *cli.Command {
 				return err
 			}
 
-			spinner = spin.NewSpinner("Calculating costs")
+			spinner = spin.NewSpinner("Calculating cost estimate")
 
 			if err := prices.PopulatePrices(resources); err != nil {
 				spinner.Fail()
