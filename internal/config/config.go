@@ -1,16 +1,13 @@
 package config
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
-	"sort"
 	"strings"
 
-	"github.com/infracost/infracost/internal/version"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
@@ -142,62 +139,6 @@ func loadConfig() *ConfigSpec {
 	}
 
 	return &config
-}
-
-func GetUserAgent() string {
-	userAgent := "infracost"
-
-	if version.Version != "" {
-		userAgent += fmt.Sprintf("-%s", version.Version)
-	}
-
-	infracostEnv := getInfracostEnv()
-	if infracostEnv != "" {
-		userAgent += fmt.Sprintf(" (%s)", infracostEnv)
-	}
-
-	return userAgent
-}
-
-func getInfracostEnv() string {
-	if IsTest() {
-		return "test"
-	} else if IsDev() {
-		return "dev"
-	} else if IsTruthy(os.Getenv("GITHUB_ACTIONS")) {
-		return "github_actions"
-	} else if IsTruthy(os.Getenv("GITLAB_CI")) {
-		return "gitlab_ci"
-	} else if IsTruthy(os.Getenv("CIRCLECI")) {
-		return "circleci"
-	} else {
-		envKeys := os.Environ()
-		sort.Strings(envKeys)
-		for _, k := range envKeys {
-			if strings.HasPrefix(k, "ATLANTIS_") {
-				return "atlantis"
-			} else if strings.HasPrefix(k, "BITBUCKET_") {
-				return "bitbucket"
-			} else if strings.HasPrefix(k, "JENKINS_") {
-				return "jenkins"
-			} else if strings.HasPrefix(k, "CONCOURSE_") {
-				return "concourse"
-			}
-		}
-		if IsTruthy(os.Getenv("CI")) {
-			return "ci"
-		}
-	}
-
-	return ""
-}
-
-func IsTest() bool {
-	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
-}
-
-func IsDev() bool {
-	return os.Getenv("INFRACOST_ENV") == "dev"
 }
 
 func IsTruthy(s string) bool {

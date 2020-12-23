@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -81,7 +82,12 @@ func parseJSON(j []byte) ([]*schema.Resource, error) {
 
 	resData := parseResourceData(providerConf, vals, conf, vars)
 	parseReferences(resData, conf)
+
 	resUsage := buildUsageResourceDataMap(resData)
+	if len(resUsage) > 0 {
+		config.Environment.TerraformInfracostProviderEnabled = true
+	}
+
 	resData = stripDataResources(resData)
 
 	for _, r := range resData {

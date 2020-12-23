@@ -3,6 +3,8 @@ package prices
 import (
 	"sync"
 
+	"github.com/infracost/infracost/internal/events"
+	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -19,7 +21,11 @@ func PopulatePrices(resources []*schema.Resource) error {
 
 	go func() {
 		defer wg.Done()
-		q.ReportSummary(resources)
+		summary := output.BuildResourceSummary(resources, output.ResourceSummaryOptions{
+			IncludeUnsupportedProviders: true,
+		})
+
+		events.SendReport("resourceSummary", summary)
 	}()
 
 	for _, r := range resources {

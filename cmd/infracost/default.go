@@ -63,6 +63,9 @@ func defaultCmd() *cli.Command {
 				return err
 			}
 
+			config.Environment.Flags = c.FlagNames()
+			config.Environment.OutputFormat = c.String("output")
+
 			if c.String("output") == "json" && c.Bool("show-skipped") {
 				msg := color.YellowString("The --show-skipped option is not needed with JSON output as that always includes them\n")
 				fmt.Fprint(os.Stderr, msg)
