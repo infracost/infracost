@@ -32,6 +32,7 @@ type CostComponent struct {
 
 type Resource struct {
 	Name           string            `json:"name"`
+	Tags           map[string]string `json:"tags,omitempty"`
 	Metadata       map[string]string `json:"metadata"`
 	HourlyCost     *decimal.Decimal  `json:"hourlyCost"`
 	MonthlyCost    *decimal.Decimal  `json:"monthlyCost"`
@@ -85,6 +86,7 @@ func outputResource(r *schema.Resource) Resource {
 
 	return Resource{
 		Name:           r.Name,
+		Tags:           r.Tags,
 		HourlyCost:     r.HourlyCost,
 		MonthlyCost:    r.MonthlyCost,
 		CostComponents: comps,

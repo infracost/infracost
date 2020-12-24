@@ -20,6 +20,7 @@ type Resource struct {
 	NoPrice        bool
 	SkipMessage    string
 	ResourceType   string
+	Tags           map[string]string
 }
 
 func CalculateCosts(resources []*Resource) {

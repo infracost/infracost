@@ -47,6 +47,10 @@ th, td {
   text-align: left;
 }
 
+td.name {
+  max-width: 32rem;
+}
+
 td.monthly-quantity, td.price, td.hourly-cost, td.monthly-cost {
   text-align: right;
 }
@@ -62,6 +66,16 @@ tr.resource {
 tr.resource.top-level {
   background-color: #6b7280;
   color: #ffffff;
+}
+
+tr.tags {
+  background-color: #6b7280;
+  color: #ffffff;
+  font-size: 0.75rem;
+}
+
+tr.tags td {
+  padding-top: 0;
 }
 
 tr.total {
@@ -85,7 +99,7 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
 
 {{define "groupRow"}}
   <tr class="group">
-  <td>
+  <td class="name">
     {{.GroupLabel}}: {{.Group}}
   </td>
   <td class="monthly-quantity"></td>
@@ -98,7 +112,7 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
 
 {{define "resourceRows"}}
   <tr class="resource{{if eq .Indent 0}} top-level{{end}}">
-    <td>
+    <td class="name">
       {{if gt .Indent 1}}{{repeat (int (add .Indent -1)) "&nbsp;&nbsp;&nbsp;&nbsp;" | safeHTML}}{{end}}
       {{if gt .Indent 0}}<span class="arrow">&#8627;</span>{{end}}
       {{.Resource.Name}}
@@ -109,6 +123,24 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     <td class="hourly-cost">{{.Resource.HourlyCost | formatCost}}</td>
     <td class="monthly-cost">{{.Resource.MonthlyCost | formatCost}}</td>
   </tr>
+  {{ if .Resource.Tags}}
+    <tr class="tags">
+      <td class="name">
+        {{$tags := list}}
+        {{range $k, $v := .Resource.Tags}}
+          {{$t := list $k "=" $v | join "" }}
+          {{$tags = append $tags $t}}
+        {{end}}
+        <span class="label">Tags:</span>
+        <span>{{$tags | join ", "}}</span>
+      </td>
+      <td class="monthly-quantity"></td>
+      <td class="unit"></td>
+      <td class="price"></td>
+      <td class="hourly-cost"></td>
+      <td class="monthly-cost"></td>
+    </tr>
+  {{end}}
   {{$ident := add .Indent 1}}
   {{range .Resource.CostComponents}}
     {{template "costComponentRow" dict "CostComponent" . "Indent" $ident}}
@@ -120,7 +152,7 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
 
 {{define "costComponentRow"}}
   <tr class="cost-component">
-    <td>
+    <td class="name">
       {{if gt .Indent 1}}{{repeat (int (add .Indent -1)) "&nbsp;&nbsp;&nbsp;&nbsp;" | safeHTML}}{{end}}
       {{if gt .Indent 0}}<span class="arrow">&#8627;</span>{{end}}
       {{.CostComponent.Name}}
@@ -159,7 +191,7 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
 
     <table>
       <thead>
-        <th>Name</th>
+        <th class="name">Name</th>
         <th class="monthly-quantity">Monthly quantity</th>
         <th class="unit">Unit</th>
         <th class="price">Price</th>
@@ -180,7 +212,7 @@ iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
         {{end}}
         <tr class="spacer"><td colspan="6"></td></tr>
         <tr class="total">
-          <td>Overall total (USD)</td>
+          <td class="name">Overall total (USD)</td>
           <td class="monthly-quantity"></td>
           <td class="unit"></td>
           <td class="price"></td>
