@@ -42,6 +42,7 @@ func createResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 			return &schema.Resource{
 				Name:         d.Address,
 				ResourceType: d.Type,
+				Tags:         d.Tags,
 				IsSkipped:    true,
 				NoPrice:      true,
 				SkipMessage:  "Free resource.",
@@ -51,6 +52,7 @@ func createResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 		res := registryItem.RFunc(d, u)
 		if res != nil {
 			res.ResourceType = d.Type
+			res.Tags = d.Tags
 			return res
 		}
 	}
@@ -58,6 +60,7 @@ func createResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 	return &schema.Resource{
 		Name:         d.Address,
 		ResourceType: d.Type,
+		Tags:         d.Tags,
 		IsSkipped:    true,
 		SkipMessage:  "This resource is not currently supported",
 	}
@@ -120,7 +123,9 @@ func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, v
 
 		v = schema.AddRawValue(v, "region", region)
 
-		resources[addr] = schema.NewResourceData(t, provider, addr, v)
+		tags := parseTags(t, v)
+
+		resources[addr] = schema.NewResourceData(t, provider, addr, tags, v)
 	}
 
 	// Recursively add any resources for child modules
@@ -131,6 +136,21 @@ func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, v
 	}
 
 	return resources
+}
+
+func parseTags(resourceType string, v gjson.Result) map[string]string {
+	tags := make(map[string]string)
+
+	a := "tags"
+	if strings.HasPrefix(resourceType, "google_") {
+		a = "labels"
+	}
+
+	for k, v := range v.Get(a).Map() {
+		tags[k] = v.String()
+	}
+
+	return tags
 }
 
 func resourceRegion(resourceType string, v gjson.Result) string {

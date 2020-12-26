@@ -245,6 +245,7 @@ func TestParseReferences_plan(t *testing.T) {
 		"aws_ebs_volume",
 		"aws",
 		"aws_ebs_volume.volume1",
+		map[string]string{},
 		gjson.Result{
 			Type: gjson.JSON,
 			Raw:  `{}`,
@@ -255,6 +256,7 @@ func TestParseReferences_plan(t *testing.T) {
 		"aws_ebs_snapshot",
 		"aws",
 		"aws_ebs_snapshot.snapshot1",
+		map[string]string{},
 		gjson.Result{
 			Type: gjson.JSON,
 			Raw:  `{}`,
@@ -306,6 +308,7 @@ func TestParseReferences_state(t *testing.T) {
 		"aws_ebs_volume",
 		"aws",
 		"aws_ebs_volume.volume1",
+		map[string]string{},
 		gjson.Result{
 			Type: gjson.JSON,
 			Raw: `{
@@ -318,6 +321,7 @@ func TestParseReferences_state(t *testing.T) {
 		"aws_ebs_snapshot",
 		"aws",
 		"aws_ebs_snapshot.snapshot1",
+		map[string]string{},
 		gjson.Result{
 			Type: gjson.JSON,
 			Raw: `{
