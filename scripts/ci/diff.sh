@@ -1,5 +1,10 @@
 #!/bin/sh -le
 
+# See https://www.infracost.io/docs/integrations/ for docs
+# For Bitbucket, BITBUCKET_TOKEN must be set to "myusername:my_app_password", the password needs to have Read scope
+# on "Repositories" and "Pull Requests" so it can post comments. Using a Bitbucket App password (https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) is recommended.
+
+# Set variables based on the order for GitHub Actions, or the env value for other CIs
 tfjson=${1:-$tfjson}
 tfplan=${2:-$tfplan}
 use_tfstate=${3:-$use_tfstate}
@@ -8,7 +13,32 @@ tfflags=${5:-$tfflags}
 percentage_threshold=${6:-$percentage_threshold}
 pricing_api_endpoint=${7:-$pricing_api_endpoint}
 
-INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
+# Set defaults
+percentage_threshold=${percentage_threshold:-0}
+GITHUB_API_URL=${GITHUB_API_URL:-https://api.github.com}
+BITBUCKET_API_URL=${BITBUCKET_API_URL:-https://api.bitbucket.org}
+# Export as it's used by infracost, not this script
+export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
+
+# Bitbucket Pipelines don't have a unique env so use this to detect it
+if [ ! -z "$BITBUCKET_BUILD_NUMBER" ]; then
+  BITBUCKET_PIPELINES=true
+fi
+
+post_bitbucket_comment () {
+  # Bitbucket comments require a different JSON format and don't support HTML 
+  jq -Mnc --arg change_word $change_word \
+          --arg absolute_percent_diff $(printf '%.1f\n' $absolute_percent_diff) \
+          --arg default_branch_monthly_cost $default_branch_monthly_cost \
+          --arg current_branch_monthly_cost $current_branch_monthly_cost \
+          --arg diff "$(git diff --no-color --no-index default_branch_infracost.txt current_branch_infracost.txt | sed 1,2d | sed 3,5d)" \
+          '{content: {raw: "Monthly cost estimate will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n\n```diff\n\($diff)\n```\n"}}' > diff_infracost.txt
+
+  cat diff_infracost.txt | curl -L -X POST -d @- \
+            -H "Content-Type: application/json" \
+            -u $BITBUCKET_TOKEN \
+            "$BITBUCKET_API_URL/2.0/repositories/$1"
+}
 
 infracost_cmd="infracost --no-color"
 if [ ! -z "$tfjson" ]; then
@@ -34,8 +64,10 @@ echo "$infracost_cmd" > infracost_cmd
 echo "Running infracost on current branch using:"
 echo "  $ $(cat infracost_cmd)"
 current_branch_output=$(cat infracost_cmd | sh)
-echo "$current_branch_output" > current_branch_infracost.txt
-current_branch_monthly_cost=$(cat current_branch_infracost.txt | awk '/OVERALL TOTAL/ { printf("%.2f",$NF) }')
+# The sed is needed to cause the header line to be different between current_branch_infracost and
+# default_branch_infracost, otherwise git diff removes it as its an identical line
+echo "$current_branch_output" | sed 's/MONTHLY COST/MONTHLY COST /' > current_branch_infracost.txt
+current_branch_monthly_cost=$(cat current_branch_infracost.txt | awk '/OVERALL TOTAL/ { gsub(",",""); printf("%.2f",$NF) }')
 echo "::set-output name=current_branch_monthly_cost::$current_branch_monthly_cost"
 
 current_branch=$(git rev-parse --abbrev-ref HEAD)
@@ -43,16 +75,20 @@ if [ "$current_branch" = "master" ] || [ "$current_branch" = "main" ]; then
   echo "Exiting as the current branch was the default branch so nothing more to do."
   exit 0
 fi
+if [ ! -z "$BITBUCKET_PIPELINES" ]; then
+  echo "Configuring git remote for Bitbucket Pipelines"
+  git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+fi
 echo "Switching to default branch"
 git fetch --depth=1 origin master &>/dev/null || git fetch --depth=1 origin main &>/dev/null || echo "Could not fetch default branch from origin, no problems, switching to it..."
-git switch master &>/dev/null || git switch main &>/dev/null
+git switch master &>/dev/null || git switch main &>/dev/null || (echo "Error: could not switch to branch master or main" && exit 1)
 git log -n1
 
 echo "Running infracost on default branch using:"
 echo "  $ $(cat infracost_cmd)"
 default_branch_output=$(cat infracost_cmd | sh)
 echo "$default_branch_output" > default_branch_infracost.txt
-default_branch_monthly_cost=$(cat default_branch_infracost.txt | awk '/OVERALL TOTAL/ { printf("%.2f",$NF) }')
+default_branch_monthly_cost=$(cat default_branch_infracost.txt | awk '/OVERALL TOTAL/ { gsub(",",""); printf("%.2f",$NF) }')
 echo "::set-output name=default_branch_monthly_cost::$default_branch_monthly_cost"
 
 percent_diff=$(echo "scale=4; $current_branch_monthly_cost / $default_branch_monthly_cost * 100 - 100" | bc)
@@ -64,17 +100,19 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; the
     change_word="decrease"
   fi
 
-  jq -Mnc --arg change_word $change_word \
+  comment_key=body
+  if [ ! -z "$GITLAB_CI" ]; then
+    comment_key=note
+  fi
+  jq -Mnc --arg comment_key $comment_key \
+          --arg change_word $change_word \
           --arg absolute_percent_diff $(printf '%.1f\n' $absolute_percent_diff) \
           --arg default_branch_monthly_cost $default_branch_monthly_cost \
           --arg current_branch_monthly_cost $current_branch_monthly_cost \
-          --arg diff "$(git diff --no-color --no-index default_branch_infracost.txt current_branch_infracost.txt | tail -n +3)" \
-          '{body: "Monthly cost estimate will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n<details><summary>infracost diff</summary>\n\n```diff\n\($diff)\n```\n</details>\n"}' > diff_infracost.txt
+          --arg diff "$(git diff --no-color --no-index default_branch_infracost.txt current_branch_infracost.txt | sed 1,2d | sed 3,5d)" \
+          '{($comment_key): "Monthly cost estimate will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n<details><summary>infracost diff</summary>\n\n```diff\n\($diff)\n```\n</details>\n"}' > diff_infracost.txt
 
   echo "Default branch and current branch diff ($absolute_percent_diff) is more than the percentage threshold ($percentage_threshold)."
-
-  GITHUB_API_URL=${GITHUB_API_URL:-https://api.github.com}
-  BITBUCKET_API_URL=${BITBUCKET_API_URL:-https://api.bitbucket.org}
 
   if [ ! -z "$GITHUB_ACTIONS" ]; then
     if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
@@ -87,11 +125,13 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; the
         "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
 
   elif [ ! -z "$GITLAB_CI" ]; then
-    echo "Posting comment to GitLab"
+    echo "Posting comment to GitLab commit $CI_COMMIT_SHA"
     cat diff_infracost.txt | curl -L -X POST -d @- \
         -H "Content-Type: application/json" \
         -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
-        "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes"
+        "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/repository/commits/$CI_COMMIT_SHA/comments"
+        # Previously we posted to the merge request, using the comment_key=body above:
+        # "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes"
 
   elif [ ! -z "$CIRCLECI" ]; then
     if echo $CIRCLE_REPOSITORY_URL | grep -Eiq github; then
@@ -102,20 +142,28 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; the
           "$GITHUB_API_URL/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commits/$CIRCLE_SHA1/comments"
 
     elif echo $CIRCLE_REPOSITORY_URL | grep -Eiq bitbucket; then
-      echo "Posting comment from CircleCI to BitBucket commit $CIRCLE_SHA1"
-      # BitBucket comments require a different JSON format and don't support HTML 
-      jq -Mnc --arg change_word $change_word \
-              --arg absolute_percent_diff $(printf '%.1f\n' $absolute_percent_diff) \
-              --arg default_branch_monthly_cost $default_branch_monthly_cost \
-              --arg current_branch_monthly_cost $current_branch_monthly_cost \
-              --arg diff "$(git diff --no-color --no-index default_branch_infracost.txt current_branch_infracost.txt | tail -n +3)" \
-              '{content: {raw: "Monthly cost estimate will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n\n```diff\n\($diff)\n```\n"}}' > diff_infracost.txt
+      if [ ! -z "$CIRCLE_PULL_REQUEST" ]; then
+        BITBUCKET_PR_ID=$(echo $CIRCLE_PULL_REQUEST | sed 's/.*pull-requests\///')
+        echo "Posting comment from CircleCI to Bitbucket pull-request $BITBUCKET_PR_ID"
+        post_bitbucket_comment "$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pullrequests/$BITBUCKET_PR_ID/comments"
 
-      # BITBUCKET_TOKEN must be set to "myusername:my_app_password"
-      cat diff_infracost.txt | curl -L -X POST -d @- \
-          -H "Content-Type: application/json" \
-          -u $BITBUCKET_TOKEN \
-          "$BITBUCKET_API_URL/2.0/repositories/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commit/$CIRCLE_SHA1/comments"
+      else
+        echo "Posting comment from CircleCI to Bitbucket commit $CIRCLE_SHA1"
+        post_bitbucket_comment "$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commit/$CIRCLE_SHA1/comments"
+      fi
+
+    else
+      echo "Error: CircleCI is not being used with GitHub or Bitbucket!"
+    fi
+
+  elif [ ! -z "$BITBUCKET_PIPELINES" ]; then
+    if [ ! -z "$BITBUCKET_PR_ID" ]; then
+      echo "Posting comment to Bitbucket pull-request $BITBUCKET_PR_ID"
+      post_bitbucket_comment "$BITBUCKET_REPO_FULL_NAME/pullrequests/$BITBUCKET_PR_ID/comments"
+
+    else
+      echo "Posting comment to Bitbucket commit $BITBUCKET_COMMIT"
+      post_bitbucket_comment "$BITBUCKET_REPO_FULL_NAME/commit/$BITBUCKET_COMMIT/comments"
     fi
   fi
 else
