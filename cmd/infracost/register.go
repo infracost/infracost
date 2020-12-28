@@ -23,7 +23,8 @@ type createAPIKeyResponse struct {
 
 func registerCmd() *cli.Command {
 	return &cli.Command{
-		Name: "register",
+		Name:  "register",
+		Usage: "Register for an Infracost API key",
 		Action: func(c *cli.Context) error {
 			fmt.Println("Please enter your name and email address to get an API key.")
 			fmt.Println("See our FAQ (https://www.infracost.io/docs/faq) for more details.")
@@ -61,7 +62,10 @@ func registerCmd() *cli.Command {
 			green := color.New(color.FgGreen)
 			bold := color.New(color.Bold, color.FgHiWhite)
 
-			msg := fmt.Sprintf("\n%s\n%s %s %s\n",
+			feedbackMsg := "Send us feedback at any time by running `infracost feedback`."
+
+			msg := fmt.Sprintf("\n%s\n\n%s\n%s %s %s\n",
+				feedbackMsg,
 				green.Sprintf("Your API key has been saved to %s", config.ConfigFilePath()),
 				green.Sprint("You can now run"),
 				bold.Sprint("`infracost`"),
@@ -79,7 +83,8 @@ func registerCmd() *cli.Command {
 
 				if !confirm {
 					saveAPIKey = false
-					msg = fmt.Sprintf("\n%s\n%s %s %s\n",
+					msg = fmt.Sprintf("\n%s\n\n%s\n%s %s %s\n",
+						feedbackMsg,
 						green.Sprint("Setting the INFRACOST_API_KEY environment variable overrides the key from config.yml."),
 						green.Sprint("You can now run"),
 						bold.Sprint("`infracost`"),

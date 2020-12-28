@@ -16,17 +16,17 @@ import (
 func reportCmd() *cli.Command {
 	return &cli.Command{
 		Name:  "report",
-		Usage: "Create a report from multiple infracost JSON files",
+		Usage: "Create a report from multiple Infracost JSON files",
 		UsageText: `infracost report [command options] [JSON paths...]
 
 EXAMPLES:
-	# Create report from multiple infracost JSON files
+	# Create report from multiple Infracost JSON files
 	infracost report out1.json out2.json out3.json
 
-	# Create HTML report from multiple infracost JSON files
+	# Create HTML report from multiple Infracost JSON files
 	infracost report --output html out*.json > report.html
 
-	# Merge multiple infracost JSON files
+	# Merge multiple Infracost JSON files
 	infracost report --output json out*.json`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
