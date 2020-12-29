@@ -37,7 +37,7 @@ func feedbackCmd() *cli.Command {
 			r, err := submitFeedback(feedback)
 			if err != nil || r.Error != "" {
 				color.Red("There was an error submitting your feedback:\n%s\n", r.Error)
-				fmt.Println("Please contact hello@infracost.io if you continue to have issues.")
+				fmt.Println("Please email hello@infracost.io if you continue to have issues.")
 				return nil
 			}
 
