@@ -25,7 +25,7 @@ func feedbackCmd() *cli.Command {
 		Usage: "Submit feedback directly to the Infracost team",
 		Action: func(c *cli.Context) error {
 			fmt.Println("Please enter any feedback you have for us.")
-			fmt.Println("If you'd like to contact us directly, please email us at hello@infracost.io")
+			fmt.Println("You can also email us at hello@infracost.io")
 			fmt.Println("Press ENTER to submit feedback.")
 
 			feedback, err := promptForFeedback()
