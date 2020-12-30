@@ -5,8 +5,9 @@
 # threshold is crossed.
 # Usage docs: https://www.infracost.io/docs/integrations/
 # It supports: GitHub Actions, GitLab CI, CircleCI with GitHub and Bitbucket, Bitbucket Pipelines
-# For Bitbucket, BITBUCKET_TOKEN must be set to "myusername:my_app_password", the password needs to have Read scope
-# on "Repositories" and "Pull Requests" so it can post comments. Using a Bitbucket App password (https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) is recommended.
+# For Bitbucket: BITBUCKET_TOKEN must be set to "myusername:my_app_password", the password needs to have Read scope
+#   on "Repositories" and "Pull Requests" so it can post comments. Using a Bitbucket App password
+#   (https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) is recommended.
 
 # Set variables based on the order for GitHub Actions, or the env value for other CIs
 tfjson=${1:-$tfjson}
@@ -23,6 +24,7 @@ GITHUB_API_URL=${GITHUB_API_URL:-https://api.github.com}
 BITBUCKET_API_URL=${BITBUCKET_API_URL:-https://api.bitbucket.org}
 # Export as it's used by infracost, not this script
 export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
+export INFRACOST_CI_DIFF=true
 
 # Bitbucket Pipelines don't have a unique env so use this to detect it
 if [ ! -z "$BITBUCKET_BUILD_NUMBER" ]; then
