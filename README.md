@@ -52,7 +52,7 @@ There are [4 usage methods](https://www.infracost.io/docs/#usage-methods) for In
   infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
   ```
 
-Checkout the [docs site](https://www.infracost.io/docs/) for additional usage options, including notes for [Terragrunt](https://www.infracost.io/docs/#terragrunt-users) and [Terraform Cloud](https://www.infracost.io/docs/#terraform-cloud-users) users.
+Checkout the [docs site](https://www.infracost.io/docs/) for additional usage options, including notes for [Terragrunt](https://www.infracost.io/docs/terragrunt) and [Terraform Cloud](https://www.infracost.io/docs/terraform_cloud_enterprise) users.
 
 ## CI/CD integrations
 

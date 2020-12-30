@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 To help us identify the resources you need, please fill out the following. If you're not sure of something, leave it blank.
-We'd appreciate it if you could also share a lit bit about your use-case.
+We'd appreciate it if you could also share a little bit about your use-case.
 
  - Resource name: [e.g. AWS Lambda]
  - Link to pricing information: [e.g. https://aws.amazon.com/redshift/pricing/]
