@@ -23,6 +23,7 @@ type EnvironmentSpec struct {
 	IsDev                               bool     `json:"isDev"`
 	OS                                  string   `json:"os"`
 	CIPlatform                          string   `json:"ciPlatform,omitempty"`
+	CIScript                            string   `json:"ciScript,omitempty"`
 	TerraformBinary                     string   `json:"terraformBinary"`
 	TerraformFullVersion                string   `json:"terraformFullVersion"`
 	TerraformVersion                    string   `json:"terraformVersion"`
@@ -46,6 +47,7 @@ func loadEnvironment() *EnvironmentSpec {
 		IsDev:                               isDev(),
 		OS:                                  runtime.GOOS,
 		CIPlatform:                          ciPlatform(),
+		CIScript:                            ciScript(),
 		TerraformBinary:                     filepath.Base(terraformBinary()),
 		TerraformFullVersion:                terraformFullVersion(),
 		TerraformVersion:                    terraformVersion(),
@@ -89,6 +91,14 @@ func terraformVersion() string {
 	p := strings.Split(v, " ")
 	if len(p) > 1 {
 		return p[len(p)-1]
+	}
+
+	return ""
+}
+
+func ciScript() string {
+	if IsTruthy(os.Getenv("INFRACOST_CI_DIFF")) {
+		return "ci-diff"
 	}
 
 	return ""

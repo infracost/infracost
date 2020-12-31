@@ -57,7 +57,7 @@ func registerCmd() *cli.Command {
 				return err
 			}
 
-			fmt.Printf("\nThank you %s!\nYour API key is: %s (also emailed to you)\n", name, r.APIKey)
+			fmt.Printf("\nThank you %s!\nYour API key is: %s\n", name, r.APIKey)
 
 			green := color.New(color.FgGreen)
 			bold := color.New(color.Bold, color.FgHiWhite)

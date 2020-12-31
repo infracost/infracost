@@ -60,7 +60,7 @@ func startUpdateCheck(c chan *update.Info) {
 
 func versionOutput(app *cli.App) string {
 	s := fmt.Sprintf("Infracost %s", app.Version)
-	v := config.Environment.TerraformVersion
+	v := config.Environment.TerraformFullVersion
 
 	if v != "" {
 		s += fmt.Sprintf("\n%s", v)
