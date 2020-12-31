@@ -213,3 +213,13 @@ The following notes are general guidelines, please leave a comment in your pull 
 - unnecessary words: drop the following words from cost component names if the cloud vendor's pricing webpage shows them: "Rate" "Volumes", "SSD", "HDD"
 
 - brackets: only use 1 set of brackets after a component name, e.g. `Database instance (on-demand, db.t3.medium)` and not `Database instance (on-demand) (db.t3.medium)`
+
+## Releasing steps
+
+1. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
+2. Wait for the GH Actions to complete, the [newly created tag](https://github.com/infracost/infracost/releases/latest) should have 6 assets.
+3. Click on the Edit release, add the release notes from the commits between this and the last release and click on publish.
+4. Announce the release in the infracost-community Slack general channel. Then wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
+5. Update the docs repo with any required changes and supported resources.
+6. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
+7. If required, bump up `terraform-provider-infracost/version`, commit and `git tag vx.y.z && git push origin vx.y.z` in terraform-provider-infracost repo.
