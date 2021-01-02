@@ -33,7 +33,7 @@ Infracost shows cloud cost estimates for a Terraform project. It helps developer
     infracost register
     ```
 
-    The key is saved in `~/.config/infracost/config.yml`. If you prefer, you can run your own [Cloud Pricing API](faq#can-i-run-my-own-cloud-pricing-api).
+    The key is saved in `~/.config/infracost/config.yml`. If you prefer, you can run your own [Cloud Pricing API](https://www.infracost.io/docs/faq#can-i-run-my-own-cloud-pricing-api).
 
 3.  Run `infracost` using our example Terraform project to see how it works.
     ```sh
