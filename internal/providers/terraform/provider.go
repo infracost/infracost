@@ -13,6 +13,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/events"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/spin"
 	"github.com/kballard/go-shellquote"
@@ -82,13 +83,13 @@ func (p *terraformProvider) loadPlanJSON() ([]byte, error) {
 
 	f, err := os.Open(p.jsonFile)
 	if err != nil {
-		return []byte{}, errors.Wrapf(err, "Error reading Terraform plan file")
+		return []byte{}, errors.Wrap(err, "Error reading Terraform plan file")
 	}
 	defer f.Close()
 
 	out, err := ioutil.ReadAll(f)
 	if err != nil {
-		return []byte{}, errors.Wrapf(err, "Error reading Terraform plan file")
+		return []byte{}, errors.Wrap(err, "Error reading Terraform plan file")
 	}
 
 	return out, nil
@@ -166,7 +167,8 @@ func (p *terraformProvider) terraformPreChecks() error {
 	if p.jsonFile == "" {
 		_, err := exec.LookPath(config.Environment.TerraformBinary)
 		if err != nil {
-			return errors.Errorf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary using the environment variable TERRAFORM_BINARY.", config.Environment.TerraformBinary)
+			msg := fmt.Sprintf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary using the environment variable TERRAFORM_BINARY.", config.Environment.TerraformBinary)
+			return events.NewError(errors.Errorf(msg), "Terraform binary could not be found")
 		}
 
 		if v, ok := checkVersion(); !ok {
@@ -174,7 +176,9 @@ func (p *terraformProvider) terraformPreChecks() error {
 		}
 
 		if !p.inTerraformDir() {
-			return errors.Errorf("Directory \"%s\" does not have any Terraform files.\nSet the Terraform directory path using the --tfdir option.", p.dir)
+			msg := fmt.Sprintf("Directory \"%s\" does not have any Terraform files.\nSet the Terraform directory path using the --tfdir option.", p.dir)
+			return events.NewError(errors.Errorf(msg), "Directory does not have any Terraform files")
+
 		}
 	}
 	return nil

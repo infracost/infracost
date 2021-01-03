@@ -151,7 +151,12 @@ EXAMPLES:
 				fmt.Fprintf(os.Stderr, "%s\n", color.HiRedString(appErr.Error()))
 			}
 
-			events.SendReport("error", stripColor(appErr.Error()))
+			msg := stripColor(appErr.Error())
+			var eventsError *events.Error
+			if errors.As(appErr, &eventsError) {
+				msg = stripColor(eventsError.Label)
+			}
+			events.SendReport("error", msg)
 		}
 
 		unexpectedErr := recover()
