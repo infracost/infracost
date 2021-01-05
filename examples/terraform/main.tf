@@ -22,11 +22,6 @@ resource "aws_instance" "web_app" {
   }
 }
 
-# Example non-supported resource
-resource "aws_simpledb_domain" "users" {
-  name = "users"
-}
-
 resource "aws_lambda_function" "hello_world" {
   function_name = "hello_world"
   role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
