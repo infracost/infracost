@@ -58,6 +58,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 // FreeResources grouped alphabetically
 var FreeResources []string = []string{
+	// AWS Certificate Manager
+	"aws_acm_certificate_validation",
+
 	// AWS API Gateway Rest APIs
 	"aws_api_gateway_account",
 	"aws_api_gateway_api_key",
@@ -108,6 +111,9 @@ var FreeResources []string = []string{
 	// AWS ECR
 	"aws_ecr_lifecycle_policy",
 	"aws_ecr_repository_policy",
+
+	// AWS Elastic Container Service
+	"aws_ecs_capacity_provider",
 
 	// AWS Elastic Load Balancing
 	"aws_alb_listener",
@@ -165,10 +171,16 @@ var FreeResources []string = []string{
 	"aws_iam_user_policy_attachment",
 	"aws_iam_user_ssh_key",
 
+	// AWS IOT
+	"aws_iot_policy",
+
 	// AWS KMS
 	"aws_kms_alias",
 	"aws_kms_ciphertext",
 	"aws_kms_grant",
+
+	// AWS Lambda
+	"aws_lambda_permission",
 
 	// AWS Others
 	"aws_db_instance_role_association",
@@ -206,6 +218,9 @@ var FreeResources []string = []string{
 	"aws_s3_bucket_ownership_controls",
 	"aws_s3_bucket_policy",
 	"aws_s3_bucket_public_access_block",
+
+	// AWS Service Discovery Service
+	"aws_service_discovery_service",
 
 	// AWS SNS
 	"aws_sns_platform_application",
