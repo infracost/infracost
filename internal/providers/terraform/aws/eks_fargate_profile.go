@@ -12,7 +12,7 @@ func GetNewEKSFargateProfileItem() *schema.RegistryItem {
 	}
 }
 
-func NewEKSFargateProfile(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewEKSFargateProfile(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	costComponents := make([]*schema.CostComponent, 0)
 

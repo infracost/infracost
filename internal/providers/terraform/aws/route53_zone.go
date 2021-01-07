@@ -13,7 +13,7 @@ func GetRoute53ZoneRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRoute53Zone(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewRoute53Zone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{

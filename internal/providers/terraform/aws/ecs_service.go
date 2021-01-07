@@ -20,7 +20,7 @@ func GetECSServiceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewECSService(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewECSService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	launchType := d.Get("launch_type").String()
 	if launchType != "FARGATE" {
 		log.Warnf("Skipping resource %s. Infracost currently only supports the FARGATE launch type for AWS ECS Services", d.Address)

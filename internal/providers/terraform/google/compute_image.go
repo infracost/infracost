@@ -13,7 +13,7 @@ func GetComputeImageRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeImage(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewComputeImage(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	// Not yet implemented, but added here so that the references can be used for google_compute_disk
 	return nil
 }

@@ -13,7 +13,7 @@ func GetEBSVolumeRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewEBSVolume(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	volumeAPIName := "gp2"

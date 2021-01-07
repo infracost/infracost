@@ -14,7 +14,7 @@ func GetElasticsearchDomainRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewElasticsearchDomain(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	clusterConfig := d.Get("cluster_config").Array()[0]
 	instanceType := clusterConfig.Get("instance_type").String()

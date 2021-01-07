@@ -12,7 +12,7 @@ func GetNewKMSKeyRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewKMSKey(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewKMSKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	region := d.Get("region").String()
 	spec := d.Get("customer_master_key_spec").String()

@@ -40,6 +40,13 @@ func GetResourceRegistryMap() *ResourceRegistryMap {
 	return &resourceRegistryMap
 }
 
+func GetUsageOnlyResources() []string {
+	r := []string{}
+	r = append(r, aws.UsageOnlyResources...)
+	r = append(r, google.UsageOnlyResources...)
+	return r
+}
+
 func HasSupportedProvider(rType string) bool {
 	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_")
 }

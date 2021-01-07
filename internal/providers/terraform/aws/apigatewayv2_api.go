@@ -12,7 +12,7 @@ func GetAPIGatewayv2ApiRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAPIGatewayv2Api(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewAPIGatewayv2Api(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
 
 	protocolType := d.Get("protocol_type").String()
@@ -31,7 +31,7 @@ func NewAPIGatewayv2Api(d *schema.ResourceData, u *schema.ResourceData) *schema.
 	}
 }
 
-func httpAPICostComponent(d *schema.ResourceData, u *schema.ResourceData) []*schema.CostComponent {
+func httpAPICostComponent(d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
 	region := d.Get("region").String()
 	monthlyRequests := decimal.Zero
 	requestSize := decimal.NewFromInt(512)
@@ -47,12 +47,12 @@ func httpAPICostComponent(d *schema.ResourceData, u *schema.ResourceData) []*sch
 	apiTierOneLimit := decimal.NewFromInt(300000000)
 	apiTierTwoLimit := decimal.NewFromInt(300000001)
 
-	if u != nil && u.Get("monthly_requests.0.value").Exists() {
-		monthlyRequests = decimal.NewFromInt(u.Get("monthly_requests.0.value").Int())
+	if u != nil && u.Get("monthly_requests").Exists() {
+		monthlyRequests = decimal.NewFromInt(u.Get("monthly_requests").Int())
 	}
 
-	if u != nil && u.Get("average_request_size.0.value").Exists() {
-		requestSize = decimal.NewFromInt(u.Get("average_request_size.0.value").Int())
+	if u != nil && u.Get("average_request_size").Exists() {
+		requestSize = decimal.NewFromInt(u.Get("average_request_size").Int())
 	}
 
 	if requestSize.GreaterThan(billableRequestSize) {
@@ -109,7 +109,7 @@ func httpAPICostComponent(d *schema.ResourceData, u *schema.ResourceData) []*sch
 	return CostComponent
 }
 
-func websocketAPICostComponent(d *schema.ResourceData, u *schema.ResourceData) []*schema.CostComponent {
+func websocketAPICostComponent(d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
 	region := d.Get("region").String()
 	monthlyMessages := decimal.Zero
 	messageSize := decimal.NewFromInt(32)
@@ -127,12 +127,12 @@ func websocketAPICostComponent(d *schema.ResourceData, u *schema.ResourceData) [
 	apiTierOneLimt := decimal.NewFromInt(1000000000)
 	apiTierTwoLimit := decimal.NewFromInt(1000000001)
 
-	if u != nil && u.Get("monthly_messages.0.value").Exists() {
-		monthlyMessages = decimal.NewFromInt(u.Get("monthly_messages.0.value").Int())
+	if u != nil && u.Get("monthly_messages").Exists() {
+		monthlyMessages = decimal.NewFromInt(u.Get("monthly_messages").Int())
 	}
 
-	if u != nil && u.Get("average_message_size.0.value").Exists() {
-		messageSize = decimal.NewFromInt(u.Get("average_message_size.0.value").Int())
+	if u != nil && u.Get("average_message_size").Exists() {
+		messageSize = decimal.NewFromInt(u.Get("average_message_size").Int())
 	}
 
 	if messageSize.GreaterThan(billableRequestSize) {

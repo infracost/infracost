@@ -11,7 +11,7 @@ type ResourceData struct {
 	ProviderName  string
 	Address       string
 	Tags          map[string]string
-	rawValues     gjson.Result
+	RawValues     gjson.Result
 	referencesMap map[string][]*ResourceData
 }
 
@@ -21,13 +21,13 @@ func NewResourceData(resourceType string, providerName string, address string, t
 		ProviderName:  providerName,
 		Address:       address,
 		Tags:          tags,
-		rawValues:     rawValues,
+		RawValues:     rawValues,
 		referencesMap: make(map[string][]*ResourceData),
 	}
 }
 
 func (d *ResourceData) Get(key string) gjson.Result {
-	return d.rawValues.Get(key)
+	return d.RawValues.Get(key)
 }
 
 func (d *ResourceData) References(key string) []*ResourceData {
@@ -42,7 +42,7 @@ func (d *ResourceData) AddReference(key string, reference *ResourceData) {
 }
 
 func (d *ResourceData) Set(key string, value interface{}) {
-	d.rawValues = AddRawValue(d.rawValues, key, value)
+	d.RawValues = AddRawValue(d.RawValues, key, value)
 }
 
 func AddRawValue(r gjson.Result, key string, v interface{}) gjson.Result {

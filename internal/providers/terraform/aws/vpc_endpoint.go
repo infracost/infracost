@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -14,7 +15,7 @@ func GetVpcEndpointRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewVpcEndpoint(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	vpcEndpointType := "Gateway"
@@ -41,8 +42,8 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 	}
 
 	var gbDataProcessed *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_data_processed.0.value").Exists() {
-		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed.0.value").Float()))
+	if u != nil && u.Get("monthly_gb_data_processed").Exists() {
+		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed").Float()))
 	}
 
 	return &schema.Resource{

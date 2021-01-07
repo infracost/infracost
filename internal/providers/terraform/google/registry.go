@@ -58,6 +58,8 @@ var FreeResources []string = []string{
 	"google_compute_url_map",
 }
 
+var UsageOnlyResources []string = []string{}
+
 // TODO: This is a list of all the google_compute* resources that may have prices:
 // compute_instance scratch_disk
 // VM instance (https://cloud.google.com/compute/vm-instance-pricing):

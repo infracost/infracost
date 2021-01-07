@@ -12,23 +12,23 @@ func GetCloudwatchLogGroupItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudwatchLogGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewCloudwatchLogGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var gbDataIngestion *decimal.Decimal
 	var gbDataStorage *decimal.Decimal
 	var gbDataScanned *decimal.Decimal
 
-	if u != nil && u.Get("monthly_gb_data_ingestion.0.value").Exists() {
-		gbDataIngestion = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_ingestion.0.value").Float()))
+	if u != nil && u.Get("monthly_gb_data_ingestion").Exists() {
+		gbDataIngestion = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_ingestion").Float()))
 	}
 
-	if u != nil && u.Get("monthly_gb_data_storage.0.value").Exists() {
-		gbDataStorage = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_storage.0.value").Float()))
+	if u != nil && u.Get("monthly_gb_data_storage").Exists() {
+		gbDataStorage = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_storage").Float()))
 	}
 
-	if u != nil && u.Get("monthly_gb_data_scanned.0.value").Exists() {
-		gbDataScanned = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_scanned.0.value").Float()))
+	if u != nil && u.Get("monthly_gb_data_scanned").Exists() {
+		gbDataScanned = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_scanned").Float()))
 	}
 
 	return &schema.Resource{

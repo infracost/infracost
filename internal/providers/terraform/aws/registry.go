@@ -10,6 +10,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetCloudwatchDashboardRegistryItem(),
 	GetCloudwatchLogGroupItem(),
 	GetCloudwatchMetricAlarmRegistryItem(),
+	GetDataTransferRegistryItem(),
 	GetDBInstanceRegistryItem(),
 	GetDMSRegistryItem(),
 	GetDocDBClusterInstanceRegistryItem(),
@@ -296,4 +297,8 @@ var FreeResources []string = []string{
 	"time_rotating",
 	"time_sleep",
 	"time_static",
+}
+
+var UsageOnlyResources []string = []string{
+	"aws_data_transfer",
 }

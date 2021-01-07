@@ -34,7 +34,7 @@ var arnAttributeMap = map[string]string{
 	"dms_replication_task":     "replication_task_arn",
 }
 
-func createResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	registryMap := GetResourceRegistryMap()
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
@@ -66,8 +66,8 @@ func createResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Reso
 	}
 }
 
-func parseJSON(j []byte) ([]*schema.Resource, error) {
-	resources := make([]*schema.Resource, 0)
+func parseJSON(j []byte, u map[string]*schema.UsageData) ([]*schema.Resource, error) {
+	resources := loadUsageFileResources(u)
 
 	if !gjson.ValidBytes(j) {
 		return resources, errors.New("invalid JSON")
@@ -84,22 +84,35 @@ func parseJSON(j []byte) ([]*schema.Resource, error) {
 	}
 
 	resData := parseResourceData(providerConf, vals, conf, vars)
+
 	parseReferences(resData, conf)
+	loadInfracostProviderUsageData(u, resData)
+	stripDataResources(resData)
 
-	resUsage := buildUsageResourceDataMap(resData)
-	if len(resUsage) > 0 {
-		config.Environment.TerraformInfracostProviderEnabled = true
-	}
-
-	resData = stripDataResources(resData)
-
-	for _, r := range resData {
-		if res := createResource(r, resUsage[r.Address]); res != nil {
-			resources = append(resources, res)
+	for _, d := range resData {
+		if r := createResource(d, u[d.Address]); r != nil {
+			resources = append(resources, r)
 		}
 	}
 
 	return resources, nil
+}
+
+func loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {
+	resources := make([]*schema.Resource, 0)
+
+	for k, v := range u {
+		for _, t := range GetUsageOnlyResources() {
+			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
+				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})
+				if r := createResource(d, v); r != nil {
+					resources = append(resources, r)
+				}
+			}
+		}
+	}
+
+	return resources
 }
 
 func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, vars gjson.Result) map[string]*schema.ResourceData {
@@ -189,7 +202,10 @@ func providerRegion(providerConf gjson.Result, vars gjson.Result, resourceType s
 
 		if region == "" {
 			region = defaultProviderRegions[providerPrefix]
-			log.Debugf("Falling back to default region (%s) for %s", region, resConf.Get("address").String())
+
+			if region != "" {
+				log.Debugf("Falling back to default region (%s) for %s", region, resConf.Get("address").String())
+			}
 		}
 	}
 
@@ -225,30 +241,40 @@ func parseRegion(providerConf gjson.Result, vars gjson.Result, providerKey strin
 	return region
 }
 
-func buildUsageResourceDataMap(resData map[string]*schema.ResourceData) map[string]*schema.ResourceData {
-	u := make(map[string]*schema.ResourceData)
+func loadInfracostProviderUsageData(u map[string]*schema.UsageData, resData map[string]*schema.ResourceData) {
+	log.Debugf("Loading usage data from Infracost provider resources")
 
 	for _, d := range resData {
 		if isInfracostResource(d) {
+			config.Environment.TerraformInfracostProviderEnabled = true
+
 			for _, ref := range d.References("resources") {
-				u[ref.Address] = d
+				if _, ok := u[ref.Address]; !ok {
+					u[ref.Address] = schema.NewUsageData(ref.Address, convertToUsageAttributes(d.RawValues))
+				} else {
+					log.Debugf("Skipping loading usage for resource %s since it has already been defined", ref.Address)
+				}
 			}
 		}
 	}
-
-	return u
 }
 
-func stripDataResources(resData map[string]*schema.ResourceData) map[string]*schema.ResourceData {
-	n := make(map[string]*schema.ResourceData)
+func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
+	a := make(map[string]gjson.Result)
 
-	for addr, d := range resData {
-		if !strings.HasPrefix(addressResourcePart(d.Address), "data.") {
-			n[addr] = d
-		}
+	for k, v := range j.Map() {
+		a[k] = v.Get("0.value")
 	}
 
-	return n
+	return a
+}
+
+func stripDataResources(resData map[string]*schema.ResourceData) {
+	for addr, d := range resData {
+		if strings.HasPrefix(addressResourcePart(d.Address), "data.") {
+			delete(resData, addr)
+		}
+	}
 }
 
 func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {

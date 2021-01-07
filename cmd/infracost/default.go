@@ -57,6 +57,11 @@ func defaultCmd() *cli.Command {
 				Usage: "Show unsupported resources, some of which might be free. Only for table and HTML output",
 				Value: false,
 			},
+			&cli.StringFlag{
+				Name:      "usage-file",
+				Usage:     "Path to Infracost usage file that specifies values for usage-based resources",
+				TakesFile: true,
+			},
 		},
 		Action: func(c *cli.Context) error {
 			if err := checkAPIKey(); err != nil {

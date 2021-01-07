@@ -12,7 +12,7 @@ func GetCloudwatchDashboardRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudwatchDashboard(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewCloudwatchDashboard(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{

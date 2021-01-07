@@ -13,7 +13,7 @@ func GetComputeSnapshotRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeSnapshot(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewComputeSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	// Not yet implemented, but added here so that the references can be used for google_compute_disk
 	return nil
 }

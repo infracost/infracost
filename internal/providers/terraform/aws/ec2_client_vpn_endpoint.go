@@ -13,7 +13,7 @@ func GetEC2ClientVPNEndpointRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewEC2ClientVPNEndpoint(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewEC2ClientVPNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	return &schema.Resource{

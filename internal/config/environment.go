@@ -29,6 +29,7 @@ type EnvironmentSpec struct {
 	TerraformVersion                    string   `json:"terraformVersion"`
 	TerraformRemoteExecutionModeEnabled bool     `json:"terraformRemoteExecutionModeEnabled"`
 	TerraformInfracostProviderEnabled   bool     `json:"terraformInfracostProviderEnabled"`
+	HasUsageFile                        bool     `json:"hasUsageFile"`
 }
 
 var Environment *EnvironmentSpec

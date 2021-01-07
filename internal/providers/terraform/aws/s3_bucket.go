@@ -16,7 +16,7 @@ func GetS3BucketRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewS3Bucket(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewS3Bucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name:           d.Address,
 		SubResources:   s3SubResources(d),

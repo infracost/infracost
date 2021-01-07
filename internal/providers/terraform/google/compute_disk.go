@@ -13,7 +13,7 @@ func GetComputeDiskRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeDisk(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewComputeDisk(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	zone := d.Get("zone").String()
