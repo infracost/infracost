@@ -13,7 +13,7 @@ func GetSQSQueueRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSqsQueue(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewSqsQueue(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var queueType string
@@ -25,14 +25,14 @@ func NewSqsQueue(d *schema.ResourceData, u *schema.ResourceData) *schema.Resourc
 	}
 
 	requestSize := decimal.NewFromInt(64)
-	if u != nil && u.Get("request_size.0.value").Exists() {
-		requestSize = decimal.NewFromInt(u.Get("request_size.0.value").Int())
+	if u != nil && u.Get("request_size").Exists() {
+		requestSize = decimal.NewFromInt(u.Get("request_size").Int())
 	}
 
 	var requests *decimal.Decimal
 
-	if u != nil && u.Get("monthly_requests.0.value").Exists() {
-		monthlyRequests := decimal.NewFromFloat(u.Get("monthly_requests.0.value").Float())
+	if u != nil && u.Get("monthly_requests").Exists() {
+		monthlyRequests := decimal.NewFromFloat(u.Get("monthly_requests").Float())
 		requests = decimalPtr(calculateRequests(requestSize, monthlyRequests))
 	}
 

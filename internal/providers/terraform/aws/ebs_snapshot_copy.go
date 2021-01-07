@@ -17,7 +17,7 @@ func GetEBSSnapshotCopyRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewEBSSnapshotCopy(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewEBSSnapshotCopy(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	gbVal := decimal.NewFromInt(int64(defaultVolumeSize))

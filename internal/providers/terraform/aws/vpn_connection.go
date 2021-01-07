@@ -13,7 +13,7 @@ func GetVPNConnectionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewVPNConnection(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewVPNConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var gbDataProcessed *decimal.Decimal
@@ -36,8 +36,8 @@ func NewVPNConnection(d *schema.ResourceData, u *schema.ResourceData) *schema.Re
 	if d.Get("transit_gateway_id").String() != "" {
 		costComponents = append(costComponents, transitGatewayAttachmentCostComponent(region, "TransitGatewayVPN"))
 
-		if u != nil && u.Get("monthly_gb_data_processed.0.value").Exists() {
-			gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed.0.value").Float()))
+		if u != nil && u.Get("monthly_gb_data_processed").Exists() {
+			gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed").Float()))
 		}
 
 		costComponents = append(costComponents, transitGatewayDataProcessingCostComponent(region, "TransitGatewayVPN", gbDataProcessed))

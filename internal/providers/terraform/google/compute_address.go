@@ -20,7 +20,7 @@ func GetComputeGlobalAddressRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeAddress(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewComputeAddress(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	addressType := d.Get("address_type").String()

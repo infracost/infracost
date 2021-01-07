@@ -17,7 +17,7 @@ func GetElastiCacheClusterItem() *schema.RegistryItem {
 	}
 }
 
-func NewElastiCacheCluster(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewElastiCacheCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var nodeType, cacheEngine string
 	var cacheNodes decimal.Decimal
 
@@ -36,7 +36,7 @@ func NewElastiCacheCluster(d *schema.ResourceData, u *schema.ResourceData) *sche
 	return newElasticacheResource(d, u, nodeType, cacheNodes, cacheEngine)
 }
 
-func newElasticacheResource(d *schema.ResourceData, u *schema.ResourceData, nodeType string, cacheNodes decimal.Decimal, cacheEngine string) *schema.Resource {
+func newElasticacheResource(d *schema.ResourceData, u *schema.UsageData, nodeType string, cacheNodes decimal.Decimal, cacheEngine string) *schema.Resource {
 	region := d.Get("region").String()
 	var backupRetention, monthlyBackupStorageTotal, snapShotRetentionLimit decimal.Decimal
 
@@ -71,7 +71,7 @@ func newElasticacheResource(d *schema.ResourceData, u *schema.ResourceData, node
 		backupRetention = snapShotRetentionLimit.Sub(decimal.NewFromInt(1))
 
 		if u != nil && u.Get("backup_storage").Exists() {
-			snapshotSize := decimal.NewFromInt(u.Get("snapshot_storage_size.0.value").Int())
+			snapshotSize := decimal.NewFromInt(u.Get("snapshot_storage_size").Int())
 			monthlyBackupStorageTotal = snapshotSize.Mul(backupRetention)
 		}
 

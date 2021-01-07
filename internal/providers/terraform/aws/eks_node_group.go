@@ -19,7 +19,7 @@ func GetNewEKSNodeGroupItem() *schema.RegistryItem {
 	}
 }
 
-func NewEKSNodeGroup(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	scalingConfig := d.Get("scaling_config").Array()[0]
 	desiredSize := scalingConfig.Get("desired_size").Int()

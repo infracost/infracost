@@ -13,18 +13,18 @@ func GetSNSTopicRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSnsTopic(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewSnsTopic(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	requestSize := decimal.NewFromInt(64)
-	if u != nil && u.Get("request_size.0.value").Exists() {
-		requestSize = decimal.NewFromFloat(u.Get("request_size.0.value").Float())
+	if u != nil && u.Get("request_size").Exists() {
+		requestSize = decimal.NewFromFloat(u.Get("request_size").Float())
 	}
 
 	var requests *decimal.Decimal
 
-	if u != nil && u.Get("monthly_requests.0.value").Exists() {
-		monthlyRequests := decimal.NewFromInt(u.Get("monthly_requests.0.value").Int())
+	if u != nil && u.Get("monthly_requests").Exists() {
+		monthlyRequests := decimal.NewFromInt(u.Get("monthly_requests").Int())
 		requests = decimalPtr(calculateRequests(requestSize, monthlyRequests))
 	}
 

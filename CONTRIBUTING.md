@@ -81,7 +81,7 @@ func GetMyResourceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewMyResource(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewMyResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	region := d.Get("region").String()
         instanceCount := 1

@@ -8,7 +8,7 @@ import (
 
 var hourToMonthMultiplier = decimal.NewFromInt(730)
 
-type ResourceFunc func(*ResourceData, *ResourceData) *Resource
+type ResourceFunc func(*ResourceData, *UsageData) *Resource
 
 type Resource struct {
 	Name           string

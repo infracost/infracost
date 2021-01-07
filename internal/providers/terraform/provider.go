@@ -16,6 +16,7 @@ import (
 	"github.com/infracost/infracost/internal/events"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/spin"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/kballard/go-shellquote"
 	"github.com/pkg/errors"
 	"golang.org/x/mod/semver"
@@ -32,6 +33,7 @@ type terraformProvider struct {
 	planFile  string
 	useState  bool
 	planFlags string
+	usageFile string
 }
 
 // New returns new Terraform Provider.
@@ -45,6 +47,7 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 	p.planFile = c.String("tfplan")
 	p.useState = c.Bool("use-tfstate")
 	p.planFlags = c.String("tfflags")
+	p.usageFile = c.String("usage-file")
 
 	if p.jsonFile != "" && p.planFile != "" {
 		return errors.New("Please provide either a Terraform Plan JSON file (tfjson) or a Terraform Plan file (tfplan)")
@@ -56,8 +59,17 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
 	var resources []*schema.Resource
 
-	var j []byte
 	var err error
+
+	u, err := usage.LoadFromFile(p.usageFile)
+	if err != nil {
+		return resources, err
+	}
+	if len(u) > 0 {
+		config.Environment.HasUsageFile = true
+	}
+
+	var j []byte
 
 	if p.useState {
 		j, err = p.generateStateJSON()
@@ -68,7 +80,7 @@ func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
 		return []*schema.Resource{}, err
 	}
 
-	resources, err = parseJSON(j)
+	resources, err = parseJSON(j, u)
 	if err != nil {
 		return resources, errors.Wrap(err, "Error parsing Terraform JSON")
 	}
@@ -81,13 +93,7 @@ func (p *terraformProvider) loadPlanJSON() ([]byte, error) {
 		return p.generatePlanJSON()
 	}
 
-	f, err := os.Open(p.jsonFile)
-	if err != nil {
-		return []byte{}, errors.Wrap(err, "Error reading Terraform plan file")
-	}
-	defer f.Close()
-
-	out, err := ioutil.ReadAll(f)
+	out, err := ioutil.ReadFile(p.jsonFile)
 	if err != nil {
 		return []byte{}, errors.Wrap(err, "Error reading Terraform plan file")
 	}

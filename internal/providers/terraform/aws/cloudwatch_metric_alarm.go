@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -13,7 +14,7 @@ func GetCloudwatchMetricAlarmRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudwatchMetricAlarm(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewCloudwatchMetricAlarm(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	costComponents := make([]*schema.CostComponent, 0)
 

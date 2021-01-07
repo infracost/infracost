@@ -16,7 +16,7 @@ func GetDBInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDBInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	deploymentOption := "Single-AZ"

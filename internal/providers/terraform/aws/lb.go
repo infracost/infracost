@@ -19,7 +19,7 @@ func GetALBRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewLB(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewLB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	costComponentName := "Application load balancer"
 	productFamily := "Load Balancer-Application"
 	if d.Get("load_balancer_type").String() == "network" {

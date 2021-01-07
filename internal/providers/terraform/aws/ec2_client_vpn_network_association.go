@@ -13,7 +13,7 @@ func GetEC2ClientVPNNetworkAssociationRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewEC2ClientVPNNetworkAssociation(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewEC2ClientVPNNetworkAssociation(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	return &schema.Resource{

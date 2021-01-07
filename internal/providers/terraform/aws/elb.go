@@ -9,7 +9,7 @@ func GetELBRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewELB(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewELB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	productFamily := "Load Balancer"
 	costComponentName := "Classic load balancer"
 	return newLBResource(d, productFamily, costComponentName)

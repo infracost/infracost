@@ -23,7 +23,7 @@ func GetComputeInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	machineType := d.Get("machine_type").String()
 	if strings.HasPrefix(machineType, "custom-") {
 		return nil

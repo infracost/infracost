@@ -13,12 +13,12 @@ func GetNATGatewayRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewNATGateway(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var gbDataProcessed *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_data_processed.0.value").Exists() {
-		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed.0.value").Float()))
+	if u != nil && u.Get("monthly_gb_data_processed").Exists() {
+		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed").Float()))
 	}
 
 	return &schema.Resource{

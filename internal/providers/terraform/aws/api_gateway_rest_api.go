@@ -12,7 +12,7 @@ func GetAPIGatewayRestAPIRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var apiTierRequests = map[string]decimal.Decimal{
@@ -24,8 +24,8 @@ func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.ResourceData) *schem
 
 	monthlyRequests := decimal.Zero
 
-	if u != nil && u.Get("monthly_requests.0.value").Exists() {
-		monthlyRequests = decimal.NewFromInt(u.Get("monthly_requests.0.value").Int())
+	if u != nil && u.Get("monthly_requests").Exists() {
+		monthlyRequests = decimal.NewFromInt(u.Get("monthly_requests").Int())
 	}
 
 	apiRequestQuantities := calculateAPIRequests(monthlyRequests, apiTierRequests)

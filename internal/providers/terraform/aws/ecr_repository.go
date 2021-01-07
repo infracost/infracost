@@ -13,13 +13,13 @@ func GetECRRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewECRRepository(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewECRRepository(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var storageSize *decimal.Decimal
 
-	if u != nil && u.Get("storage_size.0.value").Exists() {
-		storageSize = decimalPtr(decimal.NewFromFloat(u.Get("storage_size.0.value").Float()))
+	if u != nil && u.Get("storage_size").Exists() {
+		storageSize = decimalPtr(decimal.NewFromFloat(u.Get("storage_size").Float()))
 	}
 
 	return &schema.Resource{

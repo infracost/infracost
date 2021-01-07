@@ -15,7 +15,7 @@ func GetDocDBClusterInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	instanceType := d.Get("instance_class").String()

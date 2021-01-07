@@ -14,7 +14,7 @@ func GetLambdaFunctionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewLambdaFunction(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewLambdaFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	memorySize := decimal.NewFromInt(128)
@@ -23,15 +23,15 @@ func NewLambdaFunction(d *schema.ResourceData, u *schema.ResourceData) *schema.R
 	}
 
 	averageRequestDuration := decimal.NewFromInt(1)
-	if u != nil && u.Get("average_request_duration.0.value").Exists() {
-		averageRequestDuration = decimal.NewFromFloat(u.Get("average_request_duration.0.value").Float())
+	if u != nil && u.Get("average_request_duration").Exists() {
+		averageRequestDuration = decimal.NewFromFloat(u.Get("average_request_duration").Float())
 	}
 
 	var monthlyRequests *decimal.Decimal
 	var gbSeconds *decimal.Decimal
 
-	if u != nil && u.Get("monthly_requests.0.value").Exists() {
-		monthlyRequests = decimalPtr(decimal.NewFromFloat(u.Get("monthly_requests.0.value").Float()))
+	if u != nil && u.Get("monthly_requests").Exists() {
+		monthlyRequests = decimalPtr(decimal.NewFromFloat(u.Get("monthly_requests").Float()))
 		gbSeconds = decimalPtr(calculateGBSeconds(memorySize, averageRequestDuration, *monthlyRequests))
 	}
 
