@@ -6,6 +6,12 @@ then
   exit
 fi
 
+if ! command -v wget &> /dev/null
+then
+  echo "This script requires wget"
+  exit
+fi
+
 version=${1:-latest}
 if [ ! -z ${2+x} ]; then
   install_path=${2}
