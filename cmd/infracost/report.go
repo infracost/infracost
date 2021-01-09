@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
 	"strings"
 
 	"github.com/fatih/color"
@@ -67,7 +66,7 @@ EXAMPLES:
 
 				inputs = append(inputs, output.ReportInput{
 					Metadata: map[string]string{
-						"filename": path.Base(f),
+						"filename": f,
 					},
 					Root: j,
 				})
