@@ -41,7 +41,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	mixedInstanceLaunchTemplateRef := d.References("mixed_instances_policy.0.launch_template.0.launch_template_specification.0.launch_template_id")
 
 	if len(launchConfigurationRef) > 0 {
-		lc := newLaunchConfiguration(launchConfigurationRef[0].Address, launchConfigurationRef[0], region)
+		lc := newLaunchConfiguration(launchConfigurationRef[0].Address, launchConfigurationRef[0], u, region)
 
 		// AutoscalingGroup should show as not supported LaunchConfiguration is not supported
 		if lc == nil {
@@ -56,7 +56,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 			onDemandCount = decimal.Zero
 			spotCount = desiredCapacity
 		}
-		lt := newLaunchTemplate(launchTemplateRef[0].Address, launchTemplateRef[0], region, onDemandCount, spotCount)
+		lt := newLaunchTemplate(launchTemplateRef[0].Address, launchTemplateRef[0], u, region, onDemandCount, spotCount)
 
 		// AutoscalingGroup should show as not supported LaunchTemplate is not supported
 		if lt == nil {
@@ -65,7 +65,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		subResources = append(subResources, lt)
 	} else if len(mixedInstanceLaunchTemplateRef) > 0 {
 		mixedInstancesPolicy := d.Get("mixed_instances_policy.0")
-		lt := newMixedInstancesAwsLaunchTemplate(mixedInstanceLaunchTemplateRef[0].Address, mixedInstanceLaunchTemplateRef[0], region, desiredCapacity, mixedInstancesPolicy)
+		lt := newMixedInstancesAwsLaunchTemplate(mixedInstanceLaunchTemplateRef[0].Address, mixedInstanceLaunchTemplateRef[0], u, region, desiredCapacity, mixedInstancesPolicy)
 
 		// AutoscalingGroup should show as not supported LaunchTemplate is not supported
 		if lt == nil {
@@ -80,7 +80,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 }
 
-func newLaunchConfiguration(name string, d *schema.ResourceData, region string) *schema.Resource {
+func newLaunchConfiguration(name string, d *schema.ResourceData, u *schema.UsageData, region string) *schema.Resource {
 	tenancy := "Shared"
 	if d.Get("placement_tenancy").String() == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
@@ -97,7 +97,7 @@ func newLaunchConfiguration(name string, d *schema.ResourceData, region string) 
 	if d.Get("spot_price").String() != "" {
 		purchaseOption = "spot"
 	}
-	costComponents := []*schema.CostComponent{computeCostComponent(d, purchaseOption, tenancy)}
+	costComponents := []*schema.CostComponent{computeCostComponent(d, u, purchaseOption, tenancy)}
 
 	if d.Get("ebs_optimized").Bool() {
 		costComponents = append(costComponents, ebsOptimizedCostComponent(d))
@@ -120,7 +120,7 @@ func newLaunchConfiguration(name string, d *schema.ResourceData, region string) 
 	}
 }
 
-func newLaunchTemplate(name string, d *schema.ResourceData, region string, onDemandCount decimal.Decimal, spotCount decimal.Decimal) *schema.Resource {
+func newLaunchTemplate(name string, d *schema.ResourceData, u *schema.UsageData, region string, onDemandCount decimal.Decimal, spotCount decimal.Decimal) *schema.Resource {
 	tenancy := "Shared"
 	if d.Get("placement.0.tenancy").String() == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Templates", d.Address)
@@ -172,13 +172,13 @@ func newLaunchTemplate(name string, d *schema.ResourceData, region string, onDem
 	schema.MultiplyQuantities(r, totalCount)
 
 	if spotCount.GreaterThan(decimal.Zero) {
-		c := computeCostComponent(d, "spot", tenancy)
+		c := computeCostComponent(d, u, "spot", tenancy)
 		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(spotCount))
 		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
 	}
 
 	if onDemandCount.GreaterThan(decimal.Zero) {
-		c := computeCostComponent(d, "on_demand", tenancy)
+		c := computeCostComponent(d, u, "on_demand", tenancy)
 		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(onDemandCount))
 		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
 	}
@@ -186,7 +186,7 @@ func newLaunchTemplate(name string, d *schema.ResourceData, region string, onDem
 	return r
 }
 
-func newMixedInstancesAwsLaunchTemplate(name string, d *schema.ResourceData, region string, desiredCapacity decimal.Decimal, mixedInstancePolicyData gjson.Result) *schema.Resource {
+func newMixedInstancesAwsLaunchTemplate(name string, d *schema.ResourceData, u *schema.UsageData, region string, desiredCapacity decimal.Decimal, mixedInstancePolicyData gjson.Result) *schema.Resource {
 	overrideInstanceType, totalCount := getInstanceTypeAndCount(mixedInstancePolicyData, desiredCapacity)
 	if overrideInstanceType != "" {
 		d.Set("instance_type", overrideInstanceType)
@@ -194,7 +194,7 @@ func newMixedInstancesAwsLaunchTemplate(name string, d *schema.ResourceData, reg
 
 	onDemandCount, spotCount := calculateOnDemandAndSpotCounts(mixedInstancePolicyData, totalCount)
 
-	return newLaunchTemplate(name, d, region, onDemandCount, spotCount)
+	return newLaunchTemplate(name, d, u, region, onDemandCount, spotCount)
 }
 
 func elasticInferenceAcceleratorCostComponent(d *schema.ResourceData) *schema.CostComponent {

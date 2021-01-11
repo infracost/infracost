@@ -17,7 +17,8 @@ func GetInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name: "aws_instance",
 		Notes: []string{
-			"Costs associated with non-standard Linux AMIs, such as Windows and RHEL are not supported.",
+			"Costs associated with marketplace AMIs are not supported.",
+			"For non-standard Linux AMIs such as Windows and RHEL, the operating system should be specified in usage file.",
 			"EC2 detailed monitoring assumes the standard 7 metrics and the lowest tier of prices for CloudWatch.",
 			"If a root volume is not specified then an 8Gi gp2 volume is assumed.",
 		},
@@ -39,7 +40,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))
 	subResources = append(subResources, newEbsBlockDevices(d.Get("ebs_block_device"), region)...)
 
-	costComponents := []*schema.CostComponent{computeCostComponent(d, "on_demand", tenancy)}
+	costComponents := []*schema.CostComponent{computeCostComponent(d, u, "on_demand", tenancy)}
 	if d.Get("ebs_optimized").Bool() {
 		costComponents = append(costComponents, ebsOptimizedCostComponent(d))
 	}
@@ -58,7 +59,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	}
 }
 
-func computeCostComponent(d *schema.ResourceData, purchaseOption string, tenancy string) *schema.CostComponent {
+func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseOption string, tenancy string) *schema.CostComponent {
 	region := d.Get("region").String()
 	instanceType := d.Get("instance_type").String()
 
@@ -67,8 +68,31 @@ func computeCostComponent(d *schema.ResourceData, purchaseOption string, tenancy
 		"spot":      "spot",
 	}[purchaseOption]
 
+	osLabel := "Linux/UNIX"
+	operatingSystem := "Linux"
+
+	// Allow the operating system to be specified in the usage data until we can support it from the AMI directly.
+	if u != nil && u.Get("operating_system").Exists() {
+		os := strings.ToLower(u.Get("operating_system").String())
+		switch os {
+		case "windows":
+			osLabel = "Windows"
+			operatingSystem = "Windows"
+		case "rhel":
+			osLabel = "RHEL"
+			operatingSystem = "RHEL"
+		case "suse":
+			osLabel = "SUSE"
+			operatingSystem = "SUSE"
+		default:
+			if os != "linux" {
+				log.Warnf("Unrecognized operating system %s, defaulting to Linux/UNIX", os)
+			}
+		}
+	}
+
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Linux/UNIX usage (%s, %s)", purchaseOptionLabel, instanceType),
+		Name:           fmt.Sprintf("%s usage (%s, %s)", osLabel, purchaseOptionLabel, instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -80,7 +104,7 @@ func computeCostComponent(d *schema.ResourceData, purchaseOption string, tenancy
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "instanceType", Value: strPtr(instanceType)},
 				{Key: "tenancy", Value: strPtr(tenancy)},
-				{Key: "operatingSystem", Value: strPtr("Linux")},
+				{Key: "operatingSystem", Value: strPtr(operatingSystem)},
 				{Key: "preInstalledSw", Value: strPtr("NA")},
 				{Key: "capacitystatus", Value: strPtr("Used")},
 			},
