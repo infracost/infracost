@@ -15,9 +15,11 @@ while IFS= read -r planfile; do
   cd -
 done <<< "$planfiles"
 
-# Run infracost report
+# Run infracost report to merge the results
 jsonfiles=$(find . -name "infracost-out.json")
 infracost report $(echo $jsonfiles | tr '\n' ' ')
+infracost report --output html $(echo $jsonfiles | tr '\n' ' ') > infracost-report.html
+echo "Also saved HTML report in infracost-report.html"
 
 # Tidy up
 rm $(echo $planfiles | tr '\n' ' ')
