@@ -102,18 +102,22 @@ func main() {
 
 	app := &cli.App{
 		Name:  "infracost",
-		Usage: "Generate cost reports from Terraform plans",
+		Usage: "Generate cost estimates from Terraform",
 		UsageText: `infracost [global options] command [command options] [arguments...]
 
-EXAMPLES:
-	# Run infracost with a Terraform directory and var file
+USAGE METHODS:
+	# 1. Use terraform directory with any required terraform flags
 	infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
 
-	# Run infracost against a Terraform state
+	# 2. Use terraform state file
 	infracost --tfdir /path/to/code --use-tfstate
 
-	# Run infracost with a JSON Terraform plan file
-	infracost --tfjson /path/to/plan.json`,
+	# 3. Use terraform plan JSON
+	terraform plan -out plan.save .
+	terraform show -json plan.save > plan.json
+	infracost --tfjson /path/to/plan.json
+	
+DOCS: https://infracost.io/docs`,
 		EnableBashCompletion: true,
 		Version:              version.Version,
 		Flags: append([]cli.Flag{
