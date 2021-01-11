@@ -1,12 +1,5 @@
 version: v0.1
 resource_usage:
-  aws_data_transfer.us_east:
-    region: us-east-1                   # The region the data transfer is originating from
-    intra_region_gb: 1000               # The estimated data transferred between availability zones in the region
-    outbound_us_east_to_us_east_gb: 500 # The estimated data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
-    outbound_other_regions_gb: 750      # The estimated data transferred to other AWS regions.
-    outbound_internet_gb: 5000          # The estimated data transferred to the Internet.
-
   aws_api_gateway_rest_api.my_rest_api:
     monthly_requests:  100000000 # The estimated monthly requests to the Rest API Gateway.
 
@@ -23,6 +16,13 @@ resource_usage:
 
   aws_codebuild_project.my_project:
     monthly_build_minutes: 10000 # The estimated total duration of monthly codebuild execution usage in minutes.
+
+  aws_data_transfer.us_east:
+    region: us-east-1                   # The region the data transfer is originating from
+    intra_region_gb: 1000               # The estimated data transferred between availability zones in the region
+    outbound_us_east_to_us_east_gb: 500 # The estimated data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
+    outbound_other_regions_gb: 750      # The estimated data transferred to other AWS regions.
+    outbound_internet_gb: 5000          # The estimated data transferred to the Internet.
 
   aws_dx_gateway_association.my_gateway:
     monthly_gb_data_processed: 100 # The estimated GB of data processed by the DX gateway association per month.

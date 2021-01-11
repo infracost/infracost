@@ -29,17 +29,3 @@ resource "aws_lambda_function" "hello_world" {
   runtime       = "nodejs12.x"
   memory_size   = 1024                      # <<<<< Try changing this to 512 to compare costs
 }
-
-## NOTE: Terraform 0.13+ users can use the optional terraform-provider-infracost to enable estimation
-##       of usage-based resources such as Lambda. See https://www.infracost.io/docs/usage_based_resources
-terraform {
-  required_providers {
-    infracost = { source = "infracost/infracost" }
-  }
-}
-provider "infracost" {}
-data "infracost_aws_lambda_function" "hello_world" {
-  resources = [aws_lambda_function.hello_world.id]
-  monthly_requests { value = 100000000 }
-  average_request_duration { value = 250 } # <<<<< Try changing this to 100 (milliseconds) to compare costs
-}

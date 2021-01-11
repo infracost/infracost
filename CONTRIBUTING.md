@@ -13,11 +13,6 @@ Install Go dependencies:
 make deps
 ```
 
-Install latest version of terraform-provider-infracost. If you want to use a local development version, see [this](#using-a-local-version-of-terraform-provider-infracost)
-```sh
-make install_provider
-```
-
 Get an API key.
 ```sh
 make run ARGS="register"
@@ -33,7 +28,7 @@ EOF
 
 Run the code:
 ```sh
-make run ARGS="--tfdir examples/terraform"
+make run ARGS="--tfdir examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
 ```
 
 Run all tests:
@@ -49,13 +44,6 @@ make test ARGS="-v -short"
 Build:
 ```sh
 make build
-```
-
-If you want to work on the [terraform-provider-infracost repository](https://github.com/infracost/terraform-provider-infracost), you can install the local version in your `~/.terraform.d/plugins` directory by:
-```sh
-# fork/clone the repo
-cd terraform-provider-infracost
-make install
 ```
 
 ## Adding new resources
@@ -141,7 +129,6 @@ When adding your first resource, we recommend you look at one of the existing re
 
 We distinguish the **price** of a resource from its **cost**. Price is the per-unit price advertised by a cloud vendor. The cost of a resource is calculated by multiplying its price by its usage. For example, an EC2 instance might be priced at $0.02 per hour, and if run for 100 hours (its usage), it'll cost $2.00. When adding resources to Infracost, we can always show their price, but if the resource has a usage-based cost component, we can't show its cost. To solve this problem, new resources in Infracost go through two levels of support:
 
-#### Level 1 support
 You can add all price components for the resource, even ones that are usage-based, so the price column in the table output is always populated. The hourly and monthly cost for these components will show `-` as illustrated in the following output for AWS Lambda. Once this is done, please send a pull-request to this repo so someone can review/merge it. Try to re-use relevant costComponents from other resources where applicable, e.g. notice how the `newElasticacheResource` function is used in [aws_elasticache_cluster](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/elasticache_cluster.go) and [aws_elasticache_replication_group](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/elasticache_replication_group.go).
 
 Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
@@ -155,25 +142,17 @@ Please use [this pull request description](https://github.com/infracost/infracos
   Total                                                                                   -             -
   ```
 
-#### Level 2 support
-The [Infracost Terraform provider](https://github.com/infracost/terraform-provider-infracost) can be updated to add support for usage-based cost components for the new resource. This enables users to add a new data block into their Terraform file to provide usage estimates as shown below. We recommend reviewing one of the existing resources in the `terraform-provider-infracost` repo to see how it works. Once that's done, please open a pull request against the `terraform-provider-infracost` repo, and one against the `infracost` repo that uses your Terraform provider change to populate the cost fields. **Note** that we're still gathering feedback about the Infracost Terraform provider and we might change approach. We recommend that you create an issue if you'd like to work on this so we can guide you through other options that we might want to consider.
+#### Adding usage example
 
-  ```hcl
-  # Use the infracost provider to get cost estimates for Lambda requests and duration
-  data "infracost_aws_lambda_function" "hello_world_usage" {
-    resources = [aws_lambda_function.hello_world.id]
+Infracost supports passing usage data in through a usage YAML file. When adding a new resource we should add an example of how to specify the usage data in [usage-file-example.yml](/usage-file-example.yml). This should include an example resource and usage data along with comments detailing what the usage values are. Here's an example of the entry for AWS Lambda:
 
-    monthly_requests {
-      value = 100000000
-    }
-
-    average_request_duration {
-      value = 250
-    }
-  }
+  ```yaml
+  aws_lambda_function.my_function:
+    monthly_requests: 100000      # The estimated monthly requests to the Lambda function per month. See Usage values below for details on attributes.
+    average_request_duration: 500 # The estimated average duration of each request in milliseconds. See Usage values below for details on attributes.
   ```
 
-  Infracost output shows the hourly/monthly cost columns populated with non-zero values:
+When running infracost with `--usage-file=PATH/TO/USAGE/FILE.yml`, Infracost output shows the hourly/monthly cost columns populated with non-zero values:
 
   ```
   NAME                                        MONTHLY QTY  UNIT         PRICE   HOURLY COST  MONTHLY COST
@@ -222,4 +201,3 @@ The following notes are general guidelines, please leave a comment in your pull 
 4. Announce the release in the infracost-community Slack general channel. Then wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
 5. Update the docs repo with any required changes and supported resources.
 6. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
-7. If required, bump up `terraform-provider-infracost/version`, commit and `git tag vx.y.z && git push origin vx.y.z` in terraform-provider-infracost repo.
