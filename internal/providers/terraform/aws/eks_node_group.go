@@ -47,7 +47,7 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			onDemandCount = decimal.Zero
 			spotCount = decimal.NewFromInt(desiredSize)
 		}
-		lt := newLaunchTemplate(launchTemplateRef[0].Address, launchTemplateRef[0], region, onDemandCount, spotCount)
+		lt := newLaunchTemplate(launchTemplateRef[0].Address, launchTemplateRef[0], u, region, onDemandCount, spotCount)
 
 		// AutoscalingGroup should show as not supported LaunchTemplate is not supported
 		if lt == nil {

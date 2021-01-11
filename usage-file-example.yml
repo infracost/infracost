@@ -44,6 +44,9 @@ resource_usage:
   aws_ecr_repository.my_repository:
     storage: 1 # The estimated monthly ECR repository storage usage.
 
+  aws_instance.windows_instance:
+    operating_system: windows # Override the operating system of the instance. Can be: windows, suse, rhel
+
   aws_lambda_function.my_function:
     monthly_requests: 100000      # The estimated monthly requests to the Lambda function per month. See Usage values below for details on attributes.
     average_request_duration: 500 # The estimated average duration of each request in milliseconds. See Usage values below for details on attributes.
