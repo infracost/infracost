@@ -1,0 +1,77 @@
+# You can use this file to define resource usage estimates for Infracost to use when calculating
+# the cost of usage-based resource, such as AWS Lambda.
+# `infracost --usage-file /path/to/infracost-usage.yml [other flags]`
+# See https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml for available options.
+version: v0.1
+resource_usage:
+  aws_api_gateway_rest_api.my_rest_api:
+    monthly_requests:  100000000 # Estimated monthly requests to the Rest API Gateway.
+
+  aws_apigatewayv2_api.my_v2_api:
+    monthly_requests: 100000000 # Estimated monthly requests to the HTTP API Gateway.
+    average_request_size: 512   # Estimated average request size in (KB) sent to the HTTP API Gateway. Requests are metered in 512KB increments, maximum size is 10MB.
+    monthly_messages: 100000000 # Number of messages sent to the Websocket API Gateway.
+    average_message_size: 32    # Average size of the messages (KB) sent to the Websocket API Gateway. Messages are metered in 32 KB increments, maximum size is 128KB.
+
+  aws_cloudwatch_log_group.my_log_group:
+    monthly_gb_data_ingestion: 1000 # Estimated GB of data ingested by CloudWatch logs per month.
+    monthly_gb_data_storage: 1000   # Estimated GB of data stored by CloudWatch logs per month.
+    monthly_gb_data_scanned: 200    # Estimated GB of data scanned by CloudWatch logs insights per month.
+
+  aws_codebuild_project.my_project:
+    monthly_build_minutes: 10000 # Estimated total duration of monthly codebuild execution usage in minutes.
+
+  aws_data_transfer.my_region:
+    region: us-east-1                   # Region the data transfer is originating from.
+    intra_region_gb: 1000               # Estimated data transferred between availability zones in the region.
+    outbound_us_east_to_us_east_gb: 500 # Estimated data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
+    outbound_other_regions_gb: 750      # Estimated data transferred to other AWS regions.
+    outbound_internet_gb: 5000          # Estimated data transferred to the Internet.
+
+  aws_dx_gateway_association.my_gateway:
+    monthly_gb_data_processed: 100 # Estimated GB of data processed by the DX gateway association per month.
+
+  aws_dynamodb_table.my_table:
+    monthly_write_request_units: 3000000       # Estimated write request units per month in (used for on-demand DynamoDB).
+    monthly_read_request_units: 8000000        # Estimated read request units per month in (used for on-demand DynamoDB).
+    monthly_gb_data_storage: 230               # Estimated storage for tables per month in GBs.
+    monthly_gb_continuous_backup_storage: 2300 # Estimated storage for continuous backups (PITR) per month in GBs.
+    monthly_gb_on_demand_backup_storage: 460   # Estimated storage for on-demand backups per month in GBs.
+    monthly_gb_restore: 230                    # Estimated size of restored data per month in GBs.
+    monthly_gb_data_in: 10                     # Estimated size of transferred data into DynamoDB per month in GBs.
+    monthly_gb_data_out: 30                    # Estimated size of transferred data out of DynamoDB per month in GBs.
+    monthly_streams_read_request_units: 2      # Estimated streams read request units per month.
+
+  aws_ec2_transit_gateway_vpc_attachment.my_vpc_attachment:
+    monthly_gb_data_processed: 100 # Estimated GB of data processed by the EC2 transit gateway attachment(s) per month.
+
+  aws_ecr_repository.my_repository:
+    storage: 1 # Estimated monthly ECR repository storage usage.
+
+  aws_instance.windows_instance:
+    operating_system: windows # Override the operating system of the instance. Can be: windows, suse, rhel
+
+  aws_lambda_function.my_function:
+    monthly_requests: 100000      # Estimated monthly requests to the Lambda function.
+    average_request_duration: 500 # Estimated average duration of each request in milliseconds.
+
+  aws_nat_gateway.my_nat_gateway:
+    monthly_gb_data_processed: 10 # Estimated GB of data processed by the NAT Gateway per month.
+
+  aws_sns_topic.my_sns_topic:
+    monthly_requests: 1000000 # Estimated monthly requests to SNS.
+    request_size: 64          # Size of the requests to SNS, SNS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+
+  aws_sns_topic_subscription.my_topic_subscription:
+    monthly_requests: 1000000 # Estimated monthly requests to SNS.
+    request_size: 64          # Size of the requests to SNS, SNS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+
+  aws_sqs_queue.my_queue:
+    monthly_requests: 1000000 # Estimated monthly requests to SQS.
+    request_size: 64          # Size of the requests to SQS, SQS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+
+  aws_vpc_endpoint:
+    monthly_gb_data_processed: 1000 # Estimated GB of data processed by the VPC endpoint(s) per month.
+
+  aws_vpn_connection:
+    monthly_gb_data_processed: 100 # Estimated monthly data processed through a transit gateway attached to your VPN Connection.

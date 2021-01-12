@@ -17,6 +17,7 @@ tfdir=${4:-$tfdir}
 tfflags=${5:-$tfflags}
 percentage_threshold=${6:-$percentage_threshold}
 pricing_api_endpoint=${7:-$pricing_api_endpoint}
+usage_file=${8:-$usage_file}
 
 # Set defaults
 percentage_threshold=${percentage_threshold:-0}
@@ -64,6 +65,9 @@ if [ ! -z "$tfflags" ]; then
 fi
 if [ ! -z "$pricing_api_endpoint" ]; then
   infracost_cmd="$infracost_cmd --pricing-api-endpoint $pricing_api_endpoint"
+fi
+if [ ! -z "$usage_file" ]; then
+  infracost_cmd="$infracost_cmd --usage-file $usage_file"
 fi
 echo "$infracost_cmd" > infracost_cmd
 
