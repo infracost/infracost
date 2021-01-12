@@ -253,7 +253,48 @@ func TestCloudfrontDistribution(t *testing.T) {
 						},
 					},
 				},
+				{
+					Name: "Origin shield request pricing for all http methods",
+					CostComponentChecks: []testutil.CostComponentCheck{
+						{
+							Name:      "United States",
+							PriceHash: "9a59a3308256aab9256b6a421fd072d9-4a9dfd3965ffcbab75845ead7a27fd47",
+						},
+						{
+							Name:      "Europe",
+							PriceHash: "43f5e56d0b879abe92fc71f280d995fc-4a9dfd3965ffcbab75845ead7a27fd47",
+						},
+						{
+							Name:      "South America",
+							PriceHash: "224f2fff366333b0e6dfeb454010be9f-4a9dfd3965ffcbab75845ead7a27fd47",
+						},
+						{
+							Name:      "Japan",
+							PriceHash: "1169ba622705234fd01b29ed53173f2d-4a9dfd3965ffcbab75845ead7a27fd47",
+						},
+						{
+							Name:      "Australia",
+							PriceHash: "57674bc88879a321596331ff12c624fa-4a9dfd3965ffcbab75845ead7a27fd47",
+						},
+						{
+							Name:      "Singapore",
+							PriceHash: "57e69a82635268b50499099c6311b694-4a9dfd3965ffcbab75845ead7a27fd47",
+						},
+						{
+							Name:      "South Korea",
+							PriceHash: "f1f36dcbd00e0b5a78dd8134b1314350-4a9dfd3965ffcbab75845ead7a27fd47",
+						},
+						{
+							Name:      "India",
+							PriceHash: "dce9a91d009b3e40ab41d992d6009779-4a9dfd3965ffcbab75845ead7a27fd47",
+						},
+					},
+				},
 			},
+		},
+		{
+			Name:      "aws_s3_bucket.b",
+			SkipCheck: true,
 		},
 	}
 

@@ -18,6 +18,7 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *sch
 		SubResources: []*schema.Resource{
 			regionalDataOutToOrigin(u),
 			requests(u),
+			shieldRequests(u),
 		},
 	}
 }
@@ -161,6 +162,51 @@ func httpsRequests(u *schema.UsageData) *schema.Resource {
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "location", Value: strPtr(apiRegion)},
 					{Key: "requestType", Value: strPtr("CloudFront-Request-HTTPS-Proxy")},
+				},
+			},
+		})
+	}
+
+	return resource
+}
+
+func shieldRequests(u *schema.UsageData) *schema.Resource {
+	resource := &schema.Resource{
+		Name:           "Origin shield request pricing for all http methods",
+		CostComponents: []*schema.CostComponent{},
+	}
+
+	// regionMap structure is: aws grouped name -> [pricing region , usage data key]
+	regionsMap := map[string][]string{
+		"United States": {"US East (N. Virginia)", "united_states_shield_requests"},
+		"Europe":        {"EU (Frankfurt)", "europe_shield_requests"},
+		"South America": {"South America (Sao Paulo)", "south_america_shield_requests"},
+		"Japan":         {"Asia Pacific (Tokyo)", "japan_shield_requests"},
+		"Australia":     {"Asia Pacific (Sydney)", "australia_shield_requests"},
+		"Singapore":     {"Asia Pacific (Singapore)", "singapore_shield_requests"},
+		"South Korea":   {"Asia Pacific (Seoul)", "south_korea_shield_requests"},
+		"India":         {"Asia Pacific (Mumbai)", "india_shield_requests"},
+	}
+
+	for key, value := range regionsMap {
+		awsRegion := key
+		apiRegion := value[0]
+		usageKey := value[1]
+		var quantity *decimal.Decimal
+		if u != nil && u.Get(usageKey).Exists() {
+			quantity = decimalPtr(decimal.NewFromInt(u.Get(usageKey).Int()))
+		}
+		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
+			Name:            awsRegion,
+			Unit:            "requests",
+			UnitMultiplier:  10000,
+			MonthlyQuantity: quantity,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Service:    strPtr("AmazonCloudFront"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "requestDescription", Value: strPtr("Origin Shield Requests")},
+					{Key: "location", Value: strPtr(apiRegion)},
 				},
 			},
 		})
