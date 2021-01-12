@@ -144,15 +144,15 @@ Please use [this pull request description](https://github.com/infracost/infracos
 
 #### Adding usage example
 
-Infracost supports passing usage data in through a usage YAML file. When adding a new resource we should add an example of how to specify the usage data in [usage-file-example.yml](/usage-file-example.yml). This should include an example resource and usage data along with comments detailing what the usage values are. Here's an example of the entry for AWS Lambda:
+Infracost supports passing usage data in through a usage YAML file. When adding a new resource we should add an example of how to specify the usage data in [infracost-usage-example.yml](/infracost-usage-example.yml). This should include an example resource and usage data along with comments detailing what the usage values are. Here's an example of the entry for AWS Lambda:
 
   ```yaml
   aws_lambda_function.my_function:
-    monthly_requests: 100000      # The estimated monthly requests to the Lambda function per month. See Usage values below for details on attributes.
-    average_request_duration: 500 # The estimated average duration of each request in milliseconds. See Usage values below for details on attributes.
+    monthly_requests: 100000      # Estimated monthly requests to the Lambda function.
+    average_request_duration: 500 # Estimated average duration of each request in milliseconds.
   ```
 
-When running infracost with `--usage-file=PATH/TO/USAGE/FILE.yml`, Infracost output shows the hourly/monthly cost columns populated with non-zero values:
+When running infracost with `--usage-file path/to/infracost-usage.yml`, Infracost output shows the hourly/monthly cost columns populated with non-zero values:
 
   ```
   NAME                                        MONTHLY QTY  UNIT         PRICE   HOURLY COST  MONTHLY COST
