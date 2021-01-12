@@ -30,14 +30,14 @@ func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
 
 	// regionMap structure is: aws grouped name -> [pricing region , usage data key]
 	regionsMap := map[string][]string{
-		"United States, Mexico, & Canada":      []string{"United States", "united_states_data_transfer_origin_gb"},
-		"Europe & Israel":                      []string{"Europe", "europe_data_transfer_origin_gb"},
-		"South Africa, Kenya, & Middle East":   []string{"South Africa", "south_africa_data_transfer_origin_gb"},
-		"South America":                        []string{"South America", "south_america_data_transfer_origin_gb"},
-		"Japan":                                []string{"Japan", "japan_data_transfer_origin_gb"},
-		"Australia & New Zealand":              []string{"Australia", "australia_data_transfer_origin_gb"},
-		"Hong Kong, Philippines, Asia Pacific": []string{"Asia Pacific", "asia_pacific_data_transfer_origin_gb"},
-		"India":                                []string{"India", "india_data_transfer_origin_gb"},
+		"United States, Mexico, & Canada":      {"United States", "united_states_data_transfer_origin_gb"},
+		"Europe & Israel":                      {"Europe", "europe_data_transfer_origin_gb"},
+		"South Africa, Kenya, & Middle East":   {"South Africa", "south_africa_data_transfer_origin_gb"},
+		"South America":                        {"South America", "south_america_data_transfer_origin_gb"},
+		"Japan":                                {"Japan", "japan_data_transfer_origin_gb"},
+		"Australia & New Zealand":              {"Australia", "australia_data_transfer_origin_gb"},
+		"Hong Kong, Philippines, Asia Pacific": {"Asia Pacific", "asia_pacific_data_transfer_origin_gb"},
+		"India":                                {"India", "india_data_transfer_origin_gb"},
 	}
 
 	for key, value := range regionsMap {
@@ -87,14 +87,14 @@ func httpRequests(u *schema.UsageData) *schema.Resource {
 
 	// regionMap structure is: aws grouped name -> [pricing region , usage data key]
 	regionsMap := map[string][]string{
-		"United States, Mexico, & Canada":      []string{"United States", "united_states_http_requests"},
-		"Europe & Israel":                      []string{"Europe", "europe_http_requests"},
-		"South Africa, Kenya, & Middle East":   []string{"South Africa", "south_africa_http_requests"},
-		"South America":                        []string{"South America", "south_america_http_requests"},
-		"Japan":                                []string{"Japan", "japan_http_requests"},
-		"Australia & New Zealand":              []string{"Australia", "australia_http_requests"},
-		"Hong Kong, Philippines, Asia Pacific": []string{"Asia Pacific", "asia_pacific_http_requests"},
-		"India":                                []string{"India", "india_http_requests"},
+		"United States, Mexico, & Canada":      {"United States", "united_states_http_requests"},
+		"Europe & Israel":                      {"Europe", "europe_http_requests"},
+		"South Africa, Kenya, & Middle East":   {"South Africa", "south_africa_http_requests"},
+		"South America":                        {"South America", "south_america_http_requests"},
+		"Japan":                                {"Japan", "japan_http_requests"},
+		"Australia & New Zealand":              {"Australia", "australia_http_requests"},
+		"Hong Kong, Philippines, Asia Pacific": {"Asia Pacific", "asia_pacific_http_requests"},
+		"India":                                {"India", "india_http_requests"},
 	}
 
 	for key, value := range regionsMap {
@@ -132,14 +132,14 @@ func httpsRequests(u *schema.UsageData) *schema.Resource {
 
 	// regionMap structure is: aws grouped name -> [pricing region , usage data key]
 	regionsMap := map[string][]string{
-		"United States, Mexico, & Canada":      []string{"United States", "united_states_https_requests"},
-		"Europe & Israel":                      []string{"Europe", "europe_https_requests"},
-		"South Africa, Kenya, & Middle East":   []string{"South Africa", "south_africa_https_requests"},
-		"South America":                        []string{"South America", "south_america_https_requests"},
-		"Japan":                                []string{"Japan", "japan_https_requests"},
-		"Australia & New Zealand":              []string{"Australia", "australia_https_requests"},
-		"Hong Kong, Philippines, Asia Pacific": []string{"Asia Pacific", "asia_pacific_https_requests"},
-		"India":                                []string{"India", "india_https_requests"},
+		"United States, Mexico, & Canada":      {"United States", "united_states_https_requests"},
+		"Europe & Israel":                      {"Europe", "europe_https_requests"},
+		"South Africa, Kenya, & Middle East":   {"South Africa", "south_africa_https_requests"},
+		"South America":                        {"South America", "south_america_https_requests"},
+		"Japan":                                {"Japan", "japan_https_requests"},
+		"Australia & New Zealand":              {"Australia", "australia_https_requests"},
+		"Hong Kong, Philippines, Asia Pacific": {"Asia Pacific", "asia_pacific_https_requests"},
+		"India":                                {"India", "india_https_requests"},
 	}
 
 	for key, value := range regionsMap {
