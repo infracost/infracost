@@ -53,6 +53,9 @@ func NewSqsQueue(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 						{Key: "queueType", Value: strPtr(queueType)},
 					},
 				},
+				PriceFilter: &schema.PriceFilter{
+					StartUsageAmount: strPtr("0"),
+				},
 			},
 		},
 	}
