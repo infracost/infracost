@@ -201,3 +201,5 @@ The following notes are general guidelines, please leave a comment in your pull 
 4. Announce the release in the infracost-community Slack general channel. Then wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
 5. Update the docs repo with any required changes and supported resources.
 6. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
+
+If a new flag/feature is added that requires CI support, update the 9 repos mentioned in https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts. For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.
