@@ -174,6 +174,85 @@ func TestCloudfrontDistribution(t *testing.T) {
 						},
 					},
 				},
+				{
+					Name: "Request pricing for all http methods",
+					SubResourceChecks: []testutil.ResourceCheck{
+						{
+							Name: "HTTP requests",
+							CostComponentChecks: []testutil.CostComponentCheck{
+								{
+									Name:      "United States, Mexico, & Canada",
+									PriceHash: "6e7bb9693c7bdc3c1b09a5ad0cd11a4a-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "Europe & Israel",
+									PriceHash: "f81d8aa74fae2d32a4149a85920f3255-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "South Africa, Kenya, & Middle East",
+									PriceHash: "c64d2813fa3777ace1a1006389217239-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "South America",
+									PriceHash: "f0243692bd53ed2cef6ed6445b0c5683-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "Japan",
+									PriceHash: "681d410b9400be8fb5e7e2d1b089d159-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "Australia & New Zealand",
+									PriceHash: "4e86dc6c95675a4c8dd4ac876a30ab3c-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "Hong Kong, Philippines, Asia Pacific",
+									PriceHash: "871d73c17fc8c93de0ccdbc2c9c470d7-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "India",
+									PriceHash: "2632f4cda76bc34285fb6cd5fb894ee4-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+							},
+						},
+						{
+							Name: "HTTPS requests",
+							CostComponentChecks: []testutil.CostComponentCheck{
+								{
+									Name:      "United States, Mexico, & Canada",
+									PriceHash: "8890fabb60883960c9178fe0e753e47e-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "Europe & Israel",
+									PriceHash: "63c72b02594fc500d149b54e4248e38b-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "South Africa, Kenya, & Middle East",
+									PriceHash: "a1527c0b56940465cf2a5eabf97e45f0-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "South America",
+									PriceHash: "3388ba97d6c8373e5c6de6ff51b431af-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "Japan",
+									PriceHash: "3f75cf910bfbe3e47bbff04ed01e3986-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "Australia & New Zealand",
+									PriceHash: "358f87101e7deff58a09cc76e1de7bd3-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "Hong Kong, Philippines, Asia Pacific",
+									PriceHash: "1931ee7f0715a77116c6c4a7e1eecf49-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+								{
+									Name:      "India",
+									PriceHash: "0a703a33e830797459e6a0226336bb19-4a9dfd3965ffcbab75845ead7a27fd47",
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
