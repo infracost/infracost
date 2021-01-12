@@ -66,8 +66,8 @@ func createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 }
 
-func parseJSON(j []byte, u map[string]*schema.UsageData) ([]*schema.Resource, error) {
-	resources := loadUsageFileResources(u)
+func parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
+	resources := loadUsageFileResources(usage)
 
 	if !gjson.ValidBytes(j) {
 		return resources, errors.New("invalid JSON")
@@ -86,11 +86,11 @@ func parseJSON(j []byte, u map[string]*schema.UsageData) ([]*schema.Resource, er
 	resData := parseResourceData(providerConf, vals, conf, vars)
 
 	parseReferences(resData, conf)
-	loadInfracostProviderUsageData(u, resData)
+	loadInfracostProviderUsageData(usage, resData)
 	stripDataResources(resData)
 
 	for _, d := range resData {
-		if r := createResource(d, u[d.Address]); r != nil {
+		if r := createResource(d, usage[d.Address]); r != nil {
 			resources = append(resources, r)
 		}
 	}

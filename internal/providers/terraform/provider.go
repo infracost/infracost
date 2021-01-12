@@ -16,7 +16,6 @@ import (
 	"github.com/infracost/infracost/internal/events"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/spin"
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/kballard/go-shellquote"
 	"github.com/pkg/errors"
 	"golang.org/x/mod/semver"
@@ -56,19 +55,10 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 	return nil
 }
 
-func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
+func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
 	var resources []*schema.Resource
 
 	var err error
-
-	u, err := usage.LoadFromFile(p.usageFile)
-	if err != nil {
-		return resources, err
-	}
-	if len(u) > 0 {
-		config.Environment.HasUsageFile = true
-	}
-
 	var j []byte
 
 	if p.useState {
@@ -80,7 +70,7 @@ func (p *terraformProvider) LoadResources() ([]*schema.Resource, error) {
 		return []*schema.Resource{}, err
 	}
 
-	resources, err = parseJSON(j, u)
+	resources, err = parseJSON(j, usage)
 	if err != nil {
 		return resources, errors.Wrap(err, "Error parsing Terraform JSON")
 	}

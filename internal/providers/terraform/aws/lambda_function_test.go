@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
@@ -41,7 +42,7 @@ func TestLambdaFunction(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
 
 func TestLambdaFunction_usage(t *testing.T) {
@@ -63,19 +64,18 @@ func TestLambdaFunction_usage(t *testing.T) {
 			handler       = "exports.test"
 			runtime       = "nodejs12.x"
 			memory_size   = 512
-		}
-
-		data "infracost_aws_lambda_function" "lambda" {
-		  resources = [aws_lambda_function.lambda.id, aws_lambda_function.lambda_512_mem.id]
-
-			monthly_requests {
-				value = 100000
-			}
-
-			average_request_duration {
-				value = 350
-			}
 		}`
+
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_lambda_function.lambda": map[string]interface{}{
+			"monthly_requests":         100000,
+			"average_request_duration": 350,
+		},
+		"aws_lambda_function.lambda_512_mem": map[string]interface{}{
+			"monthly_requests":         100000,
+			"average_request_duration": 350,
+		},
+	})
 
 	requestCheck := testutil.CostComponentCheck{
 		Name:            "Requests",
@@ -108,5 +108,5 @@ func TestLambdaFunction_usage(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }

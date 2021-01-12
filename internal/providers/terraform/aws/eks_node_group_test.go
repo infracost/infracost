@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 	"github.com/shopspring/decimal"
 
@@ -20,7 +21,7 @@ func TestEKSNodeGroup_default(t *testing.T) {
 		node_group_name = "example"
 		node_role_arn   = "node_role_arn"
 		subnet_ids      = ["subnet_id"]
-	
+
 		scaling_config {
 			desired_size = 1
 			max_size     = 1
@@ -51,7 +52,7 @@ func TestEKSNodeGroup_default(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 
 }
 
@@ -68,7 +69,7 @@ func TestEKSNodeGroup_disk_size_instance_type(t *testing.T) {
 		node_role_arn   = "node_role_arn"
 		disk_size 			= 30
 		subnet_ids      = ["subnet_id"]
-	
+
 		scaling_config {
 			desired_size = 1
 			max_size     = 1
@@ -94,7 +95,7 @@ func TestEKSNodeGroup_disk_size_instance_type(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 
 }
 
@@ -109,73 +110,73 @@ func TestEKSNodeGroup_launch_template(t *testing.T) {
 		node_group_name = "example"
 		node_role_arn   = "node_role_arn"
 		subnet_ids      = ["subnet_id"]
-	
+
 		scaling_config {
 			desired_size = 3
 			max_size     = 1
 			min_size     = 1
 		}
-	
+
 		launch_template {
 			id      = aws_launch_template.foo.id
 			version = "default_version"
 		}
 	}
-	
+
 	resource "aws_launch_template" "foo" {
 		name = "foo"
-	
+
 		block_device_mappings {
 			device_name = "/dev/sda1"
-	
+
 			ebs {
 				volume_size = 20
 			}
 		}
-	
+
 		capacity_reservation_specification {
 			capacity_reservation_preference = "open"
 		}
-	
+
 		cpu_options {
 			core_count       = 4
 			threads_per_core = 2
 		}
-	
+
 		credit_specification {
 			cpu_credits = "standard"
 		}
-	
+
 		disable_api_termination = true
-	
+
 		ebs_optimized = true
-	
+
 		elastic_gpu_specifications {
 			type = "test"
 		}
-	
+
 		elastic_inference_accelerator {
 			type = "eia1.medium"
 		}
-	
+
 		iam_instance_profile {
 			name = "test"
 		}
-	
+
 		image_id = "ami-test"
-	
+
 		instance_initiated_shutdown_behavior = "terminate"
-		
+
 		instance_type = "m5.xlarge"
-	
+
 		kernel_id = "test"
-	
+
 		key_name = "test"
-	
+
 		license_specification {
 			license_configuration_arn = "arn:aws:license-manager:eu-west-1:123456789012:license-configuration:lic-0123456789abcdef0123456789abcdef"
 		}
-	
+
 		metadata_options {
 			http_endpoint               = "enabled"
 			http_tokens                 = "required"
@@ -185,15 +186,15 @@ func TestEKSNodeGroup_launch_template(t *testing.T) {
 		network_interfaces {
 			associate_public_ip_address = true
 		}
-	
+
 		placement {
 			availability_zone = "us-west-2a"
 		}
-	
+
 		ram_disk_id = "test"
-	
+
 		vpc_security_group_ids = ["example"]
-	
+
 	}
 	`
 
@@ -248,7 +249,7 @@ func TestEKSNodeGroup_launch_template(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 
 }
 
@@ -263,73 +264,73 @@ func TestEKSNodeGroup_launch_template_by_name(t *testing.T) {
 		node_group_name = "example"
 		node_role_arn   = "node_role_arn"
 		subnet_ids      = ["subnet_id"]
-	
+
 		scaling_config {
 			desired_size = 3
 			max_size     = 1
 			min_size     = 1
 		}
-	
+
 		launch_template {
 			name      = aws_launch_template.foo.name
 			version = "default_version"
 		}
 	}
-	
+
 	resource "aws_launch_template" "foo" {
 		name = "foo"
-	
+
 		block_device_mappings {
 			device_name = "/dev/sda1"
-	
+
 			ebs {
 				volume_size = 20
 			}
 		}
-	
+
 		capacity_reservation_specification {
 			capacity_reservation_preference = "open"
 		}
-	
+
 		cpu_options {
 			core_count       = 4
 			threads_per_core = 2
 		}
-	
+
 		credit_specification {
 			cpu_credits = "standard"
 		}
-	
+
 		disable_api_termination = true
-	
+
 		ebs_optimized = true
-	
+
 		elastic_gpu_specifications {
 			type = "test"
 		}
-	
+
 		elastic_inference_accelerator {
 			type = "eia1.medium"
 		}
-	
+
 		iam_instance_profile {
 			name = "test"
 		}
-	
+
 		image_id = "ami-test"
-	
+
 		instance_initiated_shutdown_behavior = "terminate"
-		
+
 		instance_type = "m5.xlarge"
-	
+
 		kernel_id = "test"
-	
+
 		key_name = "test"
-	
+
 		license_specification {
 			license_configuration_arn = "arn:aws:license-manager:eu-west-1:123456789012:license-configuration:lic-0123456789abcdef0123456789abcdef"
 		}
-	
+
 		metadata_options {
 			http_endpoint               = "enabled"
 			http_tokens                 = "required"
@@ -339,15 +340,15 @@ func TestEKSNodeGroup_launch_template_by_name(t *testing.T) {
 		network_interfaces {
 			associate_public_ip_address = true
 		}
-	
+
 		placement {
 			availability_zone = "us-west-2a"
 		}
-	
+
 		ram_disk_id = "test"
-	
+
 		vpc_security_group_ids = ["example"]
-	
+
 	}
 	`
 
@@ -402,6 +403,6 @@ func TestEKSNodeGroup_launch_template_by_name(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 
 }
