@@ -12,7 +12,7 @@ func GetCloudfrontDistributionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name: d.Address,
 		SubResources: []*schema.Resource{
@@ -22,7 +22,7 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.ResourceData) *
 	}
 }
 
-func regionalDataOutToOrigin(u *schema.ResourceData) *schema.Resource {
+func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
 	resource := &schema.Resource{
 		Name:           "Regional data transfer out to origin",
 		CostComponents: []*schema.CostComponent{},
@@ -67,7 +67,7 @@ func regionalDataOutToOrigin(u *schema.ResourceData) *schema.Resource {
 	return resource
 }
 
-func requests(u *schema.ResourceData) *schema.Resource {
+func requests(u *schema.UsageData) *schema.Resource {
 	resource := &schema.Resource{
 		Name: "Request pricing for all http methods",
 		SubResources: []*schema.Resource{
@@ -79,7 +79,7 @@ func requests(u *schema.ResourceData) *schema.Resource {
 	return resource
 }
 
-func httpRequests(u *schema.ResourceData) *schema.Resource {
+func httpRequests(u *schema.UsageData) *schema.Resource {
 	resource := &schema.Resource{
 		Name:         "HTTP requests",
 		SubResources: []*schema.Resource{},
@@ -124,7 +124,7 @@ func httpRequests(u *schema.ResourceData) *schema.Resource {
 	return resource
 }
 
-func httpsRequests(u *schema.ResourceData) *schema.Resource {
+func httpsRequests(u *schema.UsageData) *schema.Resource {
 	resource := &schema.Resource{
 		Name:         "HTTPS requests",
 		SubResources: []*schema.Resource{},
