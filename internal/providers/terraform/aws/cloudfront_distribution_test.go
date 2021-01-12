@@ -138,7 +138,7 @@ func TestCloudfrontDistribution(t *testing.T) {
 			Name: "aws_cloudfront_distribution.s3_distribution",
 			SubResourceChecks: []testutil.ResourceCheck{
 				{
-					Name: "Regional Data Transfer Out to Origin",
+					Name: "Regional data transfer out to origin",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
 							Name:      "United States, Mexico, & Canada",
@@ -165,7 +165,7 @@ func TestCloudfrontDistribution(t *testing.T) {
 							PriceHash: "80125f460392b4b600eb5954de37e913-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
-							Name:      "Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand",
+							Name:      "Hong Kong, Philippines, Asia Pacific",
 							PriceHash: "63a411ecbb6d084a9e9c15b49c4a3ec9-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{

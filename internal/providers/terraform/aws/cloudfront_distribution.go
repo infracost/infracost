@@ -23,20 +23,20 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.ResourceData) *
 
 func regionalDataOutToOrigin(u *schema.ResourceData) *schema.Resource {
 	resource := &schema.Resource{
-		Name:           "Regional Data Transfer Out to Origin",
+		Name:           "Regional data transfer out to origin",
 		CostComponents: []*schema.CostComponent{},
 	}
 
 	// regionMap structure is: aws grouped name -> [pricing region , usage data key]
 	regionsMap := map[string][]string{
-		"United States, Mexico, & Canada":    []string{"United States", "united_states_data_transfer_origin_gb"},
-		"Europe & Israel":                    []string{"Europe", "europe_data_transfer_origin_gb"},
-		"South Africa, Kenya, & Middle East": []string{"South Africa", "south_africa_data_transfer_origin_gb"},
-		"South America":                      []string{"South America", "south_america_data_transfer_origin_gb"},
-		"Japan":                              []string{"Japan", "japan_data_transfer_origin_gb"},
-		"Australia & New Zealand":            []string{"Australia", "australia_data_transfer_origin_gb"},
-		"Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand": []string{"Asia Pacific", "asia_pacific_data_transfer_origin_gb"},
-		"India": []string{"India", "india_data_transfer_origin_gb"},
+		"United States, Mexico, & Canada":      []string{"United States", "united_states_data_transfer_origin_gb"},
+		"Europe & Israel":                      []string{"Europe", "europe_data_transfer_origin_gb"},
+		"South Africa, Kenya, & Middle East":   []string{"South Africa", "south_africa_data_transfer_origin_gb"},
+		"South America":                        []string{"South America", "south_america_data_transfer_origin_gb"},
+		"Japan":                                []string{"Japan", "japan_data_transfer_origin_gb"},
+		"Australia & New Zealand":              []string{"Australia", "australia_data_transfer_origin_gb"},
+		"Hong Kong, Philippines, Asia Pacific": []string{"Asia Pacific", "asia_pacific_data_transfer_origin_gb"},
+		"India":                                []string{"India", "india_data_transfer_origin_gb"},
 	}
 
 	for key, value := range regionsMap {
