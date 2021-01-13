@@ -20,11 +20,17 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 
 	vpcEndpointType := "Gateway"
 
+	vpcEndpointInterfaces := 1
+
 	var endpointHours string
 	var endpointBytes string
 
 	if d.Get("vpc_endpoint_type").Exists() {
 		vpcEndpointType = d.Get("vpc_endpoint_type").String()
+	}
+
+	if len(d.Get("subnet_ids").Array()) > 1 {
+		vpcEndpointInterfaces = len(d.Get("subnet_ids").Array())
 	}
 
 	// Gateway endpoints don't have a cost associated with them
@@ -53,7 +59,7 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 				Name:           fmt.Sprintf("%s endpoint", vpcEndpointType),
 				Unit:           "hours",
 				UnitMultiplier: 1,
-				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+				HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(vpcEndpointInterfaces))),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(region),
