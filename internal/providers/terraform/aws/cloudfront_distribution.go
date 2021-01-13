@@ -29,12 +29,12 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *sch
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
-			invalidationURLs(u),
 			encryptionRequests(u),
 			realtimeLogs(u),
 			customSSLCertificate(u),
 		},
 		SubResources: []*schema.Resource{
+			invalidationURLs(u),
 			regionalDataOutToInternet(u),
 			regionalDataOutToOrigin(u),
 			requests(u),
@@ -525,25 +525,54 @@ func shieldRequests(u *schema.UsageData) *schema.Resource {
 	return resource
 }
 
-func invalidationURLs(u *schema.UsageData) *schema.CostComponent {
-	var quantity *decimal.Decimal
+func invalidationURLs(u *schema.UsageData) *schema.Resource {
+	var freeQuantity *decimal.Decimal
+	var paidQuantity *decimal.Decimal
 	if u != nil && u.Get("invalidation_requests").Exists() {
-		quantity = decimalPtr(decimal.NewFromInt(u.Get("invalidation_requests").Int()))
+		usageAmount := u.Get("invalidation_requests").Int()
+		if usageAmount > 1000 {
+			freeQuantity = decimalPtr(decimal.NewFromInt(1000))
+			paidQuantity = decimalPtr(decimal.NewFromInt(usageAmount - 1000))
+		} else {
+			freeQuantity = decimalPtr(decimal.NewFromInt(usageAmount))
+		}
 	}
-	return &schema.CostComponent{
-		Name:            "Invalidation requests",
-		Unit:            "urls",
-		UnitMultiplier:  1,
-		MonthlyQuantity: quantity,
-		ProductFilter: &schema.ProductFilter{
-			VendorName: strPtr("aws"),
-			Service:    strPtr("AmazonCloudFront"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("Invalidations")},
+
+	return &schema.Resource{
+		Name: "Invalidation requests",
+		CostComponents: []*schema.CostComponent{
+			{
+				Name:            "First 1000 urls",
+				Unit:            "urls",
+				UnitMultiplier:  1,
+				MonthlyQuantity: freeQuantity,
+				ProductFilter: &schema.ProductFilter{
+					VendorName: strPtr("aws"),
+					Service:    strPtr("AmazonCloudFront"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "usagetype", Value: strPtr("Invalidations")},
+					},
+				},
+				PriceFilter: &schema.PriceFilter{
+					StartUsageAmount: strPtr("0"),
+				},
 			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			StartUsageAmount: strPtr("1000"),
+			{
+				Name:            "Over 1000 urls",
+				Unit:            "urls",
+				UnitMultiplier:  1,
+				MonthlyQuantity: paidQuantity,
+				ProductFilter: &schema.ProductFilter{
+					VendorName: strPtr("aws"),
+					Service:    strPtr("AmazonCloudFront"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "usagetype", Value: strPtr("Invalidations")},
+					},
+				},
+				PriceFilter: &schema.PriceFilter{
+					StartUsageAmount: strPtr("1000"),
+				},
+			},
 		},
 	}
 }

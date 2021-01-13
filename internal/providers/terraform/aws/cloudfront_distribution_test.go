@@ -138,10 +138,6 @@ func TestCloudfrontDistribution(t *testing.T) {
 			Name: "aws_cloudfront_distribution.s3_distribution",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Invalidation requests",
-					PriceHash: "a38b0d76c23fe5c7e80d44fe2950d154-a71f166085a0bf987715473b95588268",
-				},
-				{
 					Name:      "Field level encryption requests",
 					PriceHash: "23b94d89fdbc6e2e4ba62367419e8b3d-4a9dfd3965ffcbab75845ead7a27fd47",
 				},
@@ -155,6 +151,19 @@ func TestCloudfrontDistribution(t *testing.T) {
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name: "Invalidation requests",
+					CostComponentChecks: []testutil.CostComponentCheck{
+						{
+							Name:      "First 1000 urls",
+							PriceHash: "a38b0d76c23fe5c7e80d44fe2950d154-a71f166085a0bf987715473b95588268",
+						},
+						{
+							Name:      "Over 1000 urls",
+							PriceHash: "a38b0d76c23fe5c7e80d44fe2950d154-a71f166085a0bf987715473b95588268",
+						},
+					},
+				},
 				{
 					Name: "Regional data transfer out to internet",
 					SubResourceChecks: []testutil.ResourceCheck{
