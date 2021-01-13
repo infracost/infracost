@@ -19,6 +19,7 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *sch
 			invalidationURLs(u),
 			encryptionRequests(u),
 			realtimeLogs(u),
+			customSSLCertificate(u),
 		},
 		SubResources: []*schema.Resource{
 			regionalDataOutToOrigin(u),
@@ -279,6 +280,26 @@ func realtimeLogs(u *schema.UsageData) *schema.CostComponent {
 			Service:    strPtr("AmazonCloudFront"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "operation", Value: strPtr("RealTimeLog")},
+			},
+		},
+	}
+}
+
+func customSSLCertificate(u *schema.UsageData) *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if u != nil && u.Get("custom_ssl_certificates").Exists() {
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("custom_ssl_certificates").Int()))
+	}
+	return &schema.CostComponent{
+		Name:            "Dedicated ip custom ssl",
+		Unit:            "certificate-months",
+		UnitMultiplier:  1,
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Service:    strPtr("AmazonCloudFront"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("SSL-Cert-Custom")},
 			},
 		},
 	}

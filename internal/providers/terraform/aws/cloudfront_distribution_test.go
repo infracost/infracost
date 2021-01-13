@@ -149,6 +149,10 @@ func TestCloudfrontDistribution(t *testing.T) {
 					Name:      "Real-time log requests",
 					PriceHash: "d2263008404d6c3cfe3f3ad047842cea-361e966330f27dcb2d64319ce0c579cf",
 				},
+				{
+					Name:      "Dedicated ip custom ssl",
+					PriceHash: "e15ddcbddbedf5da838718e496f3f9de-a9191d0a7972a4ac9c0e44b9ea6310bb",
+				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
 				{
