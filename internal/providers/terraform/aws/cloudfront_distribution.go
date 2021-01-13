@@ -18,6 +18,7 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *sch
 		CostComponents: []*schema.CostComponent{
 			invalidationURLs(u),
 			encryptionRequests(u),
+			realtimeLogs(u),
 		},
 		SubResources: []*schema.Resource{
 			regionalDataOutToOrigin(u),
@@ -258,6 +259,26 @@ func encryptionRequests(u *schema.UsageData) *schema.CostComponent {
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "requestDescription", Value: strPtr("HTTPS Proxy requests with Field Level Encryption")},
 				{Key: "location", Value: strPtr("Europe")},
+			},
+		},
+	}
+}
+
+func realtimeLogs(u *schema.UsageData) *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if u != nil && u.Get("log_lines").Exists() {
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("log_lines").Int()))
+	}
+	return &schema.CostComponent{
+		Name:            "Real-time log requests",
+		Unit:            "lines",
+		UnitMultiplier:  1000000,
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Service:    strPtr("AmazonCloudFront"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "operation", Value: strPtr("RealTimeLog")},
 			},
 		},
 	}
