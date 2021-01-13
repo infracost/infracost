@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -22,11 +24,111 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *sch
 			customSSLCertificate(u),
 		},
 		SubResources: []*schema.Resource{
+			regionalDataOutToInternet(u),
 			regionalDataOutToOrigin(u),
 			requests(u),
 			shieldRequests(u),
 		},
 	}
+}
+
+func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
+	resource := &schema.Resource{
+		Name:         "Regional data transfer out to internet",
+		SubResources: []*schema.Resource{},
+	}
+
+	// regionMap structure is: aws grouped name -> [pricing region , usage data key]
+	regionsMap := map[string][]string{
+		"United States, Mexico, & Canada":      {"United States", "united_states_data_transfer_internet_gb"},
+		"Europe & Israel":                      {"Europe", "europe_data_transfer_internet_gb"},
+		"South Africa, Kenya, & Middle East":   {"South Africa", "south_africa_data_transfer_internet_gb"},
+		"South America":                        {"South America", "south_america_data_transfer_internet_gb"},
+		"Japan":                                {"Japan", "japan_data_transfer_internet_gb"},
+		"Australia & New Zealand":              {"Australia", "australia_data_transfer_internet_gb"},
+		"Hong Kong, Philippines, Asia Pacific": {"Asia Pacific", "asia_pacific_data_transfer_internet_gb"},
+		"India":                                {"India", "india_data_transfer_internet_gb"},
+	}
+
+	endUsageAmounts := map[int64]string{
+		10240:   "First 10TB",
+		51200:   "Next 40TB",
+		153600:  "Next 100TB",
+		512000:  "Next 350TB",
+		1048576: "Next 524TB",
+		5242880: "Next 4PB",
+		0:       "Over 5PB",
+	}
+
+	// Because india has different usage amounts
+	indiaEndUsageAmounts := map[int64]string{
+		10240:  "First 10TB",
+		51200:  "Next 40TB",
+		153600: "Next 100TB",
+		0:      "Over 150TB",
+	}
+
+	for key, value := range regionsMap {
+		awsRegion := key
+		apiRegion := value[0]
+		usageKey := value[1]
+
+		var usage int64
+		var used int64
+		var lastEndUsageAmount int64
+		if u != nil && u.Get(usageKey).Exists() {
+			usage = u.Get(usageKey).Int()
+		}
+
+		regionResource := &schema.Resource{
+			Name:           awsRegion,
+			CostComponents: []*schema.CostComponent{},
+		}
+
+		selectedUsageAmounts := endUsageAmounts
+		if apiRegion == "India" {
+			selectedUsageAmounts = indiaEndUsageAmounts
+		}
+		for endUsageAmount, usageName := range selectedUsageAmounts {
+			var quantity *decimal.Decimal
+			if endUsageAmount != 0 && usage >= endUsageAmount {
+				used = endUsageAmount - used
+				lastEndUsageAmount = endUsageAmount
+				quantity = decimalPtr(decimal.NewFromInt(used))
+			} else {
+				used = usage - lastEndUsageAmount
+				quantity = decimalPtr(decimal.NewFromInt(used))
+			}
+			var usageFilter string
+			if endUsageAmount != 0 {
+				usageFilter = fmt.Sprint(endUsageAmount)
+			} else {
+				usageFilter = "Inf"
+			}
+			regionResource.CostComponents = append(regionResource.CostComponents, &schema.CostComponent{
+				Name:            usageName,
+				Unit:            "GB",
+				UnitMultiplier:  1,
+				MonthlyQuantity: quantity,
+				ProductFilter: &schema.ProductFilter{
+					VendorName: strPtr("aws"),
+					Service:    strPtr("AmazonCloudFront"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "transferType", Value: strPtr("CloudFront Outbound")},
+						{Key: "fromLocation", Value: strPtr(apiRegion)},
+					},
+				},
+				PriceFilter: &schema.PriceFilter{
+					EndUsageAmount: strPtr(usageFilter),
+				},
+			})
+		}
+
+		resource.SubResources = append(resource.SubResources, regionResource)
+
+	}
+
+	return resource
 }
 
 func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
