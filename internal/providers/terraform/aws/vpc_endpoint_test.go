@@ -17,15 +17,15 @@ func TestVpcEndpoint(t *testing.T) {
 
 	tf := `
 		resource "aws_vpc_endpoint" "interface" {
-            service_name = "com.amazonaws.region.ec2"
-            vpc_id = "vpc-123456"
-            vpc_endpoint_type = "Interface"
+			service_name = "com.amazonaws.region.ec2"
+			vpc_id = "vpc-123456"
+			vpc_endpoint_type = "Interface"
 		}
 
 		resource "aws_vpc_endpoint" "gateway_loadbalancer" {
-            service_name = "com.amazonaws.region.ec2"
-            vpc_id = "vpc-123456"
-            vpc_endpoint_type = "GatewayLoadBalancer"
+			service_name = "com.amazonaws.region.ec2"
+			vpc_id = "vpc-123456"
+			vpc_endpoint_type = "GatewayLoadBalancer"
 		}
 
 		resource "aws_vpc_endpoint" "multiple_interfaces" {
@@ -34,7 +34,7 @@ func TestVpcEndpoint(t *testing.T) {
 			vpc_endpoint_type = "Interface"
 			subnet_ids = [
 				"subnet-123456",
-    			"subnet-654321"
+				"subnet-654321"
 			]
 		}
 `
