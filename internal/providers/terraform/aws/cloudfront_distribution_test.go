@@ -143,7 +143,7 @@ func TestCloudfrontDistribution(t *testing.T) {
 				},
 				{
 					Name:      "Field level encryption requests",
-					PriceHash: "0d5deb3b37fc036565563762f71d43b5-4a9dfd3965ffcbab75845ead7a27fd47",
+					PriceHash: "23b94d89fdbc6e2e4ba62367419e8b3d-4a9dfd3965ffcbab75845ead7a27fd47",
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
