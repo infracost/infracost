@@ -245,7 +245,7 @@ func invalidationURLs(u *schema.UsageData) *schema.CostComponent {
 func encryptionRequests(u *schema.UsageData) *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if u != nil && u.Get("encryption_requests").Exists() {
-		quantity = decimalPtr(decimal.NewFromInt(u.Get("invalidation_requests").Int()))
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("encryption_requests").Int()))
 	}
 	return &schema.CostComponent{
 		Name:            "Field level encryption requests",
