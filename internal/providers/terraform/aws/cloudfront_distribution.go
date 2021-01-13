@@ -15,6 +15,9 @@ func GetCloudfrontDistributionRegistryItem() *schema.RegistryItem {
 func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name: d.Address,
+		CostComponents: []*schema.CostComponent{
+			invalidationURLs(u),
+		},
 		SubResources: []*schema.Resource{
 			regionalDataOutToOrigin(u),
 			requests(u),
@@ -213,4 +216,27 @@ func shieldRequests(u *schema.UsageData) *schema.Resource {
 	}
 
 	return resource
+}
+
+func invalidationURLs(u *schema.UsageData) *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if u != nil && u.Get("invalidation_requests").Exists() {
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("invalidation_requests").Int()))
+	}
+	return &schema.CostComponent{
+		Name:            "Invalidation requests",
+		Unit:            "urls",
+		UnitMultiplier:  1,
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Service:    strPtr("AmazonCloudFront"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("Invalidations")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("1000"),
+		},
+	}
 }

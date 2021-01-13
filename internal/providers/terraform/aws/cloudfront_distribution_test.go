@@ -136,6 +136,12 @@ func TestCloudfrontDistribution(t *testing.T) {
 	resourceChecks := []testutil.ResourceCheck{
 		{
 			Name: "aws_cloudfront_distribution.s3_distribution",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:      "Invalidation requests",
+					PriceHash: "a38b0d76c23fe5c7e80d44fe2950d154-a71f166085a0bf987715473b95588268",
+				},
+			},
 			SubResourceChecks: []testutil.ResourceCheck{
 				{
 					Name: "Regional data transfer out to origin",
