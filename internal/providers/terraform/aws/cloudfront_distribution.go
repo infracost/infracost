@@ -139,7 +139,7 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 		},
 		{
 			usageNumber: 0,
-			usageName:   "Over 5PB",
+			usageName:   "Over 150TB",
 		},
 	}
 
