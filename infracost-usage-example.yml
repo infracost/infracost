@@ -75,3 +75,54 @@ resource_usage:
 
   aws_vpn_connection:
     monthly_gb_data_processed: 100 # Estimated monthly data processed through a transit gateway attached to your VPN Connection.
+
+  aws_cloudfront_distribution.s3_distribution:
+    # Regional data transfer out to internet
+    united_states_data_transfer_internet_gb: 51200000
+    europe_data_transfer_internet_gb: 220000
+    south_africa_data_transfer_internet_gb: 10000
+    south_america_data_transfer_internet_gb: 50000
+    japan_data_transfer_internet_gb: 387000
+    australia_data_transfer_internet_gb: 500000
+    asia_pacific_data_transfer_internet_gb: 1200000
+    india_data_transfer_internet_gb: 200000
+    # Regional data transfer out to origin
+    united_states_data_transfer_origin_gb: 2200
+    europe_data_transfer_origin_gb: 1000
+    south_africa_data_transfer_origin_gb: 300
+    south_america_data_transfer_origin_gb: 200
+    japan_data_transfer_origin_gb: 10
+    australia_data_transfer_origin_gb: 100
+    asia_pacific_data_transfer_origin_gb: 30
+    india_data_transfer_origin_gb: 80
+    # HTTP requests
+    united_states_http_requests: 80000
+    europe_http_requests: 40000
+    south_africa_http_requests: 20000
+    south_america_http_requests: 10000
+    japan_http_requests: 3000
+    australia_http_requests: 15000
+    asia_pacific_http_requests: 45000
+    india_http_requests: 10000
+    # HTTPS requests
+    united_states_https_requests: 180000
+    europe_https_requests: 10000
+    south_africa_https_requests: 50000
+    south_america_https_requests: 30000
+    japan_https_requests: 1000
+    australia_https_requests: 45000
+    asia_pacific_https_requests: 25000
+    india_https_requests: 30000
+    # Shield requests
+    united_states_shield_requests: 90000
+    europe_shield_requests: 30000
+    south_america_shield_requests: 200
+    japan_shield_requests: 12300
+    australia_shield_requests: 2300
+    singapore_shield_requests: 58600
+    south_korea_shield_requests: 24000
+    india_shield_requests: 10000
+    invalidation_requests: 1200 # Invalidation requests
+    encryption_requests: 100000 # Field level encryption requests
+    log_lines: 5000000 # Real-time log requests
+    custom_ssl_certificates: 3 # Dedicated ip custom ssl
