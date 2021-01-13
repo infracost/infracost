@@ -17,6 +17,7 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *sch
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			invalidationURLs(u),
+			encryptionRequests(u),
 		},
 		SubResources: []*schema.Resource{
 			regionalDataOutToOrigin(u),
@@ -237,6 +238,27 @@ func invalidationURLs(u *schema.UsageData) *schema.CostComponent {
 		},
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("1000"),
+		},
+	}
+}
+
+func encryptionRequests(u *schema.UsageData) *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if u != nil && u.Get("encryption_requests").Exists() {
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("invalidation_requests").Int()))
+	}
+	return &schema.CostComponent{
+		Name:            "Field level encryption requests",
+		Unit:            "requests",
+		UnitMultiplier:  10000,
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Service:    strPtr("AmazonCloudFront"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "requestDescription", Value: strPtr("HTTPS Proxy requests with Field Level Encryption")},
+				{Key: "location", Value: strPtr("Europe")},
+			},
 		},
 	}
 }
