@@ -27,13 +27,20 @@ BITBUCKET_API_URL=${BITBUCKET_API_URL:-https://api.bitbucket.org}
 export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
 export INFRACOST_CI_DIFF=true
 
+if [ ! -z "$GIT_SSH_KEY" ]; then
+  mkdir -p .ssh
+  echo "${GIT_SSH_KEY}" > .ssh/git_ssh_key
+  chmod 600 .ssh/git_ssh_key
+  export GIT_SSH_COMMAND="ssh -i $(pwd)/.ssh/git_ssh_key -o 'StrictHostKeyChecking=no'"
+fi
+
 # Bitbucket Pipelines don't have a unique env so use this to detect it
 if [ ! -z "$BITBUCKET_BUILD_NUMBER" ]; then
   BITBUCKET_PIPELINES=true
 fi
 
 post_bitbucket_comment () {
-  # Bitbucket comments require a different JSON format and don't support HTML 
+  # Bitbucket comments require a different JSON format and don't support HTML
   jq -Mnc --arg change_word $change_word \
           --arg absolute_percent_diff $(printf '%.1f\n' $absolute_percent_diff) \
           --arg default_branch_monthly_cost $default_branch_monthly_cost \
@@ -127,7 +134,7 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; the
   if [ ! -z "$GITHUB_ACTIONS" ]; then
     if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
       GITHUB_SHA=$(cat $GITHUB_EVENT_PATH | jq -r .pull_request.head.sha)
-    fi  
+    fi
     echo "Posting comment to GitHub commit $GITHUB_SHA"
     cat diff_infracost.txt | curl -L -X POST -d @- \
         -H "Content-Type: application/json" \

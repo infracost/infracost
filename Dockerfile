@@ -44,7 +44,7 @@ RUN NO_DIRTY=true make build
 # Application
 FROM alpine:3.12 as app
 # Tools needed for running diffs in CI integrations
-RUN apk --update --no-cache add ca-certificates openssl curl git jq
+RUN apk --update --no-cache add ca-certificates openssl openssh-client curl git jq
 WORKDIR /root/
 # Scripts are used by CI integrations and other use-cases
 COPY scripts /scripts
