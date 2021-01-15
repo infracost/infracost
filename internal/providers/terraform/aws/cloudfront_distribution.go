@@ -156,16 +156,11 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 			usage = u.Get(usageKey).Int()
 		}
 
-		regionResource := &schema.Resource{
-			Name:           awsRegion,
-			CostComponents: []*schema.CostComponent{},
-		}
-
 		selectedUsageFilters := usageFilters
 		if apiRegion == "India" {
 			selectedUsageFilters = indiaUsageFilters
 		}
-		for _, usageFilter := range selectedUsageFilters {
+		for idx, usageFilter := range selectedUsageFilters {
 			usageName := usageFilter.usageName
 			endUsageAmount := usageFilter.usageNumber
 			var quantity *decimal.Decimal
@@ -184,8 +179,11 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 			} else {
 				usageFilter = "Inf"
 			}
-			regionResource.CostComponents = append(regionResource.CostComponents, &schema.CostComponent{
-				Name:            usageName,
+			if quantity == nil && idx > 0 {
+				continue
+			}
+			resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
+				Name:            fmt.Sprintf("%v (%v)", awsRegion, usageName),
 				Unit:            "GB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: quantity,
@@ -202,8 +200,6 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 				},
 			})
 		}
-
-		resource.SubResources = append(resource.SubResources, regionResource)
 
 	}
 
@@ -519,15 +515,15 @@ func invalidationPaths(u *schema.UsageData) *schema.Resource {
 	var paidQuantity *decimal.Decimal
 	if u != nil && u.Get("invalidation_paths").Exists() {
 		usageAmount := u.Get("invalidation_paths").Int()
-		if usageAmount > 1000 {
+		if usageAmount < 1000 {
+			freeQuantity = decimalPtr(decimal.NewFromInt(usageAmount))
+		} else {
 			freeQuantity = decimalPtr(decimal.NewFromInt(1000))
 			paidQuantity = decimalPtr(decimal.NewFromInt(usageAmount - 1000))
-		} else {
-			freeQuantity = decimalPtr(decimal.NewFromInt(usageAmount))
 		}
 	}
 
-	return &schema.Resource{
+	resource := &schema.Resource{
 		Name: "Invalidation requests",
 		CostComponents: []*schema.CostComponent{
 			{
@@ -546,24 +542,29 @@ func invalidationPaths(u *schema.UsageData) *schema.Resource {
 					StartUsageAmount: strPtr("0"),
 				},
 			},
-			{
-				Name:            "Over 1000 paths",
-				Unit:            "paths",
-				UnitMultiplier:  1,
-				MonthlyQuantity: paidQuantity,
-				ProductFilter: &schema.ProductFilter{
-					VendorName: strPtr("aws"),
-					Service:    strPtr("AmazonCloudFront"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", Value: strPtr("Invalidations")},
-					},
-				},
-				PriceFilter: &schema.PriceFilter{
-					StartUsageAmount: strPtr("1000"),
-				},
-			},
 		},
 	}
+
+	if paidQuantity != nil {
+		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
+			Name:            "Over 1000 paths",
+			Unit:            "paths",
+			UnitMultiplier:  1,
+			MonthlyQuantity: paidQuantity,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Service:    strPtr("AmazonCloudFront"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", Value: strPtr("Invalidations")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				StartUsageAmount: strPtr("1000"),
+			},
+		})
+	}
+
+	return resource
 }
 
 func encryptionRequests(u *schema.UsageData) *schema.CostComponent {

@@ -158,266 +158,50 @@ func TestCloudfrontDistribution(t *testing.T) {
 							Name:      "First 1000 paths",
 							PriceHash: "a38b0d76c23fe5c7e80d44fe2950d154-a71f166085a0bf987715473b95588268",
 						},
-						{
-							Name:      "Over 1000 paths",
-							PriceHash: "a38b0d76c23fe5c7e80d44fe2950d154-a71f166085a0bf987715473b95588268",
-						},
 					},
 				},
 				{
 					Name: "Regional data transfer out to internet",
-					SubResourceChecks: []testutil.ResourceCheck{
+					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name: "United States, Mexico, & Canada",
-							CostComponentChecks: []testutil.CostComponentCheck{
-								{
-									Name:      "First 10TB",
-									PriceHash: "99df20efc8b58ceb7813f795a75772be-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 40TB",
-									PriceHash: "99df20efc8b58ceb7813f795a75772be-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 100TB",
-									PriceHash: "99df20efc8b58ceb7813f795a75772be-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 350TB",
-									PriceHash: "99df20efc8b58ceb7813f795a75772be-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 524TB",
-									PriceHash: "99df20efc8b58ceb7813f795a75772be-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 4PB",
-									PriceHash: "99df20efc8b58ceb7813f795a75772be-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Over 5PB",
-									PriceHash: "99df20efc8b58ceb7813f795a75772be-b1ae3861dc57e2db217fa83a7420374f",
-								},
-							},
+
+							Name:      "United States, Mexico, & Canada (First 10TB)",
+							PriceHash: "99df20efc8b58ceb7813f795a75772be-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
-							Name: "Europe & Israel",
-							CostComponentChecks: []testutil.CostComponentCheck{
-								{
-									Name:      "First 10TB",
-									PriceHash: "d0e5286d1ab64579ef1a32ad9c6b0d23-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 40TB",
-									PriceHash: "d0e5286d1ab64579ef1a32ad9c6b0d23-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 100TB",
-									PriceHash: "d0e5286d1ab64579ef1a32ad9c6b0d23-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 350TB",
-									PriceHash: "d0e5286d1ab64579ef1a32ad9c6b0d23-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 524TB",
-									PriceHash: "d0e5286d1ab64579ef1a32ad9c6b0d23-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 4PB",
-									PriceHash: "d0e5286d1ab64579ef1a32ad9c6b0d23-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Over 5PB",
-									PriceHash: "d0e5286d1ab64579ef1a32ad9c6b0d23-b1ae3861dc57e2db217fa83a7420374f",
-								},
-							},
+
+							Name:      "Europe & Israel (First 10TB)",
+							PriceHash: "d0e5286d1ab64579ef1a32ad9c6b0d23-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
-							Name: "South Africa, Kenya, & Middle East",
-							CostComponentChecks: []testutil.CostComponentCheck{
-								{
-									Name:      "First 10TB",
-									PriceHash: "8867695c7ff0b60dc0ead9aaa49e0b78-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 40TB",
-									PriceHash: "8867695c7ff0b60dc0ead9aaa49e0b78-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 100TB",
-									PriceHash: "8867695c7ff0b60dc0ead9aaa49e0b78-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 350TB",
-									PriceHash: "8867695c7ff0b60dc0ead9aaa49e0b78-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 524TB",
-									PriceHash: "8867695c7ff0b60dc0ead9aaa49e0b78-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 4PB",
-									PriceHash: "8867695c7ff0b60dc0ead9aaa49e0b78-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Over 5PB",
-									PriceHash: "8867695c7ff0b60dc0ead9aaa49e0b78-b1ae3861dc57e2db217fa83a7420374f",
-								},
-							},
+
+							Name:      "South Africa, Kenya, & Middle East (First 10TB)",
+							PriceHash: "8867695c7ff0b60dc0ead9aaa49e0b78-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
-							Name: "South America",
-							CostComponentChecks: []testutil.CostComponentCheck{
-								{
-									Name:      "First 10TB",
-									PriceHash: "24a65fd18a4ff0cbdd8c00be1ca8e8b2-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 40TB",
-									PriceHash: "24a65fd18a4ff0cbdd8c00be1ca8e8b2-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 100TB",
-									PriceHash: "24a65fd18a4ff0cbdd8c00be1ca8e8b2-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 350TB",
-									PriceHash: "24a65fd18a4ff0cbdd8c00be1ca8e8b2-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 524TB",
-									PriceHash: "24a65fd18a4ff0cbdd8c00be1ca8e8b2-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 4PB",
-									PriceHash: "24a65fd18a4ff0cbdd8c00be1ca8e8b2-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Over 5PB",
-									PriceHash: "24a65fd18a4ff0cbdd8c00be1ca8e8b2-b1ae3861dc57e2db217fa83a7420374f",
-								},
-							},
+
+							Name:      "South America (First 10TB)",
+							PriceHash: "24a65fd18a4ff0cbdd8c00be1ca8e8b2-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
-							Name: "Japan",
-							CostComponentChecks: []testutil.CostComponentCheck{
-								{
-									Name:      "First 10TB",
-									PriceHash: "25895b95f4d37a1941ab6f1f6f1bee7e-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 40TB",
-									PriceHash: "25895b95f4d37a1941ab6f1f6f1bee7e-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 100TB",
-									PriceHash: "25895b95f4d37a1941ab6f1f6f1bee7e-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 350TB",
-									PriceHash: "25895b95f4d37a1941ab6f1f6f1bee7e-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 524TB",
-									PriceHash: "25895b95f4d37a1941ab6f1f6f1bee7e-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 4PB",
-									PriceHash: "25895b95f4d37a1941ab6f1f6f1bee7e-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Over 5PB",
-									PriceHash: "25895b95f4d37a1941ab6f1f6f1bee7e-b1ae3861dc57e2db217fa83a7420374f",
-								},
-							},
+
+							Name:      "Japan (First 10TB)",
+							PriceHash: "25895b95f4d37a1941ab6f1f6f1bee7e-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
-							Name: "Australia & New Zealand",
-							CostComponentChecks: []testutil.CostComponentCheck{
-								{
-									Name:      "First 10TB",
-									PriceHash: "f22352efe593321e3c184abb089b6bc4-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 40TB",
-									PriceHash: "f22352efe593321e3c184abb089b6bc4-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 100TB",
-									PriceHash: "f22352efe593321e3c184abb089b6bc4-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 350TB",
-									PriceHash: "f22352efe593321e3c184abb089b6bc4-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 524TB",
-									PriceHash: "f22352efe593321e3c184abb089b6bc4-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 4PB",
-									PriceHash: "f22352efe593321e3c184abb089b6bc4-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Over 5PB",
-									PriceHash: "f22352efe593321e3c184abb089b6bc4-b1ae3861dc57e2db217fa83a7420374f",
-								},
-							},
+
+							Name:      "Australia & New Zealand (First 10TB)",
+							PriceHash: "f22352efe593321e3c184abb089b6bc4-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
-							Name: "Hong Kong, Philippines, Asia Pacific",
-							CostComponentChecks: []testutil.CostComponentCheck{
-								{
-									Name:      "First 10TB",
-									PriceHash: "cfc8f70af2243c498cb6a86a75e61ecf-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 40TB",
-									PriceHash: "cfc8f70af2243c498cb6a86a75e61ecf-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 100TB",
-									PriceHash: "cfc8f70af2243c498cb6a86a75e61ecf-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 350TB",
-									PriceHash: "cfc8f70af2243c498cb6a86a75e61ecf-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 524TB",
-									PriceHash: "cfc8f70af2243c498cb6a86a75e61ecf-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 4PB",
-									PriceHash: "cfc8f70af2243c498cb6a86a75e61ecf-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Over 5PB",
-									PriceHash: "cfc8f70af2243c498cb6a86a75e61ecf-b1ae3861dc57e2db217fa83a7420374f",
-								},
-							},
+
+							Name:      "Hong Kong, Philippines, Asia Pacific (First 10TB)",
+							PriceHash: "cfc8f70af2243c498cb6a86a75e61ecf-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
-							Name: "India",
-							CostComponentChecks: []testutil.CostComponentCheck{
-								{
-									Name:      "First 10TB",
-									PriceHash: "33e8f28eace821ff2d942d9d36be1847-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 40TB",
-									PriceHash: "33e8f28eace821ff2d942d9d36be1847-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Next 100TB",
-									PriceHash: "33e8f28eace821ff2d942d9d36be1847-b1ae3861dc57e2db217fa83a7420374f",
-								},
-								{
-									Name:      "Over 150TB",
-									PriceHash: "33e8f28eace821ff2d942d9d36be1847-b1ae3861dc57e2db217fa83a7420374f",
-								},
-							},
+
+							Name:      "India (First 10TB)",
+							PriceHash: "33e8f28eace821ff2d942d9d36be1847-b1ae3861dc57e2db217fa83a7420374f",
 						},
 					},
 				},
