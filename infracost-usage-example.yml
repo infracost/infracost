@@ -77,52 +77,52 @@ resource_usage:
     monthly_gb_data_processed: 100 # Estimated monthly data processed through a transit gateway attached to your VPN Connection.
 
   aws_cloudfront_distribution.s3_distribution:
-    # Regional data transfer out to internet
-    united_states_data_transfer_internet_gb: 51200000
-    europe_data_transfer_internet_gb: 220000
-    south_africa_data_transfer_internet_gb: 10000
-    south_america_data_transfer_internet_gb: 50000
-    japan_data_transfer_internet_gb: 387000
-    australia_data_transfer_internet_gb: 500000
-    asia_pacific_data_transfer_internet_gb: 1200000
-    india_data_transfer_internet_gb: 200000
-    # Regional data transfer out to origin
-    united_states_data_transfer_origin_gb: 2200
-    europe_data_transfer_origin_gb: 1000
-    south_africa_data_transfer_origin_gb: 300
-    south_america_data_transfer_origin_gb: 200
-    japan_data_transfer_origin_gb: 10
-    australia_data_transfer_origin_gb: 100
-    asia_pacific_data_transfer_origin_gb: 30
-    india_data_transfer_origin_gb: 80
-    # HTTP requests
-    united_states_http_requests: 80000
-    europe_http_requests: 40000
-    south_africa_http_requests: 20000
-    south_america_http_requests: 10000
-    japan_http_requests: 3000
-    australia_http_requests: 15000
-    asia_pacific_http_requests: 45000
-    india_http_requests: 10000
-    # HTTPS requests
-    united_states_https_requests: 180000
-    europe_https_requests: 10000
-    south_africa_https_requests: 50000
-    south_america_https_requests: 30000
-    japan_https_requests: 1000
-    australia_https_requests: 45000
-    asia_pacific_https_requests: 25000
-    india_https_requests: 30000
-    # Shield requests
-    united_states_shield_requests: 90000
-    europe_shield_requests: 30000
-    south_america_shield_requests: 200
-    japan_shield_requests: 12300
-    australia_shield_requests: 2300
-    singapore_shield_requests: 58600
-    south_korea_shield_requests: 24000
-    india_shield_requests: 10000
-    invalidation_paths: 1200 # Invalidation requests
-    encryption_requests: 100000 # Field level encryption requests
-    log_lines: 5000000 # Real-time log requests
-    custom_ssl_certificates: 3 # Dedicated ip custom ssl
+    # Estimated GB of regional data transfer out to internet per month.
+    united_states_data_transfer_internet_gb: 51200000 # Estimated GB of data from the United States to internet per month.
+    europe_data_transfer_internet_gb: 220000          # Estimated GB of data from Europe to internet per month.
+    south_africa_data_transfer_internet_gb: 10000     # Estimated GB of data from South Africa to internet per month.
+    south_america_data_transfer_internet_gb: 50000    # Estimated GB of data from South America to internet per month.
+    japan_data_transfer_internet_gb: 387000           # Estimated GB of data from Japan to internet per month.
+    australia_data_transfer_internet_gb: 500000       # Estimated GB of data from Australia to internet per month.
+    asia_pacific_data_transfer_internet_gb: 1200000   # Estimated GB of data from Asia pacific to internet per month.
+    india_data_transfer_internet_gb: 200000           # Estimated GB of data from India to internet per month.
+    # Estimated GB of regional data transfer out to origin
+    united_states_data_transfer_origin_gb: 2200   # Estimated GB of data from the United States to origin per month.
+    europe_data_transfer_origin_gb: 1000          # Estimated GB of data from Europe to origin per month.
+    south_africa_data_transfer_origin_gb: 300     # Estimated GB of data from South Africa to origin per month.
+    south_america_data_transfer_origin_gb: 200    # Estimated GB of data from South America to origin per month.
+    japan_data_transfer_origin_gb: 10             # Estimated GB of data from Japan to origin per month.
+    australia_data_transfer_origin_gb: 100        # Estimated GB of data from Australia to origin per month.
+    asia_pacific_data_transfer_origin_gb: 30      # Estimated GB of data from Asia pacific to origin per month.
+    india_data_transfer_origin_gb: 80             # Estimated GB of data from India to origin per month.
+    # Estimated number of HTTP requests per month.
+    united_states_http_requests: 80000            # Estimated number of HTTP request from the United States per month. 
+    europe_http_requests: 40000                   # Estimated number of HTTP request from Europe per month.
+    south_africa_http_requests: 20000             # Estimated number of HTTP request from South Africa per month.
+    south_america_http_requests: 10000            # Estimated number of HTTP request from South America per month.
+    japan_http_requests: 3000                     # Estimated number of HTTP request from Japan per month.
+    australia_http_requests: 15000                # Estimated number of HTTP request from Australia per month.
+    asia_pacific_http_requests: 45000             # Estimated number of HTTP request from Asia Pacific per month.
+    india_http_requests: 10000                    # Estimated number of HTTP request from India per month.
+    # Estimated number of HTTPS requests per month.
+    united_states_https_requests: 180000      # Estimated number of HTTPS request from the United States per month.
+    europe_https_requests: 10000              # Estimated number of HTTPS request from Europe per month.
+    south_africa_https_requests: 50000        # Estimated number of HTTPS request from South Africa per month.
+    south_america_https_requests: 30000       # Estimated number of HTTPS request from South America per month.
+    japan_https_requests: 1000                # Estimated number of HTTPS request from Japan per month.
+    australia_https_requests: 45000           # Estimated number of HTTPS request from Australia per month.
+    asia_pacific_https_requests: 25000        # Estimated number of HTTPS request from Asia Pacific per month.
+    india_https_requests: 30000               # Estimated number of HTTPS request from India per month.
+    # Estimated number of shield requests per month.
+    united_states_shield_requests: 90000      # Estimated number of Shield request from the United States per month.
+    europe_shield_requests: 30000             # Estimated number of Shield request from Europe per month.
+    south_america_shield_requests: 200        # Estimated number of Shield request from South America per month.
+    japan_shield_requests: 12300              # Estimated number of Shield request from Japan per month.
+    australia_shield_requests: 2300           # Estimated number of Shield request from Australia per month.
+    singapore_shield_requests: 58600          # Estimated number of Shield request from Singapore per month.
+    south_korea_shield_requests: 24000        # Estimated number of Shield request from South Korea per month.
+    india_shield_requests: 10000              # Estimated number of Shield request from India per month.
+    invalidation_paths: 1200                  # Estimated number of invalidation requests per month.
+    encryption_requests: 100000               # Estimated number of field level encryption requests per month.
+    log_lines: 5000000                        # Estimated number of real-time log lines per month.
+    custom_ssl_certificates: 3                # Estimated number of dedicated IP custom SSL certificates per month.
