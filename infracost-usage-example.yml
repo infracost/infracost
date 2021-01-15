@@ -122,7 +122,7 @@ resource_usage:
     singapore_shield_requests: 58600
     south_korea_shield_requests: 24000
     india_shield_requests: 10000
-    invalidation_requests: 1200 # Invalidation requests
+    invalidation_paths: 1200 # Invalidation requests
     encryption_requests: 100000 # Field level encryption requests
     log_lines: 5000000 # Real-time log requests
     custom_ssl_certificates: 3 # Dedicated ip custom ssl

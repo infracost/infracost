@@ -34,10 +34,11 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *sch
 			customSSLCertificate(u),
 		},
 		SubResources: []*schema.Resource{
-			invalidationURLs(u),
+			invalidationPaths(u),
 			regionalDataOutToInternet(u),
 			regionalDataOutToOrigin(u),
-			requests(u),
+			httpRequests(u),
+			httpsRequests(u),
 			shieldRequests(u),
 		},
 	}
@@ -285,18 +286,6 @@ func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
 	return resource
 }
 
-func requests(u *schema.UsageData) *schema.Resource {
-	resource := &schema.Resource{
-		Name: "Request pricing for all http methods",
-		SubResources: []*schema.Resource{
-			httpRequests(u),
-			httpsRequests(u),
-		},
-	}
-
-	return resource
-}
-
 func httpRequests(u *schema.UsageData) *schema.Resource {
 	resource := &schema.Resource{
 		Name:         "HTTP requests",
@@ -451,7 +440,7 @@ func httpsRequests(u *schema.UsageData) *schema.Resource {
 
 func shieldRequests(u *schema.UsageData) *schema.Resource {
 	resource := &schema.Resource{
-		Name:           "Origin shield request pricing for all http methods",
+		Name:           "Origin shield HTTP requests",
 		CostComponents: []*schema.CostComponent{},
 	}
 
@@ -525,11 +514,11 @@ func shieldRequests(u *schema.UsageData) *schema.Resource {
 	return resource
 }
 
-func invalidationURLs(u *schema.UsageData) *schema.Resource {
+func invalidationPaths(u *schema.UsageData) *schema.Resource {
 	var freeQuantity *decimal.Decimal
 	var paidQuantity *decimal.Decimal
-	if u != nil && u.Get("invalidation_requests").Exists() {
-		usageAmount := u.Get("invalidation_requests").Int()
+	if u != nil && u.Get("invalidation_paths").Exists() {
+		usageAmount := u.Get("invalidation_paths").Int()
 		if usageAmount > 1000 {
 			freeQuantity = decimalPtr(decimal.NewFromInt(1000))
 			paidQuantity = decimalPtr(decimal.NewFromInt(usageAmount - 1000))
@@ -542,8 +531,8 @@ func invalidationURLs(u *schema.UsageData) *schema.Resource {
 		Name: "Invalidation requests",
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:            "First 1000 urls",
-				Unit:            "urls",
+				Name:            "First 1000 paths",
+				Unit:            "paths",
 				UnitMultiplier:  1,
 				MonthlyQuantity: freeQuantity,
 				ProductFilter: &schema.ProductFilter{
@@ -558,8 +547,8 @@ func invalidationURLs(u *schema.UsageData) *schema.Resource {
 				},
 			},
 			{
-				Name:            "Over 1000 urls",
-				Unit:            "urls",
+				Name:            "Over 1000 paths",
+				Unit:            "paths",
 				UnitMultiplier:  1,
 				MonthlyQuantity: paidQuantity,
 				ProductFilter: &schema.ProductFilter{
@@ -624,8 +613,8 @@ func customSSLCertificate(u *schema.UsageData) *schema.CostComponent {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("custom_ssl_certificates").Int()))
 	}
 	return &schema.CostComponent{
-		Name:            "Dedicated ip custom ssl",
-		Unit:            "certificate-months",
+		Name:            "Dedicated IP custom SSL",
+		Unit:            "certificate",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
