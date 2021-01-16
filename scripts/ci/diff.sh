@@ -28,6 +28,7 @@ export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
 export INFRACOST_CI_DIFF=true
 
 if [ ! -z "$GIT_SSH_KEY" ]; then
+  echo "Setting up private Git SSH key so terraform can access your private modules."
   mkdir -p .ssh
   echo "${GIT_SSH_KEY}" > .ssh/git_ssh_key
   chmod 600 .ssh/git_ssh_key
