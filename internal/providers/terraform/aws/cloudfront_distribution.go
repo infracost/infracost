@@ -54,7 +54,7 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 	regionsData := []*regionData{
 		{
 			awsGroupedName: "US, Mexico, Canada",
-			priceRegion:    "US",
+			priceRegion:    "United States",
 			usageKey:       "us_data_transfer_internet_gb",
 		},
 		{
@@ -216,7 +216,7 @@ func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
 	regionsData := []*regionData{
 		{
 			awsGroupedName: "US, Mexico, Canada",
-			priceRegion:    "US",
+			priceRegion:    "United States",
 			usageKey:       "us_data_transfer_origin_gb",
 		},
 		{
@@ -292,7 +292,7 @@ func httpRequests(u *schema.UsageData) *schema.Resource {
 	regionsData := []*regionData{
 		{
 			awsGroupedName: "US, Mexico, Canada",
-			priceRegion:    "US",
+			priceRegion:    "United States",
 			usageKey:       "us_http_requests",
 		},
 		{
@@ -368,7 +368,7 @@ func httpsRequests(u *schema.UsageData) *schema.Resource {
 	regionsData := []*regionData{
 		{
 			awsGroupedName: "US, Mexico, Canada",
-			priceRegion:    "US",
+			priceRegion:    "United States",
 			usageKey:       "us_https_requests",
 		},
 		{
