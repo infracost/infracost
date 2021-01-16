@@ -182,6 +182,7 @@ var FreeResources []string = []string{
 
 	// AWS Lambda
 	"aws_lambda_permission",
+	"aws_lambda_function_event_invoke_config",
 
 	// AWS Others
 	"aws_db_instance_role_association",
@@ -195,7 +196,6 @@ var FreeResources []string = []string{
 	"aws_eip_association",
 	"aws_elasticsearch_domain_policy",
 	"aws_key_pair",
-	"aws_lambda_function_event_invoke_config",
 	"aws_launch_configuration",
 	"aws_launch_template",
 	"aws_lightsail_domain",
