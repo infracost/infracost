@@ -146,78 +146,73 @@ func TestCloudfrontDistribution(t *testing.T) {
 					PriceHash: "d2263008404d6c3cfe3f3ad047842cea-361e966330f27dcb2d64319ce0c579cf",
 				},
 				{
-					Name:      "Dedicated IP custom SSL",
+					Name:      "Dedicated IP custom SSLs",
 					PriceHash: "e15ddcbddbedf5da838718e496f3f9de-a9191d0a7972a4ac9c0e44b9ea6310bb",
+				},
+				{
+					Name:      "Invalidation requests (first 1k)",
+					PriceHash: "a38b0d76c23fe5c7e80d44fe2950d154-a71f166085a0bf987715473b95588268",
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
 				{
-					Name: "Invalidation requests",
-					CostComponentChecks: []testutil.CostComponentCheck{
-						{
-							Name:      "First 1000 paths",
-							PriceHash: "a38b0d76c23fe5c7e80d44fe2950d154-a71f166085a0bf987715473b95588268",
-						},
-					},
-				},
-				{
-					Name: "Regional data transfer out to internet",
+					Name: "Data transfer out to internet",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
 
-							Name:      "United States, Mexico, & Canada (First 10TB)",
+							Name:      "US, Mexico, Canada (first 10TB)",
 							PriceHash: "99df20efc8b58ceb7813f795a75772be-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
 
-							Name:      "Europe & Israel (First 10TB)",
+							Name:      "Europe, Israel (first 10TB)",
 							PriceHash: "d0e5286d1ab64579ef1a32ad9c6b0d23-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
 
-							Name:      "South Africa, Kenya, & Middle East (First 10TB)",
+							Name:      "South Africa, Kenya, Middle East (first 10TB)",
 							PriceHash: "8867695c7ff0b60dc0ead9aaa49e0b78-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
 
-							Name:      "South America (First 10TB)",
+							Name:      "South America (first 10TB)",
 							PriceHash: "24a65fd18a4ff0cbdd8c00be1ca8e8b2-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
 
-							Name:      "Japan (First 10TB)",
+							Name:      "Japan (first 10TB)",
 							PriceHash: "25895b95f4d37a1941ab6f1f6f1bee7e-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
 
-							Name:      "Australia & New Zealand (First 10TB)",
+							Name:      "Australia, New Zealand (first 10TB)",
 							PriceHash: "f22352efe593321e3c184abb089b6bc4-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
 
-							Name:      "Hong Kong, Philippines, Asia Pacific (First 10TB)",
+							Name:      "Hong Kong, Philippines, Asia Pacific (first 10TB)",
 							PriceHash: "cfc8f70af2243c498cb6a86a75e61ecf-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
 
-							Name:      "India (First 10TB)",
+							Name:      "India (first 10TB)",
 							PriceHash: "33e8f28eace821ff2d942d9d36be1847-b1ae3861dc57e2db217fa83a7420374f",
 						},
 					},
 				},
 				{
-					Name: "Regional data transfer out to origin",
+					Name: "Data transfer out to origin",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:      "United States, Mexico, & Canada",
+							Name:      "US, Mexico, Canada",
 							PriceHash: "0c8dbb9a1aad0159dba32a7dcd48b384-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
-							Name:      "Europe & Israel",
+							Name:      "Europe, Israel",
 							PriceHash: "afb13cd55f419b70212c5767ff502944-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
-							Name:      "South Africa, Kenya, & Middle East",
+							Name:      "South Africa, Kenya, Middle East",
 							PriceHash: "7cbab97f2b54211d7654b0e4ba3f3c70-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
@@ -229,7 +224,7 @@ func TestCloudfrontDistribution(t *testing.T) {
 							PriceHash: "5456abd68dfb61de5a60286196e52205-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
-							Name:      "Australia & New Zealand",
+							Name:      "Australia, New Zealand",
 							PriceHash: "80125f460392b4b600eb5954de37e913-b1ae3861dc57e2db217fa83a7420374f",
 						},
 						{
@@ -246,15 +241,15 @@ func TestCloudfrontDistribution(t *testing.T) {
 					Name: "HTTP requests",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:      "United States, Mexico, & Canada",
+							Name:      "US, Mexico, Canada",
 							PriceHash: "6e7bb9693c7bdc3c1b09a5ad0cd11a4a-4a9dfd3965ffcbab75845ead7a27fd47",
 						},
 						{
-							Name:      "Europe & Israel",
+							Name:      "Europe, Israel",
 							PriceHash: "f81d8aa74fae2d32a4149a85920f3255-4a9dfd3965ffcbab75845ead7a27fd47",
 						},
 						{
-							Name:      "South Africa, Kenya, & Middle East",
+							Name:      "South Africa, Kenya, Middle East",
 							PriceHash: "c64d2813fa3777ace1a1006389217239-4a9dfd3965ffcbab75845ead7a27fd47",
 						},
 						{
@@ -266,7 +261,7 @@ func TestCloudfrontDistribution(t *testing.T) {
 							PriceHash: "681d410b9400be8fb5e7e2d1b089d159-4a9dfd3965ffcbab75845ead7a27fd47",
 						},
 						{
-							Name:      "Australia & New Zealand",
+							Name:      "Australia, New Zealand",
 							PriceHash: "4e86dc6c95675a4c8dd4ac876a30ab3c-4a9dfd3965ffcbab75845ead7a27fd47",
 						},
 						{
@@ -283,15 +278,15 @@ func TestCloudfrontDistribution(t *testing.T) {
 					Name: "HTTPS requests",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:      "United States, Mexico, & Canada",
+							Name:      "US, Mexico, Canada",
 							PriceHash: "8890fabb60883960c9178fe0e753e47e-4a9dfd3965ffcbab75845ead7a27fd47",
 						},
 						{
-							Name:      "Europe & Israel",
+							Name:      "Europe, Israel",
 							PriceHash: "63c72b02594fc500d149b54e4248e38b-4a9dfd3965ffcbab75845ead7a27fd47",
 						},
 						{
-							Name:      "South Africa, Kenya, & Middle East",
+							Name:      "South Africa, Kenya, Middle East",
 							PriceHash: "a1527c0b56940465cf2a5eabf97e45f0-4a9dfd3965ffcbab75845ead7a27fd47",
 						},
 						{
@@ -303,7 +298,7 @@ func TestCloudfrontDistribution(t *testing.T) {
 							PriceHash: "3f75cf910bfbe3e47bbff04ed01e3986-4a9dfd3965ffcbab75845ead7a27fd47",
 						},
 						{
-							Name:      "Australia & New Zealand",
+							Name:      "Australia, New Zealand",
 							PriceHash: "358f87101e7deff58a09cc76e1de7bd3-4a9dfd3965ffcbab75845ead7a27fd47",
 						},
 						{
@@ -320,7 +315,7 @@ func TestCloudfrontDistribution(t *testing.T) {
 					Name: "Origin shield HTTP requests",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:      "United States",
+							Name:      "US",
 							PriceHash: "9a59a3308256aab9256b6a421fd072d9-4a9dfd3965ffcbab75845ead7a27fd47",
 						},
 						{

@@ -26,7 +26,7 @@ func GetCloudfrontDistributionRegistryItem() *schema.RegistryItem {
 }
 
 func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	return &schema.Resource{
+	resource := &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			encryptionRequests(u),
@@ -34,7 +34,6 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *sch
 			customSSLCertificate(u),
 		},
 		SubResources: []*schema.Resource{
-			invalidationPaths(u),
 			regionalDataOutToInternet(u),
 			regionalDataOutToOrigin(u),
 			httpRequests(u),
@@ -42,27 +41,29 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *sch
 			shieldRequests(u),
 		},
 	}
+	resource.CostComponents = append(resource.CostComponents, invalidationRequests(u)...)
+	return resource
 }
 
 func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 	resource := &schema.Resource{
-		Name:         "Regional data transfer out to internet",
+		Name:         "Data transfer out to internet",
 		SubResources: []*schema.Resource{},
 	}
 
 	regionsData := []*regionData{
 		{
-			awsGroupedName: "United States, Mexico, & Canada",
-			priceRegion:    "United States",
-			usageKey:       "united_states_data_transfer_internet_gb",
+			awsGroupedName: "US, Mexico, Canada",
+			priceRegion:    "US",
+			usageKey:       "us_data_transfer_internet_gb",
 		},
 		{
-			awsGroupedName: "Europe & Israel",
+			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
 			usageKey:       "europe_data_transfer_internet_gb",
 		},
 		{
-			awsGroupedName: "South Africa, Kenya, & Middle East",
+			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
 			usageKey:       "south_africa_data_transfer_internet_gb",
 		},
@@ -77,7 +78,7 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 			usageKey:       "japan_data_transfer_internet_gb",
 		},
 		{
-			awsGroupedName: "Australia & New Zealand",
+			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
 			usageKey:       "australia_data_transfer_internet_gb",
 		},
@@ -96,31 +97,31 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 	usageFilters := []*usageFilterData{
 		{
 			usageNumber: 10240,
-			usageName:   "First 10TB",
+			usageName:   "first 10TB",
 		},
 		{
 			usageNumber: 51200,
-			usageName:   "Next 40TB",
+			usageName:   "next 40TB",
 		},
 		{
 			usageNumber: 153600,
-			usageName:   "Next 100TB",
+			usageName:   "next 100TB",
 		},
 		{
 			usageNumber: 512000,
-			usageName:   "Next 350TB",
+			usageName:   "next 350TB",
 		},
 		{
 			usageNumber: 1048576,
-			usageName:   "Next 524TB",
+			usageName:   "next 524TB",
 		},
 		{
 			usageNumber: 5242880,
-			usageName:   "Next 4PB",
+			usageName:   "next 4PB",
 		},
 		{
 			usageNumber: 0,
-			usageName:   "Over 5PB",
+			usageName:   "over 5PB",
 		},
 	}
 
@@ -128,19 +129,19 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 	indiaUsageFilters := []*usageFilterData{
 		{
 			usageNumber: 10240,
-			usageName:   "First 10TB",
+			usageName:   "first 10TB",
 		},
 		{
 			usageNumber: 51200,
-			usageName:   "Next 40TB",
+			usageName:   "next 40TB",
 		},
 		{
 			usageNumber: 153600,
-			usageName:   "Next 100TB",
+			usageName:   "next 100TB",
 		},
 		{
 			usageNumber: 0,
-			usageName:   "Over 150TB",
+			usageName:   "over 150TB",
 		},
 	}
 
@@ -208,23 +209,23 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 
 func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
 	resource := &schema.Resource{
-		Name:           "Regional data transfer out to origin",
+		Name:           "Data transfer out to origin",
 		CostComponents: []*schema.CostComponent{},
 	}
 
 	regionsData := []*regionData{
 		{
-			awsGroupedName: "United States, Mexico, & Canada",
-			priceRegion:    "United States",
-			usageKey:       "united_states_data_transfer_origin_gb",
+			awsGroupedName: "US, Mexico, Canada",
+			priceRegion:    "US",
+			usageKey:       "us_data_transfer_origin_gb",
 		},
 		{
-			awsGroupedName: "Europe & Israel",
+			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
 			usageKey:       "europe_data_transfer_origin_gb",
 		},
 		{
-			awsGroupedName: "South Africa, Kenya, & Middle East",
+			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
 			usageKey:       "south_africa_data_transfer_origin_gb",
 		},
@@ -239,7 +240,7 @@ func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
 			usageKey:       "japan_data_transfer_origin_gb",
 		},
 		{
-			awsGroupedName: "Australia & New Zealand",
+			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
 			usageKey:       "australia_data_transfer_origin_gb",
 		},
@@ -290,17 +291,17 @@ func httpRequests(u *schema.UsageData) *schema.Resource {
 
 	regionsData := []*regionData{
 		{
-			awsGroupedName: "United States, Mexico, & Canada",
-			priceRegion:    "United States",
-			usageKey:       "united_states_http_requests",
+			awsGroupedName: "US, Mexico, Canada",
+			priceRegion:    "US",
+			usageKey:       "us_http_requests",
 		},
 		{
-			awsGroupedName: "Europe & Israel",
+			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
 			usageKey:       "europe_http_requests",
 		},
 		{
-			awsGroupedName: "South Africa, Kenya, & Middle East",
+			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
 			usageKey:       "south_africa_http_requests",
 		},
@@ -315,7 +316,7 @@ func httpRequests(u *schema.UsageData) *schema.Resource {
 			usageKey:       "japan_http_requests",
 		},
 		{
-			awsGroupedName: "Australia & New Zealand",
+			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
 			usageKey:       "australia_http_requests",
 		},
@@ -366,17 +367,17 @@ func httpsRequests(u *schema.UsageData) *schema.Resource {
 
 	regionsData := []*regionData{
 		{
-			awsGroupedName: "United States, Mexico, & Canada",
-			priceRegion:    "United States",
-			usageKey:       "united_states_https_requests",
+			awsGroupedName: "US, Mexico, Canada",
+			priceRegion:    "US",
+			usageKey:       "us_https_requests",
 		},
 		{
-			awsGroupedName: "Europe & Israel",
+			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
 			usageKey:       "europe_https_requests",
 		},
 		{
-			awsGroupedName: "South Africa, Kenya, & Middle East",
+			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
 			usageKey:       "south_africa_https_requests",
 		},
@@ -391,7 +392,7 @@ func httpsRequests(u *schema.UsageData) *schema.Resource {
 			usageKey:       "japan_https_requests",
 		},
 		{
-			awsGroupedName: "Australia & New Zealand",
+			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
 			usageKey:       "australia_https_requests",
 		},
@@ -442,9 +443,9 @@ func shieldRequests(u *schema.UsageData) *schema.Resource {
 
 	regionsData := []*regionData{
 		{
-			awsGroupedName: "United States",
+			awsGroupedName: "US",
 			priceRegion:    "US East (N. Virginia)",
-			usageKey:       "united_states_shield_requests",
+			usageKey:       "us_shield_requests",
 		},
 		{
 			awsGroupedName: "Europe",
@@ -510,7 +511,7 @@ func shieldRequests(u *schema.UsageData) *schema.Resource {
 	return resource
 }
 
-func invalidationPaths(u *schema.UsageData) *schema.Resource {
+func invalidationRequests(u *schema.UsageData) []*schema.CostComponent {
 	var freeQuantity *decimal.Decimal
 	var paidQuantity *decimal.Decimal
 	if u != nil && u.Get("invalidation_paths").Exists() {
@@ -523,31 +524,28 @@ func invalidationPaths(u *schema.UsageData) *schema.Resource {
 		}
 	}
 
-	resource := &schema.Resource{
-		Name: "Invalidation requests",
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:            "First 1000 paths",
-				Unit:            "paths",
-				UnitMultiplier:  1,
-				MonthlyQuantity: freeQuantity,
-				ProductFilter: &schema.ProductFilter{
-					VendorName: strPtr("aws"),
-					Service:    strPtr("AmazonCloudFront"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", Value: strPtr("Invalidations")},
-					},
+	costComponents := []*schema.CostComponent{
+		{
+			Name:            "Invalidation requests (first 1k)",
+			Unit:            "paths",
+			UnitMultiplier:  1,
+			MonthlyQuantity: freeQuantity,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Service:    strPtr("AmazonCloudFront"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", Value: strPtr("Invalidations")},
 				},
-				PriceFilter: &schema.PriceFilter{
-					StartUsageAmount: strPtr("0"),
-				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				StartUsageAmount: strPtr("0"),
 			},
 		},
 	}
 
 	if paidQuantity != nil {
-		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
-			Name:            "Over 1000 paths",
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            "Invalidation requests (over 1k)",
 			Unit:            "paths",
 			UnitMultiplier:  1,
 			MonthlyQuantity: paidQuantity,
@@ -564,7 +562,7 @@ func invalidationPaths(u *schema.UsageData) *schema.Resource {
 		})
 	}
 
-	return resource
+	return costComponents
 }
 
 func encryptionRequests(u *schema.UsageData) *schema.CostComponent {
@@ -614,8 +612,8 @@ func customSSLCertificate(u *schema.UsageData) *schema.CostComponent {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("custom_ssl_certificates").Int()))
 	}
 	return &schema.CostComponent{
-		Name:            "Dedicated IP custom SSL",
-		Unit:            "certificate",
+		Name:            "Dedicated IP custom SSLs",
+		Unit:            "certificates",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
