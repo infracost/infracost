@@ -15,7 +15,7 @@ func GetSSMParameterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSSMParameter(d *schema.ResourceData, u *schema.ResourceData) *schema.Resource {
+func NewSSMParameter(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 
 	costComponents = append(costComponents, parameterStorageCostComponent(d))
@@ -56,7 +56,7 @@ func parameterStorageCostComponent(d *schema.ResourceData) *schema.CostComponent
 	}
 }
 
-func apiThroughputCostComponent(d *schema.ResourceData, u *schema.ResourceData) *schema.CostComponent {
+func apiThroughputCostComponent(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
 	region := d.Get("region").String()
 
 	var parameterType string
@@ -64,22 +64,22 @@ func apiThroughputCostComponent(d *schema.ResourceData, u *schema.ResourceData) 
 
 	monthlyRequests := decimal.Zero
 
-	if u != nil && u.Get("throughput.0.value").Exists() {
-		parameterType = u.Get("throughput.0.value").String()
+	if u != nil && u.Get("api_throughput_tier").Exists() {
+		parameterType = u.Get("api_throughput_tier").String()
 	} else {
 		parameterType = d.Get("tier").String()
 	}
 
-	if u != nil && u.Get("monthly_requests.0.value").Exists() {
-		monthlyRequests = decimal.NewFromInt(u.Get("monthly_requests.0.value").Int())
+	if u != nil && u.Get("monthly_requests").Exists() {
+		monthlyRequests = decimal.NewFromInt(u.Get("monthly_requests").Int())
 	}
 
 	switch parameterType {
 	case "Standard":
 		return &schema.CostComponent{
-			Name:           "API interactions - standard",
-			Unit:           "Requests",
-			UnitMultiplier: 1,
+			Name:            "API interactions - standard",
+			Unit:            "Requests",
+			UnitMultiplier:  1,
 			MonthlyQuantity: decimalPtr(monthlyRequests),
 		}
 	case "Advanced":

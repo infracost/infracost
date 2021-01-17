@@ -49,12 +49,12 @@ func TestAwsSSMParameterFunction(t *testing.T) {
 			Name: "aws_ssm_parameter.standard",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Parameter storage - standard",
-					SkipCheck:        true,
+					Name:      "Parameter storage - standard",
+					SkipCheck: true,
 				},
 				{
-					Name:             "API interactions - standard",
-					SkipCheck:        true,
+					Name:      "API interactions - standard",
+					SkipCheck: true,
 				},
 			},
 		},
