@@ -70,13 +70,13 @@ resource_usage:
     monthly_requests: 1000000 # Estimated monthly requests to SQS.
     request_size: 64          # Size of the requests to SQS, SQS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
 
-  aws_vpc_endpoint:
+  aws_vpc_endpoint.my_endpoint:
     monthly_gb_data_processed: 1000 # Estimated GB of data processed by the VPC endpoint(s) per month.
 
-  aws_vpn_connection:
+  aws_vpn_connection.my_connection:
     monthly_gb_data_processed: 100 # Estimated monthly data processed through a transit gateway attached to your VPN Connection.
 
-  aws_cloudfront_distribution.s3_distribution:
+  aws_cloudfront_distribution.my_s3_distribution:
     # Estimated GB of regional data transfer out to internet per month.
     monthly_gb_us_data_transfer_internet: 51200000            # Estimated GB of data from the United States to internet per month.
     monthly_gb_europe_data_transfer_internet: 220000          # Estimated GB of data from Europe to internet per month.
