@@ -55,42 +55,42 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 		{
 			awsGroupedName: "US, Mexico, Canada",
 			priceRegion:    "United States",
-			usageKey:       "monthly_gb_us_data_transfer_internet",
+			usageKey:       "monthly_gb_transfer_internet.us",
 		},
 		{
 			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
-			usageKey:       "monthly_gb_europe_data_transfer_internet",
+			usageKey:       "monthly_gb_transfer_internet.europe",
 		},
 		{
 			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
-			usageKey:       "monthly_gb_south_africa_data_transfer_internet",
+			usageKey:       "monthly_gb_transfer_internet.south_africa",
 		},
 		{
 			awsGroupedName: "South America",
 			priceRegion:    "South America",
-			usageKey:       "monthly_gb_south_america_data_transfer_internet",
+			usageKey:       "monthly_gb_transfer_internet.south_america",
 		},
 		{
 			awsGroupedName: "Japan",
 			priceRegion:    "Japan",
-			usageKey:       "monthly_gb_japan_data_transfer_internet",
+			usageKey:       "monthly_gb_transfer_internet.japan",
 		},
 		{
 			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
-			usageKey:       "monthly_gb_australia_data_transfer_internet",
+			usageKey:       "monthly_gb_transfer_internet.australia",
 		},
 		{
 			awsGroupedName: "Hong Kong, Philippines, Asia Pacific",
 			priceRegion:    "Asia Pacific",
-			usageKey:       "monthly_gb_asia_pacific_data_transfer_internet",
+			usageKey:       "monthly_gb_transfer_internet.asia_pacific",
 		},
 		{
 			awsGroupedName: "India",
 			priceRegion:    "India",
-			usageKey:       "monthly_gb_india_data_transfer_internet",
+			usageKey:       "monthly_gb_transfer_internet.india",
 		},
 	}
 
@@ -217,42 +217,42 @@ func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
 		{
 			awsGroupedName: "US, Mexico, Canada",
 			priceRegion:    "United States",
-			usageKey:       "monthly_gb_us_data_transfer_origin",
+			usageKey:       "monthly_gb_transfer_origin.us",
 		},
 		{
 			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
-			usageKey:       "monthly_gb_europe_data_transfer_origin",
+			usageKey:       "monthly_gb_transfer_origin.europe",
 		},
 		{
 			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
-			usageKey:       "monthly_gb_south_africa_data_transfer_origin",
+			usageKey:       "monthly_gb_transfer_origin.south_africa",
 		},
 		{
 			awsGroupedName: "South America",
 			priceRegion:    "South America",
-			usageKey:       "monthly_gb_south_america_data_transfer_origin",
+			usageKey:       "monthly_gb_transfer_origin.south_america",
 		},
 		{
 			awsGroupedName: "Japan",
 			priceRegion:    "Japan",
-			usageKey:       "monthly_gb_japan_data_transfer_origin",
+			usageKey:       "monthly_gb_transfer_origin.japan",
 		},
 		{
 			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
-			usageKey:       "monthly_gb_australia_data_transfer_origin",
+			usageKey:       "monthly_gb_transfer_origin.australia",
 		},
 		{
 			awsGroupedName: "Hong Kong, Philippines, Asia Pacific",
 			priceRegion:    "Asia Pacific",
-			usageKey:       "monthly_gb_asia_pacific_data_transfer_origin",
+			usageKey:       "monthly_gb_transfer_origin.asia_pacific",
 		},
 		{
 			awsGroupedName: "India",
 			priceRegion:    "India",
-			usageKey:       "monthly_gb_india_data_transfer_origin",
+			usageKey:       "monthly_gb_transfer_origin.india",
 		},
 	}
 
@@ -293,42 +293,42 @@ func httpRequests(u *schema.UsageData) *schema.Resource {
 		{
 			awsGroupedName: "US, Mexico, Canada",
 			priceRegion:    "United States",
-			usageKey:       "monthly_us_http_requests",
+			usageKey:       "monthly_http_requests.us",
 		},
 		{
 			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
-			usageKey:       "monthly_europe_http_requests",
+			usageKey:       "monthly_http_requests.europe",
 		},
 		{
 			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
-			usageKey:       "monthly_south_africa_http_requests",
+			usageKey:       "monthly_http_requests.south_africa",
 		},
 		{
 			awsGroupedName: "South America",
 			priceRegion:    "South America",
-			usageKey:       "monthly_south_america_http_requests",
+			usageKey:       "monthly_http_requests.south_america",
 		},
 		{
 			awsGroupedName: "Japan",
 			priceRegion:    "Japan",
-			usageKey:       "monthly_japan_http_requests",
+			usageKey:       "monthly_http_requests.japan",
 		},
 		{
 			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
-			usageKey:       "monthly_australia_http_requests",
+			usageKey:       "monthly_http_requests.australia",
 		},
 		{
 			awsGroupedName: "Hong Kong, Philippines, Asia Pacific",
 			priceRegion:    "Asia Pacific",
-			usageKey:       "monthly_asia_pacific_http_requests",
+			usageKey:       "monthly_http_requests.asia_pacific",
 		},
 		{
 			awsGroupedName: "India",
 			priceRegion:    "India",
-			usageKey:       "monthly_india_http_requests",
+			usageKey:       "monthly_http_requests.india",
 		},
 	}
 
@@ -369,42 +369,42 @@ func httpsRequests(u *schema.UsageData) *schema.Resource {
 		{
 			awsGroupedName: "US, Mexico, Canada",
 			priceRegion:    "United States",
-			usageKey:       "monthly_us_https_requests",
+			usageKey:       "monthly_https_requests.us",
 		},
 		{
 			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
-			usageKey:       "monthly_europe_https_requests",
+			usageKey:       "monthly_https_requests.europe",
 		},
 		{
 			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
-			usageKey:       "monthly_south_africa_https_requests",
+			usageKey:       "monthly_https_requests.south_africa",
 		},
 		{
 			awsGroupedName: "South America",
 			priceRegion:    "South America",
-			usageKey:       "monthly_south_america_https_requests",
+			usageKey:       "monthly_https_requests.south_america",
 		},
 		{
 			awsGroupedName: "Japan",
 			priceRegion:    "Japan",
-			usageKey:       "monthly_japan_https_requests",
+			usageKey:       "monthly_https_requests.japan",
 		},
 		{
 			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
-			usageKey:       "monthly_australia_https_requests",
+			usageKey:       "monthly_https_requests.australia",
 		},
 		{
 			awsGroupedName: "Hong Kong, Philippines, Asia Pacific",
 			priceRegion:    "Asia Pacific",
-			usageKey:       "monthly_asia_pacific_https_requests",
+			usageKey:       "monthly_https_requests.asia_pacific",
 		},
 		{
 			awsGroupedName: "India",
 			priceRegion:    "India",
-			usageKey:       "monthly_india_https_requests",
+			usageKey:       "monthly_https_requests.india",
 		},
 	}
 
@@ -445,42 +445,42 @@ func shieldRequests(u *schema.UsageData) *schema.Resource {
 		{
 			awsGroupedName: "US",
 			priceRegion:    "US East (N. Virginia)",
-			usageKey:       "monthly_us_shield_requests",
+			usageKey:       "monthly_shield_requests.us",
 		},
 		{
 			awsGroupedName: "Europe",
 			priceRegion:    "EU (Frankfurt)",
-			usageKey:       "monthly_europe_shield_requests",
+			usageKey:       "monthly_shield_requests.europe",
 		},
 		{
 			awsGroupedName: "South America",
 			priceRegion:    "South America (Sao Paulo)",
-			usageKey:       "monthly_south_america_shield_requests",
+			usageKey:       "monthly_shield_requests.south_america",
 		},
 		{
 			awsGroupedName: "Japan",
 			priceRegion:    "Asia Pacific (Tokyo)",
-			usageKey:       "monthly_japan_shield_requests",
+			usageKey:       "monthly_shield_requests.japan",
 		},
 		{
 			awsGroupedName: "Australia",
 			priceRegion:    "Asia Pacific (Sydney)",
-			usageKey:       "monthly_australia_shield_requests",
+			usageKey:       "monthly_shield_requests.australia",
 		},
 		{
 			awsGroupedName: "Singapore",
 			priceRegion:    "Asia Pacific (Singapore)",
-			usageKey:       "monthly_singapore_shield_requests",
+			usageKey:       "monthly_shield_requests.singapore",
 		},
 		{
 			awsGroupedName: "South Korea",
 			priceRegion:    "Asia Pacific (Seoul)",
-			usageKey:       "monthly_south_korea_shield_requests",
+			usageKey:       "monthly_shield_requests.south_korea",
 		},
 		{
 			awsGroupedName: "India",
 			priceRegion:    "Asia Pacific (Mumbai)",
-			usageKey:       "monthly_india_shield_requests",
+			usageKey:       "monthly_shield_requests.india",
 		},
 	}
 
