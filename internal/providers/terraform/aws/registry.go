@@ -232,7 +232,6 @@ var FreeResources []string = []string{
 	// AWS SSM
 	"aws_ssm_activation",
 	"aws_ssm_association",
-	"aws_ssm_document",
 	"aws_ssm_maintenance_window",
 	"aws_ssm_maintenance_window_target",
 	"aws_ssm_maintenance_window_task",
