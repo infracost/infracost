@@ -7,6 +7,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAPIGatewayStageRegistryItem(),
 	GetAPIGatewayv2ApiRegistryItem(),
 	GetAutoscalingGroupRegistryItem(),
+	GetCloudfrontDistributionRegistryItem(),
 	GetCloudwatchDashboardRegistryItem(),
 	GetCloudwatchLogGroupItem(),
 	GetCloudwatchMetricAlarmRegistryItem(),
@@ -100,6 +101,10 @@ var FreeResources []string = []string{
 	// AWS DX Transit.
 	"aws_dx_gateway",
 	"aws_dx_gateway_association_proposal",
+
+	// AWS Cloudfront
+	"aws_cloudfront_origin_access_identity",
+	"aws_cloudfront_public_key",
 
 	// AWS Cloudwatch
 	"aws_cloudwatch_log_destination",
