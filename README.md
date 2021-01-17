@@ -7,7 +7,7 @@
 
 [![Community Slack](.github/assets/community-slack.svg)](https://www.infracost.io/community-chat) [![Schedule setup call](.github/assets/schedule-setup-call.svg)](http://calendly.com/alikhajeh1/infracost-onboarding)
 
-Infracost shows cloud cost estimates for a Terraform project. It helps developers, devops and others to quickly see the cost breakdown and compare different options upfront.
+Infracost shows cloud cost estimates for Terraform projects. It helps developers, devops and others to quickly see the cost breakdown and compare different options upfront.
 
 <img src=".github/assets/screenshot.png" alt="Example Infracost output" width=600 />
 
@@ -40,8 +40,9 @@ Infracost shows cloud cost estimates for a Terraform project. It helps developer
     ```sh
     git clone https://github.com/infracost/example-terraform.git
     cd example-terraform
-    # You can play with `aws/main.tf` and re-run infracost to compare costs
-    infracost --tfdir aws
+
+    # You can play with `aws/main.tf` and `aws/infracost-usage.yml`, and re-run infracost to compare costs
+    infracost --tfdir aws --usage-file aws/infracost-usage.yml
     ```
 
 Please **watch/star** this repo as we add new cloud resources every week or so.
@@ -57,7 +58,13 @@ Checkout the [docs site](https://www.infracost.io/docs/) for additional usage op
 
 ## CI/CD integrations
 
-The [Infracost GitHub Action](https://www.infracost.io/docs/integrations#github-action), [GitLab CI template](https://www.infracost.io/docs/integrations#gitlab-ci) or [CircleCI Orb](https://www.infracost.io/docs/integrations#circleci) can be used to automatically add a comment showing the cost estimate `diff` between a pull/merge request and the master branch. If you run into any issues with CI/CD integrations, please join our [community Slack channel](https://www.infracost.io/community-chat), we'd be happy to guide you through it.
+The following CI/CD integrations can be used to automatically add a comment showing the cost estimate `diff` between a pull request and the master branch:
+- [GitHub Action](https://www.infracost.io/docs/integrations#github-action)
+- [GitLab CI template](https://www.infracost.io/docs/integrations#gitlab-ci)
+- [CircleCI Orb](https://www.infracost.io/docs/integrations#circleci)
+- [Bitbucket Pipeline](https://www.infracost.io/docs/integrations#bitbucket-pipelines)
+
+If you run into any issues with CI/CD integrations, please join our [community Slack channel](https://www.infracost.io/community-chat), we'd be happy to guide you through it.
 
 <img src="https://raw.githubusercontent.com/infracost/infracost-gh-action/master/screenshot.png" width=600 alt="Example infracost diff usage" />
 
@@ -72,8 +79,6 @@ See [this page](https://www.infracost.io/docs/usage_based_resources) for details
 Issues and pull requests are welcome! For development details, see the [contributing](CONTRIBUTING.md) file. For major changes, please open an issue first to discuss what you would like to change.
 
 [Join our community Slack channel](https://www.infracost.io/community-chat), we are a friendly bunch and happy to help you get started :)
-
-We're looking for people to help us add new AWS and Google resources and are willing to pay for it. Please direct-message Ali Khajeh-Hosseini on our community Slack channel to find out more.
 
 ## License
 
