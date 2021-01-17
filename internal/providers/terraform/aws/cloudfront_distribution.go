@@ -55,42 +55,42 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 		{
 			awsGroupedName: "US, Mexico, Canada",
 			priceRegion:    "United States",
-			usageKey:       "monthly_us_data_transfer_internet_gb",
+			usageKey:       "monthly_gb_us_data_transfer_internet",
 		},
 		{
 			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
-			usageKey:       "monthly_europe_data_transfer_internet_gb",
+			usageKey:       "monthly_gb_europe_data_transfer_internet",
 		},
 		{
 			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
-			usageKey:       "monthly_south_africa_data_transfer_internet_gb",
+			usageKey:       "monthly_gb_south_africa_data_transfer_internet",
 		},
 		{
 			awsGroupedName: "South America",
 			priceRegion:    "South America",
-			usageKey:       "monthly_south_america_data_transfer_internet_gb",
+			usageKey:       "monthly_gb_south_america_data_transfer_internet",
 		},
 		{
 			awsGroupedName: "Japan",
 			priceRegion:    "Japan",
-			usageKey:       "monthly_japan_data_transfer_internet_gb",
+			usageKey:       "monthly_gb_japan_data_transfer_internet",
 		},
 		{
 			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
-			usageKey:       "monthly_australia_data_transfer_internet_gb",
+			usageKey:       "monthly_gb_australia_data_transfer_internet",
 		},
 		{
 			awsGroupedName: "Hong Kong, Philippines, Asia Pacific",
 			priceRegion:    "Asia Pacific",
-			usageKey:       "monthly_asia_pacific_data_transfer_internet_gb",
+			usageKey:       "monthly_gb_asia_pacific_data_transfer_internet",
 		},
 		{
 			awsGroupedName: "India",
 			priceRegion:    "India",
-			usageKey:       "monthly_india_data_transfer_internet_gb",
+			usageKey:       "monthly_gb_india_data_transfer_internet",
 		},
 	}
 
@@ -217,42 +217,42 @@ func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
 		{
 			awsGroupedName: "US, Mexico, Canada",
 			priceRegion:    "United States",
-			usageKey:       "monthly_us_data_transfer_origin_gb",
+			usageKey:       "monthly_gb_us_data_transfer_origin",
 		},
 		{
 			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
-			usageKey:       "monthly_europe_data_transfer_origin_gb",
+			usageKey:       "monthly_gb_europe_data_transfer_origin",
 		},
 		{
 			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
-			usageKey:       "monthly_south_africa_data_transfer_origin_gb",
+			usageKey:       "monthly_gb_south_africa_data_transfer_origin",
 		},
 		{
 			awsGroupedName: "South America",
 			priceRegion:    "South America",
-			usageKey:       "monthly_south_america_data_transfer_origin_gb",
+			usageKey:       "monthly_gb_south_america_data_transfer_origin",
 		},
 		{
 			awsGroupedName: "Japan",
 			priceRegion:    "Japan",
-			usageKey:       "monthly_japan_data_transfer_origin_gb",
+			usageKey:       "monthly_gb_japan_data_transfer_origin",
 		},
 		{
 			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
-			usageKey:       "monthly_australia_data_transfer_origin_gb",
+			usageKey:       "monthly_gb_australia_data_transfer_origin",
 		},
 		{
 			awsGroupedName: "Hong Kong, Philippines, Asia Pacific",
 			priceRegion:    "Asia Pacific",
-			usageKey:       "monthly_asia_pacific_data_transfer_origin_gb",
+			usageKey:       "monthly_gb_asia_pacific_data_transfer_origin",
 		},
 		{
 			awsGroupedName: "India",
 			priceRegion:    "India",
-			usageKey:       "monthly_india_data_transfer_origin_gb",
+			usageKey:       "monthly_gb_india_data_transfer_origin",
 		},
 	}
 

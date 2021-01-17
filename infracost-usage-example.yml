@@ -78,23 +78,23 @@ resource_usage:
 
   aws_cloudfront_distribution.s3_distribution:
     # Estimated GB of regional data transfer out to internet per month.
-    monthly_us_data_transfer_internet_gb: 51200000            # Estimated GB of data from the United States to internet per month.
-    monthly_europe_data_transfer_internet_gb: 220000          # Estimated GB of data from Europe to internet per month.
-    monthly_south_africa_data_transfer_internet_gb: 10000     # Estimated GB of data from South Africa to internet per month.
-    monthly_south_america_data_transfer_internet_gb: 50000    # Estimated GB of data from South America to internet per month.
-    monthly_japan_data_transfer_internet_gb: 387000           # Estimated GB of data from Japan to internet per month.
-    monthly_australia_data_transfer_internet_gb: 500000       # Estimated GB of data from Australia to internet per month.
-    monthly_asia_pacific_data_transfer_internet_gb: 1200000   # Estimated GB of data from Asia pacific to internet per month.
-    monthly_india_data_transfer_internet_gb: 200000           # Estimated GB of data from India to internet per month.
+    monthly_gb_us_data_transfer_internet: 51200000            # Estimated GB of data from the United States to internet per month.
+    monthly_gb_europe_data_transfer_internet: 220000          # Estimated GB of data from Europe to internet per month.
+    monthly_gb_south_africa_data_transfer_internet: 10000     # Estimated GB of data from South Africa to internet per month.
+    monthly_gb_south_america_data_transfer_internet: 50000    # Estimated GB of data from South America to internet per month.
+    monthly_gb_japan_data_transfer_internet: 387000           # Estimated GB of data from Japan to internet per month.
+    monthly_gb_australia_data_transfer_internet: 500000       # Estimated GB of data from Australia to internet per month.
+    monthly_gb_asia_pacific_data_transfer_internet: 1200000   # Estimated GB of data from Asia pacific to internet per month.
+    monthly_gb_india_data_transfer_internet: 200000           # Estimated GB of data from India to internet per month.
     # Estimated GB of regional data transfer out to origin
-    monthly_us_data_transfer_origin_gb: 2200              # Estimated GB of data from the United States to origin per month.
-    monthly_europe_data_transfer_origin_gb: 1000          # Estimated GB of data from Europe to origin per month.
-    monthly_south_africa_data_transfer_origin_gb: 300     # Estimated GB of data from South Africa to origin per month.
-    monthly_south_america_data_transfer_origin_gb: 200    # Estimated GB of data from South America to origin per month.
-    monthly_japan_data_transfer_origin_gb: 10             # Estimated GB of data from Japan to origin per month.
-    monthly_australia_data_transfer_origin_gb: 100        # Estimated GB of data from Australia to origin per month.
-    monthly_asia_pacific_data_transfer_origin_gb: 30      # Estimated GB of data from Asia pacific to origin per month.
-    monthly_india_data_transfer_origin_gb: 80             # Estimated GB of data from India to origin per month.
+    monthly_gb_us_data_transfer_origin: 2200              # Estimated GB of data from the United States to origin per month.
+    monthly_gb_europe_data_transfer_origin: 1000          # Estimated GB of data from Europe to origin per month.
+    monthly_gb_south_africa_data_transfer_origin: 300     # Estimated GB of data from South Africa to origin per month.
+    monthly_gb_south_america_data_transfer_origin: 200    # Estimated GB of data from South America to origin per month.
+    monthly_gb_japan_data_transfer_origin: 10             # Estimated GB of data from Japan to origin per month.
+    monthly_gb_australia_data_transfer_origin: 100        # Estimated GB of data from Australia to origin per month.
+    monthly_gb_asia_pacific_data_transfer_origin: 30      # Estimated GB of data from Asia pacific to origin per month.
+    monthly_gb_india_data_transfer_origin: 80             # Estimated GB of data from India to origin per month.
     # Estimated number of HTTP requests per month.
     monthly_us_http_requests: 80000                       # Estimated number of HTTP request from the United States per month. 
     monthly_europe_http_requests: 40000                   # Estimated number of HTTP request from Europe per month.
