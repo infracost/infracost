@@ -45,6 +45,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetS3BucketRegistryItem(),
 	GetS3BucketAnalyticsConfigurationRegistryItem(),
 	GetS3BucketInventoryRegistryItem(),
+	GetSSMActivationRegistryItem(),
 	GetSSMParameterRegistryItem(),
 	GetSNSTopicRegistryItem(),
 	GetSNSTopicSubscriptionRegistryItem(),
@@ -230,7 +231,6 @@ var FreeResources []string = []string{
 	"aws_sns_topic_policy",
 
 	// AWS SSM
-	"aws_ssm_activation",
 	"aws_ssm_association",
 	"aws_ssm_maintenance_window",
 	"aws_ssm_maintenance_window_target",
