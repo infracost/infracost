@@ -44,9 +44,9 @@ func NewSSMActivation(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:            "On-Premises instance management - advanced",
-				Unit:            "Hours",
-				UnitMultiplier:  1,
+				Name:           "On-Premises instance management - advanced",
+				Unit:           "Hours",
+				UnitMultiplier: 1,
 				HourlyQuantity: decimalPtr(instanceCount),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
