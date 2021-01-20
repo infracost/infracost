@@ -146,7 +146,7 @@ func RunCostCalculations(project Project) ([]*schema.Resource, error) {
 	if err != nil {
 		return resources, err
 	}
-	err = prices.PopulatePrices(resources)
+	err = prices.PopulatePrices(resources, 4)
 	if err != nil {
 		return resources, err
 	}
