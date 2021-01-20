@@ -62,6 +62,10 @@ func defaultCmd() *cli.Command {
 				Usage:     "Path to Infracost usage file that specifies values for usage-based resources",
 				TakesFile: true,
 			},
+			&cli.IntFlag{
+				Name:  "concurrency",
+				Usage: "Concurrency level of resources processing, defaults to max(4, number of cores * 4)",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			if err := checkAPIKey(); err != nil {
@@ -70,6 +74,10 @@ func defaultCmd() *cli.Command {
 
 			config.Environment.Flags = c.FlagNames()
 			config.Environment.OutputFormat = c.String("output")
+			concurrency := c.Int("concurrency")
+			if concurrency < 1 {
+				return errors.New("concurrency level must be higher than 0. omit to fallback to default")
+			}
 
 			if c.String("output") == "json" && c.Bool("show-skipped") {
 				msg := color.YellowString("The --show-skipped option is not needed with JSON output as that always includes them\n")
@@ -88,7 +96,7 @@ func defaultCmd() *cli.Command {
 
 			spinner = spin.NewSpinner("Calculating cost estimate")
 
-			if err := prices.PopulatePrices(resources); err != nil {
+			if err := prices.PopulatePrices(resources, concurrency); err != nil {
 				spinner.Fail()
 
 				red := color.New(color.FgHiRed)

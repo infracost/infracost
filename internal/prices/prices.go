@@ -1,6 +1,7 @@
 package prices
 
 import (
+	"runtime"
 	"sync"
 
 	"github.com/infracost/infracost/internal/events"
@@ -12,7 +13,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func PopulatePrices(resources []*schema.Resource) error {
+func PopulatePrices(resources []*schema.Resource, concurrency int) error {
 	q := NewGraphQLQueryRunner()
 
 	var wg sync.WaitGroup
@@ -28,7 +29,7 @@ func PopulatePrices(resources []*schema.Resource) error {
 		events.SendReport("resourceSummary", summary)
 	}()
 
-	err := GetPricesConcurrent(resources, q)
+	err := GetPricesConcurrent(resources, q, concurrency)
 	if err != nil {
 		return err
 	}
@@ -38,10 +39,19 @@ func PopulatePrices(resources []*schema.Resource) error {
 	return nil
 }
 
-// GetPricesConcurrent gets the prices of all resources concurrently.
-func GetPricesConcurrent(resources []*schema.Resource, q QueryRunner) error {
-	// Number of workers
-	numWorkers := 10
+// GetPricesConcurrent gets the prices of all resources concurrently. Concurrency level can be
+// configured with --concurrency flag. It defaults to max(4, number of CPUs * 4).
+func GetPricesConcurrent(resources []*schema.Resource, q QueryRunner, concurrency int) error {
+	// Set the number of workers
+	numWorkers := concurrency
+	if numWorkers == 0 {
+		// User did not specify the level of concurrency. Using default.
+		numWorkers = 4
+		numCPU := runtime.NumCPU()
+		if numCPU*4 > numWorkers {
+			numWorkers = numCPU * 4
+		}
+	}
 	numJobs := len(resources)
 	jobs := make(chan *schema.Resource, numJobs)
 	resultErrors := make(chan error, numJobs)
