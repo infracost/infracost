@@ -115,7 +115,7 @@ func (p *terraformProvider) generateStateJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	return runShow(opts, p.planFile)
+	return runShow(opts, "")
 }
 
 func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
@@ -338,7 +338,11 @@ func runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
 func runShow(opts *CmdOptions, planFile string) ([]byte, error) {
 	spinner := spin.NewSpinner("Running terraform show")
 
-	out, err := Cmd(opts, "show", "-no-color", "-json", planFile)
+	args := []string{"show", "-no-color", "-json"}
+	if planFile != "" {
+		args = append(args, planFile)
+	}
+	out, err := Cmd(opts, args...)
 	if err != nil {
 		spinner.Fail()
 		terraformError(err)

@@ -35,7 +35,10 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 
 	// Gateway endpoints don't have a cost associated with them
 	if vpcEndpointType == "Gateway" {
-		return nil
+		return &schema.Resource{
+			NoPrice:   true,
+			IsSkipped: true,
+		}
 	}
 
 	switch vpcEndpointType {
