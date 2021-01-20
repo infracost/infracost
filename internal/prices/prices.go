@@ -13,7 +13,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func PopulatePrices(resources []*schema.Resource, concurrency int) error {
+func PopulatePrices(resources []*schema.Resource) error {
 	q := NewGraphQLQueryRunner()
 
 	var wg sync.WaitGroup
@@ -29,7 +29,7 @@ func PopulatePrices(resources []*schema.Resource, concurrency int) error {
 		events.SendReport("resourceSummary", summary)
 	}()
 
-	err := GetPricesConcurrent(resources, q, concurrency)
+	err := GetPricesConcurrent(resources, q)
 	if err != nil {
 		return err
 	}
@@ -39,19 +39,18 @@ func PopulatePrices(resources []*schema.Resource, concurrency int) error {
 	return nil
 }
 
-// GetPricesConcurrent gets the prices of all resources concurrently. Concurrency level can be
-// configured with --concurrency flag. It defaults to max(4, number of CPUs * 4).
-func GetPricesConcurrent(resources []*schema.Resource, q QueryRunner, concurrency int) error {
+// GetPricesConcurrent gets the prices of all resources concurrently.
+// Concurrency level is calculated using the following formula:
+// max(min(4, numCPU * 4), 16)
+func GetPricesConcurrent(resources []*schema.Resource, q QueryRunner) error {
 	// Set the number of workers
-	numWorkers := concurrency
-	if numWorkers == 0 {
-		// User did not specify the level of concurrency. Fallback to the default.
-		// default: max(4, numOfCPU * 4)
-		numWorkers = 4
-		numCPU := runtime.NumCPU()
-		if numCPU*4 > numWorkers {
-			numWorkers = numCPU * 4
-		}
+	numWorkers := 4
+	numCPU := runtime.NumCPU()
+	if numCPU*4 > numWorkers {
+		numWorkers = numCPU * 4
+	}
+	if numWorkers > 16 {
+		numWorkers = 16
 	}
 	numJobs := len(resources)
 	jobs := make(chan *schema.Resource, numJobs)
