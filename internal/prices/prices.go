@@ -45,7 +45,8 @@ func GetPricesConcurrent(resources []*schema.Resource, q QueryRunner, concurrenc
 	// Set the number of workers
 	numWorkers := concurrency
 	if numWorkers == 0 {
-		// User did not specify the level of concurrency. Using default.
+		// User did not specify the level of concurrency. Fallback to the default.
+		// default: max(4, numOfCPU * 4)
 		numWorkers = 4
 		numCPU := runtime.NumCPU()
 		if numCPU*4 > numWorkers {
@@ -71,7 +72,7 @@ func GetPricesConcurrent(resources []*schema.Resource, q QueryRunner, concurrenc
 		jobs <- r
 	}
 
-	// Get the result errors of jobs
+	// Get the result of the jobs
 	for i := 0; i < numJobs; i++ {
 		err := <-resultErrors
 		if err != nil {
