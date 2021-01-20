@@ -28,14 +28,9 @@ func PopulatePrices(resources []*schema.Resource) error {
 		events.SendReport("resourceSummary", summary)
 	}()
 
-	for _, r := range resources {
-		if r.IsSkipped {
-			continue
-		}
-
-		if err := GetPrices(r, q); err != nil {
-			return err
-		}
+	err := GetPricesConcurrent(resources, q)
+	if err != nil {
+		return err
 	}
 
 	wg.Wait()
@@ -43,7 +38,43 @@ func PopulatePrices(resources []*schema.Resource) error {
 	return nil
 }
 
+// GetPricesConcurrent gets the prices of all resources concurrently.
+func GetPricesConcurrent(resources []*schema.Resource, q QueryRunner) error {
+	// Number of workers
+	numWorkers := 10
+	numJobs := len(resources)
+	jobs := make(chan *schema.Resource, numJobs)
+	resultErrors := make(chan error, numJobs)
+
+	// Fire up the workers
+	for i := 0; i < numWorkers; i++ {
+		go func(jobs <-chan *schema.Resource, resultErrors chan<- error) {
+			for r := range jobs {
+				err := GetPrices(r, q)
+				resultErrors <- err
+			}
+		}(jobs, resultErrors)
+	}
+
+	// Feed the workers the jobs of getting prices
+	for _, r := range resources {
+		jobs <- r
+	}
+
+	// Get the result errors of jobs
+	for i := 0; i < numJobs; i++ {
+		err := <-resultErrors
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func GetPrices(r *schema.Resource, q QueryRunner) error {
+	if r.IsSkipped {
+		return nil
+	}
 	results, err := q.RunQueries(r)
 	if err != nil {
 		return err
