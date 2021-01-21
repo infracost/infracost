@@ -10,11 +10,18 @@ func GetEC2TransitGatewayVpcAttachmentRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_ec2_transit_gateway_vpc_attachment",
 		RFunc: NewEC2TransitGatewayVpcAttachment,
+		ReferenceAttributes: []string{
+			"transit_gateway_id",
+		},
 	}
 }
 
 func NewEC2TransitGatewayVpcAttachment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
+	transitGatewayRefs := d.References("transit_gateway_id")
+	if len(transitGatewayRefs) > 0 {
+		region = transitGatewayRefs[0].Get("region").String()
+	}
 
 	var gbDataProcessed *decimal.Decimal
 
