@@ -126,3 +126,6 @@ resource_usage:
     monthly_encryption_requests: 100000               # Estimated number of field level encryption requests per month.
     monthly_log_lines: 5000000                        # Estimated number of real-time log lines per month.
     monthly_custom_ssl_certificates: 3                # Estimated number of dedicated IP custom SSL certificates per month.
+
+  google_storage_bucket.my_storage_bucket:
+    monthly_gb_storage: 150   # Estimated GB of data stored in the storage bucket per month.
