@@ -1,8 +1,9 @@
 FROM golang:1.15 as builder
 
 ARG ARCH=linux
-ARG DEFAULT_TERRAFORM_VERSION=0.14.4
+ARG DEFAULT_TERRAFORM_VERSION=0.14.5
 ARG TERRAGRUNT_VERSION=0.27.1
+# Use infracost-usage.yml instead of the provider, see https://www.infracost.io/docs/usage_based_resources
 ARG TERRAFORM_PROVIDER_INFRACOST_VERSION=latest
 
 # Set Environment Variables
@@ -25,7 +26,10 @@ RUN AVAILABLE_TERRAFORM_VERSIONS="0.12.30 0.13.6 ${DEFAULT_TERRAFORM_VERSION}" &
     rm terraform_${VERSION}_linux_amd64.zip && \
     rm terraform_${VERSION}_SHA256SUMS; \
     done && \
-    mv /usr/bin/terraform_${DEFAULT_TERRAFORM_VERSION} /usr/bin/terraform
+    ln -s /usr/bin/terraform_0.12.30 /usr/bin/terraform_0.12 && \
+    ln -s /usr/bin/terraform_0.13.6 /usr/bin/terraform_0.13 && \
+    ln -s /usr/bin/terraform_${DEFAULT_TERRAFORM_VERSION} /usr/bin/terraform_0.14 && \
+    ln -s /usr/bin/terraform_${DEFAULT_TERRAFORM_VERSION} /usr/bin/terraform
 
 # Install Terragrunt
 RUN wget -q https://github.com/gruntwork-io/terragrunt/releases/download/v$TERRAGRUNT_VERSION/terragrunt_linux_amd64
