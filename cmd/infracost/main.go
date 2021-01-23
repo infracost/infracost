@@ -139,7 +139,7 @@ DOCS: https://infracost.io/docs`,
 			return nil
 		},
 		Before:   handleGlobalFlags,
-		Commands: []*cli.Command{registerCmd(), reportCmd(), feedbackCmd()},
+		Commands: []*cli.Command{registerCmd(), reportCmd()},
 		Action:   defaultCmd.Action,
 	}
 

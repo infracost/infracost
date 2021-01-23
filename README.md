@@ -5,7 +5,7 @@
 <a href="https://hub.docker.com/r/infracost/infracost/tags"><img alt="Docker Image" src="https://img.shields.io/docker/cloud/build/infracost/infracost"/></a>
 <a href="https://twitter.com/intent/tweet?text=Get%20cost%20estimates%20for%20cloud%20infrastructure%20in%20pull%20requests!&url=https://www.infracost.io&hashtags=cloud,cost,aws,IaC,terraform"><img alt="Tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
 
-[![Community Slack](.github/assets/community-slack.svg)](https://www.infracost.io/community-chat) [![Schedule setup call](.github/assets/schedule-setup-call.svg)](http://calendly.com/alikhajeh1/infracost-onboarding)
+[![Community Slack](.github/assets/community-slack.svg)](https://www.infracost.io/community-chat)
 
 Infracost shows cloud cost estimates for Terraform projects. It helps developers, devops and others to quickly see the cost breakdown and compare different options upfront.
 
