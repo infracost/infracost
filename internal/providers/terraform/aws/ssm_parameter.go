@@ -43,9 +43,9 @@ func parameterStorageCostComponent(d *schema.ResourceData, u *schema.UsageData) 
 	}
 
 	return &schema.CostComponent{
-		Name:           "Parameter storage (advanced)",
-		Unit:           "Parameter-hours",
-		UnitMultiplier: 1,
+		Name:            "Parameter storage (advanced)",
+		Unit:            "Parameter-hours",
+		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(parameterStorageHours),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -65,7 +65,7 @@ func apiThroughputCostComponent(d *schema.ResourceData, u *schema.UsageData) *sc
 	var parameterType string
 	var tierType *string
 
-	monthlyApiInteractions := decimal.Zero
+	monthlyAPIInteractions := decimal.Zero
 
 	if u != nil && u.Get("api_throughput_tier").Exists() {
 		parameterType = u.Get("api_throughput_tier").String()
@@ -74,7 +74,7 @@ func apiThroughputCostComponent(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 
 	if u != nil && u.Get("monthly_api_interactions").Exists() {
-		monthlyApiInteractions = decimal.NewFromInt(u.Get("monthly_api_interactions").Int())
+		monthlyAPIInteractions = decimal.NewFromInt(u.Get("monthly_api_interactions").Int())
 	}
 
 	switch parameterType {
@@ -88,7 +88,7 @@ func apiThroughputCostComponent(d *schema.ResourceData, u *schema.UsageData) *sc
 		Name:            fmt.Sprintf("API interactions (%s)", strings.ToLower(parameterType)),
 		Unit:            "Interactions",
 		UnitMultiplier:  10000,
-		MonthlyQuantity: decimalPtr(monthlyApiInteractions),
+		MonthlyQuantity: decimalPtr(monthlyAPIInteractions),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
