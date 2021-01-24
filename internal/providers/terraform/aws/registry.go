@@ -46,6 +46,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetS3BucketRegistryItem(),
 	GetS3BucketAnalyticsConfigurationRegistryItem(),
 	GetS3BucketInventoryRegistryItem(),
+	GetSSMActivationRegistryItem(),
+	GetSSMParameterRegistryItem(),
 	GetSNSTopicRegistryItem(),
 	GetSNSTopicSubscriptionRegistryItem(),
 	GetSQSQueueRegistryItem(),
@@ -232,6 +234,15 @@ var FreeResources []string = []string{
 	"aws_sns_platform_application",
 	"aws_sns_sms_preferences",
 	"aws_sns_topic_policy",
+
+	// AWS SSM
+	"aws_ssm_association",
+	"aws_ssm_maintenance_window",
+	"aws_ssm_maintenance_window_target",
+	"aws_ssm_maintenance_window_task",
+	"aws_ssm_patch_baseline",
+	"aws_ssm_patch_group",
+	"aws_ssm_resource_data_sync",
 
 	// AWS VPC
 	"aws_customer_gateway",
