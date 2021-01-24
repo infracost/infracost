@@ -22,10 +22,10 @@ resource_usage:
     monthly_build_minutes: 10000 # Estimated total duration of monthly codebuild execution usage in minutes.
 
   aws_data_transfer.my_region:
-    region: us-east-1                   # Region the data transfer is originating from.
+    region: us-east-1                           # Region the data transfer is originating from.
     monthly_gb_intra_region: 1000               # Estimated data transferred between availability zones in the region.
     monthly_gb_outbound_us_east_to_us_east: 500 # Estimated data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
-    monthly_gb_outbound_other_region: 750      # Estimated data transferred to other AWS regions.
+    monthly_gb_outbound_other_region: 750       # Estimated data transferred to other AWS regions.
     monthly_gb_outbound_internet: 5000          # Estimated data transferred to the Internet.
 
   aws_dx_gateway_association.my_gateway:
@@ -49,7 +49,7 @@ resource_usage:
     storage: 1 # Estimated size of ECR repository in GBs.
 
   aws_instance.windows_instance:
-    operating_system: windows # Override the operating system of the instance. Can be: windows, suse, rhel
+    operating_system: windows # Override the operating system of the instance, can be: windows, suse, rhel.
 
   aws_lambda_function.my_function:
     monthly_requests: 100000      # Estimated monthly requests to the Lambda function.
@@ -71,13 +71,13 @@ resource_usage:
     request_size: 64          # Size of the requests to SQS, SQS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
 
   aws_ssm_parameter.my_ssm_parameter:
-    api_throughput_tier: Advanced # SSM Parameter Throughput tier can be Advanced or Higher.
-    monthly_api_interactions: 1000000 # SSM Parameter API usage, SSM bills per 10000 requests.
-    parameter_storage_hours: 730 # Number of hours in the month the parameter will be stored for.
+    api_throughput_limit: advanced    # SSM Parameter Throughput limit, can be: advanced, higher.
+    monthly_api_interactions: 1000000 # Estimated monthly API interactions.
+    parameter_storage_hours: 730      # Estimated number of hours in the month parameters will be stored for.
 
   aws_ssm_activation.my_activations:
-    instance_tier: Advanced # The Instance tier to use, Advanced is the only tier that as a cost.
-    instance_count: 100 # The number of instances you expect to manage
+    instance_tier: advanced # Instance tier being used, can be: advanced, standard.
+    instance_count: 100     # Estimated number of instances being managed.
 
   aws_vpc_endpoint.my_endpoint:
     monthly_gb_data_processed: 1000 # Estimated GB of data processed by the VPC endpoint(s) per month.
@@ -131,7 +131,7 @@ resource_usage:
       singapore: 58600            # Estimated number of Shield request from Singapore per month.
       south_korea: 24000          # Estimated number of Shield request from South Korea per month.
       india: 10000                # Estimated number of Shield request from India per month.
-    monthly_invalidation_paths: 1200                  # Estimated number of invalidation requests per month.
-    monthly_encryption_requests: 100000               # Estimated number of field level encryption requests per month.
-    monthly_log_lines: 5000000                        # Estimated number of real-time log lines per month.
-    monthly_custom_ssl_certificates: 3                # Estimated number of dedicated IP custom SSL certificates per month.
+    monthly_invalidation_paths: 1200    # Estimated number of invalidation requests per month.
+    monthly_encryption_requests: 100000 # Estimated number of field level encryption requests per month.
+    monthly_log_lines: 5000000          # Estimated number of real-time log lines per month.
+    monthly_custom_ssl_certificates: 3  # Estimated number of dedicated IP custom SSL certificates per month.

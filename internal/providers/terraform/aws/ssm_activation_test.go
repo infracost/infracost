@@ -1,7 +1,6 @@
 package aws_test
 
 import (
-	"github.com/shopspring/decimal"
 	"testing"
 
 	"github.com/infracost/infracost/internal/testutil"
@@ -21,7 +20,8 @@ func TestAwsSSMActivationFunction(t *testing.T) {
 			iam_role = "my-test-iam-role"
 			registration_limit = 1001
 		}
-        `
+  `
+	// TODO: add test for usage when infracost-usage.yml is supported
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
@@ -30,7 +30,7 @@ func TestAwsSSMActivationFunction(t *testing.T) {
 				{
 					Name:             "On-prem managed instances (advanced)",
 					PriceHash:        "b6f8183d0311753e7cda0fcf60802cde-d2c98780d7b6e36641b521f1f8145c6f",
-					MonthlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(0)),
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},

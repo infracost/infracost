@@ -2,8 +2,10 @@ package aws
 
 import (
 	"fmt"
-	"github.com/infracost/infracost/internal/schema"
 	"strings"
+
+	"github.com/infracost/infracost/internal/schema"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/shopspring/decimal"
 )
@@ -17,9 +19,20 @@ func GetSSMParameterRegistryItem() *schema.RegistryItem {
 
 func NewSSMParameter(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
-
-	costComponents = append(costComponents, parameterStorageCostComponent(d, u))
-	costComponents = append(costComponents, apiThroughputCostComponent(d, u))
+	storage := parameterStorageCostComponent(d, u)
+	if storage != nil {
+		costComponents = append(costComponents, storage)
+	}
+	apiThroughput := apiThroughputCostComponent(d, u)
+	if apiThroughput != nil {
+		costComponents = append(costComponents, apiThroughput)
+	}
+	if len(costComponents) == 0 {
+		return &schema.Resource{
+			NoPrice:   true,
+			IsSkipped: true,
+		}
+	}
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -30,23 +43,25 @@ func NewSSMParameter(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 func parameterStorageCostComponent(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
 	region := d.Get("region").String()
 
-	var parameterStorageHours decimal.Decimal
-
-	if d.Get("tier").String() == "Standard" {
+	tier := "Standard"
+	if d.Get("tier").Exists() {
+		tier = d.Get("tier").String()
+	}
+	if tier == "Standard" {
+		// Standard is free
 		return nil
 	}
 
+	parameterStorageHours := decimal.NewFromInt(730)
 	if u != nil && u.Get("parameter_storage_hours").Exists() {
 		parameterStorageHours = decimal.NewFromInt(u.Get("parameter_storage_hours").Int())
-	} else {
-		parameterStorageHours = decimal.NewFromInt(730)
 	}
 
 	return &schema.CostComponent{
 		Name:            "Parameter storage (advanced)",
-		Unit:            "Parameter-hours",
+		Unit:            "hours",
 		UnitMultiplier:  1,
-		MonthlyQuantity: decimalPtr(parameterStorageHours),
+		MonthlyQuantity: &parameterStorageHours,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -62,40 +77,40 @@ func parameterStorageCostComponent(d *schema.ResourceData, u *schema.UsageData) 
 func apiThroughputCostComponent(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
 	region := d.Get("region").String()
 
-	var parameterType string
-	var tierType *string
-
-	monthlyAPIInteractions := decimal.Zero
-
-	if u != nil && u.Get("api_throughput_tier").Exists() {
-		parameterType = u.Get("api_throughput_tier").String()
-	} else {
-		parameterType = d.Get("tier").String()
+	tier := "standard"
+	if d.Get("tier").Exists() {
+		tier = d.Get("tier").String()
 	}
-
-	if u != nil && u.Get("monthly_api_interactions").Exists() {
-		monthlyAPIInteractions = decimal.NewFromInt(u.Get("monthly_api_interactions").Int())
+	if u != nil && u.Get("api_throughput_limit").Exists() {
+		tier = u.Get("api_throughput_limit").String()
 	}
+	tier = strings.ToLower(tier)
 
-	switch parameterType {
-	case "Advanced", "Higher":
-		tierType = strPtr("/PS-Param-Processed-Tier2/")
-	default:
+	if tier == "standard" {
+		// Standard is free
 		return nil
+	}
+	if !(tier == "advanced" || tier == "higher") {
+		log.Errorf("api_throughput_limit in %s must be one of: advanced, higher", d.Address)
+	}
+
+	var monthlyAPIInteractions *decimal.Decimal
+	if u != nil && u.Get("monthly_api_interactions").Exists() {
+		monthlyAPIInteractions = decimalPtr(decimal.NewFromInt(u.Get("monthly_api_interactions").Int()))
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("API interactions (%s)", strings.ToLower(parameterType)),
-		Unit:            "Interactions",
+		Name:            fmt.Sprintf("API interactions (%s)", tier),
+		Unit:            "interactions",
 		UnitMultiplier:  10000,
-		MonthlyQuantity: decimalPtr(monthlyAPIInteractions),
+		MonthlyQuantity: monthlyAPIInteractions,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
 			Service:       strPtr("AWSSystemsManager"),
 			ProductFamily: strPtr("API Request"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: tierType},
+				{Key: "usagetype", ValueRegex: strPtr("/PS-Param-Processed-Tier2/")},
 			},
 		},
 	}

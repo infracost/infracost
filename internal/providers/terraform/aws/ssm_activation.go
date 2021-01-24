@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -15,8 +17,7 @@ func GetSSMActivationRegistryItem() *schema.RegistryItem {
 func NewSSMActivation(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
-	instanceCount := decimal.Zero
-
+	var instanceCount *decimal.Decimal
 	var instanceTier string
 
 	if u != nil && u.Get("instance_tier").Exists() {
@@ -28,11 +29,10 @@ func NewSSMActivation(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 	}
 
 	if u != nil && u.Get("instance_count").Exists() {
-		instanceCount = decimal.NewFromInt(u.Get("instance_count").Int())
+		instanceCount = decimalPtr(decimal.NewFromInt(u.Get("instance_count").Int()))
 	}
 
-	switch instanceTier {
-	case "Advanced":
+	if strings.ToLower(instanceTier) == "advanced" {
 		return &schema.Resource{
 			Name: d.Address,
 			CostComponents: []*schema.CostComponent{
@@ -40,7 +40,7 @@ func NewSSMActivation(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 					Name:           "On-prem managed instances (advanced)",
 					Unit:           "hours",
 					UnitMultiplier: 1,
-					HourlyQuantity: decimalPtr(instanceCount),
+					HourlyQuantity: instanceCount,
 					ProductFilter: &schema.ProductFilter{
 						VendorName:    strPtr("aws"),
 						Region:        strPtr(region),
@@ -53,7 +53,11 @@ func NewSSMActivation(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 				},
 			},
 		}
-	default:
-		return nil
+	}
+
+	// standard instanceTier is free
+	return &schema.Resource{
+		NoPrice:   true,
+		IsSkipped: true,
 	}
 }
