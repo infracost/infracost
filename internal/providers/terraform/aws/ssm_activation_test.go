@@ -1,6 +1,7 @@
 package aws_test
 
 import (
+	"github.com/shopspring/decimal"
 	"testing"
 
 	"github.com/infracost/infracost/internal/testutil"
@@ -14,20 +15,22 @@ func TestAwsSSMActivationFunction(t *testing.T) {
 	}
 
 	tf := `
-		resource "aws_ssm_activation" "standard" {
-			name = "test_ssm_standard_activation"
+		resource "aws_ssm_activation" "advanced" {
+			name = "test_ssm_advanced_activation"
 			description = "Test"
 			iam_role = "my-test-iam-role"
+			registration_limit = 1001
 		}
         `
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
-			Name: "aws_ssm_activation.standard",
+			Name: "aws_ssm_activation.advanced",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "On-Premises instance management - standard",
-					SkipCheck: true,
+					Name:             "On-prem managed instances (advanced)",
+					PriceHash:        "b6f8183d0311753e7cda0fcf60802cde-d2c98780d7b6e36641b521f1f8145c6f",
+					MonthlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(0)),
 				},
 			},
 		},

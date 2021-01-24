@@ -70,6 +70,15 @@ resource_usage:
     monthly_requests: 1000000 # Estimated monthly requests to SQS.
     request_size: 64          # Size of the requests to SQS, SQS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
 
+  aws_ssm_parameter.my_ssm_parameter:
+    api_throughput_tier: Advanced # SSM Parameter Throughput tier can be Advanced or Higher.
+    monthly_api_interactions: 1000000 # SSM Parameter API usage, SSM bills per 10000 requests.
+    parameter_storage_hours: 730 # Number of hours in the month the parameter will be stored for.
+
+  aws_ssm_activation.my_activations:
+    instance_tier: Advanced # The Instance tier to use, Advanced is the only tier that as a cost.
+    instance_count: 100 # The number of instances you expect to manage
+
   aws_vpc_endpoint:
     monthly_gb_data_processed: 1000 # Estimated GB of data processed by the VPC endpoint(s) per month.
 

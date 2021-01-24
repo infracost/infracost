@@ -15,49 +15,45 @@ func GetSSMActivationRegistryItem() *schema.RegistryItem {
 func NewSSMActivation(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
-	tier := "Standard"
 	instanceCount := decimal.Zero
 
+	var instanceTier string
+
 	if u != nil && u.Get("instance_tier").Exists() {
-		tier = u.Get("instance_tier").String()
+		instanceTier = u.Get("instance_tier").String()
+	} else if d.Get("registration_limit").Exists() {
+		if d.Get("registration_limit").Int() > 1000 {
+			instanceTier = "Advanced"
+		}
 	}
 
 	if u != nil && u.Get("instance_count").Exists() {
 		instanceCount = decimal.NewFromInt(u.Get("instance_count").Int())
 	}
 
-	if tier == "Standard" {
+	switch instanceTier {
+	case "Advanced":
 		return &schema.Resource{
 			Name: d.Address,
 			CostComponents: []*schema.CostComponent{
 				{
-					Name:           "On-Premises instance management - standard",
-					Unit:           "Hours",
+					Name:           "On-prem managed instances (advanced)",
+					Unit:           "hours",
 					UnitMultiplier: 1,
-					HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-				},
-			},
-		}
-	}
-
-	return &schema.Resource{
-		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:           "On-Premises instance management - advanced",
-				Unit:           "Hours",
-				UnitMultiplier: 1,
-				HourlyQuantity: decimalPtr(instanceCount),
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AWSSystemsManager"),
-					ProductFamily: strPtr("AWS Systems Manager"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr("/MI-AdvInstances-Hrs/")},
+					HourlyQuantity: decimalPtr(instanceCount),
+					ProductFilter: &schema.ProductFilter{
+						VendorName:    strPtr("aws"),
+						Region:        strPtr(region),
+						Service:       strPtr("AWSSystemsManager"),
+						ProductFamily: strPtr("AWS Systems Manager"),
+						AttributeFilters: []*schema.AttributeFilter{
+							{Key: "usagetype", ValueRegex: strPtr("/MI-AdvInstances-Hrs/")},
+						},
 					},
 				},
 			},
-		},
+		}
+	default:
+		return nil
 	}
 }
