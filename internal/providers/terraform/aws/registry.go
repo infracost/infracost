@@ -7,6 +7,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAPIGatewayStageRegistryItem(),
 	GetAPIGatewayv2ApiRegistryItem(),
 	GetAutoscalingGroupRegistryItem(),
+	GetCloudfrontDistributionRegistryItem(),
 	GetCloudwatchDashboardRegistryItem(),
 	GetCloudwatchLogGroupItem(),
 	GetCloudwatchMetricAlarmRegistryItem(),
@@ -103,6 +104,10 @@ var FreeResources []string = []string{
 	"aws_dx_gateway",
 	"aws_dx_gateway_association_proposal",
 
+	// AWS Cloudfront
+	"aws_cloudfront_origin_access_identity",
+	"aws_cloudfront_public_key",
+
 	// AWS Cloudwatch
 	"aws_cloudwatch_log_destination",
 	"aws_cloudwatch_log_destination_policy",
@@ -184,6 +189,7 @@ var FreeResources []string = []string{
 
 	// AWS Lambda
 	"aws_lambda_permission",
+	"aws_lambda_function_event_invoke_config",
 
 	// AWS Others
 	"aws_db_instance_role_association",
@@ -197,7 +203,6 @@ var FreeResources []string = []string{
 	"aws_eip_association",
 	"aws_elasticsearch_domain_policy",
 	"aws_key_pair",
-	"aws_lambda_function_event_invoke_config",
 	"aws_launch_configuration",
 	"aws_launch_template",
 	"aws_lightsail_domain",

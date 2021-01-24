@@ -23,10 +23,10 @@ resource_usage:
 
   aws_data_transfer.my_region:
     region: us-east-1                   # Region the data transfer is originating from.
-    intra_region_gb: 1000               # Estimated data transferred between availability zones in the region.
-    outbound_us_east_to_us_east_gb: 500 # Estimated data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
-    outbound_other_regions_gb: 750      # Estimated data transferred to other AWS regions.
-    outbound_internet_gb: 5000          # Estimated data transferred to the Internet.
+    monthly_gb_intra_region: 1000               # Estimated data transferred between availability zones in the region.
+    monthly_gb_outbound_us_east_to_us_east: 500 # Estimated data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
+    monthly_gb_outbound_other_region: 750      # Estimated data transferred to other AWS regions.
+    monthly_gb_outbound_internet: 5000          # Estimated data transferred to the Internet.
 
   aws_dx_gateway_association.my_gateway:
     monthly_gb_data_processed: 100 # Estimated GB of data processed by the DX gateway association per month.
@@ -46,7 +46,7 @@ resource_usage:
     monthly_gb_data_processed: 100 # Estimated GB of data processed by the EC2 transit gateway attachment(s) per month.
 
   aws_ecr_repository.my_repository:
-    storage: 1 # Estimated monthly ECR repository storage usage.
+    storage: 1 # Estimated size of ECR repository in GBs.
 
   aws_instance.windows_instance:
     operating_system: windows # Override the operating system of the instance. Can be: windows, suse, rhel
@@ -79,8 +79,59 @@ resource_usage:
     instance_tier: Advanced # The Instance tier to use, Advanced is the only tier that as a cost.
     instance_count: 100 # The number of instances you expect to manage
 
-  aws_vpc_endpoint:
+  aws_vpc_endpoint.my_endpoint:
     monthly_gb_data_processed: 1000 # Estimated GB of data processed by the VPC endpoint(s) per month.
 
-  aws_vpn_connection:
+  aws_vpn_connection.my_connection:
     monthly_gb_data_processed: 100 # Estimated monthly data processed through a transit gateway attached to your VPN Connection.
+
+  aws_cloudfront_distribution.my_s3_distribution:
+    monthly_gb_transfer_internet: # Estimated GB of regional data transfer out to internet per month.
+      us: 51200000                # Estimated GB of data from the United States to internet per month.
+      europe: 220000              # Estimated GB of data from Europe to internet per month.
+      south_africa: 10000         # Estimated GB of data from South Africa to internet per month.
+      south_america: 50000        # Estimated GB of data from South America to internet per month.
+      japan: 387000               # Estimated GB of data from Japan to internet per month.
+      australia: 500000           # Estimated GB of data from Australia to internet per month.
+      asia_pacific: 1200000       # Estimated GB of data from Asia pacific to internet per month.
+      india: 200000               # Estimated GB of data from India to internet per month.
+    monthly_gb_transfer_origin:   # Estimated GB of regional data transfer out to origin
+      us: 2200                    # Estimated GB of data from the United States to origin per month.
+      europe: 1000                # Estimated GB of data from Europe to origin per month.
+      south_africa: 300           # Estimated GB of data from South Africa to origin per month.
+      south_america: 200          # Estimated GB of data from South America to origin per month.
+      japan: 10                   # Estimated GB of data from Japan to origin per month.
+      australia: 100              # Estimated GB of data from Australia to origin per month.
+      asia_pacific: 30            # Estimated GB of data from Asia pacific to origin per month.
+      india: 80                   # Estimated GB of data from India to origin per month.
+    monthly_http_requests:        # Estimated number of HTTP requests per month.
+      us: 80000                   # Estimated number of HTTP request from the United States per month.
+      europe: 40000               # Estimated number of HTTP request from Europe per month.
+      south_africa: 20000         # Estimated number of HTTP request from South Africa per month.
+      south_america: 10000        # Estimated number of HTTP request from South America per month.
+      japan: 3000                 # Estimated number of HTTP request from Japan per month.
+      australia: 15000            # Estimated number of HTTP request from Australia per month.
+      asia_pacific: 45000         # Estimated number of HTTP request from Asia Pacific per month.
+      india: 10000                # Estimated number of HTTP request from India per month.
+    monthly_https_requests:       # Estimated number of HTTPS requests per month.
+      us: 180000                  # Estimated number of HTTPS request from the United States per month.
+      europe: 10000               # Estimated number of HTTPS request from Europe per month.
+      south_africa: 50000         # Estimated number of HTTPS request from South Africa per month.
+      south_america: 30000        # Estimated number of HTTPS request from South America per month.
+      japan: 1000                 # Estimated number of HTTPS request from Japan per month.
+      australia: 45000            # Estimated number of HTTPS request from Australia per month.
+      asia_pacific: 25000         # Estimated number of HTTPS request from Asia Pacific per month.
+      india: 30000                # Estimated number of HTTPS request from India per month.
+    monthly_shield_requests:      # Estimated number of shield requests per month.
+      us: 90000                   # Estimated number of Shield request from the United States per month.
+      europe: 30000               # Estimated number of Shield request from Europe per month.
+      south_america: 200          # Estimated number of Shield request from South America per month.
+      japan: 12300                # Estimated number of Shield request from Japan per month.
+      australia: 2300             # Estimated number of Shield request from Australia per month.
+      singapore: 58600            # Estimated number of Shield request from Singapore per month.
+      south_korea: 24000          # Estimated number of Shield request from South Korea per month.
+      india: 10000                # Estimated number of Shield request from India per month.
+    monthly_invalidation_paths: 1200                  # Estimated number of invalidation requests per month.
+    monthly_encryption_requests: 100000               # Estimated number of field level encryption requests per month.
+    monthly_log_lines: 5000000                        # Estimated number of real-time log lines per month.
+    monthly_custom_ssl_certificates: 3                # Estimated number of dedicated IP custom SSL certificates per month.

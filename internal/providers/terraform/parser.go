@@ -131,7 +131,7 @@ func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, v
 
 		// Otherwise use region from the provider conf
 		if region == "" {
-			region = providerRegion(providerConf, vars, t, resConf)
+			region = providerRegion(addr, providerConf, vars, t, resConf)
 		}
 
 		v = schema.AddRawValue(v, "region", region)
@@ -184,7 +184,7 @@ func resourceRegion(resourceType string, v gjson.Result) string {
 	return strings.Split(v.Get(arnAttr).String(), ":")[3]
 }
 
-func providerRegion(providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
+func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
 	var region string
 
 	providerKey := parseProviderKey(resConf)
@@ -204,7 +204,7 @@ func providerRegion(providerConf gjson.Result, vars gjson.Result, resourceType s
 			region = defaultProviderRegions[providerPrefix]
 
 			if region != "" {
-				log.Debugf("Falling back to default region (%s) for %s", region, resConf.Get("address").String())
+				log.Debugf("Falling back to default region (%s) for %s", region, addr)
 			}
 		}
 	}

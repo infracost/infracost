@@ -17,16 +17,27 @@ func TestVpcEndpoint(t *testing.T) {
 
 	tf := `
 		resource "aws_vpc_endpoint" "interface" {
-            service_name = "com.amazonaws.region.ec2"
-            vpc_id = "vpc-123456"
-            vpc_endpoint_type = "Interface"
+			service_name = "com.amazonaws.region.ec2"
+			vpc_id = "vpc-123456"
+			vpc_endpoint_type = "Interface"
 		}
 
 		resource "aws_vpc_endpoint" "gateway_loadbalancer" {
-            service_name = "com.amazonaws.region.ec2"
-            vpc_id = "vpc-123456"
-            vpc_endpoint_type = "GatewayLoadBalancer"
-		}`
+			service_name = "com.amazonaws.region.ec2"
+			vpc_id = "vpc-123456"
+			vpc_endpoint_type = "GatewayLoadBalancer"
+		}
+
+		resource "aws_vpc_endpoint" "multiple_interfaces" {
+			service_name = "com.amazonaws.region.ec2"
+			vpc_id = "vpc-123456"
+			vpc_endpoint_type = "Interface"
+			subnet_ids = [
+				"subnet-123456",
+				"subnet-654321"
+			]
+		}
+`
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
@@ -55,6 +66,21 @@ func TestVpcEndpoint(t *testing.T) {
 				{
 					Name:            "Data processed",
 					PriceHash:       "88513e1fd2a2e28b7ae752a813e771eb-b1ae3861dc57e2db217fa83a7420374f",
+					HourlyCostCheck: testutil.NilMonthlyCostCheck(),
+				},
+			},
+		},
+		{
+			Name: "aws_vpc_endpoint.multiple_interfaces",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Interface endpoint",
+					PriceHash:       "ef7fb85cbd68a47968dd294f49ed3517-d2c98780d7b6e36641b521f1f8145c6f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
+				},
+				{
+					Name:            "Data processed",
+					PriceHash:       "5fb8d7a651606fc4214684873291830f-b1ae3861dc57e2db217fa83a7420374f",
 					HourlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
