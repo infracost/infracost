@@ -72,7 +72,7 @@ func GetMyResourceRegistryItem() *schema.RegistryItem {
 func NewMyResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	region := d.Get("region").String()
-  instanceCount := 1
+    var instanceCount int64 = 1
 
 	costComponents := []*schema.CostComponent{
 		{
