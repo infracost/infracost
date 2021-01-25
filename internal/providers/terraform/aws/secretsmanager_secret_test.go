@@ -17,9 +17,9 @@ func TestAwsSecretsManagerSecretFunction(t *testing.T) {
 	}
 
 	tf := `
-  resource "aws_secretsmanager_secret" "secret" {
-    name = "my-test-secret"
-  }
+	resource "aws_secretsmanager_secret" "secret" {
+		name = "my-test-secret"
+	}
 `
 
 	resourceChecks := []testutil.ResourceCheck{
@@ -49,9 +49,9 @@ func TestAwsSecretsManagerSecret_usage(t *testing.T) {
 	}
 
 	tf := `
-  resource "aws_secretsmanager_secret" "secret" {
-    name = "my-test-secret"
-  }
+	resource "aws_secretsmanager_secret" "secret" {
+		name = "my-test-secret"
+	}
 `
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_secretsmanager_secret.secret": map[string]interface{}{
