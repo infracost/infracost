@@ -1,15 +1,12 @@
 package usage
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/tidwall/gjson"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v2"
 )
@@ -45,58 +42,22 @@ func LoadFromFile(usageFile string) (map[string]*schema.UsageData, error) {
 }
 
 func parseYAML(y []byte) (map[string]*schema.UsageData, error) {
-	usageMap := make(map[string]*schema.UsageData)
-
 	var usageFile UsageFile
 
 	err := yaml.Unmarshal(y, &usageFile)
 	if err != nil {
-		return usageMap, errors.Wrap(err, "Error parsing usage YAML")
+		return map[string]*schema.UsageData{}, errors.Wrap(err, "Error parsing usage YAML")
 	}
 
 	if !checkVersion(usageFile.Version) {
-		return usageMap, fmt.Errorf("Invalid usage file version. Supported versions are %s ≤ x ≤ %s", minVersion, maxVersion)
+		return map[string]*schema.UsageData{}, fmt.Errorf("Invalid usage file version. Supported versions are %s ≤ x ≤ %s", minVersion, maxVersion)
 	}
 
-	for addr, v := range usageFile.ResourceUsage {
-		usageMap[addr] = schema.NewUsageData(
-			addr,
-			ParseAttributes(v),
-		)
-	}
+	usageMap := schema.NewUsageMap(usageFile.ResourceUsage)
 
 	return usageMap, nil
 }
 
-func ParseAttributes(i interface{}) map[string]gjson.Result {
-	a := make(map[string]gjson.Result)
-	for k, v := range flatten(i) {
-		j, _ := json.Marshal(v)
-		a[k] = gjson.ParseBytes(j)
-	}
-
-	return a
-}
-
 func checkVersion(v string) bool {
 	return semver.Compare(v, minVersion) >= 0 && semver.Compare(v, maxVersion) <= 0
-}
-
-func flatten(i interface{}) map[string]interface{} {
-	keys := make([]string, 0)
-	result := make(map[string]interface{})
-	flattenHelper(i, keys, result)
-	return result
-}
-
-func flattenHelper(i interface{}, keys []string, result map[string]interface{}) {
-	switch v := i.(type) {
-	case map[interface{}]interface{}:
-		for k, v := range i.(map[interface{}]interface{}) {
-			flattenHelper(v, append(keys, fmt.Sprintf("%v", k)), result)
-		}
-	default:
-		k := strings.Join(keys, ".")
-		result[k] = v
-	}
 }

@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
@@ -39,34 +40,19 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 		replica {
 		  region_name = "us-west-1"
 		}
-	}
+	}`
 
-	data "infracost_aws_dynamodb_table" "my_dynamodb_table" {
-		resources = list(aws_dynamodb_table.my_dynamodb_table.id,)
-
-		monthly_write_request_units {
-			value = 3000000
-		}
-		monthly_read_request_units {
-			value = 8000000
-		}
-		monthly_gb_data_storage {
-		 	value = 230
-		}
-		monthly_gb_continuous_backup_storage {
-			value = 2300
-		}
-		monthly_gb_on_demand_backup_storage {
-			value = 460
-		}
-		monthly_gb_restore {
-			value = 230
-		}
-		monthly_streams_read_request_units {
-			value = 2000000
-		}
-	}
-	  `
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_dynamodb_table.my_dynamodb_table": map[string]interface{}{
+			"monthly_write_request_units":          3000000,
+			"monthly_read_request_units":           8000000,
+			"monthly_gb_data_storage":              230,
+			"monthly_gb_continuous_backup_storage": 2300,
+			"monthly_gb_on_demand_backup_storage":  460,
+			"monthly_gb_restore":                   230,
+			"monthly_streams_read_request_units":   2000000,
+		},
+	})
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
@@ -133,7 +119,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }
 
 func TestNewDynamoDBTableProvisioned(t *testing.T) {
@@ -229,5 +215,5 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }

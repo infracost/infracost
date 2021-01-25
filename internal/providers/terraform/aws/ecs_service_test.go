@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
@@ -76,7 +77,7 @@ func TestECSService(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
 
 func TestECSService_externalDeployment(t *testing.T) {
@@ -119,5 +120,5 @@ func TestECSService_externalDeployment(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }

@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
@@ -39,7 +40,7 @@ func TestNATGateway(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
 
 func TestNATGateway_usage(t *testing.T) {
@@ -51,16 +52,13 @@ func TestNATGateway_usage(t *testing.T) {
 		resource "aws_nat_gateway" "nat" {
 			allocation_id = "eip-12345678"
 			subnet_id     = "subnet-12345678"
-		}
+		}`
 
-		data "infracost_aws_nat_gateway" "nat" {
-			resources = [aws_nat_gateway.nat.id]
-
-			monthly_gb_data_processed {
-				value = 100
-			}
-		}
-		`
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_nat_gateway.nat": map[string]interface{}{
+			"monthly_gb_data_processed": 100,
+		},
+	})
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
@@ -80,5 +78,5 @@ func TestNATGateway_usage(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }

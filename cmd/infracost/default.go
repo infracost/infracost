@@ -12,6 +12,7 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/spin"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -81,7 +82,15 @@ func defaultCmd() *cli.Command {
 				usageError(c, err.Error())
 			}
 
-			resources, err := provider.LoadResources()
+			u, err := usage.LoadFromFile(c.String("usage-file"))
+			if err != nil {
+				return err
+			}
+			if len(u) > 0 {
+				config.Environment.HasUsageFile = true
+			}
+
+			resources, err := provider.LoadResources(u)
 			if err != nil {
 				return err
 			}

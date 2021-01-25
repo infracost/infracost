@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
@@ -19,30 +20,30 @@ func TestFSXWindowsFS(t *testing.T) {
 	  resource "aws_vpc" "example" {
 		cidr_block = "10.0.0.0/16"
 	  }
-	  
+
 	  resource "aws_subnet" "example" {
 		vpc_id     = aws_vpc.example.id
 		cidr_block = "10.0.1.0/24"
-	  
+
 		tags = {
 		  Name = "Main"
 		}
 	  }
-	  
+
 	  resource "aws_fsx_windows_file_system" "example" {
 		storage_capacity    = 300
 		subnet_ids          = [aws_subnet.example.id]
 		throughput_capacity = 1024
 		deployment_type = "MULTI_AZ_1"
  		storage_type = "HDD"
-	  
+
 		self_managed_active_directory {
 		  dns_ips     = ["10.0.0.111", "10.0.0.222"]
 		  domain_name = "corp.example.com"
 		  password    = "avoid-plaintext-passwords"
 		  username    = "Admin"
 		}
-	  
+
 	  }`
 
 	resourceChecks := []testutil.ResourceCheck{
@@ -67,5 +68,5 @@ func TestFSXWindowsFS(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }

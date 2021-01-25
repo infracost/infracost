@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 	"github.com/shopspring/decimal"
 
@@ -46,7 +47,7 @@ func TestKMSKey(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
 
 func TestKMSKey_RSA_2048(t *testing.T) {
@@ -78,7 +79,7 @@ func TestKMSKey_RSA_2048(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
 
 func TestKMSKey_Asymmetric(t *testing.T) {
@@ -110,5 +111,5 @@ func TestKMSKey_Asymmetric(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
