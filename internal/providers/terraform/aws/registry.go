@@ -46,6 +46,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetS3BucketRegistryItem(),
 	GetS3BucketAnalyticsConfigurationRegistryItem(),
 	GetS3BucketInventoryRegistryItem(),
+	GetSecretsManagerSecret(),
 	GetSSMActivationRegistryItem(),
 	GetSSMParameterRegistryItem(),
 	GetSNSTopicRegistryItem(),
@@ -226,6 +227,11 @@ var FreeResources []string = []string{
 	"aws_s3_bucket_ownership_controls",
 	"aws_s3_bucket_policy",
 	"aws_s3_bucket_public_access_block",
+
+	// AWS Secrets Manager
+	"aws_secretsmanager_secret_policy",
+	"aws_secretsmanager_secret_rotation",
+	"aws_secretsmanager_secret_version",
 
 	// AWS Service Discovery Service
 	"aws_service_discovery_service",
