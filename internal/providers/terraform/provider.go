@@ -123,10 +123,6 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 	}
 
 	if p.planFile == "" {
-		err := runInit(opts)
-		if err != nil {
-			return []byte{}, err
-		}
 
 		var planJSON []byte
 		p.planFile, planJSON, err = runPlan(opts, p.planFlags)
@@ -234,14 +230,24 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 	args = append(args, flags...)
 	_, err = Cmd(opts, append(args, fmt.Sprintf("-out=%s", f.Name()))...)
 
-	// If the plan returns this error then Terraform is configured with remote execution mode
-	if err != nil && strings.HasPrefix(extractStderr(err), "Error: Saving a generated plan is currently not supported") {
-		log.Info("Continuing with Terraform Remote Execution Mode")
-		config.Environment.TerraformRemoteExecutionModeEnabled = true
-		planJSON, err = runRemotePlan(opts, args)
-	}
-
 	if err != nil {
+		extractedErr := extractStderr(err)
+
+		// If the plan returns this error then Terraform is configured with remote execution mode
+		if strings.HasPrefix(extractedErr, "Error: Saving a generated plan is currently not supported") {
+			log.Info("Continuing with Terraform Remote Execution Mode")
+			config.Environment.TerraformRemoteExecutionModeEnabled = true
+			planJSON, err = runRemotePlan(opts, args)
+		} else if strings.Contains(extractedErr, "Error: Could not load plugin") ||
+			strings.Contains(extractedErr, "Error: Initialization required") {
+			spinner.Stop()
+			err = runInit(opts)
+			if err != nil {
+				return "", planJSON, err
+			}
+			return runPlan(opts, planFlags)
+		}
+
 		spinner.Fail()
 
 		red := color.New(color.FgHiRed)
