@@ -239,7 +239,8 @@ func runPlan(opts *CmdOptions, planFlags string, initOnFail bool) (string, []byt
 			config.Environment.TerraformRemoteExecutionModeEnabled = true
 			planJSON, err = runRemotePlan(opts, args)
 		} else if initOnFail == true && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
-			strings.Contains(extractedErr, "Error: Initialization required")) {
+			strings.Contains(extractedErr, "Error: Initialization required") ||
+			strings.Contains(extractedErr, "Error: Module not installed")) {
 			spinner.Stop()
 			err = runInit(opts)
 			if err != nil {
