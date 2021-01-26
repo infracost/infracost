@@ -58,6 +58,9 @@ resource_usage:
   aws_nat_gateway.my_nat_gateway:
     monthly_gb_data_processed: 10 # Estimated GB of data processed by the NAT Gateway per month.
 
+  aws_secretsmanager_secret.my_secret:
+    monthly_requests: 1000000 # Estimated monthly API requests to Secrets Manager.
+
   aws_sns_topic.my_sns_topic:
     monthly_requests: 1000000 # Estimated monthly requests to SNS.
     request_size: 64          # Size of the requests to SNS, SNS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
