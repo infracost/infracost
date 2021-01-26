@@ -25,8 +25,6 @@ func TestAwsSSMParameterFunction(t *testing.T) {
   }
 	`
 
-	// TODO: add test for usage when infracost-usage.yml is supported
-
 	resourceChecks := []testutil.ResourceCheck{
 		{
 			Name: "aws_ssm_parameter.advanced",
@@ -64,12 +62,11 @@ func TestAwsSSMParameter_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_ssm_parameter.advanced": map[string]interface{}{
-			"api_throughput_limit": "advanced",
+			"api_throughput_limit":     "advanced",
 			"monthly_api_interactions": 100000,
-			"parameter_storage_hours": 600,
+			"parameter_storage_hours":  600,
 		},
 	})
-
 
 	resourceChecks := []testutil.ResourceCheck{
 		{

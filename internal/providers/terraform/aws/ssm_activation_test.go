@@ -55,7 +55,7 @@ func TestAwsSSMActivation_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_ssm_activation.advanced": map[string]interface{}{
-			"instance_tier": "advanced",
+			"instance_tier":  "advanced",
 			"instance_count": 100,
 		},
 	})
