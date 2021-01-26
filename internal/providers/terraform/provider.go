@@ -125,7 +125,7 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 	if p.planFile == "" {
 
 		var planJSON []byte
-		p.planFile, planJSON, err = runPlan(opts, p.planFlags)
+		p.planFile, planJSON, err = runPlan(opts, p.planFlags, true)
 		defer os.Remove(p.planFile)
 
 		if err != nil {
@@ -211,7 +211,7 @@ func runInit(opts *CmdOptions) error {
 	return nil
 }
 
-func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
+func runPlan(opts *CmdOptions, planFlags string, initOnFail bool) (string, []byte, error) {
 	spinner := spin.NewSpinner("Running terraform plan")
 	var planJSON []byte
 
@@ -238,14 +238,14 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 			log.Info("Continuing with Terraform Remote Execution Mode")
 			config.Environment.TerraformRemoteExecutionModeEnabled = true
 			planJSON, err = runRemotePlan(opts, args)
-		} else if strings.Contains(extractedErr, "Error: Could not load plugin") ||
-			strings.Contains(extractedErr, "Error: Initialization required") {
+		} else if initOnFail == true && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
+			strings.Contains(extractedErr, "Error: Initialization required")) {
 			spinner.Stop()
 			err = runInit(opts)
 			if err != nil {
 				return "", planJSON, err
 			}
-			return runPlan(opts, planFlags)
+			return runPlan(opts, planFlags, false)
 		}
 
 		spinner.Fail()
