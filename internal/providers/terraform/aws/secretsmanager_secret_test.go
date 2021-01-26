@@ -55,7 +55,7 @@ func TestAwsSecretsManagerSecret_usage(t *testing.T) {
 `
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_secretsmanager_secret.secret": map[string]interface{}{
-			"monthly_requests": 100000,
+			"monthly_api_calls": 100000,
 		},
 	})
 
