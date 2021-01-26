@@ -4,6 +4,10 @@
 # See https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml for available options.
 version: v0.1
 resource_usage:
+
+  #
+  # Terraform AWS resources
+  #
   aws_api_gateway_rest_api.my_rest_api:
     monthly_requests:  100000000 # Estimated monthly requests to the Rest API Gateway.
 
@@ -138,3 +142,9 @@ resource_usage:
     monthly_encryption_requests: 100000 # Estimated number of field level encryption requests per month.
     monthly_log_lines: 5000000          # Estimated number of real-time log lines per month.
     monthly_custom_ssl_certificates: 3  # Estimated number of dedicated IP custom SSL certificates per month.
+
+  #
+  # Terraform GCP resources
+  #
+  google_dns_record_set.my_record_set:
+    monthly_queries:  1000000 # Estimated monthly DNS queries.

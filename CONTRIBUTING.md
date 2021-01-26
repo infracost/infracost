@@ -175,7 +175,10 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - count: do not include the count in the Infracost name. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
 
-- units: use plural, e.g. hours, requests, GB-months, GB (already plural). For a "unit per something", use singular per time unit, e.g. use Per GB per hour. Where it makes sense, instead of "API calls" use "API requests" or "requests" for better consistency.
+- units:
+  - use plural, e.g. hours, months, requests, GB-months, GB (already plural). For a "unit per something", use singular per time unit, e.g. use Per GB per hour. Where it makes sense, instead of "API calls" use "API requests" or "requests" for better consistency.
+
+  - for things where the Terraform resource represents 1 unit, e.g. an `aws_instance`, an `aws_secretsmanager_secret` and a `google_dns_managed_zone`, the units should be months (or hours if that makes more sense). For everything else, the units should be whatever is being charged for, e.g. queries, requests.
 
 - unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 unless the price is for a large number, e.g. set it to `1000000` if the price should be shown "per 1M requests" in the output.
 
@@ -187,7 +190,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - storage type: if applicable, include the storage type in brackets in lower case, e.g. `General purpose storage (gp2)`.
 
-- upper/lower case: cost component names should start with a capital letter and use capital letters for acronyms, for example, `General purpose storage (gp2)` and `Provisioned IOPS storage`.
+- upper/lower case: cost component names should start with a capital letter and use capital letters for acronyms, unless the acronym refers to a type used by the cloud vendor, for example, `General purpose storage (gp2)` (as `gp2` is a type used by AWS) and `Provisioned IOPS storage`.
 
 - unnecessary words: drop the following words from cost component names if the cloud vendor's pricing webpage shows them: "Rate" "Volumes", "SSD", "HDD"
 
@@ -212,7 +215,9 @@ The following notes are general guidelines, please leave a comment in your pull 
 	}
 	```
 
-## Releasing steps
+## Release steps
+
+@alikhajeh1 and @aliscott rotate release responsibilities between them.
 
 1. In [here](https://github.com/infracost/infracost/actions), click on the "Go" build for the master branch, click on Build, expand Test, then use the "Search logs" box to find any line that has "Multiple products found", "No products found for" or "No prices found for". Update the resource files in question to fix these error, often it's because the price filters need to be adjusted to only return 1 result.
 2. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
@@ -222,4 +227,4 @@ The following notes are general guidelines, please leave a comment in your pull 
 6. Update the docs repo with any required changes and supported resources.
 7. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
 
-If a new flag/feature is added that requires CI support, update the 9 repos mentioned in https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts. For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.
+If a new flag/feature is added that requires CI support, update the 9 repos mentioned [here](https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts). For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.

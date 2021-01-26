@@ -26,7 +26,7 @@ func NewSecretsManagerSecret(d *schema.ResourceData, u *schema.UsageData) *schem
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Secret",
-				Unit:            "secrets",
+				Unit:            "months",
 				UnitMultiplier:  1,
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
