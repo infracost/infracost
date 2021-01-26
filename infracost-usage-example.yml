@@ -59,7 +59,7 @@ resource_usage:
     monthly_gb_data_processed: 10 # Estimated GB of data processed by the NAT Gateway per month.
 
   aws_secretsmanager_secret.my_secret:
-    monthly_api_calls: 1000000 # Estimated monthly API calls to Secrets Manager. Billed in 10K increments.
+    monthly_requests: 1000000 # Estimated monthly API requests to Secrets Manager.
 
   aws_sns_topic.my_sns_topic:
     monthly_requests: 1000000 # Estimated monthly requests to SNS.

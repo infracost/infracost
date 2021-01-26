@@ -32,9 +32,9 @@ func TestAwsSecretsManagerSecretFunction(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "API calls",
+					Name:             "API requests",
 					PriceHash:        "c43f680513f2f5fec806d6b1af30638a-94d92ed2c091732571fe7cdabadd7253",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},
@@ -55,7 +55,7 @@ func TestAwsSecretsManagerSecret_usage(t *testing.T) {
 `
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_secretsmanager_secret.secret": map[string]interface{}{
-			"monthly_api_calls": 100000,
+			"monthly_requests": 100000,
 		},
 	})
 
@@ -69,7 +69,7 @@ func TestAwsSecretsManagerSecret_usage(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "API calls",
+					Name:             "API requests",
 					PriceHash:        "c43f680513f2f5fec806d6b1af30638a-94d92ed2c091732571fe7cdabadd7253",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(100000)),
 				},

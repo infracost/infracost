@@ -15,10 +15,10 @@ func GetSecretsManagerSecret() *schema.RegistryItem {
 func NewSecretsManagerSecret(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
-	monthlyAPICalls := decimal.Zero
+	var monthlyRequests *decimal.Decimal
 
-	if u != nil && u.Get("monthly_api_calls").Exists() {
-		monthlyAPICalls = decimal.NewFromInt(u.Get("monthly_api_calls").Int())
+	if u != nil && u.Get("monthly_requests").Exists() {
+		monthlyRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_requests").Int()))
 	}
 
 	return &schema.Resource{
@@ -26,7 +26,7 @@ func NewSecretsManagerSecret(d *schema.ResourceData, u *schema.UsageData) *schem
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Secret",
-				Unit:            "secret",
+				Unit:            "secrets",
 				UnitMultiplier:  1,
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
@@ -37,10 +37,10 @@ func NewSecretsManagerSecret(d *schema.ResourceData, u *schema.UsageData) *schem
 				},
 			},
 			{
-				Name:            "API calls",
-				Unit:            "API calls",
+				Name:            "API requests",
+				Unit:            "requests",
 				UnitMultiplier:  10000,
-				MonthlyQuantity: &monthlyAPICalls,
+				MonthlyQuantity: monthlyRequests,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(region),
