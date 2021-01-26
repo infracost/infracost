@@ -4,6 +4,9 @@
 # See https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml for available options.
 version: v0.1
 resource_usage:
+  aws_acmpca_certificate_authority.my_private_ca:
+    monthly_certificates_created: 10000 # Estimated monthly private certificates that are to be created.
+
   aws_api_gateway_rest_api.my_rest_api:
     monthly_requests:  100000000 # Estimated monthly requests to the Rest API Gateway.
 
