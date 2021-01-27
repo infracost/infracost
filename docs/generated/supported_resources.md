@@ -73,6 +73,8 @@ Support for the following is not currently included:
 | `google_compute_image` |  |
 | `google_compute_instance` |  Sustained use discounts are applied to monthly costs, but not to hourly costs.<br />  Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.<br />  Custom machine types are not supported.<br />  Sole-tenant VMs are not supported.<br />  |
 | `google_compute_snapshot` |  |
+| `google_container_cluster` |  Sustained use discounts are applied to monthly costs, but not to hourly costs.<br />  Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.<br />  Custom machine types are not supported.<br />  |
+| `google_container_node_pool` |  Sustained use discounts are applied to monthly costs, but not to hourly costs.<br />  Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.<br />  Custom machine types are not supported.<br />  |
 | `google_dns_managed_zone` |  |
 | `google_dns_record_set` |  |
 
