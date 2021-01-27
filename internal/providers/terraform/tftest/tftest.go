@@ -31,9 +31,6 @@ var tfProviders = `
 			google = {
 				source  = "hashicorp/google"
 			}
-			infracost = {
-				source = "infracost/infracost"
-			}
 		}
 	}
 
