@@ -238,7 +238,7 @@ func runPlan(opts *CmdOptions, planFlags string, initOnFail bool) (string, []byt
 			log.Info("Continuing with Terraform Remote Execution Mode")
 			config.Environment.TerraformRemoteExecutionModeEnabled = true
 			planJSON, err = runRemotePlan(opts, args)
-		} else if initOnFail == true && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
+		} else if initOnFail && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
 			strings.Contains(extractedErr, "Error: Initialization required") ||
 			strings.Contains(extractedErr, "Error: Module not installed") ||
 			strings.Contains(extractedErr, "Error: Provider requirements cannot be satisfied by locked dependencies") ||
