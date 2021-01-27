@@ -240,6 +240,8 @@ func runPlan(opts *CmdOptions, planFlags string, initOnFail bool) (string, []byt
 			planJSON, err = runRemotePlan(opts, args)
 		} else if initOnFail == true && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
 			strings.Contains(extractedErr, "Error: Initialization required") ||
+			strings.Contains(extractedErr, "Error: Module not installed") ||
+			strings.Contains(extractedErr, "Error: Provider requirements cannot be satisfied by locked dependencies") ||
 			strings.Contains(extractedErr, "Error: Module not installed")) {
 			spinner.Stop()
 			err = runInit(opts)
