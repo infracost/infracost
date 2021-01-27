@@ -148,3 +148,11 @@ resource_usage:
   #
   google_dns_record_set.my_record_set:
     monthly_queries:  1000000 # Estimated monthly DNS queries.
+
+  google_container_cluster.my_cluster:
+    node_count: 4    # Estimated node count per zone for the default node pool
+    node_pool[0]:
+      node_count: 2  # Estimated node count per zone for the first node pool
+
+  google_container_node_pool.my_node_pool:
+    node_count: 4 # Estimated node count per zone for the node pool
