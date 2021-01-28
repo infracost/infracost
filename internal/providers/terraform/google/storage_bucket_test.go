@@ -41,6 +41,10 @@ func TestStorageBucket(t *testing.T) {
 				"china":          50,
 				"australia":      250,
 			},
+			"monthly_operations": map[string]interface{}{
+				"class_a": 40000,
+				"class_b": 20000,
+			},
 		},
 	})
 
@@ -97,6 +101,21 @@ func TestStorageBucket(t *testing.T) {
 							Name:            "Data transfer to Australia Destinations (0-1 TB)",
 							PriceHash:       "a3e569b71cd1e9d2294629e1b995c1f6-a62ab44470fc752864d0f5c5534f3d33",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(250)),
+						},
+					},
+				},
+				{
+					Name: "Operations",
+					CostComponentChecks: []testutil.CostComponentCheck{
+						{
+							Name:            "Class A",
+							PriceHash:       "4d209becf05f57bbea290ccb1db4185a-2e6c536b0d1e01fc280d161856794e4d",
+							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40000)),
+						},
+						{
+							Name:            "Class B",
+							PriceHash:       "8b9c674468376b8d7c4e94f0489ce913-2e6c536b0d1e01fc280d161856794e4d",
+							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20000)),
 						},
 					},
 				},

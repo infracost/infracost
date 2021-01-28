@@ -168,3 +168,6 @@ resource_usage:
       asia: 1500                # Estimated GB of data sent from Cloud Storage to Asia (excluding China, but including Hong Kong) per month.
       china: 50                 # Estimated GB of data sent from Cloud Storage to China (excluding Hong Kong) per month.
       australia: 250            # Estimated GB of data sent from Cloud Storage to Australia per month.  
+    monthly_operations:
+      class_a: 40000            # Estimated number of class A operations per month.
+      class_b: 20000            # Estimated number of class B operations per month.

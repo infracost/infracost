@@ -35,6 +35,7 @@ func NewStorageBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		},
 		SubResources: []*schema.Resource{
 			networkEgress(d, u),
+			operations(d, u),
 		},
 	}
 }
@@ -225,4 +226,62 @@ func networkEgress(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	}
 
 	return resource
+}
+
+func operations(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	var classAQuantity *decimal.Decimal
+	if u != nil && u.Get("monthly_operations.class_a").Exists() {
+		classAQuantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_operations.class_a").Int()))
+	}
+	var classBQuantity *decimal.Decimal
+	if u != nil && u.Get("monthly_operations.class_b").Exists() {
+		classBQuantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_operations.class_b").Int()))
+	}
+	storageClass := "STANDARD"
+	if d.Get("storage_class").Exists() {
+		storageClass = d.Get("storage_class").String()
+	}
+
+	storageClassResourceGroupMap := map[string]string{
+		"STANDARD":       "RegionalOps",
+		"REGIONAL":       "RegionalOps",
+		"MULTI_REGIONAL": "MultiRegionalOps",
+		"NEARLINE":       "NearlineOps",
+		"COLDLINE":       "ColdlineOps",
+		"ARCHIVE":        "ArchiveOps",
+	}
+
+	return &schema.Resource{
+		Name: "Operations",
+		CostComponents: []*schema.CostComponent{
+			{
+				Name:            "Class A",
+				Unit:            "operations",
+				UnitMultiplier:  1,
+				MonthlyQuantity: classAQuantity,
+				ProductFilter: &schema.ProductFilter{
+					VendorName: strPtr("gcp"),
+					Service:    strPtr("Cloud Storage"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
+						{Key: "description", ValueRegex: strPtr("/Class A/")},
+					},
+				},
+			},
+			{
+				Name:            "Class B",
+				Unit:            "operations",
+				UnitMultiplier:  1,
+				MonthlyQuantity: classBQuantity,
+				ProductFilter: &schema.ProductFilter{
+					VendorName: strPtr("gcp"),
+					Service:    strPtr("Cloud Storage"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
+						{Key: "description", ValueRegex: strPtr("/Class B/")},
+					},
+				},
+			},
+		},
+	}
 }
