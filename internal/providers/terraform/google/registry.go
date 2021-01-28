@@ -88,6 +88,16 @@ var FreeResources []string = []string{
 	"google_service_account_iam_member",
 	"google_service_account_iam_policy",
 	"google_service_account_key",
+	"google_storage_bucket_access_control",
+	"google_storage_bucket_acl",
+	"google_storage_bucket_iam_policy",
+	"google_storage_bucket_object",
+	"google_storage_default_object_access_control",
+	"google_storage_default_object_acl",
+	"google_storage_hmac_key",
+	"google_storage_notification",
+	"google_storage_object_access_control",
+	"google_storage_object_acl",
 	"google_usage_export_bucket",
 }
 
