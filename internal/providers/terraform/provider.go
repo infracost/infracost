@@ -48,8 +48,20 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 	p.planFlags = c.String("tfflags")
 	p.usageFile = c.String("usage-file")
 
+	if p.useState && (p.jsonFile != "" || p.planFile != "") {
+		return errors.New("The use-tfstate flag cannot be used with the tfjson or tfplan flags")
+	}
+
 	if p.jsonFile != "" && p.planFile != "" {
 		return errors.New("Please provide either a Terraform Plan JSON file (tfjson) or a Terraform Plan file (tfplan)")
+	}
+
+	if p.dir != "" && p.jsonFile != "" {
+		fmt.Fprintln(os.Stderr, color.YellowString("Warning: --tfdir is ignored if --tfjson is used"))
+	}
+
+	if p.dir == "" {
+		p.dir = getcwd()
 	}
 
 	return nil
@@ -399,4 +411,15 @@ func indent(s, indent string) string {
 
 func stripBlankLines(s string) string {
 	return regexp.MustCompile(`[\t\r\n]+`).ReplaceAllString(strings.TrimSpace(s), "\n")
+}
+
+func getcwd() string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Warn(err)
+
+		cwd = ""
+	}
+
+	return cwd
 }
