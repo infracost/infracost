@@ -401,13 +401,13 @@ func TestContainerNodePool_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"google_container_node_pool.zonal": map[string]interface{}{
-			"node_count": 4,
+			"nodes": 4,
 		},
 		"google_container_node_pool.regional": map[string]interface{}{
-			"node_count": 4,
+			"nodes": 4,
 		},
 		"google_container_node_pool.node_locations": map[string]interface{}{
-			"node_count": 4,
+			"nodes": 4,
 		},
 	})
 

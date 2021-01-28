@@ -9,150 +9,145 @@ resource_usage:
   # Terraform AWS resources
   #
   aws_api_gateway_rest_api.my_rest_api:
-    monthly_requests:  100000000 # Estimated monthly requests to the Rest API Gateway.
+    monthly_requests:  100000000 # Monthly requests to the Rest API Gateway.
 
   aws_apigatewayv2_api.my_v2_api:
-    monthly_requests: 100000000 # Estimated monthly requests to the HTTP API Gateway.
-    average_request_size: 512   # Estimated average request size in (KB) sent to the HTTP API Gateway. Requests are metered in 512KB increments, maximum size is 10MB.
+    monthly_requests: 100000000 # Monthly requests to the HTTP API Gateway.
+    request_size_kb: 512        # Average request size sent to the HTTP API Gateway in KB. Requests are metered in 512KB increments, maximum size is 10MB.
     monthly_messages: 100000000 # Number of messages sent to the Websocket API Gateway.
-    average_message_size: 32    # Average size of the messages (KB) sent to the Websocket API Gateway. Messages are metered in 32 KB increments, maximum size is 128KB.
+    message_size_kb: 32         # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
 
   aws_cloudwatch_log_group.my_log_group:
-    monthly_gb_data_ingestion: 1000 # Estimated GB of data ingested by CloudWatch logs per month.
-    monthly_gb_data_storage: 1000   # Estimated GB of data stored by CloudWatch logs per month.
-    monthly_gb_data_scanned: 200    # Estimated GB of data scanned by CloudWatch logs insights per month.
-
-  aws_codebuild_project.my_project:
-    monthly_build_minutes: 10000 # Estimated total duration of monthly codebuild execution usage in minutes.
+    storage_gb: 1000               # Total data stored by CloudWatch logs in GB.
+    monthly_data_ingested_gb: 1000 # Data ingested by CloudWatch logs per month in GB.
+    monthly_data_scanned_gb: 200   # Data scanned by CloudWatch logs insights per month in GB.
 
   aws_data_transfer.my_region:
     region: us-east-1                           # Region the data transfer is originating from.
-    monthly_gb_intra_region: 1000               # Estimated data transferred between availability zones in the region.
-    monthly_gb_outbound_us_east_to_us_east: 500 # Estimated data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
-    monthly_gb_outbound_other_region: 750       # Estimated data transferred to other AWS regions.
-    monthly_gb_outbound_internet: 5000          # Estimated data transferred to the Internet.
+    monthly_intra_region_gb: 1000               # Data transferred between availability zones in the region.
+    monthly_outbound_us_east_to_us_east_gb: 500 # Data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
+    monthly_outbound_other_region_gb: 750       # Data transferred to other AWS regions.
+    monthly_outbound_internet_gb: 5000          # Data transferred to the Internet.
 
   aws_dx_gateway_association.my_gateway:
-    monthly_gb_data_processed: 100 # Estimated GB of data processed by the DX gateway association per month.
+    monthly_data_processed_gb: 100 # Data processed by the DX gateway association per month in GB.
 
   aws_dynamodb_table.my_table:
-    monthly_write_request_units: 3000000       # Estimated write request units per month in (used for on-demand DynamoDB).
-    monthly_read_request_units: 8000000        # Estimated read request units per month in (used for on-demand DynamoDB).
-    monthly_gb_data_storage: 230               # Estimated storage for tables per month in GBs.
-    monthly_gb_continuous_backup_storage: 2300 # Estimated storage for continuous backups (PITR) per month in GBs.
-    monthly_gb_on_demand_backup_storage: 460   # Estimated storage for on-demand backups per month in GBs.
-    monthly_gb_restore: 230                    # Estimated size of restored data per month in GBs.
-    monthly_gb_data_in: 10                     # Estimated size of transferred data into DynamoDB per month in GBs.
-    monthly_gb_data_out: 30                    # Estimated size of transferred data out of DynamoDB per month in GBs.
-    monthly_streams_read_request_units: 2      # Estimated streams read request units per month.
+    monthly_write_request_units: 3000000  # Write request units per month in (used for on-demand DynamoDB).
+    monthly_read_request_units: 8000000   # Read request units per month in (used for on-demand DynamoDB).
+    storage_gb: 230                       # Total storage for tables in GB.
+    pitr_backup_storage_gb: 2300          # Total storage for Point-In-Time Recovery (PITR) backups in GB.
+    on_demand_backup_storage_gb: 460      # Total storage for on-demand backups in GB.
+    monthly_data_restored_gb: 230         # Size of restored data per month in GB.
+    monthly_streams_read_request_units: 2 # Streams read request units per month.
 
   aws_ec2_transit_gateway_vpc_attachment.my_vpc_attachment:
-    monthly_gb_data_processed: 100 # Estimated GB of data processed by the EC2 transit gateway attachment(s) per month.
+    monthly_data_processed_gb: 100 # Data processed by the EC2 transit gateway attachment(s) per month in GB.
 
   aws_ecr_repository.my_repository:
-    storage: 1 # Estimated size of ECR repository in GBs.
+    storage_gb: 1 # Total size of ECR repository in GB.
 
   aws_instance.windows_instance:
     operating_system: windows # Override the operating system of the instance, can be: windows, suse, rhel.
 
   aws_lambda_function.my_function:
-    monthly_requests: 100000      # Estimated monthly requests to the Lambda function.
-    average_request_duration: 500 # Estimated average duration of each request in milliseconds.
+    monthly_requests: 100000 # Monthly requests to the Lambda function.
+    request_duration_ms: 500 # Average duration of each request in milliseconds.
 
   aws_nat_gateway.my_nat_gateway:
-    monthly_gb_data_processed: 10 # Estimated GB of data processed by the NAT Gateway per month.
+    monthly_data_processed_gb: 10 # Data processed by the NAT Gateway per month in GB.
 
   aws_secretsmanager_secret.my_secret:
-    monthly_requests: 1000000 # Estimated monthly API requests to Secrets Manager.
+    monthly_requests: 1000000 # Monthly API requests to Secrets Manager.
 
   aws_sns_topic.my_sns_topic:
-    monthly_requests: 1000000 # Estimated monthly requests to SNS.
-    request_size: 64          # Size of the requests to SNS, SNS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+    monthly_requests: 1000000 # Monthly requests to SNS.
+    request_size_kb: 64       # Size of the requests to SNS, SNS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
 
   aws_sns_topic_subscription.my_topic_subscription:
-    monthly_requests: 1000000 # Estimated monthly requests to SNS.
-    request_size: 64          # Size of the requests to SNS, SNS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+    monthly_requests: 1000000 # Monthly requests to SNS.
+    request_size_kb: 64       # Size of the requests to SNS, SNS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
 
   aws_sqs_queue.my_queue:
-    monthly_requests: 1000000 # Estimated monthly requests to SQS.
-    request_size: 64          # Size of the requests to SQS, SQS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+    monthly_requests: 1000000 # Monthly requests to SQS.
+    request_size_kb: 64       # Size of the requests to SQS, SQS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
 
   aws_ssm_parameter.my_ssm_parameter:
     api_throughput_limit: advanced    # SSM Parameter Throughput limit, can be: advanced, higher.
-    monthly_api_interactions: 1000000 # Estimated monthly API interactions.
-    parameter_storage_hours: 730      # Estimated number of hours in the month parameters will be stored for.
+    monthly_api_interactions: 1000000 # Monthly API interactions.
+    parameter_storage_hrs: 730        # Number of hours in the month parameters will be stored for.
 
   aws_ssm_activation.my_activations:
     instance_tier: advanced # Instance tier being used, can be: advanced, standard.
-    instance_count: 100     # Estimated number of instances being managed.
+    instances: 100          # Number of instances being managed.
 
   aws_vpc_endpoint.my_endpoint:
-    monthly_gb_data_processed: 1000 # Estimated GB of data processed by the VPC endpoint(s) per month.
+    monthly_data_processed_gb: 1000 # Data processed by the VPC endpoint(s) per month in GB.
 
   aws_vpn_connection.my_connection:
-    monthly_gb_data_processed: 100 # Estimated monthly data processed through a transit gateway attached to your VPN Connection.
+    monthly_data_processed_gb: 100 # Monthly data processed through a transit gateway attached to your VPN Connection in GB.
 
   aws_cloudfront_distribution.my_s3_distribution:
-    monthly_gb_transfer_internet: # Estimated GB of regional data transfer out to internet per month.
-      us: 51200000                # Estimated GB of data from the United States to internet per month.
-      europe: 220000              # Estimated GB of data from Europe to internet per month.
-      south_africa: 10000         # Estimated GB of data from South Africa to internet per month.
-      south_america: 50000        # Estimated GB of data from South America to internet per month.
-      japan: 387000               # Estimated GB of data from Japan to internet per month.
-      australia: 500000           # Estimated GB of data from Australia to internet per month.
-      asia_pacific: 1200000       # Estimated GB of data from Asia pacific to internet per month.
-      india: 200000               # Estimated GB of data from India to internet per month.
-    monthly_gb_transfer_origin:   # Estimated GB of regional data transfer out to origin
-      us: 2200                    # Estimated GB of data from the United States to origin per month.
-      europe: 1000                # Estimated GB of data from Europe to origin per month.
-      south_africa: 300           # Estimated GB of data from South Africa to origin per month.
-      south_america: 200          # Estimated GB of data from South America to origin per month.
-      japan: 10                   # Estimated GB of data from Japan to origin per month.
-      australia: 100              # Estimated GB of data from Australia to origin per month.
-      asia_pacific: 30            # Estimated GB of data from Asia pacific to origin per month.
-      india: 80                   # Estimated GB of data from India to origin per month.
-    monthly_http_requests:        # Estimated number of HTTP requests per month.
-      us: 80000                   # Estimated number of HTTP request from the United States per month.
-      europe: 40000               # Estimated number of HTTP request from Europe per month.
-      south_africa: 20000         # Estimated number of HTTP request from South Africa per month.
-      south_america: 10000        # Estimated number of HTTP request from South America per month.
-      japan: 3000                 # Estimated number of HTTP request from Japan per month.
-      australia: 15000            # Estimated number of HTTP request from Australia per month.
-      asia_pacific: 45000         # Estimated number of HTTP request from Asia Pacific per month.
-      india: 10000                # Estimated number of HTTP request from India per month.
-    monthly_https_requests:       # Estimated number of HTTPS requests per month.
-      us: 180000                  # Estimated number of HTTPS request from the United States per month.
-      europe: 10000               # Estimated number of HTTPS request from Europe per month.
-      south_africa: 50000         # Estimated number of HTTPS request from South Africa per month.
-      south_america: 30000        # Estimated number of HTTPS request from South America per month.
-      japan: 1000                 # Estimated number of HTTPS request from Japan per month.
-      australia: 45000            # Estimated number of HTTPS request from Australia per month.
-      asia_pacific: 25000         # Estimated number of HTTPS request from Asia Pacific per month.
-      india: 30000                # Estimated number of HTTPS request from India per month.
-    monthly_shield_requests:      # Estimated number of shield requests per month.
-      us: 90000                   # Estimated number of Shield request from the United States per month.
-      europe: 30000               # Estimated number of Shield request from Europe per month.
-      south_america: 200          # Estimated number of Shield request from South America per month.
-      japan: 12300                # Estimated number of Shield request from Japan per month.
-      australia: 2300             # Estimated number of Shield request from Australia per month.
-      singapore: 58600            # Estimated number of Shield request from Singapore per month.
-      south_korea: 24000          # Estimated number of Shield request from South Korea per month.
-      india: 10000                # Estimated number of Shield request from India per month.
-    monthly_invalidation_paths: 1200    # Estimated number of invalidation requests per month.
-    monthly_encryption_requests: 100000 # Estimated number of field level encryption requests per month.
-    monthly_log_lines: 5000000          # Estimated number of real-time log lines per month.
-    monthly_custom_ssl_certificates: 3  # Estimated number of dedicated IP custom SSL certificates per month.
+    monthly_data_transfer_to_internet_gb: # Regional data transfer out to internet per month in GB.
+      us: 51200000          # United States, Mexico, & Canada
+      europe: 220000        # Europe & Israel
+      south_africa: 10000   # South Africa, Kenya, & Middle East
+      south_america: 50000  # South America
+      japan: 387000         # Japan
+      australia: 500000     # Australia & New Zealand
+      asia_pacific: 1200000 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      india: 200000         # India
+    monthly_data_transfer_to_origin_gb: # Regional data transfer out to origin in GB.
+      us: 2200           # United States, Mexico, & Canada
+      europe: 1000       # Europe & Israel
+      south_africa: 300  # South Africa, Kenya, & Middle East
+      south_america: 200 # South America
+      japan: 10          # Japan
+      australia: 100     # Australia & New Zealand
+      asia_pacific: 30   # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      india: 80          # India
+    monthly_http_requests: # Number of HTTP requests per month.
+      us: 80000            # United States, Mexico, & Canada
+      europe: 40000        # Europe & Israel
+      south_africa: 20000  # South Africa, Kenya, & Middle East
+      south_america: 10000 # South America
+      japan: 3000          # Japan
+      australia: 15000     # Australia & New Zealand
+      asia_pacific: 45000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      india: 10000         # India
+    monthly_https_requests: # Number of HTTPS requests per month.
+      us: 180000           # United States, Mexico, & Canada
+      europe: 10000        # Europe & Israel
+      south_africa: 50000  # South Africa, Kenya, & Middle East
+      south_america: 30000 # South America
+      japan: 1000          # Japan
+      australia: 45000     # Australia & New Zealand
+      asia_pacific: 25000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      india: 30000         # India
+    monthly_shield_requests: # Number of shield requests per month.
+      us: 90000          # United States
+      europe: 30000      # Europe
+      south_america: 200 # South Amarica
+      japan: 12300       # Japan
+      australia: 2300    # Australia
+      singapore: 58600   # Singapore
+      south_korea: 24000 # South Korea
+      india: 10000       # India
+    monthly_invalidation_requests: 1200 # Number of invalidation requests per month.
+    monthly_encryption_requests: 100000 # Number of field level encryption requests per month.
+    monthly_log_lines: 5000000          # Number of real-time log lines per month.
+    custom_ssl_certificates: 3          # Number of dedicated IP custom SSL certificates.
 
   #
   # Terraform GCP resources
   #
   google_dns_record_set.my_record_set:
-    monthly_queries:  1000000 # Estimated monthly DNS queries.
+    monthly_queries:  1000000 # Monthly DNS queries.
 
   google_container_cluster.my_cluster:
-    node_count: 4    # Estimated node count per zone for the default node pool
+    nodes: 4    # Node count per zone for the default node pool
     node_pool[0]:
-      node_count: 2  # Estimated node count per zone for the first node pool
+      nodes: 2  # Node count per zone for the first node pool
 
   google_container_node_pool.my_node_pool:
-    node_count: 4 # Estimated node count per zone for the node pool
+    nodes: 4 # Node count per zone for the node pool

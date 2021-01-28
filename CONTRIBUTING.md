@@ -148,8 +148,8 @@ Infracost supports passing usage data in through a usage YAML file. When adding 
 
   ```yaml
   aws_lambda_function.my_function:
-    monthly_requests: 100000      # Estimated monthly requests to the Lambda function.
-    average_request_duration: 500 # Estimated average duration of each request in milliseconds.
+    monthly_requests: 100000      # Monthly requests to the Lambda function.
+    request_duration_ms: 500      # Average duration of each request in milliseconds.
   ```
 
 When running infracost with `--usage-file path/to/infracost-usage.yml`, Infracost output shows the hourly/monthly cost columns populated with non-zero values:
@@ -217,7 +217,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 #### Usage file notes
 
-1. Where possible use similar terminology as the cloud vendor's pricing pages, their cost calculators might also help. 
+1. Where possible use similar terminology as the cloud vendor's pricing pages, their cost calculators might also help.
 
 2. Do not prefix things with `average_` as in the future we might want to use nested values, e.g. `request_duration_ms.max`.
 

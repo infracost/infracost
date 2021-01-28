@@ -55,42 +55,42 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 		{
 			awsGroupedName: "US, Mexico, Canada",
 			priceRegion:    "United States",
-			usageKey:       "monthly_gb_transfer_internet.us",
+			usageKey:       "monthly_data_transfer_to_internet_gb.us",
 		},
 		{
 			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
-			usageKey:       "monthly_gb_transfer_internet.europe",
+			usageKey:       "monthly_data_transfer_to_internet_gb.europe",
 		},
 		{
 			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
-			usageKey:       "monthly_gb_transfer_internet.south_africa",
+			usageKey:       "monthly_data_transfer_to_internet_gb.south_africa",
 		},
 		{
 			awsGroupedName: "South America",
 			priceRegion:    "South America",
-			usageKey:       "monthly_gb_transfer_internet.south_america",
+			usageKey:       "monthly_data_transfer_to_internet_gb.south_america",
 		},
 		{
 			awsGroupedName: "Japan",
 			priceRegion:    "Japan",
-			usageKey:       "monthly_gb_transfer_internet.japan",
+			usageKey:       "monthly_data_transfer_to_internet_gb.japan",
 		},
 		{
 			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
-			usageKey:       "monthly_gb_transfer_internet.australia",
+			usageKey:       "monthly_data_transfer_to_internet_gb.australia",
 		},
 		{
 			awsGroupedName: "Hong Kong, Philippines, Asia Pacific",
 			priceRegion:    "Asia Pacific",
-			usageKey:       "monthly_gb_transfer_internet.asia_pacific",
+			usageKey:       "monthly_data_transfer_to_internet_gb.asia_pacific",
 		},
 		{
 			awsGroupedName: "India",
 			priceRegion:    "India",
-			usageKey:       "monthly_gb_transfer_internet.india",
+			usageKey:       "monthly_data_transfer_to_internet_gb.india",
 		},
 	}
 
@@ -217,42 +217,42 @@ func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
 		{
 			awsGroupedName: "US, Mexico, Canada",
 			priceRegion:    "United States",
-			usageKey:       "monthly_gb_transfer_origin.us",
+			usageKey:       "monthly_data_transfer_to_origin_gb.us",
 		},
 		{
 			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
-			usageKey:       "monthly_gb_transfer_origin.europe",
+			usageKey:       "monthly_data_transfer_to_origin_gb.europe",
 		},
 		{
 			awsGroupedName: "South Africa, Kenya, Middle East",
 			priceRegion:    "South Africa",
-			usageKey:       "monthly_gb_transfer_origin.south_africa",
+			usageKey:       "monthly_data_transfer_to_origin_gb.south_africa",
 		},
 		{
 			awsGroupedName: "South America",
 			priceRegion:    "South America",
-			usageKey:       "monthly_gb_transfer_origin.south_america",
+			usageKey:       "monthly_data_transfer_to_origin_gb.south_america",
 		},
 		{
 			awsGroupedName: "Japan",
 			priceRegion:    "Japan",
-			usageKey:       "monthly_gb_transfer_origin.japan",
+			usageKey:       "monthly_data_transfer_to_origin_gb.japan",
 		},
 		{
 			awsGroupedName: "Australia, New Zealand",
 			priceRegion:    "Australia",
-			usageKey:       "monthly_gb_transfer_origin.australia",
+			usageKey:       "monthly_data_transfer_to_origin_gb.australia",
 		},
 		{
 			awsGroupedName: "Hong Kong, Philippines, Asia Pacific",
 			priceRegion:    "Asia Pacific",
-			usageKey:       "monthly_gb_transfer_origin.asia_pacific",
+			usageKey:       "monthly_data_transfer_to_origin_gb.asia_pacific",
 		},
 		{
 			awsGroupedName: "India",
 			priceRegion:    "India",
-			usageKey:       "monthly_gb_transfer_origin.india",
+			usageKey:       "monthly_data_transfer_to_origin_gb.india",
 		},
 	}
 
@@ -514,8 +514,8 @@ func shieldRequests(u *schema.UsageData) *schema.Resource {
 func invalidationRequests(u *schema.UsageData) []*schema.CostComponent {
 	var freeQuantity *decimal.Decimal
 	var paidQuantity *decimal.Decimal
-	if u != nil && u.Get("monthly_invalidation_paths").Exists() {
-		usageAmount := u.Get("monthly_invalidation_paths").Int()
+	if u != nil && u.Get("monthly_invalidation_requests").Exists() {
+		usageAmount := u.Get("monthly_invalidation_requests").Int()
 		if usageAmount < 1000 {
 			freeQuantity = decimalPtr(decimal.NewFromInt(usageAmount))
 		} else {
@@ -608,8 +608,8 @@ func realtimeLogs(u *schema.UsageData) *schema.CostComponent {
 
 func customSSLCertificate(u *schema.UsageData) *schema.CostComponent {
 	var quantity *decimal.Decimal
-	if u != nil && u.Get("monthly_custom_ssl_certificates").Exists() {
-		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_custom_ssl_certificates").Int()))
+	if u != nil && u.Get("custom_ssl_certificates").Exists() {
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("custom_ssl_certificates").Int()))
 	}
 	return &schema.CostComponent{
 		Name:            "Dedicated IP custom SSLs",

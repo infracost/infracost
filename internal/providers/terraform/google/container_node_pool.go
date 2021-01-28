@@ -29,8 +29,8 @@ func NewContainerNodePool(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	}
 
 	var countPerZoneOverride *int64
-	if u != nil && u.Get("node_count").Exists() {
-		c := u.Get("node_count").Int()
+	if u != nil && u.Get("nodes").Exists() {
+		c := u.Get("nodes").Int()
 		countPerZoneOverride = &c
 	}
 

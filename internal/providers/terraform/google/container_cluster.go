@@ -41,8 +41,8 @@ func NewContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 			countPerZone = d.Get("initial_node_count").Int()
 		}
 
-		if u != nil && u.Get("node_count").Exists() {
-			countPerZone = u.Get("node_count").Int()
+		if u != nil && u.Get("nodes").Exists() {
+			countPerZone = u.Get("nodes").Int()
 		}
 
 		nodeCount := decimal.NewFromInt(zones * countPerZone)
@@ -59,7 +59,7 @@ func NewContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 
 	for i, values := range d.Get("node_pool").Array() {
 		var countPerZoneOverride *int64
-		k := fmt.Sprintf("node_pool[%d].node_count", i)
+		k := fmt.Sprintf("node_pool[%d].nodes", i)
 		if u != nil && u.Get(k).Exists() {
 			c := u.Get(k).Int()
 			countPerZoneOverride = &c

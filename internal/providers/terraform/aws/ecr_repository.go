@@ -18,8 +18,8 @@ func NewECRRepository(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 
 	var storageSize *decimal.Decimal
 
-	if u != nil && u.Get("storage_size").Exists() {
-		storageSize = decimalPtr(decimal.NewFromFloat(u.Get("storage_size").Float()))
+	if u != nil && u.Get("storage_gb").Exists() {
+		storageSize = decimalPtr(decimal.NewFromFloat(u.Get("storage_gb").Float()))
 	}
 
 	return &schema.Resource{

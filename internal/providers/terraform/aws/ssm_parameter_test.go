@@ -64,7 +64,7 @@ func TestAwsSSMParameter_usage(t *testing.T) {
 		"aws_ssm_parameter.advanced": map[string]interface{}{
 			"api_throughput_limit":     "advanced",
 			"monthly_api_interactions": 100000,
-			"parameter_storage_hours":  600,
+			"parameter_storage_hrs":    600,
 		},
 	})
 

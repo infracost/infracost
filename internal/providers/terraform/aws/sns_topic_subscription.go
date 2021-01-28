@@ -25,8 +25,8 @@ func NewSnsTopicSubscription(d *schema.ResourceData, u *schema.UsageData) *schem
 	var freeTier string
 
 	requestSize := decimal.NewFromInt(64)
-	if u != nil && u.Get("request_size").Exists() {
-		requestSize = decimal.NewFromFloat(u.Get("request_size").Float())
+	if u != nil && u.Get("request_size_kb").Exists() {
+		requestSize = decimal.NewFromFloat(u.Get("request_size_kb").Float())
 	}
 
 	var requests *decimal.Decimal

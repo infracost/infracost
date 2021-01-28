@@ -508,25 +508,25 @@ func TestContainerCluster_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"google_container_cluster.zonal": map[string]interface{}{
-			"node_count": 4,
+			"nodes": 4,
 		},
 		"google_container_cluster.regional": map[string]interface{}{
-			"node_count": 4,
+			"nodes": 4,
 		},
 		"google_container_cluster.node_locations": map[string]interface{}{
-			"node_count": 4,
+			"nodes": 4,
 		},
 		"google_container_cluster.with_node_pools_zonal": map[string]interface{}{
-			"node_pool[0].node_count": 4,
-			"node_pool[1].node_count": 4,
+			"node_pool[0].nodes": 4,
+			"node_pool[1].nodes": 4,
 		},
 		"google_container_cluster.with_node_pools_regional": map[string]interface{}{
-			"node_pool[0].node_count": 4,
-			"node_pool[1].node_count": 4,
+			"node_pool[0].nodes": 4,
+			"node_pool[1].nodes": 4,
 		},
 		"google_container_cluster.with_node_pools_node_locations": map[string]interface{}{
-			"node_pool[0].node_count": 4,
-			"node_pool[1].node_count": 4,
+			"node_pool[0].nodes": 4,
+			"node_pool[1].nodes": 4,
 		},
 	})
 

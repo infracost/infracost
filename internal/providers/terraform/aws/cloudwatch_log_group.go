@@ -19,23 +19,23 @@ func NewCloudwatchLogGroup(d *schema.ResourceData, u *schema.UsageData) *schema.
 	var gbDataStorage *decimal.Decimal
 	var gbDataScanned *decimal.Decimal
 
-	if u != nil && u.Get("monthly_gb_data_ingestion").Exists() {
-		gbDataIngestion = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_ingestion").Float()))
+	if u != nil && u.Get("monthly_data_ingested_gb").Exists() {
+		gbDataIngestion = decimalPtr(decimal.NewFromFloat(u.Get("monthly_data_ingested_gb").Float()))
 	}
 
-	if u != nil && u.Get("monthly_gb_data_storage").Exists() {
-		gbDataStorage = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_storage").Float()))
+	if u != nil && u.Get("storage_gb").Exists() {
+		gbDataStorage = decimalPtr(decimal.NewFromFloat(u.Get("storage_gb").Float()))
 	}
 
-	if u != nil && u.Get("monthly_gb_data_scanned").Exists() {
-		gbDataScanned = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_scanned").Float()))
+	if u != nil && u.Get("monthly_data_scanned_gb").Exists() {
+		gbDataScanned = decimalPtr(decimal.NewFromFloat(u.Get("monthly_data_scanned_gb").Float()))
 	}
 
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:            "Data ingestion",
+				Name:            "Data ingested",
 				Unit:            "GB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: gbDataIngestion,

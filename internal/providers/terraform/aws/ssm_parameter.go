@@ -53,8 +53,8 @@ func parameterStorageCostComponent(d *schema.ResourceData, u *schema.UsageData) 
 	}
 
 	parameterStorageHours := decimal.NewFromInt(730)
-	if u != nil && u.Get("parameter_storage_hours").Exists() {
-		parameterStorageHours = decimal.NewFromInt(u.Get("parameter_storage_hours").Int())
+	if u != nil && u.Get("parameter_storage_hrs").Exists() {
+		parameterStorageHours = decimal.NewFromInt(u.Get("parameter_storage_hrs").Int())
 	}
 
 	return &schema.CostComponent{
