@@ -131,6 +131,8 @@ We distinguish the **price** of a resource from its **cost**. Price is the per-u
 
 You can add all price components for the resource, even ones that are usage-based, so the price column in the table output is always populated. The hourly and monthly cost for these components will show `-` as illustrated in the following output for AWS Lambda. Once this is done, please send a pull-request to this repo so someone can review/merge it. Try to re-use relevant costComponents from other resources where applicable, e.g. notice how the `newElasticacheResource` function is used in [aws_elasticache_cluster](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/elasticache_cluster.go) and [aws_elasticache_replication_group](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/elasticache_replication_group.go).
 
+To conditionally set values based on the Terraform resource values, first check `d.Get("value_name").Type != gjson.Null` like in the [google_container_cluster](https://github.com/infracost/infracost/blob/f7b0594c1ee7d13c0c37acb8edfb36dde223471a/internal/providers/terraform/google/container_cluster.go#L38-L42) resource. In the past we used `.Exists()` but this only checks that the key does not exist in the Terraform JSON, not that the key exists and is set to null.
+
 Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
 
   ```
