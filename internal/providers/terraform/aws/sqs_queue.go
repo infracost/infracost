@@ -25,8 +25,8 @@ func NewSqsQueue(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	}
 
 	requestSize := decimal.NewFromInt(64)
-	if u != nil && u.Get("request_size").Exists() {
-		requestSize = decimal.NewFromInt(u.Get("request_size").Int())
+	if u != nil && u.Get("request_size_kb").Exists() {
+		requestSize = decimal.NewFromInt(u.Get("request_size_kb").Int())
 	}
 
 	var requests *decimal.Decimal

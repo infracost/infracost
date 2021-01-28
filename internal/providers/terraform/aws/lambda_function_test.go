@@ -68,12 +68,12 @@ func TestLambdaFunction_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_lambda_function.lambda": map[string]interface{}{
-			"monthly_requests":         100000,
-			"average_request_duration": 350,
+			"monthly_requests":    100000,
+			"request_duration_ms": 350,
 		},
 		"aws_lambda_function.lambda_512_mem": map[string]interface{}{
-			"monthly_requests":         100000,
-			"average_request_duration": 350,
+			"monthly_requests":    100000,
+			"request_duration_ms": 350,
 		},
 	})
 

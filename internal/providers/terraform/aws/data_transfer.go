@@ -62,23 +62,23 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	}
 
 	var intraRegionGb *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_intra_region").Exists() {
-		intraRegionGb = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_intra_region").Float()))
+	if u != nil && u.Get("monthly_intra_region_gb").Exists() {
+		intraRegionGb = decimalPtr(decimal.NewFromFloat(u.Get("monthly_intra_region_gb").Float()))
 	}
 
 	var outboundInternetGb *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_outbound_internet").Exists() {
-		outboundInternetGb = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_outbound_internet").Float()))
+	if u != nil && u.Get("monthly_outbound_internet_gb").Exists() {
+		outboundInternetGb = decimalPtr(decimal.NewFromFloat(u.Get("monthly_outbound_internet_gb").Float()))
 	}
 
 	var outboundUsEastGb *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_outbound_us_east_to_us_east").Exists() {
-		outboundUsEastGb = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_outbound_us_east_to_us_east").Float()))
+	if u != nil && u.Get("monthly_outbound_us_east_to_us_east_gb").Exists() {
+		outboundUsEastGb = decimalPtr(decimal.NewFromFloat(u.Get("monthly_outbound_us_east_to_us_east_gb").Float()))
 	}
 
 	var outboundOtherRegionsGb *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_outbound_other_regions").Exists() {
-		outboundOtherRegionsGb = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_outbound_other_regions").Float()))
+	if u != nil && u.Get("monthly_outbound_other_regions_gb").Exists() {
+		outboundOtherRegionsGb = decimalPtr(decimal.NewFromFloat(u.Get("monthly_outbound_other_regions_gb").Float()))
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)

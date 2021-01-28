@@ -51,8 +51,8 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 
 	var gbDataProcessed *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_data_processed").Exists() {
-		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed").Float()))
+	if u != nil && u.Get("monthly_data_processed_gb").Exists() {
+		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_data_processed_gb").Float()))
 	}
 
 	return &schema.Resource{
