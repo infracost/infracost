@@ -11,6 +11,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetComputeGlobalAddressRegistryItem(),
 	GetDNSManagedZoneRegistryItem(),
 	GetDNSRecordSetRegistryItem(),
+	GetPubSubTopicRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -72,6 +73,12 @@ var FreeResources []string = []string{
 	"google_project_organization_policy",
 	"google_project_service",
 	"google_project_service_identity",
+	"google_pubsub_subscription_iam_binding",
+	"google_pubsub_subscription_iam_member",
+	"google_pubsub_subscription_iam_policy",
+	"google_pubsub_topic_iam_binding",
+	"google_pubsub_topic_iam_member",
+	"google_pubsub_topic_iam_policy",
 	"google_service_account",
 	"google_service_account_iam_binding",
 	"google_service_account_iam_member",

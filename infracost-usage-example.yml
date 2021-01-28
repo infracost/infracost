@@ -148,3 +148,11 @@ resource_usage:
   #
   google_dns_record_set.my_record_set:
     monthly_queries:  1000000 # Estimated monthly DNS queries.
+
+  google_pubsub_topic.my_topic:
+    monthly_messages:        2592000 # Monthly number of messages published to the topic.
+    message_size_kb:         1024    # Average size of messages in KB.
+    subscriptions:           1       # Number of subscriptions to the topic.
+    message_retention_days:  7       # Number of days to retain acknowledged messages.
+    snapshot_retention_days: 7       # Number of days to retain snapshots.
+    monthly_snapshots:       3       # Monthly total number of snapshots for all subscriptions.
