@@ -165,15 +165,15 @@ When running infracost with `--usage-file path/to/infracost-usage.yml`, Infracos
 
 ### Cost component names and units
 
-Our aim is to make Infracost's output understandable without needing to read separate docs. We try to match the cloud vendor pricing webpages as users have probably seen those before. It's unlikely that users will have looked at the pricing service JSON (which comes from cloud vendors' pricing APIs), or looked at the detailed billing CSVs that can show the pricing service names. Please check [this spreadsheet](https://docs.google.com/spreadsheets/d/1H_bn2jLzYr7xyrvNsFn-0rDaGPGpnrVTPsjVHzr-kM4/edit#gid=0) for examples of cost component names and units. This spreadsheet is continually updated to add new components based on pull requests and the discussion that goes on inside them. We expect that the spreadsheet will get fewer additions as most cloud vendor resources can re-use similar cost component names/units.
+Our aim is to make Infracost's output understandable without needing to read separate docs. We try to match the cloud vendor pricing webpages as users have probably seen those before. It's unlikely that users will have looked at the pricing service JSON (which comes from cloud vendors' pricing APIs), or looked at the detailed billing CSVs that can show the pricing service names. Please check [this spreadsheet](https://docs.google.com/spreadsheets/d/1H_bn2jLzYr7xyrvNsFn-0rDaGPGpnrVTPsjVHzr-kM4/edit#gid=0) for examples of cost component names and units.
 
 Where a cloud vendor's pricing pages information can be improved for clarify, we'll do that, e.g. on some pricing webpages, AWS mention use "Storage Rate" to describe pricing for "Provisioned IOPS storage", so we use the latter.
 
-**Notes**
+#### Resource notes
 
 The following notes are general guidelines, please leave a comment in your pull request if they don't make sense or they can be improved for the resource you're adding.
 
-- count: do not include the count in the Infracost name. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
+- count: do not include the count in the cost component name or in brackets. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
 
 - units:
   - use plural, e.g. hours, months, requests, GB-months, GB (already plural). For a "unit per something", use singular per time unit, e.g. use Per GB per hour. Where it makes sense, instead of "API calls" use "API requests" or "requests" for better consistency.
@@ -214,6 +214,20 @@ The following notes are general guidelines, please leave a comment in your pull 
 		return nil
 	}
 	```
+
+#### Usage file notes
+
+1. Where possible use similar terminology as the cloud vendor's pricing pages, their cost calculators might also help. 
+
+2. Do not prefix things with `average_` as in the future we might want to use nested values, e.g. `request_duration_ms.max`.
+
+3. Use the following units and keep them lower-case:
+  - time: ms, secs, mins, hrs, days, weeks, months
+	- size: b, kb, mb, gb, tb
+
+4. Put the units last, e.g. `message_size_kb`, `request_duration_ms`.
+
+5. For resources that are continuous in time, do not use prefixes, e.g. use `instances`, `subscriptions`, `storage_gb`. For non-continuous resources, prefix with `monthly_` so users knows what time interval to estimate for, e.g. `monthly_log_lines`, `monthly_requests`.
 
 ## Release steps
 
