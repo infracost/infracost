@@ -15,7 +15,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetDNSRecordSetRegistryItem(),
 	GetPubSubSubscriptionRegistryItem(),
 	GetPubSubTopicRegistryItem(),
-  GetStorageBucketRegistryItem(),
+	GetStorageBucketRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
