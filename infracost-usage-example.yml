@@ -141,9 +141,6 @@ resource_usage:
   #
   # Terraform GCP resources
   #
-  google_dns_record_set.my_record_set:
-    monthly_queries:  1000000 # Monthly DNS queries.
-
   google_container_cluster.my_cluster:
     nodes: 4    # Node count per zone for the default node pool
     node_pool[0]:
@@ -151,3 +148,14 @@ resource_usage:
 
   google_container_node_pool.my_node_pool:
     nodes: 4 # Node count per zone for the node pool
+
+  google_dns_record_set.my_record_set:
+    monthly_queries:  1000000 # Monthly DNS queries.
+
+  google_pubsub_subscription.my_subscription:
+    monthly_message_data_tb: 7.416 # Monthly amount of message data pulled by the subscription in TB.
+    storage_gb: 605                # Storage for retaining acknowledged messages in GB.
+    snapshot_storage_gb: 70.6      # Snapshot storage for unacknowledged messages in GB.
+
+  google_pubsub_topic.my_topic:
+    monthly_message_data_tb: 7.416 # Monthly amount of message data published to the topic in TB.
