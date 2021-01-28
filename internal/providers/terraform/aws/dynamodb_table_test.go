@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
@@ -39,34 +40,19 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 		replica {
 		  region_name = "us-west-1"
 		}
-	}
+	}`
 
-	data "infracost_aws_dynamodb_table" "my_dynamodb_table" {
-		resources = list(aws_dynamodb_table.my_dynamodb_table.id,)
-
-		monthly_write_request_units {
-			value = 3000000
-		}
-		monthly_read_request_units {
-			value = 8000000
-		}
-		monthly_gb_data_storage {
-		 	value = 230
-		}
-		monthly_gb_continuous_backup_storage {
-			value = 2300
-		}
-		monthly_gb_on_demand_backup_storage {
-			value = 460
-		}
-		monthly_gb_restore {
-			value = 230
-		}
-		monthly_streams_read_request_units {
-			value = 2000000
-		}
-	}
-	  `
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_dynamodb_table.my_dynamodb_table": map[string]interface{}{
+			"monthly_write_request_units":        3000000,
+			"monthly_read_request_units":         8000000,
+			"storage_gb":                         230,
+			"pitr_backup_storage_gb":             2300,
+			"on_demand_backup_storage_gb":        460,
+			"monthly_data_restored_gb":           230,
+			"monthly_streams_read_request_units": 2000000,
+		},
+	})
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
@@ -88,7 +74,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(230)),
 				},
 				{
-					Name:            "Continuous backup storage (PITR)",
+					Name:            "Point-In-Time Recovery (PITR) backup storage",
 					PriceHash:       "b4ed90c18b808ffff191ffbc16090c8e-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2300)),
 				},
@@ -98,7 +84,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(460)),
 				},
 				{
-					Name:            "Restore data size",
+					Name:            "Table data restored",
 					PriceHash:       "38fc5fdbec6f4ef5e3bdf6967dbe1cb2-b1ae3861dc57e2db217fa83a7420374f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(230)),
 				},
@@ -133,7 +119,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }
 
 func TestNewDynamoDBTableProvisioned(t *testing.T) {
@@ -188,7 +174,7 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:      "Continuous backup storage (PITR)",
+					Name:      "Point-In-Time Recovery (PITR) backup storage",
 					SkipCheck: true,
 				},
 				{
@@ -196,7 +182,7 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 					SkipCheck: true,
 				},
 				{
-					Name:      "Restore data size",
+					Name:      "Table data restored",
 					SkipCheck: true,
 				},
 				{
@@ -229,5 +215,5 @@ func TestNewDynamoDBTableProvisioned(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }

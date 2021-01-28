@@ -31,9 +31,6 @@ var tfProviders = `
 			google = {
 				source  = "hashicorp/google"
 			}
-			infracost = {
-				source = "infracost/infracost"
-			}
 		}
 	}
 
@@ -51,8 +48,6 @@ var tfProviders = `
 		credentials = "{\"type\":\"service_account\"}"
 		region = "us-central1"
 	}
-
-	provider "infracost" {}
 `
 
 var (
@@ -121,7 +116,7 @@ func installPlugins() error {
 	return nil
 }
 
-func ResourceTests(t *testing.T, tf string, checks []testutil.ResourceCheck) {
+func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
 	project := Project{
 		Files: []File{
 			{
@@ -131,18 +126,18 @@ func ResourceTests(t *testing.T, tf string, checks []testutil.ResourceCheck) {
 		},
 	}
 
-	ResourceTestsForProject(t, project, checks)
+	ResourceTestsForProject(t, project, usage, checks)
 }
 
-func ResourceTestsForProject(t *testing.T, project Project, checks []testutil.ResourceCheck) {
-	resources, err := RunCostCalculations(project)
+func ResourceTestsForProject(t *testing.T, project Project, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
+	resources, err := RunCostCalculations(project, usage)
 	assert.NoError(t, err)
 
 	testutil.TestResources(t, resources, checks)
 }
 
-func RunCostCalculations(project Project) ([]*schema.Resource, error) {
-	resources, err := loadResources(project)
+func RunCostCalculations(project Project, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
+	resources, err := loadResources(project, usage)
 	if err != nil {
 		return resources, err
 	}
@@ -158,7 +153,7 @@ func CreateProject(project Project) (string, error) {
 	return writeToTmpDir(project)
 }
 
-func loadResources(project Project) ([]*schema.Resource, error) {
+func loadResources(project Project, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
 	tfdir, err := CreateProject(project)
 	if err != nil {
 		return nil, err
@@ -166,6 +161,7 @@ func loadResources(project Project) ([]*schema.Resource, error) {
 
 	flags := flag.NewFlagSet("test", 0)
 	flags.String("tfdir", tfdir, "")
+	flags.String("usage-file", filepath.Join(tfdir, "infracost-usage.yml"), "")
 	c := cli.NewContext(nil, flags, nil)
 
 	provider := terraform.New()
@@ -174,7 +170,7 @@ func loadResources(project Project) ([]*schema.Resource, error) {
 		return nil, err
 	}
 
-	return provider.LoadResources()
+	return provider.LoadResources(usage)
 }
 
 func writeToTmpDir(project Project) (string, error) {

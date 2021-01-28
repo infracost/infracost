@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 	"github.com/shopspring/decimal"
 
@@ -18,7 +19,7 @@ func TestEKSFargateProfile_default(t *testing.T) {
 	resource "aws_eks_cluster" "example" {
 		name     = "example"
 		role_arn = "arn:aws:iam::123456789012:role/Example"
-	
+
 		vpc_config {
 			subnet_ids = ["subnet_id"]
 		}
@@ -29,7 +30,7 @@ func TestEKSFargateProfile_default(t *testing.T) {
 		fargate_profile_name   = "example"
 		pod_execution_role_arn = "arn:aws:iam::123456789012:role/Example"
 		subnet_ids             = ["subnet_id"]
-	
+
 		selector {
 			namespace = "example"
 		}
@@ -63,6 +64,6 @@ func TestEKSFargateProfile_default(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 
 }

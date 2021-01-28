@@ -6,5 +6,5 @@ import (
 
 type Provider interface {
 	ProcessArgs(*cli.Context) error
-	LoadResources() ([]*Resource, error)
+	LoadResources(map[string]*UsageData) ([]*Resource, error)
 }

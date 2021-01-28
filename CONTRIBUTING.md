@@ -72,7 +72,7 @@ func GetMyResourceRegistryItem() *schema.RegistryItem {
 func NewMyResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	region := d.Get("region").String()
-        instanceCount := 1
+    var instanceCount int64 = 1
 
 	costComponents := []*schema.CostComponent{
 		{
@@ -131,6 +131,8 @@ We distinguish the **price** of a resource from its **cost**. Price is the per-u
 
 You can add all price components for the resource, even ones that are usage-based, so the price column in the table output is always populated. The hourly and monthly cost for these components will show `-` as illustrated in the following output for AWS Lambda. Once this is done, please send a pull-request to this repo so someone can review/merge it. Try to re-use relevant costComponents from other resources where applicable, e.g. notice how the `newElasticacheResource` function is used in [aws_elasticache_cluster](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/elasticache_cluster.go) and [aws_elasticache_replication_group](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/elasticache_replication_group.go).
 
+To conditionally set values based on the Terraform resource values, first check `d.Get("value_name").Type != gjson.Null` like in the [google_container_cluster](https://github.com/infracost/infracost/blob/f7b0594c1ee7d13c0c37acb8edfb36dde223471a/internal/providers/terraform/google/container_cluster.go#L38-L42) resource. In the past we used `.Exists()` but this only checks that the key does not exist in the Terraform JSON, not that the key exists and is set to null.
+
 Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
 
   ```
@@ -148,8 +150,8 @@ Infracost supports passing usage data in through a usage YAML file. When adding 
 
   ```yaml
   aws_lambda_function.my_function:
-    monthly_requests: 100000      # Estimated monthly requests to the Lambda function.
-    average_request_duration: 500 # Estimated average duration of each request in milliseconds.
+    monthly_requests: 100000      # Monthly requests to the Lambda function.
+    request_duration_ms: 500      # Average duration of each request in milliseconds.
   ```
 
 When running infracost with `--usage-file path/to/infracost-usage.yml`, Infracost output shows the hourly/monthly cost columns populated with non-zero values:
@@ -165,17 +167,22 @@ When running infracost with `--usage-file path/to/infracost-usage.yml`, Infracos
 
 ### Cost component names and units
 
-Our aim is to make Infracost's output understandable without needing to read separate docs. We try to match the cloud vendor pricing webpages as users have probably seen those before. It's unlikely that users will have looked at the pricing service JSON (which comes from cloud vendors' pricing APIs), or looked at the detailed billing CSVs that can show the pricing service names. Please check [this spreadsheet](https://docs.google.com/spreadsheets/d/1H_bn2jLzYr7xyrvNsFn-0rDaGPGpnrVTPsjVHzr-kM4/edit#gid=0) for examples of cost component names and units. This spreadsheet is continually updated to add new components based on pull requests and the discussion that goes on inside them. We expect that the spreadsheet will get fewer additions as most cloud vendor resources can re-use similar cost component names/units.
+Our aim is to make Infracost's output understandable without needing to read separate docs. We try to match the cloud vendor pricing webpages as users have probably seen those before. It's unlikely that users will have looked at the pricing service JSON (which comes from cloud vendors' pricing APIs), or looked at the detailed billing CSVs that can show the pricing service names. Please check [this spreadsheet](https://docs.google.com/spreadsheets/d/1H_bn2jLzYr7xyrvNsFn-0rDaGPGpnrVTPsjVHzr-kM4/edit#gid=0) for examples of cost component names and units.
 
 Where a cloud vendor's pricing pages information can be improved for clarify, we'll do that, e.g. on some pricing webpages, AWS mention use "Storage Rate" to describe pricing for "Provisioned IOPS storage", so we use the latter.
 
-**Notes**
+#### Resource notes
 
 The following notes are general guidelines, please leave a comment in your pull request if they don't make sense or they can be improved for the resource you're adding.
 
-- count: do not include the count in the Infracost name. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
+- count: do not include the count in the cost component name or in brackets. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
 
-- units: use plural, e.g. hours, requests, GB-months, GB (already plural). For a "unit per something", use singular per time unit, e.g. use Per GB per hour.
+- units:
+  - use plural, e.g. hours, months, requests, GB-months, GB (already plural). For a "unit per something", use singular per time unit, e.g. use Per GB per hour. Where it makes sense, instead of "API calls" use "API requests" or "requests" for better consistency.
+
+  - for things where the Terraform resource represents 1 unit, e.g. an `aws_instance`, an `aws_secretsmanager_secret` and a `google_dns_managed_zone`, the units should be months (or hours if that makes more sense). For everything else, the units should be whatever is being charged for, e.g. queries, requests.
+
+  - for data transferred, where you pay for the data per GB, then use `GB`. For storage, where you pay per GB per month, then use `GB-months`. You'll probably see that the Cloud Pricing API's units to use a similar logic. The AWS pricing pages sometimes use a different one than their own pricing API, in that case the pricing API is a better guide.
 
 - unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 unless the price is for a large number, e.g. set it to `1000000` if the price should be shown "per 1M requests" in the output.
 
@@ -187,7 +194,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - storage type: if applicable, include the storage type in brackets in lower case, e.g. `General purpose storage (gp2)`.
 
-- upper/lower case: cost component names should start with a capital letter and use capital letters for acronyms, for example, `General purpose storage (gp2)` and `Provisioned IOPS storage`.
+- upper/lower case: cost component names should start with a capital letter and use capital letters for acronyms, unless the acronym refers to a type used by the cloud vendor, for example, `General purpose storage (gp2)` (as `gp2` is a type used by AWS) and `Provisioned IOPS storage`.
 
 - unnecessary words: drop the following words from cost component names if the cloud vendor's pricing webpage shows them: "Rate" "Volumes", "SSD", "HDD"
 
@@ -212,13 +219,30 @@ The following notes are general guidelines, please leave a comment in your pull 
 	}
 	```
 
-## Releasing steps
+#### Usage file notes
 
-1. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
-2. Wait for the GH Actions to complete, the [newly created tag](https://github.com/infracost/infracost/releases/latest) should have 6 assets.
-3. Click on the Edit release, add the release notes from the commits between this and the last release and click on publish.
-4. Announce the release in the infracost-community Slack general channel. Then wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
-5. Update the docs repo with any required changes and supported resources.
-6. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
+1. Where possible use similar terminology as the cloud vendor's pricing pages, their cost calculators might also help.
 
-If a new flag/feature is added that requires CI support, update the 9 repos mentioned in https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts. For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.
+2. Do not prefix things with `average_` as in the future we might want to use nested values, e.g. `request_duration_ms.max`.
+
+3. Use the following units and keep them lower-case:
+  - time: ms, secs, mins, hrs, days, weeks, months
+  - size: b, kb, mb, gb, tb
+
+4. Put the units last, e.g. `message_size_kb`, `request_duration_ms`.
+
+5. For resources that are continuous in time, do not use prefixes, e.g. use `instances`, `subscriptions`, `storage_gb`. For non-continuous resources, prefix with `monthly_` so users knows what time interval to estimate for, e.g. `monthly_log_lines`, `monthly_requests`.
+
+## Release steps
+
+@alikhajeh1 and @aliscott rotate release responsibilities between them.
+
+1. In [here](https://github.com/infracost/infracost/actions), click on the "Go" build for the master branch, click on Build, expand Test, then use the "Search logs" box to find any line that has "Multiple products found", "No products found for" or "No prices found for". Update the resource files in question to fix these error, often it's because the price filters need to be adjusted to only return 1 result.
+2. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
+3. Wait for the GH Actions to complete, the [newly created tag](https://github.com/infracost/infracost/releases/latest) should have 6 assets.
+4. Click on the Edit release, add the release notes from the commits between this and the last release and click on publish.
+5. Announce the release in the infracost-community Slack general channel. Then wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
+6. Update the docs repo with any required changes and supported resources.
+7. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
+
+If a new flag/feature is added that requires CI support, update the 9 repos mentioned [here](https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts). For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.

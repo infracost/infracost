@@ -57,12 +57,15 @@ post_bitbucket_comment () {
 
 infracost_cmd="infracost --no-color"
 if [ ! -z "$tfjson" ]; then
+  echo "WARNING: we do not recommend using tfjson as it doesn't work with this diff script, use tfdir instead."
   infracost_cmd="$infracost_cmd --tfjson $tfjson"
 fi
 if [ ! -z "$tfplan" ]; then
+  echo "WARNING: we do not recommend using tfplan as it doesn't work with this diff script, use tfdir instead."
   infracost_cmd="$infracost_cmd --tfplan $tfplan"
 fi
 if [ "$use_tfstate" = "true" ] || [ "$use_tfstate" = "True" ] || [ "$use_tfstate" = "TRUE" ]; then
+  echo "WARNING: we do not recommend using use_tfstate as it doesn't work with this diff script, use tfdir without this instead."
   infracost_cmd="$infracost_cmd --use-tfstate"
 fi
 if [ ! -z "$tfdir" ]; then

@@ -10,16 +10,23 @@ func GetEC2TransitGatewayVpcAttachmentRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_ec2_transit_gateway_vpc_attachment",
 		RFunc: NewEC2TransitGatewayVpcAttachment,
+		ReferenceAttributes: []string{
+			"transit_gateway_id",
+		},
 	}
 }
 
 func NewEC2TransitGatewayVpcAttachment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
+	transitGatewayRefs := d.References("transit_gateway_id")
+	if len(transitGatewayRefs) > 0 {
+		region = transitGatewayRefs[0].Get("region").String()
+	}
 
 	var gbDataProcessed *decimal.Decimal
 
-	if u != nil && u.Get("monthly_gb_data_processed").Exists() {
-		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_gb_data_processed").Float()))
+	if u != nil && u.Get("monthly_data_processed_gb").Exists() {
+		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_data_processed_gb").Float()))
 	}
 
 	return &schema.Resource{

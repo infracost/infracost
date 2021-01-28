@@ -59,9 +59,12 @@ Support for the following is not currently included:
 | `aws_s3_bucket` |  S3 replication time control data transfer, and batch operations are not supported by Terraform.<br />  |
 | `aws_s3_bucket_analytics_configuration` |  |
 | `aws_s3_bucket_inventory` |  |
+| `aws_secretsmanager_secret` |  |
 | `aws_sns_topic` |  |
 | `aws_sns_topic_subscription` |  SMS and mobile push not yet supported.<br />  |
 | `aws_sqs_queue` |  |
+| `aws_ssm_activation` |  |
+| `aws_ssm_parameter` |  |
 | `aws_vpc_endpoint` |  |
 | `aws_vpn_connection` |  |
 | `google_compute_address` |  |
@@ -70,6 +73,12 @@ Support for the following is not currently included:
 | `google_compute_image` |  |
 | `google_compute_instance` |  Sustained use discounts are applied to monthly costs, but not to hourly costs.<br />  Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.<br />  Custom machine types are not supported.<br />  Sole-tenant VMs are not supported.<br />  |
 | `google_compute_snapshot` |  |
+| `google_container_cluster` |  Sustained use discounts are applied to monthly costs, but not to hourly costs.<br />  Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.<br />  Custom machine types are not supported.<br />  |
+| `google_container_node_pool` |  Sustained use discounts are applied to monthly costs, but not to hourly costs.<br />  Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.<br />  Custom machine types are not supported.<br />  |
+| `google_dns_managed_zone` |  |
+| `google_dns_record_set` |  |
+| `google_pubsub_subscription` |  |
+| `google_pubsub_topic` |  |
 
 
 ## The resource I want isn't supported

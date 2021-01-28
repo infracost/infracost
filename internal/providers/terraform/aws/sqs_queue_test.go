@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
@@ -34,7 +35,7 @@ func TestSQSQueueFunction(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
 
 func TestSQSQueue_usage(t *testing.T) {
@@ -43,28 +44,26 @@ func TestSQSQueue_usage(t *testing.T) {
 	}
 
 	tf := `
-        resource "aws_sqs_queue" "fifo" {
-            name = "my-fifo-queue"
-            fifo_queue = true
+		resource "aws_sqs_queue" "fifo" {
+			name = "my-fifo-queue"
+			fifo_queue = true
 		}
 
-        resource "aws_sqs_queue" "standard" {
-            name = "my-standard-queue"
-            fifo_queue = false
-		}
+		resource "aws_sqs_queue" "standard" {
+			name = "my-standard-queue"
+			fifo_queue = false
+		}`
 
-        data "infracost_aws_sqs_queue" "queue" {
-            resources = [aws_sqs_queue.fifo.id, aws_sqs_queue.standard.id]
-
-            monthly_requests {
-                value = 1000000
-            }
-
-            request_size {
-                value = 63
-            }
-        }
-		`
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_sqs_queue.fifo": map[string]interface{}{
+			"monthly_requests": 1000000,
+			"request_size":     63,
+		},
+		"aws_sqs_queue.standard": map[string]interface{}{
+			"monthly_requests": 1000000,
+			"request_size":     63,
+		},
+	})
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
@@ -89,5 +88,5 @@ func TestSQSQueue_usage(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }

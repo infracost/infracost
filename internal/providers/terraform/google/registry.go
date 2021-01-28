@@ -9,7 +9,13 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetComputeInstanceRegistryItem(),
 	GetComputeAddressRegistryItem(),
 	GetComputeGlobalAddressRegistryItem(),
-	GetStorageBucketRegistryItem(),
+	GetContainerClusterRegistryItem(),
+	GetContainerNodePoolRegistryItem(),
+	GetDNSManagedZoneRegistryItem(),
+	GetDNSRecordSetRegistryItem(),
+	GetPubSubSubscriptionRegistryItem(),
+	GetPubSubTopicRegistryItem(),
+  GetStorageBucketRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -37,6 +43,9 @@ var FreeResources []string = []string{
 	"google_compute_network_endpoint_group",
 	"google_compute_network_peering",
 	"google_compute_network_peering_routes_config",
+	"google_compute_organization_security_policy",
+	"google_compute_organization_security_policy_association",
+	"google_compute_organization_security_policy_rule",
 	"google_compute_project_default_network_tier",
 	"google_compute_project_metadata",
 	"google_compute_project_metadata_item",
@@ -57,6 +66,29 @@ var FreeResources []string = []string{
 	"google_compute_subnetwork",
 	"google_compute_subnetwork_iam",
 	"google_compute_url_map",
+	"google_dns_policy",
+	"google_project",
+	"google_project_default_service_accounts",
+	"google_project_iam_audit_config",
+	"google_project_iam_binding",
+	"google_project_iam_custom_role",
+	"google_project_iam_member",
+	"google_project_iam_policy",
+	"google_project_organization_policy",
+	"google_project_service",
+	"google_project_service_identity",
+	"google_pubsub_subscription_iam_binding",
+	"google_pubsub_subscription_iam_member",
+	"google_pubsub_subscription_iam_policy",
+	"google_pubsub_topic_iam_binding",
+	"google_pubsub_topic_iam_member",
+	"google_pubsub_topic_iam_policy",
+	"google_service_account",
+	"google_service_account_iam_binding",
+	"google_service_account_iam_member",
+	"google_service_account_iam_policy",
+	"google_service_account_key",
+	"google_usage_export_bucket",
 }
 
 var UsageOnlyResources []string = []string{}
@@ -112,11 +144,7 @@ var UsageOnlyResources []string = []string{}
 // google_compute_interconnect_attachment
 //
 // Others:
-// google_compute_organization_security_policy
-// google_compute_organization_security_policy_association
-// google_compute_organization_security_policy_rule
 // google_compute_region_disk_resource_policy_attachment
 // google_compute_reservation
 // google_compute_resource_policy
 // google_compute_security_policy
-// google_usage_export_bucket

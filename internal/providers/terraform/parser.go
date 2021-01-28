@@ -66,8 +66,8 @@ func createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 }
 
-func parseJSON(j []byte, u map[string]*schema.UsageData) ([]*schema.Resource, error) {
-	resources := loadUsageFileResources(u)
+func parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
+	resources := loadUsageFileResources(usage)
 
 	if !gjson.ValidBytes(j) {
 		return resources, errors.New("invalid JSON")
@@ -86,11 +86,11 @@ func parseJSON(j []byte, u map[string]*schema.UsageData) ([]*schema.Resource, er
 	resData := parseResourceData(providerConf, vals, conf, vars)
 
 	parseReferences(resData, conf)
-	loadInfracostProviderUsageData(u, resData)
+	loadInfracostProviderUsageData(usage, resData)
 	stripDataResources(resData)
 
 	for _, d := range resData {
-		if r := createResource(d, u[d.Address]); r != nil {
+		if r := createResource(d, usage[d.Address]); r != nil {
 			resources = append(resources, r)
 		}
 	}
@@ -131,7 +131,7 @@ func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, v
 
 		// Otherwise use region from the provider conf
 		if region == "" {
-			region = providerRegion(providerConf, vars, t, resConf)
+			region = providerRegion(addr, providerConf, vars, t, resConf)
 		}
 
 		v = schema.AddRawValue(v, "region", region)
@@ -184,7 +184,7 @@ func resourceRegion(resourceType string, v gjson.Result) string {
 	return strings.Split(v.Get(arnAttr).String(), ":")[3]
 }
 
-func providerRegion(providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
+func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
 	var region string
 
 	providerKey := parseProviderKey(resConf)
@@ -204,7 +204,7 @@ func providerRegion(providerConf gjson.Result, vars gjson.Result, resourceType s
 			region = defaultProviderRegions[providerPrefix]
 
 			if region != "" {
-				log.Debugf("Falling back to default region (%s) for %s", region, resConf.Get("address").String())
+				log.Debugf("Falling back to default region (%s) for %s", region, addr)
 			}
 		}
 	}

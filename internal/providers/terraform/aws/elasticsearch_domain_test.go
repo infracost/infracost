@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 	"github.com/shopspring/decimal"
 
@@ -65,7 +66,7 @@ func TestElasticsearchDomain(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 
 	tfIOEbs := `
 	resource "aws_elasticsearch_domain" "example" {
@@ -108,7 +109,7 @@ func TestElasticsearchDomain(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tfIOEbs, resourceChecksIOEbs)
+	tftest.ResourceTests(t, tfIOEbs, schema.NewEmptyUsageMap(), resourceChecksIOEbs)
 
 	tfSTEbs := `
 	resource "aws_elasticsearch_domain" "example" {
@@ -145,5 +146,5 @@ func TestElasticsearchDomain(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tfSTEbs, resourceChecksSTEbs)
+	tftest.ResourceTests(t, tfSTEbs, schema.NewEmptyUsageMap(), resourceChecksSTEbs)
 }

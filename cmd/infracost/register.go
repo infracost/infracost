@@ -62,10 +62,7 @@ func registerCmd() *cli.Command {
 			green := color.New(color.FgGreen)
 			bold := color.New(color.Bold, color.FgHiWhite)
 
-			feedbackMsg := "Send us feedback at any time by running `infracost feedback`."
-
-			msg := fmt.Sprintf("\n%s\n\n%s\n%s %s %s\n",
-				feedbackMsg,
+			msg := fmt.Sprintf("\n%s\n%s %s %s\n",
 				green.Sprintf("Your API key has been saved to %s", config.ConfigFilePath()),
 				green.Sprint("You can now run"),
 				bold.Sprint("`infracost`"),
@@ -83,8 +80,7 @@ func registerCmd() *cli.Command {
 
 				if !confirm {
 					saveAPIKey = false
-					msg = fmt.Sprintf("\n%s\n\n%s\n%s %s %s\n",
-						feedbackMsg,
+					msg = fmt.Sprintf("\n%s\n%s %s %s\n",
 						green.Sprint("Setting the INFRACOST_API_KEY environment variable overrides the key from config.yml."),
 						green.Sprint("You can now run"),
 						bold.Sprint("`infracost`"),
