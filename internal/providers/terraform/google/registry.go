@@ -11,6 +11,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetComputeGlobalAddressRegistryItem(),
 	GetDNSManagedZoneRegistryItem(),
 	GetDNSRecordSetRegistryItem(),
+	GetPubSubSubscriptionRegistryItem(),
 	GetPubSubTopicRegistryItem(),
 }
 
