@@ -135,7 +135,6 @@ func networkEgress(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	})
 
 	// General
-	quantity = nil
 	regionsData := []*storageBucketEgressRegionData{
 		{
 			gRegion:        "Data transfer to worldwide destinations (excluding Asia & Australia)",
