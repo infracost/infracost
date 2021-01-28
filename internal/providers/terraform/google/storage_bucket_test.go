@@ -56,7 +56,7 @@ func TestStorageBucket(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:            "Data storage",
-					PriceHash:       "83fe976775a60e822109bcd6d2399e03-57bc5d148491a8381abaccb21ca6b4e9",
+					PriceHash:       "3a642690b932ab86cc5eec7ff6519d6a-57bc5d148491a8381abaccb21ca6b4e9",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(150)),
 				},
 				{
