@@ -225,7 +225,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 3. Use the following units and keep them lower-case:
   - time: ms, secs, mins, hrs, days, weeks, months
-	- size: b, kb, mb, gb, tb
+  - size: b, kb, mb, gb, tb
 
 4. Put the units last, e.g. `message_size_kb`, `request_duration_ms`.
 
