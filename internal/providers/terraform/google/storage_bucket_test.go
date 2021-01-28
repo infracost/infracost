@@ -45,6 +45,7 @@ func TestStorageBucket(t *testing.T) {
 				"class_a": 40000,
 				"class_b": 20000,
 			},
+			"monthly_data_retrieval_gb": 500,
 		},
 	})
 
@@ -56,6 +57,11 @@ func TestStorageBucket(t *testing.T) {
 					Name:            "Data storage",
 					PriceHash:       "83fe976775a60e822109bcd6d2399e03-57bc5d148491a8381abaccb21ca6b4e9",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(150)),
+				},
+				{
+					Name:            "Data retrieval",
+					PriceHash:       "457f5cf083275541906b4732399f3421-8012a4febcd0213911ed09e53341a976",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(500)),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{

@@ -161,13 +161,14 @@ resource_usage:
     monthly_message_data_tb: 7.416 # Monthly amount of message data published to the topic in TB.
     
   google_storage_bucket.my_storage_bucket:
-    monthly_storage_gb: 150     # Estimated GB of data stored in the storage bucket per month.
+    monthly_storage_gb: 150          # Estimated GB of data stored in the storage bucket per month.
     monthly_egress_data_transfer_gb:
-      same_continent: 550       # Estimated GB of data sent from Cloud Storage in the same continent per month.
-      worldwide: 12500          # Estimated GB of data sent from Cloud Storage to worldwide destinations (excluding Asia & Australia) per month.
-      asia: 1500                # Estimated GB of data sent from Cloud Storage to Asia (excluding China, but including Hong Kong) per month.
-      china: 50                 # Estimated GB of data sent from Cloud Storage to China (excluding Hong Kong) per month.
-      australia: 250            # Estimated GB of data sent from Cloud Storage to Australia per month.  
+      same_continent: 550            # Estimated GB of data sent from Cloud Storage in the same continent per month.
+      worldwide: 12500               # Estimated GB of data sent from Cloud Storage to worldwide destinations (excluding Asia & Australia) per month.
+      asia: 1500                     # Estimated GB of data sent from Cloud Storage to Asia (excluding China, but including Hong Kong) per month.
+      china: 50                      # Estimated GB of data sent from Cloud Storage to China (excluding Hong Kong) per month.
+      australia: 250                 # Estimated GB of data sent from Cloud Storage to Australia per month.  
     monthly_operations:
-      class_a: 40000            # Estimated number of class A operations per month.
-      class_b: 20000            # Estimated number of class B operations per month.
+      class_a: 40000                 # Estimated number of class A operations per month.
+      class_b: 20000                 # Estimated number of class B operations per month.
+    monthly_data_retrieval_gb: 500   # Estimated GB of retrieved data per month.

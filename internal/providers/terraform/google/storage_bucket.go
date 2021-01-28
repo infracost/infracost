@@ -32,6 +32,7 @@ func NewStorageBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			dataStorage(d, u),
+			dataRetrieval(d, u),
 		},
 		SubResources: []*schema.Resource{
 			networkEgress(d, u),
@@ -281,6 +282,44 @@ func operations(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 						{Key: "description", ValueRegex: strPtr("/Class B/")},
 					},
 				},
+			},
+		},
+	}
+}
+
+func dataRetrieval(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if u != nil && u.Get("monthly_data_retrieval_gb").Exists() {
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_retrieval_gb").Int()))
+	}
+
+	storageClass := "STANDARD"
+	if d.Get("storage_class").Exists() {
+		storageClass = d.Get("storage_class").String()
+	}
+
+	storageClassResourceGroupMap := map[string]string{
+		"NEARLINE": "NearlineOps",
+		"COLDLINE": "ColdlineOps",
+		"ARCHIVE":  "ArchiveOps",
+	}
+	resourceGroup := storageClassResourceGroupMap[storageClass]
+	// Skipping standard, regional and multi-regional since they are free
+	if resourceGroup == "" {
+		return &schema.CostComponent{IgnoreIfMissingPrice: true}
+	}
+
+	return &schema.CostComponent{
+		Name:            "Data retrieval",
+		Unit:            "GB",
+		UnitMultiplier:  1,
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("gcp"),
+			Service:    strPtr("Cloud Storage"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "resourceGroup", Value: strPtr(resourceGroup)},
+				{Key: "description", ValueRegex: strPtr("/Retrieval/")},
 			},
 		},
 	}
