@@ -18,6 +18,7 @@ func TestStorageBucket(t *testing.T) {
 		resource "google_storage_bucket" "my_storage_bucket" {
 			name          = "auto-expiring-bucket"
 			location      = "ASIA"
+			storage_class = "COLDLINE"
 			force_destroy = true
 		
 			lifecycle_rule {
