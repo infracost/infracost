@@ -23,7 +23,7 @@ func TestCloudwatchLogGroup(t *testing.T) {
 			Name: "aws_cloudwatch_log_group.logs",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Data ingestion",
+					Name:             "Data ingested",
 					PriceHash:        "4c00b8e26729863d2cc1f1a2d824dcf0-b1ae3861dc57e2db217fa83a7420374f",
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},

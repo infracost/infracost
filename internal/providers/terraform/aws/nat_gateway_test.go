@@ -56,7 +56,7 @@ func TestNATGateway_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_nat_gateway.nat": map[string]interface{}{
-			"monthly_gb_data_processed": 100,
+			"monthly_data_processed_gb": 100,
 		},
 	})
 

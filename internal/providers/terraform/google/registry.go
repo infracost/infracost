@@ -9,6 +9,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetComputeInstanceRegistryItem(),
 	GetComputeAddressRegistryItem(),
 	GetComputeGlobalAddressRegistryItem(),
+	GetContainerClusterRegistryItem(),
+	GetContainerNodePoolRegistryItem(),
 	GetDNSManagedZoneRegistryItem(),
 	GetDNSRecordSetRegistryItem(),
 	GetPubSubSubscriptionRegistryItem(),

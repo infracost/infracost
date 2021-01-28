@@ -28,8 +28,8 @@ func NewSSMActivation(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		}
 	}
 
-	if u != nil && u.Get("instance_count").Exists() {
-		instanceCount = decimalPtr(decimal.NewFromInt(u.Get("instance_count").Int()))
+	if u != nil && u.Get("instances").Exists() {
+		instanceCount = decimalPtr(decimal.NewFromInt(u.Get("instances").Int()))
 	}
 
 	if strings.ToLower(instanceTier) == "advanced" {

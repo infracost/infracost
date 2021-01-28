@@ -36,37 +36,7 @@ func NewComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		purchaseOption = "preemptible"
 	}
 
-	sustainedUseDiscount := 0.0
-	if purchaseOption == "on_demand" {
-		switch strings.Split(machineType, "-")[0] {
-		case "c2", "n2", "n2d":
-			sustainedUseDiscount = 0.2
-		case "n1", "f1", "g1", "m1":
-			sustainedUseDiscount = 0.3
-		}
-	}
-
-	costComponents := []*schema.CostComponent{
-		{
-			Name:                fmt.Sprintf("Linux/UNIX usage (%s, %s)", purchaseOptionLabel(purchaseOption), machineType),
-			Unit:                "hours",
-			UnitMultiplier:      1,
-			HourlyQuantity:      decimalPtr(decimal.NewFromInt(1)),
-			MonthlyDiscountPerc: sustainedUseDiscount,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("gcp"),
-				Region:        strPtr(region),
-				Service:       strPtr("Compute Engine"),
-				ProductFamily: strPtr("Compute Instance"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "machineType", Value: strPtr(machineType)},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr(purchaseOption),
-			},
-		},
-	}
+	costComponents := []*schema.CostComponent{computeCostComponent(region, machineType, purchaseOption)}
 
 	if d.Get("boot_disk.0.initialize_params.0").Exists() {
 		costComponents = append(costComponents, bootDisk(region, d.Get("boot_disk.0.initialize_params.0")))
@@ -84,6 +54,38 @@ func NewComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
+	}
+}
+
+func computeCostComponent(region, machineType string, purchaseOption string) *schema.CostComponent {
+	sustainedUseDiscount := 0.0
+	if purchaseOption == "on_demand" {
+		switch strings.Split(machineType, "-")[0] {
+		case "c2", "n2", "n2d":
+			sustainedUseDiscount = 0.2
+		case "n1", "f1", "g1", "m1":
+			sustainedUseDiscount = 0.3
+		}
+	}
+
+	return &schema.CostComponent{
+		Name:                fmt.Sprintf("Linux/UNIX usage (%s, %s)", purchaseOptionLabel(purchaseOption), machineType),
+		Unit:                "hours",
+		UnitMultiplier:      1,
+		HourlyQuantity:      decimalPtr(decimal.NewFromInt(1)),
+		MonthlyDiscountPerc: sustainedUseDiscount,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("gcp"),
+			Region:        strPtr(region),
+			Service:       strPtr("Compute Engine"),
+			ProductFamily: strPtr("Compute Instance"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "machineType", Value: strPtr(machineType)},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr(purchaseOption),
+		},
 	}
 }
 
