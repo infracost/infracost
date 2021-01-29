@@ -30,6 +30,7 @@ type EnvironmentSpec struct {
 	TerraformRemoteExecutionModeEnabled bool     `json:"terraformRemoteExecutionModeEnabled"`
 	TerraformInfracostProviderEnabled   bool     `json:"terraformInfracostProviderEnabled"`
 	HasUsageFile                        bool     `json:"hasUsageFile"`
+	IsAWSChina                          bool     `json:isAwsChina`
 }
 
 var Environment *EnvironmentSpec
@@ -54,6 +55,7 @@ func loadEnvironment() *EnvironmentSpec {
 		TerraformVersion:                    terraformVersion(),
 		TerraformRemoteExecutionModeEnabled: false,
 		TerraformInfracostProviderEnabled:   false,
+		IsAWSChina:                          false,
 	}
 }
 
