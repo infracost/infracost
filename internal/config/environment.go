@@ -30,7 +30,7 @@ type EnvironmentSpec struct {
 	TerraformRemoteExecutionModeEnabled bool     `json:"terraformRemoteExecutionModeEnabled"`
 	TerraformInfracostProviderEnabled   bool     `json:"terraformInfracostProviderEnabled"`
 	HasUsageFile                        bool     `json:"hasUsageFile"`
-	IsAWSChina                          bool     `json:isAwsChina`
+	IsAWSChina                          bool     `json:"isAwsChina"`
 }
 
 var Environment *EnvironmentSpec
