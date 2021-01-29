@@ -141,6 +141,10 @@ resource_usage:
   #
   # Terraform GCP resources
   #
+  google_compute_router_nat.my_nat:
+    assigned_vms: 4                 # Number of VM instances assigned to the NAT gateway
+    monthly_data_processed_gb: 1000 # Data processed (ingress and egress) by the NAT gateway per month in GB
+
   google_container_cluster.my_cluster:
     nodes: 4    # Node count per zone for the default node pool
     node_pool[0]:

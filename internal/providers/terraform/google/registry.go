@@ -3,12 +3,13 @@ package google
 import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
+	GetComputeAddressRegistryItem(),
 	GetComputeDiskRegistryItem(),
+	GetComputeGlobalAddressRegistryItem(),
 	GetComputeImageRegistryItem(),
 	GetComputeSnapshotRegistryItem(),
 	GetComputeInstanceRegistryItem(),
-	GetComputeAddressRegistryItem(),
-	GetComputeGlobalAddressRegistryItem(),
+	GetComputeRouterNATRegistryItem(),
 	GetContainerClusterRegistryItem(),
 	GetContainerNodePoolRegistryItem(),
 	GetDNSManagedZoneRegistryItem(),
