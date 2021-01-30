@@ -22,13 +22,13 @@ func NewACMPCACertificateAuthority(d *schema.ResourceData, u *schema.UsageData) 
 		"tierThree": decimal.Zero,
 	}
 
-	monthlyCertificatesCreated := decimal.Zero
+	monthlyCertificatesRequests := decimal.Zero
 
-	if u != nil && u.Get("monthly_certificates_created").Exists() {
-		monthlyCertificatesCreated = decimal.NewFromInt(u.Get("monthly_certificates_created").Int())
+	if u != nil && u.Get("monthly_certificate_requests").Exists() {
+		monthlyCertificatesRequests = decimal.NewFromInt(u.Get("monthly_certificate_requests").Int())
 	}
 
-	certificateCreationQuantities := calculateCertificateRequests(monthlyCertificatesCreated, privateCertificateTier)
+	certificateCreationQuantities := calculateCertificateRequests(monthlyCertificatesRequests, privateCertificateTier)
 
 	tierOne := certificateCreationQuantities["tierOne"]
 	tierTwo := certificateCreationQuantities["tierTwo"]
@@ -53,66 +53,15 @@ func NewACMPCACertificateAuthority(d *schema.ResourceData, u *schema.UsageData) 
 	}
 
 	if privateCertificateTier["tierOne"].GreaterThan(decimal.NewFromInt(0)) {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Certificates (1 - 1000)",
-			Unit:            "certificates",
-			UnitMultiplier:  1,
-			MonthlyQuantity: &tierOne,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AWSCertificateManager"),
-				ProductFamily: strPtr("AWS Certificate Manager"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/PrivateCertificatesIssued/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				EndUsageAmount: strPtr("1000"),
-			},
-		})
+		costComponents = append(costComponents, certificateCostComponent(region, "Certificate requests (1 - 1000)", "0", tierOne))
 	}
 
 	if privateCertificateTier["tierTwo"].GreaterThan(decimal.NewFromInt(0)) {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Certificates (1,0001 - 10,000)",
-			Unit:            "certificates",
-			UnitMultiplier:  1,
-			MonthlyQuantity: &tierTwo,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AWSCertificateManager"),
-				ProductFamily: strPtr("AWS Certificate Manager"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/PrivateCertificatesIssued/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				EndUsageAmount: strPtr("10000"),
-			},
-		})
+		costComponents = append(costComponents, certificateCostComponent(region, "Certificate requests (1001 - 10000)", "1000", tierTwo))
 	}
 
 	if privateCertificateTier["tierThree"].GreaterThan(decimal.NewFromInt(0)) {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Certificates (10,001 and above)",
-			Unit:            "certificates",
-			UnitMultiplier:  1,
-			MonthlyQuantity: &tierThree,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AWSCertificateManager"),
-				ProductFamily: strPtr("AWS Certificate Manager"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/PrivateCertificatesIssued/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("10000"),
-			},
-		})
+		costComponents = append(costComponents, certificateCostComponent(region, "Certificate requests (> 10000)", "10000", tierThree))
 	}
 
 	return &schema.Resource{
@@ -137,14 +86,33 @@ func calculateCertificateRequests(privateCertificateCount decimal.Decimal, prici
 		pricingTiers["tierTwo"] = certificateTierTwoLimit
 	} else {
 		pricingTiers["tierTwo"] = privateCertificateCount.Sub(certificateTierOneLimit)
-	}
-
-	if privateCertificateCount.GreaterThan(certificateTierThreeLimit) {
-		pricingTiers["tierThree"] = certificateTierThreeLimit
-	} else {
-		pricingTiers["tierThree"] = privateCertificateCount.Sub(certificateTierTwoLimit.Add(certificateTierOneLimit))
 		return pricingTiers
 	}
 
+	if privateCertificateCount.GreaterThan(certificateTierThreeLimit) {
+		pricingTiers["tierThree"] = privateCertificateCount.Sub(certificateTierTwoLimit.Add(certificateTierOneLimit))
+	}
+
 	return pricingTiers
+}
+
+func certificateCostComponent(region string, displayName string, usageTier string, monthlyQuantity decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            displayName,
+		Unit:            "certificates",
+		UnitMultiplier:  1,
+		MonthlyQuantity: &monthlyQuantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AWSCertificateManager"),
+			ProductFamily: strPtr("AWS Certificate Manager"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/PrivateCertificatesIssued/")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr(usageTier),
+		},
+	}
 }
