@@ -28,11 +28,11 @@ func NewACMPCACertificateAuthority(d *schema.ResourceData, u *schema.UsageData) 
 		monthlyCertificatesRequests = decimal.NewFromInt(u.Get("monthly_certificate_requests").Int())
 	}
 
-	certificateCreationQuantities := calculateCertificateRequests(monthlyCertificatesRequests, privateCertificateTier)
+	certificateTierQuantities := calculateCertificateRequests(monthlyCertificatesRequests, privateCertificateTier)
 
-	tierOne := certificateCreationQuantities["tierOne"]
-	tierTwo := certificateCreationQuantities["tierTwo"]
-	tierThree := certificateCreationQuantities["tierThree"]
+	tierOne := certificateTierQuantities["tierOne"]
+	tierTwo := certificateTierQuantities["tierTwo"]
+	tierThree := certificateTierQuantities["tierThree"]
 
 	costComponents := []*schema.CostComponent{
 		{
