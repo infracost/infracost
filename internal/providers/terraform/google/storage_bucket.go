@@ -82,8 +82,8 @@ func getDSRegionResourceGroup(location, storageClass string) (string, string) {
 func dataStorage(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
 	location := d.Get("location").String()
 	var quantity *decimal.Decimal
-	if u != nil && u.Get("monthly_storage_gb").Exists() {
-		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_storage_gb").Int()))
+	if u != nil && u.Get("storage_gb").Exists() {
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("storage_gb").Int()))
 	}
 	storageClass := "STANDARD"
 	if d.Get("storage_class").Exists() {

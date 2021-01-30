@@ -161,7 +161,7 @@ resource_usage:
     monthly_message_data_tb: 7.416 # Monthly amount of message data published to the topic in TB.
     
   google_storage_bucket.my_storage_bucket:
-    monthly_storage_gb: 150           # Estimated GB of data stored in the storage bucket per month.
+    storage_gb: 150                   # Estimated GB of data stored in the storage bucket per month.
     monthly_egress_data_transfer_gb:
       same_continent: 550             # Estimated GB of data sent from Cloud Storage in the same continent per month.
       worldwide: 12500                # Estimated GB of data sent from Cloud Storage to worldwide destinations (excluding Asia & Australia) per month.

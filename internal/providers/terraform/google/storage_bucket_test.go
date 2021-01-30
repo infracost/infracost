@@ -34,7 +34,7 @@ func TestStorageBucket(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"google_storage_bucket.my_storage_bucket": map[string]interface{}{
-			"monthly_storage_gb": 150,
+			"storage_gb": 150,
 			"monthly_egress_data_transfer_gb": map[string]interface{}{
 				"same_continent": 550,
 				"worldwide":      12500,
