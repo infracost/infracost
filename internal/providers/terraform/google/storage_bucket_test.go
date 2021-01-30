@@ -22,12 +22,12 @@ func TestStorageBucket(t *testing.T) {
 			force_destroy = true
 		
 			lifecycle_rule {
-			condition {
-				age = 3
-			}
-			action {
-				type = "Delete"
-			}
+				condition {
+					age = 3
+				}
+				action {
+					type = "Delete"
+				}
 			}
 		}
 	`
@@ -62,69 +62,64 @@ func TestStorageBucket(t *testing.T) {
 					PriceHash:       "457f5cf083275541906b4732399f3421-8012a4febcd0213911ed09e53341a976",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(500)),
 				},
-			},
-			SubResourceChecks: []testutil.ResourceCheck{
 				{
-					Name: "Network egress",
-					CostComponentChecks: []testutil.CostComponentCheck{
-						{
-							Name:            "Data transfer in same continent",
-							PriceHash:       "99caf41700f8e761f8ab246b426edbf2-8012a4febcd0213911ed09e53341a976",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(550)),
-						},
-						{
-							Name:            "Data transfer to worldwide excluding Asia, Australia (first 1TB)",
-							PriceHash:       "fa69ceb2a41a4b9cda9222f96d0e32f1-0c23081f8c5fa7d720ec507ecfd47cf6",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1024)),
-						},
-						{
-							Name:            "Data transfer to worldwide excluding Asia, Australia (next 9TB)",
-							PriceHash:       "fa69ceb2a41a4b9cda9222f96d0e32f1-1b0e0067a261ee1db4b1b62b351927dc",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(9216)),
-						},
-						{
-							Name:            "Data transfer to worldwide excluding Asia, Australia (over 10TB)",
-							PriceHash:       "fa69ceb2a41a4b9cda9222f96d0e32f1-4d6929fe300ded2d5807f08cac9b0ca0",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2260)),
-						},
-						{
-							Name:            "Data transfer to Asia excluding China, but including Hong Kong (first 1TB)",
-							PriceHash:       "d63ba0daedaf0de514cdd32537310c00-0c23081f8c5fa7d720ec507ecfd47cf6",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1024)),
-						},
-						{
-							Name:            "Data transfer to Asia excluding China, but including Hong Kong (next 9TB)",
-							PriceHash:       "d63ba0daedaf0de514cdd32537310c00-1b0e0067a261ee1db4b1b62b351927dc",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(476)),
-						},
-						{
-							Name:            "Data transfer to China excluding Hong Kong (first 1TB)",
-							PriceHash:       "237057d62af52bee885b9f353bab90e2-a62ab44470fc752864d0f5c5534f3d33",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(50)),
-						},
-						{
-							Name:            "Data transfer to Australia (first 1TB)",
-							PriceHash:       "a3e569b71cd1e9d2294629e1b995c1f6-a62ab44470fc752864d0f5c5534f3d33",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(250)),
-						},
-					},
+					Name:            "Class A operations",
+					PriceHash:       "4d209becf05f57bbea290ccb1db4185a-2e6c536b0d1e01fc280d161856794e4d",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40000)),
 				},
 				{
-					Name: "Operations",
-					CostComponentChecks: []testutil.CostComponentCheck{
-						{
-							Name:            "Class A",
-							PriceHash:       "4d209becf05f57bbea290ccb1db4185a-2e6c536b0d1e01fc280d161856794e4d",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40000)),
-						},
-						{
-							Name:            "Class B",
-							PriceHash:       "8b9c674468376b8d7c4e94f0489ce913-2e6c536b0d1e01fc280d161856794e4d",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20000)),
-						},
-					},
+					Name:            "Class B operations",
+					PriceHash:       "8b9c674468376b8d7c4e94f0489ce913-2e6c536b0d1e01fc280d161856794e4d",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20000)),
 				},
 			},
+			// SubResourceChecks: []testutil.ResourceCheck{
+			// 	{
+			// 		Name: "Network egress",
+			// 		CostComponentChecks: []testutil.CostComponentCheck{
+			// 			{
+			// 				Name:            "Data transfer in same continent",
+			// 				PriceHash:       "99caf41700f8e761f8ab246b426edbf2-8012a4febcd0213911ed09e53341a976",
+			// 				HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(550)),
+			// 			},
+			// 			{
+			// 				Name:            "Data transfer to worldwide excluding Asia, Australia (first 1TB)",
+			// 				PriceHash:       "fa69ceb2a41a4b9cda9222f96d0e32f1-0c23081f8c5fa7d720ec507ecfd47cf6",
+			// 				HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1024)),
+			// 			},
+			// 			{
+			// 				Name:            "Data transfer to worldwide excluding Asia, Australia (next 9TB)",
+			// 				PriceHash:       "fa69ceb2a41a4b9cda9222f96d0e32f1-1b0e0067a261ee1db4b1b62b351927dc",
+			// 				HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(9216)),
+			// 			},
+			// 			{
+			// 				Name:            "Data transfer to worldwide excluding Asia, Australia (over 10TB)",
+			// 				PriceHash:       "fa69ceb2a41a4b9cda9222f96d0e32f1-4d6929fe300ded2d5807f08cac9b0ca0",
+			// 				HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2260)),
+			// 			},
+			// 			{
+			// 				Name:            "Data transfer to Asia excluding China, but including Hong Kong (first 1TB)",
+			// 				PriceHash:       "d63ba0daedaf0de514cdd32537310c00-0c23081f8c5fa7d720ec507ecfd47cf6",
+			// 				HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1024)),
+			// 			},
+			// 			{
+			// 				Name:            "Data transfer to Asia excluding China, but including Hong Kong (next 9TB)",
+			// 				PriceHash:       "d63ba0daedaf0de514cdd32537310c00-1b0e0067a261ee1db4b1b62b351927dc",
+			// 				HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(476)),
+			// 			},
+			// 			{
+			// 				Name:            "Data transfer to China excluding Hong Kong (first 1TB)",
+			// 				PriceHash:       "237057d62af52bee885b9f353bab90e2-a62ab44470fc752864d0f5c5534f3d33",
+			// 				HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(50)),
+			// 			},
+			// 			{
+			// 				Name:            "Data transfer to Australia (first 1TB)",
+			// 				PriceHash:       "a3e569b71cd1e9d2294629e1b995c1f6-a62ab44470fc752864d0f5c5534f3d33",
+			// 				HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(250)),
+			// 			},
+			// 		},
+			// 	},
+			// },
 		},
 	}
 	tftest.ResourceTests(t, tf, usage, resourceChecks)

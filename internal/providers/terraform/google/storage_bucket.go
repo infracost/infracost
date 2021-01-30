@@ -1,23 +1,11 @@
 package google
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
-
-type storageBucketEgressRegionData struct {
-	gRegion        string
-	apiDescription string
-	usageKey       string
-}
-
-type storageBucketEgressRegionUsageFilterData struct {
-	usageNumber int64
-	usageName   string
-}
 
 func GetStorageBucketRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
@@ -30,14 +18,10 @@ func GetStorageBucketRegistryItem() *schema.RegistryItem {
 func NewStorageBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			dataStorage(d, u),
-			dataRetrieval(d, u),
-		},
-		SubResources: []*schema.Resource{
-			networkEgress(d, u),
-			operations(d, u),
-		},
+		CostComponents: append(
+			[]*schema.CostComponent{dataStorage(d, u), dataRetrieval(d, u)},
+			operations(d, u)...,
+		),
 	}
 }
 
@@ -110,126 +94,7 @@ func dataStorage(d *schema.ResourceData, u *schema.UsageData) *schema.CostCompon
 	}
 }
 
-func networkEgress(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	resource := &schema.Resource{
-		Name:           "Network egress",
-		CostComponents: []*schema.CostComponent{},
-	}
-
-	// Same continent
-	var quantity *decimal.Decimal
-	if u != nil && u.Get("monthly_egress_data_transfer_gb.same_continent").Exists() {
-		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_egress_data_transfer_gb.same_continent").Int()))
-	}
-	resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
-		Name:            "Data transfer in same continent",
-		Unit:            "GB",
-		UnitMultiplier:  1,
-		MonthlyQuantity: quantity,
-		ProductFilter: &schema.ProductFilter{
-			VendorName: strPtr("gcp"),
-			Region:     strPtr("global"),
-			Service:    strPtr("Cloud Storage"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr("Inter-region GCP Storage egress within EU")},
-			},
-		},
-	})
-
-	// General
-	regionsData := []*storageBucketEgressRegionData{
-		{
-			gRegion:        "Data transfer to worldwide excluding Asia, Australia",
-			apiDescription: "Download Worldwide Destinations (excluding Asia & Australia)",
-			usageKey:       "monthly_egress_data_transfer_gb.worldwide",
-		},
-		{
-			gRegion:        "Data transfer to Asia excluding China, but including Hong Kong",
-			apiDescription: "Download APAC",
-			usageKey:       "monthly_egress_data_transfer_gb.asia",
-		},
-		{
-			gRegion:        "Data transfer to China excluding Hong Kong",
-			apiDescription: "Download China",
-			usageKey:       "monthly_egress_data_transfer_gb.china",
-		},
-		{
-			gRegion:        "Data transfer to Australia",
-			apiDescription: "Download Australia",
-			usageKey:       "monthly_egress_data_transfer_gb.australia",
-		},
-	}
-	usageFiltersData := []*storageBucketEgressRegionUsageFilterData{
-		{
-			usageName:   "first 1TB",
-			usageNumber: 1024,
-		},
-		{
-			usageName:   "next 9TB",
-			usageNumber: 10240,
-		},
-		{
-			usageName:   "over 10TB",
-			usageNumber: 0,
-		},
-	}
-	for _, regData := range regionsData {
-		gRegion := regData.gRegion
-		apiDescription := regData.apiDescription
-		usageKey := regData.usageKey
-
-		var usage int64
-		var used int64
-		var lastEndUsageAmount int64
-		if u != nil && u.Get(usageKey).Exists() {
-			usage = u.Get(usageKey).Int()
-		}
-
-		for idx, usageFilter := range usageFiltersData {
-			usageName := usageFilter.usageName
-			endUsageAmount := usageFilter.usageNumber
-			var quantity *decimal.Decimal
-			if endUsageAmount != 0 && usage >= endUsageAmount {
-				used = endUsageAmount - used
-				lastEndUsageAmount = endUsageAmount
-				quantity = decimalPtr(decimal.NewFromInt(used))
-			} else if usage > lastEndUsageAmount {
-				used = usage - lastEndUsageAmount
-				lastEndUsageAmount = endUsageAmount
-				quantity = decimalPtr(decimal.NewFromInt(used))
-			}
-			var usageFilter string
-			if endUsageAmount != 0 {
-				usageFilter = fmt.Sprint(endUsageAmount)
-			} else {
-				usageFilter = ""
-			}
-			if quantity == nil && idx > 0 {
-				continue
-			}
-			resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
-				Name:            fmt.Sprintf("%v (%v)", gRegion, usageName),
-				Unit:            "GB",
-				UnitMultiplier:  1,
-				MonthlyQuantity: quantity,
-				ProductFilter: &schema.ProductFilter{
-					VendorName: strPtr("gcp"),
-					Service:    strPtr("Cloud Storage"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", Value: strPtr(apiDescription)},
-					},
-				},
-				PriceFilter: &schema.PriceFilter{
-					EndUsageAmount: strPtr(usageFilter),
-				},
-			})
-		}
-	}
-
-	return resource
-}
-
-func operations(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func operations(d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
 	var classAQuantity *decimal.Decimal
 	if u != nil && u.Get("monthly_class_a_operations").Exists() {
 		classAQuantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_class_a_operations").Int()))
@@ -252,35 +117,32 @@ func operations(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		"ARCHIVE":        "ArchiveOps",
 	}
 
-	return &schema.Resource{
-		Name: "Operations",
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:            "Class A",
-				Unit:            "operations",
-				UnitMultiplier:  1,
-				MonthlyQuantity: classAQuantity,
-				ProductFilter: &schema.ProductFilter{
-					VendorName: strPtr("gcp"),
-					Service:    strPtr("Cloud Storage"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
-						{Key: "description", ValueRegex: strPtr("/Class A/")},
-					},
+	return []*schema.CostComponent{
+		{
+			Name:            "Class A operations",
+			Unit:            "operations",
+			UnitMultiplier:  10000,
+			MonthlyQuantity: classAQuantity,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("gcp"),
+				Service:    strPtr("Cloud Storage"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
+					{Key: "description", ValueRegex: strPtr("/Class A/")},
 				},
 			},
-			{
-				Name:            "Class B",
-				Unit:            "operations",
-				UnitMultiplier:  1,
-				MonthlyQuantity: classBQuantity,
-				ProductFilter: &schema.ProductFilter{
-					VendorName: strPtr("gcp"),
-					Service:    strPtr("Cloud Storage"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
-						{Key: "description", ValueRegex: strPtr("/Class B/")},
-					},
+		},
+		{
+			Name:            "Class B operations",
+			Unit:            "operations",
+			UnitMultiplier:  10000,
+			MonthlyQuantity: classBQuantity,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("gcp"),
+				Service:    strPtr("Cloud Storage"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
+					{Key: "description", ValueRegex: strPtr("/Class B/")},
 				},
 			},
 		},
@@ -324,3 +186,135 @@ func dataRetrieval(d *schema.ResourceData, u *schema.UsageData) *schema.CostComp
 		},
 	}
 }
+
+// TODO: Move to a separate resource, similar to what we did for AWS, also needs other data transfer prices
+
+// type storageBucketEgressRegionData struct {
+// 	gRegion        string
+// 	apiDescription string
+// 	usageKey       string
+// }
+
+// type storageBucketEgressRegionUsageFilterData struct {
+// 	usageNumber int64
+// 	usageName   string
+// }
+
+// func networkEgress(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+// 	resource := &schema.Resource{
+// 		Name:           "Network egress",
+// 		CostComponents: []*schema.CostComponent{},
+// 	}
+
+// 	// Same continent
+// 	var quantity *decimal.Decimal
+// 	if u != nil && u.Get("monthly_egress_data_transfer_gb.same_continent").Exists() {
+// 		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_egress_data_transfer_gb.same_continent").Int()))
+// 	}
+// 	resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
+// 		Name:            "Data transfer in same continent",
+// 		Unit:            "GB",
+// 		UnitMultiplier:  1,
+// 		MonthlyQuantity: quantity,
+// 		ProductFilter: &schema.ProductFilter{
+// 			VendorName: strPtr("gcp"),
+// 			Region:     strPtr("global"),
+// 			Service:    strPtr("Cloud Storage"),
+// 			AttributeFilters: []*schema.AttributeFilter{
+// 				{Key: "description", Value: strPtr("Inter-region GCP Storage egress within EU")},
+// 			},
+// 		},
+// 	})
+
+// 	// General
+// 	regionsData := []*storageBucketEgressRegionData{
+// 		{
+// 			gRegion:        "Data transfer to worldwide excluding Asia, Australia",
+// 			apiDescription: "Download Worldwide Destinations (excluding Asia & Australia)",
+// 			usageKey:       "monthly_egress_data_transfer_gb.worldwide",
+// 		},
+// 		{
+// 			gRegion:        "Data transfer to Asia excluding China, but including Hong Kong",
+// 			apiDescription: "Download APAC",
+// 			usageKey:       "monthly_egress_data_transfer_gb.asia",
+// 		},
+// 		{
+// 			gRegion:        "Data transfer to China excluding Hong Kong",
+// 			apiDescription: "Download China",
+// 			usageKey:       "monthly_egress_data_transfer_gb.china",
+// 		},
+// 		{
+// 			gRegion:        "Data transfer to Australia",
+// 			apiDescription: "Download Australia",
+// 			usageKey:       "monthly_egress_data_transfer_gb.australia",
+// 		},
+// 	}
+// 	usageFiltersData := []*storageBucketEgressRegionUsageFilterData{
+// 		{
+// 			usageName:   "first 1TB",
+// 			usageNumber: 1024,
+// 		},
+// 		{
+// 			usageName:   "next 9TB",
+// 			usageNumber: 10240,
+// 		},
+// 		{
+// 			usageName:   "over 10TB",
+// 			usageNumber: 0,
+// 		},
+// 	}
+// 	for _, regData := range regionsData {
+// 		gRegion := regData.gRegion
+// 		apiDescription := regData.apiDescription
+// 		usageKey := regData.usageKey
+
+// 		var usage int64
+// 		var used int64
+// 		var lastEndUsageAmount int64
+// 		if u != nil && u.Get(usageKey).Exists() {
+// 			usage = u.Get(usageKey).Int()
+// 		}
+
+// 		for idx, usageFilter := range usageFiltersData {
+// 			usageName := usageFilter.usageName
+// 			endUsageAmount := usageFilter.usageNumber
+// 			var quantity *decimal.Decimal
+// 			if endUsageAmount != 0 && usage >= endUsageAmount {
+// 				used = endUsageAmount - used
+// 				lastEndUsageAmount = endUsageAmount
+// 				quantity = decimalPtr(decimal.NewFromInt(used))
+// 			} else if usage > lastEndUsageAmount {
+// 				used = usage - lastEndUsageAmount
+// 				lastEndUsageAmount = endUsageAmount
+// 				quantity = decimalPtr(decimal.NewFromInt(used))
+// 			}
+// 			var usageFilter string
+// 			if endUsageAmount != 0 {
+// 				usageFilter = fmt.Sprint(endUsageAmount)
+// 			} else {
+// 				usageFilter = ""
+// 			}
+// 			if quantity == nil && idx > 0 {
+// 				continue
+// 			}
+// 			resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
+// 				Name:            fmt.Sprintf("%v (%v)", gRegion, usageName),
+// 				Unit:            "GB",
+// 				UnitMultiplier:  1,
+// 				MonthlyQuantity: quantity,
+// 				ProductFilter: &schema.ProductFilter{
+// 					VendorName: strPtr("gcp"),
+// 					Service:    strPtr("Cloud Storage"),
+// 					AttributeFilters: []*schema.AttributeFilter{
+// 						{Key: "description", Value: strPtr(apiDescription)},
+// 					},
+// 				},
+// 				PriceFilter: &schema.PriceFilter{
+// 					EndUsageAmount: strPtr(usageFilter),
+// 				},
+// 			})
+// 		}
+// 	}
+
+// 	return resource
+// }
