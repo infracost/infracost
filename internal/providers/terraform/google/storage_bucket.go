@@ -1,6 +1,7 @@
 package google
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -76,7 +77,7 @@ func dataStorage(d *schema.ResourceData, u *schema.UsageData) *schema.CostCompon
 
 	region, resourceGroup := getDSRegionResourceGroup(location, storageClass)
 	return &schema.CostComponent{
-		Name:            "Storage",
+		Name:            fmt.Sprintf("Storage (%s)", strings.ToLower(storageClass)),
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
@@ -119,7 +120,7 @@ func operations(d *schema.ResourceData, u *schema.UsageData) []*schema.CostCompo
 
 	return []*schema.CostComponent{
 		{
-			Name:            "Class A operations",
+			Name:            "Object adds, bucket/object list (class A)",
 			Unit:            "operations",
 			UnitMultiplier:  10000,
 			MonthlyQuantity: classAQuantity,
@@ -133,7 +134,7 @@ func operations(d *schema.ResourceData, u *schema.UsageData) []*schema.CostCompo
 			},
 		},
 		{
-			Name:            "Class B operations",
+			Name:            "Object gets, retrieve bucket/object metadata (class B)",
 			Unit:            "operations",
 			UnitMultiplier:  10000,
 			MonthlyQuantity: classBQuantity,

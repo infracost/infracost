@@ -34,14 +34,7 @@ func TestStorageBucket(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"google_storage_bucket.my_storage_bucket": map[string]interface{}{
-			"storage_gb": 150,
-			"monthly_egress_data_transfer_gb": map[string]interface{}{
-				"same_continent": 550,
-				"worldwide":      12500,
-				"asia":           1500,
-				"china":          50,
-				"australia":      250,
-			},
+			"storage_gb":                 150,
 			"monthly_class_a_operations": 40000,
 			"monthly_class_b_operations": 20000,
 			"monthly_data_retrieval_gb":  500,
@@ -53,7 +46,7 @@ func TestStorageBucket(t *testing.T) {
 			Name: "google_storage_bucket.my_storage_bucket",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Storage",
+					Name:            "Storage (coldline)",
 					PriceHash:       "3a642690b932ab86cc5eec7ff6519d6a-57bc5d148491a8381abaccb21ca6b4e9",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(150)),
 				},
@@ -63,16 +56,24 @@ func TestStorageBucket(t *testing.T) {
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(500)),
 				},
 				{
-					Name:            "Class A operations",
+					Name:            "Object adds, bucket/object list (class A)",
 					PriceHash:       "4d209becf05f57bbea290ccb1db4185a-2e6c536b0d1e01fc280d161856794e4d",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40000)),
 				},
 				{
-					Name:            "Class B operations",
+					Name:            "Object gets, retrieve bucket/object metadata (class B)",
 					PriceHash:       "8b9c674468376b8d7c4e94f0489ce913-2e6c536b0d1e01fc280d161856794e4d",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20000)),
 				},
 			},
+			// Usage data for the tests:
+			// 		"monthly_egress_data_transfer_gb": map[string]interface{}{
+			// 			"same_continent": 550,
+			// 			"worldwide":      12500,
+			// 			"asia":           1500,
+			// 			"china":          50,
+			// 			"australia":      250,
+			// 		},
 			// SubResourceChecks: []testutil.ResourceCheck{
 			// 	{
 			// 		Name: "Network egress",
