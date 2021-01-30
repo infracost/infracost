@@ -92,7 +92,7 @@ func dataStorage(d *schema.ResourceData, u *schema.UsageData) *schema.CostCompon
 
 	region, resourceGroup := getDSRegionResourceGroup(location, storageClass)
 	return &schema.CostComponent{
-		Name:            "Data storage",
+		Name:            "Storage",
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
@@ -139,37 +139,37 @@ func networkEgress(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	// General
 	regionsData := []*storageBucketEgressRegionData{
 		{
-			gRegion:        "Data transfer to worldwide destinations (excluding Asia & Australia)",
+			gRegion:        "Data transfer to worldwide excluding Asia, Australia",
 			apiDescription: "Download Worldwide Destinations (excluding Asia & Australia)",
 			usageKey:       "monthly_egress_data_transfer_gb.worldwide",
 		},
 		{
-			gRegion:        "Data transfer to Asia Destinations (excluding China, but including Hong Kong)",
+			gRegion:        "Data transfer to Asia excluding China, but including Hong Kong",
 			apiDescription: "Download APAC",
 			usageKey:       "monthly_egress_data_transfer_gb.asia",
 		},
 		{
-			gRegion:        "Data transfer to China Destinations (excluding Hong Kong)",
+			gRegion:        "Data transfer to China excluding Hong Kong",
 			apiDescription: "Download China",
 			usageKey:       "monthly_egress_data_transfer_gb.china",
 		},
 		{
-			gRegion:        "Data transfer to Australia Destinations",
+			gRegion:        "Data transfer to Australia",
 			apiDescription: "Download Australia",
 			usageKey:       "monthly_egress_data_transfer_gb.australia",
 		},
 	}
 	usageFiltersData := []*storageBucketEgressRegionUsageFilterData{
 		{
-			usageName:   "0-1 TB",
+			usageName:   "first 1TB",
 			usageNumber: 1024,
 		},
 		{
-			usageName:   "1-10 TB",
+			usageName:   "next 9TB",
 			usageNumber: 10240,
 		},
 		{
-			usageName:   "10+ TB",
+			usageName:   "over 10TB",
 			usageNumber: 0,
 		},
 	}
