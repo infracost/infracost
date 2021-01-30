@@ -76,7 +76,7 @@ func TestACMPCACertificateAuthority_1000(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Certificates (1 - 1000)",
+					Name:             "Certificate requests (1 - 1000)",
 					PriceHash:        "58517ba36a89b107d4f5088c1e6cb3b8-3634aef65032f056acf2f6091e2c0022",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1000)),
 				},
@@ -120,12 +120,12 @@ func TestACMPCACertificateAuthority_10000(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Certificates (1 - 1000)",
+					Name:             "Certificate requests (1 - 1000)",
 					PriceHash:        "58517ba36a89b107d4f5088c1e6cb3b8-3634aef65032f056acf2f6091e2c0022",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1000)),
 				},
 				{
-					Name:             "Certificates (1001 - 10000)",
+					Name:             "Certificate requests (1001 - 10000)",
 					PriceHash:        "58517ba36a89b107d4f5088c1e6cb3b8-3634aef65032f056acf2f6091e2c0022",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(9000)),
 				},
@@ -169,17 +169,17 @@ func TestACMPCACertificateAuthority_20000(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Certificates (1 - 1000)",
+					Name:             "Certificate requests (1 - 1000)",
 					PriceHash:        "58517ba36a89b107d4f5088c1e6cb3b8-3634aef65032f056acf2f6091e2c0022",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1000)),
 				},
 				{
-					Name:             "Certificates (1001 - 10000)",
+					Name:             "Certificate requests (1001 - 10000)",
 					PriceHash:        "58517ba36a89b107d4f5088c1e6cb3b8-3634aef65032f056acf2f6091e2c0022",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10000)),
 				},
 				{
-					Name:             "Certificates (> 10000)",
+					Name:             "Certificate requests (> 10000)",
 					PriceHash:        "58517ba36a89b107d4f5088c1e6cb3b8-3634aef65032f056acf2f6091e2c0022",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(9000)),
 				},

@@ -99,7 +99,7 @@ func calculateCertificateRequests(privateCertificateCount decimal.Decimal, prici
 func certificateCostComponent(region string, displayName string, usageTier string, monthlyQuantity decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
-		Unit:            "certificates",
+		Unit:            "requests",
 		UnitMultiplier:  1,
 		MonthlyQuantity: &monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
