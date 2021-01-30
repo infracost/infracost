@@ -231,12 +231,12 @@ func networkEgress(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 
 func operations(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var classAQuantity *decimal.Decimal
-	if u != nil && u.Get("monthly_operations.class_a").Exists() {
-		classAQuantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_operations.class_a").Int()))
+	if u != nil && u.Get("monthly_class_a_operations").Exists() {
+		classAQuantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_class_a_operations").Int()))
 	}
 	var classBQuantity *decimal.Decimal
-	if u != nil && u.Get("monthly_operations.class_b").Exists() {
-		classBQuantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_operations.class_b").Int()))
+	if u != nil && u.Get("monthly_class_b_operations").Exists() {
+		classBQuantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_class_b_operations").Int()))
 	}
 	storageClass := "STANDARD"
 	if d.Get("storage_class").Exists() {

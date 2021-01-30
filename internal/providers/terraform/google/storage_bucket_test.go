@@ -42,11 +42,9 @@ func TestStorageBucket(t *testing.T) {
 				"china":          50,
 				"australia":      250,
 			},
-			"monthly_operations": map[string]interface{}{
-				"class_a": 40000,
-				"class_b": 20000,
-			},
-			"monthly_data_retrieval_gb": 500,
+			"monthly_class_a_operations": 40000,
+			"monthly_class_b_operations": 20000,
+			"monthly_data_retrieval_gb":  500,
 		},
 	})
 
