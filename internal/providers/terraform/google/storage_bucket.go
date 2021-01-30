@@ -189,6 +189,14 @@ func dataRetrieval(d *schema.ResourceData, u *schema.UsageData) *schema.CostComp
 
 // TODO: Move to a separate resource, similar to what we did for AWS, also needs other data transfer prices
 
+// infracost-usage-example.yml for this
+// monthly_egress_data_transfer_gb:
+//   same_continent: 550             # Estimated GB of data sent from Cloud Storage in the same continent per month.
+//   worldwide: 12500                # Estimated GB of data sent from Cloud Storage to worldwide destinations (excluding Asia & Australia) per month.
+//   asia: 1500                      # Estimated GB of data sent from Cloud Storage to Asia (excluding China, but including Hong Kong) per month.
+//   china: 50                       # Estimated GB of data sent from Cloud Storage to China (excluding Hong Kong) per month.
+//   australia: 250                  # Estimated GB of data sent from Cloud Storage to Australia per month.
+
 // type storageBucketEgressRegionData struct {
 // 	gRegion        string
 // 	apiDescription string
