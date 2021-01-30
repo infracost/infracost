@@ -78,7 +78,7 @@ func TestStorageBucket(t *testing.T) {
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1024)),
 						},
 						{
-							Name:            "Data transfer to worldwide excluding Asia, Australia) (next 9TB)",
+							Name:            "Data transfer to worldwide excluding Asia, Australia (next 9TB)",
 							PriceHash:       "fa69ceb2a41a4b9cda9222f96d0e32f1-1b0e0067a261ee1db4b1b62b351927dc",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(9216)),
 						},
