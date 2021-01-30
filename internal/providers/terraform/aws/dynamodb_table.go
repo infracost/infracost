@@ -245,8 +245,8 @@ func rruCostComponent(d *schema.ResourceData, u *schema.UsageData) *schema.CostC
 func dataStorageCostComponent(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
 	region := d.Get("region").String()
 	var quantity *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_data_storage").Exists() {
-		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_data_storage").Int()))
+	if u != nil && u.Get("storage_gb").Exists() {
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("storage_gb").Int()))
 	}
 	return &schema.CostComponent{
 		Name:            "Data storage",
@@ -272,11 +272,11 @@ func dataStorageCostComponent(d *schema.ResourceData, u *schema.UsageData) *sche
 func continuousBackupCostComponent(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
 	region := d.Get("region").String()
 	var quantity *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_continuous_backup_storage").Exists() {
-		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_continuous_backup_storage").Int()))
+	if u != nil && u.Get("pitr_backup_storage_gb").Exists() {
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("pitr_backup_storage_gb").Int()))
 	}
 	return &schema.CostComponent{
-		Name:            "Continuous backup storage (PITR)",
+		Name:            "Point-In-Time Recovery (PITR) backup storage",
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
@@ -295,8 +295,8 @@ func continuousBackupCostComponent(d *schema.ResourceData, u *schema.UsageData) 
 func onDemandBackupCostComponent(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
 	region := d.Get("region").String()
 	var quantity *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_on_demand_backup_storage").Exists() {
-		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_on_demand_backup_storage").Int()))
+	if u != nil && u.Get("on_demand_backup_storage_gb").Exists() {
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("on_demand_backup_storage_gb").Int()))
 	}
 	return &schema.CostComponent{
 		Name:            "On-demand backup storage",
@@ -315,11 +315,11 @@ func onDemandBackupCostComponent(d *schema.ResourceData, u *schema.UsageData) *s
 func restoreCostComponent(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
 	region := d.Get("region").String()
 	var quantity *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_restore").Exists() {
-		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_restore").Int()))
+	if u != nil && u.Get("monthly_data_restored_gb").Exists() {
+		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_restored_gb").Int()))
 	}
 	return &schema.CostComponent{
-		Name:            "Restore data size",
+		Name:            "Table data restored",
 		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,

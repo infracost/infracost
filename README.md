@@ -56,6 +56,8 @@ There are [4 usage methods](https://www.infracost.io/docs/#usage-methods) for In
 
 Checkout the [docs site](https://www.infracost.io/docs/) for additional usage options, including notes for [Terragrunt](https://www.infracost.io/docs/terragrunt) and [Terraform Cloud](https://www.infracost.io/docs/terraform_cloud_enterprise) users.
 
+As mentioned in the [FAQ](https://www.infracost.io/docs/faq), you can run Infracost in your Terraform directories without worrying about security or privacy issues as no cloud credentials, secrets, tags or Terraform resource identifiers are sent to the open-source [Cloud Pricing API](https://github.com/infracost/cloud-pricing-api). Infracost does not make any changes to your Terraform state or cloud resources.
+
 ## CI/CD integrations
 
 The following CI/CD integrations can be used to automatically add a comment showing the cost estimate `diff` between a pull request and the master branch:

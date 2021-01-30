@@ -23,8 +23,8 @@ func NewLambdaFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 	}
 
 	averageRequestDuration := decimal.NewFromInt(1)
-	if u != nil && u.Get("average_request_duration").Exists() {
-		averageRequestDuration = decimal.NewFromFloat(u.Get("average_request_duration").Float())
+	if u != nil && u.Get("request_duration_ms").Exists() {
+		averageRequestDuration = decimal.NewFromFloat(u.Get("request_duration_ms").Float())
 	}
 
 	var monthlyRequests *decimal.Decimal

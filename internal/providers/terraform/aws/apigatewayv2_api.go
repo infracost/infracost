@@ -51,8 +51,8 @@ func httpAPICostComponent(d *schema.ResourceData, u *schema.UsageData) []*schema
 		monthlyRequests = decimal.NewFromInt(u.Get("monthly_requests").Int())
 	}
 
-	if u != nil && u.Get("average_request_size").Exists() {
-		requestSize = decimal.NewFromInt(u.Get("average_request_size").Int())
+	if u != nil && u.Get("request_size_kb").Exists() {
+		requestSize = decimal.NewFromInt(u.Get("request_size_kb").Int())
 	}
 
 	if requestSize.GreaterThan(billableRequestSize) {
@@ -131,8 +131,8 @@ func websocketAPICostComponent(d *schema.ResourceData, u *schema.UsageData) []*s
 		monthlyMessages = decimal.NewFromInt(u.Get("monthly_messages").Int())
 	}
 
-	if u != nil && u.Get("average_message_size").Exists() {
-		messageSize = decimal.NewFromInt(u.Get("average_message_size").Int())
+	if u != nil && u.Get("message_size_kb").Exists() {
+		messageSize = decimal.NewFromInt(u.Get("message_size_kb").Int())
 	}
 
 	if messageSize.GreaterThan(billableRequestSize) {

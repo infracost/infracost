@@ -14,7 +14,6 @@ import (
 	"github.com/infracost/infracost/internal/spin"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
@@ -40,7 +39,6 @@ func defaultCmd() *cli.Command {
 				Name:        "tfdir",
 				Usage:       "Path to the Terraform code directory",
 				TakesFile:   true,
-				Value:       getcwd(),
 				DefaultText: "current working directory",
 			},
 			&cli.StringFlag{
@@ -156,17 +154,6 @@ func defaultCmd() *cli.Command {
 			return nil
 		},
 	}
-}
-
-func getcwd() string {
-	cwd, err := os.Getwd()
-	if err != nil {
-		log.Warn(err)
-
-		cwd = ""
-	}
-
-	return cwd
 }
 
 func unwrapped(err error) error {

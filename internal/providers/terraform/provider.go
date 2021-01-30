@@ -48,8 +48,20 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 	p.planFlags = c.String("tfflags")
 	p.usageFile = c.String("usage-file")
 
+	if p.useState && (p.jsonFile != "" || p.planFile != "") {
+		return errors.New("The use-tfstate flag cannot be used with the tfjson or tfplan flags")
+	}
+
 	if p.jsonFile != "" && p.planFile != "" {
 		return errors.New("Please provide either a Terraform Plan JSON file (tfjson) or a Terraform Plan file (tfplan)")
+	}
+
+	if p.dir != "" && p.jsonFile != "" {
+		fmt.Fprintln(os.Stderr, color.YellowString("Warning: --tfdir is ignored if --tfjson is used"))
+	}
+
+	if p.dir == "" {
+		p.dir = getcwd()
 	}
 
 	return nil
@@ -123,13 +135,9 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 	}
 
 	if p.planFile == "" {
-		err := runInit(opts)
-		if err != nil {
-			return []byte{}, err
-		}
 
 		var planJSON []byte
-		p.planFile, planJSON, err = runPlan(opts, p.planFlags)
+		p.planFile, planJSON, err = runPlan(opts, p.planFlags, true)
 		defer os.Remove(p.planFile)
 
 		if err != nil {
@@ -215,7 +223,7 @@ func runInit(opts *CmdOptions) error {
 	return nil
 }
 
-func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
+func runPlan(opts *CmdOptions, planFlags string, initOnFail bool) (string, []byte, error) {
 	spinner := spin.NewSpinner("Running terraform plan")
 	var planJSON []byte
 
@@ -234,14 +242,27 @@ func runPlan(opts *CmdOptions, planFlags string) (string, []byte, error) {
 	args = append(args, flags...)
 	_, err = Cmd(opts, append(args, fmt.Sprintf("-out=%s", f.Name()))...)
 
-	// If the plan returns this error then Terraform is configured with remote execution mode
-	if err != nil && strings.HasPrefix(extractStderr(err), "Error: Saving a generated plan is currently not supported") {
-		log.Info("Continuing with Terraform Remote Execution Mode")
-		config.Environment.TerraformRemoteExecutionModeEnabled = true
-		planJSON, err = runRemotePlan(opts, args)
-	}
-
 	if err != nil {
+		extractedErr := extractStderr(err)
+
+		// If the plan returns this error then Terraform is configured with remote execution mode
+		if strings.HasPrefix(extractedErr, "Error: Saving a generated plan is currently not supported") {
+			log.Info("Continuing with Terraform Remote Execution Mode")
+			config.Environment.TerraformRemoteExecutionModeEnabled = true
+			planJSON, err = runRemotePlan(opts, args)
+		} else if initOnFail && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
+			strings.Contains(extractedErr, "Error: Initialization required") ||
+			strings.Contains(extractedErr, "Error: Module not installed") ||
+			strings.Contains(extractedErr, "Error: Provider requirements cannot be satisfied by locked dependencies") ||
+			strings.Contains(extractedErr, "Error: Module not installed")) {
+			spinner.Stop()
+			err = runInit(opts)
+			if err != nil {
+				return "", planJSON, err
+			}
+			return runPlan(opts, planFlags, false)
+		}
+
 		spinner.Fail()
 
 		red := color.New(color.FgHiRed)
@@ -390,4 +411,15 @@ func indent(s, indent string) string {
 
 func stripBlankLines(s string) string {
 	return regexp.MustCompile(`[\t\r\n]+`).ReplaceAllString(strings.TrimSpace(s), "\n")
+}
+
+func getcwd() string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Warn(err)
+
+		cwd = ""
+	}
+
+	return cwd
 }

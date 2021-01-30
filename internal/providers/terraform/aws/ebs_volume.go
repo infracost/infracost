@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -42,14 +44,17 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 		volumeAPIName = "gp2"
 	}
 
-	var name string
+	var name, usageType string
 	switch volumeAPIName {
 	case "standard":
 		name = "Magnetic storage"
+		usageType = "EBS:VolumeIOUsage"
 	case "io1":
 		name = "Provisioned IOPS SSD storage (io1)"
+		usageType = "EBS:VolumeP-IOPS.piops"
 	case "io2":
 		name = "Provisioned IOPS SSD storage (io2)"
+		usageType = "EBS:VolumeP-IOPS.io2"
 	case "st1":
 		name = "Throughput Optimized HDD storage (st1)"
 	case "sc1":
@@ -89,7 +94,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 				ProductFamily: strPtr("System Operation"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
-					{Key: "usagetype", ValueRegex: strPtr("/EBS:VolumeP-IOPS/")},
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
 				},
 			},
 		})
@@ -107,7 +112,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 				ProductFamily: strPtr("System Operation"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
-					{Key: "usagetype", ValueRegex: strPtr("/EBS:VolumeIOUsage/")},
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
 				},
 			},
 		})

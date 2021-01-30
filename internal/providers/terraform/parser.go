@@ -37,6 +37,10 @@ var arnAttributeMap = map[string]string{
 func createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	registryMap := GetResourceRegistryMap()
 
+	if isAwsChina(d) {
+		config.Environment.IsAWSChina = true
+	}
+
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
 		if registryItem.NoPrice {
 			return &schema.Resource{
@@ -466,6 +470,10 @@ func removeAddressArrayPart(addr string) string {
 	m := r.FindStringSubmatch(addressResourcePart(addr))
 
 	return m[1]
+}
+
+func isAwsChina(d *schema.ResourceData) bool {
+	return strings.HasPrefix(d.Type, "aws_") && strings.HasPrefix(d.Get("region").String(), "cn-")
 }
 
 func containsString(a []string, s string) bool {
