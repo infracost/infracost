@@ -61,7 +61,7 @@ func getDSRegionResourceGroup(location, storageClass string) (string, string) {
 			resourceGroup = "MultiRegionalStorage"
 		// Dual-region locations
 		case "ASIA1", "EUR4", "NAM4":
-			// The pricing api treats a dual-region as  a multi-region
+			// The pricing api treats a dual-region as a multi-region
 			resourceGroup = "MultiRegionalStorage"
 		}
 	}
@@ -83,7 +83,7 @@ func dataStorage(d *schema.ResourceData, u *schema.UsageData) *schema.CostCompon
 	region, resourceGroup := getDSRegionResourceGroup(location, storageClass)
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Storage (%s)", strings.ToLower(storageClass)),
-		Unit:            "GB-months",
+		Unit:            "GiB-months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
@@ -92,6 +92,7 @@ func dataStorage(d *schema.ResourceData, u *schema.UsageData) *schema.CostCompon
 			Service:    strPtr("Cloud Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "resourceGroup", Value: strPtr(resourceGroup)},
+				{Key: "description", ValueRegex: strPtr("/^(?!.*?\\(Early Delete\\))/")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
