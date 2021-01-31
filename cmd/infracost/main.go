@@ -27,20 +27,27 @@ func usageError(c *cli.Context, msg string) {
 	cli.ShowAppHelpAndExit(c, 1)
 }
 
-func handleGlobalFlags(c *cli.Context) error {
+func usageWarning(msg string) {
+	fmt.Fprintln(os.Stderr, color.YellowString(msg)+"\n")
+}
+
+func setupConfig(c *cli.Context) error {
+	config.LoadConfig(c.String("config-file"))
+
 	if c.IsSet("no-color") {
 		config.Config.NoColor = c.Bool("no-color")
 	}
 	color.NoColor = config.Config.NoColor
 
 	if c.IsSet("log-level") {
-		err := config.Config.SetLogLevel(c.String("log-level"))
+		config.Config.LogLevel = c.String("log-level")
+		err := config.ConfigureLogger()
 		if err != nil {
 			usageError(c, err.Error())
 		}
 	}
 
-	if c.String("pricing-api-endpoint") != "" {
+	if c.IsSet("pricing-api-endpoint") {
 		config.Config.PricingAPIEndpoint = c.String("pricing-api-endpoint")
 	}
 
@@ -98,7 +105,6 @@ func main() {
 	}
 
 	updateMessageChan := make(chan *update.Info)
-	startUpdateCheck(updateMessageChan)
 
 	app := &cli.App{
 		Name:  "infracost",
@@ -116,11 +122,15 @@ USAGE METHODS:
 	terraform plan -out plan.save .
 	terraform show -json plan.save > plan.json
 	infracost --tfjson /path/to/plan.json
-	
+
 DOCS: https://infracost.io/docs`,
 		EnableBashCompletion: true,
 		Version:              version.Version,
 		Flags: append([]cli.Flag{
+			&cli.StringFlag{
+				Name:  "config-file",
+				Usage: "Path to the Infracost config file",
+			},
 			&cli.StringFlag{
 				Name:  "log-level",
 				Usage: "Log level (trace, debug, info, warn, error, fatal)",
@@ -138,7 +148,15 @@ DOCS: https://infracost.io/docs`,
 			usageError(c, err.Error())
 			return nil
 		},
-		Before:   handleGlobalFlags,
+		Before: func(c *cli.Context) error {
+			err := setupConfig(c)
+			if err != nil {
+				return err
+			}
+			startUpdateCheck(updateMessageChan)
+
+			return err
+		},
 		Commands: []*cli.Command{registerCmd(), reportCmd()},
 		Action:   defaultCmd.Action,
 	}

@@ -35,12 +35,8 @@ type EnvironmentSpec struct {
 
 var Environment *EnvironmentSpec
 
-func init() {
-	Environment = loadEnvironment()
-}
-
-func loadEnvironment() *EnvironmentSpec {
-	return &EnvironmentSpec{
+func loadEnvironment() {
+	Environment = &EnvironmentSpec{
 		Version:                             baseVersion(version.Version),
 		FullVersion:                         version.Version,
 		Flags:                               []string{},

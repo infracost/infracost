@@ -52,18 +52,13 @@ func registerCmd() *cli.Command {
 				return nil
 			}
 
-			conf, err := config.ReadConfigFileIfExists()
-			if err != nil {
-				return err
-			}
-
 			fmt.Printf("\nThank you %s!\nYour API key is: %s\n", name, r.APIKey)
 
 			green := color.New(color.FgGreen)
 			bold := color.New(color.Bold, color.FgHiWhite)
 
 			msg := fmt.Sprintf("\n%s\n%s %s %s\n",
-				green.Sprintf("Your API key has been saved to %s", config.ConfigFilePath()),
+				green.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
 				green.Sprint("You can now run"),
 				bold.Sprint("`infracost`"),
 				green.Sprint("in your Terraform code directory."),
@@ -71,8 +66,8 @@ func registerCmd() *cli.Command {
 
 			saveAPIKey := true
 
-			if conf.APIKey != "" {
-				fmt.Printf("\nYou already have an Infracost API key saved in %s\n", config.ConfigFilePath())
+			if _, ok := config.Credentials[config.Config.PricingAPIEndpoint]; ok {
+				fmt.Printf("\nYou already have an Infracost API key saved in %s\n", config.CredentialsFilePath())
 				confirm, err := promptOverwriteAPIKey()
 				if err != nil {
 					return err
@@ -90,9 +85,11 @@ func registerCmd() *cli.Command {
 			}
 
 			if saveAPIKey {
-				conf.APIKey = r.APIKey
+				config.Credentials[config.Config.PricingAPIEndpoint] = config.CredentialsProfileSpec{
+					APIKey: r.APIKey,
+				}
 
-				err = config.WriteConfigFile(conf)
+				err = config.SaveCredentials()
 				if err != nil {
 					return err
 				}

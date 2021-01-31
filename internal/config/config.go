@@ -1,59 +1,205 @@
 package config
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
-	"runtime"
-	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
-// Spec contains mapping of environment variable names to config values
+type TerraformProjectSpec struct {
+	Name      string `yaml:"name,omitempty"`
+	UsageFile string `yaml:"usage_file,omitempty"`
+	Dir       string `yaml:"dir,omitempty"`
+	PlanFile  string `yaml:"plan_file,omitempty"`
+	JSONFile  string `yaml:"json_file,omitempty"`
+	PlanFlags string `yaml:"plan_flags,omitempty"`
+	UseState  bool   `yaml:"use_state,omitempty"`
+}
+
+type ProjectSpec struct {
+	Terraform []TerraformProjectSpec `yaml:"terraform,omitempty"`
+}
+
+type OutputSpec struct {
+	Format      string   `yaml:"format,omitempty"`
+	Columns     []string `yaml:"columns,omitempty"`
+	ShowSkipped bool     `yaml:"show_skipped,omitempty"`
+}
+
 type ConfigSpec struct { // nolint:golint
-	NoColor                   bool   `yaml:"no_color,omitempty"`
-	LogLevel                  string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
-	APIKey                    string `yaml:"api_key,omitempty" envconfig:"INFRACOST_API_KEY"`
+	Version  string `yaml:"version,omitempty"`
+	LogLevel string `yaml:"log_level,omitempty" envconfig:"LOG_LEVEL"`
+	NoColor  bool   `yaml:"no_color,omitempty" envconfig:"NO_COLOR"`
+
+	APIKey                    string `envconfig:"INFRACOST_API_KEY"`
 	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
-	TerraformCloudHost        string `yaml:"terraform_cloud_host,omitempty" envconfig:"TERRAFORM_CLOUD_HOST"`
-	TerraformCloudToken       string `yaml:"terraform_cloud_token,omitempty" envconfig:"TERRAFORM_CLOUD_TOKEN"`
+
+	TerraformCloudHost  string `yaml:"terraform_cloud_host,omitempty"`
+	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty"`
+
+	Projects ProjectSpec `yaml:"projects"`
+
+	Outputs []OutputSpec `yaml:"outputs"`
 }
 
 var Config *ConfigSpec
 
-func init() {
-	log.SetFlags(0)
+func LoadConfig(configFile string) {
+	var err error
 
-	Config = loadConfig()
+	err = loadConfig(configFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = ConfigureLogger()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = loadCredentials()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	err = migrateCredentials()
+	if err != nil {
+		logrus.Debug("Error migrating credentials")
+		logrus.Debug(err)
+	}
+
+	profile, ok := Credentials[Config.PricingAPIEndpoint]
+	if ok && Config.APIKey == "" {
+		Config.APIKey = profile.APIKey
+	}
+
+	err = loadState()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	loadEnvironment()
 }
 
-func defaultConfigSpec() ConfigSpec {
-	return ConfigSpec{
-		NoColor:                   false,
+func loadConfig(configFile string) error {
+	Config = defaultConfigSpec()
+
+	err := mergeConfigFileIfExists(configFile)
+	if err != nil {
+		return err
+	}
+
+	err = loadDotEnv()
+	if err != nil {
+		return err
+	}
+
+	err = envconfig.Process("", Config)
+	if err != nil {
+		return nil
+	}
+
+	return nil
+}
+
+func defaultConfigSpec() *ConfigSpec {
+	return &ConfigSpec{
+		LogLevel: "",
+		NoColor:  false,
+
 		DefaultPricingAPIEndpoint: "https://pricing.api.infracost.io",
 		PricingAPIEndpoint:        "https://pricing.api.infracost.io",
 		DashboardAPIEndpoint:      "https://dashboard.api.infracost.io",
+
+		Projects: ProjectSpec{
+			Terraform: []TerraformProjectSpec{
+				{
+					Dir: ".",
+				},
+			},
+		},
+		Outputs: []OutputSpec{
+			{
+				Format:  "table",
+				Columns: []string{"NAME", "MONTHLY_QUANTITY", "UNIT", "PRICE", "HOURLY_COST", "MONTHLY_COST"},
+			},
+		},
 	}
 }
 
-func (c *ConfigSpec) SetLogLevel(l string) error {
-	c.LogLevel = l
+func mergeConfigFileIfExists(configFile string) error {
+	if configFile != "" && !fileExists(configFile) {
+		return fmt.Errorf("Config file does not exist at %s", configFile)
+	}
 
-	// Disable logging if no log level is set
-	if c.LogLevel == "" {
+	if configFile == "" {
+		configFile = defaultConfigFilePath()
+
+		if !fileExists(configFile) {
+			return nil
+		}
+	}
+
+	data, err := ioutil.ReadFile(configFile)
+	if err != nil {
+		return err
+	}
+
+	return yaml.Unmarshal(data, Config)
+}
+
+func loadDotEnv() error {
+	envLocalPath := filepath.Join(RootDir(), ".env.local")
+	if fileExists(envLocalPath) {
+		err := godotenv.Load(envLocalPath)
+		if err != nil {
+			return err
+		}
+	}
+
+	if fileExists(".env") {
+		err := godotenv.Load()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func ConfigureLogger() error {
+	logrus.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp: true,
+		DisableColors: true,
+		SortingFunc: func(keys []string) {
+			// Put message at the end
+			for i, key := range keys {
+				if key == "msg" && i != len(keys)-1 {
+					keys[i], keys[len(keys)-1] = keys[len(keys)-1], keys[i]
+					break
+				}
+			}
+		},
+	})
+
+	if Config.LogLevel == "" {
 		logrus.SetOutput(ioutil.Discard)
 		return nil
 	}
 
 	logrus.SetOutput(os.Stderr)
 
-	level, err := logrus.ParseLevel(c.LogLevel)
+	level, err := logrus.ParseLevel(Config.LogLevel)
 	if err != nil {
 		return err
 	}
@@ -63,84 +209,15 @@ func (c *ConfigSpec) SetLogLevel(l string) error {
 	return nil
 }
 
-func (c *ConfigSpec) IsLogging() bool {
-	return c.LogLevel != ""
+func IsLogging() bool {
+	return Config.LogLevel != ""
 }
 
-func LogSortingFunc(keys []string) {
-	// Put message at the end
-	for i, key := range keys {
-		if key == "msg" && i != len(keys)-1 {
-			keys[i], keys[len(keys)-1] = keys[len(keys)-1], keys[i]
-			break
-		}
-	}
-}
-
-func RootDir() string {
-	_, b, _, _ := runtime.Caller(0)
-	return filepath.Join(filepath.Dir(b), "../..")
-}
-
-func fileExists(path string) bool {
-	info, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-
-	return !info.IsDir()
-}
-
-// loadConfig loads the config spec from the config file and environment variables.
-// Config is loaded in the following order, with any later ones overriding the previous ones:
-//   * Default values
-//   * Config file
-//   * .env
-//   * .env.local
-//   * ENV variables
-//   * Any command line flags (e.g. --log-level)
-func loadConfig() *ConfigSpec {
-	config := defaultConfigSpec()
-
-	err := mergeConfigFileIfExists(&config)
+func defaultConfigFilePath() string { // nolint:golint
+	cwd, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err)
+		cwd = ""
 	}
 
-	envLocalPath := filepath.Join(RootDir(), ".env.local")
-	if fileExists(envLocalPath) {
-		err = godotenv.Load(envLocalPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	if fileExists(".env") {
-		err = godotenv.Load()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	err = envconfig.Process("", &config)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-		DisableColors: true,
-		SortingFunc:   LogSortingFunc,
-	})
-
-	err = config.SetLogLevel(config.LogLevel)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &config
-}
-
-func IsTruthy(s string) bool {
-	return s == "1" || strings.EqualFold(s, "true")
+	return path.Join(cwd, "infracost.yml")
 }

@@ -22,7 +22,7 @@ func NewSpinner(msg string) *Spinner {
 		msg:     msg,
 	}
 
-	if config.Config.IsLogging() {
+	if config.IsLogging() {
 		log.Infof("starting: %s", msg)
 	} else {
 		s.spinner.Prefix = "  "
@@ -45,7 +45,7 @@ func (s *Spinner) Fail() {
 		return
 	}
 	s.spinner.Stop()
-	if config.Config.IsLogging() {
+	if config.IsLogging() {
 		log.Errorf("failed: %s", s.msg)
 	} else {
 		fmt.Fprintln(os.Stderr, color.HiRedString("  ✖ %s", s.msg))
@@ -57,7 +57,7 @@ func (s *Spinner) Success() {
 		return
 	}
 	s.spinner.Stop()
-	if config.Config.IsLogging() {
+	if config.IsLogging() {
 		log.Infof("completed: %s", s.msg)
 	} else {
 		fmt.Fprintln(os.Stderr, color.GreenString("  ✔ %s", s.msg))

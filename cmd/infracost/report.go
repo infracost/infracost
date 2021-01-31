@@ -83,9 +83,9 @@ EXAMPLES:
 			case "json":
 				b, err = output.ToJSON(combined)
 			case "html":
-				b, err = output.ToHTML(combined, opts, c)
+				b, err = output.ToHTML(combined, opts, c.Bool("show-skipped"))
 			default:
-				b, err = output.ToTable(combined, c)
+				b, err = output.ToTable(combined, c.Bool("show-skipped"))
 			}
 			if err != nil {
 				return err

@@ -18,8 +18,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
-
-	"github.com/urfave/cli/v2"
 )
 
 var tfProviders = `
@@ -159,16 +157,9 @@ func loadResources(project Project, usage map[string]*schema.UsageData) ([]*sche
 		return nil, err
 	}
 
-	flags := flag.NewFlagSet("test", 0)
-	flags.String("tfdir", tfdir, "")
-	flags.String("usage-file", filepath.Join(tfdir, "infracost-usage.yml"), "")
-	c := cli.NewContext(nil, flags, nil)
-
-	provider := terraform.New()
-	err = provider.ProcessArgs(c)
-	if err != nil {
-		return nil, err
-	}
+	provider := terraform.New(config.TerraformProjectSpec{
+		Dir: tfdir,
+	})
 
 	return provider.LoadResources(usage)
 }

@@ -21,7 +21,6 @@ import (
 	"golang.org/x/mod/semver"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
 )
 
 var minTerraformVer = "v0.12"
@@ -32,39 +31,17 @@ type terraformProvider struct {
 	planFile  string
 	useState  bool
 	planFlags string
-	usageFile string
 }
 
 // New returns new Terraform Provider.
-func New() schema.Provider {
-	return &terraformProvider{}
-}
-
-func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
-	p.dir = c.String("tfdir")
-	p.jsonFile = c.String("tfjson")
-	p.planFile = c.String("tfplan")
-	p.useState = c.Bool("use-tfstate")
-	p.planFlags = c.String("tfflags")
-	p.usageFile = c.String("usage-file")
-
-	if p.useState && (p.jsonFile != "" || p.planFile != "") {
-		return errors.New("The use-tfstate flag cannot be used with the tfjson or tfplan flags")
+func New(source config.TerraformProjectSpec) schema.Provider {
+	return &terraformProvider{
+		dir:       source.Dir,
+		jsonFile:  source.JSONFile,
+		planFile:  source.PlanFile,
+		useState:  source.UseState,
+		planFlags: source.PlanFlags,
 	}
-
-	if p.jsonFile != "" && p.planFile != "" {
-		return errors.New("Please provide either a Terraform Plan JSON file (tfjson) or a Terraform Plan file (tfplan)")
-	}
-
-	if p.dir != "" && p.jsonFile != "" {
-		fmt.Fprintln(os.Stderr, color.YellowString("Warning: --tfdir is ignored if --tfjson is used"))
-	}
-
-	if p.dir == "" {
-		p.dir = getcwd()
-	}
-
-	return nil
 }
 
 func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
@@ -411,15 +388,4 @@ func indent(s, indent string) string {
 
 func stripBlankLines(s string) string {
 	return regexp.MustCompile(`[\t\r\n]+`).ReplaceAllString(strings.TrimSpace(s), "\n")
-}
-
-func getcwd() string {
-	cwd, err := os.Getwd()
-	if err != nil {
-		log.Warn(err)
-
-		cwd = ""
-	}
-
-	return cwd
 }
