@@ -80,6 +80,7 @@ Support for the following is not currently included:
 | `google_dns_record_set` |  |
 | `google_pubsub_subscription` |  |
 | `google_pubsub_topic` |  |
+| `google_storage_bucket` |  |
 
 
 ## The resource I want isn't supported
