@@ -112,7 +112,12 @@ echo "$default_branch_output" > default_branch_infracost.txt
 default_branch_monthly_cost=$(cat default_branch_infracost.txt | awk '/OVERALL TOTAL/ { gsub(",",""); printf("%.2f",$NF) }')
 echo "::set-output name=default_branch_monthly_cost::$default_branch_monthly_cost"
 
-percent_diff=$(echo "scale=4; $current_branch_monthly_cost / $default_branch_monthly_cost * 100 - 100" | bc)
+if [ $(echo "$default_branch_monthly_cost > 0" | bc -l) = 1 ]; then
+  percent_diff=$(echo "scale=4; $current_branch_monthly_cost / $default_branch_monthly_cost * 100 - 100" | bc)
+else
+  echo "Default branch has no cost, setting percent_diff=100 to force a comment"
+  percent_diff=100
+fi
 absolute_percent_diff=$(echo $percent_diff | tr -d -)
 
 if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; then
