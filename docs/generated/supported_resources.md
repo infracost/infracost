@@ -11,6 +11,8 @@ Support for the following is not currently included:
 
 | Terraform resource           | Notes |
 | ---                          | ---   |
+| `aws_acm_certificate` |  |
+| `aws_acmpca_certificate_authority` |  |
 | `aws_alb` |  |
 | `aws_api_gateway_rest_api` |  |
 | `aws_api_gateway_stage` |  |
