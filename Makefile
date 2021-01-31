@@ -5,16 +5,12 @@ VERSION := $(shell scripts/get_version.sh HEAD $(NO_DIRTY))
 LD_FLAGS := -ldflags="-X 'github.com/infracost/infracost/internal/version.Version=$(VERSION)'"
 BUILD_FLAGS := $(LD_FLAGS) -i -v
 
-GENERATE_DOCS_PKG := github.com/infracost/infracost/cmd/generate-docs
-DOCS_TEMPLATES_PATH := docs/templates
-DOCS_OUTPUT_PATH := docs/generated
-
 DEV_ENV := dev
 ifdef INFRACOST_ENV
 	DEV_ENV := $(INFRACOST_ENV)
 endif
 
-.PHONY: deps run build windows linux darwin build_all install release install_provider clean test fmt lint docs
+.PHONY: deps run build windows linux darwin build_all install release install_provider clean test fmt lint
 
 deps:
 	go mod download
@@ -34,7 +30,7 @@ linux:
 darwin:
 	env GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build $(BUILD_FLAGS) -o build/$(BINARY)-darwin-amd64 $(PKG)
 
-build_all: build windows linux darwin docs
+build_all: build windows linux darwin
 
 install:
 	CGO_ENABLED=0 go install $(BUILD_FLAGS) $(PKG)
@@ -43,7 +39,6 @@ release: build_all
 	cd build; tar -czf $(BINARY)-windows-amd64.tar.gz $(BINARY)-windows-amd64
 	cd build; tar -czf $(BINARY)-linux-amd64.tar.gz $(BINARY)-linux-amd64
 	cd build; tar -czf $(BINARY)-darwin-amd64.tar.gz $(BINARY)-darwin-amd64
-	cd docs/generated; tar -czvf docs.tar.gz *.md
 
 install_provider:
 	scripts/install_provider.sh $(TERRAFORM_PROVIDER_INFRACOST_VERSION)
@@ -60,6 +55,3 @@ fmt:
 
 lint:
 	golangci-lint run
-
-docs:
-	go run $(GENERATE_DOCS_PKG) --input $(DOCS_TEMPLATES_PATH) --output $(DOCS_OUTPUT_PATH)
