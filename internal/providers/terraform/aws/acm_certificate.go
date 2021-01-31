@@ -16,10 +16,11 @@ func NewACMCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 	region := d.Get("region").String()
 
 	if d.Get("certificate_authority_arn").Exists() {
+		one := decimal.NewFromInt(1)
 		return &schema.Resource{
 			Name: d.Address,
 			CostComponents: []*schema.CostComponent{
-				certificateCostComponent(region, "Certificate request", "0", decimal.NewFromInt(1)),
+				certificateCostComponent(region, "Certificate", "0", &one),
 			},
 		}
 	}

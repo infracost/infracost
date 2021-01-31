@@ -9,7 +9,7 @@ resource_usage:
   # Terraform AWS resources
   #
   aws_acmpca_certificate_authority.my_private_ca:
-    monthly_certificate_requests: 20000 # Estimated monthly private certificate requests.
+    monthly_requests: 20000 # Monthly private certificate requests.
 
   aws_api_gateway_rest_api.my_rest_api:
     monthly_requests:  100000000 # Monthly requests to the Rest API Gateway.

@@ -27,10 +27,10 @@ func TestCalculateTierRequests(t *testing.T) {
 	}
 
 	var fourTierMap = map[string]decimal.Decimal{
-		"1":   decimal.NewFromInt(1000),
-		"2":   decimal.NewFromInt(10000),
-		"3":   decimal.NewFromInt(100000),
-		"4":   decimal.NewFromInt(389000),
+		"1": decimal.NewFromInt(1000),
+		"2": decimal.NewFromInt(10000),
+		"3": decimal.NewFromInt(100000),
+		"4": decimal.NewFromInt(389000),
 	}
 
 	tests := []struct {
