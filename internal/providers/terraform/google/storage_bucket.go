@@ -17,12 +17,17 @@ func GetStorageBucketRegistryItem() *schema.RegistryItem {
 }
 
 func NewStorageBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	components := []*schema.CostComponent{
+		dataStorage(d, u),
+	}
+	data := dataRetrieval(d, u)
+	if data != nil {
+		components = append(components, data)
+	}
+	components = append(components, operations(d, u)...)
 	return &schema.Resource{
-		Name: d.Address,
-		CostComponents: append(
-			[]*schema.CostComponent{dataStorage(d, u), dataRetrieval(d, u)},
-			operations(d, u)...,
-		),
+		Name:           d.Address,
+		CostComponents: components,
 	}
 }
 
@@ -169,7 +174,7 @@ func dataRetrieval(d *schema.ResourceData, u *schema.UsageData) *schema.CostComp
 	resourceGroup := storageClassResourceGroupMap[storageClass]
 	// Skipping standard, regional and multi-regional since they are free
 	if resourceGroup == "" {
-		return &schema.CostComponent{IgnoreIfMissingPrice: true}
+		return nil
 	}
 
 	return &schema.CostComponent{
