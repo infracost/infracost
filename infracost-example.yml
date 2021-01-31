@@ -1,0 +1,37 @@
+# log_level: warn
+# no_color: true
+
+terraform_defaults: &terraform-defaults
+  # binary: terraform | terragrunt
+  # workspace: dev
+  # terraform_cloud_host: app.terraform.io
+  # terraform_cloud_token: ABC
+
+projects:
+  # If using Terraform project directory
+  terraform:
+    - "<<": *terraform-defaults
+      dir: examples/terraform
+      # plan_flags: -var-file=dev.tfvars -var-file=us-east.tfvars
+
+    #  If using a Terraform plan file
+    # - <<: *terraform-defaults
+    #   dir: example/terraform
+    #   plan_file: plan.save # This should be relative to the dir
+
+    #  If using a Terraform JSON file
+    # - json: plan.json
+
+    #  If using the Terraform state
+    # - <<: *terraform-defaults
+    #   dir: example/terraform
+    #   use_state: true
+
+outputs:
+  - format: table
+    # columns: NAME,MONTHLY_QUANTITY
+    # breakdown_level: none | resource | full
+    # show_skipped: true
+
+  - format: json
+    path: infracost-output.json

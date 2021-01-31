@@ -8,10 +8,9 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
 )
 
-func ToTable(out Root, c *cli.Context) ([]byte, error) {
+func ToTable(out Root, showSkipped bool) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -60,7 +59,7 @@ func ToTable(out Root, c *cli.Context) ([]byte, error) {
 
 	t.Render()
 
-	msg := out.unsupportedResourcesMessage(c.Bool("show-skipped"))
+	msg := out.unsupportedResourcesMessage(showSkipped)
 	if msg != "" {
 		_, err := bufw.WriteString(fmt.Sprintf("\n%s", msg))
 		if err != nil {
