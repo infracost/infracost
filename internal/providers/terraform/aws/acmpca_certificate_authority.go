@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 
 	"github.com/shopspring/decimal"
 )
@@ -16,11 +17,7 @@ func GetACMPCACertificateAuthorityRegistryItem() *schema.RegistryItem {
 func NewACMPCACertificateAuthority(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
-	var privateCertificateTier = map[string]decimal.Decimal{
-		"tierOne":   decimal.Zero,
-		"tierTwo":   decimal.Zero,
-		"tierThree": decimal.Zero,
-	}
+	certificateTierLimits := []int{1000, 10000, 10001}
 
 	monthlyCertificatesRequests := decimal.Zero
 
@@ -28,11 +25,11 @@ func NewACMPCACertificateAuthority(d *schema.ResourceData, u *schema.UsageData) 
 		monthlyCertificatesRequests = decimal.NewFromInt(u.Get("monthly_certificate_requests").Int())
 	}
 
-	certificateTierQuantities := calculateCertificateRequests(monthlyCertificatesRequests, privateCertificateTier)
+	privateCertificateTier := usage.CalculateTierRequests(monthlyCertificatesRequests, certificateTierLimits)
 
-	tierOne := certificateTierQuantities["tierOne"]
-	tierTwo := certificateTierQuantities["tierTwo"]
-	tierThree := certificateTierQuantities["tierThree"]
+	tierOne := privateCertificateTier["1"]
+	tierTwo := privateCertificateTier["2"]
+	tierThree := privateCertificateTier["3"]
 
 	costComponents := []*schema.CostComponent{
 		{
@@ -52,15 +49,15 @@ func NewACMPCACertificateAuthority(d *schema.ResourceData, u *schema.UsageData) 
 		},
 	}
 
-	if privateCertificateTier["tierOne"].GreaterThan(decimal.NewFromInt(0)) {
+	if tierOne.GreaterThan(decimal.NewFromInt(0)) {
 		costComponents = append(costComponents, certificateCostComponent(region, "Certificate requests (1 - 1000)", "0", tierOne))
 	}
 
-	if privateCertificateTier["tierTwo"].GreaterThan(decimal.NewFromInt(0)) {
+	if tierTwo.GreaterThan(decimal.NewFromInt(0)) {
 		costComponents = append(costComponents, certificateCostComponent(region, "Certificate requests (1001 - 10000)", "1000", tierTwo))
 	}
 
-	if privateCertificateTier["tierThree"].GreaterThan(decimal.NewFromInt(0)) {
+	if tierThree.GreaterThan(decimal.NewFromInt(0)) {
 		costComponents = append(costComponents, certificateCostComponent(region, "Certificate requests (> 10000)", "10000", tierThree))
 	}
 
@@ -68,32 +65,6 @@ func NewACMPCACertificateAuthority(d *schema.ResourceData, u *schema.UsageData) 
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
-}
-
-func calculateCertificateRequests(privateCertificateCount decimal.Decimal, pricingTiers map[string]decimal.Decimal) map[string]decimal.Decimal {
-	certificateTierOneLimit := decimal.NewFromInt(1000)
-	certificateTierTwoLimit := decimal.NewFromInt(10000)
-	certificateTierThreeLimit := decimal.NewFromInt(10001)
-
-	if privateCertificateCount.GreaterThan(certificateTierOneLimit) {
-		pricingTiers["tierOne"] = certificateTierOneLimit
-	} else {
-		pricingTiers["tierOne"] = privateCertificateCount
-		return pricingTiers
-	}
-
-	if privateCertificateCount.GreaterThan(certificateTierTwoLimit) {
-		pricingTiers["tierTwo"] = certificateTierTwoLimit
-	} else {
-		pricingTiers["tierTwo"] = privateCertificateCount.Sub(certificateTierOneLimit)
-		return pricingTiers
-	}
-
-	if privateCertificateCount.GreaterThan(certificateTierThreeLimit) {
-		pricingTiers["tierThree"] = privateCertificateCount.Sub(certificateTierTwoLimit.Add(certificateTierOneLimit))
-	}
-
-	return pricingTiers
 }
 
 func certificateCostComponent(region string, displayName string, usageTier string, monthlyQuantity decimal.Decimal) *schema.CostComponent {
