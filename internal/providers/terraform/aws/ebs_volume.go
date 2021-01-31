@@ -54,7 +54,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 		usageType = "EBS:VolumeP-IOPS.piops"
 	case "io2":
 		name = "Provisioned IOPS SSD storage (io2)"
-		usageType = "EBS:VolumeP-IOPS.io2"
+		usageType = "EBS:VolumeP-IOPS.io2$"
 	case "st1":
 		name = "Throughput Optimized HDD storage (st1)"
 	case "sc1":
