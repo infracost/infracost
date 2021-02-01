@@ -6,6 +6,17 @@ version: v0.1
 resource_usage:
 
   #
+  # The usage file also supports specifying usage for resources inside modules,
+  # by specifying the full path to the resource. This is the same value as Infracost
+  # outputs in the NAME column , e.g.:
+  #
+  # module.my_module.aws_dynamodb_table.my_table:
+  #   storage_gb: 1000
+  # module.lambda_function.aws_lambda_function.this[0]:
+  #   monthly_requests: 20000
+  #   request_duration_ms: 600
+
+  #
   # Terraform AWS resources
   #
   aws_api_gateway_rest_api.my_rest_api:
