@@ -13,6 +13,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetCloudwatchDashboardRegistryItem(),
 	GetCloudwatchLogGroupItem(),
 	GetCloudwatchMetricAlarmRegistryItem(),
+	GetCodebuildProjectRegistryItem(),
 	GetDataTransferRegistryItem(),
 	GetDBInstanceRegistryItem(),
 	GetDMSRegistryItem(),
@@ -118,6 +119,11 @@ var FreeResources []string = []string{
 	"aws_cloudwatch_log_resource_policy",
 	"aws_cloudwatch_log_stream",
 	"aws_cloudwatch_log_subscription_filter",
+
+	// AWS CodeBuild
+	"aws_codebuild_report_group",
+	"aws_codebuild_source_credential",
+	"aws_codebuild_webhook",
 
 	// AWS ECR
 	"aws_ecr_lifecycle_policy",
