@@ -31,9 +31,8 @@ func NewCodebuildProject(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 				NoPrice:   true,
 				IsSkipped: true,
 			}
-		} else {
-			monthlyBuildMinutes -= 100
 		}
+		monthlyBuildMinutes -= 100
 	}
 
 	usageType := SetUsageType(environmentComputeType, environmentType)
