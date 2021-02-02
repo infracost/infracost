@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -40,7 +42,7 @@ func NewCodebuildProject(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:            "CodeBuild instance",
+				Name:            fmt.Sprintf("CodeBuild instance (%s)", usageType),
 				Unit:            "minutes",
 				UnitMultiplier:  1,
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(monthlyBuildMinutes)),
