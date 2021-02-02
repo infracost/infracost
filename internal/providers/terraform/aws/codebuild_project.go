@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -17,31 +17,21 @@ func GetCodebuildProjectRegistryItem() *schema.RegistryItem {
 func NewCodebuildProject(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
-	environmentComputeType := d.Get("environment.0.compute_type").String()
-	environmentType := d.Get("environment.0.type").String()
+	computeType := d.Get("environment.0.compute_type").String()
+	envType := d.Get("environment.0.type").String()
 
 	var monthlyBuildMinutes int64
-	if u != nil && u.Get("monthly_build_minutes").Exists() {
-		monthlyBuildMinutes = u.Get("monthly_build_minutes").Int()
+	if u != nil && u.Get("monthly_build_mins").Exists() {
+		monthlyBuildMinutes = u.Get("monthly_build_mins").Int()
 	}
 
-	if environmentComputeType == "BUILD_GENERAL1_SMALL" {
-		if monthlyBuildMinutes <= 100 {
-			return &schema.Resource{
-				NoPrice:   true,
-				IsSkipped: true,
-			}
-		}
-		monthlyBuildMinutes -= 100
-	}
-
-	usageType := SetUsageType(environmentComputeType, environmentType)
+	usageType := usageType(computeType, envType)
 
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:            fmt.Sprintf("CodeBuild instance (%s)", usageType),
+				Name:            amazonValidName(computeType, envType),
 				Unit:            "minutes",
 				UnitMultiplier:  1,
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(monthlyBuildMinutes)),
@@ -51,7 +41,7 @@ func NewCodebuildProject(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 					Service:       strPtr("CodeBuild"),
 					ProductFamily: strPtr("Compute"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", Value: strPtr(usageType)},
+						{Key: "usagetype", ValueRegex: strPtr(usageType)},
 					},
 				},
 			},
@@ -59,16 +49,33 @@ func NewCodebuildProject(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 }
 
-func SetUsageType(environmentComputeType string, environmentType string) string {
-	usageTypeTemplate := "USE1-Build-Min:"
-	environmentType = SetValidEnvironmentType(environmentType)
-	environmentComputeType = SetValidEnvironmentComputeType(environmentComputeType)
+func amazonValidName(computeType string, envType string) string {
+	name := ""
+	switch envType {
+	case "WINDOWS_SERVER_2019_CONTAINER":
+		name = "Windows ("
+		name += strings.Replace(strings.ToLower(strings.SplitAfter(computeType, "BUILD_")[1]), "_", ".", 1) + ")"
+	case "ARM_CONTAINER":
+		name = "Linux (arm1.large)"
+	case "LINUX_GPU_CONTAINER":
+		name = "Linux (gpu1.large)"
+	default:
+		name = "Linux ("
+		name += strings.Replace(strings.ToLower(strings.SplitAfter(computeType, "BUILD_")[1]), "_", ".", 1) + ")"
+	}
 
-	return usageTypeTemplate + environmentType + environmentComputeType
+	return name
 }
 
-func SetValidEnvironmentType(environmentType string) string {
-	switch environmentType {
+func usageType(computeType string, envType string) string {
+	envType = validEnvironmentType(envType)
+	computeType = validEnvironmentComputeType(computeType)
+
+	return "/" + envType + ":" + computeType + "/"
+}
+
+func validEnvironmentType(envType string) string {
+	switch envType {
 	case "LINUX_CONTAINER":
 		return "Linux"
 	case "LINUX_GPU_CONTAINER":
@@ -82,16 +89,16 @@ func SetValidEnvironmentType(environmentType string) string {
 	}
 }
 
-func SetValidEnvironmentComputeType(computeType string) string {
+func validEnvironmentComputeType(computeType string) string {
 	switch computeType {
 	case "BUILD_GENERAL1_SMALL":
-		return ":g1.small"
+		return "g1.small"
 	case "BUILD_GENERAL1_MEDIUM":
-		return ":g1.medium"
+		return "g1.medium"
 	case "BUILD_GENERAL1_LARGE":
-		return ":g1.large"
+		return "g1.large"
 	case "BUILD_GENERAL1_2XLARGE":
-		return ":g1.2xlarge"
+		return "g1.2xlarge"
 	default:
 		return ""
 	}

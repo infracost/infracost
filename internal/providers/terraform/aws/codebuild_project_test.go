@@ -46,7 +46,7 @@ func TestCodebuildProject(t *testing.T) {
 			Name: "aws_codebuild_project.my_project",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "CodeBuild instance (USE1-Build-Min:Linux:g1.medium)",
+					Name:             "Linux (general1.medium)",
 					PriceHash:        "a26b218d7a04b4de7dc49fc899fcbf7f-a62d9273fef0987b8d1b9a67a508acdc",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
@@ -161,16 +161,16 @@ func TestCodebuildProject_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_codebuild_project.my_small_project": map[string]interface{}{
-			"monthly_build_minutes": 1000,
+			"monthly_build_mins": 1000,
 		},
 		"aws_codebuild_project.my_medium_project": map[string]interface{}{
-			"monthly_build_minutes": 10000,
+			"monthly_build_mins": 10000,
 		},
 		"aws_codebuild_project.my_large_linux_project": map[string]interface{}{
-			"monthly_build_minutes": 100000,
+			"monthly_build_mins": 100000,
 		},
 		"aws_codebuild_project.my_large_windows_project": map[string]interface{}{
-			"monthly_build_minutes": 100000,
+			"monthly_build_mins": 100000,
 		},
 	})
 
@@ -179,9 +179,9 @@ func TestCodebuildProject_usage(t *testing.T) {
 			Name: "aws_codebuild_project.my_small_project",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "CodeBuild instance (USE1-Build-Min:Linux:g1.small)",
+					Name:             "Linux (general1.small)",
 					PriceHash:        "78647b140df3f8c5350ab75213cac828-a62d9273fef0987b8d1b9a67a508acdc",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(1000 - 100)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(1000)),
 				},
 			},
 		},
@@ -189,7 +189,7 @@ func TestCodebuildProject_usage(t *testing.T) {
 			Name: "aws_codebuild_project.my_medium_project",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "CodeBuild instance (USE1-Build-Min:Linux:g1.medium)",
+					Name:             "Linux (general1.medium)",
 					PriceHash:        "a26b218d7a04b4de7dc49fc899fcbf7f-a62d9273fef0987b8d1b9a67a508acdc",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(10000)),
 				},
@@ -199,7 +199,7 @@ func TestCodebuildProject_usage(t *testing.T) {
 			Name: "aws_codebuild_project.my_large_linux_project",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "CodeBuild instance (USE1-Build-Min:Linux:g1.large)",
+					Name:             "Linux (general1.large)",
 					PriceHash:        "05233b2fb94a8929a2bc26c8a4000b1c-a62d9273fef0987b8d1b9a67a508acdc",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100000)),
 				},
@@ -209,7 +209,7 @@ func TestCodebuildProject_usage(t *testing.T) {
 			Name: "aws_codebuild_project.my_large_windows_project",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "CodeBuild instance (USE1-Build-Min:Windows:g1.large)",
+					Name:             "Windows (general1.large)",
 					PriceHash:        "a5080472369b82f5143a4c9a5b1381ee-a62d9273fef0987b8d1b9a67a508acdc",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100000)),
 				},
