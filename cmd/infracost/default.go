@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"strings"
 
 	"github.com/fatih/color"
@@ -220,22 +221,22 @@ func defaultMain() error {
 	opts := output.Options{}
 	r := output.ToOutputFormat(resources)
 
-	for _, o := range config.Config.Outputs {
+	for _, outputConfig := range config.Config.Outputs {
 		var (
 			b   []byte
 			out string
 			err error
 		)
 
-		switch strings.ToLower(o.Format) {
+		switch strings.ToLower(outputConfig.Format) {
 		case "json":
 			b, err = output.ToJSON(r)
 			out = string(b)
 		case "html":
-			b, err = output.ToHTML(r, opts, o.ShowSkipped)
+			b, err = output.ToHTML(r, opts, outputConfig)
 			out = string(b)
 		default:
-			b, err = output.ToTable(r, o.ShowSkipped)
+			b, err = output.ToTable(r, outputConfig)
 			out = fmt.Sprintf("\n%s", string(b))
 		}
 
@@ -243,7 +244,14 @@ func defaultMain() error {
 			return errors.Wrap(err, "Error generating output")
 		}
 
-		fmt.Printf("%s\n", out)
+		if outputConfig.Path != "" {
+			err := ioutil.WriteFile(outputConfig.Path, []byte(out), 0644) // nolint:gosec
+			if err != nil {
+				return errors.Wrap(err, "Error saving output")
+			}
+		} else {
+			fmt.Printf("%s\n", out)
+		}
 	}
 
 	return nil

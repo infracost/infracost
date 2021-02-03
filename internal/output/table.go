@@ -10,7 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func ToTable(out Root, showSkipped bool) ([]byte, error) {
+func ToTable(out Root, outputConfig *config.OutputSpec) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -59,7 +59,7 @@ func ToTable(out Root, showSkipped bool) ([]byte, error) {
 
 	t.Render()
 
-	msg := out.unsupportedResourcesMessage(showSkipped)
+	msg := out.unsupportedResourcesMessage(outputConfig.ShowSkipped)
 	if msg != "" {
 		_, err := bufw.WriteString(fmt.Sprintf("\n%s", msg))
 		if err != nil {

@@ -3,10 +3,9 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"strings"
 
-	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
@@ -41,11 +40,6 @@ EXAMPLES:
 			},
 		},
 		Action: func(c *cli.Context) error {
-			if c.String("output") == "json" && c.Bool("show-skipped") {
-				msg := color.YellowString("The --show-skipped option is not needed with JSON output as that always includes them\n")
-				fmt.Fprint(os.Stderr, msg)
-			}
-
 			files := make([]string, 0)
 
 			for i := 0; i < c.Args().Len(); i++ {
@@ -75,17 +69,22 @@ EXAMPLES:
 			opts := output.Options{GroupKey: "filename", GroupLabel: "File"}
 			combined := output.Combine(inputs, opts)
 
+			outputConfig := &config.OutputSpec{
+				Format:      c.String("output"),
+				ShowSkipped: c.Bool("show-skipped"),
+			}
+
 			var (
 				b   []byte
 				err error
 			)
-			switch strings.ToLower(c.String("output")) {
+			switch strings.ToLower(outputConfig.Format) {
 			case "json":
 				b, err = output.ToJSON(combined)
 			case "html":
-				b, err = output.ToHTML(combined, opts, c.Bool("show-skipped"))
+				b, err = output.ToHTML(combined, opts, outputConfig)
 			default:
-				b, err = output.ToTable(combined, c.Bool("show-skipped"))
+				b, err = output.ToTable(combined, outputConfig)
 			}
 			if err != nil {
 				return err
