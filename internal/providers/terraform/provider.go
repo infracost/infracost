@@ -26,21 +26,13 @@ import (
 var minTerraformVer = "v0.12"
 
 type terraformProvider struct {
-	dir       string
-	jsonFile  string
-	planFile  string
-	useState  bool
-	planFlags string
+	project *config.TerraformProjectSpec
 }
 
 // New returns new Terraform Provider.
-func New(source config.TerraformProjectSpec) schema.Provider {
+func New(project *config.TerraformProjectSpec) schema.Provider {
 	return &terraformProvider{
-		dir:       source.Dir,
-		jsonFile:  source.JSONFile,
-		planFile:  source.PlanFile,
-		useState:  source.UseState,
-		planFlags: source.PlanFlags,
+		project: project,
 	}
 }
 
@@ -50,7 +42,7 @@ func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) ([
 	var err error
 	var j []byte
 
-	if p.useState {
+	if p.project.UseState {
 		j, err = p.generateStateJSON()
 	} else {
 		j, err = p.loadPlanJSON()
@@ -68,11 +60,11 @@ func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) ([
 }
 
 func (p *terraformProvider) loadPlanJSON() ([]byte, error) {
-	if p.jsonFile == "" {
+	if p.project.JSONFile == "" {
 		return p.generatePlanJSON()
 	}
 
-	out, err := ioutil.ReadFile(p.jsonFile)
+	out, err := ioutil.ReadFile(p.project.JSONFile)
 	if err != nil {
 		return []byte{}, errors.Wrap(err, "Error reading Terraform plan file")
 	}
@@ -94,7 +86,7 @@ func (p *terraformProvider) generateStateJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	return runShow(opts, "")
+	return p.runShow(opts, "")
 }
 
 func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
@@ -111,11 +103,11 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	if p.planFile == "" {
+	if p.project.PlanFile == "" {
 
 		var planJSON []byte
-		p.planFile, planJSON, err = runPlan(opts, p.planFlags, true)
-		defer os.Remove(p.planFile)
+		p.project.PlanFile, planJSON, err = p.runPlan(opts, p.project.PlanFlags, true)
+		defer os.Remove(p.project.PlanFile)
 
 		if err != nil {
 			return []byte{}, err
@@ -126,15 +118,17 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 		}
 	}
 
-	return runShow(opts, p.planFile)
+	return p.runShow(opts, p.project.PlanFile)
 }
 
 func (p *terraformProvider) setupOpts() (*CmdOptions, error) {
 	opts := &CmdOptions{
-		TerraformDir: p.dir,
+		TerraformBinary:    p.Binary(),
+		TerraformWorkspace: p.project.Workspace,
+		TerraformDir:       p.Dir(),
 	}
 
-	configFile, err := CreateConfigFile(p.dir)
+	configFile, err := CreateConfigFile(p.project)
 	if err != nil {
 		return opts, err
 	}
@@ -144,11 +138,27 @@ func (p *terraformProvider) setupOpts() (*CmdOptions, error) {
 	return opts, nil
 }
 
+func (p *terraformProvider) Binary() string {
+	if p.project.Binary == "" {
+		return "terraform"
+	}
+
+	return p.project.Binary
+}
+
+func (p *terraformProvider) Dir() string {
+	if p.project.Dir == "" {
+		return "."
+	}
+
+	return p.project.Dir
+}
+
 func (p *terraformProvider) terraformPreChecks() error {
-	if p.jsonFile == "" {
-		_, err := exec.LookPath(config.Environment.TerraformBinary)
+	if p.project.JSONFile == "" {
+		_, err := exec.LookPath(p.Binary())
 		if err != nil {
-			msg := fmt.Sprintf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary using the environment variable TERRAFORM_BINARY.", config.Environment.TerraformBinary)
+			msg := fmt.Sprintf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary in your Infracost config or using the environment variable TERRAFORM_BINARY.", p.Binary())
 			return events.NewError(errors.Errorf(msg), "Terraform binary could not be found")
 		}
 
@@ -157,7 +167,7 @@ func (p *terraformProvider) terraformPreChecks() error {
 		}
 
 		if !p.inTerraformDir() {
-			msg := fmt.Sprintf("Directory \"%s\" does not have any Terraform files.\nSet the Terraform directory path using the --tfdir option.", p.dir)
+			msg := fmt.Sprintf("Directory \"%s\" does not have any Terraform files.\nSet the Terraform directory path using the --tfdir option.", p.Dir())
 			return events.NewError(errors.Errorf(msg), "Directory does not have any Terraform files")
 
 		}
@@ -165,20 +175,9 @@ func (p *terraformProvider) terraformPreChecks() error {
 	return nil
 }
 
-func checkVersion() (string, bool) {
-	v := config.Environment.TerraformVersion
-
-	// Allow any non-terraform binaries, e.g. terragrunt
-	if !strings.HasPrefix(config.Environment.TerraformFullVersion, "Terraform ") {
-		return v, true
-	}
-
-	return v, semver.Compare(v, minTerraformVer) >= 0
-}
-
 func (p *terraformProvider) inTerraformDir() bool {
 	for _, ext := range []string{"tf", "hcl", "hcl.json"} {
-		matches, err := filepath.Glob(filepath.Join(p.dir, fmt.Sprintf("*.%s", ext)))
+		matches, err := filepath.Glob(filepath.Join(p.Dir(), fmt.Sprintf("*.%s", ext)))
 		if matches != nil && err == nil {
 			return true
 		}
@@ -186,7 +185,7 @@ func (p *terraformProvider) inTerraformDir() bool {
 	return false
 }
 
-func runInit(opts *CmdOptions) error {
+func (p *terraformProvider) runInit(opts *CmdOptions) error {
 	spinner := spin.NewSpinner("Running terraform init")
 
 	_, err := Cmd(opts, "init", "-input=false", "-no-color")
@@ -200,7 +199,7 @@ func runInit(opts *CmdOptions) error {
 	return nil
 }
 
-func runPlan(opts *CmdOptions, planFlags string, initOnFail bool) (string, []byte, error) {
+func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFail bool) (string, []byte, error) {
 	spinner := spin.NewSpinner("Running terraform plan")
 	var planJSON []byte
 
@@ -226,18 +225,18 @@ func runPlan(opts *CmdOptions, planFlags string, initOnFail bool) (string, []byt
 		if strings.HasPrefix(extractedErr, "Error: Saving a generated plan is currently not supported") {
 			log.Info("Continuing with Terraform Remote Execution Mode")
 			config.Environment.TerraformRemoteExecutionModeEnabled = true
-			planJSON, err = runRemotePlan(opts, args)
+			planJSON, err = p.runRemotePlan(opts, args)
 		} else if initOnFail && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
 			strings.Contains(extractedErr, "Error: Initialization required") ||
 			strings.Contains(extractedErr, "Error: Module not installed") ||
 			strings.Contains(extractedErr, "Error: Provider requirements cannot be satisfied by locked dependencies") ||
 			strings.Contains(extractedErr, "Error: Module not installed")) {
 			spinner.Stop()
-			err = runInit(opts)
+			err = p.runInit(opts)
 			if err != nil {
 				return "", planJSON, err
 			}
-			return runPlan(opts, planFlags, false)
+			return p.runPlan(opts, planFlags, false)
 		}
 
 		spinner.Fail()
@@ -273,8 +272,8 @@ func runPlan(opts *CmdOptions, planFlags string, initOnFail bool) (string, []byt
 	return f.Name(), planJSON, nil
 }
 
-func runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
-	if !checkConfigSet() {
+func (p *terraformProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
+	if !checkCloudConfigSet(p.project) {
 		return []byte{}, ErrMissingCloudToken
 	}
 
@@ -297,7 +296,10 @@ func runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
 	s := strings.Split(u.Path, "/")
 	runID := s[len(s)-1]
 
-	token := cloudToken(host)
+	token := p.project.TerraformCloudToken
+	if token == "" {
+		token = findCloudToken(host)
+	}
 	if token == "" {
 		return []byte{}, ErrMissingCloudToken
 	}
@@ -323,7 +325,7 @@ func runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
 	return cloudAPI(host, jsonPath, token)
 }
 
-func runShow(opts *CmdOptions, planFile string) ([]byte, error) {
+func (p *terraformProvider) runShow(opts *CmdOptions, planFile string) ([]byte, error) {
 	spinner := spin.NewSpinner("Running terraform show")
 
 	args := []string{"show", "-no-color", "-json"}
@@ -339,6 +341,17 @@ func runShow(opts *CmdOptions, planFile string) ([]byte, error) {
 	spinner.Success()
 
 	return out, nil
+}
+
+func checkVersion() (string, bool) {
+	v := config.Environment.TerraformVersion
+
+	// Allow any non-terraform binaries, e.g. terragrunt
+	if !strings.HasPrefix(config.Environment.TerraformFullVersion, "Terraform ") {
+		return v, true
+	}
+
+	return v, semver.Compare(v, minTerraformVer) >= 0
 }
 
 func terraformError(err error) {

@@ -53,11 +53,7 @@ func cloudAPI(host string, path string, token string) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func cloudToken(host string) string {
-	if config.Config.TerraformCloudToken != "" {
-		return config.Config.TerraformCloudToken
-	}
-
+func findCloudToken(host string) string {
 	if os.Getenv("TF_CLI_CONFIG_FILE") != "" {
 		log.Debugf("TF_CLI_CONFIG_FILE is set, checking %s for Terraform Cloud credentials", os.Getenv("TF_CLI_CONFIG_FILE"))
 		token, err := credFromHCL(os.Getenv("TF_CLI_CONFIG_FILE"), host)
@@ -135,8 +131,8 @@ func credFromJSON(filename, host string) (string, error) {
 	return "", nil
 }
 
-func checkConfigSet() bool {
-	if config.Config.TerraformCloudToken != "" {
+func checkCloudConfigSet(project *config.TerraformProjectSpec) bool {
+	if project.TerraformCloudToken != "" {
 		return true
 	}
 

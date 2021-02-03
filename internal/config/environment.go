@@ -15,22 +15,25 @@ import (
 )
 
 type EnvironmentSpec struct {
-	Version                             string   `json:"version"`
-	FullVersion                         string   `json:"fullVersion"`
-	Flags                               []string `json:"flags"`
-	OutputFormat                        string   `json:"outputFormat"`
-	IsTest                              bool     `json:"isTest"`
-	IsDev                               bool     `json:"isDev"`
-	OS                                  string   `json:"os"`
-	CIPlatform                          string   `json:"ciPlatform,omitempty"`
-	CIScript                            string   `json:"ciScript,omitempty"`
-	TerraformBinary                     string   `json:"terraformBinary"`
-	TerraformFullVersion                string   `json:"terraformFullVersion"`
-	TerraformVersion                    string   `json:"terraformVersion"`
-	TerraformRemoteExecutionModeEnabled bool     `json:"terraformRemoteExecutionModeEnabled"`
-	TerraformInfracostProviderEnabled   bool     `json:"terraformInfracostProviderEnabled"`
-	HasUsageFile                        bool     `json:"hasUsageFile"`
-	IsAWSChina                          bool     `json:"isAwsChina"`
+	Version     string `json:"version"`
+	FullVersion string `json:"fullVersion"`
+	IsTest      bool   `json:"isTest"`
+	IsDev       bool   `json:"isDev"`
+	OS          string `json:"os"`
+	CIPlatform  string `json:"ciPlatform,omitempty"`
+	CIScript    string `json:"ciScript,omitempty"`
+
+	TerraformRemoteExecutionModeEnabled bool `json:"terraformRemoteExecutionModeEnabled"`
+	TerraformInfracostProviderEnabled   bool `json:"terraformInfracostProviderEnabled"`
+	IsAWSChina                          bool `json:"isAwsChina"`
+	HasConfigFile                       bool `json:"HasConfigFile"`
+	HasUsageFile                        bool `json:"hasUsageFile"`
+
+	Flags                []string `json:"flags"`
+	OutputFormat         string   `json:"outputFormat"`
+	TerraformBinary      string   `json:"terraformBinary"`
+	TerraformFullVersion string   `json:"terraformFullVersion"`
+	TerraformVersion     string   `json:"terraformVersion"`
 }
 
 var Environment *EnvironmentSpec

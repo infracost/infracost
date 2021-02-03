@@ -15,17 +15,21 @@ import (
 )
 
 type TerraformProjectSpec struct {
-	Name      string `yaml:"name,omitempty"`
-	UsageFile string `yaml:"usage_file,omitempty"`
-	Dir       string `yaml:"dir,omitempty"`
-	PlanFile  string `yaml:"plan_file,omitempty"`
-	JSONFile  string `yaml:"json_file,omitempty"`
-	PlanFlags string `yaml:"plan_flags,omitempty"`
-	UseState  bool   `yaml:"use_state,omitempty"`
+	Name                string `yaml:"name,omitempty" ignored:"true"`
+	Binary              string `yaml:"binary,omitempty" envconfig:"TERRAFORM_BINARY"`
+	Workspace           string `yaml:"workspace,omitempty" envconfig:"TERRAFORM_WORKSPACE"`
+	TerraformCloudHost  string `yaml:"terraform_cloud_host,omitempty" envconfig:"TERRAFORM_CLOUD_HOST"`
+	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"TERRAFORM_CLOUD_TOKEN"`
+	UsageFile           string `yaml:"usage_file,omitempty" ignored:"true"`
+	Dir                 string `yaml:"dir,omitempty" ignored:"true"`
+	PlanFile            string `yaml:"plan_file,omitempty" ignored:"true"`
+	JSONFile            string `yaml:"json_file,omitempty" ignored:"true"`
+	PlanFlags           string `yaml:"plan_flags,omitempty" ignored:"true"`
+	UseState            bool   `yaml:"use_state,omitempty" ignored:"true"`
 }
 
 type ProjectSpec struct {
-	Terraform []TerraformProjectSpec `yaml:"terraform,omitempty"`
+	Terraform []*TerraformProjectSpec `yaml:"terraform,omitempty"`
 }
 
 type OutputSpec struct {
@@ -35,7 +39,7 @@ type OutputSpec struct {
 }
 
 type ConfigSpec struct { // nolint:golint
-	Version  string `yaml:"version,omitempty"`
+	Version  string `yaml:"version,omitempty" ignored:"true"`
 	LogLevel string `yaml:"log_level,omitempty" envconfig:"LOG_LEVEL"`
 	NoColor  bool   `yaml:"no_color,omitempty" envconfig:"NO_COLOR"`
 
@@ -44,12 +48,8 @@ type ConfigSpec struct { // nolint:golint
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 
-	TerraformCloudHost  string `yaml:"terraform_cloud_host,omitempty"`
-	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty"`
-
-	Projects ProjectSpec `yaml:"projects"`
-
-	Outputs []OutputSpec `yaml:"outputs"`
+	Projects ProjectSpec   `yaml:"projects" ignored:"true"`
+	Outputs  []*OutputSpec `yaml:"outputs" ignored:"true"`
 }
 
 var Config *ConfigSpec
@@ -104,9 +104,9 @@ func loadConfig(configFile string) error {
 		return err
 	}
 
-	err = envconfig.Process("", Config)
+	err = processEnvVars()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return nil
@@ -122,13 +122,11 @@ func defaultConfigSpec() *ConfigSpec {
 		DashboardAPIEndpoint:      "https://dashboard.api.infracost.io",
 
 		Projects: ProjectSpec{
-			Terraform: []TerraformProjectSpec{
-				{
-					Dir: ".",
-				},
+			Terraform: []*TerraformProjectSpec{
+				{},
 			},
 		},
-		Outputs: []OutputSpec{
+		Outputs: []*OutputSpec{
 			{
 				Format:  "table",
 				Columns: []string{"NAME", "MONTHLY_QUANTITY", "UNIT", "PRICE", "HOURLY_COST", "MONTHLY_COST"},
@@ -169,6 +167,22 @@ func loadDotEnv() error {
 
 	if fileExists(".env") {
 		err := godotenv.Load()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func processEnvVars() error {
+	err := envconfig.Process("", Config)
+	if err != nil {
+		return err
+	}
+
+	for _, project := range Config.Projects.Terraform {
+		err = envconfig.Process("", project)
 		if err != nil {
 			return err
 		}

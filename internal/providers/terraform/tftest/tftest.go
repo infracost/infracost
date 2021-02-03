@@ -157,7 +157,7 @@ func loadResources(project Project, usage map[string]*schema.UsageData) ([]*sche
 		return nil, err
 	}
 
-	provider := terraform.New(config.TerraformProjectSpec{
+	provider := terraform.New(&config.TerraformProjectSpec{
 		Dir: tfdir,
 	})
 

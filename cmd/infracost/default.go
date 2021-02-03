@@ -81,7 +81,7 @@ func loadDefaultCmdFlags(c *cli.Context) {
 	useProjectFlags := false
 	useOutputFlags := false
 
-	project := config.TerraformProjectSpec{}
+	project := &config.TerraformProjectSpec{}
 
 	if c.IsSet("tfdir") {
 		useProjectFlags = true
@@ -115,11 +115,11 @@ func loadDefaultCmdFlags(c *cli.Context) {
 
 	if useProjectFlags {
 		config.Config.Projects = config.ProjectSpec{
-			Terraform: []config.TerraformProjectSpec{project},
+			Terraform: []*config.TerraformProjectSpec{project},
 		}
 	}
 
-	output := config.OutputSpec{}
+	output := &config.OutputSpec{}
 
 	if c.IsSet("output") {
 		useOutputFlags = true
@@ -132,7 +132,7 @@ func loadDefaultCmdFlags(c *cli.Context) {
 	}
 
 	if useOutputFlags {
-		config.Config.Outputs = []config.OutputSpec{output}
+		config.Config.Outputs = []*config.OutputSpec{output}
 	}
 }
 
