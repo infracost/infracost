@@ -3,7 +3,7 @@
 The overall process for contributing to Infracost is:
 1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check; the issue labels should help you to find a good first issue, or new resources that others have already requested/liked.
 2. Create a new issue if there's no issue for what you want to work on. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback.
-3. Send a pull request with the proposed change (don't forget to run `make lint` and `make fmt` first). Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+3. Create a fork, commit and push to your fork. Send a pull request from your fork to this repo with the proposed change (don't forget to run `make lint` and `make fmt` first). Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 4. We'll review your change and provide feedback.
 
 ## Development
@@ -241,8 +241,8 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 1. In [here](https://github.com/infracost/infracost/actions), click on the "Go" build for the master branch, click on Build, expand Test, then use the "Search logs" box to find any line that has "Multiple products found", "No products found for" or "No prices found for". Update the resource files in question to fix these error, often it's because the price filters need to be adjusted to only return 1 result.
 2. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
-3. Wait for the GH Actions to complete, the [newly created tag](https://github.com/infracost/infracost/releases/latest) should have 6 assets.
-4. Click on the Edit release, add the release notes from the commits between this and the last release and click on publish.
+3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have 4 assets.
+4. Click on the Edit draft button, add the release notes from the commits between this and the last release and click on publish.
 5. Announce the release in the infracost-community Slack general channel. Then wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
 6. Update the docs repo with any required changes and supported resources.
 7. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
