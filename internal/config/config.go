@@ -33,9 +33,10 @@ type ProjectSpec struct {
 }
 
 type OutputSpec struct {
-	Format      string   `yaml:"format,omitempty"`
-	Columns     []string `yaml:"columns,omitempty"`
-	ShowSkipped bool     `yaml:"show_skipped,omitempty"`
+	Format      string   `yaml:"format,omitempty" ignored:"true"`
+	Columns     []string `yaml:"columns,omitempty" ignored:"true"`
+	ShowSkipped bool     `yaml:"show_skipped,omitempty" ignored:"true"`
+	Path        string   `yaml:"path,omitempty" ignored:"true"`
 }
 
 type ConfigSpec struct { // nolint:golint
@@ -43,10 +44,10 @@ type ConfigSpec struct { // nolint:golint
 	LogLevel string `yaml:"log_level,omitempty" envconfig:"LOG_LEVEL"`
 	NoColor  bool   `yaml:"no_color,omitempty" envconfig:"NO_COLOR"`
 
-	APIKey                    string `envconfig:"INFRACOST_API_KEY"`
-	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
-	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
-	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
+	APIKey                    string `envconfig:"API_KEY"`
+	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"PRICING_API_ENDPOINT"`
+	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"DEFAULT_PRICING_API_ENDPOINT"`
+	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"DASHBOARD_API_ENDPOINT"`
 
 	Projects ProjectSpec   `yaml:"projects" ignored:"true"`
 	Outputs  []*OutputSpec `yaml:"outputs" ignored:"true"`
@@ -176,13 +177,13 @@ func loadDotEnv() error {
 }
 
 func processEnvVars() error {
-	err := envconfig.Process("", Config)
+	err := envconfig.Process("INFRACOST_", Config)
 	if err != nil {
 		return err
 	}
 
 	for _, project := range Config.Projects.Terraform {
-		err = envconfig.Process("", project)
+		err = envconfig.Process("INFRACOST_", project)
 		if err != nil {
 			return err
 		}
