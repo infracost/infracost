@@ -48,7 +48,7 @@ func TestCodebuildProject(t *testing.T) {
 				{
 					Name:             "Linux (general1.medium)",
 					PriceHash:        "a26b218d7a04b4de7dc49fc899fcbf7f-a62d9273fef0987b8d1b9a67a508acdc",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},

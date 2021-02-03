@@ -20,21 +20,21 @@ func NewCodebuildProject(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	computeType := d.Get("environment.0.compute_type").String()
 	envType := d.Get("environment.0.type").String()
 
-	var monthlyBuildMinutes int64
+	var monthlyBuildMinutes *decimal.Decimal
 	if u != nil && u.Get("monthly_build_mins").Exists() {
-		monthlyBuildMinutes = u.Get("monthly_build_mins").Int()
+		monthlyBuildMinutes = decimalPtr(decimal.NewFromInt(u.Get("monthly_build_mins").Int()))
 	}
 
-	usageType := usageType(computeType, envType)
+	usageType := codeBuildUsageType(computeType, envType)
 
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:            amazonValidName(computeType, envType),
+				Name:            codeBuildNameLabel(computeType, envType),
 				Unit:            "minutes",
 				UnitMultiplier:  1,
-				MonthlyQuantity: decimalPtr(decimal.NewFromInt(monthlyBuildMinutes)),
+				MonthlyQuantity: monthlyBuildMinutes,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(region),
@@ -49,7 +49,7 @@ func NewCodebuildProject(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 }
 
-func amazonValidName(computeType string, envType string) string {
+func codeBuildNameLabel(computeType string, envType string) string {
 	name := ""
 	switch envType {
 	case "WINDOWS_SERVER_2019_CONTAINER":
@@ -67,14 +67,14 @@ func amazonValidName(computeType string, envType string) string {
 	return name
 }
 
-func usageType(computeType string, envType string) string {
-	envType = validEnvironmentType(envType)
-	computeType = validEnvironmentComputeType(computeType)
+func codeBuildUsageType(computeType string, envType string) string {
+	envType = codeBuildEnvType(envType)
+	computeType = codeBuildComputeType(computeType)
 
 	return "/" + envType + ":" + computeType + "/"
 }
 
-func validEnvironmentType(envType string) string {
+func codeBuildEnvType(envType string) string {
 	switch envType {
 	case "LINUX_CONTAINER":
 		return "Linux"
@@ -89,7 +89,7 @@ func validEnvironmentType(envType string) string {
 	}
 }
 
-func validEnvironmentComputeType(computeType string) string {
+func codeBuildComputeType(computeType string) string {
 	switch computeType {
 	case "BUILD_GENERAL1_SMALL":
 		return "g1.small"
