@@ -36,6 +36,9 @@ resource_usage:
     monthly_data_ingested_gb: 1000 # Data ingested by CloudWatch logs per month in GB.
     monthly_data_scanned_gb: 200   # Data scanned by CloudWatch logs insights per month in GB.
 
+  aws_codebuild_project.my_project: 
+    monthly_build_mins: 10000 # Total duration of builds during the month in minutes. Each build is rounded up to the nearest minute.
+
   aws_data_transfer.my_region:
     region: us-east-1                           # Region the data transfer is originating from.
     monthly_intra_region_gb: 1000               # Data transferred between availability zones in the region.
