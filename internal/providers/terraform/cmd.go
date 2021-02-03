@@ -16,7 +16,9 @@ import (
 )
 
 type CmdOptions struct {
+	TerraformBinary     string
 	TerraformDir        string
+	TerraformWorkspace  string
 	TerraformConfigFile string
 }
 
@@ -32,11 +34,15 @@ func (e *CmdError) Error() string {
 func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	os.Setenv("TF_IN_AUTOMATION", "true")
 
+	if opts.TerraformWorkspace != "" {
+		os.Setenv("TF_WORKSPACE", opts.TerraformWorkspace)
+	}
+
 	if opts.TerraformConfigFile != "" {
 		os.Setenv("TF_CLI_CONFIG_FILE", opts.TerraformConfigFile)
 	}
 
-	exe := config.Environment.TerraformBinary
+	exe := opts.TerraformBinary
 	cmd := exec.Command(exe, args...)
 	log.Infof("Running command: %s", cmd.String())
 	cmd.Dir = opts.TerraformDir
@@ -120,8 +126,8 @@ func (w *cmdLogWriter) Flush() {
 	}
 }
 
-func CreateConfigFile(tfdir string) (string, error) {
-	if config.Config.TerraformCloudToken == "" {
+func CreateConfigFile(project *config.TerraformProjectSpec) (string, error) {
+	if project.TerraformCloudToken == "" {
 		return "", nil
 	}
 
@@ -136,7 +142,7 @@ func CreateConfigFile(tfdir string) (string, error) {
 		path := os.Getenv("TF_CLI_CONFIG_FILE")
 
 		if !filepath.IsAbs(path) {
-			path, err = filepath.Abs(filepath.Join(tfdir, os.Getenv("TF_CLI_CONFIG_FILE")))
+			path, err = filepath.Abs(filepath.Join(project.Dir, os.Getenv("TF_CLI_CONFIG_FILE")))
 			if err != nil {
 				return tmpFile.Name(), err
 			}
@@ -154,7 +160,7 @@ func CreateConfigFile(tfdir string) (string, error) {
 	}
 	defer f.Close()
 
-	host := config.Config.TerraformCloudHost
+	host := project.TerraformCloudHost
 	if host == "" {
 		host = "app.terraform.io"
 	}
@@ -162,7 +168,7 @@ func CreateConfigFile(tfdir string) (string, error) {
 	contents := fmt.Sprintf(`credentials "%s" {
 	token = "%s"
 }
-`, host, config.Config.TerraformCloudToken)
+`, host, project.TerraformCloudToken)
 
 	log.Debugf("Writing Terraform credentials to temporary config file %s", tmpFile.Name())
 	if _, err := f.WriteString(contents); err != nil {
