@@ -14,59 +14,112 @@ import (
 	"github.com/infracost/infracost/internal/spin"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
 func defaultCmd() *cli.Command {
-	return &cli.Command{
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:      "tfjson",
-				Usage:     "Path to Terraform plan JSON file",
-				TakesFile: true,
-			},
-			&cli.StringFlag{
-				Name:      "tfplan",
-				Usage:     "Path to Terraform plan file relative to 'tfdir'",
-				TakesFile: true,
-			},
-			&cli.BoolFlag{
-				Name:  "use-tfstate",
-				Usage: "Use Terraform state instead of generating a plan",
-				Value: false,
-			},
-			&cli.StringFlag{
-				Name:        "tfdir",
-				Usage:       "Path to the Terraform code directory",
-				TakesFile:   true,
-				DefaultText: "current working directory",
-			},
-			&cli.StringFlag{
-				Name:  "tfflags",
-				Usage: "Flags to pass to the 'terraform plan' command",
-			},
-			&cli.StringFlag{
-				Name:    "output",
-				Aliases: []string{"o"},
-				Usage:   "Output output: json, table, html",
-				Value:   "table",
-			},
-			&cli.BoolFlag{
-				Name:  "show-skipped",
-				Usage: "Show unsupported resources, some of which might be free. Only for table and HTML output format",
-				Value: false,
-			},
-			&cli.StringFlag{
-				Name:      "usage-file",
-				Usage:     "Path to Infracost usage file that specifies values for usage-based resources",
-				TakesFile: true,
-			},
+	deprecatedFlags := []cli.Flag{
+		&cli.StringFlag{
+			Name:      "tfjson",
+			Usage:     "Path to Terraform plan JSON file",
+			TakesFile: true,
+			Hidden:    true,
 		},
+		&cli.StringFlag{
+			Name:      "tfplan",
+			Usage:     "Path to Terraform plan file relative to 'tfdir'",
+			TakesFile: true,
+			Hidden:    true,
+		},
+		&cli.BoolFlag{
+			Name:   "use-tfstate",
+			Usage:  "Use Terraform state instead of generating a plan",
+			Value:  false,
+			Hidden: true,
+		},
+		&cli.StringFlag{
+			Name:        "tfdir",
+			Usage:       "Path to the Terraform code directory",
+			TakesFile:   true,
+			DefaultText: "current working directory",
+			Hidden:      true,
+		},
+		&cli.StringFlag{
+			Name:   "tfflags",
+			Usage:  "Flags to pass to the 'terraform plan' command",
+			Hidden: true,
+		},
+		&cli.StringFlag{
+			Name:   "output",
+			Usage:  "Output format: json, table, html",
+			Value:  "table",
+			Hidden: true,
+		},
+	}
+
+	deprecatedFlagsMapping := map[string]string{
+		"tfjson":      "terraform-json-file",
+		"tfplan":      "terraform-plan-file",
+		"use-tfstate": "terraform-use-state",
+		"tfdir":       "terraform-dir",
+		"tfflags":     "terraform-plan-flags",
+		"output":      "format",
+		"o":           "format",
+	}
+
+	flags := append(deprecatedFlags,
+		&cli.StringFlag{
+			Name:      "terraform-json-file",
+			Usage:     "Path to Terraform plan JSON file",
+			TakesFile: true,
+		},
+		&cli.StringFlag{
+			Name:      "terraform-plan-file",
+			Usage:     "Path to Terraform plan file relative to 'terraform-dir'",
+			TakesFile: true,
+		},
+		&cli.BoolFlag{
+			Name:  "terraform-use-state",
+			Usage: "Use Terraform state instead of generating a plan",
+			Value: false,
+		},
+		&cli.StringFlag{
+			Name:        "terraform-dir",
+			Usage:       "Path to the Terraform code directory",
+			TakesFile:   true,
+			DefaultText: "current working directory",
+		},
+		&cli.StringFlag{
+			Name:  "terraform-plan-flags",
+			Usage: "Flags to pass to the 'terraform plan' command",
+		},
+		&cli.StringFlag{
+			Name:   "format",
+			Usage:  "Output format: json, table, html",
+			Value:  "table",
+			Hidden: true,
+		},
+		&cli.BoolFlag{
+			Name:  "show-skipped",
+			Usage: "Show unsupported resources, some of which might be free. Only for table and HTML output format",
+			Value: false,
+		},
+		&cli.StringFlag{
+			Name:      "usage-file",
+			Usage:     "Path to Infracost usage file that specifies values for usage-based resources",
+			TakesFile: true,
+		},
+	)
+
+	return &cli.Command{
+		Flags: flags,
 		Action: func(c *cli.Context) error {
 			if err := checkAPIKey(); err != nil {
 				return err
 			}
 
+			handleDeprecatedFlags(c, deprecatedFlagsMapping)
 			loadDefaultCmdFlags(c)
 			err := checkUsageErrors()
 			if err != nil {
@@ -78,35 +131,55 @@ func defaultCmd() *cli.Command {
 	}
 }
 
+func handleDeprecatedFlags(c *cli.Context, deprecatedFlagsMapping map[string]string) {
+	for _, flagName := range c.FlagNames() {
+		if newName, ok := deprecatedFlagsMapping[flagName]; ok {
+			m := fmt.Sprintf("Flag --%s is deprecated and will be removed in v0.8.0.", flagName)
+			if newName != "" {
+				m += fmt.Sprintf(" Please use --%s.", newName)
+			}
+
+			usageWarning(m)
+
+			if !c.IsSet(newName) {
+				err := c.Set(newName, c.String(flagName))
+				if err != nil {
+					log.Debugf("Error setting flag %s from %s", newName, flagName)
+				}
+			}
+		}
+	}
+}
+
 func loadDefaultCmdFlags(c *cli.Context) {
 	useProjectFlags := false
 	useOutputFlags := false
 
 	project := &config.TerraformProjectSpec{}
 
-	if c.IsSet("tfdir") {
+	if c.IsSet("terraform-dir") {
 		useProjectFlags = true
-		project.Dir = c.String("tfdir")
+		project.Dir = c.String("terraform-dir")
 	}
 
-	if c.IsSet("tfplan") {
+	if c.IsSet("terraform-plan-file") {
 		useProjectFlags = true
-		project.PlanFile = c.String("tfplan")
+		project.PlanFile = c.String("terraform-plan-file")
 	}
 
-	if c.IsSet("tfjson") {
+	if c.IsSet("terraform-json-file") {
 		useProjectFlags = true
-		project.JSONFile = c.String("tfjson")
+		project.JSONFile = c.String("terraform-json-file")
 	}
 
-	if c.IsSet("use-tfstate") {
+	if c.IsSet("terraform-use-state") {
 		useProjectFlags = true
-		project.UseState = c.Bool("use-tfstate")
+		project.UseState = c.Bool("terraform-use-state")
 	}
 
-	if c.IsSet("tfflags") {
+	if c.IsSet("terraform-plan-flags") {
 		useProjectFlags = true
-		project.PlanFlags = c.String("tfflags")
+		project.PlanFlags = c.String("terraform-plan-flags")
 	}
 
 	if c.IsSet("usage-file") {
@@ -122,9 +195,9 @@ func loadDefaultCmdFlags(c *cli.Context) {
 
 	output := &config.OutputSpec{}
 
-	if c.IsSet("output") {
+	if c.IsSet("format") {
 		useOutputFlags = true
-		output.Format = c.String("output")
+		output.Format = c.String("format")
 	}
 
 	if c.IsSet("show-skipped") {
