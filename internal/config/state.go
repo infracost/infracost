@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 )
@@ -13,6 +14,13 @@ type StateSpec struct {
 }
 
 var State *StateSpec
+
+func init() {
+	err := loadState()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func loadState() error {
 	var err error

@@ -51,6 +51,8 @@ func setupConfig(c *cli.Context) error {
 		config.Config.PricingAPIEndpoint = c.String("pricing-api-endpoint")
 	}
 
+	config.Environment.Flags = c.FlagNames()
+
 	return nil
 }
 
@@ -66,14 +68,7 @@ func startUpdateCheck(c chan *update.Info) {
 }
 
 func versionOutput(app *cli.App) string {
-	s := fmt.Sprintf("Infracost %s", app.Version)
-	v := config.Environment.TerraformFullVersion
-
-	if v != "" {
-		s += fmt.Sprintf("\n%s", v)
-	}
-
-	return s
+	return fmt.Sprintf("Infracost %s", app.Version)
 }
 
 func checkAPIKey() error {
@@ -105,6 +100,7 @@ func main() {
 	}
 
 	updateMessageChan := make(chan *update.Info)
+	startUpdateCheck(updateMessageChan)
 
 	app := &cli.App{
 		Name:  "infracost",
@@ -148,15 +144,7 @@ DOCS: https://infracost.io/docs`,
 			usageError(c, err.Error())
 			return nil
 		},
-		Before: func(c *cli.Context) error {
-			err := setupConfig(c)
-			if err != nil {
-				return err
-			}
-			startUpdateCheck(updateMessageChan)
-
-			return err
-		},
+		Before:   setupConfig,
 		Commands: []*cli.Command{registerCmd(), reportCmd()},
 		Action:   defaultCmd.Action,
 	}

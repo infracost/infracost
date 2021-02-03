@@ -155,41 +155,41 @@ func loadDefaultCmdFlags(c *cli.Context) {
 	useProjectFlags := false
 	useOutputFlags := false
 
-	project := &config.TerraformProjectSpec{}
+	projectConfig := &config.TerraformProjectSpec{}
 
 	if c.IsSet("terraform-dir") {
 		useProjectFlags = true
-		project.Dir = c.String("terraform-dir")
+		projectConfig.Dir = c.String("terraform-dir")
 	}
 
 	if c.IsSet("terraform-plan-file") {
 		useProjectFlags = true
-		project.PlanFile = c.String("terraform-plan-file")
+		projectConfig.PlanFile = c.String("terraform-plan-file")
 	}
 
 	if c.IsSet("terraform-json-file") {
 		useProjectFlags = true
-		project.JSONFile = c.String("terraform-json-file")
+		projectConfig.JSONFile = c.String("terraform-json-file")
 	}
 
 	if c.IsSet("terraform-use-state") {
 		useProjectFlags = true
-		project.UseState = c.Bool("terraform-use-state")
+		projectConfig.UseState = c.Bool("terraform-use-state")
 	}
 
 	if c.IsSet("terraform-plan-flags") {
 		useProjectFlags = true
-		project.PlanFlags = c.String("terraform-plan-flags")
+		projectConfig.PlanFlags = c.String("terraform-plan-flags")
 	}
 
 	if c.IsSet("usage-file") {
 		useProjectFlags = true
-		project.UsageFile = c.String("usage-file")
+		projectConfig.UsageFile = c.String("usage-file")
 	}
 
 	if useProjectFlags {
 		config.Config.Projects = config.ProjectSpec{
-			Terraform: []*config.TerraformProjectSpec{project},
+			Terraform: []*config.TerraformProjectSpec{projectConfig},
 		}
 	}
 
@@ -211,16 +211,16 @@ func loadDefaultCmdFlags(c *cli.Context) {
 }
 
 func checkUsageErrors() error {
-	for _, project := range config.Config.Projects.Terraform {
-		if project.UseState && (project.PlanFile != "" || project.JSONFile != "") {
+	for _, projectConfig := range config.Config.Projects.Terraform {
+		if projectConfig.UseState && (projectConfig.PlanFile != "" || projectConfig.JSONFile != "") {
 			return errors.New("The use state option cannot be used with the Terraform plan or Terraform JSON options")
 		}
 
-		if project.JSONFile != "" && project.PlanFile != "" {
+		if projectConfig.JSONFile != "" && projectConfig.PlanFile != "" {
 			return errors.New("Please provide either a Terraform Plan JSON file or a Terraform Plan file")
 		}
 
-		if project.Dir != "" && project.JSONFile != "" {
+		if projectConfig.Dir != "" && projectConfig.JSONFile != "" {
 			usageWarning("Warning: Terraform directory is ignored if Terraform JSON is used")
 			return nil
 		}
@@ -240,10 +240,12 @@ func defaultMain() error {
 
 	resources := make([]*schema.Resource, 0)
 
-	for _, project := range config.Config.Projects.Terraform {
-		provider := terraform.New(project)
+	for _, projectConfig := range config.Config.Projects.Terraform {
+		config.LoadTerraformEnvironment(projectConfig)
 
-		u, err := usage.LoadFromFile(project.UsageFile)
+		provider := terraform.New(projectConfig)
+
+		u, err := usage.LoadFromFile(projectConfig.UsageFile)
 		if err != nil {
 			return err
 		}
@@ -295,6 +297,8 @@ func defaultMain() error {
 	r := output.ToOutputFormat(resources)
 
 	for _, outputConfig := range config.Config.Outputs {
+		config.LoadOutputEnvironment(outputConfig)
+
 		var (
 			b   []byte
 			out string

@@ -26,13 +26,13 @@ import (
 var minTerraformVer = "v0.12"
 
 type terraformProvider struct {
-	project *config.TerraformProjectSpec
+	config *config.TerraformProjectSpec
 }
 
 // New returns new Terraform Provider.
-func New(project *config.TerraformProjectSpec) schema.Provider {
+func New(projectConfig *config.TerraformProjectSpec) schema.Provider {
 	return &terraformProvider{
-		project: project,
+		config: projectConfig,
 	}
 }
 
@@ -42,7 +42,7 @@ func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) ([
 	var err error
 	var j []byte
 
-	if p.project.UseState {
+	if p.config.UseState {
 		j, err = p.generateStateJSON()
 	} else {
 		j, err = p.loadPlanJSON()
@@ -60,11 +60,11 @@ func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) ([
 }
 
 func (p *terraformProvider) loadPlanJSON() ([]byte, error) {
-	if p.project.JSONFile == "" {
+	if p.config.JSONFile == "" {
 		return p.generatePlanJSON()
 	}
 
-	out, err := ioutil.ReadFile(p.project.JSONFile)
+	out, err := ioutil.ReadFile(p.config.JSONFile)
 	if err != nil {
 		return []byte{}, errors.Wrap(err, "Error reading Terraform plan file")
 	}
@@ -103,11 +103,11 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	if p.project.PlanFile == "" {
+	if p.config.PlanFile == "" {
 
 		var planJSON []byte
-		p.project.PlanFile, planJSON, err = p.runPlan(opts, p.project.PlanFlags, true)
-		defer os.Remove(p.project.PlanFile)
+		p.config.PlanFile, planJSON, err = p.runPlan(opts, p.config.PlanFlags, true)
+		defer os.Remove(p.config.PlanFile)
 
 		if err != nil {
 			return []byte{}, err
@@ -118,17 +118,17 @@ func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
 		}
 	}
 
-	return p.runShow(opts, p.project.PlanFile)
+	return p.runShow(opts, p.config.PlanFile)
 }
 
 func (p *terraformProvider) setupOpts() (*CmdOptions, error) {
 	opts := &CmdOptions{
 		TerraformBinary:    p.Binary(),
-		TerraformWorkspace: p.project.Workspace,
+		TerraformWorkspace: p.config.Workspace,
 		TerraformDir:       p.Dir(),
 	}
 
-	configFile, err := CreateConfigFile(p.project)
+	configFile, err := CreateConfigFile(p.config)
 	if err != nil {
 		return opts, err
 	}
@@ -139,23 +139,23 @@ func (p *terraformProvider) setupOpts() (*CmdOptions, error) {
 }
 
 func (p *terraformProvider) Binary() string {
-	if p.project.Binary == "" {
+	if p.config.Binary == "" {
 		return "terraform"
 	}
 
-	return p.project.Binary
+	return p.config.Binary
 }
 
 func (p *terraformProvider) Dir() string {
-	if p.project.Dir == "" {
+	if p.config.Dir == "" {
 		return "."
 	}
 
-	return p.project.Dir
+	return p.config.Dir
 }
 
 func (p *terraformProvider) terraformPreChecks() error {
-	if p.project.JSONFile == "" {
+	if p.config.JSONFile == "" {
 		_, err := exec.LookPath(p.Binary())
 		if err != nil {
 			msg := fmt.Sprintf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary in your Infracost config or using the environment variable TERRAFORM_BINARY.", p.Binary())
@@ -273,7 +273,7 @@ func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFa
 }
 
 func (p *terraformProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
-	if !checkCloudConfigSet(p.project) {
+	if !checkCloudConfigSet(p.config) {
 		return []byte{}, ErrMissingCloudToken
 	}
 
@@ -296,7 +296,7 @@ func (p *terraformProvider) runRemotePlan(opts *CmdOptions, args []string) ([]by
 	s := strings.Split(u.Path, "/")
 	runID := s[len(s)-1]
 
-	token := p.project.TerraformCloudToken
+	token := p.config.TerraformCloudToken
 	if token == "" {
 		token = findCloudToken(host)
 	}

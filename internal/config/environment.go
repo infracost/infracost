@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
@@ -15,47 +14,59 @@ import (
 )
 
 type EnvironmentSpec struct {
-	Version     string `json:"version"`
-	FullVersion string `json:"fullVersion"`
-	IsTest      bool   `json:"isTest"`
-	IsDev       bool   `json:"isDev"`
-	OS          string `json:"os"`
-	CIPlatform  string `json:"ciPlatform,omitempty"`
-	CIScript    string `json:"ciScript,omitempty"`
-
-	TerraformRemoteExecutionModeEnabled bool `json:"terraformRemoteExecutionModeEnabled"`
-	TerraformInfracostProviderEnabled   bool `json:"terraformInfracostProviderEnabled"`
-	IsAWSChina                          bool `json:"isAwsChina"`
-	HasConfigFile                       bool `json:"HasConfigFile"`
-	HasUsageFile                        bool `json:"hasUsageFile"`
-
-	Flags                []string `json:"flags"`
-	OutputFormat         string   `json:"outputFormat"`
-	TerraformBinary      string   `json:"terraformBinary"`
-	TerraformFullVersion string   `json:"terraformFullVersion"`
-	TerraformVersion     string   `json:"terraformVersion"`
+	Version                             string   `json:"version"`
+	FullVersion                         string   `json:"fullVersion"`
+	IsTest                              bool     `json:"isTest"`
+	IsDev                               bool     `json:"isDev"`
+	OS                                  string   `json:"os"`
+	CIPlatform                          string   `json:"ciPlatform,omitempty"`
+	CIScript                            string   `json:"ciScript,omitempty"`
+	Flags                               []string `json:"flags"`
+	OutputFormat                        string   `json:"outputFormat"`
+	TerraformBinary                     string   `json:"terraformBinary"`
+	TerraformFullVersion                string   `json:"terraformFullVersion"`
+	TerraformVersion                    string   `json:"terraformVersion"`
+	TerraformRemoteExecutionModeEnabled bool     `json:"terraformRemoteExecutionModeEnabled"`
+	TerraformInfracostProviderEnabled   bool     `json:"terraformInfracostProviderEnabled"`
+	IsAWSChina                          bool     `json:"isAwsChina"`
+	HasConfigFile                       bool     `json:"HasConfigFile"`
+	HasUsageFile                        bool     `json:"hasUsageFile"`
 }
 
 var Environment *EnvironmentSpec
 
-func loadEnvironment() {
+func init() {
+	loadInitialEnvironment()
+}
+
+func loadInitialEnvironment() {
 	Environment = &EnvironmentSpec{
-		Version:                             baseVersion(version.Version),
-		FullVersion:                         version.Version,
-		Flags:                               []string{},
-		OutputFormat:                        "",
-		IsTest:                              isTest(),
-		IsDev:                               isDev(),
-		OS:                                  runtime.GOOS,
-		CIPlatform:                          ciPlatform(),
-		CIScript:                            ciScript(),
-		TerraformBinary:                     filepath.Base(terraformBinary()),
-		TerraformFullVersion:                terraformFullVersion(),
-		TerraformVersion:                    terraformVersion(),
-		TerraformRemoteExecutionModeEnabled: false,
-		TerraformInfracostProviderEnabled:   false,
-		IsAWSChina:                          false,
+		Version:     baseVersion(version.Version),
+		FullVersion: version.Version,
+		IsTest:      isTest(),
+		IsDev:       isDev(),
+		OS:          runtime.GOOS,
+		CIPlatform:  ciPlatform(),
+		CIScript:    ciScript(),
 	}
+}
+
+func LoadTerraformEnvironment(projectConfig *TerraformProjectSpec) {
+	binary := projectConfig.Binary
+	if binary == "" {
+		binary = "terraform"
+	}
+	out, _ := exec.Command(binary, "-version").Output()
+	fullVersion := strings.SplitN(string(out), "\n", 2)[0]
+	version := terraformVersion(fullVersion)
+
+	Environment.TerraformBinary = binary
+	Environment.TerraformFullVersion = fullVersion
+	Environment.TerraformVersion = version
+}
+
+func LoadOutputEnvironment(outputConfig *OutputSpec) {
+	Environment.OutputFormat = outputConfig.Format
 }
 
 func userAgent() string {
@@ -72,25 +83,8 @@ func baseVersion(v string) string {
 	return strings.SplitN(v, "+", 2)[0]
 }
 
-func terraformBinary() string {
-	terraformBinary := os.Getenv("TERRAFORM_BINARY")
-	if terraformBinary == "" {
-		terraformBinary = "terraform"
-	}
-	return terraformBinary
-}
-
-func terraformFullVersion() string {
-	exe := terraformBinary()
-	out, _ := exec.Command(exe, "-version").Output()
-
-	return strings.SplitN(string(out), "\n", 2)[0]
-}
-
-func terraformVersion() string {
-	v := terraformFullVersion()
-
-	p := strings.Split(v, " ")
+func terraformVersion(full string) string {
+	p := strings.Split(full, " ")
 	if len(p) > 1 {
 		return p[len(p)-1]
 	}
