@@ -84,12 +84,9 @@ func LoadConfig(configFile string) {
 		Config.APIKey = profile.APIKey
 	}
 
-	err = loadState()
-	if err != nil {
-		logrus.Fatal(err)
+	if len(Config.Projects.Terraform) > 0 {
+		LoadTerraformEnvironment(Config.Projects.Terraform[0])
 	}
-
-	loadEnvironment()
 }
 
 func loadConfig(configFile string) error {
