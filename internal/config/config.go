@@ -105,7 +105,7 @@ func (c *Config) LoadFromFile(configFile string) error {
 	}
 
 	if len(c.Projects.Terraform) > 0 {
-		c.Environment.LoadTerraformEnvironment(c.Projects.Terraform[0])
+		c.Environment.SetTerraformEnvironment(c.Projects.Terraform[0])
 	}
 
 	return nil
