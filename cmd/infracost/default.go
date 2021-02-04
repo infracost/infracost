@@ -238,7 +238,6 @@ func checkUsageErrors(cfg *config.Config) error {
 }
 
 func defaultMain(cfg *config.Config) error {
-
 	resources := make([]*schema.Resource, 0)
 
 	for _, projectCfg := range cfg.Projects.Terraform {

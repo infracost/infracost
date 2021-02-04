@@ -13,14 +13,14 @@ while IFS= read -r tfproject; do
   cd $tfproject
   filename=$(echo $tfproject | sed 's:/:-:g' | cut -c3-)
   # TODO: customize to how you run infracost
-  infracost --tfdir . --output json > "$filename-infracost-out.json"
+  infracost --terraform-dir . --format json > "$filename-infracost-out.json"
   cd - > /dev/null
 done <<< "$tfprojects"
 
 # Run infracost report to merge the subfolder results
 jsonfiles=$(find . -name "*-infracost-out.json")
-infracost report --output html $(echo $jsonfiles | tr '\n' ' ') > report.html
-infracost report --output table $(echo $jsonfiles | tr '\n' ' ')
+infracost report --format html $(echo $jsonfiles | tr '\n' ' ') > report.html
+infracost report --format table $(echo $jsonfiles | tr '\n' ' ')
 echo "Also saved HTML report in infracost-report.html"
 
 # Remove temp json files
