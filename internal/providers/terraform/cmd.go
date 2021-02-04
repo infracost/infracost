@@ -14,6 +14,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var defaultTerraformBinary = "terraform"
+
 type CmdOptions struct {
 	TerraformBinary     string
 	TerraformDir        string
@@ -42,6 +44,10 @@ func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	}
 
 	exe := opts.TerraformBinary
+	if exe == "" {
+		exe = defaultTerraformBinary
+	}
+
 	cmd := exec.Command(exe, args...)
 	log.Infof("Running command: %s", cmd.String())
 	cmd.Dir = opts.TerraformDir
