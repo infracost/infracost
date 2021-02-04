@@ -24,11 +24,10 @@ type Resource struct {
 }
 
 func CalculateCosts(state *State) {
-	for _, resources := range [][]*Resource{state.ExistingState.Resources, state.PlannedState.Resources} {
-		for _, r := range resources {
-			r.CalculateCosts()
-		}
+	for _, r := range state.AllResources() {
+		r.CalculateCosts()
 	}
+	state.CalculateTotalCosts()
 }
 
 func (r *Resource) CalculateCosts() {
@@ -93,11 +92,10 @@ func (r *Resource) RemoveCostComponent(costComponent *CostComponent) {
 }
 
 func SortResources(state *State) {
-	for _, resources := range [][]*Resource{state.ExistingState.Resources, state.PlannedState.Resources} {
-		sort.Slice(resources, func(i, j int) bool {
-			return resources[i].Name < resources[j].Name
-		})
-	}
+	resources := state.AllResources()
+	sort.Slice(resources, func(i, j int) bool {
+		return resources[i].Name < resources[j].Name
+	})
 
 }
 

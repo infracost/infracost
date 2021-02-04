@@ -103,64 +103,39 @@ func outputResource(r *schema.Resource) Resource {
 	}
 }
 
-func getResourceStateOutput(resourceState *schema.ResourcesState) ([]Resource, *decimal.Decimal, *decimal.Decimal) {
+func outputResourceState(resourceState *schema.ResourcesState) ResourceState {
 	resources := resourceState.Resources
 	arr := make([]Resource, 0, len(resources))
 
-	var totalHourlyCost *decimal.Decimal
-	var totalMonthlyCost *decimal.Decimal
-
-	for _, r := range resources {
+	for _, r := range resourceState.Resources {
 		if r.IsSkipped {
 			continue
 		}
 		arr = append(arr, outputResource(r))
-
-		if r.HourlyCost != nil {
-			if totalHourlyCost == nil {
-				totalHourlyCost = decimalPtr(decimal.Zero)
-			}
-
-			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*r.HourlyCost))
-		}
-		if r.MonthlyCost != nil {
-			if totalMonthlyCost == nil {
-				totalMonthlyCost = decimalPtr(decimal.Zero)
-			}
-
-			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*r.MonthlyCost))
-		}
 	}
 
-	return arr, totalHourlyCost, totalMonthlyCost
+	return ResourceState{
+		Resources:        arr,
+		TotalHourlyCost:  resourceState.TotalHourlyCost,
+		TotalMonthlyCost: resourceState.TotalMonthlyCost,
+	}
 }
 
 func ToOutputFormat(state *schema.State) Root {
 
-	exstArr, exstTotalHourlyCost, exstTotalMonthlyCost := getResourceStateOutput(state.ExistingState)
-	plndArr, plndTotalHourlyCost, plndTotalMonthlyCost := getResourceStateOutput(state.PlannedState)
-	diffArr, diffTotalHourlyCost, diffTotalMonthlyCost := getResourceStateOutput(state.Diff)
+	existingRS := outputResourceState(state.ExistingState)
+	plannedRS := outputResourceState(state.PlannedState)
+	diffRS := outputResourceState(state.Diff)
 
 	out := Root{
-		Resources:        plndArr,
-		TotalHourlyCost:  plndTotalHourlyCost,
-		TotalMonthlyCost: plndTotalMonthlyCost,
+		// Backward compatibility
+		Resources:        plannedRS.Resources,
+		TotalHourlyCost:  plannedRS.TotalHourlyCost,
+		TotalMonthlyCost: plannedRS.TotalMonthlyCost,
 
-		ExistingState: ResourceState{
-			Resources:        exstArr,
-			TotalHourlyCost:  exstTotalHourlyCost,
-			TotalMonthlyCost: exstTotalMonthlyCost,
-		},
-		PlannedState: ResourceState{
-			Resources:        plndArr,
-			TotalHourlyCost:  plndTotalHourlyCost,
-			TotalMonthlyCost: plndTotalMonthlyCost,
-		},
-		Diff: ResourceState{
-			Resources:        diffArr,
-			TotalHourlyCost:  diffTotalHourlyCost,
-			TotalMonthlyCost: diffTotalMonthlyCost,
-		},
+		ExistingState: existingRS,
+		PlannedState:  plannedRS,
+		Diff:          diffRS,
 		TimeGenerated: time.Now(),
 		ResourceSummary: BuildResourceSummary(state.PlannedState.Resources, ResourceSummaryOptions{
 			OnlyFields: []string{"UnsupportedCounts"},

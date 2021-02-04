@@ -15,29 +15,28 @@ import (
 
 func PopulatePrices(state *schema.State) error {
 	q := NewGraphQLQueryRunner()
+	resources := state.AllResources()
 
-	// TODO: It's not optimized at all. The processing time would be nearly 2x.
-	for _, resources := range [][]*schema.Resource{state.ExistingState.Resources, state.PlannedState.Resources} {
-		var wg sync.WaitGroup
-		wg.Add(1)
+	var wg sync.WaitGroup
+	wg.Add(1)
 
-		// TODO: Do we need to changthe routing of events? like some kind of aggregation?
-		go func() {
-			defer wg.Done()
-			summary := output.BuildResourceSummary(resources, output.ResourceSummaryOptions{
-				IncludeUnsupportedProviders: true,
-			})
+	go func() {
+		defer wg.Done()
+		// We stick just to planned state since we don't want to duplicate the summary for all states.
+		// otherwise we will count an unsupported resource 2 times.
+		summary := output.BuildResourceSummary(state.PlannedState.Resources, output.ResourceSummaryOptions{
+			IncludeUnsupportedProviders: true,
+		})
 
-			events.SendReport("resourceSummary", summary)
-		}()
+		events.SendReport("resourceSummary", summary)
+	}()
 
-		err := GetPricesConcurrent(resources, q)
-		if err != nil {
-			return err
-		}
-
-		wg.Wait()
+	err := GetPricesConcurrent(resources, q)
+	if err != nil {
+		return err
 	}
+
+	wg.Wait()
 
 	return nil
 }
