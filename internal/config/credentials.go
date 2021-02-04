@@ -4,7 +4,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
@@ -20,7 +22,7 @@ func loadCredentials(cfg *Config) error {
 
 	cfg.Credentials, err = readCredentialsFileIfExists()
 	if err != nil {
-		return err
+		return errors.New("Error parsing credentials YAML: " + strings.TrimPrefix(err.Error(), "yaml: "))
 	}
 
 	err = cfg.migrateCredentials()
