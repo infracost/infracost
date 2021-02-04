@@ -138,6 +138,8 @@ func (c *Config) loadConfigFile(configFile string) error {
 		}
 	}
 
+	c.Environment.HasConfigFile = true
+
 	data, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		return err

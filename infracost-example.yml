@@ -2,7 +2,7 @@
 # no_color: true
 
 terraform_defaults: &terraform-defaults
-  # binary: terraform | terragrunt
+  binary: terraform # terragrunt
   # workspace: dev
   # terraform_cloud_host: app.terraform.io
   # terraform_cloud_token: ABC
@@ -10,7 +10,7 @@ terraform_defaults: &terraform-defaults
 projects:
   # If using Terraform project directory
   terraform:
-    - "<<": *terraform-defaults
+    - <<: *terraform-defaults
       dir: examples/terraform
       # plan_flags: -var-file=dev.tfvars -var-file=us-east.tfvars
 
