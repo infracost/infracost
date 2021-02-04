@@ -8,10 +8,9 @@ import (
 	"strings"
 
 	"github.com/Masterminds/sprig"
-	"github.com/infracost/infracost/internal/config"
 )
 
-func ToHTML(out Root, opts Options, outputConfig *config.OutputSpec) ([]byte, error) {
+func ToHTML(out Root, opts Options) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -35,7 +34,7 @@ func ToHTML(out Root, opts Options, outputConfig *config.OutputSpec) ([]byte, er
 		return []byte{}, err
 	}
 
-	unsupportedResourcesMessage := out.unsupportedResourcesMessage(outputConfig.ShowSkipped)
+	unsupportedResourcesMessage := out.unsupportedResourcesMessage(opts.ShowSkipped)
 
 	err = tmpl.Execute(bufw, struct {
 		Root                        Root

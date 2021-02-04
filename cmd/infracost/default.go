@@ -18,7 +18,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func defaultCmd() *cli.Command {
+func defaultCmd(cfg *config.Config) *cli.Command {
 	deprecatedFlags := []cli.Flag{
 		&cli.StringFlag{
 			Name:      "tfjson",
@@ -115,18 +115,18 @@ func defaultCmd() *cli.Command {
 	return &cli.Command{
 		Flags: flags,
 		Action: func(c *cli.Context) error {
-			if err := checkAPIKey(); err != nil {
+			if err := checkAPIKey(cfg.APIKey, cfg.PricingAPIEndpoint, cfg.DefaultPricingAPIEndpoint); err != nil {
 				return err
 			}
 
 			handleDeprecatedFlags(c, deprecatedFlagsMapping)
-			loadDefaultCmdFlags(c)
-			err := checkUsageErrors()
+			loadDefaultCmdFlags(cfg, c)
+			err := checkUsageErrors(cfg)
 			if err != nil {
 				usageError(c, err.Error())
 			}
 
-			return defaultMain()
+			return defaultMain(cfg)
 		},
 	}
 }
@@ -151,49 +151,49 @@ func handleDeprecatedFlags(c *cli.Context, deprecatedFlagsMapping map[string]str
 	}
 }
 
-func loadDefaultCmdFlags(c *cli.Context) {
+func loadDefaultCmdFlags(cfg *config.Config, c *cli.Context) {
 	useProjectFlags := false
 	useOutputFlags := false
 
-	projectConfig := &config.TerraformProjectSpec{}
+	projectCfg := &config.TerraformProject{}
 
 	if c.IsSet("terraform-dir") {
 		useProjectFlags = true
-		projectConfig.Dir = c.String("terraform-dir")
+		projectCfg.Dir = c.String("terraform-dir")
 	}
 
 	if c.IsSet("terraform-plan-file") {
 		useProjectFlags = true
-		projectConfig.PlanFile = c.String("terraform-plan-file")
+		projectCfg.PlanFile = c.String("terraform-plan-file")
 	}
 
 	if c.IsSet("terraform-json-file") {
 		useProjectFlags = true
-		projectConfig.JSONFile = c.String("terraform-json-file")
+		projectCfg.JSONFile = c.String("terraform-json-file")
 	}
 
 	if c.IsSet("terraform-use-state") {
 		useProjectFlags = true
-		projectConfig.UseState = c.Bool("terraform-use-state")
+		projectCfg.UseState = c.Bool("terraform-use-state")
 	}
 
 	if c.IsSet("terraform-plan-flags") {
 		useProjectFlags = true
-		projectConfig.PlanFlags = c.String("terraform-plan-flags")
+		projectCfg.PlanFlags = c.String("terraform-plan-flags")
 	}
 
 	if c.IsSet("usage-file") {
 		useProjectFlags = true
-		projectConfig.UsageFile = c.String("usage-file")
+		projectCfg.UsageFile = c.String("usage-file")
 	}
 
 	if useProjectFlags {
-		config.Config.Projects = config.ProjectSpec{
-			Terraform: []*config.TerraformProjectSpec{projectConfig},
+		cfg.Projects = config.Projects{
+			Terraform: []*config.TerraformProject{projectCfg},
 		}
 	}
 
-	output := &config.OutputSpec{}
+	output := &config.Output{}
 
 	if c.IsSet("format") {
 		useOutputFlags = true
@@ -206,27 +206,27 @@ func loadDefaultCmdFlags(c *cli.Context) {
 	}
 
 	if useOutputFlags {
-		config.Config.Outputs = []*config.OutputSpec{output}
+		cfg.Outputs = []*config.Output{output}
 	}
 }
 
-func checkUsageErrors() error {
-	for _, projectConfig := range config.Config.Projects.Terraform {
-		if projectConfig.UseState && (projectConfig.PlanFile != "" || projectConfig.JSONFile != "") {
+func checkUsageErrors(cfg *config.Config) error {
+	for _, projectCfg := range cfg.Projects.Terraform {
+		if projectCfg.UseState && (projectCfg.PlanFile != "" || projectCfg.JSONFile != "") {
 			return errors.New("The use state option cannot be used with the Terraform plan or Terraform JSON options")
 		}
 
-		if projectConfig.JSONFile != "" && projectConfig.PlanFile != "" {
+		if projectCfg.JSONFile != "" && projectCfg.PlanFile != "" {
 			return errors.New("Please provide either a Terraform Plan JSON file or a Terraform Plan file")
 		}
 
-		if projectConfig.Dir != "" && projectConfig.JSONFile != "" {
+		if projectCfg.Dir != "" && projectCfg.JSONFile != "" {
 			usageWarning("Warning: Terraform directory is ignored if Terraform JSON is used")
 			return nil
 		}
 	}
 
-	for _, output := range config.Config.Outputs {
+	for _, output := range cfg.Outputs {
 		if output.Format == "json" && output.ShowSkipped {
 			usageWarning("The show skipped option is not needed with JSON output as that always includes them.")
 			return nil
@@ -236,21 +236,21 @@ func checkUsageErrors() error {
 	return nil
 }
 
-func defaultMain() error {
+func defaultMain(cfg *config.Config) error {
 
 	resources := make([]*schema.Resource, 0)
 
-	for _, projectConfig := range config.Config.Projects.Terraform {
-		config.LoadTerraformEnvironment(projectConfig)
+	for _, projectCfg := range cfg.Projects.Terraform {
+		cfg.Environment.LoadTerraformEnvironment(projectCfg)
 
-		provider := terraform.New(projectConfig)
+		provider := terraform.New(cfg, projectCfg)
 
-		u, err := usage.LoadFromFile(projectConfig.UsageFile)
+		u, err := usage.LoadFromFile(projectCfg.UsageFile)
 		if err != nil {
 			return err
 		}
 		if len(u) > 0 {
-			config.Environment.HasUsageFile = true
+			cfg.Environment.HasUsageFile = true
 		}
 
 		r, err := provider.LoadResources(u)
@@ -260,9 +260,13 @@ func defaultMain() error {
 		resources = append(resources, r...)
 	}
 
-	spinner = spin.NewSpinner("Calculating cost estimate")
+	spinnerOpts := spin.Options{
+		EnableLogging: cfg.IsLogging(),
+		NoColor:       cfg.NoColor,
+	}
+	spinner := spin.NewSpinner("Calculating cost estimate", spinnerOpts)
 
-	if err := prices.PopulatePrices(resources); err != nil {
+	if err := prices.PopulatePrices(cfg, resources); err != nil {
 		spinner.Fail()
 
 		red := color.New(color.FgHiRed)
@@ -293,11 +297,15 @@ func defaultMain() error {
 
 	schema.SortResources(resources)
 
-	opts := output.Options{}
 	r := output.ToOutputFormat(resources)
 
-	for _, outputConfig := range config.Config.Outputs {
-		config.LoadOutputEnvironment(outputConfig)
+	for _, outputCfg := range cfg.Outputs {
+		cfg.Environment.LoadOutputEnvironment(outputCfg)
+
+		opts := output.Options{
+			ShowSkipped: outputCfg.ShowSkipped,
+			NoColor:     cfg.NoColor,
+		}
 
 		var (
 			b   []byte
@@ -305,15 +313,15 @@ func defaultMain() error {
 			err error
 		)
 
-		switch strings.ToLower(outputConfig.Format) {
+		switch strings.ToLower(outputCfg.Format) {
 		case "json":
-			b, err = output.ToJSON(r)
+			b, err = output.ToJSON(r, opts)
 			out = string(b)
 		case "html":
-			b, err = output.ToHTML(r, opts, outputConfig)
+			b, err = output.ToHTML(r, opts)
 			out = string(b)
 		default:
-			b, err = output.ToTable(r, outputConfig)
+			b, err = output.ToTable(r, opts)
 			out = fmt.Sprintf("\n%s", string(b))
 		}
 
@@ -321,8 +329,8 @@ func defaultMain() error {
 			return errors.Wrap(err, "Error generating output")
 		}
 
-		if outputConfig.Path != "" {
-			err := ioutil.WriteFile(outputConfig.Path, []byte(out), 0644) // nolint:gosec
+		if outputCfg.Path != "" {
+			err := ioutil.WriteFile(outputCfg.Path, []byte(out), 0644) // nolint:gosec
 			if err != nil {
 				return errors.Wrap(err, "Error saving output")
 			}

@@ -14,7 +14,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type TerraformProjectSpec struct {
+type TerraformProject struct {
 	Name                string `yaml:"name,omitempty" ignored:"true"`
 	Binary              string `yaml:"binary,omitempty" envconfig:"TERRAFORM_BINARY"`
 	Workspace           string `yaml:"workspace,omitempty" envconfig:"TERRAFORM_WORKSPACE"`
@@ -28,18 +28,21 @@ type TerraformProjectSpec struct {
 	UseState            bool   `yaml:"use_state,omitempty" ignored:"true"`
 }
 
-type ProjectSpec struct {
-	Terraform []*TerraformProjectSpec `yaml:"terraform,omitempty"`
+type Projects struct {
+	Terraform []*TerraformProject `yaml:"terraform,omitempty"`
 }
 
-type OutputSpec struct {
+type Output struct {
 	Format      string   `yaml:"format,omitempty" ignored:"true"`
 	Columns     []string `yaml:"columns,omitempty" ignored:"true"`
 	ShowSkipped bool     `yaml:"show_skipped,omitempty" ignored:"true"`
 	Path        string   `yaml:"path,omitempty" ignored:"true"`
 }
 
-type ConfigSpec struct { // nolint:golint
+type Config struct { // nolint:golint
+	Environment *Environment
+	Credentials Credentials
+
 	Version  string `yaml:"version,omitempty" ignored:"true"`
 	LogLevel string `yaml:"log_level,omitempty" envconfig:"LOG_LEVEL"`
 	NoColor  bool   `yaml:"no_color,omitempty" envconfig:"NO_COLOR"`
@@ -49,69 +52,21 @@ type ConfigSpec struct { // nolint:golint
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"DASHBOARD_API_ENDPOINT"`
 
-	Projects ProjectSpec   `yaml:"projects" ignored:"true"`
-	Outputs  []*OutputSpec `yaml:"outputs" ignored:"true"`
+	Projects Projects  `yaml:"projects" ignored:"true"`
+	Outputs  []*Output `yaml:"outputs" ignored:"true"`
 }
 
-var Config *ConfigSpec
-
-func LoadConfig(configFile string) {
-	var err error
-
-	err = loadConfig(configFile)
+func init() {
+	err := loadDotEnv()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	err = ConfigureLogger()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = loadCredentials()
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	err = migrateCredentials()
-	if err != nil {
-		logrus.Debug("Error migrating credentials")
-		logrus.Debug(err)
-	}
-
-	profile, ok := Credentials[Config.PricingAPIEndpoint]
-	if ok && Config.APIKey == "" {
-		Config.APIKey = profile.APIKey
-	}
-
-	if len(Config.Projects.Terraform) > 0 {
-		LoadTerraformEnvironment(Config.Projects.Terraform[0])
-	}
 }
 
-func loadConfig(configFile string) error {
-	Config = defaultConfigSpec()
+func DefaultConfig() *Config {
+	return &Config{
+		Environment: NewEnvironment(),
 
-	err := mergeConfigFileIfExists(configFile)
-	if err != nil {
-		return err
-	}
-
-	err = loadDotEnv()
-	if err != nil {
-		return err
-	}
-
-	err = processEnvVars()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func defaultConfigSpec() *ConfigSpec {
-	return &ConfigSpec{
 		LogLevel: "",
 		NoColor:  false,
 
@@ -119,12 +74,12 @@ func defaultConfigSpec() *ConfigSpec {
 		PricingAPIEndpoint:        "https://pricing.api.infracost.io",
 		DashboardAPIEndpoint:      "https://dashboard.api.infracost.io",
 
-		Projects: ProjectSpec{
-			Terraform: []*TerraformProjectSpec{
+		Projects: Projects{
+			Terraform: []*TerraformProject{
 				{},
 			},
 		},
-		Outputs: []*OutputSpec{
+		Outputs: []*Output{
 			{
 				Format:  "table",
 				Columns: []string{"NAME", "MONTHLY_QUANTITY", "UNIT", "PRICE", "HOURLY_COST", "MONTHLY_COST"},
@@ -133,7 +88,44 @@ func defaultConfigSpec() *ConfigSpec {
 	}
 }
 
-func mergeConfigFileIfExists(configFile string) error {
+func (c *Config) LoadFromFile(configFile string) error {
+	err := c.loadConfigFile(configFile)
+	if err != nil {
+		return err
+	}
+
+	err = c.loadEnvVars()
+	if err != nil {
+		return err
+	}
+
+	err = loadCredentials(c)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	if len(c.Projects.Terraform) > 0 {
+		c.Environment.LoadTerraformEnvironment(c.Projects.Terraform[0])
+	}
+
+	return nil
+}
+
+func (c *Config) LoadFromEnv() error {
+	err := c.loadEnvVars()
+	if err != nil {
+		return err
+	}
+
+	err = c.ConfigureLogger()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Config) loadConfigFile(configFile string) error {
 	if configFile != "" && !fileExists(configFile) {
 		return fmt.Errorf("Config file does not exist at %s", configFile)
 	}
@@ -151,7 +143,59 @@ func mergeConfigFileIfExists(configFile string) error {
 		return err
 	}
 
-	return yaml.Unmarshal(data, Config)
+	return yaml.Unmarshal(data, c)
+}
+
+func (c *Config) loadEnvVars() error {
+	err := envconfig.Process("INFRACOST", c)
+	if err != nil {
+		return err
+	}
+
+	for _, project := range c.Projects.Terraform {
+		err = envconfig.Process("INFRACOST", project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *Config) ConfigureLogger() error {
+	logrus.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp: true,
+		DisableColors: true,
+		SortingFunc: func(keys []string) {
+			// Put message at the end
+			for i, key := range keys {
+				if key == "msg" && i != len(keys)-1 {
+					keys[i], keys[len(keys)-1] = keys[len(keys)-1], keys[i]
+					break
+				}
+			}
+		},
+	})
+
+	if c.LogLevel == "" {
+		logrus.SetOutput(ioutil.Discard)
+		return nil
+	}
+
+	logrus.SetOutput(os.Stderr)
+
+	level, err := logrus.ParseLevel(c.LogLevel)
+	if err != nil {
+		return err
+	}
+
+	logrus.SetLevel(level)
+
+	return nil
+}
+
+func (c *Config) IsLogging() bool {
+	return c.LogLevel != ""
 }
 
 func loadDotEnv() error {
@@ -171,58 +215,6 @@ func loadDotEnv() error {
 	}
 
 	return nil
-}
-
-func processEnvVars() error {
-	err := envconfig.Process("INFRACOST_", Config)
-	if err != nil {
-		return err
-	}
-
-	for _, project := range Config.Projects.Terraform {
-		err = envconfig.Process("INFRACOST_", project)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func ConfigureLogger() error {
-	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-		DisableColors: true,
-		SortingFunc: func(keys []string) {
-			// Put message at the end
-			for i, key := range keys {
-				if key == "msg" && i != len(keys)-1 {
-					keys[i], keys[len(keys)-1] = keys[len(keys)-1], keys[i]
-					break
-				}
-			}
-		},
-	})
-
-	if Config.LogLevel == "" {
-		logrus.SetOutput(ioutil.Discard)
-		return nil
-	}
-
-	logrus.SetOutput(os.Stderr)
-
-	level, err := logrus.ParseLevel(Config.LogLevel)
-	if err != nil {
-		return err
-	}
-
-	logrus.SetLevel(level)
-
-	return nil
-}
-
-func IsLogging() bool {
-	return Config.LogLevel != ""
 }
 
 func defaultConfigFilePath() string { // nolint:golint

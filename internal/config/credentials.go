@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 
@@ -13,39 +13,52 @@ type CredentialsProfileSpec struct {
 	APIKey string `yaml:"apiKey"`
 }
 
-type CredentialsSpec map[string]CredentialsProfileSpec
+type Credentials map[string]CredentialsProfileSpec
 
-var Credentials CredentialsSpec
-
-func loadCredentials() error {
+func loadCredentials(cfg *Config) error {
 	var err error
 
-	Credentials, err = readCredentialsFileIfExists()
-	return err
+	cfg.Credentials, err = readCredentialsFileIfExists()
+	if err != nil {
+		return err
+	}
+
+	err = cfg.migrateCredentials()
+	if err != nil {
+		logrus.Debug("Error migrating credentials")
+		logrus.Debug(err)
+	}
+
+	profile, ok := cfg.Credentials[cfg.PricingAPIEndpoint]
+	if ok && cfg.APIKey == "" {
+		cfg.APIKey = profile.APIKey
+	}
+
+	return nil
 }
 
-func SaveCredentials() error {
-	return writeCredentialsFile(Credentials)
+func (c Credentials) Save() error {
+	return writeCredentialsFile(c)
 }
 
-func readCredentialsFileIfExists() (CredentialsSpec, error) {
+func readCredentialsFileIfExists() (Credentials, error) {
 	if !fileExists(CredentialsFilePath()) {
-		return CredentialsSpec{}, nil
+		return Credentials{}, nil
 	}
 
 	data, err := ioutil.ReadFile(CredentialsFilePath())
 	if err != nil {
-		return CredentialsSpec{}, err
+		return Credentials{}, err
 	}
 
-	var c CredentialsSpec
+	var c Credentials
 
 	err = yaml.Unmarshal(data, &c)
 
 	return c, err
 }
 
-func writeCredentialsFile(c CredentialsSpec) error {
+func writeCredentialsFile(c Credentials) error {
 	data, err := yaml.Marshal(c)
 	if err != nil {
 		return err
@@ -61,48 +74,4 @@ func writeCredentialsFile(c CredentialsSpec) error {
 
 func CredentialsFilePath() string { // nolint:golint
 	return path.Join(userConfigDir(), "credentials.yml")
-}
-
-func migrateCredentials() error {
-	oldPath := path.Join(userConfigDir(), "config.yml")
-
-	if !fileExists(oldPath) {
-		return nil
-	}
-
-	log.Debugf("Migrating old credentials from %s to %s", oldPath, CredentialsFilePath())
-
-	data, err := ioutil.ReadFile(oldPath)
-	if err != nil {
-		return err
-	}
-
-	var oldCreds struct {
-		APIKey string `yaml:"api_key"`
-	}
-
-	err = yaml.Unmarshal(data, &oldCreds)
-	if err != nil {
-		return err
-	}
-
-	if oldCreds.APIKey != "" {
-		Credentials[Config.PricingAPIEndpoint] = CredentialsProfileSpec{
-			APIKey: oldCreds.APIKey,
-		}
-
-		err = SaveCredentials()
-		if err != nil {
-			return err
-		}
-
-		err = os.Remove(oldPath)
-		if err != nil {
-			return err
-		}
-
-		log.Debug("Credentials successfully migrated")
-	}
-
-	return nil
 }

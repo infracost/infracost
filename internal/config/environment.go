@@ -13,7 +13,7 @@ import (
 	"github.com/infracost/infracost/internal/version"
 )
 
-type EnvironmentSpec struct {
+type Environment struct {
 	Version                             string   `json:"version"`
 	FullVersion                         string   `json:"fullVersion"`
 	IsTest                              bool     `json:"isTest"`
@@ -33,14 +33,8 @@ type EnvironmentSpec struct {
 	HasUsageFile                        bool     `json:"hasUsageFile"`
 }
 
-var Environment *EnvironmentSpec
-
-func init() {
-	loadInitialEnvironment()
-}
-
-func loadInitialEnvironment() {
-	Environment = &EnvironmentSpec{
+func NewEnvironment() *Environment {
+	return &Environment{
 		Version:     baseVersion(version.Version),
 		FullVersion: version.Version,
 		IsTest:      isTest(),
@@ -51,8 +45,8 @@ func loadInitialEnvironment() {
 	}
 }
 
-func LoadTerraformEnvironment(projectConfig *TerraformProjectSpec) {
-	binary := projectConfig.Binary
+func (e *Environment) LoadTerraformEnvironment(projectCfg *TerraformProject) {
+	binary := projectCfg.Binary
 	if binary == "" {
 		binary = "terraform"
 	}
@@ -60,13 +54,13 @@ func LoadTerraformEnvironment(projectConfig *TerraformProjectSpec) {
 	fullVersion := strings.SplitN(string(out), "\n", 2)[0]
 	version := terraformVersion(fullVersion)
 
-	Environment.TerraformBinary = binary
-	Environment.TerraformFullVersion = fullVersion
-	Environment.TerraformVersion = version
+	e.TerraformBinary = binary
+	e.TerraformFullVersion = fullVersion
+	e.TerraformVersion = version
 }
 
-func LoadOutputEnvironment(outputConfig *OutputSpec) {
-	Environment.OutputFormat = outputConfig.Format
+func (e *Environment) LoadOutputEnvironment(outputCfg *Output) {
+	e.OutputFormat = outputCfg.Format
 }
 
 func userAgent() string {
@@ -148,8 +142,8 @@ func AddNoAuthHeaders(req *http.Request) {
 	req.Header.Set("User-Agent", userAgent())
 }
 
-func AddAuthHeaders(req *http.Request) {
+func AddAuthHeaders(apiKey string, req *http.Request) {
 	AddNoAuthHeaders(req)
-	req.Header.Set("X-Api-Key", Config.APIKey)
+	req.Header.Set("X-Api-Key", apiKey)
 	req.Header.Set("X-Trace-Id", TraceID())
 }

@@ -12,7 +12,6 @@ import (
 
 	"github.com/hashicorp/hcl2/gohcl"
 	"github.com/hashicorp/hcl2/hclparse"
-	"github.com/infracost/infracost/internal/config"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -131,11 +130,7 @@ func credFromJSON(filename, host string) (string, error) {
 	return "", nil
 }
 
-func checkCloudConfigSet(project *config.TerraformProjectSpec) bool {
-	if project.TerraformCloudToken != "" {
-		return true
-	}
-
+func checkCloudConfigSet() bool {
 	if os.Getenv("TF_CLI_CONFIG_FILE") != "" {
 		return true
 	}
