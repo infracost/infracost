@@ -1,6 +1,6 @@
 #!/bin/sh -le
 
-# This scripts runs infracost on the current branch then the master branch. It uses `git diff`
+# This script runs infracost on the current branch then the master branch. It uses `git diff`
 # to post a pull-request comment showing the cost estimate difference whenever a percentage
 # threshold is crossed.
 # Usage docs: https://www.infracost.io/docs/integrations/
@@ -47,7 +47,7 @@ post_bitbucket_comment () {
           --arg default_branch_monthly_cost $default_branch_monthly_cost \
           --arg current_branch_monthly_cost $current_branch_monthly_cost \
           --arg diff "$(git diff --no-color --no-index default_branch_infracost.txt current_branch_infracost.txt | sed 1,2d | sed 3,5d)" \
-          '{content: {raw: "Monthly cost estimate will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n\n```diff\n\($diff)\n```\n"}}' > diff_infracost.txt
+          '{content: {raw: "Infracost estimate: monthly cost will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n\n```diff\n\($diff)\n```\n"}}' > diff_infracost.txt
 
   cat diff_infracost.txt | curl -L -X POST -d @- \
             -H "Content-Type: application/json" \
@@ -117,6 +117,8 @@ if [ $(echo "$default_branch_monthly_cost > 0" | bc -l) = 1 ]; then
 else
   echo "Default branch has no cost, setting percent_diff=100 to force a comment"
   percent_diff=100
+  # Remove the empty OVERALL TOTAL line to avoid it showing-up in the diff
+  sed -i '/OVERALL TOTAL/d' default_branch_infracost.txt
 fi
 absolute_percent_diff=$(echo $percent_diff | tr -d -)
 
@@ -136,7 +138,7 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; the
           --arg default_branch_monthly_cost $default_branch_monthly_cost \
           --arg current_branch_monthly_cost $current_branch_monthly_cost \
           --arg diff "$(git diff --no-color --no-index default_branch_infracost.txt current_branch_infracost.txt | sed 1,2d | sed 3,5d)" \
-          '{($comment_key): "Monthly cost estimate will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n<details><summary>infracost diff</summary>\n\n```diff\n\($diff)\n```\n</details>\n"}' > diff_infracost.txt
+          '{($comment_key): "Infracost estimate: monthly cost \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n<details><summary>infracost diff</summary>\n\n```diff\n\($diff)\n```\n</details>\n"}' > diff_infracost.txt
 
   echo "Default branch and current branch diff ($absolute_percent_diff) is more than the percentage threshold ($percentage_threshold)."
 
@@ -193,5 +195,5 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; the
     fi
   fi
 else
-  echo "Comment not posted as default branch and current branch diff ($absolute_percent_diff) is not more than the percentage threshold ($percentage_threshold)."
+  echo "Comment not posted as default branch and current branch diff ($absolute_percent_diff) is less than or equal to percentage threshold ($percentage_threshold)."
 fi
