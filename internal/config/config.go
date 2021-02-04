@@ -7,9 +7,11 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
@@ -145,7 +147,12 @@ func (c *Config) loadConfigFile(configFile string) error {
 		return err
 	}
 
-	return yaml.Unmarshal(data, c)
+	err = yaml.Unmarshal(data, c)
+	if err != nil {
+		return errors.New("Error parsing config YAML: " + strings.TrimPrefix(err.Error(), "yaml: "))
+	}
+
+	return nil
 }
 
 func (c *Config) loadEnvVars() error {
