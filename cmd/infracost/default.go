@@ -71,6 +71,10 @@ func defaultCmd(cfg *config.Config) *cli.Command {
 
 	flags := append(deprecatedFlags,
 		&cli.StringFlag{
+			Name:  "config-file",
+			Usage: "Path to the Infracost config file. Cannot be used with other flags",
+		},
+		&cli.StringFlag{
 			Name:      "terraform-json-file",
 			Usage:     "Path to Terraform plan JSON file",
 			TakesFile: true,
@@ -121,8 +125,13 @@ func defaultCmd(cfg *config.Config) *cli.Command {
 			}
 
 			handleDeprecatedFlags(c, deprecatedFlagsMapping)
-			loadDefaultCmdFlags(cfg, c)
-			err := checkUsageErrors(cfg)
+
+			err := loadDefaultCmdFlags(cfg, c)
+			if err != nil {
+				return err
+			}
+
+			err = checkUsageErrors(cfg)
 			if err != nil {
 				usageError(c, err.Error())
 			}
@@ -152,63 +161,62 @@ func handleDeprecatedFlags(c *cli.Context, deprecatedFlagsMapping map[string]str
 	}
 }
 
-func loadDefaultCmdFlags(cfg *config.Config, c *cli.Context) {
-	useProjectFlags := false
-	useOutputFlags := false
+func loadDefaultCmdFlags(cfg *config.Config, c *cli.Context) error {
+	hasProjectFlags := (c.IsSet("terraform-dir") ||
+		c.IsSet("terraform-plan-file") ||
+		c.IsSet("terraform-json-file") ||
+		c.IsSet("terraform-use-state") ||
+		c.IsSet("terraform-plan-flags") ||
+		c.IsSet("usage-file"))
+
+	hasOutputFlags := (c.IsSet("format") ||
+		c.IsSet("show-skipped"))
+
+	if c.IsSet("config-file") {
+		if hasProjectFlags || hasOutputFlags {
+			usageError(c, "--config-file flag cannot be used with other flags")
+		}
+
+		return cfg.LoadFromFile(c.String("config-file"))
+	}
 
 	projectCfg := &config.TerraformProject{}
+	outputCfg := &config.Output{}
 
-	if c.IsSet("terraform-dir") {
-		useProjectFlags = true
-		projectCfg.Dir = c.String("terraform-dir")
-	}
-
-	if c.IsSet("terraform-plan-file") {
-		useProjectFlags = true
-		projectCfg.PlanFile = c.String("terraform-plan-file")
-	}
-
-	if c.IsSet("terraform-json-file") {
-		useProjectFlags = true
-		projectCfg.JSONFile = c.String("terraform-json-file")
-	}
-
-	if c.IsSet("terraform-use-state") {
-		useProjectFlags = true
-		projectCfg.UseState = c.Bool("terraform-use-state")
-	}
-
-	if c.IsSet("terraform-plan-flags") {
-		useProjectFlags = true
-		projectCfg.PlanFlags = c.String("terraform-plan-flags")
-	}
-
-	if c.IsSet("usage-file") {
-		useProjectFlags = true
-		projectCfg.UsageFile = c.String("usage-file")
-	}
-
-	if useProjectFlags {
+	if hasProjectFlags {
 		cfg.Projects = config.Projects{
-			Terraform: []*config.TerraformProject{projectCfg},
+			Terraform: []*config.TerraformProject{
+				projectCfg,
+			},
 		}
 	}
 
-	output := &config.Output{}
-
-	if c.IsSet("format") {
-		useOutputFlags = true
-		output.Format = c.String("format")
+	if hasOutputFlags {
+		cfg.Outputs = []*config.Output{outputCfg}
 	}
 
-	if c.IsSet("show-skipped") {
-		useOutputFlags = true
-		output.ShowSkipped = c.Bool("show-skipped")
+	if hasProjectFlags || hasOutputFlags {
+		err := cfg.LoadFromEnv()
+		if err != nil {
+			return err
+		}
 	}
 
-	if useOutputFlags {
-		cfg.Outputs = []*config.Output{output}
+	if hasProjectFlags {
+		projectCfg.Dir = c.String("terraform-dir")
+		projectCfg.PlanFile = c.String("terraform-plan-file")
+		projectCfg.JSONFile = c.String("terraform-json-file")
+		projectCfg.UseState = c.Bool("terraform-use-state")
+		projectCfg.PlanFlags = c.String("terraform-plan-flags")
+		projectCfg.UsageFile = c.String("usage-file")
 	}
+
+	if hasOutputFlags {
+		outputCfg.Format = c.String("format")
+		outputCfg.ShowSkipped = c.Bool("show-skipped")
+	}
+
+	return nil
 }
 
 func checkUsageErrors(cfg *config.Config) error {

@@ -92,10 +92,6 @@ DOCS: https://infracost.io/docs`,
 		Version:              version.Version,
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{
-				Name:  "config-file",
-				Usage: "Path to the Infracost config file",
-			},
-			&cli.StringFlag{
 				Name:  "log-level",
 				Usage: "Log level (trace, debug, info, warn, error, fatal)",
 			},
@@ -210,11 +206,6 @@ func handleUpdateMessage(updateMessageChan chan *update.Info) {
 }
 
 func loadGlobalFlags(cfg *config.Config, c *cli.Context) error {
-	err := cfg.LoadFromFile(c.String("config-file"))
-	if err != nil {
-		return err
-	}
-
 	if c.IsSet("no-color") {
 		cfg.NoColor = c.Bool("no-color")
 	}
