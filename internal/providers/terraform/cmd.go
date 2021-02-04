@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/infracost/infracost/internal/config"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -126,8 +125,8 @@ func (w *cmdLogWriter) Flush() {
 	}
 }
 
-func CreateConfigFile(project *config.TerraformProjectSpec) (string, error) {
-	if project.TerraformCloudToken == "" {
+func CreateConfigFile(dir string, terraformCloudHost string, terraformCloudToken string) (string, error) {
+	if terraformCloudToken == "" {
 		return "", nil
 	}
 
@@ -142,7 +141,7 @@ func CreateConfigFile(project *config.TerraformProjectSpec) (string, error) {
 		path := os.Getenv("TF_CLI_CONFIG_FILE")
 
 		if !filepath.IsAbs(path) {
-			path, err = filepath.Abs(filepath.Join(project.Dir, os.Getenv("TF_CLI_CONFIG_FILE")))
+			path, err = filepath.Abs(filepath.Join(dir, os.Getenv("TF_CLI_CONFIG_FILE")))
 			if err != nil {
 				return tmpFile.Name(), err
 			}
@@ -160,7 +159,7 @@ func CreateConfigFile(project *config.TerraformProjectSpec) (string, error) {
 	}
 	defer f.Close()
 
-	host := project.TerraformCloudHost
+	host := terraformCloudHost
 	if host == "" {
 		host = "app.terraform.io"
 	}
@@ -168,7 +167,7 @@ func CreateConfigFile(project *config.TerraformProjectSpec) (string, error) {
 	contents := fmt.Sprintf(`credentials "%s" {
 	token = "%s"
 }
-`, host, project.TerraformCloudToken)
+`, host, terraformCloudToken)
 
 	log.Debugf("Writing Terraform credentials to temporary config file %s", tmpFile.Name())
 	if _, err := f.WriteString(contents); err != nil {

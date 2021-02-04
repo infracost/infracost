@@ -55,8 +55,10 @@ type ResourceSummaryOptions struct {
 }
 
 type Options struct {
-	GroupLabel string
-	GroupKey   string
+	NoColor     bool
+	ShowSkipped bool
+	GroupLabel  string
+	GroupKey    string
 }
 
 type ReportInput struct {

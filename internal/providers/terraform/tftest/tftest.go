@@ -128,18 +128,20 @@ func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, 
 }
 
 func ResourceTestsForProject(t *testing.T, project Project, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
-	resources, err := RunCostCalculations(project, usage)
+	cfg := config.DefaultConfig()
+
+	resources, err := RunCostCalculations(cfg, project, usage)
 	assert.NoError(t, err)
 
 	testutil.TestResources(t, resources, checks)
 }
 
-func RunCostCalculations(project Project, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
-	resources, err := loadResources(project, usage)
+func RunCostCalculations(cfg *config.Config, project Project, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
+	resources, err := loadResources(cfg, project, usage)
 	if err != nil {
 		return resources, err
 	}
-	err = prices.PopulatePrices(resources)
+	err = prices.PopulatePrices(cfg, resources)
 	if err != nil {
 		return resources, err
 	}
@@ -151,13 +153,13 @@ func CreateProject(project Project) (string, error) {
 	return writeToTmpDir(project)
 }
 
-func loadResources(project Project, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
+func loadResources(cfg *config.Config, project Project, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
 	tfdir, err := CreateProject(project)
 	if err != nil {
 		return nil, err
 	}
 
-	provider := terraform.New(&config.TerraformProjectSpec{
+	provider := terraform.New(cfg, &config.TerraformProject{
 		Dir: tfdir,
 	})
 

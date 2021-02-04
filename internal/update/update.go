@@ -26,8 +26,8 @@ type Info struct {
 	Cmd           string
 }
 
-func CheckForUpdate() (*Info, error) {
-	if skipUpdateCheck() {
+func CheckForUpdate(cfg *config.Config) (*Info, error) {
+	if skipUpdateCheck(cfg) {
 		return nil, nil
 	}
 
@@ -91,8 +91,8 @@ func CheckForUpdate() (*Info, error) {
 	}, nil
 }
 
-func skipUpdateCheck() bool {
-	return config.IsTruthy(os.Getenv("INFRACOST_SKIP_UPDATE_CHECK")) || config.Environment.IsTest || config.Environment.IsDev
+func skipUpdateCheck(cfg *config.Config) bool {
+	return config.IsTruthy(os.Getenv("INFRACOST_SKIP_UPDATE_CHECK")) || cfg.Environment.IsTest || cfg.Environment.IsDev
 }
 
 func isBrewInstall() (bool, error) {

@@ -21,7 +21,7 @@ type createAPIKeyResponse struct {
 	Error  string `json:"error"`
 }
 
-func registerCmd() *cli.Command {
+func registerCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "register",
 		Usage: "Register for an Infracost API key",
@@ -41,7 +41,7 @@ func registerCmd() *cli.Command {
 				return nil
 			}
 
-			r, err := createAPIKey(name, email)
+			r, err := createAPIKey(cfg.DashboardAPIEndpoint, name, email)
 			if err != nil {
 				return err
 			}
@@ -66,7 +66,7 @@ func registerCmd() *cli.Command {
 
 			saveAPIKey := true
 
-			if _, ok := config.Credentials[config.Config.PricingAPIEndpoint]; ok {
+			if _, ok := cfg.Credentials[cfg.PricingAPIEndpoint]; ok {
 				fmt.Printf("\nYou already have an Infracost API key saved in %s\n", config.CredentialsFilePath())
 				confirm, err := promptOverwriteAPIKey()
 				if err != nil {
@@ -85,11 +85,11 @@ func registerCmd() *cli.Command {
 			}
 
 			if saveAPIKey {
-				config.Credentials[config.Config.PricingAPIEndpoint] = config.CredentialsProfileSpec{
+				cfg.Credentials[cfg.PricingAPIEndpoint] = config.CredentialsProfileSpec{
 					APIKey: r.APIKey,
 				}
 
-				err = config.SaveCredentials()
+				err = cfg.Credentials.Save()
 				if err != nil {
 					return err
 				}
@@ -161,8 +161,8 @@ func promptOverwriteAPIKey() (bool, error) {
 	return true, nil
 }
 
-func createAPIKey(name string, email string) (*createAPIKeyResponse, error) {
-	url := fmt.Sprintf("%s/apiKeys?source=cli-register", config.Config.DashboardAPIEndpoint)
+func createAPIKey(endpoint string, name string, email string) (*createAPIKeyResponse, error) {
+	url := fmt.Sprintf("%s/apiKeys?source=cli-register", endpoint)
 	d := map[string]string{"name": name, "email": email}
 
 	j, err := json.Marshal(d)

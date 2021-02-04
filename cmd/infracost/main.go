@@ -31,64 +31,31 @@ func usageWarning(msg string) {
 	fmt.Fprintln(os.Stderr, color.YellowString(msg)+"\n")
 }
 
-func setupConfig(c *cli.Context) error {
-	config.LoadConfig(c.String("config-file"))
-
-	if c.IsSet("no-color") {
-		config.Config.NoColor = c.Bool("no-color")
-	}
-	color.NoColor = config.Config.NoColor
-
-	if c.IsSet("log-level") {
-		config.Config.LogLevel = c.String("log-level")
-		err := config.ConfigureLogger()
-		if err != nil {
-			usageError(c, err.Error())
-		}
-	}
-
-	if c.IsSet("pricing-api-endpoint") {
-		config.Config.PricingAPIEndpoint = c.String("pricing-api-endpoint")
-	}
-
-	config.Environment.Flags = c.FlagNames()
-
-	return nil
-}
-
-func startUpdateCheck(c chan *update.Info) {
-	go func() {
-		updateInfo, err := update.CheckForUpdate()
-		if err != nil {
-			log.Debugf("error checking for update: %v", err)
-		}
-		c <- updateInfo
-		close(c)
-	}()
-}
-
-func versionOutput(app *cli.App) string {
-	return fmt.Sprintf("Infracost %s", app.Version)
-}
-
-func checkAPIKey() error {
-	infracostAPIKey := config.Config.APIKey
-	if config.Config.PricingAPIEndpoint == config.Config.DefaultPricingAPIEndpoint && infracostAPIKey == "" {
-		red := color.New(color.FgHiRed)
-		bold := color.New(color.Bold, color.FgHiWhite)
-
-		return errors.New(fmt.Sprintf("%s\n%s %s",
-			red.Sprint("No INFRACOST_API_KEY environment variable is set."),
-			red.Sprintf("We run a free Cloud Pricing API, to get an API key run"),
-			bold.Sprint("`infracost register`"),
-		))
-	}
-
-	return nil
-}
-
 func main() {
-	defaultCmd := defaultCmd()
+	var appErr error
+	updateMessageChan := make(chan *update.Info)
+
+	cfg := config.DefaultConfig()
+	appErr = cfg.LoadFromEnv()
+
+	var app *cli.App
+
+	defer func() {
+		if appErr != nil {
+			handleAppErr(cfg, appErr)
+		}
+
+		unexpectedErr := recover()
+		if unexpectedErr != nil {
+			handleUnexpectedErr(cfg, app, unexpectedErr)
+		}
+
+		handleUpdateMessage(updateMessageChan)
+
+		if appErr != nil || unexpectedErr != nil {
+			os.Exit(1)
+		}
+	}()
 
 	cli.VersionFlag = &cli.BoolFlag{
 		Name:  "version",
@@ -99,10 +66,11 @@ func main() {
 		fmt.Println(versionOutput(c.App))
 	}
 
-	updateMessageChan := make(chan *update.Info)
-	startUpdateCheck(updateMessageChan)
+	startUpdateCheck(cfg, updateMessageChan)
 
-	app := &cli.App{
+	defaultCmd := defaultCmd(cfg)
+
+	app = &cli.App{
 		Name:  "infracost",
 		Usage: "Generate cost estimates from Terraform",
 		UsageText: `infracost [global options] command [command options] [arguments...]
@@ -144,71 +112,129 @@ DOCS: https://infracost.io/docs`,
 			usageError(c, err.Error())
 			return nil
 		},
-		Before:   setupConfig,
-		Commands: []*cli.Command{registerCmd(), reportCmd()},
+		Before: func(c *cli.Context) error {
+			return loadGlobalFlags(cfg, c)
+		},
+		Commands: []*cli.Command{registerCmd(cfg), reportCmd(cfg)},
 		Action:   defaultCmd.Action,
 	}
 
-	var appErr error
-
-	defer func() {
-		if appErr != nil {
-			if spinner != nil {
-				spinner.Fail()
-			}
-
-			if appErr.Error() != "" {
-				fmt.Fprintf(os.Stderr, "%s\n", color.HiRedString(appErr.Error()))
-			}
-
-			msg := stripColor(appErr.Error())
-			var eventsError *events.Error
-			if errors.As(appErr, &eventsError) {
-				msg = stripColor(eventsError.Label)
-			}
-			events.SendReport("error", msg)
-		}
-
-		unexpectedErr := recover()
-		if unexpectedErr != nil {
-			if spinner != nil {
-				spinner.Fail()
-			}
-
-			red := color.New(color.FgHiRed)
-			bold := color.New(color.Bold, color.FgHiWhite)
-			stack := string(debug.Stack())
-
-			msg := fmt.Sprintf("\n%s\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
-				red.Sprint("An unexpected error occurred"),
-				unexpectedErr,
-				stack,
-				versionOutput(app),
-				red.Sprint("Please copy the above output and create a new issue at"),
-				bold.Sprint("https://github.com/infracost/infracost/issues/new"),
-			)
-			fmt.Fprint(os.Stderr, msg)
-
-			events.SendReport("error", fmt.Sprintf("%s\n%s", unexpectedErr, stack))
-		}
-
-		updateInfo := <-updateMessageChan
-		if updateInfo != nil {
-			msg := fmt.Sprintf("\n%s %s → %s\n%s\n",
-				color.YellowString("A new version of Infracost is available:"),
-				color.CyanString(version.Version),
-				color.CyanString(updateInfo.LatestVersion),
-				indent(color.YellowString(updateInfo.Cmd), "  "),
-			)
-			fmt.Fprint(os.Stderr, msg)
-		}
-
-		if appErr != nil || unexpectedErr != nil {
-			os.Exit(1)
-		}
-	}()
-
 	appErr = app.Run(os.Args)
+}
+
+func startUpdateCheck(cfg *config.Config, c chan *update.Info) {
+	go func() {
+		updateInfo, err := update.CheckForUpdate(cfg)
+		if err != nil {
+			log.Debugf("error checking for update: %v", err)
+		}
+		c <- updateInfo
+		close(c)
+	}()
+}
+
+func versionOutput(app *cli.App) string {
+	return fmt.Sprintf("Infracost %s", app.Version)
+}
+
+func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
+	if apiEndpoint == defaultEndpoint && apiKey == "" {
+		red := color.New(color.FgHiRed)
+		bold := color.New(color.Bold, color.FgHiWhite)
+
+		return errors.New(fmt.Sprintf("%s\n%s %s",
+			red.Sprint("No INFRACOST_API_KEY environment variable is set."),
+			red.Sprintf("We run a free Cloud Pricing API, to get an API key run"),
+			bold.Sprint("`infracost register`"),
+		))
+	}
+
+	return nil
+}
+
+func handleAppErr(cfg *config.Config, err error) {
+	if spinner != nil {
+		spinner.Fail()
+	}
+
+	if err.Error() != "" {
+		fmt.Fprintf(os.Stderr, "%s\n", color.HiRedString(err.Error()))
+	}
+
+	msg := stripColor(err.Error())
+	var eventsError *events.Error
+	if errors.As(err, &eventsError) {
+		msg = stripColor(eventsError.Label)
+	}
+	events.SendReport(cfg, "error", msg)
+}
+
+func handleUnexpectedErr(cfg *config.Config, app *cli.App, unexpectedErr interface{}) {
+	if spinner != nil {
+		spinner.Fail()
+	}
+
+	red := color.New(color.FgHiRed)
+	bold := color.New(color.Bold, color.FgHiWhite)
+	stack := string(debug.Stack())
+
+	v := ""
+	if app != nil {
+		v = versionOutput(app)
+	}
+
+	msg := fmt.Sprintf("\n%s\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
+		red.Sprint("An unexpected error occurred"),
+		unexpectedErr,
+		stack,
+		v,
+		red.Sprint("Please copy the above output and create a new issue at"),
+		bold.Sprint("https://github.com/infracost/infracost/issues/new"),
+	)
+	fmt.Fprint(os.Stderr, msg)
+
+	events.SendReport(cfg, "error", fmt.Sprintf("%s\n%s", unexpectedErr, stack))
+}
+
+func handleUpdateMessage(updateMessageChan chan *update.Info) {
+	updateInfo := <-updateMessageChan
+	if updateInfo != nil {
+		msg := fmt.Sprintf("\n%s %s → %s\n%s\n",
+			color.YellowString("A new version of Infracost is available:"),
+			color.CyanString(version.Version),
+			color.CyanString(updateInfo.LatestVersion),
+			indent(color.YellowString(updateInfo.Cmd), "  "),
+		)
+		fmt.Fprint(os.Stderr, msg)
+	}
+}
+
+func loadGlobalFlags(cfg *config.Config, c *cli.Context) error {
+	err := cfg.LoadFromFile(c.String("config-file"))
+	if err != nil {
+		return err
+	}
+
+	if c.IsSet("no-color") {
+		cfg.NoColor = c.Bool("no-color")
+	}
+	color.NoColor = cfg.NoColor
+
+	if c.IsSet("log-level") {
+		cfg.LogLevel = c.String("log-level")
+		err := cfg.ConfigureLogger()
+		if err != nil {
+			return err
+		}
+	}
+
+	if c.IsSet("pricing-api-endpoint") {
+		cfg.PricingAPIEndpoint = c.String("pricing-api-endpoint")
+	}
+
+	cfg.Environment.Flags = c.FlagNames()
+
+	return nil
 }
 
 func indent(s, indent string) string {

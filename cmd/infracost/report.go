@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func reportCmd() *cli.Command {
+func reportCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "report",
 		Usage: "Create a report from multiple Infracost JSON files",
@@ -66,10 +66,16 @@ EXAMPLES:
 				})
 			}
 
-			opts := output.Options{GroupKey: "filename", GroupLabel: "File"}
+			opts := output.Options{
+				ShowSkipped: c.Bool("show-skipped"),
+				NoColor:     cfg.NoColor,
+				GroupKey:    "filename",
+				GroupLabel:  "File",
+			}
+
 			combined := output.Combine(inputs, opts)
 
-			outputConfig := &config.OutputSpec{
+			outputCfg := &config.Output{
 				Format:      c.String("output"),
 				ShowSkipped: c.Bool("show-skipped"),
 			}
@@ -78,13 +84,13 @@ EXAMPLES:
 				b   []byte
 				err error
 			)
-			switch strings.ToLower(outputConfig.Format) {
+			switch strings.ToLower(outputCfg.Format) {
 			case "json":
-				b, err = output.ToJSON(combined)
+				b, err = output.ToJSON(combined, opts)
 			case "html":
-				b, err = output.ToHTML(combined, opts, outputConfig)
+				b, err = output.ToHTML(combined, opts)
 			default:
-				b, err = output.ToTable(combined, outputConfig)
+				b, err = output.ToTable(combined, opts)
 			}
 			if err != nil {
 				return err
