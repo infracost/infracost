@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -129,16 +128,8 @@ func (c *Config) LoadFromEnv() error {
 }
 
 func (c *Config) loadConfigFile(configFile string) error {
-	if configFile != "" && !fileExists(configFile) {
+	if !fileExists(configFile) {
 		return fmt.Errorf("Config file does not exist at %s", configFile)
-	}
-
-	if configFile == "" {
-		configFile = defaultConfigFilePath()
-
-		if !fileExists(configFile) {
-			return nil
-		}
 	}
 
 	c.Environment.HasConfigFile = true
@@ -225,13 +216,4 @@ func loadDotEnv() error {
 	}
 
 	return nil
-}
-
-func defaultConfigFilePath() string { // nolint:golint
-	cwd, err := os.Getwd()
-	if err != nil {
-		cwd = ""
-	}
-
-	return path.Join(cwd, "infracost.yml")
 }
