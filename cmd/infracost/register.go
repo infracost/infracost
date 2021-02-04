@@ -76,7 +76,7 @@ func registerCmd(cfg *config.Config) *cli.Command {
 				if !confirm {
 					saveAPIKey = false
 					msg = fmt.Sprintf("\n%s\n%s %s %s\n",
-						green.Sprint("Setting the INFRACOST_API_KEY environment variable overrides the key from config.yml."),
+						green.Sprint("Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml."),
 						green.Sprint("You can now run"),
 						bold.Sprint("`infracost`"),
 						green.Sprint("in your Terraform code directory."),
