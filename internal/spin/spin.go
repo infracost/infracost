@@ -13,6 +13,7 @@ import (
 type Options struct {
 	EnableLogging bool
 	NoColor       bool
+	Indent        string
 }
 
 type Spinner struct {
@@ -31,7 +32,7 @@ func NewSpinner(msg string, opts Options) *Spinner {
 	if s.opts.EnableLogging {
 		log.Infof("starting: %s", msg)
 	} else {
-		s.spinner.Prefix = "  "
+		s.spinner.Prefix = opts.Indent
 		s.spinner.Suffix = fmt.Sprintf(" %s", msg)
 		if !s.opts.NoColor {
 			_ = s.spinner.Color("fgHiBlue", "bold")
@@ -54,7 +55,7 @@ func (s *Spinner) Fail() {
 	if s.opts.EnableLogging {
 		log.Errorf("failed: %s", s.msg)
 	} else {
-		fmt.Fprintln(os.Stderr, color.HiRedString("  ✖ %s", s.msg))
+		fmt.Fprintln(os.Stderr, color.HiRedString("%s✖ %s", s.opts.Indent, s.msg))
 	}
 }
 
@@ -66,6 +67,6 @@ func (s *Spinner) Success() {
 	if s.opts.EnableLogging {
 		log.Infof("completed: %s", s.msg)
 	} else {
-		fmt.Fprintln(os.Stderr, color.GreenString("  ✔ %s", s.msg))
+		fmt.Fprintln(os.Stderr, color.GreenString("%s✔ %s", s.opts.Indent, s.msg))
 	}
 }

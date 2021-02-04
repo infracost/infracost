@@ -56,6 +56,7 @@ func New(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provide
 		spinnerOpts: spin.Options{
 			EnableLogging: cfg.IsLogging(),
 			NoColor:       cfg.NoColor,
+			Indent:        "  ",
 		},
 		binary:    binary,
 		dir:       dir,
