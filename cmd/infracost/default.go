@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/fatih/color"
@@ -241,7 +242,17 @@ func defaultMain(cfg *config.Config) error {
 	resources := make([]*schema.Resource, 0)
 
 	for _, projectCfg := range cfg.Projects.Terraform {
-		cfg.Environment.LoadTerraformEnvironment(projectCfg)
+		m := fmt.Sprintf("Loading resources from %s", projectCfg.Dir)
+		if projectCfg.Workspace != "" {
+			m += fmt.Sprintf(" (%s)", projectCfg.Workspace)
+		}
+		if cfg.IsLogging() {
+			log.Info(m)
+		} else {
+			fmt.Fprintln(os.Stderr, m)
+		}
+
+		cfg.Environment.SetTerraformEnvironment(projectCfg)
 
 		provider := terraform.New(cfg, projectCfg)
 
@@ -300,7 +311,7 @@ func defaultMain(cfg *config.Config) error {
 	r := output.ToOutputFormat(resources)
 
 	for _, outputCfg := range cfg.Outputs {
-		cfg.Environment.LoadOutputEnvironment(outputCfg)
+		cfg.Environment.SetOutputEnvironment(outputCfg)
 
 		opts := output.Options{
 			ShowSkipped: outputCfg.ShowSkipped,

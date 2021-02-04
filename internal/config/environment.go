@@ -45,7 +45,7 @@ func NewEnvironment() *Environment {
 	}
 }
 
-func (e *Environment) LoadTerraformEnvironment(projectCfg *TerraformProject) {
+func (e *Environment) SetTerraformEnvironment(projectCfg *TerraformProject) {
 	binary := projectCfg.Binary
 	if binary == "" {
 		binary = "terraform"
@@ -59,7 +59,7 @@ func (e *Environment) LoadTerraformEnvironment(projectCfg *TerraformProject) {
 	e.TerraformVersion = version
 }
 
-func (e *Environment) LoadOutputEnvironment(outputCfg *Output) {
+func (e *Environment) SetOutputEnvironment(outputCfg *Output) {
 	e.OutputFormat = outputCfg.Format
 }
 
