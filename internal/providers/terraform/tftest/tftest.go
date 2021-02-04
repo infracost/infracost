@@ -130,30 +130,30 @@ func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, 
 }
 
 func ResourceTestsForProject(t *testing.T, project Project, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
-	resources, err := RunCostCalculations(project, usage)
+	state, err := RunCostCalculations(project, usage)
 	assert.NoError(t, err)
 
-	testutil.TestResources(t, resources, checks)
+	testutil.TestResources(t, state.PlannedState.Resources, checks)
 }
 
-func RunCostCalculations(project Project, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
-	resources, err := loadResources(project, usage)
+func RunCostCalculations(project Project, usage map[string]*schema.UsageData) (*schema.State, error) {
+	state, err := loadResources(project, usage)
 	if err != nil {
-		return resources, err
+		return state, err
 	}
-	err = prices.PopulatePrices(resources)
+	err = prices.PopulatePrices(state)
 	if err != nil {
-		return resources, err
+		return state, err
 	}
-	schema.CalculateCosts(resources)
-	return resources, nil
+	schema.CalculateCosts(state)
+	return state, nil
 }
 
 func CreateProject(project Project) (string, error) {
 	return writeToTmpDir(project)
 }
 
-func loadResources(project Project, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
+func loadResources(project Project, usage map[string]*schema.UsageData) (*schema.State, error) {
 	tfdir, err := CreateProject(project)
 	if err != nil {
 		return nil, err
