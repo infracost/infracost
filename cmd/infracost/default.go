@@ -19,6 +19,22 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var deprecatedFlagsMapping = map[string]string{
+	"tfjson":      "terraform-json-file",
+	"tfplan":      "terraform-plan-file",
+	"use-tfstate": "terraform-use-state",
+	"tfdir":       "terraform-dir",
+	"tfflags":     "terraform-plan-flags",
+	"output":      "format",
+	"o":           "format",
+}
+
+var deprecatedEnvVarMapping = map[string]string{
+	"TERRAFORM_BINARY":      "INFRACOST_TERRAFORM_BINARY",
+	"TERRAFORM_CLOUD_HOST":  "INFRACOST_TERRAFORM_CLOUD_HOST",
+	"TERRAFORM_CLOUD_TOKEN": "INFRACOST_TERRAFORM_CLOUD_TOKEN",
+}
+
 func defaultCmd(cfg *config.Config) *cli.Command {
 	deprecatedFlags := []cli.Flag{
 		&cli.StringFlag{
@@ -57,16 +73,6 @@ func defaultCmd(cfg *config.Config) *cli.Command {
 			Value:  "table",
 			Hidden: true,
 		},
-	}
-
-	deprecatedFlagsMapping := map[string]string{
-		"tfjson":      "terraform-json-file",
-		"tfplan":      "terraform-plan-file",
-		"use-tfstate": "terraform-use-state",
-		"tfdir":       "terraform-dir",
-		"tfflags":     "terraform-plan-flags",
-		"output":      "format",
-		"o":           "format",
 	}
 
 	flags := append(deprecatedFlags,
@@ -120,11 +126,12 @@ func defaultCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Flags: flags,
 		Action: func(c *cli.Context) error {
+			handleDeprecatedEnvVars(c, deprecatedEnvVarMapping)
+			handleDeprecatedFlags(c, deprecatedFlagsMapping)
+
 			if err := checkAPIKey(cfg.APIKey, cfg.PricingAPIEndpoint, cfg.DefaultPricingAPIEndpoint); err != nil {
 				return err
 			}
-
-			handleDeprecatedFlags(c, deprecatedFlagsMapping)
 
 			err := loadDefaultCmdFlags(cfg, c)
 			if err != nil {
@@ -138,6 +145,23 @@ func defaultCmd(cfg *config.Config) *cli.Command {
 
 			return defaultMain(cfg)
 		},
+	}
+}
+
+func handleDeprecatedEnvVars(c *cli.Context, deprecatedEnvVars map[string]string) {
+	for oldName, newName := range deprecatedEnvVars {
+		if val, ok := os.LookupEnv(oldName); ok {
+			m := fmt.Sprintf("Environment variable %s is deprecated and will be removed in v0.8.0.", oldName)
+			if newName != "" {
+				m += fmt.Sprintf(" Please use %s.", newName)
+			}
+
+			usageWarning(m)
+
+			if _, ok := os.LookupEnv(newName); !ok {
+				os.Setenv(newName, val)
+			}
+		}
 	}
 }
 
