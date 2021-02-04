@@ -58,21 +58,21 @@ post_bitbucket_comment () {
 infracost_cmd="infracost --no-color"
 if [ ! -z "$tfjson" ]; then
   echo "WARNING: we do not recommend using tfjson as it doesn't work with this diff script, use tfdir instead."
-  infracost_cmd="$infracost_cmd --tfjson $tfjson"
+  infracost_cmd="$infracost_cmd --terraform-json-file $tfjson"
 fi
 if [ ! -z "$tfplan" ]; then
   echo "WARNING: we do not recommend using tfplan as it doesn't work with this diff script, use tfdir instead."
-  infracost_cmd="$infracost_cmd --tfplan $tfplan"
+  infracost_cmd="$infracost_cmd --terraform-plan-file $tfplan"
 fi
 if [ "$use_tfstate" = "true" ] || [ "$use_tfstate" = "True" ] || [ "$use_tfstate" = "TRUE" ]; then
   echo "WARNING: we do not recommend using use_tfstate as it doesn't work with this diff script, use tfdir without this instead."
-  infracost_cmd="$infracost_cmd --use-tfstate"
+  infracost_cmd="$infracost_cmd --terraform-use-state"
 fi
 if [ ! -z "$tfdir" ]; then
-  infracost_cmd="$infracost_cmd --tfdir $tfdir"
+  infracost_cmd="$infracost_cmd --terraform-dir $tfdir"
 fi
 if [ ! -z "$tfflags" ]; then
-  infracost_cmd="$infracost_cmd --tfflags \"$tfflags\""
+  infracost_cmd="$infracost_cmd --terraform-plan-flags \"$tfflags\""
 fi
 if [ ! -z "$pricing_api_endpoint" ]; then
   infracost_cmd="$infracost_cmd --pricing-api-endpoint $pricing_api_endpoint"

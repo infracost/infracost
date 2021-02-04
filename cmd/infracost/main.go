@@ -77,15 +77,15 @@ func main() {
 
 USAGE METHODS:
 	# 1. Use terraform directory with any required terraform flags
-	infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
+	infracost --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
 
 	# 2. Use terraform state file
-	infracost --tfdir /path/to/code --use-tfstate
+	infracost --terraform-dir /path/to/code --terraform-use-state
 
 	# 3. Use terraform plan JSON
 	terraform plan -out plan.save .
 	terraform show -json plan.save > plan.json
-	infracost --tfjson /path/to/plan.json
+	infracost --terraform-json-file /path/to/plan.json
 
 DOCS: https://infracost.io/docs`,
 		EnableBashCompletion: true,

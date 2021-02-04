@@ -184,7 +184,7 @@ func (p *terraformProvider) terraformPreChecks() error {
 		}
 
 		if !p.inTerraformDir() {
-			msg := fmt.Sprintf("Directory \"%s\" does not have any Terraform files.\nSet the Terraform directory path using the --tfdir option.", p.dir)
+			msg := fmt.Sprintf("Directory \"%s\" does not have any Terraform files.\nSet the Terraform directory path using the --terraform-dir option.", p.dir)
 			return events.NewError(errors.Errorf(msg), "Directory does not have any Terraform files")
 
 		}
@@ -386,16 +386,16 @@ func terraformError(err error) {
 		msg += "\nRun `terraform login` first or set the TF_CLI_CONFIG_FILE environment variable to the ABSOLUTE path.\n"
 	}
 	if strings.HasPrefix(stderr, "Error: No value for required variable") {
-		msg += "\nPass Terraform flags using the --tfflags option.\n"
-		msg += "For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"
+		msg += "\nPass Terraform flags using the --terraform-plan-flags option.\n"
+		msg += "For example: infracost --terraform-dir=path/to/terraform --terraform-plan-flags=\"-var-file=myvars.tfvars\"\n"
 	}
 	if strings.HasPrefix(stderr, "Error: Failed to read variables file") {
 		msg += "\nSpecify the -var-file flag as a path relative to your Terraform directory.\n"
-		msg += "For example: infracost --tfdir=path/to/terraform --tfflags=\"-var-file=myvars.tfvars\"\n"
+		msg += "For example: infracost --terraform-dir=path/to/terraform --terraform-plan-flags=\"-var-file=myvars.tfvars\"\n"
 	}
 	if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a state or plan file.") {
-		msg += "\nSpecify the --tfplan flag as a path relative to your Terraform directory.\n"
-		msg += "For example: infracost --tfdir=path/to/terraform --tfplan=plan.save\n"
+		msg += "\nSpecify the --terraform-plan-file flag as a path relative to your Terraform directory.\n"
+		msg += "For example: infracost --terraform-dir=path/to/terraform --terraform-plan-file=plan.save\n"
 	}
 
 	fmt.Fprintln(os.Stderr, color.HiRedString(msg))
