@@ -129,6 +129,8 @@ func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, 
 
 func ResourceTestsForProject(t *testing.T, project Project, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
 	cfg := config.DefaultConfig()
+	err := cfg.LoadFromEnv()
+	assert.NoError(t, err)
 
 	resources, err := RunCostCalculations(cfg, project, usage)
 	assert.NoError(t, err)

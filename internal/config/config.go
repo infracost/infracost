@@ -94,14 +94,9 @@ func (c *Config) LoadFromFile(configFile string) error {
 		return err
 	}
 
-	err = c.loadEnvVars()
+	err = c.LoadFromEnv()
 	if err != nil {
 		return err
-	}
-
-	err = loadCredentials(c)
-	if err != nil {
-		logrus.Fatal(err)
 	}
 
 	if len(c.Projects.Terraform) > 0 {
@@ -120,6 +115,11 @@ func (c *Config) LoadFromEnv() error {
 	err = c.ConfigureLogger()
 	if err != nil {
 		return err
+	}
+
+	err = loadCredentials(c)
+	if err != nil {
+		logrus.Fatal(err)
 	}
 
 	return nil

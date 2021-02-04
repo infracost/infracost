@@ -43,7 +43,7 @@ type terraformProvider struct {
 func New(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provider {
 	binary := projectCfg.Binary
 	if binary == "" {
-		binary = "terraform"
+		binary = defaultTerraformBinary
 	}
 
 	dir := projectCfg.Dir
