@@ -242,7 +242,12 @@ func defaultMain(cfg *config.Config) error {
 	resources := make([]*schema.Resource, 0)
 
 	for _, projectCfg := range cfg.Projects.Terraform {
-		m := fmt.Sprintf("Loading resources from %s", projectCfg.Dir)
+		dir := projectCfg.Dir
+		if dir == "." || dir == "" {
+			dir = "current directory"
+		}
+
+		m := fmt.Sprintf("Loading resources from %s", dir)
 		if projectCfg.Workspace != "" {
 			m += fmt.Sprintf(" (%s)", projectCfg.Workspace)
 		}
