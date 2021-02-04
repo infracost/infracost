@@ -88,14 +88,14 @@ func defaultCmd() *cli.Command {
 				config.Environment.HasUsageFile = true
 			}
 
-			resources, err := provider.LoadResources(u)
+			state, err := provider.LoadResources(u)
 			if err != nil {
 				return err
 			}
 
 			spinner = spin.NewSpinner("Calculating cost estimate")
 
-			if err := prices.PopulatePrices(resources); err != nil {
+			if err := prices.PopulatePrices(state); err != nil {
 				spinner.Fail()
 
 				red := color.New(color.FgHiRed)
@@ -120,12 +120,12 @@ func defaultCmd() *cli.Command {
 				return err
 			}
 
-			schema.CalculateCosts(resources)
+			schema.CalculateCosts(state)
 
-			schema.SortResources(resources)
+			schema.SortResources(state)
 
 			opts := output.Options{}
-			r := output.ToOutputFormat(resources)
+			r := output.ToOutputFormat(state)
 			var (
 				b   []byte
 				out string

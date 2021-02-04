@@ -13,11 +13,20 @@ import (
 )
 
 type Root struct {
+	Resources        []Resource       `json:"resources"`        // Keeping for backward compatibility.
+	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`  // Keeping for backward compatibility.
+	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"` // Keeping for backward compatibility.
+	ExistingState    ResourceState    `json:"existingState"`
+	PlannedState     ResourceState    `json:"plannedState"`
+	Diff             ResourceState    `json:"diff"`
+	TimeGenerated    time.Time        `json:"timeGenerated"`
+	ResourceSummary  *ResourceSummary `json:"resourceSummary"`
+}
+
+type ResourceState struct {
 	Resources        []Resource       `json:"resources"`
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
-	TimeGenerated    time.Time        `json:"timeGenerated"`
-	ResourceSummary  *ResourceSummary `json:"resourceSummary"`
 }
 
 type CostComponent struct {
@@ -94,7 +103,8 @@ func outputResource(r *schema.Resource) Resource {
 	}
 }
 
-func ToOutputFormat(resources []*schema.Resource) Root {
+func getResourceStateOutput(resourceState *schema.ResourcesState) ([]Resource, *decimal.Decimal, *decimal.Decimal) {
+	resources := resourceState.Resources
 	arr := make([]Resource, 0, len(resources))
 
 	var totalHourlyCost *decimal.Decimal
@@ -122,12 +132,37 @@ func ToOutputFormat(resources []*schema.Resource) Root {
 		}
 	}
 
+	return arr, totalHourlyCost, totalMonthlyCost
+}
+
+func ToOutputFormat(state *schema.State) Root {
+
+	exstArr, exstTotalHourlyCost, exstTotalMonthlyCost := getResourceStateOutput(state.ExistingState)
+	plndArr, plndTotalHourlyCost, plndTotalMonthlyCost := getResourceStateOutput(state.PlannedState)
+	diffArr, diffTotalHourlyCost, diffTotalMonthlyCost := getResourceStateOutput(state.Diff)
+
 	out := Root{
-		Resources:        arr,
-		TotalHourlyCost:  totalHourlyCost,
-		TotalMonthlyCost: totalMonthlyCost,
-		TimeGenerated:    time.Now(),
-		ResourceSummary: BuildResourceSummary(resources, ResourceSummaryOptions{
+		Resources:        plndArr,
+		TotalHourlyCost:  plndTotalHourlyCost,
+		TotalMonthlyCost: plndTotalMonthlyCost,
+
+		ExistingState: ResourceState{
+			Resources:        exstArr,
+			TotalHourlyCost:  exstTotalHourlyCost,
+			TotalMonthlyCost: exstTotalMonthlyCost,
+		},
+		PlannedState: ResourceState{
+			Resources:        plndArr,
+			TotalHourlyCost:  plndTotalHourlyCost,
+			TotalMonthlyCost: plndTotalMonthlyCost,
+		},
+		Diff: ResourceState{
+			Resources:        diffArr,
+			TotalHourlyCost:  diffTotalHourlyCost,
+			TotalMonthlyCost: diffTotalMonthlyCost,
+		},
+		TimeGenerated: time.Now(),
+		ResourceSummary: BuildResourceSummary(state.PlannedState.Resources, ResourceSummaryOptions{
 			OnlyFields: []string{"UnsupportedCounts"},
 		}),
 	}

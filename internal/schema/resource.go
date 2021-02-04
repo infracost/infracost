@@ -23,9 +23,11 @@ type Resource struct {
 	Tags           map[string]string
 }
 
-func CalculateCosts(resources []*Resource) {
-	for _, r := range resources {
-		r.CalculateCosts()
+func CalculateCosts(state *State) {
+	for _, resources := range [][]*Resource{state.ExistingState.Resources, state.PlannedState.Resources} {
+		for _, r := range resources {
+			r.CalculateCosts()
+		}
 	}
 }
 
@@ -90,10 +92,13 @@ func (r *Resource) RemoveCostComponent(costComponent *CostComponent) {
 	r.CostComponents = n
 }
 
-func SortResources(resources []*Resource) {
-	sort.Slice(resources, func(i, j int) bool {
-		return resources[i].Name < resources[j].Name
-	})
+func SortResources(state *State) {
+	for _, resources := range [][]*Resource{state.ExistingState.Resources, state.PlannedState.Resources} {
+		sort.Slice(resources, func(i, j int) bool {
+			return resources[i].Name < resources[j].Name
+		})
+	}
+
 }
 
 func MultiplyQuantities(resource *Resource, multiplier decimal.Decimal) {

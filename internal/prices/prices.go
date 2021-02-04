@@ -13,28 +13,31 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func PopulatePrices(resources []*schema.Resource) error {
+func PopulatePrices(state *schema.State) error {
 	q := NewGraphQLQueryRunner()
 
-	var wg sync.WaitGroup
+	// TODO: It's not optimized at all. The processing time would be nearly 2x.
+	for _, resources := range [][]*schema.Resource{state.ExistingState.Resources, state.PlannedState.Resources} {
+		var wg sync.WaitGroup
+		wg.Add(1)
 
-	wg.Add(1)
+		// TODO: Do we need to changthe routing of events? like some kind of aggregation?
+		go func() {
+			defer wg.Done()
+			summary := output.BuildResourceSummary(resources, output.ResourceSummaryOptions{
+				IncludeUnsupportedProviders: true,
+			})
 
-	go func() {
-		defer wg.Done()
-		summary := output.BuildResourceSummary(resources, output.ResourceSummaryOptions{
-			IncludeUnsupportedProviders: true,
-		})
+			events.SendReport("resourceSummary", summary)
+		}()
 
-		events.SendReport("resourceSummary", summary)
-	}()
+		err := GetPricesConcurrent(resources, q)
+		if err != nil {
+			return err
+		}
 
-	err := GetPricesConcurrent(resources, q)
-	if err != nil {
-		return err
+		wg.Wait()
 	}
-
-	wg.Wait()
 
 	return nil
 }
