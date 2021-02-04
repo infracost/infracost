@@ -45,9 +45,10 @@ type Config struct { // nolint:golint
 	Environment *Environment
 	Credentials Credentials
 
-	Version  string `yaml:"version,omitempty" ignored:"true"`
-	LogLevel string `yaml:"log_level,omitempty" envconfig:"LOG_LEVEL"`
-	NoColor  bool   `yaml:"no_color,omitempty" envconfig:"NO_COLOR"`
+	Version         string `yaml:"version,omitempty" ignored:"true"`
+	LogLevel        string `yaml:"log_level,omitempty" envconfig:"LOG_LEVEL"`
+	NoColor         bool   `yaml:"no_color,omitempty" envconfig:"NO_COLOR"`
+	SkipUpdateCheck bool   `yaml:"skip_update_check,omitempty" envconfig:"SKIP_UPDATE_CHECK"`
 
 	APIKey                    string `envconfig:"API_KEY"`
 	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"PRICING_API_ENDPOINT"`
