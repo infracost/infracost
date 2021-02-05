@@ -70,21 +70,18 @@ func createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 }
 
-func parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
-	resources := loadUsageFileResources(usage)
-
-	if !gjson.ValidBytes(j) {
-		return resources, errors.New("invalid JSON")
-	}
-
-	p := gjson.ParseBytes(j)
-	providerConf := p.Get("configuration.provider_config")
-	conf := p.Get("configuration.root_module")
-	vars := p.Get("variables")
-
-	vals := p.Get("planned_values.root_module")
-	if !vals.Exists() {
-		vals = p.Get("values.root_module")
+func parseJSONResources(parseExisting bool, baseResources []*schema.Resource, usage map[string]*schema.UsageData, p, providerConf, conf, vars gjson.Result) []*schema.Resource {
+	var resources []*schema.Resource
+	resources = append(resources, baseResources...)
+	var vals gjson.Result
+	if parseExisting {
+		vals = p.Get("prior_state.values.root_module")
+		// TODO: Does the key differ in state file?
+	} else {
+		vals = p.Get("planned_values.root_module")
+		if !vals.Exists() {
+			vals = p.Get("values.root_module")
+		}
 	}
 
 	resData := parseResourceData(providerConf, vals, conf, vars)
@@ -99,7 +96,25 @@ func parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource
 		}
 	}
 
-	return resources, nil
+	return resources
+}
+
+func parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+	baseResources := loadUsageFileResources(usage)
+
+	if !gjson.ValidBytes(j) {
+		return baseResources, baseResources, errors.New("invalid JSON")
+	}
+
+	p := gjson.ParseBytes(j)
+	providerConf := p.Get("configuration.provider_config")
+	conf := p.Get("configuration.root_module")
+	vars := p.Get("variables")
+
+	existingResources := parseJSONResources(true, baseResources, usage, p, providerConf, conf, vars)
+	plannedResources := parseJSONResources(false, baseResources, usage, p, providerConf, conf, vars)
+
+	return existingResources, plannedResources, nil
 }
 
 func loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {

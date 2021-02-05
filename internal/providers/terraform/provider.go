@@ -68,7 +68,6 @@ func (p *terraformProvider) ProcessArgs(c *cli.Context) error {
 }
 
 func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.State, error) {
-	var resources []*schema.Resource
 	var state *schema.State = &schema.State{
 		ExistingState: &schema.ResourcesState{},
 		PlannedState:  &schema.ResourcesState{},
@@ -87,13 +86,17 @@ func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) (*
 		return state, err
 	}
 
-	resources, err = parseJSON(j, usage)
+	existingResources, plannedResources, err := parseJSON(j, usage)
 	if err != nil {
 		return state, errors.Wrap(err, "Error parsing Terraform JSON")
 	}
 
 	state.PlannedState = &schema.ResourcesState{
-		Resources: resources,
+		Resources: plannedResources,
+	}
+
+	state.ExistingState = &schema.ResourcesState{
+		Resources: existingResources,
 	}
 
 	return state, nil
