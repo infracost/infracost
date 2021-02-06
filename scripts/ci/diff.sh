@@ -10,11 +10,11 @@
 #   (https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) is recommended.
 
 # Set variables based on the order for GitHub Actions, or the env value for other CIs
-tfjson=${1:-$tfjson}
-tfplan=${2:-$tfplan}
-use_tfstate=${3:-$use_tfstate}
-tfdir=${4:-$tfdir}
-tfflags=${5:-$tfflags}
+terraform_json_file=${1:-$terraform_json_file}
+terraform_plan_file=${2:-$terraform_plan_file}
+terraform_use_state=${3:-$terraform_use_state}
+terraform_dir=${4:-$terraform_dir}
+terraform_plan_flags=${5:-$terraform_plan_flags}
 percentage_threshold=${6:-$percentage_threshold}
 pricing_api_endpoint=${7:-$pricing_api_endpoint}
 usage_file=${8:-$usage_file}
@@ -56,23 +56,23 @@ post_bitbucket_comment () {
 }
 
 infracost_cmd="infracost --no-color"
-if [ ! -z "$tfjson" ]; then
-  echo "WARNING: we do not recommend using tfjson as it doesn't work with this diff script, use tfdir instead."
-  infracost_cmd="$infracost_cmd --terraform-json-file $tfjson"
+if [ ! -z "$terraform_json_file" ]; then
+  echo "WARNING: we do not recommend using terraform_json_file as it doesn't work with this diff script, use terraform_dir instead."
+  infracost_cmd="$infracost_cmd --terraform-json-file $terraform_json_file"
 fi
-if [ ! -z "$tfplan" ]; then
-  echo "WARNING: we do not recommend using tfplan as it doesn't work with this diff script, use tfdir instead."
-  infracost_cmd="$infracost_cmd --terraform-plan-file $tfplan"
+if [ ! -z "$terraform_plan_file" ]; then
+  echo "WARNING: we do not recommend using terraform_plan_file as it doesn't work with this diff script, use terraform_dir instead."
+  infracost_cmd="$infracost_cmd --terraform-plan-file $terraform_plan_file"
 fi
-if [ "$use_tfstate" = "true" ] || [ "$use_tfstate" = "True" ] || [ "$use_tfstate" = "TRUE" ]; then
-  echo "WARNING: we do not recommend using use_tfstate as it doesn't work with this diff script, use tfdir without this instead."
+if [ "$terraform_use_state" = "true" ] || [ "$terraform_use_state" = "True" ] || [ "$terraform_use_state" = "TRUE" ]; then
+  echo "WARNING: we do not recommend using terraform_use_state as it doesn't work with this diff script, use terraform_dir without this instead."
   infracost_cmd="$infracost_cmd --terraform-use-state"
 fi
-if [ ! -z "$tfdir" ]; then
-  infracost_cmd="$infracost_cmd --terraform-dir $tfdir"
+if [ ! -z "$terraform_dir" ]; then
+  infracost_cmd="$infracost_cmd --terraform-dir $terraform_dir"
 fi
-if [ ! -z "$tfflags" ]; then
-  infracost_cmd="$infracost_cmd --terraform-plan-flags \"$tfflags\""
+if [ ! -z "$terraform_plan_flags" ]; then
+  infracost_cmd="$infracost_cmd --terraform-plan-flags \"$terraform_plan_flags\""
 fi
 if [ ! -z "$pricing_api_endpoint" ]; then
   infracost_cmd="$infracost_cmd --pricing-api-endpoint $pricing_api_endpoint"
