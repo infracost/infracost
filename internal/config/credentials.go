@@ -12,7 +12,7 @@ import (
 )
 
 type CredentialsProfileSpec struct {
-	APIKey string `yaml:"apiKey"`
+	APIKey string `yaml:"api_key"`
 }
 
 type Credentials map[string]CredentialsProfileSpec
