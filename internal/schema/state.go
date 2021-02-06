@@ -71,6 +71,9 @@ func (state *State) CalculateDiff() {
 		}
 	}
 
+	state.Diff.TotalHourlyCost = diffDecimals(state.PlannedState.TotalHourlyCost, state.ExistingState.TotalHourlyCost)
+	state.Diff.TotalMonthlyCost = diffDecimals(state.PlannedState.TotalMonthlyCost, state.ExistingState.TotalMonthlyCost)
+
 }
 
 func diffResourcesByKey(resourceKey string, existingResMap, plannedResMap map[string]*Resource) (bool, *Resource) {
