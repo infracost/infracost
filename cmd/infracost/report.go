@@ -12,6 +12,28 @@ import (
 )
 
 func reportCmd(cfg *config.Config) *cli.Command {
+	deprecatedFlags := []cli.Flag{
+		&cli.StringFlag{
+			Name:   "output",
+			Usage:  "Output format: json, table, html",
+			Value:  "table",
+			Hidden: true,
+		},
+	}
+
+	flags := append(deprecatedFlags,
+		&cli.StringFlag{
+			Name:  "format",
+			Usage: "Output format: json, table, html",
+			Value: "table",
+		},
+		&cli.BoolFlag{
+			Name:  "show-skipped",
+			Usage: "Show unsupported resources, some of which might be free. Only for table and HTML output",
+			Value: false,
+		},
+	)
+
 	return &cli.Command{
 		Name:  "report",
 		Usage: "Create a report from multiple Infracost JSON files",
@@ -26,20 +48,11 @@ EXAMPLES:
 
 	# Merge multiple Infracost JSON files
 	infracost report --format json out*.json`,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "output",
-				Aliases: []string{"o"},
-				Usage:   "Output format: json, table, html",
-				Value:   "table",
-			},
-			&cli.BoolFlag{
-				Name:  "show-skipped",
-				Usage: "Show unsupported resources, some of which might be free. Only for table and HTML output",
-				Value: false,
-			},
-		},
+		Flags: flags,
 		Action: func(c *cli.Context) error {
+			handleDeprecatedEnvVars(c, deprecatedEnvVarMapping)
+			handleDeprecatedFlags(c, deprecatedFlagsMapping)
+
 			files := make([]string, 0)
 
 			for i := 0; i < c.Args().Len(); i++ {
@@ -76,7 +89,7 @@ EXAMPLES:
 			combined := output.Combine(inputs, opts)
 
 			outputCfg := &config.Output{
-				Format:      c.String("output"),
+				Format:      c.String("format"),
 				ShowSkipped: c.Bool("show-skipped"),
 			}
 
