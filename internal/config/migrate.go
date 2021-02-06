@@ -11,12 +11,13 @@ import (
 
 func (c *Config) migrateCredentials() error {
 	oldPath := path.Join(userConfigDir(), "config.yml")
+	newPath := CredentialsFilePath()
 
-	if !fileExists(oldPath) {
+	if !fileExists(oldPath) || fileExists(newPath) {
 		return nil
 	}
 
-	log.Debugf("Migrating old credentials from %s to %s", oldPath, CredentialsFilePath())
+	log.Debugf("Migrating old credentials from %s to %s", oldPath, newPath)
 
 	data, err := ioutil.ReadFile(oldPath)
 	if err != nil {
