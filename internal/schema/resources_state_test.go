@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCalculateTotalCosts(t *testing.T) {
+func TestResourceStateCalculateTotalCosts(t *testing.T) {
 	resources := []*Resource{
 		{
 			HourlyCost:  decimalPtr(decimal.NewFromInt(10)),

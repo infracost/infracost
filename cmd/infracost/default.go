@@ -121,6 +121,7 @@ func defaultCmd() *cli.Command {
 			}
 
 			schema.CalculateCosts(state)
+			state.CalculateDiff()
 
 			schema.SortResources(state)
 
