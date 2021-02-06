@@ -235,6 +235,7 @@ func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFa
 	args = append(args, flags...)
 	_, err = Cmd(opts, append(args, fmt.Sprintf("-out=%s", f.Name()))...)
 
+	// Check if the error requires a remote run or an init
 	if err != nil {
 		extractedErr := extractStderr(err)
 
@@ -255,7 +256,9 @@ func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFa
 			}
 			return p.runPlan(opts, planFlags, false)
 		}
+	}
 
+	if err != nil {
 		spinner.Fail()
 
 		red := color.New(color.FgHiRed)
@@ -284,6 +287,7 @@ func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFa
 		}
 		return "", planJSON, errors.Wrap(err, "Error running terraform plan")
 	}
+
 	spinner.Success()
 
 	return f.Name(), planJSON, nil
