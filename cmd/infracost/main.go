@@ -87,6 +87,10 @@ USAGE METHODS:
 	terraform show -json plan.save > plan.json
 	infracost --terraform-json-file /path/to/plan.json
 
+	# 4. Use terraform plan file, relative to terraform-dir
+	terraform plan -out plan.save .
+	infracost --terraform-dir /path/to/code --terraform-plan-file plan.save
+
 DOCS: https://infracost.io/docs`,
 		EnableBashCompletion: true,
 		Version:              version.Version,
