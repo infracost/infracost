@@ -31,7 +31,7 @@ type Environment struct {
 	TerraformRemoteExecutionModeEnabled bool     `json:"terraformRemoteExecutionModeEnabled"`
 	TerraformInfracostProviderEnabled   bool     `json:"terraformInfracostProviderEnabled"`
 	IsAWSChina                          bool     `json:"isAwsChina"`
-	HasConfigFile                       bool     `json:"HasConfigFile"`
+	HasConfigFile                       bool     `json:"hasConfigFile"`
 	HasUsageFile                        bool     `json:"hasUsageFile"`
 }
 
