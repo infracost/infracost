@@ -3,53 +3,58 @@ package config
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
+
+	"github.com/google/uuid"
 )
 
-type StateSpec struct {
+type State struct {
+	InstallID              string `json:"installId"`
 	LatestReleaseVersion   string `json:"latestReleaseVersion"`
 	LatestReleaseCheckedAt string `json:"latestReleaseCheckedAt"`
 }
 
-var State *StateSpec
-
-func init() {
-	err := loadState()
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func loadState() error {
+func loadState(cfg *Config) error {
 	var err error
 
-	State, err = readStateFileIfExists()
-	return err
+	cfg.State, err = readStateFileIfExists()
+	if err != nil {
+		return err
+	}
+
+	if cfg.State.InstallID == "" {
+		cfg.State.InstallID = uuid.New().String()
+		err = cfg.State.Save()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
-func SaveState() error {
-	return writeStateFile(State)
+func (s *State) Save() error {
+	return writeStateFile(s)
 }
 
-func readStateFileIfExists() (*StateSpec, error) {
+func readStateFileIfExists() (*State, error) {
 	if !fileExists(stateFilePath()) {
-		return &StateSpec{}, nil
+		return &State{}, nil
 	}
 
 	data, err := ioutil.ReadFile(stateFilePath())
 	if err != nil {
-		return &StateSpec{}, err
+		return &State{}, err
 	}
 
-	var s StateSpec
+	var s State
 	err = json.Unmarshal(data, &s)
 
 	return &s, err
 }
 
-func writeStateFile(s *StateSpec) error {
+func writeStateFile(s *State) error {
 	data, err := json.Marshal(s)
 	if err != nil {
 		return err

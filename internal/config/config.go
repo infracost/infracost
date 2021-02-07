@@ -42,6 +42,7 @@ type Output struct {
 
 type Config struct { // nolint:golint
 	Environment *Environment
+	State       *State
 	Credentials Credentials
 
 	Version         string `yaml:"version,omitempty" ignored:"true"`
@@ -118,6 +119,12 @@ func (c *Config) LoadFromEnv() error {
 	if err != nil {
 		return err
 	}
+
+	err = loadState(c)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	c.Environment.InstallID = c.State.InstallID
 
 	err = loadCredentials(c)
 	if err != nil {
