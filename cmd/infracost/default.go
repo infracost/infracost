@@ -90,9 +90,9 @@ func defaultCmd(cfg *config.Config) *cli.Command {
 			Usage: "Flags to pass to the 'terraform plan' command",
 		},
 		&cli.StringFlag{
-			Name:   "format",
-			Usage:  "Output format: json, table, html",
-			Value:  "table",
+			Name:  "format",
+			Usage: "Output format: json, table, html",
+			Value: "table",
 		},
 		&cli.BoolFlag{
 			Name:  "show-skipped",
@@ -219,12 +219,21 @@ func defaultMain(cfg *config.Config) error {
 	resources := make([]*schema.Resource, 0)
 
 	for _, projectCfg := range cfg.Projects.Terraform {
-		dir := projectCfg.Dir
-		if dir == "." || dir == "" {
-			dir = "current directory"
+		src := projectCfg.JSONFile
+
+		if src == "" {
+			src = projectCfg.PlanFile
 		}
 
-		m := fmt.Sprintf("Loading resources from %s", dir)
+		if src == "" {
+			src = projectCfg.Dir
+		}
+
+		if src == "." || src == "" {
+			src = "current directory"
+		}
+
+		m := fmt.Sprintf("Loading resources from %s", src)
 		if projectCfg.Workspace != "" {
 			m += fmt.Sprintf(" (%s)", projectCfg.Workspace)
 		}
