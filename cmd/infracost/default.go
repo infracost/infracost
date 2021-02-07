@@ -93,7 +93,6 @@ func defaultCmd(cfg *config.Config) *cli.Command {
 			Name:   "format",
 			Usage:  "Output format: json, table, html",
 			Value:  "table",
-			Hidden: true,
 		},
 		&cli.BoolFlag{
 			Name:  "show-skipped",
