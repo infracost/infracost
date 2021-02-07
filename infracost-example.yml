@@ -1,37 +1,54 @@
+## Each of your Terraform infrastructure-as-code repos have an infracost.yml file like this
+## to define its Infracost configs so anyone can just run:
+## `infracost --config-file infracost.yml`
+## See https://github.com/infracost/infracost/blob/master/infracost-example.yml for available options.
+
+## Can be set to info or warn in CI/CD systems to reduce noise, or debug to troubleshoot.
 # log_level: warn
 # no_color: true
 
-terraform_defaults: &terraform-defaults
-  binary: terraform # terragrunt
+## YAML anchors can be used to share and override default configs between projects
+# terraform_defaults: &terraform_defaults
+  ## Used to change the path to the terraform binary, e.g. `~/bin/terraform_0.13` or `terragrunt`
+  ## Terragrunt users should see https://www.infracost.io/docs/terragrunt
+  # binary: terraform
+  ## Sets the TF_WORKSPACE environment variable
   # workspace: dev
+  ## Terraform Cloud users should see https://www.infracost.io/docs/terraform_cloud_enterprise
   # terraform_cloud_host: app.terraform.io
-  # terraform_cloud_token: ABC
 
+# Add details of your repo's Terraform projects
 projects:
-  # If using Terraform project directory
   terraform:
-    - <<: *terraform-defaults
-      dir: examples/terraform
-      # plan_flags: -var-file=dev.tfvars -var-file=us-east.tfvars
+    ## If using the Terraform directory method, see https://www.infracost.io/docs/#1-terraform-directory
+    - dir: examples/terraform
+    ## Example of using a YAML anchor
+    # - <<: *terraform_defaults
+    #   dir: examples/terraform
+    #   plan_flags: -var-file=prod.tfvars -var-file=us-east.tfvars
+    #   workspace: prod
+    #   usage_file: infracost-usage.yml
 
-    #  If using a Terraform plan file
-    # - <<: *terraform-defaults
-    #   dir: example/terraform
-    #   plan_file: plan.save # This should be relative to the dir
-
-    #  If using a Terraform JSON file
-    # - json: plan.json
-
-    #  If using the Terraform state
-    # - <<: *terraform-defaults
-    #   dir: example/terraform
+    ## If using the Terraform state file method, see https://www.infracost.io/docs/#2-terraform-state-file
+    # - dir: example/terraform
     #   use_state: true
 
-outputs:
-  - format: table
-    # columns: NAME,MONTHLY_QUANTITY
-    # breakdown_level: none | resource | full
-    # show_skipped: true
+    ## If using the Terraform plan JSON method, see https://www.infracost.io/docs/#3-terraform-plan-json
+    # - json_file: /path/to/plan.json
 
-  - format: json
-    path: infracost-output.json
+    ## If using the Terraform plan file method, see https://www.infracost.io/docs/#4-terraform-plan-file
+    # - dir: example/terraform
+    #   plan_file: plan.save # This should be relative to the dir
+
+    ## Another example:
+    # - dir: examples/aws
+    #   plan_flags: -var-file=dev.tfvars -var-file=us-east.tfvars
+
+## There can be multiple outputs
+outputs:
+  - format: table # json and html are also supported
+
+  - format: html
+    path: infracost-report.html # Save the report in this file
+    ## Show unsupported resources, some of which might be free. Only for table and HTML output format
+    show_skipped: true
