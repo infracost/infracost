@@ -43,14 +43,21 @@ func (state *State) CalculateDiff() {
 	// resource that the diff is calculated, we pop it from
 	// the hashmaps. In the next phase, there would be few
 	// resources remaining in the planned hash map that are
-	// new resources, we calculate the diff of them and the
-	// diff process is over.
+	// new resources, we then traverse the planned resources
+	// and check their existence in the planned hash map. If they
+	// are found it means they are new resources and we need to
+	// calculate the diff for them. This way a complete diff for
+	// all resources is calculated.
 
 	existingRMap := make(map[string]*Resource, 0)
 	fillResourcesMap(existingRMap, "", state.ExistingState.Resources)
 	plannedRMap := make(map[string]*Resource, 0)
 	fillResourcesMap(plannedRMap, "", state.PlannedState.Resources)
-	state.Diff = &ResourcesState{}
+	state.Diff = &ResourcesState{
+		Resources:        []*Resource{},
+		TotalHourlyCost:  &decimal.Zero,
+		TotalMonthlyCost: &decimal.Zero,
+	}
 
 	for _, resource := range state.ExistingState.Resources {
 		resourceKey := resource.Name
@@ -76,6 +83,8 @@ func (state *State) CalculateDiff() {
 
 }
 
+// diffResourcesByKey calculates the diff between two resources given their resourcesMap and
+// their key.
 func diffResourcesByKey(resourceKey string, existingResMap, plannedResMap map[string]*Resource) (bool, *Resource) {
 	existing, existingOk := existingResMap[resourceKey]
 	planned, plannedOk := plannedResMap[resourceKey]
@@ -118,13 +127,11 @@ func diffResourcesByKey(resourceKey string, existingResMap, plannedResMap map[st
 			changed = true
 		}
 	}
-	//
 	ccChanged, ccDiff := diffCostComponentsByResource(existing, planned)
 	if ccChanged {
 		diff.CostComponents = ccDiff
 		changed = true
 	}
-	//
 	if existingOk {
 		delete(existingResMap, resourceKey)
 	}
@@ -135,6 +142,8 @@ func diffResourcesByKey(resourceKey string, existingResMap, plannedResMap map[st
 	return changed, diff
 }
 
+// diffCostComponentsByResource calculates the diff of cost components of two resource.
+// It uses the same strategy as the calculating the diff of resources in the CalculateDiff func.
 func diffCostComponentsByResource(existing, planned *Resource) (bool, []*CostComponent) {
 	result := make([]*CostComponent, 0)
 	changed := false
@@ -149,6 +158,9 @@ func diffCostComponentsByResource(existing, planned *Resource) (bool, []*CostCom
 	}
 	for _, costComponent := range planned.CostComponents {
 		key := costComponent.Name
+		if _, ok := plannedCCMap[key]; !ok {
+			continue
+		}
 		changed, diff := diffCostComponentsByKey(key, existingCCMap, plannedCCMap)
 		if changed {
 			result = append(result, diff)
@@ -160,6 +172,8 @@ func diffCostComponentsByResource(existing, planned *Resource) (bool, []*CostCom
 	return changed, result
 }
 
+// diffCostComponentsByKey calculates the diff between two cost components given
+// their costComponentsMap and their key.
 func diffCostComponentsByKey(key string, existingCCMap, plannedCCMap map[string]*CostComponent) (bool, *CostComponent) {
 	existing, existingOk := existingCCMap[key]
 	planned, plannedOk := plannedCCMap[key]
@@ -224,6 +238,7 @@ func diffDecimals(planned *decimal.Decimal, existing *decimal.Decimal) *decimal.
 	return &diff
 }
 
+// fillResourcesMap fills a given resource map with the structure: {resource_name.sub_resource_name: *Resource}
 func fillResourcesMap(resourcesMap map[string]*Resource, rootKey string, resources []*Resource) {
 	for _, resource := range resources {
 		key := resource.Name
@@ -235,6 +250,7 @@ func fillResourcesMap(resourcesMap map[string]*Resource, rootKey string, resourc
 	}
 }
 
+// fillResourcesMap creates a cost components map with the structure: {cost_component_name: *CostComponent}
 func getCostComponentsMap(resource *Resource) map[string]*CostComponent {
 	result := make(map[string]*CostComponent)
 	for _, costComponent := range resource.CostComponents {
