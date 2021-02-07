@@ -13,6 +13,9 @@ if [ "$atlantis_debug" = "true" ] || [ "$atlantis_debug" = "True" ] || [ "$atlan
   echo
 fi
 
+# Handle deprecated var names
+terraform_plan_flags=${terraform_plan_flags:-$tfflags}
+
 # Set defaults
 percentage_threshold=${percentage_threshold:-0}
 # Export as it's used by infracost, not this script
@@ -20,8 +23,8 @@ export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
 export INFRACOST_CI_ATLANTIS_DIFF=true
 
 infracost_cmd="infracost --no-color"
-if [ ! -z "$tfflags" ]; then
-  infracost_cmd="$infracost_cmd --tfflags \"$tfflags\""
+if [ ! -z "$terraform_plan_flags" ]; then
+  infracost_cmd="$infracost_cmd --terraform-plan-flags \"$terraform_plan_flags\""
 fi
 if [ ! -z "$pricing_api_endpoint" ]; then
   infracost_cmd="$infracost_cmd --pricing-api-endpoint $pricing_api_endpoint"
