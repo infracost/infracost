@@ -144,7 +144,7 @@ func loadDefaultCmdFlags(cfg *config.Config, c *cli.Context) error {
 
 	if c.IsSet("config-file") {
 		if hasProjectFlags || hasOutputFlags {
-			usageError(c, "--config-file flag cannot be used with other flags")
+			usageError(c, "--config-file flag cannot be used with other project and output flags")
 		}
 
 		return cfg.LoadFromFile(c.String("config-file"))
