@@ -146,7 +146,7 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; the
           --arg default_branch_monthly_cost $default_branch_monthly_cost \
           --arg current_branch_monthly_cost $current_branch_monthly_cost \
           --arg diff "$(git diff --no-color --no-index default_branch_infracost.txt current_branch_infracost.txt | sed 1,2d | sed 3,5d)" \
-          '{($comment_key): "Infracost estimate: monthly cost \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n<details><summary>infracost diff</summary>\n\n```diff\n\($diff)\n```\n</details>\n"}' > diff_infracost.txt
+          '{($comment_key): "Infracost estimate: monthly cost will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n<details><summary>infracost diff</summary>\n\n```diff\n\($diff)\n```\n</details>\n"}' > diff_infracost.txt
 
   echo "Default branch and current branch diff ($absolute_percent_diff) is more than the percentage threshold ($percentage_threshold)."
 
