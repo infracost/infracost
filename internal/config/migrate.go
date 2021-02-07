@@ -1,9 +1,11 @@
 package config
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -43,7 +45,7 @@ func (c *Config) migrateCredentials() error {
 			return err
 		}
 
-		err = os.Remove(oldPath)
+		err := os.Rename(oldPath, fmt.Sprintf("%s.backup-%d", oldPath, time.Now().Unix()))
 		if err != nil {
 			return err
 		}
