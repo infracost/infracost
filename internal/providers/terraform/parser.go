@@ -34,11 +34,19 @@ var arnAttributeMap = map[string]string{
 	"dms_replication_task":     "replication_task_arn",
 }
 
-func createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+type Parser struct {
+	env *config.Environment
+}
+
+func NewParser(env *config.Environment) *Parser {
+	return &Parser{env: env}
+}
+
+func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	registryMap := GetResourceRegistryMap()
 
 	if isAwsChina(d) {
-		config.Environment.IsAWSChina = true
+		p.env.IsAWSChina = true
 	}
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
@@ -70,28 +78,28 @@ func createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 }
 
-func parseJSONResources(parseExisting bool, baseResources []*schema.Resource, usage map[string]*schema.UsageData, p, providerConf, conf, vars gjson.Result) []*schema.Resource {
+func (p *Parser) parseJSONResources(parseExisting bool, baseResources []*schema.Resource, usage map[string]*schema.UsageData, parsed, providerConf, conf, vars gjson.Result) []*schema.Resource {
 	var resources []*schema.Resource
 	resources = append(resources, baseResources...)
 	var vals gjson.Result
 	if parseExisting {
-		vals = p.Get("prior_state.values.root_module")
+		vals = parsed.Get("prior_state.values.root_module")
 		// TODO: Does the key differ in state file?
 	} else {
-		vals = p.Get("planned_values.root_module")
+		vals = parsed.Get("planned_values.root_module")
 		if !vals.Exists() {
-			vals = p.Get("values.root_module")
+			vals = parsed.Get("values.root_module")
 		}
 	}
 
-	resData := parseResourceData(providerConf, vals, conf, vars)
+	resData := p.parseResourceData(providerConf, vals, conf, vars)
 
-	parseReferences(resData, conf)
-	loadInfracostProviderUsageData(usage, resData)
-	stripDataResources(resData)
+	p.parseReferences(resData, conf)
+	p.loadInfracostProviderUsageData(usage, resData)
+	p.stripDataResources(resData)
 
 	for _, d := range resData {
-		if r := createResource(d, usage[d.Address]); r != nil {
+		if r := p.createResource(d, usage[d.Address]); r != nil {
 			resources = append(resources, r)
 		}
 	}
@@ -99,32 +107,32 @@ func parseJSONResources(parseExisting bool, baseResources []*schema.Resource, us
 	return resources
 }
 
-func parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
-	baseResources := loadUsageFileResources(usage)
+func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+	baseResources := p.loadUsageFileResources(usage)
 
 	if !gjson.ValidBytes(j) {
 		return baseResources, baseResources, errors.New("invalid JSON")
 	}
 
-	p := gjson.ParseBytes(j)
-	providerConf := p.Get("configuration.provider_config")
-	conf := p.Get("configuration.root_module")
-	vars := p.Get("variables")
+	parsed := gjson.ParseBytes(j)
+	providerConf := parsed.Get("configuration.provider_config")
+	conf := parsed.Get("configuration.root_module")
+	vars := parsed.Get("variables")
 
-	existingResources := parseJSONResources(true, baseResources, usage, p, providerConf, conf, vars)
-	plannedResources := parseJSONResources(false, baseResources, usage, p, providerConf, conf, vars)
+	existingResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
+	plannedResources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
 
 	return existingResources, plannedResources, nil
 }
 
-func loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {
+func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {
 	resources := make([]*schema.Resource, 0)
 
 	for k, v := range u {
 		for _, t := range GetUsageOnlyResources() {
 			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
 				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})
-				if r := createResource(d, v); r != nil {
+				if r := p.createResource(d, v); r != nil {
 					resources = append(resources, r)
 				}
 			}
@@ -134,7 +142,7 @@ func loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {
 	return resources
 }
 
-func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, vars gjson.Result) map[string]*schema.ResourceData {
+func (p *Parser) parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, vars gjson.Result) map[string]*schema.ResourceData {
 	resources := make(map[string]*schema.ResourceData)
 
 	for _, r := range planVals.Get("resources").Array() {
@@ -162,7 +170,7 @@ func parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, v
 
 	// Recursively add any resources for child modules
 	for _, m := range planVals.Get("child_modules").Array() {
-		for addr, d := range parseResourceData(providerConf, m, conf, vars) {
+		for addr, d := range p.parseResourceData(providerConf, m, conf, vars) {
 			resources[addr] = d
 		}
 	}
@@ -260,12 +268,12 @@ func parseRegion(providerConf gjson.Result, vars gjson.Result, providerKey strin
 	return region
 }
 
-func loadInfracostProviderUsageData(u map[string]*schema.UsageData, resData map[string]*schema.ResourceData) {
+func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, resData map[string]*schema.ResourceData) {
 	log.Debugf("Loading usage data from Infracost provider resources")
 
 	for _, d := range resData {
 		if isInfracostResource(d) {
-			config.Environment.TerraformInfracostProviderEnabled = true
+			p.env.TerraformInfracostProviderEnabled = true
 
 			for _, ref := range d.References("resources") {
 				if _, ok := u[ref.Address]; !ok {
@@ -278,17 +286,7 @@ func loadInfracostProviderUsageData(u map[string]*schema.UsageData, resData map[
 	}
 }
 
-func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
-	a := make(map[string]gjson.Result)
-
-	for k, v := range j.Map() {
-		a[k] = v.Get("0.value")
-	}
-
-	return a
-}
-
-func stripDataResources(resData map[string]*schema.ResourceData) {
+func (p *Parser) stripDataResources(resData map[string]*schema.ResourceData) {
 	for addr, d := range resData {
 		if strings.HasPrefix(addressResourcePart(d.Address), "data.") {
 			delete(resData, addr)
@@ -296,7 +294,7 @@ func stripDataResources(resData map[string]*schema.ResourceData) {
 	}
 }
 
-func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {
+func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {
 	registryMap := GetResourceRegistryMap()
 
 	// Create a map of id -> resource data so we can lookup references
@@ -318,7 +316,7 @@ func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result)
 		}
 
 		for _, attr := range refAttrs {
-			found := parseConfReferences(resData, conf, d, attr)
+			found := p.parseConfReferences(resData, conf, d, attr)
 
 			if found {
 				continue
@@ -335,7 +333,7 @@ func parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result)
 	}
 }
 
-func parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string) bool {
+func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string) bool {
 	// Check if there's a reference in the conf
 	resConf := getConfJSON(conf, d.Address)
 	refResults := resConf.Get("expressions").Get(attr).Get("references").Array()
@@ -388,6 +386,16 @@ func parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Res
 	}
 
 	return found
+}
+
+func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
+	a := make(map[string]gjson.Result)
+
+	for k, v := range j.Map() {
+		a[k] = v.Get("0.value")
+	}
+
+	return a
 }
 
 func getConfJSON(conf gjson.Result, addr string) gjson.Result {

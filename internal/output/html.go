@@ -8,10 +8,9 @@ import (
 	"strings"
 
 	"github.com/Masterminds/sprig"
-	"github.com/urfave/cli/v2"
 )
 
-func ToHTML(out Root, opts Options, c *cli.Context) ([]byte, error) {
+func ToHTML(out Root, opts Options) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -35,7 +34,7 @@ func ToHTML(out Root, opts Options, c *cli.Context) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	unsupportedResourcesMessage := out.unsupportedResourcesMessage(c.Bool("show-skipped"))
+	unsupportedResourcesMessage := out.unsupportedResourcesMessage(opts.ShowSkipped)
 
 	err = tmpl.Execute(bufw, struct {
 		Root                        Root

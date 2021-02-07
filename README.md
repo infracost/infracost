@@ -34,7 +34,7 @@ Infracost shows cloud cost estimates for Terraform projects. It helps developers
     infracost register
     ```
 
-    The key is saved in `~/.config/infracost/config.yml`. If you prefer, you can run your own [Cloud Pricing API](https://www.infracost.io/docs/faq#can-i-run-my-own-cloud-pricing-api).
+    The key is saved in `~/.config/infracost/credentials.yml`. If you prefer, you can run your own [Cloud Pricing API](https://www.infracost.io/docs/faq#can-i-run-my-own-cloud-pricing-api).
 
 3.  Run `infracost` using our example Terraform project to see how it works.
     ```sh
@@ -42,16 +42,16 @@ Infracost shows cloud cost estimates for Terraform projects. It helps developers
     cd example-terraform
 
     # You can play with `aws/main.tf` and `aws/infracost-usage.yml`, and re-run infracost to compare costs
-    infracost --tfdir aws --usage-file aws/infracost-usage.yml
+    infracost --terraform-dir aws --usage-file aws/infracost-usage.yml
     ```
 
 Please **watch/star** this repo as we add new cloud resources every week or so.
 
 ## Basic usage
 
-There are [4 usage methods](https://www.infracost.io/docs/#usage-methods) for Infracost depending on your use-case. The following is the default method. Point to the Terraform directory using `--tfdir` and pass any required Terraform flags using `--tfflags`. Internally Infracost runs Terraform `init`, `plan` and `show`; `init` requires cloud credentials to be set, e.g. via the usual `AWS_ACCESS_KEY_ID` environment variables. This method works with remote state too.
+There are [4 usage methods](https://www.infracost.io/docs/#usage-methods) for Infracost depending on your use-case. The following is the default method. Point to the Terraform directory using `--terraform-dir` and pass any required Terraform flags using `--terraform-plan-flags`. Internally Infracost runs Terraform `init`, `plan` and `show`; `init` requires cloud credentials to be set, e.g. via the usual `AWS_ACCESS_KEY_ID` environment variables. This method works with remote state too.
   ```sh
-  infracost --tfdir /path/to/code --tfflags "-var-file=myvars.tfvars"
+  infracost --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
   ```
 
 Checkout the [docs site](https://www.infracost.io/docs/) for additional usage options, including notes for [Terragrunt](https://www.infracost.io/docs/terragrunt) and [Terraform Cloud](https://www.infracost.io/docs/terraform_cloud_enterprise) users.
@@ -65,6 +65,7 @@ The following CI/CD integrations can be used to automatically add a comment show
 - [GitLab CI template](https://www.infracost.io/docs/integrations#gitlab-ci)
 - [CircleCI Orb](https://www.infracost.io/docs/integrations#circleci)
 - [Bitbucket Pipeline](https://www.infracost.io/docs/integrations#bitbucket-pipelines)
+- [Atlantis](https://github.com/infracost/infracost-atlantis/)
 
 If you run into any issues with CI/CD integrations, please join our [community Slack channel](https://www.infracost.io/community-chat), we'd be happy to guide you through it.
 

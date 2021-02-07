@@ -5,22 +5,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/infracost/infracost/internal/config"
 	log "github.com/sirupsen/logrus"
 )
 
-func SendReport(key string, data interface{}) {
-	if config.Config.PricingAPIEndpoint != config.Config.DefaultPricingAPIEndpoint {
-		// skip for non-default pricing API endpoints
+func SendReport(cfg *config.Config, key string, data interface{}) {
+	if cfg.PricingAPIEndpoint != cfg.DefaultPricingAPIEndpoint && config.IsFalsy(os.Getenv("INFRACOST_SELF_HOSTED_TELEMETRY")) {
 		return
 	}
 
-	url := fmt.Sprintf("%s/report", config.Config.PricingAPIEndpoint)
+	url := fmt.Sprintf("%s/report", cfg.DefaultPricingAPIEndpoint)
 
 	j := make(map[string]interface{})
 	j[key] = data
-	j["environment"] = config.Environment
+	j["environment"] = cfg.Environment
 
 	body, err := json.Marshal(j)
 	if err != nil {
@@ -34,7 +34,7 @@ func SendReport(key string, data interface{}) {
 		return
 	}
 
-	config.AddAuthHeaders(req)
+	config.AddAuthHeaders(cfg.APIKey, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

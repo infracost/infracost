@@ -4,6 +4,6 @@ import (
 	"encoding/json"
 )
 
-func ToJSON(out Root) ([]byte, error) {
+func ToJSON(out Root, opts Options) ([]byte, error) {
 	return json.Marshal(out)
 }

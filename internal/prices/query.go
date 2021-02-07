@@ -50,15 +50,14 @@ type QueryRunner interface {
 }
 
 type GraphQLQueryRunner struct {
-	baseURL         string
-	graphQLEndpoint string
+	endpoint string
+	apiKey   string
 }
 
-func NewGraphQLQueryRunner() *GraphQLQueryRunner {
-	baseURL := config.Config.PricingAPIEndpoint
+func NewGraphQLQueryRunner(endpoint string, apiKey string) *GraphQLQueryRunner {
 	return &GraphQLQueryRunner{
-		baseURL:         baseURL,
-		graphQLEndpoint: fmt.Sprintf("%s/graphql", baseURL),
+		endpoint: endpoint,
+		apiKey:   apiKey,
 	}
 }
 
@@ -70,7 +69,7 @@ func (q *GraphQLQueryRunner) RunQueries(r *schema.Resource) ([]QueryResult, erro
 		return []QueryResult{}, nil
 	}
 
-	log.Debugf("Getting pricing details from %s for %s", config.Config.PricingAPIEndpoint, r.Name)
+	log.Debugf("Getting pricing details from %s for %s", q.endpoint, r.Name)
 
 	results, err := q.getQueryResults(queries)
 	if err != nil {
@@ -112,12 +111,12 @@ func (q *GraphQLQueryRunner) getQueryResults(queries []GraphQLQuery) ([]gjson.Re
 		return results, errors.Wrap(err, "Error generating request for pricing API")
 	}
 
-	req, err := http.NewRequest("POST", q.graphQLEndpoint, bytes.NewBuffer(queriesBody))
+	req, err := http.NewRequest("POST", q.endpoint, bytes.NewBuffer(queriesBody))
 	if err != nil {
 		return results, errors.Wrap(err, "Error generating request for pricing API")
 	}
 
-	config.AddAuthHeaders(req)
+	config.AddAuthHeaders(q.apiKey, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

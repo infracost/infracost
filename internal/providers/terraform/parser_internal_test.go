@@ -3,6 +3,7 @@ package terraform
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
@@ -53,8 +54,10 @@ func TestCreateResource(t *testing.T) {
 		},
 	}
 
+	p := NewParser(config.NewEnvironment())
+
 	for _, test := range tests {
-		actual := createResource(test.data, nil)
+		actual := p.createResource(test.data, nil)
 		assert.Equal(t, test.expected.Name, actual.Name)
 		assert.Equal(t, test.expected.ResourceType, actual.ResourceType)
 		assert.Equal(t, test.expected.IsSkipped, actual.IsSkipped)
@@ -230,7 +233,8 @@ func TestParseResourceData(t *testing.T) {
 		"module.module1.aws_nat_gateway.nat2": "eu-west-2",
 	}
 
-	actual := parseResourceData(providerConf, planVals, conf, vars)
+	p := NewParser(config.NewEnvironment())
+	actual := p.parseResourceData(providerConf, planVals, conf, vars)
 
 	for k, v := range actual {
 		assert.Equal(t, expected[k].Address, v.Address)
@@ -298,7 +302,8 @@ func TestParseReferences_plan(t *testing.T) {
 		}`,
 	}
 
-	parseReferences(resData, conf)
+	p := NewParser(config.NewEnvironment())
+	p.parseReferences(resData, conf)
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
 }
@@ -337,7 +342,8 @@ func TestParseReferences_state(t *testing.T) {
 
 	conf := gjson.Result{}
 
-	parseReferences(resData, conf)
+	p := NewParser(config.NewEnvironment())
+	p.parseReferences(resData, conf)
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
 }
