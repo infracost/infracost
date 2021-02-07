@@ -29,7 +29,7 @@ projects:
     #   dir: examples/terraform
     #   plan_flags: -var-file=prod.tfvars -var-file=us-east.tfvars
     #   workspace: prod
-    #   usage_file: infracost-usage.yml
+    #   usage_file: infracost-usage.yml # Define resource usage estimates
 
     ## If using the Terraform state file method, see https://www.infracost.io/docs/#2-terraform-state-file
     # - dir: example/terraform
