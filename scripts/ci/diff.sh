@@ -15,9 +15,17 @@ terraform_plan_file=${2:-$terraform_plan_file}
 terraform_use_state=${3:-$terraform_use_state}
 terraform_dir=${4:-$terraform_dir}
 terraform_plan_flags=${5:-$terraform_plan_flags}
+
 percentage_threshold=${6:-$percentage_threshold}
 pricing_api_endpoint=${7:-$pricing_api_endpoint}
 usage_file=${8:-$usage_file}
+
+# Handle deprecated var names
+terraform_json_file=${terraform_json_file:-$tfjson}
+terraform_plan_file=${terraform_plan_file:-$tfplan}
+terraform_use_state=${terraform_use_state:-$use_tfstate}
+terraform_dir=${terraform_dir:-$tfdir}
+terraform_plan_flags=${terraform_plan_flags:-$tfflags}
 
 # Set defaults
 percentage_threshold=${percentage_threshold:-0}
