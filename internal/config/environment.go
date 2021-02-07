@@ -18,6 +18,8 @@ type Environment struct {
 	FullVersion                         string   `json:"fullVersion"`
 	IsTest                              bool     `json:"isTest"`
 	IsDev                               bool     `json:"isDev"`
+	InstallID                           string   `json:"installId"`
+	IsDefaultPricingAPIEndpoint         bool     `json:"isDefaultPricingAPIEndpoint"`
 	OS                                  string   `json:"os"`
 	CIPlatform                          string   `json:"ciPlatform,omitempty"`
 	CIScript                            string   `json:"ciScript,omitempty"`

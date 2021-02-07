@@ -223,6 +223,7 @@ func loadGlobalFlags(cfg *config.Config, c *cli.Context) error {
 		cfg.PricingAPIEndpoint = c.String("pricing-api-endpoint")
 	}
 
+	cfg.Environment.IsDefaultPricingAPIEndpoint = cfg.PricingAPIEndpoint == cfg.DefaultPricingAPIEndpoint
 	cfg.Environment.Flags = c.FlagNames()
 
 	return nil
