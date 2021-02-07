@@ -105,7 +105,7 @@ DOCS: https://infracost.io/docs`,
 			},
 			&cli.StringFlag{
 				Name:  "pricing-api-endpoint",
-				Usage: "Specify an alternate price list API URL",
+				Usage: "Specify an alternate Cloud Pricing API URL",
 			},
 		}, defaultCmd.Flags...),
 		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {

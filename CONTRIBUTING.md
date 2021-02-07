@@ -241,7 +241,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 1. In [here](https://github.com/infracost/infracost/actions), click on the "Go" build for the master branch, click on Build, expand Test, then use the "Search logs" box to find any line that has "Multiple products found", "No products found for" or "No prices found for". Update the resource files in question to fix these error, often it's because the price filters need to be adjusted to only return 1 result.
 2. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
-3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have 4 assets.
+3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have 5 assets.
 4. Click on the Edit draft button, add the release notes from the commits between this and the last release and click on publish.
 5. Announce the release in the infracost-community Slack general channel. Then wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
 6. Update the docs repo with any required changes and supported resources.

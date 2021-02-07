@@ -1,7 +1,7 @@
 ## Each of your Terraform project repos can have an infracost.yml file like this
 ## to define its Infracost configs, so anyone can just run:
 ## `infracost --config-file infracost.yml`
-## See https://github.com/infracost/infracost/blob/master/infracost-example.yml for available options.
+## Uncomment lines and edit as required. See https://www.infracost.io/docs/config_file for docs.
 
 ## Can be set to info or warn in CI/CD systems to reduce noise, or debug to troubleshoot.
 # log_level: warn
