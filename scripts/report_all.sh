@@ -19,7 +19,7 @@ done <<< "$tfprojects"
 
 # Run infracost report to merge the subfolder results
 jsonfiles=$(find . -name "*-infracost-out.json")
-infracost report --format html $(echo $jsonfiles | tr '\n' ' ') > report.html
+infracost report --format html $(echo $jsonfiles | tr '\n' ' ') > infracost-report.html
 infracost report --format table $(echo $jsonfiles | tr '\n' ' ')
 echo "Also saved HTML report in infracost-report.html"
 
