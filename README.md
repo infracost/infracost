@@ -65,6 +65,7 @@ The following CI/CD integrations can be used to automatically add a comment show
 - [GitLab CI template](https://www.infracost.io/docs/integrations#gitlab-ci)
 - [CircleCI Orb](https://www.infracost.io/docs/integrations#circleci)
 - [Bitbucket Pipeline](https://www.infracost.io/docs/integrations#bitbucket-pipelines)
+- [Atlantis](https://github.com/infracost/infracost-atlantis/)
 
 If you run into any issues with CI/CD integrations, please join our [community Slack channel](https://www.infracost.io/community-chat), we'd be happy to guide you through it.
 

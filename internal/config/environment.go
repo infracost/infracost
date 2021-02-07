@@ -89,6 +89,8 @@ func terraformVersion(full string) string {
 func ciScript() string {
 	if IsTruthy(os.Getenv("INFRACOST_CI_DIFF")) {
 		return "ci-diff"
+	} else if IsTruthy(os.Getenv("INFRACOST_CI_ATLANTIS_DIFF")) {
+		return "ci-atlantis-diff"
 	}
 
 	return ""
