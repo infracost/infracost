@@ -1,5 +1,5 @@
-## Each of your Terraform infrastructure-as-code repos have an infracost.yml file like this
-## to define its Infracost configs so anyone can just run:
+## Each of your Terraform project repos can have an infracost.yml file like this
+## to define its Infracost configs, so anyone can just run:
 ## `infracost --config-file infracost.yml`
 ## See https://github.com/infracost/infracost/blob/master/infracost-example.yml for available options.
 
@@ -16,12 +16,14 @@
   # workspace: dev
   ## Terraform Cloud users should see https://www.infracost.io/docs/terraform_cloud_enterprise
   # terraform_cloud_host: app.terraform.io
+  # terraform_cloud_token: myToken123 # We recommend using INFRACOST_TERRAFORM_CLOUD_TOKEN for the token
 
-# Add details of your repo's Terraform projects
+# Add details of your repo's Terraform projects, their results will be merged into the same output
 projects:
   terraform:
     ## If using the Terraform directory method, see https://www.infracost.io/docs/#1-terraform-directory
     - dir: examples/terraform
+
     ## Example of using a YAML anchor
     # - <<: *terraform_defaults
     #   dir: examples/terraform
@@ -40,15 +42,12 @@ projects:
     # - dir: example/terraform
     #   plan_file: plan.save # This should be relative to the dir
 
-    ## Another example:
-    # - dir: examples/aws
-    #   plan_flags: -var-file=dev.tfvars -var-file=us-east.tfvars
-
 ## There can be multiple outputs
 outputs:
-  - format: table # json and html are also supported
-
-  - format: html
-    path: infracost-report.html # Save the report in this file
+  - format: table
     ## Show unsupported resources, some of which might be free. Only for table and HTML output format
     show_skipped: true
+  - format: html
+    path: infracost-report.html # Save report in this file
+  - format: json
+    path: infracost-output.json # Save output in this file
