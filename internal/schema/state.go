@@ -57,9 +57,9 @@ func (state *State) CalculateDiff() {
 	// calculate the diff for them. This way a complete diff for
 	// all resources is calculated.
 
-	existingRMap := make(map[string]*Resource, 0)
+	existingRMap := make(map[string]*Resource)
 	fillResourcesMap(existingRMap, "", state.ExistingState.Resources)
-	plannedRMap := make(map[string]*Resource, 0)
+	plannedRMap := make(map[string]*Resource)
 	fillResourcesMap(plannedRMap, "", state.PlannedState.Resources)
 	state.Diff = &ResourcesState{
 		Resources:        []*Resource{},
