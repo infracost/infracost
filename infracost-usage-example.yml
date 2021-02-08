@@ -167,6 +167,7 @@ resource_usage:
   #
   # Terraform GCP resources
   #
+
   google_compute_router_nat.my_nat:
     assigned_vms: 4                 # Number of VM instances assigned to the NAT gateway
     monthly_data_processed_gb: 1000 # Monthly data processed (ingress and egress) by the NAT gateway in GB
@@ -181,6 +182,10 @@ resource_usage:
 
   google_dns_record_set.my_record_set:
     monthly_queries:  1000000 # Monthly DNS queries.
+
+  google_kms_crypto_key.my_keys:
+    monthly_key_versions: 10000 # Number of uses crypto key versions per month
+    monthly_key_operations: 1000000 # Number of operations with crypto keys per month
 
   google_pubsub_subscription.my_subscription:
     monthly_message_data_tb: 7.416 # Monthly amount of message data pulled by the subscription in TB.
