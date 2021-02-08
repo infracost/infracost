@@ -161,6 +161,12 @@ resource_usage:
   #
   # Terraform GCP resources
   #
+  google_cloudfunctions_function.function:
+    monthly_gbz_secs: 10000 # Number of seconds of wallclock time with a 1GHz CPU provisioned
+    monthly_gb_secs: 10000 # Number of seconds of wallclock time with 1GB of memory provisioned
+    monthly_functions_calls: 1000000 # Number of invocations per month
+    monthly_outbound_data_gb: 100 # Number of data transferred from your function out to somewhere else
+
   google_compute_router_nat.my_nat:
     assigned_vms: 4                 # Number of VM instances assigned to the NAT gateway
     monthly_data_processed_gb: 1000 # Monthly data processed (ingress and egress) by the NAT gateway in GB

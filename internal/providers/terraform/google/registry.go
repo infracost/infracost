@@ -3,6 +3,7 @@ package google
 import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
+	GetCloudFunctionsRegistryItem(),
 	GetComputeAddressRegistryItem(),
 	GetComputeDiskRegistryItem(),
 	GetComputeGlobalAddressRegistryItem(),
@@ -21,6 +22,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 // FreeResources grouped alphabetically
 var FreeResources []string = []string{
+	"google_cloudfunctions_function_iam",
 	"google_compute_attached_disk",
 	"google_compute_backend_bucket",
 	"google_compute_backend_bucket_signed_url_key",
