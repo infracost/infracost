@@ -262,7 +262,6 @@ func defaultMain(cfg *config.Config) error {
 
 		state.ExistingState.Resources = append(state.ExistingState.Resources, projectState.ExistingState.Resources...)
 		state.PlannedState.Resources = append(state.PlannedState.Resources, projectState.PlannedState.Resources...)
-		state.Diff.Resources = append(state.Diff.Resources, projectState.Diff.Resources...)
 	}
 
 	spinnerOpts := spin.Options{
@@ -297,6 +296,7 @@ func defaultMain(cfg *config.Config) error {
 	}
 
 	schema.CalculateCosts(state)
+	state.CalculateDiff()
 
 	spinner.Success()
 
