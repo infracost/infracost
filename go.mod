@@ -9,8 +9,8 @@ require (
 	github.com/briandowns/spinner v1.12.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fatih/color v1.10.0
-	github.com/google/go-cmp v0.4.0 // indirect
-	github.com/google/uuid v1.2.0
+	github.com/google/go-cmp v0.4.1 // indirect
+	github.com/google/uuid v1.1.3
 	github.com/hashicorp/hcl2 v0.0.0-20191002203319-fb75b3253c80
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect

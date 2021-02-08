@@ -26,18 +26,13 @@ type Info struct {
 	Cmd           string
 }
 
-func CheckForUpdate() (*Info, error) {
-	if skipUpdateCheck() {
+func CheckForUpdate(cfg *config.Config) (*Info, error) {
+	if skipUpdateCheck(cfg) {
 		return nil, nil
 	}
 
 	// Check cache for the latest version
-	state, err := config.ReadStateFileIfNotExists()
-	if err != nil {
-		log.Debugf("error reading state file: %v", err)
-	}
-
-	cachedLatestVersion, err := checkCachedLatestVersion(state)
+	cachedLatestVersion, err := checkCachedLatestVersion(cfg)
 	if err != nil {
 		log.Debugf("error getting cached latest version: %v", err)
 	}
@@ -80,7 +75,7 @@ func CheckForUpdate() (*Info, error) {
 
 	// Save the latest version in the cache
 	if latestVersion != cachedLatestVersion {
-		err := saveCachedLatestVersion(state, latestVersion)
+		err := setCachedLatestVersion(cfg, latestVersion)
 		if err != nil {
 			log.Debugf("error saving cached latest version: %v", err)
 		}
@@ -96,8 +91,8 @@ func CheckForUpdate() (*Info, error) {
 	}, nil
 }
 
-func skipUpdateCheck() bool {
-	return config.IsTruthy(os.Getenv("INFRACOST_SKIP_UPDATE_CHECK")) || config.Environment.IsTest || config.Environment.IsDev
+func skipUpdateCheck(cfg *config.Config) bool {
+	return cfg.SkipUpdateCheck || cfg.Environment.IsTest || cfg.Environment.IsDev
 }
 
 func isBrewInstall() (bool, error) {
@@ -197,12 +192,12 @@ func getLatestGitHubVersion() (string, error) {
 	return v, nil
 }
 
-func checkCachedLatestVersion(state config.StateFile) (string, error) {
-	if state.LatestReleaseCheckedAt == "" {
+func checkCachedLatestVersion(cfg *config.Config) (string, error) {
+	if cfg.State.LatestReleaseCheckedAt == "" {
 		return "", nil
 	}
 
-	checkedAt, err := time.Parse(time.RFC3339, state.LatestReleaseCheckedAt)
+	checkedAt, err := time.Parse(time.RFC3339, cfg.State.LatestReleaseCheckedAt)
 	if err != nil {
 		return "", err
 	}
@@ -211,12 +206,12 @@ func checkCachedLatestVersion(state config.StateFile) (string, error) {
 		return "", nil
 	}
 
-	return state.LatestReleaseVersion, nil
+	return cfg.State.LatestReleaseVersion, nil
 }
 
-func saveCachedLatestVersion(state config.StateFile, latestVersion string) error {
-	state.LatestReleaseVersion = latestVersion
-	state.LatestReleaseCheckedAt = time.Now().Format(time.RFC3339)
+func setCachedLatestVersion(cfg *config.Config, latestVersion string) error {
+	cfg.State.LatestReleaseVersion = latestVersion
+	cfg.State.LatestReleaseCheckedAt = time.Now().Format(time.RFC3339)
 
-	return config.WriteStateFile(state)
+	return cfg.State.Save()
 }

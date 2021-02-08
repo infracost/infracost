@@ -1,6 +1,6 @@
 #!/bin/sh -le
 
-# This scripts runs infracost on the current branch then the master branch. It uses `git diff`
+# This script runs infracost on the current branch then the master branch. It uses `git diff`
 # to post a pull-request comment showing the cost estimate difference whenever a percentage
 # threshold is crossed.
 # Usage docs: https://www.infracost.io/docs/integrations/
@@ -10,14 +10,22 @@
 #   (https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) is recommended.
 
 # Set variables based on the order for GitHub Actions, or the env value for other CIs
-tfjson=${1:-$tfjson}
-tfplan=${2:-$tfplan}
-use_tfstate=${3:-$use_tfstate}
-tfdir=${4:-$tfdir}
-tfflags=${5:-$tfflags}
+terraform_json_file=${1:-$terraform_json_file}
+terraform_plan_file=${2:-$terraform_plan_file}
+terraform_use_state=${3:-$terraform_use_state}
+terraform_dir=${4:-$terraform_dir}
+terraform_plan_flags=${5:-$terraform_plan_flags}
+
 percentage_threshold=${6:-$percentage_threshold}
 pricing_api_endpoint=${7:-$pricing_api_endpoint}
 usage_file=${8:-$usage_file}
+
+# Handle deprecated var names
+terraform_json_file=${terraform_json_file:-$tfjson}
+terraform_plan_file=${terraform_plan_file:-$tfplan}
+terraform_use_state=${terraform_use_state:-$use_tfstate}
+terraform_dir=${terraform_dir:-$tfdir}
+terraform_plan_flags=${terraform_plan_flags:-$tfflags}
 
 # Set defaults
 percentage_threshold=${percentage_threshold:-0}
@@ -47,7 +55,7 @@ post_bitbucket_comment () {
           --arg default_branch_monthly_cost $default_branch_monthly_cost \
           --arg current_branch_monthly_cost $current_branch_monthly_cost \
           --arg diff "$(git diff --no-color --no-index default_branch_infracost.txt current_branch_infracost.txt | sed 1,2d | sed 3,5d)" \
-          '{content: {raw: "Monthly cost estimate will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n\n```diff\n\($diff)\n```\n"}}' > diff_infracost.txt
+          '{content: {raw: "Infracost estimate: monthly cost will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n\n```diff\n\($diff)\n```\n"}}' > diff_infracost.txt
 
   cat diff_infracost.txt | curl -L -X POST -d @- \
             -H "Content-Type: application/json" \
@@ -56,23 +64,23 @@ post_bitbucket_comment () {
 }
 
 infracost_cmd="infracost --no-color"
-if [ ! -z "$tfjson" ]; then
-  echo "WARNING: we do not recommend using tfjson as it doesn't work with this diff script, use tfdir instead."
-  infracost_cmd="$infracost_cmd --tfjson $tfjson"
+if [ ! -z "$terraform_json_file" ]; then
+  echo "WARNING: we do not recommend using terraform_json_file as it doesn't work with this diff script, use terraform_dir instead."
+  infracost_cmd="$infracost_cmd --terraform-json-file $terraform_json_file"
 fi
-if [ ! -z "$tfplan" ]; then
-  echo "WARNING: we do not recommend using tfplan as it doesn't work with this diff script, use tfdir instead."
-  infracost_cmd="$infracost_cmd --tfplan $tfplan"
+if [ ! -z "$terraform_plan_file" ]; then
+  echo "WARNING: we do not recommend using terraform_plan_file as it doesn't work with this diff script, use terraform_dir instead."
+  infracost_cmd="$infracost_cmd --terraform-plan-file $terraform_plan_file"
 fi
-if [ "$use_tfstate" = "true" ] || [ "$use_tfstate" = "True" ] || [ "$use_tfstate" = "TRUE" ]; then
-  echo "WARNING: we do not recommend using use_tfstate as it doesn't work with this diff script, use tfdir without this instead."
-  infracost_cmd="$infracost_cmd --use-tfstate"
+if [ "$terraform_use_state" = "true" ] || [ "$terraform_use_state" = "True" ] || [ "$terraform_use_state" = "TRUE" ]; then
+  echo "WARNING: we do not recommend using terraform_use_state as it doesn't work with this diff script, use terraform_dir without this instead."
+  infracost_cmd="$infracost_cmd --terraform-use-state"
 fi
-if [ ! -z "$tfdir" ]; then
-  infracost_cmd="$infracost_cmd --tfdir $tfdir"
+if [ ! -z "$terraform_dir" ]; then
+  infracost_cmd="$infracost_cmd --terraform-dir $terraform_dir"
 fi
-if [ ! -z "$tfflags" ]; then
-  infracost_cmd="$infracost_cmd --tfflags \"$tfflags\""
+if [ ! -z "$terraform_plan_flags" ]; then
+  infracost_cmd="$infracost_cmd --terraform-plan-flags \"$terraform_plan_flags\""
 fi
 if [ ! -z "$pricing_api_endpoint" ]; then
   infracost_cmd="$infracost_cmd --pricing-api-endpoint $pricing_api_endpoint"
@@ -117,6 +125,8 @@ if [ $(echo "$default_branch_monthly_cost > 0" | bc -l) = 1 ]; then
 else
   echo "Default branch has no cost, setting percent_diff=100 to force a comment"
   percent_diff=100
+  # Remove the empty OVERALL TOTAL line to avoid it showing-up in the diff
+  sed -i '/OVERALL TOTAL/d' default_branch_infracost.txt
 fi
 absolute_percent_diff=$(echo $percent_diff | tr -d -)
 
@@ -136,7 +146,7 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; the
           --arg default_branch_monthly_cost $default_branch_monthly_cost \
           --arg current_branch_monthly_cost $current_branch_monthly_cost \
           --arg diff "$(git diff --no-color --no-index default_branch_infracost.txt current_branch_infracost.txt | sed 1,2d | sed 3,5d)" \
-          '{($comment_key): "Monthly cost estimate will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n<details><summary>infracost diff</summary>\n\n```diff\n\($diff)\n```\n</details>\n"}' > diff_infracost.txt
+          '{($comment_key): "Infracost estimate: monthly cost will \($change_word) by \($absolute_percent_diff)% (default branch $\($default_branch_monthly_cost) vs current branch $\($current_branch_monthly_cost))\n<details><summary>infracost diff</summary>\n\n```diff\n\($diff)\n```\n</details>\n"}' > diff_infracost.txt
 
   echo "Default branch and current branch diff ($absolute_percent_diff) is more than the percentage threshold ($percentage_threshold)."
 
@@ -193,5 +203,5 @@ if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; the
     fi
   fi
 else
-  echo "Comment not posted as default branch and current branch diff ($absolute_percent_diff) is not more than the percentage threshold ($percentage_threshold)."
+  echo "Comment not posted as default branch and current branch diff ($absolute_percent_diff) is less than or equal to percentage threshold ($percentage_threshold)."
 fi

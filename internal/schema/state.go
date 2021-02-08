@@ -14,6 +14,14 @@ type State struct {
 	Diff          *ResourcesState
 }
 
+func NewState() *State {
+	return &State{
+		ExistingState: &ResourcesState{},
+		PlannedState:  &ResourcesState{},
+		Diff:          &ResourcesState{},
+	}
+}
+
 // AllResources returns a pointer list of all resources of the state.
 func (state *State) AllResources() []*Resource {
 	var resources []*Resource

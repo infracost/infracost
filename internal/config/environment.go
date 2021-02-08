@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
@@ -14,49 +13,56 @@ import (
 	"github.com/infracost/infracost/internal/version"
 )
 
-type EnvironmentSpec struct {
+type Environment struct {
 	Version                             string   `json:"version"`
 	FullVersion                         string   `json:"fullVersion"`
-	Flags                               []string `json:"flags"`
-	OutputFormat                        string   `json:"outputFormat"`
 	IsTest                              bool     `json:"isTest"`
 	IsDev                               bool     `json:"isDev"`
+	InstallID                           string   `json:"installId"`
+	IsDefaultPricingAPIEndpoint         bool     `json:"isDefaultPricingAPIEndpoint"`
 	OS                                  string   `json:"os"`
 	CIPlatform                          string   `json:"ciPlatform,omitempty"`
 	CIScript                            string   `json:"ciScript,omitempty"`
+	Flags                               []string `json:"flags"`
+	OutputFormat                        string   `json:"outputFormat"`
 	TerraformBinary                     string   `json:"terraformBinary"`
 	TerraformFullVersion                string   `json:"terraformFullVersion"`
 	TerraformVersion                    string   `json:"terraformVersion"`
 	TerraformRemoteExecutionModeEnabled bool     `json:"terraformRemoteExecutionModeEnabled"`
 	TerraformInfracostProviderEnabled   bool     `json:"terraformInfracostProviderEnabled"`
-	HasUsageFile                        bool     `json:"hasUsageFile"`
 	IsAWSChina                          bool     `json:"isAwsChina"`
+	HasConfigFile                       bool     `json:"hasConfigFile"`
+	HasUsageFile                        bool     `json:"hasUsageFile"`
 }
 
-var Environment *EnvironmentSpec
-
-func init() {
-	Environment = loadEnvironment()
-}
-
-func loadEnvironment() *EnvironmentSpec {
-	return &EnvironmentSpec{
-		Version:                             baseVersion(version.Version),
-		FullVersion:                         version.Version,
-		Flags:                               []string{},
-		OutputFormat:                        "",
-		IsTest:                              isTest(),
-		IsDev:                               isDev(),
-		OS:                                  runtime.GOOS,
-		CIPlatform:                          ciPlatform(),
-		CIScript:                            ciScript(),
-		TerraformBinary:                     filepath.Base(terraformBinary()),
-		TerraformFullVersion:                terraformFullVersion(),
-		TerraformVersion:                    terraformVersion(),
-		TerraformRemoteExecutionModeEnabled: false,
-		TerraformInfracostProviderEnabled:   false,
-		IsAWSChina:                          false,
+func NewEnvironment() *Environment {
+	return &Environment{
+		Version:     baseVersion(version.Version),
+		FullVersion: version.Version,
+		IsTest:      isTest(),
+		IsDev:       isDev(),
+		OS:          runtime.GOOS,
+		CIPlatform:  ciPlatform(),
+		CIScript:    ciScript(),
 	}
+}
+
+func (e *Environment) SetTerraformEnvironment(projectCfg *TerraformProject) {
+	binary := projectCfg.Binary
+	if binary == "" {
+		binary = "terraform"
+	}
+	out, _ := exec.Command(binary, "-version").Output()
+	fullVersion := strings.SplitN(string(out), "\n", 2)[0]
+	version := terraformVersion(fullVersion)
+
+	e.TerraformBinary = binary
+	e.TerraformFullVersion = fullVersion
+	e.TerraformVersion = version
+}
+
+func (e *Environment) SetOutputEnvironment(outputCfg *Output) {
+	e.OutputFormat = outputCfg.Format
 }
 
 func userAgent() string {
@@ -73,25 +79,8 @@ func baseVersion(v string) string {
 	return strings.SplitN(v, "+", 2)[0]
 }
 
-func terraformBinary() string {
-	terraformBinary := os.Getenv("TERRAFORM_BINARY")
-	if terraformBinary == "" {
-		terraformBinary = "terraform"
-	}
-	return terraformBinary
-}
-
-func terraformFullVersion() string {
-	exe := terraformBinary()
-	out, _ := exec.Command(exe, "-version").Output()
-
-	return strings.SplitN(string(out), "\n", 2)[0]
-}
-
-func terraformVersion() string {
-	v := terraformFullVersion()
-
-	p := strings.Split(v, " ")
+func terraformVersion(full string) string {
+	p := strings.Split(full, " ")
 	if len(p) > 1 {
 		return p[len(p)-1]
 	}
@@ -102,6 +91,8 @@ func terraformVersion() string {
 func ciScript() string {
 	if IsTruthy(os.Getenv("INFRACOST_CI_DIFF")) {
 		return "ci-diff"
+	} else if IsTruthy(os.Getenv("INFRACOST_CI_ATLANTIS_DIFF")) {
+		return "ci-atlantis-diff"
 	}
 
 	return ""
@@ -153,8 +144,8 @@ func AddNoAuthHeaders(req *http.Request) {
 	req.Header.Set("User-Agent", userAgent())
 }
 
-func AddAuthHeaders(req *http.Request) {
+func AddAuthHeaders(apiKey string, req *http.Request) {
 	AddNoAuthHeaders(req)
-	req.Header.Set("X-Api-Key", Config.APIKey)
+	req.Header.Set("X-Api-Key", apiKey)
 	req.Header.Set("X-Trace-Id", TraceID())
 }

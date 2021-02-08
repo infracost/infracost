@@ -12,7 +12,6 @@ import (
 
 	"github.com/hashicorp/hcl2/gohcl"
 	"github.com/hashicorp/hcl2/hclparse"
-	"github.com/infracost/infracost/internal/config"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -53,11 +52,7 @@ func cloudAPI(host string, path string, token string) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func cloudToken(host string) string {
-	if config.Config.TerraformCloudToken != "" {
-		return config.Config.TerraformCloudToken
-	}
-
+func findCloudToken(host string) string {
 	if os.Getenv("TF_CLI_CONFIG_FILE") != "" {
 		log.Debugf("TF_CLI_CONFIG_FILE is set, checking %s for Terraform Cloud credentials", os.Getenv("TF_CLI_CONFIG_FILE"))
 		token, err := credFromHCL(os.Getenv("TF_CLI_CONFIG_FILE"), host)
@@ -135,11 +130,7 @@ func credFromJSON(filename, host string) (string, error) {
 	return "", nil
 }
 
-func checkConfigSet() bool {
-	if config.Config.TerraformCloudToken != "" {
-		return true
-	}
-
+func checkCloudConfigSet() bool {
 	if os.Getenv("TF_CLI_CONFIG_FILE") != "" {
 		return true
 	}

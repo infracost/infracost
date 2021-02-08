@@ -7,27 +7,34 @@ import (
 
 	spinnerpkg "github.com/briandowns/spinner"
 	"github.com/fatih/color"
-	"github.com/infracost/infracost/internal/config"
 	log "github.com/sirupsen/logrus"
 )
+
+type Options struct {
+	EnableLogging bool
+	NoColor       bool
+	Indent        string
+}
 
 type Spinner struct {
 	spinner *spinnerpkg.Spinner
 	msg     string
+	opts    Options
 }
 
-func NewSpinner(msg string) *Spinner {
+func NewSpinner(msg string, opts Options) *Spinner {
 	s := &Spinner{
 		spinner: spinnerpkg.New(spinnerpkg.CharSets[14], 100*time.Millisecond, spinnerpkg.WithWriter(os.Stderr)),
 		msg:     msg,
+		opts:    opts,
 	}
 
-	if config.Config.IsLogging() {
+	if s.opts.EnableLogging {
 		log.Infof("starting: %s", msg)
 	} else {
-		s.spinner.Prefix = "  "
+		s.spinner.Prefix = opts.Indent
 		s.spinner.Suffix = fmt.Sprintf(" %s", msg)
-		if !config.Config.NoColor {
+		if !s.opts.NoColor {
 			_ = s.spinner.Color("fgHiBlue", "bold")
 		}
 		s.spinner.Start()
@@ -45,10 +52,10 @@ func (s *Spinner) Fail() {
 		return
 	}
 	s.spinner.Stop()
-	if config.Config.IsLogging() {
+	if s.opts.EnableLogging {
 		log.Errorf("failed: %s", s.msg)
 	} else {
-		fmt.Fprintln(os.Stderr, color.HiRedString("  ✖ %s", s.msg))
+		fmt.Fprintln(os.Stderr, color.HiRedString("%s✖ %s", s.opts.Indent, s.msg))
 	}
 }
 
@@ -57,9 +64,9 @@ func (s *Spinner) Success() {
 		return
 	}
 	s.spinner.Stop()
-	if config.Config.IsLogging() {
+	if s.opts.EnableLogging {
 		log.Infof("completed: %s", s.msg)
 	} else {
-		fmt.Fprintln(os.Stderr, color.GreenString("  ✔ %s", s.msg))
+		fmt.Fprintln(os.Stderr, color.GreenString("%s✔ %s", s.opts.Indent, s.msg))
 	}
 }

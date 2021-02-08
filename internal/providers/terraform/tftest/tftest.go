@@ -18,8 +18,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
-
-	"github.com/urfave/cli/v2"
 )
 
 var tfProviders = `
@@ -130,18 +128,22 @@ func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, 
 }
 
 func ResourceTestsForProject(t *testing.T, project Project, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
-	state, err := RunCostCalculations(project, usage)
+	cfg := config.DefaultConfig()
+	err := cfg.LoadFromEnv()
+	assert.NoError(t, err)
+
+	state, err := RunCostCalculations(cfg, project, usage)
 	assert.NoError(t, err)
 
 	testutil.TestResources(t, state.PlannedState.Resources, checks)
 }
 
-func RunCostCalculations(project Project, usage map[string]*schema.UsageData) (*schema.State, error) {
-	state, err := loadResources(project, usage)
+func RunCostCalculations(cfg *config.Config, project Project, usage map[string]*schema.UsageData) (*schema.State, error) {
+	state, err := loadResources(cfg, project, usage)
 	if err != nil {
 		return state, err
 	}
-	err = prices.PopulatePrices(state)
+	err = prices.PopulatePrices(cfg, state)
 	if err != nil {
 		return state, err
 	}
@@ -153,22 +155,15 @@ func CreateProject(project Project) (string, error) {
 	return writeToTmpDir(project)
 }
 
-func loadResources(project Project, usage map[string]*schema.UsageData) (*schema.State, error) {
+func loadResources(cfg *config.Config, project Project, usage map[string]*schema.UsageData) (*schema.State, error) {
 	tfdir, err := CreateProject(project)
 	if err != nil {
 		return nil, err
 	}
 
-	flags := flag.NewFlagSet("test", 0)
-	flags.String("tfdir", tfdir, "")
-	flags.String("usage-file", filepath.Join(tfdir, "infracost-usage.yml"), "")
-	c := cli.NewContext(nil, flags, nil)
-
-	provider := terraform.New()
-	err = provider.ProcessArgs(c)
-	if err != nil {
-		return nil, err
-	}
+	provider := terraform.New(cfg, &config.TerraformProject{
+		Dir: tfdir,
+	})
 
 	return provider.LoadResources(usage)
 }

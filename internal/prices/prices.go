@@ -1,9 +1,11 @@
 package prices
 
 import (
+	"fmt"
 	"runtime"
 	"sync"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/events"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
@@ -13,8 +15,8 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func PopulatePrices(state *schema.State) error {
-	q := NewGraphQLQueryRunner()
+func PopulatePrices(cfg *config.Config, state *schema.State) error {
+	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", cfg.PricingAPIEndpoint), cfg.APIKey)
 	resources := state.AllResources()
 
 	var wg sync.WaitGroup
@@ -28,7 +30,7 @@ func PopulatePrices(state *schema.State) error {
 			IncludeUnsupportedProviders: true,
 		})
 
-		events.SendReport("resourceSummary", summary)
+		events.SendReport(cfg, "resourceSummary", summary)
 	}()
 
 	err := GetPricesConcurrent(resources, q)
