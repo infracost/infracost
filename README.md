@@ -1,11 +1,11 @@
 [![Infracost logo](.github/assets/logo.svg)](https://www.infracost.io)
 
-<a href="https://www.infracost.io/docs/"><img alt="Docs" src="https://img.shields.io/badge/docs-blue"/></a>
+<a href="https://www.infracost.io/community-chat"><img alt="Community Slack channel" src="https://img.shields.io/badge/chat-Slack-%234a154b"/></a>
 <a href="https://github.com/infracost/infracost/actions?query=workflow%3AGo+branch%3Amaster"><img alt="Build Status" src="https://img.shields.io/github/workflow/status/infracost/infracost/Go/master"/></a>
 <a href="https://hub.docker.com/r/infracost/infracost/tags"><img alt="Docker Image" src="https://img.shields.io/docker/cloud/build/infracost/infracost"/></a>
 <a href="https://twitter.com/intent/tweet?text=Get%20cost%20estimates%20for%20cloud%20infrastructure%20in%20pull%20requests!&url=https://www.infracost.io&hashtags=cloud,cost,aws,IaC,terraform"><img alt="Tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
 
-[![Community Slack](.github/assets/community-slack.svg)](https://www.infracost.io/community-chat)
+<a href="https://www.infracost.io/docs/"><img alt="Getting started" src="https://img.shields.io/badge/get%20started-blue?style=for-the-badge&logo=read-the-docs&label=docs"/></a>
 
 Infracost shows cloud cost estimates for Terraform projects. It helps developers, devops and others to quickly see the cost breakdown and compare different options upfront.
 
@@ -54,7 +54,7 @@ There are [4 usage methods](https://www.infracost.io/docs/#usage-methods) for In
   infracost --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
   ```
 
-Checkout the [docs site](https://www.infracost.io/docs/) for additional usage options, including notes for [Terragrunt](https://www.infracost.io/docs/terragrunt) and [Terraform Cloud](https://www.infracost.io/docs/terraform_cloud_enterprise) users.
+Read the [**getting started**](https://www.infracost.io/docs/) docs for details, including notes for [Terragrunt](https://www.infracost.io/docs/terragrunt) and [Terraform Cloud](https://www.infracost.io/docs/terraform_cloud_enterprise) users.
 
 As mentioned in the [FAQ](https://www.infracost.io/docs/faq), you can run Infracost in your Terraform directories without worrying about security or privacy issues as no cloud credentials, secrets, tags or Terraform resource identifiers are sent to the open-source [Cloud Pricing API](https://github.com/infracost/cloud-pricing-api). Infracost does not make any changes to your Terraform state or cloud resources.
 
@@ -73,7 +73,7 @@ If you run into any issues with CI/CD integrations, please join our [community S
 
 ## Supported clouds and resources
 
-Infracost supports over [50 AWS and Google resources](https://www.infracost.io/docs/supported_resources/), Azure is [planned](https://github.com/infracost/infracost/issues/64). The quickest way to find out if your Terraform resources are supported is to run Infracost with the `--show-skipped` option. This shows the unsupported resources, some of which might be free. Please watch this repo for new releases as we add new cloud resources every week or so.
+Infracost supports over [70 AWS and Google resources](https://www.infracost.io/docs/supported_resources/), Azure is [planned](https://github.com/infracost/infracost/issues/64). The quickest way to find out if your Terraform resources are supported is to run Infracost with the `--show-skipped` option. This shows the unsupported resources, some of which might be free. Please watch this repo for new releases as we add new cloud resources every week or so.
 
 See [this page](https://www.infracost.io/docs/usage_based_resources) for details on cost estimation of usage-based resources.
 
