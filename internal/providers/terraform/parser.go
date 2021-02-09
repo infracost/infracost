@@ -199,12 +199,14 @@ func resourceRegion(resourceType string, v gjson.Result) string {
 		return ""
 	}
 
-	p := strings.Split(v.Get(arnAttr).String(), ":")
-	if len(p) > 3 {
-		return p[3]
+	arn := v.Get(arnAttr).String()
+	p := strings.Split(arn, ":")
+	if len(p) < 4 {
+		log.Debugf("Unexpected ARN format for %s", arn)
+		return ""
 	}
 
-	return ""
+	return p[3]
 }
 
 func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
