@@ -43,7 +43,7 @@ func TestConfigRuleItem(t *testing.T) {
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
 
-func TestCodebuildProject_usage(t *testing.T) {
+func TestCongigRule_usage(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
