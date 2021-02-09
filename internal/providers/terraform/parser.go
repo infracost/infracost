@@ -184,6 +184,12 @@ func resourceRegion(resourceType string, v gjson.Result) string {
 		return ""
 	}
 
+	// If a region key exists in the values use that
+	if v.Get("region").String() != "" {
+		return v.Get("region").String()
+	}
+
+	// Otherwise try and parse the ARN from the values
 	arnAttr, ok := arnAttributeMap[resourceType]
 	if !ok {
 		arnAttr = "arn"
@@ -193,7 +199,12 @@ func resourceRegion(resourceType string, v gjson.Result) string {
 		return ""
 	}
 
-	return strings.Split(v.Get(arnAttr).String(), ":")[3]
+	p := strings.Split(v.Get(arnAttr).String(), ":")
+	if len(p) > 3 {
+		return p[3]
+	}
+
+	return ""
 }
 
 func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
