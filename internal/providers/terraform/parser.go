@@ -193,7 +193,12 @@ func resourceRegion(resourceType string, v gjson.Result) string {
 		return ""
 	}
 
-	return strings.Split(v.Get(arnAttr).String(), ":")[3]
+	p := strings.Split(v.Get(arnAttr).String(), ":")
+	if len(p) > 3 {
+		return p[3]
+	}
+
+	return ""
 }
 
 func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
