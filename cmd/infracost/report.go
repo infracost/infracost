@@ -3,16 +3,37 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"strings"
 
-	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 )
 
-func reportCmd() *cli.Command {
+func reportCmd(cfg *config.Config) *cli.Command {
+	deprecatedFlags := []cli.Flag{
+		&cli.StringFlag{
+			Name:   "output",
+			Usage:  "Output format: json, table, html",
+			Value:  "table",
+			Hidden: true,
+		},
+	}
+
+	flags := append(deprecatedFlags,
+		&cli.StringFlag{
+			Name:  "format",
+			Usage: "Output format: json, table, html",
+			Value: "table",
+		},
+		&cli.BoolFlag{
+			Name:  "show-skipped",
+			Usage: "Show unsupported resources, some of which might be free. Only for table and HTML output",
+			Value: false,
+		},
+	)
+
 	return &cli.Command{
 		Name:  "report",
 		Usage: "Create a report from multiple Infracost JSON files",
@@ -23,28 +44,14 @@ EXAMPLES:
 	infracost report out1.json out2.json out3.json
 
 	# Create HTML report from multiple Infracost JSON files
-	infracost report --output html out*.json > report.html
+	infracost report --format html out*.json > report.html
 
 	# Merge multiple Infracost JSON files
-	infracost report --output json out*.json`,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "output",
-				Aliases: []string{"o"},
-				Usage:   "Output format: json, table, html",
-				Value:   "table",
-			},
-			&cli.BoolFlag{
-				Name:  "show-skipped",
-				Usage: "Show unsupported resources, some of which might be free. Only for table and HTML output",
-				Value: false,
-			},
-		},
+	infracost report --format json out*.json`,
+		Flags: flags,
 		Action: func(c *cli.Context) error {
-			if c.String("output") == "json" && c.Bool("show-skipped") {
-				msg := color.YellowString("The --show-skipped option is not needed with JSON output as that always includes them\n")
-				fmt.Fprint(os.Stderr, msg)
-			}
+			handleDeprecatedEnvVars(c, deprecatedEnvVarMapping)
+			handleDeprecatedFlags(c, deprecatedFlagsMapping)
 
 			files := make([]string, 0)
 
@@ -72,20 +79,31 @@ EXAMPLES:
 				})
 			}
 
-			opts := output.Options{GroupKey: "filename", GroupLabel: "File"}
+			opts := output.Options{
+				ShowSkipped: c.Bool("show-skipped"),
+				NoColor:     cfg.NoColor,
+				GroupKey:    "filename",
+				GroupLabel:  "File",
+			}
+
 			combined := output.Combine(inputs, opts)
+
+			outputCfg := &config.Output{
+				Format:      c.String("format"),
+				ShowSkipped: c.Bool("show-skipped"),
+			}
 
 			var (
 				b   []byte
 				err error
 			)
-			switch strings.ToLower(c.String("output")) {
+			switch strings.ToLower(outputCfg.Format) {
 			case "json":
-				b, err = output.ToJSON(combined)
+				b, err = output.ToJSON(combined, opts)
 			case "html":
-				b, err = output.ToHTML(combined, opts, c)
+				b, err = output.ToHTML(combined, opts)
 			default:
-				b, err = output.ToTable(combined, c)
+				b, err = output.ToTable(combined, opts)
 			}
 			if err != nil {
 				return err

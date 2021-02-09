@@ -1,7 +1,7 @@
-# You can use this file to define resource usage estimates for Infracost to use when calculating
-# the cost of usage-based resource, such as AWS Lambda.
-# `infracost --usage-file /path/to/infracost-usage.yml [other flags]`
-# See https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml for available options.
+## You can use this file to define resource usage estimates for Infracost to use when calculating
+## the cost of usage-based resource, such as AWS Lambda.
+## `infracost --usage-file /path/to/infracost-usage.yml [other flags]`
+## See https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml for available options.
 version: v0.1
 resource_usage:
 
@@ -35,6 +35,9 @@ resource_usage:
     storage_gb: 1000               # Total data stored by CloudWatch logs in GB.
     monthly_data_ingested_gb: 1000 # Data ingested by CloudWatch logs per month in GB.
     monthly_data_scanned_gb: 200   # Data scanned by CloudWatch logs insights per month in GB.
+
+  aws_codebuild_project.my_project: 
+    monthly_build_mins: 10000 # Total duration of builds during the month in minutes. Each build is rounded up to the nearest minute.
 
   aws_data_transfer.my_region:
     region: us-east-1                           # Region the data transfer is originating from.

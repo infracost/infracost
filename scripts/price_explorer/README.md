@@ -191,3 +191,35 @@ When adding a new resource to infracost, a `productFilter` has to be added that 
     }
   }
   ```
+
+# MongoDB lookups
+
+Instead of using the scripts, you can also run `distinct` or `regex` queries on MongoDB to explore the prices.
+
+1. Install MongoDB version 4.
+2. Join our [Community Slack channel](https://www.infracost.io/community-chat), and send a message to Ali Khajeh-Hosseini, he'll send you a link so you can download a copy of his MongoDB dump.
+3. Import the prices to your local:
+
+  ```
+  tar -xvf cloudPricing.tar
+  mongorestore --gzip cloudPricing
+```
+4. You can now query you local MongoDB:
+```
+mongo
+use cloudPricing;
+
+db.products.distinct("vendorName");
+> should show you: [ "aws", "gcp" ]
+
+db.products.distinct("service", {"vendorName": "gcp", "service": {$regex: "kms", $options: "i"} });
+> [ "Cloud Key Management Service (KMS)", "Thales CPL ekms-dpod-eu" ]
+
+db.products.distinct("attributes.description", {"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)" });
+> [
+	"Active HSM ECDSA P-256 key versions",
+	"Active HSM ECDSA P-384 key versions",
+	"Active HSM RSA 2048 bit key versions",
+...
+]
+```

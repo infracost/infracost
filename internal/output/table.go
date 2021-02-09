@@ -5,13 +5,11 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/infracost/infracost/internal/config"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
 )
 
-func ToTable(out Root, c *cli.Context) ([]byte, error) {
+func ToTable(out Root, opts Options) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -35,8 +33,8 @@ func ToTable(out Root, c *cli.Context) ([]byte, error) {
 	for _, r := range out.Resources {
 		t.Append([]string{r.Name, "", "", "", "", ""})
 
-		buildCostComponentRows(t, r.CostComponents, "", len(r.SubResources) > 0)
-		buildSubResourceRows(t, r.SubResources, "")
+		buildCostComponentRows(t, r.CostComponents, "", len(r.SubResources) > 0, opts.NoColor)
+		buildSubResourceRows(t, r.SubResources, "", opts.NoColor)
 
 		t.Append([]string{
 			"Total",
@@ -60,7 +58,7 @@ func ToTable(out Root, c *cli.Context) ([]byte, error) {
 
 	t.Render()
 
-	msg := out.unsupportedResourcesMessage(c.Bool("show-skipped"))
+	msg := out.unsupportedResourcesMessage(opts.ShowSkipped)
 	if msg != "" {
 		_, err := bufw.WriteString(fmt.Sprintf("\n%s", msg))
 		if err != nil {
@@ -73,11 +71,11 @@ func ToTable(out Root, c *cli.Context) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func buildSubResourceRows(t *tablewriter.Table, subresources []Resource, prefix string) {
+func buildSubResourceRows(t *tablewriter.Table, subresources []Resource, prefix string, noColor bool) {
 	color := []tablewriter.Colors{
 		{tablewriter.FgHiBlackColor},
 	}
-	if config.Config.NoColor {
+	if noColor {
 		color = nil
 	}
 
@@ -91,12 +89,12 @@ func buildSubResourceRows(t *tablewriter.Table, subresources []Resource, prefix 
 
 		t.Rich([]string{fmt.Sprintf("%s %s", labelPrefix, r.Name)}, color)
 
-		buildCostComponentRows(t, r.CostComponents, nextPrefix, len(r.SubResources) > 0)
-		buildSubResourceRows(t, r.SubResources, nextPrefix)
+		buildCostComponentRows(t, r.CostComponents, nextPrefix, len(r.SubResources) > 0, noColor)
+		buildSubResourceRows(t, r.SubResources, nextPrefix, noColor)
 	}
 }
 
-func buildCostComponentRows(t *tablewriter.Table, costComponents []CostComponent, prefix string, hasSubResources bool) {
+func buildCostComponentRows(t *tablewriter.Table, costComponents []CostComponent, prefix string, hasSubResources bool, noColor bool) {
 	color := []tablewriter.Colors{
 		{tablewriter.FgHiBlackColor},
 		{tablewriter.FgHiBlackColor},
@@ -105,7 +103,7 @@ func buildCostComponentRows(t *tablewriter.Table, costComponents []CostComponent
 		{tablewriter.FgHiBlackColor},
 		{tablewriter.FgHiBlackColor},
 	}
-	if config.Config.NoColor {
+	if noColor {
 		color = nil
 	}
 
