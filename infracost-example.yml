@@ -23,13 +23,13 @@ projects:
   terraform:
     ## If using the Terraform directory method, see https://www.infracost.io/docs/#1-terraform-directory
     - dir: examples/terraform
+      usage_file: infracost-usage-example.yml # Define resource usage estimates, see https://www.infracost.io/docs/usage_based_resources
 
     ## Example of using a YAML anchor
     # - <<: *terraform_defaults
     #   dir: examples/terraform
     #   plan_flags: -var-file=prod.tfvars -var-file=us-east.tfvars
     #   workspace: prod
-    #   usage_file: infracost-usage.yml # Define resource usage estimates
 
     ## If using the Terraform state file method, see https://www.infracost.io/docs/#2-terraform-state-file
     # - dir: example/terraform

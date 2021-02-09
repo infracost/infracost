@@ -22,7 +22,7 @@ percentage_threshold=${percentage_threshold:-0}
 export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
 export INFRACOST_CI_ATLANTIS_DIFF=true
 
-infracost_cmd="infracost --no-color"
+infracost_cmd="infracost --no-color --terraform-dir ."
 if [ ! -z "$terraform_plan_flags" ]; then
   infracost_cmd="$infracost_cmd --terraform-plan-flags \"$terraform_plan_flags\""
 fi
@@ -38,6 +38,18 @@ else
   echo "$infracost_cmd 2>/dev/null" > infracost_cmd
 fi
 
+# Handle Atlantis merge checkout-strategy
+current_branch_commit=$(git rev-parse HEAD)
+current_branch_previous_commit_email=$(git log -1 --pretty=format:'%ae')
+current_branch_previous_commit_message=$(git log -1 --pretty=format:'%B')
+if [ "$current_branch_previous_commit_email" = "atlantis@runatlantis.io" ] && [ "$current_branch_previous_commit_message" = "atlantis-merge" ]; then
+  if [ "$atlantis_debug" = "true" ]; then echo "Detected Atlantis merge checkout-strategy so checking out head branch to avoid running against Atlantis' temporary merge commit."; fi
+  git remote set-branches head $HEAD_BRANCH_NAME &>/dev/null || if [ "$atlantis_debug" = "true" ]; then echo "Could not set-branches $HEAD_BRANCH_NAME, this might prevent switching to it, continuing..."; fi
+  git fetch --depth=1 head $HEAD_BRANCH_NAME &>/dev/null || if [ "$atlantis_debug" = "true" ]; then echo "Could not fetch branch head/$HEAD_BRANCH_NAME, no problems, switching to it..."; fi
+  # Use 'checkout head/branch' vs the 'switch' that's used in diff.sh to ensure latest branch changes are used locally
+  git checkout head/$HEAD_BRANCH_NAME &>/dev/null || (echo "[Infracost] Error: could not switch to branch $HEAD_BRANCH_NAME" && exit 1)
+fi
+
 if [ "$atlantis_debug" = "true" ]; then
   echo "Running infracost on current branch using:"
   echo "  $ $(cat infracost_cmd)"
@@ -49,9 +61,8 @@ echo "$current_branch_output" | sed 's/MONTHLY COST/MONTHLY COST /' > current_br
 current_branch_monthly_cost=$(cat current_branch_infracost.txt | awk '/OVERALL TOTAL/ { gsub(",",""); printf("%.2f",$NF) }')
 if [ "$atlantis_debug" = "true" ]; then echo "current_branch_monthly_cost is $current_branch_monthly_cost"; fi
 
-current_branch=$(git rev-parse --abbrev-ref HEAD)
-if [ "$current_branch" = "$BASE_BRANCH_NAME" ]; then
-  echo "Exiting as the current branch was the default branch so nothing more to do."
+if [ "$HEAD_BRANCH_NAME" = "$BASE_BRANCH_NAME" ]; then
+  if [ "$atlantis_debug" = "true" ]; then echo "Exiting as the current branch was the default branch so nothing more to do."; fi
   exit 0
 fi
 
@@ -63,17 +74,25 @@ git checkout origin/$BASE_BRANCH_NAME &>/dev/null || (echo "[Infracost] Error: c
 
 if [ "$atlantis_debug" = "true" ]; then git log -n1; fi
 
-if [ "$atlantis_debug" = "true" ]; then
-  echo "Running infracost on default branch using:"
-  echo "  $ $(cat infracost_cmd)"
+# Handle case of new projects in Atlantis where the base branch doesn't have the Terraform files yet
+if [ $(find -regex ".*\.\(tf\|hcl\|hcl.json\)" | grep -v .lock.hcl | wc -l) = "0" ]; then
+  if [ "$atlantis_debug" = "true" ]; then echo "Default branch does not have this folder, setting its cost to 0."; fi
+  default_branch_monthly_cost=0
+  touch default_branch_infracost.txt
+else
+  if [ "$atlantis_debug" = "true" ]; then
+    echo "Running infracost on default branch using:"
+    echo "  $ $(cat infracost_cmd)"
+  fi
+  default_branch_output=$(cat infracost_cmd | sh)
+  echo "$default_branch_output" > default_branch_infracost.txt
+  default_branch_monthly_cost=$(cat default_branch_infracost.txt | awk '/OVERALL TOTAL/ { gsub(",",""); printf("%.2f",$NF) }')
 fi
-default_branch_output=$(cat infracost_cmd | sh)
-echo "$default_branch_output" > default_branch_infracost.txt
-default_branch_monthly_cost=$(cat default_branch_infracost.txt | awk '/OVERALL TOTAL/ { gsub(",",""); printf("%.2f",$NF) }')
+
 if [ "$atlantis_debug" = "true" ]; then echo "default_branch_monthly_cost is $default_branch_monthly_cost"; fi
 
 # Switch back to try and not confuse Atlantis
-git switch $HEAD_BRANCH_NAME &>/dev/null
+git checkout $current_branch_commit &>/dev/null
 
 if [ $(echo "$default_branch_monthly_cost > 0" | bc -l) = 1 ]; then
   percent_diff=$(echo "scale=4; $current_branch_monthly_cost / $default_branch_monthly_cost * 100 - 100" | bc)
