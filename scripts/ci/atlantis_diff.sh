@@ -43,11 +43,11 @@ current_branch_commit=$(git rev-parse HEAD)
 current_branch_previous_commit_email=$(git log -1 --pretty=format:'%ae')
 current_branch_previous_commit_message=$(git log -1 --pretty=format:'%B')
 if [ "$current_branch_previous_commit_email" = "atlantis@runatlantis.io" ] && [ "$current_branch_previous_commit_message" = "atlantis-merge" ]; then
-  if [ "$atlantis_debug" = "true" ]; then echo "Checking out previous commit on current branch to handle Atlantis merge checkout-strategy."; fi
-  git remote set-branches origin $HEAD_BRANCH_NAME &>/dev/null || if [ "$atlantis_debug" = "true" ]; then echo "Could not set-branches $HEAD_BRANCH_NAME, this might prevent switching to it, continuing..."; fi
-  git fetch --depth=1 origin $HEAD_BRANCH_NAME &>/dev/null || if [ "$atlantis_debug" = "true" ]; then echo "Could not fetch branch $HEAD_BRANCH_NAME from origin, no problems, switching to it..."; fi
-  # Use 'checkout origin/branch' vs the 'switch' that's used in diff.sh to ensure latest branch changes are used locally
-  git checkout origin/$HEAD_BRANCH_NAME &>/dev/null || (echo "[Infracost] Error: could not switch to branch $HEAD_BRANCH_NAME" && exit 1)
+  if [ "$atlantis_debug" = "true" ]; then echo "Detected Atlantis merge checkout-strategy so checking out head branch to avoid running against Atlantis' temporary merge commit."; fi
+  git remote set-branches head $HEAD_BRANCH_NAME &>/dev/null || if [ "$atlantis_debug" = "true" ]; then echo "Could not set-branches $HEAD_BRANCH_NAME, this might prevent switching to it, continuing..."; fi
+  git fetch --depth=1 head $HEAD_BRANCH_NAME &>/dev/null || if [ "$atlantis_debug" = "true" ]; then echo "Could not fetch branch head/$HEAD_BRANCH_NAME, no problems, switching to it..."; fi
+  # Use 'checkout head/branch' vs the 'switch' that's used in diff.sh to ensure latest branch changes are used locally
+  git checkout head/$HEAD_BRANCH_NAME &>/dev/null || (echo "[Infracost] Error: could not switch to branch $HEAD_BRANCH_NAME" && exit 1)
 fi
 
 if [ "$atlantis_debug" = "true" ]; then
