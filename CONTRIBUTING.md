@@ -184,7 +184,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 unless the price is for a large number, e.g. set it to `1000000` if the price should be shown "per 1M requests" in the output.
 
-- tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)". Units should not be included in brackets unless the cost component relates to storage or data transfer, e.g. "Storage (first 1TB)    GB" is more understandable than "Storage (first 1K)    GB" since users understand terabytes and petabytes.
+- tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)". Use the words "first", "next" and "over" when describing tiers. Units should not be included in brackets unless the cost component relates to storage or data transfer, e.g. "Storage (first 1TB)    GB" is more understandable than "Storage (first 1K)    GB" since users understand terabytes and petabytes.
 
 - purchase options: if applicable, include "on-demand" in brackets after the cost component name, e.g. `Database instance (on-demand`
 
@@ -234,6 +234,17 @@ The following notes are general guidelines, please leave a comment in your pull 
 4. Put the units last, e.g. `message_size_kb`, `request_duration_ms`.
 
 5. For resources that are continuous in time, do not use prefixes, e.g. use `instances`, `subscriptions`, `storage_gb`. For non-continuous resources, prefix with `monthly_` so users knows what time interval to estimate for, e.g. `monthly_log_lines`, `monthly_requests`.
+
+#### Google resource notes
+
+1. If the resource has a `zone` key, if they have a zone key, use this logic to get the region:
+	```
+	region := d.Get("region").String()
+	zone := d.Get("zone").String()
+	if zone != "" {
+		region = zoneToRegion(zone)
+	}
+	```
 
 ## Release steps
 
