@@ -58,13 +58,15 @@ func New(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provide
 			NoColor:       cfg.NoColor,
 			Indent:        "  ",
 		},
-		binary:    binary,
-		dir:       dir,
-		workspace: projectCfg.Workspace,
-		jsonFile:  projectCfg.JSONFile,
-		planFile:  projectCfg.PlanFile,
-		planFlags: projectCfg.PlanFlags,
-		useState:  projectCfg.UseState,
+		binary:              binary,
+		dir:                 dir,
+		workspace:           projectCfg.Workspace,
+		jsonFile:            projectCfg.JSONFile,
+		planFile:            projectCfg.PlanFile,
+		planFlags:           projectCfg.PlanFlags,
+		useState:            projectCfg.UseState,
+		terraformCloudHost:  projectCfg.TerraformCloudHost,
+		terraformCloudToken: projectCfg.TerraformCloudToken,
 	}
 }
 
