@@ -84,12 +84,11 @@ func (p *Parser) parseJSONResources(parseExisting bool, baseResources []*schema.
 	var vals gjson.Result
 	if parseExisting {
 		vals = parsed.Get("prior_state.values.root_module")
-		// TODO: Does the key differ in state file?
-	} else {
-		vals = parsed.Get("planned_values.root_module")
 		if !vals.Exists() {
 			vals = parsed.Get("values.root_module")
 		}
+	} else {
+		vals = parsed.Get("planned_values.root_module")
 	}
 
 	resData := p.parseResourceData(providerConf, vals, conf, vars)
