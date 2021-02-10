@@ -74,6 +74,9 @@ resource_usage:
   aws_nat_gateway.my_nat_gateway:
     monthly_data_processed_gb: 10 # Data processed by the NAT Gateway per month in GB.
 
+  aws_route53_resolver_endpoint.my_endpoint:
+    monthly_queries: 20000000000 # Monthly number of DNS queries processed through the endpoints.
+
   aws_secretsmanager_secret.my_secret:
     monthly_requests: 1000000 # Monthly API requests to Secrets Manager.
 
