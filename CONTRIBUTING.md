@@ -241,10 +241,12 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 1. In [here](https://github.com/infracost/infracost/actions), click on the "Go" build for the master branch, click on Build, expand Test, then use the "Search logs" box to find any line that has "Multiple products found", "No products found for" or "No prices found for". Update the resource files in question to fix these error, often it's because the price filters need to be adjusted to only return 1 result.
 2. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
-3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have 5 assets.
+3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have the mac/linux/windows assets.
 4. Click on the Edit draft button, add the release notes from the commits between this and the last release and click on publish.
-5. Announce the release in the infracost-community Slack general channel. Then wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
-6. Update the docs repo with any required changes and supported resources.
-7. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
+5. In the `infracost-atlantis` repo, run `docker build --no-cache -t infracost/infracost-atlantis:latest .` followed by `docker push infracost/infracost-atlantis:latest` so the Atlantis integration uses the latest version of Infracost. 
+6. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
+7. Announce the release in the infracost-community Slack announcements channel.
+8. Update the docs repo with any required changes and supported resources.
+9. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
 
-If a new flag/feature is added that requires CI support, update the 9 repos mentioned [here](https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts). For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.
+If a new flag/feature is added that requires CI support, update the repos mentioned [here](https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts). For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.
