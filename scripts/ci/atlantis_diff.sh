@@ -32,6 +32,9 @@ fi
 if [ ! -z "$usage_file" ]; then
   infracost_cmd="$infracost_cmd --usage-file $usage_file"
 fi
+if [ ! -z "$config_file" ]; then
+  infracost_cmd="$infracost_cmd --config-file $config_file"
+fi
 if [ "$atlantis_debug" = "true" ]; then
   echo "$infracost_cmd" > infracost_cmd
 else
