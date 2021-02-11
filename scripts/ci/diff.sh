@@ -19,6 +19,7 @@ terraform_plan_flags=${5:-$terraform_plan_flags}
 percentage_threshold=${6:-$percentage_threshold}
 pricing_api_endpoint=${7:-$pricing_api_endpoint}
 usage_file=${8:-$usage_file}
+config_file=${9:-$config_file}
 
 # Handle deprecated var names
 terraform_json_file=${terraform_json_file:-$tfjson}
@@ -87,6 +88,9 @@ if [ ! -z "$pricing_api_endpoint" ]; then
 fi
 if [ ! -z "$usage_file" ]; then
   infracost_cmd="$infracost_cmd --usage-file $usage_file"
+fi
+if [ ! -z "$config_file" ]; then
+  infracost_cmd="$infracost_cmd --config-file $config_file"
 fi
 echo "$infracost_cmd" > infracost_cmd
 
