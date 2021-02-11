@@ -28,38 +28,38 @@ resource_usage:
   aws_apigatewayv2_api.my_v2_api:
     monthly_requests: 100000000 # Monthly requests to the HTTP API Gateway.
     request_size_kb: 512        # Average request size sent to the HTTP API Gateway in KB. Requests are metered in 512KB increments, maximum size is 10MB.
-    monthly_messages: 100000000 # Number of messages sent to the Websocket API Gateway.
+    monthly_messages: 100000000 # Monthly number of messages sent to the Websocket API Gateway.
     message_size_kb: 32         # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
 
   aws_cloudwatch_log_group.my_log_group:
     storage_gb: 1000               # Total data stored by CloudWatch logs in GB.
-    monthly_data_ingested_gb: 1000 # Data ingested by CloudWatch logs per month in GB.
-    monthly_data_scanned_gb: 200   # Data scanned by CloudWatch logs insights per month in GB.
+    monthly_data_ingested_gb: 1000 # Monthly data ingested by CloudWatch logs in GB.
+    monthly_data_scanned_gb: 200   # Monthly data scanned by CloudWatch logs insights in GB.
 
   aws_codebuild_project.my_project: 
-    monthly_build_mins: 10000 # Total duration of builds during the month in minutes. Each build is rounded up to the nearest minute.
+    monthly_build_mins: 10000 # Monthly total duration of builds in minutes. Each build is rounded up to the nearest minute.
 
   aws_data_transfer.my_region:
     region: us-east-1                           # Region the data transfer is originating from.
-    monthly_intra_region_gb: 1000               # Data transferred between availability zones in the region.
-    monthly_outbound_us_east_to_us_east_gb: 500 # Data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
-    monthly_outbound_other_region_gb: 750       # Data transferred to other AWS regions.
-    monthly_outbound_internet_gb: 5000          # Data transferred to the Internet.
+    monthly_intra_region_gb: 1000               # Monthly data transferred between availability zones in the region.
+    monthly_outbound_us_east_to_us_east_gb: 500 # Monthly data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
+    monthly_outbound_other_region_gb: 750       # Monthly data transferred to other AWS regions.
+    monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
 
   aws_dx_gateway_association.my_gateway:
-    monthly_data_processed_gb: 100 # Data processed by the DX gateway association per month in GB.
+    monthly_data_processed_gb: 100 # Monthly data processed by the DX gateway association per month in GB.
 
   aws_dynamodb_table.my_table:
-    monthly_write_request_units: 3000000  # Write request units per month in (used for on-demand DynamoDB).
-    monthly_read_request_units: 8000000   # Read request units per month in (used for on-demand DynamoDB).
+    monthly_write_request_units: 3000000  # Monthly write request units in (used for on-demand DynamoDB).
+    monthly_read_request_units: 8000000   # Monthly read request units in (used for on-demand DynamoDB).
     storage_gb: 230                       # Total storage for tables in GB.
     pitr_backup_storage_gb: 2300          # Total storage for Point-In-Time Recovery (PITR) backups in GB.
     on_demand_backup_storage_gb: 460      # Total storage for on-demand backups in GB.
-    monthly_data_restored_gb: 230         # Size of restored data per month in GB.
-    monthly_streams_read_request_units: 2 # Streams read request units per month.
+    monthly_data_restored_gb: 230         # Monthly size of restored data in GB.
+    monthly_streams_read_request_units: 2 # Monthly streams read request units.
 
   aws_ec2_transit_gateway_vpc_attachment.my_vpc_attachment:
-    monthly_data_processed_gb: 100 # Data processed by the EC2 transit gateway attachment(s) per month in GB.
+    monthly_data_processed_gb: 100 # Monthly data processed by the EC2 transit gateway attachment(s) in GB.
 
   aws_ecr_repository.my_repository:
     storage_gb: 1 # Total size of ECR repository in GB.
@@ -72,7 +72,7 @@ resource_usage:
     request_duration_ms: 500 # Average duration of each request in milliseconds.
 
   aws_nat_gateway.my_nat_gateway:
-    monthly_data_processed_gb: 10 # Data processed by the NAT Gateway per month in GB.
+    monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
   aws_route53_resolver_endpoint.my_endpoint:
     monthly_queries: 20000000000 # Monthly number of DNS queries processed through the endpoints.
@@ -102,13 +102,13 @@ resource_usage:
     instances: 100          # Number of instances being managed.
 
   aws_vpc_endpoint.my_endpoint:
-    monthly_data_processed_gb: 1000 # Data processed by the VPC endpoint(s) per month in GB.
+    monthly_data_processed_gb: 1000 # Monthly data processed by the VPC endpoint(s) in GB.
 
   aws_vpn_connection.my_connection:
     monthly_data_processed_gb: 100 # Monthly data processed through a transit gateway attached to your VPN Connection in GB.
 
   aws_cloudfront_distribution.my_s3_distribution:
-    monthly_data_transfer_to_internet_gb: # Regional data transfer out to internet per month in GB.
+    monthly_data_transfer_to_internet_gb: # Monthly regional data transfer out to internet in GB.
       us: 51200000          # United States, Mexico, & Canada
       europe: 220000        # Europe & Israel
       south_africa: 10000   # South Africa, Kenya, & Middle East
@@ -117,7 +117,7 @@ resource_usage:
       australia: 500000     # Australia & New Zealand
       asia_pacific: 1200000 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
       india: 200000         # India
-    monthly_data_transfer_to_origin_gb: # Regional data transfer out to origin in GB.
+    monthly_data_transfer_to_origin_gb: # Monthly regional data transfer out to origin in GB.
       us: 2200           # United States, Mexico, & Canada
       europe: 1000       # Europe & Israel
       south_africa: 300  # South Africa, Kenya, & Middle East
@@ -126,7 +126,7 @@ resource_usage:
       australia: 100     # Australia & New Zealand
       asia_pacific: 30   # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
       india: 80          # India
-    monthly_http_requests: # Number of HTTP requests per month.
+    monthly_http_requests: # Monthly number of HTTP requests.
       us: 80000            # United States, Mexico, & Canada
       europe: 40000        # Europe & Israel
       south_africa: 20000  # South Africa, Kenya, & Middle East
@@ -135,7 +135,7 @@ resource_usage:
       australia: 15000     # Australia & New Zealand
       asia_pacific: 45000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
       india: 10000         # India
-    monthly_https_requests: # Number of HTTPS requests per month.
+    monthly_https_requests: # Monthly number of HTTPS requests.
       us: 180000           # United States, Mexico, & Canada
       europe: 10000        # Europe & Israel
       south_africa: 50000  # South Africa, Kenya, & Middle East
@@ -144,7 +144,7 @@ resource_usage:
       australia: 45000     # Australia & New Zealand
       asia_pacific: 25000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
       india: 30000         # India
-    monthly_shield_requests: # Number of shield requests per month.
+    monthly_shield_requests: # Monthly number of shield requests.
       us: 90000          # United States
       europe: 30000      # Europe
       south_america: 200 # South Amarica
@@ -153,9 +153,9 @@ resource_usage:
       singapore: 58600   # Singapore
       south_korea: 24000 # South Korea
       india: 10000       # India
-    monthly_invalidation_requests: 1200 # Number of invalidation requests per month.
-    monthly_encryption_requests: 100000 # Number of field level encryption requests per month.
-    monthly_log_lines: 5000000          # Number of real-time log lines per month.
+    monthly_invalidation_requests: 1200 # Monthly number of invalidation requests.
+    monthly_encryption_requests: 100000 # Monthly number of field level encryption requests.
+    monthly_log_lines: 5000000          # Monthly number of real-time log lines.
     custom_ssl_certificates: 3          # Number of dedicated IP custom SSL certificates.
 
   #
@@ -163,7 +163,7 @@ resource_usage:
   #
   google_compute_router_nat.my_nat:
     assigned_vms: 4                 # Number of VM instances assigned to the NAT gateway
-    monthly_data_processed_gb: 1000 # Data processed (ingress and egress) by the NAT gateway per month in GB
+    monthly_data_processed_gb: 1000 # Monthly data processed (ingress and egress) by the NAT gateway in GB
 
   google_container_cluster.my_cluster:
     nodes: 4    # Node count per zone for the default node pool
