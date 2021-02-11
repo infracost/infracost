@@ -22,7 +22,7 @@ percentage_threshold=${percentage_threshold:-0}
 export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
 export INFRACOST_CI_ATLANTIS_DIFF=true
 
-infracost_cmd="infracost --no-color --terraform-dir ."
+infracost_cmd="infracost --no-color"
 if [ ! -z "$terraform_plan_flags" ]; then
   infracost_cmd="$infracost_cmd --terraform-plan-flags \"$terraform_plan_flags\""
 fi
@@ -34,6 +34,8 @@ if [ ! -z "$usage_file" ]; then
 fi
 if [ ! -z "$config_file" ]; then
   infracost_cmd="$infracost_cmd --config-file $config_file"
+else
+  infracost_cmd="$infracost_cmd --terraform-dir ."
 fi
 if [ "$atlantis_debug" = "true" ]; then
   echo "$infracost_cmd" > infracost_cmd
