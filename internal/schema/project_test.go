@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStateCalculateTotalCosts(t *testing.T) {
+func TestProjectCalculateTotalCosts(t *testing.T) {
 	existingResources := []*Resource{
 		{
 			HourlyCost:  decimalPtr(decimal.NewFromInt(10)),
@@ -27,7 +27,7 @@ func TestStateCalculateTotalCosts(t *testing.T) {
 			MonthlyCost: nil,
 		},
 	}
-	existingRs := &ResourcesState{
+	existingRs := &Breakdown{
 		Resources: existingResources,
 	}
 	plannedResources := []*Resource{
@@ -49,34 +49,34 @@ func TestStateCalculateTotalCosts(t *testing.T) {
 			MonthlyCost: nil,
 		},
 	}
-	plannedRs := &ResourcesState{
+	plannedRs := &Breakdown{
 		Resources: plannedResources,
 	}
 
-	state := &State{
-		ExistingState: existingRs,
-		PlannedState:  plannedRs,
+	project := &Project{
+		PastBreakdown: existingRs,
+		Breakdown:     plannedRs,
 	}
-	state.CalculateTotalCosts()
+	project.CalculateTotalCosts()
 
 	expected, _ := decimal.NewFromInt(15).Float64()
-	actual, _ := state.ExistingState.TotalHourlyCost.Float64()
+	actual, _ := project.PastBreakdown.TotalHourlyCost.Float64()
 	assert.Equal(t, expected, actual)
 	expected, _ = decimal.NewFromInt(10800).Float64()
-	actual, _ = state.ExistingState.TotalMonthlyCost.Float64()
+	actual, _ = project.PastBreakdown.TotalMonthlyCost.Float64()
 	assert.Equal(t, expected, actual)
 
 	expected, _ = decimal.NewFromInt(25).Float64()
-	actual, _ = state.PlannedState.TotalHourlyCost.Float64()
+	actual, _ = project.Breakdown.TotalHourlyCost.Float64()
 	assert.Equal(t, expected, actual)
 	expected, _ = decimal.NewFromInt(18000).Float64()
-	actual, _ = state.PlannedState.TotalMonthlyCost.Float64()
+	actual, _ = project.Breakdown.TotalMonthlyCost.Float64()
 	assert.Equal(t, expected, actual)
 }
 
 func TestCalculateDiff(t *testing.T) {
-	state := &State{}
-	state.ExistingState = &ResourcesState{
+	project := &Project{}
+	project.PastBreakdown = &Breakdown{
 		Resources: []*Resource{
 			{
 				Name:        "rs1",
@@ -114,7 +114,7 @@ func TestCalculateDiff(t *testing.T) {
 		TotalHourlyCost:  decimalPtr(decimal.NewFromInt(3)),
 		TotalMonthlyCost: decimalPtr(decimal.NewFromInt(2160)),
 	}
-	state.PlannedState = &ResourcesState{
+	project.Breakdown = &Breakdown{
 		Resources: []*Resource{
 			{
 				Name:        "rs1",
@@ -153,7 +153,7 @@ func TestCalculateDiff(t *testing.T) {
 		TotalMonthlyCost: decimalPtr(decimal.NewFromInt(3600)),
 	}
 
-	expectedDiff := &ResourcesState{
+	expectedDiff := &Breakdown{
 		Resources: []*Resource{
 			{
 				Name:        "rs1",
@@ -208,8 +208,8 @@ func TestCalculateDiff(t *testing.T) {
 		TotalMonthlyCost: decimalPtr(decimal.NewFromInt(1440)),
 	}
 
-	state.CalculateDiff()
-	assert.Equal(t, expectedDiff, state.Diff)
+	project.CalculateDiff()
+	assert.Equal(t, expectedDiff, project.Diff)
 }
 
 func TestDiffdiffCostComponentsByResource(t *testing.T) {

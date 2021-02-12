@@ -6,42 +6,42 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// State contains the existing, planned state of
+// Project contains the existing, planned state of
 // resources and the diff between them.
-type State struct {
-	ExistingState *ResourcesState
-	PlannedState  *ResourcesState
-	Diff          *ResourcesState
+type Project struct {
+	PastBreakdown *Breakdown
+	Breakdown     *Breakdown
+	Diff          *Breakdown
 }
 
-func NewState() *State {
-	return &State{
-		ExistingState: &ResourcesState{},
-		PlannedState:  &ResourcesState{},
-		Diff:          &ResourcesState{},
+func NewProject() *Project {
+	return &Project{
+		PastBreakdown: &Breakdown{},
+		Breakdown:     &Breakdown{},
+		Diff:          &Breakdown{},
 	}
 }
 
 // AllResources returns a pointer list of all resources of the state.
-func (state *State) AllResources() []*Resource {
+func (state *Project) AllResources() []*Resource {
 	var resources []*Resource
-	resources = append(resources, state.ExistingState.Resources...)
-	resources = append(resources, state.PlannedState.Resources...)
+	resources = append(resources, state.PastBreakdown.Resources...)
+	resources = append(resources, state.Breakdown.Resources...)
 	resources = append(resources, state.Diff.Resources...)
 	return resources
 }
 
 // CalculateTotalCosts will calculate and fill the total costs fields
-// of State's ResourcesState. It must be called after calculating the costs of
+// of Project's Breakdown. It must be called after calculating the costs of
 // the resources.
-func (state *State) CalculateTotalCosts() {
-	state.ExistingState.calculateTotalCosts()
-	state.PlannedState.calculateTotalCosts()
+func (state *Project) CalculateTotalCosts() {
+	state.PastBreakdown.calculateTotalCosts()
+	state.Breakdown.calculateTotalCosts()
 }
 
 // CalculateDiff calculates the diff of existing and planned states
 // and stores it in a diff state.
-func (state *State) CalculateDiff() {
+func (state *Project) CalculateDiff() {
 	// There are many ways to calculate a diff between two sets of
 	// nested objects. The method used here is to create a nested
 	// hashmap of each set of states for fast lookup so the structure
@@ -58,16 +58,16 @@ func (state *State) CalculateDiff() {
 	// all resources is calculated.
 
 	existingRMap := make(map[string]*Resource)
-	fillResourcesMap(existingRMap, "", state.ExistingState.Resources)
+	fillResourcesMap(existingRMap, "", state.PastBreakdown.Resources)
 	plannedRMap := make(map[string]*Resource)
-	fillResourcesMap(plannedRMap, "", state.PlannedState.Resources)
-	state.Diff = &ResourcesState{
+	fillResourcesMap(plannedRMap, "", state.Breakdown.Resources)
+	state.Diff = &Breakdown{
 		Resources:        []*Resource{},
 		TotalHourlyCost:  &decimal.Zero,
 		TotalMonthlyCost: &decimal.Zero,
 	}
 
-	for _, resource := range state.ExistingState.Resources {
+	for _, resource := range state.PastBreakdown.Resources {
 		resourceKey := resource.Name
 		changed, diff := diffResourcesByKey(resourceKey, existingRMap, plannedRMap)
 		if changed {
@@ -75,7 +75,7 @@ func (state *State) CalculateDiff() {
 		}
 	}
 
-	for _, resource := range state.PlannedState.Resources {
+	for _, resource := range state.Breakdown.Resources {
 		resourceKey := resource.Name
 		if _, ok := plannedRMap[resourceKey]; !ok {
 			continue
@@ -86,8 +86,8 @@ func (state *State) CalculateDiff() {
 		}
 	}
 
-	state.Diff.TotalHourlyCost = diffDecimals(state.PlannedState.TotalHourlyCost, state.ExistingState.TotalHourlyCost)
-	state.Diff.TotalMonthlyCost = diffDecimals(state.PlannedState.TotalMonthlyCost, state.ExistingState.TotalMonthlyCost)
+	state.Diff.TotalHourlyCost = diffDecimals(state.Breakdown.TotalHourlyCost, state.PastBreakdown.TotalHourlyCost)
+	state.Diff.TotalMonthlyCost = diffDecimals(state.Breakdown.TotalMonthlyCost, state.PastBreakdown.TotalMonthlyCost)
 
 }
 
@@ -265,4 +265,14 @@ func getCostComponentsMap(resource *Resource) map[string]*CostComponent {
 		result[costComponent.Name] = costComponent
 	}
 	return result
+}
+
+func AllResources(projects []*Project) []*Resource {
+	resources := make([]*Resource, 0)
+
+	for _, p := range projects {
+		resources = append(resources, p.Breakdown.Resources...)
+	}
+
+	return resources
 }

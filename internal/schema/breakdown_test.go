@@ -27,16 +27,16 @@ func TestResourceStateCalculateTotalCosts(t *testing.T) {
 			MonthlyCost: nil,
 		},
 	}
-	rs := ResourcesState{
+	b := Breakdown{
 		Resources: resources,
 	}
-	rs.calculateTotalCosts()
+	b.calculateTotalCosts()
 
 	expected, _ := decimal.NewFromInt(15).Float64()
-	actual, _ := rs.TotalHourlyCost.Float64()
+	actual, _ := b.TotalHourlyCost.Float64()
 	assert.Equal(t, expected, actual)
 
 	expected, _ = decimal.NewFromInt(10800).Float64()
-	actual, _ = rs.TotalMonthlyCost.Float64()
+	actual, _ = b.TotalMonthlyCost.Float64()
 	assert.Equal(t, expected, actual)
 }

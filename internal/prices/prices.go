@@ -15,18 +15,18 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func PopulatePrices(cfg *config.Config, state *schema.State) error {
+func PopulatePrices(cfg *config.Config, project *schema.Project) error {
 	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", cfg.PricingAPIEndpoint), cfg.APIKey)
-	resources := state.AllResources()
+	resources := project.AllResources()
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	go func() {
 		defer wg.Done()
-		// We stick just to planned state since we don't want to duplicate the summary for all states.
+		// We ignore resources in the past breakdown since we don't want to duplicate the summary for all projects.
 		// otherwise we will count an unsupported resource 2 times.
-		summary := output.BuildResourceSummary(state.PlannedState.Resources, output.ResourceSummaryOptions{
+		summary := output.BuildResourceSummary(project.Breakdown.Resources, output.ResourceSummaryOptions{
 			IncludeUnsupportedProviders: true,
 		})
 

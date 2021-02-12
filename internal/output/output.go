@@ -16,14 +16,18 @@ type Root struct {
 	Resources        []Resource       `json:"resources"`        // Keeping for backward compatibility.
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`  // Keeping for backward compatibility.
 	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"` // Keeping for backward compatibility.
-	ExistingState    ResourceState    `json:"existingState"`
-	PlannedState     ResourceState    `json:"plannedState"`
-	Diff             ResourceState    `json:"diff"`
+	Projects         []Project        `json:"projects"`
 	TimeGenerated    time.Time        `json:"timeGenerated"`
 	ResourceSummary  *ResourceSummary `json:"resourceSummary"`
 }
 
-type ResourceState struct {
+type Project struct {
+	PastBreakdown *Breakdown `json:"pastBreakdown"`
+	Breakdown     *Breakdown `json:"breakdown"`
+	Diff          *Breakdown `json:"diff"`
+}
+
+type Breakdown struct {
 	Resources        []Resource       `json:"resources"`
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
@@ -105,43 +109,80 @@ func outputResource(r *schema.Resource) Resource {
 	}
 }
 
-func outputResourceState(resourceState *schema.ResourcesState) ResourceState {
-	resources := resourceState.Resources
+func outputBreakdown(breakdown *schema.Breakdown) *Breakdown {
+	if breakdown == nil {
+		return nil
+	}
+
+	resources := breakdown.Resources
 	arr := make([]Resource, 0, len(resources))
 
-	for _, r := range resourceState.Resources {
+	for _, r := range breakdown.Resources {
 		if r.IsSkipped {
 			continue
 		}
 		arr = append(arr, outputResource(r))
 	}
 
-	return ResourceState{
+	sortResources(arr)
+
+	return &Breakdown{
 		Resources:        arr,
-		TotalHourlyCost:  resourceState.TotalHourlyCost,
-		TotalMonthlyCost: resourceState.TotalMonthlyCost,
+		TotalHourlyCost:  breakdown.TotalHourlyCost,
+		TotalMonthlyCost: breakdown.TotalMonthlyCost,
 	}
 }
 
-func ToOutputFormat(state *schema.State) Root {
+func ToOutputFormat(projects []*schema.Project) Root {
+	var totalMonthlyCost, totalHourlyCost *decimal.Decimal
 
-	existingRS := outputResourceState(state.ExistingState)
-	plannedRS := outputResourceState(state.PlannedState)
-	diffRS := outputResourceState(state.Diff)
+	outProjects := make([]Project, 0, len(projects))
+	outResources := make([]Resource, 0)
+
+	for _, project := range projects {
+		pastBreakdown := outputBreakdown(project.PastBreakdown)
+		breakdown := outputBreakdown(project.Breakdown)
+		diff := outputBreakdown(project.Diff)
+
+		// Backward compatibility
+		outResources = append(outResources, breakdown.Resources...)
+
+		if project.Breakdown.TotalHourlyCost != nil {
+			if totalHourlyCost == nil {
+				totalHourlyCost = decimalPtr(decimal.Zero)
+			}
+
+			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*project.Breakdown.TotalHourlyCost))
+		}
+
+		if project.Breakdown.TotalMonthlyCost != nil {
+			if totalMonthlyCost == nil {
+				totalMonthlyCost = decimalPtr(decimal.Zero)
+			}
+
+			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*project.Breakdown.TotalMonthlyCost))
+		}
+
+		outProjects = append(outProjects, Project{
+			PastBreakdown: pastBreakdown,
+			Breakdown:     breakdown,
+			Diff:          diff,
+		})
+	}
+
+	resourceSummary := BuildResourceSummary(schema.AllResources(projects), ResourceSummaryOptions{
+		OnlyFields: []string{"UnsupportedCounts"},
+	})
+
+	sortResources(outResources)
 
 	out := Root{
-		// Backward compatibility
-		Resources:        plannedRS.Resources,
-		TotalHourlyCost:  plannedRS.TotalHourlyCost,
-		TotalMonthlyCost: plannedRS.TotalMonthlyCost,
-
-		ExistingState: existingRS,
-		PlannedState:  plannedRS,
-		Diff:          diffRS,
-		TimeGenerated: time.Now(),
-		ResourceSummary: BuildResourceSummary(state.PlannedState.Resources, ResourceSummaryOptions{
-			OnlyFields: []string{"UnsupportedCounts"},
-		}),
+		Resources:        outResources,
+		TotalHourlyCost:  totalHourlyCost,
+		TotalMonthlyCost: totalMonthlyCost,
+		Projects:         outProjects,
+		TimeGenerated:    time.Now(),
+		ResourceSummary:  resourceSummary,
 	}
 
 	return out
@@ -337,6 +378,12 @@ func combineCounts(c1 *map[string]int, c2 *map[string]int) *map[string]int {
 	}
 
 	return &res
+}
+
+func sortResources(resources []Resource) {
+	sort.Slice(resources, func(i, j int) bool {
+		return resources[i].Name < resources[j].Name
+	})
 }
 
 func addIntPtrs(i1 *int, i2 *int) *int {

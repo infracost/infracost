@@ -2,18 +2,18 @@ package schema
 
 import "github.com/shopspring/decimal"
 
-// ResourcesState is the state of a list of resources.
-type ResourcesState struct {
+// Breakdown is the state of a list of resources.
+type Breakdown struct {
 	Resources        []*Resource
 	TotalHourlyCost  *decimal.Decimal
 	TotalMonthlyCost *decimal.Decimal
 }
 
-func (rs *ResourcesState) calculateTotalCosts() {
+func (b *Breakdown) calculateTotalCosts() {
 	var totalHourlyCost *decimal.Decimal
 	var totalMonthlyCost *decimal.Decimal
 
-	for _, r := range rs.Resources {
+	for _, r := range b.Resources {
 		if r.IsSkipped {
 			continue
 		}
@@ -33,6 +33,6 @@ func (rs *ResourcesState) calculateTotalCosts() {
 			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*r.MonthlyCost))
 		}
 	}
-	rs.TotalHourlyCost = totalHourlyCost
-	rs.TotalMonthlyCost = totalMonthlyCost
+	b.TotalHourlyCost = totalHourlyCost
+	b.TotalMonthlyCost = totalMonthlyCost
 }

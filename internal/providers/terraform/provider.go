@@ -68,8 +68,8 @@ func New(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provide
 	}
 }
 
-func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.State, error) {
-	var state *schema.State = schema.NewState()
+func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.Project, error) {
+	var project *schema.Project = schema.NewProject()
 
 	var err error
 	var j []byte
@@ -80,24 +80,24 @@ func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) (*
 		j, err = p.loadPlanJSON()
 	}
 	if err != nil {
-		return state, err
+		return project, err
 	}
 
 	parser := NewParser(p.env)
-	existingResources, plannedResources, err := parser.parseJSON(j, usage)
+	resources, pastResources, err := parser.parseJSON(j, usage)
 	if err != nil {
-		return state, errors.Wrap(err, "Error parsing Terraform JSON")
+		return project, errors.Wrap(err, "Error parsing Terraform JSON")
 	}
 
-	state.PlannedState = &schema.ResourcesState{
-		Resources: plannedResources,
+	project.Breakdown = &schema.Breakdown{
+		Resources: resources,
 	}
 
-	state.ExistingState = &schema.ResourcesState{
-		Resources: existingResources,
+	project.PastBreakdown = &schema.Breakdown{
+		Resources: pastResources,
 	}
 
-	return state, nil
+	return project, nil
 }
 
 func (p *terraformProvider) loadPlanJSON() ([]byte, error) {
@@ -405,7 +405,7 @@ func terraformError(err error) {
 		msg += "\nSpecify the -var-file flag as a path relative to your Terraform directory.\n"
 		msg += "For example: infracost --terraform-dir=path/to/terraform --terraform-plan-flags=\"-var-file=myvars.tfvars\"\n"
 	}
-	if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a state or plan file.") {
+	if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a project or plan file.") {
 		msg += "\nSpecify the --terraform-plan-file flag as a path relative to your Terraform directory.\n"
 		msg += "For example: infracost --terraform-dir=path/to/terraform --terraform-plan-file=plan.save\n"
 	}
