@@ -84,11 +84,11 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 	var vals gjson.Result
 	if parsePrior {
 		vals = parsed.Get("prior_state.values.root_module")
+	} else {
+		vals = parsed.Get("planned_values.root_module")
 		if !vals.Exists() {
 			vals = parsed.Get("values.root_module")
 		}
-	} else {
-		vals = parsed.Get("planned_values.root_module")
 	}
 
 	resData := p.parseResourceData(providerConf, vals, conf, vars)
@@ -121,7 +121,7 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 	pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
 	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
 
-	return resources, pastResources, nil
+	return pastResources, resources, nil
 }
 
 func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {

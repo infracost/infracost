@@ -79,6 +79,27 @@ type ReportInput struct {
 	Root     Root
 }
 
+func outputBreakdown(resources []*schema.Resource) *Breakdown {
+	arr := make([]Resource, 0, len(resources))
+
+	for _, r := range resources {
+		if r.IsSkipped {
+			continue
+		}
+		arr = append(arr, outputResource(r))
+	}
+
+	sortResources(arr)
+
+	totalMonthlyCost, totalHourlyCost := calculateTotalCosts(arr)
+
+	return &Breakdown{
+		Resources:        arr,
+		TotalHourlyCost:  totalMonthlyCost,
+		TotalMonthlyCost: totalHourlyCost,
+	}
+}
+
 func outputResource(r *schema.Resource) Resource {
 	comps := make([]CostComponent, 0, len(r.CostComponents))
 	for _, c := range r.CostComponents {
@@ -109,27 +130,6 @@ func outputResource(r *schema.Resource) Resource {
 	}
 }
 
-func outputBreakdown(resources []*schema.Resource) *Breakdown {
-	arr := make([]Resource, 0, len(resources))
-
-	for _, r := range resources {
-		if r.IsSkipped {
-			continue
-		}
-		arr = append(arr, outputResource(r))
-	}
-
-	sortResources(arr)
-
-	totalMonthlyCost, totalHourlyCost := calculateTotalCosts(arr)
-
-	return &Breakdown{
-		Resources:        arr,
-		TotalHourlyCost:  totalMonthlyCost,
-		TotalMonthlyCost: totalHourlyCost,
-	}
-}
-
 func ToOutputFormat(projects []*schema.Project) Root {
 	var totalMonthlyCost, totalHourlyCost *decimal.Decimal
 
@@ -137,12 +137,19 @@ func ToOutputFormat(projects []*schema.Project) Root {
 	outResources := make([]Resource, 0)
 
 	for _, project := range projects {
-		pastBreakdown := outputBreakdown(project.PastResources)
-		breakdown := outputBreakdown(project.Resources)
-		diff := outputBreakdown(project.Diff)
+		var pastBreakdown, breakdown, diff *Breakdown
+
+		breakdown = outputBreakdown(project.Resources)
+
+		if project.HasDiff {
+			pastBreakdown = outputBreakdown(project.PastResources)
+			diff = outputBreakdown(project.Diff)
+		}
 
 		// Backward compatibility
-		outResources = append(outResources, breakdown.Resources...)
+		if breakdown != nil {
+			outResources = append(outResources, breakdown.Resources...)
+		}
 
 		if breakdown != nil && breakdown.TotalHourlyCost != nil {
 			if totalHourlyCost == nil {

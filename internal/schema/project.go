@@ -6,10 +6,13 @@ type Project struct {
 	PastResources []*Resource
 	Resources     []*Resource
 	Diff          []*Resource
+	HasDiff       bool
 }
 
 func NewProject() *Project {
-	return &Project{}
+	return &Project{
+		HasDiff: true,
+	}
 }
 
 // AllResources returns a pointer list of all resources of the state.
@@ -22,7 +25,9 @@ func (p *Project) AllResources() []*Resource {
 
 // CalculateDiff calculates the diff of past and current resources
 func (p *Project) CalculateDiff() {
-	p.Diff = calculateDiff(p.PastResources, p.Resources)
+	if p.HasDiff {
+		p.Diff = calculateDiff(p.PastResources, p.Resources)
+	}
 }
 
 // AllProjectResources returns the resources for all projects

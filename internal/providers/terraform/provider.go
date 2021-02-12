@@ -84,13 +84,16 @@ func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) (*
 	}
 
 	parser := NewParser(p.env)
-	resources, pastResources, err := parser.parseJSON(j, usage)
+	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return project, errors.Wrap(err, "Error parsing Terraform JSON")
 	}
 
+	project.HasDiff = !p.useState
+	if project.HasDiff {
+		project.PastResources = pastResources
+	}
 	project.Resources = resources
-	project.PastResources = pastResources
 
 	return project, nil
 }
