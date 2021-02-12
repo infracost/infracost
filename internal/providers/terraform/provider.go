@@ -89,13 +89,8 @@ func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) (*
 		return project, errors.Wrap(err, "Error parsing Terraform JSON")
 	}
 
-	project.Breakdown = &schema.Breakdown{
-		Resources: resources,
-	}
-
-	project.PastBreakdown = &schema.Breakdown{
-		Resources: pastResources,
-	}
+	project.Resources = resources
+	project.PastResources = pastResources
 
 	return project, nil
 }

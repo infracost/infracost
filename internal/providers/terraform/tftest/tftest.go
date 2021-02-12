@@ -135,7 +135,7 @@ func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, 
 	project, err := RunCostCalculations(cfg, tfProject, usage)
 	assert.NoError(t, err)
 
-	testutil.TestResources(t, project.Breakdown.Resources, checks)
+	testutil.TestResources(t, project.Resources, checks)
 }
 
 func RunCostCalculations(cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {

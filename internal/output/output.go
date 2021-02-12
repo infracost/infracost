@@ -109,15 +109,10 @@ func outputResource(r *schema.Resource) Resource {
 	}
 }
 
-func outputBreakdown(breakdown *schema.Breakdown) *Breakdown {
-	if breakdown == nil {
-		return nil
-	}
-
-	resources := breakdown.Resources
+func outputBreakdown(resources []*schema.Resource) *Breakdown {
 	arr := make([]Resource, 0, len(resources))
 
-	for _, r := range breakdown.Resources {
+	for _, r := range resources {
 		if r.IsSkipped {
 			continue
 		}
@@ -126,10 +121,12 @@ func outputBreakdown(breakdown *schema.Breakdown) *Breakdown {
 
 	sortResources(arr)
 
+	totalMonthlyCost, totalHourlyCost := calculateTotalCosts(arr)
+
 	return &Breakdown{
 		Resources:        arr,
-		TotalHourlyCost:  breakdown.TotalHourlyCost,
-		TotalMonthlyCost: breakdown.TotalMonthlyCost,
+		TotalHourlyCost:  totalMonthlyCost,
+		TotalMonthlyCost: totalHourlyCost,
 	}
 }
 
@@ -140,27 +137,27 @@ func ToOutputFormat(projects []*schema.Project) Root {
 	outResources := make([]Resource, 0)
 
 	for _, project := range projects {
-		pastBreakdown := outputBreakdown(project.PastBreakdown)
-		breakdown := outputBreakdown(project.Breakdown)
+		pastBreakdown := outputBreakdown(project.PastResources)
+		breakdown := outputBreakdown(project.Resources)
 		diff := outputBreakdown(project.Diff)
 
 		// Backward compatibility
 		outResources = append(outResources, breakdown.Resources...)
 
-		if project.Breakdown.TotalHourlyCost != nil {
+		if breakdown != nil && breakdown.TotalHourlyCost != nil {
 			if totalHourlyCost == nil {
 				totalHourlyCost = decimalPtr(decimal.Zero)
 			}
 
-			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*project.Breakdown.TotalHourlyCost))
+			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*breakdown.TotalHourlyCost))
 		}
 
-		if project.Breakdown.TotalMonthlyCost != nil {
+		if breakdown != nil && breakdown.TotalMonthlyCost != nil {
 			if totalMonthlyCost == nil {
 				totalMonthlyCost = decimalPtr(decimal.Zero)
 			}
 
-			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*project.Breakdown.TotalMonthlyCost))
+			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*breakdown.TotalMonthlyCost))
 		}
 
 		outProjects = append(outProjects, Project{
@@ -170,7 +167,7 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		})
 	}
 
-	resourceSummary := BuildResourceSummary(schema.AllResources(projects), ResourceSummaryOptions{
+	resourceSummary := BuildResourceSummary(schema.AllProjectResources(projects), ResourceSummaryOptions{
 		OnlyFields: []string{"UnsupportedCounts"},
 	})
 
@@ -378,6 +375,31 @@ func combineCounts(c1 *map[string]int, c2 *map[string]int) *map[string]int {
 	}
 
 	return &res
+}
+
+func calculateTotalCosts(resources []Resource) (*decimal.Decimal, *decimal.Decimal) {
+	totalHourlyCost := decimalPtr(decimal.Zero)
+	totalMonthlyCost := decimalPtr(decimal.Zero)
+
+	for _, r := range resources {
+		if r.HourlyCost != nil {
+			if totalHourlyCost == nil {
+				totalHourlyCost = decimalPtr(decimal.Zero)
+			}
+
+			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*r.HourlyCost))
+		}
+		if r.MonthlyCost != nil {
+			if totalMonthlyCost == nil {
+				totalMonthlyCost = decimalPtr(decimal.Zero)
+			}
+
+			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*r.MonthlyCost))
+		}
+
+	}
+
+	return totalHourlyCost, totalMonthlyCost
 }
 
 func sortResources(resources []Resource) {

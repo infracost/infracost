@@ -26,7 +26,7 @@ func PopulatePrices(cfg *config.Config, project *schema.Project) error {
 		defer wg.Done()
 		// We ignore resources in the past breakdown since we don't want to duplicate the summary for all projects.
 		// otherwise we will count an unsupported resource 2 times.
-		summary := output.BuildResourceSummary(project.Breakdown.Resources, output.ResourceSummaryOptions{
+		summary := output.BuildResourceSummary(project.AllResources(), output.ResourceSummaryOptions{
 			IncludeUnsupportedProviders: true,
 		})
 

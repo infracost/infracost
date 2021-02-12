@@ -27,7 +27,6 @@ func CalculateCosts(project *Project) {
 	for _, r := range project.AllResources() {
 		r.CalculateCosts()
 	}
-	project.CalculateTotalCosts()
 }
 
 func (r *Resource) CalculateCosts() {

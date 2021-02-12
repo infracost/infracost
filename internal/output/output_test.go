@@ -1,14 +1,14 @@
-package schema
+package output
 
 import (
 	"testing"
 
 	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/assert"
+	"gopkg.in/go-playground/assert.v1"
 )
 
-func TestResourceStateCalculateTotalCosts(t *testing.T) {
-	resources := []*Resource{
+func TestCalculateTotalCosts(t *testing.T) {
+	resources := []Resource{
 		{
 			HourlyCost:  decimalPtr(decimal.NewFromInt(10)),
 			MonthlyCost: decimalPtr(decimal.NewFromInt(7200)),
@@ -18,25 +18,17 @@ func TestResourceStateCalculateTotalCosts(t *testing.T) {
 			MonthlyCost: decimalPtr(decimal.NewFromInt(3600)),
 		},
 		{
-			IsSkipped:   true,
-			HourlyCost:  decimalPtr(decimal.NewFromInt(10)),
-			MonthlyCost: decimalPtr(decimal.NewFromInt(7200)),
-		},
-		{
 			HourlyCost:  nil,
 			MonthlyCost: nil,
 		},
 	}
-	b := Breakdown{
-		Resources: resources,
-	}
-	b.calculateTotalCosts()
+
+	totalHourlyCost, totalMonthlyCost := calculateTotalCosts(resources)
 
 	expected, _ := decimal.NewFromInt(15).Float64()
-	actual, _ := b.TotalHourlyCost.Float64()
+	actual, _ := totalHourlyCost.Float64()
 	assert.Equal(t, expected, actual)
-
 	expected, _ = decimal.NewFromInt(10800).Float64()
-	actual, _ = b.TotalMonthlyCost.Float64()
+	actual, _ = totalMonthlyCost.Float64()
 	assert.Equal(t, expected, actual)
 }
