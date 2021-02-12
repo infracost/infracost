@@ -232,6 +232,12 @@ var FreeResources []string = []string{
 	"aws_sqs_queue_policy",
 	"aws_volume_attachment",
 
+	// AWS RAM
+	"aws_ram_principal_association",
+	"aws_ram_resource_association",
+	"aws_ram_resource_share",
+	"aws_ram_resource_share_accepter",
+
 	// AWS S3
 	"aws_s3_access_point",
 	"aws_s3_account_public_access_block",
@@ -280,7 +286,7 @@ var FreeResources []string = []string{
 	"aws_ec2_traffic_mirror_filter_rule",
 	"aws_ec2_traffic_mirror_target",
 	"aws_ec2_transit_gateway",
-	"aws_ec2_transit_gateway_peering_attachment_accepter"
+	"aws_ec2_transit_gateway_peering_attachment_accepter",
 	"aws_ec2_transit_gateway_route",
 	"aws_ec2_transit_gateway_route_table",
 	"aws_ec2_transit_gateway_route_table_association",
