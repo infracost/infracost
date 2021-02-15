@@ -126,6 +126,7 @@ var FreeResources []string = []string{
 	"aws_codebuild_report_group",
 	"aws_codebuild_source_credential",
 	"aws_codebuild_webhook",
+
 	// AWS Config
 	"aws_config_aggregate_authorization",
 	"aws_config_configuration_aggregator",

@@ -1,8 +1,6 @@
 package aws
 
 import (
-	"fmt"
-
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
@@ -72,9 +70,6 @@ func NewConfigRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		rulesTiers := usage.CalculateTierBuckets(monthlyConfigRules, configRulesLimits)
 		packsTiers := usage.CalculateTierBuckets(monthlyConformancePacks, conformancePacksLimits)
 
-		fmt.Println(rulesTiers)
-		fmt.Println(packsTiers)
-
 		if rulesTiers[0].GreaterThan(decimal.NewFromInt(0)) {
 			costComponents = append(costComponents, configRulesCostComponent(region, "Config rule evaluations (first 100K)", "0", &rulesTiers[0]))
 		}
@@ -96,8 +91,8 @@ func NewConfigRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	} else {
 		var unknown *decimal.Decimal
 
-		costComponents = append(costComponents, configRulesCostComponent(region, "Certificates (first 1K)", "0", unknown))
-		costComponents = append(costComponents, configPacksCostComponent(region, "Certificates (first 1K)", "0", unknown))
+		costComponents = append(costComponents, configRulesCostComponent(region, "Config rule evaluations (first 100K)", "0", unknown))
+		costComponents = append(costComponents, configPacksCostComponent(region, "Conformance pack evaluations (first 1M)", "0", unknown))
 	}
 
 	return &schema.Resource{

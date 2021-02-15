@@ -15,14 +15,14 @@ func TestConfigRuleItem(t *testing.T) {
 	}
 
 	tf := `
-				resource "aws_config_config_rule" "my_config" {
-					name = "example"
-				
-					source {
-						owner             = "AWS"
-						source_identifier = "S3_BUCKET_VERSIONING_ENABLED"
-					}
-				}`
+		resource "aws_config_config_rule" "my_config" {
+			name = "example"
+		
+			source {
+				owner             = "AWS"
+				source_identifier = ""
+			}
+		}`
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
@@ -35,6 +35,14 @@ func TestConfigRuleItem(t *testing.T) {
 				{
 					Name:      "Custom configuration items",
 					PriceHash: "09799efb8c5c18a02b6cc1e17ab725c9-82a8dd965c6354fb657418947e41e612",
+				},
+				{
+					Name:      "Config rule evaluations (first 100K)",
+					PriceHash: "b5643f5c83300f4a85d84a467af5aca4-3bf3a9bc78b9ee067586248fa8117ddb",
+				},
+				{
+					Name:      "Conformance pack evaluations (first 1M)",
+					PriceHash: "59380b51cdc1fef65c1e7cf839834d1f-5809924a59f31eac9580404fc2984283",
 				},
 			},
 		},
@@ -49,14 +57,14 @@ func TestCongigRule_usage(t *testing.T) {
 	}
 
 	tf := `
-				resource "aws_config_config_rule" "my_config" {
-					name = "example"
-				
-					source {
-						owner             = "AWS"
-						source_identifier = "S3_BUCKET_VERSIONING_ENABLED"
-					}
-				}`
+		resource "aws_config_config_rule" "my_config" {
+			name = "example"
+		
+			source {
+				owner             = "AWS"
+				source_identifier = "S3_BUCKET_VERSIONING_ENABLED"
+			}
+		}`
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_config_config_rule.my_config": map[string]interface{}{
