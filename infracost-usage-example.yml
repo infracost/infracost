@@ -184,8 +184,8 @@ resource_usage:
     monthly_queries:  1000000 # Monthly DNS queries.
 
   google_kms_crypto_key.my_keys:
-    monthly_key_versions: 10000 # Number of uses crypto key versions per month
-    monthly_key_operations: 1000000 # Number of operations with crypto keys per month
+    key_versions: 10000             # Number of key versions.
+    monthly_key_operations: 1000000 # Monthly number of key operations.
 
   google_pubsub_subscription.my_subscription:
     monthly_message_data_tb: 7.416 # Monthly amount of message data pulled by the subscription in TB.

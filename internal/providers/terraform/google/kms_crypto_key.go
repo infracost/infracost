@@ -1,10 +1,14 @@
 package google
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
 )
 
 func GetKMSCryptoKeyRegistryItem() *schema.RegistryItem {
@@ -16,16 +20,25 @@ func GetKMSCryptoKeyRegistryItem() *schema.RegistryItem {
 
 func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
-	algorithm := d.Get("version_template.0.algorithm").String()
-	protectionLevel := d.Get("version_template.0.protection_level").String()
 
-	if algorithm == "EXTERNAL_SYMMETRIC_ENCRYPTION" {
-		protectionLevel = "" // default value is SOFTWARE, and EXTERNAL isn't possible value. ???
+	algorithm := "GOOGLE_SYMMETRIC_ENCRYPTION"
+	protectionLevel := "SOFTWARE"
+
+	if d.Get("version_template").Type != gjson.Null {
+		algorithm = d.Get("version_template.0.algorithm").String()
+		protectionLevel = d.Get("version_template.0.protection_level").String()
 	}
 
-	var monthlyKeys *decimal.Decimal
-	if u != nil && u.Get("monthly_key_versions").Exists() {
-		monthlyKeys = decimalPtr(decimal.NewFromInt(u.Get("monthly_key_versions").Int()))
+	monthlyKeys := decimal.Zero
+	if u != nil && u.Get("key_versions").Exists() {
+		monthlyKeys = decimal.NewFromInt(u.Get("key_versions").Int())
+	} else if d.Get("rotation_period").Exists() {
+		rotationPeriod := (d.Get("rotation_period").String())
+		rotation, err := strconv.ParseFloat(strings.Split(rotationPeriod, "s")[0], 64)
+
+		if err == nil {
+			monthlyKeys = decimal.NewFromFloat(2592000.0 / rotation)
+		}
 	}
 
 	var monthlyKeyOperations *decimal.Decimal
@@ -39,44 +52,37 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	costComponents := []*schema.CostComponent{}
 
 	if keyDescript == "HSM RSA 3072" || keyDescript == "HSM RSA 4096" || keyDescript == "HSM ECDSA P-256" || keyDescript == "HSM ECDSA P-384" {
-		tierLimit := decimal.NewFromInt(2000)
-		tierOneKeys := decimal.NewFromInt(0)
-		tierTwoKeys := decimal.NewFromInt(0)
+		tierLimits := []int{2000}
 
-		if monthlyKeys != nil {
-			if monthlyKeys.GreaterThan(tierLimit) {
-				tierOneKeys = tierLimit
-				tierTwoKeys = monthlyKeys.Sub(tierLimit)
-			} else {
-				tierOneKeys = *monthlyKeys
-			}
+		tiers := usage.CalculateTierBuckets(monthlyKeys, tierLimits)
+
+		if tiers[0].GreaterThan(decimal.NewFromInt(0)) {
+			costComponents = append(costComponents, &schema.CostComponent{
+				Name:            "Key versions (first 2K)",
+				Unit:            "months",
+				UnitMultiplier:  1,
+				MonthlyQuantity: &tiers[0],
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("gcp"),
+					Region:        strPtr(region),
+					Service:       strPtr("Cloud Key Management Service (KMS)"),
+					ProductFamily: strPtr("ApplicationServices"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "description", ValueRegex: strPtr("/" + keyDescript + "/")},
+					},
+				},
+				PriceFilter: &schema.PriceFilter{
+					EndUsageAmount: strPtr("2000"),
+				},
+			})
 		}
 
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            keyDescript + " (first 2K)",
-			Unit:            "keys",
-			UnitMultiplier:  1,
-			MonthlyQuantity: &tierOneKeys,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("gcp"),
-				Region:        strPtr(region),
-				Service:       strPtr("Cloud Key Management Service (KMS)"),
-				ProductFamily: strPtr("ApplicationServices"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", ValueRegex: strPtr("/" + keyDescript + "/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				EndUsageAmount: strPtr("2000"),
-			},
-		})
-
-		if tierTwoKeys.GreaterThan(decimal.NewFromInt(0)) {
+		if tiers[1].GreaterThan(decimal.NewFromInt(0)) {
 			costComponents = append(costComponents, &schema.CostComponent{
-				Name:            keyDescript,
-				Unit:            "keys",
+				Name:            "Key versions (over 2K)",
+				Unit:            "months",
 				UnitMultiplier:  1,
-				MonthlyQuantity: &tierTwoKeys,
+				MonthlyQuantity: &tiers[1],
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr(region),
@@ -92,11 +98,12 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			})
 		}
 	} else {
+		fmt.Println(keyDescript)
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            keyDescript,
-			Unit:            "keys",
+			Name:            "Key versions",
+			Unit:            "months",
 			UnitMultiplier:  1,
-			MonthlyQuantity: monthlyKeys,
+			MonthlyQuantity: &monthlyKeys,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
 				Region:        strPtr(region),
@@ -109,8 +116,10 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		})
 	}
 
+	fmt.Println(operationDesctipt)
+
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            operationDesctipt,
+		Name:            "Operations",
 		Unit:            "operations",
 		UnitMultiplier:  10000,
 		MonthlyQuantity: monthlyKeyOperations,
@@ -135,7 +144,7 @@ func cryptoKeyDescription(algorithm string, protectionLevel string) string {
 	switch protectionLevel {
 	case "SOFTWARE":
 		if algorithm == "GOOGLE_SYMMETRIC_ENCRYPTION" {
-			return "Software symmetric"
+			return "Active software symmetric key versions"
 		}
 		return "Software asymmetric"
 	case "HSM":
@@ -150,9 +159,6 @@ func cryptoKeyDescription(algorithm string, protectionLevel string) string {
 		}
 		rsaType := strings.Split(algorithm, "_")[3]
 		return "HSM RSA " + rsaType
-	}
-	if algorithm == "EXTERNAL_SYMMETRIC_ENCRYPTION" {
-		return "external symmetric"
 	}
 	return ""
 }
@@ -176,9 +182,6 @@ func keyOperationsDescription(algorithm string, protectionLevel string) string {
 		}
 		rsaType := strings.Split(algorithm, "_")[3]
 		return "HSM cryptographic operations with a RSA " + rsaType
-	}
-	if algorithm == "EXTERNAL_SYMMETRIC_ENCRYPTION" {
-		return "External symmetric cryptographic"
 	}
 	return ""
 }
