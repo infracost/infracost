@@ -21,7 +21,7 @@ func TestLoadResources_rootModule(t *testing.T) {
 		t.Skip("Skipping test in short mode")
 	}
 
-	project := tftest.Project{
+	project := tftest.TerraformProject{
 		Files: []tftest.File{
 			{
 				Path: "main.tf",
@@ -42,7 +42,7 @@ func TestLoadResources_rootModule(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTestsForProject(t, project, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTestsForTerraformProject(t, project, schema.NewEmptyUsageMap(), resourceChecks)
 }
 
 func TestLoadResources_nestedModule(t *testing.T) {
@@ -50,7 +50,7 @@ func TestLoadResources_nestedModule(t *testing.T) {
 		t.Skip("Skipping test in short mode")
 	}
 
-	project := tftest.Project{
+	project := tftest.TerraformProject{
 		Files: []tftest.File{
 			{
 				Path: "main.tf",
@@ -96,5 +96,5 @@ func TestLoadResources_nestedModule(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTestsForProject(t, project, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTestsForTerraformProject(t, project, schema.NewEmptyUsageMap(), resourceChecks)
 }

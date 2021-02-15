@@ -78,17 +78,17 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func (p *Parser) parseJSONResources(parseExisting bool, baseResources []*schema.Resource, usage map[string]*schema.UsageData, parsed, providerConf, conf, vars gjson.Result) []*schema.Resource {
+func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Resource, usage map[string]*schema.UsageData, parsed, providerConf, conf, vars gjson.Result) []*schema.Resource {
 	var resources []*schema.Resource
 	resources = append(resources, baseResources...)
 	var vals gjson.Result
-	if parseExisting {
+	if parsePrior {
 		vals = parsed.Get("prior_state.values.root_module")
+	} else {
+		vals = parsed.Get("planned_values.root_module")
 		if !vals.Exists() {
 			vals = parsed.Get("values.root_module")
 		}
-	} else {
-		vals = parsed.Get("planned_values.root_module")
 	}
 
 	resData := p.parseResourceData(providerConf, vals, conf, vars)
@@ -118,10 +118,10 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 	conf := parsed.Get("configuration.root_module")
 	vars := parsed.Get("variables")
 
-	existingResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
-	plannedResources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
+	pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
+	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
 
-	return existingResources, plannedResources, nil
+	return pastResources, resources, nil
 }
 
 func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {

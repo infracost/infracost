@@ -23,11 +23,10 @@ type Resource struct {
 	Tags           map[string]string
 }
 
-func CalculateCosts(state *State) {
-	for _, r := range state.AllResources() {
+func CalculateCosts(project *Project) {
+	for _, r := range project.AllResources() {
 		r.CalculateCosts()
 	}
-	state.CalculateTotalCosts()
 }
 
 func (r *Resource) CalculateCosts() {
@@ -91,12 +90,11 @@ func (r *Resource) RemoveCostComponent(costComponent *CostComponent) {
 	r.CostComponents = n
 }
 
-func SortResources(state *State) {
-	resources := state.AllResources()
+func SortResources(project *Project) {
+	resources := project.AllResources()
 	sort.Slice(resources, func(i, j int) bool {
 		return resources[i].Name < resources[j].Name
 	})
-
 }
 
 func MultiplyQuantities(resource *Resource, multiplier decimal.Decimal) {

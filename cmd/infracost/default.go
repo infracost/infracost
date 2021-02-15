@@ -216,7 +216,7 @@ func checkUsageErrors(cfg *config.Config) error {
 }
 
 func defaultMain(cfg *config.Config) error {
-	state := schema.NewState()
+	projects := make([]*schema.Project, 0)
 
 	for _, projectCfg := range cfg.Projects.Terraform {
 		src := projectCfg.JSONFile
@@ -255,13 +255,12 @@ func defaultMain(cfg *config.Config) error {
 			cfg.Environment.HasUsageFile = true
 		}
 
-		projectState, err := provider.LoadResources(u)
+		project, err := provider.LoadResources(u)
 		if err != nil {
 			return err
 		}
 
-		state.ExistingState.Resources = append(state.ExistingState.Resources, projectState.ExistingState.Resources...)
-		state.PlannedState.Resources = append(state.PlannedState.Resources, projectState.PlannedState.Resources...)
+		projects = append(projects, project)
 	}
 
 	spinnerOpts := spin.Options{
@@ -270,39 +269,39 @@ func defaultMain(cfg *config.Config) error {
 	}
 	spinner := spin.NewSpinner("Calculating cost estimate", spinnerOpts)
 
-	if err := prices.PopulatePrices(cfg, state); err != nil {
-		spinner.Fail()
+	for _, project := range projects {
+		if err := prices.PopulatePrices(cfg, project); err != nil {
+			spinner.Fail()
 
-		red := color.New(color.FgHiRed)
-		bold := color.New(color.Bold, color.FgHiWhite)
+			red := color.New(color.FgHiRed)
+			bold := color.New(color.Bold, color.FgHiWhite)
 
-		if e := unwrapped(err); errors.Is(e, prices.ErrInvalidAPIKey) {
-			return errors.New(fmt.Sprintf("%v\n%s %s %s %s %s\n%s",
-				e.Error(),
-				red.Sprint("Please check your"),
-				bold.Sprint(config.CredentialsFilePath()),
-				red.Sprint("file or"),
-				bold.Sprint("INFRACOST_API_KEY"),
-				red.Sprint("environment variable."),
-				red.Sprint("If you continue having issues please email hello@infracost.io"),
-			))
+			if e := unwrapped(err); errors.Is(e, prices.ErrInvalidAPIKey) {
+				return errors.New(fmt.Sprintf("%v\n%s %s %s %s %s\n%s",
+					e.Error(),
+					red.Sprint("Please check your"),
+					bold.Sprint(config.CredentialsFilePath()),
+					red.Sprint("file or"),
+					bold.Sprint("INFRACOST_API_KEY"),
+					red.Sprint("environment variable."),
+					red.Sprint("If you continue having issues please email hello@infracost.io"),
+				))
+			}
+
+			if e, ok := err.(*prices.PricingAPIError); ok {
+				return errors.New(fmt.Sprintf("%v\n%s", e.Error(), "We have been notified of this issue."))
+			}
+
+			return err
 		}
 
-		if e, ok := err.(*prices.PricingAPIError); ok {
-			return errors.New(fmt.Sprintf("%v\n%s", e.Error(), "We have been notified of this issue."))
-		}
-
-		return err
+		schema.CalculateCosts(project)
+		project.CalculateDiff()
 	}
-
-	schema.CalculateCosts(state)
-	state.CalculateDiff()
 
 	spinner.Success()
 
-	schema.SortResources(state)
-
-	r := output.ToOutputFormat(state)
+	r := output.ToOutputFormat(projects)
 
 	for _, outputCfg := range cfg.Outputs {
 		cfg.Environment.SetOutputEnvironment(outputCfg)
