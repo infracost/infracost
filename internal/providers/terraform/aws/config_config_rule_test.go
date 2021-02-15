@@ -33,7 +33,7 @@ func TestConfigRuleItem(t *testing.T) {
 					PriceHash: "8f34da0cbaaa71b45b67d99de4891d31-82a8dd965c6354fb657418947e41e612",
 				},
 				{
-					Name:      "Custom configuration items",
+					Name:      "Custom config items",
 					PriceHash: "09799efb8c5c18a02b6cc1e17ab725c9-82a8dd965c6354fb657418947e41e612",
 				},
 				{
