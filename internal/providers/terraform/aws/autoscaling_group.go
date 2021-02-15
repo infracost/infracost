@@ -27,6 +27,9 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	region := d.Get("region").String()
 	desiredCapacity := decimal.NewFromInt(d.Get("desired_capacity").Int())
 	if u != nil && u.Get("instances_count").Exists() {
+		if desiredCapacity.GreaterThan(decimal.Zero) {
+			log.Debugf("Overriding the desired_capacity for %s by usage data", d.Address)
+		}
 		desiredCapacity = decimal.NewFromInt(u.Get("instances_count").Int())
 	}
 
