@@ -80,7 +80,7 @@ func TestCongigRule_usage(t *testing.T) {
 			Name: "aws_config_config_rule.my_config",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Configuration items",
+					Name:             "Config items",
 					PriceHash:        "8f34da0cbaaa71b45b67d99de4891d31-82a8dd965c6354fb657418947e41e612",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(10000)),
 				},
