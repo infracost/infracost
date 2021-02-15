@@ -29,7 +29,7 @@ func NewConfigRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	costComponents := []*schema.CostComponent{}
 
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "Configuration items",
+		Name:            "Config items",
 		Unit:            "records",
 		UnitMultiplier:  1,
 		MonthlyQuantity: monthlyConfigItems,
