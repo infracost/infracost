@@ -85,7 +85,7 @@ func TestCongigRule_usage(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(10000)),
 				},
 				{
-					Name:             "Custom configuration items",
+					Name:             "Custom config items",
 					PriceHash:        "09799efb8c5c18a02b6cc1e17ab725c9-82a8dd965c6354fb657418947e41e612",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(10000)),
 				},
