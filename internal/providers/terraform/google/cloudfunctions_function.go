@@ -15,19 +15,25 @@ func GetCloudFunctionsRegistryItem() *schema.RegistryItem {
 func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
-	var monthlyGBzSeconds *decimal.Decimal
-	if u != nil && u.Get("monthly_gbz_secs").Exists() {
-		monthlyGBzSeconds = decimalPtr(decimal.NewFromInt(u.Get("monthly_gbz_secs").Int()))
+	memorySize := decimal.NewFromInt(256)
+	if d.Get("available_memory_mb").Exists() {
+		memorySize = decimal.NewFromInt(d.Get("available_memory_mb").Int())
 	}
 
-	var monthlyGBSeconds *decimal.Decimal
-	if u != nil && u.Get("monthly_gb_secs").Exists() {
-		monthlyGBSeconds = decimalPtr(decimal.NewFromInt(u.Get("monthly_gb_secs").Int()))
+	var cpuMapping = map[int]decimal.Decimal{
+		128:  decimal.NewFromInt(200),
+		256:  decimal.NewFromInt(400),
+		512:  decimal.NewFromInt(800),
+		1024: decimal.NewFromInt(1400),
+		2048: decimal.NewFromInt(2400),
+		4096: decimal.NewFromInt(4800),
 	}
 
-	var invocations *decimal.Decimal
-	if u != nil && u.Get("monthly_functions_calls").Exists() {
-		invocations = decimalPtr(decimal.NewFromInt(u.Get("monthly_functions_calls").Int()))
+	cpuSize := cpuMapping[int(memorySize.IntPart())]
+
+	invocations := decimal.Zero
+	if u != nil && u.Get("monthly_function_invocations").Exists() {
+		invocations = decimal.NewFromInt(u.Get("monthly_function_invocations").Int())
 	}
 
 	var networkEgrees *decimal.Decimal
@@ -35,14 +41,22 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		networkEgrees = decimalPtr(decimal.NewFromInt(u.Get("monthly_outbound_data_gb").Int()))
 	}
 
+	requestDuration := decimal.Zero
+	if u != nil && u.Get("request_duration_ms").Exists() {
+		requestDuration = decimal.NewFromInt(u.Get("request_duration_ms").Int())
+	}
+
+	monthlyCPUUsage := calculateGHzSeconds(cpuSize, requestDuration, invocations)
+	monthlyMemoryUsage := calculateGBSeconds(memorySize, requestDuration, invocations)
+
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:            "CPU Time",
-				Unit:            "GBz-Second",
+				Name:            "CPU",
+				Unit:            "GHz-seconds",
 				UnitMultiplier:  1,
-				MonthlyQuantity: monthlyGBzSeconds,
+				MonthlyQuantity: &monthlyCPUUsage,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr(region),
@@ -54,10 +68,10 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 				},
 			},
 			{
-				Name:            "Memory Time",
-				Unit:            "GB-Second",
+				Name:            "Memory",
+				Unit:            "GB-seconds",
 				UnitMultiplier:  1,
-				MonthlyQuantity: monthlyGBSeconds,
+				MonthlyQuantity: &monthlyMemoryUsage,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr(region),
@@ -70,9 +84,9 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 			},
 			{
 				Name:            "Invocations",
-				Unit:            "calls",
+				Unit:            "invocations",
 				UnitMultiplier:  1,
-				MonthlyQuantity: invocations,
+				MonthlyQuantity: &invocations,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr("global"),
@@ -87,13 +101,13 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 				},
 			},
 			{
-				Name:            "Outbound Data",
+				Name:            "Outbound data transfer",
 				Unit:            "GB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: networkEgrees,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
-					Region:        strPtr("us-east1"),
+					Region:        strPtr(region),
 					Service:       strPtr("Cloud Functions"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -106,4 +120,16 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 			},
 		},
 	}
+}
+
+func calculateGBSeconds(memorySize decimal.Decimal, averageRequestDuration decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
+	gb := memorySize.Div(decimal.NewFromInt(1024))
+	seconds := averageRequestDuration.Div(decimal.NewFromInt(1000))
+	return monthlyRequests.Mul(gb).Mul(seconds)
+}
+
+func calculateGHzSeconds(memorySize decimal.Decimal, averageRequestDuration decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
+	gb := memorySize.Div(decimal.NewFromInt(1000))
+	seconds := averageRequestDuration.Div(decimal.NewFromInt(1000))
+	return monthlyRequests.Mul(gb).Mul(seconds)
 }
