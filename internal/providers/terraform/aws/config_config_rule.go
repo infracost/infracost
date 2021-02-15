@@ -71,13 +71,13 @@ func NewConfigRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		packsTiers := usage.CalculateTierBuckets(monthlyConformancePacks, conformancePacksLimits)
 
 		if rulesTiers[0].GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, configRulesCostComponent(region, "Config rule evaluations (first 100K)", "0", &rulesTiers[0]))
+			costComponents = append(costComponents, configRulesCostComponent(region, "Rule evaluations (first 100K)", "0", &rulesTiers[0]))
 		}
 		if rulesTiers[1].GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, configRulesCostComponent(region, "Config rule evaluations (next 400K)", "100000", &rulesTiers[1]))
+			costComponents = append(costComponents, configRulesCostComponent(region, "Rule evaluations (next 400K)", "100000", &rulesTiers[1]))
 		}
 		if rulesTiers[2].GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, configRulesCostComponent(region, "Config rule evaluations (over 500K)", "500000", &rulesTiers[2]))
+			costComponents = append(costComponents, configRulesCostComponent(region, "Rule evaluations (over 500K)", "500000", &rulesTiers[2]))
 		}
 		if packsTiers[0].GreaterThan(decimal.NewFromInt(0)) {
 			costComponents = append(costComponents, configPacksCostComponent(region, "Conformance pack evaluations (first 1M)", "0", &packsTiers[0]))
@@ -91,7 +91,7 @@ func NewConfigRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	} else {
 		var unknown *decimal.Decimal
 
-		costComponents = append(costComponents, configRulesCostComponent(region, "Config rule evaluations (first 100K)", "0", unknown))
+		costComponents = append(costComponents, configRulesCostComponent(region, "Rule evaluations (first 100K)", "0", unknown))
 		costComponents = append(costComponents, configPacksCostComponent(region, "Conformance pack evaluations (first 1M)", "0", unknown))
 	}
 
