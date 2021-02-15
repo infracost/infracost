@@ -883,7 +883,6 @@ func TestAutoscalingGroup_mixedInstanceLaunchTemplateDynamic(t *testing.T) {
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
 
-
 func TestAutoscalingGroup_overrideUsageData(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
@@ -910,7 +909,7 @@ func TestAutoscalingGroup_overrideUsageData(t *testing.T) {
 			max_size             = 3
 			min_size             = 1
 		}`
-	
+
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_autoscaling_group.asg1": map[string]interface{}{
 			"instances_count": 6,
@@ -927,12 +926,12 @@ func TestAutoscalingGroup_overrideUsageData(t *testing.T) {
 						{
 							Name:            "Linux/UNIX usage (on-demand, t2.medium)",
 							PriceHash:       "250382a8c0da495d6048e6fc57e526bc-d2c98780d7b6e36641b521f1f8145c6f",
-							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2).Mul(3)),
+							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2).Mul(decimal.NewFromInt(3))),
 						},
 						{
 							Name:            "EC2 detailed monitoring",
 							PriceHash:       "df2e2141bd6d5e2b758fa0617157ff46-fd21869c4f4d79599eea951b2b7353e6",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(14).Mul(3)),
+							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(14).Mul(decimal.NewFromInt(3))),
 						},
 					},
 					SubResourceChecks: []testutil.ResourceCheck{
@@ -942,7 +941,7 @@ func TestAutoscalingGroup_overrideUsageData(t *testing.T) {
 								{
 									Name:             "General Purpose SSD storage (gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
-									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20).Mul(3)),
+									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20).Mul(decimal.NewFromInt(3))),
 								},
 							},
 						},
@@ -952,7 +951,7 @@ func TestAutoscalingGroup_overrideUsageData(t *testing.T) {
 								{
 									Name:             "General Purpose SSD storage (gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
-									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20).Mul(3)),
+									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20).Mul(decimal.NewFromInt(3))),
 								},
 							},
 						},
