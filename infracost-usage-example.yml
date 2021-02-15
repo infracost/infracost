@@ -40,7 +40,7 @@ resource_usage:
     monthly_build_mins: 10000 # Monthly total duration of builds in minutes. Each build is rounded up to the nearest minute.
     
   aws_config_config_rule.my_config:
-    monthly_config_items: 10000 # Configuration items records per month
+    monthly_config_items: 10000 # Monthly config item records.
     monthly_custom_config_items: 10000 # Custom configuration items records per month
     monthly_rule_evaluations: 1000000 # Config rules evaluations per month
     monthly_conformance_pack_evaluations: 26000000 # Conformance pack evaluations per month
