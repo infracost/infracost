@@ -1,5 +1,5 @@
 package schema
 
 type Provider interface {
-	LoadResources(map[string]*UsageData) ([]*Resource, error)
+	LoadResources(map[string]*UsageData) (*Project, error)
 }
