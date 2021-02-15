@@ -122,3 +122,28 @@ func TestECSService_externalDeployment(t *testing.T) {
 
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
+
+func TestECSService_EC2(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_ecs_cluster" "ecs1" {
+			name               = "ecs1"
+		}
+
+		resource "aws_ecs_service" "ecs_fargate1" {
+			name        = "ecs_fargate1"
+			cluster     = aws_ecs_cluster.ecs1.id
+
+			deployment_controller {
+				type = "EXTERNAL"
+			}
+		}
+	`
+
+	resourceChecks := []testutil.ResourceCheck{}
+
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+}
