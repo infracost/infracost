@@ -26,11 +26,11 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	desiredCapacity := decimal.NewFromInt(d.Get("desired_capacity").Int())
-	if u != nil && u.Get("instances_count").Exists() {
+	if u != nil && u.Get("instances").Exists() {
 		if desiredCapacity.GreaterThan(decimal.Zero) {
 			log.Debugf("Overriding the desired_capacity for %s by usage data", d.Address)
 		}
-		desiredCapacity = decimal.NewFromInt(u.Get("instances_count").Int())
+		desiredCapacity = decimal.NewFromInt(u.Get("instances").Int())
 	}
 
 	subResources := make([]*schema.Resource, 0)

@@ -912,7 +912,7 @@ func TestAutoscalingGroup_overrideUsageData(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_autoscaling_group.asg1": map[string]interface{}{
-			"instances_count": 6,
+			"instances": 6,
 		},
 	})
 
