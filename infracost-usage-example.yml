@@ -43,7 +43,7 @@ resource_usage:
     monthly_config_items: 10000 # Monthly config item records.
     monthly_custom_config_items: 10000 # Monthly custom config item records.
     monthly_rule_evaluations: 1000000 # Monthly config rule evaluations.
-    monthly_conformance_pack_evaluations: 26000000 # Conformance pack evaluations per month
+    monthly_conformance_pack_evaluations: 26000000 # Monthly conformance pack evaluations.
 
   aws_data_transfer.my_region:
     region: us-east-1                           # Region the data transfer is originating from.
