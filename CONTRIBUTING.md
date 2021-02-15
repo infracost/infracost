@@ -184,7 +184,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 unless the price is for a large number, e.g. set it to `1000000` if the price should be shown "per 1M requests" in the output.
 
-- tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)". Units should not be included in brackets unless the cost component relates to storage or data transfer, e.g. "Storage (first 1TB)    GB" is more understandable than "Storage (first 1K)    GB" since users understand terabytes and petabytes.
+- tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)". Use the words "first", "next" and "over" when describing tiers. Units should not be included in brackets unless the cost component relates to storage or data transfer, e.g. "Storage (first 1TB)    GB" is more understandable than "Storage (first 1K)    GB" since users understand terabytes and petabytes.
 
 - purchase options: if applicable, include "on-demand" in brackets after the cost component name, e.g. `Database instance (on-demand`
 
@@ -235,16 +235,37 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 5. For resources that are continuous in time, do not use prefixes, e.g. use `instances`, `subscriptions`, `storage_gb`. For non-continuous resources, prefix with `monthly_` so users knows what time interval to estimate for, e.g. `monthly_log_lines`, `monthly_requests`.
 
+#### Google resource notes
+
+1. If the resource has a `zone` key, if they have a zone key, use this logic to get the region:
+	```
+	region := d.Get("region").String()
+	zone := d.Get("zone").String()
+	if zone != "" {
+		region = zoneToRegion(zone)
+	}
+	```
+
 ## Release steps
 
 @alikhajeh1 and @aliscott rotate release responsibilities between them.
 
 1. In [here](https://github.com/infracost/infracost/actions), click on the "Go" build for the master branch, click on Build, expand Test, then use the "Search logs" box to find any line that has "Multiple products found", "No products found for" or "No prices found for". Update the resource files in question to fix these error, often it's because the price filters need to be adjusted to only return 1 result.
 2. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
-3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have 5 assets.
+3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have the mac/linux/windows assets.
 4. Click on the Edit draft button, add the release notes from the commits between this and the last release and click on publish.
-5. Announce the release in the infracost-community Slack general channel. Then wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
-6. Update the docs repo with any required changes and supported resources.
-7. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
+5. In the `infracost-atlantis` repo, run the following steps so the Atlantis integration uses the latest version of Infracost:
 
-If a new flag/feature is added that requires CI support, update the 9 repos mentioned [here](https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts). For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.
+	```
+	# you can also push to master if you want the GH Action to do the following.
+	git pull
+	docker build --no-cache -t infracost/infracost-atlantis:latest .
+	docker push infracost/infracost-atlantis:latest
+	```
+
+6. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
+7. Announce the release in the infracost-community Slack announcements channel.
+8. Update the docs repo with any required changes and supported resources.
+9. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
+
+If a new flag/feature is added that requires CI support, update the repos mentioned [here](https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts). For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.

@@ -28,8 +28,13 @@ func NewComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	if strings.HasPrefix(machineType, "custom-") {
 		return nil
 	}
+
+	region := d.Get("region").String()
+
 	zone := d.Get("zone").String()
-	region := zoneToRegion(zone)
+	if zone != "" {
+		region = zoneToRegion(zone)
+	}
 
 	purchaseOption := "on_demand"
 	if d.Get("scheduling.0.preemptible").Bool() {
