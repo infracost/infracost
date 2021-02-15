@@ -882,3 +882,85 @@ func TestAutoscalingGroup_mixedInstanceLaunchTemplateDynamic(t *testing.T) {
 
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
+
+
+func TestAutoscalingGroup_overrideUsageData(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_launch_configuration" "lc1" {
+			image_id      = "fake_ami"
+			instance_type = "t2.medium"
+
+			root_block_device {
+				volume_size = 10
+			}
+
+			ebs_block_device {
+				device_name = "xvdf"
+				volume_size = 10
+			}
+		}
+
+		resource "aws_autoscaling_group" "asg1" {
+			launch_configuration = aws_launch_configuration.lc1.id
+			desired_capacity     = 2
+			max_size             = 3
+			min_size             = 1
+		}`
+	
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_autoscaling_group.asg1": map[string]interface{}{
+			"instances_count": 6,
+		},
+	})
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_autoscaling_group.asg1",
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name: "aws_launch_configuration.lc1",
+					CostComponentChecks: []testutil.CostComponentCheck{
+						{
+							Name:            "Linux/UNIX usage (on-demand, t2.medium)",
+							PriceHash:       "250382a8c0da495d6048e6fc57e526bc-d2c98780d7b6e36641b521f1f8145c6f",
+							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2).Mul(3)),
+						},
+						{
+							Name:            "EC2 detailed monitoring",
+							PriceHash:       "df2e2141bd6d5e2b758fa0617157ff46-fd21869c4f4d79599eea951b2b7353e6",
+							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(14).Mul(3)),
+						},
+					},
+					SubResourceChecks: []testutil.ResourceCheck{
+						{
+							Name: "root_block_device",
+							CostComponentChecks: []testutil.CostComponentCheck{
+								{
+									Name:             "General Purpose SSD storage (gp2)",
+									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
+									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20).Mul(3)),
+								},
+							},
+						},
+						{
+							Name: "ebs_block_device[0]",
+							CostComponentChecks: []testutil.CostComponentCheck{
+								{
+									Name:             "General Purpose SSD storage (gp2)",
+									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
+									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20).Mul(3)),
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
+}

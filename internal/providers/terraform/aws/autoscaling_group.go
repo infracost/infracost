@@ -26,6 +26,9 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	desiredCapacity := decimal.NewFromInt(d.Get("desired_capacity").Int())
+	if u != nil && u.Get("instances_count").Exists() {
+		desiredCapacity = decimal.NewFromInt(u.Get("instances_count").Int())
+	}
 
 	subResources := make([]*schema.Resource, 0)
 

@@ -158,6 +158,9 @@ resource_usage:
     monthly_log_lines: 5000000          # Monthly number of real-time log lines.
     custom_ssl_certificates: 3          # Number of dedicated IP custom SSL certificates.
 
+  aws_autoscaling_group.my_asg:
+    instances_count: 15 # Number of instances in the autoscaling group.
+  
   #
   # Terraform GCP resources
   #
