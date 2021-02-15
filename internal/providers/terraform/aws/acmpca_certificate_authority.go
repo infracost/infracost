@@ -35,24 +35,21 @@ func NewACMPCACertificateAuthority(d *schema.ResourceData, u *schema.UsageData) 
 		},
 	}
 
-	certificateTierLimits := []int{1000, 9000, 10000}
+	certificateTierLimits := []int{1000, 9000}
 	if u != nil && u.Get("monthly_requests").Exists() {
 		monthlyCertificatesRequests := decimal.NewFromInt(u.Get("monthly_requests").Int())
-		privateCertificateTier := usage.CalculateTierRequests(monthlyCertificatesRequests, certificateTierLimits)
-		tierOne := privateCertificateTier["1"]
-		tierTwo := privateCertificateTier["2"]
-		tierThree := privateCertificateTier["3"]
+		certificateTiers := usage.CalculateTierBuckets(monthlyCertificatesRequests, certificateTierLimits)
 
-		if tierOne.GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, certificateCostComponent(region, "Certificates (first 1K)", "0", &tierOne))
+		if certificateTiers[0].GreaterThan(decimal.NewFromInt(0)) {
+			costComponents = append(costComponents, certificateCostComponent(region, "Certificates (first 1K)", "0", &certificateTiers[0]))
 		}
 
-		if tierTwo.GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, certificateCostComponent(region, "Certificates (next 9K)", "1000", &tierTwo))
+		if certificateTiers[1].GreaterThan(decimal.NewFromInt(0)) {
+			costComponents = append(costComponents, certificateCostComponent(region, "Certificates (next 9K)", "1000", &certificateTiers[1]))
 		}
 
-		if tierThree.GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, certificateCostComponent(region, "Certificates (over 10K)", "10000", &tierThree))
+		if certificateTiers[2].GreaterThan(decimal.NewFromInt(0)) {
+			costComponents = append(costComponents, certificateCostComponent(region, "Certificates (over 10K)", "10000", &certificateTiers[2]))
 		}
 	} else {
 		var unknown *decimal.Decimal

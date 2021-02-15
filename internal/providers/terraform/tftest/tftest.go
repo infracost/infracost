@@ -53,7 +53,7 @@ var (
 	once        sync.Once
 )
 
-type Project struct {
+type TerraformProject struct {
 	Files []File
 }
 
@@ -81,7 +81,7 @@ func EnsurePluginsInstalled() {
 }
 
 func installPlugins() error {
-	project := Project{
+	project := TerraformProject{
 		Files: []File{
 			{
 				Path:     "init.tf",
@@ -90,7 +90,7 @@ func installPlugins() error {
 		},
 	}
 
-	tfdir, err := CreateProject(project)
+	tfdir, err := CreateTerraformProject(project)
 	if err != nil {
 		return errors.Wrap(err, "Error creating Terraform project")
 	}
@@ -115,7 +115,7 @@ func installPlugins() error {
 }
 
 func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
-	project := Project{
+	project := TerraformProject{
 		Files: []File{
 			{
 				Path:     "main.tf",
@@ -124,39 +124,39 @@ func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, 
 		},
 	}
 
-	ResourceTestsForProject(t, project, usage, checks)
+	ResourceTestsForTerraformProject(t, project, usage, checks)
 }
 
-func ResourceTestsForProject(t *testing.T, project Project, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
+func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
 	cfg := config.DefaultConfig()
 	err := cfg.LoadFromEnv()
 	assert.NoError(t, err)
 
-	resources, err := RunCostCalculations(cfg, project, usage)
+	project, err := RunCostCalculations(cfg, tfProject, usage)
 	assert.NoError(t, err)
 
-	testutil.TestResources(t, resources, checks)
+	testutil.TestResources(t, project.Resources, checks)
 }
 
-func RunCostCalculations(cfg *config.Config, project Project, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
-	resources, err := loadResources(cfg, project, usage)
+func RunCostCalculations(cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+	project, err := loadResources(cfg, tfProject, usage)
 	if err != nil {
-		return resources, err
+		return project, err
 	}
-	err = prices.PopulatePrices(cfg, resources)
+	err = prices.PopulatePrices(cfg, project)
 	if err != nil {
-		return resources, err
+		return project, err
 	}
-	schema.CalculateCosts(resources)
-	return resources, nil
+	schema.CalculateCosts(project)
+	return project, nil
 }
 
-func CreateProject(project Project) (string, error) {
-	return writeToTmpDir(project)
+func CreateTerraformProject(tfProject TerraformProject) (string, error) {
+	return writeToTmpDir(tfProject)
 }
 
-func loadResources(cfg *config.Config, project Project, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
-	tfdir, err := CreateProject(project)
+func loadResources(cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+	tfdir, err := CreateTerraformProject(tfProject)
 	if err != nil {
 		return nil, err
 	}
@@ -168,14 +168,14 @@ func loadResources(cfg *config.Config, project Project, usage map[string]*schema
 	return provider.LoadResources(usage)
 }
 
-func writeToTmpDir(project Project) (string, error) {
+func writeToTmpDir(tfProject TerraformProject) (string, error) {
 	// Create temporary directory and output terraform code
 	tmpDir, err := ioutil.TempDir("", "")
 	if err != nil {
 		return tmpDir, err
 	}
 
-	for _, terraformFile := range project.Files {
+	for _, terraformFile := range tfProject.Files {
 		fullPath := filepath.Join(tmpDir, terraformFile.Path)
 		dir := filepath.Dir(fullPath)
 

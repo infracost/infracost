@@ -78,21 +78,17 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, error) {
-	resources := p.loadUsageFileResources(usage)
-
-	if !gjson.ValidBytes(j) {
-		return resources, errors.New("invalid JSON")
-	}
-
-	parsed := gjson.ParseBytes(j)
-	providerConf := parsed.Get("configuration.provider_config")
-	conf := parsed.Get("configuration.root_module")
-	vars := parsed.Get("variables")
-
-	vals := parsed.Get("planned_values.root_module")
-	if !vals.Exists() {
-		vals = parsed.Get("values.root_module")
+func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Resource, usage map[string]*schema.UsageData, parsed, providerConf, conf, vars gjson.Result) []*schema.Resource {
+	var resources []*schema.Resource
+	resources = append(resources, baseResources...)
+	var vals gjson.Result
+	if parsePrior {
+		vals = parsed.Get("prior_state.values.root_module")
+	} else {
+		vals = parsed.Get("planned_values.root_module")
+		if !vals.Exists() {
+			vals = parsed.Get("values.root_module")
+		}
 	}
 
 	resData := p.parseResourceData(providerConf, vals, conf, vars)
@@ -107,7 +103,25 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 		}
 	}
 
-	return resources, nil
+	return resources
+}
+
+func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+	baseResources := p.loadUsageFileResources(usage)
+
+	if !gjson.ValidBytes(j) {
+		return baseResources, baseResources, errors.New("invalid JSON")
+	}
+
+	parsed := gjson.ParseBytes(j)
+	providerConf := parsed.Get("configuration.provider_config")
+	conf := parsed.Get("configuration.root_module")
+	vars := parsed.Get("variables")
+
+	pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
+	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
+
+	return pastResources, resources, nil
 }
 
 func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {
