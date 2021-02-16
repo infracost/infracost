@@ -52,10 +52,11 @@ func defaultCmd(cfg *config.Config) *cli.Command {
 			Hidden: true,
 		},
 		&cli.StringFlag{
-			Name:   "output",
-			Usage:  "Output format: json, table, html",
-			Value:  "table",
-			Hidden: true,
+			Name:    "output",
+			Aliases: []string{"o"},
+			Usage:   "Output format: json, table, html",
+			Value:   "table",
+			Hidden:  true,
 		},
 	}
 
