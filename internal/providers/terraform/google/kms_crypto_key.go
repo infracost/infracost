@@ -1,7 +1,6 @@
 package google
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -98,7 +97,6 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			})
 		}
 	} else {
-		fmt.Println(keyDescript)
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Key versions",
 			Unit:            "months",
@@ -115,8 +113,6 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			},
 		})
 	}
-
-	fmt.Println(operationDesctipt)
 
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Operations",
