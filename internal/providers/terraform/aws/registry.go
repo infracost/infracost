@@ -11,9 +11,11 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetACMPCACertificateAuthorityRegistryItem(),
 	GetCloudfrontDistributionRegistryItem(),
 	GetCloudwatchDashboardRegistryItem(),
+	GetCloudwatchEventBusItem(),
 	GetCloudwatchLogGroupItem(),
 	GetCloudwatchMetricAlarmRegistryItem(),
 	GetCodebuildProjectRegistryItem(),
+	GetConfigRuleItem(),
 	GetDataTransferRegistryItem(),
 	GetDBInstanceRegistryItem(),
 	GetDMSRegistryItem(),
@@ -121,10 +123,25 @@ var FreeResources []string = []string{
 	"aws_cloudwatch_log_stream",
 	"aws_cloudwatch_log_subscription_filter",
 
+	// AWS EventBridge
+	"aws_cloudwatch_event_permission",
+	"aws_cloudwatch_event_rule",
+	"aws_cloudwatch_event_target",
+
 	// AWS CodeBuild
 	"aws_codebuild_report_group",
 	"aws_codebuild_source_credential",
 	"aws_codebuild_webhook",
+
+	// AWS Config
+	"aws_config_aggregate_authorization",
+	"aws_config_configuration_aggregator",
+	"aws_config_configuration_recorder",
+	"aws_config_configuration_recorder_status",
+	"aws_config_delivery_channel",
+	"aws_config_organization_custom_rule",
+	"aws_config_organization_managed_rule",
+	"aws_config_remediation_configuration",
 
 	// AWS ECR
 	"aws_ecr_lifecycle_policy",

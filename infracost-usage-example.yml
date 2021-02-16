@@ -31,6 +31,13 @@ resource_usage:
     monthly_messages: 100000000 # Monthly number of messages sent to the Websocket API Gateway.
     message_size_kb: 32         # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
 
+  aws_cloudwatch_event_bus.my_events:
+    monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.
+    monthly_third_party_events: 2000000       # Monthly third-party and cross-account events published. Each 64 KB chunk of payload is billed as 1 event.
+    monthly_archive_processing_gb: 100        # Monthly archive event processing in GB. 
+    archive_storage_gb: 200                   # Archive storage used for event replay in GB.
+    monthly_schema_discovery_events: 1000000  # Monthly events ingested for schema discovery. Each 8 KB chunk of payload is billed as 1 event.
+
   aws_cloudwatch_log_group.my_log_group:
     storage_gb: 1000               # Total data stored by CloudWatch logs in GB.
     monthly_data_ingested_gb: 1000 # Monthly data ingested by CloudWatch logs in GB.
@@ -38,6 +45,12 @@ resource_usage:
 
   aws_codebuild_project.my_project: 
     monthly_build_mins: 10000 # Monthly total duration of builds in minutes. Each build is rounded up to the nearest minute.
+    
+  aws_config_config_rule.my_config:
+    monthly_config_items: 10000 # Monthly config item records.
+    monthly_custom_config_items: 10000 # Monthly custom config item records.
+    monthly_rule_evaluations: 1000000 # Monthly config rule evaluations.
+    monthly_conformance_pack_evaluations: 26000000 # Monthly conformance pack evaluations.
 
   aws_data_transfer.my_region:
     region: us-east-1                           # Region the data transfer is originating from.
@@ -158,6 +171,9 @@ resource_usage:
     monthly_log_lines: 5000000          # Monthly number of real-time log lines.
     custom_ssl_certificates: 3          # Number of dedicated IP custom SSL certificates.
 
+  aws_autoscaling_group.my_asg:
+    instances: 15 # Number of instances in the autoscaling group.
+  
   #
   # Terraform GCP resources
   #
@@ -180,6 +196,10 @@ resource_usage:
 
   google_dns_record_set.my_record_set:
     monthly_queries:  1000000 # Monthly DNS queries.
+
+  google_kms_crypto_key.my_keys:
+    key_versions: 10000             # Number of key versions.
+    monthly_key_operations: 1000000 # Monthly number of key operations.
 
   google_pubsub_subscription.my_subscription:
     monthly_message_data_tb: 7.416 # Monthly amount of message data pulled by the subscription in TB.

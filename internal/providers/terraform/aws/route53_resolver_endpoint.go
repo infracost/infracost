@@ -37,13 +37,13 @@ func NewRoute53ResolverEndpoint(d *schema.ResourceData, u *schema.UsageData) *sc
 		},
 	}
 
-	queryTierLimits := []int{1000000000, 1000000001}
+	queryTierLimits := []int{1000000000}
 
 	if u != nil && u.Get("monthly_queries").Exists() {
 		monthlyQueries := decimal.NewFromInt(u.Get("monthly_queries").Int())
-		dnsQueriesTier := usage.CalculateTierRequests(monthlyQueries, queryTierLimits)
-		tierOne := dnsQueriesTier["1"]
-		tierTwo := dnsQueriesTier["2"]
+		dnsQueriesTier := usage.CalculateTierBuckets(monthlyQueries, queryTierLimits)
+		tierOne := dnsQueriesTier[0]
+		tierTwo := dnsQueriesTier[1]
 
 		if tierOne.GreaterThan(decimal.NewFromInt(0)) {
 			costComponents = append(costComponents, dnsQueriesCostComponent(region, "DNS queries (first 1B)", "0", &tierOne))
