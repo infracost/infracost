@@ -8,13 +8,11 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 )
 
 func GetECSServiceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "aws_ecs_service",
-		Notes:               []string{"Only supports Fargate on-demand."},
 		RFunc:               NewECSService,
 		ReferenceAttributes: []string{"task_definition"},
 	}
@@ -23,8 +21,11 @@ func GetECSServiceRegistryItem() *schema.RegistryItem {
 func NewECSService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	launchType := d.Get("launch_type").String()
 	if launchType != "FARGATE" {
-		log.Warnf("Skipping resource %s. Infracost currently only supports the FARGATE launch type for AWS ECS Services", d.Address)
-		return nil
+		return &schema.Resource{
+			Name:      d.Address,
+			IsSkipped: true,
+			NoPrice:   true,
+		}
 	}
 
 	region := d.Get("region").String()

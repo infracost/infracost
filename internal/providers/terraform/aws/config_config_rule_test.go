@@ -37,7 +37,7 @@ func TestConfigRuleItem(t *testing.T) {
 					PriceHash: "09799efb8c5c18a02b6cc1e17ab725c9-82a8dd965c6354fb657418947e41e612",
 				},
 				{
-					Name:      "Config rule evaluations (first 100K)",
+					Name:      "Rule evaluations (first 100K)",
 					PriceHash: "b5643f5c83300f4a85d84a467af5aca4-3bf3a9bc78b9ee067586248fa8117ddb",
 				},
 				{
@@ -90,17 +90,17 @@ func TestCongigRule_usage(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(10000)),
 				},
 				{
-					Name:             "Config rule evaluations (first 100K)",
+					Name:             "Rule evaluations (first 100K)",
 					PriceHash:        "b5643f5c83300f4a85d84a467af5aca4-3bf3a9bc78b9ee067586248fa8117ddb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100000)),
 				},
 				{
-					Name:             "Config rule evaluations (next 400K)",
+					Name:             "Rule evaluations (next 400K)",
 					PriceHash:        "b5643f5c83300f4a85d84a467af5aca4-3bf3a9bc78b9ee067586248fa8117ddb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(400000)),
 				},
 				{
-					Name:             "Config rule evaluations (over 500K)",
+					Name:             "Rule evaluations (over 500K)",
 					PriceHash:        "b5643f5c83300f4a85d84a467af5aca4-3bf3a9bc78b9ee067586248fa8117ddb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(500000)),
 				},
