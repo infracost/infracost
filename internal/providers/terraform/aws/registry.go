@@ -11,6 +11,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetACMPCACertificateAuthorityRegistryItem(),
 	GetCloudfrontDistributionRegistryItem(),
 	GetCloudwatchDashboardRegistryItem(),
+	GetCloudwatchEventBusItem(),
 	GetCloudwatchLogGroupItem(),
 	GetCloudwatchMetricAlarmRegistryItem(),
 	GetCodebuildProjectRegistryItem(),
@@ -121,6 +122,11 @@ var FreeResources []string = []string{
 	"aws_cloudwatch_log_resource_policy",
 	"aws_cloudwatch_log_stream",
 	"aws_cloudwatch_log_subscription_filter",
+
+	// AWS EventBridge
+	"aws_cloudwatch_event_permission",
+	"aws_cloudwatch_event_rule",
+	"aws_cloudwatch_event_target",
 
 	// AWS CodeBuild
 	"aws_codebuild_report_group",

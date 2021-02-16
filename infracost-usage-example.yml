@@ -31,6 +31,13 @@ resource_usage:
     monthly_messages: 100000000 # Monthly number of messages sent to the Websocket API Gateway.
     message_size_kb: 32         # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
 
+  aws_cloudwatch_event_bus.my_events:
+    monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.
+    monthly_third_party_events: 2000000       # Monthly third-party and cross-account events published. Each 64 KB chunk of payload is billed as 1 event.
+    monthly_archive_processing_gb: 100        # Monthly archive event processing in GB. 
+    archive_storage_gb: 200                   # Archive storage used for event replay in GB.
+    monthly_schema_discovery_events: 1000000  # Monthly events ingested for schema discovery. Each 8 KB chunk of payload is billed as 1 event.
+
   aws_cloudwatch_log_group.my_log_group:
     storage_gb: 1000               # Total data stored by CloudWatch logs in GB.
     monthly_data_ingested_gb: 1000 # Monthly data ingested by CloudWatch logs in GB.
