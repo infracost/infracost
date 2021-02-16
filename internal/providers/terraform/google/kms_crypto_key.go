@@ -28,15 +28,15 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		protectionLevel = d.Get("version_template.0.protection_level").String()
 	}
 
-	monthlyKeys := decimal.Zero
+	var monthlyKeys *decimal.Decimal
 	if u != nil && u.Get("key_versions").Exists() {
-		monthlyKeys = decimal.NewFromInt(u.Get("key_versions").Int())
+		monthlyKeys = decimalPtr(decimal.NewFromInt(u.Get("key_versions").Int()))
 	} else if d.Get("rotation_period").Exists() {
 		rotationPeriod := (d.Get("rotation_period").String())
 		rotation, err := strconv.ParseFloat(strings.Split(rotationPeriod, "s")[0], 64)
 
 		if err == nil {
-			monthlyKeys = decimal.NewFromFloat(2592000.0 / rotation)
+			monthlyKeys = decimalPtr(decimal.NewFromFloat(2592000.0 / rotation))
 		}
 	}
 
@@ -52,31 +52,34 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 
 	if keyDescript == "HSM RSA 3072" || keyDescript == "HSM RSA 4096" || keyDescript == "HSM ECDSA P-256" || keyDescript == "HSM ECDSA P-384" {
 		tierLimits := []int{2000}
-
-		tiers := usage.CalculateTierBuckets(monthlyKeys, tierLimits)
-
-		if tiers[0].GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, &schema.CostComponent{
-				Name:            "Key versions (first 2K)",
-				Unit:            "months",
-				UnitMultiplier:  1,
-				MonthlyQuantity: &tiers[0],
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("gcp"),
-					Region:        strPtr(region),
-					Service:       strPtr("Cloud Key Management Service (KMS)"),
-					ProductFamily: strPtr("ApplicationServices"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", ValueRegex: strPtr("/" + keyDescript + "/")},
-					},
-				},
-				PriceFilter: &schema.PriceFilter{
-					EndUsageAmount: strPtr("2000"),
-				},
-			})
+		var firstTierQty *decimal.Decimal
+		var tiers []decimal.Decimal
+		if monthlyKeys != nil {
+			tiers = usage.CalculateTierBuckets(*monthlyKeys, tierLimits)
+			firstTierQty = &tiers[0]
 		}
 
-		if tiers[1].GreaterThan(decimal.NewFromInt(0)) {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            "Key versions (first 2K)",
+			Unit:            "months",
+			UnitMultiplier:  1,
+			MonthlyQuantity: firstTierQty,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("gcp"),
+				Region:        strPtr(region),
+				Service:       strPtr("Cloud Key Management Service (KMS)"),
+				ProductFamily: strPtr("ApplicationServices"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "description", ValueRegex: strPtr("/" + keyDescript + "/")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				EndUsageAmount: strPtr("2000"),
+			},
+		})
+
+		if tiers != nil && tiers[1].GreaterThan(decimal.NewFromInt(0)) {
+
 			costComponents = append(costComponents, &schema.CostComponent{
 				Name:            "Key versions (over 2K)",
 				Unit:            "months",
@@ -101,7 +104,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			Name:            "Key versions",
 			Unit:            "months",
 			UnitMultiplier:  1,
-			MonthlyQuantity: &monthlyKeys,
+			MonthlyQuantity: monthlyKeys,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
 				Region:        strPtr(region),
