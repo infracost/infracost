@@ -31,23 +31,23 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 
 	cpuSize := cpuMapping[int(memorySize.IntPart())]
 
-	invocations := decimal.Zero
+	requestDuration := decimal.NewFromInt(100)
+	if u != nil && u.Get("request_duration_ms").Exists() {
+		// Round up to nearest 100ms
+		requestDuration = decimal.NewFromInt(u.Get("request_duration_ms").Int()).Div(decimal.NewFromInt(100)).Ceil().Mul(decimal.NewFromFloat(100))
+	}
+
+	var invocations, monthlyCPUUsage, monthlyMemoryUsage *decimal.Decimal
 	if u != nil && u.Get("monthly_function_invocations").Exists() {
-		invocations = decimal.NewFromInt(u.Get("monthly_function_invocations").Int())
+		invocations = decimalPtr(decimal.NewFromInt(u.Get("monthly_function_invocations").Int()))
+		monthlyCPUUsage = decimalPtr(calculateGHzSeconds(cpuSize, requestDuration, *invocations))
+		monthlyMemoryUsage = decimalPtr(calculateGBSeconds(memorySize, requestDuration, *invocations))
 	}
 
 	var networkEgrees *decimal.Decimal
 	if u != nil && u.Get("monthly_outbound_data_gb").Exists() {
 		networkEgrees = decimalPtr(decimal.NewFromInt(u.Get("monthly_outbound_data_gb").Int()))
 	}
-
-	requestDuration := decimal.Zero
-	if u != nil && u.Get("request_duration_ms").Exists() {
-		requestDuration = decimal.NewFromInt(u.Get("request_duration_ms").Int())
-	}
-
-	monthlyCPUUsage := calculateGHzSeconds(cpuSize, requestDuration, invocations)
-	monthlyMemoryUsage := calculateGBSeconds(memorySize, requestDuration, invocations)
 
 	return &schema.Resource{
 		Name: d.Address,
@@ -56,7 +56,7 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 				Name:            "CPU",
 				Unit:            "GHz-seconds",
 				UnitMultiplier:  1,
-				MonthlyQuantity: &monthlyCPUUsage,
+				MonthlyQuantity: monthlyCPUUsage,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr(region),
@@ -71,7 +71,7 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 				Name:            "Memory",
 				Unit:            "GB-seconds",
 				UnitMultiplier:  1,
-				MonthlyQuantity: &monthlyMemoryUsage,
+				MonthlyQuantity: monthlyMemoryUsage,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr(region),
@@ -86,7 +86,7 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 				Name:            "Invocations",
 				Unit:            "invocations",
 				UnitMultiplier:  1,
-				MonthlyQuantity: &invocations,
+				MonthlyQuantity: invocations,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr("global"),

@@ -26,20 +26,24 @@ func TestCloudFunctions(t *testing.T) {
 			Name: "google_cloudfunctions_function.function",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "CPU",
-					PriceHash: "49ab2e8c10b6537ef08737f3a7ae9d8d-1b88db789f176f93c9bfe3a2b0616ddd",
+					Name:             "CPU",
+					PriceHash:        "49ab2e8c10b6537ef08737f3a7ae9d8d-1b88db789f176f93c9bfe3a2b0616ddd",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 				{
-					Name:      "Memory",
-					PriceHash: "f75b0be4dd48eb627f5b50332da5dae6-54bcde0ad0d3ad3534913736ebf89cd7",
+					Name:             "Memory",
+					PriceHash:        "f75b0be4dd48eb627f5b50332da5dae6-54bcde0ad0d3ad3534913736ebf89cd7",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 				{
-					Name:      "Invocations",
-					PriceHash: "fcfa5cdd12792fc691843752c9bdfb37-d1cef0b8c8b290c869ada456280c923d",
+					Name:             "Invocations",
+					PriceHash:        "fcfa5cdd12792fc691843752c9bdfb37-d1cef0b8c8b290c869ada456280c923d",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 				{
-					Name:      "Outbound data transfer",
-					PriceHash: "7320c60393fe096cf61cb111487013a1-679daa94b986938e2c556da1f34c6f86",
+					Name:             "Outbound data transfer",
+					PriceHash:        "7320c60393fe096cf61cb111487013a1-679daa94b986938e2c556da1f34c6f86",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},
@@ -62,7 +66,7 @@ func TestCloudFunctions_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"google_cloudfunctions_function.my_function": map[string]interface{}{
-			"request_duration_ms":          300,
+			"request_duration_ms":          240,
 			"monthly_function_invocations": 10000000,
 			"monthly_outbound_data_gb":     100,
 		},
