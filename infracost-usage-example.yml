@@ -177,6 +177,10 @@ resource_usage:
   #
   # Terraform GCP resources
   #
+  google_cloudfunctions_function.my_function:
+    request_duration_ms: 300               # Average duration of each request in milliseconds.
+    monthly_function_invocations: 10000000 # Monthly number of function invocations.
+    monthly_outbound_data_gb: 100          # Monthly data transferred from the function out to somewhere else in GB.
 
   google_compute_router_nat.my_nat:
     assigned_vms: 4                 # Number of VM instances assigned to the NAT gateway
