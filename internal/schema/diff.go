@@ -152,7 +152,7 @@ func diffCostComponentsByKey(key string, pastCCMap, currentCCMap map[string]*Cos
 	past, pastOk := pastCCMap[key]
 	current, currentOk := currentCCMap[key]
 	if current == nil && past == nil {
-		log.Debugf("diffResourcesByKey nil current and past with key %s", key)
+		log.Debugf("diffCostComponentsByKey nil current and past with key %s", key)
 		return false, nil
 	}
 	baseCostComponent := current
