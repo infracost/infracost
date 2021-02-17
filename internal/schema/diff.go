@@ -57,6 +57,9 @@ func calculateDiff(past []*Resource, current []*Resource) []*Resource {
 func diffResourcesByKey(resourceKey string, pastResMap, currentResMap map[string]*Resource) (bool, *Resource) {
 	past, pastOk := pastResMap[resourceKey]
 	current, currentOk := currentResMap[resourceKey]
+	if current == nil && past == nil {
+		return false, nil
+	}
 	baseResource := current
 	if current == nil {
 		baseResource = past
