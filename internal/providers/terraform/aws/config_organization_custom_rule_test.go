@@ -26,8 +26,9 @@ func TestOrganizationCustomRuleItem(t *testing.T) {
 			Name: "aws_config_organization_custom_rule.my_config",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Rule evaluations (first 100K)",
-					PriceHash: "b5643f5c83300f4a85d84a467af5aca4-3bf3a9bc78b9ee067586248fa8117ddb",
+					Name:             "Rule evaluations (first 100K)",
+					PriceHash:        "b5643f5c83300f4a85d84a467af5aca4-3bf3a9bc78b9ee067586248fa8117ddb",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},
