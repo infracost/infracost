@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 )
 
 // CalculateDiff calculates the diff of past and current resources
@@ -57,6 +58,10 @@ func calculateDiff(past []*Resource, current []*Resource) []*Resource {
 func diffResourcesByKey(resourceKey string, pastResMap, currentResMap map[string]*Resource) (bool, *Resource) {
 	past, pastOk := pastResMap[resourceKey]
 	current, currentOk := currentResMap[resourceKey]
+	if current == nil && past == nil {
+		log.Debugf("diffResourcesByKey nil current and past with key %s", resourceKey)
+		return false, nil
+	}
 	baseResource := current
 	if current == nil {
 		baseResource = past
@@ -147,6 +152,7 @@ func diffCostComponentsByKey(key string, pastCCMap, currentCCMap map[string]*Cos
 	past, pastOk := pastCCMap[key]
 	current, currentOk := currentCCMap[key]
 	if current == nil && past == nil {
+		log.Debugf("diffCostComponentsByKey nil current and past with key %s", key)
 		return false, nil
 	}
 	baseCostComponent := current
