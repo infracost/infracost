@@ -133,7 +133,7 @@ func TestCalculateDiff(t *testing.T) {
 	assert.Equal(t, expectedDiff, diff)
 }
 
-func TestDiffdiffCostComponentsByResource(t *testing.T) {
+func TestDiffCostComponentsByResource(t *testing.T) {
 	pastRS := &Resource{
 		Name: "rs",
 		CostComponents: []*CostComponent{
@@ -223,6 +223,7 @@ func TestDiffDecimals(t *testing.T) {
 	assert.Equal(t, decimal.Zero, *diffDecimals(dc1, dc1))
 	assert.Equal(t, decimal.NewFromInt(10), *diffDecimals(dc2, dc1))
 	assert.Equal(t, decimal.NewFromInt(-10), *diffDecimals(dc1, dc2))
+	assert.Equal(t, decimal.Zero, *diffDecimals(nil, nil))
 }
 
 func TestGetResourcesMap(t *testing.T) {
@@ -275,4 +276,16 @@ func TestGetCostComponentsMap(t *testing.T) {
 		"cc2": cc2,
 	}
 	assert.Equal(t, expectedMap, ccMap)
+}
+
+func TestDiffResourcesByKey_bothNil(t *testing.T) {
+	emptyRMap := make(map[string]*Resource)
+	changed, _ := diffResourcesByKey("random_resource", emptyRMap, emptyRMap)
+	assert.Equal(t, false, changed)
+}
+
+func TestDiffCostComponentsByKey_bothNil(t *testing.T) {
+	emptyRMap := make(map[string]*CostComponent)
+	changed, _ := diffCostComponentsByKey("random_resource", emptyRMap, emptyRMap)
+	assert.Equal(t, false, changed)
 }

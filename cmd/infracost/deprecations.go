@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -43,9 +44,26 @@ func handleDeprecatedEnvVars(c *cli.Context, deprecatedEnvVars map[string]string
 }
 
 func handleDeprecatedFlags(c *cli.Context, deprecatedFlagsMapping map[string]string) {
-	for _, flagName := range c.FlagNames() {
+	flags := append(c.App.Flags, c.Command.Flags...)
+
+	for _, flag := range flags {
+		flagName := flag.Names()[0]
+		if !c.IsSet(flagName) {
+			continue
+		}
+
 		if newName, ok := deprecatedFlagsMapping[flagName]; ok {
-			m := fmt.Sprintf("Flag --%s is deprecated and will be removed in v0.8.0.", flagName)
+
+			oldNames := make([]string, 0, len(flag.Names()))
+			for _, n := range flag.Names() {
+				if len(n) == 1 {
+					oldNames = append(oldNames, fmt.Sprintf("-%s", n))
+				} else {
+					oldNames = append(oldNames, fmt.Sprintf("--%s", n))
+				}
+			}
+
+			m := fmt.Sprintf("Flag %s is deprecated and will be removed in v0.8.0.", strings.Join(oldNames, "/"))
 			if newName != "" {
 				m += fmt.Sprintf(" Please use --%s.", newName)
 			}

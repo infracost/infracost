@@ -3,6 +3,7 @@ package google
 import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
+	GetCloudFunctionsRegistryItem(),
 	GetComputeAddressRegistryItem(),
 	GetComputeDiskRegistryItem(),
 	GetComputeGlobalAddressRegistryItem(),
@@ -14,6 +15,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetContainerNodePoolRegistryItem(),
 	GetDNSManagedZoneRegistryItem(),
 	GetDNSRecordSetRegistryItem(),
+	GetKMSCryptoKeyRegistryItem(),
 	GetPubSubSubscriptionRegistryItem(),
 	GetPubSubTopicRegistryItem(),
 	GetStorageBucketRegistryItem(),
@@ -21,6 +23,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 // FreeResources grouped alphabetically
 var FreeResources []string = []string{
+	"google_cloudfunctions_function_iam",
 	"google_compute_attached_disk",
 	"google_compute_backend_bucket",
 	"google_compute_backend_bucket_signed_url_key",
@@ -68,6 +71,11 @@ var FreeResources []string = []string{
 	"google_compute_subnetwork_iam",
 	"google_compute_url_map",
 	"google_dns_policy",
+	"google_kms_crypto_key_iam",
+	"google_kms_key_ring",
+	"google_kms_key_ring_iam",
+	"google_kms_key_ring_import_job",
+	"google_kms_secret_ciphertext",
 	"google_project",
 	"google_project_default_service_accounts",
 	"google_project_iam_audit_config",
