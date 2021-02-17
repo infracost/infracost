@@ -40,10 +40,17 @@ resource_usage:
     monthly_build_mins: 10000 # Monthly total duration of builds in minutes. Each build is rounded up to the nearest minute.
     
   aws_config_config_rule.my_config:
-    monthly_config_items: 10000 # Monthly config item records.
-    monthly_custom_config_items: 10000 # Monthly custom config item records.
     monthly_rule_evaluations: 1000000 # Monthly config rule evaluations.
-    monthly_conformance_pack_evaluations: 26000000 # Monthly conformance pack evaluations.
+
+  aws_config_configuration_recorder.my_config:
+    monthly_config_items: 10000        # Monthly config item records.
+    monthly_custom_config_items: 20000 # Monthly custom config item records.
+
+  aws_config_organization_custom_rule.my_config:
+    monthly_rule_evaluations: 300000 # Monthly config rule evaluations.
+
+  aws_config_organization_managed_rule.my_config:
+    monthly_rule_evaluations: 10000 # Monthly config rule evaluations.
 
   aws_data_transfer.my_region:
     region: us-east-1                           # Region the data transfer is originating from.

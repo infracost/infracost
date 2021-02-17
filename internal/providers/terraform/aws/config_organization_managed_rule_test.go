@@ -9,24 +9,20 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func TestConfigRuleItem(t *testing.T) {
+func TestOrganizationManagedRuleItem(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
 	tf := `
-		resource "aws_config_config_rule" "my_config" {
-			name = "example"
-		
-			source {
-				owner             = "AWS"
-				source_identifier = ""
-			}
+		resource "aws_config_organization_managed_rule" "my_config" {
+			name            = "example"
+			rule_identifier = "IAM_PASSWORD_POLICY"
 		}`
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
-			Name: "aws_config_config_rule.my_config",
+			Name: "aws_config_organization_managed_rule.my_config",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:      "Rule evaluations (first 100K)",
@@ -39,30 +35,26 @@ func TestConfigRuleItem(t *testing.T) {
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
 
-func TestCongigRule_usage(t *testing.T) {
+func TestOrganizationManagedRule_usage(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
 	tf := `
-		resource "aws_config_config_rule" "my_config" {
-			name = "example"
-		
-			source {
-				owner             = "AWS"
-				source_identifier = "S3_BUCKET_VERSIONING_ENABLED"
-			}
+		resource "aws_config_organization_managed_rule" "my_config" {
+			name            = "example"
+			rule_identifier = "IAM_PASSWORD_POLICY"
 		}`
 
 	usage := schema.NewUsageMap(map[string]interface{}{
-		"aws_config_config_rule.my_config": map[string]interface{}{
-			"monthly_rule_evaluations": 1000000,
+		"aws_config_organization_managed_rule.my_config": map[string]interface{}{
+			"monthly_rule_evaluations": 600000,
 		},
 	})
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
-			Name: "aws_config_config_rule.my_config",
+			Name: "aws_config_organization_managed_rule.my_config",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:             "Rule evaluations (first 100K)",
@@ -77,7 +69,7 @@ func TestCongigRule_usage(t *testing.T) {
 				{
 					Name:             "Rule evaluations (over 500K)",
 					PriceHash:        "b5643f5c83300f4a85d84a467af5aca4-3bf3a9bc78b9ee067586248fa8117ddb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(500000)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100000)),
 				},
 			},
 		},

@@ -6,14 +6,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func GetConfigRuleItem() *schema.RegistryItem {
+func GetConfigOrganizationCustomRuleItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_config_config_rule",
-		RFunc: NewConfigRule,
+		Name:  "aws_config_organization_custom_rule",
+		RFunc: NewConfigOrganizationCustomRule,
 	}
 }
 
-func NewConfigRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewConfigOrganizationCustomRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	costComponents := []*schema.CostComponent{}
@@ -43,26 +43,5 @@ func NewConfigRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
-	}
-}
-
-func configRulesCostComponent(region string, displayName string, usageTier string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
-	return &schema.CostComponent{
-		Name:            displayName,
-		Unit:            "evaluations",
-		UnitMultiplier:  1,
-		MonthlyQuantity: monthlyQuantity,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr("AWSConfig"),
-			ProductFamily: strPtr("Management Tools - AWS Config Rules"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/ConfigRuleEvaluations/")},
-			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			StartUsageAmount: strPtr(usageTier),
-		},
 	}
 }
