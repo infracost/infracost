@@ -65,13 +65,10 @@ resource_usage:
     storage_gb: 1 # Total size of ECR repository in GB.
 
   aws_efs_file_system.my_file_system:
-    storage_gb: 230
-    infrequent_access_storage_gb: 100
-
-  aws_efs_file_system.ia_access:
-    storage_gb: 230 # Monthly EFS standard storage in GB on EFS volume
-    infrequent_access_storage_gb: 100  # Monthly EFS infrequent access storage in GB in.
-    infrequent_access_requests_gb: 100 # Monthly access requests in GB for both read & write requests.
+    storage_gb: 230 # Monthly EFS standard storage in GB.
+    infrequent_access_storage_gb: 100 # Monthly amount in GB that is used within IA Storage tier.
+    infrequent_access_read_requests_gb: 50 # Monthly access requests in GB for reading of data.
+    infrequent_access_write_requests_gb: 100 # Monthly access requests in GB for both writing of data.
 
   aws_instance.windows_instance:
     operating_system: windows # Override the operating system of the instance, can be: windows, suse, rhel.

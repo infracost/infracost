@@ -66,9 +66,14 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 			infrequentAccessGbStorage = decimalPtr(decimal.NewFromFloat(u.Get("infrequent_access_storage_gb").Float()))
 		}
 
-		var infrequentAccessGbRequests *decimal.Decimal
-		if u != nil && u.Get("infrequent_access_requests_gb").Exists() {
-			infrequentAccessGbRequests = decimalPtr(decimal.NewFromFloat(u.Get("infrequent_access_requests_gb").Float()))
+		var infrequentAccessReadGbRequests *decimal.Decimal
+		if u != nil && u.Get("infrequent_access_read_requests_gb").Exists() {
+			infrequentAccessReadGbRequests = decimalPtr(decimal.NewFromFloat(u.Get("infrequent_access_read_requests_gb").Float()))
+		}
+
+		var infrequentAccessWriteGbRequests *decimal.Decimal
+		if u != nil && u.Get("infrequent_access_write_requests_gb").Exists() {
+			infrequentAccessWriteGbRequests = decimalPtr(decimal.NewFromFloat(u.Get("infrequent_access_write_requests_gb").Float()))
 		}
 
 		costComponents = append(costComponents, &schema.CostComponent{
@@ -88,10 +93,26 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		})
 
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Requests (infrequent access)",
+			Name:            "Requests (infrequent access - read)",
 			Unit:            "GB",
 			UnitMultiplier:  1,
-			MonthlyQuantity: infrequentAccessGbRequests,
+			MonthlyQuantity: infrequentAccessReadGbRequests,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEFS"),
+				ProductFamily: strPtr("Storage"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "accessType", Value: strPtr("Read")},
+				},
+			},
+		})
+
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            "Requests (infrequent access - write)",
+			Unit:            "GB",
+			UnitMultiplier:  1,
+			MonthlyQuantity: infrequentAccessWriteGbRequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
