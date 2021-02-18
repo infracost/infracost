@@ -3,8 +3,9 @@
 The overall process for contributing to Infracost is:
 1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check; the issue labels should help you to find a good first issue, or new resources that others have already requested/liked.
 2. Create a new issue if there's no issue for what you want to work on. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback.
-3. Create a fork, commit and push to your fork. Send a pull request from your fork to this repo with the proposed change (don't forget to run `make lint` and `make fmt` first). Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
-4. We'll review your change and provide feedback.
+3. Add a comment to the issue you're working on to let the rest of the community know.
+4. Create a fork, commit and push to your fork. Send a pull request from your fork to this repo with the proposed change (don't forget to run `make lint` and `make fmt` first). Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Commit messages can usually start with "feat(aws): add ...", "feat(google): add ...", or "fix: nil pointer...". This helps us generate a cleaner changelog.
+5. We'll review your change and provide feedback.
 
 ## Development
 
