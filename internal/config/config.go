@@ -37,6 +37,7 @@ type Output struct {
 	Format      string   `yaml:"format,omitempty" ignored:"true"`
 	Columns     []string `yaml:"columns,omitempty" ignored:"true"`
 	ShowSkipped bool     `yaml:"show_skipped,omitempty" ignored:"true"`
+	NoColor     bool     `yaml:"no_color,omitempty" ignored:"true"`
 	Path        string   `yaml:"path,omitempty" ignored:"true"`
 }
 
