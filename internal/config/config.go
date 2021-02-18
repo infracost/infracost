@@ -17,10 +17,10 @@ import (
 
 type TerraformProject struct {
 	Name                string `yaml:"name,omitempty" ignored:"true"`
-	Binary              string `yaml:"binary,omitempty" envconfig:"TERRAFORM_BINARY"`
-	Workspace           string `yaml:"workspace,omitempty" envconfig:"TERRAFORM_WORKSPACE"`
-	TerraformCloudHost  string `yaml:"terraform_cloud_host,omitempty" envconfig:"TERRAFORM_CLOUD_HOST"`
-	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"TERRAFORM_CLOUD_TOKEN"`
+	Binary              string `yaml:"binary,omitempty" envconfig:"INFRACOST_TERRAFORM_BINARY"`
+	Workspace           string `yaml:"workspace,omitempty" envconfig:"INFRACOST_TERRAFORM_WORKSPACE"`
+	TerraformCloudHost  string `yaml:"terraform_cloud_host,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_HOST"`
+	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_TOKEN"`
 	UsageFile           string `yaml:"usage_file,omitempty" ignored:"true"`
 	Dir                 string `yaml:"dir,omitempty" ignored:"true"`
 	PlanFile            string `yaml:"plan_file,omitempty" ignored:"true"`
@@ -47,14 +47,14 @@ type Config struct { // nolint:golint
 	Credentials Credentials
 
 	Version         string `yaml:"version,omitempty" ignored:"true"`
-	LogLevel        string `yaml:"log_level,omitempty" envconfig:"LOG_LEVEL"`
-	NoColor         bool   `yaml:"no_color,omitempty" envconfig:"NO_COLOR"`
-	SkipUpdateCheck bool   `yaml:"skip_update_check,omitempty" envconfig:"SKIP_UPDATE_CHECK"`
+	LogLevel        string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
+	NoColor         bool   `yaml:"no_color,omitempty" envconfig:"INFRACOST_NO_COLOR"`
+	SkipUpdateCheck bool   `yaml:"skip_update_check,omitempty" envconfig:"INFRACOST_SKIP_UPDATE_CHECK"`
 
-	APIKey                    string `envconfig:"API_KEY"`
-	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"PRICING_API_ENDPOINT"`
-	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"DEFAULT_PRICING_API_ENDPOINT"`
-	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"DASHBOARD_API_ENDPOINT"`
+	APIKey                    string `envconfig:"INFRACOST_API_KEY"`
+	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
+	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
+	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 
 	Projects Projects  `yaml:"projects" ignored:"true"`
 	Outputs  []*Output `yaml:"outputs" ignored:"true"`
@@ -156,13 +156,13 @@ func (c *Config) loadConfigFile(configFile string) error {
 }
 
 func (c *Config) loadEnvVars() error {
-	err := envconfig.Process("INFRACOST", c)
+	err := envconfig.Process("", c)
 	if err != nil {
 		return err
 	}
 
 	for _, project := range c.Projects.Terraform {
-		err = envconfig.Process("INFRACOST", project)
+		err = envconfig.Process("", project)
 		if err != nil {
 			return err
 		}
