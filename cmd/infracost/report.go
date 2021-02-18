@@ -32,6 +32,11 @@ func reportCmd(cfg *config.Config) *cli.Command {
 			Usage: "Show unsupported resources, some of which might be free. Only for table and HTML output",
 			Value: false,
 		},
+		&cli.BoolFlag{
+			Name:  "no-color",
+			Usage: "Turn off colored output",
+			Value: false,
+		},
 	)
 
 	return &cli.Command{
@@ -81,7 +86,7 @@ EXAMPLES:
 
 			opts := output.Options{
 				ShowSkipped: c.Bool("show-skipped"),
-				NoColor:     cfg.NoColor,
+				NoColor:     c.Bool("no-color"),
 				GroupKey:    "filename",
 				GroupLabel:  "File",
 			}
@@ -91,6 +96,7 @@ EXAMPLES:
 			outputCfg := &config.Output{
 				Format:      c.String("format"),
 				ShowSkipped: c.Bool("show-skipped"),
+				NoColor:     c.Bool("no-color"),
 			}
 
 			var (
