@@ -185,6 +185,7 @@ func loadDefaultCmdFlags(cfg *config.Config, c *cli.Context) error {
 	if hasOutputFlags {
 		outputCfg.Format = c.String("format")
 		outputCfg.ShowSkipped = c.Bool("show-skipped")
+		outputCfg.NoColor = c.Bool("no-color")
 	}
 
 	return nil
@@ -309,7 +310,7 @@ func defaultMain(cfg *config.Config) error {
 
 		opts := output.Options{
 			ShowSkipped: outputCfg.ShowSkipped,
-			NoColor:     cfg.NoColor,
+			NoColor:     outputCfg.NoColor,
 		}
 
 		var (
