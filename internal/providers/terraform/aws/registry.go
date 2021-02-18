@@ -240,6 +240,7 @@ var FreeResources []string = []string{
 	"aws_rds_cluster",
 	"aws_rds_cluster_endpoint",
 	"aws_rds_cluster_parameter_group",
+	"aws_resourcegroups_group",
 	"aws_route53_resolver_dnssec_config",
 	"aws_route53_resolver_query_log_config",
 	"aws_route53_resolver_query_log_config_association",
