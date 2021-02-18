@@ -52,9 +52,9 @@ func TestNewEFSFileSystemIAStorage(t *testing.T) {
 	`
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_efs_file_system.ia_storage": map[string]interface{}{
-			"storage_gb":                    230,
-			"infrequent_access_storage_gb":  100,
-			"infrequent_access_read_requests_gb": 50,
+			"storage_gb":                          230,
+			"infrequent_access_storage_gb":        100,
+			"infrequent_access_read_requests_gb":  50,
 			"infrequent_access_write_requests_gb": 100,
 		},
 	})
