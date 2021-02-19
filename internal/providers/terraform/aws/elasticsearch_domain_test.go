@@ -101,7 +101,7 @@ func TestElasticsearchDomain(t *testing.T) {
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1000)),
 				},
 				{
-					Name:            "Storage IOPS",
+					Name:            "Storage IOPS (io1)",
 					PriceHash:       "cef5d2815d765f1a4d611688519a8cce-9c483347596633f8cf3ab7fdd5502b78",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
 				},
