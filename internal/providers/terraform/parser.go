@@ -310,9 +310,14 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 	registryMap := GetResourceRegistryMap()
 
 	// Create a map of id -> resource data so we can lookup references
-	idMap := make(map[string]*schema.ResourceData)
+	idMap := make(map[string][]*schema.ResourceData)
 	for _, d := range resData {
-		idMap[d.Get("id").String()] = d
+		id := d.Get("id").String()
+		if _, ok := idMap[id]; !ok {
+			idMap[id] = []*schema.ResourceData{}
+		}
+
+		idMap[id] = append(idMap[id], d)
 	}
 
 	for _, d := range resData {
@@ -336,9 +341,11 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 
 			// Get any values for the fields and check if they map to IDs of any resources
 			for _, refID := range d.Get(attr).Array() {
-				refData, ok := idMap[refID.String()]
+				refs, ok := idMap[refID.String()]
 				if ok {
-					d.AddReference(attr, refData)
+					for _, ref := range refs {
+						d.AddReference(attr, ref)
+					}
 				}
 			}
 		}
