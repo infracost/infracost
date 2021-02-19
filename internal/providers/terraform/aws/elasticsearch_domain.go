@@ -79,7 +79,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 			},
 		},
 		{
-			Name:            "Storage",
+			Name:            fmt.Sprintf("Storage (%s)", ebsType),
 			Unit:            "GB-months",
 			UnitMultiplier:  1,
 			MonthlyQuantity: &gbVal,

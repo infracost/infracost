@@ -48,7 +48,7 @@ func TestElasticsearchDomain(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
 				{
-					Name:            "Storage",
+					Name:            "Storage (gp2)",
 					PriceHash:       "6a8fe5ca25013b67bddcebe1786ad246-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(400)),
 				},
@@ -96,7 +96,7 @@ func TestElasticsearchDomain(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
 				{
-					Name:            "Storage",
+					Name:            "Storage (io1)",
 					PriceHash:       "17222df5167b2002292b01078f33d41f-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1000)),
 				},
@@ -138,7 +138,7 @@ func TestElasticsearchDomain(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
 				{
-					Name:            "Storage",
+					Name:            "Storage (standard)",
 					PriceHash:       "ffa31ac224a19cc7574dbfbffb50722f-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(123)),
 				},
