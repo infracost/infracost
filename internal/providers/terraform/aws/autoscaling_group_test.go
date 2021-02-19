@@ -29,6 +29,12 @@ func TestAutoscalingGroup_launchConfiguration(t *testing.T) {
 				device_name = "xvdf"
 				volume_size = 10
 			}
+
+			ebs_block_device {
+				device_name = "xvdg"
+				volume_type = "gp3"
+				volume_size = 10
+			}
 		}
 
 		resource "aws_autoscaling_group" "asg1" {
@@ -73,6 +79,16 @@ func TestAutoscalingGroup_launchConfiguration(t *testing.T) {
 								{
 									Name:             "General Purpose SSD storage (gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
+									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
+								},
+							},
+						},
+						{
+							Name: "ebs_block_device[1]",
+							CostComponentChecks: []testutil.CostComponentCheck{
+								{
+									Name:             "General Purpose SSD storage (gp3)",
+									PriceHash:        "b7a83d535d47fcfd1be68ec37f046b3d-ee3dd7e4624338037ca6fea0933a662f",
 									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 								},
 							},
