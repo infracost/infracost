@@ -39,6 +39,9 @@ func NewStorageBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: components,
+		SubResources: []*schema.Resource{
+			networkEgress(d, u),
+		},
 	}
 }
 
