@@ -158,7 +158,7 @@ func TestEBSVolume_GP3(t *testing.T) {
 				{
 					Name:             "General Purpose SSD storage (gp3)",
 					PriceHash:        "b7a83d535d47fcfd1be68ec37f046b3d-ee3dd7e4624338037ca6fea0933a662f",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40)),
 				},
 			},
 		},
