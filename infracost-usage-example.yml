@@ -221,3 +221,9 @@ resource_usage:
     monthly_class_a_operations: 40000 # Monthly number of class A operations (object adds, bucket/object list).
     monthly_class_b_operations: 20000 # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
     monthly_data_retrieval_gb: 500    # Monthly amount of data retrieved in GB.
+    monthly_egress_data_transfer_gb:
+      same_continent: 550             # Estimated GB of data sent from Cloud Storage in the same continent per month.
+      worldwide: 12500                # Estimated GB of data sent from Cloud Storage to worldwide destinations (excluding Asia & Australia) per month.
+      asia: 1500                      # Estimated GB of data sent from Cloud Storage to Asia (excluding China, but including Hong Kong) per month.
+      china: 50                       # Estimated GB of data sent from Cloud Storage to China (excluding Hong Kong) per month.
+      australia: 250                  # Estimated GB of data sent from Cloud Storage to Australia per month.
