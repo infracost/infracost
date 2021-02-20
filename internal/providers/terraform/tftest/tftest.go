@@ -46,6 +46,10 @@ var tfProviders = `
 		credentials = "{\"type\":\"service_account\"}"
 		region = "us-central1"
 	}
+
+	provider "azurerm" {
+		features {}
+	}
 `
 
 var (
