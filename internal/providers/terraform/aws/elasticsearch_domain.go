@@ -79,7 +79,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 			},
 		},
 		{
-			Name:            "Storage",
+			Name:            fmt.Sprintf("Storage (%s)", ebsType),
 			Unit:            "GB-months",
 			UnitMultiplier:  1,
 			MonthlyQuantity: &gbVal,
@@ -101,7 +101,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 
 	if ebsType == "io1" {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Storage IOPS",
+			Name:            fmt.Sprintf("Storage IOPS (%s)", ebsType),
 			Unit:            "IOPS-months",
 			UnitMultiplier:  1,
 			MonthlyQuantity: &iopsVal,
