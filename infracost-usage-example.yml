@@ -102,15 +102,15 @@ resource_usage:
 
   aws_sns_topic.my_sns_topic:
     monthly_requests: 1000000 # Monthly requests to SNS.
-    request_size_kb: 64       # Size of the requests to SNS, SNS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+    request_size_kb: 64       # Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
 
   aws_sns_topic_subscription.my_topic_subscription:
     monthly_requests: 1000000 # Monthly requests to SNS.
-    request_size_kb: 64       # Size of the requests to SNS, SNS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+    request_size_kb: 64       # Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
 
   aws_sqs_queue.my_queue:
     monthly_requests: 1000000 # Monthly requests to SQS.
-    request_size_kb: 64       # Size of the requests to SQS, SQS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+    request_size_kb: 64       # Size of requests to SQS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
 
   aws_ssm_parameter.my_ssm_parameter:
     api_throughput_limit: advanced    # SSM Parameter Throughput limit, can be: advanced, higher.
@@ -128,46 +128,46 @@ resource_usage:
     monthly_data_processed_gb: 100 # Monthly data processed through a transit gateway attached to your VPN Connection in GB.
 
   aws_cloudfront_distribution.my_s3_distribution:
-    monthly_data_transfer_to_internet_gb: # Monthly regional data transfer out to internet in GB.
-      us: 51200000          # United States, Mexico, & Canada
-      europe: 220000        # Europe & Israel
-      south_africa: 10000   # South Africa, Kenya, & Middle East
+    monthly_data_transfer_to_internet_gb: # Monthly regional data transfer out to internet from the following, in GB:
+      us: 51200000          # United States, Mexico, Canada
+      europe: 220000        # Europe, Israel
+      south_africa: 10000   # South Africa, Kenya, Middle East
       south_america: 50000  # South America
       japan: 387000         # Japan
-      australia: 500000     # Australia & New Zealand
-      asia_pacific: 1200000 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      australia: 500000     # Australia, New Zealand
+      asia_pacific: 1200000 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
       india: 200000         # India
-    monthly_data_transfer_to_origin_gb: # Monthly regional data transfer out to origin in GB.
-      us: 2200           # United States, Mexico, & Canada
-      europe: 1000       # Europe & Israel
-      south_africa: 300  # South Africa, Kenya, & Middle East
+    monthly_data_transfer_to_origin_gb: # Monthly regional data transfer out to origin from the following, in GB:
+      us: 2200           # United States, Mexico, Canada
+      europe: 1000       # Europe, Israel
+      south_africa: 300  # South Africa, Kenya, Middle East
       south_america: 200 # South America
       japan: 10          # Japan
-      australia: 100     # Australia & New Zealand
-      asia_pacific: 30   # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      australia: 100     # Australia, New Zealand
+      asia_pacific: 30   # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
       india: 80          # India
-    monthly_http_requests: # Monthly number of HTTP requests.
-      us: 80000            # United States, Mexico, & Canada
-      europe: 40000        # Europe & Israel
-      south_africa: 20000  # South Africa, Kenya, & Middle East
+    monthly_http_requests: # Monthly number of HTTP requests to:
+      us: 80000            # United States, Mexico, Canada
+      europe: 40000        # Europe, Israel
+      south_africa: 20000  # South Africa, Kenya, Middle East
       south_america: 10000 # South America
       japan: 3000          # Japan
-      australia: 15000     # Australia & New Zealand
-      asia_pacific: 45000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      australia: 15000     # Australia, New Zealand
+      asia_pacific: 45000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
       india: 10000         # India
-    monthly_https_requests: # Monthly number of HTTPS requests.
-      us: 180000           # United States, Mexico, & Canada
-      europe: 10000        # Europe & Israel
-      south_africa: 50000  # South Africa, Kenya, & Middle East
+    monthly_https_requests: # Monthly number of HTTPS requests to:
+      us: 180000           # United States, Mexico, Canada
+      europe: 10000        # Europe, Israel
+      south_africa: 50000  # South Africa, Kenya, Middle East
       south_america: 30000 # South America
       japan: 1000          # Japan
-      australia: 45000     # Australia & New Zealand
-      asia_pacific: 25000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      australia: 45000     # Australia, New Zealand
+      asia_pacific: 25000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
       india: 30000         # India
-    monthly_shield_requests: # Monthly number of shield requests.
+    monthly_shield_requests: # Monthly number of shield requests to:
       us: 90000          # United States
       europe: 30000      # Europe
-      south_america: 200 # South Amarica
+      south_america: 200 # South America
       japan: 12300       # Japan
       australia: 2300    # Australia
       singapore: 58600   # Singapore
@@ -221,3 +221,9 @@ resource_usage:
     monthly_class_a_operations: 40000 # Monthly number of class A operations (object adds, bucket/object list).
     monthly_class_b_operations: 20000 # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
     monthly_data_retrieval_gb: 500    # Monthly amount of data retrieved in GB.
+    monthly_egress_data_transfer_gb:  # Monthly data transfer from Cloud Storage to the following, in GB:
+      same_continent: 550  # Same continent.
+      worldwide: 12500     # Worldwide excluding Asia, Australia.
+      asia: 1500           # Asia excluding China, but including Hong Kong.
+      china: 50            # China excluding Hong Kong.
+      australia: 250       # Australia.
