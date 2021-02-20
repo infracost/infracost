@@ -67,13 +67,13 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		}
 
 		var infrequentAccessReadGbRequests *decimal.Decimal
-		if u != nil && u.Get("infrequent_access_read_requests_gb").Exists() {
-			infrequentAccessReadGbRequests = decimalPtr(decimal.NewFromFloat(u.Get("infrequent_access_read_requests_gb").Float()))
+		if u != nil && u.Get("monthly_infrequent_access_read_gb").Exists() {
+			infrequentAccessReadGbRequests = decimalPtr(decimal.NewFromFloat(u.Get("monthly_infrequent_access_read_gb").Float()))
 		}
 
 		var infrequentAccessWriteGbRequests *decimal.Decimal
-		if u != nil && u.Get("infrequent_access_write_requests_gb").Exists() {
-			infrequentAccessWriteGbRequests = decimalPtr(decimal.NewFromFloat(u.Get("infrequent_access_write_requests_gb").Float()))
+		if u != nil && u.Get("monthly_infrequent_access_write_gb").Exists() {
+			infrequentAccessWriteGbRequests = decimalPtr(decimal.NewFromFloat(u.Get("monthly_infrequent_access_write_gb").Float()))
 		}
 
 		costComponents = append(costComponents, &schema.CostComponent{
@@ -93,7 +93,7 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		})
 
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Requests (infrequent access - read)",
+			Name:            "Read requests (infrequent access)",
 			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: infrequentAccessReadGbRequests,
@@ -109,7 +109,7 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		})
 
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Requests (infrequent access - write)",
+			Name:            "Write requests (infrequent access)",
 			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: infrequentAccessWriteGbRequests,

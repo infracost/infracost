@@ -1,11 +1,12 @@
 package aws_test
 
 import (
+	"testing"
+
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 	"github.com/shopspring/decimal"
-	"testing"
 )
 
 func TestNewEFSFileSystemStandardStorage(t *testing.T) {
@@ -52,10 +53,10 @@ func TestNewEFSFileSystemIAStorage(t *testing.T) {
 	`
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_efs_file_system.ia_storage": map[string]interface{}{
-			"storage_gb":                          230,
-			"infrequent_access_storage_gb":        100,
-			"infrequent_access_read_requests_gb":  50,
-			"infrequent_access_write_requests_gb": 100,
+			"storage_gb":                         230,
+			"infrequent_access_storage_gb":       100,
+			"monthly_infrequent_access_read_gb":  50,
+			"monthly_infrequent_access_write_gb": 100,
 		},
 	})
 
@@ -74,12 +75,12 @@ func TestNewEFSFileSystemIAStorage(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(100)),
 				},
 				{
-					Name:             "Requests (infrequent access - write)",
+					Name:             "Write requests (infrequent access)",
 					PriceHash:        "86d91c810b14b77cac328f9fcd26459b-b1ae3861dc57e2db217fa83a7420374f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(100)),
 				},
 				{
-					Name:             "Requests (infrequent access - read)",
+					Name:             "Read requests (infrequent access)",
 					PriceHash:        "5560def6568a03a8cb3d474a588867ce-b1ae3861dc57e2db217fa83a7420374f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(50)),
 				},
