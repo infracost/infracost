@@ -131,7 +131,7 @@ func TestStorageBucket_EuMulti(t *testing.T) {
 	}
 
 	tf := `
-		resource "google_storage_bucket" "test" {
+		resource "google_storage_bucket" "my_storage_bucket" {
 			name          = "test"
 			location      = "EU"
 			force_destroy = false
