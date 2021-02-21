@@ -157,13 +157,9 @@ func TestStorageBucket_EuMulti(t *testing.T) {
 			Name: "google_storage_bucket.my_storage_bucket",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Storage (coldline)",
-					PriceHash:       "bb9ec6d33f7334ab9849c396fad8a93e-57bc5d148491a8381abaccb21ca6b4e9",
+					Name:            "Storage (standard)",
+					PriceHash:       "fc9e1d9f7ff70a2a143b33dd97962bc6-57bc5d148491a8381abaccb21ca6b4e9",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(150)),
-				},
-				{
-					Name:      "Data retrieval",
-					SkipCheck: true,
 				},
 				{
 					Name:      "Object adds, bucket/object list (class A)",
