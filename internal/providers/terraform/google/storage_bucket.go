@@ -80,6 +80,11 @@ func getDSRegionResourceGroup(location, storageClass string) (string, string) {
 		}
 	}
 
+	// Handling an exceptional naming
+	if location == "EU" && resourceGroup == "MultiRegionalStorage" {
+		region = "europe"
+	}
+
 	return region, resourceGroup
 }
 
@@ -152,6 +157,9 @@ func operations(d *schema.ResourceData, u *schema.UsageData) []*schema.CostCompo
 					{Key: "description", ValueRegex: strPtr("/Class A/")},
 				},
 			},
+			PriceFilter: &schema.PriceFilter{
+				EndUsageAmount: strPtr(""),
+			},
 		},
 		{
 			Name:            "Object gets, retrieve bucket/object metadata (class B)",
@@ -165,6 +173,9 @@ func operations(d *schema.ResourceData, u *schema.UsageData) []*schema.CostCompo
 					{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
 					{Key: "description", ValueRegex: strPtr("/Class B/")},
 				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				EndUsageAmount: strPtr(""),
 			},
 		},
 	}

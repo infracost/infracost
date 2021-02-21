@@ -124,3 +124,59 @@ func TestStorageBucket(t *testing.T) {
 	}
 	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }
+
+func TestStorageBucket_EuMulti(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "google_storage_bucket" "my_storage_bucket" {
+			name          = "test"
+			location      = "EU"
+			force_destroy = false
+		}
+	`
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"google_storage_bucket.my_storage_bucket": map[string]interface{}{
+			"storage_gb":                 150,
+			"monthly_class_a_operations": 40000,
+			"monthly_class_b_operations": 20000,
+			"monthly_data_retrieval_gb":  500,
+			"monthly_egress_data_transfer_gb": map[string]interface{}{
+				"same_continent": 550,
+				"worldwide":      12500,
+				"asia":           1500,
+				"china":          50,
+				"australia":      250,
+			},
+		},
+	})
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "google_storage_bucket.my_storage_bucket",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Storage (standard)",
+					PriceHash:       "fc9e1d9f7ff70a2a143b33dd97962bc6-57bc5d148491a8381abaccb21ca6b4e9",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(150)),
+				},
+				{
+					Name:      "Object adds, bucket/object list (class A)",
+					SkipCheck: true,
+				},
+				{
+					Name:      "Object gets, retrieve bucket/object metadata (class B)",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "Network egress",
+					SkipCheck: true,
+				},
+			},
+		},
+	}
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
+}
