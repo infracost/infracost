@@ -5,6 +5,9 @@
 version: v0.1
 resource_usage:
 
+  # Note that we're working on adding all of the supported resources (https://www.infracost.io/docs/supported_resources) to
+  # the usage file feature. Please watch https://github.com/infracost/infracost/issues/421 for updates.
+
   #
   # The usage file also supports specifying usage for resources inside modules,
   # by specifying the full path to the resource. This is the same value as Infracost
