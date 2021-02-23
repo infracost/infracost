@@ -68,7 +68,7 @@ func main() {
 
 	startUpdateCheck(cfg, updateMessageChan)
 
-	defaultCmd := defaultCmd(cfg)
+	defaultCmd := breakdownCmd(cfg)
 
 	app = &cli.App{
 		Name:  "infracost",
@@ -115,7 +115,7 @@ DOCS: https://infracost.io/docs`,
 		Before: func(c *cli.Context) error {
 			return loadGlobalFlags(cfg, c)
 		},
-		Commands: []*cli.Command{registerCmd(cfg), reportCmd(cfg)},
+		Commands: []*cli.Command{registerCmd(cfg), diffCmd(cfg), breakdownCmd(cfg), reportCmd(cfg)},
 		Action:   defaultCmd.Action,
 	}
 

@@ -35,7 +35,7 @@ func NewSpinner(msg string, opts Options) *Spinner {
 		s.spinner.Prefix = opts.Indent
 		s.spinner.Suffix = fmt.Sprintf(" %s", msg)
 		if !s.opts.NoColor {
-			_ = s.spinner.Color("fgHiBlue", "bold")
+			_ = s.spinner.Color("fgCyan", "bold")
 		}
 		s.spinner.Start()
 	}
@@ -67,6 +67,6 @@ func (s *Spinner) Success() {
 	if s.opts.EnableLogging {
 		log.Infof("completed: %s", s.msg)
 	} else {
-		fmt.Fprintln(os.Stderr, color.GreenString("%s✔ %s", s.opts.Indent, s.msg))
+		fmt.Fprintln(os.Stderr, color.CyanString("%s✔ %s", s.opts.Indent, s.msg))
 	}
 }
