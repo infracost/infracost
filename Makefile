@@ -3,7 +3,7 @@ PKG := github.com/infracost/infracost/cmd/infracost
 TERRAFORM_PROVIDER_INFRACOST_VERSION := latest
 VERSION := $(shell scripts/get_version.sh HEAD $(NO_DIRTY))
 LD_FLAGS := -ldflags="-X 'github.com/infracost/infracost/internal/version.Version=$(VERSION)'"
-BUILD_FLAGS := $(LD_FLAGS) -i -v
+BUILD_FLAGS := $(LD_FLAGS) -v
 
 DEV_ENV := dev
 ifdef INFRACOST_ENV

@@ -1,8 +1,8 @@
-FROM golang:1.15 as builder
+FROM golang:1.16 as builder
 
 ARG ARCH=linux
-ARG DEFAULT_TERRAFORM_VERSION=0.14.5
-ARG TERRAGRUNT_VERSION=0.27.1
+ARG DEFAULT_TERRAFORM_VERSION=0.14.6
+ARG TERRAGRUNT_VERSION=0.28.5
 # Use infracost-usage.yml instead of the provider, see https://www.infracost.io/docs/usage_based_resources
 ARG TERRAFORM_PROVIDER_INFRACOST_VERSION=latest
 
@@ -46,7 +46,7 @@ RUN make deps
 RUN NO_DIRTY=true make build
 
 # Application
-FROM alpine:3.12 as app
+FROM alpine:3.13 as app
 # Tools needed for running diffs in CI integrations
 RUN apk --update --no-cache add ca-certificates openssl openssh-client curl git jq
 WORKDIR /root/

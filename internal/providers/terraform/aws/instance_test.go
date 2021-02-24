@@ -48,6 +48,12 @@ func TestInstance(t *testing.T) {
 				volume_size = 40
 				iops        = 1000
 			}
+
+			ebs_block_device {
+				device_name = "xvdj"
+				volume_type = "gp3"
+				volume_size = 20
+			}
 		}`
 
 	resourceChecks := []testutil.ResourceCheck{
@@ -118,6 +124,16 @@ func TestInstance(t *testing.T) {
 							Name:            "Provisioned IOPS",
 							PriceHash:       "d5c5e1fb9b8ded55c336f6ae87aa2c3b-9c483347596633f8cf3ab7fdd5502b78",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1000)),
+						},
+					},
+				},
+				{
+					Name: "ebs_block_device[4]",
+					CostComponentChecks: []testutil.CostComponentCheck{
+						{
+							Name:            "General Purpose SSD storage (gp3)",
+							PriceHash:       "b7a83d535d47fcfd1be68ec37f046b3d-ee3dd7e4624338037ca6fea0933a662f",
+							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 						},
 					},
 				},

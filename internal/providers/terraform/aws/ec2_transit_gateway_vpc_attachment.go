@@ -12,12 +12,30 @@ func GetEC2TransitGatewayVpcAttachmentRegistryItem() *schema.RegistryItem {
 		RFunc: NewEC2TransitGatewayVpcAttachment,
 		ReferenceAttributes: []string{
 			"transit_gateway_id",
+			"vpc_id",
 		},
 	}
 }
 
 func NewEC2TransitGatewayVpcAttachment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
+
+	// Try to get the region from the VPC
+	vpcRefs := d.References("vpc_id")
+	var vpcRef *schema.ResourceData
+
+	for _, ref := range vpcRefs {
+		// the VPC ref can also be for the aws_subnet_ids resource which we don't want to consider
+		if ref.Type == "aws_default_vpc" || ref.Type == "aws_vpc" {
+			vpcRef = ref
+			break
+		}
+	}
+	if vpcRef != nil {
+		region = vpcRef.Get("region").String()
+	}
+
+	// Try to get the region from the transit gateway
 	transitGatewayRefs := d.References("transit_gateway_id")
 	if len(transitGatewayRefs) > 0 {
 		region = transitGatewayRefs[0].Get("region").String()
