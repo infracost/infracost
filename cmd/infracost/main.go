@@ -140,7 +140,7 @@ func versionOutput(app *cli.App) string {
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
 	if apiEndpoint == defaultEndpoint && apiKey == "" {
 		red := color.New(color.FgHiRed)
-		bold := color.New(color.Bold, color.FgHiWhite)
+		bold := color.New(color.Bold)
 
 		return errors.New(fmt.Sprintf("%s\n%s %s",
 			red.Sprint("No INFRACOST_API_KEY environment variable is set."),
@@ -175,7 +175,7 @@ func handleUnexpectedErr(cfg *config.Config, app *cli.App, unexpectedErr interfa
 	}
 
 	red := color.New(color.FgHiRed)
-	bold := color.New(color.Bold, color.FgHiWhite)
+	bold := color.New(color.Bold)
 	stack := string(debug.Stack())
 
 	v := ""

@@ -21,6 +21,7 @@ type Root struct {
 }
 
 type Project struct {
+	Name          string     `json:"name"`
 	PastBreakdown *Breakdown `json:"pastBreakdown"`
 	Breakdown     *Breakdown `json:"breakdown"`
 	Diff          *Breakdown `json:"diff"`
@@ -162,6 +163,7 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		}
 
 		outProjects = append(outProjects, Project{
+			Name:          project.Name,
 			PastBreakdown: pastBreakdown,
 			Breakdown:     breakdown,
 			Diff:          diff,

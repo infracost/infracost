@@ -55,7 +55,7 @@ func registerCmd(cfg *config.Config) *cli.Command {
 			fmt.Printf("\nThank you %s!\nYour API key is: %s\n", name, r.APIKey)
 
 			green := color.New(color.FgGreen)
-			bold := color.New(color.Bold, color.FgHiWhite)
+			bold := color.New(color.Bold)
 
 			msg := fmt.Sprintf("\n%s\n%s %s %s\n",
 				green.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),

@@ -73,21 +73,7 @@ func runMain(cfg *config.Config) error {
 	projects := make([]*schema.Project, 0)
 
 	for _, projectCfg := range cfg.Projects.Terraform {
-		src := projectCfg.JSONFile
-
-		if src == "" {
-			src = projectCfg.PlanFile
-		}
-
-		if src == "" {
-			src = projectCfg.Dir
-		}
-
-		if src == "." || src == "" {
-			src = "current directory"
-		}
-
-		m := fmt.Sprintf("Loading resources from %s", src)
+		m := fmt.Sprintf("Loading resources from %s", projectCfg.DisplayName())
 		if projectCfg.Workspace != "" {
 			m += fmt.Sprintf(" (%s)", projectCfg.Workspace)
 		}
@@ -128,7 +114,7 @@ func runMain(cfg *config.Config) error {
 			spinner.Fail()
 
 			red := color.New(color.FgHiRed)
-			bold := color.New(color.Bold, color.FgHiWhite)
+			bold := color.New(color.Bold)
 
 			if e := unwrapped(err); errors.Is(e, prices.ErrInvalidAPIKey) {
 				return errors.New(fmt.Sprintf("%v\n%s %s %s %s %s\n%s",

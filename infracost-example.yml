@@ -25,6 +25,9 @@ projects:
     - dir: examples/terraform
       usage_file: infracost-usage-example.yml # Define resource usage estimates, see https://www.infracost.io/docs/usage_based_resources
 
+    - dir: ../infracost-services/terraform
+      plan_flags: -var-file=env.dev.tfvars
+
     ## Example of using a YAML anchor
     # - <<: *terraform_defaults
     #   dir: examples/terraform

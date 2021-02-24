@@ -30,6 +30,7 @@ type terraformProvider struct {
 	spinnerOpts         spin.Options
 	binary              string
 	dir                 string
+	projectName         string
 	workspace           string
 	jsonFile            string
 	planFile            string
@@ -60,6 +61,7 @@ func New(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provide
 		},
 		binary:              binary,
 		dir:                 dir,
+		projectName:         projectCfg.DisplayName(),
 		workspace:           projectCfg.Workspace,
 		jsonFile:            projectCfg.JSONFile,
 		planFile:            projectCfg.PlanFile,
@@ -71,7 +73,7 @@ func New(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provide
 }
 
 func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.Project, error) {
-	var project *schema.Project = schema.NewProject()
+	var project *schema.Project = schema.NewProject(p.projectName)
 
 	var err error
 	var j []byte
@@ -270,7 +272,7 @@ func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFa
 		spinner.Fail()
 
 		red := color.New(color.FgHiRed)
-		bold := color.New(color.Bold, color.FgHiWhite)
+		bold := color.New(color.Bold)
 
 		if errors.Is(err, ErrMissingCloudToken) {
 			msg := fmt.Sprintf("\n%s %s %s\n%s\n%s\n",

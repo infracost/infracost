@@ -55,7 +55,7 @@ func breakdownCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "breakdown",
 		Usage: "Generates a full breakdown of costs",
-		UsageText: `infracost  [global options] breakdown [command options] [arguments...]
+		UsageText: `infracost [global options] breakdown [command options] [arguments...]
 
 USAGE METHODS:
 	# 1. Use terraform directory with any required terraform flags

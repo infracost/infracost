@@ -29,6 +29,26 @@ type TerraformProject struct {
 	UseState            bool   `yaml:"use_state,omitempty" ignored:"true"`
 }
 
+func (p *TerraformProject) DisplayName() string {
+	if p.Name != "" {
+		return p.Name
+	}
+
+	if p.JSONFile != "" {
+		return p.JSONFile
+	}
+
+	if p.PlanFile != "" {
+		return p.PlanFile
+	}
+
+	if p.Dir != "" {
+		return p.Dir
+	}
+
+	return "current directory"
+}
+
 type Projects struct {
 	Terraform []*TerraformProject `yaml:"terraform,omitempty"`
 }

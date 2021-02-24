@@ -3,14 +3,16 @@ package schema
 // Project contains the existing, planned state of
 // resources and the diff between them.
 type Project struct {
+	Name          string
 	PastResources []*Resource
 	Resources     []*Resource
 	Diff          []*Resource
 	HasDiff       bool
 }
 
-func NewProject() *Project {
+func NewProject(name string) *Project {
 	return &Project{
+		Name:    name,
 		HasDiff: true,
 	}
 }

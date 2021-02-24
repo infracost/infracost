@@ -16,7 +16,8 @@ const (
 	REMOVED
 )
 
-var bold = color.New(color.Bold, color.FgHiWhite)
+var bold = color.New(color.Bold)
+var blue = color.New(color.FgHiBlue)
 var faded = color.New(color.FgHiBlack)
 
 func ToDiff(out Root, opts Options) ([]byte, error) {
@@ -24,10 +25,19 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 
 	hasNilCosts := false
 
-	for _, project := range out.Projects {
+	for i, project := range out.Projects {
 		if project.Diff == nil {
 			continue
 		}
+
+		if i != 0 {
+			s += "----------------------------------\n"
+		}
+
+		s += fmt.Sprintf("%s %s\n\n",
+			bold.Sprint("Project:"),
+			project.Name,
+		)
 
 		for _, diffResource := range project.Diff.Resources {
 
@@ -53,15 +63,20 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 			newCost = project.Breakdown.TotalMonthlyCost
 		}
 
-		s += fmt.Sprintf("%s\nAmount:  %s %s\nPercent: %s",
-			bold.Sprint("Total monthly cost change"),
+		s += fmt.Sprintf("%s %s\nAmount:  %s %s\nPercent: %s",
+			bold.Sprint("Monthly cost change for"),
+			bold.Sprint(project.Name),
 			formatDiffCost(project.Diff.TotalMonthlyCost),
 			faded.Sprintf("(%s -> %s)", formatCurrencyCost(oldCost), formatCurrencyCost(newCost)),
 			formatDiffPerc(oldCost, newCost),
 		)
+
+		if i != len(out.Projects)-1 {
+			s += "\n\n"
+		}
 	}
 
-	s += faded.Sprintf("\n\n----------------------------------\n")
+	s += "\n\n----------------------------------\n"
 	s += fmt.Sprintf("Key: %s changed, %s added, %s removed",
 		opChar(UPDATED),
 		opChar(ADDED),
@@ -69,7 +84,9 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	)
 
 	if hasNilCosts {
-		s += "\n\nUsage-based resources can be estimated with the --usage-file feature, see https://infracost.io/usage-file"
+		s += fmt.Sprintf("\n\nTo estimate usage-based resources use --usage-file, see %s",
+			blue.Sprint("https://infracost.io/usage-file"),
+		)
 	}
 
 	msg := out.unsupportedResourcesMessage(opts.ShowSkipped)
@@ -244,7 +261,12 @@ func resourceHasNilCosts(resource Resource) bool {
 }
 
 func formatDiffCost(d *decimal.Decimal) string {
-	sym := "+"
+	sym := ""
+
+	if d.IsPositive() {
+		sym = "+"
+	}
+
 	if d.IsNegative() {
 		sym = "-"
 	}
@@ -279,15 +301,18 @@ func formatDiffPerc(oldCost *decimal.Decimal, newCost *decimal.Decimal) string {
 
 	p := newCost.Div(*oldCost).Sub(decimal.NewFromInt(1)).Mul(decimal.NewFromInt(100)).Round(0)
 
-	s := ""
+	sym := ""
+
 	if p.IsPositive() {
-		s += "+"
+		sym = "+"
+	}
+
+	if p.IsNegative() {
+		sym = "-"
 	}
 
 	f, _ := p.Float64()
-	s += fmt.Sprintf("%s%%", humanize.FormatFloat("#,###.", f))
-
-	return s
+	return fmt.Sprintf("%s%s%%", sym, humanize.FormatFloat("#,###.", f))
 }
 
 func formatCostDiffDetails(oldCost *decimal.Decimal, newCost *decimal.Decimal) string {
