@@ -29,11 +29,10 @@ resource_usage:
     monthly_requests:  100000000 # Monthly requests to the Rest API Gateway.
 
   aws_apigatewayv2_api.my_v2_api:
-    monthly_requests: 100000000       # Monthly requests to the HTTP API Gateway.
-    request_size_kb: 512              # Average request size sent to the HTTP API Gateway in KB. Requests are metered in 512KB increments, maximum size is 10MB.
-    monthly_messages: 1500000000      # Monthly number of messages sent to the Websocket API Gateway.
-    message_size_kb: 32               # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
-    monthly_connection_mins: 10000000 # Monthly total connection minutes to Websockets.
+    monthly_requests: 100000000 # Monthly requests to the HTTP API Gateway.
+    request_size_kb: 512        # Average request size sent to the HTTP API Gateway in KB. Requests are metered in 512KB increments, maximum size is 10MB.
+    monthly_messages: 100000000 # Monthly number of messages sent to the Websocket API Gateway.
+    message_size_kb: 32         # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
 
   aws_cloudwatch_event_bus.my_events:
     monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.
@@ -69,6 +68,12 @@ resource_usage:
     monthly_outbound_us_east_to_us_east_gb: 500 # Monthly data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
     monthly_outbound_other_region_gb: 750       # Monthly data transferred to other AWS regions.
     monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
+
+  aws_docdb_cluster_instance.my_db:
+    monthly_data_storage_gb: 1000              # Monthly amount of storage for the cluster.
+    monthly_input_output_operations: 100000000 # Monthly number of IOs for the cluster.
+    monthly_backup_storage_gb: 10000           # Monthly amount of backup storage that is in excess of 100% of the storage size for the cluster.
+    cpu_credits: 1000                          # Will be charged if your average CPU utilization over a rolling 24-hour period exceeds the baseline of the instance. 
 
   aws_dx_gateway_association.my_gateway:
     monthly_data_processed_gb: 100 # Monthly data processed by the DX gateway association per month in GB.
