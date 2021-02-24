@@ -33,13 +33,18 @@ func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		iopsVal = decimal.NewFromFloat(d.Get("iops").Float())
 	}
 
+	var monthlyIORequests *decimal.Decimal
+	if u != nil && u.Get("monthly_input_output_operations").Exists() {
+		monthlyIORequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_input_output_operations").Int()))
+	}
+
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal),
+		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal, monthlyIORequests),
 	}
 }
 
-func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.Decimal, iopsVal decimal.Decimal) []*schema.CostComponent {
+func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.Decimal, iopsVal decimal.Decimal, IORequests *decimal.Decimal) []*schema.CostComponent {
 	if volumeAPIName == "" {
 		volumeAPIName = "gp2"
 	}
@@ -59,8 +64,6 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 		name = "Throughput Optimized HDD storage (st1)"
 	case "sc1":
 		name = "Cold HDD storage (sc1)"
-	case "gp3":
-		name = "General Purpose SSD storage (gp3)"
 	default:
 		name = "General Purpose SSD storage (gp2)"
 	}
@@ -104,9 +107,10 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 
 	if volumeAPIName == "standard" {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:           "I/O requests",
-			Unit:           "request",
-			UnitMultiplier: 1000000,
+			Name:            "I/O requests",
+			Unit:            "request",
+			UnitMultiplier:  1000000,
+			MonthlyQuantity: IORequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),

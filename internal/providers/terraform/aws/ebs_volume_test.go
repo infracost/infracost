@@ -134,35 +134,3 @@ func TestEBSVolume(t *testing.T) {
 
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
-
-func TestEBSVolume_GP3(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping test in short mode")
-	}
-
-	tf := `
-	resource "aws_ebs_volume" "gp3" {
-		availability_zone = "us-west-2a"
-		size              = 40
-		type = "gp3"
-		
-		tags = {
-			Name = "HelloWorld"
-		}
-	}`
-
-	resourceChecks := []testutil.ResourceCheck{
-		{
-			Name: "aws_ebs_volume.gp3",
-			CostComponentChecks: []testutil.CostComponentCheck{
-				{
-					Name:             "General Purpose SSD storage (gp3)",
-					PriceHash:        "b7a83d535d47fcfd1be68ec37f046b3d-ee3dd7e4624338037ca6fea0933a662f",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40)),
-				},
-			},
-		},
-	}
-
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
-}
