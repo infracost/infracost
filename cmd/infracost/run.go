@@ -6,13 +6,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/spin"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -66,28 +65,26 @@ func runMain(cfg *config.Config) error {
 		projects = append(projects, project)
 	}
 
-	spinnerOpts := spin.Options{
+	spinnerOpts := ui.SpinnerOptions{
 		EnableLogging: cfg.IsLogging(),
 		NoColor:       cfg.NoColor,
 	}
-	spinner := spin.NewSpinner("Calculating cost estimate", spinnerOpts)
+	spinner := ui.NewSpinner("Calculating cost estimate", spinnerOpts)
 
 	for _, project := range projects {
 		if err := prices.PopulatePrices(cfg, project); err != nil {
 			spinner.Fail()
-
-			red := color.New(color.FgHiRed)
-			bold := color.New(color.Bold)
+			fmt.Fprintln(os.Stderr, "")
 
 			if e := unwrapped(err); errors.Is(e, prices.ErrInvalidAPIKey) {
 				return errors.New(fmt.Sprintf("%v\n%s %s %s %s %s\n%s",
 					e.Error(),
-					red.Sprint("Please check your"),
-					bold.Sprint(config.CredentialsFilePath()),
-					red.Sprint("file or"),
-					bold.Sprint("INFRACOST_API_KEY"),
-					red.Sprint("environment variable."),
-					red.Sprint("If you continue having issues please email hello@infracost.io"),
+					"Please check your",
+					ui.PrimaryString(config.CredentialsFilePath()),
+					"file or",
+					ui.PrimaryString("INFRACOST_API_KEY"),
+					"environment variable.",
+					"If you continue having issues please email hello@infracost.io",
 				))
 			}
 
@@ -167,7 +164,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if cmd.Flags().Changed("config-file") {
 		if hasProjectFlags || hasOutputFlags {
-			usageError(cmd, "--config-file flag cannot be used with other project and output flags")
+			ui.PrintUsageError(cmd, "--config-file flag cannot be used with other project and output flags")
 		}
 
 		configFile, _ := cmd.Flags().GetString("config-file")
@@ -224,14 +221,14 @@ func checkRunConfig(cfg *config.Config) error {
 		}
 
 		if projectCfg.Dir != "" && projectCfg.JSONFile != "" {
-			usageWarning("Warning: Terraform directory is ignored if Terraform JSON is used")
+			ui.PrintWarning("Warning: Terraform directory is ignored if Terraform JSON is used")
 			return nil
 		}
 	}
 
 	for _, output := range cfg.Outputs {
 		if output.Format == "json" && output.ShowSkipped {
-			usageWarning("The show skipped option is not needed with JSON output as that always includes them.")
+			ui.PrintWarning("The show skipped option is not needed with JSON output as that always includes them.")
 			return nil
 		}
 	}

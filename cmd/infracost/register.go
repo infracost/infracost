@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -48,21 +49,16 @@ func registerCmd(cfg *config.Config) *cobra.Command {
 			}
 
 			if r.Error != "" {
-				color.Red("There was an error requesting an API key:\n%s\n", r.Error)
-				fmt.Println("Please contact hello@infracost.io if you continue to have issues.")
+				fmt.Fprintln(os.Stderr, "")
+				ui.PrintErrorf("There was an error requesting an API key\n%s\nPlease contact hello@infracost.io if you continue to have issues.", r.Error)
 				return nil
 			}
 
 			fmt.Printf("\nThank you %s!\nYour API key is: %s\n", name, r.APIKey)
 
-			green := color.New(color.FgGreen)
-			bold := color.New(color.Bold)
-
-			msg := fmt.Sprintf("\n%s\n%s %s %s\n",
-				green.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
-				green.Sprint("You can now run"),
-				bold.Sprint("`infracost`"),
-				green.Sprint("in your Terraform code directory."),
+			msg := fmt.Sprintf("%s\nYou can now run %s in your Terraform code directory.",
+				fmt.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
+				ui.PrimaryString("infracost"),
 			)
 
 			saveAPIKey := true
@@ -76,11 +72,12 @@ func registerCmd(cfg *config.Config) *cobra.Command {
 
 				if !confirm {
 					saveAPIKey = false
-					msg = fmt.Sprintf("\n%s\n%s %s %s\n",
-						green.Sprint("Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml."),
-						green.Sprint("You can now run"),
-						bold.Sprint("`infracost`"),
-						green.Sprint("in your Terraform code directory."),
+
+					msg = fmt.Sprintf("%s\n%s %s %s",
+						"Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml.",
+						"You can now run",
+						ui.PrimaryString("infracost"),
+						"in your Terraform code directory.",
 					)
 				}
 			}
@@ -96,7 +93,8 @@ func registerCmd(cfg *config.Config) *cobra.Command {
 				}
 			}
 
-			fmt.Print(msg)
+			fmt.Println("")
+			ui.PrintSuccess(msg)
 
 			return nil
 		},

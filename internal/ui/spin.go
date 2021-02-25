@@ -1,4 +1,4 @@
-package spin
+package ui
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Options struct {
+type SpinnerOptions struct {
 	EnableLogging bool
 	NoColor       bool
 	Indent        string
@@ -19,10 +19,10 @@ type Options struct {
 type Spinner struct {
 	spinner *spinnerpkg.Spinner
 	msg     string
-	opts    Options
+	opts    SpinnerOptions
 }
 
-func NewSpinner(msg string, opts Options) *Spinner {
+func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
 	s := &Spinner{
 		spinner: spinnerpkg.New(spinnerpkg.CharSets[14], 100*time.Millisecond, spinnerpkg.WithWriter(os.Stderr)),
 		msg:     msg,
@@ -35,7 +35,7 @@ func NewSpinner(msg string, opts Options) *Spinner {
 		s.spinner.Prefix = opts.Indent
 		s.spinner.Suffix = fmt.Sprintf(" %s", msg)
 		if !s.opts.NoColor {
-			_ = s.spinner.Color("fgCyan", "bold")
+			_ = s.spinner.Color("fgHiCyan", "bold")
 		}
 		s.spinner.Start()
 	}
@@ -67,6 +67,6 @@ func (s *Spinner) Success() {
 	if s.opts.EnableLogging {
 		log.Infof("completed: %s", s.msg)
 	} else {
-		fmt.Fprintln(os.Stderr, color.CyanString("%s✔ %s", s.opts.Indent, s.msg))
+		fmt.Fprintln(os.Stderr, PrimaryStringf("%s✔ %s", s.opts.Indent, s.msg))
 	}
 }

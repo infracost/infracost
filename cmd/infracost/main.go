@@ -3,13 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"runtime/debug"
-	"strings"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/events"
-	"github.com/infracost/infracost/internal/spin"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
 	"github.com/pkg/errors"
@@ -20,17 +18,7 @@ import (
 	"github.com/fatih/color"
 )
 
-var spinner *spin.Spinner
-
-func usageError(cmd *cobra.Command, msg string) {
-	fmt.Fprintln(os.Stderr, color.HiRedString(msg)+"\n")
-	cmd.SetOut(os.Stderr)
-	_ = cmd.Help()
-}
-
-func usageWarning(msg string) {
-	fmt.Fprintln(os.Stderr, color.YellowString(msg)+"\n")
-}
+var spinner *ui.Spinner
 
 func main() {
 	var appErr error
@@ -74,12 +62,14 @@ Generate a full cost breakdown from terraform directory with any required terraf
 
 Docs:
   https://infracost.io/docs`,
+		SilenceUsage:  true,
+		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			return loadGlobalFlags(cfg, cmd)
 		},
 		PreRun: func(cmd *cobra.Command, args []string) {
 			deprecationMsg := "The root command is deprecated and will be removed in v0.8.0. Please use `infracost breakdown`."
-			usageWarning(deprecationMsg)
+			ui.PrintWarning(deprecationMsg)
 
 			handleDeprecatedEnvVars(deprecatedEnvVarMapping)
 			handleDeprecatedFlags(cmd, deprecatedFlagsMapping)
@@ -122,19 +112,11 @@ func startUpdateCheck(cfg *config.Config, c chan *update.Info) {
 	}()
 }
 
-func versionOutput() string {
-	return fmt.Sprintf("Infracost %s", version.Version)
-}
-
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
 	if apiEndpoint == defaultEndpoint && apiKey == "" {
-		red := color.New(color.FgHiRed)
-		bold := color.New(color.Bold)
-
-		return errors.New(fmt.Sprintf("%s\n%s %s",
-			red.Sprint("No INFRACOST_API_KEY environment variable is set."),
-			red.Sprintf("We run a free Cloud Pricing API, to get an API key run"),
-			bold.Sprint("`infracost register`"),
+		return errors.New(fmt.Sprintf(
+			"No INFRACOST_API_KEY environment variable is set.\n\nWe run a free Cloud Pricing API, to get an API key rum %s",
+			ui.PrimaryString("infracost register"),
 		))
 	}
 
@@ -144,16 +126,17 @@ func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) erro
 func handleAppErr(cfg *config.Config, err error) {
 	if spinner != nil {
 		spinner.Fail()
+		fmt.Fprintln(os.Stderr, "")
 	}
 
 	if err.Error() != "" {
-		fmt.Fprintf(os.Stderr, "%s\n", color.HiRedString(err.Error()))
+		ui.PrintError(err.Error())
 	}
 
-	msg := stripColor(err.Error())
+	msg := ui.StripColor(err.Error())
 	var eventsError *events.Error
 	if errors.As(err, &eventsError) {
-		msg = stripColor(eventsError.Label)
+		msg = ui.StripColor(eventsError.Label)
 	}
 	events.SendReport(cfg, "error", msg)
 }
@@ -161,21 +144,12 @@ func handleAppErr(cfg *config.Config, err error) {
 func handleUnexpectedErr(cfg *config.Config, unexpectedErr interface{}) {
 	if spinner != nil {
 		spinner.Fail()
+		fmt.Fprintln(os.Stderr, "")
 	}
 
-	red := color.New(color.FgHiRed)
-	bold := color.New(color.Bold)
 	stack := string(debug.Stack())
 
-	msg := fmt.Sprintf("\n%s\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
-		red.Sprint("An unexpected error occurred"),
-		unexpectedErr,
-		stack,
-		versionOutput(),
-		red.Sprint("Please copy the above output and create a new issue at"),
-		bold.Sprint("https://github.com/infracost/infracost/issues/new"),
-	)
-	fmt.Fprint(os.Stderr, msg)
+	ui.PrintUnexpectedError(unexpectedErr, stack)
 
 	events.SendReport(cfg, "error", fmt.Sprintf("%s\n%s", unexpectedErr, stack))
 }
@@ -183,11 +157,12 @@ func handleUnexpectedErr(cfg *config.Config, unexpectedErr interface{}) {
 func handleUpdateMessage(updateMessageChan chan *update.Info) {
 	updateInfo := <-updateMessageChan
 	if updateInfo != nil {
-		msg := fmt.Sprintf("\n%s %s → %s\n%s\n",
-			color.YellowString("A new version of Infracost is available:"),
-			color.CyanString(version.Version),
-			color.CyanString(updateInfo.LatestVersion),
-			indent(color.YellowString(updateInfo.Cmd), "  "),
+		msg := fmt.Sprintf("\n%s %s %s → %s\n%s\n",
+			ui.WarningString("Update:"),
+			"A new version of Infracost is available:",
+			ui.PrimaryString(version.Version),
+			ui.PrimaryString(updateInfo.LatestVersion),
+			ui.Indent(updateInfo.Cmd, "  "),
 		)
 		fmt.Fprint(os.Stderr, msg)
 	}
@@ -222,19 +197,4 @@ func loadGlobalFlags(cfg *config.Config, cmd *cobra.Command) error {
 	cfg.Environment.Flags = flagNames
 
 	return nil
-}
-
-func indent(s, indent string) string {
-	lines := make([]string, 0)
-	for _, j := range strings.Split(s, "\n") {
-		lines = append(lines, indent+j)
-	}
-
-	return strings.Join(lines, "\n")
-}
-
-func stripColor(str string) string {
-	ansi := "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))"
-	re := regexp.MustCompile(ansi)
-	return re.ReplaceAllString(str, "")
 }

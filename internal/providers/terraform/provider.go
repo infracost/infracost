@@ -11,11 +11,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/events"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/spin"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/kballard/go-shellquote"
 	"github.com/pkg/errors"
 	"golang.org/x/mod/semver"
@@ -27,7 +26,7 @@ var minTerraformVer = "v0.12"
 
 type terraformProvider struct {
 	env                 *config.Environment
-	spinnerOpts         spin.Options
+	spinnerOpts         ui.SpinnerOptions
 	binary              string
 	dir                 string
 	projectName         string
@@ -54,7 +53,7 @@ func New(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provide
 
 	return &terraformProvider{
 		env: cfg.Environment,
-		spinnerOpts: spin.Options{
+		spinnerOpts: ui.SpinnerOptions{
 			EnableLogging: cfg.IsLogging(),
 			NoColor:       cfg.NoColor,
 			Indent:        "  ",
@@ -213,7 +212,7 @@ func (p *terraformProvider) inTerraformDir() bool {
 }
 
 func (p *terraformProvider) runInit(opts *CmdOptions) error {
-	spinner := spin.NewSpinner("Running terraform init", p.spinnerOpts)
+	spinner := ui.NewSpinner("Running terraform init", p.spinnerOpts)
 
 	_, err := Cmd(opts, "init", "-input=false", "-no-color")
 	if err != nil {
@@ -227,7 +226,7 @@ func (p *terraformProvider) runInit(opts *CmdOptions) error {
 }
 
 func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFail bool) (string, []byte, error) {
-	spinner := spin.NewSpinner("Running terraform plan", p.spinnerOpts)
+	spinner := ui.NewSpinner("Running terraform plan", p.spinnerOpts)
 	var planJSON []byte
 
 	f, err := ioutil.TempFile(os.TempDir(), "tfplan")
@@ -271,26 +270,15 @@ func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFa
 	if err != nil {
 		spinner.Fail()
 
-		red := color.New(color.FgHiRed)
-		bold := color.New(color.Bold)
-
 		if errors.Is(err, ErrMissingCloudToken) {
-			msg := fmt.Sprintf("\n%s %s %s\n%s\n%s\n",
-				red.Sprint("Please set your"),
-				bold.Sprint("TERRAFORM_CLOUD_TOKEN"),
-				red.Sprint("environment variable."),
-				"It seems like Terraform Cloud's Remote Execution Mode is being used.",
-				"Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable.",
-			)
+			msg := "Please set your TERRAFORM_CLOUD_TOKEN environment variable.\n"
+			msg += "It seems like Terraform Cloud's Remote Execution Mode is being used.\n"
+			msg += "Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable."
 			fmt.Fprintln(os.Stderr, msg)
 		} else if errors.Is(err, ErrInvalidCloudToken) {
-			msg := fmt.Sprintf("\n%s %s %s\n%s\n%s\n",
-				red.Sprint("Please check your"),
-				bold.Sprint("TERRAFORM_CLOUD_TOKEN"),
-				red.Sprint("environment variable."),
-				"It seems like Terraform Cloud's Remote Execution Mode is being used.",
-				"Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable.",
-			)
+			msg := "Please check your TERRAFORM_CLOUD_TOKEN environment variable.\n"
+			msg += "It seems like Terraform Cloud's Remote Execution Mode is being used.\n"
+			msg += "Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable."
 			fmt.Fprintln(os.Stderr, msg)
 		} else {
 			terraformError(err)
@@ -357,7 +345,7 @@ func (p *terraformProvider) runRemotePlan(opts *CmdOptions, args []string) ([]by
 }
 
 func (p *terraformProvider) runShow(opts *CmdOptions, planFile string) ([]byte, error) {
-	spinner := spin.NewSpinner("Running terraform show", p.spinnerOpts)
+	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
 
 	args := []string{"show", "-no-color", "-json"}
 	if planFile != "" {
@@ -391,7 +379,7 @@ func terraformError(err error) {
 		return
 	}
 
-	msg := fmt.Sprintf("\n  Terraform command failed with:\n%s\n", indent(stderr, "    "))
+	msg := fmt.Sprintf("\n  Terraform command failed with:\n%s\n", ui.Indent(stderr, "    "))
 
 	if strings.HasPrefix(stderr, "Error: Failed to select workspace") {
 		msg += "\nRun `terraform workspace select your_workspace` first or set the TF_WORKSPACE environment variable.\n"
@@ -412,7 +400,7 @@ func terraformError(err error) {
 		msg += "For example: infracost --terraform-dir=path/to/terraform --terraform-plan-file=plan.save\n"
 	}
 
-	fmt.Fprintln(os.Stderr, color.HiRedString(msg))
+	fmt.Fprintln(os.Stderr, msg)
 }
 
 func extractStderr(err error) string {
@@ -420,14 +408,6 @@ func extractStderr(err error) string {
 		return stripBlankLines(string(e.Stderr))
 	}
 	return ""
-}
-
-func indent(s, indent string) string {
-	lines := make([]string, 0)
-	for _, j := range strings.Split(s, "\n") {
-		lines = append(lines, indent+j)
-	}
-	return strings.Join(lines, "\n")
 }
 
 func stripBlankLines(s string) string {

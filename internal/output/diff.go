@@ -2,11 +2,10 @@ package output
 
 import (
 	"fmt"
-	"regexp"
-	"strings"
 
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/shopspring/decimal"
 )
 
@@ -15,10 +14,6 @@ const (
 	ADDED
 	REMOVED
 )
-
-var bold = color.New(color.Bold)
-var blue = color.New(color.FgHiBlue)
-var faded = color.New(color.FgHiBlack)
 
 func ToDiff(out Root, opts Options) ([]byte, error) {
 	s := ""
@@ -35,7 +30,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		}
 
 		s += fmt.Sprintf("%s %s\n\n",
-			bold.Sprint("Project:"),
+			ui.BoldString("Project:"),
 			project.Name,
 		)
 
@@ -64,10 +59,10 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		}
 
 		s += fmt.Sprintf("%s %s\nAmount:  %s %s\nPercent: %s",
-			bold.Sprint("Monthly cost change for"),
-			bold.Sprint(project.Name),
+			ui.BoldString("Monthly cost change for"),
+			ui.BoldString(project.Name),
 			formatDiffCost(project.Diff.TotalMonthlyCost),
-			faded.Sprintf("(%s -> %s)", formatCurrencyCost(oldCost), formatCurrencyCost(newCost)),
+			ui.FadedStringf("(%s -> %s)", formatCurrencyCost(oldCost), formatCurrencyCost(newCost)),
 			formatDiffPerc(oldCost, newCost),
 		)
 
@@ -85,7 +80,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 
 	if hasNilCosts {
 		s += fmt.Sprintf("\n\nTo estimate usage-based resources use --usage-file, see %s",
-			blue.Sprint("https://infracost.io/usage-file"),
+			ui.LinkString("https://infracost.io/usage-file"),
 		)
 	}
 
@@ -119,7 +114,7 @@ func resourceToDiff(diffResource Resource, oldResource *Resource, newResource *R
 
 	nameLabel := diffResource.Name
 	if isTopLevel {
-		nameLabel = bold.Sprint(nameLabel)
+		nameLabel = ui.BoldString(nameLabel)
 	}
 
 	s += fmt.Sprintf("%s %s\n", opChar(op), nameLabel)
@@ -130,7 +125,7 @@ func resourceToDiff(diffResource Resource, oldResource *Resource, newResource *R
 		} else {
 			s += fmt.Sprintf("  %s%s\n",
 				formatDiffCost(diffResource.MonthlyCost),
-				faded.Sprint(formatCostDiffDetails(oldCost, newCost)),
+				ui.FadedString(formatCostDiffDetails(oldCost, newCost)),
 			)
 		}
 	}
@@ -147,7 +142,7 @@ func resourceToDiff(diffResource Resource, oldResource *Resource, newResource *R
 		}
 
 		s += "\n"
-		s += indent(costComponentToDiff(diffComponent, oldComponent, newComponent), "    ")
+		s += ui.Indent(costComponentToDiff(diffComponent, oldComponent, newComponent), "    ")
 	}
 
 	for _, diffSubResource := range diffResource.SubResources {
@@ -162,7 +157,7 @@ func resourceToDiff(diffResource Resource, oldResource *Resource, newResource *R
 		}
 
 		s += "\n"
-		s += indent(resourceToDiff(diffSubResource, oldSubResource, newSubResource, false), "    ")
+		s += ui.Indent(resourceToDiff(diffSubResource, oldSubResource, newSubResource, false), "    ")
 	}
 
 	return s
@@ -194,7 +189,7 @@ func costComponentToDiff(diffComponent CostComponent, oldComponent *CostComponen
 
 	if oldCost == nil && newCost == nil {
 		s += "  Cost depends on usage\n"
-		s += faded.Sprintf("    %s per %s%s\n",
+		s += ui.FadedStringf("    %s per %s%s\n",
 			formatDiffCost(&diffComponent.Price),
 			diffComponent.Unit,
 			formatCostDiffDetails(oldPrice, newPrice),
@@ -202,7 +197,7 @@ func costComponentToDiff(diffComponent CostComponent, oldComponent *CostComponen
 	} else {
 		s += fmt.Sprintf("  %s%s\n",
 			formatDiffCost(diffComponent.MonthlyCost),
-			faded.Sprint(formatCostDiffDetails(oldCost, newCost)),
+			ui.FadedString(formatCostDiffDetails(oldCost, newCost)),
 		)
 	}
 
@@ -321,25 +316,4 @@ func formatCostDiffDetails(oldCost *decimal.Decimal, newCost *decimal.Decimal) s
 	}
 
 	return fmt.Sprintf(" (%s -> %s)", formatCurrencyCost(oldCost), formatCurrencyCost(newCost))
-}
-
-func indent(s, indent string) string {
-	lines := make([]string, 0)
-
-	split := strings.Split(s, "\n")
-
-	for i, j := range split {
-		if stripColor(j) == "" && i == len(split)-1 {
-			lines = append(lines, j)
-		} else {
-			lines = append(lines, indent+j)
-		}
-	}
-	return strings.Join(lines, "\n")
-}
-
-func stripColor(str string) string {
-	ansi := "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))"
-	re := regexp.MustCompile(ansi)
-	return re.ReplaceAllString(str, "")
 }

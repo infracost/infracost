@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -68,7 +69,7 @@ Use terraform plan file, relative to terraform-dir:
 
 			err = checkRunConfig(cfg)
 			if err != nil {
-				usageError(cmd, err.Error())
+				ui.PrintUsageError(cmd, err.Error())
 			}
 
 			return runMain(cfg)

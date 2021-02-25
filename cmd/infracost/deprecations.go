@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/infracost/infracost/internal/ui"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -29,6 +30,8 @@ var deprecatedEnvVarMapping = map[string]string{
 }
 
 func handleDeprecatedEnvVars(deprecatedEnvVars map[string]string) {
+	hasPrinted := false
+
 	for oldName, newName := range deprecatedEnvVars {
 		if val, ok := os.LookupEnv(oldName); ok {
 			m := fmt.Sprintf("Environment variable %s is deprecated and will be removed in v0.8.0.", oldName)
@@ -36,16 +39,23 @@ func handleDeprecatedEnvVars(deprecatedEnvVars map[string]string) {
 				m += fmt.Sprintf(" Please use %s.", newName)
 			}
 
-			usageWarning(m)
+			ui.PrintWarning(m)
+			hasPrinted = true
 
 			if _, ok := os.LookupEnv(newName); !ok {
 				os.Setenv(newName, val)
 			}
 		}
 	}
+
+	if hasPrinted {
+		fmt.Fprintln(os.Stderr, "")
+	}
 }
 
 func handleDeprecatedFlags(cmd *cobra.Command, deprecatedFlagsMapping map[string]string) {
+	hasPrinted := false
+
 	cmd.Flags().Visit(func(flag *pflag.Flag) {
 		if newName, ok := deprecatedFlagsMapping[flag.Name]; ok {
 
@@ -59,7 +69,8 @@ func handleDeprecatedFlags(cmd *cobra.Command, deprecatedFlagsMapping map[string
 				m += fmt.Sprintf(" Please use --%s.", newName)
 			}
 
-			usageWarning(m)
+			ui.PrintWarning(m)
+			hasPrinted = true
 
 			if !cmd.Flags().Changed(newName) {
 				err := cmd.Flags().Set(newName, flag.Value.String())
@@ -69,4 +80,8 @@ func handleDeprecatedFlags(cmd *cobra.Command, deprecatedFlagsMapping map[string
 			}
 		}
 	})
+
+	if hasPrinted {
+		fmt.Fprintln(os.Stderr, "")
+	}
 }

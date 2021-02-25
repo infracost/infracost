@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -101,10 +101,10 @@ func reportCmd(cfg *config.Config) *cobra.Command {
 	cmd := outputCmd(cfg)
 	cmd.Use = "report"
 	cmd.Hidden = true
-	cmd.Long = color.YellowString(deprecationMsg)
+	cmd.Long = ui.WarningString(deprecationMsg)
 
 	cmd.PreRun = func(cmd *cobra.Command, args []string) {
-		usageWarning(deprecationMsg)
+		ui.PrintWarning(deprecationMsg)
 	}
 
 	// Add deprecated flag
