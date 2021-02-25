@@ -29,6 +29,9 @@ var tfProviders = `
 			google = {
 				source  = "hashicorp/google"
 			}
+			azurerm = {
+				source  = "hashicorp/azurerm"
+			}
 		}
 	}
 
@@ -48,6 +51,7 @@ var tfProviders = `
 	}
 
 	provider "azurerm" {
+		skip_provider_registration = true
 		features {}
 	}
 `
