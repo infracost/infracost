@@ -16,57 +16,20 @@ import (
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
-var runInputFlags = []cli.Flag{
-	&cli.StringFlag{
-		Name:  "config-file",
-		Usage: "Path to the Infracost config file. Cannot be used with other flags",
-	},
-	&cli.StringFlag{
-		Name:      "usage-file",
-		Usage:     "Path to Infracost usage file that specifies values for usage-based resources",
-		TakesFile: true,
-	},
-	&cli.StringFlag{
-		Name:      "terraform-json-file",
-		Usage:     "Path to Terraform plan JSON file",
-		TakesFile: true,
-	},
-	&cli.StringFlag{
-		Name:      "terraform-plan-file",
-		Usage:     "Path to Terraform plan file relative to 'terraform-dir'",
-		TakesFile: true,
-	},
-	&cli.StringFlag{
-		Name:  "terraform-plan-flags",
-		Usage: "Flags to pass to the 'terraform plan' command",
-	},
-	&cli.StringFlag{
-		Name:        "terraform-dir",
-		Usage:       "Path to the Terraform code directory",
-		TakesFile:   true,
-		DefaultText: "current working directory",
-	},
-	&cli.BoolFlag{
-		Name:  "terraform-use-state",
-		Usage: "Use Terraform state instead of generating a plan",
-		Value: false,
-	},
+func addRunInputFlags(cmd *cobra.Command) {
+	cmd.Flags().String("config-file", "", "Path to the Infracost config file. Cannot be used with other flags")
+	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
+	cmd.Flags().String("terraform-json-file", "", "Path to Terraform plan JSON file")
+	cmd.Flags().String("terraform-plan-file", "", "Path to Terraform plan file relative to 'terraform-dir'")
+	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to the 'terraform plan' command")
+	cmd.Flags().String("terraform-dir", "", "Path to the Terraform code directory. Defaults to current working directory")
 }
 
-var runOutputFlags = []cli.Flag{
-	&cli.StringFlag{
-		Name:  "format",
-		Usage: "Output format: json, table, html",
-		Value: "table",
-	},
-	&cli.BoolFlag{
-		Name:  "show-skipped",
-		Usage: "Show unsupported resources, some of which might be free. Ignored for JSON outputs",
-		Value: false,
-	},
+func addRunOutputFlags(cmd *cobra.Command) {
+	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free. Ignored for JSON outputs")
 }
 
 func runMain(cfg *config.Config) error {
@@ -148,7 +111,7 @@ func runMain(cfg *config.Config) error {
 
 		opts := output.Options{
 			ShowSkipped: outputCfg.ShowSkipped,
-			NoColor:     outputCfg.NoColor,
+			NoColor:     cfg.NoColor,
 		}
 
 		var (
@@ -189,23 +152,26 @@ func runMain(cfg *config.Config) error {
 	return nil
 }
 
-func loadRunFlags(cfg *config.Config, c *cli.Context) error {
-	hasProjectFlags := (c.IsSet("terraform-dir") ||
-		c.IsSet("terraform-plan-file") ||
-		c.IsSet("terraform-json-file") ||
-		c.IsSet("terraform-use-state") ||
-		c.IsSet("terraform-plan-flags") ||
-		c.IsSet("usage-file"))
+func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
+	cmd.Flags().Changed("terraform-dir")
 
-	hasOutputFlags := (c.IsSet("format") ||
-		c.IsSet("show-skipped"))
+	hasProjectFlags := (cmd.Flags().Changed("terraform-dir") ||
+		cmd.Flags().Changed("terraform-plan-file") ||
+		cmd.Flags().Changed("terraform-json-file") ||
+		cmd.Flags().Changed("terraform-use-state") ||
+		cmd.Flags().Changed("terraform-plan-flags") ||
+		cmd.Flags().Changed("usage-file"))
 
-	if c.IsSet("config-file") {
+	hasOutputFlags := (cmd.Flags().Changed("format") ||
+		cmd.Flags().Changed("show-skipped"))
+
+	if cmd.Flags().Changed("config-file") {
 		if hasProjectFlags || hasOutputFlags {
-			usageError(c, "--config-file flag cannot be used with other project and output flags")
+			usageError(cmd, "--config-file flag cannot be used with other project and output flags")
 		}
 
-		return cfg.LoadFromFile(c.String("config-file"))
+		configFile, _ := cmd.Flags().GetString("config-file")
+		return cfg.LoadFromFile(configFile)
 	}
 
 	projectCfg := &config.TerraformProject{}
@@ -231,18 +197,17 @@ func loadRunFlags(cfg *config.Config, c *cli.Context) error {
 	}
 
 	if hasProjectFlags {
-		projectCfg.Dir = c.String("terraform-dir")
-		projectCfg.PlanFile = c.String("terraform-plan-file")
-		projectCfg.JSONFile = c.String("terraform-json-file")
-		projectCfg.UseState = c.Bool("terraform-use-state")
-		projectCfg.PlanFlags = c.String("terraform-plan-flags")
-		projectCfg.UsageFile = c.String("usage-file")
+		projectCfg.Dir, _ = cmd.Flags().GetString("terraform-dir")
+		projectCfg.PlanFile, _ = cmd.Flags().GetString("terraform-plan-file")
+		projectCfg.JSONFile, _ = cmd.Flags().GetString("terraform-json-file")
+		projectCfg.UseState, _ = cmd.Flags().GetBool("terraform-use-state")
+		projectCfg.PlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
+		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
 	}
 
 	if hasOutputFlags {
-		outputCfg.Format = c.String("format")
-		outputCfg.ShowSkipped = c.Bool("show-skipped")
-		outputCfg.NoColor = c.Bool("no-color")
+		outputCfg.Format, _ = cmd.Flags().GetString("format")
+		outputCfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 	}
 
 	return nil

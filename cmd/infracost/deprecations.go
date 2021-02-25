@@ -6,17 +6,19 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 var deprecatedFlagsMapping = map[string]string{
-	"tfjson":      "terraform-json-file",
-	"tfplan":      "terraform-plan-file",
-	"use-tfstate": "terraform-use-state",
-	"tfdir":       "terraform-dir",
-	"tfflags":     "terraform-plan-flags",
-	"output":      "format",
-	"o":           "format",
+	"tfjson":               "terraform-json-file",
+	"tfplan":               "terraform-plan-file",
+	"use-tfstate":          "terraform-use-state",
+	"tfdir":                "terraform-dir",
+	"tfflags":              "terraform-plan-flags",
+	"output":               "format",
+	"o":                    "format",
+	"pricing-api-endpoint": "",
 }
 
 var deprecatedEnvVarMapping = map[string]string{
@@ -26,7 +28,7 @@ var deprecatedEnvVarMapping = map[string]string{
 	"SKIP_UPDATE_CHECK":     "INFRACOST_SKIP_UPDATE_CHECK",
 }
 
-func handleDeprecatedEnvVars(c *cli.Context, deprecatedEnvVars map[string]string) {
+func handleDeprecatedEnvVars(deprecatedEnvVars map[string]string) {
 	for oldName, newName := range deprecatedEnvVars {
 		if val, ok := os.LookupEnv(oldName); ok {
 			m := fmt.Sprintf("Environment variable %s is deprecated and will be removed in v0.8.0.", oldName)
@@ -43,24 +45,13 @@ func handleDeprecatedEnvVars(c *cli.Context, deprecatedEnvVars map[string]string
 	}
 }
 
-func handleDeprecatedFlags(c *cli.Context, deprecatedFlagsMapping map[string]string) {
-	flags := append(c.App.Flags, c.Command.Flags...)
+func handleDeprecatedFlags(cmd *cobra.Command, deprecatedFlagsMapping map[string]string) {
+	cmd.Flags().Visit(func(flag *pflag.Flag) {
+		if newName, ok := deprecatedFlagsMapping[flag.Name]; ok {
 
-	for _, flag := range flags {
-		flagName := flag.Names()[0]
-		if !c.IsSet(flagName) {
-			continue
-		}
-
-		if newName, ok := deprecatedFlagsMapping[flagName]; ok {
-
-			oldNames := make([]string, 0, len(flag.Names()))
-			for _, n := range flag.Names() {
-				if len(n) == 1 {
-					oldNames = append(oldNames, fmt.Sprintf("-%s", n))
-				} else {
-					oldNames = append(oldNames, fmt.Sprintf("--%s", n))
-				}
+			oldNames := []string{fmt.Sprintf("--%s", flag.Name)}
+			if flag.Shorthand != "" {
+				oldNames = append(oldNames, fmt.Sprintf("-%s", flag.Shorthand))
 			}
 
 			m := fmt.Sprintf("Flag %s is deprecated and will be removed in v0.8.0.", strings.Join(oldNames, "/"))
@@ -70,12 +61,12 @@ func handleDeprecatedFlags(c *cli.Context, deprecatedFlagsMapping map[string]str
 
 			usageWarning(m)
 
-			if !c.IsSet(newName) {
-				err := c.Set(newName, c.String(flagName))
+			if !cmd.Flags().Changed(newName) {
+				err := cmd.Flags().Set(newName, flag.Value.String())
 				if err != nil {
-					log.Debugf("Error setting flag %s from %s", newName, flagName)
+					log.Debugf("Error setting flag %s from %s", newName, flag.Name)
 				}
 			}
 		}
-	}
+	})
 }

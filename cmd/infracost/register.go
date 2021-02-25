@@ -13,7 +13,7 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
 type createAPIKeyResponse struct {
@@ -21,11 +21,12 @@ type createAPIKeyResponse struct {
 	Error  string `json:"error"`
 }
 
-func registerCmd(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "register",
-		Usage: "Register for an Infracost API key",
-		Action: func(c *cli.Context) error {
+func registerCmd(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "register",
+		Short: "Register for an Infracost API key",
+		Long:  "Register for an Infracost API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Please enter your name and email address to get an API key.")
 			fmt.Println("See our FAQ (https://www.infracost.io/docs/faq) for more details.")
 

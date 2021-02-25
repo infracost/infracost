@@ -14,17 +14,18 @@ import (
 	"github.com/infracost/infracost/internal/version"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
 	"github.com/fatih/color"
-	"github.com/urfave/cli/v2"
 )
 
 var spinner *spin.Spinner
 
-func usageError(c *cli.Context, msg string) {
+func usageError(cmd *cobra.Command, msg string) {
 	fmt.Fprintln(os.Stderr, color.HiRedString(msg)+"\n")
-	c.App.Writer = os.Stderr
-	cli.ShowAppHelpAndExit(c, 1)
+	cmd.SetOut(os.Stderr)
+	_ = cmd.Help()
 }
 
 func usageWarning(msg string) {
@@ -38,8 +39,6 @@ func main() {
 	cfg := config.DefaultConfig()
 	appErr = cfg.LoadFromEnv()
 
-	var app *cli.App
-
 	defer func() {
 		if appErr != nil {
 			handleAppErr(cfg, appErr)
@@ -47,7 +46,7 @@ func main() {
 
 		unexpectedErr := recover()
 		if unexpectedErr != nil {
-			handleUnexpectedErr(cfg, app, unexpectedErr)
+			handleUnexpectedErr(cfg, unexpectedErr)
 		}
 
 		handleUpdateMessage(updateMessageChan)
@@ -57,69 +56,59 @@ func main() {
 		}
 	}()
 
-	cli.VersionFlag = &cli.BoolFlag{
-		Name:  "version",
-		Usage: "Prints the version of infracost and terraform",
-	}
-
-	cli.VersionPrinter = func(c *cli.Context) {
-		fmt.Println(versionOutput(c.App))
-	}
-
 	startUpdateCheck(cfg, updateMessageChan)
 
-	defaultCmd := breakdownCmd(cfg)
+	rootCmd := &cobra.Command{
+		Use:     "infracost",
+		Version: version.Version,
+		Short:   "Cloud cost estimates for Terraform",
+		Long: `Infracost - cloud cost estimates for Terraform
 
-	app = &cli.App{
-		Name:  "infracost",
-		Usage: "Generate cost estimates from Terraform",
-		UsageText: `infracost [global options] command [command options] [arguments...]
+Generate a cost diff from terraform directory with any required terraform flags:
 
-USAGE METHODS:
-	# 1. Use terraform directory with any required terraform flags
-	infracost --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+  infracost diff --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
 
-	# 2. Use terraform state file
-	infracost --terraform-dir /path/to/code --terraform-use-state
+Generate a full cost breakdown from terraform directory with any required terraform flags:
 
-	# 3. Use terraform plan JSON
-	terraform plan -out plan.save .
-	terraform show -json plan.save > plan.json
-	infracost --terraform-json-file /path/to/plan.json
+  infracost breakdown --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
 
-	# 4. Use terraform plan file, relative to terraform-dir
-	terraform plan -out plan.save .
-	infracost --terraform-dir /path/to/code --terraform-plan-file plan.save
-
-DOCS: https://infracost.io/docs`,
-		EnableBashCompletion: true,
-		Version:              version.Version,
-		Flags: append([]cli.Flag{
-			&cli.StringFlag{
-				Name:  "log-level",
-				Usage: "Log level (trace, debug, info, warn, error, fatal)",
-			},
-			&cli.BoolFlag{
-				Name:  "no-color",
-				Usage: "Turn off colored output",
-			},
-			&cli.StringFlag{
-				Name:  "pricing-api-endpoint",
-				Usage: "Specify an alternate Cloud Pricing API URL",
-			},
-		}, defaultCmd.Flags...),
-		OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
-			usageError(c, err.Error())
-			return nil
+Docs:
+  https://infracost.io/docs`,
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			return loadGlobalFlags(cfg, cmd)
 		},
-		Before: func(c *cli.Context) error {
-			return loadGlobalFlags(cfg, c)
+		PreRun: func(cmd *cobra.Command, args []string) {
+			deprecationMsg := "The root command is deprecated and will be removed in v0.8.0. Please use `infracost breakdown`."
+			usageWarning(deprecationMsg)
+
+			handleDeprecatedEnvVars(deprecatedEnvVarMapping)
+			handleDeprecatedFlags(cmd, deprecatedFlagsMapping)
 		},
-		Commands: []*cli.Command{registerCmd(cfg), diffCmd(cfg), breakdownCmd(cfg), reportCmd(cfg)},
-		Action:   defaultCmd.Action,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return breakdownCmd(cfg).RunE(cmd, args)
+		},
 	}
 
-	appErr = app.Run(os.Args)
+	// Add the run flags and hide them since the root command is deprected
+	addDeprecatedBreakdownFlags(rootCmd)
+	addRunInputFlags(rootCmd)
+	addRunOutputFlags(rootCmd)
+	rootCmd.Flags().VisitAll(func(f *pflag.Flag) {
+		f.Hidden = true
+	})
+
+	rootCmd.PersistentFlags().Bool("no-color", false, "Turn off colored output")
+	rootCmd.PersistentFlags().String("log-level", "", "Log level (trace, debug, info, warn, error, fatal)")
+
+	rootCmd.AddCommand(registerCmd(cfg))
+	rootCmd.AddCommand(diffCmd(cfg))
+	rootCmd.AddCommand(breakdownCmd(cfg))
+	rootCmd.AddCommand(outputCmd(cfg))
+	rootCmd.AddCommand(reportCmd(cfg))
+
+	rootCmd.SetVersionTemplate("Infracost {{.Version}}\n")
+
+	appErr = rootCmd.Execute()
 }
 
 func startUpdateCheck(cfg *config.Config, c chan *update.Info) {
@@ -133,8 +122,8 @@ func startUpdateCheck(cfg *config.Config, c chan *update.Info) {
 	}()
 }
 
-func versionOutput(app *cli.App) string {
-	return fmt.Sprintf("Infracost %s", app.Version)
+func versionOutput() string {
+	return fmt.Sprintf("Infracost %s", version.Version)
 }
 
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
@@ -169,7 +158,7 @@ func handleAppErr(cfg *config.Config, err error) {
 	events.SendReport(cfg, "error", msg)
 }
 
-func handleUnexpectedErr(cfg *config.Config, app *cli.App, unexpectedErr interface{}) {
+func handleUnexpectedErr(cfg *config.Config, unexpectedErr interface{}) {
 	if spinner != nil {
 		spinner.Fail()
 	}
@@ -178,16 +167,11 @@ func handleUnexpectedErr(cfg *config.Config, app *cli.App, unexpectedErr interfa
 	bold := color.New(color.Bold)
 	stack := string(debug.Stack())
 
-	v := ""
-	if app != nil {
-		v = versionOutput(app)
-	}
-
 	msg := fmt.Sprintf("\n%s\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
 		red.Sprint("An unexpected error occurred"),
 		unexpectedErr,
 		stack,
-		v,
+		versionOutput(),
 		red.Sprint("Please copy the above output and create a new issue at"),
 		bold.Sprint("https://github.com/infracost/infracost/issues/new"),
 	)
@@ -209,26 +193,33 @@ func handleUpdateMessage(updateMessageChan chan *update.Info) {
 	}
 }
 
-func loadGlobalFlags(cfg *config.Config, c *cli.Context) error {
-	if c.IsSet("no-color") {
-		cfg.NoColor = c.Bool("no-color")
+func loadGlobalFlags(cfg *config.Config, cmd *cobra.Command) error {
+	if cmd.Flags().Changed("no-color") {
+		cfg.NoColor, _ = cmd.Flags().GetBool("no-color")
 	}
 	color.NoColor = cfg.NoColor
 
-	if c.IsSet("log-level") {
-		cfg.LogLevel = c.String("log-level")
+	if cmd.Flags().Changed("log-level") {
+		cfg.LogLevel, _ = cmd.Flags().GetString("log-level")
 		err := cfg.ConfigureLogger()
 		if err != nil {
 			return err
 		}
 	}
 
-	if c.IsSet("pricing-api-endpoint") {
-		cfg.PricingAPIEndpoint = c.String("pricing-api-endpoint")
+	if cmd.Flags().Changed("pricing-api-endpoint") {
+		cfg.PricingAPIEndpoint, _ = cmd.Flags().GetString("pricing-api-endpoint")
 	}
 
 	cfg.Environment.IsDefaultPricingAPIEndpoint = cfg.PricingAPIEndpoint == cfg.DefaultPricingAPIEndpoint
-	cfg.Environment.Flags = c.FlagNames()
+
+	flagNames := make([]string, 0)
+
+	cmd.Flags().Visit(func(f *pflag.Flag) {
+		flagNames = append(flagNames, f.Name)
+	})
+
+	cfg.Environment.Flags = flagNames
 
 	return nil
 }

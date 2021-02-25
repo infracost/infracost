@@ -2,96 +2,86 @@ package main
 
 import (
 	"github.com/infracost/infracost/internal/config"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
-var deprecatedBreakdownFlags = []cli.Flag{
-	&cli.StringFlag{
-		Name:      "tfjson",
-		Usage:     "Path to Terraform plan JSON file",
-		TakesFile: true,
-		Hidden:    true,
-	},
-	&cli.StringFlag{
-		Name:      "tfplan",
-		Usage:     "Path to Terraform plan file relative to 'tfdir'",
-		TakesFile: true,
-		Hidden:    true,
-	},
-	&cli.BoolFlag{
-		Name:   "use-tfstate",
-		Usage:  "Use Terraform state instead of generating a plan",
-		Value:  false,
-		Hidden: true,
-	},
-	&cli.StringFlag{
-		Name:        "tfdir",
-		Usage:       "Path to the Terraform code directory",
-		TakesFile:   true,
-		DefaultText: "current working directory",
-		Hidden:      true,
-	},
-	&cli.StringFlag{
-		Name:   "tfflags",
-		Usage:  "Flags to pass to the 'terraform plan' command",
-		Hidden: true,
-	},
-	&cli.StringFlag{
-		Name:    "output",
-		Aliases: []string{"o"},
-		Usage:   "Output format: json, table, html",
-		Value:   "table",
-		Hidden:  true,
-	},
+func addDeprecatedBreakdownFlags(cmd *cobra.Command) {
+	cmd.Flags().String("tfjson", "", "Path to Terraform plan JSON file")
+	_ = cmd.Flags().MarkHidden("tfjson")
+
+	cmd.Flags().String("tfplan", "", "Path to Terraform plan file relative to 'terraform-dir'")
+	_ = cmd.Flags().MarkHidden("tfplan")
+
+	cmd.Flags().String("tfflags", "", "Flags to pass to the 'terraform plan' command")
+	_ = cmd.Flags().MarkHidden("tfflags")
+
+	cmd.Flags().String("tfdir", "", "Path to the Terraform code directory. Defaults to current working directory")
+	_ = cmd.Flags().MarkHidden("tfdir")
+
+	cmd.Flags().Bool("use-tfstate", false, "Use Terraform state instead of generating a plan")
+	_ = cmd.Flags().MarkHidden("use-tfstate")
+
+	cmd.Flags().StringP("output", "o", "table", "Output format: json, table, html")
+	_ = cmd.Flags().MarkHidden("output")
+
+	cmd.Flags().String("pricing-api-endpoint", "", "Specify an alternate Cloud Pricing API URL")
+	_ = cmd.Flags().MarkHidden("pricing-api-endpoint")
 }
 
-func breakdownCmd(cfg *config.Config) *cli.Command {
-	flags := make([]cli.Flag, 0)
+func breakdownCmd(cfg *config.Config) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "breakdown",
+		Short: "Generates a full breakdown of costs",
+		Long: `Generates a full breakdown of costs
 
-	flags = append(flags, deprecatedBreakdownFlags...)
-	flags = append(flags, runInputFlags...)
-	flags = append(flags, runOutputFlags...)
+Use terraform directory with any required terraform flags:
 
-	return &cli.Command{
-		Name:  "breakdown",
-		Usage: "Generates a full breakdown of costs",
-		UsageText: `infracost [global options] breakdown [command options] [arguments...]
+  infracost breakdown --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
 
-USAGE METHODS:
-	# 1. Use terraform directory with any required terraform flags
-	infracost breakdown --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+Use terraform state file:
 
-	# 2. Use terraform state file
-	infracost breakdown --terraform-dir /path/to/code --terraform-use-state
+  infracost breakdown --terraform-dir /path/to/code --terraform-use-state
 
-	# 3. Use terraform plan JSON
-	terraform plan -out plan.save .
-	terraform show -json plan.save > plan.json
-	infracost breakdown--terraform-json-file /path/to/plan.json
+Use terraform plan JSON:
 
-	# 4. Use terraform plan file, relative to terraform-dir
-	terraform plan -out plan.save .
-	infracost breakdown --terraform-dir /path/to/code --terraform-plan-file plan.save`,
-		Flags: flags,
-		Action: func(c *cli.Context) error {
-			handleDeprecatedEnvVars(c, deprecatedEnvVarMapping)
-			handleDeprecatedFlags(c, deprecatedFlagsMapping)
+  terraform plan -out plan.save .
+  terraform show -json plan.save > plan.json
+  infracost breakdown --terraform-json-file /path/to/plan.json
 
+Use terraform plan file, relative to terraform-dir:
+
+  terraform plan -out plan.save .
+  infracost breakdown --terraform-dir /path/to/code --terraform-plan-file plan.save`,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			handleDeprecatedEnvVars(deprecatedEnvVarMapping)
+			handleDeprecatedFlags(cmd, deprecatedFlagsMapping)
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkAPIKey(cfg.APIKey, cfg.PricingAPIEndpoint, cfg.DefaultPricingAPIEndpoint); err != nil {
 				return err
 			}
 
-			err := loadRunFlags(cfg, c)
+			err := loadRunFlags(cfg, cmd)
 			if err != nil {
 				return err
 			}
 
 			err = checkRunConfig(cfg)
 			if err != nil {
-				usageError(c, err.Error())
+				usageError(cmd, err.Error())
 			}
 
 			return runMain(cfg)
 		},
 	}
+
+	addDeprecatedBreakdownFlags(cmd)
+
+	addRunInputFlags(cmd)
+	addRunOutputFlags(cmd)
+
+	cmd.Flags().Bool("terraform-use-state", false, "Use Terraform state instead of generating a plan")
+	cmd.Flags().String("format", "table", "Output format: json, table, html")
+
+	return cmd
 }
