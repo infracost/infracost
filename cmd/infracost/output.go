@@ -76,6 +76,8 @@ Merge multiple Infracost JSON files:
 				b, err = output.ToJSON(combined, opts)
 			case "html":
 				b, err = output.ToHTML(combined, opts)
+			case "diff":
+				b, err = output.ToDiff(combined, opts)
 			default:
 				b, err = output.ToTable(combined, opts)
 			}
