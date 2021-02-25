@@ -18,6 +18,29 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func addDeprecatedRunFlags(cmd *cobra.Command) {
+	cmd.Flags().String("tfjson", "", "Path to Terraform plan JSON file")
+	_ = cmd.Flags().MarkHidden("tfjson")
+
+	cmd.Flags().String("tfplan", "", "Path to Terraform plan file relative to 'terraform-dir'")
+	_ = cmd.Flags().MarkHidden("tfplan")
+
+	cmd.Flags().String("tfflags", "", "Flags to pass to the 'terraform plan' command")
+	_ = cmd.Flags().MarkHidden("tfflags")
+
+	cmd.Flags().String("tfdir", "", "Path to the Terraform code directory. Defaults to current working directory")
+	_ = cmd.Flags().MarkHidden("tfdir")
+
+	cmd.Flags().Bool("use-tfstate", false, "Use Terraform state instead of generating a plan")
+	_ = cmd.Flags().MarkHidden("use-tfstate")
+
+	cmd.Flags().StringP("output", "o", "table", "Output format: json, table, html")
+	_ = cmd.Flags().MarkHidden("output")
+
+	cmd.Flags().String("pricing-api-endpoint", "", "Specify an alternate Cloud Pricing API URL")
+	_ = cmd.Flags().MarkHidden("pricing-api-endpoint")
+}
+
 func addRunInputFlags(cmd *cobra.Command) {
 	cmd.Flags().String("config-file", "", "Path to the Infracost config file. Cannot be used with other flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")

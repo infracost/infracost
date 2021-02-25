@@ -62,9 +62,10 @@ Generate a full cost breakdown from terraform directory with any required terraf
 
 Docs:
   https://infracost.io/docs`,
-		SilenceUsage:  true,
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			cmd.SilenceUsage = true
+
 			return loadGlobalFlags(cfg, cmd)
 		},
 		PreRun: func(cmd *cobra.Command, args []string) {
@@ -80,7 +81,7 @@ Docs:
 	}
 
 	// Add the run flags and hide them since the root command is deprected
-	addDeprecatedBreakdownFlags(rootCmd)
+	addDeprecatedRunFlags(rootCmd)
 	addRunInputFlags(rootCmd)
 	addRunOutputFlags(rootCmd)
 	rootCmd.Flags().VisitAll(func(f *pflag.Flag) {
@@ -115,7 +116,7 @@ func startUpdateCheck(cfg *config.Config, c chan *update.Info) {
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
 	if apiEndpoint == defaultEndpoint && apiKey == "" {
 		return errors.New(fmt.Sprintf(
-			"No INFRACOST_API_KEY environment variable is set.\n\nWe run a free Cloud Pricing API, to get an API key rum %s",
+			"No INFRACOST_API_KEY environment variable is set.\nWe run a free Cloud Pricing API, to get an API key run %s",
 			ui.PrimaryString("infracost register"),
 		))
 	}
