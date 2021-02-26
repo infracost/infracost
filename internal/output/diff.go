@@ -58,13 +58,19 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 			newCost = project.Breakdown.TotalMonthlyCost
 		}
 
-		s += fmt.Sprintf("%s %s\nAmount:  %s %s\nPercent: %s",
+		s += fmt.Sprintf("%s %s\nAmount:  %s %s",
 			ui.BoldString("Monthly cost change for"),
 			ui.BoldString(project.Name),
 			formatCostChange(project.Diff.TotalMonthlyCost),
 			ui.FaintStringf("(%s -> %s)", formatCost(oldCost), formatCost(newCost)),
-			formatPercentChange(oldCost, newCost),
 		)
+
+		percent := formatPercentChange(oldCost, newCost)
+		if percent != "" {
+			s += fmt.Sprintf("\nPercent: %s",
+				formatPercentChange(oldCost, newCost),
+			)
+		}
 
 		if i != len(out.Projects)-1 {
 			s += "\n\n"

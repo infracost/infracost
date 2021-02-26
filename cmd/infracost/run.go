@@ -176,7 +176,7 @@ func runMain(cfg *config.Config) error {
 }
 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
-	cmd.Flags().Changed("terraform-dir")
+	hasConfigFile := cmd.Flags().Changed("config-file")
 
 	hasProjectFlags := (cmd.Flags().Changed("terraform-dir") ||
 		cmd.Flags().Changed("terraform-plan-file") ||
@@ -188,17 +188,20 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasOutputFlags := (cmd.Flags().Changed("format") ||
 		cmd.Flags().Changed("show-skipped"))
 
-	if cmd.Flags().Changed("config-file") {
-		if hasProjectFlags || hasOutputFlags {
-			ui.PrintUsageErrorAndExit(cmd, "--config-file flag cannot be used with other project and output flags")
-		}
+	if hasConfigFile && hasProjectFlags {
+		ui.PrintUsageErrorAndExit(cmd, "--config-file flag cannot be used with other project and output flags")
+	}
 
+	if hasConfigFile {
 		configFile, _ := cmd.Flags().GetString("config-file")
-		return cfg.LoadFromFile(configFile)
+		err := cfg.LoadFromFile(configFile)
+
+		if err != nil {
+			return err
+		}
 	}
 
 	projectCfg := &config.TerraformProject{}
-	outputCfg := &config.Output{}
 
 	if hasProjectFlags {
 		cfg.Projects = config.Projects{
@@ -208,6 +211,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		}
 	}
 
+	outputCfg := &config.Output{}
 	if hasOutputFlags {
 		cfg.Outputs = []*config.Output{outputCfg}
 	}
