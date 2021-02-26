@@ -17,11 +17,13 @@ func TestS3Bucket(t *testing.T) {
 	tf := `
 		resource "aws_s3_bucket" "bucket1" {
 			bucket = "bucket1"
+
 			lifecycle_rule {
 				enabled = true
 				tags = {
 					Key = "value"
 				}
+				
 				transition {
 					storage_class = "INTELLIGENT_TIERING"
 				}

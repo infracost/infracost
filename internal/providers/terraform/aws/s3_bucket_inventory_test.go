@@ -18,16 +18,20 @@ func TestS3BucketInventoryConfiguration(t *testing.T) {
 		resource "aws_s3_bucket" "bucket1" {
 			bucket = "bucket1"
 		}
+
 		resource "aws_s3_bucket" "bucket2" {
 			bucket = "bucket2"
 		}
+
 		resource "aws_s3_bucket_inventory" "inventory" {
 			bucket = aws_s3_bucket.bucket1.bucket
 			name = "inventory"
 			included_object_versions = "All"
+
 			schedule {
 				frequency = "Daily"
 			}
+			
 			destination {
 				bucket {
 					format     = "CSV"
