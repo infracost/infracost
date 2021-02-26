@@ -5,6 +5,7 @@ import (
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
+	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
@@ -42,4 +43,45 @@ func TestS3AnalyticsConfiguration(t *testing.T) {
 	}
 
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+}
+
+func TestS3AnalyticsConfiguration_usage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_s3_bucket" "bucket1" {
+			bucket = "bucket1"
+		}
+
+		resource "aws_s3_bucket_analytics_configuration" "bucketanalytics" {
+			bucket = aws_s3_bucket.bucket1.bucket
+			name   = "bucketanalytics"
+		}`
+
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_s3_bucket_analytics_configuration.bucketanalytics": map[string]interface{}{
+			"monthly_monitored_objects": 10000000,
+		},
+	})
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name:      "aws_s3_bucket.bucket1",
+			SkipCheck: true,
+		},
+		{
+			Name: "aws_s3_bucket_analytics_configuration.bucketanalytics",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:             "Objects monitored",
+					PriceHash:        "40e9e08970971a42c21a13af035b210e-262e24dae0e085b444e6d3d16fd79991",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(10000000)),
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }
