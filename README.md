@@ -36,13 +36,13 @@ Infracost shows cloud cost estimates for Terraform projects. It helps developers
 
     The key is saved in `~/.config/infracost/credentials.yml`. If you prefer, you can run your own [Cloud Pricing API](https://www.infracost.io/docs/faq#can-i-run-my-own-cloud-pricing-api).
 
-3.  Run `infracost` using our example Terraform project to see how it works.
+3.  Run `infracost diff` using our example Terraform project to see how it works.
     ```sh
     git clone https://github.com/infracost/example-terraform.git
     cd example-terraform
 
     # You can play with `aws/main.tf` and `aws/infracost-usage.yml`, and re-run infracost to compare costs
-    infracost --terraform-dir aws --usage-file aws/infracost-usage.yml
+    infracost diff --terraform-dir aws --usage-file aws/infracost-usage.yml
     ```
 
 Please **watch/star** this repo as we add new cloud resources every week or so.
