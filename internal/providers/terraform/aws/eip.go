@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/shopspring/decimal"
 )
 
 func GetEIPRegistryItem() *schema.RegistryItem {
@@ -31,6 +32,7 @@ func NewEIP(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 				Name:           "IP address (if unused)",
 				Unit:           "hours",
 				UnitMultiplier: 1,
+				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(region),
