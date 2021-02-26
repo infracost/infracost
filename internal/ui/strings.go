@@ -13,7 +13,8 @@ var blue = color.New(color.FgHiBlue)
 var magenta = color.New(color.FgHiCyan)
 
 var bold = color.New(color.Bold)
-var faded = color.New(color.FgHiBlack)
+var faint = color.New(color.Faint)
+var underline = color.New(color.Underline)
 
 func PrimaryString(msg string) string {
 	return magenta.Sprint(msg)
@@ -63,10 +64,18 @@ func BoldStringf(msg string, a ...interface{}) string {
 	return BoldString(fmt.Sprintf(msg, a...))
 }
 
-func FadedString(url string) string {
-	return faded.Sprint(url)
+func FaintString(url string) string {
+	return faint.Sprint(url)
 }
 
-func FadedStringf(msg string, a ...interface{}) string {
-	return FadedString(fmt.Sprintf(msg, a...))
+func FaintStringf(msg string, a ...interface{}) string {
+	return FaintString(fmt.Sprintf(msg, a...))
+}
+
+func UnderlineString(url string) string {
+	return underline.Sprint(url)
+}
+
+func UnderlineStringf(msg string, a ...interface{}) string {
+	return UnderlineString(fmt.Sprintf(msg, a...))
 }

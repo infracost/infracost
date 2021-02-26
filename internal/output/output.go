@@ -5,7 +5,6 @@ import (
 	"sort"
 	"time"
 
-	"github.com/dustin/go-humanize"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -318,30 +317,6 @@ func sortResources(resources []Resource, groupKey string) {
 	})
 }
 
-func formatAmount(d decimal.Decimal) string {
-	f, _ := d.Float64()
-	if f < 0.00005 && f != 0 {
-		return fmt.Sprintf("%.g", f)
-	}
-
-	return humanize.FormatFloat("#,###.####", f)
-}
-
-func formatCost(d *decimal.Decimal) string {
-	if d == nil {
-		return "-"
-	}
-	return formatAmount(*d)
-}
-
-func formatQuantity(q *decimal.Decimal) string {
-	if q == nil {
-		return "-"
-	}
-	f, _ := q.Float64()
-	return humanize.CommafWithDigits(f, 4)
-}
-
 func contains(arr []string, e string) bool {
 	for _, a := range arr {
 		if a == e {
@@ -353,4 +328,34 @@ func contains(arr []string, e string) bool {
 
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
+}
+
+func breakdownHasNilCosts(breakdown Breakdown) bool {
+	for _, resource := range breakdown.Resources {
+		if resourceHasNilCosts(resource) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func resourceHasNilCosts(resource Resource) bool {
+	if resource.MonthlyCost == nil {
+		return true
+	}
+
+	for _, costComponent := range resource.CostComponents {
+		if costComponent.MonthlyCost == nil {
+			return true
+		}
+	}
+
+	for _, subResource := range resource.SubResources {
+		if resourceHasNilCosts(subResource) {
+			return true
+		}
+	}
+
+	return false
 }

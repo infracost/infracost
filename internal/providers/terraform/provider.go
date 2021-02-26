@@ -276,7 +276,7 @@ func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFa
 			msg += "Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable."
 			fmt.Fprintln(os.Stderr, msg)
 		} else if errors.Is(err, ErrInvalidCloudToken) {
-			msg := "Please check your TERRAFORM_CLOUD_TOKEN environment variable.\n"
+			msg := "Please set your TERRAFORM_CLOUD_TOKEN environment variable.\n"
 			msg += "It seems like Terraform Cloud's Remote Execution Mode is being used.\n"
 			msg += "Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable."
 			fmt.Fprintln(os.Stderr, msg)

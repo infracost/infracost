@@ -1,84 +1,111 @@
 package output
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 
-	"github.com/olekukonko/tablewriter"
-	log "github.com/sirupsen/logrus"
+	"github.com/infracost/infracost/internal/ui"
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 )
 
 func ToTable(out Root, opts Options) ([]byte, error) {
-	var buf bytes.Buffer
-	bufw := bufio.NewWriter(&buf)
+	s := ""
 
-	t := tablewriter.NewWriter(bufw)
-	t.SetHeader([]string{"NAME", "MONTHLY QTY", "UNIT", "PRICE", "HOURLY COST", "MONTHLY COST"})
-	t.SetBorder(false)
-	t.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
-	t.SetAutoWrapText(false)
-	t.SetCenterSeparator("")
-	t.SetColumnSeparator("")
-	t.SetRowSeparator("")
-	t.SetColumnAlignment([]int{
-		tablewriter.ALIGN_LEFT,  // name
-		tablewriter.ALIGN_RIGHT, // monthly quantity
-		tablewriter.ALIGN_LEFT,  // unit
-		tablewriter.ALIGN_RIGHT, // price
-		tablewriter.ALIGN_RIGHT, // hourly cost
-		tablewriter.ALIGN_RIGHT, // monthly cost
-	})
+	hasNilCosts := false
 
-	for _, r := range out.Resources {
-		t.Append([]string{r.Name, "", "", "", "", ""})
+	for i, project := range out.Projects {
+		if project.Breakdown == nil {
+			continue
+		}
 
-		buildCostComponentRows(t, r.CostComponents, "", len(r.SubResources) > 0, opts.NoColor)
-		buildSubResourceRows(t, r.SubResources, "", opts.NoColor)
+		if i != 0 {
+			s += "----------------------------------\n"
+		}
 
-		t.Append([]string{
-			"Total",
-			"",
-			"",
-			"",
-			formatCost(r.HourlyCost),
-			formatCost(r.MonthlyCost),
-		})
-		t.Append([]string{"", "", "", "", "", ""})
-	}
+		s += fmt.Sprintf("%s %s\n\n",
+			ui.BoldString("Project:"),
+			project.Name,
+		)
 
-	t.Append([]string{
-		"OVERALL TOTAL (USD)",
-		"",
-		"",
-		"",
-		formatCost(out.TotalHourlyCost),
-		formatCost(out.TotalMonthlyCost),
-	})
+		if breakdownHasNilCosts(*project.Breakdown) {
+			hasNilCosts = true
+		}
 
-	t.Render()
+		s += tableForBreakdown(*project.Breakdown)
+		s += "\n"
 
-	msg := out.unsupportedResourcesMessage(opts.ShowSkipped)
-	if msg != "" {
-		_, err := bufw.WriteString(fmt.Sprintf("\n%s", msg))
-		if err != nil {
-			// The error here would just mean the output is shortened, so no need to return an error to the user in this case
-			log.Errorf("Error writing unsupported resources message: %v", err.Error())
+		if i != len(out.Projects)-1 {
+			s += "\n"
 		}
 	}
 
-	bufw.Flush()
-	return buf.Bytes(), nil
+	unsupportedMsg := out.unsupportedResourcesMessage(opts.ShowSkipped)
+
+	if hasNilCosts || unsupportedMsg != "" {
+		s += "\n----------------------------------"
+	}
+
+	if hasNilCosts {
+		s += fmt.Sprintf("\nTo estimate usage-based resources use --usage-file, see %s",
+			ui.LinkString("https://infracost.io/usage-file"),
+		)
+
+		if unsupportedMsg != "" {
+			s += "\n"
+		}
+	}
+
+	if unsupportedMsg != "" {
+		s += "\n" + unsupportedMsg
+	}
+
+	return []byte(s), nil
 }
 
-func buildSubResourceRows(t *tablewriter.Table, subresources []Resource, prefix string, noColor bool) {
-	color := []tablewriter.Colors{
-		{tablewriter.FgHiBlackColor},
-	}
-	if noColor {
-		color = nil
+func tableForBreakdown(breakdown Breakdown) string {
+	t := table.NewWriter()
+	t.Style().Options.DrawBorder = false
+	t.Style().Options.SeparateColumns = false
+	t.Style().Options.SeparateRows = false
+	t.Style().Options.SeparateHeader = false
+	t.Style().Format.Header = text.FormatDefault
+
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 1, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
+		{Number: 2, Align: text.AlignRight, AlignHeader: text.AlignRight},
+		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
+		{Number: 4, Align: text.AlignRight, AlignHeader: text.AlignRight},
+	})
+
+	t.AppendHeader(table.Row{
+		ui.UnderlineString("Name"),
+		ui.UnderlineString("Quantity"),
+		ui.UnderlineString("Unit"),
+		ui.UnderlineString("Monthly Cost"),
+	})
+
+	t.AppendRow(table.Row{"", "", "", ""})
+
+	for _, r := range breakdown.Resources {
+		t.AppendRow(table.Row{ui.BoldString(r.Name), "", "", ""})
+
+		buildCostComponentRows(t, r.CostComponents, "", len(r.SubResources) > 0)
+		buildSubResourceRows(t, r.SubResources, "")
+
+		t.AppendRow(table.Row{"", "", "", ""})
 	}
 
+	t.AppendRow(table.Row{
+		ui.BoldString("PROJECT TOTAL"),
+		"",
+		"",
+		formatCost2DP(breakdown.TotalMonthlyCost),
+	})
+
+	return t.Render()
+}
+
+func buildSubResourceRows(t table.Writer, subresources []Resource, prefix string) {
 	for i, r := range subresources {
 		labelPrefix := prefix + "├─"
 		nextPrefix := prefix + "│  "
@@ -87,39 +114,41 @@ func buildSubResourceRows(t *tablewriter.Table, subresources []Resource, prefix 
 			nextPrefix = prefix + "   "
 		}
 
-		t.Rich([]string{fmt.Sprintf("%s %s", labelPrefix, r.Name)}, color)
+		t.AppendRow(table.Row{fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), r.Name)})
 
-		buildCostComponentRows(t, r.CostComponents, nextPrefix, len(r.SubResources) > 0, noColor)
-		buildSubResourceRows(t, r.SubResources, nextPrefix, noColor)
+		buildCostComponentRows(t, r.CostComponents, nextPrefix, len(r.SubResources) > 0)
+		buildSubResourceRows(t, r.SubResources, nextPrefix)
 	}
 }
 
-func buildCostComponentRows(t *tablewriter.Table, costComponents []CostComponent, prefix string, hasSubResources bool, noColor bool) {
-	color := []tablewriter.Colors{
-		{tablewriter.FgHiBlackColor},
-		{tablewriter.FgHiBlackColor},
-		{tablewriter.FgHiBlackColor},
-		{tablewriter.FgHiBlackColor},
-		{tablewriter.FgHiBlackColor},
-		{tablewriter.FgHiBlackColor},
-	}
-	if noColor {
-		color = nil
-	}
-
+func buildCostComponentRows(t table.Writer, costComponents []CostComponent, prefix string, hasSubResources bool) {
 	for i, c := range costComponents {
 		labelPrefix := prefix + "├─"
 		if !hasSubResources && i == len(costComponents)-1 {
 			labelPrefix = prefix + "└─"
 		}
 
-		t.Rich([]string{
-			fmt.Sprintf("%s %s", labelPrefix, c.Name),
-			formatQuantity(c.MonthlyQuantity),
-			c.Unit,
-			formatAmount(c.Price),
-			formatCost(c.HourlyCost),
-			formatCost(c.MonthlyCost),
-		}, color)
+		label := fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), c.Name)
+
+		if c.MonthlyCost == nil {
+			price := fmt.Sprintf("Cost depends on usage: %s per %s",
+				formatPrice(c.Price),
+				c.Unit,
+			)
+
+			t.AppendRow(table.Row{
+				label,
+				ui.FaintString(price),
+				ui.FaintString(price),
+				ui.FaintString(price),
+			}, table.RowConfig{AutoMerge: true, AlignAutoMerge: text.AlignLeft})
+		} else {
+			t.AppendRow(table.Row{
+				label,
+				formatQuantity(c.MonthlyQuantity),
+				c.Unit,
+				formatCost2DP(c.MonthlyCost),
+			})
+		}
 	}
 }

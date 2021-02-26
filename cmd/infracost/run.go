@@ -150,6 +150,9 @@ func runMain(cfg *config.Config) error {
 		case "diff":
 			b, err = output.ToDiff(r, opts)
 			out = fmt.Sprintf("\n%s", string(b))
+		case "table_deprecated":
+			b, err = output.ToTableDeprecated(r, opts)
+			out = fmt.Sprintf("\n%s", string(b))
 		default:
 			b, err = output.ToTable(r, opts)
 			out = fmt.Sprintf("\n%s", string(b))

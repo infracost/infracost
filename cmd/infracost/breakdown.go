@@ -49,6 +49,15 @@ Use terraform plan file, relative to terraform-dir:
 				ui.PrintUsageError(cmd, err.Error())
 			}
 
+			// Handle deprecated table output for root command
+			if cmd.Name() == "infracost" {
+				for _, outputCfg := range cfg.Outputs {
+					if outputCfg.Format == "" || outputCfg.Format == "table" {
+						outputCfg.Format = "table_deprecated"
+					}
+				}
+			}
+
 			return runMain(cfg)
 		},
 	}
