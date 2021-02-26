@@ -190,7 +190,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if cmd.Flags().Changed("config-file") {
 		if hasProjectFlags || hasOutputFlags {
-			ui.PrintUsageError(cmd, "--config-file flag cannot be used with other project and output flags")
+			ui.PrintUsageErrorAndExit(cmd, "--config-file flag cannot be used with other project and output flags")
 		}
 
 		configFile, _ := cmd.Flags().GetString("config-file")

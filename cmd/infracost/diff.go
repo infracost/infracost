@@ -46,7 +46,7 @@ Use terraform plan file, relative to terraform-dir:
 
 			err = checkRunConfig(cfg)
 			if err != nil {
-				ui.PrintUsageError(cmd, err.Error())
+				ui.PrintUsageErrorAndExit(cmd, err.Error())
 			}
 
 			cfg.Outputs = []*config.Output{

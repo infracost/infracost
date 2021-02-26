@@ -32,10 +32,12 @@ func PrintWarningf(msg string, a ...interface{}) {
 	PrintWarning(fmt.Sprintf(msg, a...))
 }
 
-func PrintUsageError(cmd *cobra.Command, msg string) {
-	fmt.Fprintln(os.Stderr, ErrorString(msg)+"\n")
+func PrintUsageErrorAndExit(cmd *cobra.Command, msg string) {
 	cmd.SetOut(os.Stderr)
 	_ = cmd.Help()
+	fmt.Fprintln(os.Stderr, "")
+	PrintError(msg)
+	os.Exit(1)
 }
 
 func PrintUnexpectedError(err interface{}, stack string) {
