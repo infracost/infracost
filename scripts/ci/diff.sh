@@ -30,8 +30,9 @@ process_args () {
   percentage_threshold=${percentage_threshold:-0}
   GITHUB_API_URL=${GITHUB_API_URL:-https://api.github.com}
   BITBUCKET_API_URL=${BITBUCKET_API_URL:-https://api.bitbucket.org}
+  INFRACOST_BINARY=${INFRACOST_BINARY:-infracost}
+
   # Export as it's used by infracost, not this script
-  export INFRACOST_BINARY=${INFRACOST_BINARY:-infracost}
   export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
   export INFRACOST_CI_DIFF=true
 
@@ -139,9 +140,7 @@ post_to_github () {
   fi
   
   echo "Posting comment to GitHub commit $GITHUB_SHA"
-  
   msg="$(build_msg true)"
-
   jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
     -H "Content-Type: application/json" \
     -H "Authorization: token $GITHUB_TOKEN" \
@@ -149,7 +148,6 @@ post_to_github () {
 }
 
 post_to_gitlab () {
-
   echo "Posting comment to GitLab commit $CI_COMMIT_SHA"
   msg="$(build_msg true)"
   jq -Mnc --arg msg "$msg" '{"note": "\($msg)"}' | curl -L -X POST -d @- \
