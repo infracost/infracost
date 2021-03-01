@@ -64,6 +64,8 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 		name = "Throughput Optimized HDD storage (st1)"
 	case "sc1":
 		name = "Cold HDD storage (sc1)"
+	case "gp3":
+		name = "General Purpose SSD storage (gp3)"
 	default:
 		name = "General Purpose SSD storage (gp2)"
 	}
