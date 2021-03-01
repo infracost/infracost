@@ -84,6 +84,10 @@ Docs:
 	addDeprecatedRunFlags(rootCmd)
 	addRunInputFlags(rootCmd)
 	addRunOutputFlags(rootCmd)
+
+	rootCmd.Flags().Bool("terraform-use-state", false, "Use Terraform state instead of generating a plan")
+	rootCmd.Flags().String("format", "table", "Output format: json, table, html")
+
 	rootCmd.Flags().VisitAll(func(f *pflag.Flag) {
 		f.Hidden = true
 	})
