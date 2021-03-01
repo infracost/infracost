@@ -44,7 +44,7 @@ func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 	}
 }
 
-func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.Decimal, iopsVal decimal.Decimal, IORequests *decimal.Decimal) []*schema.CostComponent {
+func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.Decimal, iopsVal decimal.Decimal, ioRequests *decimal.Decimal) []*schema.CostComponent {
 	if volumeAPIName == "" {
 		volumeAPIName = "gp2"
 	}
@@ -112,7 +112,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 			Name:            "I/O requests",
 			Unit:            "request",
 			UnitMultiplier:  1000000,
-			MonthlyQuantity: IORequests,
+			MonthlyQuantity: ioRequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
