@@ -66,6 +66,11 @@ resource_usage:
     monthly_outbound_other_region_gb: 750       # Monthly data transferred to other AWS regions.
     monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
 
+  aws_dx_connection.my_dx_connection:
+    monthly_outbound_region_to_dx_location_gb: 100 # Monthly data transferred between AWS region & DX location.
+    dx_virtual_interface_type: Private # Used for data transfer costs out over dx.
+    dx_connection_type: Dedicated # TF doesn't set the type of connection, but the per port hour charge differs between Dedicated and Hosted.
+
   aws_dx_gateway_association.my_gateway:
     monthly_data_processed_gb: 100 # Monthly data processed by the DX gateway association per month in GB.
 
