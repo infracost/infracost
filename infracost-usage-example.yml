@@ -107,6 +107,7 @@ resource_usage:
     monthly_requests: 100000 # Monthly requests to the Lambda function.
     request_duration_ms: 500 # Average duration of each request in milliseconds.
 
+  # The same can be used for the aws_alb resource too.
   aws_lb.my_lb:
     new_connections: 10000    # Number of newly established connections per second on average.
     active_connections: 10000 # Number of active connections per minute on average.
