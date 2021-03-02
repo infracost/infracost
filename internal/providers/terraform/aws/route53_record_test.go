@@ -27,62 +27,6 @@ func TestRoute53Record(t *testing.T) {
 			ttl     = "300"
 			records = ["10.0.0.1"]
 		}
-
-		resource "aws_route53_record" "geo" {
-			zone_id = aws_route53_zone.zone1.zone_id
-			name    = "geo.example.com"
-			type    = "A"
-			ttl     = "300"
-			records = ["10.0.0.2"]
-			geolocation_routing_policy {
-				continent = "NA"
-			}
-		}
-
-		resource "aws_route53_record" "latency" {
-			zone_id = aws_route53_zone.zone1.zone_id
-			name    = "latency.example.com"
-			type    = "A"
-			ttl     = "300"
-			records = ["10.0.0.3"]
-			latency_routing_policy {
-				region = "us-west-1"
-			}
-		}
-
-		resource "aws_elb" "elb1" {
-			availability_zones = ["us-east-1c"]
-			listener {
-				instance_port     = 80
-				instance_protocol = "http"
-				lb_port           = 80
-				lb_protocol       = "http"
-			}
-		}
-
-		resource "aws_route53_record" "alias1" {
-			zone_id = aws_route53_zone.zone1.zone_id
-			name    = "alias1.example.com"
-			type    = "A"
-
-			alias {
-				name                   = aws_elb.elb1.dns_name
-				zone_id                = aws_elb.elb1.zone_id
-				evaluate_target_health = true
-			}
-		}
-
-		resource "aws_route53_record" "alias2" {
-			zone_id = aws_route53_zone.zone1.zone_id
-			name    = "alias2.example.com"
-			type    = "A"
-
-			alias {
-				name                   = aws_route53_record.standard.name
-				zone_id                = aws_route53_record.standard.zone_id
-				evaluate_target_health = true
-			}
-		}
 		`
 
 	resourceChecks := []testutil.ResourceCheck{
@@ -91,45 +35,21 @@ func TestRoute53Record(t *testing.T) {
 			SkipCheck: true,
 		},
 		{
-			Name:      "aws_elb.elb1",
-			SkipCheck: true,
-		},
-		{
 			Name: "aws_route53_record.standard",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Standard queries",
+					Name:             "Standard queries (first 1B)",
 					PriceHash:        "c07c948553cc6492cc58c7b53b8dfdf2-ce48854e53280eca3824bf5039878612",
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
-			},
-		},
-		{
-			Name: "aws_route53_record.geo",
-			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Geo DNS queries",
+					Name:             "Geo DNS queries (first 1B)",
 					PriceHash:        "1565af203c9c0e9a59815a64b9c484d0-ce48854e53280eca3824bf5039878612",
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
-			},
-		},
-		{
-			Name: "aws_route53_record.latency",
-			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Latency based routing queries",
+					Name:             "Latency based routing queries (first 1B)",
 					PriceHash:        "82e2ac0a19cdd4c54fea556c3f8c3892-ce48854e53280eca3824bf5039878612",
-					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
-				},
-			},
-		},
-		{
-			Name: "aws_route53_record.alias2",
-			CostComponentChecks: []testutil.CostComponentCheck{
-				{
-					Name:             "Standard queries",
-					PriceHash:        "c07c948553cc6492cc58c7b53b8dfdf2-ce48854e53280eca3824bf5039878612",
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
@@ -149,61 +69,20 @@ func TestRoute53Record_usage(t *testing.T) {
 			name = "example.com"
 		}
 
-		resource "aws_route53_record" "standard" {
+		resource "aws_route53_record" "my_record" {
 			zone_id = aws_route53_zone.zone1.zone_id
 			name    = "standard.example.com"
 			type    = "A"
 			ttl     = "300"
 			records = ["10.0.0.1"]
 		}
-
-		resource "aws_route53_record" "geo" {
-			zone_id = aws_route53_zone.zone1.zone_id
-			name    = "geo.example.com"
-			type    = "A"
-			ttl     = "300"
-			records = ["10.0.0.2"]
-			geolocation_routing_policy {
-				continent = "NA"
-			}
-		}
-
-		resource "aws_route53_record" "latency" {
-			zone_id = aws_route53_zone.zone1.zone_id
-			name    = "latency.example.com"
-			type    = "A"
-			ttl     = "300"
-			records = ["10.0.0.3"]
-			latency_routing_policy {
-				region = "us-west-1"
-			}
-		}
-
-		resource "aws_route53_record" "alias" {
-			zone_id = aws_route53_zone.zone1.zone_id
-			name    = "alias2.example.com"
-			type    = "A"
-
-			alias {
-				name                   = aws_route53_record.standard.name
-				zone_id                = aws_route53_record.standard.zone_id
-				evaluate_target_health = true
-			}
-		}
 		`
 
 	usage := schema.NewUsageMap(map[string]interface{}{
-		"aws_route53_record.standard": map[string]interface{}{
-			"monthly_queries": 10000000,
-		},
-		"aws_route53_record.geo": map[string]interface{}{
-			"monthly_queries": 20000000,
-		},
-		"aws_route53_record.latency": map[string]interface{}{
-			"monthly_queries": 30000000,
-		},
-		"aws_route53_record.alias": map[string]interface{}{
-			"monthly_queries": 40000000,
+		"aws_route53_record.my_record": map[string]interface{}{
+			"monthly_standard_queries":      1100000000,
+			"monthly_latency_based_queries": 1200000000,
+			"monthly_geo_queries":           1500000000,
 		},
 	})
 
@@ -213,42 +92,37 @@ func TestRoute53Record_usage(t *testing.T) {
 			SkipCheck: true,
 		},
 		{
-			Name: "aws_route53_record.standard",
+			Name: "aws_route53_record.my_record",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Standard queries",
+					Name:             "Standard queries (first 1B)",
 					PriceHash:        "c07c948553cc6492cc58c7b53b8dfdf2-ce48854e53280eca3824bf5039878612",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(10000000)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(1000000000)),
 				},
-			},
-		},
-		{
-			Name: "aws_route53_record.geo",
-			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Geo DNS queries",
-					PriceHash:        "1565af203c9c0e9a59815a64b9c484d0-ce48854e53280eca3824bf5039878612",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(20000000)),
+					Name:             "Standard queries (over 1B)",
+					PriceHash:        "c07c948553cc6492cc58c7b53b8dfdf2-ce48854e53280eca3824bf5039878612",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100000000)),
 				},
-			},
-		},
-		{
-			Name: "aws_route53_record.latency",
-			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Latency based routing queries",
+					Name:             "Latency based routing queries (first 1B)",
 					PriceHash:        "82e2ac0a19cdd4c54fea556c3f8c3892-ce48854e53280eca3824bf5039878612",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(30000000)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(1000000000)),
 				},
-			},
-		},
-		{
-			Name: "aws_route53_record.alias",
-			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Standard queries",
-					PriceHash:        "c07c948553cc6492cc58c7b53b8dfdf2-ce48854e53280eca3824bf5039878612",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(40000000)),
+					Name:             "Latency based routing queries (over 1B)",
+					PriceHash:        "82e2ac0a19cdd4c54fea556c3f8c3892-ce48854e53280eca3824bf5039878612",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(200000000)),
+				},
+				{
+					Name:             "Geo DNS queries (first 1B)",
+					PriceHash:        "1565af203c9c0e9a59815a64b9c484d0-ce48854e53280eca3824bf5039878612",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(1000000000)),
+				},
+				{
+					Name:             "Geo DNS queries (over 1B)",
+					PriceHash:        "1565af203c9c0e9a59815a64b9c484d0-ce48854e53280eca3824bf5039878612",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(500000000)),
 				},
 			},
 		},
