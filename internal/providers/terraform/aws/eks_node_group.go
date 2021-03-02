@@ -144,6 +144,7 @@ func newEksEbsBlockDevice(name string, d *schema.ResourceData, region string) *s
 
 	iopsVal := decimal.Zero
 
-	return ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal)[0]
+	var unknown *decimal.Decimal
 
+	return ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal, unknown)[0]
 }
