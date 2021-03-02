@@ -218,6 +218,7 @@ var FreeResources []string = []string{
 	// AWS Lambda
 	"aws_lambda_permission",
 	"aws_lambda_function_event_invoke_config",
+	"aws_lambda_alias",
 
 	// AWS Others
 	"aws_db_instance_role_association",
