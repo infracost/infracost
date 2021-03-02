@@ -131,6 +131,11 @@ resource_usage:
   aws_nat_gateway.my_nat_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
+  aws_route53_record.my_record:
+    monthly_standard_queries: 1100000000      # Monthly number of Standard queries.
+    monthly_latency_based_queries: 1200000000 # Monthly number of Latency Based Routing queries.
+    monthly_geo_queries: 1500000000           # Monthly number of Geo DNS and Geoproximity queries.
+
   aws_route53_resolver_endpoint.my_endpoint:
     monthly_queries: 20000000000 # Monthly number of DNS queries processed through the endpoints.
 
