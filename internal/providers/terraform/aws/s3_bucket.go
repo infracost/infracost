@@ -39,8 +39,8 @@ func s3CostComponents(d *schema.ResourceData, u *schema.UsageData) []*schema.Cos
 	}
 
 	var objTags *decimal.Decimal
-	if u != nil && u.Get("monthly_object_tags").Exists() {
-		objTags = decimalPtr(decimal.NewFromInt(u.Get("monthly_object_tags").Int()))
+	if u != nil && u.Get("object_tags").Exists() {
+		objTags = decimalPtr(decimal.NewFromInt(u.Get("object_tags").Int()))
 	}
 
 	if objTagsEnabled {
@@ -104,25 +104,25 @@ func s3SubResources(d *schema.ResourceData, u *schema.UsageData) []*schema.Resou
 		}
 
 		if subResourceMap["Standard - infrequent access"] == nil {
-			if u.Get("standard_infrequent_access.monthly_data_storage_gb").Exists() {
+			if u.Get("standard_infrequent_access.storage_gb").Exists() {
 				subResourceMap["Standard - infrequent access"] = s3ResourceForStorageClass(region, "STANDARD_IA", u)
 			}
 		}
 
 		if subResourceMap["One zone - infrequent access"] == nil {
-			if u.Get("one_zone_infrequent_access.monthly_data_storage_gb").Exists() {
+			if u.Get("one_zone_infrequent_access.storage_gb").Exists() {
 				subResourceMap["One zone - infrequent access"] = s3ResourceForStorageClass(region, "ONEZONE_IA", u)
 			}
 		}
 
 		if subResourceMap["Glacier"] == nil {
-			if u.Get("glacier.monthly_data_storage_gb").Exists() {
+			if u.Get("glacier.storage_gb").Exists() {
 				subResourceMap["Glacier"] = s3ResourceForStorageClass(region, "GLACIER", u)
 			}
 		}
 
 		if subResourceMap["Glacier deep archive"] == nil {
-			if u.Get("glacier_deep_archive.monthly_data_storage_gb").Exists() {
+			if u.Get("glacier_deep_archive.storage_gb").Exists() {
 				subResourceMap["Glacier deep archive"] = s3ResourceForStorageClass(region, "DEEP_ARCHIVE", u)
 			}
 		}
@@ -140,18 +140,18 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 	switch storageClass {
 	case "STANDARD":
 		var dataStorage *decimal.Decimal
-		if u != nil && u.Get("standard.monthly_data_storage_gb").Exists() {
-			dataStorage = decimalPtr(decimal.NewFromInt(u.Get("standard.monthly_data_storage_gb").Int()))
+		if u != nil && u.Get("standard.storage_gb").Exists() {
+			dataStorage = decimalPtr(decimal.NewFromInt(u.Get("standard.storage_gb").Int()))
 		}
 
 		var pcplRequests *decimal.Decimal
-		if u != nil && u.Get("standard.monthly_pcpl_requests").Exists() {
-			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("standard.monthly_pcpl_requests").Int()))
+		if u != nil && u.Get("standard.monthly_tier_1_requests").Exists() {
+			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("standard.monthly_tier_1_requests").Int()))
 		}
 
 		var allOtherRequests *decimal.Decimal
-		if u != nil && u.Get("standard.monthly_all_other_requests").Exists() {
-			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("standard.monthly_all_other_requests").Int()))
+		if u != nil && u.Get("standard.monthly_tier_2_requests").Exists() {
+			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("standard.monthly_tier_2_requests").Int()))
 		}
 
 		var dataScanned *decimal.Decimal
@@ -191,18 +191,18 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 
 		var pcplRequests *decimal.Decimal
-		if u != nil && u.Get("intelligent_tiering.monthly_pcpl_requests").Exists() {
-			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.monthly_pcpl_requests").Int()))
+		if u != nil && u.Get("intelligent_tiering.monthly_tier_1_requests").Exists() {
+			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.monthly_tier_1_requests").Int()))
 		}
 
 		var allOtherRequests *decimal.Decimal
-		if u != nil && u.Get("intelligent_tiering.monthly_all_other_requests").Exists() {
-			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.monthly_all_other_requests").Int()))
+		if u != nil && u.Get("intelligent_tiering.monthly_tier_2_requests").Exists() {
+			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.monthly_tier_2_requests").Int()))
 		}
 
 		var lifecycleRequests *decimal.Decimal
-		if u != nil && u.Get("intelligent_tiering.monthly_lifecycle_requests").Exists() {
-			lifecycleRequests = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.monthly_lifecycle_requests").Int()))
+		if u != nil && u.Get("intelligent_tiering.monthly_lifecycle_transition_requests").Exists() {
+			lifecycleRequests = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.monthly_lifecycle_transition_requests").Int()))
 		}
 
 		var dataScanned *decimal.Decimal
@@ -216,8 +216,8 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 
 		var earlyDeletedData *decimal.Decimal
-		if u != nil && u.Get("intelligent_tiering.early_data_delete_gb").Exists() {
-			earlyDeletedData = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.early_data_delete_gb").Int()))
+		if u != nil && u.Get("intelligent_tiering.early_delete_gb").Exists() {
+			earlyDeletedData = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.early_delete_gb").Int()))
 		}
 
 		return &schema.Resource{
@@ -236,28 +236,28 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 	case "STANDARD_IA":
 		var dataStorage *decimal.Decimal
-		if u != nil && u.Get("standard_infrequent_access.monthly_data_storage_gb").Exists() {
-			dataStorage = decimalPtr(decimal.NewFromInt(u.Get("standard_infrequent_access.monthly_data_storage_gb").Int()))
+		if u != nil && u.Get("standard_infrequent_access.storage_gb").Exists() {
+			dataStorage = decimalPtr(decimal.NewFromInt(u.Get("standard_infrequent_access.storage_gb").Int()))
 		}
 
 		var pcplRequests *decimal.Decimal
-		if u != nil && u.Get("standard_infrequent_access.monthly_pcpl_requests").Exists() {
-			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("standard_infrequent_access.monthly_pcpl_requests").Int()))
+		if u != nil && u.Get("standard_infrequent_access.monthly_tier_1_requests").Exists() {
+			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("standard_infrequent_access.monthly_tier_1_requests").Int()))
 		}
 
 		var allOtherRequests *decimal.Decimal
-		if u != nil && u.Get("standard_infrequent_access.monthly_all_other_requests").Exists() {
-			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("standard_infrequent_access.monthly_all_other_requests").Int()))
+		if u != nil && u.Get("standard_infrequent_access.monthly_tier_2_requests").Exists() {
+			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("standard_infrequent_access.monthly_tier_2_requests").Int()))
 		}
 
 		var lifecycleRequests *decimal.Decimal
-		if u != nil && u.Get("standard_infrequent_access.monthly_lifecycle_requests").Exists() {
-			lifecycleRequests = decimalPtr(decimal.NewFromInt(u.Get("standard_infrequent_access.monthly_lifecycle_requests").Int()))
+		if u != nil && u.Get("standard_infrequent_access.monthly_lifecycle_transition_requests").Exists() {
+			lifecycleRequests = decimalPtr(decimal.NewFromInt(u.Get("standard_infrequent_access.monthly_lifecycle_transition_requests").Int()))
 		}
 
 		var retrievalData *decimal.Decimal
-		if u != nil && u.Get("standard_infrequent_access.monthly_retrievals_gb").Exists() {
-			retrievalData = decimalPtr(decimal.NewFromInt(u.Get("standard_infrequent_access.monthly_retrievals_gb").Int()))
+		if u != nil && u.Get("standard_infrequent_access.monthly_retrieval_gb").Exists() {
+			retrievalData = decimalPtr(decimal.NewFromInt(u.Get("standard_infrequent_access.monthly_retrieval_gb").Int()))
 		}
 
 		var dataScanned *decimal.Decimal
@@ -284,28 +284,28 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 	case "ONEZONE_IA":
 		var dataStorage *decimal.Decimal
-		if u != nil && u.Get("one_zone_infrequent_access.monthly_data_storage_gb").Exists() {
-			dataStorage = decimalPtr(decimal.NewFromInt(u.Get("one_zone_infrequent_access.monthly_data_storage_gb").Int()))
+		if u != nil && u.Get("one_zone_infrequent_access.storage_gb").Exists() {
+			dataStorage = decimalPtr(decimal.NewFromInt(u.Get("one_zone_infrequent_access.storage_gb").Int()))
 		}
 
 		var pcplRequests *decimal.Decimal
-		if u != nil && u.Get("one_zone_infrequent_access.monthly_pcpl_requests").Exists() {
-			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("one_zone_infrequent_access.monthly_pcpl_requests").Int()))
+		if u != nil && u.Get("one_zone_infrequent_access.monthly_tier_1_requests").Exists() {
+			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("one_zone_infrequent_access.monthly_tier_1_requests").Int()))
 		}
 
 		var allOtherRequests *decimal.Decimal
-		if u != nil && u.Get("one_zone_infrequent_access.monthly_all_other_requests").Exists() {
-			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("one_zone_infrequent_access.monthly_all_other_requests").Int()))
+		if u != nil && u.Get("one_zone_infrequent_access.monthly_tier_2_requests").Exists() {
+			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("one_zone_infrequent_access.monthly_tier_2_requests").Int()))
 		}
 
 		var lifecycleRequests *decimal.Decimal
-		if u != nil && u.Get("one_zone_infrequent_access.monthly_lifecycle_requests").Exists() {
-			lifecycleRequests = decimalPtr(decimal.NewFromInt(u.Get("one_zone_infrequent_access.monthly_lifecycle_requests").Int()))
+		if u != nil && u.Get("one_zone_infrequent_access.monthly_lifecycle_transition_requests").Exists() {
+			lifecycleRequests = decimalPtr(decimal.NewFromInt(u.Get("one_zone_infrequent_access.monthly_lifecycle_transition_requests").Int()))
 		}
 
 		var retrievalData *decimal.Decimal
-		if u != nil && u.Get("one_zone_infrequent_access.monthly_retrievals_gb").Exists() {
-			retrievalData = decimalPtr(decimal.NewFromInt(u.Get("one_zone_infrequent_access.monthly_retrievals_gb").Int()))
+		if u != nil && u.Get("one_zone_infrequent_access.monthly_retrieval_gb").Exists() {
+			retrievalData = decimalPtr(decimal.NewFromInt(u.Get("one_zone_infrequent_access.monthly_retrieval_gb").Int()))
 		}
 
 		var dataScanned *decimal.Decimal
@@ -332,28 +332,28 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 	case "GLACIER":
 		var dataStorage *decimal.Decimal
-		if u != nil && u.Get("glacier.monthly_data_storage_gb").Exists() {
-			dataStorage = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_data_storage_gb").Int()))
+		if u != nil && u.Get("glacier.storage_gb").Exists() {
+			dataStorage = decimalPtr(decimal.NewFromInt(u.Get("glacier.storage_gb").Int()))
 		}
 
 		var pcplRequests *decimal.Decimal
-		if u != nil && u.Get("glacier.monthly_pcpl_requests").Exists() {
-			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_pcpl_requests").Int()))
+		if u != nil && u.Get("glacier.monthly_tier_1_requests").Exists() {
+			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_tier_1_requests").Int()))
 		}
 
 		var allOtherRequests *decimal.Decimal
-		if u != nil && u.Get("glacier.monthly_all_other_requests").Exists() {
-			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_all_other_requests").Int()))
+		if u != nil && u.Get("glacier.monthly_tier_2_requests").Exists() {
+			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_tier_2_requests").Int()))
 		}
 
 		var lifecycleRequests *decimal.Decimal
-		if u != nil && u.Get("glacier.monthly_lifecycle_requests").Exists() {
-			lifecycleRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_lifecycle_requests").Int()))
+		if u != nil && u.Get("glacier.monthly_lifecycle_transition_requests").Exists() {
+			lifecycleRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_lifecycle_transition_requests").Int()))
 		}
 
 		var earlyDeletedData *decimal.Decimal
-		if u != nil && u.Get("glacier.early_data_delete_gb").Exists() {
-			earlyDeletedData = decimalPtr(decimal.NewFromInt(u.Get("glacier.early_data_delete_gb").Int()))
+		if u != nil && u.Get("glacier.early_delete_gb").Exists() {
+			earlyDeletedData = decimalPtr(decimal.NewFromInt(u.Get("glacier.early_delete_gb").Int()))
 		}
 
 		var stdDataScanned *decimal.Decimal
@@ -387,8 +387,8 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 
 		var stdRetrievalData *decimal.Decimal
-		if u != nil && u.Get("glacier.monthly_standard_data_retrievals_gb").Exists() {
-			stdRetrievalData = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_standard_data_retrievals_gb").Int()))
+		if u != nil && u.Get("glacier.monthly_standard_data_retrieval_gb").Exists() {
+			stdRetrievalData = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_standard_data_retrieval_gb").Int()))
 		}
 
 		var stdRetrievalReq *decimal.Decimal
@@ -397,8 +397,8 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 
 		var bulkRetrievalData *decimal.Decimal
-		if u != nil && u.Get("glacier.monthly_bulk_data_retrievals_gb").Exists() {
-			bulkRetrievalData = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_bulk_data_retrievals_gb").Int()))
+		if u != nil && u.Get("glacier.monthly_bulk_data_retrieval_gb").Exists() {
+			bulkRetrievalData = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_bulk_data_retrieval_gb").Int()))
 		}
 
 		var bulkRetrievalReq *decimal.Decimal
@@ -407,8 +407,8 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 
 		var expRetrievalData *decimal.Decimal
-		if u != nil && u.Get("glacier.monthly_expedited_data_retrievals_gb").Exists() {
-			expRetrievalData = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_expedited_data_retrievals_gb").Int()))
+		if u != nil && u.Get("glacier.monthly_expedited_data_retrieval_gb").Exists() {
+			expRetrievalData = decimalPtr(decimal.NewFromInt(u.Get("glacier.monthly_expedited_data_retrieval_gb").Int()))
 		}
 
 		var expRetrievalReq *decimal.Decimal
@@ -440,28 +440,28 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 	case "DEEP_ARCHIVE":
 		var dataStorage *decimal.Decimal
-		if u != nil && u.Get("glacier_deep_archive.monthly_data_storage_gb").Exists() {
-			dataStorage = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.monthly_data_storage_gb").Int()))
+		if u != nil && u.Get("glacier_deep_archive.storage_gb").Exists() {
+			dataStorage = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.storage_gb").Int()))
 		}
 
 		var pcplRequests *decimal.Decimal
-		if u != nil && u.Get("glacier_deep_archive.monthly_pcpl_requests").Exists() {
-			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.monthly_pcpl_requests").Int()))
+		if u != nil && u.Get("glacier_deep_archive.monthly_tier_1_requests").Exists() {
+			pcplRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.monthly_tier_1_requests").Int()))
 		}
 
 		var allOtherRequests *decimal.Decimal
-		if u != nil && u.Get("glacier_deep_archive.monthly_all_other_requests").Exists() {
-			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.monthly_all_other_requests").Int()))
+		if u != nil && u.Get("glacier_deep_archive.monthly_tier_2_requests").Exists() {
+			allOtherRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.monthly_tier_2_requests").Int()))
 		}
 
 		var lifecycleRequests *decimal.Decimal
-		if u != nil && u.Get("glacier_deep_archive.monthly_lifecycle_requests").Exists() {
-			lifecycleRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.monthly_lifecycle_requests").Int()))
+		if u != nil && u.Get("glacier_deep_archive.monthly_lifecycle_transition_requests").Exists() {
+			lifecycleRequests = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.monthly_lifecycle_transition_requests").Int()))
 		}
 
 		var stdRetrievalData *decimal.Decimal
-		if u != nil && u.Get("glacier_deep_archive.monthly_standard_data_retrievals_gb").Exists() {
-			stdRetrievalData = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.monthly_standard_data_retrievals_gb").Int()))
+		if u != nil && u.Get("glacier_deep_archive.monthly_standard_data_retrieval_gb").Exists() {
+			stdRetrievalData = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.monthly_standard_data_retrieval_gb").Int()))
 		}
 
 		var stdRetrievalReq *decimal.Decimal
@@ -470,8 +470,8 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 
 		var bulkRetrievalData *decimal.Decimal
-		if u != nil && u.Get("glacier_deep_archive.monthly_bulk_data_retrievals_gb").Exists() {
-			bulkRetrievalData = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.monthly_bulk_data_retrievals_gb").Int()))
+		if u != nil && u.Get("glacier_deep_archive.monthly_bulk_data_retrieval_gb").Exists() {
+			bulkRetrievalData = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.monthly_bulk_data_retrieval_gb").Int()))
 		}
 
 		var bulkRetrievalReq *decimal.Decimal
@@ -480,8 +480,8 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 
 		var earlyDeletedData *decimal.Decimal
-		if u != nil && u.Get("glacier_deep_archive.early_data_delete_gb").Exists() {
-			earlyDeletedData = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.early_data_delete_gb").Int()))
+		if u != nil && u.Get("glacier_deep_archive.early_delete_gb").Exists() {
+			earlyDeletedData = decimalPtr(decimal.NewFromInt(u.Get("glacier_deep_archive.early_delete_gb").Int()))
 		}
 
 		return &schema.Resource{
