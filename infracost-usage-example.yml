@@ -29,10 +29,11 @@ resource_usage:
     monthly_requests:  100000000 # Monthly requests to the Rest API Gateway.
 
   aws_apigatewayv2_api.my_v2_api:
-    monthly_requests: 100000000 # Monthly requests to the HTTP API Gateway.
-    request_size_kb: 512        # Average request size sent to the HTTP API Gateway in KB. Requests are metered in 512KB increments, maximum size is 10MB.
-    monthly_messages: 100000000 # Monthly number of messages sent to the Websocket API Gateway.
-    message_size_kb: 32         # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
+    monthly_requests: 100000000       # Monthly requests to the HTTP API Gateway.
+    request_size_kb: 512              # Average request size sent to the HTTP API Gateway in KB. Requests are metered in 512KB increments, maximum size is 10MB.
+    monthly_messages: 1500000000      # Monthly number of messages sent to the Websocket API Gateway.
+    message_size_kb: 32               # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
+    monthly_connection_mins: 10000000 # Monthly total connection minutes to Websockets.
 
   aws_cloudwatch_event_bus.my_events:
     monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.

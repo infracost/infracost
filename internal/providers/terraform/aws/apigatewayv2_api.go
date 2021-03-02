@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 )
 
@@ -33,197 +34,130 @@ func NewAPIGatewayv2Api(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 func httpAPICostComponent(d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
 	region := d.Get("region").String()
-	monthlyRequests := decimal.Zero
+	var monthlyRequests *decimal.Decimal
 	requestSize := decimal.NewFromInt(512)
 
 	billableRequestSize := decimal.NewFromInt(512)
 
-	var apiTierRequests = map[string]decimal.Decimal{
-		"apiRequestTierOne": decimal.Zero,
-		"apiRequestTierTwo": decimal.Zero,
-	}
+	httpAPITiers := []int{300000000}
 
-	// httpApi request tiers
-	apiTierOneLimit := decimal.NewFromInt(300000000)
-	apiTierTwoLimit := decimal.NewFromInt(300000001)
+	costComponents := []*schema.CostComponent{}
 
 	if u != nil && u.Get("monthly_requests").Exists() {
-		monthlyRequests = decimal.NewFromInt(u.Get("monthly_requests").Int())
+		monthlyRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_requests").Int()))
+
+		if u.Get("request_size_kb").Exists() {
+			requestSize = decimal.NewFromInt(u.Get("request_size_kb").Int())
+		}
+
+		if requestSize.GreaterThan(billableRequestSize) {
+			monthlyRequests = calculateBillableRequests(&requestSize, &billableRequestSize, monthlyRequests)
+		}
+
+		apiRequestQuantities := usage.CalculateTierBuckets(*monthlyRequests, httpAPITiers)
+
+		costComponents = append(costComponents, httpCostComponent(region, "Requests (first 300M)", "0", &apiRequestQuantities[0]))
+
+		if apiRequestQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
+			costComponents = append(costComponents, httpCostComponent(region, "Requests (over 300M)", "300000000", &apiRequestQuantities[1]))
+		}
+	} else {
+		var unknown *decimal.Decimal
+
+		costComponents = append(costComponents, httpCostComponent(region, "Requests (first 300M)", "0", unknown))
 	}
 
-	if u != nil && u.Get("request_size_kb").Exists() {
-		requestSize = decimal.NewFromInt(u.Get("request_size_kb").Int())
-	}
-
-	if requestSize.GreaterThan(billableRequestSize) {
-		monthlyRequests = calculateBillableRequests(requestSize, billableRequestSize, monthlyRequests)
-	}
-
-	apiRequestQuantities := calculateAPIV2Requests(monthlyRequests, apiTierRequests, apiTierOneLimit, apiTierTwoLimit)
-
-	apiTierOne := apiRequestQuantities["apiRequestTierOne"]
-	apiTierTwo := apiRequestQuantities["apiRequestTierTwo"]
-
-	CostComponent := []*schema.CostComponent{
-		{
-			Name:            "Requests (first 300M)",
-			Unit:            "requests",
-			UnitMultiplier:  1000000,
-			MonthlyQuantity: &apiTierOne,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonApiGateway"),
-				ProductFamily: strPtr("API Calls"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayHttpRequest/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("0"),
-			},
-		},
-	}
-
-	if apiTierTwo.GreaterThan(decimal.NewFromInt(0)) {
-		CostComponent = append(CostComponent, &schema.CostComponent{
-			Name:            "Requests (over 300M)",
-			Unit:            "requests",
-			UnitMultiplier:  1000000,
-			MonthlyQuantity: &apiTierTwo,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonApiGateway"),
-				ProductFamily: strPtr("API Calls"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayHttpRequest/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("300000000"),
-			},
-		})
-	}
-
-	return CostComponent
+	return costComponents
 }
 
 func websocketAPICostComponent(d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
 	region := d.Get("region").String()
-	monthlyMessages := decimal.Zero
-	messageSize := decimal.NewFromInt(32)
+	var monthlyMessages *decimal.Decimal
+	var monthlyConnectionMinutes *decimal.Decimal
 
-	monthlyConnectionMinutes := decimal.Zero
+	messageSize := decimal.NewFromInt(32)
 
 	billableRequestSize := decimal.NewFromInt(32)
 
-	var apiTierRequests = map[string]decimal.Decimal{
-		"apiRequestTierOne": decimal.Zero,
-		"apiRequestTierTwo": decimal.Zero,
-	}
-
 	// Websocket request tiers
-	apiTierOneLimt := decimal.NewFromInt(1000000000)
-	apiTierTwoLimit := decimal.NewFromInt(1000000001)
+	websocketAPITiers := []int{1000000000}
+
+	costComponents := []*schema.CostComponent{}
 
 	if u != nil && u.Get("monthly_messages").Exists() {
-		monthlyMessages = decimal.NewFromInt(u.Get("monthly_messages").Int())
+		monthlyMessages = decimalPtr(decimal.NewFromInt(u.Get("monthly_messages").Int()))
+
+		if u.Get("message_size_kb").Exists() {
+			messageSize = decimal.NewFromInt(u.Get("message_size_kb").Int())
+		}
+
+		if messageSize.GreaterThan(billableRequestSize) {
+			monthlyMessages = calculateBillableRequests(&messageSize, &billableRequestSize, monthlyMessages)
+		}
+
+		apiRequestQuantities := usage.CalculateTierBuckets(*monthlyMessages, websocketAPITiers)
+
+		costComponents = append(costComponents, websocketCostComponent(region, "messages", "ApiGatewayMessage", "Messages (first 1B)", "0", &apiRequestQuantities[0]))
+
+		if apiRequestQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
+			costComponents = append(costComponents, websocketCostComponent(region, "messages", "ApiGatewayMessage", "Messages (over 1B)", "1000000000", &apiRequestQuantities[1]))
+		}
+	} else {
+		var unknown *decimal.Decimal
+
+		costComponents = append(costComponents, websocketCostComponent(region, "messages", "ApiGatewayMessage", "Messages (first 1B)", "0", unknown))
 	}
 
-	if u != nil && u.Get("message_size_kb").Exists() {
-		messageSize = decimal.NewFromInt(u.Get("message_size_kb").Int())
+	if u != nil && u.Get("monthly_connection_mins").Exists() {
+		monthlyConnectionMinutes = decimalPtr(decimal.NewFromInt(u.Get("monthly_connection_mins").Int()))
 	}
+	costComponents = append(costComponents, websocketCostComponent(region, "minutes", "ApiGatewayMinute", "Connection duration", "0", monthlyConnectionMinutes))
 
-	if messageSize.GreaterThan(billableRequestSize) {
-		monthlyMessages = calculateBillableRequests(messageSize, billableRequestSize, monthlyMessages)
-	}
-
-	apiRequestQuantities := calculateAPIV2Requests(monthlyMessages, apiTierRequests, apiTierOneLimt, apiTierTwoLimit)
-
-	apiTierOne := apiRequestQuantities["apiRequestTierOne"]
-	apiTierTwo := apiRequestQuantities["apiRequestTierTwo"]
-
-	costComponent := []*schema.CostComponent{
-		{
-			Name:            "Messages (first 1B)",
-			Unit:            "messages",
-			UnitMultiplier:  1000000,
-			MonthlyQuantity: &apiTierOne,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonApiGateway"),
-				ProductFamily: strPtr("WebSocket"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayMessage/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("0"),
-			},
-		},
-		{
-			Name:            "Connection duration",
-			Unit:            "minutes",
-			UnitMultiplier:  1000000,
-			MonthlyQuantity: &monthlyConnectionMinutes,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonApiGateway"),
-				ProductFamily: strPtr("WebSocket"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayMinute/")},
-				},
-			},
-		},
-	}
-
-	if apiTierTwo.GreaterThan(decimal.NewFromInt(0)) {
-		costComponent = append(costComponent, &schema.CostComponent{
-			Name:            "Messages (over 1B)",
-			Unit:            "messages",
-			UnitMultiplier:  1000000,
-			MonthlyQuantity: &apiTierTwo,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonApiGateway"),
-				ProductFamily: strPtr("WebSocket"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayMessage/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("1000000000"),
-			},
-		})
-	}
-
-	return costComponent
-
+	return costComponents
 }
 
-func calculateAPIV2Requests(requests decimal.Decimal, apiRequestTiers map[string]decimal.Decimal, apiTierOneLimit decimal.Decimal, apiTierTwoLimit decimal.Decimal) map[string]decimal.Decimal {
-
-	if requests.GreaterThanOrEqual(apiTierOneLimit) {
-		apiRequestTiers["apiRequestTierOne"] = apiTierOneLimit
-	} else {
-		apiRequestTiers["apiRequestTierOne"] = requests
-		return apiRequestTiers
-	}
-
-	if requests.GreaterThanOrEqual(apiTierTwoLimit) {
-		apiRequestTiers["apiRequestTierTwo"] = apiTierTwoLimit
-	} else {
-		apiRequestTiers["apiRequestTierTwo"] = requests.Sub(apiTierOneLimit)
-		return apiRequestTiers
-	}
-
-	return apiRequestTiers
+func calculateBillableRequests(requestSize *decimal.Decimal, billableRequestSize *decimal.Decimal, requests *decimal.Decimal) *decimal.Decimal {
+	return decimalPtr(requests.Mul(requestSize.Div(*billableRequestSize).Ceil()))
 }
 
-func calculateBillableRequests(requestSize decimal.Decimal, billableRequestSize decimal.Decimal, requests decimal.Decimal) decimal.Decimal {
-	return requests.Mul(requestSize.Div(billableRequestSize).Ceil())
+func httpCostComponent(region string, displayName string, usageTier string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            displayName,
+		Unit:            "requests",
+		UnitMultiplier:  1000000,
+		MonthlyQuantity: monthlyQuantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonApiGateway"),
+			ProductFamily: strPtr("API Calls"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayHttpRequest/")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr(usageTier),
+		},
+	}
+}
+
+func websocketCostComponent(region string, unit string, usageType string, displayName string, usageTier string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            displayName,
+		Unit:            unit,
+		UnitMultiplier:  1000000,
+		MonthlyQuantity: monthlyQuantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonApiGateway"),
+			ProductFamily: strPtr("WebSocket"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/" + usageType + "/")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr(usageTier),
+		},
+	}
 }
