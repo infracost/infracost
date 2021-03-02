@@ -72,10 +72,14 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 
 func eksComputeCostComponent(d *schema.ResourceData, region string, desiredSize int64, instanceType string) *schema.CostComponent {
 
-	purchaseOptionLabel := "on-demand"
+	purchaseOptionLabel := "on_demand"
+
+	if d.Get("capacity_type").String() != "" {
+		purchaseOptionLabel = strings.ToLower(d.Get("capacity_type").String())
+	}
 
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Linux/UNIX usage (%s, %s)", purchaseOptionLabel, instanceType),
+		Name:           fmt.Sprintf("Linux/UNIX usage (%s, %s)", strings.Replace(purchaseOptionLabel, "_", "-", 1), instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredSize)),
@@ -93,7 +97,7 @@ func eksComputeCostComponent(d *schema.ResourceData, region string, desiredSize 
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("on_demand"),
+			PurchaseOption: strPtr(purchaseOptionLabel),
 		},
 	}
 }
