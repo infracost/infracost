@@ -23,6 +23,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetDBInstanceRegistryItem(),
 	GetDMSRegistryItem(),
 	GetDocDBClusterInstanceRegistryItem(),
+	GetDXConnectionRegistryItem(),
 	GetDXGatewayAssociationRegistryItem(),
 	GetDynamoDBTableRegistryItem(),
 	GetEBSSnapshotCopyRegistryItem(),
@@ -112,8 +113,19 @@ var FreeResources []string = []string{
 	"aws_apigatewayv2_vpc_link",
 
 	// AWS DX Transit.
+	"aws_dx_bgp_peer",
 	"aws_dx_gateway",
 	"aws_dx_gateway_association_proposal",
+	"aws_dx_hosted_private_virtual_interface",
+	"aws_dx_hosted_private_virtual_interface_accepter",
+	"aws_dx_hosted_public_virtual_interface",
+	"aws_dx_hosted_public_virtual_interface_accepter",
+	"aws_dx_hosted_transit_virtual_interface",
+	"aws_dx_hosted_transit_virtual_interface_accepter",
+	"aws_dx_lag",
+	"aws_dx_private_virtual_interface",
+	"aws_dx_public_virtual_interface",
+	"aws_dx_transit_virtual_interface",
 
 	// AWS Cloudfront
 	"aws_cloudfront_origin_access_identity",
@@ -218,6 +230,7 @@ var FreeResources []string = []string{
 	// AWS Lambda
 	"aws_lambda_permission",
 	"aws_lambda_function_event_invoke_config",
+	"aws_lambda_alias",
 
 	// AWS Others
 	"aws_db_instance_role_association",

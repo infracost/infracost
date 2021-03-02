@@ -72,11 +72,53 @@ func TestElastiCacheCluster(t *testing.T) {
 				{
 					Name:             "Backup storage",
 					PriceHash:        "5a1365e07213003f7a7b9deaa791b017-ee3dd7e4624338037ca6fea0933a662f",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(0)),
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 			},
 		},
 	}
 
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+}
+
+func TestElastiCacheCluster_usage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+    resource "aws_elasticache_cluster" "redis_snapshot" {
+        cluster_id = "cluster-example"
+        engine = "redis"
+        node_type = "cache.m6g.12xlarge"
+        num_cache_nodes = 1
+        parameter_group_name = "default.redis3.2"
+        snapshot_retention_limit = 2
+    }
+	`
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_elasticache_cluster.redis_snapshot": map[string]interface{}{
+			"snapshot_storage_size_gb": 10000,
+		},
+	})
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_elasticache_cluster.redis_snapshot",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:             "Elasticache (on-demand, cache.m6g.12xlarge)",
+					PriceHash:        "3f3987c22a11fe709398881c9a36dc2a-d2c98780d7b6e36641b521f1f8145c6f",
+					MonthlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:             "Backup storage",
+					PriceHash:        "5a1365e07213003f7a7b9deaa791b017-ee3dd7e4624338037ca6fea0933a662f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(10000)),
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }

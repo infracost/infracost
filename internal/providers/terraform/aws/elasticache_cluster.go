@@ -38,7 +38,7 @@ func NewElastiCacheCluster(d *schema.ResourceData, u *schema.UsageData) *schema.
 
 func newElasticacheResource(d *schema.ResourceData, u *schema.UsageData, nodeType string, cacheNodes decimal.Decimal, cacheEngine string) *schema.Resource {
 	region := d.Get("region").String()
-	var backupRetention, monthlyBackupStorageTotal, snapShotRetentionLimit decimal.Decimal
+	var backupRetention, snapShotRetentionLimit decimal.Decimal
 
 	if d.Get("snapshot_retention_limit").Exists() {
 		snapShotRetentionLimit = decimal.NewFromInt(d.Get("snapshot_retention_limit").Int())
@@ -69,17 +69,18 @@ func newElasticacheResource(d *schema.ResourceData, u *schema.UsageData, nodeTyp
 
 	if cacheEngine == "redis" && snapShotRetentionLimit.GreaterThan(decimal.NewFromInt(1)) {
 		backupRetention = snapShotRetentionLimit.Sub(decimal.NewFromInt(1))
+		var monthlyBackupStorageTotal *decimal.Decimal
 
-		if u != nil && u.Get("backup_storage").Exists() {
-			snapshotSize := decimal.NewFromInt(u.Get("snapshot_storage_size").Int())
-			monthlyBackupStorageTotal = snapshotSize.Mul(backupRetention)
+		if u != nil && u.Get("snapshot_storage_size_gb").Exists() {
+			snapshotSize := decimal.NewFromInt(u.Get("snapshot_storage_size_gb").Int())
+			monthlyBackupStorageTotal = decimalPtr(snapshotSize.Mul(backupRetention))
 		}
 
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Backup storage",
 			Unit:            "GB-months",
 			UnitMultiplier:  1,
-			MonthlyQuantity: &monthlyBackupStorageTotal,
+			MonthlyQuantity: monthlyBackupStorageTotal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),

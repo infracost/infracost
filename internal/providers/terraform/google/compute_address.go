@@ -2,6 +2,7 @@ package google
 
 import (
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/shopspring/decimal"
 )
 
 func GetComputeAddressRegistryItem() *schema.RegistryItem {
@@ -47,7 +48,7 @@ func standardVMComputeAddress() *schema.CostComponent {
 		Name:           "IP address (if used by standard VM)",
 		Unit:           "hours",
 		UnitMultiplier: 1,
-		HourlyQuantity: nil,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
 			Region:        strPtr("global"),
@@ -68,7 +69,7 @@ func preemptibleVMComputeAddress() *schema.CostComponent {
 		Name:           "IP address (if used by preemptible VM)",
 		Unit:           "hours",
 		UnitMultiplier: 1,
-		HourlyQuantity: nil,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
 			Region:        strPtr("global"),
@@ -89,7 +90,7 @@ func unusedVMComputeAddress(region string) *schema.CostComponent {
 		Name:           "IP address (if unused)",
 		Unit:           "hours",
 		UnitMultiplier: 1,
-		HourlyQuantity: nil,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
 			Region:        strPtr(region),
