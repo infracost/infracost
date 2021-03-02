@@ -24,8 +24,8 @@ func NewFSXWindowsFS(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	storageSize := decimalPtr(decimal.NewFromInt(d.Get("storage_capacity").Int()))
 
 	var backupStorage *decimal.Decimal
-	if u != nil && u.Get("monthly_backup_storage_gb").Exists() {
-		backupStorage = decimalPtr(decimal.NewFromInt(u.Get("monthly_backup_storage_gb").Int()))
+	if u != nil && u.Get("backup_storage_gb").Exists() {
+		backupStorage = decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
 	}
 
 	return &schema.Resource{

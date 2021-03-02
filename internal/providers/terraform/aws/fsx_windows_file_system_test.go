@@ -109,7 +109,7 @@ func TestFSXWindowsFS_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_fsx_windows_file_system.example": map[string]interface{}{
-			"monthly_backup_storage_gb": 6000,
+			"backup_storage_gb": 6000,
 		},
 	})
 
