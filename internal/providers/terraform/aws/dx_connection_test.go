@@ -40,7 +40,7 @@ func TestDXConnection(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "Outbound data transfer to dx location EqDC2",
+					Name:            "Outbound data transfer (to EqDC2)",
 					PriceHash:       "e4ca252b0e2ad70c7e9c5138ade2eded-b1ae3861dc57e2db217fa83a7420374f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(100)),
 				},

@@ -2,9 +2,10 @@ package aws
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
-	"strings"
 
 	"github.com/shopspring/decimal"
 )
@@ -59,12 +60,12 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "capacity", ValueRegex: strPtr(dxBandwidth)},
 						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", dxLocation))},
-						{Key: "connectionType", Value: strPtr(connectionType)},
+						{Key: "connectionType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", connectionType))},
 					},
 				},
 			},
 			{
-				Name:            fmt.Sprintf("Outbound data transfer to dx location %s", dxLocation),
+				Name:            fmt.Sprintf("Outbound data transfer (to %s)", dxLocation),
 				Unit:            "GB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: gbDataProcessed,
@@ -75,7 +76,7 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "fromLocation", Value: strPtr(fromLocation)},
 						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s-DataXfer-Out/", dxLocation))},
-						{Key: "virtualInterfaceType", Value: strPtr(virtualInterfaceType)},
+						{Key: "virtualInterfaceType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", virtualInterfaceType))},
 					},
 				},
 			},
