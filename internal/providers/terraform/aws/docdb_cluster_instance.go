@@ -21,23 +21,23 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 	instanceType := d.Get("instance_class").String()
 
 	var storageRate *decimal.Decimal
-	if u != nil && u.Get("monthly_data_storage_gb").Exists() {
-		storageRate = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_storage_gb").Int()))
+	if u != nil && u.Get("data_storage_gb").Exists() {
+		storageRate = decimalPtr(decimal.NewFromInt(u.Get("data_storage_gb").Int()))
 	}
 
 	var ioRequests *decimal.Decimal
-	if u != nil && u.Get("monthly_input_output_operations").Exists() {
-		ioRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_input_output_operations").Int()))
+	if u != nil && u.Get("monthly_io_request").Exists() {
+		ioRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_io_request").Int()))
 	}
 
 	var backupStorage *decimal.Decimal
-	if u != nil && u.Get("monthly_backup_storage_gb").Exists() {
-		backupStorage = decimalPtr(decimal.NewFromInt(u.Get("monthly_backup_storage_gb").Int()))
+	if u != nil && u.Get("backup_storage_gb").Exists() {
+		backupStorage = decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
 	}
 
 	var cpuCreditsT3 *decimal.Decimal
-	if u != nil && u.Get("cpu_credits").Exists() {
-		cpuCreditsT3 = decimalPtr(decimal.NewFromInt(u.Get("cpu_credits").Int()))
+	if u != nil && u.Get("monthly_cpu_credit_hours").Exists() {
+		cpuCreditsT3 = decimalPtr(decimal.NewFromInt(u.Get("monthly_cpu_credit_hours").Int()))
 	}
 
 	costComponents := []*schema.CostComponent{

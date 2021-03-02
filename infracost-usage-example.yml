@@ -70,10 +70,10 @@ resource_usage:
     monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
 
   aws_docdb_cluster_instance.my_db:
-    monthly_data_storage_gb: 1000              # Monthly amount of storage for the cluster.
-    monthly_input_output_operations: 100000000 # Monthly number of IOs for the cluster.
-    monthly_backup_storage_gb: 10000           # Monthly amount of backup storage that is in excess of 100% of the storage size for the cluster.
-    cpu_credits: 1000                          # Will be charged if your average CPU utilization over a rolling 24-hour period exceeds the baseline of the instance. 
+    data_storage_gb: 1000         # Total storage for cluster in GB.
+    monthly_io_request: 100000000 # Monthly number of input/output requests for cluster.
+    backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
+    monthly_cpu_credit_hours: 100 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances. 
 
   aws_dx_gateway_association.my_gateway:
     monthly_data_processed_gb: 100 # Monthly data processed by the DX gateway association per month in GB.

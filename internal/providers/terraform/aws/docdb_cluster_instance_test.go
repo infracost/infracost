@@ -74,15 +74,15 @@ func TestNewDocDBClusterInstance_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_docdb_cluster_instance.medium": map[string]interface{}{
-			"monthly_data_storage_gb":         1000,
-			"monthly_input_output_operations": 10000000,
-			"monthly_backup_storage_gb":       1000,
-			"cpu_credits":                     10,
+			"data_storage_gb":          1000,
+			"monthly_io_request":       10000000,
+			"backup_storage_gb":        1000,
+			"monthly_cpu_credit_hours": 10,
 		},
 		"aws_docdb_cluster_instance.large": map[string]interface{}{
-			"monthly_data_storage_gb":         1000,
-			"monthly_input_output_operations": 10000000,
-			"monthly_backup_storage_gb":       1000,
+			"data_storage_gb":    1000,
+			"monthly_io_request": 10000000,
+			"backup_storage_gb":  1000,
 		},
 	})
 
