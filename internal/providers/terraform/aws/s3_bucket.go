@@ -98,7 +98,7 @@ func s3SubResources(d *schema.ResourceData, u *schema.UsageData) []*schema.Resou
 
 	if u != nil {
 		if subResourceMap["Intelligent tiering"] == nil {
-			if u.Get("intelligent_tiering.monthly_frequent_access_storage_gb").Exists() {
+			if u.Get("intelligent_tiering.frequent_access_storage_gb").Exists() {
 				subResourceMap["Intelligent tiering"] = s3ResourceForStorageClass(region, "INTELLIGENT_TIERING", u)
 			}
 		}
@@ -176,18 +176,18 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 		}
 	case "INTELLIGENT_TIERING":
 		var frequentDataStorage *decimal.Decimal
-		if u != nil && u.Get("intelligent_tiering.monthly_frequent_access_storage_gb").Exists() {
-			frequentDataStorage = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.monthly_frequent_access_storage_gb").Int()))
+		if u != nil && u.Get("intelligent_tiering.frequent_access_storage_gb").Exists() {
+			frequentDataStorage = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.frequent_access_storage_gb").Int()))
 		}
 
 		var infrequentDataStorage *decimal.Decimal
-		if u != nil && u.Get("intelligent_tiering.monthly_infrequent_access_storage_gb").Exists() {
-			infrequentDataStorage = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.monthly_infrequent_access_storage_gb").Int()))
+		if u != nil && u.Get("intelligent_tiering.infrequent_access_storage_gb").Exists() {
+			infrequentDataStorage = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.infrequent_access_storage_gb").Int()))
 		}
 
 		var monitAutoObg *decimal.Decimal
-		if u != nil && u.Get("intelligent_tiering.monthly_monitoring_automation_objects").Exists() {
-			monitAutoObg = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.monthly_monitoring_automation_objects").Int()))
+		if u != nil && u.Get("intelligent_tiering.monitored_objects").Exists() {
+			monitAutoObg = decimalPtr(decimal.NewFromInt(u.Get("intelligent_tiering.monitored_objects").Int()))
 		}
 
 		var pcplRequests *decimal.Decimal

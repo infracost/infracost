@@ -127,7 +127,7 @@ resource_usage:
     monthly_listed_objects: 100000000 # Monthly number of listed objects.
 
   aws_s3_bucket.my_bucket:
-    object_tags: 10000000 # Monthly tags.
+    object_tags: 10000000 # Total object tags.
     standard: # Usages of S3 Standard:
       storage_gb: 10000 # Total storage in GB.
       monthly_tier_1_requests: 1000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
@@ -135,9 +135,9 @@ resource_usage:
       monthly_select_data_scanned_gb: 10000 # Monthly data scanned by S3 Select in GB.
       monthly_select_data_returned_gb: 1000 # Monthly data returned by S3 Select in GB.
     intelligent_tiering: # Usages of S3 Intelligent - Tiering:
-      monthly_frequent_access_storage_gb: 20000 # Monthly data storage for Frequent Access Tier in GB.
-      monthly_infrequent_access_storage_gb: 20000 # Monthly data storage for Infrequent Access Tier in GB.
-      monthly_monitoring_automation_objects: 2000 # Monthly Monitoring and Automation objects.
+      frequent_access_storage_gb: 20000 # Total storage for Frequent Access Tier in GB.
+      infrequent_access_storage_gb: 20000 # Total storage for Infrequent Access Tier in GB.
+      monitored_objects: 2000 # Total objects monitored by the Intelligent Tiering.
       monthly_tier_1_requests: 2000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
       monthly_tier_2_requests: 200000 # Monthly GET, SELECT, and all other requests (Tier 2).
       monthly_lifecycle_transition_requests: 200000 # Monthly Lifecycle Transition requests.
