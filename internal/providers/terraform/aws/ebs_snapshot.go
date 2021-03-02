@@ -27,18 +27,18 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 
 	var listBlockRequests *decimal.Decimal
-	if u != nil && u.Get("list_blocks_requests").Exists() {
-		listBlockRequests = decimalPtr(decimal.NewFromInt(u.Get("list_blocks_requests").Int()))
+	if u != nil && u.Get("monthly_list_block_requests").Exists() {
+		listBlockRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_list_block_requests").Int()))
 	}
 
 	var getSnapshotBlockRequests *decimal.Decimal
-	if u != nil && u.Get("get_snapshot_block_requests").Exists() {
-		getSnapshotBlockRequests = decimalPtr(decimal.NewFromInt(u.Get("get_snapshot_block_requests").Int()))
+	if u != nil && u.Get("monthly_get_block_requests").Exists() {
+		getSnapshotBlockRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_get_block_requests").Int()))
 	}
 
 	var putSnapshotBlockRequests *decimal.Decimal
-	if u != nil && u.Get("put_snapshot_block_requests").Exists() {
-		putSnapshotBlockRequests = decimalPtr(decimal.NewFromInt(u.Get("put_snapshot_block_requests").Int()))
+	if u != nil && u.Get("monthly_put_block_requests").Exists() {
+		putSnapshotBlockRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_put_block_requests").Int()))
 	}
 
 	costComponents := []*schema.CostComponent{

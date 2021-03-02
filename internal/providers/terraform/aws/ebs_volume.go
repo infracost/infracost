@@ -34,8 +34,8 @@ func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 	}
 
 	var monthlyIORequests *decimal.Decimal
-	if u != nil && u.Get("monthly_input_output_operations").Exists() {
-		monthlyIORequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_input_output_operations").Int()))
+	if u != nil && u.Get("monthly_standard_io_requests").Exists() {
+		monthlyIORequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_standard_io_requests").Int()))
 	}
 
 	return &schema.Resource{

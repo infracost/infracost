@@ -78,9 +78,9 @@ func TestEBSSnapshot_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_ebs_snapshot.gp2": map[string]interface{}{
-			"list_blocks_requests":        1000000,
-			"get_snapshot_block_requests": 100000,
-			"put_snapshot_block_requests": 100000,
+			"monthly_list_block_requests": 1000000,
+			"monthly_get_block_requests":  100000,
+			"monthly_put_block_requests":  100000,
 		},
 	})
 
