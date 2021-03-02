@@ -94,6 +94,9 @@ resource_usage:
     monthly_infrequent_access_read_gb: 50   # Monthly infrequent access read requests in GB.
     monthly_infrequent_access_write_gb: 100 # Monthly infrequent access write requests in GB.
 
+  aws_elasticache_cluster.my_redis_snapshot:
+    snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB. 
+
   aws_instance.windows_instance:
     operating_system: windows # Override the operating system of the instance, can be: windows, suse, rhel.
 
