@@ -24,7 +24,7 @@ func TestS3Bucket(t *testing.T) {
 				tags = {
 					Key = "value"
 				}
-
+				
 				transition {
 					storage_class = "INTELLIGENT_TIERING"
 				}

@@ -19,7 +19,7 @@ func TestS3AnalyticsConfiguration(t *testing.T) {
 		resource "aws_s3_bucket" "bucket1" {
 			bucket = "bucket1"
 		}
-
+		
 		resource "aws_s3_bucket_analytics_configuration" "bucketanalytics" {
 			bucket = aws_s3_bucket.bucket1.bucket
 			name   = "bucketanalytics"

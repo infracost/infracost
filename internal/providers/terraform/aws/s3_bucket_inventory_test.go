@@ -32,7 +32,7 @@ func TestS3BucketInventoryConfiguration(t *testing.T) {
 			schedule {
 				frequency = "Daily"
 			}
-
+			
 			destination {
 				bucket {
 					format     = "CSV"
