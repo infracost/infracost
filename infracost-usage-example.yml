@@ -97,12 +97,22 @@ resource_usage:
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB. 
 
+  aws_elb.my_elb:
+    monthly_data_processed_gb: 10000 # Monthly data processed by a Classic Load Balancer in GB.
+
   aws_instance.windows_instance:
     operating_system: windows # Override the operating system of the instance, can be: windows, suse, rhel.
 
   aws_lambda_function.my_function:
     monthly_requests: 100000 # Monthly requests to the Lambda function.
     request_duration_ms: 500 # Average duration of each request in milliseconds.
+
+  # The same can be used for the aws_alb resource too.
+  aws_lb.my_lb:
+    new_connections: 10000    # Number of newly established connections per second on average.
+    active_connections: 10000 # Number of active connections per minute on average.
+    processed_bytes_gb: 1000  # The number of bytes processed by the load balancer for HTTP(S) requests and responses in GB.
+    rule_evaluations: 10000   # The product of number of rules processed by the load balancer and the request rate.
 
   aws_nat_gateway.my_nat_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
