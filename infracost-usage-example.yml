@@ -106,6 +106,75 @@ resource_usage:
   aws_route53_resolver_endpoint.my_endpoint:
     monthly_queries: 20000000000 # Monthly number of DNS queries processed through the endpoints.
 
+  aws_s3_bucket_analytics_configuration.my_config:
+    monthly_monitored_objects: 10000000 # Monthly number of monitored objects by S3 Analytics Storage Class Analysis.
+
+  aws_s3_bucket_inventory.my_inventory:
+    monthly_listed_objects: 100000000 # Monthly number of listed objects.
+
+  aws_s3_bucket.my_bucket:
+    monthly_object_tags: 10000000 # Monthly tags.
+    standard: # Usages of S3 Standard:
+      monthly_data_storage_gb: 10000 # Monthly data storage in GB.
+      monthly_pcpl_requests: 1000000 # Monthly PUT, COPY, POST, LIST requests.
+      monthly_all_other_requests: 100000 # Monthly GET, SELECT, and all other requests.
+      monthly_select_data_scanned_gb: 10000 # Monthly Data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 1000 # Monthly Data returned by S3 Select in GB.
+    intelligent_tiering: # Usages of S3 Intelligent - Tiering:
+      monthly_frequent_access_storage_gb: 20000 # Monthly data storage for Frequent Access Tier in GB.
+      monthly_infrequent_access_storage_gb: 20000 # Monthly data storage for Infrequent Access Tier in GB.
+      monthly_monitoring_automation_objects: 2000 # Monthly Monitoring and Automation objects.
+      monthly_pcpl_requests: 2000000 # Monthly PUT, COPY, POST, LIST requests.
+      monthly_all_other_requests: 200000 # Monthly GET, SELECT, and all other requests.
+      monthly_lifecycle_requests: 200000 # Monthly Lifecycle Transition requests.
+      monthly_select_data_scanned_gb: 20000 # Monthly Data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 2000 # Monthly Data returned by S3 Select in GB.
+      early_data_delete_gb: 200000 # If an archive is deleted within 1 months of being uploaded, you will be charged an early deletion fee per GB.
+    standard_infrequent_access: # Usages of S3 Standard - Infrequent Access:
+      monthly_data_storage_gb: 30000 # Monthly data storage in GB.
+      monthly_pcpl_requests: 3000000 # Monthly PUT, COPY, POST, LIST requests.
+      monthly_all_other_requests: 300000 # Monthly GET, SELECT, and all other requests.
+      monthly_lifecycle_requests: 300000 # Monthly Lifecycle Transition requests.
+      monthly_retrievals_gb: 30000 # Monthly Data retrievals in GB
+      monthly_select_data_scanned_gb: 30000 # Monthly Data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 3000 # Monthly Data returned by S3 Select in GB.
+    one_zone_infrequent_access: # Usages of S3 One Zone - Infrequent Access:
+      monthly_data_storage_gb: 40000 # Monthly data storage in GB.
+      monthly_pcpl_requests: 4000000 # Monthly PUT, COPY, POST, LIST requests.
+      monthly_all_other_requests: 400000 # Monthly GET, SELECT, and all other requests.
+      monthly_lifecycle_requests: 400000 # Monthly Lifecycle Transition requests.
+      monthly_retrievals_gb: 40000 # Monthly Data retrievals in GB
+      monthly_select_data_scanned_gb: 40000 # Monthly Data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 4000 # Monthly Data returned by S3 Select in GB.
+    glacier: # Usages of S3 Glacier:
+      monthly_data_storage_gb: 50000 # Monthly data storage in GB.
+      monthly_pcpl_requests: 5000000 # Monthly PUT, COPY, POST, LIST requests.
+      monthly_all_other_requests: 500000 # Monthly GET, SELECT, and all other requests.
+      monthly_lifecycle_requests: 500000 # Monthly Lifecycle Transition requests.
+      monthly_standard_select_data_scanned_gb: 500000 # Monthly Data scanned by S3 Select in GB (for standard level of S3 Glacier).
+      monthly_standard_select_data_returned_gb: 500000 # Monthly Data returned by S3 Select in GB (for standard level of S3 Glacier).
+      monthly_bulk_select_data_scanned_gb: 500000 # Monthly Data scanned by S3 Select in GB (for bulk level of S3 Glacier)
+      monthly_bulk_select_data_returned_gb: 500000 # Monthly Data returned by S3 Select in GB (for bulk level of S3 Glacier)
+      monthly_expedited_select_data_scanned_gb: 500000 # Monthly Data scanned by S3 Select in GB (for expedited level of S3 Glacier)
+      monthly_expedited_select_data_returned_gb: 500000 # Monthly Data returned by S3 Select in GB (for expedited level of S3 Glacier)
+      monthly_standard_data_retrieval_requests: 500000 # Monthly Data Retrieval requests (for standard level of S3 Glacier).
+      monthly_bulk_data_retrieval_requests: 500000 # Monthly Data Retrieval requests (for bulk level of S3 Glacier).
+      monthly_expedited_data_retrieval_requests: 500000 # Monthly Data Retrieval requests (for expedited level of S3 Glacier).
+      monthly_standard_data_retrievals_gb: 5000 # Monthly Data retrievals in GB (for standard level of S3 Glacier).
+      monthly_bulk_data_retrievals_gb: 5000 # Monthly Data retrievals in GB (for bulk level of S3 Glacier).
+      monthly_expedited_data_retrievals_gb: 5000 # Monthly Data retrievals in GB (for expedited level of S3 Glacier).
+      early_data_delete_gb: 500000 # If an archive is deleted within 3 months of being uploaded, you will be charged an early deletion fee per GB.
+    glacier_deep_archive: # Usages of S3 Glacier Deep Archive:
+      monthly_data_storage_gb: 60000 # Monthly data storage in GB.
+      monthly_pcpl_requests: 6000000 # Monthly PUT, COPY, POST, LIST requests.
+      monthly_all_other_requests: 600000 # Monthly GET, SELECT, and all other requests.
+      monthly_lifecycle_requests: 600000 # Monthly Lifecycle Transition requests.
+      monthly_standard_data_retrieval_requests: 600000 # Monthly Data Retrieval requests (for standard level of S3 Glacier).
+      monthly_bulk_data_retrieval_requests: 600000 # Monthly Data Retrieval requests (for bulk level of S3 Glacier).
+      monthly_standard_data_retrievals_gb: 6000 # Monthly Data retrievals in GB (for standard level of S3 Glacier).
+      monthly_bulk_data_retrievals_gb: 6000 # Monthly Data retrievals in GB (for bulk level of S3 Glacier).
+      early_data_delete_gb: 600000 # If an archive is deleted within 6 months of being uploaded, you will be charged an early deletion fee per GB.
+
   aws_secretsmanager_secret.my_secret:
     monthly_requests: 1000000 # Monthly API requests to Secrets Manager.
 
