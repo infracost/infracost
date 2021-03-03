@@ -35,7 +35,17 @@ func runMain(cfg *config.Config) error {
 		provider := providers.Detect(cfg, projectCfg)
 
 		if provider == nil {
-			return fmt.Errorf("Could not detect path type for %s", ui.DisplayPath(projectCfg.Path))
+			m := fmt.Sprintf("Could not detect input type for %s", ui.DisplayPath(projectCfg.Path))
+
+			if projectCfg.Path == "" {
+				m += fmt.Sprintf("\n%s %s %s",
+					"You can specify the path to your Terraform code directory or Terraform plan JSON file using the",
+					ui.PrimaryString("--path"),
+					"flag.",
+				)
+			}
+
+			return errors.New(m)
 		}
 
 		m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
