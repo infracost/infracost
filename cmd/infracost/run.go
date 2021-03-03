@@ -17,16 +17,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func addRunInputFlags(cmd *cobra.Command) {
+func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().String("path", "", "Path to the code directory or file")
 	cmd.Flags().String("config-file", "", "Path to the Infracost config file. Cannot be used with other flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
 
 	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to the 'terraform plan' command")
 	cmd.Flags().String("terraform-workspace", "", "The Terraform workspace to use")
-}
 
-func addRunOutputFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free. Ignored for JSON outputs")
 }
 

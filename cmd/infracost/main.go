@@ -72,25 +72,17 @@ Docs:
 			deprecationMsg := "The root command is deprecated and will be removed in v0.8.0. Please use `infracost breakdown`."
 			ui.PrintWarning(deprecationMsg)
 
-			handleDeprecatedEnvVars(deprecatedEnvVarMapping)
-			handleDeprecatedFlags(cmd, deprecatedFlagsMapping)
+			processDeprecatedEnvVars()
+			processDeprecatedFlags(cmd)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// The root command will be deprecated
 			return breakdownCmd(cfg).RunE(cmd, args)
 		},
 	}
 
-	// Add the run flags and hide them since the root command is deprected
-	addDeprecatedRunFlags(rootCmd)
-	addRunInputFlags(rootCmd)
-	addRunOutputFlags(rootCmd)
-
-	rootCmd.Flags().Bool("terraform-use-state", false, "Use Terraform state instead of generating a plan")
-	rootCmd.Flags().String("format", "table", "Output format: json, table, html")
-
-	rootCmd.Flags().VisitAll(func(f *pflag.Flag) {
-		f.Hidden = true
-	})
+	// Add deprecated flags since the root command is deprecated
+	addRootDeprecatedFlags(rootCmd)
 
 	rootCmd.PersistentFlags().Bool("no-color", false, "Turn off colored output")
 	rootCmd.PersistentFlags().String("log-level", "", "Log level (trace, debug, info, warn, error, fatal)")

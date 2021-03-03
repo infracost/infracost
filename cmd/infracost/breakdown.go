@@ -30,10 +30,6 @@ Use terraform plan file:
 
   terraform plan -out plan.save .
   infracost breakdown --path plan.save`,
-		PreRun: func(cmd *cobra.Command, args []string) {
-			handleDeprecatedEnvVars(deprecatedEnvVarMapping)
-			handleDeprecatedFlags(cmd, deprecatedFlagsMapping)
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkAPIKey(cfg.APIKey, cfg.PricingAPIEndpoint, cfg.DefaultPricingAPIEndpoint); err != nil {
 				return err
@@ -49,17 +45,11 @@ Use terraform plan file:
 				ui.PrintUsageErrorAndExit(cmd, err.Error())
 			}
 
-			// Handle deprecated table output for root command
-			if cmd.Name() == "infracost" && (cfg.Format == "" || cfg.Format == "table") {
-				cfg.Format = "table_deprecated"
-			}
-
 			return runMain(cfg)
 		},
 	}
 
-	addRunInputFlags(cmd)
-	addRunOutputFlags(cmd)
+	addRunFlags(cmd)
 
 	cmd.Flags().Bool("terraform-use-state", false, "Use Terraform state instead of generating a plan")
 	cmd.Flags().String("format", "table", "Output format: json, table, html")

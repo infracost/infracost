@@ -30,10 +30,6 @@ Use terraform plan file:
 
   terraform plan -out plan.save .
   infracost diff --path plan.save`,
-		PreRun: func(cmd *cobra.Command, args []string) {
-			handleDeprecatedEnvVars(deprecatedEnvVarMapping)
-			handleDeprecatedFlags(cmd, deprecatedFlagsMapping)
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkAPIKey(cfg.APIKey, cfg.PricingAPIEndpoint, cfg.DefaultPricingAPIEndpoint); err != nil {
 				return err
@@ -55,8 +51,7 @@ Use terraform plan file:
 		},
 	}
 
-	addRunInputFlags(cmd)
-	addRunOutputFlags(cmd)
+	addRunFlags(cmd)
 
 	return cmd
 }

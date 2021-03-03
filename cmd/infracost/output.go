@@ -29,10 +29,6 @@ Create HTML report from multiple Infracost JSON files:
 Merge multiple Infracost JSON files:
 
   infracost output --format json out*.json`,
-		PreRun: func(cmd *cobra.Command, args []string) {
-			handleDeprecatedEnvVars(deprecatedEnvVarMapping)
-			handleDeprecatedFlags(cmd, deprecatedFlagsMapping)
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			files := args
 
@@ -106,6 +102,7 @@ func reportCmd(cfg *config.Config) *cobra.Command {
 	cmd.Long = ui.WarningString(deprecationMsg)
 
 	cmd.PreRun = func(cmd *cobra.Command, args []string) {
+		processDeprecatedEnvVars()
 		ui.PrintWarning(deprecationMsg)
 	}
 
