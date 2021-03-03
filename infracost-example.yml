@@ -1,6 +1,7 @@
 ## Use a config file to describe multiple Terraform projects
 ## `infracost breakdown --config-file infracost-projects.yml
 ## Uncomment lines and edit as required. See https://www.infracost.io/docs/config_file for docs.
+version: 0.1
 
 ## YAML anchors can be used to share and override default configs between projects
 # project_default: &project_default

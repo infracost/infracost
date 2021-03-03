@@ -10,7 +10,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+var outputVersion = "0.1"
+
 type Root struct {
+	Version          string           `json:"version"`
 	Resources        []Resource       `json:"resources"`        // Keeping for backward compatibility.
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`  // Keeping for backward compatibility.
 	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"` // Keeping for backward compatibility.
@@ -176,6 +179,7 @@ func ToOutputFormat(projects []*schema.Project) Root {
 	sortResources(outResources, "")
 
 	out := Root{
+		Version:          outputVersion,
 		Resources:        outResources,
 		TotalHourlyCost:  totalHourlyCost,
 		TotalMonthlyCost: totalMonthlyCost,
