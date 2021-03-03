@@ -371,11 +371,6 @@ func printTerraformErr(err error) {
 		msg += "\nSpecify the -var-file flag as a path relative to your Terraform directory.\n"
 		msg += "For example: infracost --path=path/to/terraform --terraform-plan-flags=\"-var-file=myvars.tfvars\"\n"
 	}
-	// TODO
-	// if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a project or plan file.") {
-	// 	msg += "\nSpecify the --terraform-plan-file flag as a path relative to your Terraform directory.\n"
-	// 	msg += "For example: infracost --terraform-dir=path/to/terraform --terraform-plan-file=plan.save\n"
-	// }
 
 	fmt.Fprintln(os.Stderr, msg)
 }
