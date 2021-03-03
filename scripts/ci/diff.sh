@@ -11,19 +11,20 @@
 
 process_args () {
   # Set variables based on the order for GitHub Actions, or the env value for other CIs
-  terraform_json_file=${1:-$terraform_json_file}
-  terraform_plan_file=${2:-$terraform_plan_file}
-  terraform_dir=${3:-$terraform_dir}
+  path_flag=${1:-$path_flag}
   terraform_plan_flags=${4:-$terraform_plan_flags}
-
+  terraform_workspace=${4:-$terraform_workspace}
   percentage_threshold=${5:-$percentage_threshold}
   usage_file=${6:-$usage_file}
   config_file=${7:-$config_file}
 
   # Handle deprecated var names
-  terraform_json_file=${terraform_json_file:-$tfjson}
-  terraform_plan_file=${terraform_plan_file:-$tfplan}
-  terraform_dir=${terraform_dir:-$tfdir}
+  path_flag=${path_flag:-$tfjson}
+  path_flag=${path_flag:-$terraform_json_file}
+  path_flag=${path_flag:-$tfplan}
+  path_flag=${path_flag:-$terraform_plan_file}
+  path_flag=${path_flag:-$tfdir}
+  path_flag=${path_flag:-$terraform_dir}
   terraform_plan_flags=${terraform_plan_flags:-$tfflags}
 
   # Set defaults
@@ -53,14 +54,8 @@ process_args () {
 build_breakdown_cmd () {
   breakdown_cmd="${INFRACOST_BINARY} breakdown --no-color --format=json"
 
-  if [ ! -z "$terraform_json_file" ]; then
-    breakdown_cmd="$breakdown_cmd --terraform-json-file $terraform_json_file"
-  fi
-  if [ ! -z "$terraform_plan_file" ]; then
-    breakdown_cmd="$breakdown_cmd --terraform-plan-file $terraform_plan_file"
-  fi
-  if [ ! -z "$terraform_dir" ]; then
-    breakdown_cmd="$breakdown_cmd --terraform-dir $terraform_dir"
+  if [ ! -z "$path_flag" ]; then
+    breakdown_cmd="$breakdown_cmd --path $path_flag"
   fi
   if [ ! -z "$terraform_plan_flags" ]; then
     breakdown_cmd="$breakdown_cmd --terraform-plan-flags \"$terraform_plan_flags\""
@@ -255,5 +250,9 @@ elif [ ! -z "$CIRCLECI" ]; then
 elif [ ! -z "$BITBUCKET_PIPELINES" ]; then
   post_to_bitbucket
 fi
+
+msg="$(build_msg)"
+echo "$msg"
+
 
 exit

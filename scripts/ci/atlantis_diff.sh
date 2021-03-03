@@ -24,7 +24,7 @@ process_args () {
 }
 
 build_breakdown_cmd () {
-  breakdown_cmd="${INFRACOST_BINARY} breakdown --no-color --terraform-plan-file $PLANFILE --format json"
+  breakdown_cmd="${INFRACOST_BINARY} breakdown --no-color --path $PLANFILE --format json"
 
   if [ ! -z "$usage_file" ]; then
     breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
