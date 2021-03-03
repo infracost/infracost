@@ -94,6 +94,7 @@ var FreeResources []string = []string{
 	"google_kms_key_ring_iam_policy",
 	"google_kms_key_ring_import_job",
 	"google_kms_secret_ciphertext",
+	"google_os_login_ssh_public_key",
 	"google_project",
 	"google_project_default_service_accounts",
 	"google_project_iam_audit_config",

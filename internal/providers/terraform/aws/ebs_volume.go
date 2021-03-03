@@ -33,13 +33,18 @@ func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		iopsVal = decimal.NewFromFloat(d.Get("iops").Float())
 	}
 
+	var monthlyIORequests *decimal.Decimal
+	if u != nil && u.Get("monthly_standard_io_requests").Exists() {
+		monthlyIORequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_standard_io_requests").Int()))
+	}
+
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal),
+		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal, monthlyIORequests),
 	}
 }
 
-func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.Decimal, iopsVal decimal.Decimal) []*schema.CostComponent {
+func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.Decimal, iopsVal decimal.Decimal, ioRequests *decimal.Decimal) []*schema.CostComponent {
 	if volumeAPIName == "" {
 		volumeAPIName = "gp2"
 	}
@@ -104,9 +109,10 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 
 	if volumeAPIName == "standard" {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:           "I/O requests",
-			Unit:           "request",
-			UnitMultiplier: 1000000,
+			Name:            "I/O requests",
+			Unit:            "request",
+			UnitMultiplier:  1000000,
+			MonthlyQuantity: ioRequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
