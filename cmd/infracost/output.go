@@ -10,7 +10,11 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/mod/semver"
 )
+
+var minOutputVersion = "0.1"
+var maxOutputVersion = "0.1"
 
 func outputCmd(cfg *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
@@ -42,6 +46,10 @@ Merge multiple Infracost JSON files:
 				j, err := output.Load(data)
 				if err != nil {
 					return errors.Wrap(err, "Error parsing JSON file")
+				}
+
+				if !checkOutputVersion(j.Version) {
+					return fmt.Errorf("Invalid Infracost JSON file version. Supported versions are %s ≤ x ≤ %s", minOutputVersion, maxOutputVersion)
 				}
 
 				inputs = append(inputs, output.ReportInput{
@@ -111,4 +119,11 @@ func reportCmd(cfg *config.Config) *cobra.Command {
 	_ = cmd.Flags().MarkHidden("output")
 
 	return cmd
+}
+
+func checkOutputVersion(v string) bool {
+	if !strings.HasPrefix(v, "v") {
+		v = "v" + v
+	}
+	return semver.Compare(v, "v"+minOutputVersion) >= 0 && semver.Compare(v, "v"+maxOutputVersion) <= 0
 }
