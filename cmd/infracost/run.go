@@ -17,43 +17,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func addDeprecatedRunFlags(cmd *cobra.Command) {
-	cmd.Flags().String("tfjson", "", "Path to Terraform plan JSON file")
-	_ = cmd.Flags().MarkHidden("tfjson")
-
-	cmd.Flags().String("tfplan", "", "Path to Terraform plan file relative to 'terraform-dir'")
-	_ = cmd.Flags().MarkHidden("tfplan")
-
-	cmd.Flags().String("tfflags", "", "Flags to pass to the 'terraform plan' command")
-	_ = cmd.Flags().MarkHidden("tfflags")
-
-	cmd.Flags().String("tfdir", "", "Path to the Terraform code directory. Defaults to current working directory")
-	_ = cmd.Flags().MarkHidden("tfdir")
-
-	cmd.Flags().Bool("use-tfstate", false, "Use Terraform state instead of generating a plan")
-	_ = cmd.Flags().MarkHidden("use-tfstate")
-
-	cmd.Flags().StringP("output", "o", "table", "Output format: json, table, html")
-	_ = cmd.Flags().MarkHidden("output")
-
-	cmd.Flags().String("pricing-api-endpoint", "", "Specify an alternate Cloud Pricing API URL")
-	_ = cmd.Flags().MarkHidden("pricing-api-endpoint")
-
-	cmd.Flags().String("terraform-json-file", "", "Path to Terraform plan JSON file")
-	_ = cmd.Flags().MarkHidden("terraform-json-file")
-
-	cmd.Flags().String("terraform-plan-file", "", "Path to Terraform plan file relative to 'terraform-dir'")
-	_ = cmd.Flags().MarkHidden("terraform-plan-file")
-
-	cmd.Flags().String("terraform-dir", "", "Path to the Terraform code directory. Defaults to current working directory")
-	_ = cmd.Flags().MarkHidden("terraform-dir")
-}
-
 func addRunInputFlags(cmd *cobra.Command) {
 	cmd.Flags().String("path", "", "Path to the code directory or file")
 	cmd.Flags().String("config-file", "", "Path to the Infracost config file. Cannot be used with other flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
+
 	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to the 'terraform plan' command")
+	cmd.Flags().String("terraform-workspace", "", "The Terraform workspace to use")
 }
 
 func addRunOutputFlags(cmd *cobra.Command) {
@@ -179,6 +149,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasProjectFlags := (cmd.Flags().Changed("path") ||
 		cmd.Flags().Changed("usage-file") ||
 		cmd.Flags().Changed("terraform-plan-flags") ||
+		cmd.Flags().Changed("terraform-workspace") ||
 		cmd.Flags().Changed("terraform-use-state"))
 
 	if hasConfigFile && hasProjectFlags {
@@ -212,8 +183,9 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	if hasProjectFlags {
 		projectCfg.Path, _ = cmd.Flags().GetString("path")
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
-		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
+		projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")
+		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
 	}
 
 	cfg.Format, _ = cmd.Flags().GetString("format")

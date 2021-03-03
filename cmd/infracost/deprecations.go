@@ -88,3 +88,35 @@ func handleDeprecatedFlags(cmd *cobra.Command, deprecatedFlagsMapping map[string
 		fmt.Fprintln(os.Stderr, "")
 	}
 }
+
+func addDeprecatedRunFlags(cmd *cobra.Command) {
+	cmd.Flags().String("tfjson", "", "Path to Terraform plan JSON file")
+	_ = cmd.Flags().MarkHidden("tfjson")
+
+	cmd.Flags().String("tfplan", "", "Path to Terraform plan file relative to 'terraform-dir'")
+	_ = cmd.Flags().MarkHidden("tfplan")
+
+	cmd.Flags().String("tfflags", "", "Flags to pass to the 'terraform plan' command")
+	_ = cmd.Flags().MarkHidden("tfflags")
+
+	cmd.Flags().String("tfdir", "", "Path to the Terraform code directory. Defaults to current working directory")
+	_ = cmd.Flags().MarkHidden("tfdir")
+
+	cmd.Flags().Bool("use-tfstate", false, "Use Terraform state instead of generating a plan")
+	_ = cmd.Flags().MarkHidden("use-tfstate")
+
+	cmd.Flags().StringP("output", "o", "table", "Output format: json, table, html")
+	_ = cmd.Flags().MarkHidden("output")
+
+	cmd.Flags().String("pricing-api-endpoint", "", "Specify an alternate Cloud Pricing API URL")
+	_ = cmd.Flags().MarkHidden("pricing-api-endpoint")
+
+	cmd.Flags().String("terraform-json-file", "", "Path to Terraform plan JSON file")
+	_ = cmd.Flags().MarkHidden("terraform-json-file")
+
+	cmd.Flags().String("terraform-plan-file", "", "Path to Terraform plan file relative to 'terraform-dir'")
+	_ = cmd.Flags().MarkHidden("terraform-plan-file")
+
+	cmd.Flags().String("terraform-dir", "", "Path to the Terraform code directory. Defaults to current working directory")
+	_ = cmd.Flags().MarkHidden("terraform-dir")
+}
