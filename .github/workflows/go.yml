@@ -32,7 +32,7 @@ jobs:
 
       - name: Test example works ok from CLI
         run: |
-          make run --silent ARGS="--terraform-dir examples/terraform --usage-file=examples/terraform/infracost-usage.yml --format json" > infracost-output.json
+          make run --silent ARGS="--path examples/terraform --usage-file=examples/terraform/infracost-usage.yml --format json" > infracost-output.json
           jq '' infracost-output.json
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"

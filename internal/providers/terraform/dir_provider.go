@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -24,63 +23,72 @@ import (
 
 var minTerraformVer = "v0.12"
 
-type terraformProvider struct {
+type DirProvider struct {
+	Path                string
 	env                 *config.Environment
 	spinnerOpts         ui.SpinnerOptions
-	binary              string
-	dir                 string
-	projectName         string
-	workspace           string
-	jsonFile            string
-	planFile            string
-	planFlags           string
-	useState            bool
-	terraformCloudHost  string
-	terraformCloudToken string
+	PlanFlags           string
+	Workspace           string
+	UseState            bool
+	TerraformBinary     string
+	TerraformCloudHost  string
+	TerraformCloudToken string
 }
 
-// New returns new Terraform Provider.
-func New(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provider {
-	binary := projectCfg.Binary
-	if binary == "" {
-		binary = defaultTerraformBinary
+func NewDirProvider(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provider {
+	terraformBinary := projectCfg.Binary
+	if terraformBinary == "" {
+		terraformBinary = defaultTerraformBinary
 	}
 
-	dir := projectCfg.Dir
-	if dir == "" {
-		dir = "."
-	}
-
-	return &terraformProvider{
-		env: cfg.Environment,
+	return &DirProvider{
+		Path: projectCfg.Path,
+		env:  cfg.Environment,
 		spinnerOpts: ui.SpinnerOptions{
 			EnableLogging: cfg.IsLogging(),
 			NoColor:       cfg.NoColor,
 			Indent:        "  ",
 		},
-		binary:              binary,
-		dir:                 dir,
-		projectName:         projectCfg.DisplayName(),
-		workspace:           projectCfg.Workspace,
-		jsonFile:            projectCfg.JSONFile,
-		planFile:            projectCfg.PlanFile,
-		planFlags:           projectCfg.PlanFlags,
-		useState:            projectCfg.UseState,
-		terraformCloudHost:  projectCfg.TerraformCloudHost,
-		terraformCloudToken: projectCfg.TerraformCloudToken,
+		PlanFlags:           projectCfg.PlanFlags,
+		Workspace:           projectCfg.Workspace,
+		UseState:            projectCfg.UseState,
+		TerraformBinary:     terraformBinary,
+		TerraformCloudHost:  projectCfg.TerraformCloudHost,
+		TerraformCloudToken: projectCfg.TerraformCloudToken,
 	}
 }
 
-func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.Project, error) {
-	var project *schema.Project = schema.NewProject(p.projectName)
+func (p *DirProvider) Type() string {
+	return "Terraform project directory"
+}
 
-	var err error
+func (p *DirProvider) checks() error {
+	_, err := exec.LookPath(p.TerraformBinary)
+	if err != nil {
+		msg := fmt.Sprintf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary in your Infracost config or using the environment variable TERRAFORM_BINARY.", p.TerraformBinary)
+		return events.NewError(errors.Errorf(msg), "Terraform binary could not be found")
+	}
+
+	if v, ok := checkVersion(p.env); !ok {
+		return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
+	}
+	return nil
+}
+
+func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.Project, error) {
+	name := p.Path
+	if p.Workspace != "" {
+		name += fmt.Sprintf(" (%s)", p.Workspace)
+	}
+	var project *schema.Project = schema.NewProject(name)
+
 	var j []byte
+	var err error
 
-	if p.useState {
+	if p.UseState {
 		j, err = p.generateStateJSON()
 	} else {
-		j, err = p.loadPlanJSON()
+		j, err = p.generatePlanJSON()
 	}
 	if err != nil {
 		return project, err
@@ -92,7 +100,7 @@ func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) (*
 		return project, errors.Wrap(err, "Error parsing Terraform JSON")
 	}
 
-	project.HasDiff = !p.useState
+	project.HasDiff = !p.UseState
 	if project.HasDiff {
 		project.PastResources = pastResources
 	}
@@ -101,26 +109,41 @@ func (p *terraformProvider) LoadResources(usage map[string]*schema.UsageData) (*
 	return project, nil
 }
 
-func (p *terraformProvider) loadPlanJSON() ([]byte, error) {
-	if p.jsonFile == "" {
-		return p.generatePlanJSON()
-	}
-
-	out, err := ioutil.ReadFile(p.jsonFile)
-	if err != nil {
-		return []byte{}, errors.Wrap(err, "Error reading Terraform plan file")
-	}
-
-	return out, nil
-}
-
-func (p *terraformProvider) generateStateJSON() ([]byte, error) {
-	err := p.terraformPreChecks()
+func (p *DirProvider) generatePlanJSON() ([]byte, error) {
+	err := p.checks()
 	if err != nil {
 		return []byte{}, err
 	}
 
-	opts, err := p.setupOpts()
+	opts, err := p.buildCommandOpts()
+	if err != nil {
+		return []byte{}, err
+	}
+	if opts.TerraformConfigFile != "" {
+		defer os.Remove(opts.TerraformConfigFile)
+	}
+
+	planFile, planJSON, err := p.runPlan(opts, true)
+	defer os.Remove(planFile)
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	if len(planJSON) > 0 {
+		return planJSON, nil
+	}
+
+	return p.runShow(opts, planFile)
+}
+
+func (p *DirProvider) generateStateJSON() ([]byte, error) {
+	err := p.checks()
+	if err != nil {
+		return []byte{}, err
+	}
+
+	opts, err := p.buildCommandOpts()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -131,46 +154,14 @@ func (p *terraformProvider) generateStateJSON() ([]byte, error) {
 	return p.runShow(opts, "")
 }
 
-func (p *terraformProvider) generatePlanJSON() ([]byte, error) {
-	err := p.terraformPreChecks()
-	if err != nil {
-		return []byte{}, err
-	}
-
-	opts, err := p.setupOpts()
-	if err != nil {
-		return []byte{}, err
-	}
-	if opts.TerraformConfigFile != "" {
-		defer os.Remove(opts.TerraformConfigFile)
-	}
-
-	if p.planFile == "" {
-
-		var planJSON []byte
-		p.planFile, planJSON, err = p.runPlan(opts, p.planFlags, true)
-		defer os.Remove(p.planFile)
-
-		if err != nil {
-			return []byte{}, err
-		}
-
-		if len(planJSON) > 0 {
-			return planJSON, nil
-		}
-	}
-
-	return p.runShow(opts, p.planFile)
-}
-
-func (p *terraformProvider) setupOpts() (*CmdOptions, error) {
+func (p *DirProvider) buildCommandOpts() (*CmdOptions, error) {
 	opts := &CmdOptions{
-		TerraformBinary:    p.binary,
-		TerraformWorkspace: p.workspace,
-		TerraformDir:       p.dir,
+		TerraformBinary:    p.TerraformBinary,
+		TerraformWorkspace: p.Workspace,
+		Dir:                p.Path,
 	}
 
-	cfgFile, err := CreateConfigFile(p.dir, p.terraformCloudHost, p.terraformCloudToken)
+	cfgFile, err := CreateConfigFile(p.Path, p.TerraformCloudHost, p.TerraformCloudToken)
 	if err != nil {
 		return opts, err
 	}
@@ -180,52 +171,7 @@ func (p *terraformProvider) setupOpts() (*CmdOptions, error) {
 	return opts, nil
 }
 
-func (p *terraformProvider) terraformPreChecks() error {
-	if p.jsonFile == "" {
-		_, err := exec.LookPath(p.binary)
-		if err != nil {
-			msg := fmt.Sprintf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary in your Infracost config or using the environment variable TERRAFORM_BINARY.", p.binary)
-			return events.NewError(errors.Errorf(msg), "Terraform binary could not be found")
-		}
-
-		if v, ok := checkVersion(p.env); !ok {
-			return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
-		}
-
-		if !p.inTerraformDir() {
-			msg := fmt.Sprintf("Directory \"%s\" does not have any Terraform files.\nSet the Terraform directory path using the --terraform-dir option.", p.dir)
-			return events.NewError(errors.Errorf(msg), "Directory does not have any Terraform files")
-
-		}
-	}
-	return nil
-}
-
-func (p *terraformProvider) inTerraformDir() bool {
-	for _, ext := range []string{"tf", "hcl", "hcl.json"} {
-		matches, err := filepath.Glob(filepath.Join(p.dir, fmt.Sprintf("*.%s", ext)))
-		if matches != nil && err == nil {
-			return true
-		}
-	}
-	return false
-}
-
-func (p *terraformProvider) runInit(opts *CmdOptions) error {
-	spinner := ui.NewSpinner("Running terraform init", p.spinnerOpts)
-
-	_, err := Cmd(opts, "init", "-input=false", "-no-color")
-	if err != nil {
-		spinner.Fail()
-		terraformError(err)
-		return errors.Wrap(err, "Error running terraform init")
-	}
-
-	spinner.Success()
-	return nil
-}
-
-func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFail bool) (string, []byte, error) {
+func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte, error) {
 	spinner := ui.NewSpinner("Running terraform plan", p.spinnerOpts)
 	var planJSON []byte
 
@@ -235,7 +181,7 @@ func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFa
 		return "", planJSON, errors.Wrap(err, "Error creating temporary file 'tfplan'")
 	}
 
-	flags, err := shellquote.Split(planFlags)
+	flags, err := shellquote.Split(p.PlanFlags)
 	if err != nil {
 		return "", planJSON, errors.Wrap(err, "Error parsing terraform plan flags")
 	}
@@ -263,7 +209,7 @@ func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFa
 			if err != nil {
 				return "", planJSON, err
 			}
-			return p.runPlan(opts, planFlags, false)
+			return p.runPlan(opts, false)
 		}
 	}
 
@@ -281,7 +227,7 @@ func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFa
 			msg += "Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable."
 			fmt.Fprintln(os.Stderr, msg)
 		} else {
-			terraformError(err)
+			printTerraformErr(err)
 		}
 		return "", planJSON, errors.Wrap(err, "Error running terraform plan")
 	}
@@ -291,8 +237,22 @@ func (p *terraformProvider) runPlan(opts *CmdOptions, planFlags string, initOnFa
 	return f.Name(), planJSON, nil
 }
 
-func (p *terraformProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
-	if p.terraformCloudToken == "" && !checkCloudConfigSet() {
+func (p *DirProvider) runInit(opts *CmdOptions) error {
+	spinner := ui.NewSpinner("Running terraform init", p.spinnerOpts)
+
+	_, err := Cmd(opts, "init", "-input=false", "-no-color")
+	if err != nil {
+		spinner.Fail()
+		printTerraformErr(err)
+		return errors.Wrap(err, "Error running terraform init")
+	}
+
+	spinner.Success()
+	return nil
+}
+
+func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
+	if p.TerraformCloudToken == "" && !checkCloudConfigSet() {
 		return []byte{}, ErrMissingCloudToken
 	}
 
@@ -315,7 +275,7 @@ func (p *terraformProvider) runRemotePlan(opts *CmdOptions, args []string) ([]by
 	s := strings.Split(u.Path, "/")
 	runID := s[len(s)-1]
 
-	token := p.terraformCloudToken
+	token := p.TerraformCloudToken
 	if token == "" {
 		token = findCloudToken(host)
 	}
@@ -344,7 +304,7 @@ func (p *terraformProvider) runRemotePlan(opts *CmdOptions, args []string) ([]by
 	return cloudAPI(host, jsonPath, token)
 }
 
-func (p *terraformProvider) runShow(opts *CmdOptions, planFile string) ([]byte, error) {
+func (p *DirProvider) runShow(opts *CmdOptions, planFile string) ([]byte, error) {
 	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
 
 	args := []string{"show", "-no-color", "-json"}
@@ -354,7 +314,7 @@ func (p *terraformProvider) runShow(opts *CmdOptions, planFile string) ([]byte, 
 	out, err := Cmd(opts, args...)
 	if err != nil {
 		spinner.Fail()
-		terraformError(err)
+		printTerraformErr(err)
 		return []byte{}, errors.Wrap(err, "Error running terraform show")
 	}
 	spinner.Success()
@@ -373,7 +333,7 @@ func checkVersion(env *config.Environment) (string, bool) {
 	return v, semver.Compare(v, minTerraformVer) >= 0
 }
 
-func terraformError(err error) {
+func printTerraformErr(err error) {
 	stderr := extractStderr(err)
 	if stderr == "" {
 		return
@@ -389,16 +349,17 @@ func terraformError(err error) {
 	}
 	if strings.HasPrefix(stderr, "Error: No value for required variable") {
 		msg += "\nPass Terraform flags using the --terraform-plan-flags option.\n"
-		msg += "For example: infracost --terraform-dir=path/to/terraform --terraform-plan-flags=\"-var-file=myvars.tfvars\"\n"
+		msg += "For example: infracost --path=path/to/terraform --terraform-plan-flags=\"-var-file=myvars.tfvars\"\n"
 	}
 	if strings.HasPrefix(stderr, "Error: Failed to read variables file") {
 		msg += "\nSpecify the -var-file flag as a path relative to your Terraform directory.\n"
-		msg += "For example: infracost --terraform-dir=path/to/terraform --terraform-plan-flags=\"-var-file=myvars.tfvars\"\n"
+		msg += "For example: infracost --path=path/to/terraform --terraform-plan-flags=\"-var-file=myvars.tfvars\"\n"
 	}
-	if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a project or plan file.") {
-		msg += "\nSpecify the --terraform-plan-file flag as a path relative to your Terraform directory.\n"
-		msg += "For example: infracost --terraform-dir=path/to/terraform --terraform-plan-file=plan.save\n"
-	}
+	// TODO
+	// if strings.HasPrefix(stderr, "Terraform couldn't read the given file as a project or plan file.") {
+	// 	msg += "\nSpecify the --terraform-plan-file flag as a path relative to your Terraform directory.\n"
+	// 	msg += "For example: infracost --terraform-dir=path/to/terraform --terraform-plan-file=plan.save\n"
+	// }
 
 	fmt.Fprintln(os.Stderr, msg)
 }

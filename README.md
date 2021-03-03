@@ -42,16 +42,16 @@ Infracost shows cloud cost estimates for Terraform projects. It helps developers
     cd example-terraform
 
     # You can play with `aws/main.tf` and `aws/infracost-usage.yml`, and re-run infracost to compare costs
-    infracost diff --terraform-dir aws --usage-file aws/infracost-usage.yml
+    infracost diff ---path aws --usage-file aws/infracost-usage.yml
     ```
 
 Please **watch/star** this repo as we add new cloud resources every week or so.
 
 ## Basic usage
 
-There are [4 usage methods](https://www.infracost.io/docs/#usage-methods) for Infracost depending on your use-case. The following is the default method. Point to the Terraform directory using `--terraform-dir` and pass any required Terraform flags using `--terraform-plan-flags`. Internally Infracost runs Terraform `init`, `plan` and `show`; `init` requires cloud credentials to be set, e.g. via the usual `AWS_ACCESS_KEY_ID` environment variables. This method works with remote state too.
+There are [4 usage methods](https://www.infracost.io/docs/#usage-methods) for Infracost depending on your use-case. The following is the default method. Point to the Terraform directory using `--path` and pass any required Terraform flags using `--terraform-plan-flags`. Internally Infracost runs Terraform `init`, `plan` and `show`; `init` requires cloud credentials to be set, e.g. via the usual `AWS_ACCESS_KEY_ID` environment variables. This method works with remote state too.
   ```sh
-  infracost --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+  infracost --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
   ```
 
 Read the [**getting started**](https://www.infracost.io/docs/) docs for details, including notes for [Terragrunt](https://www.infracost.io/docs/terragrunt) and [Terraform Cloud](https://www.infracost.io/docs/terraform_cloud_enterprise) users.

@@ -16,37 +16,14 @@ import (
 )
 
 type TerraformProject struct {
-	Name                string `yaml:"name,omitempty" ignored:"true"`
 	Binary              string `yaml:"binary,omitempty" envconfig:"INFRACOST_TERRAFORM_BINARY"`
 	Workspace           string `yaml:"workspace,omitempty" envconfig:"INFRACOST_TERRAFORM_WORKSPACE"`
 	TerraformCloudHost  string `yaml:"terraform_cloud_host,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_HOST"`
 	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_TOKEN"`
 	UsageFile           string `yaml:"usage_file,omitempty" ignored:"true"`
-	Dir                 string `yaml:"dir,omitempty" ignored:"true"`
-	PlanFile            string `yaml:"plan_file,omitempty" ignored:"true"`
-	JSONFile            string `yaml:"json_file,omitempty" ignored:"true"`
+	Path                string `yaml:"path,omitempty" ignored:"true"`
 	PlanFlags           string `yaml:"plan_flags,omitempty" ignored:"true"`
 	UseState            bool   `yaml:"use_state,omitempty" ignored:"true"`
-}
-
-func (p *TerraformProject) DisplayName() string {
-	if p.Name != "" {
-		return p.Name
-	}
-
-	if p.JSONFile != "" {
-		return p.JSONFile
-	}
-
-	if p.PlanFile != "" {
-		return p.PlanFile
-	}
-
-	if p.Dir != "" {
-		return p.Dir
-	}
-
-	return "current directory"
 }
 
 type Projects struct {

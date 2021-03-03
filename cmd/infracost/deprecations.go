@@ -12,10 +12,13 @@ import (
 )
 
 var deprecatedFlagsMapping = map[string]string{
-	"tfjson":               "terraform-json-file",
-	"tfplan":               "terraform-plan-file",
+	"tfjson":               "path",
+	"tfplan":               "path",
+	"tfdir":                "path",
+	"terraform-json-file":  "path",
+	"terraform-plan-file":  "path",
+	"terraform-dir":        "path",
 	"use-tfstate":          "terraform-use-state",
-	"tfdir":                "terraform-dir",
 	"tfflags":              "terraform-plan-flags",
 	"output":               "format",
 	"o":                    "format",

@@ -14,22 +14,22 @@ func diffCmd(cfg *config.Config) *cobra.Command {
 
 Use terraform directory with any required terraform flags:
 
-  infracost diff --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+  infracost diff --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
 
 Use terraform state file:
 
-  infracost diff --terraform-dir /path/to/code --terraform-use-state
+  infracost diff --path /path/to/code --terraform-use-state
 
 Use terraform plan JSON:
 
   terraform plan -out plan.save .
   terraform show -json plan.save > plan.json
-  infracost diff --terraform-json-file /path/to/plan.json
+  infracost diff --path /path/to/plan.json
 
-Use terraform plan file, relative to terraform-dir:
+Use terraform plan file:
 
   terraform plan -out plan.save .
-  infracost diff --terraform-dir /path/to/code --terraform-plan-file plan.save`,
+  infracost diff --path plan.save`,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			handleDeprecatedEnvVars(deprecatedEnvVarMapping)
 			handleDeprecatedFlags(cmd, deprecatedFlagsMapping)

@@ -13,7 +13,7 @@ while IFS= read -r tfproject; do
   cd $tfproject
   filename=$(echo $tfproject | sed 's:/:-:g' | cut -c3-)
   # TODO: customize to how you run infracost
-  infracost breakdown --terraform-dir . --format json > "$filename-infracost-out.json"
+  infracost breakdown --path . --format json > "$filename-infracost-out.json"
   cd - > /dev/null
 done <<< "$tfprojects"
 

@@ -54,11 +54,11 @@ func main() {
 
 Generate a cost diff from terraform directory with any required terraform flags:
 
-  infracost diff --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+  infracost diff --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
 
 Generate a full cost breakdown from terraform directory with any required terraform flags:
 
-  infracost breakdown --terraform-dir /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+  infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
 
 Docs:
   https://infracost.io/docs`,

@@ -18,7 +18,7 @@ var defaultTerraformBinary = "terraform"
 
 type CmdOptions struct {
 	TerraformBinary     string
-	TerraformDir        string
+	Dir                 string
 	TerraformWorkspace  string
 	TerraformConfigFile string
 }
@@ -50,7 +50,7 @@ func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 
 	cmd := exec.Command(exe, args...)
 	log.Infof("Running command: %s", cmd.String())
-	cmd.Dir = opts.TerraformDir
+	cmd.Dir = opts.Dir
 
 	logWriter := &cmdLogWriter{
 		logger: log.StandardLogger().WithField("binary", "terraform"),

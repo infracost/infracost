@@ -9,7 +9,7 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/prices"
-	"github.com/infracost/infracost/internal/providers/terraform"
+	"github.com/infracost/infracost/internal/providers"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
@@ -39,15 +39,22 @@ func addDeprecatedRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().String("pricing-api-endpoint", "", "Specify an alternate Cloud Pricing API URL")
 	_ = cmd.Flags().MarkHidden("pricing-api-endpoint")
+
+	cmd.Flags().String("terraform-json-file", "", "Path to Terraform plan JSON file")
+	_ = cmd.Flags().MarkHidden("terraform-json-file")
+
+	cmd.Flags().String("terraform-plan-file", "", "Path to Terraform plan file relative to 'terraform-dir'")
+	_ = cmd.Flags().MarkHidden("terraform-plan-file")
+
+	cmd.Flags().String("terraform-dir", "", "Path to the Terraform code directory. Defaults to current working directory")
+	_ = cmd.Flags().MarkHidden("terraform-dir")
 }
 
 func addRunInputFlags(cmd *cobra.Command) {
+	cmd.Flags().String("path", "", "Path to the code directory or file")
 	cmd.Flags().String("config-file", "", "Path to the Infracost config file. Cannot be used with other flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
-	cmd.Flags().String("terraform-json-file", "", "Path to Terraform plan JSON file")
-	cmd.Flags().String("terraform-plan-file", "", "Path to Terraform plan file relative to 'terraform-dir'")
 	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to the 'terraform plan' command")
-	cmd.Flags().String("terraform-dir", "", "Path to the Terraform code directory. Defaults to current working directory")
 }
 
 func addRunOutputFlags(cmd *cobra.Command) {
@@ -58,19 +65,19 @@ func runMain(cfg *config.Config) error {
 	projects := make([]*schema.Project, 0)
 
 	for _, projectCfg := range cfg.Projects.Terraform {
-		m := fmt.Sprintf("Loading resources from %s", projectCfg.DisplayName())
-		if projectCfg.Workspace != "" {
-			m += fmt.Sprintf(" (%s)", projectCfg.Workspace)
+		cfg.Environment.SetTerraformEnvironment(projectCfg)
+
+		provider := providers.Detect(cfg, projectCfg)
+		if provider == nil {
+			return errors.New("Could not detect path type")
 		}
+
+		m := fmt.Sprintf("Detected %s at %s", provider.Type(), projectCfg.Path)
 		if cfg.IsLogging() {
 			log.Info(m)
 		} else {
 			fmt.Fprintln(os.Stderr, m)
 		}
-
-		cfg.Environment.SetTerraformEnvironment(projectCfg)
-
-		provider := terraform.New(cfg, projectCfg)
 
 		u, err := usage.LoadFromFile(projectCfg.UsageFile)
 		if err != nil {
@@ -178,10 +185,7 @@ func runMain(cfg *config.Config) error {
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasConfigFile := cmd.Flags().Changed("config-file")
 
-	hasProjectFlags := (cmd.Flags().Changed("terraform-dir") ||
-		cmd.Flags().Changed("terraform-plan-file") ||
-		cmd.Flags().Changed("terraform-json-file") ||
-		cmd.Flags().Changed("terraform-use-state") ||
+	hasProjectFlags := (cmd.Flags().Changed("path") ||
 		cmd.Flags().Changed("terraform-plan-flags") ||
 		cmd.Flags().Changed("usage-file"))
 
@@ -224,9 +228,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	}
 
 	if hasProjectFlags {
-		projectCfg.Dir, _ = cmd.Flags().GetString("terraform-dir")
-		projectCfg.PlanFile, _ = cmd.Flags().GetString("terraform-plan-file")
-		projectCfg.JSONFile, _ = cmd.Flags().GetString("terraform-json-file")
+		projectCfg.Path, _ = cmd.Flags().GetString("path")
 		projectCfg.UseState, _ = cmd.Flags().GetBool("terraform-use-state")
 		projectCfg.PlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
@@ -241,21 +243,6 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 }
 
 func checkRunConfig(cfg *config.Config) error {
-	for _, projectCfg := range cfg.Projects.Terraform {
-		if projectCfg.UseState && (projectCfg.PlanFile != "" || projectCfg.JSONFile != "") {
-			return errors.New("The use state option cannot be used with the Terraform plan or Terraform JSON options")
-		}
-
-		if projectCfg.JSONFile != "" && projectCfg.PlanFile != "" {
-			return errors.New("Please provide either a Terraform Plan JSON file or a Terraform Plan file")
-		}
-
-		if projectCfg.Dir != "" && projectCfg.JSONFile != "" {
-			ui.PrintWarning("Warning: Terraform directory is ignored if Terraform JSON is used")
-			return nil
-		}
-	}
-
 	for _, output := range cfg.Outputs {
 		if output.Format == "json" && output.ShowSkipped {
 			ui.PrintWarning("The show skipped option is not needed with JSON output as that always includes them.")
