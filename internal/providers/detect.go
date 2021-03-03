@@ -15,6 +15,10 @@ func Detect(cfg *config.Config, projectCfg *config.Project) schema.Provider {
 		return terraform.NewPlanJSONProvider(cfg, projectCfg)
 	}
 
+	if isTerraformStateJSON(projectCfg.Path) {
+		return terraform.NewStateJSONProvider(cfg, projectCfg)
+	}
+
 	if isTerraformPlan(projectCfg.Path) {
 		return terraform.NewPlanProvider(cfg, projectCfg)
 	}
@@ -24,6 +28,44 @@ func Detect(cfg *config.Config, projectCfg *config.Project) schema.Provider {
 	}
 
 	return nil
+}
+
+func isTerraformPlanJSON(path string) bool {
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		return false
+	}
+
+	var jsonFormat struct {
+		FormatVersion string      `json:"format_version"`
+		PlannedValues interface{} `json:"planned_values"`
+	}
+
+	err = json.Unmarshal(b, &jsonFormat)
+	if err != nil {
+		return false
+	}
+
+	return jsonFormat.FormatVersion != "" && jsonFormat.PlannedValues != nil
+}
+
+func isTerraformStateJSON(path string) bool {
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		return false
+	}
+
+	var jsonFormat struct {
+		FormatVersion string      `json:"format_version"`
+		Values        interface{} `json:"values"`
+	}
+
+	err = json.Unmarshal(b, &jsonFormat)
+	if err != nil {
+		return false
+	}
+
+	return jsonFormat.FormatVersion != "" && jsonFormat.Values != nil
 }
 
 func isTerraformPlan(path string) bool {
@@ -42,21 +84,6 @@ func isTerraformPlan(path string) bool {
 	}
 
 	return planFile != nil
-}
-
-func isTerraformPlanJSON(path string) bool {
-	b, err := ioutil.ReadFile(path)
-	if err != nil {
-		return false
-	}
-
-	var jsonFormat struct {
-		FormatVersion interface{} `json:"format_version"`
-		PlannedValues interface{} `json:"planned_values"`
-	}
-
-	err = json.Unmarshal(b, &jsonFormat)
-	return err == nil
 }
 
 func isTerraformDir(path string) bool {
