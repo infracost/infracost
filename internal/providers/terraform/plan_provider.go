@@ -29,6 +29,10 @@ func NewPlanProvider(cfg *config.Config, projectCfg *config.Project) schema.Prov
 }
 
 func (p *PlanProvider) Type() string {
+	return "terraform_plan"
+}
+
+func (p *PlanProvider) DisplayType() string {
 	return "Terraform plan file"
 }
 

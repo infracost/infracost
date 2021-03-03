@@ -21,6 +21,10 @@ func NewPlanJSONProvider(cfg *config.Config, projectCfg *config.Project) schema.
 }
 
 func (p *PlanJSONProvider) Type() string {
+	return "terraform_plan_json"
+}
+
+func (p *PlanJSONProvider) DisplayType() string {
 	return "Terraform plan JSON file"
 }
 

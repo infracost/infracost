@@ -64,20 +64,20 @@ func runMain(cfg *config.Config) error {
 	projects := make([]*schema.Project, 0)
 
 	for _, projectCfg := range cfg.Projects {
-		cfg.Environment.SetProjectEnvironment(projectCfg)
-
 		provider := providers.Detect(cfg, projectCfg)
 
 		if provider == nil {
 			return fmt.Errorf("Could not detect path type for %s", ui.DisplayPath(projectCfg.Path))
 		}
 
-		m := fmt.Sprintf("Detected %s at %s", provider.Type(), ui.DisplayPath(projectCfg.Path))
+		m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
 		if cfg.IsLogging() {
 			log.Info(m)
 		} else {
 			fmt.Fprintln(os.Stderr, m)
 		}
+
+		cfg.Environment.SetProjectEnvironment(provider.Type(), projectCfg)
 
 		u, err := usage.LoadFromFile(projectCfg.UsageFile)
 		if err != nil {

@@ -60,6 +60,10 @@ func NewDirProvider(cfg *config.Config, projectCfg *config.Project) schema.Provi
 }
 
 func (p *DirProvider) Type() string {
+	return "terraform_dir"
+}
+
+func (p *DirProvider) DisplayType() string {
 	return "Terraform project directory"
 }
 

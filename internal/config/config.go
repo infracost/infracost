@@ -81,11 +81,6 @@ func (c *Config) LoadFromConfigFile(path string) error {
 		return err
 	}
 
-	// TODO
-	// if len(c.Projects.Terraform) > 0 {
-	// 	c.Environment.SetTerraformEnvironment(c.Projects.Terraform[0])
-	// }
-
 	return nil
 }
 
