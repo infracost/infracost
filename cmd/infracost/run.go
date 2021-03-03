@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -64,8 +63,8 @@ func addRunOutputFlags(cmd *cobra.Command) {
 func runMain(cfg *config.Config) error {
 	projects := make([]*schema.Project, 0)
 
-	for _, projectCfg := range cfg.Projects.Terraform {
-		cfg.Environment.SetTerraformEnvironment(projectCfg)
+	for _, projectCfg := range cfg.Projects {
+		cfg.Environment.SetProjectEnvironment(projectCfg)
 
 		provider := providers.Detect(cfg, projectCfg)
 		if provider == nil {
@@ -133,51 +132,42 @@ func runMain(cfg *config.Config) error {
 
 	r := output.ToOutputFormat(projects)
 
-	for _, outputCfg := range cfg.Outputs {
-		cfg.Environment.SetOutputEnvironment(outputCfg)
+	cfg.Environment.OutputFormat = cfg.Format
 
-		opts := output.Options{
-			ShowSkipped: outputCfg.ShowSkipped,
-			NoColor:     cfg.NoColor,
-		}
-
-		var (
-			b   []byte
-			out string
-			err error
-		)
-
-		switch strings.ToLower(outputCfg.Format) {
-		case "json":
-			b, err = output.ToJSON(r, opts)
-			out = string(b)
-		case "html":
-			b, err = output.ToHTML(r, opts)
-			out = string(b)
-		case "diff":
-			b, err = output.ToDiff(r, opts)
-			out = fmt.Sprintf("\n%s", string(b))
-		case "table_deprecated":
-			b, err = output.ToTableDeprecated(r, opts)
-			out = fmt.Sprintf("\n%s", string(b))
-		default:
-			b, err = output.ToTable(r, opts)
-			out = fmt.Sprintf("\n%s", string(b))
-		}
-
-		if err != nil {
-			return errors.Wrap(err, "Error generating output")
-		}
-
-		if outputCfg.Path != "" {
-			err := ioutil.WriteFile(outputCfg.Path, []byte(out), 0644) // nolint:gosec
-			if err != nil {
-				return errors.Wrap(err, "Error saving output")
-			}
-		} else {
-			fmt.Printf("%s\n", out)
-		}
+	opts := output.Options{
+		ShowSkipped: cfg.ShowSkipped,
+		NoColor:     cfg.NoColor,
 	}
+
+	var (
+		b   []byte
+		out string
+		err error
+	)
+
+	switch strings.ToLower(cfg.Format) {
+	case "json":
+		b, err = output.ToJSON(r, opts)
+		out = string(b)
+	case "html":
+		b, err = output.ToHTML(r, opts)
+		out = string(b)
+	case "diff":
+		b, err = output.ToDiff(r, opts)
+		out = fmt.Sprintf("\n%s", string(b))
+	case "table_deprecated":
+		b, err = output.ToTableDeprecated(r, opts)
+		out = fmt.Sprintf("\n%s", string(b))
+	default:
+		b, err = output.ToTable(r, opts)
+		out = fmt.Sprintf("\n%s", string(b))
+	}
+
+	if err != nil {
+		return errors.Wrap(err, "Error generating output")
+	}
+
+	fmt.Printf("%s\n", out)
 
 	return nil
 }
@@ -186,41 +176,32 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasConfigFile := cmd.Flags().Changed("config-file")
 
 	hasProjectFlags := (cmd.Flags().Changed("path") ||
+		cmd.Flags().Changed("usage-file") ||
 		cmd.Flags().Changed("terraform-plan-flags") ||
-		cmd.Flags().Changed("usage-file"))
-
-	hasOutputFlags := (cmd.Flags().Changed("format") ||
-		cmd.Flags().Changed("show-skipped"))
+		cmd.Flags().Changed("terraform-use-state"))
 
 	if hasConfigFile && hasProjectFlags {
-		ui.PrintUsageErrorAndExit(cmd, "--config-file flag cannot be used with other project and output flags")
+		ui.PrintUsageErrorAndExit(cmd, "--config-file flag cannot be used with project flags")
 	}
 
 	if hasConfigFile {
-		configFile, _ := cmd.Flags().GetString("config-file")
-		err := cfg.LoadFromFile(configFile)
+		cfgFilePath, _ := cmd.Flags().GetString("config-file")
+		err := cfg.LoadFromConfigFile(cfgFilePath)
 
 		if err != nil {
 			return err
 		}
 	}
 
-	projectCfg := &config.TerraformProject{}
+	projectCfg := &config.Project{}
 
 	if hasProjectFlags {
-		cfg.Projects = config.Projects{
-			Terraform: []*config.TerraformProject{
-				projectCfg,
-			},
+		cfg.Projects = []*config.Project{
+			projectCfg,
 		}
 	}
 
-	outputCfg := &config.Output{}
-	if hasOutputFlags {
-		cfg.Outputs = []*config.Output{outputCfg}
-	}
-
-	if hasProjectFlags || hasOutputFlags {
+	if !hasConfigFile {
 		err := cfg.LoadFromEnv()
 		if err != nil {
 			return err
@@ -229,25 +210,21 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasProjectFlags {
 		projectCfg.Path, _ = cmd.Flags().GetString("path")
-		projectCfg.UseState, _ = cmd.Flags().GetBool("terraform-use-state")
-		projectCfg.PlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
+		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
+		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 	}
 
-	if hasOutputFlags {
-		outputCfg.Format, _ = cmd.Flags().GetString("format")
-		outputCfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
-	}
+	cfg.Format, _ = cmd.Flags().GetString("format")
+	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
 	return nil
 }
 
 func checkRunConfig(cfg *config.Config) error {
-	for _, output := range cfg.Outputs {
-		if output.Format == "json" && output.ShowSkipped {
-			ui.PrintWarning("The show skipped option is not needed with JSON output as that always includes them.")
-			return nil
-		}
+	if cfg.Format == "json" && cfg.ShowSkipped {
+		ui.PrintWarning("The show skipped option is not needed with JSON output as that always includes them.")
+		return nil
 	}
 
 	return nil

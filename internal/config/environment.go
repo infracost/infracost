@@ -47,8 +47,9 @@ func NewEnvironment() *Environment {
 	}
 }
 
-func (e *Environment) SetTerraformEnvironment(projectCfg *TerraformProject) {
-	binary := projectCfg.Binary
+func (e *Environment) SetProjectEnvironment(projectCfg *Project) {
+	// TODO: non-terraform environments
+	binary := projectCfg.TerraformBinary
 	if binary == "" {
 		binary = "terraform"
 	}
@@ -59,10 +60,6 @@ func (e *Environment) SetTerraformEnvironment(projectCfg *TerraformProject) {
 	e.TerraformBinary = binary
 	e.TerraformFullVersion = fullVersion
 	e.TerraformVersion = version
-}
-
-func (e *Environment) SetOutputEnvironment(outputCfg *Output) {
-	e.OutputFormat = outputCfg.Format
 }
 
 func userAgent() string {

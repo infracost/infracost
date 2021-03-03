@@ -1,53 +1,36 @@
-## Each of your Terraform project repos can have an infracost.yml file like this
-## to define its Infracost configs, so anyone can just run:
-## `infracost --config-file infracost.yml`
+## Use a config file to describe multiple Terraform projects
+## `infracost breakdown --config-file infracost-projects.yml
 ## Uncomment lines and edit as required. See https://www.infracost.io/docs/config_file for docs.
 
-## Can be set to info or warn in CI/CD systems to reduce noise, or debug to troubleshoot.
-# log_level: warn
-# no_color: true
-
 ## YAML anchors can be used to share and override default configs between projects
-# terraform_defaults: &terraform_defaults
+# project_default: &project_default
   ## Used to change the path to the terraform binary, e.g. `~/bin/terraform_0.13` or `terragrunt`
   ## Terragrunt users should see https://www.infracost.io/docs/terragrunt
-  # binary: terraform
+  # terraform_binary: terraform
   ## Sets the TF_WORKSPACE environment variable
-  # workspace: dev
+  # terraform_workspace: dev
   ## Terraform Cloud users should see https://www.infracost.io/docs/terraform_cloud_enterprise
   # terraform_cloud_host: app.terraform.io
   # terraform_cloud_token: myToken123 # We recommend using the env INFRACOST_TERRAFORM_CLOUD_TOKEN for the token
 
 # Add details of your repo's Terraform projects, their results will be merged into the same output
 projects:
-  terraform:
-    ## If using the Terraform directory method, see https://www.infracost.io/docs/#1-terraform-directory
-    - dir: examples/terraform
-      usage_file: infracost-usage-example.yml # Define resource usage estimates, see https://www.infracost.io/docs/usage_based_resources
+  ## If using the Terraform directory method, see https://www.infracost.io/docs/#1-terraform-directory
+  - path: examples/terraform
+    usage_file: infracost-usage-example.yml # Define resource usage estimates, see https://www.infracost.io/docs/usage_based_resources
 
-    ## Example of using a YAML anchor
-    # - <<: *terraform_defaults
-    #   dir: examples/terraform
-    #   plan_flags: -var-file=prod.tfvars -var-file=us-east.tfvars
-    #   workspace: prod
+  ## Example of using a YAML anchor
+  # - <<: *project_default
+  #   path: examples/terraform
+  #   terraform_plan_flags: -var-file=prod.tfvars -var-file=us-east.tfvars
+  #   terraform_workspace: prod
 
-    ## If using the Terraform state file method, see https://www.infracost.io/docs/#2-terraform-state-file
-    # - dir: example/terraform
-    #   use_state: true
+  ## If using the Terraform state file method, see https://www.infracost.io/docs/#2-terraform-state-file
+  # - path: example/terraform
+  #   terraform_use_state: true
 
-    ## If using the Terraform plan JSON method, see https://www.infracost.io/docs/#3-terraform-plan-json
-    # - json_file: /path/to/plan.json
+  ## If using the Terraform plan JSON method, see https://www.infracost.io/docs/#3-terraform-plan-json
+  # - path: /path/to/plan.json
 
-    ## If using the Terraform plan file method, see https://www.infracost.io/docs/#4-terraform-plan-file
-    # - dir: example/terraform
-    #   plan_file: plan.save # This should be relative to the dir
-
-## There can be multiple outputs
-outputs:
-  - format: table
-    ## Show unsupported resources, some of which might be free. Only for table and HTML output format
-    show_skipped: true
-  - format: html
-    path: infracost-report.html # Save report in this file
-  - format: json
-    path: infracost-output.json # Save output in this file
+  ## If using the Terraform plan file method, see https://www.infracost.io/docs/#4-terraform-plan-file
+  # - path: example/terraform/plan.save

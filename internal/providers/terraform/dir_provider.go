@@ -35,8 +35,8 @@ type DirProvider struct {
 	TerraformCloudToken string
 }
 
-func NewDirProvider(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provider {
-	terraformBinary := projectCfg.Binary
+func NewDirProvider(cfg *config.Config, projectCfg *config.Project) schema.Provider {
+	terraformBinary := projectCfg.TerraformBinary
 	if terraformBinary == "" {
 		terraformBinary = defaultTerraformBinary
 	}
@@ -49,9 +49,9 @@ func NewDirProvider(cfg *config.Config, projectCfg *config.TerraformProject) sch
 			NoColor:       cfg.NoColor,
 			Indent:        "  ",
 		},
-		PlanFlags:           projectCfg.PlanFlags,
-		Workspace:           projectCfg.Workspace,
-		UseState:            projectCfg.UseState,
+		PlanFlags:           projectCfg.TerraformPlanFlags,
+		Workspace:           projectCfg.TerraformWorkspace,
+		UseState:            projectCfg.TerraformUseState,
 		TerraformBinary:     terraformBinary,
 		TerraformCloudHost:  projectCfg.TerraformCloudHost,
 		TerraformCloudToken: projectCfg.TerraformCloudToken,

@@ -49,11 +49,8 @@ Use terraform plan file:
 				ui.PrintUsageErrorAndExit(cmd, err.Error())
 			}
 
-			cfg.Outputs = []*config.Output{
-				{
-					Format: "diff",
-				},
-			}
+			cfg.Format = "diff"
+
 			return runMain(cfg)
 		},
 	}

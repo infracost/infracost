@@ -12,7 +12,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func Detect(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provider {
+func Detect(cfg *config.Config, projectCfg *config.Project) schema.Provider {
 	if isTerraformPlanJSON(projectCfg.Path) {
 		return terraform.NewPlanJSONProvider(cfg, projectCfg)
 	}

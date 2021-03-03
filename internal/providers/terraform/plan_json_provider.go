@@ -13,7 +13,7 @@ type PlanJSONProvider struct {
 	env  *config.Environment
 }
 
-func NewPlanJSONProvider(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provider {
+func NewPlanJSONProvider(cfg *config.Config, projectCfg *config.Project) schema.Provider {
 	return &PlanJSONProvider{
 		Path: projectCfg.Path,
 		env:  cfg.Environment,

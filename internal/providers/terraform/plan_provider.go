@@ -15,7 +15,7 @@ type PlanProvider struct {
 	env  *config.Environment
 }
 
-func NewPlanProvider(cfg *config.Config, projectCfg *config.TerraformProject) schema.Provider {
+func NewPlanProvider(cfg *config.Config, projectCfg *config.Project) schema.Provider {
 	dirProvider := NewDirProvider(cfg, projectCfg).(*DirProvider)
 	dirProvider.Path = filepath.Dir(projectCfg.Path)
 
