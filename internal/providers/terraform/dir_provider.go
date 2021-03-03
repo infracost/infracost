@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -69,14 +70,15 @@ func (p *DirProvider) checks() error {
 		return events.NewError(errors.Errorf(msg), "Terraform binary could not be found")
 	}
 
-	if v, ok := checkVersion(p.env); !ok {
+	if v, ok := checkTerraformVersion(p.env); !ok {
 		return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
 	}
 	return nil
 }
 
 func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.Project, error) {
-	name := p.Path
+	name := ui.DisplayPath(p.Path)
+
 	if p.Workspace != "" {
 		name += fmt.Sprintf(" (%s)", p.Workspace)
 	}
@@ -322,7 +324,17 @@ func (p *DirProvider) runShow(opts *CmdOptions, planFile string) ([]byte, error)
 	return out, nil
 }
 
-func checkVersion(env *config.Environment) (string, bool) {
+func IsTerraformDir(path string) bool {
+	for _, ext := range []string{"tf", "hcl", "hcl.json"} {
+		matches, err := filepath.Glob(filepath.Join(path, fmt.Sprintf("*.%s", ext)))
+		if matches != nil && err == nil {
+			return true
+		}
+	}
+	return false
+}
+
+func checkTerraformVersion(env *config.Environment) (string, bool) {
 	v := env.TerraformVersion
 
 	// Allow any non-terraform binaries, e.g. terragrunt

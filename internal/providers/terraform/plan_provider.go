@@ -1,12 +1,15 @@
 package terraform
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 type PlanProvider struct {
@@ -17,11 +20,10 @@ type PlanProvider struct {
 
 func NewPlanProvider(cfg *config.Config, projectCfg *config.Project) schema.Provider {
 	dirProvider := NewDirProvider(cfg, projectCfg).(*DirProvider)
-	dirProvider.Path = filepath.Dir(projectCfg.Path)
 
 	return &PlanProvider{
 		DirProvider: dirProvider,
-		Path:        filepath.Base(projectCfg.Path),
+		Path:        projectCfg.Path,
 		env:         cfg.Environment,
 	}
 }
@@ -52,6 +54,31 @@ func (p *PlanProvider) LoadResources(usage map[string]*schema.UsageData) (*schem
 }
 
 func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
+	dir := filepath.Dir(p.Path)
+	planPath := filepath.Base(p.Path)
+
+	if !IsTerraformDir(dir) {
+		log.Debugf("%s is not a Terraform project directory, checking current working directory", dir)
+		dir = config.RootDir()
+		planPath = p.Path
+
+		if !IsTerraformDir(dir) {
+			return []byte{}, fmt.Errorf("%s %s.\n%s\n\n%s\n%s\n%s %s",
+				"Could not detect Terraform project directory for",
+				p.Path,
+				"Either the current working directory or the plan file's parent directory must be a Terraform project directory.",
+				"If the above does not work you can generate the plan JSON file with:",
+				ui.PrimaryString("terraform show -json plan.save > /path/to/plan.json"),
+				"and then run Infracost with",
+				ui.PrimaryString("--path=/path/to/plan.json"),
+			)
+		}
+	}
+
+	if p.DirProvider != nil {
+		p.DirProvider.Path = dir
+	}
+
 	err := p.checks()
 	if err != nil {
 		return []byte{}, err
@@ -65,5 +92,5 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	return p.runShow(opts, p.Path)
+	return p.runShow(opts, planPath)
 }

@@ -67,11 +67,12 @@ func runMain(cfg *config.Config) error {
 		cfg.Environment.SetProjectEnvironment(projectCfg)
 
 		provider := providers.Detect(cfg, projectCfg)
+
 		if provider == nil {
-			return errors.New("Could not detect path type")
+			return fmt.Errorf("Could not detect path type for %s", ui.DisplayPath(projectCfg.Path))
 		}
 
-		m := fmt.Sprintf("Detected %s at %s", provider.Type(), projectCfg.Path)
+		m := fmt.Sprintf("Detected %s at %s", provider.Type(), ui.DisplayPath(projectCfg.Path))
 		if cfg.IsLogging() {
 			log.Info(m)
 		} else {

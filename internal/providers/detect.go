@@ -3,9 +3,7 @@ package providers
 import (
 	"archive/zip"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"path/filepath"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -62,11 +60,5 @@ func isTerraformPlanJSON(path string) bool {
 }
 
 func isTerraformDir(path string) bool {
-	for _, ext := range []string{"tf", "hcl", "hcl.json"} {
-		matches, err := filepath.Glob(filepath.Join(path, fmt.Sprintf("*.%s", ext)))
-		if matches != nil && err == nil {
-			return true
-		}
-	}
-	return false
+	return terraform.IsTerraformDir(path)
 }
