@@ -8,6 +8,7 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/events"
+	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
@@ -70,6 +71,14 @@ Docs:
 			return loadGlobalFlags(cfg, cmd)
 		},
 		PreRun: func(cmd *cobra.Command, args []string) {
+			// If there's no args and the current dir isn't a Terraform dir show the help
+			cwd, err := os.Getwd()
+			if err == nil && len(cfg.Environment.Flags) == 0 && !terraform.IsTerraformDir(cwd) {
+				_ = cmd.Help()
+				os.Exit(0)
+			}
+
+			// Print the deprecation warnings
 			msg := ui.WarningString("┌────────────────────────────────────────────────────────────────────────┐\n")
 			msg += fmt.Sprintf("%s %s %s %s\n",
 				ui.WarningString("│"),

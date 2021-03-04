@@ -63,7 +63,10 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 
 	if !IsTerraformDir(dir) {
 		log.Debugf("%s is not a Terraform project directory, checking current working directory", dir)
-		dir = config.RootDir()
+		dir, err := os.Getwd()
+		if err != nil {
+			return []byte{}, err
+		}
 		planPath = p.Path
 
 		if !IsTerraformDir(dir) {

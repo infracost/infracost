@@ -27,7 +27,7 @@ func StripColor(str string) string {
 }
 
 func DisplayPath(path string) string {
-	if path == "" {
+	if path == "" || path == "." {
 		return "current directory"
 	}
 	return path
