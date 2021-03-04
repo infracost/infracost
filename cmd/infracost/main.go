@@ -69,11 +69,33 @@ Docs:
 			return loadGlobalFlags(cfg, cmd)
 		},
 		PreRun: func(cmd *cobra.Command, args []string) {
-			deprecationMsg := "The root command is deprecated and will be removed in v0.8.0. Please use `infracost breakdown`."
-			ui.PrintWarning(deprecationMsg)
+			fmt.Fprintln(os.Stderr, ui.WarningString("┌────────────────────────────────────────────────────────────────────────┐"))
+			fmt.Fprintf(os.Stderr, "%s %s %s %s\n",
+				ui.WarningString("│"),
+				ui.WarningString("Warning:"),
+				"The root command is deprecated and will be removed in v0.9.0.",
+				ui.WarningString("│"),
+			)
+
+			fmt.Fprintf(os.Stderr, "%s %s %s                                         %s\n",
+				ui.WarningString("│"),
+				"Please use",
+				ui.PrimaryString("infracost breakdown"),
+				ui.WarningString("│"),
+			)
+
+			fmt.Fprintf(os.Stderr, "%s %s %s             %s\n",
+				ui.WarningString("│"),
+				"Migration details:",
+				ui.LinkString("https://www.infracost.io/v0.8-migration"),
+				ui.WarningString("│"),
+			)
+			fmt.Fprintln(os.Stderr, ui.WarningString("└────────────────────────────────────────────────────────────────────────┘"))
 
 			processDeprecatedEnvVars()
 			processDeprecatedFlags(cmd)
+
+			fmt.Fprintln(os.Stderr, "")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// The root command will be deprecated

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/infracost/infracost/internal/config"
@@ -102,16 +103,37 @@ Merge multiple Infracost JSON files:
 }
 
 func reportCmd(cfg *config.Config) *cobra.Command {
-	deprecationMsg := "This command is deprecated and will be removed in v0.8.0. Please use `infracost output`."
-
 	cmd := outputCmd(cfg)
 	cmd.Use = "report"
 	cmd.Hidden = true
-	cmd.Long = ui.WarningString(deprecationMsg)
+	// cmd.Long = ui.WarningString(deprecationMsg)
 
 	cmd.PreRun = func(cmd *cobra.Command, args []string) {
+		fmt.Fprintln(os.Stderr, ui.WarningString("┌────────────────────────────────────────────────────────────────────┐"))
+		fmt.Fprintf(os.Stderr, "%s %s %s %s\n",
+			ui.WarningString("│"),
+			ui.WarningString("Warning:"),
+			"This command is deprecated and will be removed in v0.9.0.",
+			ui.WarningString("│"),
+		)
+
+		fmt.Fprintf(os.Stderr, "%s %s %s                                        %s\n",
+			ui.WarningString("│"),
+			"Please use",
+			ui.PrimaryString("infracost output"),
+			ui.WarningString("│"),
+		)
+
+		fmt.Fprintf(os.Stderr, "%s %s %s         %s\n",
+			ui.WarningString("│"),
+			"Migration details:",
+			ui.LinkString("https://www.infracost.io/v0.8-migration"),
+			ui.WarningString("│"),
+		)
+		fmt.Fprintln(os.Stderr, ui.WarningString("└────────────────────────────────────────────────────────────────────┘"))
+
 		processDeprecatedEnvVars()
-		ui.PrintWarning(deprecationMsg)
+		processDeprecatedFlags(cmd)
 	}
 
 	// Add deprecated flag
