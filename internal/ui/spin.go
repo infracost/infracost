@@ -6,7 +6,6 @@ import (
 	"time"
 
 	spinnerpkg "github.com/briandowns/spinner"
-	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -55,7 +54,11 @@ func (s *Spinner) Fail() {
 	if s.opts.EnableLogging {
 		log.Errorf("failed: %s", s.msg)
 	} else {
-		fmt.Fprintln(os.Stderr, color.HiRedString("%s✖ %s", s.opts.Indent, s.msg))
+		fmt.Fprintf(os.Stderr, "%s%s %s\n",
+			s.opts.Indent,
+			ErrorString("✖"),
+			s.msg,
+		)
 	}
 }
 
@@ -67,6 +70,10 @@ func (s *Spinner) Success() {
 	if s.opts.EnableLogging {
 		log.Infof("completed: %s", s.msg)
 	} else {
-		fmt.Fprintln(os.Stderr, PrimaryStringf("%s✔ %s", s.opts.Indent, s.msg))
+		fmt.Fprintf(os.Stderr, "%s%s %s\n",
+			s.opts.Indent,
+			PrimaryString("✔"),
+			s.msg,
+		)
 	}
 }

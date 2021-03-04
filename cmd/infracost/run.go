@@ -71,6 +71,10 @@ func runMain(cfg *config.Config) error {
 		}
 
 		projects = append(projects, project)
+
+		if !cfg.IsLogging() {
+			fmt.Fprintln(os.Stderr, "")
+		}
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
