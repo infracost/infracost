@@ -107,7 +107,7 @@ func reportCmd(cfg *config.Config) *cobra.Command {
 	cmd := outputCmd(cfg)
 	cmd.Use = "report"
 	cmd.Hidden = true
-	// cmd.Long = ui.WarningString(deprecationMsg)
+	cmd.Long = "This command is deprecated and will be removed in v0.9.0. Please use `infracost output`."
 
 	cmd.PreRun = func(cmd *cobra.Command, args []string) {
 		msg := ui.WarningString("┌────────────────────────────────────────────────────────────────────┐\n")
