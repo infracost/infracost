@@ -67,6 +67,7 @@ Docs:
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true
+			cfg.Environment.Command = cmd.Name()
 
 			return loadGlobalFlags(cfg, cmd)
 		},

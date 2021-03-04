@@ -23,6 +23,7 @@ type Environment struct {
 	OS                                  string   `json:"os"`
 	CIPlatform                          string   `json:"ciPlatform,omitempty"`
 	CIScript                            string   `json:"ciScript,omitempty"`
+	Command                             string   `json:"command"`
 	Flags                               []string `json:"flags"`
 	OutputFormat                        string   `json:"outputFormat"`
 	ProjectType                         string   `json:"projectType"`
