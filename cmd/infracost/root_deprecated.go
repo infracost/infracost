@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -136,7 +137,7 @@ var deprecatedEnvVarMapping = map[string]string{
 	"SKIP_UPDATE_CHECK":     "INFRACOST_SKIP_UPDATE_CHECK",
 }
 
-func processDeprecatedEnvVars() {
+func processDeprecatedEnvVars(cfg *config.Config) {
 	for oldName, newName := range deprecatedEnvVarMapping {
 		if val, ok := os.LookupEnv(oldName); ok {
 			m := fmt.Sprintf("Environment variable %s is deprecated and will be removed in v0.9.0.", oldName)
@@ -144,7 +145,11 @@ func processDeprecatedEnvVars() {
 				m += fmt.Sprintf(" Please use %s.", newName)
 			}
 
-			ui.PrintWarning(m)
+			if cfg.IsLogging() {
+				log.Warn(m)
+			} else {
+				ui.PrintWarning(m)
+			}
 
 			if _, ok := os.LookupEnv(newName); !ok {
 				os.Setenv(newName, val)

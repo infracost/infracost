@@ -10,6 +10,7 @@ import (
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/mod/semver"
 )
@@ -109,30 +110,38 @@ func reportCmd(cfg *config.Config) *cobra.Command {
 	// cmd.Long = ui.WarningString(deprecationMsg)
 
 	cmd.PreRun = func(cmd *cobra.Command, args []string) {
-		fmt.Fprintln(os.Stderr, ui.WarningString("┌────────────────────────────────────────────────────────────────────┐"))
-		fmt.Fprintf(os.Stderr, "%s %s %s %s\n",
+		msg := ui.WarningString("┌────────────────────────────────────────────────────────────────────┐\n")
+		msg += fmt.Sprintf("%s %s %s %s\n",
 			ui.WarningString("│"),
 			ui.WarningString("Warning:"),
 			"This command is deprecated and will be removed in v0.9.0.",
 			ui.WarningString("│"),
 		)
 
-		fmt.Fprintf(os.Stderr, "%s %s %s                                        %s\n",
+		msg += fmt.Sprintf("%s %s %s                                        %s\n",
 			ui.WarningString("│"),
 			"Please use",
 			ui.PrimaryString("infracost output"),
 			ui.WarningString("│"),
 		)
 
-		fmt.Fprintf(os.Stderr, "%s %s %s         %s\n",
+		msg += fmt.Sprintf("%s %s %s         %s\n",
 			ui.WarningString("│"),
 			"Migration details:",
 			ui.LinkString("https://www.infracost.io/v0.8-migration"),
 			ui.WarningString("│"),
 		)
-		fmt.Fprintln(os.Stderr, ui.WarningString("└────────────────────────────────────────────────────────────────────┘"))
+		msg += ui.WarningString("└────────────────────────────────────────────────────────────────────┘")
 
-		processDeprecatedEnvVars()
+		if cfg.IsLogging() {
+			for _, l := range strings.Split(ui.StripColor(msg), "\n") {
+				log.Warn(l)
+			}
+		} else {
+			fmt.Fprintln(os.Stderr, msg)
+		}
+
+		processDeprecatedEnvVars(cfg)
 		processDeprecatedFlags(cmd)
 	}
 

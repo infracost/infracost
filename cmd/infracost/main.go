@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"runtime/debug"
+	"strings"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/events"
@@ -69,30 +70,38 @@ Docs:
 			return loadGlobalFlags(cfg, cmd)
 		},
 		PreRun: func(cmd *cobra.Command, args []string) {
-			fmt.Fprintln(os.Stderr, ui.WarningString("┌────────────────────────────────────────────────────────────────────────┐"))
-			fmt.Fprintf(os.Stderr, "%s %s %s %s\n",
+			msg := ui.WarningString("┌────────────────────────────────────────────────────────────────────────┐\n")
+			msg += fmt.Sprintf("%s %s %s %s\n",
 				ui.WarningString("│"),
 				ui.WarningString("Warning:"),
 				"The root command is deprecated and will be removed in v0.9.0.",
 				ui.WarningString("│"),
 			)
 
-			fmt.Fprintf(os.Stderr, "%s %s %s                                         %s\n",
+			msg += fmt.Sprintf("%s %s %s                                         %s\n",
 				ui.WarningString("│"),
 				"Please use",
 				ui.PrimaryString("infracost breakdown"),
 				ui.WarningString("│"),
 			)
 
-			fmt.Fprintf(os.Stderr, "%s %s %s             %s\n",
+			msg += fmt.Sprintf("%s %s %s             %s\n",
 				ui.WarningString("│"),
 				"Migration details:",
 				ui.LinkString("https://www.infracost.io/v0.8-migration"),
 				ui.WarningString("│"),
 			)
-			fmt.Fprintln(os.Stderr, ui.WarningString("└────────────────────────────────────────────────────────────────────────┘"))
+			msg += ui.WarningString("└────────────────────────────────────────────────────────────────────────┘")
 
-			processDeprecatedEnvVars()
+			if cfg.IsLogging() {
+				for _, l := range strings.Split(ui.StripColor(msg), "\n") {
+					log.Warn(l)
+				}
+			} else {
+				fmt.Fprintln(os.Stderr, msg)
+			}
+
+			processDeprecatedEnvVars(cfg)
 			processDeprecatedFlags(cmd)
 
 			fmt.Fprintln(os.Stderr, "")
