@@ -11,7 +11,7 @@
 
 process_args () {
   # Set variables based on the order for GitHub Actions, or the env value for other CIs
-  path_flag=${1:-$path_flag}
+  path=${1:-$path}
   terraform_plan_flags=${4:-$terraform_plan_flags}
   terraform_workspace=${4:-$terraform_workspace}
   percentage_threshold=${5:-$percentage_threshold}
@@ -19,12 +19,12 @@ process_args () {
   config_file=${7:-$config_file}
 
   # Handle deprecated var names
-  path_flag=${path_flag:-$tfjson}
-  path_flag=${path_flag:-$terraform_json_file}
-  path_flag=${path_flag:-$tfplan}
-  path_flag=${path_flag:-$terraform_plan_file}
-  path_flag=${path_flag:-$tfdir}
-  path_flag=${path_flag:-$terraform_dir}
+  path=${path:-$tfjson}
+  path=${path:-$terraform_json_file}
+  path=${path:-$tfplan}
+  path=${path:-$terraform_plan_file}
+  path=${path:-$tfdir}
+  path=${path:-$terraform_dir}
   terraform_plan_flags=${terraform_plan_flags:-$tfflags}
 
   # Set defaults
@@ -54,8 +54,8 @@ process_args () {
 build_breakdown_cmd () {
   breakdown_cmd="${INFRACOST_BINARY} breakdown --no-color --format=json"
 
-  if [ ! -z "$path_flag" ]; then
-    breakdown_cmd="$breakdown_cmd --path $path_flag"
+  if [ ! -z "$path" ]; then
+    breakdown_cmd="$breakdown_cmd --path $path"
   fi
   if [ ! -z "$terraform_plan_flags" ]; then
     breakdown_cmd="$breakdown_cmd --terraform-plan-flags \"$terraform_plan_flags\""
