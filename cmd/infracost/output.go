@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/infracost/infracost/internal/config"
@@ -26,20 +27,39 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 Show a breakdown from multiple Infracost JSON files:
 
-  infracost output out1.json out2.json out3.json
+  infracost output --path out1.json --path out2.json --path out3.json
 
 Create HTML report from multiple Infracost JSON files:
 
-  infracost output --format html out*.json > output.html
+  infracost output --format html --path out*.json > output.html
 
 Merge multiple Infracost JSON files:
 
-  infracost output --format json out*.json`,
+  infracost output --format json --path out*.json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			files := args
+			inputFiles := []string{}
 
-			inputs := make([]output.ReportInput, 0, len(files))
-			for _, f := range files {
+			// Handle deprecated command name
+			if cmd.Name() == "report" {
+				inputFiles = args
+			} else {
+				if !cmd.Flags().Changed("path") {
+					m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to an Infracost JSON file.", ui.PrimaryString("--path"))
+					ui.PrintUsageErrorAndExit(cmd, m)
+				}
+
+				paths, _ := cmd.Flags().GetStringArray("path")
+				for _, path := range paths {
+					matches, _ := filepath.Glob(path)
+
+					for _, match := range matches {
+						inputFiles = append(inputFiles, match)
+					}
+				}
+			}
+
+			inputs := make([]output.ReportInput, 0, len(inputFiles))
+			for _, f := range inputFiles {
 				data, err := ioutil.ReadFile(f)
 				if err != nil {
 					return errors.Wrap(err, "Error reading JSON file")
@@ -96,6 +116,8 @@ Merge multiple Infracost JSON files:
 			return nil
 		},
 	}
+
+	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON file")
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free. Ignored for JSON outputs")
