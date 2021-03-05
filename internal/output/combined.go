@@ -25,7 +25,7 @@ func Combine(inputs []ReportInput, opts Options) Root {
 	var totalMonthlyCost *decimal.Decimal
 
 	projects := make([]Project, 0)
-	summaries := make([]*ResourceSummary, 0, len(inputs))
+	summaries := make([]*Summary, 0, len(inputs))
 
 	for _, input := range inputs {
 
@@ -57,7 +57,7 @@ func Combine(inputs []ReportInput, opts Options) Root {
 			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*input.Root.TotalMonthlyCost))
 		}
 
-		summaries = append(summaries, input.Root.ResourceSummary)
+		summaries = append(summaries, input.Root.Summary)
 	}
 
 	sortResources(combined.Resources, opts.GroupKey)
@@ -66,25 +66,25 @@ func Combine(inputs []ReportInput, opts Options) Root {
 	combined.TotalHourlyCost = totalHourlyCost
 	combined.TotalMonthlyCost = totalMonthlyCost
 	combined.TimeGenerated = time.Now()
-	combined.ResourceSummary = combinedResourceSummaries(summaries)
+	combined.Summary = combinedResourceSummaries(summaries)
 
 	return combined
 }
 
-func combinedResourceSummaries(summaries []*ResourceSummary) *ResourceSummary {
-	combined := &ResourceSummary{}
+func combinedResourceSummaries(summaries []*Summary) *Summary {
+	combined := &Summary{}
 
 	for _, s := range summaries {
 		if s == nil {
 			continue
 		}
 
-		combined.SupportedCounts = combineCounts(combined.SupportedCounts, s.SupportedCounts)
-		combined.UnsupportedCounts = combineCounts(combined.UnsupportedCounts, s.UnsupportedCounts)
-		combined.TotalSupported = addIntPtrs(combined.TotalSupported, s.TotalSupported)
-		combined.TotalUnsupported = addIntPtrs(combined.TotalUnsupported, s.TotalUnsupported)
-		combined.TotalNoPrice = addIntPtrs(combined.TotalNoPrice, s.TotalNoPrice)
-		combined.Total = addIntPtrs(combined.Total, s.Total)
+		combined.SupportedResourceCounts = combineCounts(combined.SupportedResourceCounts, s.SupportedResourceCounts)
+		combined.UnsupportedResourceCounts = combineCounts(combined.UnsupportedResourceCounts, s.UnsupportedResourceCounts)
+		combined.TotalSupportedResources = addIntPtrs(combined.TotalSupportedResources, s.TotalSupportedResources)
+		combined.TotalUnsupportedResources = addIntPtrs(combined.TotalUnsupportedResources, s.TotalUnsupportedResources)
+		combined.TotalNoPriceResources = addIntPtrs(combined.TotalNoPriceResources, s.TotalNoPriceResources)
+		combined.TotalResources = addIntPtrs(combined.TotalResources, s.TotalResources)
 	}
 
 	return combined
