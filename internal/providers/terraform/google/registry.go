@@ -16,6 +16,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetDNSManagedZoneRegistryItem(),
 	GetDNSRecordSetRegistryItem(),
 	GetKMSCryptoKeyRegistryItem(),
+	GetMonitoringItem(),
 	GetPubSubSubscriptionRegistryItem(),
 	GetPubSubTopicRegistryItem(),
 	GetStorageBucketRegistryItem(),
