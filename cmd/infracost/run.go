@@ -18,7 +18,7 @@ import (
 )
 
 func addRunFlags(cmd *cobra.Command) {
-	cmd.Flags().StringP("path", "p", "", "Path to the code directory or file (defaults to the current directory)")
+	cmd.Flags().StringP("path", "p", "", "Path to the code directory or file")
 
 	cmd.Flags().String("config-file", "", "Path to the Infracost config file. Cannot be used with other flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
@@ -150,16 +150,27 @@ func runMain(cfg *config.Config) error {
 }
 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
+	hasPathFlag := cmd.Flags().Changed("path")
 	hasConfigFile := cmd.Flags().Changed("config-file")
 
-	hasProjectFlags := (cmd.Flags().Changed("path") ||
+	if cmd.Name() != "infracost" && !hasPathFlag && !hasConfigFile {
+		m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
+		m += " - Terraform plan JSON file\n - Terraform code directory\n - Terraform plan file\n - Terraform state JSON file"
+		m += "\n\nAlternatively, to run Infracost against multiple projects, specify the path to a config file with the --config-file flag."
+
+		ui.PrintUsageErrorAndExit(cmd, m)
+	}
+
+	hasProjectFlags := (hasPathFlag ||
 		cmd.Flags().Changed("usage-file") ||
 		cmd.Flags().Changed("terraform-plan-flags") ||
 		cmd.Flags().Changed("terraform-workspace") ||
 		cmd.Flags().Changed("terraform-use-state"))
 
 	if hasConfigFile && hasProjectFlags {
-		ui.PrintUsageErrorAndExit(cmd, "--config-file flag cannot be used with project flags")
+		m := "--config-file flag cannot be used with the following flags: "
+		m += "--path, --terraform-*, --usage-file"
+		ui.PrintUsageErrorAndExit(cmd, m)
 	}
 
 	if hasConfigFile {
