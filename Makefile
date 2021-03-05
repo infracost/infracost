@@ -41,7 +41,6 @@ release: build_all
 	cd build; tar -czf $(BINARY)-linux-amd64.tar.gz $(BINARY)-linux-amd64
 	cd build; tar -czf $(BINARY)-darwin-amd64.tar.gz $(BINARY)-darwin-amd64
 	cd build; tar -czf $(BINARY)-darwin-arm64.tar.gz $(BINARY)-darwin-arm64
-	cd docs/generated; tar -czvf docs.tar.gz *.md
 
 install_provider:
 	scripts/install_provider.sh $(TERRAFORM_PROVIDER_INFRACOST_VERSION)
