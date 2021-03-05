@@ -33,7 +33,7 @@ func TestMonitoring(t *testing.T) {
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 				{
-					Name:             "Monitoring API calls",
+					Name:             "API calls",
 					PriceHash:        "ab2372dda0c91bff4b574df0f31cc087-d2f0733db2ebdc331df796416435ad3c",
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
@@ -60,8 +60,8 @@ func TestMonitoring_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"google_monitoring_metric_descriptor.my_monit": map[string]interface{}{
-			"monthly_monitoring_data_mib":  500000,
-			"monthly_monitoring_api_calls": 1000000,
+			"monthly_monitoring_data_mb": 500000,
+			"monthly_api_calls":          1000000,
 		},
 	})
 
@@ -85,7 +85,7 @@ func TestMonitoring_usage(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(250000)),
 				},
 				{
-					Name:             "Monitoring API calls",
+					Name:             "API calls",
 					PriceHash:        "ab2372dda0c91bff4b574df0f31cc087-d2f0733db2ebdc331df796416435ad3c",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(1000000)),
 				},

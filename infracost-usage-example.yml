@@ -328,8 +328,8 @@ resource_usage:
     monthly_key_operations: 1000000 # Monthly number of key operations.
 
   google_monitoring_metric_descriptor.my_monitoring:
-    monthly_monitoring_data_mib: 500000   # Monthly monitoring data in MiB (1 MiB = 1,024 kibibytes (kibibyte is 1024 bytes))
-    monthly_monitoring_api_calls: 1000000 # Monthly read API calls (Write API calls are free)
+    monthly_monitoring_data_mb: 5000 # Monthly monitoring data in MB.
+    monthly_api_calls: 1000000       # Monthly read API calls (write calls are free).
 
   google_pubsub_subscription.my_subscription:
     monthly_message_data_tb: 7.416 # Monthly amount of message data pulled by the subscription in TB.
