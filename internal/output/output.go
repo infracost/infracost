@@ -32,7 +32,7 @@ type Project struct {
 }
 
 func (p *Project) Label() string {
-	metaVals := []string{}
+	metaVals := make([]string, 0)
 	for _, v := range p.Metadata {
 		metaVals = append(metaVals, v)
 	}

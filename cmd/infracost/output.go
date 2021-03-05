@@ -51,10 +51,7 @@ Merge multiple Infracost JSON files:
 				paths, _ := cmd.Flags().GetStringArray("path")
 				for _, path := range paths {
 					matches, _ := filepath.Glob(path)
-
-					for _, match := range matches {
-						inputFiles = append(inputFiles, match)
-					}
+					inputFiles = append(inputFiles, matches...)
 				}
 			}
 
