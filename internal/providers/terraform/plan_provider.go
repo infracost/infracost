@@ -37,7 +37,7 @@ func (p *PlanProvider) DisplayType() string {
 }
 
 func (p *PlanProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.Project, error) {
-	var project *schema.Project = schema.NewProject(p.Path)
+	var project *schema.Project = schema.NewProject(p.Path, map[string]string{})
 
 	j, err := p.generatePlanJSON()
 	if err != nil {

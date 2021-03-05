@@ -81,12 +81,7 @@ func (p *DirProvider) checks() error {
 }
 
 func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.Project, error) {
-	name := ui.DisplayPath(p.Path)
-
-	if p.Workspace != "" {
-		name += fmt.Sprintf(" (%s)", p.Workspace)
-	}
-	var project *schema.Project = schema.NewProject(name)
+	var project *schema.Project = schema.NewProject(p.Path, map[string]string{"terraformWorkspace": p.Workspace})
 
 	var j []byte
 	var err error

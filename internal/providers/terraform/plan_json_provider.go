@@ -29,7 +29,7 @@ func (p *PlanJSONProvider) DisplayType() string {
 }
 
 func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.Project, error) {
-	var project *schema.Project = schema.NewProject(p.Path)
+	var project *schema.Project = schema.NewProject(p.Path, map[string]string{})
 
 	j, err := ioutil.ReadFile(p.Path)
 	if err != nil {
