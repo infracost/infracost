@@ -9,8 +9,8 @@ import (
 func diffCmd(cfg *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "diff",
-		Short: "Generates a diff view of costs",
-		Long: `Generates a diff view of costs
+		Short: "Generate diff view of costs",
+		Long: `Generate diff view of costs
 
 Use terraform directory with any required terraform flags:
 
