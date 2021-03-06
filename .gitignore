@@ -21,6 +21,7 @@ vendor/
 # Terraform artifacts
 **/.terraform/**
 examples/*/plan.save
+examples/*/tfplan.binary
 examples/*/plan.json
 examples/*/.terraform.lock.hcl
 

@@ -34,4 +34,4 @@ projects:
   # - path: /path/to/plan.json
 
   ## If using the Terraform plan file method, see https://www.infracost.io/docs/#4-terraform-plan-file
-  # - path: example/terraform/plan.save
+  # - path: example/terraform/tfplan.binary

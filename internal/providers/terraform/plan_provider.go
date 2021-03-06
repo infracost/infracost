@@ -62,7 +62,7 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 	planPath := filepath.Base(p.Path)
 
 	if !IsTerraformDir(dir) {
-		log.Debugf("%s is not a Terraform project directory, checking current working directory", dir)
+		log.Debugf("%s is not a Terraform directory, checking current working directory", dir)
 		dir, err := os.Getwd()
 		if err != nil {
 			return []byte{}, err
@@ -71,11 +71,11 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 
 		if !IsTerraformDir(dir) {
 			return []byte{}, fmt.Errorf("%s %s.\n%s\n\n%s\n%s\n%s %s",
-				"Could not detect Terraform project directory for",
+				"Could not detect Terraform directory for",
 				p.Path,
-				"Either the current working directory or the plan file's parent directory must be a Terraform project directory.",
+				"Either the current working directory or the plan file's parent directory must be a Terraform directory.",
 				"If the above does not work you can generate the plan JSON file with:",
-				ui.PrimaryString("terraform show -json plan.save > /path/to/plan.json"),
+				ui.PrimaryString("terraform show -json tfplan.binary > /path/to/plan.json"),
 				"and then run Infracost with",
 				ui.PrimaryString("--path=/path/to/plan.json"),
 			)

@@ -42,7 +42,7 @@ Infracost shows cloud cost estimates for Terraform projects. It helps developers
     cd example-terraform
 
     # You can play with `aws/main.tf` and `aws/infracost-usage.yml`, and re-run infracost to compare costs
-    infracost diff ---path aws --usage-file aws/infracost-usage.yml
+    infracost diff --path aws --usage-file aws/infracost-usage.yml
     ```
 
 Please **watch/star** this repo as we add new cloud resources every week or so.

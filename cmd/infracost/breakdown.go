@@ -22,14 +22,14 @@ Use terraform state file:
 
 Use terraform plan JSON:
 
-  terraform plan -out plan.save .
-  terraform show -json plan.save > plan.json
+  terraform plan -out tfplan.binary .
+  terraform show -json tfplan.binary > plan.json
   infracost breakdown --path /path/to/plan.json
 
 Use terraform plan file:
 
-  terraform plan -out plan.save .
-  infracost breakdown --path plan.save`,
+  terraform plan -out tfplan.binary .
+  infracost breakdown --path tfplan.binary`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkAPIKey(cfg.APIKey, cfg.PricingAPIEndpoint, cfg.DefaultPricingAPIEndpoint); err != nil {
 				return err

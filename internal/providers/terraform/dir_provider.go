@@ -64,7 +64,7 @@ func (p *DirProvider) Type() string {
 }
 
 func (p *DirProvider) DisplayType() string {
-	return "Terraform project directory"
+	return "Terraform directory"
 }
 
 func (p *DirProvider) checks() error {

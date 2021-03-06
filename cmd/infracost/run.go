@@ -18,7 +18,7 @@ import (
 )
 
 func addRunFlags(cmd *cobra.Command) {
-	cmd.Flags().StringP("path", "p", "", "Path to the Terraform code directory or JSON/plan file")
+	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
 
 	cmd.Flags().String("config-file", "", "Path to the Infracost config file. Cannot be used with other flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
@@ -38,7 +38,7 @@ func runMain(cfg *config.Config) error {
 		if provider == nil {
 			m := fmt.Sprintf("Could not detect path type for %s\n\n", ui.DisplayPath(projectCfg.Path))
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform code directory\n - Terraform plan file\n - Terraform state JSON file"
+			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file\n - Terraform state JSON file"
 			return errors.New(m)
 		}
 
@@ -155,7 +155,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if cmd.Name() != "infracost" && !hasPathFlag && !hasConfigFile {
 		m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-		m += " - Terraform plan JSON file\n - Terraform code directory\n - Terraform plan file\n - Terraform state JSON file"
+		m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file\n - Terraform state JSON file"
 		m += "\n\nAlternatively, to run Infracost against multiple projects, specify the path to a config file with the --config-file flag."
 
 		ui.PrintUsageErrorAndExit(cmd, m)
