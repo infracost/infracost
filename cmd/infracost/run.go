@@ -20,13 +20,13 @@ import (
 func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
 
-	cmd.Flags().String("config-file", "", "Path to the Infracost config file. Cannot be used with other flags")
+	cmd.Flags().String("config-file", "", "Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
 
-	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to the 'terraform plan' command")
-	cmd.Flags().String("terraform-workspace", "", "The Terraform workspace to use")
+	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory")
+	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
 
-	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free. Ignored for JSON outputs")
+	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 }
 
 func runMain(cfg *config.Config) error {
