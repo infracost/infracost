@@ -49,7 +49,7 @@ func addRootDeprecatedFlags(cmd *cobra.Command) {
 	cmd.Flags().String("format", "table", "Output format: json, table, html")
 	_ = cmd.Flags().MarkHidden("format")
 
-	cmd.Flags().String("path", "", "Path to the code directory or file")
+	cmd.Flags().StringP("path", "p", "", "Path to the Terraform code directory or JSON/plan file")
 	_ = cmd.Flags().MarkHidden("path")
 
 	cmd.Flags().String("pricing-api-endpoint", "", "Specify an alternate Cloud Pricing API URL")

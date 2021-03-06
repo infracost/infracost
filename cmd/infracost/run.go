@@ -18,7 +18,7 @@ import (
 )
 
 func addRunFlags(cmd *cobra.Command) {
-	cmd.Flags().StringP("path", "p", "", "Path to the code directory or file")
+	cmd.Flags().StringP("path", "p", "", "Path to the Terraform code directory or JSON/plan file")
 
 	cmd.Flags().String("config-file", "", "Path to the Infracost config file. Cannot be used with other flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
