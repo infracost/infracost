@@ -12,11 +12,11 @@
 process_args () {
   # Set variables based on the order for GitHub Actions, or the env value for other CIs
   path=${1:-$path}
-  terraform_plan_flags=${4:-$terraform_plan_flags}
-  terraform_workspace=${4:-$terraform_workspace}
-  percentage_threshold=${5:-$percentage_threshold}
-  usage_file=${6:-$usage_file}
-  config_file=${7:-$config_file}
+  terraform_plan_flags=${2:-$terraform_plan_flags}
+  terraform_workspace=${3:-$terraform_workspace}
+  percentage_threshold=${4:-$percentage_threshold}
+  usage_file=${5:-$usage_file}
+  config_file=${6:-$config_file}
 
   # Handle deprecated var names
   path=${path:-$tfjson}
