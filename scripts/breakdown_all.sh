@@ -10,11 +10,9 @@ tfprojects=$(find . -type f -name '*.tf' | sed -E 's|/[^/]+$||' | grep -v module
 # Run infracost on the folders individually
 while IFS= read -r tfproject; do
   echo "Running infracost breakdown for $tfproject"
-  cd $tfproject
   filename=$(echo $tfproject | sed 's:/:-:g' | cut -c3-)
   # TODO: customize to how you run infracost
-  infracost breakdown --path . --format json > "$filename-infracost-out.json"
-  cd - > /dev/null
+  infracost breakdown --path $tfproject --format json > "$filename-infracost-out.json"
 done <<< "$tfprojects"
 
 # Run infracost output to merge the subfolder results
