@@ -39,7 +39,7 @@ build_breakdown_cmd () {
 
 build_output_cmd () {
   breakdown_path=$1
-  output_cmd="${INFRACOST_BINARY} output --no-color --format=diff $1"
+  output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
   echo "${output_cmd}"
 }
 
