@@ -31,6 +31,7 @@ jobs:
             ./build/infracost-linux-amd64.tar.gz
             ./build/infracost-windows-amd64.tar.gz
             ./build/infracost-darwin-amd64.tar.gz
+            ./build/infracost-darwin-arm64.tar.gz
             ./docs/generated/docs.tar.gz
 
       - name: Build and push Docker images
