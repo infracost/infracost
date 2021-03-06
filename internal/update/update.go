@@ -57,6 +57,8 @@ func CheckForUpdate(cfg *config.Config) (*Info, error) {
 			cmd = "$ curl -s -L https://github.com/infracost/infracost/releases/latest/download/infracost-linux-amd64.tar.gz | tar xz -C /tmp && \\\n  sudo mv /tmp/infracost-linux-amd64 /usr/local/bin/infracost"
 		} else if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
 			cmd = "$ curl -s -L https://github.com/infracost/infracost/releases/latest/download/infracost-darwin-amd64.tar.gz | tar xz -C /tmp && \\\n  sudo mv /tmp/infracost-darwin-amd64 /usr/local/bin/infracost"
+		} else if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
+			cmd = "$ curl -s -L https://github.com/infracost/infracost/releases/latest/download/infracost-darwin-arm64.tar.gz | tar xz -C /tmp && \\\n  sudo mv /tmp/infracost-darwin-arm64 /usr/local/bin/infracost"
 		}
 	}
 
