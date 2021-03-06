@@ -29,6 +29,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetPubSubSubscriptionRegistryItem(),
 	GetPubSubTopicRegistryItem(),
 	GetRedisInstanceRegistryItem(),
+	GetSQLInstanceRegistryItem(),
 	GetStorageBucketRegistryItem(),
 }
 
@@ -140,6 +141,9 @@ var FreeResources []string = []string{
 	"google_service_account_iam_member",
 	"google_service_account_iam_policy",
 	"google_service_account_key",
+	"google_sql_database",
+	"google_sql_ssl_cert",
+	"google_sql_user",
 	"google_storage_bucket_access_control",
 	"google_storage_bucket_acl",
 	"google_storage_bucket_iam_binding",
