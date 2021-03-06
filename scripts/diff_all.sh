@@ -18,9 +18,8 @@ while IFS= read -r tfproject; do
 done <<< "$tfprojects"
 
 # Run infracost output to merge the subfolder results
-jsonfiles=$(find . -name "*-infracost-out.json")
-infracost output --format diff $(echo $jsonfiles | tr '\n' ' ')
-echo "Also saved HTML report in infracost-report.html"
+jsonfiles=($(find . -name "*-infracost-out.json" | tr '\n' ' '))
+infracost output --format diff $(echo ${jsonfiles[@]/#/--path })
 
 # Remove temp json files
-rm $(echo $jsonfiles | tr '\n' ' ')
+rm $jsonfiles
