@@ -40,7 +40,7 @@ func NewSQLInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 }
 
-func SharedSQLInstance(name, tier, availabilityType string, DBType SQLInstanceDBType, region string) *schema.CostComponent {
+func SharedSQLInstance(name, tier, availabilityType string, dbType SQLInstanceDBType, region string) *schema.CostComponent {
 	cost := &schema.CostComponent{
 		Name: "Instance pricing",
 	}
@@ -49,7 +49,7 @@ func SharedSQLInstance(name, tier, availabilityType string, DBType SQLInstanceDB
 		log.Debugf("No tier resource group for sql instance %s", name)
 		return cost
 	}
-	descriptionRegex := SQLInstanceAvDBTypeToDescriptionRegex(availabilityType, DBType)
+	descriptionRegex := SQLInstanceAvDBTypeToDescriptionRegex(availabilityType, dbType)
 	cost = &schema.CostComponent{
 		Name:           "Instance pricing",
 		Unit:           "seconds",
@@ -88,7 +88,7 @@ func SQLInstanceTierToResourceGroup(tier string) string {
 	return data[tier]
 }
 
-func SQLInstanceAvDBTypeToDescriptionRegex(availabilityType string, DBType SQLInstanceDBType) string {
+func SQLInstanceAvDBTypeToDescriptionRegex(availabilityType string, dbType SQLInstanceDBType) string {
 	dbTypeNames := map[SQLInstanceDBType]string{
 		MySQL:      "MySQL",
 		PostgreSQL: "PostgreSQL",
@@ -98,8 +98,8 @@ func SQLInstanceAvDBTypeToDescriptionRegex(availabilityType string, DBType SQLIn
 		"REGIONAL": "Regional",
 		"ZONAL":    "Zonal",
 	}
-	dbType := dbTypeNames[DBType]
-	avType := availabilityTypeNames[availabilityType]
-	description := fmt.Sprintf("/%s: %s/", dbType, avType)
+	dbTypeString := dbTypeNames[dbType]
+	availabilityTypeString := availabilityTypeNames[availabilityType]
+	description := fmt.Sprintf("/%s: %s/", dbTypeString, availabilityTypeString)
 	return description
 }
