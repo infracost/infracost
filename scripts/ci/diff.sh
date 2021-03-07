@@ -141,7 +141,7 @@ post_to_github () {
 }
 
 post_to_gitlab () {
-  echo "Posting comment to GitLab commit $CI_COMMIT_SHA using $CI_SERVER_URL"
+  echo "Posting comment to GitLab commit $CI_COMMIT_SHA"
   msg="$(build_msg true)"
   jq -Mnc --arg msg "$msg" '{"note": "\($msg)"}' | curl -L -X POST -d @- \
     -H "Content-Type: application/json" \
@@ -164,7 +164,7 @@ post_to_circle_ci () {
     jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
       -H "Content-Type: application/json" \
       -H "Authorization: token $GITHUB_TOKEN" \
-      "$GITHUB_API_URL/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commits/$CIRCLE_SHA1/comments"
+      "https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commits/$CIRCLE_SHA1/comments"
 
   elif echo $CIRCLE_REPOSITORY_URL | grep -Eiq bitbucket; then
     if [ ! -z "$CIRCLE_PULL_REQUEST" ]; then
