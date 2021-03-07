@@ -59,7 +59,7 @@ format_cost () {
 build_msg () {
   change_word="increase"
   change_sym="+"
-  if [ $(echo "$new_monthly_cost < ${old_monthly_cost}" | bc -l) = 1 ]; then
+  if [ $(echo "$total_monthly_cost < ${past_total_monthly_cost}" | bc -l) = 1 ]; then
     change_word="decrease"
     change_sym=""
   fi
@@ -73,8 +73,8 @@ build_msg () {
   msg="${msg}\n\n"
   msg="${msg}Monthly cost will ${change_word} by $(format_cost $diff_cost)$percent_display\n"
   msg="${msg}\n"
-  msg="${msg}Previous monthly cost: $(format_cost $old_monthly_cost)\n"
-  msg="${msg}New monthly cost: $(format_cost $new_monthly_cost)\n"
+  msg="${msg}Previous monthly cost: $(format_cost $past_total_monthly_cost)\n"
+  msg="${msg}New monthly cost: $(format_cost $total_monthly_cost)\n"
   msg="${msg}\n"
   msg="${msg}Infracost output:\n"
   msg="${msg}\n"
@@ -105,18 +105,18 @@ if [ "$atlantis_debug" = "true" ]; then
 fi
 diff_output=$(cat infracost_output_cmd | sh)
 
-old_monthly_cost=$(jq '[.projects[].pastBreakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
-new_monthly_cost=$(jq '[.projects[].breakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
+past_total_monthly_cost=$(jq '[.projects[].pastBreakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
+total_monthly_cost=$(jq '[.projects[].breakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
 diff_cost=$(jq '[.projects[].diff.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
 
 # If both old and new costs are greater than 0
-if [ $(echo "$old_monthly_cost > 0" | bc -l) = 1 ] && [ $(echo "$new_monthly_cost > 0" | bc -l) = 1 ]; then
-  percent=$(echo "scale=4; $new_monthly_cost / $old_monthly_cost * 100 - 100" | bc)
+if [ $(echo "$past_total_monthly_cost > 0" | bc -l) = 1 ] && [ $(echo "$total_monthly_cost > 0" | bc -l) = 1 ]; then
+  percent=$(echo "scale=4; $total_monthly_cost / $past_total_monthly_cost * 100 - 100" | bc)
   percent="$(printf "%.0f" $percent)"
 fi
 
 # If both old and new costs are less than or equal to 0
-if [ $(echo "$old_monthly_cost <= 0" | bc -l) = 1 ] && [ $(echo "$new_monthly_cost <= 0" | bc -l) = 1 ]; then
+if [ $(echo "$past_total_monthly_cost <= 0" | bc -l) = 1 ] && [ $(echo "$total_monthly_cost <= 0" | bc -l) = 1 ]; then
   percent=0
 fi
 
