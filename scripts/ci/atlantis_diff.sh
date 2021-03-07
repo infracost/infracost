@@ -29,7 +29,9 @@ build_breakdown_cmd () {
   if [ ! -z "$usage_file" ]; then
     breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
   fi
-
+  if [ ! -z "$config_file" ]; then
+    breakdown_cmd="$breakdown_cmd --config-file $config_file"
+  fi
   if [ "$atlantis_debug" != "true" ]; then
     breakdown_cmd="$breakdown_cmd 2>/dev/null"
   fi
