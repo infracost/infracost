@@ -149,8 +149,6 @@ post_to_gitlab () {
     -H "Content-Type: application/json" \
     -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
     "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/repository/commits/$CI_COMMIT_SHA/comments"
-  # Previously we posted to the merge request, using the comment_key=body above:
-  # "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes"
 }
 
 post_bitbucket_comment () {
@@ -241,10 +239,9 @@ else
   exit 0
 fi
 
-echo "::set-output name=past_total_monthly_cost::$past_total_monthly_cost"
-echo "::set-output name=total_monthly_cost::$total_monthly_cost"
-
 if [ ! -z "$GITHUB_ACTIONS" ]; then
+  echo "::set-output name=past_total_monthly_cost::$past_total_monthly_cost"
+  echo "::set-output name=total_monthly_cost::$total_monthly_cost"
   post_to_github
 elif [ ! -z "$GITLAB_CI" ]; then
   post_to_gitlab
