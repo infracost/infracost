@@ -29,8 +29,6 @@ process_args () {
 
   # Set defaults
   percentage_threshold=${percentage_threshold:-0}
-  GITHUB_API_URL=${GITHUB_API_URL:-https://api.github.com}
-  BITBUCKET_API_URL=${BITBUCKET_API_URL:-https://api.bitbucket.org}
   INFRACOST_BINARY=${INFRACOST_BINARY:-infracost}
 
   # Export as it's used by infracost, not this script
@@ -139,16 +137,16 @@ post_to_github () {
   jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
     -H "Content-Type: application/json" \
     -H "Authorization: token $GITHUB_TOKEN" \
-    "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
+    "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
 }
 
 post_to_gitlab () {
-  echo "Posting comment to GitLab commit $CI_COMMIT_SHA"
+  echo "Posting comment to GitLab commit $CI_COMMIT_SHA using $CI_SERVER_URL"
   msg="$(build_msg true)"
   jq -Mnc --arg msg "$msg" '{"note": "\($msg)"}' | curl -L -X POST -d @- \
     -H "Content-Type: application/json" \
     -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
-    "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/repository/commits/$CI_COMMIT_SHA/comments"
+    "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/repository/commits/$CI_COMMIT_SHA/comments"
 }
 
 post_bitbucket_comment () {
@@ -156,7 +154,7 @@ post_bitbucket_comment () {
   jq -Mnc --arg msg "$msg" '{"content": {"raw": "\($msg)"}}' | curl -L -X POST -d @- \
     -H "Content-Type: application/json" \
     -u $BITBUCKET_TOKEN \
-    "$BITBUCKET_API_URL/2.0/repositories/$1"
+    "https://api.bitbucket.org/2.0/repositories/$1"
 }
 
 post_to_circle_ci () {
