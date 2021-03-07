@@ -87,7 +87,7 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 		EnableLogging: cfg.IsLogging(),
 		NoColor:       cfg.NoColor,
 	}
-	spinner := ui.NewSpinner("Calculating cost estimate", spinnerOpts)
+	spinner := ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 
 	for _, project := range projects {
 		if err := prices.PopulatePrices(cfg, project); err != nil {

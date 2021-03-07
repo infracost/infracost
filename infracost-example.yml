@@ -1,37 +1,11 @@
-## Use a config file to describe multiple Terraform projects
-## `infracost breakdown --config-file infracost-projects.yml
-## Uncomment lines and edit as required. See https://www.infracost.io/docs/config_file for docs.
+# Use a config file to describe multiple Terraform projects:
+# `infracost breakdown --config-file infracost-projects.yml
+# Docs: https://infracost.io/config_file
 version: 0.1
 
-## YAML anchors can be used to share and override default configs between projects
-# project_default: &project_default
-  ## Used to change the path to the terraform binary, e.g. `~/bin/terraform_0.13` or `terragrunt`
-  ## Terragrunt users should see https://www.infracost.io/docs/terragrunt
-  # terraform_binary: terraform
-  ## Sets the TF_WORKSPACE environment variable
-  # terraform_workspace: dev
-  ## Terraform Cloud users should see https://www.infracost.io/docs/terraform_cloud_enterprise
-  # terraform_cloud_host: app.terraform.io
-  # terraform_cloud_token: myToken123 # We recommend using the env INFRACOST_TERRAFORM_CLOUD_TOKEN for the token
-
-# Add details of your repo's Terraform projects, their results will be merged into the same output
+# Details of the repo's Terraform projects, their results will be merged into the same breakdown or diff output
 projects:
-  ## If using the Terraform directory method, see https://www.infracost.io/docs/#1-terraform-directory
   - path: examples/terraform
-    usage_file: infracost-usage-example.yml # Define resource usage estimates, see https://www.infracost.io/docs/usage_based_resources
-
-  ## Example of using a YAML anchor
-  # - <<: *project_default
-  #   path: examples/terraform
-  #   terraform_plan_flags: -var-file=prod.tfvars -var-file=us-east.tfvars
-  #   terraform_workspace: prod
-
-  ## If using the Terraform state file method, see https://www.infracost.io/docs/#2-terraform-state-file
-  # - path: example/terraform
-  #   terraform_use_state: true
-
-  ## If using the Terraform plan JSON method, see https://www.infracost.io/docs/#3-terraform-plan-json
-  # - path: /path/to/plan.json
-
-  ## If using the Terraform plan file method, see https://www.infracost.io/docs/#4-terraform-plan-file
-  # - path: example/terraform/tfplan.binary
+    usage_file: infracost-usage-example.yml # Define resource usage estimates, see https://infracost.io/usage_file
+    # terraform_workspace: dev
+  # - path: other/project/plan.json
