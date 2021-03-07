@@ -11,25 +11,24 @@ func breakdownCmd(cfg *config.Config) *cobra.Command {
 		Use:   "breakdown",
 		Short: "Generate full breakdown of costs",
 		Long:  "Generate full breakdown of costs",
-		Example: `
-  Use terraform directory with any required terraform flags:
+		Example: `  Use Terraform directory with any required Terraform flags:
 
       infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
 
-  Use terraform state file:
-
-      infracost breakdown --path /path/to/code --terraform-use-state
-
-  Use terraform plan JSON:
+  Use Terraform plan JSON:
 
       terraform plan -out tfplan.binary .
       terraform show -json tfplan.binary > plan.json
       infracost breakdown --path /path/to/plan.json
 
-  Use terraform plan file:
+  Use Terraform plan file:
 
       terraform plan -out tfplan.binary .
-      infracost breakdown --path tfplan.binary`,
+      infracost breakdown --path tfplan.binary
+
+  Use Terraform state file:
+
+      infracost breakdown --path /path/to/code --terraform-use-state`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkAPIKey(cfg.APIKey, cfg.PricingAPIEndpoint, cfg.DefaultPricingAPIEndpoint); err != nil {
 				return err

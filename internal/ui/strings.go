@@ -48,32 +48,32 @@ func WarningStringf(msg string, a ...interface{}) string {
 	return WarningString(fmt.Sprintf(msg, a...))
 }
 
-func LinkString(url string) string {
-	return blue.Sprint(url)
+func LinkString(msg string) string {
+	return blue.Sprint(msg)
 }
 
 func LinkStringf(msg string, a ...interface{}) string {
 	return LinkString(fmt.Sprintf(msg, a...))
 }
 
-func BoldString(url string) string {
-	return bold.Sprint(url)
+func BoldString(msg string) string {
+	return bold.Sprint(msg)
 }
 
 func BoldStringf(msg string, a ...interface{}) string {
 	return BoldString(fmt.Sprintf(msg, a...))
 }
 
-func FaintString(url string) string {
-	return faint.Sprint(url)
+func FaintString(msg string) string {
+	return faint.Sprint(msg)
 }
 
 func FaintStringf(msg string, a ...interface{}) string {
 	return FaintString(fmt.Sprintf(msg, a...))
 }
 
-func UnderlineString(url string) string {
-	return underline.Sprint(url)
+func UnderlineString(msg string) string {
+	return underline.Sprint(msg)
 }
 
 func UnderlineStringf(msg string, a ...interface{}) string {

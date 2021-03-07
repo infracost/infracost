@@ -52,16 +52,15 @@ func main() {
 		Use:     "infracost",
 		Version: version.Version,
 		Short:   "Cloud cost estimates for Terraform",
-		Long: `Infracost - cloud cost estimates for Terraform
+		Long: fmt.Sprintf(`Infracost - cloud cost estimates for Terraform
 
-Docs:
-  https://infracost.io/docs`,
-		Example: `
-  Generate a cost diff from terraform directory with any required terraform flags:
+%s
+  https://infracost.io/docs`, ui.BoldString("DOCS")),
+		Example: `  Generate a cost diff from Terraform directory with any required Terraform flags:
 
       infracost diff --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
 	
-  Generate a full cost breakdown from terraform directory with any required terraform flags:
+  Generate a full cost breakdown from Terraform directory with any required Terraform flags:
 
       infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"`,
 		SilenceErrors: true,
@@ -133,6 +132,39 @@ Docs:
 	rootCmd.AddCommand(breakdownCmd(cfg))
 	rootCmd.AddCommand(outputCmd(cfg))
 	rootCmd.AddCommand(reportCmd(cfg))
+
+	rootCmd.SetUsageTemplate(fmt.Sprintf(`%s{{if .Runnable}}
+  {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}
+  {{.CommandPath}} [command]{{end}}{{if gt (len .Aliases) 0}}
+
+%s
+  {{.NameAndAliases}}{{end}}{{if .HasExample}}
+
+%s
+{{.Example}}{{end}}{{if .HasAvailableSubCommands}}
+
+%s{{range .Commands}}{{if (or .IsAvailableCommand (eq .Name "help"))}}
+  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
+
+%s
+{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .HasAvailableInheritedFlags}}
+
+%s
+{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .HasHelpSubCommands}}
+
+%s{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
+  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
+
+Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
+`,
+		ui.BoldString("USAGE"),
+		ui.BoldString("ALIAS"),
+		ui.BoldString("EXAMPLES"),
+		ui.BoldString("AVAILABLE COMMANDS"),
+		ui.BoldString("FLAGS"),
+		ui.BoldString("GLOBAL FLAGS"),
+		ui.BoldString("ADDITIONAL HELP TOPICS"),
+	))
 
 	rootCmd.SetVersionTemplate("Infracost {{.Version}}\n")
 

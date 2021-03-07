@@ -24,8 +24,7 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 		Use:   "output",
 		Short: "Output Infracost JSON files in different formats",
 		Long:  "Output Infracost JSON files in different formats",
-		Example: `
-  Show a breakdown from multiple Infracost JSON files:
+		Example: `  Show a breakdown from multiple Infracost JSON files:
 
       infracost output --path out1.json --path out2.json --path out3.json
 
