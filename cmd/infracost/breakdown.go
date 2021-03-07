@@ -9,8 +9,8 @@ import (
 func breakdownCmd(cfg *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "breakdown",
-		Short: "Generate full breakdown of costs",
-		Long:  "Generate full breakdown of costs",
+		Short: "Show full breakdown of costs",
+		Long:  "Show full breakdown of costs",
 		Example: `  Use Terraform directory with any required Terraform flags:
 
       infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
