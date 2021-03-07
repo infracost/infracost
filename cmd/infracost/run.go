@@ -225,7 +225,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 func checkRunConfig(cfg *config.Config) error {
 	if cfg.Format == "json" && cfg.ShowSkipped {
-		ui.PrintWarning("The show skipped option is not needed with JSON output as that always includes them.")
+		ui.PrintWarning("The show skipped option is not needed with JSON output as that always includes them.\n")
 		return nil
 	}
 

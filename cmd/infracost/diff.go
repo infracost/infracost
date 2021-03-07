@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -40,6 +41,11 @@ func diffCmd(cfg *config.Config) *cobra.Command {
 				ui.PrintUsageErrorAndExit(cmd, err.Error())
 			}
 
+			err = checkDiffConfig(cfg)
+			if err != nil {
+				ui.PrintUsageErrorAndExit(cmd, err.Error())
+			}
+
 			cfg.Format = "diff"
 
 			return runMain(cmd, cfg)
@@ -49,4 +55,14 @@ func diffCmd(cfg *config.Config) *cobra.Command {
 	addRunFlags(cmd)
 
 	return cmd
+}
+
+func checkDiffConfig(cfg *config.Config) error {
+	for _, projectConfig := range cfg.Projects {
+		if projectConfig.TerraformUseState {
+			return errors.New("terraform_use_state cannot be used with `infracost diff` as the Terraform state only contains the current state")
+		}
+	}
+
+	return nil
 }
