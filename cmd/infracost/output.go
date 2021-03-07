@@ -146,7 +146,7 @@ func reportCmd(cfg *config.Config) *cobra.Command {
 		msg += fmt.Sprintf("%s %s %s         %s\n",
 			ui.WarningString("│"),
 			"Migration details:",
-			ui.LinkString("https://www.infracost.io/v0.8-migration"),
+			ui.LinkString("https://www.infracost.io/docs/guides/v0.8_migration"),
 			ui.WarningString("│"),
 		)
 		msg += ui.WarningString("└────────────────────────────────────────────────────────────────────┘")
