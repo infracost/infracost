@@ -54,16 +54,16 @@ func main() {
 		Short:   "Cloud cost estimates for Terraform",
 		Long: `Infracost - cloud cost estimates for Terraform
 
-Generate a cost diff from terraform directory with any required terraform flags:
-
-  infracost diff --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
-
-Generate a full cost breakdown from terraform directory with any required terraform flags:
-
-  infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
-
 Docs:
   https://infracost.io/docs`,
+		Example: `
+  Generate a cost diff from terraform directory with any required terraform flags:
+
+      infracost diff --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+	
+  Generate a full cost breakdown from terraform directory with any required terraform flags:
+
+      infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"`,
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true

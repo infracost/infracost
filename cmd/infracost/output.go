@@ -23,19 +23,19 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "output",
 		Short: "Output Infracost JSON files in different formats",
-		Long: `Output Infracost JSON files in different formats
+		Long:  "Output Infracost JSON files in different formats",
+		Example: `
+  Show a breakdown from multiple Infracost JSON files:
 
-Show a breakdown from multiple Infracost JSON files:
+      infracost output --path out1.json --path out2.json --path out3.json
 
-  infracost output --path out1.json --path out2.json --path out3.json
+  Create HTML report from multiple Infracost JSON files:
 
-Create HTML report from multiple Infracost JSON files:
+      infracost output --format html --path out*.json > output.html
 
-  infracost output --format html --path out*.json > output.html
+  Merge multiple Infracost JSON files:
 
-Merge multiple Infracost JSON files:
-
-  infracost output --format json --path out*.json`,
+      infracost output --format json --path out*.json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFiles := []string{}
 

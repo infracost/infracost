@@ -10,22 +10,22 @@ func diffCmd(cfg *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "diff",
 		Short: "Generate diff view of costs",
-		Long: `Generate diff view of costs
+		Long:  "Generate diff view of costs",
+		Example: `
+  Use terraform directory with any required terraform flags:
 
-Use terraform directory with any required terraform flags:
+      infracost diff --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
 
-  infracost diff --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+  Use terraform plan JSON:
 
-Use terraform plan JSON:
+      terraform plan -out tfplan.binary .
+      terraform show -json tfplan.binary > plan.json
+      infracost diff --path /path/to/plan.json
 
-  terraform plan -out tfplan.binary .
-  terraform show -json tfplan.binary > plan.json
-  infracost diff --path /path/to/plan.json
+  Use terraform plan file:
 
-Use terraform plan file:
-
-  terraform plan -out tfplan.binary .
-  infracost diff --path tfplan.binary`,
+      terraform plan -out tfplan.binary .
+      infracost diff --path tfplan.binary`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkAPIKey(cfg.APIKey, cfg.PricingAPIEndpoint, cfg.DefaultPricingAPIEndpoint); err != nil {
 				return err
