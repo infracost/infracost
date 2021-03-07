@@ -75,9 +75,9 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 				p.Path,
 				"Either the current working directory or the plan file's parent directory must be a Terraform directory.",
 				"If the above does not work you can generate the plan JSON file with:",
-				ui.PrimaryString("terraform show -json tfplan.binary > /path/to/plan.json"),
+				ui.PrimaryString("terraform show -json tfplan.binary > plan.json"),
 				"and then run Infracost with",
-				ui.PrimaryString("--path=/path/to/plan.json"),
+				ui.PrimaryString("--path=plan.json"),
 			)
 		}
 	}

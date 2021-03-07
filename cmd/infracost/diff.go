@@ -20,7 +20,7 @@ func diffCmd(cfg *config.Config) *cobra.Command {
 
       terraform plan -out tfplan.binary .
       terraform show -json tfplan.binary > plan.json
-      infracost diff --path /path/to/plan.json
+      infracost diff --path plan.json
 
   Use Terraform plan file:
 

@@ -19,7 +19,7 @@ func breakdownCmd(cfg *config.Config) *cobra.Command {
 
       terraform plan -out tfplan.binary .
       terraform show -json tfplan.binary > plan.json
-      infracost breakdown --path /path/to/plan.json
+      infracost breakdown --path plan.json
 
   Use Terraform plan file:
 
