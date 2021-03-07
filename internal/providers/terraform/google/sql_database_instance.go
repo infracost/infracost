@@ -49,7 +49,7 @@ func SharedSQLInstance(name, tier, availabilityType string, DBType SQLInstanceDB
 		log.Debugf("No tier resource group for sql instance %s", name)
 		return cost
 	}
-	descriptionRegex := SQLInstanceAvTypeDBtoDescriptionRegex(availabilityType, DBType)
+	descriptionRegex := SQLInstanceAvDBTypeToDescriptionRegex(availabilityType, DBType)
 	cost = &schema.CostComponent{
 		Name:           "Instance pricing",
 		Unit:           "seconds",
@@ -88,7 +88,7 @@ func SQLInstanceTierToResourceGroup(tier string) string {
 	return data[tier]
 }
 
-func SQLInstanceAvTypeDBtoDescriptionRegex(availabilityType string, DBType SQLInstanceDBType) string {
+func SQLInstanceAvDBTypeToDescriptionRegex(availabilityType string, DBType SQLInstanceDBType) string {
 	dbTypeNames := map[SQLInstanceDBType]string{
 		MySQL:      "MySQL",
 		PostgreSQL: "PostgreSQL",
