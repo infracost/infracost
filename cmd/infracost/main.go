@@ -94,7 +94,7 @@ func main() {
 				ui.WarningString("│"),
 			)
 
-			msg += fmt.Sprintf("%s %s %s             %s\n",
+			msg += fmt.Sprintf("%s %s %s %s\n",
 				ui.WarningString("│"),
 				"Migration details:",
 				ui.LinkString("https://www.infracost.io/docs/guides/v0.8_migration"),

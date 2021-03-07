@@ -128,28 +128,28 @@ func reportCmd(cfg *config.Config) *cobra.Command {
 	cmd.Long = "This command is deprecated and will be removed in v0.9.0. Please use `infracost output`."
 
 	cmd.PreRun = func(cmd *cobra.Command, args []string) {
-		msg := ui.WarningString("┌────────────────────────────────────────────────────────────────────┐\n")
-		msg += fmt.Sprintf("%s %s %s %s\n",
+		msg := ui.WarningString("┌────────────────────────────────────────────────────────────────────────┐\n")
+		msg += fmt.Sprintf("%s     %s %s %s\n",
 			ui.WarningString("│"),
 			ui.WarningString("Warning:"),
 			"This command is deprecated and will be removed in v0.9.0.",
 			ui.WarningString("│"),
 		)
 
-		msg += fmt.Sprintf("%s %s %s                                        %s\n",
+		msg += fmt.Sprintf("%s %s %s                                            %s\n",
 			ui.WarningString("│"),
 			"Please use",
 			ui.PrimaryString("infracost output"),
 			ui.WarningString("│"),
 		)
 
-		msg += fmt.Sprintf("%s %s %s         %s\n",
+		msg += fmt.Sprintf("%s %s %s %s\n",
 			ui.WarningString("│"),
 			"Migration details:",
 			ui.LinkString("https://www.infracost.io/docs/guides/v0.8_migration"),
 			ui.WarningString("│"),
 		)
-		msg += ui.WarningString("└────────────────────────────────────────────────────────────────────┘")
+		msg += ui.WarningString("└────────────────────────────────────────────────────────────────────────┘")
 
 		if cfg.IsLogging() {
 			for _, l := range strings.Split(ui.StripColor(msg), "\n") {
