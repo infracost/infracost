@@ -129,7 +129,7 @@ func reportCmd(cfg *config.Config) *cobra.Command {
 
 	cmd.PreRun = func(cmd *cobra.Command, args []string) {
 		msg := ui.WarningString("┌────────────────────────────────────────────────────────────────────────┐\n")
-		msg += fmt.Sprintf("%s     %s %s %s\n",
+		msg += fmt.Sprintf("%s %s %s     %s\n",
 			ui.WarningString("│"),
 			ui.WarningString("Warning:"),
 			"This command is deprecated and will be removed in v0.9.0.",
