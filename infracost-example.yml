@@ -3,7 +3,7 @@
 # Docs: https://infracost.io/config_file
 version: 0.1
 
-# Details of the repo's Terraform projects, their results will be merged into the same breakdown or diff output
+# Details of the repo's Terraform projects, their results will be combined into the same breakdown or diff output
 projects:
   - path: ../infracost-services/terraform
     # usage_file: infracost-usage-example.yml # Define resource usage estimates, see https://infracost.io/usage_file

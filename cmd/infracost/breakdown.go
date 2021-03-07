@@ -19,16 +19,7 @@ func breakdownCmd(cfg *config.Config) *cobra.Command {
 
       terraform plan -out tfplan.binary .
       terraform show -json tfplan.binary > plan.json
-      infracost breakdown --path plan.json
-
-  Use Terraform plan file:
-
-      terraform plan -out tfplan.binary .
-      infracost breakdown --path tfplan.binary
-
-  Use Terraform state file:
-
-      infracost breakdown --path /path/to/code --terraform-use-state`,
+      infracost breakdown --path plan.json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkAPIKey(cfg.APIKey, cfg.PricingAPIEndpoint, cfg.DefaultPricingAPIEndpoint); err != nil {
 				return err
@@ -50,7 +41,7 @@ func breakdownCmd(cfg *config.Config) *cobra.Command {
 
 	addRunFlags(cmd)
 
-	cmd.Flags().Bool("terraform-use-state", false, "Use Terraform state instead of generating a plan")
+	cmd.Flags().Bool("terraform-use-state", false, "Use Terraform state instead of generating a plan. Applicable when path is a Terraform directory")
 	cmd.Flags().String("format", "table", "Output format: json, table, html")
 
 	return cmd
