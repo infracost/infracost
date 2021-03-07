@@ -365,11 +365,11 @@ func printTerraformErr(err error) {
 	}
 	if strings.HasPrefix(stderr, "Error: No value for required variable") {
 		msg += "\nPass Terraform flags using the --terraform-plan-flags option.\n"
-		msg += "For example: infracost --path=path/to/terraform --terraform-plan-flags=\"-var-file=myvars.tfvars\"\n"
+		msg += "For example: infracost --path=path/to/terraform --terraform-plan-flags=\"-var-file=my.tfvars\"\n"
 	}
 	if strings.HasPrefix(stderr, "Error: Failed to read variables file") {
 		msg += "\nSpecify the -var-file flag as a path relative to your Terraform directory.\n"
-		msg += "For example: infracost --path=path/to/terraform --terraform-plan-flags=\"-var-file=myvars.tfvars\"\n"
+		msg += "For example: infracost --path=path/to/terraform --terraform-plan-flags=\"-var-file=my.tfvars\"\n"
 	}
 
 	fmt.Fprintln(os.Stderr, msg)

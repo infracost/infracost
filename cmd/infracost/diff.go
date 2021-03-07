@@ -13,7 +13,7 @@ func diffCmd(cfg *config.Config) *cobra.Command {
 		Long:  "Show diff view of monthly costs",
 		Example: `  Use Terraform directory with any required Terraform flags:
 
-      infracost diff --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+      infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
 
   Use Terraform plan JSON:
 

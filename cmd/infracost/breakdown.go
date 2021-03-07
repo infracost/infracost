@@ -13,7 +13,7 @@ func breakdownCmd(cfg *config.Config) *cobra.Command {
 		Long:  "Show full breakdown of costs",
 		Example: `  Use Terraform directory with any required Terraform flags:
 
-      infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+      infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
 
   Use Terraform plan JSON:
 

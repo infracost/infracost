@@ -58,11 +58,11 @@ func main() {
   https://infracost.io/docs`, ui.BoldString("DOCS")),
 		Example: `  Generate a cost diff from Terraform directory with any required Terraform flags:
 
-      infracost diff --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+      infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
 	
   Generate a full cost breakdown from Terraform directory with any required Terraform flags:
 
-      infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"`,
+      infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"`,
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true

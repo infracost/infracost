@@ -51,7 +51,7 @@ Please **watch/star** this repo as we add new cloud resources every week or so.
 
 There are [4 usage methods](https://www.infracost.io/docs/#usage-methods) for Infracost depending on your use-case. The following is the default method. Point to the Terraform directory using `--path` and pass any required Terraform flags using `--terraform-plan-flags`. Internally Infracost runs Terraform `init`, `plan` and `show`; `init` requires cloud credentials to be set, e.g. via the usual `AWS_ACCESS_KEY_ID` environment variables. This method works with remote state too.
   ```sh
-  infracost --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
+  infracost --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
   ```
 
 Read the [**getting started**](https://www.infracost.io/docs/) docs for details, including notes for [Terragrunt](https://www.infracost.io/docs/terragrunt) and [Terraform Cloud](https://www.infracost.io/docs/terraform_cloud_enterprise) users.
