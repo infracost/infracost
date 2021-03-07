@@ -45,7 +45,7 @@ Use terraform plan file:
 				ui.PrintUsageErrorAndExit(cmd, err.Error())
 			}
 
-			return runMain(cfg)
+			return runMain(cmd, cfg)
 		},
 	}
 

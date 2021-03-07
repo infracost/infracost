@@ -16,10 +16,6 @@ Use terraform directory with any required terraform flags:
 
   infracost diff --path /path/to/code --terraform-plan-flags "-var-file=myvars.tfvars"
 
-Use terraform state file:
-
-  infracost diff --path /path/to/code --terraform-use-state
-
 Use terraform plan JSON:
 
   terraform plan -out tfplan.binary .
@@ -47,7 +43,7 @@ Use terraform plan file:
 
 			cfg.Format = "diff"
 
-			return runMain(cfg)
+			return runMain(cmd, cfg)
 		},
 	}
 

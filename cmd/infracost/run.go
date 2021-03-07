@@ -29,7 +29,7 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 }
 
-func runMain(cfg *config.Config) error {
+func runMain(cmd *cobra.Command, cfg *config.Config) error {
 	projects := make([]*schema.Project, 0)
 
 	for _, projectCfg := range cfg.Projects {
@@ -38,7 +38,19 @@ func runMain(cfg *config.Config) error {
 		if provider == nil {
 			m := fmt.Sprintf("Could not detect path type for %s\n\n", ui.DisplayPath(projectCfg.Path))
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file\n - Terraform state JSON file"
+			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
+
+			if cmd.Name() != "diff" {
+				m += "\n - Terraform state JSON file"
+			}
+
+			return errors.New(m)
+		}
+
+		if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
+			m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
+			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
+			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
 			return errors.New(m)
 		}
 
