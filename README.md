@@ -24,7 +24,7 @@ Show diff of monthly costs between current and planned state:
     brew install infracost
     ```
 
-    Linux/macOS manual:
+    Linux/macOS manual download:
     ```sh
     os=$(uname | tr '[:upper:]' '[:lower:]') && \
     arch=$(uname -m | tr '[:upper:]' '[:lower:]' | sed -e s/x86_64/amd64/) && \
@@ -57,7 +57,7 @@ Please **watch/star** this repo as we add new cloud resources every week or so.
 
 ## Usage
 
-The `infracost` CLI has the following main commands, their usage is described in our [**getting started**](https://www.infracost.io/docs/) guide:
+The `infracost` CLI has the following main commands, their usage is described in our short [**getting started**](https://www.infracost.io/docs/#usage) page:
 - `breakdown`: show full breakdown of costs
 - `diff`: show diff of monthly costs between current and planned state
 
@@ -65,7 +65,7 @@ As mentioned in our [FAQ](https://www.infracost.io/docs/faq), **no** cloud crede
 
 ## CI/CD integrations
 
-The following CI/CD integrations can be used to automatically add a pull request comment showing the diff of monthly costs between the current and planned state.:
+The following CI/CD integrations can be used to automatically add a pull request comment showing the diff of monthly costs between the current and planned state:
 - [GitHub Action](https://www.infracost.io/docs/integrations/cicd#github-action)
 - [GitLab CI template](https://www.infracost.io/docs/integrations/cicd#gitlab-ci)
 - [CircleCI Orb](https://www.infracost.io/docs/integrations/cicd#circleci)
@@ -78,7 +78,7 @@ If you run into any issues with CI/CD integrations, please join our [community S
 
 ## Supported clouds and resources
 
-Infracost supports over [80 AWS and Google resources](https://www.infracost.io/docs/supported_resources/). Microsoft Azure is [coming soon](https://github.com/infracost/infracost/issues/64), other IaC tools ([Pulumi](https://github.com/infracost/infracost/issues/187), [CloudFormation](https://github.com/infracost/infracost/issues/190)) are on our roadmap too.
+Infracost supports over [80 AWS and Google resources](https://www.infracost.io/docs/supported_resources/); Microsoft Azure is [coming soon](https://github.com/infracost/infracost/issues/64). Other IaC tools ([Pulumi](https://github.com/infracost/infracost/issues/187), [CloudFormation](https://github.com/infracost/infracost/issues/190)) are on our roadmap too.
 
 We regularly add support for new resources so we recommend watching this repo for releases: click on the Watch button > selecting Custom > Releases and click on Apply.
 
