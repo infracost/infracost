@@ -9,7 +9,13 @@
 
 Infracost shows cloud cost estimates for Terraform projects. It helps developers, devops and others to quickly see the cost breakdown and compare different options upfront.
 
-<img src=".github/assets/screenshot.png" alt="Example Infracost output" width=600 />
+Breakdown:
+
+<img src=".github/assets/breakdown_screenshot.png" alt="Example Infracost output" width=600 />
+
+Diff:
+
+<img src=".github/assets/diff_screenshot.png" alt="Example Infracost output" width=600 />
 
 ## Installation
 
