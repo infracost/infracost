@@ -136,6 +136,7 @@ func outputResource(r *schema.Resource) Resource {
 
 	return Resource{
 		Name:           r.Name,
+		Metadata:       map[string]string{},
 		Tags:           r.Tags,
 		HourlyCost:     r.HourlyCost,
 		MonthlyCost:    r.MonthlyCost,
