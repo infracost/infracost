@@ -78,13 +78,15 @@ If you run into any issues with CI/CD integrations, please join our [community S
 
 ## Supported clouds and resources
 
-Infracost supports over [70 AWS and Google resources](https://www.infracost.io/docs/supported_resources/), Azure is [planned](https://github.com/infracost/infracost/issues/64). The quickest way to find out if your Terraform resources are supported is to run Infracost with the `--show-skipped` option. This shows the unsupported resources, some of which might be free. Please watch this repo for new releases as we add new cloud resources every week or so.
+Infracost supports over [80 AWS and Google resources](https://www.infracost.io/docs/supported_resources/). Microsoft Azure is [coming soon](https://github.com/infracost/infracost/issues/64), other IaC tools ([Pulumi](https://github.com/infracost/infracost/issues/187), [CloudFormation](https://github.com/infracost/infracost/issues/190)) are on our roadmap too.
 
-See [this page](https://www.infracost.io/docs/usage_based_resources) for details on cost estimation of usage-based resources.
+We regularly add support for new resources so we recommend watching this repo for releases: click on the Watch button > selecting Custom > Releases and click on Apply.
+
+See [this page](https://www.infracost.io/docs/usage_based_resources) for details on cost estimation of usage-based resources such as AWS Lambda or Google Cloud Storage.
 
 ## Contributing
 
-Issues and pull requests are welcome! For development details, see the [contributing](CONTRIBUTING.md) file. For major changes, please open an issue first to discuss what you would like to change.
+Issues and pull requests are welcome! For development details, see the [contributing](CONTRIBUTING.md) guide. For major changes, please open an issue first to discuss what you would like to change.
 
 [Join our community Slack channel](https://www.infracost.io/community-chat), we are a friendly bunch and happy to help you get started :)
 
