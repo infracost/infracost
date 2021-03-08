@@ -220,8 +220,10 @@ func newEbsBlockDevice(name string, d gjson.Result, region string) *schema.Resou
 		iopsVal = decimal.NewFromFloat(d.Get("iops").Float())
 	}
 
+	var unknown *decimal.Decimal
+
 	return &schema.Resource{
 		Name:           name,
-		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal),
+		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal, unknown),
 	}
 }

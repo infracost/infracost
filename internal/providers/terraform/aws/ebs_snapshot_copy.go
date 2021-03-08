@@ -32,8 +32,12 @@ func NewEBSSnapshotCopy(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		}
 	}
 
+	costComponents := []*schema.CostComponent{
+		ebsSnapshotCostComponent(region, gbVal),
+	}
+
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: ebsSnapshotCostComponents(region, gbVal),
+		CostComponents: costComponents,
 	}
 }

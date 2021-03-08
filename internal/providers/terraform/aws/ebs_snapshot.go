@@ -26,33 +26,28 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		}
 	}
 
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: ebsSnapshotCostComponents(region, gbVal),
+	var listBlockRequests *decimal.Decimal
+	if u != nil && u.Get("monthly_list_block_requests").Exists() {
+		listBlockRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_list_block_requests").Int()))
 	}
-}
 
-func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.CostComponent {
-	return []*schema.CostComponent{
-		{
-			Name:            "EBS snapshot storage",
-			Unit:            "GB-months",
-			UnitMultiplier:  1,
-			MonthlyQuantity: &gbVal,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonEC2"),
-				ProductFamily: strPtr("Storage Snapshot"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/EBS:SnapshotUsage$/")},
-				},
-			},
-		},
+	var getSnapshotBlockRequests *decimal.Decimal
+	if u != nil && u.Get("monthly_get_block_requests").Exists() {
+		getSnapshotBlockRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_get_block_requests").Int()))
+	}
+
+	var putSnapshotBlockRequests *decimal.Decimal
+	if u != nil && u.Get("monthly_put_block_requests").Exists() {
+		putSnapshotBlockRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_put_block_requests").Int()))
+	}
+
+	costComponents := []*schema.CostComponent{
+		ebsSnapshotCostComponent(region, gbVal),
 		{
 			Name:           "Fast snapshot restore",
 			Unit:           "DSU-hours",
 			UnitMultiplier: 1,
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -64,9 +59,10 @@ func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.C
 			},
 		},
 		{
-			Name:           "ListChangedBlocks & ListSnapshotBlocks API requests",
-			Unit:           "requests",
-			UnitMultiplier: 1000,
+			Name:            "ListChangedBlocks & ListSnapshotBlocks API requests",
+			Unit:            "requests",
+			UnitMultiplier:  1000,
+			MonthlyQuantity: listBlockRequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -78,9 +74,10 @@ func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.C
 			},
 		},
 		{
-			Name:           "GetSnapshotBlock API requests",
-			Unit:           "SnapshotAPIUnits",
-			UnitMultiplier: 1000,
+			Name:            "GetSnapshotBlock API requests",
+			Unit:            "SnapshotAPIUnits",
+			UnitMultiplier:  1000,
+			MonthlyQuantity: getSnapshotBlockRequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -92,9 +89,10 @@ func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.C
 			},
 		},
 		{
-			Name:           "PutSnapshotBlock API requests",
-			Unit:           "SnapshotAPIUnits",
-			UnitMultiplier: 1000,
+			Name:            "PutSnapshotBlock API requests",
+			Unit:            "SnapshotAPIUnits",
+			UnitMultiplier:  1000,
+			MonthlyQuantity: putSnapshotBlockRequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -103,6 +101,28 @@ func ebsSnapshotCostComponents(region string, gbVal decimal.Decimal) []*schema.C
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/EBS:directAPI.snapshot.Put$/")},
 				},
+			},
+		}}
+
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: costComponents,
+	}
+}
+
+func ebsSnapshotCostComponent(region string, gbVal decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "EBS snapshot storage",
+		Unit:            "GB-months",
+		UnitMultiplier:  1,
+		MonthlyQuantity: &gbVal,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonEC2"),
+			ProductFamily: strPtr("Storage Snapshot"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/EBS:SnapshotUsage$/")},
 			},
 		},
 	}

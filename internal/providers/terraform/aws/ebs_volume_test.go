@@ -166,3 +166,42 @@ func TestEBSVolume_GP3(t *testing.T) {
 
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
+
+func TestEBSStandardVolume_usage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+	resource "aws_ebs_volume" "standard" {
+		availability_zone = "us-east-1a"
+		size              = 20
+		type              = "standard"
+	}`
+
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_ebs_volume.standard": map[string]interface{}{
+			"monthly_standard_io_requests": 1000000,
+		},
+	})
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_ebs_volume.standard",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:             "Magnetic storage",
+					PriceHash:        "0ed17ed1777b7be91f5b5ce79916d8d8-ee3dd7e4624338037ca6fea0933a662f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
+				},
+				{
+					Name:             "I/O requests",
+					PriceHash:        "3085cb7cbdb1e1f570812e7400f8dbc6-5be345988e7c9a0759c5cf8365868ee4",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(1000000)),
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
+}

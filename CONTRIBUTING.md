@@ -171,6 +171,11 @@ Our aim is to make Infracost's output understandable without needing to read sep
 
 Where a cloud vendor's pricing pages information can be improved for clarify, we'll do that, e.g. on some pricing webpages, AWS mention use "Storage Rate" to describe pricing for "Provisioned IOPS storage", so we use the latter.
 
+The cost component name should not change when the IaC resource params change; anything that can change should be put in brackets, so for example:
+- `General Purpose SSD storage (gp2)` should be `Storage (gp2)` as the storage type can change.
+- `Outbound data transfer to EqDC2` should be `Outbound data transfer (to EqDC2)` as the EqDC2 value changes based on the location.
+In the future, we plan to add a separate field to cost components to hold the metadata in brackets.
+
 #### Resource notes
 
 The following notes are general guidelines, please leave a comment in your pull request if they don't make sense or they can be improved for the resource you're adding.
@@ -236,6 +241,8 @@ The following notes are general guidelines, please leave a comment in your pull 
 4. Put the units last, e.g. `message_size_kb`, `request_duration_ms`.
 
 5. For resources that are continuous in time, do not use prefixes, e.g. use `instances`, `subscriptions`, `storage_gb`. For non-continuous resources, prefix with `monthly_` so users knows what time interval to estimate for, e.g. `monthly_log_lines`, `monthly_requests`.
+
+6. When the field accepts a string (e.g. `dx_connection_type: dedicated`), the values should be used in a case-insensitive way in the resource file, the `ValueRegex` option can be used with `/i` to allow case-insensitive regex matches. For example `{Key: "connectionType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", connectionType))},`.
 
 #### Google resource notes
 
