@@ -26,11 +26,11 @@ func PopulatePrices(cfg *config.Config, project *schema.Project) error {
 		defer wg.Done()
 		// We ignore resources in the past breakdown since we don't want to duplicate the summary for all projects.
 		// otherwise we will count an unsupported resource 2 times.
-		summary := output.BuildResourceSummary(project.AllResources(), output.ResourceSummaryOptions{
+		summary := output.BuildSummary(project.AllResources(), output.SummaryOptions{
 			IncludeUnsupportedProviders: true,
 		})
 
-		events.SendReport(cfg, "resourceSummary", summary)
+		events.SendReport(cfg, "summary", summary)
 	}()
 
 	err := GetPricesConcurrent(resources, q)

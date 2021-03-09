@@ -30,7 +30,7 @@ EOF
 
 Run the code:
 ```sh
-make run ARGS="--terraform-dir examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
+make run ARGS="--path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
 ```
 
 Run all tests:
@@ -122,7 +122,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 Finally create a temporary terraform file to test your resource and run (no need to commit that):
 
 ```
-make run ARGS="--terraform-dir my_new_terraform/"
+make run ARGS="--path my_new_terraform/"
 ```
 
 ### Detailed notes

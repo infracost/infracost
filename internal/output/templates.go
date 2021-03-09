@@ -120,8 +120,8 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     <td class="monthly-quantity"></td>
     <td class="unit"></td>
     <td class="price"></td>
-    <td class="hourly-cost">{{.Resource.HourlyCost | formatCost}}</td>
-    <td class="monthly-cost">{{.Resource.MonthlyCost | formatCost}}</td>
+    <td class="hourly-cost">{{.Resource.HourlyCost | formatCost2DP}}</td>
+    <td class="monthly-cost">{{.Resource.MonthlyCost | formatCost2DP}}</td>
   </tr>
   {{ if .Resource.Tags}}
     <tr class="tags">
@@ -159,9 +159,9 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     </td>
     <td class="monthly-quantity">{{.CostComponent.MonthlyQuantity | formatQuantity }}</td>
     <td class="unit">{{.CostComponent.Unit}}</td>
-    <td class="price">{{.CostComponent.Price | formatAmount }}</td>
-    <td class="hourly-cost">{{.CostComponent.HourlyCost | formatCost}}</td>
-    <td class="monthly-cost">{{.CostComponent.MonthlyCost | formatCost}}</td>
+    <td class="price">{{.CostComponent.Price | formatPrice }}</td>
+    <td class="hourly-cost">{{.CostComponent.HourlyCost | formatCost2DP}}</td>
+    <td class="monthly-cost">{{.CostComponent.MonthlyCost | formatCost2DP}}</td>
   </tr>
 {{end}}
 
@@ -212,12 +212,12 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
         {{end}}
         <tr class="spacer"><td colspan="6"></td></tr>
         <tr class="total">
-          <td class="name">Overall total (USD)</td>
+          <td class="name">Overall total</td>
           <td class="monthly-quantity"></td>
           <td class="unit"></td>
           <td class="price"></td>
-          <td class="hourly-cost">{{.Root.TotalHourlyCost | formatCost}}</td>
-          <td class="monthly-cost">{{.Root.TotalMonthlyCost | formatCost}}</td>
+          <td class="hourly-cost">{{.Root.TotalHourlyCost | formatCost2DP}}</td>
+          <td class="monthly-cost">{{.Root.TotalMonthlyCost | formatCost2DP}}</td>
         </tr>
       </tbody>
     </table>

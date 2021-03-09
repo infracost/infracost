@@ -23,8 +23,10 @@ type Environment struct {
 	OS                                  string   `json:"os"`
 	CIPlatform                          string   `json:"ciPlatform,omitempty"`
 	CIScript                            string   `json:"ciScript,omitempty"`
+	Command                             string   `json:"command"`
 	Flags                               []string `json:"flags"`
 	OutputFormat                        string   `json:"outputFormat"`
+	ProjectType                         string   `json:"projectType"`
 	TerraformBinary                     string   `json:"terraformBinary"`
 	TerraformFullVersion                string   `json:"terraformFullVersion"`
 	TerraformVersion                    string   `json:"terraformVersion"`
@@ -47,22 +49,22 @@ func NewEnvironment() *Environment {
 	}
 }
 
-func (e *Environment) SetTerraformEnvironment(projectCfg *TerraformProject) {
-	binary := projectCfg.Binary
-	if binary == "" {
-		binary = "terraform"
+func (e *Environment) SetProjectEnvironment(projectType string, projectCfg *Project) {
+	e.ProjectType = projectType
+
+	if projectType == "terraform_dir" || projectType == "terraform_plan" {
+		binary := projectCfg.TerraformBinary
+		if binary == "" {
+			binary = "terraform"
+		}
+		out, _ := exec.Command(binary, "-version").Output()
+		fullVersion := strings.SplitN(string(out), "\n", 2)[0]
+		version := terraformVersion(fullVersion)
+
+		e.TerraformBinary = binary
+		e.TerraformFullVersion = fullVersion
+		e.TerraformVersion = version
 	}
-	out, _ := exec.Command(binary, "-version").Output()
-	fullVersion := strings.SplitN(string(out), "\n", 2)[0]
-	version := terraformVersion(fullVersion)
-
-	e.TerraformBinary = binary
-	e.TerraformFullVersion = fullVersion
-	e.TerraformVersion = version
-}
-
-func (e *Environment) SetOutputEnvironment(outputCfg *Output) {
-	e.OutputFormat = outputCfg.Format
 }
 
 func userAgent() string {

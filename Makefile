@@ -1,6 +1,5 @@
 BINARY := infracost
 PKG := github.com/infracost/infracost/cmd/infracost
-TERRAFORM_PROVIDER_INFRACOST_VERSION := latest
 VERSION := $(shell scripts/get_version.sh HEAD $(NO_DIRTY))
 LD_FLAGS := -ldflags="-X 'github.com/infracost/infracost/internal/version.Version=$(VERSION)'"
 BUILD_FLAGS := $(LD_FLAGS) -v
@@ -10,7 +9,7 @@ ifdef INFRACOST_ENV
 	DEV_ENV := $(INFRACOST_ENV)
 endif
 
-.PHONY: deps run build windows linux darwin build_all install release install_provider clean test fmt lint
+.PHONY: deps run build windows linux darwin build_all install release clean test fmt lint
 
 deps:
 	go mod download
@@ -41,9 +40,6 @@ release: build_all
 	cd build; tar -czf $(BINARY)-linux-amd64.tar.gz $(BINARY)-linux-amd64
 	cd build; tar -czf $(BINARY)-darwin-amd64.tar.gz $(BINARY)-darwin-amd64
 	cd build; tar -czf $(BINARY)-darwin-arm64.tar.gz $(BINARY)-darwin-arm64
-
-install_provider:
-	scripts/install_provider.sh $(TERRAFORM_PROVIDER_INFRACOST_VERSION)
 
 clean:
 	go clean

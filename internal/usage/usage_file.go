@@ -3,6 +3,7 @@ package usage
 import (
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
@@ -11,8 +12,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const minVersion = "v0.1"
-const maxVersion = "v0.1"
+const minUsageFileVersion = "0.1"
+const maxUsageFileVersion = "0.1"
 
 type UsageFile struct { // nolint:golint
 	Version       string                 `yaml:"version"`
@@ -50,7 +51,7 @@ func parseYAML(y []byte) (map[string]*schema.UsageData, error) {
 	}
 
 	if !checkVersion(usageFile.Version) {
-		return map[string]*schema.UsageData{}, fmt.Errorf("Invalid usage file version. Supported versions are %s ≤ x ≤ %s", minVersion, maxVersion)
+		return map[string]*schema.UsageData{}, fmt.Errorf("Invalid usage file version. Supported versions are %s ≤ x ≤ %s", minUsageFileVersion, maxUsageFileVersion)
 	}
 
 	usageMap := schema.NewUsageMap(usageFile.ResourceUsage)
@@ -59,5 +60,8 @@ func parseYAML(y []byte) (map[string]*schema.UsageData, error) {
 }
 
 func checkVersion(v string) bool {
-	return semver.Compare(v, minVersion) >= 0 && semver.Compare(v, maxVersion) <= 0
+	if !strings.HasPrefix(v, "v") {
+		v = "v" + v
+	}
+	return semver.Compare(v, "v"+minUsageFileVersion) >= 0 && semver.Compare(v, "v"+maxUsageFileVersion) <= 0
 }
