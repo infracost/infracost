@@ -25,8 +25,8 @@ type createAPIKeyResponse struct {
 func registerCmd(cfg *config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:   "register",
-		Short: "Register for an Infracost API key",
-		Long:  "Register for an Infracost API key",
+		Short: "Register for a free Infracost API key",
+		Long:  "Register for a free Infracost API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Please enter your name and email address to get an API key.")
 			fmt.Println("See our FAQ (https://www.infracost.io/docs/faq) for more details.")

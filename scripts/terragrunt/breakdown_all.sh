@@ -3,7 +3,7 @@
 # See https://www.infracost.io/docs/terragrunt for usage docs
 
 # Output terraform plans
-terragrunt plan-all -out=infracost-plan
+terragrunt run-all plan -out=infracost-plan
 
 # Loop through plans and output infracost JSONs
 planfiles=($(find . -name "infracost-plan" | tr '\n' ' '))
