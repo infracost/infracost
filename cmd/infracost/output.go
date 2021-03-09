@@ -116,7 +116,7 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files")
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
-	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free. Ignored for JSON outputs")
+	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 
 	return cmd
 }
