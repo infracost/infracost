@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# See https://www.infracost.io/docs/terragrunt for usage docs
+# See https://www.infracost.io/docs/iac_tools/terragrunt for usage docs
 
 # Output terraform plans
 terragrunt run-all plan -out=infracost-plan
