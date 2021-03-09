@@ -56,9 +56,9 @@ func registerCmd(cfg *config.Config) *cobra.Command {
 
 			fmt.Printf("\nThank you %s!\nYour API key is: %s\n", name, r.APIKey)
 
-			msg := fmt.Sprintf("%s\nYou can now run %s in your Terraform directory.",
+			msg := fmt.Sprintf("%s\nYou can now run %s and point to your Terraform directory or JSON/plan file.",
 				fmt.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
-				ui.PrimaryString("infracost"),
+				ui.PrimaryString("infracost breakdown --path=..."),
 			)
 
 			saveAPIKey := true
@@ -76,8 +76,8 @@ func registerCmd(cfg *config.Config) *cobra.Command {
 					msg = fmt.Sprintf("%s\n%s %s %s",
 						"Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml.",
 						"You can now run",
-						ui.PrimaryString("infracost"),
-						"in your Terraform directory.",
+						ui.PrimaryString("infracost breakdown --path=..."),
+						"and point to your Terraform directory or JSON/plan file.",
 					)
 				}
 			}
