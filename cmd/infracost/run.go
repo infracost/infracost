@@ -168,7 +168,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	if cmd.Name() != "infracost" && !hasPathFlag && !hasConfigFile {
 		m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 		m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file\n - Terraform state JSON file"
-		m += "\n\nAlternatively, use --config-file to process multiple projects, see https://infracost.io/config_file"
+		m += "\n\nAlternatively, use --config-file to process multiple projects, see https://infracost.io/config-file"
 
 		ui.PrintUsageErrorAndExit(cmd, m)
 	}

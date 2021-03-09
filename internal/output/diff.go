@@ -88,7 +88,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 
 	if hasNilCosts {
 		s += fmt.Sprintf("\n\nTo estimate usage-based resources use --usage-file, see %s",
-			ui.LinkString("https://infracost.io/usage_file"),
+			ui.LinkString("https://infracost.io/usage-file"),
 		)
 	}
 
