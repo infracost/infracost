@@ -7,5 +7,3 @@ version: 0.1
 projects:
   - path: examples/terraform
     usage_file: infracost-usage-example.yml # Define resource usage estimates, see https://infracost.io/usage_file
-    # terraform_workspace: dev
-  # - path: other/project/plan.json

@@ -17,7 +17,7 @@ func breakdownCmd(cfg *config.Config) *cobra.Command {
 
   Use Terraform plan JSON:
 
-      terraform plan -out tfplan.binary .
+      terraform plan -out tfplan.binary
       terraform show -json tfplan.binary > plan.json
       infracost breakdown --path plan.json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
