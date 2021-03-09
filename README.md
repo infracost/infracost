@@ -76,7 +76,7 @@ The following CI/CD integrations can be used to automatically add a pull request
 
 If you run into any issues with CI/CD integrations, please join our [community Slack channel](https://www.infracost.io/community-chat), we'd be happy to guide you through it.
 
-<img src="https://raw.githubusercontent.com/infracost/infracost-gh-action/master/screenshot.png" width=600 alt="Example infracost diff usage" />
+<img src="https://raw.githubusercontent.com/infracost/infracost-gh-action/master/screenshot.png" width=480 alt="Example infracost diff usage" />
 
 ## Supported clouds and resources
 
