@@ -9,8 +9,11 @@ jobs:
     name: Upload Release Asset
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
 
       - name: Build project
         run: |
@@ -31,6 +34,7 @@ jobs:
             ./build/infracost-linux-amd64.tar.gz
             ./build/infracost-windows-amd64.tar.gz
             ./build/infracost-darwin-amd64.tar.gz
+            ./build/infracost-darwin-arm64.tar.gz
             ./docs/generated/docs.tar.gz
 
       - name: Build and push Docker images

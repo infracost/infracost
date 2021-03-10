@@ -23,15 +23,16 @@ var defaultProviderRegions = map[string]string{
 
 // ARN attribute mapping for resources that don't have a standard 'arn' attribute
 var arnAttributeMap = map[string]string{
-	"cloudwatch_dashboard":     "dashboard_arn",
-	"db_snapshot":              "db_snapshot_arn",
-	"db_cluster_snapshot":      "db_cluster_snapshot_arn",
-	"neptune_cluster_snapshot": "db_cluster_snapshot_arn",
-	"docdb_cluster_snapshot":   "db_cluster_snapshot_arn",
-	"dms_certificate":          "certificate_arn",
-	"dms_endpoint":             "endpoint_arn",
-	"dms_replication_instance": "replication_instance_arn",
-	"dms_replication_task":     "replication_task_arn",
+	"aws_cloudwatch_dashboard":     "dashboard_arn",
+	"aws_db_snapshot":              "db_snapshot_arn",
+	"aws_db_cluster_snapshot":      "db_cluster_snapshot_arn",
+	"aws_ecs_service":              "id",
+	"aws_neptune_cluster_snapshot": "db_cluster_snapshot_arn",
+	"aws_docdb_cluster_snapshot":   "db_cluster_snapshot_arn",
+	"aws_dms_certificate":          "certificate_arn",
+	"aws_dms_endpoint":             "endpoint_arn",
+	"aws_dms_replication_instance": "replication_instance_arn",
+	"aws_dms_replication_task":     "replication_task_arn",
 }
 
 type Parser struct {
@@ -309,8 +310,10 @@ func (p *Parser) stripDataResources(resData map[string]*schema.ResourceData) {
 func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {
 	registryMap := GetResourceRegistryMap()
 
-	// Create a map of id -> resource data so we can lookup references
+	// Create a map of id -> resource data and arn -> resource data so we can lookup references
 	idMap := make(map[string][]*schema.ResourceData)
+	arnMap := make(map[string][]*schema.ResourceData)
+
 	for _, d := range resData {
 		id := d.Get("id").String()
 		if _, ok := idMap[id]; !ok {
@@ -318,6 +321,18 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 		}
 
 		idMap[id] = append(idMap[id], d)
+
+		arnAttr, ok := arnAttributeMap[d.Type]
+		if !ok {
+			arnAttr = "arn"
+		}
+
+		arn := d.Get(arnAttr).String()
+		if _, ok := arnMap[arn]; !ok {
+			arnMap[arn] = []*schema.ResourceData{}
+		}
+
+		arnMap[arn] = append(arnMap[arn], d)
 	}
 
 	for _, d := range resData {
@@ -339,11 +354,24 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 				continue
 			}
 
-			// Get any values for the fields and check if they map to IDs of any resources
-			for _, refID := range d.Get(attr).Array() {
-				refs, ok := idMap[refID.String()]
+			// Get any values for the fields and check if they map to IDs or ARNs of any resources
+			for _, refVal := range d.Get(attr).Array() {
+				if refVal.String() == "" {
+					continue
+				}
+
+				// Check ID map
+				idRefs, ok := idMap[refVal.String()]
 				if ok {
-					for _, ref := range refs {
+					for _, ref := range idRefs {
+						d.AddReference(attr, ref)
+					}
+				}
+
+				// Check arn map
+				arnRefs, ok := arnMap[refVal.String()]
+				if ok {
+					for _, ref := range arnRefs {
 						d.AddReference(attr, ref)
 					}
 				}

@@ -2,13 +2,9 @@
 ## the cost of usage-based resource, such as AWS Lambda.
 ## `infracost --usage-file /path/to/infracost-usage.yml [other flags]`
 ## See https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml for available options.
-version: v0.1
+version: 0.1
 resource_usage:
 
-  # Note that we're working on adding all of the supported resources (https://www.infracost.io/docs/supported_resources) to
-  # the usage file feature. Please watch https://github.com/infracost/infracost/issues/421 for updates.
-
-  #
   # The usage file also supports specifying usage for resources inside modules,
   # by specifying the full path to the resource. This is the same value as Infracost
   # outputs in the NAME column , e.g.:
@@ -326,6 +322,10 @@ resource_usage:
   google_kms_crypto_key.my_keys:
     key_versions: 10000             # Number of key versions.
     monthly_key_operations: 1000000 # Monthly number of key operations.
+
+  google_monitoring_metric_descriptor.my_monitoring:
+    monthly_monitoring_data_mb: 5000 # Monthly monitoring data in MB.
+    monthly_api_calls: 1000000       # Monthly read API calls (write calls are free).
 
   google_pubsub_subscription.my_subscription:
     monthly_message_data_tb: 7.416 # Monthly amount of message data pulled by the subscription in TB.
