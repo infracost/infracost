@@ -356,6 +356,10 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 
 			// Get any values for the fields and check if they map to IDs or ARNs of any resources
 			for _, refVal := range d.Get(attr).Array() {
+				if refVal.String() == "" {
+					continue
+				}
+
 				// Check ID map
 				idRefs, ok := idMap[refVal.String()]
 				if ok {
