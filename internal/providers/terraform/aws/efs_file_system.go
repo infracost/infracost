@@ -47,7 +47,7 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 			Name:            "Provisioned throughput",
 			Unit:            "MBps-months",
 			UnitMultiplier:  1,
-			MonthlyQuantity: decimalPtr(provisionedThroughput),
+			MonthlyQuantity: provisionedThroughput,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -131,14 +131,17 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 	}
 }
 
-func calculateProvisionedThroughput(gbStorage *decimal.Decimal, throughput decimal.Decimal) decimal.Decimal {
+func calculateProvisionedThroughput(gbStorage *decimal.Decimal, throughput decimal.Decimal) *decimal.Decimal {
+	if gbStorage == nil {
+		gbStorage = &decimal.Zero
+	}
 	defaultThroughput := gbStorage.Mul(decimal.NewFromInt(730).Div(decimal.NewFromInt(20).Mul(decimal.NewFromInt(1))))
 	totalProvisionedThroughput := throughput.Mul(decimal.NewFromInt(730))
 	totalBillableProvisionedThroughput := totalProvisionedThroughput.Sub(defaultThroughput).Div(decimal.NewFromInt(730))
 
 	if totalBillableProvisionedThroughput.IsPositive() {
-		return totalBillableProvisionedThroughput
+		return &totalBillableProvisionedThroughput
 	}
 
-	return decimal.Zero
+	return &decimal.Zero
 }
