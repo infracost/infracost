@@ -324,7 +324,7 @@ resource_usage:
     monthly_key_operations: 1000000 # Monthly number of key operations.
 
   google_monitoring_metric_descriptor.my_monitoring:
-    monthly_monitoring_data_mb: 5000 # Monthly monitoring data in MB.
+    monthly_monitoring_data_mb: 5000 # Monthly monitoring data in MB (only for chargeable metrics).
     monthly_api_calls: 1000000       # Monthly read API calls (write calls are free).
 
   google_pubsub_subscription.my_subscription:
