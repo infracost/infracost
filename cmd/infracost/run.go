@@ -121,8 +121,6 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 
 	r := output.ToOutputFormat(projects)
 
-	cfg.Environment.OutputFormat = cfg.Format
-
 	opts := output.Options{
 		ShowSkipped: cfg.ShowSkipped,
 		NoColor:     cfg.NoColor,
