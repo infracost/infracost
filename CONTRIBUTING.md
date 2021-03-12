@@ -174,6 +174,8 @@ Where a cloud vendor's pricing pages information can be improved for clarify, we
 The cost component name should not change when the IaC resource params change; anything that can change should be put in brackets, so for example:
 - `General Purpose SSD storage (gp2)` should be `Storage (gp2)` as the storage type can change.
 - `Outbound data transfer to EqDC2` should be `Outbound data transfer (to EqDC2)` as the EqDC2 value changes based on the location.
+- `Linux/UNIX (on-demand, m1.small)` should be `Instance usage (Linux/UNIX, on-demand, m1.small)`.
+
 In the future, we plan to add a separate field to cost components to hold the metadata in brackets.
 
 #### Resource notes
