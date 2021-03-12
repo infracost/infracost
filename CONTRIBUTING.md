@@ -180,6 +180,8 @@ In the future, we plan to add a separate field to cost components to hold the me
 
 The following notes are general guidelines, please leave a comment in your pull request if they don't make sense or they can be improved for the resource you're adding.
 
+- references to other resources: if you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. For example the [aws_ebs_snapshot](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/ebs_snapshot.go#L13) uses this because its price depends on the size of the referenced volume.
+
 - count: do not include the count in the cost component name or in brackets. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
 
 - units:
