@@ -22,7 +22,7 @@ make run ARGS="register"
 Alternatively checkout and run the [cloud-pricing-api](https://github.com/infracost/cloud-pricing-api) and set the `INFRACOST_PRICING_API_ENDPOINT` environment variable to point to it.
 
 Add the API key to your `.env.local` file:
-```
+```sh
 cat <<EOF >> .env.local
 INFRACOST_API_KEY=XXX
 EOF
@@ -121,7 +121,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 Finally create a temporary terraform file to test your resource and run (no need to commit that):
 
-```
+```sh
 make run ARGS="--path my_new_terraform/"
 ```
 
@@ -208,7 +208,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 - brackets: only use 1 set of brackets after a component name, e.g. `Database instance (on-demand, db.t3.medium)` and not `Database instance (on-demand) (db.t3.medium)`
 
 - free resources: if there are certain conditions that can be checked inside a resource Go file, which mean there are no cost components for the resource, return a `NoPrice: true` and `IsSkipped: true` response as shown below.
-	```
+	```go
 	// Gateway endpoints don't have a cost associated with them
 	if vpcEndpointType == "Gateway" {
 		return &schema.Resource{
@@ -219,7 +219,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 	```
 
 - unsupported resources: if there are certain conditions that can be checked inside a resource Go file, which mean that the resource is not yet supported, log a warning to explain what is not supported and return a `nil` response as shown below.
-	```
+	```go
 	if d.Get("placement_tenancy").String() == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
 		return nil
@@ -249,7 +249,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 #### Google resource notes
 
 1. If the resource has a `zone` key, if they have a zone key, use this logic to get the region:
-	```
+	```go
 	region := d.Get("region").String()
 	zone := d.Get("zone").String()
 	if zone != "" {
@@ -267,7 +267,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 4. Click on the Edit draft button, add the release notes from the commits between this and the last release and click on publish.
 5. In the `infracost-atlantis` repo, run the following steps so the Atlantis integration uses the latest version of Infracost:
 
-	```
+	```sh
 	# you can also push to master if you want the GH Action to do the following.
 	git pull
 	docker build --no-cache -t infracost/infracost-atlantis:latest .
