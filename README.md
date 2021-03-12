@@ -48,11 +48,11 @@ Show diff of monthly costs between current and planned state:
     git clone https://github.com/infracost/example-terraform.git
     cd example-terraform
 
-    # Play with aws/main.tf and aws/infracost-usage.yml, and re-run to compare costs
-    infracost breakdown --path aws --usage-file aws/infracost-usage.yml
+    # Play with sample1/main.tf and sample1/infracost-usage.yml, and re-run to compare costs
+    infracost breakdown --path sample1 --usage-file sample1/infracost-usage.yml
 
     # Show diff of monthly costs
-    infracost diff --path aws
+    infracost diff --path sample1
     ```
 
 Please **watch/star** this repo as we add new cloud resources every week or so.
