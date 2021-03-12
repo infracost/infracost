@@ -30,6 +30,8 @@ func breakdownCmd(cfg *config.Config) *cobra.Command {
 				return err
 			}
 
+			cfg.Environment.OutputFormat = cfg.Format
+
 			err = checkRunConfig(cfg)
 			if err != nil {
 				ui.PrintUsageErrorAndExit(cmd, err.Error())

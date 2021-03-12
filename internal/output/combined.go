@@ -62,6 +62,7 @@ func Combine(inputs []ReportInput, opts Options) Root {
 
 	sortResources(combined.Resources, opts.GroupKey)
 
+	combined.Version = outputVersion
 	combined.Projects = projects
 	combined.TotalHourlyCost = totalHourlyCost
 	combined.TotalMonthlyCost = totalMonthlyCost
