@@ -48,19 +48,19 @@ func NewRoute53HealthCheck(d *schema.ResourceData, u *schema.UsageData) *schema.
 	healthCheckType := d.Get("type").String()
 
 	if strings.HasPrefix(healthCheckType, "HTTPS") {
-		costComponents = append(costComponents, calcOptionalHealthChecks(endpointType, "https"))
+		costComponents = append(costComponents, optionalHealthChecks(endpointType, "https"))
 	}
 
 	if d.Get("request_interval").String() == "10" {
-		costComponents = append(costComponents, calcOptionalHealthChecks(endpointType, "fast interval"))
+		costComponents = append(costComponents, optionalHealthChecks(endpointType, "fast interval"))
 	}
 
 	if d.Get("measure_latency").Bool() {
-		costComponents = append(costComponents, calcOptionalHealthChecks(endpointType, "latency measurement"))
+		costComponents = append(costComponents, optionalHealthChecks(endpointType, "latency measurement"))
 	}
 
 	if strings.HasSuffix(healthCheckType, "STR_MATCH") {
-		costComponents = append(costComponents, calcOptionalHealthChecks(endpointType, "string matching"))
+		costComponents = append(costComponents, optionalHealthChecks(endpointType, "string matching"))
 	}
 
 	return &schema.Resource{
@@ -69,7 +69,7 @@ func NewRoute53HealthCheck(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 }
 
-func calcOptionalHealthChecks(endpointType string, healthCheckType string) *schema.CostComponent {
+func optionalHealthChecks(endpointType string, healthCheckType string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Health check (optional, %s)", healthCheckType),
 		Unit:            "months",
