@@ -51,6 +51,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetALBRegistryItem(),
 	GetNATGatewayRegistryItem(),
 	GetRDSClusterInstanceRegistryItem(),
+	GetRoute53HealthCheck(),
 	GetRoute53ResolverEndpointRegistryItem(),
 	GetRoute53RecordRegistryItem(),
 	GetRoute53ZoneRegistryItem(),
