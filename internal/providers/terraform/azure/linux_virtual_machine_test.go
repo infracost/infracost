@@ -16,10 +16,36 @@ func TestAzureRMLinuxVirtualMachine(t *testing.T) {
 	}
 
 	tf := `
-		resource "azurerm_linux_virtual_machine" "standard" {
+		resource "azurerm_linux_virtual_machine" "standard_f2" {
 			name                = "standardlinuxvm"
 			resource_group_name = "testrg"
-			location            = "UK South"
+			location            = "uksouth"
+
+			size           = "Standard_F2"
+			admin_username = "adminuser"
+			admin_password = "T3mp0r4ry!"
+
+			network_interface_ids = [
+				"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/testnic",
+			]
+
+			os_disk {
+				caching              = "ReadWrite"
+				storage_account_type = "Standard_LRS"
+			}
+
+			source_image_reference {
+				publisher = "Canonical"
+				offer     = "UbuntuServer"
+				sku       = "16.04-LTS"
+				version   = "latest"
+			}
+		}
+
+		resource "azurerm_linux_virtual_machine" "standard_ds2_v2" {
+			name                = "standardlinuxvm"
+			resource_group_name = "testrg"
+			location            = "uksouth"
 
 			size           = "Standard_DS2_v2"
 			admin_username = "adminuser"
@@ -45,11 +71,22 @@ func TestAzureRMLinuxVirtualMachine(t *testing.T) {
 
 	resourceChecks := []testutil.ResourceCheck{
 		{
-			Name: "azurerm_linux_virtual_machine.standard",
+			Name: "azurerm_linux_virtual_machine.standard_f2",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:             "Linux/UNIX usage (Consumption, F2)",
+					PriceHash:        "733b640bd8f41ae004a0b0676d10126f-60fc60896424f2f0b576ec5c4e380288",
+					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),
+				},
+			},
+		},
+		{
+			Name: "azurerm_linux_virtual_machine.standard_ds2_v2",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:             "Linux/UNIX usage (Consumption, DS2 v2)",
-					PriceHash:        "b728239de79199e8eca1cedc13f48c53-60fc60896424f2f0b576ec5c4e380288",
+					PriceHash:        "6bd0349af7329f98eaddcdd975e0286e-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),
 				},

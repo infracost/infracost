@@ -15,7 +15,7 @@ func GetAzureRMLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
 		Name:  "azurerm_linux_virtual_machine",
 		RFunc: NewAzureRMLinuxVirtualMachine,
 		Notes: []string{
-			"Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.",
+			"Costs associated with non-standard Linux images, such as RHEL are not supported.",
 			"Custom machine types are not supported.",
 		},
 	}
@@ -56,13 +56,14 @@ func computeCostComponent(region, size string, purchaseOption string) *schema.Co
 		MonthlyDiscountPerc: sustainedUseDiscount,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
+			Region:        strPtr(region), // strPtr(region),
 			Service:       strPtr("Virtual Machines"),
 			ProductFamily: strPtr("Compute"),
 			Sku:           strPtr(sku),
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr(purchaseOption),
+			PurchaseOption: strPtr("Consumption"),
+			Unit:           strPtr("1 Hour"),
 		},
 	}
 }
