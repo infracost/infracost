@@ -28,7 +28,7 @@ func GetSQLInstanceRegistryItem() *schema.RegistryItem {
 func NewSQLInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	name := d.Address
 	tier := d.Get("settings.0").Get("tier").String()
-	availabilityType := d.Get("settings.0").Get("availabilityType").String()
+	availabilityType := d.Get("settings.0").Get("availability_type").String()
 	region := d.Get("region").String()
 	dbVersion := d.Get("database_version").String()
 	dbType := SQLInstanceDBVersionToDBType(dbVersion)
