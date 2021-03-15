@@ -99,7 +99,7 @@ build_msg () {
   
   percent_display=""
   if [ ! -z "$percent" ]; then
-    percent_display=" (${change_sym}${percent}%)"
+    percent_display=" (${change_sym}${percent}%%)"
   fi
   
   msg="💰 Infracost estimate: **monthly cost will ${change_word} by $(format_cost $diff_cost)$percent_display** ${change_emoji}\n"
@@ -117,7 +117,7 @@ build_msg () {
     
   msg="${msg}\n"
   msg="${msg}\`\`\`\n"
-  msg="${msg}${diff_output}\n"
+  msg="${msg}$(echo "${diff_output}" | sed "s/%/%%/g")\n"
   msg="${msg}\`\`\`\n"
   
   if [ "$include_html" = true ]; then
