@@ -146,7 +146,7 @@ post_to_gitlab () {
   jq -Mnc --arg msg "$msg" '{"note": "\($msg)"}' | curl -L -X POST -d @- \
     -H "Content-Type: application/json" \
     -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
-    "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/repository/commits/$CI_COMMIT_SHA/comments"
+    "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/repository/commits/$CI_COMMIT_SHA/comments"
 }
 
 post_bitbucket_comment () {
