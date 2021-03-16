@@ -23,7 +23,7 @@ func TestNewSQLInstance_SharedInstance(t *testing.T) {
 	  resource "google_sql_database_instance" "my_sql_instance" {
 		name   = "my-database-instance"
 		region = "us-central1"
-		database_version = "POSTGRES_11"
+		database_version = "SQLSERVER_2017_ENTERPRISE"
 		settings {
 		  tier = "db-f1-micro"
 		  availability_type = "ZONAL"
@@ -41,8 +41,13 @@ func TestNewSQLInstance_SharedInstance(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:            "Instance pricing",
-					PriceHash:       "00652373a56ac9fb427a933a88235829-ef2cadbde566a742ff14834f883bcb8a",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+					PriceHash:       "8c6410e6b05f87ffc7ee2268f2d7afc7-ef2cadbde566a742ff14834f883bcb8a",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:            "License (Enterprise)",
+					PriceHash:       "577c5d61a66cb3b7eaf6b405c1d5f785-ef2cadbde566a742ff14834f883bcb8a",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 			},
 		},
