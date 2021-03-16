@@ -32,12 +32,17 @@ func NewSQLInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	region := d.Get("region").String()
 	dbVersion := d.Get("database_version").String()
 	dbType := SQLInstanceDBVersionToDBType(dbVersion)
-	return &schema.Resource{
+	resource := &schema.Resource{
 		Name: name,
 		CostComponents: []*schema.CostComponent{
 			SharedSQLInstance(name, tier, availabilityType, dbType, region),
 		},
 	}
+	if strings.Contains(dbVersion, "SQLSERVER") {
+		resource.CostComponents = append(resource.CostComponents, SQLServerLicense(tier, dbVersion))
+	}
+
+	return resource
 }
 
 func SharedSQLInstance(name, tier, availabilityType string, dbType SQLInstanceDBType, region string) *schema.CostComponent {
@@ -52,7 +57,7 @@ func SharedSQLInstance(name, tier, availabilityType string, dbType SQLInstanceDB
 	descriptionRegex := SQLInstanceAvDBTypeToDescriptionRegex(availabilityType, dbType)
 	cost = &schema.CostComponent{
 		Name:           "Instance pricing",
-		Unit:           "seconds",
+		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
@@ -83,7 +88,7 @@ func SQLInstanceDBVersionToDBType(dbVersion string) SQLInstanceDBType {
 func SQLInstanceTierToResourceGroup(tier string) string {
 	data := map[string]string{
 		"db-f1-micro": "SQLGen2InstancesF1Micro",
-		"db-g1-small": "SQLGen2InstancesF1Small",
+		"db-g1-small": "SQLGen2InstancesG1Small",
 	}
 	return data[tier]
 }
@@ -102,4 +107,64 @@ func SQLInstanceAvDBTypeToDescriptionRegex(availabilityType string, dbType SQLIn
 	availabilityTypeString := availabilityTypeNames[availabilityType]
 	description := fmt.Sprintf("/%s: %s/", dbTypeString, availabilityTypeString)
 	return description
+}
+
+func SQLServerLicense(tier string, dbVersion string) *schema.CostComponent {
+	// Get license type from dbVersion
+	licenseType := SQLServerDBVersionToLicenseType(dbVersion)
+
+	// Check if tier is a shared instance or not.
+	isSharedInstance := false
+	sharedInstanceNames := []string{"db-f1-micro", "db-g1-small"}
+	for _, tierName := range sharedInstanceNames {
+		if tier == tierName {
+			isSharedInstance = true
+			break
+		}
+	}
+	// Set the pricing api resource group.
+	descriptionRegex := SQlServerTierNameToDescriptionRegex(tier, licenseType, isSharedInstance)
+	fmt.Println(descriptionRegex)
+
+	cost := &schema.CostComponent{
+		Name:           fmt.Sprintf("License (%s)", licenseType),
+		Unit:           "hours",
+		UnitMultiplier: 1,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("gcp"),
+			Region:     strPtr("global"),
+			Service:    strPtr("Compute Engine"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "resourceGroup", Value: strPtr("Google")},
+				{Key: "description", ValueRegex: strPtr(descriptionRegex)},
+			},
+		},
+	}
+	return cost
+}
+
+func SQLServerDBVersionToLicenseType(dbVersion string) string {
+	licenseType := "Standard"
+	if strings.Contains(dbVersion, "ENTERPRISE") {
+		licenseType = "Enterprise"
+	} else if strings.Contains(dbVersion, "WEB") {
+		licenseType = "Web"
+	} else if strings.Contains(dbVersion, "EXPRESS") {
+		licenseType = "Express"
+	}
+	return licenseType
+}
+
+func SQlServerTierNameToDescriptionRegex(tier, licenseType string, isSharedInstance bool) string {
+	var descriptionRegex string
+	if isSharedInstance {
+		instanceAPINames := map[string]string{
+			"db-f1-micro": "f1-micro",
+			"db-g1-small": "g1-small",
+		}
+		descriptionRegex = fmt.Sprintf("/Licensing Fee for SQL Server 2017 %s on %s/", licenseType, instanceAPINames[tier])
+	}
+	// TODO: handle custom instances
+	return descriptionRegex
 }
