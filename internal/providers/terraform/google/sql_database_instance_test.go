@@ -27,6 +27,8 @@ func TestNewSQLInstance_SharedInstance(t *testing.T) {
 		settings {
 		  tier = "db-f1-micro"
 		  availability_type = "ZONAL"
+		  disk_type = "PD_SDD"
+		  disk_size = 50
 		}
 	  
 		deletion_protection  = "true"
@@ -43,6 +45,11 @@ func TestNewSQLInstance_SharedInstance(t *testing.T) {
 					Name:            "Instance pricing",
 					PriceHash:       "8c6410e6b05f87ffc7ee2268f2d7afc7-ef2cadbde566a742ff14834f883bcb8a",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:            "Storage (HDD)",
+					PriceHash:       "5cf7faa740d422ad2a42937d73517ba4-57bc5d148491a8381abaccb21ca6b4e9",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(50)),
 				},
 				{
 					Name:            "License (Enterprise)",

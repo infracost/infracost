@@ -32,10 +32,19 @@ func NewSQLInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	region := d.Get("region").String()
 	dbVersion := d.Get("database_version").String()
 	dbType := SQLInstanceDBVersionToDBType(dbVersion)
+	diskType := "PD_SSD"
+	if d.Get("settings.0").Get("disk_type").Exists() {
+		diskType = d.Get("settings.0").Get("disk_type").String()
+	}
+	var diskSizeGB int64 = 10
+	if d.Get("settings.0").Get("disk_size").Exists() {
+		diskSizeGB = d.Get("settings.0").Get("disk_size").Int()
+	}
 	resource := &schema.Resource{
 		Name: name,
 		CostComponents: []*schema.CostComponent{
 			SharedSQLInstance(name, tier, availabilityType, dbType, region),
+			SQLInstanceStorage(region, dbType, availabilityType, diskType, diskSizeGB),
 		},
 	}
 	if strings.Contains(dbVersion, "SQLSERVER") {
@@ -123,8 +132,7 @@ func SQLServerLicense(tier string, dbVersion string) *schema.CostComponent {
 		}
 	}
 	// Set the pricing api resource group.
-	descriptionRegex := SQlServerTierNameToDescriptionRegex(tier, licenseType, isSharedInstance)
-	fmt.Println(descriptionRegex)
+	descriptionRegex := SQLServerTierNameToDescriptionRegex(tier, licenseType, isSharedInstance)
 
 	cost := &schema.CostComponent{
 		Name:           fmt.Sprintf("License (%s)", licenseType),
@@ -156,7 +164,7 @@ func SQLServerDBVersionToLicenseType(dbVersion string) string {
 	return licenseType
 }
 
-func SQlServerTierNameToDescriptionRegex(tier, licenseType string, isSharedInstance bool) string {
+func SQLServerTierNameToDescriptionRegex(tier, licenseType string, isSharedInstance bool) string {
 	var descriptionRegex string
 	if isSharedInstance {
 		instanceAPINames := map[string]string{
@@ -167,4 +175,40 @@ func SQlServerTierNameToDescriptionRegex(tier, licenseType string, isSharedInsta
 	}
 	// TODO: handle custom instances
 	return descriptionRegex
+}
+
+func SQLInstanceStorage(region string, dbType SQLInstanceDBType, availabilityType, diskType string, diskSizeGB int64) *schema.CostComponent {
+	storageTypeHumanReadableNames := map[string]string{
+		"PD_SSD": "SSD",
+		"PD_HDD": "HDD",
+	}
+	storageTypeAPIResourceGroup := map[string]string{
+		"PD_SSD": "SSD",
+		"PD_HDD": "PDStandard",
+	}
+	availabilityTypeNames := map[string]string{
+		"REGIONAL": "Regional",
+		"ZONAL":    "Zonal",
+	}
+	dbTypeNames := map[SQLInstanceDBType]string{
+		MySQL:      "MySQL",
+		PostgreSQL: "PostgreSQL",
+		SQLServer:  "SQL Server",
+	}
+	cost := &schema.CostComponent{
+		Name:            fmt.Sprintf("Storage (%s)", storageTypeHumanReadableNames[diskType]),
+		Unit:            "GB-months",
+		UnitMultiplier:  1,
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(diskSizeGB)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("gcp"),
+			Region:     strPtr(region),
+			Service:    strPtr("Cloud SQL"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "resourceGroup", Value: strPtr(storageTypeAPIResourceGroup[diskType])},
+				{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s: %s/", dbTypeNames[dbType], availabilityTypeNames[availabilityType]))},
+			},
+		},
+	}
+	return cost
 }
