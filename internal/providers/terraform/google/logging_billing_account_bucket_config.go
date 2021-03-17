@@ -28,7 +28,7 @@ func loggingCostComponent(loggingData *decimal.Decimal) []*schema.CostComponent 
 	return []*schema.CostComponent{
 		{
 			Name:            "Logging data",
-			Unit:            "GB-months",
+			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: loggingData,
 			ProductFilter: &schema.ProductFilter{
