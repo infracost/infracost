@@ -27,7 +27,7 @@ func TestNewSQLInstance_SharedInstance(t *testing.T) {
 		settings {
 		  tier = "db-f1-micro"
 		  availability_type = "ZONAL"
-		  disk_type = "PD_SDD"
+		  disk_type = "PD_SSD"
 		  disk_size = 50
 		}
 	  
