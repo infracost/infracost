@@ -70,7 +70,7 @@ func TestGetRoute53HealthCheckAWS(t *testing.T) {
 			Name: "aws_route53_health_check.simple",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Health check (basic)",
+					Name:             "Health check",
 					PriceHash:        "ce31281484f92e4e162552798229e7f1-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -80,12 +80,12 @@ func TestGetRoute53HealthCheckAWS(t *testing.T) {
 			Name: "aws_route53_health_check.https",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Health check (basic)",
+					Name:             "Health check",
 					PriceHash:        "ce31281484f92e4e162552798229e7f1-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Health check (optional, https)",
+					Name:             "Optional features",
 					PriceHash:        "2f754f0d7b985fea079c82627f121bbb-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -95,19 +95,14 @@ func TestGetRoute53HealthCheckAWS(t *testing.T) {
 			Name: "aws_route53_health_check.ssl_string_match",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Health check (basic)",
+					Name:             "Health check",
 					PriceHash:        "ce31281484f92e4e162552798229e7f1-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Health check (optional, string matching)",
+					Name:             "Optional features",
 					PriceHash:        "2f754f0d7b985fea079c82627f121bbb-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, https)",
-					PriceHash:        "2f754f0d7b985fea079c82627f121bbb-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 				},
 			},
 		},
@@ -115,24 +110,14 @@ func TestGetRoute53HealthCheckAWS(t *testing.T) {
 			Name: "aws_route53_health_check.ssl_latency_string_match",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Health check (basic)",
+					Name:             "Health check",
 					PriceHash:        "ce31281484f92e4e162552798229e7f1-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Health check (optional, string matching)",
+					Name:             "Optional features",
 					PriceHash:        "2f754f0d7b985fea079c82627f121bbb-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, https)",
-					PriceHash:        "2f754f0d7b985fea079c82627f121bbb-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, latency measurement)",
-					PriceHash:        "2f754f0d7b985fea079c82627f121bbb-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
 			},
 		},
@@ -140,29 +125,14 @@ func TestGetRoute53HealthCheckAWS(t *testing.T) {
 			Name: "aws_route53_health_check.ssl_latency_interval_string_match",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Health check (basic)",
+					Name:             "Health check",
 					PriceHash:        "ce31281484f92e4e162552798229e7f1-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Health check (optional, string matching)",
+					Name:             "Optional features",
 					PriceHash:        "2f754f0d7b985fea079c82627f121bbb-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, https)",
-					PriceHash:        "2f754f0d7b985fea079c82627f121bbb-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, latency measurement)",
-					PriceHash:        "2f754f0d7b985fea079c82627f121bbb-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, fast interval)",
-					PriceHash:        "2f754f0d7b985fea079c82627f121bbb-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(4)),
 				},
 			},
 		},
@@ -229,19 +199,19 @@ func TestGetRoute53HealthCheckOutsideAWS(t *testing.T) {
 `
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_route53_health_check.simple": map[string]interface{}{
-			"endpoint_type": "Non-AWS",
+			"endpoint_type": "non_aws",
 		},
 		"aws_route53_health_check.https": map[string]interface{}{
-			"endpoint_type": "Non-AWS",
+			"endpoint_type": "non_aws",
 		},
 		"aws_route53_health_check.ssl_string_match": map[string]interface{}{
-			"endpoint_type": "Non-AWS",
+			"endpoint_type": "Non_AWS",
 		},
 		"aws_route53_health_check.ssl_latency_string_match": map[string]interface{}{
-			"endpoint_type": "Non-AWS",
+			"endpoint_type": "Non_AWS",
 		},
 		"aws_route53_health_check.ssl_latency_interval_string_match": map[string]interface{}{
-			"endpoint_type": "Non-AWS",
+			"endpoint_type": "Non_AWS",
 		},
 	})
 
@@ -250,7 +220,7 @@ func TestGetRoute53HealthCheckOutsideAWS(t *testing.T) {
 			Name: "aws_route53_health_check.simple",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Health check (basic)",
+					Name:             "Health check",
 					PriceHash:        "ffb695281d2d6aa969f467655260a977-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -260,12 +230,12 @@ func TestGetRoute53HealthCheckOutsideAWS(t *testing.T) {
 			Name: "aws_route53_health_check.https",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Health check (basic)",
+					Name:             "Health check",
 					PriceHash:        "ffb695281d2d6aa969f467655260a977-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Health check (optional, https)",
+					Name:             "Optional features",
 					PriceHash:        "87ab632b0f2388dee4f62036923ec5c5-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -275,19 +245,14 @@ func TestGetRoute53HealthCheckOutsideAWS(t *testing.T) {
 			Name: "aws_route53_health_check.ssl_string_match",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Health check (basic)",
+					Name:             "Health check",
 					PriceHash:        "ffb695281d2d6aa969f467655260a977-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Health check (optional, https)",
+					Name:             "Optional features",
 					PriceHash:        "87ab632b0f2388dee4f62036923ec5c5-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, string matching)",
-					PriceHash:        "87ab632b0f2388dee4f62036923ec5c5-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 				},
 			},
 		},
@@ -295,24 +260,14 @@ func TestGetRoute53HealthCheckOutsideAWS(t *testing.T) {
 			Name: "aws_route53_health_check.ssl_latency_string_match",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Health check (basic)",
+					Name:             "Health check",
 					PriceHash:        "ffb695281d2d6aa969f467655260a977-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Health check (optional, https)",
+					Name:             "Optional features",
 					PriceHash:        "87ab632b0f2388dee4f62036923ec5c5-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, string matching)",
-					PriceHash:        "87ab632b0f2388dee4f62036923ec5c5-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, latency measurement)",
-					PriceHash:        "87ab632b0f2388dee4f62036923ec5c5-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
 			},
 		},
@@ -320,29 +275,14 @@ func TestGetRoute53HealthCheckOutsideAWS(t *testing.T) {
 			Name: "aws_route53_health_check.ssl_latency_interval_string_match",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Health check (basic)",
+					Name:             "Health check",
 					PriceHash:        "ffb695281d2d6aa969f467655260a977-a9191d0a7972a4ac9c0e44b9ea6310bb",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "Health check (optional, https)",
+					Name:             "Optional features",
 					PriceHash:        "87ab632b0f2388dee4f62036923ec5c5-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, string matching)",
-					PriceHash:        "87ab632b0f2388dee4f62036923ec5c5-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, latency measurement)",
-					PriceHash:        "87ab632b0f2388dee4f62036923ec5c5-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-				},
-				{
-					Name:             "Health check (optional, fast interval)",
-					PriceHash:        "87ab632b0f2388dee4f62036923ec5c5-a9191d0a7972a4ac9c0e44b9ea6310bb",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(4)),
 				},
 			},
 		},

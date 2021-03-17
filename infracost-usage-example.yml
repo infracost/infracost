@@ -136,7 +136,7 @@ resource_usage:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
   aws_route53_health_check.my_health_check:
-    endpoint_type: non-aws # Type of health check endpoint to query, endpoint types can be either aws or non-aws.
+    endpoint_type: non_aws # Type of health check endpoint to query, can be: either aws or non_aws.
 
   aws_route53_record.my_record:
     monthly_standard_queries: 1100000000      # Monthly number of Standard queries.
