@@ -18,7 +18,7 @@ func TestLoggingProjectSink(t *testing.T) {
 		resource "google_logging_project_sink" "basic" {
 			name = "my-pubsub-instance-sink"
 		
-			destination = "pubsub.googleapis.com/projects/my-project/topics/instance-activity"
+			destination = "fake"
 		}`
 
 	resourceChecks := []testutil.ResourceCheck{
@@ -46,7 +46,7 @@ func TestLoggingProjectSink_usage(t *testing.T) {
 		resource "google_logging_project_sink" "basic" {
 			name = "my-pubsub-instance-sink"
 		
-			destination = "pubsub.googleapis.com/projects/my-project/topics/instance-activity"
+			destination = "fake"
 		}`
 
 	usage := schema.NewUsageMap(map[string]interface{}{

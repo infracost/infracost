@@ -18,29 +18,8 @@ func NewLoggingFolderBucket(d *schema.ResourceData, u *schema.UsageData) *schema
 		loggingData = decimalPtr(decimal.NewFromInt(u.Get("monthly_logging_data_gb").Int()))
 	}
 
-	costComponents := []*schema.CostComponent{
-		{
-			Name:            "Logging data",
-			Unit:            "GB-months",
-			UnitMultiplier:  1,
-			MonthlyQuantity: loggingData,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("gcp"),
-				Region:        strPtr("global"),
-				Service:       strPtr("Stackdriver Logging"),
-				ProductFamily: strPtr("ApplicationServices"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr("Log Volume")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("50"),
-			},
-		},
-	}
-
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: costComponents,
+		CostComponents: loggingCostComponent(loggingData),
 	}
 }

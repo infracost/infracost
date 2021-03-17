@@ -20,18 +20,10 @@ func TestLoggingBillingAccountSink(t *testing.T) {
 			description = "what it is"
 			billing_account = "00AA00-000AAA-00AA0A" # fake
 		
-			destination = "storage.googleapis.com/${google_storage_bucket.bucket.name}"
-		}
-		
-		resource "google_storage_bucket" "bucket" {
-			name = "billing-logging-bucket"
+			destination = "storage.googleapis.com/fake"
 		}`
 
 	resourceChecks := []testutil.ResourceCheck{
-		{
-			Name:      "google_storage_bucket.bucket",
-			SkipCheck: true,
-		},
 		{
 			Name: "google_logging_billing_account_sink.basic",
 			CostComponentChecks: []testutil.CostComponentCheck{
@@ -53,18 +45,13 @@ func TestLoggingBillingAccountSink_usage(t *testing.T) {
 	}
 
 	tf := `
-	resource "google_logging_billing_account_sink" "my-sink" {
-		name            = "my-sink"
-		description = "what it is"
-		billing_account = "00AA00-000AAA-00AA0A" # fake
-	
-		# Can export to pubsub, cloud storage, or bigquery
-		destination = "storage.googleapis.com/${google_storage_bucket.bucket.name}"
-	}
-	
-	resource "google_storage_bucket" "bucket" {
-		name = "billing-logging-bucket"
-	}`
+		resource "google_logging_billing_account_sink" "my-sink" {
+			name            = "my-sink"
+			description = "what it is"
+			billing_account = "00AA00-000AAA-00AA0A" # fake
+		
+			destination = "storage.googleapis.com/fake"
+		}`
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"google_logging_billing_account_sink.my-sink": map[string]interface{}{
@@ -73,10 +60,6 @@ func TestLoggingBillingAccountSink_usage(t *testing.T) {
 	})
 
 	resourceChecks := []testutil.ResourceCheck{
-		{
-			Name:      "google_storage_bucket.bucket",
-			SkipCheck: true,
-		},
 		{
 			Name: "google_logging_billing_account_sink.my-sink",
 			CostComponentChecks: []testutil.CostComponentCheck{

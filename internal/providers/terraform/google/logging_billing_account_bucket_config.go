@@ -18,7 +18,14 @@ func NewLoggingBillingAccountBucket(d *schema.ResourceData, u *schema.UsageData)
 		loggingData = decimalPtr(decimal.NewFromInt(u.Get("monthly_logging_data_gb").Int()))
 	}
 
-	costComponents := []*schema.CostComponent{
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: loggingCostComponent(loggingData),
+	}
+}
+
+func loggingCostComponent(loggingData *decimal.Decimal) []*schema.CostComponent {
+	return []*schema.CostComponent{
 		{
 			Name:            "Logging data",
 			Unit:            "GB-months",
@@ -37,10 +44,5 @@ func NewLoggingBillingAccountBucket(d *schema.ResourceData, u *schema.UsageData)
 				StartUsageAmount: strPtr("50"),
 			},
 		},
-	}
-
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
 	}
 }

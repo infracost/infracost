@@ -17,30 +17,13 @@ func TestLoggingFolderSink(t *testing.T) {
 	tf := `
 		resource "google_logging_folder_sink" "basic" {
 			name   = "my-sink"
-  		description = "what it is"
-  		folder = google_folder.folder.name
+			description = "what it is"
+			folder = "fake"
 
-  		destination = "storage.googleapis.com/${google_storage_bucket.bucket.name}"
-		}
-		
-		resource "google_storage_bucket" "bucket" {
-			name = "billing-logging-bucket"
-		}
-		
-		resource "google_folder" "folder" {
-			display_name = "My folder"
-			parent       = "organizations/123456"
+			destination = "storage.googleapis.com/fake"
 		}`
 
 	resourceChecks := []testutil.ResourceCheck{
-		{
-			Name:      "google_storage_bucket.bucket",
-			SkipCheck: true,
-		},
-		{
-			Name:      "google_folder.folder",
-			SkipCheck: true,
-		},
 		{
 			Name: "google_logging_folder_sink.basic",
 			CostComponentChecks: []testutil.CostComponentCheck{
@@ -62,22 +45,13 @@ func TestLoggingFolderSink_usage(t *testing.T) {
 	}
 
 	tf := `
-	resource "google_logging_folder_sink" "basic" {
-		name   = "my-sink"
-		description = "what it is"
-		folder = google_folder.folder.name
+		resource "google_logging_folder_sink" "basic" {
+			name   = "my-sink"
+			description = "what it is"
+			folder = "fake"
 
-		destination = "storage.googleapis.com/${google_storage_bucket.bucket.name}"
-	}
-	
-	resource "google_storage_bucket" "bucket" {
-		name = "billing-logging-bucket"
-	}
-	
-	resource "google_folder" "folder" {
-		display_name = "My folder"
-		parent       = "organizations/123456"
-	}`
+			destination = "storage.googleapis.com/fake"
+		}`
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"google_logging_folder_sink.basic": map[string]interface{}{
@@ -86,14 +60,6 @@ func TestLoggingFolderSink_usage(t *testing.T) {
 	})
 
 	resourceChecks := []testutil.ResourceCheck{
-		{
-			Name:      "google_storage_bucket.bucket",
-			SkipCheck: true,
-		},
-		{
-			Name:      "google_folder.folder",
-			SkipCheck: true,
-		},
 		{
 			Name: "google_logging_folder_sink.basic",
 			CostComponentChecks: []testutil.CostComponentCheck{

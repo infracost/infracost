@@ -18,30 +18,12 @@ func TestLoggingOrgSink(t *testing.T) {
 		resource "google_logging_organization_sink" "basic" {
 			name   = "basic"
 			description = "what it is"
-			org_id = "123456789"
+			org_id = "fake"
 		
-			destination = "storage.googleapis.com/${google_storage_bucket.log-bucket.name}"
-		}
-		
-		resource "google_storage_bucket" "log-bucket" {
-			name = "organization-logging-bucket"
-		}
-		
-		resource "google_project_iam_member" "log-writer" {
-			role = "roles/storage.objectCreator"
-		
-			member = google_logging_organization_sink.basic.writer_identity
+			destination = "storage.googleapis.com/fake"
 		}`
 
 	resourceChecks := []testutil.ResourceCheck{
-		{
-			Name:      "google_storage_bucket.log-bucket",
-			SkipCheck: true,
-		},
-		{
-			Name:      "google_project_iam_member.log-writer",
-			SkipCheck: true,
-		},
 		{
 			Name: "google_logging_organization_sink.basic",
 			CostComponentChecks: []testutil.CostComponentCheck{
@@ -66,19 +48,9 @@ func TestLoggingOrgSink_usage(t *testing.T) {
 		resource "google_logging_organization_sink" "basic" {
 			name   = "basic"
 			description = "what it is"
-			org_id = "123456789"
+			org_id = "fake"
 		
-			destination = "storage.googleapis.com/${google_storage_bucket.log-bucket.name}"
-		}
-		
-		resource "google_storage_bucket" "log-bucket" {
-			name = "organization-logging-bucket"
-		}
-		
-		resource "google_project_iam_member" "log-writer" {
-			role = "roles/storage.objectCreator"
-		
-			member = google_logging_organization_sink.basic.writer_identity
+			destination = "storage.googleapis.com/fake"
 		}`
 
 	usage := schema.NewUsageMap(map[string]interface{}{
@@ -88,14 +60,6 @@ func TestLoggingOrgSink_usage(t *testing.T) {
 	})
 
 	resourceChecks := []testutil.ResourceCheck{
-		{
-			Name:      "google_storage_bucket.log-bucket",
-			SkipCheck: true,
-		},
-		{
-			Name:      "google_project_iam_member.log-writer",
-			SkipCheck: true,
-		},
 		{
 			Name: "google_logging_organization_sink.basic",
 			CostComponentChecks: []testutil.CostComponentCheck{

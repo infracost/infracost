@@ -15,24 +15,14 @@ func TestLoggingProjectFolderBucket(t *testing.T) {
 	}
 
 	tf := `
-		resource "google_project" "default" {
-			project_id = "your-project-id"
-			name       = "your-project-id"
-			org_id     = "123456789"
-		}
-
 		resource "google_logging_project_bucket_config" "basic" {
-				project    = google_project.default.name
+				project    = "fake"
 				location  = "global"
 				retention_days = 30
 				bucket_id = "_Default"
 		}`
 
 	resourceChecks := []testutil.ResourceCheck{
-		{
-			Name:      "google_project.default",
-			SkipCheck: true,
-		},
 		{
 			Name: "google_logging_project_bucket_config.basic",
 			CostComponentChecks: []testutil.CostComponentCheck{
@@ -54,17 +44,11 @@ func TestLoggingProjectBucket_usage(t *testing.T) {
 	}
 
 	tf := `
-		resource "google_project" "default" {
-			project_id = "your-project-id"
-			name       = "your-project-id"
-			org_id     = "123456789"
-		}
-
 		resource "google_logging_project_bucket_config" "basic" {
-				project    = google_project.default.name
-				location  = "global"
-				retention_days = 30
-				bucket_id = "_Default"
+			project    = "fake"
+			location  = "global"
+			retention_days = 30
+			bucket_id = "_Default"
 		}`
 
 	usage := schema.NewUsageMap(map[string]interface{}{
@@ -74,10 +58,6 @@ func TestLoggingProjectBucket_usage(t *testing.T) {
 	})
 
 	resourceChecks := []testutil.ResourceCheck{
-		{
-			Name:      "google_project.default",
-			SkipCheck: true,
-		},
 		{
 			Name: "google_logging_project_bucket_config.basic",
 			CostComponentChecks: []testutil.CostComponentCheck{

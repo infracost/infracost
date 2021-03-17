@@ -15,23 +15,14 @@ func TestLoggingFolderBucket(t *testing.T) {
 	}
 
 	tf := `
-	resource "google_folder" "default" {
-    display_name = "some-folder-name"
-    parent       = "organizations/123456789"
-	}
-
-	resource "google_logging_folder_bucket_config" "basic" {
-			folder    = google_folder.default.name
-			location  = "global"
-			retention_days = 30
-			bucket_id = "_Default"
-	}`
+		resource "google_logging_folder_bucket_config" "basic" {
+				folder    = "fake"
+				location  = "global"
+				retention_days = 30
+				bucket_id = "_Default"
+		}`
 
 	resourceChecks := []testutil.ResourceCheck{
-		{
-			Name:      "google_folder.default",
-			SkipCheck: true,
-		},
 		{
 			Name: "google_logging_folder_bucket_config.basic",
 			CostComponentChecks: []testutil.CostComponentCheck{
@@ -53,17 +44,12 @@ func TestLoggingFolderBucket_usage(t *testing.T) {
 	}
 
 	tf := `
-	resource "google_folder" "default" {
-    display_name = "some-folder-name"
-    parent       = "organizations/123456789"
-	}
-
-	resource "google_logging_folder_bucket_config" "basic" {
-			folder    = google_folder.default.name
-			location  = "global"
-			retention_days = 30
-			bucket_id = "_Default"
-	}`
+		resource "google_logging_folder_bucket_config" "basic" {
+				folder    = "fake"
+				location  = "global"
+				retention_days = 30
+				bucket_id = "_Default"
+		}`
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"google_logging_folder_bucket_config.basic": map[string]interface{}{
@@ -72,10 +58,6 @@ func TestLoggingFolderBucket_usage(t *testing.T) {
 	})
 
 	resourceChecks := []testutil.ResourceCheck{
-		{
-			Name:      "google_folder.default",
-			SkipCheck: true,
-		},
 		{
 			Name: "google_logging_folder_bucket_config.basic",
 			CostComponentChecks: []testutil.CostComponentCheck{
