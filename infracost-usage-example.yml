@@ -323,6 +323,30 @@ resource_usage:
     key_versions: 10000             # Number of key versions.
     monthly_key_operations: 1000000 # Monthly number of key operations.
 
+  google_logging_billing_account_bucket_config.my_config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_billing_account_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_folder_bucket_config.my_config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_folder_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_organization_bucket_config.my.config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_organization_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_project_bucket_config.my_config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_project_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
   google_monitoring_metric_descriptor.my_monitoring:
     monthly_monitoring_data_mb: 5000 # Monthly monitoring data in MB (only for chargeable metrics).
     monthly_api_calls: 1000000       # Monthly read API calls (write calls are free).
