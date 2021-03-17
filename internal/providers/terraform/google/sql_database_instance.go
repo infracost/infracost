@@ -178,11 +178,11 @@ func SQLServerTierNameToDescriptionRegex(tier, licenseType string, isSharedInsta
 }
 
 func SQLInstanceStorage(region string, dbType SQLInstanceDBType, availabilityType, diskType string, diskSizeGB int64) *schema.CostComponent {
-	storageTypeHumanReadableNames := map[string]string{
+	diskTypeHumanReadableNames := map[string]string{
 		"PD_SSD": "SSD",
 		"PD_HDD": "HDD",
 	}
-	storageTypeAPIResourceGroup := map[string]string{
+	diskTypeAPIResourceGroup := map[string]string{
 		"PD_SSD": "SSD",
 		"PD_HDD": "PDStandard",
 	}
@@ -196,7 +196,7 @@ func SQLInstanceStorage(region string, dbType SQLInstanceDBType, availabilityTyp
 		SQLServer:  "SQL Server",
 	}
 	cost := &schema.CostComponent{
-		Name:            fmt.Sprintf("Storage (%s)", storageTypeHumanReadableNames[diskType]),
+		Name:            fmt.Sprintf("Storage (%s)", diskTypeHumanReadableNames[diskType]),
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(diskSizeGB)),
@@ -205,7 +205,7 @@ func SQLInstanceStorage(region string, dbType SQLInstanceDBType, availabilityTyp
 			Region:     strPtr(region),
 			Service:    strPtr("Cloud SQL"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "resourceGroup", Value: strPtr(storageTypeAPIResourceGroup[diskType])},
+				{Key: "resourceGroup", Value: strPtr(diskTypeAPIResourceGroup[diskType])},
 				{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s: %s/", dbTypeNames[dbType], availabilityTypeNames[availabilityType]))},
 			},
 		},
