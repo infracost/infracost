@@ -56,10 +56,15 @@ func computeCostComponent(region, size string, purchaseOption string) *schema.Co
 		MonthlyDiscountPerc: sustainedUseDiscount,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(region), // strPtr(region),
+			Region:        strPtr(region),
 			Service:       strPtr("Virtual Machines"),
 			ProductFamily: strPtr("Compute"),
-			Sku:           strPtr(sku),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr(sku)},
+				{Key: "type", Value: strPtr("Consumption")},
+				{Key: "productName", ValueRegex: strPtr(regexDoesNotContain("windows"))},
+				{Key: "meterName", ValueRegex: strPtr(regexDoesNotContain("expired"))},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),

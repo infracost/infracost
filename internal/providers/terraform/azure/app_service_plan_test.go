@@ -18,10 +18,10 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 	tf := `
 		resource "azurerm_app_service_plan" "linux_standard_s3" {
 			name                = "api-lin-appserviceplan-std-s3"
-			location            = "UK South"
+			location            = "uksouth"
 			resource_group_name = "testrg"
 			kind                = "Linux"
-			reserved            = false
+			reserved            = true
 		
 			sku {
 				tier = "Standard"
@@ -31,10 +31,10 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 
 		resource "azurerm_app_service_plan" "linux_premium_p1_version_2" {
 		    name                = "api-lin-appserviceplan-prem-v2"
-		    location            = "UK South"
+			location            = "UK South"
 		    resource_group_name = "testrg"
 		    kind                = "Linux"
-		    reserved            = false
+		    reserved            = true
 		
 		    sku {
 		       tier = "Premium"
@@ -44,10 +44,10 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 
 		resource "azurerm_app_service_plan" "linux_premium_p1_version_3" {
 		    name                = "api-lin-appserviceplan-prem-v3"
-		    location            = "UK South"
+			location            = "uksouth"
 		    resource_group_name = "testrg"
 		    kind                = "Linux"
-		    reserved            = false
+		    reserved            = true
 		
 		    sku {
 		       tier = "Premium"
@@ -57,7 +57,7 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 
 		resource "azurerm_app_service_plan" "windows_premium_container_plan_pc4" {
 		    name                = "api-win-appserviceplan-pc4"
-		    location            = "UK South"
+			location            = "uksouth"
 		    resource_group_name = "testrg"
 		    kind                = "Windows"
 		    reserved            = false
@@ -74,8 +74,8 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 			Name: "azurerm_app_service_plan.linux_standard_s3",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Computing usage (Consumption, S3)",
-					PriceHash:        "d2ca2764fbf2fa06736cf31a8c90ce27-60fc60896424f2f0b576ec5c4e380288",
+					Name:             "Consumption usage (Consumption, S3)",
+					PriceHash:        "7551c2ba57d451c6ee68825f1ccf7a08-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),
 				},
@@ -85,8 +85,8 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 			Name: "azurerm_app_service_plan.linux_premium_p1_version_2",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Computing usage (Consumption, P1 v2)",
-					PriceHash:        "b10671e31a113e54bb32c30152591531-60fc60896424f2f0b576ec5c4e380288",
+					Name:             "Consumption usage (Consumption, P1 v2)",
+					PriceHash:        "2d7c2bd6cdbc3c1b6d9add52a291f176-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),
 				},
@@ -96,8 +96,8 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 			Name: "azurerm_app_service_plan.linux_premium_p1_version_3",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Computing usage (Consumption, P1 v3)",
-					PriceHash:        "3e17d3c1dc457ac52a660779547a3ebd-60fc60896424f2f0b576ec5c4e380288",
+					Name:             "Consumption usage (Consumption, P1 v3)",
+					PriceHash:        "ae4b2eef471a2d364876cb6a2eff735a-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),
 				},
@@ -107,8 +107,8 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 			Name: "azurerm_app_service_plan.windows_premium_container_plan_pc4",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Computing usage (Consumption, PC4)",
-					PriceHash:        "f83bca62167d4fafbe44390c3d63eb0e-60fc60896424f2f0b576ec5c4e380288",
+					Name:             "Consumption usage (Consumption, PC4)",
+					PriceHash:        "c1f57f264655d4f05e61b05b06698468-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),
 				},
