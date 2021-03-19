@@ -14,9 +14,9 @@ func GetAzureRMWindowsVirtualMachineRegistryItem() *schema.RegistryItem {
 		Name:  "azurerm_windows_virtual_machine",
 		RFunc: NewAzureRMWindowsVirtualMachine,
 		Notes: []string{
-			"Costs associated with non-standard Windows images such as RHEL are not supported.",
-			"Only Standard machine types are not supported.",
-			"Only Pay-As-You-Go consumption prices are currently supported.",
+			"Costs associated with Windows Server virtual machines.",
+			"Only Standard machine types are currently supported.",
+			"Only Pay-As-You-Go consumption prices are currently supported (No BYOL).",
 		},
 	}
 }

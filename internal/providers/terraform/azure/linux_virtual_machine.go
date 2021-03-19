@@ -14,8 +14,9 @@ func GetAzureRMLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
 		Name:  "azurerm_linux_virtual_machine",
 		RFunc: NewAzureRMLinuxVirtualMachine,
 		Notes: []string{
-			"Costs associated with non-standard Linux images such as RHEL are not supported.",
-			"Only Standard machine types are not supported.",
+			"Costs associated with standard Linux images.",
+			"Non-Standard images such as RHEL are not supported.",
+			"Only Standard machine types are currently supported.",
 			"Only Pay-As-You-Go consumption prices are currently supported.",
 		},
 	}
