@@ -74,7 +74,7 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 			Name: "azurerm_app_service_plan.linux_standard_s3",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Consumption usage (Consumption, S3)",
+					Name:             "(Consumption, S3)",
 					PriceHash:        "7551c2ba57d451c6ee68825f1ccf7a08-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),
@@ -85,7 +85,7 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 			Name: "azurerm_app_service_plan.linux_premium_p1_version_2",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Consumption usage (Consumption, P1 v2)",
+					Name:             "(Consumption, P1 v2)",
 					PriceHash:        "2d7c2bd6cdbc3c1b6d9add52a291f176-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),
@@ -96,7 +96,7 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 			Name: "azurerm_app_service_plan.linux_premium_p1_version_3",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Consumption usage (Consumption, P1 v3)",
+					Name:             "(Consumption, P1 v3)",
 					PriceHash:        "ae4b2eef471a2d364876cb6a2eff735a-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),
@@ -107,7 +107,7 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 			Name: "azurerm_app_service_plan.windows_premium_container_plan_pc4",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Consumption usage (Consumption, PC4)",
+					Name:             "(Consumption, PC4)",
 					PriceHash:        "c1f57f264655d4f05e61b05b06698468-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),

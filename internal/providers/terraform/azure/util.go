@@ -1,6 +1,8 @@
 package azure
 
 import (
+	"strings"
+
 	"github.com/shopspring/decimal"
 )
 
@@ -14,7 +16,7 @@ func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 
 // A regular expression forbidding a particular substring.
 // This function is case insensitive.
-func regexDoesNotContain(s string) string {
+func regexMustNotContain(s string) string {
 	return "/^((?!" + s + ").)*$/i"
 }
 
@@ -22,4 +24,12 @@ func regexDoesNotContain(s string) string {
 // This function is case insensitive.
 func regexMustContain(s string) string {
 	return "/" + s + "/i"
+}
+
+// Parse from Terraform Size value to Azure Pricing SKU Name value.
+func parseVirtualMachineSizeSKU(s string) string {
+	sku := strings.ReplaceAll(s, "Standard_", "")
+	sku = strings.ReplaceAll(sku, "Basic_", "")
+	sku = strings.ReplaceAll(sku, "_", " ")
+	return sku
 }

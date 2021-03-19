@@ -4,6 +4,7 @@ import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
+	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMAppServicePlanRegistryItem(),
 }
 
@@ -13,6 +14,9 @@ var FreeResources []string = []string{
 	"azurerm_resource_group",
 	"azurerm_resource_provider_registration",
 	"azurerm_subscription",
+
+	// Azure Blueprints
+	"azurerm_blueprint_assignment",
 
 	// Azure Networking
 	"azurerm_application_security_group",

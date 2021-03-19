@@ -13,7 +13,7 @@ func GetAzureRMAppServicePlanRegistryItem() *schema.RegistryItem {
 		Name:  "azurerm_app_service_plan",
 		RFunc: NewAzureRMAppServicePlan,
 		Notes: []string{
-			"Costs associated with running an app service plan in Azure",
+			"Costs associated with running an app service plan in Azure.",
 		},
 	}
 }
@@ -26,16 +26,15 @@ func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *sche
 }
 
 func AppServicePlanCostComponent(d *schema.ResourceData) []*schema.CostComponent {
-	sku := d.Get("sku.0.size").String()
-	purchaseOption := "Consumption"
-
 	kind := d.Get("kind").String()
+	purchaseOption := "Consumption"
+	sku := d.Get("sku.0.size").String()
 
 	costComponents := make([]*schema.CostComponent, 0)
 
 	if kind == "linux" || kind == "Linux" {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:           fmt.Sprintf("Consumption usage (%s, %s)", purchaseOption, sku),
+			Name:           fmt.Sprintf("(%s, %s)", purchaseOption, sku),
 			Unit:           "hours",
 			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -57,7 +56,7 @@ func AppServicePlanCostComponent(d *schema.ResourceData) []*schema.CostComponent
 		})
 	} else {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:           fmt.Sprintf("Consumption usage (%s, %s)", purchaseOption, sku),
+			Name:           fmt.Sprintf("(%s, %s)", purchaseOption, sku),
 			Unit:           "hours",
 			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -69,7 +68,7 @@ func AppServicePlanCostComponent(d *schema.ResourceData) []*schema.CostComponent
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "skuName", Value: strPtr(sku)},
 					{Key: "type", Value: strPtr(purchaseOption)},
-					{Key: "productName", ValueRegex: strPtr(regexDoesNotContain("linux"))},
+					{Key: "productName", ValueRegex: strPtr(regexMustNotContain("linux"))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -81,27 +80,3 @@ func AppServicePlanCostComponent(d *schema.ResourceData) []*schema.CostComponent
 
 	return costComponents
 }
-
-// func AppServicePlanAttributeFilters(d *schema.ResourceData) []*schema.AttributeFilter {
-// 	purchaseOption := "Consumption"
-//
-// 	attributeFilter := make([]*schema.AttributeFilter, 0)
-//
-// 	attributeFilter = append(attributeFilter, &schema.AttributeFilter{
-// 		Key:   "skuName",
-// 		Value: strPtr(d.Get("sku.0.size").String()),
-// 	})
-//
-// 	attributeFilter = append(attributeFilter, &schema.AttributeFilter{
-// 		Key:   "type",
-// 		Value: strPtr(purchaseOption),
-// 	})
-//
-// 	attributeFilter = append(attributeFilter, &schema.AttributeFilter{
-// 		Key:   "productName",
-// 		Value: strPtr(regexDoesNotContain("linux")),
-// 	})
-//
-// 	return attributeFilter
-// }
-//

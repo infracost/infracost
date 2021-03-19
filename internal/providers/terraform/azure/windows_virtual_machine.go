@@ -9,34 +9,31 @@ import (
 )
 
 // todo: add devtest consumption
-func GetAzureRMLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
+func GetAzureRMWindowsVirtualMachineRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_linux_virtual_machine",
-		RFunc: NewAzureRMLinuxVirtualMachine,
+		Name:  "azurerm_windows_virtual_machine",
+		RFunc: NewAzureRMWindowsVirtualMachine,
 		Notes: []string{
-			"Costs associated with non-standard Linux images such as RHEL are not supported.",
+			"Costs associated with non-standard Windows images such as RHEL are not supported.",
 			"Only Standard machine types are not supported.",
 			"Only Pay-As-You-Go consumption prices are currently supported.",
 		},
 	}
 }
 
-func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: linuxVirtualMachineCostComponent(d),
+		CostComponents: windowsVirtualMachineCostComponent(d),
 	}
 }
 
-func linuxVirtualMachineCostComponent(d *schema.ResourceData) []*schema.CostComponent {
+func windowsVirtualMachineCostComponent(d *schema.ResourceData) []*schema.CostComponent {
 	purchaseOption := "Consumption"
 	region := d.Get("location").String()
 	size := d.Get("size").String()
 
 	// todo: add additional cost elements for the vm later on
-	// if d.Get("boot_disk.0.initialize_params.0").Exists() {
-	// 	costComponents = append(costComponents, bootDisk(region, d.Get("boot_disk.0.initialize_params.0")))
-	// }
 
 	sku := parseVirtualMachineSizeSKU(size)
 
@@ -54,13 +51,13 @@ func linuxVirtualMachineCostComponent(d *schema.ResourceData) []*schema.CostComp
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(sku)},
-				{Key: "type", Value: strPtr("Consumption")},
-				{Key: "productName", ValueRegex: strPtr(regexMustNotContain("windows"))},
+				{Key: "type", Value: strPtr(purchaseOption)},
+				{Key: "productName", ValueRegex: strPtr(regexMustContain("windows"))},
 				{Key: "meterName", ValueRegex: strPtr(regexMustNotContain("expired"))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("Consumption"),
+			PurchaseOption: strPtr(purchaseOption),
 			Unit:           strPtr("1 Hour"),
 		},
 	})

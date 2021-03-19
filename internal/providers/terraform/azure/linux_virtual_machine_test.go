@@ -74,7 +74,7 @@ func TestAzureRMLinuxVirtualMachine(t *testing.T) {
 			Name: "azurerm_linux_virtual_machine.standard_f2",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Linux/UNIX usage (Consumption, F2)",
+					Name:             "(Consumption, F2)",
 					PriceHash:        "0ef60fde46609c1c899035e94296e51a-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),
@@ -85,7 +85,7 @@ func TestAzureRMLinuxVirtualMachine(t *testing.T) {
 			Name: "azurerm_linux_virtual_machine.standard_ds2_v2",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Linux/UNIX usage (Consumption, DS2 v2)",
+					Name:             "(Consumption, DS2 v2)",
 					PriceHash:        "6e2385900ffe7b67c8f24fd791f8142a-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730)),
