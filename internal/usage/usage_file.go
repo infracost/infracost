@@ -20,6 +20,54 @@ type UsageFile struct { // nolint:golint
 	ResourceUsage map[string]interface{} `yaml:"resource_usage"`
 }
 
+func SyncUsageData(project *schema.Project, usageData map[string]*schema.UsageData) error {
+	usageSchema, err := loadUsageSchema()
+	if err != nil {
+		return err
+	}
+	syncedUsageData := make(map[string]map[string]int64)
+	for _, resource := range project.Resources {
+		resourceName := resource.Name
+		resourceTypeName := strings.Split(resourceName, ".")[0]
+
+		// TODO: Move to another function.
+		resourceUSchema, ok := usageSchema[resourceTypeName]
+		if !ok {
+			continue
+		}
+		syncedUsageData[resourceName] = make(map[string]int64)
+		for _, usageKey := range resourceUSchema {
+			syncedUsageData[resourceName][usageKey] = 0
+			if existingUsage, ok := usageData[resourceName]; ok {
+				syncedUsageData[resourceName][usageKey] = existingUsage.Get(usageKey).Int()
+			}
+		}
+	}
+	d, err := yaml.Marshal(syncedUsageData)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(d))
+	return nil
+}
+
+func loadUsageSchema() (map[string][]string, error) {
+	usageSchema := make(map[string][]string)
+	// TODO: How to ship the schema in the production binary?
+	usageData, err := LoadFromFile("infracost-usage-example.yml")
+	if err != nil {
+		return usageSchema, err
+	}
+	for _, resUsageData := range usageData {
+		resourceTypeName := strings.Split(resUsageData.Address, ".")[0]
+		usageSchema[resourceTypeName] = make([]string, 0)
+		for usageKeyName := range resUsageData.Attributes {
+			usageSchema[resourceTypeName] = append(usageSchema[resourceTypeName], usageKeyName)
+		}
+	}
+	return usageSchema, nil
+}
+
 func LoadFromFile(usageFile string) (map[string]*schema.UsageData, error) {
 	usageData := make(map[string]*schema.UsageData)
 

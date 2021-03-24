@@ -77,6 +77,7 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 		}
 
 		projects = append(projects, project)
+		usage.SyncUsageData(project, u)
 
 		if !cfg.IsLogging() {
 			fmt.Fprintln(os.Stderr, "")
