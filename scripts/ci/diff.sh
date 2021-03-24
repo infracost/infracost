@@ -16,7 +16,7 @@ process_args () {
   terraform_workspace=${3:-$terraform_workspace}
   usage_file=${4:-$usage_file}
   config_file=${5:-$config_file}
-  percentage_threshold=${6:-$percentage_threshold}
+  post_condition=${6:-$post_condition}
 
   # Handle deprecated var names
   path=${path:-$tfjson}
@@ -28,7 +28,6 @@ process_args () {
   terraform_plan_flags=${terraform_plan_flags:-$tfflags}
 
   # Set defaults
-  percentage_threshold=${percentage_threshold:-0}
   INFRACOST_BINARY=${INFRACOST_BINARY:-infracost}
 
   # Export as it's used by infracost, not this script
@@ -226,9 +225,22 @@ if [ $(echo "$past_total_monthly_cost <= 0" | bc -l) = 1 ] && [ $(echo "$total_m
   percent=0
 fi
 
-absolute_percent=$(echo $percent | tr -d -)
+if [ $(echo $post_condition | jq '.percentage_threshold') != null ]; then
+  percentage_threshold=$(echo $post_condition | jq '.percentage_threshold')
+  percentage_threshold=$(echo "${percentage_threshold//'"'}")
+fi
 
-if [ -z "$percent" ]; then
+absolute_percent=$(echo $percent | tr -d -)
+diff_resources=$(jq '[.projects[].diff.resources[] | add' infracost_breakdown.json)
+
+if [ "$(echo "$post_condition" | jq '.always')" = $(echo '"true"') ]; then 
+  echo "Comment is posted as set always param"
+elif [ $(echo "$post_condition" | jq '.has_diff') = $(echo '"true"') ] && [ "$diff_resources" ]; then
+  echo "Comment is posted as set has_diff param"
+elif [ $(echo "$post_condition" | jq '.has_diff') = $(echo '"true"') ] && [ $diff_resources = null ]; then
+  echo "Comment not posted as there are no diff"
+  exit 0
+elif [ -z "$percent" ]; then
   echo "Diff percentage is empty"
 elif [ $(echo "$absolute_percent > $percentage_threshold" | bc -l) = 1 ]; then
   echo "Diff ($absolute_percent%) is greater than the percentage threshold ($percentage_threshold%)."
