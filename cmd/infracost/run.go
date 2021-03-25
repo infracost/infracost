@@ -27,6 +27,8 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
 
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
+
+	cmd.Flags().Bool("sync-usage-file", false, "Autofill the missing usage data and update the usage file")
 }
 
 func runMain(cmd *cobra.Command, cfg *config.Config) error {
@@ -77,9 +79,12 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 		}
 
 		projects = append(projects, project)
-		err = usage.SyncUsageData(project, u, projectCfg.UsageFile)
-		if err != nil {
-			return err
+
+		if cfg.SyncUsageFile {
+			err = usage.SyncUsageData(project, u, projectCfg.UsageFile)
+			if err != nil {
+				return err
+			}
 		}
 
 		if !cfg.IsLogging() {
@@ -221,6 +226,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	cfg.Format, _ = cmd.Flags().GetString("format")
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
+	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
 
 	return nil
 }

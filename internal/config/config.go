@@ -37,9 +37,10 @@ type Config struct { // nolint:golint
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 
-	Projects    []*Project `yaml:"projects" ignored:"true"`
-	Format      string     `yaml:"format,omitempty" ignored:"true"`
-	ShowSkipped bool       `yaml:"show_skipped,omitempty" ignored:"true"`
+	Projects      []*Project `yaml:"projects" ignored:"true"`
+	Format        string     `yaml:"format,omitempty" ignored:"true"`
+	ShowSkipped   bool       `yaml:"show_skipped,omitempty" ignored:"true"`
+	SyncUsageFile bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
 }
 
 func init() {
