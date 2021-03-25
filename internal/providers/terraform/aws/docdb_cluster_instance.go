@@ -30,11 +30,6 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 		ioRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_io_request").Int()))
 	}
 
-	var backupStorage *decimal.Decimal
-	if u != nil && u.Get("backup_storage_gb").Exists() {
-		backupStorage = decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
-	}
-
 	var cpuCreditsT3 *decimal.Decimal
 	if u != nil && u.Get("monthly_cpu_credit_hours").Exists() {
 		cpuCreditsT3 = decimalPtr(decimal.NewFromInt(u.Get("monthly_cpu_credit_hours").Int()))
@@ -89,21 +84,6 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 				ProductFamily: strPtr("System Operation"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", Value: strPtr("StorageIOUsage")},
-				},
-			},
-		},
-		{
-			Name:            "Backup storage",
-			Unit:            "GB-months",
-			UnitMultiplier:  1,
-			MonthlyQuantity: backupStorage,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonDocDB"),
-				ProductFamily: strPtr("Storage Snapshot"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", Value: strPtr("BackupUsage")},
 				},
 			},
 		},

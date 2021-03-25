@@ -40,11 +40,6 @@ func TestNewDocDBClusterInstance(t *testing.T) {
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
 				},
 				{
-					Name:             "Backup storage",
-					PriceHash:        "b508a58e978730edb23511dd40ad77d6-ee3dd7e4624338037ca6fea0933a662f",
-					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
-				},
-				{
 					Name:             "CPU credits",
 					PriceHash:        "f6d2bda62e25c6eb08020075859e5a97-e8e892be2fbd1c8f42fd6761ad8977d8",
 					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
@@ -76,13 +71,11 @@ func TestNewDocDBClusterInstance_usage(t *testing.T) {
 		"aws_docdb_cluster_instance.medium": map[string]interface{}{
 			"data_storage_gb":          1000,
 			"monthly_io_request":       10000000,
-			"backup_storage_gb":        1000,
 			"monthly_cpu_credit_hours": 10,
 		},
 		"aws_docdb_cluster_instance.large": map[string]interface{}{
 			"data_storage_gb":    1000,
 			"monthly_io_request": 10000000,
-			"backup_storage_gb":  1000,
 		},
 	})
 
@@ -104,11 +97,6 @@ func TestNewDocDBClusterInstance_usage(t *testing.T) {
 					Name:             "I/O",
 					PriceHash:        "c6f1f44a4f05ef22044c5af6490b6808-5be345988e7c9a0759c5cf8365868ee4",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(10000000)),
-				},
-				{
-					Name:             "Backup storage",
-					PriceHash:        "b508a58e978730edb23511dd40ad77d6-ee3dd7e4624338037ca6fea0933a662f",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(1000)),
 				},
 				{
 					Name:             "CPU credits",
@@ -134,11 +122,6 @@ func TestNewDocDBClusterInstance_usage(t *testing.T) {
 					Name:             "I/O",
 					PriceHash:        "c6f1f44a4f05ef22044c5af6490b6808-5be345988e7c9a0759c5cf8365868ee4",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(10000000)),
-				},
-				{
-					Name:             "Backup storage",
-					PriceHash:        "b508a58e978730edb23511dd40ad77d6-ee3dd7e4624338037ca6fea0933a662f",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(1000)),
 				},
 			},
 		},
