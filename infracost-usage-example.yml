@@ -135,6 +135,9 @@ resource_usage:
   aws_nat_gateway.my_nat_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
+  aws_route53_health_check.my_health_check:
+    endpoint_type: non_aws # Type of health check endpoint to query, can be: either aws or non_aws.
+
   aws_route53_record.my_record:
     monthly_standard_queries: 1100000000      # Monthly number of Standard queries.
     monthly_latency_based_queries: 1200000000 # Monthly number of Latency Based Routing queries.
@@ -323,8 +326,32 @@ resource_usage:
     key_versions: 10000             # Number of key versions.
     monthly_key_operations: 1000000 # Monthly number of key operations.
 
+  google_logging_billing_account_bucket_config.my_config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_billing_account_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_folder_bucket_config.my_config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_folder_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_organization_bucket_config.my.config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_organization_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_project_bucket_config.my_config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_project_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
   google_monitoring_metric_descriptor.my_monitoring:
-    monthly_monitoring_data_mb: 5000 # Monthly monitoring data in MB.
+    monthly_monitoring_data_mb: 5000 # Monthly monitoring data in MB (only for chargeable metrics).
     monthly_api_calls: 1000000       # Monthly read API calls (write calls are free).
 
   google_pubsub_subscription.my_subscription:

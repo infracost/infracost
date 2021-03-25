@@ -31,7 +31,7 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_outbound_region_to_dx_location_gb").Float()))
 	}
 
-	dxBandwidth := strings.Replace(d.Get("location").String(), "bps", "", 1)
+	dxBandwidth := strings.Replace(d.Get("bandwidth").String(), "bps", "", 1)
 	dxLocation := d.Get("location").String()
 
 	connectionType := "Dedicated"
@@ -58,7 +58,7 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 					Service:       strPtr("AWSDirectConnect"),
 					ProductFamily: strPtr("Direct Connect"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "capacity", ValueRegex: strPtr(dxBandwidth)},
+						{Key: "capacity", Value: strPtr(dxBandwidth)},
 						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", dxLocation))},
 						{Key: "connectionType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", connectionType))},
 					},

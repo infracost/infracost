@@ -99,7 +99,7 @@ build_msg () {
   
   percent_display=""
   if [ ! -z "$percent" ]; then
-    percent_display=" (${change_sym}${percent}%)"
+    percent_display=" (${change_sym}${percent}%%)"
   fi
   
   msg="💰 Infracost estimate: **monthly cost will ${change_word} by $(format_cost $diff_cost)$percent_display** ${change_emoji}\n"
@@ -117,7 +117,7 @@ build_msg () {
     
   msg="${msg}\n"
   msg="${msg}\`\`\`\n"
-  msg="${msg}${diff_output}\n"
+  msg="${msg}$(echo "${diff_output}" | sed "s/%/%%/g")\n"
   msg="${msg}\`\`\`\n"
   
   if [ "$include_html" = true ]; then
@@ -146,7 +146,7 @@ post_to_gitlab () {
   jq -Mnc --arg msg "$msg" '{"note": "\($msg)"}' | curl -L -X POST -d @- \
     -H "Content-Type: application/json" \
     -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
-    "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/repository/commits/$CI_COMMIT_SHA/comments"
+    "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/repository/commits/$CI_COMMIT_SHA/comments"
 }
 
 post_bitbucket_comment () {
