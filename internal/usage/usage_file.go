@@ -40,12 +40,15 @@ func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema
 	if err != nil {
 		return err
 	}
-	ioutil.WriteFile(usageFilePath, d, 0644)
+	err = ioutil.WriteFile(usageFilePath, d, 0644)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]string, existingUsageData map[string]*schema.UsageData) yaml.MapSlice {
-	syncedResourceUsage := make(map[string]interface{}, 0)
+	syncedResourceUsage := make(map[string]interface{})
 	for _, resource := range resources {
 		resourceName := resource.Name
 		resourceTypeName := strings.Split(resourceName, ".")[0]
@@ -53,7 +56,7 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]s
 		if !ok {
 			continue
 		}
-		resourceUsage := make(map[string]int64, 0)
+		resourceUsage := make(map[string]int64)
 		for _, usageKey := range resourceUSchema {
 			var usageValue int64 = 0
 			if existingUsage, ok := existingUsageData[resourceName]; ok {
@@ -87,7 +90,7 @@ func loadUsageSchema() (map[string][]string, error) {
 }
 
 func unFlattenHelper(input map[string]int64) map[string]interface{} {
-	result := make(map[string]interface{}, 0)
+	result := make(map[string]interface{})
 	for k, v := range input {
 		rootMap := &result
 		splittedKey := strings.Split(k, ".")
@@ -116,10 +119,9 @@ func mapToSortedMapSlice(input map[string]interface{}) yaml.MapSlice {
 	// Iterate over sorted keys
 	for _, k := range keys {
 		v := input[k]
-		switch v.(type) {
-		case map[string]interface{}:
-			result = append(result, yaml.MapItem{Key: k, Value: mapToSortedMapSlice(v.(map[string]interface{}))})
-		default:
+		if casted, ok := v.(map[string]interface{}); ok {
+			result = append(result, yaml.MapItem{Key: k, Value: mapToSortedMapSlice(casted)})
+		} else {
 			result = append(result, yaml.MapItem{Key: k, Value: v})
 		}
 	}
