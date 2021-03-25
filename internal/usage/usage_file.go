@@ -3,6 +3,7 @@ package usage
 import (
 	"fmt"
 	"io/ioutil"
+	"sort"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -20,35 +21,52 @@ type UsageFile struct { // nolint:golint
 	ResourceUsage map[string]interface{} `yaml:"resource_usage"`
 }
 
-func SyncUsageData(project *schema.Project, usageData map[string]*schema.UsageData) error {
+func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema.UsageData, usageFilePath string) error {
+	if usageFilePath == "" {
+		return nil
+	}
 	usageSchema, err := loadUsageSchema()
 	if err != nil {
 		return err
 	}
-	syncedUsageData := make(map[string]map[string]int64)
-	for _, resource := range project.Resources {
-		resourceName := resource.Name
-		resourceTypeName := strings.Split(resourceName, ".")[0]
-
-		// TODO: Move to another function.
-		resourceUSchema, ok := usageSchema[resourceTypeName]
-		if !ok {
-			continue
-		}
-		syncedUsageData[resourceName] = make(map[string]int64)
-		for _, usageKey := range resourceUSchema {
-			syncedUsageData[resourceName][usageKey] = 0
-			if existingUsage, ok := usageData[resourceName]; ok {
-				syncedUsageData[resourceName][usageKey] = existingUsage.Get(usageKey).Int()
-			}
-		}
+	syncedResourcesUsage := syncResourcesUsage(project.Resources, usageSchema, existingUsageData)
+	// yaml.MapSlice is used to maintain the order of keys, so re-running
+	// the code won't change the output.
+	syncedUsageData := yaml.MapSlice{
+		{Key: "version", Value: 0.1},
+		{Key: "resource_usage", Value: syncedResourcesUsage},
 	}
 	d, err := yaml.Marshal(syncedUsageData)
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(d))
+	ioutil.WriteFile(usageFilePath, d, 0644)
 	return nil
+}
+
+func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]string, existingUsageData map[string]*schema.UsageData) yaml.MapSlice {
+	syncedResourceUsage := make(map[string]interface{}, 0)
+	for _, resource := range resources {
+		resourceName := resource.Name
+		resourceTypeName := strings.Split(resourceName, ".")[0]
+		resourceUSchema, ok := usageSchema[resourceTypeName]
+		if !ok {
+			continue
+		}
+		resourceUsage := make(map[string]int64, 0)
+		for _, usageKey := range resourceUSchema {
+			var usageValue int64 = 0
+			if existingUsage, ok := existingUsageData[resourceName]; ok {
+				usageValue = existingUsage.Get(usageKey).Int()
+			}
+			resourceUsage[usageKey] = usageValue
+		}
+		syncedResourceUsage[resourceName] = unFlattenHelper(resourceUsage)
+	}
+	// yaml.MapSlice is used to maintain the order of keys, so re-running
+	// the code won't change the output.
+	result := mapToSortedMapSlice(syncedResourceUsage)
+	return result
 }
 
 func loadUsageSchema() (map[string][]string, error) {
@@ -66,6 +84,46 @@ func loadUsageSchema() (map[string][]string, error) {
 		}
 	}
 	return usageSchema, nil
+}
+
+func unFlattenHelper(input map[string]int64) map[string]interface{} {
+	result := make(map[string]interface{}, 0)
+	for k, v := range input {
+		rootMap := &result
+		splittedKey := strings.Split(k, ".")
+		for it := 0; it < len(splittedKey)-1; it++ {
+			key := splittedKey[it]
+			if _, ok := (*rootMap)[key]; !ok {
+				(*rootMap)[key] = make(map[string]interface{})
+			}
+			casted := (*rootMap)[key].(map[string]interface{})
+			rootMap = &casted
+		}
+		key := splittedKey[len(splittedKey)-1]
+		(*rootMap)[key] = v
+	}
+	return result
+}
+
+func mapToSortedMapSlice(input map[string]interface{}) yaml.MapSlice {
+	result := make(yaml.MapSlice, 0)
+	// sort keys of the input to maintain same output for different runs.
+	keys := make([]string, 0)
+	for k := range input {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	// Iterate over sorted keys
+	for _, k := range keys {
+		v := input[k]
+		switch v.(type) {
+		case map[string]interface{}:
+			result = append(result, yaml.MapItem{Key: k, Value: mapToSortedMapSlice(v.(map[string]interface{}))})
+		default:
+			result = append(result, yaml.MapItem{Key: k, Value: v})
+		}
+	}
+	return result
 }
 
 func LoadFromFile(usageFile string) (map[string]*schema.UsageData, error) {
