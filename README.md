@@ -9,11 +9,11 @@
 
 Infracost shows cloud cost estimates for infrastructure-as-code projects such as Terraform. It helps developers, devops and others to quickly see a cost breakdown and compare different options upfront.
 
-Show full breakdown of costs:
+#### Show full breakdown of costs
 
 <img src=".github/assets/breakdown_screenshot.png" alt="Infracost breakdown command" width=600 />
 
-Show diff of monthly costs between current and planned state:
+#### Show diff of monthly costs between current and planned state
 
 <img src=".github/assets/diff_screenshot.png" alt="Infracost diff command" width=600 />
 

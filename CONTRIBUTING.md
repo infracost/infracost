@@ -1,10 +1,10 @@
 # Contributing to Infracost
 
 The overall process for contributing to Infracost is:
-1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check; the issue labels should help you to find a good first issue, or new resources that others have already requested/liked.
+1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check; the issue labels should help you to find a `good first issue, or new resources that others have already requested/liked.
 2. Create a new issue if there's no issue for what you want to work on. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback.
 3. Add a comment to the issue you're working on to let the rest of the community know.
-4. Create a fork, commit and push to your fork. Send a pull request (PR) from your fork to this repo with the proposed change (don't forget to run `make lint` and `make fmt` first). Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Commit messages can usually start with "feat(aws): add ...", "feat(google): add ...", or "fix: nil pointer...". This helps us generate a cleaner changelog.
+4. Create a fork, commit and push to your fork. Send a pull request (PR) from your fork to this repo with the proposed change. Don't forget to run `make lint` and `make fmt` first. Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Commit messages can usually start with "feat(aws): add ...", "feat(google): add ...", or "fix: nil pointer...". This helps us generate a cleaner changelog.
 5. If it's your first PR to the Infracost org, a bot will leave a comment asking you to follow a quick step to sign our Contributor License Agreement.
 6. We'll review your change and provide feedback.
 
@@ -15,13 +15,7 @@ Install Go dependencies:
 make deps
 ```
 
-Get an API key.
-```sh
-make run ARGS="register"
-```
-Alternatively checkout and run the [cloud-pricing-api](https://github.com/infracost/cloud-pricing-api) and set the `INFRACOST_PRICING_API_ENDPOINT` environment variable to point to it.
-
-Add the API key to your `.env.local` file:
+Add your [Infracost API key](https://www.infracost.io/docs/#2-get-api-key) to your `.env.local` file:
 ```sh
 cat <<EOF >> .env.local
 INFRACOST_API_KEY=XXX
@@ -33,7 +27,7 @@ Run the code:
 make run ARGS="--path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
 ```
 
-Run all tests:
+Running all tests takes ~12mins on GitHub Actions so it's faster to only run your tests as you dev and leave CI to run them all:
 ```sh
 make test
 ```
