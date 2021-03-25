@@ -40,7 +40,7 @@ func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(usageFilePath, d, 0644)
+	err = ioutil.WriteFile(usageFilePath, d, 0600)
 	if err != nil {
 		return err
 	}
