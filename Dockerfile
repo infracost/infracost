@@ -40,6 +40,7 @@ WORKDIR /app
 COPY . .
 RUN make deps
 RUN NO_DIRTY=true make build
+RUN chmod +x /app/build/infracost
 
 # Application
 FROM alpine:3.13 as app
@@ -51,6 +52,5 @@ COPY scripts /scripts
 COPY --from=builder /usr/bin/terraform* /usr/bin/
 COPY --from=builder /usr/bin/terragrunt /usr/bin/
 COPY --from=builder /app/build/infracost /usr/bin/
-RUN chmod +x /usr/bin/infracost
 
 ENTRYPOINT [ "infracost" ]
