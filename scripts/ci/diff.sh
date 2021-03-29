@@ -16,7 +16,8 @@ process_args () {
   terraform_workspace=${3:-$terraform_workspace}
   usage_file=${4:-$usage_file}
   config_file=${5:-$config_file}
-  post_condition=${6:-$post_condition}
+  percentage_threshold=${6:-$percentage_threshold}
+  post_condition=${7:-$post_condition}
 
   # Handle deprecated var names
   path=${path:-$tfjson}
@@ -225,19 +226,25 @@ if [ $(echo "$past_total_monthly_cost <= 0" | bc -l) = 1 ] && [ $(echo "$total_m
   percent=0
 fi
 
+if [ -n "$percentage_threshold" ] && [ -n "$post_condition" ]; then
+  echo "Warning: The percentage_threshold parameter is deprecated, using post_condition instead"
+elif [ -n "$percentage_threshold" ]; then
+  echo -e "Warning: The percentage_threshold parameter is deprecated and will be removed in v0.9.0, please use post_condition='{\042percentage_threshold\042:\042 2\042}'"
+fi 
+
 if [ $(echo $post_condition | jq '.percentage_threshold') != null ]; then
   percentage_threshold=$(echo $post_condition | jq '.percentage_threshold')
   percentage_threshold=$(echo "${percentage_threshold//'"'}")
 fi
 
 absolute_percent=$(echo $percent | tr -d -)
-diff_resources=$(jq '[.projects[].diff.resources[] | add' infracost_breakdown.json)
+diff_resources=$(jq '[.projects[].diff.resources[]] | add' infracost_breakdown.json)
 
-if [ "$(echo "$post_condition" | jq '.always')" = $(echo '"true"') ]; then 
+if [ "$(echo "$post_condition" | jq '.always')" = $(echo '"true"') ]; then
   echo "Comment is posted as set always param"
-elif [ $(echo "$post_condition" | jq '.has_diff') = $(echo '"true"') ] && [ "$diff_resources" ]; then
+elif [ $(echo "$post_condition" | jq '.has_diff') = $(echo '"true"') ] && [ -n "$diff_resources" ]; then
   echo "Comment is posted as set has_diff param"
-elif [ $(echo "$post_condition" | jq '.has_diff') = $(echo '"true"') ] && [ $diff_resources = null ]; then
+elif [ $(echo "$post_condition" | jq '.has_diff') = $(echo '"true"') ] && [ $diff_resources == null ]; then
   echo "Comment not posted as there are no diff"
   exit 0
 elif [ -z "$percent" ]; then
