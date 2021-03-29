@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"sort"
 	"strings"
 
@@ -138,16 +139,34 @@ func loadReferenceFile() (map[string]*schema.UsageData, error) {
 	return usageData, nil
 }
 
-func LoadFromFile(usageFile string) (map[string]*schema.UsageData, error) {
+func LoadFromFile(usageFilePath string, createIfNotExisting bool) (map[string]*schema.UsageData, error) {
 	usageData := make(map[string]*schema.UsageData)
 
-	if usageFile == "" {
+	if usageFilePath == "" {
 		return usageData, nil
+	}
+
+	if createIfNotExisting {
+		if _, err := os.Stat(usageFilePath); os.IsNotExist(err) {
+			log.Warn("Specified usage file does not exist. It will be created")
+			fileContent := yaml.MapSlice{
+				{Key: "version", Value: "0.1"},
+				{Key: "resource_usage", Value: make(map[string]interface{})},
+			}
+			d, err := yaml.Marshal(fileContent)
+			if err != nil {
+				return usageData, errors.Wrapf(err, "Error creating usage file")
+			}
+			err = ioutil.WriteFile(usageFilePath, d, 0600)
+			if err != nil {
+				return usageData, errors.Wrapf(err, "Error creating usage file")
+			}
+		}
 	}
 
 	log.Debug("Loading usage data from usage file")
 
-	out, err := ioutil.ReadFile(usageFile)
+	out, err := ioutil.ReadFile(usageFilePath)
 	if err != nil {
 		return usageData, errors.Wrapf(err, "Error reading usage file")
 	}

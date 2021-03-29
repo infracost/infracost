@@ -65,7 +65,7 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 
 		cfg.Environment.SetProjectEnvironment(provider.Type(), projectCfg)
 
-		u, err := usage.LoadFromFile(projectCfg.UsageFile)
+		u, err := usage.LoadFromFile(projectCfg.UsageFile, cfg.SyncUsageFile)
 		if err != nil {
 			return err
 		}
