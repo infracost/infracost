@@ -1,7 +1,6 @@
 package usage
 
 import (
-	_ "embed"
 	"fmt"
 	"io/ioutil"
 	"os"
