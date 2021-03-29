@@ -131,7 +131,6 @@ func mapToSortedMapSlice(input map[string]interface{}) yaml.MapSlice {
 
 func loadReferenceFile() (map[string]*schema.UsageData, error) {
 	referenceUsageFileContents := infracost.GetReferenceUsageFileContents()
-	fmt.Println(referenceUsageFileContents)
 	usageData, err := parseYAML(*referenceUsageFileContents)
 	if err != nil {
 		return usageData, errors.Wrapf(err, "Error parsing usage file")
