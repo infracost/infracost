@@ -36,16 +36,16 @@ func TestRDSAuroraServerlessCluster(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_rds_cluster.postgres": map[string]interface{}{
-			"capacity_unit_hrs":  1000,
-			"storage_gb":         100,
-			"write_request_secs": 10,
-			"read_request_secs":  10,
+			"capacity_unit_hrs":      1000,
+			"storage_gb":             100,
+			"write_requests_per_sec": 10,
+			"read_requests_per_sec":  10,
 		},
 		"aws_rds_cluster.my_sql": map[string]interface{}{
-			"capacity_unit_hrs":  1000,
-			"storage_gb":         100,
-			"write_request_secs": 10,
-			"read_request_secs":  10,
+			"capacity_unit_hrs":      1000,
+			"storage_gb":             100,
+			"write_requests_per_sec": 10,
+			"read_requests_per_sec":  10,
 		},
 	})
 
@@ -115,8 +115,8 @@ func TestRDSAuroraServerlessClusterWithBackup(t *testing.T) {
 		"aws_rds_cluster.postgres": map[string]interface{}{
 			"capacity_unit_hrs":       1000,
 			"storage_gb":              100,
-			"write_request_secs":      10,
-			"read_request_secs":       10,
+			"write_requests_per_sec":  10,
+			"read_requests_per_sec":   10,
 			"backup_snapshot_size_gb": 100,
 		},
 	})
@@ -152,7 +152,7 @@ func TestRDSAuroraServerlessClusterWithBackup(t *testing.T) {
 	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }
 
-func TestRDSAuroraServerlessClusterComplete(t *testing.T) {
+func TestRDSAuroraServerlessClusterWithExport(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -170,14 +170,15 @@ func TestRDSAuroraServerlessClusterComplete(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_rds_cluster.postgres": map[string]interface{}{
-			"capacity_unit_hrs":           1000,
-			"storage_gb":                  100,
-			"write_request_secs":          10,
-			"read_request_secs":           10,
-			"backup_snapshot_size_gb":     100,
-			"backtrack_change_records":    10000000,
-			"backtrack_change_record_hrs": 24,
-			"snapshot_export_size_gb":     200,
+			"capacity_unit_hrs":            1000,
+			"storage_gb":                   100,
+			"write_requests_per_sec":       10,
+			"read_requests_per_sec":        10,
+			"backup_snapshot_size_gb":      100,
+			"average_statements_per_hr":    10000000,
+			"change_records_per_statement": 0.38,
+			"backtrack_window_hrs":         24,
+			"snapshot_export_size_gb":      200,
 		},
 	})
 
@@ -206,13 +207,72 @@ func TestRDSAuroraServerlessClusterComplete(t *testing.T) {
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100.00).Mul(decimal.NewFromInt(5)).Sub(decimal.NewFromFloat(100.00))),
 				},
 				{
+					Name:             "Snapshot export",
+					PriceHash:        "87bb7827d9684b87e0a421f624e7142d-b1ae3861dc57e2db217fa83a7420374f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(200)),
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
+}
+
+func TestRDSAuroraClusterBacktrack(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_rds_cluster" "mysql" {
+			cluster_identifier = "aurora-mysql"
+			engine = "aurora-mysql"
+			backup_retention_period = 5
+			master_username    = "foo"
+			master_password    = "barbut8chars"
+		}
+`
+
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_rds_cluster.mysql": map[string]interface{}{
+			"storage_gb":                   100,
+			"write_requests_per_sec":       10,
+			"read_requests_per_sec":        10,
+			"backup_snapshot_size_gb":      100,
+			"average_statements_per_hr":    10000000,
+			"change_records_per_statement": 0.38,
+			"backtrack_window_hrs":         24,
+			"snapshot_export_size_gb":      200,
+		},
+	})
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_rds_cluster.mysql",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:             "Storage rate",
+					PriceHash:        "2719bd917d46a9a24d7f4415b92a16f9-ee3dd7e4624338037ca6fea0933a662f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100)),
+				},
+				{
+					Name:             "I/O rate",
+					PriceHash:        "87cf7c84d9f0be12d710cb03cb93ba90-5be345988e7c9a0759c5cf8365868ee4",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20).Mul(decimal.NewFromInt(730)).Mul(decimal.NewFromInt(60)).Mul(decimal.NewFromInt(60))),
+				},
+				{
+					Name:             "Backup storage",
+					PriceHash:        "0fb26ac3fb816a8cd4c13a64fc3166fe-ee3dd7e4624338037ca6fea0933a662f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(100.00).Mul(decimal.NewFromInt(5)).Sub(decimal.NewFromFloat(100.00))),
+				},
+				{
 					Name:             "Backtrack",
 					PriceHash:        "0dd6d3925e3e60292490015f5e904d76-5617335f1d1e54cf41c65ca230dc1725",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10000000).Mul(decimal.NewFromInt(24))),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10000000).Mul(decimal.NewFromInt(730)).Mul(decimal.NewFromFloat(0.38).Mul(decimal.NewFromInt(24)))),
 				},
 				{
 					Name:             "Snapshot export",
-					PriceHash:        "87bb7827d9684b87e0a421f624e7142d-b1ae3861dc57e2db217fa83a7420374f",
+					PriceHash:        "4ff9640fb2c41ced13784dc45deb035b-b1ae3861dc57e2db217fa83a7420374f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(200)),
 				},
 			},
