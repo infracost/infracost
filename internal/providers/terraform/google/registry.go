@@ -27,6 +27,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetMonitoringItem(),
 	GetPubSubSubscriptionRegistryItem(),
 	GetPubSubTopicRegistryItem(),
+	GetRedisInstanceRegistryItem(),
 	GetStorageBucketRegistryItem(),
 }
 
