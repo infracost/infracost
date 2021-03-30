@@ -45,7 +45,7 @@ func TestVpcEndpoint(t *testing.T) {
 			Name: "aws_vpc_endpoint.interface",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Interface endpoint",
+					Name:            "Endpoint (Interface)",
 					PriceHash:       "ef7fb85cbd68a47968dd294f49ed3517-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -60,7 +60,7 @@ func TestVpcEndpoint(t *testing.T) {
 			Name: "aws_vpc_endpoint.gateway_loadbalancer",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "GatewayLoadBalancer endpoint",
+					Name:            "Endpoint (GatewayLoadBalancer)",
 					PriceHash:       "223b69fb3326be912fd0d30333e8dc50-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -75,7 +75,7 @@ func TestVpcEndpoint(t *testing.T) {
 			Name: "aws_vpc_endpoint.multiple_interfaces",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Interface endpoint",
+					Name:            "Endpoint (Interface)",
 					PriceHash:       "ef7fb85cbd68a47968dd294f49ed3517-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 				},

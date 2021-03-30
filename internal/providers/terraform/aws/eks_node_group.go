@@ -79,7 +79,7 @@ func eksComputeCostComponent(d *schema.ResourceData, region string, desiredSize 
 	}
 
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Linux/UNIX usage (%s, %s)", strings.Replace(purchaseOptionLabel, "_", "-", 1), instanceType),
+		Name:           fmt.Sprintf("Instance usage (Linux/UNIX, %s, %s)", strings.Replace(purchaseOptionLabel, "_", "-", 1), instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredSize)),
