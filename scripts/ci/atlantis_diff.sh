@@ -68,7 +68,7 @@ build_msg () {
 
   percent_display=""
   if [ ! -z "$percent" ]; then
-    percent_display=" (${change_sym}${percent}%)"
+    percent_display=" (${change_sym}${percent}%%)"
   fi
 
   msg="##### Infracost estimate #####"
@@ -80,7 +80,7 @@ build_msg () {
   msg="${msg}\n"
   msg="${msg}Infracost output:\n"
   msg="${msg}\n"
-  msg="${msg}$(echo "    ${diff_output//$'\n'/\\n    }")\n"
+  msg="${msg}$(echo "    ${diff_output//$'\n'/\\n    }" | sed "s/%/%%/g")\n"
   printf "$msg"
 }
 
