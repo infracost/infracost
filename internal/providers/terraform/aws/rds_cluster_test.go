@@ -36,13 +36,13 @@ func TestRDSAuroraServerlessCluster(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_rds_cluster.postgres": map[string]interface{}{
-			"capacity_units_per_hr":      1000,
+			"capacity_units_per_hr":  1000,
 			"storage_gb":             100,
 			"write_requests_per_sec": 10,
 			"read_requests_per_sec":  10,
 		},
 		"aws_rds_cluster.my_sql": map[string]interface{}{
-			"capacity_units_per_hr":      1000,
+			"capacity_units_per_hr":  1000,
 			"storage_gb":             100,
 			"write_requests_per_sec": 10,
 			"read_requests_per_sec":  10,
@@ -113,7 +113,7 @@ func TestRDSAuroraServerlessClusterWithBackup(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_rds_cluster.postgres": map[string]interface{}{
-			"capacity_units_per_hr":       1000,
+			"capacity_units_per_hr":   1000,
 			"storage_gb":              100,
 			"write_requests_per_sec":  10,
 			"read_requests_per_sec":   10,
@@ -170,7 +170,7 @@ func TestRDSAuroraServerlessClusterWithExport(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_rds_cluster.postgres": map[string]interface{}{
-			"capacity_units_per_hr":            1000,
+			"capacity_units_per_hr":        1000,
 			"storage_gb":                   100,
 			"write_requests_per_sec":       10,
 			"read_requests_per_sec":        10,
