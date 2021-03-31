@@ -141,7 +141,7 @@ resource_usage:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
   aws_rds_cluster.my_cluster:
-    capacity_unit_hrs: 50             # Number of aurora capacity units per hour. Only used when engine_mode is "serverless"
+    capacity_units_per_hr: 50             # Number of aurora capacity units per hour. Only used when engine_mode is "serverless"
     storage_gb: 200                   # Storage amount in GB allocated to the aurora cluster.
     write_requests_per_sec: 100           # Total number of reads per second for the cluster.
     read_requests_per_sec: 100            # Total number of writes per second for the cluster.

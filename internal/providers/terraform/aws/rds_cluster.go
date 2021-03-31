@@ -35,8 +35,8 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	}
 
 	var auroraCapacityUnits *decimal.Decimal
-	if u != nil && u.Get("capacity_unit_hrs").Exists() {
-		auroraCapacityUnits = decimalPtr(decimal.NewFromInt(u.Get("capacity_unit_hrs").Int()))
+	if u != nil && u.Get("capacity_units_per_hr").Exists() {
+		auroraCapacityUnits = decimalPtr(decimal.NewFromInt(u.Get("capacity_units_per_hr").Int()))
 	}
 
 	if databaseEngineMode == "Serverless" {
