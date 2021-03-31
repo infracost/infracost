@@ -324,6 +324,9 @@ resource_usage:
   google_container_node_pool.my_node_pool:
     nodes: 4 # Node count per zone for the node pool
 
+  google_compute_snapshot.my_snapshot:
+    storage_gb: 500 # Total size of snapshot disk storage in GB.
+
   google_dns_record_set.my_record_set:
     monthly_queries:  1000000 # Monthly DNS queries.
 
