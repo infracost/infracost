@@ -33,6 +33,11 @@ func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		iopsVal = decimal.NewFromFloat(d.Get("iops").Float())
 	}
 
+	var throughputVal *decimal.Decimal
+	if d.Get("throughput").Exists() {
+		throughputVal = decimalPtr(decimal.NewFromInt(d.Get("throughput").Int()))
+	}
+
 	var monthlyIORequests *decimal.Decimal
 	if u != nil && u.Get("monthly_standard_io_requests").Exists() {
 		monthlyIORequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_standard_io_requests").Int()))
@@ -40,11 +45,11 @@ func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal, monthlyIORequests),
+		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, throughputVal, gbVal, iopsVal, monthlyIORequests),
 	}
 }
 
-func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.Decimal, iopsVal decimal.Decimal, ioRequests *decimal.Decimal) []*schema.CostComponent {
+func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal *decimal.Decimal, gbVal decimal.Decimal, iopsVal decimal.Decimal, ioRequests *decimal.Decimal) []*schema.CostComponent {
 	if volumeAPIName == "" {
 		volumeAPIName = "gp2"
 	}
@@ -89,22 +94,8 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 	}
 
 	if volumeAPIName == "io1" || volumeAPIName == "io2" {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Provisioned IOPS",
-			Unit:            "IOPS-months",
-			UnitMultiplier:  1,
-			MonthlyQuantity: &iopsVal,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonEC2"),
-				ProductFamily: strPtr("System Operation"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
-					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
-				},
-			},
-		})
+		costComponents = append(costComponents, ebsProvisionedIops(region, volumeAPIName, usageType, &iopsVal))
+
 	}
 
 	if volumeAPIName == "standard" {
@@ -126,5 +117,53 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, gbVal decimal.
 		})
 	}
 
+	if volumeAPIName == "gp3" {
+		if throughputVal != nil {
+			if throughputVal.GreaterThan(decimal.NewFromInt(125)) {
+				throughputVal = decimalPtr(throughputVal.Sub(decimal.NewFromInt(125)))
+				costComponents = append(costComponents, &schema.CostComponent{
+					Name:            "Provisioned throughput",
+					Unit:            "Mbps-mouths",
+					UnitMultiplier:  1,
+					MonthlyQuantity: throughputVal,
+					ProductFilter: &schema.ProductFilter{
+						VendorName:    strPtr("aws"),
+						Region:        strPtr(region),
+						Service:       strPtr("AmazonEC2"),
+						ProductFamily: strPtr("Provisioned Throughput"),
+						AttributeFilters: []*schema.AttributeFilter{
+							{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
+							{Key: "usagetype", ValueRegex: strPtr("/VolumeP-Throughput.gp3/")},
+						},
+					},
+				})
+
+			}
+		}
+		if iopsVal.GreaterThan((decimal.NewFromInt(3000))) {
+			iopsVal = iopsVal.Sub(decimal.NewFromInt(3000))
+			costComponents = append(costComponents, ebsProvisionedIops(region, volumeAPIName, "VolumeP-IOPS.gp3", &iopsVal))
+		}
+
+	}
+
 	return costComponents
+}
+func ebsProvisionedIops(region string, volumeAPIName string, usageType string, iopsVal *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Provisioned IOPS",
+		Unit:            "IOPS-months",
+		UnitMultiplier:  1,
+		MonthlyQuantity: iopsVal,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonEC2"),
+			ProductFamily: strPtr("System Operation"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
+			},
+		},
+	}
 }
