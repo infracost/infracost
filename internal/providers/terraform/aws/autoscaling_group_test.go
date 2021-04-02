@@ -243,7 +243,7 @@ func TestAutoscalingGroup_launchConfiguration_tenancy(t *testing.T) {
 					Name: "aws_launch_configuration.lc1",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Instance usage (Linux/UNIX,   on-demand, m3.medium)",
+							Name:            "Instance usage (Linux/UNIX, on-demand, m3.medium)",
 							PriceHash:       "68c80ad31fd5a0747855b8196e3de65b-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 						},
