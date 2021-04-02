@@ -146,7 +146,7 @@ func TestContainerCluster(t *testing.T) {
 					Name: "default_pool",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+							Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 							PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 3)),
 						},
@@ -173,7 +173,7 @@ func TestContainerCluster(t *testing.T) {
 					Name: "default_pool",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+							Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 							PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 9)),
 						},
@@ -200,7 +200,7 @@ func TestContainerCluster(t *testing.T) {
 					Name: "default_pool",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+							Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 							PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 6)),
 						},
@@ -227,7 +227,7 @@ func TestContainerCluster(t *testing.T) {
 					Name: "default_pool",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (on-demand, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, on-demand, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 3)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 0.7 * 3)),
@@ -270,7 +270,7 @@ func TestContainerCluster(t *testing.T) {
 					Name: "node_pool[0]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (on-demand, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, on-demand, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 2)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 0.7 * 2)),
@@ -286,7 +286,7 @@ func TestContainerCluster(t *testing.T) {
 					Name: "node_pool[1]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (preemptible, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, preemptible, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-cfd7416b9a6fd4bc337fd81f1974337e",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 4)),
@@ -318,7 +318,7 @@ func TestContainerCluster(t *testing.T) {
 					Name: "node_pool[0]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (on-demand, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, on-demand, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 6)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 0.7 * 6)),
@@ -334,7 +334,7 @@ func TestContainerCluster(t *testing.T) {
 					Name: "node_pool[1]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (preemptible, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, preemptible, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-cfd7416b9a6fd4bc337fd81f1974337e",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 12)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 12)),
@@ -366,7 +366,7 @@ func TestContainerCluster(t *testing.T) {
 					Name: "node_pool[0]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (on-demand, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, on-demand, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 0.7 * 4)),
@@ -382,7 +382,7 @@ func TestContainerCluster(t *testing.T) {
 					Name: "node_pool[1]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (preemptible, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, preemptible, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-cfd7416b9a6fd4bc337fd81f1974337e",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 2)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 2)),
@@ -545,7 +545,7 @@ func TestContainerCluster_usage(t *testing.T) {
 					Name: "default_pool",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+							Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 							PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 						},
@@ -572,7 +572,7 @@ func TestContainerCluster_usage(t *testing.T) {
 					Name: "default_pool",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+							Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 							PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 12)),
 						},
@@ -599,7 +599,7 @@ func TestContainerCluster_usage(t *testing.T) {
 					Name: "default_pool",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+							Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 							PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 8)),
 						},
@@ -630,7 +630,7 @@ func TestContainerCluster_usage(t *testing.T) {
 					Name: "node_pool[0]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (on-demand, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, on-demand, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 0.7 * 4)),
@@ -646,7 +646,7 @@ func TestContainerCluster_usage(t *testing.T) {
 					Name: "node_pool[1]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (preemptible, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, preemptible, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-cfd7416b9a6fd4bc337fd81f1974337e",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 4)),
@@ -678,7 +678,7 @@ func TestContainerCluster_usage(t *testing.T) {
 					Name: "node_pool[0]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (on-demand, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, on-demand, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 12)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 0.7 * 12)),
@@ -694,7 +694,7 @@ func TestContainerCluster_usage(t *testing.T) {
 					Name: "node_pool[1]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (preemptible, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, preemptible, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-cfd7416b9a6fd4bc337fd81f1974337e",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 12)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 12)),
@@ -726,7 +726,7 @@ func TestContainerCluster_usage(t *testing.T) {
 					Name: "node_pool[0]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (on-demand, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, on-demand, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-66d0d770bee368b4f2a8f2f597eeb417",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 8)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 0.7 * 8)),
@@ -742,7 +742,7 @@ func TestContainerCluster_usage(t *testing.T) {
 					Name: "node_pool[1]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:             "Linux/UNIX usage (preemptible, n1-standard-16)",
+							Name:             "Instance usage (Linux/UNIX, preemptible, n1-standard-16)",
 							PriceHash:        "f9362669032dbf3ed07fe0340744d593-cfd7416b9a6fd4bc337fd81f1974337e",
 							HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 4)),
