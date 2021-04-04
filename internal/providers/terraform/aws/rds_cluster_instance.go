@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"fmt"
 	"github.com/infracost/infracost/internal/schema"
-
 	"github.com/shopspring/decimal"
+	"strings"
 )
 
 func GetRDSClusterInstanceRegistryItem() *schema.RegistryItem {
@@ -26,27 +27,64 @@ func NewRDSClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.
 		databaseEngine = strPtr("Aurora PostgreSQL")
 	}
 
+	costComponents := []*schema.CostComponent{
+		{
+			Name:           fmt.Sprintf("Database instance (%s, %s)", "on-demand", instanceType),
+			Unit:           "hours",
+			UnitMultiplier: 1,
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonRDS"),
+				ProductFamily: strPtr("Database Instance"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "instanceType", Value: strPtr(instanceType)},
+					{Key: "databaseEngine", Value: databaseEngine},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: strPtr("on_demand"),
+			},
+		},
+	}
+
+	if strings.HasPrefix(instanceType, "db.t3") {
+		instanceCPUCreditHours := decimal.Zero
+		if u != nil && u.Get("cpu_credit_hrs").Exists() {
+			instanceCPUCreditHours = decimal.NewFromInt(u.Get("cpu_credit_hrs").Int())
+		}
+
+		instanceVCPUCount := decimal.Zero
+		if u != nil && u.Get("virtual_cpu_count").Exists() {
+			instanceVCPUCount = decimal.NewFromInt(u.Get("virtual_cpu_count").Int())
+		}
+
+		if instanceCPUCreditHours.GreaterThan(decimal.NewFromInt(0)) {
+			cpuCreditQuantity := instanceVCPUCount.Mul(instanceCPUCreditHours)
+			costComponents = append(costComponents, rdsCPUCreditsCostComponent(region, databaseEngine, cpuCreditQuantity))
+		}
+	}
+
 	return &schema.Resource{
-		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:           "Database instance",
-				Unit:           "hours",
-				UnitMultiplier: 1,
-				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AmazonRDS"),
-					ProductFamily: strPtr("Database Instance"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "instanceType", Value: strPtr(instanceType)},
-						{Key: "databaseEngine", Value: databaseEngine},
-					},
-				},
-				PriceFilter: &schema.PriceFilter{
-					PurchaseOption: strPtr("on_demand"),
-				},
+		Name:           d.Address,
+		CostComponents: costComponents,
+	}
+}
+
+func rdsCPUCreditsCostComponent(region string, databaseEngine *string, vCPUCount decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "CPU credits",
+		Unit:            "vCPU-hours",
+		UnitMultiplier:  1,
+		MonthlyQuantity: &vCPUCount,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonRDS"),
+			ProductFamily: strPtr("CPU Credits"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "databaseEngine", Value: databaseEngine},
 			},
 		},
 	}

@@ -17,6 +17,7 @@ process_args () {
   usage_file=${4:-$usage_file}
   config_file=${5:-$config_file}
   percentage_threshold=${6:-$percentage_threshold}
+  post_condition=${7:-$post_condition}
 
   # Handle deprecated var names
   path=${path:-$tfjson}
@@ -27,7 +28,23 @@ process_args () {
   path=${path:-$terraform_dir}
   terraform_plan_flags=${terraform_plan_flags:-$tfflags}
 
+  # Validate post_condition
+  if ! echo "$post_condition" | jq empty; then
+    echo "Error: post_condition contains invalid JSON"
+  fi
+
   # Set defaults
+  if [ ! -z "$percentage_threshold" ] && [ ! -z "$post_condition" ]; then
+    echo "Warning: percentage_threshold is deprecated, using post_condition instead"
+  elif [ ! -z "$percentage_threshold" ]; then
+    post_condition="{\"percentage_threshold\": $percentage_threshold}"
+    echo "Warning: percentage_threshold is deprecated and will be removed in v0.9.0, please use post_condition='{\"percentage_threshold\": \"0\"}'"
+  else
+    post_condition=${post_condition:-'{"has_diff": true}'}
+  fi
+  if [ ! -z "$post_condition" ] && [ "$(echo "$post_condition" | jq '.percentage_threshold')" != "null" ]; then
+    percentage_threshold=$(echo "$post_condition" | jq -r '.percentage_threshold')
+  fi
   percentage_threshold=${percentage_threshold:-0}
   INFRACOST_BINARY=${INFRACOST_BINARY:-infracost}
 
@@ -192,6 +209,10 @@ post_to_bitbucket () {
   fi
 }
 
+cleanup () {
+  rm -f infracost_breakdown.json infracost_breakdown_cmd infracost_output_cmd
+}
+
 # MAIN
 
 process_args "$@"
@@ -227,13 +248,23 @@ if [ $(echo "$past_total_monthly_cost <= 0" | bc -l) = 1 ] && [ $(echo "$total_m
 fi
 
 absolute_percent=$(echo $percent | tr -d -)
+diff_resources=$(jq '[.projects[].diff.resources[]] | add' infracost_breakdown.json)
 
-if [ -z "$percent" ]; then
-  echo "Diff percentage is empty"
+if [ "$(echo "$post_condition" | jq '.always')" = "true" ]; then
+  echo "Posting comment as post_condition is set to always"
+elif [ "$(echo "$post_condition" | jq '.has_diff')" = "true" ] && [ "$diff_resources" = "null" ]; then
+  echo "Not posting comment as post_condition is set to has_diff but there is no diff"
+  cleanup
+  exit 0
+elif [ "$(echo "$post_condition" | jq '.has_diff')" = "true" ] && [ -n "$diff_resources" ]; then
+  echo "Posting comment as post_condition is set to has_diff and there is a diff"
+elif [ -z "$percent" ]; then
+  echo "Posting comment as percentage diff is empty"
 elif [ $(echo "$absolute_percent > $percentage_threshold" | bc -l) = 1 ]; then
-  echo "Diff ($absolute_percent%) is greater than the percentage threshold ($percentage_threshold%)."
+  echo "Posting comment as percentage diff ($absolute_percent%) is greater than the percentage threshold ($percentage_threshold%)."
 else
-  echo "Comment not posted as diff ($absolute_percent%) is less than or equal to percentage threshold ($percentage_threshold%)."
+  echo "Not posting comment as percentage diff ($absolute_percent%) is less than or equal to percentage threshold ($percentage_threshold%)."
+  cleanup
   exit 0
 fi
 
@@ -249,4 +280,4 @@ elif [ ! -z "$BITBUCKET_PIPELINES" ]; then
   post_to_bitbucket
 fi
 
-exit
+cleanup

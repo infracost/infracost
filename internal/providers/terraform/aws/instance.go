@@ -92,7 +92,7 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 	}
 
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("%s usage (%s, %s)", osLabel, purchaseOptionLabel, instanceType),
+		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -224,6 +224,6 @@ func newEbsBlockDevice(name string, d gjson.Result, region string) *schema.Resou
 
 	return &schema.Resource{
 		Name:           name,
-		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal, unknown),
+		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, unknown, gbVal, iopsVal, unknown),
 	}
 }

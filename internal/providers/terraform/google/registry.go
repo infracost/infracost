@@ -10,6 +10,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetComputeImageRegistryItem(),
 	GetComputeSnapshotRegistryItem(),
 	GetComputeInstanceRegistryItem(),
+	GetComputeMachineImageRegistryItem(),
 	GetComputeRouterNATRegistryItem(),
 	GetContainerClusterRegistryItem(),
 	GetContainerNodePoolRegistryItem(),
