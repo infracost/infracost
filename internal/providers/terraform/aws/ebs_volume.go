@@ -123,7 +123,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 				throughputVal = decimalPtr(throughputVal.Sub(decimal.NewFromInt(125)))
 				costComponents = append(costComponents, &schema.CostComponent{
 					Name:            "Provisioned throughput",
-					Unit:            "Mbps-mouths",
+					Unit:            "Mbps-months",
 					UnitMultiplier:  1,
 					MonthlyQuantity: throughputVal,
 					ProductFilter: &schema.ProductFilter{
