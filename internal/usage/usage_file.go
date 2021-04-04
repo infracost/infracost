@@ -23,6 +23,19 @@ type UsageFile struct { // nolint:golint
 	ResourceUsage map[string]interface{} `yaml:"resource_usage"`
 }
 
+type VariableType int
+
+const (
+	Int64 VariableType = iota
+	String
+)
+
+type UsageSchemaItem struct {
+	Key          string
+	ValueType    VariableType
+	DefaultValue interface{}
+}
+
 func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema.UsageData, usageFilePath string) error {
 	if usageFilePath == "" {
 		return nil
@@ -49,7 +62,7 @@ func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema
 	return nil
 }
 
-func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]string, existingUsageData map[string]*schema.UsageData) yaml.MapSlice {
+func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*UsageSchemaItem, existingUsageData map[string]*schema.UsageData) yaml.MapSlice {
 	syncedResourceUsage := make(map[string]interface{})
 	for _, resource := range resources {
 		resourceName := resource.Name
@@ -58,11 +71,19 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]s
 		if !ok {
 			continue
 		}
-		resourceUsage := make(map[string]int64)
-		for _, usageKey := range resourceUSchema {
-			var usageValue int64 = 0
+		resourceUsage := make(map[string]interface{})
+		for _, usageSchemaItem := range resourceUSchema {
+			usageKey := usageSchemaItem.Key
+			usageValueType := usageSchemaItem.ValueType
+			var usageValue interface{}
+			usageValue = usageSchemaItem.DefaultValue
 			if existingUsage, ok := existingUsageData[resourceName]; ok {
-				usageValue = existingUsage.Get(usageKey).Int()
+				switch usageValueType {
+				case Int64:
+					usageValue = existingUsage.Get(usageKey).Int()
+				case String:
+					usageValue = existingUsage.Get(usageKey).String()
+				}
 			}
 			resourceUsage[usageKey] = usageValue
 		}
@@ -74,23 +95,35 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]s
 	return result
 }
 
-func loadUsageSchema() (map[string][]string, error) {
-	usageSchema := make(map[string][]string)
+func loadUsageSchema() (map[string][]*UsageSchemaItem, error) {
+	usageSchema := make(map[string][]*UsageSchemaItem)
 	usageData, err := loadReferenceFile()
 	if err != nil {
 		return usageSchema, err
 	}
 	for _, resUsageData := range usageData {
 		resourceTypeName := strings.Split(resUsageData.Address, ".")[0]
-		usageSchema[resourceTypeName] = make([]string, 0)
-		for usageKeyName := range resUsageData.Attributes {
-			usageSchema[resourceTypeName] = append(usageSchema[resourceTypeName], usageKeyName)
+		usageSchema[resourceTypeName] = make([]*UsageSchemaItem, 0)
+		for usageKeyName, usageRawResult := range resUsageData.Attributes {
+			var defaultValue interface{}
+			usageValueType := Int64
+			defaultValue = 0
+			usageRawValue := usageRawResult.Value()
+			if _, ok := usageRawValue.(string); ok {
+				usageValueType = String
+				defaultValue = usageRawResult.String()
+			}
+			usageSchema[resourceTypeName] = append(usageSchema[resourceTypeName], &UsageSchemaItem{
+				Key:          usageKeyName,
+				ValueType:    usageValueType,
+				DefaultValue: defaultValue,
+			})
 		}
 	}
 	return usageSchema, nil
 }
 
-func unFlattenHelper(input map[string]int64) map[string]interface{} {
+func unFlattenHelper(input map[string]interface{}) map[string]interface{} {
 	result := make(map[string]interface{})
 	for k, v := range input {
 		rootMap := &result
