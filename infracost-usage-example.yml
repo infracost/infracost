@@ -80,9 +80,6 @@ resource_usage:
   aws_docdb_cluster_snapshot.my_snapshot:
     backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
 
-  aws_docdb_cluster_snapshot.my_snapshot:
-    backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
-
   aws_dx_connection.my_dx_connection:
     monthly_outbound_region_to_dx_location_gb: 100 # Monthly outbound data transferred from AWS region to DX location in GB.
     dx_virtual_interface_type: private             # Interface type impacts outbound data transfer costs over DX, can be: private, public.

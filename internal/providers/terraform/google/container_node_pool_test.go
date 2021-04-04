@@ -102,7 +102,7 @@ func TestContainerNodePool_zonal(t *testing.T) {
 			Name: "google_container_node_pool.default",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 3)),
 				},
@@ -117,7 +117,7 @@ func TestContainerNodePool_zonal(t *testing.T) {
 			Name: "google_container_node_pool.with_node_config",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Linux/UNIX usage (on-demand, n1-standard-16)",
+					Name:             "Instance usage (Linux/UNIX, on-demand, n1-standard-16)",
 					PriceHash:        "f9362669032dbf3ed07fe0340744d593-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 3)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 0.7 * 3)),
@@ -144,7 +144,7 @@ func TestContainerNodePool_zonal(t *testing.T) {
 			Name: "google_container_node_pool.cluster_node_locations",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 				},
@@ -159,7 +159,7 @@ func TestContainerNodePool_zonal(t *testing.T) {
 			Name: "google_container_node_pool.node_locations",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 				},
@@ -174,7 +174,7 @@ func TestContainerNodePool_zonal(t *testing.T) {
 			Name: "google_container_node_pool.initial_node_count",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 				},
@@ -189,7 +189,7 @@ func TestContainerNodePool_zonal(t *testing.T) {
 			Name: "google_container_node_pool.autoscaling",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 2)),
 				},
@@ -278,7 +278,7 @@ func TestContainerNodePool_regional(t *testing.T) {
 			Name: "google_container_node_pool.default",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 9)),
 				},
@@ -293,7 +293,7 @@ func TestContainerNodePool_regional(t *testing.T) {
 			Name: "google_container_node_pool.cluster_node_locations",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 				},
@@ -308,7 +308,7 @@ func TestContainerNodePool_regional(t *testing.T) {
 			Name: "google_container_node_pool.node_locations",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 				},
@@ -323,7 +323,7 @@ func TestContainerNodePool_regional(t *testing.T) {
 			Name: "google_container_node_pool.initial_node_count",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 12)),
 				},
@@ -338,7 +338,7 @@ func TestContainerNodePool_regional(t *testing.T) {
 			Name: "google_container_node_pool.autoscaling",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 6)),
 				},
@@ -428,7 +428,7 @@ func TestContainerNodePool_usage(t *testing.T) {
 			Name: "google_container_node_pool.zonal",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 4)),
 				},
@@ -443,7 +443,7 @@ func TestContainerNodePool_usage(t *testing.T) {
 			Name: "google_container_node_pool.regional",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 12)),
 				},
@@ -458,7 +458,7 @@ func TestContainerNodePool_usage(t *testing.T) {
 			Name: "google_container_node_pool.node_locations",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, e2-medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, e2-medium)",
 					PriceHash:       "1ed2c16a0b9da97ed123b5266cba4e50-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1 * 8)),
 				},
