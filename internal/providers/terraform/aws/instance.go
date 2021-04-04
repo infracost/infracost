@@ -224,6 +224,6 @@ func newEbsBlockDevice(name string, d gjson.Result, region string) *schema.Resou
 
 	return &schema.Resource{
 		Name:           name,
-		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, gbVal, iopsVal, unknown),
+		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, unknown, gbVal, iopsVal, unknown),
 	}
 }
