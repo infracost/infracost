@@ -44,6 +44,7 @@ var FreeResources []string = []string{
 	"google_compute_disk_iam_binding",
 	"google_compute_disk_iam_member",
 	"google_compute_disk_iam_policy",
+	"google_compute_disk_resource_policy_attachment",
 	"google_compute_firewall",
 	"google_compute_global_network_endpoint",
 	"google_compute_global_network_endpoint_group",

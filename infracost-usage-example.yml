@@ -349,6 +349,9 @@ resource_usage:
   google_compute_machine_image.my_machine_image: 
     storage_gb: 1000 # Total size of machine image storage in GB.
 
+  google_compute_snapshot.my_snapshot:
+    storage_gb: 500 # Total size of snapshot disk storage in GB.
+
   google_dns_record_set.my_record_set:
     monthly_queries:  1000000 # Monthly DNS queries.
 
