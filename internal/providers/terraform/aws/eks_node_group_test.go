@@ -34,7 +34,7 @@ func TestEKSNodeGroup_default(t *testing.T) {
 			Name: "aws_eks_node_group.example",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, t3.medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, t3.medium)",
 					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -82,7 +82,7 @@ func TestEKSNodeGroup_disk_size_instance_type(t *testing.T) {
 			Name: "aws_eks_node_group.example",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (on-demand, t2.medium)",
+					Name:            "Instance usage (Linux/UNIX, on-demand, t2.medium)",
 					PriceHash:       "250382a8c0da495d6048e6fc57e526bc-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
@@ -206,7 +206,7 @@ func TestEKSNodeGroup_launch_template(t *testing.T) {
 					Name: "aws_launch_template.foo",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX usage (on-demand, m5.xlarge)",
+							Name:            "Instance usage (Linux/UNIX, on-demand, m5.xlarge)",
 							PriceHash:       "fc1dbb5469f07f2758e25e083d0effda-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 						},
@@ -360,7 +360,7 @@ func TestEKSNodeGroup_launch_template_by_name(t *testing.T) {
 					Name: "aws_launch_template.foo",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Linux/UNIX usage (on-demand, m5.xlarge)",
+							Name:            "Instance usage (Linux/UNIX, on-demand, m5.xlarge)",
 							PriceHash:       "fc1dbb5469f07f2758e25e083d0effda-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 						},
@@ -432,7 +432,7 @@ func TestEKSNodeGroup_spot(t *testing.T) {
 			Name: "aws_eks_node_group.example",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Linux/UNIX usage (spot, t3.medium)",
+					Name:            "Instance usage (Linux/UNIX, spot, t3.medium)",
 					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-803d7f1cd2f621429b63f791730e7935",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},

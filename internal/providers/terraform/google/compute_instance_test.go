@@ -171,7 +171,7 @@ func TestComputeInstance(t *testing.T) {
 			Name: "google_compute_instance.standard",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Linux/UNIX usage (on-demand, f1-micro)",
+					Name:             "Instance usage (Linux/UNIX, on-demand, f1-micro)",
 					PriceHash:        "7b4212f1f3122457b7bc03baa4c3acaf-66d0d770bee368b4f2a8f2f597eeb417",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(730 * 0.7)),
@@ -187,7 +187,7 @@ func TestComputeInstance(t *testing.T) {
 			Name: "google_compute_instance.ssd",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Linux/UNIX usage (on-demand, f1-micro)",
+					Name:      "Instance usage (Linux/UNIX, on-demand, f1-micro)",
 					SkipCheck: true,
 				},
 				{
@@ -201,7 +201,7 @@ func TestComputeInstance(t *testing.T) {
 			Name: "google_compute_instance.preemptible",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Linux/UNIX usage (preemptible, f1-micro)",
+					Name:             "Instance usage (Linux/UNIX, preemptible, f1-micro)",
 					PriceHash:        "7b4212f1f3122457b7bc03baa4c3acaf-cfd7416b9a6fd4bc337fd81f1974337e",
 					HourlyCostCheck:  testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(730)),
@@ -216,7 +216,7 @@ func TestComputeInstance(t *testing.T) {
 			Name: "google_compute_instance.local_ssd",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Linux/UNIX usage (on-demand, f1-micro)",
+					Name:      "Instance usage (Linux/UNIX, on-demand, f1-micro)",
 					SkipCheck: true,
 				},
 				{
@@ -234,7 +234,7 @@ func TestComputeInstance(t *testing.T) {
 			Name: "google_compute_instance.preemptible_local_ssd",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Linux/UNIX usage (preemptible, f1-micro)",
+					Name:      "Instance usage (Linux/UNIX, preemptible, f1-micro)",
 					SkipCheck: true,
 				},
 				{
@@ -252,7 +252,7 @@ func TestComputeInstance(t *testing.T) {
 			Name: "google_compute_instance.gpu",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Linux/UNIX usage (on-demand, n1-standard-16)",
+					Name:      "Instance usage (Linux/UNIX, on-demand, n1-standard-16)",
 					SkipCheck: true,
 				},
 				{
@@ -271,7 +271,7 @@ func TestComputeInstance(t *testing.T) {
 			Name: "google_compute_instance.preemptible_gpu",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Linux/UNIX usage (preemptible, n1-standard-16)",
+					Name:      "Instance usage (Linux/UNIX, preemptible, n1-standard-16)",
 					SkipCheck: true,
 				},
 				{

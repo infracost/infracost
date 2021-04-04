@@ -59,7 +59,7 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           fmt.Sprintf("%s endpoint", vpcEndpointType),
+				Name:           fmt.Sprintf("Endpoint (%s)", vpcEndpointType),
 				Unit:           "hours",
 				UnitMultiplier: 1,
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(vpcEndpointInterfaces))),

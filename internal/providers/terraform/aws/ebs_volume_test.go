@@ -145,6 +145,8 @@ func TestEBSVolume_GP3(t *testing.T) {
 		availability_zone = "us-west-2a"
 		size              = 40
 		type = "gp3"
+		iops = 4000
+		throughput = 130
 		
 		tags = {
 			Name = "HelloWorld"
@@ -159,6 +161,16 @@ func TestEBSVolume_GP3(t *testing.T) {
 					Name:             "General Purpose SSD storage (gp3)",
 					PriceHash:        "b7a83d535d47fcfd1be68ec37f046b3d-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40)),
+				},
+				{
+					Name:             "Provisioned throughput",
+					PriceHash:        "9775542e08e79c6f6dff9b6537f84c04-8191dc82cee9b89717087e447a40abbd",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(5)),
+				},
+				{
+					Name:             "Provisioned IOPS",
+					PriceHash:        "4299307b615dc9d0e4e8aa362c6b4c6f-9c483347596633f8cf3ab7fdd5502b78",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1000)),
 				},
 			},
 		},

@@ -74,7 +74,7 @@ func computeCostComponent(region, machineType string, purchaseOption string) *sc
 	}
 
 	return &schema.CostComponent{
-		Name:                fmt.Sprintf("Linux/UNIX usage (%s, %s)", purchaseOptionLabel(purchaseOption), machineType),
+		Name:                fmt.Sprintf("Instance usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
 		Unit:                "hours",
 		UnitMultiplier:      1,
 		HourlyQuantity:      decimalPtr(decimal.NewFromInt(1)),

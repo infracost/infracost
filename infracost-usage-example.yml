@@ -73,6 +73,12 @@ resource_usage:
     data_storage_gb: 1000         # Total storage for cluster in GB.
     monthly_io_request: 100000000 # Monthly number of input/output requests for cluster.
     monthly_cpu_credit_hours: 100 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances. 
+    
+  aws_docdb_cluster.my_cluster:
+    backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
+
+  aws_docdb_cluster_snapshot.my_snapshot:
+    backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
 
   aws_docdb_cluster_snapshot.my_snapshot:
     backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
