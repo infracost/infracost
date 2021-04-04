@@ -10,7 +10,7 @@ ENV HOME /app
 ENV CGO_ENABLED 0
 
 # Install Packages
-RUN apt-get update -q && apt-get -y install zip jq
+RUN apt-get update -q && apt-get -y install unzip jq
 
 # Install latest of each Terraform version after 0.12 as we don't support versions before that
 RUN AVAILABLE_TERRAFORM_VERSIONS="0.12.30 0.13.6 ${DEFAULT_TERRAFORM_VERSION}" && \
