@@ -28,7 +28,7 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 
-	cmd.Flags().Bool("sync-usage-file", false, "Experimental: Autofill the missing usage data and update the usage file")
+	cmd.Flags().Bool("sync-usage-file", false, "Autofill usage-file with missing resources (experimental)")
 }
 
 func runMain(cmd *cobra.Command, cfg *config.Config) error {
