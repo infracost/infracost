@@ -2,9 +2,10 @@ package aws
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	"strings"
 )
 
 func GetRoute53HealthCheck() *schema.RegistryItem {
@@ -22,7 +23,7 @@ func NewRoute53HealthCheck(d *schema.ResourceData, u *schema.UsageData) *schema.
 	usageAmount := "50"
 	if u != nil && u.Get("endpoint_type").Exists() {
 		endpointType = strings.Replace(u.Get("endpoint_type").String(), "_", "-", 1)
-		if strings.ToLower(endpointType) == "non-aws" {
+		if strings.ToLower(endpointType) == "non_aws" {
 			usageAmount = "0"
 		}
 	}

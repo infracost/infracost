@@ -34,12 +34,12 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	dxBandwidth := strings.Replace(d.Get("bandwidth").String(), "bps", "", 1)
 	dxLocation := d.Get("location").String()
 
-	connectionType := "Dedicated"
+	connectionType := "dedicated"
 	if u != nil && u.Get("dx_connection_type").Exists() {
 		connectionType = u.Get("dx_connection_type").String()
 	}
 
-	virtualInterfaceType := "Private"
+	virtualInterfaceType := "private"
 	if u != nil && u.Get("dx_virtual_interface_type").Exists() {
 		virtualInterfaceType = u.Get("dx_virtual_interface_type").String()
 	}
