@@ -116,7 +116,8 @@ build_msg () {
   
   percent_display=""
   if [ ! -z "$percent" ]; then
-    percent_display=" (${change_sym}${percent}%%)"
+    percent_display="$(printf "%.0f" $percent)"
+    percent_display=" (${change_sym}${percent_display}%%)"
   fi
   
   msg="💰 Infracost estimate: **monthly cost will ${change_word} by $(format_cost $diff_cost)$percent_display** ${change_emoji}\n"
@@ -238,8 +239,7 @@ diff_cost=$(jq '[.projects[].diff.totalMonthlyCost | select (.!=null) | tonumber
 
 # If both old and new costs are greater than 0
 if [ $(echo "$past_total_monthly_cost > 0" | bc -l) = 1 ] && [ $(echo "$total_monthly_cost > 0" | bc -l) = 1 ]; then
-  percent=$(echo "scale=4; $total_monthly_cost / $past_total_monthly_cost * 100 - 100" | bc)
-  percent="$(printf "%.0f" $percent)"
+  percent=$(echo "scale=6; $total_monthly_cost / $past_total_monthly_cost * 100 - 100" | bc)
 fi
 
 # If both old and new costs are less than or equal to 0
