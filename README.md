@@ -28,10 +28,7 @@ Infracost shows cloud cost estimates for infrastructure-as-code projects such as
 
     Linux/macOS manual download:
     ```sh
-    os=$(uname | tr '[:upper:]' '[:lower:]') && \
-    arch=$(uname -m | tr '[:upper:]' '[:lower:]' | sed -e s/x86_64/amd64/) && \
-    curl -s -L https://github.com/infracost/infracost/releases/latest/download/infracost-$os-$arch.tar.gz | tar xz -C /tmp && \
-    sudo mv /tmp/infracost-$os-$arch /usr/local/bin/infracost
+    curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
     ```
 
     Docker and Windows users see [here](https://www.infracost.io/docs/#installation).
