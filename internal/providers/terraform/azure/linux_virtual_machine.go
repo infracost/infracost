@@ -2,6 +2,7 @@ package azure
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 
@@ -25,26 +26,23 @@ func GetAzureRMLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
 func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: linuxVirtualMachineCostComponent(d),
+		CostComponents: []*schema.CostComponent{linuxVirtualMachineCostComponent(d)},
 	}
 }
 
-func linuxVirtualMachineCostComponent(d *schema.ResourceData) []*schema.CostComponent {
-	purchaseOption := "Consumption"
+func linuxVirtualMachineCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("location").String()
 	size := d.Get("size").String()
+	purchaseOption := "Consumption"
+	purchaseOptionLabel := "pay as you go"
 
-	// todo: add additional cost elements for the vm later on
-	// if d.Get("boot_disk.0.initialize_params.0").Exists() {
-	// 	costComponents = append(costComponents, bootDisk(region, d.Get("boot_disk.0.initialize_params.0")))
-	// }
+	productNameRe := "/Virtual Machines .* Series$/"
+	if strings.HasPrefix(size, "Basic_") {
+		productNameRe = "/Virtual Machines .* Series Basic$/"
+	}
 
-	sku := parseVirtualMachineSizeSKU(size)
-
-	costComponents := make([]*schema.CostComponent, 0)
-
-	costComponents = append(costComponents, &schema.CostComponent{
-		Name:           fmt.Sprintf("(%s, %s)", purchaseOption, sku),
+	return &schema.CostComponent{
+		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, parseInstanceType(size)),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -54,17 +52,13 @@ func linuxVirtualMachineCostComponent(d *schema.ResourceData) []*schema.CostComp
 			Service:       strPtr("Virtual Machines"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", Value: strPtr(sku)},
-				{Key: "type", Value: strPtr("Consumption")},
-				{Key: "productName", ValueRegex: strPtr(regexMustNotContain("windows"))},
-				{Key: "meterName", ValueRegex: strPtr(regexMustNotContain("expired"))},
+				{Key: "armSkuName", Value: strPtr(size)},
+				{Key: "productName", ValueRegex: strPtr(productNameRe)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("Consumption"),
+			PurchaseOption: strPtr(purchaseOption),
 			Unit:           strPtr("1 Hour"),
 		},
-	})
-
-	return costComponents
+	}
 }

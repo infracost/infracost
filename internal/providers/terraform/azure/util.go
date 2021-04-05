@@ -26,10 +26,14 @@ func regexMustContain(s string) string {
 	return "/" + s + "/i"
 }
 
-// Parse from Terraform Size value to Azure Pricing SKU Name value.
-func parseVirtualMachineSizeSKU(s string) string {
-	sku := strings.ReplaceAll(s, "Standard_", "")
-	sku = strings.ReplaceAll(sku, "Basic_", "")
-	sku = strings.ReplaceAll(sku, "_", " ")
-	return sku
+// Parse from Terraform size value to Azure instance type value.
+func parseInstanceType(size string) string {
+	s := strings.ReplaceAll(size, "Standard_", "")
+	s = strings.ReplaceAll(s, "Basic_", "")
+	s = strings.ReplaceAll(s, "_", " ")
+
+	if strings.HasPrefix(size, "Basic_") {
+		return "Basic " + s
+	}
+	return s
 }

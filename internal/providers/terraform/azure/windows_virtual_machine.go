@@ -2,6 +2,7 @@ package azure
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 
@@ -24,23 +25,30 @@ func GetAzureRMWindowsVirtualMachineRegistryItem() *schema.RegistryItem {
 func NewAzureRMWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: windowsVirtualMachineCostComponent(d),
+		CostComponents: []*schema.CostComponent{windowsVirtualMachineCostComponent(d)},
 	}
 }
 
-func windowsVirtualMachineCostComponent(d *schema.ResourceData) []*schema.CostComponent {
-	purchaseOption := "Consumption"
+func windowsVirtualMachineCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	region := d.Get("location").String()
 	size := d.Get("size").String()
+	purchaseOption := "Consumption"
+	purchaseOptionLabel := "pay as you go"
 
-	// todo: add additional cost elements for the vm later on
+	productNameRe := "/Virtual Machines .* Series Windows$/"
+	if strings.HasPrefix(size, "Basic_") {
+		productNameRe = "/Virtual Machines .* Series Basic Windows $/"
+	}
 
-	sku := parseVirtualMachineSizeSKU(size)
+	// Handle Azure Hybrid Benefit
+	licenseType := d.Get("license_type").String()
+	if licenseType == "Windows_Client" || licenseType == "Windows_Server" {
+		purchaseOption = "DevTestConsumption"
+		purchaseOptionLabel = "hybrid benefit"
+	}
 
-	costComponents := make([]*schema.CostComponent, 0)
-
-	costComponents = append(costComponents, &schema.CostComponent{
-		Name:           fmt.Sprintf("(%s, %s)", purchaseOption, sku),
+	return &schema.CostComponent{
+		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, parseInstanceType(size)),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -50,17 +58,13 @@ func windowsVirtualMachineCostComponent(d *schema.ResourceData) []*schema.CostCo
 			Service:       strPtr("Virtual Machines"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", Value: strPtr(sku)},
-				{Key: "type", Value: strPtr(purchaseOption)},
-				{Key: "productName", ValueRegex: strPtr(regexMustContain("windows"))},
-				{Key: "meterName", ValueRegex: strPtr(regexMustNotContain("expired"))},
+				{Key: "armSkuName", Value: strPtr(size)},
+				{Key: "productName", ValueRegex: strPtr(productNameRe)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr(purchaseOption),
 			Unit:           strPtr("1 Hour"),
 		},
-	})
-
-	return costComponents
+	}
 }
