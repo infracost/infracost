@@ -2,9 +2,10 @@ package aws
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	"strings"
 )
 
 func GetRoute53HealthCheck() *schema.RegistryItem {

@@ -27,6 +27,8 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
 
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
+
+	cmd.Flags().Bool("sync-usage-file", false, "Sync usage-file with missing resources, needs usage-file too (experimental)")
 }
 
 func runMain(cmd *cobra.Command, cfg *config.Config) error {
@@ -63,7 +65,7 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 
 		cfg.Environment.SetProjectEnvironment(provider.Type(), projectCfg)
 
-		u, err := usage.LoadFromFile(projectCfg.UsageFile)
+		u, err := usage.LoadFromFile(projectCfg.UsageFile, cfg.SyncUsageFile)
 		if err != nil {
 			return err
 		}
@@ -77,6 +79,13 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 		}
 
 		projects = append(projects, project)
+
+		if cfg.SyncUsageFile {
+			err = usage.SyncUsageData(project, u, projectCfg.UsageFile)
+			if err != nil {
+				return err
+			}
+		}
 
 		if !cfg.IsLogging() {
 			fmt.Fprintln(os.Stderr, "")
@@ -217,14 +226,30 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	cfg.Format, _ = cmd.Flags().GetString("format")
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
+	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
 
 	return nil
 }
 
 func checkRunConfig(cfg *config.Config) error {
 	if cfg.Format == "json" && cfg.ShowSkipped {
-		ui.PrintWarning("The show skipped option is not needed with JSON output as that always includes them.\n")
-		return nil
+		ui.PrintWarning("show-skipped is not needed with JSON output format as that always includes them.\n")
+	}
+
+	if cfg.SyncUsageFile {
+		missingUsageFile := make([]string, 0)
+		for _, project := range cfg.Projects {
+			if project.UsageFile == "" {
+				missingUsageFile = append(missingUsageFile, project.Path)
+			}
+		}
+		if len(missingUsageFile) == 1 {
+			ui.PrintWarning("Ignoring sync-usage-file as no usage-file is specified.\n")
+		} else if len(missingUsageFile) == len(cfg.Projects) {
+			ui.PrintWarning("Ignoring sync-usage-file since no projects have a usage-file specified.\n")
+		} else if len(missingUsageFile) > 1 {
+			ui.PrintWarning(fmt.Sprintf("Ignoring sync-usage-file for following projects as no usage-file is specified for them: %s.\n", strings.Join(missingUsageFile, ", ")))
+		}
 	}
 
 	return nil

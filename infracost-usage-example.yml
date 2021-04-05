@@ -124,7 +124,7 @@ resource_usage:
     monthly_data_processed_gb: 10000 # Monthly data processed by a Classic Load Balancer in GB.
 
   aws_instance.windows_instance:
-    operating_system: windows # Override the operating system of the instance, can be: windows, suse, rhel.
+    operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
 
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000 # Total storage used for backups in GB.
@@ -160,7 +160,7 @@ resource_usage:
     virtual_cpu_count: 2 # Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
 
   aws_route53_health_check.my_health_check:
-    endpoint_type: non_aws # Type of health check endpoint to query, can be: either aws or non_aws.
+    endpoint_type: aws # Type of health check endpoint to query, can be: either aws or non_aws.
 
   aws_route53_record.my_record:
     monthly_standard_queries: 1100000000      # Monthly number of Standard queries.
@@ -255,12 +255,12 @@ resource_usage:
     request_size_kb: 64       # Size of requests to SQS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
 
   aws_ssm_parameter.my_ssm_parameter:
-    api_throughput_limit: advanced    # SSM Parameter Throughput limit, can be: advanced, higher.
+    api_throughput_limit: standard    # SSM Parameter Throughput limit, can be: standard, advanced, higher.
     monthly_api_interactions: 1000000 # Monthly API interactions.
     parameter_storage_hrs: 730        # Number of hours in the month parameters will be stored for.
 
   aws_ssm_activation.my_activations:
-    instance_tier: advanced # Instance tier being used, can be: advanced, standard.
+    instance_tier: standard # Instance tier being used, can be: standard, advanced.
     instances: 100          # Number of instances being managed.
 
   aws_vpc_endpoint.my_endpoint:
