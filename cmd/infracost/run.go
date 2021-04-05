@@ -236,6 +236,20 @@ func checkRunConfig(cfg *config.Config) error {
 		ui.PrintWarning("show-skipped is not needed with JSON output format as that always includes them.\n")
 	}
 
+	if cfg.SyncUsageFile {
+		missingUsageFile := make([]string, 0)
+		for _, project := range cfg.Projects {
+			if project.UsageFile == "" {
+				missingUsageFile = append(missingUsageFile, project.Path)
+			}
+		}
+		if len(missingUsageFile) == 1 {
+			ui.PrintWarning("Ignoring sync-usage-file as no usage-file is specified.\n")
+		} else if len(missingUsageFile) > 1 {
+			ui.PrintWarning(fmt.Sprintf("Ignoring sync-usage-file for following projects as no usage-file is specified for them: %s.\n", strings.Join(missingUsageFile, ", ")))
+		}
+	}
+
 	return nil
 }
 
