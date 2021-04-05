@@ -2,6 +2,7 @@ package google
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -43,7 +44,7 @@ func NewRedisInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 	}
 
 	description := fmt.Sprintf("/Redis Capacity %s %s/", serviceTier, capacityTier)
-	name := fmt.Sprintf("Redis instance (%s, %s)", serviceTier, capacityTier)
+	name := fmt.Sprintf("Redis instance (%s, %s)", strings.ToLower(serviceTier), capacityTier)
 
 	return &schema.Resource{
 		Name: d.Address,
