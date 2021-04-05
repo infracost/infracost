@@ -28,7 +28,7 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 
-	cmd.Flags().Bool("sync-usage-file", false, "Autofill usage-file with missing resources (experimental)")
+	cmd.Flags().Bool("sync-usage-file", false, "Sync usage-file with missing resources, needs usage-file too (experimental)")
 }
 
 func runMain(cmd *cobra.Command, cfg *config.Config) error {
@@ -233,8 +233,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 func checkRunConfig(cfg *config.Config) error {
 	if cfg.Format == "json" && cfg.ShowSkipped {
-		ui.PrintWarning("The show skipped option is not needed with JSON output as that always includes them.\n")
-		return nil
+		ui.PrintWarning("show-skipped is not needed with JSON output format as that always includes them.\n")
 	}
 
 	return nil
