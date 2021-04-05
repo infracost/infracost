@@ -48,17 +48,17 @@ func TestElasticsearchDomain(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
 				{
-					Name:            "Storage",
+					Name:            "Storage (gp2)",
 					PriceHash:       "6a8fe5ca25013b67bddcebe1786ad246-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(400)),
 				},
 				{
-					Name:            "Dedicated Master Instance (on-demand, c4.8xlarge.elasticsearch)",
+					Name:            "Dedicated master (on-demand, c4.8xlarge.elasticsearch)",
 					PriceHash:       "b20c99773f71f7ee11b388cd07f574c8-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "Ultrawarm Instance (on-demand, ultrawarm1.medium.elasticsearch)",
+					Name:            "UltraWarm instance (on-demand, ultrawarm1.medium.elasticsearch)",
 					PriceHash:       "86652ba1616710d216a8484a2ad025a5-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 				},
@@ -96,12 +96,12 @@ func TestElasticsearchDomain(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
 				{
-					Name:            "Storage",
+					Name:            "Storage (io1)",
 					PriceHash:       "17222df5167b2002292b01078f33d41f-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1000)),
 				},
 				{
-					Name:            "Storage IOPS",
+					Name:            "Storage IOPS (io1)",
 					PriceHash:       "cef5d2815d765f1a4d611688519a8cce-9c483347596633f8cf3ab7fdd5502b78",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
 				},
@@ -138,7 +138,7 @@ func TestElasticsearchDomain(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(3)),
 				},
 				{
-					Name:            "Storage",
+					Name:            "Storage (standard)",
 					PriceHash:       "ffa31ac224a19cc7574dbfbffb50722f-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(123)),
 				},

@@ -3,7 +3,11 @@ package usage
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
+	"sort"
+	"strings"
 
+	"github.com/infracost/infracost"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -11,24 +15,191 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const minVersion = "v0.1"
-const maxVersion = "v0.1"
+const minUsageFileVersion = "0.1"
+const maxUsageFileVersion = "0.1"
 
 type UsageFile struct { // nolint:golint
 	Version       string                 `yaml:"version"`
 	ResourceUsage map[string]interface{} `yaml:"resource_usage"`
 }
 
-func LoadFromFile(usageFile string) (map[string]*schema.UsageData, error) {
+type VariableType int
+
+const (
+	Int64 VariableType = iota
+	String
+)
+
+type SchemaItem struct {
+	Key          string
+	ValueType    VariableType
+	DefaultValue interface{}
+}
+
+func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema.UsageData, usageFilePath string) error {
+	if usageFilePath == "" {
+		return nil
+	}
+	usageSchema, err := loadUsageSchema()
+	if err != nil {
+		return err
+	}
+	syncedResourcesUsage := syncResourcesUsage(project.Resources, usageSchema, existingUsageData)
+	// yaml.MapSlice is used to maintain the order of keys, so re-running
+	// the code won't change the output.
+	syncedUsageData := yaml.MapSlice{
+		{Key: "version", Value: 0.1},
+		{Key: "resource_usage", Value: syncedResourcesUsage},
+	}
+	d, err := yaml.Marshal(syncedUsageData)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(usageFilePath, d, 0600)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*SchemaItem, existingUsageData map[string]*schema.UsageData) yaml.MapSlice {
+	syncedResourceUsage := make(map[string]interface{})
+	for _, resource := range resources {
+		resourceName := resource.Name
+		resourceTypeName := strings.Split(resourceName, ".")[0]
+		resourceUSchema, ok := usageSchema[resourceTypeName]
+		if !ok {
+			continue
+		}
+		resourceUsage := make(map[string]interface{})
+		for _, usageSchemaItem := range resourceUSchema {
+			usageKey := usageSchemaItem.Key
+			usageValueType := usageSchemaItem.ValueType
+			var usageValue interface{}
+			usageValue = usageSchemaItem.DefaultValue
+			if existingUsage, ok := existingUsageData[resourceName]; ok {
+				switch usageValueType {
+				case Int64:
+					usageValue = existingUsage.Get(usageKey).Int()
+				case String:
+					usageValue = existingUsage.Get(usageKey).String()
+				}
+			}
+			resourceUsage[usageKey] = usageValue
+		}
+		syncedResourceUsage[resourceName] = unFlattenHelper(resourceUsage)
+	}
+	// yaml.MapSlice is used to maintain the order of keys, so re-running
+	// the code won't change the output.
+	result := mapToSortedMapSlice(syncedResourceUsage)
+	return result
+}
+
+func loadUsageSchema() (map[string][]*SchemaItem, error) {
+	usageSchema := make(map[string][]*SchemaItem)
+	usageData, err := loadReferenceFile()
+	if err != nil {
+		return usageSchema, err
+	}
+	for _, resUsageData := range usageData {
+		resourceTypeName := strings.Split(resUsageData.Address, ".")[0]
+		usageSchema[resourceTypeName] = make([]*SchemaItem, 0)
+		for usageKeyName, usageRawResult := range resUsageData.Attributes {
+			var defaultValue interface{}
+			usageValueType := Int64
+			defaultValue = 0
+			usageRawValue := usageRawResult.Value()
+			if _, ok := usageRawValue.(string); ok {
+				usageValueType = String
+				defaultValue = usageRawResult.String()
+			}
+			usageSchema[resourceTypeName] = append(usageSchema[resourceTypeName], &SchemaItem{
+				Key:          usageKeyName,
+				ValueType:    usageValueType,
+				DefaultValue: defaultValue,
+			})
+		}
+	}
+	return usageSchema, nil
+}
+
+func unFlattenHelper(input map[string]interface{}) map[string]interface{} {
+	result := make(map[string]interface{})
+	for k, v := range input {
+		rootMap := &result
+		splittedKey := strings.Split(k, ".")
+		for it := 0; it < len(splittedKey)-1; it++ {
+			key := splittedKey[it]
+			if _, ok := (*rootMap)[key]; !ok {
+				(*rootMap)[key] = make(map[string]interface{})
+			}
+			casted := (*rootMap)[key].(map[string]interface{})
+			rootMap = &casted
+		}
+		key := splittedKey[len(splittedKey)-1]
+		(*rootMap)[key] = v
+	}
+	return result
+}
+
+func mapToSortedMapSlice(input map[string]interface{}) yaml.MapSlice {
+	result := make(yaml.MapSlice, 0)
+	// sort keys of the input to maintain same output for different runs.
+	keys := make([]string, 0)
+	for k := range input {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	// Iterate over sorted keys
+	for _, k := range keys {
+		v := input[k]
+		if casted, ok := v.(map[string]interface{}); ok {
+			result = append(result, yaml.MapItem{Key: k, Value: mapToSortedMapSlice(casted)})
+		} else {
+			result = append(result, yaml.MapItem{Key: k, Value: v})
+		}
+	}
+	return result
+}
+
+func loadReferenceFile() (map[string]*schema.UsageData, error) {
+	referenceUsageFileContents := infracost.GetReferenceUsageFileContents()
+	usageData, err := parseYAML(*referenceUsageFileContents)
+	if err != nil {
+		return usageData, errors.Wrapf(err, "Error parsing usage file")
+	}
+	return usageData, nil
+}
+
+func LoadFromFile(usageFilePath string, createIfNotExisting bool) (map[string]*schema.UsageData, error) {
 	usageData := make(map[string]*schema.UsageData)
 
-	if usageFile == "" {
+	if usageFilePath == "" {
+		log.Warn("Can't sync usage file as it's not specified")
 		return usageData, nil
+	}
+
+	if createIfNotExisting {
+		if _, err := os.Stat(usageFilePath); os.IsNotExist(err) {
+			log.Debug("Specified usage file does not exist. It will be created")
+			fileContent := yaml.MapSlice{
+				{Key: "version", Value: "0.1"},
+				{Key: "resource_usage", Value: make(map[string]interface{})},
+			}
+			d, err := yaml.Marshal(fileContent)
+			if err != nil {
+				return usageData, errors.Wrapf(err, "Error creating usage file")
+			}
+			err = ioutil.WriteFile(usageFilePath, d, 0600)
+			if err != nil {
+				return usageData, errors.Wrapf(err, "Error creating usage file")
+			}
+		}
 	}
 
 	log.Debug("Loading usage data from usage file")
 
-	out, err := ioutil.ReadFile(usageFile)
+	out, err := ioutil.ReadFile(usageFilePath)
 	if err != nil {
 		return usageData, errors.Wrapf(err, "Error reading usage file")
 	}
@@ -50,7 +221,7 @@ func parseYAML(y []byte) (map[string]*schema.UsageData, error) {
 	}
 
 	if !checkVersion(usageFile.Version) {
-		return map[string]*schema.UsageData{}, fmt.Errorf("Invalid usage file version. Supported versions are %s ≤ x ≤ %s", minVersion, maxVersion)
+		return map[string]*schema.UsageData{}, fmt.Errorf("Invalid usage file version. Supported versions are %s ≤ x ≤ %s", minUsageFileVersion, maxUsageFileVersion)
 	}
 
 	usageMap := schema.NewUsageMap(usageFile.ResourceUsage)
@@ -59,5 +230,8 @@ func parseYAML(y []byte) (map[string]*schema.UsageData, error) {
 }
 
 func checkVersion(v string) bool {
-	return semver.Compare(v, minVersion) >= 0 && semver.Compare(v, maxVersion) <= 0
+	if !strings.HasPrefix(v, "v") {
+		v = "v" + v
+	}
+	return semver.Compare(v, "v"+minUsageFileVersion) >= 0 && semver.Compare(v, "v"+maxUsageFileVersion) <= 0
 }

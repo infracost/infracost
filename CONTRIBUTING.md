@@ -1,10 +1,12 @@
 # Contributing to Infracost
 
 The overall process for contributing to Infracost is:
-1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check; the issue labels should help you to find a good first issue, or new resources that others have already requested/liked.
+1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check; the issue labels should help you to find a `good first issue, or new resources that others have already requested/liked.
 2. Create a new issue if there's no issue for what you want to work on. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback.
-3. Create a fork, commit and push to your fork. Send a pull request from your fork to this repo with the proposed change (don't forget to run `make lint` and `make fmt` first). Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
-4. We'll review your change and provide feedback.
+3. Add a comment to the issue you're working on to let the rest of the community know.
+4. Create a fork, commit and push to your fork. Send a pull request (PR) from your fork to this repo with the proposed change. Don't forget to run `make lint` and `make fmt` first. Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Commit messages can usually start with "feat(aws): add ...", "feat(google): add ...", or "fix: nil pointer...". This helps us generate a cleaner changelog.
+5. If it's your first PR to the Infracost org, a bot will leave a comment asking you to follow a quick step to sign our Contributor License Agreement.
+6. We'll review your change and provide feedback.
 
 ## Development
 
@@ -13,14 +15,8 @@ Install Go dependencies:
 make deps
 ```
 
-Get an API key.
+Add your [Infracost API key](https://www.infracost.io/docs/#2-get-api-key) to your `.env.local` file:
 ```sh
-make run ARGS="register"
-```
-Alternatively checkout and run the [cloud-pricing-api](https://github.com/infracost/cloud-pricing-api) and set the `INFRACOST_PRICING_API_ENDPOINT` environment variable to point to it.
-
-Add the API key to your `.env.local` file:
-```
 cat <<EOF >> .env.local
 INFRACOST_API_KEY=XXX
 EOF
@@ -28,10 +24,10 @@ EOF
 
 Run the code:
 ```sh
-make run ARGS="--terraform-dir examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
+make run ARGS="--path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
 ```
 
-Run all tests:
+Running all tests takes ~12mins on GitHub Actions so it's faster to only run your tests as you dev and leave CI to run them all:
 ```sh
 make test
 ```
@@ -119,8 +115,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 Finally create a temporary terraform file to test your resource and run (no need to commit that):
 
-```
-make run ARGS="--terraform-dir my_new_terraform/"
+```sh
+make run ARGS="--path my_new_terraform/"
 ```
 
 ### Detailed notes
@@ -169,9 +165,18 @@ Our aim is to make Infracost's output understandable without needing to read sep
 
 Where a cloud vendor's pricing pages information can be improved for clarify, we'll do that, e.g. on some pricing webpages, AWS mention use "Storage Rate" to describe pricing for "Provisioned IOPS storage", so we use the latter.
 
+The cost component name should not change when the IaC resource params change; anything that can change should be put in brackets, so for example:
+- `General Purpose SSD storage (gp2)` should be `Storage (gp2)` as the storage type can change.
+- `Outbound data transfer to EqDC2` should be `Outbound data transfer (to EqDC2)` as the EqDC2 value changes based on the location.
+- `Linux/UNIX (on-demand, m1.small)` should be `Instance usage (Linux/UNIX, on-demand, m1.small)`.
+
+In the future, we plan to add a separate field to cost components to hold the metadata in brackets.
+
 #### Resource notes
 
 The following notes are general guidelines, please leave a comment in your pull request if they don't make sense or they can be improved for the resource you're adding.
+
+- references to other resources: if you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. For example the [aws_ebs_snapshot](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/ebs_snapshot.go#L13) uses this because its price depends on the size of the referenced volume.
 
 - count: do not include the count in the cost component name or in brackets. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
 
@@ -184,7 +189,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 unless the price is for a large number, e.g. set it to `1000000` if the price should be shown "per 1M requests" in the output.
 
-- tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)". Use the words "first", "next" and "over" when describing tiers. Units should not be included in brackets unless the cost component relates to storage or data transfer, e.g. "Storage (first 1TB)    GB" is more understandable than "Storage (first 1K)    GB" since users understand terabytes and petabytes.
+- tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)". Use the words "first", "next" and "over" when describing tiers. Units should not be included in brackets unless the cost component relates to storage or data transfer, e.g. "Storage (first 1TB)    GB" is more understandable than "Storage (first 1K)    GB" since users understand terabytes and petabytes. You should be able to use the `CalculateTierBuckets` method for calculating tier buckets.
 
 - purchase options: if applicable, include "on-demand" in brackets after the cost component name, e.g. `Database instance (on-demand`
 
@@ -199,7 +204,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 - brackets: only use 1 set of brackets after a component name, e.g. `Database instance (on-demand, db.t3.medium)` and not `Database instance (on-demand) (db.t3.medium)`
 
 - free resources: if there are certain conditions that can be checked inside a resource Go file, which mean there are no cost components for the resource, return a `NoPrice: true` and `IsSkipped: true` response as shown below.
-	```
+	```go
 	// Gateway endpoints don't have a cost associated with them
 	if vpcEndpointType == "Gateway" {
 		return &schema.Resource{
@@ -210,7 +215,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 	```
 
 - unsupported resources: if there are certain conditions that can be checked inside a resource Go file, which mean that the resource is not yet supported, log a warning to explain what is not supported and return a `nil` response as shown below.
-	```
+	```go
 	if d.Get("placement_tenancy").String() == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
 		return nil
@@ -235,10 +240,12 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 5. For resources that are continuous in time, do not use prefixes, e.g. use `instances`, `subscriptions`, `storage_gb`. For non-continuous resources, prefix with `monthly_` so users knows what time interval to estimate for, e.g. `monthly_log_lines`, `monthly_requests`.
 
+6. When the field accepts a string (e.g. `dx_connection_type: dedicated`), the values should be used in a case-insensitive way in the resource file, the `ValueRegex` option can be used with `/i` to allow case-insensitive regex matches. For example `{Key: "connectionType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", connectionType))},`.
+
 #### Google resource notes
 
 1. If the resource has a `zone` key, if they have a zone key, use this logic to get the region:
-	```
+	```go
 	region := d.Get("region").String()
 	zone := d.Get("zone").String()
 	if zone != "" {
@@ -252,11 +259,11 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 1. In [here](https://github.com/infracost/infracost/actions), click on the "Go" build for the master branch, click on Build, expand Test, then use the "Search logs" box to find any line that has "Multiple products found", "No products found for" or "No prices found for". Update the resource files in question to fix these error, often it's because the price filters need to be adjusted to only return 1 result.
 2. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
-3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have the mac/linux/windows assets.
+3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have the darwin-amd64, darwin-arm64.tar.gz, windows-amd64.tar.gz, and linux-amd64.tar.gz assets.
 4. Click on the Edit draft button, add the release notes from the commits between this and the last release and click on publish.
 5. In the `infracost-atlantis` repo, run the following steps so the Atlantis integration uses the latest version of Infracost:
 
-	```
+	```sh
 	# you can also push to master if you want the GH Action to do the following.
 	git pull
 	docker build --no-cache -t infracost/infracost-atlantis:latest .

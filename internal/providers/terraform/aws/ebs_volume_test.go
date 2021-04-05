@@ -134,3 +134,86 @@ func TestEBSVolume(t *testing.T) {
 
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
+
+func TestEBSVolume_GP3(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+	resource "aws_ebs_volume" "gp3" {
+		availability_zone = "us-west-2a"
+		size              = 40
+		type = "gp3"
+		iops = 4000
+		throughput = 130
+		
+		tags = {
+			Name = "HelloWorld"
+		}
+	}`
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_ebs_volume.gp3",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:             "General Purpose SSD storage (gp3)",
+					PriceHash:        "b7a83d535d47fcfd1be68ec37f046b3d-ee3dd7e4624338037ca6fea0933a662f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40)),
+				},
+				{
+					Name:             "Provisioned throughput",
+					PriceHash:        "9775542e08e79c6f6dff9b6537f84c04-8191dc82cee9b89717087e447a40abbd",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(5)),
+				},
+				{
+					Name:             "Provisioned IOPS",
+					PriceHash:        "4299307b615dc9d0e4e8aa362c6b4c6f-9c483347596633f8cf3ab7fdd5502b78",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1000)),
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+}
+
+func TestEBSStandardVolume_usage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+	resource "aws_ebs_volume" "standard" {
+		availability_zone = "us-east-1a"
+		size              = 20
+		type              = "standard"
+	}`
+
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_ebs_volume.standard": map[string]interface{}{
+			"monthly_standard_io_requests": 1000000,
+		},
+	})
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_ebs_volume.standard",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:             "Magnetic storage",
+					PriceHash:        "0ed17ed1777b7be91f5b5ce79916d8d8-ee3dd7e4624338037ca6fea0933a662f",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
+				},
+				{
+					Name:             "I/O requests",
+					PriceHash:        "3085cb7cbdb1e1f570812e7400f8dbc6-5be345988e7c9a0759c5cf8365868ee4",
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromFloat(1000000)),
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
+}

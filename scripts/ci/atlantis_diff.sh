@@ -13,114 +13,173 @@ if [ "$atlantis_debug" = "true" ] || [ "$atlantis_debug" = "True" ] || [ "$atlan
   echo
 fi
 
-# Handle deprecated var names
-terraform_plan_flags=${terraform_plan_flags:-$tfflags}
+process_args () {
+  # Validate post_condition
+  if ! echo "$post_condition" | jq empty; then
+    echo "Error: post_condition contains invalid JSON"
+  fi
 
-# Set defaults
-percentage_threshold=${percentage_threshold:-0}
-# Export as it's used by infracost, not this script
-export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
-export INFRACOST_CI_ATLANTIS_DIFF=true
+  # Set defaults
+  if [ ! -z "$percentage_threshold" ] && [ ! -z "$post_condition" ]; then
+    if [ "$atlantis_debug" = "true" ]; then
+      echo "Warning: percentage_threshold is deprecated, using post_condition instead"
+    fi
+  elif [ ! -z "$percentage_threshold" ]; then
+    post_condition="{\"percentage_threshold\": $percentage_threshold}"
+    if [ "$atlantis_debug" = "true" ]; then
+      echo "Warning: percentage_threshold is deprecated and will be removed in v0.9.0, please use post_condition='{\"percentage_threshold\": \"0\"}'"
+    fi
+  else
+    post_condition=${post_condition:-'{"has_diff": true}'}
+  fi
+  if [ ! -z "$post_condition" ] && [ "$(echo "$post_condition" | jq '.percentage_threshold')" != "null" ]; then
+    percentage_threshold=$(echo "$post_condition" | jq -r '.percentage_threshold')
+  fi
+  percentage_threshold=${percentage_threshold:-0}
+  INFRACOST_BINARY=${INFRACOST_BINARY:-infracost}
 
-infracost_cmd="infracost --no-color"
-if [ ! -z "$terraform_plan_flags" ]; then
-  infracost_cmd="$infracost_cmd --terraform-plan-flags \"$terraform_plan_flags\""
-fi
-if [ ! -z "$pricing_api_endpoint" ]; then
-  infracost_cmd="$infracost_cmd --pricing-api-endpoint $pricing_api_endpoint"
-fi
-if [ ! -z "$usage_file" ]; then
-  infracost_cmd="$infracost_cmd --usage-file $usage_file"
-fi
-if [ ! -z "$config_file" ]; then
-  infracost_cmd="$infracost_cmd --config-file $config_file"
-else
-  infracost_cmd="$infracost_cmd --terraform-dir ."
-fi
+  # Export as it's used by infracost, not this script
+  export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
+  export INFRACOST_CI_ATLANTIS_DIFF=true
+}
+
+build_breakdown_cmd () {
+  breakdown_cmd="${INFRACOST_BINARY} breakdown --no-color --path $PLANFILE --format json"
+
+  if [ ! -z "$usage_file" ]; then
+    breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
+  fi
+  if [ ! -z "$config_file" ]; then
+    breakdown_cmd="$breakdown_cmd --config-file $config_file"
+  fi
+  if [ "$atlantis_debug" != "true" ]; then
+    breakdown_cmd="$breakdown_cmd 2>/dev/null"
+  fi
+
+  echo "$breakdown_cmd"
+}
+
+build_output_cmd () {
+  breakdown_path=$1
+  output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
+  echo "${output_cmd}"
+}
+
+
+format_cost () {
+  cost=$1
+
+  if [ -z "$cost" ] | [ "${cost}" == "null" ]; then
+    echo "-"
+  elif [ $(echo "$cost < 100" | bc -l) = 1 ]; then
+    printf "$%0.2f" $cost
+  else
+    printf "$%0.0f" $cost
+  fi
+}
+
+build_msg () {
+  change_word="increase"
+  change_sym="+"
+  if [ $(echo "$total_monthly_cost < ${past_total_monthly_cost}" | bc -l) = 1 ]; then
+    change_word="decrease"
+    change_sym=""
+  fi
+
+  percent_display=""
+  if [ ! -z "$percent" ]; then
+    percent_display="$(printf "%.0f" $percent)"
+    percent_display=" (${change_sym}${percent_display}%%)"
+  fi
+
+  msg="##### Infracost estimate #####"
+  msg="${msg}\n\n"
+  msg="${msg}Monthly cost will ${change_word} by $(format_cost $diff_cost)$percent_display\n"
+  msg="${msg}\n"
+  msg="${msg}Previous monthly cost: $(format_cost $past_total_monthly_cost)\n"
+  msg="${msg}New monthly cost: $(format_cost $total_monthly_cost)\n"
+  msg="${msg}\n"
+  msg="${msg}Infracost output:\n"
+  msg="${msg}\n"
+  msg="${msg}$(echo "    ${diff_output//$'\n'/\\n    }" | sed "s/%/%%/g")\n"
+  printf "$msg"
+}
+
+cleanup () {
+  rm -f infracost_breakdown.json infracost_breakdown_cmd infracost_output_cmd
+}
+
+# MAIN
+
+process_args "$@"
+
+infracost_breakdown_cmd=$(build_breakdown_cmd)
+echo "$infracost_breakdown_cmd" > infracost_breakdown_cmd
+
 if [ "$atlantis_debug" = "true" ]; then
-  echo "$infracost_cmd" > infracost_cmd
-else
-  echo "$infracost_cmd 2>/dev/null" > infracost_cmd
+  echo "Running infracost breakdown using:"
+  echo "  $ $(cat infracost_breakdown_cmd)"
 fi
+breakdown_output=$(cat infracost_breakdown_cmd | sh)
+echo "$breakdown_output" > infracost_breakdown.json
 
-# Handle Atlantis merge checkout-strategy
-current_branch_commit=$(git rev-parse HEAD)
-current_branch_previous_commit_email=$(git log -1 --pretty=format:'%ae')
-current_branch_previous_commit_message=$(git log -1 --pretty=format:'%B')
-if [ "$current_branch_previous_commit_email" = "atlantis@runatlantis.io" ] && [ "$current_branch_previous_commit_message" = "atlantis-merge" ]; then
-  if [ "$atlantis_debug" = "true" ]; then echo "Detected Atlantis merge checkout-strategy so checking out head branch to avoid running against Atlantis' temporary merge commit."; fi
-  git remote set-branches head $HEAD_BRANCH_NAME &>/dev/null || if [ "$atlantis_debug" = "true" ]; then echo "Could not set-branches $HEAD_BRANCH_NAME, this might prevent switching to it, continuing..."; fi
-  git fetch --depth=1 head $HEAD_BRANCH_NAME &>/dev/null || if [ "$atlantis_debug" = "true" ]; then echo "Could not fetch branch head/$HEAD_BRANCH_NAME, no problems, switching to it..."; fi
-  # Use 'checkout head/branch' vs the 'switch' that's used in diff.sh to ensure latest branch changes are used locally
-  git checkout head/$HEAD_BRANCH_NAME &>/dev/null || (echo "[Infracost] Error: could not switch to branch $HEAD_BRANCH_NAME" && exit 1)
-fi
+infracost_output_cmd=$(build_output_cmd "infracost_breakdown.json")
+echo "$infracost_output_cmd" > infracost_output_cmd
 
 if [ "$atlantis_debug" = "true" ]; then
-  echo "Running infracost on current branch using:"
-  echo "  $ $(cat infracost_cmd)"
+  echo "Running infracost output using:"
+  echo "  $ $(cat infracost_output_cmd)"
 fi
-current_branch_output=$(cat infracost_cmd | sh)
-# The sed is needed to cause the header line to be different between current_branch_infracost and
-# default_branch_infracost, otherwise git diff removes it as its an identical line
-echo "$current_branch_output" | sed 's/MONTHLY COST/MONTHLY COST /' > current_branch_infracost.txt
-current_branch_monthly_cost=$(cat current_branch_infracost.txt | awk '/OVERALL TOTAL/ { gsub(",",""); printf("%.2f",$NF) }')
-if [ "$atlantis_debug" = "true" ]; then echo "current_branch_monthly_cost is $current_branch_monthly_cost"; fi
+diff_output=$(cat infracost_output_cmd | sh)
 
-if [ "$HEAD_BRANCH_NAME" = "$BASE_BRANCH_NAME" ]; then
-  if [ "$atlantis_debug" = "true" ]; then echo "Exiting as the current branch was the default branch so nothing more to do."; fi
+past_total_monthly_cost=$(jq '[.projects[].pastBreakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
+total_monthly_cost=$(jq '[.projects[].breakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
+diff_cost=$(jq '[.projects[].diff.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
+
+# If both old and new costs are greater than 0
+if [ $(echo "$past_total_monthly_cost > 0" | bc -l) = 1 ] && [ $(echo "$total_monthly_cost > 0" | bc -l) = 1 ]; then
+  percent=$(echo "scale=6; $total_monthly_cost / $past_total_monthly_cost * 100 - 100" | bc)
+fi
+
+# If both old and new costs are less than or equal to 0
+if [ $(echo "$past_total_monthly_cost <= 0" | bc -l) = 1 ] && [ $(echo "$total_monthly_cost <= 0" | bc -l) = 1 ]; then
+  percent=0
+fi
+
+absolute_percent=$(echo $percent | tr -d -)
+diff_resources=$(jq '[.projects[].diff.resources[]] | add' infracost_breakdown.json)
+
+if [ "$(echo "$post_condition" | jq '.always')" = "true" ]; then
+  if [ "$atlantis_debug" = "true" ]; then
+    echo "Posting comment as post_condition is set to always"
+  fi
+elif [ "$(echo "$post_condition" | jq '.has_diff')" = "true" ] && [ "$diff_resources" = "null" ]; then
+  if [ "$atlantis_debug" = "true" ]; then
+    echo "Not posting comment as post_condition is set to has_diff but there is no diff"
+  fi
+  cleanup
+  exit 0
+elif [ "$(echo "$post_condition" | jq '.has_diff')" = "true" ] && [ -n "$diff_resources" ]; then
+  if [ "$atlantis_debug" = "true" ]; then
+    echo "Posting comment as post_condition is set to has_diff and there is a diff"
+  fi
+elif [ -z "$percent" ]; then
+  if [ "$atlantis_debug" = "true" ]; then
+    echo "Posting comment as percentage diff is empty"
+  fi
+elif [ $(echo "$absolute_percent > $percentage_threshold" | bc -l) = 1 ]; then
+  if [ "$atlantis_debug" = "true" ]; then
+    echo "Posting comment as percentage diff ($absolute_percent%) is greater than the percentage threshold ($percentage_threshold%)."
+  fi
+else
+  if [ "$atlantis_debug" = "true" ]; then
+    echo "Not posting comment as percentage diff ($absolute_percent%) is less than or equal to percentage threshold ($percentage_threshold%)."
+  fi
+  cleanup
   exit 0
 fi
 
-if [ "$atlantis_debug" = "true" ]; then echo "Switching to default branch"; fi
-git remote set-branches origin $BASE_BRANCH_NAME &>/dev/null || if [ "$atlantis_debug" = "true" ]; then echo "Could not set-branches $BASE_BRANCH_NAME, this might prevent switching to it, continuing..."; fi
-git fetch --depth=1 origin $BASE_BRANCH_NAME &>/dev/null || if [ "$atlantis_debug" = "true" ]; then echo "Could not fetch branch $BASE_BRANCH_NAME from origin, no problems, switching to it..."; fi
-# Use 'checkout origin/branch' vs the 'switch' that's used in diff.sh to ensure latest master changes are used locally
-git checkout origin/$BASE_BRANCH_NAME &>/dev/null || (echo "[Infracost] Error: could not switch to branch $BASE_BRANCH_NAME" && exit 1)
+msg="$(build_msg)"
+echo "$msg"
 
-if [ "$atlantis_debug" = "true" ]; then git log -n1; fi
-
-# Handle case of new projects in Atlantis where the base branch doesn't have the Terraform files yet
-if [ $(find -regex ".*\.\(tf\|hcl\|hcl.json\)" | grep -v .lock.hcl | wc -l) = "0" ]; then
-  if [ "$atlantis_debug" = "true" ]; then echo "Default branch does not have this folder, setting its cost to 0."; fi
-  default_branch_monthly_cost=0
-  touch default_branch_infracost.txt
-else
-  if [ "$atlantis_debug" = "true" ]; then
-    echo "Running infracost on default branch using:"
-    echo "  $ $(cat infracost_cmd)"
-  fi
-  default_branch_output=$(cat infracost_cmd | sh)
-  echo "$default_branch_output" > default_branch_infracost.txt
-  default_branch_monthly_cost=$(cat default_branch_infracost.txt | awk '/OVERALL TOTAL/ { gsub(",",""); printf("%.2f",$NF) }')
-fi
-
-if [ "$atlantis_debug" = "true" ]; then echo "default_branch_monthly_cost is $default_branch_monthly_cost"; fi
-
-# Switch back to try and not confuse Atlantis
-git checkout $current_branch_commit &>/dev/null
-
-if [ $(echo "$default_branch_monthly_cost > 0" | bc -l) = 1 ]; then
-  percent_diff=$(echo "scale=4; $current_branch_monthly_cost / $default_branch_monthly_cost * 100 - 100" | bc)
-else
-  if [ "$atlantis_debug" = "true" ]; then echo "Default branch has no cost, setting percent_diff=100 to force a comment"; fi
-  percent_diff=100
-  # Remove the empty OVERALL TOTAL line to avoid it showing-up in the diff
-  sed -i '/OVERALL TOTAL/d' default_branch_infracost.txt
-fi
-absolute_percent_diff=$(echo $percent_diff | tr -d -)
-
-if [ $(echo "$absolute_percent_diff > $percentage_threshold" | bc -l) = 1 ]; then
-  change_word="increase"
-  if [ $(echo "$percent_diff < 0" | bc -l) = 1 ]; then
-    change_word="decrease"
-  fi
-  echo "#####"
-  echo
-  echo "Infracost estimate: monthly cost will $change_word by $absolute_percent_diff% (default branch \$$default_branch_monthly_cost vs current branch \$$current_branch_monthly_cost)"
-  echo
-  git diff --no-color --no-index default_branch_infracost.txt current_branch_infracost.txt | sed 1,2d | sed 3,5d
-else
-  if [ "$atlantis_debug" = "true" ]; then echo "Infracost output omitted as default branch and current branch diff ($absolute_percent_diff) is less than or equal to percentage threshold ($percentage_threshold)."; fi
-fi
-# Cleanup
-rm -f infracost_cmd default_branch_infracost.txt current_branch_infracost.txt
+cleanup

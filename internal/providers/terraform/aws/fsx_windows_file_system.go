@@ -23,12 +23,17 @@ func NewFSXWindowsFS(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	throughput := decimalPtr(decimal.NewFromInt(d.Get("throughput_capacity").Int()))
 	storageSize := decimalPtr(decimal.NewFromInt(d.Get("storage_capacity").Int()))
 
+	var backupStorage *decimal.Decimal
+	if u != nil && u.Get("backup_storage_gb").Exists() {
+		backupStorage = decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
+	}
+
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			throughputCapacity(region, isMultiAZ, throughput),
 			storageCapacity(region, isMultiAZ, isHDD, storageSize),
-			backupStorageCapacity(region, isMultiAZ),
+			backupStorageCapacity(region, isMultiAZ, backupStorage),
 		},
 	}
 }
@@ -82,7 +87,7 @@ func throughputCapacity(region string, isMultiAZ bool, throughput *decimal.Decim
 	}
 }
 
-func backupStorageCapacity(region string, isMultiAZ bool) *schema.CostComponent {
+func backupStorageCapacity(region string, isMultiAZ bool, backupStorage *decimal.Decimal) *schema.CostComponent {
 	deploymentOption := "Single-AZ"
 	if isMultiAZ {
 		deploymentOption = "Multi-AZ"
@@ -91,7 +96,7 @@ func backupStorageCapacity(region string, isMultiAZ bool) *schema.CostComponent 
 		Name:            "Backup storage",
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
-		MonthlyQuantity: nil,
+		MonthlyQuantity: backupStorage,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),

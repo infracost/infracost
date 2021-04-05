@@ -50,6 +50,11 @@ var tfProviders = `
 		region = "us-central1"
 	}
 
+	provider "google-beta" {
+		credentials = "{\"type\":\"service_account\"}"
+		region = "us-central1"
+	}
+
 	provider "azurerm" {
 		skip_provider_registration = true
 		features {}
@@ -111,7 +116,7 @@ func installPlugins() error {
 	}
 
 	opts := &terraform.CmdOptions{
-		TerraformDir: tfdir,
+		Dir: tfdir,
 	}
 
 	_, err = terraform.Cmd(opts, "init", "-no-color")
@@ -169,8 +174,8 @@ func loadResources(cfg *config.Config, tfProject TerraformProject, usage map[str
 		return nil, err
 	}
 
-	provider := terraform.New(cfg, &config.TerraformProject{
-		Dir: tfdir,
+	provider := terraform.NewDirProvider(cfg, &config.Project{
+		Path: tfdir,
 	})
 
 	return provider.LoadResources(usage)

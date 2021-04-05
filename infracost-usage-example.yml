@@ -1,11 +1,10 @@
-## You can use this file to define resource usage estimates for Infracost to use when calculating
-## the cost of usage-based resource, such as AWS Lambda.
-## `infracost --usage-file /path/to/infracost-usage.yml [other flags]`
-## See https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml for available options.
-version: v0.1
+# You can use this file to define resource usage estimates for Infracost to use when calculating
+# the cost of usage-based resource, such as AWS Lambda.
+# `infracost breakdown --usage-file infracost-usage.yml [other flags]`
+# See https://infracost.io/usage-file/ for docs
+version: 0.1
 resource_usage:
 
-  #
   # The usage file also supports specifying usage for resources inside modules,
   # by specifying the full path to the resource. This is the same value as Infracost
   # outputs in the NAME column , e.g.:
@@ -26,10 +25,11 @@ resource_usage:
     monthly_requests:  100000000 # Monthly requests to the Rest API Gateway.
 
   aws_apigatewayv2_api.my_v2_api:
-    monthly_requests: 100000000 # Monthly requests to the HTTP API Gateway.
-    request_size_kb: 512        # Average request size sent to the HTTP API Gateway in KB. Requests are metered in 512KB increments, maximum size is 10MB.
-    monthly_messages: 100000000 # Monthly number of messages sent to the Websocket API Gateway.
-    message_size_kb: 32         # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
+    monthly_requests: 100000000       # Monthly requests to the HTTP API Gateway.
+    request_size_kb: 512              # Average request size sent to the HTTP API Gateway in KB. Requests are metered in 512KB increments, maximum size is 10MB.
+    monthly_messages: 1500000000      # Monthly number of messages sent to the Websocket API Gateway.
+    message_size_kb: 32               # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
+    monthly_connection_mins: 10000000 # Monthly total connection minutes to Websockets.
 
   aws_cloudwatch_event_bus.my_events:
     monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.
@@ -66,6 +66,25 @@ resource_usage:
     monthly_outbound_other_region_gb: 750       # Monthly data transferred to other AWS regions.
     monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
 
+  aws_docdb_cluster.my_cluster:
+    backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
+
+  aws_docdb_cluster_instance.my_db:
+    data_storage_gb: 1000         # Total storage for cluster in GB.
+    monthly_io_request: 100000000 # Monthly number of input/output requests for cluster.
+    monthly_cpu_credit_hours: 100 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances. 
+    
+  aws_docdb_cluster.my_cluster:
+    backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
+
+  aws_docdb_cluster_snapshot.my_snapshot:
+    backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
+
+  aws_dx_connection.my_dx_connection:
+    monthly_outbound_region_to_dx_location_gb: 100 # Monthly outbound data transferred from AWS region to DX location in GB.
+    dx_virtual_interface_type: private             # Interface type impacts outbound data transfer costs over DX, can be: private, public.
+    dx_connection_type: dedicated                  # Connection type impacts the per-port hourly price, can be: dedicated, hosted.
+
   aws_dx_gateway_association.my_gateway:
     monthly_data_processed_gb: 100 # Monthly data processed by the DX gateway association per month in GB.
 
@@ -78,47 +97,170 @@ resource_usage:
     monthly_data_restored_gb: 230         # Monthly size of restored data in GB.
     monthly_streams_read_request_units: 2 # Monthly streams read request units.
 
+  aws_ebs_snapshot.my_snapshot:
+    monthly_list_block_requests: 1000000  # Monthly number of ListChangedBlocks and ListSnapshotBlocks requests.
+    monthly_get_block_requests: 100000    # Monthly number of GetSnapshotBlock requests (block size is 512KiB).
+    monthly_put_block_requests: 100000    # Monthly number of PutSnapshotBlock requests (block size is 512KiB).
+
+  aws_ebs_volume.my_standard_volume:
+    monthly_standard_io_requests: 10000000 # Monthly I/O requests for standard volume (Magnetic storage).
+
   aws_ec2_transit_gateway_vpc_attachment.my_vpc_attachment:
     monthly_data_processed_gb: 100 # Monthly data processed by the EC2 transit gateway attachment(s) in GB.
 
   aws_ecr_repository.my_repository:
     storage_gb: 1 # Total size of ECR repository in GB.
 
+  aws_efs_file_system.my_file_system:
+    storage_gb: 230                         # Total storage for Standard class in GB.
+    infrequent_access_storage_gb: 100       # Total storage for Infrequent Access class in GB.
+    monthly_infrequent_access_read_gb: 50   # Monthly infrequent access read requests in GB.
+    monthly_infrequent_access_write_gb: 100 # Monthly infrequent access write requests in GB.
+
+  aws_elasticache_cluster.my_redis_snapshot:
+    snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB. 
+
+  aws_elb.my_elb:
+    monthly_data_processed_gb: 10000 # Monthly data processed by a Classic Load Balancer in GB.
+
   aws_instance.windows_instance:
-    operating_system: windows # Override the operating system of the instance, can be: windows, suse, rhel.
+    operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
+
+  aws_fsx_windows_file_system.my_system:
+    backup_storage_gb: 10000 # Total storage used for backups in GB.
 
   aws_lambda_function.my_function:
     monthly_requests: 100000 # Monthly requests to the Lambda function.
     request_duration_ms: 500 # Average duration of each request in milliseconds.
 
+  # The same can be used for the aws_alb resource too.
+  aws_lb.my_lb:
+    new_connections: 10000    # Number of newly established connections per second on average.
+    active_connections: 10000 # Number of active connections per minute on average.
+    processed_bytes_gb: 1000  # The number of bytes processed by the load balancer for HTTP(S) requests and responses in GB.
+    rule_evaluations: 10000   # The product of number of rules processed by the load balancer and the request rate.
+
   aws_nat_gateway.my_nat_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
+  aws_rds_cluster.my_cluster:
+    capacity_units_per_hr: 50             # Number of aurora capacity units per hour. Only used when engine_mode is "serverless"
+    storage_gb: 200                   # Storage amount in GB allocated to the aurora cluster.
+    write_requests_per_sec: 100           # Total number of reads per second for the cluster.
+    read_requests_per_sec: 100            # Total number of writes per second for the cluster.
+    backup_snapshot_size_gb: 200      # Individual storage size for backup snapshots, used in conjunction with resource parameter "backup_retention_period".
+    average_statements_per_hr: 10000 # Number of statements generated per hour when backtrack is enabled. Only availble for MySQl-compatible Aurora
+    change_records_per_statement: 0.38 # Records changed per statement executed.
+    backtrack_window_hrs: 24 # The duration window for which Aurora will support rewinding the DB cluster to a specific point in time.
+    snapshot_export_size_gb: 200      # Size of snapshot that's exported to s3 in parquet format.
+
+  # These settings only apply when using t3 instance types.
+  aws_rds_cluster_instance.my_cluster:
+    cpu_credit_hrs: 24   # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
+    virtual_cpu_count: 2 # Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
+
+  aws_route53_health_check.my_health_check:
+    endpoint_type: aws # Type of health check endpoint to query, can be: either aws or non_aws.
+
+  aws_route53_record.my_record:
+    monthly_standard_queries: 1100000000      # Monthly number of Standard queries.
+    monthly_latency_based_queries: 1200000000 # Monthly number of Latency Based Routing queries.
+    monthly_geo_queries: 1500000000           # Monthly number of Geo DNS and Geoproximity queries.
+
   aws_route53_resolver_endpoint.my_endpoint:
     monthly_queries: 20000000000 # Monthly number of DNS queries processed through the endpoints.
+
+  aws_s3_bucket_analytics_configuration.my_config:
+    monthly_monitored_objects: 10000000 # Monthly number of monitored objects by S3 Analytics Storage Class Analysis.
+
+  aws_s3_bucket_inventory.my_inventory:
+    monthly_listed_objects: 100000000 # Monthly number of listed objects.
+
+  aws_s3_bucket.my_bucket:
+    object_tags: 10000000 # Total object tags.
+    standard: # Usages of S3 Standard:
+      storage_gb: 10000 # Total storage in GB.
+      monthly_tier_1_requests: 1000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 100000 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_select_data_scanned_gb: 10000 # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 1000 # Monthly data returned by S3 Select in GB.
+    intelligent_tiering: # Usages of S3 Intelligent - Tiering:
+      frequent_access_storage_gb: 20000 # Total storage for Frequent Access Tier in GB.
+      infrequent_access_storage_gb: 20000 # Total storage for Infrequent Access Tier in GB.
+      monitored_objects: 2000 # Total objects monitored by the Intelligent Tiering.
+      monthly_tier_1_requests: 2000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 200000 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 200000 # Monthly Lifecycle Transition requests.
+      monthly_select_data_scanned_gb: 20000 # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 2000 # Monthly data returned by S3 Select in GB.
+      early_delete_gb: 200000 # If an archive is deleted within 1 months of being uploaded, you will be charged an early deletion fee per GB.
+    standard_infrequent_access: # Usages of S3 Standard - Infrequent Access:
+      storage_gb: 30000 # Total storage in GB.
+      monthly_tier_1_requests: 3000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 300000 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 300000 # Monthly Lifecycle Transition requests.
+      monthly_retrieval_gb: 30000 # Monthly data retrievals in GB
+      monthly_select_data_scanned_gb: 30000 # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 3000 # Monthly data returned by S3 Select in GB.
+    one_zone_infrequent_access: # Usages of S3 One Zone - Infrequent Access:
+      storage_gb: 40000 # Total storage in GB.
+      monthly_tier_1_requests: 4000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 400000 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 400000 # Monthly Lifecycle Transition requests.
+      monthly_retrieval_gb: 40000 # Monthly data retrievals in GB
+      monthly_select_data_scanned_gb: 40000 # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 4000 # Monthly data returned by S3 Select in GB.
+    glacier: # Usages of S3 Glacier:
+      storage_gb: 50000 # Total storage in GB.
+      monthly_tier_1_requests: 5000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 500000 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 500000 # Monthly Lifecycle Transition requests.
+      monthly_standard_select_data_scanned_gb: 500000 # Monthly data scanned by S3 Select in GB (for standard level of S3 Glacier).
+      monthly_standard_select_data_returned_gb: 500000 # Monthly data returned by S3 Select in GB (for standard level of S3 Glacier).
+      monthly_bulk_select_data_scanned_gb: 500000 # Monthly data scanned by S3 Select in GB (for bulk level of S3 Glacier)
+      monthly_bulk_select_data_returned_gb: 500000 # Monthly data returned by S3 Select in GB (for bulk level of S3 Glacier)
+      monthly_expedited_select_data_scanned_gb: 500000 # Monthly data scanned by S3 Select in GB (for expedited level of S3 Glacier)
+      monthly_expedited_select_data_returned_gb: 500000 # Monthly data returned by S3 Select in GB (for expedited level of S3 Glacier)
+      monthly_standard_data_retrieval_requests: 500000 # Monthly data Retrieval requests (for standard level of S3 Glacier).
+      monthly_bulk_data_retrieval_requests: 500000 # Monthly data Retrieval requests (for bulk level of S3 Glacier).
+      monthly_expedited_data_retrieval_requests: 500000 # Monthly data Retrieval requests (for expedited level of S3 Glacier).
+      monthly_standard_data_retrieval_gb: 5000 # Monthly data retrievals in GB (for standard level of S3 Glacier).
+      monthly_bulk_data_retrieval_gb: 5000 # Monthly data retrievals in GB (for bulk level of S3 Glacier).
+      monthly_expedited_data_retrieval_gb: 5000 # Monthly data retrievals in GB (for expedited level of S3 Glacier).
+      early_delete_gb: 500000 # If an archive is deleted within 3 months of being uploaded, you will be charged an early deletion fee per GB.
+    glacier_deep_archive: # Usages of S3 Glacier Deep Archive:
+      storage_gb: 60000 # Total storage in GB.
+      monthly_tier_1_requests: 6000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 600000 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 600000 # Monthly Lifecycle Transition requests.
+      monthly_standard_data_retrieval_requests: 600000 # Monthly data Retrieval requests (for standard level of S3 Glacier).
+      monthly_bulk_data_retrieval_requests: 600000 # Monthly data Retrieval requests (for bulk level of S3 Glacier).
+      monthly_standard_data_retrieval_gb: 6000 # Monthly data retrievals in GB (for standard level of S3 Glacier).
+      monthly_bulk_data_retrieval_gb: 6000 # Monthly data retrievals in GB (for bulk level of S3 Glacier).
+      early_delete_gb: 600000 # If an archive is deleted within 6 months of being uploaded, you will be charged an early deletion fee per GB.
 
   aws_secretsmanager_secret.my_secret:
     monthly_requests: 1000000 # Monthly API requests to Secrets Manager.
 
   aws_sns_topic.my_sns_topic:
     monthly_requests: 1000000 # Monthly requests to SNS.
-    request_size_kb: 64       # Size of the requests to SNS, SNS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+    request_size_kb: 64       # Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
 
   aws_sns_topic_subscription.my_topic_subscription:
     monthly_requests: 1000000 # Monthly requests to SNS.
-    request_size_kb: 64       # Size of the requests to SNS, SNS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+    request_size_kb: 64       # Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
 
   aws_sqs_queue.my_queue:
     monthly_requests: 1000000 # Monthly requests to SQS.
-    request_size_kb: 64       # Size of the requests to SQS, SQS bills in 64KB chunks. So if you process 1,000,000 requests at 128KB you pay for 2,000,000 requests.
+    request_size_kb: 64       # Size of requests to SQS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
 
   aws_ssm_parameter.my_ssm_parameter:
-    api_throughput_limit: advanced    # SSM Parameter Throughput limit, can be: advanced, higher.
+    api_throughput_limit: standard    # SSM Parameter Throughput limit, can be: standard, advanced, higher.
     monthly_api_interactions: 1000000 # Monthly API interactions.
     parameter_storage_hrs: 730        # Number of hours in the month parameters will be stored for.
 
   aws_ssm_activation.my_activations:
-    instance_tier: advanced # Instance tier being used, can be: advanced, standard.
+    instance_tier: standard # Instance tier being used, can be: standard, advanced.
     instances: 100          # Number of instances being managed.
 
   aws_vpc_endpoint.my_endpoint:
@@ -128,46 +270,46 @@ resource_usage:
     monthly_data_processed_gb: 100 # Monthly data processed through a transit gateway attached to your VPN Connection in GB.
 
   aws_cloudfront_distribution.my_s3_distribution:
-    monthly_data_transfer_to_internet_gb: # Monthly regional data transfer out to internet in GB.
-      us: 51200000          # United States, Mexico, & Canada
-      europe: 220000        # Europe & Israel
-      south_africa: 10000   # South Africa, Kenya, & Middle East
+    monthly_data_transfer_to_internet_gb: # Monthly regional data transfer out to internet from the following, in GB:
+      us: 51200000          # United States, Mexico, Canada
+      europe: 220000        # Europe, Israel
+      south_africa: 10000   # South Africa, Kenya, Middle East
       south_america: 50000  # South America
       japan: 387000         # Japan
-      australia: 500000     # Australia & New Zealand
-      asia_pacific: 1200000 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      australia: 500000     # Australia, New Zealand
+      asia_pacific: 1200000 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
       india: 200000         # India
-    monthly_data_transfer_to_origin_gb: # Monthly regional data transfer out to origin in GB.
-      us: 2200           # United States, Mexico, & Canada
-      europe: 1000       # Europe & Israel
-      south_africa: 300  # South Africa, Kenya, & Middle East
+    monthly_data_transfer_to_origin_gb: # Monthly regional data transfer out to origin from the following, in GB:
+      us: 2200           # United States, Mexico, Canada
+      europe: 1000       # Europe, Israel
+      south_africa: 300  # South Africa, Kenya, Middle East
       south_america: 200 # South America
       japan: 10          # Japan
-      australia: 100     # Australia & New Zealand
-      asia_pacific: 30   # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      australia: 100     # Australia, New Zealand
+      asia_pacific: 30   # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
       india: 80          # India
-    monthly_http_requests: # Monthly number of HTTP requests.
-      us: 80000            # United States, Mexico, & Canada
-      europe: 40000        # Europe & Israel
-      south_africa: 20000  # South Africa, Kenya, & Middle East
+    monthly_http_requests: # Monthly number of HTTP requests to:
+      us: 80000            # United States, Mexico, Canada
+      europe: 40000        # Europe, Israel
+      south_africa: 20000  # South Africa, Kenya, Middle East
       south_america: 10000 # South America
       japan: 3000          # Japan
-      australia: 15000     # Australia & New Zealand
-      asia_pacific: 45000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      australia: 15000     # Australia, New Zealand
+      asia_pacific: 45000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
       india: 10000         # India
-    monthly_https_requests: # Monthly number of HTTPS requests.
-      us: 180000           # United States, Mexico, & Canada
-      europe: 10000        # Europe & Israel
-      south_africa: 50000  # South Africa, Kenya, & Middle East
+    monthly_https_requests: # Monthly number of HTTPS requests to:
+      us: 180000           # United States, Mexico, Canada
+      europe: 10000        # Europe, Israel
+      south_africa: 50000  # South Africa, Kenya, Middle East
       south_america: 30000 # South America
       japan: 1000          # Japan
-      australia: 45000     # Australia & New Zealand
-      asia_pacific: 25000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, & Thailand
+      australia: 45000     # Australia, New Zealand
+      asia_pacific: 25000  # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
       india: 30000         # India
-    monthly_shield_requests: # Monthly number of shield requests.
+    monthly_shield_requests: # Monthly number of shield requests to:
       us: 90000          # United States
       europe: 30000      # Europe
-      south_america: 200 # South Amarica
+      south_america: 200 # South America
       japan: 12300       # Japan
       australia: 2300    # Australia
       singapore: 58600   # Singapore
@@ -201,12 +343,49 @@ resource_usage:
   google_container_node_pool.my_node_pool:
     nodes: 4 # Node count per zone for the node pool
 
+  google_compute_image.my_image: 
+    storage_gb: 1000 # Total size of image storage in GB.
+
+  google_compute_machine_image.my_machine_image: 
+    storage_gb: 1000 # Total size of machine image storage in GB.
+
+  google_compute_snapshot.my_snapshot:
+    storage_gb: 500 # Total size of snapshot disk storage in GB.
+
   google_dns_record_set.my_record_set:
     monthly_queries:  1000000 # Monthly DNS queries.
 
   google_kms_crypto_key.my_keys:
     key_versions: 10000             # Number of key versions.
     monthly_key_operations: 1000000 # Monthly number of key operations.
+
+  google_logging_billing_account_bucket_config.my_config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_billing_account_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_folder_bucket_config.my_config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_folder_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_organization_bucket_config.my.config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_organization_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_project_bucket_config.my_config:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_logging_project_sink.my_sink:
+    monthly_logging_data_gb: 100  # Monthly logging data in GB.
+
+  google_monitoring_metric_descriptor.my_monitoring:
+    monthly_monitoring_data_mb: 5000 # Monthly monitoring data in MB (only for chargeable metrics).
+    monthly_api_calls: 1000000       # Monthly read API calls (write calls are free).
 
   google_pubsub_subscription.my_subscription:
     monthly_message_data_tb: 7.416 # Monthly amount of message data pulled by the subscription in TB.
@@ -221,3 +400,9 @@ resource_usage:
     monthly_class_a_operations: 40000 # Monthly number of class A operations (object adds, bucket/object list).
     monthly_class_b_operations: 20000 # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
     monthly_data_retrieval_gb: 500    # Monthly amount of data retrieved in GB.
+    monthly_egress_data_transfer_gb:  # Monthly data transfer from Cloud Storage to the following, in GB:
+      same_continent: 550  # Same continent.
+      worldwide: 12500     # Worldwide excluding Asia, Australia.
+      asia: 1500           # Asia excluding China, but including Hong Kong.
+      china: 50            # China excluding Hong Kong.
+      australia: 250       # Australia.

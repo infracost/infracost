@@ -20,6 +20,21 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 
 	instanceType := d.Get("instance_class").String()
 
+	var storageRate *decimal.Decimal
+	if u != nil && u.Get("data_storage_gb").Exists() {
+		storageRate = decimalPtr(decimal.NewFromInt(u.Get("data_storage_gb").Int()))
+	}
+
+	var ioRequests *decimal.Decimal
+	if u != nil && u.Get("monthly_io_request").Exists() {
+		ioRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_io_request").Int()))
+	}
+
+	var cpuCreditsT3 *decimal.Decimal
+	if u != nil && u.Get("monthly_cpu_credit_hours").Exists() {
+		cpuCreditsT3 = decimalPtr(decimal.NewFromInt(u.Get("monthly_cpu_credit_hours").Int()))
+	}
+
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           fmt.Sprintf("Database instance (%s, %s)", "on-demand", instanceType),
@@ -40,9 +55,10 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 			},
 		},
 		{
-			Name:           "Storage",
-			Unit:           "GB-months",
-			UnitMultiplier: 1,
+			Name:            "Storage",
+			Unit:            "GB-months",
+			UnitMultiplier:  1,
+			MonthlyQuantity: storageRate,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -57,9 +73,10 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 			},
 		},
 		{
-			Name:           "I/O",
-			Unit:           "requests",
-			UnitMultiplier: 1000000,
+			Name:            "I/O",
+			Unit:            "requests",
+			UnitMultiplier:  1000000,
+			MonthlyQuantity: ioRequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -70,27 +87,14 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 				},
 			},
 		},
-		{
-			Name:           "Backup storage",
-			Unit:           "GB-months",
-			UnitMultiplier: 1,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonDocDB"),
-				ProductFamily: strPtr("Storage Snapshot"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", Value: strPtr("BackupUsage")},
-				},
-			},
-		},
 	}
 
 	if strings.HasPrefix(instanceType, "db.t3.") {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:           "CPU credits",
-			Unit:           "vCPU-hours",
-			UnitMultiplier: 1,
+			Name:            "CPU credits",
+			Unit:            "vCPU-hours",
+			UnitMultiplier:  1,
+			MonthlyQuantity: cpuCreditsT3,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),

@@ -14,8 +14,20 @@ func GetComputeImageRegistryItem() *schema.RegistryItem {
 }
 
 func NewComputeImage(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	// Not yet implemented, but added here so that the references can be used for google_compute_disk
-	return nil
+	region := d.Get("region").String()
+	description := "Storage Image"
+
+	var storageSize *decimal.Decimal
+	if computeImageDiskSize(d) != nil {
+		storageSize = computeImageDiskSize(d)
+	} else if u != nil && u.Get("storage_gb").Exists() {
+		storageSize = decimalPtr(decimal.NewFromInt(u.Get("storage_gb").Int()))
+	}
+
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: storageImage(region, description, storageSize),
+	}
 }
 
 func computeImageDiskSize(d *schema.ResourceData) *decimal.Decimal {
@@ -36,4 +48,24 @@ func computeImageDiskSize(d *schema.ResourceData) *decimal.Decimal {
 	}
 
 	return nil
+}
+
+func storageImage(region string, description string, storageSize *decimal.Decimal) []*schema.CostComponent {
+	return []*schema.CostComponent{
+		{
+			Name:            "Storage",
+			Unit:            "GB-months",
+			UnitMultiplier:  1,
+			MonthlyQuantity: storageSize,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("gcp"),
+				Region:        strPtr(region),
+				Service:       strPtr("Compute Engine"),
+				ProductFamily: strPtr("Storage"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "description", Value: strPtr(description)},
+				},
+			},
+		},
+	}
 }

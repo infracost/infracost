@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 )
 
@@ -15,111 +16,30 @@ func GetAPIGatewayRestAPIRegistryItem() *schema.RegistryItem {
 func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
-	var apiTierRequests = map[string]decimal.Decimal{
-		"tierOne":   decimal.Zero,
-		"tierTwo":   decimal.Zero,
-		"tierThree": decimal.Zero,
-		"tierFour":  decimal.Zero,
-	}
-
-	monthlyRequests := decimal.Zero
+	var costComponents []*schema.CostComponent
+	var monthlyRequests *decimal.Decimal
 
 	if u != nil && u.Get("monthly_requests").Exists() {
-		monthlyRequests = decimal.NewFromInt(u.Get("monthly_requests").Int())
-	}
+		monthlyRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_requests").Int()))
 
-	apiRequestQuantities := calculateAPIRequests(monthlyRequests, apiTierRequests)
+		requestLimits := []int{333000000, 667000000, 19000000000}
+		apiRequestQuantities := usage.CalculateTierBuckets(*monthlyRequests, requestLimits)
 
-	tierOne := apiRequestQuantities["tierOne"]
-	tierTwo := apiRequestQuantities["tierTwo"]
-	tierThree := apiRequestQuantities["tierThree"]
-	tierFour := apiRequestQuantities["tierFour"]
+		costComponents = append(costComponents, restAPICostComponent(region, "Requests (first 333M)", "0", &apiRequestQuantities[0]))
 
-	costComponents := []*schema.CostComponent{
-		{
-			Name:            "Requests (first 333M)",
-			Unit:            "requests",
-			UnitMultiplier:  1000000,
-			MonthlyQuantity: &tierOne,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonApiGateway"),
-				ProductFamily: strPtr("API Calls"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("0"),
-				EndUsageAmount:   strPtr("333000000"),
-			},
-		},
-	}
+		if apiRequestQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
+			costComponents = append(costComponents, restAPICostComponent(region, "Requests (next 667M)", "333000000", &apiRequestQuantities[1]))
+		}
 
-	if tierTwo.GreaterThan(decimal.NewFromInt(0)) {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Requests (next 667M)",
-			Unit:            "requests",
-			UnitMultiplier:  10000000,
-			MonthlyQuantity: &tierTwo,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonApiGateway"),
-				ProductFamily: strPtr("API Calls"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("333000000"),
-				EndUsageAmount:   strPtr("1000000000"),
-			},
-		})
-	}
+		if apiRequestQuantities[2].GreaterThan(decimal.NewFromInt(0)) {
+			costComponents = append(costComponents, restAPICostComponent(region, "Requests (next 19B)", "1000000000", &apiRequestQuantities[2]))
+		}
 
-	if tierThree.GreaterThan(decimal.NewFromInt(0)) {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Requests (next 19B)",
-			Unit:            "requests",
-			UnitMultiplier:  10000000,
-			MonthlyQuantity: &tierThree,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonApiGateway"),
-				ProductFamily: strPtr("API Calls"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("1000000000"),
-				EndUsageAmount:   strPtr("20000000000"),
-			},
-		})
-	}
-
-	if tierFour.GreaterThan(decimal.NewFromInt(0)) {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Requests (over 20B)",
-			Unit:            "requests",
-			UnitMultiplier:  10000000,
-			MonthlyQuantity: &tierFour,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonApiGateway"),
-				ProductFamily: strPtr("API Calls"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("20000000000"),
-			},
-		})
+		if apiRequestQuantities[3].GreaterThan(decimal.NewFromInt(0)) {
+			costComponents = append(costComponents, restAPICostComponent(region, "Requests (over 20B)", "20000000000", &apiRequestQuantities[3]))
+		}
+	} else {
+		costComponents = append(costComponents, restAPICostComponent(region, "Requests (first 333M)", "0", monthlyRequests))
 	}
 
 	return &schema.Resource{
@@ -128,38 +48,23 @@ func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	}
 }
 
-func calculateAPIRequests(requests decimal.Decimal, tiers map[string]decimal.Decimal) map[string]decimal.Decimal {
-	// API gateway charging tiers
-	apiTierOneLimit := decimal.NewFromInt(333000000)
-	apiTierTwoLimit := decimal.NewFromInt(667000000)
-	apiTierThreeLimit := decimal.NewFromInt(20000000000)
-	apiTierFourLimit := decimal.NewFromInt(21000000000)
-
-	if requests.GreaterThanOrEqual(apiTierOneLimit) {
-		tiers["tierOne"] = apiTierOneLimit
-	} else {
-		tiers["tierOne"] = requests
-		return tiers
+func restAPICostComponent(region string, displayName string, usageTier string, quantity *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            displayName,
+		Unit:            "requests",
+		UnitMultiplier:  1000000,
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonApiGateway"),
+			ProductFamily: strPtr("API Calls"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/ApiGatewayRequest/")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr(usageTier),
+		},
 	}
-
-	if requests.GreaterThanOrEqual(apiTierTwoLimit) {
-		tiers["tierTwo"] = apiTierTwoLimit
-	} else {
-		tiers["tierTwo"] = requests.Sub(apiTierOneLimit)
-		return tiers
-	}
-
-	if requests.GreaterThanOrEqual(apiTierThreeLimit) {
-		tiers["tierThree"] = apiTierThreeLimit
-	} else {
-		tiers["tierThree"] = requests.Sub(apiTierTwoLimit.Add(apiTierOneLimit))
-		return tiers
-	}
-
-	if requests.GreaterThanOrEqual(apiTierFourLimit) {
-		tiers["tierFour"] = requests.Sub(apiTierFourLimit)
-		return tiers
-	}
-
-	return tiers
 }

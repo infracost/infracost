@@ -8,13 +8,20 @@ import (
 
 func GetDXGatewayAssociationRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_dx_gateway_association",
-		RFunc: NewDXGatewayAssociation,
+		Name:                "aws_dx_gateway_association",
+		RFunc:               NewDXGatewayAssociation,
+		ReferenceAttributes: []string{"associated_gateway_id"},
 	}
 }
 
 func NewDXGatewayAssociation(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
+
+	// Try to get the region from the associated gateway
+	assocGateway := d.References("associated_gateway_id")
+	if len(assocGateway) > 0 {
+		region = assocGateway[0].Get("region").String()
+	}
 
 	var gbDataProcessed *decimal.Decimal
 

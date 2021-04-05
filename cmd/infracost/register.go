@@ -6,14 +6,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
 type createAPIKeyResponse struct {
@@ -21,11 +22,12 @@ type createAPIKeyResponse struct {
 	Error  string `json:"error"`
 }
 
-func registerCmd(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "register",
-		Usage: "Register for an Infracost API key",
-		Action: func(c *cli.Context) error {
+func registerCmd(cfg *config.Config) *cobra.Command {
+	return &cobra.Command{
+		Use:   "register",
+		Short: "Register for a free Infracost API key",
+		Long:  "Register for a free Infracost API key",
+		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Please enter your name and email address to get an API key.")
 			fmt.Println("See our FAQ (https://www.infracost.io/docs/faq) for more details.")
 
@@ -47,21 +49,16 @@ func registerCmd(cfg *config.Config) *cli.Command {
 			}
 
 			if r.Error != "" {
-				color.Red("There was an error requesting an API key:\n%s\n", r.Error)
-				fmt.Println("Please contact hello@infracost.io if you continue to have issues.")
+				fmt.Fprintln(os.Stderr, "")
+				ui.PrintErrorf("There was an error requesting an API key\n%s\nPlease contact hello@infracost.io if you continue to have issues.", r.Error)
 				return nil
 			}
 
 			fmt.Printf("\nThank you %s!\nYour API key is: %s\n", name, r.APIKey)
 
-			green := color.New(color.FgGreen)
-			bold := color.New(color.Bold, color.FgHiWhite)
-
-			msg := fmt.Sprintf("\n%s\n%s %s %s\n",
-				green.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
-				green.Sprint("You can now run"),
-				bold.Sprint("`infracost`"),
-				green.Sprint("in your Terraform code directory."),
+			msg := fmt.Sprintf("%s\nYou can now run %s and point to your Terraform directory or JSON/plan file.",
+				fmt.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
+				ui.PrimaryString("infracost breakdown --path=..."),
 			)
 
 			saveAPIKey := true
@@ -75,11 +72,12 @@ func registerCmd(cfg *config.Config) *cli.Command {
 
 				if !confirm {
 					saveAPIKey = false
-					msg = fmt.Sprintf("\n%s\n%s %s %s\n",
-						green.Sprint("Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml."),
-						green.Sprint("You can now run"),
-						bold.Sprint("`infracost`"),
-						green.Sprint("in your Terraform code directory."),
+
+					msg = fmt.Sprintf("%s\n%s %s %s",
+						"Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml.",
+						"You can now run",
+						ui.PrimaryString("infracost breakdown --path=..."),
+						"and point to your Terraform directory or JSON/plan file.",
 					)
 				}
 			}
@@ -95,7 +93,8 @@ func registerCmd(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			fmt.Print(msg)
+			fmt.Println("")
+			ui.PrintSuccess(msg)
 
 			return nil
 		},
