@@ -24,6 +24,8 @@ examples/*/plan.save
 examples/*/tfplan.binary
 examples/*/plan.json
 examples/*/.terraform.lock.hcl
+examples/*/example.json
+examples/*/example.save
 
 # Test artifacts
 .test_cache
