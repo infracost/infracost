@@ -30,7 +30,7 @@ const (
 	String
 )
 
-type UsageSchemaItem struct {
+type SchemaItem struct {
 	Key          string
 	ValueType    VariableType
 	DefaultValue interface{}
@@ -62,7 +62,7 @@ func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema
 	return nil
 }
 
-func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*UsageSchemaItem, existingUsageData map[string]*schema.UsageData) yaml.MapSlice {
+func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*SchemaItem, existingUsageData map[string]*schema.UsageData) yaml.MapSlice {
 	syncedResourceUsage := make(map[string]interface{})
 	for _, resource := range resources {
 		resourceName := resource.Name
@@ -95,15 +95,15 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 	return result
 }
 
-func loadUsageSchema() (map[string][]*UsageSchemaItem, error) {
-	usageSchema := make(map[string][]*UsageSchemaItem)
+func loadUsageSchema() (map[string][]*SchemaItem, error) {
+	usageSchema := make(map[string][]*SchemaItem)
 	usageData, err := loadReferenceFile()
 	if err != nil {
 		return usageSchema, err
 	}
 	for _, resUsageData := range usageData {
 		resourceTypeName := strings.Split(resUsageData.Address, ".")[0]
-		usageSchema[resourceTypeName] = make([]*UsageSchemaItem, 0)
+		usageSchema[resourceTypeName] = make([]*SchemaItem, 0)
 		for usageKeyName, usageRawResult := range resUsageData.Attributes {
 			var defaultValue interface{}
 			usageValueType := Int64
@@ -113,7 +113,7 @@ func loadUsageSchema() (map[string][]*UsageSchemaItem, error) {
 				usageValueType = String
 				defaultValue = usageRawResult.String()
 			}
-			usageSchema[resourceTypeName] = append(usageSchema[resourceTypeName], &UsageSchemaItem{
+			usageSchema[resourceTypeName] = append(usageSchema[resourceTypeName], &SchemaItem{
 				Key:          usageKeyName,
 				ValueType:    usageValueType,
 				DefaultValue: defaultValue,
@@ -175,12 +175,13 @@ func LoadFromFile(usageFilePath string, createIfNotExisting bool) (map[string]*s
 	usageData := make(map[string]*schema.UsageData)
 
 	if usageFilePath == "" {
+		log.Warn("Can't sync usage file as it's not specified")
 		return usageData, nil
 	}
 
 	if createIfNotExisting {
 		if _, err := os.Stat(usageFilePath); os.IsNotExist(err) {
-			log.Warn("Specified usage file does not exist. It will be created")
+			log.Debug("Specified usage file does not exist. It will be created")
 			fileContent := yaml.MapSlice{
 				{Key: "version", Value: "0.1"},
 				{Key: "resource_usage", Value: make(map[string]interface{})},
