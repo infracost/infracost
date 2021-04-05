@@ -245,6 +245,8 @@ func checkRunConfig(cfg *config.Config) error {
 		}
 		if len(missingUsageFile) == 1 {
 			ui.PrintWarning("Ignoring sync-usage-file as no usage-file is specified.\n")
+		} else if len(missingUsageFile) == len(cfg.Projects) {
+			ui.PrintWarning("Ignoring sync-usage-file since no projects have a usage-file specified.\n")
 		} else if len(missingUsageFile) > 1 {
 			ui.PrintWarning(fmt.Sprintf("Ignoring sync-usage-file for following projects as no usage-file is specified for them: %s.\n", strings.Join(missingUsageFile, ", ")))
 		}
