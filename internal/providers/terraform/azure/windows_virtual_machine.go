@@ -15,17 +15,25 @@ func GetAzureRMWindowsVirtualMachineRegistryItem() *schema.RegistryItem {
 		Name:  "azurerm_windows_virtual_machine",
 		RFunc: NewAzureRMWindowsVirtualMachine,
 		Notes: []string{
-			"Costs associated with Windows Server virtual machines.",
-			"Only Standard machine types are currently supported.",
-			"Only Pay-As-You-Go consumption prices are currently supported (No BYOL).",
+			"Non-standard images such as RHEL are not supported.",
+			"Low priority, Spot and Reserved instances are not supported.",
 		},
 	}
 }
 
 func NewAzureRMWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := d.Get("location").String()
+
+	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(d)}
+	subResources := make([]*schema.Resource, 0)
+	if len(d.Get("os_disk").Array()) > 0 {
+		subResources = append(subResources, osDiskSubResource(region, d.Get("os_disk").Array()[0], u))
+	}
+
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: []*schema.CostComponent{windowsVirtualMachineCostComponent(d)},
+		CostComponents: costComponents,
+		SubResources:   subResources,
 	}
 }
 
@@ -37,7 +45,7 @@ func windowsVirtualMachineCostComponent(d *schema.ResourceData) *schema.CostComp
 
 	productNameRe := "/Virtual Machines .* Series Windows$/"
 	if strings.HasPrefix(size, "Basic_") {
-		productNameRe = "/Virtual Machines .* Series Basic Windows $/"
+		productNameRe = "/Virtual Machines .* Series Basic Windows$/"
 	}
 
 	// Handle Azure Hybrid Benefit
@@ -47,8 +55,10 @@ func windowsVirtualMachineCostComponent(d *schema.ResourceData) *schema.CostComp
 		purchaseOptionLabel = "hybrid benefit"
 	}
 
+	skuName := parseVMSKUName(size)
+
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, parseInstanceType(size)),
+		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, skuName),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -60,6 +70,7 @@ func windowsVirtualMachineCostComponent(d *schema.ResourceData) *schema.CostComp
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "armSkuName", Value: strPtr(size)},
 				{Key: "productName", ValueRegex: strPtr(productNameRe)},
+				{Key: "skuName", Value: strPtr(skuName)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

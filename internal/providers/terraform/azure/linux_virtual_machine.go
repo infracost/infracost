@@ -15,18 +15,25 @@ func GetAzureRMLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
 		Name:  "azurerm_linux_virtual_machine",
 		RFunc: NewAzureRMLinuxVirtualMachine,
 		Notes: []string{
-			"Costs associated with standard Linux images.",
-			"Non-Standard images such as RHEL are not supported.",
-			"Only Standard machine types are currently supported.",
-			"Only Pay-As-You-Go consumption prices are currently supported.",
+			"Non-standard images such as RHEL are not supported.",
+			"Low priority, Spot and Reserved instances are not supported.",
 		},
 	}
 }
 
 func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := d.Get("location").String()
+
+	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(d)}
+	subResources := make([]*schema.Resource, 0)
+	if len(d.Get("os_disk").Array()) > 0 {
+		subResources = append(subResources, osDiskSubResource(region, d.Get("os_disk").Array()[0], u))
+	}
+
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: []*schema.CostComponent{linuxVirtualMachineCostComponent(d)},
+		CostComponents: costComponents,
+		SubResources:   subResources,
 	}
 }
 
@@ -41,8 +48,10 @@ func linuxVirtualMachineCostComponent(d *schema.ResourceData) *schema.CostCompon
 		productNameRe = "/Virtual Machines .* Series Basic$/"
 	}
 
+	skuName := parseVMSKUName(size)
+
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, parseInstanceType(size)),
+		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, skuName),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -54,6 +63,7 @@ func linuxVirtualMachineCostComponent(d *schema.ResourceData) *schema.CostCompon
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "armSkuName", Value: strPtr(size)},
 				{Key: "productName", ValueRegex: strPtr(productNameRe)},
+				{Key: "skuName", Value: strPtr(skuName)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

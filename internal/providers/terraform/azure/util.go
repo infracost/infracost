@@ -1,8 +1,6 @@
 package azure
 
 import (
-	"strings"
-
 	"github.com/shopspring/decimal"
 )
 
@@ -24,16 +22,4 @@ func regexMustNotContain(s string) string {
 // This function is case insensitive.
 func regexMustContain(s string) string {
 	return "/" + s + "/i"
-}
-
-// Parse from Terraform size value to Azure instance type value.
-func parseInstanceType(size string) string {
-	s := strings.ReplaceAll(size, "Standard_", "")
-	s = strings.ReplaceAll(s, "Basic_", "")
-	s = strings.ReplaceAll(s, "_", " ")
-
-	if strings.HasPrefix(size, "Basic_") {
-		return "Basic " + s
-	}
-	return s
 }

@@ -17,8 +17,9 @@ import (
 // These show differently in the plan JSON for Terraform 0.12 and 0.13.
 var infracostProviderNames = []string{"infracost", "registry.terraform.io/infracost/infracost"}
 var defaultProviderRegions = map[string]string{
-	"aws":    "us-east-1",
-	"google": "us-central1",
+	"aws":     "us-east-1",
+	"google":  "us-central1",
+	"azurerm": "eastus",
 }
 
 // ARN attribute mapping for resources that don't have a standard 'arn' attribute
