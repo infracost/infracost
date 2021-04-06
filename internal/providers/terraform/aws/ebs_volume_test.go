@@ -59,7 +59,7 @@ func TestEBSVolume(t *testing.T) {
 			Name: "aws_ebs_volume.gp2",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "General Purpose SSD storage (gp2)",
+					Name:             "Storage (general purpose SSD, gp2)",
 					PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
 				},
@@ -69,7 +69,7 @@ func TestEBSVolume(t *testing.T) {
 			Name: "aws_ebs_volume.standard",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Magnetic storage",
+					Name:             "Storage (magnetic)",
 					PriceHash:        "0ed17ed1777b7be91f5b5ce79916d8d8-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 				},
@@ -84,7 +84,7 @@ func TestEBSVolume(t *testing.T) {
 			Name: "aws_ebs_volume.io1",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Provisioned IOPS SSD storage (io1)",
+					Name:             "Storage (provisioned IOPS SSD, io1)",
 					PriceHash:        "99450513de8c131ee2151e1b319d8143-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(30)),
 				},
@@ -99,7 +99,7 @@ func TestEBSVolume(t *testing.T) {
 			Name: "aws_ebs_volume.io2",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Provisioned IOPS SSD storage (io2)",
+					Name:             "Storage (provisioned IOPS SSD, io2)",
 					PriceHash:        "9e420d5e498eddb54a405d09b89a668e-c86ea75c5a17b237464f7c8cc81c1ab8",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(30)),
 				},
@@ -114,7 +114,7 @@ func TestEBSVolume(t *testing.T) {
 			Name: "aws_ebs_volume.st1",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Throughput Optimized HDD storage (st1)",
+					Name:             "Storage (throughput optimized HDD, st1)",
 					PriceHash:        "eea972b50a795c92487cbcb96e8fdc29-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40)),
 				},
@@ -124,7 +124,7 @@ func TestEBSVolume(t *testing.T) {
 			Name: "aws_ebs_volume.sc1",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Cold HDD storage (sc1)",
+					Name:             "Storage (cold HDD, sc1)",
 					PriceHash:        "3122df29367c2460c76537cccf0eadb5-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(50)),
 				},
@@ -158,7 +158,7 @@ func TestEBSVolume_GP3(t *testing.T) {
 			Name: "aws_ebs_volume.gp3",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "General Purpose SSD storage (gp3)",
+					Name:             "Storage (general purpose SSD, gp3)",
 					PriceHash:        "b7a83d535d47fcfd1be68ec37f046b3d-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40)),
 				},
@@ -202,7 +202,7 @@ func TestEBSStandardVolume_usage(t *testing.T) {
 			Name: "aws_ebs_volume.standard",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:             "Magnetic storage",
+					Name:             "Storage (magnetic)",
 					PriceHash:        "0ed17ed1777b7be91f5b5ce79916d8d8-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 				},

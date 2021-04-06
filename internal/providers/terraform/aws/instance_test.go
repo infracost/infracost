@@ -71,7 +71,7 @@ func TestInstance(t *testing.T) {
 					Name: "root_block_device",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "General Purpose SSD storage (gp2)",
+							Name:            "Storage (general purpose SSD, gp2)",
 							PriceHash:       "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
 						},
@@ -81,7 +81,7 @@ func TestInstance(t *testing.T) {
 					Name: "ebs_block_device[0]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "General Purpose SSD storage (gp2)",
+							Name:            "Storage (general purpose SSD, gp2)",
 							PriceHash:       "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
 						},
@@ -91,7 +91,7 @@ func TestInstance(t *testing.T) {
 					Name: "ebs_block_device[1]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Magnetic storage",
+							Name:            "Storage (magnetic)",
 							PriceHash:       "0ed17ed1777b7be91f5b5ce79916d8d8-ee3dd7e4624338037ca6fea0933a662f",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 						},
@@ -106,7 +106,7 @@ func TestInstance(t *testing.T) {
 					Name: "ebs_block_device[2]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Cold HDD storage (sc1)",
+							Name:            "Storage (cold HDD, sc1)",
 							PriceHash:       "3122df29367c2460c76537cccf0eadb5-ee3dd7e4624338037ca6fea0933a662f",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(30)),
 						},
@@ -116,7 +116,7 @@ func TestInstance(t *testing.T) {
 					Name: "ebs_block_device[3]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Provisioned IOPS SSD storage (io1)",
+							Name:            "Storage (provisioned IOPS SSD, io1)",
 							PriceHash:       "99450513de8c131ee2151e1b319d8143-ee3dd7e4624338037ca6fea0933a662f",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(40)),
 						},
@@ -131,7 +131,7 @@ func TestInstance(t *testing.T) {
 					Name: "ebs_block_device[4]",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "General Purpose SSD storage (gp3)",
+							Name:            "Storage (general purpose SSD, gp3)",
 							PriceHash:       "b7a83d535d47fcfd1be68ec37f046b3d-ee3dd7e4624338037ca6fea0933a662f",
 							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 						},

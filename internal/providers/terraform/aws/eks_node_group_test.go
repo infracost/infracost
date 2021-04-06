@@ -44,7 +44,7 @@ func TestEKSNodeGroup_default(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "General Purpose SSD storage (gp2)",
+					Name:             "Storage (general purpose SSD, gp2)",
 					PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 				},
@@ -87,7 +87,7 @@ func TestEKSNodeGroup_disk_size_instance_type(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "General Purpose SSD storage (gp2)",
+					Name:             "Storage (general purpose SSD, gp2)",
 					PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(30)),
 				},
@@ -227,7 +227,7 @@ func TestEKSNodeGroup_launch_template(t *testing.T) {
 							Name: "root_block_device",
 							CostComponentChecks: []testutil.CostComponentCheck{
 								{
-									Name:             "General Purpose SSD storage (gp2)",
+									Name:             "Storage (general purpose SSD, gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(24)),
 								},
@@ -237,7 +237,7 @@ func TestEKSNodeGroup_launch_template(t *testing.T) {
 							Name: "block_device_mapping[0]",
 							CostComponentChecks: []testutil.CostComponentCheck{
 								{
-									Name:             "General Purpose SSD storage (gp2)",
+									Name:             "Storage (general purpose SSD, gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(60)),
 								},
@@ -381,7 +381,7 @@ func TestEKSNodeGroup_launch_template_by_name(t *testing.T) {
 							Name: "root_block_device",
 							CostComponentChecks: []testutil.CostComponentCheck{
 								{
-									Name:             "General Purpose SSD storage (gp2)",
+									Name:             "Storage (general purpose SSD, gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(24)),
 								},
@@ -391,7 +391,7 @@ func TestEKSNodeGroup_launch_template_by_name(t *testing.T) {
 							Name: "block_device_mapping[0]",
 							CostComponentChecks: []testutil.CostComponentCheck{
 								{
-									Name:             "General Purpose SSD storage (gp2)",
+									Name:             "Storage (general purpose SSD, gp2)",
 									PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 									MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(60)),
 								},
@@ -442,7 +442,7 @@ func TestEKSNodeGroup_spot(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:             "General Purpose SSD storage (gp2)",
+					Name:             "Storage (general purpose SSD, gp2)",
 					PriceHash:        "efa8e70ebe004d2e9527fd30d50d09b2-ee3dd7e4624338037ca6fea0933a662f",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 				},
