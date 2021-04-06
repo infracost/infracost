@@ -57,22 +57,22 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 	var name, usageType string
 	switch volumeAPIName {
 	case "standard":
-		name = "Magnetic storage"
+		name = "Storage (magnetic)"
 		usageType = "EBS:VolumeIOUsage"
 	case "io1":
-		name = "Provisioned IOPS SSD storage (io1)"
+		name = "Storage (provisioned IOPS SSD, io1)"
 		usageType = "EBS:VolumeP-IOPS.piops"
 	case "io2":
-		name = "Provisioned IOPS SSD storage (io2)"
+		name = "Storage (provisioned IOPS SSD, io2)"
 		usageType = "EBS:VolumeP-IOPS.io2$"
 	case "st1":
-		name = "Throughput Optimized HDD storage (st1)"
+		name = "Storage (throughput optimized HDD, st1)"
 	case "sc1":
-		name = "Cold HDD storage (sc1)"
+		name = "Storage (cold HDD, sc1)"
 	case "gp3":
-		name = "General Purpose SSD storage (gp3)"
+		name = "Storage (general purpose SSD, gp3)"
 	default:
-		name = "General Purpose SSD storage (gp2)"
+		name = "Storage (general purpose SSD, gp2)"
 	}
 
 	costComponents := []*schema.CostComponent{
