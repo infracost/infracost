@@ -66,7 +66,9 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 	syncedResourceUsage := make(map[string]interface{})
 	for _, resource := range resources {
 		resourceName := resource.Name
-		resourceTypeName := strings.Split(resourceName, ".")[0]
+		resourceTypeNames := strings.Split(resourceName, ".")
+		// This handles module names appearing in the resourceName too
+		resourceTypeName := resourceTypeNames[len(resourceTypeNames)-2]
 		resourceUSchema, ok := usageSchema[resourceTypeName]
 		if !ok {
 			continue
