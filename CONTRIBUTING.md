@@ -32,6 +32,13 @@ Running all tests takes ~12mins on GitHub Actions so it's faster to only run you
 make test
 ```
 
+Run tests for a file you added/changed with `-v` and debug log level so you can see and fix any warnings:
+```sh
+INFRACOST_LOG_LEVEL=warn go test -v internal/providers/terraform/aws/ebs_volume_test.go
+
+time="2021-04-05T15:24:16Z" level=warning msg="Multiple prices found for aws_ebs_volume.gp3 Provisioned throughput, using the first price"
+```
+
 Exclude integration tests:
 ```sh
 make test ARGS="-v -short"

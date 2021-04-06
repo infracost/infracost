@@ -136,6 +136,9 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 							{Key: "usagetype", ValueRegex: strPtr("/VolumeP-Throughput.gp3/")},
 						},
 					},
+					PriceFilter: &schema.PriceFilter{
+						Unit: strPtr("MiBps-Mo"),
+					},
 				})
 
 			}

@@ -87,7 +87,8 @@ func NewContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
-				EndUsageAmount: strPtr(""),
+				StartUsageAmount: strPtr("0"),
+				EndUsageAmount:   strPtr(""),
 			},
 		},
 	}

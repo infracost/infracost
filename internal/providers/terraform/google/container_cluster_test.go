@@ -137,7 +137,7 @@ func TestContainerCluster(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:            "Cluster management fee",
-					PriceHash:       "8f899c90440972565d0f2d5b8ff11ae0-75ba4eb307fdd3d2d30cb3abe7436559",
+					PriceHash:       "8f899c90440972565d0f2d5b8ff11ae0-ef2cadbde566a742ff14834f883bcb8a",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 			},
@@ -218,7 +218,7 @@ func TestContainerCluster(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:            "Cluster management fee",
-					PriceHash:       "8f899c90440972565d0f2d5b8ff11ae0-75ba4eb307fdd3d2d30cb3abe7436559",
+					PriceHash:       "8f899c90440972565d0f2d5b8ff11ae0-ef2cadbde566a742ff14834f883bcb8a",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 			},
@@ -257,7 +257,7 @@ func TestContainerCluster(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:            "Cluster management fee",
-					PriceHash:       "8f899c90440972565d0f2d5b8ff11ae0-75ba4eb307fdd3d2d30cb3abe7436559",
+					PriceHash:       "8f899c90440972565d0f2d5b8ff11ae0-ef2cadbde566a742ff14834f883bcb8a",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 			},
@@ -536,7 +536,7 @@ func TestContainerCluster_usage(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:            "Cluster management fee",
-					PriceHash:       "8f899c90440972565d0f2d5b8ff11ae0-75ba4eb307fdd3d2d30cb3abe7436559",
+					PriceHash:       "8f899c90440972565d0f2d5b8ff11ae0-ef2cadbde566a742ff14834f883bcb8a",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 			},
@@ -617,7 +617,7 @@ func TestContainerCluster_usage(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:            "Cluster management fee",
-					PriceHash:       "8f899c90440972565d0f2d5b8ff11ae0-75ba4eb307fdd3d2d30cb3abe7436559",
+					PriceHash:       "8f899c90440972565d0f2d5b8ff11ae0-ef2cadbde566a742ff14834f883bcb8a",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 			},
