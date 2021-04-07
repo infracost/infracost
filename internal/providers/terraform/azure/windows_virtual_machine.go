@@ -15,7 +15,6 @@ func GetAzureRMWindowsVirtualMachineRegistryItem() *schema.RegistryItem {
 		Name:  "azurerm_windows_virtual_machine",
 		RFunc: NewAzureRMWindowsVirtualMachine,
 		Notes: []string{
-			"Non-standard images such as RHEL are not supported.",
 			"Low priority, Spot and Reserved instances are not supported.",
 		},
 	}
