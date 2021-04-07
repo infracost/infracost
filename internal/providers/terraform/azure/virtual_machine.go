@@ -142,8 +142,8 @@ func osDiskSubResource(region string, d gjson.Result, u *schema.UsageData) *sche
 	if diskType == "Standard_LRS" || diskType == "StandardSSD_LRS" {
 		var opsQty *decimal.Decimal
 
-		if u != nil && u.Get("os_disk.disk_operations").Exists() {
-			opsQty = decimalPtr(decimal.NewFromInt(u.Get("os_disk.disk_operations").Int()).Div(decimal.NewFromInt(10000)))
+		if u != nil && u.Get("os_disk.monthly_disk_operations").Exists() {
+			opsQty = decimalPtr(decimal.NewFromInt(u.Get("os_disk.monthly_disk_operations").Int()).Div(decimal.NewFromInt(10000)))
 		}
 
 		costComponents = append(costComponents, &schema.CostComponent{
