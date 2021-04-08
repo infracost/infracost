@@ -14,6 +14,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetComputeRouterNATRegistryItem(),
 	GetContainerClusterRegistryItem(),
 	GetContainerNodePoolRegistryItem(),
+	GetContainerRegistryItem(),
 	GetDNSManagedZoneRegistryItem(),
 	GetDNSRecordSetRegistryItem(),
 	GetKMSCryptoKeyRegistryItem(),
