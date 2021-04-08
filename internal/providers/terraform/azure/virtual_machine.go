@@ -14,6 +14,7 @@ var diskSizeMap = map[string][]struct {
 	Name string
 	Size int
 }{
+        // The mapping is from https://docs.microsoft.com/en-us/azure/virtual-machines/disks-types
 	"Standard_LRS": {
 		{"S4", 32},
 		{"S6", 64},
