@@ -60,7 +60,7 @@ func TestParseJSONResources(t *testing.T) {
 		},
 	}
 
-	test_data := `
+	testData := `
 	{
 		"format_version":"0.1",
 		"terraform_version":"0.14.8",
@@ -264,8 +264,7 @@ func TestParseJSONResources(t *testing.T) {
 		}
 	}`
 
-	var parsed gjson.Result
-	parsed = gjson.Parse(test_data)
+	parsed := gjson.Parse(testData)
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_cloudwatch_log_group.array_resource[*]": map[string]interface{}{
@@ -296,6 +295,6 @@ func TestParseJSONResources(t *testing.T) {
 		} else {
 			assert.Equal(t, test.expected.CostComponents[0].MonthlyQuantity, resource.CostComponents[0].MonthlyQuantity)
 		}
-		i += 1
+		i++
 	}
 }
