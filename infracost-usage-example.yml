@@ -412,7 +412,7 @@ resource_usage:
   #
   azurerm_linux_virtual_machine.my_linux_vm:
     os_disk:
-      monthly_disk_operations: 2000000 # The number of disk operations (writes, reads, deletes) using a unit size of 256KiB
+      monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
   azurerm_windows_virtual_machine.my_windows_vm:
     os_disk:
-      monthly_disk_operations: 2000000 # The number of disk operations (writes, reads, deletes) using a unit size of 256KiB
+      monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
