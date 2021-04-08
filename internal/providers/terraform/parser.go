@@ -100,7 +100,12 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 	p.stripDataResources(resData)
 
 	for _, d := range resData {
-		if r := p.createResource(d, usage[d.Address]); r != nil {
+		usageAddress := usage[d.Address]
+
+		if arrayUsageAddress := usage[fmt.Sprintf("%s[*]", strings.Split(d.Address, "[")[0])]; arrayUsageAddress != nil {
+			usageAddress = arrayUsageAddress
+		}
+		if r := p.createResource(d, usageAddress); r != nil {
 			resources = append(resources, r)
 		}
 	}
