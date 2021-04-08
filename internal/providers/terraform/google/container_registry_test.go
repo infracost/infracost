@@ -9,7 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func TestContainerRegistery(t *testing.T) {
+func TestContainerRegistry(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
