@@ -9,7 +9,6 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// todo: add devtest consumption
 func GetAzureRMWindowsVirtualMachineRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_windows_virtual_machine",
