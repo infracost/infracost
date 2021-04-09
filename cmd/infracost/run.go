@@ -38,6 +38,18 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 		provider := providers.Detect(cfg, projectCfg)
 
 		if provider == nil {
+			m := fmt.Sprintf("No such file or directory %s\n\n", ui.DisplayPath(projectCfg.Path))
+			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
+			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
+
+			if cmd.Name() != "diff" {
+				m += "\n - Terraform state JSON file"
+			}
+
+			return errors.New(m)
+		}
+
+		if provider != nil {
 			m := fmt.Sprintf("Could not detect path type for %s\n\n", ui.DisplayPath(projectCfg.Path))
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
