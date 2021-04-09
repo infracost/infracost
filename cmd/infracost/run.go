@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/events"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/providers"
@@ -46,14 +47,14 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 				m += "\n - Terraform state JSON file"
 			}
 
-			return errors.New(m)
+			return events.NewError(errors.New(m), "Could not detect path type")
 		}
 
 		if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 			m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
-			return errors.New(m)
+			return events.NewError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 		}
 
 		m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
