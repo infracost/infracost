@@ -98,7 +98,7 @@ func TestAzureRMLinuxVirtualMachine(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"azurerm_linux_virtual_machine.standard_a2_v2_custom_disk": map[string]interface{}{
-			"os_disk.disk_operations": 20000,
+			"os_disk.monthly_disk_operations": 20000,
 		},
 	})
 
