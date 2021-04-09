@@ -46,7 +46,7 @@ clean:
 	rm -rf build/$(BINARY)*
 
 test:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 20m $(LD_FLAGS) ./... $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./... $(or $(ARGS), -v -cover)
 
 fmt:
 	go fmt ./...
