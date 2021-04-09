@@ -100,7 +100,7 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 	p.stripDataResources(resData)
 
 	for _, d := range resData {
-		usageData := usage[d.Address]
+		var usageData *schema.UsageData
 
 		if ud := usage[d.Address]; ud != nil {
 			usageData = ud
