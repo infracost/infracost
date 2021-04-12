@@ -419,3 +419,13 @@ resource_usage:
       asia: 1500           # Asia excluding China, but including Hong Kong.
       china: 50            # China excluding Hong Kong.
       australia: 250       # Australia.
+
+  #
+  # Terraform AzureRM resources
+  #
+  azurerm_linux_virtual_machine.my_linux_vm:
+    os_disk:
+      monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
+  azurerm_windows_virtual_machine.my_windows_vm:
+    os_disk:
+      monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.

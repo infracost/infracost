@@ -7,6 +7,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/infracost/infracost/internal/providers/terraform/aws"
+	"github.com/infracost/infracost/internal/providers/terraform/azure"
 	"github.com/infracost/infracost/internal/providers/terraform/google"
 )
 
@@ -29,6 +30,13 @@ func GetResourceRegistryMap() *ResourceRegistryMap {
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
 
+		for _, registryItem := range azure.ResourceRegistry {
+			resourceRegistryMap[registryItem.Name] = registryItem
+		}
+		for _, registryItem := range createFreeResources(azure.FreeResources) {
+			resourceRegistryMap[registryItem.Name] = registryItem
+		}
+
 		for _, registryItem := range google.ResourceRegistry {
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
@@ -43,12 +51,13 @@ func GetResourceRegistryMap() *ResourceRegistryMap {
 func GetUsageOnlyResources() []string {
 	r := []string{}
 	r = append(r, aws.UsageOnlyResources...)
+	r = append(r, azure.UsageOnlyResources...)
 	r = append(r, google.UsageOnlyResources...)
 	return r
 }
 
 func HasSupportedProvider(rType string) bool {
-	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_")
+	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_")
 }
 
 func createFreeResources(l []string) []*schema.RegistryItem {
