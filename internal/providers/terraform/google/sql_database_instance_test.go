@@ -16,19 +16,19 @@ func TestNewSQLInstance(t *testing.T) {
 
 	tf := `
 	  resource "google_sql_database" "database" {
-		name     = "my-database"
-		instance = google_sql_database_instance.my_sql_instance.name
-	  }
-	  
-	  resource "google_sql_database_instance" "my_sql_instance" {
-		name   = "my-database-instance"
-		database_version = "SQLSERVER_2017_ENTERPRISE"
-		settings {
-		  tier = "db-f1-micro"
-		  availability_type = "ZONAL"
-		  disk_size = 50
-		}
-	}	  
+			name     = "my-database"
+			instance = google_sql_database_instance.my_sql_instance.name
+			}
+			
+			resource "google_sql_database_instance" "my_sql_instance" {
+			name   = "my-database-instance"
+			database_version = "SQLSERVER_2017_ENTERPRISE"
+			settings {
+				tier = "db-f1-micro"
+				availability_type = "ZONAL"
+				disk_size = 50
+			}
+		}	  
 		
 		resource "google_sql_database_instance" "custom_postgres" {
 			name             = "master-instance"

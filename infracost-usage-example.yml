@@ -396,7 +396,7 @@ resource_usage:
     monthly_message_data_tb: 7.416 # Monthly amount of message data published to the topic in TB.
 
   google_sql_database_instance.my_instance:
-    monthly_backup_gb: 1000 # Total size of backups per month
+    backup_storage_gb: 1000 # Amount of backup storage in GB.
     
   google_storage_bucket.my_storage_bucket:
     storage_gb: 150                   # Total size of bucket in GB.
