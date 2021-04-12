@@ -16,7 +16,9 @@ resource_usage:
   #   request_duration_ms: 600
   #
   # You can use [*] for array of resources to apply usage-values individually to each element of the array.
-  # Specifying an array element have priority.
+  # If an array element (e.g. this[0]) and [*] are specified for a resource, 
+  # only the array element's usage will be applied to that resource.
+  # 
   # Example: 
   # 
   # aws_cloudwatch_log_group.my_log_group[*]:
