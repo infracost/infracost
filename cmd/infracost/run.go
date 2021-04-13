@@ -13,6 +13,7 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/pkg/errors"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -35,22 +36,10 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 	projects := make([]*schema.Project, 0)
 
 	for _, projectCfg := range cfg.Projects {
-		provider := providers.Detect(cfg, projectCfg)
+		provider, err := providers.Detect(cfg, projectCfg)
 
 		if provider == nil {
-			m := fmt.Sprintf("No such file or directory %s\n\n", ui.DisplayPath(projectCfg.Path))
-			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
-
-			if cmd.Name() != "diff" {
-				m += "\n - Terraform state JSON file"
-			}
-
-			return errors.New(m)
-		}
-
-		if provider != nil {
-			m := fmt.Sprintf("Could not detect path type for %s\n\n", ui.DisplayPath(projectCfg.Path))
+			m := fmt.Sprintf("%s\n\n", err)
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
 
