@@ -41,6 +41,7 @@ type Config struct { // nolint:golint
 	Format        string     `yaml:"format,omitempty" ignored:"true"`
 	ShowSkipped   bool       `yaml:"show_skipped,omitempty" ignored:"true"`
 	SyncUsageFile bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
+	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
 }
 
 func init() {
@@ -64,6 +65,7 @@ func DefaultConfig() *Config {
 		Projects: []*Project{{}},
 
 		Format: "table",
+		Fields: []string{"name", "monthly_quantity", "unit", "monthly_cost"},
 	}
 }
 

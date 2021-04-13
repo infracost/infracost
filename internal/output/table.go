@@ -8,6 +8,15 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
+type TableColumns struct {
+	Name            bool
+	Price           bool
+	MonthlyQuantity bool
+	Unit            bool
+	HourlyCost      bool
+	MonthlyCost     bool
+}
+
 func ToTable(out Root, opts Options) ([]byte, error) {
 	s := ""
 
@@ -31,13 +40,15 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 			hasNilCosts = true
 		}
 
-		s += tableForBreakdown(*project.Breakdown)
+		s += tableForBreakdown(*project.Breakdown, opts.Fields)
 		s += "\n"
 
 		if i != len(out.Projects)-1 {
 			s += "\n"
 		}
 	}
+
+	fmt.Println(opts.Fields)
 
 	unsupportedMsg := out.unsupportedResourcesMessage(opts.ShowSkipped)
 
@@ -62,7 +73,18 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 	return []byte(s), nil
 }
 
-func tableForBreakdown(breakdown Breakdown) string {
+func tableForBreakdown(breakdown Breakdown, fields []string) string {
+	columnName := map[string]string{
+		"name":             "Name",
+		"monthly_quantity": "Quantity",
+		"price":            "Price",
+		"unit":             "Unit",
+		"hourly_cost":      "Hourly Cost",
+		"monthly_cost":     "Monthly Cost",
+	}
+
+	fmt.Println(columnName)
+
 	t := table.NewWriter()
 	t.Style().Options.DrawBorder = false
 	t.Style().Options.SeparateColumns = false
@@ -70,19 +92,34 @@ func tableForBreakdown(breakdown Breakdown) string {
 	t.Style().Options.SeparateHeader = false
 	t.Style().Format.Header = text.FormatDefault
 
-	t.SetColumnConfigs([]table.ColumnConfig{
-		{Number: 1, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
-		{Number: 2, Align: text.AlignRight, AlignHeader: text.AlignRight},
-		{Number: 3, Align: text.AlignLeft, AlignHeader: text.AlignLeft},
-		{Number: 4, Align: text.AlignRight, AlignHeader: text.AlignRight},
-	})
+	var columns []table.ColumnConfig
+	var headers table.Row
+	columnNumber := len(fields)
 
-	t.AppendHeader(table.Row{
-		ui.UnderlineString("Name"),
-		ui.UnderlineString("Quantity"),
-		ui.UnderlineString("Unit"),
-		ui.UnderlineString("Monthly Cost"),
-	})
+	for i := 1; i < columnNumber+1; i++ {
+		if i%2 != 0 {
+			columns = append(columns, table.ColumnConfig{
+				Number:      i,
+				Align:       text.AlignLeft,
+				AlignHeader: text.AlignLeft,
+			})
+			headers = append(headers, table.Row{
+				ui.UnderlineString(fields[i-1]),
+			})
+		} else {
+			columns = append(columns, table.ColumnConfig{
+				Number:      i,
+				Align:       text.AlignRight,
+				AlignHeader: text.AlignRight,
+			})
+			headers = append(headers, table.Row{
+				ui.UnderlineString(fields[i-1]),
+			})
+		}
+	}
+
+	t.SetColumnConfigs(columns)
+	t.AppendHeader(headers)
 
 	t.AppendRow(table.Row{"", "", "", ""})
 
