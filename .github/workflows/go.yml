@@ -24,8 +24,27 @@ jobs:
           # Required: the version of golangci-lint is required and must be specified without patch version: they always use the latest patch version.
           version: v1.31
 
-      - name: Test
-        run: make test
+      - name: Test (unit and shared integration)
+        run: make test_shared_int
+        env:
+          INFRACOST_API_KEY: "00000000000000000000000000000000"
+          INFRACOST_LOG_LEVEL: info
+
+      - name: Test (AWS)
+        run: make test_aws
+        env:
+          INFRACOST_API_KEY: "00000000000000000000000000000000"
+          INFRACOST_LOG_LEVEL: info
+
+      - name: Test (Google)
+        run: make test_google
+        env:
+          INFRACOST_API_KEY: "00000000000000000000000000000000"
+          INFRACOST_LOG_LEVEL: info
+
+      - name: Test (Azure)
+        run: make test_azure
+        if: env.ARM_SUBSCRIPTION_ID != ''
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
           INFRACOST_LOG_LEVEL: info
