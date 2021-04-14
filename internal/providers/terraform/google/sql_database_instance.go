@@ -22,17 +22,34 @@ func GetSQLInstanceRegistryItem() *schema.RegistryItem {
 		Name:  "google_sql_database_instance",
 		RFunc: NewSQLInstance,
 		Notes: []string{
-			"Cloud SQL network costs are not yet supported.",
+			"Cloud SQL network/SQL Server license/1-3 years commitments costs are not yet supported.",
 		},
 	}
 }
 
 func NewSQLInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	name := d.Address
+	var resource *schema.Resource
+
+	replica := false
+	if d.Get("replica_configuration").Exists() {
+		replica = true
+	}
+
+	resource = sqlDatabaseInstanceCostComponents(d, u, false, d.Address)
+	if replica {
+		resource.SubResources = append(resource.SubResources, sqlDatabaseInstanceCostComponents(d, u, true, "Replica"))
+	}
+
+	return resource
+}
+
+func sqlDatabaseInstanceCostComponents(d *schema.ResourceData, u *schema.UsageData, replica bool, name string) *schema.Resource {
+	var costComponents []*schema.CostComponent
+
 	tier := d.Get("settings.0").Get("tier").String()
 
 	availabilityType := "ZONAL"
-	if d.Get("settings.0").Get("availability_type").Exists() {
+	if d.Get("settings.0").Get("availability_type").Exists() && !replica {
 		availabilityType = d.Get("settings.0").Get("availability_type").String()
 	}
 
@@ -50,17 +67,12 @@ func NewSQLInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		diskSizeGB = d.Get("settings.0").Get("disk_size").Int()
 	}
 
-	resource := &schema.Resource{
-		Name:           name,
-		CostComponents: []*schema.CostComponent{},
-	}
-
 	var vCPU *decimal.Decimal
 	if sqlInstanceTierToResourceGroup(tier) == "" {
 		cpu, _ := strconv.ParseInt(strings.Split(tier, "-")[2], 10, 32)
 
 		vCPU = decimalPtr(decimal.NewFromInt32(int32(cpu)))
-		resource.CostComponents = append(resource.CostComponents, cpuCostComponent(region, tier, availabilityType, dbType, vCPU))
+		costComponents = append(costComponents, cpuCostComponent(region, tier, availabilityType, dbType, vCPU))
 	}
 
 	var memory *decimal.Decimal
@@ -68,31 +80,35 @@ func NewSQLInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		ram, _ := strconv.ParseInt(strings.Split(tier, "-")[3], 10, 32)
 
 		memory = decimalPtr(decimal.NewFromInt32(int32(ram)).Div(decimal.NewFromInt(1024)))
-		resource.CostComponents = append(resource.CostComponents, memoryCostComponent(region, tier, availabilityType, dbType, memory))
+		costComponents = append(costComponents, memoryCostComponent(region, tier, availabilityType, dbType, memory))
 	}
 
-	resource.CostComponents = append(resource.CostComponents, sqlInstanceStorage(region, dbType, availabilityType, diskType, diskSizeGB))
-	var backupGB *decimal.Decimal
-	if u != nil && u.Get("backup_storage_gb").Exists() {
-		backupGB = decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
-		resource.CostComponents = append(resource.CostComponents, backupCostComponent(region, backupGB))
+	costComponents = append(costComponents, sqlInstanceStorage(region, dbType, availabilityType, diskType, diskSizeGB))
+
+	if !replica {
+		var backupGB *decimal.Decimal
+		if u != nil && u.Get("backup_storage_gb").Exists() {
+			backupGB = decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
+			costComponents = append(costComponents, backupCostComponent(region, backupGB))
+		}
+
+		if d.Get("settings.0").Get("ip_configuration.0").Get("ipv4_enabled").Exists() {
+			costComponents = append(costComponents, ipv4CostComponent())
+		}
 	}
 
-	if d.Get("settings.0").Get("ip_configuration.0").Get("ipv4_enabled").Exists() {
-		resource.CostComponents = append(resource.CostComponents, ipv4CostComponent())
+	if dbType != SQLServer {
+		if sqlInstanceTierToResourceGroup(tier) != "" {
+			costComponents = append(costComponents, sharedSQLInstance(tier, availabilityType, dbType, region))
+		} else {
+			costComponents = append(costComponents, customSQLInstance(tier, availabilityType, dbType, region, vCPU, memory))
+		}
 	}
 
-	if sqlInstanceTierToResourceGroup(tier) != "" {
-		resource.CostComponents = append(resource.CostComponents, sharedSQLInstance(tier, availabilityType, dbType, region))
-	} else {
-		resource.CostComponents = append(resource.CostComponents, customSQLInstance(tier, availabilityType, dbType, region, vCPU, memory))
+	return &schema.Resource{
+		Name:           name,
+		CostComponents: costComponents,
 	}
-
-	if strings.Contains(dbVersion, "SQLSERVER") {
-		resource.CostComponents = append(resource.CostComponents, sqlServerLicense(tier, dbVersion, vCPU))
-	}
-
-	return resource
 }
 
 func memoryCostComponent(region string, tier string, availabilityType string, dbType SQLInstanceDBType, memory *decimal.Decimal) *schema.CostComponent {
@@ -161,7 +177,7 @@ func sharedSQLInstance(tier, availabilityType string, dbType SQLInstanceDBType, 
 }
 
 func customSQLInstance(tier, availabilityType string, dbType SQLInstanceDBType, region string, vCPU *decimal.Decimal, memory *decimal.Decimal) *schema.CostComponent {
-	descriptionRegex := SQLCustomInstanceDescriptionRegex(availabilityType, dbType, vCPU, memory)
+	descriptionRegex := sqlCustomInstanceDescriptionRegex(availabilityType, dbType, vCPU, memory)
 
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("SQL instance (%s, %s)", tier, strings.ToLower(availabilityType)),
@@ -179,7 +195,7 @@ func customSQLInstance(tier, availabilityType string, dbType SQLInstanceDBType, 
 	}
 }
 
-func SQLCustomInstanceDescriptionRegex(availabilityType string, dbType SQLInstanceDBType, vCPU *decimal.Decimal, memory *decimal.Decimal) string {
+func sqlCustomInstanceDescriptionRegex(availabilityType string, dbType SQLInstanceDBType, vCPU *decimal.Decimal, memory *decimal.Decimal) string {
 	dbTypeString := sqlInstanceTypeToDescriptionName(dbType)
 	availabilityTypeString := availabilityTypeDescName(availabilityType)
 
@@ -233,75 +249,6 @@ func sqlInstanceAvDBTypeToDescriptionRegex(availabilityType string, dbType SQLIn
 	description := fmt.Sprintf("/%s: %s/", dbTypeString, availabilityTypeString)
 
 	return description
-}
-
-func sqlServerLicense(tier string, dbVersion string, vCPUs *decimal.Decimal) *schema.CostComponent {
-	licenseType := sqlServerDBVersionToLicenseType(dbVersion)
-
-	isSharedInstance := false
-	sharedInstanceNames := []string{"db-f1-micro", "db-g1-small"}
-
-	for _, tierName := range sharedInstanceNames {
-		if tier == tierName {
-			isSharedInstance = true
-			break
-		}
-	}
-
-	descriptionRegex := sqlServerTierNameToDescriptionRegex(tier, licenseType, isSharedInstance, vCPUs)
-
-	return sqlServerCostComponent(vCPUs, descriptionRegex, licenseType)
-}
-
-func sqlServerCostComponent(vCPUs *decimal.Decimal, descriptionRegex, licenseType string) *schema.CostComponent {
-	multiplier := decimal.NewFromInt(1)
-	if vCPUs.LessThan(decimal.NewFromInt(4)) {
-		multiplier = decimal.NewFromInt(4)
-	}
-
-	return &schema.CostComponent{
-		Name:           fmt.Sprintf("License (%s)", licenseType),
-		Unit:           "hours",
-		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(multiplier),
-		ProductFilter: &schema.ProductFilter{
-			VendorName: strPtr("gcp"),
-			Region:     strPtr("global"),
-			Service:    strPtr("Compute Engine"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "resourceGroup", Value: strPtr("Google")},
-				{Key: "description", ValueRegex: strPtr(descriptionRegex)},
-			},
-		},
-	}
-}
-
-func sqlServerDBVersionToLicenseType(dbVersion string) string {
-	licenseType := "Standard"
-	if strings.Contains(dbVersion, "ENTERPRISE") {
-		licenseType = "Enterprise"
-	} else if strings.Contains(dbVersion, "WEB") {
-		licenseType = "Web"
-	} else if strings.Contains(dbVersion, "EXPRESS") {
-		licenseType = "Express"
-	}
-	return licenseType
-}
-
-func sqlServerTierNameToDescriptionRegex(tier, licenseType string, isSharedInstance bool, vCPUs *decimal.Decimal) string {
-	var descriptionRegex string
-	if isSharedInstance {
-		instanceAPINames := map[string]string{
-			"db-f1-micro": "f1-micro",
-			"db-g1-small": "g1-small",
-		}
-
-		descriptionRegex = fmt.Sprintf("/Licensing Fee for SQL Server 2017 %s on %s/", licenseType, instanceAPINames[tier])
-	} else {
-		descriptionRegex = fmt.Sprintf("/Licensing Fee for SQL Server 2017 Standard on VM with %s/", vCPUs)
-	}
-
-	return descriptionRegex
 }
 
 func sqlInstanceStorage(region string, dbType SQLInstanceDBType, availabilityType, diskType string, diskSizeGB int64) *schema.CostComponent {
