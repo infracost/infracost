@@ -1,6 +1,6 @@
 # Contributing to Infracost
 
-🙌 Thank you for contributing and joining our mission to help engineers use cloud infrastructure economically and efficiently.
+🙌 Thank you for contributing and joining our mission to help engineers use cloud infrastructure economically and efficiently 🚀.
 
 ## Table of contents
 
@@ -18,6 +18,7 @@
 	- [General guidelines](#general-guidelines)
 	- [Cloud vendor-specific tips](#cloud-vendor-specific-tips)
 		- [Google](#google)
+		- [Azure](#azure)
 - [Releases](#releases)
 
 
@@ -213,30 +214,31 @@ Instead of directly querying the GraphQL, you can also run `distinct` or `regex`
 1. Install MongoDB version 4.
 2. Download a dump of the MongoDB data from https://infracost-public-dumps.s3.amazonaws.com/cloudPricing.zip.
 3. Import the prices to your local:
-		```sh
-		unzip cloudPricing.zip
-		mongorestore --gzip cloudPricing
-		```
+	```sh
+	unzip cloudPricing.zip
+	mongorestore --gzip cloudPricing
+	```
 	
 4. You can now query you local MongoDB:
-		```
-		mongo
-		use cloudPricing;
 
-		db.products.distinct("vendorName");
-		> should show you: [ "aws", "gcp" ]
+	```
+	mongo
+	use cloudPricing;
 
-		db.products.distinct("service", {"vendorName": "gcp", "service": {$regex: "kms", $options: "i"} });
-		> [ "Cloud Key Management Service (KMS)", "Thales CPL ekms-dpod-eu" ]
+	db.products.distinct("vendorName");
+	> should show you: [ "aws", "gcp" ]
 
-		db.products.distinct("attributes.description", {"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)" });
-		> [
-			"Active HSM ECDSA P-256 key versions",
-			"Active HSM ECDSA P-384 key versions",
-			"Active HSM RSA 2048 bit key versions",
-		...
-		]
-		```
+	db.products.distinct("service", {"vendorName": "gcp", "service": {$regex: "kms", $options: "i"} });
+	> [ "Cloud Key Management Service (KMS)", "Thales CPL ekms-dpod-eu" ]
+
+	db.products.distinct("attributes.description", {"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)" });
+	> [
+		"Active HSM ECDSA P-256 key versions",
+		"Active HSM ECDSA P-384 key versions",
+		"Active HSM RSA 2048 bit key versions",
+	...
+	]
+	```
 
 #### Querying the GraphQL API
 
@@ -358,7 +360,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 ### Google
 
-1. If the resource has a `zone` key, if they have a zone key, use this logic to get the region:
+- If the resource has a `zone` key, if they have a zone key, use this logic to get the region:
 	```go
 	region := d.Get("region").String()
 	zone := d.Get("zone").String()
@@ -366,6 +368,19 @@ The following notes are general guidelines, please leave a comment in your pull 
 		region = zoneToRegion(zone)
 	}
 	```
+
+### Azure
+
+- The Azure Terraform provider requires real credentials to be able to run `terraform plan`. This means you must have Azure credentials for running the Infracost commands and integration tests for Azure. We recommend creating read-only Azure credentials for this purpose. If you have an Azure subscription, you can do this by running the `az` command line:
+	```
+	az ad sp create-for-rbac --name http://InfracostReadOnly --role Reader --scope=/subscriptions/<SUBSCRIPTION ID> --years=10
+	```
+	If you do not have an Azure subscription, then please ask on the contributors channel on the Infracost Slack and we can provide you with credentials.
+
+	To run the Azure integration tests in the GitHub action in pull requests, these credentials also need to be added to your fork's secrets. To do this:
+
+	1. Go to `https://github.com/<YOUR GITHUB NAME>/infracost/settings/secrets/actions`.
+	2. Add repository secrets for `ARM_SUBSCRIPTION_ID`, `ARM_TENANT_ID`, `ARM_CLIENT_ID` and `ARM_CLIENT_SECRET`.
 
 ## Releases
 
