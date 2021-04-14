@@ -252,7 +252,7 @@ func TestNewSQLInstance_usage(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"google_sql_database_instance.small_mysql": map[string]interface{}{
-			"monthly_backup_gb": 100,
+			"backup_storage_gb": 100,
 		},
 	})
 
@@ -261,12 +261,12 @@ func TestNewSQLInstance_usage(t *testing.T) {
 			Name: "google_sql_database_instance.small_mysql",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "Storage (SSD)",
+					Name:            "Storage (SSD, zonal)",
 					PriceHash:       "e02fe49c6a08383eadddbc68669618d5-57bc5d148491a8381abaccb21ca6b4e9",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
 				},
 				{
-					Name:            "SQL instance (MySQL, db-g1-small)",
+					Name:            "SQL instance (db-g1-small, zonal)",
 					PriceHash:       "107408a8d6858ac0ca4cecf164263aee-ef2cadbde566a742ff14834f883bcb8a",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
