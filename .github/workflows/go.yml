@@ -30,29 +30,6 @@ jobs:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
           INFRACOST_LOG_LEVEL: info
 
-      - name: Test (AWS)
-        run: make test_aws
-        env:
-          INFRACOST_API_KEY: "00000000000000000000000000000000"
-          INFRACOST_LOG_LEVEL: info
-
-      - name: Test (Google)
-        run: make test_google
-        env:
-          INFRACOST_API_KEY: "00000000000000000000000000000000"
-          INFRACOST_LOG_LEVEL: info
-
-      - name: Test (Azure)
-        run: make test_azure
-        if: env.ARM_SUBSCRIPTION_ID != ''
-        env:
-          INFRACOST_API_KEY: "00000000000000000000000000000000"
-          INFRACOST_LOG_LEVEL: info
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-
       - name: Test example works ok from CLI
         run: |
           make run --silent ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml --format json" > infracost-output.json
@@ -68,3 +45,59 @@ jobs:
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
           INFRACOST_LOG_LEVEL: info
+
+  integration_aws:
+    name: Integration tests (AWS)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      - name: Test (AWS)
+        run: make test_aws
+        env:
+          INFRACOST_API_KEY: "00000000000000000000000000000000"
+          INFRACOST_LOG_LEVEL: info
+
+  integration_google:
+    name: Integration tests (Google)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      - name: Test (Google)
+        run: make test_google
+        env:
+          INFRACOST_API_KEY: "00000000000000000000000000000000"
+          INFRACOST_LOG_LEVEL: info
+
+  integration_azure:
+    name: Integration tests (Azure)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      - name: Test (Azure)
+        run: make test_azure
+        if: env.ARM_SUBSCRIPTION_ID != ''
+        env:
+          INFRACOST_API_KEY: "00000000000000000000000000000000"
+          INFRACOST_LOG_LEVEL: info
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
