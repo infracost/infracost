@@ -38,7 +38,7 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 	for _, projectCfg := range cfg.Projects {
 		provider, err := providers.Detect(cfg, projectCfg)
 
-		if provider == nil {
+		if err != nil {
 			m := fmt.Sprintf("%s\n\n", err)
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
