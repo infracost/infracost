@@ -45,8 +45,31 @@ clean:
 	go clean
 	rm -rf build/$(BINARY)*
 
+# Run only short unit tests
 test:
+	INFRACOST_LOG_LEVEL=warn go test -short $(LD_FLAGS) ./... $(or $(ARGS), -v -cover)
+
+# Run all tests
+test_all:
 	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./... $(or $(ARGS), -v -cover)
+
+# Run unit tests and shared integration tests
+test_shared_int:
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) \
+		$(shell go list ./... | grep -v ./internal/providers/terraform/aws | grep -v ./internal/providers/terraform/google | grep -v ./internal/providers/terraform/azure) \
+		$(or $(ARGS), -v -cover)
+
+# Run AWS resource tests
+test_aws:
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -v -cover)
+
+# Run Google resource tests
+test_google:
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -v -cover)
+
+# Run Azure resource tests
+test_azure:
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -v -cover)
 
 fmt:
 	go fmt ./...

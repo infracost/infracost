@@ -27,9 +27,16 @@ Run the code:
 make run ARGS="--path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
 ```
 
-Running all tests takes ~12mins on GitHub Actions so it's faster to only run your tests as you dev and leave CI to run them all:
+Running all tests takes ~20mins on GitHub Actions so it's faster to only run your tests as you dev and leave CI to run them all:
 ```sh
-make test
+make test_all
+```
+
+Run tests for a specific cloud vendor:
+```
+make test_aws
+make test_google
+make test_azure
 ```
 
 Run tests for a file you added/changed with `-v` and warn log level so you can see and fix any warnings:
@@ -41,7 +48,7 @@ time="2021-04-05T15:24:16Z" level=warning msg="Multiple prices found for aws_ebs
 
 Exclude integration tests:
 ```sh
-make test ARGS="-v -short"
+make test
 ```
 
 Build:
