@@ -290,7 +290,7 @@ func TestParseJSONResources(t *testing.T) {
 		}
 
 		assert.Equal(t, test.expected.CostComponents[0].Name, resource.CostComponents[0].Name)
-		if actual[i].CostComponents[0].MonthlyQuantity != nil {
+		if test.expected.CostComponents[0].MonthlyQuantity != nil {
 			assert.Equal(t, test.expected.CostComponents[0].MonthlyQuantity.BigInt(), resource.CostComponents[0].MonthlyQuantity.BigInt())
 		} else {
 			assert.Equal(t, test.expected.CostComponents[0].MonthlyQuantity, resource.CostComponents[0].MonthlyQuantity)
