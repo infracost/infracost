@@ -3,31 +3,38 @@ package providers
 import (
 	"archive/zip"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func Detect(cfg *config.Config, projectCfg *config.Project) schema.Provider {
+func Detect(cfg *config.Config, projectCfg *config.Project) (schema.Provider, error) {
+
+	if _, err := os.Stat(projectCfg.Path); os.IsNotExist(err) {
+		return nil, fmt.Errorf("No such file or directory %s", projectCfg.Path)
+	}
+
 	if isTerraformPlanJSON(projectCfg.Path) {
-		return terraform.NewPlanJSONProvider(cfg, projectCfg)
+		return terraform.NewPlanJSONProvider(cfg, projectCfg), nil
 	}
 
 	if isTerraformStateJSON(projectCfg.Path) {
-		return terraform.NewStateJSONProvider(cfg, projectCfg)
+		return terraform.NewStateJSONProvider(cfg, projectCfg), nil
 	}
 
 	if isTerraformPlan(projectCfg.Path) {
-		return terraform.NewPlanProvider(cfg, projectCfg)
+		return terraform.NewPlanProvider(cfg, projectCfg), nil
 	}
 
 	if isTerraformDir(projectCfg.Path) {
-		return terraform.NewDirProvider(cfg, projectCfg)
+		return terraform.NewDirProvider(cfg, projectCfg), nil
 	}
 
-	return nil
+	return nil, fmt.Errorf("Could not detect path type for %s", projectCfg.Path)
 }
 
 func isTerraformPlanJSON(path string) bool {
