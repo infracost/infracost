@@ -45,7 +45,7 @@ func TestNewNewDMSReplicationInstanceSingleLowStorage(t *testing.T) {
 			Name: "aws_dms_replication_instance.my_dms_replication_instance",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "General purpose storage (gp2)",
+					Name:            "Storage (general purpose SSD, gp2)",
 					PriceHash:       "ed71530b11f81a93bc9331f239089033-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(0)),
 				},
@@ -95,7 +95,7 @@ func TestNewNewDMSReplicationInstanceMultiHighStorage(t *testing.T) {
 			Name: "aws_dms_replication_instance.my_dms_replication_instance",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:            "General purpose storage (gp2)",
+					Name:            "Storage (general purpose SSD, gp2)",
 					PriceHash:       "309671f1b8cc2b6de57e782b60c79453-ee3dd7e4624338037ca6fea0933a662f",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(20)),
 				},

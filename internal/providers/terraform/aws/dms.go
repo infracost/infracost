@@ -79,7 +79,7 @@ func storageCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	}
 
 	return &schema.CostComponent{
-		Name:            "General purpose storage (gp2)",
+		Name:            "Storage (general purpose storage, gp2)",
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(storageSize)),
