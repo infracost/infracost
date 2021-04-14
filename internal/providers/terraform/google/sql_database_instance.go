@@ -68,7 +68,7 @@ func sqlDatabaseInstanceCostComponents(d *schema.ResourceData, u *schema.UsageDa
 
 	if sqlInstanceTierToResourceGroup(tier) != "" && dbType != SQLServer {
 		costComponents = append(costComponents, sharedSQLInstance(tier, availabilityType, dbType, region))
-	} else if sqlInstanceTierToResourceGroup(tier) == "" {
+	} else if sqlInstanceTierToResourceGroup(tier) == "" && strings.Contains(tier, "db-custom-") {
 		cpu, _ := strconv.ParseInt(strings.Split(tier, "-")[2], 10, 32)
 		vCPU := decimalPtr(decimal.NewFromInt32(int32(cpu)))
 
@@ -78,6 +78,8 @@ func sqlDatabaseInstanceCostComponents(d *schema.ResourceData, u *schema.UsageDa
 		memory := decimalPtr(decimal.NewFromInt32(int32(ram)).Div(decimal.NewFromInt(1024)))
 
 		costComponents = append(costComponents, memoryCostComponent(region, tier, availabilityType, dbType, memory))
+	} else if strings.Contains(tier, "db-n1-") && dbType == MySQL {
+		costComponents = append(costComponents, sharedSQLInstance(tier, availabilityType, dbType, region))
 	}
 
 	costComponents = append(costComponents, sqlInstanceStorage(region, dbType, availabilityType, diskType, diskSizeGB))
@@ -146,7 +148,15 @@ func cpuCostComponent(region string, tier string, availabilityType string, dbTyp
 
 func sharedSQLInstance(tier, availabilityType string, dbType SQLInstanceDBType, region string) *schema.CostComponent {
 	resourceGroup := sqlInstanceTierToResourceGroup(tier)
-	descriptionRegex := sqlInstanceAvDBTypeToDescriptionRegex(availabilityType, dbType)
+	descriptionRegex := "/" + sqlInstanceAvDBTypeToDescription(availabilityType, dbType)
+
+	var vCPU string
+	if strings.Contains(tier, "db-n1-standard") || strings.Contains(tier, "db-n1-highmem") {
+		vCPU = (strings.Split(tier, "-")[3])
+		descriptionRegex += " - " + vCPU + "/"
+	} else {
+		descriptionRegex += "/"
+	}
 
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("SQL instance (%s, %s)", tier, strings.ToLower(availabilityType)),
@@ -183,7 +193,15 @@ func sqlInstanceTierToResourceGroup(tier string) string {
 		"db-g1-small": "SQLGen2InstancesG1Small",
 	}
 
-	return data[tier]
+	if data[tier] != "" {
+		return data[tier]
+	} else if strings.Contains(tier, "db-n1-standard") {
+		return "SQLGen2InstancesN1Standard"
+	} else if strings.Contains(tier, "db-n1-highmem") {
+		return "SQLGen2InstancesN1Highmem"
+	}
+
+	return ""
 }
 
 func sqlInstanceTypeToDescriptionName(dbType SQLInstanceDBType) string {
@@ -205,10 +223,11 @@ func availabilityTypeDescName(availabilityType string) string {
 	return availabilityTypeNames[availabilityType]
 }
 
-func sqlInstanceAvDBTypeToDescriptionRegex(availabilityType string, dbType SQLInstanceDBType) string {
+func sqlInstanceAvDBTypeToDescription(availabilityType string, dbType SQLInstanceDBType) string {
 	dbTypeString := sqlInstanceTypeToDescriptionName(dbType)
 	availabilityTypeString := availabilityTypeDescName(availabilityType)
-	description := fmt.Sprintf("/%s: %s/", dbTypeString, availabilityTypeString)
+
+	description := fmt.Sprintf("%s: %s", dbTypeString, availabilityTypeString)
 
 	return description
 }

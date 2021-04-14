@@ -85,6 +85,22 @@ func TestNewSQLInstance(t *testing.T) {
 			}
 		}
 
+		resource "google_sql_database_instance" "mysql_standard" {
+			name             = "master-instance"
+			database_version = "MYSQL_5_7"
+			settings {
+				tier = "db-n1-standard-32"
+			}
+		}
+
+		resource "google_sql_database_instance" "mysql_highmem" {
+			name             = "master-instance"
+			database_version = "MYSQL_5_7"
+			settings {
+				tier = "db-n1-highmem-8"
+			}
+		}
+
 		resource "google_sql_database_instance" "with_replica" {
 			name             = "master-instance"
 			database_version = "POSTGRES_11"
@@ -246,6 +262,46 @@ func TestNewSQLInstance(t *testing.T) {
 				{
 					Name:            "Storage (HDD, zonal)",
 					PriceHash:       "429861f2d4c06792bbbe2130eeaf0254-57bc5d148491a8381abaccb21ca6b4e9",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
+				},
+				{
+					Name:            "Backups",
+					PriceHash:       "5d5ace3b30ea029049048c6fba8d6ce2-57bc5d148491a8381abaccb21ca6b4e9",
+					HourlyCostCheck: testutil.NilMonthlyCostCheck(),
+				},
+			},
+		},
+		{
+			Name: "google_sql_database_instance.mysql_standard",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "SQL instance (db-n1-standard-32, zonal)",
+					PriceHash:       "de17b8ffd65878905c410bd12415ef9d-ef2cadbde566a742ff14834f883bcb8a",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:            "Storage (SSD, zonal)",
+					PriceHash:       "e02fe49c6a08383eadddbc68669618d5-57bc5d148491a8381abaccb21ca6b4e9",
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
+				},
+				{
+					Name:            "Backups",
+					PriceHash:       "5d5ace3b30ea029049048c6fba8d6ce2-57bc5d148491a8381abaccb21ca6b4e9",
+					HourlyCostCheck: testutil.NilMonthlyCostCheck(),
+				},
+			},
+		},
+		{
+			Name: "google_sql_database_instance.mysql_highmem",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "SQL instance (db-n1-highmem-8, zonal)",
+					PriceHash:       "ef3e0450278cba3131b44600dc6b9563-ef2cadbde566a742ff14834f883bcb8a",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:            "Storage (SSD, zonal)",
+					PriceHash:       "e02fe49c6a08383eadddbc68669618d5-57bc5d148491a8381abaccb21ca6b4e9",
 					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(10)),
 				},
 				{
