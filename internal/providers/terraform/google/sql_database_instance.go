@@ -165,14 +165,6 @@ func sharedSQLInstance(tier, availabilityType string, dbType SQLInstanceDBType, 
 	}
 }
 
-func sqlCustomInstanceDescriptionRegex(availabilityType string, dbType SQLInstanceDBType, vCPU *decimal.Decimal, memory *decimal.Decimal) string {
-	dbTypeString := sqlInstanceTypeToDescriptionName(dbType)
-	availabilityTypeString := availabilityTypeDescName(availabilityType)
-
-	descriptionRegex := fmt.Sprintf("/%s: %s - %s vCPU %s %sGB RAM/", dbTypeString, availabilityTypeString, vCPU, `\+\`, memory)
-	return descriptionRegex
-}
-
 func sqlInstanceDBVersionToDBType(dbVersion string) SQLInstanceDBType {
 	if strings.Contains(dbVersion, "POSTGRES") {
 		return PostgreSQL
@@ -230,6 +222,10 @@ func sqlInstanceStorage(region string, dbType SQLInstanceDBType, availabilityTyp
 	diskTypeAPIResourceGroup := map[string]string{
 		"PD_SSD": "SSD",
 		"PD_HDD": "PDStandard",
+	}
+
+	if dbType == SQLServer {
+		diskType = "PD_SSD"
 	}
 
 	cost := &schema.CostComponent{
