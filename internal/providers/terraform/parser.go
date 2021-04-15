@@ -105,7 +105,9 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 		if ud := usage[d.Address]; ud != nil {
 			usageData = ud
 		} else if strings.HasSuffix(d.Address, "]") {
-			if arrayUsageData := usage[fmt.Sprintf("%s*]", d.Address[:len(d.Address)-2])]; arrayUsageData != nil {
+			lastIndexOfOpenBracket := strings.LastIndex(d.Address, "[")
+
+			if arrayUsageData := usage[fmt.Sprintf("%s[*]", d.Address[:lastIndexOfOpenBracket])]; arrayUsageData != nil {
 				usageData = arrayUsageData
 			}
 		}
