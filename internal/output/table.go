@@ -8,15 +8,6 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-type TableColumns struct {
-	Name            bool
-	Price           bool
-	MonthlyQuantity bool
-	Unit            bool
-	HourlyCost      bool
-	MonthlyCost     bool
-}
-
 func ToTable(out Root, opts Options) ([]byte, error) {
 	s := ""
 
@@ -48,8 +39,6 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		}
 	}
 
-	fmt.Println(opts.Fields)
-
 	unsupportedMsg := out.unsupportedResourcesMessage(opts.ShowSkipped)
 
 	if hasNilCosts || unsupportedMsg != "" {
@@ -74,17 +63,6 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 }
 
 func tableForBreakdown(breakdown Breakdown, fields []string) string {
-	columnName := map[string]string{
-		"name":             "Name",
-		"monthly_quantity": "Quantity",
-		"price":            "Price",
-		"unit":             "Unit",
-		"hourly_cost":      "Hourly Cost",
-		"monthly_cost":     "Monthly Cost",
-	}
-
-	fmt.Println(columnName)
-
 	t := table.NewWriter()
 	t.Style().Options.DrawBorder = false
 	t.Style().Options.SeparateColumns = false
@@ -94,55 +72,91 @@ func tableForBreakdown(breakdown Breakdown, fields []string) string {
 
 	var columns []table.ColumnConfig
 	var headers table.Row
-	columnNumber := len(fields)
+	headers = append(headers,
+		ui.UnderlineString("Name"),
+	)
 
-	for i := 1; i < columnNumber+1; i++ {
-		if i%2 != 0 {
-			columns = append(columns, table.ColumnConfig{
-				Number:      i,
-				Align:       text.AlignLeft,
-				AlignHeader: text.AlignLeft,
-			})
-			headers = append(headers, table.Row{
-				ui.UnderlineString(fields[i-1]),
-			})
-		} else {
-			columns = append(columns, table.ColumnConfig{
-				Number:      i,
-				Align:       text.AlignRight,
-				AlignHeader: text.AlignRight,
-			})
-			headers = append(headers, table.Row{
-				ui.UnderlineString(fields[i-1]),
-			})
-		}
+	i := 1
+
+	columns = append(columns, table.ColumnConfig{
+		Number:      i,
+		Align:       text.AlignLeft,
+		AlignHeader: text.AlignLeft,
+	})
+	i++
+
+	if contains(fields, "price") {
+		headers = append(headers, ui.UnderlineString("Price"))
+		columns = append(columns, table.ColumnConfig{
+			Number:      i,
+			Align:       text.AlignLeft,
+			AlignHeader: text.AlignLeft,
+		})
+		i++
 	}
+	if contains(fields, "monthly_quantity") {
+		headers = append(headers, ui.UnderlineString("Quantity"))
+		columns = append(columns, table.ColumnConfig{
+			Number:      i,
+			Align:       text.AlignLeft,
+			AlignHeader: text.AlignLeft,
+		})
+		i++
+	}
+	if contains(fields, "unit") {
+		headers = append(headers, ui.UnderlineString("Unit"))
+		columns = append(columns, table.ColumnConfig{
+			Number:      i,
+			Align:       text.AlignLeft,
+			AlignHeader: text.AlignLeft,
+		})
+		i++
+	}
+	if contains(fields, "hourly_cost") {
+		headers = append(headers, ui.UnderlineString("Hourly Cost"))
+		columns = append(columns, table.ColumnConfig{
+			Number:      i,
+			Align:       text.AlignRight,
+			AlignHeader: text.AlignRight,
+		})
+		i++
+	}
+	if contains(fields, "monthly_cost") {
+		headers = append(headers, ui.UnderlineString("Monthly Cost"))
+		columns = append(columns, table.ColumnConfig{
+			Number:      i,
+			Align:       text.AlignRight,
+			AlignHeader: text.AlignRight,
+		})
+		i++
+	}
+
+	t.AppendRow(table.Row{""})
 
 	t.SetColumnConfigs(columns)
 	t.AppendHeader(headers)
 
-	t.AppendRow(table.Row{"", "", "", ""})
-
 	for _, r := range breakdown.Resources {
-		t.AppendRow(table.Row{ui.BoldString(r.Name), "", "", ""})
+		t.AppendRow(table.Row{ui.BoldString(r.Name)})
 
-		buildCostComponentRows(t, r.CostComponents, "", len(r.SubResources) > 0)
-		buildSubResourceRows(t, r.SubResources, "")
+		buildCostComponentRows(t, r.CostComponents, "", len(r.SubResources) > 0, fields)
+		buildSubResourceRows(t, r.SubResources, "", fields)
 
-		t.AppendRow(table.Row{"", "", "", ""})
+		t.AppendRow(table.Row{""})
 	}
 
-	t.AppendRow(table.Row{
-		ui.BoldString("PROJECT TOTAL"),
-		"",
-		"",
-		formatCost2DP(breakdown.TotalMonthlyCost),
-	})
+	var totalCostRow table.Row
+	totalCostRow = append(totalCostRow, ui.BoldString("PROJECT TOTAL"))
+	for q := 0; q < len(fields)-1; q++ {
+		totalCostRow = append(totalCostRow, "")
+	}
+	totalCostRow = append(totalCostRow, formatCost2DP(breakdown.TotalMonthlyCost))
+	t.AppendRow(totalCostRow)
 
 	return t.Render()
 }
 
-func buildSubResourceRows(t table.Writer, subresources []Resource, prefix string) {
+func buildSubResourceRows(t table.Writer, subresources []Resource, prefix string, fields []string) {
 	for i, r := range subresources {
 		labelPrefix := prefix + "├─"
 		nextPrefix := prefix + "│  "
@@ -153,12 +167,12 @@ func buildSubResourceRows(t table.Writer, subresources []Resource, prefix string
 
 		t.AppendRow(table.Row{fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), r.Name)})
 
-		buildCostComponentRows(t, r.CostComponents, nextPrefix, len(r.SubResources) > 0)
-		buildSubResourceRows(t, r.SubResources, nextPrefix)
+		buildCostComponentRows(t, r.CostComponents, nextPrefix, len(r.SubResources) > 0, fields)
+		buildSubResourceRows(t, r.SubResources, nextPrefix, fields)
 	}
 }
 
-func buildCostComponentRows(t table.Writer, costComponents []CostComponent, prefix string, hasSubResources bool) {
+func buildCostComponentRows(t table.Writer, costComponents []CostComponent, prefix string, hasSubResources bool, fields []string) {
 	for i, c := range costComponents {
 		labelPrefix := prefix + "├─"
 		if !hasSubResources && i == len(costComponents)-1 {
@@ -180,12 +194,26 @@ func buildCostComponentRows(t table.Writer, costComponents []CostComponent, pref
 				ui.FaintString(price),
 			}, table.RowConfig{AutoMerge: true, AlignAutoMerge: text.AlignLeft})
 		} else {
-			t.AppendRow(table.Row{
-				label,
-				formatQuantity(c.MonthlyQuantity),
-				c.Unit,
-				formatCost2DP(c.MonthlyCost),
-			})
+			var tableRow table.Row
+			tableRow = append(tableRow, label)
+
+			if contains(fields, "price") {
+				tableRow = append(tableRow, formatPrice(c.Price))
+			}
+			if contains(fields, "monthly_quantity") {
+				tableRow = append(tableRow, formatQuantity(c.MonthlyQuantity))
+			}
+			if contains(fields, "unit") {
+				tableRow = append(tableRow, c.Unit)
+			}
+			if contains(fields, "hourly_cost") {
+				tableRow = append(tableRow, formatCost2DP(c.HourlyCost))
+			}
+			if contains(fields, "monthly_cost") {
+				tableRow = append(tableRow, formatCost2DP(c.MonthlyCost))
+			}
+
+			t.AppendRow(tableRow)
 		}
 	}
 }
