@@ -37,7 +37,7 @@ The overall process for contributing to Infracost is:
 
 ### Install
 
-Setup:
+Install go dependencies
 ```sh
 make deps
 ```

@@ -12,6 +12,7 @@ endif
 .PHONY: deps run build windows linux darwin build_all install release clean test fmt lint
 
 deps:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go mod download
 
 run:
