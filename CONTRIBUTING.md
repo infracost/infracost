@@ -225,19 +225,31 @@ Instead of directly querying the GraphQL, you can also run `distinct` or `regex`
 	mongo
 	use cloudPricing;
 
+	// Find the vendor names
 	db.products.distinct("vendorName");
-	> should show you: [ "aws", "gcp" ]
+	// should show: [ "aws", "azure", "gcp" ]
 
+	// Find all the services for a vendor
+	db.products.distinct("service", {"vendorName": "gcp"})
+
+	// Find the service for a vendor using a regular expression
 	db.products.distinct("service", {"vendorName": "gcp", "service": {$regex: "kms", $options: "i"} });
-	> [ "Cloud Key Management Service (KMS)", "Thales CPL ekms-dpod-eu" ]
+	// should show: [ "Cloud Key Management Service (KMS)", "Thales CPL ekms-dpod-eu" ]
 
-	db.products.distinct("attributes.description", {"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)" });
-	> [
-		"Active HSM ECDSA P-256 key versions",
-		"Active HSM ECDSA P-384 key versions",
-		"Active HSM RSA 2048 bit key versions",
-	...
-	]
+	// Find the product families for a service
+	db.products.distinct("productFamily", {"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)"})
+
+	// Find the unique descriptions for a product family
+	db.products.distinct("attributes.description", {"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)", "productFamily": "ApplicationServices" });
+	// should show:  [
+	//	"Active HSM ECDSA P-256 key versions",
+	//	"Active HSM ECDSA P-384 key versions",
+	//	"Active HSM RSA 2048 bit key versions",
+	//  ...
+	// ]
+
+	// Find a unique product for a product family based on region and description:
+	db.products.find({"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)", "productFamily": "ApplicationServices", "region": "us-east1", "attributes.description": "Active HSM ECDSA P-256 key versions" }).pretty()
 	```
 
 #### Querying the GraphQL API
@@ -370,6 +382,8 @@ The following notes are general guidelines, please leave a comment in your pull 
 	```
 
 ### Azure
+
+> **Note:** Developing Azure resources requires Azure creds. See below for details.
 
 - The Azure Terraform provider requires real credentials to be able to run `terraform plan`. This means you must have Azure credentials for running the Infracost commands and integration tests for Azure. We recommend creating read-only Azure credentials for this purpose. If you have an Azure subscription, you can do this by running the `az` command line:
 	```
