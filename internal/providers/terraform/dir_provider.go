@@ -70,7 +70,7 @@ func (p *DirProvider) DisplayType() string {
 func (p *DirProvider) checks() error {
 	_, err := exec.LookPath(p.TerraformBinary)
 	if err != nil {
-		msg := fmt.Sprintf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary in your Infracost config or using the environment variable TERRAFORM_BINARY.", p.TerraformBinary)
+		msg := fmt.Sprintf("Terraform binary \"%s\" could not be found.\nSet a custom Terraform binary in your Infracost config or using the environment variable INFRACOST_TERRAFORM_BINARY.", p.TerraformBinary)
 		return events.NewError(errors.Errorf(msg), "Terraform binary could not be found")
 	}
 
