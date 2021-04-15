@@ -1,8 +1,6 @@
 #!/bin/sh -le
 
-# This script runs infracost on the current branch then the master branch. It uses `git diff`
-# to post a pull-request comment showing the cost estimate difference whenever a percentage
-# threshold is crossed.
+# This script is used in infracost CI/CD integrations. It posts pull-request comments showing cost estimate diffs.
 # Usage docs: https://www.infracost.io/docs/integrations/cicd
 # It supports: GitHub Actions, GitLab CI, CircleCI with GitHub and Bitbucket, Bitbucket Pipelines
 # For Bitbucket: BITBUCKET_TOKEN must be set to "myusername:my_app_password", the password needs to have Read scope
