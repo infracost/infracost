@@ -67,6 +67,10 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 	for _, resource := range resources {
 		resourceName := resource.Name
 		resourceTypeNames := strings.Split(resourceName, ".")
+		if len(resourceTypeNames) < 2 {
+			// It's a resource with no name
+			continue
+		}
 		// This handles module names appearing in the resourceName too
 		resourceTypeName := resourceTypeNames[len(resourceTypeNames)-2]
 		resourceUSchema, ok := usageSchema[resourceTypeName]
