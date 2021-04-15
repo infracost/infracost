@@ -44,13 +44,15 @@ process_args () {
 }
 
 build_breakdown_cmd () {
-  breakdown_cmd="${INFRACOST_BINARY} breakdown --no-color --path $PLANFILE --format json"
+  breakdown_cmd="${INFRACOST_BINARY} breakdown --no-color --format json"
 
   if [ ! -z "$usage_file" ]; then
     breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
   fi
   if [ ! -z "$config_file" ]; then
     breakdown_cmd="$breakdown_cmd --config-file $config_file"
+  else
+    breakdown_cmd="$breakdown_cmd --path $PLANFILE"
   fi
   if [ "$atlantis_debug" != "true" ]; then
     breakdown_cmd="$breakdown_cmd 2>/dev/null"
