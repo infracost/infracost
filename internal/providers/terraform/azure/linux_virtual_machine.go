@@ -25,8 +25,10 @@ func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) 
 
 	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(d)}
 	subResources := make([]*schema.Resource, 0)
-	if len(d.Get("os_disk").Array()) > 0 {
-		subResources = append(subResources, osDiskSubResource(region, d.Get("os_disk").Array()[0], u))
+
+	osDisk := osDiskSubResource(region, d, u)
+	if osDisk != nil {
+		subResources = append(subResources, osDisk)
 	}
 
 	return &schema.Resource{
