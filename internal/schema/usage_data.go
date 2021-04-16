@@ -21,7 +21,20 @@ func NewUsageData(address string, attributes map[string]gjson.Result) *UsageData
 }
 
 func (u *UsageData) Get(key string) gjson.Result {
+	if u.Attributes[key].Type != gjson.Null {
+		return u.Attributes[key]
+	} else if strings.Contains(key, "[") && strings.Contains(key, "]") {
+		key = convertArrayKeyToWildcard(key)
+	}
+
 	return u.Attributes[key]
+}
+
+func convertArrayKeyToWildcard(key string) string {
+	lastOpenBracket := strings.LastIndex(key, "[")
+	lastCloseBracket := strings.LastIndex(key, "]")
+
+	return key[:lastOpenBracket+1] + "*" + key[lastCloseBracket:]
 }
 
 func NewUsageMap(m map[string]interface{}) map[string]*UsageData {
