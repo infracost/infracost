@@ -1,6 +1,6 @@
 # Infracost CI scripts
 
-This folder holds the `diff.sh` file that is included in the Infracost Docker image and used in the following CI integrations:
+This folder holds the `diff.sh` file that is included in the infracost/infracost Docker image and used in the following CI integrations:
 - GitHub: [infracost-gh-action](https://github.com/infracost/infracost-gh-action), demo is at [gh-actions-demo](https://github.com/infracost/gh-actions-demo)
 - GitLab: [infracost-gitlab-ci](https://gitlab.com/infracost/infracost-gitlab-ci), demo is at [gitlab-ci-demo](https://gitlab.com/infracost/gitlab-ci-demo)
 - CircleCI: [infracost-orb](https://github.com/infracost/infracost-orb), demos are at [circleci-github-demo](https://github.com/infracost/circleci-github-demo) and [circleci-bitbucket-demo](https://bitbucket.org/infracost/circleci-bitbucket-demo)
