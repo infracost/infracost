@@ -27,7 +27,7 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Redshift Cluster (%s, %s)", "on-demand", nodeType),
+			Name:           fmt.Sprintf("Cluster Usage (%s, %s)", "on-demand", nodeType),
 			Unit:           "hours",
 			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(numberOfNodes)),
@@ -93,7 +93,7 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 func redshiftConcurrencyScalingCostComponent(region string, nodeType string, numberOfNodes int64, concurrencySeconds int64) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Redshift Concurrency Scaling (%s)", nodeType),
+		Name:            fmt.Sprintf("Concurrency Scaling (%s)", nodeType),
 		Unit:            "Node-seconds", // maybe this should just be 'seconds' but the descrpiption is ""$0.00007 per Redshift Concurrency Scaling DC2.L Node-second"
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(numberOfNodes * concurrencySeconds)),
@@ -112,7 +112,7 @@ func redshiftConcurrencyScalingCostComponent(region string, nodeType string, num
 
 func redshiftSpectrumCostComponent(region string, terabytesScanned float64) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Redshift Spectrum",
+		Name:            "Spectrum",
 		Unit:            "terabytes",
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(terabytesScanned)),
