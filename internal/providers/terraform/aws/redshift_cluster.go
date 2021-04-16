@@ -46,19 +46,27 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		},
 	}
 
-	if u != nil && u.Get("excess_concurrency_scaling_sec").Type != gjson.Null {
-		concurrencyScalingSeconds := u.Get("excess_concurrency_scaling_sec").Int()
-		if concurrencyScalingSeconds > 0 {
-			costComponents = append(costComponents, redshiftConcurrencyScalingCostComponent(region, nodeType, numberOfNodes, concurrencyScalingSeconds))
+	if strings.HasPrefix(nodeType, "ra3") {
+		var managedStorage *decimal.Decimal
+		if u != nil && u.Get("managed_storage_gb").Type != gjson.Null {
+			managedStorage = decimalPtr(decimal.NewFromInt(u.Get("managed_storage_gb").Int()))
 		}
+		costComponents = append(costComponents, redshiftManagedStorageCostComponent(region, nodeType, managedStorage))
 	}
 
-	if u != nil && u.Get("spectrum_data_scanned_tb").Type != gjson.Null {
-		terabytesScanned := u.Get("spectrum_data_scanned_tb").Float()
-		if terabytesScanned > 0 {
-			costComponents = append(costComponents, redshiftSpectrumCostComponent(region, terabytesScanned))
+	if strings.HasPrefix(nodeType, "ra3") || strings.HasPrefix(nodeType, "ds2") || strings.HasPrefix(nodeType, "dc2"){
+		var concurrencyScalingSeconds *decimal.Decimal
+		if u != nil && u.Get("excess_concurrency_scaling_sec").Type != gjson.Null {
+			concurrencyScalingSeconds = decimalPtr(decimal.NewFromInt(u.Get("excess_concurrency_scaling_sec").Int()))
 		}
+		costComponents = append(costComponents, redshiftConcurrencyScalingCostComponent(region, nodeType, numberOfNodes, concurrencyScalingSeconds))
 	}
+
+	var terabytesScanned *decimal.Decimal
+	if u != nil && u.Get("spectrum_data_scanned_tb").Type != gjson.Null {
+		terabytesScanned = decimalPtr(decimal.NewFromFloat(u.Get("spectrum_data_scanned_tb").Float()))
+	}
+	costComponents = append(costComponents, redshiftSpectrumCostComponent(region, terabytesScanned))
 
 	if u != nil && u.Get("backup_storage_gb").Type != gjson.Null {
 		storageSnapshotGb := decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
@@ -75,14 +83,8 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		if storageSnapshotTiers[2].GreaterThan(decimal.Zero) {
 			costComponents = append(costComponents, redshiftStorageSnapshotCostComponent(region, "Backup storage (over 500 TB)", "512000", &storageSnapshotTiers[2]))
 		}
-	}
-
-	if strings.HasPrefix(nodeType, "ra3") {
-		var managedStorage *decimal.Decimal
-		if u != nil && u.Get("managed_storage_gb").Type != gjson.Null {
-			managedStorage = decimalPtr(decimal.NewFromInt(u.Get("managed_storage_gb").Int()))
-		}
-		costComponents = append(costComponents, redshiftManagedStorageCostComponent(region, nodeType, managedStorage))
+	} else {
+		costComponents = append(costComponents, redshiftStorageSnapshotCostComponent(region, "Backup storage (first 50 TB)", "0", nil))
 	}
 
 	return &schema.Resource{
@@ -91,12 +93,12 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	}
 }
 
-func redshiftConcurrencyScalingCostComponent(region string, nodeType string, numberOfNodes int64, concurrencySeconds int64) *schema.CostComponent {
+func redshiftConcurrencyScalingCostComponent(region string, nodeType string, numberOfNodes int64, concurrencySeconds *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Concurrency scaling (%s)", nodeType),
 		Unit:            "Node-seconds", // maybe this should just be 'seconds' but the descrpiption is ""$0.00007 per Redshift Concurrency Scaling DC2.L Node-second"
 		UnitMultiplier:  1,
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(numberOfNodes * concurrencySeconds)),
+		MonthlyQuantity: concurrencySeconds,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -110,12 +112,12 @@ func redshiftConcurrencyScalingCostComponent(region string, nodeType string, num
 	}
 }
 
-func redshiftSpectrumCostComponent(region string, terabytesScanned float64) *schema.CostComponent {
+func redshiftSpectrumCostComponent(region string, terabytesScanned *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Spectrum",
-		Unit:            "terabytes",
+		Unit:            "TB-scanned",
 		UnitMultiplier:  1,
-		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(terabytesScanned)),
+		MonthlyQuantity: terabytesScanned,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
