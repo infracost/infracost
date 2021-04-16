@@ -7,7 +7,7 @@
 
 <a href="https://www.infracost.io/docs/"><img alt="Getting started" src="https://img.shields.io/badge/get%20started-blue?style=for-the-badge&logo=read-the-docs&label=docs"/></a> 
 
-Infracost shows cloud cost estimates for infrastructure-as-code projects such as Terraform. It helps developers, devops and others to quickly see a cost breakdown and compare different options upfront.
+Infracost shows cloud cost estimates for infrastructure-as-code projects such as Terraform. It helps DevOps, SRE and developers to quickly see a cost breakdown and compare different options upfront.
 
 #### Show full breakdown of costs
 
@@ -44,13 +44,13 @@ Infracost shows cloud cost estimates for infrastructure-as-code projects such as
 3.  Run Infracost using our example Terraform project to see how it works:
     ```sh
     git clone https://github.com/infracost/example-terraform.git
-    cd example-terraform
+    cd example-terraform/sample1
 
-    # Play with sample1/main.tf and re-run to compare costs
-    infracost breakdown --path sample1
+    # Play with main.tf and re-run to compare costs
+    infracost breakdown --path .
 
-    # Show diff of monthly costs, edit the yaml file and re-run to compare costs
-    infracost diff --path sample1 --usage-file sample1/infracost-usage.yml
+    # Show diff of monthly costs, edit the yml file and re-run to compare costs
+    infracost diff --path . --sync-usage-file --usage-file infracost-usage.yml
     ```
 
 Please **watch/star** this repo as we add new cloud resources every week or so.
@@ -78,7 +78,7 @@ If you run into any issues with CI/CD integrations, please join our [community S
 
 ## Supported clouds and resources
 
-Infracost supports over [80 AWS and Google resources](https://www.infracost.io/docs/supported_resources/); Microsoft Azure is [coming soon](https://github.com/infracost/infracost/issues/64). Other IaC tools ([Pulumi](https://github.com/infracost/infracost/issues/187), [CloudFormation](https://github.com/infracost/infracost/issues/190)) are on our roadmap too.
+Infracost supports over [100 AWS and Google resources](https://www.infracost.io/docs/supported_resources/); Microsoft Azure is [coming soon](https://github.com/infracost/infracost/issues/64). Other IaC tools ([Pulumi](https://github.com/infracost/infracost/issues/187), [CloudFormation](https://github.com/infracost/infracost/issues/190)) are on our roadmap too.
 
 We regularly add support for new resources so we recommend watching this repo for releases: click on the Watch button > selecting Custom > Releases and click on Apply.
 
