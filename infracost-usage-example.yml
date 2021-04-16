@@ -14,6 +14,18 @@ resource_usage:
   # module.lambda_function.aws_lambda_function.this[0]:
   #   monthly_requests: 20000
   #   request_duration_ms: 600
+  #
+  # You can use [*] for array of resources to apply usage-values individually to each element of the array.
+  # If an array element (e.g. this[0]) and [*] are specified for a resource, 
+  # only the array element's usage will be applied to that resource.
+  # 
+  # Example: 
+  # 
+  # aws_cloudwatch_log_group.my_log_group[*]:
+  #   storage_gb: 1000
+  #   monthly_data_ingested_gb: 1000
+  #   monthly_data_scanned_gb: 200
+  #
 
   #
   # Terraform AWS resources
