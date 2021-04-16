@@ -45,7 +45,7 @@ func TestSQSQueue_usage(t *testing.T) {
 
 	tf := `
 		resource "aws_sqs_queue" "fifo" {
-			name = "my-fifo-queue"
+			name = "my.fifo"
 			fifo_queue = true
 		}
 
