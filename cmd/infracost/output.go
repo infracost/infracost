@@ -79,11 +79,13 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 			}
 
 			format, _ := cmd.Flags().GetString("format")
+			fields, _ := cmd.Flags().GetStringSlice("fields")
 
 			opts := output.Options{
 				NoColor:    cfg.NoColor,
 				GroupKey:   "filename",
 				GroupLabel: "File",
+				Fields:     fields,
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
@@ -117,6 +119,7 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
+	cmd.Flags().StringSlice("fields", []string{"name", "monthly_quantity", "unit", "monthly_cost"}, "")
 
 	return cmd
 }
