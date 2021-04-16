@@ -1,6 +1,31 @@
 # Contributing to Infracost
 
+🙌 Thank you for contributing and joining our mission to help engineers use cloud infrastructure economically and efficiently 🚀.
+
+## Table of contents
+
+- [Overview](#overview)
+- [Setting up the development environment](#setting-up-the-development-environment)
+	- [Install](#install)
+	- [Run](#run)
+	- [Test](#test)
+- [Adding new resources](#adding-new-resources)
+	- [Glossary](#glossary)
+	- [Quickstart](#quickstart)
+	- [Cost component names and units](#cost-component-names-and-units)
+	- [Finding prices](#finding-prices)
+	- [Adding usage-based cost components](#adding-usage-based-cost-components)
+	- [General guidelines](#general-guidelines)
+	- [Cloud vendor-specific tips](#cloud-vendor-specific-tips)
+		- [Google](#google)
+		- [Azure](#azure)
+- [Releases](#releases)
+
+
+## Overview
+
 The overall process for contributing to Infracost is:
+
 1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check; the issue labels should help you to find a `good first issue, or new resources that others have already requested/liked.
 2. Create a new issue if there's no issue for what you want to work on. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback.
 3. Add a comment to the issue you're working on to let the rest of the community know.
@@ -8,9 +33,11 @@ The overall process for contributing to Infracost is:
 5. If it's your first PR to the Infracost org, a bot will leave a comment asking you to follow a quick step to sign our Contributor License Agreement.
 6. We'll review your change and provide feedback.
 
-## Development
+## Setting up the development environment
 
-Install Go dependencies:
+### Install
+
+Install go dependencies
 ```sh
 make deps
 ```
@@ -22,45 +49,65 @@ INFRACOST_API_KEY=XXX
 EOF
 ```
 
+### Run
+
 Run the code:
 ```sh
 make run ARGS="--path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
 ```
 
-Running all tests takes ~20mins on GitHub Actions so it's faster to only run your tests as you dev and leave CI to run them all:
+### Test
+
+#### Unit tests
+
+To run only the unit tests:
 ```sh
-make test_all
+make test
 ```
 
-Run tests for a specific cloud vendor:
-```
-make test_aws
-make test_google
-make test_azure
-```
+#### Integration tests
 
-Run tests for a file you added/changed with `-v` and warn log level so you can see and fix any warnings:
-```sh
+The entire test suite can take >20 mins to run, so we recommend against running them all locally. These will run on GitHub actions.
+
+You can run tests for a file you added/changed with `-v` and warn log level so you can see and fix any warnings:
+```
 INFRACOST_LOG_LEVEL=warn go test -v internal/providers/terraform/aws/ebs_volume_test.go
 
 time="2021-04-05T15:24:16Z" level=warning msg="Multiple prices found for aws_ebs_volume.gp3 Provisioned throughput, using the first price"
 ```
 
-Exclude integration tests:
+To run all the tests for a specific cloud vendor:
 ```sh
-make test
+make test_aws
+make test_google
+make test_azure
 ```
 
-Build:
+If you do want to run all the tests, you can use:
+```sh
+make test_all
+```
+
+### Build
+
 ```sh
 make build
 ```
 
 ## Adding new resources
 
-### Quickstart AWS
+### Glossary
 
-_Make sure to get familiar with the pricing model of the resource first by reading the cloud vendors pricing page._ To begin, add a new file in `internal/providers/terraform/aws/` as well as an accompanying test file.
+* **Resource** - A resource for a cloud service that maps one-to-one to a Terraform resource.
+* **Cost component** - A line-item for a resource that represents a cost calculated from a price and some usage quantity. For example the AWS NAT Gateway resource has 2 cost components: one to model the hourly cost, and another to model the cost for data processed.
+
+### Quickstart
+
+> **Note:** This example uses AWS, but is also applicable to Google and Azure resources.
+
+When adding your first resource, we recommend you look at one of the existing resources to see how it's done, for example, check the [nat_gateway.go](internal/providers/terraform/aws/nat_gateway.go) resource.
+
+To begin, add a new file in `internal/providers/terraform/aws/` as well as an accompanying test file.
 
 ```go
 package aws
@@ -127,57 +174,27 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 ```
 
-Finally create a temporary terraform file to test your resource and run (no need to commit that):
+Finally create a temporary Terraform file to test your resource and run (no need to commit that):
 
 ```sh
 make run ARGS="--path my_new_terraform/"
 ```
 
-### Detailed notes
-
-When adding your first resource, we recommend you look at one of the existing resources to see how it's done, for example, check the [nat_gateway.go](internal/providers/terraform/aws/nat_gateway.go) resource. You can then review the [price_explorer](scripts/price_explorer/README.md) scripts that help you find various pricing service filters, and something called a "priceHash" that you need for writing integration tests.
-
-We distinguish the **price** of a resource from its **cost**. Price is the per-unit price advertised by a cloud vendor. The cost of a resource is calculated by multiplying its price by its usage. For example, an EC2 instance might be priced at $0.02 per hour, and if run for 100 hours (its usage), it'll cost $2.00. When adding resources to Infracost, we can always show their price, but if the resource has a usage-based cost component, we can't show its cost. To solve this problem, new resources in Infracost go through two levels of support:
-
-You can add all price components for the resource, even ones that are usage-based, so the price column in the table output is always populated. The hourly and monthly cost for these components will show `-` as illustrated in the following output for AWS Lambda. Once this is done, please send a pull-request to this repo so someone can review/merge it. Try to re-use relevant costComponents from other resources where applicable, e.g. notice how the `newElasticacheResource` function is used in [aws_elasticache_cluster](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/elasticache_cluster.go) and [aws_elasticache_replication_group](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/elasticache_replication_group.go).
-
 Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
-
-  ```
-  NAME                                        MONTHLY QTY  UNIT         PRICE   HOURLY COST  MONTHLY COST
-
-  aws_lambda_function.hello_world
-  ├─ Requests                                           -  1M requests  0.2000            -             -
-  └─ Duration                                           -  GB-seconds    2e-05            -             -
-  Total                                                                                   -             -
-  ```
-
-#### Adding usage example
-
-Infracost supports passing usage data in through a usage YAML file. When adding a new resource we should add an example of how to specify the usage data in [infracost-usage-example.yml](/infracost-usage-example.yml). This should include an example resource and usage data along with comments detailing what the usage values are. Here's an example of the entry for AWS Lambda:
-
-  ```yaml
-  aws_lambda_function.my_function:
-    monthly_requests: 100000      # Monthly requests to the Lambda function.
-    request_duration_ms: 500      # Average duration of each request in milliseconds.
-  ```
-
-When running infracost with `--usage-file path/to/infracost-usage.yml`, Infracost output shows the hourly/monthly cost columns populated with non-zero values:
-
-  ```
-  NAME                                        MONTHLY QTY  UNIT         PRICE   HOURLY COST  MONTHLY COST
-
-  aws_lambda_function.hello_world
-  ├─ Requests                                         100  1M requests  0.2000       0.0274       20.0000
-  └─ Duration                                   3,750,000  GB-seconds    2e-05       0.0856       62.5001
-  Total                                                                              0.1130       82.5001
-  ```
 
 ### Cost component names and units
 
+The first thing when adding a new resource is determining what cost components the resource should have. If there is an issue open for the resource then often this information will be included in the issue description (See https://github.com/infracost/infracost/issues/575 for an example). To determine the cost components we can look at the following resources:
+
+- Cloud vendor pricing pages for that service (e.g. https://aws.amazon.com/redshift/pricing/)
+- Cloud vendor pricing calculators
+	- AWS: https://calculator.aws
+	- Google: https://cloud.google.com/products/calculator
+	- Azure: https://azure.microsoft.com/en-gb/pricing/calculator/
+
 Our aim is to make Infracost's output understandable without needing to read separate docs. We try to match the cloud vendor pricing webpages as users have probably seen those before. It's unlikely that users will have looked at the pricing service JSON (which comes from cloud vendors' pricing APIs), or looked at the detailed billing CSVs that can show the pricing service names. Please check [this spreadsheet](https://docs.google.com/spreadsheets/d/1H_bn2jLzYr7xyrvNsFn-0rDaGPGpnrVTPsjVHzr-kM4/edit#gid=0) for examples of cost component names and units.
 
-Where a cloud vendor's pricing pages information can be improved for clarify, we'll do that, e.g. on some pricing webpages, AWS mention use "Storage Rate" to describe pricing for "Provisioned IOPS storage", so we use the latter.
+Where a cloud vendor's pricing pages information can be improved for clarify, we'll do that, e.g. on some pricing webpages, AWS mention use "Storage Rate" to describe pricing for "Storage (provisioned IOPS SSD)", so we use the latter.
 
 The cost component name should not change when the IaC resource params change; anything that can change should be put in brackets, so for example:
 - `General Purpose SSD storage (gp2)` should be `Storage (gp2)` as the storage type can change.
@@ -186,7 +203,106 @@ The cost component name should not change when the IaC resource params change; a
 
 In the future, we plan to add a separate field to cost components to hold the metadata in brackets.
 
-#### Resource notes
+### Finding prices
+
+When adding a new resource to infracost, a `ProductFilter` has to be added that uniquely identifies the product for pricing purposes (the filter is used to find a unique `productHash`). If the product contains multiple prices, then a `PriceFilter` should be used to filter down to a single price. The product filter needs a `service`, `productFamily` and `attribute` key/values to filter the products. Because cloud prices have many parameter values to determine a price on a per-region or product type basis, querying for prices can look odd as many parameter values are duplicated.
+
+When writing integration tests we check that we make sure the correct price is used by checking the `priceHash` instead of the actual value of the price. This means that if that price changes, the integration tests won't break. To determine the correct `priceHash` to use for the integration tests we can query the backend data to find a unique product and then look at the prices nested inside the product and choose the correct one based on the price attributes.
+
+Here are two methods for querying the backend data to find the filters that will uniquely identify the product.
+
+#### Querying MongoDB
+
+Instead of directly querying the GraphQL, you can also run `distinct` or `regex` queries on MongoDB to explore the products.
+
+1. Install MongoDB version 4.
+2. Download a dump of the MongoDB data from https://infracost-public-dumps.s3.amazonaws.com/cloudPricing.zip.
+3. Import the prices to your local:
+	```sh
+	unzip cloudPricing.zip
+	mongorestore --gzip cloudPricing
+	```
+	
+4. You can now query you local MongoDB:
+
+	```
+	mongo
+	use cloudPricing;
+
+	// Find the vendor names
+	db.products.distinct("vendorName");
+	// should show: [ "aws", "azure", "gcp" ]
+
+	// Find all the services for a vendor
+	db.products.distinct("service", {"vendorName": "gcp"})
+
+	// Find the service for a vendor using a regular expression
+	db.products.distinct("service", {"vendorName": "gcp", "service": {$regex: "kms", $options: "i"} });
+	// should show: [ "Cloud Key Management Service (KMS)", "Thales CPL ekms-dpod-eu" ]
+
+	// Find the product families for a service
+	db.products.distinct("productFamily", {"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)"})
+
+	// Find the unique descriptions for a product family
+	db.products.distinct("attributes.description", {"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)", "productFamily": "ApplicationServices" });
+	// should show:  [
+	//	"Active HSM ECDSA P-256 key versions",
+	//	"Active HSM ECDSA P-384 key versions",
+	//	"Active HSM RSA 2048 bit key versions",
+	//  ...
+	// ]
+
+	// Find a unique product for a product family based on region and description:
+	db.products.find({"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)", "productFamily": "ApplicationServices", "region": "us-east1", "attributes.description": "Active HSM ECDSA P-256 key versions" }).pretty()
+	```
+
+#### Querying the GraphQL API
+
+1. Use an browser extension like [modheader](https://bewisse.com/modheader/help/) to allow you to specify additional headers in your browser.
+2. Go to https://pricing.api.infracost.io/graphql
+3. Set your `X-API-Key` using the browser extension
+4. Run GraphQL queries to find the correct products. Examples can be found here: https://github.com/infracost/cloud-pricing-api/tree/master/examples/queries
+
+> **Note:** The GraphQL pricing API limits the number of results returned to 1000, which can limit it's usefulness for exploring the data.
+		
+#### Tips
+
+- AWS use many acronyms so be sure to search for those too, e.g. "ES" returns "AmazonES" for ElasticSearch.
+
+### Adding usage-based cost components
+
+We distinguish the **price** of a resource from its **cost**. Price is the per-unit price advertised by a cloud vendor. The cost of a resource is calculated by multiplying its price by its usage. For example, an EC2 instance might be priced at $0.02 per hour, and if run for 100 hours (its usage), it'll cost $2.00. When adding resources to Infracost, we can always show their price, but if the resource has a usage-based cost component, we can't show its cost unless the user specifies the usage.
+
+To do this Infracost supports passing usage data in through a usage YAML file. When adding a new resource we should add an example of how to specify the usage data in [infracost-usage-example.yml](/infracost-usage-example.yml). This should include an example resource and usage data along with comments detailing what the usage values are. Here's an example of the entry for AWS Lambda:
+
+  ```yaml
+  aws_lambda_function.my_function:
+    monthly_requests: 100000      # Monthly requests to the Lambda function.
+    request_duration_ms: 500      # Average duration of each request in milliseconds.
+  ```
+
+For an example of a resource with usage-based see the [AWS Lambda resource](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/lambda_function.go). This resource retrieves the quantities from the usage-file by calling `u.Get("monthly_requests")` and `u.Get("request_duration_ms")`. If these quantities are not provided then the `monthlyQuantity` is set to `nil`.
+
+When Infracost is run without usage data the output for this resource looks like:
+
+```
+ Name                                                           Quantity  Unit                  Monthly Cost
+
+ aws_lambda_function.hello_world
+ ├─ Requests                                            Cost depends on usage: $0.20 per 1M requests
+ └─ Duration                                            Cost depends on usage: $0.0000166667 per GB-seconds
+```
+
+When Infracost is run with the `--usage-file=path/to/infracost-usage.yml` flag then the output looks like:
+
+```
+ Name                                                           Quantity  Unit                  Monthly Cost
+ aws_lambda_function.hello_world
+ ├─ Requests                                                   100  1M requests        $20.00
+ └─ Duration                                            25,000,000  GB-seconds        $416.67
+```
+
+### General guidelines
 
 The following notes are general guidelines, please leave a comment in your pull request if they don't make sense or they can be improved for the resource you're adding.
 
@@ -240,25 +356,27 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - use `IgnoreIfMissingPrice: true` if you need to lookup a price in the Cloud Pricing API and NOT add it if there is no price. We use it for EBS Optimized instances since we don't know if they should have that cost component without looking it up.
 
-#### Usage file notes
+#### Usage file guidelines
 
-1. Where possible use similar terminology as the cloud vendor's pricing pages, their cost calculators might also help.
+- Where possible use similar terminology as the cloud vendor's pricing pages, their cost calculators might also help.
 
-2. Do not prefix things with `average_` as in the future we might want to use nested values, e.g. `request_duration_ms.max`.
+- Do not prefix things with `average_` as in the future we might want to use nested values, e.g. `request_duration_ms.max`.
 
-3. Use the following units and keep them lower-case:
+- Use the following units and keep them lower-case:
   - time: ms, secs, mins, hrs, days, weeks, months
   - size: b, kb, mb, gb, tb
 
-4. Put the units last, e.g. `message_size_kb`, `request_duration_ms`.
+- Put the units last, e.g. `message_size_kb`, `request_duration_ms`.
 
-5. For resources that are continuous in time, do not use prefixes, e.g. use `instances`, `subscriptions`, `storage_gb`. For non-continuous resources, prefix with `monthly_` so users knows what time interval to estimate for, e.g. `monthly_log_lines`, `monthly_requests`.
+- For resources that are continuous in time, do not use prefixes, e.g. use `instances`, `subscriptions`, `storage_gb`. For non-continuous resources, prefix with `monthly_` so users knows what time interval to estimate for, e.g. `monthly_log_lines`, `monthly_requests`.
 
-6. When the field accepts a string (e.g. `dx_connection_type: dedicated`), the values should be used in a case-insensitive way in the resource file, the `ValueRegex` option can be used with `/i` to allow case-insensitive regex matches. For example `{Key: "connectionType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", connectionType))},`.
+- When the field accepts a string (e.g. `dx_connection_type: dedicated`), the values should be used in a case-insensitive way in the resource file, the `ValueRegex` option can be used with `/i` to allow case-insensitive regex matches. For example `{Key: "connectionType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", connectionType))},`.
 
-#### Google resource notes
+## Cloud vendor-specific tips
 
-1. If the resource has a `zone` key, if they have a zone key, use this logic to get the region:
+### Google
+
+- If the resource has a `zone` key, if they have a zone key, use this logic to get the region:
 	```go
 	region := d.Get("region").String()
 	zone := d.Get("zone").String()
@@ -267,9 +385,24 @@ The following notes are general guidelines, please leave a comment in your pull 
 	}
 	```
 
-## Release steps
+### Azure
 
-@alikhajeh1 and @aliscott rotate release responsibilities between them.
+> **Note:** Developing Azure resources requires Azure creds. See below for details.
+
+- The Azure Terraform provider requires real credentials to be able to run `terraform plan`. This means you must have Azure credentials for running the Infracost commands and integration tests for Azure. We recommend creating read-only Azure credentials for this purpose. If you have an Azure subscription, you can do this by running the `az` command line:
+	```
+	az ad sp create-for-rbac --name http://InfracostReadOnly --role Reader --scope=/subscriptions/<SUBSCRIPTION ID> --years=10
+	```
+	If you do not have an Azure subscription, then please ask on the contributors channel on the Infracost Slack and we can provide you with credentials.
+
+	To run the Azure integration tests in the GitHub action in pull requests, these credentials also need to be added to your fork's secrets. To do this:
+
+	1. Go to `https://github.com/<YOUR GITHUB NAME>/infracost/settings/secrets/actions`.
+	2. Add repository secrets for `ARM_SUBSCRIPTION_ID`, `ARM_TENANT_ID`, `ARM_CLIENT_ID` and `ARM_CLIENT_SECRET`.
+
+## Releases
+
+[@alikhajeh1](https://github.com/alikhajeh1) and [@aliscott](https://github.com/aliscott) rotate release responsibilities between them.
 
 1. In [here](https://github.com/infracost/infracost/actions), click on the "Go" build for the master branch, click on Build, expand Test, then use the "Search logs" box to find any line that has "Multiple products found", "No products found for" or "No prices found for". Update the resource files in question to fix these error, often it's because the price filters need to be adjusted to only return 1 result.
 2. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
