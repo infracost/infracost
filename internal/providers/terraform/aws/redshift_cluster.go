@@ -27,7 +27,7 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Cluster Usage (%s, %s)", "on-demand", nodeType),
+			Name:           fmt.Sprintf("Cluster usage (%s, %s)", "on-demand", nodeType),
 			Unit:           "hours",
 			UnitMultiplier: 1,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(numberOfNodes)),
@@ -65,15 +65,15 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		storageSnapshotTiers := usage.CalculateTierBuckets(*storageSnapshotGb, []int{51200, 512000})
 
 		if storageSnapshotTiers[0].GreaterThan(decimal.Zero) {
-			costComponents = append(costComponents, redshiftStorageSnapshotCostComponent(region, "Backup Storage (first 50 TB)", "0", &storageSnapshotTiers[0]))
+			costComponents = append(costComponents, redshiftStorageSnapshotCostComponent(region, "Backup storage (first 50 TB)", "0", &storageSnapshotTiers[0]))
 		}
 
 		if storageSnapshotTiers[1].GreaterThan(decimal.Zero) {
-			costComponents = append(costComponents, redshiftStorageSnapshotCostComponent(region, "Backup Storage (next 450 TB)", "51200", &storageSnapshotTiers[1]))
+			costComponents = append(costComponents, redshiftStorageSnapshotCostComponent(region, "Backup storage (next 450 TB)", "51200", &storageSnapshotTiers[1]))
 		}
 
 		if storageSnapshotTiers[2].GreaterThan(decimal.Zero) {
-			costComponents = append(costComponents, redshiftStorageSnapshotCostComponent(region, "Backup Storage (over 500 TB)", "512000", &storageSnapshotTiers[2]))
+			costComponents = append(costComponents, redshiftStorageSnapshotCostComponent(region, "Backup storage (over 500 TB)", "512000", &storageSnapshotTiers[2]))
 		}
 	}
 
@@ -93,7 +93,7 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 func redshiftConcurrencyScalingCostComponent(region string, nodeType string, numberOfNodes int64, concurrencySeconds int64) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Concurrency Scaling (%s)", nodeType),
+		Name:            fmt.Sprintf("Concurrency scaling (%s)", nodeType),
 		Unit:            "Node-seconds", // maybe this should just be 'seconds' but the descrpiption is ""$0.00007 per Redshift Concurrency Scaling DC2.L Node-second"
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(numberOfNodes * concurrencySeconds)),
@@ -145,7 +145,7 @@ func redshiftStorageSnapshotCostComponent(region string, displayName string, sta
 
 func redshiftManagedStorageCostComponent(region string, nodeType string, managedStorage *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Managed Storage (%s)", nodeType),
+		Name:            fmt.Sprintf("Managed storage (%s)", nodeType),
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: managedStorage,
