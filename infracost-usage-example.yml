@@ -159,6 +159,12 @@ resource_usage:
     cpu_credit_hrs: 24   # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
     virtual_cpu_count: 2 # Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
 
+  aws_redshift_cluster.with_usage:
+    managed_storage_gb: 10000
+    excess_concurrency_scaling_sec: 20000
+    spectrum_data_scanned_tb: 1.5
+    backup_storage_gb: 1000000
+
   aws_route53_health_check.my_health_check:
     endpoint_type: aws # Type of health check endpoint to query, can be: either aws or non_aws.
 
