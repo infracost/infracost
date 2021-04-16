@@ -54,7 +54,7 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		costComponents = append(costComponents, redshiftManagedStorageCostComponent(region, nodeType, managedStorage))
 	}
 
-	if strings.HasPrefix(nodeType, "ra3") || strings.HasPrefix(nodeType, "ds2") || strings.HasPrefix(nodeType, "dc2"){
+	if strings.HasPrefix(nodeType, "ra3") || strings.HasPrefix(nodeType, "ds2") || strings.HasPrefix(nodeType, "dc2") {
 		var concurrencyScalingSeconds *decimal.Decimal
 		if u != nil && u.Get("excess_concurrency_scaling_sec").Type != gjson.Null {
 			concurrencyScalingSeconds = decimalPtr(decimal.NewFromInt(u.Get("excess_concurrency_scaling_sec").Int()))
