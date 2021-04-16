@@ -205,11 +205,15 @@ In the future, we plan to add a separate field to cost components to hold the me
 
 ### Finding prices
 
-When adding a new resource to infracost, a `ProductFilter` has to be added that uniquely identifies the product for pricing purposes (the filter is used to find a unique `productHash`). If the product contains multiple prices, then a `PriceFilter` should be used to filter down to a single price. The product filter needs a `service`, `productFamily` and `attribute` key/values to filter the products. Because cloud prices have many parameter values to determine a price on a per-region or product type basis, querying for prices can look odd as many parameter values are duplicated. Here are two methods for querying the backend data to find the filters that will uniquely identify the product and price.
+When adding a new resource to infracost, a `ProductFilter` has to be added that uniquely identifies the product for pricing purposes (the filter is used to find a unique `productHash`). If the product contains multiple prices, then a `PriceFilter` should be used to filter down to a single price. The product filter needs a `service`, `productFamily` and `attribute` key/values to filter the products. Because cloud prices have many parameter values to determine a price on a per-region or product type basis, querying for prices can look odd as many parameter values are duplicated.
+
+When writing integration tests we check that we make sure the correct price is used by checking the `priceHash` instead of the actual value of the price. This means that if that price changes, the integration tests won't break. To determine the correct `priceHash` to use for the integration tests we can query the backend data to find a unique product and then look at the prices nested inside the product and choose the correct one based on the price attributes.
+
+Here are two methods for querying the backend data to find the filters that will uniquely identify the product.
 
 #### Querying MongoDB
 
-Instead of directly querying the GraphQL, you can also run `distinct` or `regex` queries on MongoDB to explore the prices.
+Instead of directly querying the GraphQL, you can also run `distinct` or `regex` queries on MongoDB to explore the products.
 
 1. Install MongoDB version 4.
 2. Download a dump of the MongoDB data from https://infracost-public-dumps.s3.amazonaws.com/cloudPricing.zip.
@@ -257,7 +261,7 @@ Instead of directly querying the GraphQL, you can also run `distinct` or `regex`
 1. Use an browser extension like [modheader](https://bewisse.com/modheader/help/) to allow you to specify additional headers in your browser.
 2. Go to https://pricing.api.infracost.io/graphql
 3. Set your `X-API-Key` using the browser extension
-4. Run GraphQL queries to find the correct prices. Examples can be found here: https://github.com/infracost/cloud-pricing-api/tree/master/examples/queries
+4. Run GraphQL queries to find the correct products. Examples can be found here: https://github.com/infracost/cloud-pricing-api/tree/master/examples/queries
 
 > **Note:** The GraphQL pricing API limits the number of results returned to 1000, which can limit it's usefulness for exploring the data.
 		
