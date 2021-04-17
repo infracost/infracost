@@ -220,9 +220,9 @@ Instead of directly querying the GraphQL, you can also run `distinct` or `regex`
 3. Import the prices to your local:
 	```sh
 	unzip cloudPricing.zip
-	mongorestore --gzip cloudPricing
+	mongorestore -d cloudPricing --gzip cloudPricing
 	```
-	
+
 4. You can now query you local MongoDB:
 
 	```
@@ -264,7 +264,7 @@ Instead of directly querying the GraphQL, you can also run `distinct` or `regex`
 4. Run GraphQL queries to find the correct products. Examples can be found here: https://github.com/infracost/cloud-pricing-api/tree/master/examples/queries
 
 > **Note:** The GraphQL pricing API limits the number of results returned to 1000, which can limit it's usefulness for exploring the data.
-		
+
 #### Tips
 
 - AWS use many acronyms so be sure to search for those too, e.g. "ES" returns "AmazonES" for ElasticSearch.
