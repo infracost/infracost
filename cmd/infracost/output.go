@@ -79,7 +79,13 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 			}
 
 			format, _ := cmd.Flags().GetString("format")
-			fields, _ := cmd.Flags().GetStringSlice("fields")
+
+			var fields []string
+			if f, _ := cmd.Flags().GetStringSlice("fields"); len(f) > 0 {
+				fields, _ = cmd.Flags().GetStringSlice("fields")
+			} else {
+				fields = []string{"name", "monthly_quantity", "unit", "monthly_cost"}
+			}
 
 			opts := output.Options{
 				NoColor:    cfg.NoColor,
@@ -119,7 +125,7 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
-	cmd.Flags().StringSlice("fields", []string{"name", "monthly_quantity", "unit", "monthly_cost"}, "")
+	cmd.Flags().StringSlice("fields", []string{}, "")
 
 	return cmd
 }

@@ -230,7 +230,9 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	cfg.Format, _ = cmd.Flags().GetString("format")
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
-	cfg.Fields, _ = cmd.Flags().GetStringSlice("fields")
+	if f, _ := cmd.Flags().GetStringSlice("fields"); len(f) > 0 {
+		cfg.Fields, _ = cmd.Flags().GetStringSlice("fields")
+	}
 
 	return nil
 }
