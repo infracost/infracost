@@ -445,12 +445,12 @@ resource_usage:
   
   azurerm_managed_disk.my_disk:
     monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
+
+  azurerm_mariadb_server.my_server:
+    additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB.
   
   azurerm_windows_virtual_machine.my_windows_vm:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
-
-  azurerm_mariadb_server.my_server:
-    additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB/month.
 
 
