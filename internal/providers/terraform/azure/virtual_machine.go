@@ -7,9 +7,9 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// Parse from Terraform size value to Azure instance type value.
-func parseVMSKUName(size string) string {
-	s := strings.ReplaceAll(size, "Standard_", "")
+// Parse from instance type value to Azure SKU name.
+func parseVMSKUName(instanceType string) string {
+	s := strings.ReplaceAll(instanceType, "Standard_", "")
 	s = strings.ReplaceAll(s, "Basic_", "")
 	s = strings.ReplaceAll(s, "_", " ")
 	return s

@@ -442,7 +442,12 @@ resource_usage:
   azurerm_linux_virtual_machine.my_linux_vm:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
-  
+
+  azurerm_linux_virtual_machine_scale_set.standard_f2:
+    instances: 10 # Override the number of instances in the scale set.
+    os_disk:
+      monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
+
   azurerm_managed_disk.my_disk:
     monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
   
@@ -450,4 +455,7 @@ resource_usage:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 
-
+  azurerm_windows_virtual_machine_scale_set.basic_a2:
+    instances: 10 # Override the number of instances in the scale set.
+    os_disk:
+      monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
