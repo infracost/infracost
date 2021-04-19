@@ -38,7 +38,7 @@ func TestRedshiftCluster(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_redshift_cluster.ca": map[string]interface{}{
-			"excess_concurrency_scaling_sec": 4321,
+			"excess_concurrency_scaling_secs": 4321,
 			"spectrum_data_scanned_tb":       0.5,
 			"backup_storage_gb":              612000,
 		},

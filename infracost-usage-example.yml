@@ -161,7 +161,7 @@ resource_usage:
 
   aws_redshift_cluster.with_usage:
     managed_storage_gb: 10000
-    excess_concurrency_scaling_sec: 20000
+    excess_concurrency_scaling_secs: 20000
     spectrum_data_scanned_tb: 1.5
     backup_storage_gb: 1000000
 
