@@ -67,7 +67,7 @@ make test
 The entire test suite can take >20 mins to run, so we recommend against running them all locally. These will run on GitHub actions.
 
 You should run tests for a file you added/changed with `-v` and warn log level so you can see and fix any warnings:
-```
+```sh
 INFRACOST_LOG_LEVEL=warn go test -v internal/providers/terraform/aws/ebs_volume_test.go
 
 time="2021-04-05T15:24:16Z" level=warning msg="Multiple prices found for aws_ebs_volume.gp3 Provisioned throughput, using the first price"
@@ -222,8 +222,15 @@ Instead of directly querying the GraphQL, you can also run `distinct` or `regex`
 
 4. You can now query you local MongoDB:
 
-	```
+	Run the mongo shell:
+
+	```sh
 	mongo
+	```
+
+	Example queries:
+
+	```javascript
 	use cloudPricing;
 
 	// Find the vendor names
@@ -387,7 +394,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 > **Note:** Developing Azure resources requires Azure creds. See below for details.
 
 - The Azure Terraform provider requires real credentials to be able to run `terraform plan`. This means you must have Azure credentials for running the Infracost commands and integration tests for Azure. We recommend creating read-only Azure credentials for this purpose. If you have an Azure subscription, you can do this by running the `az` command line:
-	```
+	```sh
 	az ad sp create-for-rbac --name http://InfracostReadOnly --role Reader --scope=/subscriptions/<SUBSCRIPTION ID> --years=10
 	```
 	If you do not have an Azure subscription, then please ask on the contributors channel on the Infracost Slack and we can provide you with credentials.
