@@ -84,7 +84,7 @@ func TestMariaDBServer(t *testing.T) {
 				{
 					Name:             "Storage",
 					PriceHash:        "73c878c435ec33946f3cfd3aa7681679-ea8c44e23e41502dcee5033e136055b6",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(5120)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(5)),
 				},
 				{
 					Name:             "Additional backup storage",
@@ -104,7 +104,7 @@ func TestMariaDBServer(t *testing.T) {
 				{
 					Name:             "Storage",
 					PriceHash:        "6de6a33ecfe17c2f4c760f045edf7ae2-ea8c44e23e41502dcee5033e136055b6",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(4096000)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(4000)),
 				},
 				{
 					Name:             "Additional backup storage",
@@ -124,7 +124,7 @@ func TestMariaDBServer(t *testing.T) {
 				{
 					Name:             "Storage",
 					PriceHash:        "6de6a33ecfe17c2f4c760f045edf7ae2-ea8c44e23e41502dcee5033e136055b6",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(5120)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(5)),
 				},
 				{
 					Name:             "Additional backup storage",
@@ -207,7 +207,7 @@ func TestMariaDBServer_usage(t *testing.T) {
 				{
 					Name:             "Storage",
 					PriceHash:        "6de6a33ecfe17c2f4c760f045edf7ae2-ea8c44e23e41502dcee5033e136055b6",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(5120)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(5)),
 				},
 				{
 					Name:             "Additional backup storage",
@@ -227,7 +227,7 @@ func TestMariaDBServer_usage(t *testing.T) {
 				{
 					Name:             "Storage",
 					PriceHash:        "6de6a33ecfe17c2f4c760f045edf7ae2-ea8c44e23e41502dcee5033e136055b6",
-					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(4096000)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(4000)),
 				},
 				{
 					Name:             "Additional backup storage",

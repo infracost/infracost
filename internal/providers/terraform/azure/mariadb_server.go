@@ -51,7 +51,7 @@ func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 		},
 	})
 
-	storageGB := d.Get("storage_mb").Int()
+	storageGB := d.Get("storage_mb").Int() / 1024
 
 	// MO and GP storage cost are the same, and we don't have cost component for MO Storage now
 	if tier == "MO" {
