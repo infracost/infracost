@@ -5,6 +5,7 @@ import "github.com/infracost/infracost/internal/schema"
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
+	GetAzureMariaDBServerRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 }
 
