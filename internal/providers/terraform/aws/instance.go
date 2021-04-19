@@ -40,7 +40,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))
 	subResources = append(subResources, newEbsBlockDevices(d.Get("ebs_block_device"), region)...)
 
-	costComponents := []*schema.CostComponent{computeCostComponent(d, u, "on_demand", tenancy)}
+	costComponents := []*schema.CostComponent{computeCostComponent(d, u, tenancy)}
 	if d.Get("ebs_optimized").Bool() {
 		costComponents = append(costComponents, ebsOptimizedCostComponent(d))
 	}
@@ -59,17 +59,30 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	}
 }
 
-func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseOption string, tenancy string) *schema.CostComponent {
+func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, tenancy string) *schema.CostComponent {
 	region := d.Get("region").String()
 	instanceType := d.Get("instance_type").String()
 
 	purchaseOptionLabel := map[string]string{
 		"on_demand": "on-demand",
 		"spot":      "spot",
-	}[purchaseOption]
+	}
 
 	osLabel := "Linux/UNIX"
 	operatingSystem := "Linux"
+
+	var reservedInstanceType string
+	var reservedInstanceTerm string
+	var reservedInstancePaymentOption string
+	if u != nil && u.Get("reserved_instance_type").Exists() {
+		reservedInstanceType = u.Get("reserved_instance_type").String()
+		if u.Get("reserved_instance_term").Exists() {
+			reservedInstanceTerm = u.Get("reserved_instance_term").String()
+		}
+		if u.Get("reserved_instance_payment_option").Exists() {
+			reservedInstancePaymentOption = u.Get("reserved_instance_payment_option").String()
+		}
+	}
 
 	// Allow the operating system to be specified in the usage data until we can support it from the AMI directly.
 	if u != nil && u.Get("operating_system").Exists() {
@@ -110,7 +123,9 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: &purchaseOption,
+			PurchaseOption:     &reservedInstanceType,
+			TermLength:         &reservedInstanceTerm,
+			TermPurchaseOption: &reservedInstancePaymentOption,
 		},
 	}
 }
