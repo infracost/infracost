@@ -26,7 +26,7 @@
 
 The overall process for contributing to Infracost is:
 
-1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check; the issue labels should help you to find a `good first issue, or new resources that others have already requested/liked.
+1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. The issue labels should help you to find an issue to work on. There are also [other issues](https://github.com/infracost/infracost/issues) that you might like to check.
 2. Create a new issue if there's no issue for what you want to work on. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback.
 3. Add a comment to the issue you're working on to let the rest of the community know.
 4. Create a fork, commit and push to your fork. Send a pull request (PR) from your fork to this repo with the proposed change. Don't forget to run `make lint` and `make fmt` first. Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Commit messages can usually start with "feat(aws): add ...", "feat(google): add ...", or "fix: nil pointer...". This helps us generate a cleaner changelog.
@@ -35,6 +35,8 @@ The overall process for contributing to Infracost is:
 
 ## Setting up the development environment
 
+This guide assumes you are familiar with Terraform, if not you can take an hour to read/watch [this](https://www.terraform.io/intro/index.html) and [this](https://learn.hashicorp.com/collections/terraform/aws-get-started).
+
 ### Install
 
 Install go dependencies
@@ -42,19 +44,14 @@ Install go dependencies
 make deps
 ```
 
-Add your [Infracost API key](https://www.infracost.io/docs/#2-get-api-key) to your `.env.local` file:
-```sh
-cat <<EOF >> .env.local
-INFRACOST_API_KEY=XXX
-EOF
-```
-
 ### Run
 
 Run the code:
 ```sh
-make run ARGS="--path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
+make run ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
 ```
+
+This will use your existing [Infracost API key](https://www.infracost.io/docs/#2-get-api-key).
 
 ### Test
 
@@ -69,7 +66,7 @@ make test
 
 The entire test suite can take >20 mins to run, so we recommend against running them all locally. These will run on GitHub actions.
 
-You can run tests for a file you added/changed with `-v` and warn log level so you can see and fix any warnings:
+You should run tests for a file you added/changed with `-v` and warn log level so you can see and fix any warnings:
 ```
 INFRACOST_LOG_LEVEL=warn go test -v internal/providers/terraform/aws/ebs_volume_test.go
 
@@ -129,7 +126,7 @@ func GetMyResourceRegistryItem() *schema.RegistryItem {
 func NewMyResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	region := d.Get("region").String()
-    var instanceCount int64 = 1
+  var instanceCount int64 = 1
 
 	costComponents := []*schema.CostComponent{
 		{
@@ -174,10 +171,10 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 ```
 
-Finally create a temporary Terraform file to test your resource and run (no need to commit that):
+Finally create a temporary Terraform project, like [this](examples/terraform), to test your resource and run (no need to commit that):
 
 ```sh
-make run ARGS="--path my_new_terraform/"
+make run ARGS="breakdown --path my_new_terraform"
 ```
 
 Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
