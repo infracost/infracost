@@ -136,7 +136,7 @@ resource_usage:
   aws_elb.my_elb:
     monthly_data_processed_gb: 10000 # Monthly data processed by a Classic Load Balancer in GB.
 
-  aws_instance.windows_instance:
+  aws_instance.my_instance:
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
 
   aws_fsx_windows_file_system.my_system:
