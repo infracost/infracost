@@ -20,6 +20,10 @@ func NewAzureRMLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.Usa
 	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(region, instanceType)}
 	subResources := make([]*schema.Resource, 0)
 
+	if d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool() {
+		costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
+	}
+
 	osDisk := osDiskSubResource(region, d, u)
 	if osDisk != nil {
 		subResources = append(subResources, osDisk)

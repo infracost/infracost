@@ -25,6 +25,11 @@ func NewAzureRMWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData
 	licenseType := d.Get("license_type").String()
 
 	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(region, instanceType, licenseType)}
+
+	if d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool() {
+		costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
+	}
+
 	subResources := make([]*schema.Resource, 0)
 
 	osDisk := osDiskSubResource(region, d, u)

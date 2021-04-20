@@ -25,6 +25,11 @@ func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) 
 	instanceType := d.Get("size").String()
 
 	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(region, instanceType)}
+
+	if d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool() {
+		costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
+	}
+
 	subResources := make([]*schema.Resource, 0)
 
 	osDisk := osDiskSubResource(region, d, u)

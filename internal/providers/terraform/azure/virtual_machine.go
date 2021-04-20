@@ -15,6 +15,29 @@ func parseVMSKUName(instanceType string) string {
 	return s
 }
 
+func ultraSSDReservationCostComponent(region string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:           "Ultra disk reservation (if unattached)",
+		Unit:           "vCPU-hours",
+		UnitMultiplier: 1,
+		HourlyQuantity: nil,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(region),
+			Service:       strPtr("Storage"),
+			ProductFamily: strPtr("Storage"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", Value: strPtr("Ultra Disks")},
+				{Key: "skuName", Value: strPtr("Ultra LRS")},
+				{Key: "meterName", Value: strPtr("Reservation per vCPU Provisioned")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	}
+}
+
 func osDiskSubResource(region string, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if len(d.Get("os_disk").Array()) == 0 {
 		return nil
