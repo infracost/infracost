@@ -94,6 +94,36 @@ func TestAzureRMLinuxVirtualMachine(t *testing.T) {
 				version   = "latest"
 			}
 		}
+		
+		resource "azurerm_linux_virtual_machine" "standard_a2_ultra_enabled" {
+			name                = "standard_a2_ultra_enabled"
+			resource_group_name = "fake_resource_group"
+			location            = "eastus"
+
+			size           = "Standard_A2_v2"
+			admin_username = "fakeuser"
+			admin_password = "fakepass"
+
+			network_interface_ids = [
+				"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
+			]
+
+			os_disk {
+				caching              = "ReadWrite"
+				storage_account_type = "StandardSSD_LRS"
+			}
+			
+			additional_capabilities {
+				ultra_ssd_enabled = true
+			}
+
+			source_image_reference {
+				publisher = "Canonical"
+				offer     = "UbuntuServer"
+				sku       = "16.04-LTS"
+				version   = "latest"
+			}
+		}
 	`
 
 	usage := schema.NewUsageMap(map[string]interface{}{
@@ -176,6 +206,26 @@ func TestAzureRMLinuxVirtualMachine(t *testing.T) {
 							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 						},
 					},
+				},
+			},
+		},
+		{
+			Name: "azurerm_linux_virtual_machine.standard_a2_ultra_enabled",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:      "Instance usage (pay as you go, A2 v2)",
+					SkipCheck: true,
+				},
+				{
+					Name:             "Ultra disk reservation (if unattached)",
+					PriceHash:        "cdb969dd2d88d468c7842c5a42c07050-c1baecc1e3a89596af672fd42fe001bf",
+					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "os_disk",
+					SkipCheck: true,
 				},
 			},
 		},
