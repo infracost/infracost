@@ -128,7 +128,6 @@ func tableForBreakdown(breakdown Breakdown, fields []string) string {
 			Align:       text.AlignRight,
 			AlignHeader: text.AlignRight,
 		})
-		i++
 	}
 
 	t.AppendRow(table.Row{""})
