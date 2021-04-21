@@ -22,8 +22,14 @@ func GetAzureRMLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("location").String()
+	instanceType := d.Get("size").String()
 
-	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(d)}
+	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(region, instanceType)}
+
+	if d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool() {
+		costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
+	}
+
 	subResources := make([]*schema.Resource, 0)
 
 	osDisk := osDiskSubResource(region, d, u)
@@ -38,18 +44,16 @@ func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) 
 	}
 }
 
-func linuxVirtualMachineCostComponent(d *schema.ResourceData) *schema.CostComponent {
-	region := d.Get("location").String()
-	size := d.Get("size").String()
+func linuxVirtualMachineCostComponent(region string, instanceType string) *schema.CostComponent {
 	purchaseOption := "Consumption"
 	purchaseOptionLabel := "pay as you go"
 
 	productNameRe := "/Virtual Machines .* Series$/"
-	if strings.HasPrefix(size, "Basic_") {
+	if strings.HasPrefix(instanceType, "Basic_") {
 		productNameRe = "/Virtual Machines .* Series Basic$/"
 	}
 
-	skuName := parseVMSKUName(size)
+	skuName := parseVMSKUName(instanceType)
 
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, skuName),
@@ -62,7 +66,7 @@ func linuxVirtualMachineCostComponent(d *schema.ResourceData) *schema.CostCompon
 			Service:       strPtr("Virtual Machines"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "armSkuName", Value: strPtr(size)},
+				{Key: "armSkuName", Value: strPtr(instanceType)},
 				{Key: "productName", ValueRegex: strPtr(productNameRe)},
 				{Key: "skuName", Value: strPtr(skuName)},
 			},

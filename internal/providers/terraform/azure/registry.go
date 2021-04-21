@@ -4,8 +4,10 @@ import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
+	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
+	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

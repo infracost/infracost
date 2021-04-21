@@ -7,12 +7,35 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// Parse from Terraform size value to Azure instance type value.
-func parseVMSKUName(size string) string {
-	s := strings.ReplaceAll(size, "Standard_", "")
+// Parse from instance type value to Azure SKU name.
+func parseVMSKUName(instanceType string) string {
+	s := strings.ReplaceAll(instanceType, "Standard_", "")
 	s = strings.ReplaceAll(s, "Basic_", "")
 	s = strings.ReplaceAll(s, "_", " ")
 	return s
+}
+
+func ultraSSDReservationCostComponent(region string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:           "Ultra disk reservation (if unattached)",
+		Unit:           "vCPU-hours",
+		UnitMultiplier: 1,
+		HourlyQuantity: nil,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(region),
+			Service:       strPtr("Storage"),
+			ProductFamily: strPtr("Storage"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", Value: strPtr("Ultra Disks")},
+				{Key: "skuName", Value: strPtr("Ultra LRS")},
+				{Key: "meterName", Value: strPtr("Reservation per vCPU Provisioned")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	}
 }
 
 func osDiskSubResource(region string, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
