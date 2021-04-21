@@ -186,12 +186,6 @@ var UsageOnlyResources []string = []string{}
 // google_compute_region_disk
 // google_compute_snapshot
 //
-// Cloud VPN (https://cloud.google.com/vpc/network-pricing#vpn-pricing):
-// google_compute_vpn_gateway
-// google_compute_vpn_tunnel
-// google_compute_external_vpn_gateway
-// google_compute_ha_vpn_gateway
-//
 // Load balancers (https://cloud.google.com/vpc/network-pricing#lb):
 // google_compute_forwarding_rule
 // google_compute_global_forwarding_rule
@@ -203,8 +197,6 @@ var UsageOnlyResources []string = []string{}
 // google_compute_region_target_http_proxy
 // google_compute_region_target_https_proxy
 //
-// Cloud NAT (https://cloud.google.com/vpc/network-pricing#nat-pricing):
-// google_compute_router_nat
 //
 // Packet mirroring (https://cloud.google.com/vpc/network-pricing#packet-mirroring):
 // google_compute_packet_mirroring
