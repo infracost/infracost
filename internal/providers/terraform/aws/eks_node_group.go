@@ -88,33 +88,32 @@ func eksComputeCostComponent(d *schema.ResourceData, u *schema.UsageData, region
 		}
 	}
 
-	if RIType == "" {
-		return &schema.CostComponent{
-			Name:           fmt.Sprintf("Instance usage (Linux/UNIX, %s, %s)", strings.Replace(purchaseOptionLabel, "_", "-", 1), instanceType),
-			Unit:           "hours",
-			UnitMultiplier: 1,
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredSize)),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonEC2"),
-				ProductFamily: strPtr("Compute Instance"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "instanceType", Value: strPtr(instanceType)},
-					{Key: "operatingSystem", Value: strPtr("Linux")},
-					{Key: "preInstalledSw", Value: strPtr("NA")},
-					{Key: "tenancy", Value: strPtr("Shared")},
-					{Key: "capacitystatus", Value: strPtr("Used")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr(purchaseOptionLabel),
-			},
-		}
-	} else {
+	if RIType != "" {
 		return reservedInstanceCostComponent(region, "Linux/UNIX", purchaseOptionLabel, RIType, RITerm, RIPaymentOption, "Shared", instanceType, "Linux", desiredSize)
 	}
 
+	return &schema.CostComponent{
+		Name:           fmt.Sprintf("Instance usage (Linux/UNIX, %s, %s)", strings.Replace(purchaseOptionLabel, "_", "-", 1), instanceType),
+		Unit:           "hours",
+		UnitMultiplier: 1,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredSize)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonEC2"),
+			ProductFamily: strPtr("Compute Instance"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "instanceType", Value: strPtr(instanceType)},
+				{Key: "operatingSystem", Value: strPtr("Linux")},
+				{Key: "preInstalledSw", Value: strPtr("NA")},
+				{Key: "tenancy", Value: strPtr("Shared")},
+				{Key: "capacitystatus", Value: strPtr("Used")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr(purchaseOptionLabel),
+		},
+	}
 }
 
 func eksCPUCreditsCostComponent(d *schema.ResourceData, region string, desiredSize int64, instanceType string) *schema.CostComponent {

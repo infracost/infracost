@@ -91,57 +91,57 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 		}
 	}
 
-	var RIType, RITerm, RIPaymentOption string
+	var reservedIType, reservedTerm, reservedPaymentOption string
 	if u != nil && u.Get("reserved_instance_type").Exists() {
 		purchaseOptionLabel = "reserved"
-		RIType = u.Get("reserved_instance_type").String()
+		reservedIType = u.Get("reserved_instance_type").String()
 		if u.Get("reserved_instance_term").Exists() {
-			RITerm = u.Get("reserved_instance_term").String()
+			reservedTerm = u.Get("reserved_instance_term").String()
 		}
 		if u.Get("reserved_instance_payment_option").Exists() {
-			RIPaymentOption = u.Get("reserved_instance_payment_option").String()
+			reservedPaymentOption = u.Get("reserved_instance_payment_option").String()
 		}
 	}
 
-	if RIType != "" {
-		return reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, RIType, RITerm, RIPaymentOption, tenancy, instanceType, operatingSystem, 1)
-	} else {
-		return &schema.CostComponent{
-			Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
-			Unit:           "hours",
-			UnitMultiplier: 1,
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonEC2"),
-				ProductFamily: strPtr("Compute Instance"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "instanceType", Value: strPtr(instanceType)},
-					{Key: "tenancy", Value: strPtr(tenancy)},
-					{Key: "operatingSystem", Value: strPtr(operatingSystem)},
-					{Key: "preInstalledSw", Value: strPtr("NA")},
-					{Key: "capacitystatus", Value: strPtr("Used")},
-				},
+	if reservedIType != "" {
+		return reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, reservedIType, reservedTerm, reservedPaymentOption, tenancy, instanceType, operatingSystem, 1)
+	}
+
+	return &schema.CostComponent{
+		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
+		Unit:           "hours",
+		UnitMultiplier: 1,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonEC2"),
+			ProductFamily: strPtr("Compute Instance"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "instanceType", Value: strPtr(instanceType)},
+				{Key: "tenancy", Value: strPtr(tenancy)},
+				{Key: "operatingSystem", Value: strPtr(operatingSystem)},
+				{Key: "preInstalledSw", Value: strPtr("NA")},
+				{Key: "capacitystatus", Value: strPtr("Used")},
 			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: &purchaseOption,
-			},
-		}
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: &purchaseOption,
+		},
 	}
 }
 
-func reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, RIType, RITerm, RIPaymentOption, tenancy, instanceType, operatingSystem string, count int64) *schema.CostComponent {
-	RITermName := map[string]string{
+func reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, reservedType, reservedTerm, reservedPaymentOption, tenancy, instanceType, operatingSystem string, count int64) *schema.CostComponent {
+	reservedTermName := map[string]string{
 		"1_year": "1yr",
 		"3_year": "3yr",
-	}[RITerm]
+	}[reservedTerm]
 
-	RIPaymentOptionName := map[string]string{
+	reservedPaymentOptionName := map[string]string{
 		"no_upfront":      "No Upfront",
 		"partial_upfront": "Partial Upfront",
 		"all_upfront":     "All Upfront",
-	}[RIPaymentOption]
+	}[reservedPaymentOption]
 
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
@@ -163,9 +163,9 @@ func reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, RIType,
 		},
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount:   strPtr("0"),
-			TermOfferingClass:  &RIType,
-			TermLength:         &RITermName,
-			TermPurchaseOption: &RIPaymentOptionName,
+			TermOfferingClass:  &reservedType,
+			TermLength:         &reservedTermName,
+			TermPurchaseOption: &reservedPaymentOptionName,
 		},
 	}
 }
