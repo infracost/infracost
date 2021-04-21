@@ -40,7 +40,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))
 	subResources = append(subResources, newEbsBlockDevices(d.Get("ebs_block_device"), region)...)
 
-	costComponents := []*schema.CostComponent{computeCostComponent(d, u, tenancy)}
+	costComponents := []*schema.CostComponent{computeCostComponent(d, u, "on_demand", tenancy)}
 	if d.Get("ebs_optimized").Bool() {
 		costComponents = append(costComponents, ebsOptimizedCostComponent(d))
 	}
@@ -59,30 +59,17 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	}
 }
 
-func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, tenancy string) *schema.CostComponent {
+func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseOption string, tenancy string) *schema.CostComponent {
 	region := d.Get("region").String()
 	instanceType := d.Get("instance_type").String()
 
 	purchaseOptionLabel := map[string]string{
 		"on_demand": "on-demand",
 		"spot":      "spot",
-	}
+	}[purchaseOption]
 
 	osLabel := "Linux/UNIX"
 	operatingSystem := "Linux"
-
-	var reservedInstanceType string
-	var reservedInstanceTerm string
-	var reservedInstancePaymentOption string
-	if u != nil && u.Get("reserved_instance_type").Exists() {
-		reservedInstanceType = u.Get("reserved_instance_type").String()
-		if u.Get("reserved_instance_term").Exists() {
-			reservedInstanceTerm = u.Get("reserved_instance_term").String()
-		}
-		if u.Get("reserved_instance_payment_option").Exists() {
-			reservedInstancePaymentOption = u.Get("reserved_instance_payment_option").String()
-		}
-	}
 
 	// Allow the operating system to be specified in the usage data until we can support it from the AMI directly.
 	if u != nil && u.Get("operating_system").Exists() {
@@ -104,11 +91,63 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, tenancy s
 		}
 	}
 
+	var RIType, RITerm, RIPaymentOption string
+	if u != nil && u.Get("reserved_instance_type").Exists() {
+		purchaseOptionLabel = "reserved"
+		RIType = u.Get("reserved_instance_type").String()
+		if u.Get("reserved_instance_term").Exists() {
+			RITerm = u.Get("reserved_instance_term").String()
+		}
+		if u.Get("reserved_instance_payment_option").Exists() {
+			RIPaymentOption = u.Get("reserved_instance_payment_option").String()
+		}
+	}
+
+	if RIType != "" {
+		return reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, RIType, RITerm, RIPaymentOption, tenancy, instanceType, operatingSystem, 1)
+	} else {
+		return &schema.CostComponent{
+			Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
+			Unit:           "hours",
+			UnitMultiplier: 1,
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonEC2"),
+				ProductFamily: strPtr("Compute Instance"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "instanceType", Value: strPtr(instanceType)},
+					{Key: "tenancy", Value: strPtr(tenancy)},
+					{Key: "operatingSystem", Value: strPtr(operatingSystem)},
+					{Key: "preInstalledSw", Value: strPtr("NA")},
+					{Key: "capacitystatus", Value: strPtr("Used")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: &purchaseOption,
+			},
+		}
+	}
+}
+
+func reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, RIType, RITerm, RIPaymentOption, tenancy, instanceType, operatingSystem string, count int64) *schema.CostComponent {
+	RITermName := map[string]string{
+		"1_year": "1yr",
+		"3_year": "3yr",
+	}[RITerm]
+
+	RIPaymentOptionName := map[string]string{
+		"no_upfront":      "No Upfront",
+		"partial_upfront": "Partial Upfront",
+		"all_upfront":     "All Upfront",
+	}[RIPaymentOption]
+
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(count)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -123,9 +162,10 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, tenancy s
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption:     &reservedInstanceType,
-			TermLength:         &reservedInstanceTerm,
-			TermPurchaseOption: &reservedInstancePaymentOption,
+			StartUsageAmount:   strPtr("0"),
+			TermOfferingClass:  &RIType,
+			TermLength:         &RITermName,
+			TermPurchaseOption: &RIPaymentOptionName,
 		},
 	}
 }
