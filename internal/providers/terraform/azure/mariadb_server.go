@@ -2,12 +2,11 @@ package azure
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
-
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 )
 
 func GetAzureMariaDBServerRegistryItem() *schema.RegistryItem {
@@ -28,7 +27,7 @@ func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 		family = strings.Split(sku, "_")[1]
 		cores = strings.Split(sku, "_")[2]
 	} else {
-		log.Println("MariaDB sku format is not recognised. Please follows the tier_family_cores pattern (for example: GP_Gen5_4)")
+		log.Warnf("Unrecognised MariaDB SKU format for resource %s: %s", d.Address, sku)
 		return nil
 	}
 
@@ -39,7 +38,7 @@ func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}[tier]
 
 	if tierName == "" {
-		log.Println("MariaDB tier is not recognised. Please use B_ for Basic, GP_ for General Purpose, MO_ for Memory Optimized")
+		log.Warnf("Unrecognised MariaDB tier prefix for resource %s: %s", d.Address, tierName)
 		return nil
 	}
 
