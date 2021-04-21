@@ -2,6 +2,7 @@ package azure
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -21,15 +22,26 @@ func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 
 	region := d.Get("location").String()
 	sku := d.Get("sku_name").String()
-	tier := strings.Split(sku, "_")[0]
-	family := strings.Split(sku, "_")[1]
-	cores := strings.Split(sku, "_")[2]
+	var tier, family, cores string
+	if s := strings.Split(sku, "_"); len(s) == 3 {
+		tier = strings.Split(sku, "_")[0]
+		family = strings.Split(sku, "_")[1]
+		cores = strings.Split(sku, "_")[2]
+	} else {
+		log.Println("MariaDB sku format is not recognised. Please follows the tier_family_cores pattern (for example: GP_Gen5_4)")
+		return nil
+	}
 
 	tierName := map[string]string{
 		"B":  "Basic",
 		"GP": "General Purpose",
 		"MO": "Memory Optimized",
 	}[tier]
+
+	if tierName == "" {
+		log.Println("MariaDB tier is not recognised. Please use B_ for Basic, GP_ for General Purpose, MO_ for Memory Optimized")
+		return nil
+	}
 
 	productNameRegex := fmt.Sprintf("/%s - Compute %s/", tierName, family)
 	skuName := fmt.Sprintf("%s vCore", cores)
@@ -82,10 +94,8 @@ func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 
 	skuName = "Backup LRS"
-	if d.Get("geo_redundant_backup_enabled").Exists() {
-		if d.Get("geo_redundant_backup_enabled").String() == "true" {
-			skuName = "Backup GRS"
-		}
+	if d.Get("geo_redundant_backup_enabled").Exists() && d.Get("geo_redundant_backup_enabled").Bool() {
+		skuName = "Backup GRS"
 	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
