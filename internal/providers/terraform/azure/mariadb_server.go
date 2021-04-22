@@ -18,6 +18,7 @@ func GetAzureMariaDBServerRegistryItem() *schema.RegistryItem {
 
 func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
+	serviceName := "Azure Database for MariaDB"
 
 	region := d.Get("location").String()
 	sku := d.Get("sku_name").String()
@@ -45,22 +46,7 @@ func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 	productNameRegex := fmt.Sprintf("/%s - Compute %s/", tierName, family)
 	skuName := fmt.Sprintf("%s vCore", cores)
 
-	costComponents = append(costComponents, &schema.CostComponent{
-		Name:           fmt.Sprintf("Compute (%s)", sku),
-		Unit:           "hours",
-		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
-			Service:       strPtr("Azure Database for MariaDB"),
-			ProductFamily: strPtr("Databases"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
-				{Key: "skuName", Value: strPtr(skuName)},
-			},
-		},
-	})
+	costComponents = append(costComponents, databaseComputeInstance(region, serviceName, sku, productNameRegex, skuName))
 
 	storageGB := d.Get("storage_mb").Int() / 1024
 
@@ -70,21 +56,7 @@ func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 	productNameRegex = fmt.Sprintf("/%s - Storage/", tierName)
 
-	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "Storage",
-		Unit:            "GB-months",
-		UnitMultiplier:  1,
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(storageGB)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
-			Service:       strPtr("Azure Database for MariaDB"),
-			ProductFamily: strPtr("Databases"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
-			},
-		},
-	})
+	costComponents = append(costComponents, databaseStorageComponent(region, serviceName, productNameRegex, storageGB))
 
 	var backupStorageGB *decimal.Decimal
 
@@ -97,7 +69,53 @@ func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 		skuName = "Backup GRS"
 	}
 
-	costComponents = append(costComponents, &schema.CostComponent{
+	costComponents = append(costComponents, databaseBackupStorageComponent(region, serviceName, skuName, backupStorageGB))
+
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: costComponents,
+	}
+}
+
+func databaseComputeInstance(region, serviceName, sku, productNameRegex, skuName string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:           fmt.Sprintf("Compute (%s)", sku),
+		Unit:           "hours",
+		UnitMultiplier: 1,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(region),
+			Service:       strPtr(serviceName),
+			ProductFamily: strPtr("Databases"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
+				{Key: "skuName", Value: strPtr(skuName)},
+			},
+		},
+	}
+}
+
+func databaseStorageComponent(region, serviceName, productNameRegex string, storageGB int64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Storage",
+		Unit:            "GB-months",
+		UnitMultiplier:  1,
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(storageGB)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(region),
+			Service:       strPtr(serviceName),
+			ProductFamily: strPtr("Databases"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
+			},
+		},
+	}
+}
+
+func databaseBackupStorageComponent(region, serviceName, skuName string, backupStorageGB *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
 		Name:            "Additional backup storage",
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
@@ -105,17 +123,12 @@ func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),
-			Service:       strPtr("Azure Database for MariaDB"),
+			Service:       strPtr(serviceName),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", ValueRegex: strPtr("/Backup Storage/")},
 				{Key: "skuName", Value: strPtr(skuName)},
 			},
 		},
-	})
-
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
 	}
 }

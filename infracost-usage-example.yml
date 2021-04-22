@@ -461,7 +461,7 @@ resource_usage:
     additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB.
 
   azurerm_postgresql_server.my_server:
-    additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB.
+    additional_backup_storage_gb: 3000 # Additional consumption of backup storage in GB.
   
   azurerm_windows_virtual_machine.my_windows_vm:
     os_disk:
