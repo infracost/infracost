@@ -23,6 +23,10 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	region := d.Get("region").String()
 	scalingConfig := d.Get("scaling_config").Array()[0]
 	desiredSize := scalingConfig.Get("desired_size").Int()
+	purchaseOptionLabel := "on_demand"
+	if d.Get("capacity_type").String() != "" {
+		purchaseOptionLabel = strings.ToLower(d.Get("capacity_type").String())
+	}
 	instanceType := "t3.medium"
 	if len(d.Get("instance_types").Array()) > 0 {
 		// Only a single type is expected https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_node_group#instance_types
@@ -55,7 +59,7 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		}
 		subResources = append(subResources, lt)
 	} else {
-		costComponents = append(costComponents, eksComputeCostComponent(d, u, region, desiredSize, instanceType))
+		costComponents = append(costComponents, computeCostComponent(d, u, purchaseOptionLabel, instanceType, "Shared", desiredSize))
 		eksCPUCreditsCostComponent := eksCPUCreditsCostComponent(d, region, desiredSize, instanceType)
 		if eksCPUCreditsCostComponent != nil {
 			costComponents = append(costComponents, eksCPUCreditsCostComponent)
@@ -67,52 +71,6 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		Name:           d.Address,
 		CostComponents: costComponents,
 		SubResources:   subResources,
-	}
-}
-
-func eksComputeCostComponent(d *schema.ResourceData, u *schema.UsageData, region string, desiredSize int64, instanceType string) *schema.CostComponent {
-	purchaseOptionLabel := "on_demand"
-	if d.Get("capacity_type").String() != "" {
-		purchaseOptionLabel = strings.ToLower(d.Get("capacity_type").String())
-	}
-
-	var RIType, RITerm, RIPaymentOption string
-	if u != nil && u.Get("reserved_instance_type").Exists() {
-		purchaseOptionLabel = "reserved"
-		RIType = u.Get("reserved_instance_type").String()
-		if u.Get("reserved_instance_term").Exists() {
-			RITerm = u.Get("reserved_instance_term").String()
-		}
-		if u.Get("reserved_instance_payment_option").Exists() {
-			RIPaymentOption = u.Get("reserved_instance_payment_option").String()
-		}
-	}
-
-	if RIType != "" {
-		return reservedInstanceCostComponent(region, "Linux/UNIX", purchaseOptionLabel, RIType, RITerm, RIPaymentOption, "Shared", instanceType, "Linux", desiredSize)
-	}
-
-	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (Linux/UNIX, %s, %s)", strings.Replace(purchaseOptionLabel, "_", "-", 1), instanceType),
-		Unit:           "hours",
-		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredSize)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr("AmazonEC2"),
-			ProductFamily: strPtr("Compute Instance"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "instanceType", Value: strPtr(instanceType)},
-				{Key: "operatingSystem", Value: strPtr("Linux")},
-				{Key: "preInstalledSw", Value: strPtr("NA")},
-				{Key: "tenancy", Value: strPtr("Shared")},
-				{Key: "capacitystatus", Value: strPtr("Used")},
-			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr(purchaseOptionLabel),
-		},
 	}
 }
 

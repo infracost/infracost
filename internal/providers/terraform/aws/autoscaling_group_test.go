@@ -989,21 +989,6 @@ func TestAutoscalingGroup_reserved(t *testing.T) {
 	resource "aws_launch_configuration" "lc1" {
 		image_id      = "fake_ami"
 		instance_type = "t3.medium"
-
-		root_block_device {
-			volume_size = 10
-		}
-
-		ebs_block_device {
-			device_name = "xvdf"
-			volume_size = 10
-		}
-
-		ebs_block_device {
-			device_name = "xvdg"
-			volume_type = "gp3"
-			volume_size = 10
-		}
 	}
 
 	resource "aws_autoscaling_group" "my_asg" {
@@ -1047,12 +1032,63 @@ func TestAutoscalingGroup_reserved(t *testing.T) {
 							Name:      "root_block_device",
 							SkipCheck: true,
 						},
+					},
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
+}
+
+func TestAutoscalingGroup_windows(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+	resource "aws_launch_configuration" "lc1" {
+		image_id      = "fake_ami"
+		instance_type = "t3.medium"
+	}
+
+	resource "aws_autoscaling_group" "my_asg" {
+		launch_configuration = aws_launch_configuration.lc1.id
+		desired_capacity     = 1
+		max_size             = 1
+		min_size             = 1
+	}`
+
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_autoscaling_group.my_asg": map[string]interface{}{
+			"operating_system": "windows",
+		},
+	})
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_autoscaling_group.my_asg",
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name: "aws_launch_configuration.lc1",
+					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:      "ebs_block_device[0]",
+							Name:            "Instance usage (Windows, on-demand, t3.medium)",
+							PriceHash:       "e18ba69d4a34cb83afd75d29cc0535ff-d2c98780d7b6e36641b521f1f8145c6f",
+							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+						},
+						{
+							Name:      "EC2 detailed monitoring",
 							SkipCheck: true,
 						},
 						{
-							Name:      "ebs_block_device[1]",
+							Name:      "CPU credits",
+							SkipCheck: true,
+						},
+					},
+					SubResourceChecks: []testutil.ResourceCheck{
+						{
+							Name:      "root_block_device",
 							SkipCheck: true,
 						},
 					},

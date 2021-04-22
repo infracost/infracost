@@ -35,12 +35,14 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		tenancy = "Dedicated"
 	}
 
+	instanceType := d.Get("instance_type").String()
+
 	region := d.Get("region").String()
 	subResources := make([]*schema.Resource, 0)
 	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))
 	subResources = append(subResources, newEbsBlockDevices(d.Get("ebs_block_device"), region)...)
 
-	costComponents := []*schema.CostComponent{computeCostComponent(d, u, "on_demand", tenancy)}
+	costComponents := []*schema.CostComponent{computeCostComponent(d, u, "on_demand", instanceType, tenancy, 1)}
 	if d.Get("ebs_optimized").Bool() {
 		costComponents = append(costComponents, ebsOptimizedCostComponent(d))
 	}
@@ -59,9 +61,8 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	}
 }
 
-func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseOption string, tenancy string) *schema.CostComponent {
+func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseOption, instanceType, tenancy string, desiredSize int64) *schema.CostComponent {
 	region := d.Get("region").String()
-	instanceType := d.Get("instance_type").String()
 
 	purchaseOptionLabel := map[string]string{
 		"on_demand": "on-demand",
@@ -103,7 +104,7 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 		}
 	}
 
-	if reservedIType != "" {
+	if reservedIType != "" && reservedTerm != "" && reservedPaymentOption != "" {
 		return reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, reservedIType, reservedTerm, reservedPaymentOption, tenancy, instanceType, operatingSystem, 1)
 	}
 
@@ -111,7 +112,7 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredSize)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
