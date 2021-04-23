@@ -45,7 +45,7 @@ RUN chmod +x /app/build/infracost
 # Application
 FROM alpine:3.13 as app
 # Tools needed for running diffs in CI integrations
-RUN apk --no-cache add ca-certificates openssl openssh-client curl
+RUN apk --no-cache add ca-certificates openssl openssh-client curl git
 
 # The jq package provided by alpine:3.13 (jq 1.6-rc1) is flagged as a 
 # high severity vulnerability, so we install the latest release ourselves
