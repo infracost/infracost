@@ -138,17 +138,17 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 func validateReserveInstanceParams(typeName, term, option string) (bool, string) {
 	validTypes := []string{"convertible", "standard"}
 	if !stringInSlice(validTypes, typeName) {
-		return false, fmt.Sprintf("Invalid reserved_instance_type value. Expected: convertible, standard. Got: %s", typeName)
+		return false, fmt.Sprintf("Invalid reserved_instance_type, ignoring reserved options. Expected: convertible, standard. Got: %s", typeName)
 	}
 
 	validTerms := []string{"1_year", "3_year"}
 	if !stringInSlice(validTerms, term) {
-		return false, fmt.Sprintf("Invalid reserved_instance_term value. Expected: 1_year, 3_year. Got: %s", term)
+		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: 1_year, 3_year. Got: %s", term)
 	}
 
 	validOptions := []string{"no_upfront", "partial_upfront", "all_upfront"}
 	if !stringInSlice(validOptions, option) {
-		return false, fmt.Sprintf("Invalid reserved_instance_payment_option value. Expected: no_upfront, partial_upfront, all_upfront. Got: %s", option)
+		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: no_upfront, partial_upfront, all_upfront. Got: %s", option)
 	}
 
 	return true, ""
