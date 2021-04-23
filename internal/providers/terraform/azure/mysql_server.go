@@ -18,6 +18,7 @@ func GetAzureMySQLServerRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	serviceName := "Azure Database for MySQL"
 	var costComponents []*schema.CostComponent
 
 	region := d.Get("location").String()
@@ -46,22 +47,7 @@ func NewAzureMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	productNameRegex := fmt.Sprintf("/%s - Compute %s/", tierName, family)
 	skuName := fmt.Sprintf("%s vCore", cores)
 
-	costComponents = append(costComponents, &schema.CostComponent{
-		Name:           fmt.Sprintf("Compute (%s)", sku),
-		Unit:           "hours",
-		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
-			Service:       strPtr("Azure Database for MySQL"),
-			ProductFamily: strPtr("Databases"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
-				{Key: "skuName", Value: strPtr(skuName)},
-			},
-		},
-	})
+	costComponents = append(costComponents, databaseComputeInstance(region, serviceName, sku, productNameRegex, skuName))
 
 	storageGB := d.Get("storage_mb").Int() / 1024
 
@@ -71,21 +57,7 @@ func NewAzureMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 	productNameRegex = fmt.Sprintf("/%s - Storage/", tierName)
 
-	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "Storage",
-		Unit:            "GB-months",
-		UnitMultiplier:  1,
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(storageGB)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
-			Service:       strPtr("Azure Database for MySQL"),
-			ProductFamily: strPtr("Databases"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
-			},
-		},
-	})
+	costComponents = append(costComponents, databaseStorageComponent(region, serviceName, productNameRegex, storageGB))
 
 	var backupStorageGB *decimal.Decimal
 
@@ -98,22 +70,7 @@ func NewAzureMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		skuName = "Backup GRS"
 	}
 
-	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "Additional backup storage",
-		Unit:            "GB-months",
-		UnitMultiplier:  1,
-		MonthlyQuantity: backupStorageGB,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
-			Service:       strPtr("Azure Database for MySQL"),
-			ProductFamily: strPtr("Databases"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr("/Backup Storage/")},
-				{Key: "skuName", Value: strPtr(skuName)},
-			},
-		},
-	})
+	costComponents = append(costComponents, databaseBackupStorageComponent(region, serviceName, skuName, backupStorageGB))
 
 	return &schema.Resource{
 		Name:           d.Address,
