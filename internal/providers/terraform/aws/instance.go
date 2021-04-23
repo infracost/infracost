@@ -126,6 +126,7 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 				{Key: "tenancy", Value: strPtr(tenancy)},
 				{Key: "operatingSystem", Value: strPtr(operatingSystem)},
 				{Key: "preInstalledSw", Value: strPtr("NA")},
+				{Key: "licenseModel", Value: strPtr("No License required")},
 				{Key: "capacitystatus", Value: strPtr("Used")},
 			},
 		},

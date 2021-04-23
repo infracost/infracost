@@ -537,7 +537,7 @@ func TestEKSNodeGroup_windows(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:            "Instance usage (Windows, on-demand, t3.medium)",
-					PriceHash:       "e18ba69d4a34cb83afd75d29cc0535ff-d2c98780d7b6e36641b521f1f8145c6f",
+					PriceHash:       "9b141b37e9cd40b8225ed689fbdb0963-d2c98780d7b6e36641b521f1f8145c6f",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
