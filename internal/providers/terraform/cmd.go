@@ -33,16 +33,6 @@ func (e *CmdError) Error() string {
 }
 
 func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
-	os.Setenv("TF_IN_AUTOMATION", "true")
-
-	if opts.TerraformWorkspace != "" {
-		os.Setenv("TF_WORKSPACE", opts.TerraformWorkspace)
-	}
-
-	if opts.TerraformConfigFile != "" {
-		os.Setenv("TF_CLI_CONFIG_FILE", opts.TerraformConfigFile)
-	}
-
 	exe := opts.TerraformBinary
 	if exe == "" {
 		exe = defaultTerraformBinary
@@ -51,6 +41,16 @@ func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	cmd := exec.Command(exe, args...)
 	log.Infof("Running command: %s", cmd.String())
 	cmd.Dir = opts.Dir
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, "TF_IN_AUTOMATION=true")
+
+	if opts.TerraformWorkspace != "" {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("TF_WORKSPACE=%s", opts.TerraformWorkspace))
+	}
+
+	if opts.TerraformConfigFile != "" {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("TF_CLI_CONFIG_FILE=%s", opts.TerraformConfigFile))
+	}
 
 	logWriter := &cmdLogWriter{
 		logger: log.StandardLogger().WithField("binary", "terraform"),
