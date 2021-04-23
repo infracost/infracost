@@ -89,8 +89,8 @@ func tableForBreakdown(breakdown Breakdown, fields []string) string {
 		headers = append(headers, ui.UnderlineString("Price"))
 		columns = append(columns, table.ColumnConfig{
 			Number:      i,
-			Align:       text.AlignLeft,
-			AlignHeader: text.AlignLeft,
+			Align:       text.AlignRight,
+			AlignHeader: text.AlignRight,
 		})
 		i++
 	}
@@ -98,8 +98,8 @@ func tableForBreakdown(breakdown Breakdown, fields []string) string {
 		headers = append(headers, ui.UnderlineString("Quantity"))
 		columns = append(columns, table.ColumnConfig{
 			Number:      i,
-			Align:       text.AlignLeft,
-			AlignHeader: text.AlignLeft,
+			Align:       text.AlignRight,
+			AlignHeader: text.AlignRight,
 		})
 		i++
 	}

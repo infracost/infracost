@@ -231,13 +231,12 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
 
-	if f, _ := cmd.Flags().GetStringSlice("fields"); len(f) > 0 {
+	if cmd.Flags().Changed("fields") {
 		cfg.Fields, _ = cmd.Flags().GetStringSlice("fields")
 	}
 
-	if cfg.Fields != nil && strings.ToLower(cfg.Format) != "table" {
-		l := log.New()
-		l.Warningln("'--fields' flag is not supports for this output format")
+	if cfg.Fields != nil && cfg.Format != "table" {
+		ui.PrintWarning("'--fields' flag is not supports for this output format")
 	}
 
 	return nil

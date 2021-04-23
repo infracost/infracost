@@ -80,11 +80,9 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 			format, _ := cmd.Flags().GetString("format")
 
-			var fields []string
-			if f, _ := cmd.Flags().GetStringSlice("fields"); len(f) > 0 {
+			fields := []string{"name", "monthly_quantity", "unit", "monthly_cost"}
+			if cmd.Flags().Changed("fields") {
 				fields, _ = cmd.Flags().GetStringSlice("fields")
-			} else {
-				fields = []string{"name", "monthly_quantity", "unit", "monthly_cost"}
 			}
 
 			opts := output.Options{
@@ -102,9 +100,8 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 				err error
 			)
 
-			if f, _ := cmd.Flags().GetStringSlice("fields"); f != nil && strings.ToLower(format) != "table" {
-				l := log.New()
-				l.Warningln("'--fields' flag is not supports for this output format")
+			if cmd.Flags().Changed("fields") && format != "table" {
+				ui.PrintWarning("'--fields' flag is not supports for this output format")
 			}
 			switch strings.ToLower(format) {
 			case "json":
@@ -130,7 +127,7 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
-	cmd.Flags().StringSlice("fields", []string{"name", "monthly_quantity", "unit", "monthly_cost"}, "Specify the output table columns: price, monthly_quantity, unit, hourly_cost, monthly_cost")
+	cmd.Flags().StringSlice("fields", []string{"monthly_quantity", "unit", "monthly_cost"}, "Specify the output table columns: price, monthly_quantity, unit, hourly_cost, monthly_cost")
 
 	return cmd
 }
