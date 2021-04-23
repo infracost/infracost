@@ -92,20 +92,23 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 		}
 	}
 
-	var reservedIType, reservedTerm, reservedPaymentOption string
-	if u != nil && u.Get("reserved_instance_type").Exists() {
-		purchaseOptionLabel = "reserved"
-		reservedIType = u.Get("reserved_instance_type").String()
-		if u.Get("reserved_instance_term").Exists() {
-			reservedTerm = u.Get("reserved_instance_term").String()
-		}
-		if u.Get("reserved_instance_payment_option").Exists() {
-			reservedPaymentOption = u.Get("reserved_instance_payment_option").String()
-		}
-	}
+	var reservedType, reservedTerm, reservedPaymentOption string
+	if u != nil && u.Get("reserved_instance_type").Type != gjson.Null &&
+		u.Get("reserved_instance_term").Type != gjson.Null &&
+		u.Get("reserved_instance_payment_option").Type != gjson.Null {
 
-	if reservedIType != "" && reservedTerm != "" && reservedPaymentOption != "" {
-		return reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, reservedIType, reservedTerm, reservedPaymentOption, tenancy, instanceType, operatingSystem, 1)
+		reservedType = u.Get("reserved_instance_type").String()
+		reservedTerm = u.Get("reserved_instance_term").String()
+		reservedPaymentOption = u.Get("reserved_instance_payment_option").String()
+
+		valid, err := validateReserveInstanceParams(reservedType, reservedTerm, reservedPaymentOption)
+		if err != "" {
+			log.Warnf(err)
+		}
+		if valid {
+			purchaseOptionLabel = "reserved"
+			return reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, reservedType, reservedTerm, reservedPaymentOption, tenancy, instanceType, operatingSystem, 1)
+		}
 	}
 
 	return &schema.CostComponent{
@@ -130,6 +133,25 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 			PurchaseOption: &purchaseOption,
 		},
 	}
+}
+
+func validateReserveInstanceParams(typeName, term, option string) (bool, string) {
+	validTypes := []string{"convertible", "standard"}
+	if !stringInSlice(validTypes, typeName) {
+		return false, fmt.Sprintf("Invalid reserved_instance_type value. Expected: convertible, standard. Got: %s", typeName)
+	}
+
+	validTerms := []string{"1_year", "3_year"}
+	if !stringInSlice(validTerms, term) {
+		return false, fmt.Sprintf("Invalid reserved_instance_term value. Expected: 1_year, 3_year. Got: %s", term)
+	}
+
+	validOptions := []string{"no_upfront", "partial_upfront", "all_upfront"}
+	if !stringInSlice(validOptions, option) {
+		return false, fmt.Sprintf("Invalid reserved_instance_payment_option value. Expected: no_upfront, partial_upfront, all_upfront. Got: %s", option)
+	}
+
+	return true, ""
 }
 
 func reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, reservedType, reservedTerm, reservedPaymentOption, tenancy, instanceType, operatingSystem string, count int64) *schema.CostComponent {
