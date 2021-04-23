@@ -8,6 +8,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
 	GetAzureMariaDBServerRegistryItem(),
+	GetAzurePostgreSQLServerRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
 }
