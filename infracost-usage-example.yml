@@ -44,6 +44,13 @@ resource_usage:
     message_size_kb: 32               # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
     monthly_connection_mins: 10000000 # Monthly total connection minutes to Websockets.
 
+  aws_autoscaling_group.my_asg:
+    instances: 15 # Number of instances in the autoscaling group.
+    operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
+    reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
+    reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
+    reserved_instance_payment_option: no_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
+
   aws_cloudwatch_event_bus.my_events:
     monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.
     monthly_third_party_events: 2000000       # Monthly third-party and cross-account events published. Each 64 KB chunk of payload is billed as 1 event.
@@ -130,6 +137,12 @@ resource_usage:
     monthly_infrequent_access_read_gb: 50   # Monthly infrequent access read requests in GB.
     monthly_infrequent_access_write_gb: 100 # Monthly infrequent access write requests in GB.
 
+  aws_eks_node_group.my_instance:
+    operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
+    reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
+    reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
+    reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
+
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB. 
 
@@ -138,6 +151,9 @@ resource_usage:
 
   aws_instance.my_instance:
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
+    reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
+    reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
+    reserved_instance_payment_option: all_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
 
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000 # Total storage used for backups in GB.
@@ -338,9 +354,6 @@ resource_usage:
     monthly_encryption_requests: 100000 # Monthly number of field level encryption requests.
     monthly_log_lines: 5000000          # Monthly number of real-time log lines.
     custom_ssl_certificates: 3          # Number of dedicated IP custom SSL certificates.
-
-  aws_autoscaling_group.my_asg:
-    instances: 15 # Number of instances in the autoscaling group.
   
   #
   # Terraform GCP resources

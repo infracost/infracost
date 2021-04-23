@@ -423,3 +423,368 @@ func TestInstance_ec2DetailedMonitoring(t *testing.T) {
 
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
+
+func TestInstance_RIPrices(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tf := `
+		resource "aws_instance" "std_1yr_no_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+		resource "aws_instance" "std_3yr_no_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+		resource "aws_instance" "std_1yr_partial_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+		resource "aws_instance" "std_3yr_partial_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+		resource "aws_instance" "std_1yr_all_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+		resource "aws_instance" "std_3yr_all_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+
+		resource "aws_instance" "cnvr_1yr_no_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+		resource "aws_instance" "cnvr_3yr_no_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+		resource "aws_instance" "cnvr_1yr_partial_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+		resource "aws_instance" "cnvr_3yr_partial_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+		resource "aws_instance" "cnvr_1yr_all_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}
+		resource "aws_instance" "cnvr_3yr_all_upfront" {
+			ami           = "fake_ami"
+			instance_type = "t3.medium"
+		}`
+
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_instance.std_1yr_no_upfront": map[string]interface{}{
+			"reserved_instance_type":           "standard",
+			"reserved_instance_term":           "1_year",
+			"reserved_instance_payment_option": "no_upfront",
+		},
+		"aws_instance.std_3yr_no_upfront": map[string]interface{}{
+			"reserved_instance_type":           "standard",
+			"reserved_instance_term":           "3_year",
+			"reserved_instance_payment_option": "no_upfront",
+		},
+		"aws_instance.std_1yr_partial_upfront": map[string]interface{}{
+			"reserved_instance_type":           "standard",
+			"reserved_instance_term":           "1_year",
+			"reserved_instance_payment_option": "partial_upfront",
+		},
+		"aws_instance.std_3yr_partial_upfront": map[string]interface{}{
+			"reserved_instance_type":           "standard",
+			"reserved_instance_term":           "3_year",
+			"reserved_instance_payment_option": "partial_upfront",
+		},
+		"aws_instance.std_1yr_all_upfront": map[string]interface{}{
+			"reserved_instance_type":           "standard",
+			"reserved_instance_term":           "1_year",
+			"reserved_instance_payment_option": "all_upfront",
+		},
+		"aws_instance.std_3yr_all_upfront": map[string]interface{}{
+			"reserved_instance_type":           "standard",
+			"reserved_instance_term":           "3_year",
+			"reserved_instance_payment_option": "all_upfront",
+		},
+		"aws_instance.cnvr_1yr_no_upfront": map[string]interface{}{
+			"reserved_instance_type":           "convertible",
+			"reserved_instance_term":           "1_year",
+			"reserved_instance_payment_option": "no_upfront",
+		},
+		"aws_instance.cnvr_3yr_no_upfront": map[string]interface{}{
+			"reserved_instance_type":           "convertible",
+			"reserved_instance_term":           "3_year",
+			"reserved_instance_payment_option": "no_upfront",
+		},
+		"aws_instance.cnvr_1yr_partial_upfront": map[string]interface{}{
+			"reserved_instance_type":           "convertible",
+			"reserved_instance_term":           "1_year",
+			"reserved_instance_payment_option": "partial_upfront",
+		},
+		"aws_instance.cnvr_3yr_partial_upfront": map[string]interface{}{
+			"reserved_instance_type":           "convertible",
+			"reserved_instance_term":           "3_year",
+			"reserved_instance_payment_option": "partial_upfront",
+		},
+		"aws_instance.cnvr_1yr_all_upfront": map[string]interface{}{
+			"reserved_instance_type":           "convertible",
+			"reserved_instance_term":           "1_year",
+			"reserved_instance_payment_option": "all_upfront",
+		},
+		"aws_instance.cnvr_3yr_all_upfront": map[string]interface{}{
+			"reserved_instance_type":           "convertible",
+			"reserved_instance_term":           "3_year",
+			"reserved_instance_payment_option": "all_upfront",
+		},
+	})
+
+	resourceChecks := []testutil.ResourceCheck{
+		{
+			Name: "aws_instance.std_1yr_no_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-354de5028123250997d97c05d011fe1c",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.std_3yr_no_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-eacbcf31b049c055c292e5f56fbe6f38",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.std_1yr_partial_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-1b51d9b46826b8797099f7cfdfcdf299",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.std_3yr_partial_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-bf59b46c8f98c6a49405f768bfa8b60a",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.std_1yr_all_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-0b517bfa356310108e91658d6759b4d5",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.std_3yr_all_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-4c69aedc693029aad69299aaef81901a",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.cnvr_1yr_no_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-db82ffe7b4996cd80e13db57284de443",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.cnvr_3yr_no_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-9252443b383d5d512783a5b68e9a901f",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.cnvr_1yr_partial_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-39830253d678995796c122c70b428e1b",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.cnvr_3yr_partial_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-99d3f32d59d2381ad0a77075299b58e6",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.cnvr_1yr_all_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-a0fcfdebef129d176f42bb38df23dad9",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+		{
+			Name: "aws_instance.cnvr_3yr_all_upfront",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:            "Instance usage (Linux/UNIX, reserved, t3.medium)",
+					PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-4a6714faa3f991aee5551b21d785b47c",
+					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
+				},
+				{
+					Name:      "CPU credits",
+					SkipCheck: true,
+				},
+			},
+			SubResourceChecks: []testutil.ResourceCheck{
+				{
+					Name:      "root_block_device",
+					SkipCheck: true,
+				},
+			},
+		},
+	}
+
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
+}

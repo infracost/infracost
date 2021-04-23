@@ -35,12 +35,14 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		tenancy = "Dedicated"
 	}
 
+	instanceType := d.Get("instance_type").String()
+
 	region := d.Get("region").String()
 	subResources := make([]*schema.Resource, 0)
 	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))
 	subResources = append(subResources, newEbsBlockDevices(d.Get("ebs_block_device"), region)...)
 
-	costComponents := []*schema.CostComponent{computeCostComponent(d, u, "on_demand", tenancy)}
+	costComponents := []*schema.CostComponent{computeCostComponent(d, u, "on_demand", instanceType, tenancy, 1)}
 	if d.Get("ebs_optimized").Bool() {
 		costComponents = append(costComponents, ebsOptimizedCostComponent(d))
 	}
@@ -59,9 +61,8 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	}
 }
 
-func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseOption string, tenancy string) *schema.CostComponent {
+func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseOption, instanceType, tenancy string, desiredSize int64) *schema.CostComponent {
 	region := d.Get("region").String()
-	instanceType := d.Get("instance_type").String()
 
 	purchaseOptionLabel := map[string]string{
 		"on_demand": "on-demand",
@@ -91,11 +92,30 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 		}
 	}
 
+	var reservedType, reservedTerm, reservedPaymentOption string
+	if u != nil && u.Get("reserved_instance_type").Type != gjson.Null &&
+		u.Get("reserved_instance_term").Type != gjson.Null &&
+		u.Get("reserved_instance_payment_option").Type != gjson.Null {
+
+		reservedType = u.Get("reserved_instance_type").String()
+		reservedTerm = u.Get("reserved_instance_term").String()
+		reservedPaymentOption = u.Get("reserved_instance_payment_option").String()
+
+		valid, err := validateReserveInstanceParams(reservedType, reservedTerm, reservedPaymentOption)
+		if err != "" {
+			log.Warnf(err)
+		}
+		if valid {
+			purchaseOptionLabel = "reserved"
+			return reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, reservedType, reservedTerm, reservedPaymentOption, tenancy, instanceType, operatingSystem, 1)
+		}
+	}
+
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredSize)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -111,6 +131,64 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: &purchaseOption,
+		},
+	}
+}
+
+func validateReserveInstanceParams(typeName, term, option string) (bool, string) {
+	validTypes := []string{"convertible", "standard"}
+	if !stringInSlice(validTypes, typeName) {
+		return false, fmt.Sprintf("Invalid reserved_instance_type, ignoring reserved options. Expected: convertible, standard. Got: %s", typeName)
+	}
+
+	validTerms := []string{"1_year", "3_year"}
+	if !stringInSlice(validTerms, term) {
+		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: 1_year, 3_year. Got: %s", term)
+	}
+
+	validOptions := []string{"no_upfront", "partial_upfront", "all_upfront"}
+	if !stringInSlice(validOptions, option) {
+		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: no_upfront, partial_upfront, all_upfront. Got: %s", option)
+	}
+
+	return true, ""
+}
+
+func reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, reservedType, reservedTerm, reservedPaymentOption, tenancy, instanceType, operatingSystem string, count int64) *schema.CostComponent {
+	reservedTermName := map[string]string{
+		"1_year": "1yr",
+		"3_year": "3yr",
+	}[reservedTerm]
+
+	reservedPaymentOptionName := map[string]string{
+		"no_upfront":      "No Upfront",
+		"partial_upfront": "Partial Upfront",
+		"all_upfront":     "All Upfront",
+	}[reservedPaymentOption]
+
+	return &schema.CostComponent{
+		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
+		Unit:           "hours",
+		UnitMultiplier: 1,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(count)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonEC2"),
+			ProductFamily: strPtr("Compute Instance"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "instanceType", Value: strPtr(instanceType)},
+				{Key: "tenancy", Value: strPtr(tenancy)},
+				{Key: "operatingSystem", Value: strPtr(operatingSystem)},
+				{Key: "preInstalledSw", Value: strPtr("NA")},
+				{Key: "capacitystatus", Value: strPtr("Used")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount:   strPtr("0"),
+			TermOfferingClass:  &reservedType,
+			TermLength:         &reservedTermName,
+			TermPurchaseOption: &reservedPaymentOptionName,
 		},
 	}
 }
