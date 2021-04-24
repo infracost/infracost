@@ -126,7 +126,7 @@ func databaseBackupStorageComponent(region, serviceName, skuName string, backupS
 			Service:       strPtr(serviceName),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr("/Backup Storage/")},
+				{Key: "productName", ValueRegex: strPtr("/Single Server - Backup Storage/")},
 				{Key: "skuName", Value: strPtr(skuName)},
 			},
 		},
