@@ -80,9 +80,13 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 			format, _ := cmd.Flags().GetString("format")
 
-			fields := []string{"name", "monthly_quantity", "unit", "monthly_cost"}
+			fields := []string{"monthly_quantity", "unit", "monthly_cost"}
 			if cmd.Flags().Changed("fields") {
-				fields, _ = cmd.Flags().GetStringSlice("fields")
+				if c, _ := cmd.Flags().GetStringSlice("fields"); len(c) == 0 {
+					ui.PrintWarning("'--fields' flag is empty, set a defaults")
+				} else {
+					cfg.Fields, _ = cmd.Flags().GetStringSlice("fields")
+				}
 			}
 
 			opts := output.Options{

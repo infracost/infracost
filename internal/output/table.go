@@ -128,6 +128,7 @@ func tableForBreakdown(breakdown Breakdown, fields []string) string {
 			Align:       text.AlignRight,
 			AlignHeader: text.AlignRight,
 		})
+		i++
 	}
 
 	t.AppendRow(table.Row{""})
@@ -146,11 +147,8 @@ func tableForBreakdown(breakdown Breakdown, fields []string) string {
 
 	var totalCostRow table.Row
 	totalCostRow = append(totalCostRow, ui.BoldString("PROJECT TOTAL"))
-	numOfFields := len(fields)
-	if contains(fields, "name") {
-		numOfFields--
-	}
-	for q := 1; q < numOfFields; q++ {
+	numOfFields := i - 3
+	for q := 0; q < numOfFields; q++ {
 		totalCostRow = append(totalCostRow, "")
 	}
 	totalCostRow = append(totalCostRow, formatCost2DP(breakdown.TotalMonthlyCost))

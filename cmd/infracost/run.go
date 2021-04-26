@@ -232,7 +232,11 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
 
 	if cmd.Flags().Changed("fields") {
-		cfg.Fields, _ = cmd.Flags().GetStringSlice("fields")
+		if c, _ := cmd.Flags().GetStringSlice("fields"); len(c) == 0 {
+			ui.PrintWarning("'--fields' flag is empty, set a defaults")
+		} else {
+			cfg.Fields, _ = cmd.Flags().GetStringSlice("fields")
+		}
 	}
 
 	if cfg.Fields != nil && cfg.Format != "table" {
