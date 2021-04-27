@@ -80,12 +80,19 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 			format, _ := cmd.Flags().GetString("format")
 
+			validFields := []string{"price", "monthly_quantity", "unit", "hourly_cost", "monthly_cost"}
+
 			fields := []string{"monthly_quantity", "unit", "monthly_cost"}
 			if cmd.Flags().Changed("fields") {
 				if c, _ := cmd.Flags().GetStringSlice("fields"); len(c) == 0 {
-					ui.PrintWarning("'--fields' flag is empty, set a defaults")
+					ui.PrintWarningf("'--fields' flag is empty, using defaults: %s", cmd.Flag("fields").DefValue)
 				} else {
-					cfg.Fields, _ = cmd.Flags().GetStringSlice("fields")
+					fields, _ = cmd.Flags().GetStringSlice("fields")
+					for _, f := range fields {
+						if !contains(validFields, f) {
+							ui.PrintWarningf("Invalid field '%s' specified, valid fields are: %s", f, validFields)
+						}
+					}
 				}
 			}
 
@@ -105,7 +112,7 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 			)
 
 			if cmd.Flags().Changed("fields") && format != "table" {
-				ui.PrintWarning("'--fields' flag is not supports for this output format")
+				ui.PrintWarningf("'--fields' flag is not supports for %s output format", format)
 			}
 			switch strings.ToLower(format) {
 			case "json":
@@ -131,7 +138,7 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
-	cmd.Flags().StringSlice("fields", []string{"monthly_quantity", "unit", "monthly_cost"}, "Specify the output table columns: price, monthly_quantity, unit, hourly_cost, monthly_cost")
+	cmd.Flags().StringSlice("fields", []string{"monthly_quantity", "unit", "monthly_cost"}, "Specify output fields: price, monthly_quantity, unit, hourly_cost, monthly_cost.\nOnly supported by table output format")
 
 	return cmd
 }
@@ -190,4 +197,13 @@ func checkOutputVersion(v string) bool {
 		v = "v" + v
 	}
 	return semver.Compare(v, "v"+minOutputVersion) >= 0 && semver.Compare(v, "v"+maxOutputVersion) <= 0
+}
+
+func contains(arr []string, e string) bool {
+	for _, a := range arr {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }

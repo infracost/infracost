@@ -231,16 +231,21 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
 
+	validFields := []string{"price", "monthly_quantity", "unit", "hourly_cost", "monthly_cost"}
+
 	if cmd.Flags().Changed("fields") {
 		if c, _ := cmd.Flags().GetStringSlice("fields"); len(c) == 0 {
-			ui.PrintWarning("'--fields' flag is empty, set a defaults")
+			ui.PrintWarningf("'--fields' flag is empty, using defaults: %s", cmd.Flag("fields").DefValue)
+		} else if cfg.Fields != nil && cfg.Format != "table" {
+			ui.PrintWarningf("'--fields' flag is not supports for %s output format", cfg.Format)
 		} else {
 			cfg.Fields, _ = cmd.Flags().GetStringSlice("fields")
+			for _, f := range cfg.Fields {
+				if !contains(validFields, f) {
+					ui.PrintWarningf("Invalid field '%s' specified, valid fields are: %s", f, validFields)
+				}
+			}
 		}
-	}
-
-	if cfg.Fields != nil && cfg.Format != "table" {
-		ui.PrintWarning("'--fields' flag is not supports for this output format")
 	}
 
 	return nil
