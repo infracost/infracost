@@ -41,7 +41,7 @@ func TestEKSNodeGroup_default(t *testing.T) {
 				{
 					Name:            "CPU credits",
 					PriceHash:       "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.Zero),
+					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 				{
 					Name:             "Storage (general purpose SSD, gp2)",
