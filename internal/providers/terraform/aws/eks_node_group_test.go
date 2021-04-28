@@ -41,7 +41,7 @@ func TestEKSNodeGroup_default(t *testing.T) {
 				{
 					Name:            "CPU credits",
 					PriceHash:       "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 				{
 					Name:             "Storage (general purpose SSD, gp2)",
@@ -94,7 +94,7 @@ func TestEKSNodeGroup_defaultCpuCredits(t *testing.T) {
 				{
 					Name:            "CPU credits",
 					PriceHash:       "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2 * 350 * 3)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2 * 350 * 3)),
 				},
 				{
 					Name:             "Storage (general purpose SSD, gp2)",
@@ -581,7 +581,7 @@ func TestEKSNodeGroup_with_instance_launch_template_without_instance(t *testing.
 						{
 							Name:            "CPU credits",
 							PriceHash:       "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-							HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(350 * 2 * 3)),
+							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(350 * 2 * 3)),
 						},
 						{
 							Name:            "Inference accelerator (eia1.medium)",
@@ -653,7 +653,7 @@ func TestEKSNodeGroup_spot(t *testing.T) {
 				{
 					Name:            "CPU credits",
 					PriceHash:       "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 				{
 					Name:             "Storage (general purpose SSD, gp2)",
@@ -708,7 +708,7 @@ func TestEKSNodeGroup_reserved(t *testing.T) {
 				{
 					Name:            "CPU credits",
 					PriceHash:       "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(350 * 2 * 1)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(350 * 2 * 1)),
 				},
 				{
 					Name:             "Storage (general purpose SSD, gp2)",
@@ -761,7 +761,7 @@ func TestEKSNodeGroup_windows(t *testing.T) {
 				{
 					Name:            "CPU credits",
 					PriceHash:       "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-					HourlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(100 * 2 * 1)),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(100 * 2 * 1)),
 				},
 				{
 					Name:             "Storage (general purpose SSD, gp2)",
