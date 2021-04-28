@@ -284,6 +284,13 @@ func TestAutoscalingGroup_launchConfiguration_cpuCredits(t *testing.T) {
 			min_size             = 1
 		}`
 
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_autoscaling_group.asg1": map[string]interface{}{
+			"cpu_credit_hrs":    200,
+			"virtual_cpu_count": 2,
+		},
+	})
+
 	resourceChecks := []testutil.ResourceCheck{
 		{
 			Name: "aws_autoscaling_group.asg1",
@@ -299,7 +306,7 @@ func TestAutoscalingGroup_launchConfiguration_cpuCredits(t *testing.T) {
 						{
 							Name:             "CPU credits",
 							PriceHash:        "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-							MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
+							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(200 * 2 * 2)),
 						},
 					},
 					SubResourceChecks: []testutil.ResourceCheck{
@@ -313,7 +320,7 @@ func TestAutoscalingGroup_launchConfiguration_cpuCredits(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }
 
 func TestAutoscalingGroup_launchTemplate(t *testing.T) {
@@ -701,7 +708,7 @@ func TestAutoscalingGroup_launchTemplate_cpuCredits(t *testing.T) {
 	tf := `
 		resource "aws_launch_template" "lt1" {
 			image_id          = "fake_ami"
-			instance_type     = "t3.medium"
+			instance_type     = "t3.large"
 		}
 
 		resource "aws_autoscaling_group" "asg1" {
@@ -713,6 +720,13 @@ func TestAutoscalingGroup_launchTemplate_cpuCredits(t *testing.T) {
 			min_size         = 1
 		}`
 
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_autoscaling_group.asg1": map[string]interface{}{
+			"cpu_credit_hrs":    350,
+			"virtual_cpu_count": 2,
+		},
+	})
+
 	resourceChecks := []testutil.ResourceCheck{
 		{
 			Name: "aws_autoscaling_group.asg1",
@@ -721,14 +735,14 @@ func TestAutoscalingGroup_launchTemplate_cpuCredits(t *testing.T) {
 					Name: "aws_launch_template.lt1",
 					CostComponentChecks: []testutil.CostComponentCheck{
 						{
-							Name:            "Instance usage (Linux/UNIX, on-demand, t3.medium)",
-							PriceHash:       "c8faba8210cd512ccab6b71ca400f4de-d2c98780d7b6e36641b521f1f8145c6f",
+							Name:            "Instance usage (Linux/UNIX, on-demand, t3.large)",
+							PriceHash:       "3a45cd05e73384099c2ff360bdb74b74-d2c98780d7b6e36641b521f1f8145c6f",
 							HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(2)),
 						},
 						{
 							Name:             "CPU credits",
 							PriceHash:        "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-							MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
+							MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(2 * 350 * 2)),
 						},
 					},
 					SubResourceChecks: []testutil.ResourceCheck{
@@ -742,7 +756,7 @@ func TestAutoscalingGroup_launchTemplate_cpuCredits(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }
 
 func TestAutoscalingGroup_mixedInstanceLaunchTemplate(t *testing.T) {

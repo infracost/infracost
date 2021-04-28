@@ -19,9 +19,9 @@ resource_usage:
   # (e.g. `this[0]`) and `[*]` are specified for a resource, only the array element's usage
   # will be applied to that resource. This enables you to define default values using `[*]`
   # and override specific elements using their index.
-  # 
-  # Example: 
-  # 
+  #
+  # Example:
+  #
   # aws_cloudwatch_log_group.my_log_group[*]:
   #   storage_gb: 1000
   #   monthly_data_ingested_gb: 1000
@@ -50,11 +50,14 @@ resource_usage:
     reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
     reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
     reserved_instance_payment_option: no_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
+    # Only used when T2 credit_specification is set to unlimited or T3 & T4 instance types are used within a launch template,  or T3 & T4 instance types in a launch configuration.
+    cpu_credit_hrs: 350 # Number of hours in the month where you expect to burst the instance
+    virtual_cpu_count: 2 # Number of vCPUs that the instance type as.
 
   aws_cloudwatch_event_bus.my_events:
     monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.
     monthly_third_party_events: 2000000       # Monthly third-party and cross-account events published. Each 64 KB chunk of payload is billed as 1 event.
-    monthly_archive_processing_gb: 100        # Monthly archive event processing in GB. 
+    monthly_archive_processing_gb: 100        # Monthly archive event processing in GB.
     archive_storage_gb: 200                   # Archive storage used for event replay in GB.
     monthly_schema_discovery_events: 1000000  # Monthly events ingested for schema discovery. Each 8 KB chunk of payload is billed as 1 event.
 
@@ -63,9 +66,9 @@ resource_usage:
     monthly_data_ingested_gb: 1000 # Monthly data ingested by CloudWatch logs in GB.
     monthly_data_scanned_gb: 200   # Monthly data scanned by CloudWatch logs insights in GB.
 
-  aws_codebuild_project.my_project: 
+  aws_codebuild_project.my_project:
     monthly_build_mins: 10000 # Monthly total duration of builds in minutes. Each build is rounded up to the nearest minute.
-    
+
   aws_config_config_rule.my_config:
     monthly_rule_evaluations: 1000000 # Monthly config rule evaluations.
 
@@ -92,10 +95,7 @@ resource_usage:
   aws_docdb_cluster_instance.my_db:
     data_storage_gb: 1000         # Total storage for cluster in GB.
     monthly_io_request: 100000000 # Monthly number of input/output requests for cluster.
-    monthly_cpu_credit_hours: 100 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances. 
-    
-  aws_docdb_cluster.my_cluster:
-    backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
+    monthly_cpu_credit_hours: 100 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances.
 
   aws_docdb_cluster_snapshot.my_snapshot:
     backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
@@ -142,9 +142,12 @@ resource_usage:
     reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
     reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
     reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
+    # Only used for T3 & T4 instance types or if you specify a t2 instance with a launch template.
+    cpu_credit_hrs: 350 # Number of hours in the month where you expect to burst the instance
+    virtual_cpu_count: 2 # Number of vCPUs that the instance type as.
 
   aws_elasticache_cluster.my_redis_snapshot:
-    snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB. 
+    snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
 
   aws_elb.my_elb:
     monthly_data_processed_gb: 10000 # Monthly data processed by a Classic Load Balancer in GB.
@@ -154,6 +157,9 @@ resource_usage:
     reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
     reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
     reserved_instance_payment_option: all_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
+    # Can be used with T2 / T3 & T4 Instance types. T2 requires credit_specification to be unlimited.
+    cpu_credit_hrs: 350 # Number of hours in the month where you expect to burst the instance
+    virtual_cpu_count: 2 # Number of vCPUs that the instance type as.
 
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000 # Total storage used for backups in GB.
@@ -354,7 +360,7 @@ resource_usage:
     monthly_encryption_requests: 100000 # Monthly number of field level encryption requests.
     monthly_log_lines: 5000000          # Monthly number of real-time log lines.
     custom_ssl_certificates: 3          # Number of dedicated IP custom SSL certificates.
-  
+
   #
   # Terraform GCP resources
   #
@@ -388,10 +394,10 @@ resource_usage:
       australia: 250       # Australia.
 
 
-  google_compute_image.my_image: 
+  google_compute_image.my_image:
     storage_gb: 1000 # Total size of image storage in GB.
 
-  google_compute_machine_image.my_machine_image: 
+  google_compute_machine_image.my_machine_image:
     storage_gb: 1000 # Total size of machine image storage in GB.
 
   google_compute_snapshot.my_snapshot:
@@ -442,7 +448,7 @@ resource_usage:
 
   google_sql_database_instance.my_instance:
     backup_storage_gb: 1000 # Amount of backup storage in GB.
-    
+
   google_storage_bucket.my_storage_bucket:
     storage_gb: 150                   # Total size of bucket in GB.
     monthly_class_a_operations: 40000 # Monthly number of class A operations (object adds, bucket/object list).
@@ -478,7 +484,7 @@ resource_usage:
 
   azurerm_postgresql_server.my_server:
     additional_backup_storage_gb: 3000 # Additional consumption of backup storage in GB.
-  
+
   azurerm_windows_virtual_machine.my_windows_vm:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.

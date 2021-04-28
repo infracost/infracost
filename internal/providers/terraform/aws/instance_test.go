@@ -231,6 +231,21 @@ func TestInstance_cpuCredits(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
+	usage := schema.NewUsageMap(map[string]interface{}{
+		"aws_instance.t3_default": map[string]interface{}{
+			"cpu_credit_hrs":    0,
+			"virtual_cpu_count": 2,
+		},
+		"aws_instance.t3_unlimited": map[string]interface{}{
+			"cpu_credit_hrs":    730,
+			"virtual_cpu_count": 2,
+		},
+		"aws_instance.t2_unlimited": map[string]interface{}{
+			"cpu_credit_hrs":    300,
+			"virtual_cpu_count": 2,
+		},
+	})
+
 	tf := `
 		resource "aws_instance" "t3_default" {
 			ami           = "fake_ami"
@@ -285,7 +300,7 @@ func TestInstance_cpuCredits(t *testing.T) {
 				{
 					Name:             "CPU credits",
 					PriceHash:        "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.Zero),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
@@ -305,7 +320,7 @@ func TestInstance_cpuCredits(t *testing.T) {
 				{
 					Name:             "CPU credits",
 					PriceHash:        "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
-					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(730 * 2)),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
@@ -355,7 +370,7 @@ func TestInstance_cpuCredits(t *testing.T) {
 				{
 					Name:             "CPU credits",
 					PriceHash:        "4aaa3d22a88b57f7997e91888f867be9-e8e892be2fbd1c8f42fd6761ad8977d8",
-					MonthlyCostCheck: testutil.NilMonthlyCostCheck(),
+					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(300 * 2)),
 				},
 			},
 			SubResourceChecks: []testutil.ResourceCheck{
@@ -382,9 +397,8 @@ func TestInstance_cpuCredits(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }
-
 func TestInstance_ec2DetailedMonitoring(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")

@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"fmt"
+	"github.com/tidwall/gjson"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -21,6 +21,7 @@ func GetNewEKSNodeGroupItem() *schema.RegistryItem {
 
 func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
+
 	scalingConfig := d.Get("scaling_config").Array()[0]
 	desiredSize := scalingConfig.Get("desired_size").Int()
 	purchaseOptionLabel := "on_demand"
@@ -28,29 +29,60 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		purchaseOptionLabel = strings.ToLower(d.Get("capacity_type").String())
 	}
 	instanceType := "t3.medium"
-	if len(d.Get("instance_types").Array()) > 0 {
-		// Only a single type is expected https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_node_group#instance_types
-		instanceType = d.Get("instance_types").Array()[0].String()
-	}
+
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
 
 	launchTemplateRefID := d.References("launch_template.0.id")
 	launchTemplateRefName := d.References("launch_template.0.name")
 	launchTemplateRef := []*schema.ResourceData{}
+
 	if len(launchTemplateRefID) > 0 {
 		launchTemplateRef = launchTemplateRefID
 	} else if len(launchTemplateRefName) > 0 {
 		launchTemplateRef = launchTemplateRefName
 	}
 
+	if len(d.Get("instance_types").Array()) > 0 && len(launchTemplateRef) < 1 || len(launchTemplateRef) < 1 {
+		if len(d.Get("instance_types").Array()) > 0 {
+			instanceType = strings.ToLower(d.Get("instance_types").Array()[0].String())
+		}
+
+		costComponents = append(costComponents, computeCostComponent(d, u, purchaseOptionLabel, instanceType, "Shared", desiredSize))
+
+		var cpuCreditQuantity decimal.Decimal
+		if isInstanceBurstable(instanceType, []string{"t3", "t4"}) {
+			instanceCPUCreditHours := decimal.Zero
+			if u != nil && u.Get("cpu_credit_hrs").Exists() {
+				instanceCPUCreditHours = decimal.NewFromInt(u.Get("cpu_credit_hrs").Int())
+			}
+
+			instanceVCPUCount := decimal.Zero
+			if u != nil && u.Get("virtual_cpu_count").Exists() {
+				instanceVCPUCount = decimal.NewFromInt(u.Get("virtual_cpu_count").Int())
+			}
+
+			cpuCreditQuantity = instanceVCPUCount.Mul(instanceCPUCreditHours).Mul(decimal.NewFromInt(desiredSize))
+			instancePrefix := strings.SplitN(instanceType, ".", 2)[0]
+			costComponents = append(costComponents, cpuCreditsCostComponent(region, cpuCreditQuantity, instancePrefix))
+		}
+
+		costComponents = append(costComponents, newEksRootBlockDevice(d))
+	}
+
 	if len(launchTemplateRef) > 0 {
-		onDemandCount := decimal.NewFromInt(desiredSize)
 		spotCount := decimal.Zero
+		onDemandCount := decimal.NewFromInt(desiredSize)
+
 		if launchTemplateRef[0].Get("instance_market_options.0.market_type").String() == "spot" {
 			onDemandCount = decimal.Zero
 			spotCount = decimal.NewFromInt(desiredSize)
 		}
+
+		if launchTemplateRef[0].Get("instance_type").Type == gjson.Null {
+			launchTemplateRef[0].Set("instance_type", d.Get("instance_types").Array()[0].String())
+		}
+
 		lt := newLaunchTemplate(launchTemplateRef[0].Address, launchTemplateRef[0], u, region, onDemandCount, spotCount)
 
 		// AutoscalingGroup should show as not supported LaunchTemplate is not supported
@@ -58,45 +90,12 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			return nil
 		}
 		subResources = append(subResources, lt)
-	} else {
-		costComponents = append(costComponents, computeCostComponent(d, u, purchaseOptionLabel, instanceType, "Shared", desiredSize))
-		eksCPUCreditsCostComponent := eksCPUCreditsCostComponent(d, region, desiredSize, instanceType)
-		if eksCPUCreditsCostComponent != nil {
-			costComponents = append(costComponents, eksCPUCreditsCostComponent)
-		}
-		costComponents = append(costComponents, newEksRootBlockDevice(d))
 	}
 
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 		SubResources:   subResources,
-	}
-}
-
-func eksCPUCreditsCostComponent(d *schema.ResourceData, region string, desiredSize int64, instanceType string) *schema.CostComponent {
-
-	if !(strings.HasPrefix(instanceType, "t3.") || strings.HasPrefix(instanceType, "t4g.")) {
-		return nil
-	}
-
-	prefix := strings.SplitN(instanceType, ".", 2)[0]
-
-	return &schema.CostComponent{
-		Name:           "CPU credits",
-		Unit:           "vCPU-hours",
-		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredSize)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr("AmazonEC2"),
-			ProductFamily: strPtr("CPU Credits"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "operatingSystem", Value: strPtr("Linux")},
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/CPUCredits:%s$/", prefix))},
-			},
-		},
 	}
 }
 
