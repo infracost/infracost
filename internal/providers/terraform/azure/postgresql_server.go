@@ -47,7 +47,7 @@ func NewAzurePostrgreSQLServer(d *schema.ResourceData, u *schema.UsageData) *sch
 	productNameRegex := fmt.Sprintf("/%s - Compute %s/", tierName, family)
 	skuName := fmt.Sprintf("%s vCore", cores)
 
-	costComponents = append(costComponents, databaseComputeInstance(region, serviceName, sku, productNameRegex, skuName))
+	costComponents = append(costComponents, databaseComputeInstance(region, fmt.Sprintf("Compute (%s)", sku), serviceName, productNameRegex, skuName))
 
 	storageGB := d.Get("storage_mb").Int() / 1024
 
