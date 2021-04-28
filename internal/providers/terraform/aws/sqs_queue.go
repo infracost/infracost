@@ -41,7 +41,7 @@ func NewSqsQueue(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Requests",
-				Unit:            "requests",
+				Unit:            "1M requests",
 				UnitMultiplier:  1000000,
 				MonthlyQuantity: requests,
 				ProductFilter: &schema.ProductFilter{

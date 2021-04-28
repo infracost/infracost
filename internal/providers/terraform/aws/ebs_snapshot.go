@@ -60,7 +60,7 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		},
 		{
 			Name:            "ListChangedBlocks & ListSnapshotBlocks API requests",
-			Unit:            "requests",
+			Unit:            "1k requests",
 			UnitMultiplier:  1000,
 			MonthlyQuantity: listBlockRequests,
 			ProductFilter: &schema.ProductFilter{
@@ -75,7 +75,7 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		},
 		{
 			Name:            "GetSnapshotBlock API requests",
-			Unit:            "SnapshotAPIUnits",
+			Unit:            "1k SnapshotAPIUnits",
 			UnitMultiplier:  1000,
 			MonthlyQuantity: getSnapshotBlockRequests,
 			ProductFilter: &schema.ProductFilter{
@@ -90,7 +90,7 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		},
 		{
 			Name:            "PutSnapshotBlock API requests",
-			Unit:            "SnapshotAPIUnits",
+			Unit:            "1k SnapshotAPIUnits",
 			UnitMultiplier:  1000,
 			MonthlyQuantity: putSnapshotBlockRequests,
 			ProductFilter: &schema.ProductFilter{

@@ -73,7 +73,7 @@ func appendRequestComponentsForSpec(costComponents []*schema.CostComponent, spec
 func requestPriceComponent(name string, region string, usagetype string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
-		Unit:           "requests",
+		Unit:           "10k requests",
 		UnitMultiplier: 10000,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
