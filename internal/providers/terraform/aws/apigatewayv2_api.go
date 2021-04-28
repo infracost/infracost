@@ -123,7 +123,7 @@ func calculateBillableRequests(requestSize *decimal.Decimal, billableRequestSize
 func httpCostComponent(region string, displayName string, usageTier string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
-		Unit:            "requests",
+		Unit:            "1M requests",
 		UnitMultiplier:  1000000,
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
@@ -144,7 +144,7 @@ func httpCostComponent(region string, displayName string, usageTier string, mont
 func websocketCostComponent(region string, unit string, usageType string, displayName string, usageTier string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
-		Unit:            unit,
+		Unit:            "1M " + unit,
 		UnitMultiplier:  1000000,
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{

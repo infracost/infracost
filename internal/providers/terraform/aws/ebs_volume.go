@@ -101,7 +101,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 	if volumeAPIName == "standard" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "I/O requests",
-			Unit:            "request",
+			Unit:            "1M request",
 			UnitMultiplier:  1000000,
 			MonthlyQuantity: ioRequests,
 			ProductFilter: &schema.ProductFilter{

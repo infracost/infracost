@@ -41,7 +41,7 @@ func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Custom events published",
-				Unit:            "events",
+				Unit:            "1M events",
 				UnitMultiplier:  1000000,
 				MonthlyQuantity: monthlyCustomEvents,
 				ProductFilter: &schema.ProductFilter{
@@ -57,7 +57,7 @@ func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.
 			},
 			{
 				Name:            "Third-party events published",
-				Unit:            "events",
+				Unit:            "1M events",
 				UnitMultiplier:  1000000,
 				MonthlyQuantity: monthlyPartnerEvents,
 				ProductFilter: &schema.ProductFilter{
@@ -103,7 +103,7 @@ func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.
 			},
 			{
 				Name:            "Schema discovery",
-				Unit:            "events",
+				Unit:            "1M events",
 				UnitMultiplier:  1000000,
 				MonthlyQuantity: monthlyIngestedEvents,
 				ProductFilter: &schema.ProductFilter{

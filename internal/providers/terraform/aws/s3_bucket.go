@@ -47,7 +47,7 @@ func s3CostComponents(d *schema.ResourceData, u *schema.UsageData) []*schema.Cos
 	if objTagsEnabled {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Object tagging",
-			Unit:            "tags",
+			Unit:            "10k tags",
 			UnitMultiplier:  10000,
 			MonthlyQuantity: objTags,
 			ProductFilter: &schema.ProductFilter{
@@ -557,7 +557,7 @@ func s3ApiCostComponent(name string, service string, region string, usageType st
 func s3ApiOperationCostComponent(name string, service string, region string, usageType string, operation string, requests *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "requests",
+		Unit:            "1k requests",
 		UnitMultiplier:  1000,
 		MonthlyQuantity: requests,
 		ProductFilter: &schema.ProductFilter{
@@ -616,7 +616,7 @@ func s3DataGroupCostComponent(name string, service string, region string, usageT
 func s3LifecycleTransitionsCostComponent(region string, usageType string, operation string, requests *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Lifecycle transition",
-		Unit:            "requests",
+		Unit:            "1k requests",
 		UnitMultiplier:  1000,
 		MonthlyQuantity: requests,
 		ProductFilter: &schema.ProductFilter{
@@ -634,7 +634,7 @@ func s3LifecycleTransitionsCostComponent(region string, usageType string, operat
 func s3MonitoringCostComponent(region string, objects *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Monitoring and automation",
-		Unit:            "objects",
+		Unit:            "1k objects",
 		UnitMultiplier:  1000,
 		MonthlyQuantity: objects,
 		ProductFilter: &schema.ProductFilter{

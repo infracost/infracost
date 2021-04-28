@@ -146,7 +146,7 @@ func operations(d *schema.ResourceData, u *schema.UsageData) []*schema.CostCompo
 	return []*schema.CostComponent{
 		{
 			Name:            "Object adds, bucket/object list (class A)",
-			Unit:            "operations",
+			Unit:            "10k operations",
 			UnitMultiplier:  10000,
 			MonthlyQuantity: classAQuantity,
 			ProductFilter: &schema.ProductFilter{
@@ -163,7 +163,7 @@ func operations(d *schema.ResourceData, u *schema.UsageData) []*schema.CostCompo
 		},
 		{
 			Name:            "Object gets, retrieve bucket/object metadata (class B)",
-			Unit:            "operations",
+			Unit:            "10k operations",
 			UnitMultiplier:  10000,
 			MonthlyQuantity: classBQuantity,
 			ProductFilter: &schema.ProductFilter{

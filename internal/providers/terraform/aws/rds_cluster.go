@@ -162,7 +162,7 @@ func auroraStorageCostComponent(region string, u *schema.UsageData, databaseEngi
 		},
 		{
 			Name:            "I/O rate",
-			Unit:            "requests",
+			Unit:            "1M requests",
 			UnitMultiplier:  1000000,
 			MonthlyQuantity: &monthlyIORequests,
 			ProductFilter: &schema.ProductFilter{
@@ -200,7 +200,7 @@ func auroraBackupStorageCostComponent(region string, totalBackupStorageGB decima
 func auroraBacktrackCostComponent(region string, backtrackChangeRecords decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Backtrack",
-		Unit:            "CR-hours",
+		Unit:            "1M CR-hours",
 		UnitMultiplier:  1000000,
 		MonthlyQuantity: decimalPtr(backtrackChangeRecords),
 		ProductFilter: &schema.ProductFilter{
