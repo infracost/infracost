@@ -7,6 +7,7 @@ import (
 )
 
 var hourToMonthMultiplier = decimal.NewFromInt(730)
+var HourToMonthUnitMultiplier = 730
 
 type ResourceFunc func(*ResourceData, *UsageData) *Resource
 

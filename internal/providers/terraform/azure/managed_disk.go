@@ -204,8 +204,8 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           fmt.Sprintf("Storage (ultra, %d GiB)", diskSize),
-			Unit:           "GiB-hours",
-			UnitMultiplier: 1,
+			Unit:           "GiB",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(diskSize))),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
@@ -224,8 +224,8 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 		},
 		{
 			Name:           "Provisioned IOPS",
-			Unit:           "IOPS-hours",
-			UnitMultiplier: 1,
+			Unit:           "IOPS",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(iops))),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
@@ -244,8 +244,8 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 		},
 		{
 			Name:           "Throughput",
-			Unit:           "MB/s-hours",
-			UnitMultiplier: 1,
+			Unit:           "MB/s",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(throughput))),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
