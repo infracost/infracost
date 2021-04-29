@@ -138,7 +138,7 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
-	cmd.Flags().StringSlice("fields", []string{"monthly_quantity", "unit", "monthly_cost"}, "Comma separated list of output fields: price,monthly_quantity,unit,hourly_cost,monthly_cost.\nOnly supported by table output format")
+	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nOnly supported by table output format")
 
 	return cmd
 }
