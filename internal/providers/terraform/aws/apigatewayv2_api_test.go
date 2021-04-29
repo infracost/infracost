@@ -9,6 +9,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func TestApiGatewayv2ApiGoldenFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tftest.GoldenFileResourceTests(t, "apigatewayv2_api_test")
+}
+
 func TestApiGatewayv2Api(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {

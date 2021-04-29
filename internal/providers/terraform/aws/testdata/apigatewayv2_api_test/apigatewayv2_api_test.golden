@@ -1,0 +1,23 @@
+
+ Name                                        Quantity  Unit              Monthly Cost 
+                                                                                      
+ aws_apigatewayv2_api.http                                                            
+ └─ Requests (first 300M)              Cost depends on usage: $1.00 per 1M requests   
+                                                                                      
+ aws_apigatewayv2_api.http_usage                                                      
+ ├─ Requests (first 300M)                         300  1M requests            $300.00 
+ └─ Requests (over 300M)                          700  1M requests            $630.00 
+                                                                                      
+ aws_apigatewayv2_api.websocket                                                       
+ ├─ Messages (first 1B)                Cost depends on usage: $1.00 per 1M messages   
+ └─ Connection duration                Cost depends on usage: $0.25 per 1M minutes    
+                                                                                      
+ aws_apigatewayv2_api.websocket_usage                                                 
+ ├─ Messages (first 1B)                         1,000  1M messages          $1,000.00 
+ ├─ Messages (over 1B)                            500  1M messages            $400.00 
+ └─ Connection duration                            10  1M minutes               $2.50 
+                                                                                      
+ PROJECT TOTAL                                                              $2,332.50 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

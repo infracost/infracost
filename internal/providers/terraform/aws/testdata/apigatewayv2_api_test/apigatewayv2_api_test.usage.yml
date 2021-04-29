@@ -1,0 +1,10 @@
+version: 0.1
+resource_usage:
+  aws_apigatewayv2_api.http_usage:
+    monthly_requests: 1000000000
+    request_size_kb: 512
+
+  aws_apigatewayv2_api.websocket_usage:
+    monthly_messages: 1500000000
+    message_size_kb: 32
+    monthly_connection_mins: 10000000

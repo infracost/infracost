@@ -11,6 +11,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func TestDynamoDBTableGoldenFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tftest.GoldenFileResourceTests(t, "dynamodb_table_test")
+}
+
 func TestNewDynamoDBTableOnDemand(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
