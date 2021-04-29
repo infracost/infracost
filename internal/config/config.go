@@ -65,7 +65,7 @@ func DefaultConfig() *Config {
 		Projects: []*Project{{}},
 
 		Format: "table",
-		Fields: []string{"name", "monthly_quantity", "unit", "monthly_cost"},
+		Fields: []string{"name", "monthlyQuantity", "unit", "monthlyCost"},
 	}
 }
 
