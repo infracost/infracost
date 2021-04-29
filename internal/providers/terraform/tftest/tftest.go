@@ -1,8 +1,13 @@
 package tftest
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/usage"
+	"github.com/pmezard/go-difflib/difflib"
+	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -19,6 +24,8 @@ import (
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 )
+
+var update = flag.Bool("update", false, "update .golden files")
 
 var tfProviders = `
 	terraform {
@@ -149,6 +156,84 @@ func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, 
 	assert.NoError(t, err)
 
 	testutil.TestResources(t, project.Resources, checks)
+}
+
+func GoldenFileResourceTests(t *testing.T, testName string) {
+	cfg := config.DefaultConfig()
+	err := cfg.LoadFromEnv()
+	require.NoError(t, err)
+
+	// Load the terraform projects
+	tfProjectData, err := ioutil.ReadFile(filepath.Join("testdata", testName + ".tf"))
+	require.NoError(t, err)
+	tfProject := TerraformProject{
+		Files: []File{
+			{
+				Path:     "main.tf",
+				Contents: string(tfProjectData),
+			},
+		},
+	}
+
+	// Load the usage data, if any.
+	var usageData map[string]*schema.UsageData
+	usageFilePath := filepath.Join("testdata", testName + ".usage.yml")
+	if _, err := os.Stat(usageFilePath); err == nil || !os.IsNotExist(err) {
+		// usage file exists, load the data
+		usageData, err = usage.LoadFromFile(usageFilePath, false)
+		require.NoError(t, err)
+	}
+
+	// Generate the output
+	project, err := RunCostCalculations(cfg, tfProject, usageData)
+	require.NoError(t, err)
+
+	r := output.ToOutputFormat([]*schema.Project{project})
+
+	opts := output.Options{
+		ShowSkipped: true,
+		NoColor:     true,
+	}
+
+	actual, err := output.ToTable(r, opts)
+	require.NoError(t, err)
+
+	// strip the first line of output since it contains the temporary project path
+	endOfFirstLine := bytes.Index(actual, []byte("\n"))
+	if endOfFirstLine > 0 {
+		actual = actual[endOfFirstLine+1:]
+	}
+
+	// Load the snapshot result
+	expected := []byte("")
+	goldenFilePath := filepath.Join("testdata", testName + ".golden")
+	if _, err := os.Stat(goldenFilePath); err == nil || !os.IsNotExist(err) {
+		// golden file exists, load the data
+		expected, err = ioutil.ReadFile(goldenFilePath)
+		assert.NoError(t, err)
+	}
+
+	if !bytes.Equal(expected, actual) {
+		if *update {
+			err = ioutil.WriteFile(goldenFilePath, actual, 0644)
+			assert.NoError(t, err)
+			t.Logf(fmt.Sprintf("Wrote golden file %s", goldenFilePath))
+		} else {
+			// Generate the diff and error message.  We don't call assert.Equal because it escapes
+			// newlines (\n) and the output looks terrible.
+			diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
+				A:        difflib.SplitLines(string(expected)),
+				B:        difflib.SplitLines(string(actual)),
+				FromFile: "Expected",
+				FromDate: "",
+				ToFile:   "Actual",
+				ToDate:   "",
+				Context:  1,
+			})
+
+			t.Errorf(fmt.Sprintf("\nOutput does not match golden file: \n\n%s\n", diff))
+		}
+	}
 }
 
 func RunCostCalculations(cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
