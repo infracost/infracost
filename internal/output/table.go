@@ -94,7 +94,7 @@ func tableForBreakdown(breakdown Breakdown, fields []string) string {
 		})
 		i++
 	}
-	if contains(fields, "monthly_quantity") {
+	if contains(fields, "monthlyQuantity") {
 		headers = append(headers, ui.UnderlineString("Monthly Qty"))
 		columns = append(columns, table.ColumnConfig{
 			Number:      i,
@@ -112,7 +112,7 @@ func tableForBreakdown(breakdown Breakdown, fields []string) string {
 		})
 		i++
 	}
-	if contains(fields, "hourly_cost") {
+	if contains(fields, "hourlyCost") {
 		headers = append(headers, ui.UnderlineString("Hourly Cost"))
 		columns = append(columns, table.ColumnConfig{
 			Number:      i,
@@ -121,7 +121,7 @@ func tableForBreakdown(breakdown Breakdown, fields []string) string {
 		})
 		i++
 	}
-	if contains(fields, "monthly_cost") {
+	if contains(fields, "monthlyCost") {
 		headers = append(headers, ui.UnderlineString("Monthly Cost"))
 		columns = append(columns, table.ColumnConfig{
 			Number:      i,
@@ -201,16 +201,16 @@ func buildCostComponentRows(t table.Writer, costComponents []CostComponent, pref
 			if contains(fields, "price") {
 				tableRow = append(tableRow, formatPrice(c.Price))
 			}
-			if contains(fields, "monthly_quantity") {
+			if contains(fields, "monthlyQuantity") {
 				tableRow = append(tableRow, formatQuantity(c.MonthlyQuantity))
 			}
 			if contains(fields, "unit") {
 				tableRow = append(tableRow, c.Unit)
 			}
-			if contains(fields, "hourly_cost") {
+			if contains(fields, "hourlyCost") {
 				tableRow = append(tableRow, formatCost2DP(c.HourlyCost))
 			}
-			if contains(fields, "monthly_cost") {
+			if contains(fields, "monthlyCost") {
 				tableRow = append(tableRow, formatCost2DP(c.MonthlyCost))
 			}
 

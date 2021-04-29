@@ -231,7 +231,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
 
-	validFields := []string{"price", "monthly_quantity", "unit", "hourly_cost", "monthly_cost"}
+	validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
 
 	if cmd.Flags().Changed("fields") {
 		if c, _ := cmd.Flags().GetStringSlice("fields"); len(c) == 0 {
