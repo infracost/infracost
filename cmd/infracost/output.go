@@ -80,10 +80,27 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 			format, _ := cmd.Flags().GetString("format")
 
+			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
+
+			fields := []string{"monthlyQuantity", "unit", "monthlyCost"}
+			if cmd.Flags().Changed("fields") {
+				if c, _ := cmd.Flags().GetStringSlice("fields"); len(c) == 0 {
+					ui.PrintWarningf("fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
+				} else {
+					fields, _ = cmd.Flags().GetStringSlice("fields")
+					for _, f := range fields {
+						if !contains(validFields, f) {
+							ui.PrintWarningf("Invalid field '%s' specified, valid fields are: %s", f, validFields)
+						}
+					}
+				}
+			}
+
 			opts := output.Options{
 				NoColor:    cfg.NoColor,
 				GroupKey:   "filename",
 				GroupLabel: "File",
+				Fields:     fields,
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
@@ -93,6 +110,10 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 				b   []byte
 				err error
 			)
+
+			if cmd.Flags().Changed("fields") && format != "table" {
+				ui.PrintWarning("fields is only supported for table output format (HTML support coming soon)")
+			}
 			switch strings.ToLower(format) {
 			case "json":
 				b, err = output.ToJSON(combined, opts)
@@ -117,6 +138,7 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
+	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nOnly supported by table output format")
 
 	return cmd
 }
@@ -175,4 +197,13 @@ func checkOutputVersion(v string) bool {
 		v = "v" + v
 	}
 	return semver.Compare(v, "v"+minOutputVersion) >= 0 && semver.Compare(v, "v"+maxOutputVersion) <= 0
+}
+
+func contains(arr []string, e string) bool {
+	for _, a := range arr {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }

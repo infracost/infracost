@@ -91,6 +91,7 @@ type Options struct {
 	ShowSkipped bool
 	GroupLabel  string
 	GroupKey    string
+	Fields      []string
 }
 
 func outputBreakdown(resources []*schema.Resource) *Breakdown {

@@ -135,6 +135,7 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 	opts := output.Options{
 		ShowSkipped: cfg.ShowSkipped,
 		NoColor:     cfg.NoColor,
+		Fields:      cfg.Fields,
 	}
 
 	var (
@@ -229,6 +230,23 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	cfg.Format, _ = cmd.Flags().GetString("format")
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
+
+	validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
+
+	if cmd.Flags().Changed("fields") {
+		if c, _ := cmd.Flags().GetStringSlice("fields"); len(c) == 0 {
+			ui.PrintWarningf("fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
+		} else if cfg.Fields != nil && cfg.Format != "table" {
+			ui.PrintWarning("fields is only supported for table output format (HTML support coming soon)")
+		} else {
+			cfg.Fields, _ = cmd.Flags().GetStringSlice("fields")
+			for _, f := range cfg.Fields {
+				if !contains(validFields, f) {
+					ui.PrintWarningf("Invalid field '%s' specified, valid fields are: %s", f, validFields)
+				}
+			}
+		}
+	}
 
 	return nil
 }

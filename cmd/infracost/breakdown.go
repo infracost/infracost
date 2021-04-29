@@ -45,6 +45,7 @@ func breakdownCmd(cfg *config.Config) *cobra.Command {
 
 	cmd.Flags().Bool("terraform-use-state", false, "Use Terraform state instead of generating a plan. Applicable when path is a Terraform directory")
 	cmd.Flags().String("format", "table", "Output format: json, table, html")
+	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nOnly supported by table output format")
 
 	return cmd
 }
