@@ -235,9 +235,9 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if cmd.Flags().Changed("fields") {
 		if c, _ := cmd.Flags().GetStringSlice("fields"); len(c) == 0 {
-			ui.PrintWarningf("'--fields' flag is empty, using defaults: %s", cmd.Flag("fields").DefValue)
+			ui.PrintWarningf("fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
 		} else if cfg.Fields != nil && cfg.Format != "table" {
-			ui.PrintWarningf("'--fields' flag is not supports for %s output format", cfg.Format)
+			ui.PrintWarning("fields is only supported for table output format (HTML support coming soon)")
 		} else {
 			cfg.Fields, _ = cmd.Flags().GetStringSlice("fields")
 			for _, f := range cfg.Fields {
