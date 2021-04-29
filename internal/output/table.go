@@ -95,7 +95,7 @@ func tableForBreakdown(breakdown Breakdown, fields []string) string {
 		i++
 	}
 	if contains(fields, "monthly_quantity") {
-		headers = append(headers, ui.UnderlineString("Quantity"))
+		headers = append(headers, ui.UnderlineString("Monthly Qty"))
 		columns = append(columns, table.ColumnConfig{
 			Number:      i,
 			Align:       text.AlignRight,
