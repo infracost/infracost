@@ -1,0 +1,10 @@
+version: 0.1
+resource_usage:
+  aws_dynamodb_table.my_dynamodb_table_usage:
+    monthly_write_request_units: 3000000
+    monthly_read_request_units: 8000000
+    storage_gb: 230
+    pitr_backup_storage_gb: 2300
+    on_demand_backup_storage_gb: 460
+    monthly_data_restored_gb: 230
+    monthly_streams_read_request_units: 2000000

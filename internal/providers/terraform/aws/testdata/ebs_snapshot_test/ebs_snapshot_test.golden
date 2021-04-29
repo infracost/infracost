@@ -1,0 +1,24 @@
+
+ Name                                                             Quantity  Unit                      Monthly Cost 
+                                                                                                                   
+ aws_ebs_snapshot.gp2                                                                                              
+ ├─ EBS snapshot storage                                                10  GB-months                        $0.50 
+ ├─ Fast snapshot restore                                              730  DSU-hours                      $547.50 
+ ├─ ListChangedBlocks & ListSnapshotBlocks API requests  Cost depends on usage: $0.0006 per 1k requests            
+ ├─ GetSnapshotBlock API requests                        Cost depends on usage: $0.003 per 1k SnapshotAPIUnits     
+ └─ PutSnapshotBlock API requests                        Cost depends on usage: $0.006 per 1k SnapshotAPIUnits     
+                                                                                                                   
+ aws_ebs_snapshot.gp2_usage                                                                                        
+ ├─ EBS snapshot storage                                                 8  GB-months                        $0.40 
+ ├─ Fast snapshot restore                                              730  DSU-hours                      $547.50 
+ ├─ ListChangedBlocks & ListSnapshotBlocks API requests              1,000  1k requests                      $0.60 
+ ├─ GetSnapshotBlock API requests                                      100  1k SnapshotAPIUnits              $0.30 
+ └─ PutSnapshotBlock API requests                                      100  1k SnapshotAPIUnits              $0.60 
+                                                                                                                   
+ aws_ebs_volume.gp2                                                                                                
+ └─ Storage (general purpose SSD, gp2)                                  10  GB-months                        $1.00 
+                                                                                                                   
+ PROJECT TOTAL                                                                                           $1,098.40 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -9,6 +9,14 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
 
+func TestCloudfrontDistributionGoldenFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tftest.GoldenFileResourceTests(t, "cloudfront_distribution_test")
+}
+
 func TestCloudfrontDistribution(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
