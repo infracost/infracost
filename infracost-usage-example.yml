@@ -474,8 +474,8 @@ resource_usage:
     additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB.
 
   azurerm_mssql_database.my_database:
-    vcore_hours: 600 # Number of used vCore-hours for serverless compute.
-    monthly_long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
+    monthly_vcore_hours: 600 # Monthly number of used vCore-hours for serverless compute.
+    long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
 
   azurerm_mysql_server.my_server:
     additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB.

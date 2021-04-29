@@ -251,7 +251,7 @@ func TestMSSQLDatabase_with_license(t *testing.T) {
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(1)),
 				},
 				{
-					Name:            "SQL License",
+					Name:            "SQL license",
 					PriceHash:       "884778bbd38c482d0fb8c655195422e7-60fc60896424f2f0b576ec5c4e380288",
 					HourlyCostCheck: testutil.HourlyPriceMultiplierCheck(decimal.NewFromInt(4)),
 				},
@@ -360,7 +360,7 @@ func TestMSSQLDatabase_serverless(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"azurerm_mssql_database.serverless": map[string]interface{}{
-			"vcore_hours": 500,
+			"monthly_vcore_hours": 500,
 		},
 	})
 
@@ -426,7 +426,7 @@ func TestMSSQLDatabase_LTR(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"azurerm_mssql_database.my_db": map[string]interface{}{
-			"monthly_long_term_retention_storage_gb": 1000,
+			"long_term_retention_storage_gb": 1000,
 		},
 	})
 
