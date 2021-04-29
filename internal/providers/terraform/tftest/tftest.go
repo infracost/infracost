@@ -164,7 +164,7 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 	require.NoError(t, err)
 
 	// Load the terraform projects
-	tfProjectData, err := ioutil.ReadFile(filepath.Join("testdata", testName, testName + ".tf"))
+	tfProjectData, err := ioutil.ReadFile(filepath.Join("testdata", testName, testName+".tf"))
 	require.NoError(t, err)
 	tfProject := TerraformProject{
 		Files: []File{
@@ -177,7 +177,7 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 
 	// Load the usage data, if any.
 	var usageData map[string]*schema.UsageData
-	usageFilePath := filepath.Join("testdata", testName, testName + ".usage.yml")
+	usageFilePath := filepath.Join("testdata", testName, testName+".usage.yml")
 	if _, err := os.Stat(usageFilePath); err == nil || !os.IsNotExist(err) {
 		// usage file exists, load the data
 		usageData, err = usage.LoadFromFile(usageFilePath, false)
@@ -206,7 +206,7 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 
 	// Load the snapshot result
 	expected := []byte("")
-	goldenFilePath := filepath.Join("testdata", testName, testName + ".golden")
+	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
 	if _, err := os.Stat(goldenFilePath); err == nil || !os.IsNotExist(err) {
 		// golden file exists, load the data
 		expected, err = ioutil.ReadFile(goldenFilePath)
@@ -215,7 +215,7 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 
 	if !bytes.Equal(expected, actual) {
 		if *update {
-			err = ioutil.WriteFile(goldenFilePath, actual, 0644)
+			err = ioutil.WriteFile(goldenFilePath, actual, 0600)
 			assert.NoError(t, err)
 			t.Logf(fmt.Sprintf("Wrote golden file %s", goldenFilePath))
 		} else {
