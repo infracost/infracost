@@ -10,6 +10,14 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
 
+func TestAzureRMLinuxVirtualMachineGoldenFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tftest.GoldenFileResourceTests(t, "linux_virtual_machine_test")
+}
+
 func TestAzureRMLinuxVirtualMachine(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")

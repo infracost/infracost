@@ -1,0 +1,31 @@
+
+ Name                                                             Quantity  Unit                Monthly Cost 
+                                                                                                             
+ azurerm_linux_virtual_machine.basic_a2                                                                      
+ ├─ Instance usage (pay as you go, A2)                                 730  hours                     $57.67 
+ └─ os_disk                                                                                                  
+    ├─ Storage (S4)                                                      1  months                     $1.54 
+    └─ Disk operations                                     Cost depends on usage: $0.0005 per 10k operations 
+                                                                                                             
+ azurerm_linux_virtual_machine.standard_a2_ultra_enabled                                                     
+ ├─ Instance usage (pay as you go, A2 v2)                              730  hours                     $66.43 
+ ├─ Ultra disk reservation (if unattached)                 Cost depends on usage: $0.006 per vCPU-hours      
+ └─ os_disk                                                                                                  
+    ├─ Storage (E4)                                                      1  months                     $2.40 
+    └─ Disk operations                                     Cost depends on usage: $0.002 per 10k operations  
+                                                                                                             
+ azurerm_linux_virtual_machine.standard_a2_v2_custom_disk                                                    
+ ├─ Instance usage (pay as you go, A2 v2)                              730  hours                     $66.43 
+ └─ os_disk                                                                                                  
+    ├─ Storage (E30)                                                     1  months                    $76.80 
+    └─ Disk operations                                                   2  10k operations             $0.00 
+                                                                                                             
+ azurerm_linux_virtual_machine.standard_f2_premium_disk                                                      
+ ├─ Instance usage (pay as you go, F2)                                 730  hours                     $72.27 
+ └─ os_disk                                                                                                  
+    └─ Storage (P4)                                                      1  months                     $5.28 
+                                                                                                             
+ PROJECT TOTAL                                                                                       $348.82 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
