@@ -1,5 +1,5 @@
 
- Name                                        Quantity  Unit              Monthly Cost 
+ Name                                     Monthly Qty  Unit              Monthly Cost 
                                                                                       
  aws_api_gateway_rest_api.api                                                         
  └─ Requests (first 333M)              Cost depends on usage: $3.50 per 1M requests   

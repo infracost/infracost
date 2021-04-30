@@ -1,5 +1,5 @@
 
- Name                                                            Quantity  Unit                Monthly Cost 
+ Name                                                         Monthly Qty  Unit                Monthly Cost 
                                                                                                             
  aws_cloudfront_distribution.s3_distribution                                                                
  ├─ Field level encryption requests                       Cost depends on usage: $0.02 per 10k requests     
