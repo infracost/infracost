@@ -11,6 +11,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func TestVpcEndpointGoldenFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tftest.GoldenFileResourceTests(t, "vpc_endpoint_test")
+}
+
 func TestVpcEndpoint(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")

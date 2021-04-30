@@ -1,0 +1,10 @@
+version: 0.1
+resource_usage:
+  aws_docdb_cluster_instance.medium:
+    data_storage_gb: 1000
+    monthly_io_request: 10000000
+    monthly_cpu_credit_hours: 10
+
+  aws_docdb_cluster_instance.large:
+    data_storage_gb: 1000
+    monthly_io_request: 10000000

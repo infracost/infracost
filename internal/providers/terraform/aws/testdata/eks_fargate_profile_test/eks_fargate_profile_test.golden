@@ -1,0 +1,11 @@
+
+ Name                             Quantity  Unit       Monthly Cost 
+                                                                    
+ aws_eks_cluster.example                                            
+ └─ EKS cluster                        730  hours            $73.00 
+                                                                    
+ aws_eks_fargate_profile.example                                    
+ ├─ Per GB per hour                    730  GB-hours          $3.24 
+ └─ Per vCPU per hour                  730  CPU-hours        $29.55 
+                                                                    
+ PROJECT TOTAL                                              $105.80 

@@ -1,0 +1,12 @@
+version: 0.1
+resource_usage:
+  aws_lb.alb1_usage:
+    new_connections: 10000
+    active_connections: 1000
+    processed_bytes_gb: 1000
+    rule_evaluations: 300
+
+  aws_lb.nlb1_usage:
+    new_connections: 10000
+    active_connections: 1000
+    processed_bytes_gb: 1000

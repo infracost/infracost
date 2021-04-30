@@ -11,6 +11,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func TestLBGoldenFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tftest.GoldenFileResourceTests(t, "lb_test")
+}
+
 func TestLB(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
