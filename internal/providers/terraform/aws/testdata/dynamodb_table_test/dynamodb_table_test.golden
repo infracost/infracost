@@ -2,17 +2,17 @@
  Name                                               Monthly Qty  Unit            Monthly Cost 
                                                                                               
  aws_dynamodb_table.my_dynamodb_table                                                         
- ├─ Write capacity unit (WCU)                            14,600  WCU-hours              $9.49 
- ├─ Read capacity unit (RCU)                             21,900  RCU-hours              $2.85 
+ ├─ Write capacity unit (WCU)                                20  WCU                    $9.49 
+ ├─ Read capacity unit (RCU)                                 30  RCU                    $2.85 
  ├─ Data storage                                  Cost depends on usage: $0.25 per GB-months  
  ├─ Point-In-Time Recovery (PITR) backup storage  Cost depends on usage: $0.20 per GB-months  
  ├─ On-demand backup storage                      Cost depends on usage: $0.10 per GB-months  
  ├─ Table data restored                           Cost depends on usage: $0.15 per GB         
  ├─ Streams read request unit (sRRU)              Cost depends on usage: $0.0000002 per sRRUs 
  ├─ Global table (us-east-2)                                                                  
- │  └─ Replicated write capacity unit (rWCU)             14,600  rWCU-hours            $14.24 
+ │  └─ Replicated write capacity unit (rWCU)                 20  rWCU                  $14.24 
  └─ Global table (us-west-1)                                                                  
-    └─ Replicated write capacity unit (rWCU)             14,600  rWCU-hours            $15.88 
+    └─ Replicated write capacity unit (rWCU)                 20  rWCU                  $15.88 
                                                                                               
  aws_dynamodb_table.my_dynamodb_table_usage                                                   
  ├─ Write request unit (WRU)                          3,000,000  WRUs                   $3.75 
@@ -23,9 +23,9 @@
  ├─ Table data restored                                     230  GB                    $34.50 
  ├─ Streams read request unit (sRRU)                  2,000,000  sRRUs                  $0.40 
  ├─ Global table (us-east-2)                                                                  
- │  └─ Replicated write request unit (rWRU)           3,000,000  rWRU-hours             $5.62 
+ │  └─ Replicated write request unit (rWRU)          4,109.5890  rWRU                   $5.62 
  └─ Global table (us-west-1)                                                                  
-    └─ Replicated write request unit (rWRU)           3,000,000  rWRU-hours             $6.27 
+    └─ Replicated write request unit (rWRU)          4,109.5890  rWRU                   $6.27 
                                                                                               
  PROJECT TOTAL                                                                        $658.50 
 

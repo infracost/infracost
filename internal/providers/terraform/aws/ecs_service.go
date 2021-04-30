@@ -49,8 +49,8 @@ func NewECSService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           "Per GB per hour",
-			Unit:           "GB-hours",
-			UnitMultiplier: 1,
+			Unit:           "GB",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredCount).Mul(memory)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -64,8 +64,8 @@ func NewECSService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		},
 		{
 			Name:           "Per vCPU per hour",
-			Unit:           "CPU-hours",
-			UnitMultiplier: 1,
+			Unit:           "CPU",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredCount).Mul(cpu)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

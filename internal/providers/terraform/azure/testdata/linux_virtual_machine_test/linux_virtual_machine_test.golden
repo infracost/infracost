@@ -9,7 +9,7 @@
                                                                                                              
  azurerm_linux_virtual_machine.standard_a2_ultra_enabled                                                     
  ├─ Instance usage (pay as you go, A2 v2)                              730  hours                     $66.43 
- ├─ Ultra disk reservation (if unattached)                 Cost depends on usage: $0.006 per vCPU-hours      
+ ├─ Ultra disk reservation (if unattached)                 Cost depends on usage: $4.38 per vCPU             
  └─ os_disk                                                                                                  
     ├─ Storage (E4)                                                      1  months                     $2.40 
     └─ Disk operations                                     Cost depends on usage: $0.002 per 10k operations  
