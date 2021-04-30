@@ -193,6 +193,7 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 	opts := output.Options{
 		ShowSkipped: true,
 		NoColor:     true,
+		Fields:      cfg.Fields,
 	}
 
 	actual, err := output.ToTable(r, opts)
