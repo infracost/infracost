@@ -1,13 +1,13 @@
 
- Name                                    Monthly Qty  Unit       Monthly Cost 
-                                                                              
- aws_ecs_service.ecs_fargate1                                                 
- ├─ Per GB per hour                            2,920  GB-hours         $12.98 
- ├─ Per vCPU per hour                          1,460  CPU-hours        $59.10 
- └─ Inference accelerator (eia2.medium)        1,460  hours           $175.20 
-                                                                              
- aws_ecs_service.ecs_fargate2                                                 
- ├─ Per GB per hour                                0  GB-hours          $0.00 
- └─ Per vCPU per hour                              0  CPU-hours         $0.00 
-                                                                              
- PROJECT TOTAL                                                        $247.28 
+ Name                                    Monthly Qty  Unit   Monthly Cost 
+                                                                          
+ aws_ecs_service.ecs_fargate1                                             
+ ├─ Per GB per hour                                4  GB           $12.98 
+ ├─ Per vCPU per hour                              2  CPU          $59.10 
+ └─ Inference accelerator (eia2.medium)        1,460  hours       $175.20 
+                                                                          
+ aws_ecs_service.ecs_fargate2                                             
+ ├─ Per GB per hour                                0  GB            $0.00 
+ └─ Per vCPU per hour                              0  CPU           $0.00 
+                                                                          
+ PROJECT TOTAL                                                    $247.28 

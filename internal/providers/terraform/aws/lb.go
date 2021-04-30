@@ -106,8 +106,8 @@ func newLBResource(d *schema.ResourceData, productFamily string, costComponentNa
 	if productFamily == "Load Balancer-Application" || productFamily == "Load Balancer-Network" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Load balancer capacity units",
-			Unit:            "LCU-hours",
-			UnitMultiplier:  1,
+			Unit:            "LCU",
+			UnitMultiplier:  schema.HourToMonthUnitMultiplier,
 			MonthlyQuantity: maxLCU,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

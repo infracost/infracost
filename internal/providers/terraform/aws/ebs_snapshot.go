@@ -45,8 +45,8 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		ebsSnapshotCostComponent(region, gbVal),
 		{
 			Name:           "Fast snapshot restore",
-			Unit:           "DSU-hours",
-			UnitMultiplier: 1,
+			Unit:           "DSU",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
