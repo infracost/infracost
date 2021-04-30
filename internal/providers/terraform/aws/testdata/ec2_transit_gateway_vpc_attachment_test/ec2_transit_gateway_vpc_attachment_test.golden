@@ -1,5 +1,5 @@
 
- Name                                                      Quantity  Unit         Monthly Cost 
+ Name                                                   Monthly Qty  Unit         Monthly Cost 
                                                                                                
  aws_ec2_transit_gateway_vpc_attachment.vpc_attachment                                         
  ├─ Transit gateway attachment                                  730  hours              $36.50 

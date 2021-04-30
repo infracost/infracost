@@ -1,5 +1,5 @@
 
- Name                                                             Quantity  Unit                      Monthly Cost 
+ Name                                                          Monthly Qty  Unit                      Monthly Cost 
                                                                                                                    
  aws_ebs_snapshot.gp2                                                                                              
  ├─ EBS snapshot storage                                                10  GB-months                        $0.50 

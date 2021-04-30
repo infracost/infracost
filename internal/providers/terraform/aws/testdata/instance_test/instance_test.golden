@@ -1,5 +1,5 @@
 
- Name                                                       Quantity  Unit            Monthly Cost 
+ Name                                                    Monthly Qty  Unit            Monthly Cost 
                                                                                                    
  aws_instance.cnvr_1yr_all_upfront                                                                 
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                  $0.00 

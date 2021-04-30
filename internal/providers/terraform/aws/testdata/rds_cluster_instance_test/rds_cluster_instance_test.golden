@@ -1,19 +1,19 @@
 
- Name                                            Quantity  Unit         Monthly Cost 
-                                                                                     
- aws_rds_cluster.default                                                             
- ├─ Storage rate                                        0  GB-months           $0.00 
- └─ I/O rate                                            0  1M requests         $0.00 
-                                                                                     
- aws_rds_cluster.default_t3                                                          
- ├─ Storage rate                                        0  GB-months           $0.00 
- └─ I/O rate                                            0  1M requests         $0.00 
-                                                                                     
- aws_rds_cluster_instance.cluster_instance                                           
- └─ Database instance (on-demand, db.r4.large)        730  hours             $211.70 
-                                                                                     
- aws_rds_cluster_instance.cluster_instance_t3                                        
- ├─ Database instance (on-demand, db.t3.medium)       730  hours              $59.86 
- └─ CPU credits                                        48  vCPU-hours          $4.32 
-                                                                                     
- PROJECT TOTAL                                                               $275.88 
+ Name                                            Monthly Qty  Unit         Monthly Cost 
+                                                                                        
+ aws_rds_cluster.default                                                                
+ ├─ Storage rate                                           0  GB-months           $0.00 
+ └─ I/O rate                                               0  1M requests         $0.00 
+                                                                                        
+ aws_rds_cluster.default_t3                                                             
+ ├─ Storage rate                                           0  GB-months           $0.00 
+ └─ I/O rate                                               0  1M requests         $0.00 
+                                                                                        
+ aws_rds_cluster_instance.cluster_instance                                              
+ └─ Database instance (on-demand, db.r4.large)           730  hours             $211.70 
+                                                                                        
+ aws_rds_cluster_instance.cluster_instance_t3                                           
+ ├─ Database instance (on-demand, db.t3.medium)          730  hours              $59.86 
+ └─ CPU credits                                           48  vCPU-hours          $4.32 
+                                                                                        
+ PROJECT TOTAL                                                                  $275.88 

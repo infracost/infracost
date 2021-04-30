@@ -1,48 +1,48 @@
 
- Name                                                     Quantity  Unit        Monthly Cost 
-                                                                                             
- aws_eks_node_group.example                                                                  
- ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)          730  hours             $30.37 
- ├─ CPU credits                                                730  vCPU-hours        $36.50 
- └─ Storage (general purpose SSD, gp2)                          20  GB-months          $2.00 
-                                                                                             
- aws_eks_node_group.example2                                                                 
- ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)          730  hours             $33.87 
- └─ Storage (general purpose SSD, gp2)                          30  GB-months          $3.00 
-                                                                                             
- aws_eks_node_group.example3                                                                 
- ├─ Instance usage (Linux/UNIX, spot, t3.medium)               730  hours              $9.34 
- ├─ CPU credits                                                730  vCPU-hours        $36.50 
- └─ Storage (general purpose SSD, gp2)                          20  GB-months          $2.00 
-                                                                                             
- aws_eks_node_group.example_with_launch_template                                             
- └─ aws_launch_template.foo                                                                  
-    ├─ Instance usage (Linux/UNIX, on-demand, m5.xlarge)     2,190  hours            $420.48 
-    ├─ EBS-optimized usage                                   2,190  hours              $0.00 
-    ├─ Inference accelerator (eia1.medium)                   2,190  hours            $284.70 
-    ├─ root_block_device                                                                     
-    │  └─ Storage (general purpose SSD, gp2)                    24  GB-months          $2.40 
-    └─ block_device_mapping[0]                                                               
-       └─ Storage (general purpose SSD, gp2)                    60  GB-months          $6.00 
-                                                                                             
- aws_eks_node_group.example_with_launch_template2                                            
- └─ aws_launch_template.foo2                                                                 
-    ├─ Instance usage (Linux/UNIX, on-demand, m5.xlarge)     2,190  hours            $420.48 
-    ├─ EBS-optimized usage                                   2,190  hours              $0.00 
-    ├─ Inference accelerator (eia1.medium)                   2,190  hours            $284.70 
-    ├─ root_block_device                                                                     
-    │  └─ Storage (general purpose SSD, gp2)                    24  GB-months          $2.40 
-    └─ block_device_mapping[0]                                                               
-       └─ Storage (general purpose SSD, gp2)                    60  GB-months          $6.00 
-                                                                                             
- aws_eks_node_group.reserved                                                                 
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)           730  hours             $19.05 
- ├─ CPU credits                                                730  vCPU-hours        $36.50 
- └─ Storage (general purpose SSD, gp2)                          20  GB-months          $2.00 
-                                                                                             
- aws_eks_node_group.windows                                                                  
- ├─ Instance usage (Windows, on-demand, t3.medium)             730  hours             $43.80 
- ├─ CPU credits                                                730  vCPU-hours        $36.50 
- └─ Storage (general purpose SSD, gp2)                          20  GB-months          $2.00 
-                                                                                             
- PROJECT TOTAL                                                                     $1,720.60 
+ Name                                                     Monthly Qty  Unit        Monthly Cost 
+                                                                                                
+ aws_eks_node_group.example                                                                     
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)             730  hours             $30.37 
+ ├─ CPU credits                                                   730  vCPU-hours        $36.50 
+ └─ Storage (general purpose SSD, gp2)                             20  GB-months          $2.00 
+                                                                                                
+ aws_eks_node_group.example2                                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)             730  hours             $33.87 
+ └─ Storage (general purpose SSD, gp2)                             30  GB-months          $3.00 
+                                                                                                
+ aws_eks_node_group.example3                                                                    
+ ├─ Instance usage (Linux/UNIX, spot, t3.medium)                  730  hours              $9.27 
+ ├─ CPU credits                                                   730  vCPU-hours        $36.50 
+ └─ Storage (general purpose SSD, gp2)                             20  GB-months          $2.00 
+                                                                                                
+ aws_eks_node_group.example_with_launch_template                                                
+ └─ aws_launch_template.foo                                                                     
+    ├─ Instance usage (Linux/UNIX, on-demand, m5.xlarge)        2,190  hours            $420.48 
+    ├─ EBS-optimized usage                                      2,190  hours              $0.00 
+    ├─ Inference accelerator (eia1.medium)                      2,190  hours            $284.70 
+    ├─ root_block_device                                                                        
+    │  └─ Storage (general purpose SSD, gp2)                       24  GB-months          $2.40 
+    └─ block_device_mapping[0]                                                                  
+       └─ Storage (general purpose SSD, gp2)                       60  GB-months          $6.00 
+                                                                                                
+ aws_eks_node_group.example_with_launch_template2                                               
+ └─ aws_launch_template.foo2                                                                    
+    ├─ Instance usage (Linux/UNIX, on-demand, m5.xlarge)        2,190  hours            $420.48 
+    ├─ EBS-optimized usage                                      2,190  hours              $0.00 
+    ├─ Inference accelerator (eia1.medium)                      2,190  hours            $284.70 
+    ├─ root_block_device                                                                        
+    │  └─ Storage (general purpose SSD, gp2)                       24  GB-months          $2.40 
+    └─ block_device_mapping[0]                                                                  
+       └─ Storage (general purpose SSD, gp2)                       60  GB-months          $6.00 
+                                                                                                
+ aws_eks_node_group.reserved                                                                    
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)              730  hours             $19.05 
+ ├─ CPU credits                                                   730  vCPU-hours        $36.50 
+ └─ Storage (general purpose SSD, gp2)                             20  GB-months          $2.00 
+                                                                                                
+ aws_eks_node_group.windows                                                                     
+ ├─ Instance usage (Windows, on-demand, t3.medium)                730  hours             $43.80 
+ ├─ CPU credits                                                   730  vCPU-hours        $36.50 
+ └─ Storage (general purpose SSD, gp2)                             20  GB-months          $2.00 
+                                                                                                
+ PROJECT TOTAL                                                                        $1,720.52 

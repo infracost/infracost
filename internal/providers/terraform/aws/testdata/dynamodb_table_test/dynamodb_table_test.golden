@@ -1,5 +1,5 @@
 
- Name                                                  Quantity  Unit            Monthly Cost 
+ Name                                               Monthly Qty  Unit            Monthly Cost 
                                                                                               
  aws_dynamodb_table.my_dynamodb_table                                                         
  ├─ Write capacity unit (WCU)                            14,600  WCU-hours              $9.49 

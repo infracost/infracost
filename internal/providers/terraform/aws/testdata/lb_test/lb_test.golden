@@ -1,5 +1,5 @@
 
- Name                                  Quantity  Unit            Monthly Cost 
+ Name                               Monthly Qty  Unit            Monthly Cost 
                                                                               
  aws_alb.alb1                                                                 
  ├─ Application load balancer               730  hours                 $16.42 

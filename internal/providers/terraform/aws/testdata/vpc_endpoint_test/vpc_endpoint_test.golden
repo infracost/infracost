@@ -1,5 +1,5 @@
 
- Name                                      Quantity  Unit         Monthly Cost 
+ Name                                   Monthly Qty  Unit         Monthly Cost 
                                                                                
  aws_vpc_endpoint.gateway_loadbalancer                                         
  ├─ Endpoint (GatewayLoadBalancer)              730  hours               $7.30 

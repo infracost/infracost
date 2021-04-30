@@ -1,5 +1,5 @@
 
- Name                                        Quantity  Unit              Monthly Cost 
+ Name                                     Monthly Qty  Unit              Monthly Cost 
                                                                                       
  aws_apigatewayv2_api.http                                                            
  └─ Requests (first 300M)              Cost depends on usage: $1.00 per 1M requests   
