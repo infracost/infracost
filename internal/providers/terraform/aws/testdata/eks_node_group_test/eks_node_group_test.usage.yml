@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  aws_eks_node_group.reserved:
+    reserved_instance_type: standard
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: no_upfront
+  aws_eks_node_group.windows:
+    operating_system: windows    

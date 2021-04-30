@@ -9,6 +9,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func TestDocDBClusterInstanceGoldenFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tftest.GoldenFileResourceTests(t, "docdb_cluster_instance_test")
+}
+
 func TestNewDocDBClusterInstance(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {

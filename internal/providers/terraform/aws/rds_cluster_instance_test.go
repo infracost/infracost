@@ -11,6 +11,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func TestRDSClusterInstanceGoldenFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tftest.GoldenFileResourceTests(t, "rds_cluster_instance_test")
+}
+
 func TestRDSClusterInstance(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {

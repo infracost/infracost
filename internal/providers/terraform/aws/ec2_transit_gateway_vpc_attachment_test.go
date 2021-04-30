@@ -11,6 +11,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func TestEC2TransitGatewayVpcAttachmentGoldenFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tftest.GoldenFileResourceTests(t, "ec2_transit_gateway_vpc_attachment_test")
+}
+
 func TestEC2TransitGatewayVpcAttachment(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
