@@ -51,8 +51,8 @@ func NewRDSClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.
 
 	if strings.HasPrefix(instanceType, "db.t3") {
 		instanceCPUCreditHours := decimal.Zero
-		if u != nil && u.Get("cpu_credit_hrs").Exists() {
-			instanceCPUCreditHours = decimal.NewFromInt(u.Get("cpu_credit_hrs").Int())
+		if u != nil && u.Get("monthly_cpu_credit_hrs").Exists() {
+			instanceCPUCreditHours = decimal.NewFromInt(u.Get("monthly_cpu_credit_hrs").Int())
 		}
 
 		instanceVCPUCount := decimal.Zero

@@ -77,7 +77,7 @@ func TestRDSClusterT3Instances(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_rds_cluster_instance.cluster_instance": map[string]interface{}{
-			"cpu_credit_hrs":    24,
+			"monthly_cpu_credit_hrs":    24,
 			"virtual_cpu_count": 2,
 		},
 	})

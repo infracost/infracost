@@ -17,7 +17,7 @@ func TestEKSNodeGroup_default(t *testing.T) {
 
 	tf := `
 	resource "aws_eks_node_group" "example" {
-		cluster_name    = "test aws_eks_node_group"
+		cluster_name    = "test_aws_eks_node_group"
 		node_group_name = "example"
 		node_role_arn   = "node_role_arn"
 		subnet_ids      = ["subnet_id"]
@@ -63,7 +63,7 @@ func TestEKSNodeGroup_defaultCpuCredits(t *testing.T) {
 
 	tf := `
 	resource "aws_eks_node_group" "example" {
-		cluster_name    = "test aws_eks_node_group"
+		cluster_name    = "test_aws_eks_node_group"
 		node_group_name = "example"
 		node_role_arn   = "node_role_arn"
 		subnet_ids      = ["subnet_id"]
@@ -77,8 +77,8 @@ func TestEKSNodeGroup_defaultCpuCredits(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_eks_node_group.example": map[string]interface{}{
-			"cpu_credit_hrs":    350,
-			"virtual_cpu_count": 2,
+			"monthly_cpu_credit_hrs": 350,
+			"virtual_cpu_count":      2,
 		},
 	})
 
@@ -116,7 +116,7 @@ func TestEKSNodeGroup_disk_size_instance_type(t *testing.T) {
 
 	tf := `
 	resource "aws_eks_node_group" "example" {
-		cluster_name    = "test aws_eks_node_group"
+		cluster_name    = "test_aws_eks_node_group"
 		node_group_name = "example"
 		instance_types  = ["t2.medium"]
 		node_role_arn   = "node_role_arn"
@@ -159,7 +159,7 @@ func TestEKSNodeGroup_launch_template(t *testing.T) {
 
 	tf := `
 	resource "aws_eks_node_group" "example_with_launch_template" {
-		cluster_name    = "test aws_eks_node_group"
+		cluster_name    = "test_aws_eks_node_group"
 		node_group_name = "example"
 		node_role_arn   = "node_role_arn"
 		subnet_ids      = ["subnet_id"]
@@ -313,7 +313,7 @@ func TestEKSNodeGroup_launch_template_by_name(t *testing.T) {
 
 	tf := `
 	resource "aws_eks_node_group" "example_with_launch_template" {
-		cluster_name    = "test aws_eks_node_group"
+		cluster_name    = "test_aws_eks_node_group"
 		node_group_name = "example"
 		node_role_arn   = "node_role_arn"
 		subnet_ids      = ["subnet_id"]
@@ -467,7 +467,7 @@ func TestEKSNodeGroup_with_instance_launch_template_without_instance(t *testing.
 
 	tf := `
 	resource "aws_eks_node_group" "example_with_launch_template" {
-		cluster_name    = "test aws_eks_node_group"
+		cluster_name    = "test_aws_eks_node_group"
 		node_group_name = "example"
 		node_role_arn   = "node_role_arn"
 		subnet_ids      = ["subnet_id"]
@@ -561,8 +561,8 @@ func TestEKSNodeGroup_with_instance_launch_template_without_instance(t *testing.
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_eks_node_group.example_with_launch_template": map[string]interface{}{
-			"cpu_credit_hrs":    350,
-			"virtual_cpu_count": 2,
+			"monthly_cpu_credit_hrs": 350,
+			"virtual_cpu_count":      2,
 		},
 	})
 
@@ -628,7 +628,7 @@ func TestEKSNodeGroup_spot(t *testing.T) {
 
 	tf := `
 	resource "aws_eks_node_group" "example" {
-		cluster_name    = "test aws_eks_node_group"
+		cluster_name    = "test_aws_eks_node_group"
 		node_group_name = "example"
 		node_role_arn   = "node_role_arn"
 		subnet_ids      = ["subnet_id"]
@@ -674,7 +674,7 @@ func TestEKSNodeGroup_reserved(t *testing.T) {
 
 	tf := `
 	resource "aws_eks_node_group" "reserved" {
-		cluster_name    = "test aws_eks_node_group"
+		cluster_name    = "test_aws_eks_node_group"
 		node_group_name = "example"
 		node_role_arn   = "node_role_arn"
 		subnet_ids      = ["subnet_id"]
@@ -691,7 +691,7 @@ func TestEKSNodeGroup_reserved(t *testing.T) {
 			"reserved_instance_type":           "standard",
 			"reserved_instance_term":           "1_year",
 			"reserved_instance_payment_option": "no_upfront",
-			"cpu_credit_hrs":                   350,
+			"monthly_cpu_credit_hrs":           350,
 			"virtual_cpu_count":                2,
 		},
 	})
@@ -729,7 +729,7 @@ func TestEKSNodeGroup_windows(t *testing.T) {
 
 	tf := `
 	resource "aws_eks_node_group" "windows" {
-		cluster_name    = "test aws_eks_node_group"
+		cluster_name    = "test_aws_eks_node_group"
 		node_group_name = "example"
 		node_role_arn   = "node_role_arn"
 		subnet_ids      = ["subnet_id"]
@@ -743,9 +743,9 @@ func TestEKSNodeGroup_windows(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_eks_node_group.windows": map[string]interface{}{
-			"operating_system":  "windows",
-			"cpu_credit_hrs":    100,
-			"virtual_cpu_count": 2,
+			"operating_system":       "windows",
+			"monthly_cpu_credit_hrs": 100,
+			"virtual_cpu_count":      2,
 		},
 	})
 

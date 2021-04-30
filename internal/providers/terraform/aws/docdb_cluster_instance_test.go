@@ -71,7 +71,7 @@ func TestNewDocDBClusterInstance_usage(t *testing.T) {
 		"aws_docdb_cluster_instance.medium": map[string]interface{}{
 			"data_storage_gb":          1000,
 			"monthly_io_request":       10000000,
-			"monthly_cpu_credit_hours": 10,
+			"monthly_cpu_credit_hrs": 10,
 		},
 		"aws_docdb_cluster_instance.large": map[string]interface{}{
 			"data_storage_gb":    1000,

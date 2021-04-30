@@ -233,16 +233,16 @@ func TestInstance_cpuCredits(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_instance.t3_default": map[string]interface{}{
-			"cpu_credit_hrs":    0,
-			"virtual_cpu_count": 2,
+			"monthly_cpu_credit_hrs": 0,
+			"virtual_cpu_count":      2,
 		},
 		"aws_instance.t3_unlimited": map[string]interface{}{
-			"cpu_credit_hrs":    730,
-			"virtual_cpu_count": 2,
+			"monthly_cpu_credit_hrs": 730,
+			"virtual_cpu_count":      2,
 		},
 		"aws_instance.t2_unlimited": map[string]interface{}{
-			"cpu_credit_hrs":    300,
-			"virtual_cpu_count": 2,
+			"monthly_cpu_credit_hrs": 300,
+			"virtual_cpu_count":      2,
 		},
 	})
 

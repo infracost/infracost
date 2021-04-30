@@ -51,7 +51,7 @@ resource_usage:
     reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
     reserved_instance_payment_option: no_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
     # Only used when T2 credit_specification is set to unlimited or T3 & T4 instance types are used within a launch template,  or T3 & T4 instance types in a launch configuration.
-    cpu_credit_hrs: 350 # Number of hours in the month where you expect to burst the instance
+    monthly_cpu_credit_hrs: 350 # Number of hours in the month where you expect to burst the instance
     virtual_cpu_count: 2 # Number of vCPUs that the instance type as.
 
   aws_cloudwatch_event_bus.my_events:
@@ -95,7 +95,7 @@ resource_usage:
   aws_docdb_cluster_instance.my_db:
     data_storage_gb: 1000         # Total storage for cluster in GB.
     monthly_io_request: 100000000 # Monthly number of input/output requests for cluster.
-    monthly_cpu_credit_hours: 100 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances.
+    monthly_cpu_credit_hrs: 100 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances.
 
   aws_docdb_cluster_snapshot.my_snapshot:
     backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
@@ -143,7 +143,7 @@ resource_usage:
     reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
     reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
     # Only used for T3 & T4 instance types or if you specify a t2 instance with a launch template.
-    cpu_credit_hrs: 350 # Number of hours in the month where you expect to burst the instance
+    monthly_cpu_credit_hrs: 350 # Number of hours in the month where you expect to burst the instance
     virtual_cpu_count: 2 # Number of vCPUs that the instance type as.
 
   aws_elasticache_cluster.my_redis_snapshot:
@@ -158,7 +158,7 @@ resource_usage:
     reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
     reserved_instance_payment_option: all_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
     # Can be used with T2 / T3 & T4 Instance types. T2 requires credit_specification to be unlimited.
-    cpu_credit_hrs: 350 # Number of hours in the month where you expect to burst the instance
+    monthly_cpu_credit_hrs: 350 # Number of hours in the month where you expect to burst the instance
     virtual_cpu_count: 2 # Number of vCPUs that the instance type as.
 
   aws_fsx_windows_file_system.my_system:
@@ -191,7 +191,7 @@ resource_usage:
 
   # These settings only apply when using t3 instance types.
   aws_rds_cluster_instance.my_cluster:
-    cpu_credit_hrs: 24   # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
+    monthly_cpu_credit_hrs: 24   # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
     virtual_cpu_count: 2 # Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
 
   aws_redshift_cluster.with_usage:

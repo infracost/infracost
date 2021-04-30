@@ -53,8 +53,8 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		var cpuCreditQuantity decimal.Decimal
 		if isInstanceBurstable(instanceType, []string{"t3", "t4"}) {
 			instanceCPUCreditHours := decimal.Zero
-			if u != nil && u.Get("cpu_credit_hrs").Exists() {
-				instanceCPUCreditHours = decimal.NewFromInt(u.Get("cpu_credit_hrs").Int())
+			if u != nil && u.Get("monthly_cpu_credit_hrs").Exists() {
+				instanceCPUCreditHours = decimal.NewFromInt(u.Get("monthly_cpu_credit_hrs").Int())
 			}
 
 			instanceVCPUCount := decimal.Zero

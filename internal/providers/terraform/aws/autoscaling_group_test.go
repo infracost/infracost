@@ -286,8 +286,8 @@ func TestAutoscalingGroup_launchConfiguration_cpuCredits(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_autoscaling_group.asg1": map[string]interface{}{
-			"cpu_credit_hrs":    200,
-			"virtual_cpu_count": 2,
+			"monthly_cpu_credit_hrs": 200,
+			"virtual_cpu_count":      2,
 		},
 	})
 
@@ -722,8 +722,8 @@ func TestAutoscalingGroup_launchTemplate_cpuCredits(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_autoscaling_group.asg1": map[string]interface{}{
-			"cpu_credit_hrs":    350,
-			"virtual_cpu_count": 2,
+			"monthly_cpu_credit_hrs": 350,
+			"virtual_cpu_count":      2,
 		},
 	})
 

@@ -31,8 +31,8 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 	}
 
 	var cpuCreditsT3 *decimal.Decimal
-	if u != nil && u.Get("monthly_cpu_credit_hours").Exists() {
-		cpuCreditsT3 = decimalPtr(decimal.NewFromInt(u.Get("monthly_cpu_credit_hours").Int()))
+	if u != nil && u.Get("monthly_cpu_credit_hrs").Exists() {
+		cpuCreditsT3 = decimalPtr(decimal.NewFromInt(u.Get("monthly_cpu_credit_hrs").Int()))
 	}
 
 	costComponents := []*schema.CostComponent{
