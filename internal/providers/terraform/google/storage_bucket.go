@@ -102,7 +102,7 @@ func dataStorage(d *schema.ResourceData, u *schema.UsageData) *schema.CostCompon
 	region, resourceGroup := getDSRegionResourceGroup(location, storageClass)
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Storage (%s)", strings.ToLower(storageClass)),
-		Unit:            "GiB-months",
+		Unit:            "GiB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{

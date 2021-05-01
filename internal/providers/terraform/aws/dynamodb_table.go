@@ -250,7 +250,7 @@ func dataStorageCostComponent(d *schema.ResourceData, u *schema.UsageData) *sche
 	}
 	return &schema.CostComponent{
 		Name:            "Data storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
@@ -277,7 +277,7 @@ func continuousBackupCostComponent(d *schema.ResourceData, u *schema.UsageData) 
 	}
 	return &schema.CostComponent{
 		Name:            "Point-In-Time Recovery (PITR) backup storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
@@ -300,7 +300,7 @@ func onDemandBackupCostComponent(d *schema.ResourceData, u *schema.UsageData) *s
 	}
 	return &schema.CostComponent{
 		Name:            "On-demand backup storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{

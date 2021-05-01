@@ -49,7 +49,7 @@ func storageCapacity(region string, isMultiAZ, isHDD bool, storageSize *decimal.
 	}
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("%v storage", storageType),
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: storageSize,
 		ProductFilter: &schema.ProductFilter{
@@ -72,7 +72,7 @@ func throughputCapacity(region string, isMultiAZ bool, throughput *decimal.Decim
 	}
 	return &schema.CostComponent{
 		Name:            "Throughput capacity",
-		Unit:            "MBps-months",
+		Unit:            "MBps",
 		UnitMultiplier:  1,
 		MonthlyQuantity: throughput,
 		ProductFilter: &schema.ProductFilter{
@@ -94,7 +94,7 @@ func backupStorageCapacity(region string, isMultiAZ bool, backupStorage *decimal
 	}
 	return &schema.CostComponent{
 		Name:            "Backup storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: backupStorage,
 		ProductFilter: &schema.ProductFilter{

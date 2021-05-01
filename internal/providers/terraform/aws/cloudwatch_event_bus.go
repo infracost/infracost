@@ -88,7 +88,7 @@ func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.
 			},
 			{
 				Name:            "Archive storage",
-				Unit:            "GB-months",
+				Unit:            "GB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: monthlyArchivedEvents,
 				ProductFilter: &schema.ProductFilter{

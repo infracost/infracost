@@ -512,7 +512,7 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 func s3StorageCostComponent(name string, service string, region string, usageType string, dataStorage *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: dataStorage,
 		ProductFilter: &schema.ProductFilter{
@@ -532,7 +532,7 @@ func s3StorageCostComponent(name string, service string, region string, usageTyp
 func s3StorageVolumeTypeCostComponent(name string, service string, region string, usageType string, volumeType string, dataStorage *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: dataStorage,
 		ProductFilter: &schema.ProductFilter{
@@ -575,7 +575,7 @@ func s3ApiOperationCostComponent(name string, service string, region string, usa
 func s3DataCostComponent(name string, service string, region string, usageType string, data *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: data,
 		ProductFilter: &schema.ProductFilter{
@@ -595,7 +595,7 @@ func s3DataCostComponent(name string, service string, region string, usageType s
 func s3DataGroupCostComponent(name string, service string, region string, usageType string, group string, data *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: data,
 		ProductFilter: &schema.ProductFilter{

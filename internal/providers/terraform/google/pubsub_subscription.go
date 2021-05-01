@@ -50,7 +50,7 @@ func NewPubSubSubscription(d *schema.ResourceData, u *schema.UsageData) *schema.
 			},
 			{
 				Name:            "Retained acknowledged message storage",
-				Unit:            "GiB-months",
+				Unit:            "GiB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: storageGB,
 				ProductFilter: &schema.ProductFilter{
@@ -68,7 +68,7 @@ func NewPubSubSubscription(d *schema.ResourceData, u *schema.UsageData) *schema.
 			},
 			{
 				Name:            "Snapshot message backlog storage",
-				Unit:            "GiB-months",
+				Unit:            "GiB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: snapshotStorageGB,
 				ProductFilter: &schema.ProductFilter{

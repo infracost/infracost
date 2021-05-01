@@ -1,5 +1,5 @@
 
- Name                                      Monthly Qty  Unit                Monthly Cost 
+ Name                                      Monthly Qty  Unit                Monthly Cost
                                                                                          
  azurerm_managed_disk.custom_size_ssd                                                    
  ├─ Storage (E30)                                    1  months                    $76.80 

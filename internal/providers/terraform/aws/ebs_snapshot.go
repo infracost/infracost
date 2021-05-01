@@ -113,7 +113,7 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 func ebsSnapshotCostComponent(region string, gbVal decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "EBS snapshot storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: &gbVal,
 		ProductFilter: &schema.ProductFilter{
