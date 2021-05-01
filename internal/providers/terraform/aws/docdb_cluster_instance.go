@@ -56,7 +56,7 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 		},
 		{
 			Name:            "Storage",
-			Unit:            "GB-months",
+			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: storageRate,
 			ProductFilter: &schema.ProductFilter{

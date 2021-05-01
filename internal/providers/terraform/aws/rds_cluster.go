@@ -146,7 +146,7 @@ func auroraStorageCostComponent(region string, u *schema.UsageData, databaseEngi
 	return []*schema.CostComponent{
 		{
 			Name:            "Storage rate",
-			Unit:            "GB-months",
+			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: &storageGB,
 			ProductFilter: &schema.ProductFilter{
@@ -182,7 +182,7 @@ func auroraStorageCostComponent(region string, u *schema.UsageData, databaseEngi
 func auroraBackupStorageCostComponent(region string, totalBackupStorageGB decimal.Decimal, databaseEngine *string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Backup storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: &totalBackupStorageGB,
 		ProductFilter: &schema.ProductFilter{

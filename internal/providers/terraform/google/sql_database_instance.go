@@ -249,7 +249,7 @@ func sqlInstanceStorage(region string, dbType SQLInstanceDBType, availabilityTyp
 
 	cost := &schema.CostComponent{
 		Name:            fmt.Sprintf("Storage (%s, %s)", diskTypeHumanReadableNames[diskType], strings.ToLower(availabilityType)),
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(diskSizeGB)),
 		ProductFilter: &schema.ProductFilter{
@@ -269,7 +269,7 @@ func sqlInstanceStorage(region string, dbType SQLInstanceDBType, availabilityTyp
 func backupCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
 	cost := &schema.CostComponent{
 		Name:            "Backups",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{

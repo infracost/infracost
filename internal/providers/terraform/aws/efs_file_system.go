@@ -25,7 +25,7 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Storage (standard)",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: gbStorage,
 		ProductFilter: &schema.ProductFilter{
@@ -45,7 +45,7 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Provisioned throughput",
-			Unit:            "MBps-months",
+			Unit:            "MBps",
 			UnitMultiplier:  1,
 			MonthlyQuantity: provisionedThroughput,
 			ProductFilter: &schema.ProductFilter{
@@ -78,7 +78,7 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Storage (infrequent access)",
-			Unit:            "GB-months",
+			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: infrequentAccessGbStorage,
 			ProductFilter: &schema.ProductFilter{

@@ -80,7 +80,7 @@ func storageCostComponent(d *schema.ResourceData) *schema.CostComponent {
 
 	return &schema.CostComponent{
 		Name:            "Storage (general purpose SSD, gp2)",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(storageSize)),
 		ProductFilter: &schema.ProductFilter{

@@ -60,7 +60,7 @@
     ├─ Select data scanned                                Cost depends on usage: $0.002 per GB-months       
     └─ Select data returned                               Cost depends on usage: $0.0007 per GB-months      
                                                                                                             
- PROJECT TOTAL                                                                                        $0.00 
+ PROJECT TOTAL                                                                                        $0.00
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
