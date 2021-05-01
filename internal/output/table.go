@@ -183,7 +183,7 @@ func buildCostComponentRows(t table.Writer, costComponents []CostComponent, pref
 		label := fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), c.Name)
 
 		if c.MonthlyCost == nil {
-			price := fmt.Sprintf("Cost depends on usage: %s per %s",
+			price := fmt.Sprintf("Monthly cost depends on usage: %s per %s",
 				formatPrice(c.Price),
 				c.Unit,
 			)
