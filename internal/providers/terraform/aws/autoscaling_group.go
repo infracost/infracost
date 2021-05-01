@@ -116,7 +116,7 @@ func newLaunchConfiguration(name string, d *schema.ResourceData, u *schema.Usage
 		costComponents = append(costComponents, detailedMonitoringCostComponent(d))
 	}
 
-	c := cpuCreditsCostComponent(d)
+	c := newCPUCredit(d, u)
 	if c != nil {
 		costComponents = append(costComponents, c)
 	}
@@ -158,9 +158,13 @@ func newLaunchTemplate(name string, d *schema.ResourceData, u *schema.UsageData,
 		costComponents = append(costComponents, c)
 	}
 
-	c := cpuCreditsCostComponent(d)
-	if c != nil {
-		costComponents = append(costComponents, c)
+	if d.Get("instance_type").Exists() && d.Get("instance_type").Type != gjson.Null {
+		if isInstanceBurstable(d.Get("instance_type").String(), []string{"t2.", "t3.", "t4."}) {
+			c := newCPUCredit(d, u)
+			if c != nil {
+				costComponents = append(costComponents, c)
+			}
+		}
 	}
 
 	subResources := make([]*schema.Resource, 0)

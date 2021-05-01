@@ -49,9 +49,12 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if d.Get("monitoring").Bool() {
 		costComponents = append(costComponents, detailedMonitoringCostComponent(d))
 	}
-	c := cpuCreditsCostComponent(d)
-	if c != nil {
-		costComponents = append(costComponents, c)
+
+	if isInstanceBurstable(d.Get("instance_type").String(), []string{"t2.", "t3.", "t4."}) {
+		c := newCPUCredit(d, u)
+		if c != nil {
+			costComponents = append(costComponents, c)
+		}
 	}
 
 	return &schema.Resource{
@@ -238,7 +241,35 @@ func detailedMonitoringCostComponent(d *schema.ResourceData) *schema.CostCompone
 	}
 }
 
-func cpuCreditsCostComponent(d *schema.ResourceData) *schema.CostComponent {
+func cpuCreditsCostComponent(region string, vCPUCount decimal.Decimal, prefix string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "CPU credits",
+		Unit:            "vCPU-hours",
+		UnitMultiplier:  1,
+		MonthlyQuantity: &vCPUCount,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonEC2"),
+			ProductFamily: strPtr("CPU Credits"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "operatingSystem", Value: strPtr("Linux")},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/CPUCredits:%s$/", prefix))},
+			},
+		},
+	}
+}
+
+func isInstanceBurstable(instanceType string, burstableInstanceTypes []string) bool {
+	for _, instance := range burstableInstanceTypes {
+		if strings.HasPrefix(instanceType, instance) {
+			return true
+		}
+	}
+	return false
+}
+
+func newCPUCredit(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
 	region := d.Get("region").String()
 	instanceType := d.Get("instance_type").String()
 
@@ -253,21 +284,19 @@ func cpuCreditsCostComponent(d *schema.ResourceData) *schema.CostComponent {
 
 	prefix := strings.SplitN(instanceType, ".", 2)[0]
 
-	return &schema.CostComponent{
-		Name:           "CPU credits",
-		Unit:           "vCPU-hours",
-		UnitMultiplier: 1,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr("AmazonEC2"),
-			ProductFamily: strPtr("CPU Credits"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "operatingSystem", Value: strPtr("Linux")},
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/CPUCredits:%s$/", prefix))},
-			},
-		},
+	instanceCPUCreditHours := decimal.Zero
+	if u != nil && u.Get("monthly_cpu_credit_hrs").Exists() {
+		instanceCPUCreditHours = decimal.NewFromInt(u.Get("monthly_cpu_credit_hrs").Int())
 	}
+
+	instanceVCPUCount := decimal.Zero
+	if u != nil && u.Get("virtual_cpu_count").Exists() {
+		instanceVCPUCount = decimal.NewFromInt(u.Get("virtual_cpu_count").Int())
+	}
+
+	cpuCreditQuantity := instanceVCPUCount.Mul(instanceCPUCreditHours)
+
+	return cpuCreditsCostComponent(region, cpuCreditQuantity, prefix)
 }
 
 func newRootBlockDevice(d gjson.Result, region string) *schema.Resource {
