@@ -58,8 +58,8 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			}
 
 			instanceVCPUCount := decimal.Zero
-			if u != nil && u.Get("virtual_cpu_count").Exists() {
-				instanceVCPUCount = decimal.NewFromInt(u.Get("virtual_cpu_count").Int())
+			if u != nil && u.Get("vcpu_count").Exists() {
+				instanceVCPUCount = decimal.NewFromInt(u.Get("vcpu_count").Int())
 			}
 
 			cpuCreditQuantity = instanceVCPUCount.Mul(instanceCPUCreditHours).Mul(decimal.NewFromInt(desiredSize))
