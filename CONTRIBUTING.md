@@ -68,7 +68,7 @@ The entire test suite can take >20 mins to run, so we recommend against running 
 
 You should run tests for a file you added/changed with `-v` and warn log level so you can see and fix any warnings:
 ```sh
-INFRACOST_LOG_LEVEL=warn go test -v internal/providers/terraform/aws/ebs_volume_test.go
+INFRACOST_LOG_LEVEL=warn go test -v -cover ./internal/providers/terraform/aws/ebs_volume_test.go
 
 time="2021-04-05T15:24:16Z" level=warning msg="Multiple prices found for aws_ebs_volume.gp3 Provisioned throughput, using the first price"
 ```

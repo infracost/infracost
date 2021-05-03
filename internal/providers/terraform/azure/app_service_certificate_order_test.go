@@ -38,7 +38,7 @@ func TestAzureRMAppServiceCertificateOrder(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:             "SSL certificate (Standard)",
-					PriceHash:        "4e8a819ae89e667ac4c8e5a86c983d49-e1f24f9fc7676b8cc310519e3f060f1d",
+					PriceHash:        "038927521c484b222968e9c66f83bb36-e1f24f9fc7676b8cc310519e3f060f1d",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1).Div(decimal.NewFromInt(12))),
 				},
 			},
@@ -48,7 +48,7 @@ func TestAzureRMAppServiceCertificateOrder(t *testing.T) {
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
 					Name:             "SSL certificate (wildcard)",
-					PriceHash:        "6ec315d71563d4fc7369d88c8869765f-e1f24f9fc7676b8cc310519e3f060f1d",
+					PriceHash:        "ef0fe7889d6b55197be8698bc60e0252-e1f24f9fc7676b8cc310519e3f060f1d",
 					MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1).Div(decimal.NewFromInt(12))),
 				},
 			},
