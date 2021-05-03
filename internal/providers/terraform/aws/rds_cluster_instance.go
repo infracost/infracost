@@ -56,8 +56,8 @@ func NewRDSClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.
 		}
 
 		instanceVCPUCount := decimal.Zero
-		if u != nil && u.Get("virtual_cpu_count").Exists() {
-			instanceVCPUCount = decimal.NewFromInt(u.Get("virtual_cpu_count").Int())
+		if u != nil && u.Get("vcpu_count").Exists() {
+			instanceVCPUCount = decimal.NewFromInt(u.Get("vcpu_count").Int())
 		}
 
 		if instanceCPUCreditHours.GreaterThan(decimal.NewFromInt(0)) {

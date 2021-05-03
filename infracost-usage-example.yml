@@ -52,7 +52,7 @@ resource_usage:
     reserved_instance_payment_option: no_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
     # Only applicable when T2 credit_specification is set to unlimited or T3 & T4 instance types are used within a launch template,  or T3 & T4 instance types are used in a launch configuration.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
-    virtual_cpu_count: 2 # Number of the vCPUs for the instance type.
+    vcpu_count: 2 # Number of the vCPUs for the instance type.
 
   aws_cloudwatch_event_bus.my_events:
     monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.
@@ -144,7 +144,7 @@ resource_usage:
     reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
     # Only applicable for T3 & T4 instance types or if you specify a t2 instance within a launch template.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
-    virtual_cpu_count: 2 # Number of the vCPUs for the instance type.
+    vcpu_count: 2 # Number of the vCPUs for the instance type.
 
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
@@ -159,7 +159,7 @@ resource_usage:
     reserved_instance_payment_option: all_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
     # Can be used with T2 / T3 & T4 Instance types. T2 requires credit_specification to be unlimited.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
-    virtual_cpu_count: 2 # Number of the vCPUs for the instance type.
+    vcpu_count: 2 # Number of the vCPUs for the instance type.
 
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000 # Total storage used for backups in GB.
@@ -192,7 +192,7 @@ resource_usage:
   # These settings only apply when using t3 instance types.
   aws_rds_cluster_instance.my_cluster:
     monthly_cpu_credit_hrs: 24   # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
-    virtual_cpu_count: 2 # Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
+    vcpu_count: 2 # Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
 
   aws_redshift_cluster.with_usage:
     managed_storage_gb: 10000

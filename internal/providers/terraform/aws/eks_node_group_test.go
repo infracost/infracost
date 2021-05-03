@@ -78,7 +78,7 @@ func TestEKSNodeGroup_defaultCpuCredits(t *testing.T) {
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_eks_node_group.example": map[string]interface{}{
 			"monthly_cpu_credit_hrs": 350,
-			"virtual_cpu_count":      2,
+			"vcpu_count":             2,
 		},
 	})
 
@@ -562,7 +562,7 @@ func TestEKSNodeGroup_with_instance_launch_template_without_instance(t *testing.
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_eks_node_group.example_with_launch_template": map[string]interface{}{
 			"monthly_cpu_credit_hrs": 350,
-			"virtual_cpu_count":      2,
+			"vcpu_count":             2,
 		},
 	})
 
@@ -692,7 +692,7 @@ func TestEKSNodeGroup_reserved(t *testing.T) {
 			"reserved_instance_term":           "1_year",
 			"reserved_instance_payment_option": "no_upfront",
 			"monthly_cpu_credit_hrs":           350,
-			"virtual_cpu_count":                2,
+			"vcpu_count":                       2,
 		},
 	})
 
@@ -745,7 +745,7 @@ func TestEKSNodeGroup_windows(t *testing.T) {
 		"aws_eks_node_group.windows": map[string]interface{}{
 			"operating_system":       "windows",
 			"monthly_cpu_credit_hrs": 100,
-			"virtual_cpu_count":      2,
+			"vcpu_count":             2,
 		},
 	})
 
