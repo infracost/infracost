@@ -14,13 +14,6 @@ fix_env_vars () {
 }
 
 process_args () {
-  # Set variables based on the order for GitHub Actions, or the env value for other CIs
-  iac_path=${1:-$iac_path}
-  terraform_plan_flags=${2:-$terraform_plan_flags}
-  terraform_workspace=${3:-$terraform_workspace}
-  usage_file=${4:-$usage_file}
-  config_file=${5:-$config_file}
-  fail_condition=${7:-$fail_condition}
 
   # Validate fail_condition
   if ! echo "$fail_condition" | jq empty; then
@@ -31,7 +24,6 @@ process_args () {
   if [ ! -z "$fail_condition" ] && [ "$(echo "$fail_condition" | jq '.percentage_threshold')" != "null" ]; then
     fail_percentage_threshold=$(echo "$fail_condition" | jq -r '.percentage_threshold')
   fi
-  fail_percentage_threshold=${fail_percentage_threshold:--1}
   INFRACOST_BINARY=${INFRACOST_BINARY:-infracost}
 
   # Export as it's used by infracost, not this script
@@ -67,7 +59,6 @@ build_breakdown_cmd () {
 }
 
 build_output_cmd () {
-  breakdown_path=$1
   output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
   echo "${output_cmd}"
 }
@@ -112,11 +103,12 @@ build_msg () {
 }
 
 build_msg_html () {
-    msg=$1
-    html="<!DOCTYPE html>\n<html>\n<body>\n<pre>"
-    html="${html}\n${msg}"
-    html="${html}</pre>\n</body>\n</html>"
-    printf "$html"
+  # TODO: change it to infracost output once https://github.com/infracost/infracost/issues/509 is resolved.
+  msg=$1
+  html="<!DOCTYPE html>\n<html>\n<body>\n<pre>"
+  html="${html}\n${msg}"
+  html="${html}</pre>\n</body>\n</html>"
+  printf "$html"
 }
 
 cleanup () {
@@ -163,8 +155,8 @@ diff_resources=$(jq '[.projects[].diff.resources[]] | add' infracost_breakdown.j
 
 is_failure=0
 if [ -z $percent ]; then
-  echo "Passing as as percentage diff is empty."
-elif [ $(echo "$fail_percentage_threshold < 0" | bc -l) = 1 ]; then
+  echo "Passing as percentage diff is empty."
+elif [ -z $fail_percentage_threshold ]; then
   echo "Passing as no fail percentage threshold is specified."  
 elif [ $(echo "$absolute_percent > $fail_percentage_threshold" | bc -l) = 1 ]; then
   echo "Failing as percentage diff ($absolute_percent%) is greater than the percentage threshold ($fail_percentage_threshold%)."
