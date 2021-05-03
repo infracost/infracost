@@ -46,7 +46,7 @@ func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 	productNameRegex := fmt.Sprintf("/%s - Compute %s/", tierName, family)
 	skuName := fmt.Sprintf("%s vCore", cores)
 
-	costComponents = append(costComponents, databaseComputeInstance(region, serviceName, sku, productNameRegex, skuName))
+	costComponents = append(costComponents, databaseComputeInstance(region, fmt.Sprintf("Compute (%s)", sku), serviceName, productNameRegex, skuName))
 
 	storageGB := d.Get("storage_mb").Int() / 1024
 
@@ -77,9 +77,9 @@ func NewAzureMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 }
 
-func databaseComputeInstance(region, serviceName, sku, productNameRegex, skuName string) *schema.CostComponent {
+func databaseComputeInstance(region, name, serviceName, productNameRegex, skuName string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Compute (%s)", sku),
+		Name:           name,
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -92,6 +92,9 @@ func databaseComputeInstance(region, serviceName, sku, productNameRegex, skuName
 				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
 				{Key: "skuName", Value: strPtr(skuName)},
 			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
 		},
 	}
 }
