@@ -8,12 +8,7 @@
                                                                                                 
  aws_eks_node_group.example2                                                                    
  ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)             730  hours             $33.87 
- └─ Storage (general purpose SSD, gp2)                             30  GB-months          $3.00 
-                                                                                                
- aws_eks_node_group.example3                                                                    
- ├─ Instance usage (Linux/UNIX, spot, t3.medium)                  730  hours              $9.27 
- ├─ CPU credits                                                     0  vCPU-hours         $0.00 
- └─ Storage (general purpose SSD, gp2)                             20  GB-months          $2.00 
+ └─ Storage (general purpose SSD, gp2)                             30  GB-months          $3.00
                                                                                                 
  aws_eks_node_group.example_defaultCpuCredits                                                   
  ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)           2,190  hours             $91.10 
