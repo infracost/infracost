@@ -1,7 +1,8 @@
 #!/bin/sh -le
 
-# This is an Jenkins-specific script that runs infracost on the current branch.
-# Usage docs: https://www.infracost.io/docs/integrations/
+# This is a Jenkins-specific script that runs infracost. The output is saved in a file 
+# infracost_diff.html, which can be published using the Jenkins publishHTML plugin.
+# Usage docs: https://www.infracost.io/docs/integrations/cicd
 
 fix_env_vars () {
     # Jenkins has problems with envs case sensivity
@@ -48,6 +49,9 @@ build_breakdown_cmd () {
   fi
   if [ ! -z "$terraform_plan_flags" ]; then
     breakdown_cmd="$breakdown_cmd --terraform-plan-flags \"$terraform_plan_flags\""
+  fi
+  if [ ! -z "$terraform_workspace" ]; then
+    breakdown_cmd="$terraform_workspace --terraform-workspace $terraform_workspace"
   fi
   if [ ! -z "$usage_file" ]; then
     breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
@@ -105,13 +109,14 @@ build_msg () {
 build_msg_html () {
   # TODO: change it to infracost output once https://github.com/infracost/infracost/issues/509 is resolved.
   msg=$1
-  html="<!DOCTYPE html>\n<html>\n<body>\n<pre>"
-  html="${html}\n${msg}"
-  html="${html}</pre>\n</body>\n</html>"
-  printf "$html"
+  html="<!DOCTYPE html><html><body><pre>"
+  html="${html} ${msg}"
+  html="${html}</pre></body></html>"
+  printf '%s' "$html"
 }
 
 cleanup () {
+  # Don't delete infracost_diff.html here as Jenkinsfile publishes that
   rm -f infracost_breakdown.json infracost_breakdown_cmd infracost_output_cmd
 }
 
@@ -169,7 +174,7 @@ msg="$(build_msg)"
 echo "$msg"
 
 html=$(build_msg_html "$msg")
-echo "$html" > infracost_diff_output.html
+echo "$html" > infracost_diff.html
 
 cleanup
 
