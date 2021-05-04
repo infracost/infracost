@@ -3,37 +3,37 @@
                                                                                                    
  aws_instance.cnvr_1yr_all_upfront                                                                 
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                  $0.00 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
  aws_instance.cnvr_1yr_no_upfront                                                                  
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                 $21.90 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
  aws_instance.cnvr_1yr_partial_upfront                                                             
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                 $10.44 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
  aws_instance.cnvr_3yr_all_upfront                                                                 
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                  $0.00 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
  aws_instance.cnvr_3yr_no_upfront                                                                  
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                 $15.04 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
  aws_instance.cnvr_3yr_partial_upfront                                                             
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                  $7.01 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
@@ -73,37 +73,37 @@
                                                                                                    
  aws_instance.std_1yr_all_upfront                                                                  
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                  $0.00 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
  aws_instance.std_1yr_no_upfront                                                                   
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                 $19.05 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
  aws_instance.std_1yr_partial_upfront                                                              
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                  $9.05 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
  aws_instance.std_3yr_all_upfront                                                                  
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                  $0.00 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
  aws_instance.std_3yr_no_upfront                                                                   
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                 $13.14 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
  aws_instance.std_3yr_partial_upfront                                                              
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)             730  hours                  $6.06 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
@@ -119,13 +119,13 @@
                                                                                                    
  aws_instance.t2_unlimited_cpuCredits                                                              
  ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)            730  hours                 $33.87 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                  600  vCPU-hours            $30.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
  aws_instance.t3_default_cpuCredits                                                                
  ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)            730  hours                 $30.37 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                    0  vCPU-hours             $0.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
@@ -136,11 +136,11 @@
                                                                                                    
  aws_instance.t3_unlimited_cpuCredits                                                              
  ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)            730  hours                 $30.37 
- ├─ CPU credits                                        Cost depends on usage: $0.05 per vCPU-hours 
+ ├─ CPU credits                                                1,460  vCPU-hours            $73.00 
  └─ root_block_device                                                                              
     └─ Storage (general purpose SSD, gp2)                          8  GB-months              $0.80 
                                                                                                    
- PROJECT TOTAL                                                                             $889.14 
+ PROJECT TOTAL                                                                             $992.14 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

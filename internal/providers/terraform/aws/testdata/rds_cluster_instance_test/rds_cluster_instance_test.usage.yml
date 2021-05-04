@@ -1,5 +1,5 @@
 version: 0.1
 resource_usage:
   aws_rds_cluster_instance.cluster_instance_t3:
-    cpu_credit_hrs: 24
-    virtual_cpu_count: 2
+    monthly_cpu_credit_hrs: 24
+    vcpu_count: 2
