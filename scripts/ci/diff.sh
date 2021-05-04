@@ -73,6 +73,9 @@ build_breakdown_cmd () {
   if [ ! -z "$terraform_plan_flags" ]; then
     breakdown_cmd="$breakdown_cmd --terraform-plan-flags \"$terraform_plan_flags\""
   fi
+  if [ ! -z "$terraform_workspace" ]; then
+    breakdown_cmd="$terraform_workspace --terraform-workspace $terraform_workspace"
+  fi
   if [ ! -z "$usage_file" ]; then
     breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
   fi
@@ -83,7 +86,6 @@ build_breakdown_cmd () {
 }
 
 build_output_cmd () {
-  breakdown_path=$1
   output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
   echo "${output_cmd}"
 }

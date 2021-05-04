@@ -1,10 +1,8 @@
 #!/bin/sh -le
 
-# This is an Atlantis-specific script that runs infracost on the current branch then
-# the master branch. It uses `git diff` to output the cost estimate difference
-# whenever a percentage threshold is crossed. The output is displayed at the bottom of
+# This is an Atlantis-specific script that runs infracost. The output is displayed at the bottom of
 # the comments that Atlantis posts on pull requests.
-# Usage docs: https://www.infracost.io/docs/integrations/
+# Usage docs: https://www.infracost.io/docs/integrations/cicd
 
 if [ "$atlantis_debug" = "true" ] || [ "$atlantis_debug" = "True" ] || [ "$atlantis_debug" = "TRUE" ]; then
   atlantis_debug=true
@@ -62,7 +60,6 @@ build_breakdown_cmd () {
 }
 
 build_output_cmd () {
-  breakdown_path=$1
   output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
   echo "${output_cmd}"
 }
