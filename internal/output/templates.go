@@ -38,8 +38,8 @@ a {
 }
 
 table {
+  border: 1px solid gray;
   border-collapse: collapse;
-  border: 1px solid #6b7280;
 }
 
 th, td {
@@ -91,6 +91,7 @@ tr.total td {
 .arrow {
   color: #96a0b5;
 }
+
 {{end}}
 
 {{define "faviconBase64"}}
@@ -98,30 +99,42 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
 {{end}}
 
 {{define "groupRow"}}
+  {{$fields := .Fields}}
   <tr class="group">
   <td class="name">
     {{.GroupLabel}}: {{.Group}}
   </td>
-  <td class="monthly-quantity"></td>
-  <td class="unit"></td>
-  <td class="price"></td>
-  <td class="hourly-cost"></td>
-  <td class="monthly-cost"></td>
+  {{template "emptyTableRows" "Fields" $fields}}
   </tr>
 {{end}}
 
+{{define "emptyTableRows"}}
+  {{if contains .Fields "monthlyQuantity"}}
+    <td class="monthly-quantity"></td>
+  {{end}}
+  {{if contains .Fields "unit"}}
+    <td class="unit"></td>
+  {{end}}
+  {{if contains .Fields "price"}}
+    <td class="price"></td>
+  {{end}}
+  {{if contains .Fields "hourlyCost"}}
+    <td class="hourly-cost"></td>
+  {{end}}
+  {{if contains .Fields "monthlyCost"}}
+    <td class="monthly-cost"></td>
+  {{end}}
+{{end}}
+
 {{define "resourceRows"}}
+  {{$fields := .Fields}}
   <tr class="resource{{if eq .Indent 0}} top-level{{end}}">
     <td class="name">
       {{if gt .Indent 1}}{{repeat (int (add .Indent -1)) "&nbsp;&nbsp;&nbsp;&nbsp;" | safeHTML}}{{end}}
       {{if gt .Indent 0}}<span class="arrow">&#8627;</span>{{end}}
       {{.Resource.Name}}
     </td>
-    <td class="monthly-quantity"></td>
-    <td class="unit"></td>
-    <td class="price"></td>
-    <td class="hourly-cost">{{.Resource.HourlyCost | formatCost2DP}}</td>
-    <td class="monthly-cost">{{.Resource.MonthlyCost | formatCost2DP}}</td>
+    {{template "emptyTableRows" dict "Fields" $fields}}
   </tr>
   {{ if .Resource.Tags}}
     <tr class="tags">
@@ -134,19 +147,15 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
         <span class="label">Tags:</span>
         <span>{{$tags | join ", "}}</span>
       </td>
-      <td class="monthly-quantity"></td>
-      <td class="unit"></td>
-      <td class="price"></td>
-      <td class="hourly-cost"></td>
-      <td class="monthly-cost"></td>
+      {{template "emptyTableRows" dict "Fields" $fields}}
     </tr>
   {{end}}
   {{$ident := add .Indent 1}}
   {{range .Resource.CostComponents}}
-    {{template "costComponentRow" dict "CostComponent" . "Indent" $ident}}
+    {{template "costComponentRow" dict "CostComponent" . "Fields" $fields "Indent" $ident}}
   {{end}}
   {{range .Resource.SubResources}}
-    {{template "resourceRows" dict "Resource" . "Indent" $ident}}
+    {{template "resourceRows" dict "Resource" . "Fields" $fields "Indent" $ident}}
   {{end}}
 {{end}}
 
@@ -157,12 +166,74 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       {{if gt .Indent 0}}<span class="arrow">&#8627;</span>{{end}}
       {{.CostComponent.Name}}
     </td>
-    <td class="monthly-quantity">{{.CostComponent.MonthlyQuantity | formatQuantity }}</td>
-    <td class="unit">{{.CostComponent.Unit}}</td>
-    <td class="price">{{.CostComponent.Price | formatPrice }}</td>
-    <td class="hourly-cost">{{.CostComponent.HourlyCost | formatCost2DP}}</td>
-    <td class="monthly-cost">{{.CostComponent.MonthlyCost | formatCost2DP}}</td>
+    {{if .CostComponent.MonthlyCost}}
+      {{if contains .Fields "monthlyQuantity"}}
+        <td class="monthly-quantity">{{.CostComponent.MonthlyQuantity | formatQuantity }}</td>
+      {{end}}
+      {{if contains .Fields "unit"}}
+        <td class="unit">{{.CostComponent.Unit}}</td>
+      {{end}}
+      {{if contains .Fields "price"}}
+        <td class="price">{{.CostComponent.Price | formatPrice }}</td>
+      {{end}}
+      {{if contains .Fields "hourlyCost"}}
+        <td class="hourly-cost">{{.CostComponent.HourlyCost | formatCost2DP}}</td>
+      {{end}}
+      {{if contains .Fields "monthlyCost"}}
+        <td class="monthly-cost">{{.CostComponent.MonthlyCost | formatCost2DP}}</td>
+      {{end}}
+    {{else}}
+      <td colspan="{{len .Fields}}" class="usage-cost">Cost depends on usage: {{.CostComponent.Price | formatPrice}} per {{.CostComponent.Unit}}</td>
+    {{end}}
   </tr>
+{{end}}
+
+{{define "tableHeaders"}}
+  <th class="name">Name</th>
+  {{if contains .Fields "monthlyQuantity"}}
+    <td class="monthly-quantity">Monthly Qty</td>
+  {{end}}
+  {{if contains .Fields "unit"}}
+    <td class="unit">Unit</td>
+  {{end}}
+  {{if contains .Fields "price"}}
+    <td class="price">Price</td>
+  {{end}}
+  {{if contains .Fields "hourlyCost"}}
+    <td class="hourly-cost">Hourly Cost</td>
+  {{end}}
+  {{if contains .Fields "monthlyCost"}}
+    <td class="monthly-cost">Monthly Cost</td>
+  {{end}}
+{{end}}
+
+{{define "projectBlock"}}
+  {{$fields := .Options.Fields}}
+  <p class="project-name">Project: {{.Project.Path}}</p>
+  <div class="table-border">
+    <table>
+      <thead>      
+        {{template "tableHeaders" dict "Fields" $fields}}
+      </thead>
+      <tbody>
+        {{$groupLabel := .Options.GroupLabel}}
+        {{$groupKey := .Options.GroupKey}}
+        {{$prevGroup := ""}}
+        {{range .Resources}}
+          {{$group := index .Metadata $groupKey}}
+          {{if ne $group $prevGroup}}
+            {{template "groupRow" dict "GroupLabel" $groupLabel "Group" $group "Fields" $fields}}
+          {{end}}
+          {{template "resourceRows" dict "Resource" . "Fields" $fields "Indent" 0}}
+          {{$prevGroup = $group}}
+        {{end}}
+        <tr class="total">
+          <td class="name" colspan="{{len .Options.Fields}}">Project total</td>
+          <td class="monthly-cost">{{.Project.Breakdown.TotalMonthlyCost | formatCost2DP}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 {{end}}
 
 <!doctype html>
@@ -189,38 +260,12 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       </ul>
     </div>
 
-    <table>
-      <thead>
-        <th class="name">Name</th>
-        <th class="monthly-quantity">Monthly quantity</th>
-        <th class="unit">Unit</th>
-        <th class="price">Price</th>
-        <th class="hourly-cost">Hourly cost</th>
-        <th class="monthly-cost">Monthly cost</th>
-      </thead>
-      <tbody>
-        {{$groupLabel := .Options.GroupLabel}}
-        {{$groupKey := .Options.GroupKey}}
-        {{$prevGroup := ""}}
-        {{range .Root.Resources}}
-          {{$group := index .Metadata $groupKey}}
-          {{if ne $group $prevGroup}}
-            {{template "groupRow" dict "GroupLabel" $groupLabel "Group" $group}}
-          {{end}}
-          {{template "resourceRows" dict "Resource" . "Indent" 0}}
-          {{$prevGroup = $group}}
-        {{end}}
-        <tr class="spacer"><td colspan="6"></td></tr>
-        <tr class="total">
-          <td class="name">Overall total</td>
-          <td class="monthly-quantity"></td>
-          <td class="unit"></td>
-          <td class="price"></td>
-          <td class="hourly-cost">{{.Root.TotalHourlyCost | formatCost2DP}}</td>
-          <td class="monthly-cost">{{.Root.TotalMonthlyCost | formatCost2DP}}</td>
-        </tr>
-      </tbody>
-    </table>
+    {{$options := .Options}}
+
+    {{range .Root.Projects}}
+      {{$resources := .Breakdown.Resources}}
+      {{template "projectBlock" dict "Project" . "Options" $options "Resources" $resources "Indent" 0}}
+    {{end}}
 
     <div class="warnings">
       <p>{{.UnsupportedResourcesMessage | replaceNewLines}}</p>
