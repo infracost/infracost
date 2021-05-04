@@ -72,6 +72,22 @@ test_google:
 test_azure:
 	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -v -cover)
 
+# Update AWS golden files tests
+test_update:
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers $(or $(ARGS), -update -v -cover -run GoldenFile)
+
+# Update golden files tests
+test_update_aws:
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -update -v -cover -run GoldenFile)
+
+# Update Google golden files tests
+test_update_google:
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -update -v -cover -run GoldenFile)
+
+# Update Azure golden files tests
+test_update_azure:
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -update -v -cover -run GoldenFile)
+
 fmt:
 	go fmt ./...
 
