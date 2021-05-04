@@ -322,20 +322,6 @@ resource "aws_launch_template" "foo3" {
 
 }
 
-resource "aws_eks_node_group" "example3" {
-  cluster_name    = "test_aws_eks_node_group"
-  node_group_name = "example"
-  node_role_arn   = "node_role_arn"
-  subnet_ids      = ["subnet_id"]
-  capacity_type   = "SPOT"
-
-  scaling_config {
-    desired_size = 1
-    max_size     = 1
-    min_size     = 1
-  }
-}
-
 resource "aws_eks_node_group" "reserved" {
   cluster_name    = "test_aws_eks_node_group"
   node_group_name = "example"
