@@ -26,8 +26,6 @@ func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.Us
 	if sslState == "IP" {
 		sslType = "IP"
 	} else {
-		sslType = "SNI"
-
 		// returning directly since SNI is currently defined as free in the Azure cost page
 		return &schema.Resource{
 			NoPrice:   true,

@@ -40,18 +40,6 @@ func TestAzureRMAppServiceCertificateBinding(t *testing.T) {
 				},
 			},
 		},
-		/*
-			{
-				Name: "azurerm_app_service_certificate_binding.sni_ssl",
-				CostComponentChecks: []testutil.CostComponentCheck{
-					{
-						Name:             "IP SSL certificate",
-						PriceHash:        "582bbeaa3646b991abbdaf03f885f7b8-e285791b6e6926c07354b58a33e7ecf4",
-						MonthlyCostCheck: testutil.MonthlyPriceMultiplierCheck(decimal.NewFromInt(1)),
-					},
-				},
-			},
-		*/
 	}
 
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
