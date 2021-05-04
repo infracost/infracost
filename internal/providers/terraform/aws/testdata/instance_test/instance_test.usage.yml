@@ -1,5 +1,17 @@
 version: 0.1
 resource_usage:
+  aws_instance.t3_default_cpuCredits:
+    monthly_cpu_credit_hrs: 0
+    vcpu_count: 2
+
+  aws_instance.t3_unlimited_cpuCredits:
+    monthly_cpu_credit_hrs: 730
+    vcpu_count: 2
+
+  aws_instance.t2_unlimited_cpuCredits:
+    monthly_cpu_credit_hrs: 300
+    vcpu_count: 2
+
   aws_instance.std_1yr_no_upfront:
     reserved_instance_type: standard
     reserved_instance_term: 1_year
