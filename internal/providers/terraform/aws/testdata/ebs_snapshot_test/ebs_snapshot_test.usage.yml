@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  aws_ebs_snapshot.gp2_usage:
+    monthly_list_block_requests: 1000000
+    monthly_get_block_requests: 100000
+    monthly_put_block_requests: 100000

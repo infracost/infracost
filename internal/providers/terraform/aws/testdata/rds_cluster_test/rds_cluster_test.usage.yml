@@ -1,0 +1,37 @@
+version: 0.1
+resource_usage:
+  aws_rds_cluster.postgres_serverless:
+    capacity_units_per_hr: 1000
+    storage_gb: 100
+    write_requests_per_sec: 10
+    read_requests_per_sec: 10
+  aws_rds_cluster.my_sql_serverless:
+    capacity_units_per_hr: 1000
+    storage_gb: 100
+    write_requests_per_sec: 10
+    read_requests_per_sec: 10
+  aws_rds_cluster.postgres_serverlessWithBackup:
+    capacity_units_per_hr: 1000
+    storage_gb: 100
+    write_requests_per_sec: 10
+    read_requests_per_sec: 10
+    backup_snapshot_size_gb: 100
+  aws_rds_cluster.postgres_serverlessWithExport:
+    capacity_units_per_hr: 1000
+    storage_gb: 100
+    write_requests_per_sec: 10
+    read_requests_per_sec: 10
+    backup_snapshot_size_gb: 100
+    average_statements_per_hr: 10000000
+    change_records_per_statement: 0.38
+    backtrack_window_hrs: 24
+    snapshot_export_size_gb: 200
+  aws_rds_cluster.mysql_backtrack:
+    storage_gb:                   100
+    write_requests_per_sec:       10
+    read_requests_per_sec:        10
+    backup_snapshot_size_gb:      100
+    average_statements_per_hr:    10000000
+    change_records_per_statement: 0.38
+    backtrack_window_hrs:         24
+    snapshot_export_size_gb:      200    

@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_linux_virtual_machine_scale_set.basic_a2_usage:
+    instances: 4

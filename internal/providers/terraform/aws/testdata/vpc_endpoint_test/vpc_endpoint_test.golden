@@ -1,0 +1,19 @@
+
+ Name                                   Monthly Qty  Unit         Monthly Cost 
+                                                                               
+ aws_vpc_endpoint.gateway_loadbalancer                                         
+ ├─ Endpoint (GatewayLoadBalancer)              730  hours               $7.30 
+ └─ Data processed                      Cost depends on usage: $0.0035 per GB  
+                                                                               
+ aws_vpc_endpoint.interface                                                    
+ ├─ Endpoint (Interface)                        730  hours               $7.30 
+ └─ Data processed                      Cost depends on usage: $0.01 per GB    
+                                                                               
+ aws_vpc_endpoint.multiple_interfaces                                          
+ ├─ Endpoint (Interface)                      1,460  hours              $14.60 
+ └─ Data processed                      Cost depends on usage: $0.01 per GB    
+                                                                               
+ PROJECT TOTAL                                                          $29.20 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

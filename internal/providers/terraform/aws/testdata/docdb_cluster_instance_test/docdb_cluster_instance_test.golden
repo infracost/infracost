@@ -1,0 +1,24 @@
+
+ Name                                                Monthly Qty  Unit              Monthly Cost 
+                                                                                                 
+ aws_docdb_cluster_instance.db                                                                   
+ ├─ Database instance (on-demand, db.t3.medium)              730  hours                   $56.94 
+ ├─ Storage                                       Cost depends on usage: $0.10 per GB-months     
+ ├─ I/O                                           Cost depends on usage: $0.20 per 1M requests   
+ └─ CPU credits                                   Cost depends on usage: $0.09 per vCPU-hours    
+                                                                                                 
+ aws_docdb_cluster_instance.large                                                                
+ ├─ Database instance (on-demand, db.r5.4xlarge)             730  hours                $1,617.68 
+ ├─ Storage                                                1,000  GB-months              $100.00 
+ └─ I/O                                                       10  1M requests              $2.00 
+                                                                                                 
+ aws_docdb_cluster_instance.medium                                                               
+ ├─ Database instance (on-demand, db.t3.medium)              730  hours                   $56.94 
+ ├─ Storage                                                1,000  GB-months              $100.00 
+ ├─ I/O                                                       10  1M requests              $2.00 
+ └─ CPU credits                                               10  vCPU-hours               $0.90 
+                                                                                                 
+ PROJECT TOTAL                                                                         $1,936.46 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

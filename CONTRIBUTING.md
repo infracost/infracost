@@ -85,6 +85,14 @@ If you do want to run all the tests, you can use:
 make test_all
 ```
 
+Test golden files may be updated for all test or for a specific cloud vendor:
+```sh
+make test_update
+make test_update_aws
+make test_update_google
+make test_update_azure
+```
+
 ### Build
 
 ```sh
@@ -171,10 +179,49 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 ```
 
-Finally create a temporary Terraform project, like [this](examples/terraform), to test your resource and run (no need to commit that):
+Create a new example Terraform project for integration testing in `internal/providers/terraform/aws/testdata/aws_my_resource_test/`.  Each test case can be represented as a separate resource in the .tf file.  Be sure to include test cases with usage and without usage.
 
+Terraform project file `internal/providers/terraform/aws/testdata/aws_my_resource_test/aws_my_resource_test.tf`:
+```
+resource "aws_my_resource" "my_resource" {
+  aws_id = "fake"
+}
+
+resource "aws_my_resource" "my_resource_withUsage" {
+  aws_id = "fake"
+}
+```
+
+Usage file `internal/providers/terraform/aws/testdata/aws_my_resource_test/aws_my_resource_test.usage.yml`:
+```
+version: 0.1
+resource_usage:
+  aws_my_resource.my_resource_withUsage:
+    monthly_usage_hrs: 1000000
+```
+
+Add a golden file test to the test file `internal/providers/terraform/aws/aws_my_resource_test.go`:
+```go
+package aws_test
+
+import (
+	"testing"
+
+	"github.com/infracost/infracost/internal/providers/terraform/tftest"
+)
+
+func TestMyResourceGoldenFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode")
+	}
+
+	tftest.GoldenFileResourceTests(t, "aws_my_resource_test")
+}
+```
+
+Finally, generate the golden file by running the test with the `-update` flag:
 ```sh
-make run ARGS="breakdown --path my_new_terraform"
+go test ./internal/providers/terraform/aws/aws_my_resource_test.go -v -update
 ```
 
 Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.

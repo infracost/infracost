@@ -1,0 +1,26 @@
+provider "aws" {
+  region                      = "us-east-1" # <<<<< Try changing this to eu-west-1 to compare the costs
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+  access_key                  = "mock_access_key"
+  secret_key                  = "mock_secret_key"
+}
+
+resource "aws_lb" "lb1" {
+  load_balancer_type = "application"
+}
+
+resource "aws_alb" "alb1" {
+}
+
+resource "aws_lb" "nlb1" {
+  load_balancer_type = "network"
+}
+
+resource "aws_lb" "alb1_usage" {
+  load_balancer_type = "application"
+}
+
+resource "aws_lb" "nlb1_usage" {
+  load_balancer_type = "network"
+}

@@ -1,0 +1,13 @@
+provider "aws" {
+  region                      = "us-east-1" # <<<<< Try changing this to eu-west-1 to compare the costs
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+  access_key                  = "mock_access_key"
+  secret_key                  = "mock_secret_key"
+}
+
+resource "aws_ec2_transit_gateway_vpc_attachment" "vpc_attachment" {
+  subnet_ids = ["subnet-123456", "subnet-654321"]
+  transit_gateway_id = "tgw-123456"
+  vpc_id = "vpc-123456"
+}

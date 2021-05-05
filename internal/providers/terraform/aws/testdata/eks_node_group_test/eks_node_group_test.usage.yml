@@ -1,0 +1,18 @@
+version: 0.1
+resource_usage:
+  aws_eks_node_group.example_defaultCpuCredits":
+    monthly_cpu_credit_hrs: 350
+    vcpu_count: 2
+  aws_eks_node_group.example_with_launch_template:
+    monthly_cpu_credit_hrs: 350
+    vcpu_count: 2
+  aws_eks_node_group.reserved:
+    reserved_instance_type: standard
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: no_upfront
+    monthly_cpu_credit_hrs: 350
+    vcpu_count: 2
+  aws_eks_node_group.windows:
+    operating_system: windows
+    monthly_cpu_credit_hrs: 100
+    vcpu_count: 2

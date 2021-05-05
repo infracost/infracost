@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_api_gateway_rest_api.my_rest_api:
+    monthly_requests: 21000000000
