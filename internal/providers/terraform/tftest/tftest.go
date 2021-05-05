@@ -185,7 +185,6 @@ func writeToTmpDir(tfProject TerraformProject, tmpDir string) (string, error) {
 	os.Remove(filepath.Join(tmpDir, "init.tf"))
 	os.Remove(filepath.Join(tmpDir, "main.tf"))
 
-
 	for _, terraformFile := range tfProject.Files {
 		fullPath := filepath.Join(tmpDir, terraformFile.Path)
 		dir := filepath.Dir(fullPath)

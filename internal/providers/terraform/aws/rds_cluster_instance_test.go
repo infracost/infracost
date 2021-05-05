@@ -16,7 +16,6 @@ func TestRDSClusterInstance(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-
 	tf := `
 		resource "aws_rds_cluster" "default" {
 			cluster_identifier = "aurora-cluster-demo"

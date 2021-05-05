@@ -443,7 +443,6 @@ func TestInstance_RIPrices(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-
 	tf := `
 		resource "aws_instance" "std_1yr_no_upfront" {
 			ami           = "fake_ami"
