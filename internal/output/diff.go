@@ -70,7 +70,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		percent := formatPercentChange(oldCost, newCost)
 		if percent != "" {
 			s += fmt.Sprintf("\nPercent: %s",
-				formatPercentChange(oldCost, newCost),
+				percent,
 			)
 		}
 
@@ -286,7 +286,7 @@ func formatPercentChange(oldCost *decimal.Decimal, newCost *decimal.Decimal) str
 	p := newCost.Div(*oldCost).Sub(decimal.NewFromInt(1)).Mul(decimal.NewFromInt(100)).Round(0)
 
 	f, _ := p.Float64()
-	return fmt.Sprintf("%s%s%%", getSym(p), humanize.FormatFloat("#,###.", f))
+	return fmt.Sprintf("%s%s%%", getSymForPercent(p), humanize.FormatFloat("#,###.", f))
 }
 
 func getSym(d decimal.Decimal) string {
@@ -294,5 +294,16 @@ func getSym(d decimal.Decimal) string {
 		return "+"
 	}
 
+	if d.IsNegative() {
+		return "-"
+	}
+
+	return ""
+}
+
+func getSymForPercent(d decimal.Decimal) string {
+	if d.IsPositive() {
+		return "+"
+	}
 	return ""
 }
