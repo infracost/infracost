@@ -1,11 +1,10 @@
 package aws_test
 
 import (
-	"testing"
-
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 	"github.com/shopspring/decimal"
+	"testing"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
