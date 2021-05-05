@@ -284,9 +284,13 @@ func formatPercentChange(oldCost *decimal.Decimal, newCost *decimal.Decimal) str
 	}
 
 	p := newCost.Div(*oldCost).Sub(decimal.NewFromInt(1)).Mul(decimal.NewFromInt(100)).Round(0)
+	percentSym := ""
+	if p.IsPositive() {
+		percentSym = "+"
+	}
 
 	f, _ := p.Float64()
-	return fmt.Sprintf("%s%s%%", getSymForPercent(p), humanize.FormatFloat("#,###.", f))
+	return fmt.Sprintf("%s%s%%", percentSym, humanize.FormatFloat("#,###.", f))
 }
 
 func getSym(d decimal.Decimal) string {
@@ -298,12 +302,5 @@ func getSym(d decimal.Decimal) string {
 		return "-"
 	}
 
-	return ""
-}
-
-func getSymForPercent(d decimal.Decimal) string {
-	if d.IsPositive() {
-		return "+"
-	}
 	return ""
 }
