@@ -21,10 +21,11 @@ func TestMain(m *testing.M) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	defer os.RemoveAll(tmpDir) // clean up
 
 	tftest.EnsurePluginsInstalled(tmpDir)
 	code := m.Run()
+
+	os.RemoveAll(tmpDir) // clean up
 	os.Exit(code)
 }
 

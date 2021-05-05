@@ -84,7 +84,6 @@ func TestLB_usage(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-
 	tf := `
 		resource "aws_lb" "alb1" {
 			load_balancer_type = "application"
