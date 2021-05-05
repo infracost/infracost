@@ -28,7 +28,7 @@ func NewAzureRMAppIsolatedServicePlan(d *schema.ResourceData, u *schema.UsageDat
 	}
 	location := ""
 	group := d.References("resource_group_name")
-	if group != nil {
+	if group != nil && len(group) > 0 {
 		location = group[0].Get("location").String()
 	}
 	if location == "" {
@@ -41,7 +41,6 @@ func NewAzureRMAppIsolatedServicePlan(d *schema.ResourceData, u *schema.UsageDat
 	os := "linux"
 	if u != nil && u.Get("operating_system").Type != gjson.Null {
 		os = strings.ToLower(u.Get("operating_system").String())
-		fmt.Println("os " + os)
 	}
 	if os == "linux" {
 		productName += " - Linux"

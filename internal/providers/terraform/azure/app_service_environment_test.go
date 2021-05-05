@@ -14,6 +14,7 @@ func TestAzureRMAppIsolatedServicePlan(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
+
 	tf := `
 
 resource "azurerm_resource_group" "example1" {
@@ -194,16 +195,16 @@ resource "azurerm_app_service_environment" "example" {
 `
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"azurerm_app_service_environment.example": map[string]interface{}{
-			"operating_system": "windows",
+			"operating_system": "Windows",
 		},
 		"azurerm_app_service_environment.example2": map[string]interface{}{
-			"operating_system": "windows",
+			"operating_system": "Windows",
 		},
 		"azurerm_app_service_environment.example3": map[string]interface{}{
-			"operating_system": "linux",
+			"operating_system": "Linux",
 		},
 		"azurerm_app_service_environment.example4": map[string]interface{}{
-			"operating_system": "linux",
+			"operating_system": "Linux",
 		},
 	})
 

@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/shopspring/decimal"
 )
@@ -34,34 +33,20 @@ func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *sche
 		productName = "Premium v3 Plan"
 	}
 
-	switch sku {
-	case "PC2":
-		skuRefactor = "PC2"
+	switch sku[:2] {
+	case "PC":
+		skuRefactor = "PC" + sku[2:]
 		productName = "Premium Windows Container Plan"
-	case "PC3":
-		skuRefactor = "PC3"
-		productName = "Premium Windows Container Plan"
-	case "PC4":
-		skuRefactor = "PC4"
-		productName = "Premium Windows Container Plan"
-
 	case "Y1":
 		skuRefactor = "Shared"
 		productName = "Shared Plan"
-	case "S1":
-		skuRefactor = "S1"
-	case "S2":
-		skuRefactor = "S2"
-	case "S3":
-		skuRefactor = "S3"
-	case "B1":
-		skuRefactor = "B1"
-		productName = "Basic Plan"
-	case "B2":
-		skuRefactor = "B2"
-		productName = "Basic Plan"
-	case "B3":
-		skuRefactor = "B3"
+	}
+
+	switch sku[:1] {
+	case "S":
+		skuRefactor = "S" + sku[1:]
+	case "B":
+		skuRefactor = "B" + sku[1:]
 		productName = "Basic Plan"
 	}
 
@@ -73,10 +58,6 @@ func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *sche
 	}
 	if os != "windows" {
 		productName += " - Linux"
-	}
-	if sku[:2] == "PC" && os == "linux" {
-		log.Warnf("Skipping resource %s.This tariff plan is not supported for the Linux operating system", d.Address)
-		return nil
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
