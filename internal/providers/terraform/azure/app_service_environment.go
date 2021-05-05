@@ -28,7 +28,7 @@ func NewAzureRMAppIsolatedServicePlan(d *schema.ResourceData, u *schema.UsageDat
 	}
 	location := ""
 	group := d.References("resource_group_name")
-	if group != nil && len(group) > 0 {
+	if len(group) > 0 {
 		location = group[0].Get("location").String()
 	}
 	if location == "" {
