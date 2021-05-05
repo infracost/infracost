@@ -10,6 +10,7 @@ import (
 )
 
 func TestElastiCacheCluster(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -82,6 +83,7 @@ func TestElastiCacheCluster(t *testing.T) {
 }
 
 func TestElastiCacheCluster_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

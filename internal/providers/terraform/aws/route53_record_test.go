@@ -11,6 +11,7 @@ import (
 )
 
 func TestRoute53Record(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -60,6 +61,7 @@ func TestRoute53Record(t *testing.T) {
 }
 
 func TestRoute53Record_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

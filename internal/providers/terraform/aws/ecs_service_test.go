@@ -12,6 +12,7 @@ import (
 )
 
 func TestECSService(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -81,6 +82,7 @@ func TestECSService(t *testing.T) {
 }
 
 func TestECSService_externalDeployment(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -124,6 +126,7 @@ func TestECSService_externalDeployment(t *testing.T) {
 }
 
 func TestECSService_EC2(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

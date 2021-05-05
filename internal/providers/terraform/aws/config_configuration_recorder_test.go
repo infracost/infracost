@@ -10,6 +10,7 @@ import (
 )
 
 func TestConfigurationRecorderItem(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -50,6 +51,7 @@ func TestConfigurationRecorderItem(t *testing.T) {
 }
 
 func TestConfigurationRecorderItem_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

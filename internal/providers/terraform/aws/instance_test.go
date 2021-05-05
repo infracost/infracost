@@ -12,6 +12,7 @@ import (
 )
 
 func TestInstance(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -145,6 +146,7 @@ func TestInstance(t *testing.T) {
 }
 
 func TestInstance_ebsOptimized(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -206,6 +208,7 @@ func TestInstance_ebsOptimized(t *testing.T) {
 }
 
 func TestInstance_hostTenancy(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -227,6 +230,7 @@ func TestInstance_hostTenancy(t *testing.T) {
 }
 
 func TestInstance_cpuCredits(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -400,6 +404,7 @@ func TestInstance_cpuCredits(t *testing.T) {
 	tftest.ResourceTests(t, tf, usage, resourceChecks)
 }
 func TestInstance_ec2DetailedMonitoring(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -439,6 +444,7 @@ func TestInstance_ec2DetailedMonitoring(t *testing.T) {
 }
 
 func TestInstance_RIPrices(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

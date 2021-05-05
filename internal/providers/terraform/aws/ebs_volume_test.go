@@ -12,6 +12,7 @@ import (
 )
 
 func TestEBSVolume(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -136,6 +137,7 @@ func TestEBSVolume(t *testing.T) {
 }
 
 func TestEBSVolume_GP3(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -180,6 +182,7 @@ func TestEBSVolume_GP3(t *testing.T) {
 }
 
 func TestEBSStandardVolume_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

@@ -11,6 +11,7 @@ import (
 )
 
 func TestS3BucketInventoryConfiguration(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -66,6 +67,7 @@ func TestS3BucketInventoryConfiguration(t *testing.T) {
 }
 
 func TestS3BucketInventoryConfiguration_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

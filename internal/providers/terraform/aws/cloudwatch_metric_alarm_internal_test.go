@@ -8,6 +8,7 @@ import (
 )
 
 func TestCloudwatchMetricResolution(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		inputValue decimal.Decimal
 		expected   bool

@@ -12,6 +12,7 @@ import (
 )
 
 func TestRDSClusterInstance(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -54,6 +55,7 @@ func TestRDSClusterInstance(t *testing.T) {
 }
 
 func TestRDSClusterT3Instances(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

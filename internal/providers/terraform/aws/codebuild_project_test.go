@@ -12,6 +12,7 @@ import (
 )
 
 func TestCodebuildProject(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -58,6 +59,7 @@ func TestCodebuildProject(t *testing.T) {
 }
 
 func TestCodebuildProject_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

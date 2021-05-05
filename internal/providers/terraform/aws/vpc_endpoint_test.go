@@ -12,6 +12,7 @@ import (
 )
 
 func TestVpcEndpoint(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

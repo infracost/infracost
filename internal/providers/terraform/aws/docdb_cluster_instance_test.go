@@ -10,6 +10,7 @@ import (
 )
 
 func TestNewDocDBClusterInstance(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -52,6 +53,7 @@ func TestNewDocDBClusterInstance(t *testing.T) {
 }
 
 func TestNewDocDBClusterInstance_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

@@ -10,6 +10,7 @@ import (
 )
 
 func TestNewDocDBClusterSnapshot(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -37,6 +38,7 @@ func TestNewDocDBClusterSnapshot(t *testing.T) {
 }
 
 func TestNewDocDBClusterSnapshot_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

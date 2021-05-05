@@ -11,6 +11,7 @@ import (
 )
 
 func TestEKSNodeGroup_default(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -57,6 +58,7 @@ func TestEKSNodeGroup_default(t *testing.T) {
 }
 
 func TestEKSNodeGroup_defaultCpuCredits(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -110,6 +112,7 @@ func TestEKSNodeGroup_defaultCpuCredits(t *testing.T) {
 }
 
 func TestEKSNodeGroup_disk_size_instance_type(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -153,6 +156,7 @@ func TestEKSNodeGroup_disk_size_instance_type(t *testing.T) {
 }
 
 func TestEKSNodeGroup_launch_template(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -307,6 +311,7 @@ func TestEKSNodeGroup_launch_template(t *testing.T) {
 }
 
 func TestEKSNodeGroup_launch_template_by_name(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -461,6 +466,7 @@ func TestEKSNodeGroup_launch_template_by_name(t *testing.T) {
 }
 
 func TestEKSNodeGroup_with_instance_launch_template_without_instance(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -622,6 +628,7 @@ func TestEKSNodeGroup_with_instance_launch_template_without_instance(t *testing.
 }
 
 func TestEKSNodeGroup_spot(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -668,6 +675,7 @@ func TestEKSNodeGroup_spot(t *testing.T) {
 }
 
 func TestEKSNodeGroup_reserved(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -723,6 +731,7 @@ func TestEKSNodeGroup_reserved(t *testing.T) {
 }
 
 func TestEKSNodeGroup_windows(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

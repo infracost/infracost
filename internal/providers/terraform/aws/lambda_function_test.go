@@ -12,6 +12,7 @@ import (
 )
 
 func TestLambdaFunction(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -46,6 +47,7 @@ func TestLambdaFunction(t *testing.T) {
 }
 
 func TestLambdaFunction_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

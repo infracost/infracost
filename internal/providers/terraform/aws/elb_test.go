@@ -12,6 +12,7 @@ import (
 )
 
 func TestELB(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -48,6 +49,7 @@ func TestELB(t *testing.T) {
 }
 
 func TestELB_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

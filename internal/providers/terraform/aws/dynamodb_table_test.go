@@ -12,6 +12,7 @@ import (
 )
 
 func TestNewDynamoDBTableOnDemand(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -123,6 +124,7 @@ func TestNewDynamoDBTableOnDemand(t *testing.T) {
 }
 
 func TestNewDynamoDBTableProvisioned(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

@@ -1,8 +1,9 @@
 package aws_test
 
 import (
-	"github.com/shopspring/decimal"
 	"testing"
+
+	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
@@ -11,6 +12,7 @@ import (
 )
 
 func TestRoute53ResolverEndpointFunction(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -52,6 +54,7 @@ func TestRoute53ResolverEndpointFunction(t *testing.T) {
 }
 
 func TestRoute53ResolverEndpointUsage1B(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -99,6 +102,7 @@ func TestRoute53ResolverEndpointUsage1B(t *testing.T) {
 }
 
 func TestRoute53ResolverEndpointUsage2B(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

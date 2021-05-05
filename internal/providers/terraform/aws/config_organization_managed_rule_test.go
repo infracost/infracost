@@ -10,6 +10,7 @@ import (
 )
 
 func TestOrganizationManagedRuleItem(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -37,6 +38,7 @@ func TestOrganizationManagedRuleItem(t *testing.T) {
 }
 
 func TestOrganizationManagedRule_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

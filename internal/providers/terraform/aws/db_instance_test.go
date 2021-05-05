@@ -13,6 +13,7 @@ import (
 )
 
 func TestDBInstance(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -128,6 +129,7 @@ func TestDBInstance(t *testing.T) {
 }
 
 func TestDBInstance_allEngines(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -183,6 +185,7 @@ func TestDBInstance_allEngines(t *testing.T) {
 }
 
 func TestDBInstance_byol(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

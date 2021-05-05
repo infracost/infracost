@@ -12,6 +12,7 @@ import (
 )
 
 func TestNewNewDMSReplicationInstanceSingleLowStorage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -62,6 +63,7 @@ func TestNewNewDMSReplicationInstanceSingleLowStorage(t *testing.T) {
 }
 
 func TestNewNewDMSReplicationInstanceMultiHighStorage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

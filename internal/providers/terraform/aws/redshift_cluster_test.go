@@ -1,8 +1,9 @@
 package aws_test
 
 import (
-	"github.com/shopspring/decimal"
 	"testing"
+
+	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
@@ -11,6 +12,7 @@ import (
 )
 
 func TestRedshiftCluster(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -111,6 +113,7 @@ func TestRedshiftCluster(t *testing.T) {
 }
 
 func TestRedshiftClusterWithManagedStorage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

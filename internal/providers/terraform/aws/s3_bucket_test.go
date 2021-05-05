@@ -11,6 +11,7 @@ import (
 )
 
 func TestS3Bucket(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -363,6 +364,7 @@ func TestS3Bucket(t *testing.T) {
 }
 
 func TestS3Bucket_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

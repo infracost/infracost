@@ -12,6 +12,7 @@ import (
 )
 
 func TestRDSAuroraServerlessCluster(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -96,6 +97,7 @@ func TestRDSAuroraServerlessCluster(t *testing.T) {
 }
 
 func TestRDSAuroraServerlessClusterWithBackup(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -153,6 +155,7 @@ func TestRDSAuroraServerlessClusterWithBackup(t *testing.T) {
 }
 
 func TestRDSAuroraServerlessClusterWithExport(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -219,6 +222,7 @@ func TestRDSAuroraServerlessClusterWithExport(t *testing.T) {
 }
 
 func TestRDSAuroraClusterBacktrack(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
