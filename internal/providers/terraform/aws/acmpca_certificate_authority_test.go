@@ -45,7 +45,7 @@ func TestACMPCACertificateAuthorityFunction(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestACMPCACertificateAuthority_1000(t *testing.T) {
@@ -88,7 +88,7 @@ func TestACMPCACertificateAuthority_1000(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestACMPCACertificateAuthority_10000(t *testing.T) {
@@ -136,7 +136,7 @@ func TestACMPCACertificateAuthority_10000(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestACMPCACertificateAuthority_20000(t *testing.T) {
@@ -189,5 +189,5 @@ func TestACMPCACertificateAuthority_20000(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

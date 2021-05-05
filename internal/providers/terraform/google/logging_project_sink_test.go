@@ -34,7 +34,7 @@ func TestLoggingProjectSink(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestLoggingProjectSink_usage(t *testing.T) {
@@ -68,5 +68,5 @@ func TestLoggingProjectSink_usage(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

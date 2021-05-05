@@ -66,7 +66,7 @@ func TestElasticsearchDomain(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 
 	tfIOEbs := `
 	resource "aws_elasticsearch_domain" "example" {
@@ -109,7 +109,7 @@ func TestElasticsearchDomain(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tfIOEbs, schema.NewEmptyUsageMap(), resourceChecksIOEbs)
+	tftest.ResourceTests(t, tfIOEbs, schema.NewEmptyUsageMap(), resourceChecksIOEbs, tmpDir)
 
 	tfSTEbs := `
 	resource "aws_elasticsearch_domain" "example" {
@@ -146,5 +146,5 @@ func TestElasticsearchDomain(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tfSTEbs, schema.NewEmptyUsageMap(), resourceChecksSTEbs)
+	tftest.ResourceTests(t, tfSTEbs, schema.NewEmptyUsageMap(), resourceChecksSTEbs, tmpDir)
 }

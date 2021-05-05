@@ -138,7 +138,7 @@ func TestGetRoute53HealthCheckAWS(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestGetRoute53HealthCheckOutsideAWS(t *testing.T) {
@@ -288,5 +288,5 @@ func TestGetRoute53HealthCheckOutsideAWS(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

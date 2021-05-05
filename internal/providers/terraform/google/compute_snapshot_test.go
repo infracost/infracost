@@ -44,7 +44,7 @@ source_disk = google_compute_disk.default.name
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestComputeSnapshot_usage(t *testing.T) {
@@ -86,5 +86,5 @@ source_disk = google_compute_disk.default.name
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

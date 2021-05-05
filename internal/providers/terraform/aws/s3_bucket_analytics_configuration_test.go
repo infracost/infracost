@@ -42,7 +42,7 @@ func TestS3AnalyticsConfiguration(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestS3AnalyticsConfiguration_usage(t *testing.T) {
@@ -83,5 +83,5 @@ func TestS3AnalyticsConfiguration_usage(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

@@ -107,7 +107,7 @@ func TestRedshiftCluster(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestRedshiftClusterWithManagedStorage(t *testing.T) {
@@ -205,5 +205,5 @@ func TestRedshiftClusterWithManagedStorage(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

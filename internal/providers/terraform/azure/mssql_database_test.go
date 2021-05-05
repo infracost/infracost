@@ -144,7 +144,7 @@ func TestMSSQLDatabase(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestMSSQLDatabase_HS_with_replicas(t *testing.T) {
@@ -204,7 +204,7 @@ func TestMSSQLDatabase_HS_with_replicas(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestMSSQLDatabase_with_license(t *testing.T) {
@@ -269,7 +269,7 @@ func TestMSSQLDatabase_with_license(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestMSSQLDatabase_zone_redundant(t *testing.T) {
@@ -329,7 +329,7 @@ func TestMSSQLDatabase_zone_redundant(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestMSSQLDatabase_serverless(t *testing.T) {
@@ -395,7 +395,7 @@ func TestMSSQLDatabase_serverless(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestMSSQLDatabase_LTR(t *testing.T) {
@@ -461,5 +461,5 @@ func TestMSSQLDatabase_LTR(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

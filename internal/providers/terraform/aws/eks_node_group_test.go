@@ -52,7 +52,7 @@ func TestEKSNodeGroup_default(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 
 }
 
@@ -105,7 +105,7 @@ func TestEKSNodeGroup_defaultCpuCredits(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 
 }
 
@@ -148,7 +148,7 @@ func TestEKSNodeGroup_disk_size_instance_type(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 
 }
 
@@ -302,7 +302,7 @@ func TestEKSNodeGroup_launch_template(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 
 }
 
@@ -456,7 +456,7 @@ func TestEKSNodeGroup_launch_template_by_name(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 
 }
 
@@ -617,8 +617,7 @@ func TestEKSNodeGroup_with_instance_launch_template_without_instance(t *testing.
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
-
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestEKSNodeGroup_spot(t *testing.T) {
@@ -664,7 +663,7 @@ func TestEKSNodeGroup_spot(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestEKSNodeGroup_reserved(t *testing.T) {
@@ -719,7 +718,7 @@ func TestEKSNodeGroup_reserved(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestEKSNodeGroup_windows(t *testing.T) {
@@ -772,5 +771,5 @@ func TestEKSNodeGroup_windows(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

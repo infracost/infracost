@@ -92,7 +92,7 @@ func TestRDSAuroraServerlessCluster(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestRDSAuroraServerlessClusterWithBackup(t *testing.T) {
@@ -149,7 +149,7 @@ func TestRDSAuroraServerlessClusterWithBackup(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestRDSAuroraServerlessClusterWithExport(t *testing.T) {
@@ -215,7 +215,7 @@ func TestRDSAuroraServerlessClusterWithExport(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestRDSAuroraClusterBacktrack(t *testing.T) {
@@ -279,5 +279,5 @@ func TestRDSAuroraClusterBacktrack(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

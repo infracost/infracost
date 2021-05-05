@@ -122,7 +122,7 @@ func TestStorageBucket(t *testing.T) {
 			},
 		},
 	}
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestStorageBucket_EuMulti(t *testing.T) {
@@ -178,5 +178,5 @@ func TestStorageBucket_EuMulti(t *testing.T) {
 			},
 		},
 	}
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
