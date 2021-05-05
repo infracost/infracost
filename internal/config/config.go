@@ -164,6 +164,14 @@ func (c *Config) IsLogging() bool {
 	return c.LogLevel != ""
 }
 
+func (c *Config) IsSelfHosted() bool {
+	return c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
+}
+
+func (c *Config) IsTelemetryDisabled() bool {
+	return c.IsSelfHosted() && IsFalsy(os.Getenv("INFRACOST_SELF_HOSTED_TELEMETRY"))
+}
+
 func loadDotEnv() error {
 	envLocalPath := filepath.Join(RootDir(), ".env.local")
 	if fileExists(envLocalPath) {

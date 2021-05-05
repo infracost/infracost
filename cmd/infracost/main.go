@@ -5,8 +5,8 @@ import (
 	"os"
 	"runtime/debug"
 
+	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/events"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
@@ -29,7 +29,7 @@ func main() {
 
 	defer func() {
 		if appErr != nil {
-			handleAppErr(cfg, appErr)
+			handleCLIError(cfg, appErr)
 		}
 
 		unexpectedErr := recover()
@@ -142,22 +142,20 @@ func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) erro
 	return nil
 }
 
-func handleAppErr(cfg *config.Config, err error) {
+func handleCLIError(cfg *config.Config, cliErr error) {
 	if spinner != nil {
 		spinner.Fail()
 		fmt.Fprintln(os.Stderr, "")
 	}
 
-	if err.Error() != "" {
-		ui.PrintError(err.Error())
+	if cliErr.Error() != "" {
+		ui.PrintError(cliErr.Error())
 	}
 
-	msg := ui.StripColor(err.Error())
-	var eventsError *events.Error
-	if errors.As(err, &eventsError) {
-		msg = ui.StripColor(eventsError.Label)
+	err := apiclient.ReportCLIError(cfg, cliErr)
+	if err != nil {
+		log.Warnf("Error reporting CLI error: %s", err)
 	}
-	events.SendReport(cfg, "error", msg)
 }
 
 func handleUnexpectedErr(cfg *config.Config, unexpectedErr interface{}) {
@@ -170,7 +168,10 @@ func handleUnexpectedErr(cfg *config.Config, unexpectedErr interface{}) {
 
 	ui.PrintUnexpectedError(unexpectedErr, stack)
 
-	events.SendReport(cfg, "error", fmt.Sprintf("%s\n%s", unexpectedErr, stack))
+	err := apiclient.ReportCLIError(cfg, fmt.Errorf("%s\n%s", unexpectedErr, stack))
+	if err != nil {
+		log.Warnf("Error reporting unexpected error: %s", err)
+	}
 }
 
 func handleUpdateMessage(updateMessageChan chan *update.Info) {

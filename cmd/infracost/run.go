@@ -5,8 +5,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/events"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/providers"
@@ -48,14 +49,14 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 				m += "\n - Terraform state JSON file"
 			}
 
-			return events.NewError(errors.New(m), "Could not detect path type")
+			return clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
 		}
 
 		if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 			m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
-			return events.NewError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
+			return clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 		}
 
 		m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
@@ -111,7 +112,7 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 			spinner.Fail()
 			fmt.Fprintln(os.Stderr, "")
 
-			if e := unwrapped(err); errors.Is(e, prices.ErrInvalidAPIKey) {
+			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
 				return errors.New(fmt.Sprintf("%v\n%s %s %s %s %s\n%s",
 					e.Error(),
 					"Please check your",
@@ -123,7 +124,7 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 				))
 			}
 
-			if e, ok := err.(*prices.PricingAPIError); ok {
+			if e, ok := err.(*apiclient.GraphQLError); ok {
 				return errors.New(fmt.Sprintf("%v\n%s", e.Error(), "We have been notified of this issue."))
 			}
 
@@ -137,6 +138,17 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 	spinner.Success()
 
 	r := output.ToOutputFormat(projects)
+
+	addProjectResultsChan := make(chan bool)
+
+	go func(addProjectResultsChan chan bool, r output.Root) {
+		c := apiclient.NewDashboardAPIClient(cfg)
+		err := c.AddProjectResults(r, cfg.Environment)
+		if err != nil {
+			log.Errorf("Error reporting project results: %s", err)
+		}
+		addProjectResultsChan <- true
+	}(addProjectResultsChan, r)
 
 	opts := output.Options{
 		ShowSkipped: cfg.ShowSkipped,
@@ -170,6 +182,8 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 	}
 
 	fmt.Printf("%s\n", out)
+
+	<-addProjectResultsChan
 
 	return nil
 }
