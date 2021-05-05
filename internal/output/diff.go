@@ -294,9 +294,5 @@ func getSym(d decimal.Decimal) string {
 		return "+"
 	}
 
-	if d.IsNegative() {
-		return "-"
-	}
-
 	return ""
 }
