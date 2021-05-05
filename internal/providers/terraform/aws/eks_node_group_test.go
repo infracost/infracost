@@ -1,10 +1,11 @@
 package aws_test
 
 import (
+	"testing"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 	"github.com/shopspring/decimal"
-	"testing"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
@@ -19,6 +20,7 @@ func TestEKSNodeGroupGoldenFile(t *testing.T) {
 }
 
 func TestEKSNodeGroup_spot(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
