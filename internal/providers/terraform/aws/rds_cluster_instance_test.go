@@ -16,6 +16,7 @@ func TestRDSClusterInstance(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
+
 	tf := `
 		resource "aws_rds_cluster" "default" {
 			cluster_identifier = "aurora-cluster-demo"
@@ -50,7 +51,7 @@ func TestRDSClusterInstance(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestRDSClusterT3Instances(t *testing.T) {
@@ -104,5 +105,5 @@ func TestRDSClusterT3Instances(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

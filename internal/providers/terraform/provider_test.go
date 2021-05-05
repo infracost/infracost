@@ -1,6 +1,8 @@
 package terraform_test
 
 import (
+	"fmt"
+	"io/ioutil"
 	"os"
 	"testing"
 
@@ -10,8 +12,18 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
 
+var tmpDir string
+
 func TestMain(m *testing.M) {
-	tftest.EnsurePluginsInstalled()
+	var err error
+	tmpDir, err = ioutil.TempDir("", "tmp_terraform_test_*")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer os.RemoveAll(tmpDir) // clean up
+
+	tftest.EnsurePluginsInstalled(tmpDir)
 	code := m.Run()
 	os.Exit(code)
 }
@@ -42,7 +54,7 @@ func TestLoadResources_rootModule(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTestsForTerraformProject(t, project, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTestsForTerraformProject(t, project, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestLoadResources_nestedModule(t *testing.T) {
@@ -96,5 +108,5 @@ func TestLoadResources_nestedModule(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTestsForTerraformProject(t, project, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTestsForTerraformProject(t, project, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }

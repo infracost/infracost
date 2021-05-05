@@ -32,7 +32,7 @@ func TestPubSubTopic(t *testing.T) {
 			},
 		},
 	}
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestPubSubTopic_usage(t *testing.T) {
@@ -64,5 +64,5 @@ func TestPubSubTopic_usage(t *testing.T) {
 			},
 		},
 	}
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

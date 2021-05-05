@@ -79,12 +79,12 @@ func WithProviders(tf string) string {
 	return fmt.Sprintf("%s%s", tfProviders, tf)
 }
 
-func EnsurePluginsInstalled() {
+func EnsurePluginsInstalled(tmpDir string) {
 	flag.Parse()
 	if !testing.Short() {
 		once.Do(func() {
 			// Ensure plugins are installed and cached
-			err := installPlugins()
+			err := installPlugins(tmpDir)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -93,7 +93,7 @@ func EnsurePluginsInstalled() {
 	}
 }
 
-func installPlugins() error {
+func installPlugins(tmpDir string) error {
 	project := TerraformProject{
 		Files: []File{
 			{
@@ -103,7 +103,7 @@ func installPlugins() error {
 		},
 	}
 
-	tfdir, err := CreateTerraformProject(project)
+	tfdir, err := CreateTerraformProject(project, tmpDir)
 	if err != nil {
 		return errors.Wrap(err, "Error creating Terraform project")
 	}
@@ -127,7 +127,7 @@ func installPlugins() error {
 	return nil
 }
 
-func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
+func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck, tmpDir string) {
 	project := TerraformProject{
 		Files: []File{
 			{
@@ -137,22 +137,22 @@ func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, 
 		},
 	}
 
-	ResourceTestsForTerraformProject(t, project, usage, checks)
+	ResourceTestsForTerraformProject(t, project, usage, checks, tmpDir)
 }
 
-func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
+func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck, tmpDir string) {
 	cfg := config.DefaultConfig()
 	err := cfg.LoadFromEnv()
 	assert.NoError(t, err)
 
-	project, err := RunCostCalculations(cfg, tfProject, usage)
+	project, err := RunCostCalculations(cfg, tfProject, usage, tmpDir)
 	assert.NoError(t, err)
 
 	testutil.TestResources(t, project.Resources, checks)
 }
 
-func RunCostCalculations(cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
-	project, err := loadResources(cfg, tfProject, usage)
+func RunCostCalculations(cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData, tmpDir string) (*schema.Project, error) {
+	project, err := loadResources(cfg, tfProject, usage, tmpDir)
 	if err != nil {
 		return project, err
 	}
@@ -164,12 +164,12 @@ func RunCostCalculations(cfg *config.Config, tfProject TerraformProject, usage m
 	return project, nil
 }
 
-func CreateTerraformProject(tfProject TerraformProject) (string, error) {
-	return writeToTmpDir(tfProject)
+func CreateTerraformProject(tfProject TerraformProject, tmpDir string) (string, error) {
+	return writeToTmpDir(tfProject, tmpDir)
 }
 
-func loadResources(cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
-	tfdir, err := CreateTerraformProject(tfProject)
+func loadResources(cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData, tmpDir string) (*schema.Project, error) {
+	tfdir, err := CreateTerraformProject(tfProject, tmpDir)
 	if err != nil {
 		return nil, err
 	}
@@ -181,12 +181,10 @@ func loadResources(cfg *config.Config, tfProject TerraformProject, usage map[str
 	return provider.LoadResources(usage)
 }
 
-func writeToTmpDir(tfProject TerraformProject) (string, error) {
-	// Create temporary directory and output terraform code
-	tmpDir, err := ioutil.TempDir("", "")
-	if err != nil {
-		return tmpDir, err
-	}
+func writeToTmpDir(tfProject TerraformProject, tmpDir string) (string, error) {
+	os.Remove(filepath.Join(tmpDir, "init.tf"))
+	os.Remove(filepath.Join(tmpDir, "main.tf"))
+
 
 	for _, terraformFile := range tfProject.Files {
 		fullPath := filepath.Join(tmpDir, terraformFile.Path)
@@ -199,11 +197,11 @@ func writeToTmpDir(tfProject TerraformProject) (string, error) {
 			}
 		}
 
-		err = ioutil.WriteFile(fullPath, []byte(terraformFile.Contents), 0600)
+		err := ioutil.WriteFile(fullPath, []byte(terraformFile.Contents), 0600)
 		if err != nil {
 			return tmpDir, err
 		}
 	}
 
-	return tmpDir, err
+	return tmpDir, nil
 }

@@ -99,7 +99,7 @@ func TestAutoscalingGroup_launchConfiguration(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_launchConfiguration_spot(t *testing.T) {
@@ -146,7 +146,7 @@ func TestAutoscalingGroup_launchConfiguration_spot(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_launchConfiguration_ebsOptimized(t *testing.T) {
@@ -198,7 +198,7 @@ func TestAutoscalingGroup_launchConfiguration_ebsOptimized(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_launchConfiguration_tenancy(t *testing.T) {
@@ -262,7 +262,7 @@ func TestAutoscalingGroup_launchConfiguration_tenancy(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_launchConfiguration_cpuCredits(t *testing.T) {
@@ -320,7 +320,7 @@ func TestAutoscalingGroup_launchConfiguration_cpuCredits(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_launchTemplate(t *testing.T) {
@@ -414,7 +414,7 @@ func TestAutoscalingGroup_launchTemplate(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_launchTemplate_spot(t *testing.T) {
@@ -464,7 +464,7 @@ func TestAutoscalingGroup_launchTemplate_spot(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_launchTemplate_tenancy(t *testing.T) {
@@ -534,7 +534,7 @@ func TestAutoscalingGroup_launchTemplate_tenancy(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_launchTemplate_ebsOptimized(t *testing.T) {
@@ -587,7 +587,7 @@ func TestAutoscalingGroup_launchTemplate_ebsOptimized(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_launchTemplate_elasticInferenceAccelerator(t *testing.T) {
@@ -642,7 +642,7 @@ func TestAutoscalingGroup_launchTemplate_elasticInferenceAccelerator(t *testing.
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_launchTemplate_monitoring(t *testing.T) {
@@ -697,7 +697,7 @@ func TestAutoscalingGroup_launchTemplate_monitoring(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_launchTemplate_cpuCredits(t *testing.T) {
@@ -756,7 +756,7 @@ func TestAutoscalingGroup_launchTemplate_cpuCredits(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_mixedInstanceLaunchTemplate(t *testing.T) {
@@ -834,7 +834,7 @@ func TestAutoscalingGroup_mixedInstanceLaunchTemplate(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_mixedInstanceLaunchTemplateDynamic(t *testing.T) {
@@ -910,7 +910,7 @@ func TestAutoscalingGroup_mixedInstanceLaunchTemplateDynamic(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_overrideUsageData(t *testing.T) {
@@ -991,7 +991,7 @@ func TestAutoscalingGroup_overrideUsageData(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_reserved(t *testing.T) {
@@ -1052,7 +1052,7 @@ func TestAutoscalingGroup_reserved(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestAutoscalingGroup_windows(t *testing.T) {
@@ -1111,5 +1111,5 @@ func TestAutoscalingGroup_windows(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

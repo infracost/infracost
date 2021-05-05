@@ -77,7 +77,7 @@ func TestECSService(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestECSService_externalDeployment(t *testing.T) {
@@ -120,7 +120,7 @@ func TestECSService_externalDeployment(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestECSService_EC2(t *testing.T) {
@@ -145,5 +145,5 @@ func TestECSService_EC2(t *testing.T) {
 
 	resourceChecks := []testutil.ResourceCheck{}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }

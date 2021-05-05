@@ -40,7 +40,7 @@ func TestAwsSecretsManagerSecretFunction(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestAwsSecretsManagerSecret_usage(t *testing.T) {
@@ -77,5 +77,5 @@ func TestAwsSecretsManagerSecret_usage(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

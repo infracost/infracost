@@ -141,7 +141,7 @@ func TestInstance(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestInstance_ebsOptimized(t *testing.T) {
@@ -202,7 +202,7 @@ func TestInstance_ebsOptimized(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestInstance_hostTenancy(t *testing.T) {
@@ -223,7 +223,7 @@ func TestInstance_hostTenancy(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestInstance_cpuCredits(t *testing.T) {
@@ -397,7 +397,7 @@ func TestInstance_cpuCredits(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 func TestInstance_ec2DetailedMonitoring(t *testing.T) {
 	if testing.Short() {
@@ -435,13 +435,14 @@ func TestInstance_ec2DetailedMonitoring(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks, tmpDir)
 }
 
 func TestInstance_RIPrices(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
+
 
 	tf := `
 		resource "aws_instance" "std_1yr_no_upfront" {
@@ -800,5 +801,5 @@ func TestInstance_RIPrices(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }

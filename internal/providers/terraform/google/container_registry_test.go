@@ -106,7 +106,7 @@ func TestContainerRegistry(t *testing.T) {
 			},
 		},
 	}
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
 
 func TestContainerRegistry_EuMulti(t *testing.T) {
@@ -161,5 +161,5 @@ func TestContainerRegistry_EuMulti(t *testing.T) {
 			},
 		},
 	}
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, usage, resourceChecks, tmpDir)
 }
