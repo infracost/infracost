@@ -7,7 +7,7 @@ import (
 )
 
 func TestECSServiceGoldenFile(t *testing.T) {
-  t.Parallel()
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
