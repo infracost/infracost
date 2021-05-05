@@ -62,7 +62,7 @@ test_shared_int:
 
 # Run AWS resource tests
 test_aws:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -parallel 10 -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -v -cover)
 
 # Run Google resource tests
 test_google:
