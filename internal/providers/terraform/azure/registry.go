@@ -14,6 +14,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzurePostgreSQLServerRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
+	GetAzureRMAppServicePlanRegistryItem(),
+	GetAzureRMAppIsolatedServicePlanRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
