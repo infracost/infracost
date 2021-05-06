@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  aws_acmpca_certificate_authority.private_ca:
+    monthly_requests: 1000
+  aws_acmpca_certificate_authority.private_ca_tiered:
+    monthly_requests: 10000
+  aws_acmpca_certificate_authority.private_ca_more_tiered:
+    monthly_requests: 20001

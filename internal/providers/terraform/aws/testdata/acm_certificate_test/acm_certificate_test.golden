@@ -1,0 +1,7 @@
+
+ Name                              Monthly Qty  Unit      Monthly Cost 
+                                                                       
+ aws_acm_certificate.private_cert                                      
+ └─ Certificate                              1  requests         $0.75 
+                                                                       
+ PROJECT TOTAL                                                   $0.75 

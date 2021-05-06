@@ -1,0 +1,10 @@
+
+ Name                           Monthly Qty  Unit   Monthly Cost 
+                                                                 
+ aws_api_gateway_stage.cache_1                                   
+ └─ Cache memory (0.5 GB)               730  hours        $14.60 
+                                                                 
+ aws_api_gateway_stage.cache_2                                   
+ └─ Cache memory (237 GB)               730  hours     $2,774.00 
+                                                                 
+ PROJECT TOTAL                                         $2,788.60 
