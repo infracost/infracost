@@ -9,11 +9,15 @@
  ├─ Endpoint (Interface)                        730  hours               $7.30 
  └─ Data processed                      Cost depends on usage: $0.01 per GB    
                                                                                
+ aws_vpc_endpoint.interface_withUsage                                          
+ ├─ Endpoint (Interface)                        730  hours               $7.30 
+ └─ Data processed                            1,000  GB                 $10.00 
+                                                                               
  aws_vpc_endpoint.multiple_interfaces                                          
  ├─ Endpoint (Interface)                      1,460  hours              $14.60 
  └─ Data processed                      Cost depends on usage: $0.01 per GB    
                                                                                
- PROJECT TOTAL                                                          $29.20 
+ PROJECT TOTAL                                                          $46.50 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

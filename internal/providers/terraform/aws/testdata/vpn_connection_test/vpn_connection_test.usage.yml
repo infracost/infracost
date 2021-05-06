@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_vpn_connection.transit_withUsage:
+    monthly_data_processed_gb: 100 # Monthly data processed through a transit gateway attached to your VPN Connection in GB.
