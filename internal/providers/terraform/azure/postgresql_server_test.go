@@ -10,6 +10,7 @@ import (
 )
 
 func TestPostgreSQLServer(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -138,6 +139,7 @@ func TestPostgreSQLServer(t *testing.T) {
 }
 
 func TestPostgreSQLServer_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

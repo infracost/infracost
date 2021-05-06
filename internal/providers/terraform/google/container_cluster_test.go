@@ -12,6 +12,7 @@ import (
 )
 
 func TestContainerCluster(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -402,6 +403,7 @@ func TestContainerCluster(t *testing.T) {
 }
 
 func TestContainerCluster_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

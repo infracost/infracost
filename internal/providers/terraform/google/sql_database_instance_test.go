@@ -10,6 +10,7 @@ import (
 )
 
 func TestNewSQLInstance(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -363,6 +364,7 @@ func TestNewSQLInstance(t *testing.T) {
 }
 
 func TestNewSQLInstance_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

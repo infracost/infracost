@@ -10,6 +10,7 @@ import (
 )
 
 func TestLoggingProjectFolderBucket(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -39,6 +40,7 @@ func TestLoggingProjectFolderBucket(t *testing.T) {
 }
 
 func TestLoggingProjectBucket_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

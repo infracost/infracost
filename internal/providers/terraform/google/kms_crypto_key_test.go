@@ -10,6 +10,7 @@ import (
 )
 
 func TestKMSCryptoKey(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -40,6 +41,7 @@ func TestKMSCryptoKey(t *testing.T) {
 }
 
 func TestKMSCryptoKey_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

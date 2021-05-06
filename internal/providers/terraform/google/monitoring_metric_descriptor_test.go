@@ -10,6 +10,7 @@ import (
 )
 
 func TestMonitoring(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -45,6 +46,7 @@ func TestMonitoring(t *testing.T) {
 }
 
 func TestMonitoring_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

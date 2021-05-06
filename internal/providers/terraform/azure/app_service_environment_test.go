@@ -11,6 +11,7 @@ import (
 )
 
 func TestAzureRMAppIsolatedServicePlan(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -110,6 +111,7 @@ resource "azurerm_app_service_environment" "example" {
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
 }
 func TestAzureRMAppIsolatedServicePlan_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
