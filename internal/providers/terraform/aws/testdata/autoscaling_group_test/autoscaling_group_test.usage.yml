@@ -1,0 +1,16 @@
+version: 0.1
+resource_usage:
+  aws_autoscaling_group.asg_lc_cpu_credits:
+    monthly_cpu_credit_hrs: 200
+    vcpu_count: 2
+  aws_autoscaling_group.asg_lc_usage:
+    instances: 6
+  aws_autoscaling_group.asg_lc_reserved:
+    reserved_instance_type: standard
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: no_upfront
+  aws_autoscaling_group.asg_lc_windows:
+    operating_system: windows
+  aws_autoscaling_group.asg_lt_cpu_credits:
+    monthly_cpu_credit_hrs: 350
+    vcpu_count: 2

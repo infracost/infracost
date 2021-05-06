@@ -1,0 +1,7 @@
+
+ Name                                Monthly Qty  Unit    Monthly Cost 
+                                                                       
+ aws_cloudwatch_dashboard.dashboard                                    
+ └─ Dashboard                                  1  months         $3.00 
+                                                                       
+ PROJECT TOTAL                                                   $3.00 
