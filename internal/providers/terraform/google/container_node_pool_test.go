@@ -12,6 +12,7 @@ import (
 )
 
 func TestContainerNodePool_zonal(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -206,6 +207,7 @@ func TestContainerNodePool_zonal(t *testing.T) {
 }
 
 func TestContainerNodePool_regional(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -355,6 +357,7 @@ func TestContainerNodePool_regional(t *testing.T) {
 }
 
 func TestContainerNodePool_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

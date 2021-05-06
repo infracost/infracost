@@ -12,6 +12,7 @@ import (
 )
 
 func TestComputeSnapshot(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -48,6 +49,7 @@ source_disk = google_compute_disk.default.name
 }
 
 func TestComputeSnapshot_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

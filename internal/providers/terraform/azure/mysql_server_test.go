@@ -10,6 +10,7 @@ import (
 )
 
 func TestMySQLServer(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -139,6 +140,7 @@ func TestMySQLServer(t *testing.T) {
 }
 
 func TestMySQLServer_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

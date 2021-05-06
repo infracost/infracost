@@ -12,6 +12,7 @@ import (
 )
 
 func TestComputeMachineImage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -59,6 +60,7 @@ func TestComputeMachineImage(t *testing.T) {
 }
 
 func TestComputeMachineImage_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

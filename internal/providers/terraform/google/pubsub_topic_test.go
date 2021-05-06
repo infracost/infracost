@@ -10,6 +10,7 @@ import (
 )
 
 func TestPubSubTopic(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -36,6 +37,7 @@ func TestPubSubTopic(t *testing.T) {
 }
 
 func TestPubSubTopic_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

@@ -17,6 +17,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestLoadResources_rootModule(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping test in short mode")
 	}
@@ -46,6 +47,7 @@ func TestLoadResources_rootModule(t *testing.T) {
 }
 
 func TestLoadResources_nestedModule(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("Skipping test in short mode")
 	}

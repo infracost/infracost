@@ -10,6 +10,7 @@ import (
 )
 
 func TestMSSQLDatabase(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -148,6 +149,7 @@ func TestMSSQLDatabase(t *testing.T) {
 }
 
 func TestMSSQLDatabase_HS_with_replicas(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -208,6 +210,7 @@ func TestMSSQLDatabase_HS_with_replicas(t *testing.T) {
 }
 
 func TestMSSQLDatabase_with_license(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -273,6 +276,7 @@ func TestMSSQLDatabase_with_license(t *testing.T) {
 }
 
 func TestMSSQLDatabase_zone_redundant(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -333,6 +337,7 @@ func TestMSSQLDatabase_zone_redundant(t *testing.T) {
 }
 
 func TestMSSQLDatabase_serverless(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -399,6 +404,7 @@ func TestMSSQLDatabase_serverless(t *testing.T) {
 }
 
 func TestMSSQLDatabase_LTR(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

@@ -10,6 +10,7 @@ import (
 )
 
 func TestContainerRegistry(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -110,6 +111,7 @@ func TestContainerRegistry(t *testing.T) {
 }
 
 func TestContainerRegistry_EuMulti(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
