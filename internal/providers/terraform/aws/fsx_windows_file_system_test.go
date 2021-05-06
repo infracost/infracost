@@ -12,6 +12,7 @@ import (
 )
 
 func TestFSXWindowsFS(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -73,6 +74,7 @@ func TestFSXWindowsFS(t *testing.T) {
 }
 
 func TestFSXWindowsFS_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

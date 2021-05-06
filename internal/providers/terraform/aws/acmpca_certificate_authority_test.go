@@ -12,6 +12,7 @@ import (
 )
 
 func TestACMPCACertificateAuthorityFunction(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -49,6 +50,7 @@ func TestACMPCACertificateAuthorityFunction(t *testing.T) {
 }
 
 func TestACMPCACertificateAuthority_1000(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -92,6 +94,7 @@ func TestACMPCACertificateAuthority_1000(t *testing.T) {
 }
 
 func TestACMPCACertificateAuthority_10000(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -140,6 +143,7 @@ func TestACMPCACertificateAuthority_10000(t *testing.T) {
 }
 
 func TestACMPCACertificateAuthority_20000(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

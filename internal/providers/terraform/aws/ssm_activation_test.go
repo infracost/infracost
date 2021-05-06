@@ -12,6 +12,7 @@ import (
 )
 
 func TestAwsSSMActivationFunction(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -42,6 +43,7 @@ func TestAwsSSMActivationFunction(t *testing.T) {
 }
 
 func TestAwsSSMActivation_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

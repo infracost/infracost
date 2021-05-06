@@ -4,22 +4,31 @@
 
 ## Table of contents
 
-- [Overview](#overview)
-- [Setting up the development environment](#setting-up-the-development-environment)
-	- [Install](#install)
-	- [Run](#run)
-	- [Test](#test)
-- [Adding new resources](#adding-new-resources)
-	- [Glossary](#glossary)
-	- [Quickstart](#quickstart)
-	- [Cost component names and units](#cost-component-names-and-units)
-	- [Finding prices](#finding-prices)
-	- [Adding usage-based cost components](#adding-usage-based-cost-components)
-	- [General guidelines](#general-guidelines)
+- [Contributing to Infracost](#contributing-to-infracost)
+	- [Table of contents](#table-of-contents)
+	- [Overview](#overview)
+	- [Setting up the development environment](#setting-up-the-development-environment)
+		- [Install](#install)
+		- [Run](#run)
+		- [Test](#test)
+			- [Unit tests](#unit-tests)
+			- [Integration tests](#integration-tests)
+		- [Build](#build)
+	- [Adding new resources](#adding-new-resources)
+		- [Glossary](#glossary)
+		- [Quickstart](#quickstart)
+		- [Cost component names and units](#cost-component-names-and-units)
+		- [Finding prices](#finding-prices)
+			- [Querying MongoDB](#querying-mongodb)
+			- [Querying the GraphQL API](#querying-the-graphql-api)
+			- [Tips](#tips)
+		- [Adding usage-based cost components](#adding-usage-based-cost-components)
+		- [General guidelines](#general-guidelines)
+			- [Usage file guidelines](#usage-file-guidelines)
 	- [Cloud vendor-specific tips](#cloud-vendor-specific-tips)
 		- [Google](#google)
 		- [Azure](#azure)
-- [Releases](#releases)
+	- [Releases](#releases)
 
 
 ## Overview
@@ -211,6 +220,7 @@ import (
 )
 
 func TestMyResourceGoldenFile(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

@@ -8,6 +8,7 @@ import (
 )
 
 func TestConvertResourceString(t *testing.T) {
+	t.Parallel()
 	half := decimal.NewFromFloat(0.5)
 	one := decimal.NewFromInt(1)
 	two := decimal.NewFromInt(2)

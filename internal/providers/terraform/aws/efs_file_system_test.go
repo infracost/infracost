@@ -10,6 +10,7 @@ import (
 )
 
 func TestNewEFSFileSystemStandardStorage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -40,6 +41,7 @@ func TestNewEFSFileSystemStandardStorage(t *testing.T) {
 }
 
 func TestNewEFSFileSystemIAStorage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -92,6 +94,7 @@ func TestNewEFSFileSystemIAStorage(t *testing.T) {
 }
 
 func TestNewEFSFileSystemProvisionedThroughput(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

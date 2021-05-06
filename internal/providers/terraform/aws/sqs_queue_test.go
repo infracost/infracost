@@ -12,6 +12,7 @@ import (
 )
 
 func TestSQSQueueFunction(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -39,6 +40,7 @@ func TestSQSQueueFunction(t *testing.T) {
 }
 
 func TestSQSQueue_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

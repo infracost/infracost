@@ -11,6 +11,7 @@ import (
 )
 
 func TestS3AnalyticsConfiguration(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -46,6 +47,7 @@ func TestS3AnalyticsConfiguration(t *testing.T) {
 }
 
 func TestS3AnalyticsConfiguration_usage(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
