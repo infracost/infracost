@@ -1,8 +1,11 @@
 package apiclient
 
 import (
+	"encoding/json"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -11,17 +14,38 @@ type DashboardAPIClient struct {
 	selfHostedReportingDisabled bool
 }
 
-func NewDashboardAPIClient(cfg *config.Config) *DashboardAPIClient {
+type CreateAPIKeyResponse struct {
+	APIKey string `json:"apiKey"`
+	Error  string `json:"error"`
+}
+
+func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 	return &DashboardAPIClient{
 		APIClient: APIClient{
-			endpoint: cfg.DashboardAPIEndpoint,
-			apiKey:   cfg.APIKey,
+			endpoint: ctx.Config.DashboardAPIEndpoint,
+			apiKey:   ctx.Config.APIKey,
 		},
-		selfHostedReportingDisabled: cfg.IsTelemetryDisabled(),
+		selfHostedReportingDisabled: ctx.Config.IsTelemetryDisabled(),
 	}
 }
 
-func (c *DashboardAPIClient) AddProjectResults(out output.Root, metadata *config.Environment) error {
+func (c *DashboardAPIClient) CreateAPIKey(name string, email string) (CreateAPIKeyResponse, error) {
+	d := map[string]string{"name": name, "email": email}
+	respBody, err := c.doRequest("POST", "/apiKeys?source=cli-register", d)
+	if err != nil {
+		return CreateAPIKeyResponse{}, err
+	}
+
+	var r CreateAPIKeyResponse
+	err = json.Unmarshal(respBody, &r)
+	if err != nil {
+		return r, errors.Wrap(err, "Invalid response from API")
+	}
+
+	return r, nil
+}
+
+func (c *DashboardAPIClient) AddProjectResults(projectContexts []*config.ProjectContext, out output.Root) error {
 	if c.selfHostedReportingDisabled {
 		log.Debug("Skipping reporting project results for self-hosted Infracost")
 		return nil
@@ -29,10 +53,12 @@ func (c *DashboardAPIClient) AddProjectResults(out output.Root, metadata *config
 
 	queries := make([]GraphQLQuery, 0, len(out.Projects))
 
-	for _, projectResult := range out.Projects {
+	for i, projectResult := range out.Projects {
+		projectCtx := projectContexts[i]
+
 		v := map[string]interface{}{
 			"projectResult": projectResult,
-			"metadata":      metadata,
+			"metadata":      projectCtx.AllMetadata(),
 		}
 
 		q := `

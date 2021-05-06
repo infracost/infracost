@@ -23,8 +23,6 @@ type Project struct {
 }
 
 type Config struct { // nolint:golint
-	Environment *Environment
-	State       *State
 	Credentials Credentials
 
 	Version         string `yaml:"version,omitempty" ignored:"true"`
@@ -53,8 +51,6 @@ func init() {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Environment: NewEnvironment(),
-
 		LogLevel: "",
 		NoColor:  false,
 
@@ -75,7 +71,6 @@ func (c *Config) LoadFromConfigFile(path string) error {
 		return err
 	}
 
-	c.Environment.HasConfigFile = true
 	c.Projects = cfgFile.Projects
 
 	// Reload the environment to overwrite any of the config file configs
@@ -97,12 +92,6 @@ func (c *Config) LoadFromEnv() error {
 	if err != nil {
 		return err
 	}
-
-	err = loadState(c)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	c.Environment.InstallID = c.State.InstallID
 
 	err = loadCredentials(c)
 	if err != nil {

@@ -1,15 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"regexp"
 	"strings"
 
+	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/manifoldco/promptui"
@@ -17,12 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type createAPIKeyResponse struct {
-	APIKey string `json:"apiKey"`
-	Error  string `json:"error"`
-}
-
-func registerCmd(cfg *config.Config) *cobra.Command {
+func registerCmd(ctx *config.RunContext) *cobra.Command {
 	return &cobra.Command{
 		Use:   "register",
 		Short: "Register for a free Infracost API key",
@@ -43,7 +35,8 @@ func registerCmd(cfg *config.Config) *cobra.Command {
 				return nil
 			}
 
-			r, err := createAPIKey(cfg.DashboardAPIEndpoint, name, email)
+			d := apiclient.NewDashboardAPIClient(ctx)
+			r, err := d.CreateAPIKey(name, email)
 			if err != nil {
 				return err
 			}
@@ -63,7 +56,7 @@ func registerCmd(cfg *config.Config) *cobra.Command {
 
 			saveAPIKey := true
 
-			if _, ok := cfg.Credentials[cfg.PricingAPIEndpoint]; ok {
+			if _, ok := ctx.Config.Credentials[ctx.Config.PricingAPIEndpoint]; ok {
 				fmt.Printf("\nYou already have an Infracost API key saved in %s\n", config.CredentialsFilePath())
 				confirm, err := promptOverwriteAPIKey()
 				if err != nil {
@@ -83,11 +76,11 @@ func registerCmd(cfg *config.Config) *cobra.Command {
 			}
 
 			if saveAPIKey {
-				cfg.Credentials[cfg.PricingAPIEndpoint] = config.CredentialsProfileSpec{
+				ctx.Config.Credentials[ctx.Config.PricingAPIEndpoint] = config.CredentialsProfileSpec{
 					APIKey: r.APIKey,
 				}
 
-				err = cfg.Credentials.Save()
+				err = ctx.Config.Credentials.Save()
 				if err != nil {
 					return err
 				}
@@ -158,43 +151,4 @@ func promptOverwriteAPIKey() (bool, error) {
 	}
 
 	return true, nil
-}
-
-func createAPIKey(endpoint string, name string, email string) (*createAPIKeyResponse, error) {
-	url := fmt.Sprintf("%s/apiKeys?source=cli-register", endpoint)
-	d := map[string]string{"name": name, "email": email}
-
-	j, err := json.Marshal(d)
-	if err != nil {
-		return nil, errors.Wrap(err, "Error generating API key request")
-	}
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(j))
-	if err != nil {
-		return nil, errors.Wrap(err, "Error generating API key request")
-	}
-
-	config.AddNoAuthHeaders(req)
-
-	client := http.Client{}
-	resp, err := client.Do(req)
-
-	if err != nil {
-		return nil, errors.Wrap(err, "Error sending API key request")
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "Invalid response from API")
-	}
-
-	var r createAPIKeyResponse
-
-	err = json.Unmarshal(body, &r)
-	if err != nil {
-		return nil, errors.Wrap(err, "Invalid response from API")
-	}
-
-	return &r, nil
 }

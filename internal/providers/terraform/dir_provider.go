@@ -25,8 +25,8 @@ import (
 var minTerraformVer = "v0.12"
 
 type DirProvider struct {
+	ctx                 *config.ProjectContext
 	Path                string
-	env                 *config.Environment
 	spinnerOpts         ui.SpinnerOptions
 	PlanFlags           string
 	Workspace           string
@@ -36,26 +36,26 @@ type DirProvider struct {
 	TerraformCloudToken string
 }
 
-func NewDirProvider(cfg *config.Config, projectCfg *config.Project) schema.Provider {
-	terraformBinary := projectCfg.TerraformBinary
+func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
+	terraformBinary := ctx.ProjectConfig.TerraformBinary
 	if terraformBinary == "" {
 		terraformBinary = defaultTerraformBinary
 	}
 
 	return &DirProvider{
-		Path: projectCfg.Path,
-		env:  cfg.Environment,
+		ctx:  ctx,
+		Path: ctx.ProjectConfig.Path,
 		spinnerOpts: ui.SpinnerOptions{
-			EnableLogging: cfg.IsLogging(),
-			NoColor:       cfg.NoColor,
+			EnableLogging: ctx.RunContext.Config.IsLogging(),
+			NoColor:       ctx.RunContext.Config.NoColor,
 			Indent:        "  ",
 		},
-		PlanFlags:           projectCfg.TerraformPlanFlags,
-		Workspace:           projectCfg.TerraformWorkspace,
-		UseState:            projectCfg.TerraformUseState,
+		PlanFlags:           ctx.ProjectConfig.TerraformPlanFlags,
+		Workspace:           ctx.ProjectConfig.TerraformWorkspace,
+		UseState:            ctx.ProjectConfig.TerraformUseState,
 		TerraformBinary:     terraformBinary,
-		TerraformCloudHost:  projectCfg.TerraformCloudHost,
-		TerraformCloudToken: projectCfg.TerraformCloudToken,
+		TerraformCloudHost:  ctx.ProjectConfig.TerraformCloudHost,
+		TerraformCloudToken: ctx.ProjectConfig.TerraformCloudToken,
 	}
 }
 
@@ -74,7 +74,7 @@ func (p *DirProvider) checks() error {
 		return clierror.NewSanitizedError(errors.Errorf(msg), "Terraform binary could not be found")
 	}
 
-	if v, ok := checkTerraformVersion(p.env); !ok {
+	if v, ok := checkTerraformVersion(p.ctx.Metadata.TerraformVersion, p.ctx.Metadata.TerraformFullVersion); !ok {
 		return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
 	}
 	return nil
@@ -115,7 +115,7 @@ func (p *DirProvider) LoadResources(project *schema.Project, usage map[string]*s
 		return err
 	}
 
-	parser := NewParser(p.env)
+	parser := NewParser(p.ctx)
 	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return errors.Wrap(err, "Error parsing Terraform JSON")
@@ -218,7 +218,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 		// If the plan returns this error then Terraform is configured with remote execution mode
 		if strings.HasPrefix(extractedErr, "Error: Saving a generated plan is currently not supported") {
 			log.Info("Continuing with Terraform Remote Execution Mode")
-			p.env.TerraformRemoteExecutionModeEnabled = true
+			p.ctx.Metadata.TerraformRemoteExecutionModeEnabled = true
 			planJSON, err = p.runRemotePlan(opts, args)
 		} else if initOnFail && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
 			strings.Contains(extractedErr, "Error: Initialization required") ||
@@ -353,11 +353,9 @@ func IsTerraformDir(path string) bool {
 	return false
 }
 
-func checkTerraformVersion(env *config.Environment) (string, bool) {
-	v := env.TerraformVersion
-
+func checkTerraformVersion(v string, fullV string) (string, bool) {
 	// Allow any non-terraform binaries, e.g. terragrunt
-	if !strings.HasPrefix(env.TerraformFullVersion, "Terraform ") {
+	if !strings.HasPrefix(fullV, "Terraform ") {
 		return v, true
 	}
 

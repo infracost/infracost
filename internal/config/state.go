@@ -15,23 +15,21 @@ type State struct {
 	LatestReleaseCheckedAt string `json:"latestReleaseCheckedAt"`
 }
 
-func loadState(cfg *Config) error {
-	var err error
-
-	cfg.State, err = readStateFileIfExists()
+func LoadState() (*State, error) {
+	state, err := readStateFileIfExists()
 	if err != nil {
-		return err
+		return state, err
 	}
 
-	if cfg.State.InstallID == "" {
-		cfg.State.InstallID = uuid.New().String()
-		err = cfg.State.Save()
+	if state.InstallID == "" {
+		state.InstallID = uuid.New().String()
+		err = state.Save()
 		if err != nil {
-			return err
+			return state, err
 		}
 	}
 
-	return nil
+	return state, nil
 }
 
 func (s *State) Save() error {

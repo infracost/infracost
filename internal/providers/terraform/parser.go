@@ -37,18 +37,18 @@ var arnAttributeMap = map[string]string{
 }
 
 type Parser struct {
-	env *config.Environment
+	ctx *config.ProjectContext
 }
 
-func NewParser(env *config.Environment) *Parser {
-	return &Parser{env: env}
+func NewParser(ctx *config.ProjectContext) *Parser {
+	return &Parser{ctx}
 }
 
 func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	registryMap := GetResourceRegistryMap()
 
 	if isAwsChina(d) {
-		p.env.IsAWSChina = true
+		p.ctx.Metadata.IsAWSChina = true
 	}
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
@@ -298,7 +298,7 @@ func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, 
 
 	for _, d := range resData {
 		if isInfracostResource(d) {
-			p.env.TerraformInfracostProviderEnabled = true
+			p.ctx.Metadata.TerraformInfracostProviderEnabled = true
 
 			for _, ref := range d.References("resources") {
 				if _, ok := u[ref.Address]; !ok {

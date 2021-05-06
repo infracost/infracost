@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
-	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/version"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -16,6 +16,7 @@ import (
 type APIClient struct {
 	endpoint string
 	apiKey   string
+	runID    string
 }
 
 type GraphQLQuery struct {
@@ -23,16 +24,16 @@ type GraphQLQuery struct {
 	Variables map[string]interface{} `json:"variables"`
 }
 
-type GraphQLError struct {
+type APIError struct {
 	err error
 	msg string
 }
 
-func (e *GraphQLError) Error() string {
+func (e *APIError) Error() string {
 	return fmt.Sprintf("%s: %v", e.msg, e.err.Error())
 }
 
-type GraphQLErrorResponse struct {
+type APIErrorResponse struct {
 	Error string `json:"error"`
 }
 
@@ -44,43 +45,59 @@ func (c *APIClient) doQueries(queries []GraphQLQuery) ([]gjson.Result, error) {
 		return []gjson.Result{}, nil
 	}
 
-	reqBody, err := json.Marshal(queries)
+	respBody, err := c.doRequest("POST", "/graphql", queries)
+	return gjson.ParseBytes(respBody).Array(), err
+}
+
+func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte, error) {
+	body, err := json.Marshal(d)
 	if err != nil {
-		return []gjson.Result{}, errors.Wrap(err, "Error generating GraphQL query body")
+		return []byte{}, errors.Wrap(err, "Error generating request body")
 	}
 
-	req, err := http.NewRequest("POST", c.endpoint+"/graphql", bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest(method, c.endpoint+path, bytes.NewBuffer(body))
 	if err != nil {
-		return []gjson.Result{}, errors.Wrap(err, "Error generating GraphQL request")
+		return []byte{}, errors.Wrap(err, "Error generating request")
 	}
 
-	config.AddAuthHeaders(c.apiKey, req)
+	c.AddAuthHeaders(req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return []gjson.Result{}, errors.Wrap(err, "Error sending API request")
+		return []byte{}, errors.Wrap(err, "Error sending API request")
 	}
 	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return []gjson.Result{}, &GraphQLError{err, "Invalid API response"}
-	}
-
 	if resp.StatusCode != 200 {
-		var r GraphQLErrorResponse
-		err = json.Unmarshal(respBody, &r)
-		if err != nil {
-			return []gjson.Result{}, &GraphQLError{err, "Invalid API response"}
-		}
-
-		if r.Error == "Invalid API key" {
-			return []gjson.Result{}, ErrInvalidAPIKey
-		}
-
-		return []gjson.Result{}, &GraphQLError{errors.New(r.Error), "Received error from API"}
+		return []byte{}, &APIError{err, "Invalid API response"}
 	}
 
-	return gjson.ParseBytes(respBody).Array(), nil
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return []byte{}, &APIError{err, "Invalid API response"}
+	}
+
+	return respBody, nil
+}
+
+func (c *APIClient) AddDefaultHeaders(req *http.Request) {
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("User-Agent", userAgent())
+}
+
+func (c *APIClient) AddAuthHeaders(req *http.Request) {
+	c.AddDefaultHeaders(req)
+	req.Header.Set("X-Api-Key", c.apiKey)
+	req.Header.Set("X-Trace-Id", c.runID)
+}
+
+func userAgent() string {
+	userAgent := "infracost"
+
+	if version.Version != "" {
+		userAgent += fmt.Sprintf("-%s", version.Version)
+	}
+
+	return userAgent
 }

@@ -9,14 +9,14 @@ import (
 )
 
 type StateJSONProvider struct {
+	ctx  *config.ProjectContext
 	Path string
-	env  *config.Environment
 }
 
-func NewStateJSONProvider(cfg *config.Config, projectCfg *config.Project) schema.Provider {
+func NewStateJSONProvider(ctx *config.ProjectContext) schema.Provider {
 	return &StateJSONProvider{
-		Path: projectCfg.Path,
-		env:  cfg.Environment,
+		ctx:  ctx,
+		Path: ctx.ProjectConfig.Path,
 	}
 }
 
@@ -38,7 +38,7 @@ func (p *StateJSONProvider) LoadResources(project *schema.Project, usage map[str
 		return errors.Wrap(err, "Error reading Terraform state JSON file")
 	}
 
-	parser := NewParser(p.env)
+	parser := NewParser(p.ctx)
 
 	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {

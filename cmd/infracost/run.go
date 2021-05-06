@@ -34,12 +34,14 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool("sync-usage-file", false, "Sync usage-file with missing resources, needs usage-file too (experimental)")
 }
 
-func runMain(cmd *cobra.Command, cfg *config.Config) error {
+func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projects := make([]*schema.Project, 0)
+	projectContexts := make([]*config.ProjectContext, 0)
 
-	for _, projectCfg := range cfg.Projects {
-		provider, err := providers.Detect(cfg, projectCfg)
+	for _, projectCfg := range runCtx.Config.Projects {
+		ctx := config.NewProjectContext(runCtx, projectCfg)
 
+		provider, err := providers.Detect(ctx)
 		if err != nil {
 			m := fmt.Sprintf("%s\n\n", err)
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
@@ -51,6 +53,8 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 
 			return clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
 		}
+		ctx.LoadMetadataForProjectType(provider.Type())
+		projectContexts = append(projectContexts, ctx)
 
 		if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 			m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
@@ -60,20 +64,18 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 		}
 
 		m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
-		if cfg.IsLogging() {
+		if runCtx.Config.IsLogging() {
 			log.Info(m)
 		} else {
 			fmt.Fprintln(os.Stderr, m)
 		}
 
-		cfg.Environment.SetProjectEnvironment(provider.Type(), projectCfg)
-
-		u, err := usage.LoadFromFile(projectCfg.UsageFile, cfg.SyncUsageFile)
+		u, err := usage.LoadFromFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
 		if err != nil {
 			return err
 		}
 		if len(u) > 0 {
-			cfg.Environment.HasUsageFile = true
+			ctx.Metadata.HasUsageFile = true
 		}
 
 		metadata := config.DetectProjectMetadata(projectCfg)
@@ -89,26 +91,26 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 
 		projects = append(projects, project)
 
-		if cfg.SyncUsageFile {
+		if runCtx.Config.SyncUsageFile {
 			err = usage.SyncUsageData(project, u, projectCfg.UsageFile)
 			if err != nil {
 				return err
 			}
 		}
 
-		if !cfg.IsLogging() {
+		if !runCtx.Config.IsLogging() {
 			fmt.Fprintln(os.Stderr, "")
 		}
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: cfg.IsLogging(),
-		NoColor:       cfg.NoColor,
+		EnableLogging: runCtx.Config.IsLogging(),
+		NoColor:       runCtx.Config.NoColor,
 	}
 	spinner := ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 
 	for _, project := range projects {
-		if err := prices.PopulatePrices(cfg, project); err != nil {
+		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
 			spinner.Fail()
 			fmt.Fprintln(os.Stderr, "")
 
@@ -124,7 +126,7 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 				))
 			}
 
-			if e, ok := err.(*apiclient.GraphQLError); ok {
+			if e, ok := err.(*apiclient.APIError); ok {
 				return errors.New(fmt.Sprintf("%v\n%s", e.Error(), "We have been notified of this issue."))
 			}
 
@@ -142,8 +144,8 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 	addProjectResultsChan := make(chan bool)
 
 	go func(addProjectResultsChan chan bool, r output.Root) {
-		c := apiclient.NewDashboardAPIClient(cfg)
-		err := c.AddProjectResults(r, cfg.Environment)
+		c := apiclient.NewDashboardAPIClient(runCtx)
+		err := c.AddProjectResults(projectContexts, r)
 		if err != nil {
 			log.Errorf("Error reporting project results: %s", err)
 		}
@@ -151,9 +153,9 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 	}(addProjectResultsChan, r)
 
 	opts := output.Options{
-		ShowSkipped: cfg.ShowSkipped,
-		NoColor:     cfg.NoColor,
-		Fields:      cfg.Fields,
+		ShowSkipped: runCtx.Config.ShowSkipped,
+		NoColor:     runCtx.Config.NoColor,
+		Fields:      runCtx.Config.Fields,
 	}
 
 	var (
@@ -162,7 +164,7 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 		err error
 	)
 
-	switch strings.ToLower(cfg.Format) {
+	switch strings.ToLower(runCtx.Config.Format) {
 	case "json":
 		b, err = output.ToJSON(r, opts)
 		out = string(b)

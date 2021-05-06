@@ -280,9 +280,12 @@ func loadResources(t *testing.T, cfg *config.Config, tfProject TerraformProject,
 		return nil, err
 	}
 
-	provider := terraform.NewDirProvider(cfg, &config.Project{
-		Path: tfdir,
-	})
+	provider := terraform.NewDirProvider(config.NewProjectContext(
+		config.EmptyRunContext(),
+		&config.Project{
+			Path: tfdir,
+		},
+	))
 
 	project := schema.NewProject("tftest", &schema.ProjectMetadata{})
 

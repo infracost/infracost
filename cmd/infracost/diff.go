@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func diffCmd(cfg *config.Config) *cobra.Command {
+func diffCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "diff",
 		Short: "Show diff of monthly costs between current and planned state",
@@ -22,28 +22,28 @@ func diffCmd(cfg *config.Config) *cobra.Command {
       terraform show -json tfplan.binary > plan.json
       infracost diff --path plan.json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := checkAPIKey(cfg.APIKey, cfg.PricingAPIEndpoint, cfg.DefaultPricingAPIEndpoint); err != nil {
+			if err := checkAPIKey(ctx.Config.APIKey, ctx.Config.PricingAPIEndpoint, ctx.Config.DefaultPricingAPIEndpoint); err != nil {
 				return err
 			}
 
-			err := loadRunFlags(cfg, cmd)
+			err := loadRunFlags(ctx.Config, cmd)
 			if err != nil {
 				return err
 			}
 
-			err = checkRunConfig(cfg)
+			err = checkRunConfig(ctx.Config)
 			if err != nil {
 				ui.PrintUsageErrorAndExit(cmd, err.Error())
 			}
 
-			err = checkDiffConfig(cfg)
+			err = checkDiffConfig(ctx.Config)
 			if err != nil {
 				ui.PrintUsageErrorAndExit(cmd, err.Error())
 			}
 
-			cfg.Format = "diff"
+			ctx.Config.Format = "diff"
 
-			return runMain(cmd, cfg)
+			return runMain(cmd, ctx)
 		},
 	}
 

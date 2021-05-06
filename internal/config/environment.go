@@ -3,10 +3,8 @@ package config
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"os/exec"
 	"runtime"
-	"sort"
 	"strings"
 
 	"github.com/google/uuid"
@@ -75,72 +73,6 @@ func userAgent() string {
 	}
 
 	return userAgent
-}
-
-func baseVersion(v string) string {
-	return strings.SplitN(v, "+", 2)[0]
-}
-
-func terraformVersion(full string) string {
-	p := strings.Split(full, " ")
-	if len(p) > 1 {
-		return p[len(p)-1]
-	}
-
-	return ""
-}
-
-func ciScript() string {
-	if IsTruthy(os.Getenv("INFRACOST_CI_DIFF")) {
-		return "ci-diff"
-	} else if IsTruthy(os.Getenv("INFRACOST_CI_ATLANTIS_DIFF")) {
-		return "ci-atlantis-diff"
-	} else if IsTruthy(os.Getenv("INFRACOST_CI_JENKINS_DIFF")) {
-		return "ci-jenkins-diff"
-	}
-
-	return ""
-}
-
-func ciPlatform() string {
-	if IsTruthy(os.Getenv("GITHUB_ACTIONS")) {
-		return "github_actions"
-	} else if IsTruthy(os.Getenv("GITLAB_CI")) {
-		return "gitlab_ci"
-	} else if IsTruthy(os.Getenv("CIRCLECI")) {
-		return "circleci"
-	} else if IsTruthy(os.Getenv("JENKINS_HOME")) {
-		return "jenkins"
-	} else if IsTruthy(os.Getenv("BUILDKITE")) {
-		return "buildkite"
-	} else if IsTruthy(os.Getenv("SYSTEM_COLLECTIONURI")) {
-		return fmt.Sprintf("azure_devops_%s", os.Getenv("BUILD_REPOSITORY_PROVIDER"))
-	} else {
-		envKeys := os.Environ()
-		sort.Strings(envKeys)
-		for _, k := range envKeys {
-			if strings.HasPrefix(k, "ATLANTIS_") {
-				return "atlantis"
-			} else if strings.HasPrefix(k, "BITBUCKET_") {
-				return "bitbucket"
-			} else if strings.HasPrefix(k, "CONCOURSE_") {
-				return "concourse"
-			}
-		}
-		if IsTruthy(os.Getenv("CI")) {
-			return "ci"
-		}
-	}
-
-	return ""
-}
-
-func isTest() bool {
-	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
-}
-
-func isDev() bool {
-	return os.Getenv("INFRACOST_ENV") == "dev"
 }
 
 func TraceID() string {

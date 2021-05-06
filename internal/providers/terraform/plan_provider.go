@@ -15,16 +15,14 @@ import (
 type PlanProvider struct {
 	*DirProvider
 	Path string
-	env  *config.Environment
 }
 
-func NewPlanProvider(cfg *config.Config, projectCfg *config.Project) schema.Provider {
-	dirProvider := NewDirProvider(cfg, projectCfg).(*DirProvider)
+func NewPlanProvider(ctx *config.ProjectContext) schema.Provider {
+	dirProvider := NewDirProvider(ctx).(*DirProvider)
 
 	return &PlanProvider{
 		DirProvider: dirProvider,
-		Path:        projectCfg.Path,
-		env:         cfg.Environment,
+		Path:        ctx.ProjectConfig.Path,
 	}
 }
 
@@ -42,7 +40,7 @@ func (p *PlanProvider) LoadResources(project *schema.Project, usage map[string]*
 		return err
 	}
 
-	parser := NewParser(p.env)
+	parser := NewParser(p.ctx)
 
 	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {
