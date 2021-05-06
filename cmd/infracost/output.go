@@ -88,11 +88,15 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 					ui.PrintWarningf("fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
 				} else {
 					fields, _ = cmd.Flags().GetStringSlice("fields")
+					vf := []string{}
 					for _, f := range fields {
 						if !contains(validFields, f) {
 							ui.PrintWarningf("Invalid field '%s' specified, valid fields are: %s", f, validFields)
+						} else {
+							vf = append(vf, f)
 						}
 					}
+					fields = vf
 				}
 			}
 
@@ -111,8 +115,10 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 				err error
 			)
 
-			if cmd.Flags().Changed("fields") && format != "table" {
-				ui.PrintWarning("fields is only supported for table output format (HTML support coming soon)")
+			validFieldsFormats := []string{"table", "html"}
+
+			if cmd.Flags().Changed("fields") && !contains(validFieldsFormats, format) {
+				ui.PrintWarning("fields is only supported for table and html output formats")
 			}
 			switch strings.ToLower(format) {
 			case "json":
@@ -138,7 +144,7 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
-	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nOnly supported by table output format")
+	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
 
 	return cmd
 }
