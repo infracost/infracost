@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_vpc_endpoint.interface_withUsage:
+    monthly_data_processed_gb: 1000 # Monthly data processed by the VPC endpoint(s) in GB.

@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  aws_ssm_activation.ssm_activation_withUsage:
+    instance_tier: advanced # Instance tier being used, can be: standard, advanced.
+    instances: 100          # Number of instances being managed.

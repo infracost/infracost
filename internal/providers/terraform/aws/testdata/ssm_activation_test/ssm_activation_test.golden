@@ -1,0 +1,13 @@
+
+ Name                                           Monthly Qty  Unit            Monthly Cost 
+                                                                                          
+ aws_ssm_activation.ssm_activation                                                        
+ └─ On-prem managed instances (advanced)      Cost depends on usage: $0.00695 per hours   
+                                                                                          
+ aws_ssm_activation.ssm_activation_withUsage                                              
+ └─ On-prem managed instances (advanced)             73,000  hours                $507.35 
+                                                                                          
+ PROJECT TOTAL                                                                    $507.35 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

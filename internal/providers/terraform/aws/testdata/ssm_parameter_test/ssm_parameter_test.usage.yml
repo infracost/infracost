@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  aws_ssm_parameter.ssm_parameter_advancedWithUsage:
+    api_throughput_limit: advanced
+    monthly_api_interactions: 100000
+    parameter_storage_hrs: 600

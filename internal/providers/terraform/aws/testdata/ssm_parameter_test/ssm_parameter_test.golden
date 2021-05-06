@@ -1,0 +1,15 @@
+
+ Name                                                   Monthly Qty  Unit                 Monthly Cost 
+                                                                                                       
+ aws_ssm_parameter.ssm_parameter_advanced                                                              
+ ├─ Parameter storage (advanced)                                730  hours                       $0.05 
+ └─ API interactions (advanced)                     Cost depends on usage: $0.05 per 10k interactions  
+                                                                                                       
+ aws_ssm_parameter.ssm_parameter_advancedWithUsage                                                     
+ ├─ Parameter storage (advanced)                                600  hours                       $0.04 
+ └─ API interactions (advanced)                                  10  10k interactions            $0.50 
+                                                                                                       
+ PROJECT TOTAL                                                                                   $0.59 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
