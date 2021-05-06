@@ -25,6 +25,7 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 			safe = strings.ReplaceAll(safe, "\n", "<br />")
 			return template.HTML(safe) // nolint:gosec
 		},
+		"contains":       contains,
 		"formatCost2DP":  formatCost2DP,
 		"formatPrice":    formatPrice,
 		"formatQuantity": formatQuantity,
