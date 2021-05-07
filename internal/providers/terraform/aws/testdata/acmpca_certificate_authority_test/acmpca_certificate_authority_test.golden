@@ -1,19 +1,26 @@
 
- Name                                                     Monthly Qty  Unit      Monthly Cost 
-                                                                                              
- aws_acmpca_certificate_authority.private_ca                                                  
- ├─ Private certificate authority                                   1  months         $400.00 
- └─ Certificates (first 1K)                                     1,000  requests       $750.00 
-                                                                                              
- aws_acmpca_certificate_authority.private_ca_more_tiered                                      
- ├─ Private certificate authority                                   1  months         $400.00 
- ├─ Certificates (first 1K)                                     1,000  requests       $750.00 
- ├─ Certificates (next 9K)                                      9,000  requests     $3,150.00 
- └─ Certificates (over 10K)                                    10,001  requests        $10.00 
-                                                                                              
- aws_acmpca_certificate_authority.private_ca_tiered                                           
- ├─ Private certificate authority                                   1  months         $400.00 
- ├─ Certificates (first 1K)                                     1,000  requests       $750.00 
- └─ Certificates (next 9K)                                      9,000  requests     $3,150.00 
-                                                                                              
- PROJECT TOTAL                                                                      $9,760.00 
+ Name                                                       Monthly Qty  Unit            Monthly Cost 
+                                                                                                      
+ aws_acmpca_certificate_authority.private_ca                                                          
+ ├─ Private certificate authority                                     1  months               $400.00 
+ └─ Certificates (first 1K)                                       1,000  requests             $750.00 
+                                                                                                      
+ aws_acmpca_certificate_authority.private_ca_more_tiered                                              
+ ├─ Private certificate authority                                     1  months               $400.00 
+ ├─ Certificates (first 1K)                                       1,000  requests             $750.00 
+ ├─ Certificates (next 9K)                                        9,000  requests           $3,150.00 
+ └─ Certificates (over 10K)                                      10,001  requests              $10.00 
+                                                                                                      
+ aws_acmpca_certificate_authority.private_ca_noUsage                                                  
+ ├─ Private certificate authority                                     1  months               $400.00 
+ └─ Certificates (first 1K)                               Cost depends on usage: $0.75 per requests   
+                                                                                                      
+ aws_acmpca_certificate_authority.private_ca_tiered                                                   
+ ├─ Private certificate authority                                     1  months               $400.00 
+ ├─ Certificates (first 1K)                                       1,000  requests             $750.00 
+ └─ Certificates (next 9K)                                        9,000  requests           $3,150.00 
+                                                                                                      
+ PROJECT TOTAL                                                                             $10,160.00 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -19,6 +19,13 @@
     └─ root_block_device                                                                            
        └─ Storage (general purpose SSD, gp2)                          16  GB-months           $1.60 
                                                                                                     
+ aws_autoscaling_group.asg_lc_cpu_credits_noUsage                                                   
+ └─ aws_launch_configuration.lc_cpu_credits_noUsage                                                 
+    ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)           1,460  hours              $60.74 
+    ├─ CPU credits                                                     0  vCPU-hours          $0.00 
+    └─ root_block_device                                                                            
+       └─ Storage (general purpose SSD, gp2)                          16  GB-months           $1.60 
+                                                                                                    
  aws_autoscaling_group.asg_lc_ebs_optimized                                                         
  └─ aws_launch_configuration.lc_ebs_optimized                                                       
     ├─ Instance usage (Linux/UNIX, on-demand, r3.xlarge)           1,460  hours             $486.18 
@@ -81,6 +88,13 @@
     └─ root_block_device                                                                            
        └─ Storage (general purpose SSD, gp2)                          16  GB-months           $1.60 
                                                                                                     
+ aws_autoscaling_group.asg_lt_cpu_credits_noUsage                                                   
+ └─ aws_launch_template.lt_cpu_credits_noUsage                                                      
+    ├─ Instance usage (Linux/UNIX, on-demand, t3.large)            1,460  hours             $121.47 
+    ├─ CPU credits                                                     0  vCPU-hours          $0.00 
+    └─ root_block_device                                                                            
+       └─ Storage (general purpose SSD, gp2)                          16  GB-months           $1.60 
+                                                                                                    
  aws_autoscaling_group.asg_lt_ebs_optimized                                                         
  └─ aws_launch_template.lt_ebs_optimized                                                            
     ├─ Instance usage (Linux/UNIX, on-demand, r3.xlarge)           1,460  hours             $486.18 
@@ -128,7 +142,7 @@
     └─ root_block_device                                                                            
        └─ Storage (general purpose SSD, gp2)                          24  GB-months           $2.40 
                                                                                                     
- PROJECT TOTAL                                                                            $2,704.28 
+ PROJECT TOTAL                                                                            $2,889.69 
 
 ----------------------------------
 1 resource type wasn't estimated as it's not supported yet.
