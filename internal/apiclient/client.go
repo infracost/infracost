@@ -50,12 +50,12 @@ func (c *APIClient) doQueries(queries []GraphQLQuery) ([]gjson.Result, error) {
 }
 
 func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte, error) {
-	body, err := json.Marshal(d)
+	reqBody, err := json.Marshal(d)
 	if err != nil {
 		return []byte{}, errors.Wrap(err, "Error generating request body")
 	}
 
-	req, err := http.NewRequest(method, c.endpoint+path, bytes.NewBuffer(body))
+	req, err := http.NewRequest(method, c.endpoint+path, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return []byte{}, errors.Wrap(err, "Error generating request")
 	}
@@ -69,13 +69,23 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return []byte{}, &APIError{err, "Invalid API response"}
-	}
-
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return []byte{}, &APIError{err, "Invalid API response"}
+	}
+
+	if resp.StatusCode != 200 {
+		var r APIErrorResponse
+
+		err = json.Unmarshal(respBody, &r)
+		if err != nil {
+			return []byte{}, &APIError{err, "Invalid API response"}
+		}
+
+		if r.Error == "Invalid API key" {
+			return []byte{}, ErrInvalidAPIKey
+		}
+		return []byte{}, &APIError{errors.New(r.Error), "Received error from API"}
 	}
 
 	return respBody, nil
