@@ -68,7 +68,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 		accountReplicationType = "GRS"
 	}
 
-	dataMeterName := "Data Stored"
+	var dataMeterName string
 	if accountTier == "Premium" {
 		dataMeterName = fmt.Sprintf("%s Data Stored", accountReplicationType)
 	} else {
