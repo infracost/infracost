@@ -1,0 +1,10 @@
+
+ Name                                                 Monthly Qty  Unit   Monthly Cost 
+                                                                                       
+ azurerm_app_service_certificate_order.standard_cert                                   
+ └─ SSL certificate (Standard)                             0.0833  years         $5.83 
+                                                                                       
+ azurerm_app_service_certificate_order.wildcard_cert                                   
+ └─ SSL certificate (wildcard)                             0.0833  years        $25.00 
+                                                                                       
+ PROJECT TOTAL                                                                  $30.83 

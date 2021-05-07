@@ -1,0 +1,32 @@
+
+ Name                                     Monthly Qty  Unit            Monthly Cost 
+                                                                                    
+ azurerm_postgresql_server.basic_2core                                              
+ ├─ Compute (B_Gen5_2)                            730  hours                 $49.64 
+ ├─ Storage                                         5  GB-months              $0.50 
+ └─ Additional backup storage           Cost depends on usage: $0.10 per GB-months  
+                                                                                    
+ azurerm_postgresql_server.gp_4core                                                 
+ ├─ Compute (GP_Gen5_4)                           730  hours                $255.79 
+ ├─ Storage                                     4,000  GB-months            $460.00 
+ └─ Additional backup storage           Cost depends on usage: $0.10 per GB-months  
+                                                                                    
+ azurerm_postgresql_server.mo_16core                                                
+ ├─ Compute (MO_Gen5_16)                          730  hours              $1,379.41 
+ ├─ Storage                                         5  GB-months              $0.57 
+ └─ Additional backup storage           Cost depends on usage: $0.10 per GB-months  
+                                                                                    
+ azurerm_postgresql_server.with_geo                                                 
+ ├─ Compute (GP_Gen5_4)                           730  hours                $255.79 
+ ├─ Storage                                     4,000  GB-months            $460.00 
+ └─ Additional backup storage                   3,000  GB-months            $600.00 
+                                                                                    
+ azurerm_postgresql_server.without_geo                                              
+ ├─ Compute (MO_Gen5_16)                          730  hours              $1,379.41 
+ ├─ Storage                                         5  GB-months              $0.57 
+ └─ Additional backup storage                   2,000  GB-months            $200.00 
+                                                                                    
+ PROJECT TOTAL                                                            $5,041.69 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

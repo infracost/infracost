@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  azurerm_mssql_database.serverless:
+    monthly_vcore_hours: 500
+  azurerm_mssql_database.LTR:
+    long_term_retention_storage_gb: 1000

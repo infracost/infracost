@@ -1,0 +1,11 @@
+version: 0.1
+resource_usage:
+  azurerm_app_service_environment.windows_I1": 
+    operating_system: Windows
+  azurerm_app_service_environment.windows_I2":
+    operating_system: Windows
+  azurerm_app_service_environment.linux_I1": 
+    operating_system: Linux
+  azurerm_app_service_environment.linux_I2": 
+    operating_system": Linux
+    
