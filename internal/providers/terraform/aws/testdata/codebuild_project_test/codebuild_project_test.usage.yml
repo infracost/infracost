@@ -1,0 +1,10 @@
+version: 0.1
+resource_usage:
+  aws_codebuild_project.my_small_project:
+    monthly_build_mins: 1000
+  aws_codebuild_project.my_medium_project:
+    monthly_build_mins: 10000
+  aws_codebuild_project.my_large_linux_project:
+    monthly_build_mins: 100000
+  aws_codebuild_project.my_large_windows_project:
+    monthly_build_mins: 100000

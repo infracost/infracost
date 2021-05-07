@@ -1,0 +1,15 @@
+
+ Name                                           Monthly Qty  Unit              Monthly Cost 
+                                                                                            
+ aws_config_config_rule.my_config                                                           
+ └─ Rule evaluations (first 100K)            Cost depends on usage: $0.001 per evaluations  
+                                                                                            
+ aws_config_config_rule.my_config_withUsage                                                 
+ ├─ Rule evaluations (first 100K)                   100,000  evaluations            $100.00 
+ ├─ Rule evaluations (next 400K)                    400,000  evaluations            $320.00 
+ └─ Rule evaluations (over 500K)                    500,000  evaluations            $250.00 
+                                                                                            
+ PROJECT TOTAL                                                                      $670.00 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
