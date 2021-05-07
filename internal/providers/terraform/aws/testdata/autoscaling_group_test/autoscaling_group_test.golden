@@ -41,12 +41,6 @@
     └─ root_block_device                                                                            
        └─ Storage (general purpose SSD, gp2)                           8  GB-months           $0.80 
                                                                                                     
- aws_autoscaling_group.asg_lc_spot                                                                  
- └─ aws_launch_configuration.lc_spot                                                                
-    ├─ Instance usage (Linux/UNIX, spot, t2.medium)                1,460  hours              $20.29 
-    └─ root_block_device                                                                            
-       └─ Storage (general purpose SSD, gp2)                          16  GB-months           $1.60 
-                                                                                                    
  aws_autoscaling_group.asg_lc_tenancy_dedicated                                                     
  └─ aws_launch_configuration.lc_tenancy_dedicated                                                   
     ├─ Instance usage (Linux/UNIX, on-demand, m3.medium)           1,460  hours             $108.04 
@@ -116,12 +110,6 @@
     └─ root_block_device                                                                            
        └─ Storage (general purpose SSD, gp2)                          16  GB-months           $1.60 
                                                                                                     
- aws_autoscaling_group.asg_lt_spot                                                                  
- └─ aws_launch_template.lt_spot                                                                     
-    ├─ Instance usage (Linux/UNIX, spot, t2.medium)                1,460  hours              $20.29 
-    └─ root_block_device                                                                            
-       └─ Storage (general purpose SSD, gp2)                          16  GB-months           $1.60 
-                                                                                                    
  aws_autoscaling_group.asg_lt_tenancy_dedicated                                                     
  └─ aws_launch_template.lt_tenancy_dedicated                                                        
     ├─ Instance usage (Linux/UNIX, on-demand, m3.medium)           1,460  hours             $108.04 
@@ -130,19 +118,17 @@
                                                                                                     
  aws_autoscaling_group.asg_mixed_instance_basic                                                     
  └─ aws_launch_template.lt_mixed_instance_basic                                                     
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.large)            1,460  hours             $135.49 
-    ├─ Instance usage (Linux/UNIX, spot, t2.large)                   730  hours              $20.80 
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours             $203.23 
     └─ root_block_device                                                                            
        └─ Storage (general purpose SSD, gp2)                          24  GB-months           $2.40 
                                                                                                     
  aws_autoscaling_group.asg_mixed_instance_dynamic                                                   
  └─ aws_launch_template.lt_mixed_instance_dynamic                                                   
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.large)            1,460  hours             $135.49 
-    ├─ Instance usage (Linux/UNIX, spot, t2.large)                   730  hours              $20.80 
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours             $203.23 
     └─ root_block_device                                                                            
        └─ Storage (general purpose SSD, gp2)                          24  GB-months           $2.40 
                                                                                                     
- PROJECT TOTAL                                                                            $2,889.69 
+ PROJECT TOTAL                                                                            $2,939.78 
 
 ----------------------------------
 1 resource type wasn't estimated as it's not supported yet.

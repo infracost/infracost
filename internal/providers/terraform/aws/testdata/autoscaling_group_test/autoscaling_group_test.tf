@@ -33,20 +33,6 @@ resource "aws_autoscaling_group" "asg_lc_basic" {
   min_size             = 1
 }
 
-resource "aws_launch_configuration" "lc_spot" {
-  image_id          = "fake_ami"
-  instance_type     = "t2.medium"
-  spot_price        = 1.00
-  enable_monitoring = false
-}
-
-resource "aws_autoscaling_group" "asg_lc_spot" {
-  launch_configuration = aws_launch_configuration.lc_spot.id
-  desired_capacity     = 2
-  max_size             = 3
-  min_size             = 1
-}
-
 resource "aws_launch_configuration" "lc_ebs_optimized" {
   image_id          = "fake_ami"
   instance_type     = "r3.xlarge"
@@ -184,23 +170,6 @@ resource "aws_launch_template" "lt_basic" {
 resource "aws_autoscaling_group" "asg_lt_basic" {
   launch_template {
     id = aws_launch_template.lt_basic.id
-  }
-  desired_capacity = 2
-  max_size         = 3
-  min_size         = 1
-}
-
-resource "aws_launch_template" "lt_spot" {
-  image_id          = "fake_ami"
-  instance_type     = "t2.medium"
-  instance_market_options {
-    market_type = "spot"
-  }
-}
-
-resource "aws_autoscaling_group" "asg_lt_spot" {
-  launch_template {
-    id = aws_launch_template.lt_spot.id
   }
   desired_capacity = 2
   max_size         = 3
@@ -347,7 +316,7 @@ resource "aws_autoscaling_group" "asg_mixed_instance_basic" {
 
     instances_distribution {
       on_demand_base_capacity = 1
-      on_demand_percentage_above_base_capacity = 50
+      on_demand_percentage_above_base_capacity = 100
     }
   }
 }
@@ -379,7 +348,7 @@ resource "aws_autoscaling_group" "asg_mixed_instance_dynamic" {
 
     instances_distribution {
       on_demand_base_capacity = 1
-      on_demand_percentage_above_base_capacity = 50
+      on_demand_percentage_above_base_capacity = 100
     }
   }
 }
