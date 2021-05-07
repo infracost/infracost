@@ -1,32 +1,16 @@
 package config
 
-import (
-	"os/exec"
-	"strings"
-)
-
-type ProjectMetadata struct {
-	ProjectType                         string `json:"projectType"`
-	TerraformBinary                     string `json:"terraformBinary"`
-	TerraformFullVersion                string `json:"terraformFullVersion"`
-	TerraformVersion                    string `json:"terraformVersion"`
-	TerraformRemoteExecutionModeEnabled bool   `json:"terraformRemoteExecutionModeEnabled"`
-	TerraformInfracostProviderEnabled   bool   `json:"terraformInfracostProviderEnabled"`
-	IsAWSChina                          bool   `json:"isAwsChina"`
-	HasUsageFile                        bool   `json:"hasUsageFile"`
-}
-
 type ProjectContext struct {
 	RunContext    *RunContext
 	ProjectConfig *Project
-	Metadata      ProjectMetadata
+	metadata      map[string]interface{}
 }
 
 func NewProjectContext(runCtx *RunContext, projectCfg *Project) *ProjectContext {
 	return &ProjectContext{
 		RunContext:    runCtx,
 		ProjectConfig: projectCfg,
-		Metadata:      ProjectMetadata{},
+		metadata:      map[string]interface{}{},
 	}
 }
 
@@ -34,29 +18,17 @@ func EmptyProjectContext() *ProjectContext {
 	return &ProjectContext{
 		RunContext:    EmptyRunContext(),
 		ProjectConfig: &Project{},
-		Metadata:      ProjectMetadata{},
+		metadata:      map[string]interface{}{},
 	}
 }
 
-// TODO: Include run metadata
-func (c *ProjectContext) AllMetadata() ProjectMetadata {
-	return c.Metadata
+func (c *ProjectContext) SetMetadata(key string, value interface{}) {
+	c.metadata[key] = value
 }
 
-func (c *ProjectContext) LoadMetadataForProjectType(projectType string) {
-	c.Metadata.ProjectType = projectType
-
-	if projectType == "terraform_dir" || projectType == "terraform_plan" {
-		binary := c.ProjectConfig.TerraformBinary
-		if binary == "" {
-			binary = "terraform"
-		}
-		out, _ := exec.Command(binary, "-version").Output()
-		fullVersion := strings.SplitN(string(out), "\n", 2)[0]
-		version := terraformVersion(fullVersion)
-
-		c.Metadata.TerraformBinary = binary
-		c.Metadata.TerraformFullVersion = fullVersion
-		c.Metadata.TerraformVersion = version
+func (c *ProjectContext) AllMetadata() map[string]interface{} {
+	return map[string]interface{}{
+		"run":     c.RunContext.metadata,
+		"project": c.metadata,
 	}
 }

@@ -40,6 +40,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	for _, projectCfg := range runCtx.Config.Projects {
 		ctx := config.NewProjectContext(runCtx, projectCfg)
+		runCtx.SetCurrentProjectContext(ctx)
 
 		provider, err := providers.Detect(ctx)
 		if err != nil {
@@ -53,7 +54,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 			return clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
 		}
-		ctx.LoadMetadataForProjectType(provider.Type())
+		ctx.SetMetadata("projectType", provider.Type())
 		projectContexts = append(projectContexts, ctx)
 
 		if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
@@ -75,7 +76,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			return err
 		}
 		if len(u) > 0 {
-			ctx.Metadata.HasUsageFile = true
+			ctx.SetMetadata("hasUsageFile", true)
 		}
 
 		metadata := config.DetectProjectMetadata(projectCfg)

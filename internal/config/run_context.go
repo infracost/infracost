@@ -11,28 +11,12 @@ import (
 	"github.com/infracost/infracost/internal/version"
 )
 
-type RunMetadata struct {
-	Version                     string   `json:"version"`
-	FullVersion                 string   `json:"fullVersion"`
-	IsTest                      bool     `json:"isTest"`
-	IsDev                       bool     `json:"isDev"`
-	InstallID                   string   `json:"installId"`
-	IsDefaultPricingAPIEndpoint bool     `json:"isDefaultPricingAPIEndpoint"`
-	OS                          string   `json:"os"`
-	CIPlatform                  string   `json:"ciPlatform,omitempty"`
-	CIScript                    string   `json:"ciScript,omitempty"`
-	Command                     string   `json:"command"`
-	Flags                       []string `json:"flags"`
-	OutputFormat                string   `json:"outputFormat"`
-	HasConfigFile               bool     `json:"hasConfigFile"`
-}
-
 type RunContext struct {
-	ctx      context.Context
-	Config   *Config
-	State    *State
-	RunID    string
-	Metadata RunMetadata
+	ctx               context.Context
+	Config            *Config
+	State             *State
+	metadata          map[string]interface{}
+	currentProjectCtx *ProjectContext
 }
 
 func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
@@ -47,48 +31,58 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 		return nil, err
 	}
 
-	metadata := loadInitialRunMetadata()
-
-	return &RunContext{
+	c := &RunContext{
 		ctx:      rootCtx,
 		Config:   cfg,
 		State:    state,
-		RunID:    uuid.New().String(),
-		Metadata: metadata,
-	}, nil
+		metadata: map[string]interface{}{},
+	}
+
+	c.loadInitialMetadata()
+
+	return c, nil
 }
 
 func EmptyRunContext() *RunContext {
 	return &RunContext{
 		Config:   &Config{},
 		State:    &State{},
-		Metadata: RunMetadata{},
+		metadata: map[string]interface{}{},
 	}
 }
 
-func loadInitialRunMetadata() RunMetadata {
-	return RunMetadata{
-		Version:     baseVersion(version.Version),
-		FullVersion: version.Version,
-		IsTest:      isTest(),
-		IsDev:       isDev(),
-		OS:          runtime.GOOS,
-		CIPlatform:  ciPlatform(),
-		CIScript:    ciScript(),
+func (c *RunContext) SetMetadata(key string, value interface{}) {
+	c.metadata[key] = value
+}
+
+func (c *RunContext) AllMetadata() map[string]interface{} {
+	m := map[string]interface{}{
+		"run": c.metadata,
 	}
+	if c.currentProjectCtx != nil {
+		m["project"] = c.currentProjectCtx.metadata
+	}
+
+	return m
+}
+
+func (c *RunContext) SetCurrentProjectContext(ctx *ProjectContext) {
+	c.currentProjectCtx = ctx
+}
+
+func (c *RunContext) loadInitialMetadata() {
+	c.SetMetadata("runId", uuid.New().String())
+	c.SetMetadata("version", baseVersion(version.Version))
+	c.SetMetadata("fullVersion", version.Version)
+	c.SetMetadata("isTest", IsTest())
+	c.SetMetadata("isDev", IsDev())
+	c.SetMetadata("os", runtime.GOOS)
+	c.SetMetadata("ciPlatform", ciPlatform())
+	c.SetMetadata("ciScript", ciScript())
 }
 
 func baseVersion(v string) string {
 	return strings.SplitN(v, "+", 2)[0]
-}
-
-func terraformVersion(full string) string {
-	p := strings.Split(full, " ")
-	if len(p) > 1 {
-		return p[len(p)-1]
-	}
-
-	return ""
 }
 
 func ciScript() string {
@@ -128,12 +122,4 @@ func ciPlatform() string {
 	}
 
 	return ""
-}
-
-func isTest() bool {
-	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
-}
-
-func isDev() bool {
-	return os.Getenv("INFRACOST_ENV") == "dev"
 }

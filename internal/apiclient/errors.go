@@ -22,7 +22,7 @@ func ReportCLIError(ctx *config.RunContext, cliErr error) error {
 
 	d := make(map[string]interface{})
 	d["error"] = errMsg
-	d["environment"] = ctx.Metadata
+	d["metadata"] = ctx.AllMetadata()
 
 	c := NewDashboardAPIClient(ctx)
 	_, err := c.doRequest("POST", "/cli-error", d)

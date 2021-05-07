@@ -90,7 +90,7 @@ func CheckForUpdate(ctx *config.RunContext) (*Info, error) {
 }
 
 func skipUpdateCheck(ctx *config.RunContext) bool {
-	return ctx.Config.SkipUpdateCheck || ctx.Metadata.IsTest || ctx.Metadata.IsDev
+	return ctx.Config.SkipUpdateCheck || config.IsTest() || config.IsDev()
 }
 
 func isBrewInstall() (bool, error) {

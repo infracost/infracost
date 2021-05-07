@@ -48,7 +48,7 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	registryMap := GetResourceRegistryMap()
 
 	if isAwsChina(d) {
-		p.ctx.Metadata.IsAWSChina = true
+		p.ctx.SetMetadata("isAWSChina", true)
 	}
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
@@ -298,7 +298,7 @@ func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, 
 
 	for _, d := range resData {
 		if isInfracostResource(d) {
-			p.ctx.Metadata.TerraformInfracostProviderEnabled = true
+			p.ctx.SetMetadata("terraformInfracostProviderEnabled", true)
 
 			for _, ref := range d.References("resources") {
 				if _, ok := u[ref.Address]; !ok {

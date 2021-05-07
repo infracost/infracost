@@ -30,7 +30,7 @@ func breakdownCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			ctx.Metadata.OutputFormat = ctx.Config.Format
+			ctx.SetMetadata("outputFormat", ctx.Config.Format)
 
 			err = checkRunConfig(ctx.Config)
 			if err != nil {

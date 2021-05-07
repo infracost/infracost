@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -159,6 +160,14 @@ func (c *Config) IsSelfHosted() bool {
 
 func (c *Config) IsTelemetryDisabled() bool {
 	return c.IsSelfHosted() && IsFalsy(os.Getenv("INFRACOST_SELF_HOSTED_TELEMETRY"))
+}
+
+func IsTest() bool {
+	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
+}
+
+func IsDev() bool {
+	return os.Getenv("INFRACOST_ENV") == "dev"
 }
 
 func loadDotEnv() error {
