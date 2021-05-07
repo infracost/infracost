@@ -6,6 +6,17 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
+
+resource "aws_acmpca_certificate_authority" "private_ca_noUsage" {
+  certificate_authority_configuration {
+    key_algorithm = "RSA_4096"
+    signing_algorithm = "SHA512WITHRSA"
+    subject {
+      common_name = "private-ca.com"
+    }
+  }
+}
+
 resource "aws_acmpca_certificate_authority" "private_ca" {
   certificate_authority_configuration {
     key_algorithm = "RSA_4096"

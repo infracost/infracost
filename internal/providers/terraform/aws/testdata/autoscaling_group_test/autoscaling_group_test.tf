@@ -89,6 +89,19 @@ resource "aws_autoscaling_group" "asg_lc_tenancy_host" {
   min_size             = 1
 }
 
+resource "aws_launch_configuration" "lc_cpu_credits_noUsage" {
+  image_id          = "fake_ami"
+  instance_type     = "t3.medium"
+  enable_monitoring = false
+}
+
+resource "aws_autoscaling_group" "asg_lc_cpu_credits_noUsage" {
+  launch_configuration = aws_launch_configuration.lc_cpu_credits_noUsage.id
+  desired_capacity     = 2
+  max_size             = 3
+  min_size             = 1
+}
+
 resource "aws_launch_configuration" "lc_cpu_credits" {
   image_id          = "fake_ami"
   instance_type     = "t3.medium"
@@ -271,6 +284,20 @@ resource "aws_launch_template" "lt_monitoring" {
 resource "aws_autoscaling_group" "asg_lt_monitoring" {
   launch_template {
     id = aws_launch_template.lt_monitoring.id
+  }
+  desired_capacity = 2
+  max_size         = 3
+  min_size         = 1
+}
+
+resource "aws_launch_template" "lt_cpu_credits_noUsage" {
+  image_id          = "fake_ami"
+  instance_type     = "t3.large"
+}
+
+resource "aws_autoscaling_group" "asg_lt_cpu_credits_noUsage" {
+  launch_template {
+    id = aws_launch_template.lt_cpu_credits_noUsage.id
   }
   desired_capacity = 2
   max_size         = 3
