@@ -9,7 +9,7 @@
  aws_vpn_connection.transit_withUsage                                                
  ├─ VPN connection                                    730  hours              $36.50 
  ├─ Transit gateway attachment                        730  hours              $36.50 
- └─ Data processed                                 73,000  GB              $1,460.00 
+ └─ Data processed                                    100  GB                  $2.00 
                                                                                      
  aws_vpn_connection.vpn_connection                                                   
  └─ VPN connection                                    730  hours              $36.50 
@@ -17,7 +17,7 @@
  aws_vpn_connection.vpn_connection_withUsage                                         
  └─ VPN connection                                    730  hours              $36.50 
                                                                                      
- PROJECT TOTAL                                                             $1,679.00 
+ PROJECT TOTAL                                                               $221.00 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

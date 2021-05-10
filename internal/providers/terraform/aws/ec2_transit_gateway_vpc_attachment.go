@@ -79,7 +79,7 @@ func transitGatewayDataProcessingCostComponent(region string, operation string, 
 		Name:           "Data processed",
 		Unit:           "GB",
 		UnitMultiplier: 1,
-		HourlyQuantity: gbDataProcessed,
+		MonthlyQuantity: gbDataProcessed,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
 			Region:     strPtr(region),
