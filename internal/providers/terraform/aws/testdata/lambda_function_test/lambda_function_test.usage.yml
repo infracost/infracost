@@ -1,0 +1,9 @@
+version: 0.1
+resource_usage:
+  aws_lambda_function.lambda_withUsage:
+    monthly_requests: 100000
+    request_duration_ms: 350
+
+  aws_lambda_function.lambda_withUsage512Mem:
+    monthly_requests: 100000
+    request_duration_ms: 350
