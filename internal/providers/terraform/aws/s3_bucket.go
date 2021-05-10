@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -132,6 +133,11 @@ func s3SubResources(d *schema.ResourceData, u *schema.UsageData) []*schema.Resou
 	for _, s := range subResourceMap {
 		subResources = append(subResources, s)
 	}
+
+	// Sort so we get consistent output (map iteration returns things in random order)
+	sort.Slice(subResources, func(i, j int) bool {
+		return subResources[i].Name < subResources[j].Name
+	})
 
 	return subResources
 }
