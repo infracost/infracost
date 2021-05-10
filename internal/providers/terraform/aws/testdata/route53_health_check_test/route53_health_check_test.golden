@@ -1,0 +1,42 @@
+
+ Name                                                                  Monthly Qty  Unit    Monthly Cost 
+                                                                                                         
+ aws_route53_health_check.https                                                                          
+ ├─ Health check                                                                 1  months         $0.50 
+ └─ Optional features                                                            1  months         $1.00 
+                                                                                                         
+ aws_route53_health_check.https_withUsage                                                                
+ ├─ Health check                                                                 1  months         $0.75 
+ └─ Optional features                                                            1  months         $2.00 
+                                                                                                         
+ aws_route53_health_check.simple                                                                         
+ └─ Health check                                                                 1  months         $0.50 
+                                                                                                         
+ aws_route53_health_check.simple_withUsage                                                               
+ └─ Health check                                                                 1  months         $0.75 
+                                                                                                         
+ aws_route53_health_check.ssl_latency_interval_string_match                                              
+ ├─ Health check                                                                 1  months         $0.50 
+ └─ Optional features                                                            4  months         $4.00 
+                                                                                                         
+ aws_route53_health_check.ssl_latency_interval_string_match_withUsage                                    
+ ├─ Health check                                                                 1  months         $0.75 
+ └─ Optional features                                                            4  months         $8.00 
+                                                                                                         
+ aws_route53_health_check.ssl_latency_string_match                                                       
+ ├─ Health check                                                                 1  months         $0.50 
+ └─ Optional features                                                            3  months         $3.00 
+                                                                                                         
+ aws_route53_health_check.ssl_latency_string_match_withUsage                                             
+ ├─ Health check                                                                 1  months         $0.75 
+ └─ Optional features                                                            3  months         $6.00 
+                                                                                                         
+ aws_route53_health_check.ssl_string_match                                                               
+ ├─ Health check                                                                 1  months         $0.50 
+ └─ Optional features                                                            2  months         $2.00 
+                                                                                                         
+ aws_route53_health_check.ssl_string_match_withUsage                                                     
+ ├─ Health check                                                                 1  months         $0.75 
+ └─ Optional features                                                            2  months         $4.00 
+                                                                                                         
+ PROJECT TOTAL                                                                                    $36.25 

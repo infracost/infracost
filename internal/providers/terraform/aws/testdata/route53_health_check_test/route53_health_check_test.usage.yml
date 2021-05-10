@@ -1,0 +1,16 @@
+version: 0.1
+resource_usage:
+  aws_route53_health_check.simple_withUsage:
+    endpoint_type: non_aws
+
+  aws_route53_health_check.https_withUsage:
+    endpoint_type: non_aws
+
+  aws_route53_health_check.ssl_string_match_withUsage:
+    endpoint_type: Non_AWS
+
+  aws_route53_health_check.ssl_latency_string_match_withUsage:
+    endpoint_type: Non_AWS
+
+  aws_route53_health_check.ssl_latency_interval_string_match_withUsage:
+    endpoint_type: Non_AWS
