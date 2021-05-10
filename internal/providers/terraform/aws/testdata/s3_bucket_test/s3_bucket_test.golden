@@ -1,0 +1,133 @@
+
+ Name                                          Monthly Qty  Unit              Monthly Cost 
+                                                                                           
+ aws_s3_bucket.bucket1                                                                     
+ ├─ Object tagging                          Cost depends on usage: $0.01 per 10k tags      
+ ├─ Intelligent tiering                                                                    
+ │  ├─ Storage (frequent access)            Cost depends on usage: $0.02 per GB-months     
+ │  ├─ Storage (infrequent access)          Cost depends on usage: $0.01 per GB-months     
+ │  ├─ Monitoring and automation            Cost depends on usage: $0.0025 per 1k objects  
+ │  ├─ PUT, COPY, POST, LIST requests       Cost depends on usage: $0.005 per 1k requests  
+ │  ├─ GET, SELECT, and all other requests  Cost depends on usage: $0.0004 per 1k requests 
+ │  ├─ Lifecycle transition                 Cost depends on usage: $0.01 per 1k requests   
+ │  ├─ Select data scanned                  Cost depends on usage: $0.002 per GB-months    
+ │  ├─ Select data returned                 Cost depends on usage: $0.0007 per GB-months   
+ │  └─ Early delete (within 30 days)        Cost depends on usage: $0.02 per GB-months     
+ ├─ One zone - infrequent access                                                           
+ │  ├─ Storage                              Cost depends on usage: $0.01 per GB-months     
+ │  ├─ PUT, COPY, POST, LIST requests       Cost depends on usage: $0.01 per 1k requests   
+ │  ├─ GET, SELECT, and all other requests  Cost depends on usage: $0.001 per 1k requests  
+ │  ├─ Lifecycle transition                 Cost depends on usage: $0.01 per 1k requests   
+ │  ├─ Retrievals                           Cost depends on usage: $0.01 per GB-months     
+ │  ├─ Select data scanned                  Cost depends on usage: $0.002 per GB-months    
+ │  └─ Select data returned                 Cost depends on usage: $0.01 per GB-months     
+ ├─ Standard - infrequent access                                                           
+ │  ├─ Storage                              Cost depends on usage: $0.01 per GB-months     
+ │  ├─ PUT, COPY, POST, LIST requests       Cost depends on usage: $0.01 per 1k requests   
+ │  ├─ GET, SELECT, and all other requests  Cost depends on usage: $0.001 per 1k requests  
+ │  ├─ Lifecycle transition                 Cost depends on usage: $0.01 per 1k requests   
+ │  ├─ Retrievals                           Cost depends on usage: $0.01 per GB-months     
+ │  ├─ Select data scanned                  Cost depends on usage: $0.002 per GB-months    
+ │  └─ Select data returned                 Cost depends on usage: $0.01 per GB-months     
+ ├─ Standard                                                                               
+ │  ├─ Storage                              Cost depends on usage: $0.02 per GB-months     
+ │  ├─ PUT, COPY, POST, LIST requests       Cost depends on usage: $0.005 per 1k requests  
+ │  ├─ GET, SELECT, and all other requests  Cost depends on usage: $0.0004 per 1k requests 
+ │  ├─ Select data scanned                  Cost depends on usage: $0.002 per GB-months    
+ │  └─ Select data returned                 Cost depends on usage: $0.0007 per GB-months   
+ ├─ Glacier deep archive                                                                   
+ │  ├─ Storage                              Cost depends on usage: $0.00099 per GB-months  
+ │  ├─ PUT, COPY, POST, LIST requests       Cost depends on usage: $0.05 per 1k requests   
+ │  ├─ GET, SELECT, and all other requests  Cost depends on usage: $0.0004 per 1k requests 
+ │  ├─ Lifecycle transition                 Cost depends on usage: $0.05 per 1k requests   
+ │  ├─ Retrieval requests (standard)        Cost depends on usage: $0.10 per 1k requests   
+ │  ├─ Retrievals (standard)                Cost depends on usage: $0.02 per GB-months     
+ │  ├─ Retrieval requests (bulk)            Cost depends on usage: $0.03 per 1k requests   
+ │  ├─ Retrievals (bulk)                    Cost depends on usage: $0.0025 per GB-months   
+ │  └─ Early delete (within 180 days)       Cost depends on usage: $0.00099 per GB-months  
+ └─ Glacier                                                                                
+    ├─ Storage                              Cost depends on usage: $0.004 per GB-months    
+    ├─ PUT, COPY, POST, LIST requests       Cost depends on usage: $0.03 per 1k requests   
+    ├─ GET, SELECT, and all other requests  Cost depends on usage: $0.0004 per 1k requests 
+    ├─ Lifecycle transition                 Cost depends on usage: $0.03 per 1k requests   
+    ├─ Retrieval requests (standard)        Cost depends on usage: $0.03 per 1k requests   
+    ├─ Retrievals (standard)                Cost depends on usage: $0.01 per GB-months     
+    ├─ Select data scanned (standard)       Cost depends on usage: $0.008 per GB-months    
+    ├─ Select data returned (standard)      Cost depends on usage: $0.01 per GB-months     
+    ├─ Retrieval requests (expedited)       Cost depends on usage: $10.00 per 1k requests  
+    ├─ Retrievals (expedited)               Cost depends on usage: $0.03 per GB-months     
+    ├─ Select data scanned (expedited)      Cost depends on usage: $0.02 per GB-months     
+    ├─ Select data returned (expedited)     Cost depends on usage: $0.03 per GB-months     
+    ├─ Retrieval requests (bulk)            Cost depends on usage: $0.03 per 1k requests   
+    ├─ Retrievals (bulk)                    Cost depends on usage: $0.0025 per GB-months   
+    ├─ Select data scanned (bulk)           Cost depends on usage: $0.001 per GB-months    
+    ├─ Select data returned (bulk)          Cost depends on usage: $0.0025 per GB-months   
+    └─ Early delete (within 90 days)        Cost depends on usage: $0.004 per GB-months    
+                                                                                           
+ aws_s3_bucket.bucket_withUsage                                                            
+ ├─ Object tagging                                     0.1  10k tags                 $0.00 
+ ├─ Standard                                                                               
+ │  ├─ Storage                                      10,000  GB-months              $230.00 
+ │  ├─ PUT, COPY, POST, LIST requests                   10  1k requests              $0.05 
+ │  ├─ GET, SELECT, and all other requests              10  1k requests              $0.00 
+ │  ├─ Select data scanned                          10,000  GB-months               $20.00 
+ │  └─ Select data returned                         10,000  GB-months                $7.00 
+ ├─ Intelligent tiering                                                                    
+ │  ├─ Storage (frequent access)                    20,000  GB-months              $460.00 
+ │  ├─ Storage (infrequent access)                  20,000  GB-months              $250.00 
+ │  ├─ Monitoring and automation                        20  1k objects               $0.05 
+ │  ├─ PUT, COPY, POST, LIST requests                   20  1k requests              $0.10 
+ │  ├─ GET, SELECT, and all other requests              20  1k requests              $0.01 
+ │  ├─ Lifecycle transition                             20  1k requests              $0.20 
+ │  ├─ Select data scanned                          20,000  GB-months               $40.00 
+ │  ├─ Select data returned                         20,000  GB-months               $14.00 
+ │  └─ Early delete (within 30 days)                20,000  GB-months              $460.00 
+ ├─ Standard - infrequent access                                                           
+ │  ├─ Storage                                      30,000  GB-months              $375.00 
+ │  ├─ PUT, COPY, POST, LIST requests                   30  1k requests              $0.30 
+ │  ├─ GET, SELECT, and all other requests              30  1k requests              $0.03 
+ │  ├─ Lifecycle transition                             30  1k requests              $0.30 
+ │  ├─ Retrievals                                   30,000  GB-months              $300.00 
+ │  ├─ Select data scanned                          30,000  GB-months               $60.00 
+ │  └─ Select data returned                         30,000  GB-months              $300.00 
+ ├─ One zone - infrequent access                                                           
+ │  ├─ Storage                                      40,000  GB-months              $400.00 
+ │  ├─ PUT, COPY, POST, LIST requests                   40  1k requests              $0.40 
+ │  ├─ GET, SELECT, and all other requests              40  1k requests              $0.04 
+ │  ├─ Lifecycle transition                             40  1k requests              $0.40 
+ │  ├─ Retrievals                                   40,000  GB-months              $400.00 
+ │  ├─ Select data scanned                          40,000  GB-months               $80.00 
+ │  └─ Select data returned                         40,000  GB-months              $400.00 
+ ├─ Glacier                                                                                
+ │  ├─ Storage                                      50,000  GB-months              $200.00 
+ │  ├─ PUT, COPY, POST, LIST requests                   50  1k requests              $1.50 
+ │  ├─ GET, SELECT, and all other requests              50  1k requests              $0.02 
+ │  ├─ Lifecycle transition                             50  1k requests              $1.50 
+ │  ├─ Retrieval requests (standard)                    50  1k requests              $1.50 
+ │  ├─ Retrievals (standard)                        50,000  GB-months              $500.00 
+ │  ├─ Select data scanned (standard)               50,000  GB-months              $400.00 
+ │  ├─ Select data returned (standard)              50,000  GB-months              $500.00 
+ │  ├─ Retrieval requests (expedited)                   50  1k requests            $500.00 
+ │  ├─ Retrievals (expedited)                       50,000  GB-months            $1,500.00 
+ │  ├─ Select data scanned (expedited)              50,000  GB-months            $1,000.00 
+ │  ├─ Select data returned (expedited)             50,000  GB-months            $1,500.00 
+ │  ├─ Retrieval requests (bulk)                        50  1k requests              $1.25 
+ │  ├─ Retrievals (bulk)                            50,000  GB-months              $125.00 
+ │  ├─ Select data scanned (bulk)                   50,000  GB-months               $50.00 
+ │  ├─ Select data returned (bulk)                  50,000  GB-months              $125.00 
+ │  └─ Early delete (within 90 days)                50,000  GB-months              $200.00 
+ └─ Glacier deep archive                                                                   
+    ├─ Storage                                      60,000  GB-months               $59.40 
+    ├─ PUT, COPY, POST, LIST requests                   60  1k requests              $3.00 
+    ├─ GET, SELECT, and all other requests              60  1k requests              $0.02 
+    ├─ Lifecycle transition                             60  1k requests              $3.00 
+    ├─ Retrieval requests (standard)                    60  1k requests              $6.00 
+    ├─ Retrievals (standard)                        60,000  GB-months            $1,200.00 
+    ├─ Retrieval requests (bulk)                        60  1k requests              $1.50 
+    ├─ Retrievals (bulk)                            60,000  GB-months              $150.00 
+    └─ Early delete (within 180 days)               60,000  GB-months               $59.40 
+                                                                                           
+ PROJECT TOTAL                                                                  $11,885.98 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
