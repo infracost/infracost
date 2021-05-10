@@ -1,0 +1,7 @@
+
+ Name                    Monthly Qty  Unit    Monthly Cost 
+                                                           
+ aws_route53_zone.zone1                                    
+ └─ Hosted zone                    1  months         $0.50 
+                                                           
+ PROJECT TOTAL                                       $0.50 
