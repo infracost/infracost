@@ -70,6 +70,7 @@ var tfProviders = `
 
 var (
 	pluginCache = filepath.Join(config.RootDir(), ".test_cache/terraform_plugins")
+	initCache   = filepath.Join(config.RootDir(), ".test_cache/terraform_init")
 	once        sync.Once
 )
 
@@ -110,7 +111,12 @@ func installPlugins() error {
 		},
 	}
 
-	tfdir, err := CreateTerraformProject(project)
+	err := os.MkdirAll(initCache, os.ModePerm)
+	if err != nil {
+		log.Errorf("Error creating init cache directory: %s", err.Error())
+	}
+
+	tfdir, err := writeToTmpDir(initCache, project)
 	if err != nil {
 		return errors.Wrap(err, "Error creating Terraform project")
 	}
@@ -152,7 +158,7 @@ func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, 
 	err := cfg.LoadFromEnv()
 	assert.NoError(t, err)
 
-	project, err := RunCostCalculations(cfg, tfProject, usage)
+	project, err := RunCostCalculations(t, cfg, tfProject, usage)
 	assert.NoError(t, err)
 
 	testutil.TestResources(t, project.Resources, checks)
@@ -185,7 +191,7 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 	}
 
 	// Generate the output
-	project, err := RunCostCalculations(cfg, tfProject, usageData)
+	project, err := RunCostCalculations(t, cfg, tfProject, usageData)
 	require.NoError(t, err)
 
 	r := output.ToOutputFormat([]*schema.Project{project})
@@ -237,8 +243,8 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 	}
 }
 
-func RunCostCalculations(cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
-	project, err := loadResources(cfg, tfProject, usage)
+func RunCostCalculations(t *testing.T, cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+	project, err := loadResources(t, cfg, tfProject, usage)
 	if err != nil {
 		return project, err
 	}
@@ -250,12 +256,23 @@ func RunCostCalculations(cfg *config.Config, tfProject TerraformProject, usage m
 	return project, nil
 }
 
-func CreateTerraformProject(tfProject TerraformProject) (string, error) {
-	return writeToTmpDir(tfProject)
+func CreateTerraformProject(tmpDir string, tfProject TerraformProject) (string, error) {
+	return writeToTmpDir(tmpDir, tfProject)
 }
 
-func loadResources(cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
-	tfdir, err := CreateTerraformProject(tfProject)
+func loadResources(t *testing.T, cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+	tmpDir := t.TempDir()
+
+	_, err := os.ReadDir(initCache)
+	if err == nil {
+		if err := copyInitCacheToPath(initCache, tmpDir); err != nil {
+			return nil, err
+		}
+	} else {
+		t.Log(fmt.Sprintf("Couldn't copy terraform init cache from %s", initCache))
+	}
+
+	tfdir, err := CreateTerraformProject(tmpDir, tfProject)
 	if err != nil {
 		return nil, err
 	}
@@ -267,12 +284,52 @@ func loadResources(cfg *config.Config, tfProject TerraformProject, usage map[str
 	return provider.LoadResources(usage)
 }
 
-func writeToTmpDir(tfProject TerraformProject) (string, error) {
-	// Create temporary directory and output terraform code
-	tmpDir, err := ioutil.TempDir("", "")
+func copyInitCacheToPath(source, destination string) error {
+	files, err := os.ReadDir(source)
 	if err != nil {
-		return tmpDir, err
+		return err
 	}
+
+	for _, file := range files {
+		srcPath := filepath.Join(source, file.Name())
+		destPath := filepath.Join(destination, file.Name())
+
+		if file.IsDir() {
+			if err := os.MkdirAll(destPath, os.ModePerm); err != nil {
+				return err
+			}
+			if err := copyInitCacheToPath(srcPath, destPath); err != nil {
+				return err
+			}
+		} else {
+			info, err := file.Info()
+			if err != nil {
+				return err
+			}
+			if info.Mode()&os.ModeSymlink == os.ModeSymlink {
+				if err := os.Symlink(srcPath, destPath); err != nil {
+					return err
+				}
+			} else {
+				if file.Name() != "init.tf" { // don't copy init.tf since the provider block will conflict with main.tf
+					srcData, err := ioutil.ReadFile(srcPath)
+					if err != nil {
+						return err
+					}
+
+					if err := ioutil.WriteFile(destPath, srcData, os.ModePerm); err != nil {
+						return err
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func writeToTmpDir(tmpDir string, tfProject TerraformProject) (string, error) {
+	var err error
 
 	for _, terraformFile := range tfProject.Files {
 		fullPath := filepath.Join(tmpDir, terraformFile.Path)
