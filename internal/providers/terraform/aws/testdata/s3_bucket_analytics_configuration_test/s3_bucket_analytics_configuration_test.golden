@@ -1,0 +1,29 @@
+
+ Name                                                                Monthly Qty  Unit              Monthly Cost 
+                                                                                                                 
+ aws_s3_bucket.bucket1                                                                                           
+ └─ Standard                                                                                                     
+    ├─ Storage                                                    Cost depends on usage: $0.02 per GB-months     
+    ├─ PUT, COPY, POST, LIST requests                             Cost depends on usage: $0.005 per 1k requests  
+    ├─ GET, SELECT, and all other requests                        Cost depends on usage: $0.0004 per 1k requests 
+    ├─ Select data scanned                                        Cost depends on usage: $0.002 per GB-months    
+    └─ Select data returned                                       Cost depends on usage: $0.0007 per GB-months   
+                                                                                                                 
+ aws_s3_bucket.bucket1_withUsage                                                                                 
+ └─ Standard                                                                                                     
+    ├─ Storage                                                    Cost depends on usage: $0.02 per GB-months     
+    ├─ PUT, COPY, POST, LIST requests                             Cost depends on usage: $0.005 per 1k requests  
+    ├─ GET, SELECT, and all other requests                        Cost depends on usage: $0.0004 per 1k requests 
+    ├─ Select data scanned                                        Cost depends on usage: $0.002 per GB-months    
+    └─ Select data returned                                       Cost depends on usage: $0.0007 per GB-months   
+                                                                                                                 
+ aws_s3_bucket_analytics_configuration.bucketanalytics                                                           
+ └─ Objects monitored                                                         10  1M objects               $1.00 
+                                                                                                                 
+ aws_s3_bucket_analytics_configuration.bucketanalytics_withUsage                                                 
+ └─ Objects monitored                                             Cost depends on usage: $0.10 per 1M objects    
+                                                                                                                 
+ PROJECT TOTAL                                                                                             $1.00 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
