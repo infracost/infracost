@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_s3_bucket_analytics_configuration.bucketanalytics:
+    monthly_monitored_objects: 10000000
