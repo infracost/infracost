@@ -76,9 +76,9 @@ func transitGatewayAttachmentCostComponent(region string, operation string) *sch
 
 func transitGatewayDataProcessingCostComponent(region string, operation string, gbDataProcessed *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           "Data processed",
-		Unit:           "GB",
-		UnitMultiplier: 1,
+		Name:            "Data processed",
+		Unit:            "GB",
+		UnitMultiplier:  1,
 		MonthlyQuantity: gbDataProcessed,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
