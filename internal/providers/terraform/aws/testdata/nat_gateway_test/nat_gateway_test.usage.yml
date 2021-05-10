@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_nat_gateway.nat_withUsage:
+    monthly_data_processed_gb: 100
