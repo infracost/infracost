@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  aws_route53_resolver_endpoint.test_withUsage1B:
+    monthly_queries: 100000000
+  aws_route53_resolver_endpoint.test_withUsage2B:
+    monthly_queries: 2000000000

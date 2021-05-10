@@ -1,0 +1,20 @@
+
+ Name                                              Monthly Qty  Unit            Monthly Cost 
+                                                                                             
+ aws_route53_resolver_endpoint.test                                                          
+ ├─ Resolver endpoints                                   1,460  hours                $182.50 
+ └─ DNS queries (first 1B)                       Cost depends on usage: $0.40 per 1M queries 
+                                                                                             
+ aws_route53_resolver_endpoint.test_withUsage1B                                              
+ ├─ Resolver endpoints                                   1,460  hours                $182.50 
+ └─ DNS queries (first 1B)                                 100  1M queries            $40.00 
+                                                                                             
+ aws_route53_resolver_endpoint.test_withUsage2B                                              
+ ├─ Resolver endpoints                                   1,460  hours                $182.50 
+ ├─ DNS queries (first 1B)                               1,000  1M queries           $400.00 
+ └─ DNS queries (over 1B)                                1,000  1M queries           $200.00 
+                                                                                             
+ PROJECT TOTAL                                                                     $1,187.50 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
