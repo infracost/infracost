@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  aws_route53_record.my_record_withUsage:
+    monthly_standard_queries: 1100000000
+    monthly_latency_based_queries: 1200000000
+    monthly_geo_queries: 1500000000
