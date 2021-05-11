@@ -60,14 +60,14 @@ func NewAzureRMAppFunction(d *schema.ResourceData, u *schema.UsageData) *schema.
 		"EP3": 14.0,
 	}
 
-	app_service_plan_id := d.References("app_service_plan_id")
+	appServicePlanId := d.References("app_service_plan_id")
 
-	if len(app_service_plan_id) > 0 {
-		kind = strings.ToLower(app_service_plan_id[0].Get("kind").String())
-		skuTier = strings.ToLower(app_service_plan_id[0].Get("sku.0.tier").String())
+	if len(appServicePlanId) > 0 {
+		kind = strings.ToLower(appServicePlanId[0].Get("kind").String())
+		skuTier = strings.ToLower(appServicePlanId[0].Get("sku.0.tier").String())
 	}
-	if app_service_plan_id[0].Get("sku.0.size").Type != gjson.Null {
-		skuSize = app_service_plan_id[0].Get("sku.0.size").String()
+	if appServicePlanId[0].Get("sku.0.size").Type != gjson.Null {
+		skuSize = appServicePlanId[0].Get("sku.0.size").String()
 	}
 
 	if val, ok := skuMapCPU[skuSize]; ok {
