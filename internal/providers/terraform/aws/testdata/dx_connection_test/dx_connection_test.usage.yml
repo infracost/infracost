@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  aws_dx_connection.my_dx_connection_usage:
+    monthly_outbound_region_to_dx_location_gb: 100
+    dx_virtual_interface_type: private
+    dx_connection_type: dedicated
