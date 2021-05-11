@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_config_config_rule.my_config_withUsage:
+    monthly_rule_evaluations: 1000000

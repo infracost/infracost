@@ -1,0 +1,16 @@
+
+ Name                                           Monthly Qty  Unit           Monthly Cost 
+                                                                                         
+ aws_cloudwatch_metric_alarm.anomaly_detection                                           
+ └─ High resolution anomaly detection                     3  alarms                $0.90 
+                                                                                         
+ aws_cloudwatch_metric_alarm.expression                                                  
+ └─ Standard resolution                                   2  alarm metrics         $0.20 
+                                                                                         
+ aws_cloudwatch_metric_alarm.high                                                        
+ └─ High resolution                                       1  alarm metrics         $0.30 
+                                                                                         
+ aws_cloudwatch_metric_alarm.standard                                                    
+ └─ Standard resolution                                   1  alarm metrics         $0.10 
+                                                                                         
+ PROJECT TOTAL                                                                     $1.50 

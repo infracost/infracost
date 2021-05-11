@@ -1,0 +1,10 @@
+version: 0.1
+resource_usage:
+  aws_cloudwatch_log_group.logs_withUsage:
+    monthly_data_ingested_gb: 1000
+    storage_gb: 500
+    monthly_data_scanned_gb: 250
+  aws_cloudwatch_log_group.logs_count_withUsage[*]:
+    monthly_data_ingested_gb: 1000
+    storage_gb: 500
+    monthly_data_scanned_gb: 250

@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  aws_cloudwatch_event_bus.my_events_withUsage:
+    monthly_custom_events: 1000000
+    monthly_third_party_events: 2000000
+    monthly_archive_processing_gb: 100
+    archive_storage_gb: 200
+    monthly_schema_discovery_events: 1000000
