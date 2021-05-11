@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  aws_config_configuration_recorder.my_config_configuration_recorder_usage:
+    monthly_config_items: 1000
+    monthly_custom_config_items: 2000
