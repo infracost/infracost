@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  azurerm_postgresql_server.without_geo:
+    additional_backup_storage_gb: 2000
+  azurerm_postgresql_server.with_geo:
+    additional_backup_storage_gb: 3000
+    

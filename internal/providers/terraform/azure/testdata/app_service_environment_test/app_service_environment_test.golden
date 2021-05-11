@@ -1,0 +1,33 @@
+
+ Name                                        Monthly Qty  Unit   Monthly Cost 
+                                                                              
+ azurerm_app_service_environment.example_I1                                   
+ ├─ Stamp fee                                        730  hours       $991.34 
+ └─ Instance usage (I1)                              730  hours       $208.05 
+                                                                              
+ azurerm_app_service_environment.example_I2                                   
+ ├─ Stamp fee                                        730  hours       $991.34 
+ └─ Instance usage (I2)                              730  hours       $416.10 
+                                                                              
+ azurerm_app_service_environment.linux_I1                                     
+ ├─ Stamp fee                                        730  hours       $991.34 
+ └─ Instance usage (I1)                              730  hours       $208.05 
+                                                                              
+ azurerm_app_service_environment.linux_I2                                     
+ ├─ Stamp fee                                        730  hours       $991.34 
+ └─ Instance usage (I2)                              730  hours       $416.10 
+                                                                              
+ azurerm_app_service_environment.windows_I1                                   
+ ├─ Stamp fee                                        730  hours       $991.34 
+ └─ Instance usage (I1)                              730  hours       $208.05 
+                                                                              
+ azurerm_app_service_environment.windows_I2                                   
+ ├─ Stamp fee                                        730  hours       $991.34 
+ └─ Instance usage (I2)                              730  hours       $416.10 
+                                                                              
+ PROJECT TOTAL                                                      $7,820.49 
+
+----------------------------------
+1 resource type wasn't estimated as it's not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_subnet
