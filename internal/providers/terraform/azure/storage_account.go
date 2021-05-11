@@ -68,10 +68,6 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 		skuName = fmt.Sprintf("%s %s", accountTier, accountReplicationType)
 	}
 
-	if accountReplicationType == "RA-GRS" {
-		accountReplicationType = "GRS"
-	}
-
 	if u != nil && u.Get("storage_gb").Exists() {
 		capacity = decimalPtr(decimal.NewFromInt(u.Get("storage_gb").Int()))
 
