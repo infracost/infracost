@@ -1,0 +1,23 @@
+
+ Name                                Monthly Qty  Unit        Monthly Cost 
+                                                                           
+ azurerm_app_service_plan.elastic                                          
+ └─ Instance usage (EP2)                     730  hours              $0.00 
+                                                                           
+ azurerm_app_service_plan.funcApp                                          
+ └─ Instance usage (EP2)                     730  hours              $0.00 
+                                                                           
+ azurerm_function_app.my_functions                                         
+ ├─ vCPU                                   2,920  vCPU-hours       $505.16 
+ └─ Memory                                10,220  GB-hours         $125.71 
+                                                                           
+ azurerm_function_app.my_functions1                                        
+ ├─ Execution time                         46.72  GB Seconds         $0.00 
+ └─ Executions                            10,000  requests           $0.02 
+                                                                           
+ PROJECT TOTAL                                                     $630.89 
+
+----------------------------------
+1 resource type wasn't estimated as it's not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_storage_account
