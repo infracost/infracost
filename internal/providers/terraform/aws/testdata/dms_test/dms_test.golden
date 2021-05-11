@@ -1,0 +1,12 @@
+
+ Name                                                                         Monthly Qty  Unit       Monthly Cost 
+                                                                                                                   
+ aws_dms_replication_instance.my_dms_replication_instance_multi_high_storage                                       
+ ├─ Instance (t2.micro)                                                               730  hours            $26.28 
+ └─ Storage (general purpose SSD, gp2)                                                 20  GB-months         $4.60 
+                                                                                                                   
+ aws_dms_replication_instance.my_dms_replication_instance_single_low_storage                                       
+ ├─ Instance (t2.micro)                                                               730  hours            $13.14 
+ └─ Storage (general purpose SSD, gp2)                                                  0  GB-months         $0.00 
+                                                                                                                   
+ PROJECT TOTAL                                                                                              $44.02 
