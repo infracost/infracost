@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_elb.my_elb:
+    monthly_data_processed_gb: 10000

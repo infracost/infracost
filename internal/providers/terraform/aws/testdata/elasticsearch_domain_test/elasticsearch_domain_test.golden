@@ -1,0 +1,19 @@
+
+ Name                                                                Monthly Qty  Unit         Monthly Cost 
+                                                                                                            
+ aws_elasticsearch_domain.gp2                                                                               
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                         2,190  hours           $1,285.53 
+ ├─ Storage (gp2)                                                            400  GB-months          $54.00 
+ ├─ Dedicated master (on-demand, c4.8xlarge.elasticsearch)                   730  hours           $1,713.31 
+ └─ UltraWarm instance (on-demand, ultrawarm1.medium.elasticsearch)        1,460  hours             $347.48 
+                                                                                                            
+ aws_elasticsearch_domain.io1                                                                               
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                         2,190  hours           $1,285.53 
+ ├─ Storage (io1)                                                          1,000  GB-months         $169.00 
+ └─ Storage IOPS (io1)                                                        10  IOPS-months         $0.88 
+                                                                                                            
+ aws_elasticsearch_domain.std                                                                               
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                         2,190  hours           $1,285.53 
+ └─ Storage (standard)                                                       123  GB-months           $8.24 
+                                                                                                            
+ PROJECT TOTAL                                                                                    $6,149.50 

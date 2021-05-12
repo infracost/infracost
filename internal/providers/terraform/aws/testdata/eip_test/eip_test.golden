@@ -1,0 +1,7 @@
+
+ Name                       Monthly Qty  Unit   Monthly Cost 
+                                                             
+ aws_eip.eip1                                                
+ └─ IP address (if unused)          730  hours         $3.65 
+                                                             
+ PROJECT TOTAL                                         $3.65 
