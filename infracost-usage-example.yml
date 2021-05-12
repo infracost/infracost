@@ -178,6 +178,10 @@ resource_usage:
   aws_nat_gateway.my_nat_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
+  aws_mq_broker.my_aws_mq_broker:
+    nodes_count: 3        # The number of nodes in the cluster.
+    storage_size_gb: 12   # The monthly data storage size in GB.
+
   aws_rds_cluster.my_cluster:
     capacity_units_per_hr: 50          # Number of aurora capacity units per hour. Only used when engine_mode is "serverless"
     storage_gb: 200                    # Storage amount in GB allocated to the aurora cluster.

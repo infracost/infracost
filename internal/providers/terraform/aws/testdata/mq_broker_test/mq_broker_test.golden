@@ -1,0 +1,23 @@
+
+ Name                                                      Monthly Qty  Unit            Monthly Cost 
+                                                                                                     
+ aws_mq_broker.my_aws_mq_broker_activemq                                                             
+ ├─ Instance (ActiveMQ, mq.t2.micro)                               730  hours                 $21.90 
+ └─ Storage (ActiveMQ, Single-AZ)                        Cost depends on usage: $0.10 per GB-months  
+                                                                                                     
+ aws_mq_broker.my_aws_mq_broker_activemq_single                                                      
+ ├─ Instance (ActiveMQ, mq.t2.micro)                               730  hours                 $21.90 
+ └─ Storage (ActiveMQ, Single-AZ)                                    7  GB-months              $0.70 
+                                                                                                     
+ aws_mq_broker.my_aws_mq_broker_activemq_single_standby                                              
+ ├─ Instance (ActiveMQ, mq.m5.large)                               730  hours                $420.48 
+ └─ Storage (ActiveMQ, Multi-AZ)                                     3  GB-months              $0.90 
+                                                                                                     
+ aws_mq_broker.my_aws_mq_broker_rabbitmq_cluster                                                     
+ ├─ Instance (RabbitMQ, mq.m5.xlarge)                            2,190  hours              $1,261.44 
+ └─ Storage (RabbitMQ, Single-AZ)                                    0  GB-months              $0.00 
+                                                                                                     
+ PROJECT TOTAL                                                                             $1,727.32 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
