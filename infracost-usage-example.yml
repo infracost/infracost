@@ -472,12 +472,12 @@ resource_usage:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 
   azurerm_key_vault_key.my_keys:
-    monthly_secrets_operations: 10000 # Monthly number of secrets transactions
-    monthly_certificate_renewal_requests: 100 # Monthly number of certificate reneval requests
-    monthly_certificate_all_other_operations: 100000 # Monthly number of all other certificate transactions
-    monthly_key_rotation_renewals: 50 # Monthly number of Managed Azure Storage account key rotation renewals
-    monthly_protected_keys_operations: 1000000 # Monthly number of Software or HSM transactions
-    hsm_protected_keys: 3000
+    monthly_secrets_operations: 10000 # Monthly number of secrets transactions.
+    monthly_certificate_renewal_requests: 100 # Monthly number of certificate reneval requests.
+    monthly_certificate_all_other_operations: 100000 # Monthly number of all other certificate transactions.
+    monthly_key_rotation_renewals: 50 # Monthly number of Managed Azure Storage account key rotation renewals.
+    monthly_protected_keys_operations: 1000000 # Monthly number of Software or HSM transactions.
+    hsm_protected_keys: 3000 # Number of protected keys.
 
   azurerm_linux_virtual_machine_scale_set.standard_f2:
     instances: 10 # Override the number of instances in the scale set.
