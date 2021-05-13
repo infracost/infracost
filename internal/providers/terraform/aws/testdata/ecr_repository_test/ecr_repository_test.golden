@@ -1,0 +1,7 @@
+
+ Name                     Monthly Qty  Unit       Monthly Cost 
+                                                               
+ aws_ecr_repository.repo                                       
+ └─ Storage                         1  GB-months         $0.10 
+                                                               
+ PROJECT TOTAL                                           $0.10 

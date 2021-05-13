@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_ecr_repository.repo:
+    storage_gb: 1
