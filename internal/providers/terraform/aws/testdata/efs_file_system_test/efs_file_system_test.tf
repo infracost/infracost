@@ -21,3 +21,5 @@ resource "aws_efs_file_system" "provisioned" {
   provisioned_throughput_in_mibps = 100
   throughput_mode = "provisioned"
 }
+
+resource "aws_efs_file_system" "no_usage" {}

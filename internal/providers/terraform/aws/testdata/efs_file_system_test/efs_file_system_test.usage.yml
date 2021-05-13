@@ -9,3 +9,4 @@ resource_usage:
     monthly_infrequent_access_write_gb: 100
   aws_efs_file_system.provisioned:
     storage_gb: 230
+    
