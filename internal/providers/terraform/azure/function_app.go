@@ -1,7 +1,6 @@
 package azure
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -20,36 +19,34 @@ func GetAzureRMAppFunctionRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAppFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	meterNameCPU := "vCPU Duration"
-	meterNameMemory := "Memory Duration"
-	meterNameExecTime := "Execution Time"
-	meterNameExecutions := "Total Executions"
-	memorySize := 1.0
-	executionTime := 1.1
-	executions := 1.1
-	kind := "kind"
-	skuTier := "tier"
-	skuSize := "EP"
-	skuMemory := 3.0
-	skuCPU := 1
-	instances := 1.0
-	location := "someus"
+	var memorySize *decimal.Decimal
+	var instances *decimal.Decimal
+	var executionTime *decimal.Decimal
+	var executions *decimal.Decimal
+	var skuMemory *decimal.Decimal
+	var skuCPU *decimal.Decimal
+	var instMulCPU *decimal.Decimal
+	var instMulMemory *decimal.Decimal
+	var execTimeMulMemorySize *decimal.Decimal
 
-	if d.Get("location").Type != gjson.Null {
-		location = d.Get("location").String()
-	}
+	var multiplicationForExecTime decimal.Decimal
+	var multiplicationForCPU decimal.Decimal
+	var multiplicationForMemory decimal.Decimal
+
+	kind := "Windows"
+	location := d.Get("location").String()
+
 	if u != nil && u.Get("monthly_executions").Type != gjson.Null {
-		executions = u.Get("monthly_executions").Float()
+		executions = decimalPtr(decimal.NewFromFloat(u.Get("monthly_executions").Float()))
 	}
-	if u != nil && u.Get("execution_duration_ms").Type != gjson.Null {
-		executionTime = u.Get("execution_duration_ms").Float() / 1000
-		fmt.Println(executionTime)
-	}
-	if u != nil && u.Get("memory_mb").Type != gjson.Null {
-		memorySize = u.Get("memory_mb").Float() / 1000
+	if u != nil && u.Get("execution_duration_ms").Type != gjson.Null && u.Get("memory_mb").Type != gjson.Null {
+		memorySize = decimalPtr(decimal.NewFromFloat(u.Get("memory_mb").Float() / 1000))
+		executionTime = decimalPtr(decimal.NewFromFloat(u.Get("execution_duration_ms").Float() / 1000))
+		multiplicationForExecTime = executionTime.Mul(*memorySize)
+		execTimeMulMemorySize = &multiplicationForExecTime
 	}
 
-	skuMapCPU := map[string]int{
+	skuMapCPU := map[string]int64{
 		"EP1": 1,
 		"EP2": 2,
 		"EP3": 4,
@@ -61,35 +58,37 @@ func NewAzureRMAppFunction(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 
 	appServicePlanID := d.References("app_service_plan_id")
+	skuTier := strings.ToLower(appServicePlanID[0].Get("sku.0.tier").String())
+	skuSize := appServicePlanID[0].Get("sku.0.size").String()
 
 	if len(appServicePlanID) > 0 {
 		kind = strings.ToLower(appServicePlanID[0].Get("kind").String())
-		skuTier = strings.ToLower(appServicePlanID[0].Get("sku.0.tier").String())
-	}
-	if appServicePlanID[0].Get("sku.0.size").Type != gjson.Null {
-		skuSize = appServicePlanID[0].Get("sku.0.size").String()
 	}
 
 	if val, ok := skuMapCPU[skuSize]; ok {
-		skuCPU = val
+		skuCPU = decimalPtr(decimal.NewFromInt(val))
 	}
 	if val, ok := skuMapMemory[skuSize]; ok {
-		skuMemory = val
+		skuMemory = decimalPtr(decimal.NewFromFloat(val))
 	}
 
 	if u != nil && u.Get("instances").Type != gjson.Null {
-		instances = u.Get("instances").Float()
+		instances = decimalPtr(decimal.NewFromFloat(u.Get("instances").Float()))
+		multiplicationForCPU = instances.Mul(*skuCPU)
+		multiplicationForMemory = instances.Mul(*skuMemory)
+		instMulCPU = &multiplicationForCPU
+		instMulMemory = &multiplicationForMemory
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
 
 	if kind == "elastic" || skuTier == "elasticpremium" {
-		costComponents = append(costComponents, AppFunctionPremiumCPUCostComponent(instances, skuCPU, location, meterNameCPU))
-		costComponents = append(costComponents, AppFunctionPremiumMemoryCostComponent(instances, skuMemory, location, meterNameMemory))
+		costComponents = append(costComponents, AppFunctionPremiumCPUCostComponent(instMulCPU, location))
+		costComponents = append(costComponents, AppFunctionPremiumMemoryCostComponent(instMulMemory, location))
 	}
 	if kind == "functionapp" {
-		costComponents = append(costComponents, AppFunctionConsumptionExecutionTimeCostComponent(executions, executionTime, memorySize, location, meterNameExecTime))
-		costComponents = append(costComponents, AppFunctionConsumptionExecutionsCostComponent(executions, location, meterNameExecutions))
+		costComponents = append(costComponents, AppFunctionConsumptionExecutionTimeCostComponent(execTimeMulMemorySize, location))
+		costComponents = append(costComponents, AppFunctionConsumptionExecutionsCostComponent(executions, location))
 	}
 
 	return &schema.Resource{
@@ -98,21 +97,21 @@ func NewAzureRMAppFunction(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 }
 
-func AppFunctionPremiumCPUCostComponent(instances float64, skuCPU int, location, meterName string) *schema.CostComponent {
+func AppFunctionPremiumCPUCostComponent(instMulCPU *decimal.Decimal, location string) *schema.CostComponent {
 
 	return &schema.CostComponent{
 
 		Name:           "vCPU",
 		Unit:           "vCPU-hours",
 		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(decimal.NewFromFloat(instances * float64(skuCPU))),
+		HourlyQuantity: instMulCPU,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(location),
 			Service:       strPtr("Functions"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr(meterName)},
+				{Key: "meterName", Value: strPtr("vCPU Duration")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -121,20 +120,20 @@ func AppFunctionPremiumCPUCostComponent(instances float64, skuCPU int, location,
 	}
 
 }
-func AppFunctionPremiumMemoryCostComponent(instances, skuMemory float64, location, meterName string) *schema.CostComponent {
+func AppFunctionPremiumMemoryCostComponent(instMulMemory *decimal.Decimal, location string) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:           "Memory",
 		Unit:           "GB-hours",
 		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(decimal.NewFromFloat(instances * skuMemory)),
+		HourlyQuantity: instMulMemory,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(location),
 			Service:       strPtr("Functions"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr(meterName)},
+				{Key: "meterName", Value: strPtr("Memory Duration")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -142,47 +141,49 @@ func AppFunctionPremiumMemoryCostComponent(instances, skuMemory float64, locatio
 		},
 	}
 }
-func AppFunctionConsumptionExecutionTimeCostComponent(executions, executionTime float64, memorySize float64, location, meterName string) *schema.CostComponent {
+func AppFunctionConsumptionExecutionTimeCostComponent(execTimeMulMemorySize *decimal.Decimal, location string) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:           "Execution time",
-		Unit:           "GB Seconds",
+		Unit:           "GB-Seconds",
 		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(decimal.NewFromFloat(executionTime * memorySize)),
+		HourlyQuantity: execTimeMulMemorySize,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(location),
 			Service:       strPtr("Functions"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr(meterName)},
+				{Key: "meterName", Value: strPtr("Execution Time")},
 				{Key: "skuName", Value: strPtr("Standard")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("Consumption"),
+			PurchaseOption:   strPtr("Consumption"),
+			StartUsageAmount: strPtr("400000"),
 		},
 	}
 }
-func AppFunctionConsumptionExecutionsCostComponent(executions float64, location, meterName string) *schema.CostComponent {
+func AppFunctionConsumptionExecutionsCostComponent(executions *decimal.Decimal, location string) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            "Executions",
-		Unit:            "requests",
-		UnitMultiplier:  1,
-		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(executions / 10)),
+		Unit:            "1M requests",
+		UnitMultiplier:  100000,
+		MonthlyQuantity: executions,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(location),
 			Service:       strPtr("Functions"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr(meterName)},
+				{Key: "meterName", Value: strPtr("Total Executions")},
 				{Key: "skuName", Value: strPtr("Standard")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("Consumption"),
+			PurchaseOption:   strPtr("Consumption"),
+			StartUsageAmount: strPtr("100000"),
 		},
 	}
 }

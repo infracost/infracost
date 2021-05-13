@@ -11,3 +11,4 @@ resource_usage:
         execution_duration_ms: 500 
         memory_mb: 128 
         instances: 2 
+    
