@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -18,16 +19,16 @@ func NewMQBroker(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	engine := d.Get("engine_type").String()
 	instanceType := d.Get("host_instance_type").String()
+	storageType := "efs"
+	if d.Get("storage_type").Exists() {
+		storageType = d.Get("storage_type").String()
+	}
 	deploymentMode := d.Get("deployment_mode").String()
-	isActiveStandby := false
-	if deploymentMode == "ACTIVE_STANDBY_MULTI_AZ" {
-		isActiveStandby = true
+	isMultiAZ := false
+	if deploymentMode == "ACTIVE_STANDBY_MULTI_AZ" || deploymentMode == "CLUSTER_MULTI_AZ" {
+		isMultiAZ = true
 	}
 
-	nodesCount := decimalPtr(decimal.NewFromInt(1))
-	if u != nil && u.Get("nodes_count").Exists() {
-		nodesCount = decimalPtr(decimal.NewFromInt(u.Get("nodes_count").Int()))
-	}
 	var storageSizeGB *decimal.Decimal
 	if u != nil && u.Get("storage_size_gb").Exists() {
 		storageSizeGB = decimalPtr(decimal.NewFromInt(u.Get("storage_size_gb").Int()))
@@ -36,22 +37,22 @@ func NewMQBroker(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
-			instance(region, engine, instanceType, isActiveStandby, nodesCount),
-			storage(region, engine, isActiveStandby, storageSizeGB, nodesCount),
+			instance(region, engine, instanceType, isMultiAZ),
+			storage(region, engine, storageType, storageSizeGB),
 		},
 	}
 }
 
-func instance(region, engine, instanceType string, isActiveStandby bool, nodesCount *decimal.Decimal) *schema.CostComponent {
+func instance(region, engine, instanceType string, isMultiAZ bool) *schema.CostComponent {
 	deploymentOption := "Single-AZ"
-	if isActiveStandby {
+	if isMultiAZ {
 		deploymentOption = "Multi-AZ"
 	}
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance (%s, %s)", engine, instanceType),
+		Name:           fmt.Sprintf("Instance usage (%s, %s)", engine, instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
-		HourlyQuantity: nodesCount,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -66,26 +67,27 @@ func instance(region, engine, instanceType string, isActiveStandby bool, nodesCo
 	}
 }
 
-func storage(region, engine string, isActiveStandby bool, storageSizeGB, nodesCount *decimal.Decimal) *schema.CostComponent {
-	if storageSizeGB != nil {
-		freeSizeGB := decimal.NewFromInt(5)
-		storageSizeGB = decimalPtr(storageSizeGB.Sub(freeSizeGB))
-		if storageSizeGB.LessThanOrEqual(decimal.Zero) {
-			storageSizeGB = decimalPtr(decimal.Zero)
-		}
-	}
-	var summedStorageSizeGB *decimal.Decimal
-	if storageSizeGB != nil {
-		summedStorageSizeGB = decimalPtr(storageSizeGB.Mul(*nodesCount))
-	}
+func storage(region, engine, storageType string, isMultiAZ bool, storageSizeGB *decimal.Decimal) *schema.CostComponent {
 
+	instancesCount := decimalPtr(decimal.NewFromInt(1))
+	if engine == "RabbitMQ" {
+		storageType = "ebs"
+		instancesCount = decimalPtr(decimal.NewFromInt(3))
+	} else if isMultiAZ {
+		instancesCount = decimalPtr(decimal.NewFromInt(3))
+	}
 	deploymentOption := "Single-AZ"
-	if isActiveStandby {
+	if storageType == "efs" {
 		deploymentOption = "Multi-AZ"
 	}
 
+	var summedStorageSizeGB *decimal.Decimal
+	if storageSizeGB != nil {
+		summedStorageSizeGB = decimalPtr(storageSizeGB.Mul(*instancesCount))
+	}
+
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Storage (%s, %s)", engine, deploymentOption),
+		Name:            fmt.Sprintf("Storage (%s, %s)", engine, strings.ToUpper(storageType)),
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: summedStorageSizeGB,

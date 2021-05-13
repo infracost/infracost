@@ -61,6 +61,7 @@ resource "aws_mq_broker" "my_aws_mq_broker_activemq_single" {
   engine_type        = "ActiveMQ"
   engine_version     = "5.15.9"
   host_instance_type = "mq.t2.micro"
+  storage_type       = "ebs"
   security_groups    = [aws_security_group.my_aws_security_group.id]
   deployment_mode    = "SINGLE_INSTANCE"
 
@@ -81,6 +82,7 @@ resource "aws_mq_broker" "my_aws_mq_broker_activemq_single_standby" {
   engine_type        = "ActiveMQ"
   engine_version     = "5.15.9"
   host_instance_type = "mq.m5.large"
+  storage_type       = "efs"
   security_groups    = [aws_security_group.my_aws_security_group.id]
   deployment_mode    = "ACTIVE_STANDBY_MULTI_AZ"
 
