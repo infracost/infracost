@@ -19,19 +19,8 @@ func GetAzureRMAppFunctionRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAppFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var memorySize *decimal.Decimal
-	var instances *decimal.Decimal
-	var executionTime *decimal.Decimal
-	var executions *decimal.Decimal
-	var skuMemory *decimal.Decimal
-	var skuCPU *decimal.Decimal
-	var instMulCPU *decimal.Decimal
-	var instMulMemory *decimal.Decimal
-	var execTimeMulMemorySize *decimal.Decimal
-
-	var multiplicationForExecTime decimal.Decimal
-	var multiplicationForCPU decimal.Decimal
-	var multiplicationForMemory decimal.Decimal
+	var memorySize, instances, executionTime, executions, skuMemory, skuCPU, instMulCPU, instMulMemory, execTimeMulMemorySize *decimal.Decimal
+	var multiplicationForExecTime, multiplicationForCPU, multiplicationForMemory decimal.Decimal
 
 	kind := "Windows"
 	location := d.Get("location").String()
