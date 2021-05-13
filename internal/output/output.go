@@ -14,13 +14,10 @@ import (
 var outputVersion = "0.1"
 
 type Root struct {
-	Version          string           `json:"version"`
-	Resources        []Resource       `json:"resources"`        // Keeping for backward compatibility.
-	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`  // Keeping for backward compatibility.
-	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"` // Keeping for backward compatibility.
-	Projects         []Project        `json:"projects"`
-	TimeGenerated    time.Time        `json:"timeGenerated"`
-	Summary          *Summary         `json:"summary"`
+	Version       string    `json:"version"`
+	Projects      []Project `json:"projects"`
+	TimeGenerated time.Time `json:"timeGenerated"`
+	Summary       *Summary  `json:"summary"`
 }
 
 type Project struct {
@@ -147,10 +144,8 @@ func outputResource(r *schema.Resource) Resource {
 }
 
 func ToOutputFormat(projects []*schema.Project) Root {
-	var totalMonthlyCost, totalHourlyCost *decimal.Decimal
 
 	outProjects := make([]Project, 0, len(projects))
-	outResources := make([]Resource, 0)
 
 	for _, project := range projects {
 		var pastBreakdown, breakdown, diff *Breakdown
@@ -160,27 +155,6 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		if project.HasDiff {
 			pastBreakdown = outputBreakdown(project.PastResources)
 			diff = outputBreakdown(project.Diff)
-		}
-
-		// Backward compatibility
-		if breakdown != nil {
-			outResources = append(outResources, breakdown.Resources...)
-		}
-
-		if breakdown != nil && breakdown.TotalHourlyCost != nil {
-			if totalHourlyCost == nil {
-				totalHourlyCost = decimalPtr(decimal.Zero)
-			}
-
-			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*breakdown.TotalHourlyCost))
-		}
-
-		if breakdown != nil && breakdown.TotalMonthlyCost != nil {
-			if totalMonthlyCost == nil {
-				totalMonthlyCost = decimalPtr(decimal.Zero)
-			}
-
-			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*breakdown.TotalMonthlyCost))
 		}
 
 		outProjects = append(outProjects, Project{
@@ -196,16 +170,11 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		OnlyFields: []string{"UnsupportedResourceCounts"},
 	})
 
-	sortResources(outResources, "")
-
 	out := Root{
-		Version:          outputVersion,
-		Resources:        outResources,
-		TotalHourlyCost:  totalHourlyCost,
-		TotalMonthlyCost: totalMonthlyCost,
-		Projects:         outProjects,
-		TimeGenerated:    time.Now(),
-		Summary:          resourceSummary,
+		Version:       outputVersion,
+		Projects:      outProjects,
+		TimeGenerated: time.Now(),
+		Summary:       resourceSummary,
 	}
 
 	return out

@@ -3,8 +3,6 @@ package output
 import (
 	"encoding/json"
 	"time"
-
-	"github.com/shopspring/decimal"
 )
 
 type ReportInput struct {
@@ -21,9 +19,6 @@ func Load(data []byte) (Root, error) {
 func Combine(inputs []ReportInput, opts Options) Root {
 	var combined Root
 
-	var totalHourlyCost *decimal.Decimal
-	var totalMonthlyCost *decimal.Decimal
-
 	projects := make([]Project, 0)
 	summaries := make([]*Summary, 0, len(inputs))
 
@@ -31,41 +26,11 @@ func Combine(inputs []ReportInput, opts Options) Root {
 
 		projects = append(projects, input.Root.Projects...)
 
-		for _, r := range input.Root.Resources {
-			for k, v := range input.Metadata {
-				if r.Metadata == nil {
-					r.Metadata = make(map[string]string)
-				}
-				r.Metadata[k] = v
-			}
-
-			combined.Resources = append(combined.Resources, r)
-		}
-
-		if input.Root.TotalHourlyCost != nil {
-			if totalHourlyCost == nil {
-				totalHourlyCost = decimalPtr(decimal.Zero)
-			}
-
-			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*input.Root.TotalHourlyCost))
-		}
-		if input.Root.TotalMonthlyCost != nil {
-			if totalMonthlyCost == nil {
-				totalMonthlyCost = decimalPtr(decimal.Zero)
-			}
-
-			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*input.Root.TotalMonthlyCost))
-		}
-
 		summaries = append(summaries, input.Root.Summary)
 	}
 
-	sortResources(combined.Resources, opts.GroupKey)
-
 	combined.Version = outputVersion
 	combined.Projects = projects
-	combined.TotalHourlyCost = totalHourlyCost
-	combined.TotalMonthlyCost = totalMonthlyCost
 	combined.TimeGenerated = time.Now()
 	combined.Summary = combinedResourceSummaries(summaries)
 
