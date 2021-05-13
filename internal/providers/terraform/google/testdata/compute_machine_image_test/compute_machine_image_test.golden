@@ -1,0 +1,17 @@
+
+ Name                                                    Monthly Qty  Unit            Monthly Cost 
+                                                                                                   
+ google_compute_instance.vm                                                                        
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)            730  hours                 $24.46 
+ └─ Standard provisioned storage (pd-standard)                    10  GiB                    $0.40 
+                                                                                                   
+ google_compute_machine_image.image                                                                
+ └─ Storage                                            Cost depends on usage: $0.05 per GB-months  
+                                                                                                   
+ google_compute_machine_image.usage                                                                
+ └─ Storage                                                    5,000  GB-months            $250.00 
+                                                                                                   
+ PROJECT TOTAL                                                                             $274.86 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

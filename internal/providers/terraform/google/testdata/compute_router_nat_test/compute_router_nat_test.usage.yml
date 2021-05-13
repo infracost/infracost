@@ -1,0 +1,9 @@
+version: 0.1
+resource_usage:
+  google_compute_router_nat.nat:
+    assigned_vms: 4
+    monthly_data_processed_gb: 1000
+  google_compute_router_nat.over_32_vms:
+    assigned_vms: 32
+    monthly_data_processed_gb: 1000
+    

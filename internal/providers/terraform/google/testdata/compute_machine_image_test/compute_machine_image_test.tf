@@ -1,0 +1,36 @@
+provider "google-beta" {
+  credentials = "{\"type\":\"service_account\"}"
+  region = "us-central1"
+}
+
+provider "google" {
+  credentials = "{\"type\":\"service_account\"}"
+  region = "us-central1"
+}
+
+resource "google_compute_instance" "vm" {
+  name         = "vm"
+  machine_type = "e2-medium"
+
+  boot_disk {
+    initialize_params {
+      image = "fake"
+    }
+  }
+
+  network_interface {
+    network = "fake"
+  }
+}
+
+resource "google_compute_machine_image" "image" {
+  provider     		= "google-beta"
+  name            = "image"
+  source_instance = google_compute_instance.vm.self_link
+}
+
+resource "google_compute_machine_image" "usage" {
+  provider 				= "google-beta"
+  name            = "image"
+  source_instance = google_compute_instance.vm.self_link
+}

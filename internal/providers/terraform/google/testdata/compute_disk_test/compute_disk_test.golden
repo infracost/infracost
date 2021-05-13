@@ -1,0 +1,37 @@
+
+ Name                                           Monthly Qty  Unit       Monthly Cost 
+                                                                                     
+ google_compute_disk.image_disk_size                                                 
+ └─ Standard provisioned storage (pd-standard)           30  GiB               $1.20 
+                                                                                     
+ google_compute_disk.image_source_image                                              
+ └─ Standard provisioned storage (pd-standard)           30  GiB               $1.20 
+                                                                                     
+ google_compute_disk.image_source_snapshot                                           
+ └─ Standard provisioned storage (pd-standard)           20  GiB               $0.80 
+                                                                                     
+ google_compute_disk.size                                                            
+ └─ Standard provisioned storage (pd-standard)           20  GiB               $0.80 
+                                                                                     
+ google_compute_disk.snapshot_source_disk                                            
+ └─ Standard provisioned storage (pd-standard)           20  GiB               $0.80 
+                                                                                     
+ google_compute_disk.ssd_default                                                     
+ └─ SSD provisioned storage (pd-ssd)                    100  GiB              $17.00 
+                                                                                     
+ google_compute_disk.standard_default                                                
+ └─ Standard provisioned storage (pd-standard)          500  GiB              $20.00 
+                                                                                     
+ google_compute_image.image_disk_size                                                
+ └─ Storage                                              30  GB-months         $1.50 
+                                                                                     
+ google_compute_image.image_source_image                                             
+ └─ Storage                                              30  GB-months         $1.50 
+                                                                                     
+ google_compute_image.image_source_snapshot                                          
+ └─ Storage                                              20  GB-months         $1.00 
+                                                                                     
+ google_compute_snapshot.snapshot_source_disk                                        
+ └─ Storage                                              20  GB-months         $0.52 
+                                                                                     
+ PROJECT TOTAL                                                                $46.32 

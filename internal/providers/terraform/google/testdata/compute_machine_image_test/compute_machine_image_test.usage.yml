@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  google_compute_machine_image.usage:
+    storage_gb: 5000
+    

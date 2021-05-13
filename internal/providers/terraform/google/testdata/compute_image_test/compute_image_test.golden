@@ -1,0 +1,34 @@
+
+ Name                                             Monthly Qty  Unit            Monthly Cost 
+                                                                                            
+ google_compute_disk.disk                                                                   
+ └─ Standard provisioned storage (pd-standard)          1,000  GiB                   $40.00 
+                                                                                            
+ google_compute_image.empty                                                                 
+ └─ Storage                                     Cost depends on usage: $0.05 per GB-months  
+                                                                                            
+ google_compute_image.image                                                                 
+ └─ Storage                                               100  GB-months              $5.00 
+                                                                                            
+ google_compute_image.usage                                                                 
+ └─ Storage                                             1,000  GB-months             $50.00 
+                                                                                            
+ google_compute_image.with_disk_size                                                        
+ └─ Storage                                               500  GB-months             $25.00 
+                                                                                            
+ google_compute_image.with_source_disk                                                      
+ └─ Storage                                             1,000  GB-months             $50.00 
+                                                                                            
+ google_compute_image.with_source_image                                                     
+ └─ Storage                                               100  GB-months              $5.00 
+                                                                                            
+ google_compute_image.with_source_snapshot                                                  
+ └─ Storage                                             1,000  GB-months             $50.00 
+                                                                                            
+ google_compute_snapshot.snapshot                                                           
+ └─ Storage                                             1,000  GB-months             $26.00 
+                                                                                            
+ PROJECT TOTAL                                                                      $251.00 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

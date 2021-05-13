@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  google_cloudfunctions_function.my_function:
+    request_duration_ms:          240
+    monthly_function_invocations: 10000000
+    monthly_outbound_data_gb:     100
+    
