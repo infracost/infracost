@@ -1,0 +1,13 @@
+version: 0.1
+resource_usage:
+    azurerm_function_app.my_functions:
+        monthly_executions: 100000 
+        execution_duration_ms: 500 
+        memory_mb: 128 
+        instances: 2 
+
+    azurerm_function_app.my_functions1:
+        monthly_executions: 100000 
+        execution_duration_ms: 500 
+        memory_mb: 128 
+        instances: 2
