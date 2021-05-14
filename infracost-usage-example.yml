@@ -466,7 +466,11 @@ resource_usage:
   #
   azurerm_app_service_environment.my_service:
      operating_system: linux # Override the operating system of the instance, can be: linux, windows.
- 
+  
+  azurerm_container_registry.my_registry:
+     storage_gb: 150 # Total size of registry in GB.
+     monthly_build_vcpu_hrs: 150 # Monthly container build hours across all vCPUs.
+
   azurerm_linux_virtual_machine.my_linux_vm:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
