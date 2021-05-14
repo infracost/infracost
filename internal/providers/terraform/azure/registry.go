@@ -25,13 +25,18 @@ var FreeResources []string = []string{
 	"azurerm_resource_group",
 	"azurerm_resource_provider_registration",
 	"azurerm_subscription",
+	"azurerm_role_assignment",
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
 
 	// Azure Networking
 	"azurerm_application_security_group",
+	"azurerm_network_interface",
+	"azurerm_network_interface_security_group_association",
 	"azurerm_network_security_group",
+	"azurerm_subnet",
+	"azurerm_subnet_network_security_group_association",
 	"azurerm_virtual_network",
 
 	// Azure Policy
@@ -39,9 +44,9 @@ var FreeResources []string = []string{
 	"azurerm_policy_definition",
 	"azurerm_policy_remediation",
 	"azurerm_policy_set_definition",
+
+	// Azure Virtual Machines
+	"azurerm_virtual_machine_data_disk_attachment",
 }
 
 var UsageOnlyResources []string = []string{}
-
-// Other Notes:
-// Only Basic Load Balancers are free of charge
