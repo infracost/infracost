@@ -26,8 +26,3 @@
  └─ Instance usage (I2)                              730  hours       $416.10 
                                                                               
  PROJECT TOTAL                                                      $7,820.49 
-
-----------------------------------
-1 resource type wasn't estimated as it's not supported yet.
-Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
-1 x azurerm_subnet
