@@ -51,10 +51,8 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 	validPremiumReplicationTypes := []string{"ZRS", "LRS"}
 	validStandardReplicationTypes := []string{"LRS", "GRS", "RAGRS"}
 
-	if accessTier == "Premium" {
-		if !Contains(validPremiumReplicationTypes, accountReplicationType) || !Contains(validStandardReplicationTypes, accountReplicationType) {
-			log.Warnf("%s redundancy does not supports for %s performance tier", accountReplicationType, accountTier)
-		}
+	if accessTier == "Premium" && (!Contains(validPremiumReplicationTypes, accountReplicationType) || !Contains(validStandardReplicationTypes, accountReplicationType)) {
+		log.Warnf("%s redundancy does not supports for %s performance tier", accountReplicationType, accountTier)
 	}
 
 	var capacity, writeOperations, listOperations, readOperations, otherOperations, dataRetrieval, dataWrite, blobIndex *decimal.Decimal
@@ -75,12 +73,32 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			dataStorageTiers := []int{51200, 512000}
 			dataStorageQuantities := usage.CalculateTierBuckets(*capacity, dataStorageTiers)
 
-			costComponents = append(costComponents, blobDataStorageCostComponent(location, "Capacity (first 50TB)", skuName, "0", productName, &dataStorageQuantities[0]))
+			costComponents = append(costComponents, blobDataStorageCostComponent(
+				location,
+				"Capacity (first 50TB)",
+				skuName,
+				"0",
+				productName,
+				&dataStorageQuantities[0]))
+
 			if dataStorageQuantities[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, blobDataStorageCostComponent(location, "Capacity (next 450TB)", skuName, "51200", productName, &dataStorageQuantities[1]))
+				costComponents = append(costComponents, blobDataStorageCostComponent(
+					location,
+					"Capacity (next 450TB)",
+					skuName,
+					"51200",
+					productName,
+					&dataStorageQuantities[1]))
 			}
+
 			if dataStorageQuantities[2].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, blobDataStorageCostComponent(location, "Capacity (over 500TB)", skuName, "512000", productName, &dataStorageQuantities[2]))
+				costComponents = append(costComponents, blobDataStorageCostComponent(
+					location,
+					"Capacity (over 500TB)",
+					skuName,
+					"512000",
+					productName,
+					&dataStorageQuantities[2]))
 			}
 		} else {
 			costComponents = append(costComponents, blobDataStorageCostComponent(location, "Capacity", skuName, "0", productName, capacity))
@@ -94,45 +112,99 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 	if u != nil && u.Get("monthly_write_operations").Exists() {
 		writeOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_write_operations").Int()))
 	}
-	meterName := "/Write Operations$/"
-	costComponents = append(costComponents, blobOperationsCostComponent(location, "Write operations", "10K operations", skuName, meterName, productName, writeOperations, 10000))
+	costComponents = append(costComponents, blobOperationsCostComponent(
+		location,
+		"Write operations",
+		"10K operations",
+		skuName,
+		"/Write Operations$/",
+		productName,
+		writeOperations,
+		10000))
 
+	lccoSkuName := skuName
 	if u != nil && u.Get("monthly_list_and_create_container_operations").Exists() {
 		listOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_list_and_create_container_operations").Int()))
+
+		if skuName == "Hot RA-GRS" {
+			lccoSkuName = "Hot GRS"
+		}
 	}
-	meterName = "/List and Create Container Operations$/"
-	costComponents = append(costComponents, blobOperationsCostComponent(location, "List and create container operations", "10K operations", skuName, meterName, productName, listOperations, 10000))
+	costComponents = append(costComponents, blobOperationsCostComponent(
+		location,
+		"List and create container operations",
+		"10K operations",
+		lccoSkuName,
+		"/List and Create Container Operations$/",
+		productName,
+		listOperations,
+		10000))
 
 	if u != nil && u.Get("monthly_read_operations").Exists() {
 		readOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_read_operations").Int()))
 	}
-	meterName = "/Read Operations$/"
-	costComponents = append(costComponents, blobOperationsCostComponent(location, "Read operations", "10K operations", skuName, meterName, productName, readOperations, 10000))
+	costComponents = append(costComponents, blobOperationsCostComponent(
+		location,
+		"Read operations",
+		"10K operations",
+		skuName,
+		"/Read Operations$/",
+		productName,
+		readOperations,
+		10000))
 
 	if u != nil && u.Get("monthly_other_operations").Exists() {
 		otherOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_other_operations").Int()))
 	}
-	meterName = "/All Other Operations$/"
-	costComponents = append(costComponents, blobOperationsCostComponent(location, "All other operations", "10K operations", skuName, meterName, productName, otherOperations, 10000))
+	costComponents = append(costComponents, blobOperationsCostComponent(
+		location,
+		"All other operations",
+		"10K operations",
+		skuName,
+		"/All Other Operations$/",
+		productName,
+		otherOperations,
+		10000))
 
 	if accountTier != "Premium" {
 		if u != nil && u.Get("monthly_data_retrieval_gb").Exists() {
 			dataRetrieval = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_retrieval_gb").Int()))
 		}
-		meterName = "/Data Retrieval$/"
-		costComponents = append(costComponents, blobOperationsCostComponent(location, "Data retrieval", "GB", skuName, meterName, productName, dataRetrieval, 1))
+		costComponents = append(costComponents, blobOperationsCostComponent(
+			location,
+			"Data retrieval",
+			"GB",
+			skuName,
+			"/Data Retrieval$/",
+			productName,
+			dataRetrieval,
+			1))
 
 		if u != nil && u.Get("monthly_data_write_gb").Exists() {
 			dataWrite = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_write_gb").Int()))
 		}
-		meterName = "/Data Write$/"
-		costComponents = append(costComponents, blobOperationsCostComponent(location, "Data write", "GB", skuName, meterName, productName, dataWrite, 1))
+		costComponents = append(costComponents, blobOperationsCostComponent(
+			location,
+			"Data write",
+			"GB",
+			skuName,
+			"/Data Write$/",
+			productName,
+			dataWrite,
+			1))
 
 		if u != nil && u.Get("blob_index_tags").Exists() {
 			blobIndex = decimalPtr(decimal.NewFromInt(u.Get("blob_index_tags").Int()))
 		}
-		meterName = "/Index Tags$/"
-		costComponents = append(costComponents, blobOperationsCostComponent(location, "Blob index", "10K tags", skuName, meterName, productName, blobIndex, 10000))
+		costComponents = append(costComponents, blobOperationsCostComponent(
+			location,
+			"Blob index",
+			"10K tags",
+			skuName,
+			"/Index Tags$/",
+			productName,
+			blobIndex,
+			10000))
 	}
 
 	return &schema.Resource{
