@@ -1,0 +1,35 @@
+
+ Name                                           Monthly Qty  Unit            Monthly Cost 
+                                                                                          
+ azurerm_container_registry.basic                                                         
+ ├─ Registry usage (Basic)                               30  days                   $5.00 
+ ├─ Storage (over 10 GB)                                140  GB-months             $14.00 
+ └─ Build vCPU                                      540,000  seconds               $54.00 
+                                                                                          
+ azurerm_container_registry.my_registry                                                   
+ ├─ Geo replication (1 location)                         30  days                  $50.00 
+ ├─ Registry usage (Premium)                             30  days                  $50.00 
+ └─ Build vCPU                                      540,000  seconds               $54.00 
+                                                                                          
+ azurerm_container_registry.overStorage                                                   
+ ├─ Registry usage (Basic)                               30  days                   $5.00 
+ ├─ Storage (over 10 GB)                                540  GB-months             $54.00 
+ └─ Build vCPU                                      540,000  seconds               $54.00 
+                                                                                          
+ azurerm_container_registry.twoLocations                                                  
+ ├─ Geo replication (2 locations)                        60  days                 $100.00 
+ ├─ Registry usage (Premium)                             30  days                  $50.00 
+ └─ Build vCPU                                      540,000  seconds               $54.00 
+                                                                                          
+ azurerm_container_registry.withoutLocations                                              
+ ├─ Registry usage (Premium)                             30  days                  $50.00 
+ └─ Build vCPU                                      540,000  seconds               $54.00 
+                                                                                          
+ azurerm_container_registry.withoutUsage                                                  
+ ├─ Registry usage (Basic)                               30  days                   $5.00 
+ └─ Build vCPU                                Cost depends on usage: $0.0001 per seconds  
+                                                                                          
+ PROJECT TOTAL                                                                    $652.98 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

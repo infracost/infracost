@@ -17,6 +17,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServicePlanRegistryItem(),
 	GetAzureRMAppIsolatedServicePlanRegistryItem(),
 	GetAzureRMAppFunctionRegistryItem(),
+	GetAzureRMContainerRegistryRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -44,6 +45,11 @@ var FreeResources []string = []string{
 	"azurerm_policy_definition",
 	"azurerm_policy_remediation",
 	"azurerm_policy_set_definition",
+
+	// Azure Registry
+	"azurerm_container_registry_scope_map",
+	"azurerm_container_registry_token",
+	"azurerm_container_registry_webhook",
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
