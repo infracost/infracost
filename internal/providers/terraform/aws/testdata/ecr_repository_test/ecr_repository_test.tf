@@ -11,3 +11,7 @@ provider "aws" {
 resource "aws_ecr_repository" "repo" {
     name = "my-ecr-repo"
 }
+
+resource "aws_ecr_repository" "repo1" {
+    name = "my-ecr-repo"
+}
