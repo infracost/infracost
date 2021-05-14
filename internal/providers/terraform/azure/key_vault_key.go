@@ -1,7 +1,6 @@
 package azure
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -56,8 +55,8 @@ func NewAzureKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	meterName = "Certificate Renewal Request"
 	costComponents = append(costComponents, vaultKeysCostComponent("Certificate operations", location, "renewals", skuName, meterName, "0", certificateRenewals, 1))
 
-	if u != nil && u.Get("monthly_certificate_all_other_operations").Exists() {
-		certificateOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_certificate_all_other_operations").Int()))
+	if u != nil && u.Get("monthly_certificate_other_operations").Exists() {
+		certificateOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_certificate_other_operations").Int()))
 	}
 	meterName = "Operations"
 	costComponents = append(costComponents, vaultKeysCostComponent("Certificate operations", location, unit, skuName, meterName, "0", certificateOperations, 10000))
@@ -90,12 +89,10 @@ func NewAzureKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		var protectedKeys, hsmProtectedTransactions *decimal.Decimal
 
 		name := "HSM-protected keys"
-		keyUnit := "Per key per month"
+		keyUnit := "months"
 
 		if u != nil && u.Get("hsm_protected_keys").Exists() {
 			protectedKeys = decimalPtr(decimal.NewFromInt(u.Get("hsm_protected_keys").Int()))
-
-			fmt.Println(keyType, keySize)
 
 			if keyType == "RSA-HSM" && keySize == "2048" {
 				meterName = "Premium HSM-protected RSA 2048-bit key"
