@@ -1,0 +1,21 @@
+
+ Name                                    Monthly Qty  Unit              Monthly Cost 
+                                                                                     
+ aws_kms_key.kms                                                                     
+ ├─ Customer master key                            1  months                   $1.00 
+ ├─ Requests                          Cost depends on usage: $0.03 per 10k requests  
+ ├─ ECC GenerateDataKeyPair requests  Cost depends on usage: $0.10 per 10k requests  
+ └─ RSA GenerateDataKeyPair requests  Cost depends on usage: $0.10 per 10k requests  
+                                                                                     
+ aws_kms_key.rsa2048                                                                 
+ ├─ Customer master key                            1  months                   $1.00 
+ └─ Requests (RSA 2048)               Cost depends on usage: $0.03 per 10k requests  
+                                                                                     
+ aws_kms_key.rsa3072                                                                 
+ ├─ Customer master key                            1  months                   $1.00 
+ └─ Requests (asymmetric)             Cost depends on usage: $0.15 per 10k requests  
+                                                                                     
+ PROJECT TOTAL                                                                 $3.00 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
