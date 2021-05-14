@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_elasticache_cluster.redis_snapshot_usage:
+    snapshot_storage_size_gb: 10000

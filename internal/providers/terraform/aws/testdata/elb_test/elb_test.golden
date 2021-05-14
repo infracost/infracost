@@ -1,0 +1,15 @@
+
+ Name                      Monthly Qty  Unit         Monthly Cost 
+                                                                  
+ aws_elb.elb1                                                     
+ ├─ Classic load balancer          730  hours              $18.25 
+ └─ Data processed         Cost depends on usage: $0.008 per GB   
+                                                                  
+ aws_elb.my_elb                                                   
+ ├─ Classic load balancer          730  hours              $18.25 
+ └─ Data processed              10,000  GB                 $80.00 
+                                                                  
+ PROJECT TOTAL                                            $116.50 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

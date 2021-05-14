@@ -1,4 +1,4 @@
-package aws_test
+package azure_test
 
 import (
 	"testing"
@@ -6,11 +6,11 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
 
-func TestNewEFSFileSystemStandardStorage(t *testing.T) {
+func TestAzureRMAppFunctionGoldenFile(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "efs_file_system_test")
+	tftest.GoldenFileResourceTests(t, "function_app_test")
 }

@@ -1,0 +1,33 @@
+
+ Name                                    Monthly Qty  Unit                 Monthly Cost 
+                                                                                        
+ azurerm_app_service_plan.elastic                                                       
+ └─ Instance usage (EP2)                         730  hours                       $0.00 
+                                                                                        
+ azurerm_app_service_plan.funcApp                                                       
+ └─ Instance usage (EP2)                         730  hours                       $0.00 
+                                                                                        
+ azurerm_function_app.my_functions                                                      
+ ├─ vCPU                                       2,920  vCPU-hours                $505.16 
+ └─ Memory                                    10,220  GB-hours                  $125.71 
+                                                                                        
+ azurerm_function_app.my_functions1                                                     
+ ├─ Execution time                             46.72  GB-Seconds                  $0.00 
+ └─ Executions                                     1  100k 1M requests            $0.20 
+                                                                                        
+ azurerm_function_app.my_functions2                                                     
+ ├─ vCPU                             Cost depends on usage: $0.17 per vCPU-hours        
+ └─ Memory                           Cost depends on usage: $0.01 per GB-hours          
+                                                                                        
+ azurerm_function_app.my_functions3                                                     
+ ├─ Execution time                   Cost depends on usage: $0.000016 per GB-Seconds    
+ └─ Executions                       Cost depends on usage: $0.20 per 100k 1M requests  
+                                                                                        
+ PROJECT TOTAL                                                                  $631.07 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+
+1 resource type wasn't estimated as it's not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_storage_account

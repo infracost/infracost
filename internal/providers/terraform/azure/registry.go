@@ -17,6 +17,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServicePlanRegistryItem(),
 	GetAzureRMAppIsolatedServicePlanRegistryItem(),
 	GetAzureRMContainerRegistryRegistryItem(),
+	GetAzureRMAppFunctionRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -28,6 +29,11 @@ var FreeResources []string = []string{
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
+	
+	// Azure ContainerRegistry
+	"azurerm_container_registry_scope_map",
+	"azurerm_container_registry_token",
+	"azurerm_container_registry_webhook",
 
 	// Azure Container Registry
 	"azurerm_container_registry_scope_map",
