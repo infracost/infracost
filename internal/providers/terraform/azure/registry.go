@@ -30,7 +30,7 @@ var FreeResources []string = []string{
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
 	
-	// Azure Container Registry
+	// Azure ContainerRegistry
 	"azurerm_container_registry_scope_map",
 	"azurerm_container_registry_token",
 	"azurerm_container_registry_webhook",
