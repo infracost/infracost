@@ -1,0 +1,21 @@
+version: 0.1
+resource_usage:
+  azurerm_container_registry.my_registry:
+     storage_gb: 150 
+     monthly_build_vcpu_hrs: 150
+
+  azurerm_container_registry.twoLocations:
+     storage_gb: 150 
+     monthly_build_vcpu_hrs: 150   
+
+  azurerm_container_registry.withoutLocations:
+    storage_gb: 150 
+    monthly_build_vcpu_hrs: 150
+
+  azurerm_container_registry.basic:
+    storage_gb: 150 
+    monthly_build_vcpu_hrs: 150
+
+  azurerm_container_registry.overStorage:
+    storage_gb: 550 
+    monthly_build_vcpu_hrs: 150  
