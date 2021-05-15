@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -11,7 +10,6 @@ import (
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/mod/semver"
 )
@@ -38,20 +36,15 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFiles := []string{}
 
-			// Handle deprecated command name
-			if cmd.Name() == "report" {
-				inputFiles = args
-			} else {
-				if !cmd.Flags().Changed("path") {
-					m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to an Infracost JSON file.", ui.PrimaryString("--path"))
-					ui.PrintUsageErrorAndExit(cmd, m)
-				}
+			if !cmd.Flags().Changed("path") {
+				m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to an Infracost JSON file.", ui.PrimaryString("--path"))
+				ui.PrintUsageErrorAndExit(cmd, m)
+			}
 
-				paths, _ := cmd.Flags().GetStringArray("path")
-				for _, path := range paths {
-					matches, _ := filepath.Glob(path)
-					inputFiles = append(inputFiles, matches...)
-				}
+			paths, _ := cmd.Flags().GetStringArray("path")
+			for _, path := range paths {
+				matches, _ := filepath.Glob(path)
+				inputFiles = append(inputFiles, matches...)
 			}
 
 			inputs := make([]output.ReportInput, 0, len(inputFiles))
@@ -145,55 +138,6 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
-
-	return cmd
-}
-
-func reportCmd(cfg *config.Config) *cobra.Command {
-	cmd := outputCmd(cfg)
-	cmd.Use = "report"
-	cmd.Hidden = true
-	cmd.Long = "This command is deprecated and will be removed in v0.9.0. Please use `infracost output`."
-
-	cmd.PreRun = func(cmd *cobra.Command, args []string) {
-		msg := ui.WarningString("┌────────────────────────────────────────────────────────────────────────┐\n")
-		msg += fmt.Sprintf("%s %s %s     %s\n",
-			ui.WarningString("│"),
-			ui.WarningString("Warning:"),
-			"This command is deprecated and will be removed in v0.9.0.",
-			ui.WarningString("│"),
-		)
-
-		msg += fmt.Sprintf("%s %s %s                                            %s\n",
-			ui.WarningString("│"),
-			"Please use",
-			ui.PrimaryString("infracost output"),
-			ui.WarningString("│"),
-		)
-
-		msg += fmt.Sprintf("%s %s %s %s\n",
-			ui.WarningString("│"),
-			"Migration details:",
-			ui.LinkString("https://www.infracost.io/docs/guides/v0.8_migration"),
-			ui.WarningString("│"),
-		)
-		msg += ui.WarningString("└────────────────────────────────────────────────────────────────────────┘")
-
-		if cfg.IsLogging() {
-			for _, l := range strings.Split(ui.StripColor(msg), "\n") {
-				log.Warn(l)
-			}
-		} else {
-			fmt.Fprintln(os.Stderr, msg)
-		}
-
-		processDeprecatedEnvVars(cfg)
-		processDeprecatedFlags(cmd)
-	}
-
-	// Add deprecated flag
-	cmd.Flags().StringP("output", "o", "table", "Output format: json, table, html")
-	_ = cmd.Flags().MarkHidden("output")
 
 	return cmd
 }
