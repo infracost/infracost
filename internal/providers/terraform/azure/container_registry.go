@@ -24,7 +24,7 @@ func NewAzureRMContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *s
 	sku := "Classic"
 	location := d.Get("location").String()
 
-	if d.Get("sku").Exists() {
+	if d.Get("sku").Type != gjson.Null {
 		sku = d.Get("sku").String()
 	}
 
@@ -39,10 +39,10 @@ func NewAzureRMContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *s
 		includedStorage = decimalPtr(decimal.NewFromFloat(500))
 	}
 
-	if d.Get("georeplication_locations").Exists() {
+	if d.Get("georeplication_locations").Type != gjson.Null {
 		nambersOflocations = len(d.Get("georeplication_locations").Array())
 	}
-	if d.Get("georeplications").Exists() {
+	if d.Get("georeplications").Type != gjson.Null {
 		nambersOflocations = len(d.Get("georeplications.0.location").Array())
 	}
 
@@ -64,8 +64,12 @@ func NewAzureRMContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *s
 		if storageGb.GreaterThan(*includedStorage) {
 			overStorage = storageGb.Sub(*includedStorage)
 			storageGb = &overStorage
-			costComponents = append(costComponents, ContainerRegistryStorageCostComponent(fmt.Sprintf("Storage (over %s GB)", includedStorage), location, sku, storageGb))
+			costComponents = append(costComponents, ContainerRegistryStorageCostComponent(fmt.Sprintf("Storage (over %sGB)", includedStorage), location, sku, storageGb))
 		}
+	}
+
+	if u == nil {
+		costComponents = append(costComponents, ContainerRegistryStorageCostComponent(fmt.Sprintf("Storage (over %sGB)", includedStorage), location, sku, storageGb))
 	}
 
 	if u != nil && u.Get("monthly_build_vcpu_hrs").Type != gjson.Null {
