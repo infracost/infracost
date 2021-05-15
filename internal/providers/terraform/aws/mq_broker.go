@@ -73,11 +73,9 @@ func storage(region, engine, storageType string, isMultiAZ bool, storageSizeGB *
 	if engine == "RabbitMQ" {
 		storageType = "ebs"
 		instancesCount = decimalPtr(decimal.NewFromInt(3))
-	} else {
+	} else if isMultiAZ {
 		// ActiveMQ
-		if isMultiAZ {
-			instancesCount = decimalPtr(decimal.NewFromInt(2))
-		}
+		instancesCount = decimalPtr(decimal.NewFromInt(2))
 	}
 	deploymentOption := "Single-AZ"
 	if engine != "RabbitMQ" && storageType == "efs" {
