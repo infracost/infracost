@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"os"
 	"runtime/debug"
-	"strings"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/events"
-	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
@@ -70,59 +68,11 @@ func main() {
 
 			return loadGlobalFlags(cfg, cmd)
 		},
-		PreRun: func(cmd *cobra.Command, args []string) {
-			// If there's no args and the current dir isn't a Terraform dir show the help
-			cwd, err := os.Getwd()
-			if err == nil && len(cfg.Environment.Flags) == 0 && !terraform.IsTerraformDir(cwd) {
-				_ = cmd.Help()
-				os.Exit(0)
-			}
-
-			// Print the deprecation warnings
-			msg := ui.WarningString("┌────────────────────────────────────────────────────────────────────────┐\n")
-			msg += fmt.Sprintf("%s %s %s %s\n",
-				ui.WarningString("│"),
-				ui.WarningString("Warning:"),
-				"The root command is deprecated and will be removed in v0.9.0.",
-				ui.WarningString("│"),
-			)
-
-			msg += fmt.Sprintf("%s %s %s                                         %s\n",
-				ui.WarningString("│"),
-				"Please use",
-				ui.PrimaryString("infracost breakdown"),
-				ui.WarningString("│"),
-			)
-
-			msg += fmt.Sprintf("%s %s %s %s\n",
-				ui.WarningString("│"),
-				"Migration details:",
-				ui.LinkString("https://www.infracost.io/docs/guides/v0.8_migration"),
-				ui.WarningString("│"),
-			)
-			msg += ui.WarningString("└────────────────────────────────────────────────────────────────────────┘")
-
-			if cfg.IsLogging() {
-				for _, l := range strings.Split(ui.StripColor(msg), "\n") {
-					log.Warn(l)
-				}
-			} else {
-				fmt.Fprintln(os.Stderr, msg)
-			}
-
-			processDeprecatedEnvVars(cfg)
-			processDeprecatedFlags(cmd)
-
-			fmt.Fprintln(os.Stderr, "")
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// The root command will be deprecated
-			return breakdownCmd(cfg).RunE(cmd, args)
+			// Show the help
+			return cmd.Help()
 		},
 	}
-
-	// Add deprecated flags since the root command is deprecated
-	addRootDeprecatedFlags(rootCmd)
 
 	rootCmd.PersistentFlags().Bool("no-color", false, "Turn off colored output")
 	rootCmd.PersistentFlags().String("log-level", "", "Log level (trace, debug, info, warn, error, fatal)")
@@ -131,7 +81,6 @@ func main() {
 	rootCmd.AddCommand(diffCmd(cfg))
 	rootCmd.AddCommand(breakdownCmd(cfg))
 	rootCmd.AddCommand(outputCmd(cfg))
-	rootCmd.AddCommand(reportCmd(cfg))
 
 	rootCmd.SetUsageTemplate(fmt.Sprintf(`%s{{if .Runnable}}
   {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}
