@@ -37,19 +37,19 @@ func NewMQBroker(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
-			instance(region, engine, instanceType, isMultiAZ),
-			storage(region, engine, storageType, storageSizeGB),
+			instance(region, engine, instanceType, deploymentMode, isMultiAZ),
+			storage(region, engine, storageType, isMultiAZ, storageSizeGB),
 		},
 	}
 }
 
-func instance(region, engine, instanceType string, isMultiAZ bool) *schema.CostComponent {
+func instance(region, engine, instanceType, deploymentMode string, isMultiAZ bool) *schema.CostComponent {
 	deploymentOption := "Single-AZ"
 	if isMultiAZ {
 		deploymentOption = "Multi-AZ"
 	}
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s)", engine, instanceType),
+		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", engine, instanceType, deploymentMode),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -73,11 +73,14 @@ func storage(region, engine, storageType string, isMultiAZ bool, storageSizeGB *
 	if engine == "RabbitMQ" {
 		storageType = "ebs"
 		instancesCount = decimalPtr(decimal.NewFromInt(3))
-	} else if isMultiAZ {
-		instancesCount = decimalPtr(decimal.NewFromInt(3))
+	} else {
+		// ActiveMQ
+		if isMultiAZ {
+			instancesCount = decimalPtr(decimal.NewFromInt(2))
+		}
 	}
 	deploymentOption := "Single-AZ"
-	if storageType == "efs" {
+	if engine != "RabbitMQ" && storageType == "efs" {
 		deploymentOption = "Multi-AZ"
 	}
 
@@ -86,7 +89,7 @@ func storage(region, engine, storageType string, isMultiAZ bool, storageSizeGB *
 		summedStorageSizeGB = decimalPtr(storageSizeGB.Mul(*instancesCount))
 	}
 
-	return &schema.CostComponent{
+	costComponent := &schema.CostComponent{
 		Name:            fmt.Sprintf("Storage (%s, %s)", engine, strings.ToUpper(storageType)),
 		Unit:            "GB-months",
 		UnitMultiplier:  1,
@@ -100,8 +103,12 @@ func storage(region, engine, storageType string, isMultiAZ bool, storageSizeGB *
 				{Key: "deploymentOption", Value: strPtr(deploymentOption)},
 			},
 		},
-		PriceFilter: &schema.PriceFilter{
-			DescriptionRegex: strPtr(fmt.Sprintf("/%s/", engine)),
-		},
 	}
+	if engine == "RabbitMQ" {
+		costComponent.ProductFilter.AttributeFilters = append(costComponent.ProductFilter.AttributeFilters, &schema.AttributeFilter{
+			Key:        "usagetype",
+			ValueRegex: strPtr("/RabbitMQ/"),
+		})
+	}
+	return costComponent
 }

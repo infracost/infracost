@@ -179,7 +179,6 @@ resource_usage:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
   aws_mq_broker.my_aws_mq_broker:
-    instances: 3          # Number of instances in the cluster.
     storage_size_gb: 12   # Data storage per instance in GB.
 
   aws_rds_cluster.my_cluster:
