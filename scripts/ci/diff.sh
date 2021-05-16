@@ -234,9 +234,9 @@ load_github_env () {
 
   if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
     GITHUB_SHA=$(echo $github_event | jq -r .pull_request.head.sha)
-    export GITHUB_PR_URL=$(echo $github_event | jq -r .pull_request.html_url)
+    export VCS_PULL_REQUEST_URL=$(echo $github_event | jq -r .pull_request.html_url)
   else
-    export GITHUB_PR_URL=$(curl -s \
+    export VCS_PULL_REQUEST_URL=$(curl -s \
       -H "Accept: application/vnd.github.groot-preview+json" \
       -H "Authorization: token $GITHUB_TOKEN" \
       $GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls \
@@ -250,7 +250,7 @@ load_gitlab_env () {
   first_mr=$(echo $CI_OPEN_MERGE_REQUESTS | cut -d',' -f1)
   repo=$(echo $first_mr | cut -d'!' -f1)
   mr_number=$(echo $first_mr | cut -d'!' -f2)
-  export GITLAB_PR_URL=$CI_SERVER_URL/$repo/merge_requests/$mr_number
+  export VCS_PULL_REQUEST_URL=$CI_SERVER_URL/$repo/merge_requests/$mr_number
 }
 
 load_circle_ci_env () {

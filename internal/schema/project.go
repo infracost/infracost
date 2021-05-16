@@ -3,8 +3,14 @@ package schema
 import (
 	// nolint:gosec
 
+	"crypto/md5" // nolint:gosec
+	"encoding/base32"
 	"fmt"
+	"path/filepath"
 	"regexp"
+	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type ProjectMetadata struct {
@@ -71,9 +77,15 @@ func GenerateProjectName(metadata *ProjectMetadata) string {
 		if metadata.VCSSubPath != "" {
 			n += "/" + metadata.VCSSubPath
 		}
-		// If not then use the filepath to the project
+		// If not then use a hash of the absolute filepath to the project
 	} else {
-		n = metadata.Path
+		absPath, err := filepath.Abs(metadata.Path)
+		if err != nil {
+			log.Debugf("Could not get absolute path for %s", metadata.Path)
+			absPath = metadata.Path
+		}
+
+		n = fmt.Sprintf("project_%s", shortHash(absPath, 8))
 	}
 
 	if metadata.TerraformWorkspace != "" && metadata.TerraformWorkspace != "default" {
@@ -118,4 +130,13 @@ func parseAzureDevOpsRepoPath(path string) string {
 	}
 
 	return path
+}
+
+// Returns a lowercase truncated hash of length l
+func shortHash(s string, l int) string {
+	sum := md5.Sum([]byte(s)) //nolint:gosec
+	var b []byte = sum[:]
+	h := base32.StdEncoding.EncodeToString(b)
+
+	return strings.ToLower(h)[:l]
 }

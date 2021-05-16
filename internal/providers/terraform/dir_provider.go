@@ -96,10 +96,6 @@ func (p *DirProvider) checks() error {
 }
 
 func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	if metadata.TerraformWorkspace != "" {
-		return
-	}
-
 	terraformWorkspace := p.Workspace
 
 	if terraformWorkspace == "" {
