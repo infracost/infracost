@@ -1,0 +1,14 @@
+
+ Name                                              Monthly Qty  Unit   Monthly Cost 
+                                                                                    
+ azurerm_integration_service_environment.example                                    
+ ├─ Base units                                             730  hours     $4,847.20 
+ └─ Scale units                                          2,190  hours     $7,270.80 
+                                                                                    
+ azurerm_integration_service_environment.example1                                   
+ └─ Base units                                             730  hours     $4,847.20 
+                                                                                    
+ azurerm_integration_service_environment.example2                                   
+ └─ Base units                                             730  hours       $749.71 
+                                                                                    
+ PROJECT TOTAL                                                           $17,714.91 
