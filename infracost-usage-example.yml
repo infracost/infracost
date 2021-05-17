@@ -505,6 +505,16 @@ resource_usage:
   azurerm_postgresql_server.my_server:
     additional_backup_storage_gb: 3000 # Additional consumption of backup storage in GB.
 
+  azurerm_storage_account.my_account:
+    storage_gb: 1000000 # Total size of storage in GB.
+    monthly_write_operations: 1000000 # Monthly number of Write operations.
+    monthly_list_and_create_container_operations: 1000000 # Monthly number of List and Create Container operations. 
+    monthly_read_operations: 100000 # Monthly number of Read operations.
+    monthly_other_operations: 1000000 # Monthly number of  All other operations. 
+    monthly_data_retrieval_gb: 1000 # Monthly number of data retrieval in GB.
+    monthly_data_write_gb: 1000 # Monthly number of data write in GB.
+    blob_index_tags: 100000 # Total number of Blob indexes.
+
   azurerm_windows_virtual_machine.my_windows_vm:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.

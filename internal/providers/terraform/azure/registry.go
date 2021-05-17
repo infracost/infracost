@@ -12,6 +12,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureMSSQLDatabaseRegistryItem(),
 	GetAzureMySQLServerRegistryItem(),
 	GetAzurePostgreSQLServerRegistryItem(),
+	GetAzureStorageAccountRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMAppServicePlanRegistryItem(),

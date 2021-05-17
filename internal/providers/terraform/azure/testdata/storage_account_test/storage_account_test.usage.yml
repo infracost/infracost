@@ -1,0 +1,82 @@
+version: 0.1
+resource_usage:
+  azurerm_storage_account.Premium_LRS:
+    storage_gb: 1000000
+    monthly_write_operations: 1000000
+    monthly_list_and_create_container_operations: 1000000
+    monthly_read_operations: 100000
+    monthly_other_operations: 1000000
+    monthly_data_retrieval_gb: 1000
+    monthly_data_write_gb: 1000
+    blob_index_tags: 100000
+
+  azurerm_storage_account.Premium_ZRS:
+    storage_gb: 2000000
+    monthly_write_operations: 2000000
+    monthly_list_and_create_container_operations: 2000000
+    monthly_read_operations: 200000
+    monthly_other_operations: 2000000
+    monthly_data_retrieval_gb: 2000
+    monthly_data_write_gb: 2000
+    blob_index_tags: 200000
+
+  azurerm_storage_account.Standard_GRS_Cool:
+    storage_gb: 3000000
+    monthly_write_operations: 3000000
+    monthly_list_and_create_container_operations: 3000000
+    monthly_read_operations: 300000
+    monthly_other_operations: 3000000
+    monthly_data_retrieval_gb: 3000
+    monthly_data_write_gb: 3000
+    blob_index_tags: 300000
+
+  azurerm_storage_account.Standard_GRS_Hot:
+    storage_gb: 4000000
+    monthly_write_operations: 4000000
+    monthly_list_and_create_container_operations: 4000000
+    monthly_read_operations: 400000
+    monthly_other_operations: 4000000
+    monthly_data_retrieval_gb: 4000
+    monthly_data_write_gb: 4000
+    blob_index_tags: 400000
+
+  azurerm_storage_account.Standard_LRS_Cool:
+    storage_gb: 5000000
+    monthly_write_operations: 5000000
+    monthly_list_and_create_container_operations: 500000
+    monthly_read_operations: 500000
+    monthly_other_operations: 5000000
+    monthly_data_retrieval_gb: 5000
+    monthly_data_write_gb: 5000
+    blob_index_tags: 500000
+
+  azurerm_storage_account.Standard_LRS_Hot:
+    storage_gb: 6000000
+    monthly_write_operations: 6000000
+    monthly_list_and_create_container_operations: 6000000
+    monthly_read_operations: 600000
+    monthly_other_operations: 6000000
+    monthly_data_retrieval_gb: 6000
+    monthly_data_write_gb: 6000
+    blob_index_tags: 600000
+
+  azurerm_storage_account.Standard_RAGRS_Cool:
+    storage_gb: 7000000
+    monthly_write_operations: 7000000
+    monthly_list_and_create_container_operations: 7000000
+    monthly_read_operations: 700000
+    monthly_other_operations: 7000000
+    monthly_data_retrieval_gb: 7000
+    monthly_data_write_gb: 7000
+    blob_index_tags: 700000
+
+  azurerm_storage_account.Standard_RAGRS_Hot:
+    storage_gb: 8000000
+    monthly_write_operations: 8000000
+    monthly_list_and_create_container_operations: 8000000
+    monthly_read_operations: 800000
+    monthly_other_operations: 8000000
+    monthly_data_retrieval_gb: 8000
+    monthly_data_write_gb: 8000
+    blob_index_tags: 800000
+    
