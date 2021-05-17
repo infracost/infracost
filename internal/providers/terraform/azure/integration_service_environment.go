@@ -19,14 +19,14 @@ func GetAzureRMAppIntegrationServiceEnvironmentRegistryItem() *schema.RegistryIt
 func NewAzureRMIntegrationServiceEnvironment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	productName := "Logic Apps Integration Service Environment"
 	location := d.Get("location").String()
-	sku_name := d.Get("sku_name").String()
-	sku := strings.ToLower(sku_name[:strings.IndexByte(sku_name, '_')])
-	scaleNumber, _ := strconv.Atoi(sku_name[strings.IndexByte(sku_name, '_')+1:])
+	skuName := d.Get("sku_name").String()
+	sku := strings.ToLower(skuName[:strings.IndexByte(skuName, '_')])
+	scaleNumber, _ := strconv.Atoi(skuName[strings.IndexByte(skuName, '_')+1:])
 
 	costComponents := make([]*schema.CostComponent, 0)
 
 	if sku == "developer" {
-		productName = productName + " - Developer"
+		productName += " - Developer"
 	}
 
 	costComponents = append(costComponents, IntegrationBaseServiceEnvironmentCostComponent("Base units", location, productName))
