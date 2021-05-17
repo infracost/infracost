@@ -49,7 +49,7 @@ func instance(region, engine, instanceType, deploymentMode string, isMultiAZ boo
 		deploymentOption = "Multi-AZ"
 	}
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", engine, instanceType, deploymentMode),
+		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", engine, instanceType, strings.ToLower(deploymentMode)),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
