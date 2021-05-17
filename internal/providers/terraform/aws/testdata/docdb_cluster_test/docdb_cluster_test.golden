@@ -1,0 +1,13 @@
+
+ Name                                Monthly Qty  Unit            Monthly Cost 
+                                                                               
+ aws_docdb_cluster.my_docdb                                                    
+ └─ Backup storage                 Cost depends on usage: $0.02 per GB-months  
+                                                                               
+ aws_docdb_cluster.my_docdb_usage                                              
+ └─ Backup storage                        10,000  GB-months            $210.00 
+                                                                               
+ PROJECT TOTAL                                                         $210.00 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
