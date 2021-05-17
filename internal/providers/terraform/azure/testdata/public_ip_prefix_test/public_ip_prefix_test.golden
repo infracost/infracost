@@ -1,0 +1,7 @@
+
+ Name                              Monthly Qty  Unit   Monthly Cost 
+                                                                    
+ azurerm_public_ip_prefix.example                                   
+ └─ IP prefix                              730  hours         $4.38 
+                                                                    
+ PROJECT TOTAL                                                $4.38 

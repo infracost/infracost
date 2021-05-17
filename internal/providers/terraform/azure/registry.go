@@ -20,6 +20,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppFunctionRegistryItem(),
 	GetAzureRMContainerRegistryRegistryItem(),
 	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
+	GetAzureRMPublicIPRegistryItem(),
+	GetAzureRMPublicIPPrefixRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
