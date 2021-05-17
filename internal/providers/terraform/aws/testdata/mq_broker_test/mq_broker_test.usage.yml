@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  aws_mq_broker.my_aws_mq_broker_activemq_single_standby_ebs:
+    storage_size_gb: 5
+  aws_mq_broker.my_aws_mq_broker_rabbitmq_cluster:
+    storage_size_gb: 10
