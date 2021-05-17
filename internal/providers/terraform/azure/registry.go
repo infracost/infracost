@@ -23,6 +23,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 // FreeResources grouped alphabetically
 var FreeResources []string = []string{
+	// Azure App Service
+	"azurerm_app_service_virtual_network_swift_connection",
+
 	// Azure Base
 	"azurerm_resource_group",
 	"azurerm_resource_provider_registration",
