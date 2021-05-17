@@ -1,0 +1,10 @@
+
+ Name                        Monthly Qty  Unit   Monthly Cost 
+                                                              
+ azurerm_public_ip.example                                    
+ └─ IP address (static)              730  hours         $3.65 
+                                                              
+ azurerm_public_ip.example1                                   
+ └─ IP address (dynamic)             730  hours         $2.92 
+                                                              
+ PROJECT TOTAL                                          $6.57 
