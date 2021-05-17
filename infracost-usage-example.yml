@@ -472,6 +472,13 @@ resource_usage:
     execution_duration_ms: 500 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
     memory_mb: 128 # Average amount of memory consumed by function in MB. Only applicable for Consumption plan.
     instances: 2 # Number of instances. Only applicable for Premium plan.
+
+  azurerm_kubernetes_cluster.my_cluster:
+    default_node_pool:
+      nodes: 2 # Node count for the default node pool.
+
+  azurerm_kubernetes_cluster_node_pool.my_node:
+    nodes: 3 # Node count for the node pool.
   
   azurerm_container_registry.my_registry:
     storage_gb: 150 
