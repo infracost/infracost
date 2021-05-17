@@ -1,0 +1,7 @@
+
+ Name                                    Monthly Qty  Unit   Monthly Cost 
+                                                                          
+ aws_ec2_traffic_mirror_session.session                                   
+ └─ Traffic mirror                               730  hours        $10.95 
+                                                                          
+ PROJECT TOTAL                                                     $10.95 
