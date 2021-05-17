@@ -19,6 +19,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppIsolatedServicePlanRegistryItem(),
 	GetAzureRMAppFunctionRegistryItem(),
 	GetAzureRMContainerRegistryRegistryItem(),
+	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
 	GetAzureRMPublicIPRegistryItem(),
 	GetAzureRMPublicIPPrefixRegistryItem(),
 }
