@@ -5,6 +5,7 @@ import "github.com/infracost/infracost/internal/schema"
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
+	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
@@ -54,7 +55,7 @@ var FreeResources []string = []string{
 	"azurerm_firewall_network_rule_collection",
 	"azurerm_firewall_policy",
 	"azurerm_firewall_policy_rule_collection_group",
-  
+
 	// Azure Key Vault
 	"azurerm_key_vault",
 	"azurerm_key_vault_access_policy",
