@@ -20,9 +20,10 @@ func ReportCLIError(ctx *config.RunContext, cliErr error) error {
 		errMsg = ui.StripColor(sanitizedErr.SanitizedError())
 	}
 
-	d := make(map[string]interface{})
-	d["error"] = errMsg
-	d["metadata"] = ctx.AllMetadata()
+	d := map[string]interface{}{
+		"error": errMsg,
+		"env":   ctx.AllContextValues(),
+	}
 
 	c := NewDashboardAPIClient(ctx)
 	_, err := c.doRequest("POST", "/cli-error", d)

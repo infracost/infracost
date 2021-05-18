@@ -58,12 +58,12 @@ func (c *DashboardAPIClient) AddProjectResults(projectContexts []*config.Project
 
 		v := map[string]interface{}{
 			"projectResult": projectResult,
-			"metadata":      projectCtx.AllMetadata(),
+			"env":           projectCtx.AllContextValues(),
 		}
 
 		q := `
-			mutation($projectResult: ProjectResultInput!, $metadata: JSONObject) {
-				addProjectResult(projectResult: $projectResult, metadata: $metadata) {
+			mutation($projectResult: ProjectResultInput!, $env: JSONObject) {
+				addProjectResult(projectResult: $projectResult, env: $env) {
 					id
 				}
 			}

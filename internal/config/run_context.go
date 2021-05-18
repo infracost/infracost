@@ -15,7 +15,7 @@ type RunContext struct {
 	ctx               context.Context
 	Config            *Config
 	State             *State
-	metadata          map[string]interface{}
+	contextVals       map[string]interface{}
 	currentProjectCtx *ProjectContext
 }
 
@@ -32,53 +32,53 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 	}
 
 	c := &RunContext{
-		ctx:      rootCtx,
-		Config:   cfg,
-		State:    state,
-		metadata: map[string]interface{}{},
+		ctx:         rootCtx,
+		Config:      cfg,
+		State:       state,
+		contextVals: map[string]interface{}{},
 	}
 
-	c.loadInitialMetadata()
+	c.loadInitialContextValues()
 
 	return c, nil
 }
 
 func EmptyRunContext() *RunContext {
 	return &RunContext{
-		Config:   &Config{},
-		State:    &State{},
-		metadata: map[string]interface{}{},
+		Config:      &Config{},
+		State:       &State{},
+		contextVals: map[string]interface{}{},
 	}
 }
 
-func (c *RunContext) SetMetadata(key string, value interface{}) {
-	c.metadata[key] = value
+func (c *RunContext) SetContextValue(key string, value interface{}) {
+	c.contextVals[key] = value
 }
 
-func (c *RunContext) AllMetadata() map[string]interface{} {
-	m := map[string]interface{}{
-		"run": c.metadata,
+func (c *RunContext) AllContextValues() map[string]interface{} {
+	e := map[string]interface{}{
+		"run": c.contextVals,
 	}
 	if c.currentProjectCtx != nil {
-		m["project"] = c.currentProjectCtx.metadata
+		e["project"] = c.currentProjectCtx.contextVals
 	}
 
-	return m
+	return e
 }
 
 func (c *RunContext) SetCurrentProjectContext(ctx *ProjectContext) {
 	c.currentProjectCtx = ctx
 }
 
-func (c *RunContext) loadInitialMetadata() {
-	c.SetMetadata("runId", uuid.New().String())
-	c.SetMetadata("version", baseVersion(version.Version))
-	c.SetMetadata("fullVersion", version.Version)
-	c.SetMetadata("isTest", IsTest())
-	c.SetMetadata("isDev", IsDev())
-	c.SetMetadata("os", runtime.GOOS)
-	c.SetMetadata("ciPlatform", ciPlatform())
-	c.SetMetadata("ciScript", ciScript())
+func (c *RunContext) loadInitialContextValues() {
+	c.SetContextValue("runId", uuid.New().String())
+	c.SetContextValue("version", baseVersion(version.Version))
+	c.SetContextValue("fullVersion", version.Version)
+	c.SetContextValue("isTest", IsTest())
+	c.SetContextValue("isDev", IsDev())
+	c.SetContextValue("os", runtime.GOOS)
+	c.SetContextValue("ciPlatform", ciPlatform())
+	c.SetContextValue("ciScript", ciScript())
 }
 
 func baseVersion(v string) string {

@@ -70,7 +70,7 @@ func (p *DirProvider) DisplayType() string {
 func (p *DirProvider) checks() error {
 	binary := p.TerraformBinary
 
-	p.ctx.SetMetadata("terraformBinary", binary)
+	p.ctx.SetContextValue("terraformBinary", binary)
 
 	_, err := exec.LookPath(binary)
 	if err != nil {
@@ -86,8 +86,8 @@ func (p *DirProvider) checks() error {
 
 	fullVersion := strings.SplitN(string(out), "\n", 2)[0]
 	version := shortTerraformVersion(fullVersion)
-	p.ctx.SetMetadata("terraformFullVersion", fullVersion)
-	p.ctx.SetMetadata("terraformVersion", version)
+	p.ctx.SetContextValue("terraformFullVersion", fullVersion)
+	p.ctx.SetContextValue("terraformVersion", version)
 
 	if v, ok := checkTerraformVersion(version, fullVersion); !ok {
 		return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
@@ -229,7 +229,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 		// If the plan returns this error then Terraform is configured with remote execution mode
 		if strings.HasPrefix(extractedErr, "Error: Saving a generated plan is currently not supported") {
 			log.Info("Continuing with Terraform Remote Execution Mode")
-			p.ctx.SetMetadata("terraformRemoteExecutionModeEnabled", true)
+			p.ctx.SetContextValue("terraformRemoteExecutionModeEnabled", true)
 			planJSON, err = p.runRemotePlan(opts, args)
 		} else if initOnFail && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
 			strings.Contains(extractedErr, "Error: Initialization required") ||
