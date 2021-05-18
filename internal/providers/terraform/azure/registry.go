@@ -31,6 +31,12 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 // FreeResources grouped alphabetically
 var FreeResources []string = []string{
 	// Azure App Service
+	"azurerm_app_service_active_slot",
+	"azurerm_app_service_certificate",
+	"azurerm_app_service_managed_certificate",
+	"azurerm_app_service_slot",
+	"azurerm_app_service_slot_virtual_network_swift_connection",
+	"azurerm_app_service_source_control_token",
 	"azurerm_app_service_virtual_network_swift_connection",
 
 	// Azure Base
