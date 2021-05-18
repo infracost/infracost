@@ -36,7 +36,7 @@ func NewAzureKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *s
 		certificateRenewals = decimalPtr(decimal.NewFromInt(u.Get("monthly_certificate_renewal_requests").Int()))
 	}
 	costComponents = append(costComponents, vaultKeysCostComponent(
-		"Certificate renewal",
+		"Certificate renewals",
 		location,
 		"requests",
 		skuName,

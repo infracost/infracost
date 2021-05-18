@@ -53,7 +53,7 @@ func NewAzureKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		keyRotationRenewals = decimalPtr(decimal.NewFromInt(u.Get("monthly_key_rotation_renewals").Int()))
 	}
 	meterName = "Secret Renewal"
-	costComponents = append(costComponents, vaultKeysCostComponent("Storage key rotation", location, "renewals", skuName, meterName, "0", keyRotationRenewals, 1))
+	costComponents = append(costComponents, vaultKeysCostComponent("Storage key rotations", location, "renewals", skuName, meterName, "0", keyRotationRenewals, 1))
 
 	if !strings.HasSuffix(keyType, "HSM") {
 		var softwareProtectedTransactions *decimal.Decimal
