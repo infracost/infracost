@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  google_logging_organization_bucket_config.basic_withUsage:
+    monthly_logging_data_gb: 100
+    

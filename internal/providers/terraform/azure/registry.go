@@ -5,10 +5,12 @@ import "github.com/infracost/infracost/internal/schema"
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
-	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
+	GetAzureRMKeyVaultCertificateRegistryItem(),
+	GetAzureRMKeyVaultKeyRegistryItem(),
+	GetAzureRMKeyVaultManagedHSMRegistryItem(),
 	GetAzureMariaDBServerRegistryItem(),
 	GetAzureMSSQLDatabaseRegistryItem(),
 	GetAzureMySQLServerRegistryItem(),
@@ -23,11 +25,18 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
 	GetAzureRMPublicIPRegistryItem(),
 	GetAzureRMPublicIPPrefixRegistryItem(),
+	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
 var FreeResources []string = []string{
 	// Azure App Service
+	"azurerm_app_service_active_slot",
+	"azurerm_app_service_certificate",
+	"azurerm_app_service_managed_certificate",
+	"azurerm_app_service_slot",
+	"azurerm_app_service_slot_virtual_network_swift_connection",
+	"azurerm_app_service_source_control_token",
 	"azurerm_app_service_virtual_network_swift_connection",
 
 	// Azure Base
@@ -45,6 +54,13 @@ var FreeResources []string = []string{
 	"azurerm_firewall_network_rule_collection",
 	"azurerm_firewall_policy",
 	"azurerm_firewall_policy_rule_collection_group",
+  
+	// Azure Key Vault
+	"azurerm_key_vault",
+	"azurerm_key_vault_access_policy",
+	"azurerm_key_vault_certificate_data",
+	"azurerm_key_vault_certificate_issuer",
+	"azurerm_key_vault_secret",
 
 	// Azure Networking
 	"azurerm_application_security_group",

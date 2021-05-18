@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_docdb_cluster_snapshot.my_aws_docdb_cluster_snapshot_usage:
+    backup_storage_gb: 1000

@@ -1,0 +1,50 @@
+version: 0.1
+resource_usage:  
+  azurerm_key_vault_key.pr_rsa2048:
+    monthly_secrets_operations: 10000
+    monthly_key_rotation_renewals: 10
+    monthly_protected_keys_operations: 1000000
+    hsm_protected_keys: 1000
+
+  azurerm_key_vault_key.pr_rsa3072:
+    monthly_secrets_operations: 20000
+    monthly_key_rotation_renewals: 20
+    monthly_protected_keys_operations: 2000000
+    hsm_protected_keys: 2000
+
+  azurerm_key_vault_key.pr_ec:
+    monthly_secrets_operations: 30000
+    monthly_key_rotation_renewals: 30
+    monthly_protected_keys_operations: 3000000
+    hsm_protected_keys: 3000
+
+  azurerm_key_vault_key.pr_hsm_rsa3072:
+    monthly_secrets_operations: 40000
+    monthly_key_rotation_renewals: 40
+    monthly_protected_keys_operations: 4000000
+    hsm_protected_keys: 5000
+
+  azurerm_key_vault_key.pr_hsm_rsa2048:
+    monthly_secrets_operations: 40000
+    monthly_key_rotation_renewals: 40
+    monthly_protected_keys_operations: 4000000
+    hsm_protected_keys: 5000
+
+  azurerm_key_vault_key.std_hsm_rsa3072:
+    monthly_secrets_operations: 50000
+    monthly_key_rotation_renewals: 50
+    monthly_protected_keys_operations: 5000000
+    hsm_protected_keys: 5000
+
+  azurerm_key_vault_key.std_rsa3072:
+    monthly_secrets_operations: 60000
+    monthly_key_rotation_renewals: 60
+    monthly_protected_keys_operations: 6000000
+    hsm_protected_keys: 6000
+
+  azurerm_key_vault_key.std_rsa2048:
+    monthly_secrets_operations: 70000
+    monthly_key_rotation_renewals: 70
+    monthly_protected_keys_operations: 7000000
+    hsm_protected_keys: 7000
+    

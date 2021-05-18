@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_dx_gateway_association.my_aws_dx_gateway_association_usage:
+    monthly_data_processed_gb: 100
