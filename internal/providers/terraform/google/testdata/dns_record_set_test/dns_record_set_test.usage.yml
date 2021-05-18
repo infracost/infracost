@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  google_dns_record_set.frontend_usage:
+    monthly_queries: 100000
+    
