@@ -12,6 +12,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMKeyVaultCertificateRegistryItem(),
 	GetAzureRMKeyVaultKeyRegistryItem(),
 	GetAzureRMKeyVaultManagedHSMRegistryItem(),
+	GetAzureRMKubernetesClusterRegistryItem(),
+	GetAzureRMKubernetesClusterNodePoolRegistryItem(),
 	GetAzureMariaDBServerRegistryItem(),
 	GetAzureMSSQLDatabaseRegistryItem(),
 	GetAzureMySQLServerRegistryItem(),
