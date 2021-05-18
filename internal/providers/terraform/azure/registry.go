@@ -5,6 +5,11 @@ import "github.com/infracost/infracost/internal/schema"
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
+	GetAzureRMHDInsightHadoopClusterRegistryItem(),
+	GetAzureRMHDInsightHBaseClusterRegistryItem(),
+	GetAzureRMHDInsightInteractiveQueryClusterRegistryItem(),
+	GetAzureRMHDInsightKafkaClusterRegistryItem(),
+	GetAzureRMHDInsightSparkClusterRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),

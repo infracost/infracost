@@ -1,0 +1,15 @@
+
+ Name                                     Monthly Qty  Unit   Monthly Cost 
+                                                                           
+ azurerm_hdinsight_spark_cluster.example                                   
+ ├─ Head node (G2)                              1,460  hours     $2,154.96 
+ ├─ Worker node (G2)                            2,190  hours     $3,232.44 
+ └─ Zookeeper node (G2)                         2,190  hours     $3,232.44 
+                                                                           
+ PROJECT TOTAL                                                   $8,619.84 
+
+----------------------------------
+2 resource types weren't estimated as they're not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_storage_account
+1 x azurerm_storage_container

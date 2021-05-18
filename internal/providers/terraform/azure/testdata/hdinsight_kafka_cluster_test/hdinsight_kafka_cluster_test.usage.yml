@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  azurerm_hdinsight_kafka_cluster.standard:
+    monthly_os_disk_operations: 1000000
+
+  azurerm_hdinsight_kafka_cluster.premium:
+    monthly_os_disk_operations: 2000000
