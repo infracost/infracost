@@ -477,7 +477,7 @@ resource_usage:
     default_node_pool:
       nodes: 2 # Node count for the default node pool.
 
-  azurerm_kubernetes_cluster_node_pool.my_node:
+  azurerm_kubernetes_cluster_node_pool.my_node_pool:
     nodes: 3 # Node count for the node pool.
   
   azurerm_container_registry.my_registry:

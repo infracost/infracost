@@ -5,7 +5,6 @@ import (
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 )
 
 // Parse from instance type value to Azure SKU name.
@@ -55,28 +54,5 @@ func osDiskSubResource(region string, d *schema.ResourceData, u *schema.UsageDat
 	return &schema.Resource{
 		Name:           "os_disk",
 		CostComponents: managedDiskCostComponents(region, diskData, monthlyDiskOperations),
-	}
-}
-
-func aksOSDiskSubResource(region string, diskSize int, u *schema.UsageData) *schema.Resource {
-	diskType := "Premium_LRS"
-
-	diskName := mapDiskName(diskType, diskSize)
-	if diskName == "" {
-		log.Warnf("Could not map disk type %s and size %d to disk name", diskType, diskSize)
-		return nil
-	}
-
-	productName, ok := diskProductNameMap[diskType]
-	if !ok {
-		log.Warnf("Could not map disk type %s to product name", diskType)
-		return nil
-	}
-
-	costComponent := []*schema.CostComponent{storageCostComponent(region, diskName, productName)}
-
-	return &schema.Resource{
-		Name:           "os_disk",
-		CostComponents: costComponent,
 	}
 }

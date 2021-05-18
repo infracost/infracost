@@ -45,7 +45,6 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 		})
 	}
 
-	instanceType := d.Get("default_node_pool.0.vm_size").String()
 	nodeCount := decimal.NewFromInt(1)
 	if d.Get("default_node_pool.0.node_count").Type != gjson.Null {
 		nodeCount = decimal.NewFromInt(d.Get("default_node_pool.0.node_count").Int())
@@ -54,27 +53,8 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 		nodeCount = decimal.NewFromInt(u.Get("default_node_pool.nodes").Int())
 	}
 
-	subResources = append(subResources, &schema.Resource{
-		Name:           "default_node_pool",
-		CostComponents: []*schema.CostComponent{linuxVirtualMachineCostComponent(location, instanceType)},
-	})
-	schema.MultiplyQuantities(subResources[0], nodeCount)
-
-	osDiskType := "Managed"
-	if d.Get("default_node_pool.0.os_disk_type").Type != gjson.Null {
-		osDiskType = d.Get("default_node_pool.0.os_disk_type").String()
-	}
-	if osDiskType == "Managed" {
-		var diskSize int
-		if d.Get("default_node_pool.0.os_disk_size_gb").Type != gjson.Null {
-			diskSize = int(d.Get("default_node_pool.0.os_disk_size_gb").Int())
-		}
-		osDisk := aksOSDiskSubResource(location, diskSize, u)
-
-		if osDisk != nil {
-			subResources[0].SubResources = append(subResources[0].SubResources, osDisk)
-			schema.MultiplyQuantities(subResources[0].SubResources[0], nodeCount)
-		}
+	subResources = []*schema.Resource{
+		aksClusterNodePool("default_node_pool", location, d.Get("default_node_pool.0"), nodeCount, u),
 	}
 
 	return &schema.Resource{
