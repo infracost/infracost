@@ -8,7 +8,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
-	GetAzureKeyVaultKeyRegistryItem(),
+	GetAzureRMKeyVaultCertificateRegistryItem(),
+	GetAzureRMKeyVaultKeyRegistryItem(),
+	GetAzureRMKeyVaultManagedHSMRegistryItem(),
 	GetAzureMariaDBServerRegistryItem(),
 	GetAzureMSSQLDatabaseRegistryItem(),
 	GetAzureMySQLServerRegistryItem(),
@@ -31,6 +33,7 @@ var FreeResources []string = []string{
 
 	// Azure Key Vault
 	"azurerm_key_vault_access_policy",
+	"azurerm_key_vault_certificate_data",
 	"azurerm_key_vault_certificate_issuer",
 	"azurerm_key_vault_secret",
 

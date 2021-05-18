@@ -10,7 +10,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetAzureKeyVaultKeyRegistryItem() *schema.RegistryItem {
+func GetAzureRMKeyVaultKeyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_key_vault_key",
 		RFunc: NewAzureKeyVaultKey,
@@ -47,19 +47,6 @@ func NewAzureKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 	meterName = "Operations"
 	costComponents = append(costComponents, vaultKeysCostComponent("Secrets operations", location, unit, skuName, meterName, "0", secretsTransactions, 10000))
-
-	var certificateRenewals, certificateOperations *decimal.Decimal
-	if u != nil && u.Get("monthly_certificate_renewal_requests").Exists() {
-		certificateRenewals = decimalPtr(decimal.NewFromInt(u.Get("monthly_certificate_renewal_requests").Int()))
-	}
-	meterName = "Certificate Renewal Request"
-	costComponents = append(costComponents, vaultKeysCostComponent("Certificate operations", location, "renewals", skuName, meterName, "0", certificateRenewals, 1))
-
-	if u != nil && u.Get("monthly_certificate_other_operations").Exists() {
-		certificateOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_certificate_other_operations").Int()))
-	}
-	meterName = "Operations"
-	costComponents = append(costComponents, vaultKeysCostComponent("Certificate operations", location, unit, skuName, meterName, "0", certificateOperations, 10000))
 
 	var keyRotationRenewals *decimal.Decimal
 	if u != nil && u.Get("monthly_key_rotation_renewals").Exists() {

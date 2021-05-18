@@ -1,0 +1,7 @@
+
+ Name                                                          Monthly Qty  Unit   Monthly Cost 
+                                                                                                
+ azurerm_key_vault_managed_hardware_security_module.my_module                                   
+ └─ HSM pools                                                          730  hours     $3,540.50 
+                                                                                                
+ PROJECT TOTAL                                                                        $3,540.50 

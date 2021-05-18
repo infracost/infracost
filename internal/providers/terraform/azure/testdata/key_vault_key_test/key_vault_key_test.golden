@@ -3,30 +3,22 @@
                                                                                            
  azurerm_key_vault_key.no_usage                                                            
  ├─ Secrets operations                  Cost depends on usage: $0.03 per 10K transactions  
- ├─ Certificate operations              Cost depends on usage: $3.00 per renewals          
- ├─ Certificate operations              Cost depends on usage: $0.03 per 10K transactions  
  ├─ Storage key rotation                Cost depends on usage: $1.00 per renewals          
  └─ Software-protected keys             Cost depends on usage: $0.15 per 10K transactions  
                                                                                            
  azurerm_key_vault_key.pr_ec                                                               
  ├─ Secrets operations                                3  10K transactions            $0.09 
- ├─ Certificate operations                          300  renewals                  $900.00 
- ├─ Certificate operations                           30  10K transactions            $0.90 
  ├─ Storage key rotation                             30  renewals                   $30.00 
  └─ Software-protected keys                         300  10K transactions           $45.00 
                                                                                            
  azurerm_key_vault_key.pr_hsm_rsa2048                                                      
  ├─ Secrets operations                                4  10K transactions            $0.12 
- ├─ Certificate operations                          400  renewals                $1,200.00 
- ├─ Certificate operations                           40  10K transactions            $1.20 
  ├─ Storage key rotation                             40  renewals                   $40.00 
  ├─ HSM-protected keys                            5,000  months                  $5,000.00 
  └─ HSM-protected keys                              400  10K transactions           $60.00 
                                                                                            
  azurerm_key_vault_key.pr_hsm_rsa3072                                                      
  ├─ Secrets operations                                4  10K transactions            $0.12 
- ├─ Certificate operations                          400  renewals                $1,200.00 
- ├─ Certificate operations                           40  10K transactions            $1.20 
  ├─ Storage key rotation                             40  renewals                   $40.00 
  ├─ HSM-protected keys (first 250)                  250  months                  $1,250.00 
  ├─ HSM-protected keys (next 1250)                1,250  months                  $3,125.00 
@@ -36,40 +28,30 @@
                                                                                            
  azurerm_key_vault_key.pr_rsa2048                                                          
  ├─ Secrets operations                                1  10K transactions            $0.03 
- ├─ Certificate operations                          100  renewals                  $300.00 
- ├─ Certificate operations                           10  10K transactions            $0.30 
  ├─ Storage key rotation                             10  renewals                   $10.00 
  └─ Software-protected keys                         100  10K transactions            $3.00 
                                                                                            
  azurerm_key_vault_key.pr_rsa3072                                                          
  ├─ Secrets operations                                2  10K transactions            $0.06 
- ├─ Certificate operations                          200  renewals                  $600.00 
- ├─ Certificate operations                           20  10K transactions            $0.60 
  ├─ Storage key rotation                             20  renewals                   $20.00 
  └─ Software-protected keys                         200  10K transactions           $30.00 
                                                                                            
  azurerm_key_vault_key.std_hsm_rsa3072                                                     
  ├─ Secrets operations                                5  10K transactions            $0.15 
- ├─ Certificate operations                          500  renewals                $1,500.00 
- ├─ Certificate operations                           50  10K transactions            $1.50 
  ├─ Storage key rotation                             50  renewals                   $50.00 
  └─ Software-protected keys                         500  10K transactions           $75.00 
                                                                                            
  azurerm_key_vault_key.std_rsa2048                                                         
  ├─ Secrets operations                                7  10K transactions            $0.21 
- ├─ Certificate operations                          700  renewals                $2,100.00 
- ├─ Certificate operations                           70  10K transactions            $2.10 
  ├─ Storage key rotation                             70  renewals                   $70.00 
  └─ Software-protected keys                         700  10K transactions          $105.00 
                                                                                            
  azurerm_key_vault_key.std_rsa3072                                                         
  ├─ Secrets operations                                6  10K transactions            $0.18 
- ├─ Certificate operations                          600  renewals                $1,800.00 
- ├─ Certificate operations                           60  10K transactions            $1.80 
  ├─ Storage key rotation                             60  renewals                   $60.00 
  └─ Software-protected keys                         600  10K transactions           $90.00 
                                                                                            
- PROJECT TOTAL                                                                  $22,423.56 
+ PROJECT TOTAL                                                                  $12,813.96 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
