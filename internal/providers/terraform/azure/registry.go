@@ -32,6 +32,7 @@ var FreeResources []string = []string{
 	"azurerm_blueprint_assignment",
 
 	// Azure Key Vault
+	"azurerm_key_vault",
 	"azurerm_key_vault_access_policy",
 	"azurerm_key_vault_certificate_data",
 	"azurerm_key_vault_certificate_issuer",
