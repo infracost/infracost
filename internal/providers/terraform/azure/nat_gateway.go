@@ -1,21 +1,34 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
+	"strings"
 
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
 )
 
 func GetAzureRMAppNATGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_nat_gateway",
 		RFunc: NewAzureRMNATGateway,
+		ReferenceAttributes: []string{
+			"resource_group_name",
+		},
 	}
 }
 
 func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyDataProcessedGb *decimal.Decimal
+	location := "Global"
+	group := d.References("resource_group_name")
+
+	if strings.HasPrefix(strings.ToLower(group[0].Get("location").String()), "usgov") {
+		location = "US Gov"
+	}
+	if strings.HasPrefix(strings.ToLower(group[0].Get("location").String()), "china") {
+		location = "Сhina"
+	}
 
 	if u != nil && u.Get("monthly_data_processed_gb").Type != gjson.Null {
 		monthlyDataProcessedGb = decimalPtr(decimal.NewFromFloat(u.Get("monthly_data_processed_gb").Float()))
@@ -23,8 +36,8 @@ func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, NATGatewayCostComponent("NAT gateway"))
-	costComponents = append(costComponents, DataProcessedCostComponent("Data processed", monthlyDataProcessedGb))
+	costComponents = append(costComponents, NATGatewayCostComponent("NAT gateway", location))
+	costComponents = append(costComponents, DataProcessedCostComponent("Data processed", location, monthlyDataProcessedGb))
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -32,7 +45,7 @@ func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	}
 }
 
-func NATGatewayCostComponent(name string) *schema.CostComponent {
+func NATGatewayCostComponent(name, location string) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:           name,
@@ -53,7 +66,7 @@ func NATGatewayCostComponent(name string) *schema.CostComponent {
 		},
 	}
 }
-func DataProcessedCostComponent(name string, monthlyDataProcessedGb *decimal.Decimal) *schema.CostComponent {
+func DataProcessedCostComponent(name, location string, monthlyDataProcessedGb *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            name,
