@@ -12,5 +12,5 @@ func TestAzureRMHDInsightHBaseClusterGoldenFile(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "hdinsight_hbase_cluster_test")
+	tftest.GoldenFileResourceTests(t, "hdinsight_hbase_cluster_test") //nolint:misspell
 }

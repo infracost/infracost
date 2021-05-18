@@ -11,7 +11,7 @@ import (
 
 func GetAzureRMHDInsightHadoopClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_hdinsight_hadoop_cluster",
+		Name:  "azurerm_hdinsight_hadoop_cluster", //nolint:misspell
 		RFunc: NewAzureHDInsightHadoopCluster,
 	}
 }

@@ -10,7 +10,7 @@ import (
 
 func GetAzureRMHDInsightKafkaClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_hdinsight_kafka_cluster",
+		Name:  "azurerm_hdinsight_kafka_cluster", //nolint:misspell
 		RFunc: NewAzureHDInsightKafkaCluster,
 	}
 }
