@@ -1,0 +1,9 @@
+version: 0.1
+resource_usage:
+  google_kms_crypto_key.my_keys_withUsage:
+    key_versions: 5000
+    monthly_key_operations: 10000
+
+  google_kms_crypto_key.with_rotate_withUsage:
+    monthly_key_operations: 10000
+    
