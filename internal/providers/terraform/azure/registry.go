@@ -8,6 +8,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
+	GetAzureRMKeyVaultCertificateRegistryItem(),
+	GetAzureRMKeyVaultKeyRegistryItem(),
+	GetAzureRMKeyVaultManagedHSMRegistryItem(),
 	GetAzureMariaDBServerRegistryItem(),
 	GetAzureMSSQLDatabaseRegistryItem(),
 	GetAzureMySQLServerRegistryItem(),
@@ -37,6 +40,13 @@ var FreeResources []string = []string{
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
+
+	// Azure Key Vault
+	"azurerm_key_vault",
+	"azurerm_key_vault_access_policy",
+	"azurerm_key_vault_certificate_data",
+	"azurerm_key_vault_certificate_issuer",
+	"azurerm_key_vault_secret",
 
 	// Azure Networking
 	"azurerm_application_security_group",

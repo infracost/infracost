@@ -484,6 +484,16 @@ resource_usage:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 
+  azurerm_key_vault_certificate.my_certificate:
+    monthly_certificate_renewal_requests: 100    # Monthly number of certificate renewal requests.
+    monthly_certificate_other_operations: 100000 # Monthly number of non-renewal certificate operations.
+
+  azurerm_key_vault_key.my_keys:
+    monthly_secrets_operations: 10000          # Monthly number of secrets transactions.
+    monthly_key_rotation_renewals: 50          # Monthly number of Managed Azure Storage account key rotation renewals.
+    monthly_protected_keys_operations: 1000000 # Monthly number of Software or HSM transactions.
+    hsm_protected_keys: 3000                   # Number of protected keys.
+
   azurerm_linux_virtual_machine_scale_set.standard_f2:
     instances: 10 # Override the number of instances in the scale set.
     os_disk:
@@ -496,7 +506,7 @@ resource_usage:
     additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB.
 
   azurerm_mssql_database.my_database:
-    monthly_vcore_hours: 600 # Monthly number of used vCore-hours for serverless compute.
+    monthly_vcore_hours: 600             # Monthly number of used vCore-hours for serverless compute.
     long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
 
   azurerm_mysql_server.my_server:
