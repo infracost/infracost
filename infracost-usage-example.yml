@@ -480,6 +480,10 @@ resource_usage:
     storage_gb: 150 
     monthly_build_vcpu_hrs: 150 
 
+  azurerm_firewall.my_firewall:
+    logical_firewall_units: 2 # Number of deployed logical firewall units.
+    monthly_data_processed_gb: 100000 # Monthly number of data processed in GB.
+
   azurerm_linux_virtual_machine.my_linux_vm:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.

@@ -1,0 +1,9 @@
+version: 0.1
+resource_usage:
+  azurerm_firewall.standard:
+    logical_firewall_units: 3
+    monthly_data_processed_gb: 10000
+
+  azurerm_firewall.premium:
+    logical_firewall_units: 2
+    monthly_data_processed_gb: 10000

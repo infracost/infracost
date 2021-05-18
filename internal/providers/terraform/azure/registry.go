@@ -5,6 +5,7 @@ import "github.com/infracost/infracost/internal/schema"
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
+	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
@@ -37,6 +38,13 @@ var FreeResources []string = []string{
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
+
+	// Azure Firewall
+	"azurerm_firewall_application_rule_collection",
+	"azurerm_firewall_nat_rule_collection",
+	"azurerm_firewall_network_rule_collection",
+	"azurerm_firewall_policy",
+	"azurerm_firewall_policy_rule_collection_group",
 
 	// Azure Networking
 	"azurerm_application_security_group",

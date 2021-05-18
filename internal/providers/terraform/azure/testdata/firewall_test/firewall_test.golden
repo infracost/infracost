@@ -1,0 +1,22 @@
+
+ Name                        Monthly Qty  Unit         Monthly Cost 
+                                                                    
+ azurerm_firewall.non_usage                                         
+ ├─ Deployment                       730  hours             $912.50 
+ └─ Data processed           Cost depends on usage: $0.02 per GB    
+                                                                    
+ azurerm_firewall.premium                                           
+ ├─ Deployment                     1,460  hours           $1,277.50 
+ └─ Data processed                10,000  GB                 $80.00 
+                                                                    
+ azurerm_firewall.standard                                          
+ ├─ Deployment                     2,190  hours           $2,737.50 
+ └─ Data processed                10,000  GB                $160.00 
+                                                                    
+ azurerm_public_ip.example                                          
+ └─ IP address (static)              730  hours               $3.65 
+                                                                    
+ PROJECT TOTAL                                            $5,171.15 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
