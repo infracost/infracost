@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  google_pubsub_subscription.usage:
+    monthly_message_data_tb: 10
+    storage_gb: 20
+    snapshot_storage_gb: 30
+    

@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  google_monitoring_metric_descriptor.usage:
+    monthly_monitoring_data_mb: 500000
+    monthly_api_calls: 1000000
+    
