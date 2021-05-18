@@ -1,0 +1,11 @@
+version: 0.1
+resource_usage:
+  google_container_node_pool.zonal_usage:
+    nodes: 4
+
+  google_container_node_pool.regional_usage:
+    nodes: 4
+
+  google_container_node_pool.node_locations_usage:
+    nodes: 4
+    
