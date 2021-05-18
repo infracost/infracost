@@ -1,0 +1,34 @@
+
+ Name                               Monthly Qty  Unit      Monthly Cost 
+                                                                        
+ google_redis_instance.basic_m1                                         
+ └─ Redis instance (basic, M1)              730  GB-hours        $35.77 
+                                                                        
+ google_redis_instance.basic_m2                                         
+ └─ Redis instance (basic, M2)            3,650  GB-hours        $98.55 
+                                                                        
+ google_redis_instance.basic_m3                                         
+ └─ Redis instance (basic, M3)           18,250  GB-hours       $419.75 
+                                                                        
+ google_redis_instance.basic_m4                                         
+ └─ Redis instance (basic, M4)           32,850  GB-hours       $624.15 
+                                                                        
+ google_redis_instance.basic_m5                                         
+ └─ Redis instance (basic, M5)           76,650  GB-hours     $1,226.40 
+                                                                        
+ google_redis_instance.standard_m1                                      
+ └─ Redis instance (standard, M1)           730  GB-hours        $46.72 
+                                                                        
+ google_redis_instance.standard_m2                                      
+ └─ Redis instance (standard, M2)         3,650  GB-hours       $197.10 
+                                                                        
+ google_redis_instance.standard_m3                                      
+ └─ Redis instance (standard, M3)        18,250  GB-hours       $839.50 
+                                                                        
+ google_redis_instance.standard_m4                                      
+ └─ Redis instance (standard, M4)        32,850  GB-hours     $1,149.75 
+                                                                        
+ google_redis_instance.standard_m5                                      
+ └─ Redis instance (standard, M5)        76,650  GB-hours     $2,299.50 
+                                                                        
+ PROJECT TOTAL                                                $6,937.19 

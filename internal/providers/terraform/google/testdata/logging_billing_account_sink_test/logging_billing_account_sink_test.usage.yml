@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  google_logging_billing_account_sink.my-sink_withUsage:
+    monthly_logging_data_gb: 100
+    

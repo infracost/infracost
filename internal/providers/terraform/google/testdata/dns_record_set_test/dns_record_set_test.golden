@@ -1,0 +1,13 @@
+
+ Name                                    Monthly Qty  Unit            Monthly Cost 
+                                                                                   
+ google_dns_record_set.frontend                                                    
+ └─ Queries                            Cost depends on usage: $0.40 per 1M queries 
+                                                                                   
+ google_dns_record_set.frontend_usage                                              
+ └─ Queries                                      0.1  1M queries             $0.04 
+                                                                                   
+ PROJECT TOTAL                                                               $0.04 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -1,0 +1,104 @@
+
+ Name                                                        Monthly Qty  Unit   Monthly Cost 
+                                                                                              
+ google_container_cluster.default_regional                                                    
+ ├─ Cluster management fee                                           730  hours        $73.00 
+ └─ default_pool                                                                              
+    ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)           2,190  hours        $73.38 
+    └─ Standard provisioned storage (pd-standard)                    300  GiB          $12.00 
+                                                                                              
+ google_container_cluster.default_zonal                                                       
+ ├─ Cluster management fee                                           730  hours        $73.00 
+ └─ default_pool                                                                              
+    ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)           6,570  hours       $220.13 
+    └─ Standard provisioned storage (pd-standard)                    900  GiB          $36.00 
+                                                                                              
+ google_container_cluster.node_locations_regional                                             
+ ├─ Cluster management fee                                           730  hours        $73.00 
+ └─ default_pool                                                                              
+    ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)           4,380  hours       $146.76 
+    └─ Standard provisioned storage (pd-standard)                    600  GiB          $24.00 
+                                                                                              
+ google_container_cluster.node_locations_usage                                                
+ ├─ Cluster management fee                                           730  hours        $73.00 
+ └─ default_pool                                                                              
+    ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)           4,380  hours       $146.76 
+    └─ Standard provisioned storage (pd-standard)                    600  GiB          $24.00 
+                                                                                              
+ google_container_cluster.node_locations_zonal                                                
+ ├─ Cluster management fee                                           730  hours        $73.00 
+ └─ default_pool                                                                              
+    ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)           4,380  hours       $146.76 
+    └─ Standard provisioned storage (pd-standard)                    600  GiB          $24.00 
+                                                                                              
+ google_container_cluster.regional_usage                                                      
+ ├─ Cluster management fee                                           730  hours        $73.00 
+ └─ default_pool                                                                              
+    ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)           6,570  hours       $220.13 
+    └─ Standard provisioned storage (pd-standard)                    900  GiB          $36.00 
+                                                                                              
+ google_container_cluster.zonal_usage                                                         
+ ├─ Cluster management fee                                           730  hours        $73.00 
+ └─ default_pool                                                                              
+    ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)           2,190  hours        $73.38 
+    └─ Standard provisioned storage (pd-standard)                    300  GiB          $12.00 
+                                                                                              
+ google_container_node_pool.autoscaling_regional                                              
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              1,460  hours        $48.92 
+ └─ Standard provisioned storage (pd-standard)                       200  GiB           $8.00 
+                                                                                              
+ google_container_node_pool.autoscaling_zonal                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              4,380  hours       $146.76 
+ └─ Standard provisioned storage (pd-standard)                       600  GiB          $24.00 
+                                                                                              
+ google_container_node_pool.cluster_node_locations_regional                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              2,920  hours        $97.84 
+ └─ Standard provisioned storage (pd-standard)                       400  GiB          $16.00 
+                                                                                              
+ google_container_node_pool.cluster_node_locations_zonal                                      
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              2,920  hours        $97.84 
+ └─ Standard provisioned storage (pd-standard)                       400  GiB          $16.00 
+                                                                                              
+ google_container_node_pool.default_regional                                                  
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              2,190  hours        $73.38 
+ └─ Standard provisioned storage (pd-standard)                       300  GiB          $12.00 
+                                                                                              
+ google_container_node_pool.default_zonal                                                     
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              6,570  hours       $220.13 
+ └─ Standard provisioned storage (pd-standard)                       900  GiB          $36.00 
+                                                                                              
+ google_container_node_pool.initial_node_count_regional                                       
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              2,920  hours        $97.84 
+ └─ Standard provisioned storage (pd-standard)                       400  GiB          $16.00 
+                                                                                              
+ google_container_node_pool.initial_node_count_zonal                                          
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              8,760  hours       $293.51 
+ └─ Standard provisioned storage (pd-standard)                     1,200  GiB          $48.00 
+                                                                                              
+ google_container_node_pool.node_locations_regional                                           
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              2,920  hours        $97.84 
+ └─ Standard provisioned storage (pd-standard)                       400  GiB          $16.00 
+                                                                                              
+ google_container_node_pool.node_locations_usage                                              
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              5,840  hours       $195.67 
+ └─ Standard provisioned storage (pd-standard)                       800  GiB          $32.00 
+                                                                                              
+ google_container_node_pool.node_locations_zonal                                              
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              2,920  hours        $97.84 
+ └─ Standard provisioned storage (pd-standard)                       400  GiB          $16.00 
+                                                                                              
+ google_container_node_pool.regional_usage                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              8,760  hours       $293.51 
+ └─ Standard provisioned storage (pd-standard)                     1,200  GiB          $48.00 
+                                                                                              
+ google_container_node_pool.with_node_config_regional                                         
+ ├─ Instance usage (Linux/UNIX, on-demand, n1-standard-16)         2,190  hours     $1,165.07 
+ ├─ SSD provisioned storage (pd-ssd)                                 360  GiB          $61.20 
+ ├─ Local SSD provisioned storage                                  1,125  GiB          $90.00 
+ └─ NVIDIA Tesla K80 (on-demand)                                   8,760  hours     $2,759.40 
+                                                                                              
+ google_container_node_pool.zonal_usage                                                       
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              2,920  hours        $97.84 
+ └─ Standard provisioned storage (pd-standard)                       400  GiB          $16.00 
+                                                                                              
+ PROJECT TOTAL                                                                      $7,944.86 
