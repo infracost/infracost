@@ -1,0 +1,15 @@
+
+ Name                                                 Monthly Qty  Unit    Monthly Cost 
+                                                                                        
+ azurerm_app_service_custom_hostname_binding.example                                    
+ └─ IP SSL certificate                                          1  months        $39.00 
+                                                                                        
+ azurerm_app_service_plan.example                                                       
+ └─ Instance usage (S1)                                       730  hours         $73.00 
+                                                                                        
+ PROJECT TOTAL                                                                  $112.00 
+
+----------------------------------
+1 resource type wasn't estimated as it's not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_app_service
