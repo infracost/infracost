@@ -6,25 +6,34 @@ import (
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
 )
 
-func GetAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
+func GetAzureRMAppServiceCustomHostnameBindingRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_app_service_certificate_binding",
-		RFunc: NewAzureRMAppServiceCertificateBinding,
+		Name:  "azurerm_app_service_custom_hostname_binding",
+		RFunc: NewAzureRMAppServiceCustomHostnameBinding,
 		ReferenceAttributes: []string{
-			"certificate_id",
+			"resource_group_name",
 		},
 	}
 }
 
-func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var location string
-	group := d.References("certificate_id")
+func NewAzureRMAppServiceCustomHostnameBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	var sslType, sslState, location string
+
+	group := d.References("resource_group_name")
 	location = group[0].Get("location").String()
 
-	var sslType string
-	sslState := d.Get("ssl_state").String()
+	if d.Get("ssl_state").Type != gjson.Null {
+		sslState = d.Get("ssl_state").String()
+	} else {
+		// returning directly since SNI is currently defined as free in the Azure cost page
+		return &schema.Resource{
+			NoPrice:   true,
+			IsSkipped: true,
+		}
+	}
 
 	// The two approved values are IpBasedEnabled or SniEnabled
 	sslState = strings.ToUpper(sslState)[0:2]
