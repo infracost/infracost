@@ -55,5 +55,3 @@
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
-
-Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
