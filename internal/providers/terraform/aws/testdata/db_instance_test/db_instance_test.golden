@@ -1,85 +1,85 @@
 
- Name                                     Monthly Qty  Unit         Monthly Cost 
-                                                                                 
- aws_db_instance.aurora                                                          
- ├─ Database instance                             730  hours              $29.93 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.aurora-mysql                                                    
- ├─ Database instance                             730  hours              $29.93 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.aurora-postgresql                                               
- ├─ Database instance                             730  hours             $119.72 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.mariadb                                                         
- ├─ Database instance                             730  hours              $99.28 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.mysql                                                           
- ├─ Database instance                             730  hours              $99.28 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.mysql-allocated-storage                                         
- ├─ Database instance                             730  hours              $99.28 
- └─ Database storage                               20  GB-months           $2.30 
-                                                                                 
- aws_db_instance.mysql-default                                                   
- ├─ Database instance                             730  hours              $99.28 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.mysql-iops                                                      
- ├─ Database instance                             730  hours              $99.28 
- ├─ Database storage                               50  GB-months           $6.25 
- └─ Database storage IOPS                         500  IOPS-months        $50.00 
-                                                                                 
- aws_db_instance.mysql-magnetic                                                  
- ├─ Database instance                             730  hours              $99.28 
- └─ Database storage                               40  GB-months           $4.00 
-                                                                                 
- aws_db_instance.mysql-multi-az                                                  
- ├─ Database instance                             730  hours             $198.56 
- └─ Database storage                               30  GB-months           $6.90 
-                                                                                 
- aws_db_instance.oracle-ee                                                       
- ├─ Database instance                             730  hours              $99.28 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.oracle-se                                                       
- ├─ Database instance                             730  hours              $99.28 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.oracle-se1                                                      
- ├─ Database instance                             730  hours             $204.40 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.oracle-se1-byol                                                 
- ├─ Database instance                             730  hours              $99.28 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.oracle-se2                                                      
- ├─ Database instance                             730  hours             $219.00 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.postgres                                                        
- ├─ Database instance                             730  hours             $105.85 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.sqlserver-ee                                                    
- ├─ Database instance                             730  hours           $1,705.28 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.sqlserver-ex                                                    
- ├─ Database instance                             730  hours             $118.26 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.sqlserver-se                                                    
- ├─ Database instance                             730  hours             $893.52 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- aws_db_instance.sqlserver-web                                                   
- ├─ Database instance                             730  hours             $169.36 
- └─ Database storage                                0  GB-months           $0.00 
-                                                                                 
- PROJECT TOTAL                                                         $4,756.78 
+ Name                                     Monthly Qty  Unit   Monthly Cost 
+                                                                           
+ aws_db_instance.aurora                                                    
+ ├─ Database instance                             730  hours        $29.93 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.aurora-mysql                                              
+ ├─ Database instance                             730  hours        $29.93 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.aurora-postgresql                                         
+ ├─ Database instance                             730  hours       $119.72 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.mariadb                                                   
+ ├─ Database instance                             730  hours        $99.28 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.mysql                                                     
+ ├─ Database instance                             730  hours        $99.28 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.mysql-allocated-storage                                   
+ ├─ Database instance                             730  hours        $99.28 
+ └─ Database storage                               20  GB            $2.30 
+                                                                           
+ aws_db_instance.mysql-default                                             
+ ├─ Database instance                             730  hours        $99.28 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.mysql-iops                                                
+ ├─ Database instance                             730  hours        $99.28 
+ ├─ Database storage                               50  GB            $6.25 
+ └─ Database storage IOPS                         500  IOPS         $50.00 
+                                                                           
+ aws_db_instance.mysql-magnetic                                            
+ ├─ Database instance                             730  hours        $99.28 
+ └─ Database storage                               40  GB            $4.00 
+                                                                           
+ aws_db_instance.mysql-multi-az                                            
+ ├─ Database instance                             730  hours       $198.56 
+ └─ Database storage                               30  GB            $6.90 
+                                                                           
+ aws_db_instance.oracle-ee                                                 
+ ├─ Database instance                             730  hours        $99.28 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.oracle-se                                                 
+ ├─ Database instance                             730  hours        $99.28 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.oracle-se1                                                
+ ├─ Database instance                             730  hours       $204.40 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.oracle-se1-byol                                           
+ ├─ Database instance                             730  hours        $99.28 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.oracle-se2                                                
+ ├─ Database instance                             730  hours       $219.00 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.postgres                                                  
+ ├─ Database instance                             730  hours       $105.85 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.sqlserver-ee                                              
+ ├─ Database instance                             730  hours     $1,705.28 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.sqlserver-ex                                              
+ ├─ Database instance                             730  hours       $118.26 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.sqlserver-se                                              
+ ├─ Database instance                             730  hours       $893.52 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ aws_db_instance.sqlserver-web                                             
+ ├─ Database instance                             730  hours       $169.36 
+ └─ Database storage                                0  GB            $0.00 
+                                                                           
+ PROJECT TOTAL                                                   $4,756.78 

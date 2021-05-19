@@ -54,7 +54,7 @@ func storageImage(region string, description string, storageSize *decimal.Decima
 	return []*schema.CostComponent{
 		{
 			Name:            "Storage",
-			Unit:            "GB-months",
+			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: storageSize,
 			ProductFilter: &schema.ProductFilter{

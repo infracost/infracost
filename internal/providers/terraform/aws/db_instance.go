@@ -127,7 +127,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		},
 		{
 			Name:            "Database storage",
-			Unit:            "GB-months",
+			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: &allocatedStorageVal,
 			ProductFilter: &schema.ProductFilter{
@@ -146,7 +146,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	if volumeType == "Provisioned IOPS" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Database storage IOPS",
-			Unit:            "IOPS-months",
+			Unit:            "IOPS",
 			UnitMultiplier:  1,
 			MonthlyQuantity: &iopsVal,
 			ProductFilter: &schema.ProductFilter{

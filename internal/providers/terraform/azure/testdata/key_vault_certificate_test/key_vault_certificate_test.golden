@@ -1,19 +1,19 @@
 
- Name                                         Monthly Qty  Unit                 Monthly Cost 
-                                                                                             
- azurerm_key_vault_certificate.non-usage                                                     
- ├─ Certificate renewals                  Cost depends on usage: $3.00 per requests          
- └─ Certificate operations                Cost depends on usage: $0.03 per 10K transactions  
-                                                                                             
- azurerm_key_vault_certificate.premium                                                       
- ├─ Certificate renewals                              100  requests                  $300.00 
- └─ Certificate operations                             10  10K transactions            $0.30 
-                                                                                             
- azurerm_key_vault_certificate.standard                                                      
- ├─ Certificate renewals                              100  requests                  $300.00 
- └─ Certificate operations                             10  10K transactions            $0.30 
-                                                                                             
- PROJECT TOTAL                                                                       $600.60 
+ Name                                            Monthly Qty  Unit                      Monthly Cost 
+                                                                                                     
+ azurerm_key_vault_certificate.non-usage                                                             
+ ├─ Certificate renewals                  Monthly cost depends on usage: $3.00 per requests          
+ └─ Certificate operations                Monthly cost depends on usage: $0.03 per 10K transactions  
+                                                                                                     
+ azurerm_key_vault_certificate.premium                                                               
+ ├─ Certificate renewals                                 100  requests                       $300.00 
+ └─ Certificate operations                                10  10K transactions                 $0.30 
+                                                                                                     
+ azurerm_key_vault_certificate.standard                                                              
+ ├─ Certificate renewals                                 100  requests                       $300.00 
+ └─ Certificate operations                                10  10K transactions                 $0.30 
+                                                                                                     
+ PROJECT TOTAL                                                                               $600.60 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

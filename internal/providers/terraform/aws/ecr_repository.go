@@ -27,7 +27,7 @@ func NewECRRepository(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Storage",
-				Unit:            "GB-months",
+				Unit:            "GB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: storageSize,
 				ProductFilter: &schema.ProductFilter{

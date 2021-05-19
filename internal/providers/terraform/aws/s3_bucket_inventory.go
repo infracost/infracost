@@ -25,7 +25,7 @@ func NewS3BucketInventory(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Objects listed",
-				Unit:            "objects",
+				Unit:            "1M objects",
 				UnitMultiplier:  1000000,
 				MonthlyQuantity: listedObj,
 				ProductFilter: &schema.ProductFilter{

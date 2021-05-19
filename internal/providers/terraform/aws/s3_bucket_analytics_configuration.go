@@ -25,7 +25,7 @@ func NewS3BucketAnalyticsConfiguration(d *schema.ResourceData, u *schema.UsageDa
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Objects monitored",
-				Unit:            "objects",
+				Unit:            "1M objects",
 				UnitMultiplier:  1000000,
 				MonthlyQuantity: monitObj,
 				ProductFilter: &schema.ProductFilter{

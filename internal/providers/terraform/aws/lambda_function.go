@@ -40,7 +40,7 @@ func NewLambdaFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Requests",
-				Unit:            "requests",
+				Unit:            "1M requests",
 				UnitMultiplier:  1000000,
 				MonthlyQuantity: monthlyRequests,
 				ProductFilter: &schema.ProductFilter{

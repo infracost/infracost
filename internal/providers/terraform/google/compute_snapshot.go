@@ -29,7 +29,7 @@ func NewComputeSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Storage",
-				Unit:            "GB-months",
+				Unit:            "GB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: snapshotDiskSize,
 				ProductFilter: &schema.ProductFilter{

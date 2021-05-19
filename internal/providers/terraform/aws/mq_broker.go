@@ -89,7 +89,7 @@ func storage(region, engine, storageType string, isMultiAZ bool, storageSizeGB *
 
 	costComponent := &schema.CostComponent{
 		Name:            fmt.Sprintf("Storage (%s, %s)", engine, strings.ToUpper(storageType)),
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: summedStorageSizeGB,
 		ProductFilter: &schema.ProductFilter{

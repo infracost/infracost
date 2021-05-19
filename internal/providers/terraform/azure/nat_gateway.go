@@ -26,7 +26,7 @@ func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	if strings.HasPrefix(strings.ToLower(group[0].Get("location").String()), "usgov") {
 		location = "US Gov"
 	}
-	if strings.HasPrefix(strings.ToLower(group[0].Get("location").String()), "china") {
+	if strings.Contains(strings.ToLower(group[0].Get("location").String()), "china") {
 		location = "Сhina"
 	}
 

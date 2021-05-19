@@ -45,8 +45,8 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		ebsSnapshotCostComponent(region, gbVal),
 		{
 			Name:           "Fast snapshot restore",
-			Unit:           "DSU-hours",
-			UnitMultiplier: 1,
+			Unit:           "DSU",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -60,7 +60,7 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		},
 		{
 			Name:            "ListChangedBlocks & ListSnapshotBlocks API requests",
-			Unit:            "requests",
+			Unit:            "1k requests",
 			UnitMultiplier:  1000,
 			MonthlyQuantity: listBlockRequests,
 			ProductFilter: &schema.ProductFilter{
@@ -75,7 +75,7 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		},
 		{
 			Name:            "GetSnapshotBlock API requests",
-			Unit:            "SnapshotAPIUnits",
+			Unit:            "1k SnapshotAPIUnits",
 			UnitMultiplier:  1000,
 			MonthlyQuantity: getSnapshotBlockRequests,
 			ProductFilter: &schema.ProductFilter{
@@ -90,7 +90,7 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		},
 		{
 			Name:            "PutSnapshotBlock API requests",
-			Unit:            "SnapshotAPIUnits",
+			Unit:            "1k SnapshotAPIUnits",
 			UnitMultiplier:  1000,
 			MonthlyQuantity: putSnapshotBlockRequests,
 			ProductFilter: &schema.ProductFilter{
@@ -113,7 +113,7 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 func ebsSnapshotCostComponent(region string, gbVal decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "EBS snapshot storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: &gbVal,
 		ProductFilter: &schema.ProductFilter{

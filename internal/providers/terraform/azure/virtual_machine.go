@@ -18,8 +18,8 @@ func parseVMSKUName(instanceType string) string {
 func ultraSSDReservationCostComponent(region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "Ultra disk reservation (if unattached)",
-		Unit:           "vCPU-hours",
-		UnitMultiplier: 1,
+		Unit:           "vCPU",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: nil,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

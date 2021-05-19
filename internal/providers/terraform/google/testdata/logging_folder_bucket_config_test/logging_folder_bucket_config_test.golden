@@ -1,13 +1,13 @@
 
- Name                                                 Monthly Qty  Unit         Monthly Cost 
-                                                                                             
- google_logging_folder_bucket_config.basic                                                   
- └─ Logging data                                      Cost depends on usage: $0.50 per GB    
-                                                                                             
- google_logging_folder_bucket_config.basic_withUsage                                         
- └─ Logging data                                              100  GB                 $50.00 
-                                                                                             
- PROJECT TOTAL                                                                        $50.00 
+ Name                                                   Monthly Qty  Unit            Monthly Cost 
+                                                                                                  
+ google_logging_folder_bucket_config.basic                                                        
+ └─ Logging data                                      Monthly cost depends on usage: $0.50 per GB 
+                                                                                                  
+ google_logging_folder_bucket_config.basic_withUsage                                              
+ └─ Logging data                                                100  GB                    $50.00 
+                                                                                                  
+ PROJECT TOTAL                                                                             $50.00 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

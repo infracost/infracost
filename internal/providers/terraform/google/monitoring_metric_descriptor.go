@@ -1,6 +1,7 @@
 package google
 
 import (
+	"github.com/dustin/go-humanize"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
@@ -55,7 +56,7 @@ func NewMonitoring(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 func monitoringCostComponent(displayName string, unit string, unitMultiplier int, usageTier string, description string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
-		Unit:            unit,
+		Unit:            humanize.SI(float64(unitMultiplier), "") + " " + unit,
 		UnitMultiplier:  unitMultiplier,
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{

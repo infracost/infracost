@@ -28,8 +28,8 @@ func NewEKSFargateProfile(d *schema.ResourceData, u *schema.UsageData) *schema.R
 func memoryCostComponent(d *schema.ResourceData, region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "Per GB per hour",
-		Unit:           "GB-hours",
-		UnitMultiplier: 1,
+		Unit:           "GB",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -49,8 +49,8 @@ func memoryCostComponent(d *schema.ResourceData, region string) *schema.CostComp
 func vcpuCostComponent(d *schema.ResourceData, region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "Per vCPU per hour",
-		Unit:           "CPU-hours",
-		UnitMultiplier: 1,
+		Unit:           "CPU",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

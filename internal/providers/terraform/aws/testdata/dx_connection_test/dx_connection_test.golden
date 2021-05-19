@@ -1,15 +1,15 @@
 
- Name                                      Monthly Qty  Unit         Monthly Cost 
-                                                                                  
- aws_dx_connection.my_dx_connection                                               
- ├─ DX connection                                  730  hours             $219.00 
- └─ Outbound data transfer (to EqDC2)      Cost depends on usage: $0.02 per GB    
-                                                                                  
- aws_dx_connection.my_dx_connection_usage                                         
- ├─ DX connection                                  730  hours             $219.00 
- └─ Outbound data transfer (to EqDC2)              100  GB                  $2.00 
-                                                                                  
- PROJECT TOTAL                                                            $440.00 
+ Name                                        Monthly Qty  Unit            Monthly Cost 
+                                                                                       
+ aws_dx_connection.my_dx_connection                                                    
+ ├─ DX connection                                    730  hours                $219.00 
+ └─ Outbound data transfer (to EqDC2)      Monthly cost depends on usage: $0.02 per GB 
+                                                                                       
+ aws_dx_connection.my_dx_connection_usage                                              
+ ├─ DX connection                                    730  hours                $219.00 
+ └─ Outbound data transfer (to EqDC2)                100  GB                     $2.00 
+                                                                                       
+ PROJECT TOTAL                                                                 $440.00 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
