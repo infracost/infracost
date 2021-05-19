@@ -20,7 +20,7 @@ func ReportCLIError(ctx *config.RunContext, cliErr error) error {
 		errMsg = ui.StripColor(sanitizedErr.SanitizedError())
 	}
 
-	d := ctx.ContextValuesWithCurrentProject()
+	d := ctx.EventEnv()
 	d["error"] = errMsg
 
 	c := NewDashboardAPIClient(ctx)

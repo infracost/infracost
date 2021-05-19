@@ -309,24 +309,9 @@ func checkRunConfig(cfg *config.Config) error {
 }
 
 func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root, runID string) map[string]interface{} {
-	env := map[string]interface{}{
-		"installId":    runCtx.State.InstallID,
-		"runId":        runID,
-		"projectCount": len(projectContexts),
-	}
-
-	for k, v := range runCtx.ContextValues() {
-		env[k] = v
-	}
-
-	for _, projectContext := range projectContexts {
-		for k, v := range projectContext.ContextValues() {
-			if _, ok := env[k]; !ok {
-				env[k] = make([]interface{}, 0)
-			}
-			env[k] = append(env[k].([]interface{}), v)
-		}
-	}
+	env := runCtx.EventEnvWithProjectContexts(projectContexts)
+	env["runId"] = runID
+	env["projectCount"] = len(projectContexts)
 
 	summary := r.MergedFullSummary()
 	env["supportedResourceCounts"] = summary.SupportedResourceCounts

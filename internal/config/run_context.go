@@ -69,6 +69,30 @@ func (c *RunContext) ContextValuesWithCurrentProject() map[string]interface{} {
 	return m
 }
 
+func (c *RunContext) EventEnv() map[string]interface{} {
+	return c.EventEnvWithProjectContexts([]*ProjectContext{c.currentProjectCtx})
+}
+
+func (c *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectContext) map[string]interface{} {
+	env := c.contextVals
+	env["installId"] = c.State.InstallID
+
+	for _, projectContext := range projectContexts {
+		if projectContext == nil {
+			continue
+		}
+
+		for k, v := range projectContext.ContextValues() {
+			if _, ok := env[k]; !ok {
+				env[k] = make([]interface{}, 0)
+			}
+			env[k] = append(env[k].([]interface{}), v)
+		}
+	}
+
+	return env
+}
+
 func (c *RunContext) SetCurrentProjectContext(ctx *ProjectContext) {
 	c.currentProjectCtx = ctx
 }
