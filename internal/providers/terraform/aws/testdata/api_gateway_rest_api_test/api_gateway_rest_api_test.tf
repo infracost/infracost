@@ -10,11 +10,11 @@ provider "aws" {
 }
 
 resource "aws_api_gateway_rest_api" "api" {
-  name              = "rest-api-gateway"
-  description       = "Rest API Gateway"
+  name        = "rest-api-gateway"
+  description = "Rest API Gateway"
 }
 
 resource "aws_api_gateway_rest_api" "my_rest_api" {
-  name              = "rest-api-gateway"
-  description       = "Rest API Gateway"
+  name        = "rest-api-gateway"
+  description = "Rest API Gateway"
 }

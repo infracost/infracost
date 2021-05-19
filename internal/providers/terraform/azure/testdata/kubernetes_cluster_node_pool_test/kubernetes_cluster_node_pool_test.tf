@@ -1,6 +1,6 @@
 provider "azurerm" {
   features {}
-	skip_provider_registration = true
+  skip_provider_registration = true
 }
 
 resource "azurerm_resource_group" "example" {
@@ -15,8 +15,8 @@ resource "azurerm_kubernetes_cluster" "example" {
   dns_prefix          = "exampleaks1"
 
   default_node_pool {
-    name       = "default"
-    vm_size    = "Standard_D2_v2"
+    name    = "default"
+    vm_size = "Standard_D2_v2"
   }
 }
 

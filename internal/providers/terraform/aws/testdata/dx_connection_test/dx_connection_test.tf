@@ -10,13 +10,13 @@ provider "aws" {
 }
 
 resource "aws_dx_connection" "my_dx_connection" {
-    bandwidth = "1Gbps"
-    location = "EqDC2"
-    name = "Test"
+  bandwidth = "1Gbps"
+  location  = "EqDC2"
+  name      = "Test"
 }
 
 resource "aws_dx_connection" "my_dx_connection_usage" {
-    bandwidth = "1Gbps"
-    location = "EqDC2"
-    name = "Test_Usage"
+  bandwidth = "1Gbps"
+  location  = "EqDC2"
+  name      = "Test_Usage"
 }

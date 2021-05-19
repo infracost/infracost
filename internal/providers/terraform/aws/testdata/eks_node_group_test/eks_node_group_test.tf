@@ -41,7 +41,7 @@ resource "aws_eks_node_group" "example_with_launch_template" {
   node_role_arn   = "node_role_arn"
   subnet_ids      = ["subnet_id"]
 
-  instance_types  = ["t3.medium"]
+  instance_types = ["t3.medium"]
 
   scaling_config {
     desired_size = 3
@@ -131,7 +131,7 @@ resource "aws_eks_node_group" "example2" {
   node_group_name = "example"
   instance_types  = ["t2.medium"]
   node_role_arn   = "node_role_arn"
-  disk_size 			= 30
+  disk_size       = 30
   subnet_ids      = ["subnet_id"]
 
   scaling_config {
@@ -246,7 +246,7 @@ resource "aws_eks_node_group" "example_with_launch_template_3" {
   }
 
   launch_template {
-    name      = aws_launch_template.foo3.name
+    name    = aws_launch_template.foo3.name
     version = "default_version"
   }
 }
