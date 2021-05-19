@@ -24,16 +24,11 @@ func NewAzureFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		skuTier = d.Get("sku_tier").String()
 	}
 
-	firewallUnits := decimal.NewFromInt(1)
-	if u != nil && u.Get("logical_firewall_units").Exists() {
-		firewallUnits = decimal.NewFromInt(u.Get("logical_firewall_units").Int())
-	}
-
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:           "Deployment",
+		Name:           fmt.Sprintf("Deployment (%s)", skuTier),
 		Unit:           "hours",
 		UnitMultiplier: 1,
-		HourlyQuantity: decimalPtr(firewallUnits),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(location),
