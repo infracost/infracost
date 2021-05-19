@@ -248,7 +248,7 @@ Our aim is to make Infracost's output understandable without needing to read sep
 
 Where a cloud vendor's pricing pages information can be improved for clarify, we'll do that, e.g. on some pricing webpages, AWS mention use "Storage Rate" to describe pricing for "Storage (provisioned IOPS SSD)", so we use the latter.
 
-The cost component name should not change when the IaC resource params change; anything that can change should be put in brackets, so for example:
+The cost component name should be plural where it makes sense, e.g. "Certificate renewals", "Requests", and "Messages". Furthermore, the name should not change when the IaC resource params change; anything that can change should be put in brackets, so for example:
 - `General Purpose SSD storage (gp2)` should be `Storage (gp2)` as the storage type can change.
 - `Outbound data transfer to EqDC2` should be `Outbound data transfer (to EqDC2)` as the EqDC2 value changes based on the location.
 - `Linux/UNIX (on-demand, m1.small)` should be `Instance usage (Linux/UNIX, on-demand, m1.small)`.

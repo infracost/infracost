@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  google_logging_folder_sink.basic_withUsage:
+    monthly_logging_data_gb: 100
+    

@@ -1,0 +1,9 @@
+version: 0.1
+resource_usage:
+  azurerm_key_vault_certificate.standard:
+    monthly_certificate_renewal_requests: 100 
+    monthly_certificate_other_operations: 100000 
+
+  azurerm_key_vault_certificate.premium:
+    monthly_certificate_renewal_requests: 100 
+    monthly_certificate_other_operations: 100000 

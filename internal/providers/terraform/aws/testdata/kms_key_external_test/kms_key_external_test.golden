@@ -1,0 +1,7 @@
+
+ Name                      Monthly Qty  Unit    Monthly Cost 
+                                                             
+ aws_kms_external_key.kms                                    
+ └─ Customer master key              1  months         $1.00 
+                                                             
+ PROJECT TOTAL                                         $1.00 
