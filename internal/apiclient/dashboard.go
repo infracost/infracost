@@ -2,6 +2,7 @@ package apiclient
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
@@ -17,6 +18,17 @@ type DashboardAPIClient struct {
 type CreateAPIKeyResponse struct {
 	APIKey string `json:"apiKey"`
 	Error  string `json:"error"`
+}
+
+type runInput struct {
+	ProjectResults []projectResultInput   `json:"projectResultss"`
+	TimeGenerated  time.Time              `json:"timeGenerated"`
+	Metadata       map[string]interface{} `json:"metadata"`
+}
+
+type projectResultInput struct {
+	output.Project
+	Metadata map[string]interface{} `json:"metadata"`
 }
 
 func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
@@ -45,37 +57,58 @@ func (c *DashboardAPIClient) CreateAPIKey(name string, email string) (CreateAPIK
 	return r, nil
 }
 
-func (c *DashboardAPIClient) AddProjectResults(projectContexts []*config.ProjectContext, out output.Root) error {
+func (c *DashboardAPIClient) AddEvent(name string, env map[string]interface{}) error {
 	if c.selfHostedReportingDisabled {
-		log.Debug("Skipping reporting project results for self-hosted Infracost")
+		log.Debug("Skipping reporting events for self-hosted Infracost")
 		return nil
 	}
 
-	queries := make([]GraphQLQuery, 0, len(out.Projects))
+	d := map[string]interface{}{
+		"event": name,
+		"env":   env,
+	}
 
-	for i, projectResult := range out.Projects {
-		projectCtx := projectContexts[i]
+	_, err := c.doRequest("POST", "/event", d)
+	return err
+}
 
-		v := map[string]interface{}{
-			"projectResult": projectResult,
-			"env":           projectCtx.AllContextValues(),
+func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*config.ProjectContext, out output.Root) (string, error) {
+	if c.selfHostedReportingDisabled {
+		log.Debug("Skipping reporting project results for self-hosted Infracost")
+		return "", nil
+	}
+
+	projectResultInputs := make([]projectResultInput, len(out.Projects))
+	for i, project := range out.Projects {
+		projectResultInputs[i] = projectResultInput{
+			Project:  project,
+			Metadata: projectContexts[i].ContextValues(),
 		}
+	}
 
-		q := `
-			mutation($projectResult: ProjectResultInput!, $env: JSONObject) {
-				addProjectResult(projectResult: $projectResult, env: $env) {
-					id
-				}
+	v := map[string]interface{}{
+		"run": runInput{
+			ProjectResults: projectResultInputs,
+			TimeGenerated:  out.TimeGenerated,
+			Metadata:       ctx.ContextValues(),
+		},
+	}
+
+	q := `
+	mutation($run: RunInput!) {
+			addRun(run: $run) {
+				id
 			}
-		`
-
-		queries = append(queries, GraphQLQuery{q, v})
-	}
-
-	_, err := c.doQueries(queries)
+		}
+	`
+	results, err := c.doQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	runID := ""
+	if len(results) > 0 {
+		runID = results[0].Get("data.addRun.id").String()
+	}
+	return runID, nil
 }

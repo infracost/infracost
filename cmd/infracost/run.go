@@ -142,16 +142,24 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	r := output.ToOutputFormat(projects)
 
-	addProjectResultsChan := make(chan bool)
+	addRunChan := make(chan bool)
 
-	go func(addProjectResultsChan chan bool, r output.Root) {
+	go func(addRunChan chan bool, r output.Root) {
 		c := apiclient.NewDashboardAPIClient(runCtx)
-		err := c.AddProjectResults(projectContexts, r)
+		runID, err := c.AddRun(runCtx, projectContexts, r)
 		if err != nil {
-			log.Errorf("Error reporting project results: %s", err)
+			log.Errorf("Error reporting run: %s", err)
 		}
-		addProjectResultsChan <- true
-	}(addProjectResultsChan, r)
+
+		env := buildRunEnv(runCtx, projectContexts, r, runID)
+
+		err = c.AddEvent("infracost-run", env)
+		if err != nil {
+			log.Errorf("Error reporting event: %s", err)
+		}
+
+		addRunChan <- true
+	}(addRunChan, r)
 
 	opts := output.Options{
 		ShowSkipped: runCtx.Config.ShowSkipped,
@@ -186,7 +194,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	fmt.Printf("%s\n", out)
 
-	<-addProjectResultsChan
+	<-addRunChan
 
 	return nil
 }
@@ -298,6 +306,37 @@ func checkRunConfig(cfg *config.Config) error {
 	}
 
 	return nil
+}
+
+func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root, runID string) map[string]interface{} {
+	env := map[string]interface{}{
+		"installId":    runCtx.State.InstallID,
+		"runId":        runID,
+		"projectCount": len(projectContexts),
+	}
+
+	for k, v := range runCtx.ContextValues() {
+		env[k] = v
+	}
+
+	for _, projectContext := range projectContexts {
+		for k, v := range projectContext.ContextValues() {
+			if _, ok := env[k]; !ok {
+				env[k] = make([]interface{}, 0)
+			}
+			env[k] = append(env[k].([]interface{}), v)
+		}
+	}
+
+	summary := r.MergedFullSummary()
+	env["supportedResourceCounts"] = summary.SupportedResourceCounts
+	env["unsupportedResourceCounts"] = summary.UnsupportedResourceCounts
+	env["totalSupportedResources"] = summary.TotalSupportedResources
+	env["totalUnsupportedResources"] = summary.TotalUnsupportedResources
+	env["totalNoPriceResources"] = summary.TotalNoPriceResources
+	env["totalResources"] = summary.TotalResources
+
+	return env
 }
 
 func unwrapped(err error) error {

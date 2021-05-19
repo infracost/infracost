@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/infracost/infracost/internal/version"
 )
 
@@ -55,15 +54,19 @@ func (c *RunContext) SetContextValue(key string, value interface{}) {
 	c.contextVals[key] = value
 }
 
-func (c *RunContext) AllContextValues() map[string]interface{} {
-	e := map[string]interface{}{
-		"run": c.contextVals,
-	}
+func (c *RunContext) ContextValues() map[string]interface{} {
+	return c.contextVals
+}
+
+func (c *RunContext) ContextValuesWithCurrentProject() map[string]interface{} {
+	m := c.contextVals
 	if c.currentProjectCtx != nil {
-		e["project"] = c.currentProjectCtx.contextVals
+		for k, v := range c.currentProjectCtx.contextVals {
+			m[k] = v
+		}
 	}
 
-	return e
+	return m
 }
 
 func (c *RunContext) SetCurrentProjectContext(ctx *ProjectContext) {
@@ -71,7 +74,6 @@ func (c *RunContext) SetCurrentProjectContext(ctx *ProjectContext) {
 }
 
 func (c *RunContext) loadInitialContextValues() {
-	c.SetContextValue("runId", uuid.New().String())
 	c.SetContextValue("version", baseVersion(version.Version))
 	c.SetContextValue("fullVersion", version.Version)
 	c.SetContextValue("isTest", IsTest())

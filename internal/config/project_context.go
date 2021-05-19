@@ -36,11 +36,8 @@ func (c *ProjectContext) SetContextValue(key string, value interface{}) {
 	c.contextVals[key] = value
 }
 
-func (c *ProjectContext) AllContextValues() map[string]interface{} {
-	return map[string]interface{}{
-		"run":     c.RunContext.contextVals,
-		"project": c.contextVals,
-	}
+func (c *ProjectContext) ContextValues() map[string]interface{} {
+	return c.contextVals
 }
 
 func DetectProjectMetadata(ctx *ProjectContext) *schema.ProjectMetadata {
