@@ -18,8 +18,8 @@ resource "aws_s3_bucket" "bucket2" {
 }
 
 resource "aws_s3_bucket_inventory" "inventory" {
-  bucket = aws_s3_bucket.bucket1.bucket
-  name = "inventory"
+  bucket                   = aws_s3_bucket.bucket1.bucket
+  name                     = "inventory"
   included_object_versions = "All"
 
   schedule {
@@ -43,8 +43,8 @@ resource "aws_s3_bucket" "bucket2_withUsage" {
 }
 
 resource "aws_s3_bucket_inventory" "inventory_withUsage" {
-  bucket = aws_s3_bucket.bucket1_withUsage.bucket
-  name = "inventory_withUsage"
+  bucket                   = aws_s3_bucket.bucket1_withUsage.bucket
+  name                     = "inventory_withUsage"
   included_object_versions = "All"
 
   schedule {

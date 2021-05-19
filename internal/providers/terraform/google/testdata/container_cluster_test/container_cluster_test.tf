@@ -1,6 +1,6 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
-  region = "us-central1"
+  region      = "us-central1"
 }
 
 resource "google_container_cluster" "zonal" {
@@ -35,7 +35,7 @@ resource "google_container_cluster" "with_node_config" {
     local_ssd_count = 1
 
     guest_accelerator {
-      type = "nvidia-tesla-k80"
+      type  = "nvidia-tesla-k80"
       count = 4
     }
   }
@@ -57,8 +57,8 @@ resource "google_container_cluster" "with_node_pools_zonal" {
     node_count = 4
 
     node_config {
-      machine_type  = "n1-standard-16"
-      preemptible   = true
+      machine_type = "n1-standard-16"
+      preemptible  = true
     }
   }
 }
@@ -79,8 +79,8 @@ resource "google_container_cluster" "with_node_pools_regional" {
     node_count = 4
 
     node_config {
-      machine_type  = "n1-standard-16"
-      preemptible   = true
+      machine_type = "n1-standard-16"
+      preemptible  = true
     }
   }
 }
@@ -110,8 +110,8 @@ resource "google_container_cluster" "with_node_pools_node_locations" {
     ]
 
     node_config {
-      machine_type  = "n1-standard-16"
-      preemptible   = true
+      machine_type = "n1-standard-16"
+      preemptible  = true
     }
   }
 }
@@ -155,8 +155,8 @@ resource "google_container_cluster" "with_node_pools_zonal_withUsage" {
     node_count = 4
 
     node_config {
-      machine_type  = "n1-standard-16"
-      preemptible   = true
+      machine_type = "n1-standard-16"
+      preemptible  = true
     }
   }
 }
@@ -177,8 +177,8 @@ resource "google_container_cluster" "with_node_pools_regional_withUsage" {
     node_count = 4
 
     node_config {
-      machine_type  = "n1-standard-16"
-      preemptible   = true
+      machine_type = "n1-standard-16"
+      preemptible  = true
     }
   }
 }
@@ -208,8 +208,8 @@ resource "google_container_cluster" "with_node_pools_node_locations_withUsage" {
     ]
 
     node_config {
-      machine_type  = "n1-standard-16"
-      preemptible   = true
+      machine_type = "n1-standard-16"
+      preemptible  = true
     }
   }
 }

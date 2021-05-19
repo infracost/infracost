@@ -10,18 +10,18 @@ provider "aws" {
 }
 
 resource "aws_ec2_client_vpn_endpoint" "endpoint" {
-		  description            = "terraform-clientvpn-example"
-		  server_certificate_arn = "arn:aws:acm:us-east-1:123456789123:certificate/a13e05dc-c58d-43f8-8a9b-c456f67891c2"
-		  client_cidr_block = "10.0.0.0/16"
+  description            = "terraform-clientvpn-example"
+  server_certificate_arn = "arn:aws:acm:us-east-1:123456789123:certificate/a13e05dc-c58d-43f8-8a9b-c456f67891c2"
+  client_cidr_block      = "10.0.0.0/16"
 
-		  authentication_options {
-			type = "certificate-authentication"
-			root_certificate_chain_arn = "arn:aws:acm:us-east-1:123456789123:certificate/a13e05dc-c58d-43f8-8a9b-c456f67891c2"
-		  }
+  authentication_options {
+    type                       = "certificate-authentication"
+    root_certificate_chain_arn = "arn:aws:acm:us-east-1:123456789123:certificate/a13e05dc-c58d-43f8-8a9b-c456f67891c2"
+  }
 
-		  connection_log_options {
-			enabled               = true
-			cloudwatch_log_group  = "cloudwatch-log-group"
-			cloudwatch_log_stream = "cloudwatch-log-group-stream"
-		  }
-		}
+  connection_log_options {
+    enabled               = true
+    cloudwatch_log_group  = "cloudwatch-log-group"
+    cloudwatch_log_stream = "cloudwatch-log-group-stream"
+  }
+}

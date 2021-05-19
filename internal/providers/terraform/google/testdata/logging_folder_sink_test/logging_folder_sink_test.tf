@@ -1,20 +1,20 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
-  region = "us-central1"
+  region      = "us-central1"
 }
 
 resource "google_logging_folder_sink" "basic" {
-  name   = "my-sink"
+  name        = "my-sink"
   description = "what it is"
-  folder = "fake"
+  folder      = "fake"
 
   destination = "storage.googleapis.com/fake"
 }
 
 resource "google_logging_folder_sink" "basic_withUsage" {
-  name   = "my-sink"
+  name        = "my-sink"
   description = "what it is"
-  folder = "fake"
+  folder      = "fake"
 
   destination = "storage.googleapis.com/fake"
 }

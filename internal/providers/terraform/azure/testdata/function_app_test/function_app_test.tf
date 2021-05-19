@@ -12,12 +12,12 @@ resource "azurerm_app_service_plan" "elastic" {
   location            = azurerm_resource_group.example1.location
   resource_group_name = azurerm_resource_group.example1.name
   kind                = "elastic"
-  reserved = false
+  reserved            = false
 
   sku {
-    tier = "Standard"
-    size = "EP2"
-    capacity = 1 
+    tier     = "Standard"
+    size     = "EP2"
+    capacity = 1
   }
 }
 resource "azurerm_app_service_plan" "funcApp" {
@@ -25,12 +25,12 @@ resource "azurerm_app_service_plan" "funcApp" {
   location            = azurerm_resource_group.example1.location
   resource_group_name = azurerm_resource_group.example1.name
   kind                = "FunctionApp"
-  reserved = false
+  reserved            = false
 
   sku {
-    tier = "Standard"
-    size = "EP2"
-    capacity = 1 
+    tier     = "Standard"
+    size     = "EP2"
+    capacity = 1
   }
 }
 

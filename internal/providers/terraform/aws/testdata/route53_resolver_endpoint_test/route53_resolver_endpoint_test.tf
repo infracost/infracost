@@ -10,7 +10,7 @@ provider "aws" {
 }
 
 resource "aws_route53_resolver_endpoint" "test" {
-  direction = "INBOUND"
+  direction          = "INBOUND"
   security_group_ids = ["sg-1233456"]
 
   ip_address {
@@ -23,7 +23,7 @@ resource "aws_route53_resolver_endpoint" "test" {
 }
 
 resource "aws_route53_resolver_endpoint" "test_withUsage1B" {
-  direction = "INBOUND"
+  direction          = "INBOUND"
   security_group_ids = ["sg-1233456"]
 
   ip_address {
@@ -36,7 +36,7 @@ resource "aws_route53_resolver_endpoint" "test_withUsage1B" {
 }
 
 resource "aws_route53_resolver_endpoint" "test_withUsage2B" {
-  direction = "INBOUND"
+  direction          = "INBOUND"
   security_group_ids = ["sg-1233456"]
 
   ip_address {

@@ -1,5 +1,5 @@
 provider "azurerm" {
-	skip_provider_registration = true
+  skip_provider_registration = true
   features {}
 }
 
@@ -20,8 +20,8 @@ resource "azurerm_postgresql_server" "basic_2core" {
   storage_mb = 5120
   version    = "9.6"
 
-  geo_redundant_backup_enabled  = false
-  ssl_enforcement_enabled       = true
+  geo_redundant_backup_enabled = false
+  ssl_enforcement_enabled      = true
 }
 
 resource "azurerm_postgresql_server" "gp_4core" {
@@ -36,8 +36,8 @@ resource "azurerm_postgresql_server" "gp_4core" {
   storage_mb = 4096000
   version    = "9.6"
 
-  geo_redundant_backup_enabled  = false
-  ssl_enforcement_enabled       = true
+  geo_redundant_backup_enabled = false
+  ssl_enforcement_enabled      = true
 }
 
 resource "azurerm_postgresql_server" "mo_16core" {
@@ -52,8 +52,8 @@ resource "azurerm_postgresql_server" "mo_16core" {
   storage_mb = 5120
   version    = "9.6"
 
-  geo_redundant_backup_enabled  = false
-  ssl_enforcement_enabled       = true
+  geo_redundant_backup_enabled = false
+  ssl_enforcement_enabled      = true
 }
 
 resource "azurerm_postgresql_server" "without_geo" {
@@ -68,8 +68,8 @@ resource "azurerm_postgresql_server" "without_geo" {
   storage_mb = 5120
   version    = "9.6"
 
-  geo_redundant_backup_enabled  = false
-  ssl_enforcement_enabled       = true
+  geo_redundant_backup_enabled = false
+  ssl_enforcement_enabled      = true
 }
 
 resource "azurerm_postgresql_server" "with_geo" {
@@ -84,6 +84,6 @@ resource "azurerm_postgresql_server" "with_geo" {
   storage_mb = 4096000
   version    = "9.6"
 
-  geo_redundant_backup_enabled  = true
-  ssl_enforcement_enabled       = true
+  geo_redundant_backup_enabled = true
+  ssl_enforcement_enabled      = true
 }
