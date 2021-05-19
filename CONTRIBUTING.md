@@ -345,17 +345,17 @@ For an example of a resource with usage-based see the [AWS Lambda resource](http
 When Infracost is run without usage data the output for this resource looks like:
 
 ```
- Name                                                           Quantity  Unit                  Monthly Cost
+ Name                                                           Monthly Qty  Unit                  Monthly Cost
 
  aws_lambda_function.hello_world
- ├─ Requests                                            Cost depends on usage: $0.20 per 1M requests
- └─ Duration                                            Cost depends on usage: $0.0000166667 per GB-seconds
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests
+ └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds
 ```
 
 When Infracost is run with the `--usage-file=path/to/infracost-usage.yml` flag then the output looks like:
 
 ```
- Name                                                           Quantity  Unit                  Monthly Cost
+ Name                                                  Monthly Qty  Unit         Monthly Cost
  aws_lambda_function.hello_world
  ├─ Requests                                                   100  1M requests        $20.00
  └─ Duration                                            25,000,000  GB-seconds        $416.67
@@ -370,11 +370,15 @@ The following notes are general guidelines, please leave a comment in your pull 
 - count: do not include the count in the cost component name or in brackets. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
 
 - units:
-  - use plural, e.g. hours, months, requests, GB-months, GB (already plural). For a "unit per something", use singular per time unit, e.g. use Per GB per hour. Where it makes sense, instead of "API calls" use "API requests" or "requests" for better consistency.
+  - use plural, e.g. hours, months, requests, GB (already plural). For a "unit per something", use singular per time unit, e.g. use Per GB per hour. Where it makes sense, instead of "API calls" use "API requests" or "requests" for better consistency.
 
   - for things where the Terraform resource represents 1 unit, e.g. an `aws_instance`, an `aws_secretsmanager_secret` and a `google_dns_managed_zone`, the units should be months (or hours if that makes more sense). For everything else, the units should be whatever is being charged for, e.g. queries, requests.
 
-  - for data transferred, where you pay for the data per GB, then use `GB`. For storage, where you pay per GB per month, then use `GB-months`. You'll probably see that the Cloud Pricing API's units to use a similar logic. The AWS pricing pages sometimes use a different one than their own pricing API, in that case the pricing API is a better guide.
+  - for data transferred where you pay for the data per GB, then use `GB`.
+	
+  - for storage or other resources priced in Unit-months (e.g. `GB-months`), then use the unit by itself (`GB`).  The AWS pricing pages sometimes use a different unit than their own pricing API, in that case the pricing page is a better guide.
+
+  - for units priced in Unit-hours (e.g. `IOPS-hours`) but best understood in months, then use the unit by itself (`IOPS`) with an appropriate `UnitMultiplier`.  
 
   - unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 except:
 	
