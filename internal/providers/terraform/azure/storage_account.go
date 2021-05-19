@@ -216,7 +216,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 func blobDataStorageCostComponent(location, name, skuName, startUsage, productName string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:                 name,
-		Unit:                 "GB-months",
+		Unit:                 "GB",
 		UnitMultiplier:       1,
 		MonthlyQuantity:      quantity,
 		IgnoreIfMissingPrice: true,
