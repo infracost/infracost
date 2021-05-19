@@ -1,10 +1,10 @@
 
- Name                                           Monthly Qty  Unit       Monthly Cost 
-                                                                                     
- google_compute_disk.default                                                         
- └─ Standard provisioned storage (pd-standard)          100  GiB               $4.00 
-                                                                                     
- google_compute_snapshot.snapshot                                                    
- └─ Storage                                             100  GB-months         $2.60 
-                                                                                     
- PROJECT TOTAL                                                                 $6.60 
+ Name                                           Monthly Qty  Unit  Monthly Cost 
+                                                                                
+ google_compute_disk.default                                                    
+ └─ Standard provisioned storage (pd-standard)          100  GiB          $4.00 
+                                                                                
+ google_compute_snapshot.snapshot                                               
+ └─ Storage                                             100  GB           $2.60 
+                                                                                
+ PROJECT TOTAL                                                            $6.60 

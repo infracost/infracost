@@ -1,13 +1,13 @@
 
- Name                           Monthly Qty  Unit         Monthly Cost 
-                                                                       
- google_pubsub_topic.non_usage                                         
- └─ Message ingestion data      Cost depends on usage: $40.00 per TiB  
-                                                                       
- google_pubsub_topic.usage                                             
- └─ Message ingestion data               10  TiB               $400.00 
-                                                                       
- PROJECT TOTAL                                                 $400.00 
+ Name                              Monthly Qty  Unit              Monthly Cost 
+                                                                               
+ google_pubsub_topic.non_usage                                                 
+ └─ Message ingestion data      Monthly cost depends on usage: $40.00 per TiB  
+                                                                               
+ google_pubsub_topic.usage                                                     
+ └─ Message ingestion data                  10  TiB                    $400.00 
+                                                                               
+ PROJECT TOTAL                                                         $400.00 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

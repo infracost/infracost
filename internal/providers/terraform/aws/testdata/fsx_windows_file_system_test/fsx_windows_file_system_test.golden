@@ -2,14 +2,14 @@
  Name                                          Monthly Qty  Unit            Monthly Cost 
                                                                                          
  aws_fsx_windows_file_system.my_file_system                                              
- ├─ Throughput capacity                              1,024  MBps-months        $4,608.00 
- ├─ HDD storage                                        300  GB-months              $7.50 
- └─ Backup storage                           Cost depends on usage: $0.05 per GB-months  
+ ├─ Throughput capacity                              1,024  MBps               $4,608.00 
+ ├─ HDD storage                                        300  GB                     $7.50 
+ └─ Backup storage                           Monthly cost depends on usage: $0.05 per GB 
                                                                                          
  aws_fsx_windows_file_system.my_system                                                   
- ├─ Throughput capacity                              1,024  MBps-months        $4,608.00 
- ├─ HDD storage                                        300  GB-months              $7.50 
- └─ Backup storage                                  10,000  GB-months            $500.00 
+ ├─ Throughput capacity                              1,024  MBps               $4,608.00 
+ ├─ HDD storage                                        300  GB                     $7.50 
+ └─ Backup storage                                  10,000  GB                   $500.00 
                                                                                          
  PROJECT TOTAL                                                                 $9,731.00 
 

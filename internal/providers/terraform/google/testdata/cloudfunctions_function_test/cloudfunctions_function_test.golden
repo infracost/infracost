@@ -1,19 +1,19 @@
 
- Name                                            Monthly Qty  Unit                Monthly Cost 
-                                                                                               
- google_cloudfunctions_function.function                                                       
- ├─ CPU                                      Cost depends on usage: $0.00001 per GHz-seconds   
- ├─ Memory                                   Cost depends on usage: $0.0000025 per GB-seconds  
- ├─ Invocations                              Cost depends on usage: $0.0000004 per invocations 
- └─ Outbound data transfer                   Cost depends on usage: $0.12 per GB               
-                                                                                               
- google_cloudfunctions_function.my_function                                                    
- ├─ CPU                                            1,200,000  GHz-seconds               $12.00 
- ├─ Memory                                           750,000  GB-seconds                 $1.87 
- ├─ Invocations                                   10,000,000  invocations                $4.00 
- └─ Outbound data transfer                               100  GB                        $12.00 
-                                                                                               
- PROJECT TOTAL                                                                          $29.87 
+ Name                                               Monthly Qty  Unit                      Monthly Cost 
+                                                                                                        
+ google_cloudfunctions_function.function                                                                
+ ├─ CPU                                      Monthly cost depends on usage: $0.00001 per GHz-seconds    
+ ├─ Memory                                   Monthly cost depends on usage: $0.0000025 per GB-seconds   
+ ├─ Invocations                              Monthly cost depends on usage: $0.0000004 per invocations  
+ └─ Outbound data transfer                   Monthly cost depends on usage: $0.12 per GB                
+                                                                                                        
+ google_cloudfunctions_function.my_function                                                             
+ ├─ CPU                                               1,200,000  GHz-seconds                     $12.00 
+ ├─ Memory                                              750,000  GB-seconds                       $1.87 
+ ├─ Invocations                                      10,000,000  invocations                      $4.00 
+ └─ Outbound data transfer                                  100  GB                              $12.00 
+                                                                                                        
+ PROJECT TOTAL                                                                                   $29.87 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

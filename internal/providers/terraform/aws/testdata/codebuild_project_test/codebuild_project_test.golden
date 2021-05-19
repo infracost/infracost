@@ -1,22 +1,22 @@
 
- Name                                             Monthly Qty  Unit          Monthly Cost 
-                                                                                          
- aws_codebuild_project.my_large_linux_project                                             
- └─ Linux (general1.large)                            100,000  minutes          $2,000.00 
-                                                                                          
- aws_codebuild_project.my_large_windows_project                                           
- └─ Windows (general1.large)                          100,000  minutes          $3,600.00 
-                                                                                          
- aws_codebuild_project.my_medium_project                                                  
- └─ Linux (general1.medium)                            10,000  minutes            $100.00 
-                                                                                          
- aws_codebuild_project.my_project_noUsage                                                 
- └─ Linux (general1.medium)                      Cost depends on usage: $0.01 per minutes 
-                                                                                          
- aws_codebuild_project.my_small_project                                                   
- └─ Linux (general1.small)                              1,000  minutes              $5.00 
-                                                                                          
- PROJECT TOTAL                                                                  $5,705.00 
+ Name                                                Monthly Qty  Unit                Monthly Cost 
+                                                                                                   
+ aws_codebuild_project.my_large_linux_project                                                      
+ └─ Linux (general1.large)                               100,000  minutes                $2,000.00 
+                                                                                                   
+ aws_codebuild_project.my_large_windows_project                                                    
+ └─ Windows (general1.large)                             100,000  minutes                $3,600.00 
+                                                                                                   
+ aws_codebuild_project.my_medium_project                                                           
+ └─ Linux (general1.medium)                               10,000  minutes                  $100.00 
+                                                                                                   
+ aws_codebuild_project.my_project_noUsage                                                          
+ └─ Linux (general1.medium)                      Monthly cost depends on usage: $0.01 per minutes  
+                                                                                                   
+ aws_codebuild_project.my_small_project                                                            
+ └─ Linux (general1.small)                                 1,000  minutes                    $5.00 
+                                                                                                   
+ PROJECT TOTAL                                                                           $5,705.00 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
