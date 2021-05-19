@@ -3,7 +3,7 @@
                                                                                                    
  azurerm_container_registry.basic                                                                  
  ├─ Registry usage (Basic)                                  30  days                         $5.00 
- ├─ Storage (over 10GB)                                    140  GB-months                   $14.00 
+ ├─ Storage (over 10GB)                                    140  GB                          $14.00 
  └─ Build vCPU                                         540,000  seconds                     $54.00 
                                                                                                    
  azurerm_container_registry.my_registry                                                            
@@ -13,7 +13,7 @@
                                                                                                    
  azurerm_container_registry.overStorage                                                            
  ├─ Registry usage (Basic)                                  30  days                         $5.00 
- ├─ Storage (over 10GB)                                    540  GB-months                   $54.00 
+ ├─ Storage (over 10GB)                                    540  GB                          $54.00 
  └─ Build vCPU                                         540,000  seconds                     $54.00 
                                                                                                    
  azurerm_container_registry.twoLocations                                                           
@@ -27,7 +27,7 @@
                                                                                                    
  azurerm_container_registry.withoutUsage                                                           
  ├─ Registry usage (Basic)                                  30  days                         $5.00 
- ├─ Storage (over 10GB)                       Monthly cost depends on usage: $0.10 per GB-months   
+ ├─ Storage (over 10GB)                       Monthly cost depends on usage: $0.10 per GB          
  └─ Build vCPU                                Monthly cost depends on usage: $0.0001 per seconds   
                                                                                                    
  PROJECT TOTAL                                                                             $652.98 
