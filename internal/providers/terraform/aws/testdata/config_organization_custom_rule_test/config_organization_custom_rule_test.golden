@@ -1,15 +1,15 @@
 
- Name                                                                             Monthly Qty  Unit              Monthly Cost 
-                                                                                                                              
- aws_config_organization_custom_rule.my_config_organization_custom_rule                                                       
- └─ Rule evaluations (first 100K)                                              Cost depends on usage: $0.001 per evaluations  
-                                                                                                                              
- aws_config_organization_custom_rule.my_config_organization_custom_rule_usage                                                 
- ├─ Rule evaluations (first 100K)                                                     100,000  evaluations            $100.00 
- ├─ Rule evaluations (next 400K)                                                      400,000  evaluations            $320.00 
- └─ Rule evaluations (over 500K)                                                      100,000  evaluations             $50.00 
-                                                                                                                              
- PROJECT TOTAL                                                                                                        $470.00 
+ Name                                                                                Monthly Qty  Unit                    Monthly Cost 
+                                                                                                                                       
+ aws_config_organization_custom_rule.my_config_organization_custom_rule                                                                
+ └─ Rule evaluations (first 100K)                                              Monthly cost depends on usage: $0.001 per evaluations   
+                                                                                                                                       
+ aws_config_organization_custom_rule.my_config_organization_custom_rule_usage                                                          
+ ├─ Rule evaluations (first 100K)                                                        100,000  evaluations                  $100.00 
+ ├─ Rule evaluations (next 400K)                                                         400,000  evaluations                  $320.00 
+ └─ Rule evaluations (over 500K)                                                         100,000  evaluations                   $50.00 
+                                                                                                                                       
+ PROJECT TOTAL                                                                                                                 $470.00 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

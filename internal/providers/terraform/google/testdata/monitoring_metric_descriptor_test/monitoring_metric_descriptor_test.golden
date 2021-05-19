@@ -1,17 +1,17 @@
 
- Name                                             Monthly Qty  Unit            Monthly Cost 
-                                                                                            
- google_monitoring_metric_descriptor.non_usage                                              
- ├─ Monitoring data (first 100K)                Cost depends on usage: $0.26 per MB         
- └─ API calls                                   Cost depends on usage: $0.01 per 1k calls   
-                                                                                            
- google_monitoring_metric_descriptor.usage                                                  
- ├─ Monitoring data (first 100K)                      100,000  MB                $25,800.00 
- ├─ Monitoring data (next 150K)                       150,000  MB                $22,650.00 
- ├─ Monitoring data (over 250K)                       250,000  MB                $15,250.00 
- └─ API calls                                           1,000  1k calls              $10.00 
-                                                                                            
- PROJECT TOTAL                                                                   $63,710.00 
+ Name                                                Monthly Qty  Unit                  Monthly Cost 
+                                                                                                     
+ google_monitoring_metric_descriptor.non_usage                                                       
+ ├─ Monitoring data (first 100K)                Monthly cost depends on usage: $0.26 per 1  MB       
+ └─ API calls                                   Monthly cost depends on usage: $0.01 per 1 k calls   
+                                                                                                     
+ google_monitoring_metric_descriptor.usage                                                           
+ ├─ Monitoring data (first 100K)                         100,000  1  MB                   $25,800.00 
+ ├─ Monitoring data (next 150K)                          150,000  1  MB                   $22,650.00 
+ ├─ Monitoring data (over 250K)                          250,000  1  MB                   $15,250.00 
+ └─ API calls                                              1,000  1 k calls                   $10.00 
+                                                                                                     
+ PROJECT TOTAL                                                                            $63,710.00 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

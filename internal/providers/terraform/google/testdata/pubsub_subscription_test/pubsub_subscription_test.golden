@@ -1,17 +1,17 @@
 
- Name                                        Monthly Qty  Unit            Monthly Cost 
-                                                                                       
- google_pubsub_subscription.non_usage                                                  
- ├─ Message delivery data                  Cost depends on usage: $40.00 per TiB       
- ├─ Retained acknowledged message storage  Cost depends on usage: $0.27 per GiB-months 
- └─ Snapshot message backlog storage       Cost depends on usage: $0.27 per GiB-months 
-                                                                                       
- google_pubsub_subscription.usage                                                      
- ├─ Message delivery data                             10  TiB                  $400.00 
- ├─ Retained acknowledged message storage             20  GiB-months             $5.40 
- └─ Snapshot message backlog storage                  30  GiB-months             $8.10 
-                                                                                       
- PROJECT TOTAL                                                                 $413.50 
+ Name                                         Monthly Qty  Unit              Monthly Cost 
+                                                                                          
+ google_pubsub_subscription.non_usage                                                     
+ ├─ Message delivery data                  Monthly cost depends on usage: $40.00 per TiB  
+ ├─ Retained acknowledged message storage  Monthly cost depends on usage: $0.27 per GiB   
+ └─ Snapshot message backlog storage       Monthly cost depends on usage: $0.27 per GiB   
+                                                                                          
+ google_pubsub_subscription.usage                                                         
+ ├─ Message delivery data                              10  TiB                    $400.00 
+ ├─ Retained acknowledged message storage              20  GiB                      $5.40 
+ └─ Snapshot message backlog storage                   30  GiB                      $8.10 
+                                                                                          
+ PROJECT TOTAL                                                                    $413.50 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -6,10 +6,10 @@
  └─ Standard provisioned storage (pd-standard)                    10  GiB                    $0.40 
                                                                                                    
  google_compute_machine_image.image                                                                
- └─ Storage                                            Cost depends on usage: $0.05 per GB-months  
+ └─ Storage                                            Monthly cost depends on usage: $0.05 per GB 
                                                                                                    
  google_compute_machine_image.usage                                                                
- └─ Storage                                                    5,000  GB-months            $250.00 
+ └─ Storage                                                    5,000  GB                   $250.00 
                                                                                                    
  PROJECT TOTAL                                                                             $274.86 
 

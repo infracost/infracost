@@ -1,66 +1,66 @@
 
- Name                                                         Monthly Qty  Unit                Monthly Cost 
-                                                                                                            
- aws_cloudfront_distribution.s3_distribution                                                                
- ├─ Field level encryption requests                       Cost depends on usage: $0.02 per 10k requests     
- ├─ Real-time log requests                                Cost depends on usage: $0.01 per 1M lines         
- ├─ Dedicated IP custom SSLs                              Cost depends on usage: $600.00 per certificates   
- ├─ Invalidation requests (first 1k)                      Cost depends on usage: $0 per paths               
- ├─ Data transfer out to internet                                                                           
- │  ├─ US, Mexico, Canada (first 10TB)                    Cost depends on usage: $0.09 per GB               
- │  ├─ Europe, Israel (first 10TB)                        Cost depends on usage: $0.09 per GB               
- │  ├─ South Africa, Kenya, Middle East (first 10TB)      Cost depends on usage: $0.11 per GB               
- │  ├─ South America (first 10TB)                         Cost depends on usage: $0.11 per GB               
- │  ├─ Japan (first 10TB)                                 Cost depends on usage: $0.11 per GB               
- │  ├─ Australia, New Zealand (first 10TB)                Cost depends on usage: $0.11 per GB               
- │  ├─ Hong Kong, Philippines, Asia Pacific (first 10TB)  Cost depends on usage: $0.12 per GB               
- │  └─ India (first 10TB)                                 Cost depends on usage: $0.11 per GB               
- ├─ Data transfer out to origin                                                                             
- │  ├─ US, Mexico, Canada                                 Cost depends on usage: $0.02 per GB               
- │  ├─ Europe, Israel                                     Cost depends on usage: $0.02 per GB               
- │  ├─ South Africa, Kenya, Middle East                   Cost depends on usage: $0.06 per GB               
- │  ├─ South America                                      Cost depends on usage: $0.13 per GB               
- │  ├─ Japan                                              Cost depends on usage: $0.06 per GB               
- │  ├─ Australia, New Zealand                             Cost depends on usage: $0.08 per GB               
- │  ├─ Hong Kong, Philippines, Asia Pacific               Cost depends on usage: $0.06 per GB               
- │  └─ India                                              Cost depends on usage: $0.16 per GB               
- ├─ HTTP requests                                                                                           
- │  ├─ US, Mexico, Canada                                 Cost depends on usage: $0.0075 per 10k requests   
- │  ├─ Europe, Israel                                     Cost depends on usage: $0.009 per 10k requests    
- │  ├─ South Africa, Kenya, Middle East                   Cost depends on usage: $0.009 per 10k requests    
- │  ├─ South America                                      Cost depends on usage: $0.02 per 10k requests     
- │  ├─ Japan                                              Cost depends on usage: $0.009 per 10k requests    
- │  ├─ Australia, New Zealand                             Cost depends on usage: $0.009 per 10k requests    
- │  ├─ Hong Kong, Philippines, Asia Pacific               Cost depends on usage: $0.009 per 10k requests    
- │  └─ India                                              Cost depends on usage: $0.009 per 10k requests    
- ├─ HTTPS requests                                                                                          
- │  ├─ US, Mexico, Canada                                 Cost depends on usage: $0.01 per 10k requests     
- │  ├─ Europe, Israel                                     Cost depends on usage: $0.01 per 10k requests     
- │  ├─ South Africa, Kenya, Middle East                   Cost depends on usage: $0.01 per 10k requests     
- │  ├─ South America                                      Cost depends on usage: $0.02 per 10k requests     
- │  ├─ Japan                                              Cost depends on usage: $0.01 per 10k requests     
- │  ├─ Australia, New Zealand                             Cost depends on usage: $0.01 per 10k requests     
- │  ├─ Hong Kong, Philippines, Asia Pacific               Cost depends on usage: $0.01 per 10k requests     
- │  └─ India                                              Cost depends on usage: $0.01 per 10k requests     
- └─ Origin shield HTTP requests                                                                             
-    ├─ US                                                 Cost depends on usage: $0.0075 per 10k requests   
-    ├─ Europe                                             Cost depends on usage: $0.009 per 10k requests    
-    ├─ South America                                      Cost depends on usage: $0.02 per 10k requests     
-    ├─ Japan                                              Cost depends on usage: $0.009 per 10k requests    
-    ├─ Australia                                          Cost depends on usage: $0.009 per 10k requests    
-    ├─ Singapore                                          Cost depends on usage: $0.009 per 10k requests    
-    ├─ South Korea                                        Cost depends on usage: $0.009 per 10k requests    
-    └─ India                                              Cost depends on usage: $0.009 per 10k requests    
-                                                                                                            
- aws_s3_bucket.b                                                                                            
- └─ Standard                                                                                                
-    ├─ Storage                                            Cost depends on usage: $0.02 per GB-months        
-    ├─ PUT, COPY, POST, LIST requests                     Cost depends on usage: $0.005 per 1k requests     
-    ├─ GET, SELECT, and all other requests                Cost depends on usage: $0.0004 per 1k requests    
-    ├─ Select data scanned                                Cost depends on usage: $0.002 per GB-months       
-    └─ Select data returned                               Cost depends on usage: $0.0007 per GB-months      
-                                                                                                            
- PROJECT TOTAL                                                                                        $0.00
+ Name                                                           Monthly Qty  Unit                    Monthly Cost 
+                                                                                                                  
+ aws_cloudfront_distribution.s3_distribution                                                                      
+ ├─ Field level encryption requests                       Monthly cost depends on usage: $0.02 per 10k requests   
+ ├─ Real-time log requests                                Monthly cost depends on usage: $0.01 per 1M lines       
+ ├─ Dedicated IP custom SSLs                              Monthly cost depends on usage: $600.00 per certificates 
+ ├─ Invalidation requests (first 1k)                      Monthly cost depends on usage: $0 per paths             
+ ├─ Data transfer out to internet                                                                                 
+ │  ├─ US, Mexico, Canada (first 10TB)                    Monthly cost depends on usage: $0.09 per GB             
+ │  ├─ Europe, Israel (first 10TB)                        Monthly cost depends on usage: $0.09 per GB             
+ │  ├─ South Africa, Kenya, Middle East (first 10TB)      Monthly cost depends on usage: $0.11 per GB             
+ │  ├─ South America (first 10TB)                         Monthly cost depends on usage: $0.11 per GB             
+ │  ├─ Japan (first 10TB)                                 Monthly cost depends on usage: $0.11 per GB             
+ │  ├─ Australia, New Zealand (first 10TB)                Monthly cost depends on usage: $0.11 per GB             
+ │  ├─ Hong Kong, Philippines, Asia Pacific (first 10TB)  Monthly cost depends on usage: $0.12 per GB             
+ │  └─ India (first 10TB)                                 Monthly cost depends on usage: $0.11 per GB             
+ ├─ Data transfer out to origin                                                                                   
+ │  ├─ US, Mexico, Canada                                 Monthly cost depends on usage: $0.02 per GB             
+ │  ├─ Europe, Israel                                     Monthly cost depends on usage: $0.02 per GB             
+ │  ├─ South Africa, Kenya, Middle East                   Monthly cost depends on usage: $0.06 per GB             
+ │  ├─ South America                                      Monthly cost depends on usage: $0.13 per GB             
+ │  ├─ Japan                                              Monthly cost depends on usage: $0.06 per GB             
+ │  ├─ Australia, New Zealand                             Monthly cost depends on usage: $0.08 per GB             
+ │  ├─ Hong Kong, Philippines, Asia Pacific               Monthly cost depends on usage: $0.06 per GB             
+ │  └─ India                                              Monthly cost depends on usage: $0.16 per GB             
+ ├─ HTTP requests                                                                                                 
+ │  ├─ US, Mexico, Canada                                 Monthly cost depends on usage: $0.0075 per 10k requests 
+ │  ├─ Europe, Israel                                     Monthly cost depends on usage: $0.009 per 10k requests  
+ │  ├─ South Africa, Kenya, Middle East                   Monthly cost depends on usage: $0.009 per 10k requests  
+ │  ├─ South America                                      Monthly cost depends on usage: $0.02 per 10k requests   
+ │  ├─ Japan                                              Monthly cost depends on usage: $0.009 per 10k requests  
+ │  ├─ Australia, New Zealand                             Monthly cost depends on usage: $0.009 per 10k requests  
+ │  ├─ Hong Kong, Philippines, Asia Pacific               Monthly cost depends on usage: $0.009 per 10k requests  
+ │  └─ India                                              Monthly cost depends on usage: $0.009 per 10k requests  
+ ├─ HTTPS requests                                                                                                
+ │  ├─ US, Mexico, Canada                                 Monthly cost depends on usage: $0.01 per 10k requests   
+ │  ├─ Europe, Israel                                     Monthly cost depends on usage: $0.01 per 10k requests   
+ │  ├─ South Africa, Kenya, Middle East                   Monthly cost depends on usage: $0.01 per 10k requests   
+ │  ├─ South America                                      Monthly cost depends on usage: $0.02 per 10k requests   
+ │  ├─ Japan                                              Monthly cost depends on usage: $0.01 per 10k requests   
+ │  ├─ Australia, New Zealand                             Monthly cost depends on usage: $0.01 per 10k requests   
+ │  ├─ Hong Kong, Philippines, Asia Pacific               Monthly cost depends on usage: $0.01 per 10k requests   
+ │  └─ India                                              Monthly cost depends on usage: $0.01 per 10k requests   
+ └─ Origin shield HTTP requests                                                                                   
+    ├─ US                                                 Monthly cost depends on usage: $0.0075 per 10k requests 
+    ├─ Europe                                             Monthly cost depends on usage: $0.009 per 10k requests  
+    ├─ South America                                      Monthly cost depends on usage: $0.02 per 10k requests   
+    ├─ Japan                                              Monthly cost depends on usage: $0.009 per 10k requests  
+    ├─ Australia                                          Monthly cost depends on usage: $0.009 per 10k requests  
+    ├─ Singapore                                          Monthly cost depends on usage: $0.009 per 10k requests  
+    ├─ South Korea                                        Monthly cost depends on usage: $0.009 per 10k requests  
+    └─ India                                              Monthly cost depends on usage: $0.009 per 10k requests  
+                                                                                                                  
+ aws_s3_bucket.b                                                                                                  
+ └─ Standard                                                                                                      
+    ├─ Storage                                            Monthly cost depends on usage: $0.02 per GB             
+    ├─ PUT, COPY, POST, LIST requests                     Monthly cost depends on usage: $0.005 per 1k requests   
+    ├─ GET, SELECT, and all other requests                Monthly cost depends on usage: $0.0004 per 1k requests  
+    ├─ Select data scanned                                Monthly cost depends on usage: $0.002 per GB            
+    └─ Select data returned                               Monthly cost depends on usage: $0.0007 per GB           
+                                                                                                                  
+ PROJECT TOTAL                                                                                              $0.00 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
