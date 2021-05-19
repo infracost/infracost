@@ -51,9 +51,9 @@ func NewRedisInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           name,
-				Unit:           "GB-hours",
+				Unit:           "GB",
 				UnitMultiplier: 1,
-				HourlyQuantity: decimalPtr(decimal.NewFromInt(memorySize)),
+				MonthlyQuantity: decimalPtr(decimal.NewFromInt(memorySize)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr(region),
