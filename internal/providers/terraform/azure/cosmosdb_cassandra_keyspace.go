@@ -1,0 +1,350 @@
+package azure
+
+import (
+	"fmt"
+
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
+)
+
+func GetAzureRMCosmosdbCassandraKeyspaceRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "azurerm_cosmosdb_cassandra_keyspace",
+		RFunc: NewAzureCosmosdbCassandraKeyspace,
+		ReferenceAttributes: []string{
+			"account_name",
+		},
+	}
+}
+
+type modelType int
+
+const (
+	Provisioned modelType = iota
+	Autoscale
+	Serverless
+)
+
+func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	costComponents := []*schema.CostComponent{}
+
+	account := d.References("account_name")[0]
+	mainLocation := account.Get("location").String()
+	geoLocations := account.Get("geo_location").Array()
+
+	model := Provisioned
+	skuName := "RUs"
+	if account.Get("enable_multiple_write_locations").Type != gjson.Null {
+		if account.Get("enable_multiple_write_locations").Bool() {
+			skuName = "mRUs"
+		}
+	}
+
+	var throughputs *decimal.Decimal
+	if d.Get("throughput").Type != gjson.Null {
+		throughputs = decimalPtr(decimal.NewFromInt(d.Get("throughput").Int()))
+	}
+	if d.Get("autoscale_settings.0.max_throughput").Type != gjson.Null {
+		throughputs = decimalPtr(decimal.NewFromInt(d.Get("autoscale_settings.0.max_throughput").Int()))
+		model = Autoscale
+	}
+
+	if throughputs == nil {
+		model = Serverless
+		availabilityZone := geoLocations[0].Get("zone_zone_redundant").Bool()
+		costComponents = append(costComponents, serverlessCosmosCostComponent(mainLocation, availabilityZone, u))
+	}
+
+	if model == Provisioned || model == Autoscale {
+		costComponents = provisionedCosmosCostComponents(
+			model,
+			throughputs,
+			geoLocations,
+			skuName,
+			u)
+	}
+
+	costComponents = append(costComponents, storageCosmosCostComponents(account, u, geoLocations, skuName)...)
+
+	backupType := "Pereodic"
+	if account.Get("backup.0.type").Type != gjson.Null {
+		backupType = account.Get("backup.0.type").String()
+	}
+	costComponents = append(costComponents, backupStorageCosmosCostComponents(account, u, geoLocations, backupType, mainLocation)...)
+
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: costComponents,
+	}
+}
+
+func provisionedCosmosCostComponents(model modelType, throughputs *decimal.Decimal, zones []gjson.Result, skuName string, u *schema.UsageData) []*schema.CostComponent {
+	costComponents := []*schema.CostComponent{}
+
+	var meterName string
+	if skuName == "RUs" {
+		meterName = "100 RU/s"
+	} else {
+		meterName = "100 Multi-master RU/s"
+	}
+
+	if throughputs != nil {
+		throughputs = decimalPtr(throughputs.Div(decimal.NewFromInt(100)))
+
+		for _, g := range zones {
+			quantity := throughputs
+
+			if model == Autoscale {
+				if skuName == "RUs" {
+					quantity = decimalPtr(quantity.Mul(decimal.NewFromFloat(1.5)))
+				}
+			} else {
+				if skuName == "RUs" {
+					if g.Get("zone_redundant").Type != gjson.Null {
+						if g.Get("zone_redundant").Bool() {
+							quantity = decimalPtr(quantity.Mul(decimal.NewFromFloat(1.25)))
+						}
+					}
+				}
+			}
+
+			location := g.Get("location").String()
+			if l := locationNameMapping(location); l != "" {
+				costComponents = append(costComponents, &schema.CostComponent{
+					Name:           fmt.Sprintf("Request units (provisioned, %s)", l),
+					Unit:           "hours",
+					UnitMultiplier: 1,
+					HourlyQuantity: quantity,
+					ProductFilter: &schema.ProductFilter{
+						VendorName:    strPtr("azure"),
+						Region:        strPtr(location),
+						Service:       strPtr("Azure Cosmos DB"),
+						ProductFamily: strPtr("Databases"),
+						AttributeFilters: []*schema.AttributeFilter{
+							{Key: "meterName", Value: strPtr(meterName)},
+							{Key: "skuName", Value: strPtr(skuName)},
+						},
+					},
+					PriceFilter: &schema.PriceFilter{
+						PurchaseOption: strPtr("Consumption"),
+					},
+				})
+			}
+		}
+	}
+
+	return costComponents
+}
+
+func serverlessCosmosCostComponent(location string, availabilityZone bool, u *schema.UsageData) *schema.CostComponent {
+	var requestUnits *decimal.Decimal
+	if u != nil && u.Get("monthly_serverless_request_units").Exists() {
+		requestUnits = decimalPtr(decimal.NewFromInt(u.Get("monthly_serverless_request_units").Int()))
+		requestUnits = decimalPtr(requestUnits.Div(decimal.NewFromInt(1000000)))
+	}
+
+	if availabilityZone {
+		requestUnits = decimalPtr(requestUnits.Mul(decimal.NewFromFloat(1.25)))
+	}
+
+	return &schema.CostComponent{
+		Name:            "Requests (serverless)",
+		Unit:            "1M units",
+		UnitMultiplier:  1,
+		MonthlyQuantity: requestUnits,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(location),
+			Service:       strPtr("Azure Cosmos DB"),
+			ProductFamily: strPtr("Databases"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", ValueRegex: strPtr("Azure Cosmos DB serverless")},
+				{Key: "skuName", Value: strPtr("RUs")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	}
+}
+
+func storageCosmosCostComponents(account *schema.ResourceData, u *schema.UsageData, zones []gjson.Result, skuName string) []*schema.CostComponent {
+	costComponents := []*schema.CostComponent{}
+	var storageGB *decimal.Decimal
+	if u != nil && u.Get("storage_gb").Exists() {
+		storageGB = decimalPtr(decimal.NewFromInt(u.Get("storage_gb").Int()))
+	}
+
+	for _, g := range zones {
+		location := g.Get("location").String()
+		if l := locationNameMapping(location); l != "" {
+			costComponents = append(costComponents, storageCosmosCostComponent(
+				fmt.Sprintf("Transactional storage (%s)", l),
+				location,
+				skuName,
+				"Azure Cosmos DB",
+				storageGB))
+
+			if account.Get("analytical_storage_enabled").Type != gjson.Null {
+				if account.Get("analytical_storage_enabled").Bool() {
+					costComponents = append(costComponents, storageCosmosCostComponent(
+						fmt.Sprintf("Analytical Storage (%s)", l),
+						location,
+						"Standard",
+						"Azure Cosmos DB Analytics Storage",
+						storageGB))
+
+					var writeOperations, readOperations *decimal.Decimal
+					if u != nil && u.Get("monthly_write_operations").Exists() {
+						writeOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_write_operations").Int()))
+						writeOperations = decimalPtr(writeOperations.Div(decimal.NewFromInt(10000)))
+					}
+					if u != nil && u.Get("monthly_read_operations").Exists() {
+						readOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_read_operations").Int()))
+						readOperations = decimalPtr(readOperations.Div(decimal.NewFromInt(10000)))
+					}
+					costComponents = append(costComponents, operationsCosmosCostComponent(
+						fmt.Sprintf("Write operations (%s)", l),
+						location,
+						"Write Operations",
+						writeOperations,
+					))
+
+					costComponents = append(costComponents, operationsCosmosCostComponent(
+						fmt.Sprintf("Read operations (%s)", l),
+						location,
+						"Read Operations",
+						readOperations,
+					))
+				}
+			}
+		}
+	}
+
+	return costComponents
+}
+
+func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.UsageData, zones []gjson.Result, backupType, mainLocation string) []*schema.CostComponent {
+	costComponents := []*schema.CostComponent{}
+	var backupStorageGB *decimal.Decimal
+	if u != nil && u.Get("storage_gb").Exists() {
+		backupStorageGB = decimalPtr(decimal.NewFromInt(u.Get("storage_gb").Int()))
+	}
+
+	var name, meterName, skuName, productName string
+	if backupType == "Pereodic" {
+		name = "Pereodic backup"
+		meterName = "Data Stored"
+		skuName = "Standard"
+		productName = "Azure Cosmos DB Snapshot"
+	} else {
+		name = "Continuous backup"
+		meterName = "Continuous Backup"
+		skuName = "Backup"
+		productName = "Azure Cosmos DB - PITR"
+	}
+
+	for _, g := range zones {
+		location := g.Get("location").String()
+		if l := locationNameMapping(location); l != "" {
+			costComponents = append(costComponents, backupCosmosCostComponent(
+				fmt.Sprintf("%s (%s)", name, l),
+				location,
+				skuName,
+				productName,
+				meterName,
+				backupStorageGB,
+			))
+		}
+	}
+
+	var pitr *decimal.Decimal
+	if u != nil && u.Get("restored_data_gb").Exists() {
+		pitr = decimalPtr(decimal.NewFromInt(u.Get("restored_data_gb").Int()))
+	}
+	meterName = "Data Restore"
+	skuName = "Backup"
+	productName = "Azure Cosmos DB - PITR"
+
+	costComponents = append(costComponents, backupCosmosCostComponent(
+		"Restored data",
+		mainLocation,
+		skuName,
+		productName,
+		meterName,
+		pitr,
+	))
+
+	return costComponents
+}
+
+func storageCosmosCostComponent(name, location, skuName, productName string, quantities *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "GB",
+		UnitMultiplier:  1,
+		MonthlyQuantity: quantities,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(location),
+			Service:       strPtr("Azure Cosmos DB"),
+			ProductFamily: strPtr("Databases"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "meterName", Value: strPtr("Data Stored")},
+				{Key: "skuName", Value: strPtr(skuName)},
+				{Key: "productName", Value: strPtr(productName)},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	}
+}
+
+func backupCosmosCostComponent(name, location, skuName, productName, meterName string, quantities *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:                 name,
+		Unit:                 "GB",
+		UnitMultiplier:       1,
+		MonthlyQuantity:      quantities,
+		IgnoreIfMissingPrice: true,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(location),
+			Service:       strPtr("Azure Cosmos DB"),
+			ProductFamily: strPtr("Databases"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "meterName", Value: strPtr(meterName)},
+				{Key: "skuName", Value: strPtr(skuName)},
+				{Key: "productName", Value: strPtr(productName)},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	}
+}
+
+func operationsCosmosCostComponent(name, location, meterName string, quantities *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "10K operations",
+		UnitMultiplier:  1,
+		MonthlyQuantity: quantities,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(location),
+			Service:       strPtr("Azure Cosmos DB"),
+			ProductFamily: strPtr("Databases"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "meterName", Value: strPtr(meterName)},
+				{Key: "skuName", Value: strPtr("Standard")},
+				{Key: "productName", Value: strPtr("Azure Cosmos DB Analytics Storage")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	}
+}

@@ -5,6 +5,7 @@ import "github.com/infracost/infracost/internal/schema"
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
+	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
 	GetAzureRMKubernetesClusterRegistryItem(),
 	GetAzureRMKubernetesClusterNodePoolRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),

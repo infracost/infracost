@@ -1,0 +1,72 @@
+
+ Name                                                 Monthly Qty  Unit                Monthly Cost 
+                                                                                                    
+ azurerm_cosmosdb_cassandra_keyspace.autoscale                                                      
+ ├─ Request units (provisioned, West US)                   43,800  hours                    $350.40 
+ ├─ Request units (provisioned, Central US)                43,800  hours                    $350.40 
+ ├─ Request units (provisioned, Japan West)                43,800  hours                    $394.20 
+ ├─ Transactional storage (West US)               Cost depends on usage: $0.25 per GB               
+ ├─ Analytical Storage (West US)                  Cost depends on usage: $0.03 per GB               
+ ├─ Write operations (West US)                    Cost depends on usage: $0.06 per 10K operations   
+ ├─ Read operations (West US)                     Cost depends on usage: $0.0054 per 10K operations 
+ ├─ Transactional storage (Central US)            Cost depends on usage: $0.25 per GB               
+ ├─ Analytical Storage (Central US)               Cost depends on usage: $0.02 per GB               
+ ├─ Write operations (Central US)                 Cost depends on usage: $0.05 per 10K operations   
+ ├─ Read operations (Central US)                  Cost depends on usage: $0.005 per 10K operations  
+ ├─ Transactional storage (Japan West)            Cost depends on usage: $0.28 per GB               
+ ├─ Analytical Storage (Japan West)               Cost depends on usage: $0.03 per GB               
+ ├─ Write operations (Japan West)                 Cost depends on usage: $0.05 per 10K operations   
+ ├─ Read operations (Japan West)                  Cost depends on usage: $0.005 per 10K operations  
+ ├─ Pereodic backup (West US)                     Cost depends on usage: $0.15 per GB               
+ ├─ Pereodic backup (Central US)                  Cost depends on usage: $0.15 per GB               
+ ├─ Pereodic backup (Japan West)                  Cost depends on usage: $0.16 per GB               
+ └─ Restored data                                 Cost depends on usage: $0.15 per GB               
+                                                                                                    
+ azurerm_cosmosdb_cassandra_keyspace.provisioned                                                    
+ ├─ Request units (provisioned, West US)                    3,650  hours                     $29.20 
+ ├─ Request units (provisioned, Central US)               4,562.5  hours                     $36.50 
+ ├─ Request units (provisioned, Japan West)               4,562.5  hours                     $41.06 
+ ├─ Transactional storage (West US)                         1,000  GB                       $250.00 
+ ├─ Analytical Storage (West US)                            1,000  GB                        $30.00 
+ ├─ Write operations (West US)                                100  10K operations             $5.50 
+ ├─ Read operations (West US)                                 100  10K operations             $0.54 
+ ├─ Transactional storage (Central US)                      1,000  GB                       $250.00 
+ ├─ Analytical Storage (Central US)                         1,000  GB                        $20.00 
+ ├─ Write operations (Central US)                             100  10K operations             $5.00 
+ ├─ Read operations (Central US)                              100  10K operations             $0.50 
+ ├─ Transactional storage (Japan West)                      1,000  GB                       $282.50 
+ ├─ Analytical Storage (Japan West)                         1,000  GB                        $30.00 
+ ├─ Write operations (Japan West)                             100  10K operations             $5.00 
+ ├─ Read operations (Japan West)                              100  10K operations             $0.50 
+ ├─ Pereodic backup (West US)                               1,000  GB                       $150.00 
+ ├─ Pereodic backup (Central US)                            1,000  GB                       $150.00 
+ ├─ Pereodic backup (Japan West)                            1,000  GB                       $160.00 
+ └─ Restored data                                           3,000  GB                       $450.00 
+                                                                                                    
+ azurerm_cosmosdb_cassandra_keyspace.serverless                                                     
+ ├─ Requests (serverless)                                      10  1M units                   $2.50 
+ ├─ Transactional storage (West US)                         1,000  GB                       $250.00 
+ ├─ Analytical Storage (West US)                            1,000  GB                        $30.00 
+ ├─ Write operations (West US)                    Cost depends on usage: $0.06 per 10K operations   
+ ├─ Read operations (West US)                     Cost depends on usage: $0.0054 per 10K operations 
+ ├─ Transactional storage (Central US)                      1,000  GB                       $250.00 
+ ├─ Analytical Storage (Central US)                         1,000  GB                        $20.00 
+ ├─ Write operations (Central US)                 Cost depends on usage: $0.05 per 10K operations   
+ ├─ Read operations (Central US)                  Cost depends on usage: $0.005 per 10K operations  
+ ├─ Transactional storage (Japan West)                      1,000  GB                       $282.50 
+ ├─ Analytical Storage (Japan West)                         1,000  GB                        $30.00 
+ ├─ Write operations (Japan West)                 Cost depends on usage: $0.05 per 10K operations   
+ ├─ Read operations (Japan West)                  Cost depends on usage: $0.005 per 10K operations  
+ ├─ Pereodic backup (West US)                               1,000  GB                       $150.00 
+ ├─ Pereodic backup (Central US)                            1,000  GB                       $150.00 
+ ├─ Pereodic backup (Japan West)                            1,000  GB                       $160.00 
+ └─ Restored data                                           3,000  GB                       $450.00 
+                                                                                                    
+ PROJECT TOTAL                                                                            $4,766.30 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+
+1 resource type wasn't estimated as it's not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_cosmosdb_account
