@@ -30,6 +30,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMPublicIPPrefixRegistryItem(),
 	GetAzureRMAppNATGatewayRegistryItem(),
 	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
+	GetAzureRMNotificationHubsRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
