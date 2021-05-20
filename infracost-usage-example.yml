@@ -548,4 +548,4 @@ resource_usage:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
 
   azurerm_notification_hub_namespace.basic:
-    monthlyAdditionalPushes: 1000000 # Number of additional pushes
+    monthly_additional_pushes: 1000000 # Number of additional pushes
