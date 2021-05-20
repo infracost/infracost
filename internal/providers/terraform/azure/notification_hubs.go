@@ -59,7 +59,7 @@ func NotificationHubsCostComponent(name, location, sku string) *schema.CostCompo
 func NotificationHubsPushesCostComponent(name, location, sku string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
-		Unit:           "Million Pushes",
+		Unit:           "10 Million Pushes",
 		UnitMultiplier: 1,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
