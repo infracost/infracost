@@ -134,7 +134,7 @@ func resourceToDiff(diffResource Resource, oldResource *Resource, newResource *R
 
 	if isTopLevel {
 		if oldCost == nil && newCost == nil {
-			s += "  Cost depends on usage\n"
+			s += "  Monthly cost depends on usage\n"
 		} else {
 			s += fmt.Sprintf("  %s%s\n",
 				formatCostChange(diffResource.MonthlyCost),
@@ -201,7 +201,7 @@ func costComponentToDiff(diffComponent CostComponent, oldComponent *CostComponen
 	s += fmt.Sprintf("%s %s\n", opChar(op), diffComponent.Name)
 
 	if oldCost == nil && newCost == nil {
-		s += "  Cost depends on usage\n"
+		s += "  Monthly cost depends on usage\n"
 		s += ui.FaintStringf("    %s per %s%s\n",
 			formatPriceChange(diffComponent.Price),
 			diffComponent.Unit,

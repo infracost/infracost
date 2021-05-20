@@ -78,7 +78,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 	costComponents := []*schema.CostComponent{
 		{
 			Name:            name,
-			Unit:            "GB-months",
+			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: &gbVal,
 			ProductFilter: &schema.ProductFilter{
@@ -101,7 +101,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 	if volumeAPIName == "standard" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "I/O requests",
-			Unit:            "request",
+			Unit:            "1M request",
 			UnitMultiplier:  1000000,
 			MonthlyQuantity: ioRequests,
 			ProductFilter: &schema.ProductFilter{
@@ -123,7 +123,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 				throughputVal = decimalPtr(throughputVal.Sub(decimal.NewFromInt(125)))
 				costComponents = append(costComponents, &schema.CostComponent{
 					Name:            "Provisioned throughput",
-					Unit:            "Mbps-months",
+					Unit:            "Mbps",
 					UnitMultiplier:  1,
 					MonthlyQuantity: throughputVal,
 					ProductFilter: &schema.ProductFilter{
@@ -155,7 +155,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 func ebsProvisionedIops(region string, volumeAPIName string, usageType string, iopsVal *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Provisioned IOPS",
-		Unit:            "IOPS-months",
+		Unit:            "IOPS",
 		UnitMultiplier:  1,
 		MonthlyQuantity: iopsVal,
 		ProductFilter: &schema.ProductFilter{

@@ -2,7 +2,7 @@
  Name                                                                              Monthly Qty  Unit            Monthly Cost 
                                                                                                                              
  google_container_registry.my_registry                                                                                       
- ├─ Storage (standard)                                                                     150  GiB-months             $3.90 
+ ├─ Storage (standard)                                                                     150  GiB                    $3.90 
  ├─ Object adds, bucket/object list (class A)                                                4  10k operations         $0.20 
  ├─ Object gets, retrieve bucket/object metadata (class B)                                   2  10k operations         $0.01 
  └─ Network egress                                                                                                           

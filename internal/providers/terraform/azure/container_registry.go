@@ -132,7 +132,7 @@ func ContainerRegistryStorageCostComponent(name, location, sku string, storage *
 	return &schema.CostComponent{
 
 		Name:            name,
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: storage,
 		ProductFilter: &schema.ProductFilter{

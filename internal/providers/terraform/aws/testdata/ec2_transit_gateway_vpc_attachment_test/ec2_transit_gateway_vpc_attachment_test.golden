@@ -1,11 +1,11 @@
 
- Name                                                   Monthly Qty  Unit         Monthly Cost 
-                                                                                               
- aws_ec2_transit_gateway_vpc_attachment.vpc_attachment                                         
- ├─ Transit gateway attachment                                  730  hours              $36.50 
- └─ Data processed                                      Cost depends on usage: $0.02 per GB    
-                                                                                               
- PROJECT TOTAL                                                                          $36.50 
+ Name                                                     Monthly Qty  Unit            Monthly Cost 
+                                                                                                    
+ aws_ec2_transit_gateway_vpc_attachment.vpc_attachment                                              
+ ├─ Transit gateway attachment                                    730  hours                 $36.50 
+ └─ Data processed                                      Monthly cost depends on usage: $0.02 per GB 
+                                                                                                    
+ PROJECT TOTAL                                                                               $36.50 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -6,14 +6,15 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
-	GetAzureRMKubernetesClusterRegistryItem(),
-	GetAzureRMKubernetesClusterNodePoolRegistryItem(),
+	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
 	GetAzureRMKeyVaultCertificateRegistryItem(),
 	GetAzureRMKeyVaultKeyRegistryItem(),
 	GetAzureRMKeyVaultManagedHSMRegistryItem(),
+	GetAzureRMKubernetesClusterRegistryItem(),
+	GetAzureRMKubernetesClusterNodePoolRegistryItem(),
 	GetAzureMariaDBServerRegistryItem(),
 	GetAzureMSSQLDatabaseRegistryItem(),
 	GetAzureMySQLServerRegistryItem(),
@@ -28,6 +29,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
 	GetAzureRMPublicIPRegistryItem(),
 	GetAzureRMPublicIPPrefixRegistryItem(),
+	GetAzureRMAppNATGatewayRegistryItem(),
 	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
 }
 
@@ -50,6 +52,13 @@ var FreeResources []string = []string{
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
+
+	// Azure Firewall
+	"azurerm_firewall_application_rule_collection",
+	"azurerm_firewall_nat_rule_collection",
+	"azurerm_firewall_network_rule_collection",
+	"azurerm_firewall_policy",
+	"azurerm_firewall_policy_rule_collection_group",
 
 	// Azure Key Vault
 	"azurerm_key_vault",

@@ -24,7 +24,7 @@ func NewDNSRecordSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Queries",
-				Unit:            "queries",
+				Unit:            "1M queries",
 				UnitMultiplier:  1000000,
 				MonthlyQuantity: monthlyQueries,
 				ProductFilter: &schema.ProductFilter{

@@ -38,7 +38,7 @@ func NewSecretsManagerSecret(d *schema.ResourceData, u *schema.UsageData) *schem
 			},
 			{
 				Name:            "API requests",
-				Unit:            "requests",
+				Unit:            "10k requests",
 				UnitMultiplier:  10000,
 				MonthlyQuantity: monthlyRequests,
 				ProductFilter: &schema.ProductFilter{

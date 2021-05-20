@@ -1,37 +1,37 @@
 
- Name                                          Monthly Qty  Unit            Monthly Cost 
-                                                                                         
- aws_ebs_volume.gp2                                                                      
- └─ Storage (general purpose SSD, gp2)                  10  GB-months              $1.00 
-                                                                                         
- aws_ebs_volume.gp3                                                                      
- ├─ Storage (general purpose SSD, gp3)                  40  GB-months              $3.20 
- ├─ Provisioned throughput                               5  Mbps-months            $0.20 
- └─ Provisioned IOPS                                 1,000  IOPS-months            $5.00 
-                                                                                         
- aws_ebs_volume.io1                                                                      
- ├─ Storage (provisioned IOPS SSD, io1)                 30  GB-months              $3.75 
- └─ Provisioned IOPS                                   300  IOPS-months           $19.50 
-                                                                                         
- aws_ebs_volume.io2                                                                      
- ├─ Storage (provisioned IOPS SSD, io2)                 30  GB-months              $3.75 
- └─ Provisioned IOPS                                   300  IOPS-months           $19.50 
-                                                                                         
- aws_ebs_volume.sc1                                                                      
- └─ Storage (cold HDD, sc1)                             50  GB-months              $0.75 
-                                                                                         
- aws_ebs_volume.st1                                                                      
- └─ Storage (throughput optimized HDD, st1)             40  GB-months              $1.80 
-                                                                                         
- aws_ebs_volume.standard                                                                 
- ├─ Storage (magnetic)                                  20  GB-months              $1.00 
- └─ I/O requests                             Cost depends on usage: $0.05 per 1M request 
-                                                                                         
- aws_ebs_volume.standard_withUsage                                                       
- ├─ Storage (magnetic)                                  20  GB-months              $1.00 
- └─ I/O requests                                         1  1M request             $0.05 
-                                                                                         
- PROJECT TOTAL                                                                    $60.50 
+ Name                                             Monthly Qty  Unit                  Monthly Cost 
+                                                                                                  
+ aws_ebs_volume.gp2                                                                               
+ └─ Storage (general purpose SSD, gp2)                     10  GB                           $1.00 
+                                                                                                  
+ aws_ebs_volume.gp3                                                                               
+ ├─ Storage (general purpose SSD, gp3)                     40  GB                           $3.20 
+ ├─ Provisioned throughput                                  5  Mbps                         $0.20 
+ └─ Provisioned IOPS                                    1,000  IOPS                         $5.00 
+                                                                                                  
+ aws_ebs_volume.io1                                                                               
+ ├─ Storage (provisioned IOPS SSD, io1)                    30  GB                           $3.75 
+ └─ Provisioned IOPS                                      300  IOPS                        $19.50 
+                                                                                                  
+ aws_ebs_volume.io2                                                                               
+ ├─ Storage (provisioned IOPS SSD, io2)                    30  GB                           $3.75 
+ └─ Provisioned IOPS                                      300  IOPS                        $19.50 
+                                                                                                  
+ aws_ebs_volume.sc1                                                                               
+ └─ Storage (cold HDD, sc1)                                50  GB                           $0.75 
+                                                                                                  
+ aws_ebs_volume.st1                                                                               
+ └─ Storage (throughput optimized HDD, st1)                40  GB                           $1.80 
+                                                                                                  
+ aws_ebs_volume.standard                                                                          
+ ├─ Storage (magnetic)                                     20  GB                           $1.00 
+ └─ I/O requests                             Monthly cost depends on usage: $0.05 per 1M request  
+                                                                                                  
+ aws_ebs_volume.standard_withUsage                                                                
+ ├─ Storage (magnetic)                                     20  GB                           $1.00 
+ └─ I/O requests                                            1  1M request                   $0.05 
+                                                                                                  
+ PROJECT TOTAL                                                                             $60.50 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

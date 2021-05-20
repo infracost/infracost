@@ -9,11 +9,11 @@
                                                                                              
  aws_elasticache_cluster.redis_snapshot                                                      
  ├─ Elasticache (on-demand, cache.m6g.12xlarge)            730  hours              $2,596.61 
- └─ Backup storage                               Cost depends on usage: $0.09 per GB-months  
+ └─ Backup storage                               Monthly cost depends on usage: $0.09 per GB 
                                                                                              
  aws_elasticache_cluster.redis_snapshot_usage                                                
  ├─ Elasticache (on-demand, cache.m6g.12xlarge)            730  hours              $2,596.61 
- └─ Backup storage                                      10,000  GB-months            $850.00 
+ └─ Backup storage                                      10,000  GB                   $850.00 
                                                                                              
  PROJECT TOTAL                                                                     $8,867.59 
 

@@ -2,20 +2,20 @@
  Name                                     Monthly Qty  Unit            Monthly Cost 
                                                                                     
  aws_efs_file_system.ia_storage                                                     
- ├─ Storage (standard)                            230  GB-months             $69.00 
- ├─ Storage (infrequent access)                   100  GB-months              $2.50 
+ ├─ Storage (standard)                            230  GB                    $69.00 
+ ├─ Storage (infrequent access)                   100  GB                     $2.50 
  ├─ Read requests (infrequent access)              50  GB                     $0.50 
  └─ Write requests (infrequent access)            100  GB                     $1.00 
                                                                                     
  aws_efs_file_system.no_usage                                                       
- └─ Storage (standard)                  Cost depends on usage: $0.30 per GB-months  
+ └─ Storage (standard)                  Monthly cost depends on usage: $0.30 per GB 
                                                                                     
  aws_efs_file_system.provisioned                                                    
- ├─ Storage (standard)                            230  GB-months             $69.00 
- └─ Provisioned throughput                       88.5  MBps-months          $531.00 
+ ├─ Storage (standard)                            230  GB                    $69.00 
+ └─ Provisioned throughput                       88.5  MBps                 $531.00 
                                                                                     
  aws_efs_file_system.standard_storage                                               
- └─ Storage (standard)                            230  GB-months             $69.00 
+ └─ Storage (standard)                            230  GB                    $69.00 
                                                                                     
  PROJECT TOTAL                                                              $742.00 
 

@@ -42,7 +42,7 @@ func NewMskCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 			},
 			{
 				Name:            "Storage",
-				Unit:            "GB-months",
+				Unit:            "GB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: decimalPtr(ebsVolumeSize),
 				ProductFilter: &schema.ProductFilter{

@@ -1,32 +1,32 @@
 
- Name                                              Monthly Qty  Unit         Monthly Cost 
-                                                                                          
- aws_cloudwatch_log_group.logs                                                            
- ├─ Data ingested                                  Cost depends on usage: $0.50 per GB    
- ├─ Archival Storage                               Cost depends on usage: $0.03 per GB    
- └─ Insights queries data scanned                  Cost depends on usage: $0.005 per GB   
-                                                                                          
- aws_cloudwatch_log_group.logs_count_withUsage[0]                                         
- ├─ Data ingested                                        1,000  GB                $500.00 
- ├─ Archival Storage                                       500  GB                 $15.00 
- └─ Insights queries data scanned                          250  GB                  $1.25 
-                                                                                          
- aws_cloudwatch_log_group.logs_count_withUsage[1]                                         
- ├─ Data ingested                                        1,000  GB                $500.00 
- ├─ Archival Storage                                       500  GB                 $15.00 
- └─ Insights queries data scanned                          250  GB                  $1.25 
-                                                                                          
- aws_cloudwatch_log_group.logs_count_withUsage[2]                                         
- ├─ Data ingested                                        1,000  GB                $500.00 
- ├─ Archival Storage                                       500  GB                 $15.00 
- └─ Insights queries data scanned                          250  GB                  $1.25 
-                                                                                          
- aws_cloudwatch_log_group.logs_withUsage                                                  
- ├─ Data ingested                                        1,000  GB                $500.00 
- ├─ Archival Storage                                       500  GB                 $15.00 
- └─ Insights queries data scanned                          250  GB                  $1.25 
-                                                                                          
- PROJECT TOTAL                                                                  $2,065.00 
+ Name                                                 Monthly Qty  Unit              Monthly Cost 
+                                                                                                  
+ aws_cloudwatch_log_group.logs                                                                    
+ ├─ Data ingested                                  Monthly cost depends on usage: $0.50 per GB    
+ ├─ Archival Storage                               Monthly cost depends on usage: $0.03 per GB    
+ └─ Insights queries data scanned                  Monthly cost depends on usage: $0.005 per GB   
+                                                                                                  
+ aws_cloudwatch_log_group.logs_count_withUsage[0]                                                 
+ ├─ Data ingested                                           1,000  GB                     $500.00 
+ ├─ Archival Storage                                          500  GB                      $15.00 
+ └─ Insights queries data scanned                             250  GB                       $1.25 
+                                                                                                  
+ aws_cloudwatch_log_group.logs_count_withUsage[1]                                                 
+ ├─ Data ingested                                           1,000  GB                     $500.00 
+ ├─ Archival Storage                                          500  GB                      $15.00 
+ └─ Insights queries data scanned                             250  GB                       $1.25 
+                                                                                                  
+ aws_cloudwatch_log_group.logs_count_withUsage[2]                                                 
+ ├─ Data ingested                                           1,000  GB                     $500.00 
+ ├─ Archival Storage                                          500  GB                      $15.00 
+ └─ Insights queries data scanned                             250  GB                       $1.25 
+                                                                                                  
+ aws_cloudwatch_log_group.logs_withUsage                                                          
+ ├─ Data ingested                                           1,000  GB                     $500.00 
+ ├─ Archival Storage                                          500  GB                      $15.00 
+ └─ Insights queries data scanned                             250  GB                       $1.25 
+                                                                                                  
+ PROJECT TOTAL                                                                          $2,065.00 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

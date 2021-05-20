@@ -1,27 +1,27 @@
 
- Name                               Monthly Qty  Unit            Monthly Cost 
-                                                                              
- aws_alb.alb1                                                                 
- ├─ Application load balancer               730  hours                 $16.42 
- └─ Load balancer capacity units  Cost depends on usage: $0.008 per LCU-hours 
-                                                                              
- aws_lb.alb1_usage                                                            
- ├─ Application load balancer               730  hours                 $16.42 
- └─ Load balancer capacity units          1,000  LCU-hours              $8.00 
-                                                                              
- aws_lb.lb1                                                                   
- ├─ Application load balancer               730  hours                 $16.42 
- └─ Load balancer capacity units  Cost depends on usage: $0.008 per LCU-hours 
-                                                                              
- aws_lb.nlb1                                                                  
- ├─ Network load balancer                   730  hours                 $16.42 
- └─ Load balancer capacity units  Cost depends on usage: $0.006 per LCU-hours 
-                                                                              
- aws_lb.nlb1_usage                                                            
- ├─ Network load balancer                   730  hours                 $16.42 
- └─ Load balancer capacity units          1,000  LCU-hours              $6.00 
-                                                                              
- PROJECT TOTAL                                                         $96.12 
+ Name                                Monthly Qty  Unit              Monthly Cost 
+                                                                                 
+ aws_alb.alb1                                                                    
+ ├─ Application load balancer                730  hours                   $16.42 
+ └─ Load balancer capacity units  Monthly cost depends on usage: $5.84 per LCU   
+                                                                                 
+ aws_lb.alb1_usage                                                               
+ ├─ Application load balancer                730  hours                   $16.42 
+ └─ Load balancer capacity units          1.3698  LCU                      $8.00 
+                                                                                 
+ aws_lb.lb1                                                                      
+ ├─ Application load balancer                730  hours                   $16.42 
+ └─ Load balancer capacity units  Monthly cost depends on usage: $5.84 per LCU   
+                                                                                 
+ aws_lb.nlb1                                                                     
+ ├─ Network load balancer                    730  hours                   $16.42 
+ └─ Load balancer capacity units  Monthly cost depends on usage: $4.38 per LCU   
+                                                                                 
+ aws_lb.nlb1_usage                                                               
+ ├─ Network load balancer                    730  hours                   $16.42 
+ └─ Load balancer capacity units          1.3698  LCU                      $6.00 
+                                                                                 
+ PROJECT TOTAL                                                            $96.12 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -51,7 +51,7 @@ func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.UsageData) *schema.R
 func restAPICostComponent(region string, displayName string, usageTier string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
-		Unit:            "requests",
+		Unit:            "1M requests",
 		UnitMultiplier:  1000000,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{

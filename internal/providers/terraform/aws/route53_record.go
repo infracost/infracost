@@ -88,7 +88,7 @@ func NewRoute53Record(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 func queriesCostComponent(displayName string, usageType string, usageTier string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
-		Unit:            "queries",
+		Unit:            "1M queries",
 		UnitMultiplier:  1000000,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
