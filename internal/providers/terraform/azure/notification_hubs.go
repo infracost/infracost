@@ -10,24 +10,23 @@ import (
 
 func GetAzureRMNotificationHubsRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_notification_hubs",
+		Name:  "azurerm_notification_hub_namespace",
 		RFunc: NewAzureRMNotificationHubs,
 	}
 }
 
 func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
-	sku := "Free"
+	sku := "Basic"
 	location := d.Get("location").String()
 
-	if d.Get("sku").Type != gjson.Null {
+	if d.Get("sku_name").Type != gjson.Null {
 		sku = d.Get("sku_name").String()
 	}
-
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, NotificationHubsCostComponent("Notification Hubs Base Charge Per Namespace", location, sku))
-	costComponents = append(costComponents, NotificationHubsPushesCostComponent("Notification Hubs Additional Pushes", location, sku))
+	costComponents = append(costComponents, NotificationHubsCostComponent("Base Charge Per Namespace", location, sku))
+	costComponents = append(costComponents, NotificationHubsPushesCostComponent("Additional Pushes (over 10M)", location, sku))
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -37,7 +36,7 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 
 func NotificationHubsCostComponent(name, location, sku string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            name,
+		Name:            fmt.Sprintf("%s (%s)", name, sku),
 		Unit:            "months",
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -73,7 +72,8 @@ func NotificationHubsPushesCostComponent(name, location, sku string) *schema.Cos
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("Consumption"),
+			PurchaseOption:   strPtr("Consumption"),
+			StartUsageAmount: strPtr("10"),
 		},
 	}
 }
