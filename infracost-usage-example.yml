@@ -546,3 +546,6 @@ resource_usage:
     instances: 10 # Override the number of instances in the scale set.
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
+
+  azurerm_notification_hub_namespace.basic:
+    monthlyAdditionalPushes: 1000000 # Number of additional pushes

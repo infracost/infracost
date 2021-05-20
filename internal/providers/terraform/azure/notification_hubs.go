@@ -16,7 +16,10 @@ func GetAzureRMNotificationHubsRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-
+	var monthlyAdditionalPushes *decimal.Decimal
+	if u != nil && u.Get("monthly_additional_pushes").Type != gjson.Null {
+		monthlyAdditionalPushes = decimalPtr(decimal.NewFromInt(u.Get("monthly_additional_pushes").Int()))
+	}
 	sku := "Basic"
 	location := d.Get("location").String()
 
@@ -25,8 +28,8 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, NotificationHubsCostComponent("Base Charge Per Namespace", location, sku))
-	costComponents = append(costComponents, NotificationHubsPushesCostComponent("Additional Pushes (over 10M)", location, sku))
+	costComponents = append(costComponents, notificationHubsCostComponent("Base Charge Per Namespace", location, sku))
+	costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional Pushes (over 10M)", location, sku, monthlyAdditionalPushes))
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -34,7 +37,7 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func NotificationHubsCostComponent(name, location, sku string) *schema.CostComponent {
+func notificationHubsCostComponent(name, location, sku string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("%s (%s)", name, sku),
 		Unit:            "months",
@@ -56,11 +59,12 @@ func NotificationHubsCostComponent(name, location, sku string) *schema.CostCompo
 	}
 }
 
-func NotificationHubsPushesCostComponent(name, location, sku string) *schema.CostComponent {
+func notificationHubsPushesCostComponent(name, location, sku string, monthlyAdditionalPushes *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           name,
-		Unit:           "10 Million Pushes",
-		UnitMultiplier: 1,
+		Name:            name,
+		Unit:            "1M pushes",
+		UnitMultiplier:  1,
+		MonthlyQuantity: monthlyAdditionalPushes,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
 			Region:     strPtr(location),
