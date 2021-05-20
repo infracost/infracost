@@ -12,5 +12,5 @@ func TestKMSExternalKeyGoldenFile(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "kms_key_external_test")
+	tftest.GoldenFileResourceTests(t, "kms_external_key_test")
 }
