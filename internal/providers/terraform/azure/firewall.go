@@ -24,6 +24,14 @@ func NewAzureFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		skuTier = d.Get("sku_tier").String()
 	}
 
+	if v := d.Get("virtual_hub").String(); v != "[]" {
+		if skuTier == "Standard" {
+			skuTier = "Secured Virtual Hub"
+		} else {
+			skuTier = fmt.Sprintf("%s Secured Virtual Hub", skuTier)
+		}
+	}
+
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:           fmt.Sprintf("Deployment (%s)", skuTier),
 		Unit:           "hours",
