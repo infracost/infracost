@@ -1,0 +1,7 @@
+
+ Name                                Monthly Qty  Unit   Monthly Cost 
+                                                                      
+ aws_eks_cluster.my_aws_eks_cluster                                   
+ └─ EKS cluster                              730  hours        $73.00 
+                                                                      
+ PROJECT TOTAL                                                 $73.00 
