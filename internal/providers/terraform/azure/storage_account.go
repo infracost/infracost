@@ -113,7 +113,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 	}
 	writeMeterName := "/Write Operations$/"
 	if u != nil && u.Get("monthly_write_operations").Type != gjson.Null {
-			writeOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_write_operations").Int()))
+		writeOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_write_operations").Int()))
 	}
 	if skuName == "Hot RA-GRS" {
 		writeMeterName = "/List and Create Container Operations$/"
