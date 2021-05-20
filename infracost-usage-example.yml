@@ -469,6 +469,11 @@ resource_usage:
   #
   azurerm_app_service_environment.my_service:
      operating_system: linux # Override the operating system of the instance, can be: linux, windows.
+
+  azurerm_databricks_workspace.my_workspace:
+    monthly_all_purpose_compute_dbu: 500 # Monthly number of All-purpose Compute Databricks Units (DBUs).
+    monthly_jobs_compute_dbu: 1000 # Monthly number of Jobs Compute Databricks Units (DBUs).
+    monthly_jobs_light_compute_dbu: 2000 # Monthly number of Jobs Light Compute Databricks Units (DBUs).
   
   azurerm_function_app.my_functions:
     monthly_executions: 100000 # Monthly executions to the function. Only applicable for Consumption plan.
