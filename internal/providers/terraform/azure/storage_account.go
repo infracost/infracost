@@ -108,11 +108,68 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 		} else {
 			var unknown *decimal.Decimal
 
-			costComponents = append(costComponents, blobDataStorageCostComponent(location, "Capacity", skuName, "0", productName, unknown))
-		}
 
-		if u != nil && u.Get("monthly_write_operations").Type != gjson.Null {
+		costComponents = append(costComponents, blobDataStorageCostComponent(location, "Capacity", skuName, "0", productName, unknown))
+	}
+	writeMeterName := "/Write Operations$/"
+	if u != nil && u.Get("monthly_write_operations").Type != gjson.Null {
 			writeOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_write_operations").Int()))
+	}
+	if skuName == "Hot RA-GRS" {
+		writeMeterName = "/List and Create Container Operations$/"
+	}
+	costComponents = append(costComponents, blobOperationsCostComponent(
+		location,
+		"Write operations",
+		"10K operations",
+		skuName,
+		writeMeterName,
+		productName,
+		writeOperations,
+		10000))
+
+	if u != nil && u.Get("monthly_list_and_create_container_operations").Exists() {
+		listOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_list_and_create_container_operations").Int()))
+	}
+	costComponents = append(costComponents, blobOperationsCostComponent(
+		location,
+		"List and create container operations",
+		"10K operations",
+		skuName,
+		"/List and Create Container Operations$/",
+		productName,
+		listOperations,
+		10000))
+
+	if u != nil && u.Get("monthly_read_operations").Exists() {
+		readOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_read_operations").Int()))
+	}
+	costComponents = append(costComponents, blobOperationsCostComponent(
+		location,
+		"Read operations",
+		"10K operations",
+		skuName,
+		"/Read Operations$/",
+		productName,
+		readOperations,
+		10000))
+
+	if u != nil && u.Get("monthly_other_operations").Exists() {
+		otherOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_other_operations").Int()))
+	}
+	costComponents = append(costComponents, blobOperationsCostComponent(
+		location,
+		"All other operations",
+		"10K operations",
+		skuName,
+		"/All Other Operations$/",
+		productName,
+		otherOperations,
+		10000))
+
+	if accountTier != "Premium" {
+		if u != nil && u.Get("monthly_data_retrieval_gb").Exists() {
+			dataRetrieval = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_retrieval_gb").Int()))
 		}
 		costComponents = append(costComponents, blobOperationsCostComponent(
 			location,
