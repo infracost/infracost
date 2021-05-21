@@ -34,12 +34,17 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 	costComponents = append(costComponents, notificationHubsCostComponent("Base Charge Per Namespace", location, sku))
 	if monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(10000000)) {
 		startUsageAmt = "10"
+		message := "Over 10M"
 		multi := 10000000
+		if sku == "Standard" && monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(10000000)) {
+			message = "10-100M"
+		}
 		if sku == "Standard" && monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(1000000000)) {
 			startUsageAmt = "100"
 			multi = 1000000000
+			message = "Over 100M"
 		}
-		costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional Pushes (over 10M)", location, sku, startUsageAmt, monthlyAdditionalPushes, multi))
+		costComponents = append(costComponents, notificationHubsPushesCostComponent(fmt.Sprintf("Additional Pushes (%s)", message), location, sku, startUsageAmt, monthlyAdditionalPushes, multi))
 	}
 
 	return &schema.Resource{
