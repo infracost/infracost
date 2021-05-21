@@ -1,15 +1,22 @@
 
- Name                                              Monthly Qty  Unit                  Monthly Cost 
-                                                                                                   
- azurerm_notification_hub_namespace.example                                                        
- ├─ Base Charge Per Namespace (Basic)                        1  months                      $10.00 
- └─ Additional Pushes (over 10M)              Monthly cost depends on usage: $1.00 per 1M pushes   
-                                                                                                   
- azurerm_notification_hub_namespace.example1                                                       
- ├─ Base Charge Per Namespace (Standard)                     1  months                     $200.00 
- └─ Additional Pushes (over 10M)              Monthly cost depends on usage: $10.00 per 1M pushes  
-                                                                                                   
- PROJECT TOTAL                                                                             $210.00 
-
-----------------------------------
-To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+ Name                                              Monthly Qty  Unit       Monthly Cost 
+                                                                                        
+ azurerm_notification_hub_namespace.basicabove10M                                       
+ ├─ Base Charge Per Namespace (Basic)                        1  months           $10.00 
+ └─ Additional Pushes (over 10M)                        1.0000  1M pushes         $1.00 
+                                                                                        
+ azurerm_notification_hub_namespace.basicbelow10M                                       
+ └─ Base Charge Per Namespace (Basic)                        1  months           $10.00 
+                                                                                        
+ azurerm_notification_hub_namespace.stdabove100M                                        
+ ├─ Base Charge Per Namespace (Standard)                     1  months          $200.00 
+ └─ Additional Pushes (over 10M)                        1.0000  1M pushes         $2.50 
+                                                                                        
+ azurerm_notification_hub_namespace.stdabove10M                                         
+ ├─ Base Charge Per Namespace (Standard)                     1  months          $200.00 
+ └─ Additional Pushes (over 10M)                       10.0000  1M pushes       $100.00 
+                                                                                        
+ azurerm_notification_hub_namespace.stdbelow10M                                         
+ └─ Base Charge Per Namespace (Standard)                     1  months          $200.00 
+                                                                                        
+ PROJECT TOTAL                                                                  $723.50 

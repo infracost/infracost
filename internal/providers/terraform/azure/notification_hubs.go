@@ -17,9 +17,12 @@ func GetAzureRMNotificationHubsRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyAdditionalPushes *decimal.Decimal
+	var startUsageAmt string
+
 	if u != nil && u.Get("monthly_additional_pushes").Type != gjson.Null {
 		monthlyAdditionalPushes = decimalPtr(decimal.NewFromInt(u.Get("monthly_additional_pushes").Int()))
 	}
+
 	sku := "Basic"
 	location := d.Get("location").String()
 
@@ -29,7 +32,15 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 	costComponents := make([]*schema.CostComponent, 0)
 
 	costComponents = append(costComponents, notificationHubsCostComponent("Base Charge Per Namespace", location, sku))
-	costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional Pushes (over 10M)", location, sku, monthlyAdditionalPushes))
+	if monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(10000000)) {
+		startUsageAmt = "10"
+		multi := 10000000
+		if sku == "Standard" && monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(1000000000)) {
+			startUsageAmt = "100"
+			multi = 1000000000
+		}
+		costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional Pushes (over 10M)", location, sku, startUsageAmt, monthlyAdditionalPushes, multi))
+	}
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -59,12 +70,15 @@ func notificationHubsCostComponent(name, location, sku string) *schema.CostCompo
 	}
 }
 
-func notificationHubsPushesCostComponent(name, location, sku string, monthlyAdditionalPushes *decimal.Decimal) *schema.CostComponent {
+func notificationHubsPushesCostComponent(name, location, sku, startUsageAmt string, quantity *decimal.Decimal, multi int) *schema.CostComponent {
+	if quantity != nil {
+		quantity = decimalPtr(quantity.Div(decimal.NewFromInt(int64(multi))))
+	}
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "1M pushes",
 		UnitMultiplier:  1,
-		MonthlyQuantity: monthlyAdditionalPushes,
+		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
 			Region:     strPtr(location),
@@ -77,7 +91,7 @@ func notificationHubsPushesCostComponent(name, location, sku string, monthlyAddi
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption:   strPtr("Consumption"),
-			StartUsageAmount: strPtr("10"),
+			StartUsageAmount: strPtr(startUsageAmt),
 		},
 	}
 }
