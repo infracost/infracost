@@ -1,0 +1,11 @@
+version: 0.1
+resource_usage:
+  azurerm_databricks_workspace.premium:
+    monthly_all_purpose_compute_dbu_hrs: 500 
+    monthly_jobs_compute_dbu_hrs: 1000 
+    monthly_jobs_light_compute_dbu_hrs: 2000 
+  
+  azurerm_databricks_workspace.standard:
+    monthly_all_purpose_compute_dbu_hrs: 1000 
+    monthly_jobs_compute_dbu_hrs: 2000 
+    monthly_jobs_light_compute_dbu_hrs: 4000 
