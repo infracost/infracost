@@ -29,8 +29,8 @@ func NewAzureDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *s
 
 	var allPurpose, jobs, jobsLight *decimal.Decimal
 
-	if u != nil && u.Get("monthly_all_purpose_compute_dbu").Exists() {
-		allPurpose = decimalPtr(decimal.NewFromInt(u.Get("monthly_all_purpose_compute_dbu").Int()))
+	if u != nil && u.Get("monthly_all_purpose_compute_dbu_hrs").Exists() {
+		allPurpose = decimalPtr(decimal.NewFromInt(u.Get("monthly_all_purpose_compute_dbu_hrs").Int()))
 	}
 	costComponents = append(costComponents, databricksCostComponent(
 		"All-purpose compute DBUs",
@@ -39,8 +39,8 @@ func NewAzureDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *s
 		allPurpose,
 	))
 
-	if u != nil && u.Get("monthly_jobs_compute_dbu").Exists() {
-		jobs = decimalPtr(decimal.NewFromInt(u.Get("monthly_jobs_compute_dbu").Int()))
+	if u != nil && u.Get("monthly_jobs_compute_dbu_hrs").Exists() {
+		jobs = decimalPtr(decimal.NewFromInt(u.Get("monthly_jobs_compute_dbu_hrs").Int()))
 	}
 	costComponents = append(costComponents, databricksCostComponent(
 		"Jobs compute DBUs",
@@ -49,8 +49,8 @@ func NewAzureDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *s
 		jobs,
 	))
 
-	if u != nil && u.Get("monthly_jobs_light_compute_dbu").Exists() {
-		jobsLight = decimalPtr(decimal.NewFromInt(u.Get("monthly_jobs_light_compute_dbu").Int()))
+	if u != nil && u.Get("monthly_jobs_light_compute_dbu_hrs").Exists() {
+		jobsLight = decimalPtr(decimal.NewFromInt(u.Get("monthly_jobs_light_compute_dbu_hrs").Int()))
 	}
 	costComponents = append(costComponents, databricksCostComponent(
 		"Jobs light compute DBUs",
