@@ -10,13 +10,13 @@ provider "aws" {
 }
 
 resource "aws_sns_topic_subscription" "sns_topic_subscription" {
-  endpoint = "some-dummy-endpoint"
-  protocol = "http"
+  endpoint  = "some-dummy-endpoint"
+  protocol  = "http"
   topic_arn = "arn:aws:sns:us-east-1:123456789123:sns-topic-arn"
 }
 
 resource "aws_sns_topic_subscription" "sns_topic_subscription_withUsage" {
-  endpoint = "some-dummy-endpoint"
-  protocol = "http"
+  endpoint  = "some-dummy-endpoint"
+  protocol  = "http"
   topic_arn = "arn:aws:sns:us-east-1:123456789123:sns-topic-arn"
 }

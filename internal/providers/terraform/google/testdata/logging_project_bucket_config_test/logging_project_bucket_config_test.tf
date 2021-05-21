@@ -1,18 +1,18 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
-  region = "us-central1"
+  region      = "us-central1"
 }
 
 resource "google_logging_project_bucket_config" "basic" {
-  project    = "fake"
-  location  = "global"
+  project        = "fake"
+  location       = "global"
   retention_days = 30
-  bucket_id = "_Default"
+  bucket_id      = "_Default"
 }
 
 resource "google_logging_project_bucket_config" "basic_withUsage" {
-  project    = "fake"
-  location  = "global"
+  project        = "fake"
+  location       = "global"
   retention_days = 30
-  bucket_id = "_Default"
+  bucket_id      = "_Default"
 }

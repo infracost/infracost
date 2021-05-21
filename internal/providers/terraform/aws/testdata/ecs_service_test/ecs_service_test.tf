@@ -61,12 +61,12 @@ resource "aws_ecs_service" "ecs_fargate2" {
 }
 
 resource "aws_ecs_cluster" "ecs3" {
-  name               = "ecs1"
+  name = "ecs1"
 }
 
 resource "aws_ecs_service" "ecs_fargate3" {
-  name        = "ecs_fargate3"
-  cluster     = aws_ecs_cluster.ecs3.id
+  name    = "ecs_fargate3"
+  cluster = aws_ecs_cluster.ecs3.id
 
   deployment_controller {
     type = "EXTERNAL"

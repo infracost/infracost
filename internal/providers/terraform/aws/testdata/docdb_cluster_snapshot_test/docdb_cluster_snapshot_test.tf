@@ -10,11 +10,11 @@ provider "aws" {
 }
 
 resource "aws_docdb_cluster_snapshot" "my_aws_docdb_cluster_snapshot" {
-    db_cluster_identifier          = "fake"
-    db_cluster_snapshot_identifier = "resourcetestsnapshot1234"
+  db_cluster_identifier          = "fake"
+  db_cluster_snapshot_identifier = "resourcetestsnapshot1234"
 }
 
 resource "aws_docdb_cluster_snapshot" "my_aws_docdb_cluster_snapshot_usage" {
-    db_cluster_identifier          = "fake"
-    db_cluster_snapshot_identifier = "resourcetestsnapshot1234"
+  db_cluster_identifier          = "fake"
+  db_cluster_snapshot_identifier = "resourcetestsnapshot1234"
 }
