@@ -534,6 +534,10 @@ resource_usage:
     additional_backup_storage_gb: 3000 # Additional consumption of backup storage in GB.
 
   azurerm_storage_account.my_account:
+    data_at_rest_storage_gb: 10000
+    early_deletion_gb: 1000
+    snapshots_storage_gb: 10000
+    metadata_at_rest_storage_gb: 10000
     storage_gb: 1000000 # Total size of storage in GB.
     monthly_write_operations: 1000000 # Monthly number of Write operations.
     monthly_list_and_create_container_operations: 1000000 # Monthly number of List and Create Container operations. 
