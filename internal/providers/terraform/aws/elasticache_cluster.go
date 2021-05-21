@@ -78,7 +78,7 @@ func newElasticacheResource(d *schema.ResourceData, u *schema.UsageData, nodeTyp
 
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Backup storage",
-			Unit:            "GB-months",
+			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: monthlyBackupStorageTotal,
 			ProductFilter: &schema.ProductFilter{

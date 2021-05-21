@@ -1,0 +1,70 @@
+
+ Name                                                    Monthly Qty  Unit            Monthly Cost 
+                                                                                                   
+ google_sql_database_instance.HA_custom_postgres                                                   
+ ├─ vCPUs (regional)                                          11,680  hours                $964.77 
+ ├─ Memory (regional)                                         43,800  GB                   $613.20 
+ ├─ Storage (SSD, regional)                                       10  GB                     $3.40 
+ └─ Backups                                            Monthly cost depends on usage: $0.08 per GB 
+                                                                                                   
+ google_sql_database_instance.HA_small_mysql                                                       
+ ├─ SQL instance (db-g1-small, regional)                         730  hours                 $51.10 
+ ├─ Storage (SSD, regional)                                      100  GB                    $34.00 
+ └─ Backups                                            Monthly cost depends on usage: $0.08 per GB 
+                                                                                                   
+ google_sql_database_instance.custom_postgres                                                      
+ ├─ vCPUs (zonal)                                              1,460  hours                 $60.30 
+ ├─ Memory (zonal)                                             9,490  GB                    $66.43 
+ ├─ Storage (SSD, zonal)                                          10  GB                     $1.70 
+ └─ Backups                                            Monthly cost depends on usage: $0.08 per GB 
+                                                                                                   
+ google_sql_database_instance.micro_mysql_HDD_storage                                              
+ ├─ SQL instance (db-f1-micro, zonal)                            730  hours                  $7.67 
+ ├─ Storage (HDD, zonal)                                          10  GB                     $0.90 
+ └─ Backups                                            Monthly cost depends on usage: $0.08 per GB 
+                                                                                                   
+ google_sql_database_instance.micro_mysql_SSD_storage                                              
+ ├─ SQL instance (db-f1-micro, zonal)                            730  hours                  $7.67 
+ ├─ Storage (SSD, zonal)                                          10  GB                     $1.70 
+ └─ Backups                                            Monthly cost depends on usage: $0.08 per GB 
+                                                                                                   
+ google_sql_database_instance.mysql_highmem                                                        
+ ├─ SQL instance (db-n1-highmem-8, zonal)                        730  hours                $514.07 
+ ├─ Storage (SSD, zonal)                                          10  GB                     $1.70 
+ └─ Backups                                            Monthly cost depends on usage: $0.08 per GB 
+                                                                                                   
+ google_sql_database_instance.mysql_standard                                                       
+ ├─ SQL instance (db-n1-standard-32, zonal)                      730  hours              $1,578.26 
+ ├─ Storage (SSD, zonal)                                          10  GB                     $1.70 
+ └─ Backups                                            Monthly cost depends on usage: $0.08 per GB 
+                                                                                                   
+ google_sql_database_instance.small_mysql                                                          
+ ├─ SQL instance (db-g1-small, zonal)                            730  hours                 $25.55 
+ ├─ Storage (SSD, zonal)                                          10  GB                     $1.70 
+ └─ Backups                                            Monthly cost depends on usage: $0.08 per GB 
+                                                                                                   
+ google_sql_database_instance.sql_server                                                           
+ ├─ vCPUs (zonal)                                             11,680  hours                $482.38 
+ ├─ Memory (zonal)                                            43,800  GB                   $306.60 
+ ├─ Storage (SSD, zonal)                                          10  GB                     $1.70 
+ └─ Backups                                            Monthly cost depends on usage: $0.08 per GB 
+                                                                                                   
+ google_sql_database_instance.usage                                                                
+ ├─ SQL instance (db-g1-small, zonal)                            730  hours                 $25.55 
+ ├─ Storage (SSD, zonal)                                          10  GB                     $1.70 
+ └─ Backups                                                    1,000  GB                    $80.00 
+                                                                                                   
+ google_sql_database_instance.with_replica                                                         
+ ├─ vCPUs (regional)                                          11,680  hours                $964.77 
+ ├─ Memory (regional)                                         43,800  GB                   $613.20 
+ ├─ Storage (SSD, regional)                                      500  GB                   $170.00 
+ ├─ Backups                                            Monthly cost depends on usage: $0.08 per GB 
+ └─ Replica                                                                                        
+    ├─ vCPUs (zonal)                                          11,680  hours                $482.38 
+    ├─ Memory (zonal)                                         43,800  GB                   $306.60 
+    └─ Storage (SSD, zonal)                                      500  GB                    $85.00 
+                                                                                                   
+ PROJECT TOTAL                                                                           $7,455.69 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -10,9 +10,15 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMHDInsightInteractiveQueryClusterRegistryItem(),
 	GetAzureRMHDInsightKafkaClusterRegistryItem(),
 	GetAzureRMHDInsightSparkClusterRegistryItem(),
+	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
+	GetAzureRMKeyVaultCertificateRegistryItem(),
+	GetAzureRMKeyVaultKeyRegistryItem(),
+	GetAzureRMKeyVaultManagedHSMRegistryItem(),
+	GetAzureRMKubernetesClusterRegistryItem(),
+	GetAzureRMKubernetesClusterNodePoolRegistryItem(),
 	GetAzureMariaDBServerRegistryItem(),
 	GetAzureMSSQLDatabaseRegistryItem(),
 	GetAzureMySQLServerRegistryItem(),
@@ -27,11 +33,19 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
 	GetAzureRMPublicIPRegistryItem(),
 	GetAzureRMPublicIPPrefixRegistryItem(),
+	GetAzureRMAppNATGatewayRegistryItem(),
+	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
 var FreeResources []string = []string{
 	// Azure App Service
+	"azurerm_app_service_active_slot",
+	"azurerm_app_service_certificate",
+	"azurerm_app_service_managed_certificate",
+	"azurerm_app_service_slot",
+	"azurerm_app_service_slot_virtual_network_swift_connection",
+	"azurerm_app_service_source_control_token",
 	"azurerm_app_service_virtual_network_swift_connection",
 
 	// Azure Base
@@ -42,6 +56,20 @@ var FreeResources []string = []string{
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
+
+	// Azure Firewall
+	"azurerm_firewall_application_rule_collection",
+	"azurerm_firewall_nat_rule_collection",
+	"azurerm_firewall_network_rule_collection",
+	"azurerm_firewall_policy",
+	"azurerm_firewall_policy_rule_collection_group",
+
+	// Azure Key Vault
+	"azurerm_key_vault",
+	"azurerm_key_vault_access_policy",
+	"azurerm_key_vault_certificate_data",
+	"azurerm_key_vault_certificate_issuer",
+	"azurerm_key_vault_secret",
 
 	// Azure Networking
 	"azurerm_application_security_group",

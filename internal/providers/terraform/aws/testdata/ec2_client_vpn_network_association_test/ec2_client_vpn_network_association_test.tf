@@ -10,6 +10,6 @@ provider "aws" {
 }
 
 resource "aws_ec2_client_vpn_network_association" "association" {
-              client_vpn_endpoint_id = "some-endpoint-id"
-              subnet_id = "subnet-123456"
-          }
+  client_vpn_endpoint_id = "some-endpoint-id"
+  subnet_id              = "subnet-123456"
+}

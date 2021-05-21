@@ -130,7 +130,7 @@ func redshiftSpectrumCostComponent(region string, terabytesScanned *decimal.Deci
 func redshiftStorageSnapshotCostComponent(region string, displayName string, startUsageAmount string, storageSnapshot *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: storageSnapshot,
 		ProductFilter: &schema.ProductFilter{
@@ -148,7 +148,7 @@ func redshiftStorageSnapshotCostComponent(region string, displayName string, sta
 func redshiftManagedStorageCostComponent(region string, nodeType string, managedStorage *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Managed storage (%s)", nodeType),
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: managedStorage,
 		ProductFilter: &schema.ProductFilter{

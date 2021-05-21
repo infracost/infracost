@@ -1,0 +1,18 @@
+
+ Name                                                                              Monthly Qty  Unit            Monthly Cost 
+                                                                                                                             
+ google_container_registry.my_registry                                                                                       
+ ├─ Storage (standard)                                                                     150  GiB                    $3.90 
+ ├─ Object adds, bucket/object list (class A)                                                4  10k operations         $0.20 
+ ├─ Object gets, retrieve bucket/object metadata (class B)                                   2  10k operations         $0.01 
+ └─ Network egress                                                                                                           
+    ├─ Data transfer in same continent                                                     550  GB                     $5.50 
+    ├─ Data transfer to worldwide excluding Asia, Australia (first 1TB)                  1,024  GB                   $122.88 
+    ├─ Data transfer to worldwide excluding Asia, Australia (next 9TB)                   9,216  GB                 $1,013.76 
+    ├─ Data transfer to worldwide excluding Asia, Australia (over 10TB)                  2,260  GB                   $180.80 
+    ├─ Data transfer to Asia excluding China, but including Hong Kong (first 1TB)        1,024  GB                   $122.88 
+    ├─ Data transfer to Asia excluding China, but including Hong Kong (next 9TB)           476  GB                    $52.36 
+    ├─ Data transfer to China excluding Hong Kong (first 1TB)                               50  GB                    $11.50 
+    └─ Data transfer to Australia (first 1TB)                                              250  GB                    $47.50 
+                                                                                                                             
+ PROJECT TOTAL                                                                                                     $1,561.29 

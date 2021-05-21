@@ -74,22 +74,23 @@ test_azure:
 
 # Update AWS golden files tests
 test_update:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers $(or $(ARGS), -update -v -cover -run GoldenFile)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/... $(or $(ARGS), -update -v -cover)
 
 # Update golden files tests
 test_update_aws:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -update -v -cover -run GoldenFile)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -update -v -cover)
 
 # Update Google golden files tests
 test_update_google:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -update -v -cover -run GoldenFile)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -update -v -cover)
 
 # Update Azure golden files tests
 test_update_azure:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -update -v -cover -run GoldenFile)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -update -v -cover)
 
 fmt:
 	go fmt ./...
+	find . -name '*.tf' -exec terraform fmt {} \;
 
 lint:
 	golangci-lint run

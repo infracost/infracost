@@ -70,8 +70,8 @@ func wcuCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	}
 	return &schema.CostComponent{
 		Name:           "Write capacity unit (WCU)",
-		Unit:           "WCU-hours",
-		UnitMultiplier: 1,
+		Unit:           "WCU",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -97,8 +97,8 @@ func rcuCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	}
 	return &schema.CostComponent{
 		Name:           "Read capacity unit (RCU)",
-		Unit:           "RCU-hours",
-		UnitMultiplier: 1,
+		Unit:           "RCU",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -145,8 +145,8 @@ func newProvisionedDynamoDBGlobalTable(name string, region string, capacity int6
 			// Replicated write capacity units (rWCU)
 			{
 				Name:           "Replicated write capacity unit (rWCU)",
-				Unit:           "rWCU-hours",
-				UnitMultiplier: 1,
+				Unit:           "rWCU",
+				UnitMultiplier: schema.HourToMonthUnitMultiplier,
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -173,8 +173,8 @@ func newOnDemandDynamoDBGlobalTable(name string, region string, capacity int64) 
 			// Replicated write capacity units (rWRU)
 			{
 				Name:            "Replicated write request unit (rWRU)",
-				Unit:            "rWRU-hours",
-				UnitMultiplier:  1,
+				Unit:            "rWRU",
+				UnitMultiplier:  schema.HourToMonthUnitMultiplier,
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -250,7 +250,7 @@ func dataStorageCostComponent(d *schema.ResourceData, u *schema.UsageData) *sche
 	}
 	return &schema.CostComponent{
 		Name:            "Data storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
@@ -277,7 +277,7 @@ func continuousBackupCostComponent(d *schema.ResourceData, u *schema.UsageData) 
 	}
 	return &schema.CostComponent{
 		Name:            "Point-In-Time Recovery (PITR) backup storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
@@ -300,7 +300,7 @@ func onDemandBackupCostComponent(d *schema.ResourceData, u *schema.UsageData) *s
 	}
 	return &schema.CostComponent{
 		Name:            "On-demand backup storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{

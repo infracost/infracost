@@ -48,7 +48,7 @@ func NewSnsTopicSubscription(d *schema.ResourceData, u *schema.UsageData) *schem
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            fmt.Sprintf("%s notifications", endpointType),
-				Unit:            "notifications",
+				Unit:            "1M notifications",
 				UnitMultiplier:  1000000,
 				MonthlyQuantity: requests,
 				ProductFilter: &schema.ProductFilter{

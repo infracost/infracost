@@ -126,7 +126,7 @@ func NewAzureMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.
 		}
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Long-term retention",
-			Unit:            "GB-months",
+			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: retention,
 			ProductFilter: &schema.ProductFilter{
@@ -244,7 +244,7 @@ func mssqlStorageComponent(storageGB *decimal.Decimal, region, serviceName, tier
 
 	return &schema.CostComponent{
 		Name:            "Storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: storageGB,
 		ProductFilter: &schema.ProductFilter{

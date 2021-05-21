@@ -7,9 +7,9 @@ provider "aws" {
 }
 
 resource "aws_codebuild_project" "my_project_noUsage" {
-  name           = "test-project-cache"
-  description    = "test_codebuild_project_cache"
-  
+  name        = "test-project-cache"
+  description = "test_codebuild_project_cache"
+
   service_role = ""
 
   artifacts {
@@ -31,9 +31,9 @@ resource "aws_codebuild_project" "my_project_noUsage" {
 }
 
 resource "aws_codebuild_project" "my_small_project" {
-  name           = "test-project-cache"
-  description    = "test_codebuild_project_cache"
-  
+  name        = "test-project-cache"
+  description = "test_codebuild_project_cache"
+
   service_role = ""
 
   artifacts {
@@ -55,9 +55,9 @@ resource "aws_codebuild_project" "my_small_project" {
 }
 
 resource "aws_codebuild_project" "my_medium_project" {
-  name           = "test-project-cache"
-  description    = "test_codebuild_project_cache"
-  
+  name        = "test-project-cache"
+  description = "test_codebuild_project_cache"
+
   service_role = ""
 
   artifacts {
@@ -79,9 +79,9 @@ resource "aws_codebuild_project" "my_medium_project" {
 }
 
 resource "aws_codebuild_project" "my_large_linux_project" {
-  name           = "test-project-cache"
-  description    = "test_codebuild_project_cache"
-  
+  name        = "test-project-cache"
+  description = "test_codebuild_project_cache"
+
   service_role = ""
 
   artifacts {
@@ -103,9 +103,9 @@ resource "aws_codebuild_project" "my_large_linux_project" {
 }
 
 resource "aws_codebuild_project" "my_large_windows_project" {
-  name           = "test-project-cache"
-  description    = "test_codebuild_project_cache"
-  
+  name        = "test-project-cache"
+  description = "test_codebuild_project_cache"
+
   service_role = ""
 
   artifacts {

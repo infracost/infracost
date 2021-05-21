@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  google_pubsub_topic.usage:
+    monthly_message_data_tb: 10
+    

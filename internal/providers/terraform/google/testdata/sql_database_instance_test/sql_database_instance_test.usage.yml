@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  google_sql_database_instance.usage:
+    backup_storage_gb: 1000
+    

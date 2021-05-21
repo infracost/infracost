@@ -1,12 +1,12 @@
 
- Name                             Monthly Qty  Unit       Monthly Cost 
-                                                                       
- aws_msk_cluster.cluster-2-nodes                                       
- ├─ Instance (kafka.t3.small)           1,460  hours            $66.58 
- └─ Storage                             1,000  GB-months       $100.00 
-                                                                       
- aws_msk_cluster.cluster-4-nodes                                       
- ├─ Instance (kafka.m5.24xlarge)        2,920  hours        $29,433.60 
- └─ Storage                             4,000  GB-months       $400.00 
-                                                                       
- PROJECT TOTAL                                              $30,000.18 
+ Name                             Monthly Qty  Unit   Monthly Cost 
+                                                                   
+ aws_msk_cluster.cluster-2-nodes                                   
+ ├─ Instance (kafka.t3.small)           1,460  hours        $66.58 
+ └─ Storage                             1,000  GB          $100.00 
+                                                                   
+ aws_msk_cluster.cluster-4-nodes                                   
+ ├─ Instance (kafka.m5.24xlarge)        2,920  hours    $29,433.60 
+ └─ Storage                             4,000  GB          $400.00 
+                                                                   
+ PROJECT TOTAL                                          $30,000.18 

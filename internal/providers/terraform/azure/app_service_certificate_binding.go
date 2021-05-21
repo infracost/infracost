@@ -12,10 +12,16 @@ func GetAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_app_service_certificate_binding",
 		RFunc: NewAzureRMAppServiceCertificateBinding,
+		ReferenceAttributes: []string{
+			"certificate_id",
+		},
 	}
 }
 
 func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	var location string
+	group := d.References("certificate_id")
+	location = group[0].Get("location").String()
 
 	var sslType string
 	sslState := d.Get("ssl_state").String()
@@ -43,7 +49,7 @@ func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.Us
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
-				Region:        strPtr("Global"),
+				Region:        strPtr(location),
 				Service:       strPtr("Azure App Service"),
 				ProductFamily: strPtr("Compute"),
 				AttributeFilters: []*schema.AttributeFilter{

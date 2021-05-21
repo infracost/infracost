@@ -119,7 +119,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Operations",
-		Unit:            "operations",
+		Unit:            "10k operations",
 		UnitMultiplier:  10000,
 		MonthlyQuantity: monthlyKeyOperations,
 		ProductFilter: &schema.ProductFilter{

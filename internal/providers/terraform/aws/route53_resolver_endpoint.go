@@ -67,7 +67,7 @@ func NewRoute53ResolverEndpoint(d *schema.ResourceData, u *schema.UsageData) *sc
 func dnsQueriesCostComponent(region string, displayName string, usageTier string, monthlyQueries *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
-		Unit:            "queries",
+		Unit:            "1M queries",
 		UnitMultiplier:  1000000,
 		MonthlyQuantity: monthlyQueries,
 		ProductFilter: &schema.ProductFilter{

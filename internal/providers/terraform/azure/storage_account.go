@@ -108,33 +108,31 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 
 		costComponents = append(costComponents, blobDataStorageCostComponent(location, "Capacity", skuName, "0", productName, unknown))
 	}
-
+	writeMeterName := "/Write Operations$/"
 	if u != nil && u.Get("monthly_write_operations").Exists() {
 		writeOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_write_operations").Int()))
+	}
+	if skuName == "Hot RA-GRS" {
+		writeMeterName = "/List and Create Container Operations$/"
 	}
 	costComponents = append(costComponents, blobOperationsCostComponent(
 		location,
 		"Write operations",
 		"10K operations",
 		skuName,
-		"/Write Operations$/",
+		writeMeterName,
 		productName,
 		writeOperations,
 		10000))
 
-	lccoSkuName := skuName
 	if u != nil && u.Get("monthly_list_and_create_container_operations").Exists() {
 		listOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_list_and_create_container_operations").Int()))
-
-		if skuName == "Hot RA-GRS" {
-			lccoSkuName = "Hot GRS"
-		}
 	}
 	costComponents = append(costComponents, blobOperationsCostComponent(
 		location,
 		"List and create container operations",
 		"10K operations",
-		lccoSkuName,
+		skuName,
 		"/List and Create Container Operations$/",
 		productName,
 		listOperations,
@@ -216,7 +214,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 func blobDataStorageCostComponent(location, name, skuName, startUsage, productName string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:                 name,
-		Unit:                 "GB-months",
+		Unit:                 "GB",
 		UnitMultiplier:       1,
 		MonthlyQuantity:      quantity,
 		IgnoreIfMissingPrice: true,

@@ -1,10 +1,6 @@
 package schema
 
 import (
-	"fmt"
-	"strings"
-
-	"github.com/dustin/go-humanize"
 	"github.com/shopspring/decimal"
 )
 
@@ -77,15 +73,4 @@ func (c *CostComponent) UnitMultiplierMonthlyQuantity() *decimal.Decimal {
 	}
 	m := c.MonthlyQuantity.Div(decimal.NewFromInt(int64(c.UnitMultiplier)))
 	return &m
-}
-
-func (c *CostComponent) UnitWithMultiplier() string {
-	s := c.Unit
-
-	if c.UnitMultiplier != 1 {
-		m := strings.ReplaceAll(humanize.SI(float64(c.UnitMultiplier), ""), " ", "")
-		s = fmt.Sprintf("%s %s", m, s)
-	}
-
-	return s
 }

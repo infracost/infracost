@@ -102,7 +102,7 @@ func databaseComputeInstance(region, name, serviceName, productNameRegex, skuNam
 func databaseStorageComponent(region, serviceName, productNameRegex string, storageGB int64) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(storageGB)),
 		ProductFilter: &schema.ProductFilter{
@@ -120,7 +120,7 @@ func databaseStorageComponent(region, serviceName, productNameRegex string, stor
 func databaseBackupStorageComponent(region, serviceName, skuName string, backupStorageGB *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Additional backup storage",
-		Unit:            "GB-months",
+		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: backupStorageGB,
 		ProductFilter: &schema.ProductFilter{

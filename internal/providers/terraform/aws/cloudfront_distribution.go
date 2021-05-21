@@ -342,7 +342,7 @@ func httpRequests(u *schema.UsageData) *schema.Resource {
 		}
 		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 			Name:            awsRegion,
-			Unit:            "requests",
+			Unit:            "10k requests",
 			UnitMultiplier:  10000,
 			MonthlyQuantity: quantity,
 			ProductFilter: &schema.ProductFilter{
@@ -418,7 +418,7 @@ func httpsRequests(u *schema.UsageData) *schema.Resource {
 		}
 		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 			Name:            awsRegion,
-			Unit:            "requests",
+			Unit:            "10k requests",
 			UnitMultiplier:  10000,
 			MonthlyQuantity: quantity,
 			ProductFilter: &schema.ProductFilter{
@@ -494,7 +494,7 @@ func shieldRequests(u *schema.UsageData) *schema.Resource {
 		}
 		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 			Name:            awsRegion,
-			Unit:            "requests",
+			Unit:            "10k requests",
 			UnitMultiplier:  10000,
 			MonthlyQuantity: quantity,
 			ProductFilter: &schema.ProductFilter{
@@ -572,7 +572,7 @@ func encryptionRequests(u *schema.UsageData) *schema.CostComponent {
 	}
 	return &schema.CostComponent{
 		Name:            "Field level encryption requests",
-		Unit:            "requests",
+		Unit:            "10k requests",
 		UnitMultiplier:  10000,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
@@ -593,7 +593,7 @@ func realtimeLogs(u *schema.UsageData) *schema.CostComponent {
 	}
 	return &schema.CostComponent{
 		Name:            "Real-time log requests",
-		Unit:            "lines",
+		Unit:            "1M lines",
 		UnitMultiplier:  1000000,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{

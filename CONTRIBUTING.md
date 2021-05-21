@@ -248,7 +248,7 @@ Our aim is to make Infracost's output understandable without needing to read sep
 
 Where a cloud vendor's pricing pages information can be improved for clarify, we'll do that, e.g. on some pricing webpages, AWS mention use "Storage Rate" to describe pricing for "Storage (provisioned IOPS SSD)", so we use the latter.
 
-The cost component name should not change when the IaC resource params change; anything that can change should be put in brackets, so for example:
+The cost component name should be plural where it makes sense, e.g. "Certificate renewals", "Requests", and "Messages". Furthermore, the name should not change when the IaC resource params change; anything that can change should be put in brackets, so for example:
 - `General Purpose SSD storage (gp2)` should be `Storage (gp2)` as the storage type can change.
 - `Outbound data transfer to EqDC2` should be `Outbound data transfer (to EqDC2)` as the EqDC2 value changes based on the location.
 - `Linux/UNIX (on-demand, m1.small)` should be `Instance usage (Linux/UNIX, on-demand, m1.small)`.
@@ -345,17 +345,17 @@ For an example of a resource with usage-based see the [AWS Lambda resource](http
 When Infracost is run without usage data the output for this resource looks like:
 
 ```
- Name                                                           Quantity  Unit                  Monthly Cost
+ Name                                                           Monthly Qty  Unit                  Monthly Cost
 
  aws_lambda_function.hello_world
- ├─ Requests                                            Cost depends on usage: $0.20 per 1M requests
- └─ Duration                                            Cost depends on usage: $0.0000166667 per GB-seconds
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests
+ └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds
 ```
 
 When Infracost is run with the `--usage-file=path/to/infracost-usage.yml` flag then the output looks like:
 
 ```
- Name                                                           Quantity  Unit                  Monthly Cost
+ Name                                                  Monthly Qty  Unit         Monthly Cost
  aws_lambda_function.hello_world
  ├─ Requests                                                   100  1M requests        $20.00
  └─ Duration                                            25,000,000  GB-seconds        $416.67
@@ -370,13 +370,21 @@ The following notes are general guidelines, please leave a comment in your pull 
 - count: do not include the count in the cost component name or in brackets. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
 
 - units:
-  - use plural, e.g. hours, months, requests, GB-months, GB (already plural). For a "unit per something", use singular per time unit, e.g. use Per GB per hour. Where it makes sense, instead of "API calls" use "API requests" or "requests" for better consistency.
+  - use plural, e.g. hours, months, requests, GB (already plural). For a "unit per something", use singular per time unit, e.g. use Per GB per hour. Where it makes sense, instead of "API calls" use "API requests" or "requests" for better consistency.
 
   - for things where the Terraform resource represents 1 unit, e.g. an `aws_instance`, an `aws_secretsmanager_secret` and a `google_dns_managed_zone`, the units should be months (or hours if that makes more sense). For everything else, the units should be whatever is being charged for, e.g. queries, requests.
 
-  - for data transferred, where you pay for the data per GB, then use `GB`. For storage, where you pay per GB per month, then use `GB-months`. You'll probably see that the Cloud Pricing API's units to use a similar logic. The AWS pricing pages sometimes use a different one than their own pricing API, in that case the pricing API is a better guide.
+  - for data transferred where you pay for the data per GB, then use `GB`.
+	
+  - for storage or other resources priced in Unit-months (e.g. `GB-months`), then use the unit by itself (`GB`).  The AWS pricing pages sometimes use a different unit than their own pricing API, in that case the pricing page is a better guide.
 
-- unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 unless the price is for a large number, e.g. set it to `1000000` if the price should be shown "per 1M requests" in the output.
+  - for units priced in Unit-hours (e.g. `IOPS-hours`) but best understood in months, then use the unit by itself (`IOPS`) with an appropriate `UnitMultiplier`.  
+
+  - unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 except:
+	
+	- If the price is for a large number.  E.g. set `Unit: "1M requests", UnitMultiplier: 1000000` if the price should be shown "per 1M requests" in the output.
+
+	- If the price is for billing in Unit-hours but best understood in Unit-months.  E.g. set `Unit: "GB", UnitMultiplier: schema.HourToMonthUnitMultiplier` to show "per GB" in the output. 
 
 - tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)". Use the words "first", "next" and "over" when describing tiers. Units should not be included in brackets unless the cost component relates to storage or data transfer, e.g. "Storage (first 1TB)    GB" is more understandable than "Storage (first 1K)    GB" since users understand terabytes and petabytes. You should be able to use the `CalculateTierBuckets` method for calculating tier buckets.
 

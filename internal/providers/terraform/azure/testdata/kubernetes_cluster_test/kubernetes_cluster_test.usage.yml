@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  azurerm_kubernetes_cluster.usage_ephemeral:
+    default_node_pool:
+      nodes: 2
+      

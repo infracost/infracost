@@ -101,7 +101,7 @@ func apiThroughputCostComponent(d *schema.ResourceData, u *schema.UsageData) *sc
 
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("API interactions (%s)", tier),
-		Unit:            "interactions",
+		Unit:            "10k interactions",
 		UnitMultiplier:  10000,
 		MonthlyQuantity: monthlyAPIInteractions,
 		ProductFilter: &schema.ProductFilter{

@@ -1,0 +1,47 @@
+
+ Name                                                                                     Monthly Qty  Unit                      Monthly Cost 
+                                                                                                                                              
+ google_storage_bucket.EuMulti                                                                                                                
+ ├─ Storage (standard)                                                                            150  GiB                              $3.90 
+ ├─ Object adds, bucket/object list (class A)                                                       4  10k operations                   $0.20 
+ ├─ Object gets, retrieve bucket/object metadata (class B)                                          2  10k operations                   $0.01 
+ └─ Network egress                                                                                                                            
+    ├─ Data transfer in same continent                                                            550  GB                               $5.50 
+    ├─ Data transfer to worldwide excluding Asia, Australia (first 1TB)                         1,024  GB                             $122.88 
+    ├─ Data transfer to worldwide excluding Asia, Australia (next 9TB)                          9,216  GB                           $1,013.76 
+    ├─ Data transfer to worldwide excluding Asia, Australia (over 10TB)                         2,260  GB                             $180.80 
+    ├─ Data transfer to Asia excluding China, but including Hong Kong (first 1TB)               1,024  GB                             $122.88 
+    ├─ Data transfer to Asia excluding China, but including Hong Kong (next 9TB)                  476  GB                              $52.36 
+    ├─ Data transfer to China excluding Hong Kong (first 1TB)                                      50  GB                              $11.50 
+    └─ Data transfer to Australia (first 1TB)                                                     250  GB                              $47.50 
+                                                                                                                                              
+ google_storage_bucket.non_usage                                                                                                              
+ ├─ Storage (standard)                                                             Monthly cost depends on usage: $0.03 per GiB               
+ ├─ Object adds, bucket/object list (class A)                                      Monthly cost depends on usage: $0.05 per 10k operations    
+ ├─ Object gets, retrieve bucket/object metadata (class B)                         Monthly cost depends on usage: $0.004 per 10k operations   
+ └─ Network egress                                                                                                                            
+    ├─ Data transfer in same continent                                             Monthly cost depends on usage: $0.01 per GB                
+    ├─ Data transfer to worldwide excluding Asia, Australia (first 1TB)            Monthly cost depends on usage: $0.12 per GB                
+    ├─ Data transfer to Asia excluding China, but including Hong Kong (first 1TB)  Monthly cost depends on usage: $0.12 per GB                
+    ├─ Data transfer to China excluding Hong Kong (first 1TB)                      Monthly cost depends on usage: $0.23 per GB                
+    └─ Data transfer to Australia (first 1TB)                                      Monthly cost depends on usage: $0.19 per GB                
+                                                                                                                                              
+ google_storage_bucket.storage_bucket                                                                                                         
+ ├─ Storage (coldline)                                                                            150  GiB                              $1.05 
+ ├─ Data retrieval                                                                                250  GB                               $5.00 
+ ├─ Object adds, bucket/object list (class A)                                                       4  10k operations                   $0.40 
+ ├─ Object gets, retrieve bucket/object metadata (class B)                                          2  10k operations                   $0.10 
+ └─ Network egress                                                                                                                            
+    ├─ Data transfer in same continent                                                            550  GB                               $5.50 
+    ├─ Data transfer to worldwide excluding Asia, Australia (first 1TB)                         1,024  GB                             $122.88 
+    ├─ Data transfer to worldwide excluding Asia, Australia (next 9TB)                          9,216  GB                           $1,013.76 
+    ├─ Data transfer to worldwide excluding Asia, Australia (over 10TB)                         2,260  GB                             $180.80 
+    ├─ Data transfer to Asia excluding China, but including Hong Kong (first 1TB)               1,024  GB                             $122.88 
+    ├─ Data transfer to Asia excluding China, but including Hong Kong (next 9TB)                  476  GB                              $52.36 
+    ├─ Data transfer to China excluding Hong Kong (first 1TB)                                      50  GB                              $11.50 
+    └─ Data transfer to Australia (first 1TB)                                                     250  GB                              $47.50 
+                                                                                                                                              
+ PROJECT TOTAL                                                                                                                      $3,125.02 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

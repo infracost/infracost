@@ -121,7 +121,7 @@ func outputResource(r *schema.Resource) Resource {
 
 		comps = append(comps, CostComponent{
 			Name:            c.Name,
-			Unit:            c.UnitWithMultiplier(),
+			Unit:            c.Unit,
 			HourlyQuantity:  c.UnitMultiplierHourlyQuantity(),
 			MonthlyQuantity: c.UnitMultiplierMonthlyQuantity(),
 			Price:           c.UnitMultiplierPrice(),

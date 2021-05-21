@@ -125,28 +125,7 @@ func standardPremiumDiskCostComponents(region string, diskType string, diskData 
 		return nil
 	}
 
-	costComponents := []*schema.CostComponent{
-		{
-			Name:            fmt.Sprintf("Storage (%s)", diskName),
-			Unit:            "months",
-			UnitMultiplier:  1,
-			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("azure"),
-				Region:        strPtr(region),
-				Service:       strPtr("Storage"),
-				ProductFamily: strPtr("Storage"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "productName", Value: strPtr(productName)},
-					{Key: "skuName", Value: strPtr(fmt.Sprintf("%s LRS", diskName))},
-					{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Disks", diskName))},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr("Consumption"),
-			},
-		},
-	}
+	costComponents := []*schema.CostComponent{storageCostComponent(region, diskName, productName)}
 
 	if diskType == "Standard_LRS" || diskType == "StandardSSD_LRS" {
 		var opsQty *decimal.Decimal
@@ -180,6 +159,29 @@ func standardPremiumDiskCostComponents(region string, diskType string, diskData 
 	return costComponents
 }
 
+func storageCostComponent(region, diskName, productName string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            fmt.Sprintf("Storage (%s)", diskName),
+		Unit:            "months",
+		UnitMultiplier:  1,
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(region),
+			Service:       strPtr("Storage"),
+			ProductFamily: strPtr("Storage"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", Value: strPtr(productName)},
+				{Key: "skuName", Value: strPtr(fmt.Sprintf("%s LRS", diskName))},
+				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Disks", diskName))},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	}
+}
+
 func ultraDiskCostComponents(region string, diskType string, diskData gjson.Result) []*schema.CostComponent {
 	requestedSize := 1024
 	iops := 2048
@@ -202,8 +204,8 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           fmt.Sprintf("Storage (ultra, %d GiB)", diskSize),
-			Unit:           "GiB-hours",
-			UnitMultiplier: 1,
+			Unit:           "GiB",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(diskSize))),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
@@ -222,8 +224,8 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 		},
 		{
 			Name:           "Provisioned IOPS",
-			Unit:           "IOPS-hours",
-			UnitMultiplier: 1,
+			Unit:           "IOPS",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(iops))),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
@@ -242,8 +244,8 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 		},
 		{
 			Name:           "Throughput",
-			Unit:           "MB/s-hours",
-			UnitMultiplier: 1,
+			Unit:           "MB/s",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(throughput))),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),

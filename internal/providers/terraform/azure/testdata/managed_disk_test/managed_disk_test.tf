@@ -4,27 +4,27 @@ provider "azurerm" {
 }
 
 resource "azurerm_managed_disk" "standard" {
-  name                 = "standard"
-  resource_group_name  = "fake_resource_group"
-  location             = "eastus"
+  name                = "standard"
+  resource_group_name = "fake_resource_group"
+  location            = "eastus"
 
   create_option        = "Empty"
   storage_account_type = "Standard_LRS"
 }
 
 resource "azurerm_managed_disk" "premium" {
-  name                 = "premium"
-  resource_group_name  = "fake_resource_group"
-  location             = "eastus"
+  name                = "premium"
+  resource_group_name = "fake_resource_group"
+  location            = "eastus"
 
   create_option        = "Empty"
   storage_account_type = "Premium_LRS"
 }
 
 resource "azurerm_managed_disk" "custom_size_ssd" {
-  name                 = "custom_size_ssd"
-  resource_group_name  = "fake_resource_group"
-  location             = "eastus"
+  name                = "custom_size_ssd"
+  resource_group_name = "fake_resource_group"
+  location            = "eastus"
 
   create_option        = "Empty"
   storage_account_type = "StandardSSD_LRS"
@@ -32,9 +32,9 @@ resource "azurerm_managed_disk" "custom_size_ssd" {
 }
 
 resource "azurerm_managed_disk" "ultra" {
-  name                 = "ultra"
-  resource_group_name  = "fake_resource_group"
-  location             = "eastus"
+  name                = "ultra"
+  resource_group_name = "fake_resource_group"
+  location            = "eastus"
 
   create_option        = "Empty"
   storage_account_type = "UltraSSD_LRS"
