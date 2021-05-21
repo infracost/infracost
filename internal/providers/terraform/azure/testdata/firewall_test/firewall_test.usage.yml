@@ -5,3 +5,10 @@ resource_usage:
 
   azurerm_firewall.premium:
     monthly_data_processed_gb: 10000
+
+  azurerm_firewall.premium_virtual_hub:
+    monthly_data_processed_gb: 20000
+
+  azurerm_firewall.standard_virtual_hub:
+    monthly_data_processed_gb: 20000
+    
