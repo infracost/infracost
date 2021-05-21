@@ -112,9 +112,9 @@ func provisionedCosmosCostComponents(model modelType, throughputs *decimal.Decim
 			location := g.Get("location").String()
 			if l := locationNameMapping(location); l != "" {
 				costComponents = append(costComponents, &schema.CostComponent{
-					Name:           fmt.Sprintf("Request units (provisioned, %s)", l),
-					Unit:           "hours",
-					UnitMultiplier: 1,
+					Name:           fmt.Sprintf("Provisioned throughput (standard, %s)", l),
+					Unit:           "RU/s x 100",
+					UnitMultiplier: schema.HourToMonthUnitMultiplier,
 					HourlyQuantity: quantity,
 					ProductFilter: &schema.ProductFilter{
 						VendorName:    strPtr("azure"),
@@ -149,8 +149,8 @@ func serverlessCosmosCostComponent(location string, availabilityZone bool, u *sc
 	}
 
 	return &schema.CostComponent{
-		Name:            "Requests (serverless)",
-		Unit:            "1M units",
+		Name:            "Provisioned throughput (serverless)",
+		Unit:            "1M RU",
 		UnitMultiplier:  1,
 		MonthlyQuantity: requestUnits,
 		ProductFilter: &schema.ProductFilter{
@@ -189,30 +189,30 @@ func storageCosmosCostComponents(account *schema.ResourceData, u *schema.UsageDa
 			if account.Get("analytical_storage_enabled").Type != gjson.Null {
 				if account.Get("analytical_storage_enabled").Bool() {
 					costComponents = append(costComponents, storageCosmosCostComponent(
-						fmt.Sprintf("Analytical Storage (%s)", l),
+						fmt.Sprintf("Analytical storage (%s)", l),
 						location,
 						"Standard",
 						"Azure Cosmos DB Analytics Storage",
 						storageGB))
 
 					var writeOperations, readOperations *decimal.Decimal
-					if u != nil && u.Get("monthly_write_operations").Exists() {
-						writeOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_write_operations").Int()))
+					if u != nil && u.Get("monthly_analytical_storage_write_operations").Exists() {
+						writeOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_analytical_storage_write_operations").Int()))
 						writeOperations = decimalPtr(writeOperations.Div(decimal.NewFromInt(10000)))
 					}
-					if u != nil && u.Get("monthly_read_operations").Exists() {
-						readOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_read_operations").Int()))
+					if u != nil && u.Get("monthly_analytical_storage_read_operations").Exists() {
+						readOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_analytical_storage_read_operations").Int()))
 						readOperations = decimalPtr(readOperations.Div(decimal.NewFromInt(10000)))
 					}
 					costComponents = append(costComponents, operationsCosmosCostComponent(
-						fmt.Sprintf("Write operations (%s)", l),
+						fmt.Sprintf("Analytical write operations (%s)", l),
 						location,
 						"Write Operations",
 						writeOperations,
 					))
 
 					costComponents = append(costComponents, operationsCosmosCostComponent(
-						fmt.Sprintf("Read operations (%s)", l),
+						fmt.Sprintf("Analytical read operations (%s)", l),
 						location,
 						"Read Operations",
 						readOperations,
@@ -233,11 +233,29 @@ func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.U
 	}
 
 	var name, meterName, skuName, productName string
-	if backupType == "Pereodic" {
-		name = "Pereodic backup"
+	numberOfCopies := decimalPtr(decimal.NewFromInt(1))
+	if backupType == "Periodic" {
+		name = "Periodic backup"
 		meterName = "Data Stored"
 		skuName = "Standard"
 		productName = "Azure Cosmos DB Snapshot"
+
+		if backupStorageGB != nil {
+			intervalHrs := 4.0
+			retentionHrs := 8.0
+
+			if account.Get("backup.0.interval_in_minutes").Type != gjson.Null {
+				intervalHrs = account.Get("backup.0.interval_in_minutes").Float() / 60
+			}
+			if account.Get("backup.0.retention_in_hours").Type != gjson.Null {
+				retentionHrs = account.Get("backup.0.retention_in_hours").Float()
+			}
+
+			if retentionHrs > intervalHrs {
+				numberOfCopies = decimalPtr(decimal.NewFromFloat((retentionHrs / intervalHrs)).Floor().Sub(decimal.NewFromInt(2)))
+			}
+			backupStorageGB = decimalPtr(backupStorageGB.Mul(*numberOfCopies))
+		}
 	} else {
 		name = "Continuous backup"
 		meterName = "Continuous Backup"
@@ -246,6 +264,11 @@ func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.U
 	}
 
 	for _, g := range zones {
+		if backupStorageGB != nil {
+			if backupStorageGB.Equal(decimal.Zero) {
+				break
+			}
+		}
 		location := g.Get("location").String()
 		if l := locationNameMapping(location); l != "" {
 			costComponents = append(costComponents, backupCosmosCostComponent(
@@ -260,8 +283,8 @@ func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.U
 	}
 
 	var pitr *decimal.Decimal
-	if u != nil && u.Get("restored_data_gb").Exists() {
-		pitr = decimalPtr(decimal.NewFromInt(u.Get("restored_data_gb").Int()))
+	if u != nil && u.Get("monthly_restored_data_gb").Exists() {
+		pitr = decimalPtr(decimal.NewFromInt(u.Get("monthly_restored_data_gb").Int()))
 	}
 	meterName = "Data Restore"
 	skuName = "Backup"
