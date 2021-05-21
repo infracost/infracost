@@ -24,6 +24,9 @@ func NewAzureFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		skuTier = d.Get("sku_tier").String()
 	}
 
+	// I compare d.Get() with empty array because defaulty exists empty array of virtual hub block: "virtual_hub":[]
+	// and it means that d.Get("virtual_hub").Type will never return gjson.Null
+
 	if v := d.Get("virtual_hub").String(); v != "[]" {
 		if skuTier == "Standard" {
 			skuTier = "Secured Virtual Hub"
