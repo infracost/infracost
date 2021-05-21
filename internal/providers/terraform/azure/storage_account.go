@@ -71,7 +71,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 		if u != nil && u.Get("storage_gb").Type != gjson.Null {
 			capacity = decimalPtr(decimal.NewFromInt(u.Get("storage_gb").Int()))
 
-			if accessTier == "Hot" {
+			if accessTier == "Hot" && accountTier != "Premium" {
 				dataStorageTiers := []int{51200, 512000}
 				dataStorageQuantities := usage.CalculateTierBuckets(*capacity, dataStorageTiers)
 
@@ -114,29 +114,29 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 		if u != nil && u.Get("monthly_write_operations").Type != gjson.Null {
 			writeOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_write_operations").Int()))
 		}
+		writeMeterName := "/Write Operations$/"
+
+		if skuName == "Hot RA-GRS" {
+			writeMeterName = "/List and Create Container Operations$/"
+		}
 		costComponents = append(costComponents, blobOperationsCostComponent(
 			location,
 			"Write operations",
 			"10K operations",
 			skuName,
-			"/Write Operations$/",
+			writeMeterName,
 			productName,
 			writeOperations,
 			10000))
 
-		lccoSkuName := skuName
 		if u != nil && u.Get("monthly_list_and_create_container_operations").Type != gjson.Null {
 			listOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_list_and_create_container_operations").Int()))
-
-			if skuName == "Hot RA-GRS" {
-				lccoSkuName = "Hot GRS"
-			}
 		}
 		costComponents = append(costComponents, blobOperationsCostComponent(
 			location,
 			"List and create container operations",
 			"10K operations",
-			lccoSkuName,
+			skuName,
 			"/List and Create Container Operations$/",
 			productName,
 			listOperations,
@@ -344,7 +344,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 func blobDataStorageCostComponent(location, name, skuName, startUsage, productName string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:                 name,
-		Unit:                 "GB-months",
+		Unit:                 "GB",
 		UnitMultiplier:       1,
 		MonthlyQuantity:      quantity,
 		IgnoreIfMissingPrice: true,
@@ -396,7 +396,7 @@ func blobOperationsCostComponent(location, name, unit, skuName, meterName, produ
 func fileDataStorageCostComponent(location, name, skuName, meterName string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:                 name,
-		Unit:                 "GB-months",
+		Unit:                 "GB",
 		UnitMultiplier:       1,
 		MonthlyQuantity:      quantity,
 		IgnoreIfMissingPrice: true,
