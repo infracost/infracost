@@ -86,7 +86,7 @@ resource_usage:
     region: us-east-1                           # Region the data transfer is originating from.
     monthly_intra_region_gb: 1000               # Monthly data transferred between availability zones in the region.
     monthly_outbound_us_east_to_us_east_gb: 500 # Monthly data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
-    monthly_outbound_other_region_gb: 750       # Monthly data transferred to other AWS regions.
+    monthly_outbound_other_regions_gb: 750      # Monthly data transferred to other AWS regions.
     monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
 
   aws_docdb_cluster.my_cluster:
