@@ -41,8 +41,6 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 					costComponents = append(costComponents, notificationHubsPushesCostComponent(fmt.Sprintf("Additional pushes (%s)", message), location, sku, "10", &pushQuantities[1], 1000000))
 				}
 				if pushQuantities[2].GreaterThan(decimal.Zero) {
-					// remainingPushes := pushQuantities[2].Add(pushQuantities[0])
-					// newPushes := &remainingPushes
 					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 100M)", location, sku, "100", &pushQuantities[2], 1000000))
 				}
 			}
