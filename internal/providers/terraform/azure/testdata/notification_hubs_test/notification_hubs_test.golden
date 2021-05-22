@@ -14,7 +14,7 @@
  azurerm_notification_hub_namespace.stdabove100M                                                        
  ├─ Namespace usage (Standard)                                    1  months                     $200.00 
  ├─ Additional pushes (10-100M)                                  90  1M pushes                  $900.00 
- └─ Additional pushes (Over 100M)                                30  1M pushes                   $75.00 
+ └─ Additional pushes (Over 100M)                           30.0000  1M pushes                   $75.00 
                                                                                                         
  azurerm_notification_hub_namespace.stdabove10M                                                         
  ├─ Namespace usage (Standard)                                    1  months                     $200.00 
