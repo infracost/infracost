@@ -29,24 +29,21 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 	if u != nil && u.Get("monthly_pushes").Type != gjson.Null {
 		monthlyAdditionalPushes = decimalPtr(decimal.NewFromInt(u.Get("monthly_pushes").Int()))
 		if monthlyAdditionalPushes.GreaterThanOrEqual(decimal.NewFromInt(10000000)) {
-			if sku == "Basic" {
-				costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 10M)", location, sku, "10", monthlyAdditionalPushes, 10000000))
-			}
-			if sku == "Standard" && monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(10000000)) {
-				pushLimits := []int{10000000, 100000000}
+
+			if monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(10000000)) {
+				pushLimits := []int{10000000, 90000000}
 				pushQuantities := usage.CalculateTierBuckets(*monthlyAdditionalPushes, pushLimits)
+				message := "(10-100M)"
 				if pushQuantities[1].GreaterThan(decimal.Zero) {
-					newPushes := &pushQuantities[1]
-					if pushQuantities[1].GreaterThanOrEqual(decimal.NewFromInt(100000000)) {
-						remainingPushes := pushQuantities[1].Sub(pushQuantities[0])
-						newPushes = &remainingPushes
+					if sku == "Basic" {
+						message = "Over 10M"
 					}
-					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (10-100M)", location, sku, "10", newPushes, 1000000))
+					costComponents = append(costComponents, notificationHubsPushesCostComponent(fmt.Sprintf("Additional pushes (%s)", message), location, sku, "10", &pushQuantities[1], 1000000))
 				}
 				if pushQuantities[2].GreaterThan(decimal.Zero) {
-					remainingPushes := pushQuantities[2].Add(pushQuantities[0])
-					newPushes := &remainingPushes
-					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 100M)", location, sku, "100", newPushes, 1000000))
+					// remainingPushes := pushQuantities[2].Add(pushQuantities[0])
+					// newPushes := &remainingPushes
+					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 100M)", location, sku, "100", &pushQuantities[2], 1000000))
 				}
 			}
 		}
