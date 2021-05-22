@@ -49,7 +49,7 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 			}
 		}
 	}
-	if u == nil {
+	if u == nil && sku != "Free" {
 		costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (10-100M)", location, sku, "10", monthlyAdditionalPushes, 1000000))
 
 	}

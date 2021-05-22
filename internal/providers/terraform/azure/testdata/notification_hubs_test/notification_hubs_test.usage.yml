@@ -4,7 +4,7 @@ resource_usage:
     monthly_additional_pushes: 100001 # Monthly total number number of additional pushes.
 
   azurerm_notification_hub_namespace.basicabove10M:
-    monthly_additional_pushes: 10000001 # Monthly total number number of additional pushes.
+    monthly_additional_pushes: 20000000 # Monthly total number number of additional pushes.
 
   azurerm_notification_hub_namespace.stdbelow10M:
     monthly_additional_pushes: 100001 # Monthly total number number of additional pushes.

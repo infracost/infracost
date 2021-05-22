@@ -3,10 +3,13 @@
                                                                                                         
  azurerm_notification_hub_namespace.basicabove10M                                                       
  ├─ Namespace usage (Basic)                                       1  months                      $10.00 
- └─ Additional pushes (Over 10M)                             1.0000  1M pushes                    $1.00 
+ └─ Additional pushes (Over 10M)                                  2  1M pushes                    $2.00 
                                                                                                         
  azurerm_notification_hub_namespace.basicbelow10M                                                       
  └─ Namespace usage (Basic)                                       1  months                      $10.00 
+                                                                                                        
+ azurerm_notification_hub_namespace.free                                                                
+ └─ Namespace usage (Free)                                        1  months                       $0.00 
                                                                                                         
  azurerm_notification_hub_namespace.stdabove100M                                                        
  ├─ Namespace usage (Standard)                                    1  months                     $200.00 
@@ -24,7 +27,7 @@
  ├─ Namespace usage (Standard)                                    1  months                     $200.00 
  └─ Additional pushes (10-100M)                    Monthly cost depends on usage: $10.00 per 1M pushes  
                                                                                                         
- PROJECT TOTAL                                                                                $3,046.00 
+ PROJECT TOTAL                                                                                $3,047.00 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
