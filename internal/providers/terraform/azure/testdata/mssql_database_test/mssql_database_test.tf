@@ -1,5 +1,5 @@
 provider "azurerm" {
-	skip_provider_registration = true
+  skip_provider_registration = true
   features {}
 }
 
@@ -18,41 +18,41 @@ resource "azurerm_sql_server" "example" {
 }
 
 resource "azurerm_mssql_database" "general_purpose_gen" {
-  name           = "acctest-db-d"
-  server_id      = azurerm_sql_server.example.id
-  sku_name       = "GP_Gen5_4"
+  name      = "acctest-db-d"
+  server_id = azurerm_sql_server.example.id
+  sku_name  = "GP_Gen5_4"
 }
 resource "azurerm_mssql_database" "business_critical_gen" {
-  name           = "acctest-db-d"
-  server_id      = azurerm_sql_server.example.id
-  sku_name       = "BC_Gen5_8"
-  max_size_gb    = 10
+  name        = "acctest-db-d"
+  server_id   = azurerm_sql_server.example.id
+  sku_name    = "BC_Gen5_8"
+  max_size_gb = 10
 }
 resource "azurerm_mssql_database" "business_critical_m" {
-  name           = "acctest-db-d"
-  server_id      = azurerm_sql_server.example.id
-  sku_name       = "BC_M_8"
-  max_size_gb    = 50
+  name        = "acctest-db-d"
+  server_id   = azurerm_sql_server.example.id
+  sku_name    = "BC_M_8"
+  max_size_gb = 50
 }
 resource "azurerm_mssql_database" "hyperscale_gen" {
-  name           = "acctest-db-d"
-  server_id      = azurerm_sql_server.example.id
-  sku_name       = "HS_Gen5_2"
-  max_size_gb    = 100
+  name        = "acctest-db-d"
+  server_id   = azurerm_sql_server.example.id
+  sku_name    = "HS_Gen5_2"
+  max_size_gb = 100
 }
 
 resource "azurerm_mssql_database" "hyperscale_gen_with_replicas" {
-  name           = "acctest-db-d"
-  server_id      = azurerm_sql_server.example.id
-  sku_name       = "HS_Gen5_2"
+  name               = "acctest-db-d"
+  server_id          = azurerm_sql_server.example.id
+  sku_name           = "HS_Gen5_2"
   read_replica_count = 2
 }
 
 resource "azurerm_mssql_database" "general_purpose_gen_with_license" {
-  name           = "acctest-db-d"
-  server_id      = azurerm_sql_server.example.id
-  sku_name       = "GP_Gen5_4"
-  license_type   = "LicenseIncluded"
+  name         = "acctest-db-d"
+  server_id    = azurerm_sql_server.example.id
+  sku_name     = "GP_Gen5_4"
+  license_type = "LicenseIncluded"
 }
 
 resource "azurerm_mssql_database" "general_purpose_gen_zone" {
@@ -63,13 +63,13 @@ resource "azurerm_mssql_database" "general_purpose_gen_zone" {
 }
 
 resource "azurerm_mssql_database" "serverless" {
-  name           = "acctest-db-d"
-  server_id      = azurerm_sql_server.example.id
-  sku_name       = "GP_S_Gen5_4"
+  name      = "acctest-db-d"
+  server_id = azurerm_sql_server.example.id
+  sku_name  = "GP_S_Gen5_4"
 }
 
 resource "azurerm_mssql_database" "LTR" {
-  name           = "acctest-db-d"
-  server_id      = azurerm_sql_server.example.id
-  sku_name       = "GP_Gen5_4"
+  name      = "acctest-db-d"
+  server_id = azurerm_sql_server.example.id
+  sku_name  = "GP_Gen5_4"
 }

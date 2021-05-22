@@ -11,22 +11,22 @@ provider "aws" {
 
 resource "aws_vpn_connection" "vpn_connection" {
   customer_gateway_id = "dummy-customer-gateway-id"
-  type = "ipsec.1"
+  type                = "ipsec.1"
 }
 
 resource "aws_vpn_connection" "transit" {
   customer_gateway_id = "dummy-customer-gateway-id"
-  type = "ipsec.1"
-  transit_gateway_id = "dummy-transit-gateway-id"
+  type                = "ipsec.1"
+  transit_gateway_id  = "dummy-transit-gateway-id"
 }
 
 resource "aws_vpn_connection" "vpn_connection_withUsage" {
   customer_gateway_id = "dummy-customer-gateway-id2"
-  type = "ipsec.1"
+  type                = "ipsec.1"
 }
 
 resource "aws_vpn_connection" "transit_withUsage" {
   customer_gateway_id = "dummy-customer-gateway-id2"
-  type = "ipsec.1"
-  transit_gateway_id = "dummy-transit-gateway-id2"
+  type                = "ipsec.1"
+  transit_gateway_id  = "dummy-transit-gateway-id2"
 }

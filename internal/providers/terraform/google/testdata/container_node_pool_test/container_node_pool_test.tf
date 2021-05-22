@@ -1,6 +1,6 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
-  region = "us-central1"
+  region      = "us-central1"
 }
 
 resource "google_container_cluster" "default_regional" {
@@ -9,8 +9,8 @@ resource "google_container_cluster" "default_regional" {
 }
 
 resource "google_container_cluster" "node_locations_regional" {
-  name           = "node-locations"
-  location       = "us-central1-a"
+  name     = "node-locations"
+  location = "us-central1-a"
 
   node_locations = [
     "us-central1-a",
@@ -19,8 +19,8 @@ resource "google_container_cluster" "node_locations_regional" {
 }
 
 resource "google_container_node_pool" "default_regional" {
-  name     = "default"
-  cluster  = google_container_cluster.default_regional.id
+  name    = "default"
+  cluster = google_container_cluster.default_regional.id
 }
 
 resource "google_container_node_pool" "with_node_config_regional" {
@@ -35,7 +35,7 @@ resource "google_container_node_pool" "with_node_config_regional" {
     local_ssd_count = 1
 
     guest_accelerator {
-      type = "nvidia-tesla-k80"
+      type  = "nvidia-tesla-k80"
       count = 4
     }
   }
@@ -80,8 +80,8 @@ resource "google_container_cluster" "default_zonal" {
 }
 
 resource "google_container_cluster" "node_locations_zonal" {
-  name           = "node-locations"
-  location       = "us-central1"
+  name     = "node-locations"
+  location = "us-central1"
 
   node_locations = [
     "us-central1-a",
@@ -90,8 +90,8 @@ resource "google_container_cluster" "node_locations_zonal" {
 }
 
 resource "google_container_node_pool" "default_zonal" {
-  name     = "default"
-  cluster  = google_container_cluster.default_zonal.id
+  name    = "default"
+  cluster = google_container_cluster.default_zonal.id
 }
 
 resource "google_container_node_pool" "cluster_node_locations_zonal" {

@@ -10,21 +10,21 @@ provider "aws" {
 }
 
 resource "aws_docdb_cluster" "my_docdb" {
-    cluster_identifier      = "my-docdb-cluster"
-    engine                  = "docdb"
-    master_username         = "foo"
-    master_password         = "mustbeeightchars"
-    backup_retention_period = 5
-    preferred_backup_window = "07:00-09:00"
-    skip_final_snapshot     = true
+  cluster_identifier      = "my-docdb-cluster"
+  engine                  = "docdb"
+  master_username         = "foo"
+  master_password         = "mustbeeightchars"
+  backup_retention_period = 5
+  preferred_backup_window = "07:00-09:00"
+  skip_final_snapshot     = true
 }
 
 resource "aws_docdb_cluster" "my_docdb_usage" {
-    cluster_identifier      = "my-docdb-cluster-usage"
-    engine                  = "docdb"
-    master_username         = "foo"
-    master_password         = "mustbeeightchars"
-    backup_retention_period = 5
-    preferred_backup_window = "07:00-09:00"
-    skip_final_snapshot     = true
+  cluster_identifier      = "my-docdb-cluster-usage"
+  engine                  = "docdb"
+  master_username         = "foo"
+  master_password         = "mustbeeightchars"
+  backup_retention_period = 5
+  preferred_backup_window = "07:00-09:00"
+  skip_final_snapshot     = true
 }

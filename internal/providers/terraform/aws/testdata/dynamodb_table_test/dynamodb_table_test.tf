@@ -10,10 +10,10 @@ provider "aws" {
 }
 
 resource "aws_dynamodb_table" "my_dynamodb_table_usage" {
-  name           = "GameScores"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "UserId"
-  range_key      = "GameTitle"
+  name         = "GameScores"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "UserId"
+  range_key    = "GameTitle"
 
   attribute {
     name = "UserId"
