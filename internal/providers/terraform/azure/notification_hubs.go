@@ -33,7 +33,7 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 			if monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(10000000)) {
 				pushLimits := []int{10000000, 90000000}
 				pushQuantities := usage.CalculateTierBuckets(*monthlyAdditionalPushes, pushLimits)
-				message := "(10-100M)"
+				message := "10-100M"
 				if pushQuantities[1].GreaterThan(decimal.Zero) {
 					if sku == "Basic" {
 						message = "Over 10M"
