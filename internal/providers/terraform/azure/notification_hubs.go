@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 )
@@ -17,12 +18,6 @@ func GetAzureRMNotificationHubsRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyAdditionalPushes *decimal.Decimal
-	var startUsageAmt string
-
-	if u != nil && u.Get("monthly_additional_pushes").Type != gjson.Null {
-		monthlyAdditionalPushes = decimalPtr(decimal.NewFromInt(u.Get("monthly_additional_pushes").Int()))
-	}
-
 	sku := "Basic"
 	location := d.Get("location").String()
 
@@ -30,21 +25,33 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 		sku = d.Get("sku_name").String()
 	}
 	costComponents := make([]*schema.CostComponent, 0)
+	costComponents = append(costComponents, notificationHubsCostComponent("Namespace usage", location, sku))
+	if u != nil && u.Get("monthly_additional_pushes").Type != gjson.Null {
+		monthlyAdditionalPushes = decimalPtr(decimal.NewFromInt(u.Get("monthly_additional_pushes").Int()))
+		if monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(10000000)) {
+			if sku == "Basic" {
+				costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 10M)", location, sku, "10", monthlyAdditionalPushes, 10000000))
+			}
+			if sku == "Standard" && monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(10000000)) {
+				pushLimits := []int{10000000, 100000000}
+				pushQuantities := usage.CalculateTierBuckets(*monthlyAdditionalPushes, pushLimits)
+				if pushQuantities[1].GreaterThan(decimal.NewFromInt(10000000)) {
+					newPushes := &pushQuantities[1]
+					if pushQuantities[1].GreaterThanOrEqual(decimal.NewFromInt(100000000)) {
+						remainingPushes := pushQuantities[1].Sub(pushQuantities[0])
+						newPushes = &remainingPushes
+					}
+					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (10-100M)", location, sku, "10", newPushes, 1000000))
+				}
+				if pushQuantities[2].GreaterThan(decimal.NewFromInt(10000000)) {
+					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 100M)", location, sku, "100", &pushQuantities[2], 1000000))
+				}
+			}
+		}
+	}
+	if u == nil {
+		costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (10-100M)", location, sku, "10", monthlyAdditionalPushes, 1000000))
 
-	costComponents = append(costComponents, notificationHubsCostComponent("Base Charge Per Namespace", location, sku))
-	if monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(10000000)) {
-		startUsageAmt = "10"
-		message := "Over 10M"
-		multi := 10000000
-		if sku == "Standard" && monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(10000000)) {
-			message = "10-100M"
-		}
-		if sku == "Standard" && monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(1000000000)) {
-			startUsageAmt = "100"
-			multi = 1000000000
-			message = "Over 100M"
-		}
-		costComponents = append(costComponents, notificationHubsPushesCostComponent(fmt.Sprintf("Additional Pushes (%s)", message), location, sku, startUsageAmt, monthlyAdditionalPushes, multi))
 	}
 
 	return &schema.Resource{

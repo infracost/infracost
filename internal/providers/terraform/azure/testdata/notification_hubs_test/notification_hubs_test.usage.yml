@@ -1,16 +1,17 @@
 version: 0.1
 resource_usage:
   azurerm_notification_hub_namespace.basicbelow10M:
-    monthly_additional_pushes: 100001 # Number of additional pushes
+    monthly_additional_pushes: 100001 # Monthly total number number of additional pushes.
 
   azurerm_notification_hub_namespace.basicabove10M:
-    monthly_additional_pushes: 10000001 # Number of additional pushes
+    monthly_additional_pushes: 10000001 # Monthly total number number of additional pushes.
 
   azurerm_notification_hub_namespace.stdbelow10M:
-    monthly_additional_pushes: 100001 # Number of additional pushes
+    monthly_additional_pushes: 100001 # Monthly total number number of additional pushes.
 
   azurerm_notification_hub_namespace.stdabove10M:
-    monthly_additional_pushes: 100000001 # Number of additional pushes
-
+    monthly_additional_pushes: 90000000 # Monthly total number number of additional pushes.
+    
   azurerm_notification_hub_namespace.stdabove100M:
-    monthly_additional_pushes: 1000000001 # Number of additional pushes
+    monthly_additional_pushes: 320000000 # Monthly total number number of additional pushes.
+  
