@@ -15,7 +15,7 @@ func GetStepFunctionRegistryItem() *schema.RegistryItem {
 }
 
 func NewStepFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var storageGB, requests, transition *decimal.Decimal
+	var durationMS, requests, transition *decimal.Decimal
 
 	tier := "STANDARD"
 	region := d.Get("region").String()
@@ -25,41 +25,46 @@ func NewStepFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	}
 	costComponents := make([]*schema.CostComponent, 0)
 	if tier == "STANDARD" {
-		if u != nil && u.Get("transition").Type != gjson.Null {
-			transition = decimalPtr(decimal.NewFromInt(u.Get("transition").Int()))
+		if u != nil && u.Get("monthly_transitions").Type != gjson.Null {
+			transition = decimalPtr(decimal.NewFromInt(u.Get("monthly_transitions").Int()))
 			transitionLimits := []int{4000}
 			transitionQuantities := usage.CalculateTierBuckets(*transition, transitionLimits)
-			costComponents = append(costComponents, stepFunctionStandardCostComponent("State transition (Free tier (0-4000 transition))", region, tier, "free", &transitionQuantities[0]))
+			if transition.LessThanOrEqual(decimal.NewFromInt(4000)) {
+				return &schema.Resource{
+					NoPrice:   true,
+					IsSkipped: true,
+				}
+			}
 			if transitionQuantities[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionStandardCostComponent("State transition (4000+ transition)", region, tier, "0", &transitionQuantities[1]))
+				costComponents = append(costComponents, stepFunctionStandardCostComponent("Transitions", region, tier, "0", &transitionQuantities[1]))
 			}
 		}
 		if u == nil {
-			costComponents = append(costComponents, stepFunctionStandardCostComponent("State transition (4000+ transition)", region, tier, "0", transition))
+			costComponents = append(costComponents, stepFunctionStandardCostComponent("Transitions", region, tier, "0", transition))
 		}
 	}
 	if tier == "EXPRESS" {
-		if u != nil && u.Get("requests").Type != gjson.Null {
-			requests = decimalPtr(decimal.NewFromInt(u.Get("requests").Int()))
-			costComponents = append(costComponents, stepFunctionExpressRequestCostComponent("Express workflow requests", region, tier, requests))
+		if u != nil && u.Get("monthly_requests").Type != gjson.Null {
+			requests = decimalPtr(decimal.NewFromInt(u.Get("monthly_requests").Int()))
+			costComponents = append(costComponents, stepFunctionExpressRequestCostComponent("Requests", region, tier, requests))
 		}
-		if u != nil && u.Get("storage_gb").Type != gjson.Null {
-			storageGB = decimalPtr(decimal.NewFromInt(u.Get("storage_gb").Int()))
+		if u != nil && u.Get("workflow_duration_ms").Type != gjson.Null {
+			durationMS = decimalPtr(decimal.NewFromInt(u.Get("workflow_duration_ms").Int()))
 			pushLimits := []int{0, 3600000, 10800000}
-			pushQuantities := usage.CalculateTierBuckets(*storageGB, pushLimits)
+			pushQuantities := usage.CalculateTierBuckets(*durationMS, pushLimits)
 			if pushQuantities[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Express workflow duration (0-1000 hours)", region, tier, "0", &pushQuantities[1]))
+				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (first 1K)", region, tier, "0", &pushQuantities[1]))
 			}
 			if pushQuantities[2].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Express workflow duration (1000-4000 hours)", region, tier, "3600000", &pushQuantities[2]))
+				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (next 4K)", region, tier, "3600000", &pushQuantities[2]))
 			}
 			if pushQuantities[3].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Express workflow duration (4000+ hours)", region, tier, "18000000", &pushQuantities[3]))
+				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (over 5K)", region, tier, "18000000", &pushQuantities[3]))
 			}
 		}
 		if u == nil {
-			costComponents = append(costComponents, stepFunctionExpressRequestCostComponent("Express workflow requests", region, tier, requests))
-			costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Express workflow duration", region, tier, "0", storageGB))
+			costComponents = append(costComponents, stepFunctionExpressRequestCostComponent("Requests", region, tier, requests))
+			costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration", region, tier, "0", durationMS))
 		}
 
 	}
@@ -75,8 +80,8 @@ func stepFunctionStandardCostComponent(name, region, tier, startUsageAmt string,
 	}
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "State transition",
-		UnitMultiplier:  1,
+		Unit:            "1K transitions",
+		UnitMultiplier:  1000,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -100,8 +105,8 @@ func stepFunctionExpressRequestCostComponent(name, region, tier string, quantity
 	}
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "Requests",
-		UnitMultiplier:  1,
+		Unit:            "1M Requests",
+		UnitMultiplier:  1000000,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),

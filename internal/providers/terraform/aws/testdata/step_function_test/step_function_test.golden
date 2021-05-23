@@ -1,28 +1,27 @@
 
- Name                                                         Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                    
- aws_lambda_function.lambda                                                                                         
- ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                          Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                    
- aws_sfn_state_machine.express                                                                                      
- ├─ Express workflow requests                                   1,000,000  Requests                           $1.00 
- ├─ Express workflow duration (0-1000 hours)                        1,000  GB-Seconds                         $0.02 
- ├─ Express workflow duration (1000-4000 hours)                     3,000  GB-Seconds                         $0.02 
- └─ Express workflow duration (4000+ hours)                       55.5555  GB-Seconds                         $0.00 
-                                                                                                                    
- aws_sfn_state_machine.expresswithoutusage                                                                          
- ├─ Express workflow requests                         Monthly cost depends on usage: $0.000001 per Requests         
- └─ Express workflow duration                         Monthly cost depends on usage: $0.00001667 per GB-Seconds     
-                                                                                                                    
- aws_sfn_state_machine.standard                                                                                     
- ├─ State transition (Free tier (0-4000 transition))                4,000  State transition                   $0.00 
- └─ State transition (4000+ transition)                             6,000  State transition                   $0.15 
-                                                                                                                    
- aws_sfn_state_machine.standardwithoutusage                                                                         
- └─ State transition (4000+ transition)               Monthly cost depends on usage: $0.000025 per State transition 
-                                                                                                                    
- PROJECT TOTAL                                                                                                $1.19 
+ Name                                                Monthly Qty  Unit                        Monthly Cost 
+                                                                                                           
+ aws_lambda_function.lambda                                                                                
+ ├─ Requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
+ └─ Duration                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+                                                                                                           
+ aws_sfn_state_machine.express                                                                             
+ ├─ Requests                                                   1  1M Requests                        $1.00 
+ ├─ Duration (first 1K)                                    1,000  GB-Seconds                         $0.02 
+ ├─ Duration (next 4K)                                     3,000  GB-Seconds                         $0.02 
+ └─ Duration (over 5K)                                   55.5555  GB-Seconds                         $0.00 
+                                                                                                           
+ aws_sfn_state_machine.expresswithoutusage                                                                 
+ ├─ Requests                                 Monthly cost depends on usage: $1.00 per 1M Requests          
+ └─ Duration                                 Monthly cost depends on usage: $0.00001667 per GB-Seconds     
+                                                                                                           
+ aws_sfn_state_machine.standard                                                                            
+ └─ Transitions                                                6  1K transitions                     $0.15 
+                                                                                                           
+ aws_sfn_state_machine.standardwithoutusage                                                                
+ └─ Transitions                              Monthly cost depends on usage: $0.03 per 1K transitions       
+                                                                                                           
+ PROJECT TOTAL                                                                                       $1.19 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
