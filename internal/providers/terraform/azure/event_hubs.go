@@ -16,7 +16,7 @@ func GetAzureRMEventHubsRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-
+	var events *decimal.Decimal
 	sku := "Basic"
 	location := d.Get("location").String()
 
@@ -24,11 +24,17 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		sku = d.Get("sku").String()
 	}
 	costComponents := make([]*schema.CostComponent, 0)
-	costComponents = append(costComponents, eventHubsCostComponent("Ingress events", location, sku))
+	if u != nil && u.Get("events").Type != gjson.Null {
+		events = decimalPtr(decimal.NewFromInt(u.Get("events").Int()))
+		costComponents = append(costComponents, eventHubsCostComponent("Ingress events", location, sku, events))
+	}
+	if u == nil {
+		costComponents = append(costComponents, eventHubsCostComponent("Ingress events", location, sku, events))
+	}
 	costComponents = append(costComponents, eventHubsThroughPutCostComponent("Throughput unit (1 MB/s ingress, 2 MB/s egress)", location, sku))
 
 	if sku == "Standard" {
-		costComponents = append(costComponents, eventHubsKafkaCostComponent("Kafka Endpoint", location, sku))
+		costComponents = append(costComponents, eventHubsKafkaCostComponent("Kafka endpoint", location, sku))
 		costComponents = append(costComponents, eventHubsCaptureCostComponent("Capture", location, sku))
 	}
 
@@ -38,12 +44,15 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 }
 
-func eventHubsCostComponent(name, location, sku string) *schema.CostComponent {
+func eventHubsCostComponent(name, location, sku string, quantity *decimal.Decimal) *schema.CostComponent {
+	if quantity != nil {
+		quantity = decimalPtr(quantity.Div(decimal.NewFromInt(int64(10000000))))
+	}
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("%s (%s)", name, sku),
-		Unit:            "hours",
+		Unit:            "1M events",
 		UnitMultiplier:  1,
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
 			Region:     strPtr(location),
@@ -63,10 +72,10 @@ func eventHubsCostComponent(name, location, sku string) *schema.CostComponent {
 func eventHubsThroughPutCostComponent(name, location, sku string) *schema.CostComponent {
 
 	return &schema.CostComponent{
-		Name:           name,
-		Unit:           "1M events",
-		UnitMultiplier: 1,
-		//MonthlyQuantity: quantity,
+		Name:            name,
+		Unit:            "hour",
+		UnitMultiplier:  1,
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
 			Region:     strPtr(location),
@@ -87,7 +96,7 @@ func eventHubsKafkaCostComponent(name, location, sku string) *schema.CostCompone
 
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "hours",
+		Unit:            "hour",
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
@@ -110,7 +119,7 @@ func eventHubsCaptureCostComponent(name, location, sku string) *schema.CostCompo
 
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "hours",
+		Unit:            "hour",
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
