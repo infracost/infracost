@@ -11,9 +11,16 @@
  ├─ Express workflow duration (1000-4000 hours)                     3,000  GB-Seconds                         $0.02 
  └─ Express workflow duration (4000+ hours)                       55.5555  GB-Seconds                         $0.00 
                                                                                                                     
+ aws_sfn_state_machine.expresswithoutusage                                                                          
+ ├─ Express workflow requests                         Monthly cost depends on usage: $0.000001 per Requests         
+ └─ Express workflow duration                         Monthly cost depends on usage: $0.00001667 per GB-Seconds     
+                                                                                                                    
  aws_sfn_state_machine.standard                                                                                     
  ├─ State transition (Free tier (0-4000 transition))                4,000  State transition                   $0.00 
- └─ State transition                                                6,000  State transition                   $0.15 
+ └─ State transition (4000+ transition)                             6,000  State transition                   $0.15 
+                                                                                                                    
+ aws_sfn_state_machine.standardwithoutusage                                                                         
+ └─ State transition (4000+ transition)               Monthly cost depends on usage: $0.000025 per State transition 
                                                                                                                     
  PROJECT TOTAL                                                                                                $1.19 
 

@@ -31,11 +31,11 @@ func NewStepFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			transitionQuantities := usage.CalculateTierBuckets(*transition, transitionLimits)
 			costComponents = append(costComponents, stepFunctionStandardCostComponent("State transition (Free tier (0-4000 transition))", region, tier, "free", &transitionQuantities[0]))
 			if transitionQuantities[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionStandardCostComponent("State transition", region, tier, "0", &transitionQuantities[1]))
+				costComponents = append(costComponents, stepFunctionStandardCostComponent("State transition (4000+ transition)", region, tier, "0", &transitionQuantities[1]))
 			}
 		}
 		if u == nil {
-			costComponents = append(costComponents, stepFunctionStandardCostComponent("State transition", region, tier, "0", transition))
+			costComponents = append(costComponents, stepFunctionStandardCostComponent("State transition (4000+ transition)", region, tier, "0", transition))
 		}
 	}
 	if tier == "EXPRESS" {
