@@ -10,15 +10,15 @@ provider "aws" {
 }
 
 resource "aws_ssm_parameter" "ssm_parameter_advanced" {
-  name = "my-advanced-ssm-parameter"
-  type = "String"
+  name  = "my-advanced-ssm-parameter"
+  type  = "String"
   value = "Advanced Parameter"
-  tier = "Advanced"
+  tier  = "Advanced"
 }
 
 resource "aws_ssm_parameter" "ssm_parameter_advancedWithUsage" {
-  name = "my-advanced-ssm-parameter"
-  type = "String"
+  name  = "my-advanced-ssm-parameter"
+  type  = "String"
   value = "Advanced Parameter"
-  tier = "Advanced"
+  tier  = "Advanced"
 }

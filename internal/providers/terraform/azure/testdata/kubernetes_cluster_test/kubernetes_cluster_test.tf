@@ -1,6 +1,6 @@
 provider "azurerm" {
   features {}
-	skip_provider_registration = true
+  skip_provider_registration = true
 }
 
 resource "azurerm_resource_group" "example" {
@@ -15,8 +15,8 @@ resource "azurerm_kubernetes_cluster" "free_D2V2" {
   dns_prefix          = "exampleaks1"
 
   default_node_pool {
-    name       = "default"
-    vm_size    = "Standard_D2_v2"
+    name    = "default"
+    vm_size = "Standard_D2_v2"
   }
 }
 
@@ -25,7 +25,7 @@ resource "azurerm_kubernetes_cluster" "paid_D2SV2_3nc_128gb" {
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
   dns_prefix          = "exampleaks1"
-	sku_tier 						= "Paid"
+  sku_tier            = "Paid"
 
   default_node_pool {
     name            = "default"
@@ -40,7 +40,7 @@ resource "azurerm_kubernetes_cluster" "paid_5nc_32gb" {
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
   dns_prefix          = "exampleaks1"
-	sku_tier 						= "Paid"
+  sku_tier            = "Paid"
 
   default_node_pool {
     name            = "default"
@@ -55,12 +55,12 @@ resource "azurerm_kubernetes_cluster" "usage_ephemeral" {
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
   dns_prefix          = "exampleaks1"
-	sku_tier 						= "Paid"
+  sku_tier            = "Paid"
 
   default_node_pool {
-    name            = "default"
-    vm_size         = "Standard_D2_v2"
-    os_disk_type    = "Ephemeral"
+    name         = "default"
+    vm_size      = "Standard_D2_v2"
+    os_disk_type = "Ephemeral"
   }
 }
 

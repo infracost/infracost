@@ -14,14 +14,14 @@ resource "aws_elasticsearch_domain" "gp2" {
   elasticsearch_version = "1.5"
 
   cluster_config {
-    instance_type = "c4.2xlarge.elasticsearch"
-    instance_count = 3
+    instance_type            = "c4.2xlarge.elasticsearch"
+    instance_count           = 3
     dedicated_master_enabled = true
-    dedicated_master_type = "c4.8xlarge.elasticsearch"
-    dedicated_master_count = 1
-    warm_enabled = true
-    warm_count = 2
-    warm_type = "ultrawarm1.medium.elasticsearch"
+    dedicated_master_type    = "c4.8xlarge.elasticsearch"
+    dedicated_master_count   = 1
+    warm_enabled             = true
+    warm_count               = 2
+    warm_type                = "ultrawarm1.medium.elasticsearch"
   }
 
   ebs_options {
@@ -36,7 +36,7 @@ resource "aws_elasticsearch_domain" "io1" {
   elasticsearch_version = "1.5"
 
   cluster_config {
-    instance_type = "c4.2xlarge.elasticsearch"
+    instance_type  = "c4.2xlarge.elasticsearch"
     instance_count = 3
   }
 
@@ -44,7 +44,7 @@ resource "aws_elasticsearch_domain" "io1" {
     ebs_enabled = true
     volume_size = 1000
     volume_type = "io1"
-    iops = 10
+    iops        = 10
   }
 }
 
@@ -53,7 +53,7 @@ resource "aws_elasticsearch_domain" "std" {
   elasticsearch_version = "1.5"
 
   cluster_config {
-    instance_type = "c4.2xlarge.elasticsearch"
+    instance_type  = "c4.2xlarge.elasticsearch"
     instance_count = 3
   }
 

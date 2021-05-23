@@ -1,0 +1,22 @@
+
+ Name                                         Monthly Qty  Unit                  Monthly Cost 
+                                                                                              
+ azurerm_databricks_workspace.non_usage                                                       
+ ├─ All-purpose compute DBUs             Monthly cost depends on usage: $0.40 per DBU-hours   
+ ├─ Jobs compute DBUs                    Monthly cost depends on usage: $0.15 per DBU-hours   
+ └─ Jobs light compute DBUs              Monthly cost depends on usage: $0.07 per DBU-hours   
+                                                                                              
+ azurerm_databricks_workspace.premium                                                         
+ ├─ All-purpose compute DBUs                          500  DBU-hours                  $275.00 
+ ├─ Jobs compute DBUs                               1,000  DBU-hours                  $300.00 
+ └─ Jobs light compute DBUs                         2,000  DBU-hours                  $440.00 
+                                                                                              
+ azurerm_databricks_workspace.standard                                                        
+ ├─ All-purpose compute DBUs                        1,000  DBU-hours                  $400.00 
+ ├─ Jobs compute DBUs                               2,000  DBU-hours                  $300.00 
+ └─ Jobs light compute DBUs                         4,000  DBU-hours                  $280.00 
+                                                                                              
+ PROJECT TOTAL                                                                      $1,995.00 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

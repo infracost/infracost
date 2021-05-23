@@ -49,9 +49,9 @@ resource "aws_ebs_volume" "sc1" {
 resource "aws_ebs_volume" "gp3" {
   availability_zone = "us-west-2a"
   size              = 40
-  type = "gp3"
-  iops = 4000
-  throughput = 130
+  type              = "gp3"
+  iops              = 4000
+  throughput        = 130
 
   tags = {
     Name = "HelloWorld"

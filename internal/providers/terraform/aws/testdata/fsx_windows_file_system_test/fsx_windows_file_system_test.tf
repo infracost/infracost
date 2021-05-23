@@ -13,8 +13,8 @@ resource "aws_fsx_windows_file_system" "my_system" {
   storage_capacity    = 300
   subnet_ids          = ["fake"]
   throughput_capacity = 1024
-  deployment_type = "MULTI_AZ_1"
-  storage_type = "HDD"
+  deployment_type     = "MULTI_AZ_1"
+  storage_type        = "HDD"
 
   self_managed_active_directory {
     dns_ips     = ["10.0.0.111", "10.0.0.222"]
@@ -28,8 +28,8 @@ resource "aws_fsx_windows_file_system" "my_file_system" {
   storage_capacity    = 300
   subnet_ids          = ["fake"]
   throughput_capacity = 1024
-  deployment_type = "MULTI_AZ_1"
-  storage_type = "HDD"
+  deployment_type     = "MULTI_AZ_1"
+  storage_type        = "HDD"
 
   self_managed_active_directory {
     dns_ips     = ["10.0.0.111", "10.0.0.222"]

@@ -1,6 +1,6 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
-  region = "us-central1"
+  region      = "us-central1"
 }
 
 resource "google_compute_instance" "standard" {
@@ -27,8 +27,8 @@ resource "google_compute_instance" "ssd" {
   boot_disk {
     initialize_params {
       image = "centos-cloud/centos-7"
-      size = 40
-      type = "pd-ssd"
+      size  = 40
+      type  = "pd-ssd"
     }
   }
 
@@ -118,7 +118,7 @@ resource "google_compute_instance" "gpu" {
   }
 
   guest_accelerator {
-    type = "nvidia-tesla-k80"
+    type  = "nvidia-tesla-k80"
     count = 4
   }
 
@@ -139,7 +139,7 @@ resource "google_compute_instance" "preemptible_gpu" {
   }
 
   guest_accelerator {
-    type = "nvidia-tesla-k80"
+    type  = "nvidia-tesla-k80"
     count = 4
   }
 
