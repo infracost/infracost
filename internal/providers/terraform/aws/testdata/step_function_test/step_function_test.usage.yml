@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  aws_sfn_state_machine.express:
+    requests: 1000000
+    storage_gb: 14600000
+
+  aws_sfn_state_machine.standard:
+    transition: 10000
