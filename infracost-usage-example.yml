@@ -86,7 +86,7 @@ resource_usage:
     region: us-east-1                           # Region the data transfer is originating from.
     monthly_intra_region_gb: 1000               # Monthly data transferred between availability zones in the region.
     monthly_outbound_us_east_to_us_east_gb: 500 # Monthly data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
-    monthly_outbound_other_region_gb: 750       # Monthly data transferred to other AWS regions.
+    monthly_outbound_other_regions_gb: 750      # Monthly data transferred to other AWS regions.
     monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
 
   aws_docdb_cluster.my_cluster:
@@ -469,6 +469,11 @@ resource_usage:
   #
   azurerm_app_service_environment.my_service:
      operating_system: linux # Override the operating system of the instance, can be: linux, windows.
+
+  azurerm_databricks_workspace.my_workspace:
+    monthly_all_purpose_compute_dbu_hrs: 500 # Monthly number of All-purpose Compute Databricks Units in DBU-hours.
+    monthly_jobs_compute_dbu_hrs: 1000 # Monthly number of Jobs Compute Databricks Units in DBU-hours.
+    monthly_jobs_light_compute_dbu_hrs: 2000 # Monthly number of Jobs Light Compute Databricks Units in DBU-hours.
   
   azurerm_function_app.my_functions:
     monthly_executions: 100000 # Monthly executions to the function. Only applicable for Consumption plan.
@@ -532,6 +537,10 @@ resource_usage:
     additional_backup_storage_gb: 3000 # Additional consumption of backup storage in GB.
 
   azurerm_storage_account.my_account:
+    data_at_rest_storage_gb: 10000
+    early_deletion_gb: 1000
+    snapshots_storage_gb: 10000
+    metadata_at_rest_storage_gb: 10000
     storage_gb: 1000000 # Total size of storage in GB.
     monthly_write_operations: 1000000 # Monthly number of Write operations.
     monthly_list_and_create_container_operations: 1000000 # Monthly number of List and Create Container operations. 
@@ -549,3 +558,6 @@ resource_usage:
     instances: 10 # Override the number of instances in the scale set.
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
+
+  azurerm_notification_hub_namespace.my_namespace:
+    monthly_pushes: 1000000 # Monthly total number number of additional pushes.

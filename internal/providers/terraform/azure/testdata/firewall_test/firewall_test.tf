@@ -30,6 +30,20 @@ resource "azurerm_public_ip" "example" {
   sku                 = "Standard"
 }
 
+resource "azurerm_virtual_wan" "example" {
+  name                = "example-virtualwan"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+}
+
+resource "azurerm_virtual_hub" "example" {
+  name                = "example"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  virtual_wan_id      = azurerm_virtual_wan.example.id
+  address_prefix      = "10.0.1.0/24"
+}
+
 resource "azurerm_firewall" "standard" {
   name                = "testfirewall"
   location            = "eastus"
@@ -47,6 +61,40 @@ resource "azurerm_firewall" "premium" {
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
   sku_tier            = "Premium"
+
+  ip_configuration {
+    name                 = "configuration"
+    subnet_id            = azurerm_subnet.example.id
+    public_ip_address_id = azurerm_public_ip.example.id
+  }
+}
+
+resource "azurerm_firewall" "premium_virtual_hub" {
+  name                = "testfirewall"
+  location            = "eastus"
+  resource_group_name = azurerm_resource_group.example.name
+  sku_tier            = "Premium"
+
+  virtual_hub {
+    virtual_hub_id = azurerm_virtual_hub.example.id
+  }
+
+  ip_configuration {
+    name                 = "configuration"
+    subnet_id            = azurerm_subnet.example.id
+    public_ip_address_id = azurerm_public_ip.example.id
+  }
+}
+
+resource "azurerm_firewall" "standard_virtual_hub" {
+  name                = "testfirewall"
+  location            = "eastus"
+  resource_group_name = azurerm_resource_group.example.name
+  sku_tier            = "Standard"
+
+  virtual_hub {
+    virtual_hub_id = azurerm_virtual_hub.example.id
+  }
 
   ip_configuration {
     name                 = "configuration"

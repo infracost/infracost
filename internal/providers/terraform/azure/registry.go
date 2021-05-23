@@ -5,6 +5,7 @@ import "github.com/infracost/infracost/internal/schema"
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
+  GetAzureRMDatabricksWorkspaceRegistryItem(),
 	GetAzureRMHDInsightHadoopClusterRegistryItem(),
 	GetAzureRMHDInsightHBaseClusterRegistryItem(),
 	GetAzureRMHDInsightInteractiveQueryClusterRegistryItem(),
@@ -35,6 +36,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMPublicIPPrefixRegistryItem(),
 	GetAzureRMAppNATGatewayRegistryItem(),
 	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
+	GetAzureRMNotificationHubsRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -93,6 +95,9 @@ var FreeResources []string = []string{
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
+
+	// Azure Notification Hub
+	"azurerm_notification_hub",
 }
 
 var UsageOnlyResources []string = []string{}
