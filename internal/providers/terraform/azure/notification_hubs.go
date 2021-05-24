@@ -28,27 +28,33 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 	costComponents = append(costComponents, notificationHubsCostComponent("Namespace usage", location, sku))
 	if u != nil && u.Get("monthly_pushes").Type != gjson.Null {
 		monthlyAdditionalPushes = decimalPtr(decimal.NewFromInt(u.Get("monthly_pushes").Int()))
-		if monthlyAdditionalPushes.GreaterThanOrEqual(decimal.NewFromInt(10000000)) {
-
-			if monthlyAdditionalPushes.GreaterThan(decimal.NewFromInt(10000000)) {
+	}
+	if sku != "Free" {
+		if sku == "Basic" {
+			if monthlyAdditionalPushes != nil {
+				pushLimits := []int{10000000}
+				pushQuantities := usage.CalculateTierBuckets(*monthlyAdditionalPushes, pushLimits)
+				if pushQuantities[1].GreaterThan(decimal.Zero) {
+					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 10M)", location, sku, "10", &pushQuantities[1], 1000000))
+				}
+			} else {
+				costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 10M)", location, sku, "10", nil, 1000000))
+			}
+		} else {
+			if monthlyAdditionalPushes != nil {
 				pushLimits := []int{10000000, 90000000}
 				pushQuantities := usage.CalculateTierBuckets(*monthlyAdditionalPushes, pushLimits)
-				message := "10-100M"
 				if pushQuantities[1].GreaterThan(decimal.Zero) {
-					if sku == "Basic" {
-						message = "Over 10M"
-					}
-					costComponents = append(costComponents, notificationHubsPushesCostComponent(fmt.Sprintf("Additional pushes (%s)", message), location, sku, "10", &pushQuantities[1], 1000000))
+					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (10-100M)", location, sku, "10", &pushQuantities[1], 1000000))
 				}
 				if pushQuantities[2].GreaterThan(decimal.Zero) {
 					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 100M)", location, sku, "100", &pushQuantities[2], 1000000))
 				}
+			} else {
+				costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (10-100M)", location, sku, "10", nil, 1000000))
+				costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 100M)", location, sku, "100", nil, 1000000))
 			}
 		}
-	}
-	if u == nil && sku != "Free" {
-		costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (10-100M)", location, sku, "10", monthlyAdditionalPushes, 1000000))
-
 	}
 
 	return &schema.Resource{
