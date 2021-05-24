@@ -1,6 +1,6 @@
 provider "azurerm" {
   features {}
-	skip_provider_registration = true
+  skip_provider_registration = true
 }
 
 resource "azurerm_resource_group" "example" {
@@ -23,7 +23,7 @@ resource "azurerm_storage_container" "example" {
 }
 
 resource "azurerm_hdinsight_hbase_cluster" "example" {
- name                = "example-hdicluster"
+  name                = "example-hdicluster"
   resource_group_name = azurerm_resource_group.example.name
   location            = "eastus"
   cluster_version     = "3.6"

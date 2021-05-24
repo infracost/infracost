@@ -1,6 +1,6 @@
 provider "azurerm" {
   features {}
-	skip_provider_registration = true
+  skip_provider_registration = true
 }
 
 resource "azurerm_resource_group" "example" {
@@ -65,14 +65,14 @@ resource "azurerm_hdinsight_hadoop_cluster" "with_edge" {
       password = "AccTestvdSC4daf986!"
     }
 
-		edge_node {
-      vm_size  = "A5"
-			target_instance_count = 3
-			install_script_action {
-				name = "a"
-				uri = "fake"
-			}
-		}
+    edge_node {
+      vm_size               = "A5"
+      target_instance_count = 3
+      install_script_action {
+        name = "a"
+        uri  = "fake"
+      }
+    }
   }
 }
 
