@@ -363,6 +363,15 @@ resource_usage:
     monthly_encryption_requests: 100000 # Monthly number of field level encryption requests.
     monthly_log_lines: 5000000          # Monthly number of real-time log lines.
     custom_ssl_certificates: 3          # Number of dedicated IP custom SSL certificates.
+  
+  aws_waf_web_acl.my_waf:
+    rule_group_rules: 5 # Total number of Rule Group rules used by the Web ACL.
+    monthly_requests: 1000000 # Monthly number of web requests received.
+
+  aws_wafv2_web_acl.my_waf2:
+    rule_group_rules: 5          # Total number of Rule Group rules used by the Web ACL.
+    managed_rule_group_rules: 10 # Total number of Managed Rule Group rules used by the Web ACL.  
+    monthly_requests: 1000000 # Monthly number of web requests received.
 
   #
   # Terraform GCP resources
