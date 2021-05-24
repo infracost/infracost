@@ -68,7 +68,28 @@ resource "aws_mq_broker" "my_aws_mq_broker_activemq_single_default" {
   }
 }
 
-resource "aws_mq_broker" "my_aws_mq_broker_activemq_single_standby_ebs" {
+resource "aws_mq_broker" "my_aws_mq_broker_activemq_single_ebs" {
+  broker_name = "example"
+
+  configuration {
+    id       = aws_mq_configuration.my_aws_mq_configuration.id
+    revision = aws_mq_configuration.my_aws_mq_configuration.latest_revision
+  }
+
+  engine_type        = "ActiveMQ"
+  engine_version     = "5.15.9"
+  host_instance_type = "mq.t2.micro"
+  security_groups    = [aws_security_group.my_aws_security_group.id]
+  deployment_mode    = "SINGLE_INSTANCE"
+  storage_type       = "ebs"
+
+  user {
+    username = "ExampleUser"
+    password = "MindTheGappp"
+  }
+}
+
+resource "aws_mq_broker" "my_aws_mq_broker_activemq_standby_efs" {
   broker_name = "example"
 
   configuration {
@@ -79,7 +100,7 @@ resource "aws_mq_broker" "my_aws_mq_broker_activemq_single_standby_ebs" {
   engine_type        = "ActiveMQ"
   engine_version     = "5.15.9"
   host_instance_type = "mq.m5.large"
-  storage_type       = "ebs"
+  storage_type       = "efs"
   security_groups    = [aws_security_group.my_aws_security_group.id]
   deployment_mode    = "ACTIVE_STANDBY_MULTI_AZ"
 
@@ -121,7 +142,7 @@ resource "aws_mq_broker" "my_aws_mq_broker_rabbitmq_cluster" {
   engine_version     = "3.8.11"
   host_instance_type = "mq.m5.xlarge"
   security_groups    = [aws_security_group.my_aws_security_group.id]
-  deployment_mode    = "CLUSTER_MULTI_AZ"
+  deployment_mode    = "cluster_multi_az"
 
   user {
     username = "ExampleUser"

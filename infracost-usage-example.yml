@@ -179,7 +179,7 @@ resource_usage:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
   aws_mq_broker.my_aws_mq_broker:
-    storage_size_gb: 12   # Data storage per instance in GB.
+    storage_size_gb: 12 # Data storage per instance in GB.
 
   aws_rds_cluster.my_cluster:
     capacity_units_per_hr: 50          # Number of aurora capacity units per hour. Only used when engine_mode is "serverless"
