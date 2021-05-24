@@ -492,6 +492,9 @@ resource_usage:
     storage_gb: 150 
     monthly_build_vcpu_hrs: 150 
 
+  azurerm_hdinsight_kafka_cluster.my_cluster:
+    monthly_os_disk_operations: 1000000 # Average number of disk operations (writes, reads, deletes) using a unit size of 256KiB per OS disk per month.
+
   azurerm_firewall.my_firewall:
     monthly_data_processed_gb: 100000 # Monthly data processed by the firewall in GB.
 
