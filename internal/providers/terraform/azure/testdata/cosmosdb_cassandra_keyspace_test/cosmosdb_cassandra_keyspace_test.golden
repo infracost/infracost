@@ -2,8 +2,8 @@
  Name                                                                   Monthly Qty  Unit                      Monthly Cost 
                                                                                                                             
  azurerm_cosmosdb_cassandra_keyspace.autoscale                                                                              
- ├─ Provisioned throughput (autoscale, West US)                                37.5  RU/s x 100                     $219.00 
- ├─ Provisioned throughput (autoscale, Central US)                             37.5  RU/s x 100                     $219.00 
+ ├─ Provisioned throughput (autoscale, West US)                                  45  RU/s x 100                     $262.80 
+ ├─ Provisioned throughput (autoscale, Central US)                               45  RU/s x 100                     $262.80 
  ├─ Transactional storage (West US)                                           1,000  GB                             $250.00 
  ├─ Transactional storage (Central US)                                        1,000  GB                             $250.00 
  ├─ Continuous backup (Central US)                                            1,000  GB                             $246.00 
@@ -42,7 +42,7 @@
  ├─ Periodic backup (West US)                                                 2,000  GB                             $300.00 
  └─ Restored data                                                             3,000  GB                             $450.00 
                                                                                                                             
- PROJECT TOTAL                                                                                                    $4,545.00 
+ PROJECT TOTAL                                                                                                    $4,632.60 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

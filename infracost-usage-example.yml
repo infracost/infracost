@@ -487,7 +487,6 @@ resource_usage:
     monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
     monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
     monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
-    max_request_units_per_second: 5000 # Number of request units per second for autoscale provisioned throughput (min: 4000).
     max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
 
   azurerm_kubernetes_cluster.my_cluster:

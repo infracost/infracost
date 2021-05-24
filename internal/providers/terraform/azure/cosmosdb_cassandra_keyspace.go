@@ -45,6 +45,7 @@ func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageDa
 	if d.Get("throughput").Type != gjson.Null {
 		throughputs = decimalPtr(decimal.NewFromInt(d.Get("throughput").Int()))
 	} else if d.Get("autoscale_settings.0.max_throughput").Type != gjson.Null {
+		throughputs = decimalPtr(decimal.NewFromInt(d.Get("autoscale_settings.0.max_throughput").Int()))
 		model = Autoscale
 	} else {
 		model = Serverless
@@ -89,12 +90,10 @@ func provisionedCosmosCostComponents(model modelType, throughputs *decimal.Decim
 	if model == Autoscale {
 		name = fmt.Sprintf("%s (autoscale", name)
 
-		if u != nil && u.Get("max_request_units_per_second").Exists() {
-			throughputs = decimalPtr(decimal.NewFromInt(u.Get("max_request_units_per_second").Int()))
-
-			if u.Get("max_request_units_utilization_percentage").Exists() {
-				throughputs = decimalPtr(throughputs.Mul(decimal.NewFromFloat(u.Get("max_request_units_utilization_percentage").Float() / 100)))
-			}
+		if u != nil && u.Get("max_request_units_utilization_percentage").Exists() {
+			throughputs = decimalPtr(throughputs.Mul(decimal.NewFromFloat(u.Get("max_request_units_utilization_percentage").Float() / 100)))
+		} else {
+			throughputs = nil
 		}
 	} else {
 		name = fmt.Sprintf("%s (provisioned", name)

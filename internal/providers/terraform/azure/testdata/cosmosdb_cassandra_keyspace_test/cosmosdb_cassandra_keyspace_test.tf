@@ -106,7 +106,7 @@ resource "azurerm_cosmosdb_cassandra_keyspace" "autoscale" {
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
   autoscale_settings {
-		max_throughput = 4000
+		max_throughput = 6000
 	}
 }
 
