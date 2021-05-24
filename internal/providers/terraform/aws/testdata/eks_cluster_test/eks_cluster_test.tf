@@ -23,9 +23,9 @@ resource "aws_subnet" "my_aws_subnet" {
 }
 
 resource "aws_iam_role" "my_aws_iam_role" {
-    name = "awsconfig-example"
+  name = "awsconfig-example"
 
-    assume_role_policy = <<POLICY
+  assume_role_policy = <<POLICY
 {}
 POLICY
 }
