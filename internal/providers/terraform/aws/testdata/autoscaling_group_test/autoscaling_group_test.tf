@@ -263,8 +263,8 @@ resource "aws_autoscaling_group" "asg_lt_monitoring" {
 }
 
 resource "aws_launch_template" "lt_cpu_credits_noUsage" {
-  image_id          = "fake_ami"
-  instance_type     = "t3.large"
+  image_id      = "fake_ami"
+  instance_type = "t3.large"
 }
 
 resource "aws_autoscaling_group" "asg_lt_cpu_credits_noUsage" {
@@ -277,8 +277,8 @@ resource "aws_autoscaling_group" "asg_lt_cpu_credits_noUsage" {
 }
 
 resource "aws_launch_template" "lt_cpu_credits" {
-  image_id          = "fake_ami"
-  instance_type     = "t3.large"
+  image_id      = "fake_ami"
+  instance_type = "t3.large"
 }
 
 resource "aws_autoscaling_group" "asg_lt_cpu_credits" {
@@ -296,9 +296,9 @@ resource "aws_launch_template" "lt_mixed_instance_basic" {
 }
 
 resource "aws_autoscaling_group" "asg_mixed_instance_basic" {
-  desired_capacity   = 6
-  max_size           = 10
-  min_size           = 1
+  desired_capacity = 6
+  max_size         = 10
+  min_size         = 1
 
   mixed_instances_policy {
     launch_template {
@@ -318,7 +318,7 @@ resource "aws_autoscaling_group" "asg_mixed_instance_basic" {
     }
 
     instances_distribution {
-      on_demand_base_capacity = 1
+      on_demand_base_capacity                  = 1
       on_demand_percentage_above_base_capacity = 100
     }
   }
@@ -330,9 +330,9 @@ resource "aws_launch_template" "lt_mixed_instance_dynamic" {
 }
 
 resource "aws_autoscaling_group" "asg_mixed_instance_dynamic" {
-  desired_capacity   = 3
-  max_size           = 5
-  min_size           = 1
+  desired_capacity = 3
+  max_size         = 5
+  min_size         = 1
 
   mixed_instances_policy {
     launch_template {
@@ -350,7 +350,7 @@ resource "aws_autoscaling_group" "asg_mixed_instance_dynamic" {
     }
 
     instances_distribution {
-      on_demand_base_capacity = 1
+      on_demand_base_capacity                  = 1
       on_demand_percentage_above_base_capacity = 100
     }
   }

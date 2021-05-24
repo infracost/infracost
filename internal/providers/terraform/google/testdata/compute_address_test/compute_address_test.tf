@@ -1,6 +1,6 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
-  region = "us-central1"
+  region      = "us-central1"
 }
 
 resource "google_compute_address" "static" {
@@ -8,7 +8,7 @@ resource "google_compute_address" "static" {
 }
 
 resource "google_compute_address" "internal" {
-  name = "ipv4-address-internal"
+  name         = "ipv4-address-internal"
   address_type = "INTERNAL"
 }
 

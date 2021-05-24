@@ -9,4 +9,4 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-resource "aws_eip" "eip1" {} 
+resource "aws_eip" "eip1" {}

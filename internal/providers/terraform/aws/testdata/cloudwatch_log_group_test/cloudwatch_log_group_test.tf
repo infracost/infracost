@@ -11,7 +11,7 @@ resource "aws_cloudwatch_log_group" "logs" {
 }
 
 resource "aws_cloudwatch_log_group" "logs_withUsage" {
-  name  = "log-group"
+  name = "log-group"
 }
 
 resource "aws_cloudwatch_log_group" "logs_count_withUsage" {

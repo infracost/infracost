@@ -6,6 +6,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
+	GetAzureRMDatabricksWorkspaceRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
@@ -31,6 +32,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMPublicIPPrefixRegistryItem(),
 	GetAzureRMAppNATGatewayRegistryItem(),
 	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
+	GetAzureRMNotificationHubsRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -89,6 +91,9 @@ var FreeResources []string = []string{
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
+
+	// Azure Notification Hub
+	"azurerm_notification_hub",
 }
 
 var UsageOnlyResources []string = []string{}

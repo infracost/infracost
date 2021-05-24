@@ -10,11 +10,11 @@ provider "aws" {
 }
 
 resource "aws_config_organization_managed_rule" "my_config_organization_managed_rule" {
-    name            = "example"
-    rule_identifier = "IAM_PASSWORD_POLICY"
+  name            = "example"
+  rule_identifier = "IAM_PASSWORD_POLICY"
 }
 
 resource "aws_config_organization_managed_rule" "my_config_organization_managed_rule_usage" {
-    name            = "example_usage"
-    rule_identifier = "IAM_PASSWORD_POLICY"
+  name            = "example_usage"
+  rule_identifier = "IAM_PASSWORD_POLICY"
 }

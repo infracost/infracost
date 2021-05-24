@@ -1,22 +1,35 @@
 
- Name                          Monthly Qty  Unit            Monthly Cost 
-                                                                         
- azurerm_firewall.non_usage                                              
- ├─ Deployment (Standard)              730  hours                $912.50 
- └─ Data processed           Monthly cost depends on usage: $0.02 per GB 
-                                                                         
- azurerm_firewall.premium                                                
- ├─ Deployment (Premium)               730  hours                $638.75 
- └─ Data processed                  10,000  GB                    $80.00 
-                                                                         
- azurerm_firewall.standard                                               
- ├─ Deployment (Standard)              730  hours                $912.50 
- └─ Data processed                  10,000  GB                   $160.00 
-                                                                         
- azurerm_public_ip.example                                               
- └─ IP address (static)                730  hours                  $3.65 
-                                                                         
- PROJECT TOTAL                                                 $2,707.40 
+ Name                                           Monthly Qty  Unit            Monthly Cost 
+                                                                                          
+ azurerm_firewall.non_usage                                                               
+ ├─ Deployment (Standard)                               730  hours                $912.50 
+ └─ Data processed                            Monthly cost depends on usage: $0.02 per GB 
+                                                                                          
+ azurerm_firewall.premium                                                                 
+ ├─ Deployment (Premium)                                730  hours                $638.75 
+ └─ Data processed                                   10,000  GB                    $80.00 
+                                                                                          
+ azurerm_firewall.premium_virtual_hub                                                     
+ ├─ Deployment (Premium Secured Virtual Hub)            730  hours                $638.75 
+ └─ Data processed                                   20,000  GB                   $160.00 
+                                                                                          
+ azurerm_firewall.standard                                                                
+ ├─ Deployment (Standard)                               730  hours                $912.50 
+ └─ Data processed                                   10,000  GB                   $160.00 
+                                                                                          
+ azurerm_firewall.standard_virtual_hub                                                    
+ ├─ Deployment (Secured Virtual Hub)                    730  hours                $912.50 
+ └─ Data processed                                   20,000  GB                   $320.00 
+                                                                                          
+ azurerm_public_ip.example                                                                
+ └─ IP address (static)                                 730  hours                  $3.65 
+                                                                                          
+ PROJECT TOTAL                                                                  $4,738.65 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+
+2 resource types weren't estimated as they're not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_virtual_hub
+1 x azurerm_virtual_wan

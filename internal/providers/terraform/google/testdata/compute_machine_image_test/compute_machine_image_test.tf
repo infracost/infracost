@@ -1,11 +1,11 @@
 provider "google-beta" {
   credentials = "{\"type\":\"service_account\"}"
-  region = "us-central1"
+  region      = "us-central1"
 }
 
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
-  region = "us-central1"
+  region      = "us-central1"
 }
 
 resource "google_compute_instance" "vm" {
@@ -24,13 +24,13 @@ resource "google_compute_instance" "vm" {
 }
 
 resource "google_compute_machine_image" "image" {
-  provider     		= "google-beta"
+  provider        = "google-beta"
   name            = "image"
   source_instance = google_compute_instance.vm.self_link
 }
 
 resource "google_compute_machine_image" "usage" {
-  provider 				= "google-beta"
+  provider        = "google-beta"
   name            = "image"
   source_instance = google_compute_instance.vm.self_link
 }

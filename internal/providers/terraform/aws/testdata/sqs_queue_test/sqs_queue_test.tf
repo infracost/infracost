@@ -10,21 +10,21 @@ provider "aws" {
 }
 
 resource "aws_sqs_queue" "standard_sqs_queue" {
-  name = "my-standard-queue"
+  name       = "my-standard-queue"
   fifo_queue = false
 }
 
 resource "aws_sqs_queue" "fifo_sqs_queue" {
-  name = "my.fifo"
+  name       = "my.fifo"
   fifo_queue = true
 }
 
 resource "aws_sqs_queue" "standard_sqs_queue_withUsage" {
-  name = "my-standard-queue"
+  name       = "my-standard-queue"
   fifo_queue = false
 }
 
 resource "aws_sqs_queue" "fifo_sqs_queue_withUsage" {
-  name = "my.fifo"
+  name       = "my.fifo"
   fifo_queue = true
 }

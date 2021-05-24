@@ -11,42 +11,42 @@ provider "aws" {
 
 resource "aws_rds_cluster" "postgres_serverless" {
   cluster_identifier = "aurora-serverless"
-  engine = "aurora-postgresql"
-  engine_mode = "serverless"
+  engine             = "aurora-postgresql"
+  engine_mode        = "serverless"
   master_username    = "foo"
   master_password    = "barbut8chars"
 }
 
 resource "aws_rds_cluster" "my_sql_serverless" {
   cluster_identifier = "aurora-serverless"
-  engine = "aurora-mysql"
-  engine_mode = "serverless"
+  engine             = "aurora-mysql"
+  engine_mode        = "serverless"
   master_username    = "foo"
   master_password    = "barbut8chars"
 }
 
 resource "aws_rds_cluster" "postgres_serverlessWithBackup" {
-  cluster_identifier = "aurora-serverless"
-  engine = "aurora-postgresql"
-  engine_mode = "serverless"
+  cluster_identifier      = "aurora-serverless"
+  engine                  = "aurora-postgresql"
+  engine_mode             = "serverless"
   backup_retention_period = 5
-  master_username    = "foo"
-  master_password    = "barbut8chars"
+  master_username         = "foo"
+  master_password         = "barbut8chars"
 }
 
 resource "aws_rds_cluster" "postgres_serverlessWithExport" {
-  cluster_identifier = "aurora-serverless"
-  engine = "aurora-postgresql"
-  engine_mode = "serverless"
+  cluster_identifier      = "aurora-serverless"
+  engine                  = "aurora-postgresql"
+  engine_mode             = "serverless"
   backup_retention_period = 5
-  master_username    = "foo"
-  master_password    = "barbut8chars"
+  master_username         = "foo"
+  master_password         = "barbut8chars"
 }
 
 resource "aws_rds_cluster" "mysql_backtrack" {
-  cluster_identifier = "aurora-mysql"
-  engine = "aurora-mysql"
+  cluster_identifier      = "aurora-mysql"
+  engine                  = "aurora-mysql"
   backup_retention_period = 5
-  master_username    = "foo"
-  master_password    = "barbut8chars"
+  master_username         = "foo"
+  master_password         = "barbut8chars"
 }
