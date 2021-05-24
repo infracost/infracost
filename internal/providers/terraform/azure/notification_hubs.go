@@ -35,24 +35,24 @@ func NewAzureRMNotificationHubs(d *schema.ResourceData, u *schema.UsageData) *sc
 				pushLimits := []int{10000000}
 				pushQuantities := usage.CalculateTierBuckets(*monthlyAdditionalPushes, pushLimits)
 				if pushQuantities[1].GreaterThan(decimal.Zero) {
-					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 10M)", location, sku, "10", &pushQuantities[1], 1000000))
+					costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 10M)", location, sku, "10", &pushQuantities[1], 1000000))
 				}
 			} else {
-				costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 10M)", location, sku, "10", nil, 1000000))
+				costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 10M)", location, sku, "10", nil, 1000000))
 			}
 		} else {
 			if monthlyAdditionalPushes != nil {
 				pushLimits := []int{10000000, 90000000}
 				pushQuantities := usage.CalculateTierBuckets(*monthlyAdditionalPushes, pushLimits)
 				if pushQuantities[1].GreaterThan(decimal.Zero) {
-					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (10-100M)", location, sku, "10", &pushQuantities[1], 1000000))
+					costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (10-100M)", location, sku, "10", &pushQuantities[1], 1000000))
 				}
 				if pushQuantities[2].GreaterThan(decimal.Zero) {
-					costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 100M)", location, sku, "100", &pushQuantities[2], 1000000))
+					costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 100M)", location, sku, "100", &pushQuantities[2], 1000000))
 				}
 			} else {
-				costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (10-100M)", location, sku, "10", nil, 1000000))
-				costComponents = append(costComponents, notificationHubsPushesCostComponent("Additional pushes (Over 100M)", location, sku, "100", nil, 1000000))
+				costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (10-100M)", location, sku, "10", nil, 1000000))
+				costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 100M)", location, sku, "100", nil, 1000000))
 			}
 		}
 	}
