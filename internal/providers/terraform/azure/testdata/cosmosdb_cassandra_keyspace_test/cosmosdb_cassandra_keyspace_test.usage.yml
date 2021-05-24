@@ -15,3 +15,9 @@ resource_usage:
     storage_gb: 1000
     monthly_analytical_storage_write_operations: 1000000
     monthly_analytical_storage_read_operations: 1000000
+
+  azurerm_cosmosdb_cassandra_keyspace.autoscale:
+    storage_gb: 1000
+    monthly_restored_data_gb: 3000 
+    max_request_units_per_second: 5000 
+    max_request_units_utilization_percentage: 50

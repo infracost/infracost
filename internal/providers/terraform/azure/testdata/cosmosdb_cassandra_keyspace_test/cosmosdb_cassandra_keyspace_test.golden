@@ -2,7 +2,22 @@
  Name                                                                   Monthly Qty  Unit                      Monthly Cost 
                                                                                                                             
  azurerm_cosmosdb_cassandra_keyspace.autoscale                                                                              
- ├─ Provisioned throughput (standard, West US)                                   60  RU/s x 100                     $350.40 
+ ├─ Provisioned throughput (autoscale, West US)                                37.5  RU/s x 100                     $219.00 
+ ├─ Provisioned throughput (autoscale, Central US)                             37.5  RU/s x 100                     $219.00 
+ ├─ Transactional storage (West US)                                           1,000  GB                             $250.00 
+ ├─ Transactional storage (Central US)                                        1,000  GB                             $250.00 
+ ├─ Continuous backup (Central US)                                            1,000  GB                             $246.00 
+ └─ Restored data                                                             3,000  GB                             $450.00 
+                                                                                                                            
+ azurerm_cosmosdb_cassandra_keyspace.mutli-master_backup2copies                                                             
+ ├─ Provisioned throughput (provisioned, West US)                                10  RU/s x 100                      $58.40 
+ ├─ Provisioned throughput (provisioned, Central US)                             10  RU/s x 100                      $58.40 
+ ├─ Transactional storage (West US)                                           1,000  GB                             $250.00 
+ ├─ Transactional storage (Central US)                                        1,000  GB                             $250.00 
+ └─ Restored data                                                Monthly cost depends on usage: $0.15 per GB                
+                                                                                                                            
+ azurerm_cosmosdb_cassandra_keyspace.non-usage_autoscale                                                                    
+ ├─ Provisioned throughput (autoscale, West US)                  Monthly cost depends on usage: $5.84 per RU/s x 100        
  ├─ Transactional storage (West US)                              Monthly cost depends on usage: $0.25 per GB                
  ├─ Analytical storage (West US)                                 Monthly cost depends on usage: $0.03 per GB                
  ├─ Analytical write operations (West US)                        Monthly cost depends on usage: $0.06 per 10K operations    
@@ -10,16 +25,9 @@
  ├─ Periodic backup (West US)                                    Monthly cost depends on usage: $0.15 per GB                
  └─ Restored data                                                Monthly cost depends on usage: $0.15 per GB                
                                                                                                                             
- azurerm_cosmosdb_cassandra_keyspace.mutli-master_backup2copies                                                             
- ├─ Provisioned throughput (standard, West US)                                   10  RU/s x 100                      $58.40 
- ├─ Provisioned throughput (standard, Central US)                                10  RU/s x 100                      $58.40 
- ├─ Transactional storage (West US)                                           1,000  GB                             $250.00 
- ├─ Transactional storage (Central US)                                        1,000  GB                             $250.00 
- └─ Restored data                                                Monthly cost depends on usage: $0.15 per GB                
-                                                                                                                            
  azurerm_cosmosdb_cassandra_keyspace.provisioned                                                                            
- ├─ Provisioned throughput (standard, West US)                                    5  RU/s x 100                      $29.20 
- ├─ Provisioned throughput (standard, Central US)                              6.25  RU/s x 100                      $36.50 
+ ├─ Provisioned throughput (provisioned, West US)                                 5  RU/s x 100                      $29.20 
+ ├─ Provisioned throughput (provisioned, Central US)                           6.25  RU/s x 100                      $36.50 
  ├─ Transactional storage (West US)                                           1,000  GB                             $250.00 
  ├─ Transactional storage (Central US)                                        1,000  GB                             $250.00 
  ├─ Continuous backup (Central US)                                            1,000  GB                             $246.00 
@@ -34,7 +42,7 @@
  ├─ Periodic backup (West US)                                                 2,000  GB                             $300.00 
  └─ Restored data                                                             3,000  GB                             $450.00 
                                                                                                                             
- PROJECT TOTAL                                                                                                    $3,261.40 
+ PROJECT TOTAL                                                                                                    $4,545.00 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

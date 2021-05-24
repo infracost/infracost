@@ -44,13 +44,9 @@ func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageDa
 	var throughputs *decimal.Decimal
 	if d.Get("throughput").Type != gjson.Null {
 		throughputs = decimalPtr(decimal.NewFromInt(d.Get("throughput").Int()))
-	}
-	if d.Get("autoscale_settings.0.max_throughput").Type != gjson.Null {
-		throughputs = decimalPtr(decimal.NewFromInt(d.Get("autoscale_settings.0.max_throughput").Int()))
+	} else if d.Get("autoscale_settings.0.max_throughput").Type != gjson.Null {
 		model = Autoscale
-	}
-
-	if throughputs == nil {
+	} else {
 		model = Serverless
 		availabilityZone := geoLocations[0].Get("zone_zone_redundant").Bool()
 		costComponents = append(costComponents, serverlessCosmosCostComponent(mainLocation, availabilityZone, u))
@@ -89,48 +85,63 @@ func provisionedCosmosCostComponents(model modelType, throughputs *decimal.Decim
 		meterName = "100 Multi-master RU/s"
 	}
 
+	name := "Provisioned throughput"
+	if model == Autoscale {
+		name = fmt.Sprintf("%s (autoscale", name)
+
+		if u != nil && u.Get("max_request_units_per_second").Exists() {
+			throughputs = decimalPtr(decimal.NewFromInt(u.Get("max_request_units_per_second").Int()))
+
+			if u.Get("max_request_units_utilization_percentage").Exists() {
+				throughputs = decimalPtr(throughputs.Mul(decimal.NewFromFloat(u.Get("max_request_units_utilization_percentage").Float() / 100)))
+			}
+		}
+	} else {
+		name = fmt.Sprintf("%s (provisioned", name)
+	}
+
 	if throughputs != nil {
 		throughputs = decimalPtr(throughputs.Div(decimal.NewFromInt(100)))
+	}
 
-		for _, g := range zones {
-			quantity := throughputs
+	for _, g := range zones {
+		quantity := throughputs
 
-			if model == Autoscale {
-				if skuName == "RUs" {
-					quantity = decimalPtr(quantity.Mul(decimal.NewFromFloat(1.5)))
-				}
-			} else {
-				if skuName == "RUs" {
-					if g.Get("zone_redundant").Type != gjson.Null {
-						if g.Get("zone_redundant").Bool() {
-							quantity = decimalPtr(quantity.Mul(decimal.NewFromFloat(1.25)))
-						}
+		if model == Autoscale {
+			if skuName == "RUs" && quantity != nil {
+				quantity = decimalPtr(quantity.Mul(decimal.NewFromFloat(1.5)))
+			}
+		} else {
+			if skuName == "RUs" && quantity != nil {
+				if g.Get("zone_redundant").Type != gjson.Null {
+					if g.Get("zone_redundant").Bool() {
+						quantity = decimalPtr(quantity.Mul(decimal.NewFromFloat(1.25)))
 					}
 				}
 			}
+		}
 
-			location := g.Get("location").String()
-			if l := locationNameMapping(location); l != "" {
-				costComponents = append(costComponents, &schema.CostComponent{
-					Name:           fmt.Sprintf("Provisioned throughput (standard, %s)", l),
-					Unit:           "RU/s x 100",
-					UnitMultiplier: schema.HourToMonthUnitMultiplier,
-					HourlyQuantity: quantity,
-					ProductFilter: &schema.ProductFilter{
-						VendorName:    strPtr("azure"),
-						Region:        strPtr(location),
-						Service:       strPtr("Azure Cosmos DB"),
-						ProductFamily: strPtr("Databases"),
-						AttributeFilters: []*schema.AttributeFilter{
-							{Key: "meterName", Value: strPtr(meterName)},
-							{Key: "skuName", Value: strPtr(skuName)},
-						},
+		location := g.Get("location").String()
+		if l := locationNameMapping(location); l != "" {
+			costComponents = append(costComponents, &schema.CostComponent{
+				Name:           fmt.Sprintf("%s, %s)", name, l),
+				Unit:           "RU/s x 100",
+				UnitMultiplier: schema.HourToMonthUnitMultiplier,
+				HourlyQuantity: quantity,
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("azure"),
+					Region:        strPtr(location),
+					Service:       strPtr("Azure Cosmos DB"),
+					ProductFamily: strPtr("Databases"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "meterName", Value: strPtr(meterName)},
+						{Key: "skuName", Value: strPtr(skuName)},
 					},
-					PriceFilter: &schema.PriceFilter{
-						PurchaseOption: strPtr("Consumption"),
-					},
-				})
-			}
+				},
+				PriceFilter: &schema.PriceFilter{
+					PurchaseOption: strPtr("Consumption"),
+				},
+			})
 		}
 	}
 

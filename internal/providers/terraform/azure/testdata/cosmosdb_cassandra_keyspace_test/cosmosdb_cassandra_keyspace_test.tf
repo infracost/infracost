@@ -92,10 +92,19 @@ resource "azurerm_cosmosdb_account" "multi-master_backup2copies" {
   }
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "autoscale" {
+resource "azurerm_cosmosdb_cassandra_keyspace" "non-usage_autoscale" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
+  autoscale_settings {
+		max_throughput = 4000
+	}
+}
+
+resource "azurerm_cosmosdb_cassandra_keyspace" "autoscale" {
+  name                = "tfex-cosmos-cassandra-keyspace"
+  resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
+  account_name        = azurerm_cosmosdb_account.continuous_backup.name
   autoscale_settings {
 		max_throughput = 4000
 	}
