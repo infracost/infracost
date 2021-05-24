@@ -1,0 +1,41 @@
+
+ Name                                              Monthly Qty  Unit                      Monthly Cost 
+                                                                                                       
+ azurerm_public_ip.example                                                                             
+ └─ IP address (static)                                    730  hours                            $2.63 
+                                                                                                       
+ azurerm_virtual_machine_scale_set.linux                                                               
+ ├─ Instance usage (pay as you go, F2)                   1,460  hours                          $166.44 
+ ├─ storage_os_disk                                                                                    
+ │  ├─ Storage (S4)                                          1  months                           $1.54 
+ │  └─ Disk operations                      Monthly cost depends on usage: $0.0005 per 10k operations  
+ ├─ storage_data_disk                                                                                  
+ │  ├─ Storage (E3)                                          1  months                           $1.20 
+ │  └─ Disk operations                      Monthly cost depends on usage: $0 per 10k operations       
+ └─ storage_data_disk                                                                                  
+    ├─ Storage (S4)                                          1  months                           $1.54 
+    └─ Disk operations                      Monthly cost depends on usage: $0.0005 per 10k operations  
+                                                                                                       
+ azurerm_virtual_machine_scale_set.windows                                                             
+ ├─ Instance usage (pay as you go, F2)                   2,190  hours                          $249.66 
+ ├─ storage_os_disk                                                                                    
+ │  ├─ Storage (S4)                                          1  months                           $1.54 
+ │  └─ Disk operations                                     100  10k operations                   $0.05 
+ ├─ storage_data_disk                                                                                  
+ │  ├─ Storage (E3)                                          1  months                           $1.20 
+ │  └─ Disk operations                                     200  10k operations                   $0.00 
+ └─ storage_data_disk                                                                                  
+    ├─ Storage (S4)                                          1  months                           $1.54 
+    └─ Disk operations                                     200  10k operations                   $0.10 
+                                                                                                       
+ PROJECT TOTAL                                                                                 $427.42 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+
+4 resource types weren't estimated as they're not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_lb_backend_address_pool
+1 x azurerm_lb_probe
+1 x azurerm_lb
+1 x azurerm_lb_nat_pool

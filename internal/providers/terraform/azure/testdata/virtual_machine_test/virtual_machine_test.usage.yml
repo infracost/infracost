@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  azurerm_virtual_machine.windows:
+    storage_os_disk:
+      monthly_disk_operations: 1000000
+    storage_data_disk:
+      monthly_disk_operations: 2000000
