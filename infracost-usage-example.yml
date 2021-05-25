@@ -558,6 +558,18 @@ resource_usage:
     monthly_data_write_gb: 1000 # Monthly number of data write in GB.
     blob_index_tags: 100000 # Total number of Blob indexes.
 
+  azurerm_virtual_machine_scale_set.my_scale_set:
+    storage_profile_os_disk:
+      monthly_disk_operations: 100000 # Monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB.
+    storage_profile_data_disk:
+      monthly_disk_operations: 100000 # Monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
+
+  azurerm_virtual_machine.my_vm:
+    storage_os_disk:
+      monthly_disk_operations: 100000 # Monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB.
+    storage_data_disk:
+      monthly_disk_operations: 100000 # Monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
+
   azurerm_windows_virtual_machine.my_windows_vm:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
