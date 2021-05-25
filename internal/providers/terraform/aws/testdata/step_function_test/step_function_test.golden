@@ -7,9 +7,7 @@
                                                                                                            
  aws_sfn_state_machine.express                                                                             
  ├─ Requests                                                   1  1M Requests                        $1.00 
- ├─ Duration (first 1K)                                    1,000  GB-Seconds                         $0.02 
- ├─ Duration (next 4K)                                     3,000  GB-Seconds                         $0.02 
- └─ Duration (over 5K)                                   55.5555  GB-Seconds                         $0.00 
+ └─ Duration (first 1K)                                   72,500  GB-Seconds                         $1.21 
                                                                                                            
  aws_sfn_state_machine.expresswithoutusage                                                                 
  ├─ Requests                                 Monthly cost depends on usage: $1.00 per 1M Requests          
@@ -21,7 +19,7 @@
  aws_sfn_state_machine.standardwithoutusage                                                                
  └─ Transitions                              Monthly cost depends on usage: $0.03 per 1K transitions       
                                                                                                            
- PROJECT TOTAL                                                                                       $1.19 
+ PROJECT TOTAL                                                                                       $2.36 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -15,8 +15,8 @@ func GetStepFunctionRegistryItem() *schema.RegistryItem {
 }
 
 func NewStepFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var durationMS, requests, transition *decimal.Decimal
-
+	var durationMS, requests, transition, monthlyMemoryUsage, memoryRequest, memoryMB *decimal.Decimal
+	memorySize := decimal.NewFromInt(64)
 	tier := "STANDARD"
 	region := d.Get("region").String()
 
@@ -48,23 +48,28 @@ func NewStepFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			requests = decimalPtr(decimal.NewFromInt(u.Get("monthly_requests").Int()))
 			costComponents = append(costComponents, stepFunctionExpressRequestCostComponent("Requests", region, tier, requests))
 		}
+		if u != nil && u.Get("memory_mb").Type != gjson.Null {
+			memoryRequest = decimalPtr(decimal.NewFromInt(u.Get("memory_mb").Int()))
+			memoryMB = decimalPtr(calculateRequests(*memoryRequest, memorySize))
+		}
 		if u != nil && u.Get("workflow_duration_ms").Type != gjson.Null {
 			durationMS = decimalPtr(decimal.NewFromInt(u.Get("workflow_duration_ms").Int()))
+			monthlyMemoryUsage = decimalPtr(calculateGBSeconds(*memoryMB, *requests, *durationMS))
 			pushLimits := []int{0, 3600000, 10800000}
 			pushQuantities := usage.CalculateTierBuckets(*durationMS, pushLimits)
 			if pushQuantities[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (first 1K)", region, tier, "0", &pushQuantities[1]))
+				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (first 1K)", region, tier, "0", monthlyMemoryUsage))
 			}
 			if pushQuantities[2].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (next 4K)", region, tier, "3600000", &pushQuantities[2]))
+				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (next 4K)", region, tier, "3600000", monthlyMemoryUsage))
 			}
 			if pushQuantities[3].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (over 5K)", region, tier, "18000000", &pushQuantities[3]))
+				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (over 5K)", region, tier, "18000000", monthlyMemoryUsage))
 			}
 		}
 		if u == nil {
 			costComponents = append(costComponents, stepFunctionExpressRequestCostComponent("Requests", region, tier, requests))
-			costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration", region, tier, "0", durationMS))
+			costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration", region, tier, "0", monthlyMemoryUsage))
 		}
 
 	}
@@ -123,15 +128,12 @@ func stepFunctionExpressRequestCostComponent(name, region, tier string, quantity
 	}
 }
 
-func stepFunctionExpressDurationCostComponent(name, region, tier, startUsageAmt string, quantity *decimal.Decimal) *schema.CostComponent {
-	if quantity != nil {
-		quantity = decimalPtr(quantity.Div(decimal.NewFromInt(int64(3600))))
-	}
+func stepFunctionExpressDurationCostComponent(name, region, tier, startUsageAmt string, monthlyMemoryUsage *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB-Seconds",
 		UnitMultiplier:  1,
-		MonthlyQuantity: quantity,
+		MonthlyQuantity: monthlyMemoryUsage,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
 			Region:     strPtr(region),
