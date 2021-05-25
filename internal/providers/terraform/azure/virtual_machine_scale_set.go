@@ -27,7 +27,15 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 
 	os := "Linux"
 	if d.Get("os_profile_windows_config").Type != gjson.Null {
+		os = "Windows"
+	}
+	if d.Get("storage_profile_os_disk.0.os_type").Type != gjson.Null {
 		if d.Get("storage_profile_os_disk.0.os_type").String() == "Windows" {
+			os = "Windows"
+		}
+	}
+	if d.Get("storage_profile_image_reference.0.offer").Type != gjson.Null {
+		if d.Get("storage_profile_image_reference.0.offer").String() == "WindowsServer" {
 			os = "Windows"
 		}
 	}
