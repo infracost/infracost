@@ -6,6 +6,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
+	GetAzureRMCosmosdbGremlinDatabaseRegistryItem(),
+	GetAzureRMCosmosdbGremlinGraphRegistryItem(),
 	GetAzureRMDatabricksWorkspaceRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMHDInsightHadoopClusterRegistryItem(),

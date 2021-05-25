@@ -27,6 +27,13 @@ const (
 )
 
 func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: cosmosDBCostComponents(d, u),
+	}
+}
+
+func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
 	account := d.References("account_name")[0]
@@ -70,10 +77,7 @@ func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageDa
 	}
 	costComponents = append(costComponents, backupStorageCosmosCostComponents(account, u, geoLocations, backupType, mainLocation)...)
 
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
-	}
+	return costComponents
 }
 
 func provisionedCosmosCostComponents(model modelType, throughputs *decimal.Decimal, zones []gjson.Result, skuName string, u *schema.UsageData) []*schema.CostComponent {
