@@ -6,24 +6,24 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetWafv2WevAclRegistryItem() *schema.RegistryItem {
+func GetWafv2WebACLRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_wafv2_web_acl",
-		RFunc: NewWafv2WebAcl,
+		RFunc: NewWafv2WebACL,
 		Notes: []string{
 			"Seller fees for Managed Rule Groups from AWS Marketplace are not included. Bot Control is not supported by Terraform.",
 		},
 	}
 }
 
-func NewWafv2WebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var costComponents []*schema.CostComponent
 	var ruleGroupRules, managedRuleGroupRules, monthlyRequests, rule *decimal.Decimal
 	var sumForRules decimal.Decimal
 
-	costComponents = append(costComponents, wafv2WebAclCostComponent(
+	costComponents = append(costComponents, wafv2WebACLCostComponent(
 		region,
 		"Web ACL usage",
 		"hours",
@@ -44,7 +44,7 @@ func NewWafv2WebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 
 	if sumForRules.IsPositive() {
-		costComponents = append(costComponents, wafv2WebAclUsageCostComponent(
+		costComponents = append(costComponents, wafv2WebACLUsageCostComponent(
 			region,
 			"Rules",
 			"hours",
@@ -55,11 +55,11 @@ func NewWafv2WebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 
 	var quantity int
 	if d.Get("rule.0.statement.0.rule_group_reference_statement.0.arn").Type != gjson.Null {
-		quantity += 1
+		quantity++
 	}
 
 	if quantity > 0 {
-		costComponents = append(costComponents, wafv2WebAclCostComponent(
+		costComponents = append(costComponents, wafv2WebACLCostComponent(
 			region,
 			"Rule groups",
 			"hours",
@@ -71,7 +71,7 @@ func NewWafv2WebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	manageQuantity := d.Get("rule.0.statement.0.managed_rule_group_statement.0.name").Array()
 
 	if len(manageQuantity) > 0 {
-		costComponents = append(costComponents, wafv2WebAclCostComponent(
+		costComponents = append(costComponents, wafv2WebACLCostComponent(
 			region,
 			"Managed rule groups",
 			"hours",
@@ -84,7 +84,7 @@ func NewWafv2WebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		monthlyRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_requests").Int()))
 	}
 
-	costComponents = append(costComponents, wafv2WebAclUsageCostComponent(
+	costComponents = append(costComponents, wafv2WebACLUsageCostComponent(
 		region,
 		"Requests",
 		"requests",
@@ -98,7 +98,7 @@ func NewWafv2WebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 }
 
-func wafv2WebAclUsageCostComponent(region, displayName, unit, usagetype string, quantity *decimal.Decimal) *schema.CostComponent {
+func wafv2WebACLUsageCostComponent(region, displayName, unit, usagetype string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            unit,
@@ -118,7 +118,7 @@ func wafv2WebAclUsageCostComponent(region, displayName, unit, usagetype string, 
 		},
 	}
 }
-func wafv2WebAclCostComponent(region, displayName, unit, usagetype string, quantity int) *schema.CostComponent {
+func wafv2WebACLCostComponent(region, displayName, unit, usagetype string, quantity int) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            unit,

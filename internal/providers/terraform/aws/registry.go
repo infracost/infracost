@@ -76,8 +76,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetNewKMSExternalKeyRegistryItem(),
 	GetVPNConnectionRegistryItem(),
 	GetVpcEndpointRegistryItem(),
-	GetWafv2WevAclRegistryItem(),
-	GetWafWevAclRegistryItem(),
+	GetWafv2WebACLRegistryItem(),
+	GetWafWebACLRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -384,7 +384,7 @@ var FreeResources []string = []string{
 	"time_sleep",
 	"time_static",
 
-	//WAF
+	// WAF
 	"aws_wafv2_rule_group",
 	"aws_wafv2_ip_set",
 	"aws_wafv2_regex_pattern_set",

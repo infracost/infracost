@@ -6,24 +6,24 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetWafWevAclRegistryItem() *schema.RegistryItem {
+func GetWafWebACLRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_waf_web_acl",
-		RFunc: NewWafWebAcl,
+		RFunc: NewWafWebACL,
 		Notes: []string{
 			"Seller fees for Managed Rule Groups from AWS Marketplace are not included. Bot Control is not supported by Terraform.",
 		},
 	}
 }
 
-func NewWafWebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var costComponents []*schema.CostComponent
 	var ruleGroupRules, monthlyRequests, rule *decimal.Decimal
 	var ruleforGroup int
 
-	costComponents = append(costComponents, wafWebAclCostComponent(
+	costComponents = append(costComponents, wafWebACLCostComponent(
 		region,
 		"Web ACL usage",
 		"hours",
@@ -41,7 +41,7 @@ func NewWafWebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 			types := val.Get("type").String()
 
 			if types == "REGULAR" || types == "RATE_BASED" {
-				count += 1
+				count++
 			}
 
 		}
@@ -51,7 +51,7 @@ func NewWafWebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 	if u != nil && u.Get("rule_group_rules").Type != gjson.Null {
 		ruleGroupRules = decimalPtr(decimal.NewFromInt(u.Get("rule_group_rules").Int()))
 		sum := ruleGroupRules.Add(*rule)
-		costComponents = append(costComponents, wafWebAclUsageCostComponent(
+		costComponents = append(costComponents, wafWebACLUsageCostComponent(
 			region,
 			"Rules",
 			"hours",
@@ -61,7 +61,7 @@ func NewWafWebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 	}
 
 	if ruleGroupRules == nil {
-		costComponents = append(costComponents, wafWebAclUsageCostComponent(
+		costComponents = append(costComponents, wafWebACLUsageCostComponent(
 			region,
 			"Rules",
 			"hours",
@@ -76,12 +76,12 @@ func NewWafWebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		for _, val := range rules {
 			types := val.Get("type").String()
 			if types == "GROUP" {
-				count += 1
+				count++
 			}
 		}
 		ruleforGroup = count
 		if ruleforGroup > 0 {
-			costComponents = append(costComponents, wafWebAclCostComponent(
+			costComponents = append(costComponents, wafWebACLCostComponent(
 				region,
 				"Rule groups",
 				"hours",
@@ -95,7 +95,7 @@ func NewWafWebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		monthlyRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_requests").Int()))
 	}
 
-	costComponents = append(costComponents, wafWebAclUsageCostComponent(
+	costComponents = append(costComponents, wafWebACLUsageCostComponent(
 		region,
 		"Requests",
 		"requests",
@@ -109,7 +109,7 @@ func NewWafWebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 	}
 }
 
-func wafWebAclUsageCostComponent(region, displayName, unit, usagetype string, quantity *decimal.Decimal) *schema.CostComponent {
+func wafWebACLUsageCostComponent(region, displayName, unit, usagetype string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            unit,
@@ -129,7 +129,7 @@ func wafWebAclUsageCostComponent(region, displayName, unit, usagetype string, qu
 		},
 	}
 }
-func wafWebAclCostComponent(region, displayName, unit, usagetype string, quantity int) *schema.CostComponent {
+func wafWebACLCostComponent(region, displayName, unit, usagetype string, quantity int) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            unit,
