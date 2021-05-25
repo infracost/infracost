@@ -4,168 +4,156 @@ resource_usage:
         region: ap-northeast-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.ap-south-1:
         region: ap-south-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.us-gov-east-1:
         region: us-gov-east-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.us-west-1:
         region: us-west-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.cn-northwest-1:
         region: cn-northwest-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.eu-south-1:
         region: eu-south-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.ap-east-1:
         region: ap-east-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.us-east-2:
         region: us-east-2
         monthly_intra_region_gb: 1000
         monthly_outbound_us_east_to_us_east_gb: 200
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.us-west-2-lax-1:
         region: us-west-2-lax-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.ca-central-1:
         region: ca-central-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.eu-west-2:
         region: eu-west-2
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.eu-west-3:
         region: eu-west-3
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.eu-north-1:
         region: eu-north-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.sa-east-1:
         region: sa-east-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.us-east-1:
         region: us-east-1
         monthly_intra_region_gb: 1000
         monthly_outbound_us_east_to_us_east_gb: 500
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
-
-    aws_data_transfer.us-iso-east-1:
-        region: us-iso-east-1
-        monthly_intra_region_gb: 1000
-        monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
-
-    aws_data_transfer.us-isob-east-1:
-        region: us-isob-east-1
-        monthly_intra_region_gb: 1000
-        monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 57000
 
     aws_data_transfer.cn-north-1:
         region: cn-north-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.us-gov-west-1:
         region: us-gov-west-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.us-west-2:
         region: us-west-2
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.eu-central-1:
         region: eu-central-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.eu-west-1:
         region: eu-west-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.me-south-1:
         region: me-south-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.ap-northeast-2:
         region: ap-northeast-2
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.ap-northeast-3:
         region: ap-northeast-3
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.ap-southeast-1:
         region: ap-southeast-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.ap-southeast-2:
         region: ap-southeast-2
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
 
     aws_data_transfer.af-south-1:
         region: af-south-1
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 5000
+        monthly_outbound_internet_gb: 157000
