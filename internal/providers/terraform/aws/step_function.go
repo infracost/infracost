@@ -15,8 +15,9 @@ func GetStepFunctionRegistryItem() *schema.RegistryItem {
 }
 
 func NewStepFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var durationMS, requests, transition, monthlyMemoryUsage, memoryRequest, memoryMB *decimal.Decimal
+	var durationMS, requests, transition, monthlyMemoryUsage, duration, memoryRequest, memoryMB *decimal.Decimal
 	memorySize := decimal.NewFromInt(64)
+	requestSize := decimal.NewFromInt(100)
 	tier := "STANDARD"
 	region := d.Get("region").String()
 
@@ -53,23 +54,24 @@ func NewStepFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			memoryMB = decimalPtr(calculateRequests(*memoryRequest, memorySize))
 		}
 		if u != nil && u.Get("workflow_duration_ms").Type != gjson.Null {
-			durationMS = decimalPtr(decimal.NewFromInt(u.Get("workflow_duration_ms").Int()))
+			duration = decimalPtr(decimal.NewFromInt(u.Get("workflow_duration_ms").Int()))
+			durationMS = decimalPtr(calculateDuration(*duration, requestSize))
 			monthlyMemoryUsage = decimalPtr(calculateGBSeconds(*memoryMB, *requests, *durationMS))
-			pushLimits := []int{0, 3600000, 10800000}
-			pushQuantities := usage.CalculateTierBuckets(*durationMS, pushLimits)
-			if pushQuantities[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (first 1K)", region, tier, "0", monthlyMemoryUsage))
+			durationLimits := []int{0, 3600000, 14400000}
+			durationQuantities := usage.CalculateTierBuckets(*monthlyMemoryUsage, durationLimits)
+			if durationQuantities[1].GreaterThan(decimal.Zero) {
+				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (first 1K)", region, tier, "0", &durationQuantities[1]))
 			}
-			if pushQuantities[2].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (next 4K)", region, tier, "3600000", monthlyMemoryUsage))
+			if durationQuantities[2].GreaterThan(decimal.Zero) {
+				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (next 4K)", region, tier, "3600000", &durationQuantities[2]))
 			}
-			if pushQuantities[3].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (over 5K)", region, tier, "18000000", monthlyMemoryUsage))
+			if durationQuantities[3].GreaterThan(decimal.Zero) {
+				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (over 5K)", region, tier, "18000000", &durationQuantities[3]))
 			}
 		}
 		if u == nil {
 			costComponents = append(costComponents, stepFunctionExpressRequestCostComponent("Requests", region, tier, requests))
-			costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration", region, tier, "0", monthlyMemoryUsage))
+			costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration", region, tier, "0", duration))
 		}
 
 	}
@@ -128,12 +130,12 @@ func stepFunctionExpressRequestCostComponent(name, region, tier string, quantity
 	}
 }
 
-func stepFunctionExpressDurationCostComponent(name, region, tier, startUsageAmt string, monthlyMemoryUsage *decimal.Decimal) *schema.CostComponent {
+func stepFunctionExpressDurationCostComponent(name, region, tier, startUsageAmt string, durationQuantities *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB-Seconds",
 		UnitMultiplier:  1,
-		MonthlyQuantity: monthlyMemoryUsage,
+		MonthlyQuantity: durationQuantities,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
 			Region:     strPtr(region),
@@ -148,4 +150,8 @@ func stepFunctionExpressDurationCostComponent(name, region, tier, startUsageAmt 
 			StartUsageAmount: strPtr(startUsageAmt),
 		},
 	}
+}
+
+func calculateDuration(requestSize decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
+	return requestSize.Div(decimal.NewFromInt(100)).Ceil().Mul(monthlyRequests)
 }

@@ -59,6 +59,25 @@ EOF
 }
 
 
+resource "aws_sfn_state_machine" "expressover5k" {
+  name       = "my-state-machine"
+  role_arn   = aws_iam_role.my_aws_iam_role.arn
+  type       = "EXPRESS"
+  definition = <<EOF
+{
+  "Comment": "A Hello World example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "HelloWorld",
+  "States": {
+    "HelloWorld": {
+      "Type": "Task",
+      "Resource": "${aws_lambda_function.lambda.arn}",
+      "End": true
+    }
+  }
+}
+EOF
+}
+
 resource "aws_sfn_state_machine" "standard" {
   name       = "my-state-machine"
   role_arn   = aws_iam_role.my_aws_iam_role.arn
@@ -78,6 +97,24 @@ resource "aws_sfn_state_machine" "standard" {
 EOF
 }
 
+resource "aws_sfn_state_machine" "standardlessusage" {
+  name       = "my-state-machine"
+  role_arn   = aws_iam_role.my_aws_iam_role.arn
+  type       = "STANDARD"
+  definition = <<EOF
+{
+  "Comment": "A Hello World example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "HelloWorld",
+  "States": {
+    "HelloWorld": {
+      "Type": "Task",
+      "Resource": "${aws_lambda_function.lambda.arn}",
+      "End": true
+    }
+  }
+}
+EOF
+}
 
 resource "aws_sfn_state_machine" "standardwithoutusage" {
   name       = "my-state-machine"

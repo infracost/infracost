@@ -5,6 +5,14 @@ resource_usage:
     workflow_duration_ms: 580 # Average duration of workflow in milliseconds. Only applicable for Express Workflows.
     memory_mb: 120 # Average amount of memory consumed by workflow in MB. Only applicable for Express Workflows.
 
+  aws_sfn_state_machine.expressover5k:
+    monthly_requests: 1000000 # Monthly number of workflow requests. Only applicable for Express Workflows.
+    workflow_duration_ms: 300000 # Average duration of workflow in milliseconds. Only applicable for Express Workflows.
+    memory_mb: 120
+
   aws_sfn_state_machine.standard:
     monthly_transitions: 10000 # Monthly number of state transitions. Only applicable for Standard Workflows.
+
+  aws_sfn_state_machine.standardlessusage:
+    monthly_transitions: 100 # Monthly number of state transitions. Only applicable for Standard Workflows.
 
