@@ -467,6 +467,10 @@ resource_usage:
   #
   # Terraform AzureRM resources
   #
+  azurerm_api_management.my_api_management:
+    monthly_api_calls: 10000000 # Monthly number of api calls (only for consumption tier).
+    self_hosted_gateway_count: 5 # Number of self-hosted gateways (only for premium tier).
+
   azurerm_app_service_environment.my_service:
      operating_system: linux # Override the operating system of the instance, can be: linux, windows.
 
