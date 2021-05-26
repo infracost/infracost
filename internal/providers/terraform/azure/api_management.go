@@ -47,10 +47,10 @@ func NewAzureRMApiManagement(d *schema.ResourceData, u *schema.UsageData) *schem
 		if apiCalls != nil {
 			if apiCalls.GreaterThan(decimal.NewFromInt(1_000_000)) {
 				apiCalls = decimalPtr(apiCalls.Sub(decimal.NewFromInt(1_000_000)).Div(decimal.NewFromInt(10000)))
-				costComponents = append(costComponents, consumptionApiCostComponent(location, tier, apiCalls))
+				costComponents = append(costComponents, consumptionAPICostComponent(location, tier, apiCalls))
 			}
 		} else {
-			costComponents = append(costComponents, consumptionApiCostComponent(location, tier, apiCalls))
+			costComponents = append(costComponents, consumptionAPICostComponent(location, tier, apiCalls))
 		}
 	}
 
@@ -95,7 +95,7 @@ func apiManagementCostComponent(name, unit, location, tier string, quantity *dec
 	}
 }
 
-func consumptionApiCostComponent(location, tier string, quantity *decimal.Decimal) *schema.CostComponent {
+func consumptionAPICostComponent(location, tier string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "API management (consumption over 1M)",
 		Unit:            "1M calls",
