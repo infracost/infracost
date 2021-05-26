@@ -8,21 +8,10 @@ provider "aws" {
   access_key                  = "mock_access_key"
   secret_key                  = "mock_secret_key"
 }
-resource "aws_iam_role" "my_aws_iam_role" {
-  name               = "awsconfig-example"
-  assume_role_policy = <<POLICY
-{}
-POLICY
-}
-resource "aws_lambda_function" "lambda" {
-  function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
-  handler       = "exports.test"
-  runtime       = "nodejs12.x"
-}
-resource "aws_sfn_state_machine" "express" {
+
+resource "aws_sfn_state_machine" "expressWithoutUsage" {
   name       = "my-state-machine"
-  role_arn   = aws_iam_role.my_aws_iam_role.arn
+  role_arn   = "arn:aws:lambda:us-east-1:123456789012:resource-id"
   type       = "EXPRESS"
   definition = <<EOF
 {
@@ -31,7 +20,7 @@ resource "aws_sfn_state_machine" "express" {
   "States": {
     "HelloWorld": {
       "Type": "Task",
-      "Resource": "${aws_lambda_function.lambda.arn}",
+      "Resource": "fake123",
       "End": true
     }
   }
@@ -39,9 +28,9 @@ resource "aws_sfn_state_machine" "express" {
 EOF
 }
 
-resource "aws_sfn_state_machine" "expresswithoutusage" {
+resource "aws_sfn_state_machine" "express1Tier" {
   name       = "my-state-machine"
-  role_arn   = aws_iam_role.my_aws_iam_role.arn
+  role_arn   = "arn:aws:lambda:us-east-1:123456789012:resource-id"
   type       = "EXPRESS"
   definition = <<EOF
 {
@@ -50,7 +39,7 @@ resource "aws_sfn_state_machine" "expresswithoutusage" {
   "States": {
     "HelloWorld": {
       "Type": "Task",
-      "Resource": "${aws_lambda_function.lambda.arn}",
+      "Resource": "fake123",
       "End": true
     }
   }
@@ -58,10 +47,66 @@ resource "aws_sfn_state_machine" "expresswithoutusage" {
 EOF
 }
 
+resource "aws_sfn_state_machine" "express2Tiers" {
+  name       = "my-state-machine"
+  role_arn   = "arn:aws:lambda:us-east-1:123456789012:resource-id"
+  type       = "EXPRESS"
+  definition = <<EOF
+{
+  "Comment": "A Hello World example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "HelloWorld",
+  "States": {
+    "HelloWorld": {
+      "Type": "Task",
+      "Resource": "fake123",
+      "End": true
+    }
+  }
+}
+EOF
+}
+
+resource "aws_sfn_state_machine" "express3Tiers" {
+  name       = "my-state-machine"
+  role_arn   = "arn:aws:lambda:us-east-1:123456789012:resource-id"
+  type       = "EXPRESS"
+  definition = <<EOF
+{
+  "Comment": "A Hello World example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "HelloWorld",
+  "States": {
+    "HelloWorld": {
+      "Type": "Task",
+      "Resource": "fake123",
+      "End": true
+    }
+  }
+}
+EOF
+}
+
+resource "aws_sfn_state_machine" "standardWithoutUsage" {
+  name       = "my-state-machine"
+  role_arn   = "arn:aws:lambda:us-east-1:123456789012:resource-id"
+  type       = "STANDARD"
+  definition = <<EOF
+{
+  "Comment": "A Hello World example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "HelloWorld",
+  "States": {
+    "HelloWorld": {
+      "Type": "Task",
+      "Resource": "fake123",
+      "End": true
+    }
+  }
+}
+EOF
+}
 
 resource "aws_sfn_state_machine" "standard" {
   name       = "my-state-machine"
-  role_arn   = aws_iam_role.my_aws_iam_role.arn
+  role_arn   = "arn:aws:lambda:us-east-1:123456789012:resource-id"
   type       = "STANDARD"
   definition = <<EOF
 {
@@ -70,27 +115,7 @@ resource "aws_sfn_state_machine" "standard" {
   "States": {
     "HelloWorld": {
       "Type": "Task",
-      "Resource": "${aws_lambda_function.lambda.arn}",
-      "End": true
-    }
-  }
-}
-EOF
-}
-
-
-resource "aws_sfn_state_machine" "standardwithoutusage" {
-  name       = "my-state-machine"
-  role_arn   = aws_iam_role.my_aws_iam_role.arn
-  type       = "STANDARD"
-  definition = <<EOF
-{
-  "Comment": "A Hello World example of the Amazon States Language using an AWS Lambda Function",
-  "StartAt": "HelloWorld",
-  "States": {
-    "HelloWorld": {
-      "Type": "Task",
-      "Resource": "${aws_lambda_function.lambda.arn}",
+      "Resource": "fake123",
       "End": true
     }
   }
