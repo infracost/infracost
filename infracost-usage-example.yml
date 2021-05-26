@@ -364,6 +364,12 @@ resource_usage:
     monthly_log_lines: 5000000          # Monthly number of real-time log lines.
     custom_ssl_certificates: 3          # Number of dedicated IP custom SSL certificates.
 
+  aws_sfn_state_machine.my_sfn_state_machine:
+    monthly_transitions: 1000 # Monthly number of state transitions. Only applicable for Standard Workflows.
+    monthly_requests: 10000   # Monthly number of workflow requests. Only applicable for Express Workflows.
+    memory_mb: 128            # Average amount of memory consumed by workflow in MB. Only applicable for Express Workflows.
+    workflow_duration_ms: 500 # Average duration of workflow in milliseconds. Only applicable for Express Workflows.
+
   #
   # Terraform GCP resources
   #

@@ -76,6 +76,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetNewKMSExternalKeyRegistryItem(),
 	GetVPNConnectionRegistryItem(),
 	GetVpcEndpointRegistryItem(),
+	GetStepFunctionRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
