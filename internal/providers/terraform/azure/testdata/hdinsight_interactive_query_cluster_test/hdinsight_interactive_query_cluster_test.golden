@@ -1,0 +1,15 @@
+
+ Name                                                 Monthly Qty  Unit   Monthly Cost 
+                                                                                       
+ azurerm_hdinsight_interactive_query_cluster.example                                   
+ ├─ Head node (E2 v3)                                       1,460  hours       $277.40 
+ ├─ Worker node (E16 v3)                                    2,190  hours     $3,328.80 
+ └─ Zookeeper node (E64i v3)                                2,190  hours    $12,246.48 
+                                                                                       
+ PROJECT TOTAL                                                              $15,852.68 
+
+----------------------------------
+2 resource types weren't estimated as they're not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_storage_account
+1 x azurerm_storage_container

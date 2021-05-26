@@ -78,6 +78,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetVpcEndpointRegistryItem(),
 	GetWafv2WebACLRegistryItem(),
 	GetWafWebACLRegistryItem(),
+	GetStepFunctionRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

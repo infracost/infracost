@@ -30,7 +30,7 @@ resource "azurerm_kubernetes_cluster" "paid_D2SV2_3nc_128gb" {
   default_node_pool {
     name            = "default"
     node_count      = 3
-    vm_size         = "Standard_D2S_v2"
+    vm_size         = "Standard_DS2_v2"
     os_disk_size_gb = 128
   }
 }

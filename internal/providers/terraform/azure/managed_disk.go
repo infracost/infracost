@@ -81,6 +81,7 @@ func GetAzureRMManagedDiskRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMManagedDisk(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("location").String()
+	diskType := d.Get("storage_account_type").String()
 
 	var monthlyDiskOperations *decimal.Decimal
 
@@ -88,7 +89,7 @@ func NewAzureRMManagedDisk(d *schema.ResourceData, u *schema.UsageData) *schema.
 		monthlyDiskOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_disk_operations").Int()))
 	}
 
-	costComponents := managedDiskCostComponents(region, d.RawValues, monthlyDiskOperations)
+	costComponents := managedDiskCostComponents(region, diskType, d.RawValues, monthlyDiskOperations)
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -96,9 +97,7 @@ func NewAzureRMManagedDisk(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 }
 
-func managedDiskCostComponents(region string, diskData gjson.Result, monthlyDiskOperations *decimal.Decimal) []*schema.CostComponent {
-	diskType := diskData.Get("storage_account_type").String()
-
+func managedDiskCostComponents(region, diskType string, diskData gjson.Result, monthlyDiskOperations *decimal.Decimal) []*schema.CostComponent {
 	if diskType == "UltraSSD_LRS" {
 		return ultraDiskCostComponents(region, diskType, diskData)
 	}

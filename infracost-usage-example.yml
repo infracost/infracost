@@ -86,7 +86,7 @@ resource_usage:
     region: us-east-1                           # Region the data transfer is originating from.
     monthly_intra_region_gb: 1000               # Monthly data transferred between availability zones in the region.
     monthly_outbound_us_east_to_us_east_gb: 500 # Monthly data transferred between US east regions. NOTE: this is only valid if the region is a us-east region.
-    monthly_outbound_other_region_gb: 750       # Monthly data transferred to other AWS regions.
+    monthly_outbound_other_regions_gb: 750      # Monthly data transferred to other AWS regions.
     monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
 
   aws_docdb_cluster.my_cluster:
@@ -179,7 +179,7 @@ resource_usage:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
   aws_mq_broker.my_aws_mq_broker:
-    storage_size_gb: 12   # Data storage per instance in GB.
+    storage_size_gb: 12 # Data storage per instance in GB.
 
   aws_rds_cluster.my_cluster:
     capacity_units_per_hr: 50          # Number of aurora capacity units per hour. Only used when engine_mode is "serverless"
@@ -373,6 +373,12 @@ resource_usage:
     managed_rule_group_rules: 10 # Total number of Managed Rule Group rules used by the Web ACL.  
     monthly_requests: 1000000 # Monthly number of web requests received.
 
+  aws_sfn_state_machine.my_sfn_state_machine:
+    monthly_transitions: 1000 # Monthly number of state transitions. Only applicable for Standard Workflows.
+    monthly_requests: 10000   # Monthly number of workflow requests. Only applicable for Express Workflows.
+    memory_mb: 128            # Average amount of memory consumed by workflow in MB. Only applicable for Express Workflows.
+    workflow_duration_ms: 500 # Average duration of workflow in milliseconds. Only applicable for Express Workflows.
+
   #
   # Terraform GCP resources
   #
@@ -490,6 +496,14 @@ resource_usage:
     memory_mb: 128 # Average amount of memory consumed by function in MB. Only applicable for Consumption plan.
     instances: 2 # Number of instances. Only applicable for Premium plan.
 
+  azurerm_cosmosdb_cassandra_keyspace.my_cassandra:
+    storage_gb: 1000 # Total size of storage in GB.
+    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+
   azurerm_kubernetes_cluster.my_cluster:
     default_node_pool:
       nodes: 2 # Node count for the default node pool.
@@ -500,6 +514,9 @@ resource_usage:
   azurerm_container_registry.my_registry:
     storage_gb: 150 
     monthly_build_vcpu_hrs: 150 
+
+  azurerm_hdinsight_kafka_cluster.my_cluster:
+    monthly_os_disk_operations: 1000000 # Average number of disk operations (writes, reads, deletes) using a unit size of 256KiB per OS disk per month.
 
   azurerm_firewall.my_firewall:
     monthly_data_processed_gb: 100000 # Monthly data processed by the firewall in GB.
@@ -543,6 +560,10 @@ resource_usage:
     additional_backup_storage_gb: 3000 # Additional consumption of backup storage in GB.
 
   azurerm_storage_account.my_account:
+    data_at_rest_storage_gb: 10000
+    early_deletion_gb: 1000
+    snapshots_storage_gb: 10000
+    metadata_at_rest_storage_gb: 10000
     storage_gb: 1000000 # Total size of storage in GB.
     monthly_write_operations: 1000000 # Monthly number of Write operations.
     monthly_list_and_create_container_operations: 1000000 # Monthly number of List and Create Container operations. 
@@ -552,6 +573,18 @@ resource_usage:
     monthly_data_write_gb: 1000 # Monthly number of data write in GB.
     blob_index_tags: 100000 # Total number of Blob indexes.
 
+  azurerm_virtual_machine_scale_set.my_scale_set:
+    storage_profile_os_disk:
+      monthly_disk_operations: 100000 # Monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB.
+    storage_profile_data_disk:
+      monthly_disk_operations: 100000 # Monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
+
+  azurerm_virtual_machine.my_vm:
+    storage_os_disk:
+      monthly_disk_operations: 100000 # Monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB.
+    storage_data_disk:
+      monthly_disk_operations: 100000 # Monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
+
   azurerm_windows_virtual_machine.my_windows_vm:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
@@ -560,3 +593,6 @@ resource_usage:
     instances: 10 # Override the number of instances in the scale set.
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
+
+  azurerm_notification_hub_namespace.my_namespace:
+    monthly_pushes: 1000000 # Monthly total number number of additional pushes.
