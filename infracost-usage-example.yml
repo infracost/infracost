@@ -481,6 +481,10 @@ resource_usage:
     memory_mb: 128 # Average amount of memory consumed by function in MB. Only applicable for Consumption plan.
     instances: 2 # Number of instances. Only applicable for Premium plan.
 
+  azurerm_cdn_endpoint.my_endpoint:
+    monthly_outbound_gb: 1000000 # Monthly number of outbound data transfers in GB.
+    monthly_rules_engine_requests: 10000000 # Monthly number of rules engine requests.
+
   azurerm_cosmosdb_cassandra_keyspace.my_cassandra:
     storage_gb: 1000 # Total size of storage in GB.
     monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.

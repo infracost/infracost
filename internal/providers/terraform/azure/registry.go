@@ -5,6 +5,7 @@ import "github.com/infracost/infracost/internal/schema"
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
+	GetAzureRMCDNEndpointRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
 	GetAzureRMDatabricksWorkspaceRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
@@ -61,6 +62,9 @@ var FreeResources []string = []string{
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
+
+	// Azure CDN
+	"azurerm_cdn_profile",
 
 	// Azure Firewall
 	"azurerm_firewall_application_rule_collection",

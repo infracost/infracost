@@ -1,0 +1,14 @@
+version: 0.1
+resource_usage:
+  azurerm_cdn_endpoint.std_verizon_with_opt:
+    monthly_outbound_gb: 10000000
+  azurerm_cdn_endpoint.prm_verizon:
+    monthly_outbound_gb: 1000000
+  azurerm_cdn_endpoint.prm_verizon:
+    monthly_outbound_gb: 1000000
+  azurerm_cdn_endpoint.std_microsoft:
+    monthly_outbound_gb: 10000
+    monthly_rules_engine_requests: 10000000
+  azurerm_cdn_endpoint.std_akamai:
+    monthly_outbound_gb: 700000
+  
