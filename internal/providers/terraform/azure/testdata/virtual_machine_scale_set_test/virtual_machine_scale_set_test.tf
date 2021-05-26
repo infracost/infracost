@@ -27,7 +27,7 @@ resource "azurerm_virtual_machine_scale_set" "linux" {
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
-  upgrade_policy_mode  = "Manual"
+  upgrade_policy_mode = "Manual"
 
   sku {
     name     = "Standard_F2"
@@ -93,7 +93,7 @@ resource "azurerm_virtual_machine_scale_set" "windows" {
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
-  upgrade_policy_mode  = "Manual"
+  upgrade_policy_mode = "Manual"
 
   sku {
     name     = "Standard_F2"
