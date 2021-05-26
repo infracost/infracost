@@ -9,11 +9,11 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_cosmosdb_account" "example" {
-  name                = "tfex-cosmosdb-account"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  offer_type          = "Standard"
-	analytical_storage_enabled = true
+  name                       = "tfex-cosmosdb-account"
+  resource_group_name        = azurerm_resource_group.example.name
+  location                   = azurerm_resource_group.example.location
+  offer_type                 = "Standard"
+  analytical_storage_enabled = true
 
   capabilities {
     name = "EnableCassandra"
@@ -57,7 +57,7 @@ resource "azurerm_cosmosdb_account" "continuous_backup" {
   geo_location {
     location          = "centralus"
     failover_priority = 1
-    zone_redundant 		= true
+    zone_redundant    = true
   }
   backup {
     type = "Continuous"
@@ -83,7 +83,7 @@ resource "azurerm_cosmosdb_account" "multi-master_backup2copies" {
     failover_priority = 0
   }
 
-	geo_location {
+  geo_location {
     location          = "centralus"
     failover_priority = 1
   }
@@ -97,8 +97,8 @@ resource "azurerm_cosmosdb_cassandra_keyspace" "non-usage_autoscale" {
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
   autoscale_settings {
-		max_throughput = 4000
-	}
+    max_throughput = 4000
+  }
 }
 
 resource "azurerm_cosmosdb_cassandra_keyspace" "autoscale" {
@@ -106,22 +106,22 @@ resource "azurerm_cosmosdb_cassandra_keyspace" "autoscale" {
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
   autoscale_settings {
-		max_throughput = 6000
-	}
+    max_throughput = 6000
+  }
 }
 
 resource "azurerm_cosmosdb_cassandra_keyspace" "provisioned" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
-	throughput = 500
+  throughput          = 500
 }
 
 resource "azurerm_cosmosdb_cassandra_keyspace" "mutli-master_backup2copies" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.multi-master_backup2copies.name
-	throughput = 1000
+  throughput          = 1000
 }
 
 resource "azurerm_cosmosdb_cassandra_keyspace" "serverless" {
