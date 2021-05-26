@@ -5,7 +5,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,576.96 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $6,021.12 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB      $14,192.64 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB      $12,902.40 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $380.80 
  └─ Outbound data transfer to other regions                  750  GB         $110.25 
                                                                                      
@@ -13,7 +13,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,228.80 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $9,236.48 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $8,396.80 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $272.00 
  └─ Outbound data transfer to other regions                  750  GB          $67.50 
                                                                                      
@@ -21,7 +21,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,167.36 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,645.44 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $9,687.04 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $8,806.40 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $285.60 
  └─ Outbound data transfer to other regions                  750  GB          $67.50 
                                                                                      
@@ -29,7 +29,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,290.24 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $4,997.12 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB      $13,178.88 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB      $11,980.80 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $367.20 
  └─ Outbound data transfer to other regions                  750  GB          $60.00 
                                                                                      
@@ -37,7 +37,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,167.36 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,645.44 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $9,687.04 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $8,806.40 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $285.60 
  └─ Outbound data transfer to other regions                  750  GB          $67.50 
                                                                                      
@@ -45,7 +45,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,119.23 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $9,236.48 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $8,396.80 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $272.00 
  └─ Outbound data transfer to other regions                  750  GB          $64.50 
                                                                                      
@@ -53,7 +53,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,228.80 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $9,236.48 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $8,396.80 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $272.00 
  └─ Outbound data transfer to other regions                  750  GB          $67.50 
                                                                                      
@@ -61,7 +61,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,167.36 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $4,014.08 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB      $10,588.16 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $9,625.60 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $312.80 
  └─ Outbound data transfer to other regions                  750  GB          $73.50 
                                                                                      
@@ -69,7 +69,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,168.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
@@ -87,7 +87,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,168.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
@@ -95,7 +95,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,168.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
@@ -103,7 +103,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,168.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
@@ -111,7 +111,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,168.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
@@ -119,7 +119,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,168.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
@@ -127,7 +127,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,168.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
@@ -135,7 +135,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,198.08 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $4,526.08 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB      $10,250.24 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $9,318.40 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $221.00 
  └─ Outbound data transfer to other regions                  750  GB          $82.87 
                                                                                      
@@ -143,7 +143,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,536.00 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $5,652.48 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB      $14,192.64 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB      $12,902.40 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $387.60 
  └─ Outbound data transfer to other regions                  750  GB         $103.50 
                                                                                      
@@ -159,7 +159,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,168.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  ├─ Outbound data transfer to US East regions                200  GB           $2.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
@@ -168,7 +168,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,587.20 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $4,710.40 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB      $10,137.60 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $9,216.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $221.00 
  └─ Outbound data transfer to other regions                  750  GB          $22.50 
                                                                                      
@@ -176,7 +176,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,587.20 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $4,710.40 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB      $10,137.60 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $9,216.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $221.00 
  └─ Outbound data transfer to other regions                  750  GB          $22.50 
                                                                                      
@@ -184,7 +184,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,168.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
@@ -192,7 +192,7 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,168.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
@@ -200,8 +200,8 @@
  ├─ Intra-region data transfer                             1,000  GB          $10.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      112,640  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,168.00 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
- PROJECT TOTAL                                                           $389,841.11 
+ PROJECT TOTAL                                                           $370,159.83 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
@@ -38,8 +39,9 @@ var regionMapping = map[string]string{
 }
 
 type dataTransferRegionUsageFilterData struct {
-	usageNumber int64
-	usageName   string
+	usageName      string
+	tierCapacity   int64
+	endUsageNumber int64
 }
 
 type UsageStepsFilterData struct {
@@ -168,33 +170,34 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 
 func usageStepsFilterHelper(usageFiltersData []*dataTransferRegionUsageFilterData, usageAmount int64) []*UsageStepsFilterData {
 	results := make([]*UsageStepsFilterData, 0)
-	var used, lastEndUsageAmount int64
-	for _, usageFilter := range usageFiltersData {
-		usageName := usageFilter.usageName
-		endUsageAmount := usageFilter.usageNumber
-		var quantity *decimal.Decimal
-		if endUsageAmount != 0 && usageAmount >= endUsageAmount {
-			used = endUsageAmount - used
-			lastEndUsageAmount = endUsageAmount
-			quantity = decimalPtr(decimal.NewFromInt(used))
-		} else if usageAmount > lastEndUsageAmount {
-			used = usageAmount - lastEndUsageAmount
-			lastEndUsageAmount = endUsageAmount
-			quantity = decimalPtr(decimal.NewFromInt(used))
+	if len(usageFiltersData) == 1 {
+		quantity := decimal.NewFromInt(usageAmount)
+		results = append(results, &UsageStepsFilterData{
+			usageName:   usageFiltersData[0].usageName,
+			usageFilter: "Inf",
+			quantity:    &quantity,
+		})
+		return results
+	}
+	tierLimits := make([]int, len(usageFiltersData)-1)
+	for idx, usageFilter := range usageFiltersData {
+		if usageFilter.tierCapacity > 0 {
+			tierLimits[idx] = int(usageFilter.tierCapacity)
 		}
-		if quantity == nil {
+	}
+	tiers := usage.CalculateTierBuckets(decimal.NewFromInt(usageAmount), tierLimits)
+	for idx, usageFilter := range usageFiltersData {
+		if tiers[idx].Equals(decimal.Zero) {
 			break
 		}
-		var usageFilter string
-		if endUsageAmount != 0 {
-			usageFilter = fmt.Sprint(endUsageAmount)
-		} else {
-			usageFilter = "Inf"
+		filter := fmt.Sprint(usageFilter.endUsageNumber)
+		if usageFilter.endUsageNumber == 0 {
+			filter = "Inf"
 		}
 		results = append(results, &UsageStepsFilterData{
-			usageName:   usageName,
-			usageFilter: usageFilter,
-			quantity:    quantity,
+			usageName:   usageFilter.usageName,
+			usageFilter: filter,
+			quantity:    &tiers[idx],
 		})
 	}
 	return results
@@ -204,26 +207,31 @@ func outboundInternet(fromLocation string, networkUsage int64) []*schema.CostCom
 	costComponents := make([]*schema.CostComponent, 0)
 	defaultUsageFiltersData := []*dataTransferRegionUsageFilterData{
 		{
-			usageName:   "first 10TB",
-			usageNumber: 10240,
+			usageName:      "first 10TB",
+			tierCapacity:   10240,
+			endUsageNumber: 10240,
 		},
 		{
-			usageName:   "next 40TB",
-			usageNumber: 51200,
+			usageName:      "next 40TB",
+			tierCapacity:   40960,
+			endUsageNumber: 51200,
 		},
 		{
-			usageName:   "next 100TB",
-			usageNumber: 153600,
+			usageName:      "next 100TB",
+			tierCapacity:   102400,
+			endUsageNumber: 153600,
 		},
 		{
-			usageName:   "over 150TB",
-			usageNumber: 0,
+			usageName:      "over 150TB",
+			tierCapacity:   0,
+			endUsageNumber: 0,
 		},
 	}
 	chinaUsageFiltersData := []*dataTransferRegionUsageFilterData{
 		{
-			usageName:   "",
-			usageNumber: 0,
+			usageName:      "",
+			tierCapacity:   0,
+			endUsageNumber: 0,
 		},
 	}
 	usageFiltersData := defaultUsageFiltersData
