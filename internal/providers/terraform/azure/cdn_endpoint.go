@@ -146,17 +146,15 @@ func cdnOutboundDataCostComponents(location, sku string, u *schema.UsageData) []
 			}
 		}
 	} else {
-		for _, d := range data {
-			costComponents = append(costComponents, cdnCostComponent(
-				d.name,
-				"GB",
-				location,
-				productName,
-				skuName,
-				meterName,
-				d.startUsage,
-				nil))
-		}
+		costComponents = append(costComponents, cdnCostComponent(
+			data[0].name,
+			"GB",
+			location,
+			productName,
+			skuName,
+			meterName,
+			data[0].startUsage,
+			nil))
 	}
 
 	return costComponents
@@ -207,17 +205,15 @@ func cdnAccelerationDataTransfersCostComponents(location, sku string, d *schema.
 			}
 		}
 	} else {
-		for _, d := range data {
-			costComponents = append(costComponents, cdnCostComponent(
-				d.name,
-				"GB",
-				location,
-				productName,
-				skuName,
-				meterName,
-				d.startUsage,
-				nil))
-		}
+		costComponents = append(costComponents, cdnCostComponent(
+			data[0].name,
+			"GB",
+			location,
+			productName,
+			skuName,
+			meterName,
+			data[0].startUsage,
+			nil))
 	}
 
 	return costComponents
