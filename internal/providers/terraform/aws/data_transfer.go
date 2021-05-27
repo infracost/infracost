@@ -107,7 +107,7 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			Name:            "Intra-region data transfer",
 			Unit:            "GB",
 			UnitMultiplier:  1,
-			MonthlyQuantity: intraRegionGb,
+			MonthlyQuantity: decimalPtr(intraRegionGb.Mul(decimal.NewFromInt(2))),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Service:       strPtr("AWSDataTransfer"),
