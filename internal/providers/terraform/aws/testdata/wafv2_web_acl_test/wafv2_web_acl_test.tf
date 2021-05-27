@@ -53,12 +53,84 @@ resource "aws_wafv2_web_acl" "my_waf2" {
       }
     }
 
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+
+        excluded_rule {
+          name = "SizeRestrictions_QUERYSTRING"
+        }
+
+        excluded_rule {
+          name = "NoUserAgent_HEADER"
+        }
+      }
+      rule_group_reference_statement {
+        arn = aws_wafv2_rule_group.example.arn
+
+        excluded_rule {
+          name = "rule-to-exclude-b"
+        }
+
+        excluded_rule {
+          name = "rule-to-exclude-a"
+        }
+      }
+    }
+
     visibility_config {
       cloudwatch_metrics_enabled = false
       metric_name                = "friendly-rule-metric-name"
       sampled_requests_enabled   = false
     }
   }
+
+  rule {
+    name     = "rule-2"
+    priority = 2
+
+    action {
+      count {}
+    }
+
+    action {
+      block {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+
+        excluded_rule {
+          name = "SizeRestrictions_QUERYSTRING"
+        }
+
+        excluded_rule {
+          name = "NoUserAgent_HEADER"
+        }
+      }
+      rule_group_reference_statement {
+        arn = aws_wafv2_rule_group.example.arn
+
+        excluded_rule {
+          name = "rule-to-exclude-b"
+        }
+
+        excluded_rule {
+          name = "rule-to-exclude-a"
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = false
+      metric_name                = "friendly-rule-metric-name"
+      sampled_requests_enabled   = false
+    }
+  }
+
 
   tags = {
     Tag1 = "Value1"
@@ -150,7 +222,6 @@ resource "aws_wafv2_rule_group" "example" {
     Code = "123456"
   }
 }
-
 
 resource "aws_wafv2_web_acl" "withoutUsage" {
   name        = "managed-rule-my_waf2"

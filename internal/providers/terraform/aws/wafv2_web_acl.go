@@ -4,6 +4,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+	log "github.com/sirupsen/logrus"
 )
 
 func GetWafv2WebACLRegistryItem() *schema.RegistryItem {
@@ -30,6 +31,35 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		"USE1-WebACLV2",
 		1,
 	))
+
+	// Temp logging code to count the total number of rule_group_reference_statements:
+	// There can be multiple rules:
+	//    Each rule can have multiple statements:
+	//      Each statement can have multiple rule_group_reference_statement. We want to count the total of number of these.
+	counter := 0
+	log.Warnf(">>>> processing resource=%s", d.Address)
+	if d.Get("rule").Type != gjson.Null {
+		rules := d.Get("rule").Array()
+		for _, rule := range rules {
+			log.Warnf(">>>> processing rule=%s", rule)
+			if rule.Get("statement").Type != gjson.Null {
+				statements := rule.Get("statement").Array()
+				for _, statement := range statements {
+					log.Warnf(">>>> processing statement=%s", statement)
+					if statement.Get("rule_group_reference_statement").Type != gjson.Null {
+						managedRuleGroupStatements := statement.Get("rule_group_reference_statement").Array()
+						for _, managedRuleGroupStatement := range managedRuleGroupStatements {
+							log.Warnf(">>>> FOUND a rule_group_reference_statement=%s", managedRuleGroupStatement.Get("statement.rule_group_reference_statement").String())
+							counter = counter + 1
+						}
+					}
+				}
+			}
+		}
+	}
+	log.Warnf(">>>> TOTAL for RESOURCE=%s, rule_group_reference_statements=%d", d.Address, counter)
+	// End of temp logging code
+
 	if d.Get("rule.0.action").Type != gjson.Null {
 		rules := d.Get("rule.0.action").Array()
 		rule = decimalPtr(decimal.NewFromInt(int64(len(rules))))
