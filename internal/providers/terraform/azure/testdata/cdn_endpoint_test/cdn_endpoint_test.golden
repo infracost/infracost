@@ -21,7 +21,7 @@
                                                                                                         
  azurerm_cdn_endpoint.std_microsoft                                                                     
  ├─ Outbound data transfer (Microsoft, first 10TB)                 10,000  GB                   $810.00 
- ├─ Rules engine rule (over 5)                                          3  rules                  $3.00 
+ ├─ Rules engine rules (over 5)                                         3  rules                  $3.00 
  └─ Rules engine requests                                              10  1M requests            $6.00 
                                                                                                         
  azurerm_cdn_endpoint.std_verizon_with_opt                                                              
