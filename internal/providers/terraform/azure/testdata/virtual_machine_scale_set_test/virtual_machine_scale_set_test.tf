@@ -62,7 +62,7 @@ resource "azurerm_virtual_machine_scale_set" "linux" {
     caching           = "ReadWrite"
     create_option     = "Empty"
     managed_disk_type = "Standard_LRS"
-    disk_size_gb      = 10 
+    disk_size_gb      = 10
   }
 
   os_profile {
