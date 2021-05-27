@@ -3,6 +3,7 @@ package aws
 import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -26,7 +27,7 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	costComponents = append(costComponents, wafv2WebACLCostComponent(
 		region,
 		"Web ACL usage",
-		"hours",
+		"months",
 		"USE1-WebACLV2",
 		1,
 	))
@@ -47,34 +48,54 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		costComponents = append(costComponents, wafv2WebACLUsageCostComponent(
 			region,
 			"Rules",
-			"hours",
+			"months",
 			"USE1-RuleV2",
+			1,
 			&sumForRules,
 		))
 	}
 
-	var quantity int
-	if d.Get("rule.0.statement.0.rule_group_reference_statement.0.arn").Type != gjson.Null {
-		quantity++
-	}
+	if d.Get("rule.0.statement.0.rule_group_reference_statement").Type != gjson.Null {
+		counter := 0
+		log.Warnf(">>>> processing resource=%s", d.Address)
+		if d.Get("rule").Type != gjson.Null {
+			rules := d.Get("rule").Array()
+			for _, rule := range rules {
+				log.Warnf(">>>> processing rule=%s", rule)
+				if rule.Get("statement").Type != gjson.Null {
+					statements := rule.Get("statement").Array()
+					for _, statement := range statements {
+						log.Warnf(">>>> processing statement=%s", statement)
+						if statement.Get("rule_group_reference_statement").Type != gjson.Null {
+							managedRuleGroupStatements := statement.Get("rule_group_reference_statement").Array()
+							for _, managedRuleGroupStatement := range managedRuleGroupStatements {
+								log.Warnf(">>>> FOUND a rule_group_reference_statement=%s", managedRuleGroupStatement.Get("statement.rule_group_reference_statement").String())
+								counter = counter + 1
+							}
+						}
+					}
+				}
+			}
+		}
+		log.Warnf(">>>> TOTAL for RESOURCE=%s, rule_group_reference_statements=%d", d.Address, counter)
 
-	if quantity > 0 {
-		costComponents = append(costComponents, wafv2WebACLCostComponent(
-			region,
-			"Rule groups",
-			"hours",
-			"USE1-RuleV2",
-			quantity,
-		))
+		if counter > 0 {
+			costComponents = append(costComponents, wafv2WebACLCostComponent(
+				region,
+				"Rule groups",
+				"months",
+				"USE1-RuleV2",
+				counter,
+			))
+		}
 	}
-
 	manageQuantity := d.Get("rule.0.statement.0.managed_rule_group_statement.0.name").Array()
 
 	if len(manageQuantity) > 0 {
 		costComponents = append(costComponents, wafv2WebACLCostComponent(
 			region,
 			"Managed rule groups",
-			"hours",
+			"months",
 			"USE1-RuleV2",
 			len(manageQuantity),
 		))
@@ -87,8 +108,9 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	costComponents = append(costComponents, wafv2WebACLUsageCostComponent(
 		region,
 		"Requests",
-		"requests",
+		"1M requests",
 		"USE1-RequestV2-Tier1",
+		1000000,
 		monthlyRequests,
 	))
 
@@ -98,11 +120,11 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 }
 
-func wafv2WebACLUsageCostComponent(region, displayName, unit, usagetype string, quantity *decimal.Decimal) *schema.CostComponent {
+func wafv2WebACLUsageCostComponent(region, displayName, unit, usagetype string, unitMultiplier int, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            unit,
-		UnitMultiplier:  1,
+		UnitMultiplier:  unitMultiplier,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

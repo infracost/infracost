@@ -23,10 +23,6 @@ resource "aws_wafv2_web_acl" "my_waf2" {
       count {}
     }
 
-    action {
-      block {}
-    }
-
     statement {
       managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
@@ -169,8 +165,66 @@ resource "aws_wafv2_web_acl" "withoutUsage" {
       count {}
     }
 
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+
+        excluded_rule {
+          name = "SizeRestrictions_QUERYSTRING"
+        }
+
+        excluded_rule {
+          name = "NoUserAgent_HEADER"
+        }
+      }
+      rule_group_reference_statement {
+        arn = aws_wafv2_rule_group.example.arn
+
+        excluded_rule {
+          name = "rule-to-exclude-b"
+        }
+
+        excluded_rule {
+          name = "rule-to-exclude-a"
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = false
+      metric_name                = "friendly-rule-metric-name"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  tags = {
+    Tag1 = "Value1"
+    Tag2 = "Value2"
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = false
+    metric_name                = "friendly-metric-name"
+    sampled_requests_enabled   = false
+  }
+}
+
+resource "aws_wafv2_web_acl" "twoReferenceStatement" {
+  name        = "managed-rule-my_waf2"
+  description = "Example of a managed rule."
+  scope       = "REGIONAL"
+
+  default_action {
+    allow {}
+  }
+
+  rule {
+    name     = "rule-1"
+    priority = 1
+
     action {
-      block {}
+      count {}
     }
 
     statement {
@@ -184,6 +238,17 @@ resource "aws_wafv2_web_acl" "withoutUsage" {
 
         excluded_rule {
           name = "NoUserAgent_HEADER"
+        }
+      }
+      rule_group_reference_statement {
+        arn = aws_wafv2_rule_group.example.arn
+
+        excluded_rule {
+          name = "rule-to-exclude-b"
+        }
+
+        excluded_rule {
+          name = "rule-to-exclude-a"
         }
       }
       rule_group_reference_statement {

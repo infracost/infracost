@@ -26,16 +26,13 @@ func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 	costComponents = append(costComponents, wafWebACLCostComponent(
 		region,
 		"Web ACL usage",
-		"hours",
+		"months",
 		"USE1-WebACL",
 		1,
 	))
 	var rules []gjson.Result
 	if d.Get("rules").Type != gjson.Null {
 		rules = d.Get("rules").Array()
-	}
-	if d.Get("rules.0.type").Type != gjson.Null {
-
 		var count int
 		for _, val := range rules {
 			types := val.Get("type").String()
@@ -54,8 +51,9 @@ func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		costComponents = append(costComponents, wafWebACLUsageCostComponent(
 			region,
 			"Rules",
-			"hours",
+			"months",
 			"USE1-Rule",
+			1,
 			&sum,
 		))
 	}
@@ -64,31 +62,30 @@ func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		costComponents = append(costComponents, wafWebACLUsageCostComponent(
 			region,
 			"Rules",
-			"hours",
+			"months",
 			"USE1-Rule",
+			1,
 			rule,
 		))
 	}
 
-	if d.Get("rules.0.type").Type != gjson.Null {
-		rules := d.Get("rules").Array()
-		var count int
-		for _, val := range rules {
-			types := val.Get("type").String()
-			if types == "GROUP" {
-				count++
-			}
+	rules = d.Get("rules").Array()
+	var count int
+	for _, val := range rules {
+		types := val.Get("type").String()
+		if types == "GROUP" {
+			count++
 		}
-		ruleforGroup = count
-		if ruleforGroup > 0 {
-			costComponents = append(costComponents, wafWebACLCostComponent(
-				region,
-				"Rule groups",
-				"hours",
-				"USE1-Rule",
-				ruleforGroup,
-			))
-		}
+	}
+	ruleforGroup = count
+	if ruleforGroup > 0 {
+		costComponents = append(costComponents, wafWebACLCostComponent(
+			region,
+			"Rule groups",
+			"months",
+			"USE1-Rule",
+			ruleforGroup,
+		))
 	}
 
 	if u != nil && u.Get("monthly_requests").Type != gjson.Null {
@@ -98,8 +95,9 @@ func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 	costComponents = append(costComponents, wafWebACLUsageCostComponent(
 		region,
 		"Requests",
-		"requests",
+		"1M requests",
 		"USE1-Request",
+		1000000,
 		monthlyRequests,
 	))
 
@@ -109,11 +107,11 @@ func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 	}
 }
 
-func wafWebACLUsageCostComponent(region, displayName, unit, usagetype string, quantity *decimal.Decimal) *schema.CostComponent {
+func wafWebACLUsageCostComponent(region, displayName, unit, usagetype string, unitMultiplier int, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            unit,
-		UnitMultiplier:  1,
+		UnitMultiplier:  unitMultiplier,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
