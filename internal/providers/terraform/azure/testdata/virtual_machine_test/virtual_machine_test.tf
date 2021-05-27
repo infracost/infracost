@@ -61,7 +61,7 @@ resource "azurerm_virtual_machine" "linux" {
   os_profile_linux_config {
     disable_password_authentication = false
   }
-  
+
 
 }
 
