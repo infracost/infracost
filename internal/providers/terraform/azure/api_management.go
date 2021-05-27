@@ -30,7 +30,7 @@ func NewAzureRMApiManagement(d *schema.ResourceData, u *schema.UsageData) *schem
 		capacity, _ = decimal.NewFromString(s[1])
 	}
 
-	if tier != "Consumption" {
+	if strings.ToLower(tier) != "consumption" {
 		costComponents = append(costComponents, apiManagementCostComponent(
 			fmt.Sprintf("API management (%s)", tier),
 			"units",
@@ -54,7 +54,7 @@ func NewAzureRMApiManagement(d *schema.ResourceData, u *schema.UsageData) *schem
 		}
 	}
 
-	if tier == "Premium" {
+	if strings.ToLower(tier) == "premium" {
 		var selfHostedGateways *decimal.Decimal
 		if u != nil && u.Get("self_hosted_gateway_count").Type != gjson.Null {
 			selfHostedGateways = decimalPtr(decimal.NewFromInt(u.Get("self_hosted_gateway_count").Int()))
@@ -86,7 +86,7 @@ func apiManagementCostComponent(name, unit, location, tier string, quantity *dec
 			Service:       strPtr("API Management"),
 			ProductFamily: strPtr("Developer Tools"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", Value: strPtr(tier)},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", tier))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -107,7 +107,7 @@ func consumptionAPICostComponent(location, tier string, quantity *decimal.Decima
 			Service:       strPtr("API Management"),
 			ProductFamily: strPtr("Developer Tools"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", Value: strPtr(tier)},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", tier))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
