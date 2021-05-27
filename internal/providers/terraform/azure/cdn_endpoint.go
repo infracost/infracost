@@ -231,9 +231,9 @@ func cdnCostComponent(name, unit, location, productName, skuName, meterName, sta
 			Service:       strPtr("Content Delivery Network"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", productName))},
-				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", skuName))},
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", meterName))},
+				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", productName))},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", skuName))},
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", meterName))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
