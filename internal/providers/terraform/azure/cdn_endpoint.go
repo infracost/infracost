@@ -52,7 +52,7 @@ func NewAzureCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 			numberOfRules -= 5
 
 			costComponents = append(costComponents, cdnCostComponent(
-				"Rules engine rule (over 5)",
+				"Rules engine rules (over 5)",
 				"rules",
 				location,
 				"Azure CDN from Microsoft",
