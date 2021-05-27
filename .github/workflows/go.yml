@@ -12,6 +12,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - name: Output TF version
+        run: terraform version
       - uses: actions/checkout@v2
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
