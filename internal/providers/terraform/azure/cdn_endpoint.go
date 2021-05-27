@@ -28,18 +28,18 @@ func NewAzureCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	sku := profile.Get("sku").String()
 	location := locationToZone(d.Get("location").String())
 	if location == "" {
-		log.Warnf("Unrecognized CDN location for resource %s: %s", d.Address, sku)
+		log.Warnf("Unrecognized CDN location for resource %s: %s", d.Address, location)
 		return nil
 	}
 
-	if len(strings.Split(sku, "_")) != 2 || sku == "Standard_ChinaCdn" {
+	if len(strings.Split(sku, "_")) != 2 || strings.ToLower(sku) == "standard_chinacdn" {
 		log.Warnf("Unrecognized/unsupported CDN sku format for resource %s: %s", d.Address, sku)
 		return nil
 	}
 
 	costComponents = append(costComponents, cdnOutboundDataCostComponents(location, sku, u)...)
 
-	if sku == "Standard_Microsoft" {
+	if strings.ToLower(sku) == "standard_microsoft" {
 		numberOfRules := 0
 		if d.Get("global_delivery_rule").Type != gjson.Null {
 			numberOfRules += len(d.Get("global_delivery_rule").Array())
@@ -81,9 +81,9 @@ func NewAzureCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		}
 	}
 
-	if sku == "Standard_Akamai" || sku == "Standard_Verizon" {
+	if strings.ToLower(sku) == "standard_akamai" || strings.ToLower(sku) == "standard_verizon" {
 		if d.Get("optimization_type").Type != gjson.Null {
-			if d.Get("optimization_type").String() == "DynamicSiteAcceleration" {
+			if strings.ToLower(d.Get("optimization_type").String()) == "dynamicsiteacceleration" {
 				costComponents = append(costComponents, cdnAccelerationDataTransfersCostComponents(location, sku, d, u)...)
 			}
 		}
@@ -107,7 +107,7 @@ func cdnOutboundDataCostComponents(location, sku string, u *schema.UsageData) []
 	if s := strings.Split(sku, "_"); len(s) == 2 {
 		productName = fmt.Sprintf("Azure CDN from %s", s[1])
 		skuName = s[0]
-		if s[1] == "Verizon" {
+		if strings.ToLower(s[1]) == "verizon" {
 			name = fmt.Sprintf("Outbound data transfer (%s, ", s[0]+" "+s[1])
 		} else {
 			name = fmt.Sprintf("Outbound data transfer (%s, ", s[1])
@@ -231,9 +231,9 @@ func cdnCostComponent(name, unit, location, productName, skuName, meterName, sta
 			Service:       strPtr("Content Delivery Network"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr(productName)},
-				{Key: "skuName", Value: strPtr(skuName)},
-				{Key: "meterName", Value: strPtr(meterName)},
+				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", productName))},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", skuName))},
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", meterName))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
