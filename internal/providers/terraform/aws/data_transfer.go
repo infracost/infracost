@@ -1,7 +1,10 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
@@ -14,8 +17,6 @@ var regionMapping = map[string]string{
 	"us-west-1":       "US West (N. California)",
 	"us-west-2":       "US West (Oregon)",
 	"us-west-2-lax-1": "US West (Los Angeles)",
-	"us-iso-east-1":   "US ISO East",
-	"us-isob-east-1":  "US ISOB East (Ohio)",
 	"ca-central-1":    "Canada (Central)",
 	"cn-north-1":      "China (Beijing)",
 	"cn-northwest-1":  "China (Ningxia)",
@@ -28,13 +29,25 @@ var regionMapping = map[string]string{
 	"ap-east-1":       "Asia Pacific (Hong Kong)",
 	"ap-northeast-1":  "Asia Pacific (Tokyo)",
 	"ap-northeast-2":  "Asia Pacific (Seoul)",
-	"ap-northeast-3":  "Asia Pacific (Osaka-Local)",
+	"ap-northeast-3":  "Asia Pacific (Osaka)",
 	"ap-southeast-1":  "Asia Pacific (Singapore)",
 	"ap-southeast-2":  "Asia Pacific (Sydney)",
 	"ap-south-1":      "Asia Pacific (Mumbai)",
 	"me-south-1":      "Middle East (Bahrain)",
 	"sa-east-1":       "South America (Sao Paulo)",
 	"af-south-1":      "Africa (Cape Town)",
+}
+
+type dataTransferRegionUsageFilterData struct {
+	usageName      string
+	tierCapacity   int64
+	endUsageNumber int64
+}
+
+type UsageStepsFilterData struct {
+	usageName   string
+	usageFilter string
+	quantity    *decimal.Decimal
 }
 
 func GetDataTransferRegistryItem() *schema.RegistryItem {
@@ -59,6 +72,12 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	if region == "us-east-1" {
 		usEastRegion = regionMapping["us-east-2"]
 		otherRegion = regionMapping["us-west-2"]
+	} else if region == "us-west-1" {
+		otherRegion = regionMapping["us-west-2"]
+	} else if region == "cn-north-1" {
+		otherRegion = regionMapping["cn-northwest-1"]
+	} else if region == "cn-northwest-1" {
+		otherRegion = regionMapping["cn-north-1"]
 	}
 
 	var intraRegionGb *decimal.Decimal
@@ -88,7 +107,7 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			Name:            "Intra-region data transfer",
 			Unit:            "GB",
 			UnitMultiplier:  1,
-			MonthlyQuantity: intraRegionGb,
+			MonthlyQuantity: decimalPtr(intraRegionGb.Mul(decimal.NewFromInt(2))),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Service:       strPtr("AWSDataTransfer"),
@@ -102,24 +121,7 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	}
 
 	if outboundInternetGb != nil {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Outbound data transfer to Internet",
-			Unit:            "GB",
-			UnitMultiplier:  1,
-			MonthlyQuantity: outboundInternetGb,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Service:       strPtr("AWSDataTransfer"),
-				ProductFamily: strPtr("Data Transfer"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "transferType", Value: strPtr("AWS Outbound")},
-					{Key: "fromLocation", Value: strPtr(fromLocation)},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("10240"),
-			},
-		})
+		costComponents = append(costComponents, outboundInternet(fromLocation, outboundInternetGb.IntPart())...)
 	}
 
 	if outboundUsEastGb != nil {
@@ -164,4 +166,104 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
+}
+
+func usageStepsFilterHelper(usageFiltersData []*dataTransferRegionUsageFilterData, usageAmount int64) []*UsageStepsFilterData {
+	results := make([]*UsageStepsFilterData, 0)
+	if len(usageFiltersData) == 1 {
+		quantity := decimal.NewFromInt(usageAmount)
+		results = append(results, &UsageStepsFilterData{
+			usageName:   usageFiltersData[0].usageName,
+			usageFilter: "Inf",
+			quantity:    &quantity,
+		})
+		return results
+	}
+	tierLimits := make([]int, len(usageFiltersData)-1)
+	for idx, usageFilter := range usageFiltersData {
+		if usageFilter.tierCapacity > 0 {
+			tierLimits[idx] = int(usageFilter.tierCapacity)
+		}
+	}
+	tiers := usage.CalculateTierBuckets(decimal.NewFromInt(usageAmount), tierLimits)
+	for idx, usageFilter := range usageFiltersData {
+		if tiers[idx].Equals(decimal.Zero) {
+			break
+		}
+		filter := fmt.Sprint(usageFilter.endUsageNumber)
+		if usageFilter.endUsageNumber == 0 {
+			filter = "Inf"
+		}
+		results = append(results, &UsageStepsFilterData{
+			usageName:   usageFilter.usageName,
+			usageFilter: filter,
+			quantity:    &tiers[idx],
+		})
+	}
+	return results
+}
+
+func outboundInternet(fromLocation string, networkUsage int64) []*schema.CostComponent {
+	costComponents := make([]*schema.CostComponent, 0)
+	defaultUsageFiltersData := []*dataTransferRegionUsageFilterData{
+		{
+			usageName:      "first 10TB",
+			tierCapacity:   10240,
+			endUsageNumber: 10240,
+		},
+		{
+			usageName:      "next 40TB",
+			tierCapacity:   40960,
+			endUsageNumber: 51200,
+		},
+		{
+			usageName:      "next 100TB",
+			tierCapacity:   102400,
+			endUsageNumber: 153600,
+		},
+		{
+			usageName:      "over 150TB",
+			tierCapacity:   0,
+			endUsageNumber: 0,
+		},
+	}
+	chinaUsageFiltersData := []*dataTransferRegionUsageFilterData{
+		{
+			usageName:      "",
+			tierCapacity:   0,
+			endUsageNumber: 0,
+		},
+	}
+	usageFiltersData := defaultUsageFiltersData
+	chinaLocations := map[string]struct{}{"China (Beijing)": {}, "China (Ningxia)": {}}
+	if _, ok := chinaLocations[fromLocation]; ok {
+		usageFiltersData = chinaUsageFiltersData
+	}
+	for _, usageStep := range usageStepsFilterHelper(usageFiltersData, networkUsage) {
+		var name string
+		if usageStep.usageName == "" {
+			name = "Outbound data transfer to Internet"
+		} else {
+			name = fmt.Sprintf("Outbound data transfer to Internet (%s)", usageStep.usageName)
+		}
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            name,
+			Unit:            "GB",
+			UnitMultiplier:  1,
+			MonthlyQuantity: usageStep.quantity,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Service:       strPtr("AWSDataTransfer"),
+				ProductFamily: strPtr("Data Transfer"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "transferType", Value: strPtr("AWS Outbound")},
+					{Key: "fromLocation", Value: strPtr(fromLocation)},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				EndUsageAmount: strPtr(usageStep.usageFilter),
+			},
+		})
+	}
+	return costComponents
 }
