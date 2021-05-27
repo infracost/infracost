@@ -29,7 +29,7 @@ resource "azurerm_app_service_plan" "funcApp" {
 
   sku {
     tier     = "Standard"
-    size     = "EP2"
+    size     = "ep2"
     capacity = 1
   }
 }

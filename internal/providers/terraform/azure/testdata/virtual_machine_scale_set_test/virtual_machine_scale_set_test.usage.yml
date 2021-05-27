@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  azurerm_virtual_machine_scale_set.windows:
+    storage_profile_os_disk:
+      monthly_disk_operations: 1000000
+    storage_profile_data_disk:
+      monthly_disk_operations: 2000000

@@ -1,0 +1,19 @@
+version: 0.1
+resource_usage:
+  aws_sfn_state_machine.express1Tier:
+    monthly_requests: 100000
+    workflow_duration_ms: 123
+    memory_mb: 0
+
+  aws_sfn_state_machine.express2Tiers:
+    monthly_requests: 10000000
+    workflow_duration_ms: 800
+    memory_mb: 512
+
+  aws_sfn_state_machine.express3Tiers:
+    monthly_requests: 100000000
+    workflow_duration_ms: 801
+    memory_mb: 1200
+
+  aws_sfn_state_machine.standard:
+    monthly_transitions: 10000
