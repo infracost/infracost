@@ -70,7 +70,7 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 							managedRuleGroupStatements := statement.Get("rule_group_reference_statement").Array()
 							for _, managedRuleGroupStatement := range managedRuleGroupStatements {
 								log.Warnf(">>>> FOUND a rule_group_reference_statement=%s", managedRuleGroupStatement.Get("statement.rule_group_reference_statement").String())
-								counter = counter + 1
+								counter++
 							}
 						}
 					}
