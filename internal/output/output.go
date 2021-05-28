@@ -14,6 +14,7 @@ var outputVersion = "0.2"
 
 type Root struct {
 	Version          string           `json:"version"`
+	RunID            string           `json:"runId,omitempty"`
 	Projects         []Project        `json:"projects"`
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`

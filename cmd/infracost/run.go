@@ -142,24 +142,20 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	r := output.ToOutputFormat(projects)
 
-	addRunChan := make(chan bool)
+	var err error
 
-	go func(addRunChan chan bool, r output.Root) {
-		c := apiclient.NewDashboardAPIClient(runCtx)
-		runID, err := c.AddRun(runCtx, projectContexts, r)
-		if err != nil {
-			log.Errorf("Error reporting run: %s", err)
-		}
+	c := apiclient.NewDashboardAPIClient(runCtx)
+	r.RunID, err = c.AddRun(runCtx, projectContexts, r)
+	if err != nil {
+		log.Errorf("Error reporting run: %s", err)
+	}
 
-		env := buildRunEnv(runCtx, projectContexts, r, runID)
+	env := buildRunEnv(runCtx, projectContexts, r)
 
-		err = c.AddEvent("infracost-run", env)
-		if err != nil {
-			log.Errorf("Error reporting event: %s", err)
-		}
-
-		addRunChan <- true
-	}(addRunChan, r)
+	err = c.AddEvent("infracost-run", env)
+	if err != nil {
+		log.Errorf("Error reporting event: %s", err)
+	}
 
 	opts := output.Options{
 		ShowSkipped: runCtx.Config.ShowSkipped,
@@ -170,7 +166,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	var (
 		b   []byte
 		out string
-		err error
 	)
 
 	switch strings.ToLower(runCtx.Config.Format) {
@@ -193,8 +188,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	fmt.Printf("%s\n", out)
-
-	<-addRunChan
 
 	return nil
 }
@@ -308,9 +301,8 @@ func checkRunConfig(cfg *config.Config) error {
 	return nil
 }
 
-func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root, runID string) map[string]interface{} {
+func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root) map[string]interface{} {
 	env := runCtx.EventEnvWithProjectContexts(projectContexts)
-	env["runId"] = runID
 	env["projectCount"] = len(projectContexts)
 
 	summary := r.MergedFullSummary()

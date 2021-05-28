@@ -295,9 +295,9 @@ echo "Running infracost output using:"
 echo "  $ $(cat infracost_output_cmd)"
 diff_output=$(cat infracost_output_cmd | sh)
 
-past_total_monthly_cost=$(jq '[.projects[].pastBreakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
-total_monthly_cost=$(jq '[.projects[].breakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
-diff_cost=$(jq '[.projects[].diff.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
+past_total_monthly_cost=$(jq '[.projectResults[].pastBreakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
+total_monthly_cost=$(jq '[.projectResults[].breakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
+diff_cost=$(jq '[.projectResults[].diff.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
 
 # If both old and new costs are greater than 0
 if [ $(echo "$past_total_monthly_cost > 0" | bc -l) = 1 ] && [ $(echo "$total_monthly_cost > 0" | bc -l) = 1 ]; then
@@ -310,7 +310,7 @@ if [ $(echo "$past_total_monthly_cost <= 0" | bc -l) = 1 ] && [ $(echo "$total_m
 fi
 
 absolute_percent=$(echo $percent | tr -d -)
-diff_resources=$(jq '[.projects[].diff.resources[]] | add' infracost_breakdown.json)
+diff_resources=$(jq '[.projectResults[].diff.resources[]] | add' infracost_breakdown.json)
 
 if [ "$(echo "$post_condition" | jq '.always')" = "true" ]; then
   echo "Posting comment as post_condition is set to always"

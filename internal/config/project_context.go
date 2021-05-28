@@ -44,6 +44,7 @@ func DetectProjectMetadata(ctx *ProjectContext) *schema.ProjectMetadata {
 	vcsRepoURL := os.Getenv("INFRACOST_VCS_REPOSITORY_URL")
 	vcsSubPath := os.Getenv("INFRACOST_VCS_SUB_PATH")
 	vcsPullRequestURL := os.Getenv("INFRACOST_VCS_PULL_REQUEST_URL")
+	terraformWorkspace := os.Getenv("INFRACOST_TERRAFORM_WORKSPACE")
 
 	if vcsRepoURL == "" {
 		vcsRepoURL = gitRepo(ctx.ProjectConfig.Path)
@@ -54,10 +55,11 @@ func DetectProjectMetadata(ctx *ProjectContext) *schema.ProjectMetadata {
 	}
 
 	return &schema.ProjectMetadata{
-		Path:              ctx.ProjectConfig.Path,
-		VCSRepoURL:        vcsRepoURL,
-		VCSSubPath:        vcsSubPath,
-		VCSPullRequestURL: vcsPullRequestURL,
+		Path:               ctx.ProjectConfig.Path,
+		VCSRepoURL:         vcsRepoURL,
+		VCSSubPath:         vcsSubPath,
+		VCSPullRequestURL:  vcsPullRequestURL,
+		TerraformWorkspace: terraformWorkspace,
 	}
 }
 
