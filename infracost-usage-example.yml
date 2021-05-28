@@ -187,7 +187,7 @@ resource_usage:
     write_requests_per_sec: 100        # Total number of reads per second for the cluster.
     read_requests_per_sec: 100         # Total number of writes per second for the cluster.
     backup_snapshot_size_gb: 200       # Individual storage size for backup snapshots, used in conjunction with resource parameter "backup_retention_period".
-    average_statements_per_hr: 10000   # Number of statements generated per hour when backtrack is enabled. Only availble for MySQl-compatible Aurora
+    average_statements_per_hr: 10000   # Number of statements generated per hour when backtrack is enabled. Only available for MySQl-compatible Aurora
     change_records_per_statement: 0.38 # Records changed per statement executed.
     backtrack_window_hrs: 24           # The duration window for which Aurora will support rewinding the DB cluster to a specific point in time.
     snapshot_export_size_gb: 200       # Size of snapshot that's exported to s3 in parquet format.

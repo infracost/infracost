@@ -42,7 +42,7 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	if databaseEngineMode == "Serverless" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           "Aurora serverless",
-			Unit:           "ACU hours",
+			Unit:           "ACU-hours",
 			UnitMultiplier: 1,
 			HourlyQuantity: auroraCapacityUnits,
 			ProductFilter: &schema.ProductFilter{
@@ -145,7 +145,7 @@ func auroraStorageCostComponent(region string, u *schema.UsageData, databaseEngi
 
 	return []*schema.CostComponent{
 		{
-			Name:            "Storage rate",
+			Name:            "Storage",
 			Unit:            "GB",
 			UnitMultiplier:  1,
 			MonthlyQuantity: &storageGB,
@@ -200,7 +200,7 @@ func auroraBackupStorageCostComponent(region string, totalBackupStorageGB decima
 func auroraBacktrackCostComponent(region string, backtrackChangeRecords decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Backtrack",
-		Unit:            "1M CR-hours",
+		Unit:            "1M change-records",
 		UnitMultiplier:  1000000,
 		MonthlyQuantity: decimalPtr(backtrackChangeRecords),
 		ProductFilter: &schema.ProductFilter{
