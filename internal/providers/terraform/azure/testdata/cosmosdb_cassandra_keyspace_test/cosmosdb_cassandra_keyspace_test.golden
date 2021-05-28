@@ -20,7 +20,7 @@
  ├─ Provisioned throughput (autoscale, West US)                  Monthly cost depends on usage: $5.84 per RU/s x 100        
  ├─ Transactional storage (West US)                              Monthly cost depends on usage: $0.25 per GB                
  ├─ Analytical storage (West US)                                 Monthly cost depends on usage: $0.03 per GB                
- ├─ Analytical write operations (West US)                        Monthly cost depends on usage: $0.06 per 10K operations    
+ ├─ Analytical write operations (West US)                        Monthly cost depends on usage: $0.055 per 10K operations   
  ├─ Analytical read operations (West US)                         Monthly cost depends on usage: $0.0054 per 10K operations  
  ├─ Periodic backup (West US)                                    Monthly cost depends on usage: $0.15 per GB                
  └─ Restored data                                                Monthly cost depends on usage: $0.15 per GB                
@@ -37,7 +37,7 @@
  ├─ Provisioned throughput (serverless)                                          10  1M RU                            $2.50 
  ├─ Transactional storage (West US)                                           1,000  GB                             $250.00 
  ├─ Analytical storage (West US)                                              1,000  GB                              $30.00 
- ├─ Analytical write operations (West US)                        Monthly cost depends on usage: $0.06 per 10K operations    
+ ├─ Analytical write operations (West US)                        Monthly cost depends on usage: $0.055 per 10K operations   
  ├─ Analytical read operations (West US)                         Monthly cost depends on usage: $0.0054 per 10K operations  
  ├─ Periodic backup (West US)                                                 2,000  GB                             $300.00 
  └─ Restored data                                                             3,000  GB                             $450.00 

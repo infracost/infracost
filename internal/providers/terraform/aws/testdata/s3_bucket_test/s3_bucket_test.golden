@@ -16,7 +16,7 @@
  │  ├─ Retrievals (expedited)               Monthly cost depends on usage: $0.03 per GB             
  │  ├─ Select data scanned (expedited)      Monthly cost depends on usage: $0.02 per GB             
  │  ├─ Select data returned (expedited)     Monthly cost depends on usage: $0.03 per GB             
- │  ├─ Retrieval requests (bulk)            Monthly cost depends on usage: $0.03 per 1k requests    
+ │  ├─ Retrieval requests (bulk)            Monthly cost depends on usage: $0.025 per 1k requests   
  │  ├─ Retrievals (bulk)                    Monthly cost depends on usage: $0.0025 per GB           
  │  ├─ Select data scanned (bulk)           Monthly cost depends on usage: $0.001 per GB            
  │  ├─ Select data returned (bulk)          Monthly cost depends on usage: $0.0025 per GB           
@@ -28,19 +28,19 @@
  │  ├─ Lifecycle transition                 Monthly cost depends on usage: $0.05 per 1k requests    
  │  ├─ Retrieval requests (standard)        Monthly cost depends on usage: $0.10 per 1k requests    
  │  ├─ Retrievals (standard)                Monthly cost depends on usage: $0.02 per GB             
- │  ├─ Retrieval requests (bulk)            Monthly cost depends on usage: $0.03 per 1k requests    
+ │  ├─ Retrieval requests (bulk)            Monthly cost depends on usage: $0.025 per 1k requests   
  │  ├─ Retrievals (bulk)                    Monthly cost depends on usage: $0.0025 per GB           
  │  └─ Early delete (within 180 days)       Monthly cost depends on usage: $0.00099 per GB          
  ├─ Intelligent tiering                                                                             
- │  ├─ Storage (frequent access)            Monthly cost depends on usage: $0.02 per GB             
- │  ├─ Storage (infrequent access)          Monthly cost depends on usage: $0.01 per GB             
+ │  ├─ Storage (frequent access)            Monthly cost depends on usage: $0.023 per GB            
+ │  ├─ Storage (infrequent access)          Monthly cost depends on usage: $0.0125 per GB           
  │  ├─ Monitoring and automation            Monthly cost depends on usage: $0.0025 per 1k objects   
  │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.005 per 1k requests   
  │  ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.0004 per 1k requests  
  │  ├─ Lifecycle transition                 Monthly cost depends on usage: $0.01 per 1k requests    
  │  ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
  │  ├─ Select data returned                 Monthly cost depends on usage: $0.0007 per GB           
- │  └─ Early delete (within 30 days)        Monthly cost depends on usage: $0.02 per GB             
+ │  └─ Early delete (within 30 days)        Monthly cost depends on usage: $0.023 per GB            
  ├─ One zone - infrequent access                                                                    
  │  ├─ Storage                              Monthly cost depends on usage: $0.01 per GB             
  │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.01 per 1k requests    
@@ -50,13 +50,13 @@
  │  ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
  │  └─ Select data returned                 Monthly cost depends on usage: $0.01 per GB             
  ├─ Standard                                                                                        
- │  ├─ Storage                              Monthly cost depends on usage: $0.02 per GB             
+ │  ├─ Storage                              Monthly cost depends on usage: $0.023 per GB            
  │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.005 per 1k requests   
  │  ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.0004 per 1k requests  
  │  ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
  │  └─ Select data returned                 Monthly cost depends on usage: $0.0007 per GB           
  └─ Standard - infrequent access                                                                    
-    ├─ Storage                              Monthly cost depends on usage: $0.01 per GB             
+    ├─ Storage                              Monthly cost depends on usage: $0.0125 per GB           
     ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.01 per 1k requests    
     ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.001 per 1k requests   
     ├─ Lifecycle transition                 Monthly cost depends on usage: $0.01 per 1k requests    
