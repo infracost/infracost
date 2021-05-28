@@ -67,11 +67,7 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 					for _, statement := range statements {
 						log.Warnf(">>>> processing statement=%s", statement)
 						if statement.Get("rule_group_reference_statement").Type != gjson.Null {
-							managedRuleGroupStatements := statement.Get("rule_group_reference_statement").Array()
-							for _, managedRuleGroupStatement := range managedRuleGroupStatements {
-								log.Warnf(">>>> FOUND a rule_group_reference_statement=%s", managedRuleGroupStatement.Get("statement.rule_group_reference_statement").String())
-								counter++
-							}
+							counter++
 						}
 					}
 				}
