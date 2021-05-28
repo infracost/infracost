@@ -1,34 +1,34 @@
 
- Name                                           Monthly Qty  Unit         Monthly Cost 
-                                                                                       
- aws_rds_cluster.my_sql_serverless                                                     
- ├─ Aurora serverless                               730,000  ACU hours      $43,800.00 
- ├─ Storage rate                                        100  GB                 $10.00 
- └─ I/O rate                                          52.56  1M requests        $10.51 
-                                                                                       
- aws_rds_cluster.mysql_backtrack                                                       
- ├─ Storage rate                                        100  GB                 $10.00 
- ├─ I/O rate                                          52.56  1M requests        $10.51 
- ├─ Backup storage                                      400  GB                  $8.40 
- ├─ Backtrack                                        66,576  1M CR-hours       $798.91 
- └─ Snapshot export                                     200  GB                  $2.00 
-                                                                                       
- aws_rds_cluster.postgres_serverless                                                   
- ├─ Aurora serverless                               730,000  ACU hours      $43,800.00 
- ├─ Storage rate                                        100  GB                 $10.00 
- └─ I/O rate                                          52.56  1M requests        $10.51 
-                                                                                       
- aws_rds_cluster.postgres_serverlessWithBackup                                         
- ├─ Aurora serverless                               730,000  ACU hours      $43,800.00 
- ├─ Storage rate                                        100  GB                 $10.00 
- ├─ I/O rate                                          52.56  1M requests        $10.51 
- └─ Backup storage                                      400  GB                  $8.40 
-                                                                                       
- aws_rds_cluster.postgres_serverlessWithExport                                         
- ├─ Aurora serverless                               730,000  ACU hours      $43,800.00 
- ├─ Storage rate                                        100  GB                 $10.00 
- ├─ I/O rate                                          52.56  1M requests        $10.51 
- ├─ Backup storage                                      400  GB                  $8.40 
- └─ Snapshot export                                     200  GB                  $2.00 
-                                                                                       
- PROJECT TOTAL                                                             $176,130.67 
+ Name                                           Monthly Qty  Unit               Monthly Cost 
+                                                                                             
+ aws_rds_cluster.my_sql_serverless                                                           
+ ├─ Aurora serverless                               730,000  ACU-hours            $43,800.00 
+ ├─ Storage                                             100  GB                       $10.00 
+ └─ I/O rate                                          52.56  1M requests              $10.51 
+                                                                                             
+ aws_rds_cluster.mysql_backtrack                                                             
+ ├─ Storage                                             100  GB                       $10.00 
+ ├─ I/O rate                                          52.56  1M requests              $10.51 
+ ├─ Backup storage                                      400  GB                        $8.40 
+ ├─ Backtrack                                        66,576  1M change-records       $798.91 
+ └─ Snapshot export                                     200  GB                        $2.00 
+                                                                                             
+ aws_rds_cluster.postgres_serverless                                                         
+ ├─ Aurora serverless                               730,000  ACU-hours            $43,800.00 
+ ├─ Storage                                             100  GB                       $10.00 
+ └─ I/O rate                                          52.56  1M requests              $10.51 
+                                                                                             
+ aws_rds_cluster.postgres_serverlessWithBackup                                               
+ ├─ Aurora serverless                               730,000  ACU-hours            $43,800.00 
+ ├─ Storage                                             100  GB                       $10.00 
+ ├─ I/O rate                                          52.56  1M requests              $10.51 
+ └─ Backup storage                                      400  GB                        $8.40 
+                                                                                             
+ aws_rds_cluster.postgres_serverlessWithExport                                               
+ ├─ Aurora serverless                               730,000  ACU-hours            $43,800.00 
+ ├─ Storage                                             100  GB                       $10.00 
+ ├─ I/O rate                                          52.56  1M requests              $10.51 
+ ├─ Backup storage                                      400  GB                        $8.40 
+ └─ Snapshot export                                     200  GB                        $2.00 
+                                                                                             
+ PROJECT TOTAL                                                                   $176,130.67 
