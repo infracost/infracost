@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
  Name                                                Monthly Qty  Unit  Monthly Cost 
                                                                                      
  aws_data_transfer.af-south-1                                                        
@@ -205,3 +206,150 @@
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
  PROJECT TOTAL                                                           $370,420.47 
+=======
+ Name                                          Monthly Qty  Unit  Monthly Cost 
+                                                                               
+ aws_data_transfer.af-south-1                                                  
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $735.00 
+ └─ Outbound data transfer to other regions            750  GB         $110.25 
+                                                                               
+ aws_data_transfer.ap-east-1                                                   
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $67.50 
+                                                                               
+ aws_data_transfer.ap-northeast-1                                              
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $445.00 
+ └─ Outbound data transfer to other regions            750  GB          $67.50 
+                                                                               
+ aws_data_transfer.ap-northeast-2                                              
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $610.00 
+ └─ Outbound data transfer to other regions            750  GB          $60.00 
+                                                                               
+ aws_data_transfer.ap-northeast-3                                              
+ ├─ Intra-region data transfer                       1,000  GB           $0.00 
+ ├─ Outbound data transfer to Internet               5,000  GB           $0.00 
+ └─ Outbound data transfer to other regions            750  GB           $0.00 
+                                                                               
+ aws_data_transfer.ap-south-1                                                  
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $64.50 
+                                                                               
+ aws_data_transfer.ap-southeast-1                                              
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $67.50 
+                                                                               
+ aws_data_transfer.ap-southeast-2                                              
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $490.00 
+ └─ Outbound data transfer to other regions            750  GB          $73.50 
+                                                                               
+ aws_data_transfer.ca-central-1                                                
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $15.00 
+                                                                               
+ aws_data_transfer.cn-north-1                                                  
+ ├─ Intra-region data transfer                       1,000  GB          $10.32 
+ ├─ Outbound data transfer to Internet               5,000  GB           $0.00 
+ └─ Outbound data transfer to other regions            750  GB           $0.00 
+                                                                               
+ aws_data_transfer.cn-northwest-1                                              
+ ├─ Intra-region data transfer                       1,000  GB          $10.32 
+ ├─ Outbound data transfer to Internet               5,000  GB           $0.00 
+ └─ Outbound data transfer to other regions            750  GB           $0.00 
+                                                                               
+ aws_data_transfer.eu-central-1                                                
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $15.00 
+                                                                               
+ aws_data_transfer.eu-north-1                                                  
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $15.00 
+                                                                               
+ aws_data_transfer.eu-south-1                                                  
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $15.00 
+                                                                               
+ aws_data_transfer.eu-west-1                                                   
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $15.00 
+                                                                               
+ aws_data_transfer.eu-west-2                                                   
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $15.00 
+                                                                               
+ aws_data_transfer.eu-west-3                                                   
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $15.00 
+                                                                               
+ aws_data_transfer.me-south-1                                                  
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $552.50 
+ └─ Outbound data transfer to other regions            750  GB          $82.87 
+                                                                               
+ aws_data_transfer.sa-east-1                                                   
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $690.00 
+ └─ Outbound data transfer to other regions            750  GB         $103.50 
+                                                                               
+ aws_data_transfer.us-east-1                                                   
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ ├─ Outbound data transfer to US East regions          500  GB           $5.00 
+ └─ Outbound data transfer to other regions            750  GB          $15.00 
+                                                                               
+ aws_data_transfer.us-east-2                                                   
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ ├─ Outbound data transfer to US East regions          200  GB           $2.00 
+ └─ Outbound data transfer to other regions            750  GB          $15.00 
+                                                                               
+ aws_data_transfer.us-gov-east-1                                               
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $575.00 
+ └─ Outbound data transfer to other regions            750  GB          $22.50 
+                                                                               
+ aws_data_transfer.us-gov-west-1                                               
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $575.00 
+ └─ Outbound data transfer to other regions            750  GB          $22.50 
+                                                                               
+ aws_data_transfer.us-iso-east-1                                               
+ ├─ Intra-region data transfer                       1,000  GB           $0.00 
+ ├─ Outbound data transfer to Internet               5,000  GB           $0.00 
+ └─ Outbound data transfer to other regions            750  GB           $0.00 
+                                                                               
+ aws_data_transfer.us-isob-east-1                                              
+ ├─ Intra-region data transfer                       1,000  GB           $0.00 
+ ├─ Outbound data transfer to Internet               5,000  GB           $0.00 
+ └─ Outbound data transfer to other regions            750  GB           $0.00 
+                                                                               
+ aws_data_transfer.us-west-1                                                   
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB           $0.00 
+                                                                               
+ aws_data_transfer.us-west-2                                                   
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $15.00 
+                                                                               
+ aws_data_transfer.us-west-2-lax-1                                             
+ ├─ Intra-region data transfer                       1,000  GB          $10.00 
+ ├─ Outbound data transfer to Internet               5,000  GB         $425.00 
+ └─ Outbound data transfer to other regions            750  GB          $15.00 
+                                                                               
+ PROJECT TOTAL                                                      $12,212.26 
+>>>>>>> 51f0217a7881ddbf642c36bec48664aac90829a8

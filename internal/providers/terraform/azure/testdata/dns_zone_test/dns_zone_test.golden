@@ -1,0 +1,10 @@
+
+ Name                      Monthly Qty  Unit    Monthly Cost 
+                                                             
+ azurerm_dns_zone.germany                                    
+ └─ Hosted zone                      1  months         $0.11 
+                                                             
+ azurerm_dns_zone.westus                                     
+ └─ Hosted zone                      1  months         $0.10 
+                                                             
+ PROJECT TOTAL                                         $0.21 

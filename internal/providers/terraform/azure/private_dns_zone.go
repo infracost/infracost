@@ -1,0 +1,65 @@
+package azure
+
+import (
+	"strings"
+
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/shopspring/decimal"
+)
+
+func GetAzureRMDNSPrivateZoneRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "azurerm_private_dns_zone",
+		RFunc: NewAzureRMDNSPrivateZone,
+		ReferenceAttributes: []string{
+			"resource_group_name",
+		},
+	}
+}
+
+func NewAzureRMDNSPrivateZone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	group := d.References("resource_group_name")
+	location := group[0].Get("location").String()
+
+	if strings.HasPrefix(strings.ToLower(location), "usgov") {
+		location = "US Gov Zone 1"
+	}
+	if strings.HasPrefix(strings.ToLower(location), "germany") {
+		location = "DE Zone 1"
+	}
+	if strings.HasPrefix(strings.ToLower(location), "china") {
+		location = "Zone 1 (China)"
+	}
+	if location != "US Gov Zone 1" && location != "DE Zone 1" && location != "Zone 1 (China)" {
+		location = "Zone 1"
+	}
+
+	costComponents := make([]*schema.CostComponent, 0)
+
+	costComponents = append(costComponents, HostedPrivateZoneCostComponent(location))
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: costComponents,
+	}
+}
+func HostedPrivateZoneCostComponent(location string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Hosted zone",
+		Unit:            "months",
+		UnitMultiplier:  1,
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(location),
+			Service:       strPtr("Azure DNS"),
+			ProductFamily: strPtr("Networking"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "meterName", Value: strPtr("Public Zones")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption:   strPtr("Consumption"),
+			StartUsageAmount: strPtr("25"),
+		},
+	}
+}

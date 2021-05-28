@@ -9,6 +9,17 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMCDNEndpointRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
 	GetAzureRMDatabricksWorkspaceRegistryItem(),
+	GetAzureRMDNSaRecordRegistryItem(),
+	GetAzureRMDNSaaaaRecordRegistryItem(),
+	GetAzureRMDNScaaRecordRegistryItem(),
+	GetAzureRMDNScnameRecordRegistryItem(),
+	GetAzureRMDNSmxRecordRegistryItem(),
+	GetAzureRMDNSnsRecordRegistryItem(),
+	GetAzureRMDNSptrRecordRegistryItem(),
+	GetAzureRMDNSsrvRecordRegistryItem(),
+	GetAzureRMDNStxtRecordRegistryItem(),
+	GetAzureRMDNSPrivateZoneRegistryItem(),
+	GetAzureRMDNSZoneRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMHDInsightHadoopClusterRegistryItem(),
 	GetAzureRMHDInsightHBaseClusterRegistryItem(),
@@ -27,6 +38,13 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureMSSQLDatabaseRegistryItem(),
 	GetAzureMySQLServerRegistryItem(),
 	GetAzurePostgreSQLServerRegistryItem(),
+	GetAzureRMPrivateDNSaRecordRegistryItem(),
+	GetAzureRMPrivateDNSaaaaRecordRegistryItem(),
+	GetAzureRMPrivateDNScnameRecordRegistryItem(),
+	GetAzureRMPrivateDNSmxRecordRegistryItem(),
+	GetAzureRMPrivateDNSptrRecordRegistryItem(),
+	GetAzureRMPrivateDNSsrvRecordRegistryItem(),
+	GetAzureRMPrivateDNStxtRecordRegistryItem(),
 	GetAzureStorageAccountRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
@@ -100,6 +118,9 @@ var FreeResources []string = []string{
 
 	// Azure CDN
 	"azurerm_cdn_profile",
+
+	// Azure DNS
+	"azurerm_private_dns_zone_virtual_network_link",
 
 	// Azure Firewall
 	"azurerm_firewall_application_rule_collection",
