@@ -1,15 +1,15 @@
 
- Name                             Monthly Qty  Unit            Monthly Cost 
-                                                                            
- aws_nat_gateway.nat                                                        
- ├─ NAT gateway                           730  hours                 $32.85 
- └─ Data processed              Monthly cost depends on usage: $0.05 per GB 
-                                                                            
- aws_nat_gateway.nat_withUsage                                              
- ├─ NAT gateway                           730  hours                 $32.85 
- └─ Data processed                        100  GB                     $4.50 
-                                                                            
- PROJECT TOTAL                                                       $70.20 
+ Name                              Monthly Qty  Unit              Monthly Cost 
+                                                                               
+ aws_nat_gateway.nat                                                           
+ ├─ NAT gateway                            730  hours                   $32.85 
+ └─ Data processed              Monthly cost depends on usage: $0.045 per GB   
+                                                                               
+ aws_nat_gateway.nat_withUsage                                                 
+ ├─ NAT gateway                            730  hours                   $32.85 
+ └─ Data processed                         100  GB                       $4.50 
+                                                                               
+ PROJECT TOTAL                                                          $70.20 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

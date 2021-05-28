@@ -11,7 +11,7 @@
                                                                                              
  azurerm_function_app.my_functions2                                                          
  ├─ vCPU                             Monthly cost depends on usage: $0.17 per vCPU-hours     
- └─ Memory                           Monthly cost depends on usage: $0.01 per GB-hours       
+ └─ Memory                           Monthly cost depends on usage: $0.0123 per GB-hours     
                                                                                              
  azurerm_function_app.my_functions3                                                          
  ├─ Execution time                   Monthly cost depends on usage: $0.000016 per GB-Seconds 

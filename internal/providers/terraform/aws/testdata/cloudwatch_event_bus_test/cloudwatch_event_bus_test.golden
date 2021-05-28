@@ -5,7 +5,7 @@
  ├─ Custom events published                    Monthly cost depends on usage: $1.00 per 1M events   
  ├─ Third-party events published               Monthly cost depends on usage: $1.00 per 1M events   
  ├─ Archive processing                         Monthly cost depends on usage: $0.10 per GB          
- ├─ Archive storage                            Monthly cost depends on usage: $0.02 per GB          
+ ├─ Archive storage                            Monthly cost depends on usage: $0.023 per GB         
  └─ Schema discovery                           Monthly cost depends on usage: $0.10 per 1M events   
                                                                                                     
  aws_cloudwatch_event_bus.my_events_withUsage                                                       

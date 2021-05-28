@@ -69,21 +69,19 @@
  ├─ Capacity (first 50TB)                                     51,200  GB                           $3,015.68 
  ├─ Capacity (next 450TB)                                    512,000  GB                          $28,950.53 
  ├─ Capacity (over 500TB)                                  7,436,800  GB                         $402,985.32 
- ├─ Write operations                                             800  10K operations                  $80.00 
- ├─ List and create container operations                         800  10K operations                  $80.00 
  ├─ Read operations                                               80  10K operations                   $0.32 
  ├─ All other operations                                         800  10K operations                   $3.20 
  └─ Blob index                                                    80  10K tags                         $5.52 
                                                                                                              
  azurerm_storage_account.bb_without_usage_file                                                               
- ├─ Capacity                                      Monthly cost depends on usage: $0.04 per GB                
+ ├─ Capacity                                      Monthly cost depends on usage: $0.0425 per GB              
  ├─ Write operations                              Monthly cost depends on usage: $0.20 per 10K operations    
  ├─ List and create container operations          Monthly cost depends on usage: $0.10 per 10K operations    
  ├─ Read operations                               Monthly cost depends on usage: $0.01 per 10K operations    
  ├─ All other operations                          Monthly cost depends on usage: $0.004 per 10K operations   
  ├─ Data retrieval                                Monthly cost depends on usage: $0.01 per GB                
  ├─ Data write                                    Monthly cost depends on usage: $0.005 per GB               
- └─ Blob index                                    Monthly cost depends on usage: $0.07 per 10K tags          
+ └─ Blob index                                    Monthly cost depends on usage: $0.069 per 10K tags         
                                                                                                              
  azurerm_storage_account.file_cool_grs                                                                       
  ├─ Data at rest                                              10,000  GB                             $501.00 
@@ -126,17 +124,17 @@
  └─ All other operations                                         100  10k operations                   $0.52 
                                                                                                              
  azurerm_storage_account.file_without_usage_file                                                             
- ├─ Data at rest                                  Monthly cost depends on usage: $0.02 per GB                
- ├─ Snapshots                                     Monthly cost depends on usage: $0.02 per GB                
- ├─ Metadata at rest                              Monthly cost depends on usage: $0.03 per GB                
+ ├─ Data at rest                                  Monthly cost depends on usage: $0.0228 per GB              
+ ├─ Snapshots                                     Monthly cost depends on usage: $0.0228 per GB              
+ ├─ Metadata at rest                              Monthly cost depends on usage: $0.0297 per GB              
  ├─ Write operations                              Monthly cost depends on usage: $0.13 per 10k operations    
- ├─ List operations                               Monthly cost depends on usage: $0.07 per 10k operations    
- ├─ Read operations                               Monthly cost depends on usage: $0.01 per 10k operations    
+ ├─ List operations                               Monthly cost depends on usage: $0.065 per 10k operations   
+ ├─ Read operations                               Monthly cost depends on usage: $0.013 per 10k operations   
  ├─ All other operations                          Monthly cost depends on usage: $0.0052 per 10k operations  
  ├─ Data retrieval                                Monthly cost depends on usage: $0.01 per GB                
- └─ Early deletion                                Monthly cost depends on usage: $0.02 per GB                
+ └─ Early deletion                                Monthly cost depends on usage: $0.0228 per GB              
                                                                                                              
- PROJECT TOTAL                                                                                 $1,749,965.41 
+ PROJECT TOTAL                                                                                 $1,749,805.41 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
