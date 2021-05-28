@@ -26,11 +26,11 @@ func NewAzureRMApiManagement(d *schema.ResourceData, u *schema.UsageData) *schem
 	var tier string
 	var capacity decimal.Decimal
 	if s := strings.Split(skuName, "_"); len(s) == 2 {
-		tier = s[0]
+		tier = strings.ToLower(s[0])
 		capacity, _ = decimal.NewFromString(s[1])
 	}
 
-	if strings.ToLower(tier) != "consumption" {
+	if tier != "consumption" {
 		costComponents = append(costComponents, apiManagementCostComponent(
 			fmt.Sprintf("API management (%s)", tier),
 			"units",
@@ -45,16 +45,14 @@ func NewAzureRMApiManagement(d *schema.ResourceData, u *schema.UsageData) *schem
 		}
 
 		if apiCalls != nil {
-			if apiCalls.GreaterThan(decimal.NewFromInt(1_000_000)) {
-				apiCalls = decimalPtr(apiCalls.Sub(decimal.NewFromInt(1_000_000)).Div(decimal.NewFromInt(10000)))
-				costComponents = append(costComponents, consumptionAPICostComponent(location, tier, apiCalls))
-			}
+			apiCalls = decimalPtr(apiCalls.Div(decimal.NewFromInt(10000)))
+			costComponents = append(costComponents, consumptionAPICostComponent(location, tier, apiCalls))
 		} else {
 			costComponents = append(costComponents, consumptionAPICostComponent(location, tier, apiCalls))
 		}
 	}
 
-	if strings.ToLower(tier) == "premium" {
+	if tier == "premium" {
 		var selfHostedGateways *decimal.Decimal
 		if u != nil && u.Get("self_hosted_gateway_count").Type != gjson.Null {
 			selfHostedGateways = decimalPtr(decimal.NewFromInt(u.Get("self_hosted_gateway_count").Int()))
@@ -97,7 +95,7 @@ func apiManagementCostComponent(name, unit, location, tier string, quantity *dec
 
 func consumptionAPICostComponent(location, tier string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "API management (consumption over 1M)",
+		Name:            "API management (consumption)",
 		Unit:            "1M calls",
 		UnitMultiplier:  100,
 		MonthlyQuantity: quantity,

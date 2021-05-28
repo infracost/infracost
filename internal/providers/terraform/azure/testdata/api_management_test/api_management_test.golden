@@ -2,29 +2,29 @@
  Name                                                Monthly Qty  Unit                    Monthly Cost 
                                                                                                        
  azurerm_api_management.basic2                                                                         
- └─ API management (Basic)                                     2  units                        $294.34 
+ └─ API management (basic)                                     2  units                        $294.34 
                                                                                                        
  azurerm_api_management.consumption                                                                    
- └─ API management (consumption over 1M)                       9  1M calls                      $31.50 
+ └─ API management (consumption)                              10  1M calls                      $35.00 
                                                                                                        
  azurerm_api_management.consumption_non_usage                                                          
- └─ API management (consumption over 1M)       Monthly cost depends on usage: $3.50 per 1M calls       
+ └─ API management (consumption)               Monthly cost depends on usage: $3.50 per 1M calls       
                                                                                                        
  azurerm_api_management.developer1                                                                     
- └─ API management (Developer)                                 1  units                         $48.03 
+ └─ API management (developer)                                 1  units                         $48.03 
                                                                                                        
  azurerm_api_management.premium                                                                        
- ├─ API management (Premium)                                   4  units                     $11,180.68 
+ ├─ API management (premium)                                   4  units                     $11,180.68 
  └─ Self hosted gateway                                        5  gateways                   $5,000.50 
                                                                                                        
  azurerm_api_management.premium_non_usage                                                              
- ├─ API management (Premium)                                   4  units                     $11,180.68 
+ ├─ API management (premium)                                   4  units                     $11,180.68 
  └─ Self hosted gateway                        Monthly cost depends on usage: $1,000.10 per gateways   
                                                                                                        
  azurerm_api_management.std3                                                                           
- └─ API management (Standard)                                  3  units                      $2,060.13 
+ └─ API management (standard)                                  3  units                      $2,060.13 
                                                                                                        
- PROJECT TOTAL                                                                              $29,795.86 
+ PROJECT TOTAL                                                                              $29,799.36 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
