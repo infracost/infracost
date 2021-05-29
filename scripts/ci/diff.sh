@@ -221,7 +221,7 @@ post_to_azure_devops () {
       GITHUB_REPOSITORY=$BUILD_REPOSITORY_NAME
       GITHUB_SHA=$SYSTEM_PULLREQUEST_SOURCECOMMITID
       post_to_github
-    elif [ "$BUILD_REPOSITORY_PROVIDER" = "TfsGit" ] then
+    elif [ "$BUILD_REPOSITORY_PROVIDER" = "TfsGit" ]; then
       echo "Posting comment to Azure DevOps repo pull-request $SYSTEM_PULLREQUEST_PULLREQUESTID"
       msg="$(build_msg true)"
       jq -Mnc --arg msg "$msg" '{"comments": [{"parentCommentId": 0, "content": "\($msg)", "commentType": 1}], "status": 4}' | curl -L -X POST -d @- \

@@ -17,7 +17,7 @@ Infracost shows cloud cost estimates for infrastructure-as-code projects such as
 
 <img src=".github/assets/diff_screenshot.png" alt="Infracost diff command" width=600 />
 
-## Installation
+## Quick start
 
 1. Assuming [Terraform](https://www.terraform.io/downloads.html) is already installed, get the latest Infracost release:
 
@@ -61,16 +61,11 @@ The `infracost` CLI has the following main commands, their usage is described in
 - `breakdown`: show full breakdown of costs
 - `diff`: show diff of monthly costs between current and planned state
 
-As mentioned in our [FAQ](https://www.infracost.io/docs/faq), **no** cloud credentials, secrets, tags or resource identifiers are sent to the Cloud Pricing API. That API does not become aware of your cloud spend; it simply returns cloud prices to the CLI so calculations can be done on your machine. Infracost does not make any changes to your Terraform state or cloud resources.
+As mentioned in our [FAQ](https://www.infracost.io/docs/faq), no cloud credentials or secrets are sent to the Cloud Pricing API. Infracost does not make any changes to your Terraform state or cloud resources.
 
 ## CI/CD integrations
 
-The following CI/CD integrations can be used to automatically add a pull request comment showing the diff of monthly costs between the current and planned state:
-- [GitHub Action](https://www.infracost.io/docs/integrations/cicd#github-action)
-- [GitLab CI template](https://www.infracost.io/docs/integrations/cicd#gitlab-ci)
-- [CircleCI Orb](https://www.infracost.io/docs/integrations/cicd#circleci)
-- [Bitbucket Pipeline](https://www.infracost.io/docs/integrations/cicd#bitbucket-pipelines)
-- [Atlantis](https://www.infracost.io/docs/integrations/cicd#atlantis)
+Infracost's [CI/CD integrations](https://www.infracost.io/docs/integrations/cicd) can be used to automatically add a pull request comment showing the diff of monthly costs between the current and planned state. We have integrations for GitHub Actions, GitLab CI, Atlantis, Azure DevOps, CircleCI, Bitbucket Pipelines and Jenkins.
 
 If you run into any issues with CI/CD integrations, please join our [community Slack channel](https://www.infracost.io/community-chat), we'd be happy to guide you through it.
 
@@ -78,7 +73,7 @@ If you run into any issues with CI/CD integrations, please join our [community S
 
 ## Supported clouds and resources
 
-Infracost supports over [100 AWS and Google resources](https://www.infracost.io/docs/supported_resources/); Microsoft Azure is [coming soon](https://github.com/infracost/infracost/issues/64). Other IaC tools ([Pulumi](https://github.com/infracost/infracost/issues/187), [CloudFormation](https://github.com/infracost/infracost/issues/190)) are on our roadmap too.
+Infracost supports over [140 Terraform resources](https://www.infracost.io/docs/supported_resources/) across AWS, Google and Azure. Other IaC tools ([Pulumi](https://github.com/infracost/infracost/issues/187), [CloudFormation](https://github.com/infracost/infracost/issues/190)) are on our roadmap.
 
 We regularly add support for new resources so we recommend watching this repo for releases: click on the Watch button > selecting Custom > Releases and click on Apply.
 
