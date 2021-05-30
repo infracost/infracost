@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# This script is used in the README and https://www.infracost.io/docs/#installation
+# This script is used in the README and https://www.infracost.io/docs/#quick-start
 set -e
 
 os=$(uname | tr '[:upper:]' '[:lower:]')

@@ -32,7 +32,7 @@ Infracost shows cloud cost estimates for infrastructure-as-code projects such as
     curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
     ```
 
-    Docker and Windows users see [here](https://www.infracost.io/docs/#installation).
+    Docker and Windows users see [here](https://www.infracost.io/docs/#quick-start).
 
 2.	Register for a free API key:
     ```sh
