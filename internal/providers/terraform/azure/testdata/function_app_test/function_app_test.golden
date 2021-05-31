@@ -1,12 +1,6 @@
 
  Name                                      Monthly Qty  Unit                    Monthly Cost 
                                                                                              
- azurerm_app_service_plan.elastic                                                            
- └─ Instance usage (EP2)                           730  hours                          $0.00 
-                                                                                             
- azurerm_app_service_plan.funcApp                                                            
- └─ Instance usage (EP2)                           730  hours                          $0.00 
-                                                                                             
  azurerm_function_app.my_functions                                                           
  ├─ vCPU                                         2,920  vCPU-hours                   $505.16 
  └─ Memory                                      10,220  GB-hours                     $125.71 
@@ -17,7 +11,7 @@
                                                                                              
  azurerm_function_app.my_functions2                                                          
  ├─ vCPU                             Monthly cost depends on usage: $0.17 per vCPU-hours     
- └─ Memory                           Monthly cost depends on usage: $0.01 per GB-hours       
+ └─ Memory                           Monthly cost depends on usage: $0.0123 per GB-hours     
                                                                                              
  azurerm_function_app.my_functions3                                                          
  ├─ Execution time                   Monthly cost depends on usage: $0.000016 per GB-Seconds 

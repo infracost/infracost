@@ -29,7 +29,7 @@ process_args () {
 
   # Export as it's used by infracost, not this script
   export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
-  export INFRACOST_CI_DIFF=true
+  export INFRACOST_CI_JENKINS_DIFF=true
 
   if [ ! -z "$GIT_SSH_KEY" ]; then
     echo "Setting up private Git SSH key so terraform can access your private modules."

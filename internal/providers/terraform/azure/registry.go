@@ -3,8 +3,10 @@ package azure
 import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
+	GetAzureRMApiManagementRegistryItem(),
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
+	GetAzureRMCDNEndpointRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
 	GetAzureRMCosmosdbCassandraTableRegistryItem(),
 	GetAzureRMCosmosdbGremlinDatabaseRegistryItem(),
@@ -34,6 +36,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureMySQLServerRegistryItem(),
 	GetAzurePostgreSQLServerRegistryItem(),
 	GetAzureStorageAccountRegistryItem(),
+	GetAzureRMVirtualMachineScaleSetRegistryItem(),
+	GetAzureRMVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMAppServicePlanRegistryItem(),
@@ -45,11 +49,45 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMPublicIPPrefixRegistryItem(),
 	GetAzureRMAppNATGatewayRegistryItem(),
 	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
-	GetAzureRMNotificationHubsRegistryItem(),
+	GetAzureRMNotificationHubNamespaceRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
 var FreeResources []string = []string{
+	// Azure Api Management
+	"azurerm_api_management_api",
+	"azurerm_api_management_api_diagnostic",
+	"azurerm_api_management_api_operation",
+	"azurerm_api_management_api_operation_policy",
+	"azurerm_api_management_api_policy",
+	"azurerm_api_management_api_schema",
+	"azurerm_api_management_api_version_set",
+	"azurerm_api_management_authorization_server",
+	"azurerm_api_management_backend",
+	"azurerm_api_management_certificate",
+	"azurerm_api_management_custom_domain",
+	"azurerm_api_management_diagnostic",
+	"azurerm_api_management_email_template",
+	"azurerm_api_management_group",
+	"azurerm_api_management_group_user",
+	"azurerm_api_management_identity_provider_aad",
+	"azurerm_api_management_identity_provider_aadb2c",
+	"azurerm_api_management_identity_provider_facebook",
+	"azurerm_api_management_identity_provider_google",
+	"azurerm_api_management_identity_provider_microsoft",
+	"azurerm_api_management_identity_provider_twitter",
+	"azurerm_api_management_logger",
+	"azurerm_api_management_named_value",
+	"azurerm_api_management_openid_connect_provider",
+	"azurerm_api_management_policy",
+	"azurerm_api_management_product",
+	"azurerm_api_management_product_api",
+	"azurerm_api_management_product_group",
+	"azurerm_api_management_product_policy",
+	"azurerm_api_management_property",
+	"azurerm_api_management_subscription",
+	"azurerm_api_management_user",
+
 	// Azure App Service
 	"azurerm_app_service_active_slot",
 	"azurerm_app_service_certificate",
@@ -67,6 +105,9 @@ var FreeResources []string = []string{
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
+  
+  // Azure CDN
+	"azurerm_cdn_profile",
 
 	// Azure CosmosDB
 	"azurerm_cosmosdb_account",

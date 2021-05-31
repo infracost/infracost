@@ -74,7 +74,9 @@ func NewAzureMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.
 			},
 		})
 	} else {
-		costComponents = append(costComponents, databaseComputeInstance(region, fmt.Sprintf("Compute (provisioned, %s)", sku), serviceName, productNameRegex, skuName))
+		name := fmt.Sprintf("Compute (provisioned, %s)", sku)
+		log.Warnf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
+		costComponents = append(costComponents, databaseComputeInstance(region, name, serviceName, productNameRegex, skuName))
 	}
 
 	if tier == "Hyperscale" {

@@ -58,7 +58,7 @@ func NATGatewayCostComponent(name, location string) *schema.CostComponent {
 			Service:       strPtr("NAT Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("NAT Gateway")},
+				{Key: "meterName", Value: strPtr("Gateway")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -79,7 +79,7 @@ func DataProcessedCostComponent(name, location string, monthlyDataProcessedGb *d
 			Service:       strPtr("NAT Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("NAT Gateway")},
+				{Key: "meterName", Value: strPtr("Data Processed")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

@@ -175,7 +175,7 @@ func serverlessCosmosCostComponent(location string, availabilityZone bool, u *sc
 			Service:       strPtr("Azure Cosmos DB"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr("Azure Cosmos DB serverless")},
+				{Key: "productName", Value: strPtr("Azure Cosmos DB serverless")},
 				{Key: "skuName", Value: strPtr("RUs")},
 				{Key: "meterName", Value: strPtr("1M RUs")},
 			},

@@ -16,7 +16,7 @@
     └─ Data transfer to Australia (first 1TB)                                                     250  GB                              $47.50 
                                                                                                                                               
  google_storage_bucket.non_usage                                                                                                              
- ├─ Storage (standard)                                                             Monthly cost depends on usage: $0.03 per GiB               
+ ├─ Storage (standard)                                                             Monthly cost depends on usage: $0.026 per GiB              
  ├─ Object adds, bucket/object list (class A)                                      Monthly cost depends on usage: $0.05 per 10k operations    
  ├─ Object gets, retrieve bucket/object metadata (class B)                         Monthly cost depends on usage: $0.004 per 10k operations   
  └─ Network egress                                                                                                                            

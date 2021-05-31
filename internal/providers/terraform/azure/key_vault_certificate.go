@@ -24,7 +24,7 @@ func NewAzureKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *s
 	location = keyVault[0].Get("location").String()
 
 	if location == "" {
-		log.Warnf("Skipping resource %s. Infracost currently cannot find the location for this resource.", d.Address)
+		log.Warnf("Skipping resource %s. Could not find its 'location' property.", d.Address)
 		return nil
 	}
 

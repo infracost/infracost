@@ -5,6 +5,7 @@ import (
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -36,19 +37,19 @@ func NewAzureRMAppFunction(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 
 	skuMapCPU := map[string]int64{
-		"EP1": 1,
-		"EP2": 2,
-		"EP3": 4,
+		"ep1": 1,
+		"ep2": 2,
+		"ep3": 4,
 	}
 	skuMapMemory := map[string]float64{
-		"EP1": 3.5,
-		"EP2": 7.0,
-		"EP3": 14.0,
+		"ep1": 3.5,
+		"ep2": 7.0,
+		"ep3": 14.0,
 	}
 
 	appServicePlanID := d.References("app_service_plan_id")
 	skuTier := strings.ToLower(appServicePlanID[0].Get("sku.0.tier").String())
-	skuSize := appServicePlanID[0].Get("sku.0.size").String()
+	skuSize := strings.ToLower(appServicePlanID[0].Get("sku.0.size").String())
 
 	if len(appServicePlanID) > 0 {
 		kind = strings.ToLower(appServicePlanID[0].Get("kind").String())
@@ -59,6 +60,10 @@ func NewAzureRMAppFunction(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 	if val, ok := skuMapMemory[skuSize]; ok {
 		skuMemory = decimalPtr(decimal.NewFromFloat(val))
+	}
+	if skuCPU == nil || skuMemory == nil {
+		log.Warnf("Skipping resource %s. Could not find its CPU or Memory from its SKU.", d.Address)
+		return nil
 	}
 
 	if u != nil && u.Get("instances").Type != gjson.Null {

@@ -70,10 +70,7 @@ make test
 ```
 
 #### Integration tests
-
-The entire test suite can take >20 mins to run, so we recommend against running them all locally. These will run on GitHub actions.
-
-You should run tests for a file you added/changed with `-v` and warn log level so you can see and fix any warnings:
+You should run tests with the `-v` flag and warn log level so you can see and fix any warnings:
 ```sh
 INFRACOST_LOG_LEVEL=warn go test -v -cover ./internal/providers/terraform/aws/ebs_volume_test.go
 
@@ -87,7 +84,7 @@ make test_google
 make test_azure
 ```
 
-If you do want to run all the tests, you can use:
+To run all the tests, you can use:
 ```sh
 make test_all
 ```
@@ -227,9 +224,10 @@ func TestMyResourceGoldenFile(t *testing.T) {
 }
 ```
 
-Finally, generate the golden file by running the test with the `-update` flag:
+Finally, generate the golden file by running the test with the `-update` flag. You should **verify** that these cost calculations are correct by manually checking them, or comparing them against cost calculators from the cloud vendors. You should also ensure that there are **no warnings** about "Multiple products found", "No products found for" or "No prices found for" in the logs. These warnings indicate that the price filters have an issue.
+
 ```sh
-go test ./internal/providers/terraform/aws/aws_my_resource_test.go -v -update
+INFRACOST_LOG_LEVEL=warn go test ./internal/providers/terraform/aws/aws_my_resource_test.go -v -update
 ```
 
 Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
@@ -382,9 +380,9 @@ The following notes are general guidelines, please leave a comment in your pull 
 
   - unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 except:
 	
-	- If the price is for a large number.  E.g. set `Unit: "1M requests", UnitMultiplier: 1000000` if the price should be shown "per 1M requests" in the output.
+	  - If the price is for a large number.  E.g. set `Unit: "1M requests", UnitMultiplier: 1000000` if the price should be shown "per 1M requests" in the output.
 
-	- If the price is for billing in Unit-hours but best understood in Unit-months.  E.g. set `Unit: "GB", UnitMultiplier: schema.HourToMonthUnitMultiplier` to show "per GB" in the output. 
+    - If the price is for billing in Unit-hours but best understood in Unit-months.  E.g. set `Unit: "GB", UnitMultiplier: schema.HourToMonthUnitMultiplier` to show "per GB" in the output. 
 
 - tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)". Use the words "first", "next" and "over" when describing tiers. Units should not be included in brackets unless the cost component relates to storage or data transfer, e.g. "Storage (first 1TB)    GB" is more understandable than "Storage (first 1K)    GB" since users understand terabytes and petabytes. You should be able to use the `CalculateTierBuckets` method for calculating tier buckets.
 
@@ -484,7 +482,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 	docker push infracost/infracost-atlantis:latest
 	```
 
-6. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
+6. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls?q=infracost) to be merged.
 7. Announce the release in the infracost-community Slack announcements channel.
 8. Update the docs repo with any required changes and supported resources.
 9. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
