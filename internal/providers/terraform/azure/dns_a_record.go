@@ -19,40 +19,11 @@ func GetAzureRMDNSaRecordRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMDNSaRecord(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var monthlyQueries, firstOneBQueries *decimal.Decimal
-	costComponents := make([]*schema.CostComponent, 0)
+	group := d.References("resource_group_name")[0]
 
-	group := d.References("resource_group_name")
-	location := group[0].Get("location").String()
-
-	if strings.HasPrefix(strings.ToLower(location), "usgov") {
-		location = "US Gov Zone 1"
-	}
-	if strings.HasPrefix(strings.ToLower(location), "germany") {
-		location = "DE Zone 1"
-	}
-	if strings.HasPrefix(strings.ToLower(location), "china") {
-		location = "Zone 1 (China)"
-	}
-	if location != "US Gov Zone 1" && location != "DE Zone 1" && location != "Zone 1 (China)" {
-		location = "Zone 1"
-	}
-
-	if u != nil && u.Get("monthly_queries").Type != gjson.Null {
-		firstOneBQueries = decimalPtr(decimal.NewFromInt(1000))
-		monthlyQueries = decimalPtr(decimal.NewFromInt(u.Get("monthly_queries").Int()))
-
-		if monthlyQueries.GreaterThan(*firstOneBQueries) {
-			overOneBQueries := decimalPtr(decimal.NewFromInt(u.Get("monthly_queries").Int())).Sub(*firstOneBQueries)
-			monthlyQueries = &overOneBQueries
-			costComponents = append(costComponents, DNSqueriesOverCostComponent(location, monthlyQueries))
-		}
-	}
-
-	costComponents = append(costComponents, DNSqueriesFirstCostComponent(location, firstOneBQueries))
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: costComponents,
+		CostComponents: DNSqueriesCostComponent(d, u, group),
 	}
 }
 func DNSqueriesFirstCostComponent(location string, monthlyQueries *decimal.Decimal) *schema.CostComponent {
@@ -96,4 +67,38 @@ func DNSqueriesOverCostComponent(location string, monthlyQueries *decimal.Decima
 			StartUsageAmount: strPtr("1000"),
 		},
 	}
+}
+
+func DNSqueriesCostComponent(d *schema.ResourceData, u *schema.UsageData, group *schema.ResourceData) []*schema.CostComponent {
+	var monthlyQueries, firstOneBQueries *decimal.Decimal
+	costComponents := make([]*schema.CostComponent, 0)
+
+	location := group.Get("location").String()
+
+	if strings.HasPrefix(strings.ToLower(location), "usgov") {
+		location = "US Gov Zone 1"
+	}
+	if strings.HasPrefix(strings.ToLower(location), "germany") {
+		location = "DE Zone 1"
+	}
+	if strings.HasPrefix(strings.ToLower(location), "china") {
+		location = "Zone 1 (China)"
+	}
+	if location != "US Gov Zone 1" && location != "DE Zone 1" && location != "Zone 1 (China)" {
+		location = "Zone 1"
+	}
+
+	if u != nil && u.Get("monthly_queries").Type != gjson.Null {
+		firstOneBQueries = decimalPtr(decimal.NewFromInt(1000))
+		monthlyQueries = decimalPtr(decimal.NewFromInt(u.Get("monthly_queries").Int()))
+
+		if monthlyQueries.GreaterThan(*firstOneBQueries) {
+			overOneBQueries := decimalPtr(decimal.NewFromInt(u.Get("monthly_queries").Int())).Sub(*firstOneBQueries)
+			monthlyQueries = &overOneBQueries
+			costComponents = append(costComponents, DNSqueriesOverCostComponent(location, monthlyQueries))
+		}
+	}
+
+	costComponents = append(costComponents, DNSqueriesFirstCostComponent(location, firstOneBQueries))
+	return costComponents
 }
