@@ -81,7 +81,7 @@ resource "azurerm_cosmosdb_account" "multi-master_backup2copies" {
   }
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "non-usage_autoscale" {
+resource "azurerm_cosmosdb_gremlin_database" "non-usage_autoscale" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
@@ -90,7 +90,7 @@ resource "azurerm_cosmosdb_cassandra_keyspace" "non-usage_autoscale" {
   }
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "autoscale" {
+resource "azurerm_cosmosdb_gremlin_database" "autoscale" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
@@ -99,21 +99,21 @@ resource "azurerm_cosmosdb_cassandra_keyspace" "autoscale" {
   }
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "provisioned" {
+resource "azurerm_cosmosdb_gremlin_database" "provisioned" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
   throughput          = 500
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "mutli-master_backup2copies" {
+resource "azurerm_cosmosdb_gremlin_database" "mutli-master_backup2copies" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.multi-master_backup2copies.name
   throughput          = 1000
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "serverless" {
+resource "azurerm_cosmosdb_gremlin_database" "serverless" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name

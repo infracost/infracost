@@ -81,8 +81,8 @@ resource "azurerm_cosmosdb_account" "multi-master_backup2copies" {
   }
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "non-usage_autoscale" {
-  name                = "tfex-cosmos-cassandra-keyspace"
+resource "azurerm_cosmosdb_sql_database" "non-usage_autoscale" {
+  name                = "tfex-cosmos-mongo-db"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
   autoscale_settings {
@@ -90,8 +90,8 @@ resource "azurerm_cosmosdb_cassandra_keyspace" "non-usage_autoscale" {
   }
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "autoscale" {
-  name                = "tfex-cosmos-cassandra-keyspace"
+resource "azurerm_cosmosdb_sql_database" "autoscale" {
+  name                = "tfex-cosmos-mongo-db"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
   autoscale_settings {
@@ -99,22 +99,22 @@ resource "azurerm_cosmosdb_cassandra_keyspace" "autoscale" {
   }
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "provisioned" {
-  name                = "tfex-cosmos-cassandra-keyspace"
+resource "azurerm_cosmosdb_sql_database" "provisioned" {
+  name                = "tfex-cosmos-mongo-db"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
   throughput          = 500
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "mutli-master_backup2copies" {
-  name                = "tfex-cosmos-cassandra-keyspace"
+resource "azurerm_cosmosdb_sql_database" "mutli-master_backup2copies" {
+  name                = "tfex-cosmos-mongo-db"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.multi-master_backup2copies.name
   throughput          = 1000
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "serverless" {
-  name                = "tfex-cosmos-cassandra-keyspace"
+resource "azurerm_cosmosdb_sql_database" "serverless" {
+  name                = "tfex-cosmos-mongo-db"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
 }

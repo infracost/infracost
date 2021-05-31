@@ -27,9 +27,17 @@ const (
 )
 
 func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	account := d.References("account_name")[0]
+
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: cosmosDBCostComponents(d, u, account),
+	}
+}
+
+func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account *schema.ResourceData) []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
-	account := d.References("account_name")[0]
 	mainLocation := account.Get("location").String()
 	geoLocations := account.Get("geo_location").Array()
 
@@ -50,7 +58,8 @@ func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageDa
 	} else {
 		model = Serverless
 		availabilityZone := geoLocations[0].Get("zone_zone_redundant").Bool()
-		costComponents = append(costComponents, serverlessCosmosCostComponent(mainLocation, availabilityZone, u))
+		location := geoLocations[0].Get("location").String()
+		costComponents = append(costComponents, serverlessCosmosCostComponent(location, availabilityZone, u))
 	}
 
 	if model == Provisioned || model == Autoscale {
@@ -70,10 +79,7 @@ func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageDa
 	}
 	costComponents = append(costComponents, backupStorageCosmosCostComponents(account, u, geoLocations, backupType, mainLocation)...)
 
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
-	}
+	return costComponents
 }
 
 func provisionedCosmosCostComponents(model modelType, throughputs *decimal.Decimal, zones []gjson.Result, skuName string, u *schema.UsageData) []*schema.CostComponent {

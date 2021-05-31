@@ -118,3 +118,116 @@ resource "azurerm_cosmosdb_cassandra_keyspace" "serverless" {
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
 }
+
+resource "azurerm_cosmosdb_cassandra_table" "serverless" {
+  name                  = "testtable"
+  cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.serverless.id
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
+}
+
+resource "azurerm_cosmosdb_cassandra_table" "mutli-master_backup2copies" {
+  name                  = "testtable"
+  cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.mutli-master_backup2copies.id
+  throughput            = 1000
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
+}
+
+resource "azurerm_cosmosdb_cassandra_table" "non-usage_autoscale" {
+  name                  = "testtable"
+  cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.non-usage_autoscale.id
+  autoscale_settings {
+    max_throughput = 4000
+  }
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
+}
+
+resource "azurerm_cosmosdb_cassandra_table" "autoscale" {
+  name                  = "testtable"
+  cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.autoscale.id
+  autoscale_settings {
+    max_throughput = 6000
+  }
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
+}
+
+resource "azurerm_cosmosdb_cassandra_table" "provisioned" {
+  name                  = "testtable"
+  cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.provisioned.id
+  throughput            = 500
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
+}

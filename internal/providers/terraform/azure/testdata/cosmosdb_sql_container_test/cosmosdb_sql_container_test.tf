@@ -81,8 +81,8 @@ resource "azurerm_cosmosdb_account" "multi-master_backup2copies" {
   }
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "non-usage_autoscale" {
-  name                = "tfex-cosmos-cassandra-keyspace"
+resource "azurerm_cosmosdb_sql_database" "example" {
+  name                = "tfex-cosmos-mongo-db"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
   autoscale_settings {
@@ -90,31 +90,50 @@ resource "azurerm_cosmosdb_cassandra_keyspace" "non-usage_autoscale" {
   }
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "autoscale" {
-  name                = "tfex-cosmos-cassandra-keyspace"
+resource "azurerm_cosmosdb_sql_container" "non-usage_autoscale" {
+  name                = "example-container"
+  resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
+  account_name        = azurerm_cosmosdb_account.example.name
+  database_name       = azurerm_cosmosdb_sql_database.example.name
+  partition_key_path  = "/definition/id"
+  autoscale_settings {
+    max_throughput = 4000
+  }
+}
+
+resource "azurerm_cosmosdb_sql_container" "autoscale" {
+  name                = "example-container"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
+  database_name       = azurerm_cosmosdb_sql_database.example.name
+  partition_key_path  = "/definition/id"
   autoscale_settings {
     max_throughput = 6000
   }
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "provisioned" {
-  name                = "tfex-cosmos-cassandra-keyspace"
+resource "azurerm_cosmosdb_sql_container" "provisioned" {
+  name                = "example-container"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
+  database_name       = azurerm_cosmosdb_sql_database.example.name
+  partition_key_path  = "/definition/id"
   throughput          = 500
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "mutli-master_backup2copies" {
-  name                = "tfex-cosmos-cassandra-keyspace"
+resource "azurerm_cosmosdb_sql_container" "mutli-master_backup2copies" {
+  name                = "example-container"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
-  account_name        = azurerm_cosmosdb_account.multi-master_backup2copies.name
+  account_name        = azurerm_cosmosdb_account.example.name
+  database_name       = azurerm_cosmosdb_sql_database.example.name
+  partition_key_path  = "/definition/id"
   throughput          = 1000
 }
 
-resource "azurerm_cosmosdb_cassandra_keyspace" "serverless" {
-  name                = "tfex-cosmos-cassandra-keyspace"
+resource "azurerm_cosmosdb_sql_container" "serverless" {
+  name                = "example-container"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
+  database_name       = azurerm_cosmosdb_sql_database.example.name
+  partition_key_path  = "/definition/id"
 }
