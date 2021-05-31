@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -9,9 +10,15 @@ import (
 )
 
 func ToTable(out Root, opts Options) ([]byte, error) {
+	var tableLen int
+
 	s := ""
 
 	hasNilCosts := false
+
+	// Don't show the project total if there's only one project result
+	// since we will show the overall total anyway
+	includeProjectTotals := len(out.Projects) != 1
 
 	for i, project := range out.Projects {
 		if project.Breakdown == nil {
@@ -24,20 +31,39 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 
 		s += fmt.Sprintf("%s %s\n\n",
 			ui.BoldString("Project:"),
-			project.Label(),
+			project.Path,
 		)
 
 		if breakdownHasNilCosts(*project.Breakdown) {
 			hasNilCosts = true
 		}
 
-		s += tableForBreakdown(*project.Breakdown, opts.Fields)
+		tableOut := tableForBreakdown(*project.Breakdown, opts.Fields, includeProjectTotals)
+
+		// Get the last table length so we can align the overall total with it
+		if i == len(out.Projects)-1 {
+			tableLen = len(ui.StripColor(strings.SplitN(tableOut, "\n", 2)[0]))
+		}
+
+		s += tableOut
+
 		s += "\n"
 
 		if i != len(out.Projects)-1 {
 			s += "\n"
 		}
 	}
+
+	if includeProjectTotals {
+		s += "\n"
+	}
+
+	totalOut := formatCost2DP(out.TotalMonthlyCost)
+
+	s += fmt.Sprintf("%s%s",
+		ui.BoldString(" OVERALL TOTAL"),
+		fmt.Sprintf("%*s ", tableLen-15, totalOut), // pad based on the last line length
+	)
 
 	unsupportedMsg := out.unsupportedResourcesMessage(opts.ShowSkipped)
 
@@ -62,7 +88,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 	return []byte(s), nil
 }
 
-func tableForBreakdown(breakdown Breakdown, fields []string) string {
+func tableForBreakdown(breakdown Breakdown, fields []string, includeTotal bool) string {
 	t := table.NewWriter()
 	t.Style().Options.DrawBorder = false
 	t.Style().Options.SeparateColumns = false
@@ -145,14 +171,16 @@ func tableForBreakdown(breakdown Breakdown, fields []string) string {
 		t.AppendRow(table.Row{""})
 	}
 
-	var totalCostRow table.Row
-	totalCostRow = append(totalCostRow, ui.BoldString("PROJECT TOTAL"))
-	numOfFields := i - 3
-	for q := 0; q < numOfFields; q++ {
-		totalCostRow = append(totalCostRow, "")
+	if includeTotal {
+		var totalCostRow table.Row
+		totalCostRow = append(totalCostRow, ui.BoldString("Project total"))
+		numOfFields := i - 3
+		for q := 0; q < numOfFields; q++ {
+			totalCostRow = append(totalCostRow, "")
+		}
+		totalCostRow = append(totalCostRow, formatCost2DP(breakdown.TotalMonthlyCost))
+		t.AppendRow(totalCostRow)
 	}
-	totalCostRow = append(totalCostRow, formatCost2DP(breakdown.TotalMonthlyCost))
-	t.AppendRow(totalCostRow)
 
 	return t.Render()
 }

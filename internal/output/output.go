@@ -16,6 +16,8 @@ var outputVersion = "0.1"
 type Root struct {
 	Version       string    `json:"version"`
 	Projects      []Project `json:"projects"`
+	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
+	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
 	TimeGenerated time.Time `json:"timeGenerated"`
 	Summary       *Summary  `json:"summary"`
 }
@@ -144,6 +146,7 @@ func outputResource(r *schema.Resource) Resource {
 }
 
 func ToOutputFormat(projects []*schema.Project) Root {
+	var totalMonthlyCost, totalHourlyCost *decimal.Decimal
 
 	outProjects := make([]Project, 0, len(projects))
 
@@ -155,6 +158,22 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		if project.HasDiff {
 			pastBreakdown = outputBreakdown(project.PastResources)
 			diff = outputBreakdown(project.Diff)
+		}
+
+		if breakdown != nil && breakdown.TotalHourlyCost != nil {
+			if totalHourlyCost == nil {
+				totalHourlyCost = decimalPtr(decimal.Zero)
+			}
+
+			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*breakdown.TotalHourlyCost))
+		}
+
+		if breakdown != nil && breakdown.TotalMonthlyCost != nil {
+			if totalMonthlyCost == nil {
+				totalMonthlyCost = decimalPtr(decimal.Zero)
+			}
+
+			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*breakdown.TotalMonthlyCost))
 		}
 
 		outProjects = append(outProjects, Project{
@@ -173,6 +192,8 @@ func ToOutputFormat(projects []*schema.Project) Root {
 	out := Root{
 		Version:       outputVersion,
 		Projects:      outProjects,
+		TotalHourlyCost:  totalHourlyCost,
+		TotalMonthlyCost: totalMonthlyCost,
 		TimeGenerated: time.Now(),
 		Summary:       resourceSummary,
 	}
