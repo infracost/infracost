@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -57,15 +58,12 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 
 	if d.Get("rule.0.statement.0.rule_group_reference_statement").Type != gjson.Null {
 		counter := 0
-		log.Warnf(">>>> processing resource=%s", d.Address)
 		if d.Get("rule").Type != gjson.Null {
 			rules := d.Get("rule").Array()
 			for _, rule := range rules {
-				log.Warnf(">>>> processing rule=%s", rule)
 				if rule.Get("statement").Type != gjson.Null {
 					statements := rule.Get("statement").Array()
 					for _, statement := range statements {
-						log.Warnf(">>>> processing statement=%s", statement)
 						if statement.Get("rule_group_reference_statement").Type != gjson.Null {
 							counter++
 						}
@@ -73,7 +71,6 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 				}
 			}
 		}
-		log.Warnf(">>>> TOTAL for RESOURCE=%s, rule_group_reference_statements=%d", d.Address, counter)
 
 		if counter > 0 {
 			costComponents = append(costComponents, wafv2WebACLCostComponent(
@@ -128,7 +125,7 @@ func wafv2WebACLUsageCostComponent(region, displayName, unit, usagetype string, 
 			Service:       strPtr("awswaf"),
 			ProductFamily: strPtr("Web Application Firewall"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr(usagetype)},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -148,7 +145,7 @@ func wafv2WebACLCostComponent(region, displayName, unit, usagetype string, quant
 			Service:       strPtr("awswaf"),
 			ProductFamily: strPtr("Web Application Firewall"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr(usagetype)},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

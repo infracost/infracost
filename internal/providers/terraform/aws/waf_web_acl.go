@@ -1,6 +1,9 @@
 package aws
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -21,7 +24,6 @@ func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 
 	var costComponents []*schema.CostComponent
 	var ruleGroupRules, monthlyRequests, rule *decimal.Decimal
-	var ruleforGroup int
 
 	costComponents = append(costComponents, wafWebACLCostComponent(
 		region,
@@ -37,7 +39,7 @@ func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		for _, val := range rules {
 			types := val.Get("type").String()
 
-			if types == "REGULAR" || types == "RATE_BASED" {
+			if strings.ToLower(types) == "regular" || strings.ToLower(types) == "rate_based" {
 				count++
 			}
 
@@ -47,27 +49,16 @@ func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 
 	if u != nil && u.Get("rule_group_rules").Type != gjson.Null {
 		ruleGroupRules = decimalPtr(decimal.NewFromInt(u.Get("rule_group_rules").Int()))
-		sum := ruleGroupRules.Add(*rule)
-		costComponents = append(costComponents, wafWebACLUsageCostComponent(
-			region,
-			"Rules",
-			"months",
-			"USE1-Rule",
-			1,
-			&sum,
-		))
+		rule = decimalPtr(ruleGroupRules.Add(*rule))
 	}
-
-	if ruleGroupRules == nil {
-		costComponents = append(costComponents, wafWebACLUsageCostComponent(
-			region,
-			"Rules",
-			"months",
-			"USE1-Rule",
-			1,
-			rule,
-		))
-	}
+	costComponents = append(costComponents, wafWebACLUsageCostComponent(
+		region,
+		"Rules",
+		"months",
+		"USE1-Rule",
+		1,
+		rule,
+	))
 
 	rules = d.Get("rules").Array()
 	var count int
@@ -77,14 +68,14 @@ func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 			count++
 		}
 	}
-	ruleforGroup = count
-	if ruleforGroup > 0 {
+
+	if count > 0 {
 		costComponents = append(costComponents, wafWebACLCostComponent(
 			region,
 			"Rule groups",
 			"months",
 			"USE1-Rule",
-			ruleforGroup,
+			count,
 		))
 	}
 
@@ -119,7 +110,7 @@ func wafWebACLUsageCostComponent(region, displayName, unit, usagetype string, un
 			Service:       strPtr("awswaf"),
 			ProductFamily: strPtr("Web Application Firewall"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr(usagetype)},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -139,7 +130,7 @@ func wafWebACLCostComponent(region, displayName, unit, usagetype string, quantit
 			Service:       strPtr("awswaf"),
 			ProductFamily: strPtr("Web Application Firewall"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr(usagetype)},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
