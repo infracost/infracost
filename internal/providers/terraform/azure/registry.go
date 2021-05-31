@@ -105,8 +105,8 @@ var FreeResources []string = []string{
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
-  
-  // Azure CDN
+
+	// Azure CDN
 	"azurerm_cdn_profile",
 
 	// Azure CosmosDB
