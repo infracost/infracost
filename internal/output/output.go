@@ -11,7 +11,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-var outputVersion = "0.1"
+var outputVersion = "0.2"
 
 type Root struct {
 	Version       string    `json:"version"`

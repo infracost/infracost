@@ -14,8 +14,8 @@ import (
 	"golang.org/x/mod/semver"
 )
 
-var minOutputVersion = "0.1"
-var maxOutputVersion = "0.1"
+var minOutputVersion = "0.2"
+var maxOutputVersion = "0.2"
 
 func outputCmd(cfg *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
