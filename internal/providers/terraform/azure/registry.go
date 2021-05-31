@@ -6,8 +6,14 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
+	GetAzureRMCosmosdbCassandraTableRegistryItem(),
 	GetAzureRMCosmosdbGremlinDatabaseRegistryItem(),
 	GetAzureRMCosmosdbGremlinGraphRegistryItem(),
+	GetAzureRMCosmosdbMongoCollectionRegistryItem(),
+	GetAzureRMCosmosdbMongoDatabaseRegistryItem(),
+	GetAzureRMCosmosdbSQLContainerRegistryItem(),
+	GetAzureRMCosmosdbSQLDatabaseRegistryItem(),
+	GetAzureRMCosmosdbTableRegistryItem(),
 	GetAzureRMDatabricksWorkspaceRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMHDInsightHadoopClusterRegistryItem(),
@@ -61,6 +67,13 @@ var FreeResources []string = []string{
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
+
+	// Azure CosmosDB
+	"azurerm_cosmosdb_account",
+	"azurerm_cosmosdb_notebook_workspace",
+	"azurerm_cosmosdb_sql_stored_procedure",
+	"azurerm_cosmosdb_sql_trigger",
+	"azurerm_cosmosdb_sql_user_defined_function",
 
 	// Azure Firewall
 	"azurerm_firewall_application_rule_collection",

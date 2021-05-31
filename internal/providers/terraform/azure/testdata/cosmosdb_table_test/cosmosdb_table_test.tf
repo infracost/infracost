@@ -81,76 +81,40 @@ resource "azurerm_cosmosdb_account" "multi-master_backup2copies" {
   }
 }
 
-resource "azurerm_cosmosdb_gremlin_database" "example" {
+resource "azurerm_cosmosdb_table" "non-usage_autoscale" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
-}
-
-resource "azurerm_cosmosdb_gremlin_graph" "serverless" {
-  name                = "tfex-cosmos-gremlin-graph"
-  resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
-  account_name        = azurerm_cosmosdb_account.example.name
-  database_name       = azurerm_cosmosdb_gremlin_database.example.name
-  partition_key_path  = "/Example"
-
-  index_policy {
-    indexing_mode = "Consistent"
-  }
-}
-
-resource "azurerm_cosmosdb_gremlin_graph" "non-usage_autoscale" {
-  name                = "tfex-cosmos-gremlin-graph"
-  resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
-  account_name        = azurerm_cosmosdb_account.example.name
-  database_name       = azurerm_cosmosdb_gremlin_database.example.name
-  partition_key_path  = "/Example"
   autoscale_settings {
     max_throughput = 4000
   }
-
-  index_policy {
-    indexing_mode = "Consistent"
-  }
 }
 
-resource "azurerm_cosmosdb_gremlin_graph" "provisioned" {
-  name                = "tfex-cosmos-gremlin-graph"
+resource "azurerm_cosmosdb_table" "autoscale" {
+  name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
-  database_name       = azurerm_cosmosdb_gremlin_database.example.name
-  partition_key_path  = "/Example"
-  throughput          = 500
-
-  index_policy {
-    indexing_mode = "Consistent"
-  }
-}
-
-resource "azurerm_cosmosdb_gremlin_graph" "autoscale" {
-  name                = "tfex-cosmos-gremlin-graph"
-  resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
-  account_name        = azurerm_cosmosdb_account.continuous_backup.name
-  database_name       = azurerm_cosmosdb_gremlin_database.example.name
-  partition_key_path  = "/Example"
   autoscale_settings {
     max_throughput = 6000
   }
-
-  index_policy {
-    indexing_mode = "Consistent"
-  }
 }
 
-resource "azurerm_cosmosdb_gremlin_graph" "mutli-master_backup2copies" {
-  name                = "tfex-cosmos-gremlin-graph"
+resource "azurerm_cosmosdb_table" "provisioned" {
+  name                = "tfex-cosmos-cassandra-keyspace"
+  resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
+  account_name        = azurerm_cosmosdb_account.continuous_backup.name
+  throughput          = 500
+}
+
+resource "azurerm_cosmosdb_table" "mutli-master_backup2copies" {
+  name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.multi-master_backup2copies.name
-  database_name       = azurerm_cosmosdb_gremlin_database.example.name
-  partition_key_path  = "/Example"
   throughput          = 1000
+}
 
-  index_policy {
-    indexing_mode = "Consistent"
-  }
+resource "azurerm_cosmosdb_table" "serverless" {
+  name                = "tfex-cosmos-cassandra-keyspace"
+  resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
+  account_name        = azurerm_cosmosdb_account.example.name
 }

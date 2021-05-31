@@ -4,17 +4,17 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func GetAzureRMCosmosdbGremlinDatabaseRegistryItem() *schema.RegistryItem {
+func GetAzureRMCosmosdbTableRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_cosmosdb_gremlin_database",
-		RFunc: NewAzureCosmosdbGremlinDatabase,
+		Name:  "azurerm_cosmosdb_table",
+		RFunc: NewAzureCosmosdbTable,
 		ReferenceAttributes: []string{
 			"account_name",
 		},
 	}
 }
 
-func NewAzureCosmosdbGremlinDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureCosmosdbTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	account := d.References("account_name")[0]
 
 	return &schema.Resource{

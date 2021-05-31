@@ -81,7 +81,7 @@ resource "azurerm_cosmosdb_account" "multi-master_backup2copies" {
   }
 }
 
-resource "azurerm_cosmosdb_gremlin_database" "non-usage_autoscale" {
+resource "azurerm_cosmosdb_cassandra_keyspace" "non-usage_autoscale" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
@@ -90,7 +90,7 @@ resource "azurerm_cosmosdb_gremlin_database" "non-usage_autoscale" {
   }
 }
 
-resource "azurerm_cosmosdb_gremlin_database" "autoscale" {
+resource "azurerm_cosmosdb_cassandra_keyspace" "autoscale" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
@@ -99,22 +99,135 @@ resource "azurerm_cosmosdb_gremlin_database" "autoscale" {
   }
 }
 
-resource "azurerm_cosmosdb_gremlin_database" "provisioned" {
+resource "azurerm_cosmosdb_cassandra_keyspace" "provisioned" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
   throughput          = 500
 }
 
-resource "azurerm_cosmosdb_gremlin_database" "mutli-master_backup2copies" {
+resource "azurerm_cosmosdb_cassandra_keyspace" "mutli-master_backup2copies" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.multi-master_backup2copies.name
   throughput          = 1000
 }
 
-resource "azurerm_cosmosdb_gremlin_database" "serverless" {
+resource "azurerm_cosmosdb_cassandra_keyspace" "serverless" {
   name                = "tfex-cosmos-cassandra-keyspace"
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
+}
+
+resource "azurerm_cosmosdb_cassandra_table" "serverless" {
+  name                  = "testtable"
+  cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.serverless.id
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
+}
+
+resource "azurerm_cosmosdb_cassandra_table" "mutli-master_backup2copies" {
+  name                  = "testtable"
+  cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.mutli-master_backup2copies.id
+  throughput            = 1000
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
+}
+
+resource "azurerm_cosmosdb_cassandra_table" "non-usage_autoscale" {
+  name                  = "testtable"
+  cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.non-usage_autoscale.id
+  autoscale_settings {
+    max_throughput = 4000
+  }
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
+}
+
+resource "azurerm_cosmosdb_cassandra_table" "autoscale" {
+  name                  = "testtable"
+  cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.autoscale.id
+  autoscale_settings {
+    max_throughput = 6000
+  }
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
+}
+
+resource "azurerm_cosmosdb_cassandra_table" "provisioned" {
+  name                  = "testtable"
+  cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.provisioned.id
+  throughput            = 500
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
 }

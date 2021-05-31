@@ -27,16 +27,17 @@ const (
 )
 
 func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	account := d.References("account_name")[0]
+
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: cosmosDBCostComponents(d, u),
+		CostComponents: cosmosDBCostComponents(d, u, account),
 	}
 }
 
-func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
+func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account *schema.ResourceData) []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
-	account := d.References("account_name")[0]
 	mainLocation := account.Get("location").String()
 	geoLocations := account.Get("geo_location").Array()
 
@@ -57,7 +58,8 @@ func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData) []*sche
 	} else {
 		model = Serverless
 		availabilityZone := geoLocations[0].Get("zone_zone_redundant").Bool()
-		costComponents = append(costComponents, serverlessCosmosCostComponent(mainLocation, availabilityZone, u))
+		location := geoLocations[0].Get("location").String()
+		costComponents = append(costComponents, serverlessCosmosCostComponent(location, availabilityZone, u))
 	}
 
 	if model == Provisioned || model == Autoscale {
@@ -175,6 +177,7 @@ func serverlessCosmosCostComponent(location string, availabilityZone bool, u *sc
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", ValueRegex: strPtr("Azure Cosmos DB serverless")},
 				{Key: "skuName", Value: strPtr("RUs")},
+				{Key: "meterName", Value: strPtr("1M RUs")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
