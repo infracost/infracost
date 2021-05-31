@@ -125,7 +125,7 @@ func wafv2WebACLUsageCostComponent(region, displayName, unit, usagetype string, 
 			Service:       strPtr("awswaf"),
 			ProductFamily: strPtr("Web Application Firewall"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", usagetype))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -145,7 +145,7 @@ func wafv2WebACLCostComponent(region, displayName, unit, usagetype string, quant
 			Service:       strPtr("awswaf"),
 			ProductFamily: strPtr("Web Application Firewall"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", usagetype))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
