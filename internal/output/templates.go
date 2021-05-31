@@ -79,11 +79,16 @@ tr.tags td {
 }
 
 tr.total {
+  background-color: #d8dce2;
+  font-weight: bold;
+}
+
+table.overall-total tr.total {
   background-color: #ffdfb9;
   font-weight: bold;
 }
 
-tr.total td {
+table.overall-total tr.total td {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
 }
@@ -97,12 +102,16 @@ tr.total td {
 }
 
 @media screen and (max-width: 1024px) {
-  table.breakdown {
+  table.breakdown, table.overall-total {
     min-width: auto;
   }
 }
-table.breakdown {
+table.breakdown, table.overall-total {
   min-width: 946px;
+}
+
+table.overall-total {
+  margin-top: 1rem;
 }
 
 {{end}}
@@ -259,6 +268,15 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       {{$resources := .Breakdown.Resources}}
       {{template "projectBlock" dict "Project" . "Options" $options "Resources" $resources "Indent" 0}}
     {{end}}
+    
+    <table class="overall-total">
+      <tbody>
+        <tr class="total">
+          <td class="name" colspan="{{len .Options.Fields}}">Overall total</td>
+          <td class="monthly-cost">{{.Root.TotalMonthlyCost | formatCost2DP}}</td>
+        </tr>
+      </tbody>
+    </table>
 
     <div class="warnings">
       <p>{{.UnsupportedResourcesMessage | replaceNewLines}}</p>
