@@ -36,25 +36,23 @@ func (p *PlanProvider) DisplayType() string {
 	return "Terraform plan file"
 }
 
-func (p *PlanProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.Project, error) {
-	var project *schema.Project = schema.NewProject(p.Path, map[string]string{})
-
+func (p *PlanProvider) LoadResources(project *schema.Project, usage map[string]*schema.UsageData) error {
 	j, err := p.generatePlanJSON()
 	if err != nil {
-		return project, err
+		return err
 	}
 
 	parser := NewParser(p.env)
 
 	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {
-		return project, errors.Wrap(err, "Error parsing Terraform JSON")
+		return errors.Wrap(err, "Error parsing Terraform JSON")
 	}
 
 	project.PastResources = pastResources
 	project.Resources = resources
 
-	return project, nil
+	return nil
 }
 
 func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
