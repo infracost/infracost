@@ -221,7 +221,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
 
 {{define "projectBlock"}}
   {{$fields := .Options.Fields}}
-  <p class="project-name">Project: {{.Project.Path}}</p>
+  <p class="project-name">Project: {{.Project.Name}}</p>
   <table class="breakdown">
     <thead>      
       {{template "tableHeaders" dict "Fields" $fields}}

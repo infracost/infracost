@@ -3,7 +3,6 @@ package output
 import (
 	"fmt"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -23,26 +22,11 @@ type Root struct {
 }
 
 type Project struct {
-	Path          string            `json:"path"`
-	Metadata      map[string]string `json:"metadata"`
-	PastBreakdown *Breakdown        `json:"pastBreakdown"`
-	Breakdown     *Breakdown        `json:"breakdown"`
-	Diff          *Breakdown        `json:"diff"`
-}
-
-func (p *Project) Label() string {
-	metaVals := make([]string, 0)
-	for _, v := range p.Metadata {
-		metaVals = append(metaVals, v)
-	}
-
-	l := p.Path
-
-	if len(metaVals) > 0 {
-		l += fmt.Sprintf(" (%s)", strings.Join(metaVals, ", "))
-	}
-
-	return l
+	Name          string                  `json:"name"`
+	Metadata      *schema.ProjectMetadata `json:"metadata"`
+	PastBreakdown *Breakdown              `json:"pastBreakdown"`
+	Breakdown     *Breakdown              `json:"breakdown"`
+	Diff          *Breakdown              `json:"diff"`
 }
 
 type Breakdown struct {
@@ -177,7 +161,7 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		}
 
 		outProjects = append(outProjects, Project{
-			Path:          project.Path,
+			Name:          project.Name,
 			Metadata:      project.Metadata,
 			PastBreakdown: pastBreakdown,
 			Breakdown:     breakdown,
