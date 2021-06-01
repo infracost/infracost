@@ -7,7 +7,7 @@ import (
 func GetAzureRMCosmosdbCassandraTableRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_cosmosdb_cassandra_table",
-		RFunc: NewAzureCosmosdbCassandraTable,
+		RFunc: NewAzureRMCosmosdbCassandraTable,
 		ReferenceAttributes: []string{
 			"account_name",
 			"cassandra_keyspace_id",
@@ -15,7 +15,7 @@ func GetAzureRMCosmosdbCassandraTableRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureCosmosdbCassandraTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCosmosdbCassandraTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	keyspace := d.References("cassandra_keyspace_id")[0]
 	account := keyspace.References("account_name")[0]
 

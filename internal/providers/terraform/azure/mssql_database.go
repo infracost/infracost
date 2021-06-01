@@ -12,17 +12,17 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetAzureMSSQLDatabaseRegistryItem() *schema.RegistryItem {
+func GetAzureRMMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_mssql_database",
-		RFunc: NewAzureMSSQLDatabase,
+		RFunc: NewAzureRMMSSQLDatabase,
 		ReferenceAttributes: []string{
 			"server_id",
 		},
 	}
 }
 
-func NewAzureMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
 	server := d.References("server_id")
 	region := server[0].Get("location").String()

@@ -7,14 +7,14 @@ import (
 func GetAzureRMCosmosdbGremlinGraphRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_cosmosdb_gremlin_graph",
-		RFunc: NewAzureCosmosdbGremlinGraph,
+		RFunc: NewAzureRMCosmosdbGremlinGraph,
 		ReferenceAttributes: []string{
 			"account_name",
 		},
 	}
 }
 
-func NewAzureCosmosdbGremlinGraph(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCosmosdbGremlinGraph(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	account := d.References("account_name")[0]
 
 	return &schema.Resource{

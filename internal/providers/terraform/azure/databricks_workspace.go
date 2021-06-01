@@ -11,11 +11,11 @@ import (
 func GetAzureRMDatabricksWorkspaceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_databricks_workspace",
-		RFunc: NewAzureDatabricksWorkspace,
+		RFunc: NewAzureRMDatabricksWorkspace,
 	}
 }
 
-func NewAzureDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
 	location := d.Get("location").String()
 	sku := strings.Title(d.Get("sku").String())

@@ -7,7 +7,7 @@ import (
 func GetAzureRMCosmosdbMongoCollectionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_cosmosdb_mongo_collection",
-		RFunc: NewAzureCosmosdbMongoCollection,
+		RFunc: NewAzureRMCosmosdbMongoCollection,
 		ReferenceAttributes: []string{
 			"account_name",
 			"database_name",
@@ -15,7 +15,7 @@ func GetAzureRMCosmosdbMongoCollectionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureCosmosdbMongoCollection(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCosmosdbMongoCollection(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	mongoDB := d.References("database_name")[0]
 	account := mongoDB.References("account_name")[0]
 

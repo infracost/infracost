@@ -2,11 +2,19 @@ package azure
 
 import "github.com/infracost/infracost/internal/schema"
 
+// ResourceRegistry grouped alphabetically
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMApiManagementRegistryItem(),
+	GetAzureRMAppIsolatedServicePlanRegistryItem(),
+	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
+	GetAzureRMAppFunctionRegistryItem(),
+	GetAzureRMAppNATGatewayRegistryItem(),
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
+	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
+	GetAzureRMAppServicePlanRegistryItem(),
 	GetAzureRMCDNEndpointRegistryItem(),
+	GetAzureRMContainerRegistryRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
 	GetAzureRMCosmosdbCassandraTableRegistryItem(),
 	GetAzureRMCosmosdbGremlinDatabaseRegistryItem(),
@@ -23,33 +31,26 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMHDInsightInteractiveQueryClusterRegistryItem(),
 	GetAzureRMHDInsightKafkaClusterRegistryItem(),
 	GetAzureRMHDInsightSparkClusterRegistryItem(),
-	GetAzureRMLinuxVirtualMachineRegistryItem(),
-	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
-	GetAzureRMManagedDiskRegistryItem(),
 	GetAzureRMKeyVaultCertificateRegistryItem(),
 	GetAzureRMKeyVaultKeyRegistryItem(),
 	GetAzureRMKeyVaultManagedHSMRegistryItem(),
 	GetAzureRMKubernetesClusterRegistryItem(),
 	GetAzureRMKubernetesClusterNodePoolRegistryItem(),
-	GetAzureMariaDBServerRegistryItem(),
-	GetAzureMSSQLDatabaseRegistryItem(),
-	GetAzureMySQLServerRegistryItem(),
-	GetAzurePostgreSQLServerRegistryItem(),
-	GetAzureStorageAccountRegistryItem(),
+	GetAzureRMLinuxVirtualMachineRegistryItem(),
+	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
+	GetAzureRMManagedDiskRegistryItem(),
+	GetAzureRMMariaDBServerRegistryItem(),
+	GetAzureRMMSSQLDatabaseRegistryItem(),
+	GetAzureRMMySQLServerRegistryItem(),
+	GetAzureRMNotificationHubNamespaceRegistryItem(),
+	GetAzureRMPostgreSQLServerRegistryItem(),
+	GetAzureRMPublicIPRegistryItem(),
+	GetAzureRMPublicIPPrefixRegistryItem(),
+	GetAzureRMStorageAccountRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
-	GetAzureRMAppServicePlanRegistryItem(),
-	GetAzureRMAppIsolatedServicePlanRegistryItem(),
-	GetAzureRMAppFunctionRegistryItem(),
-	GetAzureRMContainerRegistryRegistryItem(),
-	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
-	GetAzureRMPublicIPRegistryItem(),
-	GetAzureRMPublicIPPrefixRegistryItem(),
-	GetAzureRMAppNATGatewayRegistryItem(),
-	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
-	GetAzureRMNotificationHubNamespaceRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -139,6 +140,9 @@ var FreeResources []string = []string{
 	"azurerm_subnet_network_security_group_association",
 	"azurerm_virtual_network",
 
+	// Azure Notification Hub
+	"azurerm_notification_hub",
+
 	// Azure Policy
 	"azurerm_policy_assignment",
 	"azurerm_policy_definition",
@@ -152,9 +156,6 @@ var FreeResources []string = []string{
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
-
-	// Azure Notification Hub
-	"azurerm_notification_hub",
 }
 
 var UsageOnlyResources []string = []string{}

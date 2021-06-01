@@ -11,14 +11,14 @@ import (
 func GetAzureRMKeyVaultCertificateRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_key_vault_certificate",
-		RFunc: NewAzureKeyVaultCertificate,
+		RFunc: NewAzureRMKeyVaultCertificate,
 		ReferenceAttributes: []string{
 			"key_vault_id",
 		},
 	}
 }
 
-func NewAzureKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var location, skuName string
 	keyVault := d.References("key_vault_id")
 	location = keyVault[0].Get("location").String()

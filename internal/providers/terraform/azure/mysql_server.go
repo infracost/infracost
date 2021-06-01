@@ -10,14 +10,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func GetAzureMySQLServerRegistryItem() *schema.RegistryItem {
+func GetAzureRMMySQLServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_mysql_server",
-		RFunc: NewAzureMySQLServer,
+		RFunc: NewAzureRMMySQLServer,
 	}
 }
 
-func NewAzureMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	serviceName := "Azure Database for MySQL"
 	var costComponents []*schema.CostComponent
 

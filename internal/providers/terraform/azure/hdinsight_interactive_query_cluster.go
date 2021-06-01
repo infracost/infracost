@@ -8,11 +8,11 @@ import (
 func GetAzureRMHDInsightInteractiveQueryClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_hdinsight_interactive_query_cluster", //nolint:misspell
-		RFunc: NewAzureHDInsightInteractiveQueryCluster,
+		RFunc: NewAzureRMHDInsightInteractiveQueryCluster,
 	}
 }
 
-func NewAzureHDInsightInteractiveQueryCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMHDInsightInteractiveQueryCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	location := d.Get("location").String()
 	costComponents := []*schema.CostComponent{}
 

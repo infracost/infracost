@@ -7,14 +7,14 @@ import (
 func GetAzureRMCosmosdbSQLDatabaseRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_cosmosdb_sql_database",
-		RFunc: NewAzureCosmosdbSQLDatabase,
+		RFunc: NewAzureRMCosmosdbSQLDatabase,
 		ReferenceAttributes: []string{
 			"account_name",
 		},
 	}
 }
 
-func NewAzureCosmosdbSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCosmosdbSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	account := d.References("account_name")[0]
 
 	return &schema.Resource{
