@@ -142,7 +142,7 @@ var FreeResources []string = []string{
 
 	// Azure Notification Hub
 	"azurerm_notification_hub",
-	
+
 	// Azure Policy
 	"azurerm_policy_assignment",
 	"azurerm_policy_definition",
@@ -156,7 +156,6 @@ var FreeResources []string = []string{
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
-
 }
 
 var UsageOnlyResources []string = []string{}
