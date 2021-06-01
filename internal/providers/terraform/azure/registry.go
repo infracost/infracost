@@ -154,6 +154,9 @@ var FreeResources []string = []string{
 	"azurerm_container_registry_token",
 	"azurerm_container_registry_webhook",
 
+	// Azure SQL
+	"azurerm_sql_server",
+
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
 }

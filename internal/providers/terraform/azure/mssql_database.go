@@ -24,8 +24,13 @@ func GetAzureRMMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
+	region := d.Get("region").String()
 	server := d.References("server_id")
-	region := server[0].Get("location").String()
+	if len(server) > 0 {
+		region = server[0].Get("location").String()
+	} else {
+		log.Warnf("Using %s for resource %s as its 'location' property could not be found.", region, d.Address)
+	}
 
 	serviceName := "SQL Database"
 	var sku string
