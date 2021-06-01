@@ -5,7 +5,7 @@
  ├─ Provisioned throughput (serverless)                     Monthly cost depends on usage: $0.28 per 1M RU             
  ├─ Transactional storage (West US)                         Monthly cost depends on usage: $0.25 per GB                
  ├─ Analytical storage (West US)                            Monthly cost depends on usage: $0.03 per GB                
- ├─ Analytical write operations (West US)                   Monthly cost depends on usage: $0.06 per 10K operations    
+ ├─ Analytical write operations (West US)                   Monthly cost depends on usage: $0.055 per 10K operations   
  ├─ Analytical read operations (West US)                    Monthly cost depends on usage: $0.0054 per 10K operations  
  ├─ Periodic backup (West US)                               Monthly cost depends on usage: $0.15 per GB                
  └─ Restored data                                           Monthly cost depends on usage: $0.15 per GB                
@@ -15,6 +15,7 @@
  ├─ Provisioned throughput (autoscale, Central US)                          45  RU/s x 100                     $262.80 
  ├─ Transactional storage (West US)                                      1,000  GB                             $250.00 
  ├─ Transactional storage (Central US)                                   1,000  GB                             $250.00 
+ ├─ Continuous backup (West US)                                          1,000  GB                             $200.00 
  ├─ Continuous backup (Central US)                                       1,000  GB                             $246.00 
  └─ Restored data                                                        3,000  GB                             $450.00 
                                                                                                                        
@@ -29,7 +30,7 @@
  ├─ Provisioned throughput (autoscale, West US)             Monthly cost depends on usage: $5.84 per RU/s x 100        
  ├─ Transactional storage (West US)                         Monthly cost depends on usage: $0.25 per GB                
  ├─ Analytical storage (West US)                            Monthly cost depends on usage: $0.03 per GB                
- ├─ Analytical write operations (West US)                   Monthly cost depends on usage: $0.06 per 10K operations    
+ ├─ Analytical write operations (West US)                   Monthly cost depends on usage: $0.055 per 10K operations   
  ├─ Analytical read operations (West US)                    Monthly cost depends on usage: $0.0054 per 10K operations  
  ├─ Periodic backup (West US)                               Monthly cost depends on usage: $0.15 per GB                
  └─ Restored data                                           Monthly cost depends on usage: $0.15 per GB                
@@ -39,6 +40,7 @@
  ├─ Provisioned throughput (provisioned, Central US)                      6.25  RU/s x 100                      $36.50 
  ├─ Transactional storage (West US)                                      1,000  GB                             $250.00 
  ├─ Transactional storage (Central US)                                   1,000  GB                             $250.00 
+ ├─ Continuous backup (West US)                                          1,000  GB                             $200.00 
  ├─ Continuous backup (Central US)                                       1,000  GB                             $246.00 
  └─ Restored data                                                        3,000  GB                             $450.00 
                                                                                                                        
@@ -51,7 +53,7 @@
  ├─ Periodic backup (West US)                                            2,000  GB                             $300.00 
  └─ Restored data                                                        3,000  GB                             $450.00 
                                                                                                                        
- PROJECT TOTAL                                                                                               $4,755.73 
+ PROJECT TOTAL                                                                                               $5,155.73 
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
