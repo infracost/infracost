@@ -9,7 +9,7 @@ require (
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/briandowns/spinner v1.12.0
 	github.com/dustin/go-humanize v1.0.0
-	github.com/fatih/color v1.10.0
+	github.com/fatih/color v1.12.0
 	github.com/google/go-cmp v0.5.2 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/hashicorp/hcl2 v0.0.0-20191002203319-fb75b3253c80
