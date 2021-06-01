@@ -23,11 +23,13 @@ func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	location := "Global"
 	group := d.References("resource_group_name")
 
-	if strings.HasPrefix(strings.ToLower(group[0].Get("location").String()), "usgov") {
-		location = "US Gov"
-	}
-	if strings.Contains(strings.ToLower(group[0].Get("location").String()), "china") {
-		location = "Сhina"
+	if len(group) > 0 {
+		if strings.HasPrefix(strings.ToLower(group[0].Get("location").String()), "usgov") {
+			location = "US Gov"
+		}
+		if strings.Contains(strings.ToLower(group[0].Get("location").String()), "china") {
+			location = "Сhina"
+		}
 	}
 
 	if u != nil && u.Get("monthly_data_processed_gb").Type != gjson.Null {
