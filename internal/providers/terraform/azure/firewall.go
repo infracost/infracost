@@ -11,11 +11,11 @@ import (
 func GetAzureRMFirewallRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_firewall",
-		RFunc: NewAzureFirewall,
+		RFunc: NewAzureRMFirewall,
 	}
 }
 
-func NewAzureFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
 	location := d.Get("location").String()
 

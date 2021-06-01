@@ -14,14 +14,14 @@ import (
 func GetAzureRMCDNEndpointRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_cdn_endpoint",
-		RFunc: NewAzureCDNEndpoint,
+		RFunc: NewAzureRMCDNEndpoint,
 		ReferenceAttributes: []string{
 			"profile_name",
 		},
 	}
 }
 
-func NewAzureCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
 
 	profile := d.References("profile_name")[0]
