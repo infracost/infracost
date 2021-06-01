@@ -140,3 +140,30 @@ resource "azurerm_windows_virtual_machine" "standard_a2_ultra_enabled" {
     version   = "latest"
   }
 }
+
+
+resource "azurerm_windows_virtual_machine" "Standard_E16-8as_v4" {
+  name                = "Standard_E16"
+  resource_group_name = "fake_resource_group"
+  location            = "eastus"
+
+  size           = "Standard_E16-8as_v4"
+  admin_username = "fakeuser"
+  admin_password = "fakepass"
+
+  network_interface_ids = [
+    "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "fake"
+    offer     = "fake"
+    sku       = "fake"
+    version   = "fake"
+  }
+}
