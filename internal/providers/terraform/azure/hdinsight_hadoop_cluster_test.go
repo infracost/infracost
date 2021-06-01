@@ -6,11 +6,11 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
 
-func TestAzureRMNotificationHubs(t *testing.T) {
+func TestAzureRMHDInsightHadoopClusterGoldenFile(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "notification_hubs_test")
+	tftest.GoldenFileResourceTests(t, "hdinsight_hadoop_cluster_test") //nolint:misspell
 }

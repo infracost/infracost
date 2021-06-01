@@ -3,7 +3,7 @@
                                                                                                       
  aws_s3_bucket.bucket1                                                                                
  └─ Standard                                                                                          
-    ├─ Storage                                Monthly cost depends on usage: $0.02 per GB             
+    ├─ Storage                                Monthly cost depends on usage: $0.023 per GB            
     ├─ PUT, COPY, POST, LIST requests         Monthly cost depends on usage: $0.005 per 1k requests   
     ├─ GET, SELECT, and all other requests    Monthly cost depends on usage: $0.0004 per 1k requests  
     ├─ Select data scanned                    Monthly cost depends on usage: $0.002 per GB            
@@ -11,7 +11,7 @@
                                                                                                       
  aws_s3_bucket.bucket1_withUsage                                                                      
  └─ Standard                                                                                          
-    ├─ Storage                                Monthly cost depends on usage: $0.02 per GB             
+    ├─ Storage                                Monthly cost depends on usage: $0.023 per GB            
     ├─ PUT, COPY, POST, LIST requests         Monthly cost depends on usage: $0.005 per 1k requests   
     ├─ GET, SELECT, and all other requests    Monthly cost depends on usage: $0.0004 per 1k requests  
     ├─ Select data scanned                    Monthly cost depends on usage: $0.002 per GB            
@@ -19,7 +19,7 @@
                                                                                                       
  aws_s3_bucket.bucket2                                                                                
  └─ Standard                                                                                          
-    ├─ Storage                                Monthly cost depends on usage: $0.02 per GB             
+    ├─ Storage                                Monthly cost depends on usage: $0.023 per GB            
     ├─ PUT, COPY, POST, LIST requests         Monthly cost depends on usage: $0.005 per 1k requests   
     ├─ GET, SELECT, and all other requests    Monthly cost depends on usage: $0.0004 per 1k requests  
     ├─ Select data scanned                    Monthly cost depends on usage: $0.002 per GB            
@@ -27,7 +27,7 @@
                                                                                                       
  aws_s3_bucket.bucket2_withUsage                                                                      
  └─ Standard                                                                                          
-    ├─ Storage                                Monthly cost depends on usage: $0.02 per GB             
+    ├─ Storage                                Monthly cost depends on usage: $0.023 per GB            
     ├─ PUT, COPY, POST, LIST requests         Monthly cost depends on usage: $0.005 per 1k requests   
     ├─ GET, SELECT, and all other requests    Monthly cost depends on usage: $0.0004 per 1k requests  
     ├─ Select data scanned                    Monthly cost depends on usage: $0.002 per GB            

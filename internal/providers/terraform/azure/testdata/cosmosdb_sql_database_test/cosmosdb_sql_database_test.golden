@@ -1,0 +1,48 @@
+
+ Name                                                             Monthly Qty  Unit                      Monthly Cost 
+                                                                                                                      
+ azurerm_cosmosdb_sql_database.autoscale                                                                              
+ ├─ Provisioned throughput (autoscale, West US)                            45  RU/s x 100                     $262.80 
+ ├─ Provisioned throughput (autoscale, Central US)                         45  RU/s x 100                     $262.80 
+ ├─ Transactional storage (West US)                                     1,000  GB                             $250.00 
+ ├─ Transactional storage (Central US)                                  1,000  GB                             $250.00 
+ ├─ Continuous backup (Central US)                                      1,000  GB                             $246.00 
+ └─ Restored data                                                       3,000  GB                             $450.00 
+                                                                                                                      
+ azurerm_cosmosdb_sql_database.mutli-master_backup2copies                                                             
+ ├─ Provisioned throughput (provisioned, West US)                          10  RU/s x 100                     $116.80 
+ ├─ Provisioned throughput (provisioned, Central US)                       10  RU/s x 100                     $116.80 
+ ├─ Transactional storage (West US)                                     1,000  GB                             $250.00 
+ ├─ Transactional storage (Central US)                                  1,000  GB                             $250.00 
+ └─ Restored data                                          Monthly cost depends on usage: $0.15 per GB                
+                                                                                                                      
+ azurerm_cosmosdb_sql_database.non-usage_autoscale                                                                    
+ ├─ Provisioned throughput (autoscale, West US)            Monthly cost depends on usage: $5.84 per RU/s x 100        
+ ├─ Transactional storage (West US)                        Monthly cost depends on usage: $0.25 per GB                
+ ├─ Analytical storage (West US)                           Monthly cost depends on usage: $0.03 per GB                
+ ├─ Analytical write operations (West US)                  Monthly cost depends on usage: $0.06 per 10K operations    
+ ├─ Analytical read operations (West US)                   Monthly cost depends on usage: $0.0054 per 10K operations  
+ ├─ Periodic backup (West US)                              Monthly cost depends on usage: $0.15 per GB                
+ └─ Restored data                                          Monthly cost depends on usage: $0.15 per GB                
+                                                                                                                      
+ azurerm_cosmosdb_sql_database.provisioned                                                                            
+ ├─ Provisioned throughput (provisioned, West US)                           5  RU/s x 100                      $29.20 
+ ├─ Provisioned throughput (provisioned, Central US)                     6.25  RU/s x 100                      $36.50 
+ ├─ Transactional storage (West US)                                     1,000  GB                             $250.00 
+ ├─ Transactional storage (Central US)                                  1,000  GB                             $250.00 
+ ├─ Continuous backup (Central US)                                      1,000  GB                             $246.00 
+ └─ Restored data                                                       3,000  GB                             $450.00 
+                                                                                                                      
+ azurerm_cosmosdb_sql_database.serverless                                                                             
+ ├─ Provisioned throughput (serverless)                                    10  1M RU                            $2.79 
+ ├─ Transactional storage (West US)                                     1,000  GB                             $250.00 
+ ├─ Analytical storage (West US)                                        1,000  GB                              $30.00 
+ ├─ Analytical write operations (West US)                                 100  10K operations                   $5.50 
+ ├─ Analytical read operations (West US)                                  100  10K operations                   $0.54 
+ ├─ Periodic backup (West US)                                           2,000  GB                             $300.00 
+ └─ Restored data                                                       3,000  GB                             $450.00 
+                                                                                                                      
+ PROJECT TOTAL                                                                                              $4,755.73 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

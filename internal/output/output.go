@@ -236,8 +236,23 @@ func (r *Root) unsupportedResourcesMessage(showSkipped bool) string {
 	)
 
 	if showSkipped {
+		type structMap struct {
+			key   string
+			value int
+		}
+		ind := []structMap{}
 		for t, c := range *r.Summary.UnsupportedResourceCounts {
-			msg += fmt.Sprintf("\n%d x %s", c, t)
+			ind = append(ind, structMap{key: t, value: c})
+		}
+		sort.Slice(ind, func(i, j int) bool {
+			if ind[i].value == ind[j].value {
+				return ind[i].key < ind[j].key
+			}
+			return ind[i].value > ind[j].value
+		})
+
+		for _, i := range ind {
+			msg += fmt.Sprintf("\n%d x %s", i.value, i.key)
 		}
 	}
 
