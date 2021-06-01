@@ -19,6 +19,6 @@ func NewAzureRMDNSaaaaRecord(d *schema.ResourceData, u *schema.UsageData) *schem
 
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: DNSqueriesCostComponent(d, u, group),
+		CostComponents: dnsQueriesCostComponent(d, u, group),
 	}
 }

@@ -504,31 +504,31 @@ resource_usage:
     max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
   
   azurerm_dns_a_record.my_a_record:
-    monthly_queries: 10000
+    monthly_queries: 1500000000  # Monthly number of DNS queries
   
   azurerm_dns_aaaa_record.my_aaaa_record:
-    monthly_queries: 10000
+    monthly_queries: 1500000000  # Monthly number of DNS queries
   
   azurerm_dns_caa_record.my_caa_record:
-    monthly_queries: 10000
+    monthly_queries: 1500000000  # Monthly number of DNS queries
 
   azurerm_dns_cname_record.my_cname_record:
-    monthly_queries: 10000
+    monthly_queries: 1500000000  # Monthly number of DNS queries
 
   azurerm_dns_mx_record.my_mx_record:
-    monthly_queries: 10000
+    monthly_queries: 1500000000  # Monthly number of DNS queries
 
   azurerm_dns_ns_record.my_ns_record:
-    monthly_queries: 10000
+    monthly_queries: 1500000000  # Monthly number of DNS queries
 
   azurerm_dns_ptr_record.my_ptr_record:
-    monthly_queries: 10000
+    monthly_queries: 1500000000  # Monthly number of DNS queries
 
   azurerm_dns_srv_record.my_srv_record:
-    monthly_queries: 10000
+    monthly_queries: 1500000000  # Monthly number of DNS queries
     
   azurerm_dns_txt_record.my_txt_record:
-    monthly_queries: 10000
+    monthly_queries: 11500000000  # Monthly number of DNS queries
 
   azurerm_kubernetes_cluster.my_cluster:
     default_node_pool:
@@ -584,6 +584,27 @@ resource_usage:
 
   azurerm_postgresql_server.my_server:
     additional_backup_storage_gb: 3000 # Additional consumption of backup storage in GB.
+
+  azurerm_private_dns_a_record.my_a_record:
+    monthly_queries: 1500000000  # Monthly number of DNS queries
+  
+  azurerm_private_dns_aaaa_record.my_aaaa_record:
+    monthly_queries: 1500000000  # Monthly number of DNS queries
+  
+  azurerm_private_dns_cname_record.my_cname_record:
+    monthly_queries: 1500000000  # Monthly number of DNS queries
+
+  azurerm_private_dns_mx_record.my_mx_record:
+    monthly_queries: 1500000000  # Monthly number of DNS queries
+
+  azurerm_private_dns_ptr_record.my_ptr_record:
+    monthly_queries: 1500000000  # Monthly number of DNS queries
+
+  azurerm_private_dns_srv_record.my_srv_record:
+    monthly_queries: 1500000000  # Monthly number of DNS queries
+    
+  azurerm_private_dns_txt_record.my_txt_record:
+    monthly_queries: 1500000000  # Monthly number of DNS queries
 
   azurerm_storage_account.my_account:
     data_at_rest_storage_gb: 10000

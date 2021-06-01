@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 func GetAzureRMDNSPrivateZoneRegistryItem() *schema.RegistryItem {
@@ -36,30 +35,9 @@ func NewAzureRMDNSPrivateZone(d *schema.ResourceData, u *schema.UsageData) *sche
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, HostedPrivateZoneCostComponent(location))
+	costComponents = append(costComponents, hostedPublicZoneCostComponent(location))
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
-	}
-}
-func HostedPrivateZoneCostComponent(location string) *schema.CostComponent {
-	return &schema.CostComponent{
-		Name:            "Hosted zone",
-		Unit:            "months",
-		UnitMultiplier:  1,
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
-			Service:       strPtr("Azure DNS"),
-			ProductFamily: strPtr("Networking"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Public Zones")},
-			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption:   strPtr("Consumption"),
-			StartUsageAmount: strPtr("25"),
-		},
 	}
 }

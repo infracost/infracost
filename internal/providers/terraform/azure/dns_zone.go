@@ -14,6 +14,7 @@ func GetAzureRMDNSZoneRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
+		Notes: []string{"Most expensive price tier is used."},
 	}
 }
 
@@ -36,13 +37,13 @@ func NewAzureRMDNSZone(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, HostedPublicZoneCostComponent(location))
+	costComponents = append(costComponents, hostedPublicZoneCostComponent(location))
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
 }
-func HostedPublicZoneCostComponent(location string) *schema.CostComponent {
+func hostedPublicZoneCostComponent(location string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Hosted zone",
 		Unit:            "months",
@@ -59,7 +60,7 @@ func HostedPublicZoneCostComponent(location string) *schema.CostComponent {
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption:   strPtr("Consumption"),
-			StartUsageAmount: strPtr("25"),
+			StartUsageAmount: strPtr("0"),
 		},
 	}
 }

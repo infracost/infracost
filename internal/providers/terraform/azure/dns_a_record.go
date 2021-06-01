@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
-	"github.com/tidwall/gjson"
 )
 
 func GetAzureRMDNSaRecordRegistryItem() *schema.RegistryItem {
@@ -23,55 +23,14 @@ func NewAzureRMDNSaRecord(d *schema.ResourceData, u *schema.UsageData) *schema.R
 
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: DNSqueriesCostComponent(d, u, group),
+		CostComponents: dnsQueriesCostComponent(d, u, group),
 	}
 }
-func DNSqueriesFirstCostComponent(location string, monthlyQueries *decimal.Decimal) *schema.CostComponent {
-	return &schema.CostComponent{
-		Name:            "DNS queries (first 1B)",
-		Unit:            "1M queries",
-		UnitMultiplier:  1,
-		MonthlyQuantity: monthlyQueries,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
-			Service:       strPtr("Azure DNS"),
-			ProductFamily: strPtr("Networking"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Public Queries")},
-			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption:   strPtr("Consumption"),
-			StartUsageAmount: strPtr("0"),
-		},
-	}
-}
-func DNSqueriesOverCostComponent(location string, monthlyQueries *decimal.Decimal) *schema.CostComponent {
-	return &schema.CostComponent{
-		Name:            "DNS queries (over 1B)",
-		Unit:            "1M queries",
-		UnitMultiplier:  1,
-		MonthlyQuantity: monthlyQueries,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
-			Service:       strPtr("Azure DNS"),
-			ProductFamily: strPtr("Networking"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Public Queries")},
-			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption:   strPtr("Consumption"),
-			StartUsageAmount: strPtr("1000"),
-		},
-	}
-}
-
-func DNSqueriesCostComponent(d *schema.ResourceData, u *schema.UsageData, group *schema.ResourceData) []*schema.CostComponent {
-	var monthlyQueries, firstOneBQueries *decimal.Decimal
+func dnsQueriesCostComponent(d *schema.ResourceData, u *schema.UsageData, group *schema.ResourceData) []*schema.CostComponent {
+	var monthlyQueries *decimal.Decimal
+	var requestQuantities []decimal.Decimal
 	costComponents := make([]*schema.CostComponent, 0)
+	requests := []int{1000000000}
 
 	location := group.Get("location").String()
 
@@ -88,17 +47,43 @@ func DNSqueriesCostComponent(d *schema.ResourceData, u *schema.UsageData, group 
 		location = "Zone 1"
 	}
 
-	if u != nil && u.Get("monthly_queries").Type != gjson.Null {
-		firstOneBQueries = decimalPtr(decimal.NewFromInt(1000))
+	if u != nil && u.Get("monthly_queries").Exists() {
 		monthlyQueries = decimalPtr(decimal.NewFromInt(u.Get("monthly_queries").Int()))
+		requestQuantities = usage.CalculateTierBuckets(*monthlyQueries, requests)
+		firstBqueries := requestQuantities[0].Div(decimal.NewFromInt(1000000))
+		overBqueries := requestQuantities[1].Div(decimal.NewFromInt(1000000))
+		costComponents = append(costComponents, dnsQueriesFirstCostComponent(location, "DNS queries (first 1B)", "0", &firstBqueries))
 
-		if monthlyQueries.GreaterThan(*firstOneBQueries) {
-			overOneBQueries := decimalPtr(decimal.NewFromInt(u.Get("monthly_queries").Int())).Sub(*firstOneBQueries)
-			monthlyQueries = &overOneBQueries
-			costComponents = append(costComponents, DNSqueriesOverCostComponent(location, monthlyQueries))
+		if requestQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
+			costComponents = append(costComponents, dnsQueriesFirstCostComponent(location, "DNS queries (over 1B)", "1000", &overBqueries))
 		}
+	} else {
+		var unknown *decimal.Decimal
+
+		costComponents = append(costComponents, dnsQueriesFirstCostComponent(location, "DNS queries (first 1B)", "0", unknown))
 	}
 
-	costComponents = append(costComponents, DNSqueriesFirstCostComponent(location, firstOneBQueries))
 	return costComponents
+}
+
+func dnsQueriesFirstCostComponent(location, name, startUsage string, monthlyQueries *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "1M queries",
+		UnitMultiplier:  1,
+		MonthlyQuantity: monthlyQueries,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(location),
+			Service:       strPtr("Azure DNS"),
+			ProductFamily: strPtr("Networking"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "meterName", Value: strPtr("Public Queries")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption:   strPtr("Consumption"),
+			StartUsageAmount: &startUsage,
+		},
+	}
 }
