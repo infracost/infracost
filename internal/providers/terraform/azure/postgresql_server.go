@@ -10,7 +10,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func GetAzurePostgreSQLServerRegistryItem() *schema.RegistryItem {
+func GetAzureRMPostgreSQLServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_postgresql_server",
 		RFunc: NewAzurePostrgreSQLServer,

@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func GetAzureMariaDBServerRegistryItem() *schema.RegistryItem {
+func GetAzureRMMariaDBServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_mariadb_server",
 		RFunc: NewAzureMariaDBServer,

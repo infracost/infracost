@@ -10,7 +10,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func GetAzureMySQLServerRegistryItem() *schema.RegistryItem {
+func GetAzureRMMySQLServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_mysql_server",
 		RFunc: NewAzureMySQLServer,

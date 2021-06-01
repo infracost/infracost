@@ -12,7 +12,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetAzureMSSQLDatabaseRegistryItem() *schema.RegistryItem {
+func GetAzureRMMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_mssql_database",
 		RFunc: NewAzureMSSQLDatabase,

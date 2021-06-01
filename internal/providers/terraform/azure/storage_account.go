@@ -10,7 +10,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetAzureStorageAccountRegistryItem() *schema.RegistryItem {
+func GetAzureRMStorageAccountRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_storage_account",
 		RFunc: NewAzureStorageAccount,
