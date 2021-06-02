@@ -16,7 +16,8 @@ func GetAzureRMHDInsightKafkaClusterRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMHDInsightKafkaCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	location := d.Get("location").String()
+	region := lookupRegion(d, []string{})
+
 	costComponents := []*schema.CostComponent{}
 
 	tier := d.Get("tier").String()
@@ -35,9 +36,9 @@ func NewAzureRMHDInsightKafkaCluster(d *schema.ResourceData, u *schema.UsageData
 
 	numberOfDisks := d.Get("roles.0.worker_node.0.number_of_disks_per_node").Int()
 
-	costComponents = append(costComponents, hdInsightVMCostComponent(location, "Head", headNodeVM, 2))
-	costComponents = append(costComponents, hdInsightVMCostComponent(location, "Worker", workerNodeVM, workerInstances))
-	costComponents = append(costComponents, hdInsightVMCostComponent(location, "Zookeeper", zookeeperNodeVM, 3))
+	costComponents = append(costComponents, hdInsightVMCostComponent(region, "Head", headNodeVM, 2))
+	costComponents = append(costComponents, hdInsightVMCostComponent(region, "Worker", workerNodeVM, workerInstances))
+	costComponents = append(costComponents, hdInsightVMCostComponent(region, "Zookeeper", zookeeperNodeVM, 3))
 
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Managed OS disks",
@@ -46,7 +47,7 @@ func NewAzureRMHDInsightKafkaCluster(d *schema.ResourceData, u *schema.UsageData
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(workerInstances * numberOfDisks)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("HDInsight"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -73,7 +74,7 @@ func NewAzureRMHDInsightKafkaCluster(d *schema.ResourceData, u *schema.UsageData
 		MonthlyQuantity: diskOperations,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("HDInsight"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{

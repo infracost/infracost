@@ -14,10 +14,11 @@ func GetAzureRMVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	costComponents := []*schema.CostComponent{}
 	subResources := []*schema.Resource{}
 
-	location := d.Get("location").String()
 	instanceType := d.Get("sku.0.name").String()
 	capacity := decimal.NewFromInt(d.Get("sku.0.capacity").Int())
 
@@ -41,7 +42,7 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 	}
 
 	if os == "Linux" {
-		costComponents = append(costComponents, linuxVirtualMachineCostComponent(location, instanceType))
+		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType))
 	}
 
 	if os == "Windows" {
@@ -49,7 +50,7 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 		if d.Get("license_type").Type != gjson.Null {
 			licenseType = d.Get("license_type").String()
 		}
-		costComponents = append(costComponents, windowsVirtualMachineCostComponent(location, instanceType, licenseType))
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType))
 	}
 
 	r := &schema.Resource{
@@ -65,7 +66,7 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 	if u != nil && u.Get("storage_profile_os_disk.monthly_disk_operations").Type != gjson.Null {
 		storageOperations = decimalPtr(decimal.NewFromInt(u.Get("storage_profile_os_disk.monthly_disk_operations").Int()))
 	}
-	r.SubResources = append(r.SubResources, legacyOSDiskSubResource(location, diskData, storageOperations))
+	r.SubResources = append(r.SubResources, legacyOSDiskSubResource(region, diskData, storageOperations))
 
 	if u != nil && u.Get("storage_profile_data_disk.monthly_disk_operations").Type != gjson.Null {
 		storageOperations = decimalPtr(decimal.NewFromInt(u.Get("storage_profile_data_disk.monthly_disk_operations").Int()))
@@ -82,7 +83,7 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 
 				r.SubResources = append(r.SubResources, &schema.Resource{
 					Name:           "storage_data_disk",
-					CostComponents: managedDiskCostComponents(location, diskType, s, storageOperations),
+					CostComponents: managedDiskCostComponents(region, diskType, s, storageOperations),
 				})
 			}
 		}

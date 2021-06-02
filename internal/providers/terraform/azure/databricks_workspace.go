@@ -16,8 +16,10 @@ func GetAzureRMDatabricksWorkspaceRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	var costComponents []*schema.CostComponent
-	location := d.Get("location").String()
+
 	sku := strings.Title(d.Get("sku").String())
 
 	if sku == "Trial" {
@@ -34,7 +36,7 @@ func NewAzureRMDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) 
 	}
 	costComponents = append(costComponents, databricksCostComponent(
 		"All-purpose compute DBUs",
-		location,
+		region,
 		fmt.Sprintf("%s All-purpose Compute", sku),
 		allPurpose,
 	))
@@ -44,7 +46,7 @@ func NewAzureRMDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) 
 	}
 	costComponents = append(costComponents, databricksCostComponent(
 		"Jobs compute DBUs",
-		location,
+		region,
 		fmt.Sprintf("%s Jobs Compute", sku),
 		jobs,
 	))
@@ -54,7 +56,7 @@ func NewAzureRMDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) 
 	}
 	costComponents = append(costComponents, databricksCostComponent(
 		"Jobs light compute DBUs",
-		location,
+		region,
 		fmt.Sprintf("%s Jobs Light Compute", sku),
 		jobsLight,
 	))
@@ -65,7 +67,7 @@ func NewAzureRMDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) 
 	}
 }
 
-func databricksCostComponent(name, location, skuName string, quantity *decimal.Decimal) *schema.CostComponent {
+func databricksCostComponent(name, region, skuName string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "DBU-hours",
@@ -73,7 +75,7 @@ func databricksCostComponent(name, location, skuName string, quantity *decimal.D
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Azure Databricks"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{

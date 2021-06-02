@@ -16,8 +16,9 @@ func GetAzureRMVirtualMachineRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	costComponents := []*schema.CostComponent{}
-	location := d.Get("location").String()
 	instanceType := d.Get("vm_size").String()
 
 	os := "Linux"
@@ -32,12 +33,12 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 
 	if os == "Windows" {
 		licenseType := d.Get("license_type").String()
-		costComponents = append(costComponents, windowsVirtualMachineCostComponent(location, instanceType, licenseType))
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType))
 	} else {
-		costComponents = append(costComponents, linuxVirtualMachineCostComponent(location, instanceType))
+		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType))
 	}
 
-	costComponents = append(costComponents, ultraSSDReservationCostComponent(location))
+	costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
 
 	var storageOperations *decimal.Decimal
 	if u != nil && u.Get("storage_os_disk.monthly_disk_operations").Type != gjson.Null {
@@ -46,7 +47,7 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 
 	subResources := []*schema.Resource{}
 	diskData := d.Get("storage_os_disk").Array()[0]
-	subResources = append(subResources, legacyOSDiskSubResource(location, diskData, storageOperations))
+	subResources = append(subResources, legacyOSDiskSubResource(region, diskData, storageOperations))
 
 	storages := d.Get("storage_data_disk").Array()
 	if u != nil && u.Get("storage_data_disk.monthly_disk_operations").Type != gjson.Null {
@@ -58,7 +59,7 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 
 			subResources = append(subResources, &schema.Resource{
 				Name:           "storage_data_disk",
-				CostComponents: managedDiskCostComponents(location, diskType, s, storageOperations),
+				CostComponents: managedDiskCostComponents(region, diskType, s, storageOperations),
 			})
 		}
 	}

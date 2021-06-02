@@ -16,9 +16,10 @@ func GetAzureRMAppServiceCertificateOrderRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAppServiceCertificateOrder(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	location := "Global"
-	if strings.HasPrefix(location, "usgov") {
-		location = "US Gov"
+	region := "Global"
+	// There's no China pricing for this resource yet
+	if strings.HasPrefix(region, "usgov") {
+		region = "US Gov"
 	}
 
 	productType := "Standard"
@@ -35,7 +36,7 @@ func NewAzureRMAppServiceCertificateOrder(d *schema.ResourceData, u *schema.Usag
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1).Div(decimal.NewFromInt(12))),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
-				Region:        strPtr(location),
+				Region:        strPtr(region),
 				Service:       strPtr("Azure App Service"),
 				ProductFamily: strPtr("Compute"),
 				AttributeFilters: []*schema.AttributeFilter{

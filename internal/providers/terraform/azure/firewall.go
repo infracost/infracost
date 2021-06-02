@@ -16,8 +16,9 @@ func GetAzureRMFirewallRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	var costComponents []*schema.CostComponent
-	location := d.Get("location").String()
 
 	skuTier := "Standard"
 	if d.Get("sku_tier").Type != gjson.Null {
@@ -42,7 +43,7 @@ func NewAzureRMFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Azure Firewall"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -67,7 +68,7 @@ func NewAzureRMFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		MonthlyQuantity: dataProcessed,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Azure Firewall"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{

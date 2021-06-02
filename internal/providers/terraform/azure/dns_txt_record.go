@@ -15,10 +15,8 @@ func GetAzureRMDNStxtRecordRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMDNStxtRecord(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	group := d.References("resource_group_name")[0]
-
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: dnsQueriesCostComponent(d, u, group),
+		CostComponents: dnsQueriesCostComponent(d, u),
 	}
 }

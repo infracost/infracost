@@ -17,10 +17,11 @@ func GetAzureRMMariaDBServerRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	var costComponents []*schema.CostComponent
 	serviceName := "Azure Database for MariaDB"
 
-	region := d.Get("location").String()
 	sku := d.Get("sku_name").String()
 	var tier, family, cores string
 	if s := strings.Split(sku, "_"); len(s) == 3 {

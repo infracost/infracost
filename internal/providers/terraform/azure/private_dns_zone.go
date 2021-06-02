@@ -18,25 +18,24 @@ func GetAzureRMDNSPrivateZoneRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMDNSPrivateZone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	group := d.References("resource_group_name")
-	location := group[0].Get("location").String()
+	region := lookupRegion(d, []string{})
 
-	if strings.HasPrefix(strings.ToLower(location), "usgov") {
-		location = "US Gov Zone 1"
+	if strings.HasPrefix(strings.ToLower(region), "usgov") {
+		region = "US Gov Zone 1"
 	}
-	if strings.HasPrefix(strings.ToLower(location), "germany") {
-		location = "DE Zone 1"
+	if strings.HasPrefix(strings.ToLower(region), "germany") {
+		region = "DE Zone 1"
 	}
-	if strings.HasPrefix(strings.ToLower(location), "china") {
-		location = "Zone 1 (China)"
+	if strings.HasPrefix(strings.ToLower(region), "china") {
+		region = "Zone 1 (China)"
 	}
-	if location != "US Gov Zone 1" && location != "DE Zone 1" && location != "Zone 1 (China)" {
-		location = "Zone 1"
+	if region != "US Gov Zone 1" && region != "DE Zone 1" && region != "Zone 1 (China)" {
+		region = "Zone 1"
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, hostedPublicZoneCostComponent(location))
+	costComponents = append(costComponents, hostedPublicZoneCostComponent(region))
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,

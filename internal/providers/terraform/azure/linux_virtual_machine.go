@@ -21,7 +21,8 @@ func GetAzureRMLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("location").String()
+	region := lookupRegion(d, []string{})
+
 	instanceType := d.Get("size").String()
 
 	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(region, instanceType)}

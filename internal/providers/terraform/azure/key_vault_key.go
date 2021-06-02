@@ -21,17 +21,17 @@ func GetAzureRMKeyVaultKeyRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
+	region := lookupRegion(d, []string{"key_vault_id"})
 
 	var skuName, keyType, keySize, meterName string
 	keyVault := d.References("key_vault_id")
 	if len(keyVault) > 0 {
-		region = keyVault[0].Get("location").String()
+		skuName = strings.Title(keyVault[0].Get("sku_name").String())
 	} else {
-		log.Warnf("Using %s for resource %s as its 'location' property could not be found.", region, d.Address)
+		log.Warnf("Skipping resource %s. Could not find its 'sku_name' property on key_vault_id.", d.Address)
+		return nil
 	}
 
-	skuName = strings.Title(keyVault[0].Get("sku_name").String())
 	keyType = d.Get("key_type").String()
 
 	if d.Get("key_size").Type != gjson.Null {

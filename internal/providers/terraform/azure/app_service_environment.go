@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	"github.com/shopspring/decimal"
@@ -22,17 +21,11 @@ func GetAzureRMAppIsolatedServicePlanRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAppIsolatedServicePlan(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
+	region := lookupRegion(d, []string{})
+
 	tier := "I1"
 	if d.Get("pricing_tier").Type != gjson.Null {
 		tier = d.Get("pricing_tier").String()
-	}
-
-	group := d.References("resource_group_name")
-	if len(group) > 0 {
-		region = group[0].Get("location").String()
-	} else {
-		log.Warnf("Using %s for resource %s as its 'location' property could not be found.", region, d.Address)
 	}
 
 	stampFeeTiers := []string{"I1", "I2", "I3"}

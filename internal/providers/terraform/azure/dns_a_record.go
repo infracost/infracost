@@ -19,32 +19,30 @@ func GetAzureRMDNSaRecordRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMDNSaRecord(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	group := d.References("resource_group_name")[0]
-
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: dnsQueriesCostComponent(d, u, group),
+		CostComponents: dnsQueriesCostComponent(d, u),
 	}
 }
-func dnsQueriesCostComponent(d *schema.ResourceData, u *schema.UsageData, group *schema.ResourceData) []*schema.CostComponent {
+func dnsQueriesCostComponent(d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
+	region := lookupRegion(d, []string{})
+
 	var monthlyQueries *decimal.Decimal
 	var requestQuantities []decimal.Decimal
 	costComponents := make([]*schema.CostComponent, 0)
 	requests := []int{1000000000}
 
-	location := group.Get("location").String()
-
-	if strings.HasPrefix(strings.ToLower(location), "usgov") {
-		location = "US Gov Zone 1"
+	if strings.HasPrefix(strings.ToLower(region), "usgov") {
+		region = "US Gov Zone 1"
 	}
-	if strings.HasPrefix(strings.ToLower(location), "germany") {
-		location = "DE Zone 1"
+	if strings.HasPrefix(strings.ToLower(region), "germany") {
+		region = "DE Zone 1"
 	}
-	if strings.HasPrefix(strings.ToLower(location), "china") {
-		location = "Zone 1 (China)"
+	if strings.HasPrefix(strings.ToLower(region), "china") {
+		region = "Zone 1 (China)"
 	}
-	if location != "US Gov Zone 1" && location != "DE Zone 1" && location != "Zone 1 (China)" {
-		location = "Zone 1"
+	if region != "US Gov Zone 1" && region != "DE Zone 1" && region != "Zone 1 (China)" {
+		region = "Zone 1"
 	}
 
 	if u != nil && u.Get("monthly_queries").Exists() {
@@ -52,21 +50,21 @@ func dnsQueriesCostComponent(d *schema.ResourceData, u *schema.UsageData, group 
 		requestQuantities = usage.CalculateTierBuckets(*monthlyQueries, requests)
 		firstBqueries := requestQuantities[0].Div(decimal.NewFromInt(1000000))
 		overBqueries := requestQuantities[1].Div(decimal.NewFromInt(1000000))
-		costComponents = append(costComponents, dnsQueriesFirstCostComponent(location, "DNS queries (first 1B)", "0", &firstBqueries))
+		costComponents = append(costComponents, dnsQueriesFirstCostComponent(region, "DNS queries (first 1B)", "0", &firstBqueries))
 
 		if requestQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, dnsQueriesFirstCostComponent(location, "DNS queries (over 1B)", "1000", &overBqueries))
+			costComponents = append(costComponents, dnsQueriesFirstCostComponent(region, "DNS queries (over 1B)", "1000", &overBqueries))
 		}
 	} else {
 		var unknown *decimal.Decimal
 
-		costComponents = append(costComponents, dnsQueriesFirstCostComponent(location, "DNS queries (first 1B)", "0", unknown))
+		costComponents = append(costComponents, dnsQueriesFirstCostComponent(region, "DNS queries (first 1B)", "0", unknown))
 	}
 
 	return costComponents
 }
 
-func dnsQueriesFirstCostComponent(location, name, startUsage string, monthlyQueries *decimal.Decimal) *schema.CostComponent {
+func dnsQueriesFirstCostComponent(region, name, startUsage string, monthlyQueries *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "1M queries",
@@ -74,7 +72,7 @@ func dnsQueriesFirstCostComponent(location, name, startUsage string, monthlyQuer
 		MonthlyQuantity: monthlyQueries,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Azure DNS"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
