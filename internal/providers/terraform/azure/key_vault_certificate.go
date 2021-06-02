@@ -28,7 +28,7 @@ func NewAzureRMKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) 
 	if len(keyVault) > 0 {
 		skuName = strings.Title(keyVault[0].Get("sku_name").String())
 	} else {
-		log.Warnf("Skipping resource %s. Could not find its 'sku_name' property on key_vault_id.", d.Address)
+		log.Warnf("Skipping resource %s. Could not find its 'key_vault_id.sku_name' property.", d.Address)
 		return nil
 	}
 
