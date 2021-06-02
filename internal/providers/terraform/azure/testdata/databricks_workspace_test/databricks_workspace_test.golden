@@ -16,7 +16,6 @@
  ├─ Jobs compute DBUs                               2,000  DBU-hours                  $300.00 
  └─ Jobs light compute DBUs                         4,000  DBU-hours                  $280.00 
                                                                                               
- PROJECT TOTAL                                                                      $1,995.00 
-
+ OVERALL TOTAL                                                                      $1,995.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

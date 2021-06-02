@@ -7,7 +7,6 @@
  google_logging_project_sink.basic_withUsage                                              
  └─ Logging data                                        100  GB                    $50.00 
                                                                                           
- PROJECT TOTAL                                                                     $50.00 
-
+ OVERALL TOTAL                                                                     $50.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

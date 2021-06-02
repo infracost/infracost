@@ -11,7 +11,6 @@
  ├─ Retained acknowledged message storage              20  GiB                      $5.40 
  └─ Snapshot message backlog storage                   30  GiB                      $8.10 
                                                                                           
- PROJECT TOTAL                                                                    $413.50 
-
+ OVERALL TOTAL                                                                    $413.50 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

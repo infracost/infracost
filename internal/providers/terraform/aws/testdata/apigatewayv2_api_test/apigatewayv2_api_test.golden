@@ -17,7 +17,6 @@
  ├─ Messages (over 1B)                              500  1M messages                $400.00 
  └─ Connection duration                              10  1M minutes                   $2.50 
                                                                                             
- PROJECT TOTAL                                                                    $2,332.50 
-
+ OVERALL TOTAL                                                                    $2,332.50 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

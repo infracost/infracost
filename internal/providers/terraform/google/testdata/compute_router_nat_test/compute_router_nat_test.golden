@@ -13,7 +13,6 @@
  ├─ Assigned VMs (first 32)                     23,360  VM-hours                $32.70 
  └─ Data processed                               1,000  GB                      $45.00 
                                                                                        
- PROJECT TOTAL                                                                 $126.79 
-
+ OVERALL TOTAL                                                                 $126.79 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

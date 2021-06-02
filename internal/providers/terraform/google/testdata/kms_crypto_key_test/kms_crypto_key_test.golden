@@ -14,7 +14,6 @@
  ├─ Key versions                                          25.92  months                         $1.56 
  └─ Operations                                                1  10k operations                 $0.03 
                                                                                                       
- PROJECT TOTAL                                                                              $8,001.74 
-
+ OVERALL TOTAL                                                                              $8,001.74 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

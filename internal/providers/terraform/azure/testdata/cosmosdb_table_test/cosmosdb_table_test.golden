@@ -44,7 +44,6 @@
  ├─ Periodic backup (West US)                                      2,000  GB                             $300.00 
  └─ Restored data                                                  3,000  GB                             $450.00 
                                                                                                                  
- PROJECT TOTAL                                                                                         $5,155.73 
-
+ OVERALL TOTAL                                                                                         $5,155.73 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

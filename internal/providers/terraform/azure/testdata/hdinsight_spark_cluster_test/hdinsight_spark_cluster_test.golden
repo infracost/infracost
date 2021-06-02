@@ -6,8 +6,7 @@
  ├─ Worker node (G2)                            2,190  hours     $3,232.44 
  └─ Zookeeper node (G2)                         2,190  hours     $3,232.44 
                                                                            
- PROJECT TOTAL                                                   $8,619.84 
-
+ OVERALL TOTAL                                                   $8,619.84 
 ----------------------------------
 2 resource types weren't estimated as they're not supported yet.
 Please watch/star https://github.com/infracost/infracost as new resources are added regularly.

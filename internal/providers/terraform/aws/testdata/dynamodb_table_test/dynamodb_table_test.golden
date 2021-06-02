@@ -27,7 +27,6 @@
  └─ Global table (us-west-1)                                                                           
     └─ Replicated write request unit (rWRU)             4,109.5890  rWRU                         $6.27 
                                                                                                        
- PROJECT TOTAL                                                                                 $658.50 
-
+ OVERALL TOTAL                                                                                 $658.50 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

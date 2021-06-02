@@ -17,7 +17,6 @@
  ├─ Endpoint (Interface)                         1,460  hours                   $14.60 
  └─ Data processed                      Monthly cost depends on usage: $0.01 per GB    
                                                                                        
- PROJECT TOTAL                                                                  $46.50 
-
+ OVERALL TOTAL                                                                  $46.50 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
