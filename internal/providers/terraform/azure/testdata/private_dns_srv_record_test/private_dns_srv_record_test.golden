@@ -1,0 +1,20 @@
+
+ Name                                              Monthly Qty  Unit                  Monthly Cost 
+                                                                                                   
+ azurerm_private_dns_srv_record.first1B                                                            
+ └─ DNS queries (first 1B)                               1,000  1M queries                 $400.00 
+                                                                                                   
+ azurerm_private_dns_srv_record.over1B                                                             
+ ├─ DNS queries (first 1B)                               1,000  1M queries                 $400.00 
+ └─ DNS queries (over 1B)                                  500  1M queries                 $100.00 
+                                                                                                   
+ azurerm_private_dns_srv_record.withoutUsage                                                       
+ └─ DNS queries (first 1B)                    Monthly cost depends on usage: $0.40 per 1M queries  
+                                                                                                   
+ azurerm_private_dns_zone.test                                                                     
+ └─ Hosted zone                                              1  months                       $0.50 
+                                                                                                   
+ PROJECT TOTAL                                                                             $900.50 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
