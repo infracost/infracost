@@ -43,7 +43,7 @@ func NewAzureRMDNSZone(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		CostComponents: costComponents,
 	}
 }
-func hostedPublicZoneCostComponent(location string) *schema.CostComponent {
+func hostedPublicZoneCostComponent(region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Hosted zone",
 		Unit:            "months",
@@ -51,7 +51,7 @@ func hostedPublicZoneCostComponent(location string) *schema.CostComponent {
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Azure DNS"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{

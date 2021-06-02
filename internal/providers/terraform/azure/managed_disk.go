@@ -80,7 +80,7 @@ func GetAzureRMManagedDiskRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMManagedDisk(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("location").String()
+	region := lookupRegion(d, []string{})
 	diskType := d.Get("storage_account_type").String()
 
 	var monthlyDiskOperations *decimal.Decimal

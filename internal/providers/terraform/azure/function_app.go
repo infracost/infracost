@@ -21,8 +21,7 @@ func GetAzureRMAppFunctionRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAppFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	// No need to get the default region as location is required
-	region := d.Get("location").String()
+	region := lookupRegion(d, []string{})
 
 	var memorySize, executionTime, executions, gbSeconds *decimal.Decimal
 	var skuCPU *int64

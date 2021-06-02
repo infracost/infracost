@@ -19,7 +19,8 @@ func GetAzureRMWindowsVirtualMachineRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("location").String()
+	region := lookupRegion(d, []string{})
+
 	instanceType := d.Get("size").String()
 	licenseType := d.Get("license_type").String()
 

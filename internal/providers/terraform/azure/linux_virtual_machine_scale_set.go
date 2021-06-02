@@ -14,7 +14,8 @@ func GetAzureRMLinuxVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("location").String()
+	region := lookupRegion(d, []string{})
+
 	instanceType := d.Get("sku").String()
 
 	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(region, instanceType)}

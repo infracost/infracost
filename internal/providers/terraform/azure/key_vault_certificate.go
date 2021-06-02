@@ -19,18 +19,18 @@ func GetAzureRMKeyVaultCertificateRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
+	region := lookupRegion(d, []string{"key_vault_id"})
+
+	var costComponents []*schema.CostComponent
 
 	var skuName string
 	keyVault := d.References("key_vault_id")
 	if len(keyVault) > 0 {
-		region = keyVault[0].Get("location").String()
+		skuName = strings.Title(keyVault[0].Get("sku_name").String())
 	} else {
-		log.Warnf("Using %s for resource %s as its 'location' property could not be found.", region, d.Address)
+		log.Warnf("Skipping resource %s. Could not find its 'sku_name' property on key_vault_id.", d.Address)
+		return nil
 	}
-
-	var costComponents []*schema.CostComponent
-	skuName = strings.Title(keyVault[0].Get("sku_name").String())
 
 	var certificateRenewals, certificateOperations *decimal.Decimal
 	if u != nil && u.Get("monthly_certificate_renewal_requests").Exists() {

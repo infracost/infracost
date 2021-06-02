@@ -36,9 +36,10 @@ func NewAzureRMCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.Usage
 }
 
 func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account *schema.ResourceData) []*schema.CostComponent {
+	region := lookupRegion(d, []string{})
+
 	costComponents := []*schema.CostComponent{}
 
-	mainLocation := account.Get("location").String()
 	geoLocations := account.Get("geo_location").Array()
 
 	model := Provisioned
@@ -77,7 +78,7 @@ func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account
 	if account.Get("backup.0.type").Type != gjson.Null {
 		backupType = account.Get("backup.0.type").String()
 	}
-	costComponents = append(costComponents, backupStorageCosmosCostComponents(account, u, geoLocations, backupType, mainLocation)...)
+	costComponents = append(costComponents, backupStorageCosmosCostComponents(account, u, geoLocations, backupType, region)...)
 
 	return costComponents
 }
@@ -242,7 +243,7 @@ func storageCosmosCostComponents(account *schema.ResourceData, u *schema.UsageDa
 	return costComponents
 }
 
-func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.UsageData, zones []gjson.Result, backupType, mainLocation string) []*schema.CostComponent {
+func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.UsageData, zones []gjson.Result, backupType, region string) []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 	var backupStorageGB *decimal.Decimal
 	if u != nil && u.Get("storage_gb").Exists() {
@@ -309,7 +310,7 @@ func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.U
 
 	costComponents = append(costComponents, backupCosmosCostComponent(
 		"Restored data",
-		mainLocation,
+		region,
 		skuName,
 		productName,
 		meterName,
