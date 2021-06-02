@@ -202,7 +202,7 @@ func costComponentToDiff(diffComponent CostComponent, oldComponent *CostComponen
 
 	if oldCost == nil && newCost == nil {
 		s += "  Monthly cost depends on usage\n"
-		s += ui.FaintStringf("    %s per %s%s\n",
+		s += fmt.Sprintf("    %s per %s%s\n",
 			formatPriceChange(diffComponent.Price),
 			diffComponent.Unit,
 			formatPriceChangeDetails(oldPrice, newPrice),
