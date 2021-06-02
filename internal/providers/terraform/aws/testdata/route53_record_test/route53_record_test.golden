@@ -20,7 +20,6 @@
  aws_route53_zone.zone_withUsage                                                                   
  └─ Hosted zone                                              1  months                       $0.50 
                                                                                                    
- PROJECT TOTAL                                                                           $1,956.00 
-
+ OVERALL TOTAL                                                                           $1,956.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

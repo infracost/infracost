@@ -39,7 +39,6 @@
  aws_s3_bucket_inventory.inventory_withUsage                                                          
  └─ Objects listed                                           10  1M objects                     $0.03 
                                                                                                       
- PROJECT TOTAL                                                                                  $0.03 
-
+ OVERALL TOTAL                                                                                  $0.03 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -1,4 +1,3 @@
-
  Name                                                    Monthly Qty  Unit                        Monthly Cost 
                                                                                                                
  aws_rds_cluster.default                                                                                       
@@ -24,3 +23,4 @@
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+

@@ -75,7 +75,13 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 			cfg.Environment.HasUsageFile = true
 		}
 
-		project, err := provider.LoadResources(u)
+		metadata := config.DetectProjectMetadata(projectCfg)
+		metadata.Type = provider.Type()
+		provider.AddMetadata(metadata)
+		name := schema.GenerateProjectName(metadata)
+
+		project := schema.NewProject(name, metadata)
+		err = provider.LoadResources(project, u)
 		if err != nil {
 			return err
 		}
@@ -154,9 +160,6 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 	case "diff":
 		b, err = output.ToDiff(r, opts)
 		out = fmt.Sprintf("\n%s", string(b))
-	case "table_deprecated":
-		b, err = output.ToTableDeprecated(r, opts)
-		out = fmt.Sprintf("\n%s", string(b))
 	default:
 		b, err = output.ToTable(r, opts)
 		out = fmt.Sprintf("\n%s", string(b))
@@ -232,19 +235,24 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
 
 	validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
+	validFieldsFormats := []string{"table", "html"}
 
 	if cmd.Flags().Changed("fields") {
 		if c, _ := cmd.Flags().GetStringSlice("fields"); len(c) == 0 {
 			ui.PrintWarningf("fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
-		} else if cfg.Fields != nil && cfg.Format != "table" {
-			ui.PrintWarning("fields is only supported for table output format (HTML support coming soon)")
+		} else if cfg.Fields != nil && !contains(validFieldsFormats, cfg.Format) {
+			ui.PrintWarning("fields is only supported for table and html output formats")
 		} else {
-			cfg.Fields, _ = cmd.Flags().GetStringSlice("fields")
-			for _, f := range cfg.Fields {
+			fields, _ := cmd.Flags().GetStringSlice("fields")
+			vf := []string{}
+			for _, f := range fields {
 				if !contains(validFields, f) {
 					ui.PrintWarningf("Invalid field '%s' specified, valid fields are: %s", f, validFields)
+				} else {
+					vf = append(vf, f)
 				}
 			}
+			cfg.Fields = vf
 		}
 	}
 

@@ -47,7 +47,6 @@
  ├─ Storage                                                            5  GB                       $0.57 
  └─ Long-term retention                                   Monthly cost depends on usage: $0.05 per GB    
                                                                                                          
- PROJECT TOTAL                                                                                $15,325.02 
-
+ OVERALL TOTAL                                                                                $15,325.02 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
