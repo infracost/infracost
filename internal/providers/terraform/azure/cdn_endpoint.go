@@ -26,8 +26,12 @@ func NewAzureRMCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.
 
 	var costComponents []*schema.CostComponent
 
-	profile := d.References("profile_name")[0]
-	sku := profile.Get("sku").String()
+	sku := ""
+	var profile *schema.ResourceData
+	if len(d.References("profile_name")) > 0 {
+		profile = d.References("profile_name")[0]
+		sku = profile.Get("sku").String()
+	}
 
 	if len(strings.Split(sku, "_")) != 2 || strings.ToLower(sku) == "standard_chinacdn" {
 		log.Warnf("Unrecognized/unsupported CDN sku format for resource %s: %s", d.Address, sku)

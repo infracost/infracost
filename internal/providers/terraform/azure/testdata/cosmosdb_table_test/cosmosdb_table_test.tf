@@ -118,3 +118,9 @@ resource "azurerm_cosmosdb_table" "serverless" {
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
 }
+
+resource "azurerm_cosmosdb_table" "account-in-another-module" {
+  name                = "tfex-cosmos-cassandra-keyspace"
+  resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
+  account_name        = "in-another-module"
+}

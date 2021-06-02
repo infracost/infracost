@@ -92,3 +92,8 @@
  OVERALL TOTAL                                                                                                    $5,455.03 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+
+2 resource types weren't estimated as they're not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+2 x azurerm_cosmosdb_cassandra_table
+1 x azurerm_cosmosdb_cassandra_keyspace
