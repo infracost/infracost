@@ -1,0 +1,27 @@
+
+ Name                                                Monthly Qty  Unit              Monthly Cost 
+                                                                                                 
+ azurerm_postgresql_flexible_server.burstable                                                    
+ ├─ Compute (B_Standard_B1ms)                                730  hours                   $32.12 
+ ├─ Storage                                                  128  GB                      $17.66 
+ └─ Additional backup storage                              5,000  GB                     $475.00 
+                                                                                                 
+ azurerm_postgresql_flexible_server.gp                                                           
+ ├─ Compute (GP_Standard_D4s_v3)                             730  hours                  $284.70 
+ ├─ Storage                                                   32  GB                       $4.42 
+ └─ Additional backup storage                              5,000  GB                     $475.00 
+                                                                                                 
+ azurerm_postgresql_flexible_server.mo                                                           
+ ├─ Compute (MO_Standard_E4s_v3)                             730  hours                  $382.52 
+ ├─ Storage                                                   64  GB                       $8.83 
+ └─ Additional backup storage                              5,000  GB                     $475.00 
+                                                                                                 
+ azurerm_postgresql_flexible_server.non_usage_gp                                                 
+ ├─ Compute (GP_Standard_D16s_v3)                            730  hours                $1,138.80 
+ ├─ Storage                                       Monthly cost depends on usage: $0.14 per GB    
+ └─ Additional backup storage                     Monthly cost depends on usage: $0.095 per GB   
+                                                                                                 
+ PROJECT TOTAL                                                                         $3,294.05 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
