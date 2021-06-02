@@ -13,6 +13,7 @@ func GetAzureRMDNSPrivateZoneRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
+		Notes: []string{"Most expensive price tier is used."},
 	}
 }
 
