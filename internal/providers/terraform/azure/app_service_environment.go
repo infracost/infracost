@@ -22,19 +22,19 @@ func GetAzureRMAppIsolatedServicePlanRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAppIsolatedServicePlan(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := d.Get("region").String()
 	tier := "I1"
 	if d.Get("pricing_tier").Type != gjson.Null {
 		tier = d.Get("pricing_tier").String()
 	}
-	location := ""
+
 	group := d.References("resource_group_name")
 	if len(group) > 0 {
-		location = group[0].Get("location").String()
+		region = group[0].Get("location").String()
+	} else {
+		log.Warnf("Using %s for resource %s as its 'location' property could not be found.", region, d.Address)
 	}
-	if location == "" {
-		log.Warnf("Skipping resource %s. Could not find its 'location' property.", d.Address)
-		return nil
-	}
+
 	stampFeeTiers := []string{"I1", "I2", "I3"}
 	productName := "Isolated Plan"
 	costComponents := make([]*schema.CostComponent, 0)
@@ -46,16 +46,16 @@ func NewAzureRMAppIsolatedServicePlan(d *schema.ResourceData, u *schema.UsageDat
 		productName += " - Linux"
 	}
 	if Contains(stampFeeTiers, tier) == bool(true) {
-		costComponents = append(costComponents, AppIsolatedServicePlanCostComponentStampFee(location, productName))
+		costComponents = append(costComponents, AppIsolatedServicePlanCostComponentStampFee(region, productName))
 	}
-	costComponents = append(costComponents, AppIsolatedServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", tier), location, productName, tier))
+	costComponents = append(costComponents, AppIsolatedServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", tier), region, productName, tier))
 
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
 }
-func AppIsolatedServicePlanCostComponentStampFee(location, productName string) *schema.CostComponent {
+func AppIsolatedServicePlanCostComponentStampFee(region, productName string) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:           "Stamp fee",
@@ -64,7 +64,7 @@ func AppIsolatedServicePlanCostComponentStampFee(location, productName string) *
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Azure App Service"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -77,7 +77,7 @@ func AppIsolatedServicePlanCostComponentStampFee(location, productName string) *
 		},
 	}
 }
-func AppIsolatedServicePlanCostComponent(name, location, productName, tier string) *schema.CostComponent {
+func AppIsolatedServicePlanCostComponent(name, region, productName, tier string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
@@ -85,7 +85,7 @@ func AppIsolatedServicePlanCostComponent(name, location, productName, tier strin
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Azure App Service"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{

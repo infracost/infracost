@@ -17,6 +17,15 @@ resource "azurerm_sql_server" "example" {
   administrator_login_password = "fake"
 }
 
+// TODO: support https://azure.microsoft.com/en-us/pricing/details/azure-sql-database/single/ > Purchse Model of "DTU", which have
+// sku_name like "B", "S0" or "PP6". They have a daily price in the mongo DB so we can divide that by 24 and multiply by 744 to use as the HourlyQty
+// Currently this returns: Unrecognized MSSQL SKU format for resource azurerm_mssql_database.general_purpose_gen: S1
+# resource "azurerm_mssql_database" "general_purpose_gen" {
+#   name      = "acctest-db-d"
+#   server_id = azurerm_sql_server.example.id
+#   sku_name  = "S1"
+# }
+
 resource "azurerm_mssql_database" "general_purpose_gen" {
   name      = "acctest-db-d"
   server_id = azurerm_sql_server.example.id

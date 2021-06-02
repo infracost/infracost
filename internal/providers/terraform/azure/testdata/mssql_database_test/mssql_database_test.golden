@@ -51,7 +51,3 @@
 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
-
-1 resource type wasn't estimated as it's not supported yet.
-Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
-1 x azurerm_sql_server
