@@ -36,11 +36,11 @@ func NewAzureRMCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.Usage
 }
 
 func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account *schema.ResourceData) []*schema.CostComponent {
-	region := lookupRegion(d, []string{})
+	// Find the region in from the passed-in account
+	region := lookupRegion(account, []string{})
+	geoLocations := account.Get("geo_location").Array()
 
 	costComponents := []*schema.CostComponent{}
-
-	geoLocations := account.Get("geo_location").Array()
 
 	model := Provisioned
 	skuName := "RUs"
