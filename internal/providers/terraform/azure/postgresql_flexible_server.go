@@ -115,8 +115,8 @@ func NewAzureRMPostrgreSQLFlexibleServer(d *schema.ResourceData, u *schema.Usage
 			Service:       strPtr("Azure Database for PostgreSQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr("/PostgreSQL Flexible Server Backup Storage/")},
-				{Key: "meterName", ValueRegex: strPtr("Backup Storage LRS Data Stored")},
+				{Key: "productName", Value: strPtr("Azure Database for PostgreSQL Flexible Server Backup Storage")},
+				{Key: "meterName", Value: strPtr("Backup Storage LRS Data Stored")},
 			},
 		},
 	})
