@@ -8,11 +8,11 @@ import (
 func GetAzureRMHDInsightSparkClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_hdinsight_spark_cluster", //nolint:misspell
-		RFunc: NewAzureHDInsightSparkCluster,
+		RFunc: NewAzureRMHDInsightSparkCluster,
 	}
 }
 
-func NewAzureHDInsightSparkCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMHDInsightSparkCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	location := d.Get("location").String()
 	costComponents := []*schema.CostComponent{}
 

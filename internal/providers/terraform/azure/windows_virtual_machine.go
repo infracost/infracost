@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
-
 	"github.com/shopspring/decimal"
 )
 
@@ -59,10 +58,8 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 		purchaseOptionLabel = "hybrid benefit"
 	}
 
-	skuName := parseVMSKUName(instanceType)
-
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, skuName),
+		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -72,9 +69,9 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 			Service:       strPtr("Virtual Machines"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "armSkuName", Value: strPtr(instanceType)},
+				{Key: "skuName", ValueRegex: strPtr("/.*(?<!Low Priority|Spot)$/i")},
+				{Key: "armSkuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", instanceType))},
 				{Key: "productName", ValueRegex: strPtr(productNameRe)},
-				{Key: "skuName", Value: strPtr(skuName)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

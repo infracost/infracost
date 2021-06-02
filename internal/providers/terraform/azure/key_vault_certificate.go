@@ -11,21 +11,22 @@ import (
 func GetAzureRMKeyVaultCertificateRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_key_vault_certificate",
-		RFunc: NewAzureKeyVaultCertificate,
+		RFunc: NewAzureRMKeyVaultCertificate,
 		ReferenceAttributes: []string{
 			"key_vault_id",
 		},
 	}
 }
 
-func NewAzureKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var location, skuName string
-	keyVault := d.References("key_vault_id")
-	location = keyVault[0].Get("location").String()
+func NewAzureRMKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := d.Get("region").String()
 
-	if location == "" {
-		log.Warnf("Skipping resource %s. Could not find its 'location' property.", d.Address)
-		return nil
+	var skuName string
+	keyVault := d.References("key_vault_id")
+	if len(keyVault) > 0 {
+		region = keyVault[0].Get("location").String()
+	} else {
+		log.Warnf("Using %s for resource %s as its 'location' property could not be found.", region, d.Address)
 	}
 
 	var costComponents []*schema.CostComponent
@@ -37,7 +38,7 @@ func NewAzureKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *s
 	}
 	costComponents = append(costComponents, vaultKeysCostComponent(
 		"Certificate renewals",
-		location,
+		region,
 		"requests",
 		skuName,
 		"Certificate Renewal Request",
@@ -50,7 +51,7 @@ func NewAzureKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *s
 	}
 	costComponents = append(costComponents, vaultKeysCostComponent(
 		"Certificate operations",
-		location,
+		region,
 		"10K transactions",
 		skuName,
 		"Operations",

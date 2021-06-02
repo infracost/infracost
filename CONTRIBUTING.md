@@ -482,7 +482,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 	docker push infracost/infracost-atlantis:latest
 	```
 
-6. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
+6. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls?q=infracost) to be merged.
 7. Announce the release in the infracost-community Slack announcements channel.
 8. Update the docs repo with any required changes and supported resources.
 9. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.

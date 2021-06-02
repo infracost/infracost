@@ -10,14 +10,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func GetAzurePostgreSQLServerRegistryItem() *schema.RegistryItem {
+func GetAzureRMPostgreSQLServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_postgresql_server",
-		RFunc: NewAzurePostrgreSQLServer,
+		RFunc: NewAzureRMPostrgreSQLServer,
 	}
 }
 
-func NewAzurePostrgreSQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMPostrgreSQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
 	serviceName := "Azure Database for PostgreSQL"
 

@@ -11,11 +11,11 @@ import (
 func GetAzureRMHDInsightKafkaClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_hdinsight_kafka_cluster", //nolint:misspell
-		RFunc: NewAzureHDInsightKafkaCluster,
+		RFunc: NewAzureRMHDInsightKafkaCluster,
 	}
 }
 
-func NewAzureHDInsightKafkaCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMHDInsightKafkaCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	location := d.Get("location").String()
 	costComponents := []*schema.CostComponent{}
 
