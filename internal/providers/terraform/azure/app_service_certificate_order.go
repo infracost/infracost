@@ -5,7 +5,6 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 func GetAzureRMAppServiceCertificateOrderRegistryItem() *schema.RegistryItem {
@@ -16,10 +15,7 @@ func GetAzureRMAppServiceCertificateOrderRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAppServiceCertificateOrder(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	location := "Global"
-	if strings.HasPrefix(location, "usgov") {
-		location = "US Gov"
-	}
+	region := "Global"
 
 	productType := "Standard"
 	if d.Get("product_type").Type != gjson.Null {
@@ -35,7 +31,7 @@ func NewAzureRMAppServiceCertificateOrder(d *schema.ResourceData, u *schema.Usag
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1).Div(decimal.NewFromInt(12))),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
-				Region:        strPtr(location),
+				Region:        strPtr(region),
 				Service:       strPtr("Azure App Service"),
 				ProductFamily: strPtr("Compute"),
 				AttributeFilters: []*schema.AttributeFilter{
