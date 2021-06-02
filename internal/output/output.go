@@ -13,12 +13,12 @@ import (
 var outputVersion = "0.2"
 
 type Root struct {
-	Version       string    `json:"version"`
-	Projects      []Project `json:"projects"`
+	Version          string           `json:"version"`
+	Projects         []Project        `json:"projects"`
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
-	TimeGenerated time.Time `json:"timeGenerated"`
-	Summary       *Summary  `json:"summary"`
+	TimeGenerated    time.Time        `json:"timeGenerated"`
+	Summary          *Summary         `json:"summary"`
 }
 
 type Project struct {
@@ -174,12 +174,12 @@ func ToOutputFormat(projects []*schema.Project) Root {
 	})
 
 	out := Root{
-		Version:       outputVersion,
-		Projects:      outProjects,
+		Version:          outputVersion,
+		Projects:         outProjects,
 		TotalHourlyCost:  totalHourlyCost,
 		TotalMonthlyCost: totalMonthlyCost,
-		TimeGenerated: time.Now(),
-		Summary:       resourceSummary,
+		TimeGenerated:    time.Now(),
+		Summary:          resourceSummary,
 	}
 
 	return out
