@@ -47,7 +47,3 @@
  └─ Snapshot export                             Monthly cost depends on usage: $0.01 per GB                   
                                                                                                               
  PROJECT TOTAL                                                                                    $176,130.67 
-
-----------------------------------
-To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
-
