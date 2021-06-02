@@ -489,6 +489,18 @@ resource_usage:
   azurerm_app_service_environment.my_service:
      operating_system: linux # Override the operating system of the instance, can be: linux, windows.
 
+  azurerm_automation_account.my_account:
+    monthly_watcher_hours: 0 # Monthly number of watcher hours.
+
+  azurerm_automation_dsc_configuration.my_configuration:
+    non_azure_config_node_count: 0 # Number of non-Azure configuration nodes.
+
+  azurerm_automation_dsc_nodeconfiguration.my_nodeconfiguration:
+    non_azure_config_node_count: 0 # Number of non-Azure configuration nodes.
+
+  azurerm_automation_job_schedule.my_schedule:
+    monthly_job_run_mins: 0 # Monthly number of job run minutes.   
+
   azurerm_databricks_workspace.my_workspace:
     monthly_all_purpose_compute_dbu_hrs: 500 # Monthly number of All-purpose Compute Databricks Units in DBU-hours.
     monthly_jobs_compute_dbu_hrs: 1000 # Monthly number of Jobs Compute Databricks Units in DBU-hours.

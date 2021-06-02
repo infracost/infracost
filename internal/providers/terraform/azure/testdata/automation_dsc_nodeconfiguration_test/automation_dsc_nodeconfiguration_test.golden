@@ -1,0 +1,23 @@
+
+ Name                                                      Monthly Qty  Unit              Monthly Cost 
+                                                                                                       
+ azurerm_automation_dsc_configuration.example                                                          
+ └─ Non-azure config nodes                              Monthly cost depends on usage: $6.00 per nodes 
+                                                                                                       
+ azurerm_automation_dsc_nodeconfiguration.fiveNodes                                                    
+ └─ Non-azure config nodes                                           5  nodes                   $30.00 
+                                                                                                       
+ azurerm_automation_dsc_nodeconfiguration.withoutUsage                                                 
+ └─ Non-azure config nodes                              Monthly cost depends on usage: $6.00 per nodes 
+                                                                                                       
+ azurerm_automation_dsc_nodeconfiguration.zeroNodes                                                    
+ └─ Non-azure config nodes                                           0  nodes                    $0.00 
+                                                                                                       
+ PROJECT TOTAL                                                                                  $30.00 
+
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+
+1 resource type wasn't estimated as it's not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_automation_account
