@@ -54,6 +54,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMMSSQLDatabaseRegistryItem(),
 	GetAzureRMMySQLServerRegistryItem(),
 	GetAzureRMNotificationHubNamespaceRegistryItem(),
+	GetAzureRMPostgreSQLFlexibleServerRegistryItem(),
 	GetAzureRMPostgreSQLServerRegistryItem(),
 	GetAzureRMPrivateDNSaRecordRegistryItem(),
 	GetAzureRMPrivateDNSaaaaRecordRegistryItem(),
