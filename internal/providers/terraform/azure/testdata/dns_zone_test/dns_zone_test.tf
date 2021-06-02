@@ -3,18 +3,18 @@ provider "azurerm" {
   features {}
 }
 resource "azurerm_resource_group" "example" {
-	name     = "example-resources"
-	location = "westus"
+  name     = "example-resources"
+  location = "westus"
 }
 resource "azurerm_dns_zone" "westus" {
-	name                = "mydomain.com"
-	resource_group_name = azurerm_resource_group.example.name
+  name                = "mydomain.com"
+  resource_group_name = azurerm_resource_group.example.name
 }
 resource "azurerm_resource_group" "example1" {
-	name     = "example-resources"
-	location = "germanywestcentral"
+  name     = "example-resources"
+  location = "germanywestcentral"
 }
 resource "azurerm_dns_zone" "germany" {
-	name                = "mydomain.com"
-	resource_group_name = azurerm_resource_group.example1.name
+  name                = "mydomain.com"
+  resource_group_name = azurerm_resource_group.example1.name
 }
