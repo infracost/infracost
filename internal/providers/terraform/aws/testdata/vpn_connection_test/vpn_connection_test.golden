@@ -17,7 +17,6 @@
  aws_vpn_connection.vpn_connection_withUsage                                              
  └─ VPN connection                                      730  hours                 $36.50 
                                                                                           
- PROJECT TOTAL                                                                    $221.00 
-
+ OVERALL TOTAL                                                                    $221.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

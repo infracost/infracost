@@ -89,7 +89,6 @@
  ├─ Periodic backup (West US)                                  Monthly cost depends on usage: $0.15 per GB                
  └─ Restored data                                              Monthly cost depends on usage: $0.15 per GB                
                                                                                                                           
- PROJECT TOTAL                                                                                                  $5,455.03 
-
+ OVERALL TOTAL                                                                                                  $5,455.03 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

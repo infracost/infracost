@@ -9,7 +9,6 @@
  ├─ Classic load balancer             730  hours                   $18.25 
  └─ Data processed                 10,000  GB                      $80.00 
                                                                           
- PROJECT TOTAL                                                    $116.50 
-
+ OVERALL TOTAL                                                    $116.50 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

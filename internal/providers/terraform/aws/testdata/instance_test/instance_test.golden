@@ -140,8 +140,7 @@
  └─ root_block_device                                                                                       
     └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
                                                                                                             
- PROJECT TOTAL                                                                                      $992.14 
-
+ OVERALL TOTAL                                                                                      $992.14 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
 

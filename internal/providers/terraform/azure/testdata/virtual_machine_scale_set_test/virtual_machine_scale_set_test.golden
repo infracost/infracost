@@ -25,7 +25,6 @@
     ├─ Storage (S4)                                                1  months                           $1.54 
     └─ Disk operations                                           200  10k operations                   $0.10 
                                                                                                              
- PROJECT TOTAL                                                                                       $427.59 
-
+ OVERALL TOTAL                                                                                       $427.59 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

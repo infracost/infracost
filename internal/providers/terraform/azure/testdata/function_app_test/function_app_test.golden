@@ -41,8 +41,7 @@
  ├─ Execution time                                                  Monthly cost depends on usage: $0.000016 per GB-seconds 
  └─ Executions                                                                    0.1  1M requests                    $0.02 
                                                                                                                             
- PROJECT TOTAL                                                                                                    $1,134.69 
-
+ OVERALL TOTAL                                                                                                    $1,134.69 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
 

@@ -21,7 +21,6 @@
  ├─ Storage                                       Monthly cost depends on usage: $0.14 per GB    
  └─ Additional backup storage                     Monthly cost depends on usage: $0.095 per GB   
                                                                                                  
- PROJECT TOTAL                                                                         $3,294.05 
-
+ OVERALL TOTAL                                                                         $3,294.05 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

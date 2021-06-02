@@ -6,8 +6,7 @@
  ├─ Region node (D14)                           2,190  hours     $3,274.49 
  └─ Zookeeper node (D4a v4)                     2,190  hours       $525.60 
                                                                            
- PROJECT TOTAL                                                   $3,907.40 
-
+ OVERALL TOTAL                                                   $3,907.40 
 ----------------------------------
 2 resource types weren't estimated as they're not supported yet.
 Please watch/star https://github.com/infracost/infracost as new resources are added regularly.

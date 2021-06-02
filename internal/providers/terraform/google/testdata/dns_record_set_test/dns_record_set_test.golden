@@ -7,7 +7,6 @@
  google_dns_record_set.frontend_usage                                                       
  └─ Queries                                         0.1  1M queries                   $0.04 
                                                                                             
- PROJECT TOTAL                                                                        $0.04 
-
+ OVERALL TOTAL                                                                        $0.04 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

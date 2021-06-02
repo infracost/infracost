@@ -26,7 +26,6 @@
  ├─ Archival Storage                                          500  GB                      $15.00 
  └─ Insights queries data scanned                             250  GB                       $1.25 
                                                                                                   
- PROJECT TOTAL                                                                          $2,065.00 
-
+ OVERALL TOTAL                                                                          $2,065.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

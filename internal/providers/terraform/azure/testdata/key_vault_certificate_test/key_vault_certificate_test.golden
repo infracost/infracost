@@ -13,7 +13,6 @@
  ├─ Certificate renewals                                 100  requests                       $300.00 
  └─ Certificate operations                                10  10K transactions                 $0.30 
                                                                                                      
- PROJECT TOTAL                                                                               $600.60 
-
+ OVERALL TOTAL                                                                               $600.60 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -17,7 +17,6 @@
  ├─ Provisioned IOPS                                4,000  IOPS                           $198.56 
  └─ Throughput                                         20  MB/s                             $6.99 
                                                                                                   
- PROJECT TOTAL                                                                            $534.36 
-
+ OVERALL TOTAL                                                                            $534.36 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

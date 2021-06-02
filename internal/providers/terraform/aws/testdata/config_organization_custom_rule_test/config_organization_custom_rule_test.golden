@@ -9,7 +9,6 @@
  ├─ Rule evaluations (next 400K)                                                         400,000  evaluations                  $320.00 
  └─ Rule evaluations (over 500K)                                                         100,000  evaluations                   $50.00 
                                                                                                                                        
- PROJECT TOTAL                                                                                                                 $470.00 
-
+ OVERALL TOTAL                                                                                                                 $470.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

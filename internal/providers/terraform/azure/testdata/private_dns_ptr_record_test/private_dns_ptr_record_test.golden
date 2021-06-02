@@ -14,7 +14,6 @@
  azurerm_private_dns_zone.example                                                                  
  └─ Hosted zone                                              1  months                       $0.50 
                                                                                                    
- PROJECT TOTAL                                                                             $900.50 
-
+ OVERALL TOTAL                                                                             $900.50 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

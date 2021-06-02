@@ -26,7 +26,6 @@
  aws_sfn_state_machine.standardWithoutUsage                                                             
  └─ Transitions                              Monthly cost depends on usage: $0.00005 per 1K transitions 
                                                                                                         
- PROJECT TOTAL                                                                                  $758.95 
-
+ OVERALL TOTAL                                                                                  $758.95 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

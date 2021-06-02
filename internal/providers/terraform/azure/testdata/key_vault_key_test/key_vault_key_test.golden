@@ -51,7 +51,6 @@
  ├─ Storage key rotations                               60  renewals                        $60.00 
  └─ Software-protected keys                            600  10K transactions                $90.00 
                                                                                                    
- PROJECT TOTAL                                                                          $12,813.96 
-
+ OVERALL TOTAL                                                                          $12,813.96 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
