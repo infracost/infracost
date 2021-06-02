@@ -20,7 +20,3 @@
  └─ CPU credits                                                   48  vCPU-hours                         $4.32 
                                                                                                                
  PROJECT TOTAL                                                                                         $275.88 
-
-----------------------------------
-To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
-
