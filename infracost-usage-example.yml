@@ -497,8 +497,8 @@ resource_usage:
   azurerm_function_app.my_functions:
     monthly_executions: 100000 # Monthly executions to the function. Only applicable for Consumption plan.
     execution_duration_ms: 500 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
-    memory_mb: 128 # Average amount of memory consumed by function in MB. Only applicable for Consumption plan.
-    instances: 2 # Number of instances. Only applicable for Premium plan.
+    memory_mb: 128             # Average amount of memory consumed by function in MB. Only applicable for Consumption plan.
+    instances: 1               # Number of instances. Only applicable for Premium plan.
   
   azurerm_cdn_endpoint.my_endpoint:
     monthly_outbound_gb: 1000000 # Monthly number of outbound data transfers in GB.
