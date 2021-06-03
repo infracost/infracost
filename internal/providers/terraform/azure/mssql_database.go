@@ -59,9 +59,10 @@ func dtuPurchaseCostComponents(region, sku string, d *schema.ResourceData, u *sc
 	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            fmt.Sprintf("Compute (%s)", strings.ToTitle(sku)),
-		Unit:            "days",
-		UnitMultiplier:  1,
+		Name:           fmt.Sprintf("Compute (%s)", strings.ToTitle(sku)),
+		Unit:           "days",
+		UnitMultiplier: 1,
+		// This is not the same as the 730h/month value we use elsewhere but it looks more understandable than seeing `30.4166` in the output
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(30)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
