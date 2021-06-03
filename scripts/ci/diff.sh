@@ -17,15 +17,6 @@ process_args () {
   percentage_threshold=${6:-$percentage_threshold}
   post_condition=${7:-$post_condition}
 
-  # Handle deprecated var names
-  path=${path:-$tfjson}
-  path=${path:-$terraform_json_file}
-  path=${path:-$tfplan}
-  path=${path:-$terraform_plan_file}
-  path=${path:-$tfdir}
-  path=${path:-$terraform_dir}
-  terraform_plan_flags=${terraform_plan_flags:-$tfflags}
-
   # Validate post_condition
   if ! echo "$post_condition" | jq empty; then
     echo "Error: post_condition contains invalid JSON"
