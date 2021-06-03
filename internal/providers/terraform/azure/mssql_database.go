@@ -206,9 +206,9 @@ func vCorePurchaseCostComponents(d *schema.ResourceData, u *schema.UsageData, sk
 		licenseType := "LicenseIncluded"
 		if d.Get("license_type").Type != gjson.Null {
 			licenseType = d.Get("license_type").String()
-			if licenseType == "LicenseIncluded" {
-				costComponents = append(costComponents, sqlLicenseCostComponent(region, cores, serviceName, tier))
-			}
+		}
+		if licenseType == "LicenseIncluded" {
+			costComponents = append(costComponents, sqlLicenseCostComponent(region, cores, serviceName, tier))
 		}
 	}
 
