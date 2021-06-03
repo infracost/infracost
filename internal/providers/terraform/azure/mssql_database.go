@@ -38,6 +38,98 @@ func NewAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 		sku = d.Get("sku_name").String()
 	}
 
+	if strings.ToLower(sku) == "basic" || strings.HasPrefix(strings.ToLower(sku), "s") || strings.HasPrefix(strings.ToLower(sku), "p") {
+		costComponents = append(costComponents, dtuPurchaseCostComponents(region, sku, d, u)...)
+	} else {
+		costComponents = append(costComponents, vCorePurchaseCostComponents(d, u, sku, region, serviceName)...)
+	}
+
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: costComponents,
+	}
+}
+
+func dtuPurchaseCostComponents(region, sku string, d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
+	costComponents := []*schema.CostComponent{}
+
+	skuName := strings.ToLower(sku)
+	if skuName == "basic" {
+		skuName = "b"
+	}
+
+	costComponents = append(costComponents, &schema.CostComponent{
+		Name:            fmt.Sprintf("Compute (%s)", strings.ToTitle(sku)),
+		Unit:            "hours",
+		UnitMultiplier:  1,
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(30)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(region),
+			Service:       strPtr("SQL Database"),
+			ProductFamily: strPtr("Databases"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", ValueRegex: strPtr("/^SQL Database Single/i")},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", skuName))},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	})
+
+	if skuName != "b" {
+		sn := map[string]string{
+			"p": "Premium",
+			"s": "Standard",
+		}[skuName[:1]]
+
+		var storageGB *decimal.Decimal
+		if d.Get("max_size_gb").Type != gjson.Null {
+			storageGB = decimalPtr(decimal.NewFromInt(d.Get("max_size_gb").Int()))
+			if sn == "Premium" {
+				storageGB = decimalPtr(storageGB.Sub(decimal.NewFromInt(500)))
+			} else {
+				storageGB = decimalPtr(storageGB.Sub(decimal.NewFromInt(250)))
+			}
+			if storageGB.IsNegative() {
+				storageGB = nil
+			}
+		}
+
+		if u != nil && u.Get("extra_data_storage_gb").Type != gjson.Null {
+			storageGB = decimalPtr(decimal.NewFromInt(u.Get("extra_data_storage_gb").Int()))
+		}
+
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            "Extra data storage",
+			Unit:            "GB",
+			UnitMultiplier:  1,
+			MonthlyQuantity: storageGB,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("azure"),
+				Region:        strPtr(region),
+				Service:       strPtr("SQL Database"),
+				ProductFamily: strPtr("Databases"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/SQL Database %s - Storage/i", sn))},
+					{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", sn))},
+					{Key: "meterName", Value: strPtr("Data Stored")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: strPtr("Consumption"),
+			},
+		})
+	}
+
+	costComponents = append(costComponents, longTermRetentionMSSQLCostComponent(region, u))
+
+	return costComponents
+}
+
+func vCorePurchaseCostComponents(d *schema.ResourceData, u *schema.UsageData, sku, region, serviceName string) []*schema.CostComponent {
+	costComponents := []*schema.CostComponent{}
 	tier, family, cores, err := parseMSSQLSku(d.Address, sku)
 	if err != nil {
 		log.Warnf(string(err.Error()))
@@ -111,7 +203,7 @@ func NewAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 	}
 
 	if tier != "General Purpose - Serverless" {
-		var licenseType string
+		licenseType := "LicenseIncluded"
 		if d.Get("license_type").Type != gjson.Null {
 			licenseType = d.Get("license_type").String()
 			if licenseType == "LicenseIncluded" {
@@ -126,37 +218,11 @@ func NewAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 	}
 	costComponents = append(costComponents, mssqlStorageComponent(storageGb, region, serviceName, tier, zoneRedundant))
 
-	var retention *decimal.Decimal
 	if tier != "Hyperscale" {
-		if u != nil && u.Get("long_term_retention_storage_gb").Exists() {
-			retention = decimalPtr(decimal.NewFromInt(u.Get("long_term_retention_storage_gb").Int()))
-		}
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Long-term retention",
-			Unit:            "GB",
-			UnitMultiplier:  1,
-			MonthlyQuantity: retention,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("azure"),
-				Region:        strPtr(region),
-				Service:       strPtr(serviceName),
-				ProductFamily: strPtr("Databases"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "productName", ValueRegex: strPtr("/LTR Backup Storage/")},
-					{Key: "skuName", Value: strPtr("Backup RA-GRS")},
-					{Key: "meterName", Value: strPtr("RA-GRS Data Stored")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr("Consumption"),
-			},
-		})
+		costComponents = append(costComponents, longTermRetentionMSSQLCostComponent(region, u))
 	}
 
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
-	}
+	return costComponents
 }
 
 func parseMSSQLSku(address, sku string) (string, string, string, error) {
@@ -264,6 +330,33 @@ func mssqlStorageComponent(storageGB *decimal.Decimal, region, serviceName, tier
 				{Key: "skuName", Value: strPtr(skuName)},
 				{Key: "meterName", Value: strPtr("Data Stored")},
 			},
+		},
+	}
+}
+
+func longTermRetentionMSSQLCostComponent(region string, u *schema.UsageData) *schema.CostComponent {
+	var retention *decimal.Decimal
+	if u != nil && u.Get("long_term_retention_storage_gb").Exists() {
+		retention = decimalPtr(decimal.NewFromInt(u.Get("long_term_retention_storage_gb").Int()))
+	}
+	return &schema.CostComponent{
+		Name:            "Long-term retention",
+		Unit:            "GB",
+		UnitMultiplier:  1,
+		MonthlyQuantity: retention,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(region),
+			Service:       strPtr("SQL Database"),
+			ProductFamily: strPtr("Databases"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", Value: strPtr("SQL Database - LTR Backup Storage")},
+				{Key: "skuName", Value: strPtr("Backup RA-GRS")},
+				{Key: "meterName", Value: strPtr("RA-GRS Data Stored")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
 		},
 	}
 }
