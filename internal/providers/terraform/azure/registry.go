@@ -13,6 +13,10 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
 	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
 	GetAzureRMAppServicePlanRegistryItem(),
+	GetAzureRMAutomationAccountRegistryItem(),
+	GetAzureRMAutomationDscConfigurationRegistryItem(),
+	GetAzureRMAutomationDscNodeconfigurationRegistryItem(),
+	GetAzureRMAutomationJobScheduleRegistryItem(),
 	GetAzureRMCDNEndpointRegistryItem(),
 	GetAzureRMContainerRegistryRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
@@ -116,6 +120,21 @@ var FreeResources []string = []string{
 	"azurerm_app_service_slot_virtual_network_swift_connection",
 	"azurerm_app_service_source_control_token",
 	"azurerm_app_service_virtual_network_swift_connection",
+
+	// Azure Automation
+	"azurerm_automation_certificate",
+	"azurerm_automation_connection",
+	"azurerm_automation_connection_certificate",
+	"azurerm_automation_connection_classic_certificate",
+	"azurerm_automation_connection_service_principal",
+	"azurerm_automation_credential",
+	"azurerm_automation_module",
+	"azurerm_automation_runbook",
+	"azurerm_automation_schedule",
+	"azurerm_automation_variable_bool",
+	"azurerm_automation_variable_datetime",
+	"azurerm_automation_variable_int",
+	"azurerm_automation_variable_string",
 
 	// Azure Base
 	"azurerm_resource_group",
