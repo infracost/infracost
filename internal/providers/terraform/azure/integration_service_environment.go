@@ -25,13 +25,13 @@ func NewAzureRMIntegrationServiceEnvironment(d *schema.ResourceData, u *schema.U
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	if sku == "developer" {
+	if strings.ToLower(sku) == "developer" {
 		productName += " - Developer"
 	}
 
 	costComponents = append(costComponents, IntegrationBaseServiceEnvironmentCostComponent("Base units", location, productName))
 
-	if sku == "premium" && scaleNumber > 0 {
+	if strings.ToLower(sku) == "premium" && scaleNumber > 0 {
 		costComponents = append(costComponents, IntegrationScaleServiceEnvironmentCostComponent("Scale units", location, productName, scaleNumber))
 
 	}

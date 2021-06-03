@@ -2,6 +2,7 @@ package azure
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -39,7 +40,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 		accessTier = d.Get("access_tier").String()
 	}
 
-	if accountKind == "BlockBlobStorage" {
+	if strings.ToLower(accountKind) == "blockblobstorage" {
 		productName = map[string]string{
 			"Standard": "Blob Storage",
 			"Premium":  "Premium Block Blob",
@@ -53,25 +54,25 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 		validPremiumReplicationTypes := []string{"ZRS", "LRS"}
 		validStandardReplicationTypes := []string{"LRS", "GRS", "RAGRS"}
 
-		if accessTier == "Premium" && (!Contains(validPremiumReplicationTypes, accountReplicationType) || !Contains(validStandardReplicationTypes, accountReplicationType)) {
+		if strings.ToLower(accessTier) == "premium" && (!Contains(validPremiumReplicationTypes, accountReplicationType) || !Contains(validStandardReplicationTypes, accountReplicationType)) {
 			log.Warnf("%s redundancy does not supports for %s performance tier", accountReplicationType, accountTier)
 		}
 
 		var capacity, writeOperations, listOperations, readOperations, otherOperations, dataRetrieval, dataWrite, blobIndex *decimal.Decimal
 
-		if accountReplicationType == "RAGRS" {
+		if strings.ToLower(accountReplicationType) == "ragrs" {
 			accountReplicationType = "RA-GRS"
 		}
 
 		skuName := fmt.Sprintf("%s %s", accessTier, accountReplicationType)
-		if accountTier == "Premium" {
+		if strings.ToLower(accountTier) == "premium" {
 			skuName = fmt.Sprintf("%s %s", accountTier, accountReplicationType)
 		}
 
 		if u != nil && u.Get("storage_gb").Type != gjson.Null {
 			capacity = decimalPtr(decimal.NewFromInt(u.Get("storage_gb").Int()))
 
-			if accessTier == "Hot" && accountTier != "Premium" {
+			if strings.ToLower(accessTier) == "hot" && strings.ToLower(accountTier) != "premium" {
 				dataStorageTiers := []int{51200, 512000}
 				dataStorageQuantities := usage.CalculateTierBuckets(*capacity, dataStorageTiers)
 
@@ -116,7 +117,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 		}
 		writeMeterName := "/Write Operations$/"
 
-		if skuName == "Hot RA-GRS" {
+		if strings.ToLower(skuName) == "hot ra-grs" {
 			writeMeterName = "/List and Create Container Operations$/"
 		}
 		costComponents = append(costComponents, blobOperationsCostComponent(
@@ -209,14 +210,14 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 				10000))
 		}
 	}
-	if accountKind == "FileStorage" {
+	if strings.ToLower(accountKind) == "filestorage" {
 		var dataAtRest, snapshotsStorageGb, metadataAtRestStorageGb, monthlyWriteOperations, listOperations, monthlyReadOperations, monthlyOtherOperations, monthlyDataRetrievalGb, earlyDeletionGb *decimal.Decimal
 		validHotCoolReplicationTypes := []string{"LRS", "GRS", "ZRS"}
 
-		if accessTier == "Hot" && (!Contains(validHotCoolReplicationTypes, accountReplicationType)) {
+		if strings.ToLower(accessTier) == "hot" && (!Contains(validHotCoolReplicationTypes, accountReplicationType)) {
 			log.Warnf("%s redundancy does not supports for %s performance tier", accountReplicationType, accessTier)
 		}
-		if accessTier == "Cool" && (!Contains(validHotCoolReplicationTypes, accountReplicationType)) {
+		if strings.ToLower(accessTier) == "cool" && (!Contains(validHotCoolReplicationTypes, accountReplicationType)) {
 			log.Warnf("%s redundancy does not supports for %s performance tier", accountReplicationType, accessTier)
 		}
 
@@ -307,7 +308,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			10000,
 		))
 
-		if accessTier == "Cool" {
+		if strings.ToLower(accessTier) == "cool" {
 			if u != nil && u.Get("monthly_data_retrieval_gb").Type != gjson.Null {
 				monthlyDataRetrievalGb = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_retrieval_gb").Int()))
 			}

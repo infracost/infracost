@@ -4,6 +4,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+	"strings"
 )
 
 func GetAzureRMKubernetesClusterRegistryItem() *schema.RegistryItem {
@@ -24,7 +25,7 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 		skuTier = d.Get("sku_tier").String()
 	}
 
-	if skuTier == "Paid" {
+	if strings.ToLower(skuTier) == "paid" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           "Uptime SLA",
 			Unit:           "hours",

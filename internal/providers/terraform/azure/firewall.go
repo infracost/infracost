@@ -2,6 +2,7 @@ package azure
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -28,7 +29,7 @@ func NewAzureFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 	// and it means that d.Get("virtual_hub").Type will never return gjson.Null
 
 	if v := d.Get("virtual_hub").String(); v != "[]" {
-		if skuTier == "Standard" {
+		if strings.ToLower(skuTier) == "standard" {
 			skuTier = "Secured Virtual Hub"
 		} else {
 			skuTier = fmt.Sprintf("%s Secured Virtual Hub", skuTier)

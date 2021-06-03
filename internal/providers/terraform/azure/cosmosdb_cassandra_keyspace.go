@@ -2,6 +2,7 @@ package azure
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -80,7 +81,7 @@ func provisionedCosmosCostComponents(model modelType, throughputs *decimal.Decim
 	costComponents := []*schema.CostComponent{}
 
 	var meterName string
-	if skuName == "RUs" {
+	if strings.ToLower(skuName) == "rus" {
 		meterName = "100 RU/s"
 	} else {
 		meterName = "100 Multi-master RU/s"
@@ -107,11 +108,11 @@ func provisionedCosmosCostComponents(model modelType, throughputs *decimal.Decim
 		quantity := throughputs
 
 		if model == Autoscale {
-			if skuName == "RUs" && quantity != nil {
+			if strings.ToLower(skuName) == "rus" && quantity != nil {
 				quantity = decimalPtr(quantity.Mul(decimal.NewFromFloat(1.5)))
 			}
 		} else {
-			if skuName == "RUs" && quantity != nil {
+			if strings.ToLower(skuName) == "rus" && quantity != nil {
 				if g.Get("zone_redundant").Type != gjson.Null {
 					if g.Get("zone_redundant").Bool() {
 						quantity = decimalPtr(quantity.Mul(decimal.NewFromFloat(1.25)))
@@ -245,7 +246,7 @@ func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.U
 
 	var name, meterName, skuName, productName string
 	numberOfCopies := decimalPtr(decimal.NewFromInt(1))
-	if backupType == "Periodic" {
+	if strings.ToLower(backupType) == "periodic" {
 		name = "Periodic backup"
 		meterName = "Data Stored"
 		skuName = "Standard"

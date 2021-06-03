@@ -52,7 +52,7 @@ func NewAzureRMApiManagement(d *schema.ResourceData, u *schema.UsageData) *schem
 		}
 	}
 
-	if tier == "premium" {
+	if strings.ToLower(tier) == "premium" {
 		var selfHostedGateways *decimal.Decimal
 		if u != nil && u.Get("self_hosted_gateway_count").Type != gjson.Null {
 			selfHostedGateways = decimalPtr(decimal.NewFromInt(u.Get("self_hosted_gateway_count").Int()))

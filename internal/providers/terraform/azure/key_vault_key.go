@@ -64,7 +64,7 @@ func NewAzureKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		name := "Software-protected keys"
 		meterName = "Operations"
 
-		if keyType == "RSA" && keySize == "2048" {
+		if strings.ToLower(keyType) == "rsa" && keySize == "2048" {
 			costComponents = append(costComponents, vaultKeysCostComponent(name, location, unit, skuName, meterName, "0", softwareProtectedTransactions, 10000))
 		} else {
 			meterName = "Advanced Key Operations"
@@ -72,7 +72,7 @@ func NewAzureKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		}
 	}
 
-	if strings.HasSuffix(keyType, "HSM") && skuName == "Premium" {
+	if strings.HasSuffix(keyType, "HSM") && strings.ToLower(skuName) == "premium" {
 		var protectedKeys, hsmProtectedTransactions *decimal.Decimal
 
 		name := "HSM-protected keys"
@@ -81,7 +81,7 @@ func NewAzureKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		if u != nil && u.Get("hsm_protected_keys").Exists() {
 			protectedKeys = decimalPtr(decimal.NewFromInt(u.Get("hsm_protected_keys").Int()))
 
-			if keyType == "RSA-HSM" && keySize == "2048" {
+			if strings.ToLower(keyType) == "rsa-hsm" && keySize == "2048" {
 				meterName = "Premium HSM-protected RSA 2048-bit key"
 				costComponents = append(costComponents, vaultKeysCostComponent(name, location, keyUnit, skuName, meterName, "0", protectedKeys, 1))
 			} else {
@@ -109,7 +109,7 @@ func NewAzureKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		if u != nil && u.Get("monthly_protected_keys_operations").Exists() {
 			hsmProtectedTransactions = decimalPtr(decimal.NewFromInt(u.Get("monthly_protected_keys_operations").Int()))
 
-			if keyType == "RSA" && keySize == "2048" {
+			if strings.ToLower(keyType) == "rsa" && keySize == "2048" {
 				meterName = "Operations"
 				costComponents = append(costComponents, vaultKeysCostComponent(name, location, unit, skuName, meterName, "0", hsmProtectedTransactions, 10000))
 			} else {

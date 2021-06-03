@@ -3,6 +3,7 @@ package azure
 import (
 	"fmt"
 	"math"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -98,7 +99,7 @@ func NewAzureRMManagedDisk(d *schema.ResourceData, u *schema.UsageData) *schema.
 }
 
 func managedDiskCostComponents(region, diskType string, diskData gjson.Result, monthlyDiskOperations *decimal.Decimal) []*schema.CostComponent {
-	if diskType == "UltraSSD_LRS" {
+	if strings.ToLower(diskType) == "ultrassd_lrs" {
 		return ultraDiskCostComponents(region, diskType, diskData)
 	}
 
@@ -126,7 +127,7 @@ func standardPremiumDiskCostComponents(region string, diskType string, diskData 
 
 	costComponents := []*schema.CostComponent{storageCostComponent(region, diskName, productName)}
 
-	if diskType == "Standard_LRS" || diskType == "StandardSSD_LRS" {
+	if strings.ToLower(diskType) == "standard_lrs" || strings.ToLower(diskType) == "standardssd_lrs" {
 		var opsQty *decimal.Decimal
 
 		if monthlyDiskOperations != nil {

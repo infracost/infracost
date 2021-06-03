@@ -67,7 +67,7 @@ func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *sche
 	if os == "app" {
 		os = "windows"
 	}
-	if os != "windows" && productName != "Premium Plan" {
+	if os != "windows" && strings.ToLower(productName) != "premium plan" {
 		productName += " - Linux"
 	}
 

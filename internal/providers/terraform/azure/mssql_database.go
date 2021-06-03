@@ -47,7 +47,7 @@ func NewAzureMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.
 	productNameRegex := fmt.Sprintf("/%s - %s/", tier, family)
 	skuName := mssqlSkuName(cores, zoneRedundant)
 
-	if tier == "General Purpose - Serverless" {
+	if strings.ToLower(tier) == "general purpose - serverless" {
 		var vCoreHours *decimal.Decimal
 		if u != nil && u.Get("monthly_vcore_hours").Exists() {
 			vCoreHours = decimalPtr(decimal.NewFromInt(u.Get("monthly_vcore_hours").Int()))
@@ -79,7 +79,7 @@ func NewAzureMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.
 		costComponents = append(costComponents, databaseComputeInstance(region, name, serviceName, productNameRegex, skuName))
 	}
 
-	if tier == "Hyperscale" {
+	if strings.ToLower(tier) == "hyperscale" {
 		var replicaCount *decimal.Decimal
 		if d.Get("read_replica_count").Type != gjson.Null {
 			replicaCount = decimalPtr(decimal.NewFromInt(d.Get("read_replica_count").Int()))
@@ -109,7 +109,7 @@ func NewAzureMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.
 		var licenseType string
 		if d.Get("license_type").Type != gjson.Null {
 			licenseType = d.Get("license_type").String()
-			if licenseType == "LicenseIncluded" {
+			if strings.ToLower(licenseType) == "licenseincluded" {
 				costComponents = append(costComponents, sqlLicenseCostComponent(region, cores, serviceName, tier))
 			}
 		}
@@ -233,7 +233,7 @@ func sqlLicenseCostComponent(region, cores, serviceName, tier string) *schema.Co
 
 func mssqlStorageComponent(storageGB *decimal.Decimal, region, serviceName, tier string, zoneRedundant bool) *schema.CostComponent {
 	storageTier := tier
-	if storageTier == "General Purpose - Serverless" {
+	if strings.ToLower(storageTier) == "general purpose - serverless" {
 		storageTier = "General Purpose"
 	}
 

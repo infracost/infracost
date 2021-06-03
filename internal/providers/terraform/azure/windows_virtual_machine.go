@@ -54,7 +54,7 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 	}
 
 	// Handle Azure Hybrid Benefit
-	if licenseType == "Windows_Client" || licenseType == "Windows_Server" {
+	if strings.ToLower(licenseType) == "windows_client" || strings.ToLower(licenseType) == "windows_server" {
 		purchaseOption = "DevTestConsumption"
 		purchaseOptionLabel = "hybrid benefit"
 	}

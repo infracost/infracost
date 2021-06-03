@@ -20,7 +20,7 @@ func NewAzureDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *s
 	location := d.Get("location").String()
 	sku := strings.Title(d.Get("sku").String())
 
-	if sku == "Trial" {
+	if strings.ToLower(sku) == "trial" {
 		return &schema.Resource{
 			NoPrice:   true,
 			IsSkipped: true,

@@ -4,6 +4,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+	"strings"
 )
 
 func GetAzureRMVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
@@ -30,21 +31,21 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 		os = "Windows"
 	}
 	if d.Get("storage_profile_os_disk.0.os_type").Type != gjson.Null {
-		if d.Get("storage_profile_os_disk.0.os_type").String() == "Windows" {
+		if strings.ToLower(d.Get("storage_profile_os_disk.0.os_type").String()) == "windows" {
 			os = "Windows"
 		}
 	}
 	if d.Get("storage_profile_image_reference.0.offer").Type != gjson.Null {
-		if d.Get("storage_profile_image_reference.0.offer").String() == "WindowsServer" {
+		if strings.ToLower(d.Get("storage_profile_image_reference.0.offer").String()) == "windowsserver" {
 			os = "Windows"
 		}
 	}
 
-	if os == "Linux" {
+	if strings.ToLower(os) == "linux" {
 		costComponents = append(costComponents, linuxVirtualMachineCostComponent(location, instanceType))
 	}
 
-	if os == "Windows" {
+	if strings.ToLower(os) == "windows" {
 		licenseType := "Windows_Client"
 		if d.Get("license_type").Type != gjson.Null {
 			licenseType = d.Get("license_type").String()
