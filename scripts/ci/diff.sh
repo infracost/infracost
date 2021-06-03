@@ -227,6 +227,23 @@ post_to_azure_devops () {
   fi
 }
 
+load_github_env () {
+  export VCS_REPO_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+}
+
+load_gitlab_env () {
+  export VCS_REPO_URL=$CI_REPOSITORY_URL
+}
+
+load_circle_ci_env () {
+  export VCS_REPO_URL=$CIRCLE_REPOSITORY_URL
+}
+
+load_azure_devops_env () {
+  export VCS_REPO_URL=$BUILD_REPOSITORY_URI
+}
+
+
 cleanup () {
   rm -f infracost_breakdown.json infracost_breakdown_cmd infracost_output_cmd
 }
@@ -234,6 +251,17 @@ cleanup () {
 # MAIN
 
 process_args "$@"
+
+# Load env variables
+if [ ! -z "$GITHUB_ACTIONS" ]; then
+  load_github_env
+elif [ ! -z "$GITLAB_CI" ]; then
+  load_gitlab_env
+elif [ ! -z "$CIRCLECI" ]; then
+  load_circle_ci_env
+elif [ ! -z "$SYSTEM_COLLECTIONURI" ]; then
+  load_azure_devops_env
+fi
 
 infracost_breakdown_cmd=$(build_breakdown_cmd)
 echo "$infracost_breakdown_cmd" > infracost_breakdown_cmd

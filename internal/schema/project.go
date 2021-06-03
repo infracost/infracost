@@ -86,7 +86,7 @@ func GenerateProjectName(metadata *ProjectMetadata) string {
 // Parses the "org/repo" from the git URL if possible.
 // Otherwise it just returns the URL.
 func nameFromRepoURL(url string) string {
-	r := regexp.MustCompile(`(?:\w+@|https:\/\/)(?:\w*@)?([^:\/]+)[:\/]([^\.]+)`)
+	r := regexp.MustCompile(`(?:\w+@|http(?:s)?:\/\/)(?:.*@)?([^:\/]+)[:\/]([^\.]+)`)
 	m := r.FindStringSubmatch(url)
 
 	if len(m) > 2 {
@@ -103,14 +103,14 @@ func nameFromRepoURL(url string) string {
 }
 
 func parseAzureDevOpsRepoPath(path string) string {
-	r := regexp.MustCompile(`(?:(\w+)(?:\/base\/_git\/)(\w+))`)
+	r := regexp.MustCompile(`(?:(.+)(?:\/base\/_git\/)(.+))`)
 	m := r.FindStringSubmatch(path)
 
 	if len(m) > 2 {
 		return m[1] + "/" + m[2]
 	}
 
-	r = regexp.MustCompile(`(?:(?:v3\/)(\w+)(?:\/base\/)(\w+))`)
+	r = regexp.MustCompile(`(?:(?:v3\/)(.+)(?:\/base\/)(.+))`)
 	m = r.FindStringSubmatch(path)
 
 	if len(m) > 2 {
