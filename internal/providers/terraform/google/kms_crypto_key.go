@@ -50,7 +50,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 
 	costComponents := []*schema.CostComponent{}
 
-	if keyDescript == "HSM RSA 3072" || keyDescript == "HSM RSA 4096" || keyDescript == "HSM ECDSA P-256" || keyDescript == "HSM ECDSA P-384" {
+	if strings.ToLower(keyDescript) == "hsm rsa 3072" || strings.ToLower(keyDescript) == "hsm rsa 4096" || strings.ToLower(keyDescript) == "hsm ecdsa P-256" || strings.ToLower(keyDescript) == "hsm ecdsa p-384" {
 		tierLimits := []int{2000}
 		var firstTierQty *decimal.Decimal
 		var tiers []decimal.Decimal
@@ -140,20 +140,20 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 }
 
 func cryptoKeyDescription(algorithm string, protectionLevel string) string {
-	switch protectionLevel {
-	case "SOFTWARE":
-		if algorithm == "GOOGLE_SYMMETRIC_ENCRYPTION" {
+	switch strings.ToLower(protectionLevel) {
+	case "software":
+		if strings.ToLower(algorithm) == "google_symmetric_encryption" {
 			return "Active software symmetric key versions"
 		}
 		return "Software asymmetric"
-	case "HSM":
-		if algorithm == "GOOGLE_SYMMETRIC_ENCRYPTION" {
+	case "hsm":
+		if strings.ToLower(algorithm) == "google_symmetric_encryption" {
 			return "HSM symmetric"
 		}
-		if algorithm == "EC_SIGN_P256_SHA256" {
+		if strings.ToLower(algorithm) == "ec_sign_p256_sha256" {
 			return "HSM ECDSA P-256"
 		}
-		if algorithm == "EC_SIGN_P384_SHA384" {
+		if strings.ToLower(algorithm) == "ec_sign_p384_sha384" {
 			return "HSM ECDSA P-384"
 		}
 		rsaType := strings.Split(algorithm, "_")[3]
@@ -163,20 +163,20 @@ func cryptoKeyDescription(algorithm string, protectionLevel string) string {
 }
 
 func keyOperationsDescription(algorithm string, protectionLevel string) string {
-	switch protectionLevel {
-	case "SOFTWARE":
-		if algorithm == "GOOGLE_SYMMETRIC_ENCRYPTION" {
+	switch strings.ToLower(protectionLevel) {
+	case "software":
+		if strings.ToLower(algorithm) == "google_symmetric_encryption" {
 			return "Cryptographic operations with a software symmetric"
 		}
 		return "Software asymmetric cryptographic"
-	case "HSM":
-		if algorithm == "GOOGLE_SYMMETRIC_ENCRYPTION" {
+	case "hsm":
+		if strings.ToLower(algorithm) == "google_symmetric_encryption" {
 			return "HSM symmetric cryptographic"
 		}
-		if algorithm == "EC_SIGN_P256_SHA256" {
+		if strings.ToLower(algorithm) == "ec_sign_p256_sha256" {
 			return "HSM cryptographic operations with an ECDSA P-256"
 		}
-		if algorithm == "EC_SIGN_P384_SHA384" {
+		if strings.ToLower(algorithm) == "ec_sign_p384_sha384" {
 			return "HSM cryptographic operations with an ECDSA P-384"
 		}
 		rsaType := strings.Split(algorithm, "_")[3]

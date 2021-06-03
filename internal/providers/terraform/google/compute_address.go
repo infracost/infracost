@@ -3,6 +3,7 @@ package google
 import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	"strings"
 )
 
 func GetComputeAddressRegistryItem() *schema.RegistryItem {
@@ -25,7 +26,7 @@ func NewComputeAddress(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 	region := d.Get("region").String()
 
 	addressType := d.Get("address_type").String()
-	if addressType == "INTERNAL" {
+	if strings.ToLower(addressType) == "internal" {
 		return &schema.Resource{
 			Name:      d.Address,
 			NoPrice:   true,

@@ -68,20 +68,20 @@ func getDSRegionResourceGroup(location, storageClass string) (string, string) {
 		resourceGroup = "RegionalStorage"
 	}
 	// Set the resource group to the right value if the location is a multi-region region
-	if resourceGroup == "RegionalStorage" {
-		switch location {
+	if strings.ToLower(resourceGroup) == "regionalstorage" {
+		switch strings.ToLower(location) {
 		// Multi-region locations
-		case "ASIA", "EU", "US":
+		case "asia", "eu", "us":
 			resourceGroup = "MultiRegionalStorage"
 		// Dual-region locations
-		case "ASIA1", "EUR4", "NAM4":
+		case "asia1", "eur4", "namM4":
 			// The pricing api treats a dual-region as a multi-region
 			resourceGroup = "MultiRegionalStorage"
 		}
 	}
 
 	// Handling an exceptional naming
-	if location == "EU" && resourceGroup == "MultiRegionalStorage" {
+	if strings.ToLower(location) == "eu" && strings.ToLower(resourceGroup) == "multiregionalstorage" {
 		region = "europe"
 	}
 

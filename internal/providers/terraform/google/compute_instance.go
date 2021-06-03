@@ -64,7 +64,7 @@ func NewComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 func computeCostComponent(region, machineType string, purchaseOption string) *schema.CostComponent {
 	sustainedUseDiscount := 0.0
-	if purchaseOption == "on_demand" {
+	if strings.ToLower(purchaseOption) == "on_demand" {
 		switch strings.Split(machineType, "-")[0] {
 		case "c2", "n2", "n2d":
 			sustainedUseDiscount = 0.2
@@ -107,7 +107,7 @@ func bootDisk(region string, initializeParams gjson.Result) *schema.CostComponen
 
 func scratchDisk(region string, purchaseOption string, count int) *schema.CostComponent {
 	descRegex := "/^SSD backed Local Storage( in .*)?$/"
-	if purchaseOption == "preemptible" {
+	if strings.ToLower(purchaseOption) == "preemptible" {
 		descRegex = "/^SSD backed Local Storage attached to Preemptible VMs/"
 	}
 
@@ -157,14 +157,14 @@ func guestAccelerator(region string, purchaseOption string, guestAccel gjson.Res
 	}
 
 	descRegex := fmt.Sprintf("/^%s running/", descPrefix)
-	if purchaseOption == "preemptible" {
+	if strings.ToLower(purchaseOption) == "preemptible" {
 		descRegex = fmt.Sprintf("/^%s attached to preemptible VMs running/", descPrefix)
 	}
 
 	count := decimal.NewFromInt(guestAccel.Get("count").Int())
 
 	sustainedUseDiscount := 0.0
-	if purchaseOption == "on_demand" {
+	if strings.ToLower(purchaseOption) == "on_demand" {
 		sustainedUseDiscount = 0.3
 	}
 
