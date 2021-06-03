@@ -43,7 +43,7 @@
  └─ Storage                                                            5  GB                       $0.50 
                                                                                                          
  azurerm_mssql_database.premium6                                                                         
- ├─ Compute (P6)                                                      30  hours                $3,600.00 
+ ├─ Compute (P6)                                                      30  days                 $3,600.00 
  ├─ Extra data storage                                               500  GB                     $170.00 
  └─ Long-term retention                                            1,000  GB                      $50.00 
                                                                                                          
@@ -53,12 +53,12 @@
  └─ Long-term retention                                   Monthly cost depends on usage: $0.05 per GB    
                                                                                                          
  azurerm_mssql_database.standard1                                                                        
- ├─ Compute (S1)                                                      30  hours                   $29.03 
+ ├─ Compute (S1)                                                      30  days                    $29.03 
  ├─ Extra data storage                                    Monthly cost depends on usage: $0.17 per GB    
  └─ Long-term retention                                   Monthly cost depends on usage: $0.05 per GB    
                                                                                                          
  azurerm_mssql_database.standard12                                                                       
- ├─ Compute (S12)                                                     30  hours                $4,355.10 
+ ├─ Compute (S12)                                                     30  days                 $4,355.10 
  ├─ Extra data storage                                               250  GB                      $42.50 
  └─ Long-term retention                                   Monthly cost depends on usage: $0.05 per GB    
                                                                                                          

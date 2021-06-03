@@ -60,7 +60,7 @@ func dtuPurchaseCostComponents(region, sku string, d *schema.ResourceData, u *sc
 
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            fmt.Sprintf("Compute (%s)", strings.ToTitle(sku)),
-		Unit:            "hours",
+		Unit:            "days",
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(30)),
 		ProductFilter: &schema.ProductFilter{
