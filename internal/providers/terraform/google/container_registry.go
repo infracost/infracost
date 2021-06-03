@@ -22,7 +22,7 @@ func NewContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		Name:           d.Address,
 		CostComponents: components,
 		SubResources: []*schema.Resource{
-			networkEgress(d, u),
+			networkEgress(u, "Network egress", "Data transfer", ContainerRegistryEgress),
 		},
 	}
 }
