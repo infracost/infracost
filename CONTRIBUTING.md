@@ -363,7 +363,26 @@ When Infracost is run with the `--usage-file=path/to/infracost-usage.yml` flag t
 
 The following notes are general guidelines, please leave a comment in your pull request if they don't make sense or they can be improved for the resource you're adding.
 
-- references to other resources: if you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. For example the [aws_ebs_snapshot](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/ebs_snapshot.go#L13) uses this because its price depends on the size of the referenced volume.
+- references to other resources: if you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. The following example uses this because the price for `aws_ebs_snapshot` depends on the size of the referenced volume. You should always check the array length returned by `d.References` to avoid panics.
+	```go
+	func GetEBSSnapshotRegistryItem() *schema.RegistryItem {
+		return &schema.RegistryItem{
+			Name:                "aws_ebs_snapshot",
+			RFunc:               NewEBSSnapshot,
+			ReferenceAttributes: []string{"volume_id"}, // Load the reference
+		}
+	}
+
+	func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+		volumeRefs := d.References("volume_id") // Get the reference
+
+		// Always check the array length to avoid panics as `d.References` might not find the reference, e.g. it might point to another module via a data resource.
+		if len(volumeRefs) > 0 {
+			gbVal = decimal.NewFromFloat(volumeRefs[0].Get("size").Float())
+		}
+		// ...
+	}
+	```
 
 - count: do not include the count in the cost component name or in brackets. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
 
@@ -453,6 +472,8 @@ The following notes are general guidelines, please leave a comment in your pull 
 ### Azure
 
 > **Note:** Developing Azure resources requires Azure creds. See below for details.
+
+- Unless the resource has global or zone-based pricing, the first line of the resource function should be `region := lookupRegion(d, []string{})` where the second parameter is an optional list of parent resources where the region can be found. Search the code for `lookupRegion` to find examples of how this method is used in other Azure resources.
 
 - The Azure Terraform provider requires real credentials to be able to run `terraform plan`. This means you must have Azure credentials for running the Infracost commands and integration tests for Azure. We recommend creating read-only Azure credentials for this purpose. If you have an Azure subscription, you can do this by running the `az` command line:
 	```sh
