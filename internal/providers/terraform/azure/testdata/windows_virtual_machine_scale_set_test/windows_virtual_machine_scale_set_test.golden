@@ -13,7 +13,6 @@
     ├─ Storage (S4)                                                         4  months                           $6.14 
     └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                       
- PROJECT TOTAL                                                                                                $690.38 
-
+ OVERALL TOTAL                                                                                                $690.38 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

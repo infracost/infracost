@@ -33,7 +33,6 @@
  azurerm_notification_hub_namespace.stdbelow10M                                                                
  └─ Namespace usage (Standard)                                           1  months                     $200.00 
                                                                                                                
- PROJECT TOTAL                                                                                       $2,815.00 
-
+ OVERALL TOTAL                                                                                       $2,815.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

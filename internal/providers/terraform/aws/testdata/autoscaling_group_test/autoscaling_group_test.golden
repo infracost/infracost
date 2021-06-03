@@ -128,8 +128,7 @@
     └─ root_block_device                                                                           
        └─ Storage (general purpose SSD, gp2)                          24  GB                 $2.40 
                                                                                                    
- PROJECT TOTAL                                                                           $2,939.78 
-
+ OVERALL TOTAL                                                                           $2,939.78 
 ----------------------------------
 1 resource type wasn't estimated as it's not supported yet.
 Please watch/star https://github.com/infracost/infracost as new resources are added regularly.

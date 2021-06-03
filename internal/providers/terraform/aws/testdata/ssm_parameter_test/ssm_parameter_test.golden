@@ -9,7 +9,6 @@
  ├─ Parameter storage (advanced)                                   600  hours                            $0.04 
  └─ API interactions (advanced)                                     10  10k interactions                 $0.50 
                                                                                                                
- PROJECT TOTAL                                                                                           $0.59 
-
+ OVERALL TOTAL                                                                                           $0.59 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

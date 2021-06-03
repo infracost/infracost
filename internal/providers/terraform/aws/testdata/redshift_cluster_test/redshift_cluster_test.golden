@@ -29,7 +29,6 @@
  ├─ Spectrum                                 Monthly cost depends on usage: $5.00 per TB                
  └─ Backup storage (first 50 TB)             Monthly cost depends on usage: $0.023 per GB               
                                                                                                         
- PROJECT TOTAL                                                                               $42,976.77 
-
+ OVERALL TOTAL                                                                               $42,976.77 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

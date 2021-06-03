@@ -7,7 +7,6 @@
  aws_ecr_repository.repo1                                              
  └─ Storage                Monthly cost depends on usage: $0.10 per GB 
                                                                        
- PROJECT TOTAL                                                   $0.10 
-
+ OVERALL TOTAL                                                   $0.10 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

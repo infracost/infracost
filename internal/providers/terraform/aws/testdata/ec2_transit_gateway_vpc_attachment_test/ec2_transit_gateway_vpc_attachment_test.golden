@@ -5,7 +5,6 @@
  ├─ Transit gateway attachment                                    730  hours                 $36.50 
  └─ Data processed                                      Monthly cost depends on usage: $0.02 per GB 
                                                                                                     
- PROJECT TOTAL                                                                               $36.50 
-
+ OVERALL TOTAL                                                                               $36.50 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

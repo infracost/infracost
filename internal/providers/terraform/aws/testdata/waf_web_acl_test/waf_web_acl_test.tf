@@ -69,7 +69,7 @@ resource "aws_waf_web_acl" "my_waf" {
     rule_id  = aws_waf_rule.wafrule.id
     type     = "GROUP"
   }
-   rules {
+  rules {
     action {
       type = "BLOCK"
     }
@@ -119,7 +119,7 @@ resource "aws_waf_web_acl" "withoutUsage" {
     rule_id  = aws_waf_rule.wafrule.id
     type     = "GROUP"
   }
-   rules {
+  rules {
     action {
       type = "BLOCK"
     }

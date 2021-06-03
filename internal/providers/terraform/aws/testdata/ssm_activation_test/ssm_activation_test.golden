@@ -7,7 +7,6 @@
  aws_ssm_activation.ssm_activation_withUsage                                                    
  └─ On-prem managed instances (advanced)               73,000  hours                    $507.35 
                                                                                                 
- PROJECT TOTAL                                                                          $507.35 
-
+ OVERALL TOTAL                                                                          $507.35 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -7,8 +7,7 @@
  azurerm_app_service_plan.example                                                       
  └─ Instance usage (S1)                                       730  hours         $73.00 
                                                                                         
- PROJECT TOTAL                                                                  $112.00 
-
+ OVERALL TOTAL                                                                  $112.00 
 ----------------------------------
 1 resource type wasn't estimated as it's not supported yet.
 Please watch/star https://github.com/infracost/infracost as new resources are added regularly.

@@ -15,7 +15,6 @@
  azurerm_public_ip_prefix.example                                                 
  └─ IP prefix                                 730  hours                    $4.38 
                                                                                   
- PROJECT TOTAL                                                             $74.18 
-
+ OVERALL TOTAL                                                             $74.18 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

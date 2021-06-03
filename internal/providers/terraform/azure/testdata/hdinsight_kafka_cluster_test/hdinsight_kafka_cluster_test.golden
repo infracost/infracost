@@ -22,8 +22,7 @@
  ├─ Managed OS disks                                          4  months                           $163.84 
  └─ Disk operations                                          40  100K operations                    $0.01 
                                                                                                           
- PROJECT TOTAL                                                                                 $27,535.31 
-
+ OVERALL TOTAL                                                                                 $27,535.31 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
 

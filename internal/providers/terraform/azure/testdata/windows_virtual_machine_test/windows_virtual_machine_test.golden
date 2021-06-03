@@ -37,7 +37,6 @@
  └─ os_disk                                                                                                                
     └─ Storage (P4)                                                              1  months                           $5.28 
                                                                                                                            
- PROJECT TOTAL                                                                                                   $1,943.37 
-
+ OVERALL TOTAL                                                                                                   $1,943.37 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

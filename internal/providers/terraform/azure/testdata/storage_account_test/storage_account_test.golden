@@ -136,7 +136,6 @@
  ├─ Data retrieval                                Monthly cost depends on usage: $0.01 per GB                
  └─ Early deletion                                Monthly cost depends on usage: $0.0228 per GB              
                                                                                                              
- PROJECT TOTAL                                                                                 $1,749,965.41 
-
+ OVERALL TOTAL                                                                                 $1,749,965.41 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
