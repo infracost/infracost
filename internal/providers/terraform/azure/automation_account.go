@@ -48,14 +48,14 @@ func NewAzureRMAutomationAccount(d *schema.ResourceData, u *schema.UsageData) *s
 		monthlyWatcherHours = decimalPtr(decimal.NewFromInt(u.Get("monthly_watcher_hours").Int()))
 	}
 
-	costComponents = append(costComponents, WatchersCostComponent(location, "744", "Watcher", monthlyWatcherHours))
+	costComponents = append(costComponents, watchersCostComponent(location, "744", "Watcher", monthlyWatcherHours))
 
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
 }
-func WatchersCostComponent(location, startUsage, meterName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
+func watchersCostComponent(location, startUsage, meterName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            "Watchers",
