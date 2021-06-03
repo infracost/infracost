@@ -5,13 +5,14 @@ import (
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
 func GetAzureRMCosmosdbCassandraKeyspaceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_cosmosdb_cassandra_keyspace",
-		RFunc: NewAzureRMCosmosdbCassandraKeyspace,
+		RFunc: NewAzureRMCosmosdb,
 		ReferenceAttributes: []string{
 			"account_name",
 		},
@@ -26,13 +27,16 @@ const (
 	Serverless
 )
 
-func NewAzureRMCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	account := d.References("account_name")[0]
-
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: cosmosDBCostComponents(d, u, account),
+func NewAzureRMCosmosdb(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	if len(d.References("account_name")) > 0 {
+		account := d.References("account_name")[0]
+		return &schema.Resource{
+			Name:           d.Address,
+			CostComponents: cosmosDBCostComponents(d, u, account),
+		}
 	}
+	log.Warnf("Skipping resource %s as its 'account_name' property could not be found.", d.Address)
+	return nil
 }
 
 func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account *schema.ResourceData) []*schema.CostComponent {
