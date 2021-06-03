@@ -218,9 +218,9 @@ func buildCostComponentRows(t table.Writer, costComponents []CostComponent, pref
 
 			t.AppendRow(table.Row{
 				label,
-				ui.FaintString(price),
-				ui.FaintString(price),
-				ui.FaintString(price),
+				price,
+				price,
+				price,
 			}, table.RowConfig{AutoMerge: true, AlignAutoMerge: text.AlignLeft})
 		} else {
 			var tableRow table.Row
