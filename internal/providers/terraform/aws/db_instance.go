@@ -62,10 +62,10 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 
 	var licenseModel *string
 	engineVal := d.Get("engine").String()
-	if engineVal == "oracle-se1" || engineVal == "oracle-se2" || strings.HasPrefix(engineVal, "sqlserver-") {
+	if strings.ToLower(engineVal) == "oracle-se1" || strings.ToLower(engineVal) == "oracle-se2" || strings.HasPrefix(engineVal, "sqlserver-") {
 		licenseModel = strPtr("License included")
 	}
-	if d.Get("license_model").String() == "bring-your-own-license" {
+	if strings.ToLower(d.Get("license_model").String()) == "bring-your-own-license" {
 		licenseModel = strPtr("Bring your own license")
 	}
 
@@ -73,9 +73,9 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	if d.Get("storage_type").Exists() {
 		if d.Get("iops").Exists() && d.Get("iops").Type != gjson.Null {
 			volumeType = "Provisioned IOPS"
-		} else if d.Get("storage_type").String() == "standard" {
+		} else if strings.ToLower(d.Get("storage_type").String()) == "standard" {
 			volumeType = "Magnetic"
-		} else if d.Get("storage_type").String() == "io1" {
+		} else if strings.ToLower(d.Get("storage_type").String()) == "io1" {
 			volumeType = "Provisioned IOPS"
 		}
 	}
@@ -143,7 +143,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		},
 	}
 
-	if volumeType == "Provisioned IOPS" {
+	if strings.ToLower(volumeType) == "provisioned iops" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Database storage IOPS",
 			Unit:            "IOPS",

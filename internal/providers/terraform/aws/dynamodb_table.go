@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 
@@ -24,7 +25,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 
 	billingMode := d.Get("billing_mode").String()
 
-	if billingMode == "PROVISIONED" {
+	if strings.ToLower(billingMode) == "provisioned" {
 		// Write capacity units (WCU)
 		costComponents = append(costComponents, wcuCostComponent(d))
 		// Read capacity units (RCU)
@@ -33,7 +34,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 
 	// Infracost usage data
 
-	if billingMode == "PAY_PER_REQUEST" {
+	if strings.ToLower(billingMode) == "pay_per_request" {
 		// Write request units (WRU)
 		costComponents = append(costComponents, wruCostComponent(d, u))
 		// Read request units (RRU)
@@ -124,10 +125,10 @@ func globalTables(d *schema.ResourceData, u *schema.UsageData) []*schema.Resourc
 			region := data.Get("region_name").String()
 			name := fmt.Sprintf("Global table (%s)", region)
 			var capacity int64
-			if billingMode == "PROVISIONED" {
+			if strings.ToLower(billingMode) == "provisioned" {
 				capacity = d.Get("write_capacity").Int()
 				resources = append(resources, newProvisionedDynamoDBGlobalTable(name, region, capacity))
-			} else if billingMode == "PAY_PER_REQUEST" {
+			} else if strings.ToLower(billingMode) == "pay_per_request" {
 				if u != nil && u.Get("monthly_write_request_units").Exists() {
 					capacity = u.Get("monthly_write_request_units").Int()
 				}

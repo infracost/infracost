@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 
@@ -93,12 +94,12 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 		},
 	}
 
-	if volumeAPIName == "io1" || volumeAPIName == "io2" {
+	if strings.ToLower(volumeAPIName) == "io1" || strings.ToLower(volumeAPIName) == "io2" {
 		costComponents = append(costComponents, ebsProvisionedIops(region, volumeAPIName, usageType, &iopsVal))
 
 	}
 
-	if volumeAPIName == "standard" {
+	if strings.ToLower(volumeAPIName) == "standard" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "I/O requests",
 			Unit:            "1M request",
@@ -117,7 +118,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 		})
 	}
 
-	if volumeAPIName == "gp3" {
+	if strings.ToLower(volumeAPIName) == "gp3" {
 		if throughputVal != nil {
 			if throughputVal.GreaterThan(decimal.NewFromInt(125)) {
 				throughputVal = decimalPtr(throughputVal.Sub(decimal.NewFromInt(125)))
