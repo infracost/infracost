@@ -1,3 +1,4 @@
+
  Name                                                    Monthly Qty  Unit                        Monthly Cost 
                                                                                                                
  aws_rds_cluster.default                                                                                       
@@ -20,3 +21,5 @@
  └─ CPU credits                                                   48  vCPU-hours                         $4.32 
                                                                                                                
  OVERALL TOTAL                                                                                         $275.88 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
