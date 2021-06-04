@@ -63,82 +63,48 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	backupStorageRetention := decimal.NewFromInt(d.Get("backup_retention_period").Int())
 	if backupStorageRetention.GreaterThan(decimal.NewFromInt(1)) {
 
-		var snapShotStorageSizeGB *decimal.Decimal
+		var snapShotStorageSizeGB, totalBackupStorageGB *decimal.Decimal
 		if u != nil && u.Get("backup_snapshot_size_gb").Exists() {
 			snapShotStorageSizeGB = decimalPtr(decimal.NewFromFloat(u.Get("backup_snapshot_size_gb").Float()))
-
-			totalBackupStorageGB := calculateBackupStorage(*snapShotStorageSizeGB, backupStorageRetention)
-			if totalBackupStorageGB.GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, auroraBackupStorageCostComponent(region, &totalBackupStorageGB, databaseEngine))
-			}
-		} else {
-			var unknown *decimal.Decimal
-
-			costComponents = append(costComponents, auroraBackupStorageCostComponent(region, unknown, databaseEngine))
+			totalBackupStorageGB = decimalPtr(calculateBackupStorage(*snapShotStorageSizeGB, backupStorageRetention))
 		}
+
+		costComponents = append(costComponents, auroraBackupStorageCostComponent(region, totalBackupStorageGB, databaseEngine))
 	}
 
 	if databaseEngineMode != "Serverless" && !strings.Contains(d.Get("engine").String(), "postgresql") {
-		var averageStatements, backtrackChangeRecords, backtrackWindowHours *decimal.Decimal
+		var averageStatements, backtrackChangeRecords, backtrackWindowHours, totalBacktrackChangeRecords *decimal.Decimal
 		if u != nil && averageStatementsPerHrExists(u) && changeRecordsPerStatementExists(u) && backtrackWindowHrsExists(u) {
 			averageStatements = decimalPtr(decimal.NewFromInt(u.Get("average_statements_per_hr").Int()))
 			backtrackChangeRecords = decimalPtr(decimal.NewFromFloat(u.Get("change_records_per_statement").Float()))
 			backtrackWindowHours = decimalPtr(decimal.NewFromInt(u.Get("backtrack_window_hrs").Int()))
 
-			totalBacktrackChangeRecords := calculateBacktrack(*averageStatements, *backtrackChangeRecords, *backtrackWindowHours)
-
-			if totalBacktrackChangeRecords.GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, auroraBacktrackCostComponent(region, &totalBacktrackChangeRecords))
-			}
-		} else {
-			var unknown *decimal.Decimal
-
-			costComponents = append(costComponents, auroraBacktrackCostComponent(region, unknown))
+			totalBacktrackChangeRecords = decimalPtr(calculateBacktrack(*averageStatements, *backtrackChangeRecords, *backtrackWindowHours))
 		}
+		costComponents = append(costComponents, auroraBacktrackCostComponent(region, totalBacktrackChangeRecords))
 	}
 
 	var snapshotExportSizeGB *decimal.Decimal
 	if u != nil && u.Get("snapshot_export_size_gb").Exists() {
 		snapshotExportSizeGB = decimalPtr(decimal.NewFromFloat(u.Get("snapshot_export_size_gb").Float()))
-
-		if snapshotExportSizeGB.GreaterThan(decimal.Zero) {
-			costComponents = append(costComponents, &schema.CostComponent{
-				Name:            "Snapshot export",
-				Unit:            "GB",
-				UnitMultiplier:  1,
-				MonthlyQuantity: snapshotExportSizeGB,
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Service:       strPtr("AmazonRDS"),
-					Region:        strPtr(region),
-					ProductFamily: strPtr("System Operation"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "databaseEngine", Value: databaseEngine},
-						{Key: "usagetype", ValueRegex: strPtr("/Aurora:SnapshotExportToS3/")},
-					},
-				},
-			})
-		}
-	} else {
-		var unknown *decimal.Decimal
-
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Snapshot export",
-			Unit:            "GB",
-			UnitMultiplier:  1,
-			MonthlyQuantity: unknown,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Service:       strPtr("AmazonRDS"),
-				Region:        strPtr(region),
-				ProductFamily: strPtr("System Operation"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "databaseEngine", Value: databaseEngine},
-					{Key: "usagetype", ValueRegex: strPtr("/Aurora:SnapshotExportToS3/")},
-				},
-			},
-		})
 	}
+
+	costComponents = append(costComponents, &schema.CostComponent{
+		Name:            "Snapshot export",
+		Unit:            "GB",
+		UnitMultiplier:  1,
+		MonthlyQuantity: snapshotExportSizeGB,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Service:       strPtr("AmazonRDS"),
+			Region:        strPtr(region),
+			ProductFamily: strPtr("System Operation"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "databaseEngine", Value: databaseEngine},
+				{Key: "usagetype", ValueRegex: strPtr("/Aurora:SnapshotExportToS3/")},
+			},
+		},
+	})
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -156,8 +122,7 @@ func auroraStorageCostComponent(region string, u *schema.UsageData, databaseEngi
 	if u != nil && u.Get("write_requests_per_sec").Exists() && u.Get("read_requests_per_sec").Exists() {
 		writeRequestsPerSecond = decimalPtr(decimal.NewFromInt(u.Get("write_requests_per_sec").Int()))
 		readRequestsPerSecond = decimalPtr(decimal.NewFromInt(u.Get("read_requests_per_sec").Int()))
-		monthlyIORequestsD := calculateIORequests(*readRequestsPerSecond, *writeRequestsPerSecond)
-		monthlyIORequests = &monthlyIORequestsD
+		monthlyIORequests = decimalPtr(calculateIORequests(*readRequestsPerSecond, *writeRequestsPerSecond))
 	}
 
 	return []*schema.CostComponent{
