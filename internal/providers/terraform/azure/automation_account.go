@@ -12,15 +12,12 @@ func GetAzureRMAutomationAccountRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_automation_account",
 		RFunc: NewAzureRMAutomationAccount,
-		ReferenceAttributes: []string{
-			"resource_group_name",
-		},
 	}
 }
 
 func NewAzureRMAutomationAccount(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyJobRunMins, nonAzureConfigNodeCount, monthlyWatcherHours *decimal.Decimal
-	location := lookupRegion(d, []string{"resource_group_name"})
+	location := lookupRegion(d, []string{})
 	costComponents := make([]*schema.CostComponent, 0)
 
 	if u != nil && u.Get("monthly_job_run_mins").Type != gjson.Null {

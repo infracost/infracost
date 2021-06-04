@@ -12,9 +12,6 @@ func GetAzureRMAutomationDscConfigurationRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_automation_dsc_configuration",
 		RFunc: NewAzureRMAutomationDscConfiguration,
-		ReferenceAttributes: []string{
-			"resource_group_name",
-		},
 	}
 }
 
@@ -28,7 +25,7 @@ func NewAzureRMAutomationDscConfiguration(d *schema.ResourceData, u *schema.Usag
 func nodesCostComponent(d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
 	var nonAzureConfigNodeCount *decimal.Decimal
 
-	location := lookupRegion(d, []string{"resource_group_name"})
+	location := lookupRegion(d, []string{})
 
 	if u != nil && u.Get("non_azure_config_node_count").Type != gjson.Null {
 		nonAzureConfigNodeCount = decimalPtr(decimal.NewFromInt(u.Get("non_azure_config_node_count").Int()))

@@ -12,15 +12,12 @@ func GetAzureRMAutomationJobScheduleRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_automation_job_schedule",
 		RFunc: NewAzureRMAutomationJobSchedule,
-		ReferenceAttributes: []string{
-			"resource_group_name",
-		},
 	}
 }
 
 func NewAzureRMAutomationJobSchedule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyJobRunMins *decimal.Decimal
-	location := lookupRegion(d, []string{"resource_group_name"})
+	location := lookupRegion(d, []string{})
 	if u != nil && u.Get("monthly_job_run_mins").Type != gjson.Null {
 		monthlyJobRunMins = decimalPtr(decimal.NewFromInt(u.Get("monthly_job_run_mins").Int()))
 	}
