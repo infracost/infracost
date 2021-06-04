@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  azurerm_automation_dsc_nodeconfiguration.zeroNodes: 
+    non_azure_config_node_count: 0 # Number of non-Azure configuration nodes.
+
+  azurerm_automation_dsc_nodeconfiguration.fiveNodes: 
+    non_azure_config_node_count: 5 # Number of non-Azure configuration nodes. 

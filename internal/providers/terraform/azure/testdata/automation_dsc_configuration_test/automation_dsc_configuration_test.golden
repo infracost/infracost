@@ -1,0 +1,20 @@
+
+ Name                                                    Monthly Qty  Unit                Monthly Cost 
+                                                                                                       
+ azurerm_automation_account.example                                                                    
+ ├─ Job run time                                     Monthly cost depends on usage: $0.002 per minutes 
+ ├─ Non-azure config nodes                           Monthly cost depends on usage: $6.00 per nodes    
+ └─ Watchers                                         Monthly cost depends on usage: $0.002 per hours   
+                                                                                                       
+ azurerm_automation_dsc_configuration.fiveNodes                                                        
+ └─ Non-azure config nodes                                         5  nodes                     $30.00 
+                                                                                                       
+ azurerm_automation_dsc_configuration.without_usage                                                    
+ └─ Non-azure config nodes                           Monthly cost depends on usage: $6.00 per nodes    
+                                                                                                       
+ azurerm_automation_dsc_configuration.zeroNodes                                                        
+ └─ Non-azure config nodes                                         0  nodes                      $0.00 
+                                                                                                       
+ OVERALL TOTAL                                                                                  $30.00 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
