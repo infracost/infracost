@@ -68,7 +68,6 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 			snapShotStorageSizeGB = decimalPtr(decimal.NewFromFloat(u.Get("backup_snapshot_size_gb").Float()))
 			totalBackupStorageGB = decimalPtr(calculateBackupStorage(*snapShotStorageSizeGB, backupStorageRetention))
 		}
-
 		costComponents = append(costComponents, auroraBackupStorageCostComponent(region, totalBackupStorageGB, databaseEngine))
 	}
 
