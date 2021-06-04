@@ -2,7 +2,6 @@ package azure
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -21,8 +20,7 @@ func GetAzureRMAutomationAccountRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMAutomationAccount(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyJobRunMins, nonAzureConfigNodeCount, monthlyWatcherHours *decimal.Decimal
-	group := d.References("resource_group_name")[0]
-	location := strings.ToLower(group.Get("location").String())
+	location := lookupRegion(d, []string{"resource_group_name"})
 	costComponents := make([]*schema.CostComponent, 0)
 
 	if u != nil && u.Get("monthly_job_run_mins").Type != gjson.Null {
@@ -31,8 +29,7 @@ func NewAzureRMAutomationAccount(d *schema.ResourceData, u *schema.UsageData) *s
 			costComponents = append(costComponents, runTimeCostComponent(location, "500", "Basic Runtime", monthlyJobRunMins))
 		}
 	} else {
-		var unknown *decimal.Decimal
-		costComponents = append(costComponents, runTimeCostComponent(location, "500", "Basic Runtime", unknown))
+		costComponents = append(costComponents, runTimeCostComponent(location, "500", "Basic Runtime", monthlyJobRunMins))
 	}
 
 	if u != nil && u.Get("non_azure_config_node_count").Type != gjson.Null {
@@ -41,8 +38,7 @@ func NewAzureRMAutomationAccount(d *schema.ResourceData, u *schema.UsageData) *s
 			costComponents = append(costComponents, nonNodesCostComponent(location, "5", "Non-Azure Node", nonAzureConfigNodeCount))
 		}
 	} else {
-		var unknown *decimal.Decimal
-		costComponents = append(costComponents, nonNodesCostComponent(location, "5", "Non-Azure Node", unknown))
+		costComponents = append(costComponents, nonNodesCostComponent(location, "5", "Non-Azure Node", nonAzureConfigNodeCount))
 	}
 	if u != nil && u.Get("monthly_watcher_hours").Type != gjson.Null {
 		monthlyWatcherHours = decimalPtr(decimal.NewFromInt(u.Get("monthly_watcher_hours").Int()))

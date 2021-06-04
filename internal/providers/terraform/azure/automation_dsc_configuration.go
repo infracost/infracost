@@ -2,7 +2,6 @@ package azure
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -20,19 +19,16 @@ func GetAzureRMAutomationDscConfigurationRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAutomationDscConfiguration(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-
-	group := d.References("resource_group_name")[0]
-
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: nodesCostComponent(d, u, group),
+		CostComponents: nodesCostComponent(d, u),
 	}
 }
 
-func nodesCostComponent(d *schema.ResourceData, u *schema.UsageData, group *schema.ResourceData) []*schema.CostComponent {
+func nodesCostComponent(d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
 	var nonAzureConfigNodeCount *decimal.Decimal
 
-	location := strings.ToLower(group.Get("location").String())
+	location := lookupRegion(d, []string{"resource_group_name"})
 
 	if u != nil && u.Get("non_azure_config_node_count").Type != gjson.Null {
 		nonAzureConfigNodeCount = decimalPtr(decimal.NewFromInt(u.Get("non_azure_config_node_count").Int()))
