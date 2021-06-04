@@ -12,6 +12,7 @@ type EgressResourceType int
 const (
 	StorageBucketEgress EgressResourceType = iota
 	ContainerRegistryEgress
+	ComputeExternalVPNGateway
 )
 
 type egressRegionData struct {
@@ -25,7 +26,7 @@ type egressRegionUsageFilterData struct {
 	usageName   string
 }
 
-func networkEgress(u *schema.UsageData, resourceName, prefixName string, egressResourceType EgressResourceType) *schema.Resource {
+func networkEgress(region string, u *schema.UsageData, resourceName, prefixName string, egressResourceType EgressResourceType) *schema.Resource {
 	resource := &schema.Resource{
 		Name:           resourceName,
 		CostComponents: []*schema.CostComponent{},
@@ -61,6 +62,7 @@ func networkEgress(u *schema.UsageData, resourceName, prefixName string, egressR
 		apiDescription := regData.apiDescription
 		usageKey := regData.usageKey
 
+		// TODO: Reformat it to use tier helpers.
 		var usage int64
 		var used int64
 		var lastEndUsageAmount int64
@@ -96,8 +98,9 @@ func networkEgress(u *schema.UsageData, resourceName, prefixName string, egressR
 				UnitMultiplier:  1,
 				MonthlyQuantity: quantity,
 				ProductFilter: &schema.ProductFilter{
+					Region:     getEgressAPIRegionName(region, egressResourceType),
 					VendorName: strPtr("gcp"),
-					Service:    strPtr("Cloud Storage"),
+					Service:    getEgressAPIServiceName(egressResourceType),
 					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "description", Value: strPtr(apiDescription)},
 					},
@@ -113,33 +116,59 @@ func networkEgress(u *schema.UsageData, resourceName, prefixName string, egressR
 }
 
 func doesEgressIncludeSameContinent(egressResourceType EgressResourceType) bool {
-	return true
+	switch egressResourceType {
+	case ComputeExternalVPNGateway:
+		return false
+	default:
+		return true
+	}
 }
 
 func getEgressRegionsData(prefixName string, egressResourceType EgressResourceType) []*egressRegionData {
-	regionsData := []*egressRegionData{
-		{
-			gRegion:        fmt.Sprintf("%s to worldwide excluding Asia, Australia", prefixName),
-			apiDescription: "Download Worldwide Destinations (excluding Asia & Australia)",
-			usageKey:       "monthly_egress_data_transfer_gb.worldwide",
-		},
-		{
-			gRegion:        fmt.Sprintf("%s to Asia excluding China, but including Hong Kong", prefixName),
-			apiDescription: "Download APAC",
-			usageKey:       "monthly_egress_data_transfer_gb.asia",
-		},
-		{
-			gRegion:        fmt.Sprintf("%s to China excluding Hong Kong", prefixName),
-			apiDescription: "Download China",
-			usageKey:       "monthly_egress_data_transfer_gb.china",
-		},
-		{
-			gRegion:        fmt.Sprintf("%s to Australia", prefixName),
-			apiDescription: "Download Australia",
-			usageKey:       "monthly_egress_data_transfer_gb.australia",
-		},
+	switch egressResourceType {
+	case ComputeExternalVPNGateway:
+		return []*egressRegionData{
+			{
+				gRegion: fmt.Sprintf("%s to worldwide excluding China, Australia but including Hong Kong", prefixName),
+				// There is no worldwide option in APIs, so we take a random region.
+				apiDescription: "Network Vpn Internet Egress from Americas to Western Europe",
+				usageKey:       "monthly_egress_data_transfer_gb.worldwide",
+			},
+			{
+				gRegion:        fmt.Sprintf("%s to China excluding Hong Kong", prefixName),
+				apiDescription: "Network Vpn Internet Egress from Americas to China",
+				usageKey:       "monthly_egress_data_transfer_gb.china",
+			},
+			{
+				gRegion:        fmt.Sprintf("%s to Australia", prefixName),
+				apiDescription: "Network Vpn Internet Egress from Americas to Australia",
+				usageKey:       "monthly_egress_data_transfer_gb.australia",
+			},
+		}
+	default:
+		return []*egressRegionData{
+			{
+				gRegion:        fmt.Sprintf("%s to worldwide excluding Asia, Australia", prefixName),
+				apiDescription: "Download Worldwide Destinations (excluding Asia & Australia)",
+				usageKey:       "monthly_egress_data_transfer_gb.worldwide",
+			},
+			{
+				gRegion:        fmt.Sprintf("%s to Asia excluding China, but including Hong Kong", prefixName),
+				apiDescription: "Download APAC",
+				usageKey:       "monthly_egress_data_transfer_gb.asia",
+			},
+			{
+				gRegion:        fmt.Sprintf("%s to China excluding Hong Kong", prefixName),
+				apiDescription: "Download China",
+				usageKey:       "monthly_egress_data_transfer_gb.china",
+			},
+			{
+				gRegion:        fmt.Sprintf("%s to Australia", prefixName),
+				apiDescription: "Download Australia",
+				usageKey:       "monthly_egress_data_transfer_gb.australia",
+			},
+		}
 	}
-	return regionsData
 }
 
 func getEgressUsageFiltersData(egressResourceType EgressResourceType) []*egressRegionUsageFilterData {
@@ -158,4 +187,22 @@ func getEgressUsageFiltersData(egressResourceType EgressResourceType) []*egressR
 		},
 	}
 	return usageFiltersData
+}
+
+func getEgressAPIRegionName(region string, egressResourceType EgressResourceType) *string {
+	switch egressResourceType {
+	case ComputeExternalVPNGateway:
+		return strPtr(region)
+	default:
+		return nil
+	}
+}
+
+func getEgressAPIServiceName(egressResourceType EgressResourceType) *string {
+	switch egressResourceType {
+	case ComputeExternalVPNGateway:
+		return strPtr("Compute Engine")
+	default:
+		return strPtr("Cloud Storage")
+	}
 }

@@ -13,6 +13,7 @@ func GetContainerRegistryItem() *schema.RegistryItem {
 }
 
 func NewContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := d.Get("region").String()
 	components := []*schema.CostComponent{
 		dataStorage(d, u),
 	}
@@ -22,7 +23,7 @@ func NewContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		Name:           d.Address,
 		CostComponents: components,
 		SubResources: []*schema.Resource{
-			networkEgress(u, "Network egress", "Data transfer", ContainerRegistryEgress),
+			networkEgress(region, u, "Network egress", "Data transfer", ContainerRegistryEgress),
 		},
 	}
 }

@@ -6,6 +6,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetCloudFunctionsRegistryItem(),
 	GetComputeAddressRegistryItem(),
 	GetComputeDiskRegistryItem(),
+	GetComputeExternalVPNGatewayRegistryItem(),
 	GetComputeGlobalAddressRegistryItem(),
 	GetComputeImageRegistryItem(),
 	GetComputeSnapshotRegistryItem(),

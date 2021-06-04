@@ -17,6 +17,7 @@ func GetStorageBucketRegistryItem() *schema.RegistryItem {
 }
 
 func NewStorageBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := d.Get("region").String()
 	components := []*schema.CostComponent{
 		dataStorage(d, u),
 	}
@@ -29,7 +30,7 @@ func NewStorageBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		Name:           d.Address,
 		CostComponents: components,
 		SubResources: []*schema.Resource{
-			networkEgress(u, "Network egress", "Data transfer", StorageBucketEgress),
+			networkEgress(region, u, "Network egress", "Data transfer", StorageBucketEgress),
 		},
 	}
 }
