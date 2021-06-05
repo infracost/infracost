@@ -9,6 +9,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAutoscalingGroupRegistryItem(),
 	GetACMCertificate(),
 	GetACMPCACertificateAuthorityRegistryItem(),
+	GetCloudFormationStackRegistryItem(),
+	GetCloudFormationStackSetRegistryItem(),
 	GetCloudfrontDistributionRegistryItem(),
 	GetCloudwatchDashboardRegistryItem(),
 	GetCloudwatchEventBusItem(),
@@ -135,6 +137,10 @@ var FreeResources []string = []string{
 	"aws_dx_private_virtual_interface",
 	"aws_dx_public_virtual_interface",
 	"aws_dx_transit_virtual_interface",
+
+	// AWS Cloudformation
+	"aws_cloudformation_stack_set_instance",
+	"aws_cloudformation_type",
 
 	// AWS Cloudfront
 	"aws_cloudfront_origin_access_identity",
