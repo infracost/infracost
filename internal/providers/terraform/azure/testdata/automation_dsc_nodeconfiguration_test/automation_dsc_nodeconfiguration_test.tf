@@ -4,8 +4,8 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "example-resources"
-  location = "East US"
+  name     = "example"
+  location = "eastus"
 }
 resource "azurerm_automation_account" "example" {
   name                = "account1"
@@ -16,7 +16,7 @@ resource "azurerm_automation_account" "example" {
 }
 
 resource "azurerm_automation_dsc_configuration" "example" {
-  name                    = "test"
+  name                    = "example"
   resource_group_name     = azurerm_resource_group.example.name
   automation_account_name = azurerm_automation_account.example.name
   location                = azurerm_resource_group.example.location
@@ -24,26 +24,20 @@ resource "azurerm_automation_dsc_configuration" "example" {
 }
 
 resource "azurerm_automation_dsc_nodeconfiguration" "zeroNodes" {
-  name                    = "test.localhost"
+  name                    = "zeroNodes"
   resource_group_name     = azurerm_resource_group.example.name
   automation_account_name = azurerm_automation_account.example.name
-  depends_on              = [azurerm_automation_dsc_configuration.example]
-
-  content_embedded = "configuration test {}" 
+  content_embedded        = "configuration test {}"
 }
 resource "azurerm_automation_dsc_nodeconfiguration" "fiveNodes" {
-  name                    = "test.localhost"
+  name                    = "fiveNodes"
   resource_group_name     = azurerm_resource_group.example.name
   automation_account_name = azurerm_automation_account.example.name
-  depends_on              = [azurerm_automation_dsc_configuration.example]
-
-  content_embedded = "configuration test {}" 
+  content_embedded        = "configuration test {}"
 }
 resource "azurerm_automation_dsc_nodeconfiguration" "withoutUsage" {
-  name                    = "test.localhost"
+  name                    = "withoutUsage"
   resource_group_name     = azurerm_resource_group.example.name
   automation_account_name = azurerm_automation_account.example.name
-  depends_on              = [azurerm_automation_dsc_configuration.example]
-
-  content_embedded = "configuration test {}" 
+  content_embedded        = "configuration test {}"
 }
