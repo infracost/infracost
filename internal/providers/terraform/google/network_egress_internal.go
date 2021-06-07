@@ -17,10 +17,11 @@ const (
 )
 
 type egressRegionData struct {
-	gRegion        string
-	apiDescription string
-	usageKey       string
-	fixedRegion    string
+	gRegion             string
+	apiDescription      string
+	apiDescriptionRegex string
+	usageKey            string
+	fixedRegion         string
 }
 
 type egressRegionUsageFilterData struct {
@@ -61,7 +62,6 @@ func networkEgress(region string, u *schema.UsageData, resourceName, prefixName 
 
 	for _, regData := range regionsData {
 		gRegion := regData.gRegion
-		apiDescription := regData.apiDescription
 		usageKey := regData.usageKey
 
 		// TODO: Reformat to use tier helpers.
@@ -106,18 +106,22 @@ func networkEgress(region string, u *schema.UsageData, resourceName, prefixName 
 			} else {
 				name = fmt.Sprintf("%v", gRegion)
 			}
+			attributeFilters := make([]*schema.AttributeFilter, 0)
+			if regData.apiDescriptionRegex != "" {
+				attributeFilters = append(attributeFilters, &schema.AttributeFilter{Key: "description", ValueRegex: strPtr(regData.apiDescriptionRegex)})
+			} else {
+				attributeFilters = append(attributeFilters, &schema.AttributeFilter{Key: "description", Value: strPtr(regData.apiDescription)})
+			}
 			resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 				Name:            name,
 				Unit:            "GB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: quantity,
 				ProductFilter: &schema.ProductFilter{
-					Region:     apiRegion,
-					VendorName: strPtr("gcp"),
-					Service:    getEgressAPIServiceName(egressResourceType),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", Value: strPtr(apiDescription)},
-					},
+					Region:           apiRegion,
+					VendorName:       strPtr("gcp"),
+					Service:          getEgressAPIServiceName(egressResourceType),
+					AttributeFilters: attributeFilters,
 				},
 				PriceFilter: &schema.PriceFilter{
 					EndUsageAmount: strPtr(usageFilter),
@@ -192,18 +196,18 @@ func getEgressRegionsData(prefixName string, egressResourceType EgressResourceTy
 			{
 				gRegion: fmt.Sprintf("%s to worldwide excluding China, Australia but including Hong Kong", prefixName),
 				// There is no worldwide option in APIs, so we take a random region.
-				apiDescription: "Network Vpn Internet Egress from Americas to Western Europe",
-				usageKey:       "monthly_egress_data_transfer_gb.worldwide",
+				apiDescriptionRegex: "/Vpn Internet Egress .* to Americas/",
+				usageKey:            "monthly_egress_data_transfer_gb.worldwide",
 			},
 			{
-				gRegion:        fmt.Sprintf("%s to China excluding Hong Kong", prefixName),
-				apiDescription: "Network Vpn Internet Egress from Americas to China",
-				usageKey:       "monthly_egress_data_transfer_gb.china",
+				gRegion:             fmt.Sprintf("%s to China excluding Hong Kong", prefixName),
+				apiDescriptionRegex: "/Vpn Internet Egress .* to China/",
+				usageKey:            "monthly_egress_data_transfer_gb.china",
 			},
 			{
-				gRegion:        fmt.Sprintf("%s to Australia", prefixName),
-				apiDescription: "Network Vpn Internet Egress from Americas to Australia",
-				usageKey:       "monthly_egress_data_transfer_gb.australia",
+				gRegion:             fmt.Sprintf("%s to Australia", prefixName),
+				apiDescriptionRegex: "/Vpn Internet Egress .* to Australia/",
+				usageKey:            "monthly_egress_data_transfer_gb.australia",
 			},
 		}
 	default:
