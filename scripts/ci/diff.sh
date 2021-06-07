@@ -227,6 +227,14 @@ post_to_azure_devops () {
   fi
 }
 
+post_to_slack () {
+  echo "Posting comment to Slack"
+  msg="$(build_msg false)"
+  jq -Mnc --arg msg "$msg" '{"text": "\($msg)"}' | curl -L -X POST -d @- \
+    -H "Content-Type: application/json" \
+    "$SLACK_WEBHOOK_URL"
+}
+
 load_github_env () {
   export VCS_REPO_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY
 }
@@ -325,6 +333,10 @@ elif [ ! -z "$BITBUCKET_PIPELINES" ]; then
   post_to_bitbucket
 elif [ ! -z "$SYSTEM_COLLECTIONURI" ]; then
   post_to_azure_devops
+fi
+
+if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
+  post_to_slack
 fi
 
 cleanup
