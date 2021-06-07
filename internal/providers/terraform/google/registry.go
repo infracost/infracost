@@ -8,6 +8,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetComputeDiskRegistryItem(),
 	GetComputeExternalVPNGatewayRegistryItem(),
 	GetComputeGlobalAddressRegistryItem(),
+	GetComputeHAVPNGatewayRegistryItem(),
 	GetComputeImageRegistryItem(),
 	GetComputeSnapshotRegistryItem(),
 	GetComputeInstanceRegistryItem(),
