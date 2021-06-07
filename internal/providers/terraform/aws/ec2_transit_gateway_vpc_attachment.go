@@ -1,8 +1,10 @@
 package aws
 
 import (
-	"github.com/infracost/infracost/internal/schema"
+	"fmt"
 	"strings"
+
+	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
 )
@@ -69,7 +71,7 @@ func transitGatewayAttachmentCostComponent(region string, operation string) *sch
 			Service:    strPtr("AmazonVPC"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "usagetype", ValueRegex: strPtr("/TransitGateway-Hours/")},
-				{Key: "operation", Value: strPtr(operation)},
+				{Key: "operation", Value: strPtr(fmt.Sprintf("/%s/i", operation))},
 			},
 		},
 	}
@@ -87,7 +89,7 @@ func transitGatewayDataProcessingCostComponent(region string, operation string, 
 			Service:    strPtr("AmazonVPC"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "usagetype", ValueRegex: strPtr("/TransitGateway-Bytes/")},
-				{Key: "operation", Value: strPtr(operation)},
+				{Key: "operation", Value: strPtr(fmt.Sprintf("/%s/i", operation))},
 			},
 		},
 	}

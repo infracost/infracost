@@ -44,8 +44,8 @@ func instanceCostComponent(d *schema.ResourceData) *schema.CostComponent {
 			Region:     strPtr(region),
 			Service:    strPtr("AWSDatabaseMigrationSvc"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "instanceType", Value: strPtr(instanceType)},
-				{Key: "availabilityZone", Value: strPtr(availabilityZone)},
+				{Key: "instanceType", Value: strPtr(fmt.Sprintf("/%s/i", instanceType))},
+				{Key: "availabilityZone", Value: strPtr(fmt.Sprintf("/%s/i", availabilityZone))},
 			},
 		},
 	}
@@ -89,7 +89,7 @@ func storageCostComponent(d *schema.ResourceData) *schema.CostComponent {
 			Service:    strPtr("AWSDatabaseMigrationSvc"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "storageMedia", Value: strPtr("SSD")},
-				{Key: "availabilityZone", Value: strPtr(availabilityZone)},
+				{Key: "availabilityZone", Value: strPtr(fmt.Sprintf("/%s/i", availabilityZone))},
 			},
 		},
 	}

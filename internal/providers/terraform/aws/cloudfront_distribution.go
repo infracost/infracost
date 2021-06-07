@@ -194,7 +194,7 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 					Service:    strPtr("AmazonCloudFront"),
 					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "transferType", Value: strPtr("CloudFront Outbound")},
-						{Key: "fromLocation", Value: strPtr(apiRegion)},
+						{Key: "fromLocation", Value: strPtr(fmt.Sprintf("/%s/i", apiRegion))},
 					},
 				},
 				PriceFilter: &schema.PriceFilter{
@@ -275,7 +275,7 @@ func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
 				Service:    strPtr("AmazonCloudFront"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "transferType", Value: strPtr("CloudFront to Origin")},
-					{Key: "fromLocation", Value: strPtr(apiRegion)},
+					{Key: "fromLocation", Value: strPtr(fmt.Sprintf("/%s/i", apiRegion))},
 				},
 			},
 		})
@@ -350,7 +350,7 @@ func httpRequests(u *schema.UsageData) *schema.Resource {
 				VendorName: strPtr("aws"),
 				Service:    strPtr("AmazonCloudFront"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "location", Value: strPtr(apiRegion)},
+					{Key: "location", Value: strPtr(fmt.Sprintf("/%s/i", apiRegion))},
 					{Key: "requestType", Value: strPtr("CloudFront-Request-HTTP-Proxy")},
 				},
 			},
@@ -426,7 +426,7 @@ func httpsRequests(u *schema.UsageData) *schema.Resource {
 				VendorName: strPtr("aws"),
 				Service:    strPtr("AmazonCloudFront"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "location", Value: strPtr(apiRegion)},
+					{Key: "location", Value: strPtr(fmt.Sprintf("/%s/i", apiRegion))},
 					{Key: "requestType", Value: strPtr("CloudFront-Request-HTTPS-Proxy")},
 				},
 			},
@@ -503,7 +503,7 @@ func shieldRequests(u *schema.UsageData) *schema.Resource {
 				Service:    strPtr("AmazonCloudFront"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "requestDescription", Value: strPtr("Origin Shield Requests")},
-					{Key: "location", Value: strPtr(apiRegion)},
+					{Key: "location", Value: strPtr(fmt.Sprintf("/%s/i", apiRegion))},
 				},
 			},
 		})

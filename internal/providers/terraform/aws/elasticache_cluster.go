@@ -56,7 +56,7 @@ func newElasticacheResource(d *schema.ResourceData, u *schema.UsageData, nodeTyp
 				Service:       strPtr("AmazonElastiCache"),
 				ProductFamily: strPtr("Cache Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "instanceType", Value: strPtr(nodeType)},
+					{Key: "instanceType", Value: strPtr(fmt.Sprintf("/%s/i", nodeType))},
 					{Key: "locationType", Value: strPtr("AWS Region")},
 					{Key: "cacheEngine", Value: strPtr(strings.Title(cacheEngine))},
 				},

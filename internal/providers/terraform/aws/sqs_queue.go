@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -50,7 +52,7 @@ func NewSqsQueue(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 					Service:       strPtr("AWSQueueService"),
 					ProductFamily: strPtr("API Request"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "queueType", Value: strPtr(queueType)},
+						{Key: "queueType", Value: strPtr(fmt.Sprintf("/%s/", queueType))},
 					},
 				},
 				PriceFilter: &schema.PriceFilter{

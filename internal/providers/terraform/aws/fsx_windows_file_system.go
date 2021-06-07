@@ -58,8 +58,8 @@ func storageCapacity(region string, isMultiAZ, isHDD bool, storageSize *decimal.
 			Service:       strPtr("AmazonFSx"),
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "deploymentOption", Value: strPtr(deploymentOption)},
-				{Key: "storageType", Value: strPtr(storageType)},
+				{Key: "deploymentOption", Value: strPtr(fmt.Sprintf("/%s/i", deploymentOption))},
+				{Key: "storageType", Value: strPtr(fmt.Sprintf("/%s/i", storageType))},
 			},
 		},
 	}
@@ -81,7 +81,7 @@ func throughputCapacity(region string, isMultiAZ bool, throughput *decimal.Decim
 			Service:       strPtr("AmazonFSx"),
 			ProductFamily: strPtr("Provisioned Throughput"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+				{Key: "deploymentOption", Value: strPtr(fmt.Sprintf("/%s/i", deploymentOption))},
 			},
 		},
 	}
@@ -103,7 +103,7 @@ func backupStorageCapacity(region string, isMultiAZ bool, backupStorage *decimal
 			Service:       strPtr("AmazonFSx"),
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+				{Key: "deploymentOption", Value: strPtr(fmt.Sprintf("/%s/i", deploymentOption))},
 				{Key: "usagetype", ValueRegex: strPtr("/BackupUsage/")},
 			},
 		},

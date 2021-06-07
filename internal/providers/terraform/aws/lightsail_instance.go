@@ -66,9 +66,9 @@ func NewLightsailInstance(d *schema.ResourceData, u *schema.UsageData) *schema.R
 					Service:       strPtr("AmazonLightsail"),
 					ProductFamily: strPtr("Lightsail Instance"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "operatingSystem", Value: strPtr(operatingSystem)},
-						{Key: "vcpu", Value: strPtr(specs.vcpu)},
-						{Key: "memory", Value: strPtr(specs.memory)},
+						{Key: "operatingSystem", Value: strPtr(fmt.Sprintf("/%s/i", operatingSystem))},
+						{Key: "vcpu", Value: strPtr(fmt.Sprintf("/%s/i", specs.vcpu))},
+						{Key: "memory", Value: strPtr(fmt.Sprintf("/%s/i", specs.memory))},
 					},
 				},
 			},

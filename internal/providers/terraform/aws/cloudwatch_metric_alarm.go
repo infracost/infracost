@@ -42,7 +42,7 @@ func cloudwatchMetricAlarmCostComponent(name string, unit string, region string,
 			Service:       strPtr("AmazonCloudWatch"),
 			ProductFamily: strPtr("Alarm"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "alarmType", Value: strPtr(alarmType)},
+				{Key: "alarmType", Value: strPtr(fmt.Sprintf("/%s/i", alarmType))},
 			},
 		},
 	}

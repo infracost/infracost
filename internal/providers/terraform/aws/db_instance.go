@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -91,8 +92,8 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	}
 
 	instanceAttributeFilters := []*schema.AttributeFilter{
-		{Key: "instanceType", Value: strPtr(instanceType)},
-		{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+		{Key: "instanceType", Value: strPtr(fmt.Sprintf("/%s/i", instanceType))},
+		{Key: "deploymentOption", Value: strPtr(fmt.Sprintf("/%s/i", deploymentOption))},
 		{Key: "databaseEngine", Value: databaseEngine},
 	}
 	if databaseEdition != nil {
@@ -136,8 +137,8 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("Database Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "volumeType", Value: strPtr(volumeType)},
-					{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+					{Key: "volumeType", Value: strPtr(fmt.Sprintf("/%s/i", volumeType))},
+					{Key: "deploymentOption", Value: strPtr(fmt.Sprintf("/%s/i", deploymentOption))},
 				},
 			},
 		},
@@ -155,7 +156,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("Provisioned IOPS"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+					{Key: "deploymentOption", Value: strPtr(fmt.Sprintf("/%s/i", deploymentOption))},
 				},
 			},
 		})

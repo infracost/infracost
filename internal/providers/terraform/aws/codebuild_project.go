@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -41,7 +42,7 @@ func NewCodebuildProject(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 					Service:       strPtr("CodeBuild"),
 					ProductFamily: strPtr("Compute"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr(usageType)},
+						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
 					},
 				},
 			},

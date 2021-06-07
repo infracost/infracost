@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
@@ -96,7 +98,7 @@ func queriesCostComponent(displayName string, usageType string, usageTier string
 			Service:       strPtr("AmazonRoute53"),
 			ProductFamily: strPtr("DNS Query"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: &usageType},
+				{Key: "usagetype", Value: strPtr(fmt.Sprintf("/%s/i", usageType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

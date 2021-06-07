@@ -2,11 +2,12 @@ package aws
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 func GetRedshiftClusterRegistryItem() *schema.RegistryItem {
@@ -37,7 +38,7 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 				Service:       strPtr("AmazonRedshift"),
 				ProductFamily: strPtr("Compute Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "instanceType", Value: strPtr(nodeType)},
+					{Key: "instanceType", Value: strPtr(fmt.Sprintf("/%s/i", nodeType))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -105,7 +106,7 @@ func redshiftConcurrencyScalingCostComponent(region string, nodeType string, num
 			Service:       strPtr("AmazonRedshift"),
 			ProductFamily: strPtr("Redshift Concurrency Scaling"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "instanceType", Value: strPtr(nodeType)},
+				{Key: "instanceType", Value: strPtr(fmt.Sprintf("/%s/i", nodeType))},
 				{Key: "concurrencyscalingfreeusage", Value: strPtr("No")},
 			},
 		},
@@ -157,7 +158,7 @@ func redshiftManagedStorageCostComponent(region string, nodeType string, managed
 			Service:       strPtr("AmazonRedshift"),
 			ProductFamily: strPtr("Redshift Managed Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "instanceType", Value: strPtr(nodeType)},
+				{Key: "instanceType", Value: strPtr(fmt.Sprintf("/%s/i", nodeType))},
 			},
 		},
 	}

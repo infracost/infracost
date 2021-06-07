@@ -2,9 +2,10 @@ package aws
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	"strings"
 )
 
 func GetRDSClusterInstanceRegistryItem() *schema.RegistryItem {
@@ -39,7 +40,7 @@ func NewRDSClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("Database Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "instanceType", Value: strPtr(instanceType)},
+					{Key: "instanceType", Value: strPtr(fmt.Sprintf("/%s/i", instanceType))},
 					{Key: "databaseEngine", Value: databaseEngine},
 				},
 			},

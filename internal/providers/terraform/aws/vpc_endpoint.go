@@ -70,7 +70,7 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 					Service:       strPtr("AmazonVPC"),
 					ProductFamily: strPtr("VpcEndpoint"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", endpointHours))},
+						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", endpointHours))},
 					},
 				},
 			},
@@ -85,7 +85,7 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 					Service:       strPtr("AmazonVPC"),
 					ProductFamily: strPtr("VpcEndpoint"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", endpointBytes))},
+						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", endpointBytes))},
 					},
 				},
 			},

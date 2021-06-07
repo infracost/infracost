@@ -47,7 +47,7 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 				Service:       strPtr("AmazonDocDB"),
 				ProductFamily: strPtr("Database Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "instanceType", Value: strPtr(instanceType)},
+					{Key: "instanceType", Value: strPtr(fmt.Sprintf("/%s/i", instanceType))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{

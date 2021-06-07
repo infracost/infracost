@@ -115,7 +115,7 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 				ProductFamily: strPtr("Data Transfer"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "transferType", Value: strPtr("IntraRegion")},
-					{Key: "fromLocation", Value: strPtr(fromLocation)},
+					{Key: "fromLocation", Value: strPtr(fmt.Sprintf("/%s/i", fromLocation))},
 				},
 			},
 		})
@@ -137,8 +137,8 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 				ProductFamily: strPtr("Data Transfer"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "transferType", Value: strPtr("InterRegion Outbound")},
-					{Key: "fromLocation", Value: strPtr(fromLocation)},
-					{Key: "toLocation", Value: strPtr(usEastRegion)},
+					{Key: "fromLocation", Value: strPtr(fmt.Sprintf("/%s/i", fromLocation))},
+					{Key: "toLocation", Value: strPtr(fmt.Sprintf("/%s/i", usEastRegion))},
 				},
 			},
 		})
@@ -156,8 +156,8 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 				ProductFamily: strPtr("Data Transfer"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "transferType", Value: strPtr("InterRegion Outbound")},
-					{Key: "fromLocation", Value: strPtr(fromLocation)},
-					{Key: "toLocation", Value: strPtr(otherRegion)},
+					{Key: "fromLocation", Value: strPtr(fmt.Sprintf("/%s/i", fromLocation))},
+					{Key: "toLocation", Value: strPtr(fmt.Sprintf("/%s/i", otherRegion))},
 				},
 			},
 		})
@@ -258,7 +258,7 @@ func outboundInternet(fromLocation string, networkUsage int64) []*schema.CostCom
 				ProductFamily: strPtr("Data Transfer"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "transferType", Value: strPtr("AWS Outbound")},
-					{Key: "fromLocation", Value: strPtr(fromLocation)},
+					{Key: "fromLocation", Value: strPtr(fmt.Sprintf("/%s/i", fromLocation))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{

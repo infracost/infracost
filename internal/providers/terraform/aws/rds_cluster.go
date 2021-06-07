@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	"strings"
 )
 
 func GetRDSClusterRegistryItem() *schema.RegistryItem {

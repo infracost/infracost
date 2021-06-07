@@ -57,7 +57,7 @@ func NewSnsTopicSubscription(d *schema.ResourceData, u *schema.UsageData) *schem
 					Service:       strPtr("AmazonSNS"),
 					ProductFamily: strPtr("Message Delivery"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "endpointType", Value: strPtr(endpointType)},
+						{Key: "endpointType", Value: strPtr(fmt.Sprintf("/%s/", endpointType))},
 					},
 				},
 				PriceFilter: &schema.PriceFilter{

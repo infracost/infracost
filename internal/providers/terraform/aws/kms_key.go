@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -80,7 +82,7 @@ func requestPriceComponent(name string, region string, usagetype string) *schema
 			Region:     strPtr(region),
 			Service:    strPtr("awskms"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(usagetype)},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
 			},
 		},
 	}

@@ -58,7 +58,7 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 					Service:       strPtr("AWSDirectConnect"),
 					ProductFamily: strPtr("Direct Connect"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "capacity", Value: strPtr(dxBandwidth)},
+						{Key: "capacity", Value: strPtr(fmt.Sprintf("/%s/i", dxBandwidth))},
 						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", dxLocation))},
 						{Key: "connectionType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", connectionType))},
 					},
@@ -74,7 +74,7 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 					Service:       strPtr("AWSDirectConnect"),
 					ProductFamily: strPtr("Data Transfer"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "fromLocation", Value: strPtr(fromLocation)},
+						{Key: "fromLocation", Value: strPtr(fmt.Sprintf("/%s/i", fromLocation))},
 						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s-DataXfer-Out/", dxLocation))},
 						{Key: "virtualInterfaceType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", virtualInterfaceType))},
 					},

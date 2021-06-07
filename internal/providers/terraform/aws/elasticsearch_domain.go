@@ -60,7 +60,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 				ProductFamily: strPtr("Elastic Search Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
-					{Key: "instanceType", Value: &instanceType},
+					{Key: "instanceType", Value: strPtr(fmt.Sprintf("/%s/i", instanceType))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -103,7 +103,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 				ProductFamily: strPtr("Elastic Search Volume"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ES.+-Storage/")},
-					{Key: "storageMedia", Value: strPtr(ebsFilter)},
+					{Key: "storageMedia", Value: strPtr(fmt.Sprintf("/%s/i", ebsFilter))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -167,7 +167,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 				ProductFamily: strPtr("Elastic Search Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
-					{Key: "instanceType", Value: &dedicatedMasterType},
+					{Key: "instanceType", Value: strPtr(fmt.Sprintf("/%s/i", dedicatedMasterType))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -192,7 +192,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 				ProductFamily: strPtr("Elastic Search Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
-					{Key: "instanceType", Value: &ultrawarmType},
+					{Key: "instanceType", Value: strPtr(fmt.Sprintf("/%s/i", ultrawarmType))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{

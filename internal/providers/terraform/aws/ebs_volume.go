@@ -88,7 +88,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 				Service:       strPtr("AmazonEC2"),
 				ProductFamily: strPtr("Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
+					{Key: "volumeApiName", Value: strPtr(fmt.Sprintf("/%s/i", volumeAPIName))},
 				},
 			},
 		},
@@ -111,7 +111,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 				Service:       strPtr("AmazonEC2"),
 				ProductFamily: strPtr("System Operation"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
+					{Key: "volumeApiName", Value: strPtr(fmt.Sprintf("/%s/i", volumeAPIName))},
 					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
 				},
 			},
@@ -133,7 +133,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 						Service:       strPtr("AmazonEC2"),
 						ProductFamily: strPtr("Provisioned Throughput"),
 						AttributeFilters: []*schema.AttributeFilter{
-							{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
+							{Key: "volumeApiName", Value: strPtr(fmt.Sprintf("/%s/i", volumeAPIName))},
 							{Key: "usagetype", ValueRegex: strPtr("/VolumeP-Throughput.gp3/")},
 						},
 					},
@@ -165,7 +165,7 @@ func ebsProvisionedIops(region string, volumeAPIName string, usageType string, i
 			Service:       strPtr("AmazonEC2"),
 			ProductFamily: strPtr("System Operation"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
+				{Key: "volumeApiName", Value: strPtr(fmt.Sprintf("/%s/i", volumeAPIName))},
 				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
 			},
 		},
