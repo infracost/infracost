@@ -41,7 +41,6 @@
     ├─ Data transfer to China excluding Hong Kong (first 1TB)                                      50  GB                              $11.50 
     └─ Data transfer to Australia (first 1TB)                                                     250  GB                              $47.50 
                                                                                                                                               
- PROJECT TOTAL                                                                                                                      $3,125.02 
-
+ OVERALL TOTAL                                                                                                                      $3,125.02 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

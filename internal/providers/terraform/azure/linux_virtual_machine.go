@@ -21,7 +21,8 @@ func GetAzureRMLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("location").String()
+	region := lookupRegion(d, []string{})
+
 	instanceType := d.Get("size").String()
 
 	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(region, instanceType)}
@@ -53,10 +54,8 @@ func linuxVirtualMachineCostComponent(region string, instanceType string) *schem
 		productNameRe = "/Virtual Machines .* Series Basic$/"
 	}
 
-	skuName := parseVMSKUName(instanceType)
-
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, skuName),
+		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -66,9 +65,9 @@ func linuxVirtualMachineCostComponent(region string, instanceType string) *schem
 			Service:       strPtr("Virtual Machines"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "armSkuName", Value: strPtr(instanceType)},
+				{Key: "skuName", ValueRegex: strPtr("/.*(?<!Low Priority|Spot)$/i")},
+				{Key: "armSkuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", instanceType))},
 				{Key: "productName", ValueRegex: strPtr(productNameRe)},
-				{Key: "skuName", Value: strPtr(skuName)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

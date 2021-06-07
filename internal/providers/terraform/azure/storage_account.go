@@ -11,18 +11,19 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetAzureStorageAccountRegistryItem() *schema.RegistryItem {
+func GetAzureRMStorageAccountRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_storage_account",
-		RFunc: NewAzureStorageAccount,
+		RFunc: NewAzureRMStorageAccount,
 	}
 }
 
-func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	var costComponents []*schema.CostComponent
 	var productName string
 
-	location := d.Get("location").String()
 	accountKind := "StorageV2"
 	if d.Get("account_kind").Type != gjson.Null {
 		accountKind = d.Get("account_kind").String()
@@ -77,7 +78,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 				dataStorageQuantities := usage.CalculateTierBuckets(*capacity, dataStorageTiers)
 
 				costComponents = append(costComponents, blobDataStorageCostComponent(
-					location,
+					region,
 					"Capacity (first 50TB)",
 					skuName,
 					"0",
@@ -86,7 +87,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 
 				if dataStorageQuantities[1].GreaterThan(decimal.Zero) {
 					costComponents = append(costComponents, blobDataStorageCostComponent(
-						location,
+						region,
 						"Capacity (next 450TB)",
 						skuName,
 						"51200",
@@ -96,7 +97,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 
 				if dataStorageQuantities[2].GreaterThan(decimal.Zero) {
 					costComponents = append(costComponents, blobDataStorageCostComponent(
-						location,
+						region,
 						"Capacity (over 500TB)",
 						skuName,
 						"512000",
@@ -104,12 +105,12 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 						&dataStorageQuantities[2]))
 				}
 			} else {
-				costComponents = append(costComponents, blobDataStorageCostComponent(location, "Capacity", skuName, "0", productName, capacity))
+				costComponents = append(costComponents, blobDataStorageCostComponent(region, "Capacity", skuName, "0", productName, capacity))
 			}
 		} else {
 			var unknown *decimal.Decimal
 
-			costComponents = append(costComponents, blobDataStorageCostComponent(location, "Capacity", skuName, "0", productName, unknown))
+			costComponents = append(costComponents, blobDataStorageCostComponent(region, "Capacity", skuName, "0", productName, unknown))
 		}
 
 		if u != nil && u.Get("monthly_write_operations").Type != gjson.Null {
@@ -121,7 +122,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			writeMeterName = "/List and Create Container Operations$/"
 		}
 		costComponents = append(costComponents, blobOperationsCostComponent(
-			location,
+			region,
 			"Write operations",
 			"10K operations",
 			skuName,
@@ -134,7 +135,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			listOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_list_and_create_container_operations").Int()))
 		}
 		costComponents = append(costComponents, blobOperationsCostComponent(
-			location,
+			region,
 			"List and create container operations",
 			"10K operations",
 			skuName,
@@ -147,7 +148,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			readOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_read_operations").Int()))
 		}
 		costComponents = append(costComponents, blobOperationsCostComponent(
-			location,
+			region,
 			"Read operations",
 			"10K operations",
 			skuName,
@@ -160,7 +161,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			otherOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_other_operations").Int()))
 		}
 		costComponents = append(costComponents, blobOperationsCostComponent(
-			location,
+			region,
 			"All other operations",
 			"10K operations",
 			skuName,
@@ -174,7 +175,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 				dataRetrieval = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_retrieval_gb").Int()))
 			}
 			costComponents = append(costComponents, blobOperationsCostComponent(
-				location,
+				region,
 				"Data retrieval",
 				"GB",
 				skuName,
@@ -187,7 +188,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 				dataWrite = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_write_gb").Int()))
 			}
 			costComponents = append(costComponents, blobOperationsCostComponent(
-				location,
+				region,
 				"Data write",
 				"GB",
 				skuName,
@@ -200,7 +201,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 				blobIndex = decimalPtr(decimal.NewFromInt(u.Get("blob_index_tags").Int()))
 			}
 			costComponents = append(costComponents, blobOperationsCostComponent(
-				location,
+				region,
 				"Blob index",
 				"10K tags",
 				skuName,
@@ -227,7 +228,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			dataAtRest = decimalPtr(decimal.NewFromInt(u.Get("data_at_rest_storage_gb").Int()))
 		}
 		costComponents = append(costComponents, fileDataStorageCostComponent(
-			location,
+			region,
 			"Data at rest",
 			skuName,
 			"/Data Stored$/",
@@ -238,7 +239,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			snapshotsStorageGb = decimalPtr(decimal.NewFromInt(u.Get("snapshots_storage_gb").Int()))
 		}
 		costComponents = append(costComponents, fileDataStorageCostComponent(
-			location,
+			region,
 			"Snapshots",
 			skuName,
 			"/Data Stored$/",
@@ -249,7 +250,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			metadataAtRestStorageGb = decimalPtr(decimal.NewFromInt(u.Get("metadata_at_rest_storage_gb").Int()))
 		}
 		costComponents = append(costComponents, fileDataStorageCostComponent(
-			location,
+			region,
 			"Metadata at rest",
 			skuName,
 			"/Metadata$/",
@@ -260,7 +261,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			monthlyWriteOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_write_operations").Int()))
 		}
 		costComponents = append(costComponents, fileOperationStorageCostComponent(
-			location,
+			region,
 			"10k operations",
 			"Write operations",
 			skuName,
@@ -273,7 +274,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			listOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_list_and_create_container_operations").Int()))
 		}
 		costComponents = append(costComponents, fileOperationStorageCostComponent(
-			location,
+			region,
 			"10k operations",
 			"List operations",
 			skuName,
@@ -286,7 +287,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			monthlyReadOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_read_operations").Int()))
 		}
 		costComponents = append(costComponents, fileOperationStorageCostComponent(
-			location,
+			region,
 			"10k operations",
 			"Read operations",
 			skuName,
@@ -299,7 +300,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 			monthlyOtherOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_other_operations").Int()))
 		}
 		costComponents = append(costComponents, fileOperationStorageCostComponent(
-			location,
+			region,
 			"10k operations",
 			"All other operations",
 			skuName,
@@ -313,7 +314,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 				monthlyDataRetrievalGb = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_retrieval_gb").Int()))
 			}
 			costComponents = append(costComponents, fileOperationStorageCostComponent(
-				location,
+				region,
 				"GB",
 				"Data retrieval",
 				skuName,
@@ -326,7 +327,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 				earlyDeletionGb = decimalPtr(decimal.NewFromInt(u.Get("early_deletion_gb").Int()))
 			}
 			costComponents = append(costComponents, fileOperationStorageCostComponent(
-				location,
+				region,
 				"GB",
 				"Early deletion",
 				skuName,
@@ -342,7 +343,7 @@ func NewAzureStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema
 	}
 }
 
-func blobDataStorageCostComponent(location, name, skuName, startUsage, productName string, quantity *decimal.Decimal) *schema.CostComponent {
+func blobDataStorageCostComponent(region, name, skuName, startUsage, productName string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:                 name,
 		Unit:                 "GB",
@@ -351,7 +352,7 @@ func blobDataStorageCostComponent(location, name, skuName, startUsage, productNa
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Storage"),
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -367,7 +368,7 @@ func blobDataStorageCostComponent(location, name, skuName, startUsage, productNa
 	}
 }
 
-func blobOperationsCostComponent(location, name, unit, skuName, meterName, productName string, quantity *decimal.Decimal, multi int) *schema.CostComponent {
+func blobOperationsCostComponent(region, name, unit, skuName, meterName, productName string, quantity *decimal.Decimal, multi int) *schema.CostComponent {
 	if quantity != nil {
 		quantity = decimalPtr(quantity.Div(decimal.NewFromInt(int64(multi))))
 	}
@@ -380,7 +381,7 @@ func blobOperationsCostComponent(location, name, unit, skuName, meterName, produ
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Storage"),
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -394,7 +395,7 @@ func blobOperationsCostComponent(location, name, unit, skuName, meterName, produ
 		},
 	}
 }
-func fileDataStorageCostComponent(location, name, skuName, meterName string, quantity *decimal.Decimal) *schema.CostComponent {
+func fileDataStorageCostComponent(region, name, skuName, meterName string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:                 name,
 		Unit:                 "GB",
@@ -403,7 +404,7 @@ func fileDataStorageCostComponent(location, name, skuName, meterName string, qua
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Storage"),
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -417,7 +418,7 @@ func fileDataStorageCostComponent(location, name, skuName, meterName string, qua
 		},
 	}
 }
-func fileOperationStorageCostComponent(location, unit, name, skuName, meterName string, quantity *decimal.Decimal, multi int) *schema.CostComponent {
+func fileOperationStorageCostComponent(region, unit, name, skuName, meterName string, quantity *decimal.Decimal, multi int) *schema.CostComponent {
 	if quantity != nil {
 		quantity = decimalPtr(quantity.Div(decimal.NewFromInt(int64(multi))))
 	}
@@ -429,7 +430,7 @@ func fileOperationStorageCostComponent(location, unit, name, skuName, meterName 
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Storage"),
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{

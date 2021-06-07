@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/infracost/infracost/internal/output"
-	"github.com/infracost/infracost/internal/usage"
-	"github.com/pmezard/go-difflib/difflib"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
 	"testing"
+
+	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/usage"
+	"github.com/pmezard/go-difflib/difflib"
+	"github.com/stretchr/testify/require"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/prices"
@@ -283,7 +284,9 @@ func loadResources(t *testing.T, cfg *config.Config, tfProject TerraformProject,
 		Path: tfdir,
 	})
 
-	return provider.LoadResources(usage)
+	project := schema.NewProject("tftest", &schema.ProjectMetadata{})
+
+	return project, provider.LoadResources(project, usage)
 }
 
 func copyInitCacheToPath(source, destination string) error {

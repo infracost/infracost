@@ -4,3 +4,6 @@ resource_usage:
     monthly_vcore_hours: 500
   azurerm_mssql_database.LTR:
     long_term_retention_storage_gb: 1000
+  azurerm_mssql_database.premium6:
+    long_term_retention_storage_gb: 1000
+    extra_data_storage_gb: 500

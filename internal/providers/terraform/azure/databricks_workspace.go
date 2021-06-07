@@ -11,13 +11,15 @@ import (
 func GetAzureRMDatabricksWorkspaceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_databricks_workspace",
-		RFunc: NewAzureDatabricksWorkspace,
+		RFunc: NewAzureRMDatabricksWorkspace,
 	}
 }
 
-func NewAzureDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	var costComponents []*schema.CostComponent
-	location := d.Get("location").String()
+
 	sku := strings.Title(d.Get("sku").String())
 
 	if strings.ToLower(sku) == "trial" {
@@ -34,7 +36,7 @@ func NewAzureDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *s
 	}
 	costComponents = append(costComponents, databricksCostComponent(
 		"All-purpose compute DBUs",
-		location,
+		region,
 		fmt.Sprintf("%s All-purpose Compute", sku),
 		allPurpose,
 	))
@@ -44,7 +46,7 @@ func NewAzureDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *s
 	}
 	costComponents = append(costComponents, databricksCostComponent(
 		"Jobs compute DBUs",
-		location,
+		region,
 		fmt.Sprintf("%s Jobs Compute", sku),
 		jobs,
 	))
@@ -54,7 +56,7 @@ func NewAzureDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *s
 	}
 	costComponents = append(costComponents, databricksCostComponent(
 		"Jobs light compute DBUs",
-		location,
+		region,
 		fmt.Sprintf("%s Jobs Light Compute", sku),
 		jobsLight,
 	))
@@ -65,7 +67,7 @@ func NewAzureDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *s
 	}
 }
 
-func databricksCostComponent(name, location, skuName string, quantity *decimal.Decimal) *schema.CostComponent {
+func databricksCostComponent(name, region, skuName string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "DBU-hours",
@@ -73,7 +75,7 @@ func databricksCostComponent(name, location, skuName string, quantity *decimal.D
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Azure Databricks"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{

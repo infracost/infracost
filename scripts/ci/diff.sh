@@ -17,15 +17,6 @@ process_args () {
   percentage_threshold=${6:-$percentage_threshold}
   post_condition=${7:-$post_condition}
 
-  # Handle deprecated var names
-  path=${path:-$tfjson}
-  path=${path:-$terraform_json_file}
-  path=${path:-$tfplan}
-  path=${path:-$terraform_plan_file}
-  path=${path:-$tfdir}
-  path=${path:-$terraform_dir}
-  terraform_plan_flags=${terraform_plan_flags:-$tfflags}
-
   # Validate post_condition
   if ! echo "$post_condition" | jq empty; then
     echo "Error: post_condition contains invalid JSON"
@@ -221,7 +212,7 @@ post_to_azure_devops () {
       GITHUB_REPOSITORY=$BUILD_REPOSITORY_NAME
       GITHUB_SHA=$SYSTEM_PULLREQUEST_SOURCECOMMITID
       post_to_github
-    elif [ "$BUILD_REPOSITORY_PROVIDER" = "TfsGit" ] then
+    elif [ "$BUILD_REPOSITORY_PROVIDER" = "TfsGit" ]; then
       echo "Posting comment to Azure DevOps repo pull-request $SYSTEM_PULLREQUEST_PULLREQUESTID"
       msg="$(build_msg true)"
       jq -Mnc --arg msg "$msg" '{"comments": [{"parentCommentId": 0, "content": "\($msg)", "commentType": 1}], "status": 4}' | curl -L -X POST -d @- \
@@ -236,6 +227,23 @@ post_to_azure_devops () {
   fi
 }
 
+load_github_env () {
+  export VCS_REPO_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+}
+
+load_gitlab_env () {
+  export VCS_REPO_URL=$CI_REPOSITORY_URL
+}
+
+load_circle_ci_env () {
+  export VCS_REPO_URL=$CIRCLE_REPOSITORY_URL
+}
+
+load_azure_devops_env () {
+  export VCS_REPO_URL=$BUILD_REPOSITORY_URI
+}
+
+
 cleanup () {
   rm -f infracost_breakdown.json infracost_breakdown_cmd infracost_output_cmd
 }
@@ -243,6 +251,17 @@ cleanup () {
 # MAIN
 
 process_args "$@"
+
+# Load env variables
+if [ ! -z "$GITHUB_ACTIONS" ]; then
+  load_github_env
+elif [ ! -z "$GITLAB_CI" ]; then
+  load_gitlab_env
+elif [ ! -z "$CIRCLECI" ]; then
+  load_circle_ci_env
+elif [ ! -z "$SYSTEM_COLLECTIONURI" ]; then
+  load_azure_devops_env
+fi
 
 infracost_breakdown_cmd=$(build_breakdown_cmd)
 echo "$infracost_breakdown_cmd" > infracost_breakdown_cmd

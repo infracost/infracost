@@ -30,7 +30,6 @@
  ├─ Storage (over 10GB)                       Monthly cost depends on usage: $0.10 per GB          
  └─ Build vCPU                                Monthly cost depends on usage: $0.0001 per seconds   
                                                                                                    
- PROJECT TOTAL                                                                             $652.98 
-
+ OVERALL TOTAL                                                                             $652.98 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

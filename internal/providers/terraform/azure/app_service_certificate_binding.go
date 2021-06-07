@@ -19,9 +19,7 @@ func GetAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var location string
-	group := d.References("certificate_id")
-	location = group[0].Get("location").String()
+	region := lookupRegion(d, []string{"certificate_id"})
 
 	var sslType string
 	sslState := d.Get("ssl_state").String()
@@ -49,7 +47,7 @@ func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.Us
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
-				Region:        strPtr(location),
+				Region:        strPtr(region),
 				Service:       strPtr("Azure App Service"),
 				ProductFamily: strPtr("Compute"),
 				AttributeFilters: []*schema.AttributeFilter{

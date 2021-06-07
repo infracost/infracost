@@ -15,10 +15,10 @@ func GetAzureRMKubernetesClusterRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	var costComponents []*schema.CostComponent
 	var subResources []*schema.Resource
-
-	location := d.Get("location").String()
 
 	skuTier := "Free"
 	if d.Get("sku_tier").Type != gjson.Null {
@@ -33,7 +33,7 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
-				Region:        strPtr(location),
+				Region:        strPtr(region),
 				Service:       strPtr("Azure Kubernetes Service"),
 				ProductFamily: strPtr("Compute"),
 				AttributeFilters: []*schema.AttributeFilter{
@@ -55,7 +55,7 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 	}
 
 	subResources = []*schema.Resource{
-		aksClusterNodePool("default_node_pool", location, d.Get("default_node_pool.0"), nodeCount, u),
+		aksClusterNodePool("default_node_pool", region, d.Get("default_node_pool.0"), nodeCount, u),
 	}
 
 	return &schema.Resource{

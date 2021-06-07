@@ -8,12 +8,12 @@ import (
 func GetAzureRMKeyVaultManagedHSMRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_key_vault_managed_hardware_security_module",
-		RFunc: NewAzureKeyVaultManagedHSM,
+		RFunc: NewAzureRMKeyVaultManagedHSM,
 	}
 }
 
-func NewAzureKeyVaultManagedHSM(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	location := d.Get("location").String()
+func NewAzureRMKeyVaultManagedHSM(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
 
 	var costComponents []*schema.CostComponent
 
@@ -24,7 +24,7 @@ func NewAzureKeyVaultManagedHSM(d *schema.ResourceData, u *schema.UsageData) *sc
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Key Vault"),
 			ProductFamily: strPtr("Security"),
 			AttributeFilters: []*schema.AttributeFilter{

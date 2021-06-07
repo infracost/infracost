@@ -17,8 +17,9 @@ func GetAzureRMAppIntegrationServiceEnvironmentRegistryItem() *schema.RegistryIt
 }
 
 func NewAzureRMIntegrationServiceEnvironment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	productName := "Logic Apps Integration Service Environment"
-	location := d.Get("location").String()
 	skuName := d.Get("sku_name").String()
 	sku := strings.ToLower(skuName[:strings.IndexByte(skuName, '_')])
 	scaleNumber, _ := strconv.Atoi(skuName[strings.IndexByte(skuName, '_')+1:])
@@ -29,11 +30,10 @@ func NewAzureRMIntegrationServiceEnvironment(d *schema.ResourceData, u *schema.U
 		productName += " - Developer"
 	}
 
-	costComponents = append(costComponents, IntegrationBaseServiceEnvironmentCostComponent("Base units", location, productName))
+	costComponents = append(costComponents, IntegrationBaseServiceEnvironmentCostComponent("Base units", region, productName))
 
 	if strings.ToLower(sku) == "premium" && scaleNumber > 0 {
-		costComponents = append(costComponents, IntegrationScaleServiceEnvironmentCostComponent("Scale units", location, productName, scaleNumber))
-
+		costComponents = append(costComponents, IntegrationScaleServiceEnvironmentCostComponent("Scale units", region, productName, scaleNumber))
 	}
 	return &schema.Resource{
 		Name:           d.Address,
@@ -41,7 +41,7 @@ func NewAzureRMIntegrationServiceEnvironment(d *schema.ResourceData, u *schema.U
 	}
 }
 
-func IntegrationBaseServiceEnvironmentCostComponent(name, location, productName string) *schema.CostComponent {
+func IntegrationBaseServiceEnvironmentCostComponent(name, region, productName string) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:           name,
@@ -50,7 +50,7 @@ func IntegrationBaseServiceEnvironmentCostComponent(name, location, productName 
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Logic Apps"),
 			ProductFamily: strPtr("Integration"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -64,7 +64,7 @@ func IntegrationBaseServiceEnvironmentCostComponent(name, location, productName 
 		},
 	}
 }
-func IntegrationScaleServiceEnvironmentCostComponent(name, location, productName string, scaleNumber int) *schema.CostComponent {
+func IntegrationScaleServiceEnvironmentCostComponent(name, region, productName string, scaleNumber int) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:           name,
@@ -73,7 +73,7 @@ func IntegrationScaleServiceEnvironmentCostComponent(name, location, productName
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(scaleNumber))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Logic Apps"),
 			ProductFamily: strPtr("Integration"),
 			AttributeFilters: []*schema.AttributeFilter{

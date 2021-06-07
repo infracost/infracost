@@ -12,12 +12,13 @@ import (
 func GetAzureRMHDInsightHadoopClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_hdinsight_hadoop_cluster", //nolint:misspell
-		RFunc: NewAzureHDInsightHadoopCluster,
+		RFunc: NewAzureRMHDInsightHadoopCluster,
 	}
 }
 
-func NewAzureHDInsightHadoopCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	location := d.Get("location").String()
+func NewAzureRMHDInsightHadoopCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	costComponents := []*schema.CostComponent{}
 
 	headNodeVM := d.Get("roles.0.head_node.0.vm_size").String()
@@ -28,9 +29,9 @@ func NewAzureHDInsightHadoopCluster(d *schema.ResourceData, u *schema.UsageData)
 	}
 	zookeeperNodeVM := d.Get("roles.0.zookeeper_node.0.vm_size").String()
 
-	costComponents = append(costComponents, hdInsightVMCostComponent(location, "Head", headNodeVM, 2))
-	costComponents = append(costComponents, hdInsightVMCostComponent(location, "Worker", workerNodeVM, workerInstances))
-	costComponents = append(costComponents, hdInsightVMCostComponent(location, "Zookeeper", zookeeperNodeVM, 3))
+	costComponents = append(costComponents, hdInsightVMCostComponent(region, "Head", headNodeVM, 2))
+	costComponents = append(costComponents, hdInsightVMCostComponent(region, "Worker", workerNodeVM, workerInstances))
+	costComponents = append(costComponents, hdInsightVMCostComponent(region, "Zookeeper", zookeeperNodeVM, 3))
 
 	var edgeNodeVM string
 	if d.Get("roles.0.edge_node.0.vm_size").Type != gjson.Null {
@@ -39,7 +40,7 @@ func NewAzureHDInsightHadoopCluster(d *schema.ResourceData, u *schema.UsageData)
 		if d.Get("roles.0.edge_node.0.target_instance_count").Type != gjson.Null {
 			workerInstances = d.Get("roles.0.edge_node.0.target_instance_count").Int()
 		}
-		costComponents = append(costComponents, hdInsightVMCostComponent(location, "Edge", edgeNodeVM, workerInstances))
+		costComponents = append(costComponents, hdInsightVMCostComponent(region, "Edge", edgeNodeVM, workerInstances))
 	}
 
 	return &schema.Resource{
@@ -48,7 +49,7 @@ func NewAzureHDInsightHadoopCluster(d *schema.ResourceData, u *schema.UsageData)
 	}
 }
 
-func hdInsightVMCostComponent(location, node, instanceType string, instances int64) *schema.CostComponent {
+func hdInsightVMCostComponent(region, node, instanceType string, instances int64) *schema.CostComponent {
 	skuName := parseVMSKUName(instanceType)
 	t := strings.Split(skuName, " ")
 	if len(t) > 1 {
@@ -68,7 +69,7 @@ func hdInsightVMCostComponent(location, node, instanceType string, instances int
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(instances)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("HDInsight"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{

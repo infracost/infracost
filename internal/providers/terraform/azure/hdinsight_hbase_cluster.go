@@ -8,12 +8,13 @@ import (
 func GetAzureRMHDInsightHBaseClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_hdinsight_hbase_cluster", //nolint:misspell
-		RFunc: NewAzureHDInsightHBaseCluster,
+		RFunc: NewAzureRMHDInsightHBaseCluster,
 	}
 }
 
-func NewAzureHDInsightHBaseCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	location := d.Get("location").String()
+func NewAzureRMHDInsightHBaseCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	costComponents := []*schema.CostComponent{}
 
 	headNodeVM := d.Get("roles.0.head_node.0.vm_size").String()
@@ -24,9 +25,9 @@ func NewAzureHDInsightHBaseCluster(d *schema.ResourceData, u *schema.UsageData) 
 	}
 	zookeeperNodeVM := d.Get("roles.0.zookeeper_node.0.vm_size").String()
 
-	costComponents = append(costComponents, hdInsightVMCostComponent(location, "Head", headNodeVM, 2))
-	costComponents = append(costComponents, hdInsightVMCostComponent(location, "Region", regionNodeVM, regionInstances))
-	costComponents = append(costComponents, hdInsightVMCostComponent(location, "Zookeeper", zookeeperNodeVM, 3))
+	costComponents = append(costComponents, hdInsightVMCostComponent(region, "Head", headNodeVM, 2))
+	costComponents = append(costComponents, hdInsightVMCostComponent(region, "Region", regionNodeVM, regionInstances))
+	costComponents = append(costComponents, hdInsightVMCostComponent(region, "Zookeeper", zookeeperNodeVM, 3))
 
 	return &schema.Resource{
 		Name:           d.Address,

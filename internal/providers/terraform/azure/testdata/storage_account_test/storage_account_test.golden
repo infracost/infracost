@@ -69,6 +69,8 @@
  ├─ Capacity (first 50TB)                                     51,200  GB                           $3,015.68 
  ├─ Capacity (next 450TB)                                    512,000  GB                          $28,950.53 
  ├─ Capacity (over 500TB)                                  7,436,800  GB                         $402,985.32 
+ ├─ Write operations                                             800  10K operations                  $80.00 
+ ├─ List and create container operations                         800  10K operations                  $80.00 
  ├─ Read operations                                               80  10K operations                   $0.32 
  ├─ All other operations                                         800  10K operations                   $3.20 
  └─ Blob index                                                    80  10K tags                         $5.52 
@@ -134,7 +136,6 @@
  ├─ Data retrieval                                Monthly cost depends on usage: $0.01 per GB                
  └─ Early deletion                                Monthly cost depends on usage: $0.0228 per GB              
                                                                                                              
- PROJECT TOTAL                                                                                 $1,749,805.41 
-
+ OVERALL TOTAL                                                                                 $1,749,965.41 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

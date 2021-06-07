@@ -11,7 +11,6 @@
  google_compute_machine_image.usage                                                                
  └─ Storage                                                    5,000  GB                   $250.00 
                                                                                                    
- PROJECT TOTAL                                                                             $274.86 
-
+ OVERALL TOTAL                                                                             $274.86 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

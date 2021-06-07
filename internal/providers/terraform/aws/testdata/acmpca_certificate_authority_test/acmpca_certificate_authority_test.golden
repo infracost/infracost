@@ -20,7 +20,6 @@
  ├─ Certificates (first 1K)                                         1,000  requests                 $750.00 
  └─ Certificates (next 9K)                                          9,000  requests               $3,150.00 
                                                                                                             
- PROJECT TOTAL                                                                                   $10,160.00 
-
+ OVERALL TOTAL                                                                                   $10,160.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -12,8 +12,7 @@
  ├─ Worker node (A1 v2)                                 730  hours        $43.80 
  └─ Zookeeper node (A5)                               2,190  hours       $554.07 
                                                                                  
- PROJECT TOTAL                                                         $3,967.55 
-
+ OVERALL TOTAL                                                         $3,967.55 
 ----------------------------------
 2 resource types weren't estimated as they're not supported yet.
 Please watch/star https://github.com/infracost/infracost as new resources are added regularly.

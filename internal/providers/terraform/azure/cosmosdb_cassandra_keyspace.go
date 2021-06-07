@@ -6,13 +6,14 @@ import (
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
 func GetAzureRMCosmosdbCassandraKeyspaceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_cosmosdb_cassandra_keyspace",
-		RFunc: NewAzureCosmosdbCassandraKeyspace,
+		RFunc: NewAzureRMCosmosdb,
 		ReferenceAttributes: []string{
 			"account_name",
 		},
@@ -27,12 +28,24 @@ const (
 	Serverless
 )
 
-func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	costComponents := []*schema.CostComponent{}
+func NewAzureRMCosmosdb(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	if len(d.References("account_name")) > 0 {
+		account := d.References("account_name")[0]
+		return &schema.Resource{
+			Name:           d.Address,
+			CostComponents: cosmosDBCostComponents(d, u, account),
+		}
+	}
+	log.Warnf("Skipping resource %s as its 'account_name' property could not be found.", d.Address)
+	return nil
+}
 
-	account := d.References("account_name")[0]
-	mainLocation := account.Get("location").String()
+func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account *schema.ResourceData) []*schema.CostComponent {
+	// Find the region in from the passed-in account
+	region := lookupRegion(account, []string{})
 	geoLocations := account.Get("geo_location").Array()
+
+	costComponents := []*schema.CostComponent{}
 
 	model := Provisioned
 	skuName := "RUs"
@@ -51,7 +64,8 @@ func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageDa
 	} else {
 		model = Serverless
 		availabilityZone := geoLocations[0].Get("zone_zone_redundant").Bool()
-		costComponents = append(costComponents, serverlessCosmosCostComponent(mainLocation, availabilityZone, u))
+		location := geoLocations[0].Get("location").String()
+		costComponents = append(costComponents, serverlessCosmosCostComponent(location, availabilityZone, u))
 	}
 
 	if model == Provisioned || model == Autoscale {
@@ -69,12 +83,9 @@ func NewAzureCosmosdbCassandraKeyspace(d *schema.ResourceData, u *schema.UsageDa
 	if account.Get("backup.0.type").Type != gjson.Null {
 		backupType = account.Get("backup.0.type").String()
 	}
-	costComponents = append(costComponents, backupStorageCosmosCostComponents(account, u, geoLocations, backupType, mainLocation)...)
+	costComponents = append(costComponents, backupStorageCosmosCostComponents(account, u, geoLocations, backupType, region)...)
 
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
-	}
+	return costComponents
 }
 
 func provisionedCosmosCostComponents(model modelType, throughputs *decimal.Decimal, zones []gjson.Result, skuName string, u *schema.UsageData) []*schema.CostComponent {
@@ -237,7 +248,7 @@ func storageCosmosCostComponents(account *schema.ResourceData, u *schema.UsageDa
 	return costComponents
 }
 
-func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.UsageData, zones []gjson.Result, backupType, mainLocation string) []*schema.CostComponent {
+func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.UsageData, zones []gjson.Result, backupType, region string) []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 	var backupStorageGB *decimal.Decimal
 	if u != nil && u.Get("storage_gb").Exists() {
@@ -304,7 +315,7 @@ func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.U
 
 	costComponents = append(costComponents, backupCosmosCostComponent(
 		"Restored data",
-		mainLocation,
+		region,
 		skuName,
 		productName,
 		meterName,

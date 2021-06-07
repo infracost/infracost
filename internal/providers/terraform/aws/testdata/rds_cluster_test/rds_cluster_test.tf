@@ -50,3 +50,19 @@ resource "aws_rds_cluster" "mysql_backtrack" {
   master_username         = "foo"
   master_password         = "barbut8chars"
 }
+
+resource "aws_rds_cluster" "mysql_backtrack_withoutU" {
+  cluster_identifier      = "aurora-mysql"
+  engine                  = "aurora-mysql"
+  backup_retention_period = 5
+  master_username         = "foo"
+  master_password         = "barbut8chars"
+}
+
+resource "aws_rds_cluster" "postgres_serverless_withoutU" {
+  cluster_identifier = "aurora-serverless"
+  engine             = "aurora-postgresql"
+  engine_mode        = "serverless"
+  master_username    = "foo"
+  master_password    = "barbut8chars"
+}

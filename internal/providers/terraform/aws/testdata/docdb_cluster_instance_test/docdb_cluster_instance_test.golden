@@ -18,7 +18,6 @@
  ├─ I/O                                                         10  1M requests                  $2.00 
  └─ CPU credits                                                 10  vCPU-hours                   $0.90 
                                                                                                        
- PROJECT TOTAL                                                                               $1,936.46 
-
+ OVERALL TOTAL                                                                               $1,936.46 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

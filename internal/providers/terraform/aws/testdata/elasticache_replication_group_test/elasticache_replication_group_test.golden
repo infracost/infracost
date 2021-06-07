@@ -11,7 +11,6 @@
  ├─ Elasticache (on-demand, cache.m6g.12xlarge)                   2,190  hours                $7,789.83 
  └─ Backup storage                                       Monthly cost depends on usage: $0.085 per GB   
                                                                                                         
- PROJECT TOTAL                                                                               $13,387.47 
-
+ OVERALL TOTAL                                                                               $13,387.47 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

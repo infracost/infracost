@@ -2,46 +2,78 @@ package azure
 
 import "github.com/infracost/infracost/internal/schema"
 
+// ResourceRegistry grouped alphabetically
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMApiManagementRegistryItem(),
+	GetAzureRMAppIsolatedServicePlanRegistryItem(),
+	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
+	GetAzureRMAppFunctionRegistryItem(),
+	GetAzureRMAppNATGatewayRegistryItem(),
 	GetAzureRMAppServiceCertificateBindingRegistryItem(),
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
+	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
+	GetAzureRMAppServicePlanRegistryItem(),
+	GetAzureRMAutomationAccountRegistryItem(),
+	GetAzureRMAutomationDscConfigurationRegistryItem(),
+	GetAzureRMAutomationDscNodeconfigurationRegistryItem(),
+	GetAzureRMAutomationJobScheduleRegistryItem(),
 	GetAzureRMCDNEndpointRegistryItem(),
+	GetAzureRMContainerRegistryRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
+	GetAzureRMCosmosdbCassandraTableRegistryItem(),
+	GetAzureRMCosmosdbGremlinDatabaseRegistryItem(),
+	GetAzureRMCosmosdbGremlinGraphRegistryItem(),
+	GetAzureRMCosmosdbMongoCollectionRegistryItem(),
+	GetAzureRMCosmosdbMongoDatabaseRegistryItem(),
+	GetAzureRMCosmosdbSQLContainerRegistryItem(),
+	GetAzureRMCosmosdbSQLDatabaseRegistryItem(),
+	GetAzureRMCosmosdbTableRegistryItem(),
 	GetAzureRMDatabricksWorkspaceRegistryItem(),
+	GetAzureRMDNSaRecordRegistryItem(),
+	GetAzureRMDNSaaaaRecordRegistryItem(),
+	GetAzureRMDNScaaRecordRegistryItem(),
+	GetAzureRMDNScnameRecordRegistryItem(),
+	GetAzureRMDNSmxRecordRegistryItem(),
+	GetAzureRMDNSnsRecordRegistryItem(),
+	GetAzureRMDNSptrRecordRegistryItem(),
+	GetAzureRMDNSsrvRecordRegistryItem(),
+	GetAzureRMDNStxtRecordRegistryItem(),
+	GetAzureRMDNSPrivateZoneRegistryItem(),
+	GetAzureRMDNSZoneRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMHDInsightHadoopClusterRegistryItem(),
 	GetAzureRMHDInsightHBaseClusterRegistryItem(),
 	GetAzureRMHDInsightInteractiveQueryClusterRegistryItem(),
 	GetAzureRMHDInsightKafkaClusterRegistryItem(),
 	GetAzureRMHDInsightSparkClusterRegistryItem(),
-	GetAzureRMLinuxVirtualMachineRegistryItem(),
-	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
-	GetAzureRMManagedDiskRegistryItem(),
 	GetAzureRMKeyVaultCertificateRegistryItem(),
 	GetAzureRMKeyVaultKeyRegistryItem(),
 	GetAzureRMKeyVaultManagedHSMRegistryItem(),
 	GetAzureRMKubernetesClusterRegistryItem(),
 	GetAzureRMKubernetesClusterNodePoolRegistryItem(),
-	GetAzureMariaDBServerRegistryItem(),
-	GetAzureMSSQLDatabaseRegistryItem(),
-	GetAzureMySQLServerRegistryItem(),
-	GetAzurePostgreSQLServerRegistryItem(),
-	GetAzureStorageAccountRegistryItem(),
+	GetAzureRMLinuxVirtualMachineRegistryItem(),
+	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
+	GetAzureRMManagedDiskRegistryItem(),
+	GetAzureRMMariaDBServerRegistryItem(),
+	GetAzureRMMSSQLDatabaseRegistryItem(),
+	GetAzureRMMySQLServerRegistryItem(),
+	GetAzureRMNotificationHubNamespaceRegistryItem(),
+	GetAzureRMPostgreSQLFlexibleServerRegistryItem(),
+	GetAzureRMPostgreSQLServerRegistryItem(),
+	GetAzureRMPrivateDNSaRecordRegistryItem(),
+	GetAzureRMPrivateDNSaaaaRecordRegistryItem(),
+	GetAzureRMPrivateDNScnameRecordRegistryItem(),
+	GetAzureRMPrivateDNSmxRecordRegistryItem(),
+	GetAzureRMPrivateDNSptrRecordRegistryItem(),
+	GetAzureRMPrivateDNSsrvRecordRegistryItem(),
+	GetAzureRMPrivateDNStxtRecordRegistryItem(),
+	GetAzureRMPublicIPRegistryItem(),
+	GetAzureRMPublicIPPrefixRegistryItem(),
+	GetAzureRMStorageAccountRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
-	GetAzureRMAppServicePlanRegistryItem(),
-	GetAzureRMAppIsolatedServicePlanRegistryItem(),
-	GetAzureRMAppFunctionRegistryItem(),
-	GetAzureRMContainerRegistryRegistryItem(),
-	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
-	GetAzureRMPublicIPRegistryItem(),
-	GetAzureRMPublicIPPrefixRegistryItem(),
-	GetAzureRMAppNATGatewayRegistryItem(),
-	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
-	GetAzureRMNotificationHubNamespaceRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -89,6 +121,21 @@ var FreeResources []string = []string{
 	"azurerm_app_service_source_control_token",
 	"azurerm_app_service_virtual_network_swift_connection",
 
+	// Azure Automation
+	"azurerm_automation_certificate",
+	"azurerm_automation_connection",
+	"azurerm_automation_connection_certificate",
+	"azurerm_automation_connection_classic_certificate",
+	"azurerm_automation_connection_service_principal",
+	"azurerm_automation_credential",
+	"azurerm_automation_module",
+	"azurerm_automation_runbook",
+	"azurerm_automation_schedule",
+	"azurerm_automation_variable_bool",
+	"azurerm_automation_variable_datetime",
+	"azurerm_automation_variable_int",
+	"azurerm_automation_variable_string",
+
 	// Azure Base
 	"azurerm_resource_group",
 	"azurerm_resource_provider_registration",
@@ -100,6 +147,16 @@ var FreeResources []string = []string{
 
 	// Azure CDN
 	"azurerm_cdn_profile",
+
+	// Azure CosmosDB
+	"azurerm_cosmosdb_account",
+	"azurerm_cosmosdb_notebook_workspace",
+	"azurerm_cosmosdb_sql_stored_procedure",
+	"azurerm_cosmosdb_sql_trigger",
+	"azurerm_cosmosdb_sql_user_defined_function",
+
+	// Azure DNS
+	"azurerm_private_dns_zone_virtual_network_link",
 
 	// Azure Firewall
 	"azurerm_firewall_application_rule_collection",
@@ -124,6 +181,9 @@ var FreeResources []string = []string{
 	"azurerm_subnet_network_security_group_association",
 	"azurerm_virtual_network",
 
+	// Azure Notification Hub
+	"azurerm_notification_hub",
+
 	// Azure Policy
 	"azurerm_policy_assignment",
 	"azurerm_policy_definition",
@@ -135,11 +195,11 @@ var FreeResources []string = []string{
 	"azurerm_container_registry_token",
 	"azurerm_container_registry_webhook",
 
+	// Azure SQL
+	"azurerm_sql_server",
+
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
-
-	// Azure Notification Hub
-	"azurerm_notification_hub",
 }
 
 var UsageOnlyResources []string = []string{}

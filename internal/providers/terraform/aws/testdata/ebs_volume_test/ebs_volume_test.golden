@@ -31,7 +31,6 @@
  ├─ Storage (magnetic)                                     20  GB                           $1.00 
  └─ I/O requests                                            1  1M request                   $0.05 
                                                                                                   
- PROJECT TOTAL                                                                             $60.50 
-
+ OVERALL TOTAL                                                                             $60.50 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

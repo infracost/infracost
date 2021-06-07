@@ -10,18 +10,19 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func GetAzurePostgreSQLServerRegistryItem() *schema.RegistryItem {
+func GetAzureRMPostgreSQLServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_postgresql_server",
-		RFunc: NewAzurePostrgreSQLServer,
+		RFunc: NewAzureRMPostrgreSQLServer,
 	}
 }
 
-func NewAzurePostrgreSQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMPostrgreSQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	var costComponents []*schema.CostComponent
 	serviceName := "Azure Database for PostgreSQL"
 
-	region := d.Get("location").String()
 	sku := d.Get("sku_name").String()
 	var tier, family, cores string
 	if s := strings.Split(sku, "_"); len(s) == 3 {

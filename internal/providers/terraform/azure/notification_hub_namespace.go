@@ -18,9 +18,10 @@ func GetAzureRMNotificationHubNamespaceRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMNotificationHubNamespace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	var monthlyAdditionalPushes *decimal.Decimal
 	sku := "Basic"
-	location := d.Get("location").String()
 
 	if d.Get("sku_name").Type != gjson.Null {
 		sku = d.Get("sku_name").String()
@@ -33,7 +34,7 @@ func NewAzureRMNotificationHubNamespace(d *schema.ResourceData, u *schema.UsageD
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
-	costComponents = append(costComponents, notificationHubsCostComponent("Namespace usage", location, sku))
+	costComponents = append(costComponents, notificationHubsCostComponent("Namespace usage", region, sku))
 	if u != nil && u.Get("monthly_pushes").Type != gjson.Null {
 		monthlyAdditionalPushes = decimalPtr(decimal.NewFromInt(u.Get("monthly_pushes").Int()))
 	}
@@ -43,24 +44,24 @@ func NewAzureRMNotificationHubNamespace(d *schema.ResourceData, u *schema.UsageD
 			pushLimits := []int{10000000}
 			pushQuantities := usage.CalculateTierBuckets(*monthlyAdditionalPushes, pushLimits)
 			if pushQuantities[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 10M)", location, sku, "10", &pushQuantities[1], 1000000))
+				costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 10M)", region, sku, "10", &pushQuantities[1], 1000000))
 			}
 		} else {
-			costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 10M)", location, sku, "10", nil, 1000000))
+			costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 10M)", region, sku, "10", nil, 1000000))
 		}
 	} else {
 		if monthlyAdditionalPushes != nil {
 			pushLimits := []int{10000000, 90000000}
 			pushQuantities := usage.CalculateTierBuckets(*monthlyAdditionalPushes, pushLimits)
 			if pushQuantities[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (10-100M)", location, sku, "10", &pushQuantities[1], 1000000))
+				costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (10-100M)", region, sku, "10", &pushQuantities[1], 1000000))
 			}
 			if pushQuantities[2].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 100M)", location, sku, "100", &pushQuantities[2], 1000000))
+				costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 100M)", region, sku, "100", &pushQuantities[2], 1000000))
 			}
 		} else {
-			costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (10-100M)", location, sku, "10", nil, 1000000))
-			costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 100M)", location, sku, "100", nil, 1000000))
+			costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (10-100M)", region, sku, "10", nil, 1000000))
+			costComponents = append(costComponents, notificationHubsPushesCostComponent("Pushes (over 100M)", region, sku, "100", nil, 1000000))
 		}
 	}
 
@@ -70,7 +71,7 @@ func NewAzureRMNotificationHubNamespace(d *schema.ResourceData, u *schema.UsageD
 	}
 }
 
-func notificationHubsCostComponent(name, location, sku string) *schema.CostComponent {
+func notificationHubsCostComponent(name, region, sku string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("%s (%s)", name, sku),
 		Unit:            "months",
@@ -78,7 +79,7 @@ func notificationHubsCostComponent(name, location, sku string) *schema.CostCompo
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
-			Region:     strPtr(location),
+			Region:     strPtr(region),
 			Service:    strPtr("Notification Hubs"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Notification Hubs")},
@@ -92,7 +93,7 @@ func notificationHubsCostComponent(name, location, sku string) *schema.CostCompo
 	}
 }
 
-func notificationHubsPushesCostComponent(name, location, sku, startUsageAmt string, quantity *decimal.Decimal, multi int) *schema.CostComponent {
+func notificationHubsPushesCostComponent(name, region, sku, startUsageAmt string, quantity *decimal.Decimal, multi int) *schema.CostComponent {
 	if quantity != nil {
 		quantity = decimalPtr(quantity.Div(decimal.NewFromInt(int64(multi))))
 	}
@@ -103,7 +104,7 @@ func notificationHubsPushesCostComponent(name, location, sku, startUsageAmt stri
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
-			Region:     strPtr(location),
+			Region:     strPtr(region),
 			Service:    strPtr("Notification Hubs"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Notification Hubs")},

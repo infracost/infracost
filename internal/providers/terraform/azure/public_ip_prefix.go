@@ -13,18 +13,18 @@ func GetAzureRMPublicIPPrefixRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMPublicIPPrefix(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	location := d.Get("location").String()
+	region := lookupRegion(d, []string{})
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, PublicIPPrefixCostComponent("IP prefix", location))
+	costComponents = append(costComponents, PublicIPPrefixCostComponent("IP prefix", region))
 
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
 }
-func PublicIPPrefixCostComponent(name, location string) *schema.CostComponent {
+func PublicIPPrefixCostComponent(name, region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
@@ -32,7 +32,7 @@ func PublicIPPrefixCostComponent(name, location string) *schema.CostComponent {
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Virtual Network"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{

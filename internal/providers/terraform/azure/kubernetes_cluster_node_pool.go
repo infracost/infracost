@@ -19,12 +19,7 @@ func GetAzureRMKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMKubernetesClusterNodePool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-
-	mainCluster := d.References("kubernetes_cluster_id")
-	var location string
-	if len(mainCluster) > 0 {
-		location = mainCluster[0].Get("location").String()
-	}
+	region := lookupRegion(d, []string{"kubernetes_cluster_id"})
 
 	nodeCount := decimal.NewFromInt(1)
 	if d.Get("node_count").Type != gjson.Null {
@@ -34,10 +29,10 @@ func NewAzureRMKubernetesClusterNodePool(d *schema.ResourceData, u *schema.Usage
 		nodeCount = decimal.NewFromInt(u.Get("nodes").Int())
 	}
 
-	return aksClusterNodePool(d.Address, location, d.RawValues, nodeCount, u)
+	return aksClusterNodePool(d.Address, region, d.RawValues, nodeCount, u)
 }
 
-func aksClusterNodePool(name, location string, n gjson.Result, nodeCount decimal.Decimal, u *schema.UsageData) *schema.Resource {
+func aksClusterNodePool(name, region string, n gjson.Result, nodeCount decimal.Decimal, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
 	var subResources []*schema.Resource
 
@@ -45,7 +40,7 @@ func aksClusterNodePool(name, location string, n gjson.Result, nodeCount decimal
 		Name: name,
 	}
 	instanceType := n.Get("vm_size").String()
-	costComponents = append(costComponents, linuxVirtualMachineCostComponent(location, instanceType))
+	costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType))
 	mainResource.CostComponents = costComponents
 	schema.MultiplyQuantities(mainResource, nodeCount)
 
@@ -58,7 +53,7 @@ func aksClusterNodePool(name, location string, n gjson.Result, nodeCount decimal
 		if n.Get("os_disk_size_gb").Type != gjson.Null {
 			diskSize = int(n.Get("os_disk_size_gb").Int())
 		}
-		osDisk := aksOSDiskSubResource(location, diskSize)
+		osDisk := aksOSDiskSubResource(region, diskSize)
 
 		if osDisk != nil {
 			subResources = append(subResources, osDisk)

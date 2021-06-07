@@ -1,0 +1,11 @@
+version: 0.1
+resource_usage:
+  azurerm_postgresql_flexible_server.burstable:
+    additional_backup_storage_gb: 5000
+
+  azurerm_postgresql_flexible_server.gp:
+    additional_backup_storage_gb: 5000
+
+  azurerm_postgresql_flexible_server.mo:
+    additional_backup_storage_gb: 5000
+    
