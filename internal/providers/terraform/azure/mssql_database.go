@@ -198,14 +198,13 @@ func vCorePurchaseCostComponents(d *schema.ResourceData, u *schema.UsageData, sk
 		})
 	}
 
-	if tier != "General Purpose - Serverless" {
+	if strings.ToLower(tier) != "general purpose - serverless" {
 		licenseType := "LicenseIncluded"
 		if d.Get("license_type").Type != gjson.Null {
 			licenseType = d.Get("license_type").String()
-
-			if strings.ToLower(licenseType) == "licenseincluded" {
-				costComponents = append(costComponents, sqlLicenseCostComponent(region, cores, serviceName, tier))
-			}
+		}
+		if strings.ToLower(licenseType) == "licenseincluded" {
+			costComponents = append(costComponents, sqlLicenseCostComponent(region, cores, serviceName, tier))
 		}
 	}
 
