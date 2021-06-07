@@ -17,7 +17,7 @@ func GetCloudFormationStackRegistryItem() *schema.RegistryItem {
 }
 
 func NewCloudFormationStack(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	if d.Get("template_body").Type != gjson.Null && checkAWS(d) || checkAlexa(d) || checkCustom(d) {
+	if d.Get("template_body").Type != gjson.Null && (checkAWS(d) || checkAlexa(d) || checkCustom(d)) {
 		return &schema.Resource{
 			NoPrice:   true,
 			IsSkipped: true,
@@ -70,11 +70,11 @@ func cloudFormationCostComponent(name, region, unit, usagetype string, monthlyQu
 	}
 }
 func checkAWS(d *schema.ResourceData) bool {
-	return strings.Contains(strings.ToLower(d.Get("template_body").String()), "aws::*")
+	return strings.Contains(strings.ToLower(d.Get("template_body").String()), "aws::")
 }
 func checkAlexa(d *schema.ResourceData) bool {
-	return strings.Contains(strings.ToLower(d.Get("template_body").String()), "alexa::*")
+	return strings.Contains(strings.ToLower(d.Get("template_body").String()), "alexa::")
 }
 func checkCustom(d *schema.ResourceData) bool {
-	return strings.Contains(strings.ToLower(d.Get("template_body").String()), "custom::*")
+	return strings.Contains(strings.ToLower(d.Get("template_body").String()), "custom::")
 }

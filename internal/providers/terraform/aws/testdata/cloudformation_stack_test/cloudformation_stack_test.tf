@@ -9,37 +9,7 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-resource "aws_cloudformation_stack" "skip" {
-  name = "networking-stack"
-
-  parameters = {
-    VPCCidr = "10.0.0.0/16"
-  }
-
-  template_body = <<STACK
-{
-  "Parameters" : {
-    "VPCCidr" : {
-      "Type" : "String",
-      "Default" : "10.0.0.0/16",
-      "Description" : "Enter the CIDR block for the VPC. Default is 10.0.0.0/16."
-    }
-  },
-  "Resources" : {
-    "myVpc": {
-      "Type" : "Custom::*EC2::VPC",
-      "Properties" : {
-        "CidrBlock" : { "Ref" : "VPCCidr" },
-        "Tags" : [
-          {"Key": "Name", "Value": "Primary_CF_VPC"}
-        ]
-      }
-    }
-  }
-}
-STACK
-}
-resource "aws_cloudformation_stack" "withTemplBody" {
+resource "aws_cloudformation_stack" "withTemplBodyAWS" {
   name = "networking-stack"
 
   parameters = {
