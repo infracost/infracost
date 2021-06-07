@@ -12,6 +12,7 @@ type EgressResourceType int
 const (
 	StorageBucketEgress EgressResourceType = iota
 	ContainerRegistryEgress
+	ComputeVPNGateway
 	ComputeExternalVPNGateway
 )
 
@@ -19,6 +20,7 @@ type egressRegionData struct {
 	gRegion        string
 	apiDescription string
 	usageKey       string
+	fixedRegion    string
 }
 
 type egressRegionUsageFilterData struct {
@@ -62,7 +64,7 @@ func networkEgress(region string, u *schema.UsageData, resourceName, prefixName 
 		apiDescription := regData.apiDescription
 		usageKey := regData.usageKey
 
-		// TODO: Reformat it to use tier helpers.
+		// TODO: Reformat to use tier helpers.
 		var usage int64
 		var used int64
 		var lastEndUsageAmount int64
@@ -92,13 +94,25 @@ func networkEgress(region string, u *schema.UsageData, resourceName, prefixName 
 			if quantity == nil && idx > 0 {
 				continue
 			}
+			var apiRegion *string
+			if regData.fixedRegion != "" {
+				apiRegion = strPtr(regData.fixedRegion)
+			} else {
+				apiRegion = getEgressAPIRegionName(region, egressResourceType)
+			}
+			var name string
+			if usageName != "" {
+				name = fmt.Sprintf("%v (%v)", gRegion, usageName)
+			} else {
+				name = fmt.Sprintf("%v", gRegion)
+			}
 			resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
-				Name:            fmt.Sprintf("%v (%v)", gRegion, usageName),
+				Name:            name,
 				Unit:            "GB",
 				UnitMultiplier:  1,
 				MonthlyQuantity: quantity,
 				ProductFilter: &schema.ProductFilter{
-					Region:     getEgressAPIRegionName(region, egressResourceType),
+					Region:     apiRegion,
 					VendorName: strPtr("gcp"),
 					Service:    getEgressAPIServiceName(egressResourceType),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -117,7 +131,7 @@ func networkEgress(region string, u *schema.UsageData, resourceName, prefixName 
 
 func doesEgressIncludeSameContinent(egressResourceType EgressResourceType) bool {
 	switch egressResourceType {
-	case ComputeExternalVPNGateway:
+	case ComputeExternalVPNGateway, ComputeVPNGateway:
 		return false
 	default:
 		return true
@@ -126,6 +140,53 @@ func doesEgressIncludeSameContinent(egressResourceType EgressResourceType) bool 
 
 func getEgressRegionsData(prefixName string, egressResourceType EgressResourceType) []*egressRegionData {
 	switch egressResourceType {
+	case ComputeVPNGateway:
+		return []*egressRegionData{
+			{
+				gRegion: fmt.Sprintf("%s within the same region", prefixName),
+				// There is no same region option in APIs, so we always take this price in us-central1 region.
+				apiDescription: "Network Vpn Inter Region Egress from Americas to Americas",
+				usageKey:       "monthly_egress_data_transfer_gb.same_region",
+				fixedRegion:    "us-central1",
+			},
+			{
+				gRegion:        fmt.Sprintf("%s within the US or Canada", prefixName),
+				apiDescription: "Network Vpn Inter Region Egress from Americas to Montreal",
+				usageKey:       "monthly_egress_data_transfer_gb.us_or_canada",
+				fixedRegion:    "us-central1",
+			},
+			{
+				gRegion:        fmt.Sprintf("%s within Europe", prefixName),
+				apiDescription: "Network Vpn Inter Region Egress from EMEA to EMEA",
+				usageKey:       "monthly_egress_data_transfer_gb.europe",
+				fixedRegion:    "europe-west1",
+			},
+			{
+				gRegion:        fmt.Sprintf("%s within Asia", prefixName),
+				apiDescription: "Network Vpn Inter Region Egress from Japan to Seoul",
+				usageKey:       "monthly_egress_data_transfer_gb.asia",
+				fixedRegion:    "asia-northeast1",
+			},
+			{
+				gRegion:        fmt.Sprintf("%s within South America", prefixName),
+				apiDescription: "Network Vpn Inter Region Egress from Sao Paulo to Sao Paulo",
+				usageKey:       "monthly_egress_data_transfer_gb.south_america",
+				fixedRegion:    "southamerica-east1",
+			},
+			{
+				gRegion:        fmt.Sprintf("%s to/from Indonesia and Oceania", prefixName),
+				apiDescription: "Network Vpn Inter Region Egress from Sydney to Jakarta",
+				usageKey:       "monthly_egress_data_transfer_gb.oceania",
+				fixedRegion:    "australia-southeast1",
+			},
+			{
+				gRegion:        fmt.Sprintf("%s between continents (excludes Oceania)", prefixName),
+				apiDescription: "Network Vpn Inter Region Egress from Finland to Singapore",
+				usageKey:       "monthly_egress_data_transfer_gb.worldwide",
+				fixedRegion:    "europe-north1",
+			},
+		}
+
 	case ComputeExternalVPNGateway:
 		return []*egressRegionData{
 			{
@@ -172,26 +233,34 @@ func getEgressRegionsData(prefixName string, egressResourceType EgressResourceTy
 }
 
 func getEgressUsageFiltersData(egressResourceType EgressResourceType) []*egressRegionUsageFilterData {
-	usageFiltersData := []*egressRegionUsageFilterData{
-		{
-			usageName:   "first 1TB",
-			usageNumber: 1024,
-		},
-		{
-			usageName:   "next 9TB",
-			usageNumber: 10240,
-		},
-		{
-			usageName:   "over 10TB",
-			usageNumber: 0,
-		},
+	switch egressResourceType {
+	case ComputeVPNGateway:
+		return []*egressRegionUsageFilterData{
+			{
+				usageNumber: 0,
+			},
+		}
+	default:
+		return []*egressRegionUsageFilterData{
+			{
+				usageName:   "first 1TB",
+				usageNumber: 1024,
+			},
+			{
+				usageName:   "next 9TB",
+				usageNumber: 10240,
+			},
+			{
+				usageName:   "over 10TB",
+				usageNumber: 0,
+			},
+		}
 	}
-	return usageFiltersData
 }
 
 func getEgressAPIRegionName(region string, egressResourceType EgressResourceType) *string {
 	switch egressResourceType {
-	case ComputeExternalVPNGateway:
+	case ComputeExternalVPNGateway, ComputeVPNGateway:
 		return strPtr(region)
 	default:
 		return nil
@@ -200,7 +269,7 @@ func getEgressAPIRegionName(region string, egressResourceType EgressResourceType
 
 func getEgressAPIServiceName(egressResourceType EgressResourceType) *string {
 	switch egressResourceType {
-	case ComputeExternalVPNGateway:
+	case ComputeExternalVPNGateway, ComputeVPNGateway:
 		return strPtr("Compute Engine")
 	default:
 		return strPtr("Cloud Storage")

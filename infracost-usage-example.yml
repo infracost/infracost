@@ -402,6 +402,21 @@ resource_usage:
       china: 50            # China excluding Hong Kong.
       australia: 250       # Australia.
 
+  google_compute_external_vpn_gateway.my_compute_external_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly data transfer from VPN gateway to the following, in GB:
+      worldwide: 12500                # Worldwide excluding China, Australia but including Hong Kong.
+      china: 8500                     # China excluding Hong Kong.
+      australia: 250                  # Australia.
+  
+  google_compute_vpn_gateway.my_compute_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 250                # VMs in the same Google Cloud region.
+      us_or_canada: 100               # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 70                      # Between Google Cloud regions within Europe.
+      asia: 50                        # Between Google Cloud regions within Asia.
+      south_america: 100              # Between Google Cloud regions within South America.
+      oceania: 50                     # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 200                  # to a Google Cloud region on another continent.
 
   google_compute_image.my_image:
     storage_gb: 1000 # Total size of image storage in GB.

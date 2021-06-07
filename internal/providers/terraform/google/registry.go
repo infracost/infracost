@@ -13,6 +13,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetComputeInstanceRegistryItem(),
 	GetComputeMachineImageRegistryItem(),
 	GetComputeRouterNATRegistryItem(),
+	GetComputeVPNGatewayRegistryItem(),
 	GetComputeVPNTunnelRegistryItem(),
 	GetContainerClusterRegistryItem(),
 	GetContainerNodePoolRegistryItem(),
