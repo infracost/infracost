@@ -5,7 +5,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "example" {
   name     = "example-resources"
-  location = "East US"
+  location = "eastus"
 }
 resource "azurerm_automation_account" "default" {
   name                = "automationAccount1"
@@ -50,4 +50,4 @@ resource "azurerm_automation_account" "without_usage" {
   tags = {
     environment = "development"
   }
-} 
+}

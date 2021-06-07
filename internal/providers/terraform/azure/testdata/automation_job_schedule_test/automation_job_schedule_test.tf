@@ -5,7 +5,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "example" {
   name     = "example-resources"
-  location = "East US"
+  location = "eastus"
 }
 
 resource "azurerm_automation_job_schedule" "zeroMinutes" {
@@ -25,4 +25,4 @@ resource "azurerm_automation_job_schedule" "withoutUsage" {
   automation_account_name = "tf-automation-account"
   schedule_name           = "hour"
   runbook_name            = "Get-VirtualMachine"
-} 
+}
