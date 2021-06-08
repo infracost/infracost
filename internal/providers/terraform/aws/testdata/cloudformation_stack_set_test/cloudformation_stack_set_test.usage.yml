@@ -1,0 +1,9 @@
+version: 0.1
+resource_usage:
+  aws_cloudformation_stack_set.withTemplBodyAWS:
+    monthly_handler_operations: 10000 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
+    monthly_duration_secs: 10000 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.  
+
+  aws_cloudformation_stack_set.withoutTemplBody:
+    monthly_handler_operations: 10000 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
+    monthly_duration_secs: 0 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.    
