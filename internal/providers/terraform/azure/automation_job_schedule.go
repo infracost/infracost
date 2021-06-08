@@ -35,7 +35,6 @@ func NewAzureRMAutomationJobSchedule(d *schema.ResourceData, u *schema.UsageData
 	}
 }
 
-
 func runTimeCostComponent(location, startUsage, meterName, skuName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
