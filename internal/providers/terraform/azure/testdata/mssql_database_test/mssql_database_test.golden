@@ -1,57 +1,73 @@
 
- Name                                                        Monthly Qty  Unit              Monthly Cost 
-                                                                                                         
- azurerm_mssql_database.LTR                                                                              
- ├─ Compute (provisioned, GP_Gen5_4)                                 730  hours                  $444.47 
- ├─ Storage                                                            5  GB                       $0.57 
- └─ Long-term retention                                            1,000  GB                      $50.00 
-                                                                                                         
- azurerm_mssql_database.business_critical_gen                                                            
- ├─ Compute (provisioned, BC_Gen5_8)                                 730  hours                $1,777.90 
- ├─ Storage                                                           10  GB                       $2.50 
- └─ Long-term retention                                   Monthly cost depends on usage: $0.05 per GB    
-                                                                                                         
- azurerm_mssql_database.business_critical_m                                                              
- ├─ Compute (provisioned, BC_M_8)                                    730  hours                $9,804.08 
- ├─ Storage                                                           50  GB                      $12.50 
- └─ Long-term retention                                   Monthly cost depends on usage: $0.05 per GB    
-                                                                                                         
- azurerm_mssql_database.general_purpose_gen                                                              
- ├─ Compute (provisioned, GP_Gen5_4)                                 730  hours                  $444.47 
- ├─ Storage                                                            5  GB                       $0.57 
- └─ Long-term retention                                   Monthly cost depends on usage: $0.05 per GB    
-                                                                                                         
- azurerm_mssql_database.general_purpose_gen_with_license                                                 
- ├─ Compute (provisioned, GP_Gen5_4)                                 730  hours                  $444.47 
- ├─ SQL license                                                    2,920  vCore-hours            $291.90 
- ├─ Storage                                                            5  GB                       $0.57 
- └─ Long-term retention                                   Monthly cost depends on usage: $0.05 per GB    
-                                                                                                         
- azurerm_mssql_database.general_purpose_gen_zone                                                         
- ├─ Compute (provisioned, GP_Gen5_4)                                 730  hours                  $711.16 
- ├─ Storage                                                            5  GB                       $1.15 
- └─ Long-term retention                                   Monthly cost depends on usage: $0.05 per GB    
-                                                                                                         
- azurerm_mssql_database.hyperscale_gen                                                                   
- ├─ Compute (provisioned, HS_Gen5_2)                                 730  hours                  $266.68 
- ├─ Read replicas                                         Monthly cost depends on usage: $0.37 per hours 
- └─ Storage                                                          100  GB                      $10.00 
-                                                                                                         
- azurerm_mssql_database.hyperscale_gen_with_replicas                                                     
- ├─ Compute (provisioned, HS_Gen5_2)                                 730  hours                  $266.68 
- ├─ Read replicas                                                  1,460  hours                  $533.37 
- └─ Storage                                                            5  GB                       $0.50 
-                                                                                                         
- azurerm_mssql_database.serverless                                                                       
- ├─ Compute (serverless, GP_S_Gen5_4)                                500  vCore-hours            $260.88 
- ├─ Storage                                                            5  GB                       $0.57 
- └─ Long-term retention                                   Monthly cost depends on usage: $0.05 per GB    
-                                                                                                         
- PROJECT TOTAL                                                                                $15,325.02 
-
+ Name                                                           Monthly Qty  Unit              Monthly Cost 
+                                                                                                            
+ azurerm_mssql_database.LTR                                                                                 
+ ├─ Compute (provisioned, GP_Gen5_4)                                    730  hours                  $444.47 
+ ├─ SQL license                                                       2,920  vCore-hours            $291.90 
+ ├─ Storage                                                               5  GB                       $0.57 
+ └─ Long-term retention                                               1,000  GB                      $50.00 
+                                                                                                            
+ azurerm_mssql_database.business_critical_gen                                                               
+ ├─ Compute (provisioned, BC_Gen5_8)                                    730  hours                $1,777.90 
+ ├─ SQL license                                                       5,840  vCore-hours          $2,190.00 
+ ├─ Storage                                                              10  GB                       $2.50 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_mssql_database.business_critical_m                                                                 
+ ├─ Compute (provisioned, BC_M_8)                                       730  hours                $9,804.08 
+ ├─ SQL license                                                       5,840  vCore-hours          $2,190.00 
+ ├─ Storage                                                              50  GB                      $12.50 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_mssql_database.general_purpose_gen                                                                 
+ ├─ Compute (provisioned, GP_Gen5_4)                                    730  hours                  $444.47 
+ ├─ SQL license                                                       2,920  vCore-hours            $291.90 
+ ├─ Storage                                                               5  GB                       $0.57 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_mssql_database.general_purpose_gen_without_license                                                 
+ ├─ Compute (provisioned, GP_Gen5_4)                                    730  hours                  $444.47 
+ ├─ Storage                                                               5  GB                       $0.57 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_mssql_database.general_purpose_gen_zone                                                            
+ ├─ Compute (provisioned, GP_Gen5_4)                                    730  hours                  $711.16 
+ ├─ SQL license                                                       2,920  vCore-hours            $291.90 
+ ├─ Storage                                                               5  GB                       $1.15 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_mssql_database.hyperscale_gen                                                                      
+ ├─ Compute (provisioned, HS_Gen5_2)                                    730  hours                  $266.68 
+ ├─ Read replicas                                            Monthly cost depends on usage: $0.37 per hours 
+ ├─ SQL license                                                       1,460  vCore-hours            $145.95 
+ └─ Storage                                                             100  GB                      $10.00 
+                                                                                                            
+ azurerm_mssql_database.hyperscale_gen_with_replicas                                                        
+ ├─ Compute (provisioned, HS_Gen5_2)                                    730  hours                  $266.68 
+ ├─ Read replicas                                                     1,460  hours                  $533.37 
+ ├─ SQL license                                                       1,460  vCore-hours            $145.95 
+ └─ Storage                                                               5  GB                       $0.50 
+                                                                                                            
+ azurerm_mssql_database.premium6                                                                            
+ ├─ Compute (P6)                                                         30  days                 $3,600.00 
+ ├─ Extra data storage                                                  500  GB                     $170.00 
+ └─ Long-term retention                                               1,000  GB                      $50.00 
+                                                                                                            
+ azurerm_mssql_database.serverless                                                                          
+ ├─ Compute (serverless, GP_S_Gen5_4)                                   500  vCore-hours            $260.88 
+ ├─ Storage                                                               5  GB                       $0.57 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_mssql_database.standard1                                                                           
+ ├─ Compute (S1)                                                         30  days                    $29.03 
+ ├─ Extra data storage                                       Monthly cost depends on usage: $0.17 per GB    
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_mssql_database.standard12                                                                          
+ ├─ Compute (S12)                                                        30  days                 $4,355.10 
+ ├─ Extra data storage                                                  250  GB                      $42.50 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ OVERALL TOTAL                                                                                   $28,827.36 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
-
-1 resource type wasn't estimated as it's not supported yet.
-Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
-1 x azurerm_sql_server

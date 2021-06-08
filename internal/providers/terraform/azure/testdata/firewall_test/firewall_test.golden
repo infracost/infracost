@@ -24,8 +24,7 @@
  azurerm_public_ip.example                                                                   
  └─ IP address (static)                                  730  hours                    $3.65 
                                                                                              
- PROJECT TOTAL                                                                     $4,738.65 
-
+ OVERALL TOTAL                                                                     $4,738.65 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
 

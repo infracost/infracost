@@ -119,6 +119,15 @@ resource "azurerm_cosmosdb_cassandra_keyspace" "serverless" {
   account_name        = azurerm_cosmosdb_account.example.name
 }
 
+resource "azurerm_cosmosdb_cassandra_keyspace" "no_account" {
+  name                = "no-account"
+  resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
+  account_name        = "in-another-module"
+  autoscale_settings {
+    max_throughput = 4000
+  }
+}
+
 resource "azurerm_cosmosdb_cassandra_table" "serverless" {
   name                  = "testtable"
   cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.serverless.id
@@ -213,6 +222,51 @@ resource "azurerm_cosmosdb_cassandra_table" "autoscale" {
 resource "azurerm_cosmosdb_cassandra_table" "provisioned" {
   name                  = "testtable"
   cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.provisioned.id
+  throughput            = 500
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
+}
+
+resource "azurerm_cosmosdb_cassandra_table" "noKeyspace" {
+  name = "testtable"
+  // Simulate the keyspace being somewhere we can't access
+  cassandra_keyspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg1/providers/Microsoft.DocumentDB/databaseAccounts/account1/cassandraKeyspaces/ks1"
+  throughput            = 500
+
+  schema {
+    column {
+      name = "test1"
+      type = "ascii"
+    }
+
+    column {
+      name = "test2"
+      type = "int"
+    }
+
+    partition_key {
+      name = "test1"
+    }
+  }
+}
+
+resource "azurerm_cosmosdb_cassandra_table" "noAccount" {
+  name                  = "testtable"
+  cassandra_keyspace_id = azurerm_cosmosdb_cassandra_keyspace.no_account.id
   throughput            = 500
 
   schema {

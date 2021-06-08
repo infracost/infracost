@@ -9,7 +9,6 @@
  ├─ DX connection                                    730  hours                $219.00 
  └─ Outbound data transfer (to EqDC2)                100  GB                     $2.00 
                                                                                        
- PROJECT TOTAL                                                                 $440.00 
-
+ OVERALL TOTAL                                                                 $440.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

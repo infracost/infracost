@@ -15,7 +15,6 @@
  ├─ Customer master key                               1  months                         $1.00 
  └─ Requests (asymmetric)             Monthly cost depends on usage: $0.15 per 10k requests   
                                                                                               
- PROJECT TOTAL                                                                          $3.00 
-
+ OVERALL TOTAL                                                                          $3.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

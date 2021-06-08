@@ -17,10 +17,11 @@ resource "azurerm_sql_server" "example" {
   administrator_login_password = "fake"
 }
 
-resource "azurerm_mssql_database" "general_purpose_gen" {
-  name      = "acctest-db-d"
-  server_id = azurerm_sql_server.example.id
-  sku_name  = "GP_Gen5_4"
+resource "azurerm_mssql_database" "general_purpose_gen_without_license" {
+  name         = "acctest-db-d"
+  server_id    = azurerm_sql_server.example.id
+  sku_name     = "GP_Gen5_4"
+  license_type = "BasePrice"
 }
 resource "azurerm_mssql_database" "business_critical_gen" {
   name        = "acctest-db-d"
@@ -48,7 +49,7 @@ resource "azurerm_mssql_database" "hyperscale_gen_with_replicas" {
   read_replica_count = 2
 }
 
-resource "azurerm_mssql_database" "general_purpose_gen_with_license" {
+resource "azurerm_mssql_database" "general_purpose_gen" {
   name         = "acctest-db-d"
   server_id    = azurerm_sql_server.example.id
   sku_name     = "GP_Gen5_4"
@@ -72,4 +73,23 @@ resource "azurerm_mssql_database" "LTR" {
   name      = "acctest-db-d"
   server_id = azurerm_sql_server.example.id
   sku_name  = "GP_Gen5_4"
+}
+
+resource "azurerm_mssql_database" "standard1" {
+  name      = "acctest-db-d"
+  server_id = azurerm_sql_server.example.id
+  sku_name  = "S1"
+}
+
+resource "azurerm_mssql_database" "standard12" {
+  name        = "acctest-db-d"
+  server_id   = azurerm_sql_server.example.id
+  sku_name    = "S12"
+  max_size_gb = 500
+}
+
+resource "azurerm_mssql_database" "premium6" {
+  name      = "acctest-db-d"
+  server_id = azurerm_sql_server.example.id
+  sku_name  = "P6"
 }

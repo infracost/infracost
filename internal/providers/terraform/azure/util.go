@@ -1,7 +1,9 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 )
 
 func strPtr(s string) *string {
@@ -10,6 +12,36 @@ func strPtr(s string) *string {
 
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
+}
+
+func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
+	// First check for a location set directly on a resource
+	if d.Get("location").String() != "" {
+		return d.Get("location").String()
+	}
+
+	// Then check for any parent resources with a location
+	for _, k := range parentResourceKeys {
+		parents := d.References(k)
+		for _, p := range parents {
+			if p.Get("location").String() != "" {
+				return p.Get("location").String()
+			}
+		}
+	}
+
+	// Then check for a resource group
+	groups := d.References("resource_group_name")
+	for _, g := range groups {
+		if g.Get("location").String() != "" {
+			return g.Get("location").String()
+		}
+	}
+
+	// When all else fails use the default region
+	defaultRegion := d.Get("region").String()
+	log.Warnf("Using %s for resource %s as its 'location' property could not be found.", defaultRegion, d.Address)
+	return defaultRegion
 }
 
 func locationNameMapping(l string) string {

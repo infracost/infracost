@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  aws_waf_web_acl.my_waf:
+    rule_group_rules: 5 
+    monthly_requests: 1000000  

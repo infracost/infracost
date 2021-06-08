@@ -7,7 +7,6 @@
  google_pubsub_topic.usage                                                     
  └─ Message ingestion data                  10  TiB                    $400.00 
                                                                                
- PROJECT TOTAL                                                         $400.00 
-
+ OVERALL TOTAL                                                         $400.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

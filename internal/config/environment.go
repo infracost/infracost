@@ -111,6 +111,8 @@ func ciPlatform() string {
 		return "circleci"
 	} else if IsTruthy(os.Getenv("JENKINS_HOME")) {
 		return "jenkins"
+	} else if IsTruthy(os.Getenv("BUILDKITE")) {
+		return "buildkite"
 	} else if IsTruthy(os.Getenv("SYSTEM_COLLECTIONURI")) {
 		return fmt.Sprintf("azure_devops_%s", os.Getenv("BUILD_REPOSITORY_PROVIDER"))
 	} else {

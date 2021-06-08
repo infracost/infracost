@@ -7,7 +7,6 @@
  aws_sns_topic_subscription.sns_topic_subscription_withUsage                                                             
  └─ HTTP notifications                                                         2  1M notifications                 $1.20 
                                                                                                                          
- PROJECT TOTAL                                                                                                     $1.20 
-
+ OVERALL TOTAL                                                                                                     $1.20 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

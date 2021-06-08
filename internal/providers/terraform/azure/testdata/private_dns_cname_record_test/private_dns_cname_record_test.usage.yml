@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  azurerm_private_dns_cname_record.over1B:
+    monthly_queries: 1500000000  # Monthly number of DNS queries
+  
+  azurerm_private_dns_cname_record.first1B:
+    monthly_queries: 1000000000  # Monthly number of DNS queries
+    

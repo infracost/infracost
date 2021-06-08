@@ -21,7 +21,6 @@
  ├─ Instance usage (RabbitMQ, mq.m5.xlarge, single_instance)                   730  hours                $420.48 
  └─ Storage (RabbitMQ, EBS)                                          Monthly cost depends on usage: $0.10 per GB 
                                                                                                                  
- PROJECT TOTAL                                                                                         $2,149.20 
-
+ OVERALL TOTAL                                                                                         $2,149.20 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

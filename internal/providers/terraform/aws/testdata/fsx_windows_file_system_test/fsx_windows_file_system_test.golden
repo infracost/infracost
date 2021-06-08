@@ -11,7 +11,6 @@
  ├─ HDD storage                                        300  GB                     $7.50 
  └─ Backup storage                                  10,000  GB                   $500.00 
                                                                                          
- PROJECT TOTAL                                                                 $9,731.00 
-
+ OVERALL TOTAL                                                                 $9,731.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -14,22 +14,23 @@ import (
 func GetAzureRMCDNEndpointRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_cdn_endpoint",
-		RFunc: NewAzureCDNEndpoint,
+		RFunc: NewAzureRMCDNEndpoint,
 		ReferenceAttributes: []string{
 			"profile_name",
 		},
 	}
 }
 
-func NewAzureCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := regionToZone(lookupRegion(d, []string{}))
+
 	var costComponents []*schema.CostComponent
 
-	profile := d.References("profile_name")[0]
-	sku := profile.Get("sku").String()
-	location := locationToZone(d.Get("location").String())
-	if location == "" {
-		log.Warnf("Unrecognized CDN location for resource %s: %s", d.Address, location)
-		return nil
+	sku := ""
+	var profile *schema.ResourceData
+	if len(d.References("profile_name")) > 0 {
+		profile = d.References("profile_name")[0]
+		sku = profile.Get("sku").String()
 	}
 
 	if len(strings.Split(sku, "_")) != 2 || strings.ToLower(sku) == "standard_chinacdn" {
@@ -37,7 +38,7 @@ func NewAzureCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		return nil
 	}
 
-	costComponents = append(costComponents, cdnOutboundDataCostComponents(location, sku, u)...)
+	costComponents = append(costComponents, cdnOutboundDataCostComponents(region, sku, u)...)
 
 	if strings.ToLower(sku) == "standard_microsoft" {
 		numberOfRules := 0
@@ -54,7 +55,7 @@ func NewAzureCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 			costComponents = append(costComponents, cdnCostComponent(
 				"Rules engine rules (over 5)",
 				"rules",
-				location,
+				region,
 				"Azure CDN from Microsoft",
 				"Standard",
 				"Rules",
@@ -71,7 +72,7 @@ func NewAzureCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 			costComponents = append(costComponents, cdnCostComponent(
 				"Rules engine requests",
 				"1M requests",
-				location,
+				region,
 				"Azure CDN from Microsoft",
 				"Standard",
 				"Requests",
@@ -84,7 +85,7 @@ func NewAzureCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	if strings.ToLower(sku) == "standard_akamai" || strings.ToLower(sku) == "standard_verizon" {
 		if d.Get("optimization_type").Type != gjson.Null {
 			if strings.ToLower(d.Get("optimization_type").String()) == "dynamicsiteacceleration" {
-				costComponents = append(costComponents, cdnAccelerationDataTransfersCostComponents(location, sku, d, u)...)
+				costComponents = append(costComponents, cdnAccelerationDataTransfersCostComponents(region, sku, d, u)...)
 			}
 		}
 	}
@@ -95,7 +96,7 @@ func NewAzureCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 }
 
-func cdnOutboundDataCostComponents(location, sku string, u *schema.UsageData) []*schema.CostComponent {
+func cdnOutboundDataCostComponents(region, sku string, u *schema.UsageData) []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
 	type dataTier struct {
@@ -137,7 +138,7 @@ func cdnOutboundDataCostComponents(location, sku string, u *schema.UsageData) []
 				costComponents = append(costComponents, cdnCostComponent(
 					d.name,
 					"GB",
-					location,
+					region,
 					productName,
 					skuName,
 					meterName,
@@ -149,7 +150,7 @@ func cdnOutboundDataCostComponents(location, sku string, u *schema.UsageData) []
 		costComponents = append(costComponents, cdnCostComponent(
 			data[0].name,
 			"GB",
-			location,
+			region,
 			productName,
 			skuName,
 			meterName,
@@ -160,7 +161,7 @@ func cdnOutboundDataCostComponents(location, sku string, u *schema.UsageData) []
 	return costComponents
 }
 
-func cdnAccelerationDataTransfersCostComponents(location, sku string, d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
+func cdnAccelerationDataTransfersCostComponents(region, sku string, d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
 	type dataTier struct {
@@ -196,7 +197,7 @@ func cdnAccelerationDataTransfersCostComponents(location, sku string, d *schema.
 				costComponents = append(costComponents, cdnCostComponent(
 					d.name,
 					"GB",
-					location,
+					region,
 					productName,
 					skuName,
 					meterName,
@@ -208,7 +209,7 @@ func cdnAccelerationDataTransfersCostComponents(location, sku string, d *schema.
 		costComponents = append(costComponents, cdnCostComponent(
 			data[0].name,
 			"GB",
-			location,
+			region,
 			productName,
 			skuName,
 			meterName,
@@ -219,7 +220,7 @@ func cdnAccelerationDataTransfersCostComponents(location, sku string, d *schema.
 	return costComponents
 }
 
-func cdnCostComponent(name, unit, location, productName, skuName, meterName, startUsage string, quantity *decimal.Decimal) *schema.CostComponent {
+func cdnCostComponent(name, unit, region, productName, skuName, meterName, startUsage string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            unit,
@@ -227,7 +228,7 @@ func cdnCostComponent(name, unit, location, productName, skuName, meterName, sta
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Content Delivery Network"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -243,7 +244,7 @@ func cdnCostComponent(name, unit, location, productName, skuName, meterName, sta
 	}
 }
 
-func locationToZone(location string) string {
+func regionToZone(region string) string {
 	return map[string]string{
 		"westus":             "Zone 1",
 		"westus2":            "Zone 1",
@@ -293,5 +294,5 @@ func locationToZone(location string) string {
 		"eastusslv":          "Zone 1",
 		"swedencentral":      "Zone 1",
 		"swedensouth":        "Zone 1",
-	}[location]
+	}[region]
 }

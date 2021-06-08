@@ -16,11 +16,12 @@ func GetAzureRMAppServicePlanRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	sku := d.Get("sku.0.size").String()
 	skuRefactor := ""
 	os := "windows"
 	capacity := d.Get("sku.0.capacity").Int()
-	location := d.Get("location").String()
 	productName := "Standard Plan"
 
 	// These are used by azurerm_function_app, their costs are calculated there as they don't have prices in the azurerm_app_service_plan resource
@@ -73,7 +74,7 @@ func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *sche
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, AppServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", sku), location, productName, skuRefactor, capacity))
+	costComponents = append(costComponents, AppServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", sku), region, productName, skuRefactor, capacity))
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -81,7 +82,7 @@ func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *sche
 	}
 }
 
-func AppServicePlanCostComponent(name, location, productName, skuRefactor string, capacity int64) *schema.CostComponent {
+func AppServicePlanCostComponent(name, region, productName, skuRefactor string, capacity int64) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
@@ -89,7 +90,7 @@ func AppServicePlanCostComponent(name, location, productName, skuRefactor string
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Azure App Service"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{

@@ -28,23 +28,25 @@ func (p *PlanJSONProvider) DisplayType() string {
 	return "Terraform plan JSON file"
 }
 
-func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) (*schema.Project, error) {
-	var project *schema.Project = schema.NewProject(p.Path, map[string]string{})
+func (p *PlanJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+	// no op
+}
 
+func (p *PlanJSONProvider) LoadResources(project *schema.Project, usage map[string]*schema.UsageData) error {
 	j, err := ioutil.ReadFile(p.Path)
 	if err != nil {
-		return project, errors.Wrap(err, "Error reading Terraform plan JSON file")
+		return errors.Wrap(err, "Error reading Terraform plan JSON file")
 	}
 
 	parser := NewParser(p.env)
 
 	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {
-		return project, errors.Wrap(err, "Error parsing Terraform plan JSON file")
+		return errors.Wrap(err, "Error parsing Terraform plan JSON file")
 	}
 
 	project.PastResources = pastResources
 	project.Resources = resources
 
-	return project, nil
+	return nil
 }
