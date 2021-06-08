@@ -77,7 +77,7 @@ func completionCmd() *cobra.Command {
 	}
 
 	completionCmd.Flags().String("shell", "", "supported shell formats: bash, zsh, fish, powershell")
-	completionCmd.MarkFlagRequired("shell")
+	_ = completionCmd.MarkFlagRequired("shell")
 
 	return completionCmd
 }
