@@ -12,26 +12,30 @@ func GetAzureRMAutomationJobScheduleRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_automation_job_schedule",
 		RFunc: NewAzureRMAutomationJobSchedule,
+		ReferenceAttributes: []string{
+			"resource_group_name",
+		},
 	}
 }
 
 func NewAzureRMAutomationJobSchedule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyJobRunMins *decimal.Decimal
 	location := lookupRegion(d, []string{})
+
 	if u != nil && u.Get("monthly_job_run_mins").Type != gjson.Null {
 		monthlyJobRunMins = decimalPtr(decimal.NewFromInt(u.Get("monthly_job_run_mins").Int()))
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
+	costComponents = append(costComponents, runTimeCostComponent(location, "500", "Basic Runtime", "Basic", monthlyJobRunMins))
 
-	costComponents = append(costComponents, runTimeCostComponent(location, "500", "Basic Runtime", monthlyJobRunMins))
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
 }
 
-func runTimeCostComponent(location, startUsage, meterName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
+func runTimeCostComponent(location, startUsage, meterName, skuName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            "Job run time",
@@ -45,6 +49,7 @@ func runTimeCostComponent(location, startUsage, meterName string, monthlyQuantit
 			ProductFamily: strPtr("Management and Governance"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", meterName))},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", skuName))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
