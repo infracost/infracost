@@ -37,7 +37,6 @@ func NewAzureRMAutomationAccount(d *schema.ResourceData, u *schema.UsageData) *s
 	} else {
 		costComponents = append(costComponents, nonNodesCostComponent(location, "5", "Non-Azure Node", "Non-Azure", nonAzureConfigNodeCount))
 	}
-  
 	if u != nil && u.Get("monthly_watcher_hours").Type != gjson.Null {
 		monthlyWatcherHours = decimalPtr(decimal.NewFromInt(u.Get("monthly_watcher_hours").Int()))
 	}
