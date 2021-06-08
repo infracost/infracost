@@ -1,6 +1,7 @@
 package google
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -47,10 +48,10 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 
 	var keyDescript = cryptoKeyDescription(algorithm, protectionLevel)
 	var operationDesctipt = keyOperationsDescription(algorithm, protectionLevel)
-
+	keyDescript = strings.ToLower(keyDescript)
 	costComponents := []*schema.CostComponent{}
 
-	if strings.ToLower(keyDescript) == "hsm rsa 3072" || strings.ToLower(keyDescript) == "hsm rsa 4096" || strings.ToLower(keyDescript) == "hsm ecdsa P-256" || strings.ToLower(keyDescript) == "hsm ecdsa p-384" {
+	if keyDescript == "hsm rsa 3072" || keyDescript == "hsm rsa 4096" || keyDescript == "hsm ecdsa p-256" || keyDescript == "hsm ecdsa p-384" {
 		tierLimits := []int{2000}
 		var firstTierQty *decimal.Decimal
 		var tiers []decimal.Decimal
@@ -70,7 +71,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 				Service:       strPtr("Cloud Key Management Service (KMS)"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", ValueRegex: strPtr("/" + keyDescript + "/")},
+					{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s/i", keyDescript))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -91,7 +92,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 					Service:       strPtr("Cloud Key Management Service (KMS)"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", ValueRegex: strPtr("/" + keyDescript + "/")},
+						{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s/i", keyDescript))},
 					},
 				},
 				PriceFilter: &schema.PriceFilter{
@@ -111,7 +112,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 				Service:       strPtr("Cloud Key Management Service (KMS)"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", ValueRegex: strPtr("/" + keyDescript + "/")},
+					{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s/i", keyDescript))},
 				},
 			},
 		})
@@ -128,7 +129,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			Service:       strPtr("Cloud Key Management Service (KMS)"),
 			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: strPtr("/" + operationDesctipt + "/")},
+				{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operationDesctipt))},
 			},
 		},
 	})
@@ -140,20 +141,21 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 }
 
 func cryptoKeyDescription(algorithm string, protectionLevel string) string {
+	algorithm = strings.ToLower(algorithm)
 	switch strings.ToLower(protectionLevel) {
 	case "software":
-		if strings.ToLower(algorithm) == "google_symmetric_encryption" {
+		if algorithm == "google_symmetric_encryption" {
 			return "Active software symmetric key versions"
 		}
 		return "Software asymmetric"
 	case "hsm":
-		if strings.ToLower(algorithm) == "google_symmetric_encryption" {
+		if algorithm == "google_symmetric_encryption" {
 			return "HSM symmetric"
 		}
-		if strings.ToLower(algorithm) == "ec_sign_p256_sha256" {
+		if algorithm == "ec_sign_p256_sha256" {
 			return "HSM ECDSA P-256"
 		}
-		if strings.ToLower(algorithm) == "ec_sign_p384_sha384" {
+		if algorithm == "ec_sign_p384_sha384" {
 			return "HSM ECDSA P-384"
 		}
 		rsaType := strings.Split(algorithm, "_")[3]
@@ -163,20 +165,21 @@ func cryptoKeyDescription(algorithm string, protectionLevel string) string {
 }
 
 func keyOperationsDescription(algorithm string, protectionLevel string) string {
+	algorithm = strings.ToLower(algorithm)
 	switch strings.ToLower(protectionLevel) {
 	case "software":
-		if strings.ToLower(algorithm) == "google_symmetric_encryption" {
+		if algorithm == "google_symmetric_encryption" {
 			return "Cryptographic operations with a software symmetric"
 		}
 		return "Software asymmetric cryptographic"
 	case "hsm":
-		if strings.ToLower(algorithm) == "google_symmetric_encryption" {
+		if algorithm == "google_symmetric_encryption" {
 			return "HSM symmetric cryptographic"
 		}
-		if strings.ToLower(algorithm) == "ec_sign_p256_sha256" {
+		if algorithm == "ec_sign_p256_sha256" {
 			return "HSM cryptographic operations with an ECDSA P-256"
 		}
-		if strings.ToLower(algorithm) == "ec_sign_p384_sha384" {
+		if algorithm == "ec_sign_p384_sha384" {
 			return "HSM cryptographic operations with an ECDSA P-384"
 		}
 		rsaType := strings.Split(algorithm, "_")[3]
