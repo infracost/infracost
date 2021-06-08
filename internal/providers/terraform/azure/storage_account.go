@@ -115,17 +115,13 @@ func NewAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *sche
 		if u != nil && u.Get("monthly_write_operations").Type != gjson.Null {
 			writeOperations = decimalPtr(decimal.NewFromInt(u.Get("monthly_write_operations").Int()))
 		}
-		writeMeterName := "/Write Operations$/"
 
-		if skuName == "Hot RA-GRS" {
-			writeMeterName = "/List and Create Container Operations$/"
-		}
 		costComponents = append(costComponents, blobOperationsCostComponent(
 			region,
 			"Write operations",
 			"10K operations",
 			skuName,
-			writeMeterName,
+			"Write Operations",
 			productName,
 			writeOperations,
 			10000))
@@ -138,7 +134,7 @@ func NewAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *sche
 			"List and create container operations",
 			"10K operations",
 			skuName,
-			"/List and Create Container Operations$/",
+			"List and Create Container Operations",
 			productName,
 			listOperations,
 			10000))
@@ -151,7 +147,7 @@ func NewAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *sche
 			"Read operations",
 			"10K operations",
 			skuName,
-			"/Read Operations$/",
+			"Read Operations",
 			productName,
 			readOperations,
 			10000))
@@ -164,7 +160,7 @@ func NewAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *sche
 			"All other operations",
 			"10K operations",
 			skuName,
-			"/All Other Operations$/",
+			"All Other Operations",
 			productName,
 			otherOperations,
 			10000))
@@ -178,7 +174,7 @@ func NewAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *sche
 				"Data retrieval",
 				"GB",
 				skuName,
-				"/Data Retrieval$/",
+				"Data Retrieval",
 				productName,
 				dataRetrieval,
 				1))
@@ -191,7 +187,7 @@ func NewAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *sche
 				"Data write",
 				"GB",
 				skuName,
-				"/Data Write$/",
+				"Data Write",
 				productName,
 				dataWrite,
 				1))
@@ -204,7 +200,7 @@ func NewAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *sche
 				"Blob index",
 				"10K tags",
 				skuName,
-				"/Index Tags$/",
+				"Index Tags",
 				productName,
 				blobIndex,
 				10000))
@@ -357,7 +353,7 @@ func blobDataStorageCostComponent(region, name, skuName, startUsage, productName
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr(productName)},
 				{Key: "skuName", Value: strPtr(skuName)},
-				{Key: "meterName", ValueRegex: strPtr("/Data Stored$/")},
+				{Key: "meterName", ValueRegex: strPtr("/Data Stored$/i")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -386,7 +382,7 @@ func blobOperationsCostComponent(region, name, unit, skuName, meterName, product
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr(productName)},
 				{Key: "skuName", Value: strPtr(skuName)},
-				{Key: "meterName", ValueRegex: strPtr(meterName)},
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s$/i", meterName))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
