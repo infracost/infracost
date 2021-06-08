@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -49,22 +50,34 @@ func completionCmd() *cobra.Command {
 		PS> infracost completion powershell > infracost.ps1
 		# and source this file from your PowerShell profile.
 	`,
-		DisableFlagsInUseLine: true,
-		ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
-		Args:                  cobra.ExactValidArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			switch args[0] {
-			case "bash":
-				_ = cmd.Root().GenBashCompletion(os.Stdout)
-			case "zsh":
-				_ = cmd.Root().GenZshCompletion(os.Stdout)
-			case "fish":
-				_ = cmd.Root().GenFishCompletion(os.Stdout, true)
-			case "powershell":
-				_ = cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			hasShellFlag := cmd.Flags().Changed("shell")
+			if hasShellFlag {
+				shell, err := cmd.Flags().GetString("shell")
+				if err != nil {
+					return err
+				}
+
+				switch shell {
+				case "bash":
+					_ = cmd.Root().GenBashCompletion(os.Stdout)
+				case "zsh":
+					_ = cmd.Root().GenZshCompletion(os.Stdout)
+				case "fish":
+					_ = cmd.Root().GenFishCompletion(os.Stdout, true)
+				case "powershell":
+					_ = cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout)
+				default:
+					return fmt.Errorf("unsupported shell type: %q", shell)
+				}
 			}
+
+			return nil
 		},
 	}
+
+	completionCmd.Flags().String("shell", "", "supported shell formats: bash, zsh, fish, powershell")
+	completionCmd.MarkFlagRequired("shell")
 
 	return completionCmd
 }
