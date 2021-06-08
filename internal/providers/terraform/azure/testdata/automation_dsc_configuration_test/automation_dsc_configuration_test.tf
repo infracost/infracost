@@ -35,3 +35,4 @@ resource "azurerm_automation_dsc_configuration" "without_usage" {
   location                = azurerm_resource_group.example.location
   content_embedded        = "configuration test {}"
 } 
+

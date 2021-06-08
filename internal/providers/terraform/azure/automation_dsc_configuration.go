@@ -31,11 +31,11 @@ func nodesCostComponent(d *schema.ResourceData, u *schema.UsageData) []*schema.C
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
-
 	costComponents = append(costComponents, nonNodesCostComponent(location, "5", "Non-Azure Node", "Non-Azure", nonAzureConfigNodeCount))
 
 	return costComponents
 }
+
 
 func nonNodesCostComponent(location, startUsage, meterName, skuName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{

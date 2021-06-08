@@ -473,7 +473,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 > **Note:** Developing Azure resources requires Azure creds. See below for details.
 
-- Unless the resource has global or zone-based pricing, the first line of the resource function should be `region := lookupRegion(d, []string{})` where the second parameter is an optional list of parent resources where the region can be found. Search the code for `lookupRegion` to find examples of how this method is used in other Azure resources.
+- Unless the resource has global or zone-based pricing, the first line of the resource function should be `region := lookupRegion(d, []string{})` where the second parameter is an optional list of parent resources where the region can be found. Search the code for `lookupRegion` to find examples of how this method is used in other Azure resources. The `resource_group_name` parameter does not need to be passed into `lookupRegion` as it is automatically checked.
 
 - The Azure Terraform provider requires real credentials to be able to run `terraform plan`. This means you must have Azure credentials for running the Infracost commands and integration tests for Azure. We recommend creating read-only Azure credentials for this purpose. If you have an Azure subscription, you can do this by running the `az` command line:
 	```sh

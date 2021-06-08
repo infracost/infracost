@@ -26,3 +26,4 @@ resource "azurerm_automation_job_schedule" "withoutUsage" {
   schedule_name           = "hour"
   runbook_name            = "Get-VirtualMachine"
 } 
+

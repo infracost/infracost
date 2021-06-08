@@ -27,13 +27,14 @@ func NewAzureRMAutomationJobSchedule(d *schema.ResourceData, u *schema.UsageData
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
-
 	costComponents = append(costComponents, runTimeCostComponent(location, "500", "Basic Runtime", "Basic", monthlyJobRunMins))
+
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
 }
+
 
 func runTimeCostComponent(location, startUsage, meterName, skuName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
