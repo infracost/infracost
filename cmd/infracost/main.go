@@ -81,6 +81,7 @@ func main() {
 	rootCmd.AddCommand(diffCmd(cfg))
 	rootCmd.AddCommand(breakdownCmd(cfg))
 	rootCmd.AddCommand(outputCmd(cfg))
+	rootCmd.AddCommand(completionCmd())
 
 	rootCmd.SetUsageTemplate(fmt.Sprintf(`%s{{if .Runnable}}
   {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}
