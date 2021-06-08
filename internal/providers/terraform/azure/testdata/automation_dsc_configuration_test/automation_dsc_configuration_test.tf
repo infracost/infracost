@@ -5,7 +5,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "example" {
   name     = "example-resources"
-  location = "East US"
+  location = "eastus"
 }
 resource "azurerm_automation_account" "example" {
   name                = "account1"

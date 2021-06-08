@@ -23,32 +23,32 @@ func NewAzureRMAutomationAccount(d *schema.ResourceData, u *schema.UsageData) *s
 	if u != nil && u.Get("monthly_job_run_mins").Type != gjson.Null {
 		monthlyJobRunMins = decimalPtr(decimal.NewFromInt(u.Get("monthly_job_run_mins").Int()))
 		if monthlyJobRunMins.IsPositive() {
-			costComponents = append(costComponents, runTimeCostComponent(location, "500", "Basic Runtime", monthlyJobRunMins))
+			costComponents = append(costComponents, runTimeCostComponent(location, "500", "Basic Runtime", "Basic", monthlyJobRunMins))
 		}
 	} else {
-		costComponents = append(costComponents, runTimeCostComponent(location, "500", "Basic Runtime", monthlyJobRunMins))
+		costComponents = append(costComponents, runTimeCostComponent(location, "500", "Basic Runtime", "Basic", monthlyJobRunMins))
 	}
 
 	if u != nil && u.Get("non_azure_config_node_count").Type != gjson.Null {
 		nonAzureConfigNodeCount = decimalPtr(decimal.NewFromInt(u.Get("non_azure_config_node_count").Int()))
 		if nonAzureConfigNodeCount.IsPositive() {
-			costComponents = append(costComponents, nonNodesCostComponent(location, "5", "Non-Azure Node", nonAzureConfigNodeCount))
+			costComponents = append(costComponents, nonNodesCostComponent(location, "5", "Non-Azure Node", "Non-Azure", nonAzureConfigNodeCount))
 		}
 	} else {
-		costComponents = append(costComponents, nonNodesCostComponent(location, "5", "Non-Azure Node", nonAzureConfigNodeCount))
+		costComponents = append(costComponents, nonNodesCostComponent(location, "5", "Non-Azure Node", "Non-Azure", nonAzureConfigNodeCount))
 	}
 	if u != nil && u.Get("monthly_watcher_hours").Type != gjson.Null {
 		monthlyWatcherHours = decimalPtr(decimal.NewFromInt(u.Get("monthly_watcher_hours").Int()))
 	}
 
-	costComponents = append(costComponents, watchersCostComponent(location, "744", "Watcher", monthlyWatcherHours))
+	costComponents = append(costComponents, watchersCostComponent(location, "744", "Watcher", "Basic", monthlyWatcherHours))
 
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
 }
-func watchersCostComponent(location, startUsage, meterName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
+func watchersCostComponent(location, startUsage, meterName, skuName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            "Watchers",
@@ -62,6 +62,7 @@ func watchersCostComponent(location, startUsage, meterName string, monthlyQuanti
 			ProductFamily: strPtr("Management and Governance"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", meterName))},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", skuName))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
