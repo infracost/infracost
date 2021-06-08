@@ -54,6 +54,14 @@ resource_usage:
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
     vcpu_count: 2 # Number of the vCPUs for the instance type.
 
+  aws_cloudformation_stack.my_formation:
+    monthly_handler_operations: 10000 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
+    monthly_duration_secs: 0 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.  
+
+  aws_cloudformation_stack_set.my_formation_set:
+    monthly_handler_operations: 10000 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
+    monthly_duration_secs: 0 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.  
+
   aws_cloudwatch_event_bus.my_events:
     monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.
     monthly_third_party_events: 2000000       # Monthly third-party and cross-account events published. Each 64 KB chunk of payload is billed as 1 event.
