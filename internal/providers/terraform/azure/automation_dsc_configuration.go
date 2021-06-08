@@ -36,7 +36,6 @@ func nodesCostComponent(d *schema.ResourceData, u *schema.UsageData) []*schema.C
 	return costComponents
 }
 
-
 func nonNodesCostComponent(location, startUsage, meterName, skuName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
