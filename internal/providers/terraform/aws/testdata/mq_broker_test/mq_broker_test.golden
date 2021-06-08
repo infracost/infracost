@@ -5,9 +5,13 @@
  ├─ Instance usage (ActiveMQ, mq.t2.micro, single_instance)                    730  hours                 $21.90 
  └─ Storage (ActiveMQ, EFS)                                          Monthly cost depends on usage: $0.30 per GB 
                                                                                                                  
- aws_mq_broker.my_aws_mq_broker_activemq_single_standby_ebs                                                      
+ aws_mq_broker.my_aws_mq_broker_activemq_single_ebs                                                              
+ ├─ Instance usage (ActiveMQ, mq.t2.micro, single_instance)                    730  hours                 $21.90 
+ └─ Storage (ActiveMQ, EBS)                                          Monthly cost depends on usage: $0.10 per GB 
+                                                                                                                 
+ aws_mq_broker.my_aws_mq_broker_activemq_standby_efs                                                             
  ├─ Instance usage (ActiveMQ, mq.m5.large, active_standby_multi_az)            730  hours                $420.48 
- └─ Storage (ActiveMQ, EBS)                                                     10  GB                     $1.00 
+ └─ Storage (ActiveMQ, EFS)                                          Monthly cost depends on usage: $0.30 per GB 
                                                                                                                  
  aws_mq_broker.my_aws_mq_broker_rabbitmq_cluster                                                                 
  ├─ Instance usage (RabbitMQ, mq.m5.xlarge, cluster_multi_az)                  730  hours              $1,261.44 
@@ -17,7 +21,6 @@
  ├─ Instance usage (RabbitMQ, mq.m5.xlarge, single_instance)                   730  hours                $420.48 
  └─ Storage (RabbitMQ, EBS)                                          Monthly cost depends on usage: $0.10 per GB 
                                                                                                                  
- PROJECT TOTAL                                                                                         $2,128.30 
-
+ OVERALL TOTAL                                                                                         $2,149.20 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

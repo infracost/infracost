@@ -11,7 +11,7 @@
  └─ Instance usage (PC3)                    10,950  hours     $3,557.57 
                                                                         
  azurerm_app_service_plan.premium_v1                                    
- └─ Instance usage (P1v1)                      730  hours         $0.00 
+ └─ Instance usage (P1v1)                      730  hours       $219.00 
                                                                         
  azurerm_app_service_plan.premium_v2                                    
  └─ Instance usage (P1v2)                    7,300  hours       $737.30 
@@ -22,4 +22,4 @@
  azurerm_app_service_plan.standard_s2                                   
  └─ Instance usage (S1)                      3,650  hours       $365.00 
                                                                         
- PROJECT TOTAL                                                $4,876.27 
+ OVERALL TOTAL                                                $5,095.27 

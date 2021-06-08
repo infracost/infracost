@@ -1,19 +1,25 @@
 
- Name                                            Monthly Qty  Unit         Monthly Cost 
-                                                                                        
- aws_rds_cluster.default                                                                
- ├─ Storage rate                                           0  GB                  $0.00 
- └─ I/O rate                                               0  1M requests         $0.00 
-                                                                                        
- aws_rds_cluster.default_t3                                                             
- ├─ Storage rate                                           0  GB                  $0.00 
- └─ I/O rate                                               0  1M requests         $0.00 
-                                                                                        
- aws_rds_cluster_instance.cluster_instance                                              
- └─ Database instance (on-demand, db.r4.large)           730  hours             $211.70 
-                                                                                        
- aws_rds_cluster_instance.cluster_instance_t3                                           
- ├─ Database instance (on-demand, db.t3.medium)          730  hours              $59.86 
- └─ CPU credits                                           48  vCPU-hours          $4.32 
-                                                                                        
- PROJECT TOTAL                                                                  $275.88 
+ Name                                                    Monthly Qty  Unit                        Monthly Cost 
+                                                                                                               
+ aws_rds_cluster.default                                                                                       
+ ├─ Storage                                      Monthly cost depends on usage: $0.10 per GB                   
+ ├─ I/O rate                                     Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Backtrack                                    Monthly cost depends on usage: $0.012 per 1M change-records   
+ └─ Snapshot export                              Monthly cost depends on usage: $0.01 per GB                   
+                                                                                                               
+ aws_rds_cluster.default_t3                                                                                    
+ ├─ Storage                                      Monthly cost depends on usage: $0.10 per GB                   
+ ├─ I/O rate                                     Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Backtrack                                    Monthly cost depends on usage: $0.012 per 1M change-records   
+ └─ Snapshot export                              Monthly cost depends on usage: $0.01 per GB                   
+                                                                                                               
+ aws_rds_cluster_instance.cluster_instance                                                                     
+ └─ Database instance (on-demand, db.r4.large)                   730  hours                            $211.70 
+                                                                                                               
+ aws_rds_cluster_instance.cluster_instance_t3                                                                  
+ ├─ Database instance (on-demand, db.t3.medium)                  730  hours                             $59.86 
+ └─ CPU credits                                                   48  vCPU-hours                         $4.32 
+                                                                                                               
+ OVERALL TOTAL                                                                                         $275.88 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

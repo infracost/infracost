@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  azurerm_api_management.consumption:
+    monthly_api_calls: 10000000
+  azurerm_api_management.premium:
+    self_hosted_gateway_count: 5
+    

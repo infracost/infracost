@@ -70,10 +70,7 @@ make test
 ```
 
 #### Integration tests
-
-The entire test suite can take >20 mins to run, so we recommend against running them all locally. These will run on GitHub actions.
-
-You should run tests for a file you added/changed with `-v` and warn log level so you can see and fix any warnings:
+You should run tests with the `-v` flag and warn log level so you can see and fix any warnings:
 ```sh
 INFRACOST_LOG_LEVEL=warn go test -v -cover ./internal/providers/terraform/aws/ebs_volume_test.go
 
@@ -87,7 +84,7 @@ make test_google
 make test_azure
 ```
 
-If you do want to run all the tests, you can use:
+To run all the tests, you can use:
 ```sh
 make test_all
 ```
@@ -227,9 +224,10 @@ func TestMyResourceGoldenFile(t *testing.T) {
 }
 ```
 
-Finally, generate the golden file by running the test with the `-update` flag:
+Finally, generate the golden file by running the test with the `-update` flag. You should **verify** that these cost calculations are correct by manually checking them, or comparing them against cost calculators from the cloud vendors. You should also ensure that there are **no warnings** about "Multiple products found", "No products found for" or "No prices found for" in the logs. These warnings indicate that the price filters have an issue.
+
 ```sh
-go test ./internal/providers/terraform/aws/aws_my_resource_test.go -v -update
+INFRACOST_LOG_LEVEL=warn go test ./internal/providers/terraform/aws/aws_my_resource_test.go -v -update
 ```
 
 Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
@@ -365,7 +363,26 @@ When Infracost is run with the `--usage-file=path/to/infracost-usage.yml` flag t
 
 The following notes are general guidelines, please leave a comment in your pull request if they don't make sense or they can be improved for the resource you're adding.
 
-- references to other resources: if you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. For example the [aws_ebs_snapshot](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/ebs_snapshot.go#L13) uses this because its price depends on the size of the referenced volume.
+- references to other resources: if you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. The following example uses this because the price for `aws_ebs_snapshot` depends on the size of the referenced volume. You should always check the array length returned by `d.References` to avoid panics.
+	```go
+	func GetEBSSnapshotRegistryItem() *schema.RegistryItem {
+		return &schema.RegistryItem{
+			Name:                "aws_ebs_snapshot",
+			RFunc:               NewEBSSnapshot,
+			ReferenceAttributes: []string{"volume_id"}, // Load the reference
+		}
+	}
+
+	func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+		volumeRefs := d.References("volume_id") // Get the reference
+
+		// Always check the array length to avoid panics as `d.References` might not find the reference, e.g. it might point to another module via a data resource.
+		if len(volumeRefs) > 0 {
+			gbVal = decimal.NewFromFloat(volumeRefs[0].Get("size").Float())
+		}
+		// ...
+	}
+	```
 
 - count: do not include the count in the cost component name or in brackets. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
 
@@ -382,9 +399,9 @@ The following notes are general guidelines, please leave a comment in your pull 
 
   - unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 except:
 	
-	- If the price is for a large number.  E.g. set `Unit: "1M requests", UnitMultiplier: 1000000` if the price should be shown "per 1M requests" in the output.
+	  - If the price is for a large number.  E.g. set `Unit: "1M requests", UnitMultiplier: 1000000` if the price should be shown "per 1M requests" in the output.
 
-	- If the price is for billing in Unit-hours but best understood in Unit-months.  E.g. set `Unit: "GB", UnitMultiplier: schema.HourToMonthUnitMultiplier` to show "per GB" in the output. 
+    - If the price is for billing in Unit-hours but best understood in Unit-months.  E.g. set `Unit: "GB", UnitMultiplier: schema.HourToMonthUnitMultiplier` to show "per GB" in the output. 
 
 - tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)". Use the words "first", "next" and "over" when describing tiers. Units should not be included in brackets unless the cost component relates to storage or data transfer, e.g. "Storage (first 1TB)    GB" is more understandable than "Storage (first 1K)    GB" since users understand terabytes and petabytes. You should be able to use the `CalculateTierBuckets` method for calculating tier buckets.
 
@@ -456,6 +473,8 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 > **Note:** Developing Azure resources requires Azure creds. See below for details.
 
+- Unless the resource has global or zone-based pricing, the first line of the resource function should be `region := lookupRegion(d, []string{})` where the second parameter is an optional list of parent resources where the region can be found. Search the code for `lookupRegion` to find examples of how this method is used in other Azure resources. The `resource_group_name` parameter does not need to be passed into `lookupRegion` as it is automatically checked.
+
 - The Azure Terraform provider requires real credentials to be able to run `terraform plan`. This means you must have Azure credentials for running the Infracost commands and integration tests for Azure. We recommend creating read-only Azure credentials for this purpose. If you have an Azure subscription, you can do this by running the `az` command line:
 	```sh
 	az ad sp create-for-rbac --name http://InfracostReadOnly --role Reader --scope=/subscriptions/<SUBSCRIPTION ID> --years=10
@@ -483,10 +502,10 @@ The following notes are general guidelines, please leave a comment in your pull 
 	docker build --no-cache -t infracost/infracost-atlantis:latest .
 	docker push infracost/infracost-atlantis:latest
 	```
-
-6. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls) to be merged.
-7. Announce the release in the infracost-community Slack announcements channel.
-8. Update the docs repo with any required changes and supported resources.
-9. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
+6. Update the [Infracost API](https://www.infracost.io/docs/integrations/infracost_api) to use the latest version.
+7. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls?q=infracost) to be merged.
+8. Announce the release in the infracost-community Slack announcements channel.
+9. Update the docs repo with any required changes and supported resources.
+10. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
 
 If a new flag/feature is added that requires CI support, update the repos mentioned [here](https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts). For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.

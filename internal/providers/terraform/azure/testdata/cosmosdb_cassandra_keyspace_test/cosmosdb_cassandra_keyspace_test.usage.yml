@@ -1,0 +1,21 @@
+version: 0.1
+resource_usage: 
+  azurerm_cosmosdb_cassandra_keyspace.serverless:
+  azurerm_cosmosdb_cassandra_keyspace.serverless:
+    storage_gb: 1000
+    monthly_serverless_request_units: 10000000
+    monthly_restored_data_gb: 3000
+    monthly_analytical_storage_write_operations: 1000000
+    monthly_analytical_storage_read_operations: 1000000
+
+  azurerm_cosmosdb_cassandra_keyspace.provisioned:
+    storage_gb: 1000
+    monthly_restored_data_gb: 3000
+    
+  azurerm_cosmosdb_cassandra_keyspace.mutli-master_backup2copies:
+    storage_gb: 1000
+
+  azurerm_cosmosdb_cassandra_keyspace.autoscale:
+    storage_gb: 1000 
+    monthly_restored_data_gb: 3000 
+    max_request_units_utilization_percentage: 50

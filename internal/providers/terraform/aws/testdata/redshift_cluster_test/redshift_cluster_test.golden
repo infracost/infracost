@@ -5,7 +5,7 @@
  ├─ Cluster usage (on-demand, dc2.large)                  2,920  hours                          $730.00 
  ├─ Concurrency scaling (dc2.large)          Monthly cost depends on usage: $0.00007 per node-seconds   
  ├─ Spectrum                                 Monthly cost depends on usage: $5.00 per TB                
- └─ Backup storage (first 50 TB)             Monthly cost depends on usage: $0.02 per GB                
+ └─ Backup storage (first 50 TB)             Monthly cost depends on usage: $0.023 per GB               
                                                                                                         
  aws_redshift_cluster.ca_withUsage                                                                      
  ├─ Cluster usage (on-demand, ds2.8xlarge)                  730  hours                        $4,964.00 
@@ -17,19 +17,18 @@
                                                                                                         
  aws_redshift_cluster.manageda                                                                          
  ├─ Cluster usage (on-demand, ra3.4xlarge)                4,380  hours                       $14,278.80 
- ├─ Managed storage (ra3.4xlarge)            Monthly cost depends on usage: $0.02 per GB                
+ ├─ Managed storage (ra3.4xlarge)            Monthly cost depends on usage: $0.024 per GB               
  ├─ Concurrency scaling (ra3.4xlarge)        Monthly cost depends on usage: $0.0009 per node-seconds    
  ├─ Spectrum                                 Monthly cost depends on usage: $5.00 per TB                
- └─ Backup storage (first 50 TB)             Monthly cost depends on usage: $0.02 per GB                
+ └─ Backup storage (first 50 TB)             Monthly cost depends on usage: $0.023 per GB               
                                                                                                         
  aws_redshift_cluster.manageda_withUsage                                                                
  ├─ Cluster usage (on-demand, ra3.16xlarge)                 730  hours                        $9,519.20 
  ├─ Managed storage (ra3.16xlarge)                          321  GB                               $7.70 
  ├─ Concurrency scaling (ra3.16xlarge)       Monthly cost depends on usage: $0.00362 per node-seconds   
  ├─ Spectrum                                 Monthly cost depends on usage: $5.00 per TB                
- └─ Backup storage (first 50 TB)             Monthly cost depends on usage: $0.02 per GB                
+ └─ Backup storage (first 50 TB)             Monthly cost depends on usage: $0.023 per GB               
                                                                                                         
- PROJECT TOTAL                                                                               $42,976.77 
-
+ OVERALL TOTAL                                                                               $42,976.77 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

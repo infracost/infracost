@@ -2,7 +2,7 @@
 
 # This script is used in infracost CI/CD integrations. It posts pull-request comments showing cost estimate diffs.
 # Usage docs: https://www.infracost.io/docs/integrations/cicd
-# It supports: GitHub Actions, GitLab CI, CircleCI with GitHub and Bitbucket, Bitbucket Pipelines
+# It supports: GitHub Actions, GitLab CI, CircleCI with GitHub and Bitbucket, Bitbucket Pipelines, Azure DevOps with TfsGit repos and GitHub
 # For Bitbucket: BITBUCKET_TOKEN must be set to "myusername:my_app_password", the password needs to have Read scope
 #   on "Repositories" and "Pull Requests" so it can post comments. Using a Bitbucket App password
 #   (https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) is recommended.
@@ -16,15 +16,6 @@ process_args () {
   config_file=${5:-$config_file}
   percentage_threshold=${6:-$percentage_threshold}
   post_condition=${7:-$post_condition}
-
-  # Handle deprecated var names
-  path=${path:-$tfjson}
-  path=${path:-$terraform_json_file}
-  path=${path:-$tfplan}
-  path=${path:-$terraform_plan_file}
-  path=${path:-$tfdir}
-  path=${path:-$terraform_dir}
-  terraform_plan_flags=${terraform_plan_flags:-$tfflags}
 
   # Validate post_condition
   if ! echo "$post_condition" | jq empty; then
@@ -93,12 +84,12 @@ build_output_cmd () {
 format_cost () {
   cost=$1
     
-  if [ -z "$cost" ] | [ "${cost}" == "null" ]; then
+  if [ -z "$cost" ] || [ "${cost}" = "null" ]; then
     echo "-"
-  elif [ $(echo "$cost < 100" | bc -l) = 1 ]; then
-    printf "$%0.2f" $cost
+  elif [ "$(echo "$cost < 100" | bc -l)" = 1 ]; then
+    printf "$%0.2f" "$cost"
   else
-    printf "$%0.0f" $cost
+    printf "$%0.0f" "$cost"
   fi
 }
 
@@ -146,16 +137,20 @@ build_msg () {
 }
 
 post_to_github () {
-  if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
+  if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     GITHUB_SHA=$(cat $GITHUB_EVENT_PATH | jq -r .pull_request.head.sha)
   fi
-  
-  echo "Posting comment to GitHub commit $GITHUB_SHA"
-  msg="$(build_msg true)"
-  jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
-    -H "Content-Type: application/json" \
-    -H "Authorization: token $GITHUB_TOKEN" \
-    "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
+
+  if [ -z "$GITHUB_TOKEN" ]; then
+    echo "Error: GITHUB_TOKEN is required to post comment to GitHub"
+  else
+    echo "Posting comment to GitHub commit $GITHUB_SHA"
+    msg="$(build_msg true)"
+    jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
+      -H "Content-Type: application/json" \
+      -H "Authorization: token $GITHUB_TOKEN" \
+      "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
+  fi
 }
 
 post_to_gitlab () {
@@ -210,6 +205,45 @@ post_to_bitbucket () {
   fi
 }
 
+post_to_azure_devops () {
+  if [ "$BUILD_REASON" = "PullRequest" ]; then
+    if [ "$BUILD_REPOSITORY_PROVIDER" = "GitHub" ]; then
+      echo "Posting comment to Azure DevOps GitHub pull-request $SYSTEM_PULLREQUEST_PULLREQUESTNUMBER"
+      GITHUB_REPOSITORY=$BUILD_REPOSITORY_NAME
+      GITHUB_SHA=$SYSTEM_PULLREQUEST_SOURCECOMMITID
+      post_to_github
+    elif [ "$BUILD_REPOSITORY_PROVIDER" = "TfsGit" ]; then
+      echo "Posting comment to Azure DevOps repo pull-request $SYSTEM_PULLREQUEST_PULLREQUESTID"
+      msg="$(build_msg true)"
+      jq -Mnc --arg msg "$msg" '{"comments": [{"parentCommentId": 0, "content": "\($msg)", "commentType": 1}], "status": 4}' | curl -L -X POST -d @- \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $SYSTEM_ACCESSTOKEN" \
+        "$SYSTEM_COLLECTIONURI$SYSTEM_TEAMPROJECT/_apis/git/repositories/$BUILD_REPOSITORY_ID/pullRequests/$SYSTEM_PULLREQUEST_PULLREQUESTID/threads?api-version=6.0"
+    else 
+      echo "Posting comments to Azure DevOps $BUILD_REPOSITORY_PROVIDER is not supported, email hello@infracost.io for help"
+    fi
+  else
+    echo "Posting comment to Azure DevOps $BUILD_REASON is not supported, email hello@infracost.io for help"
+  fi
+}
+
+load_github_env () {
+  export VCS_REPO_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+}
+
+load_gitlab_env () {
+  export VCS_REPO_URL=$CI_REPOSITORY_URL
+}
+
+load_circle_ci_env () {
+  export VCS_REPO_URL=$CIRCLE_REPOSITORY_URL
+}
+
+load_azure_devops_env () {
+  export VCS_REPO_URL=$BUILD_REPOSITORY_URI
+}
+
+
 cleanup () {
   rm -f infracost_breakdown.json infracost_breakdown_cmd infracost_output_cmd
 }
@@ -217,6 +251,17 @@ cleanup () {
 # MAIN
 
 process_args "$@"
+
+# Load env variables
+if [ ! -z "$GITHUB_ACTIONS" ]; then
+  load_github_env
+elif [ ! -z "$GITLAB_CI" ]; then
+  load_gitlab_env
+elif [ ! -z "$CIRCLECI" ]; then
+  load_circle_ci_env
+elif [ ! -z "$SYSTEM_COLLECTIONURI" ]; then
+  load_azure_devops_env
+fi
 
 infracost_breakdown_cmd=$(build_breakdown_cmd)
 echo "$infracost_breakdown_cmd" > infracost_breakdown_cmd
@@ -278,6 +323,8 @@ elif [ ! -z "$CIRCLECI" ]; then
   post_to_circle_ci
 elif [ ! -z "$BITBUCKET_PIPELINES" ]; then
   post_to_bitbucket
+elif [ ! -z "$SYSTEM_COLLECTIONURI" ]; then
+  post_to_azure_devops
 fi
 
 cleanup

@@ -1,29 +1,29 @@
 
- Name                                             Monthly Qty  Unit    Monthly Cost 
-                                                                                    
- azurerm_kubernetes_cluster.free_D2V2                                               
- └─ default_node_pool                                                               
-    ├─ Instance usage (pay as you go, D2 v2)              730  hours        $106.58 
-    └─ os_disk                                                                      
-       └─ Storage (P1)                                      1  months         $0.60 
-                                                                                    
- azurerm_kubernetes_cluster.paid_5nc_32gb                                           
- ├─ Uptime SLA                                            730  hours         $73.00 
- └─ default_node_pool                                                               
-    ├─ Instance usage (pay as you go, D2 v2)            3,650  hours        $532.90 
-    └─ os_disk                                                                      
-       └─ Storage (P4)                                      5  months        $26.40 
-                                                                                    
- azurerm_kubernetes_cluster.paid_D2SV2_3nc_128gb                                    
- ├─ Uptime SLA                                            730  hours         $73.00 
- └─ default_node_pool                                                               
-    ├─ Instance usage (pay as you go, D2S v2)           2,190  hours          $0.00 
-    └─ os_disk                                                                      
-       └─ Storage (P10)                                     3  months        $59.13 
-                                                                                    
- azurerm_kubernetes_cluster.usage_ephemeral                                         
- ├─ Uptime SLA                                            730  hours         $73.00 
- └─ default_node_pool                                                               
-    └─ Instance usage (pay as you go, D2 v2)            1,460  hours        $213.16 
-                                                                                    
- PROJECT TOTAL                                                            $1,157.77 
+ Name                                                   Monthly Qty  Unit    Monthly Cost 
+                                                                                          
+ azurerm_kubernetes_cluster.free_D2V2                                                     
+ └─ default_node_pool                                                                     
+    ├─ Instance usage (pay as you go, Standard_D2_v2)           730  hours        $106.58 
+    └─ os_disk                                                                            
+       └─ Storage (P1)                                            1  months         $0.60 
+                                                                                          
+ azurerm_kubernetes_cluster.paid_5nc_32gb                                                 
+ ├─ Uptime SLA                                                  730  hours         $73.00 
+ └─ default_node_pool                                                                     
+    ├─ Instance usage (pay as you go, Standard_D2_v2)         3,650  hours        $532.90 
+    └─ os_disk                                                                            
+       └─ Storage (P4)                                            5  months        $26.40 
+                                                                                          
+ azurerm_kubernetes_cluster.paid_D2SV2_3nc_128gb                                          
+ ├─ Uptime SLA                                                  730  hours         $73.00 
+ └─ default_node_pool                                                                     
+    ├─ Instance usage (pay as you go, Standard_DS2_v2)        2,190  hours        $319.74 
+    └─ os_disk                                                                            
+       └─ Storage (P10)                                           3  months        $59.13 
+                                                                                          
+ azurerm_kubernetes_cluster.usage_ephemeral                                               
+ ├─ Uptime SLA                                                  730  hours         $73.00 
+ └─ default_node_pool                                                                     
+    └─ Instance usage (pay as you go, Standard_D2_v2)         1,460  hours        $213.16 
+                                                                                          
+ OVERALL TOTAL                                                                  $1,477.51 

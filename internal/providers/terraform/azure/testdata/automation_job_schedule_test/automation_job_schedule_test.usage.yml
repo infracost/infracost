@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  azurerm_automation_job_schedule.zeroMinutes: 
+    monthly_job_run_mins: 0 # Monthly number of job run minutes.
+
+  azurerm_automation_job_schedule.fiveMinutes: 
+    monthly_job_run_mins: 5 # Monthly number of job run minutes.

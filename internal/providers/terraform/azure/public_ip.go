@@ -17,8 +17,9 @@ func GetAzureRMPublicIPRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	var meterName string
-	location := d.Get("location").String()
 	sku := "Basic"
 	allocationMethod := d.Get("allocation_method").String()
 
@@ -35,14 +36,14 @@ func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, PublicIPCostComponent(fmt.Sprintf("IP address (%s)", strings.ToLower(allocationMethod)), location, sku, meterName))
+	costComponents = append(costComponents, PublicIPCostComponent(fmt.Sprintf("IP address (%s)", strings.ToLower(allocationMethod)), region, sku, meterName))
 
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
 }
-func PublicIPCostComponent(name, location, sku, meterName string) *schema.CostComponent {
+func PublicIPCostComponent(name, region, sku, meterName string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
@@ -50,7 +51,7 @@ func PublicIPCostComponent(name, location, sku, meterName string) *schema.CostCo
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Virtual Network"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{

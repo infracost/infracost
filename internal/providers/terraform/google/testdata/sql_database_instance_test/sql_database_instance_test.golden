@@ -64,7 +64,6 @@
     ├─ Memory (zonal)                                         43,800  GB                   $306.60 
     └─ Storage (SSD, zonal)                                      500  GB                    $85.00 
                                                                                                    
- PROJECT TOTAL                                                                           $7,455.69 
-
+ OVERALL TOTAL                                                                           $7,455.69 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

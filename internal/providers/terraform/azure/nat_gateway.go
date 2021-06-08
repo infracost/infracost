@@ -20,14 +20,15 @@ func GetAzureRMAppNATGatewayRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyDataProcessedGb *decimal.Decimal
-	location := "Global"
+	region := "Global"
 	group := d.References("resource_group_name")
 
-	if strings.HasPrefix(strings.ToLower(group[0].Get("location").String()), "usgov") {
-		location = "US Gov"
-	}
-	if strings.Contains(strings.ToLower(group[0].Get("location").String()), "china") {
-		location = "Сhina"
+	if len(group) > 0 {
+		if strings.HasPrefix(strings.ToLower(group[0].Get("location").String()), "usgov") {
+			region = "US Gov"
+		} else if strings.Contains(strings.ToLower(group[0].Get("location").String()), "china") {
+			region = "Сhina"
+		}
 	}
 
 	if u != nil && u.Get("monthly_data_processed_gb").Type != gjson.Null {
@@ -36,8 +37,8 @@ func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, NATGatewayCostComponent("NAT gateway", location))
-	costComponents = append(costComponents, DataProcessedCostComponent("Data processed", location, monthlyDataProcessedGb))
+	costComponents = append(costComponents, NATGatewayCostComponent("NAT gateway", region))
+	costComponents = append(costComponents, DataProcessedCostComponent("Data processed", region, monthlyDataProcessedGb))
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -45,7 +46,7 @@ func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	}
 }
 
-func NATGatewayCostComponent(name, location string) *schema.CostComponent {
+func NATGatewayCostComponent(name, region string) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:           name,
@@ -54,11 +55,11 @@ func NATGatewayCostComponent(name, location string) *schema.CostComponent {
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr("Global"),
+			Region:        strPtr(region),
 			Service:       strPtr("NAT Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("NAT Gateway")},
+				{Key: "meterName", Value: strPtr("Gateway")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -66,7 +67,7 @@ func NATGatewayCostComponent(name, location string) *schema.CostComponent {
 		},
 	}
 }
-func DataProcessedCostComponent(name, location string, monthlyDataProcessedGb *decimal.Decimal) *schema.CostComponent {
+func DataProcessedCostComponent(name, region string, monthlyDataProcessedGb *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            name,
@@ -75,11 +76,11 @@ func DataProcessedCostComponent(name, location string, monthlyDataProcessedGb *d
 		MonthlyQuantity: monthlyDataProcessedGb,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr("Global"),
+			Region:        strPtr(region),
 			Service:       strPtr("NAT Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("NAT Gateway")},
+				{Key: "meterName", Value: strPtr("Data Processed")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

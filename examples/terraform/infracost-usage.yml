@@ -4,6 +4,10 @@
 # See https://infracost.io/usage-file/ for docs
 version: 0.1
 resource_usage:
-  aws_lambda_function.hello_world:
-    monthly_requests: 100000000
-    request_duration_ms: 250  # Try changing this to 100 (milliseconds) to compare costs
+  aws_sfn_state_machine.sfn_state_machine:
+    requests: 1000000
+    storage_gb: 14600000
+
+  aws_sfn_state_machine.sfn_state_machine1:
+    transition: 10000
+

@@ -42,7 +42,7 @@ func formatCost2DP(d *decimal.Decimal) string {
 }
 
 func formatPrice(d decimal.Decimal) string {
-	if d.LessThan(decimal.NewFromFloat(0.01)) {
+	if d.LessThan(decimal.NewFromFloat(0.1)) {
 		return "$" + d.String()
 	}
 

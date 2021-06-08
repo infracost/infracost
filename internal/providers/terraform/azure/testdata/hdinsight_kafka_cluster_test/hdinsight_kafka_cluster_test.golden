@@ -1,0 +1,32 @@
+
+ Name                                               Monthly Qty  Unit                        Monthly Cost 
+                                                                                                          
+ azurerm_hdinsight_kafka_cluster.non_usage                                                                
+ ├─ Head node (NC24)                                      1,460  hours                          $7,478.12 
+ ├─ Worker node (D3)                                        730  hours                            $215.35 
+ ├─ Zookeeper node (D3)                                   2,190  hours                            $646.05 
+ ├─ Managed OS disks                                          3  months                           $446.04 
+ └─ Disk operations                         Monthly cost depends on usage: $0.00036 per 100K operations   
+                                                                                                          
+ azurerm_hdinsight_kafka_cluster.premium                                                                  
+ ├─ Head node (F2s v2)                                    1,460  hours                            $197.10 
+ ├─ Worker node (D3)                                      2,190  hours                            $646.05 
+ ├─ Zookeeper node (F32s v2)                              2,190  hours                          $4,730.40 
+ ├─ Managed OS disks                                          9  months                         $1,338.12 
+ └─ Disk operations                                         180  100K operations                    $0.06 
+                                                                                                          
+ azurerm_hdinsight_kafka_cluster.standard                                                                 
+ ├─ Head node (E2s v3)                                    1,460  hours                            $277.40 
+ ├─ Worker node (E64is v3)                                1,460  hours                          $8,164.32 
+ ├─ Zookeeper node (G2)                                   2,190  hours                          $3,232.44 
+ ├─ Managed OS disks                                          4  months                           $163.84 
+ └─ Disk operations                                          40  100K operations                    $0.01 
+                                                                                                          
+ OVERALL TOTAL                                                                                 $27,535.31 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+
+2 resource types weren't estimated as they're not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_storage_account
+1 x azurerm_storage_container

@@ -10,18 +10,19 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func GetAzureMySQLServerRegistryItem() *schema.RegistryItem {
+func GetAzureRMMySQLServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_mysql_server",
-		RFunc: NewAzureMySQLServer,
+		RFunc: NewAzureRMMySQLServer,
 	}
 }
 
-func NewAzureMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	serviceName := "Azure Database for MySQL"
 	var costComponents []*schema.CostComponent
 
-	region := d.Get("location").String()
 	sku := d.Get("sku_name").String()
 	var tier, family, cores string
 	if s := strings.Split(sku, "_"); len(s) == 3 {

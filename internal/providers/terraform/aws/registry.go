@@ -76,6 +76,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetNewKMSExternalKeyRegistryItem(),
 	GetVPNConnectionRegistryItem(),
 	GetVpcEndpointRegistryItem(),
+	GetWafv2WebACLRegistryItem(),
+	GetWafWebACLRegistryItem(),
+	GetStepFunctionRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -381,6 +384,24 @@ var FreeResources []string = []string{
 	"time_rotating",
 	"time_sleep",
 	"time_static",
+
+	// WAF
+	"aws_wafv2_rule_group",
+	"aws_wafv2_ip_set",
+	"aws_wafv2_regex_pattern_set",
+	"aws_wafv2_web_acl_association",
+	"aws_wafv2_web_acl_logging_configuration",
+	"aws_waf_byte_match_set",
+	"aws_waf_geo_match_set",
+	"aws_waf_ipset",
+	"aws_waf_regex_match_set",
+	"aws_waf_regex_pattern_set",
+	"aws_waf_size_constraint_set",
+	"aws_waf_sql_injection_match_set",
+	"aws_waf_xss_match_set",
+	"aws_waf_rule",
+	"aws_waf_rate_based_rule",
+	"aws_waf_rule_group",
 }
 
 var UsageOnlyResources []string = []string{

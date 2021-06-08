@@ -1,0 +1,31 @@
+
+ Name                                               Monthly Qty  Unit                      Monthly Cost 
+                                                                                                        
+ aws_sfn_state_machine.express1Tier                                                                     
+ ├─ Requests                                                0.1  1M requests                      $0.10 
+ └─ Duration (first 1K)                                  0.3472  GB-hours                         $0.02 
+                                                                                                        
+ aws_sfn_state_machine.express2Tiers                                                                    
+ ├─ Requests                                                 10  1M requests                     $10.00 
+ ├─ Duration (first 1K)                                   1,000  GB-hours                        $60.01 
+ └─ Duration (next 4K)                                 111.1111  GB-hours                         $3.33 
+                                                                                                        
+ aws_sfn_state_machine.express3Tiers                                                                    
+ ├─ Requests                                                100  1M requests                    $100.00 
+ ├─ Duration (first 1K)                                   1,000  GB-hours                        $60.01 
+ ├─ Duration (next 4K)                                    4,000  GB-hours                       $119.95 
+ └─ Duration (over 5K)                                 24,687.5  GB-hours                       $405.27 
+                                                                                                        
+ aws_sfn_state_machine.expressWithoutUsage                                                              
+ ├─ Requests                                 Monthly cost depends on usage: $1.00 per 1M requests       
+ └─ Duration (first 1K)                      Monthly cost depends on usage: $0.060012 per GB-hours      
+                                                                                                        
+ aws_sfn_state_machine.standard                                                                         
+ └─ Transitions                                           5,000  1K transitions                   $0.25 
+                                                                                                        
+ aws_sfn_state_machine.standardWithoutUsage                                                             
+ └─ Transitions                              Monthly cost depends on usage: $0.00005 per 1K transitions 
+                                                                                                        
+ OVERALL TOTAL                                                                                  $758.95 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

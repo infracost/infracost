@@ -7,7 +7,6 @@
  aws_sns_topic.sns_topic_withUsage                                                       
  └─ Requests                                       2  1M requests                  $1.00 
                                                                                          
- PROJECT TOTAL                                                                     $1.00 
-
+ OVERALL TOTAL                                                                     $1.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

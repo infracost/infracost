@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
-
 	"github.com/shopspring/decimal"
 )
 
@@ -17,14 +16,27 @@ func GetAzureRMAppServicePlanRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	region := lookupRegion(d, []string{})
+
 	sku := d.Get("sku.0.size").String()
 	skuRefactor := ""
-	os := "Windows"
+	os := "windows"
 	capacity := d.Get("sku.0.capacity").Int()
-	location := d.Get("location").String()
 	productName := "Standard Plan"
 
-	switch sku[2:] {
+	// These are used by azurerm_function_app, their costs are calculated there as they don't have prices in the azurerm_app_service_plan resource
+	if strings.ToLower(sku[:2]) == "ep" {
+		return &schema.Resource{
+			Name:      d.Address,
+			IsSkipped: true,
+			NoPrice:   true,
+		}
+	}
+
+	switch strings.ToLower(sku[2:]) {
+	case "v1":
+		skuRefactor = sku[:2]
+		productName = "Premium Plan"
 	case "v2":
 		skuRefactor = sku[:2] + " " + sku[2:]
 		productName = "Premium v2 Plan"
@@ -33,19 +45,19 @@ func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *sche
 		productName = "Premium v3 Plan"
 	}
 
-	switch sku[:2] {
-	case "PC":
+	switch strings.ToLower(sku[:2]) {
+	case "pc":
 		skuRefactor = "PC" + sku[2:]
 		productName = "Premium Windows Container Plan"
-	case "Y1":
+	case "y1":
 		skuRefactor = "Shared"
 		productName = "Shared Plan"
 	}
 
-	switch sku[:1] {
-	case "S":
+	switch strings.ToLower(sku[:1]) {
+	case "s":
 		skuRefactor = "S" + sku[1:]
-	case "B":
+	case "b":
 		skuRefactor = "B" + sku[1:]
 		productName = "Basic Plan"
 	}
@@ -56,13 +68,13 @@ func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *sche
 	if os == "app" {
 		os = "windows"
 	}
-	if os != "windows" {
+	if os != "windows" && productName != "Premium Plan" {
 		productName += " - Linux"
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, AppServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", sku), location, productName, skuRefactor, capacity))
+	costComponents = append(costComponents, AppServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", sku), region, productName, skuRefactor, capacity))
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -70,22 +82,20 @@ func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *sche
 	}
 }
 
-func AppServicePlanCostComponent(name, location, productName, skuRefactor string, capacity int64) *schema.CostComponent {
-
+func AppServicePlanCostComponent(name, region, productName, skuRefactor string, capacity int64) *schema.CostComponent {
 	return &schema.CostComponent{
-
 		Name:           name,
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(location),
+			Region:        strPtr(region),
 			Service:       strPtr("Azure App Service"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Azure App Service " + productName)},
-				{Key: "skuName", Value: strPtr(skuRefactor)},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", skuRefactor))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

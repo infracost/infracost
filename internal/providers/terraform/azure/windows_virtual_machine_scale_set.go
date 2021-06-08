@@ -14,7 +14,8 @@ func GetAzureRMWindowsVirtualMachineScaleSetRegistryItem() *schema.RegistryItem 
 }
 
 func NewAzureRMWindowsVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("location").String()
+	region := lookupRegion(d, []string{})
+
 	instanceType := d.Get("sku").String()
 	licenseType := d.Get("license_type").String()
 

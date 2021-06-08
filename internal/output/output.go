@@ -3,7 +3,6 @@ package output
 import (
 	"fmt"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -11,39 +10,23 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-var outputVersion = "0.1"
+var outputVersion = "0.2"
 
 type Root struct {
 	Version          string           `json:"version"`
-	Resources        []Resource       `json:"resources"`        // Keeping for backward compatibility.
-	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`  // Keeping for backward compatibility.
-	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"` // Keeping for backward compatibility.
 	Projects         []Project        `json:"projects"`
+	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
+	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
 	TimeGenerated    time.Time        `json:"timeGenerated"`
 	Summary          *Summary         `json:"summary"`
 }
 
 type Project struct {
-	Path          string            `json:"path"`
-	Metadata      map[string]string `json:"metadata"`
-	PastBreakdown *Breakdown        `json:"pastBreakdown"`
-	Breakdown     *Breakdown        `json:"breakdown"`
-	Diff          *Breakdown        `json:"diff"`
-}
-
-func (p *Project) Label() string {
-	metaVals := make([]string, 0)
-	for _, v := range p.Metadata {
-		metaVals = append(metaVals, v)
-	}
-
-	l := p.Path
-
-	if len(metaVals) > 0 {
-		l += fmt.Sprintf(" (%s)", strings.Join(metaVals, ", "))
-	}
-
-	return l
+	Name          string                  `json:"name"`
+	Metadata      *schema.ProjectMetadata `json:"metadata"`
+	PastBreakdown *Breakdown              `json:"pastBreakdown"`
+	Breakdown     *Breakdown              `json:"breakdown"`
+	Diff          *Breakdown              `json:"diff"`
 }
 
 type Breakdown struct {
@@ -150,7 +133,6 @@ func ToOutputFormat(projects []*schema.Project) Root {
 	var totalMonthlyCost, totalHourlyCost *decimal.Decimal
 
 	outProjects := make([]Project, 0, len(projects))
-	outResources := make([]Resource, 0)
 
 	for _, project := range projects {
 		var pastBreakdown, breakdown, diff *Breakdown
@@ -160,11 +142,6 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		if project.HasDiff {
 			pastBreakdown = outputBreakdown(project.PastResources)
 			diff = outputBreakdown(project.Diff)
-		}
-
-		// Backward compatibility
-		if breakdown != nil {
-			outResources = append(outResources, breakdown.Resources...)
 		}
 
 		if breakdown != nil && breakdown.TotalHourlyCost != nil {
@@ -184,7 +161,7 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		}
 
 		outProjects = append(outProjects, Project{
-			Path:          project.Path,
+			Name:          project.Name,
 			Metadata:      project.Metadata,
 			PastBreakdown: pastBreakdown,
 			Breakdown:     breakdown,
@@ -196,14 +173,11 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		OnlyFields: []string{"UnsupportedResourceCounts"},
 	})
 
-	sortResources(outResources, "")
-
 	out := Root{
 		Version:          outputVersion,
-		Resources:        outResources,
+		Projects:         outProjects,
 		TotalHourlyCost:  totalHourlyCost,
 		TotalMonthlyCost: totalMonthlyCost,
-		Projects:         outProjects,
 		TimeGenerated:    time.Now(),
 		Summary:          resourceSummary,
 	}
@@ -236,8 +210,23 @@ func (r *Root) unsupportedResourcesMessage(showSkipped bool) string {
 	)
 
 	if showSkipped {
+		type structMap struct {
+			key   string
+			value int
+		}
+		ind := []structMap{}
 		for t, c := range *r.Summary.UnsupportedResourceCounts {
-			msg += fmt.Sprintf("\n%d x %s", c, t)
+			ind = append(ind, structMap{key: t, value: c})
+		}
+		sort.Slice(ind, func(i, j int) bool {
+			if ind[i].value == ind[j].value {
+				return ind[i].key < ind[j].key
+			}
+			return ind[i].value > ind[j].value
+		})
+
+		for _, i := range ind {
+			msg += fmt.Sprintf("\n%d x %s", i.value, i.key)
 		}
 	}
 
