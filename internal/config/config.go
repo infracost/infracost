@@ -35,6 +35,7 @@ type Config struct { // nolint:golint
 	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
+	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
 
 	Projects      []*Project `yaml:"projects" ignored:"true"`
 	Format        string     `yaml:"format,omitempty" ignored:"true"`

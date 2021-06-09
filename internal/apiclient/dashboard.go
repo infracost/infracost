@@ -13,7 +13,8 @@ import (
 
 type DashboardAPIClient struct {
 	APIClient
-	selfHostedReportingDisabled bool
+	telemetryDisabled bool
+	dashboardEnabled  bool
 }
 
 type CreateAPIKeyResponse struct {
@@ -43,7 +44,8 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 			endpoint: ctx.Config.DashboardAPIEndpoint,
 			apiKey:   ctx.Config.APIKey,
 		},
-		selfHostedReportingDisabled: ctx.Config.IsTelemetryDisabled(),
+		telemetryDisabled: ctx.Config.IsTelemetryDisabled(),
+		dashboardEnabled:  ctx.Config.EnableDashboard,
 	}
 }
 
@@ -64,8 +66,8 @@ func (c *DashboardAPIClient) CreateAPIKey(name string, email string) (CreateAPIK
 }
 
 func (c *DashboardAPIClient) AddEvent(name string, env map[string]interface{}) error {
-	if c.selfHostedReportingDisabled {
-		log.Debug("Skipping reporting events for self-hosted Infracost")
+	if c.telemetryDisabled {
+		log.Debug("Skipping telemetry for self-hosted Infracost")
 		return nil
 	}
 
@@ -79,8 +81,8 @@ func (c *DashboardAPIClient) AddEvent(name string, env map[string]interface{}) e
 }
 
 func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*config.ProjectContext, out output.Root) (string, error) {
-	if c.selfHostedReportingDisabled {
-		log.Debug("Skipping reporting project results for self-hosted Infracost")
+	if !c.dashboardEnabled {
+		log.Debug("Skipping reporting project results since dashboard is not enabled")
 		return "", nil
 	}
 
