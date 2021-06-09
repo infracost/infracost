@@ -703,6 +703,9 @@ resource_usage:
   azurerm_private_dns_txt_record.my_txt_record:
     monthly_queries: 1500000000  # Monthly number of DNS queries
 
+  azurerm_search_service.my_service:
+    monthly_images_extracted: 1000000 # Monthly number of extracted images
+
   azurerm_storage_account.my_account:
     data_at_rest_storage_gb: 10000
     early_deletion_gb: 1000

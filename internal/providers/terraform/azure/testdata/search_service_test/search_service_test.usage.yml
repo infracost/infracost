@@ -1,0 +1,10 @@
+version: 0.1
+resource_usage: 
+  azurerm_search_service.basic:
+    monthly_images_extracted: 6000000
+  
+  azurerm_search_service.standard_s2:
+    monthly_images_extracted: 2000000
+
+  azurerm_search_service.optimized_l1:
+    monthly_images_extracted: 3000000
