@@ -615,6 +615,9 @@ resource_usage:
   azurerm_dns_txt_record.my_txt_record:
     monthly_queries: 11500000000  # Monthly number of DNS queries
 
+  azurerm_eventhub_namespace.my_event_hub:
+    events: 100000000
+
   azurerm_kubernetes_cluster.my_cluster:
     default_node_pool:
       nodes: 2 # Node count for the default node pool.
