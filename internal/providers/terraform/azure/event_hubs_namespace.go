@@ -46,7 +46,7 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 
 func eventHubsCostComponent(name, location, sku string, quantity *decimal.Decimal) *schema.CostComponent {
 	if quantity != nil {
-		quantity = decimalPtr(quantity.Div(decimal.NewFromInt(int64(10000000))))
+		quantity = decimalPtr(quantity.Div(decimal.NewFromInt(int64(1000000))))
 	}
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("%s (%s)", name, sku),
