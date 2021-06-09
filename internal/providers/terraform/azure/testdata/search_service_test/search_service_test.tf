@@ -14,7 +14,7 @@ resource "azurerm_search_service" "basic" {
   location            = azurerm_resource_group.example.location
   sku                 = "basic"
   partition_count     = 2
-  replica_count       = 2 
+  replica_count       = 2
 }
 
 resource "azurerm_search_service" "standard_s2" {
