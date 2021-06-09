@@ -30,14 +30,6 @@ func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
 		}
 	}
 
-	// Then check for a resource group
-	groups := d.References("resource_group_name")
-	for _, g := range groups {
-		if g.Get("location").String() != "" {
-			return g.Get("location").String()
-		}
-	}
-
 	// When all else fails use the default region
 	defaultRegion := d.Get("region").String()
 	log.Warnf("Using %s for resource %s as its 'location' property could not be found.", defaultRegion, d.Address)
