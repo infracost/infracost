@@ -6,6 +6,7 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -21,14 +22,19 @@ type CreateAPIKeyResponse struct {
 }
 
 type runInput struct {
-	ProjectResults []projectResultInput   `json:"projectResultss"`
+	ProjectResults []projectResultInput   `json:"projectResults"`
 	TimeGenerated  time.Time              `json:"timeGenerated"`
 	Metadata       map[string]interface{} `json:"metadata"`
 }
 
 type projectResultInput struct {
-	output.Project
-	Metadata map[string]interface{} `json:"metadata"`
+	ProjectName     string                  `json:"projectName"`
+	ProjectMetadata *schema.ProjectMetadata `json:"projectMetadata"`
+	PastBreakdown   *output.Breakdown       `json:"pastBreakdown"`
+	Breakdown       *output.Breakdown       `json:"breakdown"`
+	Diff            *output.Breakdown       `json:"diff"`
+	Summary         *output.Summary         `json:"summary"`
+	Metadata        map[string]interface{}  `json:"metadata"`
 }
 
 func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
@@ -81,8 +87,13 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 	projectResultInputs := make([]projectResultInput, len(out.Projects))
 	for i, project := range out.Projects {
 		projectResultInputs[i] = projectResultInput{
-			Project:  project,
-			Metadata: projectContexts[i].ContextValues(),
+			ProjectName:     project.Name,
+			ProjectMetadata: project.Metadata,
+			PastBreakdown:   project.PastBreakdown,
+			Breakdown:       project.Breakdown,
+			Diff:            project.Diff,
+			Summary:         project.Summary,
+			Metadata:        projectContexts[i].ContextValues(),
 		}
 	}
 
@@ -108,6 +119,11 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 
 	runID := ""
 	if len(results) > 0 {
+
+		if results[0].Get("errors").Exists() {
+			return runID, errors.New(results[0].Get("errors").String())
+		}
+
 		runID = results[0].Get("data.addRun.id").String()
 	}
 	return runID, nil
