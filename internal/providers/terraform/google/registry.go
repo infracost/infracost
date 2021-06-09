@@ -3,6 +3,8 @@ package google
 import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
+	GetBigqueryDatasetRegistryItem(),
+	GetBigqueryTableRegistryItem(),
 	GetCloudFunctionsRegistryItem(),
 	GetComputeAddressRegistryItem(),
 	GetComputeDiskRegistryItem(),

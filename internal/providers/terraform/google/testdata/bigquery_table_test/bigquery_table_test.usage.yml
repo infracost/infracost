@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage: 
+  google_bigquery_table.usage:
+    monthly_active_storage_gb: 1000  
+    monthly_long_term_storage_gb: 1000 
+    monthly_streaming_inserts_mb: 1000 
+    monthly_storage_write_api_gb: 1000 
+    monthly_storage_read_api_tb: 1000
