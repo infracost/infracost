@@ -69,6 +69,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMPrivateDNStxtRecordRegistryItem(),
 	GetAzureRMPublicIPRegistryItem(),
 	GetAzureRMPublicIPPrefixRegistryItem(),
+	GetAzureRMRedisCacheRegistryItem(),
 	GetAzureRMStorageAccountRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
@@ -189,6 +190,10 @@ var FreeResources []string = []string{
 	"azurerm_policy_definition",
 	"azurerm_policy_remediation",
 	"azurerm_policy_set_definition",
+
+	// Azure Redis
+	"azurerm_redis_firewall_rule",
+	"azurerm_redis_linked_server",
 
 	// Azure Registry
 	"azurerm_container_registry_scope_map",

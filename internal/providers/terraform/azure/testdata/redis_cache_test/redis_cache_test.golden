@@ -1,0 +1,16 @@
+
+ Name                                  Monthly Qty  Unit   Monthly Cost 
+                                                                        
+ azurerm_redis_cache.basic_c2                                           
+ └─ Cache usage (Basic_C4), 4 node           2,920  hours       $613.20 
+                                                                        
+ azurerm_redis_cache.premium_p1                                         
+ └─ Cache usage (Premium_P1), 6 node         4,380  hours     $2,430.90 
+                                                                        
+ azurerm_redis_cache.standard_c3                                        
+ └─ Cache usage (Standard_C3), 2 node        1,460  hours       $657.00 
+                                                                        
+ azurerm_redis_cache.usage                                              
+ └─ Cache usage (Basic_C1), 5 node           3,650  hours       $200.75 
+                                                                        
+ OVERALL TOTAL                                                $3,901.85 
