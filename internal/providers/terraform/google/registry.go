@@ -38,6 +38,15 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 // FreeResources grouped alphabetically
 var FreeResources []string = []string{
+	"google_bigquery_dataset_access",
+	"google_bigquery_dataset_iam_binding",
+	"google_bigquery_dataset_iam_member",
+	"google_bigquery_dataset_iam_policy",
+	"google_bigquery_job",
+	"google_bigquery_routine",
+	"google_bigquery_table_iam_binding",
+	"google_bigquery_table_iam_member",
+	"google_bigquery_table_iam_policy",
 	"google_cloudfunctions_function_iam_binding",
 	"google_cloudfunctions_function_iam_member",
 	"google_cloudfunctions_function_iam_policy",
