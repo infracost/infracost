@@ -420,6 +420,12 @@ resource_usage:
       australia: 250       # Australia.
 
 
+  google_compute_forwarding_rule.my_forwarding:
+    monthly_ingress_data_gb: 100
+  
+  google_compute_global_forwarding_rule.my_global_forwarding:
+    monthly_ingress_data_gb: 100
+
   google_compute_image.my_image:
     storage_gb: 1000 # Total size of image storage in GB.
 
@@ -428,6 +434,34 @@ resource_usage:
 
   google_compute_snapshot.my_snapshot:
     storage_gb: 500 # Total size of snapshot disk storage in GB.
+
+  google_compute_target_grpc_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_target_http_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+     
+  google_compute_target_https_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_target_ssl_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_target_tcp_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+   
+  google_compute_region_target_http_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_region_target_https_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
 
   google_dns_record_set.my_record_set:
     monthly_queries:  1000000 # Monthly DNS queries.

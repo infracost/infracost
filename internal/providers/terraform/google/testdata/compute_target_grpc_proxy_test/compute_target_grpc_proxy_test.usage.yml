@@ -1,0 +1,30 @@
+version: 0.1
+resource_usage:
+  google_compute_target_grpc_proxy.default:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_target_http_proxy.default:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+     
+  google_compute_target_https_proxy.default:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_target_ssl_proxy.default:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_target_tcp_proxy.default:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+   
+  google_compute_region_target_http_proxy.default:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_region_target_https_proxy.default:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+    
