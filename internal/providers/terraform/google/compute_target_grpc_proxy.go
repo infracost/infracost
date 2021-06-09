@@ -13,14 +13,14 @@ func GetComputeTargetGrpcProxyRegistryItem() *schema.RegistryItem {
 		Notes: []string{"Price for additional forwarding rule is used"},
 	}
 }
-func GetComputeTargetHttpProxyRegistryItem() *schema.RegistryItem {
+func GetComputeTargetHTTPProxyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_compute_target_http_proxy",
 		RFunc: NewComputeTargetProxy,
 		Notes: []string{"Price for additional forwarding rule is used"},
 	}
 }
-func GetComputeTargetHttpsProxyRegistryItem() *schema.RegistryItem {
+func GetComputeTargetHTTPSProxyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_compute_target_https_proxy",
 		RFunc: NewComputeTargetProxy,
@@ -34,21 +34,21 @@ func GetComputeTargetSslProxyRegistryItem() *schema.RegistryItem {
 		Notes: []string{"Price for additional forwarding rule is used"},
 	}
 }
-func GetComputeTargetTcpProxyRegistryItem() *schema.RegistryItem {
+func GetComputeTargetTCPProxyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_compute_target_tcp_proxy",
 		RFunc: NewComputeTargetProxy,
 		Notes: []string{"Price for additional forwarding rule is used"},
 	}
 }
-func GetComputeRegionTargetHttpProxyRegistryItem() *schema.RegistryItem {
+func GetComputeRegionTargetHTTPProxyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_compute_region_target_http_proxy",
 		RFunc: NewComputeTargetProxy,
 		Notes: []string{"Price for additional forwarding rule is used"},
 	}
 }
-func GetComputeRegionTargetHttpsProxyRegistryItem() *schema.RegistryItem {
+func GetComputeRegionTargetHTTPSProxyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_compute_region_target_https_proxy",
 		RFunc: NewComputeTargetProxy,
