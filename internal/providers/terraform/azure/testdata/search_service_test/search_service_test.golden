@@ -2,7 +2,7 @@
  Name                                                 Monthly Qty  Unit                  Monthly Cost 
                                                                                                       
  azurerm_search_service.basic                                                                         
- ├─ Search usage (Basic, 4 unit)                            2,920  hours                      $294.92 
+ ├─ Search usage (Basic, 4 units)                           2,920  hours                      $294.92 
  ├─ Image extraction (first 1M)                             1,000  1000 images              $1,000.00 
  ├─ Image extraction (next 4M)                              4,000  1000 images              $3,200.00 
  └─ Image extraction (over 5M)                              1,000  1000 images                $650.00 

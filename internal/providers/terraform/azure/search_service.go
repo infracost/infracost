@@ -55,8 +55,13 @@ func NewAzureRMSearchService(d *schema.ResourceData, u *schema.UsageData) *schem
 	for _, v := range skuElems {
 		skuName += strings.Title(v) + " "
 	}
+	unitName := "unit"
+	if units.GreaterThan(decimal.NewFromInt(1)) {
+		unitName += "s"
+	}
+
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:           fmt.Sprintf("Search usage (%s, %s unit)", skuName[:len(skuName)-1], units.String()),
+		Name:           fmt.Sprintf("Search usage (%s, %s %s)", skuName[:len(skuName)-1], units.String(), unitName),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: units,
