@@ -15,7 +15,7 @@ func completionCmd() *cobra.Command {
 	
 	Bash:
 	
-		$ source <(infracost completion bash)
+		$ source <(infracost completion --shell bash)
 	
 		# To load completions for each session, execute once:
 		# Linux:
