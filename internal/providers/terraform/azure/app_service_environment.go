@@ -21,7 +21,7 @@ func GetAzureRMAppIsolatedServicePlanRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMAppIsolatedServicePlan(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := lookupRegion(d, []string{"resource_group_name"})
 
 	tier := "I1"
 	if d.Get("pricing_tier").Type != gjson.Null {

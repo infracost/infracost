@@ -20,7 +20,7 @@ func GetAzureRMAutomationJobScheduleRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMAutomationJobSchedule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyJobRunMins *decimal.Decimal
-	location := lookupRegion(d, []string{})
+	location := lookupRegion(d, []string{"resource_group_name"})
 
 	if u != nil && u.Get("monthly_job_run_mins").Type != gjson.Null {
 		monthlyJobRunMins = decimalPtr(decimal.NewFromInt(u.Get("monthly_job_run_mins").Int()))
