@@ -26,7 +26,6 @@ func NewAzureRMAppServiceCustomHostnameBinding(d *schema.ResourceData, u *schema
 	if len(group) > 0 {
 		region = group[0].Get("location").String()
 	}
-	
 	if d.Get("ssl_state").Type != gjson.Null {
 		sslState = d.Get("ssl_state").String()
 	} else {
