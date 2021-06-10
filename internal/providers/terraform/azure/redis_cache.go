@@ -67,7 +67,7 @@ func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.R
 					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", productName))},
 						{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", sku))},
-						{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s Cache$/", sku))},
+						{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s Cache$/i", sku))},
 					},
 				},
 				PriceFilter: &schema.PriceFilter{
