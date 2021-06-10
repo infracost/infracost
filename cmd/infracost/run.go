@@ -31,6 +31,10 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 
 	cmd.Flags().Bool("sync-usage-file", false, "Sync usage-file with missing resources, needs usage-file too (experimental)")
+
+	_ = cmd.MarkFlagFilename("path", "json", "tf")
+	_ = cmd.MarkFlagFilename("config-file", "yml")
+	_ = cmd.MarkFlagFilename("usage-file", "yml")
 }
 
 func runMain(cmd *cobra.Command, cfg *config.Config) error {

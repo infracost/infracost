@@ -9,7 +9,7 @@ import (
 
 func completionCmd() *cobra.Command {
 	completionCmd := &cobra.Command{
-		Use:   "completion [bash | zsh | fish | powershell]",
+		Use:   "completion --shell [bash | zsh | fish | powershell]",
 		Short: "Generate completion script",
 		Long: `To load completions:
 	
@@ -19,9 +19,9 @@ func completionCmd() *cobra.Command {
 	
 		# To load completions for each session, execute once:
 		# Linux:
-		$ infracost completion bash > /etc/bash_completion.d/infracost
+		$ infracost completion --shell bash > /etc/bash_completion.d/infracost
 		# macOS:
-		$ infracost completion bash > /usr/local/etc/bash_completion.d/infracost
+		$ infracost completion --shell bash > /usr/local/etc/bash_completion.d/infracost
 	
 	Zsh:
 	
@@ -31,7 +31,7 @@ func completionCmd() *cobra.Command {
 		$ echo "autoload -U compinit; compinit" >> ~/.zshrc
 	
 		# To load completions for each session, execute once:
-		$ infracost completion zsh > "${fpath[1]}/_infracost"
+		$ infracost completion --shell zsh > "${fpath[1]}/_infracost"
 	
 		# You will need to start a new shell for this setup to take effect.
 	
@@ -40,19 +40,18 @@ func completionCmd() *cobra.Command {
 		$ infracost completion fish | source
 	
 		# To load completions for each session, execute once:
-		$ infracost completion fish > ~/.config/fish/completions/infracost.fish
+		$ infracost completion --shell fish > ~/.config/fish/completions/infracost.fish
 	
 	PowerShell:
 	
-		PS> infracost completion powershell | Out-String | Invoke-Expression
+		PS> infracost completion --shell powershell | Out-String | Invoke-Expression
 	
 		# To load completions for every new session, run:
-		PS> infracost completion powershell > infracost.ps1
+		PS> infracost completion --shell powershell > infracost.ps1
 		# and source this file from your PowerShell profile.
 	`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			hasShellFlag := cmd.Flags().Changed("shell")
-			if hasShellFlag {
+			if hasShellFlag := cmd.Flags().Changed("shell"); hasShellFlag {
 				shell, err := cmd.Flags().GetString("shell")
 				if err != nil {
 					return err
@@ -78,6 +77,14 @@ func completionCmd() *cobra.Command {
 
 	completionCmd.Flags().String("shell", "", "supported shell formats: bash, zsh, fish, powershell")
 	_ = completionCmd.MarkFlagRequired("shell")
+
+	_ = completionCmd.RegisterFlagCompletionFunc("shell", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"bash\tCompletions for bash",
+				"zsh\tCompletions for zsh",
+				"fish\tCompletions for fish",
+				"powershell\tCompletions for powershell"},
+			cobra.ShellCompDirectiveDefault
+	})
 
 	return completionCmd
 }
