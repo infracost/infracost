@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"fmt"
+	"github.com/infracost/infracost/internal/providers/cloudformation"
 	"io/ioutil"
 	"os"
 
@@ -16,6 +17,10 @@ func Detect(cfg *config.Config, projectCfg *config.Project) (schema.Provider, er
 
 	if _, err := os.Stat(projectCfg.Path); os.IsNotExist(err) {
 		return nil, fmt.Errorf("No such file or directory %s", projectCfg.Path)
+	}
+
+	if isCloudFormationTemplateJSON(projectCfg.Path) {
+		return cloudformation.NewTemplateJSONProvider(cfg, projectCfg), nil
 	}
 
 	if isTerraformPlanJSON(projectCfg.Path) {
@@ -95,4 +100,23 @@ func isTerraformPlan(path string) bool {
 
 func isTerraformDir(path string) bool {
 	return terraform.IsTerraformDir(path)
+}
+
+func isCloudFormationTemplateJSON(path string) bool {
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		return false
+	}
+
+	var jsonFormat struct {
+		AWSTemplateFormatVersion string      `json:"AWSTemplateFormatVersion"`
+		Resources                interface{} `json:"Resources"`
+	}
+
+	err = json.Unmarshal(b, &jsonFormat)
+	if err != nil {
+		return false
+	}
+
+	return jsonFormat.AWSTemplateFormatVersion != "" && jsonFormat.Resources != nil
 }

@@ -2,6 +2,7 @@ package schema
 
 import (
 	"encoding/json"
+	"github.com/awslabs/goformation/v4/cloudformation"
 
 	"github.com/tidwall/gjson"
 )
@@ -13,6 +14,7 @@ type ResourceData struct {
 	Tags          map[string]string
 	RawValues     gjson.Result
 	referencesMap map[string][]*ResourceData
+	CFResource    cloudformation.Resource
 }
 
 func NewResourceData(resourceType string, providerName string, address string, tags map[string]string, rawValues gjson.Result) *ResourceData {
@@ -23,6 +25,19 @@ func NewResourceData(resourceType string, providerName string, address string, t
 		Tags:          tags,
 		RawValues:     rawValues,
 		referencesMap: make(map[string][]*ResourceData),
+		CFResource:    nil,
+	}
+}
+
+func NewCFResourceData(resourceType string, providerName string, address string, tags map[string]string, cfResource cloudformation.Resource) *ResourceData {
+	return &ResourceData{
+		Type:          resourceType,
+		ProviderName:  providerName,
+		Address:       address,
+		Tags:          tags,
+		RawValues:     gjson.Result{},
+		referencesMap: make(map[string][]*ResourceData),
+		CFResource:    cfResource,
 	}
 }
 
