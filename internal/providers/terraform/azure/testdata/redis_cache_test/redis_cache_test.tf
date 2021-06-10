@@ -24,7 +24,6 @@ resource "azurerm_redis_cache" "basic_c2" {
   capacity            = 4
   family              = "C"
   sku_name            = "Basic"
-  replicas_per_master = 3
 }
 
 resource "azurerm_redis_cache" "premium_p1" {
@@ -35,13 +34,4 @@ resource "azurerm_redis_cache" "premium_p1" {
   family              = "P"
   sku_name            = "Premium"
   shard_count         = 3
-}
-
-resource "azurerm_redis_cache" "usage" {
-  name                = "example-cache"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  capacity            = 1
-  family              = "C"
-  sku_name            = "Basic"
 }

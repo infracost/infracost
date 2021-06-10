@@ -32,23 +32,30 @@ func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		"premium":  2,
 	}[strings.ToLower(skuName)]
 
-	if d.Get("replicas_per_master").Type != gjson.Null {
-		nodes = 1 + d.Get("replicas_per_master").Int()
-	}
+	componentName := fmt.Sprintf("Cache usage (%s_%s%s", skuName, family, capacity)
 
-	if d.Get("shard_count").Type != gjson.Null {
-		nodes = 2 * d.Get("shard_count").Int()
-	}
+	if strings.ToLower(skuName) == "premium" {
+		if d.Get("replicas_per_master").Type != gjson.Null {
+			nodes = 1 + d.Get("replicas_per_master").Int()
+		}
 
-	if u != nil && u.Get("redis_nodes").Type != gjson.Null {
-		nodes = u.Get("redis_nodes").Int()
+		if d.Get("shard_count").Type != gjson.Null {
+			nodes = 2 * d.Get("shard_count").Int()
+		}
+
+		nodesName := "node"
+		if nodes > 1 {
+			nodesName += "s"
+		}
+
+		componentName = fmt.Sprintf("%s, %v %s", componentName, nodes, nodesName)
 	}
 
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           fmt.Sprintf("Cache usage (%s_%s), %v node", skuName, sku, nodes),
+				Name:           componentName + ")",
 				Unit:           "hours",
 				UnitMultiplier: 1,
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(nodes)),
@@ -58,8 +65,8 @@ func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.R
 					Service:       strPtr("Redis Cache"),
 					ProductFamily: strPtr("Databases"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "productName", Value: strPtr(productName)},
-						{Key: "skuName", Value: strPtr(sku)},
+						{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", productName))},
+						{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", sku))},
 						{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s Cache$/", sku))},
 					},
 				},

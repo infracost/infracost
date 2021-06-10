@@ -1,4 +1,0 @@
-version: 0.1
-resource_usage: 
-  azurerm_redis_cache.usage:
-    redis_nodes: 5
