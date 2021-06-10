@@ -23,7 +23,6 @@ func NewAzureRMAppServiceCustomHostnameBinding(d *schema.ResourceData, u *schema
 	var sslType, sslState string
 	region := "Global"
 	group := d.References("resource_group_name")
-	
 	if len(group) > 0 {
 		region = group[0].Get("location").String()
 	}
