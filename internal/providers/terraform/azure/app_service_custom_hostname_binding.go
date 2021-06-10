@@ -21,12 +21,7 @@ func GetAzureRMAppServiceCustomHostnameBindingRegistryItem() *schema.RegistryIte
 
 func NewAzureRMAppServiceCustomHostnameBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var sslType, sslState string
-
-	region := "Global"
-	group := d.References("resource_group_name")
-	if len(group) > 0 {
-		region = group[0].Get("location").String()
-	}
+	region := lookupRegion(d, []string{"resource_group_name"})
 
 	if d.Get("ssl_state").Type != gjson.Null {
 		sslState = d.Get("ssl_state").String()
