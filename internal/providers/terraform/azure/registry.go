@@ -69,6 +69,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMPrivateDNStxtRecordRegistryItem(),
 	GetAzureRMPublicIPRegistryItem(),
 	GetAzureRMPublicIPPrefixRegistryItem(),
+	GetAzureRMSearchServiceRegistryItem(),
 	GetAzureRMStorageAccountRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
