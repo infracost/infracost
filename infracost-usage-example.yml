@@ -390,6 +390,16 @@ resource_usage:
   #
   # Terraform GCP resources
   #
+  google_bigquery_dataset.my_dataset:
+    monthly_queries_tb: 100 # Monthly number of bytes processed (also referred to as bytes read) in TB.
+
+  google_bigquery_table.usage:
+    monthly_active_storage_gb: 1000    # Monthly number of active storage modifications in GB.
+    monthly_long_term_storage_gb: 1000 # Monthly number of long-term storage modifications in GB.
+    monthly_streaming_inserts_mb: 1000 # Monthly number of streaming data inserts in MB.
+    monthly_storage_write_api_gb: 1000 # Monthly number of storage write api in GB.
+    monthly_storage_read_api_tb: 1000  # Monthly number of storage read api in TB.
+
   google_cloudfunctions_function.my_function:
     request_duration_ms: 300               # Average duration of each request in milliseconds.
     monthly_function_invocations: 10000000 # Monthly number of function invocations.
