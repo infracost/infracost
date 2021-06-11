@@ -37,7 +37,7 @@ func completionCmd() *cobra.Command {
 	
 	fish:
 	
-		$ infracost completion fish | source
+		$ infracost completion --shell fish | source
 	
 		# To load completions for each session, execute once:
 		$ infracost completion --shell fish > ~/.config/fish/completions/infracost.fish
