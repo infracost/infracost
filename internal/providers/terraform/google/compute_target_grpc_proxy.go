@@ -91,7 +91,7 @@ func proxyInstanceCostComponent(region string, quantity *decimal.Decimal) *schem
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: strPtr("/^Network Load Balancing: Forwarding Rule Minimum/")},
+				{Key: "description", ValueRegex: strPtr("/^Network Load Balancing: Forwarding Rule Minimum/i")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -112,7 +112,7 @@ func dataProcessedCostComponent(region string, quantity *decimal.Decimal) *schem
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: strPtr("/^Network Internal Load Balancing: Data Processing/")},
+				{Key: "description", ValueRegex: strPtr("/^Network Internal Load Balancing: Data Processing/i")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
