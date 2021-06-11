@@ -43,17 +43,17 @@ func NewComputeForwarding(d *schema.ResourceData, u *schema.UsageData) *schema.R
 
 func computeForwardingCostComponent(region string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Forwarding rule",
-		Unit:            "hours",
-		UnitMultiplier:  1,
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		Name:           "Forwarding rules",
+		Unit:           "hours",
+		UnitMultiplier: 1,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
 			Region:        strPtr(region),
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: strPtr("/^Network Load Balancing: Forwarding Rule Additional/")},
+				{Key: "description", ValueRegex: strPtr("/^Network Load Balancing: Forwarding Rule Additional/i")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -74,7 +74,7 @@ func computeIngressDataCostComponent(region string, quantity *decimal.Decimal) *
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: strPtr("/^Network Load Balancing: Data Processing Charge/")},
+				{Key: "description", ValueRegex: strPtr("/^Network Load Balancing: Data Processing Charge/i")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
