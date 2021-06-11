@@ -18,7 +18,7 @@ func GetAzureRMDNSPrivateZoneRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMDNSPrivateZone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := lookupRegion(d, []string{"resource_group_name"})
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
 		region = "US Gov Zone 1"

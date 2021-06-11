@@ -1,0 +1,23 @@
+
+ Name                                Monthly Qty  Unit              Monthly Cost 
+                                                                                 
+ google_bigquery_dataset.default                                                 
+ └─ Queries (on-demand)           Monthly cost depends on usage: $5.00 per TB    
+                                                                                 
+ google_bigquery_table.non_usage                                                 
+ ├─ Active storage                Monthly cost depends on usage: $0.023 per GB   
+ ├─ Long-term storage             Monthly cost depends on usage: $0.016 per GB   
+ ├─ Streaming inserts             Monthly cost depends on usage: $0.00005 per MB 
+ ├─ Storage write API             Monthly cost depends on usage: $0.025 per GB   
+ └─ Storage read API              Monthly cost depends on usage: $1.10 per TB    
+                                                                                 
+ google_bigquery_table.usage                                                     
+ ├─ Active storage                         1,000  GB                      $23.00 
+ ├─ Long-term storage                      1,000  GB                      $16.00 
+ ├─ Streaming inserts                      1,000  MB                       $0.05 
+ ├─ Storage write API                      1,000  GB                      $25.00 
+ └─ Storage read API                       1,000  TB                   $1,100.00 
+                                                                                 
+ OVERALL TOTAL                                                         $1,164.05 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

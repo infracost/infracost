@@ -168,8 +168,6 @@ func newLaunchTemplate(name string, d *schema.ResourceData, u *schema.UsageData,
 	}
 
 	subResources := make([]*schema.Resource, 0)
-	rootBlockDevice := newRootBlockDevice(d.Get("root_block_device.0"), region)
-	subResources = append(subResources, rootBlockDevice)
 
 	for i, blockDeviceMappingData := range d.Get("block_device_mappings.#.ebs|@flatten").Array() {
 		name := fmt.Sprintf("block_device_mapping[%d]", i)

@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage: 
+  google_bigquery_dataset.usage:
+    monthly_queries_tb: 100.3

@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  google_compute_external_vpn_gateway.my_compute_external_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly data transfer from VPN gateway to the following, in GB:
+      worldwide: 12500     # Worldwide excluding China, Australia but including Hong Kong.
+      china: 8500          # China excluding Hong Kong.
+      australia: 250       # Australia.

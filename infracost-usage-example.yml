@@ -390,6 +390,16 @@ resource_usage:
   #
   # Terraform GCP resources
   #
+  google_bigquery_dataset.my_dataset:
+    monthly_queries_tb: 100 # Monthly number of bytes processed (also referred to as bytes read) in TB.
+
+  google_bigquery_table.usage:
+    monthly_active_storage_gb: 1000    # Monthly number of active storage modifications in GB.
+    monthly_long_term_storage_gb: 1000 # Monthly number of long-term storage modifications in GB.
+    monthly_streaming_inserts_mb: 1000 # Monthly number of streaming data inserts in MB.
+    monthly_storage_write_api_gb: 1000 # Monthly number of storage write api in GB.
+    monthly_storage_read_api_tb: 1000  # Monthly number of storage read api in TB.
+
   google_cloudfunctions_function.my_function:
     request_duration_ms: 300               # Average duration of each request in milliseconds.
     monthly_function_invocations: 10000000 # Monthly number of function invocations.
@@ -419,6 +429,31 @@ resource_usage:
       china: 50            # China excluding Hong Kong.
       australia: 250       # Australia.
 
+  google_compute_external_vpn_gateway.my_compute_external_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly data transfer from VPN gateway to the following, in GB:
+      worldwide: 12500                # Worldwide excluding China, Australia but including Hong Kong.
+      china: 8500                     # China excluding Hong Kong.
+      australia: 250                  # Australia.
+  
+  google_compute_vpn_gateway.my_compute_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 250                # VMs in the same Google Cloud region.
+      us_or_canada: 100               # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 70                      # Between Google Cloud regions within Europe.
+      asia: 50                        # Between Google Cloud regions within Asia.
+      south_america: 100              # Between Google Cloud regions within South America.
+      oceania: 50                     # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 200                  # to a Google Cloud region on another continent.
+    
+  google_compute_ha_vpn_gateway.my_compute_ha_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 250                # VMs in the same Google Cloud region.
+      us_or_canada: 100               # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 70                      # Between Google Cloud regions within Europe.
+      asia: 50                        # Between Google Cloud regions within Asia.
+      south_america: 100              # Between Google Cloud regions within South America.
+      oceania: 50                     # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 200                  # to a Google Cloud region on another continent.
 
   google_compute_forwarding_rule.my_forwarding:
     monthly_ingress_data_gb: 100
@@ -736,6 +771,9 @@ resource_usage:
     
   azurerm_private_dns_txt_record.my_txt_record:
     monthly_queries: 1500000000  # Monthly number of DNS queries
+
+  azurerm_search_service.my_service:
+    monthly_images_extracted: 1000000 # Monthly number of extracted images
 
   azurerm_storage_account.my_account:
     data_at_rest_storage_gb: 10000
