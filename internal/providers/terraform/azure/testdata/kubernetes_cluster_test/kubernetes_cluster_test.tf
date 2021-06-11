@@ -18,6 +18,10 @@ resource "azurerm_kubernetes_cluster" "free_D2V2" {
     name    = "default"
     vm_size = "Standard_D2_v2"
   }
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
 resource "azurerm_kubernetes_cluster" "paid_D2SV2_3nc_128gb" {
@@ -32,6 +36,10 @@ resource "azurerm_kubernetes_cluster" "paid_D2SV2_3nc_128gb" {
     node_count      = 3
     vm_size         = "Standard_DS2_v2"
     os_disk_size_gb = 128
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 }
 
@@ -48,6 +56,10 @@ resource "azurerm_kubernetes_cluster" "paid_5nc_32gb" {
     vm_size         = "Standard_D2_v2"
     os_disk_size_gb = 32
   }
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
 resource "azurerm_kubernetes_cluster" "usage_ephemeral" {
@@ -61,6 +73,10 @@ resource "azurerm_kubernetes_cluster" "usage_ephemeral" {
     name         = "default"
     vm_size      = "Standard_D2_v2"
     os_disk_type = "Ephemeral"
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 }
 
