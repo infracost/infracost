@@ -2,15 +2,15 @@
  Name                                              Monthly Qty  Unit              Monthly Cost 
                                                                                                
  google_compute_forwarding_rule.default                                                        
- ├─ Forwarding rule                                        730  hours                    $7.30 
+ ├─ Forwarding rules                                       730  hours                    $7.30 
  └─ Ingress data                                           100  GB                       $0.80 
                                                                                                
  google_compute_forwarding_rule.withoutUsage                                                   
- ├─ Forwarding rule                                        730  hours                    $7.30 
+ ├─ Forwarding rules                                       730  hours                    $7.30 
  └─ Ingress data                                Monthly cost depends on usage: $0.008 per GB   
                                                                                                
  google_compute_global_forwarding_rule.default                                                 
- ├─ Forwarding rule                                        730  hours                    $7.30 
+ ├─ Forwarding rules                                       730  hours                    $7.30 
  └─ Ingress data                                           100  GB                       $0.80 
                                                                                                
  OVERALL TOTAL                                                                          $23.50 
