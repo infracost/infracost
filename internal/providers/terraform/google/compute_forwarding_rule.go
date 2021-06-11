@@ -43,7 +43,7 @@ func NewComputeForwarding(d *schema.ResourceData, u *schema.UsageData) *schema.R
 
 func computeForwardingCostComponent(region string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           "Forwarding rule",
+		Name:           "Forwarding rules",
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
