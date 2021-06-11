@@ -20,7 +20,8 @@ func diffCmd(cfg *config.Config) *cobra.Command {
 
       terraform plan -out tfplan.binary
       terraform show -json tfplan.binary > plan.json
-      infracost diff --path plan.json`,
+			infracost diff --path plan.json`,
+		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkAPIKey(cfg.APIKey, cfg.PricingAPIEndpoint, cfg.DefaultPricingAPIEndpoint); err != nil {
 				return err
