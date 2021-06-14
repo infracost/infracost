@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_neptune_cluster_instance.dbT3Medium:
+    monthly_cpu_credit_hrs: 10
