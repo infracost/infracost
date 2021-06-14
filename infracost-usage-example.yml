@@ -616,7 +616,7 @@ resource_usage:
     monthly_queries: 11500000000  # Monthly number of DNS queries
 
   azurerm_eventhub_namespace.my_event_hub:
-    events: 100000000
+    monthly_ingress_events: 100000000  # Monthly number of ingress events.
 
   azurerm_kubernetes_cluster.my_cluster:
     default_node_pool:

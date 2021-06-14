@@ -1,26 +1,29 @@
 
- Name                                                     Monthly Qty  Unit                  Monthly Cost 
-                                                                                                          
- azurerm_eventhub_namespace.basic                                                                         
- ├─ Ingress events (Basic)                                         10  1M events                    $0.28 
- └─ Throughput unit (1 MB/s ingress, 2 MB/s egress)                 1  hour                         $0.02 
-                                                                                                          
- azurerm_eventhub_namespace.basicwithoutusage                                                             
- ├─ Ingress events (Basic)                           Monthly cost depends on usage: $0.028 per 1M events  
- └─ Throughput unit (1 MB/s ingress, 2 MB/s egress)                 1  hour                         $0.02 
-                                                                                                          
- azurerm_eventhub_namespace.standard                                                                      
- ├─ Ingress events (Standard)                                     100  1M events                    $2.80 
- ├─ Throughput unit (1 MB/s ingress, 2 MB/s egress)                 1  hour                         $0.03 
- ├─ Kafka endpoint                                                  1  hour                         $0.09 
- └─ Capture                                                         1  hour                         $0.10 
-                                                                                                          
- azurerm_eventhub_namespace.standardwithoutusage                                                          
- ├─ Ingress events (Standard)                        Monthly cost depends on usage: $0.028 per 1M events  
- ├─ Throughput unit (1 MB/s ingress, 2 MB/s egress)                 1  hour                         $0.03 
- ├─ Kafka endpoint                                                  1  hour                         $0.09 
- └─ Capture                                                         1  hour                         $0.10 
-                                                                                                          
- OVERALL TOTAL                                                                                      $3.55 
+ Name                                                  Monthly Qty  Unit                  Monthly Cost 
+                                                                                                       
+ azurerm_eventhub_namespace.basic                                                                      
+ ├─ Ingress events (Basic)                                      10  1M events                    $0.15 
+ └─ Throughput (1)                                          0.0013  units                        $0.02 
+                                                                                                       
+ azurerm_eventhub_namespace.basicwithoutusage                                                          
+ ├─ Ingress events (Basic)                        Monthly cost depends on usage: $0.015 per 1M events  
+ └─ Throughput (1)                                          0.0013  units                        $0.02 
+                                                                                                       
+ azurerm_eventhub_namespace.capacity                                                                   
+ ├─ Ingress events (Standard)                     Monthly cost depends on usage: $0.03 per 1M events   
+ ├─ Throughput (10)                                         0.0136  units                        $0.30 
+ └─ Capture                                                      1  hour                         $0.10 
+                                                                                                       
+ azurerm_eventhub_namespace.standard                                                                   
+ ├─ Ingress events (Standard)                                  100  1M events                    $3.00 
+ ├─ Throughput (1)                                          0.0013  units                        $0.03 
+ └─ Capture                                                      1  hour                         $0.10 
+                                                                                                       
+ azurerm_eventhub_namespace.standardwithoutusage                                                       
+ ├─ Ingress events (Standard)                     Monthly cost depends on usage: $0.03 per 1M events   
+ ├─ Throughput (1)                                          0.0013  units                        $0.03 
+ └─ Capture                                                      1  hour                         $0.10 
+                                                                                                       
+ OVERALL TOTAL                                                                                   $3.84 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

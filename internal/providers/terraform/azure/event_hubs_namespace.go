@@ -17,25 +17,26 @@ func GetAzureRMEventHubsNamespaceRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var events *decimal.Decimal
+	var capacity int64
 	sku := "Basic"
-	location := d.Get("location").String()
+	region := lookupRegion(d, []string{})
 
 	if d.Get("sku").Type != gjson.Null {
 		sku = d.Get("sku").String()
 	}
+	if d.Get("capacity").Type != gjson.Null {
+		capacity = d.Get("capacity").Int()
+	}
 	costComponents := make([]*schema.CostComponent, 0)
-	if u != nil && u.Get("events").Type != gjson.Null {
-		events = decimalPtr(decimal.NewFromInt(u.Get("events").Int()))
-		costComponents = append(costComponents, eventHubsCostComponent("Ingress events", location, sku, events))
+	if u != nil && u.Get("monthly_ingress_events").Type != gjson.Null {
+		events = decimalPtr(decimal.NewFromInt(u.Get("monthly_ingress_events").Int()))
 	}
-	if u == nil {
-		costComponents = append(costComponents, eventHubsCostComponent("Ingress events", location, sku, events))
-	}
-	costComponents = append(costComponents, eventHubsThroughPutCostComponent("Throughput unit (1 MB/s ingress, 2 MB/s egress)", location, sku))
+	costComponents = append(costComponents, eventHubsCostComponent("Ingress events", region, sku, events))
+
+	costComponents = append(costComponents, eventHubsThroughPutCostComponent("Throughput", region, sku, capacity))
 
 	if sku == "Standard" {
-		costComponents = append(costComponents, eventHubsKafkaCostComponent("Kafka endpoint", location, sku))
-		costComponents = append(costComponents, eventHubsCaptureCostComponent("Capture", location, sku))
+		costComponents = append(costComponents, eventHubsCaptureCostComponent("Capture", region, sku))
 	}
 
 	return &schema.Resource{
@@ -60,7 +61,7 @@ func eventHubsCostComponent(name, location, sku string, quantity *decimal.Decima
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Event Hubs")},
 				{Key: "skuName", Value: strPtr(sku)},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Ingress Events", sku))},
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("%s/i Ingress Events", sku))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -69,13 +70,13 @@ func eventHubsCostComponent(name, location, sku string, quantity *decimal.Decima
 	}
 }
 
-func eventHubsThroughPutCostComponent(name, location, sku string) *schema.CostComponent {
+func eventHubsThroughPutCostComponent(name, location, sku string, capacity int64) *schema.CostComponent {
 
 	return &schema.CostComponent{
-		Name:            name,
-		Unit:            "hour",
-		UnitMultiplier:  1,
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		Name:            fmt.Sprintf("%s (%v)", name, capacity),
+		Unit:            "units",
+		UnitMultiplier:  schema.HourToMonthUnitMultiplier,
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
 			Region:     strPtr(location),
@@ -83,7 +84,7 @@ func eventHubsThroughPutCostComponent(name, location, sku string) *schema.CostCo
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Event Hubs")},
 				{Key: "skuName", Value: strPtr(sku)},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Throughput Unit", sku))},
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("%s/i Throughput Unit", sku))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -96,7 +97,7 @@ func eventHubsKafkaCostComponent(name, location, sku string) *schema.CostCompone
 
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "hour",
+		Unit:            "hours",
 		UnitMultiplier:  1,
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
