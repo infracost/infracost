@@ -60,7 +60,7 @@ func eventHubsCostComponent(name, location, sku string, quantity *decimal.Decima
 			Service:    strPtr("Event Hubs"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Event Hubs")},
-				{Key: "skuName", Value: strPtr(sku)},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("%s/i", sku))},
 				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("%s/i Ingress Events", sku))},
 			},
 		},
@@ -83,7 +83,7 @@ func eventHubsThroughPutCostComponent(name, location, sku string, capacity int64
 			Service:    strPtr("Event Hubs"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Event Hubs")},
-				{Key: "skuName", Value: strPtr(sku)},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("%s/i", sku))},
 				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("%s/i Throughput Unit", sku))},
 			},
 		},
@@ -106,7 +106,7 @@ func eventHubsCaptureCostComponent(name, location, sku string) *schema.CostCompo
 			Service:    strPtr("Event Hubs"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Event Hubs")},
-				{Key: "skuName", Value: strPtr(sku)},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("%s/i", sku))},
 				{Key: "meterName", Value: strPtr("Capture")},
 			},
 		},
