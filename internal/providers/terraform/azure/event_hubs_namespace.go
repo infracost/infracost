@@ -93,29 +93,6 @@ func eventHubsThroughPutCostComponent(name, location, sku string, capacity int64
 	}
 }
 
-func eventHubsKafkaCostComponent(name, location, sku string) *schema.CostComponent {
-
-	return &schema.CostComponent{
-		Name:            name,
-		Unit:            "hours",
-		UnitMultiplier:  1,
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName: strPtr("azure"),
-			Region:     strPtr(location),
-			Service:    strPtr("Event Hubs"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Event Hubs")},
-				{Key: "skuName", Value: strPtr(sku)},
-				{Key: "meterName", Value: strPtr("Kafka Endpoint")},
-			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("Consumption"),
-		},
-	}
-}
-
 func eventHubsCaptureCostComponent(name, location, sku string) *schema.CostComponent {
 
 	return &schema.CostComponent{
