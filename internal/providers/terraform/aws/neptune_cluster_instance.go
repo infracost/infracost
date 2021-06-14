@@ -16,22 +16,22 @@ func GetNeptuneClusterInstanceRegistryItem() *schema.RegistryItem {
 }
 
 func NewNeptuneClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var monthlyCpuCreditHrs *decimal.Decimal
+	var monthlyCPUCreditHrs *decimal.Decimal
 	region := d.Get("region").String()
 	instanceClass := d.Get("instance_class").String()
 	hourlyQuantity := 1
 	if d.Get("count").Type != gjson.Null {
-		hourlyQuantity = hourlyQuantity * int(d.Get("count").Int())
+		hourlyQuantity = int(d.Get("count").Int())
 	}
 
 	if u != nil && u.Get("monthly_cpu_credit_hrs").Type != gjson.Null {
-		monthlyCpuCreditHrs = decimalPtr(decimal.NewFromInt(u.Get("monthly_cpu_credit_hrs").Int()))
+		monthlyCPUCreditHrs = decimalPtr(decimal.NewFromInt(u.Get("monthly_cpu_credit_hrs").Int()))
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
 
 	if instanceClass == "db.t3.medium" {
-		costComponents = append(costComponents, neptuneClusterCPUInstanceCostComponent(region, instanceClass, monthlyCpuCreditHrs))
+		costComponents = append(costComponents, neptuneClusterCPUInstanceCostComponent(region, instanceClass, monthlyCPUCreditHrs))
 	} else {
 		costComponents = append(costComponents, neptuneClusterDbInstanceCostComponent(instanceClass, region, instanceClass, hourlyQuantity))
 	}
