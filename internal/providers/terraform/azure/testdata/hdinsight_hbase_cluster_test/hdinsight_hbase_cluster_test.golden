@@ -2,9 +2,9 @@
  Name                                     Monthly Qty  Unit   Monthly Cost 
                                                                            
  azurerm_hdinsight_hbase_cluster.example                                   
- ├─ Head node (D1)                              1,460  hours       $107.31 
- ├─ Region node (D14)                           2,190  hours     $3,274.49 
- └─ Zookeeper node (D4a v4)                     2,190  hours       $525.60 
+ ├─ Head node (Standard_D1)                     1,460  hours       $107.31 
+ ├─ Region node (Standard_D14)                  2,190  hours     $3,274.49 
+ └─ Zookeeper node (Standard_D4a V4)            2,190  hours       $525.60 
                                                                            
  OVERALL TOTAL                                                   $3,907.40 
 ----------------------------------

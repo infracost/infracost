@@ -2,15 +2,15 @@
  Name                                           Monthly Qty  Unit   Monthly Cost 
                                                                                  
  azurerm_hdinsight_hadoop_cluster.with_edge                                      
- ├─ Head node (D3)                                    1,460  hours       $430.70 
- ├─ Worker node (D4)                                  2,190  hours     $1,292.10 
- ├─ Zookeeper node (D3)                               2,190  hours       $646.05 
- └─ Edge node (A5)                                    2,190  hours       $554.07 
+ ├─ Head node (Standard_D3)                           1,460  hours       $430.70 
+ ├─ Worker node (Standard_D4)                         2,190  hours     $1,292.10 
+ ├─ Zookeeper node (Standard_D3)                      2,190  hours       $646.05 
+ └─ Edge node (Standard_A5)                           2,190  hours       $554.07 
                                                                                  
  azurerm_hdinsight_hadoop_cluster.without_edge                                   
- ├─ Head node (A4m v2)                                1,460  hours       $446.76 
- ├─ Worker node (A1 v2)                                 730  hours        $43.80 
- └─ Zookeeper node (A5)                               2,190  hours       $554.07 
+ ├─ Head node (Standard_A4m_V2)                       1,460  hours       $446.76 
+ ├─ Worker node (Standard_A1_V2)                        730  hours        $43.80 
+ └─ Zookeeper node (Standard_A5)                      2,190  hours       $554.07 
                                                                                  
  OVERALL TOTAL                                                         $3,967.55 
 ----------------------------------

@@ -50,5 +50,5 @@ resource "azurerm_automation_account" "without_usage" {
   tags = {
     environment = "development"
   }
-} 
+}
 

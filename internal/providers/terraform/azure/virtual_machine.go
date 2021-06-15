@@ -1,8 +1,6 @@
 package azure
 
 import (
-	"strings"
-
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -69,14 +67,6 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 		CostComponents: costComponents,
 		SubResources:   subResources,
 	}
-}
-
-// Parse from instance type value to Azure SKU name.
-func parseVMSKUName(instanceType string) string {
-	s := strings.ReplaceAll(instanceType, "Standard_", "")
-	s = strings.ReplaceAll(s, "Basic_", "")
-	s = strings.ReplaceAll(s, "_", " ")
-	return s
 }
 
 func ultraSSDReservationCostComponent(region string) *schema.CostComponent {

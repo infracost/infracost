@@ -29,7 +29,7 @@ resource "azurerm_automation_dsc_nodeconfiguration" "zeroNodes" {
   automation_account_name = azurerm_automation_account.example.name
   depends_on              = [azurerm_automation_dsc_configuration.example]
 
-  content_embedded = "configuration test {}" 
+  content_embedded = "configuration test {}"
 }
 resource "azurerm_automation_dsc_nodeconfiguration" "fiveNodes" {
   name                    = "test.localhost"
@@ -37,7 +37,7 @@ resource "azurerm_automation_dsc_nodeconfiguration" "fiveNodes" {
   automation_account_name = azurerm_automation_account.example.name
   depends_on              = [azurerm_automation_dsc_configuration.example]
 
-  content_embedded = "configuration test {}" 
+  content_embedded = "configuration test {}"
 }
 resource "azurerm_automation_dsc_nodeconfiguration" "withoutUsage" {
   name                    = "test.localhost"
@@ -45,5 +45,5 @@ resource "azurerm_automation_dsc_nodeconfiguration" "withoutUsage" {
   automation_account_name = azurerm_automation_account.example.name
   depends_on              = [azurerm_automation_dsc_configuration.example]
 
-  content_embedded = "configuration test {}" 
+  content_embedded = "configuration test {}"
 }
