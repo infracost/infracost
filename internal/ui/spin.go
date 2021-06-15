@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 
 	spinnerpkg "github.com/briandowns/spinner"
@@ -22,8 +23,12 @@ type Spinner struct {
 }
 
 func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
+	spinnerCharNumb := 14
+	if runtime.GOOS == "windows" {
+		spinnerCharNumb = 9
+	}
 	s := &Spinner{
-		spinner: spinnerpkg.New(spinnerpkg.CharSets[14], 100*time.Millisecond, spinnerpkg.WithWriter(os.Stderr)),
+		spinner: spinnerpkg.New(spinnerpkg.CharSets[spinnerCharNumb], 100*time.Millisecond, spinnerpkg.WithWriter(os.Stderr)),
 		msg:     msg,
 		opts:    opts,
 	}
