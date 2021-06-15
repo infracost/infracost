@@ -27,30 +27,30 @@ func NewNeptuneCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		monthlyIoRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_io_requests").Int()))
 	}
 
-	costComponents = backupCostComponent(d, u, costComponents, region)
 	costComponents = append(costComponents, neptuneClusterStorageIOsCostComponents("Storage", "GB", region, "StorageUsage", storageGb, 1))
 	costComponents = append(costComponents, neptuneClusterStorageIOsCostComponents("I/O", "1M request", region, "StorageIOUsage", monthlyIoRequests, 1000000))
+	var retentionPeriod *decimal.Decimal
+	if d.Get("backup_retention_period").Type != gjson.Null {
+		retentionPeriod = decimalPtr(decimal.NewFromInt(d.Get("backup_retention_period").Int()))
+		if retentionPeriod.GreaterThan(decimal.NewFromInt(1)) {
+			costComponents = append(costComponents, backupCostComponent(u, region))
+		}
+	}
 
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
 }
-func backupCostComponent(d *schema.ResourceData, u *schema.UsageData, costComponents []*schema.CostComponent, region string) []*schema.CostComponent {
-	var retentionPeriod *decimal.Decimal
-	if d.Get("backup_retention_period").Exists() || d.References("db_cluster_identifier") != nil {
-		retentionPeriod = decimalPtr(decimal.NewFromInt(d.Get("backup_retention_period").Int()))
-		if retentionPeriod.GreaterThan(decimal.NewFromInt(1)) {
-			var backupStorage *decimal.Decimal
-			if u != nil && u.Get("backup_storage_gb").Type != gjson.Null {
-				backupStorage = decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
-			}
-			costComponents = append(costComponents, neptuneClusterBackupCostComponent(region, "BackupUsage", backupStorage))
-		}
-	}
-	return costComponents
-}
+func backupCostComponent(u *schema.UsageData, region string) *schema.CostComponent {
 
+	var backupStorage *decimal.Decimal
+	if u != nil && u.Get("backup_storage_gb").Type != gjson.Null {
+		backupStorage = decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
+	}
+
+	return neptuneClusterBackupCostComponent(region, "BackupUsage", backupStorage)
+}
 func neptuneClusterStorageIOsCostComponents(name, unit, region, usageType string, quantity *decimal.Decimal, unitMulti int) *schema.CostComponent {
 	return &schema.CostComponent{
 

@@ -2,6 +2,8 @@ package aws
 
 import (
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
 )
 
 func GetNeptuneClusterSnapshotRegistryItem() *schema.RegistryItem {
@@ -18,10 +20,21 @@ func NewNeptuneClusterSnapshot(d *schema.ResourceData, u *schema.UsageData) *sch
 	var resourceData *schema.ResourceData
 	dbClusterIdentifier := d.References("db_cluster_identifier")
 	resourceData = dbClusterIdentifier[0]
+	var retentionPeriod *decimal.Decimal
+
+	if resourceData.Get("backup_retention_period").Type != gjson.Null {
+		retentionPeriod = decimalPtr(decimal.NewFromInt(resourceData.Get("backup_retention_period").Int()))
+		if retentionPeriod.LessThan(decimal.NewFromInt(2)) {
+			return &schema.Resource{
+				NoPrice:   true,
+				IsSkipped: true,
+			}
+		}
+	}
 	region := d.Get("region").String()
-	costComponents := make([]*schema.CostComponent, 0)
+
 	return &schema.Resource{
 		Name:           d.Address,
-		CostComponents: backupCostComponent(resourceData, u, costComponents, region),
+		CostComponents: []*schema.CostComponent{backupCostComponent(u, region)},
 	}
 }
