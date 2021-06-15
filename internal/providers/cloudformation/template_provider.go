@@ -7,31 +7,31 @@ import (
 	"github.com/pkg/errors"
 )
 
-type TemplateJSONProvider struct {
+type TemplateProvider struct {
 	Path string
 	env  *config.Environment
 }
 
-func NewTemplateJSONProvider(cfg *config.Config, projectCfg *config.Project) schema.Provider {
-	return &TemplateJSONProvider{
+func NewTemplateProvider(cfg *config.Config, projectCfg *config.Project) schema.Provider {
+	return &TemplateProvider{
 		Path: projectCfg.Path,
 		env:  cfg.Environment,
 	}
 }
 
-func (p *TemplateJSONProvider) Type() string {
+func (p *TemplateProvider) Type() string {
 	return "cloudformation_state_json"
 }
 
-func (p *TemplateJSONProvider) DisplayType() string {
+func (p *TemplateProvider) DisplayType() string {
 	return "Cloudformation state JSON file"
 }
 
-func (p *TemplateJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+func (p *TemplateProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	// no op
 }
 
-func (p *TemplateJSONProvider) LoadResources(project *schema.Project, usage map[string]*schema.UsageData) error {
+func (p *TemplateProvider) LoadResources(project *schema.Project, usage map[string]*schema.UsageData) error {
 	template, err := goformation.Open(p.Path)
 	if err != nil {
 		return errors.Wrap(err, "Error reading Cloudformation template file")

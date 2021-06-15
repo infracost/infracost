@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"fmt"
+	"github.com/awslabs/goformation/v4"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
 	"io/ioutil"
 	"os"
@@ -19,8 +20,8 @@ func Detect(cfg *config.Config, projectCfg *config.Project) (schema.Provider, er
 		return nil, fmt.Errorf("No such file or directory %s", projectCfg.Path)
 	}
 
-	if isCloudFormationTemplateJSON(projectCfg.Path) {
-		return cloudformation.NewTemplateJSONProvider(cfg, projectCfg), nil
+	if isCloudFormationTemplate(projectCfg.Path) {
+		return cloudformation.NewTemplateProvider(cfg, projectCfg), nil
 	}
 
 	if isTerraformPlanJSON(projectCfg.Path) {
@@ -102,21 +103,15 @@ func isTerraformDir(path string) bool {
 	return terraform.IsTerraformDir(path)
 }
 
-func isCloudFormationTemplateJSON(path string) bool {
-	b, err := ioutil.ReadFile(path)
+func isCloudFormationTemplate(path string) bool {
+	template, err := goformation.Open(path)
 	if err != nil {
 		return false
 	}
 
-	var jsonFormat struct {
-		AWSTemplateFormatVersion string      `json:"AWSTemplateFormatVersion"`
-		Resources                interface{} `json:"Resources"`
+	if len(template.Resources) > 0 {
+		return true
 	}
 
-	err = json.Unmarshal(b, &jsonFormat)
-	if err != nil {
-		return false
-	}
-
-	return jsonFormat.AWSTemplateFormatVersion != "" && jsonFormat.Resources != nil
+	return false
 }
