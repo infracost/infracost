@@ -25,5 +25,5 @@ resource "azurerm_automation_job_schedule" "withoutUsage" {
   automation_account_name = "tf-automation-account"
   schedule_name           = "hour"
   runbook_name            = "Get-VirtualMachine"
-} 
+}
 
