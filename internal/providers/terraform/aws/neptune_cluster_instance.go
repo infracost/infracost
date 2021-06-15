@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -16,7 +17,6 @@ func GetNeptuneClusterInstanceRegistryItem() *schema.RegistryItem {
 }
 
 func NewNeptuneClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	fmt.Println(d)
 	var monthlyCPUCreditHrs *decimal.Decimal
 	region := d.Get("region").String()
 	instanceClass := d.Get("instance_class").String()
@@ -31,8 +31,8 @@ func NewNeptuneClusterInstance(d *schema.ResourceData, u *schema.UsageData) *sch
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	if instanceClass == "db.t3.medium" {
-		costComponents = append(costComponents, neptuneClusterCPUInstanceCostComponent(region, instanceClass, monthlyCPUCreditHrs))
+	if strings.HasPrefix(instanceClass, "db.t3.") {
+		costComponents = append(costComponents, neptuneClusterCPUInstanceCostComponent(monthlyCPUCreditHrs))
 	} else {
 		costComponents = append(costComponents, neptuneClusterDbInstanceCostComponent(instanceClass, region, instanceClass, hourlyQuantity))
 	}
@@ -64,7 +64,7 @@ func neptuneClusterDbInstanceCostComponent(name, region, instanceType string, qu
 	}
 }
 
-func neptuneClusterCPUInstanceCostComponent(region, instanceType string, quantity *decimal.Decimal) *schema.CostComponent {
+func neptuneClusterCPUInstanceCostComponent(quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:           "CPU credits",
@@ -73,10 +73,9 @@ func neptuneClusterCPUInstanceCostComponent(region, instanceType string, quantit
 		HourlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
-			Region:     strPtr(region),
 			Service:    strPtr("AmazonNeptune"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "instanceType", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", instanceType))},
+				{Key: "usagetype", Value: strPtr("APE1-CPUCredits:db.t3")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
