@@ -12,11 +12,13 @@
  └─ Database instance (on-demand, db.r4.large)                 730  hours                      $297.84 
                                                                                                        
  aws_neptune_cluster_instance.dbT3Medium                                                               
+ ├─ Database instance (on-demand, db.t3.medium)                730  hours                       $81.76 
  └─ CPU credits                                              7,300  vCPU-hours               $1,095.00 
                                                                                                        
  aws_neptune_cluster_instance.dbT3WithoutUsage                                                         
+ ├─ Database instance (on-demand, db.t3.medium)                730  hours                       $81.76 
  └─ CPU credits                                   Monthly cost depends on usage: $0.15 per vCPU-hours  
                                                                                                        
- OVERALL TOTAL                                                                               $1,690.68 
+ OVERALL TOTAL                                                                               $1,854.20 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
