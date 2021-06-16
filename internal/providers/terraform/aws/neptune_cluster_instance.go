@@ -31,10 +31,10 @@ func NewNeptuneClusterInstance(d *schema.ResourceData, u *schema.UsageData) *sch
 
 	costComponents := make([]*schema.CostComponent, 0)
 
+	costComponents = append(costComponents, neptuneClusterDbInstanceCostComponent(instanceClass, region, instanceClass, hourlyQuantity))
+
 	if strings.HasPrefix(instanceClass, "db.t3.") {
 		costComponents = append(costComponents, neptuneClusterCPUInstanceCostComponent(monthlyCPUCreditHrs))
-	} else {
-		costComponents = append(costComponents, neptuneClusterDbInstanceCostComponent(instanceClass, region, instanceClass, hourlyQuantity))
 	}
 
 	return &schema.Resource{
@@ -66,7 +66,7 @@ func neptuneClusterDbInstanceCostComponent(name, region, instanceType string, qu
 
 func neptuneClusterCPUInstanceCostComponent(quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-
+		// AWS mentions that CPU Credit pricing is the same for T3 instance across all regions, but they only return prices for Hong Kong and Sao Paulo so we hard-code APE1.
 		Name:           "CPU credits",
 		Unit:           "vCPU-hours",
 		UnitMultiplier: 1,
