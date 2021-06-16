@@ -4,7 +4,6 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation/dynamodb"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
-
 	log "github.com/sirupsen/logrus"
 )
 
@@ -36,15 +35,17 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		writeCapacity = cfr.ProvisionedThroughput.WriteCapacityUnits
 	}
 
-	r := aws.NewDynamoDBTable(&aws.DynamoDbTableArguments{
+	args := &aws.DynamoDbTableArguments{
 		Address:        d.Address,
 		Region:         region,
 		BillingMode:    billingMode,
 		WriteCapacity:  writeCapacity,
 		ReadCapacity:   readCapacity,
 		ReplicaRegions: []string{}, // Global Tables are defined using AWS::DynamoDB::GlobalTable
-	}, u)
+	}
+	args.PopulateUsage(u)
 
+	r := aws.NewDynamoDBTable(args)
 	r.Tags = mapTags(cfr.Tags)
 
 	return r
