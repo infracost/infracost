@@ -1,0 +1,13 @@
+version: 0.1
+resource_usage:
+  aws_neptune_cluster.fiveDaysRetenPeriod:
+    storage_gb: 100
+    monthly_io_requests: 10000000
+    backup_storage_gb: 1000
+
+  aws_neptune_cluster.oneDayRetenPeriod:
+    storage_gb: 100
+    monthly_io_requests: 10000000
+    backup_storage_gb: 1000
+
+  

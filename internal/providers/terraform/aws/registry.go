@@ -71,6 +71,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetSNSTopicRegistryItem(),
 	GetSNSTopicSubscriptionRegistryItem(),
 	GetSQSQueueRegistryItem(),
+	GetNeptuneClusterRegistryItem(),
+	GetNeptuneClusterInstanceRegistryItem(),
+	GetNeptuneClusterSnapshotRegistryItem(),
 	GetNewEKSNodeGroupItem(),
 	GetNewEKSFargateProfileItem(),
 	GetNewEKSClusterItem(),
@@ -246,6 +249,12 @@ var FreeResources []string = []string{
 	"aws_lambda_permission",
 	"aws_lambda_function_event_invoke_config",
 	"aws_lambda_alias",
+
+	// AWS Neptune
+	"aws_neptune_cluster_parameter_group",
+	"aws_neptune_event_subscription",
+	"aws_neptune_parameter_group",
+	"aws_neptune_subnet_group",
 
 	// AWS Others
 	"aws_db_instance_role_association",
