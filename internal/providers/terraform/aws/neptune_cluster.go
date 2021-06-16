@@ -49,7 +49,7 @@ func backupCostComponent(u *schema.UsageData, region string) *schema.CostCompone
 		backupStorage = decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
 	}
 
-	return neptuneClusterBackupCostComponent(region, "BackupUsage", backupStorage)
+	return neptuneClusterBackupCostComponent(region, backupStorage)
 }
 func neptuneClusterStorageIOsCostComponents(name, unit, region, usageType string, quantity *decimal.Decimal, unitMulti int) *schema.CostComponent {
 	return &schema.CostComponent{
@@ -72,7 +72,7 @@ func neptuneClusterStorageIOsCostComponents(name, unit, region, usageType string
 	}
 }
 
-func neptuneClusterBackupCostComponent(region, usageType string, quantity *decimal.Decimal) *schema.CostComponent {
+func neptuneClusterBackupCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            "Backup storage",
@@ -84,7 +84,7 @@ func neptuneClusterBackupCostComponent(region, usageType string, quantity *decim
 			Region:     strPtr(region),
 			Service:    strPtr("AmazonNeptune"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s$/i", usageType))},
+				{Key: "usagetype", ValueRegex: strPtr("/BackupUsage$/i")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

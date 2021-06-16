@@ -55,3 +55,8 @@ resource "aws_neptune_cluster_snapshot" "withoutUsage" {
   db_cluster_identifier          = aws_neptune_cluster.withoutUsage.id
   db_cluster_snapshot_identifier = "resourcetestsnapshot1234"
 }
+
+resource "aws_neptune_cluster_snapshot" "inAnotherModule" {
+  db_cluster_identifier          = "in-another-module"
+  db_cluster_snapshot_identifier = "resourcetestsnapshot1234"
+}

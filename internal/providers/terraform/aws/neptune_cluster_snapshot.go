@@ -19,15 +19,17 @@ func GetNeptuneClusterSnapshotRegistryItem() *schema.RegistryItem {
 func NewNeptuneClusterSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var resourceData *schema.ResourceData
 	dbClusterIdentifier := d.References("db_cluster_identifier")
-	resourceData = dbClusterIdentifier[0]
 	var retentionPeriod *decimal.Decimal
 
-	if resourceData.Get("backup_retention_period").Type != gjson.Null {
-		retentionPeriod = decimalPtr(decimal.NewFromInt(resourceData.Get("backup_retention_period").Int()))
-		if retentionPeriod.LessThan(decimal.NewFromInt(2)) {
-			return &schema.Resource{
-				NoPrice:   true,
-				IsSkipped: true,
+	if len(dbClusterIdentifier) > 0 {
+		resourceData = dbClusterIdentifier[0]
+		if resourceData.Get("backup_retention_period").Type != gjson.Null {
+			retentionPeriod = decimalPtr(decimal.NewFromInt(resourceData.Get("backup_retention_period").Int()))
+			if retentionPeriod.LessThan(decimal.NewFromInt(2)) {
+				return &schema.Resource{
+					NoPrice:   true,
+					IsSkipped: true,
+				}
 			}
 		}
 	}

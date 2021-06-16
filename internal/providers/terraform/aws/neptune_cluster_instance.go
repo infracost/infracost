@@ -33,7 +33,7 @@ func NewNeptuneClusterInstance(d *schema.ResourceData, u *schema.UsageData) *sch
 
 	costComponents = append(costComponents, neptuneClusterDbInstanceCostComponent(instanceClass, region, instanceClass, hourlyQuantity))
 
-	if strings.HasPrefix(instanceClass, "db.t3.") {
+	if strings.HasPrefix(strings.ToLower(instanceClass), "db.t3.") {
 		costComponents = append(costComponents, neptuneClusterCPUInstanceCostComponent(monthlyCPUCreditHrs))
 	}
 

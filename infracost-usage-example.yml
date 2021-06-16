@@ -102,7 +102,7 @@ resource_usage:
 
   aws_docdb_cluster_instance.my_db:
     data_storage_gb: 1000         # Total storage for cluster in GB.
-    monthly_io_request: 100000000 # Monthly number of input/output requests for cluster.
+    monthly_io_requests: 100000000 # Monthly number of input/output requests for cluster.
     monthly_cpu_credit_hrs: 100 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances.
 
   aws_docdb_cluster_snapshot.my_snapshot:
@@ -185,6 +185,17 @@ resource_usage:
 
   aws_nat_gateway.my_nat_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
+
+  aws_neptune_cluster.my_cluster:
+    storage_gb: 100
+    monthly_io_requests: 10000000
+    backup_storage_gb: 1000
+
+  aws_neptune_cluster_instance.my_cluster_instance:
+    monthly_cpu_credit_hrs: 10
+
+  aws_neptune_cluster_snapshot.my_cluster_snapshot:
+    backup_storage_gb: 1000
 
   aws_mq_broker.my_aws_mq_broker:
     storage_size_gb: 12 # Data storage per instance in GB.
