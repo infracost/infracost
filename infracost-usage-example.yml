@@ -58,15 +58,15 @@ resource_usage:
     monthly_efs_warm_restore_gb: 10000 # Monthly number of EFS warm restore in GB. 
     monthly_efs_cold_restore_gb: 10000 # Monthly number of EFS cold restore in GB. 
     monthly_efs_item_restore_requests: 10000 # Monthly number of EFS item-level restore requests. 
-    monthly_efs_warm_backup_gb: 10000 # Monthly number of EFS warm backup in GB. 
-    monthly_efs_cold_backup_gb: 10000 # Monthly number of EFS cold backup in GB. 
-    monthly_ebs_snapshot_gb: 10000 # Monthly number of EFS cold backup in GB.
-    monthly_rds_snapshot_gb: 10000
-    monthly_aurora_snapshot_gb: 10000
-    monthly_dynamodb_backup_gb: 10000
-    monthly_dynamodb_restore_gb: 10000
-    monthly_fsx_windows_backup_gb: 10000
-    monthly_fsx_lustre_backup_gb: 10000
+    monthly_efs_warm_backup_gb: 10000 # Monthly number of EFS warm backups in GB. 
+    monthly_efs_cold_backup_gb: 10000 # Monthly number of EFS cold backups in GB. 
+    monthly_ebs_snapshot_gb: 10000 # Monthly number of EBS snapshots in GB.
+    monthly_rds_snapshot_gb: 10000 # Monthly number of RDS snapshots in GB.
+    monthly_aurora_snapshot_gb: 10000 # Monthly number of Aurora snapshots in GB.
+    monthly_dynamodb_backup_gb: 10000 # Monthly number of DynamoDB backups in GB.
+    monthly_dynamodb_restore_gb: 10000 # Monthly number of DynamoDB restore in GB.
+    monthly_fsx_windows_backup_gb: 10000 # Monthly number of FSX Windows backups in GB.
+    monthly_fsx_lustre_backup_gb: 10000 # Monthly number of FSX Lustre backups in GB.
 
   aws_cloudformation_stack.my_formation:
     monthly_handler_operations: 10000 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
