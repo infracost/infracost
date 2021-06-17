@@ -11,10 +11,10 @@ provider "aws" {
 resource "aws_kinesis_firehose_delivery_stream" "withAllTags" {
   name        = "terraform-kinesis-firehose-test-stream"
   destination = "splunk"
- extended_s3_configuration {
+  extended_s3_configuration {
     role_arn   = aws_iam_role.firehose.arn
     bucket_arn = aws_s3_bucket.bucket.arn
-   data_format_conversion_configuration {
+    data_format_conversion_configuration {
       input_format_configuration {
         deserializer {
           hive_json_ser_de {}
@@ -43,12 +43,12 @@ resource "aws_kinesis_firehose_delivery_stream" "withAllTags" {
 
     vpc_config {
       security_group_ids = ["fake"]
-      subnet_ids         = ["fake","fake1"]
+      subnet_ids         = ["fake", "fake1"]
       role_arn           = aws_iam_role.firehose.arn
     }
   }
-  }
-  resource "aws_s3_bucket" "bucket" {
+}
+resource "aws_s3_bucket" "bucket" {
   bucket = "tf-test-bucket"
   acl    = "private"
 }
@@ -88,7 +88,7 @@ resource "aws_kinesis_firehose_delivery_stream" "EnabledFalse" {
 
     vpc_config {
       security_group_ids = ["fake"]
-      subnet_ids         = ["fake","fake1"]
+      subnet_ids         = ["fake", "fake1"]
       role_arn           = aws_iam_role.firehose.arn
     }
   }
@@ -102,10 +102,10 @@ resource "aws_kinesis_firehose_delivery_stream" "onlyDataIngested" {
 resource "aws_kinesis_firehose_delivery_stream" "withoutUsage" {
   name        = "terraform-kinesis-firehose-test-stream"
   destination = "splunk"
- extended_s3_configuration {
+  extended_s3_configuration {
     role_arn   = aws_iam_role.firehose.arn
     bucket_arn = aws_s3_bucket.bucket.arn
-   data_format_conversion_configuration {
+    data_format_conversion_configuration {
       input_format_configuration {
         deserializer {
           hive_json_ser_de {}
@@ -134,13 +134,13 @@ resource "aws_kinesis_firehose_delivery_stream" "withoutUsage" {
 
     vpc_config {
       security_group_ids = ["fake"]
-      subnet_ids         = ["fake","fake1"]
+      subnet_ids         = ["fake", "fake1"]
       role_arn           = aws_iam_role.firehose.arn
     }
   }
-  }
+}
 
-  resource "aws_kinesis_firehose_delivery_stream" "forTwoMilGB" {
+resource "aws_kinesis_firehose_delivery_stream" "forTwoMilGB" {
   name        = "terraform-kinesis-firehose-test-stream"
   destination = "splunk"
 }
