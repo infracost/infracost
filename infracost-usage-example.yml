@@ -172,6 +172,9 @@ resource_usage:
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000 # Total storage used for backups in GB.
 
+  aws_kinesis_firehose_delivery_stream.my_kinesis:
+    monthly_data_ingested_gb: 3000000
+
   aws_lambda_function.my_function:
     monthly_requests: 100000 # Monthly requests to the Lambda function.
     request_duration_ms: 500 # Average duration of each request in milliseconds.

@@ -1,0 +1,49 @@
+
+ Name                                                         Monthly Qty  Unit                    Monthly Cost 
+                                                                                                                
+ aws_elasticsearch_domain.test_cluster                                                                          
+ └─ Instance (on-demand, m4.large.elasticsearch)                      730  hours                        $134.32 
+                                                                                                                
+ aws_kinesis_firehose_delivery_stream.EnabledFalse                                                              
+ ├─ Data ingested (first 500TB)                                   512,000  GB                        $17,920.00 
+ ├─ Data ingested (next 1.5PB)                                  1,536,000  GB                        $46,080.00 
+ ├─ Data ingested (next 3PB)                                      952,000  GB                        $22,848.00 
+ ├─ VPC data                                                    3,000,000  GB                        $30,000.00 
+ └─ VPC AZ deilvery                                                     2  GB                             $0.02 
+                                                                                                                
+ aws_kinesis_firehose_delivery_stream.forTwoMilGB                                                               
+ ├─ Data ingested (first 500TB)                                   512,000  GB                        $17,920.00 
+ └─ Data ingested (next 1.5PB)                                  1,488,000  GB                        $44,640.00 
+                                                                                                                
+ aws_kinesis_firehose_delivery_stream.onlyDataIngested                                                          
+ ├─ Data ingested (first 500TB)                                   512,000  GB                        $17,920.00 
+ ├─ Data ingested (next 1.5PB)                                  1,536,000  GB                        $46,080.00 
+ └─ Data ingested (next 3PB)                                      952,000  GB                        $22,848.00 
+                                                                                                                
+ aws_kinesis_firehose_delivery_stream.withAllTags                                                               
+ ├─ Data ingested (first 500TB)                                   512,000  GB                        $17,920.00 
+ ├─ Data ingested (next 1.5PB)                                  1,536,000  GB                        $46,080.00 
+ ├─ Data ingested (next 3PB)                                      952,000  GB                        $22,848.00 
+ ├─ Format conversion                                           3,000,000  GB                        $63,000.00 
+ ├─ VPC data                                                    3,000,000  GB                        $30,000.00 
+ └─ VPC AZ deilvery                                                     2  GB                             $0.02 
+                                                                                                                
+ aws_kinesis_firehose_delivery_stream.withoutUsage                                                              
+ ├─ Data ingested (first 500TB)                         Monthly cost depends on usage: $0.035 per GB            
+ ├─ Data ingested (next 1.5PB)                          Monthly cost depends on usage: $0.03 per GB             
+ ├─ Data ingested (next 3PB)                            Monthly cost depends on usage: $0.024 per GB            
+ ├─ Format conversion                                   Monthly cost depends on usage: $0.021 per GB            
+ ├─ VPC data                                            Monthly cost depends on usage: $0.01 per GB             
+ └─ VPC AZ deilvery                                                     2  GB                             $0.02 
+                                                                                                                
+ aws_s3_bucket.bucket                                                                                           
+ └─ Standard                                                                                                    
+    ├─ Storage                                          Monthly cost depends on usage: $0.024 per GB            
+    ├─ PUT, COPY, POST, LIST requests                   Monthly cost depends on usage: $0.0053 per 1k requests  
+    ├─ GET, SELECT, and all other requests              Monthly cost depends on usage: $0.00042 per 1k requests 
+    ├─ Select data scanned                              Monthly cost depends on usage: $0.00225 per GB          
+    └─ Select data returned                             Monthly cost depends on usage: $0.0008 per GB           
+                                                                                                                
+ OVERALL TOTAL                                                                                      $446,238.39 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
