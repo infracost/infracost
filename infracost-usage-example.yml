@@ -54,6 +54,20 @@ resource_usage:
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
     vcpu_count: 2 # Number of the vCPUs for the instance type.
 
+  aws_backup_vault.usage:
+    monthly_efs_warm_restore_gb: 10000 # Monthly number of EFS warm restore in GB. 
+    monthly_efs_cold_restore_gb: 10000 # Monthly number of EFS cold restore in GB. 
+    monthly_efs_item_restore_requests: 10000 # Monthly number of EFS item-level restore requests. 
+    monthly_efs_warm_backup_gb: 10000 # Monthly number of EFS warm backup in GB. 
+    monthly_efs_cold_backup_gb: 10000 # Monthly number of EFS cold backup in GB. 
+    monthly_ebs_snapshot_gb: 10000 # Monthly number of EFS cold backup in GB.
+    monthly_rds_snapshot_gb: 10000
+    monthly_aurora_snapshot_gb: 10000
+    monthly_dynamodb_backup_gb: 10000
+    monthly_dynamodb_restore_gb: 10000
+    monthly_fsx_windows_backup_gb: 10000
+    monthly_fsx_lustre_backup_gb: 10000
+
   aws_cloudformation_stack.my_formation:
     monthly_handler_operations: 10000 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
     monthly_duration_secs: 0 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.  
