@@ -20,10 +20,10 @@ resource "azurerm_eventhub_namespace" "standard" {
 }
 
 resource "azurerm_eventhub_namespace" "standard_auto_inflate" {
-  name                = "acceptanceTestEventHubNamespace"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  sku                 = "Standard"
+  name                 = "acceptanceTestEventHubNamespace"
+  location             = azurerm_resource_group.example.location
+  resource_group_name  = azurerm_resource_group.example.name
+  sku                  = "Standard"
   auto_inflate_enabled = true
 
   tags = {
@@ -81,10 +81,10 @@ resource "azurerm_eventhub_namespace" "basicwithoutusage" {
 
 
 resource "azurerm_eventhub_namespace" "dedicated" {
-  name                = "acceptanceTestEventHubNamespace"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  sku                 = "Basic"
+  name                 = "acceptanceTestEventHubNamespace"
+  location             = azurerm_resource_group.example.location
+  resource_group_name  = azurerm_resource_group.example.name
+  sku                  = "Basic"
   dedicated_cluster_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/group1/providers/Microsoft.EventHub/clusters/cluster1"
 
   tags = {
@@ -94,10 +94,10 @@ resource "azurerm_eventhub_namespace" "dedicated" {
 
 
 resource "azurerm_eventhub_namespace" "dedicated_retention" {
-  name                = "acceptanceTestEventHubNamespace"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  sku                 = "Basic"
+  name                 = "acceptanceTestEventHubNamespace"
+  location             = azurerm_resource_group.example.location
+  resource_group_name  = azurerm_resource_group.example.name
+  sku                  = "Basic"
   dedicated_cluster_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/group1/providers/Microsoft.EventHub/clusters/cluster1"
 
   tags = {
