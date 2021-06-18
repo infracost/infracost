@@ -2,11 +2,12 @@ package azure
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 func GetAzureRMEventHubsNamespaceRegistryItem() *schema.RegistryItem {
@@ -30,11 +31,10 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		capacity = d.Get("capacity").Int()
 		capacityUnit = decimalPtr(decimal.NewFromInt(capacity))
 	}
-	if d.Get("auto_inflate_enabled").Type != gjson.Null {
-		if u != nil && u.Get("throughput_or_capacity_units").Type != gjson.Null {
-			capacityUnit = decimalPtr(decimal.NewFromInt(u.Get("throughput_or_capacity_units").Int()))
-		}
+	if u != nil && u.Get("throughput_or_capacity_units").Type != gjson.Null {
+		capacityUnit = decimalPtr(decimal.NewFromInt(u.Get("throughput_or_capacity_units").Int()))
 	}
+
 	if d.Get("dedicated_cluster_id").Type != gjson.Null {
 		sku = "Dedicated"
 		meterName = "Capacity Unit"
