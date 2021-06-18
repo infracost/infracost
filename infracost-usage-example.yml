@@ -618,6 +618,7 @@ resource_usage:
   azurerm_eventhub_namespace.my_event_hub:
     monthly_ingress_events: 100000000  # Monthly number of ingress events.
     extended_retention_storage_gb: 1000 # Data stored above the included storage quota in GB.
+    throughput_or_capacity_units: 10 # Number of Throughput Units (for Basic and Standard) and Capacity units (for Dedicated) namespaces.
 
   azurerm_kubernetes_cluster.my_cluster:
     default_node_pool:

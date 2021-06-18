@@ -17,7 +17,7 @@ func GetAzureRMEventHubsNamespaceRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var events, retention *decimal.Decimal
+	var events, retention, capacityUnit *decimal.Decimal
 	var capacity int64
 	sku := "Basic"
 	meterName := "Throughput Unit"
@@ -28,6 +28,12 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 	if d.Get("capacity").Type != gjson.Null {
 		capacity = d.Get("capacity").Int()
+		capacityUnit = decimalPtr(decimal.NewFromInt(capacity))
+	}
+	if d.Get("auto_inflate_enabled").Type != gjson.Null {
+		if u != nil && u.Get("throughput_or_capacity_units").Type != gjson.Null {
+			capacityUnit = decimalPtr(decimal.NewFromInt(u.Get("throughput_or_capacity_units").Int()))
+		}
 	}
 	if d.Get("dedicated_cluster_id").Type != gjson.Null {
 		sku = "Dedicated"
@@ -39,12 +45,13 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		events = decimalPtr(decimal.NewFromInt(u.Get("monthly_ingress_events").Int()))
 	}
 
-	costComponents = append(costComponents, eventHubsThroughPutCostComponent("Throughput", region, sku, meterName, capacity))
+	costComponents = append(costComponents, eventHubsThroughPutCostComponent("Throughput", region, sku, meterName, capacityUnit))
 
-	if sku == "Basic" || sku == "Standard" {
+	if sku == "Basic" {
 		costComponents = append(costComponents, eventHubsCostComponent("Ingress events", region, sku, events))
 	}
 	if sku == "Standard" {
+		costComponents = append(costComponents, eventHubsCostComponent("Ingress events", region, sku, events))
 		costComponents = append(costComponents, eventHubsCaptureCostComponent("Capture", region, sku))
 	}
 
@@ -94,13 +101,13 @@ func eventHubsCostComponent(name, location, sku string, quantity *decimal.Decima
 	}
 }
 
-func eventHubsThroughPutCostComponent(name, location, sku, meterName string, capacity int64) *schema.CostComponent {
+func eventHubsThroughPutCostComponent(name, location, sku, meterName string, capacityUnit *decimal.Decimal) *schema.CostComponent {
 	meterName = fmt.Sprintf("%s %s", sku, meterName)
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("%s (%v)", name, capacity),
+		Name:           fmt.Sprintf("%s (%v)", name, capacityUnit),
 		Unit:           "units",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		//MonthlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
+		//MonthlyQuantity: capacityUnit,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
 			Region:     strPtr(location),

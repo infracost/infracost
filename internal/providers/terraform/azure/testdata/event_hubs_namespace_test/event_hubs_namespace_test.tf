@@ -19,6 +19,18 @@ resource "azurerm_eventhub_namespace" "standard" {
   }
 }
 
+resource "azurerm_eventhub_namespace" "standard_auto_inflate" {
+  name                = "acceptanceTestEventHubNamespace"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "Standard"
+  auto_inflate_enabled = true
+
+  tags = {
+    environment = "Production"
+  }
+}
+
 resource "azurerm_eventhub_namespace" "basic" {
   name                = "acceptanceTestEventHubNamespace"
   location            = azurerm_resource_group.example.location
