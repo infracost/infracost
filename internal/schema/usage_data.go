@@ -8,6 +8,26 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+type UsageVariableType int
+
+const (
+	Int64 UsageVariableType = iota
+	String
+)
+
+// type UsageDataValidatorFuncType = func(value interface{}) error
+
+type UsageSchemaItem struct {
+	Key          string
+	DefaultValue interface{}
+	ValueType    UsageVariableType
+
+	// These aren't used yet and I'm not entirely sure how they fit in, but they were part of the discussion about usage schema.
+	// ValidatorFunc UsageDataValidatorFuncType
+	// SubUsageData  *UsageSchemaItem
+	// Description   string
+}
+
 type UsageData struct {
 	Address    string
 	Attributes map[string]gjson.Result
@@ -28,6 +48,15 @@ func (u *UsageData) Get(key string) gjson.Result {
 	}
 
 	return u.Attributes[key]
+}
+
+func (u *UsageData) GetInt(key string) *int64 {
+	if u.Get(key).Type != gjson.Null {
+		val := u.Get(key).Int()
+		return &val
+	}
+
+	return nil
 }
 
 func convertArrayKeyToWildcard(key string) string {
