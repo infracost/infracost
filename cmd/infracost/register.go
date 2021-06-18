@@ -28,19 +28,41 @@ func registerCmd(cfg *config.Config) *cobra.Command {
 		Short: "Register for a free Infracost API key",
 		Long:  "Register for a free Infracost API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("Please enter your name and email address to get an API key.")
-			fmt.Println("See our FAQ (https://www.infracost.io/docs/faq) for more details.")
-
-			name, err := promptForName()
-			if err != nil {
-				// user cancelled
-				return nil
+			
+			cmd.Flags().String("name", "", "User Name.")
+			cmd.Flags().String("email", "", "User Email address.")
+			
+			hasName := cmd.Flags().Changed("name")
+			hasEmail := cmd.Flags().Changed("email")
+			
+			if !hasName {
+				fmt.Println("Please enter your name to get an API key.")
+				fmt.Println("See our FAQ (https://www.infracost.io/docs/faq) for more details.")
+				name, err := promptForName()
+				if err != nil {
+					// user cancelled
+					return nil
+				}
+			} else {
+				name := hasName
+				if name == "" {
+					return errors.New("Please valid name")
+				}
 			}
-
-			email, err := promptForEmail()
-			if err != nil {
-				// user cancelled
-				return nil
+			
+			if !hasEmail {
+				fmt.Println("Please enter your email address to get an API key.")
+				fmt.Println("See our FAQ (https://www.infracost.io/docs/faq) for more details.")
+				email, err := promptForEmail()
+				if err != nil {
+					// user cancelled
+					return nil
+				}
+			} else {
+				email := hasEmail
+				if email == "" {
+					return errors.New("Please vaild email")
+				}
 			}
 
 			r, err := createAPIKey(cfg.DashboardAPIEndpoint, name, email)
