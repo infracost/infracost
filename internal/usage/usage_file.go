@@ -61,8 +61,8 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 		resourceName := resource.Name
 		resourceUSchema := resource.UsageSchema
 		if resource.UsageSchema == nil {
-			// There is not explicitly defined UsageSchema for this resource.  Use the old way and create one from the
-			// usage example.
+			// There is no explicitly defined UsageSchema for this resource.  Use the old way and create one from
+			// infracost-usage-example.yml.
 			resourceTypeNames := strings.Split(resourceName, ".")
 			if len(resourceTypeNames) < 2 {
 				// It's a resource with no name
