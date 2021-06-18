@@ -23,16 +23,9 @@ type UsageFile struct { // nolint:golint
 	ResourceUsage map[string]interface{} `yaml:"resource_usage"`
 }
 
-type VariableType int
-
-const (
-	Int64 VariableType = iota
-	String
-)
-
 type SchemaItem struct {
 	Key          string
-	ValueType    VariableType
+	ValueType    schema.UsageVariableType
 	DefaultValue interface{}
 }
 
@@ -66,17 +59,32 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 	syncedResourceUsage := make(map[string]interface{})
 	for _, resource := range resources {
 		resourceName := resource.Name
-		resourceTypeNames := strings.Split(resourceName, ".")
-		if len(resourceTypeNames) < 2 {
-			// It's a resource with no name
-			continue
+		resourceUSchema := resource.UsageSchema
+		if resource.UsageSchema == nil {
+			// There is not explicitly defined UsageSchema for this resource.  Use the old way and create one from the
+			// usage example.
+			resourceTypeNames := strings.Split(resourceName, ".")
+			if len(resourceTypeNames) < 2 {
+				// It's a resource with no name
+				continue
+			}
+			// This handles module names appearing in the resourceName too
+			resourceTypeName := resourceTypeNames[len(resourceTypeNames)-2]
+			schemaItems, ok := usageSchema[resourceTypeName]
+			if !ok {
+				continue
+			}
+
+			resourceUSchema = make([]*schema.UsageSchemaItem, 0, len(schemaItems))
+			for _, s := range schemaItems {
+				resourceUSchema = append(resourceUSchema, &schema.UsageSchemaItem{
+					Key:          s.Key,
+					DefaultValue: s.DefaultValue,
+					ValueType:    s.ValueType,
+				})
+			}
 		}
-		// This handles module names appearing in the resourceName too
-		resourceTypeName := resourceTypeNames[len(resourceTypeNames)-2]
-		resourceUSchema, ok := usageSchema[resourceTypeName]
-		if !ok {
-			continue
-		}
+
 		resourceUsage := make(map[string]interface{})
 		for _, usageSchemaItem := range resourceUSchema {
 			usageKey := usageSchemaItem.Key
@@ -85,9 +93,9 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 			usageValue = usageSchemaItem.DefaultValue
 			if existingUsage, ok := existingUsageData[resourceName]; ok {
 				switch usageValueType {
-				case Int64:
+				case schema.Int64:
 					usageValue = existingUsage.Get(usageKey).Int()
-				case String:
+				case schema.String:
 					usageValue = existingUsage.Get(usageKey).String()
 				}
 			}
@@ -112,11 +120,11 @@ func loadUsageSchema() (map[string][]*SchemaItem, error) {
 		usageSchema[resourceTypeName] = make([]*SchemaItem, 0)
 		for usageKeyName, usageRawResult := range resUsageData.Attributes {
 			var defaultValue interface{}
-			usageValueType := Int64
+			usageValueType := schema.Int64
 			defaultValue = 0
 			usageRawValue := usageRawResult.Value()
 			if _, ok := usageRawValue.(string); ok {
-				usageValueType = String
+				usageValueType = schema.String
 				defaultValue = usageRawResult.String()
 			}
 			usageSchema[resourceTypeName] = append(usageSchema[resourceTypeName], &SchemaItem{
