@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 )
@@ -16,9 +17,10 @@ func GetAzureRMEventHubsNamespaceRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var events *decimal.Decimal
+	var events, retention *decimal.Decimal
 	var capacity int64
 	sku := "Basic"
+	meterName := "Throughput Unit"
 	region := lookupRegion(d, []string{})
 
 	if d.Get("sku").Type != gjson.Null {
@@ -27,16 +29,38 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	if d.Get("capacity").Type != gjson.Null {
 		capacity = d.Get("capacity").Int()
 	}
+	if d.Get("dedicated_cluster_id").Type != gjson.Null {
+		sku = "Dedicated"
+		meterName = "Capacity Unit"
+	}
 	costComponents := make([]*schema.CostComponent, 0)
+
 	if u != nil && u.Get("monthly_ingress_events").Type != gjson.Null {
 		events = decimalPtr(decimal.NewFromInt(u.Get("monthly_ingress_events").Int()))
 	}
-	costComponents = append(costComponents, eventHubsCostComponent("Ingress events", region, sku, events))
 
-	costComponents = append(costComponents, eventHubsThroughPutCostComponent("Throughput", region, sku, capacity))
+	costComponents = append(costComponents, eventHubsThroughPutCostComponent("Throughput", region, sku, meterName, capacity))
 
+	if sku == "Basic" || sku == "Standard" {
+		costComponents = append(costComponents, eventHubsCostComponent("Ingress events", region, sku, events))
+	}
 	if sku == "Standard" {
 		costComponents = append(costComponents, eventHubsCaptureCostComponent("Capture", region, sku))
+	}
+
+	if sku == "Dedicated" {
+
+		if u != nil && u.Get("extended_retention_storage_gb").Type != gjson.Null {
+			retentionGB := []int{1000}
+			retention = decimalPtr(decimal.NewFromInt(u.Get("extended_retention_storage_gb").Int()))
+			retentionQuantites := usage.CalculateTierBuckets(*retention, retentionGB)
+			if retentionQuantites[1].GreaterThanOrEqual(decimal.NewFromInt(1)) {
+				costComponents = append(costComponents, eventHubsExtensionRetentionCostComponent("Extended retention", region, sku, &retentionQuantites[1]))
+			}
+		} else {
+			costComponents = append(costComponents, eventHubsExtensionRetentionCostComponent("Extended retention", region, sku, retention))
+		}
+
 	}
 
 	return &schema.Resource{
@@ -70,13 +94,13 @@ func eventHubsCostComponent(name, location, sku string, quantity *decimal.Decima
 	}
 }
 
-func eventHubsThroughPutCostComponent(name, location, sku string, capacity int64) *schema.CostComponent {
-
+func eventHubsThroughPutCostComponent(name, location, sku, meterName string, capacity int64) *schema.CostComponent {
+	meterName = fmt.Sprintf("%s %s", sku, meterName)
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("%s (%v)", name, capacity),
-		Unit:            "units",
-		UnitMultiplier:  schema.HourToMonthUnitMultiplier,
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
+		Name:           fmt.Sprintf("%s (%v)", name, capacity),
+		Unit:           "units",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		//MonthlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
 			Region:     strPtr(location),
@@ -84,7 +108,7 @@ func eventHubsThroughPutCostComponent(name, location, sku string, capacity int64
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Event Hubs")},
 				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("%s/i", sku))},
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("%s/i Throughput Unit", sku))},
+				{Key: "meterName", Value: strPtr(meterName)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -108,6 +132,29 @@ func eventHubsCaptureCostComponent(name, location, sku string) *schema.CostCompo
 				{Key: "productName", Value: strPtr("Event Hubs")},
 				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("%s/i", sku))},
 				{Key: "meterName", Value: strPtr("Capture")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	}
+}
+
+func eventHubsExtensionRetentionCostComponent(name, location, sku string, retentionQuantites *decimal.Decimal) *schema.CostComponent {
+
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "GB",
+		UnitMultiplier:  1,
+		MonthlyQuantity: retentionQuantites,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("azure"),
+			Region:     strPtr(location),
+			Service:    strPtr("Event Hubs"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", Value: strPtr("Event Hubs")},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("%s/i", sku))},
+				{Key: "meterName", Value: strPtr("Extended Retention")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

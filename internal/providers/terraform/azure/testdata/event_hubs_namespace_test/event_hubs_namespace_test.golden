@@ -2,28 +2,36 @@
  Name                                                  Monthly Qty  Unit                  Monthly Cost 
                                                                                                        
  azurerm_eventhub_namespace.basic                                                                      
- ├─ Ingress events (Basic)                                      10  1M events                    $0.15 
- └─ Throughput (1)                                          0.0013  units                        $0.02 
+ ├─ Throughput (1)                                Monthly cost depends on usage: $10.95 per units      
+ └─ Ingress events (Basic)                                      10  1M events                    $0.15 
                                                                                                        
  azurerm_eventhub_namespace.basicwithoutusage                                                          
- ├─ Ingress events (Basic)                        Monthly cost depends on usage: $0.015 per 1M events  
- └─ Throughput (1)                                          0.0013  units                        $0.02 
+ ├─ Throughput (1)                                Monthly cost depends on usage: $10.95 per units      
+ └─ Ingress events (Basic)                        Monthly cost depends on usage: $0.015 per 1M events  
                                                                                                        
  azurerm_eventhub_namespace.capacity                                                                   
+ ├─ Throughput (10)                               Monthly cost depends on usage: $21.90 per units      
  ├─ Ingress events (Standard)                     Monthly cost depends on usage: $0.015 per 1M events  
- ├─ Throughput (10)                                         0.0136  units                        $0.15 
  └─ Capture                                                      1  hour                         $0.10 
                                                                                                        
+ azurerm_eventhub_namespace.dedicated                                                                  
+ ├─ Throughput (1)                                Monthly cost depends on usage: $4,999.77 per units   
+ └─ Extended retention                            Monthly cost depends on usage: $0.10 per GB          
+                                                                                                       
+ azurerm_eventhub_namespace.dedicated_retention                                                        
+ ├─ Throughput (1)                                Monthly cost depends on usage: $4,999.77 per units   
+ └─ Extended retention                                           1  GB                           $0.10 
+                                                                                                       
  azurerm_eventhub_namespace.standard                                                                   
+ ├─ Throughput (1)                                Monthly cost depends on usage: $21.90 per units      
  ├─ Ingress events (Standard)                                  100  1M events                    $1.50 
- ├─ Throughput (1)                                          0.0013  units                        $0.02 
  └─ Capture                                                      1  hour                         $0.10 
                                                                                                        
  azurerm_eventhub_namespace.standardwithoutusage                                                       
+ ├─ Throughput (1)                                Monthly cost depends on usage: $21.90 per units      
  ├─ Ingress events (Standard)                     Monthly cost depends on usage: $0.015 per 1M events  
- ├─ Throughput (1)                                          0.0013  units                        $0.02 
  └─ Capture                                                      1  hour                         $0.10 
                                                                                                        
- OVERALL TOTAL                                                                                   $2.16 
+ OVERALL TOTAL                                                                                   $2.05 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

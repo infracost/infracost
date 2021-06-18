@@ -5,3 +5,6 @@ resource_usage:
 
   azurerm_eventhub_namespace.basic:
     monthly_ingress_events: 10000000
+
+  azurerm_eventhub_namespace.dedicated_retention:
+    extended_retention_storage_gb: 1001
