@@ -161,12 +161,12 @@ var FreeResources []string = []string{
 
 	// Azure Event Hub
 	"azurerm_eventhub",
-    "azurerm_eventhub_authorization_rule",
-    "azurerm_eventhub_cluster",
-    "azurerm_eventhub_consumer_group",
-    "azurerm_eventhub_namespace_authorization_rule",
-    "azurerm_eventhub_namespace_customer_managed_key",
-    "azurerm_eventhub_namespace_disaster_recovery_config",
+	"azurerm_eventhub_authorization_rule",
+	"azurerm_eventhub_cluster",
+	"azurerm_eventhub_consumer_group",
+	"azurerm_eventhub_namespace_authorization_rule",
+	"azurerm_eventhub_namespace_customer_managed_key",
+	"azurerm_eventhub_namespace_disaster_recovery_config",
 
 	// Azure Firewall
 	"azurerm_firewall_application_rule_collection",
