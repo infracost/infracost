@@ -47,9 +47,9 @@ resource_usage:
   aws_autoscaling_group.my_asg:
     instances: 15 # Number of instances in the autoscaling group.
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
-    reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
-    reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
-    reserved_instance_payment_option: no_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
+    reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
+    reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: no_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
     # Only applicable when T2 credit_specification is set to unlimited or T3 & T4 instance types are used within a launch template,  or T3 & T4 instance types are used in a launch configuration.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
     vcpu_count: 2 # Number of the vCPUs for the instance type.
@@ -147,9 +147,9 @@ resource_usage:
 
   aws_eks_node_group.my_instance:
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
-    reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
-    reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
-    reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
+    reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
+    reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
     # Only applicable for T3 & T4 instance types or if you specify a t2 instance within a launch template.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
     vcpu_count: 2 # Number of the vCPUs for the instance type.
@@ -162,9 +162,9 @@ resource_usage:
 
   aws_instance.my_instance:
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
-    reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
-    reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
-    reserved_instance_payment_option: all_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
+    reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
+    reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: all_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
     # Can be used with T2 / T3 & T4 Instance types. T2 requires credit_specification to be unlimited.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
     vcpu_count: 2 # Number of the vCPUs for the instance type.
@@ -223,7 +223,7 @@ resource_usage:
     backup_storage_gb: 1000000
 
   aws_route53_health_check.my_health_check:
-    endpoint_type: aws # Type of health check endpoint to query, can be: either aws or non_aws.
+    endpoint_type: aws # Type of health check endpoint to query, can be: aws, non_aws.
 
   aws_route53_record.my_record:
     monthly_standard_queries: 1100000000      # Monthly number of Standard queries.
@@ -702,6 +702,12 @@ resource_usage:
     
   azurerm_dns_txt_record.my_txt_record:
     monthly_queries: 11500000000  # Monthly number of DNS queries
+
+  azurerm_eventhub_namespace.my_event_hub:
+    monthly_ingress_events: 100000000 # Monthly number of ingress events, only applicable for Basic and Standard namespaces.
+    retention_storage_gb: 10000       # Total data stored for retention in GB, used to calculate Extended Retention costs, only applicable for Dedicated namespaces.
+    throughput_or_capacity_units: 10  # Number of Throughput Units (for Basic and Standard) and Capacity units (for Dedicated) namespaces.
+    capture_enabled: false            # Defines if capture is enabled for the Event Hub Standard namespaces, can be: true, false.
 
   azurerm_kubernetes_cluster.my_cluster:
     default_node_pool:

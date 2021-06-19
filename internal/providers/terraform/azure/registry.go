@@ -40,6 +40,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMDNStxtRecordRegistryItem(),
 	GetAzureRMDNSPrivateZoneRegistryItem(),
 	GetAzureRMDNSZoneRegistryItem(),
+	GetAzureRMEventHubsNamespaceRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMHDInsightHadoopClusterRegistryItem(),
 	GetAzureRMHDInsightHBaseClusterRegistryItem(),
@@ -159,6 +160,15 @@ var FreeResources []string = []string{
 
 	// Azure DNS
 	"azurerm_private_dns_zone_virtual_network_link",
+
+	// Azure Event Hub
+	"azurerm_eventhub",
+	"azurerm_eventhub_authorization_rule",
+	"azurerm_eventhub_cluster",
+	"azurerm_eventhub_consumer_group",
+	"azurerm_eventhub_namespace_authorization_rule",
+	"azurerm_eventhub_namespace_customer_managed_key",
+	"azurerm_eventhub_namespace_disaster_recovery_config",
 
 	// Azure Firewall
 	"azurerm_firewall_application_rule_collection",
