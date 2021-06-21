@@ -48,10 +48,10 @@ func NewKenesisFirehoseDeliveryStream(d *schema.ResourceData, u *schema.UsageDat
 	if d.Get("elasticsearch_configuration").Type != gjson.Null {
 		elasticsearchConfiguration := d.Get("elasticsearch_configuration")
 		if elasticsearchConfiguration.Get("0.vpc_config").Type != gjson.Null {
-			costComponents = append(costComponents, kenesisFirehosVPCCostComponent("VPC data", region, "VpcBandwidth", monthlyDataIngestedGb))
+			costComponents = append(costComponents, kenesisFirehosVPCCostComponent(region, monthlyDataIngestedGb))
 			vpcConfigs := elasticsearchConfiguration.Get("0.vpc_config")
 			zones := decimalPtr(decimal.NewFromInt(int64(len(vpcConfigs.Get("0.subnet_ids").Array()))))
-			costComponents = append(costComponents, kenesisFirehosVPCAZCostComponent("VPC AZ deilvery", region, "RunVpcInstance", zones))
+			costComponents = append(costComponents, kenesisFirehosVPCAZCostComponent(region, zones))
 		}
 	}
 
@@ -99,9 +99,9 @@ func kenesisFirehosConversationCostComponent(region string, quantity *decimal.De
 		},
 	}
 }
-func kenesisFirehosVPCCostComponent(name, region, operation string, quantity *decimal.Decimal) *schema.CostComponent {
+func kenesisFirehosVPCCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            name,
+		Name:            "VPC data",
 		Unit:            "GB",
 		UnitMultiplier:  1,
 		MonthlyQuantity: quantity,
@@ -111,14 +111,14 @@ func kenesisFirehosVPCCostComponent(name, region, operation string, quantity *de
 			Service:       strPtr("AmazonKinesisFirehose"),
 			ProductFamily: strPtr("Kinesis Firehose"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/%s/", operation))},
+				{Key: "operation", Value: strPtr("VpcBandwidth")},
 			},
 		},
 	}
 }
-func kenesisFirehosVPCAZCostComponent(name, region, operation string, quantity *decimal.Decimal) *schema.CostComponent {
+func kenesisFirehosVPCAZCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           name,
+		Name:           "VPC AZ deilvery",
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: quantity,
@@ -128,7 +128,7 @@ func kenesisFirehosVPCAZCostComponent(name, region, operation string, quantity *
 			Service:       strPtr("AmazonKinesisFirehose"),
 			ProductFamily: strPtr("Kinesis Firehose"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/%s/", operation))},
+				{Key: "operation", Value: strPtr("RunVpcInstance")},
 			},
 		},
 	}
