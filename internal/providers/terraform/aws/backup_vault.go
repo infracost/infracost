@@ -12,6 +12,7 @@ func GetBackupVaultRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_backup_vault",
 		RFunc: NewBackupVault,
+		Notes: []string{"AWS Storage Gateway Volume Backup prices could not be found in the AWS pricing data."},
 	}
 }
 
@@ -41,7 +42,6 @@ func NewBackupVault(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		{ref: "monthly_rds_snapshot_gb", name: "RDS snapshot", unit: "GB", usageType: "RDS:ChargedBackupUsage", service: "AmazonRDS", family: "Storage Snapshot"},
 		{ref: "monthly_dynamodb_backup_gb", name: "DynamoDB backup", unit: "GB", usageType: "TimedBackupStorage-ByteHrs", service: "AmazonDynamoDB", family: "Amazon DynamoDB On-Demand Backup Storage"},
 		{ref: "monthly_dynamodb_restore_gb", name: "DynamoDB restore", unit: "GB", usageType: "RestoreDataSize-Bytes", service: "AmazonDynamoDB", family: "Amazon DynamoDB Restore Data Size"},
-		//	{ref: "monthly_storage_gateway_backup_gb", name: "Storage gateway backup", unit: "GB", usageType: "", service: "", family: ""},
 	}
 
 	for _, d := range data {
