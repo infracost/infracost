@@ -93,6 +93,8 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 			usageValue = usageSchemaItem.DefaultValue
 			if existingUsage, ok := existingUsageData[resourceName]; ok {
 				switch usageValueType {
+				case schema.Float64:
+					usageValue = existingUsage.Get(usageKey).Float()
 				case schema.Int64:
 					usageValue = existingUsage.Get(usageKey).Int()
 				case schema.String:

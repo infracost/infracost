@@ -13,6 +13,7 @@ type UsageVariableType int
 const (
 	Int64 UsageVariableType = iota
 	String
+	Float64
 )
 
 // type UsageDataValidatorFuncType = func(value interface{}) error
@@ -48,6 +49,15 @@ func (u *UsageData) Get(key string) gjson.Result {
 	}
 
 	return u.Attributes[key]
+}
+
+func (u *UsageData) GetFloat(key string) *float64 {
+	if u.Get(key).Type != gjson.Null {
+		val := u.Get(key).Float()
+		return &val
+	}
+
+	return nil
 }
 
 func (u *UsageData) GetInt(key string) *int64 {
