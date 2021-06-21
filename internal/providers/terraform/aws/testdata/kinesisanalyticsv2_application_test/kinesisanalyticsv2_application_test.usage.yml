@@ -1,0 +1,9 @@
+version: 0.1
+resource_usage:
+  aws_kinesisanalyticsv2_application.flink:
+    kinesis_processing_units: 10
+    durable_application_backup_gb: 100
+
+  aws_kinesisanalyticsv2_application.notFlink:
+    kinesis_processing_units: 10
+    durable_application_backup_gb: 100
