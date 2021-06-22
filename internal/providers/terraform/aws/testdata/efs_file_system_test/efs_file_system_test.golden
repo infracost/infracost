@@ -1,22 +1,21 @@
 
- Name                                     Monthly Qty  Unit            Monthly Cost 
-                                                                                    
- aws_efs_file_system.ia_storage                                                     
- ├─ Storage (standard)                            230  GB                    $69.00 
- ├─ Storage (infrequent access)                   100  GB                     $2.50 
- ├─ Read requests (infrequent access)              50  GB                     $0.50 
- └─ Write requests (infrequent access)            100  GB                     $1.00 
-                                                                                    
- aws_efs_file_system.no_usage                                                       
- └─ Storage (standard)                  Monthly cost depends on usage: $0.30 per GB 
-                                                                                    
- aws_efs_file_system.provisioned                                                    
- ├─ Storage (standard)                            230  GB                    $69.00 
- └─ Provisioned throughput                       88.5  MBps                 $531.00 
-                                                                                    
- aws_efs_file_system.standard_storage                                               
- └─ Storage (standard)                            230  GB                    $69.00 
-                                                                                    
- OVERALL TOTAL                                                              $742.00 
+ Name                                        Monthly Qty  Unit            Monthly Cost 
+                                                                                       
+ aws_efs_file_system.no_usage                                                          
+ └─ Storage (one zone)                     Monthly cost depends on usage: $0.16 per GB 
+                                                                                       
+ aws_efs_file_system.oneZone                                                           
+ ├─ Storage (one zone)                               230  GB                    $36.80 
+ ├─ Storage (one zone, infrequent access)            230  GB                     $3.06 
+ ├─ Read requests (infrequent access)                 50  GB                     $0.50 
+ └─ Write requests (infrequent access)               100  GB                     $1.00 
+                                                                                       
+ aws_efs_file_system.provisioned                                                       
+ └─ Provisioned throughput                          88.5  MBps                 $531.00 
+                                                                                       
+ aws_efs_file_system.standard_storage                                                  
+ └─ Storage (standard)                               230  GB                    $69.00 
+                                                                                       
+ OVERALL TOTAL                                                                 $641.36 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
