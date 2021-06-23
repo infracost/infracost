@@ -8,17 +8,17 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetKenesisDataAnalyticsRegistryItem() *schema.RegistryItem {
+func GetKinesisDataAnalyticsRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_kinesisanalyticsv2_application",
-		RFunc: NewKenesisDataAnalytics,
+		RFunc: NewKinesisDataAnalytics,
 		Notes: []string{
 			"Terraform doesn’t currently support Analytics Studio, but when it does they will require 2 orchestration KPUs.",
 		},
 	}
 }
 
-func NewKenesisDataAnalytics(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKinesisDataAnalytics(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	costComponents := make([]*schema.CostComponent, 0)
 	var kinesisProcessingUnits, durableApplicationBackupGb *decimal.Decimal
@@ -27,7 +27,7 @@ func NewKenesisDataAnalytics(d *schema.ResourceData, u *schema.UsageData) *schem
 		kinesisProcessingUnits = decimalPtr(decimal.NewFromInt(u.Get("kinesis_processing_units").Int()))
 	}
 
-	costComponents = append(costComponents, kenesisProcessingsCostComponent("Processing (stream)", region, kinesisProcessingUnits))
+	costComponents = append(costComponents, kinesisProcessingsCostComponent("Processing (stream)", region, kinesisProcessingUnits))
 
 	if u != nil && u.Get("durable_application_backup_gb").Type != gjson.Null {
 		durableApplicationBackupGb = decimalPtr(decimal.NewFromInt(u.Get("durable_application_backup_gb").Int()))
@@ -35,9 +35,9 @@ func NewKenesisDataAnalytics(d *schema.ResourceData, u *schema.UsageData) *schem
 	runtimeEnvironment := d.Get("runtime_environment").String()
 
 	if strings.HasPrefix(strings.ToLower(runtimeEnvironment), "flink") {
-		costComponents = append(costComponents, kenesisProcessingsCostComponent("Processing (orchestration)", region, decimalPtr(decimal.NewFromInt(1))))
-		costComponents = append(costComponents, kenesisRunningStorageCostComponent(region, kinesisProcessingUnits))
-		costComponents = append(costComponents, kenesisBackupCostComponent(region, durableApplicationBackupGb))
+		costComponents = append(costComponents, kinesisProcessingsCostComponent("Processing (orchestration)", region, decimalPtr(decimal.NewFromInt(1))))
+		costComponents = append(costComponents, kinesisRunningStorageCostComponent(region, kinesisProcessingUnits))
+		costComponents = append(costComponents, kinesisBackupCostComponent(region, durableApplicationBackupGb))
 	}
 	return &schema.Resource{
 		Name:           d.Address,
@@ -45,12 +45,12 @@ func NewKenesisDataAnalytics(d *schema.ResourceData, u *schema.UsageData) *schem
 	}
 }
 
-func kenesisProcessingsCostComponent(name, region string, quantity *decimal.Decimal) *schema.CostComponent {
+func kinesisProcessingsCostComponent(name, region string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            name,
-		Unit:            "KPU",
-		UnitMultiplier:  1,
-		MonthlyQuantity: quantity,
+		Name:           name,
+		Unit:           "KPU",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),
@@ -62,7 +62,7 @@ func kenesisProcessingsCostComponent(name, region string, quantity *decimal.Deci
 		},
 	}
 }
-func kenesisRunningStorageCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
+func kinesisRunningStorageCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
 	if quantity != nil {
 		quantity = decimalPtr(quantity.Mul(decimal.NewFromInt(int64(50))))
 	}
@@ -82,7 +82,7 @@ func kenesisRunningStorageCostComponent(region string, quantity *decimal.Decimal
 		},
 	}
 }
-func kenesisBackupCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
+func kinesisBackupCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Backup",
 		Unit:            "GB",

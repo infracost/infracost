@@ -179,6 +179,9 @@ resource_usage:
   aws_kinesis_analytics_application.my_kinesis:
     kinesis_processing_units: 10 # Number of kinesis processing units.
 
+  aws_kinesisanalyticsv2_application_snapshot.my_kinesis:
+    durable_application_backup_gb: 100
+
   aws_lambda_function.my_function:
     monthly_requests: 100000 # Monthly requests to the Lambda function.
     request_duration_ms: 500 # Average duration of each request in milliseconds.
