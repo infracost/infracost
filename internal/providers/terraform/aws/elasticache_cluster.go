@@ -67,7 +67,7 @@ func newElasticacheResource(d *schema.ResourceData, u *schema.UsageData, nodeTyp
 		},
 	}
 
-	if cacheEngine == "redis" && snapShotRetentionLimit.GreaterThan(decimal.NewFromInt(1)) {
+	if strings.ToLower(cacheEngine) == "redis" && snapShotRetentionLimit.GreaterThan(decimal.NewFromInt(1)) {
 		backupRetention = snapShotRetentionLimit.Sub(decimal.NewFromInt(1))
 		var monthlyBackupStorageTotal *decimal.Decimal
 

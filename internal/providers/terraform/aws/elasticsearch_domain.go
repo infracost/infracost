@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -110,7 +111,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 			},
 		})
 
-		if ebsType == "io1" {
+		if strings.ToLower(ebsType) == "io1" {
 			iopsVal := decimal.NewFromInt(1)
 			if d.Get("ebs_options.0.iops").Exists() {
 				iopsVal = decimal.NewFromFloat(d.Get("ebs_options.0.iops").Float())

@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 
@@ -34,7 +35,7 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 
 	// Gateway endpoints don't have a cost associated with them
-	if vpcEndpointType == "Gateway" {
+	if strings.ToLower(vpcEndpointType) == "gateway" {
 		return &schema.Resource{
 			NoPrice:   true,
 			IsSkipped: true,

@@ -4,6 +4,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+	"strings"
 )
 
 func GetAPIGatewayv2ApiRegistryItem() *schema.RegistryItem {
@@ -18,11 +19,11 @@ func NewAPIGatewayv2Api(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 	protocolType := d.Get("protocol_type").String()
 
-	if protocolType == "WEBSOCKET" {
+	if strings.ToLower(protocolType) == "websocket" {
 		costComponents = websocketAPICostComponent(d, u)
 	}
 
-	if protocolType == "HTTP" {
+	if strings.ToLower(protocolType) == "http" {
 		costComponents = httpAPICostComponent(d, u)
 	}
 
