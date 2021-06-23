@@ -9,14 +9,14 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetKenesisFirehoseDeliveryStreamRegistryItem() *schema.RegistryItem {
+func GetKinesisFirehoseDeliveryStreamRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_kinesis_firehose_delivery_stream",
-		RFunc: NewKenesisFirehoseDeliveryStream,
+		RFunc: NewKinesisFirehoseDeliveryStream,
 	}
 }
 
-func NewKenesisFirehoseDeliveryStream(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKinesisFirehoseDeliveryStream(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	costComponents := make([]*schema.CostComponent, 0)
 	var monthlyDataIngestedGb *decimal.Decimal
@@ -28,30 +28,30 @@ func NewKenesisFirehoseDeliveryStream(d *schema.ResourceData, u *schema.UsageDat
 		result = usage.CalculateTierBuckets(*monthlyDataIngestedGb, tierLimits)
 
 		if result[0].GreaterThan(decimal.Zero) {
-			costComponents = append(costComponents, kenesisFirehosCostComponent("first 500TB", region, "0", "512000", &result[0]))
+			costComponents = append(costComponents, kinesisFirehoseCostComponent("first 500TB", region, "0", "512000", &result[0]))
 		}
 		if result[1].GreaterThan(decimal.Zero) {
-			costComponents = append(costComponents, kenesisFirehosCostComponent("next 1.5PB", region, "512000", "2048000", &result[1]))
+			costComponents = append(costComponents, kinesisFirehoseCostComponent("next 1.5PB", region, "512000", "2048000", &result[1]))
 		}
 		if result[2].GreaterThan(decimal.Zero) {
-			costComponents = append(costComponents, kenesisFirehosCostComponent("next 3PB", region, "2048000", "Inf", &result[2]))
+			costComponents = append(costComponents, kinesisFirehoseCostComponent("next 3PB", region, "2048000", "Inf", &result[2]))
 		}
 	} else {
 		var unknown *decimal.Decimal
-		costComponents = append(costComponents, kenesisFirehosCostComponent("first 500TB", region, "0", "512000", unknown))
+		costComponents = append(costComponents, kinesisFirehoseCostComponent("first 500TB", region, "0", "512000", unknown))
 	}
 
 	if d.Get("extended_s3_configuration.0.data_format_conversion_configuration.0.enabled").Type != gjson.True {
-		costComponents = append(costComponents, kenesisFirehosConversationCostComponent(region, monthlyDataIngestedGb))
+		costComponents = append(costComponents, kinesisFirehoseConversionCostComponent(region, monthlyDataIngestedGb))
 	}
 
 	if d.Get("elasticsearch_configuration").Type != gjson.Null {
 		elasticsearchConfiguration := d.Get("elasticsearch_configuration")
 		if elasticsearchConfiguration.Get("0.vpc_config").Type != gjson.Null {
-			costComponents = append(costComponents, kenesisFirehosVPCCostComponent(region, monthlyDataIngestedGb))
+			costComponents = append(costComponents, kinesisFirehoseVPCCostComponent(region, monthlyDataIngestedGb))
 			vpcConfigs := elasticsearchConfiguration.Get("0.vpc_config")
 			zones := decimalPtr(decimal.NewFromInt(int64(len(vpcConfigs.Get("0.subnet_ids").Array()))))
-			costComponents = append(costComponents, kenesisFirehosVPCAZCostComponent(region, zones))
+			costComponents = append(costComponents, kinesisFirehoseVPCAZCostComponent(region, zones))
 		}
 	}
 
@@ -61,7 +61,7 @@ func NewKenesisFirehoseDeliveryStream(d *schema.ResourceData, u *schema.UsageDat
 	}
 }
 
-func kenesisFirehosCostComponent(tier, region, startUsageAmount, endUsageAmount string, quantity *decimal.Decimal) *schema.CostComponent {
+func kinesisFirehoseCostComponent(tier, region, startUsageAmount, endUsageAmount string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Data ingested (%s)", tier),
 		Unit:            "GB",
@@ -82,7 +82,7 @@ func kenesisFirehosCostComponent(tier, region, startUsageAmount, endUsageAmount 
 		},
 	}
 }
-func kenesisFirehosConversationCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
+func kinesisFirehoseConversionCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Format conversion",
 		Unit:            "GB",
@@ -99,7 +99,7 @@ func kenesisFirehosConversationCostComponent(region string, quantity *decimal.De
 		},
 	}
 }
-func kenesisFirehosVPCCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
+func kinesisFirehoseVPCCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "VPC data",
 		Unit:            "GB",
@@ -116,7 +116,7 @@ func kenesisFirehosVPCCostComponent(region string, quantity *decimal.Decimal) *s
 		},
 	}
 }
-func kenesisFirehosVPCAZCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
+func kinesisFirehoseVPCAZCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "VPC AZ deilvery",
 		Unit:           "hours",
