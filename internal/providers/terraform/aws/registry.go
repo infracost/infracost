@@ -49,6 +49,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetELBRegistryItem(),
 	GetFSXWindowsFSRegistryItem(),
 	GetInstanceRegistryItem(),
+	GetKinesisFirehoseDeliveryStreamRegistryItem(),
 	GetLambdaFunctionRegistryItem(),
 	GetLBRegistryItem(),
 	GetLightsailInstanceRegistryItem(),
