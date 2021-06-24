@@ -7,9 +7,6 @@
  ├─ Running storage                                        Monthly cost depends on usage: $0.12 per GB    
  └─ Backup                                                 Monthly cost depends on usage: $0.024 per GB   
                                                                                                           
- aws_kinesisanalyticsv2_application.sql                                                                   
- └─ Processing (stream)                                    Monthly cost depends on usage: $92.71 per KPU  
-                                                                                                          
  aws_kinesisanalyticsv2_application.withoutUsage                                                          
  ├─ Processing (stream)                                    Monthly cost depends on usage: $92.71 per KPU  
  ├─ Processing (orchestration)                                          1  KPU                     $92.71 
