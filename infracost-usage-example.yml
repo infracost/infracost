@@ -188,6 +188,7 @@ resource_usage:
 
   aws_kinesis_analytics_application.my_kinesis:
     kinesis_processing_units: 10 # Number of Kinesis processing units.
+    durable_application_backup_gb: 100 # Total amount of durable application backup in GB.
 
   aws_kinesisanalyticsv2_application.my_kinesis:
     kinesis_processing_units: 10 # Number of Kinesis processing units.
