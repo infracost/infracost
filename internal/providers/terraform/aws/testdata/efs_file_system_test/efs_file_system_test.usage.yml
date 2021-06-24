@@ -1,6 +1,9 @@
 version: 0.1
 resource_usage:
   aws_efs_file_system.standard:
+    infrequent_access_storage_gb: 100
+    monthly_infrequent_access_read_gb: 50
+    monthly_infrequent_access_write_gb: 100
     storage_gb: 230
   aws_efs_file_system.oneZone:
     storage_gb: 230

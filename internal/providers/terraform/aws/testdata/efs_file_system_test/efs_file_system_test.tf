@@ -10,7 +10,9 @@ provider "aws" {
 }
 
 resource "aws_efs_file_system" "standard" {
-  availability_zone_name = "Standard"
+   lifecycle_policy {
+    transition_to_ia = "AFTER_7_DAYS"
+  }
 }
 
 resource "aws_efs_file_system" "oneZone" {

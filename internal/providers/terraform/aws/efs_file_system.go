@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"strings"
+	"fmt"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -12,13 +12,11 @@ func GetEFSFileSystemRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_efs_file_system",
 		RFunc: NewEFSFileSystem,
-		Notes: []string{"In Terraform config the availability_zone_name field is required in this resource for correct results"},
 	}
 }
 
 func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
-	var availabilityZoneName string
 	costComponents := make([]*schema.CostComponent, 0)
 	var gbStorage, infrequentAccessGbStorage *decimal.Decimal
 
@@ -30,41 +28,9 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 	}
 
 	if d.Get("availability_zone_name").Type != gjson.Null {
-		availabilityZoneName = d.Get("availability_zone_name").String()
-		if strings.HasPrefix(strings.ToLower(availabilityZoneName), "standard") {
-			costComponents = append(costComponents, &schema.CostComponent{
-				Name:            "Storage (standard)",
-				Unit:            "GB",
-				UnitMultiplier:  1,
-				MonthlyQuantity: gbStorage,
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AmazonEFS"),
-					ProductFamily: strPtr("Storage"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr("/-TimedStorage-ByteHrs/")},
-					},
-				},
-			})
-		}
-		if strings.HasPrefix(strings.ToLower(availabilityZoneName), "one") {
-			costComponents = append(costComponents, &schema.CostComponent{
-				Name:            "Storage (one zone)",
-				Unit:            "GB",
-				UnitMultiplier:  1,
-				MonthlyQuantity: gbStorage,
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AmazonEFS"),
-					ProductFamily: strPtr("Storage"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr("/-TimedStorage-Z-ByteHrs/")},
-					},
-				},
-			})
-		}
+		costComponents = append(costComponents, StorageOneZoneCostComponent("Storage (one zone)", region, "-TimedStorage-Z-ByteHrs", gbStorage))
+	} else {
+		costComponents = append(costComponents, StorageStandardCostComponent("Storage (standard)", region, "-TimedStorage-ByteHrs", gbStorage))
 	}
 
 	if d.Get("provisioned_throughput_in_mibps").Exists() && d.Get("provisioned_throughput_in_mibps").Type != gjson.Null {
@@ -91,48 +57,19 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 	if len(d.Get("lifecycle_policy").Array()) > 0 {
 
 		var infrequentAccessReadGbRequests *decimal.Decimal
-		if u != nil && u.Get("monthly_infrequent_access_read_gb").Exists() {
+		if u != nil && u.Get("monthly_infrequent_access_read_gb").Type != gjson.Null {
 			infrequentAccessReadGbRequests = decimalPtr(decimal.NewFromFloat(u.Get("monthly_infrequent_access_read_gb").Float()))
 		}
 
 		var infrequentAccessWriteGbRequests *decimal.Decimal
-		if u != nil && u.Get("monthly_infrequent_access_write_gb").Exists() {
+		if u != nil && u.Get("monthly_infrequent_access_write_gb").Type != gjson.Null {
 			infrequentAccessWriteGbRequests = decimalPtr(decimal.NewFromFloat(u.Get("monthly_infrequent_access_write_gb").Float()))
 		}
 
-		if strings.HasPrefix(strings.ToLower(availabilityZoneName), "standard") {
-			costComponents = append(costComponents, &schema.CostComponent{
-				Name:            "Storage (standard, infrequent access)",
-				Unit:            "GB",
-				UnitMultiplier:  1,
-				MonthlyQuantity: infrequentAccessGbStorage,
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AmazonEFS"),
-					ProductFamily: strPtr("Storage"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr("/-IATimedStorage-ByteHrs/")},
-					},
-				},
-			})
-		}
-		if strings.HasPrefix(strings.ToLower(availabilityZoneName), "one") {
-			costComponents = append(costComponents, &schema.CostComponent{
-				Name:            "Storage (one zone, infrequent access)",
-				Unit:            "GB",
-				UnitMultiplier:  1,
-				MonthlyQuantity: gbStorage,
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AmazonEFS"),
-					ProductFamily: strPtr("Storage"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr("/IATimedStorage-Z-ByteHrs/")},
-					},
-				},
-			})
+		if d.Get("availability_zone_name").Type != gjson.Null {
+			costComponents = append(costComponents, StorageOneZoneCostComponent("Storage (one zone, infrequent access)", region, "IATimedStorage-Z-ByteHrs", infrequentAccessGbStorage))
+		} else {
+			costComponents = append(costComponents, StorageStandardCostComponent("Storage (standard, infrequent access)", region, "-IATimedStorage-ByteHrs", infrequentAccessGbStorage))
 		}
 
 		costComponents = append(costComponents, &schema.CostComponent{
@@ -187,4 +124,40 @@ func calculateProvisionedThroughput(gbStorage *decimal.Decimal, throughput decim
 	}
 
 	return &decimal.Zero
+}
+func StorageStandardCostComponent(name, region, usagetype string, quantity *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+
+		Name:            name,
+		Unit:            "GB",
+		UnitMultiplier:  1,
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonEFS"),
+			ProductFamily: strPtr("Storage"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
+			},
+		},
+	}
+}
+func StorageOneZoneCostComponent(name, region, usagetype string, quantity *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+
+		Name:            name,
+		Unit:            "GB",
+		UnitMultiplier:  1,
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonEFS"),
+			ProductFamily: strPtr("Storage"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
+			},
+		},
+	}
 }
