@@ -1,0 +1,15 @@
+version: 0.1
+resource_usage: 
+  aws_backup_vault.usage:
+    monthly_efs_warm_restore_gb: 10000
+    monthly_efs_cold_restore_gb: 10000
+    monthly_efs_warm_backup_gb: 10000
+    monthly_efs_cold_backup_gb: 10000
+    monthly_efs_item_restore_requests: 10000
+    monthly_ebs_snapshot_gb: 10000
+    monthly_rds_snapshot_gb: 10000
+    monthly_aurora_snapshot_gb: 10000
+    monthly_dynamodb_backup_gb: 10000
+    monthly_dynamodb_restore_gb: 10000
+    monthly_fsx_windows_backup_gb: 10000
+    monthly_fsx_lustre_backup_gb: 10000

@@ -54,6 +54,20 @@ resource_usage:
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
     vcpu_count: 2 # Number of the vCPUs for the instance type.
 
+  aws_backup_vault.usage:
+    monthly_efs_warm_restore_gb: 10000 # Monthly number of EFS warm restore in GB. 
+    monthly_efs_cold_restore_gb: 10000 # Monthly number of EFS cold restore in GB. 
+    monthly_efs_item_restore_requests: 10000 # Monthly number of EFS item-level restore requests. 
+    monthly_efs_warm_backup_gb: 10000 # Monthly number of EFS warm backups in GB. 
+    monthly_efs_cold_backup_gb: 10000 # Monthly number of EFS cold backups in GB. 
+    monthly_ebs_snapshot_gb: 10000 # Monthly number of EBS snapshots in GB.
+    monthly_rds_snapshot_gb: 10000 # Monthly number of RDS snapshots in GB.
+    monthly_aurora_snapshot_gb: 10000 # Monthly number of Aurora snapshots in GB.
+    monthly_dynamodb_backup_gb: 10000 # Monthly number of DynamoDB backups in GB.
+    monthly_dynamodb_restore_gb: 10000 # Monthly number of DynamoDB restore in GB.
+    monthly_fsx_windows_backup_gb: 10000 # Monthly number of FSX Windows backups in GB.
+    monthly_fsx_lustre_backup_gb: 10000 # Monthly number of FSX Lustre backups in GB.
+
   aws_cloudformation_stack.my_formation:
     monthly_handler_operations: 10000 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
     monthly_duration_secs: 0 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.  
@@ -172,15 +186,18 @@ resource_usage:
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000 # Total storage used for backups in GB.
 
-  aws_kinesisanalyticsv2_application.my_kinesis:
-    kinesis_processing_units: 10 # Number of kinesis processing units.
-    durable_application_backup_gb: 100 # Total number durable application backup in GB.
-
   aws_kinesis_analytics_application.my_kinesis:
-    kinesis_processing_units: 10 # Number of kinesis processing units.
+    kinesis_processing_units: 10 # Number of Kinesis processing units.
+
+  aws_kinesisanalyticsv2_application.my_kinesis:
+    kinesis_processing_units: 10 # Number of Kinesis processing units.
+    durable_application_backup_gb: 100 # Total amount of durable application backup in GB.
 
   aws_kinesisanalyticsv2_application_snapshot.my_kinesis:
-    durable_application_backup_gb: 100
+    durable_application_backup_gb: 100 # Total amount of durable application backups in GB.
+
+  aws_kinesis_firehose_delivery_stream.my_kinesis:
+    monthly_data_ingested_gb: 3000000 # Monthly data ingested by the Delivery Stream in GB.
 
   aws_lambda_function.my_function:
     monthly_requests: 100000 # Monthly requests to the Lambda function.
