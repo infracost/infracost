@@ -9,6 +9,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAutoscalingGroupRegistryItem(),
 	GetACMCertificate(),
 	GetACMPCACertificateAuthorityRegistryItem(),
+	GetBackupVaultRegistryItem(),
 	GetCloudFormationStackRegistryItem(),
 	GetCloudFormationStackSetRegistryItem(),
 	GetCloudfrontDistributionRegistryItem(),
@@ -51,6 +52,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetKinesisAnalyticsApplicationRegistryItem(),
 	GetKinesisDataAnalyticsRegistryItem(),
 	GetKinesisDataAnalyticsSnapshotRegistryItem(),
+	GetKinesisFirehoseDeliveryStreamRegistryItem(),
 	GetLambdaFunctionRegistryItem(),
 	GetLBRegistryItem(),
 	GetLightsailInstanceRegistryItem(),
@@ -128,6 +130,14 @@ var FreeResources []string = []string{
 	"aws_apigatewayv2_route_response",
 	"aws_apigatewayv2_stage",
 	"aws_apigatewayv2_vpc_link",
+
+	// AWS Backup
+	"aws_backup_global_settings",
+	"aws_backup_plan",
+	"aws_backup_region_settings",
+	"aws_backup_selection",
+	"aws_backup_vault_notifications",
+	"aws_backup_vault_policy",
 
 	// AWS DX Transit.
 	"aws_dx_bgp_peer",

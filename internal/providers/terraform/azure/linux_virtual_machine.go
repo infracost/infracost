@@ -65,7 +65,7 @@ func linuxVirtualMachineCostComponent(region string, instanceType string) *schem
 			Service:       strPtr("Virtual Machines"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", ValueRegex: strPtr("/.*(?<!Low Priority|Spot)$/i")},
+				{Key: "skuName", ValueRegex: strPtr("/^(?!.*(Low Priority|Spot)$).*$/i")},
 				{Key: "armSkuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", instanceType))},
 				{Key: "productName", ValueRegex: strPtr(productNameRe)},
 			},
