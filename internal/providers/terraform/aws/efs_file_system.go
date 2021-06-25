@@ -28,9 +28,9 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 	}
 
 	if d.Get("availability_zone_name").Type != gjson.Null {
-		costComponents = append(costComponents, StorageOneZoneCostComponent("Storage (one zone)", region, "-TimedStorage-Z-ByteHrs", gbStorage))
+		costComponents = append(costComponents, efsStorageCostComponent("Storage (one zone)", region, "-TimedStorage-Z-ByteHrs", gbStorage))
 	} else {
-		costComponents = append(costComponents, StorageStandardCostComponent("Storage (standard)", region, "-TimedStorage-ByteHrs", gbStorage))
+		costComponents = append(costComponents, efsStorageCostComponent("Storage (standard)", region, "-TimedStorage-ByteHrs", gbStorage))
 	}
 
 	if d.Get("provisioned_throughput_in_mibps").Exists() && d.Get("provisioned_throughput_in_mibps").Type != gjson.Null {
@@ -67,9 +67,9 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		}
 
 		if d.Get("availability_zone_name").Type != gjson.Null {
-			costComponents = append(costComponents, StorageOneZoneCostComponent("Storage (one zone, infrequent access)", region, "IATimedStorage-Z-ByteHrs", infrequentAccessGbStorage))
+			costComponents = append(costComponents, efsStorageCostComponent("Storage (one zone, infrequent access)", region, "IATimedStorage-Z-ByteHrs", infrequentAccessGbStorage))
 		} else {
-			costComponents = append(costComponents, StorageStandardCostComponent("Storage (standard, infrequent access)", region, "-IATimedStorage-ByteHrs", infrequentAccessGbStorage))
+			costComponents = append(costComponents, efsStorageCostComponent("Storage (standard, infrequent access)", region, "-IATimedStorage-ByteHrs", infrequentAccessGbStorage))
 		}
 
 		costComponents = append(costComponents, &schema.CostComponent{
@@ -125,25 +125,7 @@ func calculateProvisionedThroughput(gbStorage *decimal.Decimal, throughput decim
 
 	return &decimal.Zero
 }
-func StorageStandardCostComponent(name, region, usagetype string, quantity *decimal.Decimal) *schema.CostComponent {
-	return &schema.CostComponent{
-
-		Name:            name,
-		Unit:            "GB",
-		UnitMultiplier:  1,
-		MonthlyQuantity: quantity,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr("AmazonEFS"),
-			ProductFamily: strPtr("Storage"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
-			},
-		},
-	}
-}
-func StorageOneZoneCostComponent(name, region, usagetype string, quantity *decimal.Decimal) *schema.CostComponent {
+func efsStorageCostComponent(name, region, usagetype string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            name,
