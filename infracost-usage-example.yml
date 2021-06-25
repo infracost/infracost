@@ -186,6 +186,17 @@ resource_usage:
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000 # Total storage used for backups in GB.
 
+  aws_kinesis_analytics_application.my_kinesis:
+    kinesis_processing_units: 10 # Number of Kinesis processing units.
+    durable_application_backup_gb: 100 # Total amount of durable application backup in GB.
+
+  aws_kinesisanalyticsv2_application.my_kinesis:
+    kinesis_processing_units: 10 # Number of Kinesis processing units.
+    durable_application_backup_gb: 100 # Total amount of durable application backup in GB.
+
+  aws_kinesisanalyticsv2_application_snapshot.my_kinesis:
+    durable_application_backup_gb: 100 # Total amount of durable application backups in GB.
+
   aws_kinesis_firehose_delivery_stream.my_kinesis:
     monthly_data_ingested_gb: 3000000 # Monthly data ingested by the Delivery Stream in GB.
 

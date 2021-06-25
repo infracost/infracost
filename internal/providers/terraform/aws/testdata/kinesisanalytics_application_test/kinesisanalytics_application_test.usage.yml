@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+ aws_kinesis_analytics_application.withUsage:
+    kinesis_processing_units: 10
+
