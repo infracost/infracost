@@ -19,6 +19,7 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 			"launch_template.0.id",
 			"launch_template.0.name",
 			"mixed_instances_policy.0.launch_template.0.launch_template_specification.0.launch_template_id",
+			"launch_template",
 		},
 	}
 }
@@ -34,6 +35,23 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 
 	subResources := make([]*schema.Resource, 0)
+
+	// AWS Launch Template form terraform-aws-modules/eks/aws module
+	r := d.References("launch_template")
+	if r != nil {
+		onDemandCount, spotCount := desiredCapacity, decimal.Zero
+		if r[0].Get("instance_market_options.0.market_type").String() == "spot" {
+			onDemandCount = decimal.Zero
+			spotCount = desiredCapacity
+		}
+
+		lt := newLaunchTemplate(r[0].Address, r[0], u, region, onDemandCount, spotCount)
+		subResources = append(subResources, lt)
+		return &schema.Resource{
+			Name:         d.Address,
+			SubResources: subResources,
+		}
+	}
 
 	launchConfigurationRef := d.References("launch_configuration")
 	launchTemplateRefID := d.References("launch_template.0.id")

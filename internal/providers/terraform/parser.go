@@ -347,6 +347,12 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 		arnMap[arn] = append(arnMap[arn], d)
 	}
 
+	if m := conf.Get("module_calls.worker_groups_launch_template.source"); m.Type != gjson.Null {
+		if m.String() == "terraform-aws-modules/eks/aws" {
+			eksModuleLaunchTemplateCheck(resData)
+		}
+	}
+
 	for _, d := range resData {
 		var refAttrs []string
 
@@ -574,4 +580,29 @@ func gjsonEscape(s string) string {
 	s = strings.ReplaceAll(s, "?", `\?`)
 
 	return s
+}
+
+func eksModuleLaunchTemplateCheck(resData map[string]*schema.ResourceData) {
+	dr := []struct {
+		SourceNameSuffix string
+		DestNameSuffix   string
+		Attribute        string
+	}{
+		{
+			SourceNameSuffix: "aws_autoscaling_group.workers_launch_template[0]",
+			DestNameSuffix:   "aws_launch_template.workers_launch_template[0]",
+			Attribute:        "launch_template",
+		},
+	}
+
+	for _, d := range resData {
+		if strings.HasSuffix(d.Address, dr[0].SourceNameSuffix) {
+			for _, r := range resData {
+				if strings.HasSuffix(r.Address, dr[0].DestNameSuffix) {
+					d.AddReference(dr[0].Attribute, r)
+					return
+				}
+			}
+		}
+	}
 }
