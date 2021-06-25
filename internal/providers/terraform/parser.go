@@ -600,7 +600,6 @@ func eksModuleLaunchTemplateCheck(resData map[string]*schema.ResourceData) {
 			for _, r := range resData {
 				if strings.HasSuffix(r.Address, dr[0].DestNameSuffix) {
 					d.AddReference(dr[0].Attribute, r)
-					return
 				}
 			}
 		}
