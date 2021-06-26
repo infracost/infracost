@@ -187,18 +187,14 @@ func loadReferenceFile() (map[string]*schema.UsageData, error) {
 	return usageData, nil
 }
 
-func LoadFromFile(usageFilePath string, syncUsageFile bool) (map[string]*schema.UsageData, error) {
+func LoadFromFile(usageFilePath string, createIfNotExisting bool) (map[string]*schema.UsageData, error) {
 	usageData := make(map[string]*schema.UsageData)
 
 	if usageFilePath == "" {
-		if syncUsageFile {
-			log.Warn("Can't sync usage file as it's not specified")
-		}
-
 		return usageData, nil
 	}
 
-	if syncUsageFile {
+	if createIfNotExisting {
 		if _, err := os.Stat(usageFilePath); os.IsNotExist(err) {
 			log.Debug("Specified usage file does not exist. It will be created")
 			fileContent := yaml.MapSlice{
