@@ -13,6 +13,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
 	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
 	GetAzureRMAppServicePlanRegistryItem(),
+	GetAzureRMApplicationInsightsWebRegistryItem(),
+	GetAzureRMApplicationInsightsRegistryItem(),
 	GetAzureRMAutomationAccountRegistryItem(),
 	GetAzureRMAutomationDscConfigurationRegistryItem(),
 	GetAzureRMAutomationDscNodeconfigurationRegistryItem(),

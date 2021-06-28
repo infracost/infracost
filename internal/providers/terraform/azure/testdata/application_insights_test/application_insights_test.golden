@@ -1,0 +1,16 @@
+
+ Name                                           Monthly Qty  Unit            Monthly Cost 
+                                                                                          
+ azurerm_application_insights.non_usage                                                   
+ └─ Data ingested                             Monthly cost depends on usage: $2.30 per GB 
+                                                                                          
+ azurerm_application_insights.usage                                                       
+ └─ Data ingested                                     1,000  GB                 $2,300.00 
+                                                                                          
+ azurerm_application_insights.with_retention                                              
+ ├─ Data ingested                                     1,000  GB                 $2,300.00 
+ └─ Data retention (30 days)                         30,000  GB                 $3,000.00 
+                                                                                          
+ OVERALL TOTAL                                                                  $7,600.00 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

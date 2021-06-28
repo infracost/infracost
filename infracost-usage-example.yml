@@ -591,6 +591,9 @@ resource_usage:
   azurerm_app_service_environment.my_service:
      operating_system: linux # Override the operating system of the instance, can be: linux, windows.
 
+  azurerm_application_insights.my_insights:
+    monthly_data_ingested_gb: 1000 # Monthly number of data ingested in GB.
+
   azurerm_automation_account.my_account:
     monthly_watcher_hours: 0 # Monthly number of watcher hours.
 
