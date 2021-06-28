@@ -42,9 +42,9 @@ func NewAzureRMLoadBalancer(d *schema.ResourceData, u *schema.UsageData) *schema
 			NoPrice:   true,
 			IsSkipped: true,
 		}
-	} else {
-		costComponents = append(costComponents, dataProcessedCostComponent(region, monthlyDataProcessedGb))
 	}
+
+	costComponents = append(costComponents, dataProcessedCostComponent(region, monthlyDataProcessedGb))
 
 	return &schema.Resource{
 		Name:           d.Address,
