@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
@@ -347,11 +348,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 		arnMap[arn] = append(arnMap[arn], d)
 	}
 
-	if m := conf.Get("module_calls.worker_groups_launch_template.source"); m.Type != gjson.Null {
-		if m.String() == "terraform-aws-modules/eks/aws" {
-			eksModuleLaunchTemplateCheck(resData)
-		}
-	}
+	parseKnownModuleRefs(resData, conf)
 
 	for _, d := range resData {
 		var refAttrs []string
@@ -464,7 +461,13 @@ func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
 }
 
 func getConfJSON(conf gjson.Result, addr string) gjson.Result {
-	c := getModuleConfJSON(conf, getModuleNames(addr))
+	modNames := getModuleNames(addr)
+	c := getModuleConfJSON(conf, modNames)
+
+	if len(modNames) > 0 {
+		c = c.Get("module")
+	}
+
 	return c.Get(fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(addr))))
 }
 
@@ -476,10 +479,10 @@ func getModuleConfJSON(conf gjson.Result, names []string) gjson.Result {
 	// Build up the gjson search key
 	p := make([]string, 0, len(names))
 	for _, n := range names {
-		p = append(p, fmt.Sprintf("module_calls.%s.module", n))
+		p = append(p, fmt.Sprintf("module_calls.%s", n))
 	}
 
-	return conf.Get(strings.Join(p, "."))
+	return conf.Get(strings.Join(p, ".module."))
 }
 
 func isInfracostResource(res *schema.ResourceData) bool {
@@ -582,24 +585,35 @@ func gjsonEscape(s string) string {
 	return s
 }
 
-func eksModuleLaunchTemplateCheck(resData map[string]*schema.ResourceData) {
-	dr := []struct {
-		SourceNameSuffix string
-		DestNameSuffix   string
+// Parses known modules to create references for specific resources in that module
+// This is useful if the module uses a `dynamic` block which means the references aren't defined in the plan JSON
+// See https://github.com/hashicorp/terraform/issues/28346 for more info
+func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Result) {
+	knownRefs := []struct {
+		SourceAddrSuffix string
+		DestAddrSuffix   string
 		Attribute        string
+		ModuleSource     string
 	}{
 		{
-			SourceNameSuffix: "aws_autoscaling_group.workers_launch_template[0]",
-			DestNameSuffix:   "aws_launch_template.workers_launch_template[0]",
+			SourceAddrSuffix: "aws_autoscaling_group.workers_launch_template[0]",
+			DestAddrSuffix:   "aws_launch_template.workers_launch_template[0]",
 			Attribute:        "launch_template",
+			ModuleSource:     "terraform-aws-modules/eks/aws",
 		},
 	}
 
 	for _, d := range resData {
-		if strings.HasSuffix(d.Address, dr[0].SourceNameSuffix) {
-			for _, r := range resData {
-				if strings.HasSuffix(r.Address, dr[0].DestNameSuffix) {
-					d.AddReference(dr[0].Attribute, r)
+		for _, knownRef := range knownRefs {
+			modNames := getModuleNames(d.Address)
+			modSource := getModuleConfJSON(conf, modNames).Get("source").String()
+			matches := strings.HasSuffix(d.Address, knownRef.SourceAddrSuffix) && modSource == knownRef.ModuleSource
+
+			if matches {
+				for _, destD := range resData {
+					if cmp.Equal(getModuleNames(destD.Address), modNames) && strings.HasSuffix(destD.Address, knownRef.DestAddrSuffix) {
+						d.AddReference(knownRef.Attribute, destD)
+					}
 				}
 			}
 		}
