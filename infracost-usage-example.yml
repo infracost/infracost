@@ -738,6 +738,9 @@ resource_usage:
     capture_enabled: false            # Defines if capture is enabled for the Event Hub Standard namespaces, can be: true, false.
 
   azurerm_kubernetes_cluster.my_cluster:
+    load_balancer:
+      monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
+
     default_node_pool:
       nodes: 2 # Node count for the default node pool.
 
