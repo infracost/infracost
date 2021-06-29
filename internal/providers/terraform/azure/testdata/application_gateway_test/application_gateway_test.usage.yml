@@ -1,0 +1,12 @@
+version: 0.1
+resource_usage:
+  azurerm_application_gateway.standard: 
+    monthly_data_processed_gb: 100000
+    monthly_v2_capacity_units: 10000
+
+  azurerm_application_gateway.wafV2: 
+    monthly_v2_capacity_units: 10000
+
+  azurerm_application_gateway.waf: 
+    monthly_data_processed_gb: 100000
+    monthly_v2_capacity_units: 10000
