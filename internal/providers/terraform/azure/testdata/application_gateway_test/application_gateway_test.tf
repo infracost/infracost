@@ -1,10 +1,6 @@
 provider "azurerm" {
   skip_provider_registration = true
   features {}
-   subscription_id             = "84171726-c002-4fc7-924a-b6ff82c59677"
-  client_id                   = "eec7409b-6cbd-420d-b3ba-bc0ef14c4bbf"
-  client_secret               = "OZ~wK2ZpptK2O1Z61_qD2ycu~1KQ4WDzvL"
-  tenant_id                   = "b0b4f93e-59ae-44ff-b39a-e51e7e2b16e9"
 }
 resource "azurerm_resource_group" "example" {
   name     = "example-resources"
@@ -179,8 +175,8 @@ resource "azurerm_application_gateway" "withoutUsage" {
   location            = azurerm_resource_group.example.location
 
   sku {
-    name     = "WAF_v2"
-    tier     = "WAF_v2"
+    name     = "WAF_Medium"
+    tier     = "WAF"
     capacity = 2
   }
 

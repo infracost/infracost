@@ -55,42 +55,43 @@ func NewAzureRMApplicationGateway(d *schema.ResourceData, u *schema.UsageData) *
 
 	}
 
-	if u != nil && u.Get("monthly_data_processed_gb").Type != gjson.Null {
-		monthlyDataProcessedGb = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_processed_gb").Int()))
-		result := usage.CalculateTierBuckets(*monthlyDataProcessedGb, tierLimits)
+	if sku != "v2" {
+		if u != nil && u.Get("monthly_data_processed_gb").Type != gjson.Null {
+			monthlyDataProcessedGb = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_processed_gb").Int()))
+			result := usage.CalculateTierBuckets(*monthlyDataProcessedGb, tierLimits)
 
-		if sku == "small" {
-			if result[0].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, dataProcessingCostComponent("Data processing (0-10TB)", region, sku, "0", &result[0]))
+			if sku == "small" {
+				if result[0].GreaterThan(decimal.Zero) {
+					costComponents = append(costComponents, dataProcessingCostComponent("Data processing (0-10TB)", region, sku, "0", &result[0]))
+				}
+				if result[1].GreaterThan(decimal.Zero) {
+					costComponents = append(costComponents, dataProcessingCostComponent("Data processing (10-40TB)", region, sku, "0", &result[1]))
+				}
+				if result[2].GreaterThan(decimal.Zero) {
+					costComponents = append(costComponents, dataProcessingCostComponent("Data processing (over 40TB)", region, sku, "0", &result[2]))
+				}
 			}
-			if result[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, dataProcessingCostComponent("Data processing (10-40TB)", region, sku, "0", &result[1]))
+
+			if sku == "medium" {
+				if result[1].GreaterThan(decimal.Zero) {
+					costComponents = append(costComponents, dataProcessingCostComponent("Data processing (10-40TB)", region, sku, "10240", &result[1]))
+				}
+				if result[2].GreaterThan(decimal.Zero) {
+					costComponents = append(costComponents, dataProcessingCostComponent("Data processing (over 40TB)", region, sku, "10240", &result[2]))
+				}
 			}
-			if result[2].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, dataProcessingCostComponent("Data processing (over 40TB)", region, sku, "0", &result[2]))
+
+			if sku == "large" {
+				if result[2].GreaterThan(decimal.Zero) {
+					costComponents = append(costComponents, dataProcessingCostComponent("Data processing (over 40TB)", region, sku, "40960", &result[2]))
+				}
 			}
+
+		} else {
+			var unknown *decimal.Decimal
+			costComponents = append(costComponents, dataProcessingCostComponent("Data processing (0-10TB)", region, sku, "0", unknown))
 		}
-
-		if sku == "medium" {
-			if result[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, dataProcessingCostComponent("Data processing (10-40TB)", region, sku, "10240", &result[1]))
-			}
-			if result[2].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, dataProcessingCostComponent("Data processing (over 40TB)", region, sku, "10240", &result[2]))
-			}
-		}
-
-		if sku == "large" {
-			if result[2].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, dataProcessingCostComponent("Data processing (over 40TB)", region, sku, "40960", &result[2]))
-			}
-		}
-
-	} else {
-		var unknown *decimal.Decimal
-		costComponents = append(costComponents, dataProcessingCostComponent("Data processing (0-10TB)", region, sku, "", unknown))
 	}
-
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
