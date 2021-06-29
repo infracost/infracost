@@ -16,12 +16,12 @@ resource "azurerm_lb" "standard" {
   name                = "TestLoadBalancer"
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
-  sku = "Standard"
+  sku                 = "Standard"
 }
 
 resource "azurerm_lb" "withoutUsage" {
   name                = "TestLoadBalancer"
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
-  sku = "Standard"
+  sku                 = "Standard"
 }

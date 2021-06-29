@@ -13,16 +13,20 @@ func GetAzureRMLoadBalancerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_lb",
 		RFunc: NewAzureRMLoadBalancer,
+		ReferenceAttributes: []string{
+			"resource_group_name",
+		},
 	}
 }
 
 func NewAzureRMLoadBalancer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := "Global"
-
-	if strings.HasPrefix(strings.ToLower(d.Get("location").String()), "usgov") {
+	region := lookupRegion(d, []string{"resource_group_name"})
+	if strings.Contains(strings.ToLower(region), "usgov") {
 		region = "US Gov"
-	} else if strings.Contains(strings.ToLower(d.Get("location").String()), "china") {
+	} else if strings.Contains(strings.ToLower(region), "china") {
 		region = "Сhina"
+	} else {
+		region = "Global"
 	}
 
 	var costComponents []*schema.CostComponent
