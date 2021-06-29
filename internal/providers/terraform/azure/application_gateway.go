@@ -20,7 +20,7 @@ func GetAzureRMApplicationGatewayRegistryItem() *schema.RegistryItem {
 func NewAzureRMApplicationGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 	var monthlyDataProcessedGb, monthlyCapacityUnits *decimal.Decimal
-	skuName := d.Get("sku.0.name").String() // Standard_Medium
+	skuName := d.Get("sku.0.name").String()
 	var sku, tier string
 	costComponents := make([]*schema.CostComponent, 0)
 	tierLimits := []int{10240, 30720}
@@ -28,14 +28,16 @@ func NewAzureRMApplicationGateway(d *schema.ResourceData, u *schema.UsageData) *
 	capacity := d.Get("sku.0.capacity").Int()
 
 	skuNameParts := strings.Split(skuName, "_")
-	sku = strings.ToLower(skuNameParts[1])
+	if len(skuNameParts[1]) != 0 {
+		sku = strings.ToLower(skuNameParts[1])
+	}
 	if sku != "v2" {
 		if strings.ToLower(skuNameParts[0]) == "standard" {
 			tier = "basic"
 		} else {
 			tier = "WAF"
 		}
-		costComponents = append(costComponents, gatewayCostComponent(fmt.Sprintf("Gateway usage (%s,%s)", tier, sku), region, tier, sku, capacity))
+		costComponents = append(costComponents, gatewayCostComponent(fmt.Sprintf("Gateway usage (%s, %s)", tier, sku), region, tier, sku, capacity))
 	}
 	if u != nil && u.Get("monthly_v2_capacity_units").Type != gjson.Null {
 		monthlyCapacityUnits = decimalPtr(decimal.NewFromInt(u.Get("monthly_v2_capacity_units").Int()))

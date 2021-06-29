@@ -1,6 +1,10 @@
 provider "azurerm" {
   skip_provider_registration = true
   features {}
+   subscription_id             = "84171726-c002-4fc7-924a-b6ff82c59677"
+  client_id                   = "eec7409b-6cbd-420d-b3ba-bc0ef14c4bbf"
+  client_secret               = "OZ~wK2ZpptK2O1Z61_qD2ycu~1KQ4WDzvL"
+  tenant_id                   = "b0b4f93e-59ae-44ff-b39a-e51e7e2b16e9"
 }
 resource "azurerm_resource_group" "example" {
   name     = "example-resources"
@@ -15,6 +19,60 @@ resource "azurerm_application_gateway" "standard" {
   sku {
     name     = "Standard_Small"
     tier     = "Standard"
+    capacity = 2
+  }
+
+  gateway_ip_configuration {
+    name      = "my-gateway-ip-configuration"
+    subnet_id = azurerm_subnet.frontend.id
+  }
+
+  frontend_port {
+    name = local.frontend_port_name
+    port = 80
+  }
+
+  frontend_ip_configuration {
+    name                 = local.frontend_ip_configuration_name
+    public_ip_address_id = azurerm_public_ip.example.id
+  }
+
+  backend_address_pool {
+    name = local.backend_address_pool_name
+  }
+
+  backend_http_settings {
+    name                  = local.http_setting_name
+    cookie_based_affinity = "Disabled"
+    path                  = "/path1/"
+    port                  = 80
+    protocol              = "Http"
+    request_timeout       = 60
+  }
+
+  http_listener {
+    name                           = local.listener_name
+    frontend_ip_configuration_name = local.frontend_ip_configuration_name
+    frontend_port_name             = local.frontend_port_name
+    protocol                       = "Http"
+  }
+
+  request_routing_rule {
+    name                       = local.request_routing_rule_name
+    rule_type                  = "Basic"
+    http_listener_name         = local.listener_name
+    backend_address_pool_name  = local.backend_address_pool_name
+    backend_http_settings_name = local.http_setting_name
+  }
+}
+resource "azurerm_application_gateway" "waf" {
+  name                = "example-appgateway"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  sku {
+    name     = "Waf_Medium"
+    tier     = "Waf"
     capacity = 2
   }
 
