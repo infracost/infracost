@@ -16,7 +16,7 @@ func GetAzureRMApplicationInsightsRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMApplicationInsights(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := lookupRegion(d, []string{})
 	costComponents := []*schema.CostComponent{}
 
 	var dataIngested *decimal.Decimal
