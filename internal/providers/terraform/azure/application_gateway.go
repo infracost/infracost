@@ -38,24 +38,7 @@ func NewAzureRMApplicationGateway(d *schema.ResourceData, u *schema.UsageData) *
 			tier = "WAF"
 		}
 		costComponents = append(costComponents, gatewayCostComponent(fmt.Sprintf("Gateway usage (%s, %s)", tier, sku), region, tier, sku, capacity))
-	}
-	if u != nil && u.Get("monthly_v2_capacity_units").Type != gjson.Null {
-		monthlyCapacityUnits = decimalPtr(decimal.NewFromInt(u.Get("monthly_v2_capacity_units").Int()))
-	}
-	if sku == "v2" {
-		if strings.ToLower(skuNameParts[0]) == "standard" {
-			tier = "basic v2"
-			costComponents = append(costComponents, fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), region, "standard v2", capacity))
-			costComponents = append(costComponents, capacityUnitsCostComponent("basic", region, "standard v2", monthlyCapacityUnits))
-		} else {
-			tier = "WAF v2"
-			costComponents = append(costComponents, fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), region, tier, capacity))
-			costComponents = append(costComponents, capacityUnitsCostComponent("WAF", region, tier, monthlyCapacityUnits))
-		}
 
-	}
-
-	if sku != "v2" {
 		if u != nil && u.Get("monthly_data_processed_gb").Type != gjson.Null {
 			monthlyDataProcessedGb = decimalPtr(decimal.NewFromInt(u.Get("monthly_data_processed_gb").Int()))
 			result := usage.CalculateTierBuckets(*monthlyDataProcessedGb, tierLimits)
@@ -92,6 +75,22 @@ func NewAzureRMApplicationGateway(d *schema.ResourceData, u *schema.UsageData) *
 			costComponents = append(costComponents, dataProcessingCostComponent("Data processing (0-10TB)", region, sku, "0", unknown))
 		}
 	}
+	if u != nil && u.Get("monthly_v2_capacity_units").Type != gjson.Null {
+		monthlyCapacityUnits = decimalPtr(decimal.NewFromInt(u.Get("monthly_v2_capacity_units").Int()))
+	}
+	if sku == "v2" {
+		if strings.ToLower(skuNameParts[0]) == "standard" {
+			tier = "basic v2"
+			costComponents = append(costComponents, fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), region, "standard v2", capacity))
+			costComponents = append(costComponents, capacityUnitsCostComponent("basic", region, "standard v2", monthlyCapacityUnits))
+		} else {
+			tier = "WAF v2"
+			costComponents = append(costComponents, fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), region, tier, capacity))
+			costComponents = append(costComponents, capacityUnitsCostComponent("WAF", region, tier, monthlyCapacityUnits))
+		}
+
+	}
+
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
