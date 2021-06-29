@@ -11,13 +11,14 @@ func GetAzureRMLoadBalancerOutboundRuleRegistryItem() *schema.RegistryItem {
 		Name:  "azurerm_lb_outbound_rule",
 		RFunc: NewAzureRMLoadBalancerRule,
 		ReferenceAttributes: []string{
+			"loadbalancer_id",
 			"resource_group_name",
 		},
 	}
 }
 
 func NewAzureRMLoadBalancerOutboundRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := lookupRegion(d, []string{"loadbalancer_id", "resource_group_name"})
 	if len(region) > 0 {
 		if strings.HasPrefix(strings.ToLower(region), "usgov") {
 			region = "US Gov"
