@@ -60,13 +60,12 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 
 	if d.Get("network_profile.0.load_balancer_sku").Type != gjson.Null {
 		if strings.ToLower(d.Get("network_profile.0.load_balancer_sku").String()) == "standard" {
-			location := region
 			if strings.Contains(strings.ToLower(region), "usgov") {
-				location = "US Gov"
+				region = "US Gov"
 			} else if strings.Contains(strings.ToLower(region), "china") {
-				location = "Сhina"
+				region = "Сhina"
 			} else {
-				location = "Global"
+				region = "Global"
 			}
 			var monthlyDataProcessedGb *decimal.Decimal
 			if u != nil && u.Get("load_balancer.monthly_data_processed_gb").Type != gjson.Null {
@@ -74,27 +73,26 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 			}
 			lbResource := schema.Resource{
 				Name:           "Load Balancer",
-				CostComponents: []*schema.CostComponent{dataProcessedCostComponent(location, monthlyDataProcessedGb)},
+				CostComponents: []*schema.CostComponent{dataProcessedCostComponent(region, monthlyDataProcessedGb)},
 			}
 			subResources = append(subResources, &lbResource)
 		}
 	}
 	if d.Get("addon_profile.0.http_application_routing").Type != gjson.Null {
 		if strings.ToLower(d.Get("addon_profile.0.http_application_routing.0.enabled").String()) == "true" {
-			location := region
 			if strings.HasPrefix(strings.ToLower(region), "usgov") {
-				location = "US Gov Zone 1"
+				region = "US Gov Zone 1"
 			} else if strings.HasPrefix(strings.ToLower(region), "germany") {
-				location = "DE Zone 1"
+				region = "DE Zone 1"
 			} else if strings.HasPrefix(strings.ToLower(region), "china") {
-				location = "Zone 1 (China)"
+				region = "Zone 1 (China)"
 			} else {
-				location = "Zone 1"
+				region = "Zone 1"
 			}
 
 			dnsResource := schema.Resource{
 				Name:           "DNS",
-				CostComponents: []*schema.CostComponent{hostedPublicZoneCostComponent(location)},
+				CostComponents: []*schema.CostComponent{hostedPublicZoneCostComponent(region)},
 			}
 			subResources = append(subResources, &dnsResource)
 		}
