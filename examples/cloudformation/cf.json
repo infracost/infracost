@@ -1,0 +1,93 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+        "AlertsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "TableName": "dev-alerts",
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "pk",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "sk",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "pk",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "sk",
+                        "KeyType": "RANGE"
+                    }
+                ],
+                "BillingMode": "PAY_PER_REQUEST",
+                "PointInTimeRecoverySpecification": {
+                    "PointInTimeRecoveryEnabled": true
+                }
+            }
+        },
+        "BusinessesTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "TableName": "dev-businesses",
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "pk",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "sk",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "pk",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "sk",
+                        "KeyType": "RANGE"
+                    }
+                ],
+                "BillingMode": "PAY_PER_REQUEST"
+            }
+        },
+        "CustomersTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "TableName": "dev-customers",
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "pk",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "sk",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "pk",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "sk",
+                        "KeyType": "RANGE"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits" : 12,
+                    "WriteCapacityUnits" : 32
+                },
+                "BillingMode": "PROVISIONED"
+            }
+        }
+    }
+}
