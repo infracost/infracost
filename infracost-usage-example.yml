@@ -773,6 +773,9 @@ resource_usage:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
 
+  azurerm_lb.my_lb:
+    monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
+
   azurerm_managed_disk.my_disk:
     monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 
