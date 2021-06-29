@@ -14,6 +14,7 @@ const (
 	Int64 UsageVariableType = iota
 	String
 	Float64
+	StringArray
 )
 
 // type UsageDataValidatorFuncType = func(value interface{}) error
@@ -22,7 +23,7 @@ type UsageSchemaItem struct {
 	Key          string
 	DefaultValue interface{}
 	ValueType    UsageVariableType
-
+	ShouldSync   bool
 	// These aren't used yet and I'm not entirely sure how they fit in, but they were part of the discussion about usage schema.
 	// ValidatorFunc UsageDataValidatorFuncType
 	// SubUsageData  *UsageSchemaItem
@@ -64,6 +65,29 @@ func (u *UsageData) GetInt(key string) *int64 {
 	if u.Get(key).Type != gjson.Null {
 		val := u.Get(key).Int()
 		return &val
+	}
+
+	return nil
+}
+
+func (u *UsageData) GetString(key string) *string {
+	if u.Get(key).Type != gjson.Null {
+		val := u.Get(key).String()
+		return &val
+	}
+
+	return nil
+}
+
+func (u *UsageData) GetStringArray(key string) *[]string {
+	if u.Get(key).Type != gjson.Null {
+		gjsonArray := u.Get(key).Array()
+
+		stringArray := make([]string, len(gjsonArray))
+		for i, gresult := range gjsonArray {
+			stringArray[i] = gresult.String()
+		}
+		return &stringArray
 	}
 
 	return nil

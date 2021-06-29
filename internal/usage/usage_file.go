@@ -81,6 +81,7 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 					Key:          s.Key,
 					DefaultValue: s.DefaultValue,
 					ValueType:    s.ValueType,
+					ShouldSync:   true,
 				})
 			}
 		}
@@ -89,19 +90,32 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 		for _, usageSchemaItem := range resourceUSchema {
 			usageKey := usageSchemaItem.Key
 			usageValueType := usageSchemaItem.ValueType
-			var usageValue interface{}
-			usageValue = usageSchemaItem.DefaultValue
+			var existingUsageValue interface{}
 			if existingUsage, ok := existingUsageData[resourceName]; ok {
 				switch usageValueType {
 				case schema.Float64:
-					usageValue = existingUsage.Get(usageKey).Float()
+					if v := existingUsage.GetFloat(usageKey); v != nil {
+						existingUsageValue = *v
+					}
 				case schema.Int64:
-					usageValue = existingUsage.Get(usageKey).Int()
+					if v := existingUsage.GetInt(usageKey); v != nil {
+						existingUsageValue = *v
+					}
 				case schema.String:
-					usageValue = existingUsage.Get(usageKey).String()
+					if v := existingUsage.GetString(usageKey); v != nil {
+						existingUsageValue = *v
+					}
+				case schema.StringArray:
+					if v := existingUsage.GetStringArray(usageKey); v != nil {
+						existingUsageValue = *v
+					}
 				}
 			}
-			resourceUsage[usageKey] = usageValue
+			if existingUsageValue != nil {
+				resourceUsage[usageKey] = existingUsageValue
+			} else if usageSchemaItem.ShouldSync {
+				resourceUsage[usageKey] = usageSchemaItem.DefaultValue
+			}
 		}
 		syncedResourceUsage[resourceName] = unFlattenHelper(resourceUsage)
 	}
