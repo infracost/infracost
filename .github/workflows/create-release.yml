@@ -27,7 +27,6 @@ jobs:
           PRE_RELEASE: "false"
           CHANGELOG_FILE: "none"
           ALLOW_EMPTY_CHANGELOG: "true"
-          ALLOW_TAG_PREFIX: "true"
           RELEASE_NAME_PREFIX: "Release "
         with:
           args: |
