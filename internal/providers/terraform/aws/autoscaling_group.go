@@ -19,6 +19,7 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 			"launch_template.0.id",
 			"launch_template.0.name",
 			"mixed_instances_policy.0.launch_template.0.launch_template_specification.0.launch_template_id",
+			"launch_template",
 		},
 	}
 }
@@ -36,13 +37,12 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	subResources := make([]*schema.Resource, 0)
 
 	launchConfigurationRef := d.References("launch_configuration")
-	launchTemplateRefID := d.References("launch_template.0.id")
-	launchTemplateRefName := d.References("launch_template.0.name")
-	launchTemplateRef := []*schema.ResourceData{}
-	if len(launchTemplateRefID) > 0 {
-		launchTemplateRef = launchTemplateRefID
-	} else if len(launchTemplateRefName) > 0 {
-		launchTemplateRef = launchTemplateRefName
+	launchTemplateRef := d.References("launch_template")
+	if len(launchTemplateRef) == 0 {
+		launchTemplateRef = d.References("launch_template.0.id")
+	}
+	if len(launchTemplateRef) == 0 {
+		launchTemplateRef = d.References("launch_template.0.name")
 	}
 	mixedInstanceLaunchTemplateRef := d.References("mixed_instances_policy.0.launch_template.0.launch_template_specification.0.launch_template_id")
 
