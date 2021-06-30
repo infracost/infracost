@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_kinesisanalyticsv2_application_snapshot.flink:
+    durable_application_backup_gb: 100

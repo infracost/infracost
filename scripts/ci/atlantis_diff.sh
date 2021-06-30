@@ -50,7 +50,13 @@ build_breakdown_cmd () {
   if [ ! -z "$config_file" ]; then
     breakdown_cmd="$breakdown_cmd --config-file $config_file"
   else
-    breakdown_cmd="$breakdown_cmd --path $PLANFILE"
+    if [ -f "$PLANFILE.json" ]; then
+      breakdown_cmd="$breakdown_cmd --path $PLANFILE.json"
+    elif [ -f "$PLANFILE" ]; then
+      breakdown_cmd="$breakdown_cmd --path $PLANFILE"
+    else
+      echo "Error: $PLANFILE does not exist"
+    fi
   fi
   if [ "$atlantis_debug" != "true" ]; then
     breakdown_cmd="$breakdown_cmd 2>/dev/null"

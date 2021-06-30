@@ -1,0 +1,13 @@
+version: 0.1
+resource_usage:
+  aws_kinesis_firehose_delivery_stream.withAllTags:
+    monthly_data_ingested_gb: 7000000
+
+  aws_kinesis_firehose_delivery_stream.EnabledFalse:
+    monthly_data_ingested_gb: 3000000
+
+  aws_kinesis_firehose_delivery_stream.onlyDataIngested:
+    monthly_data_ingested_gb: 3000000
+  
+  aws_kinesis_firehose_delivery_stream.forTwoMilGB:
+    monthly_data_ingested_gb: 2000000

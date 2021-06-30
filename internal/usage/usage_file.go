@@ -191,7 +191,6 @@ func LoadFromFile(usageFilePath string, createIfNotExisting bool) (map[string]*s
 	usageData := make(map[string]*schema.UsageData)
 
 	if usageFilePath == "" {
-		log.Warn("Can't sync usage file as it's not specified")
 		return usageData, nil
 	}
 

@@ -1,0 +1,10 @@
+
+ Name                            Monthly Qty  Unit   Monthly Cost 
+                                                                  
+ azurerm_lb_outbound_rule.rules                                   
+ └─ Rule usage                           730  hours         $7.30 
+                                                                  
+ azurerm_public_ip.example                                        
+ └─ IP address (static)                  730  hours         $2.63 
+                                                                  
+ OVERALL TOTAL                                              $9.93 

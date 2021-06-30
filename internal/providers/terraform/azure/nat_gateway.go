@@ -19,18 +19,16 @@ func GetAzureRMAppNATGatewayRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var monthlyDataProcessedGb *decimal.Decimal
-	region := "Global"
-	group := d.References("resource_group_name")
-
-	if len(group) > 0 {
-		if strings.HasPrefix(strings.ToLower(group[0].Get("location").String()), "usgov") {
-			region = "US Gov"
-		} else if strings.Contains(strings.ToLower(group[0].Get("location").String()), "china") {
-			region = "Сhina"
-		}
+	region := lookupRegion(d, []string{"resource_group_name"})
+	if strings.Contains(strings.ToLower(region), "usgov") {
+		region = "US Gov"
+	} else if strings.Contains(strings.ToLower(region), "china") {
+		region = "Сhina"
+	} else {
+		region = "Global"
 	}
 
+	var monthlyDataProcessedGb *decimal.Decimal
 	if u != nil && u.Get("monthly_data_processed_gb").Type != gjson.Null {
 		monthlyDataProcessedGb = decimalPtr(decimal.NewFromFloat(u.Get("monthly_data_processed_gb").Float()))
 	}

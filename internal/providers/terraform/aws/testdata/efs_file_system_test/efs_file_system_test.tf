@@ -9,12 +9,17 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-resource "aws_efs_file_system" "standard_storage" {}
-
-resource "aws_efs_file_system" "ia_storage" {
+resource "aws_efs_file_system" "standard" {
   lifecycle_policy {
     transition_to_ia = "AFTER_7_DAYS"
   }
+}
+
+resource "aws_efs_file_system" "oneZone" {
+  lifecycle_policy {
+    transition_to_ia = "AFTER_7_DAYS"
+  }
+  availability_zone_name = "One Zone"
 }
 
 resource "aws_efs_file_system" "provisioned" {
@@ -22,4 +27,6 @@ resource "aws_efs_file_system" "provisioned" {
   throughput_mode                 = "provisioned"
 }
 
-resource "aws_efs_file_system" "no_usage" {}
+resource "aws_efs_file_system" "no_usage" {
+  availability_zone_name = "One Zone"
+}

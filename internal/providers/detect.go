@@ -4,6 +4,8 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"fmt"
+	"github.com/awslabs/goformation/v4"
+	"github.com/infracost/infracost/internal/providers/cloudformation"
 	"io/ioutil"
 	"os"
 
@@ -16,6 +18,10 @@ func Detect(cfg *config.Config, projectCfg *config.Project) (schema.Provider, er
 
 	if _, err := os.Stat(projectCfg.Path); os.IsNotExist(err) {
 		return nil, fmt.Errorf("No such file or directory %s", projectCfg.Path)
+	}
+
+	if isCloudFormationTemplate(projectCfg.Path) {
+		return cloudformation.NewTemplateProvider(cfg, projectCfg), nil
 	}
 
 	if isTerraformPlanJSON(projectCfg.Path) {
@@ -95,4 +101,17 @@ func isTerraformPlan(path string) bool {
 
 func isTerraformDir(path string) bool {
 	return terraform.IsTerraformDir(path)
+}
+
+func isCloudFormationTemplate(path string) bool {
+	template, err := goformation.Open(path)
+	if err != nil {
+		return false
+	}
+
+	if len(template.Resources) > 0 {
+		return true
+	}
+
+	return false
 }
