@@ -34,5 +34,5 @@ resource "azurerm_automation_dsc_configuration" "without_usage" {
   automation_account_name = azurerm_automation_account.example.name
   location                = azurerm_resource_group.example.location
   content_embedded        = "configuration test {}"
-} 
+}
 

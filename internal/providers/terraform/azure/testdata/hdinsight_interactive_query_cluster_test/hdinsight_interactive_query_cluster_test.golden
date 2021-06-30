@@ -2,9 +2,9 @@
  Name                                                 Monthly Qty  Unit   Monthly Cost 
                                                                                        
  azurerm_hdinsight_interactive_query_cluster.example                                   
- ├─ Head node (E2 v3)                                       1,460  hours       $277.40 
- ├─ Worker node (E16 v3)                                    2,190  hours     $3,328.80 
- └─ Zookeeper node (E64i v3)                                2,190  hours    $12,246.48 
+ ├─ Head node (Standard_E2_V3)                              1,460  hours       $277.40 
+ ├─ Worker node (Standard_E16_V3)                           2,190  hours     $3,328.80 
+ └─ Zookeeper node (Standard_E64i_V3)                       2,190  hours    $12,246.48 
                                                                                        
  OVERALL TOTAL                                                              $15,852.68 
 ----------------------------------

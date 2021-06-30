@@ -1,0 +1,38 @@
+
+ Name                                                  Monthly Qty  Unit                Monthly Cost 
+                                                                                                     
+ google_compute_region_target_http_proxy.default                                                     
+ ├─ Proxy instance                                            10.2  hours                      $0.26 
+ └─ Data processed                                             100  GB                         $0.80 
+                                                                                                     
+ google_compute_region_target_https_proxy.default                                                    
+ ├─ Proxy instance                                            10.2  hours                      $0.26 
+ └─ Data processed                                             100  GB                         $0.80 
+                                                                                                     
+ google_compute_target_grpc_proxy.default                                                            
+ ├─ Proxy instance                                            10.2  hours                      $0.26 
+ └─ Data processed                                             100  GB                         $0.80 
+                                                                                                     
+ google_compute_target_grpc_proxy.withoutUsage                                                       
+ ├─ Proxy instance                                 Monthly cost depends on usage: $0.025 per hours   
+ └─ Data processed                                 Monthly cost depends on usage: $0.008 per GB      
+                                                                                                     
+ google_compute_target_http_proxy.default                                                            
+ ├─ Proxy instance                                            10.2  hours                      $0.26 
+ └─ Data processed                                             100  GB                         $0.80 
+                                                                                                     
+ google_compute_target_https_proxy.default                                                           
+ ├─ Proxy instance                                            10.2  hours                      $0.26 
+ └─ Data processed                                             100  GB                         $0.80 
+                                                                                                     
+ google_compute_target_ssl_proxy.default                                                             
+ ├─ Proxy instance                                            10.2  hours                      $0.26 
+ └─ Data processed                                             100  GB                         $0.80 
+                                                                                                     
+ google_compute_target_tcp_proxy.default                                                             
+ ├─ Proxy instance                                            10.2  hours                      $0.26 
+ └─ Data processed                                             100  GB                         $0.80 
+                                                                                                     
+ OVERALL TOTAL                                                                                 $7.38 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

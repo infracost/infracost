@@ -233,7 +233,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 			planJSON, err = p.runRemotePlan(opts, args)
 		} else if initOnFail && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
 			strings.Contains(extractedErr, "Error: Initialization required") ||
-			strings.Contains(extractedErr, "Error: Module not installed") ||
+			strings.Contains(extractedErr, "Error: Backend initialization required") ||
 			strings.Contains(extractedErr, "Error: Provider requirements cannot be satisfied by locked dependencies") ||
 			strings.Contains(extractedErr, "Error: Module not installed")) {
 			spinner.Stop()
@@ -355,7 +355,7 @@ func (p *DirProvider) runShow(opts *CmdOptions, planFile string) ([]byte, error)
 }
 
 func IsTerraformDir(path string) bool {
-	for _, ext := range []string{"tf", "hcl", "hcl.json"} {
+	for _, ext := range []string{"tf", "hcl", "hcl.json", "tf.json"} {
 		matches, err := filepath.Glob(filepath.Join(path, fmt.Sprintf("*.%s", ext)))
 		if matches != nil && err == nil {
 			return true

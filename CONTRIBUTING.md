@@ -116,7 +116,7 @@ make build
 
 When adding your first resource, we recommend you first view [this YouTube video](https://www.youtube.com/watch?v=ab7TKRbMlzE). You can also look at one of the existing resources to see how it's done, for example, check the [nat_gateway.go](internal/providers/terraform/aws/nat_gateway.go) resource.
 
-To begin, add a new file in `internal/providers/terraform/aws/` as well as an accompanying test file.
+To begin, add a new file in `internal/resources/aws/` that creates cost components from the resource's attributes.
 
 ```go
 package aws
@@ -124,6 +124,57 @@ package aws
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/shopspring/decimal"
+)
+
+type MyResourceArguments struct {
+	Address string      `json:"address,omitempty"`
+	Region  string      `json:"region,omitempty"`
+	InstanceCount int64 `json:"instanceCount,omitempty"`
+	InstanceType string `json:"instanceType,omitempty"`
+	UsageType string    `json:"usageType,omitempty"`
+}
+
+func NewMyResource(args *MyResourceArguments) *schema.Resource {
+	costComponents := []*schema.CostComponent{
+		{
+			Name:           fmt.Sprintf("Instance (on-demand, %s)", "my_instance_type"),
+			Unit:           "hours",
+			UnitMultiplier:  1,
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(args.InstanceCount)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(args.Region),
+				Service:       strPtr("AmazonES"),
+				ProductFamily: strPtr("My AWS Resource family"),
+				AttributeFilters: []*schema.AttributeFilter{
+					// Note the use of start/end anchors and case-insensitive match with ValueRegex
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", args.UsageType))},
+					{Key: "instanceType", Value: strPtr(args.InstanceType)},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: strPtr("on_demand"),
+			},
+		},
+	}
+
+	return &schema.Resource{
+		Name:           args.Address,
+		CostComponents: costComponents,
+	}
+}
+```
+
+Next, add `internal/providers/terraform/aws/` add an accompanying test file.  This code extracts attributes from the
+terraform data and uses the file in `internal/resources/aws` to generate the cost components.  
+
+```go
+package aws
+
+import (
+	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -136,36 +187,19 @@ func GetMyResourceRegistryItem() *schema.RegistryItem {
 }
 
 func NewMyResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-
 	region := d.Get("region").String()
-  var instanceCount int64 = 1
+	sku := d.Get("sku_name").String()
+	instanceTypeFromSku := strings.Split(sku, "_")[0];
 
-	costComponents := []*schema.CostComponent{
-		{
-			Name:           fmt.Sprintf("Instance (on-demand, %s)", "my_instance_type"),
-			Unit:           "hours",
-			UnitMultiplier:  1,
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonES"),
-				ProductFamily: strPtr("My AWS Resource family"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/Some Usage type/")},
-					{Key: "instanceType", Value: strPtr("Some instance type")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr("on_demand"),
-			},
-		},
+	args := &aws.MyResourceArguments{
+		Address: d.Address,
+		Region:  region,
+		InstanceCount: d.Get("terraformFieldThatHasNumberOfInstances"),
+		InstanceType: instanceTypeFromSku,
+		UsageType: "someHardCodedUsageType",
 	}
 
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
-	}
+	return aws.NewNATGateway(args)
 }
 ```
 
@@ -338,6 +372,20 @@ To do this Infracost supports passing usage data in through a usage YAML file. W
     request_duration_ms: 500      # Average duration of each request in milliseconds.
   ```
 
+The resource cost calcuation file (`internal/resources/*`) should describe the usage as `UsageSchemaItems` and container a helper to populate the resource arguments from usage data:
+```go
+var LambdaFunctionUsageSchema = []*schema.UsageSchemaItem{
+	{Key: "request_duration_ms", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monthly_requests", DefaultValue: 0, ValueType: schema.Float64},
+}
+
+func (args *LambdaFunctionArguments) PopulateUsage(u *schema.UsageData) {
+	if u != nil {
+		args.RequestDurationMS = u.GetFloat("request_duration_ms")
+		args.MonthlyRequests = u.GetFloat("monthly_requests")
+	}
+}
+```
 For an example of a resource with usage-based see the [AWS Lambda resource](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/lambda_function.go). This resource retrieves the quantities from the usage-file by calling `u.Get("monthly_requests")` and `u.Get("request_duration_ms")`. If these quantities are not provided then the `monthlyQuantity` is set to `nil`.
 
 When Infracost is run without usage data the output for this resource looks like:
@@ -473,7 +521,24 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 > **Note:** Developing Azure resources requires Azure creds. See below for details.
 
-- Unless the resource has global or zone-based pricing, the first line of the resource function should be `region := lookupRegion(d, []string{})` where the second parameter is an optional list of parent resources where the region can be found. Search the code for `lookupRegion` to find examples of how this method is used in other Azure resources. The `resource_group_name` parameter does not need to be passed into `lookupRegion` as it is automatically checked.
+- Unless the resource has global or zone-based pricing, the first line of the resource function should be `region := lookupRegion(d, []string{})` where the second parameter is an optional list of parent resources where the region can be found. See the following examples of how this method is used in other Azure resources.
+	```go
+	func GetAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
+		return &schema.RegistryItem{
+			Name:  "azurerm_app_service_certificate_binding",
+			RFunc: NewAzureRMAppServiceCertificateBinding,
+			ReferenceAttributes: []string{
+				"certificate_id",
+				"resource_group_name",
+			},
+		}
+	}
+
+	func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+		region := lookupRegion(d, []string{"certificate_id", "resource_group_name"})
+		...
+	}
+	```
 
 - The Azure Terraform provider requires real credentials to be able to run `terraform plan`. This means you must have Azure credentials for running the Infracost commands and integration tests for Azure. We recommend creating read-only Azure credentials for this purpose. If you have an Azure subscription, you can do this by running the `az` command line:
 	```sh

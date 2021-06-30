@@ -2,9 +2,9 @@
  Name                                     Monthly Qty  Unit   Monthly Cost 
                                                                            
  azurerm_hdinsight_spark_cluster.example                                   
- ├─ Head node (G2)                              1,460  hours     $2,154.96 
- ├─ Worker node (G2)                            2,190  hours     $3,232.44 
- └─ Zookeeper node (G2)                         2,190  hours     $3,232.44 
+ ├─ Head node (Standard_G2)                     1,460  hours     $2,154.96 
+ ├─ Worker node (Standard_G2)                   2,190  hours     $3,232.44 
+ └─ Zookeeper node (Standard_G2)                2,190  hours     $3,232.44 
                                                                            
  OVERALL TOTAL                                                   $8,619.84 
 ----------------------------------

@@ -15,6 +15,7 @@ func GetAzureRMCosmosdbCassandraKeyspaceRegistryItem() *schema.RegistryItem {
 		RFunc: NewAzureRMCosmosdb,
 		ReferenceAttributes: []string{
 			"account_name",
+			"resource_group_name",
 		},
 	}
 }
@@ -41,7 +42,7 @@ func NewAzureRMCosmosdb(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account *schema.ResourceData) []*schema.CostComponent {
 	// Find the region in from the passed-in account
-	region := lookupRegion(account, []string{})
+	region := lookupRegion(account, []string{"account_name", "resource_group_name"})
 	geoLocations := account.Get("geo_location").Array()
 
 	costComponents := []*schema.CostComponent{}

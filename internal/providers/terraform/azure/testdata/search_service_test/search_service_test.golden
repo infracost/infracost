@@ -1,0 +1,26 @@
+
+ Name                                                 Monthly Qty  Unit                  Monthly Cost 
+                                                                                                      
+ azurerm_search_service.basic                                                                         
+ ├─ Search usage (Basic, 4 units)                           2,920  hours                      $294.92 
+ ├─ Image extraction (first 1M)                             1,000  1000 images              $1,000.00 
+ ├─ Image extraction (next 4M)                              4,000  1000 images              $3,200.00 
+ └─ Image extraction (over 5M)                              1,000  1000 images                $650.00 
+                                                                                                      
+ azurerm_search_service.non_usage_l1                                                                  
+ ├─ Search usage (Storage Optimized L1, 1 unit)               730  hours                    $2,802.47 
+ └─ Image extraction (first 1M)                  Monthly cost depends on usage: $1.00 per 1000 images 
+                                                                                                      
+ azurerm_search_service.optimized_l1                                                                  
+ ├─ Search usage (Storage Optimized L1, 1 unit)               730  hours                    $2,802.47 
+ ├─ Image extraction (first 1M)                             1,000  1000 images              $1,000.00 
+ └─ Image extraction (next 4M)                              2,000  1000 images              $1,600.00 
+                                                                                                      
+ azurerm_search_service.standard_s2                                                                   
+ ├─ Search usage (Standard S2, 1 unit)                        730  hours                      $981.12 
+ ├─ Image extraction (first 1M)                             1,000  1000 images              $1,000.00 
+ └─ Image extraction (next 4M)                              1,000  1000 images                $800.00 
+                                                                                                      
+ OVERALL TOTAL                                                                             $16,130.98 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

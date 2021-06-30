@@ -32,14 +32,10 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
   Merge multiple Infracost JSON files:
 
-      infracost output --format json --path out*.json`,
+			infracost output --format json --path out*.json`,
+		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFiles := []string{}
-
-			if !cmd.Flags().Changed("path") {
-				m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to an Infracost JSON file.", ui.PrimaryString("--path"))
-				ui.PrintUsageErrorAndExit(cmd, m)
-			}
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 			for _, path := range paths {
@@ -134,10 +130,16 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	}
 
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files")
+	_ = cmd.MarkFlagRequired("path")
+	_ = cmd.MarkFlagFilename("path", "json")
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
+
+	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"table", "json", "html"}, cobra.ShellCompDirectiveDefault
+	})
 
 	return cmd
 }

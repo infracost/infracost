@@ -67,8 +67,6 @@
  aws_autoscaling_group.asg_lt_basic                                                                
  └─ aws_launch_template.lt_basic                                                                   
     ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74 
-    ├─ root_block_device                                                                           
-    │  └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60 
     ├─ block_device_mapping[0]                                                                     
     │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00 
     └─ block_device_mapping[1]                                                                     
@@ -78,57 +76,41 @@
  aws_autoscaling_group.asg_lt_cpu_credits                                                          
  └─ aws_launch_template.lt_cpu_credits                                                             
     ├─ Instance usage (Linux/UNIX, on-demand, t3.large)            1,460  hours            $121.47 
-    ├─ CPU credits                                                 1,400  vCPU-hours        $70.00 
-    └─ root_block_device                                                                           
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60 
+    └─ CPU credits                                                 1,400  vCPU-hours        $70.00 
                                                                                                    
  aws_autoscaling_group.asg_lt_cpu_credits_noUsage                                                  
  └─ aws_launch_template.lt_cpu_credits_noUsage                                                     
     ├─ Instance usage (Linux/UNIX, on-demand, t3.large)            1,460  hours            $121.47 
-    ├─ CPU credits                                                     0  vCPU-hours         $0.00 
-    └─ root_block_device                                                                           
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60 
+    └─ CPU credits                                                     0  vCPU-hours         $0.00 
                                                                                                    
  aws_autoscaling_group.asg_lt_ebs_optimized                                                        
  └─ aws_launch_template.lt_ebs_optimized                                                           
     ├─ Instance usage (Linux/UNIX, on-demand, r3.xlarge)           1,460  hours            $486.18 
-    ├─ EBS-optimized usage                                         1,460  hours             $29.20 
-    └─ root_block_device                                                                           
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60 
+    └─ EBS-optimized usage                                         1,460  hours             $29.20 
                                                                                                    
  aws_autoscaling_group.asg_lt_elastic_inference_accelerator                                        
  └─ aws_launch_template.lt_elastic_inference_accelerator                                           
     ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74 
-    ├─ Inference accelerator (eia2.medium)                         1,460  hours            $175.20 
-    └─ root_block_device                                                                           
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60 
+    └─ Inference accelerator (eia2.medium)                         1,460  hours            $175.20 
                                                                                                    
  aws_autoscaling_group.asg_lt_monitoring                                                           
  └─ aws_launch_template.lt_monitoring                                                              
     ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74 
-    ├─ EC2 detailed monitoring                                        14  metrics            $4.20 
-    └─ root_block_device                                                                           
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60 
+    └─ EC2 detailed monitoring                                        14  metrics            $4.20 
                                                                                                    
  aws_autoscaling_group.asg_lt_tenancy_dedicated                                                    
  └─ aws_launch_template.lt_tenancy_dedicated                                                       
-    ├─ Instance usage (Linux/UNIX, on-demand, m3.medium)           1,460  hours            $108.04 
-    └─ root_block_device                                                                           
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60 
+    └─ Instance usage (Linux/UNIX, on-demand, m3.medium)           1,460  hours            $108.04 
                                                                                                    
  aws_autoscaling_group.asg_mixed_instance_basic                                                    
  └─ aws_launch_template.lt_mixed_instance_basic                                                    
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23 
-    └─ root_block_device                                                                           
-       └─ Storage (general purpose SSD, gp2)                          24  GB                 $2.40 
+    └─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23 
                                                                                                    
  aws_autoscaling_group.asg_mixed_instance_dynamic                                                  
  └─ aws_launch_template.lt_mixed_instance_dynamic                                                  
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23 
-    └─ root_block_device                                                                           
-       └─ Storage (general purpose SSD, gp2)                          24  GB                 $2.40 
+    └─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23 
                                                                                                    
- OVERALL TOTAL                                                                           $2,939.78 
+ OVERALL TOTAL                                                                           $2,923.78 
 ----------------------------------
 1 resource type wasn't estimated as it's not supported yet.
 Please watch/star https://github.com/infracost/infracost as new resources are added regularly.

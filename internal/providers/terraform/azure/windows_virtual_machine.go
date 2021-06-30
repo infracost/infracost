@@ -70,7 +70,7 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 			Service:       strPtr("Virtual Machines"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", ValueRegex: strPtr("/.*(?<!Low Priority|Spot)$/i")},
+				{Key: "skuName", ValueRegex: strPtr("/^(?!.*(Low Priority|Spot)$).*$/i")},
 				{Key: "armSkuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", instanceType))},
 				{Key: "productName", ValueRegex: strPtr(productNameRe)},
 			},

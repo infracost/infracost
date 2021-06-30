@@ -10,6 +10,7 @@ func GetAzureRMCosmosdbSQLContainerRegistryItem() *schema.RegistryItem {
 		RFunc: NewAzureRMCosmosdb,
 		ReferenceAttributes: []string{
 			"account_name",
+			"resource_group_name",
 		},
 	}
 }

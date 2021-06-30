@@ -26,8 +26,8 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 	}
 
 	var ioRequests *decimal.Decimal
-	if u != nil && u.Get("monthly_io_request").Exists() {
-		ioRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_io_request").Int()))
+	if u != nil && u.Get("monthly_io_requests").Exists() {
+		ioRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_io_requests").Int()))
 	}
 
 	var cpuCreditsT3 *decimal.Decimal

@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  azurerm_lb.basic:
+    monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
+
+  azurerm_lb.standard:
+    monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
