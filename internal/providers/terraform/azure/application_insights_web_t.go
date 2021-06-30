@@ -1,6 +1,8 @@
 package azure
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -18,7 +20,7 @@ func NewAzureRMApplicationInsightsWeb(d *schema.ResourceData, u *schema.UsageDat
 	costComponents := []*schema.CostComponent{}
 
 	if d.Get("kind").Type != gjson.Null {
-		if d.Get("kind").String() == "multistep" && d.Get("enabled").Type == gjson.True {
+		if strings.ToLower(d.Get("kind").String()) == "multistep" && d.Get("enabled").Type == gjson.True {
 			costComponents = append(costComponents, appInsightCostComponents(
 				region,
 				"Multi-step web test",
