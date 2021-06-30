@@ -1,12 +1,10 @@
 package azure
 
 import (
-	"strings"
-
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
-
 	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
+	"strings"
 )
 
 func GetAzureRMLoadBalancerRegistryItem() *schema.RegistryItem {
@@ -21,13 +19,7 @@ func GetAzureRMLoadBalancerRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMLoadBalancer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
-	if strings.Contains(strings.ToLower(region), "usgov") {
-		region = "US Gov"
-	} else if strings.Contains(strings.ToLower(region), "china") {
-		region = "Сhina"
-	} else {
-		region = "Global"
-	}
+	region = convertRegion(region)
 
 	var costComponents []*schema.CostComponent
 	var sku string
