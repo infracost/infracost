@@ -614,6 +614,10 @@ resource_usage:
   azurerm_automation_dsc_nodeconfiguration.my_nodeconfiguration:
     non_azure_config_node_count: 0 # Number of non-Azure configuration nodes.
 
+  azurerm_application_gateway.my_gateway: 
+    monthly_data_processed_gb: 100000 #  Monthly data processed by the Application Gateway in GB.
+    monthly_v2_capacity_units: 10000  # Number capacity(for v2) units gateway.
+
   azurerm_automation_job_schedule.my_schedule:
     monthly_job_run_mins: 0 # Monthly number of job run minutes.  
 
@@ -772,6 +776,9 @@ resource_usage:
     instances: 10 # Override the number of instances in the scale set.
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
+
+  azurerm_lb.my_lb:
+    monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
 
   azurerm_managed_disk.my_disk:
     monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
