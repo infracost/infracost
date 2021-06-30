@@ -99,18 +99,21 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 		}
 	} else {
 		ami := d.Get("image_id").String()
-		svc := ec2.New(session.New(), &aws.Config{
+		sess, err := session.NewSession(&aws.Config{
 			Region: &region,
 		})
-		input := &ec2.DescribeImagesInput{
-			ImageIds: []*string{
-				aws.String(ami),
-			},
-		}
-		result, err := svc.DescribeImages(input)
 		if err == nil {
-			if len(result.Images) > 0 {
-				usageOperation = *result.Images[0].UsageOperation
+			svc := ec2.New(sess)
+			input := &ec2.DescribeImagesInput{
+				ImageIds: []*string{
+					aws.String(ami),
+				},
+			}
+			result, err := svc.DescribeImages(input)
+			if err == nil {
+				if len(result.Images) > 0 {
+					usageOperation = *result.Images[0].UsageOperation
+				}
 			}
 		}
 	}
