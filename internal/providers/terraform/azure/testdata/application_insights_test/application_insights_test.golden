@@ -9,8 +9,8 @@
                                                                                           
  azurerm_application_insights.with_retention                                              
  ├─ Data ingested                                     1,000  GB                 $2,300.00 
- └─ Data retention (30 days)                         30,000  GB                 $3,000.00 
+ └─ Data retention (120 days)                         1,000  GB                   $100.00 
                                                                                           
- OVERALL TOTAL                                                                  $7,600.00 
+ OVERALL TOTAL                                                                  $4,700.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

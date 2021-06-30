@@ -30,12 +30,12 @@ func NewAzureRMApplicationInsights(d *schema.ResourceData, u *schema.UsageData) 
 		dataRetentionDays = decimalPtr(decimal.NewFromInt(d.Get("retention_in_days").Int()))
 
 		if dataRetentionDays.GreaterThan(decimal.NewFromInt(90)) && dataIngested != nil {
-			days := dataRetentionDays.Sub(decimal.NewFromInt(90))
+			days := dataRetentionDays.Sub(decimal.NewFromInt(90)).Div(decimal.NewFromInt(30))
 			qty := decimalPtr(dataIngested.Mul(days))
 
 			costComponents = append(costComponents, appInsightCostComponents(
 				region,
-				fmt.Sprintf("Data retention (%s days)", days.String()),
+				fmt.Sprintf("Data retention (%s days)", dataRetentionDays.String()),
 				"GB",
 				"Data Retention",
 				"Enterprise",
@@ -53,7 +53,7 @@ func NewAzureRMApplicationInsights(d *schema.ResourceData, u *schema.UsageData) 
 func appInsightCostComponents(region, name, unit, meterName, skuName string, qty *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "GB",
+		Unit:            unit,
 		UnitMultiplier:  1,
 		MonthlyQuantity: qty,
 		ProductFilter: &schema.ProductFilter{

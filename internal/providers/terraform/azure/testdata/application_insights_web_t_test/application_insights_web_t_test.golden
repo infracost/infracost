@@ -5,7 +5,7 @@
  └─ Data ingested                                Monthly cost depends on usage: $2.30 per GB 
                                                                                              
  azurerm_application_insights_web_test.non_free                                              
- └─ Multi-step web test                                      1  GB                    $10.00 
+ └─ Multi-step web test                                      1  test                  $10.00 
                                                                                              
  OVERALL TOTAL                                                                        $10.00 
 ----------------------------------
