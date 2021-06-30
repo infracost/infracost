@@ -7,6 +7,7 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/agext/levenshtein v1.2.2 // indirect
+	github.com/aws/aws-sdk-go v1.38.69 // indirect
 	github.com/briandowns/spinner v1.13.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fatih/color v1.12.0

@@ -110,7 +110,16 @@
  └─ aws_launch_template.lt_mixed_instance_dynamic                                                  
     └─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23 
                                                                                                    
- OVERALL TOTAL                                                                           $2,923.78 
+ aws_autoscaling_group.with_ami                                                                    
+ └─ aws_launch_template.with_ami                                                                   
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours            $155.34 
+    ├─ block_device_mapping[0]                                                                     
+    │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00 
+    └─ block_device_mapping[1]                                                                     
+       ├─ Storage (provisioned IOPS SSD, io1)                         40  GB                 $5.00 
+       └─ Provisioned IOPS                                           400  IOPS              $26.00 
+                                                                                                   
+ OVERALL TOTAL                                                                           $3,112.13 
 ----------------------------------
 1 resource type wasn't estimated as it's not supported yet.
 Please watch/star https://github.com/infracost/infracost as new resources are added regularly.

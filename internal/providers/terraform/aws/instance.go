@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
 
@@ -74,6 +77,7 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 
 	osLabel := "Linux/UNIX"
 	operatingSystem := "Linux"
+	var usageOperation string
 
 	// Allow the operating system to be specified in the usage data until we can support it from the AMI directly.
 	if u != nil && u.Get("operating_system").Exists() {
@@ -91,6 +95,22 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 		default:
 			if os != "linux" {
 				log.Warnf("Unrecognized operating system %s, defaulting to Linux/UNIX", os)
+			}
+		}
+	} else {
+		ami := d.Get("image_id").String()
+		svc := ec2.New(session.New(), &aws.Config{
+			Region: &region,
+		})
+		input := &ec2.DescribeImagesInput{
+			ImageIds: []*string{
+				aws.String(ami),
+			},
+		}
+		result, err := svc.DescribeImages(input)
+		if err == nil {
+			if len(result.Images) > 0 {
+				usageOperation = *result.Images[0].UsageOperation
 			}
 		}
 	}
@@ -114,7 +134,7 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 		}
 	}
 
-	return &schema.CostComponent{
+	costComponent := &schema.CostComponent{
 		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
@@ -127,7 +147,6 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "instanceType", Value: strPtr(instanceType)},
 				{Key: "tenancy", Value: strPtr(tenancy)},
-				{Key: "operatingSystem", Value: strPtr(operatingSystem)},
 				{Key: "preInstalledSw", Value: strPtr("NA")},
 				{Key: "licenseModel", Value: strPtr("No License required")},
 				{Key: "capacitystatus", Value: strPtr("Used")},
@@ -137,6 +156,16 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 			PurchaseOption: &purchaseOption,
 		},
 	}
+
+	if usageOperation != "" {
+		costComponent.ProductFilter.AttributeFilters = append(costComponent.ProductFilter.AttributeFilters,
+			&schema.AttributeFilter{Key: "operation", Value: strPtr(usageOperation)})
+	} else {
+		costComponent.ProductFilter.AttributeFilters = append(costComponent.ProductFilter.AttributeFilters,
+			&schema.AttributeFilter{Key: "operatingSystem", Value: strPtr(operatingSystem)})
+	}
+
+	return costComponent
 }
 
 func validateReserveInstanceParams(typeName, term, option string) (bool, string) {

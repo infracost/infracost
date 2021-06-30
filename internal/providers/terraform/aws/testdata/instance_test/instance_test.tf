@@ -164,3 +164,8 @@ resource "aws_instance" "cnvr_3yr_all_upfront" {
   ami           = "fake_ami"
   instance_type = "t3.medium"
 }
+
+resource "aws_instance" "with_ami" {
+  ami           = "ami-091967a4c3dbe5eac"
+  instance_type = "t2.medium"
+}

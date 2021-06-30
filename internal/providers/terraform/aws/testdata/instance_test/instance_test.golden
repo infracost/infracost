@@ -140,7 +140,12 @@
  └─ root_block_device                                                                                       
     └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
                                                                                                             
- OVERALL TOTAL                                                                                      $992.14 
+ aws_instance.with_ami                                                                                      
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)               730  hours                       $33.87 
+ └─ root_block_device                                                                                       
+    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
+                                                                                                            
+ OVERALL TOTAL                                                                                    $1,026.81 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
 

@@ -355,3 +355,33 @@ resource "aws_autoscaling_group" "asg_mixed_instance_dynamic" {
     }
   }
 }
+
+resource "aws_launch_template" "with_ami" {
+  image_id      = "ami-091967a4c3dbe5eac"
+  instance_type = "t2.medium"
+
+  block_device_mappings {
+    device_name = "xvdf"
+    ebs {
+      volume_size = 10
+    }
+  }
+
+  block_device_mappings {
+    device_name = "xvfa"
+    ebs {
+      volume_size = 20
+      volume_type = "io1"
+      iops        = 200
+    }
+  }
+}
+
+resource "aws_autoscaling_group" "with_ami" {
+  launch_template {
+    id = aws_launch_template.with_ami.id
+  }
+  desired_capacity = 2
+  max_size         = 3
+  min_size         = 1
+}
