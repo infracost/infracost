@@ -596,8 +596,8 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 		ModuleSource     string
 	}{
 		{
-			SourceAddrSuffix: "aws_autoscaling_group.workers_launch_template[0]",
-			DestAddrSuffix:   "aws_launch_template.workers_launch_template[0]",
+			SourceAddrSuffix: "aws_autoscaling_group.workers_launch_template",
+			DestAddrSuffix:   "aws_launch_template.workers_launch_template",
 			Attribute:        "launch_template",
 			ModuleSource:     "terraform-aws-modules/eks/aws",
 		},
@@ -607,11 +607,14 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 		for _, knownRef := range knownRefs {
 			modNames := getModuleNames(d.Address)
 			modSource := getModuleConfJSON(conf, modNames).Get("source").String()
-			matches := strings.HasSuffix(d.Address, knownRef.SourceAddrSuffix) && modSource == knownRef.ModuleSource
+			matches := strings.HasSuffix(removeAddressArrayPart(d.Address), knownRef.SourceAddrSuffix) && modSource == knownRef.ModuleSource
 
 			if matches {
+				countIndex := addressCountIndex(d.Address)
+
 				for _, destD := range resData {
-					if cmp.Equal(getModuleNames(destD.Address), modNames) && strings.HasSuffix(destD.Address, knownRef.DestAddrSuffix) {
+					suffix := fmt.Sprintf("%s[%d]", knownRef.DestAddrSuffix, countIndex)
+					if cmp.Equal(getModuleNames(destD.Address), modNames) && strings.HasSuffix(destD.Address, suffix) {
 						d.AddReference(knownRef.Attribute, destD)
 					}
 				}
