@@ -60,13 +60,7 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 
 	if d.Get("network_profile.0.load_balancer_sku").Type != gjson.Null {
 		if strings.ToLower(d.Get("network_profile.0.load_balancer_sku").String()) == "standard" {
-			if strings.Contains(strings.ToLower(region), "usgov") {
-				region = "US Gov"
-			} else if strings.Contains(strings.ToLower(region), "china") {
-				region = "Сhina"
-			} else {
-				region = "Global"
-			}
+			region = convertRegion(region)
 			var monthlyDataProcessedGb *decimal.Decimal
 			if u != nil && u.Get("load_balancer.monthly_data_processed_gb").Type != gjson.Null {
 				monthlyDataProcessedGb = decimalPtr(decimal.NewFromInt(u.Get("load_balancer.monthly_data_processed_gb").Int()))

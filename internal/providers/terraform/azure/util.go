@@ -4,6 +4,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
+	"strings"
 )
 
 func strPtr(s string) *string {
@@ -34,6 +35,16 @@ func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
 	defaultRegion := d.Get("region").String()
 	log.Warnf("Using %s for resource %s as its 'location' property could not be found.", defaultRegion, d.Address)
 	return defaultRegion
+}
+
+func convertRegion(region string) string {
+	if strings.Contains(strings.ToLower(region), "usgov") {
+		return "US Gov"
+	} else if strings.Contains(strings.ToLower(region), "china") {
+		return "Сhina"
+	} else {
+		return "Global"
+	}
 }
 
 func locationNameMapping(l string) string {
