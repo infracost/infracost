@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"runtime"
 	"sort"
@@ -116,6 +117,8 @@ func ciScript() string {
 		return "ci-diff"
 	} else if IsTruthy(os.Getenv("INFRACOST_CI_ATLANTIS_DIFF")) {
 		return "ci-atlantis-diff"
+	} else if IsTruthy(os.Getenv("INFRACOST_CI_JENKINS_DIFF")) {
+		return "ci-jenkins-diff"
 	}
 
 	return ""
@@ -128,6 +131,12 @@ func ciPlatform() string {
 		return "gitlab_ci"
 	} else if IsTruthy(os.Getenv("CIRCLECI")) {
 		return "circleci"
+	} else if IsTruthy(os.Getenv("JENKINS_HOME")) {
+		return "jenkins"
+	} else if IsTruthy(os.Getenv("BUILDKITE")) {
+		return "buildkite"
+	} else if IsTruthy(os.Getenv("SYSTEM_COLLECTIONURI")) {
+		return fmt.Sprintf("azure_devops_%s", os.Getenv("BUILD_REPOSITORY_PROVIDER"))
 	} else {
 		envKeys := os.Environ()
 		sort.Strings(envKeys)
@@ -136,8 +145,6 @@ func ciPlatform() string {
 				return "atlantis"
 			} else if strings.HasPrefix(k, "BITBUCKET_") {
 				return "bitbucket"
-			} else if strings.HasPrefix(k, "JENKINS_") {
-				return "jenkins"
 			} else if strings.HasPrefix(k, "CONCOURSE_") {
 				return "concourse"
 			}
