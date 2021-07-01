@@ -12,6 +12,7 @@ fix_env_vars () {
     usage_file=${usage_file:-$USAGE_FILE}
     config_file=${config_file:-$CONFIG_FILE}
     fail_condition=${fail_condition:-$FAIL_CONDITION}
+    show_skipped=${show_skipped:-$SHOW_SKIPPED}
 }
 
 process_args () {
