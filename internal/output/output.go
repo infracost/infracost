@@ -31,6 +31,13 @@ type Project struct {
 	fullSummary   *Summary
 }
 
+func (p *Project) Label() string {
+	if p.Metadata.VCSRepoURL != "" {
+		return p.Name
+	}
+	return fmt.Sprintf("%s (%s)", p.Name, p.Metadata.Path)
+}
+
 type Breakdown struct {
 	Resources        []Resource       `json:"resources"`
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
