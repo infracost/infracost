@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/awslabs/goformation/v4 v4.19.5
-	github.com/briandowns/spinner v1.13.0
+	github.com/briandowns/spinner v1.16.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fatih/color v1.12.0
 	github.com/google/go-cmp v0.5.6
