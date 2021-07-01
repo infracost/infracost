@@ -16,6 +16,7 @@ process_args () {
   config_file=${5:-$config_file}
   percentage_threshold=${6:-$percentage_threshold}
   post_condition=${7:-$post_condition}
+  show_skipped=${8:-$show_skipped}
 
   # Validate post_condition
   if ! echo "$post_condition" | jq empty; then
@@ -78,6 +79,10 @@ build_breakdown_cmd () {
 
 build_output_cmd () {
   output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
+  if [ ! -z "$show_skipped" ]; then
+    # The "=" is important as otherwise the value of the flag is ignored by the CLI
+    output_cmd="$output_cmd --show-skipped=$show_skipped"
+  fi
   echo "${output_cmd}"
 }
 
