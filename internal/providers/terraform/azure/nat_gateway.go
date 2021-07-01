@@ -1,8 +1,6 @@
 package azure
 
 import (
-	"strings"
-
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -20,13 +18,7 @@ func GetAzureRMAppNATGatewayRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
-	if strings.Contains(strings.ToLower(region), "usgov") {
-		region = "US Gov"
-	} else if strings.Contains(strings.ToLower(region), "china") {
-		region = "Сhina"
-	} else {
-		region = "Global"
-	}
+	region = convertRegion(region)
 
 	var monthlyDataProcessedGb *decimal.Decimal
 	if u != nil && u.Get("monthly_data_processed_gb").Type != gjson.Null {
