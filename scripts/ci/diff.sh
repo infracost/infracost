@@ -149,7 +149,7 @@ post_to_github () {
     jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
       -H "Content-Type: application/json" \
       -H "Authorization: token $GITHUB_TOKEN" \
-      "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
+      "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
   fi
 }
 
@@ -240,7 +240,7 @@ load_github_env () {
   
   github_event=$(cat $GITHUB_EVENT_PATH)
 
-  if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
+  if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     GITHUB_SHA=$(echo $github_event | jq -r .pull_request.head.sha)
     export VCS_PULL_REQUEST_URL=$(echo $github_event | jq -r .pull_request.html_url)
   else
