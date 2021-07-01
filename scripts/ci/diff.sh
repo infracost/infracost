@@ -251,7 +251,6 @@ load_azure_devops_env () {
   export VCS_REPO_URL=$BUILD_REPOSITORY_URI
 }
 
-
 cleanup () {
   rm -f infracost_breakdown.json infracost_breakdown_cmd infracost_output_cmd
 }

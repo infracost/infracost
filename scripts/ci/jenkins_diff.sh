@@ -115,11 +115,18 @@ build_msg_html () {
   printf '%s' "$html"
 }
 
+post_to_slack () {
+  echo "Posting comment to Slack"
+  msg="$(build_msg false)"
+  jq -Mnc --arg msg "$msg" '{"text": "\($msg)"}' | curl -L -X POST -d @- \
+    -H "Content-Type: application/json" \
+    "$SLACK_WEBHOOK_URL"
+}
+
 cleanup () {
   # Don't delete infracost_diff.html here as Jenkinsfile publishes that
   rm -f infracost_breakdown.json infracost_breakdown_cmd infracost_output_cmd
 }
-
 
 # MAIN
 
@@ -175,6 +182,10 @@ echo "$msg"
 
 html=$(build_msg_html "$msg")
 echo "$html" > infracost_diff.html
+
+if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
+  post_to_slack
+fi
 
 cleanup
 
