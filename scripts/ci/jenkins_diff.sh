@@ -64,6 +64,10 @@ build_breakdown_cmd () {
 
 build_output_cmd () {
   output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
+  if [ ! -z "$show_skipped" ]; then
+    # The "=" is important as otherwise the value of the flag is ignored by the CLI
+    output_cmd="$output_cmd --show-skipped=$show_skipped"
+  fi
   echo "${output_cmd}"
 }
 
