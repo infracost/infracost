@@ -1,6 +1,8 @@
 package azure
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -15,7 +17,6 @@ func GetAzureRMKubernetesClusterRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
-
 	var costComponents []*schema.CostComponent
 	var subResources []*schema.Resource
 
@@ -55,6 +56,40 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 
 	subResources = []*schema.Resource{
 		aksClusterNodePool("default_node_pool", region, d.Get("default_node_pool.0"), nodeCount, u),
+	}
+
+	if d.Get("network_profile.0.load_balancer_sku").Type != gjson.Null {
+		if strings.ToLower(d.Get("network_profile.0.load_balancer_sku").String()) == "standard" {
+			region = convertRegion(region)
+			var monthlyDataProcessedGb *decimal.Decimal
+			if u != nil && u.Get("load_balancer.monthly_data_processed_gb").Type != gjson.Null {
+				monthlyDataProcessedGb = decimalPtr(decimal.NewFromInt(u.Get("load_balancer.monthly_data_processed_gb").Int()))
+			}
+			lbResource := schema.Resource{
+				Name:           "Load Balancer",
+				CostComponents: []*schema.CostComponent{dataProcessedCostComponent(region, monthlyDataProcessedGb)},
+			}
+			subResources = append(subResources, &lbResource)
+		}
+	}
+	if d.Get("addon_profile.0.http_application_routing").Type != gjson.Null {
+		if strings.ToLower(d.Get("addon_profile.0.http_application_routing.0.enabled").String()) == "true" {
+			if strings.HasPrefix(strings.ToLower(region), "usgov") {
+				region = "US Gov Zone 1"
+			} else if strings.HasPrefix(strings.ToLower(region), "germany") {
+				region = "DE Zone 1"
+			} else if strings.HasPrefix(strings.ToLower(region), "china") {
+				region = "Zone 1 (China)"
+			} else {
+				region = "Zone 1"
+			}
+
+			dnsResource := schema.Resource{
+				Name:           "DNS",
+				CostComponents: []*schema.CostComponent{hostedPublicZoneCostComponent(region)},
+			}
+			subResources = append(subResources, &dnsResource)
+		}
 	}
 
 	return &schema.Resource{

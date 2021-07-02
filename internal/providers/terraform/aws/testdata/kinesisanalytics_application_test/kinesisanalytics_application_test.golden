@@ -1,0 +1,12 @@
+
+ Name                                               Monthly Qty  Unit              Monthly Cost 
+                                                                                                
+ aws_kinesis_analytics_application.withUsage                                                    
+ └─ Processing (stream)                                      10  KPU                    $927.10 
+                                                                                                
+ aws_kinesis_analytics_application.withoutUsage                                                 
+ └─ Processing (stream)                          Monthly cost depends on usage: $92.71 per KPU  
+                                                                                                
+ OVERALL TOTAL                                                                          $927.10 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

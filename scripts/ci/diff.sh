@@ -16,6 +16,7 @@ process_args () {
   config_file=${5:-$config_file}
   percentage_threshold=${6:-$percentage_threshold}
   post_condition=${7:-$post_condition}
+  show_skipped=${8:-$show_skipped}
 
   # Validate post_condition
   if ! echo "$post_condition" | jq empty; then
@@ -65,7 +66,7 @@ build_breakdown_cmd () {
     breakdown_cmd="$breakdown_cmd --terraform-plan-flags \"$terraform_plan_flags\""
   fi
   if [ ! -z "$terraform_workspace" ]; then
-    breakdown_cmd="$terraform_workspace --terraform-workspace $terraform_workspace"
+    breakdown_cmd="$breakdown_cmd --terraform-workspace $terraform_workspace"
   fi
   if [ ! -z "$usage_file" ]; then
     breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
@@ -78,6 +79,10 @@ build_breakdown_cmd () {
 
 build_output_cmd () {
   output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
+  if [ ! -z "$show_skipped" ]; then
+    # The "=" is important as otherwise the value of the flag is ignored by the CLI
+    output_cmd="$output_cmd --show-skipped=$show_skipped"
+  fi
   echo "${output_cmd}"
 }
 
@@ -250,7 +255,6 @@ load_circle_ci_env () {
 load_azure_devops_env () {
   export VCS_REPO_URL=$BUILD_REPOSITORY_URI
 }
-
 
 cleanup () {
   rm -f infracost_breakdown.json infracost_breakdown_cmd infracost_output_cmd

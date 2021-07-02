@@ -14,6 +14,7 @@ resource "azurerm_kubernetes_cluster" "free_D2V2" {
   resource_group_name = azurerm_resource_group.example.name
   dns_prefix          = "exampleaks1"
 
+
   default_node_pool {
     name    = "default"
     vm_size = "Standard_D2_v2"
@@ -68,7 +69,15 @@ resource "azurerm_kubernetes_cluster" "usage_ephemeral" {
   resource_group_name = azurerm_resource_group.example.name
   dns_prefix          = "exampleaks1"
   sku_tier            = "Paid"
-
+  network_profile {
+    network_plugin    = "azure"
+    load_balancer_sku = "Standard"
+  }
+  addon_profile {
+    http_application_routing {
+      enabled = true
+    }
+  }
   default_node_pool {
     name         = "default"
     vm_size      = "Standard_D2_v2"

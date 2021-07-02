@@ -5,6 +5,7 @@ import "github.com/infracost/infracost/internal/schema"
 // ResourceRegistry grouped alphabetically
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMApiManagementRegistryItem(),
+	GetAzureRMApplicationGatewayRegistryItem(),
 	GetAzureRMAppIsolatedServicePlanRegistryItem(),
 	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
 	GetAzureRMAppFunctionRegistryItem(),
@@ -13,6 +14,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
 	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
 	GetAzureRMAppServicePlanRegistryItem(),
+	GetAzureRMApplicationInsightsWebRegistryItem(),
+	GetAzureRMApplicationInsightsRegistryItem(),
 	GetAzureRMAutomationAccountRegistryItem(),
 	GetAzureRMAutomationDscConfigurationRegistryItem(),
 	GetAzureRMAutomationDscNodeconfigurationRegistryItem(),
@@ -52,6 +55,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMKeyVaultManagedHSMRegistryItem(),
 	GetAzureRMKubernetesClusterRegistryItem(),
 	GetAzureRMKubernetesClusterNodePoolRegistryItem(),
+	GetAzureRMLoadBalancerRegistryItem(),
+	GetAzureRMLoadBalancerRuleRegistryItem(),
+	GetAzureRMLoadBalancerOutboundRuleRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
@@ -183,6 +189,13 @@ var FreeResources []string = []string{
 	"azurerm_key_vault_certificate_data",
 	"azurerm_key_vault_certificate_issuer",
 	"azurerm_key_vault_secret",
+
+	// Azure Load Balancer
+	"azurerm_lb_backend_address_pool",
+	"azurerm_lb_backend_address_pool_address",
+	"azurerm_lb_nat_pool",
+	"azurerm_lb_nat_rule",
+	"azurerm_lb_probe",
 
 	// Azure Networking
 	"azurerm_application_security_group",

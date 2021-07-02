@@ -50,7 +50,13 @@ build_breakdown_cmd () {
   if [ ! -z "$config_file" ]; then
     breakdown_cmd="$breakdown_cmd --config-file $config_file"
   else
-    breakdown_cmd="$breakdown_cmd --path $PLANFILE"
+    if [ -f "$PLANFILE.json" ]; then
+      breakdown_cmd="$breakdown_cmd --path $PLANFILE.json"
+    elif [ -f "$PLANFILE" ]; then
+      breakdown_cmd="$breakdown_cmd --path $PLANFILE"
+    else
+      echo "Error: PLANFILE '$PLANFILE' does not exist"
+    fi
   fi
   if [ "$atlantis_debug" != "true" ]; then
     breakdown_cmd="$breakdown_cmd 2>/dev/null"
@@ -61,9 +67,12 @@ build_breakdown_cmd () {
 
 build_output_cmd () {
   output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
+  if [ ! -z "$show_skipped" ]; then
+    # The "=" is important as otherwise the value of the flag is ignored by the CLI
+    output_cmd="$output_cmd --show-skipped=$show_skipped"
+  fi
   echo "${output_cmd}"
 }
-
 
 format_cost () {
   cost=$1
@@ -102,6 +111,20 @@ build_msg () {
   msg="${msg}\n"
   msg="${msg}$(echo "    ${diff_output//$'\n'/\\n    }" | sed "s/%/%%/g")\n"
   printf "$msg"
+}
+
+post_to_slack () {
+  msg="$(build_msg false)"
+  if [ "$atlantis_debug" = "true" ]; then
+    echo "Posting comment to Slack"
+    jq -Mnc --arg msg "$msg" '{"text": "\($msg)"}' | curl -L -X POST -d @- \
+      -H "Content-Type: application/json" \
+      "$SLACK_WEBHOOK_URL"
+  else
+    jq -Mnc --arg msg "$msg" '{"text": "\($msg)"}' | curl -S -s -o /dev/null -L -X POST -d @- \
+      -H "Content-Type: application/json" \
+      "$SLACK_WEBHOOK_URL"
+  fi
 }
 
 cleanup () {
@@ -180,5 +203,9 @@ fi
 
 msg="$(build_msg)"
 echo "$msg"
+
+if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
+  post_to_slack
+fi
 
 cleanup
