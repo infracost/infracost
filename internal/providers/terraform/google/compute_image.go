@@ -1,6 +1,8 @@
 package google
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -63,7 +65,7 @@ func storageImage(region string, description string, storageSize *decimal.Decima
 				Service:       strPtr("Compute Engine"),
 				ProductFamily: strPtr("Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr(description)},
+					{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s/i", description))},
 				},
 			},
 		},

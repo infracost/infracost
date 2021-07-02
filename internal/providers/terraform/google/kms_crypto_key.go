@@ -93,7 +93,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 					Service:       strPtr("Cloud Key Management Service (KMS)"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", ValueRegex: strPtr("/" + keyDescript + "/")},
+						{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s/i", keyDescript))},
 					},
 				},
 				PriceFilter: &schema.PriceFilter{
@@ -113,7 +113,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 				Service:       strPtr("Cloud Key Management Service (KMS)"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", ValueRegex: strPtr("/" + keyDescript + "/")},
+					{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s/i", keyDescript))},
 				},
 			},
 		})
@@ -130,7 +130,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			Service:       strPtr("Cloud Key Management Service (KMS)"),
 			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: strPtr("/" + operationDesctipt + "/")},
+				{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operationDesctipt))},
 			},
 		},
 	})

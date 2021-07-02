@@ -100,7 +100,7 @@ func dataStorage(d *schema.ResourceData, u *schema.UsageData) *schema.CostCompon
 			Region:     strPtr(region),
 			Service:    strPtr("Cloud Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "resourceGroup", Value: strPtr(resourceGroup)},
+				{Key: "resourceGroup", ValueRegex: strPtr(fmt.Sprintf("/%s/i", resourceGroup))},
 				{Key: "description", ValueRegex: strPtr("/^(?!.*?\\(Early Delete\\))/")},
 			},
 		},
@@ -143,7 +143,7 @@ func operations(d *schema.ResourceData, u *schema.UsageData) []*schema.CostCompo
 				VendorName: strPtr("gcp"),
 				Service:    strPtr("Cloud Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
+					{Key: "resourceGroup", ValueRegex: strPtr(fmt.Sprintf("/%s/i", storageClassResourceGroupMap[storageClass]))},
 					{Key: "description", ValueRegex: strPtr("/Class A/")},
 				},
 			},
@@ -160,7 +160,7 @@ func operations(d *schema.ResourceData, u *schema.UsageData) []*schema.CostCompo
 				VendorName: strPtr("gcp"),
 				Service:    strPtr("Cloud Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
+					{Key: "resourceGroup", ValueRegex: strPtr(fmt.Sprintf("/%s/i", storageClassResourceGroupMap[storageClass]))},
 					{Key: "description", ValueRegex: strPtr("/Class B/")},
 				},
 			},
@@ -202,7 +202,7 @@ func dataRetrieval(d *schema.ResourceData, u *schema.UsageData) *schema.CostComp
 			VendorName: strPtr("gcp"),
 			Service:    strPtr("Cloud Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "resourceGroup", Value: strPtr(resourceGroup)},
+				{Key: "resourceGroup", ValueRegex: strPtr(fmt.Sprintf("/%s/i", resourceGroup))},
 				{Key: "description", ValueRegex: strPtr("/Retrieval/")},
 			},
 		},
