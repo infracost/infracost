@@ -2,7 +2,6 @@ package aws
 
 import (
 	"github.com/infracost/infracost/internal/schema"
-	"strings"
 
 	"github.com/shopspring/decimal"
 )
@@ -27,7 +26,7 @@ func NewEC2TransitGatewayVpcAttachment(d *schema.ResourceData, u *schema.UsageDa
 
 	for _, ref := range vpcRefs {
 		// the VPC ref can also be for the aws_subnet_ids resource which we don't want to consider
-		if strings.ToLower(ref.Type) == "aws_default_vpc" || strings.ToLower(ref.Type) == "aws_vpc" {
+		if ref.Type == "aws_default_vpc" || ref.Type == "aws_vpc" {
 			vpcRef = ref
 			break
 		}

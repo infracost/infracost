@@ -5,7 +5,6 @@ import (
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 func GetStepFunctionRegistryItem() *schema.RegistryItem {
@@ -26,14 +25,14 @@ func NewStepFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		tier = d.Get("type").String()
 	}
 
-	if strings.ToLower(tier) == "standard" {
+	if tier == "STANDARD" {
 		if u != nil && u.Get("monthly_transitions").Type != gjson.Null {
 			transitions = decimalPtr(decimal.NewFromInt(u.Get("monthly_transitions").Int()))
 		}
 		costComponents = append(costComponents, stepFunctionStandardCostComponent(region, transitions))
 	}
 
-	if strings.ToLower(tier) == "express" {
+	if tier == "EXPRESS" {
 		if u != nil && u.Get("monthly_requests").Type != gjson.Null {
 			requests = decimalPtr(decimal.NewFromInt(u.Get("monthly_requests").Int()))
 		}

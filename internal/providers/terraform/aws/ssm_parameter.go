@@ -47,7 +47,7 @@ func parameterStorageCostComponent(d *schema.ResourceData, u *schema.UsageData) 
 	if d.Get("tier").Exists() {
 		tier = d.Get("tier").String()
 	}
-	if strings.ToLower(tier) == "standard" {
+	if tier == "Standard" {
 		// Standard is free
 		return nil
 	}

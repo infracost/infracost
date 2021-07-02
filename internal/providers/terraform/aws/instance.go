@@ -28,10 +28,10 @@ func GetInstanceRegistryItem() *schema.RegistryItem {
 
 func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	tenancy := "Shared"
-	if strings.ToLower(d.Get("tenancy").String()) == "host" {
+	if d.Get("tenancy").String() == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances", d.Address)
 		return nil
-	} else if strings.ToLower(d.Get("tenancy").String()) == "dedicated" {
+	} else if d.Get("tenancy").String() == "dedicated" {
 		tenancy = "Dedicated"
 	}
 

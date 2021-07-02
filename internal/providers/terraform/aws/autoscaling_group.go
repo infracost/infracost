@@ -2,7 +2,6 @@ package aws
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
@@ -59,7 +58,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	} else if len(launchTemplateRef) > 0 {
 		onDemandCount := desiredCapacity
 		spotCount := decimal.Zero
-		if strings.ToLower(launchTemplateRef[0].Get("instance_market_options.0.market_type").String()) == "spot" {
+		if launchTemplateRef[0].Get("instance_market_options.0.market_type").String() == "spot" {
 			onDemandCount = decimal.Zero
 			spotCount = desiredCapacity
 		}
@@ -89,10 +88,10 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 
 func newLaunchConfiguration(name string, d *schema.ResourceData, u *schema.UsageData, region string) *schema.Resource {
 	tenancy := "Shared"
-	if strings.ToLower(d.Get("placement_tenancy").String()) == "host" {
+	if d.Get("placement_tenancy").String() == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
 		return nil
-	} else if strings.ToLower(d.Get("placement_tenancy").String()) == "dedicated" {
+	} else if d.Get("placement_tenancy").String() == "dedicated" {
 		tenancy = "Dedicated"
 	}
 
@@ -131,10 +130,10 @@ func newLaunchConfiguration(name string, d *schema.ResourceData, u *schema.Usage
 
 func newLaunchTemplate(name string, d *schema.ResourceData, u *schema.UsageData, region string, onDemandCount decimal.Decimal, spotCount decimal.Decimal) *schema.Resource {
 	tenancy := "Shared"
-	if strings.ToLower(d.Get("placement.0.tenancy").String()) == "host" {
+	if d.Get("placement.0.tenancy").String() == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Templates", d.Address)
 		return nil
-	} else if strings.ToLower(d.Get("placement.0.tenancy").String()) == "dedicated" {
+	} else if d.Get("placement.0.tenancy").String() == "dedicated" {
 		tenancy = "Dedicated"
 	}
 

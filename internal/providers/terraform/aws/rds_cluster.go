@@ -40,7 +40,7 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		auroraCapacityUnits = decimalPtr(decimal.NewFromInt(u.Get("capacity_units_per_hr").Int()))
 	}
 
-	if strings.ToLower(databaseEngineMode) == "serverless" {
+	if databaseEngineMode == "Serverless" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           "Aurora serverless",
 			Unit:           "ACU-hours",
