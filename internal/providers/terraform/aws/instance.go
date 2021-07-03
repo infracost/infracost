@@ -39,13 +39,14 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	}
 
 	instanceType := d.Get("instance_type").String()
+	ami := d.Get("ami").String()
 
 	region := d.Get("region").String()
 	subResources := make([]*schema.Resource, 0)
 	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))
 	subResources = append(subResources, newEbsBlockDevices(d.Get("ebs_block_device"), region)...)
 
-	costComponents := []*schema.CostComponent{computeCostComponent(d, u, "on_demand", instanceType, tenancy, 1)}
+	costComponents := []*schema.CostComponent{computeCostComponent(d, u, "on_demand", instanceType, ami, tenancy, 1)}
 	if d.Get("ebs_optimized").Bool() {
 		costComponents = append(costComponents, ebsOptimizedCostComponent(d))
 	}
@@ -67,7 +68,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	}
 }
 
-func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseOption, instanceType, tenancy string, desiredSize int64) *schema.CostComponent {
+func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseOption, instanceType, ami, tenancy string, desiredSize int64) *schema.CostComponent {
 	region := d.Get("region").String()
 
 	purchaseOptionLabel := map[string]string{
@@ -75,8 +76,8 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 		"spot":      "spot",
 	}[purchaseOption]
 
-	osLabel := "Linux/UNIX"
-	operatingSystem := "Linux"
+	var osLabel string
+	var operatingSystem string
 	var usageOperation string
 
 	// Allow the operating system to be specified in the usage data until we can support it from the AMI directly.
@@ -97,25 +98,20 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 				log.Warnf("Unrecognized operating system %s, defaulting to Linux/UNIX", os)
 			}
 		}
-	} else {
-		ami := d.Get("image_id").String()
-		sess, err := session.NewSession(&aws.Config{
-			Region: &region,
-		})
-		if err == nil {
-			svc := ec2.New(sess)
-			input := &ec2.DescribeImagesInput{
-				ImageIds: []*string{
-					aws.String(ami),
-				},
-			}
-			result, err := svc.DescribeImages(input)
-			if err == nil {
-				if len(result.Images) > 0 {
-					usageOperation = *result.Images[0].UsageOperation
-				}
-			}
+	} else if ami != "" {
+		var err error
+		usageOperation, osLabel, err = osLabelAndOperationFromAmi(region, ami)
+		if err != nil {
+			log.Debugf("Error detecting operating system from AMI: %v", err)
 		}
+	}
+
+	if osLabel == "" {
+		osLabel = "Linux/UNIX"
+	}
+
+	if operatingSystem == "" {
+		operatingSystem = "Linux"
 	}
 
 	var reservedType, reservedTerm, reservedPaymentOption string
@@ -150,7 +146,6 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "instanceType", Value: strPtr(instanceType)},
 				{Key: "tenancy", Value: strPtr(tenancy)},
-				{Key: "preInstalledSw", Value: strPtr("NA")},
 				{Key: "licenseModel", Value: strPtr("No License required")},
 				{Key: "capacitystatus", Value: strPtr("Used")},
 			},
@@ -160,12 +155,14 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 		},
 	}
 
-	if usageOperation != "" {
+	if usageOperation == "" {
 		costComponent.ProductFilter.AttributeFilters = append(costComponent.ProductFilter.AttributeFilters,
-			&schema.AttributeFilter{Key: "operation", Value: strPtr(usageOperation)})
+			&schema.AttributeFilter{Key: "operatingSystem", Value: strPtr(operatingSystem)},
+			&schema.AttributeFilter{Key: "preInstalledSw", Value: strPtr("NA")},
+		)
 	} else {
 		costComponent.ProductFilter.AttributeFilters = append(costComponent.ProductFilter.AttributeFilters,
-			&schema.AttributeFilter{Key: "operatingSystem", Value: strPtr(operatingSystem)})
+			&schema.AttributeFilter{Key: "operation", Value: strPtr(usageOperation)})
 	}
 
 	return costComponent
@@ -366,4 +363,39 @@ func newEbsBlockDevice(name string, d gjson.Result, region string) *schema.Resou
 		Name:           name,
 		CostComponents: ebsVolumeCostComponents(region, volumeAPIName, unknown, gbVal, iopsVal, unknown),
 	}
+}
+
+func osLabelAndOperationFromAmi(region string, ami string) (string, string, error) {	
+	log.Debugf("Checking if we can detect the OS for AMI %s from the AWS EC2 API", ami)
+
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String(region),
+	})
+	if err != nil {
+		return "", "", err
+	}
+
+	svc := ec2.New(sess)
+	input := &ec2.DescribeImagesInput{
+		ImageIds: []*string{
+			aws.String(ami),
+		},
+	}
+
+	result, err := svc.DescribeImages(input)
+	if err != nil {
+		return "", "", err
+	}
+
+	op := ""
+	osLabel := ""
+
+	if len(result.Images) > 0 {
+		op = aws.StringValue(result.Images[0].UsageOperation)
+		osLabel = aws.StringValue(result.Images[0].PlatformDetails)
+		
+		log.Debugf("Detected OS for AMI %s is %s", ami, osLabel)
+	}
+
+	return op, osLabel, nil
 }

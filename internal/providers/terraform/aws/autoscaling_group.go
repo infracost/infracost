@@ -96,6 +96,7 @@ func newLaunchConfiguration(name string, d *schema.ResourceData, u *schema.Usage
 	}
 
 	instanceType := d.Get("instance_type").String()
+	ami := d.Get("image_id").String()
 
 	subResources := make([]*schema.Resource, 0)
 	subResources = append(subResources, newRootBlockDevice(d.Get("root_block_device.0"), region))
@@ -105,7 +106,7 @@ func newLaunchConfiguration(name string, d *schema.ResourceData, u *schema.Usage
 	if d.Get("spot_price").String() != "" {
 		purchaseOption = "spot"
 	}
-	costComponents := []*schema.CostComponent{computeCostComponent(d, u, purchaseOption, instanceType, tenancy, 1)}
+	costComponents := []*schema.CostComponent{computeCostComponent(d, u, purchaseOption, instanceType, ami, tenancy, 1)}
 
 	if d.Get("ebs_optimized").Bool() {
 		costComponents = append(costComponents, ebsOptimizedCostComponent(d))
@@ -138,6 +139,7 @@ func newLaunchTemplate(name string, d *schema.ResourceData, u *schema.UsageData,
 	}
 
 	instanceType := d.Get("instance_type").String()
+	ami := d.Get("image_id").String()
 
 	totalCount := onDemandCount.Add(spotCount)
 
@@ -184,13 +186,13 @@ func newLaunchTemplate(name string, d *schema.ResourceData, u *schema.UsageData,
 	schema.MultiplyQuantities(r, totalCount)
 
 	if spotCount.GreaterThan(decimal.Zero) {
-		c := computeCostComponent(d, u, "spot", instanceType, tenancy, 1)
+		c := computeCostComponent(d, u, "spot", instanceType, ami, tenancy, 1)
 		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(spotCount))
 		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
 	}
 
 	if onDemandCount.GreaterThan(decimal.Zero) {
-		c := computeCostComponent(d, u, "on_demand", instanceType, tenancy, 1)
+		c := computeCostComponent(d, u, "on_demand", instanceType, ami, tenancy, 1)
 		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(onDemandCount))
 		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
 	}

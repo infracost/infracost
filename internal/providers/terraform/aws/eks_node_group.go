@@ -1,8 +1,9 @@
 package aws
 
 import (
-	"github.com/tidwall/gjson"
 	"strings"
+
+	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -48,7 +49,7 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			instanceType = strings.ToLower(d.Get("instance_types").Array()[0].String())
 		}
 
-		costComponents = append(costComponents, computeCostComponent(d, u, purchaseOptionLabel, instanceType, "Shared", desiredSize))
+		costComponents = append(costComponents, computeCostComponent(d, u, purchaseOptionLabel, instanceType, "", "Shared", desiredSize))
 
 		var cpuCreditQuantity decimal.Decimal
 		if isInstanceBurstable(instanceType, []string{"t3", "t4"}) {
