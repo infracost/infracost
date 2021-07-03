@@ -2,6 +2,7 @@ package tftest
 
 import (
 	"bytes"
+	"context"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -280,8 +281,13 @@ func loadResources(t *testing.T, cfg *config.Config, tfProject TerraformProject,
 		return nil, err
 	}
 
+	runCtx, err := config.NewRunContextFromEnv(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
 	provider := terraform.NewDirProvider(config.NewProjectContext(
-		config.EmptyRunContext(),
+		runCtx,
 		&config.Project{
 			Path: tfdir,
 		},

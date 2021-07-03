@@ -55,7 +55,7 @@ func (s *Spinner) Fail() {
 	if !s.spinner.Active() {
 		return
 	}
-	s.spinner.Stop()
+	s.Stop()
 	if s.opts.EnableLogging {
 		log.Errorf("failed: %s", s.msg)
 	} else {
@@ -71,7 +71,7 @@ func (s *Spinner) Success() {
 	if !s.spinner.Active() {
 		return
 	}
-	s.spinner.Stop()
+	s.Stop()
 	if s.opts.EnableLogging {
 		log.Infof("completed: %s", s.msg)
 	} else {
