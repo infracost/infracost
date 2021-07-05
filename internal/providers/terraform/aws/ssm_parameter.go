@@ -47,7 +47,7 @@ func parameterStorageCostComponent(d *schema.ResourceData, u *schema.UsageData) 
 	if d.Get("tier").Exists() {
 		tier = d.Get("tier").String()
 	}
-	if tier == "Standard" {
+	if strings.ToLower(tier) == "standard" {
 		// Standard is free
 		return nil
 	}
@@ -86,11 +86,11 @@ func apiThroughputCostComponent(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 	tier = strings.ToLower(tier)
 
-	if tier == "standard" {
+	if strings.ToLower(tier) == "standard" {
 		// Standard is free
 		return nil
 	}
-	if !(tier == "advanced" || tier == "higher") {
+	if !(strings.ToLower(tier) == "advanced" || strings.ToLower(tier) == "higher") {
 		log.Errorf("api_throughput_limit in %s must be one of: advanced, higher", d.Address)
 	}
 
