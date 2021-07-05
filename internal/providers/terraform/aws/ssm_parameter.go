@@ -86,11 +86,11 @@ func apiThroughputCostComponent(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 	tier = strings.ToLower(tier)
 
-	if strings.ToLower(tier) == "standard" {
+	if tier == "standard" {
 		// Standard is free
 		return nil
 	}
-	if !(strings.ToLower(tier) == "advanced" || strings.ToLower(tier) == "higher") {
+	if !(tier == "advanced" || tier == "higher") {
 		log.Errorf("api_throughput_limit in %s must be one of: advanced, higher", d.Address)
 	}
 
