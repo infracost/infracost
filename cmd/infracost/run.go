@@ -5,8 +5,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/events"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/providers"
@@ -37,12 +38,15 @@ func addRunFlags(cmd *cobra.Command) {
 	_ = cmd.MarkFlagFilename("usage-file", "yml")
 }
 
-func runMain(cmd *cobra.Command, cfg *config.Config) error {
+func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projects := make([]*schema.Project, 0)
+	projectContexts := make([]*config.ProjectContext, 0)
 
-	for _, projectCfg := range cfg.Projects {
-		provider, err := providers.Detect(cfg, projectCfg)
+	for _, projectCfg := range runCtx.Config.Projects {
+		ctx := config.NewProjectContext(runCtx, projectCfg)
+		runCtx.SetCurrentProjectContext(ctx)
 
+		provider, err := providers.Detect(ctx)
 		if err != nil {
 			m := fmt.Sprintf("%s\n\n", err)
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
@@ -52,34 +56,34 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 				m += "\n - Terraform state JSON file"
 			}
 
-			return events.NewError(errors.New(m), "Could not detect path type")
+			return clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
 		}
+		ctx.SetContextValue("projectType", provider.Type())
+		projectContexts = append(projectContexts, ctx)
 
 		if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 			m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
-			return events.NewError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
+			return clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 		}
 
 		m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
-		if cfg.IsLogging() {
+		if runCtx.Config.IsLogging() {
 			log.Info(m)
 		} else {
 			fmt.Fprintln(os.Stderr, m)
 		}
 
-		cfg.Environment.SetProjectEnvironment(provider.Type(), projectCfg)
-
-		u, err := usage.LoadFromFile(projectCfg.UsageFile, cfg.SyncUsageFile)
+		u, err := usage.LoadFromFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
 		if err != nil {
 			return err
 		}
 		if len(u) > 0 {
-			cfg.Environment.HasUsageFile = true
+			ctx.SetContextValue("hasUsageFile", true)
 		}
 
-		metadata := config.DetectProjectMetadata(projectCfg)
+		metadata := config.DetectProjectMetadata(ctx)
 		metadata.Type = provider.Type()
 		provider.AddMetadata(metadata)
 		name := schema.GenerateProjectName(metadata)
@@ -92,30 +96,30 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 
 		projects = append(projects, project)
 
-		if cfg.SyncUsageFile {
+		if runCtx.Config.SyncUsageFile {
 			err = usage.SyncUsageData(project, u, projectCfg.UsageFile)
 			if err != nil {
 				return err
 			}
 		}
 
-		if !cfg.IsLogging() {
+		if !runCtx.Config.IsLogging() {
 			fmt.Fprintln(os.Stderr, "")
 		}
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: cfg.IsLogging(),
-		NoColor:       cfg.NoColor,
+		EnableLogging: runCtx.Config.IsLogging(),
+		NoColor:       runCtx.Config.NoColor,
 	}
 	spinner := ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 
 	for _, project := range projects {
-		if err := prices.PopulatePrices(cfg, project); err != nil {
+		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
 			spinner.Fail()
 			fmt.Fprintln(os.Stderr, "")
 
-			if e := unwrapped(err); errors.Is(e, prices.ErrInvalidAPIKey) {
+			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
 				return errors.New(fmt.Sprintf("%v\n%s %s %s %s %s\n%s",
 					e.Error(),
 					"Please check your",
@@ -127,7 +131,7 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 				))
 			}
 
-			if e, ok := err.(*prices.PricingAPIError); ok {
+			if e, ok := err.(*apiclient.APIError); ok {
 				return errors.New(fmt.Sprintf("%v\n%s", e.Error(), "We have been notified of this issue."))
 			}
 
@@ -142,19 +146,33 @@ func runMain(cmd *cobra.Command, cfg *config.Config) error {
 
 	r := output.ToOutputFormat(projects)
 
+	var err error
+
+	c := apiclient.NewDashboardAPIClient(runCtx)
+	r.RunID, err = c.AddRun(runCtx, projectContexts, r)
+	if err != nil {
+		log.Errorf("Error reporting run: %s", err)
+	}
+
+	env := buildRunEnv(runCtx, projectContexts, r)
+
+	err = c.AddEvent("infracost-run", env)
+	if err != nil {
+		log.Errorf("Error reporting event: %s", err)
+	}
+
 	opts := output.Options{
-		ShowSkipped: cfg.ShowSkipped,
-		NoColor:     cfg.NoColor,
-		Fields:      cfg.Fields,
+		ShowSkipped: runCtx.Config.ShowSkipped,
+		NoColor:     runCtx.Config.NoColor,
+		Fields:      runCtx.Config.Fields,
 	}
 
 	var (
 		b   []byte
 		out string
-		err error
 	)
 
-	switch strings.ToLower(cfg.Format) {
+	switch strings.ToLower(runCtx.Config.Format) {
 	case "json":
 		b, err = output.ToJSON(r, opts)
 		out = string(b)
@@ -285,6 +303,21 @@ func checkRunConfig(cfg *config.Config) error {
 	}
 
 	return nil
+}
+
+func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root) map[string]interface{} {
+	env := runCtx.EventEnvWithProjectContexts(projectContexts)
+	env["projectCount"] = len(projectContexts)
+
+	summary := r.MergedFullSummary()
+	env["supportedResourceCounts"] = summary.SupportedResourceCounts
+	env["unsupportedResourceCounts"] = summary.UnsupportedResourceCounts
+	env["totalSupportedResources"] = summary.TotalSupportedResources
+	env["totalUnsupportedResources"] = summary.TotalUnsupportedResources
+	env["totalNoPriceResources"] = summary.TotalNoPriceResources
+	env["totalResources"] = summary.TotalResources
+
+	return env
 }
 
 func unwrapped(err error) error {

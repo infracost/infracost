@@ -154,7 +154,7 @@ post_to_github () {
     jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
       -H "Content-Type: application/json" \
       -H "Authorization: token $GITHUB_TOKEN" \
-      "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
+      "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
   fi
 }
 
@@ -242,10 +242,28 @@ post_to_slack () {
 
 load_github_env () {
   export VCS_REPO_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+  
+  github_event=$(cat $GITHUB_EVENT_PATH)
+
+  if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+    GITHUB_SHA=$(echo $github_event | jq -r .pull_request.head.sha)
+    export VCS_PULL_REQUEST_URL=$(echo $github_event | jq -r .pull_request.html_url)
+  else
+    export VCS_PULL_REQUEST_URL=$(curl -s \
+      -H "Accept: application/vnd.github.groot-preview+json" \
+      -H "Authorization: token $GITHUB_TOKEN" \
+      $GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls \
+      | jq -r '. | map(select(.state == "open")) | . |= sort_by(.updated_at) | reverse | .[0].html_url')
+  fi
 }
 
 load_gitlab_env () {
   export VCS_REPO_URL=$CI_REPOSITORY_URL
+  
+  first_mr=$(echo $CI_OPEN_MERGE_REQUESTS | cut -d',' -f1)
+  repo=$(echo $first_mr | cut -d'!' -f1)
+  mr_number=$(echo $first_mr | cut -d'!' -f2)
+  export VCS_PULL_REQUEST_URL=$CI_SERVER_URL/$repo/merge_requests/$mr_number
 }
 
 load_circle_ci_env () {
@@ -328,8 +346,10 @@ fi
 if [ ! -z "$GITHUB_ACTIONS" ]; then
   echo "::set-output name=past_total_monthly_cost::$past_total_monthly_cost"
   echo "::set-output name=total_monthly_cost::$total_monthly_cost"
+  load_github_env
   post_to_github
 elif [ ! -z "$GITLAB_CI" ]; then
+  load_gitlab_env
   post_to_gitlab
 elif [ ! -z "$CIRCLECI" ]; then
   post_to_circle_ci

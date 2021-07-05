@@ -8,14 +8,14 @@ import (
 )
 
 type TemplateProvider struct {
+	ctx  *config.ProjectContext
 	Path string
-	env  *config.Environment
 }
 
-func NewTemplateProvider(cfg *config.Config, projectCfg *config.Project) schema.Provider {
+func NewTemplateProvider(ctx *config.ProjectContext) schema.Provider {
 	return &TemplateProvider{
-		Path: projectCfg.Path,
-		env:  cfg.Environment,
+		ctx:  ctx,
+		Path: ctx.ProjectConfig.Path,
 	}
 }
 
@@ -37,7 +37,7 @@ func (p *TemplateProvider) LoadResources(project *schema.Project, usage map[stri
 		return errors.Wrap(err, "Error reading Cloudformation template file")
 	}
 
-	parser := NewParser(p.env)
+	parser := NewParser(p.ctx)
 	pastResources, resources, err := parser.parseTemplate(template, usage)
 	if err != nil {
 		return errors.Wrap(err, "Error parsing Cloudformation template file")

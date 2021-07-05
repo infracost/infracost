@@ -2,8 +2,9 @@ package cloudformation
 
 import (
 	"fmt"
-	"github.com/awslabs/goformation/v4/cloudformation"
 	"strings"
+
+	"github.com/awslabs/goformation/v4/cloudformation"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
@@ -11,18 +12,18 @@ import (
 )
 
 type Parser struct {
-	env *config.Environment
+	ctx *config.ProjectContext
 }
 
-func NewParser(env *config.Environment) *Parser {
-	return &Parser{env: env}
+func NewParser(ctx *config.ProjectContext) *Parser {
+	return &Parser{ctx}
 }
 
 func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	registryMap := GetResourceRegistryMap()
 
 	if isAwsChina(d) {
-		p.env.IsAWSChina = true
+		p.ctx.SetContextValue("isAWSChina", true)
 	}
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {

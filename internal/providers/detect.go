@@ -4,43 +4,45 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"fmt"
-	"github.com/awslabs/goformation/v4"
-	"github.com/infracost/infracost/internal/providers/cloudformation"
 	"io/ioutil"
 	"os"
+
+	"github.com/awslabs/goformation/v4"
+	"github.com/infracost/infracost/internal/providers/cloudformation"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func Detect(cfg *config.Config, projectCfg *config.Project) (schema.Provider, error) {
+func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
+	path := ctx.ProjectConfig.Path
 
-	if _, err := os.Stat(projectCfg.Path); os.IsNotExist(err) {
-		return nil, fmt.Errorf("No such file or directory %s", projectCfg.Path)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return nil, fmt.Errorf("No such file or directory %s", path)
 	}
 
-	if isCloudFormationTemplate(projectCfg.Path) {
-		return cloudformation.NewTemplateProvider(cfg, projectCfg), nil
+	if isCloudFormationTemplate(path) {
+		return cloudformation.NewTemplateProvider(ctx), nil
 	}
 
-	if isTerraformPlanJSON(projectCfg.Path) {
-		return terraform.NewPlanJSONProvider(cfg, projectCfg), nil
+	if isTerraformPlanJSON(path) {
+		return terraform.NewPlanJSONProvider(ctx), nil
 	}
 
-	if isTerraformStateJSON(projectCfg.Path) {
-		return terraform.NewStateJSONProvider(cfg, projectCfg), nil
+	if isTerraformStateJSON(path) {
+		return terraform.NewStateJSONProvider(ctx), nil
 	}
 
-	if isTerraformPlan(projectCfg.Path) {
-		return terraform.NewPlanProvider(cfg, projectCfg), nil
+	if isTerraformPlan(path) {
+		return terraform.NewPlanProvider(ctx), nil
 	}
 
-	if isTerraformDir(projectCfg.Path) {
-		return terraform.NewDirProvider(cfg, projectCfg), nil
+	if isTerraformDir(path) {
+		return terraform.NewDirProvider(ctx), nil
 	}
 
-	return nil, fmt.Errorf("Could not detect path type for %s", projectCfg.Path)
+	return nil, fmt.Errorf("Could not detect path type for %s", path)
 }
 
 func isTerraformPlanJSON(path string) bool {

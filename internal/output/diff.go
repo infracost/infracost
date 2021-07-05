@@ -32,7 +32,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 
 		s += fmt.Sprintf("%s %s\n\n",
 			ui.BoldString("Project:"),
-			project.Name,
+			project.Label(),
 		)
 
 		for _, diffResource := range project.Diff.Resources {
@@ -62,7 +62,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 
 		s += fmt.Sprintf("%s %s\nAmount:  %s %s",
 			ui.BoldString("Monthly cost change for"),
-			ui.BoldString(project.Name),
+			ui.BoldString(project.Label()),
 			formatCostChange(project.Diff.TotalMonthlyCost),
 			ui.FaintStringf("(%s -> %s)", formatCost(oldCost), formatCost(newCost)),
 		)

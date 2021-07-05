@@ -17,7 +17,7 @@ import (
 var minOutputVersion = "0.2"
 var maxOutputVersion = "0.2"
 
-func outputCmd(cfg *config.Config) *cobra.Command {
+func outputCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "output",
 		Short: "Combine and output Infracost JSON files in different formats",
@@ -90,7 +90,7 @@ func outputCmd(cfg *config.Config) *cobra.Command {
 			}
 
 			opts := output.Options{
-				NoColor:    cfg.NoColor,
+				NoColor:    ctx.Config.NoColor,
 				GroupKey:   "filename",
 				GroupLabel: "File",
 				Fields:     fields,

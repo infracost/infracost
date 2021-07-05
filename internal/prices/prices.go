@@ -1,13 +1,10 @@
 package prices
 
 import (
-	"fmt"
 	"runtime"
-	"sync"
 
+	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/events"
-	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -16,37 +13,21 @@ import (
 )
 
 func PopulatePrices(cfg *config.Config, project *schema.Project) error {
-	q := NewGraphQLQueryRunner(fmt.Sprintf("%s/graphql", cfg.PricingAPIEndpoint), cfg.APIKey)
 	resources := project.AllResources()
 
-	var wg sync.WaitGroup
-	wg.Add(1)
+	c := apiclient.NewPricingAPIClient(cfg)
 
-	go func() {
-		defer wg.Done()
-		// We ignore resources in the past breakdown since we don't want to duplicate the summary for all projects.
-		// otherwise we will count an unsupported resource 2 times.
-		summary := output.BuildSummary(project.AllResources(), output.SummaryOptions{
-			IncludeUnsupportedProviders: true,
-		})
-
-		events.SendReport(cfg, "summary", summary)
-	}()
-
-	err := GetPricesConcurrent(resources, q)
+	err := GetPricesConcurrent(c, resources)
 	if err != nil {
 		return err
 	}
-
-	wg.Wait()
-
 	return nil
 }
 
 // GetPricesConcurrent gets the prices of all resources concurrently.
 // Concurrency level is calculated using the following formula:
 // max(min(4, numCPU * 4), 16)
-func GetPricesConcurrent(resources []*schema.Resource, q QueryRunner) error {
+func GetPricesConcurrent(c *apiclient.PricingAPIClient, resources []*schema.Resource) error {
 	// Set the number of workers
 	numWorkers := 4
 	numCPU := runtime.NumCPU()
@@ -64,7 +45,7 @@ func GetPricesConcurrent(resources []*schema.Resource, q QueryRunner) error {
 	for i := 0; i < numWorkers; i++ {
 		go func(jobs <-chan *schema.Resource, resultErrors chan<- error) {
 			for r := range jobs {
-				err := GetPrices(r, q)
+				err := GetPrices(c, r)
 				resultErrors <- err
 			}
 		}(jobs, resultErrors)
@@ -85,11 +66,12 @@ func GetPricesConcurrent(resources []*schema.Resource, q QueryRunner) error {
 	return nil
 }
 
-func GetPrices(r *schema.Resource, q QueryRunner) error {
+func GetPrices(c *apiclient.PricingAPIClient, r *schema.Resource) error {
 	if r.IsSkipped {
 		return nil
 	}
-	results, err := q.RunQueries(r)
+
+	results, err := c.RunQueries(r)
 	if err != nil {
 		return err
 	}
