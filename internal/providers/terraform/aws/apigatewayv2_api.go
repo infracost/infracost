@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"fmt"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
@@ -154,7 +155,7 @@ func websocketCostComponent(region string, unit string, usageType string, displa
 			Service:       strPtr("AmazonApiGateway"),
 			ProductFamily: strPtr("WebSocket"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/" + usageType + "/")},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

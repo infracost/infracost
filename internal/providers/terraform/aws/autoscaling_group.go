@@ -225,7 +225,7 @@ func elasticInferenceAcceleratorCostComponent(d *schema.ResourceData) *schema.Co
 			Service:       strPtr("AmazonEI"),
 			ProductFamily: strPtr("Elastic Inference"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", deviceType))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", deviceType))},
 			},
 		},
 	}
