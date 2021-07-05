@@ -74,14 +74,14 @@ func NewAzureRMAppFunction(d *schema.ResourceData, u *schema.UsageData) *schema.
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	if (kind == "elastic" || skuTier == "elasticpremium") && skuCPU != nil && skuMemory != nil {
+	if (strings.ToLower(kind) == "elastic" || strings.ToLower(skuTier) == "elasticpremium") && skuCPU != nil && skuMemory != nil {
 		costComponents = append(costComponents, AppFunctionPremiumCPUCostComponent(skuSize, instances, skuCPU, region))
 		costComponents = append(costComponents, AppFunctionPremiumMemoryCostComponent(skuSize, instances, skuMemory, region))
 	} else {
-		if kind == "functionapp" || gbSeconds != nil {
+		if strings.ToLower(kind) == "functionapp" || gbSeconds != nil {
 			costComponents = append(costComponents, AppFunctionConsumptionExecutionTimeCostComponent(gbSeconds, region))
 		}
-		if kind == "functionapp" || executions != nil {
+		if strings.ToLower(kind) == "functionapp" || executions != nil {
 			costComponents = append(costComponents, AppFunctionConsumptionExecutionsCostComponent(executions, region))
 		}
 	}

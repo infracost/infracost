@@ -47,7 +47,7 @@ func NewAzureRMPostrgreSQLFlexibleServer(d *schema.ResourceData, u *schema.Usage
 		return nil
 	}
 
-	if tierName == "Burstable" {
+	if strings.ToLower(tierName) == "burstable" {
 		meterName = types
 		skuName = types
 	} else {

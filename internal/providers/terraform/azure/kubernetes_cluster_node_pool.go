@@ -5,6 +5,7 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+	"strings"
 )
 
 func GetAzureRMKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
@@ -47,7 +48,7 @@ func aksClusterNodePool(name, region string, n gjson.Result, nodeCount decimal.D
 	if n.Get("os_disk_type").Type != gjson.Null {
 		osDiskType = n.Get("os_disk_type").String()
 	}
-	if osDiskType == "Managed" {
+	if strings.ToLower(osDiskType) == "managed" {
 		var diskSize int
 		if n.Get("os_disk_size_gb").Type != gjson.Null {
 			diskSize = int(n.Get("os_disk_size_gb").Int())
