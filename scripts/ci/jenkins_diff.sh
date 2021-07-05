@@ -107,7 +107,7 @@ build_msg () {
   msg="${msg}\n"
   msg="${msg}Infracost output:\n"
   msg="${msg}\n"
-  msg="${msg}$(echo "    ${diff_output//$'\n'/\\n    }" | sed "s/%/%%/g")\n"
+  msg="${msg}$(echo "${diff_output}" | sed 's/^/    /' | sed "s/%/%%/g")\n"
   printf "$msg"
 }
 
