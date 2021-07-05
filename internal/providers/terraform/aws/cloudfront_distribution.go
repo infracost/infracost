@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -158,7 +159,7 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 		}
 
 		selectedUsageFilters := usageFilters
-		if apiRegion == "India" {
+		if strings.ToLower(apiRegion) == "india" {
 			selectedUsageFilters = indiaUsageFilters
 		}
 		for idx, usageFilter := range selectedUsageFilters {

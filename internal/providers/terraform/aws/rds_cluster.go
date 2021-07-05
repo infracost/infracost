@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -40,7 +41,7 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		auroraCapacityUnits = decimalPtr(decimal.NewFromInt(u.Get("capacity_units_per_hr").Int()))
 	}
 
-	if databaseEngineMode == "Serverless" {
+	if strings.ToLower(databaseEngineMode) == "serverless" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           "Aurora serverless",
 			Unit:           "ACU-hours",
@@ -52,7 +53,7 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr(databaseEngineMode),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "databaseEngine", Value: databaseEngine},
+					{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", *databaseEngine))},
 				},
 			},
 		})
@@ -99,7 +100,7 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 			Region:        strPtr(region),
 			ProductFamily: strPtr("System Operation"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "databaseEngine", Value: databaseEngine},
+				{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", *databaseEngine))},
 				{Key: "usagetype", ValueRegex: strPtr("/Aurora:SnapshotExportToS3/")},
 			},
 		},
@@ -136,7 +137,7 @@ func auroraStorageCostComponent(region string, u *schema.UsageData, databaseEngi
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("Database Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "databaseEngine", Value: databaseEngineStorageType},
+					{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", *databaseEngineStorageType))},
 					{Key: "usagetype", ValueRegex: strPtr("/Aurora:Storage/")},
 				},
 			},
@@ -152,7 +153,7 @@ func auroraStorageCostComponent(region string, u *schema.UsageData, databaseEngi
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("System Operation"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "databaseEngine", Value: databaseEngineStorageType},
+					{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", *databaseEngineStorageType))},
 					{Key: "usagetype", ValueRegex: strPtr("/Aurora:Storage/")},
 				},
 			},
@@ -172,7 +173,7 @@ func auroraBackupStorageCostComponent(region string, totalBackupStorageGB *decim
 			Service:       strPtr("AmazonRDS"),
 			ProductFamily: strPtr("Storage Snapshot"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "databaseEngine", Value: databaseEngine},
+				{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", *databaseEngine))},
 			},
 		},
 	}

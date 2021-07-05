@@ -35,7 +35,7 @@ func NewMQBroker(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	}
 
 	isMultiAZ := false
-	if deploymentMode == "active_standby_multi_az" || deploymentMode == "cluster_multi_az" {
+	if strings.ToLower(deploymentMode) == "active_standby_multi_az" || strings.ToLower(deploymentMode) == "cluster_multi_az" {
 		isMultiAZ = true
 	}
 
@@ -88,7 +88,7 @@ func storage(region, engine, storageType string, isMultiAZ bool, storageSizeGB *
 		}
 	} else {
 		// ActiveMQ
-		if storageType == "ebs" {
+		if strings.ToLower(storageType) == "ebs" {
 			usageType = "TimedStorage-EBS-ByteHrs"
 		} else {
 			// EFS

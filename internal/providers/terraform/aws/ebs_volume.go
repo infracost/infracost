@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 
@@ -55,7 +56,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 	}
 
 	var name, usageType string
-	switch volumeAPIName {
+	switch strings.ToLower(volumeAPIName) {
 	case "standard":
 		name = "Storage (magnetic)"
 		usageType = "EBS:VolumeIOUsage"
@@ -87,18 +88,18 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 				Service:       strPtr("AmazonEC2"),
 				ProductFamily: strPtr("Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
+					{Key: "volumeApiName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", volumeAPIName))},
 				},
 			},
 		},
 	}
 
-	if volumeAPIName == "io1" || volumeAPIName == "io2" {
+	if strings.ToLower(volumeAPIName) == "io1" || strings.ToLower(volumeAPIName) == "io2" {
 		costComponents = append(costComponents, ebsProvisionedIops(region, volumeAPIName, usageType, &iopsVal))
 
 	}
 
-	if volumeAPIName == "standard" {
+	if strings.ToLower(volumeAPIName) == "standard" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "I/O requests",
 			Unit:            "1M request",
@@ -110,14 +111,14 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 				Service:       strPtr("AmazonEC2"),
 				ProductFamily: strPtr("System Operation"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
-					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
+					{Key: "volumeApiName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", volumeAPIName))},
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
 				},
 			},
 		})
 	}
 
-	if volumeAPIName == "gp3" {
+	if strings.ToLower(volumeAPIName) == "gp3" {
 		if throughputVal != nil {
 			if throughputVal.GreaterThan(decimal.NewFromInt(125)) {
 				throughputVal = decimalPtr(throughputVal.Sub(decimal.NewFromInt(125)))
@@ -132,7 +133,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 						Service:       strPtr("AmazonEC2"),
 						ProductFamily: strPtr("Provisioned Throughput"),
 						AttributeFilters: []*schema.AttributeFilter{
-							{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
+							{Key: "volumeApiName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", volumeAPIName))},
 							{Key: "usagetype", ValueRegex: strPtr("/VolumeP-Throughput.gp3/")},
 						},
 					},
@@ -164,8 +165,8 @@ func ebsProvisionedIops(region string, volumeAPIName string, usageType string, i
 			Service:       strPtr("AmazonEC2"),
 			ProductFamily: strPtr("System Operation"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "volumeApiName", Value: strPtr(volumeAPIName)},
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
+				{Key: "volumeApiName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", volumeAPIName))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
 			},
 		},
 	}

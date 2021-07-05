@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 
@@ -34,7 +35,7 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 
 	// Gateway endpoints don't have a cost associated with them
-	if vpcEndpointType == "Gateway" {
+	if strings.ToLower(vpcEndpointType) == "gateway" {
 		return &schema.Resource{
 			NoPrice:   true,
 			IsSkipped: true,
@@ -69,7 +70,7 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 					Service:       strPtr("AmazonVPC"),
 					ProductFamily: strPtr("VpcEndpoint"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", endpointHours))},
+						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", endpointHours))},
 					},
 				},
 			},
@@ -84,7 +85,7 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 					Service:       strPtr("AmazonVPC"),
 					ProductFamily: strPtr("VpcEndpoint"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", endpointBytes))},
+						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", endpointBytes))},
 					},
 				},
 			},
