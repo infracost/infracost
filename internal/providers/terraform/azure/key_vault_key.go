@@ -73,7 +73,7 @@ func NewAzureRMKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.
 		}
 	}
 
-	if strings.HasSuffix(keyType, "HSM") && skuName == "Premium" {
+	if strings.HasSuffix(keyType, "HSM") && strings.ToLower(skuName) == "premium" {
 		var protectedKeys, hsmProtectedTransactions *decimal.Decimal
 
 		name := "HSM-protected keys"
