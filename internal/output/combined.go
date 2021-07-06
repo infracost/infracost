@@ -25,10 +25,13 @@ func Combine(inputs []ReportInput, opts Options) Root {
 	var totalMonthlyCost *decimal.Decimal
 
 	projects := make([]Project, 0)
+	summaries := make([]*Summary, 0, len(inputs))
 
 	for _, input := range inputs {
 
 		projects = append(projects, input.Root.Projects...)
+
+		summaries = append(summaries, input.Root.Summary)
 
 		if input.Root.TotalHourlyCost != nil {
 			if totalHourlyCost == nil {
@@ -51,6 +54,7 @@ func Combine(inputs []ReportInput, opts Options) Root {
 	combined.TotalHourlyCost = totalHourlyCost
 	combined.TotalMonthlyCost = totalMonthlyCost
 	combined.TimeGenerated = time.Now()
+	combined.Summary = MergeSummaries(summaries)
 
 	return combined
 }
