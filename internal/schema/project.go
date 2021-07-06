@@ -67,7 +67,7 @@ func AllProjectResources(projects []*Project) []*Resource {
 	return resources
 }
 
-func GenerateProjectName(metadata *ProjectMetadata) string {
+func GenerateProjectName(metadata *ProjectMetadata, dashboardEnabled bool) string {
 	var n string
 
 	// If the VCS repo is set, create the name from that
@@ -78,7 +78,7 @@ func GenerateProjectName(metadata *ProjectMetadata) string {
 			n += "/" + metadata.VCSSubPath
 		}
 		// If not then use a hash of the absolute filepath to the project
-	} else {
+	} else if dashboardEnabled {
 		absPath, err := filepath.Abs(metadata.Path)
 		if err != nil {
 			log.Debugf("Could not get absolute path for %s", metadata.Path)
@@ -86,6 +86,8 @@ func GenerateProjectName(metadata *ProjectMetadata) string {
 		}
 
 		n = fmt.Sprintf("project_%s", shortHash(absPath, 8))
+	} else {
+		n = metadata.Path
 	}
 
 	if metadata.TerraformWorkspace != "" && metadata.TerraformWorkspace != "default" {
