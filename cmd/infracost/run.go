@@ -86,7 +86,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		metadata := config.DetectProjectMetadata(ctx)
 		metadata.Type = provider.Type()
 		provider.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata)
+		name := schema.GenerateProjectName(metadata, runCtx.Config.EnableDashboard)
 
 		project := schema.NewProject(name, metadata)
 		err = provider.LoadResources(project, u)
@@ -162,9 +162,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	opts := output.Options{
-		ShowSkipped: runCtx.Config.ShowSkipped,
-		NoColor:     runCtx.Config.NoColor,
-		Fields:      runCtx.Config.Fields,
+		DashboardEnabled: runCtx.Config.EnableDashboard,
+		ShowSkipped:      runCtx.Config.ShowSkipped,
+		NoColor:          runCtx.Config.NoColor,
+		Fields:           runCtx.Config.Fields,
 	}
 
 	var (

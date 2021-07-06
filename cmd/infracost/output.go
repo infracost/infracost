@@ -90,10 +90,11 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			opts := output.Options{
-				NoColor:    ctx.Config.NoColor,
-				GroupKey:   "filename",
-				GroupLabel: "File",
-				Fields:     fields,
+				DashboardEnabled: ctx.Config.EnableDashboard,
+				NoColor:          ctx.Config.NoColor,
+				GroupKey:         "filename",
+				GroupLabel:       "File",
+				Fields:           fields,
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 

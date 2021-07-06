@@ -33,8 +33,8 @@ type Project struct {
 	fullSummary   *Summary
 }
 
-func (p *Project) Label() string {
-	if p.Metadata.VCSRepoURL != "" {
+func (p *Project) Label(dashboardEnabled bool) string {
+	if !dashboardEnabled {
 		return p.Name
 	}
 	return fmt.Sprintf("%s (%s)", p.Name, p.Metadata.Path)
@@ -81,11 +81,12 @@ type SummaryOptions struct {
 }
 
 type Options struct {
-	NoColor     bool
-	ShowSkipped bool
-	GroupLabel  string
-	GroupKey    string
-	Fields      []string
+	DashboardEnabled bool
+	NoColor          bool
+	ShowSkipped      bool
+	GroupLabel       string
+	GroupKey         string
+	Fields           []string
 }
 
 func outputBreakdown(resources []*schema.Resource) *Breakdown {

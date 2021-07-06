@@ -30,7 +30,7 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 		"formatPrice":    formatPrice,
 		"formatQuantity": formatQuantity,
 		"projectLabel": func(p Project) string {
-			return p.Label()
+			return p.Label(opts.DashboardEnabled)
 		},
 	})
 	tmpl, err := tmpl.Parse(HTMLTemplate)
