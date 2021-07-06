@@ -77,7 +77,7 @@ func kinesisRunningStorageCostComponent(region string, quantity *decimal.Decimal
 			Service:       strPtr("AmazonKinesisAnalytics"),
 			ProductFamily: strPtr("Kinesis Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/RunningApplicationStorage/i")},
+				{Key: "usagetype", ValueRegex: strPtr("/RunningApplicationStorage$/i")},
 			},
 		},
 	}
