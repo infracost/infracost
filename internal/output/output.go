@@ -19,6 +19,8 @@ type Root struct {
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
 	TimeGenerated    time.Time        `json:"timeGenerated"`
+	Summary          *Summary         `json:"summary"`
+	FullSummary      *Summary         `json:"-"`
 }
 
 type Project struct {
@@ -142,6 +144,8 @@ func ToOutputFormat(projects []*schema.Project) Root {
 	var totalMonthlyCost, totalHourlyCost *decimal.Decimal
 
 	outProjects := make([]Project, 0, len(projects))
+	summaries := make([]*Summary, 0, len(projects))
+	fullSummaries := make([]*Summary, 0, len(projects))
 
 	for _, project := range projects {
 		var pastBreakdown, breakdown, diff *Breakdown
@@ -172,8 +176,10 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		summary := BuildSummary(project.Resources, SummaryOptions{
 			OnlyFields: []string{"UnsupportedResourceCounts"},
 		})
+		summaries = append(summaries, summary)
 
 		fullSummary := BuildSummary(project.Resources, SummaryOptions{IncludeUnsupportedProviders: true})
+		fullSummaries = append(fullSummaries, fullSummary)
 
 		outProjects = append(outProjects, Project{
 			Name:          project.Name,
@@ -192,37 +198,23 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		TotalHourlyCost:  totalHourlyCost,
 		TotalMonthlyCost: totalMonthlyCost,
 		TimeGenerated:    time.Now(),
+		Summary:          MergeSummaries(summaries),
+		FullSummary:      MergeSummaries(fullSummaries),
 	}
 
 	return out
 }
 
-func (r *Root) MergedSummary() *Summary {
-	summaries := make([]*Summary, 0, len(r.Projects))
-	for _, projectResult := range r.Projects {
-		summaries = append(summaries, projectResult.Summary)
-	}
-
-	return MergeSummaries(summaries)
-}
-
-func (r *Root) MergedFullSummary() *Summary {
-	summaries := make([]*Summary, 0, len(r.Projects))
-	for _, projectResult := range r.Projects {
-		summaries = append(summaries, projectResult.fullSummary)
-	}
-
-	return MergeSummaries(summaries)
-}
-
 func (r *Root) unsupportedResourcesMessage(showSkipped bool) string {
-	summary := r.MergedSummary()
-
-	if summary.UnsupportedResourceCounts == nil || len(*summary.UnsupportedResourceCounts) == 0 {
+	if r.Summary == nil {
 		return ""
 	}
 
-	unsupportedTypeCount := len(*summary.UnsupportedResourceCounts)
+	if r.Summary.UnsupportedResourceCounts == nil || len(*r.Summary.UnsupportedResourceCounts) == 0 {
+		return ""
+	}
+
+	unsupportedTypeCount := len(*r.Summary.UnsupportedResourceCounts)
 
 	unsupportedMsg := "resource types weren't estimated as they're not supported yet"
 	if unsupportedTypeCount == 1 {
@@ -247,7 +239,7 @@ func (r *Root) unsupportedResourcesMessage(showSkipped bool) string {
 			value int
 		}
 		ind := []structMap{}
-		for t, c := range *r.MergedFullSummary().UnsupportedResourceCounts {
+		for t, c := range *r.Summary.UnsupportedResourceCounts {
 			ind = append(ind, structMap{key: t, value: c})
 		}
 		sort.Slice(ind, func(i, j int) bool {
