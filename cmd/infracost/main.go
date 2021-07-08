@@ -25,7 +25,13 @@ func main() {
 	var appErr error
 	updateMessageChan := make(chan *update.Info)
 
-	ctx, appErr := config.NewRunContextFromEnv(context.Background())
+	ctx, err := config.NewRunContextFromEnv(context.Background())
+	if err != nil {
+		if err.Error() != "" {
+			ui.PrintError(err.Error())
+		}
+		os.Exit(1)
+	}
 
 	defer func() {
 		if appErr != nil {
