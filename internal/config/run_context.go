@@ -23,13 +23,10 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 	cfg := DefaultConfig()
 	err := cfg.LoadFromEnv()
 	if err != nil {
-		return nil, err
+		return EmptyRunContext(), err
 	}
 
-	state, err := LoadState()
-	if err != nil {
-		return nil, err
-	}
+	state, _ := LoadState()
 
 	c := &RunContext{
 		ctx:         rootCtx,
