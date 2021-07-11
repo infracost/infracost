@@ -15,11 +15,15 @@ func GetNATGatewayRegistryItem() *schema.RegistryItem {
 func NewNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
-	args := &aws.NATGatewayArguments{
-		Address: d.Address,
-		Region:  region,
-	}
-	args.PopulateUsage(u)
+	// We initialize the args and populate the defaults and usage data.
+	args := &aws.NATGatewayArguments{}
+	args.PopulateArgs(u)
+
+	// Then we can override the fields with IAC fields.
+	// We can have a utility function to print an info log
+	// that users could know the following fields were overridden.
+	args.Region = &region
+	args.Address = &d.Address
 
 	return aws.NewNATGateway(args)
 }
