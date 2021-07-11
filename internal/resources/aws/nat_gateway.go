@@ -7,9 +7,9 @@ import (
 
 type NATGatewayArguments struct {
 	Address *string `json:"address,omitempty"`
-	Region  *string `json:"region,omitempty" infracost_usage:"region,us-east1,Region where gateway is located"`
+	Region  *string `json:"region,omitempty" infracost_usage:"region,us-east1,Region where gateway is located,infracost"`
 
-	MonthlyDataProcessedGB *float64 `json:"monthlyDataProcessedGB,omitempty" infracost_usage:"monthly_data_processed_gb,0,Monthly data processed by the NAT Gateway in GB"`
+	MonthlyDataProcessedGB *float64 `json:"monthlyDataProcessedGB,omitempty" infracost_usage:"monthly_data_processed_gb,0,Monthly data processed by the NAT Gateway in GB,infracost,terraform"`
 }
 
 func (args *NATGatewayArguments) PopulateArgs(u *schema.UsageData) {
