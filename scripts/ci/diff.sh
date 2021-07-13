@@ -37,6 +37,7 @@ process_args () {
   fi
   percentage_threshold=${percentage_threshold:-0}
   INFRACOST_BINARY=${INFRACOST_BINARY:-infracost}
+  GITHUB_API_URL=${GITHUB_API_URL:-https://api.github.com}
 
   # Export as it's used by infracost, not this script
   export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
@@ -182,7 +183,7 @@ post_to_circle_ci () {
     jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
       -H "Content-Type: application/json" \
       -H "Authorization: token $GITHUB_TOKEN" \
-      "https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commits/$CIRCLE_SHA1/comments"
+      "$GITHUB_API_URL/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commits/$CIRCLE_SHA1/comments"
 
   elif echo $CIRCLE_REPOSITORY_URL | grep -Eiq bitbucket; then
     if [ ! -z "$CIRCLE_PULL_REQUEST" ]; then
