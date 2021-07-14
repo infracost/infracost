@@ -1,22 +1,28 @@
 
- Name                                      Monthly Qty  Unit              Monthly Cost 
-                                                                                       
- aws_vpc_endpoint.gateway_loadbalancer                                                 
- ├─ Endpoint (GatewayLoadBalancer)                 730  hours                    $7.30 
- └─ Data processed                      Monthly cost depends on usage: $0.0035 per GB  
-                                                                                       
- aws_vpc_endpoint.interface                                                            
- ├─ Endpoint (Interface)                           730  hours                    $7.30 
- └─ Data processed                      Monthly cost depends on usage: $0.01 per GB    
-                                                                                       
- aws_vpc_endpoint.interface_withUsage                                                  
- ├─ Endpoint (Interface)                           730  hours                    $7.30 
- └─ Data processed                               1,000  GB                      $10.00 
-                                                                                       
- aws_vpc_endpoint.multiple_interfaces                                                  
- ├─ Endpoint (Interface)                         1,460  hours                   $14.60 
- └─ Data processed                      Monthly cost depends on usage: $0.01 per GB    
-                                                                                       
- OVERALL TOTAL                                                                  $46.50 
+ Name                                        Monthly Qty  Unit              Monthly Cost 
+                                                                                         
+ aws_vpc_endpoint.gateway_loadbalancer                                                   
+ ├─ Data processed                        Monthly cost depends on usage: $0.0035 per GB  
+ └─ Endpoint (GatewayLoadBalancer)                   730  hours                    $7.30 
+                                                                                         
+ aws_vpc_endpoint.interface                                                              
+ ├─ Data processed (first 1PB)            Monthly cost depends on usage: $0.01 per GB    
+ └─ Endpoint (Interface)                             730  hours                    $7.30 
+                                                                                         
+ aws_vpc_endpoint.interface_withBigUsage                                                 
+ ├─ Data processed (first 1PB)                     1,000  GB                      $10.00 
+ ├─ Data processed (next 4PB)                      4,000  GB                      $24.00 
+ ├─ Data processed (over 5PB)                      2,000  GB                       $8.00 
+ └─ Endpoint (Interface)                             730  hours                    $7.30 
+                                                                                         
+ aws_vpc_endpoint.interface_withUsage                                                    
+ ├─ Data processed (first 1PB)                     1,000  GB                      $10.00 
+ └─ Endpoint (Interface)                             730  hours                    $7.30 
+                                                                                         
+ aws_vpc_endpoint.multiple_interfaces                                                    
+ ├─ Data processed (first 1PB)            Monthly cost depends on usage: $0.01 per GB    
+ └─ Endpoint (Interface)                           1,460  hours                   $14.60 
+                                                                                         
+ OVERALL TOTAL                                                                    $95.80 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
