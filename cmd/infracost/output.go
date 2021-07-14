@@ -32,7 +32,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
   Merge multiple Infracost JSON files:
 
-			infracost output --format json --path out*.json`,
+      infracost output --format json --path out*.json`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFiles := []string{}
