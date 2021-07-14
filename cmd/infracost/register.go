@@ -27,7 +27,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 			if _, ok := ctx.Config.Credentials[ctx.Config.PricingAPIEndpoint]; ok {
 
 				isRegenerate = true
-				fmt.Printf("\nYou already have an Infracost API key saved in %s.\n", config.CredentialsFilePath())
+				fmt.Printf("You already have an Infracost API key saved in %s.\n", config.CredentialsFilePath())
 
 				status, err := promptGenerateNewKey()
 				if err != nil {
@@ -70,6 +70,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 			fmt.Printf("\nThank you %s!\nYour API key is: %s\n", name, r.APIKey)
 
 			if isRegenerate {
+				fmt.Println()
 				confirm, err := promptOverwriteAPIKey()
 				if err != nil {
 					return err
@@ -154,7 +155,7 @@ func promptForEmail() (string, error) {
 
 func promptOverwriteAPIKey() (bool, error) {
 	p := promptui.Prompt{
-		Label:     "Would you like to overwrite your existing saved API key?",
+		Label:     "Would you like to overwrite your existing saved API key",
 		IsConfirm: true,
 	}
 
@@ -172,7 +173,7 @@ func promptOverwriteAPIKey() (bool, error) {
 
 func promptGenerateNewKey() (bool, error) {
 	p := promptui.Prompt{
-		Label:     "Would you like to generate a new one?",
+		Label:     "Would you like to generate a new API key",
 		IsConfirm: true,
 	}
 
