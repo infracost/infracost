@@ -37,7 +37,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				if !status {
 					return nil
 				}
-				
+
 				fmt.Println()
 			}
 
