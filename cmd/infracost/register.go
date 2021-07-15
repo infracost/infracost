@@ -37,6 +37,8 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				if !status {
 					return nil
 				}
+				
+				fmt.Println()
 			}
 
 			fmt.Println("Please enter your name and email address to get an API key.")
