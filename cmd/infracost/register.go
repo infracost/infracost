@@ -20,6 +20,25 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 		Short: "Register for a free Infracost API key",
 		Long:  "Register for a free Infracost API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
+
+			var msg string
+			var isRegenerate bool
+
+			if _, ok := ctx.Config.Credentials[ctx.Config.PricingAPIEndpoint]; ok {
+
+				isRegenerate = true
+				fmt.Printf("You already have an Infracost API key saved in %s.\n", config.CredentialsFilePath())
+
+				status, err := promptGenerateNewKey()
+				if err != nil {
+					return err
+				}
+
+				if !status {
+					return nil
+				}
+			}
+
 			fmt.Println("Please enter your name and email address to get an API key.")
 			fmt.Println("See our FAQ (https://www.infracost.io/docs/faq) for more details.")
 
@@ -36,6 +55,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			d := apiclient.NewDashboardAPIClient(ctx)
+
 			r, err := d.CreateAPIKey(name, email)
 			if err != nil {
 				return err
@@ -49,42 +69,40 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 
 			fmt.Printf("\nThank you %s!\nYour API key is: %s\n", name, r.APIKey)
 
-			msg := fmt.Sprintf("%s\nYou can now run %s and point to your Terraform directory or JSON/plan file.",
-				fmt.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
-				ui.PrimaryString("infracost breakdown --path=..."),
-			)
-
-			saveAPIKey := true
-
-			if _, ok := ctx.Config.Credentials[ctx.Config.PricingAPIEndpoint]; ok {
-				fmt.Printf("\nYou already have an Infracost API key saved in %s\n", config.CredentialsFilePath())
+			if isRegenerate {
+				fmt.Println()
 				confirm, err := promptOverwriteAPIKey()
 				if err != nil {
 					return err
 				}
 
 				if !confirm {
-					saveAPIKey = false
-
 					msg = fmt.Sprintf("%s\n%s %s %s",
 						"Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml.",
 						"You can now run",
 						ui.PrimaryString("infracost breakdown --path=..."),
 						"and point to your Terraform directory or JSON/plan file.",
 					)
+
+					fmt.Println("")
+					ui.PrintSuccess(msg)
+					return nil
 				}
 			}
 
-			if saveAPIKey {
-				ctx.Config.Credentials[ctx.Config.PricingAPIEndpoint] = config.CredentialsProfileSpec{
-					APIKey: r.APIKey,
-				}
-
-				err = ctx.Config.Credentials.Save()
-				if err != nil {
-					return err
-				}
+			ctx.Config.Credentials[ctx.Config.PricingAPIEndpoint] = config.CredentialsProfileSpec{
+				APIKey: r.APIKey,
 			}
+
+			err = ctx.Config.Credentials.Save()
+			if err != nil {
+				return err
+			}
+
+			msg = fmt.Sprintf("%s\nYou can now run %s and point to your Terraform directory or JSON/plan file.",
+				fmt.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
+				ui.PrimaryString("infracost breakdown --path=..."),
+			)
 
 			fmt.Println("")
 			ui.PrintSuccess(msg)
@@ -147,6 +165,23 @@ func promptOverwriteAPIKey() (bool, error) {
 			return false, nil
 		}
 
+		return false, err
+	}
+
+	return true, nil
+}
+
+func promptGenerateNewKey() (bool, error) {
+	p := promptui.Prompt{
+		Label:     "Would you like to generate a new API key",
+		IsConfirm: true,
+	}
+
+	_, err := p.Run()
+	if err != nil {
+		if errors.Is(err, promptui.ErrAbort) {
+			return false, nil
+		}
 		return false, err
 	}
 
