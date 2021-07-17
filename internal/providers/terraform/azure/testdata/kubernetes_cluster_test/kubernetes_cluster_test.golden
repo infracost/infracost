@@ -23,7 +23,11 @@
                                                                                           
  azurerm_kubernetes_cluster.usage_ephemeral                                               
  ├─ Uptime SLA                                                  730  hours         $73.00 
- └─ default_node_pool                                                                     
-    └─ Instance usage (pay as you go, Standard_D2_v2)         1,460  hours        $213.16 
+ ├─ default_node_pool                                                                     
+ │  └─ Instance usage (pay as you go, Standard_D2_v2)         1,460  hours        $213.16 
+ ├─ Load Balancer                                                                         
+ │  └─ Data processed                                           100  GB             $0.50 
+ └─ DNS                                                                                   
+    └─ Hosted zone                                                1  months         $0.50 
                                                                                           
- OVERALL TOTAL                                                                  $1,477.51 
+ OVERALL TOTAL                                                                  $1,478.51 

@@ -1,6 +1,8 @@
 package google
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -81,6 +83,7 @@ func computeDiskSize(d *schema.ResourceData) *decimal.Decimal {
 }
 
 func defaultDiskSize(diskType string) *decimal.Decimal {
+	diskType = strings.ToLower(diskType)
 	if diskType == "pd-balanced" || diskType == "pd-ssd" {
 		return decimalPtr(decimal.NewFromInt(100))
 	}

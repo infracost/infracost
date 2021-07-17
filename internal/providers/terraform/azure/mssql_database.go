@@ -83,7 +83,7 @@ func dtuPurchaseCostComponents(region, sku string, d *schema.ResourceData, u *sc
 		var storageGB *decimal.Decimal
 		if d.Get("max_size_gb").Type != gjson.Null {
 			storageGB = decimalPtr(decimal.NewFromInt(d.Get("max_size_gb").Int()))
-			if sn == "Premium" {
+			if strings.ToLower(sn) == "premium" {
 				storageGB = decimalPtr(storageGB.Sub(decimal.NewFromInt(500)))
 			} else {
 				storageGB = decimalPtr(storageGB.Sub(decimal.NewFromInt(250)))
@@ -140,7 +140,7 @@ func vCorePurchaseCostComponents(d *schema.ResourceData, u *schema.UsageData, sk
 	productNameRegex := fmt.Sprintf("/%s - %s/", tier, family)
 	skuName := mssqlSkuName(cores, zoneRedundant)
 
-	if tier == "General Purpose - Serverless" {
+	if strings.ToLower(tier) == "general purpose - serverless" {
 		var vCoreHours *decimal.Decimal
 		if u != nil && u.Get("monthly_vcore_hours").Exists() {
 			vCoreHours = decimalPtr(decimal.NewFromInt(u.Get("monthly_vcore_hours").Int()))
@@ -172,7 +172,7 @@ func vCorePurchaseCostComponents(d *schema.ResourceData, u *schema.UsageData, sk
 		costComponents = append(costComponents, databaseComputeInstance(region, name, serviceName, productNameRegex, skuName))
 	}
 
-	if tier == "Hyperscale" {
+	if strings.ToLower(tier) == "hyperscale" {
 		var replicaCount *decimal.Decimal
 		if d.Get("read_replica_count").Type != gjson.Null {
 			replicaCount = decimalPtr(decimal.NewFromInt(d.Get("read_replica_count").Int()))
@@ -203,7 +203,7 @@ func vCorePurchaseCostComponents(d *schema.ResourceData, u *schema.UsageData, sk
 		if d.Get("license_type").Type != gjson.Null {
 			licenseType = d.Get("license_type").String()
 		}
-		if licenseType == "LicenseIncluded" {
+		if strings.ToLower(licenseType) == "licenseincluded" {
 			costComponents = append(costComponents, sqlLicenseCostComponent(region, cores, serviceName, tier))
 		}
 	}
@@ -300,7 +300,7 @@ func sqlLicenseCostComponent(region, cores, serviceName, tier string) *schema.Co
 
 func mssqlStorageComponent(storageGB *decimal.Decimal, region, serviceName, tier string, zoneRedundant bool) *schema.CostComponent {
 	storageTier := tier
-	if storageTier == "General Purpose - Serverless" {
+	if strings.ToLower(storageTier) == "general purpose - serverless" {
 		storageTier = "General Purpose"
 	}
 

@@ -31,7 +31,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 
 		s += fmt.Sprintf("%s %s\n\n",
 			ui.BoldString("Project:"),
-			project.Name,
+			project.Label(opts.DashboardEnabled),
 		)
 
 		if breakdownHasNilCosts(*project.Breakdown) {

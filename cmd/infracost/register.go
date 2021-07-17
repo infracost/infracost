@@ -1,15 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"regexp"
 	"strings"
 
+	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/manifoldco/promptui"
@@ -17,17 +14,33 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type createAPIKeyResponse struct {
-	APIKey string `json:"apiKey"`
-	Error  string `json:"error"`
-}
-
-func registerCmd(cfg *config.Config) *cobra.Command {
+func registerCmd(ctx *config.RunContext) *cobra.Command {
 	return &cobra.Command{
 		Use:   "register",
 		Short: "Register for a free Infracost API key",
 		Long:  "Register for a free Infracost API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
+
+			var msg string
+			var isRegenerate bool
+
+			if _, ok := ctx.Config.Credentials[ctx.Config.PricingAPIEndpoint]; ok {
+
+				isRegenerate = true
+				fmt.Printf("You already have an Infracost API key saved in %s.\n", config.CredentialsFilePath())
+
+				status, err := promptGenerateNewKey()
+				if err != nil {
+					return err
+				}
+
+				if !status {
+					return nil
+				}
+
+				fmt.Println()
+			}
+
 			fmt.Println("Please enter your name and email address to get an API key.")
 			fmt.Println("See our FAQ (https://www.infracost.io/docs/faq) for more details.")
 
@@ -43,7 +56,9 @@ func registerCmd(cfg *config.Config) *cobra.Command {
 				return nil
 			}
 
-			r, err := createAPIKey(cfg.DashboardAPIEndpoint, name, email)
+			d := apiclient.NewDashboardAPIClient(ctx)
+
+			r, err := d.CreateAPIKey(name, email)
 			if err != nil {
 				return err
 			}
@@ -56,42 +71,40 @@ func registerCmd(cfg *config.Config) *cobra.Command {
 
 			fmt.Printf("\nThank you %s!\nYour API key is: %s\n", name, r.APIKey)
 
-			msg := fmt.Sprintf("%s\nYou can now run %s and point to your Terraform directory or JSON/plan file.",
-				fmt.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
-				ui.PrimaryString("infracost breakdown --path=..."),
-			)
-
-			saveAPIKey := true
-
-			if _, ok := cfg.Credentials[cfg.PricingAPIEndpoint]; ok {
-				fmt.Printf("\nYou already have an Infracost API key saved in %s\n", config.CredentialsFilePath())
+			if isRegenerate {
+				fmt.Println()
 				confirm, err := promptOverwriteAPIKey()
 				if err != nil {
 					return err
 				}
 
 				if !confirm {
-					saveAPIKey = false
-
 					msg = fmt.Sprintf("%s\n%s %s %s",
 						"Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml.",
 						"You can now run",
 						ui.PrimaryString("infracost breakdown --path=..."),
 						"and point to your Terraform directory or JSON/plan file.",
 					)
+
+					fmt.Println("")
+					ui.PrintSuccess(msg)
+					return nil
 				}
 			}
 
-			if saveAPIKey {
-				cfg.Credentials[cfg.PricingAPIEndpoint] = config.CredentialsProfileSpec{
-					APIKey: r.APIKey,
-				}
-
-				err = cfg.Credentials.Save()
-				if err != nil {
-					return err
-				}
+			ctx.Config.Credentials[ctx.Config.PricingAPIEndpoint] = config.CredentialsProfileSpec{
+				APIKey: r.APIKey,
 			}
+
+			err = ctx.Config.Credentials.Save()
+			if err != nil {
+				return err
+			}
+
+			msg = fmt.Sprintf("%s\nYou can now run %s and point to your Terraform directory or JSON/plan file.",
+				fmt.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
+				ui.PrimaryString("infracost breakdown --path=..."),
+			)
 
 			fmt.Println("")
 			ui.PrintSuccess(msg)
@@ -160,41 +173,19 @@ func promptOverwriteAPIKey() (bool, error) {
 	return true, nil
 }
 
-func createAPIKey(endpoint string, name string, email string) (*createAPIKeyResponse, error) {
-	url := fmt.Sprintf("%s/apiKeys?source=cli-register", endpoint)
-	d := map[string]string{"name": name, "email": email}
-
-	j, err := json.Marshal(d)
-	if err != nil {
-		return nil, errors.Wrap(err, "Error generating API key request")
+func promptGenerateNewKey() (bool, error) {
+	p := promptui.Prompt{
+		Label:     "Would you like to generate a new API key",
+		IsConfirm: true,
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(j))
+	_, err := p.Run()
 	if err != nil {
-		return nil, errors.Wrap(err, "Error generating API key request")
+		if errors.Is(err, promptui.ErrAbort) {
+			return false, nil
+		}
+		return false, err
 	}
 
-	config.AddNoAuthHeaders(req)
-
-	client := http.Client{}
-	resp, err := client.Do(req)
-
-	if err != nil {
-		return nil, errors.Wrap(err, "Error sending API key request")
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "Invalid response from API")
-	}
-
-	var r createAPIKeyResponse
-
-	err = json.Unmarshal(body, &r)
-	if err != nil {
-		return nil, errors.Wrap(err, "Invalid response from API")
-	}
-
-	return &r, nil
+	return true, nil
 }

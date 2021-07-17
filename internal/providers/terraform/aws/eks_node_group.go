@@ -74,7 +74,7 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		spotCount := decimal.Zero
 		onDemandCount := decimal.NewFromInt(desiredSize)
 
-		if launchTemplateRef[0].Get("instance_market_options.0.market_type").String() == "spot" {
+		if strings.ToLower(launchTemplateRef[0].Get("instance_market_options.0.market_type").String()) == "spot" {
 			onDemandCount = decimal.Zero
 			spotCount = decimal.NewFromInt(desiredSize)
 		}

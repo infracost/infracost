@@ -1,0 +1,13 @@
+
+ Name                                                                                             Monthly Qty  Unit  Monthly Cost 
+                                                                                                                                  
+ google_compute_external_vpn_gateway.my_compute_external_vpn_gateway                                                              
+ └─ Network egress                                                                                                                
+    ├─ IPSec traffic to worldwide excluding China, Australia but including Hong Kong (first 1TB)        1,024  GB         $122.88 
+    ├─ IPSec traffic to worldwide excluding China, Australia but including Hong Kong (next 9TB)         9,216  GB       $1,013.76 
+    ├─ IPSec traffic to worldwide excluding China, Australia but including Hong Kong (over 10TB)        2,260  GB         $180.80 
+    ├─ IPSec traffic to China excluding Hong Kong (first 1TB)                                           1,024  GB         $235.52 
+    ├─ IPSec traffic to China excluding Hong Kong (next 9TB)                                            7,476  GB       $1,644.72 
+    └─ IPSec traffic to Australia (first 1TB)                                                             250  GB          $47.50 
+                                                                                                                                  
+ OVERALL TOTAL                                                                                                          $3,245.18 

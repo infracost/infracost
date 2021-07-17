@@ -14,11 +14,13 @@ var outputVersion = "0.2"
 
 type Root struct {
 	Version          string           `json:"version"`
+	RunID            string           `json:"runId,omitempty"`
 	Projects         []Project        `json:"projects"`
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
 	TimeGenerated    time.Time        `json:"timeGenerated"`
 	Summary          *Summary         `json:"summary"`
+	FullSummary      *Summary         `json:"-"`
 }
 
 type Project struct {
@@ -27,6 +29,15 @@ type Project struct {
 	PastBreakdown *Breakdown              `json:"pastBreakdown"`
 	Breakdown     *Breakdown              `json:"breakdown"`
 	Diff          *Breakdown              `json:"diff"`
+	Summary       *Summary                `json:"summary"`
+	fullSummary   *Summary
+}
+
+func (p *Project) Label(dashboardEnabled bool) string {
+	if !dashboardEnabled {
+		return p.Name
+	}
+	return fmt.Sprintf("%s (%s)", p.Name, p.Metadata.Path)
 }
 
 type Breakdown struct {
@@ -70,11 +81,12 @@ type SummaryOptions struct {
 }
 
 type Options struct {
-	NoColor     bool
-	ShowSkipped bool
-	GroupLabel  string
-	GroupKey    string
-	Fields      []string
+	DashboardEnabled bool
+	NoColor          bool
+	ShowSkipped      bool
+	GroupLabel       string
+	GroupKey         string
+	Fields           []string
 }
 
 func outputBreakdown(resources []*schema.Resource) *Breakdown {
@@ -133,6 +145,8 @@ func ToOutputFormat(projects []*schema.Project) Root {
 	var totalMonthlyCost, totalHourlyCost *decimal.Decimal
 
 	outProjects := make([]Project, 0, len(projects))
+	summaries := make([]*Summary, 0, len(projects))
+	fullSummaries := make([]*Summary, 0, len(projects))
 
 	for _, project := range projects {
 		var pastBreakdown, breakdown, diff *Breakdown
@@ -160,18 +174,24 @@ func ToOutputFormat(projects []*schema.Project) Root {
 			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*breakdown.TotalMonthlyCost))
 		}
 
+		summary := BuildSummary(project.Resources, SummaryOptions{
+			OnlyFields: []string{"UnsupportedResourceCounts"},
+		})
+		summaries = append(summaries, summary)
+
+		fullSummary := BuildSummary(project.Resources, SummaryOptions{IncludeUnsupportedProviders: true})
+		fullSummaries = append(fullSummaries, fullSummary)
+
 		outProjects = append(outProjects, Project{
 			Name:          project.Name,
 			Metadata:      project.Metadata,
 			PastBreakdown: pastBreakdown,
 			Breakdown:     breakdown,
 			Diff:          diff,
+			Summary:       summary,
+			fullSummary:   fullSummary,
 		})
 	}
-
-	resourceSummary := BuildSummary(schema.AllProjectResources(projects), SummaryOptions{
-		OnlyFields: []string{"UnsupportedResourceCounts"},
-	})
 
 	out := Root{
 		Version:          outputVersion,
@@ -179,13 +199,18 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		TotalHourlyCost:  totalHourlyCost,
 		TotalMonthlyCost: totalMonthlyCost,
 		TimeGenerated:    time.Now(),
-		Summary:          resourceSummary,
+		Summary:          MergeSummaries(summaries),
+		FullSummary:      MergeSummaries(fullSummaries),
 	}
 
 	return out
 }
 
 func (r *Root) unsupportedResourcesMessage(showSkipped bool) string {
+	if r.Summary == nil {
+		return ""
+	}
+
 	if r.Summary.UnsupportedResourceCounts == nil || len(*r.Summary.UnsupportedResourceCounts) == 0 {
 		return ""
 	}
@@ -288,6 +313,25 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) *Summary {
 	return s
 }
 
+func MergeSummaries(summaries []*Summary) *Summary {
+	merged := &Summary{}
+
+	for _, s := range summaries {
+		if s == nil {
+			continue
+		}
+
+		merged.SupportedResourceCounts = mergeCounts(merged.SupportedResourceCounts, s.SupportedResourceCounts)
+		merged.UnsupportedResourceCounts = mergeCounts(merged.UnsupportedResourceCounts, s.UnsupportedResourceCounts)
+		merged.TotalSupportedResources = addIntPtrs(merged.TotalSupportedResources, s.TotalSupportedResources)
+		merged.TotalUnsupportedResources = addIntPtrs(merged.TotalUnsupportedResources, s.TotalUnsupportedResources)
+		merged.TotalNoPriceResources = addIntPtrs(merged.TotalNoPriceResources, s.TotalNoPriceResources)
+		merged.TotalResources = addIntPtrs(merged.TotalResources, s.TotalResources)
+	}
+
+	return merged
+}
+
 func calculateTotalCosts(resources []Resource) (*decimal.Decimal, *decimal.Decimal) {
 	totalHourlyCost := decimalPtr(decimal.Zero)
 	totalMonthlyCost := decimalPtr(decimal.Zero)
@@ -371,4 +415,45 @@ func resourceHasNilCosts(resource Resource) bool {
 	}
 
 	return false
+}
+
+func mergeCounts(c1 *map[string]int, c2 *map[string]int) *map[string]int {
+	if c1 == nil && c2 == nil {
+		return nil
+	}
+
+	res := make(map[string]int)
+
+	if c1 != nil {
+		for k, v := range *c1 {
+			res[k] = v
+		}
+	}
+
+	if c2 != nil {
+		for k, v := range *c2 {
+			res[k] += v
+		}
+	}
+
+	return &res
+}
+
+func addIntPtrs(i1 *int, i2 *int) *int {
+	if i1 == nil && i2 == nil {
+		return nil
+	}
+
+	val1 := 0
+	if i1 != nil {
+		val1 = *i1
+	}
+
+	val2 := 0
+	if i2 != nil {
+		val2 = *i2
+	}
+
+	res := val1 + val2
+	return &res
 }

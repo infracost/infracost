@@ -19,11 +19,7 @@ func GetAzureRMDNSZoneRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMDNSZone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := ""
-	group := d.References("resource_group_name")
-	if len(group) > 0 {
-		region = group[0].Get("location").String()
-	}
+	region := lookupRegion(d, []string{"resource_group_name"})
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
 		region = "US Gov Zone 1"

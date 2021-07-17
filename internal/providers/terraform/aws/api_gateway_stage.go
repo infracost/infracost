@@ -37,7 +37,7 @@ func NewAPIGatewayStage(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 					Service:       strPtr("AmazonApiGateway"),
 					ProductFamily: strPtr("Amazon API Gateway Cache"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "cacheMemorySizeGb", Value: strPtr(cacheMemorySize.String())},
+						{Key: "cacheMemorySizeGb", ValueRegex: strPtr(fmt.Sprintf("/%s/i", cacheMemorySize.String()))},
 					},
 				},
 			},

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
@@ -37,18 +38,18 @@ var arnAttributeMap = map[string]string{
 }
 
 type Parser struct {
-	env *config.Environment
+	ctx *config.ProjectContext
 }
 
-func NewParser(env *config.Environment) *Parser {
-	return &Parser{env: env}
+func NewParser(ctx *config.ProjectContext) *Parser {
+	return &Parser{ctx}
 }
 
 func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	registryMap := GetResourceRegistryMap()
 
 	if isAwsChina(d) {
-		p.env.IsAWSChina = true
+		p.ctx.SetContextValue("isAWSChina", true)
 	}
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
@@ -298,7 +299,7 @@ func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, 
 
 	for _, d := range resData {
 		if isInfracostResource(d) {
-			p.env.TerraformInfracostProviderEnabled = true
+			p.ctx.SetContextValue("terraformInfracostProviderEnabled", true)
 
 			for _, ref := range d.References("resources") {
 				if _, ok := u[ref.Address]; !ok {
@@ -346,6 +347,8 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 
 		arnMap[arn] = append(arnMap[arn], d)
 	}
+
+	parseKnownModuleRefs(resData, conf)
 
 	for _, d := range resData {
 		var refAttrs []string
@@ -458,7 +461,13 @@ func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
 }
 
 func getConfJSON(conf gjson.Result, addr string) gjson.Result {
-	c := getModuleConfJSON(conf, getModuleNames(addr))
+	modNames := getModuleNames(addr)
+	c := getModuleConfJSON(conf, modNames)
+
+	if len(modNames) > 0 {
+		c = c.Get("module")
+	}
+
 	return c.Get(fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(addr))))
 }
 
@@ -470,10 +479,10 @@ func getModuleConfJSON(conf gjson.Result, names []string) gjson.Result {
 	// Build up the gjson search key
 	p := make([]string, 0, len(names))
 	for _, n := range names {
-		p = append(p, fmt.Sprintf("module_calls.%s.module", n))
+		p = append(p, fmt.Sprintf("module_calls.%s", n))
 	}
 
-	return conf.Get(strings.Join(p, "."))
+	return conf.Get(strings.Join(p, ".module."))
 }
 
 func isInfracostResource(res *schema.ResourceData) bool {
@@ -574,4 +583,42 @@ func gjsonEscape(s string) string {
 	s = strings.ReplaceAll(s, "?", `\?`)
 
 	return s
+}
+
+// Parses known modules to create references for specific resources in that module
+// This is useful if the module uses a `dynamic` block which means the references aren't defined in the plan JSON
+// See https://github.com/hashicorp/terraform/issues/28346 for more info
+func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Result) {
+	knownRefs := []struct {
+		SourceAddrSuffix string
+		DestAddrSuffix   string
+		Attribute        string
+		ModuleSource     string
+	}{
+		{
+			SourceAddrSuffix: "aws_autoscaling_group.workers_launch_template",
+			DestAddrSuffix:   "aws_launch_template.workers_launch_template",
+			Attribute:        "launch_template",
+			ModuleSource:     "terraform-aws-modules/eks/aws",
+		},
+	}
+
+	for _, d := range resData {
+		for _, knownRef := range knownRefs {
+			modNames := getModuleNames(d.Address)
+			modSource := getModuleConfJSON(conf, modNames).Get("source").String()
+			matches := strings.HasSuffix(removeAddressArrayPart(d.Address), knownRef.SourceAddrSuffix) && modSource == knownRef.ModuleSource
+
+			if matches {
+				countIndex := addressCountIndex(d.Address)
+
+				for _, destD := range resData {
+					suffix := fmt.Sprintf("%s[%d]", knownRef.DestAddrSuffix, countIndex)
+					if cmp.Equal(getModuleNames(destD.Address), modNames) && strings.HasSuffix(destD.Address, suffix) {
+						d.AddReference(knownRef.Attribute, destD)
+					}
+				}
+			}
+		}
+	}
 }

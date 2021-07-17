@@ -47,12 +47,34 @@ resource_usage:
   aws_autoscaling_group.my_asg:
     instances: 15 # Number of instances in the autoscaling group.
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
-    reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
-    reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
-    reserved_instance_payment_option: no_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
+    reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
+    reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: no_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
     # Only applicable when T2 credit_specification is set to unlimited or T3 & T4 instance types are used within a launch template,  or T3 & T4 instance types are used in a launch configuration.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
     vcpu_count: 2 # Number of the vCPUs for the instance type.
+
+  aws_backup_vault.usage:
+    monthly_efs_warm_restore_gb: 10000 # Monthly number of EFS warm restore in GB. 
+    monthly_efs_cold_restore_gb: 10000 # Monthly number of EFS cold restore in GB. 
+    monthly_efs_item_restore_requests: 10000 # Monthly number of EFS item-level restore requests. 
+    monthly_efs_warm_backup_gb: 10000 # Monthly number of EFS warm backups in GB. 
+    monthly_efs_cold_backup_gb: 10000 # Monthly number of EFS cold backups in GB. 
+    monthly_ebs_snapshot_gb: 10000 # Monthly number of EBS snapshots in GB.
+    monthly_rds_snapshot_gb: 10000 # Monthly number of RDS snapshots in GB.
+    monthly_aurora_snapshot_gb: 10000 # Monthly number of Aurora snapshots in GB.
+    monthly_dynamodb_backup_gb: 10000 # Monthly number of DynamoDB backups in GB.
+    monthly_dynamodb_restore_gb: 10000 # Monthly number of DynamoDB restore in GB.
+    monthly_fsx_windows_backup_gb: 10000 # Monthly number of FSX Windows backups in GB.
+    monthly_fsx_lustre_backup_gb: 10000 # Monthly number of FSX Lustre backups in GB.
+
+  aws_cloudformation_stack.my_formation:
+    monthly_handler_operations: 10000 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
+    monthly_duration_secs: 0 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.  
+
+  aws_cloudformation_stack_set.my_formation_set:
+    monthly_handler_operations: 10000 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
+    monthly_duration_secs: 0 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.  
 
   aws_cloudwatch_event_bus.my_events:
     monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.
@@ -94,7 +116,7 @@ resource_usage:
 
   aws_docdb_cluster_instance.my_db:
     data_storage_gb: 1000         # Total storage for cluster in GB.
-    monthly_io_request: 100000000 # Monthly number of input/output requests for cluster.
+    monthly_io_requests: 100000000 # Monthly number of input/output requests for cluster.
     monthly_cpu_credit_hrs: 100 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances.
 
   aws_docdb_cluster_snapshot.my_snapshot:
@@ -139,9 +161,9 @@ resource_usage:
 
   aws_eks_node_group.my_instance:
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
-    reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
-    reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
-    reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
+    reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
+    reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
     # Only applicable for T3 & T4 instance types or if you specify a t2 instance within a launch template.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
     vcpu_count: 2 # Number of the vCPUs for the instance type.
@@ -154,15 +176,29 @@ resource_usage:
 
   aws_instance.my_instance:
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
-    reserved_instance_type: standard # Offering class for Reserved Instances. Can be: convertible, standard.
-    reserved_instance_term: 1_year # Term for Reserved Instances. Can be: 1_year, 3_year.
-    reserved_instance_payment_option: all_upfront # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront.
+    reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
+    reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: all_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
     # Can be used with T2 / T3 & T4 Instance types. T2 requires credit_specification to be unlimited.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
     vcpu_count: 2 # Number of the vCPUs for the instance type.
 
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000 # Total storage used for backups in GB.
+
+  aws_kinesis_analytics_application.my_kinesis:
+    kinesis_processing_units: 10 # Number of Kinesis processing units.
+    durable_application_backup_gb: 100 # Total amount of durable application backup in GB.
+
+  aws_kinesisanalyticsv2_application.my_kinesis:
+    kinesis_processing_units: 10 # Number of Kinesis processing units.
+    durable_application_backup_gb: 100 # Total amount of durable application backup in GB.
+
+  aws_kinesisanalyticsv2_application_snapshot.my_kinesis:
+    durable_application_backup_gb: 100 # Total amount of durable application backups in GB.
+
+  aws_kinesis_firehose_delivery_stream.my_kinesis:
+    monthly_data_ingested_gb: 3000000 # Monthly data ingested by the Delivery Stream in GB.
 
   aws_lambda_function.my_function:
     monthly_requests: 100000 # Monthly requests to the Lambda function.
@@ -177,6 +213,17 @@ resource_usage:
 
   aws_nat_gateway.my_nat_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
+
+  aws_neptune_cluster.my_cluster:
+    storage_gb: 100                # Total storage for the cluster in GB.
+    monthly_io_requests: 10000000  # Monthly number of input/output requests for cluster.
+    backup_storage_gb: 1000        # Total storage used for backups in GB.
+
+  aws_neptune_cluster_instance.my_cluster_instance:
+    monthly_cpu_credit_hrs: 10     # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
+
+  aws_neptune_cluster_snapshot.my_cluster_snapshot:
+    backup_storage_gb: 1000        # Total storage used for backup snapshots in GB.
 
   aws_mq_broker.my_aws_mq_broker:
     storage_size_gb: 12 # Data storage per instance in GB.
@@ -204,7 +251,7 @@ resource_usage:
     backup_storage_gb: 1000000
 
   aws_route53_health_check.my_health_check:
-    endpoint_type: aws # Type of health check endpoint to query, can be: either aws or non_aws.
+    endpoint_type: aws # Type of health check endpoint to query, can be: aws, non_aws.
 
   aws_route53_record.my_record:
     monthly_standard_queries: 1100000000      # Monthly number of Standard queries.
@@ -382,6 +429,16 @@ resource_usage:
   #
   # Terraform GCP resources
   #
+  google_bigquery_dataset.my_dataset:
+    monthly_queries_tb: 100 # Monthly number of bytes processed (also referred to as bytes read) in TB.
+
+  google_bigquery_table.usage:
+    monthly_active_storage_gb: 1000    # Monthly number of active storage modifications in GB.
+    monthly_long_term_storage_gb: 1000 # Monthly number of long-term storage modifications in GB.
+    monthly_streaming_inserts_mb: 1000 # Monthly number of streaming data inserts in MB.
+    monthly_storage_write_api_gb: 1000 # Monthly number of storage write api in GB.
+    monthly_storage_read_api_tb: 1000  # Monthly number of storage read api in TB.
+
   google_cloudfunctions_function.my_function:
     request_duration_ms: 300               # Average duration of each request in milliseconds.
     monthly_function_invocations: 10000000 # Monthly number of function invocations.
@@ -411,6 +468,37 @@ resource_usage:
       china: 50            # China excluding Hong Kong.
       australia: 250       # Australia.
 
+  google_compute_external_vpn_gateway.my_compute_external_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly data transfer from VPN gateway to the following, in GB:
+      worldwide: 12500                # Worldwide excluding China, Australia but including Hong Kong.
+      china: 8500                     # China excluding Hong Kong.
+      australia: 250                  # Australia.
+  
+  google_compute_vpn_gateway.my_compute_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 250                # VMs in the same Google Cloud region.
+      us_or_canada: 100               # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 70                      # Between Google Cloud regions within Europe.
+      asia: 50                        # Between Google Cloud regions within Asia.
+      south_america: 100              # Between Google Cloud regions within South America.
+      oceania: 50                     # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 200                  # to a Google Cloud region on another continent.
+    
+  google_compute_ha_vpn_gateway.my_compute_ha_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 250                # VMs in the same Google Cloud region.
+      us_or_canada: 100               # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 70                      # Between Google Cloud regions within Europe.
+      asia: 50                        # Between Google Cloud regions within Asia.
+      south_america: 100              # Between Google Cloud regions within South America.
+      oceania: 50                     # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 200                  # to a Google Cloud region on another continent.
+
+  google_compute_forwarding_rule.my_forwarding:
+    monthly_ingress_data_gb: 100
+  
+  google_compute_global_forwarding_rule.my_global_forwarding:
+    monthly_ingress_data_gb: 100
 
   google_compute_image.my_image:
     storage_gb: 1000 # Total size of image storage in GB.
@@ -420,6 +508,34 @@ resource_usage:
 
   google_compute_snapshot.my_snapshot:
     storage_gb: 500 # Total size of snapshot disk storage in GB.
+
+  google_compute_target_grpc_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_target_http_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+     
+  google_compute_target_https_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_target_ssl_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_target_tcp_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+   
+  google_compute_region_target_http_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
+
+  google_compute_region_target_https_proxy.my_proxy:
+    monthly_proxy_instances: 10.2
+    monthly_data_processed_gb: 100
 
   google_dns_record_set.my_record_set:
     monthly_queries:  1000000 # Monthly DNS queries.
@@ -489,6 +605,9 @@ resource_usage:
   azurerm_app_service_environment.my_service:
      operating_system: linux # Override the operating system of the instance, can be: linux, windows.
 
+  azurerm_application_insights.my_insights:
+    monthly_data_ingested_gb: 1000 # Monthly amount of data ingested in GB.
+
   azurerm_automation_account.my_account:
     monthly_watcher_hours: 0 # Monthly number of watcher hours.
 
@@ -497,6 +616,10 @@ resource_usage:
 
   azurerm_automation_dsc_nodeconfiguration.my_nodeconfiguration:
     non_azure_config_node_count: 0 # Number of non-Azure configuration nodes.
+
+  azurerm_application_gateway.my_gateway: 
+    monthly_data_processed_gb: 100000 #  Monthly data processed by the Application Gateway in GB.
+    monthly_v2_capacity_units: 10000  # Number capacity(for v2) units gateway.
 
   azurerm_automation_job_schedule.my_schedule:
     monthly_job_run_mins: 0 # Monthly number of job run minutes.  
@@ -615,7 +738,16 @@ resource_usage:
   azurerm_dns_txt_record.my_txt_record:
     monthly_queries: 11500000000  # Monthly number of DNS queries
 
+  azurerm_eventhub_namespace.my_event_hub:
+    monthly_ingress_events: 100000000 # Monthly number of ingress events, only applicable for Basic and Standard namespaces.
+    retention_storage_gb: 10000       # Total data stored for retention in GB, used to calculate Extended Retention costs, only applicable for Dedicated namespaces.
+    throughput_or_capacity_units: 10  # Number of Throughput Units (for Basic and Standard) and Capacity units (for Dedicated) namespaces.
+    capture_enabled: false            # Defines if capture is enabled for the Event Hub Standard namespaces, can be: true, false.
+
   azurerm_kubernetes_cluster.my_cluster:
+    load_balancer:
+      monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
+
     default_node_pool:
       nodes: 2 # Node count for the default node pool.
 
@@ -650,6 +782,9 @@ resource_usage:
     instances: 10 # Override the number of instances in the scale set.
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
+
+  azurerm_lb.my_lb:
+    monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
 
   azurerm_managed_disk.my_disk:
     monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
@@ -694,6 +829,9 @@ resource_usage:
     
   azurerm_private_dns_txt_record.my_txt_record:
     monthly_queries: 1500000000  # Monthly number of DNS queries
+
+  azurerm_search_service.my_service:
+    monthly_images_extracted: 1000000 # Monthly number of extracted images
 
   azurerm_storage_account.my_account:
     data_at_rest_storage_gb: 10000

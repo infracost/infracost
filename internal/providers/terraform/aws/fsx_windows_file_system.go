@@ -19,7 +19,7 @@ func GetFSXWindowsFSRegistryItem() *schema.RegistryItem {
 func NewFSXWindowsFS(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	isMultiAZ := strings.Contains(d.Get("deployment_type").String(), "MULTI_AZ")
-	isHDD := d.Get("storage_type").String() == "HDD"
+	isHDD := strings.ToLower(d.Get("storage_type").String()) == "hdd"
 	throughput := decimalPtr(decimal.NewFromInt(d.Get("throughput_capacity").Int()))
 	storageSize := decimalPtr(decimal.NewFromInt(d.Get("storage_capacity").Int()))
 

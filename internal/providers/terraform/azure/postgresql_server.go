@@ -53,7 +53,7 @@ func NewAzureRMPostrgreSQLServer(d *schema.ResourceData, u *schema.UsageData) *s
 	storageGB := d.Get("storage_mb").Int() / 1024
 
 	// MO and GP storage cost are the same, and we don't have cost component for MO Storage now
-	if tier == "MO" {
+	if strings.ToLower(tier) == "mo" {
 		tierName = "General Purpose"
 	}
 	productNameRegex = fmt.Sprintf("/%s - Storage/", tierName)

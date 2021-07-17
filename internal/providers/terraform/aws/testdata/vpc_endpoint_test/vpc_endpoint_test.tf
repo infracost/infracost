@@ -21,6 +21,12 @@ resource "aws_vpc_endpoint" "interface_withUsage" {
   vpc_endpoint_type = "Interface"
 }
 
+resource "aws_vpc_endpoint" "interface_withBigUsage" {
+  service_name      = "com.amazonaws.region.ec2"
+  vpc_id            = "vpc-123456"
+  vpc_endpoint_type = "Interface"
+}
+
 resource "aws_vpc_endpoint" "gateway_loadbalancer" {
   service_name      = "com.amazonaws.region.ec2"
   vpc_id            = "vpc-123456"

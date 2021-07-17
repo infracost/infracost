@@ -16,6 +16,7 @@ process_args () {
   config_file=${5:-$config_file}
   percentage_threshold=${6:-$percentage_threshold}
   post_condition=${7:-$post_condition}
+  show_skipped=${8:-$show_skipped}
 
   # Validate post_condition
   if ! echo "$post_condition" | jq empty; then
@@ -36,6 +37,7 @@ process_args () {
   fi
   percentage_threshold=${percentage_threshold:-0}
   INFRACOST_BINARY=${INFRACOST_BINARY:-infracost}
+  GITHUB_API_URL=${GITHUB_API_URL:-https://api.github.com}
 
   # Export as it's used by infracost, not this script
   export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
@@ -65,7 +67,7 @@ build_breakdown_cmd () {
     breakdown_cmd="$breakdown_cmd --terraform-plan-flags \"$terraform_plan_flags\""
   fi
   if [ ! -z "$terraform_workspace" ]; then
-    breakdown_cmd="$terraform_workspace --terraform-workspace $terraform_workspace"
+    breakdown_cmd="$breakdown_cmd --terraform-workspace $terraform_workspace"
   fi
   if [ ! -z "$usage_file" ]; then
     breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
@@ -78,6 +80,10 @@ build_breakdown_cmd () {
 
 build_output_cmd () {
   output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
+  if [ ! -z "$show_skipped" ]; then
+    # The "=" is important as otherwise the value of the flag is ignored by the CLI
+    output_cmd="$output_cmd --show-skipped=$show_skipped"
+  fi
   echo "${output_cmd}"
 }
 
@@ -149,7 +155,7 @@ post_to_github () {
     jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
       -H "Content-Type: application/json" \
       -H "Authorization: token $GITHUB_TOKEN" \
-      "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
+      "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
   fi
 }
 
@@ -177,7 +183,7 @@ post_to_circle_ci () {
     jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
       -H "Content-Type: application/json" \
       -H "Authorization: token $GITHUB_TOKEN" \
-      "https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commits/$CIRCLE_SHA1/comments"
+      "$GITHUB_API_URL/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commits/$CIRCLE_SHA1/comments"
 
   elif echo $CIRCLE_REPOSITORY_URL | grep -Eiq bitbucket; then
     if [ ! -z "$CIRCLE_PULL_REQUEST" ]; then
@@ -227,12 +233,38 @@ post_to_azure_devops () {
   fi
 }
 
+post_to_slack () {
+  echo "Posting comment to Slack"
+  msg="$(build_msg false)"
+  jq -Mnc --arg msg "$msg" '{"text": "\($msg)"}' | curl -L -X POST -d @- \
+    -H "Content-Type: application/json" \
+    "$SLACK_WEBHOOK_URL"
+}
+
 load_github_env () {
   export VCS_REPO_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+  
+  github_event=$(cat $GITHUB_EVENT_PATH)
+
+  if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+    GITHUB_SHA=$(echo $github_event | jq -r .pull_request.head.sha)
+    export VCS_PULL_REQUEST_URL=$(echo $github_event | jq -r .pull_request.html_url)
+  else
+    export VCS_PULL_REQUEST_URL=$(curl -s \
+      -H "Accept: application/vnd.github.groot-preview+json" \
+      -H "Authorization: token $GITHUB_TOKEN" \
+      $GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls \
+      | jq -r '. | map(select(.state == "open")) | . |= sort_by(.updated_at) | reverse | .[0].html_url')
+  fi
 }
 
 load_gitlab_env () {
   export VCS_REPO_URL=$CI_REPOSITORY_URL
+  
+  first_mr=$(echo $CI_OPEN_MERGE_REQUESTS | cut -d',' -f1)
+  repo=$(echo $first_mr | cut -d'!' -f1)
+  mr_number=$(echo $first_mr | cut -d'!' -f2)
+  export VCS_PULL_REQUEST_URL=$CI_SERVER_URL/$repo/merge_requests/$mr_number
 }
 
 load_circle_ci_env () {
@@ -242,7 +274,6 @@ load_circle_ci_env () {
 load_azure_devops_env () {
   export VCS_REPO_URL=$BUILD_REPOSITORY_URI
 }
-
 
 cleanup () {
   rm -f infracost_breakdown.json infracost_breakdown_cmd infracost_output_cmd
@@ -316,8 +347,10 @@ fi
 if [ ! -z "$GITHUB_ACTIONS" ]; then
   echo "::set-output name=past_total_monthly_cost::$past_total_monthly_cost"
   echo "::set-output name=total_monthly_cost::$total_monthly_cost"
+  load_github_env
   post_to_github
 elif [ ! -z "$GITLAB_CI" ]; then
+  load_gitlab_env
   post_to_gitlab
 elif [ ! -z "$CIRCLECI" ]; then
   post_to_circle_ci
@@ -325,6 +358,10 @@ elif [ ! -z "$BITBUCKET_PIPELINES" ]; then
   post_to_bitbucket
 elif [ ! -z "$SYSTEM_COLLECTIONURI" ]; then
   post_to_azure_devops
+fi
+
+if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
+  post_to_slack
 fi
 
 cleanup

@@ -29,6 +29,9 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 		"formatCost2DP":  formatCost2DP,
 		"formatPrice":    formatPrice,
 		"formatQuantity": formatQuantity,
+		"projectLabel": func(p Project) string {
+			return p.Label(opts.DashboardEnabled)
+		},
 	})
 	tmpl, err := tmpl.Parse(HTMLTemplate)
 	if err != nil {

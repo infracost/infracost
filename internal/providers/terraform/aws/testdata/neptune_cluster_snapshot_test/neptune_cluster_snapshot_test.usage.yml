@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  aws_neptune_cluster_snapshot.fiveDaysRetenPeriod:
+    backup_storage_gb: 1000
+
+  aws_neptune_cluster_snapshot.oneDayRetenPeriod:
+    backup_storage_gb: 1000

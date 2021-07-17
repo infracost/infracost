@@ -2,6 +2,7 @@ package azure
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -25,11 +26,11 @@ func NewAzureRMFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		skuTier = d.Get("sku_tier").String()
 	}
 
-	// I compare d.Get() with empty array because defaulty exists empty array of virtual hub block: "virtual_hub":[]
+	// Compare d.Get() with empty array because by default an empty array of virtual hub block: "virtual_hub":[] exists,
 	// and it means that d.Get("virtual_hub").Type will never return gjson.Null
 
 	if v := d.Get("virtual_hub").String(); v != "[]" {
-		if skuTier == "Standard" {
+		if strings.ToLower(skuTier) == "standard" {
 			skuTier = "Secured Virtual Hub"
 		} else {
 			skuTier = fmt.Sprintf("%s Secured Virtual Hub", skuTier)

@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/infracost/infracost/internal/schema"
+	"strings"
 
 	"github.com/shopspring/decimal"
 )
@@ -43,7 +44,7 @@ func NewLB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		maxLCU = decimalPtr(decimal.Max(*maxLCU, *processedBytesLCU))
 	}
 
-	if d.Get("load_balancer_type").String() == "application" {
+	if strings.ToLower(d.Get("load_balancer_type").String()) == "application" {
 		costComponentName := "Application load balancer"
 		productFamily := "Load Balancer-Application"
 
@@ -85,7 +86,7 @@ func newLBResource(d *schema.ResourceData, productFamily string, costComponentNa
 		},
 	}
 
-	if productFamily == "Load Balancer" {
+	if strings.ToLower(productFamily) == "load balancer" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Data processed",
 			Unit:            "GB",
@@ -103,7 +104,7 @@ func newLBResource(d *schema.ResourceData, productFamily string, costComponentNa
 		})
 	}
 
-	if productFamily == "Load Balancer-Application" || productFamily == "Load Balancer-Network" {
+	if strings.ToLower(productFamily) == "load balancer-application" || strings.ToLower(productFamily) == "load balancer-network" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Load balancer capacity units",
 			Unit:            "LCU",

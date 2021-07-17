@@ -4,7 +4,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "example"
+  name     = "example-resources"
   location = "eastus"
 }
 resource "azurerm_automation_account" "example" {
@@ -16,7 +16,7 @@ resource "azurerm_automation_account" "example" {
 }
 
 resource "azurerm_automation_dsc_configuration" "example" {
-  name                    = "example"
+  name                    = "test"
   resource_group_name     = azurerm_resource_group.example.name
   automation_account_name = azurerm_automation_account.example.name
   location                = azurerm_resource_group.example.location
@@ -24,20 +24,26 @@ resource "azurerm_automation_dsc_configuration" "example" {
 }
 
 resource "azurerm_automation_dsc_nodeconfiguration" "zeroNodes" {
-  name                    = "zeroNodes"
+  name                    = "test.localhost"
   resource_group_name     = azurerm_resource_group.example.name
   automation_account_name = azurerm_automation_account.example.name
-  content_embedded        = "configuration test {}"
+  depends_on              = [azurerm_automation_dsc_configuration.example]
+
+  content_embedded = "configuration test {}"
 }
 resource "azurerm_automation_dsc_nodeconfiguration" "fiveNodes" {
-  name                    = "fiveNodes"
+  name                    = "test.localhost"
   resource_group_name     = azurerm_resource_group.example.name
   automation_account_name = azurerm_automation_account.example.name
-  content_embedded        = "configuration test {}"
+  depends_on              = [azurerm_automation_dsc_configuration.example]
+
+  content_embedded = "configuration test {}"
 }
 resource "azurerm_automation_dsc_nodeconfiguration" "withoutUsage" {
-  name                    = "withoutUsage"
+  name                    = "test.localhost"
   resource_group_name     = azurerm_resource_group.example.name
   automation_account_name = azurerm_automation_account.example.name
-  content_embedded        = "configuration test {}"
+  depends_on              = [azurerm_automation_dsc_configuration.example]
+
+  content_embedded = "configuration test {}"
 }

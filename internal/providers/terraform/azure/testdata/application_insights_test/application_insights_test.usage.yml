@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage: 
+  azurerm_application_insights.usage:
+    monthly_data_ingested_gb: 1000
+  azurerm_application_insights.with_retention:
+    monthly_data_ingested_gb: 1000

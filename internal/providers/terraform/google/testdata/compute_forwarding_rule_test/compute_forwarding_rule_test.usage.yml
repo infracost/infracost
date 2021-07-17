@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  google_compute_forwarding_rule.default:
+    monthly_ingress_data_gb: 100
+  
+  google_compute_global_forwarding_rule.default:
+    monthly_ingress_data_gb: 100
+    

@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
@@ -19,6 +20,7 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 			"launch_template.0.id",
 			"launch_template.0.name",
 			"mixed_instances_policy.0.launch_template.0.launch_template_specification.0.launch_template_id",
+			"launch_template",
 		},
 	}
 }
@@ -36,13 +38,12 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	subResources := make([]*schema.Resource, 0)
 
 	launchConfigurationRef := d.References("launch_configuration")
-	launchTemplateRefID := d.References("launch_template.0.id")
-	launchTemplateRefName := d.References("launch_template.0.name")
-	launchTemplateRef := []*schema.ResourceData{}
-	if len(launchTemplateRefID) > 0 {
-		launchTemplateRef = launchTemplateRefID
-	} else if len(launchTemplateRefName) > 0 {
-		launchTemplateRef = launchTemplateRefName
+	launchTemplateRef := d.References("launch_template")
+	if len(launchTemplateRef) == 0 {
+		launchTemplateRef = d.References("launch_template.0.id")
+	}
+	if len(launchTemplateRef) == 0 {
+		launchTemplateRef = d.References("launch_template.0.name")
 	}
 	mixedInstanceLaunchTemplateRef := d.References("mixed_instances_policy.0.launch_template.0.launch_template_specification.0.launch_template_id")
 
@@ -58,7 +59,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	} else if len(launchTemplateRef) > 0 {
 		onDemandCount := desiredCapacity
 		spotCount := decimal.Zero
-		if launchTemplateRef[0].Get("instance_market_options.0.market_type").String() == "spot" {
+		if strings.ToLower(launchTemplateRef[0].Get("instance_market_options.0.market_type").String()) == "spot" {
 			onDemandCount = decimal.Zero
 			spotCount = desiredCapacity
 		}
@@ -88,10 +89,10 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 
 func newLaunchConfiguration(name string, d *schema.ResourceData, u *schema.UsageData, region string) *schema.Resource {
 	tenancy := "Shared"
-	if d.Get("placement_tenancy").String() == "host" {
+	if strings.ToLower(d.Get("placement_tenancy").String()) == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
 		return nil
-	} else if d.Get("placement_tenancy").String() == "dedicated" {
+	} else if strings.ToLower(d.Get("placement_tenancy").String()) == "dedicated" {
 		tenancy = "Dedicated"
 	}
 
@@ -130,10 +131,10 @@ func newLaunchConfiguration(name string, d *schema.ResourceData, u *schema.Usage
 
 func newLaunchTemplate(name string, d *schema.ResourceData, u *schema.UsageData, region string, onDemandCount decimal.Decimal, spotCount decimal.Decimal) *schema.Resource {
 	tenancy := "Shared"
-	if d.Get("placement.0.tenancy").String() == "host" {
+	if strings.ToLower(d.Get("placement.0.tenancy").String()) == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Templates", d.Address)
 		return nil
-	} else if d.Get("placement.0.tenancy").String() == "dedicated" {
+	} else if strings.ToLower(d.Get("placement.0.tenancy").String()) == "dedicated" {
 		tenancy = "Dedicated"
 	}
 
@@ -168,8 +169,6 @@ func newLaunchTemplate(name string, d *schema.ResourceData, u *schema.UsageData,
 	}
 
 	subResources := make([]*schema.Resource, 0)
-	rootBlockDevice := newRootBlockDevice(d.Get("root_block_device.0"), region)
-	subResources = append(subResources, rootBlockDevice)
 
 	for i, blockDeviceMappingData := range d.Get("block_device_mappings.#.ebs|@flatten").Array() {
 		name := fmt.Sprintf("block_device_mapping[%d]", i)
@@ -226,7 +225,7 @@ func elasticInferenceAcceleratorCostComponent(d *schema.ResourceData) *schema.Co
 			Service:       strPtr("AmazonEI"),
 			ProductFamily: strPtr("Elastic Inference"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", deviceType))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", deviceType))},
 			},
 		},
 	}

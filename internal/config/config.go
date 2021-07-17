@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -23,8 +24,6 @@ type Project struct {
 }
 
 type Config struct { // nolint:golint
-	Environment *Environment
-	State       *State
 	Credentials Credentials
 
 	Version         string `yaml:"version,omitempty" ignored:"true"`
@@ -36,6 +35,7 @@ type Config struct { // nolint:golint
 	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
+	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
 
 	Projects      []*Project `yaml:"projects" ignored:"true"`
 	Format        string     `yaml:"format,omitempty" ignored:"true"`
@@ -53,8 +53,6 @@ func init() {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Environment: NewEnvironment(),
-
 		LogLevel: "",
 		NoColor:  false,
 
@@ -75,7 +73,6 @@ func (c *Config) LoadFromConfigFile(path string) error {
 		return err
 	}
 
-	c.Environment.HasConfigFile = true
 	c.Projects = cfgFile.Projects
 
 	// Reload the environment to overwrite any of the config file configs
@@ -97,12 +94,6 @@ func (c *Config) LoadFromEnv() error {
 	if err != nil {
 		return err
 	}
-
-	err = loadState(c)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	c.Environment.InstallID = c.State.InstallID
 
 	err = loadCredentials(c)
 	if err != nil {
@@ -162,6 +153,22 @@ func (c *Config) ConfigureLogger() error {
 
 func (c *Config) IsLogging() bool {
 	return c.LogLevel != ""
+}
+
+func (c *Config) IsSelfHosted() bool {
+	return c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
+}
+
+func (c *Config) IsTelemetryDisabled() bool {
+	return c.IsSelfHosted() && IsFalsy(os.Getenv("INFRACOST_SELF_HOSTED_TELEMETRY"))
+}
+
+func IsTest() bool {
+	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
+}
+
+func IsDev() bool {
+	return os.Getenv("INFRACOST_ENV") == "dev"
 }
 
 func loadDotEnv() error {

@@ -1,6 +1,8 @@
 package google
 
 import (
+	"fmt"
+
 	"github.com/dustin/go-humanize"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -64,7 +66,7 @@ func monitoringCostComponent(displayName string, unit string, unitMultiplier int
 			Service:       strPtr("Stackdriver Monitoring"),
 			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: &description},
+				{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s/i", description))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

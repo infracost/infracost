@@ -1,11 +1,10 @@
 package azure
 
 import (
-	"strings"
-
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+	"strings"
 )
 
 func GetAzureRMVirtualMachineRegistryItem() *schema.RegistryItem {
@@ -23,15 +22,15 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 
 	os := "Linux"
 	if d.Get("storage_image_reference.0.offer").Type != gjson.Null {
-		if d.Get("storage_image_reference.0.offer").String() == "WindowsServer" {
+		if strings.ToLower(d.Get("storage_image_reference.0.offer").String()) == "windowsserver" {
 			os = "Windows"
 		}
 	}
-	if d.Get("storage_os_disk.0.os_type").String() == "Windows" {
+	if strings.ToLower(d.Get("storage_os_disk.0.os_type").String()) == "windows" {
 		os = "Windows"
 	}
 
-	if os == "Windows" {
+	if strings.ToLower(os) == "windows" {
 		licenseType := d.Get("license_type").String()
 		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType))
 	} else {
@@ -69,14 +68,6 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 		CostComponents: costComponents,
 		SubResources:   subResources,
 	}
-}
-
-// Parse from instance type value to Azure SKU name.
-func parseVMSKUName(instanceType string) string {
-	s := strings.ReplaceAll(instanceType, "Standard_", "")
-	s = strings.ReplaceAll(s, "Basic_", "")
-	s = strings.ReplaceAll(s, "_", " ")
-	return s
 }
 
 func ultraSSDReservationCostComponent(region string) *schema.CostComponent {

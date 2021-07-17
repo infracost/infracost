@@ -2,6 +2,7 @@ package azure
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -25,7 +26,7 @@ func NewAzureRMNotificationHubNamespace(d *schema.ResourceData, u *schema.UsageD
 	if d.Get("sku_name").Type != gjson.Null {
 		sku = d.Get("sku_name").String()
 	}
-	if sku == "Free" {
+	if strings.ToLower(sku) == "free" {
 		return &schema.Resource{
 			NoPrice:   true,
 			IsSkipped: true,
@@ -38,7 +39,7 @@ func NewAzureRMNotificationHubNamespace(d *schema.ResourceData, u *schema.UsageD
 		monthlyAdditionalPushes = decimalPtr(decimal.NewFromInt(u.Get("monthly_pushes").Int()))
 	}
 
-	if sku == "Basic" {
+	if strings.ToLower(sku) == "basic" {
 		if monthlyAdditionalPushes != nil {
 			pushLimits := []int{10000000}
 			pushQuantities := usage.CalculateTierBuckets(*monthlyAdditionalPushes, pushLimits)

@@ -92,7 +92,7 @@ func NewECSService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 				Service:       strPtr("AmazonEI"),
 				ProductFamily: strPtr("Elastic Inference"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", deviceType))},
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", deviceType))},
 				},
 			},
 		})

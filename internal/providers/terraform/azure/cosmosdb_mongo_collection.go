@@ -12,6 +12,7 @@ func GetAzureRMCosmosdbMongoCollectionRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"account_name",
 			"database_name",
+			"resource_group_name",
 		},
 	}
 }

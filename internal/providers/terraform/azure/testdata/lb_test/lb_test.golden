@@ -1,0 +1,12 @@
+
+ Name                        Monthly Qty  Unit              Monthly Cost 
+                                                                         
+ azurerm_lb.standard                                                     
+ └─ Data processed                   100  GB                       $0.50 
+                                                                         
+ azurerm_lb.withoutUsage                                                 
+ └─ Data processed        Monthly cost depends on usage: $0.005 per GB   
+                                                                         
+ OVERALL TOTAL                                                     $0.50 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

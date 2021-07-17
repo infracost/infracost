@@ -276,7 +276,7 @@ func TestParseJSONResources(t *testing.T) {
 	conf := parsed.Get("configuration.root_module")
 	vars := parsed.Get("variables")
 
-	p := NewParser(config.NewEnvironment())
+	p := NewParser(config.EmptyProjectContext())
 
 	actual := p.parseJSONResources(false, nil, usage, parsed, providerConf, conf, vars)
 
@@ -344,7 +344,7 @@ func TestCreateResource(t *testing.T) {
 		},
 	}
 
-	p := NewParser(config.NewEnvironment())
+	p := NewParser(config.EmptyProjectContext())
 
 	for _, test := range tests {
 		actual := p.createResource(test.data, nil)
@@ -523,7 +523,7 @@ func TestParseResourceData(t *testing.T) {
 		"module.module1.aws_nat_gateway.nat2": "eu-west-2",
 	}
 
-	p := NewParser(config.NewEnvironment())
+	p := NewParser(config.EmptyProjectContext())
 	actual := p.parseResourceData(providerConf, planVals, conf, vars)
 
 	for k, v := range actual {
@@ -592,7 +592,7 @@ func TestParseReferences_plan(t *testing.T) {
 		}`,
 	}
 
-	p := NewParser(config.NewEnvironment())
+	p := NewParser(config.EmptyProjectContext())
 	p.parseReferences(resData, conf)
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
@@ -632,8 +632,180 @@ func TestParseReferences_state(t *testing.T) {
 
 	conf := gjson.Result{}
 
-	p := NewParser(config.NewEnvironment())
+	p := NewParser(config.EmptyProjectContext())
 	p.parseReferences(resData, conf)
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
+}
+
+func TestParseKnownModuleRefs(t *testing.T) {
+	res := schema.NewResourceData(
+		"aws_autoscaling_group",
+		"registry.terraform.io/hashicorp/aws",
+		"module.worker_groups_launch_template.aws_autoscaling_group.workers_launch_template[0]",
+		nil,
+		gjson.Result{
+			Type: gjson.JSON,
+			Raw: `{
+				"capacity_rebalance":false,
+				"desired_capacity":6,
+				"enabled_metrics":null,
+				"force_delete":false,
+				"force_delete_warm_pool":false,
+				"health_check_grace_period":300,
+				"initial_lifecycle_hook":[],
+				"instance_refresh":[],
+				"launch_configuration":null,
+				"launch_template":[{}],
+				"load_balancers":null,
+				"max_instance_lifetime":0,
+				"max_size":3,
+				"metrics_granularity":"1Minute",
+				"min_elb_capacity":null,
+				"min_size":1,
+				"mixed_instances_policy":[],
+				"name_prefix":"my-cluster-0",
+				"placement_group":null,
+				"protect_from_scale_in":false,
+				"region":"us-east-1",
+				"suspended_processes":["AZRebalance"],
+				"tag":[
+					{"key":"Name",
+					"propagate_at_launch":true,
+					"value":"my-cluster-0-eks_asg"},
+					{"key":"kubernetes.io/cluster/my-cluster",
+					"propagate_at_launch":true,
+					"value":"owned"}
+				],
+				"tags":null,
+				"target_group_arns":null,
+				"termination_policies":[],
+				"timeouts":null,
+				"wait_for_capacity_timeout":"10m",
+				"wait_for_elb_capacity":null,
+				"warm_pool":[]}`,
+		},
+	)
+
+	lt := schema.NewResourceData(
+		"aws_launch_template",
+		"registry.terraform.io/hashicorp/aws",
+		"module.worker_groups_launch_template.aws_launch_template.workers_launch_template[0]",
+		nil,
+		gjson.Result{
+			Type: gjson.JSON,
+			Raw: `{
+				"block_device_mappings":[
+					{
+						"device_name":"/dev/xvda",
+						"ebs":[
+							{
+								"delete_on_termination":"true",
+								"encrypted":"false",
+								"iops":0,
+								"kms_key_id":"",
+								"snapshot_id":null,
+								"volume_size":100,
+								"volume_type":"gp2"
+							}
+						],
+					"no_device":null,
+					"virtual_name":null
+					}
+				],
+				"capacity_reservation_specification":[],
+				"cpu_options":[],
+				"credit_specification":[
+					{
+						"cpu_credits":"standard"
+					}
+				],
+				"description":null,
+				"disable_api_termination":null,
+				"ebs_optimized":"true",
+				"elastic_gpu_specifications":[],
+				"elastic_inference_accelerator":[],
+				"enclave_options":[{"enabled":false}],
+				"hibernation_options":[],
+				"iam_instance_profile":[{"arn":null}],
+				"image_id":"ami-083ae86883eb12ef6",
+				"instance_initiated_shutdown_behavior":null,
+				"instance_market_options":[],
+				"instance_type":"m4.large",
+				"kernel_id":null,
+				"key_name":"",
+				"license_specification":[],
+				"metadata_options":[
+					{
+						"http_endpoint":"enabled",
+						"http_tokens":"optional"
+					}
+				],
+				"monitoring":[{"enabled":true}],
+				"name_prefix":"my-cluster-0",
+				"network_interfaces":[
+					{
+						"associate_carrier_ip_address":null,
+						"associate_public_ip_address":"false",
+						"delete_on_termination":"true",
+						"description":null,
+						"device_index":null,
+						"interface_type":null,
+						"ipv4_address_count":null,
+						"ipv4_addresses":null,
+						"ipv6_address_count":null,
+						"ipv6_addresses":null,
+						"network_interface_id":null,
+						"private_ip_address":null,
+						"subnet_id":null
+					}
+				],
+				"placement":[],
+				"ram_disk_id":null,
+				"region":"us-east-1",
+				"security_group_names":null,
+				"tag_specifications":[
+					{
+						"resource_type":"volume",
+						"tags":
+						{
+							"Name":"my-cluster-0-eks_asg"
+						}
+					},
+					{
+						"resource_type":"instance",
+						"tags":
+						{
+							"Name":"my-cluster-0-eks_asg"
+						}
+					}
+				],
+				"tags":null,
+				"update_default_version":false,
+				"vpc_security_group_ids":null
+			}`,
+		},
+	)
+
+	resData := map[string]*schema.ResourceData{
+		res.Address: res,
+		lt.Address:  lt,
+	}
+
+	conf := gjson.Result{
+		Type: gjson.JSON,
+		Raw: `
+		{
+			"module_calls": {
+				"worker_groups_launch_template": {
+					"source": "terraform-aws-modules/eks/aws"
+				}
+			}
+		}`,
+	}
+	assert.Nil(t, resData[res.Address].References("launch_template"))
+
+	parseKnownModuleRefs(resData, conf)
+
+	assert.NotNil(t, resData[res.Address].References("launch_template"))
 }

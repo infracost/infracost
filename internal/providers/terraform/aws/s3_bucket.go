@@ -520,7 +520,7 @@ func s3StorageCostComponent(name string, service string, region string, usageTyp
 			Region:     strPtr(region),
 			Service:    strPtr(service),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -540,8 +540,8 @@ func s3StorageVolumeTypeCostComponent(name string, service string, region string
 			Region:     strPtr(region),
 			Service:    strPtr(service),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
-				{Key: "volumeType", Value: strPtr(volumeType)},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
+				{Key: "volumeType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", volumeType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -565,8 +565,8 @@ func s3ApiOperationCostComponent(name string, service string, region string, usa
 			Region:     strPtr(region),
 			Service:    strPtr(service),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
-				{Key: "operation", Value: strPtr(operation)},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
+				{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operation))},
 			},
 		},
 	}
@@ -583,7 +583,7 @@ func s3DataCostComponent(name string, service string, region string, usageType s
 			Region:     strPtr(region),
 			Service:    strPtr(service),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -603,8 +603,8 @@ func s3DataGroupCostComponent(name string, service string, region string, usageT
 			Region:     strPtr(region),
 			Service:    strPtr(service),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
-				{Key: "group", Value: strPtr(group)},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
+				{Key: "group", ValueRegex: strPtr(fmt.Sprintf("/%s/i", group))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -624,8 +624,8 @@ func s3LifecycleTransitionsCostComponent(region string, usageType string, operat
 			Region:     strPtr(region),
 			Service:    strPtr("AmazonS3"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", usageType))},
-				{Key: "operation", Value: strPtr(operation)},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
+				{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operation))},
 			},
 		},
 	}

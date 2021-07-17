@@ -25,7 +25,7 @@ func NewAzureRMDNSaRecord(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	}
 }
 func dnsQueriesCostComponent(d *schema.ResourceData, u *schema.UsageData) []*schema.CostComponent {
-	region := lookupRegion(d, []string{})
+	region := lookupRegion(d, []string{"resource_group_name"})
 
 	var monthlyQueries *decimal.Decimal
 	var requestQuantities []decimal.Decimal

@@ -39,12 +39,12 @@ func NewLightsailInstance(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	operatingSystem := "Linux"
 	operatingSystemLabel := "Linux/UNIX"
 
-	if strings.Contains(d.Get("bundle_id").String(), "_win_") {
+	if strings.Contains(strings.ToLower(d.Get("bundle_id").String()), "_win_") {
 		operatingSystem = "Windows"
 		operatingSystemLabel = "Windows"
 	}
 
-	bundlePrefix := strings.Split(d.Get("bundle_id").String(), "_")[0]
+	bundlePrefix := strings.Split(strings.ToLower(d.Get("bundle_id").String()), "_")[0]
 
 	specs, ok := bundlePrefixMappings[bundlePrefix]
 	if !ok {
@@ -70,6 +70,9 @@ func NewLightsailInstance(d *schema.ResourceData, u *schema.UsageData) *schema.R
 						{Key: "vcpu", Value: strPtr(specs.vcpu)},
 						{Key: "memory", Value: strPtr(specs.memory)},
 					},
+				},
+				PriceFilter: &schema.PriceFilter{
+					EndUsageAmount: strPtr("Inf"),
 				},
 			},
 		},

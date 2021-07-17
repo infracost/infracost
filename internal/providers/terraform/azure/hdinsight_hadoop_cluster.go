@@ -50,20 +50,27 @@ func NewAzureRMHDInsightHadoopCluster(d *schema.ResourceData, u *schema.UsageDat
 }
 
 func hdInsightVMCostComponent(region, node, instanceType string, instances int64) *schema.CostComponent {
-	skuName := parseVMSKUName(instanceType)
-	t := strings.Split(skuName, " ")
+	t := strings.Split(instanceType, "_")
+	dSeries := []string{"D1", "D2", "D3", "D4", "D5"}
+	aSeries := []string{"A5", "A6", "A7", "A8", "A9", "A10", "A11"}
 	if len(t) > 1 {
-		dSeries := []string{"D1", "D2", "D3", "D4", "D5"}
-		if Contains(dSeries, t[0]) {
-			skuName = t[0]
-		} else {
-			version := strings.ToLower(t[1])
-			skuName = t[0] + " " + version
+		if Contains(dSeries, t[1]) {
+			instanceType = fmt.Sprintf("%s_%s", t[0], t[1])
+		}
+	}
+	if len(t) == 1 {
+		if Contains(aSeries, t[0]) {
+			instanceType = fmt.Sprintf("Standard_%s", t[0])
+		}
+	}
+	if len(t) == 3 {
+		if strings.HasSuffix(strings.ToLower(instanceType), "v4") {
+			instanceType = fmt.Sprintf("%s_%s %s", t[0], t[1], t[2])
 		}
 	}
 
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("%s node (%s)", node, skuName),
+		Name:           fmt.Sprintf("%s node (%s)", node, instanceType),
 		Unit:           "hours",
 		UnitMultiplier: 1,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(instances)),
@@ -73,7 +80,7 @@ func hdInsightVMCostComponent(region, node, instanceType string, instances int64
 			Service:       strPtr("HDInsight"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", Value: strPtr(skuName)},
+				{Key: "armSkuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", instanceType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

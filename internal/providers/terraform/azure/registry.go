@@ -5,6 +5,7 @@ import "github.com/infracost/infracost/internal/schema"
 // ResourceRegistry grouped alphabetically
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMApiManagementRegistryItem(),
+	GetAzureRMApplicationGatewayRegistryItem(),
 	GetAzureRMAppIsolatedServicePlanRegistryItem(),
 	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
 	GetAzureRMAppFunctionRegistryItem(),
@@ -13,6 +14,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAppServiceCertificateOrderRegistryItem(),
 	GetAzureRMAppServiceCustomHostnameBindingRegistryItem(),
 	GetAzureRMAppServicePlanRegistryItem(),
+	GetAzureRMApplicationInsightsWebRegistryItem(),
+	GetAzureRMApplicationInsightsRegistryItem(),
 	GetAzureRMAutomationAccountRegistryItem(),
 	GetAzureRMAutomationDscConfigurationRegistryItem(),
 	GetAzureRMAutomationDscNodeconfigurationRegistryItem(),
@@ -40,6 +43,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMDNStxtRecordRegistryItem(),
 	GetAzureRMDNSPrivateZoneRegistryItem(),
 	GetAzureRMDNSZoneRegistryItem(),
+	GetAzureRMEventHubsNamespaceRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
 	GetAzureRMHDInsightHadoopClusterRegistryItem(),
 	GetAzureRMHDInsightHBaseClusterRegistryItem(),
@@ -51,6 +55,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMKeyVaultManagedHSMRegistryItem(),
 	GetAzureRMKubernetesClusterRegistryItem(),
 	GetAzureRMKubernetesClusterNodePoolRegistryItem(),
+	GetAzureRMLoadBalancerRegistryItem(),
+	GetAzureRMLoadBalancerRuleRegistryItem(),
+	GetAzureRMLoadBalancerOutboundRuleRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
@@ -69,6 +76,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMPrivateDNStxtRecordRegistryItem(),
 	GetAzureRMPublicIPRegistryItem(),
 	GetAzureRMPublicIPPrefixRegistryItem(),
+	GetAzureRMSearchServiceRegistryItem(),
+	GetAzureRMRedisCacheRegistryItem(),
 	GetAzureRMStorageAccountRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
@@ -158,6 +167,15 @@ var FreeResources []string = []string{
 	// Azure DNS
 	"azurerm_private_dns_zone_virtual_network_link",
 
+	// Azure Event Hub
+	"azurerm_eventhub",
+	"azurerm_eventhub_authorization_rule",
+	"azurerm_eventhub_cluster",
+	"azurerm_eventhub_consumer_group",
+	"azurerm_eventhub_namespace_authorization_rule",
+	"azurerm_eventhub_namespace_customer_managed_key",
+	"azurerm_eventhub_namespace_disaster_recovery_config",
+
 	// Azure Firewall
 	"azurerm_firewall_application_rule_collection",
 	"azurerm_firewall_nat_rule_collection",
@@ -171,6 +189,13 @@ var FreeResources []string = []string{
 	"azurerm_key_vault_certificate_data",
 	"azurerm_key_vault_certificate_issuer",
 	"azurerm_key_vault_secret",
+
+	// Azure Load Balancer
+	"azurerm_lb_backend_address_pool",
+	"azurerm_lb_backend_address_pool_address",
+	"azurerm_lb_nat_pool",
+	"azurerm_lb_nat_rule",
+	"azurerm_lb_probe",
 
 	// Azure Networking
 	"azurerm_application_security_group",
@@ -189,6 +214,10 @@ var FreeResources []string = []string{
 	"azurerm_policy_definition",
 	"azurerm_policy_remediation",
 	"azurerm_policy_set_definition",
+
+	// Azure Redis
+	"azurerm_redis_firewall_rule",
+	"azurerm_redis_linked_server",
 
 	// Azure Registry
 	"azurerm_container_registry_scope_map",
