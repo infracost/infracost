@@ -6,16 +6,28 @@ import (
 )
 
 type NATGatewayArguments struct {
-	Address string `json:"address,omitempty"`
-	Region  string `json:"region,omitempty"`
+	Address *string `json:"address,omitempty"`
+	Region  *string `json:"region,omitempty" infracost_usage:"region,us-east1,Region where gateway is located,infracost"`
 
-	MonthlyDataProcessedGB *float64 `json:"monthlyDataProcessedGB,omitempty"`
+	MonthlyDataProcessedGB *float64 `json:"monthlyDataProcessedGB,omitempty" infracost_usage:"monthly_data_processed_gb,0,Monthly data processed by the NAT Gateway in GB,infracost,terraform"`
 }
 
-func (args *NATGatewayArguments) PopulateUsage(u *schema.UsageData) {
+func (args *NATGatewayArguments) PopulateArgs(u *schema.UsageData) {
+	address := strPtr("nat_gateway") // TODO: Better default value?
+	region := strPtr("")             // TODO: FIXME: A default value?
+	monthlyDataProcessedGB := floatPtr(0.0)
 	if u != nil {
-		args.MonthlyDataProcessedGB = u.GetFloat("monthly_data_processed_gb")
+		if u.Get("region").Exists() {
+			usageRegion := u.Get("region").String()
+			region = &usageRegion
+		}
+		if u.Get("monthly_data_processed_gb").Exists() {
+			monthlyDataProcessedGB = u.GetFloat("monthly_data_processed_gb")
+		}
 	}
+	args.Address = address
+	args.Region = region
+	args.MonthlyDataProcessedGB = monthlyDataProcessedGB
 }
 
 var NATGatewayUsageSchema = []*schema.UsageSchemaItem{
@@ -29,8 +41,7 @@ func NewNATGateway(args *NATGatewayArguments) *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name:        args.Address,
-		UsageSchema: NATGatewayUsageSchema,
+		Name: *args.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           "NAT gateway",
@@ -39,7 +50,7 @@ func NewNATGateway(args *NATGatewayArguments) *schema.Resource {
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(args.Region),
+					Region:        args.Region,
 					Service:       strPtr("AmazonEC2"),
 					ProductFamily: strPtr("NAT Gateway"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -54,7 +65,7 @@ func NewNATGateway(args *NATGatewayArguments) *schema.Resource {
 				MonthlyQuantity: gbDataProcessed,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(args.Region),
+					Region:        args.Region,
 					Service:       strPtr("AmazonEC2"),
 					ProductFamily: strPtr("NAT Gateway"),
 					AttributeFilters: []*schema.AttributeFilter{

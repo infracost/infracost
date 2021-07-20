@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -84,7 +85,6 @@ func NewDynamoDBTable(args *DynamoDbTableArguments) *schema.Resource {
 		Name:           args.Address,
 		CostComponents: costComponents,
 		SubResources:   subResources,
-		UsageSchema:    DynamoDbTableUsageSchema,
 	}
 }
 
