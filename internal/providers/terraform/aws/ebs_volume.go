@@ -122,7 +122,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 		if throughputVal != nil {
 			if throughputVal.GreaterThan(decimal.NewFromInt(125)) {
 				throughputVal = decimalPtr(throughputVal.Sub(decimal.NewFromInt(125)))
-				throughputVal = decimalPtr((*throughputVal).Div(decimal.NewFromInt(1024)))
+				throughputVal = decimalPtr(throughputVal.Div(decimal.NewFromInt(1024)))
 				costComponents = append(costComponents, &schema.CostComponent{
 					Name:            "Provisioned throughput",
 					Unit:            "Gbps",
