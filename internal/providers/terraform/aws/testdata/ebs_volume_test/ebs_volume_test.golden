@@ -6,7 +6,7 @@
                                                                                                   
  aws_ebs_volume.gp3                                                                               
  ├─ Storage (general purpose SSD, gp3)                     40  GB                           $3.20 
- ├─ Provisioned throughput                                  5  Mbps                         $0.20 
+ ├─ Provisioned throughput                             0.0048  Gbps                         $0.20 
  └─ Provisioned IOPS                                    1,000  IOPS                         $5.00 
                                                                                                   
  aws_ebs_volume.io1                                                                               
