@@ -1,0 +1,32 @@
+
+ Name                                                Monthly Qty  Unit                      Monthly Cost 
+                                                                                                         
+ azurerm_private_endpoint.with_inbound                                                                   
+ ├─ Private endpoint                                         730  hour                             $7.30 
+ ├─ Inbound data processed                                   100  GB                               $1.00 
+ └─ Outbound data processed                   Monthly cost depends on usage: $0.01 per GB                
+                                                                                                         
+ azurerm_private_endpoint.with_outbound                                                                  
+ ├─ Private endpoint                                         730  hour                             $7.30 
+ ├─ Inbound data processed                    Monthly cost depends on usage: $0.01 per GB                
+ └─ Outbound data processed                                  100  GB                               $1.00 
+                                                                                                         
+ azurerm_private_endpoint.without_usage_file                                                             
+ ├─ Private endpoint                                         730  hour                             $7.30 
+ ├─ Inbound data processed                    Monthly cost depends on usage: $0.01 per GB                
+ └─ Outbound data processed                   Monthly cost depends on usage: $0.01 per GB                
+                                                                                                         
+ azurerm_storage_account.example                                                                         
+ ├─ Data at rest                              Monthly cost depends on usage: $0.0228 per GB              
+ ├─ Snapshots                                 Monthly cost depends on usage: $0.0228 per GB              
+ ├─ Metadata at rest                          Monthly cost depends on usage: $0.0297 per GB              
+ ├─ Write operations                          Monthly cost depends on usage: $0.13 per 10k operations    
+ ├─ List operations                           Monthly cost depends on usage: $0.0715 per 10k operations  
+ ├─ Read operations                           Monthly cost depends on usage: $0.013 per 10k operations   
+ ├─ All other operations                      Monthly cost depends on usage: $0.00572 per 10k operations 
+ ├─ Data retrieval                            Monthly cost depends on usage: $0.01 per GB                
+ └─ Early deletion                            Monthly cost depends on usage: $0.0228 per GB              
+                                                                                                         
+ OVERALL TOTAL                                                                                    $23.90 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
