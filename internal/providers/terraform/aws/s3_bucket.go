@@ -497,7 +497,7 @@ func s3ResourceForStorageClass(region string, storageClass string, u *schema.Usa
 				s3ApiOperationCostComponent("PUT, COPY, POST, LIST requests", "AmazonS3GlacierDeepArchive", region, "Requests-GDA-Tier1", "PostObject", pcplRequests),
 				s3ApiCostComponent("GET, SELECT, and all other requests", "AmazonS3", region, "Requests-GDA-Tier2", allOtherRequests),
 				s3LifecycleTransitionsCostComponent(region, "Requests-Tier3", "S3-GDATransition", lifecycleRequests),
-				s3ApiOperationCostComponent("Retrieval requests (standard)", "AmazonS3GlacierDeepArchive", region, "Requests-GDA-Tier3", "DeepArchiveRestoreObject", stdRetrievalReq),
+				s3ApiOperationCostComponent("Retrieval requests (standard)", "AmazonS3GlacierDeepArchive", region, "Requests-GDA-Tier3", "", stdRetrievalReq),
 				s3DataCostComponent("Retrievals (standard)", "AmazonS3GlacierDeepArchive", region, "Standard-Retrieval-Bytes", stdRetrievalData),
 				s3ApiCostComponent("Retrieval requests (bulk)", "AmazonS3GlacierDeepArchive", region, "Requests-GDA-Tier5", bulkRetrievalReq),
 				s3DataCostComponent("Retrievals (bulk)", "AmazonS3GlacierDeepArchive", region, "Bulk-Retrieval-Bytes", bulkRetrievalData),
