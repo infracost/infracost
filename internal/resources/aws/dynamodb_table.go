@@ -212,7 +212,7 @@ func wruCostComponent(region string, monthlyWRU *int64) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Write request unit (WRU)",
 		Unit:            "WRUs",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -237,7 +237,7 @@ func rruCostComponent(region string, monthlyRRU *int64) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Read request unit (RRU)",
 		Unit:            "RRUs",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -262,7 +262,7 @@ func dataStorageCostComponent(region string, storageGB *int64) *schema.CostCompo
 	return &schema.CostComponent{
 		Name:            "Data storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -288,7 +288,7 @@ func continuousBackupCostComponent(region string, pitrBackupStorageGB *int64) *s
 	return &schema.CostComponent{
 		Name:            "Point-In-Time Recovery (PITR) backup storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -310,7 +310,7 @@ func onDemandBackupCostComponent(region string, onDemandBackupStorageGB *int64) 
 	return &schema.CostComponent{
 		Name:            "On-demand backup storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -329,7 +329,7 @@ func restoreCostComponent(region string, monthlyDataRestoredGB *int64) *schema.C
 	return &schema.CostComponent{
 		Name:            "Table data restored",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -348,7 +348,7 @@ func streamCostComponent(region string, monthlyStreamsRRU *int64) *schema.CostCo
 	return &schema.CostComponent{
 		Name:            "Streams read request unit (sRRU)",
 		Unit:            "sRRUs",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

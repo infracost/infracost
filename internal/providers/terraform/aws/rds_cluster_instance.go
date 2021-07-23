@@ -31,7 +31,7 @@ func NewRDSClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.
 		{
 			Name:           fmt.Sprintf("Database instance (%s, %s)", "on-demand", instanceType),
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -76,7 +76,7 @@ func rdsCPUCreditsCostComponent(region string, databaseEngine *string, vCPUCount
 	return &schema.CostComponent{
 		Name:            "CPU credits",
 		Unit:            "vCPU-hours",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: &vCPUCount,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

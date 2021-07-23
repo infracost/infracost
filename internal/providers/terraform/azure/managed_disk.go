@@ -137,7 +137,7 @@ func standardPremiumDiskCostComponents(region string, diskType string, diskData 
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Disk operations",
 			Unit:            "10k operations",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: opsQty,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
@@ -163,7 +163,7 @@ func storageCostComponent(region, diskName, productName string) *schema.CostComp
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Storage (%s)", diskName),
 		Unit:            "months",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

@@ -47,7 +47,7 @@ func IntegrationBaseServiceEnvironmentCostComponent(name, region, productName st
 
 		Name:           name,
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -70,7 +70,7 @@ func IntegrationScaleServiceEnvironmentCostComponent(name, region, productName s
 
 		Name:           name,
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(scaleNumber))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

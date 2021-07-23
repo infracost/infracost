@@ -61,7 +61,7 @@ func transitGatewayAttachmentCostComponent(region string, operation string) *sch
 	return &schema.CostComponent{
 		Name:           "Transit gateway attachment",
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -79,7 +79,7 @@ func transitGatewayDataProcessingCostComponent(region string, operation string, 
 	return &schema.CostComponent{
 		Name:            "Data processed",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: gbDataProcessed,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),

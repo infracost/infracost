@@ -27,7 +27,7 @@ func NewMskCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 			{
 				Name:           fmt.Sprintf("Instance (%s)", instanceType),
 				Unit:           "hours",
-				UnitMultiplier: 1,
+				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: &brokerNodes,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -43,7 +43,7 @@ func NewMskCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 			{
 				Name:            "Storage",
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: decimalPtr(ebsVolumeSize),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

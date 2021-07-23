@@ -43,7 +43,7 @@ func hostedPublicZoneCostComponent(region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Hosted zone",
 		Unit:            "months",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

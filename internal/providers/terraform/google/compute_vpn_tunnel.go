@@ -26,7 +26,7 @@ func VPNTunnelInstance(region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "VPN Tunnel",
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),

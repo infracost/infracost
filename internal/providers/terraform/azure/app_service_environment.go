@@ -53,7 +53,7 @@ func AppIsolatedServicePlanCostComponentStampFee(region, productName string) *sc
 
 		Name:           "Stamp fee",
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -74,7 +74,7 @@ func AppIsolatedServicePlanCostComponent(name, region, productName, tier string)
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

@@ -39,7 +39,7 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 		{
 			Name:           fmt.Sprintf("Database instance (%s, %s)", "on-demand", instanceType),
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -57,7 +57,7 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 		{
 			Name:            "Storage",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: storageRate,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -75,7 +75,7 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 		{
 			Name:            "I/O",
 			Unit:            "1M requests",
-			UnitMultiplier:  1000000,
+			UnitMultiplier:  decimal.NewFromInt(1000000),
 			MonthlyQuantity: ioRequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -93,7 +93,7 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "CPU credits",
 			Unit:            "vCPU-hours",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: cpuCreditsT3,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

@@ -21,7 +21,7 @@ func NewACMPCACertificateAuthority(d *schema.ResourceData, u *schema.UsageData) 
 		{
 			Name:            "Private certificate authority",
 			Unit:            "months",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -66,7 +66,7 @@ func certificateCostComponent(region string, displayName string, usageTier strin
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "requests",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

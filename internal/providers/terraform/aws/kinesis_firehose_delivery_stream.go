@@ -65,7 +65,7 @@ func kinesisFirehoseCostComponent(tier, region, startUsageAmount, endUsageAmount
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Data ingested (%s)", tier),
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -86,7 +86,7 @@ func kinesisFirehoseConversionCostComponent(region string, quantity *decimal.Dec
 	return &schema.CostComponent{
 		Name:            "Format conversion",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -103,7 +103,7 @@ func kinesisFirehoseVPCCostComponent(region string, quantity *decimal.Decimal) *
 	return &schema.CostComponent{
 		Name:            "VPC data",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -120,7 +120,7 @@ func kinesisFirehoseVPCAZCostComponent(region string, quantity *decimal.Decimal)
 	return &schema.CostComponent{
 		Name:           "VPC AZ deilvery",
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

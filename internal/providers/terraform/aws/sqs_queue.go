@@ -42,7 +42,7 @@ func NewSqsQueue(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 			{
 				Name:            "Requests",
 				Unit:            "1M requests",
-				UnitMultiplier:  1000000,
+				UnitMultiplier:  decimal.NewFromInt(1000000),
 				MonthlyQuantity: requests,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

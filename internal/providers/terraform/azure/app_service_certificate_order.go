@@ -31,7 +31,7 @@ func NewAzureRMAppServiceCertificateOrder(d *schema.ResourceData, u *schema.Usag
 		{
 			Name:           fmt.Sprintf("SSL certificate (%s)", productType),
 			Unit:           "years",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			// Convert yearly price to monthly
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1).Div(decimal.NewFromInt(12))),
 			ProductFilter: &schema.ProductFilter{

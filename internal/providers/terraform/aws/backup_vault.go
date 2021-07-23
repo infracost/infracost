@@ -81,7 +81,7 @@ func backupVaultCostComponent(region string, d backupData) *schema.CostComponent
 	return &schema.CostComponent{
 		Name:            d.name,
 		Unit:            d.unit,
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: d.qty,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -99,7 +99,7 @@ func additionalBackupVaultCostComponent(region string, d backupData) *schema.Cos
 	return &schema.CostComponent{
 		Name:            d.name,
 		Unit:            d.unit,
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: d.qty,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

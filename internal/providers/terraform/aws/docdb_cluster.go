@@ -47,7 +47,7 @@ func docDBCluster(region string, backupStorage *decimal.Decimal) *schema.CostCom
 	return &schema.CostComponent{
 		Name:            "Backup storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: backupStorage,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

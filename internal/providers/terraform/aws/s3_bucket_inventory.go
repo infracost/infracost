@@ -26,7 +26,7 @@ func NewS3BucketInventory(d *schema.ResourceData, u *schema.UsageData) *schema.R
 			{
 				Name:            "Objects listed",
 				Unit:            "1M objects",
-				UnitMultiplier:  1000000,
+				UnitMultiplier:  decimal.NewFromInt(1000000),
 				MonthlyQuantity: listedObj,
 				ProductFilter: &schema.ProductFilter{
 					VendorName: strPtr("aws"),

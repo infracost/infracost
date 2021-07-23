@@ -29,7 +29,7 @@ func clusterHoursCostComponent(d *schema.ResourceData, region string) *schema.Co
 	return &schema.CostComponent{
 		Name:           "EKS cluster",
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

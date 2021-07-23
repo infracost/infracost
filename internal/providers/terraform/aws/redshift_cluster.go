@@ -29,7 +29,7 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		{
 			Name:           fmt.Sprintf("Cluster usage (%s, %s)", "on-demand", nodeType),
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(numberOfNodes)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -97,7 +97,7 @@ func redshiftConcurrencyScalingCostComponent(region string, nodeType string, num
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Concurrency scaling (%s)", nodeType),
 		Unit:            "node-seconds",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: concurrencySeconds,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -116,7 +116,7 @@ func redshiftSpectrumCostComponent(region string, terabytesScanned *decimal.Deci
 	return &schema.CostComponent{
 		Name:            "Spectrum",
 		Unit:            "TB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: terabytesScanned,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -131,7 +131,7 @@ func redshiftStorageSnapshotCostComponent(region string, displayName string, sta
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: storageSnapshot,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -149,7 +149,7 @@ func redshiftManagedStorageCostComponent(region string, nodeType string, managed
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Managed storage (%s)", nodeType),
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: managedStorage,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

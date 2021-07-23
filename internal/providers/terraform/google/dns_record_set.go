@@ -25,7 +25,7 @@ func NewDNSRecordSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			{
 				Name:            "Queries",
 				Unit:            "1M queries",
-				UnitMultiplier:  1000000,
+				UnitMultiplier:  decimal.NewFromInt(1000000),
 				MonthlyQuantity: monthlyQueries,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),

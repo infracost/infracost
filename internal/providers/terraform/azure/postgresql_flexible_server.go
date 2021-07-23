@@ -60,7 +60,7 @@ func NewAzureRMPostrgreSQLFlexibleServer(d *schema.ResourceData, u *schema.Usage
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:           fmt.Sprintf("Compute (%s)", sku),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -85,7 +85,7 @@ func NewAzureRMPostrgreSQLFlexibleServer(d *schema.ResourceData, u *schema.Usage
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: storageGB,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -107,7 +107,7 @@ func NewAzureRMPostrgreSQLFlexibleServer(d *schema.ResourceData, u *schema.Usage
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Additional backup storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: backupStorageGB,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

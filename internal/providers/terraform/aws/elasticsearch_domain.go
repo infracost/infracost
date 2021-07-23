@@ -51,7 +51,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 		{
 			Name:           fmt.Sprintf("Instance (on-demand, %s)", instanceType),
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -94,7 +94,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            fmt.Sprintf("Storage (%s)", ebsType),
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: &gbVal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -124,7 +124,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 			costComponents = append(costComponents, &schema.CostComponent{
 				Name:            fmt.Sprintf("Storage IOPS (%s)", ebsType),
 				Unit:            "IOPS",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: &iopsVal,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -158,7 +158,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           fmt.Sprintf("Dedicated master (on-demand, %s)", dedicatedMasterType),
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(dedicatedMasterCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -183,7 +183,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           fmt.Sprintf("UltraWarm instance (on-demand, %s)", ultrawarmType),
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(ultrawarmCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

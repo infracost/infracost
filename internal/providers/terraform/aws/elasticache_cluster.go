@@ -48,7 +48,7 @@ func newElasticacheResource(d *schema.ResourceData, u *schema.UsageData, nodeTyp
 		{
 			Name:           fmt.Sprintf("Elasticache (on-demand, %s)", nodeType),
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(cacheNodes),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -79,7 +79,7 @@ func newElasticacheResource(d *schema.ResourceData, u *schema.UsageData, nodeTyp
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Backup storage",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: monthlyBackupStorageTotal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

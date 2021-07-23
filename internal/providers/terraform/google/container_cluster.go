@@ -75,7 +75,7 @@ func NewContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		{
 			Name:           "Cluster management fee",
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),

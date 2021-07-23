@@ -34,7 +34,7 @@ func NewComputeRouterNAT(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 			{
 				Name:           "Assigned VMs (first 32)",
 				Unit:           "VM-hours",
-				UnitMultiplier: 1,
+				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(assignedVMs)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
@@ -49,7 +49,7 @@ func NewComputeRouterNAT(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 			{
 				Name:            "Data processed",
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: dataProcessedGB,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),

@@ -23,7 +23,7 @@ func NewRoute53ResolverEndpoint(d *schema.ResourceData, u *schema.UsageData) *sc
 		{
 			Name:           "Resolver endpoints",
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(resolverEndpointCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -68,7 +68,7 @@ func dnsQueriesCostComponent(region string, displayName string, usageTier string
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "1M queries",
-		UnitMultiplier:  1000000,
+		UnitMultiplier:  decimal.NewFromInt(1000000),
 		MonthlyQuantity: monthlyQueries,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

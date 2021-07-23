@@ -98,7 +98,7 @@ func consumptionAPICostComponent(region, tier string, quantity *decimal.Decimal)
 	return &schema.CostComponent{
 		Name:            "API management (consumption)",
 		Unit:            "1M calls",
-		UnitMultiplier:  100,
+		UnitMultiplier:  decimal.NewFromInt(100),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

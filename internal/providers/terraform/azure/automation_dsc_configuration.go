@@ -44,7 +44,7 @@ func nonNodesCostComponent(location, startUsage, meterName, skuName string, mont
 
 		Name:            "Non-azure config nodes",
 		Unit:            "nodes",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

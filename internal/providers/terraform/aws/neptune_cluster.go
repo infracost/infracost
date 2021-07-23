@@ -56,7 +56,7 @@ func neptuneClusterStorageIOsCostComponents(name, unit, region, usageType string
 
 		Name:            name,
 		Unit:            unit,
-		UnitMultiplier:  unitMulti,
+		UnitMultiplier:  decimal.NewFromInt(int64(unitMulti)),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -77,7 +77,7 @@ func neptuneClusterBackupCostComponent(region string, quantity *decimal.Decimal)
 
 		Name:            "Backup storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),

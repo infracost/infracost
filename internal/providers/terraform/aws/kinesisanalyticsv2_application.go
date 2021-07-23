@@ -69,7 +69,7 @@ func kinesisRunningStorageCostComponent(region string, quantity *decimal.Decimal
 	return &schema.CostComponent{
 		Name:            "Running storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -86,7 +86,7 @@ func kinesisBackupCostComponent(region string, quantity *decimal.Decimal) *schem
 	return &schema.CostComponent{
 		Name:            "Backup",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

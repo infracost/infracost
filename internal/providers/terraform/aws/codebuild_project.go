@@ -33,7 +33,7 @@ func NewCodebuildProject(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 			{
 				Name:            codeBuildNameLabel(computeType, envType),
 				Unit:            "minutes",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: monthlyBuildMinutes,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

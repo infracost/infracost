@@ -54,7 +54,7 @@ func cloudFormationCostComponent(name, region, unit, usagetype string, monthlyQu
 
 		Name:            name,
 		Unit:            unit,
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
