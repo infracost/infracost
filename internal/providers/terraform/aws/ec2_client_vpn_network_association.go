@@ -22,7 +22,7 @@ func NewEC2ClientVPNNetworkAssociation(d *schema.ResourceData, u *schema.UsageDa
 			{
 				Name:           "Endpoint association",
 				Unit:           "hours",
-				UnitMultiplier: 1,
+				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName: strPtr("aws"),

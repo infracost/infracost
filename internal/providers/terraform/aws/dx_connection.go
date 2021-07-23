@@ -50,7 +50,7 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			{
 				Name:           "DX connection",
 				Unit:           "hours",
-				UnitMultiplier: 1,
+				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -67,7 +67,7 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			{
 				Name:            fmt.Sprintf("Outbound data transfer (to %s)", dxLocation),
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: gbDataProcessed,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

@@ -26,7 +26,7 @@ func NewS3BucketAnalyticsConfiguration(d *schema.ResourceData, u *schema.UsageDa
 			{
 				Name:            "Objects monitored",
 				Unit:            "1M objects",
-				UnitMultiplier:  1000000,
+				UnitMultiplier:  decimal.NewFromInt(1000000),
 				MonthlyQuantity: monitObj,
 				ProductFilter: &schema.ProductFilter{
 					VendorName: strPtr("aws"),

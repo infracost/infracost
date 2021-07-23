@@ -22,7 +22,7 @@ func NewEC2TrafficMirrorSession(d *schema.ResourceData, u *schema.UsageData) *sc
 			{
 				Name:           "Traffic mirror",
 				Unit:           "hours",
-				UnitMultiplier: 1,
+				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName: strPtr("aws"),

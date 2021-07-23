@@ -52,7 +52,7 @@ func restAPICostComponent(region string, displayName string, usageTier string, q
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "1M requests",
-		UnitMultiplier:  1000000,
+		UnitMultiplier:  decimal.NewFromInt(1000000),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

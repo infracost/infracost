@@ -89,7 +89,7 @@ func ContainerRegistryCostComponent(name, region, sku string) *schema.CostCompon
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "days",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(30)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -111,7 +111,7 @@ func ContainerRegistryGeolocationCostComponent(name, region, sku string, nambers
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "days",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(30 * int64(nambersOflocations))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -134,7 +134,7 @@ func ContainerRegistryStorageCostComponent(name, region, sku string, storage *de
 
 		Name:            name,
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: storage,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -157,7 +157,7 @@ func ContainerRegistryCPUCostComponent(name, region, sku string, monthlyBuildVcp
 
 		Name:            name,
 		Unit:            "seconds",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: monthlyBuildVcpu,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

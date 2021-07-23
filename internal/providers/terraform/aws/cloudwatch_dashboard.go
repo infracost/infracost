@@ -19,7 +19,7 @@ func NewCloudwatchDashboard(d *schema.ResourceData, u *schema.UsageData) *schema
 			{
 				Name:            "Dashboard",
 				Unit:            "months",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

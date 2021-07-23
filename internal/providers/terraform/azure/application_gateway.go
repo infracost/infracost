@@ -101,7 +101,7 @@ func gatewayCostComponent(name, region, tier, sku string, capacity int64) *schem
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -122,7 +122,7 @@ func dataProcessingCostComponent(name, region, sku, startUsage string, capacity 
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: capacity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -143,7 +143,7 @@ func capacityUnitsCostComponent(name, region, tier string, capacity *decimal.Dec
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("V2 capacity units (%s)", name),
 		Unit:            "CU",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: capacity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -166,7 +166,7 @@ func fixedForV2CostComponent(name, region, tier string, capacity int64) *schema.
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

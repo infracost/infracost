@@ -45,7 +45,7 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           "Aurora serverless",
 			Unit:           "ACU-hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: auroraCapacityUnits,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -92,7 +92,7 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Snapshot export",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: snapshotExportSizeGB,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -129,7 +129,7 @@ func auroraStorageCostComponent(region string, u *schema.UsageData, databaseEngi
 		{
 			Name:            "Storage",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: storageGB,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -145,7 +145,7 @@ func auroraStorageCostComponent(region string, u *schema.UsageData, databaseEngi
 		{
 			Name:            "I/O rate",
 			Unit:            "1M requests",
-			UnitMultiplier:  1000000,
+			UnitMultiplier:  decimal.NewFromInt(1000000),
 			MonthlyQuantity: monthlyIORequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -165,7 +165,7 @@ func auroraBackupStorageCostComponent(region string, totalBackupStorageGB *decim
 	return &schema.CostComponent{
 		Name:            "Backup storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: totalBackupStorageGB,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -183,7 +183,7 @@ func auroraBacktrackCostComponent(region string, backtrackChangeRecords *decimal
 	return &schema.CostComponent{
 		Name:            "Backtrack",
 		Unit:            "1M change-records",
-		UnitMultiplier:  1000000,
+		UnitMultiplier:  decimal.NewFromInt(1000000),
 		MonthlyQuantity: backtrackChangeRecords,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

@@ -72,7 +72,7 @@ func newLBResource(d *schema.ResourceData, productFamily string, costComponentNa
 			Name:           costComponentName,
 			Unit:           "hours",
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
@@ -90,7 +90,7 @@ func newLBResource(d *schema.ResourceData, productFamily string, costComponentNa
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Data processed",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: dataProcessed,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

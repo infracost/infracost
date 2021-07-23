@@ -29,7 +29,7 @@ func NewAPIGatewayStage(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 			{
 				Name:           fmt.Sprintf("Cache memory (%s GB)", cacheMemorySize),
 				Unit:           "hours",
-				UnitMultiplier: 1,
+				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

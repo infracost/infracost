@@ -107,7 +107,7 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Intra-region data transfer",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(intraRegionGb.Mul(decimal.NewFromInt(2))),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -129,7 +129,7 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Outbound data transfer to US East regions",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: outboundUsEastGb,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -148,7 +148,7 @@ func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Outbound data transfer to other regions",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: outboundOtherRegionsGb,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -250,7 +250,7 @@ func outboundInternet(fromLocation string, networkUsage int64) []*schema.CostCom
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            name,
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: usageStep.quantity,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
