@@ -20,7 +20,7 @@ func NewRoute53Zone(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 			{
 				Name:            "Hosted zone",
 				Unit:            "months",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

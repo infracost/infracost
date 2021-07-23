@@ -56,7 +56,7 @@ func dtuPurchaseCostComponents(region, sku string, d *schema.ResourceData, u *sc
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:           fmt.Sprintf("Compute (%s)", strings.ToTitle(sku)),
 		Unit:           "days",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		// This is not the same as the 730h/month value we use elsewhere but it looks more understandable than seeing `30.4166` in the output
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(30)),
 		ProductFilter: &schema.ProductFilter{
@@ -100,7 +100,7 @@ func dtuPurchaseCostComponents(region, sku string, d *schema.ResourceData, u *sc
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Extra data storage",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: storageGB,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
@@ -150,7 +150,7 @@ func vCorePurchaseCostComponents(d *schema.ResourceData, u *schema.UsageData, sk
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            fmt.Sprintf("Compute (serverless, %s)", sku),
 			Unit:            "vCore-hours",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: vCoreHours,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
@@ -180,7 +180,7 @@ func vCorePurchaseCostComponents(d *schema.ResourceData, u *schema.UsageData, sk
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           "Read replicas",
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: replicaCount,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
@@ -281,7 +281,7 @@ func sqlLicenseCostComponent(region, cores, serviceName, tier string) *schema.Co
 	return &schema.CostComponent{
 		Name:           "SQL license",
 		Unit:           "vCore-hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(coresNum)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -314,7 +314,7 @@ func mssqlStorageComponent(storageGB *decimal.Decimal, region, serviceName, tier
 	return &schema.CostComponent{
 		Name:            "Storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: storageGB,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -338,7 +338,7 @@ func longTermRetentionMSSQLCostComponent(region string, u *schema.UsageData) *sc
 	return &schema.CostComponent{
 		Name:            "Long-term retention",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: retention,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

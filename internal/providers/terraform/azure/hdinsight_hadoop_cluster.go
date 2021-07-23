@@ -72,7 +72,7 @@ func hdInsightVMCostComponent(region, node, instanceType string, instances int64
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("%s node (%s)", node, instanceType),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(instances)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

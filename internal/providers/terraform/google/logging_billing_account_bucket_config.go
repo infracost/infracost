@@ -29,7 +29,7 @@ func loggingCostComponent(loggingData *decimal.Decimal) []*schema.CostComponent 
 		{
 			Name:            "Logging data",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: loggingData,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),

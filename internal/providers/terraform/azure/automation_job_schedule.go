@@ -40,7 +40,7 @@ func runTimeCostComponent(location, startUsage, meterName, skuName string, month
 
 		Name:            "Job run time",
 		Unit:            "minutes",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

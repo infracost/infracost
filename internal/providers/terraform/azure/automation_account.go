@@ -54,7 +54,7 @@ func watchersCostComponent(location, startUsage, meterName, skuName string, mont
 
 		Name:            "Watchers",
 		Unit:            "hours",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

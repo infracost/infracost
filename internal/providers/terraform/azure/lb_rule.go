@@ -33,7 +33,7 @@ func rulesCostComponent(region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "Rule usage",
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

@@ -29,7 +29,7 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           "Uptime SLA",
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),

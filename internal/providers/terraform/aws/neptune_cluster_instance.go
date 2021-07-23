@@ -48,7 +48,7 @@ func neptuneClusterDbInstanceCostComponent(name, region, instanceType string, qu
 
 		Name:           fmt.Sprintf("Database instance (on-demand, %s)", instanceType),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(quantity))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -69,7 +69,7 @@ func neptuneClusterCPUInstanceCostComponent(quantity *decimal.Decimal) *schema.C
 		// AWS mentions that CPU Credit pricing is the same for T3 instance across all regions, but they only return prices for Hong Kong and Sao Paulo so we hard-code APE1.
 		Name:           "CPU credits",
 		Unit:           "vCPU-hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),

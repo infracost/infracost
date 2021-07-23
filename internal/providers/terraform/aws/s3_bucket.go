@@ -48,7 +48,7 @@ func s3CostComponents(d *schema.ResourceData, u *schema.UsageData) []*schema.Cos
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Object tagging",
 			Unit:            "10k tags",
-			UnitMultiplier:  10000,
+			UnitMultiplier:  decimal.NewFromInt(10000),
 			MonthlyQuantity: objTags,
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("aws"),
@@ -513,7 +513,7 @@ func s3StorageCostComponent(name string, service string, region string, usageTyp
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: dataStorage,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -533,7 +533,7 @@ func s3StorageVolumeTypeCostComponent(name string, service string, region string
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: dataStorage,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -558,7 +558,7 @@ func s3ApiOperationCostComponent(name string, service string, region string, usa
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "1k requests",
-		UnitMultiplier:  1000,
+		UnitMultiplier:  decimal.NewFromInt(1000),
 		MonthlyQuantity: requests,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -576,7 +576,7 @@ func s3DataCostComponent(name string, service string, region string, usageType s
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: data,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -596,7 +596,7 @@ func s3DataGroupCostComponent(name string, service string, region string, usageT
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: data,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -617,7 +617,7 @@ func s3LifecycleTransitionsCostComponent(region string, usageType string, operat
 	return &schema.CostComponent{
 		Name:            "Lifecycle transition",
 		Unit:            "1k requests",
-		UnitMultiplier:  1000,
+		UnitMultiplier:  decimal.NewFromInt(1000),
 		MonthlyQuantity: requests,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -635,7 +635,7 @@ func s3MonitoringCostComponent(region string, objects *decimal.Decimal) *schema.
 	return &schema.CostComponent{
 		Name:            "Monitoring and automation",
 		Unit:            "1k objects",
-		UnitMultiplier:  1000,
+		UnitMultiplier:  decimal.NewFromInt(1000),
 		MonthlyQuantity: objects,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),

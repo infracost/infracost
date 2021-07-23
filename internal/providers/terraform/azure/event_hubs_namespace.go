@@ -84,7 +84,7 @@ func eventHubsIngressCostComponent(region, sku string, quantity *decimal.Decimal
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Ingress event (%s)", sku),
 		Unit:            "1M events",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
@@ -147,7 +147,7 @@ func eventHubsExtensionRetentionCostComponent(region, sku string, retention *dec
 	return &schema.CostComponent{
 		Name:            "Extended retention",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: retention,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),

@@ -93,7 +93,7 @@ func dataStorage(d *schema.ResourceData, u *schema.UsageData) *schema.CostCompon
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Storage (%s)", strings.ToLower(storageClass)),
 		Unit:            "GiB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("gcp"),
@@ -137,7 +137,7 @@ func operations(d *schema.ResourceData, u *schema.UsageData) []*schema.CostCompo
 		{
 			Name:            "Object adds, bucket/object list (class A)",
 			Unit:            "10k operations",
-			UnitMultiplier:  10000,
+			UnitMultiplier:  decimal.NewFromInt(10000),
 			MonthlyQuantity: classAQuantity,
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("gcp"),
@@ -154,7 +154,7 @@ func operations(d *schema.ResourceData, u *schema.UsageData) []*schema.CostCompo
 		{
 			Name:            "Object gets, retrieve bucket/object metadata (class B)",
 			Unit:            "10k operations",
-			UnitMultiplier:  10000,
+			UnitMultiplier:  decimal.NewFromInt(10000),
 			MonthlyQuantity: classBQuantity,
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("gcp"),
@@ -196,7 +196,7 @@ func dataRetrieval(d *schema.ResourceData, u *schema.UsageData) *schema.CostComp
 	return &schema.CostComponent{
 		Name:            "Data retrieval",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("gcp"),
