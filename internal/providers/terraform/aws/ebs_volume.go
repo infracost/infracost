@@ -126,7 +126,7 @@ func ebsVolumeCostComponents(region string, volumeAPIName string, throughputVal 
 				costComponents = append(costComponents, &schema.CostComponent{
 					Name:            "Provisioned throughput",
 					Unit:            "Mbps",
-					UnitMultiplier:  decimal.NewFromFloat(1.0/1024.0),
+					UnitMultiplier:  decimal.NewFromFloat(1.0 / 1024.0),
 					MonthlyQuantity: throughputVal,
 					ProductFilter: &schema.ProductFilter{
 						VendorName:    strPtr("aws"),
