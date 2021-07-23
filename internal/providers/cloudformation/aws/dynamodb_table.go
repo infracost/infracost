@@ -39,13 +39,13 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		Address:        d.Address,
 		Region:         region,
 		BillingMode:    billingMode,
-		WriteCapacity:  writeCapacity,
-		ReadCapacity:   readCapacity,
+		WriteCapacity:  &writeCapacity,
+		ReadCapacity:   &readCapacity,
 		ReplicaRegions: []string{}, // Global Tables are defined using AWS::DynamoDB::GlobalTable
 	}
-	args.PopulateUsage(u)
+	keysToSkipSync := []string{"region", "billing_mode", "write_capacity", "read_capacity", "replica_regions"}
 
-	r := aws.NewDynamoDBTable(args)
+	r := aws.NewDynamoDBTable(args, u, keysToSkipSync)
 	r.Tags = mapTags(cfr.Tags)
 
 	return r

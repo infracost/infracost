@@ -17,20 +17,6 @@ func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
 }
 
 func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
-
-	billingMode := d.Get("billing_mode").String()
-
-	var readCapacity int64
-	if d.Get("read_capacity").Exists() {
-		readCapacity = d.Get("read_capacity").Int()
-	}
-
-	var writeCapacity int64
-	if d.Get("write_capacity").Exists() {
-		writeCapacity = d.Get("write_capacity").Int()
-	}
-
 	replicaRegions := []string{}
 	if d.Get("replica").Exists() {
 		for _, data := range d.Get("replica").Array() {
@@ -40,13 +26,13 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 
 	args := &aws.DynamoDbTableArguments{
 		Address:        d.Address,
-		Region:         region,
-		BillingMode:    billingMode,
-		WriteCapacity:  writeCapacity,
-		ReadCapacity:   readCapacity,
+		Region:         d.Get("region").String(),
+		BillingMode:    d.Get("billing_mode").String(),
+		WriteCapacity:  intPtr(d.Get("write_capacity").Int()),
+		ReadCapacity:   intPtr(d.Get("read_capacity").Int()),
 		ReplicaRegions: replicaRegions,
 	}
-	args.PopulateUsage(u)
+	keysToSkipSync := []string{"region", "billing_mode", "write_capacity", "read_capacity", "replica_regions"}
 
-	return aws.NewDynamoDBTable(args)
+	return aws.NewDynamoDBTable(args, u, keysToSkipSync)
 }
