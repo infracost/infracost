@@ -49,7 +49,7 @@ func computeDisk(region string, diskType string, size *decimal.Decimal) *schema.
 	return &schema.CostComponent{
 		Name:            diskTypeLabel,
 		Unit:            "GiB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: size,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),

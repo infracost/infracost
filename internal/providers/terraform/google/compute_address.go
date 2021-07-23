@@ -49,7 +49,7 @@ func standardVMComputeAddress() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "IP address (if used by standard VM)",
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
@@ -70,7 +70,7 @@ func preemptibleVMComputeAddress() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "IP address (if used by preemptible VM)",
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
@@ -91,7 +91,7 @@ func unusedVMComputeAddress(region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "IP address (if unused)",
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),

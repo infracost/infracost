@@ -50,7 +50,7 @@ func configRulesCostComponent(region string, displayName string, usageTier strin
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "evaluations",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

@@ -58,7 +58,7 @@ func NewLightsailInstance(d *schema.ResourceData, u *schema.UsageData) *schema.R
 			{
 				Name:           fmt.Sprintf("Virtual server (%s)", operatingSystemLabel),
 				Unit:           "hours",
-				UnitMultiplier: 1,
+				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

@@ -60,7 +60,7 @@ func parameterStorageCostComponent(d *schema.ResourceData, u *schema.UsageData) 
 	return &schema.CostComponent{
 		Name:            "Parameter storage (advanced)",
 		Unit:            "hours",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: &parameterStorageHours,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -102,7 +102,7 @@ func apiThroughputCostComponent(d *schema.ResourceData, u *schema.UsageData) *sc
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("API interactions (%s)", tier),
 		Unit:            "10k interactions",
-		UnitMultiplier:  10000,
+		UnitMultiplier:  decimal.NewFromInt(10000),
 		MonthlyQuantity: monthlyAPIInteractions,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

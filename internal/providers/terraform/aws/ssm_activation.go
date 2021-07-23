@@ -39,7 +39,7 @@ func NewSSMActivation(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 				{
 					Name:           "On-prem managed instances (advanced)",
 					Unit:           "hours",
-					UnitMultiplier: 1,
+					UnitMultiplier: decimal.NewFromInt(1),
 					HourlyQuantity: instanceCount,
 					ProductFilter: &schema.ProductFilter{
 						VendorName:    strPtr("aws"),

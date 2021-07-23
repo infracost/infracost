@@ -217,7 +217,7 @@ func elasticInferenceAcceleratorCostComponent(d *schema.ResourceData) *schema.Co
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Inference accelerator (%s)", deviceType),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

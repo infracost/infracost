@@ -37,7 +37,7 @@ func NewCloudwatchLogGroup(d *schema.ResourceData, u *schema.UsageData) *schema.
 			{
 				Name:            "Data ingested",
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: gbDataIngestion,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -52,7 +52,7 @@ func NewCloudwatchLogGroup(d *schema.ResourceData, u *schema.UsageData) *schema.
 			{
 				Name:            "Archival Storage",
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: gbDataStorage,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -67,7 +67,7 @@ func NewCloudwatchLogGroup(d *schema.ResourceData, u *schema.UsageData) *schema.
 			{
 				Name:            "Insights queries data scanned",
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: gbDataScanned,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

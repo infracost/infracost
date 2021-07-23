@@ -7,7 +7,7 @@ import (
 type CostComponent struct {
 	Name                 string
 	Unit                 string
-	UnitMultiplier       int
+	UnitMultiplier       decimal.Decimal
 	IgnoreIfMissingPrice bool
 	ProductFilter        *ProductFilter
 	PriceFilter          *PriceFilter
@@ -33,9 +33,9 @@ func (c *CostComponent) CalculateCosts() {
 
 func (c *CostComponent) fillQuantities() {
 	if c.MonthlyQuantity != nil && c.HourlyQuantity == nil {
-		c.HourlyQuantity = decimalPtr(c.MonthlyQuantity.Div(hourToMonthMultiplier))
+		c.HourlyQuantity = decimalPtr(c.MonthlyQuantity.Div(HourToMonthUnitMultiplier))
 	} else if c.HourlyQuantity != nil && c.MonthlyQuantity == nil {
-		c.MonthlyQuantity = decimalPtr(c.HourlyQuantity.Mul(hourToMonthMultiplier))
+		c.MonthlyQuantity = decimalPtr(c.HourlyQuantity.Mul(HourToMonthUnitMultiplier))
 	}
 }
 
@@ -56,14 +56,14 @@ func (c *CostComponent) PriceHash() string {
 }
 
 func (c *CostComponent) UnitMultiplierPrice() decimal.Decimal {
-	return c.Price().Mul(decimal.NewFromInt(int64(c.UnitMultiplier)))
+	return c.Price().Mul(c.UnitMultiplier)
 }
 
 func (c *CostComponent) UnitMultiplierHourlyQuantity() *decimal.Decimal {
 	if c.HourlyQuantity == nil {
 		return nil
 	}
-	m := c.HourlyQuantity.Div(decimal.NewFromInt(int64(c.UnitMultiplier)))
+	m := c.HourlyQuantity.Div(c.UnitMultiplier)
 	return &m
 }
 
@@ -71,6 +71,6 @@ func (c *CostComponent) UnitMultiplierMonthlyQuantity() *decimal.Decimal {
 	if c.MonthlyQuantity == nil {
 		return nil
 	}
-	m := c.MonthlyQuantity.Div(decimal.NewFromInt(int64(c.UnitMultiplier)))
+	m := c.MonthlyQuantity.Div(c.UnitMultiplier)
 	return &m
 }

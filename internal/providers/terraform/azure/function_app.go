@@ -142,7 +142,7 @@ func AppFunctionConsumptionExecutionTimeCostComponent(gbSeconds *decimal.Decimal
 	return &schema.CostComponent{
 		Name:            "Execution time",
 		Unit:            "GB-seconds",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: gbSeconds,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -170,7 +170,7 @@ func AppFunctionConsumptionExecutionsCostComponent(executions *decimal.Decimal, 
 	return &schema.CostComponent{
 		Name:            "Executions",
 		Unit:            "1M requests",
-		UnitMultiplier:  100000,
+		UnitMultiplier:  decimal.NewFromInt(100000),
 		MonthlyQuantity: executions,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

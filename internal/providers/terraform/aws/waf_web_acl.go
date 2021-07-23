@@ -105,7 +105,7 @@ func wafWebACLUsageCostComponent(region, displayName, unit, usagetype string, un
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            unit,
-		UnitMultiplier:  unitMultiplier,
+		UnitMultiplier:  decimal.NewFromInt(int64(unitMultiplier)),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

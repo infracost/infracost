@@ -42,7 +42,7 @@ func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.
 			{
 				Name:            "Custom events published",
 				Unit:            "1M events",
-				UnitMultiplier:  1000000,
+				UnitMultiplier:  decimal.NewFromInt(1000000),
 				MonthlyQuantity: monthlyCustomEvents,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -58,7 +58,7 @@ func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.
 			{
 				Name:            "Third-party events published",
 				Unit:            "1M events",
-				UnitMultiplier:  1000000,
+				UnitMultiplier:  decimal.NewFromInt(1000000),
 				MonthlyQuantity: monthlyPartnerEvents,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -74,7 +74,7 @@ func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.
 			{
 				Name:            "Archive processing",
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: monthlyArchiveProcessing,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -89,7 +89,7 @@ func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.
 			{
 				Name:            "Archive storage",
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: monthlyArchivedEvents,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -104,7 +104,7 @@ func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.
 			{
 				Name:            "Schema discovery",
 				Unit:            "1M events",
-				UnitMultiplier:  1000000,
+				UnitMultiplier:  decimal.NewFromInt(1000000),
 				MonthlyQuantity: monthlyIngestedEvents,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

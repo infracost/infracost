@@ -104,7 +104,7 @@ func bigQueryTableCostComponent(name, unit, region, service, description, startU
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            unit,
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: qty,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),

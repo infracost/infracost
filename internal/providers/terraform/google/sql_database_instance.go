@@ -110,7 +110,7 @@ func memoryCostComponent(region string, tier string, availabilityType string, db
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Memory (%s)", strings.ToLower(availabilityType)),
 		Unit:           "GB",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: memory,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
@@ -132,7 +132,7 @@ func cpuCostComponent(region string, tier string, availabilityType string, dbTyp
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("vCPUs (%s)", strings.ToLower(availabilityType)),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: vCPU,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
@@ -161,7 +161,7 @@ func sharedSQLInstance(tier, availabilityType string, dbType SQLInstanceDBType, 
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("SQL instance (%s, %s)", tier, strings.ToLower(availabilityType)),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("gcp"),
@@ -250,7 +250,7 @@ func sqlInstanceStorage(region string, dbType SQLInstanceDBType, availabilityTyp
 	cost := &schema.CostComponent{
 		Name:            fmt.Sprintf("Storage (%s, %s)", diskTypeHumanReadableNames[diskType], strings.ToLower(availabilityType)),
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(diskSizeGB)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("gcp"),
@@ -270,7 +270,7 @@ func backupCostComponent(region string, quantity *decimal.Decimal) *schema.CostC
 	cost := &schema.CostComponent{
 		Name:            "Backups",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("gcp"),
@@ -290,7 +290,7 @@ func ipv4CostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "IP address (if unused)",
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("gcp"),

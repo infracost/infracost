@@ -30,7 +30,7 @@ func NewConfigurationRecorder(d *schema.ResourceData, u *schema.UsageData) *sche
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Config items",
 		Unit:            "records",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: monthlyConfigItems,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -46,7 +46,7 @@ func NewConfigurationRecorder(d *schema.ResourceData, u *schema.UsageData) *sche
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Custom config items",
 		Unit:            "records",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: monthlyCustomConfigItems,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

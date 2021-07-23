@@ -75,7 +75,7 @@ func notificationHubsCostComponent(name, region, sku string) *schema.CostCompone
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("%s (%s)", name, sku),
 		Unit:            "months",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
@@ -100,7 +100,7 @@ func notificationHubsPushesCostComponent(name, region, sku, startUsageAmt string
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "1M pushes",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),

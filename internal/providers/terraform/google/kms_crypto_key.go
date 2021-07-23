@@ -63,7 +63,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Key versions (first 2K)",
 			Unit:            "months",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: firstTierQty,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
@@ -84,7 +84,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			costComponents = append(costComponents, &schema.CostComponent{
 				Name:            "Key versions (over 2K)",
 				Unit:            "months",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: &tiers[1],
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
@@ -104,7 +104,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Key versions",
 			Unit:            "months",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: monthlyKeys,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
@@ -121,7 +121,7 @@ func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Operations",
 		Unit:            "10k operations",
-		UnitMultiplier:  10000,
+		UnitMultiplier:  decimal.NewFromInt(10000),
 		MonthlyQuantity: monthlyKeyOperations,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),

@@ -68,7 +68,7 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Data processed",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: gbDataProcessed,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -85,7 +85,7 @@ func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:           fmt.Sprintf("Endpoint (%s)", vpcEndpointType),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(vpcEndpointInterfaces))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -108,7 +108,7 @@ func vpcEndpointDataProcessedCostComponent(region string, endpointBytes string, 
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: gbDataProcessed,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

@@ -72,7 +72,7 @@ func stepFunctionStandardCostComponent(region string, quantity *decimal.Decimal)
 	return &schema.CostComponent{
 		Name:            "Transitions",
 		Unit:            "1K transitions",
-		UnitMultiplier:  2,
+		UnitMultiplier:  decimal.NewFromInt(2),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -90,7 +90,7 @@ func stepFunctionExpressRequestCostComponent(region string, quantity *decimal.De
 	return &schema.CostComponent{
 		Name:            "Requests",
 		Unit:            "1M requests",
-		UnitMultiplier:  1000000,
+		UnitMultiplier:  decimal.NewFromInt(1000000),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -108,7 +108,7 @@ func stepFunctionExpressDurationCostComponent(name string, region string, startU
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB-hours",
-		UnitMultiplier:  3600,
+		UnitMultiplier:  decimal.NewFromInt(3600),
 		MonthlyQuantity: gbSeconds,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),

@@ -33,7 +33,7 @@ func NewPubSubSubscription(d *schema.ResourceData, u *schema.UsageData) *schema.
 			{
 				Name:            "Message delivery data",
 				Unit:            "TiB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: messageDataTB,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
@@ -51,7 +51,7 @@ func NewPubSubSubscription(d *schema.ResourceData, u *schema.UsageData) *schema.
 			{
 				Name:            "Retained acknowledged message storage",
 				Unit:            "GiB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: storageGB,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
@@ -69,7 +69,7 @@ func NewPubSubSubscription(d *schema.ResourceData, u *schema.UsageData) *schema.
 			{
 				Name:            "Snapshot message backlog storage",
 				Unit:            "GiB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: snapshotStorageGB,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),

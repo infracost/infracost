@@ -52,7 +52,7 @@ func NewRedisInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 			{
 				Name:            name,
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(memorySize)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),

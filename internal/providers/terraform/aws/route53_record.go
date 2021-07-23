@@ -89,7 +89,7 @@ func queriesCostComponent(displayName string, usageType string, usageTier string
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "1M queries",
-		UnitMultiplier:  1000000,
+		UnitMultiplier:  decimal.NewFromInt(1000000),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

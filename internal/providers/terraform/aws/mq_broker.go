@@ -61,7 +61,7 @@ func instance(region, engine, instanceType, deploymentMode string, isMultiAZ boo
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", engine, instanceType, strings.ToLower(deploymentMode)),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -104,7 +104,7 @@ func storage(region, engine, storageType string, isMultiAZ bool, storageSizeGB *
 	costComponent := &schema.CostComponent{
 		Name:            fmt.Sprintf("Storage (%s, %s)", engine, strings.ToUpper(storageType)),
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: summedStorageSizeGB,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

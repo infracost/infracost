@@ -31,7 +31,7 @@ func NewRoute53HealthCheck(d *schema.ResourceData, u *schema.UsageData) *schema.
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Health check",
 		Unit:            "months",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -69,7 +69,7 @@ func NewRoute53HealthCheck(d *schema.ResourceData, u *schema.UsageData) *schema.
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Optional features",
 			Unit:            "months",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(optionalHealthCheckCount),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

@@ -43,7 +43,7 @@ func NewAzureRMHDInsightKafkaCluster(d *schema.ResourceData, u *schema.UsageData
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Managed OS disks",
 		Unit:            "months",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(workerInstances * numberOfDisks)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -70,7 +70,7 @@ func NewAzureRMHDInsightKafkaCluster(d *schema.ResourceData, u *schema.UsageData
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Disk operations",
 		Unit:            "100K operations",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: diskOperations,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

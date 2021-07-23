@@ -86,7 +86,7 @@ func AppServicePlanCostComponent(name, region, productName, skuRefactor string, 
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

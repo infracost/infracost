@@ -22,7 +22,7 @@ func NewVPNConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		{
 			Name:           "VPN connection",
 			Unit:           "hours",
-			UnitMultiplier: 1,
+			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),

@@ -49,7 +49,7 @@ func NewLambdaFunction(args *LambdaFunctionArguments) *schema.Resource {
 			{
 				Name:            "Requests",
 				Unit:            "1M requests",
-				UnitMultiplier:  1000000,
+				UnitMultiplier:  decimal.NewFromInt(1000000),
 				MonthlyQuantity: monthlyRequests,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -65,7 +65,7 @@ func NewLambdaFunction(args *LambdaFunctionArguments) *schema.Resource {
 			{
 				Name:            "Duration",
 				Unit:            "GB-seconds",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: gbSeconds,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

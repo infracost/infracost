@@ -34,7 +34,7 @@ func cloudwatchMetricAlarmCostComponent(name string, unit string, region string,
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            unit,
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(quantity),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

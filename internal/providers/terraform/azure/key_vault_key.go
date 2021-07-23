@@ -134,7 +134,7 @@ func vaultKeysCostComponent(name, region, unit, skuName, meterName, startUsage s
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            unit,
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
