@@ -307,7 +307,7 @@ Instead of directly querying the GraphQL, you can also run `distinct` or `regex`
 	mongorestore -d cloudPricing --gzip cloudPricing
 	```
 
-4. You can now query you local MongoDB:
+4. You can now query your local MongoDB:
 
 	Run the mongo shell:
 
