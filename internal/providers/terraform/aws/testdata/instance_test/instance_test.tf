@@ -1,3 +1,14 @@
+
+// AWS provider is locked due to https://github.com/hashicorp/terraform-provider-aws/issues/20287
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "3.50.0"
+    }
+  }
+}
+
 provider "aws" {
   region                      = "us-east-1"
   skip_credentials_validation = true
