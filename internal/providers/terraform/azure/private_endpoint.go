@@ -47,7 +47,6 @@ func privateEndpointCostComponent(region, name, meterName string) *schema.CostCo
 		Unit:                 "hour",
 		UnitMultiplier:       1,
 		MonthlyQuantity:      decimalPtr(decimal.NewFromInt(730)),
-		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),
@@ -67,7 +66,6 @@ func privateEndpointDataCostComponent(region, name, meterName string, quantity *
 		Unit:                 "GB",
 		UnitMultiplier:       1,
 		MonthlyQuantity:      quantity,
-		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),
