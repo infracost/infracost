@@ -49,7 +49,7 @@ func NewSnsTopicSubscription(d *schema.ResourceData, u *schema.UsageData) *schem
 			{
 				Name:            fmt.Sprintf("%s notifications", endpointType),
 				Unit:            "1M notifications",
-				UnitMultiplier:  1000000,
+				UnitMultiplier:  decimal.NewFromInt(1000000),
 				MonthlyQuantity: requests,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

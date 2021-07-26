@@ -63,7 +63,7 @@ func NewAzureRMSearchService(d *schema.ResourceData, u *schema.UsageData) *schem
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:           fmt.Sprintf("Search usage (%s, %s %s)", skuName[:len(skuName)-1], units.String(), unitName),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: units,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -122,7 +122,7 @@ func searchServiceCostComponent(region, name, startUsage string, qty *decimal.De
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "1000 images",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: qty,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

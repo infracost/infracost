@@ -29,12 +29,12 @@ func loggingCostComponent(loggingData *decimal.Decimal) []*schema.CostComponent 
 		{
 			Name:            "Logging data",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: loggingData,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
 				Region:        strPtr("global"),
-				Service:       strPtr("Stackdriver Logging"),
+				Service:       strPtr("Cloud Logging"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "description", Value: strPtr("Log Volume")},

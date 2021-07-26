@@ -187,7 +187,7 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 			resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 				Name:            fmt.Sprintf("%v (%v)", awsRegion, usageName),
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: quantity,
 				ProductFilter: &schema.ProductFilter{
 					VendorName: strPtr("aws"),
@@ -268,7 +268,7 @@ func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
 		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 			Name:            awsRegion,
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: quantity,
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("aws"),
@@ -344,7 +344,7 @@ func httpRequests(u *schema.UsageData) *schema.Resource {
 		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 			Name:            awsRegion,
 			Unit:            "10k requests",
-			UnitMultiplier:  10000,
+			UnitMultiplier:  decimal.NewFromInt(10000),
 			MonthlyQuantity: quantity,
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("aws"),
@@ -420,7 +420,7 @@ func httpsRequests(u *schema.UsageData) *schema.Resource {
 		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 			Name:            awsRegion,
 			Unit:            "10k requests",
-			UnitMultiplier:  10000,
+			UnitMultiplier:  decimal.NewFromInt(10000),
 			MonthlyQuantity: quantity,
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("aws"),
@@ -496,7 +496,7 @@ func shieldRequests(u *schema.UsageData) *schema.Resource {
 		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 			Name:            awsRegion,
 			Unit:            "10k requests",
-			UnitMultiplier:  10000,
+			UnitMultiplier:  decimal.NewFromInt(10000),
 			MonthlyQuantity: quantity,
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("aws"),
@@ -529,7 +529,7 @@ func invalidationRequests(u *schema.UsageData) []*schema.CostComponent {
 		{
 			Name:            "Invalidation requests (first 1k)",
 			Unit:            "paths",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: freeQuantity,
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("aws"),
@@ -548,7 +548,7 @@ func invalidationRequests(u *schema.UsageData) []*schema.CostComponent {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Invalidation requests (over 1k)",
 			Unit:            "paths",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: paidQuantity,
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("aws"),
@@ -574,7 +574,7 @@ func encryptionRequests(u *schema.UsageData) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Field level encryption requests",
 		Unit:            "10k requests",
-		UnitMultiplier:  10000,
+		UnitMultiplier:  decimal.NewFromInt(10000),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -595,7 +595,7 @@ func realtimeLogs(u *schema.UsageData) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Real-time log requests",
 		Unit:            "1M lines",
-		UnitMultiplier:  1000000,
+		UnitMultiplier:  decimal.NewFromInt(1000000),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
@@ -615,7 +615,7 @@ func customSSLCertificate(u *schema.UsageData) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Dedicated IP custom SSLs",
 		Unit:            "certificates",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),

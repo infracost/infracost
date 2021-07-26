@@ -55,7 +55,7 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 			{
 				Name:            "CPU",
 				Unit:            "GHz-seconds",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: monthlyCPUUsage,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
@@ -70,7 +70,7 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 			{
 				Name:            "Memory",
 				Unit:            "GB-seconds",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: monthlyMemoryUsage,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
@@ -85,7 +85,7 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 			{
 				Name:            "Invocations",
 				Unit:            "invocations",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: invocations,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
@@ -103,7 +103,7 @@ func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 			{
 				Name:            "Outbound data transfer",
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: networkEgrees,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),

@@ -35,7 +35,7 @@ func NewNATGateway(args *NATGatewayArguments) *schema.Resource {
 			{
 				Name:           "NAT gateway",
 				Unit:           "hours",
-				UnitMultiplier: 1,
+				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -50,7 +50,7 @@ func NewNATGateway(args *NATGatewayArguments) *schema.Resource {
 			{
 				Name:            "Data processed",
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: gbDataProcessed,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

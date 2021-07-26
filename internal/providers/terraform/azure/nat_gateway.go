@@ -41,7 +41,7 @@ func NATGatewayCostComponent(name, region string) *schema.CostComponent {
 
 		Name:           name,
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -62,7 +62,7 @@ func DataProcessedCostComponent(name, region string, monthlyDataProcessedGb *dec
 
 		Name:            name,
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: monthlyDataProcessedGb,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

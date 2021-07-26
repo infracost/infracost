@@ -82,7 +82,7 @@ func databaseComputeInstance(region, name, serviceName, productNameRegex, skuNam
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -104,7 +104,7 @@ func databaseStorageComponent(region, serviceName, productNameRegex string, stor
 	return &schema.CostComponent{
 		Name:            "Storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(storageGB)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -122,7 +122,7 @@ func databaseBackupStorageComponent(region, serviceName, skuName string, backupS
 	return &schema.CostComponent{
 		Name:            "Additional backup storage",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: backupStorageGB,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

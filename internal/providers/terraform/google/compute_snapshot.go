@@ -32,7 +32,7 @@ func NewComputeSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 			{
 				Name:            "Storage",
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: snapshotDiskSize,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),

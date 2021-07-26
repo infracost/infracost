@@ -68,7 +68,7 @@ func dnsQueriesFirstCostComponent(region, name, startUsage string, monthlyQuerie
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "1M queries",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: monthlyQueries,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

@@ -19,7 +19,7 @@ func NewDNSManagedZone(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 			{
 				Name:            "Managed zone",
 				Unit:            "months",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),

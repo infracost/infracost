@@ -174,7 +174,7 @@ func serverlessCosmosCostComponent(location string, availabilityZone bool, u *sc
 	return &schema.CostComponent{
 		Name:            "Provisioned throughput (serverless)",
 		Unit:            "1M RU",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: requestUnits,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -330,7 +330,7 @@ func storageCosmosCostComponent(name, location, skuName, productName string, qua
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantities,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -353,7 +353,7 @@ func backupCosmosCostComponent(name, location, skuName, productName, meterName s
 	return &schema.CostComponent{
 		Name:                 name,
 		Unit:                 "GB",
-		UnitMultiplier:       1,
+		UnitMultiplier:       decimal.NewFromInt(1),
 		MonthlyQuantity:      quantities,
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
@@ -377,7 +377,7 @@ func operationsCosmosCostComponent(name, location, meterName string, quantities 
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "10K operations",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantities,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

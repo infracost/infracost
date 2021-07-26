@@ -43,10 +43,10 @@ func NewAzureRMPrivateEndpoint(d *schema.ResourceData, u *schema.UsageData) *sch
 
 func privateEndpointCostComponent(region, name, meterName string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:                 name,
-		Unit:                 "hour",
-		UnitMultiplier:       1,
-		MonthlyQuantity:      decimalPtr(decimal.NewFromInt(730)),
+		Name:            name,
+		Unit:            "hour",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(730)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),
@@ -62,10 +62,10 @@ func privateEndpointCostComponent(region, name, meterName string) *schema.CostCo
 
 func privateEndpointDataCostComponent(region, name, meterName string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:                 name,
-		Unit:                 "GB",
-		UnitMultiplier:       1,
-		MonthlyQuantity:      quantity,
+		Name:            name,
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),

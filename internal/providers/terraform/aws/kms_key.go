@@ -33,7 +33,7 @@ func CustomerMasterKeyCostComponent(region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Customer master key",
 		Unit:            "months",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -74,7 +74,7 @@ func requestPriceComponent(name string, region string, usagetype string) *schema
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "10k requests",
-		UnitMultiplier: 10000,
+		UnitMultiplier: decimal.NewFromInt(10000),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
 			Region:     strPtr(region),

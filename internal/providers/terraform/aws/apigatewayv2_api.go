@@ -126,7 +126,7 @@ func httpCostComponent(region string, displayName string, usageTier string, mont
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "1M requests",
-		UnitMultiplier:  1000000,
+		UnitMultiplier:  decimal.NewFromInt(1000000),
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -147,7 +147,7 @@ func websocketCostComponent(region string, unit string, usageType string, displa
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "1M " + unit,
-		UnitMultiplier:  1000000,
+		UnitMultiplier:  decimal.NewFromInt(1000000),
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

@@ -40,7 +40,7 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Provisioned throughput",
 			Unit:            "MBps",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: provisionedThroughput,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -75,7 +75,7 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Read requests (infrequent access)",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: infrequentAccessReadGbRequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -91,7 +91,7 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "Write requests (infrequent access)",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: infrequentAccessWriteGbRequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -130,7 +130,7 @@ func efsStorageCostComponent(name, region, usagetype string, quantity *decimal.D
 
 		Name:            name,
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

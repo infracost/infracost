@@ -71,7 +71,7 @@ func databricksCostComponent(name, region, skuName string, quantity *decimal.Dec
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "DBU-hours",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

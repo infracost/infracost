@@ -343,7 +343,7 @@ func blobDataStorageCostComponent(region, name, skuName, startUsage, productName
 	return &schema.CostComponent{
 		Name:                 name,
 		Unit:                 "GB",
-		UnitMultiplier:       1,
+		UnitMultiplier:       decimal.NewFromInt(1),
 		MonthlyQuantity:      quantity,
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
@@ -372,7 +372,7 @@ func blobOperationsCostComponent(region, name, unit, skuName, meterName, product
 	return &schema.CostComponent{
 		Name:                 name,
 		Unit:                 unit,
-		UnitMultiplier:       1,
+		UnitMultiplier:       decimal.NewFromInt(1),
 		MonthlyQuantity:      quantity,
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
@@ -395,7 +395,7 @@ func fileDataStorageCostComponent(region, name, skuName, meterName string, quant
 	return &schema.CostComponent{
 		Name:                 name,
 		Unit:                 "GB",
-		UnitMultiplier:       1,
+		UnitMultiplier:       decimal.NewFromInt(1),
 		MonthlyQuantity:      quantity,
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
@@ -421,7 +421,7 @@ func fileOperationStorageCostComponent(region, unit, name, skuName, meterName st
 	return &schema.CostComponent{
 		Name:                 name,
 		Unit:                 unit,
-		UnitMultiplier:       1,
+		UnitMultiplier:       decimal.NewFromInt(1),
 		MonthlyQuantity:      quantity,
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
