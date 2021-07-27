@@ -17,7 +17,7 @@
 	- [Quickstart](#quickstart)
 	- [Cost component names and units](#cost-component-names-and-units)
 	- [Finding prices](#finding-prices)
-		- [Querying MongoDB](#querying-mongodb)
+		- [Querying Postgres](#querying-postgres)
 		- [Querying the GraphQL API](#querying-the-graphql-api)
 		- [Tips](#tips)
 	- [Adding usage-based cost components](#adding-usage-based-cost-components)
@@ -291,60 +291,65 @@ In the future, we plan to add a separate field to cost components to hold the me
 
 When adding a new resource to infracost, a `ProductFilter` has to be added that uniquely identifies the product for pricing purposes (the filter is used to find a unique `productHash`). If the product contains multiple prices, then a `PriceFilter` should be used to filter down to a single price. The product filter needs a `service`, `productFamily` and `attribute` key/values to filter the products. Because cloud prices have many parameter values to determine a price on a per-region or product type basis, querying for prices can look odd as many parameter values are duplicated.
 
-When writing integration tests we check that we make sure the correct price is used by checking the `priceHash` instead of the actual value of the price. This means that if that price changes, the integration tests won't break. To determine the correct `priceHash` to use for the integration tests we can query the backend data to find a unique product and then look at the prices nested inside the product and choose the correct one based on the price attributes.
+To determine the correct `PriceFilter` to use we can query the backend data to find a unique product and then look at the prices nested inside the product and choose the correct one based on the price attributes.
 
-Here are two methods for querying the backend data to find the filters that will uniquely identify the product.
+Here are two methods for querying the backend data to find the filters that will uniquely identify the product and price.
 
-#### Querying MongoDB
+#### Querying Postgres
 
-Instead of directly querying the GraphQL, you can also run `distinct` or `regex` queries on MongoDB to explore the products.
+Instead of directly querying the GraphQL, you can also run `distinct` or `regex` queries on PostgresSQL to explore the products.
 
-1. Install MongoDB version 4.
-2. Download a dump of the MongoDB data from https://infracost-public-dumps.s3.amazonaws.com/cloudPricing.zip.
-3. Import the prices to your local:
-	```sh
-	unzip cloudPricing.zip
-	mongorestore -d cloudPricing --gzip cloudPricing
-	```
-
-4. You can now query your local MongoDB:
-
-	Run the mongo shell:
-
-	```sh
-	mongo
-	```
+1. Install PostgresSQL 12.
+2. Clone the Cloud Pricing API repo (https://github.com/infracost/cloud-pricing-api).
+3. Follow the [installation instructions](https://github.com/infracost/cloud-pricing-api/blob/master/README.md#installation) to setup and populate your database. 
+4. You can query the `products` table in your local Postgres:
 
 	Example queries:
 
-	```javascript
-	use cloudPricing;
+	```sql
+	-- Find the vendor names
+	SELECT DISTINCT("vendorName") FROM products;
+	-- should show: "aws", "azure", "gcp"
 
-	// Find the vendor names
-	db.products.distinct("vendorName");
-	// should show: [ "aws", "azure", "gcp" ]
+	-- Find all the services for a vendor
+	SELECT DISTINCT("service") FROM products WHERE "vendorName" = 'gcp';
+	
+	-- Find the service for a vendor using a regular expression
+	SELECT DISTINCT("service") FROM products WHERE "vendorName" = 'gcp' AND "service" ~* 'kms';
+	-- should show: "Cloud Key Management Service (KMS)", "Thales CPL ekms-dpod-eu"
 
-	// Find all the services for a vendor
-	db.products.distinct("service", {"vendorName": "gcp"})
+	-- Find the product families for a service
+	SELECT DISTINCT("productFamily") FROM products 
+	WHERE "vendorName" = 'gcp' AND "service" = 'Cloud Key Management Service (KMS)';
 
-	// Find the service for a vendor using a regular expression
-	db.products.distinct("service", {"vendorName": "gcp", "service": {$regex: "kms", $options: "i"} });
-	// should show: [ "Cloud Key Management Service (KMS)", "Thales CPL ekms-dpod-eu" ]
+	-- Find the unique descriptions for a product family
+	SELECT DISTINCT("attributes" ->> 'description') FROM products 
+	WHERE "vendorName" = 'gcp' 
+	AND "service" = 'Cloud Key Management Service (KMS)' 
+	AND "productFamily" = 'ApplicationServices';
+	-- should show:  
+	--	"Active HSM ECDSA P-256 key versions",
+	--	"Active HSM ECDSA P-384 key versions",
+	--	"Active HSM RSA 2048 bit key versions",
+	--  ...
 
-	// Find the product families for a service
-	db.products.distinct("productFamily", {"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)"})
-
-	// Find the unique descriptions for a product family
-	db.products.distinct("attributes.description", {"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)", "productFamily": "ApplicationServices" });
-	// should show:  [
-	//	"Active HSM ECDSA P-256 key versions",
-	//	"Active HSM ECDSA P-384 key versions",
-	//	"Active HSM RSA 2048 bit key versions",
-	//  ...
-	// ]
-
-	// Find a unique product for a product family based on region and description:
-	db.products.find({"vendorName": "gcp", "service": "Cloud Key Management Service (KMS)", "productFamily": "ApplicationServices", "region": "us-east1", "attributes.description": "Active HSM ECDSA P-256 key versions" }).pretty()
+	-- Find a unique product for a product family based on region and description:
+	SELECT * FROM products 
+	WHERE "vendorName" = 'gcp' 
+	AND service = 'Cloud Key Management Service (KMS)' 
+	AND "productFamily" = 'ApplicationServices' 
+	AND "region" = 'us-east1'
+	AND "attributes" ->> 'description' = 'Active HSM ECDSA P-256 key versions';
+ 
+	-- Find a unique price for a product using a price filter (this requires a subquery because of the way prices are stored):
+	SELECT "vendorName", "service", "productFamily", "region", "productHash", "sku", jsonb_pretty(attributes), jsonb_pretty(single_price) FROM
+	(SELECT *, jsonb_array_elements((jsonb_each("prices")).value) single_price FROM products 
+	 WHERE "vendorName" = 'gcp' 
+	 AND service = 'Cloud Key Management Service (KMS)' 
+	 AND "productFamily" = 'ApplicationServices' 
+	 AND "region" = 'us-east1'
+	 AND "attributes" ->> 'description' = 'Active HSM ECDSA SECP256K1 key versions') p  	
+	WHERE single_price ->> 'startUsageAmount' = '2000';		
 	```
 
 #### Querying the GraphQL API
