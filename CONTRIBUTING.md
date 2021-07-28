@@ -348,7 +348,7 @@ Instead of directly querying the GraphQL, you can also run `distinct` or `regex`
 	 AND service = 'Cloud Key Management Service (KMS)' 
 	 AND "productFamily" = 'ApplicationServices' 
 	 AND "region" = 'us-east1'
-	 AND "attributes" ->> 'description' = 'Active HSM ECDSA SECP256K1 key versions') p  	
+	 AND "attributes" ->> 'description' = 'Active HSM ECDSA SECP256K1 key versions') AS sub  	
 	WHERE single_price ->> 'startUsageAmount' = '2000';		
 	```
 
