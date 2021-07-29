@@ -174,22 +174,6 @@ var FreeResources []string = []string{
 	"azurerm_cosmosdb_sql_user_defined_function",
 
 	// Azure DNS
-	"azurerm_dns_a_record",
-	"azurerm_dns_aaaa_record",
-	"azurerm_dns_caa_record",
-	"azurerm_dns_cname_record",
-	"azurerm_dns_mx_record",
-	"azurerm_dns_ns_record",
-	"azurerm_dns_ptr_record",
-	"azurerm_dns_srv_record",
-	"azurerm_dns_txt_record",
-	"azurerm_private_dns_a_record",
-	"azurerm_private_dns_a_record",
-	"azurerm_private_dns_cname_record",
-	"azurerm_private_dns_mx_record",
-	"azurerm_private_dns_ptr_record",
-	"azurerm_private_dns_srv_record",
-	"azurerm_private_dns_txtrecord",
 	"azurerm_private_dns_zone_virtual_network_link",
 
 	// Azure Database
