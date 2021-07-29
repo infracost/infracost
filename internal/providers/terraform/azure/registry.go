@@ -270,14 +270,6 @@ var FreeResources []string = []string{
 	"azurerm_sentinel_alert_rule_fusion",
 	"azurerm_sentinel_alert_rule_ms_security_incident",
 	"azurerm_sentinel_alert_rule_scheduled",
-	"azurerm_sentinel_data_connector_aws_cloud_trail",
-	"azurerm_sentinel_data_connector_azure_active_directory",
-	"azurerm_sentinel_data_connector_azure_advanced_threat_protection",
-	"azurerm_sentinel_data_connector_azure_security_center",
-	"azurerm_sentinel_data_connector_microsoft_cloud_app_security",
-	"azurerm_sentinel_data_connector_microsoft_defender_advanced_threat_protection",
-	"azurerm_sentinel_data_connector_office_365",
-	"azurerm_sentinel_data_connector_threat_intelligence",
 
 	// Azure SQL
 	"azurerm_sql_server",
