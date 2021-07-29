@@ -80,6 +80,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMSearchServiceRegistryItem(),
 	GetAzureRMRedisCacheRegistryItem(),
 	GetAzureRMStorageAccountRegistryItem(),
+	GetAzureRMSynapseWorkspacRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
@@ -228,6 +229,10 @@ var FreeResources []string = []string{
 
 	// Azure SQL
 	"azurerm_sql_server",
+
+	// Azure Synapse Analytics
+	"azurerm_synapse_firewall_rule",
+	"azurerm_synapse_private_link_hub",
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
