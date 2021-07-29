@@ -191,12 +191,19 @@ var FreeResources []string = []string{
 	"azurerm_key_vault_certificate_issuer",
 	"azurerm_key_vault_secret",
 
+	// Azure Lighthouse (Delegated Resoure Management)
+	"azurerm_lighthouse_definition",
+	"azurerm_lighthouse_assignment",
+
 	// Azure Load Balancer
 	"azurerm_lb_backend_address_pool",
 	"azurerm_lb_backend_address_pool_address",
 	"azurerm_lb_nat_pool",
 	"azurerm_lb_nat_rule",
 	"azurerm_lb_probe",
+
+	// Azure Management Lock
+	"azurerm_management_lock",
 
 	// Azure Networking
 	"azurerm_application_security_group",
