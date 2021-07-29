@@ -202,7 +202,10 @@ var FreeResources []string = []string{
 	"azurerm_lb_nat_rule",
 	"azurerm_lb_probe",
 
-	// Azure Management Lock
+	// Azure Management
+	"azurerm_management_group",
+	"azurerm_management_group_subscription_association",
+	"azurerm_management_group_policy_assignment",
 	"azurerm_management_lock",
 
 	// Azure Networking
