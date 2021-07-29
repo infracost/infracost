@@ -146,11 +146,19 @@ var FreeResources []string = []string{
 	"azurerm_automation_variable_int",
 	"azurerm_automation_variable_string",
 
+	// Azure Backup & Recovery Services Vault
+	"azurerm_backup_policy_vm",
+	"azurerm_backup_policy_file_share",
+	"azurerm_site_recovery_network_mapping",
+	"azurerm_site_recovery_replication_policy",
+
 	// Azure Base
 	"azurerm_resource_group",
 	"azurerm_resource_provider_registration",
 	"azurerm_subscription",
 	"azurerm_role_assignment",
+	"azurerm_role_definition",
+	"azurerm_user_assigned_identity",
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
@@ -166,7 +174,34 @@ var FreeResources []string = []string{
 	"azurerm_cosmosdb_sql_user_defined_function",
 
 	// Azure DNS
+	"azurerm_dns_a_record",
+	"azurerm_dns_aaaa_record",
+	"azurerm_dns_caa_record",
+	"azurerm_dns_cname_record",
+	"azurerm_dns_mx_record",
+	"azurerm_dns_ns_record",
+	"azurerm_dns_ptr_record",
+	"azurerm_dns_srv_record",
+	"azurerm_dns_txt_record",
+	"azurerm_private_dns_a_record",
+	"azurerm_private_dns_a_record",
+	"azurerm_private_dns_cname_record",
+	"azurerm_private_dns_mx_record",
+	"azurerm_private_dns_ptr_record",
+	"azurerm_private_dns_srv_record",
+	"azurerm_private_dns_txtrecord",
 	"azurerm_private_dns_zone_virtual_network_link",
+
+	// Azure Database
+	"azurerm_mariadb_configuration",
+	"azurerm_mariadb_firewall_rule",
+	"azurerm_mariadb_virtual_network_rule",
+	"azurerm_mysql_firewall_rule",
+	"azurerm_mysql_virtual_network_rule",
+	"azurerm_postgresql_configuration",
+	"azurerm_postgresql_firewall_rule",
+	"azurerm_postgresql_flexible_server_firewall_rule",
+	"azurerm_postgresql_virtual_network_rule",
 
 	// Azure Event Hub
 	"azurerm_eventhub",
@@ -208,15 +243,21 @@ var FreeResources []string = []string{
 	"azurerm_management_group_policy_assignment",
 	"azurerm_management_lock",
 
+	// Azure Managed Applications
+	"azurerm_managed_application",
+	"azurerm_managed_application_definition",
+
 	// Azure Networking
 	"azurerm_application_security_group",
 	"azurerm_network_interface",
 	"azurerm_network_interface_security_group_association",
 	"azurerm_network_security_group",
+	"azurerm_network_security_rule",
 	"azurerm_private_link_service",
 	"azurerm_subnet",
 	"azurerm_subnet_network_security_group_association",
 	"azurerm_virtual_network",
+	"azurerm_virtual_network_gateway_connection",
 
 	// Azure Notification Hub
 	"azurerm_notification_hub",
@@ -227,6 +268,9 @@ var FreeResources []string = []string{
 	"azurerm_policy_remediation",
 	"azurerm_policy_set_definition",
 
+	// Azure Portal
+	"azurerm_dashboard",
+
 	// Azure Redis
 	"azurerm_redis_firewall_rule",
 	"azurerm_redis_linked_server",
@@ -236,11 +280,43 @@ var FreeResources []string = []string{
 	"azurerm_container_registry_token",
 	"azurerm_container_registry_webhook",
 
+	// Azure Sentinel
+	"azurerm_sentinel_alert_rule_machine_learning_behavior_analytics",
+	"azurerm_sentinel_alert_rule_fusion",
+	"azurerm_sentinel_alert_rule_ms_security_incident",
+	"azurerm_sentinel_alert_rule_scheduled",
+	"azurerm_sentinel_data_connector_aws_cloud_trail",
+	"azurerm_sentinel_data_connector_azure_active_directory",
+	"azurerm_sentinel_data_connector_azure_advanced_threat_protection",
+	"azurerm_sentinel_data_connector_azure_security_center",
+	"azurerm_sentinel_data_connector_microsoft_cloud_app_security",
+	"azurerm_sentinel_data_connector_microsoft_defender_advanced_threat_protection",
+	"azurerm_sentinel_data_connector_office_365",
+	"azurerm_sentinel_data_connector_threat_intelligence",
+
 	// Azure SQL
 	"azurerm_sql_server",
+	"azurerm_sql_firewall_rule",
+	"azurerm_sql_virtual_network_rule",
+	"azurerm_mssql_firewall_rule",
+
+	// Azure Storage
+	"azurerm_storage_table_entity",
+	"azurerm_storage_management_policy",
+	"azurerm_storage_blob_inventory_policy",
+
+	// Azure Virtual Desktop
+	"azurerm_virtual_desktop_application",
+	"azurerm_virtual_desktop_application_group",
+	"azurerm_virtual_desktop_workspace",
+	"azurerm_virtual_desktop_workspace_application_group_association",
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
+	"azurerm_availability_set",
+	"azurerm_proximity_placement_group",
+	"azurerm_ssh_public_key",
+	"azurerm_marketplace_agreement",
 }
 
 var UsageOnlyResources []string = []string{}
