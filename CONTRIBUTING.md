@@ -299,10 +299,14 @@ Here are two methods for querying the backend data to find the filters that will
 
 Instead of directly querying the GraphQL, you can also run `distinct` or `regex` queries on PostgresSQL to explore the products.
 
-1. Install PostgresSQL 12.
-2. Clone the Cloud Pricing API repo (https://github.com/infracost/cloud-pricing-api).
-3. Follow the [installation instructions](https://github.com/infracost/cloud-pricing-api/blob/master/README.md#installation) to setup and populate your database. 
-4. You can query the `products` table in your local Postgres:
+1. Follow the [Docker compose](https://github.com/infracost/cloud-pricing-api#docker-compose) or [dev setup](https://github.com/infracost/cloud-pricing-api/blob/master/CONTRIBUTING.md#development) instructions to setup and populate your Cloud Pricing API. Docker compose is quicker to setup.
+2. Connect to the Postgres DB:
+  ```sh
+	# only needed for docker-compose:  docker exec -it cloud-pricing-api_postgres_1 bash
+	psql
+	use cloud_pricing;
+	```
+3. You can query the `products` table in your local Postgres:
 
 	Example queries:
 
