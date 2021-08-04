@@ -1,4 +1,11 @@
 version: 0.1
 resource_usage:
-  azurerm_synapse_workspace.example:
+  azurerm_synapse_workspace.general:
     serverless_sql_pool_size_tb: 11
+  azurerm_synapse_workspace.dataflows:
+    dataflow_general_purpose_instances: 3
+    dataflow_general_purpose_vcores: 8
+    dataflow_compute_optimized_instances: 1
+    dataflow_compute_optimized_vcores: 12
+    dataflow_memory_optimized_instances: 2
+    dataflow_memory_optimized_vcores: 20
