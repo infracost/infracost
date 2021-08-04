@@ -3,6 +3,7 @@ package azure
 import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
 )
 
 func GetAzureRMSynapseWorkspacRegistryItem() *schema.RegistryItem {
@@ -21,12 +22,19 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	// var serverlessSqlPoolSize *decimal.Decimal
-	// if u != nil && u.Get("serverless_sql_pool_size_tb").Type != gjson.Null {
-	// 	serverlessSqlPoolSize = decimalPtr(decimal.NewFromInt(u.Get("serverless_sql_pool_size_tb").Int()))
-	// }
-	costComponents = append(costComponents, synapseServerlessSqlPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", decimalPtr(decimal.NewFromInt(10))))
-	costComponents = append(costComponents, synapseServerlessSqlPoolCostComponent(region, "Serverless SQL pool size", "10", decimalPtr(decimal.NewFromInt(2))))
+	var serverlessSqlPoolSize *decimal.Decimal
+	if u != nil && u.Get("serverless_sql_pool_size_tb").Type != gjson.Null {
+		serverlessSqlPoolSize = decimalPtr(decimal.NewFromInt(u.Get("serverless_sql_pool_size_tb").Int()))
+	}
+
+	if serverlessSqlPoolSize != nil && serverlessSqlPoolSize.LessThanOrEqual(decimal.NewFromInt(10)) {
+		costComponents = append(costComponents, synapseServerlessSqlPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", serverlessSqlPoolSize))
+	}
+
+	if serverlessSqlPoolSize != nil && serverlessSqlPoolSize.GreaterThan(decimal.NewFromInt(10)) {
+		costComponents = append(costComponents, synapseServerlessSqlPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", decimalPtr(decimal.NewFromInt(10))))
+		costComponents = append(costComponents, synapseServerlessSqlPoolCostComponent(region, "Serverless SQL pool size", "10", decimalPtr(serverlessSqlPoolSize.Sub(decimal.NewFromInt(10)))))
+	}
 
 	costComponents = append(costComponents, synapseDataFlowCostComponent(region, "Data flow - general purpose", "DZH318Z0CGNQ", decimal.NewFromInt(8), decimal.NewFromInt(1)))
 	costComponents = append(costComponents, synapseDataFlowCostComponent(region, "Data flow - compute optimized", "DZH318Z0CGNF", decimal.NewFromInt(8), decimal.NewFromInt(1)))
@@ -63,10 +71,9 @@ func synapseServerlessSqlPoolCostComponent(region, name, start string, quantity 
 func synapseDataFlowCostComponent(region, name, productId string, vCores, instances decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
-		Unit:           "hours",
+		Unit:           "vCores",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(vCores),
-		//MonthlyQuantity: decimalPtr(schema.HourToMonthUnitMultiplier),
+		HourlyQuantity: decimalPtr(vCores.Mul(instances)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),
