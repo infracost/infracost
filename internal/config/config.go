@@ -57,7 +57,7 @@ func DefaultConfig() *Config {
 		NoColor:  false,
 
 		DefaultPricingAPIEndpoint: "https://pricing.api.infracost.io",
-		PricingAPIEndpoint:        "https://pricing.api.infracost.io",
+		PricingAPIEndpoint:        "",
 		DashboardAPIEndpoint:      "https://dashboard.api.infracost.io",
 
 		Projects: []*Project{{}},

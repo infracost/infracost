@@ -92,8 +92,9 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				}
 			}
 
-			ctx.Config.Credentials[ctx.Config.PricingAPIEndpoint] = config.CredentialsProfileSpec{
-				APIKey: r.APIKey,
+			ctx.Config.Credentials[ctx.Config.PricingAPIEndpoint] = &config.CredentialsProfileSpec{
+				APIKey:  r.APIKey,
+				Default: true,
 			}
 
 			err = ctx.Config.Credentials.Save()

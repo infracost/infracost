@@ -36,7 +36,7 @@ func (c *Config) migrateCredentials() error {
 	}
 
 	if oldCreds.APIKey != "" {
-		c.Credentials[c.PricingAPIEndpoint] = CredentialsProfileSpec{
+		c.Credentials[c.PricingAPIEndpoint] = &CredentialsProfileSpec{
 			APIKey: oldCreds.APIKey,
 		}
 

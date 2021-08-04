@@ -12,10 +12,11 @@ import (
 )
 
 type CredentialsProfileSpec struct {
-	APIKey string `yaml:"api_key"`
+	APIKey  string `yaml:"api_key"`
+	Default bool   `yaml:"default,omitempty"`
 }
 
-type Credentials map[string]CredentialsProfileSpec
+type Credentials map[string]*CredentialsProfileSpec
 
 func loadCredentials(cfg *Config) error {
 	var err error
@@ -31,7 +32,20 @@ func loadCredentials(cfg *Config) error {
 		logrus.Debug(err)
 	}
 
-	profile, ok := cfg.Credentials[cfg.PricingAPIEndpoint]
+	var profile *CredentialsProfileSpec
+	var ok bool
+
+	if cfg.PricingAPIEndpoint == "" {
+		cfg.PricingAPIEndpoint = cfg.Credentials.GetDefaultPricingAPIEndpoint()
+	}
+	if cfg.PricingAPIEndpoint == "" {
+		cfg.PricingAPIEndpoint = cfg.DefaultPricingAPIEndpoint
+	}
+
+	if cfg.PricingAPIEndpoint != "" {
+		profile, ok = cfg.Credentials[cfg.PricingAPIEndpoint]
+	}
+
 	if ok && cfg.APIKey == "" {
 		cfg.APIKey = profile.APIKey
 	}
@@ -41,6 +55,24 @@ func loadCredentials(cfg *Config) error {
 
 func (c Credentials) Save() error {
 	return writeCredentialsFile(c)
+}
+
+func (c Credentials) GetDefaultPricingAPIEndpoint() string {
+	// Find the first key that's set as the default
+	for k, v := range c {
+		if v.Default {
+			return k
+		}
+	}
+
+	// If there's only one key in the map just return it
+	if len(c) == 1 {
+		for k := range c {
+			return k
+		}
+	}
+
+	return ""
 }
 
 func readCredentialsFileIfExists() (Credentials, error) {
