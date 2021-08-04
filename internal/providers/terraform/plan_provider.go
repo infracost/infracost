@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
@@ -66,7 +67,7 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 		planPath = p.Path
 
 		if !IsTerraformDir(dir) {
-			return []byte{}, fmt.Errorf("%s %s.\n%s\n\n%s\n%s\n%s %s",
+			m := fmt.Sprintf("%s %s.\n%s\n\n%s\n%s\n%s %s",
 				"Could not detect Terraform directory for",
 				p.Path,
 				"Either the current working directory or the plan file's parent directory must be a Terraform directory.",
@@ -75,6 +76,7 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 				"and then run Infracost with",
 				ui.PrimaryString("--path=plan.json"),
 			)
+			return []byte{}, clierror.NewSanitizedError(errors.New(m), "Could not detect Terraform directory for plan file")
 		}
 	}
 
