@@ -11,20 +11,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type CredentialsProfileSpec struct {
-	APIKey  string `yaml:"api_key"`
-	Default bool   `yaml:"default,omitempty"`
-}
+var credentialsVersion = "0.1"
 
-type Credentials map[string]*CredentialsProfileSpec
+type Credentials struct {
+	Version            string `yaml:"version"`
+	APIKey             string `yaml:"api_key,omitempty"`
+	PricingAPIEndpoint string `yaml:"pricing_api_endpoint,omitempty"`
+}
 
 func loadCredentials(cfg *Config) error {
 	var err error
-
-	cfg.Credentials, err = readCredentialsFileIfExists()
-	if err != nil {
-		return errors.New("Error parsing credentials YAML: " + strings.TrimPrefix(err.Error(), "yaml: "))
-	}
 
 	err = cfg.migrateCredentials()
 	if err != nil {
@@ -32,47 +28,30 @@ func loadCredentials(cfg *Config) error {
 		logrus.Debug(err)
 	}
 
-	var profile *CredentialsProfileSpec
-	var ok bool
+	cfg.Credentials, err = readCredentialsFileIfExists()
+	if err != nil {
+		return errors.New("Error parsing credentials YAML: " + strings.TrimPrefix(err.Error(), "yaml: "))
+	}
 
 	if cfg.PricingAPIEndpoint == "" {
-		cfg.PricingAPIEndpoint = cfg.Credentials.GetDefaultPricingAPIEndpoint()
+		cfg.PricingAPIEndpoint = cfg.Credentials.PricingAPIEndpoint
 	}
 	if cfg.PricingAPIEndpoint == "" {
 		cfg.PricingAPIEndpoint = cfg.DefaultPricingAPIEndpoint
 	}
 
-	if cfg.PricingAPIEndpoint != "" {
-		profile, ok = cfg.Credentials[cfg.PricingAPIEndpoint]
-	}
-
-	if ok && cfg.APIKey == "" {
-		cfg.APIKey = profile.APIKey
+	if cfg.APIKey == "" {
+		cfg.APIKey = cfg.Credentials.APIKey
 	}
 
 	return nil
 }
 
 func (c Credentials) Save() error {
+	if c.Version == "" {
+		c.Version = credentialsVersion
+	}
 	return writeCredentialsFile(c)
-}
-
-func (c Credentials) GetDefaultPricingAPIEndpoint() string {
-	// Find the first key that's set as the default
-	for k, v := range c {
-		if v.Default {
-			return k
-		}
-	}
-
-	// If there's only one key in the map just return it
-	if len(c) == 1 {
-		for k := range c {
-			return k
-		}
-	}
-
-	return ""
 }
 
 func readCredentialsFileIfExists() (Credentials, error) {

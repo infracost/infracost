@@ -97,7 +97,7 @@ func (c *Config) LoadFromEnv() error {
 
 	err = loadCredentials(c)
 	if err != nil {
-		logrus.Fatal(err)
+		return err
 	}
 
 	return nil

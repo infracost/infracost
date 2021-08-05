@@ -15,8 +15,13 @@ var validConfigureKeys = []string{"api_key", "pricing_api_endpoint"}
 func configureCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "configure",
-		Short: "Configure Infracost",
-		Long:  "Configure Infracost CLI",
+		Short: "Display or change global configuration",
+		Long: `Display or change global configuration.
+
+Supported settings:
+  - api_key: Infracost API key
+  - pricing_api_endpoint: endpoint of the Cloud Pricing API
+`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Show the help
 			return cmd.Help()
@@ -31,19 +36,20 @@ func configureCmd(ctx *config.RunContext) *cobra.Command {
 func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set <key> <value>",
-		Short: "Set Infracost CLI global configuration",
-		Long:  "Set Infracost CLI global configuration",
+		Short: "Set global configuration",
+		Long: `Set global configuration.
+
+Supported settings:
+  - api_key: Infracost API key
+  - pricing_api_endpoint: endpoint of the Cloud Pricing API
+`,
 		Example: `  Set your Infracost API key:
 
-      infracost configure set api_key API_KEY_VALUE
+      infracost configure set api_key MY_API_KEY
 
-  Set your Infracost Pricing API Endpoint:
+  Set your Cloud Pricing API endpoint:
 
-      infracost	configure set pricing_api_endpoint https://cloud-pricing-api.internal
-
-  Set your Infracost API key for a specific Pricing API Endpoint:
-
-      infracost configure set api_key API_KEY_VALUE --pricing-api-endpoint https://cloud-pricing-api.internal`,
+      infracost	configure set pricing_api_endpoint https://cloud-pricing-api`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 2 {
 				return errors.New("Too many arguments")
@@ -63,24 +69,8 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 			key := args[0]
 			value := args[1]
 
-			if cmd.Flags().Changed("pricing-api-endpoint") && key != "api_key" {
-				ui.PrintWarning("--pricing-api-endpoint flag is only used when key is api_key")
-			}
-
 			if key == "pricing_api_endpoint" {
-				if existing, ok := ctx.Config.Credentials[value]; ok {
-					existing.Default = true
-				} else {
-					ctx.Config.Credentials[value] = &config.CredentialsProfileSpec{
-						Default: true,
-					}
-				}
-
-				for k, v := range ctx.Config.Credentials {
-					if k != value {
-						v.Default = false
-					}
-				}
+				ctx.Config.Credentials.PricingAPIEndpoint = value
 
 				err := ctx.Config.Credentials.Save()
 				if err != nil {
@@ -89,21 +79,7 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			if key == "api_key" {
-				pricingAPIEndpoint, _ := cmd.Flags().GetString("pricing-api-endpoint")
-				if pricingAPIEndpoint == "" {
-					pricingAPIEndpoint = ctx.Config.PricingAPIEndpoint
-				}
-
-				ctx.Config.Credentials[pricingAPIEndpoint] = &config.CredentialsProfileSpec{
-					APIKey:  value,
-					Default: true,
-				}
-
-				for k, v := range ctx.Config.Credentials {
-					if k != pricingAPIEndpoint {
-						v.Default = false
-					}
-				}
+				ctx.Config.Credentials.APIKey = value
 
 				err := ctx.Config.Credentials.Save()
 				if err != nil {
@@ -115,27 +91,26 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String("pricing-api-endpoint", "", "The Pricing API Endpoint. Only applicable when key is api_key")
-
 	return cmd
 }
 
 func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get <key>",
-		Short: "Get Infracost CLI global configuration",
-		Long:  "Get Infracost CLI global configuration",
+		Short: "Get global configuration",
+		Long: `Get global configuration.
+
+Supported settings:
+  - api_key: Infracost API key
+  - pricing_api_endpoint: endpoint of the Cloud Pricing API
+`,
 		Example: `  Get your saved Infracost API key:
 
       infracost configure get api_key
 
-  Get your saved Infracost Pricing API Endpoint:
+  Get your saved Cloud Pricing API endpoint:
 
-      infracost	configure get pricing_api_endpoint
-
-  Get your saved Infracost API key for a specific Pricing API Endpoint:
-
-      infracost configure get api_key --pricing-api-endpoint https://cloud-pricing-api.internal`,
+      infracost	configure get pricing_api_endpoint`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 1 {
 				return errors.New("Too many arguments")
@@ -155,34 +130,26 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 			key := args[0]
 			var value string
 
-			if cmd.Flags().Changed("pricing-api-endpoint") && key != "api_key" {
-				ui.PrintWarning("--pricing-api-endpoint flag is only used when key is api_key")
-			}
-
 			if key == "pricing_api_endpoint" {
-				value = ctx.Config.Credentials.GetDefaultPricingAPIEndpoint()
+				value = ctx.Config.Credentials.PricingAPIEndpoint
 
 				if value == "" {
-					ui.PrintWarning("Could not find any Pricing API Endpoint in your saved config")
+					msg := fmt.Sprintf("No Cloud Pricing API endpoint in your saved config (%s).\nSet an API key using %s.",
+						config.CredentialsFilePath(),
+						ui.PrimaryString("infracost configure set pricing_api_endpoint https://cloud-pricing-api"),
+					)
+					ui.PrintWarning(msg)
+
 				}
-			}
+			} else if key == "api_key" {
+				value = ctx.Config.Credentials.APIKey
 
-			if key == "api_key" {
-				pricingAPIEndpoint, _ := cmd.Flags().GetString("pricing-api-endpoint")
-				if pricingAPIEndpoint == "" {
-					pricingAPIEndpoint = ctx.Config.Credentials.GetDefaultPricingAPIEndpoint()
-				}
-
-				profile := ctx.Config.Credentials[pricingAPIEndpoint]
-
-				if profile != nil {
-					value = profile.APIKey
-				} else {
-					if pricingAPIEndpoint != ctx.Config.DefaultPricingAPIEndpoint {
-						ui.PrintWarningf("Could not find an API key for Pricing API Endpoint %s in your saved config", pricingAPIEndpoint)
-					} else {
-						ui.PrintWarning("Could not find an API key in your saved config")
-					}
+				if value == "" {
+					msg := fmt.Sprintf("No API key in your saved config (%s).\nSet an API key using %s.",
+						config.CredentialsFilePath(),
+						ui.PrimaryString("infracost configure set api_key MY_API_KEY"),
+					)
+					ui.PrintWarning(msg)
 				}
 			}
 
@@ -193,8 +160,6 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 			return nil
 		},
 	}
-
-	cmd.Flags().String("pricing-api-endpoint", "", "The Pricing API Endpoint. Only applicable when key is api_key")
 
 	return cmd
 }
