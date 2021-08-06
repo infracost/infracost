@@ -29,13 +29,11 @@ import (
 
 var update = flag.Bool("update", false, "update .golden files")
 
-// AWS provider is locked due to https://github.com/hashicorp/terraform-provider-aws/issues/20287
 var tfProviders = `
 	terraform {
 		required_providers {
 			aws = {
 				source  = "hashicorp/aws"
-				version = "3.50.0"
 			}
 			google = {
 				source  = "hashicorp/google"
