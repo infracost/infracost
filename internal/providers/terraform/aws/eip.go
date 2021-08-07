@@ -31,7 +31,7 @@ func NewEIP(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 			{
 				Name:           "IP address (if unused)",
 				Unit:           "hours",
-				UnitMultiplier: 1,
+				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

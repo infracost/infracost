@@ -76,7 +76,7 @@ func computeCostComponent(region, machineType string, purchaseOption string) *sc
 	return &schema.CostComponent{
 		Name:                fmt.Sprintf("Instance usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
 		Unit:                "hours",
-		UnitMultiplier:      1,
+		UnitMultiplier:      decimal.NewFromInt(1),
 		HourlyQuantity:      decimalPtr(decimal.NewFromInt(1)),
 		MonthlyDiscountPerc: sustainedUseDiscount,
 		ProductFilter: &schema.ProductFilter{
@@ -114,7 +114,7 @@ func scratchDisk(region string, purchaseOption string, count int) *schema.CostCo
 	return &schema.CostComponent{
 		Name:            "Local SSD provisioned storage",
 		Unit:            "GiB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(int64(375 * count))), // local SSDs are always 375 GiB
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
@@ -171,7 +171,7 @@ func guestAccelerator(region string, purchaseOption string, guestAccel gjson.Res
 	return &schema.CostComponent{
 		Name:                fmt.Sprintf("%s (%s)", name, purchaseOptionLabel(purchaseOption)),
 		Unit:                "hours",
-		UnitMultiplier:      1,
+		UnitMultiplier:      decimal.NewFromInt(1),
 		HourlyQuantity:      decimalPtr(count),
 		MonthlyDiscountPerc: sustainedUseDiscount,
 		ProductFilter: &schema.ProductFilter{

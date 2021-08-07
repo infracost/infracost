@@ -29,7 +29,7 @@ func NewBigqueryDataset(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 			{
 				Name:            "Queries (on-demand)",
 				Unit:            "TB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: queriesTB,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),

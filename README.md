@@ -81,9 +81,9 @@ See [this page](https://www.infracost.io/docs/usage_based_resources) for details
 
 ## Contributing
 
-Issues and pull requests are welcome! For development details, see the [contributing](CONTRIBUTING.md) guide. For major changes, including CLI interface changes, please open an issue first to discuss what you would like to change.
+Issues and pull requests are welcome! For development details, see the [contributing](CONTRIBUTING.md) guide. For major changes, including CLI interface changes, please open an issue first to discuss what you would like to change. [Join our community Slack channel](https://www.infracost.io/community-chat), we are a friendly bunch and happy to help you get started :)
 
-[Join our community Slack channel](https://www.infracost.io/community-chat), we are a friendly bunch and happy to help you get started :)
+We're also looking for [Sr Full Stack Engineer](https://www.infracost.io/join-the-team) to join our team.
 
 ## License
 

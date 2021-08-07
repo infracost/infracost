@@ -57,7 +57,7 @@ func storageImage(region string, description string, storageSize *decimal.Decima
 		{
 			Name:            "Storage",
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: storageSize,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),

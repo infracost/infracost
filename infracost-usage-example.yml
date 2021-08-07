@@ -830,6 +830,10 @@ resource_usage:
   azurerm_private_dns_txt_record.my_txt_record:
     monthly_queries: 1500000000  # Monthly number of DNS queries
 
+  azurerm_private_endpoint.with_inbound:
+    monthly_inbound_data_processed_gb: 100 # Monthly inbound data processed in GB.
+    monthly_outbound_data_processed_gb: 100 # Monthly outbound data processed in GB.
+
   azurerm_search_service.my_service:
     monthly_images_extracted: 1000000 # Monthly number of extracted images
 

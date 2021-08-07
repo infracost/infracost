@@ -74,6 +74,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMPrivateDNSptrRecordRegistryItem(),
 	GetAzureRMPrivateDNSsrvRecordRegistryItem(),
 	GetAzureRMPrivateDNStxtRecordRegistryItem(),
+	GetAzureRMPrivateEndpointRegistryItem(),
 	GetAzureRMPublicIPRegistryItem(),
 	GetAzureRMPublicIPPrefixRegistryItem(),
 	GetAzureRMSearchServiceRegistryItem(),
@@ -145,11 +146,19 @@ var FreeResources []string = []string{
 	"azurerm_automation_variable_int",
 	"azurerm_automation_variable_string",
 
+	// Azure Backup & Recovery Services Vault
+	"azurerm_backup_policy_vm",
+	"azurerm_backup_policy_file_share",
+	"azurerm_site_recovery_network_mapping",
+	"azurerm_site_recovery_replication_policy",
+
 	// Azure Base
 	"azurerm_resource_group",
 	"azurerm_resource_provider_registration",
 	"azurerm_subscription",
 	"azurerm_role_assignment",
+	"azurerm_role_definition",
+	"azurerm_user_assigned_identity",
 
 	// Azure Blueprints
 	"azurerm_blueprint_assignment",
@@ -166,6 +175,17 @@ var FreeResources []string = []string{
 
 	// Azure DNS
 	"azurerm_private_dns_zone_virtual_network_link",
+
+	// Azure Database
+	"azurerm_mariadb_configuration",
+	"azurerm_mariadb_firewall_rule",
+	"azurerm_mariadb_virtual_network_rule",
+	"azurerm_mysql_firewall_rule",
+	"azurerm_mysql_virtual_network_rule",
+	"azurerm_postgresql_configuration",
+	"azurerm_postgresql_firewall_rule",
+	"azurerm_postgresql_flexible_server_firewall_rule",
+	"azurerm_postgresql_virtual_network_rule",
 
 	// Azure Event Hub
 	"azurerm_eventhub",
@@ -190,6 +210,10 @@ var FreeResources []string = []string{
 	"azurerm_key_vault_certificate_issuer",
 	"azurerm_key_vault_secret",
 
+	// Azure Lighthouse (Delegated Resoure Management)
+	"azurerm_lighthouse_definition",
+	"azurerm_lighthouse_assignment",
+
 	// Azure Load Balancer
 	"azurerm_lb_backend_address_pool",
 	"azurerm_lb_backend_address_pool_address",
@@ -197,14 +221,28 @@ var FreeResources []string = []string{
 	"azurerm_lb_nat_rule",
 	"azurerm_lb_probe",
 
+	// Azure Management
+	"azurerm_management_group",
+	"azurerm_management_group_subscription_association",
+	"azurerm_management_group_policy_assignment",
+	"azurerm_management_lock",
+
+	// Azure Managed Applications
+	"azurerm_managed_application",
+	"azurerm_managed_application_definition",
+
 	// Azure Networking
 	"azurerm_application_security_group",
 	"azurerm_network_interface",
 	"azurerm_network_interface_security_group_association",
 	"azurerm_network_security_group",
+	"azurerm_network_security_rule",
+	"azurerm_private_link_service",
 	"azurerm_subnet",
 	"azurerm_subnet_network_security_group_association",
 	"azurerm_virtual_network",
+	"azurerm_virtual_network_gateway_connection",
+	"azurerm_local_network_gateway",
 
 	// Azure Notification Hub
 	"azurerm_notification_hub",
@@ -215,6 +253,9 @@ var FreeResources []string = []string{
 	"azurerm_policy_remediation",
 	"azurerm_policy_set_definition",
 
+	// Azure Portal
+	"azurerm_dashboard",
+
 	// Azure Redis
 	"azurerm_redis_firewall_rule",
 	"azurerm_redis_linked_server",
@@ -224,11 +265,35 @@ var FreeResources []string = []string{
 	"azurerm_container_registry_token",
 	"azurerm_container_registry_webhook",
 
+	// Azure Sentinel
+	"azurerm_sentinel_alert_rule_machine_learning_behavior_analytics",
+	"azurerm_sentinel_alert_rule_fusion",
+	"azurerm_sentinel_alert_rule_ms_security_incident",
+	"azurerm_sentinel_alert_rule_scheduled",
+
 	// Azure SQL
 	"azurerm_sql_server",
+	"azurerm_sql_firewall_rule",
+	"azurerm_sql_virtual_network_rule",
+	"azurerm_mssql_firewall_rule",
+
+	// Azure Storage
+	"azurerm_storage_table_entity",
+	"azurerm_storage_management_policy",
+	"azurerm_storage_blob_inventory_policy",
+
+	// Azure Virtual Desktop
+	"azurerm_virtual_desktop_application",
+	"azurerm_virtual_desktop_application_group",
+	"azurerm_virtual_desktop_workspace",
+	"azurerm_virtual_desktop_workspace_application_group_association",
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
+	"azurerm_availability_set",
+	"azurerm_proximity_placement_group",
+	"azurerm_ssh_public_key",
+	"azurerm_marketplace_agreement",
 }
 
 var UsageOnlyResources []string = []string{}

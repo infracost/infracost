@@ -40,7 +40,7 @@ func NewAzureRMFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:           fmt.Sprintf("Deployment (%s)", skuTier),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
@@ -65,7 +65,7 @@ func NewAzureRMFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Data processed",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: dataProcessed,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),

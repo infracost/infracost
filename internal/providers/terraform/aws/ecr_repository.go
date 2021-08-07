@@ -28,7 +28,7 @@ func NewECRRepository(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 			{
 				Name:            "Storage",
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: storageSize,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),

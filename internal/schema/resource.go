@@ -6,8 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-var hourToMonthMultiplier = decimal.NewFromInt(730)
-var HourToMonthUnitMultiplier = 730
+var HourToMonthUnitMultiplier = decimal.NewFromInt(730)
 
 type ResourceFunc func(*ResourceData, *UsageData) *Resource
 

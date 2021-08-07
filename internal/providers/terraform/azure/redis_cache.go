@@ -57,7 +57,7 @@ func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.R
 			{
 				Name:           componentName + ")",
 				Unit:           "hours",
-				UnitMultiplier: 1,
+				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(nodes)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("azure"),

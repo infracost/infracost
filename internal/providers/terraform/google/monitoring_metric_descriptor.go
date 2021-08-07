@@ -59,7 +59,7 @@ func monitoringCostComponent(displayName string, unit string, unitMultiplier int
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            humanize.SI(float64(unitMultiplier), "") + " " + unit,
-		UnitMultiplier:  unitMultiplier,
+		UnitMultiplier:  decimal.NewFromInt(int64(unitMultiplier)),
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),

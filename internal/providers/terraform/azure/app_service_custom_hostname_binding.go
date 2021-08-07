@@ -55,7 +55,7 @@ func NewAzureRMAppServiceCustomHostnameBinding(d *schema.ResourceData, u *schema
 		{
 			Name:            "IP SSL certificate",
 			Unit:            "months",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),

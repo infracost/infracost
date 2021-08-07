@@ -45,7 +45,7 @@ func computeForwardingCostComponent(region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "Forwarding rules",
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
@@ -66,7 +66,7 @@ func computeIngressDataCostComponent(region string, quantity *decimal.Decimal) *
 	return &schema.CostComponent{
 		Name:            "Ingress data",
 		Unit:            "GB",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),

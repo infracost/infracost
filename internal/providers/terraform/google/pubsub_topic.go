@@ -25,7 +25,7 @@ func NewPubSubTopic(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 			{
 				Name:            "Message ingestion data",
 				Unit:            "TiB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: messageDataTB,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),

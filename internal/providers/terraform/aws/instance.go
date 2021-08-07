@@ -117,7 +117,7 @@ func computeCostComponent(d *schema.ResourceData, u *schema.UsageData, purchaseO
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(desiredSize)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -173,7 +173,7 @@ func reservedInstanceCostComponent(region, osLabel, purchaseOptionLabel, reserve
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, instanceType),
 		Unit:           "hours",
-		UnitMultiplier: 1,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(count)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -204,7 +204,7 @@ func ebsOptimizedCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:                 "EBS-optimized usage",
 		Unit:                 "hours",
-		UnitMultiplier:       1,
+		UnitMultiplier:       decimal.NewFromInt(1),
 		HourlyQuantity:       decimalPtr(decimal.NewFromInt(1)),
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
@@ -226,7 +226,7 @@ func detailedMonitoringCostComponent(d *schema.ResourceData) *schema.CostCompone
 	return &schema.CostComponent{
 		Name:                 "EC2 detailed monitoring",
 		Unit:                 "metrics",
-		UnitMultiplier:       1,
+		UnitMultiplier:       decimal.NewFromInt(1),
 		MonthlyQuantity:      decimalPtr(decimal.NewFromInt(int64(defaultEC2InstanceMetricCount))),
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
@@ -245,7 +245,7 @@ func cpuCreditsCostComponent(region string, vCPUCount decimal.Decimal, prefix st
 	return &schema.CostComponent{
 		Name:            "CPU credits",
 		Unit:            "vCPU-hours",
-		UnitMultiplier:  1,
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: &vCPUCount,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),

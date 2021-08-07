@@ -44,7 +44,7 @@ func networkEgress(region string, u *schema.UsageData, resourceName, prefixName 
 		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 			Name:            fmt.Sprintf("%s in same continent", prefixName),
 			Unit:            "GB",
-			UnitMultiplier:  1,
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: quantity,
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("gcp"),
@@ -115,7 +115,7 @@ func networkEgress(region string, u *schema.UsageData, resourceName, prefixName 
 			resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 				Name:            name,
 				Unit:            "GB",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: quantity,
 				ProductFilter: &schema.ProductFilter{
 					Region:           apiRegion,

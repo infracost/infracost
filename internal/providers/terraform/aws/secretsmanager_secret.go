@@ -27,7 +27,7 @@ func NewSecretsManagerSecret(d *schema.ResourceData, u *schema.UsageData) *schem
 			{
 				Name:            "Secret",
 				Unit:            "months",
-				UnitMultiplier:  1,
+				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
@@ -39,7 +39,7 @@ func NewSecretsManagerSecret(d *schema.ResourceData, u *schema.UsageData) *schem
 			{
 				Name:            "API requests",
 				Unit:            "10k requests",
-				UnitMultiplier:  10000,
+				UnitMultiplier:  decimal.NewFromInt(10000),
 				MonthlyQuantity: monthlyRequests,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
