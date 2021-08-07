@@ -13,7 +13,7 @@ import (
 const minConfigFileVersion = "0.1"
 const maxConfigFileVersion = "0.1"
 
-type ConfigFileSpec struct { // nolint:golint
+type ConfigFileSpec struct { // nolint:revive
 	Version  string     `yaml:"version"`
 	Projects []*Project `yaml:"projects" ignored:"true"`
 }
