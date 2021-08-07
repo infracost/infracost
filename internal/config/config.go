@@ -155,14 +155,6 @@ func (c *Config) IsLogging() bool {
 	return c.LogLevel != ""
 }
 
-func (c *Config) IsSelfHosted() bool {
-	return c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
-}
-
-func (c *Config) IsTelemetryDisabled() bool {
-	return c.IsSelfHosted() && IsFalsy(os.Getenv("INFRACOST_SELF_HOSTED_TELEMETRY"))
-}
-
 func IsTest() bool {
 	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
 }
