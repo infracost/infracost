@@ -28,11 +28,11 @@ func NewAzureRMVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
-	
+
 	if sku == "Basic" {
 		sku = "Basic Gateway"
 	}
-	
+
 	costComponents = append(costComponents, vpnGateway(region, sku))
 
 	if u != nil && u.Get("s2s_tunnel").Type != gjson.Null {
@@ -45,7 +45,7 @@ func NewAzureRMVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 				costComponents = append(costComponents, vpnGatewayS2S(region, sku, &tunnelValues[1]))
 			}
 		}
-	}else {
+	} else {
 		costComponents = append(costComponents, vpnGatewayS2S(region, sku, tunnel))
 	}
 
@@ -66,7 +66,7 @@ func NewAzureRMVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 				costComponents = append(costComponents, vpnGatewayP2P(region, sku, &connectionValues[5]))
 			}
 		}
-	}else {
+	} else {
 		costComponents = append(costComponents, vpnGatewayP2P(region, sku, connection))
 	}
 
@@ -75,7 +75,7 @@ func NewAzureRMVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		if data_transfers != nil {
 			costComponents = append(costComponents, vpnGatewayDataTransfers(zone, sku, data_transfers))
 		}
-	}else {
+	} else {
 		costComponents = append(costComponents, vpnGatewayDataTransfers(zone, sku, data_transfers))
 	}
 
