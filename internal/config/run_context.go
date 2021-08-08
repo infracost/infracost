@@ -134,6 +134,12 @@ func ciPlatform() string {
 		return "buildkite"
 	} else if IsTruthy(os.Getenv("SYSTEM_COLLECTIONURI")) {
 		return fmt.Sprintf("azure_devops_%s", os.Getenv("BUILD_REPOSITORY_PROVIDER"))
+	} else if IsTruthy(os.Getenv("TFC_RUN_ID")) {
+		return "tfc"
+	} else if IsTruthy(os.Getenv("ENV0_ENVIRONMENT_ID")) {
+		return "env0"
+	} else if IsTruthy(os.Getenv("SCALR_RUN_ID")) {
+		return "scalr"
 	} else {
 		envKeys := os.Environ()
 		sort.Strings(envKeys)
@@ -144,6 +150,10 @@ func ciPlatform() string {
 				return "bitbucket"
 			} else if strings.HasPrefix(k, "CONCOURSE_") {
 				return "concourse"
+			} else if strings.HasPrefix(k, "SPACELIFT_") {
+				return "spacelift"
+			} else if strings.HasPrefix(k, "HARNESS_") {
+				return "harness"
 			}
 		}
 		if IsTruthy(os.Getenv("CI")) {
