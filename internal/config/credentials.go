@@ -74,6 +74,6 @@ func writeCredentialsFile(c Credentials) error {
 	return ioutil.WriteFile(CredentialsFilePath(), data, 0600)
 }
 
-func CredentialsFilePath() string { // nolint:golint
+func CredentialsFilePath() string {
 	return path.Join(userConfigDir(), "credentials.yml")
 }
