@@ -1,11 +1,11 @@
 version: 0.1
 resource_usage:
   azurerm_virtual_network_gateway.Basic:
-    s2s_tunnel: 12 # Monthly number of ingress events.
+    s2s_tunnel: 10 # Monthly number of ingress events.
     p2p_connection: 150
     data_transfers: 1
 
-  azurerm_virtual_network_gateway.VpnGw1:
+  azurerm_virtual_network_gateway.VpnGw2:
     s2s_tunnel: 12 # Monthly number of ingress events.
     p2p_connection: 150
 
