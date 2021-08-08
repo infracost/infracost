@@ -137,7 +137,7 @@ func parseAzureDevOpsRepoPath(path string) string {
 // Returns a lowercase truncated hash of length l
 func shortHash(s string, l int) string {
 	sum := md5.Sum([]byte(s)) //nolint:gosec
-	var b []byte = sum[:]
+	var b = sum[:]
 	h := base32.StdEncoding.EncodeToString(b)
 
 	return strings.ToLower(h)[:l]

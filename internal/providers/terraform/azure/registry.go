@@ -88,7 +88,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 }
 
 // FreeResources grouped alphabetically
-var FreeResources []string = []string{
+var FreeResources = []string{
 	// Azure Api Management
 	"azurerm_api_management_api",
 	"azurerm_api_management_api_diagnostic",
@@ -297,4 +297,4 @@ var FreeResources []string = []string{
 	"azurerm_marketplace_agreement",
 }
 
-var UsageOnlyResources []string = []string{}
+var UsageOnlyResources = []string{}

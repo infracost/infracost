@@ -18,7 +18,7 @@ import (
 const minUsageFileVersion = "0.1"
 const maxUsageFileVersion = "0.1"
 
-type UsageFile struct { // nolint:golint
+type UsageFile struct { // nolint:revive
 	Version       string                 `yaml:"version"`
 	ResourceUsage map[string]interface{} `yaml:"resource_usage"`
 }

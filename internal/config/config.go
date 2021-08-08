@@ -23,7 +23,7 @@ type Project struct {
 	TerraformUseState   bool   `yaml:"terraform_use_state,omitempty" ignored:"true"`
 }
 
-type Config struct { // nolint:golint
+type Config struct {
 	Credentials Credentials
 
 	Version         string `yaml:"version,omitempty" ignored:"true"`

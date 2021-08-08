@@ -120,7 +120,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			fmt.Fprintln(os.Stderr, "")
 
 			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
-				return errors.New(fmt.Sprintf("%v\n%s %s %s %s %s\n%s",
+				return fmt.Errorf("%v\n%s %s %s %s %s\n%s",
 					e.Error(),
 					"Please check your",
 					ui.PrimaryString(config.CredentialsFilePath()),
@@ -128,11 +128,11 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 					ui.PrimaryString("INFRACOST_API_KEY"),
 					"environment variable.",
 					"If you continue having issues please email hello@infracost.io",
-				))
+				)
 			}
 
 			if e, ok := err.(*apiclient.APIError); ok {
-				return errors.New(fmt.Sprintf("%v\n%s", e.Error(), "We have been notified of this issue."))
+				return fmt.Errorf("%v\n%s", e.Error(), "We have been notified of this issue.")
 			}
 
 			return err
