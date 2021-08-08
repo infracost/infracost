@@ -1,5 +1,4 @@
 package azure_test
-package azure_test
 
 import (
 	"testing"
