@@ -87,7 +87,7 @@ EOF
   }
 }
 
-resource "azurerm_virtual_network_gateway" "vpnGw2" {
+resource "azurerm_virtual_network_gateway" "VpnGw2" {
   name                = "test"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -145,7 +145,7 @@ EOF
 }
 
 
-resource "azurerm_virtual_network_gateway" "vpnGw1" {
+resource "azurerm_virtual_network_gateway" "VpnGw1" {
   name                = "test"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -203,7 +203,7 @@ EOF
 }
 
 
-resource "azurerm_virtual_network_gateway" "vpnGw3" {
+resource "azurerm_virtual_network_gateway" "VpnGw3" {
   name                = "test"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -260,7 +260,7 @@ EOF
   }
 }
 
-resource "azurerm_virtual_network_gateway" "vpnGw4" {
+resource "azurerm_virtual_network_gateway" "VpnGw4" {
   name                = "test"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -318,7 +318,7 @@ EOF
 }
 
 
-resource "azurerm_virtual_network_gateway" "vpnGw5" {
+resource "azurerm_virtual_network_gateway" "VpnGw5" {
   name                = "test"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
