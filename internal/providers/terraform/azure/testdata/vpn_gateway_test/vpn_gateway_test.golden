@@ -1,0 +1,44 @@
+
+ Name                                              Monthly Qty  Unit                        Monthly Cost 
+                                                                                                         
+ azurerm_public_ip.example                                                                               
+ └─ IP address (dynamic)                                   730  hours                              $2.92 
+                                                                                                         
+ azurerm_virtual_network_gateway.Basic                                                                   
+ ├─ Vpn Gateway (Basic Gateway)                            730  hours                             $26.28 
+ ├─ VPN Gateway S2S Tunnels                Monthly cost depends on usage: $0 per 1 hour per tunnel       
+ └─ VPN Gateway P2P Tunnels                Monthly cost depends on usage: $0 per 1 hour per connection   
+                                                                                                         
+ azurerm_virtual_network_gateway.VpnGw1AZ                                                                
+ ├─ Vpn Gateway (VpnGw1AZ)                                 730  hours                            $263.53 
+ ├─ VPN Gateway S2S Tunnels                Monthly cost depends on usage: $0 per 1 hour per tunnel       
+ └─ VPN Gateway P2P Tunnels                Monthly cost depends on usage: $0 per 1 hour per connection   
+                                                                                                         
+ azurerm_virtual_network_gateway.vpnGw1                                                                  
+ ├─ Vpn Gateway (VpnGw1)                                   730  hours                            $138.70 
+ ├─ VPN Gateway S2S Tunnels                Monthly cost depends on usage: $0 per 1 hour per tunnel       
+ └─ VPN Gateway P2P Tunnels                Monthly cost depends on usage: $0 per 1 hour per connection   
+                                                                                                         
+ azurerm_virtual_network_gateway.vpnGw2                                                                  
+ ├─ Vpn Gateway (VpnGw2)                                   730  hours                            $411.72 
+ ├─ VPN Gateway S2S Tunnels                Monthly cost depends on usage: $0 per 1 hour per tunnel       
+ └─ VPN Gateway P2P Tunnels                Monthly cost depends on usage: $0 per 1 hour per connection   
+                                                                                                         
+ azurerm_virtual_network_gateway.vpnGw3                                                                  
+ ├─ Vpn Gateway (VpnGw3)                                   730  hours                            $912.50 
+ ├─ VPN Gateway S2S Tunnels                Monthly cost depends on usage: $0 per 1 hour per tunnel       
+ └─ VPN Gateway P2P Tunnels                Monthly cost depends on usage: $0 per 1 hour per connection   
+                                                                                                         
+ azurerm_virtual_network_gateway.vpnGw4                                                                  
+ ├─ Vpn Gateway (VpnGw4)                                   730  hours                          $1,533.00 
+ ├─ VPN Gateway S2S Tunnels                Monthly cost depends on usage: $0 per 1 hour per tunnel       
+ └─ VPN Gateway P2P Tunnels                Monthly cost depends on usage: $0 per 1 hour per connection   
+                                                                                                         
+ azurerm_virtual_network_gateway.vpnGw5                                                                  
+ ├─ Vpn Gateway (VpnGw5)                                   730  hours                          $2,664.50 
+ ├─ VPN Gateway S2S Tunnels                Monthly cost depends on usage: $0 per 1 hour per tunnel       
+ └─ VPN Gateway P2P Tunnels                Monthly cost depends on usage: $0 per 1 hour per connection   
+                                                                                                         
+ OVERALL TOTAL                                                                                 $5,953.15 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
