@@ -18,7 +18,7 @@ func GetAzureRMVpnGatewayRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var tunnel, connection, data_transfers *decimal.Decimal
+	var tunnel, connection, dataTransfers *decimal.Decimal
 	sku := "Basic"
 	region := lookupRegion(d, []string{})
 	zone := regionToZone(region)
@@ -69,13 +69,13 @@ func NewAzureRMVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		costComponents = append(costComponents, vpnGatewayP2P(region, sku, connection))
 	}
 
-	if u != nil && u.Get("data_transfers").Type != gjson.Null {
-		data_transfers = decimalPtr(decimal.NewFromInt(u.Get("data_transfers").Int()))
-		if data_transfers != nil {
-			costComponents = append(costComponents, vpnGatewayDataTransfers(zone, sku, data_transfers))
+	if u != nil && u.Get("dataTransfers").Type != gjson.Null {
+		dataTransfers = decimalPtr(decimal.NewFromInt(u.Get("dataTransfers").Int()))
+		if dataTransfers != nil {
+			costComponents = append(costComponents, vpnGatewayDataTransfers(zone, sku, dataTransfers))
 		}
 	} else {
-		costComponents = append(costComponents, vpnGatewayDataTransfers(zone, sku, data_transfers))
+		costComponents = append(costComponents, vpnGatewayDataTransfers(zone, sku, dataTransfers))
 	}
 
 	return &schema.Resource{
@@ -148,12 +148,12 @@ func vpnGatewayP2P(region, sku string, connection *decimal.Decimal) *schema.Cost
 	}
 }
 
-func vpnGatewayDataTransfers(zone, sku string, data_transfers *decimal.Decimal) *schema.CostComponent {
+func vpnGatewayDataTransfers(zone, sku string, dataTransfers *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "VPN Gateway Data Tranfers",
 		Unit:           "GB",
 		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: data_transfers,
+		HourlyQuantity: dataTransfers,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
 			Region:     strPtr(zone),
