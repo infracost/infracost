@@ -41,7 +41,6 @@ func NewAzureRMVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 			tunnelLimits := []int{10, 30}
 			tunnelValues := usage.CalculateTierBuckets(*tunnel, tunnelLimits)
 			if tunnelValues[1].GreaterThan(decimal.Zero) {
-				fmt.Println(&tunnelValues[1])
 				costComponents = append(costComponents, vpnGatewayS2S(region, sku, &tunnelValues[1]))
 			}
 		}
