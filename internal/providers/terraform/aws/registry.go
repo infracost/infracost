@@ -92,7 +92,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 }
 
 // FreeResources grouped alphabetically
-var FreeResources []string = []string{
+var FreeResources = []string{
 	// AWS Certificate Manager
 	"aws_acm_certificate_validation",
 
@@ -432,6 +432,6 @@ var FreeResources []string = []string{
 	"aws_waf_rule_group",
 }
 
-var UsageOnlyResources []string = []string{
+var UsageOnlyResources = []string{
 	"aws_data_transfer",
 }

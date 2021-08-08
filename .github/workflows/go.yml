@@ -19,10 +19,10 @@ jobs:
           go-version: 1.16
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v2.3.0
+        uses: golangci/golangci-lint-action@v2.5.2
         with:
           # Required: the version of golangci-lint is required and must be specified without patch version: they always use the latest patch version.
-          version: v1.31
+          version: v1.41
 
       - name: Test (unit and shared integration)
         run: make test_shared_int

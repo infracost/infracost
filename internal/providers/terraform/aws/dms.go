@@ -60,7 +60,7 @@ func storageCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	}
 
 	baseStorageSize := d.Get("allocated_storage").Int()
-	var freeStorageSize int64 = 0
+	var freeStorageSize int64
 	switch instanceFamily {
 	case "c4":
 		freeStorageSize = 100
@@ -73,7 +73,7 @@ func storageCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	case "t3":
 		freeStorageSize = 50
 	}
-	var storageSize int64 = 0
+	var storageSize int64
 	if baseStorageSize > freeStorageSize {
 		storageSize = baseStorageSize - freeStorageSize
 	}
