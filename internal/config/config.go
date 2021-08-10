@@ -57,7 +57,7 @@ func DefaultConfig() *Config {
 		NoColor:  false,
 
 		DefaultPricingAPIEndpoint: "https://pricing.api.infracost.io",
-		PricingAPIEndpoint:        "https://pricing.api.infracost.io",
+		PricingAPIEndpoint:        "",
 		DashboardAPIEndpoint:      "https://dashboard.api.infracost.io",
 
 		Projects: []*Project{{}},
@@ -97,7 +97,7 @@ func (c *Config) LoadFromEnv() error {
 
 	err = loadCredentials(c)
 	if err != nil {
-		logrus.Fatal(err)
+		return err
 	}
 
 	return nil

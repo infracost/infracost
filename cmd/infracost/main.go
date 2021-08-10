@@ -83,6 +83,7 @@ func main() {
 	rootCmd.PersistentFlags().String("log-level", "", "Log level (trace, debug, info, warn, error, fatal)")
 
 	rootCmd.AddCommand(registerCmd(ctx))
+	rootCmd.AddCommand(configureCmd(ctx))
 	rootCmd.AddCommand(diffCmd(ctx))
 	rootCmd.AddCommand(breakdownCmd(ctx))
 	rootCmd.AddCommand(outputCmd(ctx))
@@ -206,10 +207,6 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 		if err != nil {
 			return err
 		}
-	}
-
-	if cmd.Flags().Changed("pricing-api-endpoint") {
-		ctx.Config.PricingAPIEndpoint, _ = cmd.Flags().GetString("pricing-api-endpoint")
 	}
 
 	ctx.SetContextValue("isDefaultPricingAPIEndpoint", ctx.Config.PricingAPIEndpoint == ctx.Config.DefaultPricingAPIEndpoint)
