@@ -148,15 +148,16 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	var err error
 
-	c := apiclient.NewDashboardAPIClient(runCtx)
-	r.RunID, err = c.AddRun(runCtx, projectContexts, r)
+	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
+	r.RunID, err = dashboardClient.AddRun(runCtx, projectContexts, r)
 	if err != nil {
 		log.Errorf("Error reporting run: %s", err)
 	}
 
 	env := buildRunEnv(runCtx, projectContexts, r)
 
-	err = c.AddEvent("infracost-run", env)
+	pricingClient := apiclient.NewPricingAPIClient(runCtx.Config)
+	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
 		log.Errorf("Error reporting event: %s", err)
 	}
