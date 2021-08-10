@@ -4,17 +4,13 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 
 	"github.com/mitchellh/go-homedir"
 )
 
-func IsTruthy(s string) bool {
-	return s == "1" || strings.EqualFold(s, "true")
-}
-
-func IsFalsy(s string) bool {
-	return s == "0" || strings.EqualFold(s, "false")
+func IsEnvPresent(s string) bool {
+	_, present := os.LookupEnv(s)
+	return present
 }
 
 func RootDir() string {
