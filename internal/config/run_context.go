@@ -110,11 +110,11 @@ func baseVersion(v string) string {
 }
 
 func ciScript() string {
-	if IsTruthy(os.Getenv("INFRACOST_CI_DIFF")) {
+	if IsEnvPresent("INFRACOST_CI_DIFF") {
 		return "ci-diff"
-	} else if IsTruthy(os.Getenv("INFRACOST_CI_ATLANTIS_DIFF")) {
+	} else if IsEnvPresent("INFRACOST_CI_ATLANTIS_DIFF") {
 		return "ci-atlantis-diff"
-	} else if IsTruthy(os.Getenv("INFRACOST_CI_JENKINS_DIFF")) {
+	} else if IsEnvPresent("INFRACOST_CI_JENKINS_DIFF") {
 		return "ci-jenkins-diff"
 	}
 
@@ -122,18 +122,24 @@ func ciScript() string {
 }
 
 func ciPlatform() string {
-	if IsTruthy(os.Getenv("GITHUB_ACTIONS")) {
+	if IsEnvPresent("GITHUB_ACTIONS") {
 		return "github_actions"
-	} else if IsTruthy(os.Getenv("GITLAB_CI")) {
+	} else if IsEnvPresent("GITLAB_CI") {
 		return "gitlab_ci"
-	} else if IsTruthy(os.Getenv("CIRCLECI")) {
+	} else if IsEnvPresent("CIRCLECI") {
 		return "circleci"
-	} else if IsTruthy(os.Getenv("JENKINS_HOME")) {
+	} else if IsEnvPresent("JENKINS_HOME") {
 		return "jenkins"
-	} else if IsTruthy(os.Getenv("BUILDKITE")) {
+	} else if IsEnvPresent("BUILDKITE") {
 		return "buildkite"
-	} else if IsTruthy(os.Getenv("SYSTEM_COLLECTIONURI")) {
+	} else if IsEnvPresent("SYSTEM_COLLECTIONURI") {
 		return fmt.Sprintf("azure_devops_%s", os.Getenv("BUILD_REPOSITORY_PROVIDER"))
+	} else if IsEnvPresent("TFC_RUN_ID") {
+		return "tfc"
+	} else if IsEnvPresent("ENV0_ENVIRONMENT_ID") {
+		return "env0"
+	} else if IsEnvPresent("SCALR_RUN_ID") {
+		return "scalr"
 	} else {
 		envKeys := os.Environ()
 		sort.Strings(envKeys)
@@ -144,9 +150,13 @@ func ciPlatform() string {
 				return "bitbucket"
 			} else if strings.HasPrefix(k, "CONCOURSE_") {
 				return "concourse"
+			} else if strings.HasPrefix(k, "SPACELIFT_") {
+				return "spacelift"
+			} else if strings.HasPrefix(k, "HARNESS_") {
+				return "harness"
 			}
 		}
-		if IsTruthy(os.Getenv("CI")) {
+		if IsEnvPresent("CI") {
 			return "ci"
 		}
 	}

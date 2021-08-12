@@ -31,6 +31,16 @@ func NewPricingAPIClient(cfg *config.Config) *PricingAPIClient {
 	}
 }
 
+func (c *PricingAPIClient) AddEvent(name string, env map[string]interface{}) error {
+	d := map[string]interface{}{
+		"event": name,
+		"env":   env,
+	}
+
+	_, err := c.doRequest("POST", "/event", d)
+	return err
+}
+
 func (c *PricingAPIClient) RunQueries(r *schema.Resource) ([]PriceQueryResult, error) {
 	keys, queries := c.batchQueries(r)
 
