@@ -301,7 +301,7 @@ Instead of directly querying the GraphQL, you can also run `distinct` or `regex`
 
 1. Follow the [Docker compose](https://github.com/infracost/cloud-pricing-api#docker-compose) or [dev setup](https://github.com/infracost/cloud-pricing-api/blob/master/CONTRIBUTING.md#development) instructions to setup and populate your Cloud Pricing API. Docker compose is quicker to setup.
 2. Connect to the Postgres DB:
-  ```sh
+  	```sh
 	# only needed for docker-compose:  docker exec -it cloud-pricing-api_postgres_1 bash
 	psql
 	use cloud_pricing;
@@ -345,8 +345,11 @@ Instead of directly querying the GraphQL, you can also run `distinct` or `regex`
 	AND "region" = 'us-east1'
 	AND "attributes" ->> 'description' = 'Active HSM ECDSA P-256 key versions';
  
-	-- Find a unique price for a product using a price filter (this requires a subquery because of the way prices are stored):
-	SELECT "vendorName", "service", "productFamily", "region", "productHash", "sku", jsonb_pretty(attributes), jsonb_pretty(single_price) FROM
+	-- Find a unique price for a product using a price filter (this requires 
+	-- a subquery because of the way prices are stored):
+	SELECT "vendorName", "service", "productFamily", "region", "productHash", 
+	       "sku", jsonb_pretty(attributes), jsonb_pretty(single_price) 
+	FROM
 	(SELECT *, jsonb_array_elements((jsonb_each("prices")).value) single_price FROM products 
 	 WHERE "vendorName" = 'gcp' 
 	 AND service = 'Cloud Key Management Service (KMS)' 

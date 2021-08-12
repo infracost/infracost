@@ -13,8 +13,7 @@ import (
 
 type DashboardAPIClient struct {
 	APIClient
-	telemetryDisabled bool
-	dashboardEnabled  bool
+	dashboardEnabled bool
 }
 
 type CreateAPIKeyResponse struct {
@@ -44,8 +43,7 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 			endpoint: ctx.Config.DashboardAPIEndpoint,
 			apiKey:   ctx.Config.APIKey,
 		},
-		telemetryDisabled: ctx.Config.IsTelemetryDisabled(),
-		dashboardEnabled:  ctx.Config.EnableDashboard,
+		dashboardEnabled: ctx.Config.EnableDashboard,
 	}
 }
 
@@ -63,21 +61,6 @@ func (c *DashboardAPIClient) CreateAPIKey(name string, email string) (CreateAPIK
 	}
 
 	return r, nil
-}
-
-func (c *DashboardAPIClient) AddEvent(name string, env map[string]interface{}) error {
-	if c.telemetryDisabled {
-		log.Debug("Skipping telemetry for self-hosted Infracost")
-		return nil
-	}
-
-	d := map[string]interface{}{
-		"event": name,
-		"env":   env,
-	}
-
-	_, err := c.doRequest("POST", "/event", d)
-	return err
 }
 
 func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*config.ProjectContext, out output.Root) (string, error) {
