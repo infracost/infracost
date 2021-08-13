@@ -87,7 +87,7 @@ func vpnGateway(region, sku, meterName string) *schema.CostComponent {
 
 func vpnGatewayP2S(region, sku string, connection *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           "VPN gateway P2S tunnels",
+		Name:           "VPN gateway P2S tunnels (over 128)",
 		Unit:           "tunnel",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: connection,
