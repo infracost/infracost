@@ -18,7 +18,7 @@ func GetAzureRMVpnGatewayRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var tunnel, connection, dataTransfers *decimal.Decimal
+	var connection, dataTransfers *decimal.Decimal
 	sku := "Basic"
 	region := lookupRegion(d, []string{})
 	zone := regionToZone(region)
@@ -37,25 +37,11 @@ func NewAzureRMVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 
 	costComponents = append(costComponents, vpnGateway(region, sku, meterName))
 
-	if u != nil && u.Get("s2s_tunnel").Type != gjson.Null {
-		tunnel = decimalPtr(decimal.NewFromInt(u.Get("s2s_tunnel").Int()))
-		if tunnel != nil {
-			tunnelLimits := []int{10}
-			tunnelValues := usage.CalculateTierBuckets(*tunnel, tunnelLimits)
-			if tunnelValues[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, vpnGatewayS2S(region, sku, &tunnelValues[1]))
-			}
-		}
-	} else {
-		costComponents = append(costComponents, vpnGatewayS2S(region, sku, tunnel))
-	}
-
 	if u != nil && u.Get("p2s_connection").Type != gjson.Null {
 		connection = decimalPtr(decimal.NewFromInt(u.Get("p2s_connection").Int()))
 		if connection != nil {
 			connectionLimits := []int{128}
 			connectionValues := usage.CalculateTierBuckets(*connection, connectionLimits)
-			fmt.Println("connectionValues", connectionValues)
 			if connectionValues[1].GreaterThan(decimal.Zero) {
 				costComponents = append(costComponents, vpnGatewayP2S(region, sku, &connectionValues[1]))
 			}
@@ -90,29 +76,7 @@ func vpnGateway(region, sku, meterName string) *schema.CostComponent {
 			Region:     strPtr(region),
 			Service:    strPtr("VPN Gateway"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", ValueRegex: strPtr(sku)},
-			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("Consumption"),
-		},
-	}
-}
-
-func vpnGatewayS2S(region, sku string, tunnel *decimal.Decimal) *schema.CostComponent {
-
-	return &schema.CostComponent{
-		Name:           "VPN gateway S2S tunnels",
-		Unit:           "tunnel",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: tunnel,
-		ProductFilter: &schema.ProductFilter{
-			VendorName: strPtr("azure"),
-			Region:     strPtr(region),
-			Service:    strPtr("VPN Gateway"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", ValueRegex: strPtr(sku)},
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", "S2S Connection"))},
+				{Key: "meterName", Value: strPtr(sku)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -132,7 +96,7 @@ func vpnGatewayP2S(region, sku string, connection *decimal.Decimal) *schema.Cost
 			Region:     strPtr(region),
 			Service:    strPtr("VPN Gateway"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", ValueRegex: strPtr(sku)},
+				{Key: "skuName", Value: strPtr(sku)},
 				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", "P2S Connection"))},
 			},
 		},
