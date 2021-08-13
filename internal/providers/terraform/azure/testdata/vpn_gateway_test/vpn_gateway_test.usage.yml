@@ -2,13 +2,17 @@ version: 0.1
 resource_usage:
   azurerm_virtual_network_gateway.Basic:
     s2s_tunnel: 10 # Total number of s2s tunnels.
-    p2p_connection: 150 # Total number of p2p tunnels.
-    data_transfers: 1 # Monthly data transfers.
+    p2s_connection: 150 # Total number of p2s tunnels.
+    monthly_data_transfer_gb: 1 # Monthly data transfer in GB.
 
   azurerm_virtual_network_gateway.VpnGw2:
     s2s_tunnel: 12 # Total number of s2s tunnels.
-    p2p_connection: 150 # Total number of p2p tunnels.
+    p2s_connection: 150 # Total number of p2s tunnels.
+
+  azurerm_virtual_network_gateway.VpnGw5:
+    s2s_tunnel: 12 # Total number of s2s tunnels.
+    p2s_connection: 6000 # Total number of p2s tunnels.
 
   azurerm_virtual_network_gateway.VpnGw1AZ:
     s2s_tunnel: 14 # Total number of s2s tunnels.
-    p2p_connection: 150 # Total number of p2p tunnels.
+    p2s_connection: 150 # Total number of p2s tunnels.
