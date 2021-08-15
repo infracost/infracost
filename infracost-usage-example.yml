@@ -874,3 +874,7 @@ resource_usage:
 
   azurerm_notification_hub_namespace.my_namespace:
     monthly_pushes: 1000000 # Monthly total number number of additional pushes.
+
+  azurerm_virtual_network_gateway.Basic:
+    p2s_connection: 150 # Total number of p2s tunnels.
+    monthly_data_transfer_gb: 1 # Monthly data transfer in GB.
