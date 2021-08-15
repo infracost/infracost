@@ -83,6 +83,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
 	GetAzureRMVpnGatewayRegistryItem(),
+	GetAzureRMVpnGatewayConnectionRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
 }

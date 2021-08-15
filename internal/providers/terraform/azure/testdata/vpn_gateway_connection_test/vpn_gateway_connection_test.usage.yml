@@ -1,0 +1,13 @@
+version: 0.1
+resource_usage:
+  azurerm_virtual_network_gateway_connection.Basic:
+    s2s_tunnel: 11 # Total number of s2s tunnels.
+
+  azurerm_virtual_network_gateway_connection.VpnGw2:
+    s2s_tunnel: 12 # Total number of s2s tunnels.
+
+  azurerm_virtual_network_gateway_connection.VpnGw5:
+    s2s_tunnel: 20 # Total number of s2s tunnels.
+
+  azurerm_virtual_network_gateway_connection.VpnGw1AZ:
+    s2s_tunnel: 15 # Total number of s2s tunnels.
