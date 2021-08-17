@@ -5,6 +5,7 @@ import "github.com/infracost/infracost/internal/schema"
 // ResourceRegistry grouped alphabetically
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMActiveDirectoryDomainServiceRegistryItem(),
+	GetAzureRMActiveDirectoryDomainServiceReplicaSetRegistryItem(),
 	GetAzureRMApiManagementRegistryItem(),
 	GetAzureRMApplicationGatewayRegistryItem(),
 	GetAzureRMAppIsolatedServicePlanRegistryItem(),

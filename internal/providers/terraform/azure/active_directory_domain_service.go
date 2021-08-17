@@ -16,6 +16,15 @@ func GetAzureRMActiveDirectoryDomainServiceRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMActiveDirectoryDomainService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
+	costComponents := activeDirectoryDomainServiceCostComponents("Active directory domain service", region, d)
+
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: costComponents,
+	}
+}
+
+func activeDirectoryDomainServiceCostComponents(name, region string, d *schema.ResourceData) []*schema.CostComponent {
 	productType := "Standard"
 
 	if d.Get("sku").Type != gjson.Null {
@@ -24,7 +33,7 @@ func NewAzureRMActiveDirectoryDomainService(d *schema.ResourceData, u *schema.Us
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Active directory domain service (%s)", productType),
+			Name:           fmt.Sprintf("%s (%s)", name, productType),
 			Unit:           "hours",
 			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -43,9 +52,5 @@ func NewAzureRMActiveDirectoryDomainService(d *schema.ResourceData, u *schema.Us
 			},
 		},
 	}
-
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
-	}
+	return costComponents
 }
