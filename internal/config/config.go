@@ -24,7 +24,8 @@ type Project struct {
 }
 
 type Config struct {
-	Credentials Credentials
+	Credentials   Credentials
+	Configuration Configuration
 
 	Version         string `yaml:"version,omitempty" ignored:"true"`
 	LogLevel        string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
@@ -36,6 +37,8 @@ type Config struct {
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
+
+	Currency string `envconfig:"INFRACOST_CURRENCY"`
 
 	Projects      []*Project `yaml:"projects" ignored:"true"`
 	Format        string     `yaml:"format,omitempty" ignored:"true"`
@@ -96,6 +99,11 @@ func (c *Config) LoadFromEnv() error {
 	}
 
 	err = loadCredentials(c)
+	if err != nil {
+		return err
+	}
+
+	err = loadConfiguration(c)
 	if err != nil {
 		return err
 	}
