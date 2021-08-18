@@ -1,33 +1,20 @@
 package aws
 
 import (
+	infracost "github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
 
 type NATGatewayArguments struct {
-	Address *string `json:"address,omitempty"`
+	Address *string `json:"address,omitempty" infracost_usage:"address,nat_gateway,The name of gateway,infracost"`
 	Region  *string `json:"region,omitempty" infracost_usage:"region,us-east1,Region where gateway is located,infracost"`
 
-	MonthlyDataProcessedGB *float64 `json:"monthlyDataProcessedGB,omitempty" infracost_usage:"monthly_data_processed_gb,0,Monthly data processed by the NAT Gateway in GB,infracost,terraform"`
+	MonthlyDataProcessedGB *float64 `json:"monthlyDataProcessedGB,omitempty" infracost_usage:"monthly_data_processed_gb,12,Monthly data processed by the NAT Gateway in GB,infracost,terraform"`
 }
 
 func (args *NATGatewayArguments) PopulateArgs(u *schema.UsageData) {
-	address := strPtr("nat_gateway") // TODO: Better default value?
-	region := strPtr("")             // TODO: FIXME: A default value?
-	monthlyDataProcessedGB := floatPtr(0.0)
-	if u != nil {
-		if u.Get("region").Exists() {
-			usageRegion := u.Get("region").String()
-			region = &usageRegion
-		}
-		if u.Get("monthly_data_processed_gb").Exists() {
-			monthlyDataProcessedGB = u.GetFloat("monthly_data_processed_gb")
-		}
-	}
-	args.Address = address
-	args.Region = region
-	args.MonthlyDataProcessedGB = monthlyDataProcessedGB
+	infracost.PopulateDefaultArgsAndUsage(args, u)
 }
 
 var NATGatewayUsageSchema = []*schema.UsageSchemaItem{
