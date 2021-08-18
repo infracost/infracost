@@ -46,7 +46,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 				hasNilCosts = true
 			}
 
-			s += resourceToDiff(diffResource, oldResource, newResource, true)
+			s += resourceToDiff(out.Currency, diffResource, oldResource, newResource, true)
 			s += "\n"
 		}
 
@@ -63,8 +63,8 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		s += fmt.Sprintf("%s %s\nAmount:  %s %s",
 			ui.BoldString("Monthly cost change for"),
 			ui.BoldString(project.Label(opts.DashboardEnabled)),
-			formatCostChange(project.Diff.TotalMonthlyCost),
-			ui.FaintStringf("(%s -> %s)", formatCost(oldCost), formatCost(newCost)),
+			formatCostChange(out.Currency, project.Diff.TotalMonthlyCost),
+			ui.FaintStringf("(%s -> %s)", formatCost(out.Currency, oldCost), formatCost(out.Currency, newCost)),
 		)
 
 		percent := formatPercentChange(oldCost, newCost)
@@ -105,7 +105,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	return []byte(s), nil
 }
 
-func resourceToDiff(diffResource Resource, oldResource *Resource, newResource *Resource, isTopLevel bool) string {
+func resourceToDiff(currency string, diffResource Resource, oldResource *Resource, newResource *Resource, isTopLevel bool) string {
 	s := ""
 
 	op := UPDATED
@@ -137,8 +137,8 @@ func resourceToDiff(diffResource Resource, oldResource *Resource, newResource *R
 			s += "  Monthly cost depends on usage\n"
 		} else {
 			s += fmt.Sprintf("  %s%s\n",
-				formatCostChange(diffResource.MonthlyCost),
-				ui.FaintString(formatCostChangeDetails(oldCost, newCost)),
+				formatCostChange(currency, diffResource.MonthlyCost),
+				ui.FaintString(formatCostChangeDetails(currency, oldCost, newCost)),
 			)
 		}
 	}
@@ -155,7 +155,7 @@ func resourceToDiff(diffResource Resource, oldResource *Resource, newResource *R
 		}
 
 		s += "\n"
-		s += ui.Indent(costComponentToDiff(diffComponent, oldComponent, newComponent), "    ")
+		s += ui.Indent(costComponentToDiff(currency, diffComponent, oldComponent, newComponent), "    ")
 	}
 
 	for _, diffSubResource := range diffResource.SubResources {
@@ -170,13 +170,13 @@ func resourceToDiff(diffResource Resource, oldResource *Resource, newResource *R
 		}
 
 		s += "\n"
-		s += ui.Indent(resourceToDiff(diffSubResource, oldSubResource, newSubResource, false), "    ")
+		s += ui.Indent(resourceToDiff(currency, diffSubResource, oldSubResource, newSubResource, false), "    ")
 	}
 
 	return s
 }
 
-func costComponentToDiff(diffComponent CostComponent, oldComponent *CostComponent, newComponent *CostComponent) string {
+func costComponentToDiff(currency string, diffComponent CostComponent, oldComponent *CostComponent, newComponent *CostComponent) string {
 	s := ""
 
 	op := UPDATED
@@ -203,14 +203,14 @@ func costComponentToDiff(diffComponent CostComponent, oldComponent *CostComponen
 	if oldCost == nil && newCost == nil {
 		s += "  Monthly cost depends on usage\n"
 		s += fmt.Sprintf("    %s per %s%s\n",
-			formatPriceChange(diffComponent.Price),
+			formatPriceChange(currency, diffComponent.Price),
 			diffComponent.Unit,
-			formatPriceChangeDetails(oldPrice, newPrice),
+			formatPriceChangeDetails(currency, oldPrice, newPrice),
 		)
 	} else {
 		s += fmt.Sprintf("  %s%s\n",
-			formatCostChange(diffComponent.MonthlyCost),
-			ui.FaintString(formatCostChangeDetails(oldCost, newCost)),
+			formatCostChange(currency, diffComponent.MonthlyCost),
+			ui.FaintString(formatCostChangeDetails(currency, oldCost, newCost)),
 		)
 	}
 
@@ -248,34 +248,34 @@ func findCostComponentByName(costComponents []CostComponent, name string) *CostC
 	return nil
 }
 
-func formatCostChange(d *decimal.Decimal) string {
+func formatCostChange(currency string, d *decimal.Decimal) string {
 	if d == nil {
 		return ""
 	}
 
 	abs := d.Abs()
-	return fmt.Sprintf("%s%s", getSym(*d), formatCost(&abs))
+	return fmt.Sprintf("%s%s", getSym(*d), formatCost(currency, &abs))
 }
 
-func formatCostChangeDetails(oldCost *decimal.Decimal, newCost *decimal.Decimal) string {
+func formatCostChangeDetails(currency string, oldCost *decimal.Decimal, newCost *decimal.Decimal) string {
 	if oldCost == nil || newCost == nil {
 		return ""
 	}
 
-	return fmt.Sprintf(" (%s -> %s)", formatCost(oldCost), formatCost(newCost))
+	return fmt.Sprintf(" (%s -> %s)", formatCost(currency, oldCost), formatCost(currency, newCost))
 }
 
-func formatPriceChange(d decimal.Decimal) string {
+func formatPriceChange(currency string, d decimal.Decimal) string {
 	abs := d.Abs()
-	return fmt.Sprintf("%s%s", getSym(d), formatPrice(abs))
+	return fmt.Sprintf("%s%s", getSym(d), formatPrice(currency, abs))
 }
 
-func formatPriceChangeDetails(oldPrice *decimal.Decimal, newPrice *decimal.Decimal) string {
+func formatPriceChangeDetails(currency string, oldPrice *decimal.Decimal, newPrice *decimal.Decimal) string {
 	if oldPrice == nil || newPrice == nil {
 		return ""
 	}
 
-	return fmt.Sprintf(" (%s -> %s)", formatPrice(*oldPrice), formatPrice(*newPrice))
+	return fmt.Sprintf(" (%s -> %s)", formatPrice(currency, *oldPrice), formatPrice(currency, *newPrice))
 }
 
 func formatPercentChange(oldCost *decimal.Decimal, newCost *decimal.Decimal) string {

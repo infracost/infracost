@@ -199,6 +199,7 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 	require.NoError(t, err)
 
 	r := output.ToOutputFormat([]*schema.Project{project})
+	r.Currency = "USD"
 
 	opts := output.Options{
 		ShowSkipped: true,

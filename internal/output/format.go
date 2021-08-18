@@ -15,7 +15,7 @@ func formatQuantity(q *decimal.Decimal) string {
 	return humanize.CommafWithDigits(f, 4)
 }
 
-func formatCost(d *decimal.Decimal) string {
+func formatCost(currency string, d *decimal.Decimal) string {
 	if d == nil {
 		return "-"
 	}
@@ -27,10 +27,13 @@ func formatCost(d *decimal.Decimal) string {
 		s = humanize.FormatFloat("#,###.", f)
 	}
 
+	if currency != "USD" {
+		return "$" + s + currency
+	}
 	return "$" + s
 }
 
-func formatCost2DP(d *decimal.Decimal) string {
+func formatCost2DP(currency string, d *decimal.Decimal) string {
 	if d == nil {
 		return "-"
 	}
@@ -38,10 +41,14 @@ func formatCost2DP(d *decimal.Decimal) string {
 	f, _ := d.Float64()
 
 	s := humanize.FormatFloat("#,###.##", f)
+
+	if currency != "USD" {
+		return "$" + s + currency
+	}
 	return "$" + s
 }
 
-func formatPrice(d decimal.Decimal) string {
+func formatPrice(currency string, d decimal.Decimal) string {
 	if d.LessThan(decimal.NewFromFloat(0.1)) {
 		return "$" + d.String()
 	}
@@ -49,5 +56,9 @@ func formatPrice(d decimal.Decimal) string {
 	f, _ := d.Float64()
 
 	s := humanize.FormatFloat("#,###.##", f)
+
+	if currency != "USD" {
+		return "$" + s + currency
+	}
 	return "$" + s
 }

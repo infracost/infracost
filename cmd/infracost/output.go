@@ -100,7 +100,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
-			combined := output.Combine(inputs, opts)
+			combined := output.Combine(ctx.Config.Currency, inputs, opts)
 
 			var (
 				b   []byte

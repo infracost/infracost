@@ -38,7 +38,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 			hasNilCosts = true
 		}
 
-		tableOut := tableForBreakdown(*project.Breakdown, opts.Fields, includeProjectTotals)
+		tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
 
 		// Get the last table length so we can align the overall total with it
 		if i == len(out.Projects)-1 {
@@ -58,7 +58,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		s += "\n"
 	}
 
-	totalOut := formatCost2DP(out.TotalMonthlyCost)
+	totalOut := formatCost2DP(out.Currency, out.TotalMonthlyCost)
 
 	s += fmt.Sprintf("%s%s",
 		ui.BoldString(" OVERALL TOTAL"),
@@ -88,7 +88,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 	return []byte(s), nil
 }
 
-func tableForBreakdown(breakdown Breakdown, fields []string, includeTotal bool) string {
+func tableForBreakdown(currency string, breakdown Breakdown, fields []string, includeTotal bool) string {
 	t := table.NewWriter()
 	t.Style().Options.DrawBorder = false
 	t.Style().Options.SeparateColumns = false
@@ -165,8 +165,8 @@ func tableForBreakdown(breakdown Breakdown, fields []string, includeTotal bool) 
 	for _, r := range breakdown.Resources {
 		t.AppendRow(table.Row{ui.BoldString(r.Name)})
 
-		buildCostComponentRows(t, r.CostComponents, "", len(r.SubResources) > 0, fields)
-		buildSubResourceRows(t, r.SubResources, "", fields)
+		buildCostComponentRows(t, currency, r.CostComponents, "", len(r.SubResources) > 0, fields)
+		buildSubResourceRows(t, currency, r.SubResources, "", fields)
 
 		t.AppendRow(table.Row{""})
 	}
@@ -178,14 +178,14 @@ func tableForBreakdown(breakdown Breakdown, fields []string, includeTotal bool) 
 		for q := 0; q < numOfFields; q++ {
 			totalCostRow = append(totalCostRow, "")
 		}
-		totalCostRow = append(totalCostRow, formatCost2DP(breakdown.TotalMonthlyCost))
+		totalCostRow = append(totalCostRow, formatCost2DP(currency, breakdown.TotalMonthlyCost))
 		t.AppendRow(totalCostRow)
 	}
 
 	return t.Render()
 }
 
-func buildSubResourceRows(t table.Writer, subresources []Resource, prefix string, fields []string) {
+func buildSubResourceRows(t table.Writer, currency string, subresources []Resource, prefix string, fields []string) {
 	for i, r := range subresources {
 		labelPrefix := prefix + "├─"
 		nextPrefix := prefix + "│  "
@@ -196,12 +196,12 @@ func buildSubResourceRows(t table.Writer, subresources []Resource, prefix string
 
 		t.AppendRow(table.Row{fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), r.Name)})
 
-		buildCostComponentRows(t, r.CostComponents, nextPrefix, len(r.SubResources) > 0, fields)
-		buildSubResourceRows(t, r.SubResources, nextPrefix, fields)
+		buildCostComponentRows(t, currency, r.CostComponents, nextPrefix, len(r.SubResources) > 0, fields)
+		buildSubResourceRows(t, currency, r.SubResources, nextPrefix, fields)
 	}
 }
 
-func buildCostComponentRows(t table.Writer, costComponents []CostComponent, prefix string, hasSubResources bool, fields []string) {
+func buildCostComponentRows(t table.Writer, currency string, costComponents []CostComponent, prefix string, hasSubResources bool, fields []string) {
 	for i, c := range costComponents {
 		labelPrefix := prefix + "├─"
 		if !hasSubResources && i == len(costComponents)-1 {
@@ -212,7 +212,7 @@ func buildCostComponentRows(t table.Writer, costComponents []CostComponent, pref
 
 		if c.MonthlyCost == nil {
 			price := fmt.Sprintf("Monthly cost depends on usage: %s per %s",
-				formatPrice(c.Price),
+				formatPrice(currency, c.Price),
 				c.Unit,
 			)
 
@@ -227,7 +227,7 @@ func buildCostComponentRows(t table.Writer, costComponents []CostComponent, pref
 			tableRow = append(tableRow, label)
 
 			if contains(fields, "price") {
-				tableRow = append(tableRow, formatPrice(c.Price))
+				tableRow = append(tableRow, formatPrice(currency, c.Price))
 			}
 			if contains(fields, "monthlyQuantity") {
 				tableRow = append(tableRow, formatQuantity(c.MonthlyQuantity))
@@ -236,10 +236,10 @@ func buildCostComponentRows(t table.Writer, costComponents []CostComponent, pref
 				tableRow = append(tableRow, c.Unit)
 			}
 			if contains(fields, "hourlyCost") {
-				tableRow = append(tableRow, formatCost2DP(c.HourlyCost))
+				tableRow = append(tableRow, formatCost2DP(currency, c.HourlyCost))
 			}
 			if contains(fields, "monthlyCost") {
-				tableRow = append(tableRow, formatCost2DP(c.MonthlyCost))
+				tableRow = append(tableRow, formatCost2DP(currency, c.MonthlyCost))
 			}
 
 			t.AppendRow(tableRow)

@@ -145,6 +145,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	spinner.Success()
 
 	r := output.ToOutputFormat(projects)
+	r.Currency = runCtx.Config.Currency
 
 	var err error
 
