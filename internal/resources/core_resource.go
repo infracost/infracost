@@ -10,6 +10,7 @@ import (
 )
 
 type CoreResource interface {
+	PopulateArgs(u *schema.UsageData)
 }
 
 // PopulateDefaultArgsAndUsage tries to do two tasks.
