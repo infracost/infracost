@@ -9,7 +9,3 @@ func strPtr(s string) *string {
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
-
-func floatPtr(f float64) *float64 {
-	return &f
-}
