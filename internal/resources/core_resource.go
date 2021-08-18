@@ -2,11 +2,9 @@ package infracost
 
 import (
 	"reflect"
-	"strconv"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 type CoreResource interface {
@@ -14,7 +12,7 @@ type CoreResource interface {
 }
 
 // PopulateDefaultArgsAndUsage tries to do two tasks.
-// 1. Try to fill default values of args fields based on provided tags.
+// 1. Try to fill default values of args fields based on provided tags (commented and disabled, kept for reference and discussion).
 // 2. If the field is present in usage data, set the relevant field.
 func PopulateDefaultArgsAndUsage(args interface{}, u *schema.UsageData) {
 	ps := reflect.ValueOf(args)
@@ -47,22 +45,23 @@ func PopulateDefaultArgsAndUsage(args interface{}, u *schema.UsageData) {
 		// Key name for the usage file
 		usageKey := infracostTagSplitted[0]
 		// Default value for the arg
-		defaultUsageStr := infracostTagSplitted[1]
+		// defaultUsageStr := infracostTagSplitted[1]
 
 		// The arg is a pointer (*float64, *string, ...)
 		if f.Kind() == reflect.Ptr {
 			// It's a *float64
 			if f.Type() == reflect.TypeOf(floatPtr) {
 				// Cast the default value to the right type.
-				newValue, err := strconv.ParseFloat(defaultUsageStr, 64)
-				if err != nil {
-					ui.PrintWarningf("Invalid default value for field %v", s.Type().Field(i).Name)
-				} else {
-					// Set the default value for the tag.
-					f.Set(reflect.ValueOf(&newValue))
-				}
+				// newValue, err := strconv.ParseFloat(defaultUsageStr, 64)
+				// if err != nil {
+				// 	ui.PrintWarningf("Invalid default value for field %v", s.Type().Field(i).Name)
+				// } else {
+				// 	// Set the default value for the tag.
+				// 	f.Set(reflect.ValueOf(&newValue))
+				// }
+
 				// Check whether a value for this arg was specified in the usage data.
-				if u.Get(usageKey).Exists() {
+				if u != nil && u.Get(usageKey).Exists() {
 					// Set the value of the arg to the value specified in the usage data.
 					f.Set(reflect.ValueOf(u.GetFloat(usageKey)))
 				}
