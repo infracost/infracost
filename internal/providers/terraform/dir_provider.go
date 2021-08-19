@@ -1,9 +1,9 @@
 package terraform
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"os/exec"
@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
@@ -28,6 +29,7 @@ type DirProvider struct {
 	ctx                 *config.ProjectContext
 	Path                string
 	spinnerOpts         ui.SpinnerOptions
+	IsTerragrunt        bool
 	PlanFlags           string
 	Workspace           string
 	UseState            bool
@@ -113,32 +115,52 @@ func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.TerraformWorkspace = terraformWorkspace
 }
 
-func (p *DirProvider) LoadResources(project *schema.Project, usage map[string]*schema.UsageData) error {
-	var j []byte
+func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+	projects := make([]*schema.Project, 0)
+	var out []byte
 	var err error
 
 	if p.UseState {
-		j, err = p.generateStateJSON()
+		out, err = p.generateStateJSON()
 	} else {
-		j, err = p.generatePlanJSON()
+		out, err = p.generatePlanJSON()
 	}
 	if err != nil {
-		return err
+		return projects, err
 	}
 
-	parser := NewParser(p.ctx)
-	pastResources, resources, err := parser.parseJSON(j, usage)
-	if err != nil {
-		return errors.Wrap(err, "Error parsing Terraform JSON")
+	jsons := [][]byte{out}
+	if p.IsTerragrunt {
+		jsons = bytes.Split(out, []byte{'\n'})
+		if len(jsons) > 1 {
+			jsons = jsons[:len(jsons)-1]
+		}
 	}
 
-	project.HasDiff = !p.UseState
-	if project.HasDiff {
-		project.PastResources = pastResources
-	}
-	project.Resources = resources
+	for _, j := range jsons {
+		metadata := config.DetectProjectMetadata(p.ctx)
+		metadata.Type = p.Type()
+		p.AddMetadata(metadata)
+		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
 
-	return nil
+		project := schema.NewProject(name, metadata)
+
+		parser := NewParser(p.ctx)
+		pastResources, resources, err := parser.parseJSON(j, usage)
+		if err != nil {
+			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
+		}
+
+		project.HasDiff = !p.UseState
+		if project.HasDiff {
+			project.PastResources = pastResources
+		}
+		project.Resources = resources
+
+		projects = append(projects, project)
+	}
+
+	return projects, nil
 }
 
 func (p *DirProvider) generatePlanJSON() ([]byte, error) {
@@ -207,10 +229,10 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 	spinner := ui.NewSpinner("Running terraform plan", p.spinnerOpts)
 	var planJSON []byte
 
-	f, err := ioutil.TempFile(os.TempDir(), "tfplan")
-	if err != nil {
-		spinner.Fail()
-		return "", planJSON, errors.Wrap(err, "Error creating temporary file 'tfplan'")
+	fileName := ".tfplan-" + uuid.New().String()
+	// For Terragrunt we need a relative path
+	if !p.IsTerragrunt {
+		fileName = filepath.Join(os.TempDir(), fileName)
 	}
 
 	flags, err := shellquote.Split(p.PlanFlags)
@@ -218,9 +240,14 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 		return "", planJSON, errors.Wrap(err, "Error parsing terraform plan flags")
 	}
 
-	args := []string{"plan", "-input=false", "-lock=false", "-no-color"}
+	args := []string{}
+	if p.IsTerragrunt {
+		args = append(args, "run-all")
+	}
+
+	args = append(args, "plan", "-input=false", "-lock=false", "-no-color")
 	args = append(args, flags...)
-	_, err = Cmd(opts, append(args, fmt.Sprintf("-out=%s", f.Name()))...)
+	_, err = Cmd(opts, append(args, fmt.Sprintf("-out=%s", fileName))...)
 
 	// Check if the error requires a remote run or an init
 	if err != nil {
@@ -266,13 +293,19 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 
 	spinner.Success()
 
-	return f.Name(), planJSON, nil
+	return fileName, planJSON, nil
 }
 
 func (p *DirProvider) runInit(opts *CmdOptions) error {
 	spinner := ui.NewSpinner("Running terraform init", p.spinnerOpts)
 
-	_, err := Cmd(opts, "init", "-input=false", "-no-color")
+	args := []string{}
+	if p.IsTerragrunt {
+		args = append(args, "run-all")
+	}
+	args = append(args, "init", "-input=false", "-no-color")
+
+	_, err := Cmd(opts, args...)
 	if err != nil {
 		spinner.Fail()
 		printTerraformErr(err)
@@ -339,7 +372,12 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 func (p *DirProvider) runShow(opts *CmdOptions, planFile string) ([]byte, error) {
 	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
 
-	args := []string{"show", "-no-color", "-json"}
+	args := []string{}
+	if p.IsTerragrunt {
+		args = append(args, "run-all")
+	}
+
+	args = append(args, "show", "-no-color", "-json")
 	if planFile != "" {
 		args = append(args, planFile)
 	}

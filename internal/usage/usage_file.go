@@ -29,7 +29,7 @@ type SchemaItem struct {
 	DefaultValue interface{}
 }
 
-func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema.UsageData, usageFilePath string) error {
+func SyncUsageData(projects []*schema.Project, existingUsageData map[string]*schema.UsageData, usageFilePath string) error {
 	if usageFilePath == "" {
 		return nil
 	}
@@ -37,7 +37,14 @@ func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema
 	if err != nil {
 		return err
 	}
-	syncedResourcesUsage := syncResourcesUsage(project.Resources, usageSchema, existingUsageData)
+
+	// TODO: update this when we properly support multiple projects in usage
+	resources := make([]*schema.Resource, 0)
+	for _, project := range projects {
+		resources = append(resources, project.Resources...)
+	}
+
+	syncedResourcesUsage := syncResourcesUsage(resources, usageSchema, existingUsageData)
 	// yaml.MapSlice is used to maintain the order of keys, so re-running
 	// the code won't change the output.
 	syncedUsageData := yaml.MapSlice{

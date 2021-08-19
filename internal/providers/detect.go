@@ -38,6 +38,10 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 		return terraform.NewPlanProvider(ctx), nil
 	}
 
+	if isTerragruntDir(path) {
+		return terraform.NewTerragruntProvider(ctx), nil
+	}
+
 	if isTerraformDir(path) {
 		return terraform.NewDirProvider(ctx), nil
 	}
@@ -99,6 +103,18 @@ func isTerraformPlan(path string) bool {
 	}
 
 	return planFile != nil
+}
+
+func isTerragruntDir(path string) bool {
+	return true
+	// if val, ok := os.LookupEnv("TERRAGRUNT_CONFIG"); ok {
+	// 	if filepath.IsAbs(val) {
+	// 		return config.FileExists(val)
+	// 	}
+	// 	return config.FileExists(filepath.Join(path, val))
+	// }
+
+	// return config.FileExists(filepath.Join(path, "terragrunt.hcl")) || config.FileExists(filepath.Join(path, "terragrunt.hcl.json"))
 }
 
 func isTerraformDir(path string) bool {
