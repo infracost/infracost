@@ -1,28 +1,28 @@
 
- Name                                       Monthly Qty  Unit          Monthly Cost 
-                                                                                    
- azurerm_application_gateway.standard                                               
- ├─ Gateway usage (basic, small)                  1,460  hours               $36.50 
- ├─ Data processing (0-10TB)                     10,240  GB                  $81.92 
- ├─ Data processing (10-40TB)                    30,720  GB                 $245.76 
- └─ Data processing (over 40TB)                  59,040  GB                 $472.32 
-                                                                                    
- azurerm_application_gateway.waf                                                    
- ├─ Gateway usage (WAF, medium)                   1,460  hours              $183.96 
- ├─ Data processing (10-40TB)                    30,720  GB                 $215.04 
- └─ Data processing (over 40TB)                  59,040  GB                 $413.28 
-                                                                                    
- azurerm_application_gateway.wafV2                                                  
- ├─ Gateway usage (WAF v2)                        1,460  hours              $525.60 
- └─ V2 capacity units (WAF)                      10,000  CU                 $144.00 
-                                                                                    
- azurerm_application_gateway.withoutUsage                                           
- ├─ Gateway usage (WAF, medium)                   1,460  hours              $183.96 
- └─ Data processing (0-10TB)               Monthly cost depends on usage: $0 per GB 
-                                                                                    
- azurerm_public_ip.example                                                          
- └─ IP address (dynamic)                            730  hours                $2.92 
-                                                                                    
- OVERALL TOTAL                                                            $2,505.26 
+ Name                                        Monthly Qty  Unit            Monthly Cost 
+                                                                                       
+ azurerm_application_gateway.standard                                                  
+ ├─ Gateway usage (basic, small)                   1,460  hours                 $36.50 
+ ├─ Data processing (0-10TB)                      10,240  GB                    $81.92 
+ ├─ Data processing (10-40TB)                     30,720  GB                   $245.76 
+ └─ Data processing (over 40TB)                   59,040  GB                   $472.32 
+                                                                                       
+ azurerm_application_gateway.waf                                                       
+ ├─ Gateway usage (WAF, medium)                    1,460  hours                $183.96 
+ ├─ Data processing (10-40TB)                     30,720  GB                   $215.04 
+ └─ Data processing (over 40TB)                   59,040  GB                   $413.28 
+                                                                                       
+ azurerm_application_gateway.wafV2                                                     
+ ├─ Gateway usage (WAF v2)                         1,460  hours                $525.60 
+ └─ V2 capacity units (WAF)                       10,000  CU                   $144.00 
+                                                                                       
+ azurerm_application_gateway.withoutUsage                                              
+ ├─ Gateway usage (WAF, medium)                    1,460  hours                $183.96 
+ └─ Data processing (0-10TB)               Monthly cost depends on usage: $0.00 per GB 
+                                                                                       
+ azurerm_public_ip.example                                                             
+ └─ IP address (dynamic)                             730  hours                  $2.92 
+                                                                                       
+ OVERALL TOTAL                                                               $2,505.26 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -74,7 +74,7 @@
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
  aws_data_transfer.cn-north-1                                                        
- ├─ Intra-region data transfer                                 2  GB           $0.02 
+ ├─ Intra-region data transfer                                 2  GB           $0.02
  ├─ Outbound data transfer to Internet                         1  GB           $0.14 
  └─ Outbound data transfer to other regions                    1  GB           $0.09 
                                                                                      
@@ -82,7 +82,7 @@
  ├─ Intra-region data transfer                                 2  GB           $0.02 
  ├─ Outbound data transfer to Internet                         1  GB           $0.14 
  └─ Outbound data transfer to other regions                    1  GB           $0.09 
-                                                                                     
+
  aws_data_transfer.eu-central-1                                                      
  ├─ Intra-region data transfer                             2,000  GB          $20.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
@@ -137,7 +137,7 @@
  ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $4,526.08 
  ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $9,318.40 
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $221.00 
- └─ Outbound data transfer to other regions                  750  GB          $82.87 
+ └─ Outbound data transfer to other regions                  750  GB          $82.88 
                                                                                      
  aws_data_transfer.sa-east-1                                                         
  ├─ Intra-region data transfer                             2,000  GB          $20.00 

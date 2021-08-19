@@ -5,7 +5,7 @@
  ├─ Field level encryption requests                       Monthly cost depends on usage: $0.02 per 10k requests   
  ├─ Real-time log requests                                Monthly cost depends on usage: $0.01 per 1M lines       
  ├─ Dedicated IP custom SSLs                              Monthly cost depends on usage: $600.00 per certificates 
- ├─ Invalidation requests (first 1k)                      Monthly cost depends on usage: $0 per paths             
+ ├─ Invalidation requests (first 1k)                      Monthly cost depends on usage: $0.00 per paths          
  ├─ Data transfer out to internet                                                                                 
  │  ├─ US, Mexico, Canada (first 10TB)                    Monthly cost depends on usage: $0.085 per GB            
  │  ├─ Europe, Israel (first 10TB)                        Monthly cost depends on usage: $0.085 per GB            
