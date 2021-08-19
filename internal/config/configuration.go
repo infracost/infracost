@@ -35,6 +35,9 @@ func loadConfiguration(cfg *Config) error {
 	if cfg.Currency == "" {
 		cfg.Currency = cfg.Configuration.Currency
 	}
+	if cfg.Currency == "" {
+		cfg.Currency = "USD"
+	}
 
 	return nil
 }
