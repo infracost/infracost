@@ -1,6 +1,9 @@
 package azure
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -45,26 +48,48 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 		costComponents = append(costComponents, synapseServerlessSqlPoolCostComponent(region, "Serverless SQL pool size (over 10TB)", "10", decimalPtr(serverlessSqlPoolSize.Sub(decimal.NewFromInt(10)))))
 	}
 
-	var dataflowGeneralPurposeInstances, dataflowGeneralPurposeVCores *decimal.Decimal
-	if u != nil && u.Get("dataflow_general_purpose_instances").Type != gjson.Null && u.Get("dataflow_general_purpose_vcores").Type != gjson.Null {
-		dataflowGeneralPurposeInstances = decimalPtr(decimal.NewFromInt(u.Get("dataflow_general_purpose_instances").Int()))
-		dataflowGeneralPurposeVCores = decimalPtr(decimal.NewFromInt(u.Get("dataflow_general_purpose_vcores").Int()))
-	}
-	costComponents = append(costComponents, synapseDataFlowCostComponent(region, "Data flow - general purpose", "DZH318Z0CGNQ", dataflowGeneralPurposeInstances, dataflowGeneralPurposeVCores))
+	dataflowTiers := [2]string{"Basic", "Standard"}
+	for _, tier := range dataflowTiers {
+		var dataflowInstances, dataflowVCores *decimal.Decimal
 
-	var dataflowComputeOptimizedInstances, dataflowComputeOptimizedVCores *decimal.Decimal
-	if u != nil && u.Get("dataflow_compute_optimized_instances").Type != gjson.Null && u.Get("dataflow_compute_optimized_vcores").Type != gjson.Null {
-		dataflowComputeOptimizedInstances = decimalPtr(decimal.NewFromInt(u.Get("dataflow_compute_optimized_instances").Int()))
-		dataflowComputeOptimizedVCores = decimalPtr(decimal.NewFromInt(u.Get("dataflow_compute_optimized_vcores").Int()))
-	}
-	costComponents = append(costComponents, synapseDataFlowCostComponent(region, "Data flow - compute optimized", "DZH318Z0CGNF", dataflowComputeOptimizedInstances, dataflowComputeOptimizedVCores))
+		var instancesUsageKey = fmt.Sprintf("dataflow_%s_instances", strings.ToLower(tier))
+		var vcoresUsageKey = fmt.Sprintf("dataflow_%s_vcores", strings.ToLower(tier))
 
-	var dataflowMemoryOptimizedInstances, dataflowMemoryOptimizedVCores *decimal.Decimal
-	if u != nil && u.Get("dataflow_memory_optimized_instances").Type != gjson.Null && u.Get("dataflow_memory_optimized_vcores").Type != gjson.Null {
-		dataflowMemoryOptimizedInstances = decimalPtr(decimal.NewFromInt(u.Get("dataflow_memory_optimized_instances").Int()))
-		dataflowMemoryOptimizedVCores = decimalPtr(decimal.NewFromInt(u.Get("dataflow_memory_optimized_vcores").Int()))
+		if u != nil && u.Get(instancesUsageKey).Type != gjson.Null && u.Get(vcoresUsageKey).Type != gjson.Null {
+			dataflowInstances = decimalPtr(decimal.NewFromInt(u.Get(instancesUsageKey).Int()))
+			dataflowVCores = decimalPtr(decimal.NewFromInt(u.Get(vcoresUsageKey).Int()))
+		}
+		costComponents = append(costComponents, synapseDataFlowCostComponent(region, fmt.Sprintf("Data flow - %s", strings.ToLower(tier)), tier, dataflowInstances, dataflowVCores))
 	}
-	costComponents = append(costComponents, synapseDataFlowCostComponent(region, "Data flow - memory optimized", "DZH318Z0CGNM", dataflowMemoryOptimizedInstances, dataflowMemoryOptimizedVCores))
+
+	datapipelineTiers := [2]string{"Azure Hosted IR", "Self Hosted IR"}
+	datapipelineUsageKeys := [2]string{"azure_hosted", "self_hosted"}
+	if managedVirtualNetwork {
+		datapipelineTiers = [2]string{"Azure Hosted Managed VNET IR", "Self Hosted IR"}
+	}
+
+	for i, tier := range datapipelineTiers {
+		var activityRuns, integrationRuntimeHours, externalIntegrationRuntimeHours *decimal.Decimal
+		var usageName = strings.Replace(datapipelineUsageKeys[i], "_", " ", 1)
+
+		var activityRunsUsageKey = fmt.Sprintf("datapipeline_%s_activity_runs", datapipelineUsageKeys[i])
+		if u != nil && u.Get(activityRunsUsageKey).Type != gjson.Null {
+			activityRuns = decimalPtr(decimal.NewFromInt(u.Get(activityRunsUsageKey).Int()))
+		}
+		costComponents = append(costComponents, synapseDataPipelineActivityRunCostComponent(region, fmt.Sprintf("Data pipeline %s activity runs", usageName), tier, "Orchestration Activity Run", activityRuns))
+
+		var integrationRuntimeUsageKey = fmt.Sprintf("datapipeline_%s_integration_runtime_hours", datapipelineUsageKeys[i])
+		if u != nil && u.Get(integrationRuntimeUsageKey).Type != gjson.Null {
+			integrationRuntimeHours = decimalPtr(decimal.NewFromInt(u.Get(integrationRuntimeUsageKey).Int()))
+		}
+		costComponents = append(costComponents, synapseDataPipelineActivityIntegrationRuntimeCostComponent(region, fmt.Sprintf("Data pipeline %s integration runtime", usageName), tier, "Pipeline Activity", integrationRuntimeHours))
+
+		var externalIntegrationRuntimeUsageKey = fmt.Sprintf("datapipeline_%s_external_integration_runtime_hours", datapipelineUsageKeys[i])
+		if u != nil && u.Get(externalIntegrationRuntimeUsageKey).Type != gjson.Null {
+			externalIntegrationRuntimeHours = decimalPtr(decimal.NewFromInt(u.Get(externalIntegrationRuntimeUsageKey).Int()))
+		}
+		costComponents = append(costComponents, synapseDataPipelineActivityIntegrationRuntimeCostComponent(region, fmt.Sprintf("Data pipeline %s external integration runtime", usageName), tier, "External Pipeline Activity", externalIntegrationRuntimeHours))
+	}
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -115,7 +140,53 @@ func synapseManagedVirtualNetworkCostComponent(region, name string) *schema.Cost
 	}
 }
 
-func synapseDataFlowCostComponent(region, name, productId string, instances, vCores *decimal.Decimal) *schema.CostComponent {
+func synapseDataPipelineActivityRunCostComponent(region, name, sku, meter string, runs *decimal.Decimal) *schema.CostComponent {
+
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "1k Activity Runs",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: runs,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(region),
+			Service:       strPtr("Azure Synapse Analytics"),
+			ProductFamily: strPtr("Analytics"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr(sku)},
+				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s %s", sku, meter))},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	}
+}
+
+func synapseDataPipelineActivityIntegrationRuntimeCostComponent(region, name, sku, meter string, hours *decimal.Decimal) *schema.CostComponent {
+
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "hours",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: hours,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(region),
+			Service:       strPtr("Azure Synapse Analytics"),
+			ProductFamily: strPtr("Analytics"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr(sku)},
+				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s %s", sku, meter))},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	}
+}
+
+func synapseDataFlowCostComponent(region, name, tier string, instances, vCores *decimal.Decimal) *schema.CostComponent {
 
 	var HourlyQuantity *decimal.Decimal
 	if instances != nil && vCores != nil {
@@ -133,7 +204,7 @@ func synapseDataFlowCostComponent(region, name, productId string, instances, vCo
 			Service:       strPtr("Azure Synapse Analytics"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productId", Value: strPtr(productId)},
+				{Key: "productName", Value: strPtr(fmt.Sprintf("Azure Synapse Analytics Data Flow - %s", tier))},
 				{Key: "skuName", Value: strPtr("vCore")},
 			},
 		},
@@ -142,6 +213,3 @@ func synapseDataFlowCostComponent(region, name, productId string, instances, vCo
 		},
 	}
 }
-
-//db.products.distinct("attributes.description", {"vendorName": "azure", "service": "Azure Synapse Analytics", "productFamily": "Analytics" });
-//db.products.find({"vendorName": "azure", "service": "Azure Synapse Analytics", "productFamily": "Analytics", "region": "westeurope", "attributes.productName": "Azure Synapse Analytics Serverless SQL Pool" }).pretty()
