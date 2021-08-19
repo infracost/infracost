@@ -37,7 +37,7 @@ func (s *State) Save() error {
 }
 
 func readStateFileIfExists() (*State, error) {
-	if !fileExists(stateFilePath()) {
+	if !FileExists(stateFilePath()) {
 		return &State{}, nil
 	}
 

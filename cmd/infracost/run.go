@@ -85,21 +85,15 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			ctx.SetContextValue("hasUsageFile", true)
 		}
 
-		metadata := config.DetectProjectMetadata(ctx)
-		metadata.Type = provider.Type()
-		provider.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, runCtx.Config.EnableDashboard)
-
-		project := schema.NewProject(name, metadata)
-		err = provider.LoadResources(project, u)
+		providerProjects, err := provider.LoadResources(u)
 		if err != nil {
 			return err
 		}
 
-		projects = append(projects, project)
+		projects = append(projects, providerProjects...)
 
 		if runCtx.Config.SyncUsageFile {
-			err = usage.SyncUsageData(project, u, projectCfg.UsageFile)
+			err = usage.SyncUsageData(projects, u, projectCfg.UsageFile)
 			if err != nil {
 				return err
 			}

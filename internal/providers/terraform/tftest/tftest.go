@@ -163,7 +163,7 @@ func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, 
 	project, err := RunCostCalculations(t, runCtx, tfProject, usage)
 	assert.NoError(t, err)
 
-	testutil.TestResources(t, project.Resources, checks)
+	testutil.TestResources(t, project[0].Resources, checks)
 }
 
 type GoldenFileOptions = struct {
@@ -220,10 +220,10 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	}
 
 	// Generate the output
-	project, err := RunCostCalculations(t, runCtx, tfProject, usageData)
+	projects, err := RunCostCalculations(t, runCtx, tfProject, usageData)
 	require.NoError(t, err)
 
-	r := output.ToOutputFormat([]*schema.Project{project})
+	r := output.ToOutputFormat(projects)
 	r.Currency = runCtx.Config.Currency
 
 	opts := output.Options{
@@ -254,24 +254,27 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 
-func RunCostCalculations(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
-	project, err := loadResources(t, runCtx, tfProject, usage)
+func RunCostCalculations(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+	projects, err := loadResources(t, runCtx, tfProject, usage)
 	if err != nil {
-		return project, err
+		return projects, err
 	}
-	err = prices.PopulatePrices(runCtx.Config, project)
-	if err != nil {
-		return project, err
+
+	for _, project := range projects {
+		err = prices.PopulatePrices(runCtx.Config, project)
+		if err != nil {
+			return projects, err
+		}
+		schema.CalculateCosts(project)
 	}
-	schema.CalculateCosts(project)
-	return project, nil
+	return projects, nil
 }
 
 func CreateTerraformProject(tmpDir string, tfProject TerraformProject) (string, error) {
 	return writeToTmpDir(tmpDir, tfProject)
 }
 
-func loadResources(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+func loadResources(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	tmpDir := t.TempDir()
 
 	_, err := os.ReadDir(initCache)
@@ -295,9 +298,7 @@ func loadResources(t *testing.T, runCtx *config.RunContext, tfProject TerraformP
 		},
 	))
 
-	project := schema.NewProject("tftest", &schema.ProjectMetadata{})
-
-	return project, provider.LoadResources(project, usage)
+	return provider.LoadResources(usage)
 }
 
 func copyInitCacheToPath(source, destination string) error {
