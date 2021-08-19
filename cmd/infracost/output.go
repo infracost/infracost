@@ -68,19 +68,21 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			format, _ := cmd.Flags().GetString("format")
-
+			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
 
 			fields := []string{"monthlyQuantity", "unit", "monthlyCost"}
 			if cmd.Flags().Changed("fields") {
-				if c, _ := cmd.Flags().GetStringSlice("fields"); len(c) == 0 {
+				fields, _ = cmd.Flags().GetStringSlice("fields")
+				if len(fields) == 0 {
 					ui.PrintWarningf("fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
+				} else if len(fields) == 1 && fields[0] == includeAllFields {
+					fields = validFields
 				} else {
-					fields, _ = cmd.Flags().GetStringSlice("fields")
 					vf := []string{}
 					for _, f := range fields {
 						if !contains(validFields, f) {
-							ui.PrintWarningf("Invalid field '%s' specified, valid fields are: %s", f, validFields)
+							ui.PrintWarningf("Invalid field '%s' specified, valid fields are: %s or '%s' to include all fields", f, validFields, includeAllFields)
 						} else {
 							vf = append(vf, f)
 						}
