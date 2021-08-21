@@ -21,6 +21,7 @@ func configureCmd(ctx *config.RunContext) *cobra.Command {
 Supported settings:
   - api_key: Infracost API key
   - pricing_api_endpoint: endpoint of the Cloud Pricing API
+  - currency: convert output from USD to your preferred currency
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Show the help
@@ -42,6 +43,7 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 Supported settings:
   - api_key: Infracost API key
   - pricing_api_endpoint: endpoint of the Cloud Pricing API
+  - currency: convert output from USD to your preferred currency
 `,
 		Example: `  Set your Infracost API key:
 
@@ -116,6 +118,7 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 Supported settings:
   - api_key: Infracost API key
   - pricing_api_endpoint: endpoint of the Cloud Pricing API
+  - currency: convert output from USD to your preferred currency
 `,
 		Example: `  Get your saved Infracost API key:
 
@@ -125,7 +128,7 @@ Supported settings:
 
       infracost	configure get pricing_api_endpoint
 
-  Get your preferred currenc:
+  Get your preferred currency:
 
       infracost	configure get currency`,
 		Args: func(cmd *cobra.Command, args []string) error {
