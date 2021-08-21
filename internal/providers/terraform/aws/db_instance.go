@@ -168,7 +168,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("System Operation"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/RDS:StorageIOUsage/i"))},
+					{Key: "usagetype", ValueRegex: strPtr("/RDS:StorageIOUsage/i")},
 				},
 			},
 		})
