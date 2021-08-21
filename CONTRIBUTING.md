@@ -261,7 +261,7 @@ func TestMyResourceGoldenFile(t *testing.T) {
 Finally, generate the golden file by running the test with the `-update` flag. You should **verify** that these cost calculations are correct by manually checking them, or comparing them against cost calculators from the cloud vendors. You should also ensure that there are **no warnings** about "Multiple products found", "No products found for" or "No prices found for" in the logs. These warnings indicate that the price filters have an issue.
 
 ```sh
-INFRACOST_LOG_LEVEL=warn go test ./internal/providers/terraform/aws/aws_my_resource_test.go -v -update
+INFRACOST_LOG_LEVEL=warn go test ./internal/providers/terraform/aws/my_resource_test.go -v -update
 ```
 
 Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
