@@ -3,16 +3,16 @@
                                                                                                         
  aws_neptune_cluster.fiveDaysRetenPeriod                                                                
  ├─ Storage                                        Monthly cost depends on usage: $0.12 per GB          
- ├─ I/O                                            Monthly cost depends on usage: $0.23 per 1M request  
+ ├─ I/O requests                                   Monthly cost depends on usage: $0.23 per 1M request  
  └─ Backup storage                                 Monthly cost depends on usage: $0.022 per GB         
                                                                                                         
  aws_neptune_cluster.oneDayRetenPeriod                                                                  
  ├─ Storage                                        Monthly cost depends on usage: $0.12 per GB          
- └─ I/O                                            Monthly cost depends on usage: $0.23 per 1M request  
+ └─ I/O requests                                   Monthly cost depends on usage: $0.23 per 1M request  
                                                                                                         
  aws_neptune_cluster.withoutUsage                                                                       
  ├─ Storage                                        Monthly cost depends on usage: $0.12 per GB          
- ├─ I/O                                            Monthly cost depends on usage: $0.23 per 1M request  
+ ├─ I/O requests                                   Monthly cost depends on usage: $0.23 per 1M request  
  └─ Backup storage                                 Monthly cost depends on usage: $0.022 per GB         
                                                                                                         
  aws_neptune_cluster_snapshot.fiveDaysRetenPeriod                                                       
