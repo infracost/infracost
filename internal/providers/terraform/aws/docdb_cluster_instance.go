@@ -73,7 +73,7 @@ func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schem
 			},
 		},
 		{
-			Name:            "I/O",
+			Name:            "I/O requests",
 			Unit:            "1M requests",
 			UnitMultiplier:  decimal.NewFromInt(1000000),
 			MonthlyQuantity: ioRequests,
