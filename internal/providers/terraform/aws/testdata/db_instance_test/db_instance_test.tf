@@ -34,12 +34,27 @@ resource "aws_db_instance" "mysql-magnetic" {
   allocated_storage = 40
 }
 
-resource "aws_db_instance" "mysql-iops" {
+resource "aws_db_instance" "mysql-iops-below-min" {
   engine            = "mysql"
   instance_class    = "db.t3.large"
   storage_type      = "io1"
   allocated_storage = 50
   iops              = 500
+}
+
+resource "aws_db_instance" "mysql-iops" {
+  engine            = "mysql"
+  instance_class    = "db.t3.large"
+  storage_type      = "io1"
+  allocated_storage = 50
+  iops              = 1200
+}
+
+resource "aws_db_instance" "mysql-default-iops" {
+  engine            = "mysql"
+  instance_class    = "db.t3.large"
+  storage_type      = "io1"
+  allocated_storage = 50
 }
 
 resource "aws_db_instance" "aurora" {
