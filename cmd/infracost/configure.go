@@ -55,7 +55,7 @@ Supported settings:
 
   Set your preferred currency:
 
-      infracost	configure set currency USD`,
+      infracost	configure set currency EUR`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 2 {
 				return errors.New("Too many arguments")
