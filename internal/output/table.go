@@ -60,9 +60,10 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 
 	totalOut := formatCost2DP(out.Currency, out.TotalMonthlyCost)
 
+	overallTitle := formatTitleWithCurrency(" OVERALL TOTAL", out.Currency)
 	s += fmt.Sprintf("%s%s",
-		ui.BoldString(" OVERALL TOTAL"),
-		fmt.Sprintf("%*s ", tableLen-15, totalOut), // pad based on the last line length
+		ui.BoldString(overallTitle),
+		fmt.Sprintf("%*s ", tableLen-(len(overallTitle)+1), totalOut), // pad based on the last line length
 	)
 
 	unsupportedMsg := out.unsupportedResourcesMessage(opts.ShowSkipped)
@@ -112,7 +113,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 	i++
 
 	if contains(fields, "price") {
-		headers = append(headers, ui.UnderlineString("Price"))
+		headers = append(headers, ui.UnderlineString(formatTitleWithCurrency("Price", currency)))
 		columns = append(columns, table.ColumnConfig{
 			Number:      i,
 			Align:       text.AlignRight,
@@ -139,7 +140,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		i++
 	}
 	if contains(fields, "hourlyCost") {
-		headers = append(headers, ui.UnderlineString("Hourly Cost"))
+		headers = append(headers, ui.UnderlineString(formatTitleWithCurrency("Hourly Cost", currency)))
 		columns = append(columns, table.ColumnConfig{
 			Number:      i,
 			Align:       text.AlignRight,
@@ -148,7 +149,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		i++
 	}
 	if contains(fields, "monthlyCost") {
-		headers = append(headers, ui.UnderlineString("Monthly Cost"))
+		headers = append(headers, ui.UnderlineString(formatTitleWithCurrency("Monthly Cost", currency)))
 		columns = append(columns, table.ColumnConfig{
 			Number:      i,
 			Align:       text.AlignRight,
@@ -173,7 +174,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 
 	if includeTotal {
 		var totalCostRow table.Row
-		totalCostRow = append(totalCostRow, ui.BoldString("Project total"))
+		totalCostRow = append(totalCostRow, ui.BoldString(formatTitleWithCurrency("Project total", currency)))
 		numOfFields := i - 3
 		for q := 0; q < numOfFields; q++ {
 			totalCostRow = append(totalCostRow, "")

@@ -1,6 +1,7 @@
 package output
 
 import (
+	"fmt"
 	"github.com/Rhymond/go-money"
 	"github.com/dustin/go-humanize"
 	"github.com/shopspring/decimal"
@@ -42,14 +43,14 @@ func formatPrice(currency string, d decimal.Decimal) string {
 }
 
 func formatFullDecimalCurrency(currency string, d decimal.Decimal) string {
-	formatter := getCurrencyFormatter(currency)
+	formatter := money.GetCurrency(currency).Formatter()
 	scaledInt := decimalToScaledInt(d, formatter.Fraction, 10)
 	formatter.Fraction = scaledInt.FractionLength
 	return formatter.Format(scaledInt.Number)
 }
 
 func formatRoundedDecimalCurrency(currency string, d decimal.Decimal) string {
-	formatter := getCurrencyFormatter(currency)
+	formatter := money.GetCurrency(currency).Formatter()
 
 	scaledInt := decimalToScaledInt(d, formatter.Fraction, formatter.Fraction)
 	formatter.Fraction = scaledInt.FractionLength
@@ -57,7 +58,7 @@ func formatRoundedDecimalCurrency(currency string, d decimal.Decimal) string {
 }
 
 func formatWholeDecimalCurrency(currency string, d decimal.Decimal) string {
-	formatter := getCurrencyFormatter(currency)
+	formatter := money.GetCurrency(currency).Formatter()
 
 	scaledInt := decimalToScaledInt(d, 0, 0)
 	formatter.Fraction = scaledInt.FractionLength
@@ -103,12 +104,9 @@ func decimalToScaledInt(d decimal.Decimal, minFracLen, maxFracLen int) *scaledIn
 	return &scaledInt64{co, frac}
 }
 
-func getCurrencyFormatter(currency string) *money.Formatter {
-	formatter := money.GetCurrency(currency).Formatter()
-	if currency != "USD" && formatter.Grapheme == "$" {
-		// This currency uses the $ symbol.  Append the currency code just to be clear it's not USD.
-		formatter.Template += " " + currency
+func formatTitleWithCurrency(title, currency string) string {
+	if currency == "USD" {
+		return title
 	}
-
-	return formatter
+	return fmt.Sprintf("%s (%s)", title, currency)
 }
