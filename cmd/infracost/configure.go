@@ -175,7 +175,7 @@ Supported settings:
 				value = ctx.Config.Configuration.Currency
 
 				if value == "" {
-					msg := fmt.Sprintf("No currency in your saved config (%s).\nSet a currency using %s.",
+					msg := fmt.Sprintf("No currency in your saved config (%s), defaulting to USD.\nSet a currency using %s.",
 						config.CredentialsFilePath(),
 						ui.PrimaryString("infracost configure set currency CURRENCY_CODE"),
 					)
