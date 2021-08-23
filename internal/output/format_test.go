@@ -19,9 +19,9 @@ func TestFormatCost(t *testing.T) {
 		"rounds large PAB":        {currency: "PAB", val: "1234.567", expected: "B/.1,235"},
 		"rounds small PAB":        {currency: "PAB", val: "1.234567", expected: "B/.1.23"},
 		"rounds really small PAB": {currency: "PAB", val: "0.01234567890123456789", expected: "B/.0.01"},
-		"rounds large BSD":        {currency: "BSD", val: "1234.567", expected: "$1,235 BSD"},
-		"rounds small BSD":        {currency: "BSD", val: "1.234567", expected: "$1.23 BSD"},
-		"rounds really small BSD": {currency: "BSD", val: "0.01234567890123456789", expected: "$0.01 BSD"},
+		"rounds large BSD":        {currency: "BSD", val: "1234.567", expected: "$1,235"},
+		"rounds small BSD":        {currency: "BSD", val: "1.234567", expected: "$1.23"},
+		"rounds really small BSD": {currency: "BSD", val: "0.01234567890123456789", expected: "$0.01"},
 		"handles nil":             {currency: "USD", val: "", expected: "-"},
 	}
 
@@ -56,9 +56,9 @@ func TestFormatCost2DP(t *testing.T) {
 		"rounds large PAB":        {currency: "PAB", val: "1234.567", expected: "B/.1,234.57"},
 		"rounds small PAB":        {currency: "PAB", val: "1.234567", expected: "B/.1.23"},
 		"rounds really small PAB": {currency: "PAB", val: "0.01234567890123456789", expected: "B/.0.01"},
-		"rounds large BSD":        {currency: "BSD", val: "1234.567", expected: "$1,234.57 BSD"},
-		"rounds small BSD":        {currency: "BSD", val: "1.234567", expected: "$1.23 BSD"},
-		"rounds really small BSD": {currency: "BSD", val: "0.01234567890123456789", expected: "$0.01 BSD"},
+		"rounds large BSD":        {currency: "BSD", val: "1234.567", expected: "$1,234.57"},
+		"rounds small BSD":        {currency: "BSD", val: "1.234567", expected: "$1.23"},
+		"rounds really small BSD": {currency: "BSD", val: "0.01234567890123456789", expected: "$0.01"},
 		"handles nil":             {currency: "USD", val: "", expected: "-"},
 	}
 
@@ -93,9 +93,9 @@ func TestFormatPrice(t *testing.T) {
 		"rounds large PAB":        {currency: "PAB", val: "1234.567", expected: "B/.1,234.57"},
 		"rounds small PAB":        {currency: "PAB", val: "1.234567", expected: "B/.1.23"},
 		"rounds really small PAB": {currency: "PAB", val: "0.01234567890123456789", expected: "B/.0.0123456789"},
-		"rounds large BSD":        {currency: "BSD", val: "1234.567", expected: "$1,234.57 BSD"},
-		"rounds small BSD":        {currency: "BSD", val: "1.234567", expected: "$1.23 BSD"},
-		"rounds really small BSD": {currency: "BSD", val: "0.01234567890123456789", expected: "$0.0123456789 BSD"},
+		"rounds large BSD":        {currency: "BSD", val: "1234.567", expected: "$1,234.57"},
+		"rounds small BSD":        {currency: "BSD", val: "1.234567", expected: "$1.23"},
+		"rounds really small BSD": {currency: "BSD", val: "0.01234567890123456789", expected: "$0.0123456789"},
 	}
 
 	for name, tc := range tests {
