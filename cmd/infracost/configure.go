@@ -177,7 +177,7 @@ Supported settings:
 				if value == "" {
 					msg := fmt.Sprintf("No currency in your saved config (%s), defaulting to USD.\nSet a currency using %s.",
 						config.CredentialsFilePath(),
-						ui.PrimaryString("infracost configure set currency CURRENCY_CODE"),
+						ui.PrimaryString("infracost configure set currency CURRENCY"),
 					)
 					ui.PrintWarning(msg)
 				}
