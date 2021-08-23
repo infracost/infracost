@@ -310,7 +310,7 @@ func checkRunConfig(cfg *config.Config) error {
 	}
 
 	if money.GetCurrency(cfg.Currency) == nil {
-		ui.PrintWarning(fmt.Sprintf("Ignoring unknown currency '%s' using USD.\n", cfg.Currency))
+		ui.PrintWarning(fmt.Sprintf("Ignoring unknown currency '%s', using USD.\n", cfg.Currency))
 		cfg.Currency = "USD"
 	}
 
