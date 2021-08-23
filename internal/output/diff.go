@@ -63,7 +63,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		s += fmt.Sprintf("%s %s\nAmount:  %s %s",
 			ui.BoldString("Monthly cost change for"),
 			ui.BoldString(project.Label(opts.DashboardEnabled)),
-			formatCostChange(out.Currency, project.Diff.TotalMonthlyCost),
+			formatTitleWithCurrency(formatCostChange(out.Currency, project.Diff.TotalMonthlyCost), out.Currency),
 			ui.FaintStringf("(%s -> %s)", formatCost(out.Currency, oldCost), formatCost(out.Currency, newCost)),
 		)
 
