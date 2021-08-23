@@ -74,7 +74,7 @@
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
  aws_data_transfer.cn-north-1                                                        
- ├─ Intra-region data transfer                                 2  GB           $0.02
+ ├─ Intra-region data transfer                                 2  GB           $0.02 
  ├─ Outbound data transfer to Internet                         1  GB           $0.14 
  └─ Outbound data transfer to other regions                    1  GB           $0.09 
                                                                                      
@@ -82,7 +82,7 @@
  ├─ Intra-region data transfer                                 2  GB           $0.02 
  ├─ Outbound data transfer to Internet                         1  GB           $0.14 
  └─ Outbound data transfer to other regions                    1  GB           $0.09 
-
+                                                                                     
  aws_data_transfer.eu-central-1                                                      
  ├─ Intra-region data transfer                             2,000  GB          $20.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB         $921.60 
