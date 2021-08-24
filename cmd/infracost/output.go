@@ -44,6 +44,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			inputs := make([]output.ReportInput, 0, len(inputFiles))
+			currency := ""
 			for _, f := range inputFiles {
 				data, err := ioutil.ReadFile(f)
 				if err != nil {
@@ -57,6 +58,11 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
 				if !checkOutputVersion(j.Version) {
 					return fmt.Errorf("Invalid Infracost JSON file version. Supported versions are %s ≤ x ≤ %s", minOutputVersion, maxOutputVersion)
+				}
+
+				currency, err = checkCurrency(currency, j.Currency)
+				if err != nil {
+					return err
 				}
 
 				inputs = append(inputs, output.ReportInput{
@@ -100,7 +106,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
-			combined := output.Combine(ctx.Config.Currency, inputs, opts)
+			combined := output.Combine(currency, inputs, opts)
 
 			var (
 				b   []byte
@@ -145,6 +151,23 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	})
 
 	return cmd
+}
+
+func checkCurrency(inputCurrency, fileCurrency string) (string, error) {
+	if fileCurrency == "" {
+		fileCurrency = "USD" // default to USD
+	}
+
+	if inputCurrency == "" {
+		// this must be the first file, save the input currency
+		inputCurrency = fileCurrency
+	}
+
+	if inputCurrency != fileCurrency {
+		return "", fmt.Errorf("Invalid Infracost JSON file currency mismatch.  Can't combine %s and %s", inputCurrency, fileCurrency)
+	}
+
+	return inputCurrency, nil
 }
 
 func checkOutputVersion(v string) bool {
