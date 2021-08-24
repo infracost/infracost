@@ -53,7 +53,7 @@ Supported settings:
 
       infracost	configure set pricing_api_endpoint https://cloud-pricing-api
 
-  Set your preferred currency:
+  Set your preferred currency code (ISO 4217):
 
       infracost	configure set currency EUR`,
 		Args: func(cmd *cobra.Command, args []string) error {
