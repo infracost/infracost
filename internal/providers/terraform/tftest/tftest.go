@@ -168,9 +168,25 @@ func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, 
 	testutil.TestResources(t, project.Resources, checks)
 }
 
+type GoldenFileOptions = struct {
+	Currency string
+}
+
 func GoldenFileResourceTests(t *testing.T, testName string) {
+	GoldenFileResourceTestsWithOpts(t, testName,
+		&GoldenFileOptions{
+			Currency: "USD",
+		})
+}
+
+func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *GoldenFileOptions) {
 	cfg := config.DefaultConfig()
 	err := cfg.LoadFromEnv()
+
+	if options != nil && options.Currency != "" {
+		cfg.Currency = options.Currency
+	}
+
 	require.NoError(t, err)
 
 	// Load the terraform projects
@@ -199,6 +215,7 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 	require.NoError(t, err)
 
 	r := output.ToOutputFormat([]*schema.Project{project})
+	r.Currency = cfg.Currency
 
 	opts := output.Options{
 		ShowSkipped: true,

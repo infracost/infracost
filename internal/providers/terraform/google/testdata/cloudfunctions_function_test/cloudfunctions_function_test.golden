@@ -9,10 +9,10 @@
                                                                                                         
  google_cloudfunctions_function.my_function                                                             
  ├─ CPU                                               1,200,000  GHz-seconds                     $12.00 
- ├─ Memory                                              750,000  GB-seconds                       $1.87 
+ ├─ Memory                                              750,000  GB-seconds                       $1.88 
  ├─ Invocations                                      10,000,000  invocations                      $4.00 
  └─ Outbound data transfer                                  100  GB                              $12.00 
                                                                                                         
- OVERALL TOTAL                                                                                   $29.87 
+ OVERALL TOTAL                                                                                   $29.88 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

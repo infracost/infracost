@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Rhymond/go-money"
 	"os"
 	"strings"
 
@@ -145,6 +146,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	spinner.Success()
 
 	r := output.ToOutputFormat(projects)
+	r.Currency = runCtx.Config.Currency
 
 	var err error
 
@@ -305,6 +307,11 @@ func checkRunConfig(cfg *config.Config) error {
 		} else if len(missingUsageFile) > 1 {
 			ui.PrintWarning(fmt.Sprintf("Ignoring sync-usage-file for following projects as no usage-file is specified for them: %s.\n", strings.Join(missingUsageFile, ", ")))
 		}
+	}
+
+	if money.GetCurrency(cfg.Currency) == nil {
+		ui.PrintWarning(fmt.Sprintf("Ignoring unknown currency '%s', using USD.\n", cfg.Currency))
+		cfg.Currency = "USD"
 	}
 
 	return nil
