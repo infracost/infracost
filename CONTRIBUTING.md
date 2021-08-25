@@ -465,7 +465,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)". Use the words "first", "next" and "over" when describing tiers. Units should not be included in brackets unless the cost component relates to storage or data transfer, e.g. "Storage (first 1TB)    GB" is more understandable than "Storage (first 1K)    GB" since users understand terabytes and petabytes. You should be able to use the `CalculateTierBuckets` method for calculating tier buckets.
 
-- purchase options: if applicable, include "on-demand" in brackets after the cost component name, e.g. `Database instance (on-demand`
+- purchase options: if applicable, include "on-demand" in brackets after the cost component name, e.g. `Database instance (on-demand)`
 
 - instance type: if applicable, include it in brackets as the 2nd argument, after the cost component name, e.g. `Database instance (on-demand, db.t3.medium)`
 
