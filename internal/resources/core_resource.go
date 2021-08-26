@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 
@@ -40,7 +39,6 @@ func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
 		}
 		// Key name for the usage file
 		usageKey := infracostTagSplitted[0]
-		fmt.Println(usageKey)
 
 		// The arg is a pointer (*float64, *string, ...)
 		if f.Kind() == reflect.Ptr {
