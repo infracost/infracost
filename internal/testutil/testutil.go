@@ -1,7 +1,12 @@
 package testutil
 
 import (
+	"bytes"
+	"flag"
 	"fmt"
+	"github.com/pmezard/go-difflib/difflib"
+	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -9,6 +14,8 @@ import (
 
 	"github.com/shopspring/decimal"
 )
+
+var update = flag.Bool("update", false, "update .golden files")
 
 type CostCheckFunc func(*testing.T, *schema.CostComponent)
 
@@ -138,4 +145,36 @@ func formatCost(d *decimal.Decimal) string {
 		return "-"
 	}
 	return formatAmount(*d)
+}
+
+func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) {
+	// Load the snapshot result
+	expected := []byte("")
+	if _, err := os.Stat(goldenFilePath); err == nil || !os.IsNotExist(err) {
+		// golden file exists, load the data
+		expected, err = ioutil.ReadFile(goldenFilePath)
+		assert.NoError(t, err)
+	}
+
+	if !bytes.Equal(expected, actual) {
+		if *update {
+			err := ioutil.WriteFile(goldenFilePath, actual, 0600)
+			assert.NoError(t, err)
+			t.Logf(fmt.Sprintf("Wrote golden file %s", goldenFilePath))
+		} else {
+			// Generate the diff and error message.  We don't call assert.Equal because it escapes
+			// newlines (\n) and the output looks terrible.
+			diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
+				A:        difflib.SplitLines(string(expected)),
+				B:        difflib.SplitLines(string(actual)),
+				FromFile: "Expected",
+				FromDate: "",
+				ToFile:   "Actual",
+				ToDate:   "",
+				Context:  1,
+			})
+
+			t.Errorf(fmt.Sprintf("\nOutput does not match golden file: \n\n%s\n", diff))
+		}
+	}
 }
