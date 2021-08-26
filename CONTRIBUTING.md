@@ -571,14 +571,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 2. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
 3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have the darwin-amd64.tar.tz, darwin-arm64.tar.gz, windows-amd64.tar.gz, and linux-amd64.tar.gz assets.
 4. Click on the Edit draft button, set the `vx.y.z` value in the tag name and release title. Also add the release notes from the commits between this and the last release and click on publish.
-5. In the `infracost-atlantis` repo, run the following steps so the Atlantis integration uses the latest version of Infracost:
-
-	```sh
-	# you can also push to master if you want the GH Action to do the following.
-	git pull
-	docker build --no-cache -t infracost/infracost-atlantis:latest .
-	docker push infracost/infracost-atlantis:latest
-	```
+5. In the `infracost-atlantis` repo, run the, update the "Infracost (latest release, vx.y.z)" text to point to the newly released version. Pushing a commit to master will trigger the GH Action, which builds/pushes that repo's docker image.
 6. Update the [Infracost API](https://www.infracost.io/docs/integrations/infracost_api) to use the latest version.
 7. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls?q=infracost) to be merged.
 8. Announce the release in the infracost-community Slack announcements channel.
