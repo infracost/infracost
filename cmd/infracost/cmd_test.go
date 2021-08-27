@@ -14,7 +14,7 @@ import (
 )
 
 var timestampRegex = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)((-(\d{2}):(\d{2})|Z| [A-Z]{3})?)`)
-var vcsRepoUrlRegex = regexp.MustCompile(`"vcsRepoUrl": "[^"]*"`)
+var vcsRepoURLRegex = regexp.MustCompile(`"vcsRepoUrl": "[^"]*"`)
 
 type GoldenFileOptions = struct {
 	Currency    string
@@ -71,7 +71,7 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 
 	// strip out any timestamps
 	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
-	actual = vcsRepoUrlRegex.ReplaceAll(actual, []byte(`"vcsRepoUrl": "REPLACED"`))
+	actual = vcsRepoURLRegex.ReplaceAll(actual, []byte(`"vcsRepoUrl": "REPLACED"`))
 
 	if logBuf != nil && logBuf.Len() > 0 {
 		actual = append(actual, "\nLogs:\n"...)
