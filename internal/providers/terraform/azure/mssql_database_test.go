@@ -7,10 +7,11 @@ import (
 )
 
 func TestMSSQLDatabase(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "mssql_database_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	opts.CaptureLogs = true
+	tftest.GoldenFileResourceTestsWithOpts(t, "mssql_database_test", opts)
 }
