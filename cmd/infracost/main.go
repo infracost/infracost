@@ -51,6 +51,11 @@ func main() {
 
 	startUpdateCheck(ctx, updateMessageChan)
 
+	rootCmd := NewRootCommand(ctx)
+	appErr = rootCmd.Execute()
+}
+
+func NewRootCommand(ctx *config.RunContext) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:     "infracost",
 		Version: version.Version,
@@ -124,7 +129,7 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 
 	rootCmd.SetVersionTemplate("Infracost {{.Version}}\n")
 
-	appErr = rootCmd.Execute()
+	return rootCmd
 }
 
 func startUpdateCheck(ctx *config.RunContext, c chan *update.Info) {
