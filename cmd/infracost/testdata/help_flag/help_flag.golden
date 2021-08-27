@@ -1,0 +1,34 @@
+Infracost - cloud cost estimates for Terraform
+
+DOCS
+  https://infracost.io/docs
+
+USAGE
+  infracost [flags]
+  infracost [command]
+
+EXAMPLES
+  Generate a cost diff from Terraform directory with any required Terraform flags:
+
+      infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
+	
+  Generate a full cost breakdown from Terraform directory with any required Terraform flags:
+
+      infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
+
+AVAILABLE COMMANDS
+  breakdown   Show full breakdown of costs
+  completion  Generate completion script
+  configure   Display or change global configuration
+  diff        Show diff of monthly costs between current and planned state
+  help        Help about any command
+  output      Combine and output Infracost JSON files in different formats
+  register    Register for a free Infracost API key
+
+FLAGS
+  -h, --help               help for infracost
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output
+  -v, --version            version for infracost
+
+Use "infracost [command] --help" for more information about a command.
