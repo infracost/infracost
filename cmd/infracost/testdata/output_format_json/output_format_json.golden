@@ -7,7 +7,7 @@
       "metadata": {
         "path": "./examples/terraform/",
         "type": "terraform_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepoUrl": "REPLACED",
         "vcsSubPath": "examples/terraform",
         "terraformWorkspace": "default"
       },
@@ -213,7 +213,7 @@
       "metadata": {
         "path": "./cmd/infracost/testdata/azure_firewall_plan.json",
         "type": "terraform_plan_json",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepoUrl": "REPLACED",
         "vcsSubPath": "cmd/infracost/testdata/azure_firewall_plan.json"
       },
       "pastBreakdown": {
