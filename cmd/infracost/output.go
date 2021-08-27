@@ -132,7 +132,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(b))
+			cmd.Println(string(b))
 
 			return nil
 		},
