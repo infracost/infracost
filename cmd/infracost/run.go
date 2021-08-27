@@ -195,7 +195,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		return errors.Wrap(err, "Error generating output")
 	}
 
-	fmt.Printf("%s\n", out)
+	cmd.Printf("%s\n", out)
 
 	return nil
 }
