@@ -18,8 +18,7 @@ func TestDiffTerraformDirectory(t *testing.T) {
 }
 
 func TestDiffTerraformShowSkipped(t *testing.T) {
-	testdataName := testutil.CalcGoldenFileTestdataDirName()
-	GoldenFileCommandTest(t, testdataName, []string{"diff", "--path", "./testdata/" + testdataName + "/plan.json", "--show-skipped"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/azure_firewall_plan.json", "--show-skipped"}, nil)
 }
 
 // Need to figure out how to capture synced file before we enable this
