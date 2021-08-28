@@ -40,7 +40,7 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 
 	outBuf := bytes.NewBuffer([]byte{})
 
-	runCtx.Config.EnableDashboard = false
+	runCtx.Config.EventsDisabled = true
 	runCtx.Config.Currency = options.Currency
 	runCtx.Config.NoColor = true
 

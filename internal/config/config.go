@@ -48,6 +48,7 @@ type Config struct {
 	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
 
 	// for testing
+	EventsDisabled       bool
 	LogWriter            io.Writer
 	LogDisableTimestamps bool
 }
