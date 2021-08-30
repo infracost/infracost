@@ -27,7 +27,7 @@ func main() {
 	ctx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
 		if err.Error() != "" {
-			ui.PrintError(err.Error())
+			ui.PrintError(os.Stderr, err.Error())
 		}
 		os.Exit(1)
 	}
@@ -161,7 +161,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 	}
 
 	if cliErr.Error() != "" {
-		ui.PrintError(cliErr.Error())
+		ui.PrintError(os.Stderr, cliErr.Error())
 	}
 
 	err := apiclient.ReportCLIError(ctx, cliErr)

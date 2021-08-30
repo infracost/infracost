@@ -38,6 +38,7 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	require.Nil(t, err)
 
+	errBuf := bytes.NewBuffer([]byte{})
 	outBuf := bytes.NewBuffer([]byte{})
 
 	runCtx.Config.EventsDisabled = true
@@ -45,6 +46,7 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 	runCtx.Config.NoColor = true
 
 	rootCmd := main.NewRootCommand(runCtx)
+	rootCmd.SetErr(errBuf)
 	rootCmd.SetOut(outBuf)
 	rootCmd.SetArgs(args)
 
@@ -69,14 +71,19 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 		actual = outBuf.Bytes()
 	}
 
-	// strip out any timestamps
-	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
-	actual = vcsRepoURLRegex.ReplaceAll(actual, []byte(`"vcsRepoUrl": "REPLACED"`))
+	if errBuf != nil && errBuf.Len() > 0 {
+		actual = append(actual, "\nErr:\n"...)
+		actual = append(actual, errBuf.Bytes()...)
+	}
 
 	if logBuf != nil && logBuf.Len() > 0 {
 		actual = append(actual, "\nLogs:\n"...)
 		actual = append(actual, logBuf.Bytes()...)
 	}
+
+	// strip out any timestamps
+	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
+	actual = vcsRepoURLRegex.ReplaceAll(actual, []byte(`"vcsRepoUrl": "REPLACED"`))
 
 	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)

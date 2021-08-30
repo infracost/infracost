@@ -19,6 +19,12 @@ func TestBreakdownFormatJSON(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "json", "--path", "../../examples/terraform/plan.json"}, opts)
 }
 
+func TestBreakdownFormatJSONShowSkipped(t *testing.T) {
+	opts := DefaultOptions()
+	opts.IsJSON = true
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "json", "--path", "../../examples/terraform/plan.json", "--show-skipped"}, opts)
+}
+
 func TestBreakdownFormatTable(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "table", "--path", "../../examples/terraform/plan.json"}, nil)
 }
@@ -33,6 +39,10 @@ func TestBreakdownTerraformDirectory(t *testing.T) {
 
 func TestBreakdownTerraformFieldsAll(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform/plan.json", "--fields", "all"}, nil)
+}
+
+func TestBreakdownTerraformFieldsInvalid(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform/plan.json", "--fields", "price,hourlyCost,invalid"}, nil)
 }
 
 func TestBreakdownTerraformShowSkipped(t *testing.T) {
