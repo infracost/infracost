@@ -41,7 +41,7 @@ func (p *PlanProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sch
 		return []*schema.Project{}, err
 	}
 
-	metadata := config.DetectProjectMetadata(p.ctx)
+	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
@@ -86,16 +86,12 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 		}
 	}
 
-	if p.DirProvider != nil {
-		p.DirProvider.Path = dir
-	}
-
 	err := p.checks()
 	if err != nil {
 		return []byte{}, err
 	}
 
-	opts, err := p.buildCommandOpts()
+	opts, err := p.buildCommandOpts(dir)
 	if err != nil {
 		return []byte{}, err
 	}

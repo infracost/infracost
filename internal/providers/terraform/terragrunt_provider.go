@@ -3,21 +3,20 @@ package terraform
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"sync"
+	"os"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/pkg/errors"
 )
 
 var defaultTerragruntBinary = "terragrunt"
-var minTerragruntVersion = "v0.31.0"
+var minTerragruntVer = "v0.28.1"
 
 type TerragruntProvider struct {
-	ctx              *config.ProjectContext
-	TerragruntBinary string
-	Path             string
+	ctx  *config.ProjectContext
+	Path string
+	*DirProvider
 }
 
 type TerragruntInfo struct {
@@ -25,16 +24,20 @@ type TerragruntInfo struct {
 }
 
 func NewTerragruntProvider(ctx *config.ProjectContext) schema.Provider {
+	dirProvider := NewDirProvider(ctx).(*DirProvider)
 
 	terragruntBinary := ctx.ProjectConfig.TerraformBinary
 	if terragruntBinary == "" {
 		terragruntBinary = defaultTerragruntBinary
 	}
 
+	dirProvider.TerraformBinary = terragruntBinary
+	dirProvider.IsTerragrunt = true
+
 	return &TerragruntProvider{
-		ctx:              ctx,
-		TerragruntBinary: terragruntBinary,
-		Path:             ctx.ProjectConfig.Path,
+		ctx:         ctx,
+		DirProvider: dirProvider,
+		Path:        ctx.ProjectConfig.Path,
 	}
 }
 
@@ -56,70 +59,51 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 		return []*schema.Project{}, err
 	}
 
-	parallelism := 4
-	projects := make([]*schema.Project, 0)
+	var outs [][]byte
 
-	var waitGroup sync.WaitGroup
-	var semaphore = make(chan struct{}, parallelism) // Make a semaphore from a buffered channel
-	errs := make(chan error)
-
-	for _, path := range paths {
-		waitGroup.Add(1)
-		go func(path string) {
-			defer waitGroup.Done()
-			pathProjects, err := p.loadProjectWhenReady(semaphore, path, usage)
-			if err != nil {
-				errs <- err
-			}
-
-			projects = append(projects, pathProjects...)
-		}(path)
+	if p.UseState {
+		outs, err = p.generateStateJSONs(paths)
+	} else {
+		outs, err = p.generatePlanJSONs(paths)
+	}
+	if err != nil {
+		return []*schema.Project{}, err
 	}
 
-	waitGroup.Wait()
-	close(errs)
+	projects := make([]*schema.Project, 0, len(paths))
 
-	var multiErr *multierror.Error
-	for err := range errs {
-		multiErr = multierror.Append(multiErr, err)
+	for i, path := range paths {
+		metadata := config.DetectProjectMetadata(path)
+		metadata.Type = p.Type()
+		p.AddMetadata(metadata)
+		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+
+		project := schema.NewProject(name, metadata)
+
+		parser := NewParser(p.ctx)
+		pastResources, resources, err := parser.parseJSON(outs[i], usage)
+		if err != nil {
+			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
+		}
+
+		project.HasDiff = !p.UseState
+		if project.HasDiff {
+			project.PastResources = pastResources
+		}
+		project.Resources = resources
+
+		projects = append(projects, project)
 	}
 
-	fmt.Println(len(projects))
-
-	return projects, multiErr.ErrorOrNil()
-}
-
-func (p *TerragruntProvider) loadProjectWhenReady(semaphore chan struct{}, path string, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
-	semaphore <- struct{}{} // Add one to the buffered channel. Will block if parallelism limit is met
-	defer func() {
-		<-semaphore // Remove one from the buffered channel
-	}()
-
-	projectCfg := &config.Project{
-		Path:                path,
-		TerraformPlanFlags:  p.ctx.ProjectConfig.TerraformPlanFlags,
-		TerraformBinary:     p.TerragruntBinary,
-		TerraformWorkspace:  p.ctx.ProjectConfig.TerraformWorkspace,
-		TerraformCloudHost:  p.ctx.ProjectConfig.TerraformCloudHost,
-		TerraformCloudToken: p.ctx.ProjectConfig.TerraformCloudToken,
-		UsageFile:           p.ctx.ProjectConfig.UsageFile,
-		TerraformUseState:   p.ctx.ProjectConfig.TerraformUseState,
-	}
-
-	ctx := config.NewProjectContext(p.ctx.RunContext, projectCfg)
-	ctx.SetContextValues(p.ctx.ContextValues())
-
-	dirProvider := NewDirProvider(ctx).(*DirProvider)
-
-	return dirProvider.LoadResources(usage)
+	return projects, nil
 }
 
 func (p *TerragruntProvider) getProjectPaths() ([]string, error) {
 	opts := &CmdOptions{
-		TerraformBinary: p.TerragruntBinary,
+		TerraformBinary: p.TerraformBinary,
 		Dir:             p.Path,
 	}
-	out, err := Cmd(opts, "run-all", "terragrunt-info")
+	out, err := Cmd(opts, "run-all", "--terragrunt-ignore-external-dependencies", "terragrunt-info")
 	if err != nil {
 		return []string{}, err
 	}
@@ -131,7 +115,6 @@ func (p *TerragruntProvider) getProjectPaths() ([]string, error) {
 
 	paths := make([]string, 0, len(jsons))
 	for _, j := range jsons {
-		fmt.Println(string(j))
 		var info TerragruntInfo
 		err = json.Unmarshal(j, &info)
 		if err != nil {
@@ -142,4 +125,77 @@ func (p *TerragruntProvider) getProjectPaths() ([]string, error) {
 	}
 
 	return paths, nil
+}
+
+func (p *TerragruntProvider) generateStateJSONs(paths []string) ([][]byte, error) {
+	err := p.checks()
+	if err != nil {
+		return [][]byte{}, err
+	}
+
+	outs := make([][]byte, 0, len(paths))
+
+	for _, path := range paths {
+		opts, err := p.buildCommandOpts(path)
+		if err != nil {
+			return [][]byte{}, err
+		}
+		if opts.TerraformConfigFile != "" {
+			defer os.Remove(opts.TerraformConfigFile)
+		}
+
+		out, err := p.runShow(opts, "")
+		if err != nil {
+			return outs, err
+		}
+		outs = append(outs, out)
+	}
+
+	return outs, nil
+}
+
+func (p *DirProvider) generatePlanJSONs(paths []string) ([][]byte, error) {
+	err := p.checks()
+	if err != nil {
+		return [][]byte{}, err
+	}
+
+	opts, err := p.buildCommandOpts(p.Path)
+	if err != nil {
+		return [][]byte{}, err
+	}
+	if opts.TerraformConfigFile != "" {
+		defer os.Remove(opts.TerraformConfigFile)
+	}
+
+	planFile, planJSON, err := p.runPlan(opts, true)
+	defer os.Remove(planFile)
+
+	if err != nil {
+		return [][]byte{}, err
+	}
+
+	if len(planJSON) > 0 {
+		return [][]byte{planJSON}, nil
+	}
+
+	outs := make([][]byte, 0, len(paths))
+
+	for _, path := range paths {
+		opts, err := p.buildCommandOpts(path)
+		if err != nil {
+			return [][]byte{}, err
+		}
+		if opts.TerraformConfigFile != "" {
+			defer os.Remove(opts.TerraformConfigFile)
+		}
+
+		out, err := p.runShow(opts, planFile)
+		if err != nil {
+			return outs, err
+		}
+		outs = append(outs, out)
+	}
+
+	return outs, nil
 }

@@ -38,7 +38,7 @@ func (p *StateJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Terraform state JSON file")
 	}
 
-	metadata := config.DetectProjectMetadata(p.ctx)
+	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
