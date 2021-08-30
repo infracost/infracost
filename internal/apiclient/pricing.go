@@ -11,7 +11,8 @@ import (
 
 type PricingAPIClient struct {
 	APIClient
-	Currency string
+	Currency       string
+	EventsDisabled bool
 }
 
 type PriceQueryKey struct {
@@ -35,11 +36,16 @@ func NewPricingAPIClient(cfg *config.Config) *PricingAPIClient {
 			endpoint: cfg.PricingAPIEndpoint,
 			apiKey:   cfg.APIKey,
 		},
-		Currency: currency,
+		Currency:       currency,
+		EventsDisabled: cfg.EventsDisabled,
 	}
 }
 
 func (c *PricingAPIClient) AddEvent(name string, env map[string]interface{}) error {
+	if c.EventsDisabled {
+		return nil
+	}
+
 	d := map[string]interface{}{
 		"event": name,
 		"env":   env,

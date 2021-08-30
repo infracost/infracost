@@ -158,7 +158,7 @@ Supported settings:
 						config.CredentialsFilePath(),
 						ui.PrimaryString("infracost configure set pricing_api_endpoint https://cloud-pricing-api"),
 					)
-					ui.PrintWarning(msg)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 
 				}
 			} else if key == "api_key" {
@@ -169,7 +169,7 @@ Supported settings:
 						config.CredentialsFilePath(),
 						ui.PrimaryString("infracost configure set api_key MY_API_KEY"),
 					)
-					ui.PrintWarning(msg)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
 			} else if key == "currency" {
 				value = ctx.Config.Configuration.Currency
@@ -179,7 +179,7 @@ Supported settings:
 						config.CredentialsFilePath(),
 						ui.PrimaryString("infracost configure set currency CURRENCY"),
 					)
-					ui.PrintWarning(msg)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
 			}
 

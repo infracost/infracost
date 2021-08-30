@@ -81,14 +81,14 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			if cmd.Flags().Changed("fields") {
 				fields, _ = cmd.Flags().GetStringSlice("fields")
 				if len(fields) == 0 {
-					ui.PrintWarningf("fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
+					ui.PrintWarningf(cmd.ErrOrStderr(), "fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
 				} else if len(fields) == 1 && fields[0] == includeAllFields {
 					fields = validFields
 				} else {
 					vf := []string{}
 					for _, f := range fields {
 						if !contains(validFields, f) {
-							ui.PrintWarningf("Invalid field '%s' specified, valid fields are: %s or '%s' to include all fields", f, validFields, includeAllFields)
+							ui.PrintWarningf(cmd.ErrOrStderr(), "Invalid field '%s' specified, valid fields are: %s or '%s' to include all fields", f, validFields, includeAllFields)
 						} else {
 							vf = append(vf, f)
 						}
@@ -116,7 +116,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			validFieldsFormats := []string{"table", "html"}
 
 			if cmd.Flags().Changed("fields") && !contains(validFieldsFormats, format) {
-				ui.PrintWarning("fields is only supported for table and html output formats")
+				ui.PrintWarning(cmd.ErrOrStderr(), "fields is only supported for table and html output formats")
 			}
 			switch strings.ToLower(format) {
 			case "json":
@@ -132,7 +132,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(string(b))
+			cmd.Println(string(b))
 
 			return nil
 		},

@@ -2,41 +2,42 @@ package ui
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/infracost/infracost/internal/version"
 	"github.com/spf13/cobra"
 )
 
-func PrintSuccess(msg string) {
-	fmt.Fprintf(os.Stderr, "%s %s\n", SuccessString("Success:"), msg)
+func PrintSuccess(w io.Writer, msg string) {
+	fmt.Fprintf(w, "%s %s\n", SuccessString("Success:"), msg)
 }
 
-func PrintSuccessf(msg string, a ...interface{}) {
-	PrintSuccess(fmt.Sprintf(msg, a...))
+func PrintSuccessf(w io.Writer, msg string, a ...interface{}) {
+	PrintSuccess(w, fmt.Sprintf(msg, a...))
 }
 
-func PrintError(msg string) {
-	fmt.Fprintf(os.Stderr, "%s %s\n", ErrorString("Error:"), msg)
+func PrintError(w io.Writer, msg string) {
+	fmt.Fprintf(w, "%s %s\n", ErrorString("Error:"), msg)
 }
 
-func PrintErrorf(msg string, a ...interface{}) {
-	PrintError(fmt.Sprintf(msg, a...))
+func PrintErrorf(w io.Writer, msg string, a ...interface{}) {
+	PrintError(w, fmt.Sprintf(msg, a...))
 }
 
-func PrintWarning(msg string) {
-	fmt.Fprintf(os.Stderr, "%s %s\n", WarningString("Warning:"), msg)
+func PrintWarning(w io.Writer, msg string) {
+	fmt.Fprintf(w, "%s %s\n", WarningString("Warning:"), msg)
 }
 
-func PrintWarningf(msg string, a ...interface{}) {
-	PrintWarning(fmt.Sprintf(msg, a...))
+func PrintWarningf(w io.Writer, msg string, a ...interface{}) {
+	PrintWarning(w, fmt.Sprintf(msg, a...))
 }
 
 func PrintUsageErrorAndExit(cmd *cobra.Command, msg string) {
 	cmd.SetOut(os.Stderr)
 	_ = cmd.Help()
 	fmt.Fprintln(os.Stderr, "")
-	PrintError(msg)
+	PrintError(os.Stderr, msg)
 	os.Exit(1)
 }
 

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -45,6 +46,11 @@ type Config struct {
 	ShowSkipped   bool       `yaml:"show_skipped,omitempty" ignored:"true"`
 	SyncUsageFile bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
 	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
+
+	// for testing
+	EventsDisabled       bool
+	LogWriter            io.Writer
+	LogDisableTimestamps bool
 }
 
 func init() {
@@ -67,6 +73,8 @@ func DefaultConfig() *Config {
 
 		Format: "table",
 		Fields: []string{"monthlyQuantity", "unit", "monthlyCost"},
+
+		EventsDisabled: IsTest(),
 	}
 }
 
@@ -129,8 +137,9 @@ func (c *Config) loadEnvVars() error {
 
 func (c *Config) ConfigureLogger() error {
 	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-		DisableColors: true,
+		FullTimestamp:    true,
+		DisableTimestamp: c.LogDisableTimestamps,
+		DisableColors:    true,
 		SortingFunc: func(keys []string) {
 			// Put message at the end
 			for i, key := range keys {
@@ -147,7 +156,11 @@ func (c *Config) ConfigureLogger() error {
 		return nil
 	}
 
-	logrus.SetOutput(os.Stderr)
+	if c.LogWriter != nil {
+		logrus.SetOutput(c.LogWriter)
+	} else {
+		logrus.SetOutput(os.Stderr)
+	}
 
 	level, err := logrus.ParseLevel(c.LogLevel)
 	if err != nil {

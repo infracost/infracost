@@ -13,7 +13,6 @@ import (
 
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/require"
 
 	"github.com/infracost/infracost/internal/config"
@@ -26,8 +25,6 @@ import (
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 )
-
-var update = flag.Bool("update", false, "update .golden files")
 
 var tfProviders = `
 	terraform {
@@ -232,36 +229,8 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 		actual = actual[endOfFirstLine+1:]
 	}
 
-	// Load the snapshot result
-	expected := []byte("")
 	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
-	if _, err := os.Stat(goldenFilePath); err == nil || !os.IsNotExist(err) {
-		// golden file exists, load the data
-		expected, err = ioutil.ReadFile(goldenFilePath)
-		assert.NoError(t, err)
-	}
-
-	if !bytes.Equal(expected, actual) {
-		if *update {
-			err = ioutil.WriteFile(goldenFilePath, actual, 0600)
-			assert.NoError(t, err)
-			t.Logf(fmt.Sprintf("Wrote golden file %s", goldenFilePath))
-		} else {
-			// Generate the diff and error message.  We don't call assert.Equal because it escapes
-			// newlines (\n) and the output looks terrible.
-			diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
-				A:        difflib.SplitLines(string(expected)),
-				B:        difflib.SplitLines(string(actual)),
-				FromFile: "Expected",
-				FromDate: "",
-				ToFile:   "Actual",
-				ToDate:   "",
-				Context:  1,
-			})
-
-			t.Errorf(fmt.Sprintf("\nOutput does not match golden file: \n\n%s\n", diff))
-		}
-	}
+	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 
 func RunCostCalculations(t *testing.T, cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {

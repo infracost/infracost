@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/Rhymond/go-money"
+	"io"
 	"os"
 	"strings"
 
@@ -195,7 +196,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		return errors.Wrap(err, "Error generating output")
 	}
 
-	fmt.Printf("%s\n", out)
+	cmd.Printf("%s\n", out)
 
 	return nil
 }
@@ -267,16 +268,16 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	if cmd.Flags().Changed("fields") {
 		fields, _ := cmd.Flags().GetStringSlice("fields")
 		if len(fields) == 0 {
-			ui.PrintWarningf("fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
+			ui.PrintWarningf(cmd.ErrOrStderr(), "fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
 		} else if cfg.Fields != nil && !contains(validFieldsFormats, cfg.Format) {
-			ui.PrintWarning("fields is only supported for table and html output formats")
+			ui.PrintWarning(cmd.ErrOrStderr(), "fields is only supported for table and html output formats")
 		} else if len(fields) == 1 && fields[0] == includeAllFields {
 			cfg.Fields = validFields
 		} else {
 			vf := []string{}
 			for _, f := range fields {
 				if !contains(validFields, f) {
-					ui.PrintWarningf("Invalid field '%s' specified, valid fields are: %s or '%s' to include all fields", f, validFields, includeAllFields)
+					ui.PrintWarningf(cmd.ErrOrStderr(), "Invalid field '%s' specified, valid fields are: %s or '%s' to include all fields", f, validFields, includeAllFields)
 				} else {
 					vf = append(vf, f)
 				}
@@ -288,9 +289,9 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	return nil
 }
 
-func checkRunConfig(cfg *config.Config) error {
+func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 	if cfg.Format == "json" && cfg.ShowSkipped {
-		ui.PrintWarning("show-skipped is not needed with JSON output format as that always includes them.\n")
+		ui.PrintWarning(warningWriter, "show-skipped is not needed with JSON output format as that always includes them.\n")
 	}
 
 	if cfg.SyncUsageFile {
@@ -301,16 +302,16 @@ func checkRunConfig(cfg *config.Config) error {
 			}
 		}
 		if len(missingUsageFile) == 1 {
-			ui.PrintWarning("Ignoring sync-usage-file as no usage-file is specified.\n")
+			ui.PrintWarning(warningWriter, "Ignoring sync-usage-file as no usage-file is specified.\n")
 		} else if len(missingUsageFile) == len(cfg.Projects) {
-			ui.PrintWarning("Ignoring sync-usage-file since no projects have a usage-file specified.\n")
+			ui.PrintWarning(warningWriter, "Ignoring sync-usage-file since no projects have a usage-file specified.\n")
 		} else if len(missingUsageFile) > 1 {
-			ui.PrintWarning(fmt.Sprintf("Ignoring sync-usage-file for following projects as no usage-file is specified for them: %s.\n", strings.Join(missingUsageFile, ", ")))
+			ui.PrintWarning(warningWriter, fmt.Sprintf("Ignoring sync-usage-file for following projects as no usage-file is specified for them: %s.\n", strings.Join(missingUsageFile, ", ")))
 		}
 	}
 
 	if money.GetCurrency(cfg.Currency) == nil {
-		ui.PrintWarning(fmt.Sprintf("Ignoring unknown currency '%s', using USD.\n", cfg.Currency))
+		ui.PrintWarning(warningWriter, fmt.Sprintf("Ignoring unknown currency '%s', using USD.\n", cfg.Currency))
 		cfg.Currency = "USD"
 	}
 
