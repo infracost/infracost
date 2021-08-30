@@ -36,32 +36,26 @@ func (c *ProjectContext) SetContextValue(key string, value interface{}) {
 	c.contextVals[key] = value
 }
 
-func (c *ProjectContext) SetContextValues(m map[string]interface{}) {
-	for k, v := range m {
-		c.SetContextValue(k, v)
-	}
-}
-
 func (c *ProjectContext) ContextValues() map[string]interface{} {
 	return c.contextVals
 }
 
-func DetectProjectMetadata(ctx *ProjectContext) *schema.ProjectMetadata {
+func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 	vcsRepoURL := os.Getenv("INFRACOST_VCS_REPOSITORY_URL")
 	vcsSubPath := os.Getenv("INFRACOST_VCS_SUB_PATH")
 	vcsPullRequestURL := os.Getenv("INFRACOST_VCS_PULL_REQUEST_URL")
 	terraformWorkspace := os.Getenv("INFRACOST_TERRAFORM_WORKSPACE")
 
 	if vcsRepoURL == "" {
-		vcsRepoURL = gitRepo(ctx.ProjectConfig.Path)
+		vcsRepoURL = gitRepo(path)
 	}
 
 	if vcsRepoURL != "" && vcsSubPath == "" {
-		vcsSubPath = gitSubPath(ctx.ProjectConfig.Path)
+		vcsSubPath = gitSubPath(path)
 	}
 
 	return &schema.ProjectMetadata{
-		Path:               ctx.ProjectConfig.Path,
+		Path:               path,
 		VCSRepoURL:         vcsRepoURL,
 		VCSSubPath:         vcsSubPath,
 		VCSPullRequestURL:  vcsPullRequestURL,

@@ -37,7 +37,7 @@ func (p *TemplateProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Cloudformation template file")
 	}
 
-	metadata := config.DetectProjectMetadata(p.ctx)
+	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)

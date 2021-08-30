@@ -88,13 +88,11 @@ func (p *DirProvider) checks() error {
 
 	fullVersion := strings.SplitN(string(out), "\n", 2)[0]
 	version := shortTerraformVersion(fullVersion)
+
 	p.ctx.SetContextValue("terraformFullVersion", fullVersion)
 	p.ctx.SetContextValue("terraformVersion", version)
 
-	if v, ok := checkTerraformVersion(version, fullVersion); !ok {
-		return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
-	}
-	return nil
+	return checkTerraformVersion(version, fullVersion)
 }
 
 func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
@@ -138,7 +136,7 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 	}
 
 	for _, j := range jsons {
-		metadata := config.DetectProjectMetadata(p.ctx)
+		metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
 		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
@@ -169,7 +167,7 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		return []byte{}, err
 	}
 
-	opts, err := p.buildCommandOpts()
+	opts, err := p.buildCommandOpts(p.Path)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -197,7 +195,7 @@ func (p *DirProvider) generateStateJSON() ([]byte, error) {
 		return []byte{}, err
 	}
 
-	opts, err := p.buildCommandOpts()
+	opts, err := p.buildCommandOpts(p.Path)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -208,11 +206,11 @@ func (p *DirProvider) generateStateJSON() ([]byte, error) {
 	return p.runShow(opts, "")
 }
 
-func (p *DirProvider) buildCommandOpts() (*CmdOptions, error) {
+func (p *DirProvider) buildCommandOpts(path string) (*CmdOptions, error) {
 	opts := &CmdOptions{
 		TerraformBinary:    p.TerraformBinary,
 		TerraformWorkspace: p.Workspace,
-		Dir:                p.Path,
+		Dir:                path,
 	}
 
 	cfgFile, err := CreateConfigFile(p.Path, p.TerraformCloudHost, p.TerraformCloudToken)
@@ -242,7 +240,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 
 	args := []string{}
 	if p.IsTerragrunt {
-		args = append(args, "run-all")
+		args = append(args, "run-all", "--terragrunt-ignore-external-dependencies")
 	}
 
 	args = append(args, "plan", "-input=false", "-lock=false", "-no-color")
@@ -301,7 +299,7 @@ func (p *DirProvider) runInit(opts *CmdOptions) error {
 
 	args := []string{}
 	if p.IsTerragrunt {
-		args = append(args, "run-all")
+		args = append(args, "run-all", "--terragrunt-ignore-external-dependencies")
 	}
 	args = append(args, "init", "-input=false", "-no-color")
 
@@ -372,12 +370,7 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 func (p *DirProvider) runShow(opts *CmdOptions, planFile string) ([]byte, error) {
 	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
 
-	args := []string{}
-	if p.IsTerragrunt {
-		args = append(args, "run-all")
-	}
-
-	args = append(args, "show", "-no-color", "-json")
+	args := []string{"show", "-no-color", "-json"}
 	if planFile != "" {
 		args = append(args, planFile)
 	}
@@ -411,13 +404,17 @@ func shortTerraformVersion(full string) string {
 	return ""
 }
 
-func checkTerraformVersion(v string, fullV string) (string, bool) {
-	// Allow any non-terraform binaries, e.g. terragrunt
-	if !strings.HasPrefix(fullV, "Terraform ") {
-		return v, true
+func checkTerraformVersion(v string, fullV string) error {
+	if strings.HasPrefix(fullV, "Terraform ") && semver.Compare(v, minTerraformVer) < 0 {
+		return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
 	}
 
-	return v, semver.Compare(v, minTerraformVer) >= 0
+	if strings.HasPrefix(fullV, "terragrunt") && semver.Compare(v, minTerragruntVer) < 0 {
+		return errors.Errorf("Terragrunt %s is not supported. Please use Terragrunt version >= %s.", v, minTerragruntVer)
+	}
+
+	// Allow any non-terraform and non-terragrunt binaries
+	return nil
 }
 
 func printTerraformErr(err error) {
