@@ -73,6 +73,8 @@ func DefaultConfig() *Config {
 
 		Format: "table",
 		Fields: []string{"monthlyQuantity", "unit", "monthlyCost"},
+
+		EventsDisabled: IsTest(),
 	}
 }
 
