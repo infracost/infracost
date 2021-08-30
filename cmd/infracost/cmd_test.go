@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-var timestampRegex = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)((-(\d{2}):(\d{2})|Z| [A-Z]{3})?)`)
+var timestampRegex = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]{3})?)`)
 var vcsRepoURLRegex = regexp.MustCompile(`"vcsRepoUrl": "[^"]*"`)
 
 type GoldenFileOptions = struct {
