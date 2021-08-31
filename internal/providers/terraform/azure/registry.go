@@ -80,6 +80,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMSearchServiceRegistryItem(),
 	GetAzureRMRedisCacheRegistryItem(),
 	GetAzureRMStorageAccountRegistryItem(),
+	GetAzureRMSynapseSparkPoolRegistryItem(),
+	GetAzureRMSynapseSQLPoolRegistryItem(),
 	GetAzureRMSynapseWorkspacRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),

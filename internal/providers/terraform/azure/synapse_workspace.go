@@ -30,22 +30,18 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 		managedVirtualNetwork = d.Get("managed_virtual_network_enabled").Bool()
 	}
 
-	if managedVirtualNetwork {
-		costComponents = append(costComponents, synapseManagedVirtualNetworkCostComponent(region, "Managed virtual network"))
-	}
-
 	var serverlessSqlPoolSize *decimal.Decimal
 	if u != nil && u.Get("serverless_sql_pool_size_tb").Type != gjson.Null {
 		serverlessSqlPoolSize = decimalPtr(decimal.NewFromInt(u.Get("serverless_sql_pool_size_tb").Int()))
 	}
 
 	if serverlessSqlPoolSize == nil || (serverlessSqlPoolSize != nil && serverlessSqlPoolSize.LessThanOrEqual(decimal.NewFromInt(10))) {
-		costComponents = append(costComponents, synapseServerlessSqlPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", serverlessSqlPoolSize))
+		costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", serverlessSqlPoolSize))
 	}
 
 	if serverlessSqlPoolSize != nil && serverlessSqlPoolSize.GreaterThan(decimal.NewFromInt(10)) {
-		costComponents = append(costComponents, synapseServerlessSqlPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", decimalPtr(decimal.NewFromInt(10))))
-		costComponents = append(costComponents, synapseServerlessSqlPoolCostComponent(region, "Serverless SQL pool size (over 10TB)", "10", decimalPtr(serverlessSqlPoolSize.Sub(decimal.NewFromInt(10)))))
+		costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", decimalPtr(decimal.NewFromInt(10))))
+		costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size (over 10TB)", "10", decimalPtr(serverlessSqlPoolSize.Sub(decimal.NewFromInt(10)))))
 	}
 
 	dataflowTiers := [2]string{"Basic", "Standard"}
@@ -97,7 +93,7 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func synapseServerlessSqlPoolCostComponent(region, name, start string, quantity *decimal.Decimal) *schema.CostComponent {
+func synapseServerlessSQLPoolCostComponent(region, name, start string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "TB",
