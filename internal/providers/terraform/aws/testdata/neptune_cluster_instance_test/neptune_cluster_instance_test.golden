@@ -3,7 +3,7 @@
                                                                                                        
  aws_neptune_cluster.default                                                                           
  ├─ Storage                                       Monthly cost depends on usage: $0.12 per GB          
- └─ I/O                                           Monthly cost depends on usage: $0.23 per 1M request  
+ └─ I/O requests                                  Monthly cost depends on usage: $0.23 per 1M request  
                                                                                                        
  aws_neptune_cluster_instance.dbR4LargeCount2[0]                                                       
  └─ Database instance (on-demand, db.r4.large)                 730  hours                      $297.84 

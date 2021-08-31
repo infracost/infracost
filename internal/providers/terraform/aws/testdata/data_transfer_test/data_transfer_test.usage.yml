@@ -24,11 +24,13 @@ resource_usage:
         monthly_outbound_other_regions_gb: 750
         monthly_outbound_internet_gb: 157000
 
+    # Use only 1 GB so we mask price changes cause changes in the USD-CNY exchange rate.  AWS lists China
+    # region prices in CNY and the cloud price api converts to USD on the fly using current exchange rates.
     aws_data_transfer.cn-northwest-1:
         region: cn-northwest-1
-        monthly_intra_region_gb: 1000
-        monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 157000
+        monthly_intra_region_gb: 1
+        monthly_outbound_other_regions_gb: 1
+        monthly_outbound_internet_gb: 1
 
     aws_data_transfer.eu-south-1:
         region: eu-south-1
@@ -92,11 +94,13 @@ resource_usage:
         monthly_outbound_other_regions_gb: 750
         monthly_outbound_internet_gb: 57000
 
+    # Use only 1 GB so we mask price changes cause changes in the USD-CNY exchange rate.  AWS lists China
+    # region prices in CNY and the cloud price api converts to USD on the fly using current exchange rates.
     aws_data_transfer.cn-north-1:
         region: cn-north-1
-        monthly_intra_region_gb: 1000
-        monthly_outbound_other_regions_gb: 750
-        monthly_outbound_internet_gb: 157000
+        monthly_intra_region_gb: 1
+        monthly_outbound_other_regions_gb: 1
+        monthly_outbound_internet_gb: 1
 
     aws_data_transfer.us-gov-west-1:
         region: us-gov-west-1

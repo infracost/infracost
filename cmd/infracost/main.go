@@ -27,7 +27,7 @@ func main() {
 	ctx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
 		if err.Error() != "" {
-			ui.PrintError(err.Error())
+			ui.PrintError(os.Stderr, err.Error())
 		}
 		os.Exit(1)
 	}
@@ -51,6 +51,11 @@ func main() {
 
 	startUpdateCheck(ctx, updateMessageChan)
 
+	rootCmd := NewRootCommand(ctx)
+	appErr = rootCmd.Execute()
+}
+
+func NewRootCommand(ctx *config.RunContext) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:     "infracost",
 		Version: version.Version,
@@ -124,7 +129,7 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 
 	rootCmd.SetVersionTemplate("Infracost {{.Version}}\n")
 
-	appErr = rootCmd.Execute()
+	return rootCmd
 }
 
 func startUpdateCheck(ctx *config.RunContext, c chan *update.Info) {
@@ -156,7 +161,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 	}
 
 	if cliErr.Error() != "" {
-		ui.PrintError(cliErr.Error())
+		ui.PrintError(os.Stderr, cliErr.Error())
 	}
 
 	err := apiclient.ReportCLIError(ctx, cliErr)

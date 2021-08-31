@@ -115,3 +115,7 @@
 1 resource type wasn't estimated as it's not supported yet.
 Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
 2 x aws_autoscaling_group
+Logs:
+
+level=warning msg="Skipping resource aws_launch_configuration.lc_tenancy_host. Infracost currently does not support host tenancy for AWS Launch Configurations"
+level=warning msg="Skipping resource aws_launch_template.lt_tenancy_host. Infracost currently does not support host tenancy for AWS Launch Templates"

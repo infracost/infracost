@@ -1,6 +1,7 @@
 package apiclient
 
 import (
+	"fmt"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -10,6 +11,8 @@ import (
 
 type PricingAPIClient struct {
 	APIClient
+	Currency       string
+	EventsDisabled bool
 }
 
 type PriceQueryKey struct {
@@ -23,15 +26,26 @@ type PriceQueryResult struct {
 }
 
 func NewPricingAPIClient(cfg *config.Config) *PricingAPIClient {
+	currency := cfg.Currency
+	if currency == "" {
+		currency = "USD"
+	}
+
 	return &PricingAPIClient{
-		APIClient{
+		APIClient: APIClient{
 			endpoint: cfg.PricingAPIEndpoint,
 			apiKey:   cfg.APIKey,
 		},
+		Currency:       currency,
+		EventsDisabled: cfg.EventsDisabled,
 	}
 }
 
 func (c *PricingAPIClient) AddEvent(name string, env map[string]interface{}) error {
+	if c.EventsDisabled {
+		return nil
+	}
+
 	d := map[string]interface{}{
 		"event": name,
 		"env":   env,
@@ -64,16 +78,16 @@ func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *sche
 	v["productFilter"] = product
 	v["priceFilter"] = price
 
-	query := `
+	query := fmt.Sprintf(`
 		query($productFilter: ProductFilter!, $priceFilter: PriceFilter) {
 			products(filter: $productFilter) {
 				prices(filter: $priceFilter) {
 					priceHash
-					USD
+					%s
 				}
 			}
 		}
-	`
+	`, c.Currency)
 
 	return GraphQLQuery{query, v}
 }

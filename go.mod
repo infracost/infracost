@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
+	github.com/Rhymond/go-money v1.0.3 // indirect
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/awslabs/goformation/v4 v4.19.5
 	github.com/briandowns/spinner v1.15.0

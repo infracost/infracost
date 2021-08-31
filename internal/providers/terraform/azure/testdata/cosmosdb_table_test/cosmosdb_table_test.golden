@@ -51,3 +51,6 @@ To estimate usage-based resources use --usage-file, see https://infracost.io/usa
 1 resource type wasn't estimated as it's not supported yet.
 Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
 1 x azurerm_cosmosdb_table
+Logs:
+
+level=warning msg="Skipping resource azurerm_cosmosdb_table.account-in-another-module as its 'account_name' property could not be found."

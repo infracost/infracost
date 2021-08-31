@@ -77,12 +77,12 @@ build_output_cmd () {
 format_cost () {
   cost=$1
 
-  if [ -z "$cost" ] | [ "${cost}" == "null" ]; then
+  if [ -z "$cost" ] || [ "${cost}" = "null" ]; then
     echo "-"
-  elif [ $(echo "$cost < 100" | bc -l) = 1 ]; then
-    printf "$%0.2f" $cost
+  elif [ "$(echo "$cost < 100" | bc -l)" = 1 ]; then
+    printf "$currency%0.2f" "$cost"
   else
-    printf "$%0.0f" $cost
+    printf "$currency%0.0f" "$cost"
   fi
 }
 
@@ -157,6 +157,16 @@ diff_output=$(cat infracost_output_cmd | sh)
 past_total_monthly_cost=$(jq '[.projects[].pastBreakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
 total_monthly_cost=$(jq '[.projects[].breakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
 diff_cost=$(jq '[.projects[].diff.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
+currency=$(jq -r '.currency | select (.!=null)' infracost_breakdown.json)
+if [ "$currency" = "" ] || [ "$currency" = "USD" ]; then
+  currency="$"
+elif [ "$currency" = "EUR" ]; then
+  currency="€"
+elif [ "$currency" = "GBP" ]; then
+  currency="£"
+else
+  currency="$currency " # Space is needed so output is "INR 123"
+fi
 
 # If both old and new costs are greater than 0
 if [ $(echo "$past_total_monthly_cost > 0" | bc -l) = 1 ] && [ $(echo "$total_monthly_cost > 0" | bc -l) = 1 ]; then

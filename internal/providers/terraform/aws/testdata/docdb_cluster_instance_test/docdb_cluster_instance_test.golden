@@ -4,18 +4,18 @@
  aws_docdb_cluster_instance.db                                                                         
  ├─ Database instance (on-demand, db.t3.medium)                730  hours                       $56.94 
  ├─ Storage                                       Monthly cost depends on usage: $0.10 per GB          
- ├─ I/O                                           Monthly cost depends on usage: $0.20 per 1M requests 
+ ├─ I/O requests                                  Monthly cost depends on usage: $0.20 per 1M requests 
  └─ CPU credits                                   Monthly cost depends on usage: $0.09 per vCPU-hours  
                                                                                                        
  aws_docdb_cluster_instance.large                                                                      
  ├─ Database instance (on-demand, db.r5.4xlarge)               730  hours                    $1,617.68 
  ├─ Storage                                                  1,000  GB                         $100.00 
- └─ I/O                                                         10  1M requests                  $2.00 
+ └─ I/O requests                                                10  1M requests                  $2.00 
                                                                                                        
  aws_docdb_cluster_instance.medium                                                                     
  ├─ Database instance (on-demand, db.t3.medium)                730  hours                       $56.94 
  ├─ Storage                                                  1,000  GB                         $100.00 
- ├─ I/O                                                         10  1M requests                  $2.00 
+ ├─ I/O requests                                                10  1M requests                  $2.00 
  └─ CPU credits                                                 10  vCPU-hours                   $0.90 
                                                                                                        
  OVERALL TOTAL                                                                               $1,936.46 

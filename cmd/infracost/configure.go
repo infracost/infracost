@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var validConfigureKeys = []string{"api_key", "pricing_api_endpoint"}
+var validConfigureKeys = []string{"api_key", "pricing_api_endpoint", "currency"}
 
 func configureCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
@@ -21,6 +21,7 @@ func configureCmd(ctx *config.RunContext) *cobra.Command {
 Supported settings:
   - api_key: Infracost API key
   - pricing_api_endpoint: endpoint of the Cloud Pricing API
+  - currency: convert output from USD to your preferred currency
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Show the help
@@ -42,6 +43,7 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 Supported settings:
   - api_key: Infracost API key
   - pricing_api_endpoint: endpoint of the Cloud Pricing API
+  - currency: convert output from USD to your preferred currency
 `,
 		Example: `  Set your Infracost API key:
 
@@ -49,7 +51,11 @@ Supported settings:
 
   Set your Cloud Pricing API endpoint:
 
-      infracost	configure set pricing_api_endpoint https://cloud-pricing-api`,
+      infracost	configure set pricing_api_endpoint https://cloud-pricing-api
+
+  Set your preferred currency code (ISO 4217):
+
+      infracost	configure set currency EUR`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 2 {
 				return errors.New("Too many arguments")
@@ -87,6 +93,15 @@ Supported settings:
 				}
 			}
 
+			if key == "currency" {
+				ctx.Config.Configuration.Currency = value
+
+				err := ctx.Config.Configuration.Save()
+				if err != nil {
+					return err
+				}
+			}
+
 			return nil
 		},
 	}
@@ -103,6 +118,7 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 Supported settings:
   - api_key: Infracost API key
   - pricing_api_endpoint: endpoint of the Cloud Pricing API
+  - currency: convert output from USD to your preferred currency
 `,
 		Example: `  Get your saved Infracost API key:
 
@@ -110,7 +126,11 @@ Supported settings:
 
   Get your saved Cloud Pricing API endpoint:
 
-      infracost	configure get pricing_api_endpoint`,
+      infracost	configure get pricing_api_endpoint
+
+  Get your preferred currency:
+
+      infracost	configure get currency`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 1 {
 				return errors.New("Too many arguments")
@@ -138,7 +158,7 @@ Supported settings:
 						config.CredentialsFilePath(),
 						ui.PrimaryString("infracost configure set pricing_api_endpoint https://cloud-pricing-api"),
 					)
-					ui.PrintWarning(msg)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 
 				}
 			} else if key == "api_key" {
@@ -149,7 +169,17 @@ Supported settings:
 						config.CredentialsFilePath(),
 						ui.PrimaryString("infracost configure set api_key MY_API_KEY"),
 					)
-					ui.PrintWarning(msg)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
+				}
+			} else if key == "currency" {
+				value = ctx.Config.Configuration.Currency
+
+				if value == "" {
+					msg := fmt.Sprintf("No currency in your saved config (%s), defaulting to USD.\nSet a currency using %s.",
+						config.CredentialsFilePath(),
+						ui.PrimaryString("infracost configure set currency CURRENCY"),
+					)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
 			}
 

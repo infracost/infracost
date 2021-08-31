@@ -1,0 +1,71 @@
+
+Project: infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
+
++ azurerm_firewall.non_usage
+  +$913
+
+    + Deployment (Standard)
+      +$913
+
+    + Data processed
+      Monthly cost depends on usage
+        +$0.016 per GB
+
++ azurerm_firewall.premium
+  +$639
+
+    + Deployment (Premium)
+      +$639
+
+    + Data processed
+      Monthly cost depends on usage
+        +$0.008 per GB
+
++ azurerm_firewall.premium_virtual_hub
+  +$639
+
+    + Deployment (Premium Secured Virtual Hub)
+      +$639
+
+    + Data processed
+      Monthly cost depends on usage
+        +$0.008 per GB
+
++ azurerm_firewall.standard
+  +$913
+
+    + Deployment (Standard)
+      +$913
+
+    + Data processed
+      Monthly cost depends on usage
+        +$0.016 per GB
+
++ azurerm_firewall.standard_virtual_hub
+  +$913
+
+    + Deployment (Secured Virtual Hub)
+      +$913
+
+    + Data processed
+      Monthly cost depends on usage
+        +$0.016 per GB
+
++ azurerm_public_ip.example
+  +$3.65
+
+    + IP address (static)
+      +$3.65
+
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
+Amount:  +$4,019 ($0.00 -> $4,019)
+
+----------------------------------
+Key: ~ changed, + added, - removed
+
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+
+2 resource types weren't estimated as they're not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_virtual_hub
+1 x azurerm_virtual_wan

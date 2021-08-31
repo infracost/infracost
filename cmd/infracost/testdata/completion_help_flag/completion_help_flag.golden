@@ -1,0 +1,49 @@
+To load completions:
+	
+	Bash:
+	
+		$ source <(infracost completion --shell bash)
+	
+		# To load completions for each session, execute once:
+		# Linux:
+		$ infracost completion --shell bash > /etc/bash_completion.d/infracost
+		# macOS:
+		$ infracost completion --shell bash > /usr/local/etc/bash_completion.d/infracost
+	
+	Zsh:
+	
+		# If shell completion is not already enabled in your environment,
+		# you will need to enable it.  You can execute the following once:
+	
+		$ echo "autoload -U compinit; compinit" >> ~/.zshrc
+	
+		# To load completions for each session, execute once:
+		$ infracost completion --shell zsh > "${fpath[1]}/_infracost"
+	
+		# You will need to start a new shell for this setup to take effect.
+	
+	fish:
+	
+		$ infracost completion --shell fish | source
+	
+		# To load completions for each session, execute once:
+		$ infracost completion --shell fish > ~/.config/fish/completions/infracost.fish
+	
+	PowerShell:
+	
+		PS> infracost completion --shell powershell | Out-String | Invoke-Expression
+	
+		# To load completions for every new session, run:
+		PS> infracost completion --shell powershell > infracost.ps1
+		# and source this file from your PowerShell profile.
+
+USAGE
+  infracost completion --shell [bash | zsh | fish | powershell] [flags]
+
+FLAGS
+  -h, --help           help for completion
+      --shell string   supported shell formats: bash, zsh, fish, powershell
+
+GLOBAL FLAGS
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output

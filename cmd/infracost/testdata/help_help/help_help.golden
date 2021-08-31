@@ -1,0 +1,12 @@
+Help provides help for any command in the application.
+Simply type infracost help [path to command] for full details.
+
+USAGE
+  infracost help [command] [flags]
+
+FLAGS
+  -h, --help   help for help
+
+GLOBAL FLAGS
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output
