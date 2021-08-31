@@ -28,11 +28,11 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
   Create HTML report from multiple Infracost JSON files:
 
-      infracost output --format html --path out*.json > output.html
+      infracost output --format html --path "out*.json" > output.html
 
   Merge multiple Infracost JSON files:
 
-      infracost output --format json --path out*.json`,
+      infracost output --format json --path "out*.json"`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFiles := []string{}
