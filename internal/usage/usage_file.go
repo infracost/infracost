@@ -81,7 +81,6 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 					Key:          s.Key,
 					DefaultValue: s.DefaultValue,
 					ValueType:    s.ValueType,
-					ShouldSync:   true,
 				})
 			}
 		}
@@ -113,7 +112,7 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 			}
 			if existingUsageValue != nil {
 				resourceUsage[usageKey] = existingUsageValue
-			} else if usageSchemaItem.ShouldSync {
+			} else {
 				resourceUsage[usageKey] = usageSchemaItem.DefaultValue
 			}
 		}

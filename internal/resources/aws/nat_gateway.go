@@ -7,10 +7,10 @@ import (
 )
 
 type NATGatewayArguments struct {
-	Address string `json:"address,omitempty"`
-	Region  string `json:"region,omitempty"`
+	Address string
+	Region  string
 
-	MonthlyDataProcessedGB *float64 `json:"monthlyDataProcessedGB,omitempty" infracost_usage:"monthly_data_processed_gb"`
+	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
 func (args *NATGatewayArguments) PopulateUsage(u *schema.UsageData) {

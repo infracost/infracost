@@ -2,92 +2,47 @@ package aws
 
 import (
 	"fmt"
+	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
 
 type DynamoDbTableArguments struct {
-	Address string `json:"address,omitempty"`
+	// "required" args that can't really be missing.
+	Address        string
+	Region         string
+	BillingMode    string
+	ReplicaRegions []string
 
-	// "required" args that can't really be missing.  These can still be overridden by usage.
-	Region         string   `json:"region,omitempty"`
-	BillingMode    string   `json:"billingMode,omitempty"`
-	ReplicaRegions []string `json:"replicaRegions,omitempty"`
+	// "optional" args, that may be empty depending on the resource config
+	WriteCapacity *int64
+	ReadCapacity  *int64
 
-	// "optional" args, meaning that we may show a 'Monthly cost depends on usage...' if they are missing.
-	WriteCapacity                  *int64 `json:"writeCapacity,omitempty"`
-	ReadCapacity                   *int64 `json:"readCapacity,omitempty"`
-	MonthlyWriteRequestUnits       *int64 `json:"monthlyWriteRequestUnits,omitempty"`
-	MonthlyReadRequestUnits        *int64 `json:"monthlyReadRequestUnits,omitempty"`
-	StorageGB                      *int64 `json:"storageGB,omitempty"`
-	PitrBackupStorageGB            *int64 `json:"pitrBackupStorageGB,omitempty"`
-	OnDemandBackupStorageGB        *int64 `json:"onDemandBackupStorageGB,omitempty"`
-	MonthlyDataRestoredGB          *int64 `json:"monthlyDataRestoredGB,omitempty"`
-	MonthlyStreamsReadRequestUnits *int64 `json:"monthlyStreamsReadRequestUnits,omitempty"`
+	// "usage" args
+	MonthlyWriteRequestUnits       *int64 `infracost_usage:"monthly_write_request_units"`
+	MonthlyReadRequestUnits        *int64 `infracost_usage:"monthly_read_request_units"`
+	StorageGB                      *int64 `infracost_usage:"storage_gb"`
+	PitrBackupStorageGB            *int64 `infracost_usage:"pitr_backup_storage_gb"`
+	OnDemandBackupStorageGB        *int64 `infracost_usage:"on_demand_backup_storage_gb"`
+	MonthlyDataRestoredGB          *int64 `infracost_usage:"monthly_data_restored_gb"`
+	MonthlyStreamsReadRequestUnits *int64 `infracost_usage:"monthly_streams_read_request_units"`
 }
 
-func (args *DynamoDbTableArguments) buildUsageSchema(keysToSkipSync []string) []*schema.UsageSchemaItem {
-	schema := []*schema.UsageSchemaItem{
-		{Key: "region", DefaultValue: "us-east-1", ValueType: schema.String},
-		{Key: "billing_mode", DefaultValue: "PROVISIONED", ValueType: schema.String},
-		{Key: "replica_regions", DefaultValue: []string{}, ValueType: schema.StringArray},
-		{Key: "write_capacity", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "read_capacity", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "monthly_write_request_units", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "monthly_read_request_units", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "pitr_backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "on_demand_backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "monthly_data_restored_gb", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "monthly_streams_read_request_units", DefaultValue: 0, ValueType: schema.Int64},
-	}
-	setShouldSync(schema, keysToSkipSync)
-	return schema
+func (args *DynamoDbTableArguments) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(args, u)
 }
 
-func (args *DynamoDbTableArguments) populateFromUsage(u *schema.UsageData) {
-	if u != nil {
-		if val := u.GetString("region"); val != nil {
-			args.Region = *val
-		}
-		if val := u.GetString("billing_mode"); val != nil {
-			args.BillingMode = *val
-		}
-		if val := u.GetStringArray("replica_regions"); val != nil {
-			args.ReplicaRegions = *val
-		}
-		if val := u.GetInt("write_capacity"); val != nil {
-			args.WriteCapacity = val
-		}
-		if val := u.GetInt("read_capacity"); val != nil {
-			args.ReadCapacity = val
-		}
-		if val := u.GetInt("monthly_write_request_units"); val != nil {
-			args.MonthlyWriteRequestUnits = val
-		}
-		if val := u.GetInt("monthly_read_request_units"); val != nil {
-			args.MonthlyReadRequestUnits = val
-		}
-		if val := u.GetInt("storage_gb"); val != nil {
-			args.StorageGB = val
-		}
-		if val := u.GetInt("pitr_backup_storage_gb"); val != nil {
-			args.PitrBackupStorageGB = val
-		}
-		if val := u.GetInt("on_demand_backup_storage_gb"); val != nil {
-			args.OnDemandBackupStorageGB = val
-		}
-		if val := u.GetInt("monthly_data_restored_gb"); val != nil {
-			args.MonthlyDataRestoredGB = val
-		}
-		if val := u.GetInt("monthly_streams_read_request_units"); val != nil {
-			args.MonthlyStreamsReadRequestUnits = val
-		}
-	}
+var DynamoDBTableUsageSchema = []*schema.UsageSchemaItem{
+	{Key: "monthly_write_request_units", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_read_request_units", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "pitr_backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "on_demand_backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_data_restored_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_streams_read_request_units", DefaultValue: 0, ValueType: schema.Int64},
 }
 
-func NewDynamoDBTable(args *DynamoDbTableArguments, u *schema.UsageData, keysToSkipSync []string) *schema.Resource {
-	args.populateFromUsage(u)
+func NewDynamoDBTable(args *DynamoDbTableArguments) *schema.Resource {
 
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
@@ -125,9 +80,9 @@ func NewDynamoDBTable(args *DynamoDbTableArguments, u *schema.UsageData, keysToS
 
 	return &schema.Resource{
 		Name:           args.Address,
+		UsageSchema:    DynamoDBTableUsageSchema,
 		CostComponents: costComponents,
 		SubResources:   subResources,
-		UsageSchema:    args.buildUsageSchema(keysToSkipSync),
 	}
 }
 
