@@ -32,7 +32,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		ReadCapacity:   intPtr(d.Get("read_capacity").Int()),
 		ReplicaRegions: replicaRegions,
 	}
-	keysToSkipSync := []string{"region", "billing_mode", "write_capacity", "read_capacity", "replica_regions"}
+	args.PopulateUsage(u)
 
-	return aws.NewDynamoDBTable(args, u, keysToSkipSync)
+	return aws.NewDynamoDBTable(args)
 }

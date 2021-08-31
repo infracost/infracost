@@ -1,6 +1,7 @@
 package resources
 
 import (
+	log "github.com/sirupsen/logrus"
 	"reflect"
 	"strings"
 
@@ -11,15 +12,22 @@ type CoreResource interface {
 	PopulateUsage(u *schema.UsageData)
 }
 
+// Dummy variables for type checking
+var intPtr *int64
+var floatPtr *float64
+var strPtr *string
+
 func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
+	if u == nil {
+		// nothing to do
+		return
+	}
+
 	ps := reflect.ValueOf(args)
 	s := ps.Elem()
 	if s.Kind() != reflect.Struct {
 		return
 	}
-
-	// Dummy variables for type checking
-	var floatPtr *float64
 
 	// Iterate over all fields of the args struct and
 	// try to set the values from the usage if it exist.
@@ -40,18 +48,18 @@ func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
 		// Key name for the usage file
 		usageKey := infracostTagSplitted[0]
 
-		// The arg is a pointer (*float64, *string, ...)
-		if f.Kind() == reflect.Ptr {
-			// It's a *float64
+		// Check whether a value for this arg was specified in the usage data.
+		if u.Get(usageKey).Exists() {
+			// Set the value of the arg to the value specified in the usage data.
 			if f.Type() == reflect.TypeOf(floatPtr) {
-
-				// Check whether a value for this arg was specified in the usage data.
-				if u != nil && u.Get(usageKey).Exists() {
-					// Set the value of the arg to the value specified in the usage data.
-					f.Set(reflect.ValueOf(u.GetFloat(usageKey)))
-				}
+				f.Set(reflect.ValueOf(u.GetFloat(usageKey)))
+			} else if f.Type() == reflect.TypeOf(intPtr) {
+				f.Set(reflect.ValueOf(u.GetInt(usageKey)))
+			} else if f.Type() == reflect.TypeOf(strPtr) {
+				f.Set(reflect.ValueOf(u.GetString(usageKey)))
+			} else {
+				log.Errorf("Unsupported field { UsageKey: %s, Type: %v }", usageKey, f.Type())
 			}
-			// TODO: Add support for other kinds (*string, *int, *int64).
 		}
 	}
 }
