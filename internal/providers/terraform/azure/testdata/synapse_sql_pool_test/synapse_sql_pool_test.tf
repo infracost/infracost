@@ -46,6 +46,6 @@ resource "azurerm_synapse_workspace" "example" {
 resource "azurerm_synapse_sql_pool" "example" {
   name                 = "examplesqlpool"
   synapse_workspace_id = azurerm_synapse_workspace.example.id
-  sku_name             = "DW30000c"
+  sku_name             = "DW200c"
   create_mode          = "Default"
 }
