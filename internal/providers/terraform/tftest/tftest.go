@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"sync"
 	"testing"
 
@@ -155,33 +157,43 @@ func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, 
 }
 
 func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
-	cfg := config.DefaultConfig()
-	err := cfg.LoadFromEnv()
+	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	assert.NoError(t, err)
 
-	project, err := RunCostCalculations(t, cfg, tfProject, usage)
+	project, err := RunCostCalculations(t, runCtx, tfProject, usage)
 	assert.NoError(t, err)
 
 	testutil.TestResources(t, project.Resources, checks)
 }
 
 type GoldenFileOptions = struct {
-	Currency string
+	Currency    string
+	CaptureLogs bool
+}
+
+func DefaultGoldenFileOptions() *GoldenFileOptions {
+	return &GoldenFileOptions{
+		Currency:    "USD",
+		CaptureLogs: false,
+	}
 }
 
 func GoldenFileResourceTests(t *testing.T, testName string) {
-	GoldenFileResourceTestsWithOpts(t, testName,
-		&GoldenFileOptions{
-			Currency: "USD",
-		})
+	GoldenFileResourceTestsWithOpts(t, testName, DefaultGoldenFileOptions())
 }
 
 func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *GoldenFileOptions) {
-	cfg := config.DefaultConfig()
-	err := cfg.LoadFromEnv()
+	runCtx, err := config.NewRunContextFromEnv(context.Background())
+
+	var logBuf *bytes.Buffer
+	if options != nil && options.CaptureLogs {
+		logBuf = testutil.ConfigureTestToCaptureLogs(t, runCtx)
+	} else {
+		testutil.ConfigureTestToFailOnLogs(t, runCtx)
+	}
 
 	if options != nil && options.Currency != "" {
-		cfg.Currency = options.Currency
+		runCtx.Config.Currency = options.Currency
 	}
 
 	require.NoError(t, err)
@@ -208,16 +220,16 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	}
 
 	// Generate the output
-	project, err := RunCostCalculations(t, cfg, tfProject, usageData)
+	project, err := RunCostCalculations(t, runCtx, tfProject, usageData)
 	require.NoError(t, err)
 
 	r := output.ToOutputFormat([]*schema.Project{project})
-	r.Currency = cfg.Currency
+	r.Currency = runCtx.Config.Currency
 
 	opts := output.Options{
 		ShowSkipped: true,
 		NoColor:     true,
-		Fields:      cfg.Fields,
+		Fields:      runCtx.Config.Fields,
 	}
 
 	actual, err := output.ToTable(r, opts)
@@ -229,16 +241,25 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 		actual = actual[endOfFirstLine+1:]
 	}
 
+	if logBuf != nil && logBuf.Len() > 0 {
+		actual = append(actual, "\nLogs:\n"...)
+
+		// need to sort the logs so they can be compared consistently
+		logLines := strings.Split(logBuf.String(), "\n")
+		sort.Strings(logLines)
+		actual = append(actual, strings.Join(logLines, "\n")...)
+	}
+
 	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 
-func RunCostCalculations(t *testing.T, cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
-	project, err := loadResources(t, cfg, tfProject, usage)
+func RunCostCalculations(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+	project, err := loadResources(t, runCtx, tfProject, usage)
 	if err != nil {
 		return project, err
 	}
-	err = prices.PopulatePrices(cfg, project)
+	err = prices.PopulatePrices(runCtx.Config, project)
 	if err != nil {
 		return project, err
 	}
@@ -250,7 +271,7 @@ func CreateTerraformProject(tmpDir string, tfProject TerraformProject) (string, 
 	return writeToTmpDir(tmpDir, tfProject)
 }
 
-func loadResources(t *testing.T, cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+func loadResources(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
 	tmpDir := t.TempDir()
 
 	_, err := os.ReadDir(initCache)
@@ -263,11 +284,6 @@ func loadResources(t *testing.T, cfg *config.Config, tfProject TerraformProject,
 	}
 
 	tfdir, err := CreateTerraformProject(tmpDir, tfProject)
-	if err != nil {
-		return nil, err
-	}
-
-	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
 		return nil, err
 	}

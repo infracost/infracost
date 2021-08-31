@@ -7,10 +7,11 @@ import (
 )
 
 func TestAzureRMDNSaaaaRecord(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "dns_aaaa_record_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	opts.CaptureLogs = true
+	tftest.GoldenFileResourceTestsWithOpts(t, "dns_aaaa_record_test", opts)
 }
