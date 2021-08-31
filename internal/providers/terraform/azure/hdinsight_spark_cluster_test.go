@@ -7,10 +7,11 @@ import (
 )
 
 func TestAzureRMHDInsightSparkClusterGoldenFile(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "hdinsight_spark_cluster_test") //nolint:misspell
+	opts := tftest.DefaultGoldenFileOptions()
+	opts.CaptureLogs = true
+	tftest.GoldenFileResourceTestsWithOpts(t, "hdinsight_spark_cluster_test", opts) //nolint:misspell
 }

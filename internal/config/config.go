@@ -1,6 +1,7 @@
 package config
 
 import (
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -24,7 +25,8 @@ type Project struct {
 }
 
 type Config struct {
-	Credentials Credentials
+	Credentials   Credentials
+	Configuration Configuration
 
 	Version         string `yaml:"version,omitempty" ignored:"true"`
 	LogLevel        string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
@@ -37,11 +39,18 @@ type Config struct {
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
 
+	Currency string `envconfig:"INFRACOST_CURRENCY"`
+
 	Projects      []*Project `yaml:"projects" ignored:"true"`
 	Format        string     `yaml:"format,omitempty" ignored:"true"`
 	ShowSkipped   bool       `yaml:"show_skipped,omitempty" ignored:"true"`
 	SyncUsageFile bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
 	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
+
+	// for testing
+	EventsDisabled       bool
+	LogWriter            io.Writer
+	LogDisableTimestamps bool
 }
 
 func init() {
@@ -64,6 +73,8 @@ func DefaultConfig() *Config {
 
 		Format: "table",
 		Fields: []string{"monthlyQuantity", "unit", "monthlyCost"},
+
+		EventsDisabled: IsTest(),
 	}
 }
 
@@ -100,6 +111,11 @@ func (c *Config) LoadFromEnv() error {
 		return err
 	}
 
+	err = loadConfiguration(c)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -121,8 +137,9 @@ func (c *Config) loadEnvVars() error {
 
 func (c *Config) ConfigureLogger() error {
 	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-		DisableColors: true,
+		FullTimestamp:    true,
+		DisableTimestamp: c.LogDisableTimestamps,
+		DisableColors:    true,
 		SortingFunc: func(keys []string) {
 			// Put message at the end
 			for i, key := range keys {
@@ -139,7 +156,11 @@ func (c *Config) ConfigureLogger() error {
 		return nil
 	}
 
-	logrus.SetOutput(os.Stderr)
+	if c.LogWriter != nil {
+		logrus.SetOutput(c.LogWriter)
+	} else {
+		logrus.SetOutput(os.Stderr)
+	}
 
 	level, err := logrus.ParseLevel(c.LogLevel)
 	if err != nil {

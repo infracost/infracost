@@ -7,10 +7,11 @@ import (
 )
 
 func TestAzureRMCosmosDBCassandraTableGoldenFile(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "cosmosdb_cassandra_table_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	opts.CaptureLogs = true
+	tftest.GoldenFileResourceTestsWithOpts(t, "cosmosdb_cassandra_table_test", opts)
 }

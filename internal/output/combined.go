@@ -18,7 +18,7 @@ func Load(data []byte) (Root, error) {
 	return out, err
 }
 
-func Combine(inputs []ReportInput, opts Options) Root {
+func Combine(currency string, inputs []ReportInput, opts Options) Root {
 	var combined Root
 
 	var totalHourlyCost *decimal.Decimal
@@ -50,6 +50,7 @@ func Combine(inputs []ReportInput, opts Options) Root {
 	}
 
 	combined.Version = outputVersion
+	combined.Currency = currency
 	combined.Projects = projects
 	combined.TotalHourlyCost = totalHourlyCost
 	combined.TotalMonthlyCost = totalMonthlyCost

@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -25,6 +26,11 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	}
 
 	instanceType := d.Get("instance_class").String()
+
+	var monthlyIORequests *decimal.Decimal
+	if u != nil && u.Get("monthly_standard_io_requests").Exists() {
+		monthlyIORequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_standard_io_requests").Int()))
+	}
 
 	var databaseEngine *string
 	switch strings.ToLower(d.Get("engine").String()) {
@@ -69,25 +75,32 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		licenseModel = strPtr("Bring your own license")
 	}
 
-	volumeType := "General Purpose"
-	if d.Get("storage_type").Exists() {
-		if d.Get("iops").Exists() && d.Get("iops").Type != gjson.Null {
-			volumeType = "Provisioned IOPS"
-		} else if strings.ToLower(d.Get("storage_type").String()) == "standard" {
-			volumeType = "Magnetic"
-		} else if strings.ToLower(d.Get("storage_type").String()) == "io1" {
-			volumeType = "Provisioned IOPS"
-		}
+	iopsVal := decimal.Zero
+	if d.Get("iops").Exists() && d.Get("iops").Type != gjson.Null {
+		iopsVal = decimal.NewFromFloat(d.Get("iops").Float())
 	}
 
-	allocatedStorageVal := decimal.Zero
-	if d.Get("allocated_storage").Exists() {
+	allocatedStorageVal := decimal.NewFromInt(20)
+	if d.Get("allocated_storage").Exists() && d.Get("allocated_storage").Type != gjson.Null {
 		allocatedStorageVal = decimal.NewFromFloat(d.Get("allocated_storage").Float())
 	}
 
-	iopsVal := decimal.Zero
-	if d.Get("iops").Exists() {
-		iopsVal = decimal.NewFromFloat(d.Get("iops").Float())
+	volumeType := "General Purpose"
+	storageName := "Storage (general purpose SSD, gp2)"
+	if d.Get("storage_type").Exists() {
+		if strings.ToLower(d.Get("storage_type").String()) == "io1" || iopsVal.GreaterThan(decimal.Zero) {
+			volumeType = "Provisioned IOPS"
+			storageName = "Storage (provisioned IOPS SSD, io1)"
+			if iopsVal.LessThan(decimal.NewFromInt(1000)) {
+				iopsVal = decimal.NewFromInt(1000)
+			}
+			if allocatedStorageVal.LessThan(decimal.NewFromInt(100)) {
+				allocatedStorageVal = decimal.NewFromInt(100)
+			}
+		} else if strings.ToLower(d.Get("storage_type").String()) == "standard" {
+			volumeType = "Magnetic"
+			storageName = "Storage (magnetic)"
+		}
 	}
 
 	instanceAttributeFilters := []*schema.AttributeFilter{
@@ -110,7 +123,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           "Database instance",
+			Name:           fmt.Sprintf("Database instance (on-demand, %s, %s)", deploymentOption, instanceType),
 			Unit:           "hours",
 			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -126,7 +139,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 			},
 		},
 		{
-			Name:            "Database storage",
+			Name:            storageName,
 			Unit:            "GB",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: &allocatedStorageVal,
@@ -143,9 +156,27 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		},
 	}
 
+	if strings.ToLower(volumeType) == "magnetic" {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            "I/O requests",
+			Unit:            "1M requests",
+			UnitMultiplier:  decimal.NewFromInt(1000000),
+			MonthlyQuantity: monthlyIORequests,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonRDS"),
+				ProductFamily: strPtr("System Operation"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr("/RDS:StorageIOUsage/i")},
+				},
+			},
+		})
+	}
+
 	if strings.ToLower(volumeType) == "provisioned iops" {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Database storage IOPS",
+			Name:            "Provisioned IOPS",
 			Unit:            "IOPS",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: &iopsVal,

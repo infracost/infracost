@@ -65,7 +65,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 
 			if r.Error != "" {
 				fmt.Fprintln(os.Stderr, "")
-				ui.PrintErrorf("There was an error requesting an API key\n%s\nPlease contact hello@infracost.io if you continue to have issues.", r.Error)
+				ui.PrintErrorf(cmd.ErrOrStderr(), "There was an error requesting an API key\n%s\nPlease contact hello@infracost.io if you continue to have issues.", r.Error)
 				return nil
 			}
 
@@ -87,7 +87,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 					)
 
 					fmt.Println("")
-					ui.PrintSuccess(msg)
+					ui.PrintSuccess(cmd.ErrOrStderr(), msg)
 					return nil
 				}
 			}
@@ -106,7 +106,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 			)
 
 			fmt.Println("")
-			ui.PrintSuccess(msg)
+			ui.PrintSuccess(cmd.ErrOrStderr(), msg)
 
 			return nil
 		},

@@ -1,0 +1,11 @@
+Register for a free Infracost API key
+
+USAGE
+  infracost register [flags]
+
+FLAGS
+  -h, --help   help for register
+
+GLOBAL FLAGS
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output

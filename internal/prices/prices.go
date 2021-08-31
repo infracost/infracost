@@ -77,13 +77,13 @@ func GetPrices(c *apiclient.PricingAPIClient, r *schema.Resource) error {
 	}
 
 	for _, r := range results {
-		setCostComponentPrice(r.Resource, r.CostComponent, r.Result)
+		setCostComponentPrice(c.Currency, r.Resource, r.CostComponent, r.Result)
 	}
 
 	return nil
 }
 
-func setCostComponentPrice(r *schema.Resource, c *schema.CostComponent, res gjson.Result) {
+func setCostComponentPrice(currency string, r *schema.Resource, c *schema.CostComponent, res gjson.Result) {
 	var p decimal.Decimal
 
 	products := res.Get("data.products").Array()
@@ -119,9 +119,9 @@ func setCostComponentPrice(r *schema.Resource, c *schema.CostComponent, res gjso
 	}
 
 	var err error
-	p, err = decimal.NewFromString(prices[0].Get("USD").String())
+	p, err = decimal.NewFromString(prices[0].Get(currency).String())
 	if err != nil {
-		log.Warnf("Error converting price (using 0.00) '%v': %s", prices[0].Get("USD").String(), err.Error())
+		log.Warnf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, prices[0].Get(currency).String(), err.Error())
 		c.SetPrice(decimal.Zero)
 		return
 	}

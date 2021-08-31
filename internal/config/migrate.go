@@ -12,6 +12,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+func (c *Config) migrateConfiguration() error {
+	// there are no migrations yet
+	return nil
+}
+
 func (c *Config) migrateCredentials() error {
 	oldPath := path.Join(userConfigDir(), "config.yml")
 	credPath := CredentialsFilePath()

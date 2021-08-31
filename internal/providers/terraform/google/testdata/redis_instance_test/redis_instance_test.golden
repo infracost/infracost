@@ -8,7 +8,7 @@
  └─ Redis instance (basic, M2)                5  GB           $0.14 
                                                                     
  google_redis_instance.basic_m3                                     
- └─ Redis instance (basic, M3)               25  GB           $0.57 
+ └─ Redis instance (basic, M3)               25  GB           $0.58 
                                                                     
  google_redis_instance.basic_m4                                     
  └─ Redis instance (basic, M4)               45  GB           $0.86 
@@ -26,7 +26,7 @@
  └─ Redis instance (standard, M3)            25  GB           $1.15 
                                                                     
  google_redis_instance.standard_m4                                  
- └─ Redis instance (standard, M4)            45  GB           $1.57 
+ └─ Redis instance (standard, M4)            45  GB           $1.58 
                                                                     
  google_redis_instance.standard_m5                                  
  └─ Redis instance (standard, M5)           105  GB           $3.15 
