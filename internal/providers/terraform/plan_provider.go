@@ -99,5 +99,6 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	return p.runShow(opts, planPath)
+	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
+	return p.runShow(opts, spinner, planPath)
 }

@@ -38,6 +38,10 @@ type DirProvider struct {
 	TerraformCloudToken string
 }
 
+type RunShowOptions struct {
+	CmdOptions *CmdOptions
+}
+
 func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
 	terraformBinary := ctx.ProjectConfig.TerraformBinary
 	if terraformBinary == "" {
@@ -175,7 +179,8 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	planFile, planJSON, err := p.runPlan(opts, true)
+	spinner := ui.NewSpinner("Running terraform plan", p.spinnerOpts)
+	planFile, planJSON, err := p.runPlan(opts, spinner, true)
 	defer os.Remove(planFile)
 
 	if err != nil {
@@ -186,7 +191,8 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		return planJSON, nil
 	}
 
-	return p.runShow(opts, planFile)
+	spinner = ui.NewSpinner("Running terraform show", p.spinnerOpts)
+	return p.runShow(opts, spinner, planFile)
 }
 
 func (p *DirProvider) generateStateJSON() ([]byte, error) {
@@ -203,7 +209,8 @@ func (p *DirProvider) generateStateJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	return p.runShow(opts, "")
+	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
+	return p.runShow(opts, spinner, "")
 }
 
 func (p *DirProvider) buildCommandOpts(path string) (*CmdOptions, error) {
@@ -223,8 +230,7 @@ func (p *DirProvider) buildCommandOpts(path string) (*CmdOptions, error) {
 	return opts, nil
 }
 
-func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte, error) {
-	spinner := ui.NewSpinner("Running terraform plan", p.spinnerOpts)
+func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail bool) (string, []byte, error) {
 	var planJSON []byte
 
 	fileName := ".tfplan-" + uuid.New().String()
@@ -262,11 +268,11 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 			strings.Contains(extractedErr, "Error: Provider requirements cannot be satisfied by locked dependencies") ||
 			strings.Contains(extractedErr, "Error: Module not installed")) {
 			spinner.Stop()
-			err = p.runInit(opts)
+			err = p.runInit(opts, ui.NewSpinner("Running terraform init", p.spinnerOpts))
 			if err != nil {
 				return "", planJSON, err
 			}
-			return p.runPlan(opts, false)
+			return p.runPlan(opts, spinner, false)
 		}
 	}
 
@@ -294,9 +300,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 	return fileName, planJSON, nil
 }
 
-func (p *DirProvider) runInit(opts *CmdOptions) error {
-	spinner := ui.NewSpinner("Running terraform init", p.spinnerOpts)
-
+func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
 	args := []string{}
 	if p.IsTerragrunt {
 		args = append(args, "run-all", "--terragrunt-ignore-external-dependencies")
@@ -367,9 +371,7 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 	return cloudAPI(host, jsonPath, token)
 }
 
-func (p *DirProvider) runShow(opts *CmdOptions, planFile string) ([]byte, error) {
-	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
-
+func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile string) ([]byte, error) {
 	args := []string{"show", "-no-color", "-json"}
 	if planFile != "" {
 		args = append(args, planFile)
