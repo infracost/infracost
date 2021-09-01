@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
+	"path/filepath"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 var defaultTerragruntBinary = "terragrunt"
@@ -177,7 +179,12 @@ func (p *DirProvider) generatePlanJSONs(paths []string) ([][]byte, error) {
 
 	spinner := ui.NewSpinner("Running terragrunt run-all plan", p.spinnerOpts)
 	planFile, planJSON, err := p.runPlan(opts, spinner, true)
-	defer os.Remove(planFile)
+	defer func() {
+		err := cleanupPlanFiles(paths, planFile)
+		if err != nil {
+			log.Warnf("Error cleaning up plan files: %v", err)
+		}
+	}()
 
 	if err != nil {
 		return [][]byte{}, err
@@ -211,4 +218,19 @@ func (p *DirProvider) generatePlanJSONs(paths []string) ([][]byte, error) {
 	}
 
 	return outs, nil
+}
+
+func cleanupPlanFiles(paths []string, planFile string) error {
+	if planFile == "" {
+		return nil
+	}
+
+	for _, path := range paths {
+		err := os.Remove(filepath.Join(path, planFile))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
