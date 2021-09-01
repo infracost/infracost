@@ -7,6 +7,7 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
 )
 
@@ -135,6 +136,12 @@ func (p *TerragruntProvider) generateStateJSONs(paths []string) ([][]byte, error
 
 	outs := make([][]byte, 0, len(paths))
 
+	spinnerMsg := "Running terragrunt show"
+	if len(paths) > 1 {
+		spinnerMsg += " for each project"
+	}
+	spinner := ui.NewSpinner(spinnerMsg, p.spinnerOpts)
+
 	for _, path := range paths {
 		opts, err := p.buildCommandOpts(path)
 		if err != nil {
@@ -144,7 +151,7 @@ func (p *TerragruntProvider) generateStateJSONs(paths []string) ([][]byte, error
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, "")
+		out, err := p.runShow(opts, spinner, "")
 		if err != nil {
 			return outs, err
 		}
@@ -168,7 +175,8 @@ func (p *DirProvider) generatePlanJSONs(paths []string) ([][]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	planFile, planJSON, err := p.runPlan(opts, true)
+	spinner := ui.NewSpinner("Running terragrunt run-all plan", p.spinnerOpts)
+	planFile, planJSON, err := p.runPlan(opts, spinner, true)
 	defer os.Remove(planFile)
 
 	if err != nil {
@@ -180,6 +188,11 @@ func (p *DirProvider) generatePlanJSONs(paths []string) ([][]byte, error) {
 	}
 
 	outs := make([][]byte, 0, len(paths))
+	spinnerMsg := "Running terragrunt show"
+	if len(paths) > 1 {
+		spinnerMsg += " for each project"
+	}
+	spinner = ui.NewSpinner(spinnerMsg, p.spinnerOpts)
 
 	for _, path := range paths {
 		opts, err := p.buildCommandOpts(path)
@@ -190,7 +203,7 @@ func (p *DirProvider) generatePlanJSONs(paths []string) ([][]byte, error) {
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, planFile)
+		out, err := p.runShow(opts, spinner, planFile)
 		if err != nil {
 			return outs, err
 		}
