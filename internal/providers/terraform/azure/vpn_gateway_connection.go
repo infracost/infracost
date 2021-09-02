@@ -66,7 +66,7 @@ func NewAzureRMVpnGatewayConnection(d *schema.ResourceData, u *schema.UsageData)
 
 func vpnGatewayS2S(region, sku, meterName string, tunnel *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           "VPN gateway S2S tunnel",
+		Name:           fmt.Sprintf("VPN gateway S2S tunnel (%s)", meterName),
 		Unit:           "tunnel",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: tunnel,
