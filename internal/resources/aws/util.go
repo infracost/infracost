@@ -1,6 +1,8 @@
 package aws
 
-import "github.com/shopspring/decimal"
+import (
+	"github.com/shopspring/decimal"
+)
 
 func strPtr(s string) *string {
 	return &s

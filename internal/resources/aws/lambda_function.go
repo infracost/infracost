@@ -1,25 +1,23 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
 )
 
 type LambdaFunctionArguments struct {
-	Address    string `json:"address,omitempty"`
-	Region     string `json:"region,omitempty"`
-	MemorySize int64  `json:"memorySize,omitempty"`
+	Address    string
+	Region     string
+	MemorySize int64
 
-	RequestDurationMS *float64 `json:"requestDurationMS,omitempty"`
-	MonthlyRequests   *float64 `json:"monthlyRequests,omitempty"`
+	RequestDurationMS *float64 `infracost_usage:"request_duration_ms"`
+	MonthlyRequests   *float64 `infracost_usage:"monthly_requests"`
 }
 
 func (args *LambdaFunctionArguments) PopulateUsage(u *schema.UsageData) {
-	if u != nil {
-		args.RequestDurationMS = u.GetFloat("request_duration_ms")
-		args.MonthlyRequests = u.GetFloat("monthly_requests")
-	}
+	resources.PopulateArgsWithUsage(args, u)
 }
 
 var LambdaFunctionUsageSchema = []*schema.UsageSchemaItem{
@@ -44,7 +42,8 @@ func NewLambdaFunction(args *LambdaFunctionArguments) *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name: args.Address,
+		Name:        args.Address,
+		UsageSchema: LambdaFunctionUsageSchema,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Requests",

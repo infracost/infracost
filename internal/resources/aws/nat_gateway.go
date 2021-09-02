@@ -1,21 +1,20 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
 
 type NATGatewayArguments struct {
-	Address string `json:"address,omitempty"`
-	Region  string `json:"region,omitempty"`
+	Address string
+	Region  string
 
-	MonthlyDataProcessedGB *float64 `json:"monthlyDataProcessedGB,omitempty"`
+	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
 func (args *NATGatewayArguments) PopulateUsage(u *schema.UsageData) {
-	if u != nil {
-		args.MonthlyDataProcessedGB = u.GetFloat("monthly_data_processed_gb")
-	}
+	resources.PopulateArgsWithUsage(args, u)
 }
 
 var NATGatewayUsageSchema = []*schema.UsageSchemaItem{

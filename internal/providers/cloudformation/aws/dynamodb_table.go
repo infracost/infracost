@@ -39,8 +39,8 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		Address:        d.Address,
 		Region:         region,
 		BillingMode:    billingMode,
-		WriteCapacity:  writeCapacity,
-		ReadCapacity:   readCapacity,
+		WriteCapacity:  &writeCapacity,
+		ReadCapacity:   &readCapacity,
 		ReplicaRegions: []string{}, // Global Tables are defined using AWS::DynamoDB::GlobalTable
 	}
 	args.PopulateUsage(u)
