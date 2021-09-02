@@ -43,7 +43,14 @@ resource "azurerm_synapse_workspace" "example" {
   }
 }
 
-resource "azurerm_synapse_sql_pool" "example" {
+resource "azurerm_synapse_sql_pool" "default" {
+  name                 = "examplesqlpool"
+  synapse_workspace_id = azurerm_synapse_workspace.example.id
+  sku_name             = "DW200c"
+  create_mode          = "Default"
+}
+
+resource "azurerm_synapse_sql_pool" "no_backup" {
   name                 = "examplesqlpool"
   synapse_workspace_id = azurerm_synapse_workspace.example.id
   sku_name             = "DW200c"
