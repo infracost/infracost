@@ -50,7 +50,7 @@ func (c Configuration) Save() error {
 }
 
 func readConfigurationFileIfExists() (Configuration, error) {
-	if !fileExists(ConfigurationFilePath()) {
+	if !FileExists(ConfigurationFilePath()) {
 		return Configuration{}, nil
 	}
 
