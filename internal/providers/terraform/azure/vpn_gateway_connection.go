@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 )
@@ -23,7 +22,6 @@ func GetAzureRMVpnGatewayConnectionRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMVpnGatewayConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
-	var tunnel *decimal.Decimal
 	sku := "Basic"
 
 	var vpnGateway *schema.ResourceData
@@ -33,28 +31,17 @@ func NewAzureRMVpnGatewayConnection(d *schema.ResourceData, u *schema.UsageData)
 	}
 
 	region := lookupRegion(d, []string{})
-
-	meterName := sku
-
+	if strings.ToLower(sku) == "basic" {
+		return &schema.Resource{
+			NoPrice:   true,
+			IsSkipped: true,
+		}
+	}
 	costComponents := make([]*schema.CostComponent, 0)
 
-	if sku == "Basic" {
-		sku = "Basic Gateway"
-		meterName = "Basic"
-	}
-
 	if d.Get("type").Type != gjson.Null {
-		if strings.ToLower(d.Get("type").String()) == "ipsec" && u != nil && u.Get("s2s_tunnel").Type != gjson.Null {
-			tunnel = decimalPtr(decimal.NewFromInt(u.Get("s2s_tunnel").Int()))
-			if tunnel != nil {
-				tunnelLimits := []int{10}
-				tunnelValues := usage.CalculateTierBuckets(*tunnel, tunnelLimits)
-				if tunnelValues[1].GreaterThan(decimal.Zero) {
-					costComponents = append(costComponents, vpnGatewayS2S(region, sku, meterName, &tunnelValues[1]))
-				}
-			}
-		} else {
-			costComponents = append(costComponents, vpnGatewayS2S(region, sku, meterName, tunnel))
+		if strings.ToLower(d.Get("type").String()) == "ipsec" {
+			costComponents = append(costComponents, vpnGatewayS2S(region, sku))
 		}
 	}
 
@@ -64,12 +51,12 @@ func NewAzureRMVpnGatewayConnection(d *schema.ResourceData, u *schema.UsageData)
 	}
 }
 
-func vpnGatewayS2S(region, sku, meterName string, tunnel *decimal.Decimal) *schema.CostComponent {
+func vpnGatewayS2S(region, sku string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("VPN gateway S2S tunnel (%s)", meterName),
-		Unit:           "tunnel",
+		Name:           fmt.Sprintf("VPN gateway (%s)", sku),
+		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: tunnel,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
 			Region:     strPtr(region),
