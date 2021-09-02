@@ -23,6 +23,7 @@ type TerragruntProvider struct {
 }
 
 type TerragruntInfo struct {
+	ConfigPath string
 	WorkingDir string
 }
 
@@ -57,7 +58,8 @@ func (p *TerragruntProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
-	paths, err := p.getProjectPaths()
+	configDirs, workingDirs, err := p.getProjectDirs()
+
 	if err != nil {
 		return []*schema.Project{}, err
 	}
@@ -65,17 +67,17 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	var outs [][]byte
 
 	if p.UseState {
-		outs, err = p.generateStateJSONs(paths)
+		outs, err = p.generateStateJSONs(workingDirs)
 	} else {
-		outs, err = p.generatePlanJSONs(paths)
+		outs, err = p.generatePlanJSONs(workingDirs)
 	}
 	if err != nil {
 		return []*schema.Project{}, err
 	}
 
-	projects := make([]*schema.Project, 0, len(paths))
+	projects := make([]*schema.Project, 0, len(configDirs))
 
-	for i, path := range paths {
+	for i, path := range configDirs {
 		metadata := config.DetectProjectMetadata(path)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
@@ -101,14 +103,14 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	return projects, nil
 }
 
-func (p *TerragruntProvider) getProjectPaths() ([]string, error) {
+func (p *TerragruntProvider) getProjectDirs() ([]string, []string, error) {
 	opts := &CmdOptions{
 		TerraformBinary: p.TerraformBinary,
 		Dir:             p.Path,
 	}
 	out, err := Cmd(opts, "run-all", "--terragrunt-ignore-external-dependencies", "terragrunt-info")
 	if err != nil {
-		return []string{}, err
+		return []string{}, []string{}, err
 	}
 
 	jsons := bytes.SplitAfter(out, []byte{'}', '\n'})
@@ -116,18 +118,21 @@ func (p *TerragruntProvider) getProjectPaths() ([]string, error) {
 		jsons = jsons[:len(jsons)-1]
 	}
 
-	paths := make([]string, 0, len(jsons))
+	configDirs := make([]string, 0, len(jsons))
+	workingDirs := make([]string, 0, len(jsons))
+
 	for _, j := range jsons {
 		var info TerragruntInfo
 		err = json.Unmarshal(j, &info)
 		if err != nil {
-			return paths, err
+			return configDirs, workingDirs, err
 		}
 
-		paths = append(paths, info.WorkingDir)
+		configDirs = append(configDirs, filepath.Dir(info.ConfigPath))
+		workingDirs = append(workingDirs, info.WorkingDir)
 	}
 
-	return paths, nil
+	return configDirs, workingDirs, nil
 }
 
 func (p *TerragruntProvider) generateStateJSONs(paths []string) ([][]byte, error) {
@@ -210,7 +215,7 @@ func (p *DirProvider) generatePlanJSONs(paths []string) ([][]byte, error) {
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, spinner, planFile)
+		out, err := p.runShow(opts, spinner, filepath.Join(path, planFile))
 		if err != nil {
 			return outs, err
 		}
