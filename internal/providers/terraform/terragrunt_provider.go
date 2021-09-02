@@ -104,12 +104,17 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 }
 
 func (p *TerragruntProvider) getProjectDirs() ([]string, []string, error) {
+	spinner := ui.NewSpinner("Running terragrunt run-all terragrunt-info", p.spinnerOpts)
+
 	opts := &CmdOptions{
 		TerraformBinary: p.TerraformBinary,
 		Dir:             p.Path,
 	}
 	out, err := Cmd(opts, "run-all", "--terragrunt-ignore-external-dependencies", "terragrunt-info")
 	if err != nil {
+		spinner.Fail()
+		p.printTerraformErr(err)
+
 		return []string{}, []string{}, err
 	}
 
@@ -125,12 +130,15 @@ func (p *TerragruntProvider) getProjectDirs() ([]string, []string, error) {
 		var info TerragruntInfo
 		err = json.Unmarshal(j, &info)
 		if err != nil {
+			spinner.Fail()
 			return configDirs, workingDirs, err
 		}
 
 		configDirs = append(configDirs, filepath.Dir(info.ConfigPath))
 		workingDirs = append(workingDirs, info.WorkingDir)
 	}
+
+	spinner.Success()
 
 	return configDirs, workingDirs, nil
 }

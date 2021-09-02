@@ -290,7 +290,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 			msg += "Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable."
 			fmt.Fprintln(os.Stderr, msg)
 		} else {
-			printTerraformErr(err)
+			p.printTerraformErr(err)
 		}
 		return "", planJSON, errors.Wrap(err, "Error running terraform plan")
 	}
@@ -310,7 +310,7 @@ func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
 	_, err := Cmd(opts, args...)
 	if err != nil {
 		spinner.Fail()
-		printTerraformErr(err)
+		p.printTerraformErr(err)
 		return errors.Wrap(err, "Error running terraform init")
 	}
 
@@ -379,7 +379,7 @@ func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile st
 	out, err := Cmd(opts, args...)
 	if err != nil {
 		spinner.Fail()
-		printTerraformErr(err)
+		p.printTerraformErr(err)
 		return []byte{}, errors.Wrap(err, "Error running terraform show")
 	}
 	spinner.Success()
@@ -419,13 +419,18 @@ func checkTerraformVersion(v string, fullV string) error {
 	return nil
 }
 
-func printTerraformErr(err error) {
+func (p *DirProvider) printTerraformErr(err error) {
 	stderr := extractStderr(err)
 	if stderr == "" {
 		return
 	}
 
-	msg := fmt.Sprintf("\n  Terraform command failed with:\n%s\n", ui.Indent(stderr, "    "))
+	binName := "Terraform"
+	if p.IsTerragrunt {
+		binName = "Terragrunt"
+	}
+
+	msg := fmt.Sprintf("\n  %s command failed with:\n%s\n", binName, ui.Indent(stderr, "    "))
 
 	if strings.HasPrefix(stderr, "Error: Failed to select workspace") {
 		msg += "\nRun `terraform workspace select your_workspace` first or set the TF_WORKSPACE environment variable.\n"
