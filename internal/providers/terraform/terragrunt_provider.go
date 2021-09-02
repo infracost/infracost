@@ -58,6 +58,9 @@ func (p *TerragruntProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+	// We want to run Terragrunt commands from the config dirs
+	// Terragrunt internally runs Terraform in the working dirs, so we need to be aware of these
+	// so we can handle reading and cleaning up the generated plan files.
 	configDirs, workingDirs, err := p.getProjectDirs()
 
 	if err != nil {
@@ -67,9 +70,9 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	var outs [][]byte
 
 	if p.UseState {
-		outs, err = p.generateStateJSONs(workingDirs)
+		outs, err = p.generateStateJSONs(configDirs)
 	} else {
-		outs, err = p.generatePlanJSONs(workingDirs)
+		outs, err = p.generatePlanJSONs(configDirs, workingDirs)
 	}
 	if err != nil {
 		return []*schema.Project{}, err
@@ -143,21 +146,21 @@ func (p *TerragruntProvider) getProjectDirs() ([]string, []string, error) {
 	return configDirs, workingDirs, nil
 }
 
-func (p *TerragruntProvider) generateStateJSONs(paths []string) ([][]byte, error) {
+func (p *TerragruntProvider) generateStateJSONs(configDirs []string) ([][]byte, error) {
 	err := p.checks()
 	if err != nil {
 		return [][]byte{}, err
 	}
 
-	outs := make([][]byte, 0, len(paths))
+	outs := make([][]byte, 0, len(configDirs))
 
 	spinnerMsg := "Running terragrunt show"
-	if len(paths) > 1 {
+	if len(configDirs) > 1 {
 		spinnerMsg += " for each project"
 	}
 	spinner := ui.NewSpinner(spinnerMsg, p.spinnerOpts)
 
-	for _, path := range paths {
+	for _, path := range configDirs {
 		opts, err := p.buildCommandOpts(path)
 		if err != nil {
 			return [][]byte{}, err
@@ -176,7 +179,7 @@ func (p *TerragruntProvider) generateStateJSONs(paths []string) ([][]byte, error
 	return outs, nil
 }
 
-func (p *DirProvider) generatePlanJSONs(paths []string) ([][]byte, error) {
+func (p *DirProvider) generatePlanJSONs(configDirs []string, workingDirs []string) ([][]byte, error) {
 	err := p.checks()
 	if err != nil {
 		return [][]byte{}, err
@@ -193,7 +196,7 @@ func (p *DirProvider) generatePlanJSONs(paths []string) ([][]byte, error) {
 	spinner := ui.NewSpinner("Running terragrunt run-all plan", p.spinnerOpts)
 	planFile, planJSON, err := p.runPlan(opts, spinner, true)
 	defer func() {
-		err := cleanupPlanFiles(paths, planFile)
+		err := cleanupPlanFiles(workingDirs, planFile)
 		if err != nil {
 			log.Warnf("Error cleaning up plan files: %v", err)
 		}
@@ -207,14 +210,14 @@ func (p *DirProvider) generatePlanJSONs(paths []string) ([][]byte, error) {
 		return [][]byte{planJSON}, nil
 	}
 
-	outs := make([][]byte, 0, len(paths))
+	outs := make([][]byte, 0, len(configDirs))
 	spinnerMsg := "Running terragrunt show"
-	if len(paths) > 1 {
+	if len(configDirs) > 1 {
 		spinnerMsg += " for each project"
 	}
 	spinner = ui.NewSpinner(spinnerMsg, p.spinnerOpts)
 
-	for _, path := range paths {
+	for i, path := range configDirs {
 		opts, err := p.buildCommandOpts(path)
 		if err != nil {
 			return [][]byte{}, err
@@ -223,7 +226,7 @@ func (p *DirProvider) generatePlanJSONs(paths []string) ([][]byte, error) {
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, spinner, filepath.Join(path, planFile))
+		out, err := p.runShow(opts, spinner, filepath.Join(workingDirs[i], planFile))
 		if err != nil {
 			return outs, err
 		}
