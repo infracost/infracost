@@ -2,6 +2,11 @@ include {
   path = find_in_parent_folders()
 }
 
+# Add dependency on dev to make output consistent order
+dependencies {
+  paths = ["../dev"]
+}
+
 terraform {
   source = "..//modules/example"
 }

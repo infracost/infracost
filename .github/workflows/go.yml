@@ -24,6 +24,12 @@ jobs:
           # Required: the version of golangci-lint is required and must be specified without patch version: they always use the latest patch version.
           version: v1.41
 
+      - name: Install Terragrunt v0.31.8
+        run: |
+          sudo wget -q -O /usr/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/v0.31.8/terragrunt_linux_amd64"
+          sudo chmod +x /usr/bin/terragrunt
+          terragrunt --version
+
       - name: Test (unit and shared integration)
         run: make test_shared_int
         env:
