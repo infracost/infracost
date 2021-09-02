@@ -1,8 +1,9 @@
 package main_test
 
 import (
-	"github.com/infracost/infracost/internal/testutil"
 	"testing"
+
+	"github.com/infracost/infracost/internal/testutil"
 )
 
 func TestDiffHelp(t *testing.T) {
@@ -29,4 +30,8 @@ func TestDiffTerraformShowSkipped(t *testing.T) {
 
 func TestDiffTerraformUsageFile(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples/terraform/plan.json", "--usage-file", "../../examples/terraform/infracost-usage.yml"}, nil)
+}
+
+func TestDiffTerragrunt(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples/terragrunt"}, nil)
 }
