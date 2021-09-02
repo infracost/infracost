@@ -160,10 +160,11 @@ func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, 
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	assert.NoError(t, err)
 
-	project, err := RunCostCalculations(t, runCtx, tfProject, usage)
+	projects, err := RunCostCalculations(t, runCtx, tfProject, usage)
 	assert.NoError(t, err)
+	assert.Len(t, projects, 1)
 
-	testutil.TestResources(t, project[0].Resources, checks)
+	testutil.TestResources(t, projects[0].Resources, checks)
 }
 
 type GoldenFileOptions = struct {
