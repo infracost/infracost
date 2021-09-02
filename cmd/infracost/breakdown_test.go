@@ -1,8 +1,9 @@
 package main_test
 
 import (
-	"github.com/infracost/infracost/internal/testutil"
 	"testing"
+
+	"github.com/infracost/infracost/internal/testutil"
 )
 
 func TestBreakdownHelp(t *testing.T) {
@@ -57,4 +58,8 @@ func TestBreakdownTerraformShowSkipped(t *testing.T) {
 
 func TestBreakdownTerraformUsageFile(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform/plan.json", "--usage-file", "../../examples/terraform/infracost-usage.yml"}, nil)
+}
+
+func TestBreakdownTerragrunt(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil)
 }
