@@ -2,7 +2,7 @@ FROM golang:1.16 as builder
 
 ARG ARCH=linux
 ARG DEFAULT_TERRAFORM_VERSION=0.15.5
-ARG TERRAGRUNT_VERSION=0.29.10
+ARG TERRAGRUNT_VERSION=0.31.8
 
 # Set Environment Variables
 SHELL ["/bin/bash", "-c"]
