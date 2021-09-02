@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/Rhymond/go-money"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/Rhymond/go-money"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
@@ -99,6 +100,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		projects = append(projects, project)
 
 		if runCtx.Config.SyncUsageFile {
+			err = usage.ConfigureEstimation(ctx, project)
+			if err != nil {
+				return err
+			}
 			err = usage.SyncUsageData(project, u, projectCfg.UsageFile)
 			if err != nil {
 				return err

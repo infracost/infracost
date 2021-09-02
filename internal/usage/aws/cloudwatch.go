@@ -7,14 +7,15 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	"github.com/infracost/infracost/internal/config"
 )
 
-func cloudwatchNewClient(region string) (*cloudwatch.Client, error) {
-	config, err := sdkNewConfig(region)
+func cloudwatchNewClient(ctx *config.ProjectContext, region string) (*cloudwatch.Client, error) {
+	cfg, err := getConfig(ctx, region)
 	if err != nil {
 		return nil, err
 	}
-	return cloudwatch.NewFromConfig(config), nil
+	return cloudwatch.NewFromConfig(cfg), nil
 }
 
 type statsRequest struct {
@@ -26,8 +27,8 @@ type statsRequest struct {
 	unit       types.StandardUnit
 }
 
-func cloudwatchGetMonthlyStats(req statsRequest) (*cloudwatch.GetMetricStatisticsOutput, error) {
-	client, err := sdkNewCloudWatchClient(req.region)
+func cloudwatchGetMonthlyStats(ctx *config.ProjectContext, req statsRequest) (*cloudwatch.GetMetricStatisticsOutput, error) {
+	client, err := cloudwatchNewClient(ctx, req.region)
 	if err != nil {
 		return nil, err
 	}

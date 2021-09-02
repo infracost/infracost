@@ -6,18 +6,19 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/infracost/infracost/internal/config"
 )
 
-func s3NewClient(region string) (*s3.Client, error) {
-	config, err := sdkNewConfig(region)
+func s3NewClient(ctx *config.ProjectContext, region string) (*s3.Client, error) {
+	cfg, err := getConfig(ctx, region)
 	if err != nil {
 		return nil, err
 	}
-	return s3.NewFromConfig(config), nil
+	return s3.NewFromConfig(cfg), nil
 }
 
-func s3FindMetricsFilter(region string, bucket string) string {
-	client, err := s3NewClient(region)
+func s3FindMetricsFilter(ctx *config.ProjectContext, region string, bucket string) string {
+	client, err := s3NewClient(ctx, region)
 	if err != nil {
 		sdkWarn("S3", "requests", bucket, err)
 		return ""
@@ -37,8 +38,8 @@ func s3FindMetricsFilter(region string, bucket string) string {
 	return ""
 }
 
-func s3GetBucketSizeBytes(region string, bucket string, storageType string) float64 {
-	stats, err := sdkGetMonthlyStats(sdkStatsRequest{
+func s3GetBucketSizeBytes(ctx *config.ProjectContext, region string, bucket string, storageType string) float64 {
+	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 		region:    region,
 		namespace: "AWS/S3",
 		metric:    "BucketSizeBytes",
@@ -58,10 +59,10 @@ func s3GetBucketSizeBytes(region string, bucket string, storageType string) floa
 	return *stats.Datapoints[0].Average
 }
 
-func s3GetBucketRequests(region string, bucket string, filterName string, metrics []string) float64 {
+func s3GetBucketRequests(ctx *config.ProjectContext, region string, bucket string, filterName string, metrics []string) float64 {
 	count := float64(0)
 	for _, metric := range metrics {
-		stats, err := sdkGetMonthlyStats(sdkStatsRequest{
+		stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 			region:    region,
 			namespace: "AWS/S3",
 			metric:    metric,

@@ -8,6 +8,11 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/Rhymond/go-money v1.0.3 // indirect
 	github.com/agext/levenshtein v1.2.2 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.9.0 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.7.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.8.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.5.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.14.0 // indirect
 	github.com/awslabs/goformation/v4 v4.19.5
 	github.com/briandowns/spinner v1.15.0
 	github.com/dustin/go-humanize v1.0.0
