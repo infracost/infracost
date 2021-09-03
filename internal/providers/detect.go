@@ -11,6 +11,7 @@ import (
 	"github.com/infracost/infracost/internal/providers/cloudformation"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/providers/crossplane"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -40,6 +41,10 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 
 	if isTerraformDir(path) {
 		return terraform.NewDirProvider(ctx), nil
+	}
+
+	if isCrossPlaneTemplateProvider(path) {
+		return crossplane.NewTemplateProvider(ctx), nil
 	}
 
 	return nil, fmt.Errorf("Could not detect path type for %s", path)
@@ -116,4 +121,8 @@ func isCloudFormationTemplate(path string) bool {
 	}
 
 	return false
+}
+
+func isCrossPlaneTemplateProvider(path string) bool {
+	return crossplane.IsCrossPlaneTemplateProvider(path)
 }
