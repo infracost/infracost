@@ -5,6 +5,7 @@ import (
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -24,8 +25,8 @@ func NewAzureRMKubernetesClusterNodePool(d *schema.ResourceData, u *schema.Usage
 	region := lookupRegion(d, []string{"kubernetes_cluster_id"})
 
 	nodeCount := decimal.NewFromInt(1)
-	if d.Get("node_count").Type != gjson.Null {
-		nodeCount = decimal.NewFromInt(d.Get("node_count").Int())
+	if d.Get("nodeCount").Type != gjson.Null {
+		nodeCount = decimal.NewFromInt(d.Get("nodeCount").Int())
 	}
 	if u != nil && u.Get("nodes").Exists() {
 		nodeCount = decimal.NewFromInt(u.Get("nodes").Int())
@@ -41,8 +42,8 @@ func aksClusterNodePool(name, region string, n gjson.Result, nodeCount decimal.D
 	mainResource := &schema.Resource{
 		Name: name,
 	}
-	// instanceType := n.Get("vm_size").String()
-	// costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType))
+	instanceType := n.Get("nodeVMSize").String()
+	costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType))
 	mainResource.CostComponents = costComponents
 	schema.MultiplyQuantities(mainResource, nodeCount)
 
@@ -68,25 +69,24 @@ func aksClusterNodePool(name, region string, n gjson.Result, nodeCount decimal.D
 }
 
 func aksOSDiskSubResource(region string, diskSize int) *schema.Resource {
-	// diskType := "Premium_LRS"
+	diskType := "Premium_LRS"
 
-	// diskName := mapDiskName(diskType, diskSize)
-	// if diskName == "" {
-	// 	log.Warnf("Could not map disk type %s and size %d to disk name", diskType, diskSize)
-	// 	return nil
-	// }
+	diskName := mapDiskName(diskType, diskSize)
+	if diskName == "" {
+		log.Warnf("Could not map disk type %s and size %d to disk name", diskType, diskSize)
+		return nil
+	}
 
-	// productName, ok := diskProductNameMap[diskType]
-	// if !ok {
-	// 	log.Warnf("Could not map disk type %s to product name", diskType)
-	// 	return nil
-	// }
+	productName, ok := diskProductNameMap[diskType]
+	if !ok {
+		log.Warnf("Could not map disk type %s to product name", diskType)
+		return nil
+	}
 
-	// costComponent := []*schema.CostComponent{storageCostComponent(region, diskName, productName)}
+	costComponent := []*schema.CostComponent{storageCostComponent(region, diskName, productName)}
 
-	// return &schema.Resource{
-	// 	Name:           "os_disk",
-	// 	CostComponents: costComponent,
-	// }
-	return &schema.Resource{}
+	return &schema.Resource{
+		Name:           "os_disk",
+		CostComponents: costComponent,
+	}
 }

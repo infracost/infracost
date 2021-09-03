@@ -22,15 +22,19 @@ func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
 		return d.Get("location").String()
 	}
 
-	// Then check for any parent resources with a location
-	for _, k := range parentResourceKeys {
-		parents := d.References(k)
-		for _, p := range parents {
-			if p.Get("location").String() != "" {
-				return p.Get("location").String()
-			}
-		}
+	if d.Get("forProvider.location").String() != "" {
+		return d.Get("forProvider.location").String()
 	}
+
+	// Then check for any parent resources with a location
+	// for _, k := range parentResourceKeys {
+	// 	parents := d.References(k)
+	// 	for _, p := range parents {
+	// 		if p.Get("location").String() != "" {
+	// 			return p.Get("location").String()
+	// 		}
+	// 	}
+	// }
 
 	// When all else fails use the default region
 	defaultRegion := d.Get("region").String()

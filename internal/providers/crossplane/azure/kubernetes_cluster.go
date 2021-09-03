@@ -10,7 +10,7 @@ import (
 
 func GetAzureRMKubernetesClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_kubernetes_cluster",
+		Name:  "compute.azure.crossplane.io/AKSCluster",
 		RFunc: NewAzureRMKubernetesCluster,
 	}
 }
@@ -47,15 +47,12 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 	}
 
 	nodeCount := decimal.NewFromInt(1)
-	if d.Get("default_node_pool.0.node_count").Type != gjson.Null {
-		nodeCount = decimal.NewFromInt(d.Get("default_node_pool.0.node_count").Int())
-	}
-	if u != nil && u.Get("default_node_pool.nodes").Exists() {
-		nodeCount = decimal.NewFromInt(u.Get("default_node_pool.nodes").Int())
+	if d.Get("nodeCount").Type != gjson.Null {
+		nodeCount = decimal.NewFromInt(d.Get("nodeCount").Int())
 	}
 
 	subResources = []*schema.Resource{
-		aksClusterNodePool("default_node_pool", region, d.Get("default_node_pool.0"), nodeCount, u),
+		aksClusterNodePool("default_node_pool", region, d.RawValues, nodeCount, u),
 	}
 
 	if d.Get("network_profile.0.load_balancer_sku").Type != gjson.Null {
