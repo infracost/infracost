@@ -44,28 +44,14 @@ func (p *TemplateProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 // LoadResources loads past and current resources
 func (p *TemplateProvider) LoadResources(project *schema.Project, usage map[string]*schema.UsageData) error {
-
 	data, err := readCrossPlaneTemplate(p.Path)
 	if err != nil {
-		log.Error(err)
 		return errors.Wrap(err, "Error reading CrossPlane template file")
 	}
-
-	parser := NewParser(p.ctx)
-
-	for _, bytes := range data {
-		pastResources, resources, err := parser.parseJSON(bytes, usage)
-		if err != nil {
-			return errors.Wrap(err, "Error parsing CrossPlane template file")
-		}
-		if len(pastResources) > 0 {
-			project.PastResources = append(project.PastResources, pastResources...)
-		}
-		if len(resources) > 0 {
-			project.Resources = append(project.Resources, resources...)
-		}
+	project.PastResources, project.Resources, err = NewParser(p.ctx).parseJSON(data, usage)
+	if err != nil {
+		return errors.Wrap(err, "Error parsing CrossPlane template file")
 	}
-
 	return nil
 }
 
@@ -93,6 +79,8 @@ func IsCrossPlaneTemplateProvider(path string) bool {
 	return false
 }
 
+// readCrossPlaneTemplate returns crossplane templates as list.
+// This is needed since '.yml' or '.yaml' file can have multiple templates seperated by '---'
 func readCrossPlaneTemplate(path string) ([][]byte, error) {
 	var bytes [][]byte
 	extension := filepath.Ext(path)

@@ -11,26 +11,10 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// These show differently in the plan JSON for Terraform 0.12 and 0.13.
-var infracostProviderNames = []string{"infracost", "registry.terraform.io/infracost/infracost"}
 var defaultProviderRegions = map[string]string{
 	"aws":     "us-east-1",
 	"google":  "us-central1",
 	"azurerm": "eastus",
-}
-
-// ARN attribute mapping for resources that don't have a standard 'arn' attribute
-var arnAttributeMap = map[string]string{
-	"aws_cloudwatch_dashboard":     "dashboard_arn",
-	"aws_db_snapshot":              "db_snapshot_arn",
-	"aws_db_cluster_snapshot":      "db_cluster_snapshot_arn",
-	"aws_ecs_service":              "id",
-	"aws_neptune_cluster_snapshot": "db_cluster_snapshot_arn",
-	"aws_docdb_cluster_snapshot":   "db_cluster_snapshot_arn",
-	"aws_dms_certificate":          "certificate_arn",
-	"aws_dms_endpoint":             "endpoint_arn",
-	"aws_dms_replication_instance": "replication_instance_arn",
-	"aws_dms_replication_task":     "replication_task_arn",
 }
 
 // Parser ...
@@ -73,35 +57,31 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+func (p *Parser) parseJSON(data [][]byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+	var resources []*schema.Resource
 	baseResources := p.loadUsageFileResources(usage)
-
-	if !gjson.ValidBytes(j) {
-		return baseResources, baseResources, errors.New("invalid JSON")
+	// Process each Crossplane template
+	for _, bytes := range data {
+		if !gjson.ValidBytes(bytes) {
+			return baseResources, baseResources, errors.New("invalid JSON")
+		}
+		resources = append(resources, p.parseJSONResources(false, usage, gjson.ParseBytes(bytes))...)
 	}
-
-	return nil, p.parseJSONResources(false, baseResources, usage, gjson.ParseBytes(j)), nil
+	resources = append(resources, baseResources...)
+	return nil, resources, nil
 }
 
-func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Resource, usage map[string]*schema.UsageData, parsed gjson.Result) []*schema.Resource {
+func (p *Parser) parseJSONResources(parsePrior bool, usage map[string]*schema.UsageData, parsed gjson.Result) []*schema.Resource {
 	resData := map[string]*schema.ResourceData{}
 	var resources []*schema.Resource
-	resources = append(resources, baseResources...)
 
-	kind := parsed.Get("kind").String()
-	switch kind {
-	case "Provider", "ProviderConfig", "CompositeResourceDefinition", "ProviderConfigUsage", "Account":
-		log.Infof("Skipping: %s", kind)
-	case "Composition":
-		log.Infof("Trying to process : %s", kind)
+	if parsed.Get("kind").String() == "Composition" {
 		resData = p.parseCompositeResource(parsed)
-	default:
-		log.Infof("Trying to process : %s", kind)
+	} else {
 		resData = p.parseSimpleResourse(parsed)
 	}
 
 	// p.parseReferences(resData, conf)
-	p.loadInfracostProviderUsageData(usage, resData)
 	// p.stripDataResources(resData)
 
 	for _, d := range resData {
@@ -177,42 +157,4 @@ func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schem
 		}
 	}
 	return resources
-}
-
-func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, resData map[string]*schema.ResourceData) {
-	log.Debugf("Loading usage data from Infracost provider resources")
-
-	for _, d := range resData {
-		if isInfracostResource(d) {
-			p.ctx.SetContextValue("terraformInfracostProviderEnabled", true)
-
-			for _, ref := range d.References("resources") {
-				if _, ok := u[ref.Address]; !ok {
-					u[ref.Address] = schema.NewUsageData(ref.Address, convertToUsageAttributes(d.RawValues))
-				} else {
-					log.Debugf("Skipping loading usage for resource %s since it has already been defined", ref.Address)
-				}
-			}
-		}
-	}
-}
-
-func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
-	a := make(map[string]gjson.Result)
-
-	for k, v := range j.Map() {
-		a[k] = v.Get("0.value")
-	}
-
-	return a
-}
-
-func isInfracostResource(res *schema.ResourceData) bool {
-	for _, p := range infracostProviderNames {
-		if res.ProviderName == p {
-			return true
-		}
-	}
-
-	return false
 }
