@@ -1,0 +1,28 @@
+---
+apiVersion: database.azure.crossplane.io/v1beta1
+kind: PostgreSQLServer
+metadata:
+  name: example-psql
+  labels:
+    example: "true"
+spec:
+  forProvider:
+    administratorLogin: myadmin
+    resourceGroupNameRef:
+      name: example-rg
+    location: eastus
+    minimalTlsVersion: TLS12
+    sslEnforcement: Disabled
+    version: "9.6"
+    sku:
+      # Note that Basic servers do not support virtual network rules
+      tier: GeneralPurpose
+      capacity: 8
+      family: Gen5
+    storageProfile:
+      storageMB: 5120
+  writeConnectionSecretToRef:
+    namespace: crossplane-system
+    name: example-psql
+  providerConfigRef:
+    name: example

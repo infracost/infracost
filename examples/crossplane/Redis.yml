@@ -1,0 +1,21 @@
+apiVersion: cache.azure.crossplane.io/v1beta1
+kind: Redis
+metadata:
+  name: example
+  labels:
+    example: "true"
+spec:
+  forProvider:
+    resourceGroupNameRef:
+      name: redis-example
+    location: eastus
+    sku:
+      name: Standard
+      family: C
+      capacity: 3
+    enableNonSslPort: true
+  writeConnectionSecretToRef:
+    namespace: crossplane-system
+    name: example-cache
+  providerConfigRef:
+    name: example

@@ -28,9 +28,6 @@ func NewAzureRMKubernetesClusterNodePool(d *schema.ResourceData, u *schema.Usage
 	if d.Get("nodeCount").Type != gjson.Null {
 		nodeCount = decimal.NewFromInt(d.Get("nodeCount").Int())
 	}
-	if u != nil && u.Get("nodes").Exists() {
-		nodeCount = decimal.NewFromInt(u.Get("nodes").Int())
-	}
 
 	return aksClusterNodePool(d.Address, region, d.RawValues, nodeCount, u)
 }

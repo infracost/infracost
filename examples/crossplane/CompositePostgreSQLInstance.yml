@@ -1,0 +1,72 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: compositepostgresqlinstances.azure.database.example.org
+  labels:
+    provider: azure
+    guide: quickstart
+spec:
+  writeConnectionSecretsToNamespace: crossplane-system
+  compositeTypeRef:
+    apiVersion: database.example.org/v1alpha1
+    kind: CompositePostgreSQLInstance
+  resources:
+    - name: resourcegroup
+      base:
+        apiVersion: azure.crossplane.io/v1alpha3
+        kind: ResourceGroup
+        spec:
+          location: eastus
+    - name: postgresqlserver
+      base:
+        apiVersion: database.azure.crossplane.io/v1beta1
+        kind: PostgreSQLServer
+        spec:
+          forProvider:
+            administratorLogin: myadmin
+            resourceGroupNameSelector:
+              matchControllerRef: true
+            location: eastus
+            sslEnforcement: Disabled
+            version: "9.6"
+            sku:
+              tier: GeneralPurpose
+              capacity: 8
+              family: Gen5
+            storageProfile:
+              storageMB: 5120
+          writeConnectionSecretToRef:
+            namespace: crossplane-system
+      patches:
+        - fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.writeConnectionSecretToRef.name"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-postgresql"
+        - fromFieldPath: "spec.parameters.storageGB"
+          toFieldPath: "spec.forProvider.storageProfile.storageMB"
+          transforms:
+            - type: math
+              math:
+                multiply: 1024
+      connectionDetails:
+        - fromConnectionSecretKey: username
+        - fromConnectionSecretKey: password
+        - fromConnectionSecretKey: endpoint
+        - type: FromValue
+          name: port
+          value: "5432"
+    - name: firewallrule
+      base:
+        apiVersion: database.azure.crossplane.io/v1alpha3
+        kind: PostgreSQLServerFirewallRule
+        spec:
+          forProvider:
+            serverNameSelector:
+              matchControllerRef: true
+            resourceGroupNameSelector:
+              matchControllerRef: true
+            properties:
+              startIpAddress: 0.0.0.0
+              endIpAddress: 255.255.255.254

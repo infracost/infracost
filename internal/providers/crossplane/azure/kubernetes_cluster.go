@@ -8,6 +8,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+// GetAzureRMKubernetesClusterRegistryItem ....
 func GetAzureRMKubernetesClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "compute.azure.crossplane.io/AKSCluster",
@@ -15,6 +16,8 @@ func GetAzureRMKubernetesClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
+// NewAzureRMKubernetesCluster ...
+// Reference: https://doc.crds.dev/github.com/crossplane/provider-azure/compute.azure.crossplane.io/AKSCluster/v1alpha3@v0.16.1
 func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 	var costComponents []*schema.CostComponent

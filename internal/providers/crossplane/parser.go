@@ -80,24 +80,7 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 		return baseResources, baseResources, errors.New("invalid JSON")
 	}
 
-	parsed := gjson.ParseBytes(j)
-
-	log.Infof("parsed: %s", parsed)
-
-	// TODO: Revisit. Next action Item
-
-	// return nil, nil, nil
-
-	// providerConf := parsed.Get("configuration.provider_config")
-	// conf := parsed.Get("configuration.root_module")
-	// vars := parsed.Get("variables")
-
-	// TODO: Do we support pastResources with CrossPlane?
-	// pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
-	var pastResources []*schema.Resource
-	resources := p.parseJSONResources(false, baseResources, usage, parsed)
-
-	return pastResources, resources, nil
+	return nil, p.parseJSONResources(false, baseResources, usage, gjson.ParseBytes(j)), nil
 }
 
 func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Resource, usage map[string]*schema.UsageData, parsed gjson.Result) []*schema.Resource {
@@ -107,14 +90,13 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 
 	kind := parsed.Get("kind").String()
 	switch kind {
-	case "Provider", "ProviderConfig", "CompositeResourceDefinition", "ResourceGroup", "ProviderConfigUsage":
-		log.Infof("Skipping king: %s", kind)
+	case "Provider", "ProviderConfig", "CompositeResourceDefinition", "ProviderConfigUsage", "Account":
+		log.Infof("Skipping: %s", kind)
 	case "Composition":
-		resources := parsed.Get("spec.resources").Array()
-		log.Warn("Composition kind is not supported yet")
-		log.Info(resources)
+		log.Infof("Trying to process : %s", kind)
+		resData = p.parseCompositeResource(parsed)
 	default:
-		log.Infof("Tring to process : %s", kind)
+		log.Infof("Trying to process : %s", kind)
 		resData = p.parseSimpleResourse(parsed)
 	}
 
@@ -143,55 +125,42 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 
 func (p *Parser) parseSimpleResourse(parsed gjson.Result) map[string]*schema.ResourceData {
 	resources := make(map[string]*schema.ResourceData)
-	apiVersion := parsed.Get("apiVersion").String()
-	kind := parsed.Get("kind").String()
-	provider := getProvider(apiVersion)
-	name := parsed.Get("metadata.name").String()
-	labels := getLabels(parsed)
-	address := apiVersion + "/" + kind
-	resourceType := provider + "/" + kind
+	name, resourceType, provider, address, labels := p.getMetaData(parsed)
 	spec := parsed.Get("spec")
-	// for key, value := range spec.Map() {
-	// 	log.Infof("key: %+v", key, value.Str)
-	// }
 	spec = schema.AddRawValue(spec, "name", name)
 	resources[address] = schema.NewResourceData(resourceType, provider, address, labels, spec)
 	return resources
 }
 
-func (p *Parser) parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, vars gjson.Result) map[string]*schema.ResourceData {
+func (p *Parser) getMetaData(parsed gjson.Result) (string, string, string, string, map[string]string) {
+	apiVersion := parsed.Get("apiVersion").String()
+	kind := parsed.Get("kind").String()
+	name := parsed.Get("metadata.name").String()
+	provider := getProvider(apiVersion)
+	labels := getLabels(parsed)
+	address := apiVersion + "/" + kind
+	resourceType := provider + "/" + kind
+	return name, resourceType, provider, address, labels
+}
+
+func (p *Parser) parseCompositeResource(parsed gjson.Result) map[string]*schema.ResourceData {
 	resources := make(map[string]*schema.ResourceData)
-
-	// for _, r := range planVals.Get("resources").Array() {
-	// 	t := r.Get("type").String()
-	// 	provider := r.Get("provider_name").String()
-	// 	addr := r.Get("address").String()
-	// 	v := r.Get("values")
-
-	// 	resConf := getConfJSON(conf, addr)
-
-	// 	// Try getting the region from the ARN
-	// 	region := resourceRegion(t, v)
-
-	// 	// Otherwise use region from the provider conf
-	// 	if region == "" {
-	// 		region = providerRegion(addr, providerConf, vars, t, resConf)
-	// 	}
-
-	// 	v = schema.AddRawValue(v, "region", region)
-
-	// 	tags := parseTags(t, v)
-
-	// 	resources[addr] = schema.NewResourceData(t, provider, addr, tags, v)
-	// }
-
-	// Recursively add any resources for child modules
-	for _, m := range planVals.Get("child_modules").Array() {
-		for addr, d := range p.parseResourceData(providerConf, m, conf, vars) {
-			resources[addr] = d
+	if parsed.Get("spec").Get("resources").IsArray() {
+		for _, r := range parsed.Get("spec").Get("resources").Array() {
+			base := r.Get("base")
+			kind := base.Get("kind").String()
+			switch kind {
+			case "Provider", "ProviderConfig", "CompositeResourceDefinition", "ResourceGroup", "ProviderConfigUsage", "Account":
+				log.Infof("Skipping: %s", kind)
+			default:
+				//TODO: Process r.Get("patches") then update base before calling parseSimpleResourse
+				resource := p.parseSimpleResourse(base)
+				for key, value := range resource {
+					resources[key] = value
+				}
+			}
 		}
 	}
-
 	return resources
 }
 
@@ -227,14 +196,6 @@ func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, 
 		}
 	}
 }
-
-// func (p *Parser) stripDataResources(resData map[string]*schema.ResourceData) {
-// 	for addr, d := range resData {
-// 		if strings.HasPrefix(addressResourcePart(d.Address), "data.") {
-// 			delete(resData, addr)
-// 		}
-// 	}
-// }
 
 func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
 	a := make(map[string]gjson.Result)
