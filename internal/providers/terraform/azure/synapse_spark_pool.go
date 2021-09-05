@@ -2,9 +2,11 @@ package azure
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
 )
 
 func GetAzureRMSynapseSparkPoolRegistryItem() *schema.RegistryItem {
@@ -12,16 +14,53 @@ func GetAzureRMSynapseSparkPoolRegistryItem() *schema.RegistryItem {
 		Name:  "azurerm_synapse_spark_pool",
 		RFunc: NewAzureRMSynapseSparkPool,
 		ReferenceAttributes: []string{
-			"resource_group_name",
+			"synapse_workspace_id",
 		},
 		Notes: []string{"the total costs consist of several resources that should be viewed as a whole"},
 	}
 }
 
 func NewAzureRMSynapseSparkPool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	//region := lookupRegion(d, []string{"resource_group_name"})
-
+	region := lookupRegion(d, []string{"synapse_workspace_id"})
 	costComponents := make([]*schema.CostComponent, 0)
+
+	nodeSize := "Small"
+	if d.Get("node_size").Type != gjson.Null {
+		nodeSize = d.Get("node_size").String()
+	}
+
+	nodevCores := synapseSparkPoolNodeSize(nodeSize)
+
+	var nodeCount *decimal.Decimal
+	if d.Get("node_count").Type != gjson.Null {
+		nodeCount = decimalPtr(decimal.NewFromInt(d.Get("node_count").Int()))
+	}
+
+	if nodeCount == nil {
+		if d.Get("auto_scale").Type != gjson.Null {
+			autoScale := d.Get("auto_scale").Array()
+			nodeCount = decimalPtr(decimal.NewFromInt(autoScale[0].Get("min_node_count").Int()))
+		}
+	}
+
+	var hours = decimalPtr(decimal.NewFromInt(9))
+	if u != nil && u.Get("monthly_hours").Type != gjson.Null {
+		hours = decimalPtr(decimal.NewFromInt(u.Get("monthly_hours").Int()))
+	}
+
+	var freevCoreHours, vCoreHours *decimal.Decimal
+	if nodeCount != nil && nodevCores != nil {
+		freevCoreHours = decimalPtr(decimal.NewFromInt(120).Div(*nodevCores).Div(*nodeCount))
+		if hours != nil && hours.LessThan(*freevCoreHours) {
+			freevCoreHours = hours
+		}
+		if hours != nil && hours.GreaterThan(*freevCoreHours) {
+			vCoreHours = decimalPtr(hours.Sub(*freevCoreHours))
+		}
+	}
+
+	costComponents = append(costComponents, synapseSparkPoolCostComponent(region, fmt.Sprintf("%sx %s node (first 120 vCore-hours)", nodeCount, strings.ToLower(nodeSize)), "0", nodeCount, nodevCores, freevCoreHours))
+	costComponents = append(costComponents, synapseSparkPoolCostComponent(region, fmt.Sprintf("%sx %s node (over 120 vCore-hours)", nodeCount, strings.ToLower(nodeSize)), "120", nodeCount, nodevCores, vCoreHours))
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -29,30 +68,48 @@ func NewAzureRMSynapseSparkPool(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func synapseSparkPoolCostComponent(region, name, tier string, instances, vCores *decimal.Decimal) *schema.CostComponent {
+func synapseSparkPoolNodeSize(sizeName string) *decimal.Decimal {
+	switch sizeName {
+	case "Small":
+		return decimalPtr(decimal.NewFromInt(4))
+	case "Medium":
+		return decimalPtr(decimal.NewFromInt(8))
+	case "Large":
+		return decimalPtr(decimal.NewFromInt(16))
+	case "XLarge":
+		return decimalPtr(decimal.NewFromInt(32))
+	case "XXLarge":
+		return decimalPtr(decimal.NewFromInt(64))
+	default:
+		return nil
+	}
+}
 
-	var HourlyQuantity *decimal.Decimal
-	if instances != nil && vCores != nil {
-		HourlyQuantity = decimalPtr(vCores.Mul(*instances))
+func synapseSparkPoolCostComponent(region, name, start string, instances, vCores, hours *decimal.Decimal) *schema.CostComponent {
+
+	var hourlyQuantity *decimal.Decimal
+	if instances != nil && vCores != nil && hours != nil {
+		hourlyQuantity = decimalPtr(vCores.Mul(*instances).Mul(*hours))
 	}
 
 	return &schema.CostComponent{
-		Name:           name,
-		Unit:           "vCore",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: HourlyQuantity,
+		Name:            name,
+		Unit:            "vCore-hour",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: hourlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),
 			Service:       strPtr("Azure Synapse Analytics"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr(fmt.Sprintf("Azure Synapse Analytics Data Flow - %s", tier))},
+				{Key: "productName", Value: strPtr("Azure Synapse Analytics Serverless Apache Spark Pool - Memory Optimized")},
 				{Key: "skuName", Value: strPtr("vCore")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("Consumption"),
+			PurchaseOption:   strPtr("Consumption"),
+			StartUsageAmount: strPtr(start),
 		},
 	}
 }

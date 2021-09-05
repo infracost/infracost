@@ -50,6 +50,13 @@ resource "azurerm_synapse_sql_pool" "default" {
   create_mode          = "Default"
 }
 
+resource "azurerm_synapse_sql_pool" "storage" {
+  name                 = "examplesqlpool"
+  synapse_workspace_id = azurerm_synapse_workspace.example.id
+  sku_name             = "DW200c"
+  create_mode          = "Default"
+}
+
 resource "azurerm_synapse_sql_pool" "no_backup" {
   name                 = "examplesqlpool"
   synapse_workspace_id = azurerm_synapse_workspace.example.id

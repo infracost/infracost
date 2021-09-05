@@ -2,7 +2,7 @@ version: 0.1
 resource_usage:
   azurerm_synapse_workspace.example:
     serverless_sql_pool_size_tb: 11
-  azurerm_synapse_sql_pool.default:
+  azurerm_synapse_sql_pool.storage:
     storage_tb: 1
   azurerm_synapse_sql_pool.no_backup:
     storage_tb: 1
