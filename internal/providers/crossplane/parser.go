@@ -7,7 +7,6 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -57,7 +56,7 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func (p *Parser) parseJSON(data [][]byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+func (p *Parser) parseTemplates(data [][]byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
 	var resources []*schema.Resource
 	baseResources := p.loadUsageFileResources(usage)
 	// Process each Crossplane template
@@ -65,21 +64,19 @@ func (p *Parser) parseJSON(data [][]byte, usage map[string]*schema.UsageData) ([
 		if !gjson.ValidBytes(bytes) {
 			return baseResources, baseResources, errors.New("invalid JSON")
 		}
-		resources = append(resources, p.parseJSONResources(false, usage, gjson.ParseBytes(bytes))...)
+		resources = append(resources, p.parseTemplate(usage, gjson.ParseBytes(bytes))...)
 	}
 	resources = append(resources, baseResources...)
 	return nil, resources, nil
 }
 
-func (p *Parser) parseJSONResources(parsePrior bool, usage map[string]*schema.UsageData, parsed gjson.Result) []*schema.Resource {
-	resData := map[string]*schema.ResourceData{}
+func (p *Parser) parseTemplate(usage map[string]*schema.UsageData, parsed gjson.Result) []*schema.Resource {
 	var resources []*schema.Resource
-
+	parseFunc := p.parseSimpleResourse
 	if parsed.Get("kind").String() == "Composition" {
-		resData = p.parseCompositeResource(parsed)
-	} else {
-		resData = p.parseSimpleResourse(parsed)
+		parseFunc = p.parseCompositeResource
 	}
+	resData := parseFunc(parsed)
 
 	// p.parseReferences(resData, conf)
 	// p.stripDataResources(resData)
@@ -115,10 +112,16 @@ func (p *Parser) parseSimpleResourse(parsed gjson.Result) map[string]*schema.Res
 func (p *Parser) getMetaData(parsed gjson.Result) (string, string, string, string, map[string]string) {
 	apiVersion := parsed.Get("apiVersion").String()
 	kind := parsed.Get("kind").String()
-	name := parsed.Get("metadata.name").String()
+	name := parsed.Get("name").String()
+	if name == "" {
+		name = parsed.Get("metadata.name").String()
+	}
 	provider := getProvider(apiVersion)
 	labels := getLabels(parsed)
-	address := apiVersion + "/" + kind
+	address := provider + "." + kind
+	if name != "" {
+		address += "." + name
+	}
 	resourceType := provider + "/" + kind
 	return name, resourceType, provider, address, labels
 }
@@ -128,16 +131,11 @@ func (p *Parser) parseCompositeResource(parsed gjson.Result) map[string]*schema.
 	if parsed.Get("spec").Get("resources").IsArray() {
 		for _, r := range parsed.Get("spec").Get("resources").Array() {
 			base := r.Get("base")
-			kind := base.Get("kind").String()
-			switch kind {
-			case "Provider", "ProviderConfig", "CompositeResourceDefinition", "ResourceGroup", "ProviderConfigUsage", "Account":
-				log.Infof("Skipping: %s", kind)
-			default:
-				//TODO: Process r.Get("patches") then update base before calling parseSimpleResourse
-				resource := p.parseSimpleResourse(base)
-				for key, value := range resource {
-					resources[key] = value
-				}
+			base = schema.AddRawValue(base, "name", r.Get("name").String())
+			//TODO: Process r.Get("patches") then update base before calling parseSimpleResourse
+			resource := p.parseSimpleResourse(base)
+			for key, value := range resource {
+				resources[key] = value
 			}
 		}
 	}

@@ -26,16 +26,6 @@ func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
 		return d.Get("forProvider.location").String()
 	}
 
-	// Then check for any parent resources with a location
-	// for _, k := range parentResourceKeys {
-	// 	parents := d.References(k)
-	// 	for _, p := range parents {
-	// 		if p.Get("location").String() != "" {
-	// 			return p.Get("location").String()
-	// 		}
-	// 	}
-	// }
-
 	// When all else fails use the default region
 	defaultRegion := d.Get("region").String()
 	log.Warnf("Using %s for resource %s as its 'location' property could not be found.", defaultRegion, d.Address)

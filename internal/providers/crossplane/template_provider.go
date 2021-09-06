@@ -48,7 +48,7 @@ func (p *TemplateProvider) LoadResources(project *schema.Project, usage map[stri
 	if err != nil {
 		return errors.Wrap(err, "Error reading CrossPlane template file")
 	}
-	project.PastResources, project.Resources, err = NewParser(p.ctx).parseJSON(data, usage)
+	project.PastResources, project.Resources, err = NewParser(p.ctx).parseTemplates(data, usage)
 	if err != nil {
 		return errors.Wrap(err, "Error parsing CrossPlane template file")
 	}
@@ -57,22 +57,20 @@ func (p *TemplateProvider) LoadResources(project *schema.Project, usage map[stri
 
 // IsCrossPlaneTemplateProvider ...
 func IsCrossPlaneTemplateProvider(path string) bool {
-	template := map[string]interface{}{}
 	data, err := readCrossPlaneTemplate(path)
 	if err != nil {
 		log.Error(err)
 		return false
 	}
 	for _, bytes := range data {
+		template := map[string]interface{}{}
 		if err = json.Unmarshal(bytes, &template); err != nil {
 			log.Error(err)
 			return false
 		}
-		if err == nil {
-			if apiVersionObj, ok := template["apiVersion"]; ok {
-				if apiVersion, ok := apiVersionObj.(string); ok && strings.Contains(apiVersion, "crossplane.io/") {
-					return true
-				}
+		if apiVersionObj, ok := template["apiVersion"]; ok {
+			if apiVersion, ok := apiVersionObj.(string); ok && strings.Contains(apiVersion, "crossplane.io/") {
+				return true
 			}
 		}
 	}
