@@ -46,7 +46,7 @@ This guide assumes you are familiar with Terraform, if not you can take an hour 
 
 ### Install
 
-Install go dependencies
+Assuming you have already [installed go](https://golang.org/doc/install), install the go dependencies
 ```sh
 make deps
 ```
@@ -58,7 +58,7 @@ Run the code:
 make run ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
 ```
 
-This will use your existing [Infracost API key](https://www.infracost.io/docs/#2-get-api-key).
+This will use your existing Infracost API key; register for a [free API key](https://www.infracost.io/docs/#2-get-api-key) key if you don't have one already.
 
 ### Test
 
