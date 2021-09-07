@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"context"
 	"sort"
 
 	"github.com/shopspring/decimal"
@@ -9,6 +10,8 @@ import (
 var HourToMonthUnitMultiplier = decimal.NewFromInt(730)
 
 type ResourceFunc func(*ResourceData, *UsageData) *Resource
+
+type EstimateFunc func(context.Context, map[string]interface{}) error
 
 type Resource struct {
 	Name           string
@@ -22,6 +25,7 @@ type Resource struct {
 	ResourceType   string
 	Tags           map[string]string
 	UsageSchema    []*UsageSchemaItem
+	EstimateUsage  EstimateFunc
 }
 
 func CalculateCosts(project *Project) {

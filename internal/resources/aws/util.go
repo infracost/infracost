@@ -15,3 +15,12 @@ func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 func int64Ptr(i int64) *int64 {
 	return &i
 }
+
+func asGiB(i int64) int64 {
+	i = i / (1024 * 1024 * 1024)
+	if i == 0 {
+		return 1
+	} else {
+		return i
+	}
+}

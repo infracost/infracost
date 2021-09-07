@@ -1,6 +1,7 @@
 package usage
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -114,6 +115,12 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 				resourceUsage[usageKey] = existingUsageValue
 			} else {
 				resourceUsage[usageKey] = usageSchemaItem.DefaultValue
+			}
+		}
+		if resource.EstimateUsage != nil {
+			err := resource.EstimateUsage(context.TODO(), resourceUsage)
+			if err != nil {
+				log.Warnf("Error estimating usage for resource %s: %v", resourceName, err)
 			}
 		}
 		syncedResourceUsage[resourceName] = unFlattenHelper(resourceUsage)

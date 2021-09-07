@@ -104,6 +104,13 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			if err != nil {
 				return err
 			}
+			// TODO: reload resources to use freshly-synced usage estimates from cloud
+			//   - how to do this without drastically increasing runtime?
+			//   - we just need to recompute costs...maybe separate that from loading?
+			// err = provider.LoadResources(project, u)
+			// if err != nil {
+			// 	return err
+			// }
 		}
 
 		if !runCtx.Config.IsLogging() {
