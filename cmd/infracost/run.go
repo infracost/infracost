@@ -53,7 +53,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		if err != nil {
 			m := fmt.Sprintf("%s\n\n", err)
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
+			m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
 
 			if cmd.Name() != "diff" {
 				m += "\n - Terraform state JSON file"
@@ -67,7 +67,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 			m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
+			m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
 			return clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 		}
 
@@ -202,7 +202,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if cmd.Name() != "infracost" && !hasPathFlag && !hasConfigFile {
 		m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-		m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file\n - Terraform state JSON file"
+		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file\n - Terraform state JSON file"
 		m += "\n\nAlternatively, use --config-file to process multiple projects, see https://infracost.io/config-file"
 
 		ui.PrintUsageErrorAndExit(cmd, m)
