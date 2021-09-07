@@ -39,6 +39,7 @@ jobs:
       - name: Test example works ok from CLI
         run: |
           make run --silent ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml --format json" > infracost-output.json
+          [ -s infracost-output.json ] || (echo "file is empty" && exit 1)
           jq '' infracost-output.json
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
@@ -47,6 +48,7 @@ jobs:
       - name: Test example works ok from config file
         run: |
           make run --silent ARGS="breakdown --config-file=infracost-example.yml"
+          [ -s infracost-output.json ] || (echo "file is empty" && exit 1)
           jq '' infracost-output.json
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
