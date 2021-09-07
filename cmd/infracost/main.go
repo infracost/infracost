@@ -128,6 +128,7 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	))
 
 	rootCmd.SetVersionTemplate("Infracost {{.Version}}\n")
+	rootCmd.SetOut(os.Stdout)
 
 	return rootCmd
 }
