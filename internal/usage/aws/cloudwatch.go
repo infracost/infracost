@@ -7,10 +7,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
-	"github.com/infracost/infracost/internal/config"
 )
 
-func cloudwatchNewClient(ctx *config.ProjectContext, region string) (*cloudwatch.Client, error) {
+func cloudwatchNewClient(ctx context.Context, region string) (*cloudwatch.Client, error) {
 	cfg, err := getConfig(ctx, region)
 	if err != nil {
 		return nil, err
@@ -27,7 +26,7 @@ type statsRequest struct {
 	unit       types.StandardUnit
 }
 
-func cloudwatchGetMonthlyStats(ctx *config.ProjectContext, req statsRequest) (*cloudwatch.GetMetricStatisticsOutput, error) {
+func cloudwatchGetMonthlyStats(ctx context.Context, req statsRequest) (*cloudwatch.GetMetricStatisticsOutput, error) {
 	client, err := cloudwatchNewClient(ctx, req.region)
 	if err != nil {
 		return nil, err
@@ -39,7 +38,7 @@ func cloudwatchGetMonthlyStats(ctx *config.ProjectContext, req statsRequest) (*c
 			Value: strPtr(v),
 		})
 	}
-	return client.GetMetricStatistics(context.TODO(), &cloudwatch.GetMetricStatisticsInput{
+	return client.GetMetricStatistics(ctx, &cloudwatch.GetMetricStatisticsInput{
 		Namespace:  strPtr(req.namespace),
 		MetricName: strPtr(req.metric),
 		StartTime:  aws.Time(time.Now().Add(-timeMonth)),

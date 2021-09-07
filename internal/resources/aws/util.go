@@ -11,3 +11,7 @@ func strPtr(s string) *string {
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
+
+func int64Ptr(i int64) *int64 {
+	return &i
+}

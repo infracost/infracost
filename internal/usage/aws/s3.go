@@ -6,10 +6,9 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/infracost/infracost/internal/config"
 )
 
-func s3NewClient(ctx *config.ProjectContext, region string) (*s3.Client, error) {
+func s3NewClient(ctx context.Context, region string) (*s3.Client, error) {
 	cfg, err := getConfig(ctx, region)
 	if err != nil {
 		return nil, err
@@ -17,13 +16,13 @@ func s3NewClient(ctx *config.ProjectContext, region string) (*s3.Client, error) 
 	return s3.NewFromConfig(cfg), nil
 }
 
-func s3FindMetricsFilter(ctx *config.ProjectContext, region string, bucket string) string {
+func s3FindMetricsFilter(ctx context.Context, region string, bucket string) string {
 	client, err := s3NewClient(ctx, region)
 	if err != nil {
 		sdkWarn("S3", "requests", bucket, err)
 		return ""
 	}
-	result, err := client.ListBucketMetricsConfigurations(context.TODO(), &s3.ListBucketMetricsConfigurationsInput{
+	result, err := client.ListBucketMetricsConfigurations(ctx, &s3.ListBucketMetricsConfigurationsInput{
 		Bucket: strPtr(bucket),
 	})
 	if err != nil {
@@ -38,7 +37,7 @@ func s3FindMetricsFilter(ctx *config.ProjectContext, region string, bucket strin
 	return ""
 }
 
-func s3GetBucketSizeBytes(ctx *config.ProjectContext, region string, bucket string, storageType string) float64 {
+func s3GetBucketSizeBytes(ctx context.Context, region string, bucket string, storageType string) float64 {
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 		region:    region,
 		namespace: "AWS/S3",
@@ -59,7 +58,7 @@ func s3GetBucketSizeBytes(ctx *config.ProjectContext, region string, bucket stri
 	return *stats.Datapoints[0].Average
 }
 
-func s3GetBucketRequests(ctx *config.ProjectContext, region string, bucket string, filterName string, metrics []string) float64 {
+func s3GetBucketRequests(ctx context.Context, region string, bucket string, filterName string, metrics []string) float64 {
 	count := float64(0)
 	for _, metric := range metrics {
 		stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{

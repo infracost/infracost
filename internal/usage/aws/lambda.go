@@ -1,11 +1,12 @@
 package aws
 
 import (
+	"context"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
-	"github.com/infracost/infracost/internal/config"
 )
 
-func lambdaGetInvocations(ctx *config.ProjectContext, region string, fn string) float64 {
+func lambdaGetInvocations(ctx context.Context, region string, fn string) float64 {
 	namespace := "AWS/Lambda"
 	metric := "Invocations"
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
@@ -26,7 +27,7 @@ func lambdaGetInvocations(ctx *config.ProjectContext, region string, fn string) 
 	return 0
 }
 
-func lambdaGetDuration(ctx *config.ProjectContext, region string, fn string) float64 {
+func lambdaGetDuration(ctx context.Context, region string, fn string) float64 {
 	namespace := "AWS/Lambda"
 	metric := "Duration"
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{

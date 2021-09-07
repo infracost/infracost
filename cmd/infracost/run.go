@@ -100,10 +100,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		projects = append(projects, project)
 
 		if runCtx.Config.SyncUsageFile {
-			err = usage.ConfigureEstimation(ctx, project)
-			if err != nil {
-				return err
-			}
 			err = usage.SyncUsageData(project, u, projectCfg.UsageFile)
 			if err != nil {
 				return err
