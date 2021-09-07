@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/Rhymond/go-money"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/Rhymond/go-money"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
@@ -244,6 +245,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if !hasConfigFile {
 		err := cfg.LoadFromEnv()
+
 		if err != nil {
 			return err
 		}
@@ -253,8 +255,11 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		projectCfg.Path, _ = cmd.Flags().GetString("path")
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
-		projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")
 		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
+
+		if cmd.Flags().Changed("terraform-workspace") {
+			projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")
+		}
 	}
 
 	cfg.Format, _ = cmd.Flags().GetString("format")
