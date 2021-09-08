@@ -17,10 +17,12 @@ func int64Ptr(i int64) *int64 {
 }
 
 func asGiB(i int64) int64 {
-	i = i / (1024 * 1024 * 1024)
+	if i == 0 {
+		return 0
+	}
+	i /= (1024 * 1024 * 1024)
 	if i == 0 {
 		return 1
-	} else {
-		return i
 	}
+	return i
 }
