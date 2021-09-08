@@ -6,7 +6,7 @@
                                                                                                         
  azurerm_virtual_network_gateway.Basic                                                                  
  ├─ VPN gateway (Basic)                                           730  hours                     $26.28 
- ├─ VPN gateway P2S tunnels (over 128)                Monthly cost depends on usage: $0.00 per tunnel   
+ ├─ VPN gateway P2S tunnels (over 128)                Monthly cost depends on usage: $7.30 per tunnel   
  └─ VPN gateway data tranfer                          Monthly cost depends on usage: $0.035 per GB      
                                                                                                         
  azurerm_virtual_network_gateway.VpnGw1                                                                 
@@ -60,6 +60,3 @@
  OVERALL TOTAL                                                                                $5,964.83 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
-Logs:
-
-level=warning msg="No products found for azurerm_virtual_network_gateway.Basic VPN gateway P2S tunnels (over 128), using 0.00"
