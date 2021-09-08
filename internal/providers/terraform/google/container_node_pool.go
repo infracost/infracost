@@ -99,6 +99,7 @@ func newNodePool(address string, d gjson.Result, countPerZoneOverride *int64, cl
 }
 
 func nodePoolCostComponents(region string, nodeConfig gjson.Result) []*schema.CostComponent {
+	poolSize := decimal.NewFromInt(1)
 	machineType := "e2-medium"
 	if nodeConfig.Get("machine_type").Exists() {
 		machineType = nodeConfig.Get("machine_type").String()
@@ -120,8 +121,8 @@ func nodePoolCostComponents(region string, nodeConfig gjson.Result) []*schema.Co
 	}
 
 	costComponents := []*schema.CostComponent{
-		computeCostComponent(region, machineType, purchaseOption),
-		computeDisk(region, diskType, &diskSize),
+		computeCostComponent(region, machineType, purchaseOption, poolSize),
+		computeDisk(region, diskType, &diskSize, poolSize),
 	}
 
 	localSSDCount := nodeConfig.Get("local_ssd_count").Int()
@@ -130,7 +131,7 @@ func nodePoolCostComponents(region string, nodeConfig gjson.Result) []*schema.Co
 	}
 
 	for _, guestAccel := range nodeConfig.Get("guest_accelerator").Array() {
-		costComponents = append(costComponents, guestAccelerator(region, purchaseOption, guestAccel))
+		costComponents = append(costComponents, guestAccelerator(region, purchaseOption, guestAccel, poolSize))
 	}
 
 	return costComponents
