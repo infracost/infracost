@@ -81,7 +81,7 @@ build_breakdown_cmd () {
 }
 
 build_output_cmd () {
-  output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
+  output_cmd="${INFRACOST_BINARY} output --no-color --format $2 --path $1"
   if [ -n "$show_skipped" ]; then
     # The "=" is important as otherwise the value of the flag is ignored by the CLI
     output_cmd="$output_cmd --show-skipped=$show_skipped"
@@ -350,7 +350,7 @@ load_azure_devops_env () {
 }
 
 cleanup () {
-  rm -f infracost_breakdown.json infracost_breakdown_cmd infracost_output_cmd
+  rm -f infracost_breakdown_cmd infracost_output_diff_cmd infracost_output_html_cmd
 }
 
 # MAIN
@@ -376,12 +376,20 @@ echo "  $ $(cat infracost_breakdown_cmd)"
 breakdown_output=$(cat infracost_breakdown_cmd | sh)
 echo "$breakdown_output" > infracost_breakdown.json
 
-infracost_output_cmd=$(build_output_cmd "infracost_breakdown.json")
-echo "$infracost_output_cmd" > infracost_output_cmd
+infracost_output_diff_cmd=$(build_output_cmd "infracost_breakdown.json" "diff")
+echo "$infracost_output_diff_cmd" > infracost_output_diff_cmd
   
 echo "Running infracost output using:"
-echo "  $ $(cat infracost_output_cmd)"
-diff_output=$(cat infracost_output_cmd | sh)
+echo "  $ $(cat infracost_output_diff_cmd)"
+diff_output=$(cat infracost_output_diff_cmd | sh)
+
+infracost_output_html_cmd=$(build_output_cmd "infracost_breakdown.json" "html")
+echo "$infracost_output_html_cmd" > infracost_output_html_cmd
+html_output=$(cat infracost_output_html_cmd | sh)
+echo "$html_output" > infracost_breakdown.html
+
+echo "Running infracost output using:"
+echo "  $ $(cat infracost_output_html_cmd)"
 
 past_total_monthly_cost=$(jq '[.projects[].pastBreakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
 total_monthly_cost=$(jq '[.projects[].breakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
