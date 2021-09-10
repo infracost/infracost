@@ -43,6 +43,7 @@ func addRunFlags(cmd *cobra.Command) {
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projects := make([]*schema.Project, 0)
+	syncResults := make([]*usage.SyncResult, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
 
 	for _, projectCfg := range runCtx.Config.Projects {
@@ -100,7 +101,15 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		projects = append(projects, project)
 
 		if runCtx.Config.SyncUsageFile {
-			err = usage.SyncUsageData(project, u, projectCfg.UsageFile)
+			syncResult, err := usage.SyncUsageData(project, u, projectCfg.UsageFile)
+			syncResults = append(syncResults, syncResult)
+			var usageEstimates, usageEstimateErrors int
+			if syncResult != nil {
+				usageEstimates = syncResult.EstimationCount
+				usageEstimateErrors = len(syncResult.EstimationErrors)
+			}
+			ctx.SetContextValue("usageEstimates", usageEstimates)
+			ctx.SetContextValue("usageEstimateErrors", usageEstimateErrors)
 			if err != nil {
 				return err
 			}
@@ -202,6 +211,24 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	cmd.Printf("%s\n", out)
+
+	if len(syncResults) > 0 {
+		var resources, attempts, errors int
+		for _, syncResult := range syncResults {
+			resources += syncResult.ResourceCount
+			attempts += syncResult.EstimationCount
+			errors += len(syncResult.EstimationErrors)
+		}
+		successes := attempts - errors
+		if successes > 0 {
+			m := fmt.Sprintf("Performed cloud-based usage estimation for %d resources of %d", successes, resources)
+			if runCtx.Config.IsLogging() {
+				log.Info(m)
+			} else {
+				fmt.Fprintln(os.Stderr, m)
+			}
+		}
+	}
 
 	return nil
 }
