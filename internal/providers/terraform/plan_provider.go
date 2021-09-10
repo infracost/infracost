@@ -15,7 +15,8 @@ import (
 
 type PlanProvider struct {
 	*DirProvider
-	Path string
+	Path           string
+	cachedPlanJSON []byte
 }
 
 func NewPlanProvider(ctx *config.ProjectContext) schema.Provider {
@@ -55,6 +56,10 @@ func (p *PlanProvider) LoadResources(project *schema.Project, usage map[string]*
 }
 
 func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
+	if p.cachedPlanJSON != nil {
+		return p.cachedPlanJSON, nil
+	}
+
 	dir := filepath.Dir(p.Path)
 	planPath := filepath.Base(p.Path)
 
@@ -97,5 +102,9 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	return p.runShow(opts, planPath)
+	j, err := p.runShow(opts, planPath)
+	if err == nil {
+		p.cachedPlanJSON = j
+	}
+	return j, err
 }

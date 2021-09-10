@@ -34,6 +34,8 @@ type DirProvider struct {
 	TerraformBinary     string
 	TerraformCloudHost  string
 	TerraformCloudToken string
+	cachedStateJSON     []byte
+	cachedPlanJSON      []byte
 }
 
 func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
@@ -142,6 +144,10 @@ func (p *DirProvider) LoadResources(project *schema.Project, usage map[string]*s
 }
 
 func (p *DirProvider) generatePlanJSON() ([]byte, error) {
+	if p.cachedPlanJSON != nil {
+		return p.cachedPlanJSON, nil
+	}
+
 	err := p.checks()
 	if err != nil {
 		return []byte{}, err
@@ -166,10 +172,18 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		return planJSON, nil
 	}
 
-	return p.runShow(opts, planFile)
+	j, err := p.runShow(opts, planFile)
+	if err == nil {
+		p.cachedPlanJSON = j
+	}
+	return j, err
 }
 
 func (p *DirProvider) generateStateJSON() ([]byte, error) {
+	if p.cachedStateJSON != nil {
+		return p.cachedStateJSON, nil
+	}
+
 	err := p.checks()
 	if err != nil {
 		return []byte{}, err
@@ -183,7 +197,11 @@ func (p *DirProvider) generateStateJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	return p.runShow(opts, "")
+	j, err := p.runShow(opts, "")
+	if err == nil {
+		p.cachedStateJSON = j
+	}
+	return j, err
 }
 
 func (p *DirProvider) buildCommandOpts() (*CmdOptions, error) {
