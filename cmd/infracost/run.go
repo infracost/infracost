@@ -103,11 +103,13 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		if runCtx.Config.SyncUsageFile {
 			syncResult, err := usage.SyncUsageData(project, u, projectCfg.UsageFile)
 			syncResults = append(syncResults, syncResult)
-			var usageEstimates, usageEstimateErrors int
+			var usageSyncs, usageEstimates, usageEstimateErrors int
 			if syncResult != nil {
+				usageSyncs = syncResult.ResourceCount
 				usageEstimates = syncResult.EstimationCount
 				usageEstimateErrors = len(syncResult.EstimationErrors)
 			}
+			ctx.SetContextValue("usageSyncs", usageSyncs)
 			ctx.SetContextValue("usageEstimates", usageEstimates)
 			ctx.SetContextValue("usageEstimateErrors", usageEstimateErrors)
 			if err != nil {
