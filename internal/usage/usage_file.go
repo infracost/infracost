@@ -63,7 +63,7 @@ func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema
 }
 
 func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*SchemaItem, existingUsageData map[string]*schema.UsageData) (SyncResult, yaml.MapSlice) {
-	syncResult := SyncResult{}
+	syncResult := SyncResult{EstimationErrors: make(map[string]error)}
 	syncedResourceUsage := make(map[string]interface{})
 	for _, resource := range resources {
 		resourceName := resource.Name
