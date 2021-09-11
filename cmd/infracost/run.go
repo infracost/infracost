@@ -220,6 +220,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			resources += syncResult.ResourceCount
 			attempts += syncResult.EstimationCount
 			errors += len(syncResult.EstimationErrors)
+			remediate(syncResult)
 		}
 		successes := attempts - errors
 		if successes > 0 {
@@ -374,4 +375,21 @@ func unwrapped(err error) error {
 	}
 
 	return e
+}
+
+func remediate(syncResult *usage.SyncResult) {
+	if len(syncResult.EstimationErrors) > 0 && ui.CanPrompt() {
+		fmt.Fprintf(os.Stdout, "\nUnable to estimate usage for some resources because metrics are not being collected.\n")
+		fmt.Fprintf(os.Stdout, "Infracost can %s to improve future results.\n", ui.BoldString("enable these"))
+		for name, err := range syncResult.EstimationErrors {
+			remediater, ok := err.(schema.Remediater)
+			fmt.Fprintf(os.Stdout, " - Resource %s:\n", ui.PrimaryString(name))
+			if ok && ui.PromptBool(fmt.Sprintf("    May we %s?", ui.BoldString(remediater.Describe()))) {
+				err := remediater.Remediate()
+				if err != nil {
+					fmt.Fprintf(os.Stdout, "    Failed: %s\n", ui.ErrorString(err.Error()))
+				}
+			}
+		}
+	}
 }
