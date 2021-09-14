@@ -43,7 +43,6 @@ func addRunFlags(cmd *cobra.Command) {
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projects := make([]*schema.Project, 0)
-	syncResults := make([]*usage.SyncResult, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
 
 	for _, projectCfg := range runCtx.Config.Projects {
@@ -102,19 +101,11 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 		if runCtx.Config.SyncUsageFile {
 			syncResult, err := usage.SyncUsageData(project, u, projectCfg.UsageFile)
-			syncResults = append(syncResults, syncResult)
-			var usageSyncs, usageEstimates, usageEstimateErrors int
-			if syncResult != nil {
-				usageSyncs = syncResult.ResourceCount
-				usageEstimates = syncResult.EstimationCount
-				usageEstimateErrors = len(syncResult.EstimationErrors)
-			}
-			ctx.SetContextValue("usageSyncs", usageSyncs)
-			ctx.SetContextValue("usageEstimates", usageEstimates)
-			ctx.SetContextValue("usageEstimateErrors", usageEstimateErrors)
+			summarizeUsage(ctx, syncResult)
 			if err != nil {
 				return err
 			}
+			remediateUsage(runCtx, ctx, syncResult)
 			err = provider.LoadResources(project, u)
 			if err != nil {
 				return err
@@ -214,26 +205,49 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	cmd.Printf("%s\n", out)
 
-	if len(syncResults) > 0 {
-		var resources, attempts, errors int
-		for _, syncResult := range syncResults {
-			resources += syncResult.ResourceCount
-			attempts += syncResult.EstimationCount
-			errors += len(syncResult.EstimationErrors)
-			remediate(syncResult)
-		}
-		successes := attempts - errors
-		if successes > 0 {
-			m := fmt.Sprintf("Performed cloud-based usage estimation for %d resources of %d", successes, resources)
-			if runCtx.Config.IsLogging() {
-				log.Info(m)
-			} else {
-				fmt.Fprintln(os.Stderr, m)
-			}
+	return nil
+}
+
+func summarizeUsage(ctx *config.ProjectContext, syncResult *usage.SyncResult) {
+	var usageSyncs, usageEstimates, usageEstimateErrors int
+	if syncResult != nil {
+		usageSyncs = syncResult.ResourceCount
+		usageEstimates = syncResult.EstimationCount
+		usageEstimateErrors = len(syncResult.EstimationErrors)
+	}
+	ctx.SetContextValue("usageSyncs", usageSyncs)
+	ctx.SetContextValue("usageEstimates", usageEstimates)
+	ctx.SetContextValue("usageEstimateErrors", usageEstimateErrors)
+}
+
+func remediateUsage(runCtx *config.RunContext, ctx *config.ProjectContext, syncResult *usage.SyncResult) {
+	resources := syncResult.ResourceCount
+	attempts := syncResult.EstimationCount
+	errors := len(syncResult.EstimationErrors)
+	successes := attempts - errors
+
+	if attempts > 0 {
+		m := fmt.Sprintf("Performed cloud-based usage estimation for %d resources of %d", successes, resources)
+		if runCtx.Config.IsLogging() {
+			log.Info(m)
+		} else {
+			fmt.Fprintln(os.Stdout, m)
 		}
 	}
 
-	return nil
+	var remAttempts, remErrors int
+	for name, err := range syncResult.EstimationErrors {
+		if remediater, ok := err.(schema.Remediater); ok {
+			remAttempts++
+			err = remediater.Remediate()
+			if err != nil {
+				remErrors++
+				log.Warningf("Cannot enable estimation for %s: %s", name, err.Error())
+			}
+		}
+	}
+	ctx.SetContextValue("remediationAttempts", remAttempts)
+	ctx.SetContextValue("remediationErrors", remErrors)
 }
 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
@@ -375,21 +389,4 @@ func unwrapped(err error) error {
 	}
 
 	return e
-}
-
-func remediate(syncResult *usage.SyncResult) {
-	if len(syncResult.EstimationErrors) > 0 && ui.CanPrompt() {
-		fmt.Fprintf(os.Stdout, "\nUnable to estimate usage for some resources because metrics are not being collected.\n")
-		fmt.Fprintf(os.Stdout, "Infracost can %s to improve future results.\n", ui.BoldString("enable these"))
-		for name, err := range syncResult.EstimationErrors {
-			remediater, ok := err.(schema.Remediater)
-			fmt.Fprintf(os.Stdout, " - Resource %s:\n", ui.PrimaryString(name))
-			if ok && ui.PromptBool(fmt.Sprintf("    May we %s?", ui.BoldString(remediater.Describe()))) {
-				err := remediater.Remediate()
-				if err != nil {
-					fmt.Fprintf(os.Stdout, "    Failed: %s\n", ui.ErrorString(err.Error()))
-				}
-			}
-		}
-	}
 }
