@@ -21,11 +21,11 @@ func (c *Config) migrateCredentials() error {
 	oldPath := path.Join(userConfigDir(), "config.yml")
 	credPath := CredentialsFilePath()
 
-	if fileExists(oldPath) && !fileExists(credPath) {
+	if FileExists(oldPath) && !FileExists(credPath) {
 		return c.migrateV0_7_17(oldPath, credPath)
 	}
 
-	if fileExists(credPath) {
+	if FileExists(credPath) {
 		var content struct {
 			Version string `yaml:"version"`
 		}

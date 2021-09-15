@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/awslabs/goformation/v4"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
@@ -36,6 +37,10 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 
 	if isTerraformPlan(path) {
 		return terraform.NewPlanProvider(ctx), nil
+	}
+
+	if isTerragruntDir(path) {
+		return terraform.NewTerragruntProvider(ctx), nil
 	}
 
 	if isTerraformDir(path) {
@@ -99,6 +104,17 @@ func isTerraformPlan(path string) bool {
 	}
 
 	return planFile != nil
+}
+
+func isTerragruntDir(path string) bool {
+	if val, ok := os.LookupEnv("TERRAGRUNT_CONFIG"); ok {
+		if filepath.IsAbs(val) {
+			return config.FileExists(val)
+		}
+		return config.FileExists(filepath.Join(path, val))
+	}
+
+	return config.FileExists(filepath.Join(path, "terragrunt.hcl")) || config.FileExists(filepath.Join(path, "terragrunt.hcl.json"))
 }
 
 func isTerraformDir(path string) bool {

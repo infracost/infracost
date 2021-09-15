@@ -53,7 +53,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		if err != nil {
 			m := fmt.Sprintf("%s\n\n", err)
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
+			m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
 
 			if cmd.Name() != "diff" {
 				m += "\n - Terraform state JSON file"
@@ -67,7 +67,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 			m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
+			m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
 			return clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 		}
 
@@ -86,31 +86,30 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			ctx.SetContextValue("hasUsageFile", true)
 		}
 
-		metadata := config.DetectProjectMetadata(ctx)
-		metadata.Type = provider.Type()
-		provider.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, runCtx.Config.EnableDashboard)
-
-		project := schema.NewProject(name, metadata)
-		err = provider.LoadResources(project, u)
+		providerProjects, err := provider.LoadResources(u)
 		if err != nil {
 			return err
 		}
 
-		projects = append(projects, project)
+		usageProjects := make([]*schema.Project, len(projects))
+		copy(usageProjects, projects)
+		usageProjects = append(usageProjects, providerProjects...)
 
 		if runCtx.Config.SyncUsageFile {
-			syncResult, err := usage.SyncUsageData(project, u, projectCfg.UsageFile)
+			syncResult, err := usage.SyncUsageData(usageProjects, u, projectCfg.UsageFile)
 			summarizeUsage(ctx, syncResult)
 			if err != nil {
 				return err
 			}
 			remediateUsage(runCtx, ctx, syncResult)
-			err = provider.LoadResources(project, u)
+
+			providerProjects, err = provider.LoadResources(u)
 			if err != nil {
 				return err
 			}
 		}
+
+		projects = append(projects, providerProjects...)
 
 		if !runCtx.Config.IsLogging() {
 			fmt.Fprintln(os.Stderr, "")
@@ -256,7 +255,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if cmd.Name() != "infracost" && !hasPathFlag && !hasConfigFile {
 		m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-		m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file\n - Terraform state JSON file"
+		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file\n - Terraform state JSON file"
 		m += "\n\nAlternatively, use --config-file to process multiple projects, see https://infracost.io/config-file"
 
 		ui.PrintUsageErrorAndExit(cmd, m)
@@ -293,6 +292,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if !hasConfigFile {
 		err := cfg.LoadFromEnv()
+
 		if err != nil {
 			return err
 		}
@@ -302,8 +302,11 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		projectCfg.Path, _ = cmd.Flags().GetString("path")
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
-		projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")
 		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
+
+		if cmd.Flags().Changed("terraform-workspace") {
+			projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")
+		}
 	}
 
 	cfg.Format, _ = cmd.Flags().GetString("format")

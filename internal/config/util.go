@@ -23,7 +23,7 @@ func userConfigDir() string {
 	return dir
 }
 
-func fileExists(path string) bool {
+func FileExists(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
 		return false

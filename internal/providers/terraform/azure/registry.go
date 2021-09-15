@@ -84,6 +84,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMStorageAccountRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
+	GetAzureRMVpnGatewayConnectionRegistryItem(),
 	GetAzureRMVpnGatewayRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
@@ -244,7 +245,6 @@ var FreeResources = []string{
 	"azurerm_subnet",
 	"azurerm_subnet_network_security_group_association",
 	"azurerm_virtual_network",
-	"azurerm_virtual_network_gateway_connection",
 	"azurerm_local_network_gateway",
 
 	// Azure Notification Hub

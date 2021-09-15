@@ -30,6 +30,7 @@ func NewComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	}
 
 	region := d.Get("region").String()
+	size := decimal.NewFromInt(1)
 
 	zone := d.Get("zone").String()
 	if zone != "" {
@@ -41,7 +42,7 @@ func NewComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		purchaseOption = "preemptible"
 	}
 
-	costComponents := []*schema.CostComponent{computeCostComponent(region, machineType, purchaseOption)}
+	costComponents := []*schema.CostComponent{computeCostComponent(region, machineType, purchaseOption, size)}
 
 	if d.Get("boot_disk.0.initialize_params.0").Exists() {
 		costComponents = append(costComponents, bootDisk(region, d.Get("boot_disk.0.initialize_params.0")))
@@ -53,7 +54,7 @@ func NewComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	}
 
 	for _, guestAccel := range d.Get("guest_accelerator").Array() {
-		costComponents = append(costComponents, guestAccelerator(region, purchaseOption, guestAccel))
+		costComponents = append(costComponents, guestAccelerator(region, purchaseOption, guestAccel, size))
 	}
 
 	return &schema.Resource{
@@ -62,7 +63,7 @@ func NewComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	}
 }
 
-func computeCostComponent(region, machineType string, purchaseOption string) *schema.CostComponent {
+func computeCostComponent(region, machineType string, purchaseOption string, instanceCount decimal.Decimal) *schema.CostComponent {
 	sustainedUseDiscount := 0.0
 	if strings.ToLower(purchaseOption) == "on_demand" {
 		switch strings.ToLower(strings.Split(machineType, "-")[0]) {
@@ -77,7 +78,7 @@ func computeCostComponent(region, machineType string, purchaseOption string) *sc
 		Name:                fmt.Sprintf("Instance usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
 		Unit:                "hours",
 		UnitMultiplier:      decimal.NewFromInt(1),
-		HourlyQuantity:      decimalPtr(decimal.NewFromInt(1)),
+		HourlyQuantity:      decimalPtr(instanceCount),
 		MonthlyDiscountPerc: sustainedUseDiscount,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
@@ -102,7 +103,7 @@ func bootDisk(region string, initializeParams gjson.Result) *schema.CostComponen
 
 	diskType := initializeParams.Get("type").String()
 
-	return computeDisk(region, diskType, size)
+	return computeDisk(region, diskType, size, decimal.NewFromInt(1))
 }
 
 func scratchDisk(region string, purchaseOption string, count int) *schema.CostComponent {
@@ -128,7 +129,7 @@ func scratchDisk(region string, purchaseOption string, count int) *schema.CostCo
 	}
 }
 
-func guestAccelerator(region string, purchaseOption string, guestAccel gjson.Result) *schema.CostComponent {
+func guestAccelerator(region string, purchaseOption string, guestAccel gjson.Result, instanceCount decimal.Decimal) *schema.CostComponent {
 	model := guestAccel.Get("type").String()
 
 	var (
@@ -162,6 +163,7 @@ func guestAccelerator(region string, purchaseOption string, guestAccel gjson.Res
 	}
 
 	count := decimal.NewFromInt(guestAccel.Get("count").Int())
+	count = instanceCount.Mul(count)
 
 	sustainedUseDiscount := 0.0
 	if strings.ToLower(purchaseOption) == "on_demand" {

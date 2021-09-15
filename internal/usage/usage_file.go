@@ -36,7 +36,7 @@ type SyncResult struct {
 	EstimationErrors map[string]error
 }
 
-func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema.UsageData, usageFilePath string) (*SyncResult, error) {
+func SyncUsageData(projects []*schema.Project, existingUsageData map[string]*schema.UsageData, usageFilePath string) (*SyncResult, error) {
 	if usageFilePath == "" {
 		return nil, nil
 	}
@@ -44,7 +44,14 @@ func SyncUsageData(project *schema.Project, existingUsageData map[string]*schema
 	if err != nil {
 		return nil, err
 	}
-	syncResult, syncedResourcesUsage := syncResourcesUsage(project.Resources, usageSchema, existingUsageData)
+
+	// TODO: update this when we properly support multiple projects in usage
+	resources := make([]*schema.Resource, 0)
+	for _, project := range projects {
+		resources = append(resources, project.Resources...)
+	}
+
+	syncResult, syncedResourcesUsage := syncResourcesUsage(resources, usageSchema, existingUsageData)
 	// yaml.MapSlice is used to maintain the order of keys, so re-running
 	// the code won't change the output.
 	syncedUsageData := yaml.MapSlice{
