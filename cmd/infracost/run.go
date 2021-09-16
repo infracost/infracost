@@ -99,7 +99,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			}
 			remediateUsage(runCtx, ctx, syncResult)
 
-			// Reload so new usage will apply immediately
+			u, err := usage.LoadFromFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
+			if err != nil {
+				return err
+			}
 			providerProjects, err = provider.LoadResources(u)
 			if err != nil {
 				return err
