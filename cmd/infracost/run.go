@@ -91,18 +91,15 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			return err
 		}
 
-		usageProjects := make([]*schema.Project, len(projects))
-		copy(usageProjects, projects)
-		usageProjects = append(usageProjects, providerProjects...)
-
 		if runCtx.Config.SyncUsageFile {
-			syncResult, err := usage.SyncUsageData(usageProjects, u, projectCfg.UsageFile)
+			syncResult, err := usage.SyncUsageData(providerProjects, u, projectCfg.UsageFile)
 			summarizeUsage(ctx, syncResult)
 			if err != nil {
 				return err
 			}
 			remediateUsage(runCtx, ctx, syncResult)
 
+			// Reload so new usage will apply immediately
 			providerProjects, err = provider.LoadResources(u)
 			if err != nil {
 				return err
