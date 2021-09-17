@@ -22,13 +22,13 @@ func NewLambdaFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		memorySize = d.Get("memory_size").Int()
 	}
 
-	args := &aws.LambdaFunctionArguments{
+	a := &aws.LambdaFunction{
 		Address:    d.Address,
 		Region:     region,
 		Name:       name,
 		MemorySize: memorySize,
 	}
-	args.PopulateUsage(u)
+	a.PopulateUsage(u)
 
-	return aws.NewLambdaFunction(args)
+	return a.BuildResource()
 }

@@ -12,11 +12,11 @@ func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
 		Notes: []string{
 			"DAX is not yet supported.",
 		},
-		RFunc: NewDynamoDBTable,
+		RFunc: NewDynamoDBTableResource,
 	}
 }
 
-func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDynamoDBTableResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	replicaRegions := []string{}
 	if d.Get("replica").Exists() {
 		for _, data := range d.Get("replica").Array() {
@@ -24,7 +24,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		}
 	}
 
-	args := &aws.DynamoDbTableArguments{
+	a := &aws.DynamoDBTable{
 		Address:        d.Address,
 		Region:         d.Get("region").String(),
 		Name:           d.Get("name").String(),
@@ -33,7 +33,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		ReadCapacity:   intPtr(d.Get("read_capacity").Int()),
 		ReplicaRegions: replicaRegions,
 	}
-	args.PopulateUsage(u)
+	a.PopulateUsage(u)
 
-	return aws.NewDynamoDBTable(args)
+	return a.BuildResource()
 }

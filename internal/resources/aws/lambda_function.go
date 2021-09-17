@@ -10,7 +10,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type LambdaFunctionArguments struct {
+type LambdaFunction struct {
 	Address    string
 	Region     string
 	Name       string
@@ -20,38 +20,38 @@ type LambdaFunctionArguments struct {
 	MonthlyRequests   *float64 `infracost_usage:"monthly_requests"`
 }
 
-func (args *LambdaFunctionArguments) PopulateUsage(u *schema.UsageData) {
-	resources.PopulateArgsWithUsage(args, u)
-}
-
 var LambdaFunctionUsageSchema = []*schema.UsageSchemaItem{
 	{Key: "request_duration_ms", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "monthly_requests", DefaultValue: 0, ValueType: schema.Float64},
 }
 
-func NewLambdaFunction(args *LambdaFunctionArguments) *schema.Resource {
-	memorySize := decimal.NewFromInt(args.MemorySize)
+func (a *LambdaFunction) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(a, u)
+}
+
+func (a *LambdaFunction) BuildResource() *schema.Resource {
+	memorySize := decimal.NewFromInt(a.MemorySize)
 
 	averageRequestDuration := decimal.NewFromInt(1)
-	if args.RequestDurationMS != nil {
-		averageRequestDuration = decimal.NewFromFloat(*args.RequestDurationMS)
+	if a.RequestDurationMS != nil {
+		averageRequestDuration = decimal.NewFromFloat(*a.RequestDurationMS)
 	}
 
 	var monthlyRequests *decimal.Decimal
 	var gbSeconds *decimal.Decimal
 
-	if args.MonthlyRequests != nil {
-		monthlyRequests = decimalPtr(decimal.NewFromFloat(*args.MonthlyRequests))
+	if a.MonthlyRequests != nil {
+		monthlyRequests = decimalPtr(decimal.NewFromFloat(*a.MonthlyRequests))
 		gbSeconds = decimalPtr(calculateGBSeconds(memorySize, averageRequestDuration, *monthlyRequests))
 	}
 
 	estimate := func(ctx context.Context, values map[string]interface{}) error {
-		inv, err := aws.LambdaGetInvocations(ctx, args.Region, args.Name)
+		inv, err := aws.LambdaGetInvocations(ctx, a.Region, a.Name)
 		if err != nil {
 			return err
 		}
 		values["monthly_requests"] = inv
-		dur, err := aws.LambdaGetDurationAvg(ctx, args.Region, args.Name)
+		dur, err := aws.LambdaGetDurationAvg(ctx, a.Region, a.Name)
 		if err != nil {
 			return err
 		}
@@ -60,7 +60,7 @@ func NewLambdaFunction(args *LambdaFunctionArguments) *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name:        args.Address,
+		Name:        a.Address,
 		UsageSchema: LambdaFunctionUsageSchema,
 		CostComponents: []*schema.CostComponent{
 			{
@@ -70,7 +70,7 @@ func NewLambdaFunction(args *LambdaFunctionArguments) *schema.Resource {
 				MonthlyQuantity: monthlyRequests,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(args.Region),
+					Region:        strPtr(a.Region),
 					Service:       strPtr("AWSLambda"),
 					ProductFamily: strPtr("Serverless"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -86,7 +86,7 @@ func NewLambdaFunction(args *LambdaFunctionArguments) *schema.Resource {
 				MonthlyQuantity: gbSeconds,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(args.Region),
+					Region:        strPtr(a.Region),
 					Service:       strPtr("AWSLambda"),
 					ProductFamily: strPtr("Serverless"),
 					AttributeFilters: []*schema.AttributeFilter{

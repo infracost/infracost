@@ -10,7 +10,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type DynamoDbTableArguments struct {
+type DynamoDBTable struct {
 	// "required" args that can't really be missing.
 	Address        string
 	Region         string
@@ -32,10 +32,6 @@ type DynamoDbTableArguments struct {
 	MonthlyStreamsReadRequestUnits *int64 `infracost_usage:"monthly_streams_read_request_units"`
 }
 
-func (args *DynamoDbTableArguments) PopulateUsage(u *schema.UsageData) {
-	resources.PopulateArgsWithUsage(args, u)
-}
-
 var DynamoDBTableUsageSchema = []*schema.UsageSchemaItem{
 	{Key: "monthly_write_request_units", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_read_request_units", DefaultValue: 0, ValueType: schema.Int64},
@@ -46,55 +42,59 @@ var DynamoDBTableUsageSchema = []*schema.UsageSchemaItem{
 	{Key: "monthly_streams_read_request_units", DefaultValue: 0, ValueType: schema.Int64},
 }
 
-func NewDynamoDBTable(args *DynamoDbTableArguments) *schema.Resource {
+func (a *DynamoDBTable) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(a, u)
+}
+
+func (a *DynamoDBTable) BuildResource() *schema.Resource {
 
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
 
-	if args.BillingMode == "PROVISIONED" {
+	if a.BillingMode == "PROVISIONED" {
 		// Write capacity units (WCU)
-		costComponents = append(costComponents, wcuCostComponent(args.Region, args.WriteCapacity))
+		costComponents = append(costComponents, a.wcuCostComponent(a.Region, a.WriteCapacity))
 		// Read capacity units (RCU)
-		costComponents = append(costComponents, rcuCostComponent(args.Region, args.ReadCapacity))
+		costComponents = append(costComponents, a.rcuCostComponent(a.Region, a.ReadCapacity))
 	}
 
 	// Infracost usage data
 
-	if args.BillingMode == "PAY_PER_REQUEST" {
+	if a.BillingMode == "PAY_PER_REQUEST" {
 		// Write request units (WRU)
-		costComponents = append(costComponents, wruCostComponent(args.Region, args.MonthlyWriteRequestUnits))
+		costComponents = append(costComponents, a.wruCostComponent(a.Region, a.MonthlyWriteRequestUnits))
 		// Read request units (RRU)
-		costComponents = append(costComponents, rruCostComponent(args.Region, args.MonthlyReadRequestUnits))
+		costComponents = append(costComponents, a.rruCostComponent(a.Region, a.MonthlyReadRequestUnits))
 	}
 
 	// Data storage
-	costComponents = append(costComponents, dataStorageCostComponent(args.Region, args.StorageGB))
+	costComponents = append(costComponents, a.dataStorageCostComponent(a.Region, a.StorageGB))
 	// Continuous backups (PITR)
-	costComponents = append(costComponents, continuousBackupCostComponent(args.Region, args.PitrBackupStorageGB))
+	costComponents = append(costComponents, a.continuousBackupCostComponent(a.Region, a.PitrBackupStorageGB))
 	// OnDemand backups
-	costComponents = append(costComponents, onDemandBackupCostComponent(args.Region, args.OnDemandBackupStorageGB))
+	costComponents = append(costComponents, a.onDemandBackupCostComponent(a.Region, a.OnDemandBackupStorageGB))
 	// Restoring tables
-	costComponents = append(costComponents, restoreCostComponent(args.Region, args.MonthlyDataRestoredGB))
+	costComponents = append(costComponents, a.restoreCostComponent(a.Region, a.MonthlyDataRestoredGB))
 
 	// Stream reads
-	costComponents = append(costComponents, streamCostComponent(args.Region, args.MonthlyStreamsReadRequestUnits))
+	costComponents = append(costComponents, a.streamCostComponent(a.Region, a.MonthlyStreamsReadRequestUnits))
 
 	// Global tables (replica)
-	subResources = append(subResources, globalTables(args.BillingMode, args.ReplicaRegions, args.WriteCapacity, args.MonthlyWriteRequestUnits)...)
+	subResources = append(subResources, a.globalTables(a.BillingMode, a.ReplicaRegions, a.WriteCapacity, a.MonthlyWriteRequestUnits)...)
 
 	estimate := func(ctx context.Context, values map[string]interface{}) error {
-		storageB, err := aws.DynamoDBGetStorageBytes(ctx, args.Region, args.Name)
+		storageB, err := aws.DynamoDBGetStorageBytes(ctx, a.Region, a.Name)
 		if err != nil {
 			return err
 		}
 		values["storage_gb"] = asGiB(storageB)
 
-		if args.BillingMode == "PAY_PER_REQUEST" {
-			reads, err := aws.DynamoDBGetRRU(ctx, args.Region, args.Name)
+		if a.BillingMode == "PAY_PER_REQUEST" {
+			reads, err := aws.DynamoDBGetRRU(ctx, a.Region, a.Name)
 			if err != nil {
 				return err
 			}
-			writes, err := aws.DynamoDBGetWRU(ctx, args.Region, args.Name)
+			writes, err := aws.DynamoDBGetWRU(ctx, a.Region, a.Name)
 			if err != nil {
 				return err
 			}
@@ -105,7 +105,7 @@ func NewDynamoDBTable(args *DynamoDbTableArguments) *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name:           args.Address,
+		Name:           a.Address,
 		UsageSchema:    DynamoDBTableUsageSchema,
 		EstimateUsage:  estimate,
 		CostComponents: costComponents,
@@ -113,7 +113,7 @@ func NewDynamoDBTable(args *DynamoDbTableArguments) *schema.Resource {
 	}
 }
 
-func wcuCostComponent(region string, provisionedWCU *int64) *schema.CostComponent {
+func (a *DynamoDBTable) wcuCostComponent(region string, provisionedWCU *int64) *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if provisionedWCU != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*provisionedWCU))
@@ -139,7 +139,7 @@ func wcuCostComponent(region string, provisionedWCU *int64) *schema.CostComponen
 	}
 }
 
-func rcuCostComponent(region string, provisionedRCU *int64) *schema.CostComponent {
+func (a *DynamoDBTable) rcuCostComponent(region string, provisionedRCU *int64) *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if provisionedRCU != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*provisionedRCU))
@@ -165,22 +165,22 @@ func rcuCostComponent(region string, provisionedRCU *int64) *schema.CostComponen
 	}
 }
 
-func globalTables(billingMode string, replicaRegions []string, writeCapacity *int64, monthlyWRU *int64) []*schema.Resource {
+func (a *DynamoDBTable) globalTables(billingMode string, replicaRegions []string, writeCapacity *int64, monthlyWRU *int64) []*schema.Resource {
 	resources := make([]*schema.Resource, 0)
 
 	for _, region := range replicaRegions {
 		name := fmt.Sprintf("Global table (%s)", region)
 		if billingMode == "PROVISIONED" {
-			resources = append(resources, newProvisionedDynamoDBGlobalTable(name, region, writeCapacity))
+			resources = append(resources, a.newProvisionedDynamoDBGlobalTable(name, region, writeCapacity))
 		} else if billingMode == "PAY_PER_REQUEST" {
-			resources = append(resources, newOnDemandDynamoDBGlobalTable(name, region, monthlyWRU))
+			resources = append(resources, a.newOnDemandDynamoDBGlobalTable(name, region, monthlyWRU))
 		}
 	}
 
 	return resources
 }
 
-func newProvisionedDynamoDBGlobalTable(name string, region string, provisionedWCU *int64) *schema.Resource {
+func (a *DynamoDBTable) newProvisionedDynamoDBGlobalTable(name string, region string, provisionedWCU *int64) *schema.Resource {
 	var quantity *decimal.Decimal
 	if provisionedWCU != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*provisionedWCU))
@@ -213,7 +213,7 @@ func newProvisionedDynamoDBGlobalTable(name string, region string, provisionedWC
 	}
 }
 
-func newOnDemandDynamoDBGlobalTable(name string, region string, monthlyWRU *int64) *schema.Resource {
+func (a *DynamoDBTable) newOnDemandDynamoDBGlobalTable(name string, region string, monthlyWRU *int64) *schema.Resource {
 	var quantity *decimal.Decimal
 	if monthlyWRU != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*monthlyWRU))
@@ -241,7 +241,7 @@ func newOnDemandDynamoDBGlobalTable(name string, region string, monthlyWRU *int6
 	}
 }
 
-func wruCostComponent(region string, monthlyWRU *int64) *schema.CostComponent {
+func (a *DynamoDBTable) wruCostComponent(region string, monthlyWRU *int64) *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if monthlyWRU != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*monthlyWRU))
@@ -266,7 +266,7 @@ func wruCostComponent(region string, monthlyWRU *int64) *schema.CostComponent {
 	}
 }
 
-func rruCostComponent(region string, monthlyRRU *int64) *schema.CostComponent {
+func (a *DynamoDBTable) rruCostComponent(region string, monthlyRRU *int64) *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if monthlyRRU != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*monthlyRRU))
@@ -291,7 +291,7 @@ func rruCostComponent(region string, monthlyRRU *int64) *schema.CostComponent {
 	}
 }
 
-func dataStorageCostComponent(region string, storageGB *int64) *schema.CostComponent {
+func (a *DynamoDBTable) dataStorageCostComponent(region string, storageGB *int64) *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if storageGB != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*storageGB))
@@ -317,7 +317,7 @@ func dataStorageCostComponent(region string, storageGB *int64) *schema.CostCompo
 	}
 }
 
-func continuousBackupCostComponent(region string, pitrBackupStorageGB *int64) *schema.CostComponent {
+func (a *DynamoDBTable) continuousBackupCostComponent(region string, pitrBackupStorageGB *int64) *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if pitrBackupStorageGB != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*pitrBackupStorageGB))
@@ -339,7 +339,7 @@ func continuousBackupCostComponent(region string, pitrBackupStorageGB *int64) *s
 	}
 }
 
-func onDemandBackupCostComponent(region string, onDemandBackupStorageGB *int64) *schema.CostComponent {
+func (a *DynamoDBTable) onDemandBackupCostComponent(region string, onDemandBackupStorageGB *int64) *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if onDemandBackupStorageGB != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*onDemandBackupStorageGB))
@@ -358,7 +358,7 @@ func onDemandBackupCostComponent(region string, onDemandBackupStorageGB *int64) 
 	}
 }
 
-func restoreCostComponent(region string, monthlyDataRestoredGB *int64) *schema.CostComponent {
+func (a *DynamoDBTable) restoreCostComponent(region string, monthlyDataRestoredGB *int64) *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if monthlyDataRestoredGB != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*monthlyDataRestoredGB))
@@ -377,7 +377,7 @@ func restoreCostComponent(region string, monthlyDataRestoredGB *int64) *schema.C
 	}
 }
 
-func streamCostComponent(region string, monthlyStreamsRRU *int64) *schema.CostComponent {
+func (a *DynamoDBTable) streamCostComponent(region string, monthlyStreamsRRU *int64) *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if monthlyStreamsRRU != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*monthlyStreamsRRU))
