@@ -1,6 +1,7 @@
 package usage
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -29,13 +30,19 @@ type SchemaItem struct {
 	DefaultValue interface{}
 }
 
-func SyncUsageData(projects []*schema.Project, existingUsageData map[string]*schema.UsageData, usageFilePath string) error {
+type SyncResult struct {
+	ResourceCount    int
+	EstimationCount  int
+	EstimationErrors map[string]error
+}
+
+func SyncUsageData(projects []*schema.Project, existingUsageData map[string]*schema.UsageData, usageFilePath string) (*SyncResult, error) {
 	if usageFilePath == "" {
-		return nil
+		return nil, nil
 	}
 	usageSchema, err := loadUsageSchema()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// TODO: update this when we properly support multiple projects in usage
@@ -44,7 +51,7 @@ func SyncUsageData(projects []*schema.Project, existingUsageData map[string]*sch
 		resources = append(resources, project.Resources...)
 	}
 
-	syncedResourcesUsage := syncResourcesUsage(resources, usageSchema, existingUsageData)
+	syncResult, syncedResourcesUsage := syncResourcesUsage(resources, usageSchema, existingUsageData)
 	// yaml.MapSlice is used to maintain the order of keys, so re-running
 	// the code won't change the output.
 	syncedUsageData := yaml.MapSlice{
@@ -53,16 +60,17 @@ func SyncUsageData(projects []*schema.Project, existingUsageData map[string]*sch
 	}
 	d, err := yaml.Marshal(syncedUsageData)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = ioutil.WriteFile(usageFilePath, d, 0600)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &syncResult, nil
 }
 
-func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*SchemaItem, existingUsageData map[string]*schema.UsageData) yaml.MapSlice {
+func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*SchemaItem, existingUsageData map[string]*schema.UsageData) (SyncResult, yaml.MapSlice) {
+	syncResult := SyncResult{EstimationErrors: make(map[string]error)}
 	syncedResourceUsage := make(map[string]interface{})
 	for _, resource := range resources {
 		resourceName := resource.Name
@@ -123,12 +131,21 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 				resourceUsage[usageKey] = usageSchemaItem.DefaultValue
 			}
 		}
+		syncResult.ResourceCount++
+		if resource.EstimateUsage != nil {
+			syncResult.EstimationCount++
+			err := resource.EstimateUsage(context.TODO(), resourceUsage)
+			if err != nil {
+				syncResult.EstimationErrors[resourceName] = err
+				log.Warnf("Error estimating usage for resource %s: %v", resourceName, err)
+			}
+		}
 		syncedResourceUsage[resourceName] = unFlattenHelper(resourceUsage)
 	}
 	// yaml.MapSlice is used to maintain the order of keys, so re-running
 	// the code won't change the output.
 	result := mapToSortedMapSlice(syncedResourceUsage)
-	return result
+	return syncResult, result
 }
 
 func loadUsageSchema() (map[string][]*SchemaItem, error) {

@@ -36,6 +36,8 @@ type DirProvider struct {
 	TerraformBinary     string
 	TerraformCloudHost  string
 	TerraformCloudToken string
+	cachedStateJSON     []byte
+	cachedPlanJSON      []byte
 }
 
 type RunShowOptions struct {
@@ -166,6 +168,10 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 }
 
 func (p *DirProvider) generatePlanJSON() ([]byte, error) {
+	if p.cachedPlanJSON != nil {
+		return p.cachedPlanJSON, nil
+	}
+
 	err := p.checks()
 	if err != nil {
 		return []byte{}, err
@@ -192,10 +198,18 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 	}
 
 	spinner = ui.NewSpinner("Running terraform show", p.spinnerOpts)
-	return p.runShow(opts, spinner, planFile)
+	j, err := p.runShow(opts, spinner, planFile)
+	if err == nil {
+		p.cachedPlanJSON = j
+	}
+	return j, err
 }
 
 func (p *DirProvider) generateStateJSON() ([]byte, error) {
+	if p.cachedStateJSON != nil {
+		return p.cachedStateJSON, nil
+	}
+
 	err := p.checks()
 	if err != nil {
 		return []byte{}, err
@@ -210,7 +224,11 @@ func (p *DirProvider) generateStateJSON() ([]byte, error) {
 	}
 
 	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
-	return p.runShow(opts, spinner, "")
+	j, err := p.runShow(opts, spinner, "")
+	if err == nil {
+		p.cachedStateJSON = j
+	}
+	return j, err
 }
 
 func (p *DirProvider) buildCommandOpts(path string) (*CmdOptions, error) {

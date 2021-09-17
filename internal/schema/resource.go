@@ -22,6 +22,7 @@ type Resource struct {
 	ResourceType   string
 	Tags           map[string]string
 	UsageSchema    []*UsageSchemaItem
+	EstimateUsage  EstimateFunc
 }
 
 func CalculateCosts(project *Project) {

@@ -91,14 +91,25 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			return err
 		}
 
-		projects = append(projects, providerProjects...)
-
 		if runCtx.Config.SyncUsageFile {
-			err = usage.SyncUsageData(projects, u, projectCfg.UsageFile)
+			syncResult, err := usage.SyncUsageData(providerProjects, u, projectCfg.UsageFile)
+			summarizeUsage(ctx, syncResult)
+			if err != nil {
+				return err
+			}
+			remediateUsage(runCtx, ctx, syncResult)
+
+			u, err := usage.LoadFromFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
+			if err != nil {
+				return err
+			}
+			providerProjects, err = provider.LoadResources(u)
 			if err != nil {
 				return err
 			}
 		}
+
+		projects = append(projects, providerProjects...)
 
 		if !runCtx.Config.IsLogging() {
 			fmt.Fprintln(os.Stderr, "")
@@ -194,6 +205,48 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	cmd.Printf("%s\n", out)
 
 	return nil
+}
+
+func summarizeUsage(ctx *config.ProjectContext, syncResult *usage.SyncResult) {
+	var usageSyncs, usageEstimates, usageEstimateErrors int
+	if syncResult != nil {
+		usageSyncs = syncResult.ResourceCount
+		usageEstimates = syncResult.EstimationCount
+		usageEstimateErrors = len(syncResult.EstimationErrors)
+	}
+	ctx.SetContextValue("usageSyncs", usageSyncs)
+	ctx.SetContextValue("usageEstimates", usageEstimates)
+	ctx.SetContextValue("usageEstimateErrors", usageEstimateErrors)
+}
+
+func remediateUsage(runCtx *config.RunContext, ctx *config.ProjectContext, syncResult *usage.SyncResult) {
+	resources := syncResult.ResourceCount
+	attempts := syncResult.EstimationCount
+	errors := len(syncResult.EstimationErrors)
+	successes := attempts - errors
+
+	if attempts > 0 {
+		m := fmt.Sprintf("Performed cloud-based usage estimation for %d resources of %d", successes, resources)
+		if runCtx.Config.IsLogging() {
+			log.Info(m)
+		} else {
+			fmt.Fprintln(os.Stdout, m)
+		}
+	}
+
+	var remAttempts, remErrors int
+	for name, err := range syncResult.EstimationErrors {
+		if remediater, ok := err.(schema.Remediater); ok {
+			remAttempts++
+			err = remediater.Remediate()
+			if err != nil {
+				remErrors++
+				log.Warningf("Cannot enable estimation for %s: %s", name, err.Error())
+			}
+		}
+	}
+	ctx.SetContextValue("remediationAttempts", remAttempts)
+	ctx.SetContextValue("remediationErrors", remErrors)
 }
 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
