@@ -57,10 +57,10 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonES"),
-				ProductFamily: strPtr("Elastic Search Instance"),
+				ProductFamily: strPtr("Amazon OpenSearch Service Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
-					{Key: "instanceType", Value: &instanceType},
+					{Key: "instanceType", Value: opensearchifyInstanceType(instanceType)},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -100,7 +100,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonES"),
-				ProductFamily: strPtr("Elastic Search Volume"),
+				ProductFamily: strPtr("Amazon OpenSearch Service Volume"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ES.+-Storage/")},
 					{Key: "storageMedia", Value: strPtr(ebsFilter)},
@@ -130,7 +130,7 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(region),
 					Service:       strPtr("AmazonES"),
-					ProductFamily: strPtr("Elastic Search Volume"),
+					ProductFamily: strPtr("Amazon OpenSearch Service Volume"),
 					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "usagetype", ValueRegex: strPtr("/ES:PIOPS/")},
 						{Key: "storageMedia", Value: strPtr("PIOPS")},
@@ -164,10 +164,10 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonES"),
-				ProductFamily: strPtr("Elastic Search Instance"),
+				ProductFamily: strPtr("Amazon OpenSearch Service Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
-					{Key: "instanceType", Value: &dedicatedMasterType},
+					{Key: "instanceType", Value: opensearchifyInstanceType(dedicatedMasterType)},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -189,10 +189,10 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonES"),
-				ProductFamily: strPtr("Elastic Search Instance"),
+				ProductFamily: strPtr("Amazon OpenSearch Service Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
-					{Key: "instanceType", Value: &ultrawarmType},
+					{Key: "instanceType", Value: opensearchifyInstanceType(ultrawarmType)},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -205,4 +205,11 @@ func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
+}
+
+// AWS renamed Elasticsearch Service to OpenSearch Service and changed the 'instancetype' field in prices
+// "m4.large.elasticsearch" to "m4.large.search"
+func opensearchifyInstanceType(instanceType string) *string {
+	s := strings.Replace(instanceType, ".elasticsearch", ".search", 1)
+	return &s
 }
