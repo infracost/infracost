@@ -6,29 +6,29 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type NATGatewayArguments struct {
+type NATGateway struct {
 	Address string
 	Region  string
 
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-func (args *NATGatewayArguments) PopulateUsage(u *schema.UsageData) {
-	resources.PopulateArgsWithUsage(args, u)
-}
-
 var NATGatewayUsageSchema = []*schema.UsageSchemaItem{
 	{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
 }
 
-func NewNATGateway(args *NATGatewayArguments) *schema.Resource {
+func (a *NATGateway) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(a, u)
+}
+
+func (a *NATGateway) BuildResource() *schema.Resource {
 	var gbDataProcessed *decimal.Decimal
-	if args.MonthlyDataProcessedGB != nil {
-		gbDataProcessed = decimalPtr(decimal.NewFromFloat(*args.MonthlyDataProcessedGB))
+	if a.MonthlyDataProcessedGB != nil {
+		gbDataProcessed = decimalPtr(decimal.NewFromFloat(*a.MonthlyDataProcessedGB))
 	}
 
 	return &schema.Resource{
-		Name:        args.Address,
+		Name:        a.Address,
 		UsageSchema: NATGatewayUsageSchema,
 		CostComponents: []*schema.CostComponent{
 			{
@@ -38,7 +38,7 @@ func NewNATGateway(args *NATGatewayArguments) *schema.Resource {
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(args.Region),
+					Region:        strPtr(a.Region),
 					Service:       strPtr("AmazonEC2"),
 					ProductFamily: strPtr("NAT Gateway"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -53,7 +53,7 @@ func NewNATGateway(args *NATGatewayArguments) *schema.Resource {
 				MonthlyQuantity: gbDataProcessed,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(args.Region),
+					Region:        strPtr(a.Region),
 					Service:       strPtr("AmazonEC2"),
 					ProductFamily: strPtr("NAT Gateway"),
 					AttributeFilters: []*schema.AttributeFilter{

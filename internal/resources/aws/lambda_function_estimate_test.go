@@ -45,7 +45,8 @@ func TestLambda(t *testing.T) {
 		</GetMetricStatisticsResponse>
 	`)
 
-	resource := resources.NewLambdaFunction(&resources.LambdaFunctionArguments{})
+	args := &resources.LambdaFunction{}
+	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
 	estimates.mustHave("monthly_requests", float64(1234))
 	estimates.mustHave("request_duration_ms", float64(5678.9))

@@ -32,7 +32,8 @@ func TestDynamoDBStorage(t *testing.T) {
 	defer stub.Close()
 	stubDescribeTable(stub)
 
-	resource := resources.NewDynamoDBTable(&resources.DynamoDbTableArguments{})
+	args := resources.DynamoDBTable{}
+	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
 	estimates.mustHave("storage_gb", int64(10))
 }
@@ -68,9 +69,10 @@ func TestDynamoDBPayPerRequest(t *testing.T) {
 	  </GetMetricStatisticsResult>
 	</GetMetricStatisticsResponse>`)
 
-	resource := resources.NewDynamoDBTable(&resources.DynamoDbTableArguments{
+	args := resources.DynamoDBTable{
 		BillingMode: "PAY_PER_REQUEST",
-	})
+	}
+	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
 
 	estimates.mustHave("monthly_read_request_units", int64(123))
@@ -82,9 +84,10 @@ func TestDynamoDBProvisioned(t *testing.T) {
 	defer stub.Close()
 	stubDescribeTable(stub)
 
-	resource := resources.NewDynamoDBTable(&resources.DynamoDbTableArguments{
+	args := resources.DynamoDBTable{
 		BillingMode: "PROVISIONED",
-	})
+	}
+	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
 
 	estimates.mustHave("monthly_read_request_units", nil)
