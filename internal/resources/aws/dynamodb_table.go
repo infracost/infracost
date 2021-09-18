@@ -1,9 +1,12 @@
 package aws
 
 import (
+	"context"
 	"fmt"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage/aws"
 	"github.com/shopspring/decimal"
 )
 
@@ -11,6 +14,7 @@ type DynamoDbTableArguments struct {
 	// "required" args that can't really be missing.
 	Address        string
 	Region         string
+	Name           string
 	BillingMode    string
 	ReplicaRegions []string
 
@@ -78,9 +82,32 @@ func NewDynamoDBTable(args *DynamoDbTableArguments) *schema.Resource {
 	// Global tables (replica)
 	subResources = append(subResources, globalTables(args.BillingMode, args.ReplicaRegions, args.WriteCapacity, args.MonthlyWriteRequestUnits)...)
 
+	estimate := func(ctx context.Context, values map[string]interface{}) error {
+		storageB, err := aws.DynamoDBGetStorageBytes(ctx, args.Region, args.Name)
+		if err != nil {
+			return err
+		}
+		values["storage_gb"] = asGiB(storageB)
+
+		if args.BillingMode == "PAY_PER_REQUEST" {
+			reads, err := aws.DynamoDBGetRRU(ctx, args.Region, args.Name)
+			if err != nil {
+				return err
+			}
+			writes, err := aws.DynamoDBGetWRU(ctx, args.Region, args.Name)
+			if err != nil {
+				return err
+			}
+			values["monthly_read_request_units"] = reads
+			values["monthly_write_request_units"] = writes
+		}
+		return nil
+	}
+
 	return &schema.Resource{
 		Name:           args.Address,
 		UsageSchema:    DynamoDBTableUsageSchema,
+		EstimateUsage:  estimate,
 		CostComponents: costComponents,
 		SubResources:   subResources,
 	}
