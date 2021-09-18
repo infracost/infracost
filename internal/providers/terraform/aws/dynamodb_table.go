@@ -27,6 +27,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 	args := &aws.DynamoDbTableArguments{
 		Address:        d.Address,
 		Region:         d.Get("region").String(),
+		Name:           d.Get("name").String(),
 		BillingMode:    d.Get("billing_mode").String(),
 		WriteCapacity:  intPtr(d.Get("write_capacity").Int()),
 		ReadCapacity:   intPtr(d.Get("read_capacity").Int()),

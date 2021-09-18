@@ -1,14 +1,20 @@
-//nolint:deadcode,unused
+//nolint:deadcode,unused,varcheck
 package aws
 
 import (
 	"context"
+	"math"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 )
+
+const statAvg = types.StatisticAverage
+const statSum = types.StatisticSum
+
+const unitCount = types.StandardUnitCount
 
 func cloudwatchNewClient(ctx context.Context, region string) (*cloudwatch.Client, error) {
 	cfg, err := getConfig(ctx, region)
@@ -49,4 +55,13 @@ func cloudwatchGetMonthlyStats(ctx context.Context, req statsRequest) (*cloudwat
 		Unit:       req.unit,
 		Dimensions: dim,
 	})
+}
+
+// Sum together sums of all datapoints & round up.
+func cloudwatchSumSumCeil(out *cloudwatch.GetMetricStatisticsOutput) int64 {
+	var sum float64
+	for _, v := range out.Datapoints {
+		sum += *v.Sum
+	}
+	return int64(math.Ceil(sum))
 }

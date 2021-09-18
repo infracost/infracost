@@ -11,3 +11,14 @@ func strPtr(s string) *string {
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
+
+func asGiB(i int64) int64 {
+	if i == 0 {
+		return 0
+	}
+	i /= (1024 * 1024 * 1024)
+	if i == 0 {
+		return 1
+	}
+	return i
+}
