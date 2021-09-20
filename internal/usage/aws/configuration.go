@@ -15,7 +15,7 @@ var ctxKey = &ctxKeyType{}
 func getConfig(ctx context.Context, region string) (aws.Config, error) {
 	opts := []func(*config.LoadOptions) error{
 		config.WithRegion(region),
-		// config.WithClientLogMode(aws.LogResponseWithBody),
+		// config.WithClientLogMode(aws.LogRequestWithBody | aws.LogResponseWithBody),
 	}
 
 	if ctxOpts, ok := ctx.Value(ctxKey).([]func(*config.LoadOptions) error); ok {
