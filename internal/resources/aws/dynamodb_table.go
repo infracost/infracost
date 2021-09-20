@@ -98,8 +98,8 @@ func NewDynamoDBTable(args *DynamoDbTableArguments) *schema.Resource {
 			if err != nil {
 				return err
 			}
-			values["monthly_read_request_units"] = reads
-			values["monthly_write_request_units"] = writes
+			values["monthly_read_request_units"] = ceil64(reads)
+			values["monthly_write_request_units"] = ceil64(writes)
 		}
 		return nil
 	}
