@@ -3,17 +3,16 @@ package aws
 import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 type AutoscalingGroup struct {
 	// "required" args that can't really be missing.
-	Address  string
-	Region   string
-	Capacity int64
+	Address string
+	Region  string
 
 	// "optional" args, that may be empty depending on the resource config
 	LaunchConfiguration *LaunchConfiguration
+	LaunchTemplate      *LaunchTemplate
 }
 
 var AutoscalingGroupUsageSchema = []*schema.UsageSchemaItem{
@@ -30,8 +29,18 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 
 	if a.LaunchConfiguration != nil {
 		lc := a.LaunchConfiguration.BuildResource()
-		schema.MultiplyQuantities(lc, decimal.NewFromInt(a.Capacity))
+		// If the Launch Configuration returns nil it is not supported so the Autoscaling Group should also return nil
+		if lc == nil {
+			return nil
+		}
 		subResources = append(subResources, lc)
+	} else if a.LaunchTemplate != nil {
+		lt := a.LaunchTemplate.BuildResource()
+		// If the Launch Template returns nil it is not supported so the Autoscaling Group should also return nil
+		if lt == nil {
+			return nil
+		}
+		subResources = append(subResources, lt)
 	}
 
 	return &schema.Resource{

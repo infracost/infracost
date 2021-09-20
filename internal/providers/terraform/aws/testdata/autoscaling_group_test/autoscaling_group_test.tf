@@ -148,3 +148,210 @@ resource "aws_autoscaling_group" "asg_lc_windows" {
   max_size             = 1
   min_size             = 1
 }
+
+resource "aws_launch_template" "lt_basic" {
+  image_id      = "fake_ami"
+  instance_type = "t2.medium"
+
+  block_device_mappings {
+    device_name = "xvdf"
+    ebs {
+      volume_size = 10
+    }
+  }
+
+  block_device_mappings {
+    device_name = "xvfa"
+    ebs {
+      volume_size = 20
+      volume_type = "io1"
+      iops        = 200
+    }
+  }
+}
+
+resource "aws_autoscaling_group" "asg_lt_basic" {
+  launch_template {
+    id = aws_launch_template.lt_basic.id
+  }
+  desired_capacity = 2
+  max_size         = 3
+  min_size         = 1
+}
+
+resource "aws_launch_template" "lt_tenancy_dedicated" {
+  image_id      = "fake_ami"
+  instance_type = "m3.medium"
+  placement {
+    tenancy = "dedicated"
+  }
+}
+
+resource "aws_autoscaling_group" "asg_lt_tenancy_dedicated" {
+  launch_template {
+    id = aws_launch_template.lt_tenancy_dedicated.id
+  }
+  desired_capacity = 2
+  max_size         = 3
+  min_size         = 1
+}
+
+resource "aws_launch_template" "lt_tenancy_host" {
+  image_id      = "fake_ami"
+  instance_type = "m3.medium"
+  placement {
+    tenancy = "host"
+  }
+}
+
+resource "aws_autoscaling_group" "asg_lt_tenancy_host" {
+  launch_template {
+    id = aws_launch_template.lt_tenancy_host.id
+  }
+  desired_capacity = 2
+  max_size         = 3
+  min_size         = 1
+}
+
+resource "aws_launch_template" "lt_ebs_optimized" {
+  image_id      = "fake_ami"
+  instance_type = "r3.xlarge"
+  ebs_optimized = true
+}
+
+resource "aws_autoscaling_group" "asg_lt_ebs_optimized" {
+  launch_template {
+    id = aws_launch_template.lt_ebs_optimized.id
+  }
+  desired_capacity = 2
+  max_size         = 3
+  min_size         = 1
+}
+
+resource "aws_launch_template" "lt_elastic_inference_accelerator" {
+  image_id      = "fake_ami"
+  instance_type = "t2.medium"
+  elastic_inference_accelerator {
+    type = "eia2.medium"
+  }
+}
+
+resource "aws_autoscaling_group" "asg_lt_elastic_inference_accelerator" {
+  launch_template {
+    id = aws_launch_template.lt_elastic_inference_accelerator.id
+  }
+  desired_capacity = 2
+  max_size         = 3
+  min_size         = 1
+}
+
+resource "aws_launch_template" "lt_monitoring" {
+  image_id      = "fake_ami"
+  instance_type = "t2.medium"
+  monitoring {
+    enabled = true
+  }
+}
+
+resource "aws_autoscaling_group" "asg_lt_monitoring" {
+  launch_template {
+    id = aws_launch_template.lt_monitoring.id
+  }
+  desired_capacity = 2
+  max_size         = 3
+  min_size         = 1
+}
+
+resource "aws_launch_template" "lt_cpu_credits_noUsage" {
+  image_id      = "fake_ami"
+  instance_type = "t3.large"
+}
+
+resource "aws_autoscaling_group" "asg_lt_cpu_credits_noUsage" {
+  launch_template {
+    id = aws_launch_template.lt_cpu_credits_noUsage.id
+  }
+  desired_capacity = 2
+  max_size         = 3
+  min_size         = 1
+}
+
+resource "aws_launch_template" "lt_cpu_credits" {
+  image_id      = "fake_ami"
+  instance_type = "t3.large"
+}
+
+resource "aws_autoscaling_group" "asg_lt_cpu_credits" {
+  launch_template {
+    id = aws_launch_template.lt_cpu_credits.id
+  }
+  desired_capacity = 2
+  max_size         = 3
+  min_size         = 1
+}
+
+resource "aws_launch_template" "lt_mixed_instance_basic" {
+  image_id      = "fake_ami"
+  instance_type = "t2.medium"
+}
+
+resource "aws_autoscaling_group" "asg_mixed_instance_basic" {
+  desired_capacity = 6
+  max_size         = 10
+  min_size         = 1
+
+  mixed_instances_policy {
+    launch_template {
+      launch_template_specification {
+        launch_template_id = aws_launch_template.lt_mixed_instance_basic.id
+      }
+
+      override {
+        instance_type     = "t2.large"
+        weighted_capacity = "2"
+      }
+
+      override {
+        instance_type     = "t2.xlarge"
+        weighted_capacity = "4"
+      }
+    }
+
+    instances_distribution {
+      on_demand_base_capacity                  = 1
+      on_demand_percentage_above_base_capacity = 100
+    }
+  }
+}
+
+resource "aws_launch_template" "lt_mixed_instance_dynamic" {
+  image_id      = "fake_ami"
+  instance_type = "t2.medium"
+}
+
+resource "aws_autoscaling_group" "asg_mixed_instance_dynamic" {
+  desired_capacity = 3
+  max_size         = 5
+  min_size         = 1
+
+  mixed_instances_policy {
+    launch_template {
+      launch_template_specification {
+        launch_template_id = aws_launch_template.lt_mixed_instance_dynamic.id
+      }
+
+      dynamic "override" {
+        for_each = ["t2.large", "t2.xlarge"]
+
+        content {
+          instance_type = override.value
+        }
+      }
+    }
+
+    instances_distribution {
+      on_demand_base_capacity                  = 1
+      on_demand_percentage_above_base_capacity = 100
+    }
+  }
+}
