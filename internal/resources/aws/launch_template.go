@@ -11,15 +11,15 @@ import (
 
 type LaunchTemplate struct {
 	// "required" args that can't really be missing.
-	Address          string
-	Region           string
-	OnDemandCount    int64
-	SpotCount        int64
-	Tenancy          string
-	InstanceType     string
-	EBSOptimized     bool
-	EnableMonitoring bool
-	CPUCredits       string
+	Address               string
+	Region                string
+	OnDemandInstanceCount int64
+	SpotInstanceCount     int64
+	Tenancy               string
+	InstanceType          string
+	EBSOptimized          bool
+	EnableMonitoring      bool
+	CPUCredits            string
 
 	// "optional" args, that may be empty depending on the resource config
 	ElasticInferenceAcceleratorType *string
@@ -54,20 +54,21 @@ func (a *LaunchTemplate) BuildResource() *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 
 	instance := &Instance{
-		Region:                        a.Region,
-		Tenancy:                       a.Tenancy,
-		InstanceType:                  a.InstanceType,
-		EBSOptimized:                  a.EBSOptimized,
-		EnableMonitoring:              a.EnableMonitoring,
-		CPUCredits:                    a.CPUCredits,
-		OperatingSystem:               a.OperatingSystem,
-		RootBlockDevice:               a.RootBlockDevice,
-		EBSBlockDevices:               a.EBSBlockDevices,
-		ReservedInstanceType:          a.ReservedInstanceType,
-		ReservedInstanceTerm:          a.ReservedInstanceTerm,
-		ReservedInstancePaymentOption: a.ReservedInstancePaymentOption,
-		MonthlyCPUCreditHours:         a.MonthlyCPUCreditHours,
-		VCPUCount:                     a.VCPUCount,
+		Region:                          a.Region,
+		Tenancy:                         a.Tenancy,
+		InstanceType:                    a.InstanceType,
+		EBSOptimized:                    a.EBSOptimized,
+		EnableMonitoring:                a.EnableMonitoring,
+		CPUCredits:                      a.CPUCredits,
+		ElasticInferenceAcceleratorType: a.ElasticInferenceAcceleratorType,
+		OperatingSystem:                 a.OperatingSystem,
+		RootBlockDevice:                 a.RootBlockDevice,
+		EBSBlockDevices:                 a.EBSBlockDevices,
+		ReservedInstanceType:            a.ReservedInstanceType,
+		ReservedInstanceTerm:            a.ReservedInstanceTerm,
+		ReservedInstancePaymentOption:   a.ReservedInstancePaymentOption,
+		MonthlyCPUCreditHours:           a.MonthlyCPUCreditHours,
+		VCPUCount:                       a.VCPUCount,
 	}
 	instanceResource := instance.BuildResource()
 
@@ -85,20 +86,20 @@ func (a *LaunchTemplate) BuildResource() *schema.Resource {
 		SubResources:   instanceResource.SubResources,
 	}
 
-	totalCount := decimal.NewFromInt(a.OnDemandCount + a.SpotCount)
+	totalCount := decimal.NewFromInt(a.OnDemandInstanceCount + a.SpotInstanceCount)
 	schema.MultiplyQuantities(r, totalCount)
 
-	if a.SpotCount > 0 {
+	if a.SpotInstanceCount > 0 {
 		instance.PurchaseOption = "spot"
 		c := instance.computeCostComponent()
-		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(a.SpotCount)))
+		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(a.SpotInstanceCount)))
 		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
 	}
 
-	if a.OnDemandCount > 0 {
+	if a.OnDemandInstanceCount > 0 {
 		instance.PurchaseOption = "on_demand"
 		c := instance.computeCostComponent()
-		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(a.OnDemandCount)))
+		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(a.OnDemandInstanceCount)))
 		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
 	}
 
