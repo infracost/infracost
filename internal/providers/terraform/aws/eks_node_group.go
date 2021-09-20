@@ -1,8 +1,9 @@
 package aws
 
 import (
-	"github.com/tidwall/gjson"
 	"strings"
+
+	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -71,25 +72,26 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	}
 
 	if len(launchTemplateRef) > 0 {
-		spotCount := decimal.Zero
-		onDemandCount := decimal.NewFromInt(desiredSize)
+		spotCount := int64(0)
+		onDemandCount := desiredSize
 
 		if strings.ToLower(launchTemplateRef[0].Get("instance_market_options.0.market_type").String()) == "spot" {
-			onDemandCount = decimal.Zero
-			spotCount = decimal.NewFromInt(desiredSize)
+			onDemandCount = int64(0)
+			spotCount = desiredSize
 		}
 
 		if launchTemplateRef[0].Get("instance_type").Type == gjson.Null {
 			launchTemplateRef[0].Set("instance_type", d.Get("instance_types").Array()[0].String())
 		}
 
-		lt := newLaunchTemplate(launchTemplateRef[0].Address, launchTemplateRef[0], u, region, onDemandCount, spotCount)
+		lt := newLaunchTemplate(launchTemplateRef[0], u, region, onDemandCount, spotCount)
+		ltResource := lt.BuildResource()
 
 		// AutoscalingGroup should show as not supported LaunchTemplate is not supported
-		if lt == nil {
+		if ltResource == nil {
 			return nil
 		}
-		subResources = append(subResources, lt)
+		subResources = append(subResources, ltResource)
 	}
 
 	return &schema.Resource{
