@@ -13,7 +13,6 @@ type LaunchConfiguration struct {
 	// "required" args that can't really be missing.
 	Address          string
 	Region           string
-	Count            int64
 	Tenancy          string
 	PurchaseOption   string
 	InstanceType     string
@@ -27,6 +26,7 @@ type LaunchConfiguration struct {
 	EBSBlockDevices                 []*EBSVolume
 
 	// "usage" args
+	InstanceCount                 *int64  `infracost_usage:"instances"`
 	OperatingSystem               *string `infracost_usage:"operating_system"`
 	ReservedInstanceType          *string `infracost_usage:"reserved_instance_type"`
 	ReservedInstanceTerm          *string `infracost_usage:"reserved_instance_term"`
@@ -35,7 +35,9 @@ type LaunchConfiguration struct {
 	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
 }
 
-var LaunchConfigurationUsageSchema = InstanceUsageSchema
+var LaunchConfigurationUsageSchema = append([]*schema.UsageSchemaItem{
+	{Key: "instances", DefaultValue: 0, ValueType: schema.Int64},
+}, InstanceUsageSchema...)
 
 func (a *LaunchConfiguration) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
@@ -52,21 +54,22 @@ func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 	}
 
 	instance := &Instance{
-		Region:                        a.Region,
-		Tenancy:                       a.Tenancy,
-		PurchaseOption:                a.PurchaseOption,
-		InstanceType:                  a.InstanceType,
-		EBSOptimized:                  a.EBSOptimized,
-		EnableMonitoring:              a.EnableMonitoring,
-		CPUCredits:                    a.CPUCredits,
-		OperatingSystem:               a.OperatingSystem,
-		RootBlockDevice:               a.RootBlockDevice,
-		EBSBlockDevices:               a.EBSBlockDevices,
-		ReservedInstanceType:          a.ReservedInstanceType,
-		ReservedInstanceTerm:          a.ReservedInstanceTerm,
-		ReservedInstancePaymentOption: a.ReservedInstancePaymentOption,
-		MonthlyCPUCreditHours:         a.MonthlyCPUCreditHours,
-		VCPUCount:                     a.VCPUCount,
+		Region:                          a.Region,
+		Tenancy:                         a.Tenancy,
+		PurchaseOption:                  a.PurchaseOption,
+		InstanceType:                    a.InstanceType,
+		EBSOptimized:                    a.EBSOptimized,
+		EnableMonitoring:                a.EnableMonitoring,
+		CPUCredits:                      a.CPUCredits,
+		ElasticInferenceAcceleratorType: a.ElasticInferenceAcceleratorType,
+		OperatingSystem:                 a.OperatingSystem,
+		RootBlockDevice:                 a.RootBlockDevice,
+		EBSBlockDevices:                 a.EBSBlockDevices,
+		ReservedInstanceType:            a.ReservedInstanceType,
+		ReservedInstanceTerm:            a.ReservedInstanceTerm,
+		ReservedInstancePaymentOption:   a.ReservedInstancePaymentOption,
+		MonthlyCPUCreditHours:           a.MonthlyCPUCreditHours,
+		VCPUCount:                       a.VCPUCount,
 	}
 	instanceResource := instance.BuildResource()
 
@@ -77,7 +80,11 @@ func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 		SubResources:   instanceResource.SubResources,
 	}
 
-	schema.MultiplyQuantities(r, decimal.NewFromInt(a.Count))
+	qty := int64(0)
+	if a.InstanceCount != nil {
+		qty = *a.InstanceCount
+	}
+	schema.MultiplyQuantities(r, decimal.NewFromInt(qty))
 
 	return r
 }
