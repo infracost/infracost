@@ -25,6 +25,8 @@ type LaunchConfiguration struct {
 	ReservedInstanceType          *string `infracost_usage:"reserved_instance_type"`
 	ReservedInstanceTerm          *string `infracost_usage:"reserved_instance_term"`
 	ReservedInstancePaymentOption *string `infracost_usage:"reserved_instance_payment_option"`
+	MonthlyCPUCreditHours         *int64  `infracost_usage:"monthly_cpu_credit_hrs"`
+	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
 }
 
 var LaunchConfigurationUsageSchema = InstanceUsageSchema
@@ -48,6 +50,8 @@ func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 		ReservedInstanceType:          a.ReservedInstanceType,
 		ReservedInstanceTerm:          a.ReservedInstanceTerm,
 		ReservedInstancePaymentOption: a.ReservedInstancePaymentOption,
+		MonthlyCPUCreditHours:         a.MonthlyCPUCreditHours,
+		VCPUCount:                     a.VCPUCount,
 	}
 	instanceResource := instance.BuildResource()
 

@@ -11,6 +11,7 @@ import (
 )
 
 var defaultEC2InstanceMetricCount = 7
+var burstableInstanceTypePrefixes = []string{"t2.", "t3.", "t4."}
 
 type Instance struct {
 	// "required" args that can't really be missing.
@@ -32,13 +33,17 @@ type Instance struct {
 	ReservedInstanceType          *string `infracost_usage:"reserved_instance_type"`
 	ReservedInstanceTerm          *string `infracost_usage:"reserved_instance_term"`
 	ReservedInstancePaymentOption *string `infracost_usage:"reserved_instance_payment_option"`
+	MonthlyCPUCreditHours         *int64  `infracost_usage:"monthly_cpu_credit_hrs"`
+	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
 }
 
 var InstanceUsageSchema = []*schema.UsageSchemaItem{
 	{Key: "operating_system", DefaultValue: "linux", ValueType: schema.String},
 	{Key: "reserved_instance_type", DefaultValue: "", ValueType: schema.String},
-	{Key: "reserved_instance_tyem", DefaultValue: "", ValueType: schema.String},
+	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
 	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+	{Key: "monthly_cpu_credit_hrs", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "vcpu_count", DefaultValue: 0, ValueType: schema.Int64},
 }
 
 func (a *Instance) PopulateUsage(u *schema.UsageData) {
@@ -53,6 +58,10 @@ func (a *Instance) BuildResource() *schema.Resource {
 		a.Tenancy = "Dedicated"
 	} else {
 		a.Tenancy = "Shared"
+	}
+
+	if a.CPUCredits == "" && (strings.HasPrefix(a.InstanceType, "t3.") || strings.HasPrefix(a.InstanceType, "t4g.")) {
+		a.CPUCredits = "unlimited"
 	}
 
 	if a.OperatingSystem == nil {
@@ -78,6 +87,10 @@ func (a *Instance) BuildResource() *schema.Resource {
 
 	if a.EnableMonitoring {
 		costComponents = append(costComponents, a.detailedMonitoringCostComponent())
+	}
+
+	if a.isBurstable() && a.CPUCredits == "unlimited" {
+		costComponents = append(costComponents, a.cpuCreditCostComponent())
 	}
 
 	return &schema.Resource{
@@ -242,6 +255,41 @@ func (a *Instance) detailedMonitoringCostComponent() *schema.CostComponent {
 		},
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
+		},
+	}
+}
+
+func (a *Instance) isBurstable() bool {
+	for _, prefix := range burstableInstanceTypePrefixes {
+		if strings.HasPrefix(a.InstanceType, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func (a *Instance) cpuCreditCostComponent() *schema.CostComponent {
+	prefix := strings.SplitN(a.InstanceType, ".", 2)[0]
+
+	qty := decimal.Zero
+	if a.MonthlyCPUCreditHours != nil && a.VCPUCount != nil {
+		qty = decimal.NewFromInt(*a.MonthlyCPUCreditHours).Mul(decimal.NewFromInt(*a.VCPUCount))
+	}
+
+	return &schema.CostComponent{
+		Name:            "CPU credits",
+		Unit:            "vCPU-hours",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(qty),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(a.Region),
+			Service:       strPtr("AmazonEC2"),
+			ProductFamily: strPtr("CPU Credits"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "operatingSystem", Value: strPtr("Linux")},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/CPUCredits:%s$/", prefix))},
+			},
 		},
 	}
 }
