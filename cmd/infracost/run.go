@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/Rhymond/go-money"
 
@@ -373,6 +374,7 @@ func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root) map[string]interface{} {
 	env := runCtx.EventEnvWithProjectContexts(projectContexts)
 	env["projectCount"] = len(projectContexts)
+	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
 
 	summary := r.FullSummary
 	env["supportedResourceCounts"] = summary.SupportedResourceCounts
