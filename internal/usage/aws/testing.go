@@ -30,7 +30,7 @@ func WithTestEndpoint(ctx context.Context, url string) context.Context {
 	opts := []func(*config.LoadOptions) error{
 		config.WithEndpointResolver(resolver),
 		config.WithCredentialsProvider(&testCredentials{}),
-		// config.WithClientLogMode(aws.LogResponseWithBody),
+		// config.WithClientLogMode(aws.LogRequestWithBody | aws.LogResponseWithBody),
 	}
 	return context.WithValue(ctx, ctxKey, opts)
 }
