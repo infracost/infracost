@@ -43,6 +43,9 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 			res.ResourceType = d.Type
 			// TODO: Figure out how to set tags.  For now, have the RFunc set them.
 			// res.Tags = d.Tags
+			if u != nil {
+				res.EstimationSummary = u.CalcEstimationSummary()
+			}
 			return res
 		}
 	}

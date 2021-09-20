@@ -74,6 +74,11 @@ type Summary struct {
 	TotalUnsupportedResources *int            `json:"totalUnsupportedResources,omitempty"`
 	TotalNoPriceResources     *int            `json:"totalNoPriceResources,omitempty"`
 	TotalResources            *int            `json:"totalResources,omitempty"`
+
+	EstimatedUsageCounts   *map[string]int `json:"-"`
+	UnestimatedUsageCounts *map[string]int `json:"-"`
+	TotalEstimatedUsages   *int            `json:"-"`
+	TotalUnestimatedUsages *int            `json:"-"`
 }
 
 type SummaryOptions struct {
@@ -266,6 +271,11 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) *Summary {
 	totalUnsupportedResources := 0
 	totalNoPriceResources := 0
 
+	estimatedUsageCounts := make(map[string]int)
+	unestimatedUsageCounts := make(map[string]int)
+	totalEstimatedUsages := 0
+	totalUnestimatedUsages := 0
+
 	for _, r := range resources {
 		if !opts.IncludeUnsupportedProviders && !terraform.HasSupportedProvider(r.ResourceType) {
 			continue
@@ -285,6 +295,23 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) *Summary {
 				supportedResourceCounts[r.ResourceType] = 0
 			}
 			supportedResourceCounts[r.ResourceType]++
+		}
+
+		for usage, isEstimated := range r.EstimationSummary {
+			k := r.ResourceType + "." + usage
+			if isEstimated {
+				totalEstimatedUsages++
+				if _, ok := estimatedUsageCounts[k]; !ok {
+					estimatedUsageCounts[k] = 0
+				}
+				estimatedUsageCounts[k]++
+			} else {
+				totalUnestimatedUsages++
+				if _, ok := unestimatedUsageCounts[k]; !ok {
+					unestimatedUsageCounts[k] = 0
+				}
+				unestimatedUsageCounts[k]++
+			}
 		}
 	}
 
@@ -311,6 +338,19 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) *Summary {
 		s.TotalResources = &totalResources
 	}
 
+	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "EstimatedUsageCounts") {
+		s.EstimatedUsageCounts = &estimatedUsageCounts
+	}
+	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "UnestimatedUsageCounts") {
+		s.UnestimatedUsageCounts = &unestimatedUsageCounts
+	}
+	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "TotalEstimatedUsages") {
+		s.TotalEstimatedUsages = &totalEstimatedUsages
+	}
+	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "TotalUnestimatedUsages") {
+		s.TotalUnestimatedUsages = &totalUnestimatedUsages
+	}
+
 	return s
 }
 
@@ -328,6 +368,11 @@ func MergeSummaries(summaries []*Summary) *Summary {
 		merged.TotalUnsupportedResources = addIntPtrs(merged.TotalUnsupportedResources, s.TotalUnsupportedResources)
 		merged.TotalNoPriceResources = addIntPtrs(merged.TotalNoPriceResources, s.TotalNoPriceResources)
 		merged.TotalResources = addIntPtrs(merged.TotalResources, s.TotalResources)
+
+		merged.EstimatedUsageCounts = mergeCounts(merged.EstimatedUsageCounts, s.EstimatedUsageCounts)
+		merged.UnestimatedUsageCounts = mergeCounts(merged.UnestimatedUsageCounts, s.UnestimatedUsageCounts)
+		merged.TotalEstimatedUsages = addIntPtrs(merged.TotalEstimatedUsages, s.TotalEstimatedUsages)
+		merged.TotalUnestimatedUsages = addIntPtrs(merged.TotalUnestimatedUsages, s.TotalUnestimatedUsages)
 	}
 
 	return merged
