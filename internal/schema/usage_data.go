@@ -99,6 +99,24 @@ func convertArrayKeyToWildcard(key string) string {
 	return key[:lastOpenBracket+1] + "*" + key[lastCloseBracket:]
 }
 
+// CalcEstimationSummary returns a map where a value of true means the attribute key has an actual estimate, false means
+// it is using the defaults
+func (u *UsageData) CalcEstimationSummary() map[string]bool {
+	estimationMap := make(map[string]bool)
+	for k, v := range u.Attributes {
+		// figure out if the attribute has estimated value or if it is just using the defaults
+		hasEstimate := false
+		switch v.Type {
+		case gjson.Number:
+			hasEstimate = v.Num > 0
+		case gjson.String:
+			hasEstimate = v.Str != ""
+		}
+		estimationMap[k] = hasEstimate
+	}
+	return estimationMap
+}
+
 func NewUsageMap(m map[string]interface{}) map[string]*UsageData {
 	usageMap := make(map[string]*UsageData)
 

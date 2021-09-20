@@ -382,6 +382,11 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["totalNoPriceResources"] = summary.TotalNoPriceResources
 	env["totalResources"] = summary.TotalResources
 
+	env["estimatedUsageCounts"] = summary.EstimatedUsageCounts
+	env["unestimatedUsageCounts"] = summary.UnestimatedUsageCounts
+	env["totalEstimatedUsages"] = summary.TotalEstimatedUsages
+	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
+
 	return env
 }
 

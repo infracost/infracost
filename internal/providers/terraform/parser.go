@@ -68,6 +68,9 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 		if res != nil {
 			res.ResourceType = d.Type
 			res.Tags = d.Tags
+			if u != nil {
+				res.EstimationSummary = u.CalcEstimationSummary()
+			}
 			return res
 		}
 	}
