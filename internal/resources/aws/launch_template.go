@@ -9,13 +9,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type LaunchConfiguration struct {
+type LaunchTemplate struct {
 	// "required" args that can't really be missing.
 	Address          string
 	Region           string
-	Count            int64
+	OnDemandCount    int64
+	SpotCount        int64
 	Tenancy          string
-	PurchaseOption   string
 	InstanceType     string
 	EBSOptimized     bool
 	EnableMonitoring bool
@@ -35,15 +35,15 @@ type LaunchConfiguration struct {
 	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
 }
 
-var LaunchConfigurationUsageSchema = InstanceUsageSchema
+var LaunchTemplateUsageSchema = InstanceUsageSchema
 
-func (a *LaunchConfiguration) PopulateUsage(u *schema.UsageData) {
+func (a *LaunchTemplate) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *LaunchConfiguration) BuildResource() *schema.Resource {
+func (a *LaunchTemplate) BuildResource() *schema.Resource {
 	if strings.ToLower(a.Tenancy) == "host" {
-		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", a.Address)
+		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Templates", a.Address)
 		return nil
 	} else if strings.ToLower(a.Tenancy) == "dedicated" {
 		a.Tenancy = "Dedicated"
@@ -51,10 +51,11 @@ func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 		a.Tenancy = "Shared"
 	}
 
+	costComponents := make([]*schema.CostComponent, 0)
+
 	instance := &Instance{
 		Region:                        a.Region,
 		Tenancy:                       a.Tenancy,
-		PurchaseOption:                a.PurchaseOption,
 		InstanceType:                  a.InstanceType,
 		EBSOptimized:                  a.EBSOptimized,
 		EnableMonitoring:              a.EnableMonitoring,
@@ -70,14 +71,36 @@ func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 	}
 	instanceResource := instance.BuildResource()
 
+	// Skip the Instance usage cost component since we will prepend these later with the correct purchase options and counts
+	for _, costComponent := range instanceResource.CostComponents {
+		if !strings.HasPrefix(costComponent.Name, "Instance usage") {
+			costComponents = append(costComponents, costComponent)
+		}
+	}
+
 	r := &schema.Resource{
 		Name:           a.Address,
-		UsageSchema:    LaunchConfigurationUsageSchema,
-		CostComponents: instanceResource.CostComponents,
+		UsageSchema:    LaunchTemplateUsageSchema,
+		CostComponents: costComponents,
 		SubResources:   instanceResource.SubResources,
 	}
 
-	schema.MultiplyQuantities(r, decimal.NewFromInt(a.Count))
+	totalCount := decimal.NewFromInt(a.OnDemandCount + a.SpotCount)
+	schema.MultiplyQuantities(r, totalCount)
+
+	if a.SpotCount > 0 {
+		instance.PurchaseOption = "spot"
+		c := instance.computeCostComponent()
+		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(a.SpotCount)))
+		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
+	}
+
+	if a.OnDemandCount > 0 {
+		instance.PurchaseOption = "on_demand"
+		c := instance.computeCostComponent()
+		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(a.OnDemandCount)))
+		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
+	}
 
 	return r
 }

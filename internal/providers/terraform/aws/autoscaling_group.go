@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/resources/aws"
-	log "github.com/sirupsen/logrus"
+	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -27,17 +27,40 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 
 func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	a := &aws.AutoscalingGroup{
-		Address:  d.Address,
-		Capacity: d.Get("desired_capacity").Int(),
+		Address: d.Address,
+		Region:  d.Get("region").String(),
 	}
 
-	if len(d.References("launch_configuration")) > 0 {
-		lc := d.References("launch_configuration")[0]
-		if lc == nil {
-			return nil
+	capacity := d.Get("desired_capacity").Int()
+
+	launchConfigurationRef := d.References("launch_configuration")
+	launchTemplateRef := d.References("launch_template")
+	if len(launchTemplateRef) == 0 {
+		launchTemplateRef = d.References("launch_template.0.id")
+	}
+	if len(launchTemplateRef) == 0 {
+		launchTemplateRef = d.References("launch_template.0.name")
+	}
+	mixedInstanceLaunchTemplateRef := d.References("mixed_instances_policy.0.launch_template.0.launch_template_specification.0.launch_template_id")
+
+	if len(launchConfigurationRef) > 0 {
+		data := launchConfigurationRef[0]
+		a.LaunchConfiguration = newLaunchConfiguration(data, u, a.Region, capacity)
+	} else if len(launchTemplateRef) > 0 {
+		data := launchTemplateRef[0]
+
+		onDemandCount := capacity
+		spotCount := int64(0)
+		if strings.ToLower(d.Get("instance_market_options.0.market_type").String()) == "spot" {
+			onDemandCount = int64(0)
+			spotCount = capacity
 		}
 
-		a.LaunchConfiguration = newLaunchConfiguration(lc, u, d.Get("region").String())
+		a.LaunchTemplate = newLaunchTemplate(data, u, a.Region, onDemandCount, spotCount)
+	} else if len(mixedInstanceLaunchTemplateRef) > 0 {
+		data := mixedInstanceLaunchTemplateRef[0]
+		a.LaunchTemplate = newMixedInstancesLaunchTemplate(data, u, a.Region, capacity, d.Get("mixed_instances_policy.0"))
+		return nil
 	}
 
 	a.PopulateUsage(u)
@@ -45,15 +68,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	return a.BuildResource()
 }
 
-func newLaunchConfiguration(d *schema.ResourceData, u *schema.UsageData, region string) *aws.LaunchConfiguration {
-	tenancy := "Shared"
-	if strings.ToLower(d.Get("placement_tenancy").String()) == "host" {
-		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
-		return nil
-	} else if strings.ToLower(d.Get("placement_tenancy").String()) == "dedicated" {
-		tenancy = "Dedicated"
-	}
-
+func newLaunchConfiguration(d *schema.ResourceData, u *schema.UsageData, region string, count int64) *aws.LaunchConfiguration {
 	purchaseOption := "on_demand"
 	if d.Get("spot_price").String() != "" {
 		purchaseOption = "spot"
@@ -62,7 +77,8 @@ func newLaunchConfiguration(d *schema.ResourceData, u *schema.UsageData, region 
 	a := &aws.LaunchConfiguration{
 		Address:          d.Address,
 		Region:           region,
-		Tenancy:          tenancy,
+		Count:            count,
+		Tenancy:          d.Get("placement_tenancy").String(),
 		PurchaseOption:   purchaseOption,
 		InstanceType:     d.Get("instance_type").String(),
 		EBSOptimized:     d.Get("ebs_optimized").Bool(),
@@ -99,4 +115,94 @@ func newLaunchConfiguration(d *schema.ResourceData, u *schema.UsageData, region 
 	a.PopulateUsage(u)
 
 	return a
+}
+
+func newLaunchTemplate(d *schema.ResourceData, u *schema.UsageData, region string, onDemandCount, spotCount int64) *aws.LaunchTemplate {
+	a := &aws.LaunchTemplate{
+		Address:          d.Address,
+		Region:           region,
+		OnDemandCount:    onDemandCount,
+		SpotCount:        spotCount,
+		Tenancy:          d.Get("placement.0.tenancy").String(),
+		InstanceType:     d.Get("instance_type").String(),
+		EBSOptimized:     d.Get("ebs_optimized").Bool(),
+		EnableMonitoring: d.Get("monitoring.0.enabled").Bool(),
+		CPUCredits:       d.Get("credit_specification.0.cpu_credits").String(),
+	}
+
+	if d.Get("elastic_inference_accelerator.0.type").Type != gjson.Null {
+		a.ElasticInferenceAcceleratorType = strPtr(d.Get("elastic_inference_accelerator.0.type").String())
+	}
+
+	for i, data := range d.Get("block_device_mappings.#.ebs|@flatten").Array() {
+		ebsBlockDevice := &aws.EBSVolume{
+			Address: fmt.Sprintf("block_device_mapping[%d]", i),
+			Region:  region,
+			Type:    data.Get("volume_type").String(),
+			IOPS:    data.Get("iops").Int(),
+		}
+
+		if data.Get("volume_size").Type != gjson.Null {
+			ebsBlockDevice.Size = intPtr(data.Get("volume_size").Int())
+		}
+
+		a.EBSBlockDevices = append(a.EBSBlockDevices, ebsBlockDevice)
+	}
+
+	a.PopulateUsage(u)
+
+	return a
+}
+
+func newMixedInstancesLaunchTemplate(d *schema.ResourceData, u *schema.UsageData, region string, capacity int64, mixedInstancePolicyData gjson.Result) *aws.LaunchTemplate {
+	overrideInstanceType, totalCount := getInstanceTypeAndCount(mixedInstancePolicyData, capacity)
+	if overrideInstanceType != "" {
+		d.Set("instance_type", overrideInstanceType)
+	}
+
+	onDemandCount, spotCount := calculateOnDemandAndSpotCounts(mixedInstancePolicyData, totalCount)
+
+	return newLaunchTemplate(d, u, region, onDemandCount, spotCount)
+}
+
+func getInstanceTypeAndCount(mixedInstancePolicyData gjson.Result, capacity int64) (string, int64) {
+	count := capacity
+	instanceType := ""
+
+	override := mixedInstancePolicyData.Get("launch_template.0.override.0")
+	if override.Exists() {
+		instanceType = override.Get("instance_type").String()
+		weightedCapacity := int64(1)
+		if override.Get("weighted_capacity").Type != gjson.Null {
+			weightedCapacity = override.Get("weighted_capacity").Int()
+		}
+
+		if weightedCapacity == 0 {
+			count = int64(0)
+		} else {
+			count = decimal.NewFromInt(capacity).Div(decimal.NewFromInt(weightedCapacity)).Ceil().IntPart()
+		}
+	}
+
+	return instanceType, count
+}
+
+func calculateOnDemandAndSpotCounts(mixedInstancePolicyData gjson.Result, totalCount int64) (int64, int64) {
+	instanceDistribution := mixedInstancePolicyData.Get("instances_distribution.0")
+	onDemandBaseCount := int64(0)
+	if instanceDistribution.Get("on_demand_base_capacity").Exists() {
+		onDemandBaseCount = instanceDistribution.Get("on_demand_base_capacity").Int()
+	}
+
+	onDemandPerc := int64(100)
+	if instanceDistribution.Get("on_demand_percentage_above_base_capacity").Exists() {
+		onDemandPerc = instanceDistribution.Get("on_demand_percentage_above_base_capacity").Int()
+	}
+
+	onDemandCount := onDemandBaseCount
+	remainingCount := totalCount - onDemandCount
+	onDemandCount += (remainingCount * decimal.NewFromInt(onDemandPerc).Div(decimal.NewFromInt(100)).Ceil().IntPart())
+	spotCount := totalCount - onDemandCount
+
+	return onDemandCount, spotCount
 }

@@ -25,8 +25,9 @@ type Instance struct {
 	CPUCredits       string
 
 	// "optional" args, that may be empty depending on the resource config
-	RootBlockDevice *EBSVolume
-	EBSBlockDevices []*EBSVolume
+	ElasticInferenceAcceleratorType *string
+	RootBlockDevice                 *EBSVolume
+	EBSBlockDevices                 []*EBSVolume
 
 	// "usage" args
 	OperatingSystem               *string `infracost_usage:"operating_system"`
@@ -68,6 +69,10 @@ func (a *Instance) BuildResource() *schema.Resource {
 		a.OperatingSystem = strPtr("linux")
 	}
 
+	if a.PurchaseOption == "" {
+		a.PurchaseOption = "on_demand"
+	}
+
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
 
@@ -87,6 +92,10 @@ func (a *Instance) BuildResource() *schema.Resource {
 
 	if a.EnableMonitoring {
 		costComponents = append(costComponents, a.detailedMonitoringCostComponent())
+	}
+
+	if a.ElasticInferenceAcceleratorType != nil {
+		costComponents = append(costComponents, a.elasticInferenceAcceleratorCostComponent())
 	}
 
 	if a.isBurstable() && a.CPUCredits == "unlimited" {
@@ -255,6 +264,24 @@ func (a *Instance) detailedMonitoringCostComponent() *schema.CostComponent {
 		},
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
+		},
+	}
+}
+
+func (a *Instance) elasticInferenceAcceleratorCostComponent() *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:           fmt.Sprintf("Inference accelerator (%s)", strVal(a.ElasticInferenceAcceleratorType)),
+		Unit:           "hours",
+		UnitMultiplier: decimal.NewFromInt(1),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(a.Region),
+			Service:       strPtr("AmazonEI"),
+			ProductFamily: strPtr("Elastic Inference"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", strVal(a.ElasticInferenceAcceleratorType)))},
+			},
 		},
 	}
 }
