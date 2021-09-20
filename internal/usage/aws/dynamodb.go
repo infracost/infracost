@@ -15,7 +15,7 @@ func dynamodbNewClient(ctx context.Context, region string) (*dynamodb.Client, er
 	return dynamodb.NewFromConfig(cfg), nil
 }
 
-func dynamodbGetRequests(ctx context.Context, region string, table string, metric string) (int64, error) {
+func dynamodbGetRequests(ctx context.Context, region string, table string, metric string) (float64, error) {
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 		region:     region,
 		namespace:  "AWS/DynamoDB",
@@ -30,7 +30,7 @@ func dynamodbGetRequests(ctx context.Context, region string, table string, metri
 	if len(stats.Datapoints) == 0 {
 		return 0, nil
 	}
-	return cloudwatchSumSumCeil(stats), nil
+	return *stats.Datapoints[0].Sum, nil
 }
 
 func DynamoDBGetStorageBytes(ctx context.Context, region string, table string) (int64, error) {
@@ -45,10 +45,10 @@ func DynamoDBGetStorageBytes(ctx context.Context, region string, table string) (
 	return result.Table.TableSizeBytes, nil
 }
 
-func DynamoDBGetRRU(ctx context.Context, region string, table string) (int64, error) {
+func DynamoDBGetRRU(ctx context.Context, region string, table string) (float64, error) {
 	return dynamodbGetRequests(ctx, region, table, "ConsumedReadCapacityUnits")
 }
 
-func DynamoDBGetWRU(ctx context.Context, region string, table string) (int64, error) {
+func DynamoDBGetWRU(ctx context.Context, region string, table string) (float64, error) {
 	return dynamodbGetRequests(ctx, region, table, "ConsumedWriteCapacityUnits")
 }

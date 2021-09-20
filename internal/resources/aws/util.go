@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"math"
+
 	"github.com/shopspring/decimal"
 )
 
@@ -21,4 +23,8 @@ func asGiB(i int64) int64 {
 		return 1
 	}
 	return i
+}
+
+func ceil64(f float64) int64 {
+	return int64(math.Ceil(f))
 }
