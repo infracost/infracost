@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 )
 
-func lambdaGetInvocations(ctx context.Context, region string, fn string) float64 {
+func LambdaGetInvocations(ctx context.Context, region string, fn string) (float64, error) {
 	namespace := "AWS/Lambda"
 	metric := "Invocations"
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
@@ -21,14 +21,14 @@ func lambdaGetInvocations(ctx context.Context, region string, fn string) float64
 		},
 	})
 	if err != nil {
-		sdkWarn(namespace, metric, fn, err)
+		return 0, err
 	} else if len(stats.Datapoints) > 0 {
-		return *stats.Datapoints[0].Sum
+		return *stats.Datapoints[0].Sum, nil
 	}
-	return 0
+	return 0, nil
 }
 
-func lambdaGetDuration(ctx context.Context, region string, fn string) float64 {
+func LambdaGetDurationAvg(ctx context.Context, region string, fn string) (float64, error) {
 	namespace := "AWS/Lambda"
 	metric := "Duration"
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
@@ -42,10 +42,9 @@ func lambdaGetDuration(ctx context.Context, region string, fn string) float64 {
 		},
 	})
 	if err != nil {
-		sdkWarn(namespace, metric, fn, err)
-		return 0
+		return 0, err
 	} else if len(stats.Datapoints) == 0 {
-		return 0
+		return 0, nil
 	}
-	return *stats.Datapoints[0].Average
+	return *stats.Datapoints[0].Average, nil
 }

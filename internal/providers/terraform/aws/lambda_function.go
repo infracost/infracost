@@ -16,8 +16,8 @@ func GetLambdaFunctionRegistryItem() *schema.RegistryItem {
 
 func NewLambdaFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
-
-	var memorySize int64 = 128
+	name := d.Get("function_name").String()
+	memorySize := int64(128)
 	if d.Get("memory_size").Type != gjson.Null {
 		memorySize = d.Get("memory_size").Int()
 	}
@@ -25,6 +25,7 @@ func NewLambdaFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 	args := &aws.LambdaFunctionArguments{
 		Address:    d.Address,
 		Region:     region,
+		Name:       name,
 		MemorySize: memorySize,
 	}
 	args.PopulateUsage(u)
