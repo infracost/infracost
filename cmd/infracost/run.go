@@ -375,6 +375,7 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env := runCtx.EventEnvWithProjectContexts(projectContexts)
 	env["projectCount"] = len(projectContexts)
 	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
+	env["currency"] = runCtx.Config.Currency
 
 	summary := r.FullSummary
 	env["supportedResourceCounts"] = summary.SupportedResourceCounts
