@@ -23,17 +23,17 @@ func GetNewEKSNodeGroupItem() *schema.RegistryItem {
 func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
-	desiredSize := d.Get("scaling_config.0.desired_size").Int()
+	instanceCount := d.Get("scaling_config.0.desired_size").Int()
 
 	diskSize := int64(20)
 	if d.Get("disk_size").Exists() {
 		diskSize = d.Get("disk_size").Int()
 	}
 	a := &aws.EKSNodeGroup{
-		Address:     d.Address,
-		Region:      region,
-		DesiredSize: desiredSize,
-		DiskSize:    diskSize,
+		Address:       d.Address,
+		Region:        region,
+		InstanceCount: intPtr(instanceCount),
+		DiskSize:      diskSize,
 	}
 
 	launchTemplateRefID := d.References("launch_template.0.id")
@@ -49,19 +49,16 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	if len(launchTemplateRef) > 0 {
 		data := launchTemplateRef[0]
 
-		spotCount := int64(0)
-		onDemandCount := desiredSize
-
+		onDemandPercentageAboveBaseCount := int64(100)
 		if strings.ToLower(launchTemplateRef[0].Get("instance_market_options.0.market_type").String()) == "spot" {
-			onDemandCount = int64(0)
-			spotCount = desiredSize
+			onDemandPercentageAboveBaseCount = int64(0)
 		}
 
 		if data.Get("instance_type").Type == gjson.Null {
 			data.Set("instance_type", d.Get("instance_types").Array()[0].String())
 		}
 
-		a.LaunchTemplate = newLaunchTemplate(data, u, region, onDemandCount, spotCount)
+		a.LaunchTemplate = newLaunchTemplate(data, u, region, instanceCount, int64(0), onDemandPercentageAboveBaseCount)
 	} else {
 		instanceType := strings.ToLower(d.Get("instance_types.0").String())
 		if instanceType == "" {

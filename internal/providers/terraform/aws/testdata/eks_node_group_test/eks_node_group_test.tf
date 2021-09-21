@@ -351,3 +351,46 @@ resource "aws_eks_node_group" "windows" {
   }
 }
 
+resource "aws_eks_node_group" "usage" {
+  cluster_name    = "test_aws_eks_node_group"
+  node_group_name = "example"
+  node_role_arn   = "node_role_arn"
+  subnet_ids      = ["subnet_id"]
+
+  scaling_config {
+    desired_size = 1
+    max_size     = 1
+    min_size     = 1
+  }
+}
+
+resource "aws_launch_template" "lt_usage" {
+  image_id      = "fake_ami"
+  instance_type = "t2.medium"
+
+  block_device_mappings {
+    device_name = "xvdf"
+    ebs {
+      volume_size = 10
+    }
+  }
+}
+
+resource "aws_eks_node_group" "lt_usage" {
+  cluster_name    = "test_aws_eks_node_group"
+  node_group_name = "example"
+  node_role_arn   = "node_role_arn"
+  subnet_ids      = ["subnet_id"]
+
+  scaling_config {
+    desired_size = 1
+    max_size     = 1
+    min_size     = 1
+  }
+
+  launch_template {
+    id      = aws_launch_template.lt_usage.id
+    version = "default_version"
+  }
+}
+
