@@ -46,6 +46,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projects := make([]*schema.Project, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
 
+	var spinner *ui.Spinner
+
 	for _, projectCfg := range runCtx.Config.Projects {
 		ctx := config.NewProjectContext(runCtx, projectCfg)
 		runCtx.SetCurrentProjectContext(ctx)
@@ -93,21 +95,49 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		}
 
 		if runCtx.Config.SyncUsageFile {
+			spinnerOpts := ui.SpinnerOptions{
+				EnableLogging: runCtx.Config.IsLogging(),
+				NoColor:       runCtx.Config.NoColor,
+				Indent:        "  ",
+			}
+			spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
+
 			syncResult, err := usage.SyncUsageData(providerProjects, u, projectCfg.UsageFile)
 			summarizeUsage(ctx, syncResult)
 			if err != nil {
+				spinner.Fail()
 				return err
 			}
+
 			remediateUsage(runCtx, ctx, syncResult)
 
 			u, err := usage.LoadFromFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
 			if err != nil {
+				spinner.Fail()
 				return err
 			}
 			providerProjects, err = provider.LoadResources(u)
 			if err != nil {
+				spinner.Fail()
 				return err
 			}
+
+			resources := syncResult.ResourceCount
+			attempts := syncResult.EstimationCount
+			errors := len(syncResult.EstimationErrors)
+			successes := attempts - errors
+
+			pluralized := ""
+			if resources > 1 {
+				pluralized = "s"
+			}
+
+			spinner.Success()
+			cmd.Println(fmt.Sprintf("    %s Synced %d of %d resource%s",
+				ui.FaintString("└─"),
+				successes,
+				resources,
+				pluralized))
 		}
 
 		projects = append(projects, providerProjects...)
@@ -121,7 +151,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		EnableLogging: runCtx.Config.IsLogging(),
 		NoColor:       runCtx.Config.NoColor,
 	}
-	spinner := ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
+	spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 
 	for _, project := range projects {
 		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
@@ -221,20 +251,6 @@ func summarizeUsage(ctx *config.ProjectContext, syncResult *usage.SyncResult) {
 }
 
 func remediateUsage(runCtx *config.RunContext, ctx *config.ProjectContext, syncResult *usage.SyncResult) {
-	resources := syncResult.ResourceCount
-	attempts := syncResult.EstimationCount
-	errors := len(syncResult.EstimationErrors)
-	successes := attempts - errors
-
-	if attempts > 0 {
-		m := fmt.Sprintf("Performed cloud-based usage estimation for %d resources of %d", successes, resources)
-		if runCtx.Config.IsLogging() {
-			log.Info(m)
-		} else {
-			fmt.Fprintln(os.Stdout, m)
-		}
-	}
-
 	var remAttempts, remErrors int
 	for name, err := range syncResult.EstimationErrors {
 		if remediater, ok := err.(schema.Remediater); ok {
