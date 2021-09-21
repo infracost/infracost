@@ -23,7 +23,7 @@ type EBSVolume struct {
 	Size *int64
 
 	// "usage" args
-	MonthlyStandardIORequests int64 `infracost_usage:"monthly_standard_io_requests"`
+	MonthlyStandardIORequests *int64 `infracost_usage:"monthly_standard_io_requests"`
 }
 
 var EBSVolumeSchema = []*schema.UsageSchemaItem{
@@ -129,11 +129,16 @@ func (a *EBSVolume) provisionedIOPSCostComponent(usageType string, iops int64) *
 }
 
 func (a *EBSVolume) ioRequestsCostComponent() *schema.CostComponent {
+	var qty *decimal.Decimal
+	if a.MonthlyStandardIORequests != nil {
+		qty = decimalPtr(decimal.NewFromInt(*a.MonthlyStandardIORequests))
+	}
+
 	return &schema.CostComponent{
 		Name:            "I/O requests",
 		Unit:            "1M request",
 		UnitMultiplier:  decimal.NewFromInt(1000000),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(a.MonthlyStandardIORequests)),
+		MonthlyQuantity: qty,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(a.Region),
