@@ -44,6 +44,10 @@ func (a *EBSVolume) BuildResource() *schema.Resource {
 
 	costComponents = append(costComponents, a.storageCostComponent())
 
+	if strings.ToLower(a.Type) == "gp3" && a.Throughput > 125 {
+		costComponents = append(costComponents, a.provisionedThroughputCostComponent())
+	}
+
 	if strings.ToLower(a.Type) == "io1" {
 		costComponents = append(costComponents, a.provisionedIOPSCostComponent("EBS:VolumeP-IOPS.piops", a.IOPS))
 	} else if strings.ToLower(a.Type) == "io2" {
@@ -54,10 +58,6 @@ func (a *EBSVolume) BuildResource() *schema.Resource {
 
 	if strings.ToLower(a.Type) == "standard" {
 		costComponents = append(costComponents, a.ioRequestsCostComponent())
-	}
-
-	if strings.ToLower(a.Type) == "gp3" && a.Throughput > 125 {
-		costComponents = append(costComponents, a.provisionedThroughputCostComponent())
 	}
 
 	return &schema.Resource{
