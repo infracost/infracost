@@ -4,12 +4,11 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"fmt"
+	"github.com/awslabs/goformation/v4"
+	"github.com/infracost/infracost/internal/providers/cloudformation"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	"github.com/awslabs/goformation/v4"
-	"github.com/infracost/infracost/internal/providers/cloudformation"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -45,6 +44,10 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 
 	if isTerraformDir(path) {
 		return terraform.NewDirProvider(ctx), nil
+	}
+
+	if isTerragruntNestedDir(path, 5) {
+		return terraform.NewTerragruntProvider(ctx), nil
 	}
 
 	return nil, fmt.Errorf("Could not detect path type for %s", path)
@@ -115,6 +118,26 @@ func isTerragruntDir(path string) bool {
 	}
 
 	return config.FileExists(filepath.Join(path, "terragrunt.hcl")) || config.FileExists(filepath.Join(path, "terragrunt.hcl.json"))
+}
+
+func isTerragruntNestedDir(path string, maxDepth int) bool {
+	if isTerragruntDir(path) {
+		return true
+	}
+
+	if maxDepth > 0 {
+		entries, err := os.ReadDir(path)
+		if err == nil {
+			for _, entry := range entries {
+				if entry.IsDir() {
+					if isTerragruntNestedDir(filepath.Join(path, entry.Name()), maxDepth-1) {
+						return true
+					}
+				}
+			}
+		}
+	}
+	return false
 }
 
 func isTerraformDir(path string) bool {

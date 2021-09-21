@@ -63,3 +63,7 @@ func TestBreakdownTerraformUsageFile(t *testing.T) {
 func TestBreakdownTerragrunt(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil)
 }
+
+func TestBreakdownTerragruntNested(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples"}, nil)
+}
