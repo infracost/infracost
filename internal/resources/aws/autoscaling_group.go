@@ -16,7 +16,7 @@ type AutoscalingGroup struct {
 }
 
 var AutoscalingGroupUsageSchema = []*schema.UsageSchemaItem{
-	{Key: "capacity", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "instances", DefaultValue: 0, ValueType: schema.Int64},
 }
 
 func (a *AutoscalingGroup) PopulateUsage(u *schema.UsageData) {
