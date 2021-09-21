@@ -17,6 +17,10 @@ func strVal(s *string) string {
 	return *s
 }
 
+func intPtr(i int64) *int64 {
+	return &i
+}
+
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
