@@ -26,7 +26,7 @@ type LaunchConfiguration struct {
 	EBSBlockDevices                 []*EBSVolume
 
 	// "usage" args
-	InstanceCount                 *int64  `infracost_usage:"instances"`
+	InstanceCount                 *int64  // This is populated from the Autoscaling Group / EKS Node Group
 	OperatingSystem               *string `infracost_usage:"operating_system"`
 	ReservedInstanceType          *string `infracost_usage:"reserved_instance_type"`
 	ReservedInstanceTerm          *string `infracost_usage:"reserved_instance_term"`
@@ -35,9 +35,7 @@ type LaunchConfiguration struct {
 	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
 }
 
-var LaunchConfigurationUsageSchema = append([]*schema.UsageSchemaItem{
-	{Key: "instances", DefaultValue: 0, ValueType: schema.Int64},
-}, InstanceUsageSchema...)
+var LaunchConfigurationUsageSchema = InstanceUsageSchema
 
 func (a *LaunchConfiguration) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)

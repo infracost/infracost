@@ -11,15 +11,15 @@ import (
 
 type LaunchTemplate struct {
 	// "required" args that can't really be missing.
-	Address               string
-	Region                string
-	OnDemandInstanceCount int64
-	SpotInstanceCount     int64
-	Tenancy               string
-	InstanceType          string
-	EBSOptimized          bool
-	EnableMonitoring      bool
-	CPUCredits            string
+	Address                          string
+	Region                           string
+	OnDemandBaseCount                int64
+	OnDemandPercentageAboveBaseCount int64
+	Tenancy                          string
+	InstanceType                     string
+	EBSOptimized                     bool
+	EnableMonitoring                 bool
+	CPUCredits                       string
 
 	// "optional" args, that may be empty depending on the resource config
 	ElasticInferenceAcceleratorType *string
@@ -27,6 +27,7 @@ type LaunchTemplate struct {
 	EBSBlockDevices                 []*EBSVolume
 
 	// "usage" args
+	InstanceCount                 *int64  // This is populated from the Autoscaling Group / EKS Node Group
 	OperatingSystem               *string `infracost_usage:"operating_system"`
 	ReservedInstanceType          *string `infracost_usage:"reserved_instance_type"`
 	ReservedInstanceTerm          *string `infracost_usage:"reserved_instance_term"`
@@ -86,22 +87,43 @@ func (a *LaunchTemplate) BuildResource() *schema.Resource {
 		SubResources:   instanceResource.SubResources,
 	}
 
-	totalCount := decimal.NewFromInt(a.OnDemandInstanceCount + a.SpotInstanceCount)
-	schema.MultiplyQuantities(r, totalCount)
+	instanceCount := int64(0)
+	if a.InstanceCount != nil {
+		instanceCount = *a.InstanceCount
+	}
 
-	if a.SpotInstanceCount > 0 {
+	schema.MultiplyQuantities(r, decimal.NewFromInt(instanceCount))
+
+	onDemandCount, spotCount := a.calculateOnDemandAndSpotInstanceCounts()
+
+	if spotCount > 0 {
 		instance.PurchaseOption = "spot"
 		c := instance.computeCostComponent()
-		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(a.SpotInstanceCount)))
+		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(spotCount)))
 		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
 	}
 
-	if a.OnDemandInstanceCount > 0 {
+	if onDemandCount > 0 {
 		instance.PurchaseOption = "on_demand"
 		c := instance.computeCostComponent()
-		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(a.OnDemandInstanceCount)))
+		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(onDemandCount)))
 		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
 	}
 
 	return r
+}
+
+func (a *LaunchTemplate) calculateOnDemandAndSpotInstanceCounts() (int64, int64) {
+	instanceCount := int64(0)
+	if a.InstanceCount != nil {
+		instanceCount = *a.InstanceCount
+	}
+
+	onDemandInstanceCount := a.OnDemandBaseCount
+	remainingCount := instanceCount - onDemandInstanceCount
+	percMultiplier := decimal.NewFromInt(a.OnDemandPercentageAboveBaseCount).Div(decimal.NewFromInt(100))
+	onDemandInstanceCount += decimal.NewFromInt(remainingCount).Mul(percMultiplier).Ceil().IntPart()
+	spotInstanceCount := instanceCount - onDemandInstanceCount
+
+	return onDemandInstanceCount, spotInstanceCount
 }

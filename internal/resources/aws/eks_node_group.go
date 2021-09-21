@@ -4,6 +4,7 @@ import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
 )
 
 type EKSNodeGroup struct {
@@ -11,32 +12,38 @@ type EKSNodeGroup struct {
 	Address string
 	Region  string
 
-	DesiredSize    int64
 	InstanceType   string
 	PurchaseOption string
 	DiskSize       int64
 
 	// "optional" args, that may be empty depending on the resource config
 	RootBlockDevice *EBSVolume
+	LaunchTemplate  *LaunchTemplate
 
 	// "usage" args
+	InstanceCount                 *int64  `infracost_usage:"instances"`
 	OperatingSystem               *string `infracost_usage:"operating_system"`
 	ReservedInstanceType          *string `infracost_usage:"reserved_instance_type"`
 	ReservedInstanceTerm          *string `infracost_usage:"reserved_instance_term"`
 	ReservedInstancePaymentOption *string `infracost_usage:"reserved_instance_payment_option"`
 	MonthlyCPUCreditHours         *int64  `infracost_usage:"monthly_cpu_credit_hrs"`
 	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
-
-	// "optional" args, that may be empty depending on the resource config
-	LaunchTemplate *LaunchTemplate
 }
 
 var EKSNodeGroupUsageSchema = []*schema.UsageSchemaItem{
-	{Key: "capacity", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "instances", DefaultValue: 0, ValueType: schema.Int64},
 }
 
 func (a *EKSNodeGroup) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
+
+	if u == nil {
+		return
+	}
+
+	if a.LaunchTemplate != nil && u.Get("instances").Type != gjson.Null {
+		a.LaunchTemplate.InstanceCount = intPtr(u.Get("instances").Int())
+	}
 }
 
 func (a *EKSNodeGroup) BuildResource() *schema.Resource {
@@ -85,7 +92,11 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 			}
 		}
 
-		schema.MultiplyQuantities(r, decimal.NewFromInt(a.DesiredSize))
+		qty := int64(0)
+		if a.InstanceCount != nil {
+			qty = *a.InstanceCount
+		}
+		schema.MultiplyQuantities(r, decimal.NewFromInt(qty))
 	}
 
 	return r
