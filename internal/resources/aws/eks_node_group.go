@@ -48,6 +48,9 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 		UsageSchema: EKSNodeGroupUsageSchema,
 	}
 
+	// The EKS Node Group resource either has the instance attributes inline or a reference to a Launch Template.
+	// If it has a reference to a Launch Template we create generic resources for that and add add it as a subresource
+	// of the EKS Node Group resource.
 	if a.LaunchTemplate != nil {
 		lt := a.LaunchTemplate.BuildResource()
 		// If the Launch Template returns nil it is not supported so the Autoscaling Group should also return nil

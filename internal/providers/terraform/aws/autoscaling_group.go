@@ -33,6 +33,8 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 
 	instanceCount := d.Get("desired_capacity").Int()
 
+	// The Autoscaling Group resource has either a Launch Configuration or Launch Template sub-resource.
+	// So we create generic resources for these and add them as a subresource of the Autoscaling Group resource.
 	launchConfigurationRef := d.References("launch_configuration")
 	launchTemplateRef := d.References("launch_template")
 	if len(launchTemplateRef) == 0 {
