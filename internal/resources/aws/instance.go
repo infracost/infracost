@@ -1,11 +1,13 @@
 package aws
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage/aws"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
@@ -19,6 +21,7 @@ type Instance struct {
 	Region           string
 	Tenancy          string
 	PurchaseOption   string
+	AMI              string
 	InstanceType     string
 	EBSOptimized     bool
 	EnableMonitoring bool
@@ -102,11 +105,23 @@ func (a *Instance) BuildResource() *schema.Resource {
 		costComponents = append(costComponents, a.cpuCreditCostComponent())
 	}
 
+	estimate := func(ctx context.Context, values map[string]interface{}) error {
+		platform, err := aws.EC2DescribeOS(ctx, a.Region, a.AMI)
+		if err != nil {
+			return err
+		}
+		if platform != "" {
+			values["operating_system"] = platform
+		}
+		return nil
+	}
+
 	return &schema.Resource{
 		Name:           a.Address,
 		UsageSchema:    InstanceUsageSchema,
 		CostComponents: costComponents,
 		SubResources:   subResources,
+		EstimateUsage:  estimate,
 	}
 }
 
