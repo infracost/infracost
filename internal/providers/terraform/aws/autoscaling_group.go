@@ -109,8 +109,6 @@ func newLaunchConfiguration(d *schema.ResourceData, u *schema.UsageData, region 
 		a.EBSBlockDevices = append(a.EBSBlockDevices, ebsBlockDevice)
 	}
 
-	a.PopulateUsage(u)
-
 	return a
 }
 
@@ -146,8 +144,6 @@ func newLaunchTemplate(d *schema.ResourceData, u *schema.UsageData, region strin
 
 		a.EBSBlockDevices = append(a.EBSBlockDevices, ebsBlockDevice)
 	}
-
-	a.PopulateUsage(u)
 
 	return a
 }

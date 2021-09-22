@@ -3,7 +3,6 @@ package aws
 import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 type AutoscalingGroup struct {
@@ -16,21 +15,20 @@ type AutoscalingGroup struct {
 	LaunchTemplate      *LaunchTemplate
 }
 
-var AutoscalingGroupUsageSchema = []*schema.UsageSchemaItem{
+var AutoscalingGroupUsageSchema = append([]*schema.UsageSchemaItem{
 	{Key: "instances", DefaultValue: 0, ValueType: schema.Int64},
-}
+}, InstanceUsageSchema...)
 
 func (a *AutoscalingGroup) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 
-	if u == nil {
-		return
+	// The usage keys for Launch Template and Configuration are specified on the Autoscaling Group resource
+	if a.LaunchTemplate != nil {
+		resources.PopulateArgsWithUsage(a.LaunchTemplate, u)
 	}
 
-	if a.LaunchTemplate != nil && u.Get("instances").Type != gjson.Null {
-		a.LaunchTemplate.InstanceCount = intPtr(u.Get("instances").Int())
-	} else if a.LaunchConfiguration != nil && u.Get("instances").Type != gjson.Null {
-		a.LaunchConfiguration.InstanceCount = intPtr(u.Get("instances").Int())
+	if a.LaunchConfiguration != nil {
+		resources.PopulateArgsWithUsage(a.LaunchConfiguration, u)
 	}
 }
 

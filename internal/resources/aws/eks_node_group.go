@@ -4,7 +4,6 @@ import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	"github.com/tidwall/gjson"
 )
 
 type EKSNodeGroup struct {
@@ -30,19 +29,16 @@ type EKSNodeGroup struct {
 	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
 }
 
-var EKSNodeGroupUsageSchema = []*schema.UsageSchemaItem{
+var EKSNodeGroupUsageSchema = append([]*schema.UsageSchemaItem{
 	{Key: "instances", DefaultValue: 0, ValueType: schema.Int64},
-}
+}, InstanceUsageSchema...)
 
 func (a *EKSNodeGroup) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 
-	if u == nil {
-		return
-	}
-
-	if a.LaunchTemplate != nil && u.Get("instances").Type != gjson.Null {
-		a.LaunchTemplate.InstanceCount = intPtr(u.Get("instances").Int())
+	// The usage keys for Launch Template are specified on the EKS Node Groupresource
+	if a.LaunchTemplate != nil {
+		resources.PopulateArgsWithUsage(a.LaunchTemplate, u)
 	}
 }
 
