@@ -27,7 +27,7 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		region,
 		"Web ACL usage",
 		"months",
-		"USE1-WebACLV2",
+		".*[^ShieldProtected]-WebACLV2",
 		1,
 		decimalPtr(decimal.NewFromInt(1)),
 	))
@@ -49,7 +49,7 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 			region,
 			"Rules",
 			"months",
-			"USE1-RuleV2",
+			".*[^ShieldProtected]-RuleV2",
 			1,
 			&sumForRules,
 		))
@@ -76,7 +76,7 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 				region,
 				"Rule groups",
 				"months",
-				"USE1-RuleV2",
+				".*[^ShieldProtected]-RuleV2",
 				1,
 				decimalPtr(decimal.NewFromInt(int64(counter))),
 			))
@@ -89,7 +89,7 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 			region,
 			"Managed rule groups",
 			"months",
-			"USE1-RuleV2",
+			".*[^ShieldProtected]-RuleV2",
 			1,
 			decimalPtr(decimal.NewFromInt(int64(len(manageQuantity)))),
 		))
@@ -103,7 +103,7 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		region,
 		"Requests",
 		"1M requests",
-		"USE1-RequestV2-Tier1",
+		".*[^ShieldProtected]-RequestV2-Tier1",
 		1000000,
 		monthlyRequests,
 	))
