@@ -501,7 +501,7 @@ func isInfracostResource(res *schema.ResourceData) bool {
 // addressResourcePart parses a resource addr and returns resource suffix (without the module prefix).
 // For example: `module.name1.module.name2.resource` will return `name2.resource`.
 func addressResourcePart(addr string) string {
-	p := strings.Split(addr, ".")
+	p := splitAddress(addr)
 
 	if len(p) >= 3 && p[len(p)-3] == "data" {
 		return strings.Join(p[len(p)-3:], ".")
@@ -513,7 +513,7 @@ func addressResourcePart(addr string) string {
 // addressModulePart parses a resource addr and returns module prefix.
 // For example: `module.name1.module.name2.resource` will return `module.name1.module.name2.`.
 func addressModulePart(addr string) string {
-	ap := strings.Split(addr, ".")
+	ap := splitAddress(addr)
 
 	var mp []string
 
@@ -564,6 +564,17 @@ func removeAddressArrayPart(addr string) string {
 	m := r.FindStringSubmatch(addressResourcePart(addr))
 
 	return m[1]
+}
+
+// splitAddress splits the address by `.`, but ignores any `.`s quoted in the array part of the address
+func splitAddress(addr string) []string {
+	quoted := false
+	return strings.FieldsFunc(addr, func(r rune) bool {
+		if r == '"' {
+			quoted = !quoted
+		}
+		return !quoted && r == '.'
+	})
 }
 
 func isAwsChina(d *schema.ResourceData) bool {
