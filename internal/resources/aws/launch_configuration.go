@@ -26,7 +26,8 @@ type LaunchConfiguration struct {
 	EBSBlockDevices                 []*EBSVolume
 
 	// "usage" args
-	InstanceCount                 *int64  // This is populated from the Autoscaling Group / EKS Node Group
+	// These are populated from the Autoscaling Group resource
+	InstanceCount                 *int64  `infracost_usage:"instances"`
 	OperatingSystem               *string `infracost_usage:"operating_system"`
 	ReservedInstanceType          *string `infracost_usage:"reserved_instance_type"`
 	ReservedInstanceTerm          *string `infracost_usage:"reserved_instance_term"`
