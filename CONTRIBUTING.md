@@ -575,9 +575,10 @@ The following notes are general guidelines, please leave a comment in your pull 
 4. Click on the Edit draft button, set the `vx.y.z` value in the tag name and release title. Also add the release notes from the commits between this and the last release and click on publish.
 5. In the `infracost-atlantis` repo, run the, update the "Infracost (latest release, vx.y.z)" text to point to the newly released version. Pushing a commit to master will trigger the GH Action, which builds/pushes that repo's docker image.
 6. Update the [Infracost API](https://www.infracost.io/docs/integrations/infracost_api) to use the latest version.
-7. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls?q=infracost) to be merged.
-8. Announce the release in the infracost-community Slack announcements channel.
-9. Update the docs repo with any required changes and supported resources. Don't forget to bump-up the version in [this page](https://www.infracost.io/docs/#1-install-infracost).
-10. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
+7. Update the [Terraform Cloud Run Tasks workers](https://www.infracost.io/docs/iac_tools/terraform_cloud_enterprise#terraform-cloud-run-tasks) to use the latest version.
+8. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls?q=infracost) to be merged.
+9. Announce the release in the infracost-community Slack announcements channel.
+10. Update the docs repo with any required changes and supported resources. Don't forget to bump-up the version in [this page](https://www.infracost.io/docs/#1-install-infracost).
+11. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
 
 If a new flag/feature is added that requires CI support, update the repos mentioned [here](https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts). For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.
