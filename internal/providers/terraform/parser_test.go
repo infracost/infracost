@@ -524,7 +524,7 @@ func TestParseResourceData(t *testing.T) {
 	}
 
 	p := NewParser(config.EmptyProjectContext())
-	actual := p.parseResourceData(providerConf, planVals, conf, vars)
+	actual := p.parseResourceData(false, providerConf, planVals, conf, vars)
 
 	for k, v := range actual {
 		assert.Equal(t, expected[k].Address, v.Address)

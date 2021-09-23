@@ -39,3 +39,7 @@ func TestDiffTerragrunt(t *testing.T) {
 func TestDiffTerragruntNested(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples"}, nil)
 }
+
+func TestDiffTerraform_v0_12(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/terraform_v0.12_plan.json"}, nil)
+}
