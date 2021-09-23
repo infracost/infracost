@@ -38,11 +38,12 @@ var arnAttributeMap = map[string]string{
 }
 
 type Parser struct {
-	ctx *config.ProjectContext
+	ctx              *config.ProjectContext
+	terraformVersion string
 }
 
 func NewParser(ctx *config.ProjectContext) *Parser {
-	return &Parser{ctx}
+	return &Parser{ctx, ""}
 }
 
 func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
@@ -88,16 +89,20 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 	var resources []*schema.Resource
 	resources = append(resources, baseResources...)
 	var vals gjson.Result
+
+	isState := false
 	if parsePrior {
+		isState = true
 		vals = parsed.Get("prior_state.values.root_module")
 	} else {
 		vals = parsed.Get("planned_values.root_module")
 		if !vals.Exists() {
+			isState = true
 			vals = parsed.Get("values.root_module")
 		}
 	}
 
-	resData := p.parseResourceData(providerConf, vals, conf, vars)
+	resData := p.parseResourceData(isState, providerConf, vals, conf, vars)
 
 	p.parseReferences(resData, conf)
 	p.loadInfracostProviderUsageData(usage, resData)
@@ -131,6 +136,8 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 	}
 
 	parsed := gjson.ParseBytes(j)
+
+	p.terraformVersion = parsed.Get("terraform_version").String()
 	providerConf := parsed.Get("configuration.provider_config")
 	conf := parsed.Get("configuration.root_module")
 	vars := parsed.Get("variables")
@@ -158,13 +165,31 @@ func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schem
 	return resources
 }
 
-func (p *Parser) parseResourceData(providerConf, planVals gjson.Result, conf gjson.Result, vars gjson.Result) map[string]*schema.ResourceData {
+func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Result, conf gjson.Result, vars gjson.Result) map[string]*schema.ResourceData {
 	resources := make(map[string]*schema.ResourceData)
 
 	for _, r := range planVals.Get("resources").Array() {
 		t := r.Get("type").String()
 		provider := r.Get("provider_name").String()
 		addr := r.Get("address").String()
+
+		// Terraform v0.12 files have a different format for the addresses of provisioned resources
+		// So we need to build the full address from the module and index
+		if strings.HasPrefix(p.terraformVersion, "0.12.") && isState {
+			modAddr := planVals.Get("address").String()
+			if modAddr != "" && !strings.HasPrefix(addr, modAddr) {
+				addr = fmt.Sprintf("%s.%s", modAddr, addr)
+			}
+			if r.Get("index").Type != gjson.Null {
+				indexSuffix := fmt.Sprintf("[%s]", r.Get("index").Raw)
+				// Check that the suffix doesn't already exist on the address. This can happen if Terraform v0.12 was
+				// used to generate the state but then a different version is used to show it.
+				if !strings.HasSuffix(addr, indexSuffix) {
+					addr = fmt.Sprintf("%s%s", addr, indexSuffix)
+				}
+			}
+		}
+
 		v := r.Get("values")
 
 		resConf := getConfJSON(conf, addr)
@@ -186,7 +211,7 @@ func (p *Parser) parseResourceData(providerConf, planVals gjson.Result, conf gjs
 
 	// Recursively add any resources for child modules
 	for _, m := range planVals.Get("child_modules").Array() {
-		for addr, d := range p.parseResourceData(providerConf, m, conf, vars) {
+		for addr, d := range p.parseResourceData(isState, providerConf, m, conf, vars) {
 			resources[addr] = d
 		}
 	}
