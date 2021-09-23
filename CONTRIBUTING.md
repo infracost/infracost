@@ -258,6 +258,8 @@ func TestMyResourceGoldenFile(t *testing.T) {
 }
 ```
 
+Terraform supports multiple provider blocks (e.g. `provider "aws"`) so you can test for multiple regions by adding resources that point to a different provider using the `alias = aws.my-other-provider` attribute. See [waf_web_acl_test.tf](internal/providers/terraform/aws/testdata/waf_web_acl_test/waf_web_acl_test.tf) for an example.
+
 Finally, generate the golden file by running the test with the `-update` flag. You should **verify** that these cost calculations are correct by manually checking them, or comparing them against cost calculators from the cloud vendors. You should also ensure that there are **no warnings** about "Multiple products found", "No products found for" or "No prices found for" in the logs. These warnings indicate that the price filters have an issue.
 
 ```sh

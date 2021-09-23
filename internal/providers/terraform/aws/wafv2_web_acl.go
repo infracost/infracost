@@ -27,7 +27,7 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		region,
 		"Web ACL usage",
 		"months",
-		".*[^ShieldProtected]-WebACLV2",
+		"[A-Z0-9]*-(?!ShieldProtected-)WebACLV2",
 		1,
 		decimalPtr(decimal.NewFromInt(1)),
 	))
@@ -48,8 +48,8 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		costComponents = append(costComponents, wafWebACLUsageCostComponent(
 			region,
 			"Rules",
-			"months",
-			".*[^ShieldProtected]-RuleV2",
+			"rules",
+			"[A-Z0-9]*-(?!ShieldProtected-)RuleV2",
 			1,
 			&sumForRules,
 		))
@@ -75,8 +75,8 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 			costComponents = append(costComponents, wafWebACLUsageCostComponent(
 				region,
 				"Rule groups",
-				"months",
-				".*[^ShieldProtected]-RuleV2",
+				"groups",
+				"[A-Z0-9]*-(?!ShieldProtected-)RuleV2",
 				1,
 				decimalPtr(decimal.NewFromInt(int64(counter))),
 			))
@@ -88,8 +88,8 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		costComponents = append(costComponents, wafWebACLUsageCostComponent(
 			region,
 			"Managed rule groups",
-			"months",
-			".*[^ShieldProtected]-RuleV2",
+			"groups",
+			"[A-Z0-9]*-(?!ShieldProtected-)RuleV2",
 			1,
 			decimalPtr(decimal.NewFromInt(int64(len(manageQuantity)))),
 		))
@@ -103,7 +103,7 @@ func NewWafv2WebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		region,
 		"Requests",
 		"1M requests",
-		".*[^ShieldProtected]-RequestV2-Tier1",
+		"[A-Z0-9]*-(?!ShieldProtected-)RequestV2-Tier1",
 		1000000,
 		monthlyRequests,
 	))
