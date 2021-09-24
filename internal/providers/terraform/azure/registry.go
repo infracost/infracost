@@ -246,6 +246,9 @@ var FreeResources = []string{
 	"azurerm_subnet_network_security_group_association",
 	"azurerm_virtual_network",
 	"azurerm_local_network_gateway",
+	"azurerm_nat_gateway_public_ip_association",
+	"azurerm_nat_gateway_public_ip_prefix_association",
+
 
 	// Azure Notification Hub
 	"azurerm_notification_hub",
