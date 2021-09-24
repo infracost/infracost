@@ -145,6 +145,7 @@ build_msg () {
 post_to_github () {
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     GITHUB_SHA=$(cat $GITHUB_EVENT_PATH | jq -r .pull_request.head.sha)
+    GITHUB_PULL_REQUEST_NUMBER=$(echo $github_event | jq -r .pull_request.number)
   fi
 
   if [ -z "$GITHUB_TOKEN" ]; then
@@ -156,6 +157,12 @@ post_to_github () {
       -H "Content-Type: application/json" \
       -H "Authorization: token $GITHUB_TOKEN" \
       "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
+    if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+      jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
+        -H "Content-Type: application/json" \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$GITHUB_PULL_REQUEST_NUMBER/comments"
+    fi
   fi
 }
 
