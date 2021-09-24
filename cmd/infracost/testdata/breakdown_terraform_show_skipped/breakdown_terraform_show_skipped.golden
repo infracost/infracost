@@ -8,12 +8,12 @@ Project: infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
  └─ Data processed                            Monthly cost depends on usage: $0.016 per GB   
                                                                                              
  azurerm_firewall.premium                                                                    
- ├─ Deployment (Premium)                                 730  hours                  $638.75 
- └─ Data processed                            Monthly cost depends on usage: $0.008 per GB   
+ ├─ Deployment (Premium)                                 730  hours                $1,277.50 
+ └─ Data processed                            Monthly cost depends on usage: $0.016 per GB   
                                                                                              
  azurerm_firewall.premium_virtual_hub                                                        
- ├─ Deployment (Premium Secured Virtual Hub)             730  hours                  $638.75 
- └─ Data processed                            Monthly cost depends on usage: $0.008 per GB   
+ ├─ Deployment (Premium Secured Virtual Hub)             730  hours                $1,277.50 
+ └─ Data processed                            Monthly cost depends on usage: $0.016 per GB   
                                                                                              
  azurerm_firewall.standard                                                                   
  ├─ Deployment (Standard)                                730  hours                  $912.50 
@@ -26,7 +26,7 @@ Project: infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
  azurerm_public_ip.example                                                                   
  └─ IP address (static)                                  730  hours                    $3.65 
                                                                                              
- OVERALL TOTAL                                                                     $4,018.65 
+ OVERALL TOTAL                                                                     $5,296.15 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
 
