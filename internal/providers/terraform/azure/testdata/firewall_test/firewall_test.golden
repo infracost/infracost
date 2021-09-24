@@ -6,12 +6,12 @@
  └─ Data processed                            Monthly cost depends on usage: $0.016 per GB   
                                                                                              
  azurerm_firewall.premium                                                                    
- ├─ Deployment (Premium)                                 730  hours                  $638.75 
- └─ Data processed                                    10,000  GB                      $80.00 
+ ├─ Deployment (Premium)                                 730  hours                $1,277.50 
+ └─ Data processed                                    10,000  GB                     $160.00 
                                                                                              
  azurerm_firewall.premium_virtual_hub                                                        
- ├─ Deployment (Premium Secured Virtual Hub)             730  hours                  $638.75 
- └─ Data processed                                    20,000  GB                     $160.00 
+ ├─ Deployment (Premium Secured Virtual Hub)             730  hours                $1,277.50 
+ └─ Data processed                                    20,000  GB                     $320.00 
                                                                                              
  azurerm_firewall.standard                                                                   
  ├─ Deployment (Standard)                                730  hours                  $912.50 
@@ -24,7 +24,7 @@
  azurerm_public_ip.example                                                                   
  └─ IP address (static)                                  730  hours                    $3.65 
                                                                                              
- OVERALL TOTAL                                                                     $4,738.65 
+ OVERALL TOTAL                                                                     $6,256.15 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
 
