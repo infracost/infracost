@@ -77,6 +77,7 @@ func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 		UsageSchema:    LaunchConfigurationUsageSchema,
 		CostComponents: instanceResource.CostComponents,
 		SubResources:   instanceResource.SubResources,
+		EstimateUsage:  instanceResource.EstimateUsage,
 	}
 
 	qty := int64(0)

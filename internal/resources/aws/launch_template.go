@@ -86,6 +86,7 @@ func (a *LaunchTemplate) BuildResource() *schema.Resource {
 		UsageSchema:    LaunchTemplateUsageSchema,
 		CostComponents: costComponents,
 		SubResources:   instanceResource.SubResources,
+		EstimateUsage:  instanceResource.EstimateUsage,
 	}
 
 	instanceCount := int64(0)
