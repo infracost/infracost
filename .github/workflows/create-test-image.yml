@@ -1,0 +1,27 @@
+name: Build and push docker infracost/infracost:test
+on:
+  workflow_dispatch
+jobs:
+  build:
+    name: Build and Push Docker test image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      - name: Build project
+        run: |
+          make build
+
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_ORG }}/${{ secrets.DOCKER_REPOSITORY }}
+          tags: test
+          tag_with_ref: true
+
