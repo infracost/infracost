@@ -292,6 +292,7 @@ var FreeResources = []string{
 	"azurerm_virtual_desktop_application_group",
 	"azurerm_virtual_desktop_workspace",
 	"azurerm_virtual_desktop_workspace_application_group_association",
+	"azurerm_virtual_desktop_host_pool",
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
