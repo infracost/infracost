@@ -284,10 +284,37 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		cmd.Flags().Changed("terraform-workspace") ||
 		cmd.Flags().Changed("terraform-use-state"))
 
-	if hasConfigFile && hasProjectFlags {
-		m := "--config-file flag cannot be used with the following flags: "
+	envProjectCfg := cfg.Projects[0]
+
+	hasProjectEnvs := envProjectCfg.Path != "" ||
+		envProjectCfg.TerraformBinary != "" ||
+		envProjectCfg.TerraformCloudHost != "" ||
+		envProjectCfg.TerraformWorkspace != "" ||
+		envProjectCfg.TerraformCloudToken != ""
+
+	projectCfg := &config.Project{}
+
+	if hasProjectFlags {
+		cfg.Projects = []*config.Project{
+			projectCfg,
+		}
+	}
+
+	if hasConfigFile && (hasProjectFlags || hasProjectEnvs) {
+		m := "--config-file flag cannot be used with the following flags or environement variables: "
 		m += "--path, --terraform-*, --usage-file"
 		ui.PrintUsageErrorAndExit(cmd, m)
+	}
+
+	if hasProjectFlags {
+		projectCfg.Path, _ = cmd.Flags().GetString("path")
+		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
+		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
+		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
+
+		if cmd.Flags().Changed("terraform-workspace") {
+			projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")
+		}
 	}
 
 	if hasConfigFile {
@@ -299,30 +326,11 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		}
 	}
 
-	projectCfg := &config.Project{}
-
-	if hasProjectFlags {
-		cfg.Projects = []*config.Project{
-			projectCfg,
-		}
-	}
-
 	if !hasConfigFile {
 		err := cfg.LoadFromEnv()
 
 		if err != nil {
 			return err
-		}
-	}
-
-	if hasProjectFlags {
-		projectCfg.Path, _ = cmd.Flags().GetString("path")
-		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
-		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
-		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
-
-		if cmd.Flags().Changed("terraform-workspace") {
-			projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")
 		}
 	}
 
