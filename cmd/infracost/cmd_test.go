@@ -4,13 +4,15 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/infracost/infracost/cmd/infracost"
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/testutil"
-	"github.com/stretchr/testify/require"
+	"os"
 	"path/filepath"
 	"regexp"
 	"testing"
+
+	main "github.com/infracost/infracost/cmd/infracost"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/testutil"
+	"github.com/stretchr/testify/require"
 )
 
 var timestampRegex = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]{3})?)`)
@@ -34,6 +36,9 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 	if options == nil {
 		options = DefaultOptions()
 	}
+	
+	// Fix the VCS repo URL so the golden files don't fail on forks
+	os.Setenv("INFRACOST_VCS_REPOSITORY_URL", "https://github.com/infracost/infracost.git")
 
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	require.Nil(t, err)
@@ -83,7 +88,6 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 
 	// strip out any timestamps
 	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
-	actual = vcsRepoURLRegex.ReplaceAll(actual, []byte(`"vcsRepoUrl": "REPLACED"`))
 
 	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
