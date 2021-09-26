@@ -275,7 +275,8 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file\n - Terraform state JSON file"
 		m += "\n\nAlternatively, use --config-file to process multiple projects, see https://infracost.io/config-file"
 
-		ui.PrintUsageErrorAndExit(cmd, m)
+		ui.PrintUsage(cmd)
+		return errors.New(m)
 	}
 
 	hasProjectFlags := (hasPathFlag ||
@@ -295,7 +296,8 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	if hasConfigFile && (hasProjectFlags || hasProjectEnvs) {
 		m := "--config-file flag cannot be used with the following flags or equivalent environment variables: "
 		m += "--path, --terraform-*, --usage-file"
-		ui.PrintUsageErrorAndExit(cmd, m)
+		ui.PrintUsage(cmd)
+		return errors.New(m)
 	}
 
 	if hasProjectFlags {

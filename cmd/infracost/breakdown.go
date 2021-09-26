@@ -35,7 +35,8 @@ func breakdownCmd(ctx *config.RunContext) *cobra.Command {
 
 			err = checkRunConfig(cmd.ErrOrStderr(), ctx.Config)
 			if err != nil {
-				ui.PrintUsageErrorAndExit(cmd, err.Error())
+				ui.PrintUsage(cmd)
+				return err
 			}
 
 			return runMain(cmd, ctx)
