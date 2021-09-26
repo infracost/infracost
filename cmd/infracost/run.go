@@ -293,7 +293,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		projectCfg.TerraformCloudToken != ""
 
 	if hasConfigFile && (hasProjectFlags || hasProjectEnvs) {
-		m := "--config-file flag cannot be used with the following flags or environement variables: "
+		m := "--config-file flag cannot be used with the following flags or equivalent environment variables: "
 		m += "--path, --terraform-*, --usage-file"
 		ui.PrintUsageErrorAndExit(cmd, m)
 	}
