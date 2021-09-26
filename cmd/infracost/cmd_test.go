@@ -16,7 +16,6 @@ import (
 )
 
 var timestampRegex = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]{3})?)`)
-var vcsRepoURLRegex = regexp.MustCompile(`"vcsRepoUrl": "[^"]*"`)
 
 type GoldenFileOptions = struct {
 	Currency    string
@@ -36,7 +35,7 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 	if options == nil {
 		options = DefaultOptions()
 	}
-	
+
 	// Fix the VCS repo URL so the golden files don't fail on forks
 	os.Setenv("INFRACOST_VCS_REPOSITORY_URL", "https://github.com/infracost/infracost.git")
 
@@ -62,10 +61,10 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 		testutil.ConfigureTestToFailOnLogs(t, runCtx)
 	}
 
-	err = rootCmd.Execute()
-	require.Nil(t, err)
-
+	var cmdErr error
 	var actual []byte
+
+	cmdErr = rootCmd.Execute()
 
 	if options.IsJSON {
 		prettyBuf := bytes.NewBuffer([]byte{})
@@ -76,9 +75,20 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 		actual = outBuf.Bytes()
 	}
 
+	var errBytes []byte
+
 	if errBuf != nil && errBuf.Len() > 0 {
+		errBytes = append(errBytes, errBuf.Bytes()...)
+	}
+
+	if cmdErr != nil {
+		errBytes = append(errBytes, []byte("Error: ")...)
+		errBytes = append(errBytes, cmdErr.Error()...)
+	}
+
+	if len(errBytes) > 0 {
 		actual = append(actual, "\nErr:\n"...)
-		actual = append(actual, errBuf.Bytes()...)
+		actual = append(actual, errBytes...)
 	}
 
 	if logBuf != nil && logBuf.Len() > 0 {

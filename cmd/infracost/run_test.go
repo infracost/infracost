@@ -1,0 +1,30 @@
+package main_test
+
+import (
+	"os"
+	"testing"
+
+	"github.com/infracost/infracost/internal/testutil"
+)
+
+func TestFlagErrorsNoPath(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown"}, nil)
+}
+
+func TestFlagErrorsPathAndConfigFile(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform/plan.json", "--config-file", "infracost-config.yml"}, nil)
+}
+
+func TestFlagErrorsConfigFileAndTerraformWorkspace(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", "./testdata/infracost-config.yml", "--terraform-workspace", "dev"}, nil)
+}
+
+func TestFlagErrorsConfigFileAndTerraformWorkspaceEnv(t *testing.T) {
+	os.Setenv("INFRACOST_TERRAFORM_WORKSPACE", "dev")
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", "./testdata/infracost-config.yml"}, nil)
+}
+
+func TestFlagErrorsTerraformWorkspaceFlagAndEnv(t *testing.T) {
+	os.Setenv("INFRACOST_TERRAFORM_WORKSPACE", "dev")
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform", "--terraform-workspace", "prod"}, nil)
+}
