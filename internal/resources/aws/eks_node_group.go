@@ -48,6 +48,8 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 		UsageSchema: EKSNodeGroupUsageSchema,
 	}
 
+	var estimateInstanceQualities schema.EstimateFunc
+
 	// The EKS Node Group resource either has the instance attributes inline or a reference to a Launch Template.
 	// If it has a reference to a Launch Template we create generic resources for that and add add it as a subresource
 	// of the EKS Node Group resource.
@@ -58,6 +60,7 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 			return nil
 		}
 		r.SubResources = append(r.SubResources, lt)
+		estimateInstanceQualities = lt.EstimateUsage
 	} else {
 		instance := &Instance{
 			Region:                        a.Region,
@@ -90,6 +93,7 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 				r.SubResources = append(r.SubResources, subResource)
 			}
 		}
+		estimateInstanceQualities = instanceResource.EstimateUsage
 
 		qty := int64(0)
 		if a.InstanceCount != nil {
@@ -97,6 +101,10 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 		}
 		schema.MultiplyQuantities(r, decimal.NewFromInt(qty))
 	}
+
+	// for now, just delegate OS detection to subresources
+	// later: node count, etc
+	r.EstimateUsage = estimateInstanceQualities
 
 	return r
 }
