@@ -40,7 +40,7 @@ func stubDescribeImages(stub *stubbedAWS, ami string, usageOp string) {
 	stub.WhenBody(body).Then(200, response)
 }
 
-func TestInstanceUsageOperation(t *testing.T) {
+func TestInstanceOS(t *testing.T) {
 	stub := stubAWS(t)
 	defer stub.Close()
 
