@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"context"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -57,5 +59,8 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 		UsageSchema:    AutoscalingGroupUsageSchema,
 		CostComponents: costComponents,
 		SubResources:   subResources,
+		EstimateUsage: func(ctx context.Context, u map[string]interface{}) error {
+			return subResources[0].EstimateUsage(ctx, u)
+		},
 	}
 }

@@ -76,6 +76,7 @@ func newLaunchConfiguration(d *schema.ResourceData, u *schema.UsageData, region 
 	a := &aws.LaunchConfiguration{
 		Address:          d.Address,
 		Region:           region,
+		AMI:              d.Get("image_id").String(),
 		InstanceCount:    intPtr(instanceCount),
 		Tenancy:          d.Get("placement_tenancy").String(),
 		PurchaseOption:   purchaseOption,
@@ -118,6 +119,7 @@ func newLaunchTemplate(d *schema.ResourceData, u *schema.UsageData, region strin
 	a := &aws.LaunchTemplate{
 		Address:                          d.Address,
 		Region:                           region,
+		AMI:                              d.Get("image_id").String(),
 		InstanceCount:                    intPtr(instanceCount),
 		OnDemandBaseCount:                onDemandBaseCount,
 		OnDemandPercentageAboveBaseCount: onDemandPercentageAboveBaseCount,

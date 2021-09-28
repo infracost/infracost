@@ -13,6 +13,7 @@ type LaunchTemplate struct {
 	// "required" args that can't really be missing.
 	Address                          string
 	Region                           string
+	AMI                              string
 	OnDemandBaseCount                int64
 	OnDemandPercentageAboveBaseCount int64
 	Tenancy                          string
@@ -58,6 +59,7 @@ func (a *LaunchTemplate) BuildResource() *schema.Resource {
 	instance := &Instance{
 		Region:                          a.Region,
 		Tenancy:                         a.Tenancy,
+		AMI:                             a.AMI,
 		InstanceType:                    a.InstanceType,
 		EBSOptimized:                    a.EBSOptimized,
 		EnableMonitoring:                a.EnableMonitoring,
