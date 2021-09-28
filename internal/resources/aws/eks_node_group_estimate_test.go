@@ -6,29 +6,24 @@ import (
 	resources "github.com/infracost/infracost/internal/resources/aws"
 )
 
-// Tests LaunchConfiguration as a side effect.
-func TestAutoscalingGroupOSWithLaunchConfiguration(t *testing.T) {
+func TestEKSNodeGroupOS(t *testing.T) {
 	stub := stubAWS(t)
 	defer stub.Close()
 
-	stubDescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002")
-
-	args := resources.AutoscalingGroup{
-		LaunchConfiguration: &resources.LaunchConfiguration{AMI: "ami-0227c65b90645ae0c"},
-	}
+	args := resources.EKSNodeGroup{}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
-	estimates.mustHave("operating_system", "windows")
+	estimates.mustHave("operating_system", "linux")
 }
 
 // Tests LaunchTemplate as a side effect.
-func TestAutoscalingGroupOSWithLaunchTemplate(t *testing.T) {
+func TestEKSNodeGroupOSWithLaunchTemplate(t *testing.T) {
 	stub := stubAWS(t)
 	defer stub.Close()
 
 	stubDescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002")
 
-	args := resources.AutoscalingGroup{
+	args := resources.EKSNodeGroup{
 		LaunchTemplate: &resources.LaunchTemplate{AMI: "ami-0227c65b90645ae0c"},
 	}
 	resource := args.BuildResource()

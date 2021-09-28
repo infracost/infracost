@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"context"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -102,9 +104,16 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 		schema.MultiplyQuantities(r, decimal.NewFromInt(qty))
 	}
 
-	// for now, just delegate OS detection to subresources
-	// later: node count, etc
-	r.EstimateUsage = estimateInstanceQualities
+	estimate := func(ctx context.Context, u map[string]interface{}) error {
+		err := estimateInstanceQualities(ctx, u)
+		// By default (no LaunchTemplate), instances use Amazon Linux 2 AMI."
+		// c.f. https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html
+		if _, ok := u["operating_system"]; !ok {
+			u["operating_system"] = "linux"
+		}
+		return err
+	}
+	r.EstimateUsage = estimate
 
 	return r
 }
