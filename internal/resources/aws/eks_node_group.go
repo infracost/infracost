@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"context"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -48,6 +50,8 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 		UsageSchema: EKSNodeGroupUsageSchema,
 	}
 
+	var estimateInstanceQualities schema.EstimateFunc
+
 	// The EKS Node Group resource either has the instance attributes inline or a reference to a Launch Template.
 	// If it has a reference to a Launch Template we create generic resources for that and add add it as a subresource
 	// of the EKS Node Group resource.
@@ -58,6 +62,7 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 			return nil
 		}
 		r.SubResources = append(r.SubResources, lt)
+		estimateInstanceQualities = lt.EstimateUsage
 	} else {
 		instance := &Instance{
 			Region:                        a.Region,
@@ -90,6 +95,7 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 				r.SubResources = append(r.SubResources, subResource)
 			}
 		}
+		estimateInstanceQualities = instanceResource.EstimateUsage
 
 		qty := int64(0)
 		if a.InstanceCount != nil {
@@ -97,6 +103,17 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 		}
 		schema.MultiplyQuantities(r, decimal.NewFromInt(qty))
 	}
+
+	estimate := func(ctx context.Context, u map[string]interface{}) error {
+		err := estimateInstanceQualities(ctx, u)
+		// By default (no LaunchTemplate), instances use Amazon Linux 2 AMI."
+		// c.f. https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html
+		if _, ok := u["operating_system"]; !ok {
+			u["operating_system"] = "linux"
+		}
+		return err
+	}
+	r.EstimateUsage = estimate
 
 	return r
 }

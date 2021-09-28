@@ -15,6 +15,7 @@ type LaunchConfiguration struct {
 	Region           string
 	Tenancy          string
 	PurchaseOption   string
+	AMI              string
 	InstanceType     string
 	EBSOptimized     bool
 	EnableMonitoring bool
@@ -56,6 +57,7 @@ func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 		Region:                          a.Region,
 		Tenancy:                         a.Tenancy,
 		PurchaseOption:                  a.PurchaseOption,
+		AMI:                             a.AMI,
 		InstanceType:                    a.InstanceType,
 		EBSOptimized:                    a.EBSOptimized,
 		EnableMonitoring:                a.EnableMonitoring,
@@ -77,6 +79,7 @@ func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 		UsageSchema:    LaunchConfigurationUsageSchema,
 		CostComponents: instanceResource.CostComponents,
 		SubResources:   instanceResource.SubResources,
+		EstimateUsage:  instanceResource.EstimateUsage,
 	}
 
 	qty := int64(0)

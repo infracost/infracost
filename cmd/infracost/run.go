@@ -251,17 +251,19 @@ func summarizeUsage(ctx *config.ProjectContext, syncResult *usage.SyncResult) {
 }
 
 func remediateUsage(runCtx *config.RunContext, ctx *config.ProjectContext, syncResult *usage.SyncResult) {
-	var remAttempts, remErrors int
-	for name, err := range syncResult.EstimationErrors {
-		if remediater, ok := err.(schema.Remediater); ok {
-			remAttempts++
-			err = remediater.Remediate()
-			if err != nil {
-				remErrors++
-				log.Warningf("Cannot enable estimation for %s: %s", name, err.Error())
-			}
+	var remediable, remAttempts, remErrors int
+	for _, err := range syncResult.EstimationErrors {
+		if _, ok := err.(schema.Remediater); ok {
+			remediable++
+			// remAttempts++
+			// err = remediater.Remediate()
+			// if err != nil {
+			// 	remErrors++
+			// 	log.Warningf("Cannot enable estimation for %s: %s", name, err.Error())
+			// }
 		}
 	}
+	ctx.SetContextValue("remediationOpportunities", remediable)
 	ctx.SetContextValue("remediationAttempts", remAttempts)
 	ctx.SetContextValue("remediationErrors", remErrors)
 }

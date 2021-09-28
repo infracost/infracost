@@ -35,6 +35,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		Region:           region,
 		Tenancy:          d.Get("tenancy").String(),
 		PurchaseOption:   purchaseOption,
+		AMI:              d.Get("ami").String(),
 		InstanceType:     d.Get("instance_type").String(),
 		EBSOptimized:     d.Get("ebs_optimized").Bool(),
 		EnableMonitoring: d.Get("monitoring").Bool(),
