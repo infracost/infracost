@@ -41,9 +41,16 @@ resource "azurerm_app_service_custom_hostname_binding" "example" {
   resource_group_name = azurerm_resource_group.example.name
   ssl_state           = "IpBasedEnabled"
 }
+
 resource "azurerm_app_service_custom_hostname_binding" "example1" {
   hostname            = "www.mywebsite.com"
   app_service_name    = azurerm_app_service.example.name
   resource_group_name = azurerm_resource_group.example.name
   ssl_state           = "SniEnabled"
+}
+
+resource "azurerm_app_service_custom_hostname_binding" "no_ssl_state" {
+  hostname            = "www.mywebsite.com"
+  app_service_name    = azurerm_app_service.example.name
+  resource_group_name = azurerm_resource_group.example.name
 }

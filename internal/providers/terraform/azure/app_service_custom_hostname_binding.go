@@ -28,18 +28,12 @@ func NewAzureRMAppServiceCustomHostnameBinding(d *schema.ResourceData, u *schema
 	}
 	if d.Get("ssl_state").Type != gjson.Null {
 		sslState = d.Get("ssl_state").String()
-	} else {
-		// returning directly since SNI is currently defined as free in the Azure cost page
-		return &schema.Resource{
-			NoPrice:   true,
-			IsSkipped: true,
-		}
 	}
 
 	// The two approved values are IpBasedEnabled or SniEnabled
-	sslState = strings.ToUpper(sslState)[0:2]
+	sslState = strings.ToUpper(sslState)
 
-	if sslState == "IP" {
+	if strings.HasPrefix(sslState, "IP") {
 		sslType = "IP"
 	} else {
 		// returning directly since SNI is currently defined as free in the Azure cost page
