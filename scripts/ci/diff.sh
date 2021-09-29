@@ -197,7 +197,7 @@ post_to_github_pull_request () {
 
   msg="$(build_msg true)"
 
-  if [ "${latest_pr_comment}" != "" ]; then
+  if [ "${latest_pr_comment}" != "null" ]; then
     if [ "${msg}" != "$(echo $latest_pr_comment | jq -r .body)" ]; then
       local comment_id=$(echo $latest_pr_comment | jq -r .id)
       echo "Updating comment $comment_id for pull request $GITHUB_PULL_REQUEST_NUMBER."
