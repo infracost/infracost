@@ -99,6 +99,7 @@ format_cost () {
   fi
 }
 
+MSG_START="💰 Infracost estimate:"
 build_msg () {
   include_html=$1
   
@@ -117,7 +118,7 @@ build_msg () {
     percent_display=" (${change_sym}${percent_display}%%)"
   fi
   
-  msg="💰 Infracost estimate: **monthly cost will ${change_word} by $(format_cost $diff_cost)$percent_display** ${change_emoji}\n"
+  msg="${MSG_START} **monthly cost will ${change_word} by $(format_cost $diff_cost)$percent_display** ${change_emoji}\n"
   msg="${msg}\n"
   msg="${msg}Previous monthly cost: $(format_cost $past_total_monthly_cost)\n"
   msg="${msg}New monthly cost: $(format_cost $total_monthly_cost)\n"
@@ -143,26 +144,74 @@ build_msg () {
 }
 
 post_to_github () {
-  if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
-    GITHUB_SHA=$(cat $GITHUB_EVENT_PATH | jq -r .pull_request.head.sha)
-    GITHUB_PULL_REQUEST_NUMBER=$(echo $github_event | jq -r .pull_request.number)
-  fi
-
   if [ -z "$GITHUB_TOKEN" ]; then
     echo "Error: GITHUB_TOKEN is required to post comment to GitHub"
   else
-    echo "Posting comment to GitHub commit $GITHUB_SHA"
-    msg="$(build_msg true)"
+    if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+      GITHUB_PULL_REQUEST_NUMBER=$(echo $github_event | jq -r .pull_request.number)
+      post_to_github_pull_request
+    else
+      post_to_github_commit
+    fi
+  fi
+}
+
+post_to_github_commit () {
+  echo "Posting comment to GitHub commit $GITHUB_SHA"
+  msg="$(build_msg true)"
+  jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
+    -H "Content-Type: application/json" \
+    -H "Authorization: token $GITHUB_TOKEN" \
+    "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
+}
+
+fetch_existing_github_pull_request_comments() {
+  pull_request_comments=() # empty array
+
+  local infra_comments="[]"
+  local PER_PAGE=100
+  local page=0
+  local respLength=0
+  while ((page == 0)) || ((respLength == PER_PAGE)); do
+    ((page++))
+    echo "$MSG_START"
+    echo "Fetching comments for pull request $GITHUB_PULL_REQUEST_NUMBER, $page"
+    local resp=$(
+      curl -L --retry 3 \
+      -H "Content-Type: application/json" \
+      -H "Authorization: token $GITHUB_TOKEN" \
+      "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$GITHUB_PULL_REQUEST_NUMBER/comments?page=$page&per_page=$PER_PAGE"
+    )
+
+    infra_comments=${infra_comments},$(echo ${resp} | jq "[.[] | select(.body | contains(\"${MSG_START}\"))]")
+
+    respLength=`echo $resp | jq length`
+  done
+
+  pull_request_comments=$(echo "[$infra_comments]" | jq 'flatten(1)')
+}
+
+post_to_github_pull_request () {
+  fetch_existing_github_pull_request_comments
+  local latest_pr_comment=`echo $pull_request_comments | jq last`
+
+  if [ "${latest_pr_comment}" != "" ]; then
+    if [ "${msg}" == "$(echo $latest_pr_comment | jq -r .body)" ]; then
+      local comment_id=$(echo $latest_pr_comment | jq -r .id)
+      echo "Updating comment $comment_id for pull request $GITHUB_PULL_REQUEST_NUMBER."
+      jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L --retry 3 -X PATCH -d @- \
+        -H "Content-Type: application/json" \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/comments/$comment_id"
+    else
+      echo "Skipping comment for pull request $GITHUB_PULL_REQUEST_NUMBER, no change in msg."
+    fi
+  else
+    echo "Creating new comment for pull request $GITHUB_PULL_REQUEST_NUMBER."
     jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
       -H "Content-Type: application/json" \
       -H "Authorization: token $GITHUB_TOKEN" \
-      "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
-    if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
-      jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
-        -H "Content-Type: application/json" \
-        -H "Authorization: token $GITHUB_TOKEN" \
-        "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$GITHUB_PULL_REQUEST_NUMBER/comments"
-    fi
+      "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$GITHUB_PULL_REQUEST_NUMBER/comments"
   fi
 }
 
