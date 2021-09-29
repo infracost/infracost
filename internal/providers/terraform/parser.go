@@ -17,10 +17,20 @@ import (
 
 // These show differently in the plan JSON for Terraform 0.12 and 0.13.
 var infracostProviderNames = []string{"infracost", "registry.terraform.io/infracost/infracost"}
+
 var defaultProviderRegions = map[string]string{
-	"aws":     "us-east-1",
-	"google":  "us-central1",
-	"azurerm": "eastus",
+	"aws":      "us-east-1",
+	"google":   "us-central1",
+	"azurerm":  "eastus",
+	"scaleway": "fr-par-1",
+}
+
+// Map the Terraform configuration key used to specify the region
+var providerRegionKeys = map[string]string{
+	"aws":      "region",
+	"google":   "region",
+	"azurerm":  "region",
+	"scaleway": "zone",
 }
 
 // ARN attribute mapping for resources that don't have a standard 'arn' attribute
@@ -202,7 +212,9 @@ func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Re
 			region = providerRegion(addr, providerConf, vars, t, resConf)
 		}
 
-		v = schema.AddRawValue(v, "region", region)
+		// Get the provider name to read the region key
+		providerPrefix := strings.Split(t, "_")[0]
+		v = schema.AddRawValue(v, providerRegionKeys[providerPrefix], region)
 
 		tags := parseTags(t, v)
 
@@ -302,10 +314,10 @@ func parseProviderKey(resConf gjson.Result) string {
 
 func parseRegion(providerConf gjson.Result, vars gjson.Result, providerKey string) string {
 	// Try to get constant value
-	region := providerConf.Get(fmt.Sprintf("%s.expressions.region.constant_value", gjsonEscape(providerKey))).String()
+	region := providerConf.Get(fmt.Sprintf("%s.expressions.%s.constant_value", gjsonEscape(providerKey), providerRegionKeys[providerKey])).String()
 	if region == "" {
 		// Try to get reference
-		refName := providerConf.Get(fmt.Sprintf("%s.expressions.region.references.0", gjsonEscape(providerKey))).String()
+		refName := providerConf.Get(fmt.Sprintf("%s.expressions.%s.references.0", gjsonEscape(providerKey), providerRegionKeys[providerKey])).String()
 		splitRef := strings.Split(refName, ".")
 
 		if splitRef[0] == "var" {
