@@ -10,6 +10,7 @@ require (
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.9.1
 	github.com/aws/aws-sdk-go-v2/config v1.8.2
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.12.1
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.8.1
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.5.1
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.18.0
