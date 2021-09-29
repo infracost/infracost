@@ -198,7 +198,9 @@ post_to_github_pull_request () {
   msg="$(build_msg true)"
 
   if [ "${latest_pr_comment}" != "null" ]; then
-    if [ "${msg}" != "$(echo $latest_pr_comment | jq -r .body)" ]; then
+    existing_msg=$(echo $latest_pr_comment | jq -r .body)
+    # '// /' does a string substitution that removes spaces before comparison
+    if [ "${msg// /}" != "${existing_msg// /}" ]; then
       local comment_id=$(echo $latest_pr_comment | jq -r .id)
       echo "Updating comment $comment_id for pull request $GITHUB_PULL_REQUEST_NUMBER."
       jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L --retry 3 -X PATCH -d @- \
