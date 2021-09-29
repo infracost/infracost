@@ -166,7 +166,7 @@ post_to_github_commit () {
 }
 
 fetch_existing_github_pull_request_comments() {
-  pull_request_comments=() # empty array
+  pull_request_comments="[]" # empty array
 
   local infra_comments="[]"
   local PER_PAGE=100
@@ -196,7 +196,7 @@ post_to_github_pull_request () {
   local latest_pr_comment=`echo $pull_request_comments | jq last`
 
   if [ "${latest_pr_comment}" != "" ]; then
-    if [ "${msg}" == "$(echo $latest_pr_comment | jq -r .body)" ]; then
+    if [ "${msg}" != "$(echo $latest_pr_comment | jq -r .body)" ]; then
       local comment_id=$(echo $latest_pr_comment | jq -r .id)
       echo "Updating comment $comment_id for pull request $GITHUB_PULL_REQUEST_NUMBER."
       jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L --retry 3 -X PATCH -d @- \
