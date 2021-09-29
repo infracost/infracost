@@ -174,7 +174,7 @@ fetch_existing_github_pull_request_comments() {
   local respLength=0
   while ((page == 0)) || ((respLength == PER_PAGE)); do
     page=$((page+1))
-    echo "$MSG_START"
+
     echo "Fetching comments for pull request $GITHUB_PULL_REQUEST_NUMBER, $page"
     local resp=$(
       curl -L --retry 3 \
@@ -194,6 +194,8 @@ fetch_existing_github_pull_request_comments() {
 post_to_github_pull_request () {
   fetch_existing_github_pull_request_comments
   local latest_pr_comment=`echo $pull_request_comments | jq last`
+
+  msg="$(build_msg true)"
 
   if [ "${latest_pr_comment}" != "" ]; then
     if [ "${msg}" != "$(echo $latest_pr_comment | jq -r .body)" ]; then
