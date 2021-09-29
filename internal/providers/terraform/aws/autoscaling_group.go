@@ -26,12 +26,15 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 }
 
 func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	instanceCount := d.Get("desired_capacity").Int()
 	a := &aws.AutoscalingGroup{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
+		Name:    d.Get("name").String(),
 	}
-
-	instanceCount := d.Get("desired_capacity").Int()
+	if instanceCount > 0 {
+		a.DesiredCapacity = &instanceCount
+	}
 
 	// The Autoscaling Group resource has either a Launch Configuration or Launch Template sub-resource.
 	// So we create generic resources for these and add them as a subresource of the Autoscaling Group resource.
