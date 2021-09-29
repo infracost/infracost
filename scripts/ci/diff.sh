@@ -1,4 +1,4 @@
-#!/bin/sh -le
+#!/bin/bash -le
 
 # This script is used in infracost CI/CD integrations. It posts pull-request comments showing cost estimate diffs.
 # Usage docs: https://www.infracost.io/docs/integrations/cicd
@@ -173,7 +173,7 @@ fetch_existing_github_pull_request_comments() {
   local page=0
   local respLength=0
   while ((page == 0)) || ((respLength == PER_PAGE)); do
-    ((page++))
+    page=$((page+1))
     echo "$MSG_START"
     echo "Fetching comments for pull request $GITHUB_PULL_REQUEST_NUMBER, $page"
     local resp=$(
