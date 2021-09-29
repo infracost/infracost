@@ -1,0 +1,13 @@
+
+ Name                                            Monthly Qty  Unit   Monthly Cost 
+                                                                                  
+ azurerm_bastion_host.example                                                     
+ ├─ Azure Bastion (Basic)                                730  hours       $138.70 
+ ├─ Outbound data transfer (first 10TB) (Basic)       10,000  GB        $1,200.00 
+ ├─ Outbound data transfer (next 40TB) (Basic)        50,000  GB        $4,250.00 
+ └─ Outbound data transfer (next 100TB) (Basic)       40,000  GB        $3,280.00 
+                                                                                  
+ azurerm_public_ip.deploy                                                         
+ └─ IP address (static)                                  730  hours         $3.65 
+                                                                                  
+ OVERALL TOTAL                                                          $8,872.35 

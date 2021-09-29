@@ -22,6 +22,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAutomationDscConfigurationRegistryItem(),
 	GetAzureRMAutomationDscNodeconfigurationRegistryItem(),
 	GetAzureRMAutomationJobScheduleRegistryItem(),
+	GetAzureRMBastionHostRegistryItem(),
 	GetAzureRMCDNEndpointRegistryItem(),
 	GetAzureRMContainerRegistryRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
