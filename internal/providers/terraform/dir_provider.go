@@ -406,7 +406,7 @@ func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile st
 }
 
 func IsTerraformDir(path string) bool {
-	for _, ext := range []string{"tf", "hcl", "hcl.json", "tf.json"} {
+	for _, ext := range []string{"tf", "tf.json"} {
 		matches, err := filepath.Glob(filepath.Join(path, fmt.Sprintf("*.%s", ext)))
 		if matches != nil && err == nil {
 			return true
