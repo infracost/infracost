@@ -138,6 +138,7 @@ build_msg () {
   
   if [ "$include_html" = true ]; then
     msg="${msg}</details>\n"
+    msg="${msg}<sub><a href='https://infracost.io/feedback' rel='noopener noreferrer' target='_blank'>How can this comment be more helpful?</a></sub>"
   fi
   
   printf "$msg"
