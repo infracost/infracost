@@ -425,7 +425,7 @@ When Infracost is run with the `--usage-file=path/to/infracost-usage.yml` flag t
 
 The following notes are general guidelines, please leave a comment in your pull request if they don't make sense or they can be improved for the resource you're adding.
 
-- references to other resources: if you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. The following example uses this because the price for `aws_ebs_snapshot` depends on the size of the referenced volume. You should always check the array length returned by `d.References` to avoid panics.
+- references to other resources: if you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. The following example uses this because the price for `aws_ebs_snapshot` depends on the size of the referenced volume. You should always check the array length returned by `d.References` to avoid panics. You can also do nested lookups, e.g. `ReferenceAttributes: []string{"alias.0.name"}` to lookup the name of the first alias.
 	```go
 	func GetEBSSnapshotRegistryItem() *schema.RegistryItem {
 		return &schema.RegistryItem{
