@@ -68,7 +68,7 @@ func (r *Resource) CalculateCosts() {
 		r.HourlyCost = &h
 		r.MonthlyCost = &m
 	}
-	if r.NoPrice && r.IsSkipped {
+	if r.NoPrice {
 		log.Debugf("No Price or skipped resource in the terraform file %s", r.Name)
 	}
 }
