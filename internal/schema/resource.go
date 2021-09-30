@@ -69,7 +69,7 @@ func (r *Resource) CalculateCosts() {
 		r.MonthlyCost = &m
 	}
 	if !hasCost {
-		log.Debugf("free resource in the terraform file", r.Name)
+		log.Debugf("Free resource in the terraform file %s", r.Name)
 	}
 }
 
