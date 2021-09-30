@@ -1,9 +1,11 @@
 package schema
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 )
 
 var HourToMonthUnitMultiplier = decimal.NewFromInt(730)
@@ -67,6 +69,9 @@ func (r *Resource) CalculateCosts() {
 		r.HourlyCost = &h
 		r.MonthlyCost = &m
 	}
+	if !hasCost {
+		log.Debugf("free resource in the terraform file", r.Name)
+	}
 }
 
 func (r *Resource) FlattenedSubResources() []*Resource {
@@ -87,6 +92,7 @@ func (r *Resource) RemoveCostComponent(costComponent *CostComponent) {
 	n := make([]*CostComponent, 0, len(r.CostComponents)-1)
 	for _, c := range r.CostComponents {
 		if c != costComponent {
+			fmt.Println("removeCostComponent", c)
 			n = append(n, c)
 		}
 	}
