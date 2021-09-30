@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"fmt"
 	"sort"
 
 	"github.com/shopspring/decimal"
@@ -92,7 +91,6 @@ func (r *Resource) RemoveCostComponent(costComponent *CostComponent) {
 	n := make([]*CostComponent, 0, len(r.CostComponents)-1)
 	for _, c := range r.CostComponents {
 		if c != costComponent {
-			fmt.Println("removeCostComponent", c)
 			n = append(n, c)
 		}
 	}
