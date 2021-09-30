@@ -148,8 +148,7 @@ post_to_github () {
   if [ -z "$GITHUB_TOKEN" ]; then
     echo "Error: GITHUB_TOKEN is required to post comment to GitHub"
   else
-    if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
-      GITHUB_PULL_REQUEST_NUMBER=$(echo $github_event | jq -r .pull_request.number)
+    if [ ! -z "$GITHUB_PULL_REQUEST_NUMBER" ] && [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
       post_to_github_pull_request
     else
       post_to_github_commit
@@ -280,6 +279,7 @@ post_to_azure_devops () {
       echo "Posting comment to Azure DevOps GitHub pull-request $SYSTEM_PULLREQUEST_PULLREQUESTNUMBER"
       GITHUB_REPOSITORY=$BUILD_REPOSITORY_NAME
       GITHUB_SHA=$SYSTEM_PULLREQUEST_SOURCECOMMITID
+      GITHUB_PULL_REQUEST_NUMBER=$SYSTEM_PULLREQUEST_PULLREQUESTNUMBER
       post_to_github
     elif [ "$BUILD_REPOSITORY_PROVIDER" = "TfsGit" ]; then
       # See https://docs.microsoft.com/en-us/javascript/api/azure-devops-extension-api/commentthreadstatus
@@ -313,6 +313,7 @@ load_github_env () {
 
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     GITHUB_SHA=$(echo $github_event | jq -r .pull_request.head.sha)
+    GITHUB_PULL_REQUEST_NUMBER=$(echo $github_event | jq -r .pull_request.number)
     export VCS_PULL_REQUEST_URL=$(echo $github_event | jq -r .pull_request.html_url)
   else
     export VCS_PULL_REQUEST_URL=$(curl -s \
