@@ -138,7 +138,7 @@ build_msg () {
   
   if [ "$include_html" = true ]; then
     msg="${msg}</details>\n"
-    msg="${msg}<sub><a href='https://infracost.io/feedback' rel='noopener noreferrer' target='_blank'>How can this comment be more helpful?</a></sub>"
+    msg="${msg}<sub><a href='https://infracost.io/feedback' rel='noopener noreferrer' target='_blank'>How can this comment be more helpful?</a></sub>\n"
   fi
   
   printf "$msg"
@@ -197,6 +197,8 @@ post_to_github_pull_request () {
   local latest_pr_comment=`echo $pull_request_comments | jq last`
 
   msg="$(build_msg true)"
+  msg="${msg}\n"
+  msg="${msg}This comment will be updated when the cost estimate changes.\n"
 
   if [ "${latest_pr_comment}" != "null" ]; then
     existing_msg=$(echo $latest_pr_comment | jq -r .body)
