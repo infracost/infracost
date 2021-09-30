@@ -4,6 +4,7 @@ import (
 	"sort"
 
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 )
 
 var HourToMonthUnitMultiplier = decimal.NewFromInt(730)
@@ -66,6 +67,9 @@ func (r *Resource) CalculateCosts() {
 	if hasCost {
 		r.HourlyCost = &h
 		r.MonthlyCost = &m
+	}
+	if r.NoPrice {
+		log.Debugf("No Price or skipped resource in the terraform file %s", r.Name)
 	}
 }
 
