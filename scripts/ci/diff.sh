@@ -408,7 +408,7 @@ diff_resources=$(jq '[.projects[].diff.resources[]] | add' infracost_breakdown.j
 
 if [ "$(echo "$post_condition" | jq '.always')" = "true" ]; then
   echo "Posting comment as post_condition is set to always"
-elif if [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
+elif [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
   if [ "$diff_resources" = "null" ]; then
     echo "Not posting comment as post_condition is set to update but there is no diff"
     cleanup
