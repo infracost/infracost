@@ -240,13 +240,15 @@ post_bitbucket_comment () {
 
 post_to_circle_ci () {
   if echo $CIRCLE_REPOSITORY_URL | grep -Eiq github; then
-    echo "Posting comment from CircleCI to GitHub commit $CIRCLE_SHA1"
-    msg="$(build_msg true)"
-    jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
-      -H "Content-Type: application/json" \
-      -H "Authorization: token $GITHUB_TOKEN" \
-      "$GITHUB_API_URL/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commits/$CIRCLE_SHA1/comments"
-
+    GITHUB_REPOSITORY="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
+    GITHUB_SHA=$CIRCLE_SHA1
+    if [ ! -z "$CIRCLE_PULL_REQUEST" ]; then
+      GITHUB_PULL_REQUEST_NUMBER=${CIRCLE_PULL_REQUEST##*/}
+      echo "Posting comment from CircleCI to GitHub pull request $GITHUB_PULL_REQUEST_NUMBER"
+    else
+      echo "Posting comment from CircleCI to GitHub commit $GITHUB_SHA"
+    fi
+    post_to_github
   elif echo $CIRCLE_REPOSITORY_URL | grep -Eiq bitbucket; then
     if [ ! -z "$CIRCLE_PULL_REQUEST" ]; then
       BITBUCKET_PR_ID=$(echo $CIRCLE_PULL_REQUEST | sed 's/.*pull-requests\///')
