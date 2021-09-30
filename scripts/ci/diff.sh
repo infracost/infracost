@@ -148,7 +148,7 @@ post_to_github () {
   if [ -z "$GITHUB_TOKEN" ]; then
     echo "Error: GITHUB_TOKEN is required to post comment to GitHub"
   else
-    if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+    if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
       GITHUB_PULL_REQUEST_NUMBER=$(echo $github_event | jq -r .pull_request.number)
       post_to_github_pull_request
     else
@@ -401,6 +401,14 @@ diff_resources=$(jq '[.projects[].diff.resources[]] | add' infracost_breakdown.j
 
 if [ "$(echo "$post_condition" | jq '.always')" = "true" ]; then
   echo "Posting comment as post_condition is set to always"
+elif if [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
+  if [ "$diff_resources" = "null" ]; then
+    echo "Not posting comment as post_condition is set to update but there is no diff"
+    cleanup
+    exit 0
+  else
+    echo "Posting comment as post_condition is set to update and there is a diff"
+  fi
 elif [ "$(echo "$post_condition" | jq '.has_diff')" = "true" ] && [ "$diff_resources" = "null" ]; then
   echo "Not posting comment as post_condition is set to has_diff but there is no diff"
   cleanup
