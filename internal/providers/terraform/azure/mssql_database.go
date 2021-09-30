@@ -324,7 +324,7 @@ func mssqlStorageComponent(storageGB *decimal.Decimal, region, serviceName, tier
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
 				{Key: "skuName", Value: strPtr(skuName)},
-				{Key: "meterName", Value: strPtr("Data Stored")},
+				{Key: "meterName", ValueRegex: strPtr("/^Data Stored/")},
 			},
 		},
 	}

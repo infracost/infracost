@@ -147,15 +147,17 @@ func CreateConfigFile(dir string, terraformCloudHost string, terraformCloudToken
 		path := os.Getenv("TF_CLI_CONFIG_FILE")
 
 		if !filepath.IsAbs(path) {
-			path, err = filepath.Abs(filepath.Join(dir, os.Getenv("TF_CLI_CONFIG_FILE")))
+			path, err = filepath.Abs(filepath.Join(dir, path))
 			if err != nil {
-				return tmpFile.Name(), err
+				log.Warningf("Unable to copy existing config from %s: %v", path, err)
 			}
 		}
 
-		err = copyFile(path, tmpFile.Name())
-		if err != nil {
-			return tmpFile.Name(), err
+		if err == nil {
+			err = copyFile(path, tmpFile.Name())
+			if err != nil {
+				log.Warningf("Unable to copy existing config from %s: %v", path, err)
+			}
 		}
 	}
 

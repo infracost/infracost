@@ -186,14 +186,14 @@ func IsDev() bool {
 
 func loadDotEnv() error {
 	envLocalPath := filepath.Join(RootDir(), ".env.local")
-	if fileExists(envLocalPath) {
+	if FileExists(envLocalPath) {
 		err := godotenv.Load(envLocalPath)
 		if err != nil {
 			return err
 		}
 	}
 
-	if fileExists(".env") {
+	if FileExists(".env") {
 		err := godotenv.Load()
 		if err != nil {
 			return err

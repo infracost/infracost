@@ -46,7 +46,7 @@ This guide assumes you are familiar with Terraform, if not you can take an hour 
 
 ### Install
 
-Install go dependencies
+Assuming you have already [installed go](https://golang.org/doc/install), install the go dependencies
 ```sh
 make deps
 ```
@@ -58,7 +58,7 @@ Run the code:
 make run ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
 ```
 
-This will use your existing [Infracost API key](https://www.infracost.io/docs/#2-get-api-key).
+This will use your existing Infracost API key; register for a [free API key](https://www.infracost.io/docs/#2-get-api-key) key if you don't have one already.
 
 ### Test
 
@@ -258,6 +258,8 @@ func TestMyResourceGoldenFile(t *testing.T) {
 }
 ```
 
+Terraform supports multiple provider blocks (e.g. `provider "aws"`) so you can test for multiple regions by adding resources that point to a different provider using the `alias = aws.my-other-provider` attribute. See [waf_web_acl_test.tf](internal/providers/terraform/aws/testdata/waf_web_acl_test/waf_web_acl_test.tf) for an example.
+
 Finally, generate the golden file by running the test with the `-update` flag. You should **verify** that these cost calculations are correct by manually checking them, or comparing them against cost calculators from the cloud vendors. You should also ensure that there are **no warnings** about "Multiple products found", "No products found for" or "No prices found for" in the logs. These warnings indicate that the price filters have an issue.
 
 ```sh
@@ -423,7 +425,7 @@ When Infracost is run with the `--usage-file=path/to/infracost-usage.yml` flag t
 
 The following notes are general guidelines, please leave a comment in your pull request if they don't make sense or they can be improved for the resource you're adding.
 
-- references to other resources: if you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. The following example uses this because the price for `aws_ebs_snapshot` depends on the size of the referenced volume. You should always check the array length returned by `d.References` to avoid panics.
+- references to other resources: if you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. The following example uses this because the price for `aws_ebs_snapshot` depends on the size of the referenced volume. You should always check the array length returned by `d.References` to avoid panics. You can also do nested lookups, e.g. `ReferenceAttributes: []string{"alias.0.name"}` to lookup the name of the first alias.
 	```go
 	func GetEBSSnapshotRegistryItem() *schema.RegistryItem {
 		return &schema.RegistryItem{
@@ -573,9 +575,10 @@ The following notes are general guidelines, please leave a comment in your pull 
 4. Click on the Edit draft button, set the `vx.y.z` value in the tag name and release title. Also add the release notes from the commits between this and the last release and click on publish.
 5. In the `infracost-atlantis` repo, run the, update the "Infracost (latest release, vx.y.z)" text to point to the newly released version. Pushing a commit to master will trigger the GH Action, which builds/pushes that repo's docker image.
 6. Update the [Infracost API](https://www.infracost.io/docs/integrations/infracost_api) to use the latest version.
-7. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls?q=infracost) to be merged.
-8. Announce the release in the infracost-community Slack announcements channel.
-9. Update the docs repo with any required changes and supported resources. Don't forget to bump-up the version in [this page](https://www.infracost.io/docs/#1-install-infracost).
-10. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
+7. Update the [Terraform Cloud Run Tasks workers](https://www.infracost.io/docs/iac_tools/terraform_cloud_enterprise#terraform-cloud-run-tasks) to use the latest version.
+8. Wait for the [infracost brew PR](https://github.com/Homebrew/homebrew-core/pulls?q=infracost) to be merged.
+9. Announce the release in the infracost-community Slack announcements channel.
+10. Update the docs repo with any required changes and supported resources. Don't forget to bump-up the version in [this page](https://www.infracost.io/docs/#1-install-infracost).
+11. Close addressed issues and tag anyone who liked/commented in them to tell them it's live in version X.
 
 If a new flag/feature is added that requires CI support, update the repos mentioned [here](https://github.com/infracost/infracost/tree/master/scripts/ci#infracost-ci-scripts). For the GitHub Action, a new tag is needed and the release should be published on the GitHub Marketplace. For the CircleCI orb, the readme mentions the commit prefix that triggers releases to the CircleCI orb marketplace.

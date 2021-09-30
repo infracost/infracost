@@ -55,7 +55,7 @@ func (c Credentials) Save() error {
 }
 
 func readCredentialsFileIfExists() (Credentials, error) {
-	if !fileExists(CredentialsFilePath()) {
+	if !FileExists(CredentialsFilePath()) {
 		return Credentials{}, nil
 	}
 

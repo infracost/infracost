@@ -1,8 +1,9 @@
 package main_test
 
 import (
-	"github.com/infracost/infracost/internal/testutil"
 	"testing"
+
+	"github.com/infracost/infracost/internal/testutil"
 )
 
 func TestBreakdownHelp(t *testing.T) {
@@ -57,4 +58,28 @@ func TestBreakdownTerraformShowSkipped(t *testing.T) {
 
 func TestBreakdownTerraformUsageFile(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform/plan.json", "--usage-file", "../../examples/terraform/infracost-usage.yml"}, nil)
+}
+
+func TestBreakdownTerragrunt(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil)
+}
+
+func TestBreakdownTerragruntNested(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples"}, nil)
+}
+
+func TestBreakdownTerraform_v0_12(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/terraform_v0.12_plan.json"}, nil)
+}
+
+func TestBreakdownTerraformUseState_v0_12(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/terraform_v0.12_state.json", "--terraform-use-state"}, nil)
+}
+
+func TestBreakdownTerraform_v0_14(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/terraform_v0.14_plan.json"}, nil)
+}
+
+func TestBreakdownTerraformUseState_v0_14(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/terraform_v0.14_state.json", "--terraform-use-state"}, nil)
 }

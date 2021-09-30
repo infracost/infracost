@@ -12,24 +12,24 @@ Project: infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
         +$0.016 per GB
 
 + azurerm_firewall.premium
-  +$639
+  +$1,278
 
     + Deployment (Premium)
-      +$639
+      +$1,278
 
     + Data processed
       Monthly cost depends on usage
-        +$0.008 per GB
+        +$0.016 per GB
 
 + azurerm_firewall.premium_virtual_hub
-  +$639
+  +$1,278
 
     + Deployment (Premium Secured Virtual Hub)
-      +$639
+      +$1,278
 
     + Data processed
       Monthly cost depends on usage
-        +$0.008 per GB
+        +$0.016 per GB
 
 + azurerm_firewall.standard
   +$913
@@ -58,7 +58,7 @@ Project: infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
       +$3.65
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
-Amount:  +$4,019 ($0.00 -> $4,019)
+Amount:  +$5,296 ($0.00 -> $5,296)
 
 ----------------------------------
 Key: ~ changed, + added, - removed

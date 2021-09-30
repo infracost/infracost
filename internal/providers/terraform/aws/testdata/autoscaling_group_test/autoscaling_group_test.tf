@@ -290,6 +290,27 @@ resource "aws_autoscaling_group" "asg_lt_cpu_credits" {
   min_size         = 1
 }
 
+resource "aws_launch_template" "lt_usage" {
+  image_id      = "fake_ami"
+  instance_type = "t2.medium"
+
+  block_device_mappings {
+    device_name = "xvdf"
+    ebs {
+      volume_size = 10
+    }
+  }
+}
+
+resource "aws_autoscaling_group" "asg_lt_usage" {
+  launch_template {
+    id = aws_launch_template.lt_usage.id
+  }
+  desired_capacity = 2
+  max_size         = 3
+  min_size         = 1
+}
+
 resource "aws_launch_template" "lt_mixed_instance_basic" {
   image_id      = "fake_ami"
   instance_type = "t2.medium"

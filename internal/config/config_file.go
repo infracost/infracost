@@ -21,7 +21,7 @@ type ConfigFileSpec struct { // nolint:revive
 func LoadConfigFile(path string) (ConfigFileSpec, error) {
 	cfgFile := ConfigFileSpec{}
 
-	if !fileExists(path) {
+	if !FileExists(path) {
 		return cfgFile, fmt.Errorf("Config file does not exist at %s", path)
 	}
 

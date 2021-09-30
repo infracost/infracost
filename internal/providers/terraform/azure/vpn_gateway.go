@@ -31,8 +31,7 @@ func NewAzureRMVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	costComponents := make([]*schema.CostComponent, 0)
 
 	if sku == "Basic" {
-		sku = "Basic Gateway"
-		meterName = "Basic"
+		meterName = "Basic Gateway"
 	}
 
 	costComponents = append(costComponents, vpnGateway(region, sku, meterName))
@@ -67,7 +66,7 @@ func NewAzureRMVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 
 func vpnGateway(region, sku, meterName string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("VPN gateway (%s)", meterName),
+		Name:           fmt.Sprintf("VPN gateway (%s)", sku),
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -76,7 +75,7 @@ func vpnGateway(region, sku, meterName string) *schema.CostComponent {
 			Region:     strPtr(region),
 			Service:    strPtr("VPN Gateway"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr(sku)},
+				{Key: "meterName", Value: strPtr(meterName)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

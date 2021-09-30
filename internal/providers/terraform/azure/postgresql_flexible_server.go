@@ -23,14 +23,16 @@ func NewAzureRMPostrgreSQLFlexibleServer(d *schema.ResourceData, u *schema.Usage
 
 	region := d.Get("location").String()
 	sku := d.Get("sku_name").String()
-	var tier, types, skuName, meterName string
+	var tier, types, skuName, meterName, version, series string
 
-	if s := strings.Split(sku, "_"); len(s) == 3 {
-		tier = strings.Split(sku, "_")[0]
-		types = strings.Split(sku, "_")[2]
-	} else if s := strings.Split(sku, "_"); len(s) == 4 {
-		tier = strings.Split(sku, "_")[0]
-		types = strings.Split(sku, "_")[2]
+	s := strings.Split(sku, "_")
+	if len(s) == 3 {
+		tier = s[0]
+		types = s[2]
+	} else if len(s) == 4 {
+		tier = s[0]
+		types = s[2]
+		version = s[3]
 	} else {
 		log.Warnf("Unrecognised PostgreSQL Flexible Server SKU format for resource %s: %s", d.Address, sku)
 		return nil
@@ -50,11 +52,13 @@ func NewAzureRMPostrgreSQLFlexibleServer(d *schema.ResourceData, u *schema.Usage
 	if strings.ToLower(tierName) == "burstable" {
 		meterName = types
 		skuName = types
+		series = "BS"
 	} else {
 		meterName = "vCore"
 		cores := types[1:]
 		cores = cores[:(len(cores) - 1)]
 		skuName = fmt.Sprintf("%s vCore", cores)
+		series = types[:1] + version
 	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
@@ -68,7 +72,7 @@ func NewAzureRMPostrgreSQLFlexibleServer(d *schema.ResourceData, u *schema.Usage
 			Service:       strPtr("Azure Database for PostgreSQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/Azure Database for PostgreSQL Flexible Server %s/i", tierName))},
+				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/Azure Database for PostgreSQL Flexible Server %s %s/i", tierName, series))},
 				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", skuName))},
 				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", meterName))},
 			},

@@ -11,17 +11,19 @@ var HourToMonthUnitMultiplier = decimal.NewFromInt(730)
 type ResourceFunc func(*ResourceData, *UsageData) *Resource
 
 type Resource struct {
-	Name           string
-	CostComponents []*CostComponent
-	SubResources   []*Resource
-	HourlyCost     *decimal.Decimal
-	MonthlyCost    *decimal.Decimal
-	IsSkipped      bool
-	NoPrice        bool
-	SkipMessage    string
-	ResourceType   string
-	Tags           map[string]string
-	UsageSchema    []*UsageSchemaItem
+	Name              string
+	CostComponents    []*CostComponent
+	SubResources      []*Resource
+	HourlyCost        *decimal.Decimal
+	MonthlyCost       *decimal.Decimal
+	IsSkipped         bool
+	NoPrice           bool
+	SkipMessage       string
+	ResourceType      string
+	Tags              map[string]string
+	UsageSchema       []*UsageSchemaItem
+	EstimateUsage     EstimateFunc
+	EstimationSummary map[string]bool
 }
 
 func CalculateCosts(project *Project) {

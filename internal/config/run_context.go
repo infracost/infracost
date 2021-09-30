@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/infracost/infracost/internal/version"
 )
@@ -17,6 +18,7 @@ type RunContext struct {
 	State             *State
 	contextVals       map[string]interface{}
 	currentProjectCtx *ProjectContext
+	StartTime         int64
 }
 
 func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
@@ -33,6 +35,7 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 		Config:      cfg,
 		State:       state,
 		contextVals: map[string]interface{}{},
+		StartTime:   time.Now().Unix(),
 	}
 
 	c.loadInitialContextValues()
@@ -45,6 +48,7 @@ func EmptyRunContext() *RunContext {
 		Config:      &Config{},
 		State:       &State{},
 		contextVals: map[string]interface{}{},
+		StartTime:   time.Now().Unix(),
 	}
 }
 
