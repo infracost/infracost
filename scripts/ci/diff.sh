@@ -198,8 +198,7 @@ post_to_github_pull_request () {
   local latest_pr_comment=$(echo "$pull_request_comments" | jq last)
 
   msg="$(build_msg true)"
-  msg="${msg}\n"
-  msg="${msg}This comment will be updated when the cost estimate changes.\n"
+  msg="${msg}$(printf "\nThis comment will be updated when the cost estimate changes.\n")"
 
   if [ "${latest_pr_comment}" != "null" ]; then
     existing_msg=$(echo "$latest_pr_comment" | jq -r .body)
