@@ -24,15 +24,15 @@ process_args () {
   fi
 
   # Set defaults
-  if [ ! -z "$percentage_threshold" ] && [ ! -z "$post_condition" ]; then
+  if [ -n "$percentage_threshold" ] && [ -n "$post_condition" ]; then
     echo "Warning: percentage_threshold is deprecated, using post_condition instead"
-  elif [ ! -z "$percentage_threshold" ]; then
+  elif [ -n "$percentage_threshold" ]; then
     post_condition="{\"percentage_threshold\": $percentage_threshold}"
     echo "Warning: percentage_threshold is deprecated and will be removed in v0.9.0, please use post_condition='{\"percentage_threshold\": \"0\"}'"
   else
     post_condition=${post_condition:-'{"has_diff": true}'}
   fi
-  if [ ! -z "$post_condition" ] && [ "$(echo "$post_condition" | jq '.percentage_threshold')" != "null" ]; then
+  if [ -n "$post_condition" ] && [ "$(echo "$post_condition" | jq '.percentage_threshold')" != "null" ]; then
     percentage_threshold=$(echo "$post_condition" | jq -r '.percentage_threshold')
   fi
   percentage_threshold=${percentage_threshold:-0}
@@ -45,7 +45,7 @@ process_args () {
   export INFRACOST_CI_POST_CONDITION=$post_condition
   export INFRACOST_CI_PERCENTAGE_THRESHOLD=$percentage_threshold
 
-  if [ ! -z "$GIT_SSH_KEY" ]; then
+  if [ -n "$GIT_SSH_KEY" ]; then
     echo "Setting up private Git SSH key so terraform can access your private modules."
     mkdir -p .ssh
     echo "${GIT_SSH_KEY}" > .ssh/git_ssh_key
@@ -54,7 +54,7 @@ process_args () {
   fi
 
   # Bitbucket Pipelines don't have a unique env so use this to detect it
-  if [ ! -z "$BITBUCKET_BUILD_NUMBER" ]; then
+  if [ -n "$BITBUCKET_BUILD_NUMBER" ]; then
     BITBUCKET_PIPELINES=true
   fi
 }
@@ -62,19 +62,19 @@ process_args () {
 build_breakdown_cmd () {
   breakdown_cmd="${INFRACOST_BINARY} breakdown --no-color --format json"
 
-  if [ ! -z "$path" ]; then
+  if [ -n "$path" ]; then
     breakdown_cmd="$breakdown_cmd --path $path"
   fi
-  if [ ! -z "$terraform_plan_flags" ]; then
+  if [ -n "$terraform_plan_flags" ]; then
     breakdown_cmd="$breakdown_cmd --terraform-plan-flags \"$terraform_plan_flags\""
   fi
-  if [ ! -z "$terraform_workspace" ]; then
+  if [ -n "$terraform_workspace" ]; then
     breakdown_cmd="$breakdown_cmd --terraform-workspace $terraform_workspace"
   fi
-  if [ ! -z "$usage_file" ]; then
+  if [ -n "$usage_file" ]; then
     breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
   fi
-  if [ ! -z "$config_file" ]; then
+  if [ -n "$config_file" ]; then
     breakdown_cmd="$breakdown_cmd --config-file $config_file"
   fi
   echo "$breakdown_cmd"
@@ -82,7 +82,7 @@ build_breakdown_cmd () {
 
 build_output_cmd () {
   output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
-  if [ ! -z "$show_skipped" ]; then
+  if [ -n "$show_skipped" ]; then
     # The "=" is important as otherwise the value of the flag is ignored by the CLI
     output_cmd="$output_cmd --show-skipped=$show_skipped"
   fi
@@ -108,22 +108,22 @@ build_msg () {
   change_word="increase"
   change_sym="+"
     change_emoji="📈"
-  if [ $(echo "$total_monthly_cost < ${past_total_monthly_cost}" | bc -l) = 1 ]; then
+  if [ "$(echo "$total_monthly_cost < ${past_total_monthly_cost}" | bc -l)" = 1 ]; then
     change_word="decrease"
     change_sym=""
     change_emoji="📉"
   fi
   
   percent_display=""
-  if [ ! -z "$percent" ]; then
-    percent_display="$(printf "%.0f" $percent)"
+  if [ -n "$percent" ]; then
+    percent_display="$(printf "%.0f" "$percent")"
     percent_display=" (${change_sym}${percent_display}%%)"
   fi
   
-  msg="${MSG_START} **monthly cost will ${change_word} by $(format_cost $diff_cost)$percent_display** ${change_emoji}\n"
+  msg="${MSG_START} **monthly cost will ${change_word} by $(format_cost "$diff_cost")$percent_display** ${change_emoji}\n"
   msg="${msg}\n"
-  msg="${msg}Previous monthly cost: $(format_cost $past_total_monthly_cost)\n"
-  msg="${msg}New monthly cost: $(format_cost $total_monthly_cost)\n"
+  msg="${msg}Previous monthly cost: $(format_cost "$past_total_monthly_cost")\n"
+  msg="${msg}New monthly cost: $(format_cost "$total_monthly_cost")\n"
   msg="${msg}\n"
   
   if [ "$include_html" = true ]; then
@@ -150,7 +150,7 @@ post_to_github () {
   if [ -z "$GITHUB_TOKEN" ]; then
     echo "Error: GITHUB_TOKEN is required to post comment to GitHub"
   else
-    if [ ! -z "$GITHUB_PULL_REQUEST_NUMBER" ] && [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
+    if [ -n "$GITHUB_PULL_REQUEST_NUMBER" ] && [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
       post_to_github_pull_request
     else
       post_to_github_commit
@@ -185,9 +185,9 @@ fetch_existing_github_pull_request_comments() {
       "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$GITHUB_PULL_REQUEST_NUMBER/comments?page=$page&per_page=$PER_PAGE"
     )
 
-    infra_comments=${infra_comments},$(echo ${resp} | jq "[.[] | select(.body | contains(\"${MSG_START}\"))]")
+    infra_comments=${infra_comments},$(echo "${resp}" | jq "[.[] | select(.body | contains(\"${MSG_START}\"))]")
 
-    respLength=`echo $resp | jq length`
+    respLength=$(echo "$resp" | jq length)
   done
 
   pull_request_comments=$(echo "[$infra_comments]" | jq 'flatten(1)')
@@ -195,17 +195,17 @@ fetch_existing_github_pull_request_comments() {
 
 post_to_github_pull_request () {
   fetch_existing_github_pull_request_comments
-  local latest_pr_comment=`echo $pull_request_comments | jq last`
+  local latest_pr_comment=$(echo "$pull_request_comments" | jq last)
 
   msg="$(build_msg true)"
   msg="${msg}\n"
   msg="${msg}This comment will be updated when the cost estimate changes.\n"
 
   if [ "${latest_pr_comment}" != "null" ]; then
-    existing_msg=$(echo $latest_pr_comment | jq -r .body)
+    existing_msg=$(echo "$latest_pr_comment" | jq -r .body)
     # '// /' does a string substitution that removes spaces before comparison
     if [ "${msg// /}" != "${existing_msg// /}" ]; then
-      local comment_id=$(echo $latest_pr_comment | jq -r .id)
+      local comment_id=$(echo "$latest_pr_comment" | jq -r .id)
       echo "Updating comment $comment_id for pull request $GITHUB_PULL_REQUEST_NUMBER."
       jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L --retry 3 -X PATCH -d @- \
         -H "Content-Type: application/json" \
@@ -236,24 +236,24 @@ post_bitbucket_comment () {
   msg="$(build_msg false)"
   jq -Mnc --arg msg "$msg" '{"content": {"raw": "\($msg)"}}' | curl -L -X POST -d @- \
     -H "Content-Type: application/json" \
-    -u $BITBUCKET_TOKEN \
+    -u "$BITBUCKET_TOKEN" \
     "https://api.bitbucket.org/2.0/repositories/$1"
 }
 
 post_to_circle_ci () {
-  if echo $CIRCLE_REPOSITORY_URL | grep -Eiq github; then
+  if echo "$CIRCLE_REPOSITORY_URL" | grep -Eiq github; then
     GITHUB_REPOSITORY="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
     GITHUB_SHA=$CIRCLE_SHA1
-    if [ ! -z "$CIRCLE_PULL_REQUEST" ]; then
+    if [ -n "$CIRCLE_PULL_REQUEST" ]; then
       GITHUB_PULL_REQUEST_NUMBER=${CIRCLE_PULL_REQUEST##*/}
       echo "Posting comment from CircleCI to GitHub pull request $GITHUB_PULL_REQUEST_NUMBER"
     else
       echo "Posting comment from CircleCI to GitHub commit $GITHUB_SHA"
     fi
     post_to_github
-  elif echo $CIRCLE_REPOSITORY_URL | grep -Eiq bitbucket; then
-    if [ ! -z "$CIRCLE_PULL_REQUEST" ]; then
-      BITBUCKET_PR_ID=$(echo $CIRCLE_PULL_REQUEST | sed 's/.*pull-requests\///')
+  elif echo "$CIRCLE_REPOSITORY_URL" | grep -Eiq bitbucket; then
+    if [ -n "$CIRCLE_PULL_REQUEST" ]; then
+      BITBUCKET_PR_ID=$(echo "$CIRCLE_PULL_REQUEST" | sed 's/.*pull-requests\///')
 
       echo "Posting comment from CircleCI to Bitbucket pull-request $BITBUCKET_PR_ID"
       post_bitbucket_comment "$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pullrequests/$BITBUCKET_PR_ID/comments"
@@ -268,7 +268,7 @@ post_to_circle_ci () {
 }
 
 post_to_bitbucket () {
-  if [ ! -z "$BITBUCKET_PR_ID" ]; then
+  if [ -n "$BITBUCKET_PR_ID" ]; then
     echo "Posting comment to Bitbucket pull-request $BITBUCKET_PR_ID"
     post_bitbucket_comment "$BITBUCKET_REPO_FULL_NAME/pullrequests/$BITBUCKET_PR_ID/comments"
   else
@@ -290,7 +290,7 @@ post_to_azure_devops () {
       azure_devops_comment_status=${azure_devops_comment_status:-4}
       echo "Posting comment to Azure DevOps repo pull-request $SYSTEM_PULLREQUEST_PULLREQUESTID"
       msg="$(build_msg true)"
-      jq -Mnc --arg msg "$msg" --arg azure_devops_comment_status $azure_devops_comment_status '{"comments": [{"parentCommentId": 0, "content": "\($msg)", "commentType": 1}], "status": $azure_devops_comment_status}' | curl -L -X POST -d @- \
+      jq -Mnc --arg msg "$msg" --arg azure_devops_comment_status "$azure_devops_comment_status" '{"comments": [{"parentCommentId": 0, "content": "\($msg)", "commentType": 1}], "status": $azure_devops_comment_status}' | curl -L -X POST -d @- \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $SYSTEM_ACCESSTOKEN" \
         "$SYSTEM_COLLECTIONURI$SYSTEM_TEAMPROJECT/_apis/git/repositories/$BUILD_REPOSITORY_ID/pullRequests/$SYSTEM_PULLREQUEST_PULLREQUESTID/threads?api-version=6.0"
@@ -313,27 +313,29 @@ post_to_slack () {
 load_github_env () {
   export VCS_REPO_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY
   
-  github_event=$(cat $GITHUB_EVENT_PATH)
+  github_event=$(cat "$GITHUB_EVENT_PATH")
 
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
-    GITHUB_SHA=$(echo $github_event | jq -r .pull_request.head.sha)
-    GITHUB_PULL_REQUEST_NUMBER=$(echo $github_event | jq -r .pull_request.number)
-    export VCS_PULL_REQUEST_URL=$(echo $github_event | jq -r .pull_request.html_url)
+    GITHUB_SHA=$(echo "$github_event" | jq -r .pull_request.head.sha)
+    GITHUB_PULL_REQUEST_NUMBER=$(echo "$github_event" | jq -r .pull_request.number)
+    VCS_PULL_REQUEST_URL=$(echo "$github_event" | jq -r .pull_request.html_url)
+    export VCS_PULL_REQUEST_URL
   else
-    export VCS_PULL_REQUEST_URL=$(curl -s \
+    VCS_PULL_REQUEST_URL=$(curl -s \
       -H "Accept: application/vnd.github.groot-preview+json" \
       -H "Authorization: token $GITHUB_TOKEN" \
-      $GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls \
+      "$GITHUB_API_URL"/repos/"$GITHUB_REPOSITORY"/commits/"$GITHUB_SHA"/pulls \
       | jq -r '. | map(select(.state == "open")) | . |= sort_by(.updated_at) | reverse | .[0].html_url')
+    export VCS_PULL_REQUEST_URL
   fi
 }
 
 load_gitlab_env () {
   export VCS_REPO_URL=$CI_REPOSITORY_URL
   
-  first_mr=$(echo $CI_OPEN_MERGE_REQUESTS | cut -d',' -f1)
-  repo=$(echo $first_mr | cut -d'!' -f1)
-  mr_number=$(echo $first_mr | cut -d'!' -f2)
+  first_mr=$(echo "$CI_OPEN_MERGE_REQUESTS" | cut -d',' -f1)
+  repo=$(echo "$first_mr" | cut -d'!' -f1)
+  mr_number=$(echo "$first_mr" | cut -d'!' -f2)
   export VCS_PULL_REQUEST_URL=$CI_SERVER_URL/$repo/merge_requests/$mr_number
 }
 
@@ -354,13 +356,13 @@ cleanup () {
 process_args "$@"
 
 # Load env variables
-if [ ! -z "$GITHUB_ACTIONS" ]; then
+if [ -n "$GITHUB_ACTIONS" ]; then
   load_github_env
-elif [ ! -z "$GITLAB_CI" ]; then
+elif [ -n "$GITLAB_CI" ]; then
   load_gitlab_env
-elif [ ! -z "$CIRCLECI" ]; then
+elif [ -n "$CIRCLECI" ]; then
   load_circle_ci_env
-elif [ ! -z "$SYSTEM_COLLECTIONURI" ]; then
+elif [ -n "$SYSTEM_COLLECTIONURI" ]; then
   load_azure_devops_env
 fi
 
@@ -394,12 +396,12 @@ else
 fi
 
 # If both old and new costs are greater than 0
-if [ $(echo "$past_total_monthly_cost > 0" | bc -l) = 1 ] && [ $(echo "$total_monthly_cost > 0" | bc -l) = 1 ]; then
-  percent=$(echo "scale=6; $total_monthly_cost / $past_total_monthly_cost * 100 - 100" | bc)
+if [ "$(echo "$past_total_monthly_cost > 0" | bc -l)" = 1 ] && [ "$(echo "$total_monthly_cost > 0" | bc -l)" = 1 ]; then
+  percent="$(echo "scale=6; $total_monthly_cost / $past_total_monthly_cost * 100 - 100" | bc)"
 fi
 
 # If both old and new costs are less than or equal to 0
-if [ $(echo "$past_total_monthly_cost <= 0" | bc -l) = 1 ] && [ $(echo "$total_monthly_cost <= 0" | bc -l) = 1 ]; then
+if [ "$(echo "$past_total_monthly_cost <= 0" | bc -l)" = 1 ] && [ "$(echo "$total_monthly_cost <= 0" | bc -l)" = 1 ]; then
   percent=0
 fi
 
@@ -424,7 +426,7 @@ elif [ "$(echo "$post_condition" | jq '.has_diff')" = "true" ] && [ -n "$diff_re
   echo "Posting comment as post_condition is set to has_diff and there is a diff"
 elif [ -z "$percent" ]; then
   echo "Posting comment as percentage diff is empty"
-elif [ $(echo "$absolute_percent > $percentage_threshold" | bc -l) = 1 ]; then
+elif [ "$(echo "$absolute_percent > $percentage_threshold" | bc -l)" = 1 ]; then
   echo "Posting comment as percentage diff ($absolute_percent%) is greater than the percentage threshold ($percentage_threshold%)."
 else
   echo "Not posting comment as percentage diff ($absolute_percent%) is less than or equal to percentage threshold ($percentage_threshold%)."
@@ -432,23 +434,23 @@ else
   exit 0
 fi
 
-if [ ! -z "$GITHUB_ACTIONS" ]; then
+if [ -n "$GITHUB_ACTIONS" ]; then
   echo "::set-output name=past_total_monthly_cost::$past_total_monthly_cost"
   echo "::set-output name=total_monthly_cost::$total_monthly_cost"
   load_github_env
   post_to_github
-elif [ ! -z "$GITLAB_CI" ]; then
+elif [ -n "$GITLAB_CI" ]; then
   load_gitlab_env
   post_to_gitlab
-elif [ ! -z "$CIRCLECI" ]; then
+elif [ -n "$CIRCLECI" ]; then
   post_to_circle_ci
-elif [ ! -z "$BITBUCKET_PIPELINES" ]; then
+elif [ -n "$BITBUCKET_PIPELINES" ]; then
   post_to_bitbucket
-elif [ ! -z "$SYSTEM_COLLECTIONURI" ]; then
+elif [ -n "$SYSTEM_COLLECTIONURI" ]; then
   post_to_azure_devops
 fi
 
-if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
+if [ -n "$SLACK_WEBHOOK_URL" ]; then
   post_to_slack
 fi
 
