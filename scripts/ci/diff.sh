@@ -104,6 +104,7 @@ format_cost () {
 MSG_START="💰 Infracost estimate:"
 build_msg () {
   include_html=$1
+  update_msg=$2
   
   change_word="increase"
   change_sym="+"
@@ -140,6 +141,9 @@ build_msg () {
   
   if [ "$include_html" = true ]; then
     msg="${msg}</details>\n"
+    if [ -n "$update_msg" ]; then
+      msg="${msg}\n${update_msg}\n\n"
+    fi
     msg="${msg}<sub><a href='https://infracost.io/feedback' rel='noopener noreferrer' target='_blank'>How can this comment be more helpful?</a></sub>\n"
   fi
   
@@ -197,8 +201,7 @@ post_to_github_pull_request () {
   fetch_existing_github_pull_request_comments
   local latest_pr_comment=$(echo "$pull_request_comments" | jq last)
 
-  msg="$(build_msg true)"
-  msg="${msg}$(printf "<br/><br/>\n\n*This comment will be updated when the cost estimate changes.*\n")"
+  msg="$(build_msg true "This comment will be updated when the cost estimate changes.")"
 
   if [ "${latest_pr_comment}" != "null" ]; then
     existing_msg=$(echo "$latest_pr_comment" | jq -r .body)
