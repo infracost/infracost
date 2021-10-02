@@ -69,6 +69,42 @@ func SyncUsageData(projects []*schema.Project, existingUsageData map[string]*sch
 	return &syncResult, nil
 }
 
+func GetInvalidUsageKeys(usageData map[string]*schema.UsageData) ([]string, error) {
+	invalidKeys := make([]string, 0)
+	usageSchema, err := loadUsageSchema()
+	if err != nil {
+		return invalidKeys, err
+	}
+	for resourceName, rUsage := range usageData {
+		resourceTypeNames := strings.Split(resourceName, ".")
+		if len(resourceTypeNames) < 2 {
+			// It's a resource with no name
+			continue
+		}
+		// This handles module names appearing in the resourceName too
+		resourceTypeName := resourceTypeNames[len(resourceTypeNames)-2]
+
+		// Load all possible usage keys from the reference
+		schemaItems, ok := usageSchema[resourceTypeName]
+		if !ok {
+			continue
+		}
+		schemaKeys := make(map[string]bool, 0)
+		for _, schemaItem := range schemaItems {
+			schemaKeys[schemaItem.Key] = true
+		}
+
+		// Iterate over provided keys and check if they are
+		// present in the reference schema
+		for key := range rUsage.Attributes {
+			if _, ok := schemaKeys[key]; !ok {
+				invalidKeys = append(invalidKeys, key)
+			}
+		}
+	}
+	return invalidKeys, nil
+}
+
 func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*SchemaItem, existingUsageData map[string]*schema.UsageData) (SyncResult, yaml.MapSlice) {
 	syncResult := SyncResult{EstimationErrors: make(map[string]error)}
 	syncedResourceUsage := make(map[string]interface{})

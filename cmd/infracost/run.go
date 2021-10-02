@@ -85,8 +85,15 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		if err != nil {
 			return err
 		}
+		invalidUsageKeys := make([]string, 0)
 		if len(u) > 0 {
 			ctx.SetContextValue("hasUsageFile", true)
+			// Validate the usage file
+			invalidUsageKeys, err = usage.GetInvalidUsageKeys(u)
+			if err != nil {
+				spinner.Fail()
+				return err
+			}
 		}
 
 		providerProjects, err := provider.LoadResources(u)
@@ -138,6 +145,13 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 				successes,
 				resources,
 				pluralized))
+		}
+
+		if len(invalidUsageKeys) > 0 {
+			fmt.Println("Following usage keys are misspelled:")
+			for _, invalidKey := range invalidUsageKeys {
+				fmt.Println(invalidKey)
+			}
 		}
 
 		projects = append(projects, providerProjects...)
