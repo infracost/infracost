@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>infracost</id>
+    <version>0.9.8</version>
+    <packageSourceUrl>https://github.com/infracost/infracost/scripts/chocolately</packageSourceUrl>
+    <owners>OWNER HERE</owners>
+    <title>infracost</title>
+    <authors>AUTHOR HERE</authors>
+    <projectUrl>https://github.com/infracost/infracost</projectUrl>
+    <copyright>2021 Infracost</copyright>
+   <projectSourceUrl>https://github.com/infracostinfracost</projectSourceUrl>
+    <docsUrl>https://www.infracost.io/</docsUrl>
+    <tags>Infracost shows cloud cost estimates for infrastructure-as-code projects such as Terraform.</tags>
+    <summary>Cloud cost estimates for Terraform in pull requests</summary>
+    <description>Cloud cost estimates for Terraform in pull requests. The ultimate way to estimate cost in pull requests.</description>
+  </metadata>
+  <files>
+    <!-- this section controls what actually gets packaged into the Chocolatey package -->
+    <file src="tools\**" target="tools" />
+    <!--Building from Linux? You may need this instead: <file src="tools/**" target="tools" />-->
+  </files>
+</package>
