@@ -2,13 +2,17 @@ package aws
 
 import (
 	"fmt"
+	"regexp"
+	"sort"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
+	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/shopspring/decimal"
+	"github.com/infracost/infracost/internal/schema"
 )
+
+var repUnderscore = regexp.MustCompile(`_`)
 
 func GetDXConnectionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
@@ -19,16 +23,10 @@ func GetDXConnectionRegistryItem() *schema.RegistryItem {
 
 func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
-	fromLocation, ok := regionMapping[region]
 
-	if !ok {
-		log.Warnf("Skipping resource %s. Could not find mapping for region %s", d.Address, region)
-		return nil
-	}
-
-	var gbDataProcessed *decimal.Decimal
-	if u != nil && u.Get("monthly_outbound_region_to_dx_location_gb").Exists() {
-		gbDataProcessed = decimalPtr(decimal.NewFromFloat(u.Get("monthly_outbound_region_to_dx_location_gb").Float()))
+	virtualInterfaceType := "private"
+	if u != nil && u.Get("dx_virtual_interface_type").Exists() {
+		virtualInterfaceType = u.Get("dx_virtual_interface_type").String()
 	}
 
 	dxBandwidth := strings.Replace(d.Get("bandwidth").String(), "bps", "", 1)
@@ -39,33 +37,50 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		connectionType = u.Get("dx_connection_type").String()
 	}
 
-	virtualInterfaceType := "private"
-	if u != nil && u.Get("dx_virtual_interface_type").Exists() {
-		virtualInterfaceType = u.Get("dx_virtual_interface_type").String()
-	}
-
-	return &schema.Resource{
-		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:           "DX connection",
-				Unit:           "hours",
-				UnitMultiplier: decimal.NewFromInt(1),
-				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AWSDirectConnect"),
-					ProductFamily: strPtr("Direct Connect"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "capacity", Value: strPtr(dxBandwidth)},
-						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", dxLocation))},
-						{Key: "connectionType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", connectionType))},
-					},
+	components := []*schema.CostComponent{
+		{
+			Name:           "DX connection",
+			Unit:           "hours",
+			UnitMultiplier: decimal.NewFromInt(1),
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AWSDirectConnect"),
+				ProductFamily: strPtr("Direct Connect"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "capacity", Value: strPtr(dxBandwidth)},
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/", dxLocation))},
+					{Key: "connectionType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", connectionType))},
 				},
 			},
-			{
-				Name:            fmt.Sprintf("Outbound data transfer (to %s)", dxLocation),
+		},
+	}
+
+	if u != nil && u.GetMap("monthly_outbound_from_region_to_dx_connection_location") != nil {
+		regions := u.GetMap("monthly_outbound_from_region_to_dx_connection_location")
+
+		// sort the region keys so that we get a consistent output in the cli
+		keys := make([]string, 0, len(regions))
+		for key := range regions {
+			keys = append(keys, key)
+		}
+
+		sort.Strings(keys)
+
+		for _, key := range keys {
+			estimate := regions[key]
+
+			name := repUnderscore.ReplaceAllString(key, "-")
+			fromLocation, ok := regionMapping[name]
+			if !ok {
+				log.Warnf("Skipping resource %s usage cost: Outbound data transfer. Could not find mapping for region %s", d.Address, key)
+				continue
+			}
+
+			gbDataProcessed := decimalPtr(decimal.NewFromFloat(estimate.Float()))
+			components = append(components, &schema.CostComponent{
+				Name:            fmt.Sprintf("Outbound data transfer (from %s, to %s)", name, dxLocation),
 				Unit:            "GB",
 				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: gbDataProcessed,
@@ -79,7 +94,12 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 						{Key: "virtualInterfaceType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", virtualInterfaceType))},
 					},
 				},
-			},
-		},
+			})
+		}
+	}
+
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: components,
 	}
 }

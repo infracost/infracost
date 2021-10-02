@@ -123,7 +123,9 @@ resource_usage:
     backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
 
   aws_dx_connection.my_dx_connection:
-    monthly_outbound_region_to_dx_location_gb: 100 # Monthly outbound data transferred from AWS region to DX location in GB.
+    monthly_outbound_from_region_to_dx_connection_location:
+      us_east_1: 200 # Monthly outbound data transferred to the DX location from us-east-1 in GB
+      eu_west_2: 100 # Monthly outbound data transferred to the DX location from eu-west-2 in GB
     dx_virtual_interface_type: private             # Interface type impacts outbound data transfer costs over DX, can be: private, public.
     dx_connection_type: dedicated                  # Connection type impacts the per-port hourly price, can be: dedicated, hosted.
 
