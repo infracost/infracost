@@ -89,7 +89,7 @@ func GetInvalidUsageKeys(usageData map[string]*schema.UsageData) ([]string, erro
 		if !ok {
 			continue
 		}
-		schemaKeys := make(map[string]bool, 0)
+		schemaKeys := make(map[string]bool)
 		for _, schemaItem := range schemaItems {
 			schemaKeys[schemaItem.Key] = true
 		}
