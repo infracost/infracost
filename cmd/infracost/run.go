@@ -94,7 +94,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			return err
 		}
 
-		if runCtx.Config.SyncUsageFile {
+		if runCtx.Config.SyncUsageFile && projectCfg.UsageFile != "" {
 			spinnerOpts := ui.SpinnerOptions{
 				EnableLogging: runCtx.Config.IsLogging(),
 				NoColor:       runCtx.Config.NoColor,
@@ -122,22 +122,26 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 				return err
 			}
 
-			resources := syncResult.ResourceCount
-			attempts := syncResult.EstimationCount
-			errors := len(syncResult.EstimationErrors)
-			successes := attempts - errors
+			if syncResult == nil {
+				spinner.Fail()
+			} else {
+				resources := syncResult.ResourceCount
+				attempts := syncResult.EstimationCount
+				errors := len(syncResult.EstimationErrors)
+				successes := attempts - errors
 
-			pluralized := ""
-			if resources > 1 {
-				pluralized = "s"
+				pluralized := ""
+				if resources > 1 {
+					pluralized = "s"
+				}
+
+				spinner.Success()
+				cmd.Println(fmt.Sprintf("    %s Synced %d of %d resource%s",
+					ui.FaintString("└─"),
+					successes,
+					resources,
+					pluralized))
 			}
-
-			spinner.Success()
-			cmd.Println(fmt.Sprintf("    %s Synced %d of %d resource%s",
-				ui.FaintString("└─"),
-				successes,
-				resources,
-				pluralized))
 		}
 
 		projects = append(projects, providerProjects...)
@@ -251,6 +255,10 @@ func summarizeUsage(ctx *config.ProjectContext, syncResult *usage.SyncResult) {
 }
 
 func remediateUsage(runCtx *config.RunContext, ctx *config.ProjectContext, syncResult *usage.SyncResult) {
+	if syncResult == nil {
+		return
+	}
+
 	var remediable, remAttempts, remErrors int
 	for _, err := range syncResult.EstimationErrors {
 		if _, ok := err.(schema.Remediater); ok {
