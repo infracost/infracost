@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.8.2
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.8.1
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.5.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.17.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.18.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.16.0
 	github.com/awslabs/goformation/v4 v4.19.5
 	github.com/briandowns/spinner v1.15.0
