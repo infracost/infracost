@@ -41,13 +41,18 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		putSnapshotBlockRequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_put_block_requests").Int()))
 	}
 
+	var fastSnapshotRestoreHours *decimal.Decimal
+	if u != nil && u.Get("monthly_put_block_requests").Exists() {
+		fastSnapshotRestoreHours = decimalPtr(decimal.NewFromInt(u.Get("fast_snapshot_restore_hours").Int()))
+	}
+
 	costComponents := []*schema.CostComponent{
 		ebsSnapshotCostComponent(region, gbVal),
 		{
-			Name:           "Fast snapshot restore",
-			Unit:           "DSU",
-			UnitMultiplier: schema.HourToMonthUnitMultiplier,
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			Name:            "Fast snapshot restore",
+			Unit:            "DSU-hours",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: fastSnapshotRestoreHours,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
