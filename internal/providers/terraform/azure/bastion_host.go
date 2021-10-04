@@ -16,13 +16,12 @@ func GetAzureRMBastionHostRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMBastionHost(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	name := "Azure Bastion"
 	productType := "Basic"
 	region := lookupRegion(d, []string{})
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("%s (%s)", name, productType),
+			Name:           "Bastion host",
 			Unit:           "hours",
 			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -94,7 +93,7 @@ func outboundDataTransferComponents(u *schema.UsageData, region, productType str
 
 func outboundDataTransferSingleComponent(name, region, productType, startUsage string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("%s (%s)", name, productType),
+		Name:            name,
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
