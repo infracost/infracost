@@ -3,7 +3,6 @@ package schema
 import (
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/tidwall/gjson"
@@ -50,45 +49,6 @@ func (u *UsageData) Get(key string) gjson.Result {
 	}
 
 	return u.Attributes[key]
-}
-
-// GetMap returns a map of gjson.Result. GetMap expects key to be
-// the name of a usage file property that contains sub properties. e.g.
-//
-// 		given a usage file with the following property:
-//
-//			prop_1:
-//				sub_prop_1: 1000
-//				sub_prop_2: 3000
-//
-// 		GetMap with the "prop_1" as key will return a map:
-//
-//			map[string]gjson.Result{
-//				"sub_prop_1": ...,
-//				"sub_prop_2": ...,
-//		   }
-//
-// GetMap only support 1 level of nesting. Further levels must be handled another way.
-// If key cannot be found in UsageData GetMap returns nil.
-func (u *UsageData) GetMap(key string) map[string]gjson.Result {
-	start, err := regexp.Compile(`^` + key + `\.`)
-	if err != nil {
-		return nil
-	}
-
-	matching := make(map[string]gjson.Result)
-
-	for s, result := range u.Attributes {
-		if start.MatchString(s) {
-			matching[start.ReplaceAllString(s, "")] = result
-		}
-	}
-
-	if len(matching) == 0 {
-		return nil
-	}
-
-	return matching
 }
 
 func (u *UsageData) GetFloat(key string) *float64 {

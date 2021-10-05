@@ -7,12 +7,11 @@ import (
 	"strings"
 
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/schema"
 )
 
-var repUnderscore = regexp.MustCompile(`_`)
+var repDash = regexp.MustCompile(`-`)
 
 func GetDXConnectionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
@@ -57,44 +56,73 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		},
 	}
 
-	if u != nil && u.GetMap("monthly_outbound_from_region_to_dx_connection_location") != nil {
-		regions := u.GetMap("monthly_outbound_from_region_to_dx_connection_location")
-
+	if u != nil {
 		// sort the region keys so that we get a consistent output in the cli
-		keys := make([]string, 0, len(regions))
-		for key := range regions {
-			keys = append(keys, key)
+		regions := make([]string, 0, len(regionMapping))
+		for key := range regionMapping {
+			regions = append(regions, key)
 		}
 
-		sort.Strings(keys)
+		sort.Strings(regions)
 
-		for _, key := range keys {
-			estimate := regions[key]
+		var usingRegionConf bool
+		usagePrefix := "monthly_outbound_from_region_to_dx_connection_location"
+		for _, r := range regions {
+			key := usagePrefix + "." + repDash.ReplaceAllString(r, "_")
+			if u.Get(key).Exists() {
+				usingRegionConf = true
 
-			name := repUnderscore.ReplaceAllString(key, "-")
-			fromLocation, ok := regionMapping[name]
-			if !ok {
-				log.Warnf("Skipping resource %s usage cost: Outbound data transfer. Could not find mapping for region %s", d.Address, key)
-				continue
-			}
+				// no need to do implicit map exists checking here as r
+				// has been built from the base regionMapping
+				fromLocation := regionMapping[r]
 
-			gbDataProcessed := decimalPtr(decimal.NewFromFloat(estimate.Float()))
-			components = append(components, &schema.CostComponent{
-				Name:            fmt.Sprintf("Outbound data transfer (from %s, to %s)", name, dxLocation),
-				Unit:            "GB",
-				UnitMultiplier:  decimal.NewFromInt(1),
-				MonthlyQuantity: gbDataProcessed,
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Service:       strPtr("AWSDirectConnect"),
-					ProductFamily: strPtr("Data Transfer"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "fromLocation", Value: strPtr(fromLocation)},
-						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s-DataXfer-Out/", dxLocation))},
-						{Key: "virtualInterfaceType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", virtualInterfaceType))},
+				estimate := u.Get(key)
+				gbDataProcessed := decimalPtr(decimal.NewFromFloat(estimate.Float()))
+				components = append(components, &schema.CostComponent{
+					Name:            fmt.Sprintf("Outbound data transfer (from %s, to %s)", r, dxLocation),
+					Unit:            "GB",
+					UnitMultiplier:  decimal.NewFromInt(1),
+					MonthlyQuantity: gbDataProcessed,
+					ProductFilter: &schema.ProductFilter{
+						VendorName:    strPtr("aws"),
+						Service:       strPtr("AWSDirectConnect"),
+						ProductFamily: strPtr("Data Transfer"),
+						AttributeFilters: []*schema.AttributeFilter{
+							{Key: "fromLocation", Value: strPtr(fromLocation)},
+							{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s-DataXfer-Out/", dxLocation))},
+							{Key: "virtualInterfaceType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", virtualInterfaceType))},
+						},
 					},
-				},
-			})
+				})
+			}
+		}
+
+		// if we don't have any dx_connection usage data using the new
+		// "monthly_outbound_from_region_to_dx_connection_location" yaml conf
+		// we should fall back to the old "monthly_outbound_region_to_dx_location_gb" configuration
+		if !usingRegionConf {
+			if u.Get("monthly_outbound_region_to_dx_location_gb").Exists() {
+				fromLocation, ok := regionMapping[region]
+				if ok {
+					gbDataProcessed := decimalPtr(decimal.NewFromFloat(u.Get("monthly_outbound_region_to_dx_location_gb").Float()))
+					components = append(components, &schema.CostComponent{
+						Name:            fmt.Sprintf("Outbound data transfer (from %s, to %s)", region, dxLocation),
+						Unit:            "GB",
+						UnitMultiplier:  decimal.NewFromInt(1),
+						MonthlyQuantity: gbDataProcessed,
+						ProductFilter: &schema.ProductFilter{
+							VendorName:    strPtr("aws"),
+							Service:       strPtr("AWSDirectConnect"),
+							ProductFamily: strPtr("Data Transfer"),
+							AttributeFilters: []*schema.AttributeFilter{
+								{Key: "fromLocation", Value: strPtr(fromLocation)},
+								{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s-DataXfer-Out/", dxLocation))},
+								{Key: "virtualInterfaceType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", virtualInterfaceType))},
+							},
+						},
+					})
+				}
+			}
 		}
 	}
 
