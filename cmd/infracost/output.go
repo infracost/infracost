@@ -9,6 +9,7 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
+	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.org/x/mod/semver"
@@ -39,12 +40,22 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 			for _, path := range paths {
-				matches, _ := filepath.Glob(path)
-				inputFiles = append(inputFiles, matches...)
+				expanded, err := homedir.Expand(path)
+				if err != nil {
+					return errors.Wrap(err, "Failed to expand path")
+				}
+
+				matches, _ := filepath.Glob(expanded)
+				if len(matches) > 0 {
+					inputFiles = append(inputFiles, matches...)
+				} else {
+					inputFiles = append(inputFiles, path)
+				}
 			}
 
 			inputs := make([]output.ReportInput, 0, len(inputFiles))
 			currency := ""
+
 			for _, f := range inputFiles {
 				data, err := ioutil.ReadFile(f)
 				if err != nil {
