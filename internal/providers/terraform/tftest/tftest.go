@@ -8,12 +8,13 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"sync"
 	"testing"
 
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/require"
 
 	"github.com/infracost/infracost/internal/config"
@@ -27,15 +28,11 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform"
 )
 
-var update = flag.Bool("update", false, "update .golden files")
-
-// AWS provider is locked due to https://github.com/hashicorp/terraform-provider-aws/issues/20287
 var tfProviders = `
 	terraform {
 		required_providers {
 			aws = {
 				source  = "hashicorp/aws"
-				version = "3.50.0"
 			}
 			google = {
 				source  = "hashicorp/google"
@@ -160,19 +157,46 @@ func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, 
 }
 
 func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
-	cfg := config.DefaultConfig()
-	err := cfg.LoadFromEnv()
+	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	assert.NoError(t, err)
 
-	project, err := RunCostCalculations(t, cfg, tfProject, usage)
+	projects, err := RunCostCalculations(t, runCtx, tfProject, usage)
 	assert.NoError(t, err)
+	assert.Len(t, projects, 1)
 
-	testutil.TestResources(t, project.Resources, checks)
+	testutil.TestResources(t, projects[0].Resources, checks)
+}
+
+type GoldenFileOptions = struct {
+	Currency    string
+	CaptureLogs bool
+}
+
+func DefaultGoldenFileOptions() *GoldenFileOptions {
+	return &GoldenFileOptions{
+		Currency:    "USD",
+		CaptureLogs: false,
+	}
 }
 
 func GoldenFileResourceTests(t *testing.T, testName string) {
-	cfg := config.DefaultConfig()
-	err := cfg.LoadFromEnv()
+	GoldenFileResourceTestsWithOpts(t, testName, DefaultGoldenFileOptions())
+}
+
+func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *GoldenFileOptions) {
+	runCtx, err := config.NewRunContextFromEnv(context.Background())
+
+	var logBuf *bytes.Buffer
+	if options != nil && options.CaptureLogs {
+		logBuf = testutil.ConfigureTestToCaptureLogs(t, runCtx)
+	} else {
+		testutil.ConfigureTestToFailOnLogs(t, runCtx)
+	}
+
+	if options != nil && options.Currency != "" {
+		runCtx.Config.Currency = options.Currency
+	}
+
 	require.NoError(t, err)
 
 	// Load the terraform projects
@@ -197,15 +221,16 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 	}
 
 	// Generate the output
-	project, err := RunCostCalculations(t, cfg, tfProject, usageData)
+	projects, err := RunCostCalculations(t, runCtx, tfProject, usageData)
 	require.NoError(t, err)
 
-	r := output.ToOutputFormat([]*schema.Project{project})
+	r := output.ToOutputFormat(projects)
+	r.Currency = runCtx.Config.Currency
 
 	opts := output.Options{
 		ShowSkipped: true,
 		NoColor:     true,
-		Fields:      cfg.Fields,
+		Fields:      runCtx.Config.Fields,
 	}
 
 	actual, err := output.ToTable(r, opts)
@@ -217,56 +242,40 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 		actual = actual[endOfFirstLine+1:]
 	}
 
-	// Load the snapshot result
-	expected := []byte("")
+	if logBuf != nil && logBuf.Len() > 0 {
+		actual = append(actual, "\nLogs:\n"...)
+
+		// need to sort the logs so they can be compared consistently
+		logLines := strings.Split(logBuf.String(), "\n")
+		sort.Strings(logLines)
+		actual = append(actual, strings.Join(logLines, "\n")...)
+	}
+
 	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
-	if _, err := os.Stat(goldenFilePath); err == nil || !os.IsNotExist(err) {
-		// golden file exists, load the data
-		expected, err = ioutil.ReadFile(goldenFilePath)
-		assert.NoError(t, err)
-	}
-
-	if !bytes.Equal(expected, actual) {
-		if *update {
-			err = ioutil.WriteFile(goldenFilePath, actual, 0600)
-			assert.NoError(t, err)
-			t.Logf(fmt.Sprintf("Wrote golden file %s", goldenFilePath))
-		} else {
-			// Generate the diff and error message.  We don't call assert.Equal because it escapes
-			// newlines (\n) and the output looks terrible.
-			diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
-				A:        difflib.SplitLines(string(expected)),
-				B:        difflib.SplitLines(string(actual)),
-				FromFile: "Expected",
-				FromDate: "",
-				ToFile:   "Actual",
-				ToDate:   "",
-				Context:  1,
-			})
-
-			t.Errorf(fmt.Sprintf("\nOutput does not match golden file: \n\n%s\n", diff))
-		}
-	}
+	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 
-func RunCostCalculations(t *testing.T, cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
-	project, err := loadResources(t, cfg, tfProject, usage)
+func RunCostCalculations(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+	projects, err := loadResources(t, runCtx, tfProject, usage)
 	if err != nil {
-		return project, err
+		return projects, err
 	}
-	err = prices.PopulatePrices(cfg, project)
-	if err != nil {
-		return project, err
+
+	for _, project := range projects {
+		err = prices.PopulatePrices(runCtx.Config, project)
+		if err != nil {
+			return projects, err
+		}
+		schema.CalculateCosts(project)
 	}
-	schema.CalculateCosts(project)
-	return project, nil
+	return projects, nil
 }
 
 func CreateTerraformProject(tmpDir string, tfProject TerraformProject) (string, error) {
 	return writeToTmpDir(tmpDir, tfProject)
 }
 
-func loadResources(t *testing.T, cfg *config.Config, tfProject TerraformProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+func loadResources(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	tmpDir := t.TempDir()
 
 	_, err := os.ReadDir(initCache)
@@ -283,11 +292,6 @@ func loadResources(t *testing.T, cfg *config.Config, tfProject TerraformProject,
 		return nil, err
 	}
 
-	runCtx, err := config.NewRunContextFromEnv(context.Background())
-	if err != nil {
-		return nil, err
-	}
-
 	provider := terraform.NewDirProvider(config.NewProjectContext(
 		runCtx,
 		&config.Project{
@@ -295,9 +299,7 @@ func loadResources(t *testing.T, cfg *config.Config, tfProject TerraformProject,
 		},
 	))
 
-	project := schema.NewProject("tftest", &schema.ProjectMetadata{})
-
-	return project, provider.LoadResources(project, usage)
+	return provider.LoadResources(usage)
 }
 
 func copyInitCacheToPath(source, destination string) error {

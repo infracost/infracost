@@ -54,7 +54,7 @@ func privateEndpointCostComponent(region, name, meterName string) *schema.CostCo
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Virtual Network Private Link")},
-				{Key: "meterName", ValueRegex: strPtr(meterName)},
+				{Key: "meterName", Value: strPtr(meterName)},
 			},
 		},
 	}
@@ -73,7 +73,7 @@ func privateEndpointDataCostComponent(region, name, meterName string, quantity *
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Virtual Network Private Link")},
-				{Key: "meterName", ValueRegex: strPtr(meterName)},
+				{Key: "meterName", Value: strPtr(meterName)},
 			},
 		},
 	}

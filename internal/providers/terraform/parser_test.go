@@ -524,7 +524,7 @@ func TestParseResourceData(t *testing.T) {
 	}
 
 	p := NewParser(config.EmptyProjectContext())
-	actual := p.parseResourceData(providerConf, planVals, conf, vars)
+	actual := p.parseResourceData(false, providerConf, planVals, conf, vars)
 
 	for k, v := range actual {
 		assert.Equal(t, expected[k].Address, v.Address)
@@ -808,4 +808,126 @@ func TestParseKnownModuleRefs(t *testing.T) {
 	parseKnownModuleRefs(resData, conf)
 
 	assert.NotNil(t, resData[res.Address].References("launch_template"))
+}
+
+func TestAddressResourcePart(t *testing.T) {
+	tests := []struct {
+		address  string
+		expected string
+	}{
+		{"aws_instance.my_instance", "aws_instance.my_instance"},
+		{"data.aws_instance.my_instance", "data.aws_instance.my_instance"},
+		{"aws_instance.my_instance[\"index.1\"]", "aws_instance.my_instance[\"index.1\"]"},
+		{"data.aws_instance.my_instance[\"index.1\"]", "data.aws_instance.my_instance[\"index.1\"]"},
+		// Modules
+		{"module.my_module.aws_instance.my_instance", "aws_instance.my_instance"},
+		{"module.my_module.data.aws_instance.my_instance", "data.aws_instance.my_instance"},
+		{"module.my_module.aws_instance.my_instance[\"index.1\"]", "aws_instance.my_instance[\"index.1\"]"},
+		{"module.my_module.data.aws_instance.my_instance[\"index.1\"]", "data.aws_instance.my_instance[\"index.1\"]"},
+		// Submodules
+		{"module.my_module.module.my_submodule.aws_instance.my_instance", "aws_instance.my_instance"},
+		{"module.my_module.module.my_submodule.data.aws_instance.my_instance", "data.aws_instance.my_instance"},
+		{"module.my_module.module.my_submodule.aws_instance.my_instance[\"index.1\"]", "aws_instance.my_instance[\"index.1\"]"},
+		{"module.my_module.module.my_submodule.data.aws_instance.my_instance[\"index.1\"]", "data.aws_instance.my_instance[\"index.1\"]"},
+		// Submodules with index
+		{"module.my_module.module.my_submodule[\"index.1\"].aws_instance.my_instance", "aws_instance.my_instance"},
+		{"module.my_module.module.my_submodule[\"index.1\"].data.aws_instance.my_instance", "data.aws_instance.my_instance"},
+		{"module.my_module.module.my_submodule[\"index.1\"].aws_instance.my_instance[\"index.1\"]", "aws_instance.my_instance[\"index.1\"]"},
+		{"module.my_module.module.my_submodule[\"index.1\"].data.aws_instance.my_instance[\"index.1\"]", "data.aws_instance.my_instance[\"index.1\"]"},
+	}
+
+	for _, test := range tests {
+		actual := addressResourcePart(test.address)
+		assert.Equal(t, test.expected, actual)
+	}
+}
+
+func TestAddressModulePart(t *testing.T) {
+	tests := []struct {
+		address  string
+		expected string
+	}{
+		{"aws_instance.my_instance", ""},
+		{"data.aws_instance.my_instance", ""},
+		{"aws_instance.my_instance[\"index.1\"]", ""},
+		{"data.aws_instance.my_instance[\"index.1\"]", ""},
+		// Modules
+		{"module.my_module.aws_instance.my_instance", "module.my_module."},
+		{"module.my_module.data.aws_instance.my_instance", "module.my_module."},
+		{"module.my_module.aws_instance.my_instance[\"index.1\"]", "module.my_module."},
+		{"module.my_module.data.aws_instance.my_instance[\"index.1\"]", "module.my_module."},
+		// Submodules
+		{"module.my_module.module.my_submodule.aws_instance.my_instance", "module.my_module.module.my_submodule."},
+		{"module.my_module.module.my_submodule.data.aws_instance.my_instance", "module.my_module.module.my_submodule."},
+		{"module.my_module.module.my_submodule.aws_instance.my_instance[\"index.1\"]", "module.my_module.module.my_submodule."},
+		{"module.my_module.module.my_submodule.data.aws_instance.my_instance[\"index.1\"]", "module.my_module.module.my_submodule."},
+		// Submodules with index
+		{"module.my_module.module.my_submodule[\"index.1\"].aws_instance.my_instance", "module.my_module.module.my_submodule[\"index.1\"]."},
+		{"module.my_module.module.my_submodule[\"index.1\"].data.aws_instance.my_instance", "module.my_module.module.my_submodule[\"index.1\"]."},
+		{"module.my_module.module.my_submodule[\"index.1\"].aws_instance.my_instance[\"index.1\"]", "module.my_module.module.my_submodule[\"index.1\"]."},
+		{"module.my_module.module.my_submodule[\"index.1\"].data.aws_instance.my_instance[\"index.1\"]", "module.my_module.module.my_submodule[\"index.1\"]."},
+	}
+
+	for _, test := range tests {
+		actual := addressModulePart(test.address)
+		assert.Equal(t, test.expected, actual)
+	}
+}
+
+func TestRemoveAddressArrayPart(t *testing.T) {
+	tests := []struct {
+		address  string
+		expected string
+	}{
+		{"aws_instance.my_instance", "aws_instance.my_instance"},
+		{"data.aws_instance.my_instance", "data.aws_instance.my_instance"},
+		{"aws_instance.my_instance[\"index.1\"]", "aws_instance.my_instance"},
+		{"data.aws_instance.my_instance[\"index.1\"]", "data.aws_instance.my_instance"},
+		{"aws_instance.my_instance[\"index[1]\"]", "aws_instance.my_instance"},
+		{"data.aws_instance.my_instance[\"index[1]\"]", "data.aws_instance.my_instance"},
+		// Modules
+		{"module.my_module.aws_instance.my_instance", "aws_instance.my_instance"},
+		{"module.my_module.data.aws_instance.my_instance", "data.aws_instance.my_instance"},
+		{"module.my_module.aws_instance.my_instance[\"index.1\"]", "aws_instance.my_instance"},
+		{"module.my_module.data.aws_instance.my_instance[\"index.1\"]", "data.aws_instance.my_instance"},
+		{"module.my_module.aws_instance.my_instance[\"index[1]\"]", "aws_instance.my_instance"},
+		{"module.my_module.data.aws_instance.my_instance[\"index[1]\"]", "data.aws_instance.my_instance"},
+	}
+
+	for _, test := range tests {
+		actual := removeAddressArrayPart(test.address)
+		assert.Equal(t, test.expected, actual)
+	}
+}
+
+func TestGetModuleNames(t *testing.T) {
+	tests := []struct {
+		address  string
+		expected []string
+	}{
+		{"aws_instance.my_instance", []string{}},
+		{"data.aws_instance.my_instance", []string{}},
+		{"aws_instance.my_instance[\"index.1\"]", []string{}},
+		{"data.aws_instance.my_instance[\"index.1\"]", []string{}},
+		// Modules
+		{"module.my_module.aws_instance.my_instance", []string{"my_module"}},
+		{"module.my_module.data.aws_instance.my_instance", []string{"my_module"}},
+		{"module.my_module.aws_instance.my_instance[\"index.1\"]", []string{"my_module"}},
+		{"module.my_module.data.aws_instance.my_instance[\"index.1\"]", []string{"my_module"}},
+		// Submodules
+		{"module.my_module.module.my_submodule.aws_instance.my_instance", []string{"my_module", "my_submodule"}},
+		{"module.my_module.module.my_submodule.data.aws_instance.my_instance", []string{"my_module", "my_submodule"}},
+		{"module.my_module.module.my_submodule.aws_instance.my_instance[\"index.1\"]", []string{"my_module", "my_submodule"}},
+		{"module.my_module.module.my_submodule.data.aws_instance.my_instance[\"index.1\"]", []string{"my_module", "my_submodule"}},
+		// Submodules with index
+		{"module.my_module.module.my_submodule[\"index.1\"].aws_instance.my_instance", []string{"my_module", "my_submodule"}},
+		{"module.my_module.module.my_submodule[\"index.1\"].data.aws_instance.my_instance", []string{"my_module", "my_submodule"}},
+		{"module.my_module.module.my_submodule[\"index.1\"].aws_instance.my_instance[\"index.1\"]", []string{"my_module", "my_submodule"}},
+		{"module.my_module.module.my_submodule[\"index.1\"].data.aws_instance.my_instance[\"index.1\"]", []string{"my_module", "my_submodule"}},
+	}
+
+	for _, test := range tests {
+		actual := getModuleNames(test.address)
+		assert.Equal(t, test.expected, actual)
+	}
 }

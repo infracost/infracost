@@ -13,7 +13,7 @@ import (
 const minConfigFileVersion = "0.1"
 const maxConfigFileVersion = "0.1"
 
-type ConfigFileSpec struct { // nolint:golint
+type ConfigFileSpec struct { // nolint:revive
 	Version  string     `yaml:"version"`
 	Projects []*Project `yaml:"projects" ignored:"true"`
 }
@@ -21,7 +21,7 @@ type ConfigFileSpec struct { // nolint:golint
 func LoadConfigFile(path string) (ConfigFileSpec, error) {
 	cfgFile := ConfigFileSpec{}
 
-	if !fileExists(path) {
+	if !FileExists(path) {
 		return cfgFile, fmt.Errorf("Config file does not exist at %s", path)
 	}
 

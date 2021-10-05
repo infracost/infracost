@@ -4,7 +4,7 @@
  azurerm_mssql_database.LTR                                                                                 
  ├─ Compute (provisioned, GP_Gen5_4)                                    730  hours                  $444.47 
  ├─ SQL license                                                       2,920  vCore-hours            $291.90 
- ├─ Storage                                                               5  GB                       $0.57 
+ ├─ Storage                                                               5  GB                       $0.58 
  └─ Long-term retention                                               1,000  GB                      $50.00 
                                                                                                             
  azurerm_mssql_database.business_critical_gen                                                               
@@ -22,12 +22,12 @@
  azurerm_mssql_database.general_purpose_gen                                                                 
  ├─ Compute (provisioned, GP_Gen5_4)                                    730  hours                  $444.47 
  ├─ SQL license                                                       2,920  vCore-hours            $291.90 
- ├─ Storage                                                               5  GB                       $0.57 
+ ├─ Storage                                                               5  GB                       $0.58 
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
  azurerm_mssql_database.general_purpose_gen_without_license                                                 
  ├─ Compute (provisioned, GP_Gen5_4)                                    730  hours                  $444.47 
- ├─ Storage                                                               5  GB                       $0.57 
+ ├─ Storage                                                               5  GB                       $0.58 
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
  azurerm_mssql_database.general_purpose_gen_zone                                                            
@@ -55,7 +55,7 @@
                                                                                                             
  azurerm_mssql_database.serverless                                                                          
  ├─ Compute (serverless, GP_S_Gen5_4)                                   500  vCore-hours            $260.88 
- ├─ Storage                                                               5  GB                       $0.57 
+ ├─ Storage                                                               5  GB                       $0.58 
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
  azurerm_mssql_database.standard1                                                                           
@@ -71,3 +71,19 @@
  OVERALL TOTAL                                                                                   $28,382.88 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+Logs:
+
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, BC_Gen5_8)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, BC_M_8)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, HS_Gen5_2)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, HS_Gen5_2)' due to limitations in the Azure API."
+level=warning msg="Multiple products found for azurerm_mssql_database.LTR Compute (provisioned, GP_Gen5_4), using the first product"
+level=warning msg="Multiple products found for azurerm_mssql_database.business_critical_gen Compute (provisioned, BC_Gen5_8), using the first product"
+level=warning msg="Multiple products found for azurerm_mssql_database.business_critical_m Compute (provisioned, BC_M_8), using the first product"
+level=warning msg="Multiple products found for azurerm_mssql_database.general_purpose_gen Compute (provisioned, GP_Gen5_4), using the first product"
+level=warning msg="Multiple products found for azurerm_mssql_database.general_purpose_gen_without_license Compute (provisioned, GP_Gen5_4), using the first product"
+level=warning msg="Multiple products found for azurerm_mssql_database.general_purpose_gen_zone Compute (provisioned, GP_Gen5_4), using the first product"

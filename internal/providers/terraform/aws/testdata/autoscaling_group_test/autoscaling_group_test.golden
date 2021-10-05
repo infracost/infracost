@@ -102,6 +102,12 @@
  └─ aws_launch_template.lt_tenancy_dedicated                                                       
     └─ Instance usage (Linux/UNIX, on-demand, m3.medium)           1,460  hours            $108.04 
                                                                                                    
+ aws_autoscaling_group.asg_lt_usage                                                                
+ └─ aws_launch_template.lt_usage                                                                   
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           4,380  hours            $203.23 
+    └─ block_device_mapping[0]                                                                     
+       └─ Storage (general purpose SSD, gp2)                          60  GB                 $6.00 
+                                                                                                   
  aws_autoscaling_group.asg_mixed_instance_basic                                                    
  └─ aws_launch_template.lt_mixed_instance_basic                                                    
     └─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23 
@@ -110,8 +116,12 @@
  └─ aws_launch_template.lt_mixed_instance_dynamic                                                  
     └─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23 
                                                                                                    
- OVERALL TOTAL                                                                           $2,923.78 
+ OVERALL TOTAL                                                                           $3,133.01 
 ----------------------------------
 1 resource type wasn't estimated as it's not supported yet.
 Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
 2 x aws_autoscaling_group
+Logs:
+
+level=warning msg="Skipping resource aws_launch_configuration.lc_tenancy_host. Infracost currently does not support host tenancy for AWS Launch Configurations"
+level=warning msg="Skipping resource aws_launch_template.lt_tenancy_host. Infracost currently does not support host tenancy for AWS Launch Templates"

@@ -11,7 +11,6 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -28,7 +27,7 @@ func main() {
 	ctx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
 		if err.Error() != "" {
-			ui.PrintError(err.Error())
+			ui.PrintError(os.Stderr, err.Error())
 		}
 		os.Exit(1)
 	}
@@ -52,6 +51,11 @@ func main() {
 
 	startUpdateCheck(ctx, updateMessageChan)
 
+	rootCmd := NewRootCommand(ctx)
+	appErr = rootCmd.Execute()
+}
+
+func NewRootCommand(ctx *config.RunContext) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:     "infracost",
 		Version: version.Version,
@@ -84,6 +88,7 @@ func main() {
 	rootCmd.PersistentFlags().String("log-level", "", "Log level (trace, debug, info, warn, error, fatal)")
 
 	rootCmd.AddCommand(registerCmd(ctx))
+	rootCmd.AddCommand(configureCmd(ctx))
 	rootCmd.AddCommand(diffCmd(ctx))
 	rootCmd.AddCommand(breakdownCmd(ctx))
 	rootCmd.AddCommand(outputCmd(ctx))
@@ -123,8 +128,9 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	))
 
 	rootCmd.SetVersionTemplate("Infracost {{.Version}}\n")
+	rootCmd.SetOut(os.Stdout)
 
-	appErr = rootCmd.Execute()
+	return rootCmd
 }
 
 func startUpdateCheck(ctx *config.RunContext, c chan *update.Info) {
@@ -140,10 +146,10 @@ func startUpdateCheck(ctx *config.RunContext, c chan *update.Info) {
 
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
 	if apiEndpoint == defaultEndpoint && apiKey == "" {
-		return errors.New(fmt.Sprintf(
+		return fmt.Errorf(
 			"No INFRACOST_API_KEY environment variable is set.\nWe run a free Cloud Pricing API, to get an API key run %s",
 			ui.PrimaryString("infracost register"),
-		))
+		)
 	}
 
 	return nil
@@ -156,7 +162,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 	}
 
 	if cliErr.Error() != "" {
-		ui.PrintError(cliErr.Error())
+		ui.PrintError(os.Stderr, cliErr.Error())
 	}
 
 	err := apiclient.ReportCLIError(ctx, cliErr)
@@ -207,10 +213,6 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 		if err != nil {
 			return err
 		}
-	}
-
-	if cmd.Flags().Changed("pricing-api-endpoint") {
-		ctx.Config.PricingAPIEndpoint, _ = cmd.Flags().GetString("pricing-api-endpoint")
 	}
 
 	ctx.SetContextValue("isDefaultPricingAPIEndpoint", ctx.Config.PricingAPIEndpoint == ctx.Config.DefaultPricingAPIEndpoint)

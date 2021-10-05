@@ -16,13 +16,19 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: 1.17
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v2.3.0
+        uses: golangci/golangci-lint-action@v2.5.2
         with:
           # Required: the version of golangci-lint is required and must be specified without patch version: they always use the latest patch version.
-          version: v1.31
+          version: v1.41
+
+      - name: Install Terragrunt v0.31.8
+        run: |
+          sudo wget -q -O /usr/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/v0.31.8/terragrunt_linux_amd64"
+          sudo chmod +x /usr/bin/terragrunt
+          terragrunt --version
 
       - name: Test (unit and shared integration)
         run: make test_shared_int
@@ -33,6 +39,7 @@ jobs:
       - name: Test example works ok from CLI
         run: |
           make run --silent ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml --format json" > infracost-output.json
+          [ -s infracost-output.json ] || (echo "file is empty" && exit 1)
           jq '' infracost-output.json
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
@@ -41,6 +48,7 @@ jobs:
       - name: Test example works ok from config file
         run: |
           make run --silent ARGS="breakdown --config-file=infracost-example.yml"
+          [ -s infracost-output.json ] || (echo "file is empty" && exit 1)
           jq '' infracost-output.json
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
@@ -55,7 +63,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: 1.17
 
       - name: Test (AWS)
         run: make test_aws
@@ -72,7 +80,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: 1.17
 
       - name: Test (Google)
         run: make test_google
@@ -89,7 +97,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: 1.17
 
       - name: Test (Azure)
         run: make test_azure

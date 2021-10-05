@@ -23,7 +23,7 @@
  ├─ Table data restored                                        230  GB                          $34.50 
  ├─ Streams read request unit (sRRU)                     2,000,000  sRRUs                        $0.40 
  ├─ Global table (us-east-2)                                                                           
- │  └─ Replicated write request unit (rWRU)             4,109.5890  rWRU                         $5.62 
+ │  └─ Replicated write request unit (rWRU)             4,109.5890  rWRU                         $5.63 
  └─ Global table (us-west-1)                                                                           
     └─ Replicated write request unit (rWRU)             4,109.5890  rWRU                         $6.27 
                                                                                                        

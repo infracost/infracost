@@ -4,6 +4,7 @@ import (
 	"sort"
 
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 )
 
 var HourToMonthUnitMultiplier = decimal.NewFromInt(730)
@@ -11,17 +12,19 @@ var HourToMonthUnitMultiplier = decimal.NewFromInt(730)
 type ResourceFunc func(*ResourceData, *UsageData) *Resource
 
 type Resource struct {
-	Name           string
-	CostComponents []*CostComponent
-	SubResources   []*Resource
-	HourlyCost     *decimal.Decimal
-	MonthlyCost    *decimal.Decimal
-	IsSkipped      bool
-	NoPrice        bool
-	SkipMessage    string
-	ResourceType   string
-	Tags           map[string]string
-	UsageSchema    []*UsageSchemaItem
+	Name              string
+	CostComponents    []*CostComponent
+	SubResources      []*Resource
+	HourlyCost        *decimal.Decimal
+	MonthlyCost       *decimal.Decimal
+	IsSkipped         bool
+	NoPrice           bool
+	SkipMessage       string
+	ResourceType      string
+	Tags              map[string]string
+	UsageSchema       []*UsageSchemaItem
+	EstimateUsage     EstimateFunc
+	EstimationSummary map[string]bool
 }
 
 func CalculateCosts(project *Project) {
@@ -64,6 +67,9 @@ func (r *Resource) CalculateCosts() {
 	if hasCost {
 		r.HourlyCost = &h
 		r.MonthlyCost = &m
+	}
+	if r.NoPrice {
+		log.Debugf("Skipping free resource %s", r.Name)
 	}
 }
 

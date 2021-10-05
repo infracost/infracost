@@ -14,6 +14,7 @@ const (
 	Int64 UsageVariableType = iota
 	String
 	Float64
+	StringArray
 )
 
 // type UsageDataValidatorFuncType = func(value interface{}) error
@@ -22,7 +23,6 @@ type UsageSchemaItem struct {
 	Key          string
 	DefaultValue interface{}
 	ValueType    UsageVariableType
-
 	// These aren't used yet and I'm not entirely sure how they fit in, but they were part of the discussion about usage schema.
 	// ValidatorFunc UsageDataValidatorFuncType
 	// SubUsageData  *UsageSchemaItem
@@ -69,11 +69,52 @@ func (u *UsageData) GetInt(key string) *int64 {
 	return nil
 }
 
+func (u *UsageData) GetString(key string) *string {
+	if u.Get(key).Type != gjson.Null {
+		val := u.Get(key).String()
+		return &val
+	}
+
+	return nil
+}
+
+func (u *UsageData) GetStringArray(key string) *[]string {
+	if u.Get(key).Type != gjson.Null {
+		gjsonArray := u.Get(key).Array()
+
+		stringArray := make([]string, len(gjsonArray))
+		for i, gresult := range gjsonArray {
+			stringArray[i] = gresult.String()
+		}
+		return &stringArray
+	}
+
+	return nil
+}
+
 func convertArrayKeyToWildcard(key string) string {
 	lastOpenBracket := strings.LastIndex(key, "[")
 	lastCloseBracket := strings.LastIndex(key, "]")
 
 	return key[:lastOpenBracket+1] + "*" + key[lastCloseBracket:]
+}
+
+// CalcEstimationSummary returns a map where a value of true means the attribute key has an actual estimate, false means
+// it is using the defaults
+func (u *UsageData) CalcEstimationSummary() map[string]bool {
+	estimationMap := make(map[string]bool)
+	for k, v := range u.Attributes {
+		// figure out if the attribute has estimated value or if it is just using the defaults
+		hasEstimate := false
+		switch v.Type {
+		case gjson.Number:
+			hasEstimate = v.Num > 0
+		case gjson.String:
+			hasEstimate = v.Str != ""
+		}
+		estimationMap[k] = hasEstimate
+	}
+	return estimationMap
 }
 
 func NewUsageMap(m map[string]interface{}) map[string]*UsageData {

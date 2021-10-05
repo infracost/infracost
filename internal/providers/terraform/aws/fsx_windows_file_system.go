@@ -82,6 +82,7 @@ func throughputCapacity(region string, isMultiAZ bool, throughput *decimal.Decim
 			ProductFamily: strPtr("Provisioned Throughput"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+				{Key: "fileSystemType", Value: strPtr("Windows")},
 			},
 		},
 	}
@@ -105,6 +106,7 @@ func backupStorageCapacity(region string, isMultiAZ bool, backupStorage *decimal
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "deploymentOption", Value: strPtr(deploymentOption)},
 				{Key: "usagetype", ValueRegex: strPtr("/BackupUsage/")},
+				{Key: "fileSystemType", Value: strPtr("Windows")},
 			},
 		},
 	}

@@ -143,7 +143,7 @@ func auroraStorageCostComponent(region string, u *schema.UsageData, databaseEngi
 			},
 		},
 		{
-			Name:            "I/O rate",
+			Name:            "I/O requests",
 			Unit:            "1M requests",
 			UnitMultiplier:  decimal.NewFromInt(1000000),
 			MonthlyQuantity: monthlyIORequests,

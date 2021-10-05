@@ -14,3 +14,5 @@ resource_usage:
   aws_autoscaling_group.asg_lt_cpu_credits:
     monthly_cpu_credit_hrs: 350
     vcpu_count: 2
+  aws_autoscaling_group.asg_lt_usage:
+    instances: 6

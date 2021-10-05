@@ -13,7 +13,7 @@
                                                                                  
  azurerm_mariadb_server.mo_16core                                                
  ├─ Compute (MO_Gen5_16)                       730  hours              $1,379.41 
- ├─ Storage                                      5  GB                     $0.57 
+ ├─ Storage                                      5  GB                     $0.58 
  └─ Additional backup storage        Monthly cost depends on usage: $0.10 per GB 
                                                                                  
  azurerm_mariadb_server.with_geo                                                 
@@ -23,7 +23,7 @@
                                                                                  
  azurerm_mariadb_server.without_geo                                              
  ├─ Compute (MO_Gen5_16)                       730  hours              $1,379.41 
- ├─ Storage                                      5  GB                     $0.57 
+ ├─ Storage                                      5  GB                     $0.58 
  └─ Additional backup storage                2,000  GB                   $200.00 
                                                                                  
  OVERALL TOTAL                                                         $5,041.69 

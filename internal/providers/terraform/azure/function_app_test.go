@@ -7,10 +7,11 @@ import (
 )
 
 func TestAzureRMAppFunctionGoldenFile(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "function_app_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	opts.CaptureLogs = true
+	tftest.GoldenFileResourceTestsWithOpts(t, "function_app_test", opts)
 }

@@ -2,8 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/Rhymond/go-money"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
@@ -42,6 +46,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projects := make([]*schema.Project, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
 
+	var spinner *ui.Spinner
+
 	for _, projectCfg := range runCtx.Config.Projects {
 		ctx := config.NewProjectContext(runCtx, projectCfg)
 		runCtx.SetCurrentProjectContext(ctx)
@@ -50,7 +56,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		if err != nil {
 			m := fmt.Sprintf("%s\n\n", err)
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
+			m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
 
 			if cmd.Name() != "diff" {
 				m += "\n - Terraform state JSON file"
@@ -64,7 +70,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 			m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file"
+			m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
 			return clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 		}
 
@@ -83,25 +89,62 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			ctx.SetContextValue("hasUsageFile", true)
 		}
 
-		metadata := config.DetectProjectMetadata(ctx)
-		metadata.Type = provider.Type()
-		provider.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, runCtx.Config.EnableDashboard)
-
-		project := schema.NewProject(name, metadata)
-		err = provider.LoadResources(project, u)
+		providerProjects, err := provider.LoadResources(u)
 		if err != nil {
 			return err
 		}
 
-		projects = append(projects, project)
+		if runCtx.Config.SyncUsageFile && projectCfg.UsageFile != "" {
+			spinnerOpts := ui.SpinnerOptions{
+				EnableLogging: runCtx.Config.IsLogging(),
+				NoColor:       runCtx.Config.NoColor,
+				Indent:        "  ",
+			}
+			spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
 
-		if runCtx.Config.SyncUsageFile {
-			err = usage.SyncUsageData(project, u, projectCfg.UsageFile)
+			syncResult, err := usage.SyncUsageData(providerProjects, u, projectCfg.UsageFile)
+			summarizeUsage(ctx, syncResult)
 			if err != nil {
+				spinner.Fail()
 				return err
 			}
+
+			remediateUsage(runCtx, ctx, syncResult)
+
+			u, err := usage.LoadFromFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
+			if err != nil {
+				spinner.Fail()
+				return err
+			}
+			providerProjects, err = provider.LoadResources(u)
+			if err != nil {
+				spinner.Fail()
+				return err
+			}
+
+			if syncResult == nil {
+				spinner.Fail()
+			} else {
+				resources := syncResult.ResourceCount
+				attempts := syncResult.EstimationCount
+				errors := len(syncResult.EstimationErrors)
+				successes := attempts - errors
+
+				pluralized := ""
+				if resources > 1 {
+					pluralized = "s"
+				}
+
+				spinner.Success()
+				cmd.Println(fmt.Sprintf("    %s Synced %d of %d resource%s",
+					ui.FaintString("└─"),
+					successes,
+					resources,
+					pluralized))
+			}
 		}
+
+		projects = append(projects, providerProjects...)
 
 		if !runCtx.Config.IsLogging() {
 			fmt.Fprintln(os.Stderr, "")
@@ -112,7 +155,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		EnableLogging: runCtx.Config.IsLogging(),
 		NoColor:       runCtx.Config.NoColor,
 	}
-	spinner := ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
+	spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 
 	for _, project := range projects {
 		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
@@ -120,7 +163,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			fmt.Fprintln(os.Stderr, "")
 
 			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
-				return errors.New(fmt.Sprintf("%v\n%s %s %s %s %s\n%s",
+				return fmt.Errorf("%v\n%s %s %s %s %s\n%s",
 					e.Error(),
 					"Please check your",
 					ui.PrimaryString(config.CredentialsFilePath()),
@@ -128,11 +171,11 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 					ui.PrimaryString("INFRACOST_API_KEY"),
 					"environment variable.",
 					"If you continue having issues please email hello@infracost.io",
-				))
+				)
 			}
 
 			if e, ok := err.(*apiclient.APIError); ok {
-				return errors.New(fmt.Sprintf("%v\n%s", e.Error(), "We have been notified of this issue."))
+				return fmt.Errorf("%v\n%s", e.Error(), "We have been notified of this issue.")
 			}
 
 			return err
@@ -145,18 +188,20 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	spinner.Success()
 
 	r := output.ToOutputFormat(projects)
+	r.Currency = runCtx.Config.Currency
 
 	var err error
 
-	c := apiclient.NewDashboardAPIClient(runCtx)
-	r.RunID, err = c.AddRun(runCtx, projectContexts, r)
+	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
+	r.RunID, err = dashboardClient.AddRun(runCtx, projectContexts, r)
 	if err != nil {
 		log.Errorf("Error reporting run: %s", err)
 	}
 
 	env := buildRunEnv(runCtx, projectContexts, r)
 
-	err = c.AddEvent("infracost-run", env)
+	pricingClient := apiclient.NewPricingAPIClient(runCtx.Config)
+	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
 		log.Errorf("Error reporting event: %s", err)
 	}
@@ -192,9 +237,43 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		return errors.Wrap(err, "Error generating output")
 	}
 
-	fmt.Printf("%s\n", out)
+	cmd.Printf("%s\n", out)
 
 	return nil
+}
+
+func summarizeUsage(ctx *config.ProjectContext, syncResult *usage.SyncResult) {
+	var usageSyncs, usageEstimates, usageEstimateErrors int
+	if syncResult != nil {
+		usageSyncs = syncResult.ResourceCount
+		usageEstimates = syncResult.EstimationCount
+		usageEstimateErrors = len(syncResult.EstimationErrors)
+	}
+	ctx.SetContextValue("usageSyncs", usageSyncs)
+	ctx.SetContextValue("usageEstimates", usageEstimates)
+	ctx.SetContextValue("usageEstimateErrors", usageEstimateErrors)
+}
+
+func remediateUsage(runCtx *config.RunContext, ctx *config.ProjectContext, syncResult *usage.SyncResult) {
+	if syncResult == nil {
+		return
+	}
+
+	var remediable, remAttempts, remErrors int
+	for _, err := range syncResult.EstimationErrors {
+		if _, ok := err.(schema.Remediater); ok {
+			remediable++
+			// remAttempts++
+			// err = remediater.Remediate()
+			// if err != nil {
+			// 	remErrors++
+			// 	log.Warningf("Cannot enable estimation for %s: %s", name, err.Error())
+			// }
+		}
+	}
+	ctx.SetContextValue("remediationOpportunities", remediable)
+	ctx.SetContextValue("remediationAttempts", remAttempts)
+	ctx.SetContextValue("remediationErrors", remErrors)
 }
 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
@@ -203,10 +282,11 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if cmd.Name() != "infracost" && !hasPathFlag && !hasConfigFile {
 		m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-		m += " - Terraform plan JSON file\n - Terraform directory\n - Terraform plan file\n - Terraform state JSON file"
+		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file\n - Terraform state JSON file"
 		m += "\n\nAlternatively, use --config-file to process multiple projects, see https://infracost.io/config-file"
 
-		ui.PrintUsageErrorAndExit(cmd, m)
+		ui.PrintUsage(cmd)
+		return errors.New(m)
 	}
 
 	hasProjectFlags := (hasPathFlag ||
@@ -215,10 +295,30 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		cmd.Flags().Changed("terraform-workspace") ||
 		cmd.Flags().Changed("terraform-use-state"))
 
-	if hasConfigFile && hasProjectFlags {
-		m := "--config-file flag cannot be used with the following flags: "
+	projectCfg := cfg.Projects[0]
+
+	hasProjectEnvs := projectCfg.Path != "" ||
+		projectCfg.TerraformBinary != "" ||
+		projectCfg.TerraformCloudHost != "" ||
+		projectCfg.TerraformWorkspace != "" ||
+		projectCfg.TerraformCloudToken != ""
+
+	if hasConfigFile && (hasProjectFlags || hasProjectEnvs) {
+		m := "--config-file flag cannot be used with the following flags or equivalent environment variables: "
 		m += "--path, --terraform-*, --usage-file"
-		ui.PrintUsageErrorAndExit(cmd, m)
+		ui.PrintUsage(cmd)
+		return errors.New(m)
+	}
+
+	if hasProjectFlags {
+		projectCfg.Path, _ = cmd.Flags().GetString("path")
+		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
+		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
+		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
+
+		if cmd.Flags().Changed("terraform-workspace") {
+			projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")
+		}
 	}
 
 	if hasConfigFile {
@@ -230,47 +330,27 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		}
 	}
 
-	projectCfg := &config.Project{}
-
-	if hasProjectFlags {
-		cfg.Projects = []*config.Project{
-			projectCfg,
-		}
-	}
-
-	if !hasConfigFile {
-		err := cfg.LoadFromEnv()
-		if err != nil {
-			return err
-		}
-	}
-
-	if hasProjectFlags {
-		projectCfg.Path, _ = cmd.Flags().GetString("path")
-		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
-		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
-		projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")
-		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
-	}
-
 	cfg.Format, _ = cmd.Flags().GetString("format")
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
 
+	includeAllFields := "all"
 	validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
 	validFieldsFormats := []string{"table", "html"}
 
 	if cmd.Flags().Changed("fields") {
-		if c, _ := cmd.Flags().GetStringSlice("fields"); len(c) == 0 {
-			ui.PrintWarningf("fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
+		fields, _ := cmd.Flags().GetStringSlice("fields")
+		if len(fields) == 0 {
+			ui.PrintWarningf(cmd.ErrOrStderr(), "fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
 		} else if cfg.Fields != nil && !contains(validFieldsFormats, cfg.Format) {
-			ui.PrintWarning("fields is only supported for table and html output formats")
+			ui.PrintWarning(cmd.ErrOrStderr(), "fields is only supported for table and html output formats")
+		} else if len(fields) == 1 && fields[0] == includeAllFields {
+			cfg.Fields = validFields
 		} else {
-			fields, _ := cmd.Flags().GetStringSlice("fields")
 			vf := []string{}
 			for _, f := range fields {
 				if !contains(validFields, f) {
-					ui.PrintWarningf("Invalid field '%s' specified, valid fields are: %s", f, validFields)
+					ui.PrintWarningf(cmd.ErrOrStderr(), "Invalid field '%s' specified, valid fields are: %s or '%s' to include all fields", f, validFields, includeAllFields)
 				} else {
 					vf = append(vf, f)
 				}
@@ -282,9 +362,9 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	return nil
 }
 
-func checkRunConfig(cfg *config.Config) error {
+func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 	if cfg.Format == "json" && cfg.ShowSkipped {
-		ui.PrintWarning("show-skipped is not needed with JSON output format as that always includes them.\n")
+		ui.PrintWarning(warningWriter, "show-skipped is not needed with JSON output format as that always includes them.\n")
 	}
 
 	if cfg.SyncUsageFile {
@@ -295,12 +375,17 @@ func checkRunConfig(cfg *config.Config) error {
 			}
 		}
 		if len(missingUsageFile) == 1 {
-			ui.PrintWarning("Ignoring sync-usage-file as no usage-file is specified.\n")
+			ui.PrintWarning(warningWriter, "Ignoring sync-usage-file as no usage-file is specified.\n")
 		} else if len(missingUsageFile) == len(cfg.Projects) {
-			ui.PrintWarning("Ignoring sync-usage-file since no projects have a usage-file specified.\n")
+			ui.PrintWarning(warningWriter, "Ignoring sync-usage-file since no projects have a usage-file specified.\n")
 		} else if len(missingUsageFile) > 1 {
-			ui.PrintWarning(fmt.Sprintf("Ignoring sync-usage-file for following projects as no usage-file is specified for them: %s.\n", strings.Join(missingUsageFile, ", ")))
+			ui.PrintWarning(warningWriter, fmt.Sprintf("Ignoring sync-usage-file for following projects as no usage-file is specified for them: %s.\n", strings.Join(missingUsageFile, ", ")))
 		}
+	}
+
+	if money.GetCurrency(cfg.Currency) == nil {
+		ui.PrintWarning(warningWriter, fmt.Sprintf("Ignoring unknown currency '%s', using USD.\n", cfg.Currency))
+		cfg.Currency = "USD"
 	}
 
 	return nil
@@ -309,6 +394,8 @@ func checkRunConfig(cfg *config.Config) error {
 func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root) map[string]interface{} {
 	env := runCtx.EventEnvWithProjectContexts(projectContexts)
 	env["projectCount"] = len(projectContexts)
+	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
+	env["currency"] = runCtx.Config.Currency
 
 	summary := r.FullSummary
 	env["supportedResourceCounts"] = summary.SupportedResourceCounts
@@ -317,6 +404,11 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["totalUnsupportedResources"] = summary.TotalUnsupportedResources
 	env["totalNoPriceResources"] = summary.TotalNoPriceResources
 	env["totalResources"] = summary.TotalResources
+
+	env["estimatedUsageCounts"] = summary.EstimatedUsageCounts
+	env["unestimatedUsageCounts"] = summary.UnestimatedUsageCounts
+	env["totalEstimatedUsages"] = summary.TotalEstimatedUsages
+	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
 
 	return env
 }

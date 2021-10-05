@@ -2,5 +2,13 @@ version: 0.1
 resource_usage:
   aws_dx_connection.my_dx_connection_usage:
     monthly_outbound_region_to_dx_location_gb: 100
+    monthly_outbound_from_region_to_dx_connection_location:
+      eu_west_1: 1000
+      ap_east_1: 3000
+      does_not_exist: 6000
+    dx_virtual_interface_type: private
+    dx_connection_type: dedicated
+  aws_dx_connection.my_dx_connection_usage_backwards_compat:
+    monthly_outbound_region_to_dx_location_gb: 200
     dx_virtual_interface_type: private
     dx_connection_type: dedicated

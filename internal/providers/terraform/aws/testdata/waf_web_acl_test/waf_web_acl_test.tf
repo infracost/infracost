@@ -9,6 +9,18 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
+provider "aws" {
+  alias                       = "us-west-1"
+  region                      = "us-west-1"
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true
+  skip_requesting_account_id  = true
+  skip_get_ec2_platforms      = true
+  skip_region_validation      = true
+  access_key                  = "mock_access_key"
+  secret_key                  = "mock_secret_key"
+}
+
 resource "aws_waf_ipset" "ipset" {
   name = "tfIPSet"
 
@@ -78,8 +90,8 @@ resource "aws_waf_web_acl" "my_waf" {
     rule_id  = aws_waf_rule.wafrule.id
     type     = "GROUP"
   }
-
 }
+
 resource "aws_waf_web_acl" "withoutUsage" {
   depends_on = [
     aws_waf_ipset.ipset,
@@ -128,5 +140,55 @@ resource "aws_waf_web_acl" "withoutUsage" {
     rule_id  = aws_waf_rule.wafrule.id
     type     = "GROUP"
   }
+}
 
+resource "aws_waf_web_acl" "us_west_1" {
+  provider = aws.us-west-1
+  depends_on = [
+    aws_waf_ipset.ipset,
+    aws_waf_rule.wafrule,
+  ]
+  name        = "tfWebACL"
+  metric_name = "tfWebACL"
+
+  default_action {
+    type = "ALLOW"
+  }
+
+  rules {
+    action {
+      type = "BLOCK"
+    }
+
+    priority = 1
+    rule_id  = aws_waf_rule.wafrule.id
+    type     = "REGULAR"
+  }
+  rules {
+    action {
+      type = "BLOCK"
+    }
+
+    priority = 1
+    rule_id  = aws_waf_rule.wafrule.id
+    type     = "RATE_BASED"
+  }
+  rules {
+    action {
+      type = "BLOCK"
+    }
+
+    priority = 1
+    rule_id  = aws_waf_rule.wafrule.id
+    type     = "GROUP"
+  }
+  rules {
+    action {
+      type = "BLOCK"
+    }
+
+    priority = 1
+    rule_id  = aws_waf_rule.wafrule.id
+    type     = "GROUP"
+  }
 }

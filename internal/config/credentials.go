@@ -11,19 +11,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type CredentialsProfileSpec struct {
-	APIKey string `yaml:"api_key"`
-}
+var credentialsVersion = "0.1"
 
-type Credentials map[string]CredentialsProfileSpec
+type Credentials struct {
+	Version            string `yaml:"version"`
+	APIKey             string `yaml:"api_key,omitempty"`
+	PricingAPIEndpoint string `yaml:"pricing_api_endpoint,omitempty"`
+}
 
 func loadCredentials(cfg *Config) error {
 	var err error
-
-	cfg.Credentials, err = readCredentialsFileIfExists()
-	if err != nil {
-		return errors.New("Error parsing credentials YAML: " + strings.TrimPrefix(err.Error(), "yaml: "))
-	}
 
 	err = cfg.migrateCredentials()
 	if err != nil {
@@ -31,20 +28,34 @@ func loadCredentials(cfg *Config) error {
 		logrus.Debug(err)
 	}
 
-	profile, ok := cfg.Credentials[cfg.PricingAPIEndpoint]
-	if ok && cfg.APIKey == "" {
-		cfg.APIKey = profile.APIKey
+	cfg.Credentials, err = readCredentialsFileIfExists()
+	if err != nil {
+		return errors.New("Error parsing credentials YAML: " + strings.TrimPrefix(err.Error(), "yaml: "))
+	}
+
+	if cfg.PricingAPIEndpoint == "" {
+		cfg.PricingAPIEndpoint = cfg.Credentials.PricingAPIEndpoint
+	}
+	if cfg.PricingAPIEndpoint == "" {
+		cfg.PricingAPIEndpoint = cfg.DefaultPricingAPIEndpoint
+	}
+
+	if cfg.APIKey == "" {
+		cfg.APIKey = cfg.Credentials.APIKey
 	}
 
 	return nil
 }
 
 func (c Credentials) Save() error {
+	if c.Version == "" {
+		c.Version = credentialsVersion
+	}
 	return writeCredentialsFile(c)
 }
 
 func readCredentialsFileIfExists() (Credentials, error) {
-	if !fileExists(CredentialsFilePath()) {
+	if !FileExists(CredentialsFilePath()) {
 		return Credentials{}, nil
 	}
 
@@ -74,6 +85,6 @@ func writeCredentialsFile(c Credentials) error {
 	return ioutil.WriteFile(CredentialsFilePath(), data, 0600)
 }
 
-func CredentialsFilePath() string { // nolint:golint
+func CredentialsFilePath() string {
 	return path.Join(userConfigDir(), "credentials.yml")
 }

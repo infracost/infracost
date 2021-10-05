@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/shopspring/decimal"
 	"html/template"
 	"strings"
 
@@ -25,10 +26,11 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 			safe = strings.ReplaceAll(safe, "\n", "<br />")
 			return template.HTML(safe) // nolint:gosec
 		},
-		"contains":       contains,
-		"formatCost2DP":  formatCost2DP,
-		"formatPrice":    formatPrice,
-		"formatQuantity": formatQuantity,
+		"contains":                contains,
+		"formatCost2DP":           func(d *decimal.Decimal) string { return formatCost2DP(out.Currency, d) },
+		"formatPrice":             func(d decimal.Decimal) string { return formatPrice(out.Currency, d) },
+		"formatTitleWithCurrency": func(title string) string { return formatTitleWithCurrency(title, out.Currency) },
+		"formatQuantity":          formatQuantity,
 		"projectLabel": func(p Project) string {
 			return p.Label(opts.DashboardEnabled)
 		},

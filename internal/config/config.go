@@ -1,6 +1,7 @@
 package config
 
 import (
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -23,8 +24,9 @@ type Project struct {
 	TerraformUseState   bool   `yaml:"terraform_use_state,omitempty" ignored:"true"`
 }
 
-type Config struct { // nolint:golint
-	Credentials Credentials
+type Config struct {
+	Credentials   Credentials
+	Configuration Configuration
 
 	Version         string `yaml:"version,omitempty" ignored:"true"`
 	LogLevel        string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
@@ -37,11 +39,18 @@ type Config struct { // nolint:golint
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
 
+	Currency string `envconfig:"INFRACOST_CURRENCY"`
+
 	Projects      []*Project `yaml:"projects" ignored:"true"`
 	Format        string     `yaml:"format,omitempty" ignored:"true"`
 	ShowSkipped   bool       `yaml:"show_skipped,omitempty" ignored:"true"`
 	SyncUsageFile bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
 	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
+
+	// for testing
+	EventsDisabled       bool
+	LogWriter            io.Writer
+	LogDisableTimestamps bool
 }
 
 func init() {
@@ -57,13 +66,15 @@ func DefaultConfig() *Config {
 		NoColor:  false,
 
 		DefaultPricingAPIEndpoint: "https://pricing.api.infracost.io",
-		PricingAPIEndpoint:        "https://pricing.api.infracost.io",
+		PricingAPIEndpoint:        "",
 		DashboardAPIEndpoint:      "https://dashboard.api.infracost.io",
 
 		Projects: []*Project{{}},
 
 		Format: "table",
 		Fields: []string{"monthlyQuantity", "unit", "monthlyCost"},
+
+		EventsDisabled: IsTest(),
 	}
 }
 
@@ -97,7 +108,12 @@ func (c *Config) LoadFromEnv() error {
 
 	err = loadCredentials(c)
 	if err != nil {
-		logrus.Fatal(err)
+		return err
+	}
+
+	err = loadConfiguration(c)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -121,8 +137,9 @@ func (c *Config) loadEnvVars() error {
 
 func (c *Config) ConfigureLogger() error {
 	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-		DisableColors: true,
+		FullTimestamp:    true,
+		DisableTimestamp: c.LogDisableTimestamps,
+		DisableColors:    true,
 		SortingFunc: func(keys []string) {
 			// Put message at the end
 			for i, key := range keys {
@@ -139,7 +156,11 @@ func (c *Config) ConfigureLogger() error {
 		return nil
 	}
 
-	logrus.SetOutput(os.Stderr)
+	if c.LogWriter != nil {
+		logrus.SetOutput(c.LogWriter)
+	} else {
+		logrus.SetOutput(os.Stderr)
+	}
 
 	level, err := logrus.ParseLevel(c.LogLevel)
 	if err != nil {
@@ -155,14 +176,6 @@ func (c *Config) IsLogging() bool {
 	return c.LogLevel != ""
 }
 
-func (c *Config) IsSelfHosted() bool {
-	return c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
-}
-
-func (c *Config) IsTelemetryDisabled() bool {
-	return c.IsSelfHosted() && IsFalsy(os.Getenv("INFRACOST_SELF_HOSTED_TELEMETRY"))
-}
-
 func IsTest() bool {
 	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
 }
@@ -173,14 +186,14 @@ func IsDev() bool {
 
 func loadDotEnv() error {
 	envLocalPath := filepath.Join(RootDir(), ".env.local")
-	if fileExists(envLocalPath) {
+	if FileExists(envLocalPath) {
 		err := godotenv.Load(envLocalPath)
 		if err != nil {
 			return err
 		}
 	}
 
-	if fileExists(".env") {
+	if FileExists(".env") {
 		err := godotenv.Load()
 		if err != nil {
 			return err

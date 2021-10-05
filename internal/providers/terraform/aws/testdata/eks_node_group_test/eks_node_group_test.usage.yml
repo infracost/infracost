@@ -16,3 +16,7 @@ resource_usage:
     operating_system: windows
     monthly_cpu_credit_hrs: 100
     vcpu_count: 2
+  aws_eks_node_group.usage:
+    instances: 6
+  aws_eks_node_group.lt_usage:
+    instances: 6
