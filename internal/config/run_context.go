@@ -107,7 +107,7 @@ func (c *RunContext) loadInitialContextValues() {
 	c.SetContextValue("os", runtime.GOOS)
 	c.SetContextValue("ciPlatform", ciPlatform())
 	c.SetContextValue("ciScript", ciScript())
-	c.SetContextValue("ciPushCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
+	c.SetContextValue("ciPostCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
 	c.SetContextValue("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
 }
 
