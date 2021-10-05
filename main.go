@@ -1,6 +1,6 @@
 package infracost
 
-import _ "embed" // nolint:golint
+import _ "embed"
 
 //go:embed infracost-usage-example.yml
 var referenceUsageFileContents []byte

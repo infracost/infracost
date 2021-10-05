@@ -1,14 +1,29 @@
 package testutil
 
 import (
+	"bytes"
+	"flag"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
+	"unicode"
+
+	"github.com/infracost/infracost/internal/config"
+	"github.com/pmezard/go-difflib/difflib"
+	"github.com/stretchr/testify/require"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/shopspring/decimal"
 )
+
+var update = flag.Bool("update", false, "update .golden files")
 
 type CostCheckFunc func(*testing.T, *schema.CostComponent)
 
@@ -138,4 +153,112 @@ func formatCost(d *decimal.Decimal) string {
 		return "-"
 	}
 	return formatAmount(*d)
+}
+
+func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) {
+	// Load the snapshot result
+	expected := []byte("")
+	if _, err := os.Stat(goldenFilePath); err == nil || !os.IsNotExist(err) {
+		// golden file exists, load the data
+		expected, err = ioutil.ReadFile(goldenFilePath)
+		assert.NoError(t, err)
+	}
+
+	if !bytes.Equal(expected, actual) {
+		if *update {
+			// create the golden file dir if needed
+			goldenFileDir := filepath.Dir(goldenFilePath)
+			if _, err := os.Stat(goldenFileDir); err != nil {
+				if os.IsNotExist(err) {
+					_ = os.MkdirAll(goldenFileDir, 0755)
+				}
+			}
+
+			err := ioutil.WriteFile(goldenFilePath, actual, 0600)
+			assert.NoError(t, err)
+			t.Logf(fmt.Sprintf("Wrote golden file %s", goldenFilePath))
+		} else {
+			// Generate the diff and error message.  We don't call assert.Equal because it escapes
+			// newlines (\n) and the output looks terrible.
+			diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
+				A:        difflib.SplitLines(string(expected)),
+				B:        difflib.SplitLines(string(actual)),
+				FromFile: "Expected",
+				FromDate: "",
+				ToFile:   "Actual",
+				ToDate:   "",
+				Context:  1,
+			})
+
+			t.Errorf(fmt.Sprintf("\nOutput does not match golden file: \n\n%s\n", diff))
+		}
+	}
+}
+
+type ErrorOnAnyWriter struct {
+	t *testing.T
+}
+
+func (e ErrorOnAnyWriter) Write(data []byte) (n int, err error) {
+	e.t.Errorf("Unexpected log write.  To capture logs remove t.Parallel and use GoldenFileOptions { CaptureLogs = true }: %s", data)
+	return io.Discard.Write(data)
+}
+
+func ConfigureTestToFailOnLogs(t *testing.T, runCtx *config.RunContext) {
+	runCtx.Config.LogLevel = "warn"
+	runCtx.Config.LogDisableTimestamps = true
+	runCtx.Config.LogWriter = io.MultiWriter(os.Stderr, ErrorOnAnyWriter{t})
+	err := runCtx.Config.ConfigureLogger()
+	require.Nil(t, err)
+}
+
+func ConfigureTestToCaptureLogs(t *testing.T, runCtx *config.RunContext) *bytes.Buffer {
+	logBuf := bytes.NewBuffer([]byte{})
+	runCtx.Config.LogLevel = "warn"
+	runCtx.Config.LogDisableTimestamps = true
+	runCtx.Config.LogWriter = io.MultiWriter(os.Stderr, logBuf)
+
+	err := runCtx.Config.ConfigureLogger()
+	require.Nil(t, err)
+	return logBuf
+}
+
+// From https://gist.github.com/stoewer/fbe273b711e6a06315d19552dd4d33e6
+func toSnakeCase(s string) string {
+	var res = make([]rune, 0, len(s))
+	var p = '_'
+	for i, r := range s {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+			res = append(res, '_')
+		} else if unicode.IsUpper(r) && i > 0 {
+			if unicode.IsLetter(p) && !unicode.IsUpper(p) || unicode.IsDigit(p) {
+				res = append(res, '_', unicode.ToLower(r))
+			} else {
+				res = append(res, unicode.ToLower(r))
+			}
+		} else {
+			res = append(res, unicode.ToLower(r))
+		}
+
+		p = r
+	}
+	return string(res)
+}
+
+func CalcGoldenFileTestdataDirName() string {
+	pc, _, _, ok := runtime.Caller(1)
+	if !ok {
+		panic("Couldn't determine currentFunctionName")
+	}
+
+	fn := runtime.FuncForPC(pc)
+	if fn == nil {
+		panic("Couldn't determine currentFunctionName")
+	}
+
+	camelCaseName := fn.Name()[strings.LastIndex(fn.Name(), ".")+1:] // slice to get everything after the last .
+	if !strings.HasPrefix(camelCaseName, "Test") {
+		panic(fmt.Sprintf("Please don't use this method outside of tests.  Found name: %v", camelCaseName))
+	}
+	return toSnakeCase(camelCaseName[4:])
 }

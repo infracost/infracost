@@ -3,13 +3,13 @@
                                                                                                                
  aws_rds_cluster.default                                                                                       
  ├─ Storage                                      Monthly cost depends on usage: $0.10 per GB                   
- ├─ I/O rate                                     Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ I/O requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
  ├─ Backtrack                                    Monthly cost depends on usage: $0.012 per 1M change-records   
  └─ Snapshot export                              Monthly cost depends on usage: $0.01 per GB                   
                                                                                                                
  aws_rds_cluster.default_t3                                                                                    
  ├─ Storage                                      Monthly cost depends on usage: $0.10 per GB                   
- ├─ I/O rate                                     Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ I/O requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
  ├─ Backtrack                                    Monthly cost depends on usage: $0.012 per 1M change-records   
  └─ Snapshot export                              Monthly cost depends on usage: $0.01 per GB                   
                                                                                                                

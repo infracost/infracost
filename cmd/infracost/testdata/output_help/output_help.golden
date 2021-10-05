@@ -1,0 +1,29 @@
+Combine and output Infracost JSON files in different formats
+
+USAGE
+  infracost output [flags]
+
+EXAMPLES
+  Show a breakdown from multiple Infracost JSON files:
+
+      infracost output --path out1.json --path out2.json --path out3.json
+
+  Create HTML report from multiple Infracost JSON files:
+
+      infracost output --format html --path "out*.json" > output.html
+
+  Merge multiple Infracost JSON files:
+
+      infracost output --format json --path "out*.json"
+
+FLAGS
+      --fields strings     Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.
+                           Supported by table and html output formats (default [monthlyQuantity,unit,monthlyCost])
+      --format string      Output format: json, diff, table, html (default "table")
+  -h, --help               help for output
+  -p, --path stringArray   Path to Infracost JSON files
+      --show-skipped       Show unsupported resources, some of which might be free
+
+GLOBAL FLAGS
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output

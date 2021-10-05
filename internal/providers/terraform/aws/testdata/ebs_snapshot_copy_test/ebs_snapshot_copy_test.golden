@@ -3,7 +3,7 @@
                                                                                                                        
  aws_ebs_snapshot.gp2                                                                                                  
  ├─ EBS snapshot storage                                                  10  GB                                 $0.50 
- ├─ Fast snapshot restore                                                  1  DSU                              $547.50 
+ ├─ Fast snapshot restore                                Monthly cost depends on usage: $0.75 per DSU-hours            
  ├─ ListChangedBlocks & ListSnapshotBlocks API requests  Monthly cost depends on usage: $0.0006 per 1k requests        
  ├─ GetSnapshotBlock API requests                        Monthly cost depends on usage: $0.003 per 1k SnapshotAPIUnits 
  └─ PutSnapshotBlock API requests                        Monthly cost depends on usage: $0.006 per 1k SnapshotAPIUnits 
@@ -14,6 +14,6 @@
  aws_ebs_volume.gp2                                                                                                    
  └─ Storage (general purpose SSD, gp2)                                    10  GB                                 $1.00 
                                                                                                                        
- OVERALL TOTAL                                                                                                 $549.50 
+ OVERALL TOTAL                                                                                                   $2.00 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

@@ -1,0 +1,29 @@
+Show diff of monthly costs between current and planned state
+
+USAGE
+  infracost diff [flags]
+
+EXAMPLES
+  Use Terraform directory with any required Terraform flags:
+
+      infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
+
+  Use Terraform plan JSON:
+
+      terraform plan -out tfplan.binary
+      terraform show -json tfplan.binary > plan.json
+      infracost diff --path plan.json
+
+FLAGS
+      --config-file string            Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags
+  -h, --help                          help for diff
+  -p, --path string                   Path to the Terraform directory or JSON/plan file
+      --show-skipped                  Show unsupported resources, some of which might be free
+      --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)
+      --terraform-plan-flags string   Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory
+      --terraform-workspace string    Terraform workspace to use. Applicable when path is a Terraform directory
+      --usage-file string             Path to Infracost usage file that specifies values for usage-based resources
+
+GLOBAL FLAGS
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output

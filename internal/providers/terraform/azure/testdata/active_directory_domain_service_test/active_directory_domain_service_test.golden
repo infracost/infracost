@@ -1,0 +1,13 @@
+
+ Name                                                Monthly Qty  Unit   Monthly Cost 
+                                                                                      
+ azurerm_active_directory_domain_service.enterprise                                   
+ └─ Active directory domain service (Enterprise)             730  hours       $292.00 
+                                                                                      
+ azurerm_active_directory_domain_service.premium                                      
+ └─ Active directory domain service (Premium)                730  hours     $1,168.00 
+                                                                                      
+ azurerm_active_directory_domain_service.standard                                     
+ └─ Active directory domain service (Standard)               730  hours       $109.50 
+                                                                                      
+ OVERALL TOTAL                                                              $1,569.50 

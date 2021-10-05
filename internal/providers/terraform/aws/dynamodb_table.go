@@ -12,25 +12,11 @@ func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
 		Notes: []string{
 			"DAX is not yet supported.",
 		},
-		RFunc: NewDynamoDBTable,
+		RFunc: NewDynamoDBTableResource,
 	}
 }
 
-func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
-
-	billingMode := d.Get("billing_mode").String()
-
-	var readCapacity int64
-	if d.Get("read_capacity").Exists() {
-		readCapacity = d.Get("read_capacity").Int()
-	}
-
-	var writeCapacity int64
-	if d.Get("write_capacity").Exists() {
-		writeCapacity = d.Get("write_capacity").Int()
-	}
-
+func NewDynamoDBTableResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	replicaRegions := []string{}
 	if d.Get("replica").Exists() {
 		for _, data := range d.Get("replica").Array() {
@@ -38,15 +24,16 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		}
 	}
 
-	args := &aws.DynamoDbTableArguments{
+	a := &aws.DynamoDBTable{
 		Address:        d.Address,
-		Region:         region,
-		BillingMode:    billingMode,
-		WriteCapacity:  writeCapacity,
-		ReadCapacity:   readCapacity,
+		Region:         d.Get("region").String(),
+		Name:           d.Get("name").String(),
+		BillingMode:    d.Get("billing_mode").String(),
+		WriteCapacity:  intPtr(d.Get("write_capacity").Int()),
+		ReadCapacity:   intPtr(d.Get("read_capacity").Int()),
 		ReplicaRegions: replicaRegions,
 	}
-	args.PopulateUsage(u)
+	a.PopulateUsage(u)
 
-	return aws.NewDynamoDBTable(args)
+	return a.BuildResource()
 }

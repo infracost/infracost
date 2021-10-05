@@ -4,6 +4,8 @@ import "github.com/infracost/infracost/internal/schema"
 
 // ResourceRegistry grouped alphabetically
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
+	GetAzureRMActiveDirectoryDomainServiceRegistryItem(),
+	GetAzureRMActiveDirectoryDomainServiceReplicaSetRegistryItem(),
 	GetAzureRMApiManagementRegistryItem(),
 	GetAzureRMApplicationGatewayRegistryItem(),
 	GetAzureRMAppIsolatedServicePlanRegistryItem(),
@@ -20,6 +22,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMAutomationDscConfigurationRegistryItem(),
 	GetAzureRMAutomationDscNodeconfigurationRegistryItem(),
 	GetAzureRMAutomationJobScheduleRegistryItem(),
+	GetAzureRMBastionHostRegistryItem(),
 	GetAzureRMCDNEndpointRegistryItem(),
 	GetAzureRMContainerRegistryRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
@@ -85,12 +88,14 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMSynapseWorkspacRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
+	GetAzureRMVpnGatewayConnectionRegistryItem(),
+	GetAzureRMVpnGatewayRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
-var FreeResources []string = []string{
+var FreeResources = []string{
 	// Azure Api Management
 	"azurerm_api_management_api",
 	"azurerm_api_management_api_diagnostic",
@@ -247,8 +252,9 @@ var FreeResources []string = []string{
 	"azurerm_subnet",
 	"azurerm_subnet_network_security_group_association",
 	"azurerm_virtual_network",
-	"azurerm_virtual_network_gateway_connection",
 	"azurerm_local_network_gateway",
+	"azurerm_nat_gateway_public_ip_association",
+	"azurerm_nat_gateway_public_ip_prefix_association",
 
 	// Azure Notification Hub
 	"azurerm_notification_hub",
@@ -293,6 +299,7 @@ var FreeResources []string = []string{
 	"azurerm_virtual_desktop_application_group",
 	"azurerm_virtual_desktop_workspace",
 	"azurerm_virtual_desktop_workspace_application_group_association",
+	"azurerm_virtual_desktop_host_pool",
 
 	// Azure Synapse Analytics
 	"azurerm_synapse_firewall_rule",
@@ -306,4 +313,4 @@ var FreeResources []string = []string{
 	"azurerm_marketplace_agreement",
 }
 
-var UsageOnlyResources []string = []string{}
+var UsageOnlyResources = []string{}

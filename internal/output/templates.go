@@ -209,13 +209,13 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     <td class="unit">Unit</td>
   {{end}}
   {{if contains .Fields "price"}}
-    <td class="price">Price</td>
+    <td class="price">{{ "Price" | formatTitleWithCurrency }}</td>
   {{end}}
   {{if contains .Fields "hourlyCost"}}
-    <td class="hourly-cost">Hourly Cost</td>
+    <td class="hourly-cost">{{ "Hourly Cost" | formatTitleWithCurrency }}</td>
   {{end}}
   {{if contains .Fields "monthlyCost"}}
-    <td class="monthly-cost">Monthly Cost</td>
+    <td class="monthly-cost">{{ "Monthly Cost" | formatTitleWithCurrency }}</td>
   {{end}}
 {{end}}
 
@@ -272,7 +272,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     <table class="overall-total">
       <tbody>
         <tr class="total">
-          <td class="name" colspan="{{len .Options.Fields}}">Overall total</td>
+          <td class="name" colspan="{{len .Options.Fields}}">{{ "Overall total" | formatTitleWithCurrency }}</td>
           <td class="monthly-cost">{{.Root.TotalMonthlyCost | formatCost2DP}}</td>
         </tr>
       </tbody>

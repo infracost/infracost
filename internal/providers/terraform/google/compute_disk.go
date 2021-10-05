@@ -29,12 +29,12 @@ func NewComputeDisk(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
-			computeDisk(region, diskType, size),
+			computeDisk(region, diskType, size, decimal.NewFromInt(1)),
 		},
 	}
 }
 
-func computeDisk(region string, diskType string, size *decimal.Decimal) *schema.CostComponent {
+func computeDisk(region string, diskType string, size *decimal.Decimal, instanceCount decimal.Decimal) *schema.CostComponent {
 	diskTypeDesc := "/^Storage PD Capacity/"
 	diskTypeLabel := "Standard provisioned storage (pd-standard)"
 	switch diskType {
@@ -45,6 +45,8 @@ func computeDisk(region string, diskType string, size *decimal.Decimal) *schema.
 		diskTypeDesc = "/^SSD backed PD Capacity/"
 		diskTypeLabel = "SSD provisioned storage (pd-ssd)"
 	}
+
+	size = decimalPtr(instanceCount.Mul(*size))
 
 	return &schema.CostComponent{
 		Name:            diskTypeLabel,

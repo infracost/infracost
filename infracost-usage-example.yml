@@ -123,7 +123,10 @@ resource_usage:
     backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
 
   aws_dx_connection.my_dx_connection:
-    monthly_outbound_region_to_dx_location_gb: 100 # Monthly outbound data transferred from AWS region to DX location in GB.
+    monthly_outbound_region_to_dx_location_gb: 100 # (DEPRECATED use monthly_outbound_from_region_to_dx_connection_location instead) Monthly outbound data transferred from AWS region to DX location in GB.
+    monthly_outbound_from_region_to_dx_connection_location:
+      us_east_1: 200 # Monthly outbound data transferred to the DX location from us-east-1 in GB
+      eu_west_2: 100 # Monthly outbound data transferred to the DX location from eu-west-2 in GB
     dx_virtual_interface_type: private             # Interface type impacts outbound data transfer costs over DX, can be: private, public.
     dx_connection_type: dedicated                  # Connection type impacts the per-port hourly price, can be: dedicated, hosted.
 
@@ -143,6 +146,7 @@ resource_usage:
     monthly_list_block_requests: 1000000  # Monthly number of ListChangedBlocks and ListSnapshotBlocks requests.
     monthly_get_block_requests: 100000    # Monthly number of GetSnapshotBlock requests (block size is 512KiB).
     monthly_put_block_requests: 100000    # Monthly number of PutSnapshotBlock requests (block size is 512KiB).
+    fast_snapshot_restore_hours: 100      # Monthly number of DSU-hours for Fast snapshot restore  
 
   aws_ebs_volume.my_standard_volume:
     monthly_standard_io_requests: 10000000 # Monthly I/O requests for standard volume (Magnetic storage).
@@ -874,3 +878,7 @@ resource_usage:
 
   azurerm_notification_hub_namespace.my_namespace:
     monthly_pushes: 1000000 # Monthly total number number of additional pushes.
+
+  azurerm_virtual_network_gateway.Basic:
+    p2s_connection: 150 # Total number of p2s tunnels.
+    monthly_data_transfer_gb: 1 # Monthly data transfer in GB.

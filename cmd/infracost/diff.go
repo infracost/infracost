@@ -32,14 +32,16 @@ func diffCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			err = checkRunConfig(ctx.Config)
+			err = checkRunConfig(cmd.ErrOrStderr(), ctx.Config)
 			if err != nil {
-				ui.PrintUsageErrorAndExit(cmd, err.Error())
+				ui.PrintUsage(cmd)
+				return err
 			}
 
 			err = checkDiffConfig(ctx.Config)
 			if err != nil {
-				ui.PrintUsageErrorAndExit(cmd, err.Error())
+				ui.PrintUsage(cmd)
+				return err
 			}
 
 			ctx.Config.Format = "diff"

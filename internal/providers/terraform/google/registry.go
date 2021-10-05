@@ -14,8 +14,10 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetComputeGlobalForwardingRuleRegistryItem(),
 	GetComputeHAVPNGatewayRegistryItem(),
 	GetComputeImageRegistryItem(),
+	GetComputeInstanceGroupManagerRegistryItem(),
 	GetComputeInstanceRegistryItem(),
 	GetComputeMachineImageRegistryItem(),
+	GetComputeRegionInstanceGroupManagerRegistryItem(),
 	GetComputeRegionTargetHTTPProxyRegistryItem(),
 	GetComputeRegionTargetHTTPSProxyRegistryItem(),
 	GetComputeRouterNATRegistryItem(),
@@ -50,7 +52,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 }
 
 // FreeResources grouped alphabetically
-var FreeResources []string = []string{
+var FreeResources = []string{
 	"google_bigquery_dataset_access",
 	"google_bigquery_dataset_iam_binding",
 	"google_bigquery_dataset_iam_member",
@@ -86,6 +88,7 @@ var FreeResources []string = []string{
 	"google_compute_instance_iam_binding",
 	"google_compute_instance_iam_member",
 	"google_compute_instance_iam_policy",
+	"google_compute_instance_template",
 	"google_compute_machine_image_iam_binding",
 	"google_compute_machine_image_iam_member",
 	"google_compute_machine_image_iam_policy",
@@ -184,7 +187,7 @@ var FreeResources []string = []string{
 	"google_usage_export_bucket",
 }
 
-var UsageOnlyResources []string = []string{}
+var UsageOnlyResources = []string{}
 
 // TODO: This is a list of all the google_compute* resources that may have prices:
 // compute_instance scratch_disk

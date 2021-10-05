@@ -15,11 +15,11 @@ func GetNATGatewayRegistryItem() *schema.RegistryItem {
 func NewNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
-	args := &aws.NATGatewayArguments{
+	a := &aws.NATGateway{
 		Address: d.Address,
 		Region:  region,
 	}
-	args.PopulateUsage(u)
+	a.PopulateUsage(u)
 
-	return aws.NewNATGateway(args)
+	return a.BuildResource()
 }

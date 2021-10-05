@@ -1,0 +1,10 @@
+
+ Name                                                         Monthly Qty  Unit   Monthly Cost 
+                                                                                               
+ azurerm_active_directory_domain_service.example                                               
+ └─ Active directory domain service (Enterprise)                      730  hours       $292.00 
+                                                                                               
+ azurerm_active_directory_domain_service_replica_set.replica                                   
+ └─ Active directory domain service replica set (Enterprise)          730  hours       $292.00 
+                                                                                               
+ OVERALL TOTAL                                                                         $584.00 

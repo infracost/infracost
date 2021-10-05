@@ -21,6 +21,7 @@ vendor/
 # Terraform artifacts
 .terraform.lock.hcl
 **/.terraform/**
+**/.terragrunt-cache/**
 examples/*/plan.save
 examples/*/tfplan.binary
 examples/*/plan.json

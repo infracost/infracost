@@ -28,7 +28,7 @@ func NewNeptuneCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 	}
 
 	costComponents = append(costComponents, neptuneClusterStorageIOsCostComponents("Storage", "GB", region, "StorageUsage", storageGb, 1))
-	costComponents = append(costComponents, neptuneClusterStorageIOsCostComponents("I/O", "1M request", region, "StorageIOUsage", monthlyIoRequests, 1000000))
+	costComponents = append(costComponents, neptuneClusterStorageIOsCostComponents("I/O requests", "1M request", region, "StorageIOUsage", monthlyIoRequests, 1000000))
 	var retentionPeriod *decimal.Decimal
 	if d.Get("backup_retention_period").Type != gjson.Null {
 		retentionPeriod = decimalPtr(decimal.NewFromInt(d.Get("backup_retention_period").Int()))
