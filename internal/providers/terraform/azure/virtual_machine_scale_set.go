@@ -1,10 +1,12 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
+	"strings"
+
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strings"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
@@ -64,19 +66,20 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 
 	diskData := d.Get("storage_profile_os_disk").Array()[0]
 	var storageOperations *decimal.Decimal
-	if u != nil && u.Get("storage_profile_os_disk.monthly_disk_operations").Type != gjson.Null {
-		storageOperations = decimalPtr(decimal.NewFromInt(u.Get("storage_profile_os_disk.monthly_disk_operations").Int()))
+	if u != nil {
+		if v, ok := u.Get("storage_profile_os_disk").Map()["monthly_disk_operations"]; ok {
+			storageOperations = decimalPtr(decimal.NewFromInt(v.Int()))
+		}
 	}
 	r.SubResources = append(r.SubResources, legacyOSDiskSubResource(region, diskData, storageOperations))
 
-	if u != nil && u.Get("storage_profile_data_disk.monthly_disk_operations").Type != gjson.Null {
-		storageOperations = decimalPtr(decimal.NewFromInt(u.Get("storage_profile_data_disk.monthly_disk_operations").Int()))
+	if u != nil {
+		if v, ok := u.Get("storage_profile_data_disk").Map()["monthly_disk_operations"]; ok {
+			storageOperations = decimalPtr(decimal.NewFromInt(v.Int()))
+		}
 	}
 
 	storages := d.Get("storage_profile_data_disk").Array()
-	if u != nil && u.Get("storage_profile_data_disk.monthly_disk_operations").Type != gjson.Null {
-		storageOperations = decimalPtr(decimal.NewFromInt(u.Get("storage_profile_data_disk.monthly_disk_operations").Int()))
-	}
 	if len(storages) > 0 {
 		for _, s := range storages {
 			if s.Get("managed_disk_type").Type != gjson.Null {

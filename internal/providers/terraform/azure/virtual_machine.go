@@ -1,10 +1,12 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
+	"strings"
+
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strings"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMVirtualMachineRegistryItem() *schema.RegistryItem {
@@ -40,8 +42,10 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 	costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
 
 	var storageOperations *decimal.Decimal
-	if u != nil && u.Get("storage_os_disk.monthly_disk_operations").Type != gjson.Null {
-		storageOperations = decimalPtr(decimal.NewFromInt(u.Get("storage_os_disk.monthly_disk_operations").Int()))
+	if u != nil {
+		if v, ok := u.Get("storage_os_disk").Map()["monthly_disk_operations"]; ok {
+			storageOperations = decimalPtr(decimal.NewFromInt(v.Int()))
+		}
 	}
 
 	subResources := []*schema.Resource{}
@@ -49,8 +53,10 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 	subResources = append(subResources, legacyOSDiskSubResource(region, diskData, storageOperations))
 
 	storages := d.Get("storage_data_disk").Array()
-	if u != nil && u.Get("storage_data_disk.monthly_disk_operations").Type != gjson.Null {
-		storageOperations = decimalPtr(decimal.NewFromInt(u.Get("storage_data_disk.monthly_disk_operations").Int()))
+	if u != nil {
+		if v, ok := u.Get("storage_data_disk").Map()["monthly_disk_operations"]; ok {
+			storageOperations = decimalPtr(decimal.NewFromInt(v.Int()))
+		}
 	}
 	if len(storages) > 0 {
 		for _, s := range storages {
@@ -112,8 +118,10 @@ func osDiskSubResource(region string, d *schema.ResourceData, u *schema.UsageDat
 
 	var monthlyDiskOperations *decimal.Decimal
 
-	if u != nil && u.Get("os_disk.monthly_disk_operations").Exists() {
-		monthlyDiskOperations = decimalPtr(decimal.NewFromInt(u.Get("os_disk.monthly_disk_operations").Int()))
+	if u != nil {
+		if v, ok := u.Get("os_disk").Map()["monthly_disk_operations"]; ok {
+			monthlyDiskOperations = decimalPtr(decimal.NewFromInt(v.Int()))
+		}
 	}
 
 	return &schema.Resource{

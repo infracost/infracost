@@ -136,33 +136,39 @@ func NewEmptyUsageMap() map[string]*UsageData {
 
 func ParseAttributes(i interface{}) map[string]gjson.Result {
 	a := make(map[string]gjson.Result)
-	for k, v := range flatten(i) {
-		j, _ := json.Marshal(v)
-		a[k] = gjson.ParseBytes(j)
+
+	switch attrs := i.(type) {
+	case map[string]interface{}:
+		for k, v := range attrs {
+			j, _ := json.Marshal(toJSONMap(v))
+			a[k] = gjson.ParseBytes(j)
+		}
+	case map[interface{}]interface{}:
+		for k, v := range attrs {
+			j, _ := json.Marshal(toJSONMap(v))
+			a[fmt.Sprintf("%s", k)] = gjson.ParseBytes(j)
+		}
 	}
 
 	return a
 }
 
-func flatten(i interface{}) map[string]interface{} {
-	keys := make([]string, 0)
-	result := make(map[string]interface{})
-	flattenHelper(i, keys, result)
-	return result
-}
-
-func flattenHelper(i interface{}, keys []string, result map[string]interface{}) {
-	switch v := i.(type) {
+func toJSONMap(i interface{}) interface{} {
+	switch parent := i.(type) {
 	case map[string]interface{}:
 		for k, v := range i.(map[string]interface{}) {
-			flattenHelper(v, append(keys, k), result)
+			parent[k] = toJSONMap(v)
 		}
+
+		return parent
 	case map[interface{}]interface{}:
+		m := make(map[string]interface{}, len(parent))
 		for k, v := range i.(map[interface{}]interface{}) {
-			flattenHelper(v, append(keys, fmt.Sprintf("%v", k)), result)
+			m[fmt.Sprintf("%s", k)] = toJSONMap(v)
 		}
-	default:
-		k := strings.Join(keys, ".")
-		result[k] = v
+
+		return m
 	}
+
+	return i
 }

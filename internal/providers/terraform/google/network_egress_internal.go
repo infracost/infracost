@@ -3,8 +3,9 @@ package google
 import (
 	"fmt"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 type EgressResourceType int
@@ -38,8 +39,10 @@ func networkEgress(region string, u *schema.UsageData, resourceName, prefixName 
 	// Same continent
 	if doesEgressIncludeSameContinent(egressResourceType) {
 		var quantity *decimal.Decimal
-		if u != nil && u.Get("monthly_egress_data_transfer_gb.same_continent").Exists() {
-			quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_egress_data_transfer_gb.same_continent").Int()))
+		if u != nil {
+			if v, ok := u.Get("monthly_egress_data_transfer_gb").Map()["same_continent"]; ok {
+				quantity = decimalPtr(decimal.NewFromInt(v.Int()))
+			}
 		}
 		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 			Name:            fmt.Sprintf("%s in same continent", prefixName),
