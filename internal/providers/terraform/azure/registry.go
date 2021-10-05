@@ -190,6 +190,9 @@ var FreeResources []string = []string{
 	"azurerm_postgresql_flexible_server_firewall_rule",
 	"azurerm_postgresql_virtual_network_rule",
 
+	// Azure Datalake Gen 2
+	"azurerm_storage_data_lake_gen2_filesystem",
+
 	// Azure Event Hub
 	"azurerm_eventhub",
 	"azurerm_eventhub_authorization_rule",

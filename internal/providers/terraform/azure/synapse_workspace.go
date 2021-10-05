@@ -46,16 +46,18 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 
 	dataflowTiers := [2]string{"Basic", "Standard"}
 	for _, tier := range dataflowTiers {
-		var dataflowInstances, dataflowVCores *decimal.Decimal
+		var dataflowInstances, dataflowVCores, dataflowHours *decimal.Decimal
 
 		var instancesUsageKey = fmt.Sprintf("dataflow_%s_instances", strings.ToLower(tier))
 		var vcoresUsageKey = fmt.Sprintf("dataflow_%s_vcores", strings.ToLower(tier))
+		var hoursUsageKey = fmt.Sprintf("dataflow_%s_hours", strings.ToLower(tier))
 
-		if u != nil && u.Get(instancesUsageKey).Type != gjson.Null && u.Get(vcoresUsageKey).Type != gjson.Null {
+		if u != nil && u.Get(instancesUsageKey).Type != gjson.Null && u.Get(vcoresUsageKey).Type != gjson.Null && u.Get(hoursUsageKey).Type != gjson.Null {
 			dataflowInstances = decimalPtr(decimal.NewFromInt(u.Get(instancesUsageKey).Int()))
 			dataflowVCores = decimalPtr(decimal.NewFromInt(u.Get(vcoresUsageKey).Int()))
+			dataflowHours = decimalPtr(decimal.NewFromInt(u.Get(hoursUsageKey).Int()))
 		}
-		costComponents = append(costComponents, synapseDataFlowCostComponent(region, fmt.Sprintf("Data flow - %s", strings.ToLower(tier)), tier, dataflowInstances, dataflowVCores))
+		costComponents = append(costComponents, synapseDataFlowCostComponent(region, fmt.Sprintf("Data flow - %s", strings.ToLower(tier)), tier, dataflowInstances, dataflowVCores, dataflowHours))
 	}
 
 	datapipelineTiers := [2]string{"Azure Hosted IR", "Self Hosted IR"}
@@ -65,7 +67,7 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 
 	for i, tier := range datapipelineTiers {
-		var activityRuns, integrationRuntimeHours, externalIntegrationRuntimeHours *decimal.Decimal
+		var activityRuns, dataIntegrationUnits, dataIntegrationHours, dataMovementHours, integrationRuntimeHours, externalIntegrationRuntimeHours *decimal.Decimal
 		var usageName = strings.Replace(datapipelineUsageKeys[i], "_", " ", 1)
 
 		var activityRunsUsageKey = fmt.Sprintf("datapipeline_%s_activity_runs", datapipelineUsageKeys[i])
@@ -73,6 +75,22 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 			activityRuns = decimalPtr(decimal.NewFromInt(u.Get(activityRunsUsageKey).Int()))
 		}
 		costComponents = append(costComponents, synapseDataPipelineActivityRunCostComponent(region, fmt.Sprintf("Data pipeline %s activity runs", usageName), tier, "Orchestration Activity Run", activityRuns))
+
+		if datapipelineUsageKeys[i] == "azure_hosted" {
+			var dataIntegrationUnitUsageKey = fmt.Sprintf("datapipeline_%s_data_integration_unit", datapipelineUsageKeys[i])
+			var dataIntegrationHoursUsageKey = fmt.Sprintf("datapipeline_%s_data_integration_hours", datapipelineUsageKeys[i])
+			if u != nil && u.Get(dataIntegrationUnitUsageKey).Type != gjson.Null && u.Get(dataIntegrationHoursUsageKey).Type != gjson.Null {
+				dataIntegrationUnits = decimalPtr(decimal.NewFromInt(u.Get(dataIntegrationUnitUsageKey).Int()))
+				dataIntegrationHours = decimalPtr(decimal.NewFromInt(u.Get(dataIntegrationHoursUsageKey).Int()))
+			}
+			costComponents = append(costComponents, synapseDataPipelineDataMovementCostComponent(region, fmt.Sprintf("Data pipeline %s data integration units", usageName), tier, "Data Movement", "DIU-hour", dataIntegrationUnits, dataIntegrationHours))
+		} else {
+			var dataMovementHoursUsageKey = fmt.Sprintf("datapipeline_%s_data_movement_hours", datapipelineUsageKeys[i])
+			if u != nil && u.Get(dataMovementHoursUsageKey).Type != gjson.Null {
+				dataMovementHours = decimalPtr(decimal.NewFromInt(u.Get(dataMovementHoursUsageKey).Int()))
+			}
+			costComponents = append(costComponents, synapseDataPipelineDataMovementCostComponent(region, fmt.Sprintf("Data pipeline %s data movement", usageName), tier, "Data Movement", "hours", decimalPtr(decimal.NewFromInt(1)), dataMovementHours))
+		}
 
 		var integrationRuntimeUsageKey = fmt.Sprintf("datapipeline_%s_integration_runtime_hours", datapipelineUsageKeys[i])
 		if u != nil && u.Get(integrationRuntimeUsageKey).Type != gjson.Null {
@@ -115,19 +133,21 @@ func synapseServerlessSQLPoolCostComponent(region, name, start string, quantity 
 	}
 }
 
-func synapseManagedVirtualNetworkCostComponent(region, name string) *schema.CostComponent {
+func synapseDataPipelineActivityRunCostComponent(region, name, sku, meter string, runs *decimal.Decimal) *schema.CostComponent {
+
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "hours",
+		Unit:            "1k activity runs",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(730)),
+		MonthlyQuantity: runs,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),
 			Service:       strPtr("Azure Synapse Analytics"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Azure Synapse Analytics Managed VNET")},
+				{Key: "skuName", Value: strPtr(sku)},
+				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s %s", sku, meter))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -136,13 +156,18 @@ func synapseManagedVirtualNetworkCostComponent(region, name string) *schema.Cost
 	}
 }
 
-func synapseDataPipelineActivityRunCostComponent(region, name, sku, meter string, runs *decimal.Decimal) *schema.CostComponent {
+func synapseDataPipelineDataMovementCostComponent(region, name, sku, meter, unit string, diu, hours *decimal.Decimal) *schema.CostComponent {
+
+	var hourlyQuantity *decimal.Decimal
+	if diu != nil && hours != nil {
+		hourlyQuantity = decimalPtr(diu.Mul(*hours))
+	}
 
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "1k Activity Runs",
+		Unit:            unit,
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: runs,
+		MonthlyQuantity: hourlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),
@@ -182,18 +207,18 @@ func synapseDataPipelineActivityIntegrationRuntimeCostComponent(region, name, sk
 	}
 }
 
-func synapseDataFlowCostComponent(region, name, tier string, instances, vCores *decimal.Decimal) *schema.CostComponent {
+func synapseDataFlowCostComponent(region, name, tier string, instances, vCores, hours *decimal.Decimal) *schema.CostComponent {
 
-	var HourlyQuantity *decimal.Decimal
-	if instances != nil && vCores != nil {
-		HourlyQuantity = decimalPtr(vCores.Mul(*instances))
+	var hourlyQuantity *decimal.Decimal
+	if instances != nil && vCores != nil && hours != nil {
+		hourlyQuantity = decimalPtr(vCores.Mul(*instances).Mul(*hours))
 	}
 
 	return &schema.CostComponent{
-		Name:           name,
-		Unit:           "vCore",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: HourlyQuantity,
+		Name:            name,
+		Unit:            "vCore-hour",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: hourlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),
