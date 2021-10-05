@@ -30,18 +30,18 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 		managedVirtualNetwork = d.Get("managed_virtual_network_enabled").Bool()
 	}
 
-	var serverlessSqlPoolSize *decimal.Decimal
+	var serverlessSQLPoolSize *decimal.Decimal
 	if u != nil && u.Get("serverless_sql_pool_size_tb").Type != gjson.Null {
-		serverlessSqlPoolSize = decimalPtr(decimal.NewFromInt(u.Get("serverless_sql_pool_size_tb").Int()))
+		serverlessSQLPoolSize = decimalPtr(decimal.NewFromInt(u.Get("serverless_sql_pool_size_tb").Int()))
 	}
 
-	if serverlessSqlPoolSize == nil || (serverlessSqlPoolSize != nil && serverlessSqlPoolSize.LessThanOrEqual(decimal.NewFromInt(10))) {
-		costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", serverlessSqlPoolSize))
+	if serverlessSQLPoolSize == nil || (serverlessSQLPoolSize != nil && serverlessSQLPoolSize.LessThanOrEqual(decimal.NewFromInt(10))) {
+		costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", serverlessSQLPoolSize))
 	}
 
-	if serverlessSqlPoolSize != nil && serverlessSqlPoolSize.GreaterThan(decimal.NewFromInt(10)) {
+	if serverlessSQLPoolSize != nil && serverlessSQLPoolSize.GreaterThan(decimal.NewFromInt(10)) {
 		costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", decimalPtr(decimal.NewFromInt(10))))
-		costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size (over 10TB)", "10", decimalPtr(serverlessSqlPoolSize.Sub(decimal.NewFromInt(10)))))
+		costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size (over 10TB)", "10", decimalPtr(serverlessSQLPoolSize.Sub(decimal.NewFromInt(10)))))
 	}
 
 	dataflowTiers := [2]string{"Basic", "Standard"}
