@@ -439,10 +439,8 @@ fi
 if [ -n "$GITHUB_ACTIONS" ]; then
   echo "::set-output name=past_total_monthly_cost::$past_total_monthly_cost"
   echo "::set-output name=total_monthly_cost::$total_monthly_cost"
-  load_github_env
   post_to_github
 elif [ -n "$GITLAB_CI" ]; then
-  load_gitlab_env
   post_to_gitlab
 elif [ -n "$CIRCLECI" ]; then
   post_to_circle_ci
