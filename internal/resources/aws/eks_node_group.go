@@ -44,10 +44,30 @@ func (a *EKSNodeGroup) PopulateUsage(u *schema.UsageData) {
 	}
 }
 
+// getUsageSchemaWithDefaultInstanceCount is a temporary hack to make --sync-usage-file use the node group's "desired_size"
+// as the default value for the "instances" usage param.  Without this, --sync-usage-file sets instances=0 causing the
+// costs for the node group to be $0.  This can be removed when --sync-usage-file creates the usage file with usgage keys
+// commented out by default.
+func (a *EKSNodeGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.UsageSchemaItem {
+	if a.InstanceCount == nil || *a.InstanceCount == 0 {
+		return EKSNodeGroupUsageSchema
+	}
+
+	usageSchema := make([]*schema.UsageSchemaItem, 0, len(EKSNodeGroupUsageSchema))
+	for _, u := range EKSNodeGroupUsageSchema {
+		if u.Key == "instances" {
+			usageSchema = append(usageSchema, &schema.UsageSchemaItem{Key: "instances", DefaultValue: a.InstanceCount, ValueType: schema.Int64})
+		} else {
+			usageSchema = append(usageSchema, u)
+		}
+	}
+	return usageSchema
+}
+
 func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 	r := &schema.Resource{
 		Name:        a.Address,
-		UsageSchema: EKSNodeGroupUsageSchema,
+		UsageSchema: a.getUsageSchemaWithDefaultInstanceCount(),
 	}
 
 	var estimateInstanceQualities schema.EstimateFunc
