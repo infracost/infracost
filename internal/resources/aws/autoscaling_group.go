@@ -37,6 +37,33 @@ func (a *AutoscalingGroup) PopulateUsage(u *schema.UsageData) {
 	}
 }
 
+// getUsageSchemaWithDefaultInstanceCount is a temporary hack to make --sync-usage-file use the group's "desired_size"
+// as the default value for the "instances" usage param.  Without this, --sync-usage-file sets instances=0 causing the
+// costs for the node group to be $0.  This can be removed when --sync-usage-file creates the usage file with usgage keys
+// commented out by default.
+func (a *AutoscalingGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.UsageSchemaItem {
+	var instanceCount *int64
+	if a.LaunchConfiguration != nil {
+		instanceCount = a.LaunchConfiguration.InstanceCount
+	} else if a.LaunchTemplate != nil {
+		instanceCount = a.LaunchTemplate.InstanceCount
+	}
+
+	if instanceCount == nil || *instanceCount == 0 {
+		return AutoscalingGroupUsageSchema
+	}
+
+	usageSchema := make([]*schema.UsageSchemaItem, 0, len(AutoscalingGroupUsageSchema))
+	for _, u := range AutoscalingGroupUsageSchema {
+		if u.Key == "instances" {
+			usageSchema = append(usageSchema, &schema.UsageSchemaItem{Key: "instances", DefaultValue: instanceCount, ValueType: schema.Int64})
+		} else {
+			usageSchema = append(usageSchema, u)
+		}
+	}
+	return usageSchema
+}
+
 func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
@@ -84,7 +111,7 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           a.Address,
-		UsageSchema:    AutoscalingGroupUsageSchema,
+		UsageSchema:    a.getUsageSchemaWithDefaultInstanceCount(),
 		CostComponents: costComponents,
 		SubResources:   subResources,
 		EstimateUsage:  estimate,

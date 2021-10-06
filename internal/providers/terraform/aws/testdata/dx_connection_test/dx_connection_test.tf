@@ -20,3 +20,9 @@ resource "aws_dx_connection" "my_dx_connection_usage" {
   location  = "EqDC2"
   name      = "Test_Usage"
 }
+
+resource "aws_dx_connection" "my_dx_connection_usage_backwards_compat" {
+  bandwidth = "1Gbps"
+  location  = "EqDC2"
+  name      = "Test_Usage_Backwards"
+}
