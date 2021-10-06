@@ -38,7 +38,9 @@ func AutoscalingGetInstanceCount(ctx context.Context, region string, name string
 	if err != nil {
 		return 0, err
 	}
-	resp, err := client.DescribeAutoScalingGroups(ctx, &autoscaling.DescribeAutoScalingGroupsInput{})
+	resp, err := client.DescribeAutoScalingGroups(ctx, &autoscaling.DescribeAutoScalingGroupsInput{
+		AutoScalingGroupNames: []string{name},
+	})
 	if err != nil {
 		return 0, err
 	}

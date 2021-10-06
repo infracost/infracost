@@ -87,20 +87,22 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 	}
 
 	estimate := func(ctx context.Context, u map[string]interface{}) error {
-		err := estimateInstanceQualities(ctx, u)
-		if err != nil {
-			return err
+		if estimateInstanceQualities != nil {
+			err := estimateInstanceQualities(ctx, u)
+			if err != nil {
+				return err
+			}
 		}
-		return nil
 		if a.Name != "" {
 			count, err := aws.AutoscalingGetInstanceCount(ctx, a.Region, a.Name)
 			if err != nil {
 				return err
 			}
 			if count > 0 {
-				u["instances"] = count
+				u["instances"] = int64(count)
 			}
 		}
+		return nil
 	}
 
 	return &schema.Resource{
