@@ -6,7 +6,6 @@
  └─ Data processed                               1,000  GB                      $45.00 
                                                                                        
  google_compute_router_nat.no_usage                                                    
- ├─ Assigned VMs (first 32)                          0  VM-hours                 $0.00 
  └─ Data processed                      Monthly cost depends on usage: $0.045 per GB   
                                                                                        
  google_compute_router_nat.over_32_vms                                                 

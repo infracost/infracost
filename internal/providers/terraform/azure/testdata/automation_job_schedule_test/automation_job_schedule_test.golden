@@ -7,9 +7,6 @@
  azurerm_automation_job_schedule.withoutUsage                                                    
  └─ Job run time                               Monthly cost depends on usage: $0.002 per minutes 
                                                                                                  
- azurerm_automation_job_schedule.zeroMinutes                                                     
- └─ Job run time                                             0  minutes                    $0.00 
-                                                                                                 
  OVERALL TOTAL                                                                             $0.01 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
