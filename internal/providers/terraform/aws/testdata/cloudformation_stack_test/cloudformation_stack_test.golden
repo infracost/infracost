@@ -2,8 +2,7 @@
  Name                                             Monthly Qty  Unit                    Monthly Cost 
                                                                                                     
  aws_cloudformation_stack.withoutTemplBody                                                          
- ├─ Handler operations                                 10,000  operations                     $9.00 
- └─ Durations above 30s                                     0  seconds                        $0.00 
+ └─ Handler operations                                 10,000  operations                     $9.00 
                                                                                                     
  aws_cloudformation_stack.withoutUsage                                                              
  ├─ Handler operations                      Monthly cost depends on usage: $0.0009 per operations   

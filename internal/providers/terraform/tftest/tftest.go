@@ -13,17 +13,19 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/stretchr/testify/require"
+
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 )

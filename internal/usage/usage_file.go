@@ -8,12 +8,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/infracost/infracost"
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v2"
+
+	"github.com/infracost/infracost"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 const minUsageFileVersion = "0.1"
@@ -217,7 +218,7 @@ func mapToSortedMapSlice(input map[string]interface{}) yaml.MapSlice {
 
 func loadReferenceFile() (map[string]*schema.UsageData, error) {
 	referenceUsageFileContents := infracost.GetReferenceUsageFileContents()
-	usageData, err := parseYAML(*referenceUsageFileContents)
+	usageData, err := ParseYaml(*referenceUsageFileContents)
 	if err != nil {
 		return usageData, errors.Wrapf(err, "Error parsing usage file")
 	}
@@ -256,7 +257,7 @@ func LoadFromFile(usageFilePath string, createIfNotExisting bool) (map[string]*s
 		return usageData, errors.Wrapf(err, "Error reading usage file")
 	}
 
-	usageData, err = parseYAML(out)
+	usageData, err = ParseYaml(out)
 	if err != nil {
 		return usageData, errors.Wrapf(err, "Error parsing usage file")
 	}
@@ -264,7 +265,7 @@ func LoadFromFile(usageFilePath string, createIfNotExisting bool) (map[string]*s
 	return usageData, nil
 }
 
-func parseYAML(y []byte) (map[string]*schema.UsageData, error) {
+func ParseYaml(y []byte) (map[string]*schema.UsageData, error) {
 	var usageFile UsageFile
 
 	err := yaml.Unmarshal(y, &usageFile)

@@ -22,7 +22,6 @@
  aws_autoscaling_group.asg_lc_cpu_credits_noUsage                                                  
  └─ aws_launch_configuration.lc_cpu_credits_noUsage                                                
     ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)           1,460  hours             $60.74 
-    ├─ CPU credits                                                     0  vCPU-hours         $0.00 
     └─ root_block_device                                                                           
        └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60 
                                                                                                    
@@ -37,7 +36,6 @@
  └─ aws_launch_configuration.lc_reserved                                                           
     ├─ Instance usage (Linux/UNIX, reserved, t3.medium)              730  hours             $19.05 
     ├─ EC2 detailed monitoring                                         7  metrics            $2.10 
-    ├─ CPU credits                                                     0  vCPU-hours         $0.00 
     └─ root_block_device                                                                           
        └─ Storage (general purpose SSD, gp2)                           8  GB                 $0.80 
                                                                                                    
@@ -60,7 +58,6 @@
  └─ aws_launch_configuration.lc_windows                                                            
     ├─ Instance usage (Windows, on-demand, t3.medium)                730  hours             $43.80 
     ├─ EC2 detailed monitoring                                         7  metrics            $2.10 
-    ├─ CPU credits                                                     0  vCPU-hours         $0.00 
     └─ root_block_device                                                                           
        └─ Storage (general purpose SSD, gp2)                           8  GB                 $0.80 
                                                                                                    
@@ -80,8 +77,7 @@
                                                                                                    
  aws_autoscaling_group.asg_lt_cpu_credits_noUsage                                                  
  └─ aws_launch_template.lt_cpu_credits_noUsage                                                     
-    ├─ Instance usage (Linux/UNIX, on-demand, t3.large)            1,460  hours            $121.47 
-    └─ CPU credits                                                     0  vCPU-hours         $0.00 
+    └─ Instance usage (Linux/UNIX, on-demand, t3.large)            1,460  hours            $121.47 
                                                                                                    
  aws_autoscaling_group.asg_lt_ebs_optimized                                                        
  └─ aws_launch_template.lt_ebs_optimized                                                           
