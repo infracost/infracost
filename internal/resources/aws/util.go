@@ -32,6 +32,13 @@ func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
 
+func intPtrToDecimalPtr(i *int64) *decimal.Decimal {
+	if i == nil {
+		return nil
+	}
+	return decimalPtr(decimal.NewFromInt(*i))
+}
+
 func asGiB(i int64) int64 {
 	if i == 0 {
 		return 0
