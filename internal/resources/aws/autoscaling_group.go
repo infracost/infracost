@@ -15,7 +15,6 @@ type AutoscalingGroup struct {
 	Name    string
 
 	// "optional" args, that may be empty depending on the resource config
-	DesiredCapacity     *int64
 	LaunchConfiguration *LaunchConfiguration
 	LaunchTemplate      *LaunchTemplate
 }
@@ -88,12 +87,12 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 	}
 
 	estimate := func(ctx context.Context, u map[string]interface{}) error {
-		if a.DesiredCapacity != nil {
-			// as a default
-			u["instances"] = *a.DesiredCapacity
+		err := estimateInstanceQualities(ctx, u)
+		if err != nil {
+			return err
 		}
+		return nil
 		if a.Name != "" {
-			// actual usage overrides desired capacity
 			count, err := aws.AutoscalingGetInstanceCount(ctx, a.Region, a.Name)
 			if err != nil {
 				return err
@@ -102,11 +101,6 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 				u["instances"] = count
 			}
 		}
-		err := estimateInstanceQualities(ctx, u)
-		if err != nil {
-			return err
-		}
-		return nil
 	}
 
 	return &schema.Resource{
