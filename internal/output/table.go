@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
+
+	"github.com/infracost/infracost/internal/ui"
 )
 
 func ToTable(out Root, opts Options) ([]byte, error) {
@@ -164,9 +165,14 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 	t.AppendHeader(headers)
 
 	for _, r := range breakdown.Resources {
+		filteredComponents := filterZeroValComponents(r.CostComponents)
+		if len(filteredComponents) == 0 && len(r.SubResources) == 0 {
+			continue
+		}
+
 		t.AppendRow(table.Row{ui.BoldString(r.Name)})
 
-		buildCostComponentRows(t, currency, r.CostComponents, "", len(r.SubResources) > 0, fields)
+		buildCostComponentRows(t, currency, filteredComponents, "", len(r.SubResources) > 0, fields)
 		buildSubResourceRows(t, currency, r.SubResources, "", fields)
 
 		t.AppendRow(table.Row{""})
@@ -188,6 +194,11 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 
 func buildSubResourceRows(t table.Writer, currency string, subresources []Resource, prefix string, fields []string) {
 	for i, r := range subresources {
+		filteredComponents := filterZeroValComponents(r.CostComponents)
+		if len(filteredComponents) == 0 {
+			continue
+		}
+
 		labelPrefix := prefix + "├─"
 		nextPrefix := prefix + "│  "
 		if i == len(subresources)-1 {
@@ -197,7 +208,7 @@ func buildSubResourceRows(t table.Writer, currency string, subresources []Resour
 
 		t.AppendRow(table.Row{fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), r.Name)})
 
-		buildCostComponentRows(t, currency, r.CostComponents, nextPrefix, len(r.SubResources) > 0, fields)
+		buildCostComponentRows(t, currency, filteredComponents, nextPrefix, len(r.SubResources) > 0, fields)
 		buildSubResourceRows(t, currency, r.SubResources, nextPrefix, fields)
 	}
 }
@@ -223,6 +234,7 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 				price,
 				price,
 			}, table.RowConfig{AutoMerge: true, AlignAutoMerge: text.AlignLeft})
+
 		} else {
 			var tableRow table.Row
 			tableRow = append(tableRow, label)
@@ -246,4 +258,16 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 			t.AppendRow(tableRow)
 		}
 	}
+}
+
+func filterZeroValComponents(costComponents []CostComponent) []CostComponent {
+	var filteredComponents []CostComponent
+	for _, c := range costComponents {
+		if c.MonthlyCost != nil && c.MonthlyCost.IsZero() {
+			continue
+		}
+
+		filteredComponents = append(filteredComponents, c)
+	}
+	return filteredComponents
 }
