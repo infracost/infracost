@@ -12,5 +12,7 @@ func TestDXConnectionGoldenFile(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "dx_connection_test")
+	tftest.GoldenFileResourceTestsWithOpts(t, "dx_connection_test", &tftest.GoldenFileOptions{
+		CaptureLogs: true,
+	})
 }
