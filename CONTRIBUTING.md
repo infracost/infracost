@@ -303,11 +303,11 @@ INFRACOST_LOG_LEVEL=warn go test ./internal/providers/terraform/aws/my_resource_
 Please use the following pull request description template as a guide on the level of details to include in your PR, including required integration tests.
 
 ```markdown
-Objective:
+## Objective:
 
 Add support for aws_docdb_cluster_instance.  Fixes #123
 
-Pricing details:
+## Pricing details:
 
 The aws_docdb_cluster_instance has 4 price components described in https://aws.amazon.com/documentdb/pricing/. There is no support for Reserved Instances nor Spot prices.
 
@@ -315,17 +315,17 @@ T3 instances have an additional price for CPU Credits, this is charged per vCPU-
 
 The count parameter replicates the resource in the Terraform plan JSON so there is no need to handle it in the resource/test file.
 
-Status:
+## Status:
 
- [ ] Added to resource_registry.go
- [ ] Added internal/resources file
- [ ] Added internal/provider/terraform/.../resources file
- [ ] Added usage parameters to infracost-usage-example.yml 
- [ ] Added test cases without usage-file
- [ ] Added test cases with usage-file
- [ ] Compared test case output to cloud cost calculator.
+- [ ] Added to resource_registry.go
+- [ ] Added internal/resources file
+- [ ] Added internal/provider/terraform/.../resources file
+- [ ] Added usage parameters to infracost-usage-example.yml
+- [ ] Added test cases without usage-file
+- [ ] Added test cases with usage-file
+- [ ] Compared test case output to cloud cost calculator.
 
-Issues:
+## Issues:
 
 None
 
