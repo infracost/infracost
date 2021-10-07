@@ -195,6 +195,7 @@ func (a *MyResource) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           a.Address,
+		UsageSchema:    MyResourceUsageSchema,
 		CostComponents: costComponents,
 	}
 }
