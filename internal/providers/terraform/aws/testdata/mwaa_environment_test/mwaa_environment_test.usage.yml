@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  aws_mwaa_environment.large_with_usage:
+    additional_workers: 2.5
+    additional_schedulers: 3
+    meta_database_gb: 1000

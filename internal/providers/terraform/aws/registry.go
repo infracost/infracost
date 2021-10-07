@@ -59,6 +59,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetMSKClusterRegistryItem(),
 	GetALBRegistryItem(),
 	GetMQBrokerRegistryItem(),
+	GetMWAAEnvironmentRegistryItem(),
 	GetNATGatewayRegistryItem(),
 	GetRDSClusterRegistryItem(),
 	GetRDSClusterInstanceRegistryItem(),
