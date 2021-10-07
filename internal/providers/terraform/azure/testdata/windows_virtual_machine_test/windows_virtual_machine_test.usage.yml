@@ -1,4 +1,5 @@
 version: 0.1
 resource_usage:
   azurerm_windows_virtual_machine.standard_a2_v2_custom_disk:
-    os_disk.monthly_disk_operations: 20000
+    os_disk:
+      monthly_disk_operations: 20000
