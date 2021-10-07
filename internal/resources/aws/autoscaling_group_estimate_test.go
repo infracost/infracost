@@ -38,7 +38,7 @@ func stubASGDescribe(stub *stubbedAWS, name string, count int64) {
 	// shoddy stub: woefully incomplete compared to real response
 	if count > 0 {
 		for i := int64(0); i < count; i++ {
-			instanceMembers = instanceMembers + `
+			instanceMembers += `
 					<member></member>`
 		}
 
