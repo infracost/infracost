@@ -6,7 +6,7 @@ resource_usage:
     serverless_sql_pool_size_tb: 10
   azurerm_synapse_workspace.datapipelines:
     datapipeline_azure_hosted_activity_runs: 3
-    datapipeline_azure_hosted_data_integration_unit: 1
+    datapipeline_azure_hosted_data_integration_units: 1
     datapipeline_azure_hosted_data_integration_hours: 31
     datapipeline_azure_hosted_integration_runtime_hours: 200
     datapipeline_azure_hosted_external_integration_runtime_hours: 4000

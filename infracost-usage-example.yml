@@ -855,6 +855,31 @@ resource_usage:
     monthly_data_write_gb: 1000 # Monthly number of data write in GB.
     blob_index_tags: 100000 # Total number of Blob indexes.
 
+  azurerm_synapse_spark_pool.my_spark_pool:
+    monthly_hours: 730 # Monthly number of hours used by each instance in the pool.
+
+  azurerm_synapse_sql_pool.my_sql_pool:
+    storage_tb: 1 # Total storage size, including snapshots, in TB.
+    disaster_recovery_enabled: false # Whether geo-redundant disaster recovery is enabled or not.
+
+  azurerm_synapse_workspace.my_workspace:
+    serverless_sql_pool_size_tb: 10 # TODO
+    datapipeline_azure_hosted_activity_runs: 3 # TODO
+    datapipeline_azure_hosted_data_integration_units: 1 # TODO
+    datapipeline_azure_hosted_data_integration_hours: 31 # TODO
+    datapipeline_azure_hosted_integration_runtime_hours: 200 # TODO
+    datapipeline_azure_hosted_external_integration_runtime_hours: 4000 # TODO
+    datapipeline_self_hosted_activity_runs: 1 # TODO
+    datapipeline_self_hosted_data_movement_hours: 10 # TODO
+    datapipeline_self_hosted_integration_runtime_hours: 200 # TODO
+    datapipeline_self_hosted_external_integration_runtime_hours: 4000 # TODO
+    dataflow_basic_instances: 1 # TODO
+    dataflow_basic_vcores: 8 # TODO
+    dataflow_basic_hours: 1 # TODO
+    dataflow_standard_instances: 1 # TODO
+    dataflow_standard_vcores: 12 # TODO
+    dataflow_standard_hours: 1 # TODO
+
   azurerm_virtual_machine_scale_set.my_scale_set:
     storage_profile_os_disk:
       monthly_disk_operations: 100000 # Monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB.

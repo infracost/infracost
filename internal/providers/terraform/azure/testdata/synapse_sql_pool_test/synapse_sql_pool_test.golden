@@ -18,8 +18,8 @@
  azurerm_synapse_workspace.example                                                                                      
  ├─ Serverless SQL pool size (first 10TB)                                    10  TB                               $0.00 
  ├─ Serverless SQL pool size (over 10TB)                                      1  TB                               $5.00 
- ├─ Data flow - basic                                        Monthly cost depends on usage: $0.27 per vCore-hour        
- ├─ Data flow - standard                                     Monthly cost depends on usage: $0.35 per vCore-hour        
+ ├─ Data flow - basic                                        Monthly cost depends on usage: $0.27 per vCore-hours        
+ ├─ Data flow - standard                                     Monthly cost depends on usage: $0.35 per vCore-hours        
  ├─ Data pipeline azure hosted activity runs                 Monthly cost depends on usage: $1.00 per 1k activity runs  
  ├─ Data pipeline azure hosted data integration units        Monthly cost depends on usage: $0.25 per DIU-hour          
  ├─ Data pipeline azure hosted integration runtime           Monthly cost depends on usage: $0.005 per hours            

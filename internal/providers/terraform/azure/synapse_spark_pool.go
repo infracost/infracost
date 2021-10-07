@@ -94,7 +94,7 @@ func synapseSparkPoolCostComponent(region, name, start string, instances, vCores
 
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "vCore-hour",
+		Unit:            "vCore-hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: hourlyQuantity,
 		ProductFilter: &schema.ProductFilter{

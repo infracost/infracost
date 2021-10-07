@@ -2,18 +2,18 @@
  Name                                                               Monthly Qty  Unit                      Monthly Cost 
                                                                                                                         
  azurerm_synapse_spark_pool.autoscale                                                                                   
- ├─ 4x small node (first 120 vCore-hours)                                   120  vCore-hour                       $0.00 
- └─ 4x small node (over 120 vCore-hours)                                     24  vCore-hour                       $3.71 
+ ├─ 4x small node (first 120 vCore-hours)                                   120  vCore-hours                       $0.00 
+ └─ 4x small node (over 120 vCore-hours)                                     24  vCore-hours                       $3.71 
                                                                                                                         
  azurerm_synapse_spark_pool.default                                                                                     
- ├─ 3x small node (first 120 vCore-hours)                                   120  vCore-hour                       $0.00 
- └─ 3x small node (over 120 vCore-hours)                                     12  vCore-hour                       $1.85 
+ ├─ 3x small node (first 120 vCore-hours)                                   120  vCore-hours                       $0.00 
+ └─ 3x small node (over 120 vCore-hours)                                     12  vCore-hours                       $1.85 
                                                                                                                         
  azurerm_synapse_workspace.example                                                                                      
  ├─ Serverless SQL pool size (first 10TB)                                    10  TB                               $0.00 
  ├─ Serverless SQL pool size (over 10TB)                                      1  TB                               $5.00 
- ├─ Data flow - basic                                        Monthly cost depends on usage: $0.27 per vCore-hour        
- ├─ Data flow - standard                                     Monthly cost depends on usage: $0.35 per vCore-hour        
+ ├─ Data flow - basic                                        Monthly cost depends on usage: $0.27 per vCore-hours        
+ ├─ Data flow - standard                                     Monthly cost depends on usage: $0.35 per vCore-hours        
  ├─ Data pipeline azure hosted activity runs                 Monthly cost depends on usage: $1.00 per 1k activity runs  
  ├─ Data pipeline azure hosted data integration units        Monthly cost depends on usage: $0.25 per DIU-hour          
  ├─ Data pipeline azure hosted integration runtime           Monthly cost depends on usage: $0.005 per hours            

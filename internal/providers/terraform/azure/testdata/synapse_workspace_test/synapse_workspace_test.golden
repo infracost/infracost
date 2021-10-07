@@ -3,8 +3,8 @@
                                                                                                                         
  azurerm_synapse_workspace.dataflows                                                                                    
  ├─ Serverless SQL pool size (first 10TB)                    Monthly cost depends on usage: $0 per TB                   
- ├─ Data flow - basic                                                         8  vCore-hour                       $2.14 
- ├─ Data flow - standard                                                     12  vCore-hour                       $4.14 
+ ├─ Data flow - basic                                                         8  vCore-hours                       $2.14 
+ ├─ Data flow - standard                                                     12  vCore-hours                       $4.14 
  ├─ Data pipeline azure hosted activity runs                 Monthly cost depends on usage: $1.00 per 1k activity runs  
  ├─ Data pipeline azure hosted data integration units        Monthly cost depends on usage: $0.25 per DIU-hour          
  ├─ Data pipeline azure hosted integration runtime           Monthly cost depends on usage: $0.005 per hours            
@@ -16,8 +16,8 @@
                                                                                                                         
  azurerm_synapse_workspace.datapipelines                                                                                
  ├─ Serverless SQL pool size (first 10TB)                    Monthly cost depends on usage: $0 per TB                   
- ├─ Data flow - basic                                        Monthly cost depends on usage: $0.27 per vCore-hour        
- ├─ Data flow - standard                                     Monthly cost depends on usage: $0.35 per vCore-hour        
+ ├─ Data flow - basic                                        Monthly cost depends on usage: $0.27 per vCore-hours        
+ ├─ Data flow - standard                                     Monthly cost depends on usage: $0.35 per vCore-hours        
  ├─ Data pipeline azure hosted activity runs                                  3  1k activity runs                 $3.00 
  ├─ Data pipeline azure hosted data integration units                        31  DIU-hour                         $7.75 
  ├─ Data pipeline azure hosted integration runtime                          200  hours                            $1.00 
@@ -30,8 +30,8 @@
  azurerm_synapse_workspace.general                                                                                      
  ├─ Serverless SQL pool size (first 10TB)                                    10  TB                               $0.00 
  ├─ Serverless SQL pool size (over 10TB)                                      1  TB                               $5.00 
- ├─ Data flow - basic                                        Monthly cost depends on usage: $0.27 per vCore-hour        
- ├─ Data flow - standard                                     Monthly cost depends on usage: $0.35 per vCore-hour        
+ ├─ Data flow - basic                                        Monthly cost depends on usage: $0.27 per vCore-hours        
+ ├─ Data flow - standard                                     Monthly cost depends on usage: $0.35 per vCore-hours        
  ├─ Data pipeline azure hosted activity runs                 Monthly cost depends on usage: $1.00 per 1k activity runs  
  ├─ Data pipeline azure hosted data integration units        Monthly cost depends on usage: $0.25 per DIU-hour          
  ├─ Data pipeline azure hosted integration runtime           Monthly cost depends on usage: $0.005 per hours            
@@ -43,8 +43,8 @@
                                                                                                                         
  azurerm_synapse_workspace.vnet                                                                                         
  ├─ Serverless SQL pool size (first 10TB)                                    10  TB                               $0.00 
- ├─ Data flow - basic                                        Monthly cost depends on usage: $0.27 per vCore-hour        
- ├─ Data flow - standard                                     Monthly cost depends on usage: $0.35 per vCore-hour        
+ ├─ Data flow - basic                                        Monthly cost depends on usage: $0.27 per vCore-hours        
+ ├─ Data flow - standard                                     Monthly cost depends on usage: $0.35 per vCore-hours        
  ├─ Data pipeline azure hosted activity runs                 Monthly cost depends on usage: $1.00 per 1k activity runs  
  ├─ Data pipeline azure hosted data integration units        Monthly cost depends on usage: $0.25 per DIU-hour          
  ├─ Data pipeline azure hosted integration runtime           Monthly cost depends on usage: $1.00 per hours             

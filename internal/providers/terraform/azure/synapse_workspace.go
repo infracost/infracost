@@ -77,7 +77,7 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 		costComponents = append(costComponents, synapseDataPipelineActivityRunCostComponent(region, fmt.Sprintf("Data pipeline %s activity runs", usageName), tier, "Orchestration Activity Run", activityRuns))
 
 		if datapipelineUsageKeys[i] == "azure_hosted" {
-			var dataIntegrationUnitUsageKey = fmt.Sprintf("datapipeline_%s_data_integration_unit", datapipelineUsageKeys[i])
+			var dataIntegrationUnitUsageKey = fmt.Sprintf("datapipeline_%s_data_integration_units", datapipelineUsageKeys[i])
 			var dataIntegrationHoursUsageKey = fmt.Sprintf("datapipeline_%s_data_integration_hours", datapipelineUsageKeys[i])
 			if u != nil && u.Get(dataIntegrationUnitUsageKey).Type != gjson.Null && u.Get(dataIntegrationHoursUsageKey).Type != gjson.Null {
 				dataIntegrationUnits = decimalPtr(decimal.NewFromInt(u.Get(dataIntegrationUnitUsageKey).Int()))
@@ -216,7 +216,7 @@ func synapseDataFlowCostComponent(region, name, tier string, instances, vCores, 
 
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "vCore-hour",
+		Unit:            "vCore-hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: hourlyQuantity,
 		ProductFilter: &schema.ProductFilter{
