@@ -324,6 +324,7 @@ The count parameter replicates the resource in the Terraform plan JSON so there 
 - [ ] Added test cases without usage-file
 - [ ] Added test cases with usage-file
 - [ ] Compared test case output to cloud cost calculator.
+- [ ] Created a PR to update "Supported Resources" in the [docs](https://github.com/infracost/docs/blob/master/docs/supported_resources.md))
 
 ## Issues:
 
