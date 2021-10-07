@@ -1,10 +1,10 @@
 package schema
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 )
 
@@ -15,6 +15,7 @@ const (
 	String
 	Float64
 	StringArray
+	Items
 )
 
 // type UsageDataValidatorFuncType = func(value interface{}) error
@@ -140,35 +141,17 @@ func ParseAttributes(i interface{}) map[string]gjson.Result {
 	switch attrs := i.(type) {
 	case map[string]interface{}:
 		for k, v := range attrs {
-			j, _ := json.Marshal(toJSONMap(v))
+			// we use the jsoniter lib here as the std lib json
+			// cannot handle marshalling map[interface{}]interface{}
+			j, _ := jsoniter.Marshal(v)
 			a[k] = gjson.ParseBytes(j)
 		}
 	case map[interface{}]interface{}:
 		for k, v := range attrs {
-			j, _ := json.Marshal(toJSONMap(v))
+			j, _ := jsoniter.Marshal(v)
 			a[fmt.Sprintf("%s", k)] = gjson.ParseBytes(j)
 		}
 	}
 
 	return a
-}
-
-func toJSONMap(i interface{}) interface{} {
-	switch parent := i.(type) {
-	case map[string]interface{}:
-		for k, v := range i.(map[string]interface{}) {
-			parent[k] = toJSONMap(v)
-		}
-
-		return parent
-	case map[interface{}]interface{}:
-		m := make(map[string]interface{}, len(parent))
-		for k, v := range i.(map[interface{}]interface{}) {
-			m[fmt.Sprintf("%s", k)] = toJSONMap(v)
-		}
-
-		return m
-	}
-
-	return i
 }
