@@ -26,6 +26,7 @@
 - [Cloud vendor-specific tips](#cloud-vendor-specific-tips)
 	- [Google](#google)
 	- [Azure](#azure)
+- [Code reviews](#code-reviews)
 - [Releases](#releases)
 
 
@@ -629,6 +630,21 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 	1. Go to `https://github.com/<YOUR GITHUB NAME>/infracost/settings/secrets/actions`.
 	2. Add repository secrets for `ARM_SUBSCRIPTION_ID`, `ARM_TENANT_ID`, `ARM_CLIENT_ID` and `ARM_CLIENT_SECRET`.
+
+## Code reviews
+
+Here is a list of things we should look for during code review when adding new resources:
+
+- Is the [infracost-usage-example.yml](https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml) file updated with any new usage file parameters and descriptions?
+- Some common bugs that are discovered in reviews:
+	- case sensitive string comparisons: `d.Get("kind") ==` should be `strings.ToLower(d.Get("kind").String()) ==`
+	- case sensitive regex in price filters: `ValueRegex: strPtr(fmt.Sprintf("/%s/", deviceType))` should be `ValueRegex: strPtr(fmt.Sprintf("/%s/i", deviceType))`
+	- missing anchors in price filter regex: `fmt.Sprintf("/%s/", x)` when it should be `fmt.Sprintf("/^%s$/", x)`
+	- incorrect output capitalization: └─ Data Ingested should be └─ Data ingested
+	- misnamed unit: `GB-month` should be `GB`
+- Any "Missing prices" or "Multiple prices" lines when running with `--log-level debug`?
+- Any incorrect prices or calculations?
+- Any [docs](https://www.infracost.io/docs/) pages need to be updated? e.g. the [supported resources](https://github.com/infracost/docs/blob/master/docs/supported_resources.md) page. If so, please open a PR so it can be merged after the CLI is released.
 
 ## Releases
 

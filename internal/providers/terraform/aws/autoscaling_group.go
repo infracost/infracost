@@ -29,8 +29,8 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	a := &aws.AutoscalingGroup{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
+		Name:    d.Get("name").String(),
 	}
-
 	instanceCount := d.Get("desired_capacity").Int()
 
 	// The Autoscaling Group resource has either a Launch Configuration or Launch Template sub-resource.

@@ -5,12 +5,14 @@ import (
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage/aws"
 )
 
 type AutoscalingGroup struct {
 	// "required" args that can't really be missing.
 	Address string
 	Region  string
+	Name    string
 
 	// "optional" args, that may be empty depending on the resource config
 	LaunchConfiguration *LaunchConfiguration
@@ -64,6 +66,7 @@ func (a *AutoscalingGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.Us
 func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
+	var estimateInstanceQualities schema.EstimateFunc
 
 	if a.LaunchConfiguration != nil {
 		lc := a.LaunchConfiguration.BuildResource()
@@ -72,6 +75,7 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 			return nil
 		}
 		subResources = append(subResources, lc)
+		estimateInstanceQualities = lc.EstimateUsage
 	} else if a.LaunchTemplate != nil {
 		lt := a.LaunchTemplate.BuildResource()
 		// If the Launch Template returns nil it is not supported so the Autoscaling Group should also return nil
@@ -79,6 +83,26 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 			return nil
 		}
 		subResources = append(subResources, lt)
+		estimateInstanceQualities = lt.EstimateUsage
+	}
+
+	estimate := func(ctx context.Context, u map[string]interface{}) error {
+		if estimateInstanceQualities != nil {
+			err := estimateInstanceQualities(ctx, u)
+			if err != nil {
+				return err
+			}
+		}
+		if a.Name != "" {
+			count, err := aws.AutoscalingGetInstanceCount(ctx, a.Region, a.Name)
+			if err != nil {
+				return err
+			}
+			if count > 0 {
+				u["instances"] = int64(count)
+			}
+		}
+		return nil
 	}
 
 	return &schema.Resource{
@@ -86,8 +110,6 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 		UsageSchema:    a.getUsageSchemaWithDefaultInstanceCount(),
 		CostComponents: costComponents,
 		SubResources:   subResources,
-		EstimateUsage: func(ctx context.Context, u map[string]interface{}) error {
-			return subResources[0].EstimateUsage(ctx, u)
-		},
+		EstimateUsage:  estimate,
 	}
 }
