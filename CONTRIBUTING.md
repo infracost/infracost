@@ -115,7 +115,7 @@ make build
 
 > **Note:** This example uses AWS, but is also applicable to Google and Azure resources.
 
-When adding your first resource, we recommend you first view [this YouTube video](https://www.youtube.com/watch?v=z0L76v3rWUg). You can also look at one of the existing resources to see how it's done, for example, check the [nat_gateway.go](internal/providers/terraform/aws/nat_gateway.go) resource.
+When adding your first resource, we recommend you first view [this YouTube video](https://www.youtube.com/watch?v=z0L76v3rWUg). You can also look at one of the existing resources to see how it's done, for example, check the [mwaa_environment.go](internal/providers/terraform/aws/mwaa_environment.go) resource.
 
 To begin, add a new file in `internal/resources/aws/` that creates cost components from the resource's attributes.
 
