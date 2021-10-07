@@ -25,7 +25,7 @@ resource_usage:
       monthly_tier_1_requests:               30000
       monthly_tier_2_requests:               30000
       monthly_lifecycle_transition_requests: 30000
-      monthly_retrieval_gb:                  30000
+      monthly_data_retrieval_gb:             30000
       monthly_select_data_scanned_gb:        30000
       monthly_select_data_returned_gb:       30000
 
@@ -34,7 +34,7 @@ resource_usage:
       monthly_tier_1_requests:               40000
       monthly_tier_2_requests:               40000
       monthly_lifecycle_transition_requests: 40000
-      monthly_retrieval_gb:                  40000
+      monthly_data_retrieval_gb:             40000
       monthly_select_data_scanned_gb:        40000
       monthly_select_data_returned_gb:       40000
 

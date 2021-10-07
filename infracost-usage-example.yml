@@ -276,7 +276,7 @@ resource_usage:
       monthly_tier_1_requests: 3000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
       monthly_tier_2_requests: 300000 # Monthly GET, SELECT, and all other requests (Tier 2).
       monthly_lifecycle_transition_requests: 300000 # Monthly Lifecycle Transition requests.
-      monthly_retrieval_gb: 30000 # Monthly data retrievals in GB
+      monthly_data_retrieval_gb: 30000 # Monthly data retrievals in GB
       monthly_select_data_scanned_gb: 30000 # Monthly data scanned by S3 Select in GB.
       monthly_select_data_returned_gb: 3000 # Monthly data returned by S3 Select in GB.
     one_zone_infrequent_access: # Usages of S3 One Zone - Infrequent Access:
@@ -284,7 +284,7 @@ resource_usage:
       monthly_tier_1_requests: 4000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
       monthly_tier_2_requests: 400000 # Monthly GET, SELECT, and all other requests (Tier 2).
       monthly_lifecycle_transition_requests: 400000 # Monthly Lifecycle Transition requests.
-      monthly_retrieval_gb: 40000 # Monthly data retrievals in GB
+      monthly_data_retrieval_gb: 40000 # Monthly data retrievals in GB
       monthly_select_data_scanned_gb: 40000 # Monthly data scanned by S3 Select in GB.
       monthly_select_data_returned_gb: 4000 # Monthly data returned by S3 Select in GB.
     glacier: # Usages of S3 Glacier:
