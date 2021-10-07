@@ -1,8 +1,6 @@
 package aws
 
 import (
-	"sort"
-
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -38,25 +36,28 @@ var S3BucketUsageSchema = []*schema.UsageSchemaItem{
 func (a *S3Bucket) PopulateUsage(u *schema.UsageData) {
 	// Add the storage classes based on what's based through in the usage
 	// and any storage classes added in the lifecycle storage classes.
-	storageClassMap := map[string]S3StorageClass{
-		"standard":                   &S3StandardStorageClass{Region: a.Region},
-		"intelligent_tiering":        &S3IntelligentTieringStorageClass{Region: a.Region},
-		"standard_infrequent_access": &S3StandardInfrequentAccessStorageClass{Region: a.Region},
-		"one_zone_infrequent_access": &S3OneZoneInfrequentAccessStorageClass{Region: a.Region},
-		"glacier":                    &S3GlacierStorageClass{Region: a.Region},
-		"glacier_deep_archive":       &S3GlacierDeepArchiveStorageClass{Region: a.Region},
+	storageClassNamePairs := []struct {
+		name         string
+		storageClass S3StorageClass
+	}{
+		{"standard", &S3StandardStorageClass{Region: a.Region}},
+		{"intelligent_tiering", &S3IntelligentTieringStorageClass{Region: a.Region}},
+		{"standard_infrequent_access", &S3StandardInfrequentAccessStorageClass{Region: a.Region}},
+		{"one_zone_infrequent_access", &S3OneZoneInfrequentAccessStorageClass{Region: a.Region}},
+		{"glacier", &S3GlacierStorageClass{Region: a.Region}},
+		{"glacier_deep_archive", &S3GlacierDeepArchiveStorageClass{Region: a.Region}},
 	}
 
-	for k, storageClass := range storageClassMap {
-		if stringInSlice(a.LifecycleStorageClasses, k) || (u != nil && u.Get(k).Type != gjson.Null) {
+	for _, s := range storageClassNamePairs {
+		if stringInSlice(a.LifecycleStorageClasses, s.name) || (u != nil && u.Get(s.name).Type != gjson.Null) {
 			// Populate the storage class usage using the map in the usage data
 			if u != nil {
-				storageClass.PopulateUsage(&schema.UsageData{
-					Address:    k,
-					Attributes: u.Get(k).Map(),
+				s.storageClass.PopulateUsage(&schema.UsageData{
+					Address:    s.name,
+					Attributes: u.Get(s.name).Map(),
 				})
 			}
-			a.storageClasses = append(a.storageClasses, storageClass)
+			a.storageClasses = append(a.storageClasses, s.storageClass)
 		}
 	}
 
@@ -73,11 +74,6 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 	for _, storageClass := range a.storageClasses {
 		subResources = append(subResources, storageClass.BuildResource())
 	}
-
-	// Sort the subresources so that the output is deterministic
-	sort.Slice(subResources, func(i, j int) bool {
-		return subResources[i].Name < subResources[j].Name
-	})
 
 	return &schema.Resource{
 		Name:           a.Address,
