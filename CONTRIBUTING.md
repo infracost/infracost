@@ -124,34 +124,67 @@ package aws
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
 
-type MyResourceArguments struct {
-	Address string      `json:"address,omitempty"`
-	Region  string      `json:"region,omitempty"`
-	InstanceCount int64 `json:"instanceCount,omitempty"`
-	InstanceType string `json:"instanceType,omitempty"`
-	UsageType string    `json:"usageType,omitempty"`
+type MyResource struct {
+	// These fields are required since they are pulled directly from the IAC configuration (e.g. the terraform plan) 
+	Address string
+	Region  string
+	InstanceCount int64
+	InstanceType string
+	UsageType string
+
+	// If there is a parameter than needs to be read from infracost-usage.yml you define it like this:
+	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-func NewMyResource(args *MyResourceArguments) *schema.Resource {
+// If the resource requires a usage parameter
+var MyResourceUsageSchema = []*schema.UsageSchemaItem{
+	{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
+}
+
+// If the resource requires a usage parameter
+func (a *MyResource) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(a, u)
+}
+
+func (a *MyResource) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           fmt.Sprintf("Instance (on-demand, %s)", "my_instance_type"),
 			Unit:           "hours",
-			UnitMultiplier:  1,
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(args.InstanceCount)),
+			UnitMultiplier: decimal.NewFromInt(1),
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(a.InstanceCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(args.Region),
-				Service:       strPtr("AmazonES"),
+				Region:        strPtr(a.Region),
+				Service:       strPtr("AmazonRS"),
 				ProductFamily: strPtr("My AWS Resource family"),
 				AttributeFilters: []*schema.AttributeFilter{
 					// Note the use of start/end anchors and case-insensitive match with ValueRegex
-					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", args.UsageType))},
-					{Key: "instanceType", Value: strPtr(args.InstanceType)},
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", a.UsageType))},
+					{Key: "instanceType", Value: strPtr(a.InstanceType)},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: strPtr("on_demand"),
+			},
+		},
+		{ // Optional usage parameter
+			Name:           "Data processed",
+			Unit:           "GB",
+			UnitMultiplier: decimal.NewFromInt(1),
+			HourlyQuantity: decimalPtr(decimal.NewFromFloat(*a.MonthlyDataProcessedGB)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(a.Region),
+				Service:       strPtr("AmazonRS"),
+				ProductFamily: strPtr("My AWS Resource family"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", Value: strPrt("UsageBytes")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -161,13 +194,13 @@ func NewMyResource(args *MyResourceArguments) *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name:           args.Address,
+		Name:           a.Address,
 		CostComponents: costComponents,
 	}
 }
 ```
 
-Next, add `internal/providers/terraform/aws/` add an accompanying test file.  This code extracts attributes from the
+Next, add `internal/providers/terraform/aws/` and an accompanying test file.  This code extracts attributes from the
 terraform data and uses the file in `internal/resources/aws` to generate the cost components.  
 
 ```go
@@ -190,16 +223,17 @@ func NewMyResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	region := d.Get("region").String()
 	sku := d.Get("sku_name").String()
 	instanceTypeFromSku := strings.Split(sku, "_")[0];
-
-	args := &aws.MyResourceArguments{
+	
+	a := &aws.MyResource{
 		Address: d.Address,
 		Region:  region,
 		InstanceCount: d.Get("terraformFieldThatHasNumberOfInstances"),
 		InstanceType: instanceTypeFromSku,
 		UsageType: "someHardCodedUsageType",
 	}
+	a.PopulateUsage(u)
 
-	return aws.NewNATGateway(args)
+	return a.BuildResource()
 }
 ```
 
@@ -235,7 +269,7 @@ Usage file `internal/providers/terraform/aws/testdata/aws_my_resource_test/aws_m
 version: 0.1
 resource_usage:
   aws_my_resource.my_resource_withUsage:
-    monthly_usage_hrs: 1000000
+    monthly_data_processed_gb: 1000000
 ```
 
 Add a golden file test to the test file `internal/providers/terraform/aws/aws_my_resource_test.go`:
@@ -266,7 +300,36 @@ Finally, generate the golden file by running the test with the `-update` flag. Y
 INFRACOST_LOG_LEVEL=warn go test ./internal/providers/terraform/aws/my_resource_test.go -v -update
 ```
 
-Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
+Please use the following pull request description template as a guide on the level of details to include in your PR, including required integration tests.
+
+```markdown
+Objective:
+
+Add support for aws_docdb_cluster_instance.  Fixes #123
+
+Pricing details:
+
+The aws_docdb_cluster_instance has 4 price components described in https://aws.amazon.com/documentdb/pricing/. There is no support for Reserved Instances nor Spot prices.
+
+T3 instances have an additional price for CPU Credits, this is charged per vCPU-hour and https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/unlimited-mode-examples.html suggests that the pricing is independent of the number of CPU cores in the T3 instance; instead the total number of vCPU-hours are calculated and multiplied by the price.
+
+The count parameter replicates the resource in the Terraform plan JSON so there is no need to handle it in the resource/test file.
+
+Status:
+
+ [ ] Added to resource_registry.go
+ [ ] Added internal/resources file
+ [ ] Added internal/provider/terraform/.../resources file
+ [ ] Added usage parameters to infracost-usage-example.yml 
+ [ ] Added test cases without usage-file
+ [ ] Added test cases with usage-file
+ [ ] Compared test case output to cloud cost calculator.
+
+Issues:
+
+None
+
+```
 
 ### Cost component names and units
 
