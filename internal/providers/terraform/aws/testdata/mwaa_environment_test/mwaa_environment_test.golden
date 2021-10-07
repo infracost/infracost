@@ -8,9 +8,9 @@
  └─ Meta database                                Monthly cost depends on usage: $0.10 per GB             
                                                                                                          
  aws_mwaa_environment.large_with_usage                                                                   
- ├─ Environment (Medium)                                       730  hours                        $540.20 
- ├─ Worker (Medium)                                          1,825  hours                        $200.75 
- ├─ Scheduler (Medium)                                       2,190  hours                        $240.90 
+ ├─ Environment (Large)                                        730  hours                        $722.70 
+ ├─ Worker (Large)                                           1,825  hours                        $401.50 
+ ├─ Scheduler (Large)                                        2,190  hours                        $481.80 
  └─ Meta database                                            1,000  GB                           $100.00 
                                                                                                          
  aws_mwaa_environment.medium                                                                             
@@ -27,6 +27,6 @@
     ├─ Select data scanned                       Monthly cost depends on usage: $0.002 per GB            
     └─ Select data returned                      Monthly cost depends on usage: $0.0007 per GB           
                                                                                                          
- OVERALL TOTAL                                                                                 $1,979.75 
+ OVERALL TOTAL                                                                                 $2,603.90 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

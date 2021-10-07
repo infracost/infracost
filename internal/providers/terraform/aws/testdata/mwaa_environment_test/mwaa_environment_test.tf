@@ -73,7 +73,7 @@ resource "aws_mwaa_environment" "large_with_usage" {
   dag_s3_path        = "dags/"
   execution_role_arn = aws_iam_role.r.arn
   name               = "example"
-  environment_class  = "mw1.medIUM"
+  environment_class  = "mW1.laRgE"
 
   network_configuration {
     security_group_ids = [aws_security_group.example.id]
