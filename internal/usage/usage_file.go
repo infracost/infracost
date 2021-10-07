@@ -8,12 +8,14 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/infracost/infracost"
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v2"
+
+	"github.com/infracost/infracost"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 const minUsageFileVersion = "0.1"
@@ -123,6 +125,10 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 					if v := existingUsage.GetStringArray(usageKey); v != nil {
 						existingUsageValue = *v
 					}
+				case schema.JSON:
+					if v := existingUsage.Get(usageKey).Map(); v != nil {
+						existingUsageValue = v
+					}
 				}
 			}
 			if existingUsageValue != nil {
@@ -140,7 +146,7 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 				log.Warnf("Error estimating usage for resource %s: %v", resourceName, err)
 			}
 		}
-		syncedResourceUsage[resourceName] = unFlattenHelper(resourceUsage)
+		syncedResourceUsage[resourceName] = resourceUsage
 	}
 	// yaml.MapSlice is used to maintain the order of keys, so re-running
 	// the code won't change the output.
@@ -166,6 +172,12 @@ func loadUsageSchema() (map[string][]*SchemaItem, error) {
 				usageValueType = schema.String
 				defaultValue = usageRawResult.String()
 			}
+
+			if usageRawResult.Type == gjson.JSON {
+				usageValueType = schema.JSON
+				defaultValue = usageRawResult.String()
+			}
+
 			usageSchema[resourceTypeName] = append(usageSchema[resourceTypeName], &SchemaItem{
 				Key:          usageKeyName,
 				ValueType:    usageValueType,
@@ -174,25 +186,6 @@ func loadUsageSchema() (map[string][]*SchemaItem, error) {
 		}
 	}
 	return usageSchema, nil
-}
-
-func unFlattenHelper(input map[string]interface{}) map[string]interface{} {
-	result := make(map[string]interface{})
-	for k, v := range input {
-		rootMap := &result
-		splittedKey := strings.Split(k, ".")
-		for it := 0; it < len(splittedKey)-1; it++ {
-			key := splittedKey[it]
-			if _, ok := (*rootMap)[key]; !ok {
-				(*rootMap)[key] = make(map[string]interface{})
-			}
-			casted := (*rootMap)[key].(map[string]interface{})
-			rootMap = &casted
-		}
-		key := splittedKey[len(splittedKey)-1]
-		(*rootMap)[key] = v
-	}
-	return result
 }
 
 func mapToSortedMapSlice(input map[string]interface{}) yaml.MapSlice {
