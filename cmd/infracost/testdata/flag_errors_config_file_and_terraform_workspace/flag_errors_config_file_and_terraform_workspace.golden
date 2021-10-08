@@ -34,4 +34,4 @@ GLOBAL FLAGS
       --log-level string   Log level (trace, debug, info, warn, error, fatal)
       --no-color           Turn off colored output
 
-Error: --config-file flag cannot be used with the following flags or equivalent environment variables: --path, --terraform-*, --usage-file
+Error: --config-file flag cannot be used with the following flags: --path, --terraform-*, --usage-file
