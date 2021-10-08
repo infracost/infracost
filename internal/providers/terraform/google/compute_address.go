@@ -78,7 +78,7 @@ func preemptibleVMComputeAddress() *schema.CostComponent {
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr("External IP Charge on a Preemptible VM")},
+				{Key: "description", Value: strPtr("External IP Charge on a Spot Preemptible VM")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
