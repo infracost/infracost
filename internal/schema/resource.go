@@ -22,7 +22,7 @@ type Resource struct {
 	SkipMessage       string
 	ResourceType      string
 	Tags              map[string]string
-	UsageSchema       []*UsageSchemaItem
+	UsageSchema       []*UsageItem
 	EstimateUsage     EstimateFunc
 	EstimationSummary map[string]bool
 }

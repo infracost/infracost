@@ -26,7 +26,7 @@ type EBSVolume struct {
 	MonthlyStandardIORequests *int64 `infracost_usage:"monthly_standard_io_requests"`
 }
 
-var EBSVolumeSchema = []*schema.UsageSchemaItem{
+var EBSVolumeSchema = []*schema.UsageItem{
 	{Key: "monthly_standard_io_requests", DefaultValue: 0, ValueType: schema.Int64},
 }
 

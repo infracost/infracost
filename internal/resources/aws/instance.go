@@ -41,7 +41,7 @@ type Instance struct {
 	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
 }
 
-var InstanceUsageSchema = []*schema.UsageSchemaItem{
+var InstanceUsageSchema = []*schema.UsageItem{
 	{Key: "operating_system", DefaultValue: "linux", ValueType: schema.String},
 	{Key: "reserved_instance_type", DefaultValue: "", ValueType: schema.String},
 	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},

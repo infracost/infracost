@@ -81,15 +81,18 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			fmt.Fprintln(os.Stderr, m)
 		}
 
-		u, err := usage.LoadFromFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
+		usageFile, err := usage.LoadUsageFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
 		if err != nil {
 			return err
 		}
-		if len(u) > 0 {
+
+		usageData := usageFile.ToUsageDataMap()
+
+		if len(usageData) > 0 {
 			ctx.SetContextValue("hasUsageFile", true)
 		}
 
-		providerProjects, err := provider.LoadResources(u)
+		providerProjects, err := provider.LoadResources(usageData)
 		if err != nil {
 			return err
 		}
@@ -102,8 +105,14 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			}
 			spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
 
-			syncResult, err := usage.SyncUsageData(providerProjects, u, projectCfg.UsageFile)
+			syncResult, err := usageFile.SyncUsageData(providerProjects)
 			summarizeUsage(ctx, syncResult)
+			if err != nil {
+				spinner.Fail()
+				return err
+			}
+
+			err = usageFile.WriteToPath(projectCfg.UsageFile)
 			if err != nil {
 				spinner.Fail()
 				return err
@@ -111,12 +120,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 			remediateUsage(runCtx, ctx, syncResult)
 
-			u, err := usage.LoadFromFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
-			if err != nil {
-				spinner.Fail()
-				return err
-			}
-			providerProjects, err = provider.LoadResources(u)
+			usageData := usageFile.ToUsageDataMap()
+			providerProjects, err = provider.LoadResources(usageData)
 			if err != nil {
 				spinner.Fail()
 				return err

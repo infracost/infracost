@@ -19,7 +19,7 @@ type AutoscalingGroup struct {
 	LaunchTemplate      *LaunchTemplate
 }
 
-var AutoscalingGroupUsageSchema = append([]*schema.UsageSchemaItem{
+var AutoscalingGroupUsageSchema = append([]*schema.UsageItem{
 	{Key: "instances", DefaultValue: 0, ValueType: schema.Int64},
 }, InstanceUsageSchema...)
 
@@ -40,7 +40,7 @@ func (a *AutoscalingGroup) PopulateUsage(u *schema.UsageData) {
 // as the default value for the "instances" usage param.  Without this, --sync-usage-file sets instances=0 causing the
 // costs for the node group to be $0.  This can be removed when --sync-usage-file creates the usage file with usgage keys
 // commented out by default.
-func (a *AutoscalingGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.UsageSchemaItem {
+func (a *AutoscalingGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.UsageItem {
 	var instanceCount *int64
 	if a.LaunchConfiguration != nil {
 		instanceCount = a.LaunchConfiguration.InstanceCount
@@ -52,10 +52,10 @@ func (a *AutoscalingGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.Us
 		return AutoscalingGroupUsageSchema
 	}
 
-	usageSchema := make([]*schema.UsageSchemaItem, 0, len(AutoscalingGroupUsageSchema))
+	usageSchema := make([]*schema.UsageItem, 0, len(AutoscalingGroupUsageSchema))
 	for _, u := range AutoscalingGroupUsageSchema {
 		if u.Key == "instances" {
-			usageSchema = append(usageSchema, &schema.UsageSchemaItem{Key: "instances", DefaultValue: instanceCount, ValueType: schema.Int64})
+			usageSchema = append(usageSchema, &schema.UsageItem{Key: "instances", DefaultValue: intVal(instanceCount), ValueType: schema.Int64})
 		} else {
 			usageSchema = append(usageSchema, u)
 		}
