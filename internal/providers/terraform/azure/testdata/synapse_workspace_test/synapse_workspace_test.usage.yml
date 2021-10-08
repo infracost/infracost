@@ -1,0 +1,23 @@
+version: 0.1
+resource_usage:
+  azurerm_synapse_workspace.general:
+    serverless_sql_pool_size_tb: 11
+  azurerm_synapse_workspace.vnet:
+    serverless_sql_pool_size_tb: 10
+  azurerm_synapse_workspace.datapipelines:
+    monthly_datapipeline_azure_hosted_activity_runs: 3
+    monthly_datapipeline_azure_hosted_data_integration_units: 1
+    monthly_datapipeline_azure_hosted_data_integration_hours: 31
+    monthly_datapipeline_azure_hosted_integration_runtime_hours: 200
+    monthly_datapipeline_azure_hosted_external_integration_runtime_hours: 4000
+    monthly_datapipeline_self_hosted_activity_runs: 1
+    monthly_datapipeline_self_hosted_data_movement_hours: 10
+    monthly_datapipeline_self_hosted_integration_runtime_hours: 200
+    monthly_datapipeline_self_hosted_external_integration_runtime_hours: 4000
+  azurerm_synapse_workspace.dataflows:
+    dataflow_basic_instances: 1
+    dataflow_basic_vcores: 8
+    monthly_dataflow_basic_hours: 1
+    dataflow_standard_instances: 1
+    dataflow_standard_vcores: 12
+    monthly_dataflow_standard_hours: 1

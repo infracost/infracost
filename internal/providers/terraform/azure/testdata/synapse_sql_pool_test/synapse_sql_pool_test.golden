@@ -1,0 +1,40 @@
+
+ Name                                                               Monthly Qty  Unit                      Monthly Cost 
+                                                                                                                        
+ azurerm_synapse_sql_pool.default                                                                                       
+ ├─ DWU blocks (DW200c)                                                     730  hours                        $2,204.60 
+ ├─ Storage                                                  Monthly cost depends on usage: $23.00 per TB               
+ └─ Geo-redundant disaster recovery                          Monthly cost depends on usage: $56.20 per TB               
+                                                                                                                        
+ azurerm_synapse_sql_pool.no_backup                                                                                     
+ ├─ DWU blocks (DW200c)                                                     730  hours                        $2,204.60 
+ └─ Storage                                                                   1  TB                              $23.00 
+                                                                                                                        
+ azurerm_synapse_sql_pool.storage                                                                                       
+ ├─ DWU blocks (DW200c)                                                     730  hours                        $2,204.60 
+ ├─ Storage                                                                   1  TB                              $23.00 
+ └─ Geo-redundant disaster recovery                                           1  TB                              $56.20 
+                                                                                                                        
+ azurerm_synapse_workspace.example                                                                                      
+ ├─ Serverless SQL pool size                                                 11  TB                              $55.00 
+ ├─ Data flow (basic)                                        Monthly cost depends on usage: $0.27 per vCore-hours       
+ ├─ Data flow (standard)                                     Monthly cost depends on usage: $0.35 per vCore-hours       
+ ├─ Data pipeline azure hosted activity runs                 Monthly cost depends on usage: $1.00 per 1k activity runs  
+ ├─ Data pipeline azure hosted data integration units        Monthly cost depends on usage: $0.25 per DIU-hours         
+ ├─ Data pipeline azure hosted integration runtime           Monthly cost depends on usage: $0.005 per hours            
+ ├─ Data pipeline azure hosted external integration runtime  Monthly cost depends on usage: $0.00025 per hours          
+ ├─ Data pipeline self hosted activity runs                  Monthly cost depends on usage: $1.50 per 1k activity runs  
+ ├─ Data pipeline self hosted data movement                  Monthly cost depends on usage: $0.10 per hours             
+ ├─ Data pipeline self hosted integration runtime            Monthly cost depends on usage: $0.002 per hours            
+ └─ Data pipeline self hosted external integration runtime   Monthly cost depends on usage: $0.0001 per hours           
+                                                                                                                        
+ OVERALL TOTAL                                                                                                $6,771.00 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+
+1 resource type wasn't estimated as it's not supported yet.
+Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
+1 x azurerm_storage_account
+Logs:
+
+level=warning msg="Skipping resource azurerm_storage_account.example. Infracost only supports BlockBlobStorage and FileStorage account kinds"

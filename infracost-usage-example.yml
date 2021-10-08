@@ -860,6 +860,31 @@ resource_usage:
     monthly_data_write_gb: 1000 # Monthly number of data write in GB.
     blob_index_tags: 100000 # Total number of Blob indexes.
 
+  azurerm_synapse_spark_pool.my_spark_pool:
+    monthly_hours: 730 # Monthly number of hours used by each instance in the pool.
+
+  azurerm_synapse_sql_pool.my_sql_pool:
+    storage_tb: 1 # Total storage size, including snapshots, in TB.
+    disaster_recovery_enabled: false # Whether geo-redundant disaster recovery is enabled or not.
+
+  azurerm_synapse_workspace.my_workspace:
+    serverless_sql_pool_size_tb: 10 # Total storage size, including snapshots, in TB.
+    monthly_datapipeline_azure_hosted_activity_runs: 3 # Monthly number of Azure hosted activity runs.
+    monthly_datapipeline_azure_hosted_data_integration_units: 1 # Monthly number of Azure hosted data integration units.
+    monthly_datapipeline_azure_hosted_data_integration_hours: 31 # Monthly number of Azure hosted data integration hours.
+    monthly_datapipeline_azure_hosted_integration_runtime_hours: 200 # Monthly number of Azure hosted integration runtime hours.
+    monthly_datapipeline_azure_hosted_external_integration_runtime_hours: 4000 # Monthly number of Azure hosted external integration runtime hours.
+    monthly_datapipeline_self_hosted_activity_runs: 1 # Monthly number of self hosted activity runs.
+    monthly_datapipeline_self_hosted_data_movement_hours: 10 # Monthly number of self hosted data movement hours.
+    monthly_datapipeline_self_hosted_integration_runtime_hours: 200 # Monthly number of self hosted integration runtime hours.
+    monthly_datapipeline_self_hosted_external_integration_runtime_hours: 4000 # Monthly number of self hosted external integration runtime hours.
+    dataflow_basic_instances: 1 # Number of Data Flow basic instances.
+    dataflow_basic_vcores: 8 # Number of Data Flow basic vCores.
+    monthly_dataflow_basic_hours: 1 # Monthly number of Data Flow basic hours (this is multiplied by the number of instances and vCores).
+    dataflow_standard_instances: 1 # Number of Data Flow standard instances.
+    dataflow_standard_vcores: 12 # Number of Data Flow standard vCores.
+    monthly_dataflow_standard_hours: 1 # Monthly number of Data Flow standard hours (this is multiplied by the number of instances and vCores).
+
   azurerm_virtual_machine_scale_set.my_scale_set:
     storage_profile_os_disk:
       monthly_disk_operations: 100000 # Monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB.

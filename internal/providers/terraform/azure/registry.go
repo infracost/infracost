@@ -83,6 +83,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMSearchServiceRegistryItem(),
 	GetAzureRMRedisCacheRegistryItem(),
 	GetAzureRMStorageAccountRegistryItem(),
+	GetAzureRMSynapseSparkPoolRegistryItem(),
+	GetAzureRMSynapseSQLPoolRegistryItem(),
+	GetAzureRMSynapseWorkspacRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
 	GetAzureRMVpnGatewayConnectionRegistryItem(),
@@ -192,6 +195,9 @@ var FreeResources = []string{
 	"azurerm_postgresql_flexible_server_firewall_rule",
 	"azurerm_postgresql_virtual_network_rule",
 
+	// Azure Datalake Gen 2
+	"azurerm_storage_data_lake_gen2_filesystem",
+
 	// Azure Event Hub
 	"azurerm_eventhub",
 	"azurerm_eventhub_authorization_rule",
@@ -294,6 +300,10 @@ var FreeResources = []string{
 	"azurerm_virtual_desktop_workspace",
 	"azurerm_virtual_desktop_workspace_application_group_association",
 	"azurerm_virtual_desktop_host_pool",
+
+	// Azure Synapse Analytics
+	"azurerm_synapse_firewall_rule",
+	"azurerm_synapse_private_link_hub",
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",

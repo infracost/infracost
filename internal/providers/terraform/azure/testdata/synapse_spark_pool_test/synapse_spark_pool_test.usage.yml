@@ -1,0 +1,9 @@
+version: 0.1
+resource_usage:
+  azurerm_synapse_workspace.example:
+    serverless_sql_pool_size_tb: 11
+  azurerm_synapse_spark_pool.default:
+    monthly_hours: 11
+  azurerm_synapse_spark_pool.autoscale:
+    monthly_hours: 9
+    
