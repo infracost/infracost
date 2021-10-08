@@ -295,20 +295,14 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		cmd.Flags().Changed("terraform-workspace") ||
 		cmd.Flags().Changed("terraform-use-state"))
 
-	projectCfg := cfg.Projects[0]
-
-	hasProjectEnvs := projectCfg.Path != "" ||
-		projectCfg.TerraformBinary != "" ||
-		projectCfg.TerraformCloudHost != "" ||
-		projectCfg.TerraformWorkspace != "" ||
-		projectCfg.TerraformCloudToken != ""
-
-	if hasConfigFile && (hasProjectFlags || hasProjectEnvs) {
-		m := "--config-file flag cannot be used with the following flags or equivalent environment variables: "
+	if hasConfigFile && hasProjectFlags {
+		m := "--config-file flag cannot be used with the following flags: "
 		m += "--path, --terraform-*, --usage-file"
 		ui.PrintUsage(cmd)
 		return errors.New(m)
 	}
+
+	projectCfg := cfg.Projects[0]
 
 	if hasProjectFlags {
 		projectCfg.Path, _ = cmd.Flags().GetString("path")
