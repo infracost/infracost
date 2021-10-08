@@ -36,7 +36,7 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 
 	costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size", "10", serverlessSQLPoolSize))
-	
+
 	dataflowTiers := [2]string{"Basic", "Standard"}
 	for _, tier := range dataflowTiers {
 		var dataflowInstances, dataflowVCores, dataflowHours *decimal.Decimal

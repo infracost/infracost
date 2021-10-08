@@ -70,7 +70,7 @@ resource "azurerm_synapse_workspace" "datapipelines" {
   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.example.id
   sql_administrator_login              = "sqladminuser"
   sql_administrator_login_password     = "H@Sh1CoR3!"
-  
+
 
   aad_admin {
     login     = "AzureAD Admin"
@@ -90,7 +90,7 @@ resource "azurerm_synapse_workspace" "dataflows" {
   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.example.id
   sql_administrator_login              = "sqladminuser"
   sql_administrator_login_password     = "H@Sh1CoR3!"
-  
+
 
   aad_admin {
     login     = "AzureAD Admin"
