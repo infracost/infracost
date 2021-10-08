@@ -266,6 +266,11 @@ Finally, generate the golden file by running the test with the `-update` flag. Y
 INFRACOST_LOG_LEVEL=warn go test ./internal/providers/terraform/aws/my_resource_test.go -v -update
 ```
 
+The following method works better if you're updating golden test files that use `CaptureLogs = true`: 
+```sh
+ARGS="--run TestNewAzureRMSynapseSQLPool -update" make test_azure
+```
+
 Please use [this pull request description](https://github.com/infracost/infracost/pull/91) as a guide on the level of details to include in your PR, including required integration tests.
 
 ### Cost component names and units
