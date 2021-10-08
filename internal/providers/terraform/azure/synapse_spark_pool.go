@@ -39,7 +39,7 @@ func NewAzureRMSynapseSparkPool(d *schema.ResourceData, u *schema.UsageData) *sc
 	if nodeCount == nil {
 		if d.Get("auto_scale").Type != gjson.Null {
 			autoScale := d.Get("auto_scale").Array()
-			if	len(autoScale) > 0 {
+			if len(autoScale) > 0 {
 				nodeCount = decimalPtr(decimal.NewFromInt(autoScale[0].Get("min_node_count").Int()))
 			}
 		}
