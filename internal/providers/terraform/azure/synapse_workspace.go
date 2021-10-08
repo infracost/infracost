@@ -57,7 +57,7 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 			dataflowVCores = decimalPtr(decimal.NewFromInt(u.Get(vcoresUsageKey).Int()))
 			dataflowHours = decimalPtr(decimal.NewFromInt(u.Get(hoursUsageKey).Int()))
 		}
-		costComponents = append(costComponents, synapseDataFlowCostComponent(region, fmt.Sprintf("Data flow - %s", strings.ToLower(tier)), tier, dataflowInstances, dataflowVCores, dataflowHours))
+		costComponents = append(costComponents, synapseDataFlowCostComponent(region, fmt.Sprintf("Data flow (%s)", strings.ToLower(tier)), tier, dataflowInstances, dataflowVCores, dataflowHours))
 	}
 
 	datapipelineTiers := [2]string{"Azure Hosted IR", "Self Hosted IR"}
@@ -83,7 +83,7 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 				dataIntegrationUnits = decimalPtr(decimal.NewFromInt(u.Get(dataIntegrationUnitUsageKey).Int()))
 				dataIntegrationHours = decimalPtr(decimal.NewFromInt(u.Get(dataIntegrationHoursUsageKey).Int()))
 			}
-			costComponents = append(costComponents, synapseDataPipelineDataMovementCostComponent(region, fmt.Sprintf("Data pipeline %s data integration units", usageName), tier, "Data Movement", "DIU-hour", dataIntegrationUnits, dataIntegrationHours))
+			costComponents = append(costComponents, synapseDataPipelineDataMovementCostComponent(region, fmt.Sprintf("Data pipeline %s data integration units", usageName), tier, "Data Movement", "DIU-hours", dataIntegrationUnits, dataIntegrationHours))
 		} else {
 			var dataMovementHoursUsageKey = fmt.Sprintf("datapipeline_%s_data_movement_hours", datapipelineUsageKeys[i])
 			if u != nil && u.Get(dataMovementHoursUsageKey).Type != gjson.Null {
