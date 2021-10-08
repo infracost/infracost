@@ -108,6 +108,10 @@ func mergeUsageItems(destItems []*schema.UsageItem, srcItems []*schema.UsageItem
 
 		destItem.ValueType = srcItem.ValueType
 
+		if srcItem.Description != "" {
+			destItem.Description = srcItem.Description
+		}
+
 		if srcItem.ValueType == schema.Items {
 			if srcItem.DefaultValue != nil {
 				srcDefaultValue := srcItem.DefaultValue.([]*schema.UsageItem)

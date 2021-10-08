@@ -281,9 +281,10 @@ func yamlToUsageItem(keyNode *yamlv3.Node, valNode *yamlv3.Node) (*schema.UsageI
 	}
 
 	return &schema.UsageItem{
-		Key:       keyNode.Value,
-		ValueType: usageValueType,
-		Value:     value,
+		Key:         keyNode.Value,
+		ValueType:   usageValueType,
+		Value:       value,
+		Description: valNode.LineComment,
 	}, nil
 }
 
@@ -364,10 +365,11 @@ func resourceUsagesToYAML(resourceUsages []*ResourceUsage) yamlv3.Node {
 			}
 
 			itemValNode := &yamlv3.Node{
-				Kind:    kind,
-				Tag:     tag,
-				Value:   value,
-				Content: content,
+				Kind:        kind,
+				Tag:         tag,
+				Value:       value,
+				Content:     content,
+				LineComment: item.Description,
 			}
 
 			resourceValNode.Content = append(resourceValNode.Content, itemKeyNode)
