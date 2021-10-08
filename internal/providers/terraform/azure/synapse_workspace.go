@@ -43,7 +43,7 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 
 		var instancesUsageKey = fmt.Sprintf("dataflow_%s_instances", strings.ToLower(tier))
 		var vcoresUsageKey = fmt.Sprintf("dataflow_%s_vcores", strings.ToLower(tier))
-		var hoursUsageKey = fmt.Sprintf("dataflow_%s_hours", strings.ToLower(tier))
+		var hoursUsageKey = fmt.Sprintf("monthly_dataflow_%s_hours", strings.ToLower(tier))
 
 		if u != nil && u.Get(instancesUsageKey).Type != gjson.Null && u.Get(vcoresUsageKey).Type != gjson.Null && u.Get(hoursUsageKey).Type != gjson.Null {
 			dataflowInstances = decimalPtr(decimal.NewFromInt(u.Get(instancesUsageKey).Int()))
@@ -63,35 +63,35 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 		var activityRuns, dataIntegrationUnits, dataIntegrationHours, dataMovementHours, integrationRuntimeHours, externalIntegrationRuntimeHours *decimal.Decimal
 		var usageName = strings.Replace(datapipelineUsageKeys[i], "_", " ", 1)
 
-		var activityRunsUsageKey = fmt.Sprintf("datapipeline_%s_activity_runs", datapipelineUsageKeys[i])
+		var activityRunsUsageKey = fmt.Sprintf("monthly_datapipeline_%s_activity_runs", datapipelineUsageKeys[i])
 		if u != nil && u.Get(activityRunsUsageKey).Type != gjson.Null {
 			activityRuns = decimalPtr(decimal.NewFromInt(u.Get(activityRunsUsageKey).Int()))
 		}
 		costComponents = append(costComponents, synapseDataPipelineActivityRunCostComponent(region, fmt.Sprintf("Data pipeline %s activity runs", usageName), tier, "Orchestration Activity Run", activityRuns))
 
 		if datapipelineUsageKeys[i] == "azure_hosted" {
-			var dataIntegrationUnitUsageKey = fmt.Sprintf("datapipeline_%s_data_integration_units", datapipelineUsageKeys[i])
-			var dataIntegrationHoursUsageKey = fmt.Sprintf("datapipeline_%s_data_integration_hours", datapipelineUsageKeys[i])
+			var dataIntegrationUnitUsageKey = fmt.Sprintf("monthly_datapipeline_%s_data_integration_units", datapipelineUsageKeys[i])
+			var dataIntegrationHoursUsageKey = fmt.Sprintf("monthly_datapipeline_%s_data_integration_hours", datapipelineUsageKeys[i])
 			if u != nil && u.Get(dataIntegrationUnitUsageKey).Type != gjson.Null && u.Get(dataIntegrationHoursUsageKey).Type != gjson.Null {
 				dataIntegrationUnits = decimalPtr(decimal.NewFromInt(u.Get(dataIntegrationUnitUsageKey).Int()))
 				dataIntegrationHours = decimalPtr(decimal.NewFromInt(u.Get(dataIntegrationHoursUsageKey).Int()))
 			}
 			costComponents = append(costComponents, synapseDataPipelineDataMovementCostComponent(region, fmt.Sprintf("Data pipeline %s data integration units", usageName), tier, "Data Movement", "DIU-hours", dataIntegrationUnits, dataIntegrationHours))
 		} else {
-			var dataMovementHoursUsageKey = fmt.Sprintf("datapipeline_%s_data_movement_hours", datapipelineUsageKeys[i])
+			var dataMovementHoursUsageKey = fmt.Sprintf("monthly_datapipeline_%s_data_movement_hours", datapipelineUsageKeys[i])
 			if u != nil && u.Get(dataMovementHoursUsageKey).Type != gjson.Null {
 				dataMovementHours = decimalPtr(decimal.NewFromInt(u.Get(dataMovementHoursUsageKey).Int()))
 			}
 			costComponents = append(costComponents, synapseDataPipelineDataMovementCostComponent(region, fmt.Sprintf("Data pipeline %s data movement", usageName), tier, "Data Movement", "hours", decimalPtr(decimal.NewFromInt(1)), dataMovementHours))
 		}
 
-		var integrationRuntimeUsageKey = fmt.Sprintf("datapipeline_%s_integration_runtime_hours", datapipelineUsageKeys[i])
+		var integrationRuntimeUsageKey = fmt.Sprintf("monthly_datapipeline_%s_integration_runtime_hours", datapipelineUsageKeys[i])
 		if u != nil && u.Get(integrationRuntimeUsageKey).Type != gjson.Null {
 			integrationRuntimeHours = decimalPtr(decimal.NewFromInt(u.Get(integrationRuntimeUsageKey).Int()))
 		}
 		costComponents = append(costComponents, synapseDataPipelineActivityIntegrationRuntimeCostComponent(region, fmt.Sprintf("Data pipeline %s integration runtime", usageName), tier, "Pipeline Activity", integrationRuntimeHours))
 
-		var externalIntegrationRuntimeUsageKey = fmt.Sprintf("datapipeline_%s_external_integration_runtime_hours", datapipelineUsageKeys[i])
+		var externalIntegrationRuntimeUsageKey = fmt.Sprintf("monthly_datapipeline_%s_external_integration_runtime_hours", datapipelineUsageKeys[i])
 		if u != nil && u.Get(externalIntegrationRuntimeUsageKey).Type != gjson.Null {
 			externalIntegrationRuntimeHours = decimalPtr(decimal.NewFromInt(u.Get(externalIntegrationRuntimeUsageKey).Int()))
 		}
