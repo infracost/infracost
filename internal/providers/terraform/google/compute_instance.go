@@ -109,7 +109,7 @@ func bootDisk(region string, initializeParams gjson.Result) *schema.CostComponen
 func scratchDisk(region string, purchaseOption string, count int) *schema.CostComponent {
 	descRegex := "/^SSD backed Local Storage( in .*)?$/"
 	if strings.ToLower(purchaseOption) == "preemptible" {
-		descRegex = "/^SSD backed Local Storage attached to Preemptible VMs/"
+		descRegex = "/^SSD backed Local Storage attached to Spot Preemptible VMs/"
 	}
 
 	return &schema.CostComponent{
@@ -159,7 +159,7 @@ func guestAccelerator(region string, purchaseOption string, guestAccel gjson.Res
 
 	descRegex := fmt.Sprintf("/^%s running/", descPrefix)
 	if strings.ToLower(purchaseOption) == "preemptible" {
-		descRegex = fmt.Sprintf("/^%s attached to preemptible VMs running/", descPrefix)
+		descRegex = fmt.Sprintf("/^%s attached to Spot Preemptible VMs running/", descPrefix)
 	}
 
 	count := decimal.NewFromInt(guestAccel.Get("count").Int())

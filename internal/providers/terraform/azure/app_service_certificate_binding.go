@@ -2,10 +2,9 @@ package azure
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	"strings"
 )
 
 func GetAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
@@ -25,9 +24,9 @@ func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.Us
 	sslState := d.Get("ssl_state").String()
 
 	// The two approved values are IpBasedEnabled or SniEnabled
-	sslState = strings.ToUpper(sslState)[0:2]
+	sslState = strings.ToUpper(sslState)
 
-	if sslState == "IP" {
+	if strings.HasPrefix(sslState, "IP") {
 		sslType = "IP"
 	} else {
 		// returning directly since SNI is currently defined as free in the Azure cost page

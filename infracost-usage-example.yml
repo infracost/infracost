@@ -232,6 +232,11 @@ resource_usage:
   aws_mq_broker.my_aws_mq_broker:
     storage_size_gb: 12 # Data storage per instance in GB.
 
+  aws_mwaa_environment.my_aws_mwaa_environment:
+    additional_workers: 2.5        # Average number of monthly additional worker instances
+    additional_schedulers: 2       # Average number of monthly additional scheduler instances
+    meta_database_gb: 1000         # Total storage used for meta database
+
   aws_rds_cluster.my_cluster:
     capacity_units_per_hr: 50          # Number of aurora capacity units per hour. Only used when engine_mode is "serverless"
     storage_gb: 200                    # Storage amount in GB allocated to the aurora cluster.
