@@ -39,28 +39,18 @@ func NewAzureRMSynapseSparkPool(d *schema.ResourceData, u *schema.UsageData) *sc
 	if nodeCount == nil {
 		if d.Get("auto_scale").Type != gjson.Null {
 			autoScale := d.Get("auto_scale").Array()
-			nodeCount = decimalPtr(decimal.NewFromInt(autoScale[0].Get("min_node_count").Int()))
+			if	len(autoScale) > 0 {
+				nodeCount = decimalPtr(decimal.NewFromInt(autoScale[0].Get("min_node_count").Int()))
+			}
 		}
 	}
 
-	var hours = decimalPtr(decimal.NewFromInt(9))
+	var hours *decimal.Decimal
 	if u != nil && u.Get("monthly_hours").Type != gjson.Null {
 		hours = decimalPtr(decimal.NewFromInt(u.Get("monthly_hours").Int()))
 	}
 
-	var freevCoreHours, vCoreHours *decimal.Decimal
-	if nodeCount != nil && nodevCores != nil {
-		freevCoreHours = decimalPtr(decimal.NewFromInt(120).Div(*nodevCores).Div(*nodeCount))
-		if hours != nil && hours.LessThan(*freevCoreHours) {
-			freevCoreHours = hours
-		}
-		if hours != nil && hours.GreaterThan(*freevCoreHours) {
-			vCoreHours = decimalPtr(hours.Sub(*freevCoreHours))
-		}
-	}
-
-	costComponents = append(costComponents, synapseSparkPoolCostComponent(region, fmt.Sprintf("%sx %s node (first 120 vCore-hours)", nodeCount, strings.ToLower(nodeSize)), "0", nodeCount, nodevCores, freevCoreHours))
-	costComponents = append(costComponents, synapseSparkPoolCostComponent(region, fmt.Sprintf("%sx %s node (over 120 vCore-hours)", nodeCount, strings.ToLower(nodeSize)), "120", nodeCount, nodevCores, vCoreHours))
+	costComponents = append(costComponents, synapseSparkPoolCostComponent(region, fmt.Sprintf("%s (%s nodes)", strings.ToLower(nodeSize), nodeCount), "120", nodeCount, nodevCores, hours))
 
 	return &schema.Resource{
 		Name:           d.Address,

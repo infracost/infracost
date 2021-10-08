@@ -35,15 +35,8 @@ func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *sc
 		serverlessSQLPoolSize = decimalPtr(decimal.NewFromInt(u.Get("serverless_sql_pool_size_tb").Int()))
 	}
 
-	if serverlessSQLPoolSize == nil || (serverlessSQLPoolSize != nil && serverlessSQLPoolSize.LessThanOrEqual(decimal.NewFromInt(10))) {
-		costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", serverlessSQLPoolSize))
-	}
-
-	if serverlessSQLPoolSize != nil && serverlessSQLPoolSize.GreaterThan(decimal.NewFromInt(10)) {
-		costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size (first 10TB)", "0", decimalPtr(decimal.NewFromInt(10))))
-		costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size (over 10TB)", "10", decimalPtr(serverlessSQLPoolSize.Sub(decimal.NewFromInt(10)))))
-	}
-
+	costComponents = append(costComponents, synapseServerlessSQLPoolCostComponent(region, "Serverless SQL pool size", "10", serverlessSQLPoolSize))
+	
 	dataflowTiers := [2]string{"Basic", "Standard"}
 	for _, tier := range dataflowTiers {
 		var dataflowInstances, dataflowVCores, dataflowHours *decimal.Decimal
