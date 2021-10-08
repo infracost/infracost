@@ -1,0 +1,12 @@
+version: 0.1
+resource_usage:
+  aws_cloudfront_distribution.s3_distribution:
+    custom_ssl_certificates: 3
+    monthly_data_transfer_to_internet_gb:
+      us: 51200000
+      europe: 220000
+      south_africa: 10000
+  aws_s3_bucket.b:
+    object_tags: 10000000
+    glacier:
+      storage_gb: 50000

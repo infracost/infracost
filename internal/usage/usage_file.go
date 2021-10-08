@@ -8,12 +8,14 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/infracost/infracost"
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v2"
+
+	"github.com/infracost/infracost"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 const minUsageFileVersion = "0.1"
@@ -90,47 +92,16 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 				continue
 			}
 
-			resourceUSchema = make([]*schema.UsageSchemaItem, 0, len(schemaItems))
-			for _, s := range schemaItems {
-				resourceUSchema = append(resourceUSchema, &schema.UsageSchemaItem{
-					Key:          s.Key,
-					DefaultValue: s.DefaultValue,
-					ValueType:    s.ValueType,
-				})
-			}
+			resourceUSchema = schemaItemsToUsageSchemaItems(schemaItems)
 		}
 
-		resourceUsage := make(map[string]interface{})
-		for _, usageSchemaItem := range resourceUSchema {
-			usageKey := usageSchemaItem.Key
-			usageValueType := usageSchemaItem.ValueType
-			var existingUsageValue interface{}
-			if existingUsage, ok := existingUsageData[resourceName]; ok {
-				switch usageValueType {
-				case schema.Float64:
-					if v := existingUsage.GetFloat(usageKey); v != nil {
-						existingUsageValue = *v
-					}
-				case schema.Int64:
-					if v := existingUsage.GetInt(usageKey); v != nil {
-						existingUsageValue = *v
-					}
-				case schema.String:
-					if v := existingUsage.GetString(usageKey); v != nil {
-						existingUsageValue = *v
-					}
-				case schema.StringArray:
-					if v := existingUsage.GetStringArray(usageKey); v != nil {
-						existingUsageValue = *v
-					}
-				}
-			}
-			if existingUsageValue != nil {
-				resourceUsage[usageKey] = existingUsageValue
-			} else {
-				resourceUsage[usageKey] = usageSchemaItem.DefaultValue
-			}
+		var resourceUsageData *schema.UsageData
+		if v, ok := existingUsageData[resourceName]; ok {
+			resourceUsageData = v
 		}
+
+		resourceUsage := buildResourceUsage(resourceUSchema, resourceUsageData)
+
 		syncResult.ResourceCount++
 		if resource.EstimateUsage != nil {
 			syncResult.EstimationCount++
@@ -140,12 +111,91 @@ func syncResourcesUsage(resources []*schema.Resource, usageSchema map[string][]*
 				log.Warnf("Error estimating usage for resource %s: %v", resourceName, err)
 			}
 		}
-		syncedResourceUsage[resourceName] = unFlattenHelper(resourceUsage)
+		syncedResourceUsage[resourceName] = resourceUsage
 	}
 	// yaml.MapSlice is used to maintain the order of keys, so re-running
 	// the code won't change the output.
 	result := mapToSortedMapSlice(syncedResourceUsage)
 	return syncResult, result
+}
+
+func schemaItemsToUsageSchemaItems(schemaItems []*SchemaItem) []*schema.UsageSchemaItem {
+	resourceUSchema := make([]*schema.UsageSchemaItem, 0, len(schemaItems))
+
+	for _, s := range schemaItems {
+		resourceUSchema = append(resourceUSchema, &schema.UsageSchemaItem{
+			Key:          s.Key,
+			DefaultValue: s.DefaultValue,
+			ValueType:    s.ValueType,
+		})
+	}
+
+	return resourceUSchema
+}
+
+func buildResourceUsage(schemaItems []*schema.UsageSchemaItem, existingUsageData *schema.UsageData) map[string]interface{} {
+	usage := make(map[string]interface{})
+
+	for _, usageSchemaItem := range schemaItems {
+		usageKey := usageSchemaItem.Key
+		usageValueType := usageSchemaItem.ValueType
+
+		var existingUsageValue interface{}
+		if existingUsageData != nil {
+			switch usageValueType {
+			case schema.Float64:
+				if v := existingUsageData.GetFloat(usageKey); v != nil {
+					existingUsageValue = *v
+				}
+			case schema.Int64:
+				if v := existingUsageData.GetInt(usageKey); v != nil {
+					existingUsageValue = *v
+				}
+			case schema.String:
+				if v := existingUsageData.GetString(usageKey); v != nil {
+					existingUsageValue = *v
+				}
+			case schema.StringArray:
+				if v := existingUsageData.GetStringArray(usageKey); v != nil {
+					existingUsageValue = *v
+				}
+			case schema.Items:
+				if v := existingUsageData.Get(usageKey).Map(); v != nil {
+					subData := schema.NewUsageData(usageKey, v)
+					existingUsageValue = buildResourceUsage(
+						schemaItemsToUsageSchemaItems(usageSchemaItem.DefaultValue.([]*SchemaItem)),
+						subData,
+					)
+				}
+			}
+		}
+
+		usage[usageKey] = usageSchemaItem.DefaultValue
+
+		if usageValueType == schema.Items {
+			usage[usageKey] = itemsToMap(usageSchemaItem.DefaultValue.([]*SchemaItem))
+		}
+
+		if existingUsageValue != nil {
+			usage[usageKey] = existingUsageValue
+		}
+	}
+
+	return usage
+}
+
+func itemsToMap(items []*SchemaItem) map[string]interface{} {
+	m := make(map[string]interface{}, len(items))
+	for _, item := range items {
+		if item.ValueType == schema.Items {
+			m[item.Key] = itemsToMap(item.DefaultValue.([]*SchemaItem))
+			continue
+		}
+
+		m[item.Key] = item.DefaultValue
+	}
+
+	return m
 }
 
 func loadUsageSchema() (map[string][]*SchemaItem, error) {
@@ -154,45 +204,87 @@ func loadUsageSchema() (map[string][]*SchemaItem, error) {
 	if err != nil {
 		return usageSchema, err
 	}
+
 	for _, resUsageData := range usageData {
 		resourceTypeName := strings.Split(resUsageData.Address, ".")[0]
 		usageSchema[resourceTypeName] = make([]*SchemaItem, 0)
+
 		for usageKeyName, usageRawResult := range resUsageData.Attributes {
-			var defaultValue interface{}
-			usageValueType := schema.Int64
-			defaultValue = 0
-			usageRawValue := usageRawResult.Value()
-			if _, ok := usageRawValue.(string); ok {
-				usageValueType = schema.String
-				defaultValue = usageRawResult.String()
-			}
-			usageSchema[resourceTypeName] = append(usageSchema[resourceTypeName], &SchemaItem{
-				Key:          usageKeyName,
-				ValueType:    usageValueType,
-				DefaultValue: defaultValue,
-			})
+			usageSchema[resourceTypeName] = append(
+				usageSchema[resourceTypeName],
+				toSchemaItem(usageRawResult, usageKeyName),
+			)
 		}
 	}
+
 	return usageSchema, nil
 }
 
-func unFlattenHelper(input map[string]interface{}) map[string]interface{} {
-	result := make(map[string]interface{})
-	for k, v := range input {
-		rootMap := &result
-		splittedKey := strings.Split(k, ".")
-		for it := 0; it < len(splittedKey)-1; it++ {
-			key := splittedKey[it]
-			if _, ok := (*rootMap)[key]; !ok {
-				(*rootMap)[key] = make(map[string]interface{})
-			}
-			casted := (*rootMap)[key].(map[string]interface{})
-			rootMap = &casted
+// toSchema item turns gjson.Result into a *SchemaItem. This function supports recursion
+// to allow for complex gjson types "gjson.JSON" to be parsed into nested sets of SchemaItem
+//
+// e.g. given:
+//
+// 		usageRawResult: gjson.Result{
+//    		Type: gjson.JSON,
+//    		Raw: `{"prop1": "test", "prop2":"test2", "prop3": {"nested1": "test3"}}`
+// 		}
+//
+// 		usageKeyName: "testKey"
+//
+// toSchemaItem will return:
+//
+// 		SchemaItem{
+//				Key:          "testKey",
+//				DefaultValue: []*SchemaItem{
+//					{
+//						Key: "prop1",
+//						DefaultValue: "test",
+//					},
+//					{
+//						Key: "prop2",
+//						DefaultValue: "test2",
+//					},
+//					{
+//						Key: "prop3",
+//						DefaultValue: []*SchemaItem{
+//							{
+//								Key: "nested1",
+//								DefaultValue: "test3",
+//							},
+//						},
+//					},
+//				},
+//			}
+//
+func toSchemaItem(usageRawResult gjson.Result, usageKeyName string) *SchemaItem {
+	var defaultValue interface{}
+	usageValueType := schema.Int64
+	defaultValue = 0
+
+	if usageRawResult.Type == gjson.JSON {
+		usageValueType = schema.Items
+		props := usageRawResult.Map()
+		items := make([]*SchemaItem, 0, len(props))
+
+		for key, result := range props {
+			items = append(items, toSchemaItem(result, key))
 		}
-		key := splittedKey[len(splittedKey)-1]
-		(*rootMap)[key] = v
+
+		defaultValue = items
 	}
-	return result
+
+	usageRawValue := usageRawResult.Value()
+	if _, ok := usageRawValue.(string); ok {
+		usageValueType = schema.String
+		defaultValue = usageRawResult.String()
+	}
+
+	return &SchemaItem{
+		Key:          usageKeyName,
+		ValueType:    usageValueType,
+		DefaultValue: defaultValue,
+	}
 }
 
 func mapToSortedMapSlice(input map[string]interface{}) yaml.MapSlice {
@@ -217,7 +309,7 @@ func mapToSortedMapSlice(input map[string]interface{}) yaml.MapSlice {
 
 func loadReferenceFile() (map[string]*schema.UsageData, error) {
 	referenceUsageFileContents := infracost.GetReferenceUsageFileContents()
-	usageData, err := parseYAML(*referenceUsageFileContents)
+	usageData, err := parseYaml(*referenceUsageFileContents)
 	if err != nil {
 		return usageData, errors.Wrapf(err, "Error parsing usage file")
 	}
@@ -256,7 +348,7 @@ func LoadFromFile(usageFilePath string, createIfNotExisting bool) (map[string]*s
 		return usageData, errors.Wrapf(err, "Error reading usage file")
 	}
 
-	usageData, err = parseYAML(out)
+	usageData, err = parseYaml(out)
 	if err != nil {
 		return usageData, errors.Wrapf(err, "Error parsing usage file")
 	}
@@ -264,7 +356,7 @@ func LoadFromFile(usageFilePath string, createIfNotExisting bool) (map[string]*s
 	return usageData, nil
 }
 
-func parseYAML(y []byte) (map[string]*schema.UsageData, error) {
+func parseYaml(y []byte) (map[string]*schema.UsageData, error) {
 	var usageFile UsageFile
 
 	err := yaml.Unmarshal(y, &usageFile)

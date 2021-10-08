@@ -3,9 +3,10 @@ package azure
 import (
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMKubernetesClusterRegistryItem() *schema.RegistryItem {
@@ -50,8 +51,10 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 	if d.Get("default_node_pool.0.node_count").Type != gjson.Null {
 		nodeCount = decimal.NewFromInt(d.Get("default_node_pool.0.node_count").Int())
 	}
-	if u != nil && u.Get("default_node_pool.nodes").Exists() {
-		nodeCount = decimal.NewFromInt(u.Get("default_node_pool.nodes").Int())
+	if u != nil {
+		if v, ok := u.Get("default_node_pool").Map()["nodes"]; ok {
+			nodeCount = decimal.NewFromInt(v.Int())
+		}
 	}
 
 	subResources = []*schema.Resource{
@@ -62,8 +65,10 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 		if strings.ToLower(d.Get("network_profile.0.load_balancer_sku").String()) == "standard" {
 			region = convertRegion(region)
 			var monthlyDataProcessedGb *decimal.Decimal
-			if u != nil && u.Get("load_balancer.monthly_data_processed_gb").Type != gjson.Null {
-				monthlyDataProcessedGb = decimalPtr(decimal.NewFromInt(u.Get("load_balancer.monthly_data_processed_gb").Int()))
+			if u != nil {
+				if v, ok := u.Get("load_balancer").Map()["monthly_data_processed_gb"]; ok {
+					monthlyDataProcessedGb = decimalPtr(decimal.NewFromInt(v.Int()))
+				}
 			}
 			lbResource := schema.Resource{
 				Name:           "Load Balancer",

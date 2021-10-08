@@ -1,10 +1,10 @@
 package schema
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 )
 
@@ -15,6 +15,7 @@ const (
 	String
 	Float64
 	StringArray
+	Items
 )
 
 // type UsageDataValidatorFuncType = func(value interface{}) error
@@ -136,33 +137,21 @@ func NewEmptyUsageMap() map[string]*UsageData {
 
 func ParseAttributes(i interface{}) map[string]gjson.Result {
 	a := make(map[string]gjson.Result)
-	for k, v := range flatten(i) {
-		j, _ := json.Marshal(v)
-		a[k] = gjson.ParseBytes(j)
+
+	switch attrs := i.(type) {
+	case map[string]interface{}:
+		for k, v := range attrs {
+			// we use the jsoniter lib here as the std lib json
+			// cannot handle marshalling map[interface{}]interface{}
+			j, _ := jsoniter.Marshal(v)
+			a[k] = gjson.ParseBytes(j)
+		}
+	case map[interface{}]interface{}:
+		for k, v := range attrs {
+			j, _ := jsoniter.Marshal(v)
+			a[fmt.Sprintf("%s", k)] = gjson.ParseBytes(j)
+		}
 	}
 
 	return a
-}
-
-func flatten(i interface{}) map[string]interface{} {
-	keys := make([]string, 0)
-	result := make(map[string]interface{})
-	flattenHelper(i, keys, result)
-	return result
-}
-
-func flattenHelper(i interface{}, keys []string, result map[string]interface{}) {
-	switch v := i.(type) {
-	case map[string]interface{}:
-		for k, v := range i.(map[string]interface{}) {
-			flattenHelper(v, append(keys, k), result)
-		}
-	case map[interface{}]interface{}:
-		for k, v := range i.(map[interface{}]interface{}) {
-			flattenHelper(v, append(keys, fmt.Sprintf("%v", k)), result)
-		}
-	default:
-		k := strings.Join(keys, ".")
-		result[k] = v
-	}
 }

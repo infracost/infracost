@@ -13,17 +13,19 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/stretchr/testify/require"
+
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 )
@@ -269,6 +271,52 @@ func RunCostCalculations(t *testing.T, runCtx *config.RunContext, tfProject Terr
 		schema.CalculateCosts(project)
 	}
 	return projects, nil
+}
+
+func GoldenFileUsageSyncTest(t *testing.T, testName string) {
+	runCtx, err := config.NewRunContextFromEnv(context.Background())
+	require.NoError(t, err)
+
+	tfProjectData, err := ioutil.ReadFile(filepath.Join("testdata", testName, testName+".tf"))
+	require.NoError(t, err)
+	tfProject := TerraformProject{
+		Files: []File{
+			{
+				Path:     "main.tf",
+				Contents: string(tfProjectData),
+			},
+		},
+	}
+
+	var existing map[string]*schema.UsageData
+	usageFilePath := filepath.Join("testdata", testName, testName+"_existing_usage.yml")
+	if _, err := os.Stat(usageFilePath); err == nil || !os.IsNotExist(err) {
+		// usage file exists, load the data
+		existing, err = usage.LoadFromFile(usageFilePath, false)
+		require.NoError(t, err)
+	}
+
+	actual, err := RunSyncUsage(t, runCtx, tfProject, existing)
+	require.NoError(t, err)
+
+	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
+	testutil.AssertGoldenFile(t, goldenFilePath, actual)
+}
+
+func RunSyncUsage(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, existing map[string]*schema.UsageData) ([]byte, error) {
+	tmpDir := t.TempDir()
+	projects, err := loadResources(t, runCtx, tfProject, map[string]*schema.UsageData{})
+	if err != nil {
+		return nil, err
+	}
+
+	out := filepath.Join(tmpDir, "actual-usage.yml")
+	_, err = usage.SyncUsageData(projects, existing, out)
+	if err != nil {
+		return nil, err
+	}
+
+	return os.ReadFile(out)
 }
 
 func CreateTerraformProject(tmpDir string, tfProject TerraformProject) (string, error) {
