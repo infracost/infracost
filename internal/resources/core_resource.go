@@ -1,9 +1,10 @@
 package resources
 
 import (
-	log "github.com/sirupsen/logrus"
 	"reflect"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/schema"
 )

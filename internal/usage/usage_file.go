@@ -26,10 +26,24 @@ type ResourceUsage struct {
 func (r *ResourceUsage) Map() map[string]interface{} {
 	m := make(map[string]interface{}, len(r.Items))
 	for _, item := range r.Items {
-		m[item.Key] = item.Value
+		m[item.Key] = mapUsageItem(item)
 	}
 
 	return m
+}
+
+func mapUsageItem(item *schema.UsageItem) interface{} {
+	if item.ValueType == schema.Items {
+		subItems := item.Value.([]*schema.UsageItem)
+		m := make(map[string]interface{}, len(subItems))
+		for _, item := range subItems {
+			m[item.Key] = mapUsageItem(item)
+		}
+
+		return m
+	}
+
+	return item.Value
 }
 
 func resourceUsagesMap(resourceUsages []*ResourceUsage) map[string]*ResourceUsage {

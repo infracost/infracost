@@ -271,6 +271,7 @@ func RunCostCalculations(t *testing.T, runCtx *config.RunContext, tfProject Terr
 		}
 		schema.CalculateCosts(project)
 	}
+
 	return projects, nil
 }
 
