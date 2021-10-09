@@ -81,12 +81,17 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			fmt.Fprintln(os.Stderr, m)
 		}
 
-		usageFile, err := usage.LoadUsageFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
-		if err != nil {
-			return err
-		}
+		usageData := make(map[string]*schema.UsageData)
+		var usageFile *usage.UsageFile
 
-		usageData := usageFile.ToUsageDataMap()
+		if projectCfg.UsageFile != "" {
+			usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
+			if err != nil {
+				return err
+			}
+
+			usageData = usageFile.ToUsageDataMap()
+		}
 
 		if len(usageData) > 0 {
 			ctx.SetContextValue("hasUsageFile", true)
@@ -97,7 +102,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			return err
 		}
 
-		if runCtx.Config.SyncUsageFile && projectCfg.UsageFile != "" {
+		if runCtx.Config.SyncUsageFile && usageFile != nil {
 			spinnerOpts := ui.SpinnerOptions{
 				EnableLogging: runCtx.Config.IsLogging(),
 				NoColor:       runCtx.Config.NoColor,
