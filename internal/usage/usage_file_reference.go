@@ -30,25 +30,17 @@ func LoadReferenceFile() (*UsageFileReference, error) {
 	return referenceFile, nil
 }
 
-func (u *UsageFileReference) GetReferenceResourceUsage(name string) *ResourceUsage {
-	matchingResourceUsage := u.FindMatchingResourceUsage(name)
-
-	if matchingResourceUsage == nil {
-		return nil
+// SetDefaultValues updates the reference file to strip the values and set the default values
+func (u *UsageFileReference) SetDefaultValues() {
+	for _, resourceUsage := range u.ResourceUsages {
+		for _, item := range resourceUsage.Items {
+			setUsageItemDefaultValues(item)
+		}
 	}
-
-	refResourceUsage := &ResourceUsage{
-		Name:  matchingResourceUsage.Name,
-		Items: matchingResourceUsage.Items,
-	}
-
-	for _, item := range refResourceUsage.Items {
-		setUsageItemDefaultValues(item)
-	}
-
-	return refResourceUsage
 }
 
+// FindMatchingResourceUsage returns the matching resource usage for the given resource name
+// by looking for a resource with the same resource type
 func (u *UsageFileReference) FindMatchingResourceUsage(name string) *ResourceUsage {
 	addrParts := strings.Split(name, ".")
 	if len(addrParts) < 2 {

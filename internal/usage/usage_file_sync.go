@@ -19,6 +19,7 @@ func (u *UsageFile) SyncUsageData(projects []*schema.Project) (*SyncResult, erro
 	if err != nil {
 		return nil, err
 	}
+	referenceFile.SetDefaultValues()
 
 	// TODO: update this when we properly support multiple projects in usage
 	resources := make([]*schema.Resource, 0)
@@ -52,7 +53,7 @@ func (u *UsageFile) syncResourceUsages(resources []*schema.Resource, referenceFi
 		}
 
 		// Merge the usage schema from the reference usage file
-		refResourceUsage := referenceFile.GetReferenceResourceUsage(resource.Name)
+		refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
 		if refResourceUsage != nil {
 			mergeResourceUsageItems(resourceUsage, refResourceUsage)
 		}

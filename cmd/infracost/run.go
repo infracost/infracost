@@ -56,7 +56,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		var usageFile *usage.UsageFile
 
 		if projectCfg.UsageFile != "" {
-			usageFile, err := usage.LoadUsageFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
+			var err error
+			usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
 			if err != nil {
 				return err
 			}
