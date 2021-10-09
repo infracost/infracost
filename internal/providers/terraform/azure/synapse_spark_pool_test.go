@@ -7,10 +7,11 @@ import (
 )
 
 func TestNewAzureRMSynapseSparkPool(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "synapse_spark_pool_test")
+	tftest.GoldenFileResourceTestsWithOpts(t, "synapse_spark_pool_test", &tftest.GoldenFileOptions{
+		CaptureLogs: true,
+	})
 }
