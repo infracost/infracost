@@ -122,7 +122,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 			spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
 
-			syncResult, err := usageFile.SyncUsageData(providerProjects)
+			syncResult, err := usage.SyncUsageData(usageFile, providerProjects)
 			summarizeUsage(ctx, syncResult)
 			if err != nil {
 				spinner.Fail()

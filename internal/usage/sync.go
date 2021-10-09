@@ -14,7 +14,7 @@ type SyncResult struct {
 	EstimationErrors map[string]error
 }
 
-func (u *UsageFile) SyncUsageData(projects []*schema.Project) (*SyncResult, error) {
+func SyncUsageData(usageFile *UsageFile, projects []*schema.Project) (*SyncResult, error) {
 	referenceFile, err := LoadReferenceFile()
 	if err != nil {
 		return nil, err
@@ -27,21 +27,21 @@ func (u *UsageFile) SyncUsageData(projects []*schema.Project) (*SyncResult, erro
 		resources = append(resources, project.Resources...)
 	}
 
-	syncResult := u.syncResourceUsages(resources, referenceFile)
+	syncResult := syncResourceUsages(usageFile, resources, referenceFile)
 
 	return syncResult, nil
 }
 
-func (u *UsageFile) syncResourceUsages(resources []*schema.Resource, referenceFile *UsageFileReference) *SyncResult {
+func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, referenceFile *ReferenceFile) *SyncResult {
 	syncResult := &SyncResult{
 		EstimationErrors: make(map[string]error),
 	}
 
-	existingResourceUsagesMap := resourceUsagesMap(u.ResourceUsages)
+	existingResourceUsagesMap := resourceUsagesMap(usageFile.ResourceUsages)
 	resourcesUsages := make([]*ResourceUsage, 0, len(resources))
 
-	existingResourceOrder := make([]string, 0, len(u.ResourceUsages))
-	for _, resourceUsage := range u.ResourceUsages {
+	existingResourceOrder := make([]string, 0, len(usageFile.ResourceUsages))
+	for _, resourceUsage := range usageFile.ResourceUsages {
 		existingResourceOrder = append(existingResourceOrder, resourceUsage.Name)
 	}
 
@@ -89,7 +89,7 @@ func (u *UsageFile) syncResourceUsages(resources []*schema.Resource, referenceFi
 		resourcesUsages = append(resourcesUsages, resourceUsage)
 	}
 
-	u.ResourceUsages = resourcesUsages
+	usageFile.ResourceUsages = resourcesUsages
 
 	return syncResult
 }

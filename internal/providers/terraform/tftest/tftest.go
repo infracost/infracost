@@ -315,7 +315,7 @@ func RunSyncUsage(t *testing.T, runCtx *config.RunContext, tfProject TerraformPr
 		return nil, err
 	}
 
-	_, err = usageFile.SyncUsageData(projects)
+	_, err = usage.SyncUsageData(usageFile, projects)
 	if err != nil {
 		return nil, err
 	}

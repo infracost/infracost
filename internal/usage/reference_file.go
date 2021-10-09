@@ -8,22 +8,24 @@ import (
 	"github.com/pkg/errors"
 )
 
-type UsageFileReference struct { // nolint:revive
+// ReferenceFile represents the reference example usage file
+type ReferenceFile struct { // nolint:revive
 	*UsageFile
 }
 
-func LoadReferenceFile() (*UsageFileReference, error) {
+// LoadReferenceFile loads the reference example usage file
+func LoadReferenceFile() (*ReferenceFile, error) {
 	contents := infracost.GetReferenceUsageFileContents()
 	if contents == nil {
-		return &UsageFileReference{}, errors.New("Could not find reference usage file")
+		return &ReferenceFile{}, errors.New("Could not find reference usage file")
 	}
 
 	usageFile, err := LoadUsageFileFromString(string(*contents))
 	if err != nil {
-		return &UsageFileReference{}, err
+		return &ReferenceFile{}, err
 	}
 
-	referenceFile := &UsageFileReference{
+	referenceFile := &ReferenceFile{
 		UsageFile: usageFile,
 	}
 
@@ -31,7 +33,7 @@ func LoadReferenceFile() (*UsageFileReference, error) {
 }
 
 // SetDefaultValues updates the reference file to strip the values and set the default values
-func (u *UsageFileReference) SetDefaultValues() {
+func (u *ReferenceFile) SetDefaultValues() {
 	for _, resourceUsage := range u.ResourceUsages {
 		for _, item := range resourceUsage.Items {
 			setUsageItemDefaultValues(item)
@@ -41,7 +43,7 @@ func (u *UsageFileReference) SetDefaultValues() {
 
 // FindMatchingResourceUsage returns the matching resource usage for the given resource name
 // by looking for a resource with the same resource type
-func (u *UsageFileReference) FindMatchingResourceUsage(name string) *ResourceUsage {
+func (u *ReferenceFile) FindMatchingResourceUsage(name string) *ResourceUsage {
 	addrParts := strings.Split(name, ".")
 	if len(addrParts) < 2 {
 		return nil
@@ -58,6 +60,7 @@ func (u *UsageFileReference) FindMatchingResourceUsage(name string) *ResourceUsa
 	return nil
 }
 
+// setUsageItemDefaultValues recursively sets the default values for the given usage item
 func setUsageItemDefaultValues(item *schema.UsageItem) {
 	if item == nil {
 		return
