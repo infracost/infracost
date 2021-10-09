@@ -16,6 +16,7 @@ import (
 
 const minUsageFileVersion = "0.1"
 const maxUsageFileVersion = "0.1"
+const commentMark = "00__"
 
 type ResourceUsage struct {
 	Name  string
@@ -67,6 +68,9 @@ func LoadUsageFile(path string, createIfNotExist bool) (*UsageFile, error) {
 func CreateBlankUsageFile(path string) (*UsageFile, error) {
 	usageFile := &UsageFile{
 		Version: maxUsageFileVersion,
+		RawResourceUsage: yamlv3.Node{
+			Kind: yamlv3.MappingNode,
+		},
 	}
 	d, err := yamlv3.Marshal(usageFile)
 	if err != nil {
@@ -101,17 +105,20 @@ func LoadUsageFileFromString(s string) (*UsageFile, error) {
 }
 
 func (u *UsageFile) WriteToPath(path string) error {
-	u.RawResourceUsage = resourceUsagesToYAML(u.ResourceUsages)
+	var resourceUsageNodeIsCommented bool
+	u.RawResourceUsage, resourceUsageNodeIsCommented = resourceUsagesToYAML(u.ResourceUsages)
 
-	var b bytes.Buffer
-	yamlEncoder := yamlv3.NewEncoder(&b)
+	var buf bytes.Buffer
+	yamlEncoder := yamlv3.NewEncoder(&buf)
 	yamlEncoder.SetIndent(2)
 	err := yamlEncoder.Encode(u)
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile(path, b.Bytes(), 0600)
+	b := buf.Bytes()
+	b = replaceCommentMarks(b, resourceUsageNodeIsCommented)
+	err = ioutil.WriteFile(path, b, 0600)
 	if err != nil {
 		return err
 	}
@@ -288,10 +295,12 @@ func yamlToUsageItem(keyNode *yamlv3.Node, valNode *yamlv3.Node) (*schema.UsageI
 	}, nil
 }
 
-func resourceUsagesToYAML(resourceUsages []*ResourceUsage) yamlv3.Node {
+func resourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 	rootNode := yamlv3.Node{
 		Kind: yamlv3.MappingNode,
 	}
+
+	rootNodeIsCommented := true
 
 	for _, resourceUsage := range resourceUsages {
 		if len(resourceUsage.Items) == 0 {
@@ -308,13 +317,20 @@ func resourceUsagesToYAML(resourceUsages []*ResourceUsage) yamlv3.Node {
 			Kind: yamlv3.MappingNode,
 		}
 
+		resourceNodeIsCommented := true
+
 		for _, item := range resourceUsage.Items {
 			kind := yamlv3.ScalarNode
 			content := make([]*yamlv3.Node, 0)
 
-			rawValue := item.Value
-			if rawValue == nil {
-				rawValue = item.DefaultValue
+			rawValue := item.DefaultValue
+			itemNodeIsCommented := true
+
+			if item.Value != nil {
+				rawValue = item.Value
+				itemNodeIsCommented = false
+				resourceNodeIsCommented = false
+				rootNodeIsCommented = false
 			}
 
 			if item.ValueType == schema.Items {
@@ -324,7 +340,7 @@ func resourceUsagesToYAML(resourceUsages []*ResourceUsage) yamlv3.Node {
 						Name:  item.Key,
 						Items: subResourceItems,
 					}
-					subResourceValNode := resourceUsagesToYAML([]*ResourceUsage{subResourceUsage})
+					subResourceValNode, _ := resourceUsagesToYAML([]*ResourceUsage{subResourceUsage})
 					resourceValNode.Content = append(resourceValNode.Content, subResourceValNode.Content...)
 				}
 				continue
@@ -363,6 +379,9 @@ func resourceUsagesToYAML(resourceUsages []*ResourceUsage) yamlv3.Node {
 				Tag:   "!!str",
 				Value: item.Key,
 			}
+			if itemNodeIsCommented {
+				markNodeAsComment(itemKeyNode)
+			}
 
 			itemValNode := &yamlv3.Node{
 				Kind:        kind,
@@ -376,9 +395,28 @@ func resourceUsagesToYAML(resourceUsages []*ResourceUsage) yamlv3.Node {
 			resourceValNode.Content = append(resourceValNode.Content, itemValNode)
 		}
 
+		if resourceNodeIsCommented {
+			markNodeAsComment(resourceKeyNode)
+		}
+
 		rootNode.Content = append(rootNode.Content, resourceKeyNode)
 		rootNode.Content = append(rootNode.Content, resourceValNode)
 	}
 
-	return rootNode
+	return rootNode, rootNodeIsCommented
+}
+
+// markNodeAsComment marks a node as a comment which we then post process later to add the #
+// We could use the yamlv3 FootComment/LineComment but this gets complicated with indentation
+// especially when we have edge cases like resources that are fully commented out
+func markNodeAsComment(node *yamlv3.Node) {
+	node.Value = commentMark + node.Value
+}
+
+func replaceCommentMarks(b []byte, resourceUsageNodeIsCommented bool) []byte {
+	if resourceUsageNodeIsCommented {
+		b = bytes.Replace(b, []byte("resource_usage:"), []byte("# resource_usage:"), 1)
+	}
+
+	return bytes.ReplaceAll(b, []byte(commentMark), []byte("# "))
 }

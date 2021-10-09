@@ -2,6 +2,7 @@ package usage
 
 import (
 	"context"
+	"sort"
 
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
@@ -37,6 +38,13 @@ func (u *UsageFile) syncResourceUsages(resources []*schema.Resource, referenceFi
 
 	existingResourceUsagesMap := resourceUsagesMap(u.ResourceUsages)
 	resourcesUsages := make([]*ResourceUsage, 0, len(resources))
+
+	existingResourceOrder := make([]string, 0, len(u.ResourceUsages))
+	for _, resourceUsage := range u.ResourceUsages {
+		existingResourceOrder = append(existingResourceOrder, resourceUsage.Name)
+	}
+
+	sortResourcesExistingFirst(resources, existingResourceOrder)
 
 	for _, resource := range resources {
 		resourceUsage := &ResourceUsage{
@@ -132,8 +140,13 @@ func mergeUsageItems(destItems []*schema.UsageItem, srcItems []*schema.UsageItem
 				destItem.Value = mergeUsageItems(destItem.Value.([]*schema.UsageItem), srcValue)
 			}
 		} else {
-			destItem.DefaultValue = srcItem.DefaultValue
-			destItem.Value = srcItem.Value
+			if srcItem.DefaultValue != nil {
+				destItem.DefaultValue = srcItem.DefaultValue
+			}
+
+			if srcItem.Value != nil {
+				destItem.Value = srcItem.Value
+			}
 		}
 	}
 
@@ -157,6 +170,10 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 			if v := usageData.GetFloat(item.Key); v != nil {
 				val = *v
 			}
+		case schema.String:
+			if v := usageData.GetString(item.Key); v != nil {
+				val = *v
+			}
 		case schema.StringArray:
 			if v := usageData.GetStringArray(item.Key); v != nil {
 				val = *v
@@ -169,4 +186,38 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 
 		item.Value = val
 	}
+}
+
+// sortResourcesExistingFirst sorts the resources by the existing order first, and then the rest by name
+func sortResourcesExistingFirst(resources []*schema.Resource, existingResourceOrder []string) {
+	sort.Slice(resources, func(i, j int) bool {
+		existingIndexI := indexOf(resources[i].Name, existingResourceOrder)
+		existingIndexJ := indexOf(resources[j].Name, existingResourceOrder)
+
+		// If both resources are in the existing resource order, sort by the existing resource order
+		if existingIndexI != -1 && existingIndexJ != -1 {
+			return existingIndexI < existingIndexJ
+		}
+
+		// If one resource is in the existing resource order, sort it first
+		if existingIndexI == -1 && existingIndexJ != -1 {
+			return false
+		}
+
+		if existingIndexJ == -1 && existingIndexI != -1 {
+			return true
+		}
+
+		// Otherwise sort by name
+		return resources[i].Name < resources[j].Name
+	})
+}
+
+func indexOf(s string, arr []string) int {
+	for k, v := range arr {
+		if s == v {
+			return k
+		}
+	}
+	return -1
 }

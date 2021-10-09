@@ -304,6 +304,11 @@ func RunSyncUsage(t *testing.T, runCtx *config.RunContext, tfProject TerraformPr
 		return nil, err
 	}
 
+	// If the usage file doesn't exist use a temp path so we don't write to the real path
+	if _, err := os.Stat(usageFilePath); os.IsNotExist(err) {
+		usageFilePath = filepath.Join(tmpDir, "existing_usage.yml")
+	}
+
 	usageFile, err := usage.LoadUsageFile(usageFilePath, true)
 	if err != nil {
 		return nil, err
@@ -314,7 +319,7 @@ func RunSyncUsage(t *testing.T, runCtx *config.RunContext, tfProject TerraformPr
 		return nil, err
 	}
 
-	out := filepath.Join(tmpDir, "actual-usage.yml")
+	out := filepath.Join(tmpDir, "actual_usage.yml")
 	err = usageFile.WriteToPath(out)
 	if err != nil {
 		return nil, err
