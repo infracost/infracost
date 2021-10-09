@@ -164,6 +164,7 @@ resource_usage:
     monthly_infrequent_access_write_gb: 100 # Monthly infrequent access write requests in GB.
 
   aws_eks_node_group.my_instance:
+    instances: 15 # Number of instances in the EKS node group.
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
     reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
     reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.

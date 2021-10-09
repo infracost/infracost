@@ -52,6 +52,32 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		ctx := config.NewProjectContext(runCtx, projectCfg)
 		runCtx.SetCurrentProjectContext(ctx)
 
+		usageData := make(map[string]*schema.UsageData)
+		var usageFile *usage.UsageFile
+
+		if projectCfg.UsageFile != "" {
+			usageFile, err := usage.LoadUsageFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
+			if err != nil {
+				return err
+			}
+
+			invalidKeys, err := usageFile.InvalidKeys()
+			if err != nil {
+				log.Errorf("Error checking usage file keys: %v", err)
+			} else if len(invalidKeys) > 0 {
+				ui.PrintWarningf(cmd.ErrOrStderr(),
+					"The following usage file parameters are invalid and will be ignored: %s\n",
+					strings.Join(invalidKeys, ", "),
+				)
+			}
+
+			usageData = usageFile.ToUsageDataMap()
+		}
+
+		if len(usageData) > 0 {
+			ctx.SetContextValue("hasUsageFile", true)
+		}
+
 		provider, err := providers.Detect(ctx)
 		if err != nil {
 			m := fmt.Sprintf("%s\n\n", err)
@@ -81,22 +107,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			fmt.Fprintln(os.Stderr, m)
 		}
 
-		usageData := make(map[string]*schema.UsageData)
-		var usageFile *usage.UsageFile
-
-		if projectCfg.UsageFile != "" {
-			usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
-			if err != nil {
-				return err
-			}
-
-			usageData = usageFile.ToUsageDataMap()
-		}
-
-		if len(usageData) > 0 {
-			ctx.SetContextValue("hasUsageFile", true)
-		}
-
 		providerProjects, err := provider.LoadResources(usageData)
 		if err != nil {
 			return err
@@ -108,6 +118,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 				NoColor:       runCtx.Config.NoColor,
 				Indent:        "  ",
 			}
+
 			spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
 
 			syncResult, err := usageFile.SyncUsageData(providerProjects)

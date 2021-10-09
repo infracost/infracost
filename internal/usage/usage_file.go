@@ -34,10 +34,13 @@ func (r *ResourceUsage) Map() map[string]interface{} {
 
 func mapUsageItem(item *schema.UsageItem) interface{} {
 	if item.ValueType == schema.Items {
-		subItems := item.Value.([]*schema.UsageItem)
-		m := make(map[string]interface{}, len(subItems))
-		for _, item := range subItems {
-			m[item.Key] = mapUsageItem(item)
+		m := make(map[string]interface{})
+
+		if item.Value != nil {
+			subItems := item.Value.([]*schema.UsageItem)
+			for _, item := range subItems {
+				m[item.Key] = mapUsageItem(item)
+			}
 		}
 
 		return m
@@ -156,6 +159,50 @@ func (u *UsageFile) checkVersion() bool {
 		v = "v" + u.Version
 	}
 	return semver.Compare(v, "v"+minUsageFileVersion) >= 0 && semver.Compare(v, "v"+maxUsageFileVersion) <= 0
+}
+
+// InvalidKeys returns a list of keys that are invalid in the usage file.
+// It currently checks the reference usage file for a list of valid keys.
+// In the future we will want this to usage the resource usage schema structs as well.
+func (u *UsageFile) InvalidKeys() ([]string, error) {
+	invalidKeys := make([]string, 0)
+
+	refFile, err := LoadReferenceFile()
+	if err != nil {
+		return invalidKeys, err
+	}
+
+	for _, resourceUsage := range u.ResourceUsages {
+		refResourceUsage := refFile.FindMatchingResourceUsage(resourceUsage.Name)
+		if refResourceUsage == nil {
+			continue
+		}
+
+		refItemMap := refResourceUsage.Map()
+
+		// Iterate over provided keys and check if they are
+		// present in the reference usage file
+		for _, item := range resourceUsage.Items {
+			invalidKeys = append(invalidKeys, findInvalidKeys(item, refItemMap)...)
+		}
+	}
+
+	return invalidKeys, nil
+}
+
+// findInvalidKeys recursively searches for invalid keys in the provided item
+func findInvalidKeys(item *schema.UsageItem, refMap map[string]interface{}) []string {
+	invalidKeys := make([]string, 0)
+
+	if refVal, ok := refMap[item.Key]; !ok {
+		invalidKeys = append(invalidKeys, item.Key)
+	} else if item.ValueType == schema.Items && item.Value != nil {
+		for _, subItem := range item.Value.([]*schema.UsageItem) {
+			invalidKeys = append(invalidKeys, findInvalidKeys(subItem, refVal.(map[string]interface{}))...)
+		}
+	}
+
+	return invalidKeys
 }
 
 func (u *UsageFile) loadResourceUsages() error {

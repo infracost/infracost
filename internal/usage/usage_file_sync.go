@@ -52,7 +52,7 @@ func (u *UsageFile) syncResourceUsages(resources []*schema.Resource, referenceFi
 		}
 
 		// Merge the usage schema from the reference usage file
-		refResourceUsage := referenceFile.findMatchingResourceUsage(resource.Name)
+		refResourceUsage := referenceFile.GetReferenceResourceUsage(resource.Name)
 		if refResourceUsage != nil {
 			mergeResourceUsageItems(resourceUsage, refResourceUsage)
 		}

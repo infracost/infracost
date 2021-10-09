@@ -9,7 +9,7 @@ import (
 )
 
 type UsageFileReference struct { // nolint:revive
-	usageFile *UsageFile
+	*UsageFile
 }
 
 func LoadReferenceFile() (*UsageFileReference, error) {
@@ -24,40 +24,42 @@ func LoadReferenceFile() (*UsageFileReference, error) {
 	}
 
 	referenceFile := &UsageFileReference{
-		usageFile: usageFile,
+		UsageFile: usageFile,
 	}
-
-	referenceFile.stripResourceNames()
-	referenceFile.setDefaultValues()
 
 	return referenceFile, nil
 }
 
-func (u *UsageFileReference) stripResourceNames() {
-	for _, resourceUsage := range u.usageFile.ResourceUsages {
-		resourceType := strings.Split(resourceUsage.Name, ".")[0]
-		resourceUsage.Name = resourceType
+func (u *UsageFileReference) GetReferenceResourceUsage(name string) *ResourceUsage {
+	matchingResourceUsage := u.FindMatchingResourceUsage(name)
+
+	if matchingResourceUsage == nil {
+		return nil
 	}
+
+	refResourceUsage := &ResourceUsage{
+		Name:  matchingResourceUsage.Name,
+		Items: matchingResourceUsage.Items,
+	}
+
+	for _, item := range refResourceUsage.Items {
+		setUsageItemDefaultValues(item)
+	}
+
+	return refResourceUsage
 }
 
-func (u *UsageFileReference) setDefaultValues() {
-	for _, resourceUsage := range u.usageFile.ResourceUsages {
-		for _, item := range resourceUsage.Items {
-			setUsageItemDefaultValues(item)
-		}
-	}
-}
-
-func (u *UsageFileReference) findMatchingResourceUsage(name string) *ResourceUsage {
+func (u *UsageFileReference) FindMatchingResourceUsage(name string) *ResourceUsage {
 	addrParts := strings.Split(name, ".")
 	if len(addrParts) < 2 {
 		return nil
 	}
 
-	resourceType := addrParts[len(addrParts)-2]
+	wantResourceType := addrParts[len(addrParts)-2]
 
-	for _, resourceUsage := range u.usageFile.ResourceUsages {
-		if resourceUsage.Name == resourceType {
+	for _, resourceUsage := range u.ResourceUsages {
+		resourceType := strings.Split(resourceUsage.Name, ".")[0]
+		if resourceType == wantResourceType {
 			return resourceUsage
 		}
 	}
