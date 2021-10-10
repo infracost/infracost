@@ -8,7 +8,7 @@ resource_usage:
     # monthly_cpu_credit_hrs: 0 # Number of hours in the month where the instance is expected to burst.
     # vcpu_count: 0 # Number of the vCPUs for the instance type.
   aws_s3_bucket.with_usage:
-    object_tags: 10000000 # Total object tags.
+    object_tags: 10000000 # This comment shouldn't be overwritten
     # standard:
       # storage_gb: 0 # Total storage in GB.
       # monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
