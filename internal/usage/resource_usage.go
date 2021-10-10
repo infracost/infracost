@@ -2,6 +2,7 @@ package usage
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
@@ -148,7 +149,13 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 			switch item.ValueType {
 			case schema.Float64:
 				tag = "!!float"
-				value = fmt.Sprintf("%f", rawValue)
+				// Format the float with as few decimal places as necessary
+				value = strconv.FormatFloat(rawValue.(float64), 'f', -1, 64)
+
+				// If the float is a whole number render it as an int so it doesn't show decimal places
+				if value == fmt.Sprintf("%.f", rawValue) {
+					tag = "!!int"
+				}
 			case schema.Int64:
 				tag = "!!int"
 				value = fmt.Sprintf("%d", rawValue)
