@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -152,7 +153,25 @@ func (u *UsageFile) InvalidKeys() ([]string, error) {
 		}
 	}
 
+	// Remove duplicate entries
+	invalidKeys = removeDuplicateStr(invalidKeys)
+
+	// Sort the keys alphabetically
+	sort.Strings(invalidKeys)
+
 	return invalidKeys, nil
+}
+
+func removeDuplicateStr(strSlice []string) []string {
+	allKeys := make(map[string]bool)
+	list := []string{}
+	for _, item := range strSlice {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = true
+			list = append(list, item)
+		}
+	}
+	return list
 }
 
 // findInvalidKeys recursively searches for invalid keys in the provided item
