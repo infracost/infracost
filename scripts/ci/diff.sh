@@ -17,6 +17,7 @@ process_args () {
   percentage_threshold=${6:-$percentage_threshold}
   post_condition=${7:-$post_condition}
   show_skipped=${8:-$show_skipped}
+  save_assets=${9:-$save_assets}
 
   # Validate post_condition
   if ! echo "$post_condition" | jq empty; then
@@ -351,6 +352,9 @@ load_azure_devops_env () {
 
 cleanup () {
   rm -f infracost_breakdown_cmd infracost_output_diff_cmd infracost_output_html_cmd
+  if [ -z "$save_assets" ]; then
+    rm -f infracost_breakdown.json infracost_output_html.json
+  fi
 }
 
 # MAIN
@@ -383,10 +387,12 @@ echo "Running infracost output using:"
 echo "  $ $(cat infracost_output_diff_cmd)"
 diff_output=$(cat infracost_output_diff_cmd | sh)
 
-infracost_output_html_cmd=$(build_output_cmd "infracost_breakdown.json" "html")
-echo "$infracost_output_html_cmd" > infracost_output_html_cmd
-html_output=$(cat infracost_output_html_cmd | sh)
-echo "$html_output" > infracost_breakdown.html
+if [ -n "$save_assets" ]; then
+  infracost_output_html_cmd=$(build_output_cmd "infracost_breakdown.json" "html")
+  echo "$infracost_output_html_cmd" > infracost_output_html_cmd
+  html_output=$(cat infracost_output_html_cmd | sh)
+  echo "$html_output" > infracost_breakdown.html
+fi
 
 echo "Running infracost output using:"
 echo "  $ $(cat infracost_output_html_cmd)"
