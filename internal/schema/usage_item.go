@@ -7,7 +7,7 @@ const (
 	String
 	Float64
 	StringArray
-	Items
+	SubResourceUsage
 )
 
 // type UsageDataValidatorFuncType = func(value interface{}) error

@@ -71,9 +71,9 @@ func setUsageItemDefaultValues(item *schema.UsageItem) {
 		item.DefaultValue = 0.0
 	case schema.Int64:
 		item.DefaultValue = 0
-	case schema.Items:
+	case schema.SubResourceUsage:
 		if item.Value != nil {
-			for _, subItem := range item.Value.([]*schema.UsageItem) {
+			for _, subItem := range item.Value.(*ResourceUsage).Items {
 				setUsageItemDefaultValues(subItem)
 			}
 		}

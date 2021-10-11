@@ -6,6 +6,7 @@ import (
 
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 )
 
 type SyncResult struct {
@@ -55,11 +56,11 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 		// Merge the usage schema from the reference usage file
 		refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
 		if refResourceUsage != nil {
-			mergeResourceUsageItems(resourceUsage, refResourceUsage)
+			mergeResourceUsages(resourceUsage, refResourceUsage)
 		}
 
 		// Merge the usage schema from the resource struct
-		mergeResourceUsageItems(resourceUsage, &ResourceUsage{
+		mergeResourceUsages(resourceUsage, &ResourceUsage{
 			Name:  resource.Name,
 			Items: resource.UsageSchema,
 		})
@@ -67,7 +68,7 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 		// Merge any existing resource usage
 		existingResourceUsage := existingResourceUsagesMap[resource.Name]
 		if existingResourceUsage != nil {
-			mergeResourceUsageItems(resourceUsage, existingResourceUsage)
+			mergeResourceUsages(resourceUsage, existingResourceUsage)
 		}
 
 		syncResult.ResourceCount++
@@ -94,25 +95,21 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 	return syncResult
 }
 
-func mergeResourceUsageItems(dest *ResourceUsage, src *ResourceUsage) {
+func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage) {
 	if dest == nil || src == nil {
 		return
 	}
 
-	dest.Items = mergeUsageItems(dest.Items, src.Items)
-}
-
-func mergeUsageItems(destItems []*schema.UsageItem, srcItems []*schema.UsageItem) []*schema.UsageItem {
-	destItemMap := make(map[string]*schema.UsageItem, len(destItems))
-	for _, item := range destItems {
+	destItemMap := make(map[string]*schema.UsageItem, len(dest.Items))
+	for _, item := range dest.Items {
 		destItemMap[item.Key] = item
 	}
 
-	for _, srcItem := range srcItems {
+	for _, srcItem := range src.Items {
 		destItem, ok := destItemMap[srcItem.Key]
 		if !ok {
 			destItem = &schema.UsageItem{Key: srcItem.Key}
-			destItems = append(destItems, destItem)
+			dest.Items = append(dest.Items, destItem)
 		}
 
 		destItem.ValueType = srcItem.ValueType
@@ -121,24 +118,28 @@ func mergeUsageItems(destItems []*schema.UsageItem, srcItems []*schema.UsageItem
 			destItem.Description = srcItem.Description
 		}
 
-		if srcItem.ValueType == schema.Items {
+		if srcItem.ValueType == schema.SubResourceUsage {
 			if srcItem.DefaultValue != nil {
-				srcDefaultValue := srcItem.DefaultValue.([]*schema.UsageItem)
+				srcDefaultValue := srcItem.DefaultValue.(*ResourceUsage)
 				if destItem.DefaultValue == nil {
-					destItem.DefaultValue = make([]*schema.UsageItem, 0)
+					destItem.DefaultValue = &ResourceUsage{
+						Name: srcDefaultValue.Name,
+					}
 				}
-				destItem.DefaultValue = mergeUsageItems(destItem.DefaultValue.([]*schema.UsageItem), srcDefaultValue)
+				mergeResourceUsages(destItem.DefaultValue.(*ResourceUsage), srcDefaultValue)
 			}
 
 			if srcItem.Value != nil {
-				srcValue := srcItem.Value.([]*schema.UsageItem)
+				srcValue := srcItem.Value.(*ResourceUsage)
 				if destItem.Value == nil {
 					destItem.Value = destItem.DefaultValue
 				}
 				if destItem.Value == nil {
-					destItem.Value = make([]*schema.UsageItem, 0)
+					destItem.Value = &ResourceUsage{
+						Name: srcValue.Name,
+					}
 				}
-				destItem.Value = mergeUsageItems(destItem.Value.([]*schema.UsageItem), srcValue)
+				mergeResourceUsages(destItem.Value.(*ResourceUsage), srcValue)
 			}
 		} else {
 			if srcItem.DefaultValue != nil {
@@ -150,8 +151,6 @@ func mergeUsageItems(destItems []*schema.UsageItem, srcItems []*schema.UsageItem
 			}
 		}
 	}
-
-	return destItems
 }
 
 func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *schema.UsageData) {
@@ -179,10 +178,30 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 			if v := usageData.GetStringArray(item.Key); v != nil {
 				val = *v
 			}
-		case schema.Items:
-			subResourceUsage := &ResourceUsage{}
-			subExisting := schema.NewUsageData(item.Key, usageData.Get(item.Key).Map())
+		case schema.SubResourceUsage:
+			subUsageMap := usageData.Get(item.Key).Map()
+			subExisting := schema.NewUsageData(item.Key, subUsageMap)
+
+			subResourceUsage := &ResourceUsage{
+				Name: item.Key,
+			}
+			// If the item has a value, use it as the base
+			if item.Value != nil {
+				subResourceUsage = item.Value.(*ResourceUsage)
+			}
+
+			// If the item has no value but does have a default value, then merge in
+			// any keys that exist in the existing usage that match a key in the default value
+			if item.Value == nil && item.DefaultValue != nil {
+				for _, subItem := range item.DefaultValue.(*ResourceUsage).Items {
+					if subExisting.Get(subItem.Key).Type != gjson.Null {
+						subResourceUsage.Items = append(subResourceUsage.Items, subItem)
+					}
+				}
+			}
+
 			mergeResourceUsageWithUsageData(subResourceUsage, subExisting)
+			val = item.Value
 		}
 
 		item.Value = val

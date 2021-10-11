@@ -26,12 +26,12 @@ func (r *ResourceUsage) Map() map[string]interface{} {
 }
 
 func mapUsageItem(item *schema.UsageItem) interface{} {
-	if item.ValueType == schema.Items {
+	if item.ValueType == schema.SubResourceUsage {
 		m := make(map[string]interface{})
 
 		if item.Value != nil {
-			subItems := item.Value.([]*schema.UsageItem)
-			for _, item := range subItems {
+			subResourceUsage := item.Value.(*ResourceUsage)
+			for _, item := range subResourceUsage.Items {
 				m[item.Key] = mapUsageItem(item)
 			}
 		}
@@ -130,13 +130,9 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 				rootNodeIsCommented = false
 			}
 
-			if item.ValueType == schema.Items {
+			if item.ValueType == schema.SubResourceUsage {
 				if rawValue != nil {
-					subResourceItems := rawValue.([]*schema.UsageItem)
-					subResourceUsage := &ResourceUsage{
-						Name:  item.Key,
-						Items: subResourceItems,
-					}
+					subResourceUsage := rawValue.(*ResourceUsage)
 					subResourceValNode, _ := ResourceUsagesToYAML([]*ResourceUsage{subResourceUsage})
 					resourceValNode.Content = append(resourceValNode.Content, subResourceValNode.Content...)
 				}
@@ -173,7 +169,7 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 						Value: item,
 					})
 				}
-			case schema.Items:
+			case schema.SubResourceUsage:
 				tag = "!!map"
 				kind = yamlv3.MappingNode
 			}
@@ -272,7 +268,7 @@ func usageItemFromYAML(keyNode *yamlv3.Node, valNode *yamlv3.Node) (*schema.Usag
 	var usageValueType schema.UsageVariableType
 
 	if valNode.ShortTag() == "!!map" {
-		usageValueType = schema.Items
+		usageValueType = schema.SubResourceUsage
 
 		if len(valNode.Content)%2 != 0 {
 			log.Errorf("YAML map node contents are not divisible by 2")
@@ -293,7 +289,10 @@ func usageItemFromYAML(keyNode *yamlv3.Node, valNode *yamlv3.Node) (*schema.Usag
 			items = append(items, mapUsageItem)
 		}
 
-		value = items
+		value = &ResourceUsage{
+			Name:  keyNode.Value,
+			Items: items,
+		}
 	} else {
 		err := valNode.Decode(&value)
 		if err != nil {
