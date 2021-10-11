@@ -152,9 +152,10 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 				// Format the float with as few decimal places as necessary
 				value = strconv.FormatFloat(rawValue.(float64), 'f', -1, 64)
 
-				// If the float is a whole number render it as an int so it doesn't show decimal places
+				// If the float is a whole number then add at least one decimal place
+				// so the YAML marshaller doesn't need to add an explicit !!float tag
 				if value == fmt.Sprintf("%.f", rawValue) {
-					tag = "!!int"
+					value = fmt.Sprintf("%s.0", value)
 				}
 			case schema.Int64:
 				tag = "!!int"

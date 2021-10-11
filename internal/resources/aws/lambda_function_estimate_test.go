@@ -48,6 +48,6 @@ func TestLambda(t *testing.T) {
 	args := &resources.LambdaFunction{}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
-	estimates.mustHave("monthly_requests", float64(1234))
-	estimates.mustHave("request_duration_ms", float64(5678.9))
+	estimates.mustHave("monthly_requests", int64(1234))
+	estimates.mustHave("request_duration_ms", int64(5679))
 }

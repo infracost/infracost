@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"math"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -16,13 +17,13 @@ type LambdaFunction struct {
 	Name       string
 	MemorySize int64
 
-	RequestDurationMS *float64 `infracost_usage:"request_duration_ms"`
-	MonthlyRequests   *float64 `infracost_usage:"monthly_requests"`
+	RequestDurationMS *int64 `infracost_usage:"request_duration_ms"`
+	MonthlyRequests   *int64 `infracost_usage:"monthly_requests"`
 }
 
 var LambdaFunctionUsageSchema = []*schema.UsageItem{
-	{Key: "request_duration_ms", DefaultValue: 0.0, ValueType: schema.Float64},
-	{Key: "monthly_requests", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "request_duration_ms", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_requests", DefaultValue: 0, ValueType: schema.Int64},
 }
 
 func (a *LambdaFunction) PopulateUsage(u *schema.UsageData) {
@@ -34,14 +35,14 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 
 	averageRequestDuration := decimal.NewFromInt(1)
 	if a.RequestDurationMS != nil {
-		averageRequestDuration = decimal.NewFromFloat(*a.RequestDurationMS)
+		averageRequestDuration = decimal.NewFromInt(*a.RequestDurationMS)
 	}
 
 	var monthlyRequests *decimal.Decimal
 	var gbSeconds *decimal.Decimal
 
 	if a.MonthlyRequests != nil {
-		monthlyRequests = decimalPtr(decimal.NewFromFloat(*a.MonthlyRequests))
+		monthlyRequests = decimalPtr(decimal.NewFromInt(*a.MonthlyRequests))
 		gbSeconds = decimalPtr(calculateGBSeconds(memorySize, averageRequestDuration, *monthlyRequests))
 	}
 
@@ -50,12 +51,12 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 		if err != nil {
 			return err
 		}
-		values["monthly_requests"] = inv
+		values["monthly_requests"] = int64(math.Round(inv))
 		dur, err := aws.LambdaGetDurationAvg(ctx, a.Region, a.Name)
 		if err != nil {
 			return err
 		}
-		values["request_duration_ms"] = dur
+		values["request_duration_ms"] = int64(math.Round(dur))
 		return nil
 	}
 
