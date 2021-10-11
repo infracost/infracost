@@ -133,7 +133,13 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 			if item.ValueType == schema.SubResourceUsage {
 				if rawValue != nil {
 					subResourceUsage := rawValue.(*ResourceUsage)
-					subResourceValNode, _ := ResourceUsagesToYAML([]*ResourceUsage{subResourceUsage})
+					subResourceValNode, allSubResourcesCommented := ResourceUsagesToYAML([]*ResourceUsage{subResourceUsage})
+
+					if !allSubResourcesCommented {
+						resourceNodeIsCommented = false
+						rootNodeIsCommented = false
+					}
+
 					resourceValNode.Content = append(resourceValNode.Content, subResourceValNode.Content...)
 				}
 				continue
@@ -169,9 +175,6 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 						Value: item,
 					})
 				}
-			case schema.SubResourceUsage:
-				tag = "!!map"
-				kind = yamlv3.MappingNode
 			}
 
 			itemKeyNode := &yamlv3.Node{
