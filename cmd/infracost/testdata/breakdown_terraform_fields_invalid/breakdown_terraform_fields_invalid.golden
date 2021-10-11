@@ -1,23 +1,33 @@
 
-Project: infracost/infracost/examples/terraform/plan.json
+Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
 
- Name                                                                 Price          Hourly Cost                      
-                                                                                                                      
- aws_instance.web_app                                                                                                 
- ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                $0.77                $0.77                      
- ├─ root_block_device                                                                                                 
- │  └─ Storage (general purpose SSD, gp2)                             $0.10                $0.01                      
- └─ ebs_block_device[0]                                                                                               
-    ├─ Storage (provisioned IOPS SSD, io1)                            $0.13                $0.17                      
-    └─ Provisioned IOPS                                              $0.065                $0.07                      
-                                                                                                                      
- aws_lambda_function.hello_world                                                                                      
- ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                      
- OVERALL TOTAL                                                                                                $742.64 
-----------------------------------
-To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+ Name                                                           Price  Hourly Cost 
+                                                                                   
+ aws_instance.web_app                                                              
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)          $0.77        $0.77 
+ ├─ root_block_device                                                              
+ │  └─ Storage (general purpose SSD, gp2)                       $0.10        $0.01 
+ └─ ebs_block_device[0]                                                            
+    ├─ Storage (provisioned IOPS SSD, io1)                      $0.13        $0.17 
+    └─ Provisioned IOPS                                        $0.065        $0.07 
+                                                                                   
+ aws_instance.zero_cost_instance                                                   
+ ├─ Instance usage (Linux/UNIX, reserved, m5.4xlarge)           $0.00        $0.00 
+ ├─ root_block_device                                                              
+ │  └─ Storage (general purpose SSD, gp2)                       $0.10        $0.01 
+ └─ ebs_block_device[0]                                                            
+    ├─ Storage (provisioned IOPS SSD, io1)                      $0.13        $0.17 
+    └─ Provisioned IOPS                                        $0.065        $0.07 
+                                                                                   
+ aws_lambda_function.hello_world                                                   
+ ├─ Requests                                                    $0.20        $0.03 
+ └─ Duration                                            $0.0000166667        $0.57 
+                                                                                   
+ aws_lambda_function.zero_cost_lambda                                              
+ ├─ Requests                                                    $0.20        $0.00 
+ └─ Duration                                            $0.0000166667        $0.00 
+                                                                                   
+ OVERALL TOTAL                                                           $1,361.31 
 
 Err:
 Warning: Invalid field 'invalid' specified, valid fields are: [price monthlyQuantity unit hourlyCost monthlyCost] or 'all' to include all fields
