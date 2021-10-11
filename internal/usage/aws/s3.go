@@ -38,7 +38,7 @@ func s3FindMetricsFilter(ctx context.Context, region string, bucket string) stri
 	return ""
 }
 
-func s3GetBucketSizeBytes(ctx context.Context, region string, bucket string, storageType string) float64 {
+func S3GetBucketSizeBytes(ctx context.Context, region string, bucket string, storageType string) float64 {
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 		region:    region,
 		namespace: "AWS/S3",
@@ -59,7 +59,7 @@ func s3GetBucketSizeBytes(ctx context.Context, region string, bucket string, sto
 	return *stats.Datapoints[0].Average
 }
 
-func s3GetBucketRequests(ctx context.Context, region string, bucket string, filterName string, metrics []string) float64 {
+func S3GetBucketRequests(ctx context.Context, region string, bucket string, filterName string, metrics []string) float64 {
 	count := float64(0)
 	for _, metric := range metrics {
 		stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{

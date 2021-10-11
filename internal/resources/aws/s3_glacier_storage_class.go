@@ -29,7 +29,7 @@ type S3GlacierStorageClass struct {
 	EarlyDeleteGB                         *int64 `infracost_usage:"early_delete_gb"`
 }
 
-var S3GlacierStorageClassUsageSchema = []*schema.UsageSchemaItem{
+var S3GlacierStorageClassUsageSchema = []*schema.UsageItem{
 	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_tier_1_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_tier_2_requests", DefaultValue: 0, ValueType: schema.Int64},

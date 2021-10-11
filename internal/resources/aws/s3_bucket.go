@@ -29,7 +29,7 @@ type S3StorageClass interface {
 	BuildResource() *schema.Resource
 }
 
-var S3BucketUsageSchema = []*schema.UsageSchemaItem{
+var S3BucketUsageSchema = []*schema.UsageItem{
 	{Key: "object_tags", DefaultValue: 0, ValueType: schema.Int64},
 }
 
@@ -77,6 +77,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           a.Address,
+		UsageSchema:    S3BucketUsageSchema,
 		CostComponents: costComponents,
 		SubResources:   subResources,
 	}

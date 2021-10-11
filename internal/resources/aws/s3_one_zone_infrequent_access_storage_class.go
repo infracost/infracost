@@ -19,7 +19,7 @@ type S3OneZoneInfrequentAccessStorageClass struct {
 	MonthlySelectDataReturnedGB        *int64 `infracost_usage:"monthly_select_data_returned_gb"`
 }
 
-var S3OneZoneInfrequentAccessStorageClassUsageSchema = []*schema.UsageSchemaItem{
+var S3OneZoneInfrequentAccessStorageClassUsageSchema = []*schema.UsageItem{
 	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_tier_1_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_tier_2_requests", DefaultValue: 0, ValueType: schema.Int64},

@@ -21,7 +21,7 @@ type S3IntelligentTieringStorageClass struct {
 	EarlyDeleteGB                      *int64 `infracost_usage:"early_delete_gb"`
 }
 
-var S3IntelligentTieringStorageClassUsageSchema = []*schema.UsageSchemaItem{
+var S3IntelligentTieringStorageClassUsageSchema = []*schema.UsageItem{
 	{Key: "frequent_access_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "infrequent_access_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monitored_objects", DefaultValue: 0, ValueType: schema.Int64},
