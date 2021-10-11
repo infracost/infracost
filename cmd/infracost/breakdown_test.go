@@ -57,7 +57,7 @@ func TestBreakdownTerraformShowSkipped(t *testing.T) {
 // }
 
 func TestBreakdownTerraformUsageFile(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml" }, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
 }
 
 func TestBreakdownTerragrunt(t *testing.T) {
