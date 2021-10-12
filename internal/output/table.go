@@ -8,6 +8,8 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/infracost/infracost/internal/ui"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func ToTable(out Root, opts Options) ([]byte, error) {
@@ -165,9 +167,10 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 	t.AppendHeader(headers)
 
 	for _, r := range breakdown.Resources {
-		filteredComponents := filterZeroValComponents(r.CostComponents)
-		filteredSubResources := filterZeroValResources(r.SubResources)
+		filteredComponents := filterZeroValComponents(r.CostComponents, r.Name)
+		filteredSubResources := filterZeroValResources(r.SubResources, r.Name)
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
+			log.Info(fmt.Sprintf("Hiding resource with no usage: %s", r.Name))
 			continue
 		}
 
@@ -195,8 +198,8 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 
 func buildSubResourceRows(t table.Writer, currency string, subresources []Resource, prefix string, fields []string) {
 	for i, r := range subresources {
-		filteredComponents := filterZeroValComponents(r.CostComponents)
-		filteredSubResources := filterZeroValResources(r.SubResources)
+		filteredComponents := filterZeroValComponents(r.CostComponents, r.Name)
+		filteredSubResources := filterZeroValResources(r.SubResources, r.Name)
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
 			continue
 		}
@@ -262,10 +265,11 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 	}
 }
 
-func filterZeroValComponents(costComponents []CostComponent) []CostComponent {
+func filterZeroValComponents(costComponents []CostComponent, resourceName string) []CostComponent {
 	var filteredComponents []CostComponent
 	for _, c := range costComponents {
 		if c.MonthlyQuantity != nil && c.MonthlyQuantity.IsZero() {
+			log.Info(fmt.Sprintf("Hiding cost with no usage: %s '%s'", resourceName, c.Name))
 			continue
 		}
 
@@ -274,12 +278,13 @@ func filterZeroValComponents(costComponents []CostComponent) []CostComponent {
 	return filteredComponents
 }
 
-func filterZeroValResources(resources []Resource) []Resource {
+func filterZeroValResources(resources []Resource, resourceName string) []Resource {
 	var filteredResources []Resource
 	for _, r := range resources {
-		filteredComponents := filterZeroValComponents(r.CostComponents)
-		filteredSubResources := filterZeroValResources(r.SubResources)
+		filteredComponents := filterZeroValComponents(r.CostComponents, fmt.Sprintf("%s.%s", resourceName, r.Name))
+		filteredSubResources := filterZeroValResources(r.SubResources, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
+			log.Info(fmt.Sprintf("Hiding resource with no usage: %s.%s", resourceName, r.Name))
 			continue
 		}
 
