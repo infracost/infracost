@@ -22,15 +22,15 @@ type S3GlacierDeepArchiveStorageClass struct {
 }
 
 var S3GlacierDeepArchiveStorageClassUsageSchema = []*schema.UsageItem{
-	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monthly_tier_1_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_tier_2_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_lifecycle_transition_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_standard_data_retrieval_requests", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_standard_data_retrieval_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_standard_data_retrieval_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monthly_bulk_data_retrieval_requests", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_bulk_data_retrieval_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "early_delete_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_bulk_data_retrieval_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "early_delete_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 }
 
 func (a *S3GlacierDeepArchiveStorageClass) UsageKey() string {

@@ -12,6 +12,8 @@ type S3IntelligentTieringStorageClass struct {
 	// "usage" args
 	FrequentAccessStorageGB            *float64 `infracost_usage:"frequent_access_storage_gb"`
 	InfrequentAccessStorageGB          *float64 `infracost_usage:"infrequent_access_storage_gb"`
+	ArchiveAccessStorageGB             *float64 `infracost_usage:"archive_access_storage_gb"`
+	DeepArchiveAccessStorageGB         *float64 `infracost_usage:"deep_archive_access_storage_gb"`
 	MonitoredObjects                   *int64   `infracost_usage:"monitored_objects"`
 	MonthlyTier1Requests               *int64   `infracost_usage:"monthly_tier_1_requests"`
 	MonthlyTier2Requests               *int64   `infracost_usage:"monthly_tier_2_requests"`
@@ -22,15 +24,17 @@ type S3IntelligentTieringStorageClass struct {
 }
 
 var S3IntelligentTieringStorageClassUsageSchema = []*schema.UsageItem{
-	{Key: "frequent_access_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "infrequent_access_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "frequent_access_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "infrequent_access_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "archive_access_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "deep_archive_access_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monitored_objects", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_tier_1_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_tier_2_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_lifecycle_transition_requests", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_select_data_scanned_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_select_data_returned_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "early_delete_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_select_data_scanned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "monthly_select_data_returned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "early_delete_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 }
 
 func (a *S3IntelligentTieringStorageClass) UsageKey() string {

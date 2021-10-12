@@ -20,13 +20,13 @@ type S3StandardInfrequentAccessStorageClass struct {
 }
 
 var S3StandardInfrequentAccessStorageClassUsageSchema = []*schema.UsageItem{
-	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monthly_tier_1_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_tier_2_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_lifecycle_transition_requests", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_data_retrieval_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_select_data_scanned_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_select_data_returned_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_data_retrieval_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "monthly_select_data_scanned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "monthly_select_data_returned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 }
 
 func (a *S3StandardInfrequentAccessStorageClass) UsageKey() string {

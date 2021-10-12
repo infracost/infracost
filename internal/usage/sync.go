@@ -114,7 +114,7 @@ func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage, opts MergeReso
 	for _, srcItem := range src.Items {
 		destItem, ok := destItemMap[srcItem.Key]
 		if !ok {
-			destItem = &schema.UsageItem{Key: srcItem.Key}
+			destItem = &schema.UsageItem{Key: srcItem.Key, ValueType: srcItem.ValueType}
 			dest.Items = append(dest.Items, destItem)
 		}
 
@@ -190,26 +190,39 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 			subUsageMap := usageData.Get(item.Key).Map()
 			subExisting := schema.NewUsageData(item.Key, subUsageMap)
 
-			subResourceUsage := &ResourceUsage{
-				Name: item.Key,
-			}
+			var subResourceUsage *ResourceUsage
 			// If the item has a value, use it as the base
 			if item.Value != nil {
 				subResourceUsage = item.Value.(*ResourceUsage)
 			}
 
-			// If the item has no value but does have a default value, then merge in
-			// any keys that exist in the existing usage that match a key in the default value
+			// If the resource usage is nil, but the usage data we want to merge has data
+			// for any of its sub-items, we want to add the sub-items in first before we merge
 			if item.Value == nil && item.DefaultValue != nil {
+				subResourceUsage = &ResourceUsage{
+					Name: item.Key,
+				}
+
+				hasSubItems := false
 				for _, subItem := range item.DefaultValue.(*ResourceUsage).Items {
 					if subExisting.Get(subItem.Key).Type != gjson.Null {
+						hasSubItems = true
 						subResourceUsage.Items = append(subResourceUsage.Items, subItem)
 					}
 				}
+
+				if !hasSubItems {
+					subResourceUsage = nil
+				}
 			}
 
-			mergeResourceUsageWithUsageData(subResourceUsage, subExisting)
-			val = subResourceUsage
+			if subResourceUsage != nil {
+				mergeResourceUsageWithUsageData(subResourceUsage, subExisting)
+			}
+
+			if subResourceUsage != nil {
+				val = subResourceUsage
+			}
 		}
 
 		item.Value = val

@@ -135,17 +135,34 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 			}
 
 			if item.ValueType == schema.SubResourceUsage {
-				if rawValue != nil {
-					subResourceUsage := rawValue.(*ResourceUsage)
-					subResourceValNode, allSubResourcesCommented := ResourceUsagesToYAML([]*ResourceUsage{subResourceUsage})
-
-					if !allSubResourcesCommented {
-						resourceNodeIsCommented = false
-						rootNodeIsCommented = false
-					}
-
-					resourceValNode.Content = append(resourceValNode.Content, subResourceValNode.Content...)
+				// If the value is a subresource, we need to add in any missing default sub-items
+				// so they get rendered as comments
+				subResourceUsage := &ResourceUsage{
+					Name: item.Key,
 				}
+				if item.Value != nil {
+					subResourceUsage = item.Value.(*ResourceUsage)
+				}
+
+				subResourceUsageMap := subResourceUsage.Map()
+
+				if item.DefaultValue != nil {
+					for _, defaultItem := range item.DefaultValue.(*ResourceUsage).Items {
+						if _, ok := subResourceUsageMap[defaultItem.Key]; !ok {
+							subResourceUsage.Items = append(subResourceUsage.Items, defaultItem)
+						}
+					}
+				}
+
+				subResourceValNode, allSubResourcesCommented := ResourceUsagesToYAML([]*ResourceUsage{subResourceUsage})
+
+				if !allSubResourcesCommented {
+					resourceNodeIsCommented = false
+					rootNodeIsCommented = false
+				}
+
+				resourceValNode.Content = append(resourceValNode.Content, subResourceValNode.Content...)
+
 				continue
 			}
 
@@ -170,7 +187,7 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 
 				// If the float is a whole number then add at least one decimal place
 				// so the YAML marshaller doesn't need to add an explicit !!float tag
-				if value == fmt.Sprintf("%.f", rawValue) {
+				if value == fmt.Sprintf("%.f", rawFloat) {
 					value = fmt.Sprintf("%s.0", value)
 				}
 			case schema.Int64:
