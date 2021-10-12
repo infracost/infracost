@@ -23,8 +23,4 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
  ├─ Requests                                                    100  1M requests        $20.00 
  └─ Duration                                             25,000,000  GB-seconds        $416.67 
                                                                                                
- aws_lambda_function.zero_cost_lambda                                                          
- ├─ Requests                                                      0  1M requests         $0.00 
- └─ Duration                                                      0  GB-seconds          $0.00 
-                                                                                               
  OVERALL TOTAL                                                                       $1,361.31 

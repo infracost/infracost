@@ -10,3 +10,10 @@ resource_usage:
   aws_lambda_function.zero_cost_lambda:
     monthly_requests: 0
     request_duration_ms: 0
+  aws_s3_bucket.usage:
+    standard:
+      storage_gb: 0
+      monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB.

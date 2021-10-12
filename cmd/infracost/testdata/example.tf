@@ -53,3 +53,7 @@ resource "aws_lambda_function" "zero_cost_lambda" {
   runtime       = "nodejs12.x"
   memory_size   = 1024 # <<<<< Try changing this to 512 to compare costs
 }
+
+resource "aws_s3_bucket" "usage" {
+  bucket = "bucket_withUsage"
+}

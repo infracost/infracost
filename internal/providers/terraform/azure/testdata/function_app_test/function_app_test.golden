@@ -9,10 +9,6 @@
  ├─ vCPU (EP2)                                                                      4  vCPU                         $505.16 
  └─ Memory (EP2)                                                                   14  GB                           $125.71 
                                                                                                                             
- azurerm_function_app.elasticFunctionWithZeroInstances                                                                      
- ├─ vCPU (EP2)                                                                      0  vCPU                           $0.00 
- └─ Memory (EP2)                                                                    0  GB                             $0.00 
-                                                                                                                            
  azurerm_function_app.elasticPremiumFunction                                                                                
  ├─ vCPU (EP1)                                                                      1  vCPU                         $126.29 
  └─ Memory (EP1)                                                                  3.5  GB                            $31.43 

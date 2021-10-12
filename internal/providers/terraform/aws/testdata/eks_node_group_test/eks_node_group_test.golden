@@ -3,7 +3,6 @@
                                                                                                 
  aws_eks_node_group.example                                                                     
  ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)             730  hours             $30.37 
- ├─ CPU credits                                                     0  vCPU-hours         $0.00 
  └─ Storage (general purpose SSD, gp2)                             20  GB                 $2.00 
                                                                                                 
  aws_eks_node_group.example2                                                                    
@@ -12,7 +11,6 @@
                                                                                                 
  aws_eks_node_group.example_defaultCpuCredits                                                   
  ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)           2,190  hours             $91.10 
- ├─ CPU credits                                                     0  vCPU-hours         $0.00 
  └─ Storage (general purpose SSD, gp2)                             60  GB                 $6.00 
                                                                                                 
  aws_eks_node_group.example_with_launch_template                                                
@@ -52,7 +50,6 @@
                                                                                                 
  aws_eks_node_group.usage                                                                       
  ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)           4,380  hours            $182.21 
- ├─ CPU credits                                                     0  vCPU-hours         $0.00 
  └─ Storage (general purpose SSD, gp2)                            120  GB                $12.00 
                                                                                                 
  aws_eks_node_group.windows                                                                     

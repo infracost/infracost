@@ -23,10 +23,6 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
  ├─ Requests                                                    $0.20        $0.03 
  └─ Duration                                            $0.0000166667        $0.57 
                                                                                    
- aws_lambda_function.zero_cost_lambda                                              
- ├─ Requests                                                    $0.20        $0.00 
- └─ Duration                                            $0.0000166667        $0.00 
-                                                                                   
  OVERALL TOTAL                                                           $1,361.31 
 
 Err:

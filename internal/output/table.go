@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
+
+	"github.com/infracost/infracost/internal/ui"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func ToTable(out Root, opts Options) ([]byte, error) {
@@ -164,10 +167,17 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 	t.AppendHeader(headers)
 
 	for _, r := range breakdown.Resources {
+		filteredComponents := filterZeroValComponents(r.CostComponents, r.Name)
+		filteredSubResources := filterZeroValResources(r.SubResources, r.Name)
+		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
+			log.Info(fmt.Sprintf("Hiding resource with no usage: %s", r.Name))
+			continue
+		}
+
 		t.AppendRow(table.Row{ui.BoldString(r.Name)})
 
-		buildCostComponentRows(t, currency, r.CostComponents, "", len(r.SubResources) > 0, fields)
-		buildSubResourceRows(t, currency, r.SubResources, "", fields)
+		buildCostComponentRows(t, currency, filteredComponents, "", len(r.SubResources) > 0, fields)
+		buildSubResourceRows(t, currency, filteredSubResources, "", fields)
 
 		t.AppendRow(table.Row{""})
 	}
@@ -188,6 +198,12 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 
 func buildSubResourceRows(t table.Writer, currency string, subresources []Resource, prefix string, fields []string) {
 	for i, r := range subresources {
+		filteredComponents := filterZeroValComponents(r.CostComponents, r.Name)
+		filteredSubResources := filterZeroValResources(r.SubResources, r.Name)
+		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
+			continue
+		}
+
 		labelPrefix := prefix + "├─"
 		nextPrefix := prefix + "│  "
 		if i == len(subresources)-1 {
@@ -197,8 +213,8 @@ func buildSubResourceRows(t table.Writer, currency string, subresources []Resour
 
 		t.AppendRow(table.Row{fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), r.Name)})
 
-		buildCostComponentRows(t, currency, r.CostComponents, nextPrefix, len(r.SubResources) > 0, fields)
-		buildSubResourceRows(t, currency, r.SubResources, nextPrefix, fields)
+		buildCostComponentRows(t, currency, filteredComponents, nextPrefix, len(r.SubResources) > 0, fields)
+		buildSubResourceRows(t, currency, filteredSubResources, nextPrefix, fields)
 	}
 }
 
@@ -223,6 +239,7 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 				price,
 				price,
 			}, table.RowConfig{AutoMerge: true, AlignAutoMerge: text.AlignLeft})
+
 		} else {
 			var tableRow table.Row
 			tableRow = append(tableRow, label)
@@ -246,4 +263,32 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 			t.AppendRow(tableRow)
 		}
 	}
+}
+
+func filterZeroValComponents(costComponents []CostComponent, resourceName string) []CostComponent {
+	var filteredComponents []CostComponent
+	for _, c := range costComponents {
+		if c.MonthlyQuantity != nil && c.MonthlyQuantity.IsZero() {
+			log.Info(fmt.Sprintf("Hiding cost with no usage: %s '%s'", resourceName, c.Name))
+			continue
+		}
+
+		filteredComponents = append(filteredComponents, c)
+	}
+	return filteredComponents
+}
+
+func filterZeroValResources(resources []Resource, resourceName string) []Resource {
+	var filteredResources []Resource
+	for _, r := range resources {
+		filteredComponents := filterZeroValComponents(r.CostComponents, fmt.Sprintf("%s.%s", resourceName, r.Name))
+		filteredSubResources := filterZeroValResources(r.SubResources, fmt.Sprintf("%s.%s", resourceName, r.Name))
+		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
+			log.Info(fmt.Sprintf("Hiding resource with no usage: %s.%s", resourceName, r.Name))
+			continue
+		}
+
+		filteredResources = append(filteredResources, r)
+	}
+	return filteredResources
 }
