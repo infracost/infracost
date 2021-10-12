@@ -379,6 +379,29 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
   
   
   
+    
+  <tr class="cost-component">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      Instance usage (Linux/UNIX, reserved, m5.4xlarge)
+    </td>
+    
+      
+        <td class="monthly-quantity">730</td>
+      
+      
+        <td class="unit">hours</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$0.00</td>
+      
+    
+  </tr>
+
+  
   
     
   

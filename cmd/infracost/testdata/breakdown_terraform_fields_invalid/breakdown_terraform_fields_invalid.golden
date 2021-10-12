@@ -12,6 +12,7 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
     └─ Provisioned IOPS                                        $0.065        $0.07 
                                                                                    
  aws_instance.zero_cost_instance                                                   
+ ├─ Instance usage (Linux/UNIX, reserved, m5.4xlarge)           $0.00        $0.00 
  ├─ root_block_device                                                              
  │  └─ Storage (general purpose SSD, gp2)                       $0.10        $0.01 
  └─ ebs_block_device[0]                                                            
