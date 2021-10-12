@@ -124,8 +124,8 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 			kind := yamlv3.ScalarNode
 			content := make([]*yamlv3.Node, 0)
 
-			rawValue := item.DefaultValue
 			itemNodeIsCommented := true
+			rawValue := item.DefaultValue
 
 			if item.Value != nil {
 				rawValue = item.Value
@@ -155,8 +155,18 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 			switch item.ValueType {
 			case schema.Float64:
 				tag = "!!float"
+
+				// Float values might be represented as integers, so we need to make sure it's a float first
+				var rawFloat float64
+				switch f := rawValue.(type) {
+				case float64:
+					rawFloat = f
+				case int64:
+					rawFloat = float64(f)
+				}
+
 				// Format the float with as few decimal places as necessary
-				value = strconv.FormatFloat(rawValue.(float64), 'f', -1, 64)
+				value = strconv.FormatFloat(rawFloat, 'f', -1, 64)
 
 				// If the float is a whole number then add at least one decimal place
 				// so the YAML marshaller doesn't need to add an explicit !!float tag

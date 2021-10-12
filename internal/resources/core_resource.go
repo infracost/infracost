@@ -48,6 +48,9 @@ func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
 		}
 		// Key name for the usage file
 		usageKey := infracostTagSplitted[0]
+		if usageKey == "" {
+			continue
+		}
 
 		// Check whether a value for this arg was specified in the usage data.
 		if u.Get(usageKey).Exists() {

@@ -39,6 +39,13 @@ func intPtrToDecimalPtr(i *int64) *decimal.Decimal {
 	return decimalPtr(decimal.NewFromInt(*i))
 }
 
+func floatPtrToDecimalPtr(f *float64) *decimal.Decimal {
+	if f == nil {
+		return nil
+	}
+	return decimalPtr(decimal.NewFromFloat(*f))
+}
+
 func asGiB(i int64) int64 {
 	if i == 0 {
 		return 0

@@ -7,13 +7,12 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func s3StorageCostComponent(name string, service string, region string, usageType string, storageGB *int64) *schema.CostComponent {
-
+func s3StorageCostComponent(name string, service string, region string, usageType string, storageGB *float64) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: intPtrToDecimalPtr(storageGB),
+		MonthlyQuantity: floatPtrToDecimalPtr(storageGB),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
 			Region:     strPtr(region),
@@ -28,12 +27,12 @@ func s3StorageCostComponent(name string, service string, region string, usageTyp
 	}
 }
 
-func s3StorageVolumeTypeCostComponent(name string, service string, region string, usageType string, volumeType string, storageGB *int64) *schema.CostComponent {
+func s3StorageVolumeTypeCostComponent(name string, service string, region string, usageType string, volumeType string, storageGB *float64) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: intPtrToDecimalPtr(storageGB),
+		MonthlyQuantity: floatPtrToDecimalPtr(storageGB),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
 			Region:     strPtr(region),
@@ -71,12 +70,12 @@ func s3ApiOperationCostComponent(name string, service string, region string, usa
 	}
 }
 
-func s3DataCostComponent(name string, service string, region string, usageType string, dataGB *int64) *schema.CostComponent {
+func s3DataCostComponent(name string, service string, region string, usageType string, dataGB *float64) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: intPtrToDecimalPtr(dataGB),
+		MonthlyQuantity: floatPtrToDecimalPtr(dataGB),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
 			Region:     strPtr(region),
@@ -91,12 +90,12 @@ func s3DataCostComponent(name string, service string, region string, usageType s
 	}
 }
 
-func s3DataGroupCostComponent(name string, service string, region string, usageType string, group string, dataGB *int64) *schema.CostComponent {
+func s3DataGroupCostComponent(name string, service string, region string, usageType string, group string, dataGB *float64) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: intPtrToDecimalPtr(dataGB),
+		MonthlyQuantity: floatPtrToDecimalPtr(dataGB),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
 			Region:     strPtr(region),

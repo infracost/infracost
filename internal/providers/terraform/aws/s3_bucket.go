@@ -68,7 +68,7 @@ func NewS3BucketResource(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	a := &aws.S3Bucket{
 		Address:                 d.Address,
 		Region:                  d.Get("region").String(),
-		Name:                    d.Get("name").String(),
+		Name:                    d.Get("bucket").String(),
 		ObjectTagsEnabled:       objTagsEnabled,
 		LifecycleStorageClasses: lifecycleStorageClasses,
 	}

@@ -2,6 +2,7 @@ package schema
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	jsoniter "github.com/json-iterator/go"
@@ -69,6 +70,20 @@ func (u *UsageData) GetStringArray(key string) *[]string {
 	}
 
 	return nil
+}
+
+func (u *UsageData) IsEmpty(key string) bool {
+	if u.Attributes[key].Type == gjson.Null {
+		return true
+	}
+
+	if u.Attributes[key].Value() == nil {
+		return true
+	}
+
+	val := reflect.ValueOf(u.Attributes[key].Value())
+
+	return val.IsZero() || val.Len() == 0
 }
 
 func convertArrayKeyToWildcard(key string) string {

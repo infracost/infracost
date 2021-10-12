@@ -10,19 +10,23 @@ type S3StandardStorageClass struct {
 	Region string
 
 	// "usage" args
-	StorageGB                   *int64 `infracost_usage:"storage_gb"`
-	MonthlyTier1Requests        *int64 `infracost_usage:"monthly_tier_1_requests"`
-	MonthlyTier2Requests        *int64 `infracost_usage:"monthly_tier_2_requests"`
-	MonthlySelectDataScannedGB  *int64 `infracost_usage:"monthly_select_data_scanned_gb"`
-	MonthlySelectDataReturnedGB *int64 `infracost_usage:"monthly_select_data_returned_gb"`
+	StorageGB                   *float64 `infracost_usage:"storage_gb"`
+	MonthlyTier1Requests        *int64   `infracost_usage:"monthly_tier_1_requests"`
+	MonthlyTier2Requests        *int64   `infracost_usage:"monthly_tier_2_requests"`
+	MonthlySelectDataScannedGB  *float64 `infracost_usage:"monthly_select_data_scanned_gb"`
+	MonthlySelectDataReturnedGB *float64 `infracost_usage:"monthly_select_data_returned_gb"`
 }
 
 var S3StandardStorageClassUsageSchema = []*schema.UsageItem{
-	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monthly_tier_1_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_tier_2_requests", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_select_data_scanned_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_select_data_returned_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_select_data_scanned_gb", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monthly_select_data_returned_gb", DefaultValue: 0, ValueType: schema.Float64},
+}
+
+func (a *S3StandardStorageClass) UsageKey() string {
+	return "standard"
 }
 
 func (a *S3StandardStorageClass) PopulateUsage(u *schema.UsageData) {
@@ -32,7 +36,7 @@ func (a *S3StandardStorageClass) PopulateUsage(u *schema.UsageData) {
 func (a *S3StandardStorageClass) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:        "Standard",
-		UsageSchema: S3BucketUsageSchema,
+		UsageSchema: S3StandardStorageClassUsageSchema,
 		CostComponents: []*schema.CostComponent{
 			s3StorageVolumeTypeCostComponent("Storage", "AmazonS3", a.Region, "TimedStorage-ByteHrs", "Standard", a.StorageGB),
 			s3ApiCostComponent("PUT, COPY, POST, LIST requests", "AmazonS3", a.Region, "Requests-Tier1", a.MonthlyTier1Requests),
