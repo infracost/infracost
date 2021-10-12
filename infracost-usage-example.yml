@@ -1,33 +1,9 @@
 # You can use this file to define resource usage estimates for Infracost to use when calculating
-# the cost of usage-based resource, such as AWS Lambda.
+# the cost of usage-based resource, such as AWS S3 or Lambda.
 # `infracost breakdown --usage-file infracost-usage.yml [other flags]`
 # See https://infracost.io/usage-file/ for docs
 version: 0.1
 resource_usage:
-
-  # Usage for resources inside modules can be specified using the full path of the resource.
-  # This is the same value as Infracost outputs in the Name column, for example:
-  #
-  # module.my_module.aws_dynamodb_table.my_table:
-  #   storage_gb: 1000
-  # module.lambda_function.aws_lambda_function.this[0]:
-  #   monthly_requests: 20000
-  #   request_duration_ms: 600
-  #
-  # The wildcard character `[*]` can be used for an array of resources. Infracost will apply
-  # the usage values individually to each element of the array. If an array element
-  # (e.g. `this[0]`) and `[*]` are specified for a resource, only the array element's usage
-  # will be applied to that resource. This enables you to define default values using `[*]`
-  # and override specific elements using their index.
-  #
-  # Example:
-  #
-  # aws_cloudwatch_log_group.my_log_group[*]:
-  #   storage_gb: 1000
-  #   monthly_data_ingested_gb: 1000
-  #   monthly_data_scanned_gb: 200
-  #
-
   #
   # Terraform AWS resources
   #
