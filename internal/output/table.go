@@ -166,14 +166,15 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 
 	for _, r := range breakdown.Resources {
 		filteredComponents := filterZeroValComponents(r.CostComponents)
-		if len(filteredComponents) == 0 && len(r.SubResources) == 0 {
+		filteredSubResources := filterZeroValResources(r.SubResources)
+		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
 			continue
 		}
 
 		t.AppendRow(table.Row{ui.BoldString(r.Name)})
 
 		buildCostComponentRows(t, currency, filteredComponents, "", len(r.SubResources) > 0, fields)
-		buildSubResourceRows(t, currency, r.SubResources, "", fields)
+		buildSubResourceRows(t, currency, filteredSubResources, "", fields)
 
 		t.AppendRow(table.Row{""})
 	}
@@ -195,7 +196,8 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 func buildSubResourceRows(t table.Writer, currency string, subresources []Resource, prefix string, fields []string) {
 	for i, r := range subresources {
 		filteredComponents := filterZeroValComponents(r.CostComponents)
-		if len(filteredComponents) == 0 {
+		filteredSubResources := filterZeroValResources(r.SubResources)
+		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
 			continue
 		}
 
@@ -209,7 +211,7 @@ func buildSubResourceRows(t table.Writer, currency string, subresources []Resour
 		t.AppendRow(table.Row{fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), r.Name)})
 
 		buildCostComponentRows(t, currency, filteredComponents, nextPrefix, len(r.SubResources) > 0, fields)
-		buildSubResourceRows(t, currency, r.SubResources, nextPrefix, fields)
+		buildSubResourceRows(t, currency, filteredSubResources, nextPrefix, fields)
 	}
 }
 
@@ -270,4 +272,18 @@ func filterZeroValComponents(costComponents []CostComponent) []CostComponent {
 		filteredComponents = append(filteredComponents, c)
 	}
 	return filteredComponents
+}
+
+func filterZeroValResources(resources []Resource) []Resource {
+	var filteredResources []Resource
+	for _, r := range resources {
+		filteredComponents := filterZeroValComponents(r.CostComponents)
+		filteredSubResources := filterZeroValResources(r.SubResources)
+		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
+			continue
+		}
+
+		filteredResources = append(filteredResources, r)
+	}
+	return filteredResources
 }

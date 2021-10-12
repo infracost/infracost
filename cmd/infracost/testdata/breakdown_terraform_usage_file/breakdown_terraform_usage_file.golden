@@ -22,6 +22,4 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
  ├─ Requests                                                    100  1M requests        $20.00 
  └─ Duration                                             25,000,000  GB-seconds        $416.67 
                                                                                                
- aws_s3_bucket.usage                                                                           
-                                                                                               
  OVERALL TOTAL                                                                       $1,361.31 
