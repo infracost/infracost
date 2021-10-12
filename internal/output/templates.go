@@ -140,9 +140,9 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
 
 {{define "resourceRows"}}
   {{$fields := .Fields}}
-  {{- $filteredCostComponents := filterZeroValComponents .Resource.CostComponents}}
-  {{- $filteredSubResources := filterZeroValResources .Resource.SubResources}}
-  {{- if hasCost $filteredCostComponents $filteredSubResources }}
+  {{- $filteredCostComponents := filterZeroValComponents .Resource.CostComponents .Resource.Name}}
+  {{- $filteredSubResources := filterZeroValResources .Resource.SubResources .Resource.Name}}
+  {{- if hasCost $filteredCostComponents $filteredSubResources .Resource.Name }}
   <tr class="resource{{if eq .Indent 0}} top-level{{end}}">
     <td class="name">
       {{if gt .Indent 1}}{{repeat (int (add .Indent -1)) "&nbsp;&nbsp;&nbsp;&nbsp;" | safeHTML}}{{end}}

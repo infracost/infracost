@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/Masterminds/sprig"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func ToHTML(out Root, opts Options) ([]byte, error) {
@@ -26,8 +28,15 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 			safe = strings.ReplaceAll(safe, "\n", "<br />")
 			return template.HTML(safe) // nolint:gosec
 		},
-		"contains":                contains,
-		"hasCost":                 func(cc []CostComponent, sr []Resource) bool { return len(cc) > 0 || len(sr) > 0 },
+		"contains": contains,
+		"hasCost": func(cc []CostComponent, sr []Resource, resourceName string) bool {
+			if len(cc) > 0 || len(sr) > 0 {
+				return true
+			}
+
+			log.Info(fmt.Sprintf("Hiding resource with no usage: %s", resourceName))
+			return false
+		},
 		"filterZeroValComponents": filterZeroValComponents,
 		"filterZeroValResources":  filterZeroValResources,
 		"formatCost2DP":           func(d *decimal.Decimal) string { return formatCost2DP(out.Currency, d) },
