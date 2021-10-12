@@ -1,0 +1,23 @@
+    └─ Synced 0 of 6 resources
+
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_sync_usage_file/sync_usage_file.json
+
+ Name                                    Monthly Qty  Unit   Monthly Cost 
+                                                                          
+ aws_nat_gateway.example_count[0]                                         
+ ├─ NAT gateway                                  730  hours        $32.85 
+ └─ Data processed                               200  GB            $9.00 
+                                                                          
+ aws_nat_gateway.example_count[1]                                         
+ ├─ NAT gateway                                  730  hours        $32.85 
+ └─ Data processed                                10  GB            $0.45 
+                                                                          
+ aws_nat_gateway.example_each["assets"]                                   
+ ├─ NAT gateway                                  730  hours        $32.85 
+ └─ Data processed                                 3  GB            $0.05 
+                                                                          
+ aws_nat_gateway.example_each["media"]                                    
+ ├─ NAT gateway                                  730  hours        $32.85 
+ └─ Data processed                                 2  GB            $0.90 
+                                                                          
+ OVERALL TOTAL                                                    $141.80 

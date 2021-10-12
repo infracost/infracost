@@ -2,7 +2,9 @@ package usage
 
 import (
 	"context"
+	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
@@ -51,7 +53,41 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 		existingOrder = append(existingOrder, resourceUsage.Name)
 	}
 
+	sortResourcesExistingFirst(resources, existingResourceOrder)
+	wildCardResources := make(map[string]bool)
+
 	for _, resource := range resources {
+
+		// Add existing wildcard resource usages if not already added
+		if strings.HasSuffix(resource.Name, "]") {
+			lastIndexOfOpenBracket := strings.LastIndex(resource.Name, "[")
+			wildCardName := fmt.Sprintf("%s[*]", resource.Name[:lastIndexOfOpenBracket])
+
+			if !wildCardResources[wildCardName] {
+				resourceUsage := &ResourceUsage{
+					Name: wildCardName,
+				}
+
+				wildCardResources[wildCardName] = true
+				if existingResourceUsage, ok := existingResourceUsagesMap[wildCardName]; ok {
+					// Merge the usage schema from the reference usage file
+					refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
+					if refResourceUsage != nil {
+						mergeResourceUsages(resourceUsage, refResourceUsage, MergeResourceUsagesOpts{})
+					}
+
+					// Merge the usage schema from the resource struct
+					mergeResourceUsages(resourceUsage, &ResourceUsage{
+						Name:  wildCardName,
+						Items: resource.UsageSchema,
+					}, MergeResourceUsagesOpts{})
+
+					mergeResourceUsages(resourceUsage, existingResourceUsage, MergeResourceUsagesOpts{})
+					resourcesUsages = append(resourcesUsages, resourceUsage)
+				}
+			}
+		}
+
 		resourceUsage := &ResourceUsage{
 			Name: resource.Name,
 		}
@@ -233,13 +269,20 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 }
 
 // sortResourcesExistingFirst sorts the resources by the existing order first, and then the rest by name
-func sortResourceUsages(resourceUsages []*ResourceUsage, existingOrder []string) {
+// Keep multiple-resource (count or each) together even if they are not in the existing
+// order
+func sortResourcesExistingFirst(resources []*schema.Resource, existingResourceOrder []string) {
 	sort.Slice(resourceUsages, func(i, j int) bool {
 		iExistingIndex := indexOf(resourceUsages[i].Name, existingOrder)
 		jExistingIndex := indexOf(resourceUsages[j].Name, existingOrder)
 
 		// If both resources are in the existing resource order, sort by the existing resource order
 		if iExistingIndex != -1 && jExistingIndex != -1 {
+			// this happens when the resource usage does not exists but the wildcard resource
+			// usage exists
+			if jExistingIndex == iExistingIndex {
+				return resources[i].Name < resources[j].Name
+			}
 			return iExistingIndex < jExistingIndex
 		}
 
@@ -279,6 +322,22 @@ func indexOf(s string, arr []string) int {
 	for k, v := range arr {
 		if s == v {
 			return k
+		}
+	}
+
+	if isMultipleResource := strings.HasSuffix(s, "]"); isMultipleResource {
+		lastIndexOfOpenBracket := strings.LastIndex(s, "[")
+		prefixName := s[:lastIndexOfOpenBracket]
+		return lastIndexOfPrefix(prefixName, arr) + 1
+	}
+
+	return -1
+}
+
+func lastIndexOfPrefix(s string, arr []string) int {
+	for i := len(arr) - 1; i >= 0; i-- {
+		if strings.HasPrefix(arr[i], s) {
+			return i
 		}
 	}
 	return -1

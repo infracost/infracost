@@ -1,0 +1,26 @@
+version: "0.1"
+resource_usage:
+  aws_nat_gateway.example_count[*]:
+    monthly_data_processed_gb: 2.0 # Monthly data processed by the NAT Gateway in GB.
+  aws_nat_gateway.example_count[0]:
+    monthly_data_processed_gb: 200 # Monthly data processed by the NAT Gateway in GB.
+  aws_nat_gateway.example_count[1]:
+    monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
+  aws_nat_gateway.example_each[*]:
+    monthly_data_processed_gb: 2.0 # Monthly data processed by the NAT Gateway in GB.
+  aws_nat_gateway.example_each["assets"]:
+    monthly_data_processed_gb: 0.0 # Monthly data processed by the NAT Gateway in GB.
+  # aws_nat_gateway.example_each["media"]:
+    # monthly_data_processed_gb: 0.0 # Monthly data processed by the NAT Gateway in GB.
+  aws_cloudwatch_log_group.production_logs[*]:
+    storage_gb: 1000 # Total data stored by CloudWatch logs in GB.
+    # monthly_data_ingested_gb: 0 # Monthly data ingested by CloudWatch logs in GB.
+    # monthly_data_scanned_gb: 0 # Monthly data scanned by CloudWatch logs insights in GB.
+  # aws_cloudwatch_log_group.production_logs["assets"]:
+    # storage_gb: 0 # Total data stored by CloudWatch logs in GB.
+    # monthly_data_ingested_gb: 0 # Monthly data ingested by CloudWatch logs in GB.
+    # monthly_data_scanned_gb: 0 # Monthly data scanned by CloudWatch logs insights in GB.
+  # aws_cloudwatch_log_group.production_logs["media"]:
+    # storage_gb: 0 # Total data stored by CloudWatch logs in GB.
+    # monthly_data_ingested_gb: 0 # Monthly data ingested by CloudWatch logs in GB.
+    # monthly_data_scanned_gb: 0 # Monthly data scanned by CloudWatch logs insights in GB.

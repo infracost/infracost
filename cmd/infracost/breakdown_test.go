@@ -50,11 +50,15 @@ func TestBreakdownTerraformShowSkipped(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/azure_firewall_plan.json", "--show-skipped"}, nil)
 }
 
-// Need to figure out how to capture synced file before we enable this
-// func TestBreakdownTerraformSyncUsageFile(t *testing.T) {
-// 	testdataName := testutil.CalcGoldenFileTestdataDirName()
-// 	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--sync-usage-file" }, nil)
-// }
+func TestBreakdownTerraformSyncUsageFile(t *testing.T) {
+	testdataName := testutil.CalcGoldenFileTestdataDirName()
+	expectedFilePath := "./testdata/" + testdataName + "/infracost-usage.yml.expected"
+	actualFilePath := "./testdata/" + testdataName + "/infracost-usage.yml"
+
+	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "testdata/breakdown_terraform_sync_usage_file/sync_usage_file.json", "--usage-file", actualFilePath, "--sync-usage-file"}, nil)
+
+	testutil.AssertFileEqual(t, actualFilePath, expectedFilePath)
+}
 
 func TestBreakdownTerraformUsageFile(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
