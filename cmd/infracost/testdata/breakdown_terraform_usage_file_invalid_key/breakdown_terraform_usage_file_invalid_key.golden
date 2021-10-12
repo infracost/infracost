@@ -27,6 +27,14 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
  └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
+ aws_s3_bucket.usage                                                                                                  
+ └─ Standard                                                                                                          
+    ├─ Storage                                          Monthly cost depends on usage: $0.023 per GB                  
+    ├─ PUT, COPY, POST, LIST requests                   Monthly cost depends on usage: $0.005 per 1k requests         
+    ├─ GET, SELECT, and all other requests              Monthly cost depends on usage: $0.0004 per 1k requests        
+    ├─ Select data scanned                              Monthly cost depends on usage: $0.002 per GB                  
+    └─ Select data returned                             Monthly cost depends on usage: $0.0007 per GB                 
+                                                                                                                      
  OVERALL TOTAL                                                                                              $1,921.95 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
