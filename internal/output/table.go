@@ -265,7 +265,7 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 func filterZeroValComponents(costComponents []CostComponent) []CostComponent {
 	var filteredComponents []CostComponent
 	for _, c := range costComponents {
-		if c.MonthlyCost != nil && c.MonthlyCost.IsZero() {
+		if c.MonthlyQuantity != nil && c.MonthlyQuantity.IsZero() {
 			continue
 		}
 
