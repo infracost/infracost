@@ -1,0 +1,12 @@
+version: 0.1
+resource_usage:
+  aws_instance.zero_cost_instance:
+    reserved_instance_type: standard
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: all_upfront
+  aws_lambda_function.hello_world:
+    monthly_requests: 100000000
+    request_duration_ms: 250
+  aws_lambda_function.zero_cost_lambda:
+    monthly_requests: 0
+    request_duration_ms: 0

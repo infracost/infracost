@@ -11,27 +11,27 @@ func TestBreakdownHelp(t *testing.T) {
 }
 
 func TestBreakdownFormatHTML(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "html", "--path", "../../examples/terraform/plan.json"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "html", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
 }
 
 func TestBreakdownFormatJSON(t *testing.T) {
 	opts := DefaultOptions()
 	opts.IsJSON = true
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "json", "--path", "../../examples/terraform/plan.json"}, opts)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "json", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, opts)
 }
 
 func TestBreakdownFormatJSONShowSkipped(t *testing.T) {
 	opts := DefaultOptions()
 	opts.IsJSON = true
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "json", "--path", "../../examples/terraform/plan.json", "--show-skipped"}, opts)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "json", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--show-skipped"}, opts)
 }
 
 func TestBreakdownFormatTable(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "table", "--path", "../../examples/terraform/plan.json"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "table", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
 }
 
 func TestBreakdownTerraformPlanJSON(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform/plan.json"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
 }
 
 func TestBreakdownTerraformDirectory(t *testing.T) {
@@ -39,11 +39,11 @@ func TestBreakdownTerraformDirectory(t *testing.T) {
 }
 
 func TestBreakdownTerraformFieldsAll(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform/plan.json", "--fields", "all"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--fields", "all"}, nil)
 }
 
 func TestBreakdownTerraformFieldsInvalid(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform/plan.json", "--fields", "price,hourlyCost,invalid"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--fields", "price,hourlyCost,invalid"}, nil)
 }
 
 func TestBreakdownTerraformShowSkipped(t *testing.T) {
@@ -53,11 +53,11 @@ func TestBreakdownTerraformShowSkipped(t *testing.T) {
 // Need to figure out how to capture synced file before we enable this
 // func TestBreakdownTerraformSyncUsageFile(t *testing.T) {
 // 	testdataName := testutil.CalcGoldenFileTestdataDirName()
-// 	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "../../examples/terraform/plan.json", "--usage-file", "./testdata/" + testdataName + "/infracost-usage.yml", "--sync-usage-file"}, nil)
+// 	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--sync-usage-file" }, nil)
 // }
 
 func TestBreakdownTerraformUsageFile(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform/plan.json", "--usage-file", "../../examples/terraform/infracost-usage.yml"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
 }
 
 func TestBreakdownTerragrunt(t *testing.T) {
