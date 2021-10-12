@@ -209,6 +209,42 @@
             "tracing_config": [],
             "vpc_config": []
           }
+        },
+        {
+          "address": "aws_s3_bucket.usage",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "usage",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "acl": "private",
+            "bucket": "bucket_withUsage",
+            "bucket_prefix": null,
+            "cors_rule": [],
+            "force_destroy": false,
+            "grant": [],
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "policy": null,
+            "replication_configuration": [],
+            "server_side_encryption_configuration": [],
+            "tags": null,
+            "website": []
+          },
+          "sensitive_values": {
+            "cors_rule": [],
+            "grant": [],
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "replication_configuration": [],
+            "server_side_encryption_configuration": [],
+            "tags_all": {},
+            "versioning": [],
+            "website": []
+          }
         }
       ]
     }
@@ -603,6 +639,70 @@
           "vpc_config": []
         }
       }
+    },
+    {
+      "address": "aws_s3_bucket.usage",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "usage",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "acl": "private",
+          "bucket": "bucket_withUsage",
+          "bucket_prefix": null,
+          "cors_rule": [],
+          "force_destroy": false,
+          "grant": [],
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "policy": null,
+          "replication_configuration": [],
+          "server_side_encryption_configuration": [],
+          "tags": null,
+          "website": []
+        },
+        "after_unknown": {
+          "acceleration_status": true,
+          "arn": true,
+          "bucket_domain_name": true,
+          "bucket_regional_domain_name": true,
+          "cors_rule": [],
+          "grant": [],
+          "hosted_zone_id": true,
+          "id": true,
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "region": true,
+          "replication_configuration": [],
+          "request_payer": true,
+          "server_side_encryption_configuration": [],
+          "tags_all": true,
+          "versioning": true,
+          "website": [],
+          "website_domain": true,
+          "website_endpoint": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "cors_rule": [],
+          "grant": [],
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "replication_configuration": [],
+          "server_side_encryption_configuration": [],
+          "tags_all": {},
+          "versioning": [],
+          "website": []
+        }
+      }
     }
   ],
   "configuration": {
@@ -754,6 +854,19 @@
             },
             "runtime": {
               "constant_value": "nodejs12.x"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_s3_bucket.usage",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "usage",
+          "provider_config_key": "aws",
+          "expressions": {
+            "bucket": {
+              "constant_value": "bucket_withUsage"
             }
           },
           "schema_version": 0

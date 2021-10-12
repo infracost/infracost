@@ -57,6 +57,26 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
     + Duration
       $0.00
 
++ aws_s3_bucket.usage
+  $0.00
+
+    + Standard
+    
+        + Storage
+          $0.00
+    
+        + PUT, COPY, POST, LIST requests
+          $0.00
+    
+        + GET, SELECT, and all other requests
+          $0.00
+    
+        + Select data scanned
+          $0.00
+    
+        + Select data returned
+          $0.00
+
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/example_plan.json
 Amount:  +$1,361 ($0.00 -> $1,361)
 

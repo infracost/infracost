@@ -193,6 +193,67 @@
                 "monthlyCost": "0"
               }
             ]
+          },
+          {
+            "name": "aws_s3_bucket.usage",
+            "metadata": {},
+            "hourlyCost": "0",
+            "monthlyCost": "0",
+            "subresources": [
+              {
+                "name": "Standard",
+                "metadata": {},
+                "hourlyCost": "0",
+                "monthlyCost": "0",
+                "costComponents": [
+                  {
+                    "name": "Storage",
+                    "unit": "GB",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.023",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0"
+                  },
+                  {
+                    "name": "PUT, COPY, POST, LIST requests",
+                    "unit": "1k requests",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.005",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0"
+                  },
+                  {
+                    "name": "GET, SELECT, and all other requests",
+                    "unit": "1k requests",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.0004",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0"
+                  },
+                  {
+                    "name": "Select data scanned",
+                    "unit": "GB",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.002",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0"
+                  },
+                  {
+                    "name": "Select data returned",
+                    "unit": "GB",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.0007",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0"
+                  }
+                ]
+              }
+            ]
           }
         ],
         "totalHourlyCost": "1.86480479452054793334316749",
@@ -373,6 +434,67 @@
                 "price": "0.0000166667",
                 "hourlyCost": "0",
                 "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "aws_s3_bucket.usage",
+            "metadata": {},
+            "hourlyCost": "0",
+            "monthlyCost": "0",
+            "subresources": [
+              {
+                "name": "Standard",
+                "metadata": {},
+                "hourlyCost": "0",
+                "monthlyCost": "0",
+                "costComponents": [
+                  {
+                    "name": "Storage",
+                    "unit": "GB",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.023",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0"
+                  },
+                  {
+                    "name": "PUT, COPY, POST, LIST requests",
+                    "unit": "1k requests",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.005",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0"
+                  },
+                  {
+                    "name": "GET, SELECT, and all other requests",
+                    "unit": "1k requests",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.0004",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0"
+                  },
+                  {
+                    "name": "Select data scanned",
+                    "unit": "GB",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.002",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0"
+                  },
+                  {
+                    "name": "Select data returned",
+                    "unit": "GB",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.0007",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0"
+                  }
+                ]
               }
             ]
           }

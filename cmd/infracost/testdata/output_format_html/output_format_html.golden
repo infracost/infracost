@@ -678,6 +678,177 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
   
 
       
+        
+  
+  <tr class="resource top-level">
+    <td class="name">
+      
+      
+      aws_s3_bucket.usage
+    </td>
+    
+  
+    <td class="monthly-quantity"></td>
+  
+  
+    <td class="unit"></td>
+  
+  
+  
+  
+    <td class="monthly-cost"></td>
+  
+
+  </tr>
+  
+  
+  
+  
+    
+  
+  <tr class="resource">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      Standard
+    </td>
+    
+  
+    <td class="monthly-quantity"></td>
+  
+  
+    <td class="unit"></td>
+  
+  
+  
+  
+    <td class="monthly-cost"></td>
+  
+
+  </tr>
+  
+  
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="arrow">&#8627;</span>
+      Storage
+    </td>
+    
+      
+        <td class="monthly-quantity">0</td>
+      
+      
+        <td class="unit">GB</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$0.00</td>
+      
+    
+  </tr>
+
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="arrow">&#8627;</span>
+      PUT, COPY, POST, LIST requests
+    </td>
+    
+      
+        <td class="monthly-quantity">0</td>
+      
+      
+        <td class="unit">1k requests</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$0.00</td>
+      
+    
+  </tr>
+
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="arrow">&#8627;</span>
+      GET, SELECT, and all other requests
+    </td>
+    
+      
+        <td class="monthly-quantity">0</td>
+      
+      
+        <td class="unit">1k requests</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$0.00</td>
+      
+    
+  </tr>
+
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="arrow">&#8627;</span>
+      Select data scanned
+    </td>
+    
+      
+        <td class="monthly-quantity">0</td>
+      
+      
+        <td class="unit">GB</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$0.00</td>
+      
+    
+  </tr>
+
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="arrow">&#8627;</span>
+      Select data returned
+    </td>
+    
+      
+        <td class="monthly-quantity">0</td>
+      
+      
+        <td class="unit">GB</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$0.00</td>
+      
+    
+  </tr>
+
+  
+  
+
+  
+
+      
       <tr class="total">
         <td class="name" colspan="3">Project total</td>
         <td class="monthly-cost">$1,361.31</td>
