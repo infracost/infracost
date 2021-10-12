@@ -12,3 +12,5 @@ resource_usage:
     invalid_key_1: 3000
     dup_invalid_key: 4000
     dup_invalid_key: 5000
+  aws_lambda_function.zero_cost_lambda:
+    dup_invalid_key: 5000

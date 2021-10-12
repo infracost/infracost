@@ -61,7 +61,7 @@ func TestBreakdownTerraformUsageFile(t *testing.T) {
 }
 
 func TestBreakdownTerraformUsageFileInvalidKey(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform/plan.json", "--usage-file", "./testdata/infracost-usage-invalid-key.yml"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/infracost-usage-invalid-key.yml"}, nil)
 }
 
 func TestBreakdownTerragrunt(t *testing.T) {
