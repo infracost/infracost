@@ -158,7 +158,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       
       
   
-  <p class="project-name">Project: infracost/infracost/examples/terraform</p>
+  <p class="project-name">Project: infracost/infracost/cmd/infracost/testdata</p>
   <table class="breakdown">
     <thead>      
       
@@ -360,6 +360,182 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     <td class="name">
       
       
+      aws_instance.zero_cost_instance
+    </td>
+    
+  
+    <td class="monthly-quantity"></td>
+  
+  
+    <td class="unit"></td>
+  
+  
+  
+  
+    <td class="monthly-cost"></td>
+  
+
+  </tr>
+  
+  
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      Instance usage (Linux/UNIX, reserved, m5.4xlarge)
+    </td>
+    
+      
+        <td class="monthly-quantity">730</td>
+      
+      
+        <td class="unit">hours</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$0.00</td>
+      
+    
+  </tr>
+
+  
+  
+    
+  
+  <tr class="resource">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      root_block_device
+    </td>
+    
+  
+    <td class="monthly-quantity"></td>
+  
+  
+    <td class="unit"></td>
+  
+  
+  
+  
+    <td class="monthly-cost"></td>
+  
+
+  </tr>
+  
+  
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="arrow">&#8627;</span>
+      Storage (general purpose SSD, gp2)
+    </td>
+    
+      
+        <td class="monthly-quantity">50</td>
+      
+      
+        <td class="unit">GB</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$5.00</td>
+      
+    
+  </tr>
+
+  
+  
+
+  
+    
+  
+  <tr class="resource">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      ebs_block_device[0]
+    </td>
+    
+  
+    <td class="monthly-quantity"></td>
+  
+  
+    <td class="unit"></td>
+  
+  
+  
+  
+    <td class="monthly-cost"></td>
+  
+
+  </tr>
+  
+  
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="arrow">&#8627;</span>
+      Storage (provisioned IOPS SSD, io1)
+    </td>
+    
+      
+        <td class="monthly-quantity">1,000</td>
+      
+      
+        <td class="unit">GB</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$125.00</td>
+      
+    
+  </tr>
+
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="arrow">&#8627;</span>
+      Provisioned IOPS
+    </td>
+    
+      
+        <td class="monthly-quantity">800</td>
+      
+      
+        <td class="unit">IOPS</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$52.00</td>
+      
+    
+  </tr>
+
+  
+  
+
+  
+
+      
+        
+  
+  <tr class="resource top-level">
+    <td class="name">
+      
+      
       aws_lambda_function.hello_world
     </td>
     
@@ -387,7 +563,17 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       Requests
     </td>
     
-      <td colspan="3" class="usage-cost">Cost depends on usage: $0.20 per 1M requests</td>
+      
+        <td class="monthly-quantity">100</td>
+      
+      
+        <td class="unit">1M requests</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$20.00</td>
+      
     
   </tr>
 
@@ -400,7 +586,91 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       Duration
     </td>
     
-      <td colspan="3" class="usage-cost">Cost depends on usage: $0.0000166667 per GB-seconds</td>
+      
+        <td class="monthly-quantity">25,000,000</td>
+      
+      
+        <td class="unit">GB-seconds</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$416.67</td>
+      
+    
+  </tr>
+
+  
+  
+
+      
+        
+  
+  <tr class="resource top-level">
+    <td class="name">
+      
+      
+      aws_lambda_function.zero_cost_lambda
+    </td>
+    
+  
+    <td class="monthly-quantity"></td>
+  
+  
+    <td class="unit"></td>
+  
+  
+  
+  
+    <td class="monthly-cost"></td>
+  
+
+  </tr>
+  
+  
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      Requests
+    </td>
+    
+      
+        <td class="monthly-quantity">0</td>
+      
+      
+        <td class="unit">1M requests</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$0.00</td>
+      
+    
+  </tr>
+
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      Duration
+    </td>
+    
+      
+        <td class="monthly-quantity">0</td>
+      
+      
+        <td class="unit">GB-seconds</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$0.00</td>
+      
     
   </tr>
 
@@ -410,7 +680,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       
       <tr class="total">
         <td class="name" colspan="3">Project total</td>
-        <td class="monthly-cost">$742.64</td>
+        <td class="monthly-cost">$1,361.31</td>
       </tr>
     </tbody>
   </table>
@@ -823,7 +1093,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       <tbody>
         <tr class="total">
           <td class="name" colspan="3">Overall total</td>
-          <td class="monthly-cost">$4,761.29</td>
+          <td class="monthly-cost">$5,379.96</td>
         </tr>
       </tbody>
     </table>

@@ -11,7 +11,7 @@ func TestDiffHelp(t *testing.T) {
 }
 
 func TestDiffTerraformPlanJSON(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples/terraform/plan.json"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
 }
 
 func TestDiffTerraformDirectory(t *testing.T) {
@@ -25,11 +25,11 @@ func TestDiffTerraformShowSkipped(t *testing.T) {
 // Need to figure out how to capture synced file before we enable this
 // func TestDiffTerraformSyncUsageFile(t *testing.T) {
 // 	testdataName := testutil.CalcGoldenFileTestdataDirName()
-// 	GoldenFileCommandTest(t, testdataName, []string{"diff", "--path", "../../examples/terraform/plan.json", "--usage-file", "./testdata/" + testdataName + "/infracost-usage.yml", "--sync-usage-file"}, nil)
+// 	GoldenFileCommandTest(t, testdataName, []string{"diff", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--sync-usage-file"}, nil)
 // }
 
 func TestDiffTerraformUsageFile(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples/terraform/plan.json", "--usage-file", "../../examples/terraform/infracost-usage.yml"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
 }
 
 func TestDiffTerragrunt(t *testing.T) {

@@ -12,7 +12,7 @@ func TestFlagErrorsNoPath(t *testing.T) {
 }
 
 func TestFlagErrorsPathAndConfigFile(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform/plan.json", "--config-file", "infracost-config.yml"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--config-file", "infracost-config.yml"}, nil)
 }
 
 func TestFlagErrorsConfigFileAndTerraformWorkspace(t *testing.T) {
