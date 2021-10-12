@@ -27,6 +27,9 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 			return template.HTML(safe) // nolint:gosec
 		},
 		"contains":                contains,
+		"hasCost":                 func(cc []CostComponent, sr []Resource) bool { return len(cc) > 0 || len(sr) > 0 },
+		"filterZeroValComponents": filterZeroValComponents,
+		"filterZeroValResources":  filterZeroValResources,
 		"formatCost2DP":           func(d *decimal.Decimal) string { return formatCost2DP(out.Currency, d) },
 		"formatPrice":             func(d decimal.Decimal) string { return formatPrice(out.Currency, d) },
 		"formatTitleWithCurrency": func(title string) string { return formatTitleWithCurrency(title, out.Currency) },

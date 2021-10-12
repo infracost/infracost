@@ -140,6 +140,9 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
 
 {{define "resourceRows"}}
   {{$fields := .Fields}}
+  {{- $filteredCostComponents := filterZeroValComponents .Resource.CostComponents}}
+  {{- $filteredSubResources := filterZeroValResources .Resource.SubResources}}
+  {{- if hasCost $filteredCostComponents $filteredSubResources }}
   <tr class="resource{{if eq .Indent 0}} top-level{{end}}">
     <td class="name">
       {{if gt .Indent 1}}{{repeat (int (add .Indent -1)) "&nbsp;&nbsp;&nbsp;&nbsp;" | safeHTML}}{{end}}
@@ -163,12 +166,13 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     </tr>
   {{end}}
   {{$ident := add .Indent 1}}
-  {{range .Resource.CostComponents}}
+  {{range $filteredCostComponents}}
     {{template "costComponentRow" dict "CostComponent" . "Fields" $fields "Indent" $ident}}
   {{end}}
-  {{range .Resource.SubResources}}
+  {{range $filteredSubResources}}
     {{template "resourceRows" dict "Resource" . "Fields" $fields "Indent" $ident}}
   {{end}}
+  {{- end}}
 {{end}}
 
 {{define "costComponentRow"}}
