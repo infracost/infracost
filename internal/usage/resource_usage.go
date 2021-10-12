@@ -44,7 +44,9 @@ func mapUsageItem(item *schema.UsageItem) interface{} {
 
 func ResourceUsagesFromYAML(raw yamlv3.Node) ([]*ResourceUsage, error) {
 	if len(raw.Content)%2 != 0 {
-		log.Errorf("YAML resource usage contents are not divisible by 2")
+		// This error shouldn't really happen, the YAML lib flattens map node key and values into a single array
+		// so this means the YAML map node is invalid but to be safe we add a log here in case it does.
+		log.Errorf("YAML resource usage contents are not divisible by 2. Expected map node to have equal number of key and value nodes.")
 		return []*ResourceUsage{}, errors.New("unexpected YAML format")
 	}
 
@@ -55,7 +57,9 @@ func ResourceUsagesFromYAML(raw yamlv3.Node) ([]*ResourceUsage, error) {
 		resourceValNode := raw.Content[i+1]
 
 		if len(resourceValNode.Content)%2 != 0 {
-			log.Errorf("YAML resource value contents are not divisible by 2")
+			// This error shouldn't really happen, the YAML lib flattens map node key and values into a single array
+			// so this means the YAML map node is invalid but to be safe we add a log here in case it does.
+			log.Errorf("YAML resource value contents are not divisible by 2. Expected map node to have equal number of key and value nodes.")
 			return resourceUsages, errors.New("unexpected YAML format")
 		}
 
@@ -274,7 +278,9 @@ func usageItemFromYAML(keyNode *yamlv3.Node, valNode *yamlv3.Node) (*schema.Usag
 		usageValueType = schema.SubResourceUsage
 
 		if len(valNode.Content)%2 != 0 {
-			log.Errorf("YAML map node contents are not divisible by 2")
+			// This error shouldn't really happen, the YAML lib flattens map node key and values into a single array
+			// so this means the YAML map node is invalid but to be safe we add a log here in case it does.
+			log.Errorf("YAML value map node contents are not divisible by 2. Expected map node to have equal number of key and value nodes.")
 			return nil, errors.New("unexpected YAML format")
 		}
 
