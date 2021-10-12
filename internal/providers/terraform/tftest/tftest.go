@@ -218,8 +218,9 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	usageFilePath := filepath.Join("testdata", testName, testName+".usage.yml")
 	if _, err := os.Stat(usageFilePath); err == nil || !os.IsNotExist(err) {
 		// usage file exists, load the data
-		usageData, err = usage.LoadFromFile(usageFilePath, false)
+		usageFile, err := usage.LoadUsageFile(usageFilePath, false)
 		require.NoError(t, err)
+		usageData = usageFile.ToUsageDataMap()
 	}
 
 	// Generate the output
@@ -270,6 +271,7 @@ func RunCostCalculations(t *testing.T, runCtx *config.RunContext, tfProject Terr
 		}
 		schema.CalculateCosts(project)
 	}
+
 	return projects, nil
 }
 
@@ -288,30 +290,38 @@ func GoldenFileUsageSyncTest(t *testing.T, testName string) {
 		},
 	}
 
-	var existing map[string]*schema.UsageData
 	usageFilePath := filepath.Join("testdata", testName, testName+"_existing_usage.yml")
-	if _, err := os.Stat(usageFilePath); err == nil || !os.IsNotExist(err) {
-		// usage file exists, load the data
-		existing, err = usage.LoadFromFile(usageFilePath, false)
-		require.NoError(t, err)
-	}
-
-	actual, err := RunSyncUsage(t, runCtx, tfProject, existing)
+	actual, err := RunSyncUsage(t, runCtx, tfProject, usageFilePath)
 	require.NoError(t, err)
 
 	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 
-func RunSyncUsage(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, existing map[string]*schema.UsageData) ([]byte, error) {
+func RunSyncUsage(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usageFilePath string) ([]byte, error) {
 	tmpDir := t.TempDir()
 	projects, err := loadResources(t, runCtx, tfProject, map[string]*schema.UsageData{})
 	if err != nil {
 		return nil, err
 	}
 
-	out := filepath.Join(tmpDir, "actual-usage.yml")
-	_, err = usage.SyncUsageData(projects, existing, out)
+	// If the usage file doesn't exist use a temp path so we don't write to the real path
+	if _, err := os.Stat(usageFilePath); os.IsNotExist(err) {
+		usageFilePath = filepath.Join(tmpDir, "existing_usage.yml")
+	}
+
+	usageFile, err := usage.LoadUsageFile(usageFilePath, true)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = usage.SyncUsageData(usageFile, projects)
+	if err != nil {
+		return nil, err
+	}
+
+	out := filepath.Join(tmpDir, "actual_usage.yml")
+	err = usageFile.WriteToPath(out)
 	if err != nil {
 		return nil, err
 	}

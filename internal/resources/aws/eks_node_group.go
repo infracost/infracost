@@ -31,7 +31,7 @@ type EKSNodeGroup struct {
 	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
 }
 
-var EKSNodeGroupUsageSchema = append([]*schema.UsageSchemaItem{
+var EKSNodeGroupUsageSchema = append([]*schema.UsageItem{
 	{Key: "instances", DefaultValue: 0, ValueType: schema.Int64},
 }, InstanceUsageSchema...)
 
@@ -48,15 +48,15 @@ func (a *EKSNodeGroup) PopulateUsage(u *schema.UsageData) {
 // as the default value for the "instances" usage param.  Without this, --sync-usage-file sets instances=0 causing the
 // costs for the node group to be $0.  This can be removed when --sync-usage-file creates the usage file with usgage keys
 // commented out by default.
-func (a *EKSNodeGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.UsageSchemaItem {
+func (a *EKSNodeGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.UsageItem {
 	if a.InstanceCount == nil || *a.InstanceCount == 0 {
 		return EKSNodeGroupUsageSchema
 	}
 
-	usageSchema := make([]*schema.UsageSchemaItem, 0, len(EKSNodeGroupUsageSchema))
+	usageSchema := make([]*schema.UsageItem, 0, len(EKSNodeGroupUsageSchema))
 	for _, u := range EKSNodeGroupUsageSchema {
 		if u.Key == "instances" {
-			usageSchema = append(usageSchema, &schema.UsageSchemaItem{Key: "instances", DefaultValue: a.InstanceCount, ValueType: schema.Int64})
+			usageSchema = append(usageSchema, &schema.UsageItem{Key: "instances", DefaultValue: intVal(a.InstanceCount), ValueType: schema.Int64})
 		} else {
 			usageSchema = append(usageSchema, u)
 		}

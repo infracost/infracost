@@ -32,7 +32,7 @@ type DynamoDBTable struct {
 	MonthlyStreamsReadRequestUnits *int64 `infracost_usage:"monthly_streams_read_request_units"`
 }
 
-var DynamoDBTableUsageSchema = []*schema.UsageSchemaItem{
+var DynamoDBTableUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_write_request_units", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_read_request_units", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Int64},

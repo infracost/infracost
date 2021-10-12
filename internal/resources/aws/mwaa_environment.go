@@ -21,10 +21,10 @@ type MWAAEnvironment struct {
 }
 
 // If the resource requires a usage parameter
-var MWAAEnvironmentUsageSchema = []*schema.UsageSchemaItem{
-	{Key: "additional_workers", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "additional_schedulers", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "meta_database_gb", DefaultValue: 0, ValueType: schema.Float64},
+var MWAAEnvironmentUsageSchema = []*schema.UsageItem{
+	{Key: "additional_workers", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "additional_schedulers", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "meta_database_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 }
 
 // If the resource requires a usage parameter

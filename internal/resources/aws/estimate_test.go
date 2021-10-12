@@ -49,7 +49,7 @@ func newEstimates(ctx context.Context, t *testing.T, resource *schema.Resource) 
 				t.Errorf("Expected %T %s of type []string, got a %T", resource, item.Key, value)
 			}
 		default:
-			t.Errorf("Unknown UsageSchemaItem.ValueType %v", item.ValueType)
+			t.Errorf("Unknown UsageItem.ValueType %v", item.ValueType)
 		}
 	}
 

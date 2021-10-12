@@ -21,6 +21,13 @@ func intPtr(i int64) *int64 {
 	return &i
 }
 
+func intVal(i *int64) int64 {
+	if i == nil {
+		return 0
+	}
+	return *i
+}
+
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }

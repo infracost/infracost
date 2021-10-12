@@ -1,12 +1,17 @@
 version: 0.1
 resource_usage:
-  aws_cloudfront_distribution.s3_distribution:
+  aws_instance.with_usage:
+    operating_system: windows
+    reserved_instance_type: standard
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: all_upfront
+  aws_s3_bucket.with_usage:
+    object_tags: 10000000 # This comment shouldn't be overwritten
+    glacier:
+      storage_gb: 50000
+  aws_cloudfront_distribution.with_usage:
     custom_ssl_certificates: 3
     monthly_data_transfer_to_internet_gb:
       us: 51200000
       europe: 220000
       south_africa: 10000
-  aws_s3_bucket.b:
-    object_tags: 10000000
-    glacier:
-      storage_gb: 50000
