@@ -37,6 +37,214 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   comment             = "Some comment"
   default_root_object = "index.html"
 
+  aliases = ["mysite.example.com", "yoursite.example.com"]
+
+  default_cache_behavior {
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "allow-all"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+  }
+
+  # Cache behavior with precedence 0
+  ordered_cache_behavior {
+    path_pattern     = "/content/immutable/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+      headers      = ["Origin"]
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 86400
+    max_ttl                = 31536000
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  # Cache behavior with precedence 1
+  ordered_cache_behavior {
+    path_pattern     = "/content/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  price_class = "PriceClass_200"
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "whitelist"
+      locations        = ["US", "CA", "GB", "DE"]
+    }
+  }
+
+  tags = {
+    Environment = "production"
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+}
+
+resource "aws_cloudfront_distribution" "s3_distribution_0_with_shield" {
+  origin {
+    domain_name = aws_s3_bucket.b.bucket_regional_domain_name
+    origin_id   = local.s3_origin_id
+
+    s3_origin_config {
+      origin_access_identity = "origin-access-identity/cloudfront/ABCDEFG1234567"
+    }
+
+    origin_shield {
+      enabled = true
+      origin_shield_region = "sa-east-1"
+    }
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "Some comment"
+  default_root_object = "index.html"
+
+  aliases = ["mysite.example.com", "yoursite.example.com"]
+
+  default_cache_behavior {
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "allow-all"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+  }
+
+  # Cache behavior with precedence 0
+  ordered_cache_behavior {
+    path_pattern     = "/content/immutable/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+      headers      = ["Origin"]
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 86400
+    max_ttl                = 31536000
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  # Cache behavior with precedence 1
+  ordered_cache_behavior {
+    path_pattern     = "/content/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  price_class = "PriceClass_200"
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "whitelist"
+      locations        = ["US", "CA", "GB", "DE"]
+    }
+  }
+
+  tags = {
+    Environment = "production"
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+}
+
+resource "aws_cloudfront_distribution" "s3_distribution_1_with_logging" {
+  origin {
+    domain_name = aws_s3_bucket.b.bucket_regional_domain_name
+    origin_id   = local.s3_origin_id
+
+    s3_origin_config {
+      origin_access_identity = "origin-access-identity/cloudfront/ABCDEFG1234567"
+    }
+
+    origin_shield {
+      enabled = true
+      origin_shield_region = "sa-east-1"
+    }
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "Some comment"
+  default_root_object = "index.html"
+
   logging_config {
     include_cookies = false
     bucket          = "mylogs.s3.amazonaws.com"
@@ -124,6 +332,229 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   viewer_certificate {
     cloudfront_default_certificate = true
+  }
+}
+
+resource "aws_cloudfront_distribution" "s3_distribution_2_with_encryption" {
+  origin {
+    domain_name = aws_s3_bucket.b.bucket_regional_domain_name
+    origin_id   = local.s3_origin_id
+
+    s3_origin_config {
+      origin_access_identity = "origin-access-identity/cloudfront/ABCDEFG1234567"
+    }
+
+    origin_shield {
+      enabled = true
+      origin_shield_region = "sa-east-1"
+    }
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "Some comment"
+  default_root_object = "index.html"
+
+  logging_config {
+    include_cookies = false
+    bucket          = "mylogs.s3.amazonaws.com"
+    prefix          = "myprefix"
+  }
+
+  aliases = ["mysite.example.com", "yoursite.example.com"]
+
+  default_cache_behavior {
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "allow-all"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    field_level_encryption_id = "test encryption"
+  }
+
+  # Cache behavior with precedence 0
+  ordered_cache_behavior {
+    path_pattern     = "/content/immutable/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+      headers      = ["Origin"]
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 86400
+    max_ttl                = 31536000
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  # Cache behavior with precedence 1
+  ordered_cache_behavior {
+    path_pattern     = "/content/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  price_class = "PriceClass_200"
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "whitelist"
+      locations        = ["US", "CA", "GB", "DE"]
+    }
+  }
+
+  tags = {
+    Environment = "production"
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+}
+
+resource "aws_cloudfront_distribution" "s3_distribution_3_with_ssl" {
+  origin {
+    domain_name = aws_s3_bucket.b.bucket_regional_domain_name
+    origin_id   = local.s3_origin_id
+
+    s3_origin_config {
+      origin_access_identity = "origin-access-identity/cloudfront/ABCDEFG1234567"
+    }
+
+    origin_shield {
+      enabled = true
+      origin_shield_region = "sa-east-1"
+    }
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "Some comment"
+  default_root_object = "index.html"
+
+  logging_config {
+    include_cookies = false
+    bucket          = "mylogs.s3.amazonaws.com"
+    prefix          = "myprefix"
+  }
+
+  aliases = ["mysite.example.com", "yoursite.example.com"]
+
+  default_cache_behavior {
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "allow-all"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    field_level_encryption_id = "test encryption"
+  }
+
+  # Cache behavior with precedence 0
+  ordered_cache_behavior {
+    path_pattern     = "/content/immutable/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+      headers      = ["Origin"]
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 86400
+    max_ttl                = 31536000
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  # Cache behavior with precedence 1
+  ordered_cache_behavior {
+    path_pattern     = "/content/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.s3_origin_id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  price_class = "PriceClass_200"
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "whitelist"
+      locations        = ["US", "CA", "GB", "DE"]
+    }
+  }
+
+  tags = {
+    Environment = "production"
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+    ssl_support_method = "vip"
   }
 }
 
@@ -135,6 +566,11 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_usage" {
     s3_origin_config {
       origin_access_identity = "origin-access-identity/cloudfront/ABCDEFG1234567"
     }
+
+    origin_shield {
+      enabled = true
+      origin_shield_region = "sa-east-1"
+    }
   }
 
   enabled             = true
@@ -167,6 +603,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_usage" {
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
+    field_level_encryption_id = "test encryption"
   }
 
   # Cache behavior with precedence 0
@@ -229,6 +666,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_usage" {
 
   viewer_certificate {
     cloudfront_default_certificate = true
+    ssl_support_method = "vip"
   }
 }
 
@@ -240,6 +678,11 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_zero_usage" {
     s3_origin_config {
       origin_access_identity = "origin-access-identity/cloudfront/ABCDEFG1234567"
     }
+
+    origin_shield {
+      enabled = true
+      origin_shield_region = "sa-east-1"
+    }
   }
 
   enabled             = true
@@ -272,6 +715,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_zero_usage" {
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
+    field_level_encryption_id = "test encryption"
   }
 
   # Cache behavior with precedence 0
@@ -334,5 +778,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_zero_usage" {
 
   viewer_certificate {
     cloudfront_default_certificate = true
+    ssl_support_method = "vip"
   }
 }
