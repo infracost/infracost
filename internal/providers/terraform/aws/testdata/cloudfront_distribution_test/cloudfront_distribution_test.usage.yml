@@ -20,14 +20,14 @@ resource_usage:
       asia_pacific: 1234 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
       india: 1234 # India
     monthly_http_requests:
-      us: 123400 # United States, Mexico, Canada
-      europe: 123400 # Europe, Israel
-      south_africa: 123400 # South Africa, Kenya, Middle East
-      south_america: 123400 # South America
-      japan: 123400 # Japan
-      australia: 123400 # Australia, New Zealand
-      asia_pacific: 123400 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
-      india: 123400 # India
+      us: 223400 # United States, Mexico, Canada
+      europe: 223400 # Europe, Israel
+      south_africa: 223400 # South Africa, Kenya, Middle East
+      south_america: 223400 # South America
+      japan: 223400 # Japan
+      australia: 223400 # Australia, New Zealand
+      asia_pacific: 223400 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      india: 223400 # India
     monthly_https_requests:
       us: 123400 # United States, Mexico, Canada
       europe: 123400 # Europe, Israel

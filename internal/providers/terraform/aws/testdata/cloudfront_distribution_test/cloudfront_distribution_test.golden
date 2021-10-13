@@ -125,14 +125,14 @@
  │  ├─ Hong Kong, Philippines, Asia Pacific                           1,234  GB                            $74.04 
  │  └─ India                                                          1,234  GB                           $197.44 
  ├─ HTTP requests                                                                                                 
- │  ├─ US, Mexico, Canada                                             12.34  10k requests                   $0.09 
- │  ├─ Europe, Israel                                                 12.34  10k requests                   $0.11 
- │  ├─ South Africa, Kenya, Middle East                               12.34  10k requests                   $0.11 
- │  ├─ South America                                                  12.34  10k requests                   $0.20 
- │  ├─ Japan                                                          12.34  10k requests                   $0.11 
- │  ├─ Australia, New Zealand                                         12.34  10k requests                   $0.11 
- │  ├─ Hong Kong, Philippines, Asia Pacific                           12.34  10k requests                   $0.11 
- │  └─ India                                                          12.34  10k requests                   $0.11 
+ │  ├─ US, Mexico, Canada                                             22.34  10k requests                   $0.17 
+ │  ├─ Europe, Israel                                                 22.34  10k requests                   $0.20 
+ │  ├─ South Africa, Kenya, Middle East                               22.34  10k requests                   $0.20 
+ │  ├─ South America                                                  22.34  10k requests                   $0.36 
+ │  ├─ Japan                                                          22.34  10k requests                   $0.20 
+ │  ├─ Australia, New Zealand                                         22.34  10k requests                   $0.20 
+ │  ├─ Hong Kong, Philippines, Asia Pacific                           22.34  10k requests                   $0.20 
+ │  └─ India                                                          22.34  10k requests                   $0.20 
  ├─ HTTPS requests                                                                                                
  │  ├─ US, Mexico, Canada                                             12.34  10k requests                   $0.12 
  │  ├─ Europe, Israel                                                 12.34  10k requests                   $0.15 
@@ -160,6 +160,6 @@
     ├─ Select data scanned                                Monthly cost depends on usage: $0.002 per GB            
     └─ Select data returned                               Monthly cost depends on usage: $0.0007 per GB           
                                                                                                                   
- OVERALL TOTAL                                                                                      $5,266,435.41 
+ OVERALL TOTAL                                                                                      $5,266,436.19 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
