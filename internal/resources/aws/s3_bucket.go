@@ -8,6 +8,7 @@ import (
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/infracost/infracost/internal/usage/aws"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 )
 
 type S3Bucket struct {
@@ -91,10 +92,6 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 
 	estimate := func(ctx context.Context, u map[string]interface{}) error {
 		// https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html
-		filter, err := aws.S3FindMetricsFilter(ctx, a.Region, a.Name)
-		if err != nil {
-			return err
-		}
 
 		storageMetricsMap := map[string]map[string]string{
 			"standard": {
@@ -146,7 +143,14 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 			}
 		}
 
-		if filter != "" {
+		filter, err := aws.S3FindMetricsFilter(ctx, a.Region, a.Name)
+		if err != nil {
+			return err
+		}
+
+		if filter == "" {
+			log.Debugf("Unable to find matching metrics filter for S3 bucket, so unable to sync additional metrics")
+		} else {
 			standardStorageClassUsage := u["standard"].(map[string]interface{})
 
 			monthlyTier1Requests, err := aws.S3GetBucketRequests(ctx, a.Region, a.Name, filter, []string{"PutRequests", "PostRequests", "ListRequests"})
