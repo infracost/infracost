@@ -50,11 +50,7 @@ func CreateBlankUsageFile(path string) (*UsageFile, error) {
 			Kind: yamlv3.MappingNode,
 		},
 	}
-	d, err := yamlv3.Marshal(usageFile)
-	if err != nil {
-		return usageFile, errors.Wrapf(err, "Error creating usage file")
-	}
-	err = ioutil.WriteFile(path, d, 0600)
+	err := usageFile.WriteToPath(path)
 	if err != nil {
 		return usageFile, errors.Wrapf(err, "Error creating usage file")
 	}
@@ -85,20 +81,45 @@ func LoadUsageFileFromString(s string) (*UsageFile, error) {
 func (u *UsageFile) WriteToPath(path string) error {
 	allCommented := u.dumpResourceUsages()
 
+	root := &yamlv3.Node{
+		Kind: yamlv3.MappingNode,
+		HeadComment: `You can use this file to define resource usage estimates for Infracost to use when calculating
+the cost of usage-based resource, such as AWS S3 or Lambda.
+` + "`infracost breakdown --usage-file infracost-usage.yml [other flags]`" + `
+See https://infracost.io/usage-file/ for docs`,
+	}
+
+	resourceUsagesKeyNode := &yamlv3.Node{
+		Kind:  yamlv3.ScalarNode,
+		Value: "resource_usages",
+	}
+	if allCommented {
+		markNodeAsComment(resourceUsagesKeyNode)
+	}
+
+	root.Content = append(root.Content,
+		&yamlv3.Node{
+			Kind:  yamlv3.ScalarNode,
+			Value: "version",
+		},
+		&yamlv3.Node{
+			Kind:  yamlv3.ScalarNode,
+			Value: u.Version,
+		},
+		resourceUsagesKeyNode,
+		&u.RawResourceUsage,
+	)
+
 	var buf bytes.Buffer
 	yamlEncoder := yamlv3.NewEncoder(&buf)
 	yamlEncoder.SetIndent(2)
-	err := yamlEncoder.Encode(u)
+	err := yamlEncoder.Encode(root)
 	if err != nil {
 		return err
 	}
 
 	b := buf.Bytes()
-
 	// If all the resources are commented then we also want to comment the resource_usage key
-	if allCommented {
-		b = bytes.Replace(b, []byte("resource_usage:"), []byte("# resource_usage:"), 1)
-	}
 	b = replaceCommentMarks(b)
 
 	err = ioutil.WriteFile(path, b, 0600)
