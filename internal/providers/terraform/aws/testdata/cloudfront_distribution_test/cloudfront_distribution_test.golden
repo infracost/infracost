@@ -52,6 +52,106 @@
     ├─ South Korea                                        Monthly cost depends on usage: $0.009 per 10k requests  
     └─ India                                              Monthly cost depends on usage: $0.009 per 10k requests  
                                                                                                                   
+ aws_cloudfront_distribution.s3_distribution_with_usage                                                           
+ ├─ Field level encryption requests                                   12.34  10k requests                   $0.25 
+ ├─ Real-time log requests                                            12.34  1M lines                       $0.12 
+ ├─ Dedicated IP custom SSLs                                             12  certificates               $7,200.00 
+ ├─ Invalidation requests (first 1k)                                  1,000  paths                          $0.00 
+ ├─ Invalidation requests (over 1k)                                  11,340  paths                         $56.70 
+ ├─ Data transfer out to internet                                                                                 
+ │  ├─ US, Mexico, Canada (first 10TB)                               10,240  GB                           $870.40 
+ │  ├─ US, Mexico, Canada (next 40TB)                                40,960  GB                         $3,276.80 
+ │  ├─ US, Mexico, Canada (next 100TB)                              102,400  GB                         $6,144.00 
+ │  ├─ US, Mexico, Canada (next 350TB)                              358,400  GB                        $14,336.00 
+ │  ├─ US, Mexico, Canada (next 524TB)                              536,576  GB                        $16,097.28 
+ │  ├─ US, Mexico, Canada (next 4PB)                              4,194,304  GB                       $104,857.60 
+ │  ├─ US, Mexico, Canada (over 5PB)                              7,097,120  GB                       $141,942.40 
+ │  ├─ Europe, Israel (first 10TB)                                   10,240  GB                           $870.40 
+ │  ├─ Europe, Israel (next 40TB)                                    40,960  GB                         $3,276.80 
+ │  ├─ Europe, Israel (next 100TB)                                  102,400  GB                         $6,144.00 
+ │  ├─ Europe, Israel (next 350TB)                                  358,400  GB                        $14,336.00 
+ │  ├─ Europe, Israel (next 524TB)                                  536,576  GB                        $16,097.28 
+ │  ├─ Europe, Israel (next 4PB)                                  4,194,304  GB                       $104,857.60 
+ │  ├─ Europe, Israel (over 5PB)                                  7,097,120  GB                       $141,942.40 
+ │  ├─ South Africa, Kenya, Middle East (first 10TB)                 10,240  GB                         $1,126.40 
+ │  ├─ South Africa, Kenya, Middle East (next 40TB)                  40,960  GB                         $4,300.80 
+ │  ├─ South Africa, Kenya, Middle East (next 100TB)                102,400  GB                         $9,216.00 
+ │  ├─ South Africa, Kenya, Middle East (next 350TB)                358,400  GB                        $28,672.00 
+ │  ├─ South Africa, Kenya, Middle East (next 524TB)                536,576  GB                        $32,194.56 
+ │  ├─ South Africa, Kenya, Middle East (next 4PB)                4,194,304  GB                       $209,715.20 
+ │  ├─ South Africa, Kenya, Middle East (over 5PB)                7,097,120  GB                       $283,884.80 
+ │  ├─ South America (first 10TB)                                    10,240  GB                         $1,126.40 
+ │  ├─ South America (next 40TB)                                     40,960  GB                         $4,300.80 
+ │  ├─ South America (next 100TB)                                   102,400  GB                         $9,216.00 
+ │  ├─ South America (next 350TB)                                   358,400  GB                        $28,672.00 
+ │  ├─ South America (next 524TB)                                   536,576  GB                        $32,194.56 
+ │  ├─ South America (next 4PB)                                   4,194,304  GB                       $209,715.20 
+ │  ├─ South America (over 5PB)                                   7,097,120  GB                       $283,884.80 
+ │  ├─ Japan (first 10TB)                                            10,240  GB                         $1,167.36 
+ │  ├─ Japan (next 40TB)                                             40,960  GB                         $3,645.44 
+ │  ├─ Japan (next 100TB)                                           102,400  GB                         $8,806.40 
+ │  ├─ Japan (next 350TB)                                           358,400  GB                        $30,105.60 
+ │  ├─ Japan (next 524TB)                                           536,576  GB                        $42,926.08 
+ │  ├─ Japan (next 4PB)                                           4,194,304  GB                       $293,601.28 
+ │  ├─ Japan (over 5PB)                                           7,097,120  GB                       $425,827.20 
+ │  ├─ Australia, New Zealand (first 10TB)                           10,240  GB                         $1,167.36 
+ │  ├─ Australia, New Zealand (next 40TB)                            40,960  GB                         $4,014.08 
+ │  ├─ Australia, New Zealand (next 100TB)                          102,400  GB                         $9,625.60 
+ │  ├─ Australia, New Zealand (next 350TB)                          358,400  GB                        $32,972.80 
+ │  ├─ Australia, New Zealand (next 524TB)                          536,576  GB                        $48,291.84 
+ │  ├─ Australia, New Zealand (next 4PB)                          4,194,304  GB                       $356,515.84 
+ │  ├─ Australia, New Zealand (over 5PB)                          7,097,120  GB                       $567,769.60 
+ │  ├─ Hong Kong, Philippines, Asia Pacific (first 10TB)             10,240  GB                         $1,228.80 
+ │  ├─ Hong Kong, Philippines, Asia Pacific (next 40TB)              40,960  GB                         $4,096.00 
+ │  ├─ Hong Kong, Philippines, Asia Pacific (next 100TB)            102,400  GB                         $9,728.00 
+ │  ├─ Hong Kong, Philippines, Asia Pacific (next 350TB)            358,400  GB                        $32,256.00 
+ │  ├─ Hong Kong, Philippines, Asia Pacific (next 524TB)            536,576  GB                        $42,926.08 
+ │  ├─ Hong Kong, Philippines, Asia Pacific (next 4PB)            4,194,304  GB                       $293,601.28 
+ │  ├─ Hong Kong, Philippines, Asia Pacific (over 5PB)            7,097,120  GB                       $425,827.20 
+ │  ├─ India (first 10TB)                                            10,240  GB                         $1,116.16 
+ │  ├─ India (next 40TB)                                             40,960  GB                         $3,481.60 
+ │  ├─ India (next 100TB)                                           102,400  GB                         $8,396.80 
+ │  ├─ India (next 350TB)                                           358,400  GB                        $28,672.00 
+ │  ├─ India (next 524TB)                                           536,576  GB                        $41,852.93 
+ │  ├─ India (next 4PB)                                           4,194,304  GB                       $314,572.80 
+ │  └─ India (over 5PB)                                           7,097,120  GB                       $510,992.64 
+ ├─ Data transfer out to origin                                                                                   
+ │  ├─ US, Mexico, Canada                                             1,234  GB                            $24.68 
+ │  ├─ Europe, Israel                                                 1,234  GB                            $24.68 
+ │  ├─ South Africa, Kenya, Middle East                               1,234  GB                            $74.04 
+ │  ├─ South America                                                  1,234  GB                           $154.25 
+ │  ├─ Japan                                                          1,234  GB                            $74.04 
+ │  ├─ Australia, New Zealand                                         1,234  GB                            $98.72 
+ │  ├─ Hong Kong, Philippines, Asia Pacific                           1,234  GB                            $74.04 
+ │  └─ India                                                          1,234  GB                           $197.44 
+ ├─ HTTP requests                                                                                                 
+ │  ├─ US, Mexico, Canada                                             12.34  10k requests                   $0.09 
+ │  ├─ Europe, Israel                                                 12.34  10k requests                   $0.11 
+ │  ├─ South Africa, Kenya, Middle East                               12.34  10k requests                   $0.11 
+ │  ├─ South America                                                  12.34  10k requests                   $0.20 
+ │  ├─ Japan                                                          12.34  10k requests                   $0.11 
+ │  ├─ Australia, New Zealand                                         12.34  10k requests                   $0.11 
+ │  ├─ Hong Kong, Philippines, Asia Pacific                           12.34  10k requests                   $0.11 
+ │  └─ India                                                          12.34  10k requests                   $0.11 
+ ├─ HTTPS requests                                                                                                
+ │  ├─ US, Mexico, Canada                                             12.34  10k requests                   $0.12 
+ │  ├─ Europe, Israel                                                 12.34  10k requests                   $0.15 
+ │  ├─ South Africa, Kenya, Middle East                               12.34  10k requests                   $0.15 
+ │  ├─ South America                                                  12.34  10k requests                   $0.27 
+ │  ├─ Japan                                                          12.34  10k requests                   $0.15 
+ │  ├─ Australia, New Zealand                                         12.34  10k requests                   $0.15 
+ │  ├─ Hong Kong, Philippines, Asia Pacific                           12.34  10k requests                   $0.15 
+ │  └─ India                                                          12.34  10k requests                   $0.15 
+ └─ Origin shield HTTP requests                                                                                   
+    ├─ US                                                             12.34  10k requests                   $0.09 
+    ├─ Europe                                                         12.34  10k requests                   $0.11 
+    ├─ South America                                                  12.34  10k requests                   $0.20 
+    ├─ Japan                                                          12.34  10k requests                   $0.11 
+    ├─ Australia                                                      12.34  10k requests                   $0.11 
+    ├─ Singapore                                                      12.34  10k requests                   $0.11 
+    ├─ South Korea                                                    12.34  10k requests                   $0.11 
+    └─ India                                                          12.34  10k requests                   $0.11 
+                                                                                                                  
  aws_s3_bucket.b                                                                                                  
  └─ Standard                                                                                                      
     ├─ Storage                                            Monthly cost depends on usage: $0.023 per GB            
@@ -60,6 +160,6 @@
     ├─ Select data scanned                                Monthly cost depends on usage: $0.002 per GB            
     └─ Select data returned                               Monthly cost depends on usage: $0.0007 per GB           
                                                                                                                   
- OVERALL TOTAL                                                                                              $0.00 
+ OVERALL TOTAL                                                                                      $5,266,435.41 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
