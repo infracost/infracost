@@ -225,7 +225,9 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 			}
 		}
 
-		item.Value = val
+		if val != nil {
+			item.Value = val
+		}
 	}
 }
 
