@@ -36,6 +36,7 @@ func WithTestEndpoint(ctx context.Context, url string) context.Context {
 	ctx = context.WithValue(ctx, ctxConfigOptsKey, opts)
 
 	s3Opts := func(o *s3.Options) {
+		// We need this so the SDK doesn't use a subdomain for its requests
 		o.UsePathStyle = true
 	}
 

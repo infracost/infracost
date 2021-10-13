@@ -117,6 +117,8 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 			},
 		}
 
+		// We want to check all storage classes, not just the ones that have been added by the lifecycle policy or previous
+		// usage data, so that any additional storage classes that have estimated data will be added when we reload the resources.
 		for _, storageClass := range a.AllStorageClasses() {
 			if _, ok := storageMetricsMap[storageClass.UsageKey()]; !ok {
 				continue
@@ -133,6 +135,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 					return err
 				}
 
+				// Always add usage for the Standard storage class, but skip others that have no data.
 				if storageBytes > 0 || storageClass.UsageKey() == "standard" {
 					storageClassUsage[usageKey] = storageBytes / 1000 / 1000 / 1000
 				}
