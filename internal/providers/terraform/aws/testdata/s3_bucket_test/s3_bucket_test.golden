@@ -12,6 +12,8 @@
  ├─ Intelligent tiering                                                                             
  │  ├─ Storage (frequent access)            Monthly cost depends on usage: $0.023 per GB            
  │  ├─ Storage (infrequent access)          Monthly cost depends on usage: $0.0125 per GB           
+ │  ├─ Storage (archive access)             Monthly cost depends on usage: $0.004 per GB            
+ │  ├─ Storage (deep archive access)        Monthly cost depends on usage: $0.00099 per GB          
  │  ├─ Monitoring and automation            Monthly cost depends on usage: $0.0025 per 1k objects   
  │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.005 per 1k requests   
  │  ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.0004 per 1k requests  
@@ -75,6 +77,8 @@
  ├─ Intelligent tiering                                                                             
  │  ├─ Storage (frequent access)                       20,000  GB                           $460.00 
  │  ├─ Storage (infrequent access)                     20,000  GB                           $250.00 
+ │  ├─ Storage (archive access)                        20,000  GB                            $80.00 
+ │  ├─ Storage (deep archive access)                   20,000  GB                            $19.80 
  │  ├─ Monitoring and automation                           20  1k objects                     $0.05 
  │  ├─ PUT, COPY, POST, LIST requests                      20  1k requests                    $0.10 
  │  ├─ GET, SELECT, and all other requests                 20  1k requests                    $0.01 
@@ -127,6 +131,6 @@
     ├─ Retrievals (bulk)                               60,000  GB                           $150.00 
     └─ Early delete (within 180 days)                  60,000  GB                            $59.40 
                                                                                                     
- OVERALL TOTAL                                                                           $11,885.98 
+ OVERALL TOTAL                                                                           $11,985.78 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

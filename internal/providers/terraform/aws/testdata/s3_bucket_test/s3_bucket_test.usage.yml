@@ -12,6 +12,8 @@ resource_usage:
     intelligent_tiering:
       frequent_access_storage_gb:            20000
       infrequent_access_storage_gb:          20000
+      archive_access_storage_gb:             20000
+      deep_archive_access_storage_gb:        20000
       monthly_tier_1_requests:               20000
       monthly_tier_2_requests:               20000
       monthly_select_data_scanned_gb:        20000
