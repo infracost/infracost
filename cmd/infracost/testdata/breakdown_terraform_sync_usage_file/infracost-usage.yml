@@ -9,7 +9,7 @@ resource_usage:
   aws_nat_gateway.example_each[*]:
     monthly_data_processed_gb: 2.0 # Monthly data processed by the NAT Gateway in GB.
   aws_nat_gateway.example_each["assets"]:
-    monthly_data_processed_gb: 0.0 # Monthly data processed by the NAT Gateway in GB.
+    monthly_data_processed_gb: 4.0 # Monthly data processed by the NAT Gateway in GB.
   # aws_nat_gateway.example_each["media"]:
     # monthly_data_processed_gb: 0.0 # Monthly data processed by the NAT Gateway in GB.
   aws_cloudwatch_log_group.production_logs[*]:

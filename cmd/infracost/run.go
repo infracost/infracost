@@ -137,7 +137,13 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 			remediateUsage(runCtx, ctx, syncResult)
 
+			// usageFile has been modified by SyncUsageData to be able to write commented usage, we need to reload it to get a fresh usageData from the file.
+			usageFile, err := usage.LoadUsageFile(projectCfg.UsageFile, false)
+			if err != nil {
+				return err
+			}
 			usageData := usageFile.ToUsageDataMap()
+
 			providerProjects, err = provider.LoadResources(usageData)
 			if err != nil {
 				spinner.Fail()
