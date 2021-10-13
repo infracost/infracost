@@ -2,11 +2,13 @@ package aws
 
 import (
 	"fmt"
-	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/usage"
+	"strconv"
+
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strconv"
+
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type regionData struct {
@@ -236,8 +238,8 @@ func httpRequests(u *schema.UsageData) *schema.Resource {
 	}
 
 	var uMap map[string]gjson.Result
-	if u != nil && u.Get("monthly_https_requests").Exists() {
-		uMap = u.Get("monthly_https_requests").Map()
+	if u != nil && u.Get("monthly_http_requests").Exists() {
+		uMap = u.Get("monthly_http_requests").Map()
 	}
 
 	regionsData := []*regionData{
