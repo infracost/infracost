@@ -18,7 +18,7 @@
  google_compute_instance.preemptible_gpu                                                       
  ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)          730  hours       $116.80 
  ├─ Standard provisioned storage (pd-standard)                         10  GiB           $0.40 
- └─ NVIDIA Tesla K80 (preemptible)                                  2,920  hours       $394.20 
+ └─ NVIDIA Tesla K80 (preemptible)                                  2,920  hours       $109.50 
                                                                                                
  google_compute_instance.preemptible_local_ssd                                                 
  ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)                730  hours         $2.56 
@@ -33,4 +33,4 @@
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                  730  hours         $3.88 
  └─ Standard provisioned storage (pd-standard)                         10  GiB           $0.40 
                                                                                                
- OVERALL TOTAL                                                                       $1,923.12 
+ OVERALL TOTAL                                                                       $1,638.42 
