@@ -44,19 +44,25 @@ var S3BucketUsageSchema = []*schema.UsageItem{
 	{Key: "glacier_deep_archive", DefaultValue: &usage.ResourceUsage{Name: "glacier_deep_archive", Items: S3GlacierDeepArchiveStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
 }
 
+func (a *S3Bucket) AllStorageClasses() []S3StorageClass {
+	if a.allStorageClasses == nil {
+		a.allStorageClasses = []S3StorageClass{
+			&S3StandardStorageClass{Region: a.Region},
+			&S3IntelligentTieringStorageClass{Region: a.Region},
+			&S3StandardInfrequentAccessStorageClass{Region: a.Region},
+			&S3OneZoneInfrequentAccessStorageClass{Region: a.Region},
+			&S3GlacierStorageClass{Region: a.Region},
+			&S3GlacierDeepArchiveStorageClass{Region: a.Region},
+		}
+	}
+
+	return a.allStorageClasses
+}
+
 func (a *S3Bucket) PopulateUsage(u *schema.UsageData) {
 	// Add the storage classes based on what's based through in the usage
 	// and any storage classes added in the lifecycle storage classes.
-	a.allStorageClasses = []S3StorageClass{
-		&S3StandardStorageClass{Region: a.Region},
-		&S3IntelligentTieringStorageClass{Region: a.Region},
-		&S3StandardInfrequentAccessStorageClass{Region: a.Region},
-		&S3OneZoneInfrequentAccessStorageClass{Region: a.Region},
-		&S3GlacierStorageClass{Region: a.Region},
-		&S3GlacierDeepArchiveStorageClass{Region: a.Region},
-	}
-
-	for _, storageClass := range a.allStorageClasses {
+	for _, storageClass := range a.AllStorageClasses() {
 		if stringInSlice(a.LifecycleStorageClasses, storageClass.UsageKey()) || (u != nil && !u.IsEmpty(storageClass.UsageKey())) {
 			// Populate the storage class usage using the map in the usage data
 			if u != nil {
@@ -96,7 +102,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 			},
 			"intelligent_tiering": {
 				"frequent_access_storage_gb":     "IntelligentTieringFAStorage",
-				"infrequent_access_storage_gb":   "IntelligentTieringFAStorage",
+				"infrequent_access_storage_gb":   "IntelligentTieringIAStorage",
 				"archive_access_storage_gb":      "IntelligentTieringAAStorage",
 				"deep_archive_access_storage_gb": "IntelligentTieringDAAStorage",
 			},
@@ -114,7 +120,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 			},
 		}
 
-		for _, storageClass := range a.allStorageClasses {
+		for _, storageClass := range a.AllStorageClasses() {
 			if _, ok := storageMetricsMap[storageClass.UsageKey()]; !ok {
 				continue
 			}

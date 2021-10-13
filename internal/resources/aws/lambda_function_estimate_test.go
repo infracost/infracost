@@ -14,7 +14,7 @@ func TestLambda(t *testing.T) {
 		<GetMetricStatisticsResponse xmlns="http://monitoring.amazonaws.com/doc/2010-08-01/">
 		  <GetMetricStatisticsResult>
 		    <Datapoints>
-		      <member>
+				<member>
 		        <Unit>Count</Unit>
 		        <Sum>1234.0</Sum>
 		        <Timestamp>1970-01-01T00:00:00Z</Timestamp>
