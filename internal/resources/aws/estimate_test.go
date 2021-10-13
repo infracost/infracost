@@ -12,7 +12,6 @@ import (
 
 	"github.com/infracost/infracost/internal/schema"
 	awsusage "github.com/infracost/infracost/internal/usage/aws"
-	"github.com/stretchr/testify/assert"
 )
 
 type estimates struct {
@@ -62,11 +61,6 @@ func newEstimates(ctx context.Context, t *testing.T, resource *schema.Resource) 
 		t:     t,
 		usage: u,
 	}
-}
-
-func (sa estimates) mustHave(key string, expected interface{}) {
-	actual := sa.usage[key]
-	assert.Equal(sa.t, expected, actual)
 }
 
 type stubbedRequest struct {

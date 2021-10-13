@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	resources "github.com/infracost/infracost/internal/resources/aws"
+	"github.com/stretchr/testify/assert"
 )
 
 func stubASGQuery(stub *stubbedAWS, name string, value float64) {
@@ -77,7 +78,7 @@ func TestAutoscalingGroupOSWithLaunchConfiguration(t *testing.T) {
 	}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
-	estimates.mustHave("operating_system", "windows")
+	assert.Equal(t, "windows", estimates.usage["operating_system"])
 }
 
 // Tests LaunchTemplate as a side effect.
@@ -93,7 +94,7 @@ func TestAutoscalingGroupOSWithLaunchTemplate(t *testing.T) {
 	}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
-	estimates.mustHave("operating_system", "windows")
+	assert.Equal(t, "windows", estimates.usage["operating_system"])
 }
 
 func TestAutoscalingGroupInstancesWithCloudWatch(t *testing.T) {
@@ -108,7 +109,7 @@ func TestAutoscalingGroupInstancesWithCloudWatch(t *testing.T) {
 	}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
-	estimates.mustHave("instances", int64(3))
+	assert.Equal(t, int64(3), estimates.usage["instances"])
 }
 
 func TestAutoscalingGroupInstancesWithoutCloudWatch(t *testing.T) {
@@ -124,5 +125,5 @@ func TestAutoscalingGroupInstancesWithoutCloudWatch(t *testing.T) {
 	}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
-	estimates.mustHave("instances", int64(5))
+	assert.Equal(t, int64(5), estimates.usage["instances"])
 }

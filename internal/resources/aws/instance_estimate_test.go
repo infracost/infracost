@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	resources "github.com/infracost/infracost/internal/resources/aws"
+	"github.com/stretchr/testify/assert"
 )
 
 func stubDescribeImages(stub *stubbedAWS, ami string, usageOp string) {
@@ -58,6 +59,6 @@ func TestInstanceOS(t *testing.T) {
 		args := resources.Instance{AMI: ami}
 		resource := args.BuildResource()
 		estimates := newEstimates(stub.ctx, t, resource)
-		estimates.mustHave("operating_system", os)
+		assert.Equal(t, os, estimates.usage["operating_system"])
 	}
 }

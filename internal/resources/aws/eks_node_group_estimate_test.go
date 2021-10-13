@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	resources "github.com/infracost/infracost/internal/resources/aws"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEKSNodeGroupOS(t *testing.T) {
@@ -13,7 +14,7 @@ func TestEKSNodeGroupOS(t *testing.T) {
 	args := resources.EKSNodeGroup{}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
-	estimates.mustHave("operating_system", "linux")
+	assert.Equal(t, "linux", estimates.usage["operating_system"])
 }
 
 // Tests LaunchTemplate as a side effect.
@@ -28,5 +29,5 @@ func TestEKSNodeGroupOSWithLaunchTemplate(t *testing.T) {
 	}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
-	estimates.mustHave("operating_system", "windows")
+	assert.Equal(t, "windows", estimates.usage["operating_system"])
 }
