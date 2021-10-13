@@ -4,6 +4,9 @@
 # See https://infracost.io/usage-file/ for docs
 version: 0.1
 # resource_usages:
+  ##
+  ## The following usage values are all commented-out, you can uncomment resources and customize as needed.
+  ##
   # aws_cloudfront_distribution.no_usage:
     # monthly_data_transfer_to_internet_gb:
       # us: 0 # United States, Mexico, Canada

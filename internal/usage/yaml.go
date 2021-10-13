@@ -2,6 +2,7 @@ package usage
 
 import (
 	"bytes"
+	"strings"
 
 	yamlv3 "gopkg.in/yaml.v3"
 )
@@ -13,6 +14,11 @@ const yamlCommentMark = "00__"
 // especially when we have edge cases like resources that are fully commented out
 func markNodeAsComment(node *yamlv3.Node) {
 	node.Value = yamlCommentMark + node.Value
+}
+
+// isNodeMarkedAsCommented returns true if the node is marked as commented
+func isNodeMarkedAsCommented(node *yamlv3.Node) bool {
+	return strings.HasPrefix(node.Value, yamlCommentMark)
 }
 
 // replaceCommentMarks replaces the comment marks in the YAML document with #

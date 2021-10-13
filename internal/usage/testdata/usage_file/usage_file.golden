@@ -123,6 +123,9 @@ resource_usages:
     # monthly_encryption_requests: 0 # Monthly number of field level encryption requests.
     # monthly_log_lines: 0 # Monthly number of real-time log lines.
     custom_ssl_certificates: 3 # Number of dedicated IP custom SSL certificates.
+  ##
+  ## The following usage values are all commented-out, you can uncomment resources and customize as needed.
+  ##
   # aws_cloudfront_distribution.no_usage:
     # monthly_data_transfer_to_internet_gb:
       # us: 0 # United States, Mexico, Canada

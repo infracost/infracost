@@ -110,6 +110,16 @@ See https://infracost.io/usage-file/ for docs`,
 		&u.RawResourceUsage,
 	)
 
+	// Add a comment to the first commented-out resource
+	for _, node := range u.RawResourceUsage.Content {
+		if isNodeMarkedAsCommented(node) {
+			node.HeadComment = `##
+## The following usage values are all commented-out, you can uncomment resources and customize as needed.
+##`
+			break
+		}
+	}
+
 	var buf bytes.Buffer
 	yamlEncoder := yamlv3.NewEncoder(&buf)
 	yamlEncoder.SetIndent(2)
