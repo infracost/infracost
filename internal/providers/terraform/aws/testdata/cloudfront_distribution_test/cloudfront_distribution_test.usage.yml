@@ -51,6 +51,22 @@ resource_usage:
     monthly_log_lines: 12340000 # Monthly number of real-time log lines.
     custom_ssl_certificates: 12 # Number of dedicated IP custom SSL certificates.
 
+  aws_cloudfront_distribution.s3_distribution_with_single_non_default_usage:
+    monthly_data_transfer_to_internet_gb:
+      europe: 22340000 # Europe, Israel
+    monthly_data_transfer_to_origin_gb:
+      europe: 2234 # Europe, Israel
+    monthly_http_requests:
+      europe: 223402 # Europe, Israel
+    monthly_https_requests:
+      europe: 223400 # Europe, Israel
+    monthly_shield_requests:
+      europe: 223 # Europe
+    monthly_invalidation_requests: 12340 # Monthly number of invalidation requests.
+    monthly_encryption_requests: 123400 # Monthly number of field level encryption requests.
+    monthly_log_lines: 12340000 # Monthly number of real-time log lines.
+    custom_ssl_certificates: 12 # Number of dedicated IP custom SSL certificates.
+
   aws_cloudfront_distribution.s3_distribution_with_zero_usage:
     monthly_data_transfer_to_internet_gb:
       us: 0 # United States, Mexico, Canada
