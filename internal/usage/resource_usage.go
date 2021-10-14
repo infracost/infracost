@@ -180,6 +180,8 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 					rawFloat = f
 				case int64:
 					rawFloat = float64(f)
+				case int:
+					rawFloat = float64(f)
 				}
 
 				// Format the float with as few decimal places as necessary

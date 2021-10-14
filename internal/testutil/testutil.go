@@ -267,13 +267,13 @@ func CalcGoldenFileTestdataDirName() string {
 func AssertFileEqual(t *testing.T, actualFilePath, expectedFilePath string) {
 	expected := []byte("")
 	if _, err := os.Stat(expectedFilePath); err == nil || !os.IsNotExist(err) {
-		expected, err = ioutil.ReadFile(expectedFilePath)
+		expected, err = os.ReadFile(expectedFilePath)
 		assert.NoError(t, err)
 	}
 
 	actual := []byte("")
 	if _, err := os.Stat(actualFilePath); err == nil || !os.IsNotExist(err) {
-		actual, err = ioutil.ReadFile(actualFilePath)
+		actual, err = os.ReadFile(actualFilePath)
 		assert.NoError(t, err)
 	}
 

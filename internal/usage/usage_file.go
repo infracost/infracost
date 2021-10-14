@@ -90,7 +90,7 @@ See https://infracost.io/usage-file/ for docs`,
 
 	resourceUsagesKeyNode := &yamlv3.Node{
 		Kind:  yamlv3.ScalarNode,
-		Value: "resource_usages",
+		Value: "resource_usage",
 	}
 	if allCommented {
 		markNodeAsComment(resourceUsagesKeyNode)

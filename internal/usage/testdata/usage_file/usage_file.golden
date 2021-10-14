@@ -3,7 +3,7 @@
 # `infracost breakdown --usage-file infracost-usage.yml [other flags]`
 # See https://infracost.io/usage-file/ for docs
 version: 0.1
-resource_usages:
+resource_usage:
   aws_instance.with_usage:
     operating_system: windows # Override the operating system of the instance, can be: linux, windows, suse, rhel.
     reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.

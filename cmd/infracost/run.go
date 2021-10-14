@@ -142,6 +142,31 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			if err != nil {
 				return err
 			}
+
+			// Merge wildcard usages into individual usage
+			wildCardUsage := make(map[string]*usage.ResourceUsage)
+			for _, us := range usageFile.ResourceUsages {
+				if strings.HasSuffix(us.Name, "[*]") {
+					lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
+					prefixName := us.Name[:lastIndexOfOpenBracket]
+					wildCardUsage[prefixName] = us
+				}
+			}
+
+			for _, us := range usageFile.ResourceUsages {
+				if strings.HasSuffix(us.Name, "[*]") {
+					continue
+				}
+
+				if !strings.HasSuffix(us.Name, "]") {
+					continue
+				}
+				lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
+				prefixName := us.Name[:lastIndexOfOpenBracket]
+
+				usage.MergeResourceUsage(us, wildCardUsage[prefixName])
+
+			}
 			usageData := usageFile.ToUsageDataMap()
 
 			providerProjects, err = provider.LoadResources(usageData)

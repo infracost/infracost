@@ -5,7 +5,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_sync_usa
  Name                                                   Monthly Qty  Unit              Monthly Cost 
                                                                                                     
  aws_cloudwatch_log_group.production_logs["assets"]                                                 
- ├─ Data ingested                                    Monthly cost depends on usage: $0.50 per GB    
+ ├─ Data ingested                                               100  GB                      $50.00 
  ├─ Archival Storage                                          1,000  GB                      $30.00 
  └─ Insights queries data scanned                    Monthly cost depends on usage: $0.005 per GB   
                                                                                                     
@@ -30,6 +30,6 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_sync_usa
  ├─ NAT gateway                                                 730  hours                   $32.85 
  └─ Data processed                                                2  GB                       $0.09 
                                                                                                     
- OVERALL TOTAL                                                                              $201.12 
+ OVERALL TOTAL                                                                              $251.12 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

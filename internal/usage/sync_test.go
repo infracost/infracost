@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMergeResourceUsages(t *testing.T) {
+func TestReplaceResourceUsages(t *testing.T) {
 	dest := &ResourceUsage{
 		Name: "resource",
 		Items: []*schema.UsageItem{
@@ -68,7 +68,7 @@ func TestMergeResourceUsages(t *testing.T) {
 		},
 	}
 
-	mergeResourceUsages(dest, src, MergeResourceUsagesOpts{})
+	replaceResourceUsages(dest, src, ReplaceResourceUsagesOpts{})
 
 	assert.Len(t, dest.Items, 5)
 	assert.Equal(t, int64(1), dest.Items[0].DefaultValue.(int64))
@@ -83,7 +83,7 @@ func TestMergeResourceUsages(t *testing.T) {
 	assert.Equal(t, int64(50), dest.Items[4].Value.(int64))
 }
 
-func TestMergeResourceUsagesSubResources(t *testing.T) {
+func TestReplaceResourceUsagesSubResources(t *testing.T) {
 	dest := &ResourceUsage{
 		Name: "resource",
 		Items: []*schema.UsageItem{
@@ -192,7 +192,7 @@ func TestMergeResourceUsagesSubResources(t *testing.T) {
 		},
 	}
 
-	mergeResourceUsages(dest, src, MergeResourceUsagesOpts{})
+	replaceResourceUsages(dest, src, ReplaceResourceUsagesOpts{})
 
 	assert.Len(t, dest.Items, 3)
 
@@ -220,7 +220,7 @@ func TestMergeResourceUsagesSubResources(t *testing.T) {
 	assert.Equal(t, int64(10), subResource3.Items[0].Value.(int64))
 }
 
-func TestMergeResourceUsagesTypes(t *testing.T) {
+func TestReplaceResourceUsagesTypes(t *testing.T) {
 	newDest := func() *ResourceUsage {
 		return &ResourceUsage{
 			Name: "resource",
@@ -248,7 +248,7 @@ func TestMergeResourceUsagesTypes(t *testing.T) {
 	}
 
 	dest := newDest()
-	mergeResourceUsages(dest, src, MergeResourceUsagesOpts{OverrideValueType: true})
+	replaceResourceUsages(dest, src, ReplaceResourceUsagesOpts{OverrideValueType: true})
 
 	assert.Len(t, dest.Items, 1)
 	assert.Equal(t, schema.Float64, dest.Items[0].ValueType)
@@ -256,7 +256,7 @@ func TestMergeResourceUsagesTypes(t *testing.T) {
 	assert.Equal(t, float64(10), dest.Items[0].Value.(float64))
 
 	dest = newDest()
-	mergeResourceUsages(dest, src, MergeResourceUsagesOpts{OverrideValueType: false})
+	replaceResourceUsages(dest, src, ReplaceResourceUsagesOpts{OverrideValueType: false})
 
 	assert.Len(t, dest.Items, 1)
 	assert.Equal(t, schema.Int64, dest.Items[0].ValueType)
@@ -264,7 +264,7 @@ func TestMergeResourceUsagesTypes(t *testing.T) {
 	assert.Equal(t, float64(10), dest.Items[0].Value.(float64))
 }
 
-func TestMergeResourceUsagesDescription(t *testing.T) {
+func TestReplaceResourceUsagesDescription(t *testing.T) {
 	dest := &ResourceUsage{
 		Name: "resource",
 		Items: []*schema.UsageItem{
@@ -307,7 +307,7 @@ func TestMergeResourceUsagesDescription(t *testing.T) {
 		},
 	}
 
-	mergeResourceUsages(dest, src, MergeResourceUsagesOpts{})
+	replaceResourceUsages(dest, src, ReplaceResourceUsagesOpts{})
 
 	assert.Len(t, dest.Items, 3)
 	assert.Equal(t, "Src description 1", dest.Items[0].Description)
@@ -315,7 +315,7 @@ func TestMergeResourceUsagesDescription(t *testing.T) {
 	assert.Equal(t, "Dest description 3", dest.Items[2].Description)
 }
 
-func TestMergeResourceUsageWithUsageData(t *testing.T) {
+func TestReplaceResourceUsageWithUsageData(t *testing.T) {
 	dest := &ResourceUsage{
 		Name: "resource",
 		Items: []*schema.UsageItem{
@@ -354,7 +354,7 @@ func TestMergeResourceUsageWithUsageData(t *testing.T) {
 	assert.Equal(t, int64(30), dest.Items[2].Value.(int64))
 }
 
-func TestMergeResourceUsageWithUsageDataDeep(t *testing.T) {
+func TestReplaceResourceUsageWithUsageDataDeep(t *testing.T) {
 	dest := &ResourceUsage{
 		Name: "resource",
 		Items: []*schema.UsageItem{

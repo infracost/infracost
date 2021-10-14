@@ -17,7 +17,7 @@ type SyncResult struct {
 	EstimationErrors map[string]error
 }
 
-type MergeResourceUsagesOpts struct {
+type ReplaceResourceUsagesOpts struct {
 	OverrideValueType bool
 }
 
@@ -53,7 +53,6 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 		existingOrder = append(existingOrder, resourceUsage.Name)
 	}
 
-	sortResourcesExistingFirst(resources, existingResourceOrder)
 	wildCardResources := make(map[string]bool)
 
 	for _, resource := range resources {
@@ -73,17 +72,19 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 					// Merge the usage schema from the reference usage file
 					refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
 					if refResourceUsage != nil {
-						mergeResourceUsages(resourceUsage, refResourceUsage, MergeResourceUsagesOpts{})
+						replaceResourceUsages(resourceUsage, refResourceUsage, ReplaceResourceUsagesOpts{})
 					}
 
 					// Merge the usage schema from the resource struct
-					mergeResourceUsages(resourceUsage, &ResourceUsage{
+					// We want to override the value type from the usage schema since we can't always tell from the YAML
+					// what the value type should be, e.g. user might add an int value for a float attribute.
+					replaceResourceUsages(resourceUsage, &ResourceUsage{
 						Name:  wildCardName,
 						Items: resource.UsageSchema,
-					}, MergeResourceUsagesOpts{})
+					}, ReplaceResourceUsagesOpts{OverrideValueType: true})
 
-					mergeResourceUsages(resourceUsage, existingResourceUsage, MergeResourceUsagesOpts{})
-					resourcesUsages = append(resourcesUsages, resourceUsage)
+					replaceResourceUsages(resourceUsage, existingResourceUsage, ReplaceResourceUsagesOpts{})
+					resourceUsages = append(resourceUsages, resourceUsage)
 				}
 			}
 		}
@@ -95,21 +96,21 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 		// Merge the usage schema from the reference usage file
 		refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
 		if refResourceUsage != nil {
-			mergeResourceUsages(resourceUsage, refResourceUsage, MergeResourceUsagesOpts{})
+			replaceResourceUsages(resourceUsage, refResourceUsage, ReplaceResourceUsagesOpts{})
 		}
 
 		// Merge the usage schema from the resource struct
 		// We want to override the value type from the usage schema since we can't always tell from the YAML
 		// what the value type should be, e.g. user might add an int value for a float attribute.
-		mergeResourceUsages(resourceUsage, &ResourceUsage{
+		replaceResourceUsages(resourceUsage, &ResourceUsage{
 			Name:  resource.Name,
 			Items: resource.UsageSchema,
-		}, MergeResourceUsagesOpts{OverrideValueType: true})
+		}, ReplaceResourceUsagesOpts{OverrideValueType: true})
 
 		// Merge any existing resource usage
 		existingResourceUsage := existingResourceUsagesMap[resource.Name]
 		if existingResourceUsage != nil {
-			mergeResourceUsages(resourceUsage, existingResourceUsage, MergeResourceUsagesOpts{})
+			replaceResourceUsages(resourceUsage, existingResourceUsage, ReplaceResourceUsagesOpts{})
 		}
 
 		syncResult.ResourceCount++
@@ -138,7 +139,67 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 	return syncResult
 }
 
-func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage, opts MergeResourceUsagesOpts) {
+// MergeResourceUsage merge ResourceItem from src to dest without overiding dest
+func MergeResourceUsage(dest *ResourceUsage, src *ResourceUsage) {
+	if dest == nil || src == nil {
+		return
+	}
+
+	destItemMap := make(map[string]*schema.UsageItem, len(dest.Items))
+	for _, item := range dest.Items {
+		destItemMap[item.Key] = item
+	}
+
+	for _, srcItem := range src.Items {
+		destItem, ok := destItemMap[srcItem.Key]
+		if !ok {
+			destItem = &schema.UsageItem{Key: srcItem.Key}
+			dest.Items = append(dest.Items, destItem)
+		}
+
+		if srcItem.ValueType == schema.SubResourceUsage {
+			if srcItem.DefaultValue != nil {
+				srcDefaultValue := srcItem.DefaultValue.(*ResourceUsage)
+				if destItem.DefaultValue == nil {
+					destItem.DefaultValue = &ResourceUsage{
+						Name: srcDefaultValue.Name,
+					}
+				}
+				MergeResourceUsage(destItem.DefaultValue.(*ResourceUsage), srcDefaultValue)
+			}
+
+			if srcItem.Value != nil {
+				srcValue := srcItem.Value.(*ResourceUsage)
+				if destItem.Value == nil {
+					destItem.Value = destItem.DefaultValue
+				}
+				if destItem.Value == nil {
+					destItem.Value = &ResourceUsage{
+						Name: srcValue.Name,
+					}
+				}
+				MergeResourceUsage(destItem.Value.(*ResourceUsage), srcValue)
+			}
+		} else if destItem.Value == nil {
+			destItem.ValueType = srcItem.ValueType
+
+			if srcItem.Description != "" {
+				destItem.Description = srcItem.Description
+			}
+
+			if srcItem.DefaultValue != nil {
+				destItem.DefaultValue = srcItem.DefaultValue
+			}
+
+			if srcItem.Value != nil {
+				destItem.Value = srcItem.Value
+			}
+		}
+	}
+}
+
+// replaceResourceUsages override usageItems from dest with usageItems from src
+func replaceResourceUsages(dest *ResourceUsage, src *ResourceUsage, opts ReplaceResourceUsagesOpts) {
 	if dest == nil || src == nil {
 		return
 	}
@@ -171,7 +232,7 @@ func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage, opts MergeReso
 						Name: srcDefaultValue.Name,
 					}
 				}
-				mergeResourceUsages(destItem.DefaultValue.(*ResourceUsage), srcDefaultValue, opts)
+				replaceResourceUsages(destItem.DefaultValue.(*ResourceUsage), srcDefaultValue, opts)
 			}
 
 			if srcItem.Value != nil {
@@ -184,7 +245,7 @@ func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage, opts MergeReso
 						Name: srcValue.Name,
 					}
 				}
-				mergeResourceUsages(destItem.Value.(*ResourceUsage), srcValue, opts)
+				replaceResourceUsages(destItem.Value.(*ResourceUsage), srcValue, opts)
 			}
 		} else {
 			if srcItem.DefaultValue != nil {
@@ -268,10 +329,10 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 	}
 }
 
-// sortResourcesExistingFirst sorts the resources by the existing order first, and then the rest by name
+// sortResourceUsages sorts the resources by the existing order first, and then the rest by name
 // Keep multiple-resource (count or each) together even if they are not in the existing
 // order
-func sortResourcesExistingFirst(resources []*schema.Resource, existingResourceOrder []string) {
+func sortResourceUsages(resourceUsages []*ResourceUsage, existingOrder []string) {
 	sort.Slice(resourceUsages, func(i, j int) bool {
 		iExistingIndex := indexOf(resourceUsages[i].Name, existingOrder)
 		jExistingIndex := indexOf(resourceUsages[j].Name, existingOrder)
@@ -281,7 +342,7 @@ func sortResourcesExistingFirst(resources []*schema.Resource, existingResourceOr
 			// this happens when the resource usage does not exists but the wildcard resource
 			// usage exists
 			if jExistingIndex == iExistingIndex {
-				return resources[i].Name < resources[j].Name
+				return resourceUsages[i].Name < resourceUsages[j].Name
 			}
 			return iExistingIndex < jExistingIndex
 		}
