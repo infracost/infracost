@@ -16,7 +16,6 @@ type regionData struct {
 	awsGroupedName string
 	priceRegion    string
 	usageKey       string
-	showNil        bool
 }
 
 var (
@@ -24,13 +23,14 @@ var (
 	tierLimits = []int{10240, 40960, 102400, 358400, 536576, 4194304}
 	tierNames  = []string{"first 10TB", "next 40TB", "next 100TB", "next 350TB", "next 524TB", "next 4PB", "over 5PB"}
 
+	defaultRegion = &regionData{
+		awsGroupedName: "US, Mexico, Canada",
+		priceRegion:    "United States",
+		usageKey:       "us",
+	}
+
 	regionsData = []*regionData{
-		{
-			awsGroupedName: "US, Mexico, Canada",
-			priceRegion:    "United States",
-			usageKey:       "us",
-			showNil:        true,
-		},
+		defaultRegion,
 		{
 			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
@@ -154,11 +154,21 @@ func newCloudfrontRegionUsage(u *schema.UsageData) cloudfrontRegionUsage {
 
 func (c cloudfrontRegionUsage) toSubResources() []*schema.Resource {
 	var resources []*schema.Resource
-	for _, regData := range regionsData {
-		if _, ok := c.definitions[regData.usageKey]; !ok && !regData.showNil {
-			continue
-		}
 
+	var toProcess []*regionData
+	for _, regData := range regionsData {
+		// filter out the regions that don't have usage definitions
+		if _, ok := c.definitions[regData.usageKey]; ok {
+			toProcess = append(toProcess, regData)
+		}
+	}
+
+	// if we don't have any usage definitions so the default US region for output
+	if len(toProcess) == 0 {
+		toProcess = append(toProcess, defaultRegion)
+	}
+
+	for _, regData := range toProcess {
 		resource := &schema.Resource{
 			Name: regData.awsGroupedName,
 		}
