@@ -2,16 +2,20 @@ package aws
 
 import (
 	"context"
+	"math"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage/aws"
 	"github.com/shopspring/decimal"
 )
 
 type EKSNodeGroup struct {
 	// "required" args that can't really be missing.
-	Address string
-	Region  string
+	Address     string
+	Region      string
+	Name        string
+	ClusterName string
 
 	InstanceType   string
 	PurchaseOption string
@@ -126,12 +130,39 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 
 	estimate := func(ctx context.Context, u map[string]interface{}) error {
 		err := estimateInstanceQualities(ctx, u)
+		if err != nil {
+			return err
+		}
+
 		// By default (no LaunchTemplate), instances use Amazon Linux 2 AMI."
 		// c.f. https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html
 		if _, ok := u["operating_system"]; !ok {
 			u["operating_system"] = "linux"
 		}
-		return err
+
+		if a.ClusterName != "" && a.Name != "" {
+			// Sum the counts from the EKS Node Group's Autoscaling Groups
+			asgNames, err := aws.EKSGetNodeGroupAutoscalingGroups(ctx, a.Region, a.ClusterName, a.Name)
+			if err != nil {
+				return err
+			}
+			count := float64(0.0)
+
+			if len(asgNames) > 0 {
+				for _, asgName := range asgNames {
+					asgCount, err := aws.AutoscalingGetInstanceCount(ctx, a.Region, asgName)
+					if err != nil {
+						return err
+					}
+					count += asgCount
+				}
+			}
+
+			if count > 0 {
+				u["instances"] = int64(math.Round(count))
+			}
+		}
+		return nil
 	}
 	r.EstimateUsage = estimate
 

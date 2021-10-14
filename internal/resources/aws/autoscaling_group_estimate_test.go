@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func stubASGQuery(stub *stubbedAWS, name string, value float64) {
+func stubCloudWatchASGQuery(stub *stubbedAWS, name string, value float64) {
 	var datapoints string
 
 	if value > 0 {
@@ -32,7 +32,7 @@ func stubASGQuery(stub *stubbedAWS, name string, value float64) {
 	`)
 }
 
-func stubASGDescribe(stub *stubbedAWS, name string, count int64) {
+func stubEC2DescribeAutoscalingGroups(stub *stubbedAWS, name string, count int64) {
 	var instanceMembers string
 	var groupMember string
 
@@ -58,9 +58,9 @@ func stubASGDescribe(stub *stubbedAWS, name string, count int64) {
 		 	`+groupMember+`
 	    </AutoScalingGroups>
 	  </DescribeAutoScalingGroupsResult>
-	  <ResponseMetadata>
-	    <RequestId>8aea7709-e291-4e80-a89e-682e23109bb7</RequestId>
-	  </ResponseMetadata>
+		<ResponseMetadata>
+			<RequestId>00000000-0000-0000-0000-000000000000</RequestId>
+		</ResponseMetadata>
 	</DescribeAutoScalingGroupsResponse>
 	`)
 }
@@ -70,8 +70,8 @@ func TestAutoscalingGroupOSWithLaunchConfiguration(t *testing.T) {
 	stub := stubAWS(t)
 	defer stub.Close()
 
-	stubDescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002")
-	stubASGQuery(stub, "deadbeef", 1) // don't care
+	stubEC2DescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002")
+	stubCloudWatchASGQuery(stub, "deadbeef", 1) // don't care
 
 	args := resources.AutoscalingGroup{
 		LaunchConfiguration: &resources.LaunchConfiguration{AMI: "ami-0227c65b90645ae0c"},
@@ -86,8 +86,8 @@ func TestAutoscalingGroupOSWithLaunchTemplate(t *testing.T) {
 	stub := stubAWS(t)
 	defer stub.Close()
 
-	stubDescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002")
-	stubASGQuery(stub, "deadbeef", 1) // don't care
+	stubEC2DescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002")
+	stubCloudWatchASGQuery(stub, "deadbeef", 1) // don't care
 
 	args := resources.AutoscalingGroup{
 		LaunchTemplate: &resources.LaunchTemplate{AMI: "ami-0227c65b90645ae0c"},
@@ -101,8 +101,8 @@ func TestAutoscalingGroupInstancesWithCloudWatch(t *testing.T) {
 	stub := stubAWS(t)
 	defer stub.Close()
 
-	stubDescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002") // don't care
-	stubASGQuery(stub, "deadbeef", 3.14159)
+	stubEC2DescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002") // don't care
+	stubCloudWatchASGQuery(stub, "deadbeef", 3.14159)
 
 	args := resources.AutoscalingGroup{
 		Name: "deadbeef",
@@ -116,9 +116,9 @@ func TestAutoscalingGroupInstancesWithoutCloudWatch(t *testing.T) {
 	stub := stubAWS(t)
 	defer stub.Close()
 
-	stubDescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002") // don't care
-	stubASGQuery(stub, "deadbeef", 0)                                      // no results
-	stubASGDescribe(stub, "deadbeef", 5)
+	stubEC2DescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002") // don't care
+	stubCloudWatchASGQuery(stub, "deadbeef", 0)                               // no results
+	stubEC2DescribeAutoscalingGroups(stub, "deadbeef", 5)
 
 	args := resources.AutoscalingGroup{
 		Name: "deadbeef",

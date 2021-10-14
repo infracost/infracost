@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func stubDescribeTable(stub *stubbedAWS) {
+func stubDynamoDBDescribeTable(stub *stubbedAWS) {
 	stub.WhenBody(`{"TableName":""}`).Then(200, `{
     "Table": {
         "AttributeDefinitions": [],
@@ -31,7 +31,7 @@ func stubDescribeTable(stub *stubbedAWS) {
 func TestDynamoDBStorage(t *testing.T) {
 	stub := stubAWS(t)
 	defer stub.Close()
-	stubDescribeTable(stub)
+	stubDynamoDBDescribeTable(stub)
 
 	args := resources.DynamoDBTable{}
 	resource := args.BuildResource()
@@ -43,7 +43,7 @@ func TestDynamoDBStorage(t *testing.T) {
 func TestDynamoDBPayPerRequest(t *testing.T) {
 	stub := stubAWS(t)
 	defer stub.Close()
-	stubDescribeTable(stub)
+	stubDynamoDBDescribeTable(stub)
 	stub.WhenBody("MetricName=ConsumedReadCapacityUnits", "Statistics.member.1=Sum", "Unit=Count").Then(200, `
 	<GetMetricStatisticsResponse xmlns="http://monitoring.amazonaws.com/doc/2010-08-01/">
 	  <GetMetricStatisticsResult>
@@ -84,7 +84,7 @@ func TestDynamoDBPayPerRequest(t *testing.T) {
 func TestDynamoDBProvisioned(t *testing.T) {
 	stub := stubAWS(t)
 	defer stub.Close()
-	stubDescribeTable(stub)
+	stubDynamoDBDescribeTable(stub)
 
 	args := resources.DynamoDBTable{
 		BillingMode: "PROVISIONED",

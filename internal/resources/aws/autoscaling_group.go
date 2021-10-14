@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"math"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -99,7 +100,7 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 				return err
 			}
 			if count > 0 {
-				u["instances"] = int64(count)
+				u["instances"] = int64(math.Round(count))
 			}
 		}
 		return nil
