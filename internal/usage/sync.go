@@ -39,14 +39,13 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 	}
 
 	existingResourceUsagesMap := resourceUsagesMap(usageFile.ResourceUsages)
-	resourcesUsages := make([]*ResourceUsage, 0, len(resources))
+	resourceUsages := make([]*ResourceUsage, 0, len(resources))
 
-	existingResourceOrder := make([]string, 0, len(usageFile.ResourceUsages))
+	// Track the existing order so we can keep these at the top
+	existingOrder := make([]string, 0, len(usageFile.ResourceUsages))
 	for _, resourceUsage := range usageFile.ResourceUsages {
-		existingResourceOrder = append(existingResourceOrder, resourceUsage.Name)
+		existingOrder = append(existingOrder, resourceUsage.Name)
 	}
-
-	sortResourcesExistingFirst(resources, existingResourceOrder)
 
 	for _, resource := range resources {
 		resourceUsage := &ResourceUsage{
@@ -87,10 +86,12 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 			mergeResourceUsageWithUsageData(resourceUsage, estimatedUsageData)
 		}
 
-		resourcesUsages = append(resourcesUsages, resourceUsage)
+		resourceUsages = append(resourceUsages, resourceUsage)
 	}
 
-	usageFile.ResourceUsages = resourcesUsages
+	sortResourceUsages(resourceUsages, existingOrder)
+
+	usageFile.ResourceUsages = resourceUsages
 
 	return syncResult
 }
@@ -209,28 +210,46 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 }
 
 // sortResourcesExistingFirst sorts the resources by the existing order first, and then the rest by name
-func sortResourcesExistingFirst(resources []*schema.Resource, existingResourceOrder []string) {
-	sort.Slice(resources, func(i, j int) bool {
-		existingIndexI := indexOf(resources[i].Name, existingResourceOrder)
-		existingIndexJ := indexOf(resources[j].Name, existingResourceOrder)
+func sortResourceUsages(resourceUsages []*ResourceUsage, existingOrder []string) {
+	sort.Slice(resourceUsages, func(i, j int) bool {
+		iExistingIndex := indexOf(resourceUsages[i].Name, existingOrder)
+		jExistingIndex := indexOf(resourceUsages[j].Name, existingOrder)
 
 		// If both resources are in the existing resource order, sort by the existing resource order
-		if existingIndexI != -1 && existingIndexJ != -1 {
-			return existingIndexI < existingIndexJ
+		if iExistingIndex != -1 && jExistingIndex != -1 {
+			return iExistingIndex < jExistingIndex
 		}
 
 		// If one resource is in the existing resource order, sort it first
-		if existingIndexI == -1 && existingIndexJ != -1 {
+		if iExistingIndex == -1 && jExistingIndex != -1 {
 			return false
 		}
-
-		if existingIndexJ == -1 && existingIndexI != -1 {
+		if jExistingIndex == -1 && iExistingIndex != -1 {
 			return true
 		}
 
+		// If neither resource is in the existing resource order, sort resources that have a value first
+		iHasUsage := resourceUsageHasValue(resourceUsages[i])
+		jHasUsafe := resourceUsageHasValue(resourceUsages[j])
+		if iHasUsage && !jHasUsafe {
+			return true
+		}
+		if jHasUsafe && !iHasUsage {
+			return false
+		}
+
 		// Otherwise sort by name
-		return resources[i].Name < resources[j].Name
+		return resourceUsages[i].Name < resourceUsages[j].Name
 	})
+}
+
+func resourceUsageHasValue(resourceUsage *ResourceUsage) bool {
+	for _, item := range resourceUsage.Items {
+		if item.Value != nil {
+			return true
+		}
+	}
+	return false
 }
 
 func indexOf(s string, arr []string) int {
