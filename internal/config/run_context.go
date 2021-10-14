@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/infracost/infracost/internal/version"
 )
 
@@ -99,6 +101,11 @@ func (c *RunContext) SetCurrentProjectContext(ctx *ProjectContext) {
 	c.currentProjectCtx = ctx
 }
 
+// setProjectContextValue Set context value into currentProjectContext
+func (c *RunContext) setProjectContextValue(key string, value interface{}) {
+	c.currentProjectCtx.SetContextValue(key, value)
+}
+
 func (c *RunContext) loadInitialContextValues() {
 	c.SetContextValue("version", baseVersion(version.Version))
 	c.SetContextValue("fullVersion", version.Version)
@@ -109,6 +116,43 @@ func (c *RunContext) loadInitialContextValues() {
 	c.SetContextValue("ciScript", ciScript())
 	c.SetContextValue("ciPostCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
 	c.SetContextValue("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
+}
+
+// SetContextUsageSummary Set usage summary into current project context
+func (c *RunContext) SetContextUsageSummary(syncResult *usage.SyncResult) {
+	var usageSyncs, usageEstimates, usageEstimateErrors int
+	if syncResult != nil {
+		usageSyncs = syncResult.ResourceCount
+		usageEstimates = syncResult.EstimationCount
+		usageEstimateErrors = len(syncResult.EstimationErrors)
+	}
+	c.setProjectContextValue("usageSyncs", usageSyncs)
+	c.setProjectContextValue("usageEstimates", usageEstimates)
+	c.setProjectContextValue("usageEstimateErrors", usageEstimateErrors)
+}
+
+// SetContextRemediateUsage Set remedite usage into current project context
+func (c *RunContext) SetContextRemediateUsage(syncResult *usage.SyncResult) {
+
+	if syncResult == nil {
+		return
+	}
+
+	var remediable, remAttempts, remErrors int
+	for _, err := range syncResult.EstimationErrors {
+		if _, ok := err.(schema.Remediater); ok {
+			remediable++
+			// remAttempts++
+			// err = remediater.Remediate()
+			// if err != nil {
+			// 	remErrors++
+			// 	log.Warningf("Cannot enable estimation for %s: %s", name, err.Error())
+			// }
+		}
+	}
+	c.setProjectContextValue("remediationOpportunities", remediable)
+	c.setProjectContextValue("remediationAttempts", remAttempts)
+	c.setProjectContextValue("remediationErrors", remErrors)
 }
 
 func baseVersion(v string) string {

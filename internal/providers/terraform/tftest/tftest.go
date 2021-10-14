@@ -217,7 +217,7 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	usageFilePath := filepath.Join("testdata", testName, testName+".usage.yml")
 	if _, err := os.Stat(usageFilePath); err == nil || !os.IsNotExist(err) {
 		// usage file exists, load the data
-		usageFile, err := usage.LoadUsageFile(usageFilePath, false)
+		usageFile, err := usage.LoadUsageFile(usageFilePath)
 		require.NoError(t, err)
 		usageData = usageFile.ToUsageDataMap()
 	}
@@ -304,12 +304,7 @@ func RunSyncUsage(t *testing.T, runCtx *config.RunContext, tfProject TerraformPr
 		return nil, err
 	}
 
-	// If the usage file doesn't exist use a temp path so we don't write to the real path
-	if _, err := os.Stat(usageFilePath); os.IsNotExist(err) {
-		usageFilePath = filepath.Join(tmpDir, "existing_usage.yml")
-	}
-
-	usageFile, err := usage.LoadUsageFile(usageFilePath, true)
+	usageFile, err := usage.LoadUsageFile(usageFilePath)
 	if err != nil {
 		return nil, err
 	}

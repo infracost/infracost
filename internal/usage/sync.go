@@ -139,65 +139,6 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 	return syncResult
 }
 
-// MergeResourceUsage merge ResourceItem from src to dest without overiding dest
-func MergeResourceUsage(dest *ResourceUsage, src *ResourceUsage) {
-	if dest == nil || src == nil {
-		return
-	}
-
-	destItemMap := make(map[string]*schema.UsageItem, len(dest.Items))
-	for _, item := range dest.Items {
-		destItemMap[item.Key] = item
-	}
-
-	for _, srcItem := range src.Items {
-		destItem, ok := destItemMap[srcItem.Key]
-		if !ok {
-			destItem = &schema.UsageItem{Key: srcItem.Key}
-			dest.Items = append(dest.Items, destItem)
-		}
-
-		if srcItem.ValueType == schema.SubResourceUsage {
-			if srcItem.DefaultValue != nil {
-				srcDefaultValue := srcItem.DefaultValue.(*ResourceUsage)
-				if destItem.DefaultValue == nil {
-					destItem.DefaultValue = &ResourceUsage{
-						Name: srcDefaultValue.Name,
-					}
-				}
-				MergeResourceUsage(destItem.DefaultValue.(*ResourceUsage), srcDefaultValue)
-			}
-
-			if srcItem.Value != nil {
-				srcValue := srcItem.Value.(*ResourceUsage)
-				if destItem.Value == nil {
-					destItem.Value = destItem.DefaultValue
-				}
-				if destItem.Value == nil {
-					destItem.Value = &ResourceUsage{
-						Name: srcValue.Name,
-					}
-				}
-				MergeResourceUsage(destItem.Value.(*ResourceUsage), srcValue)
-			}
-		} else if destItem.Value == nil {
-			destItem.ValueType = srcItem.ValueType
-
-			if srcItem.Description != "" {
-				destItem.Description = srcItem.Description
-			}
-
-			if srcItem.DefaultValue != nil {
-				destItem.DefaultValue = srcItem.DefaultValue
-			}
-
-			if srcItem.Value != nil {
-				destItem.Value = srcItem.Value
-			}
-		}
-	}
-}
-
 // replaceResourceUsages override usageItems from dest with usageItems from src
 func replaceResourceUsages(dest *ResourceUsage, src *ResourceUsage, opts ReplaceResourceUsagesOpts) {
 	if dest == nil || src == nil {
