@@ -3,6 +3,7 @@ package aws
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -91,14 +92,14 @@ func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *sch
 		components = append(components, v)
 	}
 
+	if v := shieldRequests(d, u); v != nil {
+		components = append(components, v)
+	}
+
 	components = append(components, invalidationRequests(u)...)
 
 	regionalUsage := newCloudfrontRegionUsage(u)
 	subResources := regionalUsage.toSubResources()
-
-	if v := shieldRequests(d, u); v != nil {
-		subResources = append(subResources, v)
-	}
 
 	return &schema.Resource{
 		Name:           d.Address,
@@ -337,13 +338,9 @@ var regionShieldMapping = map[string]string{
 	"sa-east-1":       "south_america",
 }
 
-func shieldRequests(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func shieldRequests(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
 	if !d.Get("origin.0.origin_shield.0.enabled").Bool() {
 		return nil
-	}
-
-	resource := &schema.Resource{
-		Name: "Origin shield HTTP requests",
 	}
 
 	region := d.Get("region").String()
@@ -357,7 +354,7 @@ func shieldRequests(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 
 	if apiRegion == "" {
-		log.Warnf("region %s not supported for origin shield requests skipping", region)
+		log.Warnf("Skipping Origin shield HTTP requests for resource %s. Could not find mapping for region %s", d.Address, region)
 		return nil
 	}
 
@@ -369,8 +366,7 @@ func shieldRequests(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 
 	if usageKey == "" {
-		log.Warnf("region %s not supported for origin shield requests, unsupported in usage file, skipping", region)
-		return nil
+		log.Warnf("No usage for Origin shield HTTP requests for resource %s.  Region %s not supported in usage file.", d.Address, region)
 	}
 
 	var quantity *decimal.Decimal
@@ -381,24 +377,23 @@ func shieldRequests(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		}
 	}
 
-	resource.CostComponents = []*schema.CostComponent{
-		{
-			Name:            apiRegion,
-			Unit:            "10k requests",
-			UnitMultiplier:  decimal.NewFromInt(10000),
-			MonthlyQuantity: quantity,
-			ProductFilter: &schema.ProductFilter{
-				VendorName: strPtr("aws"),
-				Service:    strPtr("AmazonCloudFront"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "requestDescription", Value: strPtr("Origin Shield Requests")},
-					{Key: "location", Value: strPtr(apiRegion)},
-				},
+	pieces := strings.Split(apiRegion, "(")
+	prettyName := strings.TrimSpace(pieces[0]) + " " + region
+
+	return &schema.CostComponent{
+		Name:            fmt.Sprintf("Origin shield HTTP requests (%s)", prettyName),
+		Unit:            "10k requests",
+		UnitMultiplier:  decimal.NewFromInt(10000),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Service:    strPtr("AmazonCloudFront"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "requestDescription", Value: strPtr("Origin Shield Requests")},
+				{Key: "location", Value: strPtr(apiRegion)},
 			},
 		},
 	}
-
-	return resource
 }
 
 func invalidationRequests(u *schema.UsageData) []*schema.CostComponent {
