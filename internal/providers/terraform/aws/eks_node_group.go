@@ -32,6 +32,8 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	a := &aws.EKSNodeGroup{
 		Address:       d.Address,
 		Region:        region,
+		Name:          d.Get("node_group_name").String(),
+		ClusterName:   d.Get("cluster_name").String(),
 		InstanceCount: intPtr(instanceCount),
 		DiskSize:      diskSize,
 	}
