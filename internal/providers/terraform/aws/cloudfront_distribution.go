@@ -3,8 +3,10 @@ package aws
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -17,50 +19,19 @@ type regionData struct {
 	usageKey       string
 }
 
-func GetCloudfrontDistributionRegistryItem() *schema.RegistryItem {
-	return &schema.RegistryItem{
-		Name:  "aws_cloudfront_distribution",
-		RFunc: NewCloudfrontDistribution,
-	}
-}
+var (
+	tierStarts = []int{0, 10240, 51200, 153600, 512000, 1048576, 5242880}
+	tierLimits = []int{10240, 40960, 102400, 358400, 536576, 4194304}
+	tierNames  = []string{"first 10TB", "next 40TB", "next 100TB", "next 350TB", "next 524TB", "next 4PB", "over 5PB"}
 
-func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	resource := &schema.Resource{
-		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			encryptionRequests(u),
-			realtimeLogs(u),
-			customSSLCertificate(u),
-		},
-		SubResources: []*schema.Resource{
-			regionalDataOutToInternet(u),
-			regionalDataOutToOrigin(u),
-			httpRequests(u),
-			httpsRequests(u),
-			shieldRequests(u),
-		},
-	}
-	resource.CostComponents = append(resource.CostComponents, invalidationRequests(u)...)
-	return resource
-}
-
-func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
-	resource := &schema.Resource{
-		Name:         "Data transfer out to internet",
-		SubResources: []*schema.Resource{},
+	defaultRegion = &regionData{
+		awsGroupedName: "US, Mexico, Canada",
+		priceRegion:    "United States",
+		usageKey:       "us",
 	}
 
-	var uMap map[string]gjson.Result
-	if u != nil && u.Get("monthly_data_transfer_to_internet_gb").Exists() {
-		uMap = u.Get("monthly_data_transfer_to_internet_gb").Map()
-	}
-
-	regionsData := []*regionData{
-		{
-			awsGroupedName: "US, Mexico, Canada",
-			priceRegion:    "United States",
-			usageKey:       "us",
-		},
+	regionsData = []*regionData{
+		defaultRegion,
 		{
 			awsGroupedName: "Europe, Israel",
 			priceRegion:    "Europe",
@@ -97,42 +68,159 @@ func regionalDataOutToInternet(u *schema.UsageData) *schema.Resource {
 			usageKey:       "india",
 		},
 	}
+)
 
-	tierStarts := []int{0, 10240, 51200, 153600, 512000, 1048576, 5242880}
-	tierLimits := []int{10240, 40960, 102400, 358400, 536576, 4194304}
-	tierNames := []string{"first 10TB", "next 40TB", "next 100TB", "next 350TB", "next 524TB", "next 4PB", "over 5PB"}
+func GetCloudfrontDistributionRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "aws_cloudfront_distribution",
+		RFunc: NewCloudfrontDistribution,
+	}
+}
 
+func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	var components []*schema.CostComponent
+
+	if v := encryptionRequests(d, u); v != nil {
+		components = append(components, v)
+	}
+
+	if v := realtimeLogs(d, u); v != nil {
+		components = append(components, v)
+	}
+
+	if v := customSSLCertificate(d, u); v != nil {
+		components = append(components, v)
+	}
+
+	if v := shieldRequests(d, u); v != nil {
+		components = append(components, v)
+	}
+
+	components = append(components, invalidationRequests(u)...)
+
+	regionalUsage := newCloudfrontRegionUsage(u)
+	subResources := regionalUsage.toSubResources()
+
+	return &schema.Resource{
+		Name:           d.Address,
+		CostComponents: components,
+		SubResources:   subResources,
+	}
+}
+
+type cloudfrontRegionUsage struct {
+	definitions map[string]struct{}
+
+	MonthlyDataTransferToInternet map[string]gjson.Result
+	MonthlyDataTransferToOrigin   map[string]gjson.Result
+	MonthlyHTTPReq                map[string]gjson.Result
+	MonthlyHTTPSReq               map[string]gjson.Result
+}
+
+func newCloudfrontRegionUsage(u *schema.UsageData) cloudfrontRegionUsage {
+	regionUsage := cloudfrontRegionUsage{
+		definitions:                   map[string]struct{}{},
+		MonthlyDataTransferToInternet: map[string]gjson.Result{},
+		MonthlyDataTransferToOrigin:   map[string]gjson.Result{},
+		MonthlyHTTPReq:                map[string]gjson.Result{},
+		MonthlyHTTPSReq:               map[string]gjson.Result{},
+	}
+
+	if u == nil {
+		return regionUsage
+	}
+
+	regionUsage.MonthlyDataTransferToInternet = u.Get("monthly_data_transfer_to_internet_gb").Map()
+	for k := range regionUsage.MonthlyDataTransferToInternet {
+		regionUsage.definitions[k] = struct{}{}
+	}
+
+	regionUsage.MonthlyDataTransferToOrigin = u.Get("monthly_data_transfer_to_origin_gb").Map()
+	for k := range regionUsage.MonthlyDataTransferToOrigin {
+		regionUsage.definitions[k] = struct{}{}
+	}
+
+	regionUsage.MonthlyHTTPReq = u.Get("monthly_http_requests").Map()
+	for k := range regionUsage.MonthlyHTTPReq {
+		regionUsage.definitions[k] = struct{}{}
+	}
+
+	regionUsage.MonthlyHTTPSReq = u.Get("monthly_https_requests").Map()
+	for k := range regionUsage.MonthlyHTTPSReq {
+		regionUsage.definitions[k] = struct{}{}
+	}
+
+	return regionUsage
+}
+
+func (c cloudfrontRegionUsage) toSubResources() []*schema.Resource {
+	var resources []*schema.Resource
+
+	var toProcess []*regionData
 	for _, regData := range regionsData {
-		awsRegion := regData.awsGroupedName
-		fromLocation := regData.priceRegion
-		usageKey := regData.usageKey
-
-		var quantity *decimal.Decimal
-		if _, ok := uMap[usageKey]; ok {
-			quantity = decimalPtr(decimal.NewFromInt(uMap[usageKey].Int()))
-		}
-
-		if quantity == nil {
-			resource.CostComponents = append(resource.CostComponents,
-				dataOutCostComponent(awsRegion, tierNames[0], fromLocation, 0, nil))
-			continue
-		}
-
-		tiers := usage.CalculateTierBuckets(*quantity, tierLimits)
-		for i := range tiers {
-			if tiers[i].GreaterThan(decimal.Zero) {
-				resource.CostComponents = append(resource.CostComponents,
-					dataOutCostComponent(awsRegion, tierNames[i], fromLocation, tierStarts[i], &tiers[i]))
-			}
+		// filter out the regions that don't have usage definitions
+		if _, ok := c.definitions[regData.usageKey]; ok {
+			toProcess = append(toProcess, regData)
 		}
 	}
 
-	return resource
+	// if we don't have any usage definitions so the default US region for output
+	if len(toProcess) == 0 {
+		toProcess = append(toProcess, defaultRegion)
+	}
+
+	for _, regData := range toProcess {
+		resource := &schema.Resource{
+			Name: regData.awsGroupedName,
+		}
+
+		var components []*schema.CostComponent
+		components = append(components, c.dataOutToInternet(regData)...)
+		components = append(components, c.regionalDataOutToOrigin(regData))
+		components = append(components, c.httpRequests(regData))
+		components = append(components, c.httpsRequests(regData))
+
+		resource.CostComponents = components
+		resources = append(resources, resource)
+	}
+
+	return resources
 }
 
-func dataOutCostComponent(awsRegion, usageName, fromLocation string, startUsage int, quantity *decimal.Decimal) *schema.CostComponent {
+func (c cloudfrontRegionUsage) dataOutToInternet(regData *regionData) []*schema.CostComponent {
+	costName := "Data transfer out to internet"
+
+	fromLocation := regData.priceRegion
+	usageKey := regData.usageKey
+
+	var quantity *decimal.Decimal
+	if _, ok := c.MonthlyDataTransferToInternet[usageKey]; ok {
+		quantity = decimalPtr(decimal.NewFromInt(c.MonthlyDataTransferToInternet[usageKey].Int()))
+	}
+
+	if quantity == nil {
+		return []*schema.CostComponent{
+			dataOutCostComponent(costName, tierNames[0], fromLocation, 0, nil),
+		}
+	}
+
+	tiers := usage.CalculateTierBuckets(*quantity, tierLimits)
+	var components []*schema.CostComponent
+	for i := range tiers {
+		if tiers[i].GreaterThan(decimal.Zero) {
+			components = append(
+				components,
+				dataOutCostComponent(costName, tierNames[i], fromLocation, tierStarts[i], &tiers[i]),
+			)
+		}
+	}
+
+	return components
+}
+
+func dataOutCostComponent(costName, usageName, fromLocation string, startUsage int, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("%v (%v)", awsRegion, usageName),
+		Name:            fmt.Sprintf("%s (%s)", costName, usageName),
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
@@ -150,328 +238,162 @@ func dataOutCostComponent(awsRegion, usageName, fromLocation string, startUsage 
 	}
 }
 
-func regionalDataOutToOrigin(u *schema.UsageData) *schema.Resource {
-	resource := &schema.Resource{
-		Name:           "Data transfer out to origin",
-		CostComponents: []*schema.CostComponent{},
+func (c cloudfrontRegionUsage) regionalDataOutToOrigin(regData *regionData) *schema.CostComponent {
+	name := "Data transfer out to origin"
+
+	apiRegion := regData.priceRegion
+	usageKey := regData.usageKey
+	var quantity *decimal.Decimal
+	if _, ok := c.MonthlyDataTransferToOrigin[usageKey]; ok {
+		quantity = decimalPtr(decimal.NewFromInt(c.MonthlyDataTransferToOrigin[usageKey].Int()))
 	}
 
-	var uMap map[string]gjson.Result
-	if u != nil && u.Get("monthly_data_transfer_to_origin_gb").Exists() {
-		uMap = u.Get("monthly_data_transfer_to_origin_gb").Map()
-	}
-
-	regionsData := []*regionData{
-		{
-			awsGroupedName: "US, Mexico, Canada",
-			priceRegion:    "United States",
-			usageKey:       "us",
-		},
-		{
-			awsGroupedName: "Europe, Israel",
-			priceRegion:    "Europe",
-			usageKey:       "europe",
-		},
-		{
-			awsGroupedName: "South Africa, Kenya, Middle East",
-			priceRegion:    "South Africa",
-			usageKey:       "south_africa",
-		},
-		{
-			awsGroupedName: "South America",
-			priceRegion:    "South America",
-			usageKey:       "south_america",
-		},
-		{
-			awsGroupedName: "Japan",
-			priceRegion:    "Japan",
-			usageKey:       "japan",
-		},
-		{
-			awsGroupedName: "Australia, New Zealand",
-			priceRegion:    "Australia",
-			usageKey:       "australia",
-		},
-		{
-			awsGroupedName: "Hong Kong, Philippines, Asia Pacific",
-			priceRegion:    "Asia Pacific",
-			usageKey:       "asia_pacific",
-		},
-		{
-			awsGroupedName: "India",
-			priceRegion:    "India",
-			usageKey:       "india",
-		},
-	}
-
-	for _, regData := range regionsData {
-		awsRegion := regData.awsGroupedName
-		apiRegion := regData.priceRegion
-		usageKey := regData.usageKey
-		var quantity *decimal.Decimal
-		if _, ok := uMap[usageKey]; ok {
-			quantity = decimalPtr(decimal.NewFromInt(uMap[usageKey].Int()))
-		}
-		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
-			Name:            awsRegion,
-			Unit:            "GB",
-			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyQuantity: quantity,
-			ProductFilter: &schema.ProductFilter{
-				VendorName: strPtr("aws"),
-				Service:    strPtr("AmazonCloudFront"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "transferType", Value: strPtr("CloudFront to Origin")},
-					{Key: "fromLocation", Value: strPtr(apiRegion)},
-				},
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Service:    strPtr("AmazonCloudFront"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "transferType", Value: strPtr("CloudFront to Origin")},
+				{Key: "fromLocation", Value: strPtr(apiRegion)},
 			},
-		})
+		},
 	}
-
-	return resource
 }
 
-func httpRequests(u *schema.UsageData) *schema.Resource {
-	resource := &schema.Resource{
-		Name:         "HTTP requests",
-		SubResources: []*schema.Resource{},
+func (c cloudfrontRegionUsage) httpRequests(regData *regionData) *schema.CostComponent {
+	name := "HTTP requests"
+
+	apiRegion := regData.priceRegion
+	usageKey := regData.usageKey
+	var quantity *decimal.Decimal
+	if _, ok := c.MonthlyHTTPReq[usageKey]; ok {
+		quantity = decimalPtr(decimal.NewFromInt(c.MonthlyHTTPReq[usageKey].Int()))
 	}
 
-	var uMap map[string]gjson.Result
-	if u != nil && u.Get("monthly_http_requests").Exists() {
-		uMap = u.Get("monthly_http_requests").Map()
-	}
-
-	regionsData := []*regionData{
-		{
-			awsGroupedName: "US, Mexico, Canada",
-			priceRegion:    "United States",
-			usageKey:       "us",
-		},
-		{
-			awsGroupedName: "Europe, Israel",
-			priceRegion:    "Europe",
-			usageKey:       "europe",
-		},
-		{
-			awsGroupedName: "South Africa, Kenya, Middle East",
-			priceRegion:    "South Africa",
-			usageKey:       "south_africa",
-		},
-		{
-			awsGroupedName: "South America",
-			priceRegion:    "South America",
-			usageKey:       "south_america",
-		},
-		{
-			awsGroupedName: "Japan",
-			priceRegion:    "Japan",
-			usageKey:       "japan",
-		},
-		{
-			awsGroupedName: "Australia, New Zealand",
-			priceRegion:    "Australia",
-			usageKey:       "australia",
-		},
-		{
-			awsGroupedName: "Hong Kong, Philippines, Asia Pacific",
-			priceRegion:    "Asia Pacific",
-			usageKey:       "asia_pacific",
-		},
-		{
-			awsGroupedName: "India",
-			priceRegion:    "India",
-			usageKey:       "india",
-		},
-	}
-
-	for _, regData := range regionsData {
-		awsRegion := regData.awsGroupedName
-		apiRegion := regData.priceRegion
-		usageKey := regData.usageKey
-		var quantity *decimal.Decimal
-		if _, ok := uMap[usageKey]; ok {
-			quantity = decimalPtr(decimal.NewFromInt(uMap[usageKey].Int()))
-		}
-		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
-			Name:            awsRegion,
-			Unit:            "10k requests",
-			UnitMultiplier:  decimal.NewFromInt(10000),
-			MonthlyQuantity: quantity,
-			ProductFilter: &schema.ProductFilter{
-				VendorName: strPtr("aws"),
-				Service:    strPtr("AmazonCloudFront"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "location", Value: strPtr(apiRegion)},
-					{Key: "requestType", Value: strPtr("CloudFront-Request-HTTP-Proxy")},
-				},
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "10k requests",
+		UnitMultiplier:  decimal.NewFromInt(10000),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Service:    strPtr("AmazonCloudFront"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "location", Value: strPtr(apiRegion)},
+				{Key: "requestType", Value: strPtr("CloudFront-Request-HTTP-Proxy")},
 			},
-		})
+		},
 	}
-
-	return resource
 }
 
-func httpsRequests(u *schema.UsageData) *schema.Resource {
-	resource := &schema.Resource{
-		Name:         "HTTPS requests",
-		SubResources: []*schema.Resource{},
+func (c cloudfrontRegionUsage) httpsRequests(regData *regionData) *schema.CostComponent {
+	name := "HTTPS requests"
+
+	apiRegion := regData.priceRegion
+	usageKey := regData.usageKey
+	var quantity *decimal.Decimal
+	if _, ok := c.MonthlyHTTPSReq[usageKey]; ok {
+		quantity = decimalPtr(decimal.NewFromInt(c.MonthlyHTTPSReq[usageKey].Int()))
 	}
 
-	var uMap map[string]gjson.Result
-	if u != nil && u.Get("monthly_https_requests").Exists() {
-		uMap = u.Get("monthly_https_requests").Map()
-	}
-
-	regionsData := []*regionData{
-		{
-			awsGroupedName: "US, Mexico, Canada",
-			priceRegion:    "United States",
-			usageKey:       "us",
-		},
-		{
-			awsGroupedName: "Europe, Israel",
-			priceRegion:    "Europe",
-			usageKey:       "europe",
-		},
-		{
-			awsGroupedName: "South Africa, Kenya, Middle East",
-			priceRegion:    "South Africa",
-			usageKey:       "south_africa",
-		},
-		{
-			awsGroupedName: "South America",
-			priceRegion:    "South America",
-			usageKey:       "south_america",
-		},
-		{
-			awsGroupedName: "Japan",
-			priceRegion:    "Japan",
-			usageKey:       "japan",
-		},
-		{
-			awsGroupedName: "Australia, New Zealand",
-			priceRegion:    "Australia",
-			usageKey:       "australia",
-		},
-		{
-			awsGroupedName: "Hong Kong, Philippines, Asia Pacific",
-			priceRegion:    "Asia Pacific",
-			usageKey:       "asia_pacific",
-		},
-		{
-			awsGroupedName: "India",
-			priceRegion:    "India",
-			usageKey:       "india",
-		},
-	}
-
-	for _, regData := range regionsData {
-		awsRegion := regData.awsGroupedName
-		apiRegion := regData.priceRegion
-		usageKey := regData.usageKey
-		var quantity *decimal.Decimal
-		if _, ok := uMap[usageKey]; ok {
-			quantity = decimalPtr(decimal.NewFromInt(uMap[usageKey].Int()))
-		}
-		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
-			Name:            awsRegion,
-			Unit:            "10k requests",
-			UnitMultiplier:  decimal.NewFromInt(10000),
-			MonthlyQuantity: quantity,
-			ProductFilter: &schema.ProductFilter{
-				VendorName: strPtr("aws"),
-				Service:    strPtr("AmazonCloudFront"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "location", Value: strPtr(apiRegion)},
-					{Key: "requestType", Value: strPtr("CloudFront-Request-HTTPS-Proxy")},
-				},
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "10k requests",
+		UnitMultiplier:  decimal.NewFromInt(10000),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Service:    strPtr("AmazonCloudFront"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "location", Value: strPtr(apiRegion)},
+				{Key: "requestType", Value: strPtr("CloudFront-Request-HTTPS-Proxy")},
 			},
-		})
+		},
 	}
-
-	return resource
 }
 
-func shieldRequests(u *schema.UsageData) *schema.Resource {
-	resource := &schema.Resource{
-		Name:           "Origin shield HTTP requests",
-		CostComponents: []*schema.CostComponent{},
+var regionShieldMapping = map[string]string{
+	"us-gov-west-1":   "us",
+	"us-gov-east-1":   "us",
+	"us-east-1":       "us",
+	"us-east-2":       "us",
+	"us-west-1":       "us",
+	"us-west-2":       "us",
+	"us-west-2-lax-1": "us",
+	"eu-central-1":    "europe",
+	"eu-west-1":       "europe",
+	"eu-west-2":       "europe",
+	"eu-south-1":      "europe",
+	"eu-west-3":       "europe",
+	"eu-north-1":      "europe",
+	"ap-northeast-1":  "japan",
+	"ap-northeast-2":  "south_korea",
+	"ap-southeast-1":  "singapore",
+	"ap-southeast-2":  "australia",
+	"ap-south-1":      "india",
+	"sa-east-1":       "south_america",
+}
+
+func shieldRequests(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
+	if !d.Get("origin.0.origin_shield.0.enabled").Bool() {
+		return nil
 	}
 
-	var uMap map[string]gjson.Result
-	if u != nil && u.Get("monthly_shield_requests").Exists() {
-		uMap = u.Get("monthly_shield_requests").Map()
+	region := d.Get("region").String()
+	if d.Get("origin.0.origin_shield.0.origin_shield_region").Exists() {
+		region = d.Get("origin.0.origin_shield.0.origin_shield_region").String()
 	}
 
-	regionsData := []*regionData{
-		{
-			awsGroupedName: "US",
-			priceRegion:    "US East (N. Virginia)",
-			usageKey:       "us",
-		},
-		{
-			awsGroupedName: "Europe",
-			priceRegion:    "EU (Frankfurt)",
-			usageKey:       "europe",
-		},
-		{
-			awsGroupedName: "South America",
-			priceRegion:    "South America (Sao Paulo)",
-			usageKey:       "south_america",
-		},
-		{
-			awsGroupedName: "Japan",
-			priceRegion:    "Asia Pacific (Tokyo)",
-			usageKey:       "japan",
-		},
-		{
-			awsGroupedName: "Australia",
-			priceRegion:    "Asia Pacific (Sydney)",
-			usageKey:       "australia",
-		},
-		{
-			awsGroupedName: "Singapore",
-			priceRegion:    "Asia Pacific (Singapore)",
-			usageKey:       "singapore",
-		},
-		{
-			awsGroupedName: "South Korea",
-			priceRegion:    "Asia Pacific (Seoul)",
-			usageKey:       "south_korea",
-		},
-		{
-			awsGroupedName: "India",
-			priceRegion:    "Asia Pacific (Mumbai)",
-			usageKey:       "india",
-		},
+	var apiRegion string
+	if v, ok := regionMapping[region]; ok {
+		apiRegion = v
 	}
 
-	for _, regData := range regionsData {
-		awsRegion := regData.awsGroupedName
-		apiRegion := regData.priceRegion
-		usageKey := regData.usageKey
-		var quantity *decimal.Decimal
-		if _, ok := uMap[usageKey]; ok {
-			quantity = decimalPtr(decimal.NewFromInt(uMap[usageKey].Int()))
+	if apiRegion == "" {
+		log.Warnf("Skipping Origin shield HTTP requests for resource %s. Could not find mapping for region %s", d.Address, region)
+		return nil
+	}
+
+	// we need to find the legacy usage key that's defined in the usage file
+	// this is done so we support backwards compatibility and don't nuke old usage files.
+	var usageKey string
+	if v, ok := regionShieldMapping[region]; ok {
+		usageKey = v
+	}
+
+	if usageKey == "" {
+		log.Warnf("No usage for Origin shield HTTP requests for resource %s.  Region %s not supported in usage file.", d.Address, region)
+	}
+
+	var quantity *decimal.Decimal
+	if u != nil {
+		shieldU := u.Get("monthly_shield_requests").Map()
+		if _, ok := shieldU[usageKey]; ok {
+			quantity = decimalPtr(decimal.NewFromInt(shieldU[usageKey].Int()))
 		}
-		resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
-			Name:            awsRegion,
-			Unit:            "10k requests",
-			UnitMultiplier:  decimal.NewFromInt(10000),
-			MonthlyQuantity: quantity,
-			ProductFilter: &schema.ProductFilter{
-				VendorName: strPtr("aws"),
-				Service:    strPtr("AmazonCloudFront"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "requestDescription", Value: strPtr("Origin Shield Requests")},
-					{Key: "location", Value: strPtr(apiRegion)},
-				},
-			},
-		})
 	}
 
-	return resource
+	pieces := strings.Split(apiRegion, "(")
+	prettyName := strings.TrimSpace(pieces[0]) + " " + region
+
+	return &schema.CostComponent{
+		Name:            fmt.Sprintf("Origin shield HTTP requests (%s)", prettyName),
+		Unit:            "10k requests",
+		UnitMultiplier:  decimal.NewFromInt(10000),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Service:    strPtr("AmazonCloudFront"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "requestDescription", Value: strPtr("Origin Shield Requests")},
+				{Key: "location", Value: strPtr(apiRegion)},
+			},
+		},
+	}
 }
 
 func invalidationRequests(u *schema.UsageData) []*schema.CostComponent {
@@ -528,11 +450,18 @@ func invalidationRequests(u *schema.UsageData) []*schema.CostComponent {
 	return costComponents
 }
 
-func encryptionRequests(u *schema.UsageData) *schema.CostComponent {
+func encryptionRequests(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
+	// for some reason field_level_encryption_id is set to a raw value of "null" when empty so
+	// Exists() method returns true event thought the value is Type is Null
+	if d.Get("default_cache_behavior.0.field_level_encryption_id").Type == gjson.Null {
+		return nil
+	}
+
 	var quantity *decimal.Decimal
 	if u != nil && u.Get("monthly_encryption_requests").Exists() {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_encryption_requests").Int()))
 	}
+
 	return &schema.CostComponent{
 		Name:            "Field level encryption requests",
 		Unit:            "10k requests",
@@ -549,11 +478,16 @@ func encryptionRequests(u *schema.UsageData) *schema.CostComponent {
 	}
 }
 
-func realtimeLogs(u *schema.UsageData) *schema.CostComponent {
+func realtimeLogs(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
+	if !d.Get("logging_config.0.bucket").Exists() {
+		return nil
+	}
+
 	var quantity *decimal.Decimal
 	if u != nil && u.Get("monthly_log_lines").Exists() {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_log_lines").Int()))
 	}
+
 	return &schema.CostComponent{
 		Name:            "Real-time log requests",
 		Unit:            "1M lines",
@@ -569,8 +503,12 @@ func realtimeLogs(u *schema.UsageData) *schema.CostComponent {
 	}
 }
 
-func customSSLCertificate(u *schema.UsageData) *schema.CostComponent {
-	var quantity *decimal.Decimal
+func customSSLCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
+	if d.Get("viewer_certificate.0.ssl_support_method").String() != "vip" {
+		return nil
+	}
+
+	quantity := decimalPtr(decimal.NewFromInt(1))
 	if u != nil && u.Get("custom_ssl_certificates").Exists() {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("custom_ssl_certificates").Int()))
 	}

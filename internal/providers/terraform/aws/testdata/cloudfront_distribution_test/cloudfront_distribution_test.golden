@@ -1,165 +1,179 @@
 
- Name                                                           Monthly Qty  Unit                    Monthly Cost 
-                                                                                                                  
- aws_cloudfront_distribution.s3_distribution                                                                      
- ├─ Field level encryption requests                       Monthly cost depends on usage: $0.02 per 10k requests   
- ├─ Real-time log requests                                Monthly cost depends on usage: $0.01 per 1M lines       
- ├─ Dedicated IP custom SSLs                              Monthly cost depends on usage: $600.00 per certificates 
- ├─ Invalidation requests (first 1k)                      Monthly cost depends on usage: $0.00 per paths          
- ├─ Data transfer out to internet                                                                                 
- │  ├─ US, Mexico, Canada (first 10TB)                    Monthly cost depends on usage: $0.085 per GB            
- │  ├─ Europe, Israel (first 10TB)                        Monthly cost depends on usage: $0.085 per GB            
- │  ├─ South Africa, Kenya, Middle East (first 10TB)      Monthly cost depends on usage: $0.11 per GB             
- │  ├─ South America (first 10TB)                         Monthly cost depends on usage: $0.11 per GB             
- │  ├─ Japan (first 10TB)                                 Monthly cost depends on usage: $0.11 per GB             
- │  ├─ Australia, New Zealand (first 10TB)                Monthly cost depends on usage: $0.11 per GB             
- │  ├─ Hong Kong, Philippines, Asia Pacific (first 10TB)  Monthly cost depends on usage: $0.12 per GB             
- │  └─ India (first 10TB)                                 Monthly cost depends on usage: $0.11 per GB             
- ├─ Data transfer out to origin                                                                                   
- │  ├─ US, Mexico, Canada                                 Monthly cost depends on usage: $0.02 per GB             
- │  ├─ Europe, Israel                                     Monthly cost depends on usage: $0.02 per GB             
- │  ├─ South Africa, Kenya, Middle East                   Monthly cost depends on usage: $0.06 per GB             
- │  ├─ South America                                      Monthly cost depends on usage: $0.13 per GB             
- │  ├─ Japan                                              Monthly cost depends on usage: $0.06 per GB             
- │  ├─ Australia, New Zealand                             Monthly cost depends on usage: $0.08 per GB             
- │  ├─ Hong Kong, Philippines, Asia Pacific               Monthly cost depends on usage: $0.06 per GB             
- │  └─ India                                              Monthly cost depends on usage: $0.16 per GB             
- ├─ HTTP requests                                                                                                 
- │  ├─ US, Mexico, Canada                                 Monthly cost depends on usage: $0.0075 per 10k requests 
- │  ├─ Europe, Israel                                     Monthly cost depends on usage: $0.009 per 10k requests  
- │  ├─ South Africa, Kenya, Middle East                   Monthly cost depends on usage: $0.009 per 10k requests  
- │  ├─ South America                                      Monthly cost depends on usage: $0.016 per 10k requests  
- │  ├─ Japan                                              Monthly cost depends on usage: $0.009 per 10k requests  
- │  ├─ Australia, New Zealand                             Monthly cost depends on usage: $0.009 per 10k requests  
- │  ├─ Hong Kong, Philippines, Asia Pacific               Monthly cost depends on usage: $0.009 per 10k requests  
- │  └─ India                                              Monthly cost depends on usage: $0.009 per 10k requests  
- ├─ HTTPS requests                                                                                                
- │  ├─ US, Mexico, Canada                                 Monthly cost depends on usage: $0.01 per 10k requests   
- │  ├─ Europe, Israel                                     Monthly cost depends on usage: $0.012 per 10k requests  
- │  ├─ South Africa, Kenya, Middle East                   Monthly cost depends on usage: $0.012 per 10k requests  
- │  ├─ South America                                      Monthly cost depends on usage: $0.022 per 10k requests  
- │  ├─ Japan                                              Monthly cost depends on usage: $0.012 per 10k requests  
- │  ├─ Australia, New Zealand                             Monthly cost depends on usage: $0.0125 per 10k requests 
- │  ├─ Hong Kong, Philippines, Asia Pacific               Monthly cost depends on usage: $0.012 per 10k requests  
- │  └─ India                                              Monthly cost depends on usage: $0.012 per 10k requests  
- └─ Origin shield HTTP requests                                                                                   
-    ├─ US                                                 Monthly cost depends on usage: $0.0075 per 10k requests 
-    ├─ Europe                                             Monthly cost depends on usage: $0.009 per 10k requests  
-    ├─ South America                                      Monthly cost depends on usage: $0.016 per 10k requests  
-    ├─ Japan                                              Monthly cost depends on usage: $0.009 per 10k requests  
-    ├─ Australia                                          Monthly cost depends on usage: $0.009 per 10k requests  
-    ├─ Singapore                                          Monthly cost depends on usage: $0.009 per 10k requests  
-    ├─ South Korea                                        Monthly cost depends on usage: $0.009 per 10k requests  
-    └─ India                                              Monthly cost depends on usage: $0.009 per 10k requests  
-                                                                                                                  
- aws_cloudfront_distribution.s3_distribution_with_usage                                                           
- ├─ Field level encryption requests                                   12.34  10k requests                   $0.25 
- ├─ Real-time log requests                                            12.34  1M lines                       $0.12 
- ├─ Dedicated IP custom SSLs                                             12  certificates               $7,200.00 
- ├─ Invalidation requests (first 1k)                                  1,000  paths                          $0.00 
- ├─ Invalidation requests (over 1k)                                  11,340  paths                         $56.70 
- ├─ Data transfer out to internet                                                                                 
- │  ├─ US, Mexico, Canada (first 10TB)                               10,240  GB                           $870.40 
- │  ├─ US, Mexico, Canada (next 40TB)                                40,960  GB                         $3,276.80 
- │  ├─ US, Mexico, Canada (next 100TB)                              102,400  GB                         $6,144.00 
- │  ├─ US, Mexico, Canada (next 350TB)                              358,400  GB                        $14,336.00 
- │  ├─ US, Mexico, Canada (next 524TB)                              536,576  GB                        $16,097.28 
- │  ├─ US, Mexico, Canada (next 4PB)                              4,194,304  GB                       $104,857.60 
- │  ├─ US, Mexico, Canada (over 5PB)                              7,097,120  GB                       $141,942.40 
- │  ├─ Europe, Israel (first 10TB)                                   10,240  GB                           $870.40 
- │  ├─ Europe, Israel (next 40TB)                                    40,960  GB                         $3,276.80 
- │  ├─ Europe, Israel (next 100TB)                                  102,400  GB                         $6,144.00 
- │  ├─ Europe, Israel (next 350TB)                                  358,400  GB                        $14,336.00 
- │  ├─ Europe, Israel (next 524TB)                                  536,576  GB                        $16,097.28 
- │  ├─ Europe, Israel (next 4PB)                                  4,194,304  GB                       $104,857.60 
- │  ├─ Europe, Israel (over 5PB)                                  7,097,120  GB                       $141,942.40 
- │  ├─ South Africa, Kenya, Middle East (first 10TB)                 10,240  GB                         $1,126.40 
- │  ├─ South Africa, Kenya, Middle East (next 40TB)                  40,960  GB                         $4,300.80 
- │  ├─ South Africa, Kenya, Middle East (next 100TB)                102,400  GB                         $9,216.00 
- │  ├─ South Africa, Kenya, Middle East (next 350TB)                358,400  GB                        $28,672.00 
- │  ├─ South Africa, Kenya, Middle East (next 524TB)                536,576  GB                        $32,194.56 
- │  ├─ South Africa, Kenya, Middle East (next 4PB)                4,194,304  GB                       $209,715.20 
- │  ├─ South Africa, Kenya, Middle East (over 5PB)                7,097,120  GB                       $283,884.80 
- │  ├─ South America (first 10TB)                                    10,240  GB                         $1,126.40 
- │  ├─ South America (next 40TB)                                     40,960  GB                         $4,300.80 
- │  ├─ South America (next 100TB)                                   102,400  GB                         $9,216.00 
- │  ├─ South America (next 350TB)                                   358,400  GB                        $28,672.00 
- │  ├─ South America (next 524TB)                                   536,576  GB                        $32,194.56 
- │  ├─ South America (next 4PB)                                   4,194,304  GB                       $209,715.20 
- │  ├─ South America (over 5PB)                                   7,097,120  GB                       $283,884.80 
- │  ├─ Japan (first 10TB)                                            10,240  GB                         $1,167.36 
- │  ├─ Japan (next 40TB)                                             40,960  GB                         $3,645.44 
- │  ├─ Japan (next 100TB)                                           102,400  GB                         $8,806.40 
- │  ├─ Japan (next 350TB)                                           358,400  GB                        $30,105.60 
- │  ├─ Japan (next 524TB)                                           536,576  GB                        $42,926.08 
- │  ├─ Japan (next 4PB)                                           4,194,304  GB                       $293,601.28 
- │  ├─ Japan (over 5PB)                                           7,097,120  GB                       $425,827.20 
- │  ├─ Australia, New Zealand (first 10TB)                           10,240  GB                         $1,167.36 
- │  ├─ Australia, New Zealand (next 40TB)                            40,960  GB                         $4,014.08 
- │  ├─ Australia, New Zealand (next 100TB)                          102,400  GB                         $9,625.60 
- │  ├─ Australia, New Zealand (next 350TB)                          358,400  GB                        $32,972.80 
- │  ├─ Australia, New Zealand (next 524TB)                          536,576  GB                        $48,291.84 
- │  ├─ Australia, New Zealand (next 4PB)                          4,194,304  GB                       $356,515.84 
- │  ├─ Australia, New Zealand (over 5PB)                          7,097,120  GB                       $567,769.60 
- │  ├─ Hong Kong, Philippines, Asia Pacific (first 10TB)             10,240  GB                         $1,228.80 
- │  ├─ Hong Kong, Philippines, Asia Pacific (next 40TB)              40,960  GB                         $4,096.00 
- │  ├─ Hong Kong, Philippines, Asia Pacific (next 100TB)            102,400  GB                         $9,728.00 
- │  ├─ Hong Kong, Philippines, Asia Pacific (next 350TB)            358,400  GB                        $32,256.00 
- │  ├─ Hong Kong, Philippines, Asia Pacific (next 524TB)            536,576  GB                        $42,926.08 
- │  ├─ Hong Kong, Philippines, Asia Pacific (next 4PB)            4,194,304  GB                       $293,601.28 
- │  ├─ Hong Kong, Philippines, Asia Pacific (over 5PB)            7,097,120  GB                       $425,827.20 
- │  ├─ India (first 10TB)                                            10,240  GB                         $1,116.16 
- │  ├─ India (next 40TB)                                             40,960  GB                         $3,481.60 
- │  ├─ India (next 100TB)                                           102,400  GB                         $8,396.80 
- │  ├─ India (next 350TB)                                           358,400  GB                        $28,672.00 
- │  ├─ India (next 524TB)                                           536,576  GB                        $41,852.93 
- │  ├─ India (next 4PB)                                           4,194,304  GB                       $314,572.80 
- │  └─ India (over 5PB)                                           7,097,120  GB                       $510,992.64 
- ├─ Data transfer out to origin                                                                                   
- │  ├─ US, Mexico, Canada                                             1,234  GB                            $24.68 
- │  ├─ Europe, Israel                                                 1,234  GB                            $24.68 
- │  ├─ South Africa, Kenya, Middle East                               1,234  GB                            $74.04 
- │  ├─ South America                                                  1,234  GB                           $154.25 
- │  ├─ Japan                                                          1,234  GB                            $74.04 
- │  ├─ Australia, New Zealand                                         1,234  GB                            $98.72 
- │  ├─ Hong Kong, Philippines, Asia Pacific                           1,234  GB                            $74.04 
- │  └─ India                                                          1,234  GB                           $197.44 
- ├─ HTTP requests                                                                                                 
- │  ├─ US, Mexico, Canada                                             22.34  10k requests                   $0.17 
- │  ├─ Europe, Israel                                                 22.34  10k requests                   $0.20 
- │  ├─ South Africa, Kenya, Middle East                               22.34  10k requests                   $0.20 
- │  ├─ South America                                                  22.34  10k requests                   $0.36 
- │  ├─ Japan                                                          22.34  10k requests                   $0.20 
- │  ├─ Australia, New Zealand                                         22.34  10k requests                   $0.20 
- │  ├─ Hong Kong, Philippines, Asia Pacific                           22.34  10k requests                   $0.20 
- │  └─ India                                                          22.34  10k requests                   $0.20 
- ├─ HTTPS requests                                                                                                
- │  ├─ US, Mexico, Canada                                             12.34  10k requests                   $0.12 
- │  ├─ Europe, Israel                                                 12.34  10k requests                   $0.15 
- │  ├─ South Africa, Kenya, Middle East                               12.34  10k requests                   $0.15 
- │  ├─ South America                                                  12.34  10k requests                   $0.27 
- │  ├─ Japan                                                          12.34  10k requests                   $0.15 
- │  ├─ Australia, New Zealand                                         12.34  10k requests                   $0.15 
- │  ├─ Hong Kong, Philippines, Asia Pacific                           12.34  10k requests                   $0.15 
- │  └─ India                                                          12.34  10k requests                   $0.15 
- └─ Origin shield HTTP requests                                                                                   
-    ├─ US                                                             12.34  10k requests                   $0.09 
-    ├─ Europe                                                         12.34  10k requests                   $0.11 
-    ├─ South America                                                  12.34  10k requests                   $0.20 
-    ├─ Japan                                                          12.34  10k requests                   $0.11 
-    ├─ Australia                                                      12.34  10k requests                   $0.11 
-    ├─ Singapore                                                      12.34  10k requests                   $0.11 
-    ├─ South Korea                                                    12.34  10k requests                   $0.11 
-    └─ India                                                          12.34  10k requests                   $0.11 
-                                                                                                                  
- aws_s3_bucket.b                                                                                                  
- └─ Standard                                                                                                      
-    ├─ Storage                                            Monthly cost depends on usage: $0.023 per GB            
-    ├─ PUT, COPY, POST, LIST requests                     Monthly cost depends on usage: $0.005 per 1k requests   
-    ├─ GET, SELECT, and all other requests                Monthly cost depends on usage: $0.0004 per 1k requests  
-    ├─ Select data scanned                                Monthly cost depends on usage: $0.002 per GB            
-    └─ Select data returned                               Monthly cost depends on usage: $0.0007 per GB           
-                                                                                                                  
- OVERALL TOTAL                                                                                      $5,266,436.19 
+ Name                                                                             Monthly Qty  Unit                    Monthly Cost 
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution                                                                                        
+ ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                                              
+    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution_0_with_shield                                                                          
+ ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
+ ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                                              
+    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution_1_with_logging                                                                         
+ ├─ Real-time log requests                                                  Monthly cost depends on usage: $0.01 per 1M lines       
+ ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
+ ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                                              
+    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution_2_with_encryption                                                                      
+ ├─ Field level encryption requests                                         Monthly cost depends on usage: $0.02 per 10k requests   
+ ├─ Real-time log requests                                                  Monthly cost depends on usage: $0.01 per 1M lines       
+ ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
+ ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                                              
+    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution_3_with_ssl                                                                             
+ ├─ Field level encryption requests                                         Monthly cost depends on usage: $0.02 per 10k requests   
+ ├─ Real-time log requests                                                  Monthly cost depends on usage: $0.01 per 1M lines       
+ ├─ Dedicated IP custom SSLs                                                                1  certificates                 $600.00 
+ ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
+ ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                                              
+    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution_with_single_non_default_usage                                                          
+ ├─ Field level encryption requests                                                     12.34  10k requests                   $0.25 
+ ├─ Real-time log requests                                                              12.34  1M lines                       $0.12 
+ ├─ Dedicated IP custom SSLs                                                               12  certificates               $7,200.00 
+ ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
+ ├─ Invalidation requests (first 1k)                                                    1,000  paths                          $0.00 
+ ├─ Invalidation requests (over 1k)                                                    11,340  paths                         $56.70 
+ └─ Europe, Israel                                                                                                                  
+    ├─ Data transfer out to internet (first 10TB)                                      10,240  GB                           $870.40 
+    ├─ Data transfer out to internet (next 40TB)                                       40,960  GB                         $3,276.80 
+    ├─ Data transfer out to internet (next 100TB)                                     102,400  GB                         $6,144.00 
+    ├─ Data transfer out to internet (next 350TB)                                     358,400  GB                        $14,336.00 
+    ├─ Data transfer out to internet (next 524TB)                                     536,576  GB                        $16,097.28 
+    ├─ Data transfer out to internet (next 4PB)                                     4,194,304  GB                       $104,857.60 
+    ├─ Data transfer out to internet (over 5PB)                                    17,097,120  GB                       $341,942.40 
+    ├─ Data transfer out to origin                                                      2,234  GB                            $44.68 
+    ├─ HTTP requests                                                                  22.3402  10k requests                   $0.20 
+    └─ HTTPS requests                                                                   22.34  10k requests                   $0.27 
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution_with_usage                                                                             
+ ├─ Field level encryption requests                                                     12.34  10k requests                   $0.25 
+ ├─ Real-time log requests                                                              12.34  1M lines                       $0.12 
+ ├─ Dedicated IP custom SSLs                                                               12  certificates               $7,200.00 
+ ├─ Origin shield HTTP requests (South America sa-east-1)                              0.0323  10k requests                   $0.00 
+ ├─ Invalidation requests (first 1k)                                                    1,000  paths                          $0.00 
+ ├─ Invalidation requests (over 1k)                                                    11,340  paths                         $56.70 
+ ├─ US, Mexico, Canada                                                                                                              
+ │  ├─ Data transfer out to internet (first 10TB)                                      10,240  GB                           $870.40 
+ │  ├─ Data transfer out to internet (next 40TB)                                       40,960  GB                         $3,276.80 
+ │  ├─ Data transfer out to internet (next 100TB)                                     102,400  GB                         $6,144.00 
+ │  ├─ Data transfer out to internet (next 350TB)                                     358,400  GB                        $14,336.00 
+ │  ├─ Data transfer out to internet (next 524TB)                                     536,576  GB                        $16,097.28 
+ │  ├─ Data transfer out to internet (next 4PB)                                     4,194,304  GB                       $104,857.60 
+ │  ├─ Data transfer out to internet (over 5PB)                                     7,097,120  GB                       $141,942.40 
+ │  ├─ Data transfer out to origin                                                      1,234  GB                            $24.68 
+ │  ├─ HTTP requests                                                                  12.3402  10k requests                   $0.09 
+ │  └─ HTTPS requests                                                                   12.34  10k requests                   $0.12 
+ ├─ Europe, Israel                                                                                                                  
+ │  ├─ Data transfer out to internet (first 10TB)                                      10,240  GB                           $870.40 
+ │  ├─ Data transfer out to internet (next 40TB)                                       40,960  GB                         $3,276.80 
+ │  ├─ Data transfer out to internet (next 100TB)                                     102,400  GB                         $6,144.00 
+ │  ├─ Data transfer out to internet (next 350TB)                                     358,400  GB                        $14,336.00 
+ │  ├─ Data transfer out to internet (next 524TB)                                     536,576  GB                        $16,097.28 
+ │  ├─ Data transfer out to internet (next 4PB)                                     4,194,304  GB                       $104,857.60 
+ │  ├─ Data transfer out to internet (over 5PB)                                    17,097,120  GB                       $341,942.40 
+ │  ├─ Data transfer out to origin                                                      2,234  GB                            $44.68 
+ │  ├─ HTTP requests                                                                  22.3402  10k requests                   $0.20 
+ │  └─ HTTPS requests                                                                   22.34  10k requests                   $0.27 
+ ├─ South Africa, Kenya, Middle East                                                                                                
+ │  ├─ Data transfer out to internet (first 10TB)                                      10,240  GB                         $1,126.40 
+ │  ├─ Data transfer out to internet (next 40TB)                                       40,960  GB                         $4,300.80 
+ │  ├─ Data transfer out to internet (next 100TB)                                     102,400  GB                         $9,216.00 
+ │  ├─ Data transfer out to internet (next 350TB)                                     358,400  GB                        $28,672.00 
+ │  ├─ Data transfer out to internet (next 524TB)                                     536,576  GB                        $32,194.56 
+ │  ├─ Data transfer out to internet (next 4PB)                                     4,194,304  GB                       $209,715.20 
+ │  ├─ Data transfer out to internet (over 5PB)                                    27,097,120  GB                     $1,083,884.80 
+ │  ├─ Data transfer out to origin                                                      3,234  GB                           $194.04 
+ │  ├─ HTTP requests                                                                  32.3402  10k requests                   $0.29 
+ │  └─ HTTPS requests                                                                   32.34  10k requests                   $0.39 
+ ├─ South America                                                                                                                   
+ │  ├─ Data transfer out to internet (first 10TB)                                      10,240  GB                         $1,126.40 
+ │  ├─ Data transfer out to internet (next 40TB)                                       40,960  GB                         $4,300.80 
+ │  ├─ Data transfer out to internet (next 100TB)                                     102,400  GB                         $9,216.00 
+ │  ├─ Data transfer out to internet (next 350TB)                                     358,400  GB                        $28,672.00 
+ │  ├─ Data transfer out to internet (next 524TB)                                     536,576  GB                        $32,194.56 
+ │  ├─ Data transfer out to internet (next 4PB)                                     4,194,304  GB                       $209,715.20 
+ │  ├─ Data transfer out to internet (over 5PB)                                    37,097,120  GB                     $1,483,884.80 
+ │  ├─ Data transfer out to origin                                                      4,234  GB                           $529.25 
+ │  ├─ HTTP requests                                                                  42.3402  10k requests                   $0.68 
+ │  └─ HTTPS requests                                                                   42.34  10k requests                   $0.93 
+ ├─ Japan                                                                                                                           
+ │  ├─ Data transfer out to internet (first 10TB)                                      10,240  GB                         $1,167.36 
+ │  ├─ Data transfer out to internet (next 40TB)                                       40,960  GB                         $3,645.44 
+ │  ├─ Data transfer out to internet (next 100TB)                                     102,400  GB                         $8,806.40 
+ │  ├─ Data transfer out to internet (next 350TB)                                     358,400  GB                        $30,105.60 
+ │  ├─ Data transfer out to internet (next 524TB)                                     536,576  GB                        $42,926.08 
+ │  ├─ Data transfer out to internet (next 4PB)                                     4,194,304  GB                       $293,601.28 
+ │  ├─ Data transfer out to internet (over 5PB)                                    47,097,120  GB                     $2,825,827.20 
+ │  ├─ Data transfer out to origin                                                      5,234  GB                           $314.04 
+ │  ├─ HTTP requests                                                                  52.3402  10k requests                   $0.47 
+ │  └─ HTTPS requests                                                                   52.34  10k requests                   $0.63 
+ ├─ Australia, New Zealand                                                                                                          
+ │  ├─ Data transfer out to internet (first 10TB)                                      10,240  GB                         $1,167.36 
+ │  ├─ Data transfer out to internet (next 40TB)                                       40,960  GB                         $4,014.08 
+ │  ├─ Data transfer out to internet (next 100TB)                                     102,400  GB                         $9,625.60 
+ │  ├─ Data transfer out to internet (next 350TB)                                     358,400  GB                        $32,972.80 
+ │  ├─ Data transfer out to internet (next 524TB)                                     536,576  GB                        $48,291.84 
+ │  ├─ Data transfer out to internet (next 4PB)                                     4,194,304  GB                       $356,515.84 
+ │  ├─ Data transfer out to internet (over 5PB)                                    57,097,120  GB                     $4,567,769.60 
+ │  ├─ Data transfer out to origin                                                      6,234  GB                           $498.72 
+ │  ├─ HTTP requests                                                                  62.3402  10k requests                   $0.56 
+ │  └─ HTTPS requests                                                                   62.34  10k requests                   $0.78 
+ ├─ Hong Kong, Philippines, Asia Pacific                                                                                            
+ │  ├─ Data transfer out to internet (first 10TB)                                      10,240  GB                         $1,228.80 
+ │  ├─ Data transfer out to internet (next 40TB)                                       40,960  GB                         $4,096.00 
+ │  ├─ Data transfer out to internet (next 100TB)                                     102,400  GB                         $9,728.00 
+ │  ├─ Data transfer out to internet (next 350TB)                                     358,400  GB                        $32,256.00 
+ │  ├─ Data transfer out to internet (next 524TB)                                     536,576  GB                        $42,926.08 
+ │  ├─ Data transfer out to internet (next 4PB)                                     4,194,304  GB                       $293,601.28 
+ │  ├─ Data transfer out to internet (over 5PB)                                    57,097,120  GB                     $3,425,827.20 
+ │  ├─ Data transfer out to origin                                                      7,234  GB                           $434.04 
+ │  ├─ HTTP requests                                                                  72.3402  10k requests                   $0.65 
+ │  └─ HTTPS requests                                                                   72.34  10k requests                   $0.87 
+ └─ India                                                                                                                           
+    ├─ Data transfer out to internet (first 10TB)                                      10,240  GB                         $1,116.16 
+    ├─ Data transfer out to internet (next 40TB)                                       40,960  GB                         $3,481.60 
+    ├─ Data transfer out to internet (next 100TB)                                     102,400  GB                         $8,396.80 
+    ├─ Data transfer out to internet (next 350TB)                                     358,400  GB                        $28,672.00 
+    ├─ Data transfer out to internet (next 524TB)                                     536,576  GB                        $41,852.93 
+    ├─ Data transfer out to internet (next 4PB)                                     4,194,304  GB                       $314,572.80 
+    ├─ Data transfer out to internet (over 5PB)                                    67,097,120  GB                     $4,830,992.64 
+    ├─ Data transfer out to origin                                                      8,234  GB                         $1,317.44 
+    ├─ HTTP requests                                                                  82.3402  10k requests                   $0.74 
+    └─ HTTPS requests                                                                   72.34  10k requests                   $0.87 
+                                                                                                                                    
+ aws_s3_bucket.b                                                                                                                    
+ └─ Standard                                                                                                                        
+    ├─ Storage                                                              Monthly cost depends on usage: $0.023 per GB            
+    ├─ PUT, COPY, POST, LIST requests                                       Monthly cost depends on usage: $0.005 per 1k requests   
+    ├─ GET, SELECT, and all other requests                                  Monthly cost depends on usage: $0.0004 per 1k requests  
+    ├─ Select data scanned                                                  Monthly cost depends on usage: $0.002 per GB            
+    └─ Select data returned                                                 Monthly cost depends on usage: $0.0007 per GB           
+                                                                                                                                    
+ OVERALL TOTAL                                                                                                       $21,684,502.45 
 ----------------------------------
 To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
