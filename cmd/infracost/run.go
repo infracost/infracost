@@ -80,7 +80,7 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg
 		return errors.Wrap(err, "Error synchronizing usage data")
 	}
 
-	runCtx.SetContextUsageSummary(syncResult)
+	runCtx.SetProjectContextFrom(syncResult)
 	if err != nil {
 		return errors.Wrap(err, "Error summarizing usage")
 	}
@@ -89,8 +89,6 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg
 	if err != nil {
 		return errors.Wrap(err, "Error writing usage file")
 	}
-
-	runCtx.SetContextRemediateUsage(syncResult)
 
 	if syncResult == nil {
 		spinner.Fail()

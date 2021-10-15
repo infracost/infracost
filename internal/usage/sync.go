@@ -21,6 +21,27 @@ type ReplaceResourceUsagesOpts struct {
 	OverrideValueType bool
 }
 
+func (s *SyncResult) ProjectContext() map[string]interface{} {
+	r := make(map[string]interface{})
+
+	r["usageSyncs"] = s.ResourceCount
+	r["usageEstimates"] = s.EstimationCount
+	r["usageEstimateErrors"] = len(s.EstimationErrors)
+
+	var remediable, remAttempts, remErrors int
+	for _, err := range s.EstimationErrors {
+		if _, ok := err.(schema.Remediater); ok {
+			remediable++
+		}
+	}
+
+	r["remediationOpportunities"] = remediable
+	r["remediationAttempts"] = remAttempts
+	r["remediationErrors"] = remErrors
+
+	return r
+}
+
 func SyncUsageData(usageFile *UsageFile, projects []*schema.Project) (*SyncResult, error) {
 	referenceFile, err := LoadReferenceFile()
 	if err != nil {
