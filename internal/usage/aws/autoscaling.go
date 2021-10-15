@@ -52,8 +52,5 @@ func AutoscalingGetInstanceCount(ctx context.Context, region string, name string
 	if now > 0 {
 		return float64(now), nil
 	}
-	if asg.MinSize != nil && asg.MaxSize != nil {
-		return float64(*asg.MinSize+*asg.MaxSize) / 2, nil
-	}
 	return 0, nil
 }
