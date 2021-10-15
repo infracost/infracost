@@ -344,7 +344,7 @@ func shieldRequests(d *schema.ResourceData, u *schema.UsageData) *schema.CostCom
 	}
 
 	region := d.Get("region").String()
-	if d.Get("origin.0.origin_shield.0.origin_shield_region").Exists() {
+	if !d.Empty("origin.0.origin_shield.0.origin_shield_region") {
 		region = d.Get("origin.0.origin_shield.0.origin_shield_region").String()
 	}
 
@@ -399,7 +399,7 @@ func shieldRequests(d *schema.ResourceData, u *schema.UsageData) *schema.CostCom
 func invalidationRequests(u *schema.UsageData) []*schema.CostComponent {
 	var freeQuantity *decimal.Decimal
 	var paidQuantity *decimal.Decimal
-	if u != nil && u.Get("monthly_invalidation_requests").Exists() {
+	if u != nil && !u.Empty("monthly_invalidation_requests") {
 		usageAmount := u.Get("monthly_invalidation_requests").Int()
 		if usageAmount < 1000 {
 			freeQuantity = decimalPtr(decimal.NewFromInt(usageAmount))
@@ -451,14 +451,12 @@ func invalidationRequests(u *schema.UsageData) []*schema.CostComponent {
 }
 
 func encryptionRequests(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
-	// for some reason field_level_encryption_id is set to a raw value of "null" when empty so
-	// Exists() method returns true event thought the value is Type is Null
-	if d.Get("default_cache_behavior.0.field_level_encryption_id").Type == gjson.Null {
+	if d.Empty("default_cache_behavior.0.field_level_encryption_id") {
 		return nil
 	}
 
 	var quantity *decimal.Decimal
-	if u != nil && u.Get("monthly_encryption_requests").Exists() {
+	if u != nil && !u.Empty("monthly_encryption_requests") {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_encryption_requests").Int()))
 	}
 
@@ -479,12 +477,12 @@ func encryptionRequests(d *schema.ResourceData, u *schema.UsageData) *schema.Cos
 }
 
 func realtimeLogs(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
-	if !d.Get("logging_config.0.bucket").Exists() {
+	if d.Empty("logging_config.0.bucket") {
 		return nil
 	}
 
 	var quantity *decimal.Decimal
-	if u != nil && u.Get("monthly_log_lines").Exists() {
+	if u != nil && !u.Empty("monthly_log_lines") {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_log_lines").Int()))
 	}
 
@@ -509,7 +507,7 @@ func customSSLCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.C
 	}
 
 	quantity := decimalPtr(decimal.NewFromInt(1))
-	if u != nil && u.Get("custom_ssl_certificates").Exists() {
+	if u != nil && !u.Empty("custom_ssl_certificates") {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("custom_ssl_certificates").Int()))
 	}
 	return &schema.CostComponent{

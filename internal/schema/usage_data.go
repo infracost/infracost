@@ -86,6 +86,13 @@ func (u *UsageData) IsEmpty(key string) bool {
 	return val.IsZero() || val.Len() == 0
 }
 
+// Return true if the key doesn't exist, is null, or is an empty string.
+// Needed because gjson.Exists returns true as long as a key exists, even if it's empty or null.
+func (u *UsageData) Empty(key string) bool {
+	g := u.Get(key)
+	return g.Type == gjson.Null || len(g.Raw) == 0 || g.Raw == "\"\""
+}
+
 func convertArrayKeyToWildcard(key string) string {
 	lastOpenBracket := strings.LastIndex(key, "[")
 	lastCloseBracket := strings.LastIndex(key, "]")
