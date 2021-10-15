@@ -115,40 +115,38 @@ func TestParseAttributes(t *testing.T) {
 	}
 }
 
-
-
 func TestUsageDataEmpty(t *testing.T) {
 	u := NewUsageMap(map[string]interface{}{
 		"some.resource": map[string]interface{}{
-			"number": 0,
-			"string": "string",
+			"number":       0,
+			"string":       "string",
 			"empty_string": "",
-			"null": nil,
+			"null":         nil,
 			"nested": map[string]interface{}{
-				"number": 0,
-				"string": "string",
+				"number":       0,
+				"string":       "string",
 				"empty_string": "",
-				"null": nil,
+				"null":         nil,
 			},
 		},
 	})["some.resource"]
 
 	tests := []struct {
-		key string
+		key  string
 		want bool
 	}{
-		{ key: "missing", want: true },
-		{ key: "number", want: false },
-		{ key: "string", want: false },
-		{ key: "empty_string", want: true },
-		{ key: "null", want: true },
+		{key: "missing", want: true},
+		{key: "number", want: false},
+		{key: "string", want: false},
+		{key: "empty_string", want: true},
+		{key: "null", want: true},
 
 		// nested keys don't work in usage, so these are all expected to return true
-		{ key: "nested.missing", want: true },
-		{ key: "nested.number", want: true },
-		{ key: "nested.string", want: true },
-		{ key: "nested.empty_string", want: true },
-		{ key: "nested.null", want: true },
+		{key: "nested.missing", want: true},
+		{key: "nested.number", want: true},
+		{key: "nested.string", want: true},
+		{key: "nested.empty_string", want: true},
+		{key: "nested.null", want: true},
 	}
 
 	for _, tt := range tests {

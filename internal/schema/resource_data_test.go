@@ -28,21 +28,21 @@ func TestResourceDataEmpty(t *testing.T) {
 		})
 
 	tests := []struct {
-		key string
+		key  string
 		want bool
 	}{
-		{ key: "someresource.missing", want: true },
-		{ key: "someresource.number", want: false },
-		{ key: "someresource.string", want: false },
-		{ key: "someresource.empty_string", want: true },
-		{ key: "someresource.null", want: true },
+		{key: "someresource.missing", want: true},
+		{key: "someresource.number", want: false},
+		{key: "someresource.string", want: false},
+		{key: "someresource.empty_string", want: true},
+		{key: "someresource.null", want: true},
 
 		// nested keys don't work in usage, so these are all expected to return false
-		{ key: "someresource.nested.missing", want: true },
-		{ key: "someresource.nested.number", want: false },
-		{ key: "someresource.nested.string", want: false },
-		{ key: "someresource.nested.empty_string", want: true },
-		{ key: "someresource.nested.null", want: true },
+		{key: "someresource.nested.missing", want: true},
+		{key: "someresource.nested.number", want: false},
+		{key: "someresource.nested.string", want: false},
+		{key: "someresource.nested.empty_string", want: true},
+		{key: "someresource.nested.null", want: true},
 	}
 
 	for _, tt := range tests {
