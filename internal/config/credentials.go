@@ -1,7 +1,6 @@
 package config
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -59,7 +58,7 @@ func readCredentialsFileIfExists() (Credentials, error) {
 		return Credentials{}, nil
 	}
 
-	data, err := ioutil.ReadFile(CredentialsFilePath())
+	data, err := os.ReadFile(CredentialsFilePath())
 	if err != nil {
 		return Credentials{}, err
 	}
@@ -82,7 +81,7 @@ func writeCredentialsFile(c Credentials) error {
 		return err
 	}
 
-	return ioutil.WriteFile(CredentialsFilePath(), data, 0600)
+	return os.WriteFile(CredentialsFilePath(), data, 0600)
 }
 
 func CredentialsFilePath() string {

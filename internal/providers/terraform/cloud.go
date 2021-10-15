@@ -3,7 +3,7 @@ package terraform
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path"
@@ -49,7 +49,7 @@ func cloudAPI(host string, path string, token string) ([]byte, error) {
 		return []byte{}, errors.Errorf("invalid response from Terraform remote: %s", resp.Status)
 	}
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
 
 func findCloudToken(host string) string {
@@ -112,7 +112,7 @@ func credFromHCL(filename string, host string) (string, error) {
 }
 
 func credFromJSON(filename, host string) (string, error) {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return "", err
 	}

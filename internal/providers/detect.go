@@ -4,11 +4,11 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"fmt"
-	"github.com/awslabs/goformation/v4"
-	"github.com/infracost/infracost/internal/providers/cloudformation"
-	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/awslabs/goformation/v4"
+	"github.com/infracost/infracost/internal/providers/cloudformation"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -54,7 +54,7 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 }
 
 func isTerraformPlanJSON(path string) bool {
-	b, err := ioutil.ReadFile(path)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return false
 	}
@@ -73,7 +73,7 @@ func isTerraformPlanJSON(path string) bool {
 }
 
 func isTerraformStateJSON(path string) bool {
-	b, err := ioutil.ReadFile(path)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return false
 	}

@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -162,7 +161,7 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) {
 	expected := []byte("")
 	if _, err := os.Stat(goldenFilePath); err == nil || !os.IsNotExist(err) {
 		// golden file exists, load the data
-		expected, err = ioutil.ReadFile(goldenFilePath)
+		expected, err = os.ReadFile(goldenFilePath)
 		assert.NoError(t, err)
 	}
 
@@ -176,7 +175,7 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) {
 				}
 			}
 
-			err := ioutil.WriteFile(goldenFilePath, actual, 0600)
+			err := os.WriteFile(goldenFilePath, actual, 0600)
 			assert.NoError(t, err)
 			t.Logf(fmt.Sprintf("Wrote golden file %s", goldenFilePath))
 		} else {

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -137,7 +136,7 @@ func CreateConfigFile(dir string, terraformCloudHost string, terraformCloudToken
 	}
 
 	log.Debug("Creating temporary config file for Terraform credentials")
-	tmpFile, err := ioutil.TempFile("", "")
+	tmpFile, err := os.CreateTemp("", "")
 	if err != nil {
 		return "", err
 	}
