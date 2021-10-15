@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -25,7 +25,7 @@ func LoadConfigFile(path string) (ConfigFileSpec, error) {
 		return cfgFile, fmt.Errorf("Config file does not exist at %s", path)
 	}
 
-	rawCfgFile, err := ioutil.ReadFile(path)
+	rawCfgFile, err := os.ReadFile(path)
 	if err != nil {
 		return cfgFile, err
 	}

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -57,7 +57,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			currency := ""
 
 			for _, f := range inputFiles {
-				data, err := ioutil.ReadFile(f)
+				data, err := os.ReadFile(f)
 				if err != nil {
 					return errors.Wrap(err, "Error reading JSON file")
 				}

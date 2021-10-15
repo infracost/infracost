@@ -5,7 +5,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -202,7 +201,7 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	require.NoError(t, err)
 
 	// Load the terraform projects
-	tfProjectData, err := ioutil.ReadFile(filepath.Join("testdata", testName, testName+".tf"))
+	tfProjectData, err := os.ReadFile(filepath.Join("testdata", testName, testName+".tf"))
 	require.NoError(t, err)
 	tfProject := TerraformProject{
 		Files: []File{
@@ -279,7 +278,7 @@ func GoldenFileUsageSyncTest(t *testing.T, testName string) {
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	require.NoError(t, err)
 
-	tfProjectData, err := ioutil.ReadFile(filepath.Join("testdata", testName, testName+".tf"))
+	tfProjectData, err := os.ReadFile(filepath.Join("testdata", testName, testName+".tf"))
 	require.NoError(t, err)
 	tfProject := TerraformProject{
 		Files: []File{
@@ -388,12 +387,12 @@ func copyInitCacheToPath(source, destination string) error {
 				}
 			} else {
 				if file.Name() != "init.tf" { // don't copy init.tf since the provider block will conflict with main.tf
-					srcData, err := ioutil.ReadFile(srcPath)
+					srcData, err := os.ReadFile(srcPath)
 					if err != nil {
 						return err
 					}
 
-					if err := ioutil.WriteFile(destPath, srcData, os.ModePerm); err != nil {
+					if err := os.WriteFile(destPath, srcData, os.ModePerm); err != nil {
 						return err
 					}
 				}
@@ -418,7 +417,7 @@ func writeToTmpDir(tmpDir string, tfProject TerraformProject) (string, error) {
 			}
 		}
 
-		err = ioutil.WriteFile(fullPath, []byte(terraformFile.Contents), 0600)
+		err = os.WriteFile(fullPath, []byte(terraformFile.Contents), 0600)
 		if err != nil {
 			return tmpDir, err
 		}

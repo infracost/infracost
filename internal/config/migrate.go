@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"time"
@@ -30,7 +29,7 @@ func (c *Config) migrateCredentials() error {
 			Version string `yaml:"version"`
 		}
 
-		data, err := ioutil.ReadFile(credPath)
+		data, err := os.ReadFile(credPath)
 		if err != nil {
 			return err
 		}
@@ -51,7 +50,7 @@ func (c *Config) migrateCredentials() error {
 func (c *Config) migrateV0_7_17(oldPath string, newPath string) error {
 	log.Debugf("Migrating old credentials from %s to %s", oldPath, newPath)
 
-	data, err := ioutil.ReadFile(oldPath)
+	data, err := os.ReadFile(oldPath)
 	if err != nil {
 		return err
 	}
@@ -91,7 +90,7 @@ func (c *Config) migrateV0_9_4(credPath string) error {
 	// Use MapSlice to keep the order of the items, so we can always use the first one
 	var oldCreds yaml.MapSlice
 
-	data, err := ioutil.ReadFile(credPath)
+	data, err := os.ReadFile(credPath)
 	if err != nil {
 		return err
 	}

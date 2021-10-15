@@ -2,7 +2,6 @@ package config
 
 import (
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -152,7 +151,7 @@ func (c *Config) ConfigureLogger() error {
 	})
 
 	if c.LogLevel == "" {
-		logrus.SetOutput(ioutil.Discard)
+		logrus.SetOutput(io.Discard)
 		return nil
 	}
 

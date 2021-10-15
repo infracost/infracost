@@ -3,7 +3,6 @@ package usage
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"sort"
 	"strings"
@@ -35,7 +34,7 @@ func LoadUsageFile(path string, createIfNotExist bool) (*UsageFile, error) {
 		}
 	}
 
-	contents, err := ioutil.ReadFile(path)
+	contents, err := os.ReadFile(path)
 	if err != nil {
 		return &UsageFile{}, errors.Wrapf(err, "Error reading usage file")
 	}
@@ -132,12 +131,7 @@ See https://infracost.io/usage-file/ for docs`,
 	// If all the resources are commented then we also want to comment the resource_usage key
 	b = replaceCommentMarks(b)
 
-	err = ioutil.WriteFile(path, b, 0600)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return os.WriteFile(path, b, 0600)
 }
 
 func (u *UsageFile) ToUsageDataMap() map[string]*schema.UsageData {

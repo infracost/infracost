@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path"
 
@@ -41,7 +40,7 @@ func readStateFileIfExists() (*State, error) {
 		return &State{}, nil
 	}
 
-	data, err := ioutil.ReadFile(stateFilePath())
+	data, err := os.ReadFile(stateFilePath())
 	if err != nil {
 		return &State{}, err
 	}
@@ -63,7 +62,7 @@ func writeStateFile(s *State) error {
 		return err
 	}
 
-	return ioutil.WriteFile(stateFilePath(), data, 0600)
+	return os.WriteFile(stateFilePath(), data, 0600)
 }
 
 func stateFilePath() string {

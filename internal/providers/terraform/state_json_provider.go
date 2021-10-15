@@ -1,7 +1,7 @@
 package terraform
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
@@ -33,7 +33,7 @@ func (p *StateJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 func (p *StateJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
-	j, err := ioutil.ReadFile(p.Path)
+	j, err := os.ReadFile(p.Path)
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Terraform state JSON file")
 	}

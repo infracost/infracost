@@ -1,7 +1,6 @@
 package config
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -54,7 +53,7 @@ func readConfigurationFileIfExists() (Configuration, error) {
 		return Configuration{}, nil
 	}
 
-	data, err := ioutil.ReadFile(ConfigurationFilePath())
+	data, err := os.ReadFile(ConfigurationFilePath())
 	if err != nil {
 		return Configuration{}, err
 	}
@@ -77,7 +76,7 @@ func writeConfigurationFile(c Configuration) error {
 		return err
 	}
 
-	return ioutil.WriteFile(ConfigurationFilePath(), data, 0600)
+	return os.WriteFile(ConfigurationFilePath(), data, 0600)
 }
 
 func ConfigurationFilePath() string {
