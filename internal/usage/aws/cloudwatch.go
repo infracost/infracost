@@ -20,6 +20,7 @@ func cloudwatchNewClient(ctx context.Context, region string) (*cloudwatch.Client
 	if err != nil {
 		return nil, err
 	}
+
 	return cloudwatch.NewFromConfig(cfg), nil
 }
 
@@ -44,6 +45,7 @@ func cloudwatchGetMonthlyStats(ctx context.Context, req statsRequest) (*cloudwat
 			Value: strPtr(v),
 		})
 	}
+
 	return client.GetMetricStatistics(ctx, &cloudwatch.GetMetricStatisticsInput{
 		Namespace:  strPtr(req.namespace),
 		MetricName: strPtr(req.metric),

@@ -10,27 +10,35 @@ type S3IntelligentTieringStorageClass struct {
 	Region string
 
 	// "usage" args
-	FrequentAccessStorageGB            *int64 `infracost_usage:"frequent_access_storage_gb"`
-	InfrequentAccessStorageGB          *int64 `infracost_usage:"infrequent_access_storage_gb"`
-	MonitoredObjects                   *int64 `infracost_usage:"monitored_objects"`
-	MonthlyTier1Requests               *int64 `infracost_usage:"monthly_tier_1_requests"`
-	MonthlyTier2Requests               *int64 `infracost_usage:"monthly_tier_2_requests"`
-	MonthlyLifecycleTransitionRequests *int64 `infracost_usage:"monthly_lifecycle_transition_requests"`
-	MonthlySelectDataScannedGB         *int64 `infracost_usage:"monthly_select_data_scanned_gb"`
-	MonthlySelectDataReturnedGB        *int64 `infracost_usage:"monthly_select_data_returned_gb"`
-	EarlyDeleteGB                      *int64 `infracost_usage:"early_delete_gb"`
+	FrequentAccessStorageGB            *float64 `infracost_usage:"frequent_access_storage_gb"`
+	InfrequentAccessStorageGB          *float64 `infracost_usage:"infrequent_access_storage_gb"`
+	ArchiveAccessStorageGB             *float64 `infracost_usage:"archive_access_storage_gb"`
+	DeepArchiveAccessStorageGB         *float64 `infracost_usage:"deep_archive_access_storage_gb"`
+	MonitoredObjects                   *int64   `infracost_usage:"monitored_objects"`
+	MonthlyTier1Requests               *int64   `infracost_usage:"monthly_tier_1_requests"`
+	MonthlyTier2Requests               *int64   `infracost_usage:"monthly_tier_2_requests"`
+	MonthlyLifecycleTransitionRequests *int64   `infracost_usage:"monthly_lifecycle_transition_requests"`
+	MonthlySelectDataScannedGB         *float64 `infracost_usage:"monthly_select_data_scanned_gb"`
+	MonthlySelectDataReturnedGB        *float64 `infracost_usage:"monthly_select_data_returned_gb"`
+	EarlyDeleteGB                      *float64 `infracost_usage:"early_delete_gb"`
 }
 
 var S3IntelligentTieringStorageClassUsageSchema = []*schema.UsageItem{
-	{Key: "frequent_access_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "infrequent_access_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "frequent_access_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "infrequent_access_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "archive_access_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "deep_archive_access_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monitored_objects", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_tier_1_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_tier_2_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_lifecycle_transition_requests", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_select_data_scanned_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_select_data_returned_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "early_delete_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_select_data_scanned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "monthly_select_data_returned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "early_delete_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+}
+
+func (a *S3IntelligentTieringStorageClass) UsageKey() string {
+	return "intelligent_tiering"
 }
 
 func (a *S3IntelligentTieringStorageClass) PopulateUsage(u *schema.UsageData) {
@@ -40,10 +48,12 @@ func (a *S3IntelligentTieringStorageClass) PopulateUsage(u *schema.UsageData) {
 func (a *S3IntelligentTieringStorageClass) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:        "Intelligent tiering",
-		UsageSchema: S3BucketUsageSchema,
+		UsageSchema: S3IntelligentTieringStorageClassUsageSchema,
 		CostComponents: []*schema.CostComponent{
 			s3StorageCostComponent("Storage (frequent access)", "AmazonS3", a.Region, "TimedStorage-INT-FA-ByteHrs", a.FrequentAccessStorageGB),
 			s3StorageCostComponent("Storage (infrequent access)", "AmazonS3", a.Region, "TimedStorage-INT-IA-ByteHrs", a.InfrequentAccessStorageGB),
+			s3StorageVolumeTypeCostComponent("Storage (archive access)", "AmazonS3", a.Region, "TimedStorage-INT-AA-ByteHrs", "IntelligentTieringArchiveStorage", a.FrequentAccessStorageGB),
+			s3StorageVolumeTypeCostComponent("Storage (deep archive access)", "AmazonS3", a.Region, "TimedStorage-INT-DAA-ByteHrs", "IntelligentTieringDeepArchiveStorage", a.InfrequentAccessStorageGB),
 			s3MonitoringCostComponent(a.Region, a.MonitoredObjects),
 			s3ApiCostComponent("PUT, COPY, POST, LIST requests", "AmazonS3", a.Region, "Requests-INT-Tier1", a.MonthlyTier1Requests),
 			s3ApiCostComponent("GET, SELECT, and all other requests", "AmazonS3", a.Region, "Requests-INT-Tier2", a.MonthlyTier2Requests),

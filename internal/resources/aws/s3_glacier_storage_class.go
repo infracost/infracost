@@ -10,23 +10,23 @@ type S3GlacierStorageClass struct {
 	Region string
 
 	// "usage" args
-	StorageGB                             *int64 `infracost_usage:"storage_gb"`
-	MonthlyTier1Requests                  *int64 `infracost_usage:"monthly_tier_1_requests"`
-	MonthlyTier2Requests                  *int64 `infracost_usage:"monthly_tier_2_requests"`
-	MonthlyLifecycleTransitionRequests    *int64 `infracost_usage:"monthly_lifecycle_transition_requests"`
-	MonthlyStandardDataRetrievalRequests  *int64 `infracost_usage:"monthly_standard_data_retrieval_requests"`
-	MonthlyStandardDataRetrievalGB        *int64 `infracost_usage:"monthly_standard_data_retrieval_gb"`
-	MonthlyStandardSelectDataScannedGB    *int64 `infracost_usage:"monthly_standard_select_data_scanned_gb"`
-	MonthlyStandardSelectDataReturnedGB   *int64 `infracost_usage:"monthly_standard_select_data_returned_gb"`
-	MonthlyExpeditedDataRetrievalRequests *int64 `infracost_usage:"monthly_expedited_data_retrieval_requests"`
-	MonthlyExpeditedDataRetrievalGB       *int64 `infracost_usage:"monthly_expedited_data_retrieval_gb"`
-	MonthlyExpeditedSelectDataScannedGB   *int64 `infracost_usage:"monthly_expedited_select_data_scanned_gb"`
-	MonthlyExpeditedSelectDataReturnedGB  *int64 `infracost_usage:"monthly_expedited_select_data_returned_gb"`
-	MonthlyBulkDataRetrievalRequests      *int64 `infracost_usage:"monthly_bulk_data_retrieval_requests"`
-	MonthlyBulkDataRetrievalGB            *int64 `infracost_usage:"monthly_bulk_data_retrieval_gb"`
-	MonthlyBulkSelectDataScannedGB        *int64 `infracost_usage:"monthly_bulk_select_data_scanned_gb"`
-	MonthlyBulkSelectDataReturnedGB       *int64 `infracost_usage:"monthly_bulk_select_data_returned_gb"`
-	EarlyDeleteGB                         *int64 `infracost_usage:"early_delete_gb"`
+	StorageGB                             *float64 `infracost_usage:"storage_gb"`
+	MonthlyTier1Requests                  *int64   `infracost_usage:"monthly_tier_1_requests"`
+	MonthlyTier2Requests                  *int64   `infracost_usage:"monthly_tier_2_requests"`
+	MonthlyLifecycleTransitionRequests    *int64   `infracost_usage:"monthly_lifecycle_transition_requests"`
+	MonthlyStandardDataRetrievalRequests  *int64   `infracost_usage:"monthly_standard_data_retrieval_requests"`
+	MonthlyStandardDataRetrievalGB        *float64 `infracost_usage:"monthly_standard_data_retrieval_gb"`
+	MonthlyStandardSelectDataScannedGB    *float64 `infracost_usage:"monthly_standard_select_data_scanned_gb"`
+	MonthlyStandardSelectDataReturnedGB   *float64 `infracost_usage:"monthly_standard_select_data_returned_gb"`
+	MonthlyExpeditedDataRetrievalRequests *int64   `infracost_usage:"monthly_expedited_data_retrieval_requests"`
+	MonthlyExpeditedDataRetrievalGB       *float64 `infracost_usage:"monthly_expedited_data_retrieval_gb"`
+	MonthlyExpeditedSelectDataScannedGB   *float64 `infracost_usage:"monthly_expedited_select_data_scanned_gb"`
+	MonthlyExpeditedSelectDataReturnedGB  *float64 `infracost_usage:"monthly_expedited_select_data_returned_gb"`
+	MonthlyBulkDataRetrievalRequests      *int64   `infracost_usage:"monthly_bulk_data_retrieval_requests"`
+	MonthlyBulkDataRetrievalGB            *float64 `infracost_usage:"monthly_bulk_data_retrieval_gb"`
+	MonthlyBulkSelectDataScannedGB        *float64 `infracost_usage:"monthly_bulk_select_data_scanned_gb"`
+	MonthlyBulkSelectDataReturnedGB       *float64 `infracost_usage:"monthly_bulk_select_data_returned_gb"`
+	EarlyDeleteGB                         *float64 `infracost_usage:"early_delete_gb"`
 }
 
 var S3GlacierStorageClassUsageSchema = []*schema.UsageItem{
@@ -35,18 +35,22 @@ var S3GlacierStorageClassUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_tier_2_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_lifecycle_transition_requests", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_standard_data_retrieval_requests", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_standard_data_retrieval_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_standard_select_data_scanned_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_standard_select_data_returned_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_standard_data_retrieval_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "monthly_standard_select_data_scanned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "monthly_standard_select_data_returned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monthly_expedited_data_retrieval_requests", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_expedited_data_retrieval_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_expedited_select_data_scanned_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_expedited_select_data_returned_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_expedited_data_retrieval_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "monthly_expedited_select_data_scanned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "monthly_expedited_select_data_returned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monthly_bulk_data_retrieval_requests", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_bulk_data_retrieval_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_bulk_select_data_scanned_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_bulk_select_data_returned_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "early_delete_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_bulk_data_retrieval_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "monthly_bulk_select_data_scanned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "monthly_bulk_select_data_returned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "early_delete_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+}
+
+func (a *S3GlacierStorageClass) UsageKey() string {
+	return "glacier"
 }
 
 func (a *S3GlacierStorageClass) PopulateUsage(u *schema.UsageData) {
@@ -56,7 +60,7 @@ func (a *S3GlacierStorageClass) PopulateUsage(u *schema.UsageData) {
 func (a *S3GlacierStorageClass) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:        "Glacier",
-		UsageSchema: S3BucketUsageSchema,
+		UsageSchema: S3GlacierStorageClassUsageSchema,
 		CostComponents: []*schema.CostComponent{
 			s3StorageCostComponent("Storage", "AmazonGlacier", a.Region, "TimedStorage-ByteHrs", a.StorageGB),
 			s3ApiOperationCostComponent("PUT, COPY, POST, LIST requests", "AmazonS3", a.Region, "Requests-GLACIER-Tier1", "PostObject", a.MonthlyTier1Requests),

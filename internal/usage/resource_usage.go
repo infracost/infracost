@@ -124,8 +124,8 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 			kind := yamlv3.ScalarNode
 			content := make([]*yamlv3.Node, 0)
 
-			rawValue := item.DefaultValue
 			itemNodeIsCommented := true
+			rawValue := item.DefaultValue
 
 			if item.Value != nil {
 				rawValue = item.Value
@@ -135,17 +135,34 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 			}
 
 			if item.ValueType == schema.SubResourceUsage {
-				if rawValue != nil {
-					subResourceUsage := rawValue.(*ResourceUsage)
-					subResourceValNode, allSubResourcesCommented := ResourceUsagesToYAML([]*ResourceUsage{subResourceUsage})
-
-					if !allSubResourcesCommented {
-						resourceNodeIsCommented = false
-						rootNodeIsCommented = false
-					}
-
-					resourceValNode.Content = append(resourceValNode.Content, subResourceValNode.Content...)
+				// If the value is a subresource, we need to add in any missing default sub-items
+				// so they get rendered as comments
+				subResourceUsage := &ResourceUsage{
+					Name: item.Key,
 				}
+				if item.Value != nil {
+					subResourceUsage = item.Value.(*ResourceUsage)
+				}
+
+				subResourceUsageMap := subResourceUsage.Map()
+
+				if item.DefaultValue != nil {
+					for _, defaultItem := range item.DefaultValue.(*ResourceUsage).Items {
+						if _, ok := subResourceUsageMap[defaultItem.Key]; !ok {
+							subResourceUsage.Items = append(subResourceUsage.Items, defaultItem)
+						}
+					}
+				}
+
+				subResourceValNode, allSubResourcesCommented := ResourceUsagesToYAML([]*ResourceUsage{subResourceUsage})
+
+				if !allSubResourcesCommented {
+					resourceNodeIsCommented = false
+					rootNodeIsCommented = false
+				}
+
+				resourceValNode.Content = append(resourceValNode.Content, subResourceValNode.Content...)
+
 				continue
 			}
 
@@ -155,12 +172,22 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 			switch item.ValueType {
 			case schema.Float64:
 				tag = "!!float"
+
+				// Float values might be represented as integers, so we need to make sure it's a float first
+				var rawFloat float64
+				switch f := rawValue.(type) {
+				case float64:
+					rawFloat = f
+				case int64:
+					rawFloat = float64(f)
+				}
+
 				// Format the float with as few decimal places as necessary
-				value = strconv.FormatFloat(rawValue.(float64), 'f', -1, 64)
+				value = strconv.FormatFloat(rawFloat, 'f', -1, 64)
 
 				// If the float is a whole number then add at least one decimal place
 				// so the YAML marshaller doesn't need to add an explicit !!float tag
-				if value == fmt.Sprintf("%.f", rawValue) {
+				if value == fmt.Sprintf("%.f", rawFloat) {
 					value = fmt.Sprintf("%s.0", value)
 				}
 			case schema.Int64:

@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/infracost/infracost/internal/schema"
-	usage "github.com/infracost/infracost/internal/usage/aws"
+	awsusage "github.com/infracost/infracost/internal/usage/aws"
 )
 
 type estimates struct {
@@ -20,14 +20,14 @@ type estimates struct {
 }
 
 func newEstimates(ctx context.Context, t *testing.T, resource *schema.Resource) estimates {
-	usage := make(map[string]interface{})
-	err := resource.EstimateUsage(ctx, usage)
+	u := make(map[string]interface{})
+	err := resource.EstimateUsage(ctx, u)
 	if err != nil {
 		t.Fatalf("Expected %T.EstimateUsage to succeed, got %s", resource, err)
 	}
 
 	for _, item := range resource.UsageSchema {
-		value := usage[item.Key]
+		value := u[item.Key]
 		if value == nil {
 			continue
 		}
@@ -48,6 +48,10 @@ func newEstimates(ctx context.Context, t *testing.T, resource *schema.Resource) 
 			if _, ok := value.([]string); !ok {
 				t.Errorf("Expected %T %s of type []string, got a %T", resource, item.Key, value)
 			}
+		case schema.SubResourceUsage:
+			if _, ok := value.(map[string]interface{}); !ok {
+				t.Errorf("Expected %T %s of type map[string]interface{}, got a %T", resource, item.Key, value)
+			}
 		default:
 			t.Errorf("Unknown UsageItem.ValueType %v", item.ValueType)
 		}
@@ -55,18 +59,12 @@ func newEstimates(ctx context.Context, t *testing.T, resource *schema.Resource) 
 
 	return estimates{
 		t:     t,
-		usage: usage,
-	}
-}
-
-func (sa estimates) mustHave(key string, expected interface{}) {
-	actual := sa.usage[key]
-	if actual != expected {
-		sa.t.Fatalf("Expected %s %v %T, got %v %T", key, expected, expected, actual, actual)
+		usage: u,
 	}
 }
 
 type stubbedRequest struct {
+	fullPath       *string
 	bodyFragments  []string
 	response       string
 	responseStatus int
@@ -105,15 +103,29 @@ func (sa *stubbedAWS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for _, sr := range sa.requests {
 		match := true
+
+		if sr.fullPath != nil && *sr.fullPath != r.URL.RequestURI() {
+			match = false
+		}
+
 		for _, fragment := range sr.bodyFragments {
 			match = match && strings.Contains(body, fragment)
 		}
+
 		if match {
 			sa.writeResponse(w, sr.responseStatus, sr.response)
 			return
 		}
 	}
 	sa.t.Fatalf("received unexpected stubbed AWS call: %s %s %s", r.Method, r.URL, body)
+}
+
+func (sa *stubbedAWS) WhenFullPath(path string) *stubbedRequest {
+	sr := &stubbedRequest{
+		fullPath: &path,
+	}
+	sa.requests = append(sa.requests, sr)
+	return sr
 }
 
 func (sa *stubbedAWS) WhenBody(fragments ...string) *stubbedRequest {
@@ -134,6 +146,6 @@ func stubAWS(t *testing.T) *stubbedAWS {
 		requests: make([]*stubbedRequest, 0),
 	}
 	stub.server = httptest.NewServer(stub)
-	stub.ctx = usage.WithTestEndpoint(context.TODO(), stub.server.URL)
+	stub.ctx = awsusage.WithTestEndpoint(context.TODO(), stub.server.URL)
 	return stub
 }

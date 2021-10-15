@@ -8,9 +8,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 )
 
-type ctxKeyType struct{}
+type ctxConfigOptsKeyType struct{}
 
-var ctxKey = &ctxKeyType{}
+var ctxConfigOptsKey = &ctxConfigOptsKeyType{}
 
 func getConfig(ctx context.Context, region string) (aws.Config, error) {
 	opts := []func(*config.LoadOptions) error{
@@ -18,7 +18,7 @@ func getConfig(ctx context.Context, region string) (aws.Config, error) {
 		// config.WithClientLogMode(aws.LogRequestWithBody | aws.LogResponseWithBody),
 	}
 
-	if ctxOpts, ok := ctx.Value(ctxKey).([]func(*config.LoadOptions) error); ok {
+	if ctxOpts, ok := ctx.Value(ctxConfigOptsKey).([]func(*config.LoadOptions) error); ok {
 		opts = append(opts, ctxOpts...)
 	}
 

@@ -15,6 +15,10 @@ type SyncResult struct {
 	EstimationErrors map[string]error
 }
 
+type MergeResourceUsagesOpts struct {
+	OverrideValueType bool
+}
+
 func SyncUsageData(usageFile *UsageFile, projects []*schema.Project) (*SyncResult, error) {
 	referenceFile, err := LoadReferenceFile()
 	if err != nil {
@@ -55,19 +59,21 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 		// Merge the usage schema from the reference usage file
 		refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
 		if refResourceUsage != nil {
-			mergeResourceUsages(resourceUsage, refResourceUsage)
+			mergeResourceUsages(resourceUsage, refResourceUsage, MergeResourceUsagesOpts{})
 		}
 
 		// Merge the usage schema from the resource struct
+		// We want to override the value type from the usage schema since we can't always tell from the YAML
+		// what the value type should be, e.g. user might add an int value for a float attribute.
 		mergeResourceUsages(resourceUsage, &ResourceUsage{
 			Name:  resource.Name,
 			Items: resource.UsageSchema,
-		})
+		}, MergeResourceUsagesOpts{OverrideValueType: true})
 
 		// Merge any existing resource usage
 		existingResourceUsage := existingResourceUsagesMap[resource.Name]
 		if existingResourceUsage != nil {
-			mergeResourceUsages(resourceUsage, existingResourceUsage)
+			mergeResourceUsages(resourceUsage, existingResourceUsage, MergeResourceUsagesOpts{})
 		}
 
 		syncResult.ResourceCount++
@@ -96,7 +102,7 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 	return syncResult
 }
 
-func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage) {
+func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage, opts MergeResourceUsagesOpts) {
 	if dest == nil || src == nil {
 		return
 	}
@@ -109,11 +115,13 @@ func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage) {
 	for _, srcItem := range src.Items {
 		destItem, ok := destItemMap[srcItem.Key]
 		if !ok {
-			destItem = &schema.UsageItem{Key: srcItem.Key}
+			destItem = &schema.UsageItem{Key: srcItem.Key, ValueType: srcItem.ValueType}
 			dest.Items = append(dest.Items, destItem)
 		}
 
-		destItem.ValueType = srcItem.ValueType
+		if opts.OverrideValueType {
+			destItem.ValueType = srcItem.ValueType
+		}
 
 		if srcItem.Description != "" {
 			destItem.Description = srcItem.Description
@@ -127,7 +135,7 @@ func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage) {
 						Name: srcDefaultValue.Name,
 					}
 				}
-				mergeResourceUsages(destItem.DefaultValue.(*ResourceUsage), srcDefaultValue)
+				mergeResourceUsages(destItem.DefaultValue.(*ResourceUsage), srcDefaultValue, opts)
 			}
 
 			if srcItem.Value != nil {
@@ -140,7 +148,7 @@ func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage) {
 						Name: srcValue.Name,
 					}
 				}
-				mergeResourceUsages(destItem.Value.(*ResourceUsage), srcValue)
+				mergeResourceUsages(destItem.Value.(*ResourceUsage), srcValue, opts)
 			}
 		} else {
 			if srcItem.DefaultValue != nil {
@@ -183,29 +191,44 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 			subUsageMap := usageData.Get(item.Key).Map()
 			subExisting := schema.NewUsageData(item.Key, subUsageMap)
 
-			subResourceUsage := &ResourceUsage{
-				Name: item.Key,
-			}
+			var subResourceUsage *ResourceUsage
 			// If the item has a value, use it as the base
 			if item.Value != nil {
 				subResourceUsage = item.Value.(*ResourceUsage)
 			}
 
-			// If the item has no value but does have a default value, then merge in
-			// any keys that exist in the existing usage that match a key in the default value
+			// If the resource usage is nil, but the usage data we want to merge has data
+			// for any of its sub-items, we want to add the sub-items in first before we merge
 			if item.Value == nil && item.DefaultValue != nil {
+				subResourceUsage = &ResourceUsage{
+					Name: item.Key,
+				}
+
+				hasSubItems := false
 				for _, subItem := range item.DefaultValue.(*ResourceUsage).Items {
 					if subExisting.Get(subItem.Key).Type != gjson.Null {
+						hasSubItems = true
 						subResourceUsage.Items = append(subResourceUsage.Items, subItem)
 					}
 				}
+
+				if !hasSubItems {
+					subResourceUsage = nil
+				}
 			}
 
-			mergeResourceUsageWithUsageData(subResourceUsage, subExisting)
-			val = item.Value
+			if subResourceUsage != nil {
+				mergeResourceUsageWithUsageData(subResourceUsage, subExisting)
+			}
+
+			if subResourceUsage != nil {
+				val = subResourceUsage
+			}
 		}
 
-		item.Value = val
+		if val != nil {
+			item.Value = val
+		}
 	}
 }
 

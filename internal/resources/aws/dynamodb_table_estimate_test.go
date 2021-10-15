@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	resources "github.com/infracost/infracost/internal/resources/aws"
+	"github.com/stretchr/testify/assert"
 )
 
 func stubDescribeTable(stub *stubbedAWS) {
@@ -35,7 +36,8 @@ func TestDynamoDBStorage(t *testing.T) {
 	args := resources.DynamoDBTable{}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
-	estimates.mustHave("storage_gb", int64(10))
+
+	assert.Equal(t, int64(10), estimates.usage["storage_gb"])
 }
 
 func TestDynamoDBPayPerRequest(t *testing.T) {
@@ -75,8 +77,8 @@ func TestDynamoDBPayPerRequest(t *testing.T) {
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
 
-	estimates.mustHave("monthly_read_request_units", int64(123))
-	estimates.mustHave("monthly_write_request_units", int64(456))
+	assert.Equal(t, int64(123), estimates.usage["monthly_read_request_units"])
+	assert.Equal(t, int64(456), estimates.usage["monthly_write_request_units"])
 }
 
 func TestDynamoDBProvisioned(t *testing.T) {
@@ -90,6 +92,6 @@ func TestDynamoDBProvisioned(t *testing.T) {
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
 
-	estimates.mustHave("monthly_read_request_units", nil)
-	estimates.mustHave("monthly_write_request_units", nil)
+	assert.Equal(t, nil, estimates.usage["monthly_read_request_units"])
+	assert.Equal(t, nil, estimates.usage["monthly_write_request_units"])
 }
