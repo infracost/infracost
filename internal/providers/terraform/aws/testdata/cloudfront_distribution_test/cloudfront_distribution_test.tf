@@ -131,7 +131,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_0_with_shield" {
     }
 
     origin_shield {
-      enabled = true
+      enabled              = true
       origin_shield_region = "sa-east-1"
     }
   }
@@ -235,7 +235,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_1_with_logging" {
     }
 
     origin_shield {
-      enabled = true
+      enabled              = true
       origin_shield_region = "sa-east-1"
     }
   }
@@ -345,7 +345,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_2_with_encryption" {
     }
 
     origin_shield {
-      enabled = true
+      enabled              = true
       origin_shield_region = "sa-east-1"
     }
   }
@@ -376,10 +376,10 @@ resource "aws_cloudfront_distribution" "s3_distribution_2_with_encryption" {
       }
     }
 
-    viewer_protocol_policy = "allow-all"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    viewer_protocol_policy    = "allow-all"
+    min_ttl                   = 0
+    default_ttl               = 3600
+    max_ttl                   = 86400
     field_level_encryption_id = "test encryption"
   }
 
@@ -456,7 +456,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_3_with_ssl" {
     }
 
     origin_shield {
-      enabled = true
+      enabled              = true
       origin_shield_region = "sa-east-1"
     }
   }
@@ -487,10 +487,10 @@ resource "aws_cloudfront_distribution" "s3_distribution_3_with_ssl" {
       }
     }
 
-    viewer_protocol_policy = "allow-all"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    viewer_protocol_policy    = "allow-all"
+    min_ttl                   = 0
+    default_ttl               = 3600
+    max_ttl                   = 86400
     field_level_encryption_id = "test encryption"
   }
 
@@ -554,7 +554,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_3_with_ssl" {
 
   viewer_certificate {
     cloudfront_default_certificate = true
-    ssl_support_method = "vip"
+    ssl_support_method             = "vip"
   }
 }
 
@@ -568,7 +568,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_usage" {
     }
 
     origin_shield {
-      enabled = true
+      enabled              = true
       origin_shield_region = "sa-east-1"
     }
   }
@@ -599,10 +599,10 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_usage" {
       }
     }
 
-    viewer_protocol_policy = "allow-all"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    viewer_protocol_policy    = "allow-all"
+    min_ttl                   = 0
+    default_ttl               = 3600
+    max_ttl                   = 86400
     field_level_encryption_id = "test encryption"
   }
 
@@ -666,7 +666,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_usage" {
 
   viewer_certificate {
     cloudfront_default_certificate = true
-    ssl_support_method = "vip"
+    ssl_support_method             = "vip"
   }
 }
 
@@ -680,7 +680,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_single_non_default_
     }
 
     origin_shield {
-      enabled = true
+      enabled              = true
       origin_shield_region = "sa-east-1"
     }
   }
@@ -711,10 +711,10 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_single_non_default_
       }
     }
 
-    viewer_protocol_policy = "allow-all"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    viewer_protocol_policy    = "allow-all"
+    min_ttl                   = 0
+    default_ttl               = 3600
+    max_ttl                   = 86400
     field_level_encryption_id = "test encryption"
   }
 
@@ -778,7 +778,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_single_non_default_
 
   viewer_certificate {
     cloudfront_default_certificate = true
-    ssl_support_method = "vip"
+    ssl_support_method             = "vip"
   }
 }
 
@@ -792,7 +792,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_zero_usage" {
     }
 
     origin_shield {
-      enabled = true
+      enabled              = true
       origin_shield_region = "sa-east-1"
     }
   }
@@ -823,10 +823,10 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_zero_usage" {
       }
     }
 
-    viewer_protocol_policy = "allow-all"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    viewer_protocol_policy    = "allow-all"
+    min_ttl                   = 0
+    default_ttl               = 3600
+    max_ttl                   = 86400
     field_level_encryption_id = "test encryption"
   }
 
@@ -890,6 +890,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_with_zero_usage" {
 
   viewer_certificate {
     cloudfront_default_certificate = true
-    ssl_support_method = "vip"
+    ssl_support_method             = "vip"
   }
 }
