@@ -48,14 +48,6 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg
 		return fmt.Errorf("Error generating usage: no usage file given")
 	}
 
-	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: runCtx.Config.IsLogging(),
-		NoColor:       runCtx.Config.NoColor,
-		Indent:        "  ",
-	}
-
-	spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
-
 	var usageFile *usage.UsageFile
 
 	usageFilePath := projectCfg.UsageFile
@@ -75,6 +67,13 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg
 		return errors.Wrap(err, "Error loading resources")
 	}
 
+	spinnerOpts := ui.SpinnerOptions{
+		EnableLogging: runCtx.Config.IsLogging(),
+		NoColor:       runCtx.Config.NoColor,
+		Indent:        "  ",
+	}
+
+	spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
 	syncResult, err := usage.SyncUsageData(usageFile, providerProjects)
 	if err != nil {
 		return errors.Wrap(err, "Error synchronizing usage data")
