@@ -24,6 +24,7 @@ func NewAzureRMDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) 
 
 	if sku == "Trial" {
 		return &schema.Resource{
+			Name:      d.Address,
 			NoPrice:   true,
 			IsSkipped: true,
 		}

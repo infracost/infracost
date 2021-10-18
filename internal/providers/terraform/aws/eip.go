@@ -18,6 +18,7 @@ func NewEIP(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if (d.Get("customer_owned_ipv4_pool").Exists() && d.Get("customer_owned_ipv4_pool").String() != "") ||
 		d.Get("instance").Exists() || d.Get("network_interface").Exists() {
 		return &schema.Resource{
+			Name:      d.Address,
 			NoPrice:   true,
 			IsSkipped: true,
 		}

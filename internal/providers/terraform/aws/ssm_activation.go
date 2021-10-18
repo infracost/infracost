@@ -57,6 +57,7 @@ func NewSSMActivation(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 
 	// standard instanceTier is free
 	return &schema.Resource{
+		Name:      d.Address,
 		NoPrice:   true,
 		IsSkipped: true,
 	}

@@ -1,10 +1,11 @@
 package azure
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 func GetAzureRMLoadBalancerRegistryItem() *schema.RegistryItem {
@@ -35,6 +36,7 @@ func NewAzureRMLoadBalancer(d *schema.ResourceData, u *schema.UsageData) *schema
 
 	if strings.ToLower(sku) == "basic" {
 		return &schema.Resource{
+			Name:      d.Address,
 			NoPrice:   true,
 			IsSkipped: true,
 		}

@@ -27,6 +27,7 @@ func NewAzureRMSearchService(d *schema.ResourceData, u *schema.UsageData) *schem
 	sku := strings.ToLower(d.Get("sku").String())
 	if sku == "free" {
 		return &schema.Resource{
+			Name:      d.Address,
 			NoPrice:   true,
 			IsSkipped: true,
 		}

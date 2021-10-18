@@ -2,9 +2,10 @@ package azure
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	"strings"
 )
 
 func GetAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
@@ -31,6 +32,7 @@ func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.Us
 	} else {
 		// returning directly since SNI is currently defined as free in the Azure cost page
 		return &schema.Resource{
+			Name:      d.Address,
 			NoPrice:   true,
 			IsSkipped: true,
 		}

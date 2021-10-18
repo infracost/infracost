@@ -38,6 +38,7 @@ func NewAzureRMAppServiceCustomHostnameBinding(d *schema.ResourceData, u *schema
 	} else {
 		// returning directly since SNI is currently defined as free in the Azure cost page
 		return &schema.Resource{
+			Name:      d.Address,
 			NoPrice:   true,
 			IsSkipped: true,
 		}

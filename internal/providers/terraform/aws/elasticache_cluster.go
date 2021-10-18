@@ -25,6 +25,7 @@ func NewElastiCacheCluster(d *schema.ResourceData, u *schema.UsageData) *schema.
 	// If replicationGroupID is set, show costs in aws_elasticache_replication_group and not in this resource
 	if len(replicationGroupID) > 0 {
 		return &schema.Resource{
+			Name:      d.Address,
 			NoPrice:   true,
 			IsSkipped: true,
 		}

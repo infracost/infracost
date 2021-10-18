@@ -33,6 +33,7 @@ func NewAzureRMVpnGatewayConnection(d *schema.ResourceData, u *schema.UsageData)
 	region := lookupRegion(d, []string{})
 	if strings.ToLower(sku) == "basic" {
 		return &schema.Resource{
+			Name:      d.Address,
 			NoPrice:   true,
 			IsSkipped: true,
 		}

@@ -33,6 +33,7 @@ func NewAzureRMApplicationInsightsWeb(d *schema.ResourceData, u *schema.UsageDat
 
 	if len(costComponents) == 0 {
 		return &schema.Resource{
+			Name:      d.Address,
 			IsSkipped: true,
 			NoPrice:   true,
 		}

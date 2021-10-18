@@ -28,6 +28,7 @@ func NewAzureRMNotificationHubNamespace(d *schema.ResourceData, u *schema.UsageD
 	}
 	if strings.ToLower(sku) == "free" {
 		return &schema.Resource{
+			Name:      d.Address,
 			NoPrice:   true,
 			IsSkipped: true,
 		}
