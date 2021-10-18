@@ -26,6 +26,7 @@ func NewACMCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 	}
 
 	return &schema.Resource{
+		Name:      d.Address,
 		NoPrice:   true,
 		IsSkipped: true,
 	}

@@ -29,6 +29,7 @@ func NewSSMParameter(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	}
 	if len(costComponents) == 0 {
 		return &schema.Resource{
+			Name:      d.Address,
 			NoPrice:   true,
 			IsSkipped: true,
 		}

@@ -27,6 +27,7 @@ func NewNeptuneClusterSnapshot(d *schema.ResourceData, u *schema.UsageData) *sch
 			retentionPeriod = decimalPtr(decimal.NewFromInt(resourceData.Get("backup_retention_period").Int()))
 			if retentionPeriod.LessThan(decimal.NewFromInt(2)) {
 				return &schema.Resource{
+					Name:      d.Address,
 					NoPrice:   true,
 					IsSkipped: true,
 				}

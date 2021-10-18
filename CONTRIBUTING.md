@@ -550,6 +550,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 	// Gateway endpoints don't have a cost associated with them
 	if vpcEndpointType == "Gateway" {
 		return &schema.Resource{
+			Name:      d.Address,
 			NoPrice:   true,
 			IsSkipped: true,
 		}
