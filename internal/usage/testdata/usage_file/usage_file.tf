@@ -316,3 +316,9 @@ resource "aws_cloudfront_distribution" "with_usage" {
     cloudfront_default_certificate = true
   }
 }
+
+resource "aws_instance" "instance_counted" {
+  count = 2
+  ami = "ami-0ff8a91507f77f867"
+  instance_type = "t3.nano"
+}
