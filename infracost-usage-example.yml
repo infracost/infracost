@@ -26,9 +26,8 @@ resource_usage:
     reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
     reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
     reserved_instance_payment_option: no_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
-    # Only applicable when T2 credit_specification is set to unlimited or T3 & T4 instance types are used within a launch template,  or T3 & T4 instance types are used in a launch configuration.
-    monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
-    vcpu_count: 2 # Number of the vCPUs for the instance type.
+    monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    vcpu_count: 2 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
 
   aws_backup_vault.usage:
     monthly_efs_warm_restore_gb: 10000 # Monthly number of EFS warm restore in GB. 
@@ -145,9 +144,8 @@ resource_usage:
     reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
     reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
     reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
-    # Only applicable for T3 & T4 instance types or if you specify a t2 instance within a launch template.
-    monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
-    vcpu_count: 2 # Number of the vCPUs for the instance type.
+    monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    vcpu_count: 2 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
 
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
@@ -160,9 +158,8 @@ resource_usage:
     reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
     reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
     reserved_instance_payment_option: all_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
-    # Can be used with T2 / T3 & T4 Instance types. T2 requires credit_specification to be unlimited.
-    monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst.
-    vcpu_count: 2 # Number of the vCPUs for the instance type.
+    monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    vcpu_count: 2 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
 
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000 # Total storage used for backups in GB.
@@ -185,7 +182,12 @@ resource_usage:
     monthly_requests: 100000 # Monthly requests to the Lambda function.
     request_duration_ms: 500 # Average duration of each request in milliseconds.
 
-  # The same can be used for the aws_alb resource too.
+  aws_alb.my_alb:
+    new_connections: 10000    # Number of newly established connections per second on average.
+    active_connections: 10000 # Number of active connections per minute on average.
+    processed_bytes_gb: 1000  # The number of bytes processed by the load balancer for HTTP(S) requests and responses in GB.
+    rule_evaluations: 10000   # The product of number of rules processed by the load balancer and the request rate.
+
   aws_lb.my_lb:
     new_connections: 10000    # Number of newly established connections per second on average.
     active_connections: 10000 # Number of active connections per minute on average.
@@ -225,7 +227,6 @@ resource_usage:
     backtrack_window_hrs: 24           # The duration window for which Aurora will support rewinding the DB cluster to a specific point in time.
     snapshot_export_size_gb: 200       # Size of snapshot that's exported to s3 in parquet format.
 
-  # These settings only apply when using t3 instance types.
   aws_rds_cluster_instance.my_cluster:
     monthly_cpu_credit_hrs: 24   # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
     vcpu_count: 2 # Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
