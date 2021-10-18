@@ -44,7 +44,7 @@ func addRunFlags(cmd *cobra.Command) {
 
 func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg *config.Project, provider schema.Provider) error {
 	if projectCfg.UsageFile == "" {
-		// This should not happen as we check eariler in the code that usage-file is not empty when sync-usage-file flag is on.
+		// This should not happen as we check earlier in the code that usage-file is not empty when sync-usage-file flag is on.
 		return fmt.Errorf("Error generating usage: no usage file given")
 	}
 
@@ -76,16 +76,19 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg
 	spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
 	syncResult, err := usage.SyncUsageData(usageFile, providerProjects)
 	if err != nil {
+		spinner.Fail()
 		return errors.Wrap(err, "Error synchronizing usage data")
 	}
 
 	runCtx.SetProjectContextFrom(syncResult)
 	if err != nil {
+		spinner.Fail()
 		return errors.Wrap(err, "Error summarizing usage")
 	}
 
 	err = usageFile.WriteToPath(projectCfg.UsageFile)
 	if err != nil {
+		spinner.Fail()
 		return errors.Wrap(err, "Error writing usage file")
 	}
 
@@ -209,6 +212,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			us.MergeResourceUsage(wildCardUsage[prefixName])
 		}
 
+		if !runCtx.Config.IsLogging() {
+			fmt.Fprintln(os.Stderr, "")
+		}
+
 		spinnerOpts := ui.SpinnerOptions{
 			EnableLogging: runCtx.Config.IsLogging(),
 			NoColor:       runCtx.Config.NoColor,
@@ -224,10 +231,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		}
 
 		projects = append(projects, providerProjects...)
-
-		if !runCtx.Config.IsLogging() {
-			fmt.Fprintln(os.Stderr, "")
-		}
 	}
 
 	for _, project := range projects {
