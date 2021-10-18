@@ -90,7 +90,16 @@ func (u *UsageData) IsEmpty(key string) bool {
 // Needed because gjson.Exists returns true as long as a key exists, even if it's empty or null.
 func (u *UsageData) Empty(key string) bool {
 	g := u.Get(key)
-	return g.Type == gjson.Null || len(g.Raw) == 0 || g.Raw == "\"\""
+	return g.Type == gjson.Null || len(g.Raw) == 0 || g.Raw == "\"\"" || emptyObjectOrArray(g)
+}
+
+func emptyObjectOrArray(g gjson.Result) bool {
+	empty := true
+	g.ForEach(func(key, val gjson.Result) bool {
+		empty = false
+		return false // exit the ForEach after the first value
+	})
+	return empty
 }
 
 func convertArrayKeyToWildcard(key string) string {

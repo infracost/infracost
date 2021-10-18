@@ -15,13 +15,25 @@ func TestResourceDataEmpty(t *testing.T) {
 					"someresource": {
 						"number": 0,
 						"string": "string",
+						"object": { "a": 1 },
+						"array": [ 1, 2, 3],
 						"empty_string": "",
-						"null": nil,
+						"empty_object": {  
+                        },
+						"empty_array": [  
+                        ],	
+						"null": null,
 						"nested": {
 							"number": 0,
 							"string": "string",
+							"object": { "a": 1 },
+							"array": [ 1, 2, 3],
 							"empty_string": "",
-							"null": nil,
+							"empty_object": {
+							},
+							"empty_array": [
+							],	
+							"null": null,
 						}
 					}
 				}`,
@@ -34,21 +46,28 @@ func TestResourceDataEmpty(t *testing.T) {
 		{key: "someresource.missing", want: true},
 		{key: "someresource.number", want: false},
 		{key: "someresource.string", want: false},
+		{key: "someresource.object", want: false},
+		{key: "someresource.array", want: false},
 		{key: "someresource.empty_string", want: true},
+		{key: "someresource.empty_object", want: true},
+		{key: "someresource.empty_array", want: true},
 		{key: "someresource.null", want: true},
 
-		// nested keys don't work in usage, so these are all expected to return false
 		{key: "someresource.nested.missing", want: true},
 		{key: "someresource.nested.number", want: false},
 		{key: "someresource.nested.string", want: false},
+		{key: "someresource.nested.object", want: false},
+		{key: "someresource.nested.array", want: false},
 		{key: "someresource.nested.empty_string", want: true},
+		{key: "someresource.nested.empty_object", want: true},
+		{key: "someresource.nested.empty_array", want: true},
 		{key: "someresource.nested.null", want: true},
 	}
 
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.key, func(t *testing.T) {
-			assert.Equal(t, r.Empty(tt.key), tt.want)
+			assert.Equal(t, tt.want, r.Empty(tt.key))
 		})
 	}
 

@@ -49,7 +49,7 @@ func (d *ResourceData) Get(key string) gjson.Result {
 // Needed because gjson.Exists returns true as long as a key exists, even if it's empty or null.
 func (d *ResourceData) Empty(key string) bool {
 	g := d.RawValues.Get(key)
-	return g.Type == gjson.Null || len(g.Raw) == 0 || g.Raw == "\"\""
+	return g.Type == gjson.Null || len(g.Raw) == 0 || g.Raw == "\"\"" || emptyObjectOrArray(g)
 }
 
 func (d *ResourceData) References(key string) []*ResourceData {
