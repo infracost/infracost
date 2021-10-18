@@ -1,0 +1,35 @@
+    └─ Synced 0 of 6 resources
+
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_sync_usage_file/sync_usage_file.json
+
+ Name                                                   Monthly Qty  Unit              Monthly Cost 
+                                                                                                    
+ aws_cloudwatch_log_group.production_logs["assets"]                                                 
+ ├─ Data ingested                                               100  GB                      $50.00 
+ ├─ Archival Storage                                          1,000  GB                      $30.00 
+ └─ Insights queries data scanned                    Monthly cost depends on usage: $0.005 per GB   
+                                                                                                    
+ aws_cloudwatch_log_group.production_logs["media"]                                                  
+ ├─ Data ingested                                    Monthly cost depends on usage: $0.50 per GB    
+ ├─ Archival Storage                                          1,000  GB                      $30.00 
+ └─ Insights queries data scanned                    Monthly cost depends on usage: $0.005 per GB   
+                                                                                                    
+ aws_nat_gateway.example_count[0]                                                                   
+ ├─ NAT gateway                                                 730  hours                   $32.85 
+ └─ Data processed                                              200  GB                       $9.00 
+                                                                                                    
+ aws_nat_gateway.example_count[1]                                                                   
+ ├─ NAT gateway                                                 730  hours                   $32.85 
+ └─ Data processed                                               10  GB                       $0.45 
+                                                                                                    
+ aws_nat_gateway.example_each["assets"]                                                             
+ ├─ NAT gateway                                                 730  hours                   $32.85 
+ └─ Data processed                                                4  GB                       $0.18 
+                                                                                                    
+ aws_nat_gateway.example_each["media"]                                                              
+ ├─ NAT gateway                                                 730  hours                   $32.85 
+ └─ Data processed                                                2  GB                       $0.09 
+                                                                                                    
+ OVERALL TOTAL                                                                              $251.12 
+----------------------------------
+To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file

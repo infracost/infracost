@@ -2,7 +2,9 @@ package usage
 
 import (
 	"context"
+	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
@@ -15,8 +17,29 @@ type SyncResult struct {
 	EstimationErrors map[string]error
 }
 
-type MergeResourceUsagesOpts struct {
+type ReplaceResourceUsagesOpts struct {
 	OverrideValueType bool
+}
+
+func (s *SyncResult) ProjectContext() map[string]interface{} {
+	r := make(map[string]interface{})
+
+	r["usageSyncs"] = s.ResourceCount
+	r["usageEstimates"] = s.EstimationCount
+	r["usageEstimateErrors"] = len(s.EstimationErrors)
+
+	var remediable, remAttempts, remErrors int
+	for _, err := range s.EstimationErrors {
+		if _, ok := err.(schema.Remediater); ok {
+			remediable++
+		}
+	}
+
+	r["remediationOpportunities"] = remediable
+	r["remediationAttempts"] = remAttempts
+	r["remediationErrors"] = remErrors
+
+	return r
 }
 
 func SyncUsageData(usageFile *UsageFile, projects []*schema.Project) (*SyncResult, error) {
@@ -51,7 +74,42 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 		existingOrder = append(existingOrder, resourceUsage.Name)
 	}
 
+	wildCardResources := make(map[string]bool)
+
 	for _, resource := range resources {
+
+		// Add existing wildcard resource usages if not already added
+		if strings.HasSuffix(resource.Name, "]") {
+			lastIndexOfOpenBracket := strings.LastIndex(resource.Name, "[")
+			wildCardName := fmt.Sprintf("%s[*]", resource.Name[:lastIndexOfOpenBracket])
+
+			if !wildCardResources[wildCardName] {
+				resourceUsage := &ResourceUsage{
+					Name: wildCardName,
+				}
+
+				wildCardResources[wildCardName] = true
+				if existingResourceUsage, ok := existingResourceUsagesMap[wildCardName]; ok {
+					// Merge the usage schema from the reference usage file
+					refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
+					if refResourceUsage != nil {
+						replaceResourceUsages(resourceUsage, refResourceUsage, ReplaceResourceUsagesOpts{})
+					}
+
+					// Merge the usage schema from the resource struct
+					// We want to override the value type from the usage schema since we can't always tell from the YAML
+					// what the value type should be, e.g. user might add an int value for a float attribute.
+					replaceResourceUsages(resourceUsage, &ResourceUsage{
+						Name:  wildCardName,
+						Items: resource.UsageSchema,
+					}, ReplaceResourceUsagesOpts{OverrideValueType: true})
+
+					replaceResourceUsages(resourceUsage, existingResourceUsage, ReplaceResourceUsagesOpts{})
+					resourceUsages = append(resourceUsages, resourceUsage)
+				}
+			}
+		}
+
 		resourceUsage := &ResourceUsage{
 			Name: resource.Name,
 		}
@@ -59,21 +117,21 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 		// Merge the usage schema from the reference usage file
 		refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
 		if refResourceUsage != nil {
-			mergeResourceUsages(resourceUsage, refResourceUsage, MergeResourceUsagesOpts{})
+			replaceResourceUsages(resourceUsage, refResourceUsage, ReplaceResourceUsagesOpts{})
 		}
 
 		// Merge the usage schema from the resource struct
 		// We want to override the value type from the usage schema since we can't always tell from the YAML
 		// what the value type should be, e.g. user might add an int value for a float attribute.
-		mergeResourceUsages(resourceUsage, &ResourceUsage{
+		replaceResourceUsages(resourceUsage, &ResourceUsage{
 			Name:  resource.Name,
 			Items: resource.UsageSchema,
-		}, MergeResourceUsagesOpts{OverrideValueType: true})
+		}, ReplaceResourceUsagesOpts{OverrideValueType: true})
 
 		// Merge any existing resource usage
 		existingResourceUsage := existingResourceUsagesMap[resource.Name]
 		if existingResourceUsage != nil {
-			mergeResourceUsages(resourceUsage, existingResourceUsage, MergeResourceUsagesOpts{})
+			replaceResourceUsages(resourceUsage, existingResourceUsage, ReplaceResourceUsagesOpts{})
 		}
 
 		syncResult.ResourceCount++
@@ -102,7 +160,8 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 	return syncResult
 }
 
-func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage, opts MergeResourceUsagesOpts) {
+// replaceResourceUsages override usageItems from dest with usageItems from src
+func replaceResourceUsages(dest *ResourceUsage, src *ResourceUsage, opts ReplaceResourceUsagesOpts) {
 	if dest == nil || src == nil {
 		return
 	}
@@ -135,7 +194,7 @@ func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage, opts MergeReso
 						Name: srcDefaultValue.Name,
 					}
 				}
-				mergeResourceUsages(destItem.DefaultValue.(*ResourceUsage), srcDefaultValue, opts)
+				replaceResourceUsages(destItem.DefaultValue.(*ResourceUsage), srcDefaultValue, opts)
 			}
 
 			if srcItem.Value != nil {
@@ -148,7 +207,7 @@ func mergeResourceUsages(dest *ResourceUsage, src *ResourceUsage, opts MergeReso
 						Name: srcValue.Name,
 					}
 				}
-				mergeResourceUsages(destItem.Value.(*ResourceUsage), srcValue, opts)
+				replaceResourceUsages(destItem.Value.(*ResourceUsage), srcValue, opts)
 			}
 		} else {
 			if srcItem.DefaultValue != nil {
@@ -232,7 +291,9 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 	}
 }
 
-// sortResourcesExistingFirst sorts the resources by the existing order first, and then the rest by name
+// sortResourceUsages sorts the resources by the existing order first, and then the rest by name
+// Keep multiple-resource (count or each) together even if they are not in the existing
+// order
 func sortResourceUsages(resourceUsages []*ResourceUsage, existingOrder []string) {
 	sort.Slice(resourceUsages, func(i, j int) bool {
 		iExistingIndex := indexOf(resourceUsages[i].Name, existingOrder)
@@ -240,6 +301,11 @@ func sortResourceUsages(resourceUsages []*ResourceUsage, existingOrder []string)
 
 		// If both resources are in the existing resource order, sort by the existing resource order
 		if iExistingIndex != -1 && jExistingIndex != -1 {
+			// this happens when the resource usage does not exists but the wildcard resource
+			// usage exists
+			if jExistingIndex == iExistingIndex {
+				return resourceUsages[i].Name < resourceUsages[j].Name
+			}
 			return iExistingIndex < jExistingIndex
 		}
 
@@ -279,6 +345,22 @@ func indexOf(s string, arr []string) int {
 	for k, v := range arr {
 		if s == v {
 			return k
+		}
+	}
+
+	if isMultipleResource := strings.HasSuffix(s, "]"); isMultipleResource {
+		lastIndexOfOpenBracket := strings.LastIndex(s, "[")
+		prefixName := s[:lastIndexOfOpenBracket]
+		return lastIndexOfPrefix(prefixName, arr) + 1
+	}
+
+	return -1
+}
+
+func lastIndexOfPrefix(s string, arr []string) int {
+	for i := len(arr) - 1; i >= 0; i-- {
+		if strings.HasPrefix(arr[i], s) {
+			return i
 		}
 	}
 	return -1

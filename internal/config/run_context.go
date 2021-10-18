@@ -99,6 +99,11 @@ func (c *RunContext) SetCurrentProjectContext(ctx *ProjectContext) {
 	c.currentProjectCtx = ctx
 }
 
+// setProjectContextValue Set context value into currentProjectContext
+func (c *RunContext) setProjectContextValue(key string, value interface{}) {
+	c.currentProjectCtx.SetContextValue(key, value)
+}
+
 func (c *RunContext) loadInitialContextValues() {
 	c.SetContextValue("version", baseVersion(version.Version))
 	c.SetContextValue("fullVersion", version.Version)
@@ -109,6 +114,17 @@ func (c *RunContext) loadInitialContextValues() {
 	c.SetContextValue("ciScript", ciScript())
 	c.SetContextValue("ciPostCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
 	c.SetContextValue("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
+}
+
+type ProjectContexter interface {
+	ProjectContext() map[string]interface{}
+}
+
+func (c *RunContext) SetProjectContextFrom(d ProjectContexter) {
+	m := d.ProjectContext()
+	for k, v := range m {
+		c.setProjectContextValue(k, v)
+	}
 }
 
 func baseVersion(v string) string {

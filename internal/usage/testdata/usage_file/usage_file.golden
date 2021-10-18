@@ -3,7 +3,31 @@
 # `infracost breakdown --usage-file infracost-usage.yml [other flags]`
 # See https://infracost.io/usage-file/ for docs
 version: 0.1
-resource_usages:
+resource_usage:
+  aws_instance.instance_counted[*]:
+    operating_system: windows # Override the operating system of the instance, can be: linux, windows, suse, rhel.
+    # reserved_instance_type: "" # Offering class for Reserved Instances, can be: convertible, standard.
+    # reserved_instance_term: "" # Term for Reserved Instances, can be: 1_year, 3_year.
+    # reserved_instance_payment_option: "" # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
+    # monthly_cpu_credit_hrs: 0 # Number of hours in the month where the instance is expected to burst.
+    # vcpu_count: 0 # Number of the vCPUs for the instance type.
+  aws_instance.instance_counted[0]:
+    operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
+    # reserved_instance_type: "" # Offering class for Reserved Instances, can be: convertible, standard.
+    # reserved_instance_term: "" # Term for Reserved Instances, can be: 1_year, 3_year.
+    # reserved_instance_payment_option: "" # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
+    # monthly_cpu_credit_hrs: 0 # Number of hours in the month where the instance is expected to burst.
+    # vcpu_count: 0 # Number of the vCPUs for the instance type.
+  ##
+  ## The following usage values are all commented-out, you can uncomment resources and customize as needed.
+  ##
+  # aws_instance.instance_counted[1]:
+    # operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
+    # reserved_instance_type: "" # Offering class for Reserved Instances, can be: convertible, standard.
+    # reserved_instance_term: "" # Term for Reserved Instances, can be: 1_year, 3_year.
+    # reserved_instance_payment_option: "" # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
+    # monthly_cpu_credit_hrs: 0 # Number of hours in the month where the instance is expected to burst.
+    # vcpu_count: 0 # Number of the vCPUs for the instance type.
   aws_instance.with_usage:
     operating_system: windows # Override the operating system of the instance, can be: linux, windows, suse, rhel.
     reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
@@ -125,9 +149,6 @@ resource_usages:
     # monthly_encryption_requests: 0 # Monthly number of field level encryption requests.
     # monthly_log_lines: 0 # Monthly number of real-time log lines.
     custom_ssl_certificates: 3 # Number of dedicated IP custom SSL certificates.
-  ##
-  ## The following usage values are all commented-out, you can uncomment resources and customize as needed.
-  ##
   # aws_cloudfront_distribution.no_usage:
     # monthly_data_transfer_to_internet_gb:
       # us: 0 # United States, Mexico, Canada

@@ -42,42 +42,83 @@ func addRunFlags(cmd *cobra.Command) {
 	_ = cmd.MarkFlagFilename("usage-file", "yml")
 }
 
+func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg *config.Project, provider schema.Provider) error {
+	if projectCfg.UsageFile == "" {
+		// This should not happen as we check eariler in the code that usage-file is not empty when sync-usage-file flag is on.
+		return fmt.Errorf("Error generating usage: no usage file given")
+	}
+
+	var usageFile *usage.UsageFile
+
+	usageFilePath := projectCfg.UsageFile
+	err := usage.CreateUsageFile(usageFilePath)
+	if err != nil {
+		return errors.Wrap(err, "Error creating  usage file")
+	}
+
+	usageFile, err = usage.LoadUsageFile(usageFilePath)
+	if err != nil {
+		return errors.Wrap(err, "Error loading usage file")
+	}
+
+	usageData := usageFile.ToUsageDataMap()
+	providerProjects, err := provider.LoadResources(usageData)
+	if err != nil {
+		return errors.Wrap(err, "Error loading resources")
+	}
+
+	spinnerOpts := ui.SpinnerOptions{
+		EnableLogging: runCtx.Config.IsLogging(),
+		NoColor:       runCtx.Config.NoColor,
+		Indent:        "  ",
+	}
+
+	spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
+	syncResult, err := usage.SyncUsageData(usageFile, providerProjects)
+	if err != nil {
+		return errors.Wrap(err, "Error synchronizing usage data")
+	}
+
+	runCtx.SetProjectContextFrom(syncResult)
+	if err != nil {
+		return errors.Wrap(err, "Error summarizing usage")
+	}
+
+	err = usageFile.WriteToPath(projectCfg.UsageFile)
+	if err != nil {
+		return errors.Wrap(err, "Error writing usage file")
+	}
+
+	if syncResult == nil {
+		spinner.Fail()
+	} else {
+		resources := syncResult.ResourceCount
+		attempts := syncResult.EstimationCount
+		errors := len(syncResult.EstimationErrors)
+		successes := attempts - errors
+
+		pluralized := ""
+		if resources > 1 {
+			pluralized = "s"
+		}
+
+		spinner.Success()
+		cmd.Println(fmt.Sprintf("    %s Synced %d of %d resource%s",
+			ui.FaintString("└─"),
+			successes,
+			resources,
+			pluralized))
+	}
+	return nil
+}
+
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projects := make([]*schema.Project, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
 
-	var spinner *ui.Spinner
-
 	for _, projectCfg := range runCtx.Config.Projects {
 		ctx := config.NewProjectContext(runCtx, projectCfg)
 		runCtx.SetCurrentProjectContext(ctx)
-
-		usageData := make(map[string]*schema.UsageData)
-		var usageFile *usage.UsageFile
-
-		if projectCfg.UsageFile != "" {
-			var err error
-			usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile, runCtx.Config.SyncUsageFile)
-			if err != nil {
-				return err
-			}
-
-			invalidKeys, err := usageFile.InvalidKeys()
-			if err != nil {
-				log.Errorf("Error checking usage file keys: %v", err)
-			} else if len(invalidKeys) > 0 {
-				ui.PrintWarningf(cmd.ErrOrStderr(),
-					"The following usage file parameters are invalid and will be ignored: %s\n",
-					strings.Join(invalidKeys, ", "),
-				)
-			}
-
-			usageData = usageFile.ToUsageDataMap()
-		}
-
-		if len(usageData) > 0 {
-			ctx.SetContextValue("hasUsageFile", true)
-		}
 
 		provider, err := providers.Detect(ctx)
 		if err != nil {
@@ -108,62 +149,78 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			fmt.Fprintln(os.Stderr, m)
 		}
 
-		providerProjects, err := provider.LoadResources(usageData)
-		if err != nil {
-			return err
+		// Generate usage file
+		if runCtx.Config.SyncUsageFile {
+			err := generateUsageFile(cmd, runCtx, projectCfg, provider)
+			if err != nil {
+				return errors.Wrap(err, "Error generating usage file")
+			}
 		}
 
-		if runCtx.Config.SyncUsageFile && usageFile != nil {
-			spinnerOpts := ui.SpinnerOptions{
-				EnableLogging: runCtx.Config.IsLogging(),
-				NoColor:       runCtx.Config.NoColor,
-				Indent:        "  ",
-			}
+		// Load usage data
+		usageData := make(map[string]*schema.UsageData)
+		var usageFile *usage.UsageFile
 
-			spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
-
-			syncResult, err := usage.SyncUsageData(usageFile, providerProjects)
-			summarizeUsage(ctx, syncResult)
+		if projectCfg.UsageFile != "" {
+			var err error
+			usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile)
 			if err != nil {
-				spinner.Fail()
 				return err
 			}
 
-			err = usageFile.WriteToPath(projectCfg.UsageFile)
+			invalidKeys, err := usageFile.InvalidKeys()
 			if err != nil {
-				spinner.Fail()
-				return err
+				log.Errorf("Error checking usage file keys: %v", err)
+			} else if len(invalidKeys) > 0 {
+				ui.PrintWarningf(cmd.ErrOrStderr(),
+					"The following usage file parameters are invalid and will be ignored: %s\n",
+					strings.Join(invalidKeys, ", "),
+				)
+			}
+		} else {
+			usageFile = usage.NewBlankUsageFile()
+		}
+
+		if len(usageData) > 0 {
+			ctx.SetContextValue("hasUsageFile", true)
+		}
+
+		// Merge wildcard usages into individual usage
+		wildCardUsage := make(map[string]*usage.ResourceUsage)
+		for _, us := range usageFile.ResourceUsages {
+			if strings.HasSuffix(us.Name, "[*]") {
+				lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
+				prefixName := us.Name[:lastIndexOfOpenBracket]
+				wildCardUsage[prefixName] = us
+			}
+		}
+
+		for _, us := range usageFile.ResourceUsages {
+			if strings.HasSuffix(us.Name, "[*]") {
+				continue
 			}
 
-			remediateUsage(runCtx, ctx, syncResult)
-
-			usageData := usageFile.ToUsageDataMap()
-			providerProjects, err = provider.LoadResources(usageData)
-			if err != nil {
-				spinner.Fail()
-				return err
+			if !strings.HasSuffix(us.Name, "]") {
+				continue
 			}
+			lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
+			prefixName := us.Name[:lastIndexOfOpenBracket]
 
-			if syncResult == nil {
-				spinner.Fail()
-			} else {
-				resources := syncResult.ResourceCount
-				attempts := syncResult.EstimationCount
-				errors := len(syncResult.EstimationErrors)
-				successes := attempts - errors
+			us.MergeResourceUsage(wildCardUsage[prefixName])
+		}
 
-				pluralized := ""
-				if resources > 1 {
-					pluralized = "s"
-				}
+		spinnerOpts := ui.SpinnerOptions{
+			EnableLogging: runCtx.Config.IsLogging(),
+			NoColor:       runCtx.Config.NoColor,
+		}
+		spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 
-				spinner.Success()
-				cmd.Println(fmt.Sprintf("    %s Synced %d of %d resource%s",
-					ui.FaintString("└─"),
-					successes,
-					resources,
-					pluralized))
-			}
+		usageData = usageFile.ToUsageDataMap()
+
+		providerProjects, err := provider.LoadResources(usageData)
+		if err != nil {
+			spinner.Fail()
+			return err
 		}
 
 		projects = append(projects, providerProjects...)
@@ -172,12 +229,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			fmt.Fprintln(os.Stderr, "")
 		}
 	}
-
-	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: runCtx.Config.IsLogging(),
-		NoColor:       runCtx.Config.NoColor,
-	}
-	spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 
 	for _, project := range projects {
 		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
@@ -262,40 +313,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	cmd.Printf("%s\n", out)
 
 	return nil
-}
-
-func summarizeUsage(ctx *config.ProjectContext, syncResult *usage.SyncResult) {
-	var usageSyncs, usageEstimates, usageEstimateErrors int
-	if syncResult != nil {
-		usageSyncs = syncResult.ResourceCount
-		usageEstimates = syncResult.EstimationCount
-		usageEstimateErrors = len(syncResult.EstimationErrors)
-	}
-	ctx.SetContextValue("usageSyncs", usageSyncs)
-	ctx.SetContextValue("usageEstimates", usageEstimates)
-	ctx.SetContextValue("usageEstimateErrors", usageEstimateErrors)
-}
-
-func remediateUsage(runCtx *config.RunContext, ctx *config.ProjectContext, syncResult *usage.SyncResult) {
-	if syncResult == nil {
-		return
-	}
-
-	var remediable, remAttempts, remErrors int
-	for _, err := range syncResult.EstimationErrors {
-		if _, ok := err.(schema.Remediater); ok {
-			remediable++
-			// remAttempts++
-			// err = remediater.Remediate()
-			// if err != nil {
-			// 	remErrors++
-			// 	log.Warningf("Cannot enable estimation for %s: %s", name, err.Error())
-			// }
-		}
-	}
-	ctx.SetContextValue("remediationOpportunities", remediable)
-	ctx.SetContextValue("remediationAttempts", remAttempts)
-	ctx.SetContextValue("remediationErrors", remErrors)
 }
 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {

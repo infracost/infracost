@@ -25,6 +25,67 @@ func (r *ResourceUsage) Map() map[string]interface{} {
 	return m
 }
 
+// MergeResourceUsage merge ResourceItem from src to r without overiding r
+func (r *ResourceUsage) MergeResourceUsage(src *ResourceUsage) {
+	if src == nil {
+		return
+	}
+
+	destItemMap := make(map[string]*schema.UsageItem, len(r.Items))
+	for _, item := range r.Items {
+		destItemMap[item.Key] = item
+	}
+
+	for _, srcItem := range src.Items {
+		destItem, ok := destItemMap[srcItem.Key]
+		if !ok {
+			destItem = &schema.UsageItem{Key: srcItem.Key}
+			r.Items = append(r.Items, destItem)
+		}
+
+		if srcItem.ValueType == schema.SubResourceUsage {
+			if srcItem.DefaultValue != nil {
+				srcDefaultValue := srcItem.DefaultValue.(*ResourceUsage)
+				if destItem.DefaultValue == nil {
+					destItem.DefaultValue = &ResourceUsage{
+						Name: srcDefaultValue.Name,
+					}
+				}
+				d := destItem.DefaultValue.(*ResourceUsage)
+				d.MergeResourceUsage(srcDefaultValue)
+			}
+
+			if srcItem.Value != nil {
+				srcValue := srcItem.Value.(*ResourceUsage)
+				if destItem.Value == nil {
+					destItem.Value = destItem.DefaultValue
+				}
+				if destItem.Value == nil {
+					destItem.Value = &ResourceUsage{
+						Name: srcValue.Name,
+					}
+				}
+				d := destItem.Value.(*ResourceUsage)
+				d.MergeResourceUsage(srcValue)
+			}
+		} else if destItem.Value == nil {
+			destItem.ValueType = srcItem.ValueType
+
+			if srcItem.Description != "" {
+				destItem.Description = srcItem.Description
+			}
+
+			if srcItem.DefaultValue != nil {
+				destItem.DefaultValue = srcItem.DefaultValue
+			}
+
+			if srcItem.Value != nil {
+				destItem.Value = srcItem.Value
+			}
+		}
+	}
+}
+
 func mapUsageItem(item *schema.UsageItem) interface{} {
 	if item.ValueType == schema.SubResourceUsage {
 		m := make(map[string]interface{})
@@ -179,6 +240,8 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 				case float64:
 					rawFloat = f
 				case int64:
+					rawFloat = float64(f)
+				case int:
 					rawFloat = float64(f)
 				}
 

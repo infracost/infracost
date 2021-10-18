@@ -25,36 +25,53 @@ type UsageFile struct { // nolint:revive
 	ResourceUsages []*ResourceUsage `yaml:"-"`
 }
 
-func LoadUsageFile(path string, createIfNotExist bool) (*UsageFile, error) {
-	if createIfNotExist {
-		if _, err := os.Stat(path); os.IsNotExist(err) {
-			log.Debug("Specified usage file does not exist. It will be created")
+// CreateUsageFile creates a blank usage file if it does not exists
+func CreateUsageFile(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
 
-			return CreateBlankUsageFile(path)
+		usageFile := NewBlankUsageFile()
+
+		err = usageFile.WriteToPath(path)
+		if err != nil {
+			return errors.Wrapf(err, "Error writing blank usage file to %s", path)
 		}
+	} else {
+		log.Debug("Specified usage file already exists, no overriding")
+	}
+
+	return nil
+}
+
+func LoadUsageFile(path string) (*UsageFile, error) {
+	blankUsage := NewBlankUsageFile()
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		log.Debug("Specified usage file does not exist. Using a blank file")
+
+		return blankUsage, nil
 	}
 
 	contents, err := os.ReadFile(path)
 	if err != nil {
-		return &UsageFile{}, errors.Wrapf(err, "Error reading usage file")
+		return blankUsage, errors.Wrapf(err, "Error reading usage file")
 	}
 
-	return LoadUsageFileFromString(string(contents))
+	usageFile, err := LoadUsageFileFromString(string(contents))
+	if err != nil {
+		return blankUsage, errors.Wrapf(err, "Error loading usage file")
+	}
+
+	return usageFile, nil
 }
 
-func CreateBlankUsageFile(path string) (*UsageFile, error) {
+func NewBlankUsageFile() *UsageFile {
 	usageFile := &UsageFile{
 		Version: maxUsageFileVersion,
 		RawResourceUsage: yamlv3.Node{
 			Kind: yamlv3.MappingNode,
 		},
 	}
-	err := usageFile.WriteToPath(path)
-	if err != nil {
-		return usageFile, errors.Wrapf(err, "Error creating usage file")
-	}
 
-	return usageFile, nil
+	return usageFile
 }
 
 func LoadUsageFileFromString(s string) (*UsageFile, error) {
@@ -90,7 +107,7 @@ See https://infracost.io/usage-file/ for docs`,
 
 	resourceUsagesKeyNode := &yamlv3.Node{
 		Kind:  yamlv3.ScalarNode,
-		Value: "resource_usages",
+		Value: "resource_usage",
 	}
 	if allCommented {
 		markNodeAsComment(resourceUsagesKeyNode)
@@ -217,7 +234,11 @@ func findInvalidKeys(item *schema.UsageItem, refMap map[string]interface{}) []st
 func (u *UsageFile) parseResourceUsages() error {
 	var err error
 	u.ResourceUsages, err = ResourceUsagesFromYAML(u.RawResourceUsage)
-	return err
+	if err != nil {
+		return errors.Wrapf(err, "Error parsing usage file")
+	}
+
+	return nil
 }
 
 func (u *UsageFile) dumpResourceUsages() bool {

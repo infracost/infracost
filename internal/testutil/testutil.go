@@ -263,3 +263,33 @@ func CalcGoldenFileTestdataDirName() string {
 	}
 	return toSnakeCase(camelCaseName[4:])
 }
+
+func AssertFileEqual(t *testing.T, actualFilePath, expectedFilePath string) {
+	expected := []byte("")
+	if _, err := os.Stat(expectedFilePath); err == nil || !os.IsNotExist(err) {
+		expected, err = os.ReadFile(expectedFilePath)
+		assert.NoError(t, err)
+	}
+
+	actual := []byte("")
+	if _, err := os.Stat(actualFilePath); err == nil || !os.IsNotExist(err) {
+		actual, err = os.ReadFile(actualFilePath)
+		assert.NoError(t, err)
+	}
+
+	if !bytes.Equal(expected, actual) {
+		// Generate the diff and error message.  We don't call assert.Equal because it escapes
+		// newlines (\n) and the output looks terrible.
+		diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
+			A:        difflib.SplitLines(string(expected)),
+			B:        difflib.SplitLines(string(actual)),
+			FromFile: "Expected",
+			FromDate: "",
+			ToFile:   "Actual",
+			ToDate:   "",
+			Context:  1,
+		})
+
+		t.Errorf(fmt.Sprintf("\nOutput does not match golden file: \n\n%s\n", diff))
+	}
+}
