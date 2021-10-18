@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	log "github.com/sirupsen/logrus"
 )
 
 func dynamodbNewClient(ctx context.Context, region string) (*dynamodb.Client, error) {
@@ -16,6 +17,7 @@ func dynamodbNewClient(ctx context.Context, region string) (*dynamodb.Client, er
 }
 
 func dynamodbGetRequests(ctx context.Context, region string, table string, metric string) (float64, error) {
+	log.Debugf("Querying AWS CloudWatch: AWS/DynamoDB %s (region: %s, TableName: %s)", metric, region, table)
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 		region:     region,
 		namespace:  "AWS/DynamoDB",
@@ -38,6 +40,7 @@ func DynamoDBGetStorageBytes(ctx context.Context, region string, table string) (
 	if err != nil {
 		return 0, err
 	}
+	log.Debugf("Querying AWS DynamoDB API: DescribeTable(region: %s, table: %s)", region, table)
 	result, err := client.DescribeTable(ctx, &dynamodb.DescribeTableInput{TableName: strPtr(table)})
 	if err != nil {
 		return 0, err

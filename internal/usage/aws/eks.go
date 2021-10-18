@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
+	log "github.com/sirupsen/logrus"
 )
 
 func eksNewClient(ctx context.Context, region string) (*eks.Client, error) {
@@ -22,6 +23,7 @@ func EKSGetNodeGroupAutoscalingGroups(ctx context.Context, region string, cluste
 		return []string{}, err
 	}
 
+	log.Debugf("Querying AWS EKS API: DescribeNodegroup(region: %s, ClusterName: %s, NodegroupName: %s)", region, clusterName, nodeGroupName)
 	result, err := client.DescribeNodegroup(ctx, &eks.DescribeNodegroupInput{
 		ClusterName:   strPtr(clusterName),
 		NodegroupName: strPtr(nodeGroupName),

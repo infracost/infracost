@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	log "github.com/sirupsen/logrus"
 )
 
 // c.f. https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/billing-info-fields.html
@@ -39,6 +40,7 @@ func EC2DescribeOS(ctx context.Context, region string, ami string) (string, erro
 	if err != nil {
 		return "", err
 	}
+	log.Debugf("Querying AWS EC2 API: DescribeImages (region: %s, ImageIds: [%s])", region, ami)
 	result, err := client.DescribeImages(ctx, &ec2.DescribeImagesInput{
 		ImageIds: []string{ami},
 	})

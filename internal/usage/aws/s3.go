@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	log "github.com/sirupsen/logrus"
 )
 
 type ctxS3ConfigOptsKeyType struct{}
@@ -31,6 +32,7 @@ func S3FindMetricsFilter(ctx context.Context, region string, bucket string) (str
 	if err != nil {
 		return "", err
 	}
+	log.Debugf("Querying AWS EKS API: DescribeNodegroup(region: %s, Bucket: %s)", region, bucket)
 	result, err := client.ListBucketMetricsConfigurations(ctx, &s3.ListBucketMetricsConfigurationsInput{
 		Bucket: strPtr(bucket),
 	})
@@ -47,6 +49,7 @@ func S3FindMetricsFilter(ctx context.Context, region string, bucket string) (str
 }
 
 func S3GetBucketSizeBytes(ctx context.Context, region string, bucket string, storageType string) (float64, error) {
+	log.Debugf("Querying AWS CloudWatch: AWS/S3 BucketSizeBytes (region: %s, BucketName: %s, StorageType: %s)", region, bucket, storageType)
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 		region:    region,
 		namespace: "AWS/S3",
@@ -69,6 +72,7 @@ func S3GetBucketSizeBytes(ctx context.Context, region string, bucket string, sto
 func S3GetBucketRequests(ctx context.Context, region string, bucket string, filterName string, metrics []string) (int64, error) {
 	count := int64(0)
 	for _, metric := range metrics {
+		log.Debugf("Querying AWS CloudWatch: AWS/S3 %s (region: %s, BucketName: %s, FilterId: %s)", metric, region, bucket, filterName)
 		stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 			region:    region,
 			namespace: "AWS/S3",
@@ -90,6 +94,7 @@ func S3GetBucketRequests(ctx context.Context, region string, bucket string, filt
 }
 
 func S3GetBucketDataBytes(ctx context.Context, region string, bucket string, filterName string, metric string) (float64, error) {
+	log.Debugf("Querying AWS CloudWatch: AWS/S3 %s (region: %s, BucketName: %s, FilterId: %s)", metric, region, bucket, filterName)
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 		region:    region,
 		namespace: "AWS/S3",
