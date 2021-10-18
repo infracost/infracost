@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
@@ -21,8 +22,16 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	hasNilCosts := false
 	hasEmptyDiff := true
 
+	noDiffProjects := make([]string, 0)
+
 	for i, project := range out.Projects {
 		if project.Diff == nil {
+			continue
+		}
+
+		// Check whether there is any diff or not
+		if project.Diff.TotalMonthlyCost.Equal(decimal.Zero) {
+			noDiffProjects = append(noDiffProjects, project.Label(opts.DashboardEnabled))
 			continue
 		}
 
@@ -77,6 +86,11 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		if i != len(out.Projects)-1 {
 			s += "\n\n"
 		}
+	}
+
+	if len(noDiffProjects) > 0 {
+		s += "----------------------------------\n"
+		s += fmt.Sprintf("The following projects had no cost estimate changes: %s", strings.Join(noDiffProjects, ","))
 	}
 
 	s += "\n\n----------------------------------\n"
