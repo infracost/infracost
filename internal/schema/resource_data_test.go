@@ -67,7 +67,7 @@ func TestResourceDataEmpty(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.key, func(t *testing.T) {
-			assert.Equal(t, tt.want, r.Empty(tt.key))
+			assert.Equal(t, tt.want, r.IsEmpty(tt.key))
 		})
 	}
 

@@ -344,7 +344,7 @@ func shieldRequests(d *schema.ResourceData, u *schema.UsageData) *schema.CostCom
 	}
 
 	region := d.Get("region").String()
-	if !d.Empty("origin.0.origin_shield.0.origin_shield_region") {
+	if !d.IsEmpty("origin.0.origin_shield.0.origin_shield_region") {
 		region = d.Get("origin.0.origin_shield.0.origin_shield_region").String()
 	}
 
@@ -399,7 +399,7 @@ func shieldRequests(d *schema.ResourceData, u *schema.UsageData) *schema.CostCom
 func invalidationRequests(u *schema.UsageData) []*schema.CostComponent {
 	var freeQuantity *decimal.Decimal
 	var paidQuantity *decimal.Decimal
-	if u != nil && !u.Empty("monthly_invalidation_requests") {
+	if u != nil && !u.IsEmpty("monthly_invalidation_requests") {
 		usageAmount := u.Get("monthly_invalidation_requests").Int()
 		if usageAmount < 1000 {
 			freeQuantity = decimalPtr(decimal.NewFromInt(usageAmount))
@@ -451,12 +451,12 @@ func invalidationRequests(u *schema.UsageData) []*schema.CostComponent {
 }
 
 func encryptionRequests(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
-	if d.Empty("default_cache_behavior.0.field_level_encryption_id") {
+	if d.IsEmpty("default_cache_behavior.0.field_level_encryption_id") {
 		return nil
 	}
 
 	var quantity *decimal.Decimal
-	if u != nil && !u.Empty("monthly_encryption_requests") {
+	if u != nil && !u.IsEmpty("monthly_encryption_requests") {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_encryption_requests").Int()))
 	}
 
@@ -477,12 +477,12 @@ func encryptionRequests(d *schema.ResourceData, u *schema.UsageData) *schema.Cos
 }
 
 func realtimeLogs(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
-	if d.Empty("logging_config.0.bucket") {
+	if d.IsEmpty("logging_config.0.bucket") {
 		return nil
 	}
 
 	var quantity *decimal.Decimal
-	if u != nil && !u.Empty("monthly_log_lines") {
+	if u != nil && !u.IsEmpty("monthly_log_lines") {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("monthly_log_lines").Int()))
 	}
 
@@ -507,7 +507,7 @@ func customSSLCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.C
 	}
 
 	quantity := decimalPtr(decimal.NewFromInt(1))
-	if u != nil && !u.Empty("custom_ssl_certificates") {
+	if u != nil && !u.IsEmpty("custom_ssl_certificates") {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("custom_ssl_certificates").Int()))
 	}
 	return &schema.CostComponent{

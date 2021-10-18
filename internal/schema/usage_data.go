@@ -2,7 +2,6 @@ package schema
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	jsoniter "github.com/json-iterator/go"
@@ -72,23 +71,9 @@ func (u *UsageData) GetStringArray(key string) *[]string {
 	return nil
 }
 
-func (u *UsageData) IsEmpty(key string) bool {
-	if u.Attributes[key].Type == gjson.Null {
-		return true
-	}
-
-	if u.Attributes[key].Value() == nil {
-		return true
-	}
-
-	val := reflect.ValueOf(u.Attributes[key].Value())
-
-	return val.IsZero() || val.Len() == 0
-}
-
 // Return true if the key doesn't exist, is null, or is an empty string.
 // Needed because gjson.Exists returns true as long as a key exists, even if it's empty or null.
-func (u *UsageData) Empty(key string) bool {
+func (u *UsageData) IsEmpty(key string) bool {
 	g := u.Get(key)
 	return g.Type == gjson.Null || len(g.Raw) == 0 || g.Raw == "\"\"" || emptyObjectOrArray(g)
 }
