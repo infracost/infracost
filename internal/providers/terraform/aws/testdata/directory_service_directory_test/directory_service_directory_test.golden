@@ -1,0 +1,28 @@
+
+ Name                                                      Monthly Qty  Unit      Monthly Cost 
+                                                                                               
+ aws_directory_service_directory.ad_connector_small                                            
+ └─ Directory service (AD Connector, Small)                        730  hours           $36.50 
+                                                                                               
+ aws_directory_service_directory.microsoft_ad_enterprise                                       
+ └─ Directory service (Microsoft AD, Enterprise)                   730  hours          $146.00 
+                                                                                               
+ aws_directory_service_directory.microsoft_ad_standard                                         
+ └─ Directory service (Microsoft AD, Standard)                     730  hours           $43.80 
+                                                                                               
+ aws_directory_service_directory.microsoft_ad_with_usage                                       
+ ├─ Directory service (Microsoft AD, Standard)                     730  hours           $43.80 
+ ├─ Outbound data transfer (from us-east-1, to eu-west-2)        2,000  GB              $40.00 
+ └─ Directory sharing                                                8  accounts         $0.14 
+                                                                                               
+ aws_directory_service_directory.simple_ad_large                                               
+ └─ Directory service (Simple AD, Large)                           730  hours          $109.50 
+                                                                                               
+ aws_directory_service_directory.simple_ad_small                                               
+ └─ Directory service (Simple AD, Small)                           730  hours           $36.50 
+                                                                                               
+ aws_directory_service_directory.simple_ad_with_usage                                          
+ ├─ Directory service (Simple AD, Small)                           730  hours           $36.50 
+ └─ Outbound data transfer (from us-east-1, to eu-west-2)        1,000  GB              $20.00 
+                                                                                               
+ OVERALL TOTAL                                                                         $512.74 
