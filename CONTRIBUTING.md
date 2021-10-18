@@ -653,7 +653,7 @@ Here is a list of things we should look for during code review when adding new r
 1. In [here](https://github.com/infracost/infracost/actions), click on the "Go" build for the master branch, click on Build, expand Test, then use the "Search logs" box to find any line that has "Multiple products found", "No products found for" or "No prices found for". Update the resource files in question to fix these error, often it's because the price filters need to be adjusted to only return 1 result.
 2. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
 3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have the darwin-amd64.tar.tz, darwin-arm64.tar.gz, windows-amd64.tar.gz, and linux-amd64.tar.gz assets.
-4. Click on the Edit draft button, set the `vx.y.z` value in the tag name and release title. Also add the release notes from the commits between this and the last release and click on publish.
+4. Click on the Edit draft button, set the `vx.y.z` value in the tag name and release title. Click the "Auto-generate release notes" button to generate the release notes and edit these to clean them up as required and then click on publish.
 5. In the `infracost-atlantis` repo, run the, update the "Infracost (latest release, vx.y.z)" text to point to the newly released version. Pushing a commit to master will trigger the GH Action, which builds/pushes that repo's docker image.
 6. Update the [Infracost API](https://www.infracost.io/docs/integrations/infracost_api) to use the latest version.
 7. Update the [Terraform Cloud Run Tasks workers](https://www.infracost.io/docs/iac_tools/terraform_cloud_enterprise#terraform-cloud-run-tasks) to use the latest version.
