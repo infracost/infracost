@@ -650,7 +650,7 @@ Here is a list of things we should look for during code review when adding new r
 
 [@alikhajeh1](https://github.com/alikhajeh1) and [@aliscott](https://github.com/aliscott) rotate release responsibilities between them.
 
-1. In [here](https://github.com/infracost/infracost/actions), click on the "Go" build for the master branch, click on Build, expand Test, then use the "Search logs" box to find any line that has "Multiple products found", "No products found for" or "No prices found for". Update the resource files in question to fix these error, often it's because the price filters need to be adjusted to only return 1 result.
+1. In [here](https://github.com/infracost/infracost/actions), click on the "Go" build for the master branch and make sure that tests have run and passed for the latest master commit.
 2. In the infracost repo, run `git tag vx.y.z && git push origin vx.y.z`
 3. Wait for the GH Actions to complete, the [newly created draft release](https://github.com/infracost/infracost/releases/) should have the darwin-amd64.tar.tz, darwin-arm64.tar.gz, windows-amd64.tar.gz, and linux-amd64.tar.gz assets.
 4. Click on the Edit draft button, set the `vx.y.z` value in the tag name and release title. Click the "Auto-generate release notes" button to generate the release notes and edit these to clean them up as required and then click on publish.
