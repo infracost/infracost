@@ -7,7 +7,7 @@ provider "aws" {
 }
 
 resource "aws_nat_gateway" "example_each" {
-  subnet_id     = "subnet"
+  subnet_id = "subnet"
 
   for_each = toset(["assets", "media"])
   tags = {
@@ -16,11 +16,11 @@ resource "aws_nat_gateway" "example_each" {
 }
 
 resource "aws_nat_gateway" "example_count" {
-  subnet_id     = "subnet"
-  count         = 2
+  subnet_id = "subnet"
+  count     = 2
 }
 
 resource "aws_cloudwatch_log_group" "production_logs" {
   for_each = toset(["assets", "media"])
-  name = "${each.key}_log"
+  name     = "${each.key}_log"
 }

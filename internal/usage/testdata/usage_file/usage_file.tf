@@ -318,7 +318,7 @@ resource "aws_cloudfront_distribution" "with_usage" {
 }
 
 resource "aws_instance" "instance_counted" {
-  count = 2
-  ami = "ami-0ff8a91507f77f867"
+  count         = 2
+  ami           = "ami-0ff8a91507f77f867"
   instance_type = "t3.nano"
 }

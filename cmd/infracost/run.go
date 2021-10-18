@@ -212,16 +212,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			us.MergeResourceUsage(wildCardUsage[prefixName])
 		}
 
-		if !runCtx.Config.IsLogging() {
-			fmt.Fprintln(os.Stderr, "")
-		}
-
-		spinnerOpts := ui.SpinnerOptions{
-			EnableLogging: runCtx.Config.IsLogging(),
-			NoColor:       runCtx.Config.NoColor,
-		}
-		spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
-
 		usageData = usageFile.ToUsageDataMap()
 
 		providerProjects, err := provider.LoadResources(usageData)
@@ -232,6 +222,16 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 		projects = append(projects, providerProjects...)
 	}
+
+	if !runCtx.Config.IsLogging() {
+		fmt.Fprintln(os.Stderr, "")
+	}
+
+	spinnerOpts := ui.SpinnerOptions{
+		EnableLogging: runCtx.Config.IsLogging(),
+		NoColor:       runCtx.Config.NoColor,
+	}
+	spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 
 	for _, project := range projects {
 		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
