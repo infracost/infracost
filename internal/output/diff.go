@@ -30,7 +30,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		}
 
 		// Check whether there is any diff or not
-		if project.Diff.TotalMonthlyCost.Equal(decimal.Zero) {
+		if len(project.Diff.Resources) == 0 {
 			noDiffProjects = append(noDiffProjects, project.Label(opts.DashboardEnabled))
 			continue
 		}
