@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
@@ -19,10 +20,16 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	s := ""
 
 	hasNilCosts := false
-	hasEmptyDiff := true
+	noDiffProjects := make([]string, 0)
 
 	for i, project := range out.Projects {
 		if project.Diff == nil {
+			continue
+		}
+
+		// Check whether there is any diff or not
+		if len(project.Diff.Resources) == 0 {
+			noDiffProjects = append(noDiffProjects, project.Label(opts.DashboardEnabled))
 			continue
 		}
 
@@ -36,8 +43,6 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		)
 
 		for _, diffResource := range project.Diff.Resources {
-			hasEmptyDiff = false
-
 			oldResource := findResourceByName(project.PastBreakdown.Resources, diffResource.Name)
 			newResource := findResourceByName(project.Breakdown.Resources, diffResource.Name)
 
@@ -79,22 +84,25 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		}
 	}
 
+	if len(noDiffProjects) > 0 {
+		s += "----------------------------------\n"
+		s += fmt.Sprintf("\nThe following projects have no cost estimate changes: %s", strings.Join(noDiffProjects, ", "))
+		s += fmt.Sprintf("\nRun %s to see their full breakdown.", ui.PrimaryString("infracost breakdown"))
+	}
+
 	s += "\n\n----------------------------------\n"
-	s += fmt.Sprintf("Key: %s changed, %s added, %s removed",
-		opChar(UPDATED),
-		opChar(ADDED),
-		opChar(REMOVED),
-	)
+	if len(noDiffProjects) != len(out.Projects) {
+		s += fmt.Sprintf("Key: %s changed, %s added, %s removed",
+			opChar(UPDATED),
+			opChar(ADDED),
+			opChar(REMOVED),
+		)
+	}
 
 	if hasNilCosts {
 		s += fmt.Sprintf("\n\nTo estimate usage-based resources use --usage-file, see %s",
 			ui.LinkString("https://infracost.io/usage-file"),
 		)
-	}
-
-	if hasEmptyDiff {
-		s += fmt.Sprintf("\n\nNo changes detected. Run %s to see the full breakdown.",
-			ui.PrimaryString("infracost breakdown"))
 	}
 
 	unsupportedMsg := out.unsupportedResourcesMessage(opts.ShowSkipped)
