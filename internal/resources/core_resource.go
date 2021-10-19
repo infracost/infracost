@@ -57,13 +57,33 @@ func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
 			// Set the value of the arg to the value specified in the usage data.
 			if f.Type() == reflect.TypeOf(floatPtr) {
 				f.Set(reflect.ValueOf(u.GetFloat(usageKey)))
-			} else if f.Type() == reflect.TypeOf(intPtr) {
-				f.Set(reflect.ValueOf(u.GetInt(usageKey)))
-			} else if f.Type() == reflect.TypeOf(strPtr) {
-				f.Set(reflect.ValueOf(u.GetString(usageKey)))
-			} else {
-				log.Errorf("Unsupported field { UsageKey: %s, Type: %v }", usageKey, f.Type())
+				continue
 			}
+
+			if f.Type() == reflect.TypeOf(intPtr) {
+				f.Set(reflect.ValueOf(u.GetInt(usageKey)))
+				continue
+			}
+
+			if f.Type() == reflect.TypeOf(strPtr) {
+				f.Set(reflect.ValueOf(u.GetString(usageKey)))
+				continue
+			}
+
+			if f.Type().Elem().Kind() == reflect.Struct {
+				if f.IsNil() {
+					f.Set(reflect.New(f.Type().Elem()))
+				}
+
+				PopulateArgsWithUsage(f.Interface(), &schema.UsageData{
+					Address:    usageKey,
+					Attributes: u.Get(usageKey).Map(),
+				})
+
+				continue
+			}
+
+			log.Errorf("Unsupported field { UsageKey: %s, Type: %v }", usageKey, f.Type())
 		}
 	}
 }
