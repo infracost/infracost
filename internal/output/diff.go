@@ -91,11 +91,13 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	}
 
 	s += "\n\n----------------------------------\n"
-	s += fmt.Sprintf("Key: %s changed, %s added, %s removed",
-		opChar(UPDATED),
-		opChar(ADDED),
-		opChar(REMOVED),
-	)
+	if len(noDiffProjects) != len(out.Projects) {
+		s += fmt.Sprintf("Key: %s changed, %s added, %s removed",
+			opChar(UPDATED),
+			opChar(ADDED),
+			opChar(REMOVED),
+		)
+	}
 
 	if hasNilCosts {
 		s += fmt.Sprintf("\n\nTo estimate usage-based resources use --usage-file, see %s",
