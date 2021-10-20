@@ -20,6 +20,7 @@ type CmdOptions struct {
 	Dir                 string
 	TerraformWorkspace  string
 	TerraformConfigFile string
+	Env                 map[string]string
 }
 
 type CmdError struct {
@@ -41,6 +42,11 @@ func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	log.Infof("Running command: %s", cmd.String())
 	cmd.Dir = opts.Dir
 	cmd.Env = os.Environ()
+
+	for k, v := range opts.Env {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", k, v))
+	}
+
 	cmd.Env = append(cmd.Env, "TF_IN_AUTOMATION=true")
 
 	if opts.TerraformWorkspace != "" {

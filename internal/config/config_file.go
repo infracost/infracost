@@ -25,12 +25,14 @@ func LoadConfigFile(path string) (ConfigFileSpec, error) {
 		return cfgFile, fmt.Errorf("Config file does not exist at %s", path)
 	}
 
-	rawCfgFile, err := os.ReadFile(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return cfgFile, err
 	}
 
-	err = yaml.Unmarshal(rawCfgFile, &cfgFile)
+	content = []byte(os.ExpandEnv(string(content)))
+
+	err = yaml.Unmarshal(content, &cfgFile)
 	if err != nil {
 		return cfgFile, errors.New("Error parsing config YAML: " + strings.TrimPrefix(err.Error(), "yaml: "))
 	}
