@@ -13,14 +13,15 @@ import (
 )
 
 type Project struct {
-	Path                string `yaml:"path,omitempty" ignored:"true"`
-	TerraformPlanFlags  string `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
-	TerraformBinary     string `yaml:"terraform_binary,omitempty" envconfig:"INFRACOST_TERRAFORM_BINARY"`
-	TerraformWorkspace  string `yaml:"terraform_workspace,omitempty" envconfig:"INFRACOST_TERRAFORM_WORKSPACE"`
-	TerraformCloudHost  string `yaml:"terraform_cloud_host,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_HOST"`
-	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_TOKEN"`
-	UsageFile           string `yaml:"usage_file,omitempty" ignored:"true"`
-	TerraformUseState   bool   `yaml:"terraform_use_state,omitempty" ignored:"true"`
+	Path                string            `yaml:"path,omitempty" ignored:"true"`
+	TerraformPlanFlags  string            `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
+	TerraformBinary     string            `yaml:"terraform_binary,omitempty" envconfig:"INFRACOST_TERRAFORM_BINARY"`
+	TerraformWorkspace  string            `yaml:"terraform_workspace,omitempty" envconfig:"INFRACOST_TERRAFORM_WORKSPACE"`
+	TerraformCloudHost  string            `yaml:"terraform_cloud_host,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_HOST"`
+	TerraformCloudToken string            `yaml:"terraform_cloud_token,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_TOKEN"`
+	UsageFile           string            `yaml:"usage_file,omitempty" ignored:"true"`
+	TerraformUseState   bool              `yaml:"terraform_use_state,omitempty" ignored:"true"`
+	Env                 map[string]string `yaml:"env,omitempty" ignored:"true"`
 }
 
 type Config struct {

@@ -36,6 +36,7 @@ type DirProvider struct {
 	TerraformBinary     string
 	TerraformCloudHost  string
 	TerraformCloudToken string
+	Env                 map[string]string
 	cachedStateJSON     []byte
 	cachedPlanJSON      []byte
 }
@@ -64,6 +65,7 @@ func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
 		TerraformBinary:     terraformBinary,
 		TerraformCloudHost:  ctx.ProjectConfig.TerraformCloudHost,
 		TerraformCloudToken: ctx.ProjectConfig.TerraformCloudToken,
+		Env:                 ctx.ProjectConfig.Env,
 	}
 }
 
@@ -236,6 +238,7 @@ func (p *DirProvider) buildCommandOpts(path string) (*CmdOptions, error) {
 		TerraformBinary:    p.TerraformBinary,
 		TerraformWorkspace: p.Workspace,
 		Dir:                path,
+		Env:                p.Env,
 	}
 
 	cfgFile, err := CreateConfigFile(p.Path, p.TerraformCloudHost, p.TerraformCloudToken)
