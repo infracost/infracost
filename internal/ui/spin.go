@@ -52,7 +52,7 @@ func (s *Spinner) Stop() {
 }
 
 func (s *Spinner) Fail() {
-	if !s.spinner.Active() {
+	if s.spinner == nil || !s.spinner.Active() {
 		return
 	}
 	s.Stop()

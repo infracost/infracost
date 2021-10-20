@@ -216,7 +216,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 		providerProjects, err := provider.LoadResources(usageData)
 		if err != nil {
-			spinner.Fail()
 			return err
 		}
 
