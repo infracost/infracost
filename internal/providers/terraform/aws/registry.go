@@ -90,7 +90,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetWafv2WebACLRegistryItem(),
 	GetWafWebACLRegistryItem(),
 	GetStepFunctionRegistryItem(),
-	GetDirectoryServiceDirectory(),
+	getDirectoryServiceDirectory(),
 }
 
 // FreeResources grouped alphabetically

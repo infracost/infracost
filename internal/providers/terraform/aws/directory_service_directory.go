@@ -12,16 +12,16 @@ import (
 
 var adReg = regexp.MustCompile(`(AD)`)
 
-func GetDirectoryServiceDirectory() *schema.RegistryItem {
+func getDirectoryServiceDirectory() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_directory_service_directory",
-		RFunc: NewDirectoryServiceDirectory,
+		RFunc: newDirectoryServiceDirectory,
 	}
 }
 
-func NewDirectoryServiceDirectory(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newDirectoryServiceDirectory(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
-	regionName, ok := regionMapping[region]
+	regionName, ok := aws.RegionMapping[region]
 	if !ok {
 		log.Warnf("Could not find mapping for resource %s region %s", d.Address, region)
 	}

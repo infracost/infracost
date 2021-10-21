@@ -78,7 +78,9 @@ func stringInSlice(slice []string, s string) bool {
 	return false
 }
 
-var regionMapping = map[string]string{
+// RegionMapping is a helpful conversion map that changes
+// aws region name to the name commonly used in pricing filters.
+var RegionMapping = map[string]string{
 	"us-gov-west-1":   "AWS GovCloud (US-West)",
 	"us-gov-east-1":   "AWS GovCloud (US-East)",
 	"us-east-1":       "US East (N. Virginia)",
@@ -122,38 +124,38 @@ var regionMapping = map[string]string{
 //    MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_processed_gb"`
 // }
 type RegionsUsage struct {
-	UsGovWest1   *int64 `infracost_usage:"us_gov_west_1"`
-	UsGovEast1   *int64 `infracost_usage:"us_gov_east_1"`
-	UsEast1      *int64 `infracost_usage:"us_east_1"`
-	UsEast2      *int64 `infracost_usage:"us_east_2"`
-	UsWest1      *int64 `infracost_usage:"us_west_1"`
-	UsWest2      *int64 `infracost_usage:"us_west_2"`
-	UsWest2Lax1  *int64 `infracost_usage:"us_west_2_lax_1"`
-	CaCentral1   *int64 `infracost_usage:"ca_central_1"`
-	CnNorth1     *int64 `infracost_usage:"cn_north_1"`
-	CnNorthwest1 *int64 `infracost_usage:"cn_northwest_1"`
-	EuCentral1   *int64 `infracost_usage:"eu_central_1"`
-	EuWest1      *int64 `infracost_usage:"eu_west_1"`
-	EuWest2      *int64 `infracost_usage:"eu_west_2"`
-	EuSouth1     *int64 `infracost_usage:"eu_south_1"`
-	EuWest3      *int64 `infracost_usage:"eu_west_3"`
-	EuNorth1     *int64 `infracost_usage:"eu_north_1"`
-	ApEast1      *int64 `infracost_usage:"ap_east_1"`
-	ApNortheast1 *int64 `infracost_usage:"ap_northeast_1"`
-	ApNortheast2 *int64 `infracost_usage:"ap_northeast_2"`
-	ApNortheast3 *int64 `infracost_usage:"ap_northeast_3"`
-	ApSoutheast1 *int64 `infracost_usage:"ap_southeast_1"`
-	ApSoutheast2 *int64 `infracost_usage:"ap_southeast_2"`
-	ApSouth1     *int64 `infracost_usage:"ap_south_1"`
-	MeSouth1     *int64 `infracost_usage:"me_south_1"`
-	SaEast1      *int64 `infracost_usage:"sa_east_1"`
-	AfSouth1     *int64 `infracost_usage:"af_south_1"`
+	USGovWest1   *float64 `infracost_usage:"us_gov_west_1"`
+	USGovEast1   *float64 `infracost_usage:"us_gov_east_1"`
+	USEast1      *float64 `infracost_usage:"us_east_1"`
+	USEast2      *float64 `infracost_usage:"us_east_2"`
+	USWest1      *float64 `infracost_usage:"us_west_1"`
+	USWest2      *float64 `infracost_usage:"us_west_2"`
+	USWest2Lax1  *float64 `infracost_usage:"us_west_2_lax_1"`
+	CACentral1   *float64 `infracost_usage:"ca_central_1"`
+	CNNorth1     *float64 `infracost_usage:"cn_north_1"`
+	CNNorthwest1 *float64 `infracost_usage:"cn_northwest_1"`
+	EUCentral1   *float64 `infracost_usage:"eu_central_1"`
+	EUWest1      *float64 `infracost_usage:"eu_west_1"`
+	EUWest2      *float64 `infracost_usage:"eu_west_2"`
+	EUSouth1     *float64 `infracost_usage:"eu_south_1"`
+	EUWest3      *float64 `infracost_usage:"eu_west_3"`
+	EUNorth1     *float64 `infracost_usage:"eu_north_1"`
+	APEast1      *float64 `infracost_usage:"ap_east_1"`
+	APNortheast1 *float64 `infracost_usage:"ap_northeast_1"`
+	APNortheast2 *float64 `infracost_usage:"ap_northeast_2"`
+	APNortheast3 *float64 `infracost_usage:"ap_northeast_3"`
+	APSoutheast1 *float64 `infracost_usage:"ap_southeast_1"`
+	APSoutheast2 *float64 `infracost_usage:"ap_southeast_2"`
+	APSouth1     *float64 `infracost_usage:"ap_south_1"`
+	MESouth1     *float64 `infracost_usage:"me_south_1"`
+	SAEast1      *float64 `infracost_usage:"sa_east_1"`
+	AFSouth1     *float64 `infracost_usage:"af_south_1"`
 }
 
 // RegionUsage defines a hard definition in the regions map.
 type RegionUsage struct {
 	Key   string
-	Value int64
+	Value float64
 }
 
 // Values returns RegionUsage as a slice which can be iterated over
@@ -174,7 +176,7 @@ func (r RegionsUsage) Values() []RegionUsage {
 
 		regions = append(regions, RegionUsage{
 			Key:   underscore.ReplaceAllString(t.Field(i).Tag.Get("infracost_usage"), "-"),
-			Value: *f.Interface().(*int64),
+			Value: *f.Interface().(*float64),
 		})
 	}
 

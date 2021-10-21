@@ -7,6 +7,7 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 )
@@ -32,25 +33,25 @@ func GetDataTransferRegistryItem() *schema.RegistryItem {
 
 func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := strings.ToLower(u.Get("region").String())
-	fromLocation, ok := regionMapping[region]
+	fromLocation, ok := aws.RegionMapping[region]
 
 	if !ok {
 		log.Warnf("Skipping resource %s. Could not find mapping for region %s", d.Address, region)
 		return nil
 	}
 
-	usEastRegion := regionMapping["us-east-1"]
-	otherRegion := regionMapping["us-west-1"]
+	usEastRegion := aws.RegionMapping["us-east-1"]
+	otherRegion := aws.RegionMapping["us-west-1"]
 
 	if region == "us-east-1" {
-		usEastRegion = regionMapping["us-east-2"]
-		otherRegion = regionMapping["us-west-2"]
+		usEastRegion = aws.RegionMapping["us-east-2"]
+		otherRegion = aws.RegionMapping["us-west-2"]
 	} else if region == "us-west-1" {
-		otherRegion = regionMapping["us-west-2"]
+		otherRegion = aws.RegionMapping["us-west-2"]
 	} else if region == "cn-north-1" {
-		otherRegion = regionMapping["cn-northwest-1"]
+		otherRegion = aws.RegionMapping["cn-northwest-1"]
 	} else if region == "cn-northwest-1" {
-		otherRegion = regionMapping["cn-north-1"]
+		otherRegion = aws.RegionMapping["cn-north-1"]
 	}
 
 	var intraRegionGb *decimal.Decimal

@@ -9,6 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -73,7 +74,7 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 
 			for _, k := range keys {
 				regionName := repUnderscore.ReplaceAllString(k, "-")
-				fromLocation, ok := regionMapping[regionName]
+				fromLocation, ok := aws.RegionMapping[regionName]
 				if !ok {
 					log.Warnf("Skipping resource %s usage cost: Outbound data transfer. Could not find mapping for region %s", d.Address, k)
 					continue
@@ -104,7 +105,7 @@ func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		// "monthly_outbound_from_region_to_dx_connection_location" yaml conf
 		// we should fall back to the old "monthly_outbound_region_to_dx_location_gb" configuration
 		if !hasPerRegionUsage && u.Get("monthly_outbound_region_to_dx_location_gb").Exists() {
-			fromLocation, ok := regionMapping[region]
+			fromLocation, ok := aws.RegionMapping[region]
 			if ok {
 				gbDataProcessed := decimalPtr(decimal.NewFromFloat(u.Get("monthly_outbound_region_to_dx_location_gb").Float()))
 				components = append(components, &schema.CostComponent{
