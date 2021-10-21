@@ -273,14 +273,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		log.Errorf("Error reporting run: %s", err)
 	}
 
-	env := buildRunEnv(runCtx, projectContexts, r)
-
-	pricingClient := apiclient.NewPricingAPIClient(runCtx.Config)
-	err = pricingClient.AddEvent("infracost-run", env)
-	if err != nil {
-		log.Errorf("Error reporting event: %s", err)
-	}
-
 	opts := output.Options{
 		DashboardEnabled: runCtx.Config.EnableDashboard,
 		ShowSkipped:      runCtx.Config.ShowSkipped,
@@ -310,6 +302,19 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	if err != nil {
 		return errors.Wrap(err, "Error generating output")
+	}
+
+	if runCtx.Config.Format == "diff" || runCtx.Config.Format == "table" {
+		lines := strings.Count(out, "\n") + 1
+		runCtx.SetContextValue("lineCount", lines)
+	}
+
+	env := buildRunEnv(runCtx, projectContexts, r)
+
+	pricingClient := apiclient.NewPricingAPIClient(runCtx.Config)
+	err = pricingClient.AddEvent("infracost-run", env)
+	if err != nil {
+		log.Errorf("Error reporting event: %s", err)
 	}
 
 	cmd.Printf("%s\n", out)
