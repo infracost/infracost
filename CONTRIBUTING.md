@@ -117,7 +117,26 @@ make build
 
 When adding your first resource, we recommend you first view [this YouTube video](https://www.youtube.com/watch?v=z0L76v3rWUg). You can also look at one of the existing resources to see how it's done, for example, check the [mwaa_environment.go](internal/providers/terraform/aws/mwaa_environment.go) resource.
 
-To begin, add a new file in `internal/resources/aws/` that creates cost components from the resource's attributes.
+When adding a resource, the following files should be added. In this quick start we'll go through each one.
+
+```
+└─ internal
+  ├─ providers
+  │ └─ terraform
+  │   └─ aws
+  │     ├─ <my_resource>.go                  # Mappings from the Terraform attributes to the generic resource
+  │     ├─ <my_resource>_test.go             # Integration tests for the resource
+  │     └─ testdata
+  │       └─ <my_resource>_test
+  │         ├─ <my_resource>_test.golden     # Expected output from the golden test
+  │         ├─ <my_resource>_test.tf         # Terraform code for running the golden test
+  │         └─ <my_resource>_test.usage.yml  # Any usage data for running the golden test
+  └─ resources
+    └─ aws
+      └─ <my_resource>.go                    # Generic resource that contains the mappings to cost components
+```
+
+To begin, add the `internal/resources/aws/<my_resource>.go` that creates cost components from the resource's attributes.
 
 ```go
 package aws
@@ -131,7 +150,8 @@ import (
 )
 
 type MyResource struct {
-	// These fields are required since they are pulled directly from the IAC configuration (e.g. the terraform plan) 
+	// These fields can be pulled directly from the IaC configuration (e.g. the terraform plan) for this resource
+	// so they should always be specified
 	Address string
 	Region  string
 	InstanceCount int64
@@ -202,8 +222,8 @@ func (a *MyResource) BuildResource() *schema.Resource {
 }
 ```
 
-Next, add `internal/providers/terraform/aws/` and an accompanying test file.  This code extracts attributes from the
-terraform data and uses the file in `internal/resources/aws` to generate the cost components.  
+Next, the `internal/providers/terraform/aws/<my_resource>.go` and an accompanying `internal/providers/terraform/aws/<my_resource>_test.go` test file.  This code extracts attributes from the
+terraform data and uses the file in `internal/resources/aws/<my_resource>.go` to generate the cost components.
 
 ```go
 package aws
@@ -253,9 +273,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 ```
 
-Create a new example Terraform project for integration testing in `internal/providers/terraform/aws/testdata/aws_my_resource_test/`.  Each test case can be represented as a separate resource in the .tf file.  Be sure to include test cases with usage and without usage.
+Create a new example Terraform project for integration testing in `internal/providers/terraform/aws/testdata/<my_resource>_test/`.  Each test case can be represented as a separate resource in the .tf file.  Be sure to include test cases with usage and without usage.
 
-Terraform project file `internal/providers/terraform/aws/testdata/aws_my_resource_test/aws_my_resource_test.tf`:
+Terraform project file `internal/providers/terraform/aws/testdata/<my_resource>_test/<my_resource>_test.tf`:
 ```
 resource "aws_my_resource" "my_resource" {
   aws_id = "fake"
@@ -266,7 +286,7 @@ resource "aws_my_resource" "my_resource_withUsage" {
 }
 ```
 
-Usage file `internal/providers/terraform/aws/testdata/aws_my_resource_test/aws_my_resource_test.usage.yml`:
+Usage file `internal/providers/terraform/aws/testdata/<my_resource>_test/<my_resource>_test.usage.yml`:
 ```
 version: 0.1
 resource_usage:
@@ -274,7 +294,7 @@ resource_usage:
     monthly_data_processed_gb: 1000000
 ```
 
-Add a golden file test to the test file `internal/providers/terraform/aws/aws_my_resource_test.go`:
+Add a golden file test to the test file `internal/providers/terraform/aws/<my_resource>_test.go`:
 ```go
 package aws_test
 
@@ -290,7 +310,7 @@ func TestMyResourceGoldenFile(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "aws_my_resource_test")
+	tftest.GoldenFileResourceTests(t, "my_resource_test")
 }
 ```
 
