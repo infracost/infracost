@@ -29,6 +29,10 @@ func intPtr(i int64) *int64 {
 	return &i
 }
 
+func floatPtr(i float64) *float64 {
+	return &i
+}
+
 func intVal(i *int64) int64 {
 	if i == nil {
 		return 0
@@ -193,30 +197,30 @@ func (r RegionsUsage) Values() []RegionUsage {
 //
 // See DirectoryServiceDirectory for an example usage.
 var RegionUsageSchema = []*schema.UsageItem{
-	{Key: "us_gov_west_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "us_gov_east_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "us_east_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "us_east_2", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "us_west_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "us_west_2", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "us_west_2_lax_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "ca_central_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "cn_north_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "cn_northwest_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "eu_central_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "eu_west_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "eu_west_2", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "eu_south_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "eu_west_3", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "eu_north_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "ap_east_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "ap_northeast_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "ap_northeast_2", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "ap_northeast_3", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "ap_southeast_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "ap_southeast_2", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "ap_south_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "me_south_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "sa_east_1", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "af_south_1", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "us_gov_west_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "us_gov_east_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "us_east_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "us_east_2", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "us_west_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "us_west_2", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "us_west_2_lax_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ca_central_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "cn_north_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "cn_northwest_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "eu_central_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "eu_west_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "eu_west_2", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "eu_south_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "eu_west_3", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "eu_north_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_east_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_northeast_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_northeast_2", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_northeast_3", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_southeast_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_southeast_2", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_south_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "me_south_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "sa_east_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "af_south_1", DefaultValue: 0, ValueType: schema.Float64},
 }

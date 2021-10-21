@@ -19,12 +19,12 @@ var (
 		{
 			Key:          "additional_domain_controllers",
 			DefaultValue: 0,
-			ValueType:    schema.Int64,
+			ValueType:    schema.Float64,
 		},
 		{
 			Key:          "shared_accounts",
 			DefaultValue: 0,
-			ValueType:    schema.Int64,
+			ValueType:    schema.Float64,
 		},
 	}
 
@@ -77,14 +77,14 @@ type DirectoryServiceDirectory struct {
 
 	// AdditionalDomainControllers represents a usage cost definition for the number controllers
 	// above the default value (2) that are provisioned in this directory service.
-	AdditionalDomainControllers *int64 `infracost_usage:"additional_domain_controllers"`
+	AdditionalDomainControllers *float64 `infracost_usage:"additional_domain_controllers"`
 
 	// SharedAccounts represents the number of accounts/vpcs the directory is shared with.
 	// This cost is only applicable if the type of directory is MicrosoftAD.
 	// Directory Service sharing support is not supported by terraform aws at this time.
 	// Therefore, this field is built from the usage cost file. An open issue referencing
 	// shared directory support here: https://github.com/hashicorp/terraform-provider-aws/issues/6003
-	SharedAccounts *int64 `infracost_usage:"shared_accounts"`
+	SharedAccounts *float64 `infracost_usage:"shared_accounts"`
 }
 
 // PopulateUsage parses the u schema.Usage into the DirectoryServiceDirectory.
@@ -122,7 +122,7 @@ func (d *DirectoryServiceDirectory) BuildResource() *schema.Resource {
 			Name:           "Directory sharing",
 			Unit:           "accounts",
 			UnitMultiplier: schema.HourToMonthUnitMultiplier,
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(*d.SharedAccounts)),
+			HourlyQuantity: decimalPtr(decimal.NewFromFloat(*d.SharedAccounts)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    awsVendorFilter,
 				Region:        strPtr(d.Region),
@@ -144,12 +144,12 @@ func (d *DirectoryServiceDirectory) BuildResource() *schema.Resource {
 	}
 }
 
-func (d DirectoryServiceDirectory) domainControllerCostComponent(amount int64, name, size string) *schema.CostComponent {
+func (d DirectoryServiceDirectory) domainControllerCostComponent(amount float64, name, size string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "controllers",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(amount)),
+		HourlyQuantity: decimalPtr(decimal.NewFromFloat(amount)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:       awsVendorFilter,
 			Region:           strPtr(d.Region),

@@ -6,10 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newFloat(i float64) *float64 {
-	return &i
-}
-
 func TestRegionsUsage_Values(t *testing.T) {
 	tests := []struct {
 		name  string
@@ -19,9 +15,9 @@ func TestRegionsUsage_Values(t *testing.T) {
 		{
 			name: "should return non nil values as slice",
 			usage: RegionsUsage{
-				USWest1:  newFloat(88),
-				EUWest2:  newFloat(99),
-				AFSouth1: newFloat(77),
+				USWest1:  floatPtr(88),
+				EUWest2:  floatPtr(99),
+				AFSouth1: floatPtr(77),
 			},
 			want: []RegionUsage{
 				{"us-west-1", 88},
