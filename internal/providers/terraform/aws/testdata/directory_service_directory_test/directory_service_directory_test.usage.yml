@@ -1,12 +1,8 @@
 version: 0.1
 resource_usage:
   aws_directory_service_directory.simple_ad_with_usage:
-    monthly_data_processed_gb:
-      eu_west_2: 1000
-      us_east_1: 888
+    additional_domain_controllers: 3
     shared_accounts: 5
   aws_directory_service_directory.microsoft_ad_with_usage:
-    monthly_data_processed_gb:
-      eu_west_2: 2000
-      us_east_1: 999
+    additional_domain_controllers: 4
     shared_accounts: 8

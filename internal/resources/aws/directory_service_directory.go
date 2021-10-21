@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -80,10 +79,9 @@ type DirectoryServiceDirectory struct {
 	// Values can be either (Small|Large)
 	Size string
 
-	// MonthlyDataProcessedDB represents data transfer from the directory to given
-	// regions. This field is built from usage cost file and requires users to specify
-	// estimates for each region they wish to see.
-	MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_data_processed_gb"`
+	// AdditionalDomainControllers represents a usage cost definition for the number controllers
+	// above the default value (2) that are provisioned in this directory service.
+	AdditionalDomainControllers *int64 `infracost_usage:"additional_domain_controllers"`
 
 	// SharedAccounts represents the number of accounts/vpcs the directory is shared with.
 	// This cost is only applicable if the type of directory is MicrosoftAD.
@@ -95,7 +93,6 @@ type DirectoryServiceDirectory struct {
 
 // PopulateUsage parses the u schema.Usage into the DirectoryServiceDirectory.
 // It uses the `infracost_usage` struct tags to populate data into the DirectoryServiceDirectory.
-// monthly_data_transfer_out_gb.
 func (d *DirectoryServiceDirectory) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(d, u)
 }
@@ -110,80 +107,63 @@ func (d *DirectoryServiceDirectory) BuildResource() *schema.Resource {
 	}
 
 	costComponents := []*schema.CostComponent{
-		{
-			Name:           fmt.Sprintf("Directory service (%s, %s)", d.Type, size),
-			Unit:           "hours",
-			UnitMultiplier: decimal.NewFromInt(1),
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:       awsVendorFilter,
-				Region:           strPtr(d.Region),
-				Service:          directorySvcSvcFilter,
-				ProductFamily:    productFmlyFilter,
-				AttributeFilters: d.getAttributeFiltersForDirectory(size),
-			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr("on_demand"),
-			},
-		},
+		d.domainControllerCostComponent(
+			2, // directory service provisions a minimum of 2 controllers
+			fmt.Sprintf("Directory service (%s, %s)", d.Type, size),
+			size,
+		),
 	}
 
-	if d.MonthlyDataProcessedGB != nil {
-		for _, r := range d.MonthlyDataProcessedGB.Values() {
-			// no outbound data transfer from the same region
-			if r.Key == d.Region {
-				continue
-			}
+	if d.AdditionalDomainControllers != nil {
+		costComponents = append(
+			costComponents,
+			d.domainControllerCostComponent(*d.AdditionalDomainControllers, "Additional domain controllers", size),
+		)
+	}
 
-			toLocation, ok := regionMapping[r.Key]
-			if !ok {
-				log.Warnf("Skipping resource %s usage cost: Outbound data transfer. Could not find mapping for region %s", d.Address, r.Key)
-				continue
-			}
-
-			costComponents = append(costComponents, &schema.CostComponent{
-				Name:            fmt.Sprintf("Outbound data transfer (from %s, to %s)", d.Region, r.Key),
-				Unit:            "GB",
-				UnitMultiplier:  decimal.NewFromInt(1),
-				MonthlyQuantity: decimalPtr(decimal.NewFromInt(r.Value)),
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    awsVendorFilter,
-					Service:       strPtr("AWSDataTransfer"),
-					ProductFamily: strPtr("Data Transfer"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "transferType", Value: strPtr("InterRegion Outbound")},
-						{Key: "fromLocation", Value: strPtr(d.RegionName)},
-						{Key: "toLocation", Value: strPtr(toLocation)},
-					},
+	if d.SharedAccounts != nil && d.Type == dtMicrosoftAD {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            "Directory sharing",
+			Unit:            "accounts",
+			UnitMultiplier:  decimal.NewFromInt(730),
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(*d.SharedAccounts * 730)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    awsVendorFilter,
+				Region:        strPtr(d.Region),
+				Service:       directorySvcSvcFilter,
+				ProductFamily: productFmlyFilter,
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "directorySize", Value: strPtr(size)},
+					{Key: "directoryType", Value: strPtr("Shared " + d.Type)},
+					{Key: "location", Value: strPtr(d.RegionName)},
 				},
-			})
-		}
-
-		if d.SharedAccounts != nil && d.Type == dtMicrosoftAD {
-			costComponents = append(costComponents, &schema.CostComponent{
-				Name:            "Directory sharing",
-				Unit:            "accounts",
-				UnitMultiplier:  decimal.NewFromInt(1),
-				MonthlyQuantity: decimalPtr(decimal.NewFromInt(*d.SharedAccounts)),
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    awsVendorFilter,
-					Region:        strPtr(d.Region),
-					Service:       directorySvcSvcFilter,
-					ProductFamily: productFmlyFilter,
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "directorySize", Value: strPtr(size)},
-						{Key: "directoryType", Value: strPtr("Shared " + d.Type)},
-						{Key: "location", Value: strPtr(d.RegionName)},
-					},
-				},
-			})
-		}
+			},
+		})
 	}
 
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
 		UsageSchema:    directoryServiceDirectorySchema,
+	}
+}
+
+func (d DirectoryServiceDirectory) domainControllerCostComponent(amount int64, name, size string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "controllers",
+		UnitMultiplier:  decimal.NewFromInt(730),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(amount * 730)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:       awsVendorFilter,
+			Region:           strPtr(d.Region),
+			Service:          directorySvcSvcFilter,
+			ProductFamily:    productFmlyFilter,
+			AttributeFilters: d.getAttributeFiltersForDirectory(size),
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
 	}
 }
 
