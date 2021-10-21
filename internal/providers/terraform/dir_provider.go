@@ -174,6 +174,17 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		return p.cachedPlanJSON, nil
 	}
 
+	if !p.IsTerragrunt {
+		spinner := ui.NewSpinner("Looking for cached plan", p.spinnerOpts)
+		if cached := ReadPlanCache(p.Path); cached != nil {
+
+			p.cachedPlanJSON = cached
+			spinner.Success()
+			return p.cachedPlanJSON, nil
+		}
+		spinner.Fail()
+	}
+
 	err := p.checks()
 	if err != nil {
 		return []byte{}, err
@@ -203,6 +214,9 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 	j, err := p.runShow(opts, spinner, planFile)
 	if err == nil {
 		p.cachedPlanJSON = j
+		if !p.IsTerragrunt {
+			WritePlanCache(p.Path, j)
+		}
 	}
 	return j, err
 }
