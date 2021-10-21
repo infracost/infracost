@@ -8,7 +8,6 @@ import (
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/usage"
 )
 
 const (
@@ -18,12 +17,9 @@ const (
 var (
 	directoryServiceDirectorySchema = []*schema.UsageItem{
 		{
-			Key: "monthly_data_processed_gb",
-			DefaultValue: &usage.ResourceUsage{
-				Name:  "monthly_data_processed_gb",
-				Items: RegionUsageSchema,
-			},
-			ValueType: schema.SubResourceUsage,
+			Key:          "additional_domain_controllers",
+			DefaultValue: 0,
+			ValueType:    schema.Int64,
 		},
 		{
 			Key:          "shared_accounts",
