@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
+	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 )
@@ -349,7 +350,7 @@ func shieldRequests(d *schema.ResourceData, u *schema.UsageData) *schema.CostCom
 	}
 
 	var apiRegion string
-	if v, ok := regionMapping[region]; ok {
+	if v, ok := aws.RegionMapping[region]; ok {
 		apiRegion = v
 	}
 

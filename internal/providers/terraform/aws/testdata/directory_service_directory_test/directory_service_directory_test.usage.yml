@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  aws_directory_service_directory.simple_ad_with_usage:
+    additional_domain_controllers: 3
+    shared_accounts: 5
+  aws_directory_service_directory.microsoft_ad_with_usage:
+    additional_domain_controllers: 4
+    shared_accounts: 8

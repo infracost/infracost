@@ -4,40 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
-)
 
-var regionMapping = map[string]string{
-	"us-gov-west-1":   "AWS GovCloud (US-West)",
-	"us-gov-east-1":   "AWS GovCloud (US-East)",
-	"us-east-1":       "US East (N. Virginia)",
-	"us-east-2":       "US East (Ohio)",
-	"us-west-1":       "US West (N. California)",
-	"us-west-2":       "US West (Oregon)",
-	"us-west-2-lax-1": "US West (Los Angeles)",
-	"ca-central-1":    "Canada (Central)",
-	"cn-north-1":      "China (Beijing)",
-	"cn-northwest-1":  "China (Ningxia)",
-	"eu-central-1":    "EU (Frankfurt)",
-	"eu-west-1":       "EU (Ireland)",
-	"eu-west-2":       "EU (London)",
-	"eu-south-1":      "EU (Milan)",
-	"eu-west-3":       "EU (Paris)",
-	"eu-north-1":      "EU (Stockholm)",
-	"ap-east-1":       "Asia Pacific (Hong Kong)",
-	"ap-northeast-1":  "Asia Pacific (Tokyo)",
-	"ap-northeast-2":  "Asia Pacific (Seoul)",
-	"ap-northeast-3":  "Asia Pacific (Osaka)",
-	"ap-southeast-1":  "Asia Pacific (Singapore)",
-	"ap-southeast-2":  "Asia Pacific (Sydney)",
-	"ap-south-1":      "Asia Pacific (Mumbai)",
-	"me-south-1":      "Middle East (Bahrain)",
-	"sa-east-1":       "South America (Sao Paulo)",
-	"af-south-1":      "Africa (Cape Town)",
-}
+	"github.com/infracost/infracost/internal/resources/aws"
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
+)
 
 type dataTransferRegionUsageFilterData struct {
 	usageName      string
@@ -60,25 +33,25 @@ func GetDataTransferRegistryItem() *schema.RegistryItem {
 
 func NewDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := strings.ToLower(u.Get("region").String())
-	fromLocation, ok := regionMapping[region]
+	fromLocation, ok := aws.RegionMapping[region]
 
 	if !ok {
 		log.Warnf("Skipping resource %s. Could not find mapping for region %s", d.Address, region)
 		return nil
 	}
 
-	usEastRegion := regionMapping["us-east-1"]
-	otherRegion := regionMapping["us-west-1"]
+	usEastRegion := aws.RegionMapping["us-east-1"]
+	otherRegion := aws.RegionMapping["us-west-1"]
 
 	if region == "us-east-1" {
-		usEastRegion = regionMapping["us-east-2"]
-		otherRegion = regionMapping["us-west-2"]
+		usEastRegion = aws.RegionMapping["us-east-2"]
+		otherRegion = aws.RegionMapping["us-west-2"]
 	} else if region == "us-west-1" {
-		otherRegion = regionMapping["us-west-2"]
+		otherRegion = aws.RegionMapping["us-west-2"]
 	} else if region == "cn-north-1" {
-		otherRegion = regionMapping["cn-northwest-1"]
+		otherRegion = aws.RegionMapping["cn-northwest-1"]
 	} else if region == "cn-northwest-1" {
-		otherRegion = regionMapping["cn-north-1"]
+		otherRegion = aws.RegionMapping["cn-north-1"]
 	}
 
 	var intraRegionGb *decimal.Decimal

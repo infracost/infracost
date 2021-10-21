@@ -7,10 +7,11 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/infracost/infracost/internal/version"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/version"
 )
 
 type APIClient struct {
