@@ -119,10 +119,10 @@ func (d *DirectoryServiceDirectory) BuildResource() *schema.Resource {
 
 	if d.SharedAccounts != nil && d.Type == dtMicrosoftAD {
 		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Directory sharing",
-			Unit:            "accounts",
-			UnitMultiplier:  decimal.NewFromInt(730),
-			MonthlyQuantity: decimalPtr(decimal.NewFromInt(*d.SharedAccounts * 730)),
+			Name:           "Directory sharing",
+			Unit:           "accounts",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(*d.SharedAccounts)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    awsVendorFilter,
 				Region:        strPtr(d.Region),
@@ -146,10 +146,10 @@ func (d *DirectoryServiceDirectory) BuildResource() *schema.Resource {
 
 func (d DirectoryServiceDirectory) domainControllerCostComponent(amount int64, name, size string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            name,
-		Unit:            "controllers",
-		UnitMultiplier:  decimal.NewFromInt(730),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(amount * 730)),
+		Name:           name,
+		Unit:           "controllers",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(amount)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:       awsVendorFilter,
 			Region:           strPtr(d.Region),
