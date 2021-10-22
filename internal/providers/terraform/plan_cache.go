@@ -127,7 +127,8 @@ func UsePlanCache(p *DirProvider) bool {
 }
 
 func ReadPlanCache(p *DirProvider) []byte {
-	cache := path.Join(p.Path, cacheFileName)
+
+	cache := path.Join(calcDataDir(p), cacheFileName)
 
 	info, err := os.Stat(cache)
 	if err != nil {
@@ -170,10 +171,11 @@ func WritePlanCache(p *DirProvider, planJSON []byte) {
 		return
 	}
 
+	dataDir := calcDataDir(p)
 	// create the .infracost dir if it doesn't already exist
-	if _, err := os.Stat(path.Join(p.Path, infracostDir)); err != nil {
+	if _, err := os.Stat(path.Join(dataDir, infracostDir)); err != nil {
 		if os.IsNotExist(err) {
-			err := os.MkdirAll(path.Join(p.Path, infracostDir), 0700)
+			err := os.MkdirAll(path.Join(dataDir, infracostDir), 0700)
 			if err != nil {
 				log.Debugf("Couldn't create %v directory: %v", infracostDir, err)
 				return
@@ -181,12 +183,27 @@ func WritePlanCache(p *DirProvider, planJSON []byte) {
 		}
 	}
 
-	err = os.WriteFile(path.Join(p.Path, cacheFileName), cacheJSON, 0600)
+	err = os.WriteFile(path.Join(dataDir, cacheFileName), cacheJSON, 0600)
 	if err != nil {
 		log.Debugf("Failed to write plan cache: %v", err)
 		return
 	}
 	log.Debugf("Wrote plan JSON to %v", cacheFileName)
+}
+
+func calcDataDir(p *DirProvider) string {
+	if dir, ok := p.Env["TF_DATA_DIR"]; ok {
+		log.Debugf("Writing plan cache to config env TF_DATA_DIR: %v", dir)
+		return dir
+	}
+
+	if dir, ok := os.LookupEnv("TF_DATA_DIR"); ok {
+		log.Debugf("Writing plan cache to env TF_DATA_DIR: %v", dir)
+		return dir
+	}
+
+	log.Debugf("Writing plan cache to path: %v", p.Path)
+	return p.Path
 }
 
 func calcConfigState(p *DirProvider) configState {
