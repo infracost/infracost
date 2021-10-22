@@ -174,8 +174,7 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		return p.cachedPlanJSON, nil
 	}
 
-	usePlanCache := !p.ctx.RunContext.Config.NoCache && !p.IsTerragrunt && !p.ctx.RunContext.IsCIRun()
-	if usePlanCache {
+	if UsePlanCache(p) {
 		spinner := ui.NewSpinner("Checking for cached plan...", p.spinnerOpts)
 		if cached := ReadPlanCache(p); cached != nil {
 
@@ -215,7 +214,8 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 	j, err := p.runShow(opts, spinner, planFile)
 	if err == nil {
 		p.cachedPlanJSON = j
-		if usePlanCache {
+		if UsePlanCache(p) {
+			// Note we check UsePlanCache again because we have discovered we're using remote execution inside p.runPlan
 			WritePlanCache(p, j)
 		}
 	}

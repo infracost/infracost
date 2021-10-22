@@ -103,6 +103,29 @@ type cacheFile struct {
 	Plan        []byte      `json:"plan"`
 }
 
+func UsePlanCache(p *DirProvider) bool {
+	if p.ctx.RunContext.Config.NoCache {
+		// cache was turned off with --no-cache
+		return false
+	}
+
+	if p.IsTerragrunt {
+		// not sure how to support terragrunt yet
+		return false
+	}
+
+	if p.ctx.RunContext.IsCIRun() {
+		return false
+	}
+
+	if _, ok := p.ctx.ContextValues()["terraformRemoteExecutionModeEnabled"]; ok {
+		// remote execution is enabled
+		return false
+	}
+
+	return true
+}
+
 func ReadPlanCache(p *DirProvider) []byte {
 	cache := path.Join(p.Path, cacheFileName)
 
