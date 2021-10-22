@@ -12,6 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var cacheFileVersion = "0.1"
 var infracostDir = ".infracost"
 var cacheFileName = path.Join(infracostDir, ".infracost-cache")
 var cacheMaxAgeSecs int64 = 60 * 10 // 10 minutes
@@ -21,9 +22,35 @@ type terraformConfigFileState struct {
 	Modified string `json:"modified"`
 }
 
+type configState struct {
+	Version            string                     `json:"version"`
+	TFConfigFileStates []terraformConfigFileState `json:"tf_config_file_states"`
+}
+
+func (state *configState) equivalent(otherState *configState) bool {
+	if state.Version != otherState.Version {
+		log.Debugf("Plan cache config state not equivalent: version changed")
+		return false
+	}
+
+	if len(state.TFConfigFileStates) != len(otherState.TFConfigFileStates) {
+		log.Debugf("Plan cache config state not equivalent: TFConfigFileStates has changed size")
+		return false
+	}
+
+	for i := range state.TFConfigFileStates {
+		if state.TFConfigFileStates[i] != otherState.TFConfigFileStates[i] {
+			log.Debugf("Plan cache config state not equivalent: %v", state.TFConfigFileStates[i])
+			return false
+		}
+	}
+
+	return true
+}
+
 type cacheFile struct {
-	ConfigState []terraformConfigFileState `json:"config_state"`
-	Plan        []byte                     `json:"plan"`
+	ConfigState configState `json:"config_state"`
+	Plan        []byte      `json:"plan"`
 }
 
 func ReadPlanCache(dir string) []byte {
@@ -53,18 +80,10 @@ func ReadPlanCache(dir string) []byte {
 		return nil
 	}
 
-	state := calcConfigFileStates(dir)
-
-	if len(state) != len(cf.ConfigState) {
-		log.Debugf("Skipping plan cache: ConfigFileState has changed size")
+	state := calcConfigState(dir)
+	if !cf.ConfigState.equivalent(&state) {
+		log.Debugf("Skipping plan cache: Config state has changed")
 		return nil
-	}
-
-	for i := range state {
-		if state[i] != cf.ConfigState[i] {
-			log.Debugf("Skipping plan cache: ConfigFileState has changed: %v", state[i])
-			return nil
-		}
 	}
 
 	log.Debugf("Read plan JSON from %v", cacheFileName)
@@ -72,8 +91,7 @@ func ReadPlanCache(dir string) []byte {
 }
 
 func WritePlanCache(dir string, planJSON []byte) {
-	state := calcConfigFileStates(dir)
-	cacheJSON, err := json.Marshal(cacheFile{ConfigState: state, Plan: planJSON})
+	cacheJSON, err := json.Marshal(cacheFile{ConfigState: calcConfigState(dir), Plan: planJSON})
 	if err != nil {
 		log.Debugf("Failed to marshal plan cache: %v", err)
 		return
@@ -98,8 +116,15 @@ func WritePlanCache(dir string, planJSON []byte) {
 	log.Debugf("Wrote plan JSON to %v", cacheFileName)
 }
 
+func calcConfigState(dir string) configState {
+	return configState{
+		Version:            cacheFileVersion,
+		TFConfigFileStates: calcTerraformConfigFileStates(dir),
+	}
+}
+
 // Finds all files used by a terraform project directory and returns them with their last modified time.
-func calcConfigFileStates(dir string) []terraformConfigFileState {
+func calcTerraformConfigFileStates(dir string) []terraformConfigFileState {
 	filepaths := findNestedSourceFiles(dir)
 	configFileStates := make([]terraformConfigFileState, 0, len(filepaths))
 
