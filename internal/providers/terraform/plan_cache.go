@@ -34,6 +34,7 @@ type configState struct {
 	TerraformCloudHost  string                     `json:"terraform_cloud_host"`
 	ConfigEnv           string                     `json:"config_env"`
 	TFEnv               string                     `json:"tf_env"`
+	TFLockFileDate      string                     `json:"tf_lock_file_date"`
 	TFConfigFileStates  []terraformConfigFileState `json:"tf_config_file_states"`
 }
 
@@ -80,6 +81,11 @@ func (state *configState) equivalent(otherState *configState) bool {
 
 	if state.TFEnv != otherState.TFEnv {
 		log.Debugf("Plan cache config state not equivalent: tf_env changed")
+		return false
+	}
+
+	if state.TFLockFileDate != otherState.TFLockFileDate {
+		log.Debugf("Plan cache config state not equivalent: tf_lock_file_date changed")
 		return false
 	}
 
@@ -207,6 +213,11 @@ func calcDataDir(p *DirProvider) string {
 }
 
 func calcConfigState(p *DirProvider) configState {
+	var tfLockFileDate string
+	if lockStat, err := os.Stat(path.Join(p.Path, ".terraform.lock.hcl")); err == nil {
+		tfLockFileDate = lockStat.ModTime().String()
+	}
+
 	return configState{
 		Version:             cacheFileVersion,
 		TerraformPlanFlags:  p.PlanFlags,
@@ -217,6 +228,7 @@ func calcConfigState(p *DirProvider) configState {
 		TerraformCloudHost:  p.TerraformCloudHost,
 		ConfigEnv:           envToString(p.Env),
 		TFEnv:               tfEnvToString(),
+		TFLockFileDate:      tfLockFileDate,
 		TFConfigFileStates:  calcTerraformConfigFileStates(p.Path),
 	}
 }
