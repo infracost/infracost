@@ -12,7 +12,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var cacheFileName = ".infracache"
+var infracostDir = ".infracost"
+var cacheFileName = path.Join(infracostDir, ".infracost-cache")
 var cacheMaxAgeSecs int64 = 60 * 10 // 10 minutes
 
 type terraformConfigFileState struct {
@@ -76,6 +77,17 @@ func WritePlanCache(dir string, planJSON []byte) {
 	if err != nil {
 		log.Debugf("Failed to marshal plan cache: %v", err)
 		return
+	}
+
+	// create the .infracost dir if it doesn't already exist
+	if _, err := os.Stat(path.Join(dir, infracostDir)); err != nil {
+		if os.IsNotExist(err) {
+			err := os.MkdirAll(path.Join(dir, infracostDir), 0700)
+			if err != nil {
+				log.Debugf("Couldn't create %v directory: %v", infracostDir, err)
+				return
+			}
+		}
 	}
 
 	err = os.WriteFile(path.Join(dir, cacheFileName), cacheJSON, 0600)
