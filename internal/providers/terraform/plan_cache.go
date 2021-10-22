@@ -23,13 +23,49 @@ type terraformConfigFileState struct {
 }
 
 type configState struct {
-	Version            string                     `json:"version"`
-	TFConfigFileStates []terraformConfigFileState `json:"tf_config_file_states"`
+	Version             string                     `json:"version"`
+	TerraformPlanFlags  string                     `json:"terraform_plan_flags"`
+	TerraformUseState   bool                       `json:"terraform_use_state"`
+	TerraformWorkspace  string                     `json:"terraform_workspace"`
+	TerraformBinary     string                     `json:"terraform_binary"`
+	TerraformCloudToken string                     `json:"terraform_cloud_token"`
+	TerraformCloudHost  string                     `json:"terraform_cloud_host"`
+	TFConfigFileStates  []terraformConfigFileState `json:"tf_config_file_states"`
 }
 
 func (state *configState) equivalent(otherState *configState) bool {
 	if state.Version != otherState.Version {
 		log.Debugf("Plan cache config state not equivalent: version changed")
+		return false
+	}
+
+	if state.TerraformPlanFlags != otherState.TerraformPlanFlags {
+		log.Debugf("Plan cache config state not equivalent: terraform_plan_flags changed")
+		return false
+	}
+
+	if state.TerraformUseState != otherState.TerraformUseState {
+		log.Debugf("Plan cache config state not equivalent: terraform_use_state changed")
+		return false
+	}
+
+	if state.TerraformWorkspace != otherState.TerraformWorkspace {
+		log.Debugf("Plan cache config state not equivalent: terraform_workspace changed")
+		return false
+	}
+
+	if state.TerraformBinary != otherState.TerraformBinary {
+		log.Debugf("Plan cache config state not equivalent: terraform_binary changed")
+		return false
+	}
+
+	if state.TerraformCloudToken != otherState.TerraformCloudToken {
+		log.Debugf("Plan cache config state not equivalent: terraform_cloud_token changed")
+		return false
+	}
+
+	if state.TerraformCloudHost != otherState.TerraformCloudHost {
+		log.Debugf("Plan cache config state not equivalent: terraform_cloud_host changed")
 		return false
 	}
 
@@ -53,8 +89,8 @@ type cacheFile struct {
 	Plan        []byte      `json:"plan"`
 }
 
-func ReadPlanCache(dir string) []byte {
-	cache := path.Join(dir, cacheFileName)
+func ReadPlanCache(p *DirProvider) []byte {
+	cache := path.Join(p.Path, cacheFileName)
 
 	info, err := os.Stat(cache)
 	if err != nil {
@@ -80,7 +116,7 @@ func ReadPlanCache(dir string) []byte {
 		return nil
 	}
 
-	state := calcConfigState(dir)
+	state := calcConfigState(p)
 	if !cf.ConfigState.equivalent(&state) {
 		log.Debugf("Skipping plan cache: Config state has changed")
 		return nil
@@ -90,17 +126,17 @@ func ReadPlanCache(dir string) []byte {
 	return cf.Plan
 }
 
-func WritePlanCache(dir string, planJSON []byte) {
-	cacheJSON, err := json.Marshal(cacheFile{ConfigState: calcConfigState(dir), Plan: planJSON})
+func WritePlanCache(p *DirProvider, planJSON []byte) {
+	cacheJSON, err := json.Marshal(cacheFile{ConfigState: calcConfigState(p), Plan: planJSON})
 	if err != nil {
 		log.Debugf("Failed to marshal plan cache: %v", err)
 		return
 	}
 
 	// create the .infracost dir if it doesn't already exist
-	if _, err := os.Stat(path.Join(dir, infracostDir)); err != nil {
+	if _, err := os.Stat(path.Join(p.Path, infracostDir)); err != nil {
 		if os.IsNotExist(err) {
-			err := os.MkdirAll(path.Join(dir, infracostDir), 0700)
+			err := os.MkdirAll(path.Join(p.Path, infracostDir), 0700)
 			if err != nil {
 				log.Debugf("Couldn't create %v directory: %v", infracostDir, err)
 				return
@@ -108,7 +144,7 @@ func WritePlanCache(dir string, planJSON []byte) {
 		}
 	}
 
-	err = os.WriteFile(path.Join(dir, cacheFileName), cacheJSON, 0600)
+	err = os.WriteFile(path.Join(p.Path, cacheFileName), cacheJSON, 0600)
 	if err != nil {
 		log.Debugf("Failed to write plan cache: %v", err)
 		return
@@ -116,10 +152,16 @@ func WritePlanCache(dir string, planJSON []byte) {
 	log.Debugf("Wrote plan JSON to %v", cacheFileName)
 }
 
-func calcConfigState(dir string) configState {
+func calcConfigState(p *DirProvider) configState {
 	return configState{
-		Version:            cacheFileVersion,
-		TFConfigFileStates: calcTerraformConfigFileStates(dir),
+		Version:             cacheFileVersion,
+		TerraformPlanFlags:  p.PlanFlags,
+		TerraformUseState:   p.UseState,
+		TerraformWorkspace:  p.Workspace,
+		TerraformBinary:     p.TerraformBinary,
+		TerraformCloudToken: p.TerraformCloudToken,
+		TerraformCloudHost:  p.TerraformCloudHost,
+		TFConfigFileStates:  calcTerraformConfigFileStates(p.Path),
 	}
 }
 
