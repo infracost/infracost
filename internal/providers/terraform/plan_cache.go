@@ -2,11 +2,13 @@ package terraform
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -30,6 +32,8 @@ type configState struct {
 	TerraformBinary     string                     `json:"terraform_binary"`
 	TerraformCloudToken string                     `json:"terraform_cloud_token"`
 	TerraformCloudHost  string                     `json:"terraform_cloud_host"`
+	ConfigEnv           string                     `json:"config_env"`
+	TFEnv               string                     `json:"tf_env"`
 	TFConfigFileStates  []terraformConfigFileState `json:"tf_config_file_states"`
 }
 
@@ -66,6 +70,16 @@ func (state *configState) equivalent(otherState *configState) bool {
 
 	if state.TerraformCloudHost != otherState.TerraformCloudHost {
 		log.Debugf("Plan cache config state not equivalent: terraform_cloud_host changed")
+		return false
+	}
+
+	if state.ConfigEnv != otherState.ConfigEnv {
+		log.Debugf("Plan cache config state not equivalent: config_env changed")
+		return false
+	}
+
+	if state.TFEnv != otherState.TFEnv {
+		log.Debugf("Plan cache config state not equivalent: tf_env changed")
 		return false
 	}
 
@@ -161,8 +175,33 @@ func calcConfigState(p *DirProvider) configState {
 		TerraformBinary:     p.TerraformBinary,
 		TerraformCloudToken: p.TerraformCloudToken,
 		TerraformCloudHost:  p.TerraformCloudHost,
+		ConfigEnv:           envToString(p.Env),
+		TFEnv:               tfEnvToString(),
 		TFConfigFileStates:  calcTerraformConfigFileStates(p.Path),
 	}
+}
+
+func envToString(env map[string]string) string {
+	envPairs := make([]string, 0, len(env))
+	for k, v := range env {
+		envPairs = append(envPairs, fmt.Sprintf("%s=%s", k, v))
+	}
+	sort.Strings(envPairs)
+	return strings.Join(envPairs, ",")
+}
+
+func tfEnvToString() string {
+	tfEnvs := []string{}
+	for _, s := range os.Environ() {
+		if strings.HasPrefix(s, "TF_VAR_") ||
+			strings.HasPrefix(s, "TF_CLI_ARGS") ||
+			strings.HasPrefix(s, "TF_WORKSPACE") ||
+			strings.HasPrefix(s, "TF_CLI_CONFIG_FILE") {
+			tfEnvs = append(tfEnvs, s)
+		}
+	}
+	sort.Strings(tfEnvs)
+	return strings.Join(tfEnvs, ",")
 }
 
 // Finds all files used by a terraform project directory and returns them with their last modified time.
