@@ -174,7 +174,7 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		return p.cachedPlanJSON, nil
 	}
 
-	usePlanCache := !p.IsTerragrunt && !p.ctx.RunContext.IsCIRun()
+	usePlanCache := !p.ctx.RunContext.Config.NoCache && !p.IsTerragrunt && !p.ctx.RunContext.IsCIRun()
 	if usePlanCache {
 		spinner := ui.NewSpinner("Checking for cached plan...", p.spinnerOpts)
 		if cached := ReadPlanCache(p); cached != nil {

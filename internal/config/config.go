@@ -47,6 +47,8 @@ type Config struct {
 	SyncUsageFile bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
 	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
 
+	NoCache bool `yaml:"fields,omitempty" ignored:"true"`
+
 	// for testing
 	EventsDisabled       bool
 	LogWriter            io.Writer

@@ -33,6 +33,8 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory")
 	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
 
+	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache the terraform plan")
+
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 
 	cmd.Flags().Bool("sync-usage-file", false, "Sync usage-file with missing resources, needs usage-file too (experimental)")
@@ -364,6 +366,8 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 			return err
 		}
 	}
+
+	cfg.NoCache, _ = cmd.Flags().GetBool("no-cache")
 
 	cfg.Format, _ = cmd.Flags().GetString("format")
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
