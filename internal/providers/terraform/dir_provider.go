@@ -176,13 +176,18 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 
 	if UsePlanCache(p) {
 		spinner := ui.NewSpinner("Checking for cached plan...", p.spinnerOpts)
-		if cached := ReadPlanCache(p); cached != nil {
+		cached, err := ReadPlanCache(p)
+		if cached != nil {
 
 			p.cachedPlanJSON = cached
 			spinner.SuccessWithMessage("Checking for cached plan... found")
 			return p.cachedPlanJSON, nil
 		}
-		spinner.SuccessWithMessage("Checking for cached plan... not found")
+		if err != nil {
+			spinner.SuccessWithMessage(fmt.Sprintf("Checking for cached plan... %v", err.Error()))
+		} else {
+			spinner.SuccessWithMessage("Checking for cached plan... none")
+		}
 	}
 
 	err := p.checks()
