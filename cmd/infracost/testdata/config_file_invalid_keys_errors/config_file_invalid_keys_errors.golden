@@ -1,6 +1,6 @@
 
 Err:
-Error: config YAML was invalid:
+Error: config file is invalid, see https://infracost.io/config-file for valid options:
 	project config defined for path: [../../examples/terraform] is invalid:
 		a_bad_key is not a valid project configuration option
 		second_bad_key is not a valid project configuration option

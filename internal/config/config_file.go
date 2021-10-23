@@ -17,8 +17,8 @@ const (
 )
 
 var (
-	ErrorInvalidConfigFile = errors.New("error parsing config YAML please check file syntax")
-	ErrorNilProjects       = errors.New("error no projects specified in config YAML, please specify at least one project")
+	ErrorInvalidConfigFile = errors.New("parsing config file failed check file syntax")
+	ErrorNilProjects       = errors.New("no projects specified in config file, please specify at least one project, see https://infracost.io/config-file for file specification")
 )
 
 // YamlError is a custom error type that allows setting multiple
@@ -144,7 +144,7 @@ func (f *fileSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 
 	validationError := &YamlError{
-		base: "config YAML was invalid",
+		base: "config file is invalid, see https://infracost.io/config-file for valid options",
 	}
 
 	for i, fields := range r.Projects {
@@ -179,7 +179,7 @@ func (f *fileSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	if !checkVersion(r.Version) {
 		return &YamlError{
-			base: "invalid config file",
+			base: "config file is invalid, see https://infracost.io/config-file for file specification",
 			errors: []error{
 				fmt.Errorf("version [%s] is not supported, valid versions are %s ≤ x ≤ %s", r.Version, minConfigFileVersion, maxConfigFileVersion),
 			},
