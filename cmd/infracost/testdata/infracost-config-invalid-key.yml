@@ -1,0 +1,8 @@
+version: 0.1
+
+projects:
+  - path: "../../examples/terraform"
+    a_bad_key: "here"
+    second_bad_key: "again"
+  - path: "../../examples/test"
+    a_further_bad_key: "here"

@@ -24,6 +24,18 @@ func TestFlagErrorsConfigFileAndTerraformWorkspaceEnv(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", "./testdata/infracost-config.yml"}, nil)
 }
 
+func TestConfigFileNilProjectsErrors(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", "./testdata/infracost-config-nil-projects.yml"}, nil)
+}
+
+func TestConfigFileInvalidKeysErrors(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", "./testdata/infracost-config-invalid-key.yml"}, nil)
+}
+
+func TestConfigFileInvalidPathErrors(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", "./testdata/infracost-config-invalid-path.yml"}, nil)
+}
+
 func TestFlagErrorsTerraformWorkspaceFlagAndEnv(t *testing.T) {
 	os.Setenv("INFRACOST_TERRAFORM_WORKSPACE", "dev")
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform", "--terraform-workspace", "prod"}, nil)

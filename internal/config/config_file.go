@@ -144,7 +144,7 @@ func (f *fileSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 
 	validationError := &YamlError{
-		base: "Config YAML was invalid",
+		base: "config YAML was invalid",
 	}
 
 	for i, fields := range r.Projects {
@@ -179,7 +179,7 @@ func (f *fileSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	if !checkVersion(r.Version) {
 		return &YamlError{
-			base: "Invalid config file",
+			base: "invalid config file",
 			errors: []error{
 				fmt.Errorf("version [%s] is not supported, valid versions are %s ≤ x ≤ %s", r.Version, minConfigFileVersion, maxConfigFileVersion),
 			},
@@ -203,7 +203,7 @@ func loadConfigFile(path string) (fileSpec, error) {
 	var cfgFile fileSpec
 
 	if !FileExists(path) {
-		return cfgFile, fmt.Errorf("Config file does not exist at %s", path)
+		return cfgFile, fmt.Errorf("config file does not exist at %s", path)
 	}
 
 	content, err := os.ReadFile(path)

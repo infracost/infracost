@@ -1,0 +1,5 @@
+
+Err:
+Error: config YAML was invalid:
+	project config at index 0 was invalid:
+		project must have a valid path definition

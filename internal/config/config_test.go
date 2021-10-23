@@ -75,7 +75,7 @@ projects:
     invalid_key: "test"
 `),
 			error: &YamlError{
-				base: "Config YAML was invalid",
+				base: "config YAML was invalid",
 				errors: []error{
 					&YamlError{
 						base: "project config defined for path: [path/to/my_terraform] is invalid",
@@ -94,7 +94,7 @@ projects:
   - path: path/to/my_terraform
 `),
 			error: &YamlError{
-				base: "Invalid config file",
+				base: "invalid config file",
 				errors: []error{
 					errors.New("version [81923.1] is not supported, valid versions are 0.1 ≤ x ≤ 0.1"),
 				},
