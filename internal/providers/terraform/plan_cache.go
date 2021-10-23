@@ -16,7 +16,7 @@ import (
 
 var cacheFileVersion = "0.1"
 var infracostDir = ".infracost"
-var cacheFileName = path.Join(infracostDir, ".infracost-cache")
+var cacheFileName = ".infracost-cache"
 var cacheMaxAgeSecs int64 = 60 * 10 // 10 minutes
 
 type terraformConfigFileState struct {
@@ -35,6 +35,7 @@ type configState struct {
 	ConfigEnv           string                     `json:"config_env"`
 	TFEnv               string                     `json:"tf_env"`
 	TFLockFileDate      string                     `json:"tf_lock_file_date"`
+	TFDataDate          string                     `json:"tf_data_date"`
 	TFConfigFileStates  []terraformConfigFileState `json:"tf_config_file_states"`
 }
 
@@ -89,6 +90,11 @@ func (state *configState) equivalent(otherState *configState) bool {
 		return false
 	}
 
+	if state.TFDataDate != otherState.TFDataDate {
+		log.Debugf("Plan cache config state not equivalent: tf_data_date changed")
+		return false
+	}
+
 	if len(state.TFConfigFileStates) != len(otherState.TFConfigFileStates) {
 		log.Debugf("Plan cache config state not equivalent: TFConfigFileStates has changed size")
 		return false
@@ -133,8 +139,7 @@ func UsePlanCache(p *DirProvider) bool {
 }
 
 func ReadPlanCache(p *DirProvider) []byte {
-
-	cache := path.Join(calcDataDir(p), cacheFileName)
+	cache := path.Join(calcCacheDir(p), cacheFileName)
 
 	info, err := os.Stat(cache)
 	if err != nil {
@@ -177,11 +182,11 @@ func WritePlanCache(p *DirProvider, planJSON []byte) {
 		return
 	}
 
-	dataDir := calcDataDir(p)
+	cacheDir := calcCacheDir(p)
 	// create the .infracost dir if it doesn't already exist
-	if _, err := os.Stat(path.Join(dataDir, infracostDir)); err != nil {
+	if _, err := os.Stat(cacheDir); err != nil {
 		if os.IsNotExist(err) {
-			err := os.MkdirAll(path.Join(dataDir, infracostDir), 0700)
+			err := os.MkdirAll(cacheDir, 0700)
 			if err != nil {
 				log.Debugf("Couldn't create %v directory: %v", infracostDir, err)
 				return
@@ -189,7 +194,7 @@ func WritePlanCache(p *DirProvider, planJSON []byte) {
 		}
 	}
 
-	err = os.WriteFile(path.Join(dataDir, cacheFileName), cacheJSON, 0600)
+	err = os.WriteFile(path.Join(cacheDir, cacheFileName), cacheJSON, 0600)
 	if err != nil {
 		log.Debugf("Failed to write plan cache: %v", err)
 		return
@@ -199,17 +204,25 @@ func WritePlanCache(p *DirProvider, planJSON []byte) {
 
 func calcDataDir(p *DirProvider) string {
 	if dir, ok := p.Env["TF_DATA_DIR"]; ok {
-		log.Debugf("Writing plan cache to config env TF_DATA_DIR: %v", dir)
 		return dir
 	}
 
 	if dir, ok := os.LookupEnv("TF_DATA_DIR"); ok {
-		log.Debugf("Writing plan cache to env TF_DATA_DIR: %v", dir)
 		return dir
 	}
 
-	log.Debugf("Writing plan cache to path: %v", p.Path)
-	return p.Path
+	return path.Join(p.Path, ".terraform")
+}
+
+func calcCacheDir(p *DirProvider) string {
+	dataDir := calcDataDir(p)
+
+	if dataDir != (path.Join(p.Path, ".terraform")) {
+		// there is a custom data dir, store the cache under that
+		return path.Join(dataDir, infracostDir)
+	}
+
+	return path.Join(p.Path, infracostDir)
 }
 
 func calcConfigState(p *DirProvider) configState {
@@ -229,8 +242,41 @@ func calcConfigState(p *DirProvider) configState {
 		ConfigEnv:           envToString(p.Env),
 		TFEnv:               tfEnvToString(),
 		TFLockFileDate:      tfLockFileDate,
+		TFDataDate:          calcTFDataDate(calcDataDir(p), 2).String(),
 		TFConfigFileStates:  calcTerraformConfigFileStates(p.Path),
 	}
+}
+
+func calcTFDataDate(path string, maxDepth int) time.Time {
+	var t time.Time
+
+	entries, err := os.ReadDir(path)
+	if err == nil {
+		for _, entry := range entries {
+			if entry.Name() == infracostDir {
+				// ignore the infradir since we expect that to change
+				continue
+			}
+
+			if info, err := entry.Info(); err == nil {
+				if t.Before(info.ModTime()) {
+					t = info.ModTime()
+				}
+			}
+
+			if entry.IsDir() {
+				if maxDepth > 0 {
+					dirT := calcTFDataDate(filepath.Join(path, entry.Name()), maxDepth-1)
+					if t.Before(dirT) {
+						t = dirT
+					}
+				}
+
+			}
+		}
+	}
+
+	return t
 }
 
 func envToString(env map[string]string) string {
