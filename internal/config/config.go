@@ -12,16 +12,31 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Project defines a specific terraform project config. This can be used
+// specify per folder/project configurations so that users don't have
+// to provide flags every run. Fields are documented below. More info
+// is outlined here: https://www.infracost.io/docs/multi_project/config_file/
 type Project struct {
-	Path                string            `yaml:"path,omitempty" ignored:"true"`
-	TerraformPlanFlags  string            `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
-	TerraformBinary     string            `yaml:"terraform_binary,omitempty" envconfig:"INFRACOST_TERRAFORM_BINARY"`
-	TerraformWorkspace  string            `yaml:"terraform_workspace,omitempty" envconfig:"INFRACOST_TERRAFORM_WORKSPACE"`
-	TerraformCloudHost  string            `yaml:"terraform_cloud_host,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_HOST"`
-	TerraformCloudToken string            `yaml:"terraform_cloud_token,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_TOKEN"`
-	UsageFile           string            `yaml:"usage_file,omitempty" ignored:"true"`
-	TerraformUseState   bool              `yaml:"terraform_use_state,omitempty" ignored:"true"`
-	Env                 map[string]string `yaml:"env,omitempty" ignored:"true"`
+	// Path to the Terraform directory or JSON/plan file.
+	// A path can be repeated with different parameters, e.g. for multiple workspaces.
+	Path string `yaml:"path,omitempty" ignored:"true"`
+	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
+	TerraformPlanFlags string `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
+	// TerraformBinary is an optional field used to change the path to the terraform or terragrunt binary
+	TerraformBinary string `yaml:"terraform_binary,omitempty" envconfig:"INFRACOST_TERRAFORM_BINARY"`
+	// TerraformWorkspace is an optional field used to set the Terraform workspace
+	TerraformWorkspace string `yaml:"terraform_workspace,omitempty" envconfig:"INFRACOST_TERRAFORM_WORKSPACE"`
+	// TerraformCloudHost is used to override the default app.terraform.io backend host. Only applicable for
+	// terraform cloud/enterprise users.
+	TerraformCloudHost string `yaml:"terraform_cloud_host,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_HOST"`
+	// TerraformCloudToken sets the Team API Token or User API Token so infracost can use it to access the plan.
+	// Only applicable for terraform cloud/enterprise users.
+	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_TOKEN"`
+	// UsageFile is the full path to usage file that specifies values for usage-based resources
+	UsageFile string `yaml:"usage_file,omitempty" ignored:"true"`
+	// TerraformUseState sets if the users wants to use the terraform state for infracost ops.
+	TerraformUseState bool              `yaml:"terraform_use_state,omitempty" ignored:"true"`
+	Env               map[string]string `yaml:"env,omitempty" ignored:"true"`
 }
 
 type Config struct {
@@ -79,7 +94,7 @@ func DefaultConfig() *Config {
 }
 
 func (c *Config) LoadFromConfigFile(path string) error {
-	cfgFile, err := LoadConfigFile(path)
+	cfgFile, err := loadConfigFile(path)
 	if err != nil {
 		return err
 	}
