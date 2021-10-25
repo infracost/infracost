@@ -508,6 +508,10 @@
   ],
   "totalHourlyCost": "1.86480479452054793334316749",
   "totalMonthlyCost": "1361.3075",
+  "pastTotalHourlyCost": "0",
+  "pastTotalMonthlyCost": "0",
+  "diffTotalHourlyCost": "1.86480479452054793334316749",
+  "diffTotalMonthlyCost": "1361.3075",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "unsupportedResourceCounts": {}
