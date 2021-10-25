@@ -139,8 +139,6 @@ func UsePlanCache(p *DirProvider) bool {
 }
 
 func ReadPlanCache(p *DirProvider) ([]byte, error) {
-	p.ctx.UsingCache = true
-
 	cache := path.Join(calcCacheDir(p), cacheFileName)
 
 	info, err := os.Stat(cache)
@@ -179,6 +177,7 @@ func ReadPlanCache(p *DirProvider) ([]byte, error) {
 	}
 
 	log.Debugf("Read plan JSON from %v", cacheFileName)
+	p.ctx.UsingCache = true
 	return cf.Plan, nil
 }
 
