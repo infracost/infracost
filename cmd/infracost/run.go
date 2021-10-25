@@ -436,6 +436,15 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
 	env["currency"] = runCtx.Config.Currency
 
+	usingCache := make([]bool, 0, len(projectContexts))
+	cacheErrors := make([]string, 0, len(projectContexts))
+	for _, pCtx := range projectContexts {
+		usingCache = append(usingCache, pCtx.UsingCache)
+		cacheErrors = append(cacheErrors, pCtx.CacheErr)
+	}
+	env["usingCache"] = usingCache
+	env["cacheErrors"] = cacheErrors
+
 	summary := r.FullSummary
 	env["supportedResourceCounts"] = summary.SupportedResourceCounts
 	env["unsupportedResourceCounts"] = summary.UnsupportedResourceCounts

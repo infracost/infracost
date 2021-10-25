@@ -139,22 +139,27 @@ func UsePlanCache(p *DirProvider) bool {
 }
 
 func ReadPlanCache(p *DirProvider) ([]byte, error) {
+	p.ctx.UsingCache = true
+
 	cache := path.Join(calcCacheDir(p), cacheFileName)
 
 	info, err := os.Stat(cache)
 	if err != nil {
 		log.Debugf("Skipping plan cache: Cache file does not exist")
+		p.ctx.CacheErr = "not found"
 		return nil, fmt.Errorf("not found")
 	}
 
 	if time.Now().Unix()-info.ModTime().Unix() > cacheMaxAgeSecs {
 		log.Debugf("Skipping plan cache: Cache file is too old")
+		p.ctx.CacheErr = "expired"
 		return nil, fmt.Errorf("expired")
 	}
 
 	data, err := os.ReadFile(cache)
 	if err != nil {
 		log.Debugf("Skipping plan cache: Error reading cache file: %v", err)
+		p.ctx.CacheErr = "unreadable"
 		return nil, fmt.Errorf("unreadable")
 	}
 
@@ -162,12 +167,14 @@ func ReadPlanCache(p *DirProvider) ([]byte, error) {
 	err = json.Unmarshal(data, &cf)
 	if err != nil {
 		log.Debugf("Skipping plan cache: Error unmarshalling cache file: %v", err)
+		p.ctx.CacheErr = "bad format"
 		return nil, fmt.Errorf("bad format")
 	}
 
 	state := calcConfigState(p)
 	if _, err := cf.ConfigState.equivalent(&state); err != nil {
 		log.Debugf("Skipping plan cache: Config state has changed")
+		p.ctx.CacheErr = err.Error()
 		return nil, fmt.Errorf("change detected")
 	}
 
