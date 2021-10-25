@@ -168,7 +168,7 @@ func ReadPlanCache(p *DirProvider) ([]byte, error) {
 	state := calcConfigState(p)
 	if _, err := cf.ConfigState.equivalent(&state); err != nil {
 		log.Debugf("Skipping plan cache: Config state has changed")
-		return nil, err
+		return nil, fmt.Errorf("change detected")
 	}
 
 	log.Debugf("Read plan JSON from %v", cacheFileName)
