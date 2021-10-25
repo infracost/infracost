@@ -67,6 +67,11 @@ func (s *Spinner) Fail() {
 	}
 }
 
+func (s *Spinner) SuccessWithMessage(newMsg string) {
+	s.msg = newMsg
+	s.Success()
+}
+
 func (s *Spinner) Success() {
 	if !s.spinner.Active() {
 		return

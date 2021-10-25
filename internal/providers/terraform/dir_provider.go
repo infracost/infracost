@@ -174,6 +174,18 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		return p.cachedPlanJSON, nil
 	}
 
+	if UsePlanCache(p) {
+		spinner := ui.NewSpinner("Checking for cached plan...", p.spinnerOpts)
+		cached, err := ReadPlanCache(p)
+		if err != nil {
+			spinner.SuccessWithMessage(fmt.Sprintf("Checking for cached plan... %v", err.Error()))
+		} else {
+			p.cachedPlanJSON = cached
+			spinner.SuccessWithMessage("Checking for cached plan... found")
+			return p.cachedPlanJSON, nil
+		}
+	}
+
 	err := p.checks()
 	if err != nil {
 		return []byte{}, err
@@ -203,6 +215,10 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 	j, err := p.runShow(opts, spinner, planFile)
 	if err == nil {
 		p.cachedPlanJSON = j
+		if UsePlanCache(p) {
+			// Note we check UsePlanCache again because we have discovered we're using remote execution inside p.runPlan
+			WritePlanCache(p, j)
+		}
 	}
 	return j, err
 }
