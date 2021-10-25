@@ -96,7 +96,7 @@ projects:
 			error: &YamlError{
 				base: "config file is invalid, see https://infracost.io/config-file for file specification",
 				errors: []error{
-					errors.New("version [81923.1] is not supported, valid versions are 0.1 ≤ x ≤ 0.1"),
+					errors.New("version '81923.1' is not supported, valid versions are 0.1 ≤ x ≤ 0.1"),
 				},
 			},
 		},

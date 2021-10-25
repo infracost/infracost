@@ -181,7 +181,7 @@ func (f *fileSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return &YamlError{
 			base: "config file is invalid, see https://infracost.io/config-file for file specification",
 			errors: []error{
-				fmt.Errorf("version [%s] is not supported, valid versions are %s ≤ x ≤ %s", r.Version, minConfigFileVersion, maxConfigFileVersion),
+				fmt.Errorf("version '%s' is not supported, valid versions are %s ≤ x ≤ %s", r.Version, minConfigFileVersion, maxConfigFileVersion),
 			},
 			indent: 0,
 		}
