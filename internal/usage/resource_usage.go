@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	yamlv3 "gopkg.in/yaml.v3"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 // ResourceUsage represents a resource block in the usage file
@@ -25,7 +26,7 @@ func (r *ResourceUsage) Map() map[string]interface{} {
 	return m
 }
 
-// MergeResourceUsage merge ResourceItem from src to r without overiding r
+// MergeResourceUsage merge ResourceItem from src to r without overriding r
 func (r *ResourceUsage) MergeResourceUsage(src *ResourceUsage) {
 	if src == nil {
 		return

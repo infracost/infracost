@@ -1,0 +1,5 @@
+
+Err:
+Error: config file is invalid, see https://infracost.io/config-file for valid options:
+	project config at index 0 was invalid:
+		project must have a valid path definition
