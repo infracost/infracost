@@ -106,7 +106,7 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg
 		}
 
 		spinner.Success()
-		cmd.Println(fmt.Sprintf("    %s Synced %d of %d resource%s",
+		cmd.PrintErrln(fmt.Sprintf("    %s Synced %d of %d resource%s",
 			ui.FaintString("└─"),
 			successes,
 			resources,
