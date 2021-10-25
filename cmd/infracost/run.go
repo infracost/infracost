@@ -33,7 +33,7 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory")
 	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
 
-	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache the terraform plan")
+	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
 
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 
