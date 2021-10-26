@@ -14,6 +14,9 @@ type ProjectContext struct {
 	RunContext    *RunContext
 	ProjectConfig *Project
 	contextVals   map[string]interface{}
+
+	UsingCache bool
+	CacheErr   string
 }
 
 func NewProjectContext(runCtx *RunContext, projectCfg *Project) *ProjectContext {

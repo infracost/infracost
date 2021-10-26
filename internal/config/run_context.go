@@ -116,6 +116,10 @@ func (c *RunContext) loadInitialContextValues() {
 	c.SetContextValue("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
 }
 
+func (c *RunContext) IsCIRun() bool {
+	return c.ContextValues()["ciPlatform"] != ""
+}
+
 type ProjectContexter interface {
 	ProjectContext() map[string]interface{}
 }

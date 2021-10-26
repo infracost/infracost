@@ -13,15 +13,19 @@ import (
 var outputVersion = "0.2"
 
 type Root struct {
-	Version          string           `json:"version"`
-	RunID            string           `json:"runId,omitempty"`
-	Currency         string           `json:"currency"`
-	Projects         []Project        `json:"projects"`
-	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
-	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
-	TimeGenerated    time.Time        `json:"timeGenerated"`
-	Summary          *Summary         `json:"summary"`
-	FullSummary      *Summary         `json:"-"`
+	Version              string           `json:"version"`
+	RunID                string           `json:"runId,omitempty"`
+	Currency             string           `json:"currency"`
+	Projects             []Project        `json:"projects"`
+	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`
+	TotalMonthlyCost     *decimal.Decimal `json:"totalMonthlyCost"`
+	PastTotalHourlyCost  *decimal.Decimal `json:"pastTotalHourlyCost"`
+	PastTotalMonthlyCost *decimal.Decimal `json:"pastTotalMonthlyCost"`
+	DiffTotalHourlyCost  *decimal.Decimal `json:"diffTotalHourlyCost"`
+	DiffTotalMonthlyCost *decimal.Decimal `json:"diffTotalMonthlyCost"`
+	TimeGenerated        time.Time        `json:"timeGenerated"`
+	Summary              *Summary         `json:"summary"`
+	FullSummary          *Summary         `json:"-"`
 }
 
 type Project struct {
@@ -148,7 +152,9 @@ func outputResource(r *schema.Resource) Resource {
 }
 
 func ToOutputFormat(projects []*schema.Project) Root {
-	var totalMonthlyCost, totalHourlyCost *decimal.Decimal
+	var totalMonthlyCost, totalHourlyCost,
+		pastTotalMonthlyCost, pastTotalHourlyCost,
+		diffTotalMonthlyCost, diffTotalHourlyCost *decimal.Decimal
 
 	outProjects := make([]Project, 0, len(projects))
 	summaries := make([]*Summary, 0, len(projects))
@@ -159,25 +165,57 @@ func ToOutputFormat(projects []*schema.Project) Root {
 
 		breakdown = outputBreakdown(project.Resources)
 
+		if breakdown != nil {
+			if breakdown.TotalHourlyCost != nil {
+				if totalHourlyCost == nil {
+					totalHourlyCost = decimalPtr(decimal.Zero)
+				}
+				totalHourlyCost = decimalPtr(totalHourlyCost.Add(*breakdown.TotalHourlyCost))
+			}
+
+			if breakdown.TotalMonthlyCost != nil {
+				if totalMonthlyCost == nil {
+					totalMonthlyCost = decimalPtr(decimal.Zero)
+				}
+				totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*breakdown.TotalMonthlyCost))
+			}
+		}
+
 		if project.HasDiff {
 			pastBreakdown = outputBreakdown(project.PastResources)
 			diff = outputBreakdown(project.Diff)
-		}
 
-		if breakdown != nil && breakdown.TotalHourlyCost != nil {
-			if totalHourlyCost == nil {
-				totalHourlyCost = decimalPtr(decimal.Zero)
+			if pastBreakdown != nil {
+				if pastBreakdown.TotalHourlyCost != nil {
+					if pastTotalHourlyCost == nil {
+						pastTotalHourlyCost = decimalPtr(decimal.Zero)
+					}
+					pastTotalHourlyCost = decimalPtr(pastTotalHourlyCost.Add(*pastBreakdown.TotalHourlyCost))
+				}
+
+				if pastBreakdown.TotalMonthlyCost != nil {
+					if pastTotalMonthlyCost == nil {
+						pastTotalMonthlyCost = decimalPtr(decimal.Zero)
+					}
+					pastTotalMonthlyCost = decimalPtr(pastTotalMonthlyCost.Add(*pastBreakdown.TotalMonthlyCost))
+				}
 			}
 
-			totalHourlyCost = decimalPtr(totalHourlyCost.Add(*breakdown.TotalHourlyCost))
-		}
+			if diff != nil {
+				if diff.TotalHourlyCost != nil {
+					if diffTotalHourlyCost == nil {
+						diffTotalHourlyCost = decimalPtr(decimal.Zero)
+					}
+					diffTotalHourlyCost = decimalPtr(diffTotalHourlyCost.Add(*diff.TotalHourlyCost))
+				}
 
-		if breakdown != nil && breakdown.TotalMonthlyCost != nil {
-			if totalMonthlyCost == nil {
-				totalMonthlyCost = decimalPtr(decimal.Zero)
+				if diff.TotalMonthlyCost != nil {
+					if diffTotalMonthlyCost == nil {
+						diffTotalMonthlyCost = decimalPtr(decimal.Zero)
+					}
+					diffTotalMonthlyCost = decimalPtr(diffTotalMonthlyCost.Add(*diff.TotalMonthlyCost))
+				}
 			}
-
-			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*breakdown.TotalMonthlyCost))
 		}
 
 		summary := BuildSummary(project.Resources, SummaryOptions{
@@ -200,13 +238,17 @@ func ToOutputFormat(projects []*schema.Project) Root {
 	}
 
 	out := Root{
-		Version:          outputVersion,
-		Projects:         outProjects,
-		TotalHourlyCost:  totalHourlyCost,
-		TotalMonthlyCost: totalMonthlyCost,
-		TimeGenerated:    time.Now(),
-		Summary:          MergeSummaries(summaries),
-		FullSummary:      MergeSummaries(fullSummaries),
+		Version:              outputVersion,
+		Projects:             outProjects,
+		TotalHourlyCost:      totalHourlyCost,
+		TotalMonthlyCost:     totalMonthlyCost,
+		PastTotalHourlyCost:  pastTotalHourlyCost,
+		PastTotalMonthlyCost: pastTotalMonthlyCost,
+		DiffTotalHourlyCost:  diffTotalHourlyCost,
+		DiffTotalMonthlyCost: diffTotalMonthlyCost,
+		TimeGenerated:        time.Now(),
+		Summary:              MergeSummaries(summaries),
+		FullSummary:          MergeSummaries(fullSummaries),
 	}
 
 	return out

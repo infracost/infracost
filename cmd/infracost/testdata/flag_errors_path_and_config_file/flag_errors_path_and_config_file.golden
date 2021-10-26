@@ -22,6 +22,7 @@ FLAGS
                                       Supported by table and html output formats (default [monthlyQuantity,unit,monthlyCost])
       --format string                 Output format: json, table, html (default "table")
   -h, --help                          help for breakdown
+      --no-cache                      Don't attempt to cache Terraform plans
   -p, --path string                   Path to the Terraform directory or JSON/plan file
       --show-skipped                  Show unsupported resources, some of which might be free
       --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)
