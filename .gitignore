@@ -28,6 +28,9 @@ examples/*/plan.json
 examples/*/example.json
 examples/*/example.save
 
+# Infracost artifacts
+**/.infracost
+
 # Test artifacts
 .test_cache
 
