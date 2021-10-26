@@ -17,6 +17,7 @@ process_args () {
   percentage_threshold=${6:-$percentage_threshold}
   post_condition=${7:-$post_condition}
   show_skipped=${8:-$show_skipped}
+  sync_usage_file=${9:-$sync_usage_file}
 
   # Validate post_condition
   if ! echo "$post_condition" | jq empty; then
@@ -72,7 +73,11 @@ build_breakdown_cmd () {
     breakdown_cmd="$breakdown_cmd --terraform-workspace $terraform_workspace"
   fi
   if [ -n "$usage_file" ]; then
-    breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
+    if [ "$sync_usage_file" = "true" ] || [ "$sync_usage_file" = "True" ] || [ "$sync_usage_file" = "TRUE" ]; then
+      breakdown_cmd="$breakdown_cmd --sync-usage-file --usage-file $usage_file"
+    else
+      breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
+    fi
   fi
   if [ -n "$config_file" ]; then
     breakdown_cmd="$breakdown_cmd --config-file $config_file"

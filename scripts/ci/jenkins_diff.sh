@@ -10,6 +10,7 @@ fix_env_vars () {
     terraform_plan_flags=${terraform_plan_flags:-$TERRAFORM_PLAN_FLAGS}
     terraform_workspace=${terraform_workspace:-$TERRAFORM_WORKSPACE}
     usage_file=${usage_file:-$USAGE_FILE}
+    sync_usage_file=${sync_usage_file:-$SYNC_USAGE_FILE}
     config_file=${config_file:-$CONFIG_FILE}
     fail_condition=${fail_condition:-$FAIL_CONDITION}
     show_skipped=${show_skipped:-$SHOW_SKIPPED}
@@ -55,7 +56,11 @@ build_breakdown_cmd () {
     breakdown_cmd="$breakdown_cmd --terraform-workspace $terraform_workspace"
   fi
   if [ ! -z "$usage_file" ]; then
-    breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
+    if [ "$sync_usage_file" = "true" ] || [ "$sync_usage_file" = "True" ] || [ "$sync_usage_file" = "TRUE" ]; then
+      breakdown_cmd="$breakdown_cmd --sync-usage-file --usage-file $usage_file"
+    else
+      breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
+    fi
   fi
   if [ ! -z "$config_file" ]; then
     breakdown_cmd="$breakdown_cmd --config-file $config_file"
