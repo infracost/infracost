@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -160,7 +161,13 @@ func (f *fileSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			base: fmt.Sprintf("project config defined for path: [%s] is invalid", fields["path"]),
 		}
 
+		sorted := make([]string, 0, len(fields))
 		for k := range fields {
+			sorted = append(sorted, k)
+		}
+		sort.Strings(sorted)
+
+		for _, k := range sorted {
 			if _, ok := allowedKeys[k]; ok {
 				continue
 			}
