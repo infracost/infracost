@@ -147,7 +147,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
         </li>
         <li>
           <span class="label">Time generated:</span>
-          <span class="value">REPLACED_TIME</span>
+          <span class="value">REPLACED_TIMET</span>
         </li>
       </ul>
     </div>
