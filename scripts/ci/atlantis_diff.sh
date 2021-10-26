@@ -45,7 +45,7 @@ build_breakdown_cmd () {
   breakdown_cmd="${INFRACOST_BINARY} breakdown --no-color --format json"
 
   if [ ! -z "$usage_file" ]; then
-    if [ "$sync_usage_file" == "true" ]; then
+    if [ "$sync_usage_file" = "true" ] || [ "$sync_usage_file" = "True" ] || [ "$sync_usage_file" = "TRUE" ]; then
       breakdown_cmd="$breakdown_cmd --sync-usage-file --usage-file $usage_file"
     else
       breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
