@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/shopspring/decimal"
 	"html/template"
 	"strings"
+
+	"github.com/infracost/infracost/internal/ui"
+	"github.com/shopspring/decimal"
 
 	"github.com/Masterminds/sprig"
 
@@ -28,7 +30,8 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 			safe = strings.ReplaceAll(safe, "\n", "<br />")
 			return template.HTML(safe) // nolint:gosec
 		},
-		"contains": contains,
+		"stripColor": ui.StripColor,
+		"contains":   contains,
 		"hasCost": func(cc []CostComponent, sr []Resource, resourceName string) bool {
 			if len(cc) > 0 || len(sr) > 0 {
 				return true
@@ -52,13 +55,13 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	unsupportedResourcesMessage := out.unsupportedResourcesMessage(opts.ShowSkipped)
+	summaryMessage := out.summaryMessage(opts.ShowSkipped)
 
 	err = tmpl.Execute(bufw, struct {
-		Root                        Root
-		UnsupportedResourcesMessage string
-		Options                     Options
-	}{out, unsupportedResourcesMessage, opts})
+		Root           Root
+		SummaryMessage string
+		Options        Options
+	}{out, summaryMessage, opts})
 	if err != nil {
 		return []byte{}, err
 	}

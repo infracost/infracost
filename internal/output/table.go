@@ -17,8 +17,6 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 
 	s := ""
 
-	hasNilCosts := false
-
 	// Don't show the project total if there's only one project result
 	// since we will show the overall total anyway
 	includeProjectTotals := len(out.Projects) != 1
@@ -36,10 +34,6 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 			ui.BoldString("Project:"),
 			project.Label(opts.DashboardEnabled),
 		)
-
-		if breakdownHasNilCosts(*project.Breakdown) {
-			hasNilCosts = true
-		}
 
 		tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
 
@@ -69,24 +63,10 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		fmt.Sprintf("%*s ", tableLen-(len(overallTitle)+1), totalOut), // pad based on the last line length
 	)
 
-	unsupportedMsg := out.unsupportedResourcesMessage(opts.ShowSkipped)
+	summaryMsg := out.summaryMessage(opts.ShowSkipped)
 
-	if hasNilCosts || unsupportedMsg != "" {
-		s += "\n----------------------------------"
-	}
-
-	if hasNilCosts {
-		s += fmt.Sprintf("\nTo estimate usage-based resources use --usage-file, see %s",
-			ui.LinkString("https://infracost.io/usage-file"),
-		)
-
-		if unsupportedMsg != "" {
-			s += "\n"
-		}
-	}
-
-	if unsupportedMsg != "" {
-		s += "\n" + unsupportedMsg
+	if summaryMsg != "" {
+		s += "\n----------------------------------\n" + summaryMsg
 	}
 
 	return []byte(s), nil
