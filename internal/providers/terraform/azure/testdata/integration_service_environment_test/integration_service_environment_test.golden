@@ -12,3 +12,10 @@
  └─ Base units                                             730  hours       $749.71 
                                                                                     
  OVERALL TOTAL                                                           $17,714.91 
+----------------------------------
+9 cloud resources were detected:
+∙ 3 were estimated
+∙ 6 were free
+  ∙ 4 x azurerm_subnet
+  ∙ 1 x azurerm_resource_group
+  ∙ 1 x azurerm_virtual_network

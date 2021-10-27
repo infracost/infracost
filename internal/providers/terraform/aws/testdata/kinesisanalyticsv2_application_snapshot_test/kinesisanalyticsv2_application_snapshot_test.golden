@@ -21,4 +21,7 @@
                                                                                                           
  OVERALL TOTAL                                                                                    $187.82 
 ----------------------------------
-To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+5 cloud resources were detected:
+∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free
+  ∙ 1 x aws_iam_role

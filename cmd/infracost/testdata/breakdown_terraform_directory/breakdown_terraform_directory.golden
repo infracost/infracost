@@ -17,4 +17,5 @@ Project: infracost/infracost/examples/terraform
                                                                                                                       
  OVERALL TOTAL                                                                                                $742.64 
 ----------------------------------
-To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+2 cloud resources were detected, rerun with --show-skipped to see details:
+∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file

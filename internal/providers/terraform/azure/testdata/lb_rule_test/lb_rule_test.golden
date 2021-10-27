@@ -8,3 +8,9 @@
  └─ IP address (static)             730  hours         $2.63 
                                                              
  OVERALL TOTAL                                         $9.93 
+----------------------------------
+4 cloud resources were detected:
+∙ 2 were estimated
+∙ 2 were free
+  ∙ 1 x azurerm_lb
+  ∙ 1 x azurerm_resource_group

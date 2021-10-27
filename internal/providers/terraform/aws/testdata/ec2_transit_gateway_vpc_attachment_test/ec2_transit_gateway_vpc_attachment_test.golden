@@ -7,4 +7,5 @@
                                                                                                     
  OVERALL TOTAL                                                                               $36.50 
 ----------------------------------
-To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+1 cloud resource was detected:
+∙ 1 was estimated, 1 includes usage-based costs, see https://infracost.io/usage-file

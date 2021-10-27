@@ -12,3 +12,8 @@
     └─ IPSec traffic between continents (excludes Oceania)          200  GB          $16.00 
                                                                                             
  OVERALL TOTAL                                                                       $38.90 
+----------------------------------
+2 cloud resources were detected:
+∙ 1 was estimated, 1 includes usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free
+  ∙ 1 x google_compute_network

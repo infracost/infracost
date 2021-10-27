@@ -1033,7 +1033,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     </table>
 
     <div class="warnings">
-      <p>2 resource types weren&#39;t estimated as they&#39;re not supported yet, rerun with --show-skipped to see.<br />Please watch/star https://github.com/infracost/infracost as new resources are added regularly.</p>
+      <p></p>
     </div>
   </body>
 </html>

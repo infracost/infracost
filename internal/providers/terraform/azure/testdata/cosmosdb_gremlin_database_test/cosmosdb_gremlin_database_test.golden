@@ -46,4 +46,8 @@
                                                                                                                           
  OVERALL TOTAL                                                                                                  $5,155.73 
 ----------------------------------
-To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+9 cloud resources were detected:
+∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
+∙ 4 were free
+  ∙ 3 x azurerm_cosmosdb_account
+  ∙ 1 x azurerm_resource_group
