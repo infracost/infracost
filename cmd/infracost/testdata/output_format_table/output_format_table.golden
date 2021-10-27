@@ -55,8 +55,3 @@ Project: infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
  Project total                                                                     $4,018.65 
 
  OVERALL TOTAL                                                                     $5,379.96 
-----------------------------------
-To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
-
-2 resource types weren't estimated as they're not supported yet, rerun with --show-skipped to see.
-Please watch/star https://github.com/infracost/infracost as new resources are added regularly.

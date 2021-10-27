@@ -18,4 +18,8 @@
                                                                                               
  OVERALL TOTAL                                                                      $1,995.00 
 ----------------------------------
-To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+5 cloud resources were detected:
+∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were free
+  ∙ 1 x azurerm_databricks_workspace
+  ∙ 1 x azurerm_resource_group

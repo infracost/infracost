@@ -7,3 +7,8 @@
  └─ NVIDIA Tesla K80 (on-demand)                            5,840  hours     $1,839.60 
                                                                                        
  OVERALL TOTAL                                                               $2,110.13 
+----------------------------------
+2 cloud resources were detected:
+∙ 1 was estimated
+∙ 1 was free
+  ∙ 1 x google_compute_instance_template

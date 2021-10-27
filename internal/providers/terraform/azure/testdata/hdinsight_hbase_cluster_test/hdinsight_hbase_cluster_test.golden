@@ -8,10 +8,13 @@
                                                                            
  OVERALL TOTAL                                                   $3,907.40 
 ----------------------------------
-2 resource types weren't estimated as they're not supported yet.
-Please watch/star https://github.com/infracost/infracost as new resources are added regularly.
-1 x azurerm_storage_account
-1 x azurerm_storage_container
+4 cloud resources were detected:
+∙ 1 was estimated
+∙ 2 weren't estimated, report them in https://github.com/infracost/infracost
+  ∙ 1 x azurerm_storage_account
+  ∙ 1 x azurerm_storage_container
+∙ 1 was free
+  ∙ 1 x azurerm_resource_group
 Logs:
 
 level=warning msg="Skipping resource azurerm_storage_account.example. Infracost only supports BlockBlobStorage and FileStorage account kinds"

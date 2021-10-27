@@ -17,4 +17,7 @@
                                                                                                           
  OVERALL TOTAL                                                                                     $30.00 
 ----------------------------------
-To estimate usage-based resources use --usage-file, see https://infracost.io/usage-file
+6 cloud resources were detected:
+∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free
+  ∙ 1 x azurerm_resource_group

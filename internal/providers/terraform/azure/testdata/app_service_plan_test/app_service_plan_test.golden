@@ -23,3 +23,8 @@
  └─ Instance usage (S1)                      3,650  hours       $365.00 
                                                                         
  OVERALL TOTAL                                                $5,095.27 
+----------------------------------
+8 cloud resources were detected:
+∙ 7 were estimated
+∙ 1 was free
+  ∙ 1 x azurerm_resource_group

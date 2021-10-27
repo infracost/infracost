@@ -24,6 +24,9 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
  └─ Duration                                            $0.0000166667        $0.57 
                                                                                    
  OVERALL TOTAL                                                           $1,361.31 
+----------------------------------
+5 cloud resources were detected, rerun with --show-skipped to see details:
+∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
 
 Err:
 Warning: Invalid field 'invalid' specified, valid fields are: [price monthlyQuantity unit hourlyCost monthlyCost] or 'all' to include all fields

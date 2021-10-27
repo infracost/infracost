@@ -11,3 +11,8 @@
  └─ Cache usage (Standard_C3)                1,460  hours       $657.00 
                                                                         
  OVERALL TOTAL                                                $3,241.20 
+----------------------------------
+4 cloud resources were detected:
+∙ 3 were estimated
+∙ 1 was free
+  ∙ 1 x azurerm_resource_group

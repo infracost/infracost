@@ -26,3 +26,8 @@
     └─ Storage (P1)                                              2  months         $1.20 
                                                                                          
  OVERALL TOTAL                                                                   $602.33 
+----------------------------------
+6 cloud resources were detected:
+∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free
+  ∙ 1 x azurerm_resource_group

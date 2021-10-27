@@ -502,7 +502,13 @@
         "totalMonthlyCost": "1361.3075"
       },
       "summary": {
-        "unsupportedResourceCounts": {}
+        "totalDetectedResources": 5,
+        "totalSupportedResources": 5,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 5,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
       }
     }
   ],
@@ -514,6 +520,12 @@
   "diffTotalMonthlyCost": "1361.3075",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
-    "unsupportedResourceCounts": {}
+    "totalDetectedResources": 5,
+    "totalSupportedResources": 5,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 5,
+    "totalNoPriceResources": 0,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {}
   }
 }

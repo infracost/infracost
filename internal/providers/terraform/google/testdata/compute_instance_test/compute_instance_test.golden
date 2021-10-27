@@ -34,3 +34,6 @@
  └─ Standard provisioned storage (pd-standard)                         10  GiB           $0.40 
                                                                                                
  OVERALL TOTAL                                                                       $1,638.42 
+----------------------------------
+7 cloud resources were detected:
+∙ 7 were estimated

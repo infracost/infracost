@@ -11,3 +11,10 @@
  └─ Active directory domain service (Standard)               730  hours       $109.50 
                                                                                       
  OVERALL TOTAL                                                              $1,569.50 
+----------------------------------
+6 cloud resources were detected:
+∙ 3 were estimated
+∙ 3 were free
+  ∙ 1 x azurerm_resource_group
+  ∙ 1 x azurerm_subnet
+  ∙ 1 x azurerm_virtual_network
