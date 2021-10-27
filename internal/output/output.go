@@ -7,6 +7,8 @@ import (
 
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/ui"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 )
 
@@ -72,12 +74,16 @@ type Resource struct {
 }
 
 type Summary struct {
+	TotalResources            *int `json:"totalResources,omitempty"`
+	TotalDetectedResources    *int `json:"totalDetectedResources,omitempty"`
+	TotalSupportedResources   *int `json:"totalSupportedResources,omitempty"`
+	TotalUnsupportedResources *int `json:"totalUnsupportedResources,omitempty"`
+	TotalUsageBasedResources  *int `json:"totalUsageBasedResources,omitempty"`
+	TotalNoPriceResources     *int `json:"totalNoPriceResources,omitempty"`
+
 	SupportedResourceCounts   *map[string]int `json:"supportedResourceCounts,omitempty"`
 	UnsupportedResourceCounts *map[string]int `json:"unsupportedResourceCounts,omitempty"`
-	TotalSupportedResources   *int            `json:"totalSupportedResources,omitempty"`
-	TotalUnsupportedResources *int            `json:"totalUnsupportedResources,omitempty"`
-	TotalNoPriceResources     *int            `json:"totalNoPriceResources,omitempty"`
-	TotalResources            *int            `json:"totalResources,omitempty"`
+	NoPriceResourceCounts     *map[string]int `json:"noPriceResourceCounts,omitempty"`
 
 	EstimatedUsageCounts   *map[string]int `json:"-"`
 	UnestimatedUsageCounts *map[string]int `json:"-"`
@@ -151,7 +157,7 @@ func outputResource(r *schema.Resource) Resource {
 	}
 }
 
-func ToOutputFormat(projects []*schema.Project) Root {
+func ToOutputFormat(projects []*schema.Project) (Root, error) {
 	var totalMonthlyCost, totalHourlyCost,
 		pastTotalMonthlyCost, pastTotalHourlyCost,
 		diffTotalMonthlyCost, diffTotalHourlyCost *decimal.Decimal
@@ -218,12 +224,26 @@ func ToOutputFormat(projects []*schema.Project) Root {
 			}
 		}
 
-		summary := BuildSummary(project.Resources, SummaryOptions{
-			OnlyFields: []string{"UnsupportedResourceCounts"},
+		summary, err := BuildSummary(project.Resources, SummaryOptions{
+			OnlyFields: []string{
+				"TotalDetectedResources",
+				"TotalSupportedResources",
+				"TotalUnsupportedResources",
+				"TotalUsageBasedResources",
+				"TotalNoPriceResources",
+				"UnsupportedResourceCounts",
+				"NoPriceResourceCounts",
+			},
 		})
+		if err != nil {
+			return Root{}, err
+		}
 		summaries = append(summaries, summary)
 
-		fullSummary := BuildSummary(project.Resources, SummaryOptions{IncludeUnsupportedProviders: true})
+		fullSummary, err := BuildSummary(project.Resources, SummaryOptions{IncludeUnsupportedProviders: true})
+		if err != nil {
+			return Root{}, err
+		}
 		fullSummaries = append(fullSummaries, fullSummary)
 
 		outProjects = append(outProjects, Project{
@@ -251,66 +271,116 @@ func ToOutputFormat(projects []*schema.Project) Root {
 		FullSummary:          MergeSummaries(fullSummaries),
 	}
 
-	return out
+	return out, nil
 }
 
-func (r *Root) unsupportedResourcesMessage(showSkipped bool) string {
-	if r.Summary == nil {
-		return ""
+func (r *Root) summaryMessage(showSkipped bool) string {
+	msg := ""
+
+	if r.Summary == nil || r.Summary.TotalDetectedResources == nil {
+		return msg
 	}
 
-	if r.Summary.UnsupportedResourceCounts == nil || len(*r.Summary.UnsupportedResourceCounts) == 0 {
-		return ""
+	if *r.Summary.TotalDetectedResources == 0 {
+		msg += "No cloud resources were detected"
+		return msg
+	} else if *r.Summary.TotalDetectedResources == 1 {
+		msg += "1 cloud resource was detected"
+	} else {
+		msg += fmt.Sprintf("%d cloud resources were detected", *r.Summary.TotalDetectedResources)
 	}
 
-	unsupportedTypeCount := len(*r.Summary.UnsupportedResourceCounts)
-
-	unsupportedMsg := "resource types weren't estimated as they're not supported yet"
-	if unsupportedTypeCount == 1 {
-		unsupportedMsg = "resource type wasn't estimated as it's not supported yet"
+	if !showSkipped {
+		msg += ", rerun with --show-skipped to see details"
 	}
 
-	showSkippedMsg := ", rerun with --show-skipped to see"
-	if showSkipped {
-		showSkippedMsg = ""
-	}
+	msg += ":"
 
-	msg := fmt.Sprintf("%d %s%s.\n%s",
-		unsupportedTypeCount,
-		unsupportedMsg,
-		showSkippedMsg,
-		"Please watch/star https://github.com/infracost/infracost as new resources are added regularly.",
-	)
-
-	if showSkipped {
-		type structMap struct {
-			key   string
-			value int
+	// Always show the total estimated, even if it's zero
+	if r.Summary.TotalSupportedResources != nil {
+		if *r.Summary.TotalSupportedResources == 1 {
+			msg += "\n∙ 1 was estimated"
+		} else {
+			msg += fmt.Sprintf("\n∙ %d were estimated", *r.Summary.TotalSupportedResources)
 		}
-		ind := []structMap{}
-		for t, c := range *r.Summary.UnsupportedResourceCounts {
-			ind = append(ind, structMap{key: t, value: c})
-		}
-		sort.Slice(ind, func(i, j int) bool {
-			if ind[i].value == ind[j].value {
-				return ind[i].key < ind[j].key
+
+		if r.Summary.TotalUsageBasedResources != nil && *r.Summary.TotalUsageBasedResources > 0 {
+			if *r.Summary.TotalUsageBasedResources == 1 {
+				msg += fmt.Sprintf(", 1 includes usage-based costs, see %s", ui.LinkString("https://infracost.io/usage-file"))
+			} else {
+				msg += fmt.Sprintf(", %d include usage-based costs, see %s", *r.Summary.TotalUsageBasedResources, ui.LinkString("https://infracost.io/usage-file"))
 			}
-			return ind[i].value > ind[j].value
-		})
+		}
+	}
 
-		for _, i := range ind {
-			msg += fmt.Sprintf("\n%d x %s", i.value, i.key)
+	if r.Summary.TotalUnsupportedResources != nil && *r.Summary.TotalUnsupportedResources > 0 {
+		if *r.Summary.TotalUnsupportedResources == 1 {
+			msg += fmt.Sprintf("\n∙ 1 wasn't estimated, report it in %s", ui.LinkString("https://github.com/infracost/infracost"))
+		} else {
+			msg += fmt.Sprintf("\n∙ %d weren't estimated, report them in %s", *r.Summary.TotalUnsupportedResources, ui.LinkString("https://github.com/infracost/infracost"))
+		}
+
+		if showSkipped {
+			msg += formatCounts(r.Summary.UnsupportedResourceCounts)
+		}
+	}
+
+	if r.Summary.TotalNoPriceResources != nil && *r.Summary.TotalNoPriceResources > 0 {
+		if *r.Summary.TotalNoPriceResources == 1 {
+			msg += "\n∙ 1 was free"
+		} else {
+			msg += fmt.Sprintf("\n∙ %d were free", *r.Summary.TotalNoPriceResources)
+		}
+
+		if showSkipped {
+			msg += formatCounts(r.Summary.NoPriceResourceCounts)
 		}
 	}
 
 	return msg
 }
 
-func BuildSummary(resources []*schema.Resource, opts SummaryOptions) *Summary {
+func formatCounts(countMap *map[string]int) string {
+	msg := ""
+
+	if countMap == nil {
+		return msg
+	}
+
+	type structMap struct {
+		key   string
+		value int
+	}
+	m := []structMap{}
+
+	for t, c := range *countMap {
+		m = append(m, structMap{key: t, value: c})
+	}
+
+	sort.Slice(m, func(i, j int) bool {
+		if m[i].value == m[j].value {
+			return m[i].key < m[j].key
+		}
+		return m[i].value > m[j].value
+	})
+
+	for _, i := range m {
+		msg += fmt.Sprintf("\n  ∙ %d x %s", i.value, i.key)
+	}
+
+	return msg
+}
+
+func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, error) {
+	s := &Summary{}
+
 	supportedResourceCounts := make(map[string]int)
 	unsupportedResourceCounts := make(map[string]int)
+	noPriceResourceCounts := make(map[string]int)
+	totalDetectedResources := 0
 	totalSupportedResources := 0
 	totalUnsupportedResources := 0
+	totalUsageBasedResources := 0
 	totalNoPriceResources := 0
 
 	estimatedUsageCounts := make(map[string]int)
@@ -318,13 +388,24 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) *Summary {
 	totalEstimatedUsages := 0
 	totalUnestimatedUsages := 0
 
+	refFile, err := usage.LoadReferenceFile()
+	if err != nil {
+		return s, err
+	}
+
 	for _, r := range resources {
 		if !opts.IncludeUnsupportedProviders && !terraform.HasSupportedProvider(r.ResourceType) {
 			continue
 		}
 
+		totalDetectedResources++
+
 		if r.NoPrice {
 			totalNoPriceResources++
+			if _, ok := noPriceResourceCounts[r.ResourceType]; !ok {
+				noPriceResourceCounts[r.ResourceType] = 0
+			}
+			noPriceResourceCounts[r.ResourceType]++
 		} else if r.IsSkipped {
 			totalUnsupportedResources++
 			if _, ok := unsupportedResourceCounts[r.ResourceType]; !ok {
@@ -337,6 +418,10 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) *Summary {
 				supportedResourceCounts[r.ResourceType] = 0
 			}
 			supportedResourceCounts[r.ResourceType]++
+
+			if refFile.FindMatchingResourceUsage(r.Name) != nil {
+				totalUsageBasedResources++
+			}
 		}
 
 		for usage, isEstimated := range r.EstimationSummary {
@@ -359,13 +444,11 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) *Summary {
 
 	totalResources := len(resources)
 
-	s := &Summary{}
-
-	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "SupportedResourceCounts") {
-		s.SupportedResourceCounts = &supportedResourceCounts
+	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "TotalResources") {
+		s.TotalResources = &totalResources
 	}
-	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "UnsupportedResourceCounts") {
-		s.UnsupportedResourceCounts = &unsupportedResourceCounts
+	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "TotalDetectedResources") {
+		s.TotalDetectedResources = &totalDetectedResources
 	}
 	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "TotalSupportedResources") {
 		s.TotalSupportedResources = &totalSupportedResources
@@ -373,11 +456,20 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) *Summary {
 	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "TotalUnsupportedResources") {
 		s.TotalUnsupportedResources = &totalUnsupportedResources
 	}
+	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "TotalUsageBasedResources") {
+		s.TotalUsageBasedResources = &totalUsageBasedResources
+	}
 	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "TotalNoPriceResources") {
 		s.TotalNoPriceResources = &totalNoPriceResources
 	}
-	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "Total") {
-		s.TotalResources = &totalResources
+	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "SupportedResourceCounts") {
+		s.SupportedResourceCounts = &supportedResourceCounts
+	}
+	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "UnsupportedResourceCounts") {
+		s.UnsupportedResourceCounts = &unsupportedResourceCounts
+	}
+	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "NoPriceResourceCounts") {
+		s.NoPriceResourceCounts = &noPriceResourceCounts
 	}
 
 	if len(opts.OnlyFields) == 0 || contains(opts.OnlyFields, "EstimatedUsageCounts") {
@@ -393,7 +485,7 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) *Summary {
 		s.TotalUnestimatedUsages = &totalUnestimatedUsages
 	}
 
-	return s
+	return s, nil
 }
 
 func MergeSummaries(summaries []*Summary) *Summary {
@@ -404,12 +496,15 @@ func MergeSummaries(summaries []*Summary) *Summary {
 			continue
 		}
 
-		merged.SupportedResourceCounts = mergeCounts(merged.SupportedResourceCounts, s.SupportedResourceCounts)
-		merged.UnsupportedResourceCounts = mergeCounts(merged.UnsupportedResourceCounts, s.UnsupportedResourceCounts)
+		merged.TotalResources = addIntPtrs(merged.TotalResources, s.TotalResources)
+		merged.TotalDetectedResources = addIntPtrs(merged.TotalDetectedResources, s.TotalDetectedResources)
 		merged.TotalSupportedResources = addIntPtrs(merged.TotalSupportedResources, s.TotalSupportedResources)
 		merged.TotalUnsupportedResources = addIntPtrs(merged.TotalUnsupportedResources, s.TotalUnsupportedResources)
+		merged.TotalUsageBasedResources = addIntPtrs(merged.TotalUsageBasedResources, s.TotalUsageBasedResources)
 		merged.TotalNoPriceResources = addIntPtrs(merged.TotalNoPriceResources, s.TotalNoPriceResources)
-		merged.TotalResources = addIntPtrs(merged.TotalResources, s.TotalResources)
+		merged.SupportedResourceCounts = mergeCounts(merged.SupportedResourceCounts, s.SupportedResourceCounts)
+		merged.UnsupportedResourceCounts = mergeCounts(merged.UnsupportedResourceCounts, s.UnsupportedResourceCounts)
+		merged.NoPriceResourceCounts = mergeCounts(merged.NoPriceResourceCounts, s.NoPriceResourceCounts)
 
 		merged.EstimatedUsageCounts = mergeCounts(merged.EstimatedUsageCounts, s.EstimatedUsageCounts)
 		merged.UnestimatedUsageCounts = mergeCounts(merged.UnestimatedUsageCounts, s.UnestimatedUsageCounts)
@@ -473,36 +568,6 @@ func contains(arr []string, e string) bool {
 
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
-}
-
-func breakdownHasNilCosts(breakdown Breakdown) bool {
-	for _, resource := range breakdown.Resources {
-		if resourceHasNilCosts(resource) {
-			return true
-		}
-	}
-
-	return false
-}
-
-func resourceHasNilCosts(resource Resource) bool {
-	if resource.MonthlyCost == nil {
-		return true
-	}
-
-	for _, costComponent := range resource.CostComponents {
-		if costComponent.MonthlyCost == nil {
-			return true
-		}
-	}
-
-	for _, subResource := range resource.SubResources {
-		if resourceHasNilCosts(subResource) {
-			return true
-		}
-	}
-
-	return false
 }
 
 func mergeCounts(c1 *map[string]int, c2 *map[string]int) *map[string]int {

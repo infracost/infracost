@@ -19,7 +19,6 @@ const (
 func ToDiff(out Root, opts Options) ([]byte, error) {
 	s := ""
 
-	hasNilCosts := false
 	noDiffProjects := make([]string, 0)
 
 	for i, project := range out.Projects {
@@ -45,11 +44,6 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		for _, diffResource := range project.Diff.Resources {
 			oldResource := findResourceByName(project.PastBreakdown.Resources, diffResource.Name)
 			newResource := findResourceByName(project.Breakdown.Resources, diffResource.Name)
-
-			if (newResource == nil || resourceHasNilCosts(*newResource)) &&
-				(oldResource == nil || resourceHasNilCosts(*oldResource)) {
-				hasNilCosts = true
-			}
 
 			s += resourceToDiff(out.Currency, diffResource, oldResource, newResource, true)
 			s += "\n"
@@ -99,13 +93,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		)
 	}
 
-	if hasNilCosts {
-		s += fmt.Sprintf("\n\nTo estimate usage-based resources use --usage-file, see %s",
-			ui.LinkString("https://infracost.io/usage-file"),
-		)
-	}
-
-	unsupportedMsg := out.unsupportedResourcesMessage(opts.ShowSkipped)
+	unsupportedMsg := out.summaryMessage(opts.ShowSkipped)
 	if unsupportedMsg != "" {
 		s += "\n\n" + unsupportedMsg
 	}

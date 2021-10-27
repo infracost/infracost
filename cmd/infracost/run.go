@@ -268,10 +268,12 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	spinner.Success()
 
-	r := output.ToOutputFormat(projects)
-	r.Currency = runCtx.Config.Currency
+	r, err := output.ToOutputFormat(projects)
+	if err != nil {
+		return err
+	}
 
-	var err error
+	r.Currency = runCtx.Config.Currency
 
 	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
 	r.RunID, err = dashboardClient.AddRun(runCtx, projectContexts, r)
@@ -457,6 +459,7 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	summary := r.FullSummary
 	env["supportedResourceCounts"] = summary.SupportedResourceCounts
 	env["unsupportedResourceCounts"] = summary.UnsupportedResourceCounts
+	env["noPriceResourceCounts"] = summary.NoPriceResourceCounts
 	env["totalSupportedResources"] = summary.TotalSupportedResources
 	env["totalUnsupportedResources"] = summary.TotalUnsupportedResources
 	env["totalNoPriceResources"] = summary.TotalNoPriceResources

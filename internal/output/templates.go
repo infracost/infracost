@@ -283,7 +283,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     </table>
 
     <div class="warnings">
-      <p>{{.UnsupportedResourcesMessage | replaceNewLines}}</p>
+      <p>{{.SummaryMessage | stripColor | replaceNewLines}}</p>
     </div>
   </body>
 </html>`

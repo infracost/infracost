@@ -226,7 +226,10 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	projects, err := RunCostCalculations(t, runCtx, tfProject, usageData)
 	require.NoError(t, err)
 
-	r := output.ToOutputFormat(projects)
+	r, err := output.ToOutputFormat(projects)
+	if err != nil {
+		require.NoError(t, err)
+	}
 	r.Currency = runCtx.Config.Currency
 
 	opts := output.Options{
