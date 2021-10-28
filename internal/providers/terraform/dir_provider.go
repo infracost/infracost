@@ -483,9 +483,9 @@ func (p *DirProvider) printTerraformErr(err error) {
 		msg += "\nSpecify the -var-file flag as a path relative to your Terraform directory.\n"
 		msg += "For example: infracost --path=path/to/terraform --terraform-plan-flags=\"-var-file=my.tfvars\"\n"
 	}
-	if strings.HasPrefix(stderr, "Error: NoCredentialProviders: no valid providers in chain") {
-		msg += "\nSpecify AWS credentials, please.\n"
-		msg += "For details, see https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication\"\n"
+	if strings.HasPrefix(stderr, "Error: error configuring Terraform AWS Provider: no valid credential sources for Terraform AWS Provider found.") {
+		msg += "\nTerraform requires AWS credentials to be set.\n"
+		msg += "For more details, see https://registry.terraform.io/providers/hashicorp/aws\n"
 	}
 
 	fmt.Fprintln(os.Stderr, msg)
