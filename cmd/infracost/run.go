@@ -125,6 +125,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		ctx := config.NewProjectContext(runCtx, projectCfg)
 		runCtx.SetCurrentProjectContext(ctx)
 
+		for k, v := range projectCfg.Env {
+			os.Setenv(k, v)
+		}
+
 		provider, err := providers.Detect(ctx)
 		if err != nil {
 			m := fmt.Sprintf("%s\n\n", err)
