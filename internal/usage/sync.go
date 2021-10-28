@@ -21,6 +21,14 @@ type ReplaceResourceUsagesOpts struct {
 	OverrideValueType bool
 }
 
+func (s *SyncResult) Merge(other *SyncResult) {
+	s.ResourceCount += other.ResourceCount
+	s.EstimationCount += other.EstimationCount
+	for k, v := range other.EstimationErrors {
+		s.EstimationErrors[k] = v
+	}
+}
+
 func (s *SyncResult) ProjectContext() map[string]interface{} {
 	r := make(map[string]interface{})
 
@@ -75,82 +83,17 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 	}
 
 	wildCardResources := make(map[string]bool)
+	for _, resource := range resources {
+		ru := syncWildCardResource(wildCardResources, resource, referenceFile, existingResourceUsagesMap)
+		if ru != nil {
+			resourceUsages = append(resourceUsages, ru)
+		}
+	}
 
 	for _, resource := range resources {
-
-		// Add existing wildcard resource usages if not already added
-		if strings.HasSuffix(resource.Name, "]") {
-			lastIndexOfOpenBracket := strings.LastIndex(resource.Name, "[")
-			wildCardName := fmt.Sprintf("%s[*]", resource.Name[:lastIndexOfOpenBracket])
-
-			if !wildCardResources[wildCardName] {
-				resourceUsage := &ResourceUsage{
-					Name: wildCardName,
-				}
-
-				wildCardResources[wildCardName] = true
-				if existingResourceUsage, ok := existingResourceUsagesMap[wildCardName]; ok {
-					// Merge the usage schema from the reference usage file
-					refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
-					if refResourceUsage != nil {
-						replaceResourceUsages(resourceUsage, refResourceUsage, ReplaceResourceUsagesOpts{})
-					}
-
-					// Merge the usage schema from the resource struct
-					// We want to override the value type from the usage schema since we can't always tell from the YAML
-					// what the value type should be, e.g. user might add an int value for a float attribute.
-					replaceResourceUsages(resourceUsage, &ResourceUsage{
-						Name:  wildCardName,
-						Items: resource.UsageSchema,
-					}, ReplaceResourceUsagesOpts{OverrideValueType: true})
-
-					replaceResourceUsages(resourceUsage, existingResourceUsage, ReplaceResourceUsagesOpts{})
-					resourceUsages = append(resourceUsages, resourceUsage)
-				}
-			}
-		}
-
-		resourceUsage := &ResourceUsage{
-			Name: resource.Name,
-		}
-
-		// Merge the usage schema from the reference usage file
-		refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
-		if refResourceUsage != nil {
-			replaceResourceUsages(resourceUsage, refResourceUsage, ReplaceResourceUsagesOpts{})
-		}
-
-		// Merge the usage schema from the resource struct
-		// We want to override the value type from the usage schema since we can't always tell from the YAML
-		// what the value type should be, e.g. user might add an int value for a float attribute.
-		replaceResourceUsages(resourceUsage, &ResourceUsage{
-			Name:  resource.Name,
-			Items: resource.UsageSchema,
-		}, ReplaceResourceUsagesOpts{OverrideValueType: true})
-
-		// Merge any existing resource usage
-		existingResourceUsage := existingResourceUsagesMap[resource.Name]
-		if existingResourceUsage != nil {
-			replaceResourceUsages(resourceUsage, existingResourceUsage, ReplaceResourceUsagesOpts{})
-		}
-
-		syncResult.ResourceCount++
-		if resource.EstimateUsage != nil {
-			syncResult.EstimationCount++
-
-			resourceUsageMap := resourceUsage.Map()
-			err := resource.EstimateUsage(context.TODO(), resourceUsageMap)
-			if err != nil {
-				syncResult.EstimationErrors[resource.Name] = err
-				log.Warnf("Error estimating usage for resource %s: %v", resource.Name, err)
-			}
-
-			// Merge in the estimated usage
-			estimatedUsageData := schema.NewUsageData(resource.Name, schema.ParseAttributes(resourceUsageMap))
-			mergeResourceUsageWithUsageData(resourceUsage, estimatedUsageData)
-		}
-
-		resourceUsages = append(resourceUsages, resourceUsage)
+		ru, resourceSyncResult := syncResource(resource, referenceFile, existingResourceUsagesMap)
+		resourceUsages = append(resourceUsages, ru)
+		syncResult.Merge(resourceSyncResult)
 	}
 
 	sortResourceUsages(resourceUsages, existingOrder)
@@ -158,6 +101,91 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 	usageFile.ResourceUsages = resourceUsages
 
 	return syncResult
+}
+
+func syncWildCardResource(wildCardResources map[string]bool, resource *schema.Resource, referenceFile *ReferenceFile, existingResourceUsagesMap map[string]*ResourceUsage) *ResourceUsage {
+	var resourceUsage *ResourceUsage
+
+	// Add existing wildcard resource usages if not already added
+	if strings.HasSuffix(resource.Name, "]") {
+		lastIndexOfOpenBracket := strings.LastIndex(resource.Name, "[")
+		wildCardName := fmt.Sprintf("%s[*]", resource.Name[:lastIndexOfOpenBracket])
+
+		if !wildCardResources[wildCardName] {
+			resourceUsage = &ResourceUsage{
+				Name: wildCardName,
+			}
+
+			wildCardResources[wildCardName] = true
+			if existingResourceUsage, ok := existingResourceUsagesMap[wildCardName]; ok {
+				// Merge the usage schema from the reference usage file
+				refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
+				if refResourceUsage != nil {
+					replaceResourceUsages(resourceUsage, refResourceUsage, ReplaceResourceUsagesOpts{})
+				}
+
+				// Merge the usage schema from the resource struct
+				// We want to override the value type from the usage schema since we can't always tell from the YAML
+				// what the value type should be, e.g. user might add an int value for a float attribute.
+				replaceResourceUsages(resourceUsage, &ResourceUsage{
+					Name:  wildCardName,
+					Items: resource.UsageSchema,
+				}, ReplaceResourceUsagesOpts{OverrideValueType: true})
+
+				replaceResourceUsages(resourceUsage, existingResourceUsage, ReplaceResourceUsagesOpts{})
+			}
+		}
+	}
+
+	return resourceUsage
+}
+
+func syncResource(resource *schema.Resource, referenceFile *ReferenceFile, existingResourceUsagesMap map[string]*ResourceUsage) (*ResourceUsage, *SyncResult) {
+	syncResult := &SyncResult{
+		EstimationErrors: make(map[string]error),
+	}
+
+	resourceUsage := &ResourceUsage{
+		Name: resource.Name,
+	}
+
+	// Merge the usage schema from the reference usage file
+	refResourceUsage := referenceFile.FindMatchingResourceUsage(resource.Name)
+	if refResourceUsage != nil {
+		replaceResourceUsages(resourceUsage, refResourceUsage, ReplaceResourceUsagesOpts{})
+	}
+
+	// Merge the usage schema from the resource struct
+	// We want to override the value type from the usage schema since we can't always tell from the YAML
+	// what the value type should be, e.g. user might add an int value for a float attribute.
+	replaceResourceUsages(resourceUsage, &ResourceUsage{
+		Name:  resource.Name,
+		Items: resource.UsageSchema,
+	}, ReplaceResourceUsagesOpts{OverrideValueType: true})
+
+	// Merge any existing resource usage
+	existingResourceUsage := existingResourceUsagesMap[resource.Name]
+	if existingResourceUsage != nil {
+		replaceResourceUsages(resourceUsage, existingResourceUsage, ReplaceResourceUsagesOpts{})
+	}
+
+	syncResult.ResourceCount++
+	if resource.EstimateUsage != nil {
+		syncResult.EstimationCount++
+
+		resourceUsageMap := resourceUsage.Map()
+		err := resource.EstimateUsage(context.TODO(), resourceUsageMap)
+		if err != nil {
+			syncResult.EstimationErrors[resource.Name] = err
+			log.Warnf("Error estimating usage for resource %s: %v", resource.Name, err)
+		}
+
+		// Merge in the estimated usage
+		estimatedUsageData := schema.NewUsageData(resource.Name, schema.ParseAttributes(resourceUsageMap))
+		mergeResourceUsageWithUsageData(resourceUsage, estimatedUsageData)
+	}
+
+	return resourceUsage, syncResult
 }
 
 // replaceResourceUsages override usageItems from dest with usageItems from src
