@@ -33,7 +33,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		}
 
 		if i != 0 {
-			s += "----------------------------------\n"
+			s += "──────────────────────────────────\n"
 		}
 
 		s += fmt.Sprintf("%s %s\n\n",
@@ -63,7 +63,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 			ui.BoldString("Monthly cost change for"),
 			ui.BoldString(project.Label(opts.DashboardEnabled)),
 			formatTitleWithCurrency(formatCostChange(out.Currency, project.Diff.TotalMonthlyCost), out.Currency),
-			ui.FaintStringf("(%s -> %s)", formatCost(out.Currency, oldCost), formatCost(out.Currency, newCost)),
+			ui.FaintStringf("(%s → %s)", formatCost(out.Currency, oldCost), formatCost(out.Currency, newCost)),
 		)
 
 		percent := formatPercentChange(oldCost, newCost)
@@ -79,12 +79,12 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	}
 
 	if len(noDiffProjects) > 0 {
-		s += "----------------------------------\n"
+		s += "──────────────────────────────────\n"
 		s += fmt.Sprintf("\nThe following projects have no cost estimate changes: %s", strings.Join(noDiffProjects, ", "))
 		s += fmt.Sprintf("\nRun %s to see their full breakdown.", ui.PrimaryString("infracost breakdown"))
 	}
 
-	s += "\n\n----------------------------------\n"
+	s += "\n\n──────────────────────────────────\n"
 	if len(noDiffProjects) != len(out.Projects) {
 		s += fmt.Sprintf("Key: %s changed, %s added, %s removed",
 			opChar(UPDATED),
@@ -215,7 +215,7 @@ func costComponentToDiff(currency string, diffComponent CostComponent, oldCompon
 
 // colorizeDiffName colorizes any arrows in the name
 func colorizeDiffName(name string) string {
-	return strings.ReplaceAll(name, " -> ", fmt.Sprintf(" %s ", color.YellowString("->")))
+	return strings.ReplaceAll(name, " → ", fmt.Sprintf(" %s ", color.YellowString("→")))
 }
 
 func opChar(op int) string {
@@ -273,7 +273,7 @@ func formatCostChangeDetails(currency string, oldCost *decimal.Decimal, newCost 
 		return ""
 	}
 
-	return fmt.Sprintf(" (%s -> %s)", formatCost(currency, oldCost), formatCost(currency, newCost))
+	return fmt.Sprintf(" (%s → %s)", formatCost(currency, oldCost), formatCost(currency, newCost))
 }
 
 func formatPriceChange(currency string, d decimal.Decimal) string {
@@ -286,7 +286,7 @@ func formatPriceChangeDetails(currency string, oldPrice *decimal.Decimal, newPri
 		return ""
 	}
 
-	return fmt.Sprintf(" (%s -> %s)", formatPrice(currency, *oldPrice), formatPrice(currency, *newPrice))
+	return fmt.Sprintf(" (%s → %s)", formatPrice(currency, *oldPrice), formatPrice(currency, *newPrice))
 }
 
 func formatPercentChange(oldCost *decimal.Decimal, newCost *decimal.Decimal) string {

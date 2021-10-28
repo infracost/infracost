@@ -280,7 +280,7 @@ func diffName(current string, past string) string {
 		} else if pastLabels[i] == currentLabels[i] {
 			labels = append(labels, currentLabels[i])
 		} else {
-			labels = append(labels, fmt.Sprintf("%s -> %s", pastLabels[i], currentLabels[i]))
+			labels = append(labels, fmt.Sprintf("%s → %s", pastLabels[i], currentLabels[i]))
 		}
 	}
 
