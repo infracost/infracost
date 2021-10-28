@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetStorageBucketRegistryItem() *schema.RegistryItem {
@@ -80,6 +81,10 @@ func getDSRegionResourceGroup(location, storageClass string) (string, string) {
 
 func dataStorage(d *schema.ResourceData, u *schema.UsageData) *schema.CostComponent {
 	location := d.Get("location").String()
+	if location == "" {
+		location = "US"
+	}
+
 	var quantity *decimal.Decimal
 	if u != nil && u.Get("storage_gb").Exists() {
 		quantity = decimalPtr(decimal.NewFromInt(u.Get("storage_gb").Int()))
