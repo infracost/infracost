@@ -1,6 +1,6 @@
 version: 0.1
 resource_usage:
-  google_container_registry.my_registry:
+  google_container_registry.my_registry_usage:
     storage_gb: 150
     monthly_class_a_operations: 40000
     monthly_class_b_operations: 20000
