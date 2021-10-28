@@ -27,7 +27,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		}
 
 		if i != 0 {
-			s += "----------------------------------\n"
+			s += "──────────────────────────────────\n"
 		}
 
 		s += fmt.Sprintf("%s %s\n\n",
@@ -66,7 +66,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 	summaryMsg := out.summaryMessage(opts.ShowSkipped)
 
 	if summaryMsg != "" {
-		s += "\n----------------------------------\n" + summaryMsg
+		s += "\n──────────────────────────────────\n" + summaryMsg
 	}
 
 	return []byte(s), nil
