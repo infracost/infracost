@@ -3,6 +3,7 @@ package usage
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"sort"
 	"strings"
 
@@ -68,6 +69,11 @@ func SyncUsageData(usageFile *UsageFile, projects []*schema.Project) (*SyncResul
 	return syncResult, nil
 }
 
+type syncResourceResult struct {
+	ru *ResourceUsage
+	sr *SyncResult
+}
+
 func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, referenceFile *ReferenceFile) *SyncResult {
 	syncResult := &SyncResult{
 		EstimationErrors: make(map[string]error),
@@ -90,10 +96,38 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 		}
 	}
 
-	for _, resource := range resources {
-		ru, resourceSyncResult := syncResource(resource, referenceFile, existingResourceUsagesMap)
-		resourceUsages = append(resourceUsages, ru)
-		syncResult.Merge(resourceSyncResult)
+	numWorkers := 4
+	numCPU := runtime.NumCPU()
+	if numCPU*4 > numWorkers {
+		numWorkers = numCPU * 4
+	}
+	if numWorkers > 16 {
+		numWorkers = 16
+	}
+	numJobs := len(resources)
+	jobs := make(chan *schema.Resource, numJobs)
+	results := make(chan syncResourceResult, numJobs)
+
+	// Fire up the workers
+	for i := 0; i < numWorkers; i++ {
+		go func(jobs <-chan *schema.Resource, results chan<- syncResourceResult) {
+			for r := range jobs {
+				ru, sr := syncResource(r, referenceFile, existingResourceUsagesMap)
+				results <- syncResourceResult{ru, sr}
+			}
+		}(jobs, results)
+	}
+
+	// Feed the workers the jobs of getting prices
+	for _, r := range resources {
+		jobs <- r
+	}
+
+	// Get the result of the jobs
+	for i := 0; i < numJobs; i++ {
+		result := <-results
+		resourceUsages = append(resourceUsages, result.ru)
+		syncResult.Merge(result.sr)
 	}
 
 	sortResourceUsages(resourceUsages, existingOrder)
