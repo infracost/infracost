@@ -143,11 +143,11 @@ func resourceToDiff(currency string, diffResource Resource, oldResource *Resourc
 		var oldComponent, newComponent *CostComponent
 
 		if oldResource != nil {
-			oldComponent = findCostComponentByName(oldResource.CostComponents, diffComponent.Name)
+			oldComponent = findMatchingCostComponent(oldResource.CostComponents, diffComponent.Name)
 		}
 
 		if newResource != nil {
-			newComponent = findCostComponentByName(newResource.CostComponents, diffComponent.Name)
+			newComponent = findMatchingCostComponent(newResource.CostComponents, diffComponent.Name)
 		}
 
 		s += "\n"
@@ -194,7 +194,7 @@ func costComponentToDiff(currency string, diffComponent CostComponent, oldCompon
 		newPrice = &newComponent.Price
 	}
 
-	s += fmt.Sprintf("%s %s\n", opChar(op), diffComponent.Name)
+	s += fmt.Sprintf("%s %s\n", opChar(op), colorizeDiffName(diffComponent.Name))
 
 	if oldCost == nil && newCost == nil {
 		s += "  Monthly cost depends on usage\n"
@@ -211,6 +211,11 @@ func costComponentToDiff(currency string, diffComponent CostComponent, oldCompon
 	}
 
 	return s
+}
+
+// colorizeDiffName colorizes any arrows in the name
+func colorizeDiffName(name string) string {
+	return strings.ReplaceAll(name, " -> ", fmt.Sprintf(" %s ", color.YellowString("->")))
 }
 
 func opChar(op int) string {
@@ -234,10 +239,20 @@ func findResourceByName(resources []Resource, name string) *Resource {
 	return nil
 }
 
-func findCostComponentByName(costComponents []CostComponent, name string) *CostComponent {
-	for _, c := range costComponents {
-		if c.Name == name {
-			return &c
+// findMatchingCostComponent finds a matching cost component by first looking for an exact match by name
+// and if that's not found, looking for a match of everything before any brackets.
+func findMatchingCostComponent(costComponents []CostComponent, name string) *CostComponent {
+	for _, costComponent := range costComponents {
+		if costComponent.Name == name {
+			return &costComponent
+		}
+	}
+
+	for _, costComponent := range costComponents {
+		splitKey := strings.Split(name, " (")
+		splitName := strings.Split(costComponent.Name, " (")
+		if len(splitKey) > 1 && len(splitName) > 1 && splitName[0] == splitKey[0] {
+			return &costComponent
 		}
 	}
 

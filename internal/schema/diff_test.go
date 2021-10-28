@@ -155,6 +155,15 @@ func TestDiffCostComponentsByResource(t *testing.T) {
 				HourlyCost:          decimalPtr(decimal.NewFromInt(1)),
 				MonthlyCost:         decimalPtr(decimal.NewFromInt(720)),
 			},
+			{
+				Name:                "cc4 (label 1, label 2)",
+				HourlyQuantity:      decimalPtr(decimal.NewFromInt(10)),
+				MonthlyQuantity:     decimalPtr(decimal.NewFromInt(7200)),
+				MonthlyDiscountPerc: 0.2,
+				price:               decimal.NewFromInt(2),
+				HourlyCost:          decimalPtr(decimal.NewFromInt(5)),
+				MonthlyCost:         decimalPtr(decimal.NewFromInt(3600)),
+			},
 		},
 	}
 	currentRS := &Resource{
@@ -178,6 +187,15 @@ func TestDiffCostComponentsByResource(t *testing.T) {
 				HourlyCost:          decimalPtr(decimal.NewFromInt(3)),
 				MonthlyCost:         decimalPtr(decimal.NewFromInt(2160)),
 			},
+			{
+				Name:                "cc4 (label 1, label 3)",
+				HourlyQuantity:      decimalPtr(decimal.NewFromInt(20)),
+				MonthlyQuantity:     decimalPtr(decimal.NewFromInt(14400)),
+				MonthlyDiscountPerc: 0.45,
+				price:               decimal.NewFromInt(3),
+				HourlyCost:          decimalPtr(decimal.NewFromInt(2)),
+				MonthlyCost:         decimalPtr(decimal.NewFromInt(1440)),
+			},
 		},
 	}
 
@@ -199,6 +217,15 @@ func TestDiffCostComponentsByResource(t *testing.T) {
 			price:               decimal.NewFromInt(-1),
 			HourlyCost:          decimalPtr(decimal.NewFromInt(-1)),
 			MonthlyCost:         decimalPtr(decimal.NewFromInt(-720)),
+		},
+		{
+			Name:                "cc4 (label 1, label 2 → label 3)",
+			HourlyQuantity:      decimalPtr(decimal.NewFromInt(10)),
+			MonthlyQuantity:     decimalPtr(decimal.NewFromInt(7200)),
+			MonthlyDiscountPerc: 0.25,
+			price:               decimal.NewFromInt(1),
+			HourlyCost:          decimalPtr(decimal.NewFromInt(-3)),
+			MonthlyCost:         decimalPtr(decimal.NewFromInt(-2160)),
 		},
 		{
 			Name:                "cc3",
@@ -260,32 +287,115 @@ func TestGetResourcesMap(t *testing.T) {
 	assert.Equal(t, expectedMap, resourcesMap)
 }
 
-func TestGetCostComponentsMap(t *testing.T) {
-	cc1 := &CostComponent{
-		Name: "cc1",
+func TestFindMatchingCostComponent(t *testing.T) {
+	tests := []struct {
+		costComponents []*CostComponent
+		name           string
+		expected       *CostComponent
+	}{
+		{
+			costComponents: []*CostComponent{
+				{Name: "Instance usage"},
+				{Name: "EBS-optimized usage"},
+				{Name: "CPU Credits"},
+			},
+			name: "EBS-optimized usage",
+			expected: &CostComponent{
+				Name: "EBS-optimized usage",
+			},
+		},
+		{
+			costComponents: []*CostComponent{
+				{Name: "Instance usage"},
+				{Name: "EBS-optimized usage"},
+				{Name: "CPU Credits"},
+			},
+			name:     "Not existent",
+			expected: nil,
+		},
+		{
+			costComponents: []*CostComponent{
+				{Name: "Capacity (first 50TB)"},
+				{Name: "Capacity (next 450TB)"},
+				{Name: "Capacity (over 500TB)"},
+			},
+			name: "Capacity (over 500TB)",
+			expected: &CostComponent{
+				Name: "Capacity (over 500TB)",
+			},
+		},
+		{
+			costComponents: []*CostComponent{
+				{Name: "Instance usage (Linux/UNIX, on-demand, t3.small)"},
+				{Name: "EBS-optimized usage"},
+				{Name: "CPU Credits"},
+			},
+			name: "Instance usage (Linux/UNIX, reserved, t3.small)",
+			expected: &CostComponent{
+				Name: "Instance usage (Linux/UNIX, on-demand, t3.small)",
+			},
+		},
+		{
+			costComponents: []*CostComponent{
+				{Name: "Instance usage"},
+				{Name: "EBS-optimized usage"},
+				{Name: "CPU Credits"},
+			},
+			name:     "Instance usage (Linux/UNIX, reserved, t3.small)",
+			expected: nil,
+		},
 	}
-	cc2 := &CostComponent{
-		Name: "cc2",
+
+	for _, test := range tests {
+		actual := findMatchingCostComponent(test.costComponents, test.name)
+		assert.Equal(t, test.expected, actual)
 	}
-	resource := &Resource{
-		CostComponents: []*CostComponent{cc1, cc2},
-	}
-	ccMap := getCostComponentsMap(resource)
-	expectedMap := map[string]*CostComponent{
-		"cc1": cc1,
-		"cc2": cc2,
-	}
-	assert.Equal(t, expectedMap, ccMap)
 }
 
-func TestDiffResourcesByKey_bothNil(t *testing.T) {
-	emptyRMap := make(map[string]*Resource)
-	changed, _ := diffResourcesByKey("random_resource", emptyRMap, emptyRMap)
-	assert.Equal(t, false, changed)
-}
+func TestDiffName(t *testing.T) {
+	tests := []struct {
+		current  string
+		past     string
+		expected string
+	}{
+		{
+			current:  "Instance usage",
+			past:     "Instance usage",
+			expected: "Instance usage",
+		},
+		{
+			current:  "Instance usage",
+			past:     "",
+			expected: "Instance usage",
+		},
+		{
+			current:  "",
+			past:     "Instance usage",
+			expected: "Instance usage",
+		},
+		{
+			current:  "Instance usage",
+			past:     "Different",
+			expected: "Instance usage",
+		},
+		{
+			current:  "Instance usage (Linux/UNIX)",
+			past:     "Instance usage (Linux/UNIX)",
+			expected: "Instance usage (Linux/UNIX)",
+		},
+		{
+			current:  "Instance usage (Linux/UNIX, reserved)",
+			past:     "Instance usage (Linux/UNIX, on-demand)",
+			expected: "Instance usage (Linux/UNIX, on-demand → reserved)",
+		},
+		{
+			current:  "Instance usage (Linux/UNIX, reserved, t3.medium)",
+			past:     "Instance usage (Linux/UNIX, on-demand, t3.small)",
+			expected: "Instance usage (Linux/UNIX, on-demand → reserved, t3.small → t3.medium)",
+		},
+	}
 
-func TestDiffCostComponentsByKey_bothNil(t *testing.T) {
-	emptyRMap := make(map[string]*CostComponent)
-	changed, _ := diffCostComponentsByKey("random_resource", emptyRMap, emptyRMap)
-	assert.Equal(t, false, changed)
+	for _, test := range tests {
+		assert.Equal(t, test.expected, diffName(test.current, test.past))
+	}
 }
