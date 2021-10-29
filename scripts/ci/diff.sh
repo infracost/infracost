@@ -18,6 +18,7 @@ process_args () {
   post_condition=${7:-$post_condition}
   show_skipped=${8:-$show_skipped}
   sync_usage_file=${9:-$sync_usage_file}
+  post_header=${10:-$post_header}
 
   # Validate post_condition
   if ! echo "$post_condition" | jq empty; then
@@ -126,6 +127,9 @@ build_msg () {
     percent_display=" (${change_sym}${percent_display}%%)"
   fi
   
+  if [ ! -z "$post_header" ]; then
+    msg="${post_header}\n"
+  fi
   msg="${MSG_START} **monthly cost will ${change_word} by $(format_cost "$diff_cost")$percent_display** ${change_emoji}\n"
   msg="${msg}\n"
   msg="${msg}Previous monthly cost: $(format_cost "$past_total_monthly_cost")\n"

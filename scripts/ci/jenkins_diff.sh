@@ -14,6 +14,7 @@ fix_env_vars () {
     config_file=${config_file:-$CONFIG_FILE}
     fail_condition=${fail_condition:-$FAIL_CONDITION}
     show_skipped=${show_skipped:-$SHOW_SKIPPED}
+    post_header=${post_header:-$POST_HEADER}
 }
 
 process_args () {
@@ -103,6 +104,9 @@ build_msg () {
     percent_display=" (${change_sym}${percent_display}%%)"
   fi
 
+  if [ ! -z "$post_header" ]; then
+    msg="${post_header}\n"
+  fi
   msg="${msg}\n##### Infracost estimate #####"
   msg="${msg}\n\n"
   msg="${msg}Monthly cost will ${change_word} by $(format_cost $diff_cost)$percent_display\n"
