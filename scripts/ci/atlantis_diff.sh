@@ -104,7 +104,11 @@ build_msg () {
     percent_display=" (${change_sym}${percent_display}%%)"
   fi
 
-  msg="##### Infracost estimate #####"
+  msg=""
+  if [ ! -z "$post_header" ]; then
+    msg="${msg}${post_header}\n"
+  fi
+  msg="${msg}##### Infracost estimate #####"
   msg="${msg}\n\n"
   msg="${msg}Monthly cost will ${change_word} by $(format_cost $diff_cost)$percent_display\n"
   msg="${msg}\n"
