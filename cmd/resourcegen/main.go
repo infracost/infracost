@@ -280,7 +280,7 @@ func initAssets() (map[string]*template.Template, error) {
 
 	err := fs.WalkDir(assets, ".", func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
-			return fmt.Errorf("error walking resource generator embeded assets %w", err)
+			return fmt.Errorf("error walking resource generator embedded assets %w", err)
 		}
 
 		if !info.IsDir() && strings.HasSuffix(path, ".tmpl") {
