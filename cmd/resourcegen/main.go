@@ -166,7 +166,7 @@ func writeOutput(c config, written []string) {
 		b.WriteString("\t" + s + "\n")
 	}
 
-	b.WriteString(fmt.Sprintf("added function %s to resource registry: \n\n\t%s\n\n", c.registryLocation(), c.registryFuncName()))
+	b.WriteString(fmt.Sprintf("added function %s to resource registry: \n\n\t%s\n\n", c.registryFuncName(), c.registryLocation()))
 	b.WriteString("happy hacking!!\n")
 
 	fmt.Println(b.String())
