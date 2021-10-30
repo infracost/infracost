@@ -4,7 +4,7 @@ provider "google" {
 }
 
 resource "google_container_registry" "my_registry" {
-  project  = "my-project"
+  project = "my-project"
 }
 
 resource "google_container_registry" "my_registry_usage" {

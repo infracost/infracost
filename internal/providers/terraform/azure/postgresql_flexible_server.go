@@ -2,6 +2,7 @@ package azure
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -23,19 +24,21 @@ func NewAzureRMPostrgreSQLFlexibleServer(d *schema.ResourceData, u *schema.Usage
 
 	region := d.Get("location").String()
 	sku := d.Get("sku_name").String()
-	var tier, types, skuName, meterName, version, series string
+	var tier, size, skuName, meterName, version, series string
 
 	s := strings.Split(sku, "_")
-	if len(s) == 3 {
-		tier = s[0]
-		types = s[2]
-	} else if len(s) == 4 {
-		tier = s[0]
-		types = s[2]
-		version = s[3]
-	} else {
+	if len(s) < 3 || len(s) > 4 {
 		log.Warnf("Unrecognised PostgreSQL Flexible Server SKU format for resource %s: %s", d.Address, sku)
 		return nil
+	}
+
+	if len(s) > 2 {
+		tier = s[0]
+		size = s[2]
+	}
+
+	if len(s) > 3 {
+		version = s[3]
 	}
 
 	tierName := map[string]string{
@@ -50,15 +53,22 @@ func NewAzureRMPostrgreSQLFlexibleServer(d *schema.ResourceData, u *schema.Usage
 	}
 
 	if strings.ToLower(tierName) == "burstable" {
-		meterName = types
-		skuName = types
+		meterName = size
+		skuName = size
 		series = "BS"
 	} else {
 		meterName = "vCore"
-		cores := types[1:]
-		cores = cores[:(len(cores) - 1)]
+
+		coreRegex := regexp.MustCompile(`(\d+)`)
+		match := coreRegex.FindStringSubmatch(size)
+		if len(match) < 1 {
+			log.Warnf("Unrecognised PostgreSQL flexible server size for resource %s: %s", d.Address, size)
+			return nil
+		}
+		cores := match[1]
 		skuName = fmt.Sprintf("%s vCore", cores)
-		series = types[:1] + version
+
+		series = coreRegex.ReplaceAllString(size, "") + version
 	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
