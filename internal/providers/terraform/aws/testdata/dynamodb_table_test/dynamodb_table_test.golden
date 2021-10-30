@@ -28,6 +28,6 @@
     └─ Replicated write request unit (rWRU)             4,109.5890  rWRU                         $6.27 
                                                                                                        
  OVERALL TOTAL                                                                                 $658.50 
-----------------------------------
+──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file

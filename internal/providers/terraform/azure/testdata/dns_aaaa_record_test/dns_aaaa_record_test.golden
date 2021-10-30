@@ -15,7 +15,7 @@
  └─ Hosted zone                                       1  months                       $0.50 
                                                                                             
  OVERALL TOTAL                                                                      $900.50 
-----------------------------------
+──────────────────────────────────
 5 cloud resources were detected:
 ∙ 4 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free

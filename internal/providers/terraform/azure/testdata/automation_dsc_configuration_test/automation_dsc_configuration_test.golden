@@ -13,7 +13,7 @@
  └─ Non-azure config nodes                           Monthly cost depends on usage: $6.00 per nodes    
                                                                                                        
  OVERALL TOTAL                                                                                  $30.00 
-----------------------------------
+──────────────────────────────────
 5 cloud resources were detected:
 ∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free

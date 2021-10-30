@@ -48,6 +48,6 @@
  └─ Snapshot export                             Monthly cost depends on usage: $0.01 per GB                   
                                                                                                               
  OVERALL TOTAL                                                                                    $176,130.67 
-----------------------------------
+──────────────────────────────────
 7 cloud resources were detected:
 ∙ 7 were estimated, 7 include usage-based costs, see https://infracost.io/usage-file

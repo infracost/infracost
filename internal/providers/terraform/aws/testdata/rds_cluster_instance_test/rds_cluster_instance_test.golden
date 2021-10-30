@@ -21,6 +21,6 @@
  └─ CPU credits                                                   48  vCPU-hours                         $4.32 
                                                                                                                
  OVERALL TOTAL                                                                                         $275.88 
-----------------------------------
+──────────────────────────────────
 4 cloud resources were detected:
 ∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file

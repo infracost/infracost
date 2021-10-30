@@ -26,7 +26,7 @@
  └─ Instance usage (I2)                              730  hours       $416.10 
                                                                               
  OVERALL TOTAL                                                      $7,820.49 
-----------------------------------
+──────────────────────────────────
 9 cloud resources were detected:
 ∙ 6 were estimated, 6 include usage-based costs, see https://infracost.io/usage-file
 ∙ 3 were free

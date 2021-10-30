@@ -27,7 +27,7 @@
  └─ Additional backup storage                   2,000  GB                   $200.00 
                                                                                     
  OVERALL TOTAL                                                            $5,041.69 
-----------------------------------
+──────────────────────────────────
 6 cloud resources were detected:
 ∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free

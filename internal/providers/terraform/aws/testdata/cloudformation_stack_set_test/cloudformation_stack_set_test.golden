@@ -9,7 +9,7 @@
  └─ Durations above 30s                         Monthly cost depends on usage: $0.00008 per seconds     
                                                                                                         
  OVERALL TOTAL                                                                                    $9.00 
-----------------------------------
+──────────────────────────────────
 3 cloud resources were detected:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free

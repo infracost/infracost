@@ -32,9 +32,9 @@ Project: infracost/infracost/examples/terragrunt/dev
         +$0.0000166667 per GB-seconds
 
 Monthly cost change for infracost/infracost/examples/terragrunt/dev
-Amount:  +$51.97 ($0.00 -> $51.97)
+Amount:  +$51.97 ($0.00 → $51.97)
 
-----------------------------------
+──────────────────────────────────
 Project: infracost/infracost/examples/terragrunt/prod
 
 + aws_instance.web_app
@@ -68,9 +68,9 @@ Project: infracost/infracost/examples/terragrunt/prod
         +$0.0000166667 per GB-seconds
 
 Monthly cost change for infracost/infracost/examples/terragrunt/prod
-Amount:  +$748 ($0.00 -> $748)
+Amount:  +$748 ($0.00 → $748)
 
-----------------------------------
+──────────────────────────────────
 Key: ~ changed, + added, - removed
 
 4 cloud resources were detected, rerun with --show-skipped to see details:

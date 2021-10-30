@@ -8,7 +8,7 @@
  └─ Instance usage (S1)                                       730  hours         $73.00 
                                                                                         
  OVERALL TOTAL                                                                  $112.00 
-----------------------------------
+──────────────────────────────────
 6 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost

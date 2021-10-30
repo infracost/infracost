@@ -27,7 +27,7 @@
  └─ Throughput                                                    1  units                       $21.90 
                                                                                                         
  OVERALL TOTAL                                                                               $16,954.19 
-----------------------------------
+──────────────────────────────────
 7 cloud resources were detected:
 ∙ 6 were estimated, 6 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free

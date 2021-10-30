@@ -22,7 +22,7 @@
  └─ Additional backup storage                     Monthly cost depends on usage: $0.095 per GB   
                                                                                                  
  OVERALL TOTAL                                                                         $3,294.05 
-----------------------------------
+──────────────────────────────────
 5 cloud resources were detected:
 ∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free

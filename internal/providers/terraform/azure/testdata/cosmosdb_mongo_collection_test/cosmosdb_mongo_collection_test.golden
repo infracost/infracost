@@ -90,7 +90,7 @@
  └─ Restored data                                              Monthly cost depends on usage: $0.15 per GB                
                                                                                                                           
  OVERALL TOTAL                                                                                                  $5,455.03 
-----------------------------------
+──────────────────────────────────
 14 cloud resources were detected:
 ∙ 10 were estimated, 10 include usage-based costs, see https://infracost.io/usage-file
 ∙ 4 were free

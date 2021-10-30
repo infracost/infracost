@@ -118,6 +118,6 @@
     └─ Standard provisioned storage (pd-standard)                           400  GiB          $16.00 
                                                                                                      
  OVERALL TOTAL                                                                            $25,959.78 
-----------------------------------
+──────────────────────────────────
 13 cloud resources were detected:
 ∙ 13 were estimated, 13 include usage-based costs, see https://infracost.io/usage-file

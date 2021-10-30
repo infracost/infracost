@@ -7,7 +7,7 @@
  └─ Zookeeper node (Standard_D4a V4)            2,190  hours       $525.60 
                                                                            
  OVERALL TOTAL                                                   $3,907.40 
-----------------------------------
+──────────────────────────────────
 4 cloud resources were detected:
 ∙ 1 was estimated
 ∙ 2 weren't estimated, report them in https://github.com/infracost/infracost

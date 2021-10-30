@@ -15,7 +15,7 @@
  └─ Requests                     Monthly cost depends on usage: $0.60 per 1M requests 
                                                                                       
  OVERALL TOTAL                                                                 $30.60 
-----------------------------------
+──────────────────────────────────
 5 cloud resources were detected:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
 ∙ 3 were free

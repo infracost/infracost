@@ -20,6 +20,6 @@
  └─ CPU credits                                   Monthly cost depends on usage: $0.15 per vCPU-hours  
                                                                                                        
  OVERALL TOTAL                                                                               $1,854.20 
-----------------------------------
+──────────────────────────────────
 5 cloud resources were detected:
 ∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file

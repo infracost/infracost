@@ -19,6 +19,6 @@
  └─ Storage (general purpose SSD, gp2)                                    10  GB                                 $1.00 
                                                                                                                        
  OVERALL TOTAL                                                                                                  $78.40 
-----------------------------------
+──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file

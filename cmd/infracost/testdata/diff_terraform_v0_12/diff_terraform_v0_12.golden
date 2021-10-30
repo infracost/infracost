@@ -95,10 +95,10 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.12_plan.json
           +$0.80
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/terraform_v0.12_plan.json
-Amount:  +$40.56 ($40.56 -> $81.12)
+Amount:  +$40.56 ($40.56 → $81.12)
 Percent: +100%
 
-----------------------------------
+──────────────────────────────────
 Key: ~ changed, + added, - removed
 
 26 cloud resources were detected, rerun with --show-skipped to see details:

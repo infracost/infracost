@@ -27,7 +27,7 @@ Project: infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
  └─ IP address (static)                                  730  hours                    $3.65 
                                                                                              
  OVERALL TOTAL                                                                     $5,296.15 
-----------------------------------
+──────────────────────────────────
 11 cloud resources were detected:
 ∙ 6 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 weren't estimated, report them in https://github.com/infracost/infracost

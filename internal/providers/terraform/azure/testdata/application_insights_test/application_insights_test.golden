@@ -12,7 +12,7 @@
  └─ Data retention (120 days)                         1,000  GB                   $100.00 
                                                                                           
  OVERALL TOTAL                                                                  $4,700.00 
-----------------------------------
+──────────────────────────────────
 4 cloud resources were detected:
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free

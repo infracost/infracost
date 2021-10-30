@@ -8,7 +8,7 @@
  └─ Job run time                               Monthly cost depends on usage: $0.002 per minutes 
                                                                                                  
  OVERALL TOTAL                                                                             $0.01 
-----------------------------------
+──────────────────────────────────
 4 cloud resources were detected:
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free

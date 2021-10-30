@@ -17,7 +17,7 @@
  └─ Jobs light compute DBUs                         4,000  DBU-hours                  $280.00 
                                                                                               
  OVERALL TOTAL                                                                      $1,995.00 
-----------------------------------
+──────────────────────────────────
 5 cloud resources were detected:
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free

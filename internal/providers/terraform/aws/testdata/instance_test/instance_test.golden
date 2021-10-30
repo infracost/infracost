@@ -128,7 +128,7 @@
     └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
                                                                                                             
  OVERALL TOTAL                                                                                      $992.14 
-----------------------------------
+──────────────────────────────────
 23 cloud resources were detected:
 ∙ 22 were estimated, 22 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost

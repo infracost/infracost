@@ -35,6 +35,6 @@
  └─ Storage                                              20  GB           $0.52 
                                                                                 
  OVERALL TOTAL                                                           $46.32 
-----------------------------------
+──────────────────────────────────
 11 cloud resources were detected:
 ∙ 11 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file

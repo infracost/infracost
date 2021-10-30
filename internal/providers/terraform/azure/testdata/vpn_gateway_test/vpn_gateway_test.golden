@@ -40,7 +40,7 @@
  └─ VPN gateway data tranfer               Monthly cost depends on usage: $0.035 per GB      
                                                                                              
  OVERALL TOTAL                                                                    $49,247.27 
-----------------------------------
+──────────────────────────────────
 11 cloud resources were detected:
 ∙ 8 were estimated, 7 include usage-based costs, see https://infracost.io/usage-file
 ∙ 3 were free

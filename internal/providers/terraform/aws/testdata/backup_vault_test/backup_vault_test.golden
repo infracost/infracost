@@ -30,6 +30,6 @@
  └─ FSx for lustre backup              10,000  GB                       $550.00 
                                                                                 
  OVERALL TOTAL                                                       $12,960.00 
-----------------------------------
+──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file

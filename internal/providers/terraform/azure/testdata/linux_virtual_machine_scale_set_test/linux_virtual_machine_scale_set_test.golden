@@ -14,6 +14,6 @@
     └─ Disk operations                                   Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                     
  OVERALL TOTAL                                                                                              $414.44 
-----------------------------------
+──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file

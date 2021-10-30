@@ -24,7 +24,7 @@
  └─ IP address (dynamic)                             730  hours                  $2.92 
                                                                                        
  OVERALL TOTAL                                                               $2,505.26 
-----------------------------------
+──────────────────────────────────
 9 cloud resources were detected:
 ∙ 5 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
 ∙ 4 were free

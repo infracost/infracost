@@ -14,6 +14,6 @@
  └─ Duration                                              17,500  GB-seconds                         $0.29 
                                                                                                            
  OVERALL TOTAL                                                                                       $0.40 
-----------------------------------
+──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
