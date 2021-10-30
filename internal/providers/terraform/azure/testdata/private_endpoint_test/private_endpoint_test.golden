@@ -28,7 +28,7 @@
  └─ Early deletion                            Monthly cost depends on usage: $0.0228 per GB              
                                                                                                          
  OVERALL TOTAL                                                                                    $23.90 
-----------------------------------
+──────────────────────────────────
 7 cloud resources were detected:
 ∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
 ∙ 3 were free

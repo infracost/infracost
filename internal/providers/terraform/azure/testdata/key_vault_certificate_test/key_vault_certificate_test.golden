@@ -14,7 +14,7 @@
  └─ Certificate operations                                10  10K transactions                 $0.30 
                                                                                                      
  OVERALL TOTAL                                                                               $600.60 
-----------------------------------
+──────────────────────────────────
 6 cloud resources were detected:
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
 ∙ 3 were free

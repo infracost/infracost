@@ -14,7 +14,7 @@
  └─ Outbound data transfer (from us-east-1, to EqDC2)               200  GB            $4.00 
                                                                                              
  OVERALL TOTAL                                                                       $959.20 
-----------------------------------
+──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
 Logs:

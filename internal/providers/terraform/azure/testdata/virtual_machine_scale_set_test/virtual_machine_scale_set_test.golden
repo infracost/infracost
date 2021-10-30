@@ -26,7 +26,7 @@
     └─ Disk operations                                           200  10k operations                   $0.10 
                                                                                                              
  OVERALL TOTAL                                                                                       $427.59 
-----------------------------------
+──────────────────────────────────
 5 cloud resources were detected:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
 ∙ 3 were free

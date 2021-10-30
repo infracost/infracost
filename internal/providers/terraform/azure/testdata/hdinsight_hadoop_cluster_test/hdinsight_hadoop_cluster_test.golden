@@ -13,7 +13,7 @@
  └─ Zookeeper node (Standard_A5)                      2,190  hours       $554.07 
                                                                                  
  OVERALL TOTAL                                                         $3,967.55 
-----------------------------------
+──────────────────────────────────
 5 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 2 weren't estimated, report them in https://github.com/infracost/infracost

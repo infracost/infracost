@@ -45,7 +45,7 @@
  └─ Restored data                                                  3,000  GB                             $450.00 
                                                                                                                  
  OVERALL TOTAL                                                                                         $5,155.73 
-----------------------------------
+──────────────────────────────────
 10 cloud resources were detected:
 ∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost

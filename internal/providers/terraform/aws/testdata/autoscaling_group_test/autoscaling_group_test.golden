@@ -113,7 +113,7 @@
     └─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23 
                                                                                                    
  OVERALL TOTAL                                                                           $3,133.01 
-----------------------------------
+──────────────────────────────────
 40 cloud resources were detected:
 ∙ 18 were estimated, 18 include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 weren't estimated, report them in https://github.com/infracost/infracost

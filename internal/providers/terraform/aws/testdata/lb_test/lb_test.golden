@@ -22,6 +22,6 @@
  └─ Load balancer capacity units          1.3698  LCU                      $6.00 
                                                                                  
  OVERALL TOTAL                                                            $96.13 
-----------------------------------
+──────────────────────────────────
 5 cloud resources were detected:
 ∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file

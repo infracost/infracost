@@ -69,7 +69,7 @@
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
  OVERALL TOTAL                                                                                   $28,382.88 
-----------------------------------
+──────────────────────────────────
 14 cloud resources were detected:
 ∙ 12 were estimated, 12 include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free

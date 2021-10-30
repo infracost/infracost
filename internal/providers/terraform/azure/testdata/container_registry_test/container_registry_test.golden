@@ -31,7 +31,7 @@
  └─ Build vCPU                                Monthly cost depends on usage: $0.0001 per seconds   
                                                                                                    
  OVERALL TOTAL                                                                             $652.98 
-----------------------------------
+──────────────────────────────────
 7 cloud resources were detected:
 ∙ 6 were estimated, 6 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free

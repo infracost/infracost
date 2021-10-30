@@ -18,6 +18,6 @@
  └─ Connection duration                              10  1M minutes                   $2.50 
                                                                                             
  OVERALL TOTAL                                                                    $2,332.50 
-----------------------------------
+──────────────────────────────────
 4 cloud resources were detected:
 ∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file

@@ -40,6 +40,6 @@
  └─ Objects listed                                           10  1M objects                     $0.03 
                                                                                                       
  OVERALL TOTAL                                                                                  $0.03 
-----------------------------------
+──────────────────────────────────
 6 cloud resources were detected:
 ∙ 6 were estimated, 6 include usage-based costs, see https://infracost.io/usage-file

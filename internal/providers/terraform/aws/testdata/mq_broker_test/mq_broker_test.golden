@@ -22,7 +22,7 @@
  └─ Storage (RabbitMQ, EBS)                                          Monthly cost depends on usage: $0.10 per GB 
                                                                                                                  
  OVERALL TOTAL                                                                                         $2,149.20 
-----------------------------------
+──────────────────────────────────
 8 cloud resources were detected:
 ∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
 ∙ 3 were free

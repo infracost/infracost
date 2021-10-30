@@ -28,7 +28,7 @@
     └─ Select data returned                      Monthly cost depends on usage: $0.0007 per GB           
                                                                                                          
  OVERALL TOTAL                                                                                 $2,603.90 
-----------------------------------
+──────────────────────────────────
 8 cloud resources were detected:
 ∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
 ∙ 4 were free

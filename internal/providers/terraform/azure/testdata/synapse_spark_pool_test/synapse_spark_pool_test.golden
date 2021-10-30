@@ -21,7 +21,7 @@
  └─ Data pipeline self hosted external integration runtime   Monthly cost depends on usage: $0.0001 per hours           
                                                                                                                         
  OVERALL TOTAL                                                                                                   $97.66 
-----------------------------------
+──────────────────────────────────
 6 cloud resources were detected:
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost

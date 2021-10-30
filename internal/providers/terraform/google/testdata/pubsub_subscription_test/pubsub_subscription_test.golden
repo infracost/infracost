@@ -12,6 +12,6 @@
  └─ Snapshot message backlog storage                   30  GiB                      $8.10 
                                                                                           
  OVERALL TOTAL                                                                    $413.50 
-----------------------------------
+──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file

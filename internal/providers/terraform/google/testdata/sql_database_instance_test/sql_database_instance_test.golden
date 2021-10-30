@@ -65,6 +65,6 @@
     └─ Storage (SSD, zonal)                                      500  GB                    $85.00 
                                                                                                    
  OVERALL TOTAL                                                                           $7,455.69 
-----------------------------------
+──────────────────────────────────
 11 cloud resources were detected:
 ∙ 11 were estimated, 11 include usage-based costs, see https://infracost.io/usage-file

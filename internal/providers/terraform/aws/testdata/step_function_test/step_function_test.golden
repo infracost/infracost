@@ -27,6 +27,6 @@
  └─ Transitions                              Monthly cost depends on usage: $0.00005 per 1K transitions 
                                                                                                         
  OVERALL TOTAL                                                                                  $758.95 
-----------------------------------
+──────────────────────────────────
 6 cloud resources were detected:
 ∙ 6 were estimated, 6 include usage-based costs, see https://infracost.io/usage-file

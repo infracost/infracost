@@ -8,7 +8,7 @@
  └─ Multi-step web test                                      1  test                  $10.00 
                                                                                              
  OVERALL TOTAL                                                                        $10.00 
-----------------------------------
+──────────────────────────────────
 4 cloud resources were detected:
 ∙ 2 were estimated, 1 includes usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free

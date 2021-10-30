@@ -16,7 +16,7 @@
  └─ IP prefix                                 730  hours                    $4.38 
                                                                                   
  OVERALL TOTAL                                                             $74.18 
-----------------------------------
+──────────────────────────────────
 5 cloud resources were detected:
 ∙ 4 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free

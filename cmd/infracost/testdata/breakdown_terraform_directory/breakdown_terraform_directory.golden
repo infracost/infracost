@@ -16,6 +16,6 @@ Project: infracost/infracost/examples/terraform
  └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
  OVERALL TOTAL                                                                                                $742.64 
-----------------------------------
+──────────────────────────────────
 2 cloud resources were detected, rerun with --show-skipped to see details:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file

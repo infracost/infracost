@@ -14,6 +14,6 @@
  └─ Ingress data                                           100  GB                       $0.80 
                                                                                                
  OVERALL TOTAL                                                                          $23.50 
-----------------------------------
+──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file

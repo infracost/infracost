@@ -27,6 +27,6 @@
  └─ Insights queries data scanned                             250  GB                       $1.25 
                                                                                                   
  OVERALL TOTAL                                                                          $2,065.00 
-----------------------------------
+──────────────────────────────────
 5 cloud resources were detected:
 ∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file

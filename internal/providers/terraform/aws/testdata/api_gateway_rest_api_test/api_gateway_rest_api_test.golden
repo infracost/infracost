@@ -11,6 +11,6 @@
  └─ Requests (over 20B)                           1,000  1M requests              $1,510.00 
                                                                                             
  OVERALL TOTAL                                                                   $49,763.10 
-----------------------------------
+──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file

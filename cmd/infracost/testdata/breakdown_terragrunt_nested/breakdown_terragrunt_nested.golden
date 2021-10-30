@@ -17,7 +17,7 @@ Project: infracost/infracost/examples/terragrunt/dev
                                                                                                                     
  Project total                                                                                               $51.97 
 
-----------------------------------
+──────────────────────────────────
 Project: infracost/infracost/examples/terragrunt/prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost 
@@ -37,6 +37,6 @@ Project: infracost/infracost/examples/terragrunt/prod
  Project total                                                                                                $747.64 
 
  OVERALL TOTAL                                                                                                $799.61 
-----------------------------------
+──────────────────────────────────
 4 cloud resources were detected, rerun with --show-skipped to see details:
 ∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
