@@ -93,7 +93,7 @@ func synapseSparkPoolCostComponent(region, name, start string, instances, vCores
 			Service:       strPtr("Azure Synapse Analytics"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Azure Synapse Analytics Serverless Apache Spark Pool - Memory Optimized")},
+				{Key: "productName", Value: strPtr("Azure Synapse Analytics Serverless Apache Spark Pool - Memory Optimized")},
 				{Key: "skuName", Value: strPtr("vCore")},
 			},
 		},
