@@ -393,6 +393,16 @@ func TestDiffName(t *testing.T) {
 			past:     "Instance usage (Linux/UNIX, on-demand, t3.small)",
 			expected: "Instance usage (Linux/UNIX, on-demand → reserved, t3.small → t3.medium)",
 		},
+		{
+			current:  "Instance usage (Linux/UNIX, reserved, t3.medium)",
+			past:     "Instance usage (Linux/UNIX, on-demand)",
+			expected: "Instance usage (Linux/UNIX, on-demand) → (Linux/UNIX, reserved, t3.medium)",
+		},
+		{
+			current:  "Instance usage (Linux/UNIX, reserved)",
+			past:     "Instance usage (Linux/UNIX, on-demand, t3.small)",
+			expected: "Instance usage (Linux/UNIX, on-demand, t3.small) → (Linux/UNIX, reserved)",
+		},
 	}
 
 	for _, test := range tests {

@@ -2,7 +2,6 @@ package schema
 
 import (
 	"fmt"
-	"math"
 	"regexp"
 	"strings"
 
@@ -269,7 +268,12 @@ func diffName(current string, past string) string {
 	pastLabels := strings.Split(pastM[2], ", ")
 	currentLabels := strings.Split(currentM[2], ", ")
 
-	labelCount := int(math.Max(float64(len(pastLabels)), float64(len(currentLabels))))
+	// If the names don't have the same label count then return the labels in the format `(old, labels) → (new, labels)`
+	if len(pastLabels) != len(currentLabels) {
+		return fmt.Sprintf("%s (%s) → (%s)", currentM[1], pastM[2], currentM[2])
+	}
+
+	labelCount := len(currentLabels)
 	labels := make([]string, 0, labelCount)
 
 	for i := 0; i < labelCount; i++ {
