@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/Rhymond/go-money v1.0.3
-	github.com/aws/aws-sdk-go-v2 v1.9.2
+	github.com/aws/aws-sdk-go-v2 v1.10.0
 	github.com/aws/aws-sdk-go-v2/config v1.8.2
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.12.1
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.8.1
@@ -68,7 +68,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.7.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.4.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.7.1 // indirect
-	github.com/aws/smithy-go v1.8.0 // indirect
+	github.com/aws/smithy-go v1.8.1 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
