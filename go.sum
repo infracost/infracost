@@ -56,8 +56,8 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.9.0 h1:SZiVvMwLnXwx34MMnpicxQ
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.9.0/go.mod h1:iX4tSMY8NP1mzU2PMS6arLyB/Yufz2LxCkn9DsgiWEI=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.5.1 h1:kFNLgBc41n1EPcgAzHRpNXiih0xGqHzDJTvg6JBVCUA=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.5.1/go.mod h1:cE6kNzPMNj8ID5OCS8T2sVnZNgPRiaJ7RRvpdCiIOUA=
-github.com/aws/aws-sdk-go-v2/service/ec2 v1.18.0 h1:5wWtSfYRWgkpKKMW4yJ5llzI9s24Fls7Pv7uw2BiYbk=
-github.com/aws/aws-sdk-go-v2/service/ec2 v1.18.0/go.mod h1:d8R2f1hFcknkA3MW4SeExwEua2KpR+dhSrwWlnlwe5Q=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.20.0 h1:qvcoul6cfXEjiQMY1N43zaDui3FWsEpXLVxHlmWc3pk=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.20.0/go.mod h1:P+gshV4VLT7jUbWALAhV9lXDyZ40R7E/Rvr2ryBqn2s=
 github.com/aws/aws-sdk-go-v2/service/eks v1.11.0 h1:8y6WMuHlNVCkgAHuiUFEbPDBBmCQUCR8jiw56B9Cx2E=
 github.com/aws/aws-sdk-go-v2/service/eks v1.11.0/go.mod h1:ZtM31a28WNSvj7j/DgFdYqyfvljBQ4PRdAI215ewQjs=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.3.0/go.mod h1:v8ygadNyATSm6elwJ/4gzJwcFhri9RqS8skgHKiwXPU=
@@ -65,7 +65,6 @@ github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.4.0 h1:EtQ6hVAg
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.4.0/go.mod h1:vEkJTjJ8vnv0uWy2tAp7DSydWFpudMGWPQ2SFucoN1k=
 github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.1.1 h1:MzX4O+nYfcHbpgk4GgXSSc3koenQ0ShxzK3qu4crZRw=
 github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.1.1/go.mod h1:CStcbRap+CGgI5IYfxM7DI9HSUTQX9jeGzav433hJ9M=
-github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.3.1/go.mod h1:Ve+eJOx9UWaT/lMVebnFhDhO49fSLVedHoA82+Rqme0=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.4.0 h1:/T5wKsw/po118HEDvnSE8YU7TESxvZbYM2rnn+Oi7Kk=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.4.0/go.mod h1:X5/JuOxPLU/ogICgDTtnpfaQzdQJO0yKDcpoxWLLJ8Y=
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.8.0 h1:j1JV89mkJP4f9cssTWbu+anj3p2v+UWMA7qERQQqMkM=
