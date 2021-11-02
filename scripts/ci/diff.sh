@@ -30,6 +30,16 @@ process_args () {
   elif [ -n "$percentage_threshold" ]; then
     post_condition="{\"percentage_threshold\": $percentage_threshold}"
     echo "Warning: percentage_threshold is deprecated and will be removed in v0.9.0, please use post_condition='{\"percentage_threshold\": \"0\"}'"
+  # Default to using update method when posting to GitHub via GitHub actions, Circle CI or Azure DevOps
+  # GitHub actions
+  elif [ -n "$GITHUB_ACTIONS" ]; then
+    post_condition=${post_condition:-'{"update": true}'}
+  # CircleCI GitHub
+  elif [ -n "$CIRCLECI" ] && echo "$CIRCLE_REPOSITORY_URL" | grep -Eiq github; then
+    post_condition=${post_condition:-'{"update": true}'}
+  # Azure DevOps GitHub
+  elif [ -n "$SYSTEM_COLLECTIONURI" ] && [ "$BUILD_REASON" = "PullRequest" ] && [ "$BUILD_REPOSITORY_PROVIDER" = "GitHub" ]; then
+    post_condition=${post_condition:-'{"update": true}'}
   else
     post_condition=${post_condition:-'{"has_diff": true}'}
   fi
