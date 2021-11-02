@@ -74,4 +74,18 @@ resource "azurerm_private_endpoint" "with_outbound" {
   }
 }
 
+resource "azurerm_private_endpoint" "with_multiple_tiers" {
+  name                = "example-privateendpoint"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  subnet_id           = azurerm_subnet.internal.id
+
+  private_service_connection {
+    name                           = "example-privateserviceconnection"
+    private_connection_resource_id = azurerm_storage_account.example.id
+    subresource_names              = ["file"]
+    is_manual_connection           = false
+  }
+}
+
 

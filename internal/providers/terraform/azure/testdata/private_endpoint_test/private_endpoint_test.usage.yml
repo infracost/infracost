@@ -4,3 +4,6 @@ resource_usage:
     monthly_inbound_data_processed_gb: 100
   azurerm_private_endpoint.with_outbound:
     monthly_outbound_data_processed_gb: 100
+  azurerm_private_endpoint.with_multiple_tiers:
+    monthly_inbound_data_processed_gb: 5120000
+    monthly_outbound_data_processed_gb: 5120000
