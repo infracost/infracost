@@ -49,7 +49,7 @@ process_args () {
   if [ -n "$GIT_SSH_KEY" ]; then
     echo "Setting up private Git SSH key so terraform can access your private modules."
     mkdir -p .ssh
-    echo "${GIT_SSH_KEY}" > .ssh/git_ssh_key
+    echo "$GIT_SSH_KEY" > .ssh/git_ssh_key
     chmod 600 .ssh/git_ssh_key
     export GIT_SSH_COMMAND="ssh -i $(pwd)/.ssh/git_ssh_key -o 'StrictHostKeyChecking=no'"
   fi
@@ -61,7 +61,7 @@ process_args () {
 }
 
 build_breakdown_cmd () {
-  breakdown_cmd="${INFRACOST_BINARY} breakdown --no-color --format json"
+  breakdown_cmd="$INFRACOST_BINARY breakdown --no-color --format json"
 
   if [ -n "$path" ]; then
     breakdown_cmd="$breakdown_cmd --path $path"
@@ -86,7 +86,7 @@ build_breakdown_cmd () {
 }
 
 build_output_cmd () {
-  output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
+  output_cmd="$INFRACOST_BINARY output --no-color --format diff --path $1"
   if [ -n "$show_skipped" ]; then
     # The "=" is important as otherwise the value of the flag is ignored by the CLI
     output_cmd="$output_cmd --show-skipped=$show_skipped"
@@ -94,10 +94,142 @@ build_output_cmd () {
   echo "${output_cmd}"
 }
 
+MSG_START="💰 Infracost estimate:"
+build_msg () {
+  local include_html=$1
+  local update_msg=$2
+
+  local percent_display
+  local change_word
+  local change_emoji
+  local msg
+
+  percent_display=$(percent_display "$past_total_monthly_cost" "$total_monthly_cost")
+  change_word=$(change_word "$past_total_monthly_cost" "$total_monthly_cost")
+  change_emoji=$(change_emoji "$past_total_monthly_cost" "$total_monthly_cost")
+
+  msg="$MSG_START **monthly cost will $change_word by $(format_cost "$diff_total_monthly_cost")$percent_display** $change_emoji\n"
+  msg+="\n"
+
+  if [ "$include_html" = true ]; then
+    msg+="<table>\n"
+    msg+="  <thead>\n"
+    msg+="    <td>Project</td>\n"
+    msg+="    <td>Previous</td>\n"
+    msg+="    <td>New</td>\n"
+    msg+="    <td>Diff</td>\n"
+    msg+="  </thead>\n"
+    msg+="  <tbody>\n"
+
+    local diff_resources
+    local skipped_projects
+    for (( i = 0; i < project_count; i++ )); do
+      diff_resources=$(jq '.projects['"$i"'].diff.resources[]' infracost_breakdown.json)
+      if  [ -n "$diff_resources" ]; then
+        msg+="$(build_project_row "$i")"
+      else
+        if [ -z "$skipped_projects" ]; then
+          skipped_projects="$(jq -r '.projects['"$i"'].name' infracost_breakdown.json)"
+        else
+          skipped_projects="$skipped_projects, $(jq -r '.projects['"$i"'].name' infracost_breakdown.json)"
+        fi
+      fi
+    done
+
+    if (( $project_count > 1 )); then
+      msg+="$(build_overall_row)"
+    fi
+
+    msg+="  </tbody>\n"
+    msg+="</table>\n"
+    msg+="\n"
+    
+    if [ -n "$skipped_projects" ]; then
+      msg+="The following projects have no cost estimate changes: $skipped_projects\n\n"
+    fi
+
+    msg+="<details>\n"
+    msg+="  <summary><strong>Infracost output</strong></summary>\n"
+  else
+    msg+="Previous monthly cost: $(format_cost "$past_total_monthly_cost")\n"
+    msg+="New monthly cost: $(format_cost "$total_monthly_cost")\n"
+    msg+="\n"
+    msg+="**Infracost output:**\n"
+  fi
+
+  msg+="\n"
+  msg+="\`\`\`\n"
+  msg+="$(echo "$diff_output" | sed "s/%/%%/g")\n"
+  msg+="\`\`\`\n"
+
+  if [ "$include_html" = true ]; then
+    msg+="</details>\n"
+    if [ -n "$update_msg" ]; then
+      msg+="\n$update_msg\n\n"
+    fi
+    msg+="<sub><a href='https://infracost.io/feedback' rel='noopener noreferrer' target='_blank'>How can this comment be more helpful?</a></sub>\n"
+  fi
+  
+  printf "$msg"
+}
+
+build_project_row () {
+  local i=$1
+
+  local max_name_length
+  local name
+  local label
+  local past_monthly_cost
+  local monthly_cost
+  local diff_monthly_cost
+  local percent_display
+  local sym
+
+  max_name_length=64
+  name=$(jq -r '.projects['"$i"'].name' infracost_breakdown.json)
+  # Truncate the middle of the name if it's too long
+  name=$(echo $name | awk -v l="$max_name_length" '{if (length($0) > l) {print substr($0, 0, l-(l/2)-1)"..."substr($0, length($0)-(l/2)+3, length($0))} else print $0}')
+  
+  past_monthly_cost=$(jq -r '.projects['"$i"'].pastBreakdown.totalMonthlyCost' infracost_breakdown.json)
+  monthly_cost=$(jq -r '.projects['"$i"'].breakdown.totalMonthlyCost' infracost_breakdown.json)
+  diff_monthly_cost=$(jq -r '.projects['"$i"'].diff.totalMonthlyCost' infracost_breakdown.json)
+
+  percent_display=$(percent_display "$past_monthly_cost" "$monthly_cost")
+  sym=$(change_symbol "$past_total_monthly_cost" "$total_monthly_cost")
+
+  local row=""
+  row+="    <tr>\n"
+  row+="      <td>$name</td>\n"
+  row+="      <td align=\"right\">$(format_cost "$past_monthly_cost")</td>\n"
+  row+="      <td align=\"right\">$(format_cost "$monthly_cost")</td>\n"
+  row+="      <td>$sym$(format_cost "$diff_monthly_cost")$percent_display</td>\n"
+  row+="    </tr>\n"
+  
+  printf "%s" "$row"
+}
+
+build_overall_row () {
+  local percent_display
+  local sym
+
+  percent_display=$(percent_display "$past_total_monthly_cost" "$total_monthly_cost")
+  sym=$(change_symbol "$past_total_monthly_cost" "$total_monthly_cost")
+
+  local row=""
+  row+="    <tr>\n"
+  row+="      <td>All projects</td>\n"
+  row+="      <td align=\"right\">$(format_cost "$past_total_monthly_cost")</td>\n"
+  row+="      <td align=\"right\">$(format_cost "$total_monthly_cost")</td>\n"
+  row+="      <td>$sym$(format_cost "$diff_total_monthly_cost")$percent_display</td>\n"
+  row+="    </tr>\n"
+
+  printf "%s" "$row"
+}
+
 format_cost () {
   cost=$1
 
-  if [ -z "$cost" ] || [ "${cost}" = "null" ]; then
+  if [ -z "$cost" ] || [ "$cost" = "null" ]; then
     echo "-"
   elif [ "$(echo "$cost < 100" | bc -l)" = 1 ]; then
     printf "$currency%0.2f" "$cost"
@@ -106,53 +238,78 @@ format_cost () {
   fi
 }
 
-MSG_START="💰 Infracost estimate:"
-build_msg () {
-  include_html=$1
-  update_msg=$2
-  
-  change_word="increase"
-  change_sym="+"
-    change_emoji="📈"
-  if [ "$(echo "$total_monthly_cost < ${past_total_monthly_cost}" | bc -l)" = 1 ]; then
-    change_word="decrease"
-    change_sym=""
+calculate_percentage () {
+  local old=$1
+  local new=$2
+
+  local percent=""
+
+  # If both old and new costs are greater than 0
+  if [ "$(echo "$old > 0" | bc -l)" = 1 ] && [ "$(echo "$new > 0" | bc -l)" = 1 ]; then
+    percent="$(echo "scale=6; $new / $old * 100 - 100" | bc)"
+  fi
+
+  # If both old and new costs are less than or equal to 0
+  if [ "$(echo "$old <= 0" | bc -l)" = 1 ] && [ "$(echo "$new <= 0" | bc -l)" = 1 ]; then
+    percent="0"
+  fi
+
+  printf "%s" "$percent"
+}
+
+change_emoji () {
+  local old=$1
+  local new=$2
+
+  local change_emoji="📈"
+  if [ "$(echo "$new < $old" | bc -l)" = 1 ]; then
     change_emoji="📉"
   fi
-  
-  percent_display=""
+
+  printf "%s" "$change_emoji"
+}
+
+change_word () {
+  local old=$1
+  local new=$2
+
+  local change_word="increase"
+  if [ "$(echo "$new < $old" | bc -l)" = 1 ]; then
+    change_word="decrease"
+  fi
+
+  printf "%s" "$change_word"
+}
+
+change_symbol () {
+  local old=$1
+  local new=$2
+
+  local change_symbol="+"
+  if [ "$(echo "$new < $old" | bc -l)" = 1 ]; then
+    change_symbol=""
+  fi
+
+  printf "%s" "$change_symbol"
+}
+
+percent_display () {
+  local old=$1
+  local new=$2
+
+  local percent
+  local sym
+
+  percent=$(calculate_percentage "$old" "$new")
+  sym=$(change_symbol "$old" "$new")
+
+  local s=""
   if [ -n "$percent" ]; then
-    percent_display="$(printf "%.0f" "$percent")"
-    percent_display=" (${change_sym}${percent_display}%%)"
+    s="$(printf "%.0f" "$percent")"
+    s=" ($sym$s%%)"
   fi
-  
-  msg="${MSG_START} **monthly cost will ${change_word} by $(format_cost "$diff_cost")$percent_display** ${change_emoji}\n"
-  msg="${msg}\n"
-  msg="${msg}Previous monthly cost: $(format_cost "$past_total_monthly_cost")\n"
-  msg="${msg}New monthly cost: $(format_cost "$total_monthly_cost")\n"
-  msg="${msg}\n"
-  
-  if [ "$include_html" = true ]; then
-    msg="${msg}<details>\n"
-    msg="${msg}  <summary><strong>Infracost output</strong></summary>\n"
-  else
-    msg="${msg}**Infracost output:**\n"
-  fi
-    
-  msg="${msg}\n"
-  msg="${msg}\`\`\`\n"
-  msg="${msg}$(echo "${diff_output}" | sed "s/%/%%/g")\n"
-  msg="${msg}\`\`\`\n"
-  
-  if [ "$include_html" = true ]; then
-    msg="${msg}</details>\n"
-    if [ -n "$update_msg" ]; then
-      msg="${msg}\n${update_msg}\n\n"
-    fi
-    msg="${msg}<sub><a href='https://infracost.io/feedback' rel='noopener noreferrer' target='_blank'>How can this comment be more helpful?</a></sub>\n"
-  fi
-  
-  printf "$msg"
+
+  printf "%s" "$s"
 }
 
 post_to_github () {
@@ -208,7 +365,7 @@ post_to_github_pull_request () {
 
   msg="$(build_msg true "This comment will be updated when the cost estimate changes.")"
 
-  if [ "${latest_pr_comment}" != "null" ]; then
+  if [ "$latest_pr_comment" != "null" ]; then
     existing_msg=$(echo "$latest_pr_comment" | jq -r .body)
     # '// /' does a string substitution that removes spaces before comparison
     if [ "${msg// /}" != "${existing_msg// /}" ]; then
@@ -319,7 +476,7 @@ post_to_slack () {
 
 load_github_env () {
   export VCS_REPO_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-  
+
   github_event=$(cat "$GITHUB_EVENT_PATH")
 
   if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
@@ -388,9 +545,10 @@ echo "Running infracost output using:"
 echo "  $ $(cat infracost_output_cmd)"
 diff_output=$(cat infracost_output_cmd | sh)
 
-past_total_monthly_cost=$(jq '[.projects[].pastBreakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
-total_monthly_cost=$(jq '[.projects[].breakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
-diff_cost=$(jq '[.projects[].diff.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
+project_count=$(jq -r '.projects | length' infracost_breakdown.json)
+past_total_monthly_cost=$(jq '(.pastTotalMonthlyCost // 0) | tonumber' infracost_breakdown.json)
+total_monthly_cost=$(jq '(.totalMonthlyCost // 0) | tonumber' infracost_breakdown.json)
+diff_total_monthly_cost=$(jq '(.diffTotalMonthlyCost // 0) | tonumber' infracost_breakdown.json)
 currency=$(jq -r '.currency | select (.!=null)' infracost_breakdown.json)
 if [ "$currency" = "" ] || [ "$currency" = "USD" ]; then
   currency="$"
@@ -402,17 +560,9 @@ else
   currency="$currency " # Space is needed so output is "INR 123"
 fi
 
-# If both old and new costs are greater than 0
-if [ "$(echo "$past_total_monthly_cost > 0" | bc -l)" = 1 ] && [ "$(echo "$total_monthly_cost > 0" | bc -l)" = 1 ]; then
-  percent="$(echo "scale=6; $total_monthly_cost / $past_total_monthly_cost * 100 - 100" | bc)"
-fi
+percent=$(calculate_percentage "$past_total_monthly_cost" "$total_monthly_cost")
 
-# If both old and new costs are less than or equal to 0
-if [ "$(echo "$past_total_monthly_cost <= 0" | bc -l)" = 1 ] && [ "$(echo "$total_monthly_cost <= 0" | bc -l)" = 1 ]; then
-  percent=0
-fi
-
-absolute_percent=$(echo $percent | tr -d -)
+absolute_percent=$(echo "$percent" | tr -d -)
 diff_resources=$(jq '[.projects[].diff.resources[]] | add' infracost_breakdown.json)
 
 if [ "$(echo "$post_condition" | jq '.always')" = "true" ]; then
