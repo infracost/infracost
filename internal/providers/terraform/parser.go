@@ -113,19 +113,67 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 
 		if ud := usage[d.Address]; ud != nil {
 			usageData = ud
-		} else if strings.HasSuffix(d.Address, "]") {
-			lastIndexOfOpenBracket := strings.LastIndex(d.Address, "[")
-
-			if arrayUsageData := usage[fmt.Sprintf("%s[*]", d.Address[:lastIndexOfOpenBracket])]; arrayUsageData != nil {
-				usageData = arrayUsageData
+		} else {
+			// Check for array/map indexes.
+			// We should generate all combinations of asterisk and indexes.
+			// So module[0].resource[1] could be any of:
+			//		- module[0].resource[*]
+			//		- module[*].resource[1]
+			//		- module[*].resource[*]
+			stringArrIndexes := findAllCharIndexes(d.Address, '[')
+			combinations := allCombinations(stringArrIndexes)
+			for _, combination := range combinations {
+				newAddress := d.Address
+				for i := len(combination) - 1; i >= 0; i-- {
+					bracketIndex := combination[i]
+					closingBracket := bracketIndex + strings.Index(d.Address[bracketIndex:], "]")
+					newAddress = fmt.Sprintf("%s[*]%s", newAddress[:bracketIndex], newAddress[closingBracket+1:])
+				}
+				if arrayUsageData := usage[newAddress]; arrayUsageData != nil {
+					usageData = arrayUsageData
+					break
+				}
 			}
 		}
+
 		if r := p.createResource(d, usageData); r != nil {
 			resources = append(resources, r)
 		}
 	}
 
 	return resources
+}
+
+func findAllCharIndexes(str string, ch rune) []int {
+	idxs := make([]int, 0)
+	for idx, char := range str {
+		if char == ch {
+			idxs = append(idxs, idx)
+		}
+	}
+	return idxs
+}
+
+func allCombinations(set []int) (subsets [][]int) {
+	length := uint(len(set))
+
+	// Go through all possible combinations of objects
+	// from 1 (only first object in subset) to 2^length (all objects in subset)
+	for subsetBits := 1; subsetBits < (1 << length); subsetBits++ {
+		var subset []int
+
+		for object := uint(0); object < length; object++ {
+			// checks if object is contained in subset
+			// by checking if bit 'object' is set in subsetBits
+			if (subsetBits>>object)&1 == 1 {
+				// add object to subset
+				subset = append(subset, set[object])
+			}
+		}
+		// add subset to subsets
+		subsets = append(subsets, subset)
+	}
+	return subsets
 }
 
 func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
