@@ -16,8 +16,8 @@ func get{{.ResourceName}}RegistryItem() *schema.RegistryItem {
 
 func new{{ .ResourceName }}(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	{{- if .WithHelp }}
-	// in new{{.ResourceName}} we parse the resource data coming from d
-	// into the underlying {{ .ResourceName }}, we use schema.ResourceData lookup
+	// In new{{.ResourceName}} we parse the resource data coming from d
+	// into the underlying {{ .ResourceName }}. We use schema.ResourceData lookup
 	// to find data stored on attributes in the resource. This can be done as follows:
 	region := d.Get("region").String()
 	sku := d.Get("sku_name").String()

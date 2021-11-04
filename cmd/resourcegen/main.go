@@ -156,7 +156,7 @@ func exitWithErr(err error) {
 
 func writeOutput(c config, written []string) {
 	b := strings.Builder{}
-	b.WriteString(fmt.Sprintf("\nsuccessfully generated resource %s, files written:\n\n", c.Filename))
+	b.WriteString(fmt.Sprintf("\nSuccessfully generated resource %s, files written:\n\n", c.Filename))
 	for i, s := range written {
 		if i == len(written)-1 {
 			b.WriteString("\t" + s + "\n\n")
@@ -166,7 +166,7 @@ func writeOutput(c config, written []string) {
 		b.WriteString("\t" + s + "\n")
 	}
 
-	b.WriteString(fmt.Sprintf("added function %s to resource registry: \n\n\t%s\n\n", c.registryFuncName(), c.registryLocation()))
+	b.WriteString(fmt.Sprintf("Added function %s to resource registry: \n\n\t%s\n\n", c.registryFuncName(), c.registryLocation()))
 	b.WriteString("happy hacking!!\n")
 
 	fmt.Println(b.String())
