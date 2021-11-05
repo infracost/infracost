@@ -9,7 +9,7 @@ import (
 
 func get{{.ResourceName}}RegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "{{ .Filename }}",
+		Name:  "{{ .CloudProvider }}_{{ .Filename }}",
 		RFunc: new{{ .ResourceName }},
 	}
 }
