@@ -69,7 +69,7 @@ var {{ .ResourceName }}UsageSchema = []*schema.UsageItem{
 	{{- end }}
 }
 
-// PopulateUsage parses the u schema.Usage into the {{ .ResourceName }}.
+// PopulateUsage parses the u schema.UsageData into the {{ .ResourceName }}.
 // It uses the `infracost_usage` struct tags to populate data into the {{ .ResourceName }}.
 func ({{ .ResourceLetter }} *{{ .ResourceName }}) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage({{ .ResourceLetter }}, u)
