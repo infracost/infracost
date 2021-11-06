@@ -6,26 +6,26 @@
 
 - [Overview](#overview)
 - [Setting up the development environment](#setting-up-the-development-environment)
-	- [Install](#install)
-	- [Run](#run)
-	- [Test](#test)
-		- [Unit tests](#unit-tests)
-		- [Integration tests](#integration-tests)
-	- [Build](#build)
+  - [Install](#install)
+  - [Run](#run)
+  - [Test](#test)
+    - [Unit tests](#unit-tests)
+    - [Integration tests](#integration-tests)
+  - [Build](#build)
 - [Adding new resources](#adding-new-resources)
-	- [Glossary](#glossary)
-	- [Quickstart](#quickstart)
-	- [Cost component names and units](#cost-component-names-and-units)
-	- [Finding prices](#finding-prices)
-		- [Querying Postgres](#querying-postgres)
-		- [Querying the GraphQL API](#querying-the-graphql-api)
-		- [Tips](#tips)
-	- [Adding usage-based cost components](#adding-usage-based-cost-components)
-	- [General guidelines](#general-guidelines)
-		- [Usage file guidelines](#usage-file-guidelines)
+  - [Glossary](#glossary)
+  - [Quickstart](#quickstart)
+  - [Cost component names and units](#cost-component-names-and-units)
+  - [Finding prices](#finding-prices)
+    - [Querying Postgres](#querying-postgres)
+    - [Querying the GraphQL API](#querying-the-graphql-api)
+    - [Tips](#tips)
+  - [Adding usage-based cost components](#adding-usage-based-cost-components)
+  - [General guidelines](#general-guidelines)
+    - [Usage file guidelines](#usage-file-guidelines)
 - [Cloud vendor-specific tips](#cloud-vendor-specific-tips)
-	- [Google](#google)
-	- [Azure](#azure)
+  - [Google](#google)
+  - [Azure](#azure)
 - [Code reviews](#code-reviews)
 - [Releases](#releases)
 
@@ -158,7 +158,7 @@ type MyResource struct {
 	InstanceType string
 	UsageType string
 
-	// If there is a parameter than needs to be read from infracost-usage.yml you define it like this:
+	// If there is a parameter that needs to be read from infracost-usage.yml you define it like this:
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
@@ -222,7 +222,7 @@ func (a *MyResource) BuildResource() *schema.Resource {
 }
 ```
 
-Next, the `internal/providers/terraform/aws/<my_resource>.go` and an accompanying `internal/providers/terraform/aws/<my_resource>_test.go` test file.  This code extracts attributes from the
+Next, the `internal/providers/terraform/aws/<my_resource>.go` and an accompanying `internal/providers/terraform/aws/<my_resource>_test.go` test file. This code extracts attributes from the
 terraform data and uses the file in `internal/resources/aws/<my_resource>.go` to generate the cost components.
 
 ```go
@@ -245,7 +245,7 @@ func NewMyResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	region := d.Get("region").String()
 	sku := d.Get("sku_name").String()
 	instanceTypeFromSku := strings.Split(sku, "_")[0];
-	
+
 	a := &aws.MyResource{
 		Address: d.Address,
 		Region:  region,
@@ -267,13 +267,13 @@ package aws
 import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
-	...,
+	// ...,
   GetMyResourceRegistryItem(),
 }
 
 ```
 
-Create a new example Terraform project for integration testing in `internal/providers/terraform/aws/testdata/<my_resource>_test/`.  Each test case can be represented as a separate resource in the .tf file.  Be sure to include test cases with usage and without usage.
+Create a new example Terraform project for integration testing in `internal/providers/terraform/aws/testdata/<my_resource>_test/`.  Each test case can be represented as a separate resource in the .tf file. Be sure to include test cases with usage and without usage.
 
 Terraform project file `internal/providers/terraform/aws/testdata/<my_resource>_test/<my_resource>_test.tf`:
 ```
@@ -360,13 +360,14 @@ The first thing when adding a new resource is determining what cost components t
 
 - Cloud vendor pricing pages for that service (e.g. https://aws.amazon.com/redshift/pricing/)
 - Cloud vendor pricing calculators
-	- AWS: https://calculator.aws
-	- Google: https://cloud.google.com/products/calculator
-	- Azure: https://azure.microsoft.com/en-gb/pricing/calculator/
+  - AWS: https://calculator.aws
+  - Google: https://cloud.google.com/products/calculator
+  - Azure: https://azure.microsoft.com/en-gb/pricing/calculator/
 
 Our aim is to make Infracost's output understandable without needing to read separate docs. We try to match the cloud vendor pricing webpages as users have probably seen those before. It's unlikely that users will have looked at the pricing service JSON (which comes from cloud vendors' pricing APIs), or looked at the detailed billing CSVs that can show the pricing service names. Please check [this spreadsheet](https://docs.google.com/spreadsheets/d/1H_bn2jLzYr7xyrvNsFn-0rDaGPGpnrVTPsjVHzr-kM4/edit#gid=0) for examples of cost component names and units.
 
-Where a cloud vendor's pricing pages information can be improved for clarify, we'll do that, e.g. on some pricing webpages, AWS mention use "Storage Rate" to describe pricing for "Storage (provisioned IOPS SSD)", so we use the latter.
+-- TODO clarify the statement
+Where a cloud vendor's pricing pages information can be improved or clarified, we'll do that, e.g. on some pricing webpages, AWS mention use "Storage Rate" to describe pricing for "Storage (provisioned IOPS SSD)", so we use the latter.
 
 The cost component name should be plural where it makes sense, e.g. "Certificate renewals", "Requests", and "Messages". Furthermore, the name should not change when the IaC resource params change; anything that can change should be put in brackets, so for example:
 - `General Purpose SSD storage (gp2)` should be `Storage (gp2)` as the storage type can change.
@@ -377,7 +378,7 @@ In the future, we plan to add a separate field to cost components to hold the me
 
 ### Finding prices
 
-When adding a new resource to infracost, a `ProductFilter` has to be added that uniquely identifies the product for pricing purposes (the filter is used to find a unique `productHash`). If the product contains multiple prices, then a `PriceFilter` should be used to filter down to a single price. The product filter needs a `service`, `productFamily` and `attribute` key/values to filter the products. Because cloud prices have many parameter values to determine a price on a per-region or product type basis, querying for prices can look odd as many parameter values are duplicated.
+When adding a new resource to Infracost, a `ProductFilter` has to be added that uniquely identifies the product for pricing purposes (the filter is used to find a unique `productHash`). If the product contains multiple prices, then a `PriceFilter` should be used to filter down to a single price. The product filter needs a `service`, `productFamily` and `attribute` key/values to filter the products. Because cloud prices have many parameter values to determine a price on a per-region or product type basis, querying for prices can look odd as many parameter values are duplicated.
 
 To determine the correct `PriceFilter` to use we can query the backend data to find a unique product and then look at the prices nested inside the product and choose the correct one based on the price attributes.
 
@@ -389,72 +390,74 @@ Instead of directly querying the GraphQL, you can also run `distinct` or `regex`
 
 1. Follow the [Docker compose](https://github.com/infracost/cloud-pricing-api#docker-compose) or [dev setup](https://github.com/infracost/cloud-pricing-api/blob/master/CONTRIBUTING.md#development) instructions to setup and populate your Cloud Pricing API. Docker compose is quicker to setup.
 2. Connect to the Postgres DB:
-  	```sh
-	# only needed for docker-compose:  docker exec -it cloud-pricing-api_postgres_1 bash
-	psql
-	use cloud_pricing;
-	```
+
+  ```sh
+  # only needed for docker-compose:  docker exec -it cloud-pricing-api_postgres_1 bash
+  psql
+  use cloud_pricing;
+  ```
+
 3. You can query the `products` table in your local Postgres:
 
-	Example queries:
+  Example queries:
 
-	```sql
-	-- Find the vendor names
-	SELECT DISTINCT("vendorName") FROM products;
-	-- should show: "aws", "azure", "gcp"
+  ```sql
+  -- Find the vendor names
+  SELECT DISTINCT("vendorName") FROM products;
+  -- should show: "aws", "azure", "gcp"
 
-	-- Find all the services for a vendor
-	SELECT DISTINCT("service") FROM products WHERE "vendorName" = 'gcp';
-	
-	-- Find the service for a vendor using a regular expression
-	SELECT DISTINCT("service") FROM products WHERE "vendorName" = 'gcp' AND "service" ~* 'kms';
-	-- should show: "Cloud Key Management Service (KMS)", "Thales CPL ekms-dpod-eu"
+  -- Find all the services for a vendor
+  SELECT DISTINCT("service") FROM products WHERE "vendorName" = 'gcp';
 
-	-- Find the product families for a service
-	SELECT DISTINCT("productFamily") FROM products 
-	WHERE "vendorName" = 'gcp' AND "service" = 'Cloud Key Management Service (KMS)';
+  -- Find the service for a vendor using a regular expression
+  SELECT DISTINCT("service") FROM products WHERE "vendorName" = 'gcp' AND "service" ~* 'kms';
+  -- should show: "Cloud Key Management Service (KMS)", "Thales CPL ekms-dpod-eu"
 
-	-- Find the unique descriptions for a product family
-	SELECT DISTINCT("attributes" ->> 'description') FROM products 
-	WHERE "vendorName" = 'gcp' 
-	AND "service" = 'Cloud Key Management Service (KMS)' 
-	AND "productFamily" = 'ApplicationServices';
-	-- should show:  
-	--	"Active HSM ECDSA P-256 key versions",
-	--	"Active HSM ECDSA P-384 key versions",
-	--	"Active HSM RSA 2048 bit key versions",
-	--  ...
+  -- Find the product families for a service
+  SELECT DISTINCT("productFamily") FROM products
+  WHERE "vendorName" = 'gcp' AND "service" = 'Cloud Key Management Service (KMS)';
 
-	-- Find a unique product for a product family based on region and description:
-	SELECT * FROM products 
-	WHERE "vendorName" = 'gcp' 
-	AND service = 'Cloud Key Management Service (KMS)' 
-	AND "productFamily" = 'ApplicationServices' 
-	AND "region" = 'us-east1'
-	AND "attributes" ->> 'description' = 'Active HSM ECDSA P-256 key versions';
- 
-	-- Find a unique price for a product using a price filter (this requires 
-	-- a subquery because of the way prices are stored):
-	SELECT "vendorName", "service", "productFamily", "region", "productHash", 
-	       "sku", jsonb_pretty(attributes), jsonb_pretty(single_price) 
-	FROM
-	(SELECT *, jsonb_array_elements((jsonb_each("prices")).value) single_price FROM products 
-	 WHERE "vendorName" = 'gcp' 
-	 AND service = 'Cloud Key Management Service (KMS)' 
-	 AND "productFamily" = 'ApplicationServices' 
-	 AND "region" = 'us-east1'
-	 AND "attributes" ->> 'description' = 'Active HSM ECDSA SECP256K1 key versions') AS sub  	
-	WHERE single_price ->> 'startUsageAmount' = '2000';		
-	```
+  -- Find the unique descriptions for a product family
+  SELECT DISTINCT("attributes" ->> 'description') FROM products
+  WHERE "vendorName" = 'gcp'
+  AND "service" = 'Cloud Key Management Service (KMS)'
+  AND "productFamily" = 'ApplicationServices';
+  -- should show:
+  --  "Active HSM ECDSA P-256 key versions",
+  --  "Active HSM ECDSA P-384 key versions",
+  --  "Active HSM RSA 2048 bit key versions",
+  --  ...
+
+  -- Find a unique product for a product family based on region and description:
+  SELECT * FROM products
+  WHERE "vendorName" = 'gcp'
+  AND service = 'Cloud Key Management Service (KMS)'
+  AND "productFamily" = 'ApplicationServices'
+  AND "region" = 'us-east1'
+  AND "attributes" ->> 'description' = 'Active HSM ECDSA P-256 key versions';
+
+  -- Find a unique price for a product using a price filter (this requires
+  -- a subquery because of the way prices are stored):
+  SELECT "vendorName", "service", "productFamily", "region", "productHash",
+         "sku", jsonb_pretty(attributes), jsonb_pretty(single_price)
+  FROM
+  (SELECT *, jsonb_array_elements((jsonb_each("prices")).value) single_price FROM products
+   WHERE "vendorName" = 'gcp'
+   AND service = 'Cloud Key Management Service (KMS)'
+   AND "productFamily" = 'ApplicationServices'
+   AND "region" = 'us-east1'
+   AND "attributes" ->> 'description' = 'Active HSM ECDSA SECP256K1 key versions') AS sub
+  WHERE single_price ->> 'startUsageAmount' = '2000';
+  ```
 
 #### Querying the GraphQL API
 
-1. Use an browser extension like [modheader](https://bewisse.com/modheader/help/) to allow you to specify additional headers in your browser.
+1. Use a browser extension like [modheader](https://bewisse.com/modheader/help/) to allow you to specify additional headers in your browser.
 2. Go to https://pricing.api.infracost.io/graphql
 3. Set your `X-API-Key` using the browser extension
 4. Run GraphQL queries to find the correct products. Examples can be found here: https://github.com/infracost/cloud-pricing-api/tree/master/examples/queries
 
-> **Note:** The GraphQL pricing API limits the number of results returned to 1000, which can limit it's usefulness for exploring the data.
+> **Note:** The GraphQL pricing API limits the number of results returned to 1000, which can limit its usefulness for exploring the data.
 
 #### Tips
 
@@ -472,7 +475,7 @@ To do this Infracost supports passing usage data in through a usage YAML file. W
     request_duration_ms: 500      # Average duration of each request in milliseconds.
   ```
 
-The resource cost calcuation file (`internal/resources/*`) should describe the usage as `UsageItems` and container a helper to populate the resource arguments from usage data:
+The resource cost calculation file (`internal/resources/*`) should describe the usage as `UsageItems` and contain a helper to populate the resource arguments from usage data:
 ```go
 var LambdaFunctionUsageSchema = []*schema.UsageItem{
 	{Key: "request_duration_ms", DefaultValue: 0, ValueType: schema.Int64},
@@ -486,7 +489,8 @@ func (args *LambdaFunctionArguments) PopulateUsage(u *schema.UsageData) {
 	}
 }
 ```
-For an example of a resource with usage-based see the [AWS Lambda resource](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/lambda_function.go). This resource retrieves the quantities from the usage-file by calling `u.Get("monthly_requests")` and `u.Get("request_duration_ms")`. If these quantities are not provided then the `monthlyQuantity` is set to `nil`.
+
+For an example of a resource with usage-based cost components see the [AWS Lambda resource](https://github.com/infracost/infracost/blob/master/internal/providers/terraform/aws/lambda_function.go). This resource retrieves the quantities from the usage-file by calling `u.Get("monthly_requests")` and `u.Get("request_duration_ms")`. If these quantities are not provided then the `monthlyQuantity` is set to `nil`.
 
 When Infracost is run without usage data the output for this resource looks like:
 
@@ -512,7 +516,7 @@ When Infracost is run with the `--usage-file=path/to/infracost-usage.yml` flag t
 The following notes are general guidelines, please leave a comment in your pull request if they don't make sense or they can be improved for the resource you're adding.
 
 - references to other resources: if you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. The following example uses this because the price for `aws_ebs_snapshot` depends on the size of the referenced volume. You should always check the array length returned by `d.References` to avoid panics. You can also do nested lookups, e.g. `ReferenceAttributes: []string{"alias.0.name"}` to lookup the name of the first alias.
-	```go
+  ```go
 	func GetEBSSnapshotRegistryItem() *schema.RegistryItem {
 		return &schema.RegistryItem{
 			Name:                "aws_ebs_snapshot",
@@ -530,7 +534,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 		}
 		// ...
 	}
-	```
+  ```
 
 - count: do not include the count in the cost component name or in brackets. Terraform's `count` replicates a resource in `plan.json` file. If something like `desired_count` or other cost-related count parameter is included in the `plan.json` file, do use count when calculating the HourlyQuantity/MonthlyQuantity so each line-item in the Infracost output shows the total price/cost for that line-item.
 
@@ -540,16 +544,16 @@ The following notes are general guidelines, please leave a comment in your pull 
   - for things where the Terraform resource represents 1 unit, e.g. an `aws_instance`, an `aws_secretsmanager_secret` and a `google_dns_managed_zone`, the units should be months (or hours if that makes more sense). For everything else, the units should be whatever is being charged for, e.g. queries, requests.
 
   - for data transferred where you pay for the data per GB, then use `GB`.
-	
-  - for storage or other resources priced in Unit-months (e.g. `GB-months`), then use the unit by itself (`GB`).  The AWS pricing pages sometimes use a different unit than their own pricing API, in that case the pricing page is a better guide.
 
-  - for units priced in Unit-hours (e.g. `IOPS-hours`) but best understood in months, then use the unit by itself (`IOPS`) with an appropriate `UnitMultiplier`.  
+  - for storage or other resources priced in Unit-months (e.g. `GB-months`), then use the unit by itself (`GB`). The AWS pricing pages sometimes use a different unit than their own pricing API, in that case the pricing page is a better guide.
+
+  - for units priced in Unit-hours (e.g. `IOPS-hours`) but best understood in months, then use the unit by itself (`IOPS`) with an appropriate `UnitMultiplier`.
 
   - unit multiplier: when adding a `costComponent`, set the `UnitMultiplier` to 1 except:
-	
-	  - If the price is for a large number.  E.g. set `Unit: "1M requests", UnitMultiplier: 1000000` if the price should be shown "per 1M requests" in the output.
 
-    - If the price is for billing in Unit-hours but best understood in Unit-months.  E.g. set `Unit: "GB", UnitMultiplier: schema.HourToMonthUnitMultiplier` to show "per GB" in the output. 
+    - If the price is for a large number. E.g. set `Unit: "1M requests", UnitMultiplier: 1000000` if the price should be shown "per 1M requests" in the output.
+
+    - If the price is for billing in Unit-hours but best understood in Unit-months. E.g. set `Unit: "GB", UnitMultiplier: schema.HourToMonthUnitMultiplier` to show "per GB" in the output.
 
 - tiers in names: use the K postfix for thousand, M for million, B for billion and T for trillion, e.g. "Requests (first 300M)" and "Messages (first 1B)". Use the words "first", "next" and "over" when describing tiers. Units should not be included in brackets unless the cost component relates to storage or data transfer, e.g. "Storage (first 1TB)    GB" is more understandable than "Storage (first 1K)    GB" since users understand terabytes and petabytes. You should be able to use the `CalculateTierBuckets` method for calculating tier buckets.
 
@@ -565,8 +569,8 @@ The following notes are general guidelines, please leave a comment in your pull 
 
 - brackets: only use 1 set of brackets after a component name, e.g. `Database instance (on-demand, db.t3.medium)` and not `Database instance (on-demand) (db.t3.medium)`
 
-- free resources: if there are certain conditions that can be checked inside a resource Go file, which mean there are no cost components for the resource, return a `NoPrice: true` and `IsSkipped: true` response as shown below.
-	```go
+- free resources: if there are certain conditions that can be checked inside a resource Go file, which means there are no cost components for the resource, return a `NoPrice: true` and `IsSkipped: true` response as shown below.
+  ```go
 	// Gateway endpoints don't have a cost associated with them
 	if vpcEndpointType == "Gateway" {
 		return &schema.Resource{
@@ -575,15 +579,15 @@ The following notes are general guidelines, please leave a comment in your pull 
 			IsSkipped: true,
 		}
 	}
-	```
+  ```
 
-- unsupported resources: if there are certain conditions that can be checked inside a resource Go file, which mean that the resource is not yet supported, log a warning to explain what is not supported and return a `nil` response as shown below.
-	```go
+- unsupported resources: if there are certain conditions that can be checked inside a resource Go file, which means that the resource is not yet supported, log a warning to explain what is not supported and return a `nil` response as shown below.
+  ```go
 	if d.Get("placement_tenancy").String() == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
 		return nil
 	}
-	```
+  ```
 
 - to conditionally set values based on the Terraform resource values, first check `d.Get("value_name").Type != gjson.Null` like in the [google_container_cluster](https://github.com/infracost/infracost/blob/f7b0594c1ee7d13c0c37acb8edfb36dde223471a/internal/providers/terraform/google/container_cluster.go#L38-L42) resource. In the past we used `.Exists()` but this only checks that the key does not exist in the Terraform JSON, not that the key exists and is set to null.
 
@@ -610,20 +614,20 @@ The following notes are general guidelines, please leave a comment in your pull 
 ### Google
 
 - If the resource has a `zone` key, if they have a zone key, use this logic to get the region:
-	```go
+  ```go
 	region := d.Get("region").String()
 	zone := d.Get("zone").String()
 	if zone != "" {
 		region = zoneToRegion(zone)
 	}
-	```
+  ```
 
 ### Azure
 
 > **Note:** Developing Azure resources requires Azure creds. See below for details.
 
 - Unless the resource has global or zone-based pricing, the first line of the resource function should be `region := lookupRegion(d, []string{})` where the second parameter is an optional list of parent resources where the region can be found. See the following examples of how this method is used in other Azure resources.
-	```go
+  ```go
 	func GetAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
 		return &schema.RegistryItem{
 			Name:  "azurerm_app_service_certificate_binding",
@@ -639,18 +643,18 @@ The following notes are general guidelines, please leave a comment in your pull 
 		region := lookupRegion(d, []string{"certificate_id", "resource_group_name"})
 		...
 	}
-	```
+  ```
 
 - The Azure Terraform provider requires real credentials to be able to run `terraform plan`. This means you must have Azure credentials for running the Infracost commands and integration tests for Azure. We recommend creating read-only Azure credentials for this purpose. If you have an Azure subscription, you can do this by running the `az` command line:
-	```sh
-	az ad sp create-for-rbac --name http://InfracostReadOnly --role Reader --scope=/subscriptions/<SUBSCRIPTION ID> --years=10
-	```
-	If you do not have an Azure subscription, then please ask on the contributors channel on the Infracost Slack and we can provide you with credentials.
+  ```sh
+  az ad sp create-for-rbac --name http://InfracostReadOnly --role Reader --scope=/subscriptions/<SUBSCRIPTION ID> --years=10
+  ```
+  If you do not have an Azure subscription, then please ask on the contributors channel on the Infracost Slack and we can provide you with credentials.
 
-	To run the Azure integration tests in the GitHub action in pull requests, these credentials also need to be added to your fork's secrets. To do this:
+  To run the Azure integration tests in the GitHub action in pull requests, these credentials also need to be added to your fork's secrets. To do this:
 
-	1. Go to `https://github.com/<YOUR GITHUB NAME>/infracost/settings/secrets/actions`.
-	2. Add repository secrets for `ARM_SUBSCRIPTION_ID`, `ARM_TENANT_ID`, `ARM_CLIENT_ID` and `ARM_CLIENT_SECRET`.
+  1. Go to `https://github.com/<YOUR GITHUB NAME>/infracost/settings/secrets/actions`.
+  2. Add repository secrets for `ARM_SUBSCRIPTION_ID`, `ARM_TENANT_ID`, `ARM_CLIENT_ID` and `ARM_CLIENT_SECRET`.
 
 ## Code reviews
 
@@ -658,11 +662,11 @@ Here is a list of things we should look for during code review when adding new r
 
 - Is the [infracost-usage-example.yml](https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml) file updated with any new usage file parameters and descriptions?
 - Some common bugs that are discovered in reviews:
-	- case sensitive string comparisons: `d.Get("kind") ==` should be `strings.ToLower(d.Get("kind").String()) ==`
-	- case sensitive regex in price filters: `ValueRegex: strPtr(fmt.Sprintf("/%s/", deviceType))` should be `ValueRegex: strPtr(fmt.Sprintf("/%s/i", deviceType))`
-	- missing anchors in price filter regex: `fmt.Sprintf("/%s/", x)` when it should be `fmt.Sprintf("/^%s$/", x)`
-	- incorrect output capitalization: └─ Data Ingested should be └─ Data ingested
-	- misnamed unit: `GB-month` should be `GB`
+  - case sensitive string comparisons: `d.Get("kind") ==` should be `strings.ToLower(d.Get("kind").String()) ==`
+  - case sensitive regex in price filters: `ValueRegex: strPtr(fmt.Sprintf("/%s/", deviceType))` should be `ValueRegex: strPtr(fmt.Sprintf("/%s/i", deviceType))`
+  - missing anchors in price filter regex: `fmt.Sprintf("/%s/", x)` when it should be `fmt.Sprintf("/^%s$/", x)`
+  - incorrect output capitalization: └─ Data Ingested should be └─ Data ingested
+  - misnamed unit: `GB-month` should be `GB`
 - Any "Missing prices" or "Multiple prices" lines when running with `--log-level debug`?
 - Any incorrect prices or calculations?
 - Any [docs](https://www.infracost.io/docs/) pages need to be updated? e.g. the [supported resources](https://github.com/infracost/docs/blob/master/docs/supported_resources/) pages. If so, please open a PR so it can be merged after the CLI is released.
