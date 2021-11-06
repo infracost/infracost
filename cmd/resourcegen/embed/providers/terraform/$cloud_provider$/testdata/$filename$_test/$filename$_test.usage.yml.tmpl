@@ -3,6 +3,13 @@ resource_usage:
 {{- if .WithHelp }}
 # If {{ .ResourceName }} has any defined usage parameters uncomment the lines below.
 # Then add your configurations making sure to change the names of resource/usage params.
+#
 # {{ .CloudProvider }}_{{ .Filename }}.{{ .Filename }}:
 #   my_usage_parameter: 100000000
+#
+# Also add a usage example into the infracost-usage-example.yml with comments
+# describing each parameter (be aware that its resources are ordered alphabetically):
+#
+# {{ .CloudProvider }}_{{ .Filename }}.my_{{ .Filename }}:
+#   my_usage_parameter: 100000000 # Monthly requests to the resource
 {{ end }}
