@@ -91,6 +91,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetWafWebACLRegistryItem(),
 	GetStepFunctionRegistryItem(),
 	getDirectoryServiceDirectory(),
+	getTransferServerRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -341,6 +342,11 @@ var FreeResources = []string{
 	"aws_ssm_patch_baseline",
 	"aws_ssm_patch_group",
 	"aws_ssm_resource_data_sync",
+
+	// AWS Transfer Family
+	"aws_transfer_access",
+	"aws_transfer_ssh_key",
+	"aws_transfer_user",
 
 	// AWS VPC
 	"aws_customer_gateway",

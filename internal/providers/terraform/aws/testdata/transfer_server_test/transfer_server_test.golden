@@ -1,0 +1,19 @@
+
+ Name                                                 Monthly Qty  Unit            Monthly Cost 
+                                                                                                
+ aws_transfer_server.default_no_protocols                                                       
+ ├─ FTPS protocol enabled                                     730  hours                $219.00 
+ ├─ Data downloaded                                 Monthly cost depends on usage: $0.04 per GB 
+ └─ Data uploaded                                   Monthly cost depends on usage: $0.04 per GB 
+                                                                                                
+ aws_transfer_server.multiple_protocols_with_usage                                              
+ ├─ FTP protocol enabled                                      730  hours                $219.00 
+ ├─ FTPS protocol enabled                                     730  hours                $219.00 
+ ├─ SFTP protocol enabled                                     730  hours                $219.00 
+ ├─ Data downloaded                                            50  GB                     $2.00 
+ └─ Data uploaded                                              10  GB                     $0.40 
+                                                                                                
+ OVERALL TOTAL                                                                          $878.40 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file

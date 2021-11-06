@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  aws_transfer_server.multiple_protocols_with_usage:
+    monthly_data_downloaded_gb: 50
+    monthly_data_uploaded_gb: 10
