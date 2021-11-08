@@ -345,6 +345,10 @@ resource_usage:
     instance_tier: standard # Instance tier being used, can be: standard, advanced.
     instances: 100          # Number of instances being managed.
 
+  aws_transfer_server.my_transfer_server:
+    monthly_data_downloaded_gb: 50 # Monthly data downloaded over enabled protocols in GB.
+    monthly_data_uploaded_gb: 10 # Monthly data uploaded over enabled protocols in GB.
+
   aws_vpc_endpoint.my_endpoint:
     monthly_data_processed_gb: 1000 # Monthly data processed by the VPC endpoint(s) in GB.
 
