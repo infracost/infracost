@@ -33,6 +33,12 @@ var TransferServerUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_data_uploaded_gb", DefaultValue: 0, ValueType: schema.Float64},
 }
 
+// Names of resource's service/product family to use in price search
+var (
+	resourceService       = strPtr("AWSTransfer")
+	resourceProductFamily = strPtr("AWS Transfer Family")
+)
+
 // PopulateUsage parses the u schema.UsageData into the TransferServer.
 // It uses the `infracost_usage` struct tags to populate data into the TransferServer.
 func (t *TransferServer) PopulateUsage(u *schema.UsageData) {
@@ -44,37 +50,25 @@ func (t *TransferServer) PopulateUsage(u *schema.UsageData) {
 func (t *TransferServer) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
-	service := "AWSTransfer"
-	productFamily := "AWS Transfer Family"
-
 	for _, protocol := range t.Protocols {
 		costComponents = append(costComponents,
-			newProtocolCostComponent(
+			t.newProtocolCostComponent(
 				protocol,
 				"[A-Z0-9]*-ProtocolHours",
-				t.Region,
-				service,
-				productFamily,
 			),
 		)
 	}
 
 	costComponents = append(costComponents,
-		newDataTransferCostComponent(
+		t.newDataTransferCostComponent(
 			"Data downloaded",
 			t.MonthlyDataDownloadedGB,
 			"[A-Z0-9]*-DownloadBytes",
-			t.Region,
-			service,
-			productFamily,
 		),
-		newDataTransferCostComponent(
+		t.newDataTransferCostComponent(
 			"Data uploaded",
 			t.MonthlyDataUploadedGB,
 			"[A-Z0-9]*-UploadBytes",
-			t.Region,
-			service,
-			productFamily,
 		),
 	)
 
@@ -85,25 +79,18 @@ func (t *TransferServer) BuildResource() *schema.Resource {
 	}
 }
 
-func newProtocolCostComponent(protocol string, usageType string, region string, service string, productFamily string) *schema.CostComponent {
-	// This value can be used for any storage type as their pricing is
-	// identical, but for some protocols EFS prices are missing in the pricing API.
-	storageType := "S3"
-
+func (t *TransferServer) newProtocolCostComponent(protocol string, usageType string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("%s protocol enabled", protocol),
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr(service),
-			ProductFamily: strPtr(productFamily),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", usageType))},
-				{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/^%s:%s$/i", protocol, storageType))},
-			},
+			VendorName:       strPtr("aws"),
+			Region:           strPtr(t.Region),
+			Service:          resourceService,
+			ProductFamily:    resourceProductFamily,
+			AttributeFilters: t.getAttributeFilters(protocol, usageType),
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
@@ -111,10 +98,9 @@ func newProtocolCostComponent(protocol string, usageType string, region string, 
 	}
 }
 
-func newDataTransferCostComponent(name string, quantity *float64, usageType string, region string, service string, productFamily string) *schema.CostComponent {
-	// This value can be used for any protocol/storage type as their pricing is
-	// identical, but for some protocols EFS prices are missing in the pricing API.
-	storageType := "FTP:S3"
+func (t *TransferServer) newDataTransferCostComponent(name string, quantity *float64, usageType string) *schema.CostComponent {
+	// The pricing is identical for all protocols and the traffic is combined
+	transferProtocol := "FTP"
 
 	return &schema.CostComponent{
 		Name:            name,
@@ -122,17 +108,24 @@ func newDataTransferCostComponent(name string, quantity *float64, usageType stri
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: floatPtrToDecimalPtr(quantity),
 		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr(service),
-			ProductFamily: strPtr(productFamily),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", usageType))},
-				{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", storageType))},
-			},
+			VendorName:       strPtr("aws"),
+			Region:           strPtr(t.Region),
+			Service:          resourceService,
+			ProductFamily:    resourceProductFamily,
+			AttributeFilters: t.getAttributeFilters(transferProtocol, usageType),
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+	}
+}
+func (t *TransferServer) getAttributeFilters(protocol string, usageType string) []*schema.AttributeFilter {
+	// The pricing for all storage types is identical, but for some protocols
+	// EFS prices are missing in the pricing API.
+	storageType := "S3"
+
+	return []*schema.AttributeFilter{
+		{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", usageType))},
+		{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/^%s:%s$/i", protocol, storageType))},
 	}
 }
