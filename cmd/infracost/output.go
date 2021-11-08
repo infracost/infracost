@@ -33,7 +33,15 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
   Merge multiple Infracost JSON files:
 
-      infracost output --format json --path "out*.json"`,
+      infracost output --format json --path "out*.json"
+
+  Create markdown report from multiple Infracost JSON files:
+
+      infracost output --format markdown --path "out*.json"
+
+  Create an HTML enhanced markdown report from multiple Infracost JSON files:
+
+      infracost output --format markdown-html --path "out*.json"`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFiles := []string{}
@@ -136,6 +144,11 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				b, err = output.ToHTML(combined, opts)
 			case "diff":
 				b, err = output.ToDiff(combined, opts)
+			case "markdown":
+				b, err = output.ToMarkdown(combined, opts)
+			case "markdown-html":
+				opts.IncludeHTML = true
+				b, err = output.ToMarkdown(combined, opts)
 			default:
 				b, err = output.ToTable(combined, opts)
 			}
@@ -153,7 +166,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
 
-	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
+	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, markdown, markdown-html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
 
