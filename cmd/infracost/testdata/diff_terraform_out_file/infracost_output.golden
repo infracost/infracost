@@ -1,0 +1,95 @@
+Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
+
++ aws_instance.web_app
+  +$743
+
+    + Instance usage (Linux/UNIX, on-demand, m5.4xlarge)
+      +$561
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$5.00
+
+    + ebs_block_device[0]
+    
+        + Storage (provisioned IOPS SSD, io1)
+          +$125
+    
+        + Provisioned IOPS
+          +$52.00
+
++ aws_instance.zero_cost_instance
+  +$743
+
+    + Instance usage (Linux/UNIX, on-demand, m5.4xlarge)
+      +$561
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$5.00
+
+    + ebs_block_device[0]
+    
+        + Storage (provisioned IOPS SSD, io1)
+          +$125
+    
+        + Provisioned IOPS
+          +$52.00
+
++ aws_lambda_function.hello_world
+  Monthly cost depends on usage
+
+    + Requests
+      Monthly cost depends on usage
+        +$0.20 per 1M requests
+
+    + Duration
+      Monthly cost depends on usage
+        +$0.0000166667 per GB-seconds
+
++ aws_lambda_function.zero_cost_lambda
+  Monthly cost depends on usage
+
+    + Requests
+      Monthly cost depends on usage
+        +$0.20 per 1M requests
+
+    + Duration
+      Monthly cost depends on usage
+        +$0.0000166667 per GB-seconds
+
++ aws_s3_bucket.usage
+  Monthly cost depends on usage
+
+    + Standard
+    
+        + Storage
+          Monthly cost depends on usage
+            +$0.023 per GB
+    
+        + PUT, COPY, POST, LIST requests
+          Monthly cost depends on usage
+            +$0.005 per 1k requests
+    
+        + GET, SELECT, and all other requests
+          Monthly cost depends on usage
+            +$0.0004 per 1k requests
+    
+        + Select data scanned
+          Monthly cost depends on usage
+            +$0.002 per GB
+    
+        + Select data returned
+          Monthly cost depends on usage
+            +$0.0007 per GB
+
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/example_plan.json
+Amount:  +$1,485 ($0.00 → $1,485)
+
+──────────────────────────────────
+Key: ~ changed, + added, - removed
+
+5 cloud resources were detected, rerun with --show-skipped to see details:
+∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file

@@ -1,9 +1,12 @@
 package main_test
 
 import (
+	"io/ioutil"
+	"path/filepath"
 	"testing"
 
 	"github.com/infracost/infracost/internal/testutil"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDiffHelp(t *testing.T) {
@@ -20,6 +23,20 @@ func TestDiffTerraformDirectory(t *testing.T) {
 
 func TestDiffTerraformShowSkipped(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/azure_firewall_plan.json", "--show-skipped"}, nil)
+}
+
+func TestDiffTerraformOutFile(t *testing.T) {
+	testdataName := testutil.CalcGoldenFileTestdataDirName()
+	goldenFilePath := "./testdata/" + testdataName + "/infracost_output.golden"
+	outputPath := filepath.Join(t.TempDir(), "infracost_output.txt")
+
+	GoldenFileCommandTest(t, testdataName, []string{"diff", "--path", "./testdata/example_plan.json", "--out-file", outputPath}, nil)
+
+	actual, err := ioutil.ReadFile(outputPath)
+	require.Nil(t, err)
+	actual = stripDynamicValues(actual)
+
+	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 
 // Need to figure out how to capture synced file before we enable this
