@@ -39,6 +39,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			inputFiles := []string{}
 
 			paths, _ := cmd.Flags().GetStringArray("path")
+
 			for _, path := range paths {
 				expanded, err := homedir.Expand(path)
 				if err != nil {
@@ -143,19 +144,28 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			cmd.Println(string(b))
+			if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
+				err = saveOutFile(cmd, outFile, b)
+				if err != nil {
+					return err
+				}
+			} else {
+				cmd.Println(string(b))
+			}
 
 			return nil
 		},
 	}
 
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files")
-	_ = cmd.MarkFlagRequired("path")
-	_ = cmd.MarkFlagFilename("path", "json")
+	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
+
+	_ = cmd.MarkFlagRequired("path")
+	_ = cmd.MarkFlagFilename("path", "json")
 
 	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"table", "json", "html"}, cobra.ShellCompDirectiveDefault
