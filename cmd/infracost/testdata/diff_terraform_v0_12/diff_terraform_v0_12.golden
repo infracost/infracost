@@ -1,4 +1,3 @@
-
 Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.12_plan.json
 
 + aws_instance.instance_2

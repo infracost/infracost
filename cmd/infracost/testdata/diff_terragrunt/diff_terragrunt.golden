@@ -1,4 +1,3 @@
-
 Project: infracost/infracost/examples/terragrunt/dev
 
 + aws_instance.web_app

@@ -1,4 +1,3 @@
-
 Project: infracost/infracost/examples/terraform
 
 + aws_instance.web_app
