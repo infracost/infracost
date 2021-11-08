@@ -1,0 +1,14 @@
+{{- if .WithHelp -}}
+# Add your expected Infracost output for {{ .ResourceName }} below.
+# Test output can be populated into this file by running the following cmd from the root directory:
+#
+# INFRACOST_LOG_LEVEL=warn go test ./internal/providers/terraform/{{ .CloudProvider }}/{{ .Filename }}_test.go -v -update
+#
+# Be sure to check the output matches the expected pricing for {{ .ResourceName }}.
+{{- else -}}
+# Run:
+#
+# INFRACOST_LOG_LEVEL=warn go test ./internal/providers/terraform/{{ .CloudProvider }}/{{ .Filename }}_test.go -v -update
+#
+# to update this file with golden file outputs.
+{{ end }}

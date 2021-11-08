@@ -1,0 +1,48 @@
+package {{ .CloudProvider }}
+
+import (
+	"github.com/infracost/infracost/internal/resources/{{ .CloudProvider }}"
+	"github.com/infracost/infracost/internal/schema"
+
+	"strings"
+)
+
+func get{{.ResourceName}}RegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:  "{{ .CloudProvider }}_{{ .Filename }}",
+		RFunc: new{{ .ResourceName }},
+	}
+}
+
+func new{{ .ResourceName }}(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	{{- if .WithHelp }}
+	// In new{{.ResourceName}} we parse the resource data coming from d
+	// into the underlying {{ .ResourceName }}. We use schema.ResourceData lookup
+	// to find data stored on attributes in the resource. This can be done as follows:
+	region := d.Get("region").String()
+	sku := d.Get("sku_name").String()
+	count := d.Get("terraformFieldThatHasNumberOfInstances").Int()
+
+	usageType := "adefault"
+	if !d.IsEmpty("usageType") {
+		usageType = d.Get("usageType").String()
+	}
+
+	{{ .ResourceLetter }} := &{{ .CloudProvider }}.{{ .ResourceName }}{
+		Address:       d.Address,
+		Region:        region,
+		InstanceCount: count,
+		InstanceType:  strings.Split(sku, "_")[0],
+		UsageType: usageType,
+	}
+
+	{{- else }}
+	{{ .ResourceLetter }} := &{{ .CloudProvider }}.{{ .ResourceName }}{
+		Address:       d.Address,
+		Region:        d.Get("region").String(),
+	}
+	{{- end }}
+	{{ .ResourceLetter }}.PopulateUsage(u)
+
+	return {{ .ResourceLetter }}.BuildResource()
+}
