@@ -18,11 +18,11 @@ process_args () {
   fi
 
   # Set defaults
-  if [ ! -z "$percentage_threshold" ] && [ ! -z "$post_condition" ]; then
+  if [ -n "$percentage_threshold" ] && [ -n "$post_condition" ]; then
     if [ "$atlantis_debug" = "true" ]; then
       echo "Warning: percentage_threshold is deprecated, using post_condition instead"
     fi
-  elif [ ! -z "$percentage_threshold" ]; then
+  elif [ -n "$percentage_threshold" ]; then
     post_condition="{\"percentage_threshold\": $percentage_threshold}"
     if [ "$atlantis_debug" = "true" ]; then
       echo "Warning: percentage_threshold is deprecated and will be removed in v0.9.0, please use post_condition='{\"percentage_threshold\": \"0\"}'"
@@ -30,7 +30,7 @@ process_args () {
   else
     post_condition=${post_condition:-'{"has_diff": true}'}
   fi
-  if [ ! -z "$post_condition" ] && [ "$(echo "$post_condition" | jq '.percentage_threshold')" != "null" ]; then
+  if [ -n "$post_condition" ] && [ "$(echo "$post_condition" | jq '.percentage_threshold')" != "null" ]; then
     percentage_threshold=$(echo "$post_condition" | jq -r '.percentage_threshold')
   fi
   percentage_threshold=${percentage_threshold:-0}
@@ -42,16 +42,16 @@ process_args () {
 }
 
 build_breakdown_cmd () {
-  breakdown_cmd="${INFRACOST_BINARY} breakdown --no-color --format json"
+  breakdown_cmd="$INFRACOST_BINARY breakdown --no-color --format json"
 
-  if [ ! -z "$usage_file" ]; then
+  if [ -n "$usage_file" ]; then
     if [ "$sync_usage_file" = "true" ] || [ "$sync_usage_file" = "True" ] || [ "$sync_usage_file" = "TRUE" ]; then
       breakdown_cmd="$breakdown_cmd --sync-usage-file --usage-file $usage_file"
     else
       breakdown_cmd="$breakdown_cmd --usage-file $usage_file"
     fi
   fi
-  if [ ! -z "$config_file" ]; then
+  if [ -n "$config_file" ]; then
     breakdown_cmd="$breakdown_cmd --config-file $config_file"
   else
     if [ -f "$PLANFILE.json" ]; then
@@ -62,26 +62,43 @@ build_breakdown_cmd () {
       echo "Error: PLANFILE '$PLANFILE' does not exist"
     fi
   fi
-  if [ "$atlantis_debug" != "true" ]; then
-    breakdown_cmd="$breakdown_cmd 2>/dev/null"
-  fi
-
   echo "$breakdown_cmd"
 }
 
 build_output_cmd () {
-  output_cmd="${INFRACOST_BINARY} output --no-color --format diff --path $1"
-  if [ ! -z "$show_skipped" ]; then
+  output_cmd="$INFRACOST_BINARY output --no-color --format diff --path $1"
+  if [ -n "$show_skipped" ]; then
     # The "=" is important as otherwise the value of the flag is ignored by the CLI
     output_cmd="$output_cmd --show-skipped=$show_skipped"
   fi
   echo "${output_cmd}"
 }
 
+build_msg () {
+  local percent_display
+  local change_word
+  local msg
+
+  percent_display=$(percent_display "$past_total_monthly_cost" "$total_monthly_cost" | sed "s/%/%%/g")
+  change_word=$(change_word "$past_total_monthly_cost" "$total_monthly_cost")
+
+  msg="##### Infracost estimate #####"
+  msg="${msg}\n\n"
+  msg="${msg}Monthly cost will $change_word by $(format_cost $diff_total_monthly_cost)$percent_display\n"
+  msg="${msg}\n"
+  msg="${msg}Previous monthly cost: $(format_cost $past_total_monthly_cost)\n"
+  msg="${msg}New monthly cost: $(format_cost $total_monthly_cost)\n"
+  msg="${msg}\n"
+  msg="${msg}Infracost output:\n"
+  msg="${msg}\n"
+  msg="${msg}$(echo "$diff_output" | sed 's/^/    /' | sed "s/%/%%/g")\n"
+  printf "$msg"
+}
+
 format_cost () {
   cost=$1
 
-  if [ -z "$cost" ] || [ "${cost}" = "null" ]; then
+  if [ -z "$cost" ] || [ "$cost" = "null" ]; then
     echo "-"
   elif [ "$(echo "$cost < 100" | bc -l)" = 1 ]; then
     printf "$currency%0.2f" "$cost"
@@ -90,31 +107,78 @@ format_cost () {
   fi
 }
 
-build_msg () {
-  change_word="increase"
-  change_sym="+"
-  if [ $(echo "$total_monthly_cost < ${past_total_monthly_cost}" | bc -l) = 1 ]; then
+calculate_percentage () {
+  local old=$1
+  local new=$2
+
+  local percent=""
+
+  # If both old and new costs are greater than 0
+  if [ "$(echo "$old > 0" | bc -l)" = 1 ] && [ "$(echo "$new > 0" | bc -l)" = 1 ]; then
+    percent="$(echo "scale=6; $new / $old * 100 - 100" | bc)"
+  fi
+
+  # If both old and new costs are less than or equal to 0
+  if [ "$(echo "$old <= 0" | bc -l)" = 1 ] && [ "$(echo "$new <= 0" | bc -l)" = 1 ]; then
+    percent="0"
+  fi
+
+  printf "%s" "$percent"
+}
+
+change_emoji () {
+  local old=$1
+  local new=$2
+
+  local change_emoji="📈"
+  if [ "$(echo "$new < $old" | bc -l)" = 1 ]; then
+    change_emoji="📉"
+  fi
+
+  printf "%s" "$change_emoji"
+}
+
+change_word () {
+  local old=$1
+  local new=$2
+
+  local change_word="increase"
+  if [ "$(echo "$new < $old" | bc -l)" = 1 ]; then
     change_word="decrease"
-    change_sym=""
   fi
 
-  percent_display=""
-  if [ ! -z "$percent" ]; then
-    percent_display="$(printf "%.0f" $percent)"
-    percent_display=" (${change_sym}${percent_display}%%)"
+  printf "%s" "$change_word"
+}
+
+change_symbol () {
+  local old=$1
+  local new=$2
+
+  local change_symbol="+"
+  if [ "$(echo "$new < $old" | bc -l)" = 1 ]; then
+    change_symbol=""
   fi
 
-  msg="##### Infracost estimate #####"
-  msg="${msg}\n\n"
-  msg="${msg}Monthly cost will ${change_word} by $(format_cost $diff_cost)$percent_display\n"
-  msg="${msg}\n"
-  msg="${msg}Previous monthly cost: $(format_cost $past_total_monthly_cost)\n"
-  msg="${msg}New monthly cost: $(format_cost $total_monthly_cost)\n"
-  msg="${msg}\n"
-  msg="${msg}Infracost output:\n"
-  msg="${msg}\n"
-  msg="${msg}$(echo "${diff_output}" | sed 's/^/    /' | sed "s/%/%%/g")\n"
-  printf "$msg"
+  printf "%s" "$change_symbol"
+}
+
+percent_display () {
+  local old=$1
+  local new=$2
+
+  local percent
+  local sym
+
+  percent=$(calculate_percentage "$old" "$new")
+  sym=$(change_symbol "$old" "$new")
+
+  local s=""
+  if [ -n "$percent" ]; then
+    s="$(printf "%.0f" "$percent")"
+    s=" ($sym$s%%)"
+  fi
+
+  printf "%s" "$s"
 }
 
 post_to_slack () {
@@ -158,9 +222,10 @@ if [ "$atlantis_debug" = "true" ]; then
 fi
 diff_output=$(cat infracost_output_cmd | sh)
 
-past_total_monthly_cost=$(jq '[.projects[].pastBreakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
-total_monthly_cost=$(jq '[.projects[].breakdown.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
-diff_cost=$(jq '[.projects[].diff.totalMonthlyCost | select (.!=null) | tonumber] | add' infracost_breakdown.json)
+project_count=$(jq -r '.projects | length' infracost_breakdown.json)
+past_total_monthly_cost=$(jq '(.pastTotalMonthlyCost // 0) | tonumber' infracost_breakdown.json)
+total_monthly_cost=$(jq '(.totalMonthlyCost // 0) | tonumber' infracost_breakdown.json)
+diff_total_monthly_cost=$(jq '(.diffTotalMonthlyCost // 0) | tonumber' infracost_breakdown.json)
 currency=$(jq -r '.currency | select (.!=null)' infracost_breakdown.json)
 if [ "$currency" = "" ] || [ "$currency" = "USD" ]; then
   currency="$"
@@ -172,15 +237,7 @@ else
   currency="$currency " # Space is needed so output is "INR 123"
 fi
 
-# If both old and new costs are greater than 0
-if [ $(echo "$past_total_monthly_cost > 0" | bc -l) = 1 ] && [ $(echo "$total_monthly_cost > 0" | bc -l) = 1 ]; then
-  percent=$(echo "scale=6; $total_monthly_cost / $past_total_monthly_cost * 100 - 100" | bc)
-fi
-
-# If both old and new costs are less than or equal to 0
-if [ $(echo "$past_total_monthly_cost <= 0" | bc -l) = 1 ] && [ $(echo "$total_monthly_cost <= 0" | bc -l) = 1 ]; then
-  percent=0
-fi
+percent=$(calculate_percentage "$past_total_monthly_cost" "$total_monthly_cost")
 
 absolute_percent=$(echo $percent | tr -d -)
 diff_resources=$(jq '[.projects[].diff.resources[]] | add' infracost_breakdown.json)
@@ -218,7 +275,7 @@ fi
 msg="$(build_msg)"
 echo "$msg"
 
-if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
+if [ -n "$SLACK_WEBHOOK_URL" ]; then
   post_to_slack
 fi
 
