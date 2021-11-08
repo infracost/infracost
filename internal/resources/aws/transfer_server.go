@@ -33,12 +33,6 @@ var TransferServerUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_data_uploaded_gb", DefaultValue: 0, ValueType: schema.Float64},
 }
 
-// Names of resource's service/product family to use in price search
-var (
-	resourceService       = strPtr("AWSTransfer")
-	resourceProductFamily = strPtr("AWS Transfer Family")
-)
-
 // PopulateUsage parses the u schema.UsageData into the TransferServer.
 // It uses the `infracost_usage` struct tags to populate data into the TransferServer.
 func (t *TransferServer) PopulateUsage(u *schema.UsageData) {
@@ -88,8 +82,8 @@ func (t *TransferServer) newProtocolCostComponent(protocol string, usageType str
 		ProductFilter: &schema.ProductFilter{
 			VendorName:       strPtr("aws"),
 			Region:           strPtr(t.Region),
-			Service:          resourceService,
-			ProductFamily:    resourceProductFamily,
+			Service:          strPtr(t.serviceName()),
+			ProductFamily:    strPtr(t.productFamilyName()),
 			AttributeFilters: t.getAttributeFilters(protocol, usageType),
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -110,8 +104,8 @@ func (t *TransferServer) newDataTransferCostComponent(name string, quantity *flo
 		ProductFilter: &schema.ProductFilter{
 			VendorName:       strPtr("aws"),
 			Region:           strPtr(t.Region),
-			Service:          resourceService,
-			ProductFamily:    resourceProductFamily,
+			Service:          strPtr(t.serviceName()),
+			ProductFamily:    strPtr(t.productFamilyName()),
 			AttributeFilters: t.getAttributeFilters(transferProtocol, usageType),
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -119,6 +113,15 @@ func (t *TransferServer) newDataTransferCostComponent(name string, quantity *flo
 		},
 	}
 }
+
+func (t *TransferServer) serviceName() string {
+	return "AWSTransfer"
+}
+
+func (t *TransferServer) productFamilyName() string {
+	return "AWS Transfer Family"
+}
+
 func (t *TransferServer) getAttributeFilters(protocol string, usageType string) []*schema.AttributeFilter {
 	// The pricing for all storage types is identical, but for some protocols
 	// EFS prices are missing in the pricing API.
