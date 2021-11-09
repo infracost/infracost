@@ -19,12 +19,8 @@ func TestOutputFormatJSON(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "json", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json"}, opts)
 }
 
-func TestOutputFormatMarkdown(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "markdown", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json"}, nil)
-}
-
-func TestOutputFormatMarkdownHTML(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "markdown-html", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json"}, nil)
+func TestOutputFormatGithubComment(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "github-comment", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json"}, nil)
 }
 
 func TestOutputFormatTable(t *testing.T) {
