@@ -79,7 +79,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	}
 
 	if len(noDiffProjects) > 0 {
-		s += "──────────────────────────────────\n"
+		s += "\n\n──────────────────────────────────\n"
 		s += fmt.Sprintf("\nThe following projects have no cost estimate changes: %s", strings.Join(noDiffProjects, ", "))
 		s += fmt.Sprintf("\nRun %s to see their full breakdown.", ui.PrimaryString("infracost breakdown"))
 	}

@@ -16,10 +16,14 @@ EXAMPLES
 
       infracost output --format json --path "out*.json"
 
+  Create markdown report suitable for posting in a GitHub comment:
+
+      infracost output --format github-comment --path "out*.json"
+
 FLAGS
       --fields strings     Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.
                            Supported by table and html output formats (default [monthlyQuantity,unit,monthlyCost])
-      --format string      Output format: json, diff, table, html (default "table")
+      --format string      Output format: json, diff, table, html, github-comment (default "table")
   -h, --help               help for output
   -p, --path stringArray   Path to Infracost JSON files
       --show-skipped       Show unsupported resources, some of which might be free

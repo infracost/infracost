@@ -287,3 +287,61 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     </div>
   </body>
 </html>`
+
+var CommentMarkdownTemplate = `
+{{- define "summaryRow"}}
+    <tr>
+      <td>{{ truncateProjectName .Name }}</td>
+      <td align="right">{{ formatCost .PastCost }}</td>
+      <td align="right">{{ formatCost .Cost }}</td>
+      <td>{{ formatCostChange .PastCost .Cost }}</td>
+    </tr>
+{{- end}}
+
+{{- if increasing .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }} 
+💰 Infracost estimate: **monthly cost will increase by {{ formatCostChange .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }} 📈
+{{- else }}
+💰 Infracost estimate: **monthly cost will decrease by {{ formatCostChange .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }} 📉
+{{- end }}
+
+{{- if .Options.IncludeHTML }}
+<table>
+  <thead>
+    <td>Project</td>
+    <td>Previous</td>
+    <td>New</td>
+    <td>Diff</td>
+  </thead>
+  <tbody>
+{{- range .Root.Projects }}
+	{{- if hasDiff . }}
+    	{{- template "summaryRow" dict "Name" .Name "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+	{{- end }}
+{{- end }}
+{{- if gt (len .Root.Projects) 1  }}
+    {{- template "summaryRow" dict "Name" "All projects" "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
+{{- end }}
+  </tbody>
+</table>
+    
+{{- if .SkippedProjects }} 
+The following projects have no cost estimate changes: {{ .SkippedProjects }}
+
+{{ end }}
+<details>
+<summary><strong>Infracost output</strong></summary>
+{{- else }}
+Previous monthly cost: {{ formatCost .Root.PastTotalMonthlyCost }}
+New monthly cost: {{ formatCost .Root.TotalMonthlyCost }}
+
+**Infracost output:**
+{{- end }}
+
+` + "```" /* can't escape backticks */ + `
+{{ .DiffOutput }}
+` + "```" /* can't escape backticks */ + `
+
+{{- if .Options.IncludeHTML }}
+</details>
+{{- end}}
+`

@@ -35,7 +35,11 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
   Merge multiple Infracost JSON files:
 
-      infracost output --format json --path "out*.json"`,
+      infracost output --format json --path "out*.json"
+
+  Create markdown report suitable for posting in a GitHub comment:
+
+      infracost output --format github-comment --path "out*.json"`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFiles := []string{}
@@ -140,6 +144,9 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				b, err = output.ToHTML(combined, opts)
 			case "diff":
 				b, err = output.ToDiff(combined, opts)
+			case "github-comment":
+				opts.IncludeHTML = true
+				b, err = output.ToMarkdown(combined, opts)
 			default:
 				b, err = output.ToTable(combined, opts)
 			}
@@ -163,7 +170,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
 
-	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
+	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
 
