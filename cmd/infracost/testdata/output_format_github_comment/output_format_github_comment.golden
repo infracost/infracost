@@ -1,5 +1,5 @@
  
-💰 Infracost estimate: **monthly cost will increase by $1,321 +814% 📈
+💰 Infracost estimate: **monthly cost will increase by $1,321 (+814%) 📈
 <table>
   <thead>
     <td>Project</td>
@@ -18,13 +18,13 @@
       <td>infracost/infracost/cmd/infraco.../testdata/terraform_v0.14_plan.json</td>
       <td align="right">$40.56</td>
       <td align="right">$81.12</td>
-      <td>$40.56 +100%</td>
+      <td>$40.56 (+100%)</td>
     </tr>
     <tr>
       <td>All projects</td>
       <td align="right">$162</td>
       <td align="right">$1,483</td>
-      <td>$1,321 +814%</td>
+      <td>$1,321 (+814%)</td>
     </tr>
   </tbody>
 </table> 

@@ -37,7 +37,7 @@ func ToMarkdown(out Root, opts Options) ([]byte, error) {
 
 			percentChange := formatPercentChange(pastCost, cost)
 			if len(percentChange) > 0 {
-				percentChange = " " + percentChange
+				percentChange = " " + "(" + percentChange + ")"
 			}
 
 			// can't just use out.DiffTotalMonthlyCost because it isn't set if there is no past cost
