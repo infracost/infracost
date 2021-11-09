@@ -103,6 +103,7 @@ type Options struct {
 	GroupLabel       string
 	GroupKey         string
 	Fields           []string
+	IncludeHTML      bool
 }
 
 func outputBreakdown(resources []*schema.Resource) *Breakdown {

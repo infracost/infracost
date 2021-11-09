@@ -23,6 +23,10 @@ func TestOutputFormatJSON(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "json", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json"}, opts)
 }
 
+func TestOutputFormatGithubComment(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "github-comment", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json"}, nil)
+}
+
 func TestOutputFormatTable(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "table", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json"}, nil)
 }

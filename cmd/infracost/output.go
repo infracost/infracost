@@ -6,11 +6,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/mod/semver"
 )
@@ -33,7 +35,11 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
   Merge multiple Infracost JSON files:
 
-      infracost output --format json --path "out*.json"`,
+      infracost output --format json --path "out*.json"
+
+  Create markdown report suitable for posting in a GitHub comment:
+
+      infracost output --format github-comment --path "out*.json"`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFiles := []string{}
@@ -86,6 +92,8 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			format, _ := cmd.Flags().GetString("format")
+			ctx.SetContextValue("outputFormat", format)
+
 			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
 
@@ -137,11 +145,20 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				b, err = output.ToHTML(combined, opts)
 			case "diff":
 				b, err = output.ToDiff(combined, opts)
+			case "github-comment":
+				opts.IncludeHTML = true
+				b, err = output.ToMarkdown(combined, opts)
 			default:
 				b, err = output.ToTable(combined, opts)
 			}
 			if err != nil {
 				return err
+			}
+
+			pricingClient := apiclient.NewPricingAPIClient(ctx.Config)
+			err = pricingClient.AddEvent("infracost-output", ctx.EventEnv())
+			if err != nil {
+				log.Errorf("Error reporting event: %s", err)
 			}
 
 			if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
@@ -160,7 +177,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files")
 	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
 
-	cmd.Flags().String("format", "table", "Output format: json, diff, table, html")
+	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
 
