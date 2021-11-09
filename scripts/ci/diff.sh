@@ -177,7 +177,9 @@ build_msg () {
     if [ -n "$update_msg" ]; then
       msg+="\n$update_msg\n\n"
     fi
-    msg+="<sub><a href='https://infracost.io/feedback' rel='noopener noreferrer' target='_blank'>How can this comment be more helpful?</a></sub>\n"
+    msg+="<sub>\n"
+    msg+="  Is this comment useful? <a href=\"https://www.infracost.io/feedback/submit?value=yes\" rel=\"noopener noreferrer\" target=\"_blank\">Yes</a>, <a href=\"https://www.infracost.io/feedback/submit?value=no\" rel=\"noopener noreferrer\" target=\"_blank\">No</a>\n"
+    msg+="</sub>\n"
   fi
   
   printf "$msg"
