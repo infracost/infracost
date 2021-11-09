@@ -12,6 +12,27 @@ import (
 	"github.com/Masterminds/sprig"
 )
 
+func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipMinusSign bool) string {
+	if pastCost != nil && pastCost.Equals(*cost) {
+		return "$0"
+	}
+
+	percentChange := formatPercentChange(pastCost, cost)
+	if len(percentChange) > 0 {
+		percentChange = " " + "(" + percentChange + ")"
+	}
+
+	// can't just use out.DiffTotalMonthlyCost because it isn't set if there is no past cost
+	if pastCost != nil {
+		d := cost.Sub(*pastCost)
+		if skipMinusSign {
+			d = d.Abs()
+		}
+		return formatCost(currency, &d) + percentChange
+	}
+	return formatCost(currency, cost) + percentChange
+}
+
 func ToMarkdown(out Root, opts Options) ([]byte, error) {
 	diff, err := ToDiff(out, opts)
 	if err != nil {
@@ -26,28 +47,23 @@ func ToMarkdown(out Root, opts Options) ([]byte, error) {
 	tmpl.Funcs(template.FuncMap{
 		"formatCost": func(d *decimal.Decimal) string {
 			if d == nil || d.IsZero() {
-				return "-"
+				return formatWholeDecimalCurrency(out.Currency, decimal.Zero)
 			}
 			return formatCost(out.Currency, d)
 		},
 		"formatCostChange": func(pastCost, cost *decimal.Decimal) string {
-			if pastCost != nil && pastCost.Equals(*cost) {
-				return "-"
-			}
-
-			percentChange := formatPercentChange(pastCost, cost)
-			if len(percentChange) > 0 {
-				percentChange = " " + percentChange
-			}
-
-			// can't just use out.DiffTotalMonthlyCost because it isn't set if there is no past cost
-			if pastCost != nil {
-				d := cost.Sub(*pastCost)
-				return formatCost(out.Currency, &d) + percentChange
-			}
-			return formatCost(out.Currency, cost) + percentChange
+			return formatMarkdownCostChange(out.Currency, pastCost, cost, false)
 		},
-		"increasing": func(pastCost, cost *decimal.Decimal) bool { return pastCost == nil || cost.GreaterThan(*pastCost) },
+		"formatCostChangeSentence": func(pastCost, cost *decimal.Decimal) string {
+			if pastCost != nil {
+				if pastCost.Equals(*cost) {
+					return "monthly cost will not change"
+				} else if pastCost.GreaterThan(*cost) {
+					return "monthly cost will decrease by " + formatMarkdownCostChange(out.Currency, pastCost, cost, true) + " 📉"
+				}
+			}
+			return "monthly cost will increase by " + formatMarkdownCostChange(out.Currency, pastCost, cost, false) + " 📈"
+		},
 		"hasDiff": func(p Project) bool {
 			if p.Diff == nil || len(p.Diff.Resources) == 0 {
 				return false
