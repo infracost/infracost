@@ -6,11 +6,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/mod/semver"
 )
@@ -85,6 +87,8 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			format, _ := cmd.Flags().GetString("format")
+			ctx.SetContextValue("outputFormat", format)
+
 			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
 
@@ -141,6 +145,12 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 			if err != nil {
 				return err
+			}
+
+			pricingClient := apiclient.NewPricingAPIClient(ctx.Config)
+			err = pricingClient.AddEvent("infracost-output", ctx.EventEnv())
+			if err != nil {
+				log.Errorf("Error reporting event: %s", err)
 			}
 
 			cmd.Println(string(b))
