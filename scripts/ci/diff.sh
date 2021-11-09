@@ -118,7 +118,7 @@ build_msg () {
   change_word=$(change_word "$past_total_monthly_cost" "$total_monthly_cost")
   change_emoji=$(change_emoji "$past_total_monthly_cost" "$total_monthly_cost")
 
-  msg="$MSG_START"
+  msg="$MSG_START "
   if [ "$diff_total_monthly_cost" != "0" ]; then
     msg+="**monthly cost will $change_word by $(format_cost "${diff_total_monthly_cost#-}")$percent_display** $change_emoji\n"
   else
