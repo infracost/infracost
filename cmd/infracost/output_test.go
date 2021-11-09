@@ -1,8 +1,12 @@
 package main_test
 
 import (
-	"github.com/infracost/infracost/internal/testutil"
+	"io/ioutil"
+	"path/filepath"
 	"testing"
+
+	"github.com/infracost/infracost/internal/testutil"
+	"github.com/stretchr/testify/require"
 )
 
 func TestOutputHelp(t *testing.T) {
@@ -29,4 +33,46 @@ func TestOutputFormatTable(t *testing.T) {
 
 func TestOutputTerraformFieldsAll(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json", "--fields", "all"}, nil)
+}
+
+func TestOutputTerraformOutFileHTML(t *testing.T) {
+	testdataName := testutil.CalcGoldenFileTestdataDirName()
+	goldenFilePath := "./testdata/" + testdataName + "/infracost_output.golden"
+	outputPath := filepath.Join(t.TempDir(), "infracost_output.html")
+
+	GoldenFileCommandTest(t, testdataName, []string{"output", "--path", "./testdata/example_out.json", "--format", "html", "--out-file", outputPath}, nil)
+
+	actual, err := ioutil.ReadFile(outputPath)
+	require.Nil(t, err)
+	actual = stripDynamicValues(actual)
+
+	testutil.AssertGoldenFile(t, goldenFilePath, actual)
+}
+
+func TestOutputTerraformOutFileJSON(t *testing.T) {
+	testdataName := testutil.CalcGoldenFileTestdataDirName()
+	goldenFilePath := "./testdata/" + testdataName + "/infracost_output.golden"
+	outputPath := filepath.Join(t.TempDir(), "infracost_output.json")
+
+	GoldenFileCommandTest(t, testdataName, []string{"output", "--path", "./testdata/example_out.json", "--format", "json", "--out-file", outputPath}, nil)
+
+	actual, err := ioutil.ReadFile(outputPath)
+	require.Nil(t, err)
+	actual = stripDynamicValues(actual)
+
+	testutil.AssertGoldenFile(t, goldenFilePath, actual)
+}
+
+func TestOutputTerraformOutFileTable(t *testing.T) {
+	testdataName := testutil.CalcGoldenFileTestdataDirName()
+	goldenFilePath := "./testdata/" + testdataName + "/infracost_output.golden"
+	outputPath := filepath.Join(t.TempDir(), "infracost_output.txt")
+
+	GoldenFileCommandTest(t, testdataName, []string{"output", "--path", "./testdata/example_out.json", "--out-file", outputPath}, nil)
+
+	actual, err := ioutil.ReadFile(outputPath)
+	require.Nil(t, err)
+	actual = stripDynamicValues(actual)
+
+	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }

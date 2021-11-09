@@ -16,6 +16,7 @@ import (
 )
 
 var timestampRegex = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)
+var outputPathRegex = regexp.MustCompile(`Output saved to .*`)
 
 type GoldenFileOptions = struct {
 	Currency    string
@@ -96,9 +97,17 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 		actual = append(actual, logBuf.Bytes()...)
 	}
 
-	// strip out any timestamps
-	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
+	actual = stripDynamicValues(actual)
 
 	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
+}
+
+// stripDynamicValues strips out any values that change between test runs from the output,
+// including timestamps and temp file paths
+func stripDynamicValues(actual []byte) []byte {
+	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
+	actual = outputPathRegex.ReplaceAll(actual, []byte("Output saved to REPLACED_OUTPUT_PATH"))
+
+	return actual
 }

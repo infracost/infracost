@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"runtime/debug"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -224,6 +226,18 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 	})
 
 	ctx.SetContextValue("flags", flagNames)
+
+	return nil
+}
+
+// saveOutFile saves the output of the command to the file path past in the `--out-file` flag
+func saveOutFile(cmd *cobra.Command, outFile string, b []byte) error {
+	err := ioutil.WriteFile(outFile, b, 0644) // nolint:gosec
+	if err != nil {
+		return errors.Wrap(err, "Unable to save output")
+	}
+
+	cmd.PrintErrf("Output saved to %s\n", outFile)
 
 	return nil
 }

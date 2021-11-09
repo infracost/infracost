@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -288,24 +289,17 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		Fields:           runCtx.Config.Fields,
 	}
 
-	var (
-		b   []byte
-		out string
-	)
+	var b []byte
 
 	switch strings.ToLower(runCtx.Config.Format) {
 	case "json":
 		b, err = output.ToJSON(r, opts)
-		out = string(b)
 	case "html":
 		b, err = output.ToHTML(r, opts)
-		out = string(b)
 	case "diff":
 		b, err = output.ToDiff(r, opts)
-		out = fmt.Sprintf("\n%s", string(b))
 	default:
 		b, err = output.ToTable(r, opts)
-		out = fmt.Sprintf("\n%s", string(b))
 	}
 
 	if err != nil {
@@ -313,7 +307,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	if runCtx.Config.Format == "diff" || runCtx.Config.Format == "table" {
-		lines := strings.Count(out, "\n") + 1
+		lines := bytes.Count(b, []byte("\n")) + 1
 		runCtx.SetContextValue("lineCount", lines)
 	}
 
@@ -325,7 +319,19 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		log.Errorf("Error reporting event: %s", err)
 	}
 
-	cmd.Printf("%s\n", out)
+	// Print a new line to separate the spinners from the output
+	if !runCtx.Config.IsLogging() {
+		cmd.PrintErrln()
+	}
+
+	if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
+		err = saveOutFile(cmd, outFile, b)
+		if err != nil {
+			return err
+		}
+	} else {
+		cmd.Println(string(b))
+	}
 
 	return nil
 }

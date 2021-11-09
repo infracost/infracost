@@ -18,6 +18,7 @@ FLAGS
       --config-file string            Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags
   -h, --help                          help for diff
       --no-cache                      Don't attempt to cache Terraform plans
+      --out-file string               Save output to a file
   -p, --path string                   Path to the Terraform directory or JSON/plan file
       --show-skipped                  Show unsupported resources, some of which might be free
       --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)

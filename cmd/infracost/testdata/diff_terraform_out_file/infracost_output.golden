@@ -20,10 +20,10 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
           +$52.00
 
 + aws_instance.zero_cost_instance
-  +$182
+  +$743
 
-    + Instance usage (Linux/UNIX, reserved, m5.4xlarge)
-      $0.00
+    + Instance usage (Linux/UNIX, on-demand, m5.4xlarge)
+      +$561
 
     + root_block_device
     
@@ -39,45 +39,54 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
           +$52.00
 
 + aws_lambda_function.hello_world
-  +$437
+  Monthly cost depends on usage
 
     + Requests
-      +$20.00
+      Monthly cost depends on usage
+        +$0.20 per 1M requests
 
     + Duration
-      +$417
+      Monthly cost depends on usage
+        +$0.0000166667 per GB-seconds
 
 + aws_lambda_function.zero_cost_lambda
-  $0.00
+  Monthly cost depends on usage
 
     + Requests
-      $0.00
+      Monthly cost depends on usage
+        +$0.20 per 1M requests
 
     + Duration
-      $0.00
+      Monthly cost depends on usage
+        +$0.0000166667 per GB-seconds
 
 + aws_s3_bucket.usage
-  $0.00
+  Monthly cost depends on usage
 
     + Standard
     
         + Storage
-          $0.00
+          Monthly cost depends on usage
+            +$0.023 per GB
     
         + PUT, COPY, POST, LIST requests
-          $0.00
+          Monthly cost depends on usage
+            +$0.005 per 1k requests
     
         + GET, SELECT, and all other requests
-          $0.00
+          Monthly cost depends on usage
+            +$0.0004 per 1k requests
     
         + Select data scanned
-          $0.00
+          Monthly cost depends on usage
+            +$0.002 per GB
     
         + Select data returned
-          $0.00
+          Monthly cost depends on usage
+            +$0.0007 per GB
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/example_plan.json
-Amount:  +$1,361 ($0.00 → $1,361)
+Amount:  +$1,485 ($0.00 → $1,485)
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed

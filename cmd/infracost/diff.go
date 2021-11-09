@@ -52,6 +52,8 @@ func diffCmd(ctx *config.RunContext) *cobra.Command {
 
 	addRunFlags(cmd)
 
+	cmd.Flags().String("out-file", "", "Save output to a file")
+
 	return cmd
 }
 

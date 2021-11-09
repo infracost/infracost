@@ -1,9 +1,12 @@
 package main_test
 
 import (
+	"io/ioutil"
+	"path/filepath"
 	"testing"
 
 	"github.com/infracost/infracost/internal/testutil"
+	"github.com/stretchr/testify/require"
 )
 
 func TestBreakdownHelp(t *testing.T) {
@@ -50,14 +53,60 @@ func TestBreakdownTerraformShowSkipped(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/azure_firewall_plan.json", "--show-skipped"}, nil)
 }
 
+func TestBreakdownTerraformOutFileHTML(t *testing.T) {
+	testdataName := testutil.CalcGoldenFileTestdataDirName()
+	goldenFilePath := "./testdata/" + testdataName + "/infracost_output.golden"
+	outputPath := filepath.Join(t.TempDir(), "infracost_output.html")
+
+	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "./testdata/example_plan.json", "--format", "html", "--out-file", outputPath}, nil)
+
+	actual, err := ioutil.ReadFile(outputPath)
+	require.Nil(t, err)
+	actual = stripDynamicValues(actual)
+
+	testutil.AssertGoldenFile(t, goldenFilePath, actual)
+}
+
+func TestBreakdownTerraformOutFileJSON(t *testing.T) {
+	testdataName := testutil.CalcGoldenFileTestdataDirName()
+	goldenFilePath := "./testdata/" + testdataName + "/infracost_output.golden"
+	outputPath := filepath.Join(t.TempDir(), "infracost_output.json")
+
+	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "./testdata/example_plan.json", "--format", "json", "--out-file", outputPath}, nil)
+
+	actual, err := ioutil.ReadFile(outputPath)
+	require.Nil(t, err)
+	actual = stripDynamicValues(actual)
+
+	testutil.AssertGoldenFile(t, goldenFilePath, actual)
+}
+
+func TestBreakdownTerraformOutFileTable(t *testing.T) {
+	testdataName := testutil.CalcGoldenFileTestdataDirName()
+	goldenFilePath := "./testdata/" + testdataName + "/infracost_output.golden"
+	outputPath := filepath.Join(t.TempDir(), "infracost_output.txt")
+
+	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "./testdata/example_plan.json", "--out-file", outputPath}, nil)
+
+	actual, err := ioutil.ReadFile(outputPath)
+	require.Nil(t, err)
+	actual = stripDynamicValues(actual)
+
+	testutil.AssertGoldenFile(t, goldenFilePath, actual)
+}
+
 func TestBreakdownTerraformSyncUsageFile(t *testing.T) {
 	testdataName := testutil.CalcGoldenFileTestdataDirName()
-	expectedFilePath := "./testdata/" + testdataName + "/infracost-usage.yml.expected"
-	actualFilePath := "./testdata/" + testdataName + "/infracost-usage.yml"
+	goldenFilePath := "./testdata/" + testdataName + "/infracost-usage.yml.golden"
+	usageFilePath := "./testdata/" + testdataName + "/infracost-usage.yml"
 
-	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "testdata/breakdown_terraform_sync_usage_file/sync_usage_file.json", "--usage-file", actualFilePath, "--sync-usage-file"}, nil)
+	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "testdata/breakdown_terraform_sync_usage_file/sync_usage_file.json", "--usage-file", usageFilePath, "--sync-usage-file"}, nil)
 
-	testutil.AssertFileEqual(t, actualFilePath, expectedFilePath)
+	actual, err := ioutil.ReadFile(usageFilePath)
+	require.Nil(t, err)
+	actual = stripDynamicValues(actual)
+
+	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 
 func TestBreakdownTerraformUsageFile(t *testing.T) {
