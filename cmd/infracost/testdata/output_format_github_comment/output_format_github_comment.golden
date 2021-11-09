@@ -12,19 +12,19 @@
       <td>infracost/infracost/cmd/infracost/testdata</td>
       <td align="right">$0</td>
       <td align="right">$1,361</td>
-      <td>$1,361</td>
+      <td>+$1,361</td>
     </tr>
     <tr>
       <td>infracost/infracost/cmd/infraco.../testdata/terraform_v0.14_plan.json</td>
       <td align="right">$40.56</td>
       <td align="right">$81.12</td>
-      <td>$40.56 (+100%)</td>
+      <td>+$40.56 (+100%)</td>
     </tr>
     <tr>
       <td>All projects</td>
       <td align="right">$81.12</td>
       <td align="right">$1,483</td>
-      <td>$1,402 (+1,728%)</td>
+      <td>+$1,402 (+1,728%)</td>
     </tr>
   </tbody>
 </table> 
