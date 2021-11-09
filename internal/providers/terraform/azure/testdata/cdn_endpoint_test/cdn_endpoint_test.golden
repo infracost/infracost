@@ -42,6 +42,6 @@
 ──────────────────────────────────
 10 cloud resources were detected:
 ∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
-∙ 5 were free
+∙ 5 were free:
   ∙ 4 x azurerm_cdn_profile
   ∙ 1 x azurerm_resource_group

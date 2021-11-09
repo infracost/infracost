@@ -15,7 +15,7 @@
 ──────────────────────────────────
 9 cloud resources were detected:
 ∙ 3 were estimated
-∙ 6 were free
+∙ 6 were free:
   ∙ 4 x azurerm_subnet
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_virtual_network
