@@ -297,12 +297,7 @@ var CommentMarkdownTemplate = `
       <td>{{ formatCostChange .PastCost .Cost }}</td>
     </tr>
 {{- end}}
-
-{{- if increasing .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }} 
-💰 Infracost estimate: **monthly cost will increase by {{ formatCostChange .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }} 📈
-{{- else }}
-💰 Infracost estimate: **monthly cost will decrease by {{ formatCostChange .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }} 📉
-{{- end }}
+💰 Infracost estimate: **{{ formatCostChangeSentence .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }}**
 
 {{- if .Options.IncludeHTML }}
 <table>
