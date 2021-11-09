@@ -3,7 +3,7 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json",
+      "name": "infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json",
       "metadata": {
         "path": "./cmd/infracost/testdata/terraform_v0.14_plan.json",
         "type": "terraform_plan_json",
