@@ -85,7 +85,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 
 	s += "──────────────────────────────────\n"
 	if len(noDiffProjects) != len(out.Projects) {
-		s += fmt.Sprintf("Key: %s changed, %s added, %s removed",
+		s += fmt.Sprintf("Key: %s changed, %s added, %s removed\n",
 			opChar(UPDATED),
 			opChar(ADDED),
 			opChar(REMOVED),
@@ -94,7 +94,10 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 
 	unsupportedMsg := out.summaryMessage(opts.ShowSkipped)
 	if unsupportedMsg != "" {
-		s += "\n\n" + unsupportedMsg
+		if len(noDiffProjects) != len(out.Projects) {
+			s += "\n"
+		}
+		s += unsupportedMsg
 	}
 
 	return []byte(s), nil
