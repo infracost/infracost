@@ -32,9 +32,9 @@
 ──────────────────────────────────
 7 cloud resources were detected:
 ∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
-∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost
+∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost:
   ∙ 1 x azurerm_storage_account
-∙ 2 were free
+∙ 2 were free:
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_storage_data_lake_gen2_filesystem
 Logs:

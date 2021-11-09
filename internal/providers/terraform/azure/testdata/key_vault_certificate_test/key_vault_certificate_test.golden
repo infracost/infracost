@@ -17,6 +17,6 @@
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
-∙ 3 were free
+∙ 3 were free:
   ∙ 2 x azurerm_key_vault
   ∙ 1 x azurerm_resource_group

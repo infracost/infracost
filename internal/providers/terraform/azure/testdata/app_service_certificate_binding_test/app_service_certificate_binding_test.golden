@@ -8,7 +8,7 @@
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 1 was estimated
-∙ 3 were free
+∙ 3 were free:
   ∙ 1 x azurerm_app_service_certificate
   ∙ 1 x azurerm_app_service_certificate_binding
   ∙ 1 x azurerm_resource_group

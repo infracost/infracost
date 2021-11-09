@@ -28,5 +28,5 @@
 ──────────────────────────────────
 7 cloud resources were detected:
 ∙ 6 were estimated, 6 include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free
+∙ 1 was free:
   ∙ 1 x aws_neptune_cluster_snapshot

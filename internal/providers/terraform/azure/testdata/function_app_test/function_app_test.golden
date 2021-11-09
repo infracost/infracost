@@ -41,10 +41,10 @@
 ──────────────────────────────────
 16 cloud resources were detected:
 ∙ 10 were estimated, 10 include usage-based costs, see https://infracost.io/usage-file
-∙ 2 weren't estimated, report them in https://github.com/infracost/infracost
+∙ 2 weren't estimated, report them in https://github.com/infracost/infracost:
   ∙ 1 x azurerm_function_app
   ∙ 1 x azurerm_storage_account
-∙ 4 were free
+∙ 4 were free:
   ∙ 3 x azurerm_app_service_plan
   ∙ 1 x azurerm_resource_group
 Logs:

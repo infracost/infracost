@@ -72,7 +72,7 @@
 ──────────────────────────────────
 14 cloud resources were detected:
 ∙ 12 were estimated, 12 include usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free
+∙ 2 were free:
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_sql_server
 Logs:

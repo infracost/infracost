@@ -61,7 +61,7 @@
 ──────────────────────────────────
 25 cloud resources were detected:
 ∙ 14 were estimated, 7 include usage-based costs, see https://infracost.io/usage-file
-∙ 11 were free
+∙ 11 were free:
   ∙ 7 x azurerm_local_network_gateway
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_subnet

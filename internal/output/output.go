@@ -322,6 +322,7 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 		}
 
 		if showSkipped {
+			msg += ":"
 			msg += formatCounts(r.Summary.UnsupportedResourceCounts)
 		}
 	}
@@ -334,6 +335,7 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 		}
 
 		if showSkipped {
+			msg += ":"
 			msg += formatCounts(r.Summary.NoPriceResourceCounts)
 		}
 	}
