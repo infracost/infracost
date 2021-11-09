@@ -319,7 +319,8 @@ var CommentMarkdownTemplate = `
 </table>
     
   {{- if .SkippedProjects }} 
-<p>The following projects have no cost estimate changes: {{ .SkippedProjects }}</p>
+
+The following projects have no cost estimate changes: {{ .SkippedProjects }}
   {{- end }}
 {{- else }}
   <tbody>
