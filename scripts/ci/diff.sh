@@ -118,7 +118,12 @@ build_msg () {
   change_word=$(change_word "$past_total_monthly_cost" "$total_monthly_cost")
   change_emoji=$(change_emoji "$past_total_monthly_cost" "$total_monthly_cost")
 
-  msg="$MSG_START **monthly cost will $change_word by $(format_cost "${diff_total_monthly_cost#-}")$percent_display** $change_emoji\n"
+  msg="$MSG_START"
+  if [ "$diff_total_monthly_cost" != "0" ]; then
+    msg+="**monthly cost will $change_word by $(format_cost "${diff_total_monthly_cost#-}")$percent_display** $change_emoji\n"
+  else
+    msg+="**monthly cost will not change**\n"
+  fi
   msg+="\n"
 
   if [ "$include_html" = true ]; then
@@ -227,7 +232,10 @@ build_overall_row () {
   local percent_display
   local sym
 
-  percent_display=$(percent_display "$past_total_monthly_cost" "$total_monthly_cost")
+  if [ "$diff_total_monthly_cost" != "0" ]; then
+    percent_display=$(percent_display "$past_total_monthly_cost" "$total_monthly_cost")
+  fi
+
   sym=$(change_symbol "$past_total_monthly_cost" "$total_monthly_cost")
 
   local row=""
