@@ -215,14 +215,12 @@ build_project_row () {
     percent_display=$(percent_display "$past_monthly_cost" "$monthly_cost")
   fi
 
-  sym=$(change_symbol "$past_monthly_cost" "$monthly_cost")
-
   local row=""
   row+="    <tr>\n"
   row+="      <td>$name</td>\n"
   row+="      <td align=\"right\">$(format_cost "$past_monthly_cost")</td>\n"
   row+="      <td align=\"right\">$(format_cost "$monthly_cost")</td>\n"
-  row+="      <td>$sym$(format_cost "$diff_monthly_cost")$percent_display</td>\n"
+  row+="      <td>$(format_cost "$diff_monthly_cost" true)$percent_display</td>\n"
   row+="    </tr>\n"
   
   printf "%s" "$row"
@@ -236,14 +234,12 @@ build_overall_row () {
     percent_display=$(percent_display "$past_total_monthly_cost" "$total_monthly_cost")
   fi
 
-  sym=$(change_symbol "$past_total_monthly_cost" "$total_monthly_cost")
-
   local row=""
   row+="    <tr>\n"
   row+="      <td>All projects</td>\n"
   row+="      <td align=\"right\">$(format_cost "$past_total_monthly_cost")</td>\n"
   row+="      <td align=\"right\">$(format_cost "$total_monthly_cost")</td>\n"
-  row+="      <td>$sym$(format_cost "$diff_total_monthly_cost")$percent_display</td>\n"
+  row+="      <td>$(format_cost "$diff_total_monthly_cost" true)$percent_display</td>\n"
   row+="    </tr>\n"
 
   printf "%s" "$row"
@@ -251,13 +247,29 @@ build_overall_row () {
 
 format_cost () {
   cost=$1
+  include_plus=$2
+
+  sym=""
+  if [ "$(echo "$cost < 0" | bc -l)" = 1 ]; then
+    sym="-"
+  elif [ "$include_plus" = true ] && [ "$(echo "$cost > 0" | bc -l)" = 1 ]; then
+    sym="+"
+  fi
 
   if [ -z "$cost" ] || [ "$cost" = "null" ] || [ "$cost" = "0" ]; then
-    printf "$currency%s" "0"
-  elif [ "$(echo "$cost < 100" | bc -l)" = 1 ]; then
-    printf "$currency%0.2f" "$cost"
+    cost="0"
+  elif [ "$(echo "${cost#-} < 100" | bc -l)" = 1 ]; then
+    cost="$(printf "%'0.2f" "$cost")"
   else
-    printf "$currency%0.0f" "$cost"
+    cost="$(printf "%'0.0f" "$cost")"
+  fi
+
+  # If the currency length is greater than 1, assume it's a currency code and display `INR -22.78`
+  if [ ${#currency} -gt 1 ]; then
+    printf "%s" "$currency$sym${cost#-}"
+  # If currency length is 1, assume it's a symbol and display it like `-$22.78`
+  else
+    printf "%s" "$sym$currency${cost#-}"
   fi
 }
 
