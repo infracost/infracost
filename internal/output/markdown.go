@@ -12,9 +12,9 @@ import (
 	"github.com/Masterminds/sprig"
 )
 
-func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipMinusSign bool) string {
+func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus bool) string {
 	if pastCost != nil && pastCost.Equals(*cost) {
-		return "$0"
+		return formatWholeDecimalCurrency(currency, decimal.Zero)
 	}
 
 	percentChange := formatPercentChange(pastCost, cost)
@@ -22,15 +22,27 @@ func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, 
 		percentChange = " " + "(" + percentChange + ")"
 	}
 
+	plusMinus := "+"
+	if skipPlusMinus {
+		plusMinus = ""
+	}
+
 	// can't just use out.DiffTotalMonthlyCost because it isn't set if there is no past cost
 	if pastCost != nil {
 		d := cost.Sub(*pastCost)
-		if skipMinusSign {
+		if skipPlusMinus {
 			d = d.Abs()
+			return formatCost(currency, &d) + percentChange
 		}
-		return formatCost(currency, &d) + percentChange
+
+		if d.LessThan(decimal.Zero) {
+			plusMinus = ""
+		}
+
+		return plusMinus + formatCost(currency, &d) + percentChange
 	}
-	return formatCost(currency, cost) + percentChange
+
+	return plusMinus + formatCost(currency, cost) + percentChange
 }
 
 func ToMarkdown(out Root, opts Options) ([]byte, error) {
@@ -62,7 +74,7 @@ func ToMarkdown(out Root, opts Options) ([]byte, error) {
 					return "monthly cost will decrease by " + formatMarkdownCostChange(out.Currency, pastCost, cost, true) + " 📉"
 				}
 			}
-			return "monthly cost will increase by " + formatMarkdownCostChange(out.Currency, pastCost, cost, false) + " 📈"
+			return "monthly cost will increase by " + formatMarkdownCostChange(out.Currency, pastCost, cost, true) + " 📈"
 		},
 		"hasDiff": func(p Project) bool {
 			if p.Diff == nil || len(p.Diff.Resources) == 0 {
