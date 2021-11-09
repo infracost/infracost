@@ -1,0 +1,31 @@
+
+💰 Infracost estimate: **monthly cost will decrease by -$40.56 -50% 📉
+<table>
+  <thead>
+    <td>Project</td>
+    <td>Previous</td>
+    <td>New</td>
+    <td>Diff</td>
+  </thead>
+  <tbody>
+  </tbody>
+</table> 
+The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
+
+
+<details>
+<summary><strong>Infracost output</strong></summary>
+
+```
+
+
+──────────────────────────────────
+
+The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
+Run infracost breakdown to see their full breakdown.
+
+──────────────────────────────────
+
+```
+</details>
+

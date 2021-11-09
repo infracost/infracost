@@ -1,5 +1,5 @@
  
-💰 Infracost estimate: **monthly cost will increase by $5,380 📈
+💰 Infracost estimate: **monthly cost will increase by $1,321 +814% 📈
 <table>
   <thead>
     <td>Project</td>
@@ -15,19 +15,22 @@
       <td>$1,361</td>
     </tr>
     <tr>
-      <td>infracost/infracost/cmd/infraco...t/testdata/azure_firewall_plan.json</td>
-      <td align="right">-</td>
-      <td align="right">$4,019</td>
-      <td>$4,019</td>
+      <td>infracost/infracost/cmd/infraco.../testdata/terraform_v0.14_plan.json</td>
+      <td align="right">$40.56</td>
+      <td align="right">$81.12</td>
+      <td>$40.56 +100%</td>
     </tr>
     <tr>
       <td>All projects</td>
-      <td align="right">-</td>
-      <td align="right">$5,380</td>
-      <td>$5,380</td>
+      <td align="right">$162</td>
+      <td align="right">$1,483</td>
+      <td>$1,321 +814%</td>
     </tr>
   </tbody>
-</table>
+</table> 
+The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
+
+
 <details>
 <summary><strong>Infracost output</strong></summary>
 
@@ -114,66 +117,111 @@ Monthly cost change for infracost/infracost/cmd/infracost/testdata
 Amount:  +$1,361 ($0.00 → $1,361)
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
+Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
-+ azurerm_firewall.non_usage
-  +$913
++ aws_instance.instance_2
+  +$4.60
 
-    + Deployment (Standard)
-      +$913
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
 
-    + Data processed
-      Monthly cost depends on usage
-        +$0.016 per GB
+    + CPU credits
+      $0.00
 
-+ azurerm_firewall.premium
-  +$639
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
 
-    + Deployment (Premium)
-      +$639
++ aws_instance.instance_counted[1]
+  +$4.60
 
-    + Data processed
-      Monthly cost depends on usage
-        +$0.008 per GB
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
 
-+ azurerm_firewall.premium_virtual_hub
-  +$639
+    + CPU credits
+      $0.00
 
-    + Deployment (Premium Secured Virtual Hub)
-      +$639
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
 
-    + Data processed
-      Monthly cost depends on usage
-        +$0.008 per GB
++ aws_instance.instance_named["test.2"]
+  +$4.60
 
-+ azurerm_firewall.standard
-  +$913
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
 
-    + Deployment (Standard)
-      +$913
+    + CPU credits
+      $0.00
 
-    + Data processed
-      Monthly cost depends on usage
-        +$0.016 per GB
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
 
-+ azurerm_firewall.standard_virtual_hub
-  +$913
++ module.db.module.db_2.module.db_instance.aws_db_instance.this[0]
+  +$12.99
 
-    + Deployment (Secured Virtual Hub)
-      +$913
+    + Database instance (on-demand, Single-AZ, db.t3.micro)
+      +$12.41
 
-    + Data processed
-      Monthly cost depends on usage
-        +$0.016 per GB
+    + Storage (general purpose SSD, gp2)
+      +$0.58
 
-+ azurerm_public_ip.example
-  +$3.65
++ module.instances.aws_instance.module_instance_2
+  +$4.60
 
-    + IP address (static)
-      +$3.65
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
-Amount:  +$4,019 ($0.00 → $4,019)
+    + CPU credits
+      $0.00
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
+
++ module.instances.aws_instance.module_instance_counted[1]
+  +$4.60
+
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
+
+    + CPU credits
+      $0.00
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
+
++ module.instances.aws_instance.module_instance_named["test.2"]
+  +$4.60
+
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
+
+    + CPU credits
+      $0.00
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
+
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
+Amount:  +$40.56 ($40.56 → $81.12)
+Percent: +100%
+
+
+
+──────────────────────────────────
+
+The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
+Run infracost breakdown to see their full breakdown.
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
