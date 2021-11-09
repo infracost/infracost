@@ -21,8 +21,6 @@
 <summary><strong>Infracost output</strong></summary>
 
 ```
-
-
 ──────────────────────────────────
 
 The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json

@@ -215,8 +215,6 @@ Monthly cost change for infracost/infracost/cmd/infracost/testdata/terraform_v0.
 Amount:  +$40.56 ($40.56 → $81.12)
 Percent: +100%
 
-
-
 ──────────────────────────────────
 
 The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json
