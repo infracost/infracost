@@ -14,7 +14,7 @@ import (
 
 func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipMinusSign bool) string {
 	if pastCost != nil && pastCost.Equals(*cost) {
-		return "-"
+		return "$0"
 	}
 
 	percentChange := formatPercentChange(pastCost, cost)
@@ -47,7 +47,7 @@ func ToMarkdown(out Root, opts Options) ([]byte, error) {
 	tmpl.Funcs(template.FuncMap{
 		"formatCost": func(d *decimal.Decimal) string {
 			if d == nil || d.IsZero() {
-				return "-"
+				return formatWholeDecimalCurrency(out.Currency, decimal.Zero)
 			}
 			return formatCost(out.Currency, d)
 		},
