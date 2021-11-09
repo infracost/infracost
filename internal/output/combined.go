@@ -51,12 +51,12 @@ func Combine(currency string, inputs []ReportInput, opts Options) Root {
 
 			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*input.Root.TotalMonthlyCost))
 		}
-		if input.Root.PastTotalMonthlyCost != nil {
-			if pastTotalMonthlyCost == nil {
-				pastTotalMonthlyCost = decimalPtr(decimal.Zero)
+		if input.Root.PastTotalHourlyCost != nil {
+			if pastTotalHourlyCost == nil {
+				pastTotalHourlyCost = decimalPtr(decimal.Zero)
 			}
 
-			pastTotalMonthlyCost = decimalPtr(pastTotalMonthlyCost.Add(*input.Root.PastTotalMonthlyCost))
+			pastTotalHourlyCost = decimalPtr(pastTotalHourlyCost.Add(*input.Root.PastTotalHourlyCost))
 		}
 		if input.Root.PastTotalMonthlyCost != nil {
 			if pastTotalMonthlyCost == nil {
