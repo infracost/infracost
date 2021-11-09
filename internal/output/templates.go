@@ -306,23 +306,30 @@ var CommentMarkdownTemplate = `
     <td>Previous</td>
     <td>New</td>
     <td>Diff</td>
-  </thead>
+  </thead> 
+{{- if gt (len .Root.Projects) 1  }}
   <tbody>
-{{- range .Root.Projects }}
-	{{- if hasDiff . }}
+  {{- range .Root.Projects }}
+  	{{- if hasDiff . }}
     	{{- template "summaryRow" dict "Name" .Name "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
 	{{- end }}
-{{- end }}
-{{- if gt (len .Root.Projects) 1  }}
-    {{- template "summaryRow" dict "Name" "All projects" "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
-{{- end }}
+  {{- end }}
+  {{- template "summaryRow" dict "Name" "All projects" "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
   </tbody>
 </table>
     
-{{- if .SkippedProjects }} 
-The following projects have no cost estimate changes: {{ .SkippedProjects }}
+  {{- if .SkippedProjects }} 
+<p>The following projects have no cost estimate changes: {{ .SkippedProjects }}</p>
+  {{- end }}
+{{- else }}
+  <tbody>
+  {{- range .Root.Projects }}
+    {{- template "summaryRow" dict "Name" .Name "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+  {{- end }}
+  </tbody>
+</table>
+{{- end }}
 
-{{ end }}
 <details>
 <summary><strong>Infracost output</strong></summary>
 {{- else }}
