@@ -118,7 +118,7 @@ build_msg () {
   change_word=$(change_word "$past_total_monthly_cost" "$total_monthly_cost")
   change_emoji=$(change_emoji "$past_total_monthly_cost" "$total_monthly_cost")
 
-  msg="$MSG_START **monthly cost will $change_word by $(format_cost "$diff_total_monthly_cost")$percent_display** $change_emoji\n"
+  msg="$MSG_START **monthly cost will $change_word by $(format_cost "${diff_total_monthly_cost#-}")$percent_display** $change_emoji\n"
   msg+="\n"
 
   if [ "$include_html" = true ]; then
@@ -135,7 +135,7 @@ build_msg () {
     local skipped_projects
     for (( i = 0; i < project_count; i++ )); do
       diff_resources=$(jq '.projects['"$i"'].diff.resources[]' infracost_breakdown.json)
-      if  [ -n "$diff_resources" ]; then
+      if  [ -n "$diff_resources" ] || [ $project_count -eq 1 ]; then
         msg+="$(build_project_row "$i")"
       else
         if [ -z "$skipped_projects" ]; then
@@ -206,7 +206,10 @@ build_project_row () {
   monthly_cost=$(jq -r '.projects['"$i"'].breakdown.totalMonthlyCost' infracost_breakdown.json)
   diff_monthly_cost=$(jq -r '.projects['"$i"'].diff.totalMonthlyCost' infracost_breakdown.json)
 
-  percent_display=$(percent_display "$past_monthly_cost" "$monthly_cost")
+  if [ "$diff_monthly_cost" != "0" ]; then
+    percent_display=$(percent_display "$past_monthly_cost" "$monthly_cost")
+  fi
+
   sym=$(change_symbol "$past_total_monthly_cost" "$total_monthly_cost")
 
   local row=""
@@ -241,8 +244,8 @@ build_overall_row () {
 format_cost () {
   cost=$1
 
-  if [ -z "$cost" ] || [ "$cost" = "null" ]; then
-    echo "-"
+  if [ -z "$cost" ] || [ "$cost" = "null" ] || [ "$cost" = "0" ]; then
+    printf "$currency%s" "0"
   elif [ "$(echo "$cost < 100" | bc -l)" = 1 ]; then
     printf "$currency%0.2f" "$cost"
   else
@@ -298,7 +301,7 @@ change_symbol () {
   local new=$2
 
   local change_symbol="+"
-  if [ "$(echo "$new < $old" | bc -l)" = 1 ]; then
+  if [ "$(echo "$new <= $old" | bc -l)" = 1 ]; then
     change_symbol=""
   fi
 
