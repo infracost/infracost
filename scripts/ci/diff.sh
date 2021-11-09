@@ -215,7 +215,7 @@ build_project_row () {
     percent_display=$(percent_display "$past_monthly_cost" "$monthly_cost")
   fi
 
-  sym=$(change_symbol "$past_total_monthly_cost" "$total_monthly_cost")
+  sym=$(change_symbol "$past_monthly_cost" "$monthly_cost")
 
   local row=""
   row+="    <tr>\n"
