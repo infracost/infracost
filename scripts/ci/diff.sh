@@ -479,7 +479,6 @@ fetch_existing_gitlab_merge_request_comments() {
   existing_gitlab_merge_request_comments="$(echo "[$infracost_comments]" | jq 'flatten(1)')"
 }
 
-
 post_to_gitlab_merge_request () {
   local latest_mr_comment
   local comment_id
@@ -565,20 +564,81 @@ post_to_azure_devops () {
       GITHUB_PULL_REQUEST_NUMBER=$SYSTEM_PULLREQUEST_PULLREQUESTNUMBER
       post_to_github
     elif [ "$BUILD_REPOSITORY_PROVIDER" = "TfsGit" ]; then
-      # See https://docs.microsoft.com/en-us/javascript/api/azure-devops-extension-api/commentthreadstatus
-      azure_devops_comment_status=${azure_devops_comment_status:-4}
-      echo "Posting comment to Azure DevOps repo pull-request $SYSTEM_PULLREQUEST_PULLREQUESTID"
-      msg="$(build_msg true)"
-      jq -Mnc --arg msg "$msg" --arg azure_devops_comment_status "$azure_devops_comment_status" '{"comments": [{"parentCommentId": 0, "content": "\($msg)", "commentType": 1}], "status": $azure_devops_comment_status}' | curl -L -X POST -d @- \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $SYSTEM_ACCESSTOKEN" \
-        "$SYSTEM_COLLECTIONURI$SYSTEM_TEAMPROJECT/_apis/git/repositories/$BUILD_REPOSITORY_ID/pullRequests/$SYSTEM_PULLREQUEST_PULLREQUESTID/threads?api-version=6.0"
+      if [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
+        post_to_azure_devops_update_thread
+      else
+        post_to_azure_devops_new_thread
+      fi
     else 
       echo "Posting comments to Azure DevOps $BUILD_REPOSITORY_PROVIDER is not supported, email hello@infracost.io for help"
     fi
   else
     echo "Posting comment to Azure DevOps $BUILD_REASON is not supported, email hello@infracost.io for help"
   fi
+}
+
+fetch_existing_azure_devops_threads() {
+  existing_azure_devops_threads="[]" # empty array
+
+  local resp
+
+  resp=$(
+    curl -L \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $SYSTEM_ACCESSTOKEN" \
+    "$SYSTEM_COLLECTIONURI$SYSTEM_TEAMPROJECT/_apis/git/repositories/$BUILD_REPOSITORY_ID/pullRequests/$SYSTEM_PULLREQUEST_PULLREQUESTID/threads?api-version=6.0"
+  )
+
+  existing_azure_devops_threads=$(printf "%s" "$resp" | jq "[.value[] | select(.comments[0].content | contains(\"${MSG_START}\"))]")
+}
+
+post_to_azure_devops_update_thread() {
+  local latest_thread
+  local thread_id
+  local comment_id
+  
+  # See https://docs.microsoft.com/en-us/javascript/api/azure-devops-extension-api/commentthreadstatus
+  local azure_devops_comment_status=${azure_devops_comment_status:-4}
+
+  fetch_existing_azure_devops_threads
+  latest_thread=$(echo "$existing_azure_devops_threads" | jq last)
+
+  msg="$(build_msg true "This comment will be updated when the cost estimate changes.")"
+
+  if [ "$latest_thread" != "null" ]; then
+    existing_msg=$(echo "$latest_thread" | jq -r .comments[0].content)
+    # '// /' does a string substitution that removes spaces before comparison
+    if [ "${msg// /}" != "${existing_msg// /}" ]; then
+      thread_id=$(echo "$latest_thread" | jq -r .id)
+      comment_id=$(echo "$latest_thread" | jq -r .comments[0].id)
+      echo "Updating thread $thread_id, comment $comment_id for pull request $SYSTEM_PULLREQUEST_PULLREQUESTID."
+      jq -Mnc --arg msg "$msg" --arg azure_devops_comment_status "$azure_devops_comment_status" '{"parentCommentId": 0, "content": "\($msg)", "commentType": 1}' | curl -L -X PATCH -d @- \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $SYSTEM_ACCESSTOKEN" \
+        "$SYSTEM_COLLECTIONURI$SYSTEM_TEAMPROJECT/_apis/git/repositories/$BUILD_REPOSITORY_ID/pullRequests/$SYSTEM_PULLREQUEST_PULLREQUESTID/threads/$thread_id/comments/$comment_id?api-version=6.0"
+    else
+      echo "Skipping comment for pull request $SYSTEM_PULLREQUEST_PULLREQUESTID, no change in msg."
+    fi
+  else
+    echo "Creating new comment for pull request $SYSTEM_PULLREQUEST_PULLREQUESTID."
+    jq -Mnc --arg msg "$msg" --arg azure_devops_comment_status "$azure_devops_comment_status" '{"comments": [{"parentCommentId": 0, "content": "\($msg)", "commentType": 1}], "status": $azure_devops_comment_status}' | curl -L -X POST -d @- \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer $SYSTEM_ACCESSTOKEN" \
+      "$SYSTEM_COLLECTIONURI$SYSTEM_TEAMPROJECT/_apis/git/repositories/$BUILD_REPOSITORY_ID/pullRequests/$SYSTEM_PULLREQUEST_PULLREQUESTID/threads?api-version=6.0"
+  fi
+}
+
+post_to_azure_devops_new_thread () {
+  # See https://docs.microsoft.com/en-us/javascript/api/azure-devops-extension-api/commentthreadstatus
+  local azure_devops_comment_status=${azure_devops_comment_status:-4}
+
+  msg="$(build_msg true)"
+
+  echo "Creating new comment for pull request $SYSTEM_PULLREQUEST_PULLREQUESTID."
+  jq -Mnc --arg msg "$msg" --arg azure_devops_comment_status "$azure_devops_comment_status" '{"comments": [{"parentCommentId": 0, "content": "\($msg)", "commentType": 1}], "status": $azure_devops_comment_status}' | curl -L -X POST -d @- \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $SYSTEM_ACCESSTOKEN" \
+    "$SYSTEM_COLLECTIONURI$SYSTEM_TEAMPROJECT/_apis/git/repositories/$BUILD_REPOSITORY_ID/pullRequests/$SYSTEM_PULLREQUEST_PULLREQUESTID/threads?api-version=6.0"
 }
 
 post_to_slack () {
