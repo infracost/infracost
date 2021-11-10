@@ -11,26 +11,10 @@ provider "aws" {
 
 resource "aws_config_configuration_recorder" "my_config_configuration_recorder" {
   name     = "example"
-  role_arn = aws_iam_role.r.arn
-}
-
-resource "aws_iam_role" "r" {
-  name = "awsconfig-example"
-
-  assume_role_policy = <<POLICY
-{}
-POLICY
+  role_arn = "arn:aws:iam::123456789012:role/role"
 }
 
 resource "aws_config_configuration_recorder" "my_config_configuration_recorder_usage" {
   name     = "example"
-  role_arn = aws_iam_role.rusage.arn
-}
-
-resource "aws_iam_role" "rusage" {
-  name = "awsconfig-example-usage"
-
-  assume_role_policy = <<POLICY
-{}
-POLICY
+  role_arn = "arn:aws:iam::123456789012:role/role"
 }
