@@ -13,7 +13,7 @@ ENV CGO_ENABLED 0
 RUN apt-get update -q && apt-get -y install unzip
 
 # Install latest of each Terraform version after 0.12 as we don't support versions before that
-RUN AVAILABLE_TERRAFORM_VERSIONS="0.12.31 0.13.7 0.14.11 ${DEFAULT_TERRAFORM_VERSION} 1.0.2" && \
+RUN AVAILABLE_TERRAFORM_VERSIONS="0.12.31 0.13.7 0.14.11 ${DEFAULT_TERRAFORM_VERSION} 1.0.10" && \
     for VERSION in ${AVAILABLE_TERRAFORM_VERSIONS}; do \
     wget -q https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip && \
     wget -q https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_SHA256SUMS && \
@@ -27,7 +27,7 @@ RUN AVAILABLE_TERRAFORM_VERSIONS="0.12.31 0.13.7 0.14.11 ${DEFAULT_TERRAFORM_VER
     ln -s /usr/bin/terraform_0.12.31 /usr/bin/terraform_0.12 && \
     ln -s /usr/bin/terraform_0.13.7 /usr/bin/terraform_0.13 && \
     ln -s /usr/bin/terraform_0.14.11 /usr/bin/terraform_0.14 && \
-    ln -s /usr/bin/terraform_1.0.2 /usr/bin/terraform_1.0 && \
+    ln -s /usr/bin/terraform_1.0.10 /usr/bin/terraform_1.0 && \
     ln -s /usr/bin/terraform_${DEFAULT_TERRAFORM_VERSION} /usr/bin/terraform_0.15 && \
     ln -s /usr/bin/terraform_${DEFAULT_TERRAFORM_VERSION} /usr/bin/terraform
 
