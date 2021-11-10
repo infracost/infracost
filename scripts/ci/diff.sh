@@ -30,21 +30,8 @@ process_args () {
   elif [ -n "$percentage_threshold" ]; then
     post_condition="{\"percentage_threshold\": $percentage_threshold}"
     echo "Warning: percentage_threshold is deprecated and will be removed in v0.9.0, please use post_condition='{\"percentage_threshold\": \"0\"}'"
-  # Default to using update method when posting to GitHub via GitHub actions, Circle CI or Azure DevOps
-  # GitHub actions
-  elif [ -n "$GITHUB_ACTIONS" ]; then
-    post_condition=${post_condition:-'{"update": true}'}
-  # CircleCI GitHub
-  elif [ -n "$CIRCLECI" ] && echo "$CIRCLE_REPOSITORY_URL" | grep -Eiq github; then
-    post_condition=${post_condition:-'{"update": true}'}
-  # Azure DevOps GitHub
-  elif [ -n "$SYSTEM_COLLECTIONURI" ] && [ "$BUILD_REASON" = "PullRequest" ] && [ "$BUILD_REPOSITORY_PROVIDER" = "GitHub" ]; then
-    post_condition=${post_condition:-'{"update": true}'}
-  # GitLab CI
-  elif [ -n "$GITLAB_CI" ]; then
-    post_condition=${post_condition:-'{"update": true}'}
   else
-    post_condition=${post_condition:-'{"has_diff": true}'}
+    post_condition=${post_condition:-'{"update": true}'}
   fi
   if [ -n "$post_condition" ] && [ "$(echo "$post_condition" | jq '.percentage_threshold')" != "null" ]; then
     percentage_threshold=$(echo "$post_condition" | jq -r '.percentage_threshold')
@@ -182,9 +169,13 @@ build_msg () {
 
   if [ "$include_html" = true ]; then
     msg+="</details>\n"
-    if [ -n "$update_msg" ]; then
-      msg+="\n$update_msg\n\n"
-    fi
+  fi
+
+  if [ -n "$update_msg" ]; then
+    msg+="\n$update_msg\n\n"
+  fi
+
+  if [ "$include_html" = true ]; then
     msg+="<sub>\n"
     msg+="  Is this comment useful? <a href=\"https://www.infracost.io/feedback/submit?value=yes\" rel=\"noopener noreferrer\" target=\"_blank\">Yes</a>, <a href=\"https://www.infracost.io/feedback/submit?value=no\" rel=\"noopener noreferrer\" target=\"_blank\">No</a>\n"
     msg+="</sub>\n"
@@ -463,7 +454,7 @@ fetch_existing_gitlab_merge_request_comments() {
   while ((page == 0)) || ((resp_length == per_page)); do
     page=$((page+1))
 
-    echo "Fetching comments for pull request $CI_MERGE_REQUEST_IID, $page"
+    echo "Fetching comments for merge request $CI_MERGE_REQUEST_IID, $page"
     resp=$(
       curl -L --retry 3 \
       -H "Content-Type: application/json" \
@@ -518,6 +509,64 @@ post_bitbucket_comment () {
     "https://api.bitbucket.org/2.0/repositories/$1"
 }
 
+
+fetch_existing_bitbucket_pull_request_comments() {
+  existing_bitbucket_pull_request_comments="[]" # empty array
+
+  local infracost_comments="[]"
+  local per_page=100
+  local page=1
+  local resp
+
+  local next="https://api.bitbucket.org/2.0/repositories/$BITBUCKET_REPO_FULL_NAME/pullrequests/$BITBUCKET_PR_ID/comments?page=$page&pagelen=$per_page"
+
+  while [ "$next" != "null" ]; do
+    echo "Fetching comments for pull request $BITBUCKET_PR_ID, $page"
+    resp=$(
+      curl -L --retry 3 \
+      -H "Content-Type: application/json" \
+      -u "$BITBUCKET_TOKEN" \
+      "$next"
+    )
+
+    infracost_comments=${infracost_comments},$(printf "%s" "$resp" | jq "[.values[] | select(.content.raw | contains(\"${MSG_START}\"))]")
+    next=$(printf "%s" "$resp" | jq -r .next)
+  done
+
+  existing_bitbucket_pull_request_comments="$(echo "[$infracost_comments]" | jq 'flatten(1)')"
+}
+
+post_to_bitbucket_update_pull_request () {
+  local latest_pr_comment
+  local comment_id
+
+  fetch_existing_bitbucket_pull_request_comments
+  latest_pr_comment=$(echo "$existing_bitbucket_pull_request_comments" | jq last)
+
+  msg="$(build_msg false "This comment will be updated when the cost estimate changes.")"
+
+  if [ "$latest_pr_comment" != "null" ]; then
+    existing_msg=$(echo "$latest_pr_comment" | jq -r .content.raw)
+    # '// /' does a string substitution that removes spaces before comparison
+    if [ "${msg// /}" != "${existing_msg// /}" ]; then
+      comment_id=$(echo "$latest_pr_comment" | jq -r .id)
+      echo "Updating comment $comment_id for pull request $BITBUCKET_PR_ID."
+      jq -Mnc --arg msg "$msg" '{"content": {"raw": "\($msg)"}}' | curl -L -X PUT -d @- \
+        -H "Content-Type: application/json" \
+        -u "$BITBUCKET_TOKEN" \
+        "https://api.bitbucket.org/2.0/repositories/$BITBUCKET_REPO_FULL_NAME/pullrequests/$BITBUCKET_PR_ID/comments/${comment_id}"
+    else
+      echo "Skipping comment for pull request $BITBUCKET_PR_ID, no change in msg."
+    fi
+  else
+    echo "Creating new comment for pull request $BITBUCKET_PR_ID."
+    jq -Mnc --arg msg "$msg" '{"content": {"raw": "\($msg)"}}' | curl -L -X POST -d @- \
+      -H "Content-Type: application/json" \
+      -u "$BITBUCKET_TOKEN" \
+      "https://api.bitbucket.org/2.0/repositories/$BITBUCKET_REPO_FULL_NAME/pullrequests/$BITBUCKET_PR_ID/comments"
+  fi
+}
+
 post_to_circle_ci () {
   if echo "$CIRCLE_REPOSITORY_URL" | grep -Eiq github; then
     GITHUB_REPOSITORY="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
@@ -546,7 +595,10 @@ post_to_circle_ci () {
 }
 
 post_to_bitbucket () {
-  if [ -n "$BITBUCKET_PR_ID" ]; then
+  if [ -n "$BITBUCKET_PR_ID" ] && [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
+    echo "Posting comment to Bitbucket pull-request $BITBUCKET_PR_ID"
+    post_to_bitbucket_update_pull_request "$BITBUCKET_REPO_FULL_NAME/pullrequests/$BITBUCKET_PR_ID/comments"
+  elif [ -n "$BITBUCKET_PR_ID" ]; then
     echo "Posting comment to Bitbucket pull-request $BITBUCKET_PR_ID"
     post_bitbucket_comment "$BITBUCKET_REPO_FULL_NAME/pullrequests/$BITBUCKET_PR_ID/comments"
   else
