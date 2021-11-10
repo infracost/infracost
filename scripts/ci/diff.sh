@@ -40,6 +40,9 @@ process_args () {
   # Azure DevOps GitHub
   elif [ -n "$SYSTEM_COLLECTIONURI" ] && [ "$BUILD_REASON" = "PullRequest" ] && [ "$BUILD_REPOSITORY_PROVIDER" = "GitHub" ]; then
     post_condition=${post_condition:-'{"update": true}'}
+  # GitLab CI
+  elif [ -n "$GITLAB_CI" ]; then
+    post_condition=${post_condition:-'{"update": true}'}
   else
     post_condition=${post_condition:-'{"has_diff": true}'}
   fi
@@ -369,34 +372,39 @@ post_to_github_commit () {
 }
 
 fetch_existing_github_pull_request_comments() {
-  pull_request_comments="[]" # empty array
+  existing_github_pull_request_comments="[]" # empty array
 
-  local infra_comments="[]"
-  local PER_PAGE=100
+  local infracost_comments="[]"
+  local per_page=100
   local page=0
-  local respLength=0
-  while ((page == 0)) || ((respLength == PER_PAGE)); do
+  local resp
+  local resp_length=0
+
+  while ((page == 0)) || ((resp_length == per_page)); do
     page=$((page+1))
 
     echo "Fetching comments for pull request $GITHUB_PULL_REQUEST_NUMBER, $page"
-    local resp=$(
+    resp=$(
       curl -L --retry 3 \
       -H "Content-Type: application/json" \
       -H "Authorization: token $GITHUB_TOKEN" \
-      "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$GITHUB_PULL_REQUEST_NUMBER/comments?page=$page&per_page=$PER_PAGE"
+      "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$GITHUB_PULL_REQUEST_NUMBER/comments?page=$page&per_page=$per_page"
     )
 
-    infra_comments=${infra_comments},$(echo "${resp}" | jq "[.[] | select(.body | contains(\"${MSG_START}\"))]")
+    infracost_comments=${infracost_comments},$(printf "%s" "$resp" | jq "[.[] | select(.body | contains(\"${MSG_START}\"))]")
 
-    respLength=$(echo "$resp" | jq length)
+    resp_length=$(printf "%s" "$resp" | jq length)
   done
 
-  pull_request_comments=$(echo "[$infra_comments]" | jq 'flatten(1)')
+  existing_github_pull_request_comments="$(echo "[$infracost_comments]" | jq 'flatten(1)')"
 }
 
 post_to_github_pull_request () {
+  local latest_pr_comment
+  local comment_id
+
   fetch_existing_github_pull_request_comments
-  local latest_pr_comment=$(echo "$pull_request_comments" | jq last)
+  latest_pr_comment=$(echo "$existing_github_pull_request_comments" | jq last)
 
   msg="$(build_msg true "This comment will be updated when the cost estimate changes.")"
 
@@ -404,7 +412,7 @@ post_to_github_pull_request () {
     existing_msg=$(echo "$latest_pr_comment" | jq -r .body)
     # '// /' does a string substitution that removes spaces before comparison
     if [ "${msg// /}" != "${existing_msg// /}" ]; then
-      local comment_id=$(echo "$latest_pr_comment" | jq -r .id)
+      comment_id=$(echo "$latest_pr_comment" | jq -r .id)
       echo "Updating comment $comment_id for pull request $GITHUB_PULL_REQUEST_NUMBER."
       jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L --retry 3 -X PATCH -d @- \
         -H "Content-Type: application/json" \
@@ -423,12 +431,84 @@ post_to_github_pull_request () {
 }
 
 post_to_gitlab () {
+  if [ -z "$GITLAB_TOKEN" ]; then
+    echo "Error: GITLAB_TOKEN is required to post comment to GitHub"
+  else
+    if [ -n "$CI_MERGE_REQUEST_IID" ] && [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
+      post_to_gitlab_merge_request
+    else
+      post_to_gitlab_commit
+    fi
+  fi
+}
+
+post_to_gitlab_commit () {
   echo "Posting comment to GitLab commit $CI_COMMIT_SHA"
   msg="$(build_msg true)"
   jq -Mnc --arg msg "$msg" '{"note": "\($msg)"}' | curl -L -X POST -d @- \
     -H "Content-Type: application/json" \
     -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
     "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/repository/commits/$CI_COMMIT_SHA/comments"
+}
+
+fetch_existing_gitlab_merge_request_comments() {
+  existing_gitlab_merge_request_comments="[]" # empty array
+
+  local infracost_comments="[]"
+  local per_page=100
+  local page=0
+  local resp
+  local resp_length=0
+
+  while ((page == 0)) || ((resp_length == per_page)); do
+    page=$((page+1))
+
+    echo "Fetching comments for pull request $CI_MERGE_REQUEST_IID, $page"
+    resp=$(
+      curl -L --retry 3 \
+      -H "Content-Type: application/json" \
+      -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+      "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes?page=$page&per_page=$per_page"
+    )
+
+    infracost_comments=${infracost_comments},$(printf "%s" "$resp" | jq "[.[] | select(.body | contains(\"${MSG_START}\"))]")
+
+    resp_length=$(printf "%s" "$resp" | jq length)
+  done
+
+  existing_gitlab_merge_request_comments="$(echo "[$infracost_comments]" | jq 'flatten(1)')"
+}
+
+
+post_to_gitlab_merge_request () {
+  local latest_mr_comment
+  local comment_id
+
+  fetch_existing_gitlab_merge_request_comments
+  latest_mr_comment=$(echo "$existing_gitlab_merge_request_comments" | jq last)
+
+  msg="$(build_msg true "This comment will be updated when the cost estimate changes.")"
+
+  if [ "$latest_mr_comment" != "null" ]; then
+    existing_msg=$(echo "$latest_mr_comment" | jq -r .body)
+    # '// /' does a string substitution that removes spaces before comparison
+    if [ "${msg// /}" != "${existing_msg// /}" ]; then
+      comment_id=$(echo "$latest_mr_comment" | jq -r .id)
+      echo "Updating comment $comment_id for merge request $CI_MERGE_REQUEST_IID."
+      jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L --retry 3 -X PUT -d @- \
+        -H "Content-Type: application/json" \
+        -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+        "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes/$comment_id"
+    else
+      echo "Skipping comment for merge request $CI_MERGE_REQUEST_IID, no change in msg."
+    fi
+  else
+    echo "Creating new comment for merge request $CI_MERGE_REQUEST_IID."
+    jq -Mnc --arg msg "$msg" '{"body": "\($msg)"}' | curl -L -X POST -d @- \
+      -H "Content-Type: application/json" \
+      -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+      "$CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes"
+  fi
 }
 
 post_bitbucket_comment () {
@@ -531,7 +611,7 @@ load_github_env () {
 
 load_gitlab_env () {
   export VCS_REPO_URL=$CI_REPOSITORY_URL
-  
+
   first_mr=$(echo "$CI_OPEN_MERGE_REQUESTS" | cut -d',' -f1)
   repo=$(echo "$first_mr" | cut -d'!' -f1)
   mr_number=$(echo "$first_mr" | cut -d'!' -f2)
@@ -575,7 +655,7 @@ echo "$breakdown_output" > infracost_breakdown.json
 
 infracost_output_cmd=$(build_output_cmd "infracost_breakdown.json")
 echo "$infracost_output_cmd" > infracost_output_cmd
-  
+
 echo "Running infracost output using:"
 echo "  $ $(cat infracost_output_cmd)"
 diff_output=$(cat infracost_output_cmd | sh)
