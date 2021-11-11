@@ -113,7 +113,7 @@ func eventHubsThroughPutCostComponent(region, sku, meterName string, capacity de
 			Service:    strPtr("Event Hubs"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", sku))},
-				{Key: "meterName", Value: strPtr(meterName)},
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", meterName))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
