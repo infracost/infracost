@@ -6,9 +6,5 @@
                                                                       
  OVERALL TOTAL                                                 $73.00 
 ──────────────────────────────────
-4 cloud resources were detected:
+1 cloud resource was detected:
 ∙ 1 was estimated
-∙ 3 were free:
-  ∙ 1 x aws_iam_role
-  ∙ 1 x aws_subnet
-  ∙ 1 x aws_vpc

@@ -1,38 +1,25 @@
 
- Name                                                  Monthly Qty  Unit                    Monthly Cost 
-                                                                                                         
- aws_mwaa_environment.default_environment_class                                                          
- ├─ Environment (Small)                                        730  hours                        $357.70 
- ├─ Worker (Small)                               Monthly cost depends on usage: $0.055 per hours         
- ├─ Scheduler (Small)                            Monthly cost depends on usage: $0.055 per hours         
- └─ Meta database                                Monthly cost depends on usage: $0.10 per GB             
-                                                                                                         
- aws_mwaa_environment.large_with_usage                                                                   
- ├─ Environment (Large)                                        730  hours                        $722.70 
- ├─ Worker (Large)                                           1,825  hours                        $401.50 
- ├─ Scheduler (Large)                                        2,190  hours                        $481.80 
- └─ Meta database                                            1,000  GB                           $100.00 
-                                                                                                         
- aws_mwaa_environment.medium                                                                             
- ├─ Environment (Medium)                                       730  hours                        $540.20 
- ├─ Worker (Medium)                              Monthly cost depends on usage: $0.11 per hours          
- ├─ Scheduler (Medium)                           Monthly cost depends on usage: $0.11 per hours          
- └─ Meta database                                Monthly cost depends on usage: $0.10 per GB             
-                                                                                                         
- aws_s3_bucket.example                                                                                   
- └─ Standard                                                                                             
-    ├─ Storage                                   Monthly cost depends on usage: $0.023 per GB            
-    ├─ PUT, COPY, POST, LIST requests            Monthly cost depends on usage: $0.005 per 1k requests   
-    ├─ GET, SELECT, and all other requests       Monthly cost depends on usage: $0.0004 per 1k requests  
-    ├─ Select data scanned                       Monthly cost depends on usage: $0.002 per GB            
-    └─ Select data returned                      Monthly cost depends on usage: $0.0007 per GB           
-                                                                                                         
- OVERALL TOTAL                                                                                 $2,603.90 
+ Name                                                Monthly Qty  Unit                Monthly Cost 
+                                                                                                   
+ aws_mwaa_environment.default_environment_class                                                    
+ ├─ Environment (Small)                                      730  hours                    $357.70 
+ ├─ Worker (Small)                               Monthly cost depends on usage: $0.055 per hours   
+ ├─ Scheduler (Small)                            Monthly cost depends on usage: $0.055 per hours   
+ └─ Meta database                                Monthly cost depends on usage: $0.10 per GB       
+                                                                                                   
+ aws_mwaa_environment.large_with_usage                                                             
+ ├─ Environment (Large)                                      730  hours                    $722.70 
+ ├─ Worker (Large)                                         1,825  hours                    $401.50 
+ ├─ Scheduler (Large)                                      2,190  hours                    $481.80 
+ └─ Meta database                                          1,000  GB                       $100.00 
+                                                                                                   
+ aws_mwaa_environment.medium                                                                       
+ ├─ Environment (Medium)                                     730  hours                    $540.20 
+ ├─ Worker (Medium)                              Monthly cost depends on usage: $0.11 per hours    
+ ├─ Scheduler (Medium)                           Monthly cost depends on usage: $0.11 per hours    
+ └─ Meta database                                Monthly cost depends on usage: $0.10 per GB       
+                                                                                                   
+ OVERALL TOTAL                                                                           $2,603.90 
 ──────────────────────────────────
-8 cloud resources were detected:
-∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
-∙ 4 were free:
-  ∙ 1 x aws_iam_role
-  ∙ 1 x aws_security_group
-  ∙ 1 x aws_subnet
-  ∙ 1 x aws_vpc
+3 cloud resources were detected:
+∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file

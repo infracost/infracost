@@ -9,33 +9,12 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-}
-
-resource "aws_subnet" "my_aws_subnet" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
-
-  tags = {
-    Name = "Main"
-  }
-}
-
-resource "aws_iam_role" "my_aws_iam_role" {
-  name = "awsconfig-example"
-
-  assume_role_policy = <<POLICY
-{}
-POLICY
-}
-
 resource "aws_eks_cluster" "my_aws_eks_cluster" {
   name     = "my_aws_eks_cluster"
-  role_arn = aws_iam_role.my_aws_iam_role.arn
+  role_arn = "arn:aws:iam::123456789012:role/role"
 
   vpc_config {
-    subnet_ids = [aws_subnet.my_aws_subnet.id]
+    subnet_ids = ["subnet-123456"]
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
