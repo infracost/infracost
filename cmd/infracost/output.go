@@ -31,15 +31,15 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
   Create HTML report from multiple Infracost JSON files:
 
-      infracost output --format html --path "out*.json" > output.html
+      infracost output --format html --path "out*.json" --out-file output.html # glob needs quotes
 
   Merge multiple Infracost JSON files:
 
-      infracost output --format json --path "out*.json"
+      infracost output --format json --path "out*.json" # glob needs quotes
 
-  Create markdown report suitable for posting in a GitHub comment:
+  Create markdown report to post in a GitHub comment:
 
-      infracost output --format github-comment --path "out*.json"`,
+      infracost output --format github-comment --path "out*.json" # glob needs quotes`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFiles := []string{}
@@ -174,7 +174,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files")
+	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment")
