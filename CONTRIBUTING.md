@@ -346,7 +346,7 @@ The count parameter replicates the resource in the Terraform plan JSON so there 
 - [ ] Added test cases without usage-file
 - [ ] Added test cases with usage-file
 - [ ] Compared test case output to cloud cost calculator.
-- [ ] Created a PR to update "Supported Resources" in the [docs](https://github.com/infracost/docs/blob/master/docs/supported_resources.md))
+- [ ] Created a PR to update "Supported Resources" in the [docs](https://github.com/infracost/docs/blob/master/docs/supported_resources/))
 
 ## Issues:
 
@@ -665,7 +665,7 @@ Here is a list of things we should look for during code review when adding new r
 	- misnamed unit: `GB-month` should be `GB`
 - Any "Missing prices" or "Multiple prices" lines when running with `--log-level debug`?
 - Any incorrect prices or calculations?
-- Any [docs](https://www.infracost.io/docs/) pages need to be updated? e.g. the [supported resources](https://github.com/infracost/docs/blob/master/docs/supported_resources.md) page. If so, please open a PR so it can be merged after the CLI is released.
+- Any [docs](https://www.infracost.io/docs/) pages need to be updated? e.g. the [supported resources](https://github.com/infracost/docs/blob/master/docs/supported_resources/) pages. If so, please open a PR so it can be merged after the CLI is released.
 
 ## Releases
 
