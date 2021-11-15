@@ -30,10 +30,6 @@ resource "azurerm_key_vault_certificate" "non-usage" {
   name         = "imported-cert"
   key_vault_id = azurerm_key_vault.standard.id
 
-  certificate {
-    contents = ""
-  }
-
   certificate_policy {
     issuer_parameters {
       name = "Self"
@@ -55,10 +51,6 @@ resource "azurerm_key_vault_certificate" "standard" {
   name         = "imported-cert"
   key_vault_id = azurerm_key_vault.standard.id
 
-  certificate {
-    contents = ""
-  }
-
   certificate_policy {
     issuer_parameters {
       name = "Self"
@@ -79,10 +71,6 @@ resource "azurerm_key_vault_certificate" "standard" {
 resource "azurerm_key_vault_certificate" "premium" {
   name         = "imported-cert"
   key_vault_id = azurerm_key_vault.premium.id
-
-  certificate {
-    contents = ""
-  }
 
   certificate_policy {
     issuer_parameters {
