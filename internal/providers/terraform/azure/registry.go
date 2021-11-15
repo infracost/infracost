@@ -48,6 +48,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMDNSZoneRegistryItem(),
 	GetAzureRMEventHubsNamespaceRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
+	getAzureRMFrontdoorFirewallPolicyRegistryItem(),
+	getAzureRMFrontdoorRegistryItem(),
 	GetAzureRMHDInsightHadoopClusterRegistryItem(),
 	GetAzureRMHDInsightHBaseClusterRegistryItem(),
 	GetAzureRMHDInsightInteractiveQueryClusterRegistryItem(),
@@ -213,6 +215,10 @@ var FreeResources = []string{
 	"azurerm_firewall_network_rule_collection",
 	"azurerm_firewall_policy",
 	"azurerm_firewall_policy_rule_collection_group",
+
+	// Azure Front Door
+	"azurerm_frontdoor_custom_https_configuration",
+	"azurerm_frontdoor_rules_engine",
 
 	// Azure Key Vault
 	"azurerm_key_vault",

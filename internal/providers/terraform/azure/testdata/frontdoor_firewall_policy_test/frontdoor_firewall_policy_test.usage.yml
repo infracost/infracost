@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  azurerm_frontdoor_firewall_policy.firewall_policy_with_usage:
+    monthly_custom_rule_requests: 110000      # Monthly number of custom rule requests
+    monthly_managed_ruleset_requests: 1000000 # Monthly number of managed ruleset requests
