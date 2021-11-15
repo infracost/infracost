@@ -16,7 +16,7 @@ EXAMPLES
 
       infracost output --format json --path "out*.json" # glob needs quotes
 
-  Create markdown report suitable for posting in a GitHub comment:
+  Create markdown report to post in a GitHub comment:
 
       infracost output --format github-comment --path "out*.json" # glob needs quotes
 
