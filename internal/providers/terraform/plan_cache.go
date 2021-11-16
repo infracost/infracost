@@ -17,7 +17,7 @@ import (
 var cacheFileVersion = "0.1"
 var infracostDir = ".infracost"
 var cacheFileName = ".infracost-cache"
-var cacheMaxAgeSecs int64 = 60 * 10 // 10 minutes
+var cacheMaxAgeSecs int64 = 60 * 30 // 30 minutes
 
 type terraformConfigFileState struct {
 	Filepath string `json:"filepath"`
