@@ -198,3 +198,15 @@
 ──────────────────────────────────
 24 cloud resources were detected:
 ∙ 24 were estimated, 24 include usage-based costs, see https://infracost.io/usage-file
+Logs:
+
+level=warning msg="Multiple products found for aws_data_transfer.ap-southeast-1 Outbound data transfer to Internet (first 10TB), using the first product"
+level=warning msg="Multiple products found for aws_data_transfer.ap-southeast-1 Outbound data transfer to Internet (first 10TB), using the first product"
+level=warning msg="Multiple products found for aws_data_transfer.ap-southeast-1 Outbound data transfer to Internet (next 100TB), using the first product"
+level=warning msg="Multiple products found for aws_data_transfer.ap-southeast-1 Outbound data transfer to Internet (next 100TB), using the first product"
+level=warning msg="Multiple products found for aws_data_transfer.ap-southeast-1 Outbound data transfer to Internet (next 40TB), using the first product"
+level=warning msg="Multiple products found for aws_data_transfer.ap-southeast-1 Outbound data transfer to Internet (next 40TB), using the first product"
+level=warning msg="Multiple products found for aws_data_transfer.ap-southeast-1 Outbound data transfer to Internet (over 150TB), using the first product"
+level=warning msg="Multiple products found for aws_data_transfer.ap-southeast-1 Outbound data transfer to Internet (over 150TB), using the first product"
+level=warning msg="Multiple products found for aws_data_transfer.ap-southeast-1 Outbound data transfer to other regions, using the first product"
+level=warning msg="Multiple products found for aws_data_transfer.ap-southeast-1 Outbound data transfer to other regions, using the first product"

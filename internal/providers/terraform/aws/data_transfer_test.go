@@ -10,12 +10,13 @@ import (
 )
 
 func TestDataTransferGoldenFile(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "data_transfer_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	opts.CaptureLogs = true
+	tftest.GoldenFileResourceTestsWithOpts(t, "data_transfer_test", opts)
 }
 
 func TestChinaDataTransfer(t *testing.T) {
