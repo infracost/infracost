@@ -166,6 +166,8 @@ func ciPlatform() string {
 		return "env0"
 	} else if IsEnvPresent("SCALR_RUN_ID") {
 		return "scalr"
+	} else if IsEnvPresent("CF_BUILD_ID") {
+		return "codefresh"
 	} else {
 		envKeys := os.Environ()
 		sort.Strings(envKeys)
