@@ -1,0 +1,25 @@
+
+ Name                                                   Monthly Qty  Unit            Monthly Cost 
+                                                                                                  
+ azurerm_frontdoor.frontdoor_with_usage                                                           
+ ├─ Routing rules (first 5 rules)                             3,650  hours                $109.50 
+ ├─ Routing rules (per additional rule)                         730  hours                  $8.76 
+ ├─ Frontend hosts (over 100)                                    10  hosts                 $50.00 
+ ├─ Inbound data transfer                                     1,000  GB                    $10.00 
+ └─ Outbound data transfer                                                                        
+    ├─ North America, Europe and Africa (first 10TB)         10,000  GB                 $1,700.00 
+    ├─ North America, Europe and Africa (next 40TB)          40,000  GB                 $6,000.00 
+    └─ North America, Europe and Africa (over 50TB)         150,000  GB                $19,500.00 
+                                                                                                  
+ azurerm_frontdoor.frontdoor_without_usage                                                        
+ ├─ Routing rules (first 5 rules)                               730  hours                 $21.90 
+ ├─ Inbound data transfer                             Monthly cost depends on usage: $0.01 per GB 
+ └─ Outbound data transfer                                                                        
+    └─ North America, Europe and Africa (first 10TB)  Monthly cost depends on usage: $0.17 per GB 
+                                                                                                  
+ OVERALL TOTAL                                                                         $27,400.16 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group

@@ -1,0 +1,23 @@
+
+ Name                                                               Monthly Qty  Unit                  Monthly Cost 
+                                                                                                                    
+ azurerm_frontdoor_firewall_policy.firewall_policy_example                                                          
+ ├─ Policy                                                                    1  months                       $5.00 
+ ├─ Custom rules                                                              2  rules                        $2.00 
+ ├─ Custom rule requests                                       Monthly cost depends on usage: $0.60 per 1M requests 
+ ├─ Managed rulesets                                                          2  rulesets                    $40.00 
+ └─ Managed ruleset requests                                   Monthly cost depends on usage: $1.00 per 1M requests 
+                                                                                                                    
+ azurerm_frontdoor_firewall_policy.firewall_policy_with_usage                                                       
+ ├─ Policy                                                                    1  months                       $5.00 
+ ├─ Custom rules                                                              2  rules                        $2.00 
+ ├─ Custom rule requests                                                   0.11  1M requests                  $0.07 
+ ├─ Managed rulesets                                                          2  rulesets                    $40.00 
+ └─ Managed ruleset requests                                                  1  1M requests                  $1.00 
+                                                                                                                    
+ OVERALL TOTAL                                                                                               $95.07 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
