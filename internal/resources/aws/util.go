@@ -113,6 +113,12 @@ var RegionMapping = map[string]string{
 	"af-south-1":      "Africa (Cape Town)",
 }
 
+// RegionCodeMapping helps to find region's abbreviated code for a more granular
+// filtering when resources may have multiple products for the same region.
+var RegionCodeMapping = map[string]string{
+	"ap-southeast-1": "APS1",
+}
+
 // RegionsUsage is a reusable type that represents a usage cost map.
 // This can be used in resources that define a usage parameter that's
 // changed on a per-region basis. e.g.
