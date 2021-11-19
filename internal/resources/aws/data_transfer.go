@@ -261,6 +261,13 @@ func (r *DataTransfer) buildProductFilter(transferType string, toRegion *string)
 		})
 	}
 
+	if regionCode, ok := RegionCodeMapping[r.Region]; ok {
+		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
+			Key:        "usagetype",
+			ValueRegex: strPtr(fmt.Sprintf("/^%s-/i", regionCode)),
+		})
+	}
+
 	return &schema.ProductFilter{
 		VendorName:       strPtr("aws"),
 		Service:          strPtr("AWSDataTransfer"),
