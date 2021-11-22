@@ -9,6 +9,7 @@ import (
 
 	"github.com/awslabs/goformation/v4"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -64,6 +65,11 @@ func isTerraformPlanJSON(path string) bool {
 		PlannedValues interface{} `json:"planned_values"`
 	}
 
+	b, hasWrapper := terraform.StripSetupTerraformWrapper(b)
+	if hasWrapper {
+		log.Infof("Stripped wrapper output from %s (to make it a valid JSON file) since setup-terraform GitHub Action was used without terraform_wrapper: false", path)
+	}
+
 	err = json.Unmarshal(b, &jsonFormat)
 	if err != nil {
 		return false
@@ -81,6 +87,11 @@ func isTerraformStateJSON(path string) bool {
 	var jsonFormat struct {
 		FormatVersion string      `json:"format_version"`
 		Values        interface{} `json:"values"`
+	}
+
+	b, hasWrapper := terraform.StripSetupTerraformWrapper(b)
+	if hasWrapper {
+		log.Debugf("Stripped setup-terraform wrapper output from %s", path)
 	}
 
 	err = json.Unmarshal(b, &jsonFormat)
