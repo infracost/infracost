@@ -136,7 +136,9 @@ func baseVersion(v string) string {
 }
 
 func ciScript() string {
-	if IsEnvPresent("INFRACOST_CI_DIFF") {
+	if IsEnvPresent("INFRACOST_GITHUB_ACTION") {
+		return "infracost-github-action"
+	} else if IsEnvPresent("INFRACOST_CI_DIFF") {
 		return "ci-diff"
 	} else if IsEnvPresent("INFRACOST_CI_ATLANTIS_DIFF") {
 		return "ci-atlantis-diff"
