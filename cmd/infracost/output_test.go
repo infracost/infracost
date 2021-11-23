@@ -27,6 +27,10 @@ func TestOutputFormatGithubComment(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "github-comment", "--path", "./testdata/example_out.json", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
 }
 
+func TestOutputFormatGithubCommentMultipleSkipped(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "github-comment", "--path", "./testdata/example_out.json", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
+}
+
 func TestOutputFormatGithubCommentNoChange(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "github-comment", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
 }

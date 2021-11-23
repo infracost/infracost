@@ -1,5 +1,5 @@
 
-💰 Infracost estimate: **monthly cost will increase by $1,402 (+1,728%) 📈**
+💰 Infracost estimate: **monthly cost will increase by $1,402 (+1,152%) 📈**
 <table>
   <thead>
     <td>Project</td>
@@ -22,14 +22,14 @@
     </tr>
     <tr>
       <td>All projects</td>
-      <td align="right">$81.12</td>
-      <td align="right">$1,483</td>
-      <td>+$1,402 (+1,728%)</td>
+      <td align="right">$122</td>
+      <td align="right">$1,524</td>
+      <td>+$1,402 (+1,152%)</td>
     </tr>
   </tbody>
 </table>
 
-1 project has no cost estimate changes.
+2 projects have no cost estimate changes.
 
 <details>
 <summary><strong>Infracost output</strong></summary>
@@ -218,7 +218,7 @@ Percent: +100%
 
 ──────────────────────────────────
 
-The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json
+The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json, infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json
 Run infracost breakdown to see their full breakdown.
 
 ──────────────────────────────────

@@ -3,11 +3,11 @@ package output
 import (
 	"bufio"
 	"bytes"
+	"text/template"
+
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	"strings"
-	"text/template"
 
 	"github.com/Masterminds/sprig"
 )
@@ -99,22 +99,22 @@ func ToMarkdown(out Root, opts Options) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	skippedProjects := make([]string, 0)
+	skippedProjectCount := 0
 	for _, p := range out.Projects {
 		if p.Diff == nil || len(p.Diff.Resources) == 0 {
-			skippedProjects = append(skippedProjects, p.Name)
+			skippedProjectCount++
 		}
 	}
 
 	err = tmpl.Execute(bufw, struct {
-		Root            Root
-		SkippedProjects string
-		DiffOutput      string
-		WillUpdate      bool
-		Options         Options
+		Root                Root
+		SkippedProjectCount int
+		DiffOutput          string
+		WillUpdate          bool
+		Options             Options
 	}{
 		out,
-		strings.Join(skippedProjects, ", "),
+		skippedProjectCount,
 		ui.StripColor(string(diff)),
 		true,
 		opts})
