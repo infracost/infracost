@@ -131,6 +131,8 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
+	j, _ = StripSetupTerraformWrapper(j)
+
 	if !gjson.ValidBytes(j) {
 		return baseResources, baseResources, errors.New("invalid JSON")
 	}
@@ -146,6 +148,20 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
 
 	return pastResources, resources, nil
+}
+
+// StripTerraformWrapper removes any output added from the setup-terraform
+// GitHub action terraform wrapper, so we can parse the output of this as
+// valid JSON. It returns the stripped out JSON and a boolean that is true
+// if the wrapper output was found and removed.
+func StripSetupTerraformWrapper(b []byte) ([]byte, bool) {
+	headerLine := regexp.MustCompile(`(?m)^\[command\].*\n`)
+	outputLine := regexp.MustCompile(`(?m)^::.*\n`)
+
+	stripped := headerLine.ReplaceAll(b, []byte{})
+	stripped = outputLine.ReplaceAll(stripped, []byte{})
+
+	return stripped, len(stripped) != len(b)
 }
 
 func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {

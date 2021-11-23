@@ -133,6 +133,10 @@ func TestInstanceWithAttachmentAfterDeploy(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/instance_with_attachment_after_deploy.json"}, nil)
 }
 
+func TestBreakdownTerraformWrapper(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/plan_with_terraform_wrapper.json"}, nil)
+}
+
 func TestBreakdownTerraform_v0_12(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/terraform_v0.12_plan.json"}, nil)
 }
