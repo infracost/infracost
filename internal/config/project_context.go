@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -56,6 +57,8 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 	if vcsRepoURL != "" && vcsSubPath == "" {
 		vcsSubPath = gitSubPath(path)
 	}
+
+	vcsRepoURL = stripVCSRepoPassword(vcsRepoURL)
 
 	return &schema.ProjectMetadata{
 		Path:               path,
@@ -120,4 +123,9 @@ func gitToplevel(path string) (string, error) {
 		return "", err
 	}
 	return strings.Split(string(out), "\n")[0], nil
+}
+
+func stripVCSRepoPassword(repoURL string) string {
+	r := regexp.MustCompile(`.*:([^@]*)@`)
+	return r.ReplaceAllString(repoURL, "")
 }
