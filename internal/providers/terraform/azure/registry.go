@@ -84,7 +84,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMPublicIPPrefixRegistryItem(),
 	GetAzureRMSearchServiceRegistryItem(),
 	GetAzureRMRedisCacheRegistryItem(),
-	GetAzureRMStorageAccountRegistryItem(),
+	getAzureRMStorageAccountRegistryItem(),
 	GetAzureRMSynapseSparkPoolRegistryItem(),
 	GetAzureRMSynapseSQLPoolRegistryItem(),
 	GetAzureRMSynapseWorkspacRegistryItem(),
