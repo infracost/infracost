@@ -8,6 +8,24 @@ resource "azurerm_resource_group" "example" {
   location = "westus"
 }
 
+resource "azurerm_storage_account" "unsupported" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "BlobStorage"
+  account_tier             = "Premium"
+  account_replication_type = "ZRS"
+}
+
+resource "azurerm_storage_account" "bb_Premium_unsupported_access_tier" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "BlockBlobStorage"
+  account_tier             = "Premium"
+  account_replication_type = "RAGZRS"
+}
+
 resource "azurerm_storage_account" "bb_Premium_ZRS" {
   name                     = "storageaccountname"
   resource_group_name      = azurerm_resource_group.example.name
@@ -99,6 +117,15 @@ resource "azurerm_storage_account" "file_without_usage_file" {
   account_kind             = "FileStorage"
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  access_tier              = "Cool"
+}
+resource "azurerm_storage_account" "file_unsupported_access_tier" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "FileStorage"
+  account_tier             = "Standard"
+  account_replication_type = "GZRS"
   access_tier              = "Cool"
 }
 resource "azurerm_storage_account" "file_cool_lrs" {
