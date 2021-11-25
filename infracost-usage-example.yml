@@ -855,18 +855,18 @@ resource_usage:
     monthly_images_extracted: 1000000 # Monthly number of extracted images
 
   azurerm_storage_account.my_account:
-    data_at_rest_storage_gb: 10000
-    early_deletion_gb: 1000
-    snapshots_storage_gb: 10000
-    metadata_at_rest_storage_gb: 10000
-    storage_gb: 1000000 # Total size of storage in GB.
-    monthly_write_operations: 1000000 # Monthly number of Write operations.
-    monthly_list_and_create_container_operations: 1000000 # Monthly number of List and Create Container operations. 
-    monthly_read_operations: 100000 # Monthly number of Read operations.
-    monthly_other_operations: 1000000 # Monthly number of  All other operations. 
-    monthly_data_retrieval_gb: 1000 # Monthly number of data retrieval in GB.
-    monthly_data_write_gb: 1000 # Monthly number of data write in GB.
-    blob_index_tags: 100000 # Total number of Blob indexes.
+    data_at_rest_storage_gb: 10000                        # Total size of Data at Rest in GB (File storage).
+    early_deletion_gb: 1000                               # Total size of Early deletion data in GB.
+    snapshots_storage_gb: 10000                           # Total size of Snapshots in GB (File storage).
+    metadata_at_rest_storage_gb: 10000                    # Total size of Metadata in GB (File storage).
+    storage_gb: 1000000                                   # Total size of storage in GB.
+    monthly_write_operations: 1000000                     # Monthly number of Write operations.
+    monthly_list_and_create_container_operations: 1000000 # Monthly number of List and Create Container operations.
+    monthly_read_operations: 100000                       # Monthly number of Read operations.
+    monthly_other_operations: 1000000                     # Monthly number of All other operations.
+    monthly_data_retrieval_gb: 1000                       # Monthly number of data retrieval in GB.
+    monthly_data_write_gb: 1000                           # Monthly number of data write in GB.
+    blob_index_tags: 100000                               # Total number of Blob indexes.
 
   azurerm_synapse_spark_pool.my_spark_pool:
     monthly_hours: 730 # Monthly number of hours used by each instance in the pool.

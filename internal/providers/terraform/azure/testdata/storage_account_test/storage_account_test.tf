@@ -44,6 +44,15 @@ resource "azurerm_storage_account" "bb_Premium_LRS" {
   account_replication_type = "LRS"
 }
 
+resource "azurerm_storage_account" "bb_Standard_unsupported_access_tier" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "BlockBlobStorage"
+  account_tier             = "Standard"
+  account_replication_type = "RAGZRS"
+}
+
 resource "azurerm_storage_account" "bb_Standard_LRS_Hot" {
   name                     = "storageaccountname"
   resource_group_name      = azurerm_resource_group.example.name
@@ -110,6 +119,7 @@ resource "azurerm_storage_account" "bb_without_usage_file" {
   account_replication_type = "RAGRS"
   access_tier              = "Cool"
 }
+
 resource "azurerm_storage_account" "file_without_usage_file" {
   name                     = "storageaccountname"
   resource_group_name      = azurerm_resource_group.example.name
@@ -119,6 +129,7 @@ resource "azurerm_storage_account" "file_without_usage_file" {
   account_replication_type = "LRS"
   access_tier              = "Cool"
 }
+
 resource "azurerm_storage_account" "file_unsupported_access_tier" {
   name                     = "storageaccountname"
   resource_group_name      = azurerm_resource_group.example.name
@@ -128,6 +139,7 @@ resource "azurerm_storage_account" "file_unsupported_access_tier" {
   account_replication_type = "GZRS"
   access_tier              = "Cool"
 }
+
 resource "azurerm_storage_account" "file_cool_lrs" {
   name                     = "storageaccountname"
   resource_group_name      = azurerm_resource_group.example.name
@@ -137,6 +149,7 @@ resource "azurerm_storage_account" "file_cool_lrs" {
   account_replication_type = "LRS"
   access_tier              = "Cool"
 }
+
 resource "azurerm_storage_account" "file_hot_lrs" {
   name                     = "storageaccountname"
   resource_group_name      = azurerm_resource_group.example.name
@@ -146,6 +159,7 @@ resource "azurerm_storage_account" "file_hot_lrs" {
   account_replication_type = "LRS"
   access_tier              = "Hot"
 }
+
 resource "azurerm_storage_account" "file_cool_grs" {
   name                     = "storageaccountname"
   resource_group_name      = azurerm_resource_group.example.name
@@ -155,6 +169,7 @@ resource "azurerm_storage_account" "file_cool_grs" {
   account_replication_type = "GRS"
   access_tier              = "Cool"
 }
+
 resource "azurerm_storage_account" "file_hot_grs" {
   name                     = "storageaccountname"
   resource_group_name      = azurerm_resource_group.example.name

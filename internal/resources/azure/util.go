@@ -1,6 +1,8 @@
 package azure
 
 import (
+	"fmt"
+
 	"github.com/shopspring/decimal"
 )
 
@@ -17,4 +19,17 @@ func floatPtrToDecimalPtr(f *float64) *decimal.Decimal {
 		return nil
 	}
 	return decimalPtr(decimal.NewFromFloat(*f))
+}
+
+func contains(a []string, x string) bool {
+	for _, n := range a {
+		if x == n {
+			return true
+		}
+	}
+	return false
+}
+
+func regexPtr(regex string) *string {
+	return strPtr(fmt.Sprintf("/%s/i", regex))
 }
