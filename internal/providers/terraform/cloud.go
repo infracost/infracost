@@ -20,12 +20,6 @@ import (
 var ErrMissingCloudToken = errors.New("No Terraform Cloud Token is set")
 var ErrInvalidCloudToken = errors.New("Invalid Terraform Cloud Token")
 
-type terraformConfig struct {
-	Credentials map[string]struct {
-		Token string
-	}
-}
-
 func cloudAPI(host string, path string, token string) ([]byte, error) {
 	client := &http.Client{}
 
@@ -98,14 +92,22 @@ func credFromHCL(filename string, host string) (string, error) {
 		return "", parseDiags
 	}
 
-	var conf terraformConfig
+	var conf struct {
+		Credentials []struct {
+			Name  string `hcl:"name,label"`
+			Token string `hcl:"token"`
+		} `hcl:"credentials,block"`
+	}
+
 	decodeDiags := gohcl.DecodeBody(f.Body, nil, &conf)
 	if decodeDiags.HasErrors() {
 		return "", parseDiags
 	}
 
-	if hostCred, ok := conf.Credentials[host]; ok {
-		return hostCred.Token, nil
+	for _, c := range conf.Credentials {
+		if c.Name == host {
+			return c.Token, nil
+		}
 	}
 
 	return "", nil
@@ -117,7 +119,11 @@ func credFromJSON(filename, host string) (string, error) {
 		return "", err
 	}
 
-	var conf terraformConfig
+	var conf struct {
+		Credentials map[string]struct {
+			Token string `json:"token"`
+		} `json:"credentials"`
+	}
 	err = json.Unmarshal(data, &conf)
 	if err != nil {
 		return "", err
