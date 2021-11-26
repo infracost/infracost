@@ -123,3 +123,14 @@ resource_usage:
     monthly_list_and_create_container_operations: 1000000
     monthly_read_operations: 100000
     monthly_other_operations: 1000000
+
+  azurerm_storage_account.file_premium_lrs:
+    data_at_rest_storage_gb: 10000
+    early_deletion_gb: 1000
+    snapshots_storage_gb: 10000
+    metadata_at_rest_storage_gb: 10000
+    monthly_data_retrieval_gb: 1000
+    monthly_write_operations: 1000000
+    monthly_list_and_create_container_operations: 1000000
+    monthly_read_operations: 100000
+    monthly_other_operations: 1000000

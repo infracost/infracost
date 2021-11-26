@@ -125,6 +125,14 @@
  ├─ Read operations                                               10  10k operations                   $0.06 
  └─ All other operations                                         100  10k operations                   $0.57 
                                                                                                              
+ azurerm_storage_account.file_premium_lrs                                                                    
+ ├─ Data at rest                                              10,000  GB                           $1,760.00 
+ └─ Snapshots                                                 10,000  GB                           $1,500.00 
+                                                                                                             
+ azurerm_storage_account.file_premium_zrs                                                                    
+ ├─ Data at rest                                  Monthly cost depends on usage: $0.22 per GB                
+ └─ Snapshots                                     Monthly cost depends on usage: $0.19 per GB                
+                                                                                                             
  azurerm_storage_account.file_without_usage_file                                                             
  ├─ Data at rest                                  Monthly cost depends on usage: $0.0228 per GB              
  ├─ Snapshots                                     Monthly cost depends on usage: $0.0228 per GB              
@@ -136,17 +144,18 @@
  ├─ Data retrieval                                Monthly cost depends on usage: $0.01 per GB                
  └─ Early deletion                                Monthly cost depends on usage: $0.0228 per GB              
                                                                                                              
- OVERALL TOTAL                                                                                 $1,778,552.71 
+ OVERALL TOTAL                                                                                 $1,781,812.71 
 ──────────────────────────────────
-19 cloud resources were detected:
-∙ 14 were estimated, 14 include usage-based costs, see https://infracost.io/usage-file
-∙ 4 weren't estimated, report them in https://github.com/infracost/infracost:
-  ∙ 4 x azurerm_storage_account
+22 cloud resources were detected:
+∙ 16 were estimated, 16 include usage-based costs, see https://infracost.io/usage-file
+∙ 5 weren't estimated, report them in https://github.com/infracost/infracost:
+  ∙ 5 x azurerm_storage_account
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
 Logs:
 
 level=warning msg="Skipping resource azurerm_storage_account.bb_Premium_unsupported_access_tier. BlockBlobStorage Premium doesn't support RA-GZRS redundancy"
 level=warning msg="Skipping resource azurerm_storage_account.bb_Standard_unsupported_access_tier. BlockBlobStorage Standard doesn't support RA-GZRS redundancy"
+level=warning msg="Skipping resource azurerm_storage_account.file_premium_unsupported_access_tier. FileStorage Premium doesn't support GZRS redundancy"
 level=warning msg="Skipping resource azurerm_storage_account.file_unsupported_access_tier. FileStorage Standard doesn't support GZRS redundancy"
 level=warning msg="Skipping resource azurerm_storage_account.unsupported. Infracost only supports BlockBlobStorage and FileStorage account kinds"

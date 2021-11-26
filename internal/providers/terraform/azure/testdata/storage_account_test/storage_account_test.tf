@@ -179,3 +179,30 @@ resource "azurerm_storage_account" "file_hot_grs" {
   account_replication_type = "GRS"
   access_tier              = "Hot"
 }
+
+resource "azurerm_storage_account" "file_premium_unsupported_access_tier" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "FileStorage"
+  account_tier             = "Premium"
+  account_replication_type = "GZRS"
+}
+
+resource "azurerm_storage_account" "file_premium_lrs" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "FileStorage"
+  account_tier             = "Premium"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_storage_account" "file_premium_zrs" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "FileStorage"
+  account_tier             = "Premium"
+  account_replication_type = "ZRS"
+}
