@@ -120,7 +120,10 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 			"Premium":  "Premium Block Blob",
 		}[r.AccountTier]
 	case r.isFileStorage():
-		productName = "Files v2"
+		productName = map[string]string{
+			"Standard": "Files v2",
+			"Premium":  "Premium Files",
+		}[r.AccountTier]
 	}
 
 	skuName := fmt.Sprintf("%s %s", r.AccessTier, r.AccountReplicationType)
@@ -505,7 +508,7 @@ func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 // FileStorage:
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
-//   Premium:       cost exists (TODO)
+//   Premium:       cost exists
 func (r *StorageAccount) dataAtRestCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -520,6 +523,9 @@ func (r *StorageAccount) dataAtRestCostComponents() []*schema.CostComponent {
 	}
 
 	meterName := "Data Stored"
+	if r.isPremium() {
+		meterName = "Provisioned"
+	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Data at rest",
@@ -542,7 +548,7 @@ func (r *StorageAccount) dataAtRestCostComponents() []*schema.CostComponent {
 // FileStorage:
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
-//   Premium:       cost exists (TODO)
+//   Premium:       cost exists
 func (r *StorageAccount) snapshotsCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -557,6 +563,9 @@ func (r *StorageAccount) snapshotsCostComponents() []*schema.CostComponent {
 	}
 
 	meterName := "Data Stored"
+	if r.isPremium() {
+		meterName = "Snapshots"
+	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Snapshots",
