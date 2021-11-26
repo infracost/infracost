@@ -86,6 +86,9 @@ resource_usage:
     monthly_outbound_other_regions_gb: 750      # Monthly data transferred to other AWS regions.
     monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
 
+  aws_db_instance.my_db:
+    monthly_standard_io_requests: 10000 # Monthly number of input/output requests for database.
+
   aws_directory_service_directory.my_directory:
     additional_domain_controllers: 3 # The number of domain controllers in the directory service provisioned in addition to the minimum 2 controllers
     shared_accounts: 8 # Number of accounts that Microsoft AD directory is shared with
@@ -94,9 +97,9 @@ resource_usage:
     backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
 
   aws_docdb_cluster_instance.my_db:
-    data_storage_gb: 1000         # Total storage for cluster in GB.
+    data_storage_gb: 1000          # Total storage for cluster in GB.
     monthly_io_requests: 100000000 # Monthly number of input/output requests for cluster.
-    monthly_cpu_credit_hrs: 100 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances.
+    monthly_cpu_credit_hrs: 100    # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances.
 
   aws_docdb_cluster_snapshot.my_snapshot:
     backup_storage_gb: 10000      # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
@@ -104,10 +107,10 @@ resource_usage:
   aws_dx_connection.my_dx_connection:
     monthly_outbound_region_to_dx_location_gb: 100 # (DEPRECATED use monthly_outbound_from_region_to_dx_connection_location instead) Monthly outbound data transferred from AWS region to DX location in GB.
     monthly_outbound_from_region_to_dx_connection_location:
-      us_east_1: 200 # Monthly outbound data transferred to the DX location from us-east-1 in GB
-      eu_west_2: 100 # Monthly outbound data transferred to the DX location from eu-west-2 in GB
-    dx_virtual_interface_type: private             # Interface type impacts outbound data transfer costs over DX, can be: private, public.
-    dx_connection_type: dedicated                  # Connection type impacts the per-port hourly price, can be: dedicated, hosted.
+      us_east_1: 200                   # Monthly outbound data transferred to the DX location from us-east-1 in GB
+      eu_west_2: 100                   # Monthly outbound data transferred to the DX location from eu-west-2 in GB
+    dx_virtual_interface_type: private # Interface type impacts outbound data transfer costs over DX, can be: private, public.
+    dx_connection_type: dedicated      # Connection type impacts the per-port hourly price, can be: dedicated, hosted.
 
   aws_dx_gateway_association.my_gateway:
     monthly_data_processed_gb: 100 # Monthly data processed by the DX gateway association per month in GB.
@@ -122,10 +125,10 @@ resource_usage:
     monthly_streams_read_request_units: 2 # Monthly streams read request units.
 
   aws_ebs_snapshot.my_snapshot:
-    monthly_list_block_requests: 1000000  # Monthly number of ListChangedBlocks and ListSnapshotBlocks requests.
-    monthly_get_block_requests: 100000    # Monthly number of GetSnapshotBlock requests (block size is 512KiB).
-    monthly_put_block_requests: 100000    # Monthly number of PutSnapshotBlock requests (block size is 512KiB).
-    fast_snapshot_restore_hours: 100      # Monthly number of DSU-hours for Fast snapshot restore  
+    monthly_list_block_requests: 1000000 # Monthly number of ListChangedBlocks and ListSnapshotBlocks requests.
+    monthly_get_block_requests: 100000   # Monthly number of GetSnapshotBlock requests (block size is 512KiB).
+    monthly_put_block_requests: 100000   # Monthly number of PutSnapshotBlock requests (block size is 512KiB).
+    fast_snapshot_restore_hours: 100     # Monthly number of DSU-hours for Fast snapshot restore.
 
   aws_ebs_volume.my_standard_volume:
     monthly_standard_io_requests: 10000000 # Monthly I/O requests for standard volume (Magnetic storage).
@@ -143,13 +146,13 @@ resource_usage:
     monthly_infrequent_access_write_gb: 100 # Monthly infrequent access write requests in GB.
 
   aws_eks_node_group.my_instance:
-    instances: 15 # Number of instances in the EKS node group.
-    operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
+    instances: 15                    # Number of instances in the EKS node group.
+    operating_system: linux          # Override the operating system of the instance, can be: linux, windows, suse, rhel.
     reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
-    reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_term: 1_year   # Term for Reserved Instances, can be: 1_year, 3_year.
     reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
-    vcpu_count: 2 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    vcpu_count: 2               # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
 
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
