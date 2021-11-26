@@ -11,7 +11,5 @@ func TestAzureRMHDInsightKafkaClusterGoldenFile(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	opts := tftest.DefaultGoldenFileOptions()
-	opts.CaptureLogs = true
-	tftest.GoldenFileResourceTestsWithOpts(t, "hdinsight_kafka_cluster_test", opts) //nolint:misspell
+	tftest.GoldenFileResourceTests(t, "hdinsight_kafka_cluster_test") //nolint:misspell
 }

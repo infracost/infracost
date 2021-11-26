@@ -27,10 +27,13 @@ type StorageAccount struct {
 	AccountKind            string
 	AccountReplicationType string
 	AccountTier            string
+	NFSv3                  bool
 
 	// "usage" args
 	MonthlyStorageGB                        *float64 `infracost_usage:"storage_gb"`
+	MonthlyIterativeReadOperations          *int64   `infracost_usage:"monthly_iterative_read_operations"`
 	MonthlyReadOperations                   *int64   `infracost_usage:"monthly_read_operations"`
+	MonthlyIterativeWriteOperations         *int64   `infracost_usage:"monthly_iterative_write_operations"`
 	MonthlyWriteOperations                  *int64   `infracost_usage:"monthly_write_operations"`
 	MonthlyListAndCreateContainerOperations *int64   `infracost_usage:"monthly_list_and_create_container_operations"`
 	MonthlyOtherOperations                  *int64   `infracost_usage:"monthly_other_operations"`
@@ -46,7 +49,9 @@ type StorageAccount struct {
 // StorageAccountUsageSchema defines a list which represents the usage schema of StorageAccount.
 var StorageAccountUsageSchema = []*schema.UsageItem{
 	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monthly_iterative_read_operations", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_read_operations", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "monthly_iterative_write_operations", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_write_operations", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_list_and_create_container_operations", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "monthly_other_operations", DefaultValue: 0, ValueType: schema.Int64},
@@ -68,8 +73,8 @@ func (r *StorageAccount) PopulateUsage(u *schema.UsageData) {
 // BuildResource builds a schema.Resource from valid StorageAccount data.
 // This method is called after the resource is initialised by an IaC provider.
 func (r *StorageAccount) BuildResource() *schema.Resource {
-	if !r.isBlockBlobStorage() && !r.isFileStorage() {
-		log.Warnf("Skipping resource %s. Infracost only supports BlockBlobStorage and FileStorage account kinds", r.Address)
+	if !r.isBlockBlobStorage() && !r.isFileStorage() && !r.isStorageV2() {
+		log.Warnf("Skipping resource %s. Infracost only supports StorageV2, BlockBlobStorage and FileStorage account kinds", r.Address)
 		return nil
 	}
 
@@ -92,8 +97,10 @@ func (r *StorageAccount) BuildResource() *schema.Resource {
 	costComponents = append(costComponents, r.snapshotsCostComponents()...)
 	costComponents = append(costComponents, r.metadataAtRestCostComponents()...)
 
+	costComponents = append(costComponents, r.iterativeWriteOperationsCostComponents()...)
 	costComponents = append(costComponents, r.writeOperationsCostComponents()...)
 	costComponents = append(costComponents, r.listAndCreateContainerOperationsCostComponents()...)
+	costComponents = append(costComponents, r.iterativeReadOperationsCostComponents()...)
 	costComponents = append(costComponents, r.readOperationsCostComponents()...)
 	costComponents = append(costComponents, r.otherOperationsCostComponents()...)
 	costComponents = append(costComponents, r.dataRetrievalCostComponents()...)
@@ -119,6 +126,18 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 			"Standard": "Blob Storage",
 			"Premium":  "Premium Block Blob",
 		}[r.AccountTier]
+	case r.isStorageV2():
+		if r.NFSv3 {
+			productName = map[string]string{
+				"Standard": "General Block Blob v2 Hierarchical Namespace",
+				"Premium":  "Premium Block Blob v2 Hierarchical Namespace",
+			}[r.AccountTier]
+		} else {
+			productName = map[string]string{
+				"Standard": "General Block Blob v2",
+				"Premium":  "Premium Block Blob",
+			}[r.AccountTier]
+		}
 	case r.isFileStorage():
 		productName = map[string]string{
 			"Standard": "Files v2",
@@ -148,11 +167,18 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
 //   Premium:       cost exists
+// StorageV2:
+//   Standard Hot:        cost exists
+//   Standard Hot NFSv3:  cost exists
+//   Standard Cool:       cost exists
+//   Standard Cool NFSv3: cost exists
+//   Premium:             cost exists
+//   Premium NFSv3:       cost exists
 // FileStorage: see dataAtRestCostComponents()
 func (r *StorageAccount) storageCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
-	if !r.isBlockBlobStorage() {
+	if r.isFileStorage() {
 		return costComponents
 	}
 
@@ -208,12 +234,63 @@ func (r *StorageAccount) storageCostComponents() []*schema.CostComponent {
 	return costComponents
 }
 
+// iterativeWriteOperationsCostComponents returns a cost component for Iterative
+// Write Operations.
+//
+// BlockBlobStorage: n/a
+// StorageV2:
+//   Standard Hot:        no cost
+//   Standard Hot NFSv3:  cost exists
+//   Standard Cool:       no cost
+//   Standard Cool NFSv3: cost exists
+//   Premium:             no cost
+//   Premium NFSv3:       no cost
+// FileStorage: n/a
+func (r *StorageAccount) iterativeWriteOperationsCostComponents() []*schema.CostComponent {
+	costComponents := []*schema.CostComponent{}
+
+	if !r.isStorageV2() || !r.NFSv3 || r.isPremium() {
+		return costComponents
+	}
+
+	var quantity *decimal.Decimal
+	itemsPerCost := 100
+
+	if r.MonthlyIterativeWriteOperations != nil {
+		value := decimal.NewFromInt(*r.MonthlyIterativeWriteOperations)
+		quantity = decimalPtr(value.Div(decimal.NewFromInt(int64(itemsPerCost))))
+	}
+
+	meterName := "Iterative Write Operations"
+
+	costComponents = append(costComponents, &schema.CostComponent{
+		Name:                 "Iterative write operations",
+		Unit:                 "100 operations",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		MonthlyQuantity:      quantity,
+		IgnoreIfMissingPrice: r.canSkipPrice(),
+		ProductFilter:        r.buildProductFilter(meterName),
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	})
+
+	return costComponents
+}
+
 // writeOperationsCostComponents returns a cost component for Write Operations.
 //
 // BlockBlobStorage:
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
 //   Premium:       cost exists
+// StorageV2:
+//   Standard Hot:        cost exists
+//   Standard Hot NFSv3:  cost exists
+//   Standard Cool:       cost exists
+//   Standard Cool NFSv3: cost exists
+//   Premium:             cost exists
+//   Premium NFSv3:       cost exists
 // FileStorage:
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
@@ -234,13 +311,17 @@ func (r *StorageAccount) writeOperationsCostComponents() []*schema.CostComponent
 	}
 
 	meterName := "Write Operations"
+	if r.isStorageV2() && r.NFSv3 {
+		meterName = "(?<!Iterative) Write Operations"
+	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "Write operations",
-		Unit:            "10k operations",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: quantity,
-		ProductFilter:   r.buildProductFilter(meterName),
+		Name:                 "Write operations",
+		Unit:                 "10k operations",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		MonthlyQuantity:      quantity,
+		IgnoreIfMissingPrice: r.canSkipPrice(),
+		ProductFilter:        r.buildProductFilter(meterName),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
@@ -256,6 +337,13 @@ func (r *StorageAccount) writeOperationsCostComponents() []*schema.CostComponent
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
 //   Premium:       cost exists
+// StorageV2:
+//   Standard Hot:        cost exists
+//   Standard Hot NFSv3:  no cost
+//   Standard Cool:       cost exists
+//   Standard Cool NFSv3: no cost
+//   Premium:             cost exists
+//   Premium NFSv3:       cost exists
 // FileStorage:
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
@@ -284,11 +372,55 @@ func (r *StorageAccount) listAndCreateContainerOperationsCostComponents() []*sch
 	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            name,
-		Unit:            "10k operations",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: quantity,
-		ProductFilter:   r.buildProductFilter(meterName),
+		Name:                 name,
+		Unit:                 "10k operations",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		MonthlyQuantity:      quantity,
+		IgnoreIfMissingPrice: r.canSkipPrice(),
+		ProductFilter:        r.buildProductFilter(meterName),
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	})
+
+	return costComponents
+}
+
+// iterativeReadOperationsCostComponents returns a cost component for Iterative Read Operations.
+//
+// BlockBlobStorage: n/a
+// StorageV2:
+//   Standard Hot:        no cost
+//   Standard Hot NFSv3:  cost exists
+//   Standard Cool:       no cost
+//   Standard Cool NFSv3: cost exists
+//   Premium:             no cost
+//   Premium NFSv3:       no cost
+// FileStorage: n/a
+func (r *StorageAccount) iterativeReadOperationsCostComponents() []*schema.CostComponent {
+	costComponents := []*schema.CostComponent{}
+
+	if !r.isStorageV2() || !r.NFSv3 || r.isPremium() {
+		return costComponents
+	}
+
+	var quantity *decimal.Decimal
+	itemsPerCost := 10000
+
+	if r.MonthlyIterativeReadOperations != nil {
+		value := decimal.NewFromInt(*r.MonthlyIterativeReadOperations)
+		quantity = decimalPtr(value.Div(decimal.NewFromInt(int64(itemsPerCost))))
+	}
+
+	meterName := "Iterative Read Operations"
+
+	costComponents = append(costComponents, &schema.CostComponent{
+		Name:                 "Iterative read operations",
+		Unit:                 "10k operations",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		MonthlyQuantity:      quantity,
+		IgnoreIfMissingPrice: r.canSkipPrice(),
+		ProductFilter:        r.buildProductFilter(meterName),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
@@ -303,6 +435,13 @@ func (r *StorageAccount) listAndCreateContainerOperationsCostComponents() []*sch
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
 //   Premium:       cost exists
+// StorageV2:
+//   Standard Hot:        cost exists
+//   Standard Hot NFSv3:  cost exists
+//   Standard Cool:       cost exists
+//   Standard Cool NFSv3: cost exists
+//   Premium:             cost exists
+//   Premium NFSv3:       cost exists
 // FileStorage:
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
@@ -323,13 +462,17 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 	}
 
 	meterName := "Read Operations"
+	if r.isStorageV2() && r.NFSv3 {
+		meterName = "(?<!Iterative) Read Operations"
+	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "Read operations",
-		Unit:            "10k operations",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: quantity,
-		ProductFilter:   r.buildProductFilter(meterName),
+		Name:                 "Read operations",
+		Unit:                 "10k operations",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		MonthlyQuantity:      quantity,
+		IgnoreIfMissingPrice: r.canSkipPrice(),
+		ProductFilter:        r.buildProductFilter(meterName),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
@@ -344,6 +487,13 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
 //   Premium:       cost exists
+// StorageV2:
+//   Standard Hot:        cost exists
+//   Standard Hot NFSv3:  cost exists
+//   Standard Cool:       cost exists
+//   Standard Cool NFSv3: cost exists
+//   Premium:             cost exists
+//   Premium NFSv3:       cost exists
 // FileStorage:
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
@@ -366,11 +516,12 @@ func (r *StorageAccount) otherOperationsCostComponents() []*schema.CostComponent
 	meterName := "Other Operations"
 
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "All other operations",
-		Unit:            "10k operations",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: quantity,
-		ProductFilter:   r.buildProductFilter(meterName),
+		Name:                 "All other operations",
+		Unit:                 "10k operations",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		MonthlyQuantity:      quantity,
+		IgnoreIfMissingPrice: r.canSkipPrice(),
+		ProductFilter:        r.buildProductFilter(meterName),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
@@ -386,6 +537,13 @@ func (r *StorageAccount) otherOperationsCostComponents() []*schema.CostComponent
 //   Standard Hot:  no cost
 //   Standard Cool: cost exists
 //   Premium:       no cost
+// StorageV2:
+//   Standard Hot:        no cost
+//   Standard Hot NFSv3:  no cost
+//   Standard Cool:       cost exists
+//   Standard Cool NFSv3: cost exists
+//   Premium:             no cost
+//   Premium NFSv3:       no cost
 // FileStorage:
 //   Standard Hot:  no cost
 //   Standard Cool: cost exists
@@ -406,11 +564,12 @@ func (r *StorageAccount) dataRetrievalCostComponents() []*schema.CostComponent {
 	meterName := "Data Retrieval"
 
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "Data retrieval",
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: quantity,
-		ProductFilter:   r.buildProductFilter(meterName),
+		Name:                 "Data retrieval",
+		Unit:                 "GB",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		MonthlyQuantity:      quantity,
+		IgnoreIfMissingPrice: r.canSkipPrice(),
+		ProductFilter:        r.buildProductFilter(meterName),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
@@ -425,6 +584,13 @@ func (r *StorageAccount) dataRetrievalCostComponents() []*schema.CostComponent {
 //   Standard Hot:  no cost
 //   Standard Cool: cost exists
 //   Premium:       no cost
+// StorageV2:
+//   Standard Hot:        no cost
+//   Standard Hot NFSv3:  no cost
+//   Standard Cool:       no cost
+//   Standard Cool NFSv3: no cost
+//   Premium:             no cost
+//   Premium NFSv3:       no cost
 // FileStorage:
 //   Standard Hot:  no cost
 //   Standard Cool: no cost
@@ -445,11 +611,12 @@ func (r *StorageAccount) dataWriteCostComponents() []*schema.CostComponent {
 	meterName := "Data Write"
 
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "Data write",
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: quantity,
-		ProductFilter:   r.buildProductFilter(meterName),
+		Name:                 "Data write",
+		Unit:                 "GB",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		MonthlyQuantity:      quantity,
+		IgnoreIfMissingPrice: r.canSkipPrice(),
+		ProductFilter:        r.buildProductFilter(meterName),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
@@ -465,6 +632,13 @@ func (r *StorageAccount) dataWriteCostComponents() []*schema.CostComponent {
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
 //   Premium:       no cost
+// StorageV2:
+//   Standard Hot:        cost exists
+//   Standard Hot NFSv3:  no cost
+//   Standard Cool:       cost exists
+//   Standard Cool NFSv3: no cost
+//   Premium:             no cost
+//   Premium NFSv3:       no cost
 // FileStorage:
 //   Standard Hot:  no cost
 //   Standard Cool: no cost
@@ -473,7 +647,8 @@ func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
 	isBlockPremium := r.isBlockBlobStorage() && r.isPremium()
-	if isBlockPremium || r.isFileStorage() {
+	isV2NFSv3 := r.isStorageV2() && (r.NFSv3 || r.isPremium())
+	if r.isFileStorage() || isBlockPremium || isV2NFSv3 {
 		return costComponents
 	}
 
@@ -488,11 +663,12 @@ func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 	meterName := "Index Tags"
 
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "Blob index",
-		Unit:            "10k tags",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: quantity,
-		ProductFilter:   r.buildProductFilter(meterName),
+		Name:                 "Blob index",
+		Unit:                 "10k tags",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		MonthlyQuantity:      quantity,
+		IgnoreIfMissingPrice: r.canSkipPrice(),
+		ProductFilter:        r.buildProductFilter(meterName),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
@@ -505,6 +681,7 @@ func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 // File Storage.
 //
 // BlockBlobStorage: n/a
+// StorageV2: n/a
 // FileStorage:
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
@@ -545,6 +722,7 @@ func (r *StorageAccount) dataAtRestCostComponents() []*schema.CostComponent {
 // File Storage.
 //
 // BlockBlobStorage: n/a
+// StorageV2: n/a
 // FileStorage:
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
@@ -585,6 +763,7 @@ func (r *StorageAccount) snapshotsCostComponents() []*schema.CostComponent {
 // File Storage.
 //
 // BlockBlobStorage: n/a
+// StorageV2: n/a
 // FileStorage:
 //   Standard Hot:  cost exists
 //   Standard Cool: cost exists
@@ -622,6 +801,13 @@ func (r *StorageAccount) metadataAtRestCostComponents() []*schema.CostComponent 
 // File Storage.
 //
 // BlockBlobStorage: n/a
+// StorageV2:
+//   Standard Hot:        no cost
+//   Standard Hot NFSv3:  no cost
+//   Standard Cool:       cost exists
+//   Standard Cool NFSv3: cost exists
+//   Premium:             no cost
+//   Premium NFSv3:       no cost
 // FileStorage:
 //   Standard Hot:  no cost
 //   Standard Cool: cost exists
@@ -629,7 +815,7 @@ func (r *StorageAccount) metadataAtRestCostComponents() []*schema.CostComponent 
 func (r *StorageAccount) earlyDeletionCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
-	if !r.isFileStorage() || !r.isCool() {
+	if r.isBlockBlobStorage() || !r.isCool() {
 		return costComponents
 	}
 
@@ -642,11 +828,12 @@ func (r *StorageAccount) earlyDeletionCostComponents() []*schema.CostComponent {
 	meterName := "Early Delete"
 
 	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "Early deletion",
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: quantity,
-		ProductFilter:   r.buildProductFilter(meterName),
+		Name:                 "Early deletion",
+		Unit:                 "GB",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		MonthlyQuantity:      quantity,
+		IgnoreIfMissingPrice: r.canSkipPrice(),
+		ProductFilter:        r.buildProductFilter(meterName),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
@@ -660,11 +847,12 @@ func (r *StorageAccount) buildStorageCostComponent(name string, startUsage strin
 	meterName := "Data Stored"
 
 	return &schema.CostComponent{
-		Name:            name,
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: quantity,
-		ProductFilter:   r.buildProductFilter(meterName),
+		Name:                 name,
+		Unit:                 "GB",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		MonthlyQuantity:      quantity,
+		IgnoreIfMissingPrice: r.canSkipPrice(),
+		ProductFilter:        r.buildProductFilter(meterName),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr(startUsage),
@@ -678,6 +866,10 @@ func (r *StorageAccount) isBlockBlobStorage() bool {
 
 func (r *StorageAccount) isFileStorage() bool {
 	return strings.EqualFold(r.AccountKind, "filestorage")
+}
+
+func (r *StorageAccount) isStorageV2() bool {
+	return strings.EqualFold(r.AccountKind, "storagev2")
 }
 
 func (r *StorageAccount) isHot() bool {
@@ -709,4 +901,11 @@ func (r *StorageAccount) isReplicationTypeSupported() bool {
 	}
 
 	return true
+}
+
+func (r *StorageAccount) canSkipPrice() bool {
+	// Not all regions support GZRS/RA-GZRS redundancy types. Some operations miss
+	// prices for specific regions.
+	// Read more: https://docs.microsoft.com/en-us/azure/storage/common/storage-redundancy
+	return r.isStorageV2()
 }

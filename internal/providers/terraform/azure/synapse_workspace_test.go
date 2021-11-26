@@ -11,7 +11,5 @@ func TestNewAzureRMSynapseWorkspace(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTestsWithOpts(t, "synapse_workspace_test", &tftest.GoldenFileOptions{
-		CaptureLogs: true,
-	})
+	tftest.GoldenFileResourceTests(t, "synapse_workspace_test")
 }

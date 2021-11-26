@@ -144,12 +144,91 @@
  ├─ Data retrieval                                Monthly cost depends on usage: $0.01 per GB                
  └─ Early deletion                                Monthly cost depends on usage: $0.0228 per GB              
                                                                                                              
- OVERALL TOTAL                                                                                 $1,781,812.71 
+ azurerm_storage_account.v2_cool_gzrs                                                                        
+ ├─ Read operations                                               10  10k operations                   $0.10 
+ ├─ All other operations                                         100  10k operations                   $0.44 
+ └─ Data retrieval                                             1,000  GB                              $10.00 
+                                                                                                             
+ azurerm_storage_account.v2_cool_lrs                                                                         
+ ├─ Capacity                                               1,000,000  GB                          $15,200.00 
+ ├─ Write operations                                             100  10k operations                  $10.00 
+ ├─ List and create container operations                         100  10k operations                   $5.50 
+ ├─ Read operations                                               10  10k operations                   $0.10 
+ ├─ All other operations                                         100  10k operations                   $0.44 
+ ├─ Data retrieval                                             1,000  GB                              $10.00 
+ ├─ Blob index                                                    10  10k tags                         $0.39 
+ └─ Early deletion                                             1,000  GB                              $15.20 
+                                                                                                             
+ azurerm_storage_account.v2_cool_lrs_nfsv3                                                                   
+ ├─ Capacity                                               1,000,000  GB                          $15,000.00 
+ ├─ Iterative write operations                                 1,700  100 operations                 $221.00 
+ ├─ Write operations                                             100  10k operations                  $13.00 
+ ├─ Iterative read operations                                     15  10k operations                   $1.08 
+ ├─ Read operations                                               10  10k operations                   $0.13 
+ ├─ All other operations                                         100  10k operations                   $0.60 
+ ├─ Data retrieval                                             1,000  GB                              $10.00 
+ └─ Early deletion                                             1,000  GB                              $15.00 
+                                                                                                             
+ azurerm_storage_account.v2_cool_ragzrs                                                                      
+ ├─ Read operations                                               10  10k operations                   $0.10 
+ ├─ All other operations                                         100  10k operations                   $0.44 
+ └─ Data retrieval                                             1,000  GB                              $10.00 
+                                                                                                             
+ azurerm_storage_account.v2_hot_gzrs                                                                         
+ ├─ Read operations                                               10  10k operations                   $0.04 
+ └─ All other operations                                         100  10k operations                   $0.44 
+                                                                                                             
+ azurerm_storage_account.v2_hot_lrs                                                                          
+ ├─ Capacity (first 50TB)                                     51,200  GB                           $1,064.96 
+ ├─ Capacity (next 450TB)                                    512,000  GB                          $10,223.62 
+ ├─ Capacity (over 500TB)                                    436,800  GB                           $8,358.60 
+ ├─ Write operations                                             100  10k operations                   $5.50 
+ ├─ Read operations                                               10  10k operations                   $0.04 
+ ├─ All other operations                                         100  10k operations                   $0.44 
+ └─ Blob index                                                    10  10k tags                         $0.39 
+                                                                                                             
+ azurerm_storage_account.v2_hot_lrs_nfsv3                                                                    
+ ├─ Capacity (first 50TB)                                     51,200  GB                           $1,075.20 
+ ├─ Capacity (next 450TB)                                    512,000  GB                          $10,240.00 
+ ├─ Capacity (over 500TB)                                    436,800  GB                           $8,342.88 
+ ├─ Iterative write operations                                 1,700  100 operations                 $122.40 
+ ├─ Write operations                                             100  10k operations                   $7.20 
+ ├─ Iterative read operations                                     15  10k operations                   $1.08 
+ ├─ Read operations                                               10  10k operations                   $0.06 
+ └─ All other operations                                         100  10k operations                   $0.60 
+                                                                                                             
+ azurerm_storage_account.v2_hot_ragzrs                                                                       
+ ├─ Read operations                                               10  10k operations                   $0.04 
+ └─ All other operations                                         100  10k operations                   $0.44 
+                                                                                                             
+ azurerm_storage_account.v2_premium_lrs                                                                      
+ ├─ Capacity                                               1,000,000  GB                         $195,000.00 
+ ├─ Write operations                                             100  10k operations                   $2.28 
+ ├─ List and create container operations                         100  10k operations                   $6.50 
+ ├─ Read operations                                               10  10k operations                   $0.02 
+ └─ All other operations                                         100  10k operations                   $0.18 
+                                                                                                             
+ azurerm_storage_account.v2_premium_lrs_nfsv3                                                                
+ ├─ Capacity                                               1,000,000  GB                         $195,000.00 
+ ├─ Write operations                                             100  10k operations                   $2.96 
+ ├─ List and create container operations                         100  10k operations                   $8.45 
+ ├─ Read operations                                               10  10k operations                   $0.02 
+ └─ All other operations                                         100  10k operations                   $0.24 
+                                                                                                             
+ azurerm_storage_account.v2_without_usage                                                                    
+ ├─ Capacity                                      Monthly cost depends on usage: $0.021 per GB               
+ ├─ Iterative write operations                    Monthly cost depends on usage: $0.072 per 100 operations   
+ ├─ Write operations                              Monthly cost depends on usage: $0.072 per 10k operations   
+ ├─ Iterative read operations                     Monthly cost depends on usage: $0.072 per 10k operations   
+ ├─ Read operations                               Monthly cost depends on usage: $0.006 per 10k operations   
+ └─ All other operations                          Monthly cost depends on usage: $0.006 per 10k operations   
+                                                                                                             
+ OVERALL TOTAL                                                                                 $2,241,800.82 
 ──────────────────────────────────
-22 cloud resources were detected:
-∙ 16 were estimated, 16 include usage-based costs, see https://infracost.io/usage-file
-∙ 5 weren't estimated, report them in https://github.com/infracost/infracost:
-  ∙ 5 x azurerm_storage_account
+34 cloud resources were detected:
+∙ 27 were estimated, 27 include usage-based costs, see https://infracost.io/usage-file
+∙ 6 weren't estimated, report them in https://github.com/infracost/infracost:
+  ∙ 6 x azurerm_storage_account
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
 Logs:
@@ -158,4 +237,5 @@ level=warning msg="Skipping resource azurerm_storage_account.bb_Premium_unsuppor
 level=warning msg="Skipping resource azurerm_storage_account.bb_Standard_unsupported_access_tier. BlockBlobStorage Standard doesn't support RA-GZRS redundancy"
 level=warning msg="Skipping resource azurerm_storage_account.file_premium_unsupported_access_tier. FileStorage Premium doesn't support GZRS redundancy"
 level=warning msg="Skipping resource azurerm_storage_account.file_unsupported_access_tier. FileStorage Standard doesn't support GZRS redundancy"
-level=warning msg="Skipping resource azurerm_storage_account.unsupported. Infracost only supports BlockBlobStorage and FileStorage account kinds"
+level=warning msg="Skipping resource azurerm_storage_account.unsupported. Infracost only supports StorageV2, BlockBlobStorage and FileStorage account kinds"
+level=warning msg="Skipping resource azurerm_storage_account.v2_premium_unsupported_access_tier. StorageV2 Premium doesn't support GZRS redundancy"
