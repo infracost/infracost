@@ -37,6 +37,11 @@ func newAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *sche
 		accessTier = d.Get("access_tier").String()
 	}
 
+	nfsv3 := false
+	if !d.IsEmpty("nfsv3_enabled") {
+		nfsv3 = d.Get("nfsv3_enabled").Bool()
+	}
+
 	r := &azure.StorageAccount{
 		Address:                d.Address,
 		Region:                 region,
@@ -44,6 +49,7 @@ func newAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *sche
 		AccountKind:            accountKind,
 		AccountReplicationType: accountReplicationType,
 		AccountTier:            accountTier,
+		NFSv3:                  nfsv3,
 	}
 	r.PopulateUsage(u)
 

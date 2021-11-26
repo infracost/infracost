@@ -11,7 +11,5 @@ func TestNewAzureRMSynapseSQLPool(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	opts := tftest.DefaultGoldenFileOptions()
-	opts.CaptureLogs = true
-	tftest.GoldenFileResourceTestsWithOpts(t, "synapse_sql_pool_test", opts)
+	tftest.GoldenFileResourceTests(t, "synapse_sql_pool_test")
 }

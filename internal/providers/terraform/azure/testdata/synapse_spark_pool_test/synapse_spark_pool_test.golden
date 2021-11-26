@@ -1,6 +1,13 @@
 
  Name                                                               Monthly Qty  Unit                      Monthly Cost 
                                                                                                                         
+ azurerm_storage_account.example                                                                                        
+ ├─ Capacity                                                 Monthly cost depends on usage: $0.0196 per GB              
+ ├─ List and create container operations                     Monthly cost depends on usage: $0.054 per 10k operations   
+ ├─ Read operations                                          Monthly cost depends on usage: $0.0043 per 10k operations  
+ ├─ All other operations                                     Monthly cost depends on usage: $0.0043 per 10k operations  
+ └─ Blob index                                               Monthly cost depends on usage: $0.039 per 10k tags         
+                                                                                                                        
  azurerm_synapse_spark_pool.autoscale                                                                                   
  └─ small (4 nodes)                                                         144  vCore-hours                     $22.26 
                                                                                                                         
@@ -23,12 +30,7 @@
  OVERALL TOTAL                                                                                                   $97.66 
 ──────────────────────────────────
 6 cloud resources were detected:
-∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
-∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost:
-  ∙ 1 x azurerm_storage_account
+∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_storage_data_lake_gen2_filesystem
-Logs:
-
-level=warning msg="Skipping resource azurerm_storage_account.example. Infracost only supports BlockBlobStorage and FileStorage account kinds"

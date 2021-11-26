@@ -206,3 +206,124 @@ resource "azurerm_storage_account" "file_premium_zrs" {
   account_tier             = "Premium"
   account_replication_type = "ZRS"
 }
+
+resource "azurerm_storage_account" "v2_without_usage" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  access_tier              = "Hot"
+  nfsv3_enabled            = true
+}
+
+resource "azurerm_storage_account" "v2_cool_lrs" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  access_tier              = "Cool"
+}
+
+resource "azurerm_storage_account" "v2_cool_lrs_nfsv3" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  access_tier              = "Cool"
+  nfsv3_enabled            = true
+}
+
+resource "azurerm_storage_account" "v2_hot_lrs" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  access_tier              = "Hot"
+}
+
+resource "azurerm_storage_account" "v2_hot_lrs_nfsv3" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  access_tier              = "Hot"
+  nfsv3_enabled            = true
+}
+
+resource "azurerm_storage_account" "v2_cool_gzrs" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "GZRS"
+  access_tier              = "Cool"
+}
+
+resource "azurerm_storage_account" "v2_hot_gzrs" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "GZRS"
+  access_tier              = "Hot"
+}
+
+resource "azurerm_storage_account" "v2_cool_ragzrs" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "RAGZRS"
+  access_tier              = "Cool"
+}
+
+resource "azurerm_storage_account" "v2_hot_ragzrs" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Standard"
+  account_replication_type = "RAGZRS"
+  access_tier              = "Hot"
+}
+
+resource "azurerm_storage_account" "v2_premium_unsupported_access_tier" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Premium"
+  account_replication_type = "GZRS"
+}
+
+resource "azurerm_storage_account" "v2_premium_lrs" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Premium"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_storage_account" "v2_premium_lrs_nfsv3" {
+  name                     = "storageaccountname"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_kind             = "StorageV2"
+  account_tier             = "Premium"
+  account_replication_type = "LRS"
+  nfsv3_enabled            = true
+}
