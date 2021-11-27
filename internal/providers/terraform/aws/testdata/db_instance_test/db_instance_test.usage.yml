@@ -1,0 +1,26 @@
+version: 0.1
+resource_usage:
+  aws_db_instance.mysql-multi-az:
+    additional_backup_storage_gb: 1000
+  aws_db_instance.mysql-iops-below-min:
+    additional_backup_storage_gb: 1000
+  aws_db_instance.mysql-iops:
+    additional_backup_storage_gb: 1000
+  aws_db_instance.aurora:
+    additional_backup_storage_gb: 1000
+  aws_db_instance.mariadb:
+    additional_backup_storage_gb: 1000
+  aws_db_instance.mysql:
+    additional_backup_storage_gb: 1000
+  aws_db_instance.postgres:
+    additional_backup_storage_gb: 1000
+  aws_db_instance.oracle-se:
+    additional_backup_storage_gb: 1000
+  aws_db_instance.oracle-se1:
+    additional_backup_storage_gb: 1000
+  aws_db_instance.oracle-se2:
+    additional_backup_storage_gb: 1000
+  aws_db_instance.sqlserver-ex:
+    additional_backup_storage_gb: 1000
+  aws_db_instance.sqlserver-web:
+    additional_backup_storage_gb: 1000
