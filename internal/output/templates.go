@@ -291,13 +291,13 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
 var CommentMarkdownTemplate = `
 {{- define "summaryRow"}}
     <tr>
-      <td>{{ truncateProjectName .Name }}</td>
+      <td>{{ truncateMiddle .Name 64 "..." }}</td>
       <td align="right">{{ formatCost .PastCost }}</td>
       <td align="right">{{ formatCost .Cost }}</td>
       <td>{{ formatCostChange .PastCost .Cost }}</td>
     </tr>
 {{- end}}
-💰 Infracost estimate: **{{ formatCostChangeSentence .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }}**
+💰 Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }}**
 
 {{- if .Options.IncludeHTML }}
 <table>

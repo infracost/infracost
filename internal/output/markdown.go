@@ -45,6 +45,17 @@ func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, 
 	return plusMinus + formatCost(currency, cost) + percentChange
 }
 
+func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal) string {
+	if pastCost != nil {
+		if pastCost.Equals(*cost) {
+			return "monthly cost will not change"
+		} else if pastCost.GreaterThan(*cost) {
+			return "monthly cost will decrease by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " 📉"
+		}
+	}
+	return "monthly cost will increase by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " 📈"
+}
+
 func ToMarkdown(out Root, opts Options) ([]byte, error) {
 	diff, err := ToDiff(out, opts)
 	if err != nil {
@@ -66,16 +77,7 @@ func ToMarkdown(out Root, opts Options) ([]byte, error) {
 		"formatCostChange": func(pastCost, cost *decimal.Decimal) string {
 			return formatMarkdownCostChange(out.Currency, pastCost, cost, false)
 		},
-		"formatCostChangeSentence": func(pastCost, cost *decimal.Decimal) string {
-			if pastCost != nil {
-				if pastCost.Equals(*cost) {
-					return "monthly cost will not change"
-				} else if pastCost.GreaterThan(*cost) {
-					return "monthly cost will decrease by " + formatMarkdownCostChange(out.Currency, pastCost, cost, true) + " 📉"
-				}
-			}
-			return "monthly cost will increase by " + formatMarkdownCostChange(out.Currency, pastCost, cost, true) + " 📈"
-		},
+		"formatCostChangeSentence": formatCostChangeSentence,
 		"hasDiff": func(p Project) bool {
 			if p.Diff == nil || len(p.Diff.Resources) == 0 {
 				return false
@@ -85,14 +87,7 @@ func ToMarkdown(out Root, opts Options) ([]byte, error) {
 		"projectLabel": func(p Project) string {
 			return p.Label(opts.DashboardEnabled)
 		},
-		"truncateProjectName": func(name string) string {
-			maxProjectNameLength := 64
-			// Truncate the middle of the name if it's too long
-			if len(name) > maxProjectNameLength {
-				return name[0:(maxProjectNameLength/2)-1] + "..." + name[len(name)-(maxProjectNameLength/2+3):]
-			}
-			return name
-		},
+		"truncateMiddle": truncateMiddle,
 	})
 	tmpl, err = tmpl.Parse(CommentMarkdownTemplate)
 	if err != nil {
