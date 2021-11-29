@@ -86,6 +86,9 @@ resource_usage:
     monthly_outbound_other_regions_gb: 750      # Monthly data transferred to other AWS regions.
     monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
 
+  aws_db_instance.my_db:
+    monthly_standard_io_requests: 10000 # Monthly number of input/output requests for database.
+
   aws_directory_service_directory.my_directory:
     additional_domain_controllers: 3 # The number of domain controllers in the directory service provisioned in addition to the minimum 2 controllers
     shared_accounts: 8 # Number of accounts that Microsoft AD directory is shared with
