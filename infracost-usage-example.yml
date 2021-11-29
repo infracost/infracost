@@ -87,6 +87,7 @@ resource_usage:
     monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
 
   aws_db_instance.my_db:
+    additional_backup_storage_gb: 1000  # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
     monthly_standard_io_requests: 10000 # Monthly number of input/output requests for database.
 
   aws_directory_service_directory.my_directory:

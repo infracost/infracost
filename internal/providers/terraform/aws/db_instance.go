@@ -7,7 +7,6 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
-	"github.com/tidwall/gjson"
 )
 
 func GetDBInstanceRegistryItem() *schema.RegistryItem {
@@ -28,7 +27,7 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	instanceType := d.Get("instance_class").String()
 
 	var monthlyIORequests *decimal.Decimal
-	if u != nil && u.Get("monthly_standard_io_requests").Exists() {
+	if u != nil && !u.IsEmpty("monthly_standard_io_requests") {
 		monthlyIORequests = decimalPtr(decimal.NewFromInt(u.Get("monthly_standard_io_requests").Int()))
 	}
 
@@ -76,18 +75,18 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	}
 
 	iopsVal := decimal.Zero
-	if d.Get("iops").Exists() && d.Get("iops").Type != gjson.Null {
+	if !d.IsEmpty("iops") {
 		iopsVal = decimal.NewFromFloat(d.Get("iops").Float())
 	}
 
 	allocatedStorageVal := decimal.NewFromInt(20)
-	if d.Get("allocated_storage").Exists() && d.Get("allocated_storage").Type != gjson.Null {
+	if !d.IsEmpty("allocated_storage") {
 		allocatedStorageVal = decimal.NewFromFloat(d.Get("allocated_storage").Float())
 	}
 
 	volumeType := "General Purpose"
 	storageName := "Storage (general purpose SSD, gp2)"
-	if d.Get("storage_type").Exists() {
+	if !d.IsEmpty("storage_type") {
 		if strings.ToLower(d.Get("storage_type").String()) == "io1" || iopsVal.GreaterThan(decimal.Zero) {
 			volumeType = "Provisioned IOPS"
 			storageName = "Storage (provisioned IOPS SSD, io1)"
@@ -187,6 +186,36 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 				ProductFamily: strPtr("Provisioned IOPS"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+				},
+			},
+		})
+	}
+
+	if !d.IsEmpty("backup_retention_period") || (u != nil && !u.IsEmpty("additional_backup_storage_gb")) {
+		var backupStorageGB *decimal.Decimal
+		if u != nil && !u.IsEmpty("additional_backup_storage_gb") {
+			backupStorageGB = decimalPtr(decimal.NewFromInt(u.Get("additional_backup_storage_gb").Int()))
+		}
+
+		backupStorageDbEngine := "Any"
+		if databaseEngine != nil && strings.HasPrefix(*databaseEngine, "Aurora") {
+			backupStorageDbEngine = *databaseEngine
+		}
+
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            "Additional backup storage",
+			Unit:            "GB",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: backupStorageGB,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonRDS"),
+				ProductFamily: strPtr("Storage Snapshot"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "databaseEngine", Value: strPtr(backupStorageDbEngine)},
+					{Key: "usagetype", ValueRegex: strPtr("/BackupUsage/i")},
+					{Key: "engineCode", ValueRegex: strPtr("/[0-9]+/")},
 				},
 			},
 		})
