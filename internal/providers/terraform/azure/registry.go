@@ -250,17 +250,18 @@ var FreeResources = []string{
 
 	// Azure Networking
 	"azurerm_application_security_group",
+	"azurerm_local_network_gateway",
+	"azurerm_nat_gateway_public_ip_association",
+	"azurerm_nat_gateway_public_ip_prefix_association",
 	"azurerm_network_interface",
 	"azurerm_network_interface_security_group_association",
 	"azurerm_network_security_group",
 	"azurerm_network_security_rule",
 	"azurerm_private_link_service",
+	"azurerm_storage_account_network_rules",
 	"azurerm_subnet",
 	"azurerm_subnet_network_security_group_association",
 	"azurerm_virtual_network",
-	"azurerm_local_network_gateway",
-	"azurerm_nat_gateway_public_ip_association",
-	"azurerm_nat_gateway_public_ip_prefix_association",
 
 	// Azure Notification Hub
 	"azurerm_notification_hub",
