@@ -69,7 +69,7 @@ Infracost's [CI/CD integrations](https://www.infracost.io/docs/integrations/cicd
 
 If you run into any issues with CI/CD integrations, please join our [community Slack channel](https://www.infracost.io/community-chat), we'd be happy to guide you through it.
 
-<img src="https://raw.githubusercontent.com/infracost/infracost-gh-action/master/screenshot.png" width=480 alt="Example infracost diff usage" />
+<img src="https://raw.githubusercontent.com/infracost/actions/master/.github/assets/screenshot.png" alt="Infracost in GitHub Actions" />
 
 ## Supported clouds and resources
 
