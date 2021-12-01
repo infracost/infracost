@@ -2,7 +2,7 @@
  Name                                                Monthly Qty  Unit              Monthly Cost 
                                                                                                  
  azurerm_postgresql_flexible_server.burstable                                                    
- ├─ Compute (B_Standard_B1ms)                                730  hours                   $32.12 
+ ├─ Compute (B_Standard_B1ms)                                730  hours                   $16.06 
  ├─ Storage                                                  128  GB                      $17.66 
  └─ Additional backup storage                              5,000  GB                     $475.00 
                                                                                                  
@@ -21,7 +21,7 @@
  ├─ Storage                                       Monthly cost depends on usage: $0.14 per GB    
  └─ Additional backup storage                     Monthly cost depends on usage: $0.095 per GB   
                                                                                                  
- OVERALL TOTAL                                                                         $3,294.05 
+ OVERALL TOTAL                                                                         $3,277.99 
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
