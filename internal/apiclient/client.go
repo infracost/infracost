@@ -80,13 +80,13 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 
 		err = json.Unmarshal(respBody, &r)
 		if err != nil {
-			return []byte{}, &APIError{err, "Invalid API response"}
+			return []byte{}, &APIError{fmt.Errorf(resp.Status), "Invalid API response"}
 		}
 
 		if r.Error == "Invalid API key" {
 			return []byte{}, ErrInvalidAPIKey
 		}
-		return []byte{}, &APIError{errors.New(r.Error), "Received error from API"}
+		return []byte{}, &APIError{fmt.Errorf("%v %v", resp.Status, r.Error), "Received error from API"}
 	}
 
 	return respBody, nil
