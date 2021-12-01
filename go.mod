@@ -13,7 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.12.0
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.9.0
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.24.0
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.17.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.20.0
 	github.com/awslabs/goformation/v4 v4.19.5
 	github.com/briandowns/spinner v1.15.0
 	github.com/dave/dst v0.26.2
@@ -66,7 +66,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.5.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.3.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.5.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.8.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.9.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.6.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.11.0 // indirect
 	github.com/aws/smithy-go v1.9.0 // indirect
@@ -94,6 +94,7 @@ require (
 )
 
 require (
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 )
