@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.11.1
 	github.com/aws/aws-sdk-go-v2/config v1.9.0
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.16.0
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.9.0
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.12.0
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.9.0
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.20.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.17.0
