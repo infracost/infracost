@@ -122,8 +122,8 @@ func s3LifecycleTransitionsCostComponent(region string, usageType string, operat
 			Region:     strPtr(region),
 			Service:    strPtr("AmazonS3"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
-				{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operation))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", usageType))},
+				{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", operation))},
 			},
 		},
 	}
