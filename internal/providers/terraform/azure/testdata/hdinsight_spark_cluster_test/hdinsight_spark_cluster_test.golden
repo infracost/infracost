@@ -8,7 +8,7 @@
                                                                                                      
  azurerm_storage_account.example                                                                     
  ├─ Capacity                              Monthly cost depends on usage: $0.0196 per GB              
- ├─ List and create container operations  Monthly cost depends on usage: $0.054 per 10k operations   
+ ├─ Write operations                      Monthly cost depends on usage: $0.054 per 10k operations   
  ├─ Read operations                       Monthly cost depends on usage: $0.0043 per 10k operations  
  ├─ All other operations                  Monthly cost depends on usage: $0.0043 per 10k operations  
  └─ Blob index                            Monthly cost depends on usage: $0.039 per 10k tags         
