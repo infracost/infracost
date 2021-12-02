@@ -26,6 +26,11 @@ func strVal(s *string) string {
 	return *s
 }
 
+// nolint:deadcode,unused
+func regexPtr(regex string) *string {
+	return strPtr(fmt.Sprintf("/%s/i", regex))
+}
+
 func intPtr(i int64) *int64 {
 	return &i
 }
@@ -81,10 +86,6 @@ func stringInSlice(slice []string, s string) bool {
 		}
 	}
 	return false
-}
-
-func regexPtr(regex string) *string {
-	return strPtr(fmt.Sprintf("/%s/i", regex))
 }
 
 // RegionMapping is a helpful conversion map that changes
