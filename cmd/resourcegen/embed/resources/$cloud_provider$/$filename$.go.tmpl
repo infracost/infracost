@@ -1,41 +1,47 @@
 package {{ .CloudProvider }}
 
 import (
+	{{- if .WithHelp }}
 	"fmt"
-
-	"github.com/shopspring/decimal"
-
+	{{- end }}
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	{{- if .WithHelp }}
+	"github.com/shopspring/decimal"
+	{{- end }}
 )
 
-// TODO: fill in these {{ .ResourceName }} comments with a short description of the cloud resource.
-// Add any links to the pricing pages or documentation that might be useful to developers in the future.
-// e.g:
-// 		more resource information here: https://aws.amazon.com/<PATH/TO/RESOURCE>/
+// {{ .ResourceName }} struct represents <TODO: cloud service short description>.
 //
-//		pricing information here: https://aws.amazon.com/<PATH/TO/PRICING>/
+// <TODO: Add any important information about the resource and links to the
+// pricing pages or documentation that might be useful to developers in the future, e.g:>
 //
+// Resource information: {{ .ResourceURL }}/<PATH/TO/RESOURCE>/
+// Pricing information: {{ .ResourceURL }}/<PATH/TO/PRICING>/
 type {{ .ResourceName }} struct {
 	{{- if .WithHelp }}
 	// Add {{ .ResourceName }} struct properties below that correspond to your resource
 	// and are directly used in cost calculation.
 	//
-	// These properties are configured directly from attributes parsed in the IAC provider.
+	// These properties are configured directly from attributes parsed in the IaC provider.
 	// See your resource file: internal/providers/terraform/{{ .CloudProvider }}/{{ .Filename }}.go
 	// for an example in how this is achieved.
 	//
-	// Below are a few examples of common properties that are often part of resources:
+	// Below there are a few examples of common properties that are often part of resources:
 	{{- end }}
-	// Address is the unique name of the resource in the IAC language.
-	Address       string
-	// Region is the {{ .CloudProvider }} region the {{ .ResourceName }} is provisioned within.
-	Region        string
 	{{- if .WithHelp }}
-	// InstanceCount is an example property designed to show you a complete example with cost components.
+	// Address is the unique name of the resource in the IaC language. It is required.
+	Address string
+	// Region is the {{ .CloudProvider }} region the {{ .ResourceName }} is provisioned within. It is required.
+	Region string
+
+	// The properties below are examples to show how they can be used with cost components.
 	InstanceCount int64
-	InstanceType string
-	UsageType string
+	InstanceType  string
+	UsageType     string
+  {{- else }}
+	Address string
+	Region  string
 	{{- end }}
 	{{- if .WithHelp }}
 	// Add the usage parameters for {{ .ResourceName }} below.
@@ -48,11 +54,13 @@ type {{ .ResourceName }} struct {
 	//
 	// This property would work if you have a usage parameter defined in your usage file as such:
 	//
-	//   	{{ .CloudProvider }}_{{ .Filename }}.{{ .Filename }}:
-	//    		monthly_data_processed_gb: 200.50
+	//   	{{ .FullResourceName }}.{{ .Filename }}:
+	//      monthly_data_processed_gb: 200.50
 	//
-	// Then would need to define a parameter on this struct like the one below.
+	// It should be defined as a parameter on this struct like the one below.
 	// Note the `infracost_usage` tag matches the name of the property in the usage file.
+
+	// "usage" args
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 	{{- end }}
 }
@@ -71,66 +79,26 @@ var {{ .ResourceName }}UsageSchema = []*schema.UsageItem{
 
 // PopulateUsage parses the u schema.UsageData into the {{ .ResourceName }}.
 // It uses the `infracost_usage` struct tags to populate data into the {{ .ResourceName }}.
-func ({{ .ResourceLetter }} *{{ .ResourceName }}) PopulateUsage(u *schema.UsageData) {
-	resources.PopulateArgsWithUsage({{ .ResourceLetter }}, u)
+func (r *{{ .ResourceName }}) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(r, u)
 }
 
-// BuildResource builds a schema.Resource from a valid {{ .ResourceName }}.
-// This method is called after the resource is initialised by an iac provider.
+// BuildResource builds a schema.Resource from a valid {{ .ResourceName }} struct.
+// This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
-func ({{ .ResourceLetter }}  *{{.ResourceName}}) BuildResource() *schema.Resource {
+func (r *{{.ResourceName}}) BuildResource() *schema.Resource {
 	{{- if .WithHelp }}
-	// Resource schema.CostComponent are how Infracost builds price outputs.
-	// Below are a few examples based on the dummy parameters we highlighted earlier.
+	// List of schema.CostComponent items is how Infracost builds price outputs.
+	// Below are a few examples based on the dummy parameters defined in the struct above.
 	//
 	// These are examples and are safe to remove.
 	costComponents := []*schema.CostComponent{
 		// Below is an example cost component using properties that we've parsed
-		// from the iac into the {{ .ResourceName }}.InstanceCount & {{ .ResourceName }}.InstanceType.
-		{
-			Name:           fmt.Sprintf("Instance (on-demand, %s)", "my_instance_type"),
-			Unit:           "hours",
-			UnitMultiplier: decimal.NewFromInt(1),
-			// InstanceCount goes into the hourly quantity to increase the price with the number
-			// of instances that are provisioned.
-			HourlyQuantity: decimalPtr(decimal.NewFromInt({{ .ResourceLetter }}.InstanceCount)),
-			// ProductFilters find the actual price from the Infracost pricing database.
-			// see https://github.com/infracost/infracost/blob/master/CONTRIBUTING.md#finding-prices
-			// for more info on how to generate these filters to fetch the prices you need.
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("{{ .CloudProvider }}"),
-				Region:        strPtr({{ .ResourceLetter }}.Region),
-				Service:       strPtr("My{{ .CloudProvider }} Service"),
-				ProductFamily: strPtr("My {{ .CloudProvider }} Resource family"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", {{ .ResourceLetter }}.UsageType))},
-					{Key: "instanceType", Value: strPtr({{ .ResourceLetter }}.InstanceType)},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr("on_demand"),
-			},
-		},
+		// from the IaC into the {{ .ResourceName }}.InstanceCount & {{ .ResourceName }}.InstanceType.
+		r.instanceCostComponent(),
 		// Below is an example of a cost component built with the parsed usage property.
-		// Note the {{ .ResourceLetter }}.MonthlyDataProcessedGB field passed to hourly quantity.
-		{
-			Name:           "Data processed",
-			Unit:           "GB",
-			UnitMultiplier: decimal.NewFromInt(1),
-			HourlyQuantity: decimalPtr(decimal.NewFromFloat(*{{ .ResourceLetter }}.MonthlyDataProcessedGB)),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("{{ .CloudProvider }}"),
-				Region:        strPtr({{ .ResourceLetter }}.Region),
-				Service:       strPtr("My{{ .CloudProvider }} Service"),
-				ProductFamily: strPtr("My {{ .CloudProvider }} Resource family"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", Value: strPtr("UsageBytes")},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr("on_demand"),
-			},
-		},
+		// Note the r.MonthlyDataProcessedGB field passed to hourly quantity.
+		r.dataProcessedCostComponent(),
 	}
 	{{- else }}
 	costComponents := []*schema.CostComponent{
@@ -139,8 +107,57 @@ func ({{ .ResourceLetter }}  *{{.ResourceName}}) BuildResource() *schema.Resourc
 	{{- end }}
 
 	return &schema.Resource{
-		Name:           {{ .ResourceLetter }}.Address,
+		Name:           r.Address,
 		UsageSchema:    {{ .ResourceName }}UsageSchema,
 		CostComponents: costComponents,
 	}
 }
+{{ if .WithHelp }}
+func (r *{{ .ResourceName }}) instanceCostComponent() *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:           fmt.Sprintf("Instance (on-demand, %s)", r.InstanceType),
+		Unit:           "hours",
+		UnitMultiplier: decimal.NewFromInt(1),
+		// InstanceCount goes into the hourly quantity to increase the price with the number
+		// of instances that are provisioned.
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.InstanceCount)),
+		// ProductFilters find the actual price from the Infracost pricing database.
+		// see https://github.com/infracost/infracost/blob/master/CONTRIBUTING.md#finding-prices
+		// for more info on how to generate these filters to fetch the prices you need.
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("{{ .CloudProvider }}"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("My {{ .CloudProvider }} Service"),
+			ProductFamily: strPtr("My {{ .CloudProvider }} Resource family"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: regexPtr(fmt.Sprintf("^%s$", r.UsageType))},
+				{Key: "instanceType", Value: strPtr(r.InstanceType)},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func (r *{{ .ResourceName }}) dataProcessedCostComponent() *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:           "Data processed",
+		Unit:           "GB",
+		UnitMultiplier: decimal.NewFromInt(1),
+		HourlyQuantity: floatPtrToDecimalPtr(r.MonthlyDataProcessedGB),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("{{ .CloudProvider }}"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("My {{ .CloudProvider }} Service"),
+			ProductFamily: strPtr("My {{ .CloudProvider }} Resource family"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("UsageBytes")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+{{- end }}
