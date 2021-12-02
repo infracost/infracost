@@ -3,46 +3,59 @@ package {{ .CloudProvider }}
 import (
 	"github.com/infracost/infracost/internal/resources/{{ .CloudProvider }}"
 	"github.com/infracost/infracost/internal/schema"
+	{{- if .WithHelp }}
 
 	"strings"
+	{{- end }}
 )
 
-func get{{.ResourceName}}RegistryItem() *schema.RegistryItem {
+func {{.RegistryFuncName}}() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "{{ .CloudProvider }}_{{ .Filename }}",
-		RFunc: new{{ .ResourceName }},
+		Name:  "{{ .FullResourceName }}",
+		RFunc: {{ .RFuncName }},
+		{{- if (eq .CloudProvider "azure") }}
+		ReferenceAttributes: []string{
+			"resource_group_name",
+		},
+		{{- end }}
 	}
 }
 
-func new{{ .ResourceName }}(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func {{ .RFuncName }}(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	{{- if (eq .CloudProvider "azure") }}
+	region := lookupRegion(d, []string{"resource_group_name"})
+	{{- else }}
+	region := d.Get("region").String()
+	{{- end }}
 	{{- if .WithHelp }}
-	// In new{{.ResourceName}} we parse the resource data coming from d
+
+	// In {{.RFuncName}} we parse the resource data coming from d
 	// into the underlying {{ .ResourceName }}. We use schema.ResourceData lookup
 	// to find data stored on attributes in the resource. This can be done as follows:
-	region := d.Get("region").String()
 	sku := d.Get("sku_name").String()
+	instanceType := strings.Split(sku, "_")[0]
 	count := d.Get("terraformFieldThatHasNumberOfInstances").Int()
 
-	usageType := "adefault"
+	usageType := "default"
 	if !d.IsEmpty("usageType") {
 		usageType = d.Get("usageType").String()
 	}
 
-	{{ .ResourceLetter }} := &{{ .CloudProvider }}.{{ .ResourceName }}{
+	r := &{{ .CloudProvider }}.{{ .ResourceName }}{
 		Address:       d.Address,
 		Region:        region,
 		InstanceCount: count,
-		InstanceType:  strings.Split(sku, "_")[0],
-		UsageType: usageType,
+		InstanceType:  instanceType,
+		UsageType:     usageType,
 	}
 
 	{{- else }}
-	{{ .ResourceLetter }} := &{{ .CloudProvider }}.{{ .ResourceName }}{
-		Address:       d.Address,
-		Region:        d.Get("region").String(),
+	r := &{{ .CloudProvider }}.{{ .ResourceName }}{
+		Address: d.Address,
+		Region:  region,
 	}
 	{{- end }}
-	{{ .ResourceLetter }}.PopulateUsage(u)
+	r.PopulateUsage(u)
 
-	return {{ .ResourceLetter }}.BuildResource()
+	return r.BuildResource()
 }

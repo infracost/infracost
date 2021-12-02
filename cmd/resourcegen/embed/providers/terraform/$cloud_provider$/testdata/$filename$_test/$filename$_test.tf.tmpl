@@ -1,7 +1,46 @@
-{{ .CloudProviderTerraformBlock }}
-
-# Add the terraform for your {{ .ResourceName }} below
-# e.g:
-resource "{{ .CloudProvider }}_{{ .Filename }}" "{{ .Filename }}" {
-  aws_id = "fake"
+{{- if (eq .CloudProvider "aws") -}}
+provider "aws" {
+  region                      = "us-east-1"
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true
+  skip_requesting_account_id  = true
+  skip_get_ec2_platforms      = true
+  skip_region_validation      = true
+  access_key                  = "mock_access_key"
+  secret_key                  = "mock_secret_key"
 }
+
+# Add example resources for {{ .ResourceName }} below
+
+# resource "{{ .FullResourceName }}" "{{ .Filename }}" {
+# }
+{{- end }}
+{{- if (eq .CloudProvider "azure") -}}
+provider "azurerm" {
+  skip_provider_registration = true
+  features {}
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
+  location = "West Europe"
+}
+
+# Add example resources for {{ .ResourceName }} below
+
+# resource "{{ .FullResourceName }}" "{{ .Filename }}" {
+#   name                = "exampleresource"
+#   resource_group_name = azurerm_resource_group.example.name
+# }
+{{- end }}
+{{- if (eq .CloudProvider "google") -}}
+provider "google" {
+  credentials = "{\"type\":\"service_account\"}"
+  region      = "us-central1"
+}
+
+# Add example resources for {{ .ResourceName }} below
+
+# resource "{{ .FullResourceName }}" "{{ .Filename }}" {
+# }
+{{- end }}

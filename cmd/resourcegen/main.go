@@ -39,7 +39,7 @@ func main() {
 	var c config
 	flag.StringVar(&c.CloudProvider, "cloud-provider", "aws", "Cloud provider to create resource for, one of [aws, azure, google]")
 	flag.StringVar(&c.Filename, "resource-name", "", "The resource name to generate, use underscores between names, e.g. autoscaling_group (required)")
-	flag.BoolVar(&c.WithHelp, "with-help", true, "Generate your resources with doc blocks and examples to help you get started. Useful for understanding how to add a resource")
+	flag.BoolVar(&c.WithHelp, "with-help", false, "Generate your resources with doc blocks and examples to help you get started. Useful for understanding how to add a resource")
 	flag.Parse()
 
 	if flag.NFlag() == 0 {
@@ -84,52 +84,53 @@ type config struct {
 	WithHelp bool
 }
 
-func (c config) ResourceLetter() string {
-	return strings.ToLower(string(c.ResourceName[0]))
-}
-
-func (c config) CloudProviderTerraformBlock() string {
-	switch c.CloudProvider {
-	case "aws":
-		return `provider "aws" {
-  region                      = "us-east-1"
-  skip_credentials_validation = true
-  skip_metadata_api_check     = true
-  skip_requesting_account_id  = true
-  skip_get_ec2_platforms      = true
-  skip_region_validation      = true
-  access_key                  = "mock_access_key"
-  secret_key                  = "mock_secret_key"
-}
-`
-	case "google":
-		return `provider "google" {
-  credentials = "{\"type\":\"service_account\"}"
-  region      = "us-central1"
-}
-`
-	case "azure":
-		return `provider "azurerm" {
-  skip_provider_registration = true
-  features {}
-}
-`
+func (c config) FullResourceName() string {
+	prefix := c.CloudProvider
+	if c.CloudProvider == "azure" {
+		prefix = "azurerm"
 	}
 
-	return fmt.Sprintf(`provider %q {
-	# Provider %s is not implemented by resource generator.
-	# Please add provider block in CloudProviderTerraformBlock method
-	# for subsequent usage.
+	return fmt.Sprintf("%s_%s", prefix, c.Filename)
 }
-`, c.CloudProvider, c.CloudProvider)
+
+func (c config) RFuncName() string {
+	return "new" + c.ResourceName
+}
+
+func (c config) RegistryFuncName() string {
+	return "get" + c.ResourceName + "RegistryItem"
+}
+
+func (c config) ProviderDirectory() string {
+	return path.Join("internal/providers/terraform/", c.CloudProvider)
+}
+
+func (c config) ResourceURL() string {
+	switch c.CloudProvider {
+	case "aws":
+		return "https://aws.amazon.com"
+	case "azure":
+		return "https://azure.microsoft.com"
+	case "google":
+		return "https://cloud.google.com"
+	}
+
+	return "https://example.com"
+}
+
+func (c config) RunTestCommand() string {
+	return strings.Join([]string{
+		fmt.Sprintf("ARGS=\"--run Test%s -v -update\"", c.ResourceName),
+		fmt.Sprintf("make test_%s", c.CloudProvider),
+	}, " ")
 }
 
 func (c config) registryLocation() string {
-	return "internal/providers/terraform/" + c.CloudProvider + "/registry.go"
+	return path.Join(c.ProviderDirectory(), "registry.go")
 }
 
-func (c config) registryFuncName() string {
-	return "get" + c.ResourceName + "RegistryItem"
+func (c config) testDataLocation() string {
+	return path.Join(c.ProviderDirectory(), "testdata", c.Filename+"_test")
 }
 
 type rep struct {
@@ -161,7 +162,7 @@ func exitWithErr(err error) {
 
 func writeOutput(c config, written []string) {
 	b := strings.Builder{}
-	b.WriteString(fmt.Sprintf("\nSuccessfully generated resource %s, files written:\n\n", c.Filename))
+	b.WriteString(fmt.Sprintf("\nSuccessfully generated resource %s, files written:\n\n", c.FullResourceName()))
 	for i, s := range written {
 		if i == len(written)-1 {
 			b.WriteString("\t" + s + "\n\n")
@@ -171,8 +172,19 @@ func writeOutput(c config, written []string) {
 		b.WriteString("\t" + s + "\n")
 	}
 
-	b.WriteString(fmt.Sprintf("Added function %s to resource registry: \n\n\t%s\n\n", c.registryFuncName(), c.registryLocation()))
-	b.WriteString("Happy hacking!!\n")
+	b.WriteString(fmt.Sprintf("Added function %s to resource registry:\n\n", c.RegistryFuncName()))
+	b.WriteString(fmt.Sprintf("\t%s\n\n", c.registryLocation()))
+
+	b.WriteString(strings.Join(
+		[]string{
+			"Start by adding an example resource to the Terraform test file:",
+			fmt.Sprintf("\t%s", path.Join(c.testDataLocation(), c.Filename+"_test.tf")),
+			"and running the following command to generate initial Infracost output:",
+			fmt.Sprintf("\t%s", c.RunTestCommand()),
+			"Check out 'Adding new resources' section in our CONTRIBUTING.md guide for next steps!",
+			"Happy hacking!!\n",
+		}, "\n\n"),
+	)
 
 	fmt.Println(b.String())
 }
@@ -190,7 +202,7 @@ func addResourceToRegistry(c config) error {
 					cl := vs.Values[0].(*dst.CompositeLit)
 					e := &dst.CallExpr{
 						Fun: &dst.Ident{
-							Name: c.registryFuncName(),
+							Name: c.RegistryFuncName(),
 						},
 					}
 
@@ -209,7 +221,7 @@ func addResourceToRegistry(c config) error {
 
 	err = decorator.Fprint(ff, f)
 	if err != nil {
-		return fmt.Errorf("Could not write function %s to registry file %s %w", c.registryFuncName(), c.registryLocation(), err)
+		return fmt.Errorf("Could not write function %s to registry file %s %w", c.RegistryFuncName(), c.registryLocation(), err)
 	}
 
 	return nil
