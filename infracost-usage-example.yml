@@ -822,6 +822,9 @@ resource_usage:
   azurerm_nat_gateway.my_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
+  azurerm_point_to_site_vpn_gateway.my_point_to_site_gateway:
+    monthly_p2s_connections_hrs: 20 # Hourly number of connections to the point to site gateway
+    
   azurerm_postgresql_flexible_server.my_flexible_server:
     additional_backup_storage_gb: 5000 # Additional consumption of backup storage in GB.
 
@@ -896,6 +899,9 @@ resource_usage:
     dataflow_standard_instances: 1 # Number of Data Flow standard instances.
     dataflow_standard_vcores: 12 # Number of Data Flow standard vCores.
     monthly_dataflow_standard_hours: 1 # Monthly number of Data Flow standard hours (this is multiplied by the number of instances and vCores).
+
+  azurerm_virtual_hub.my_virtual_hub:
+    monthly_data_processed_gb: 10 # Monthly data processed by the Virtual WAN Hub in GB
 
   azurerm_virtual_machine_scale_set.my_scale_set:
     storage_profile_os_disk:

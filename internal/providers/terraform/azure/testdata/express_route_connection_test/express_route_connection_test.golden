@@ -1,0 +1,21 @@
+
+ Name                                                 Monthly Qty  Unit   Monthly Cost 
+                                                                                       
+ azurerm_express_route_connection.express_route_conn                                   
+ └─ ER Connections                                            730  hours        $36.50 
+                                                                                       
+ azurerm_express_route_gateway.express_route                                           
+ └─ ER scale units                                            730  hours       $306.60 
+                                                                                       
+ OVERALL TOTAL                                                                 $343.10 
+──────────────────────────────────
+8 cloud resources were detected:
+∙ 2 were estimated
+∙ 3 weren't estimated, report them in https://github.com/infracost/infracost:
+  ∙ 1 x azurerm_express_route_circuit
+  ∙ 1 x azurerm_express_route_circuit_peering
+  ∙ 1 x azurerm_express_route_port
+∙ 3 were free:
+  ∙ 1 x azurerm_resource_group
+  ∙ 1 x azurerm_virtual_hub
+  ∙ 1 x azurerm_virtual_wan
