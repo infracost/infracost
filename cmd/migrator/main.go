@@ -58,21 +58,31 @@ func main() {
 		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
 
 		allCount += 1
-		// isMigrated, err := migrateFile(filePath, referenceFile)
-		isMigrated, err := migrateFile("internal/providers/terraform/aws/sqs_queue.go", referenceFile)
-		break
+		fmt.Printf(" %d  %s\n", allCount, filePath)
+		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
+		// isMigrated, err := migrateFile("internal/providers/terraform/aws/nat_gateway.go", referenceFile, "internal/providers/terraform/aws/", "nat_gateway.go")
+		// break
 		if isMigrated {
 			migratedCount += 1
 		} else {
 			problemFiles = append(problemFiles, filePath)
 		}
-		fmt.Printf("%s  ::  %t  ::  %s \n", filePath, isMigrated, err)
+		if isMigrated && err == nil {
+			fmt.Printf("\t %t\n", isMigrated)
+		} else {
+			fmt.Printf("\t %t  :: %s \n", isMigrated, err)
+		}
 	}
 	fmt.Println()
-	fmt.Printf("%d of %d resources can be migrated! The impossible files are: \n %s \n", migratedCount, allCount, strings.Join(problemFiles, "\n"))
+	fmt.Printf("%d of %d resources can be migrated! The impossible files are: \n%s\n", migratedCount, allCount, strings.Join(problemFiles, "\n"))
 }
 
-func migrateFile(filePath string, referenceFile *usage.ReferenceFile) (bool, error) {
+func migrateFile(filePath string, referenceFile *usage.ReferenceFile, basePath, fileName string) (bool, error) {
+	resFilePath := fmt.Sprintf("internal/resources/%s/%s", PROVIDER, fileName)
+	if _, err := os.Stat(resFilePath); err == nil {
+		return true, errors.New("manually migrated")
+	}
+
 	fset := token.NewFileSet()
 	file, err := parser.ParseFile(fset, filePath, nil, 0)
 	if err != nil {
@@ -81,17 +91,28 @@ func migrateFile(filePath string, referenceFile *usage.ReferenceFile) (bool, err
 	if isImpossibleWithGets(file) {
 		return false, errors.New("bad d/u gets")
 	}
+	if isImpossibleWithDotGets(file) {
+		return false, errors.New("dotted d/u gets")
+	}
 	if isImpossibleWithResourceDefsCount(file) {
 		return false, errors.New("multiple resource defs")
 	}
+	if isImpossibleWithGetsTypes(file) {
+		return false, errors.New("unknown d/u gets types")
+	}
 
-	pFile, _, err := doMigration(fset, file, referenceFile)
+	_, _, err = doMigration(fset, file, referenceFile)
 	if err != nil {
 		return false, err
 	}
 
-	saveFile(fset, pFile)
-	// saveFile(fset, resourceFile)
+	// saveFile(fset, pFile)
+
+	// resFilePath := fmt.Sprintf("internal/resources/%s/%s", PROVIDER, fileName)
+	// err = saveFile(fset, resourceFile, resFilePath)
+	if err != nil {
+		return false, err
+	}
 
 	return true, nil
 }
@@ -114,13 +135,76 @@ func isImpossibleWithGets(file *ast.File) bool {
 						if ok {
 							if argLit.Kind != token.STRING {
 								isImpossible = true
-							} else {
+							}
+						} else {
+							isImpossible = true
+						}
+					}
+				}
+			}
+		}
+		return true
+	})
+	return isImpossible
+}
+
+func isImpossibleWithDotGets(file *ast.File) bool {
+	isImpossible := false
+	astutil.Apply(file, nil, func(c *astutil.Cursor) bool {
+		if isImpossible {
+			return false
+		}
+		n := c.Node()
+		callExpr, ok := n.(*ast.CallExpr)
+		if ok {
+			selExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
+			if ok {
+				ident, ok := selExpr.X.(*ast.Ident)
+				if ok {
+					if (ident.Name == "d" || ident.Name == "u") && selExpr.Sel.Name == "Get" {
+						argLit, ok := callExpr.Args[0].(*ast.BasicLit)
+						if ok {
+							if argLit.Kind == token.STRING {
 								if strings.Contains(argLit.Value, ".") {
 									isImpossible = true
 								}
 							}
 						} else {
 							isImpossible = true
+						}
+					}
+				}
+			}
+		}
+		return true
+	})
+	return isImpossible
+}
+
+func isImpossibleWithGetsTypes(file *ast.File) bool {
+	isImpossible := false
+	astutil.Apply(file, nil, func(c *astutil.Cursor) bool {
+		if isImpossible {
+			return false
+		}
+		n := c.Node()
+		if callExpr, ok := n.(*ast.CallExpr); ok {
+			if selExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+				if callExpr2, ok := selExpr.X.(*ast.CallExpr); ok {
+					if selExpr2, ok := callExpr2.Fun.(*ast.SelectorExpr); ok {
+						if identExpr, ok := selExpr2.X.(*ast.Ident); ok {
+							if identExpr.Name == "d" || identExpr.Name == "u" {
+								if argLit, ok := callExpr2.Args[0].(*ast.BasicLit); ok {
+									if argLit.Kind == token.STRING {
+										switch selExpr.Sel.Name {
+										case "Map":
+											isImpossible = true
+										case "Array":
+											isImpossible = true
+										}
+									}
+								}
+							}
 						}
 					}
 				}
@@ -432,6 +516,9 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 		})
 		var defaultValue string
 		usageDefaultValues := referenceFile.FindMatchingResourceUsage(fmt.Sprintf("%s_%s.foo", PROVIDER, resourceName))
+		if usageDefaultValues == nil {
+			log.Fatalf("nil usageData for: %s", resourceName)
+		}
 		for _, usageItem := range usageDefaultValues.Items {
 			if usageItem.Key == key {
 				switch val.fieldType {
@@ -440,7 +527,11 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 				case "Int":
 					defaultValue = fmt.Sprintf("%d", usageItem.DefaultValue.(int))
 				case "Float":
-					defaultValue = fmt.Sprintf("%d", usageItem.DefaultValue.(int))
+					if fc, ok := usageItem.DefaultValue.(float64); ok {
+						defaultValue = fmt.Sprintf("%f", fc)
+					} else {
+						defaultValue = fmt.Sprintf("%d", usageItem.DefaultValue.(int))
+					}
 				}
 			}
 		}
@@ -841,12 +932,12 @@ func fixRFuncName(resourceCamelName string, file *ast.File) {
 func isImportNeededForProvider(importPath string) bool {
 	switch importPath {
 	case fmt.Sprintf("github.com/infracost/infracost/internal/resources/%s", PROVIDER):
+		return true
 	case "github.com/infracost/infracost/internal/schema":
 		return true
 	default:
 		return false
 	}
-	return false
 }
 
 func duTypeToSchemaType(duType string) string {
@@ -926,8 +1017,18 @@ func duTypeToPtrCall(duType string) string {
 	}
 }
 
-func saveFile(fset *token.FileSet, file *ast.File) {
-	fmt.Println("#################################")
-	printer.Fprint(os.Stdout, fset, file)
-	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+func saveFile(fset *token.FileSet, file *ast.File, filePath string) error {
+	f, err := os.Create(filePath)
+	defer f.Close()
+
+	if err != nil {
+	}
+	return err
+
+	printer.Fprint(f, fset, file)
+	return nil
+
+	// fmt.Println("#################################")
+	// printer.Fprint(os.Stdout, fset, file)
+	// fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 }
