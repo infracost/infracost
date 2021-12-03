@@ -101,15 +101,14 @@ func migrateFile(filePath string, referenceFile *usage.ReferenceFile, basePath, 
 		return false, errors.New("unknown d/u gets types")
 	}
 
-	_, _, err = doMigration(fset, file, referenceFile)
+	_, resourceFile, err := doMigration(fset, file, referenceFile)
 	if err != nil {
 		return false, err
 	}
 
 	// saveFile(fset, pFile)
 
-	// resFilePath := fmt.Sprintf("internal/resources/%s/%s", PROVIDER, fileName)
-	// err = saveFile(fset, resourceFile, resFilePath)
+	err = saveFile(fset, resourceFile, resFilePath)
 	if err != nil {
 		return false, err
 	}
@@ -1022,8 +1021,8 @@ func saveFile(fset *token.FileSet, file *ast.File, filePath string) error {
 	defer f.Close()
 
 	if err != nil {
+		return err
 	}
-	return err
 
 	printer.Fprint(f, fset, file)
 	return nil

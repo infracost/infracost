@@ -40,3 +40,5 @@ scripts/price_explorer/index.json
 
 # Generated docs
 docs/generated/
+
+examples/my_terraform
