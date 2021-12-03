@@ -137,6 +137,10 @@ func TestBreakdownTerraformWrapper(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/plan_with_terraform_wrapper.json"}, nil)
 }
 
+func TestBreakdownWithTarget(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/plan_with_target.json"}, nil)
+}
+
 func TestBreakdownTerraform_v0_12(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/terraform_v0.12_plan.json"}, nil)
 }

@@ -1,0 +1,17 @@
+Project: infracost/infracost/cmd/infracost/testdata/plan_with_target.json
+
+~ aws_instance.web_app_1
+  +$7.59 ($8.59 → $16.18)
+
+    ~ Instance usage (Linux/UNIX, on-demand, t3.micro → t3.small)
+      +$7.59 ($7.59 → $15.18)
+
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/plan_with_target.json
+Amount:  +$7.59 ($8.59 → $16.18)
+Percent: +88%
+
+──────────────────────────────────
+Key: ~ changed, + added, - removed
+
+1 cloud resource was detected, rerun with --show-skipped to see details:
+∙ 1 was estimated, 1 includes usage-based costs, see https://infracost.io/usage-file
