@@ -60,7 +60,7 @@ func main() {
 		allCount += 1
 		fmt.Printf(" %d  %s\n", allCount, filePath)
 		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
-		// isMigrated, err := migrateFile("internal/providers/terraform/aws/nat_gateway.go", referenceFile, "internal/providers/terraform/aws/", "nat_gateway.go")
+		// isMigrated, err := migrateFile("internal/providers/terraform/aws/db_instance.go", referenceFile, "internal/providers/terraform/aws/", "db_instance.go")
 		// break
 		if isMigrated {
 			migratedCount += 1
@@ -123,12 +123,9 @@ func isImpossibleWithGets(file *ast.File) bool {
 			return false
 		}
 		n := c.Node()
-		callExpr, ok := n.(*ast.CallExpr)
-		if ok {
-			selExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
-			if ok {
-				ident, ok := selExpr.X.(*ast.Ident)
-				if ok {
+		if callExpr, ok := n.(*ast.CallExpr); ok {
+			if selExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+				if ident, ok := selExpr.X.(*ast.Ident); ok {
 					if (ident.Name == "d" || ident.Name == "u") && selExpr.Sel.Name == "Get" {
 						argLit, ok := callExpr.Args[0].(*ast.BasicLit)
 						if ok {
@@ -137,6 +134,23 @@ func isImpossibleWithGets(file *ast.File) bool {
 							}
 						} else {
 							isImpossible = true
+						}
+					}
+				}
+			}
+		} else if pSelExpr, ok := n.(*ast.SelectorExpr); ok {
+			if callExpr, ok := pSelExpr.X.(*ast.CallExpr); ok {
+				if selExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+					if ident, ok := selExpr.X.(*ast.Ident); ok {
+						if (ident.Name == "d" || ident.Name == "u") && pSelExpr.Sel.Name == "Type" {
+							argLit, ok := callExpr.Args[0].(*ast.BasicLit)
+							if ok {
+								if argLit.Kind != token.STRING {
+									isImpossible = true
+								}
+							} else {
+								isImpossible = true
+							}
 						}
 					}
 				}
@@ -154,12 +168,9 @@ func isImpossibleWithDotGets(file *ast.File) bool {
 			return false
 		}
 		n := c.Node()
-		callExpr, ok := n.(*ast.CallExpr)
-		if ok {
-			selExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
-			if ok {
-				ident, ok := selExpr.X.(*ast.Ident)
-				if ok {
+		if callExpr, ok := n.(*ast.CallExpr); ok {
+			if selExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+				if ident, ok := selExpr.X.(*ast.Ident); ok {
 					if (ident.Name == "d" || ident.Name == "u") && selExpr.Sel.Name == "Get" {
 						argLit, ok := callExpr.Args[0].(*ast.BasicLit)
 						if ok {
@@ -170,6 +181,25 @@ func isImpossibleWithDotGets(file *ast.File) bool {
 							}
 						} else {
 							isImpossible = true
+						}
+					}
+				}
+			}
+		} else if pSelExpr, ok := n.(*ast.SelectorExpr); ok {
+			if callExpr, ok := pSelExpr.X.(*ast.CallExpr); ok {
+				if selExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+					if ident, ok := selExpr.X.(*ast.Ident); ok {
+						if (ident.Name == "d" || ident.Name == "u") && pSelExpr.Sel.Name == "Type" {
+							argLit, ok := callExpr.Args[0].(*ast.BasicLit)
+							if ok {
+								if argLit.Kind == token.STRING {
+									if strings.Contains(argLit.Value, ".") {
+										isImpossible = true
+									}
+								}
+							} else {
+								isImpossible = true
+							}
 						}
 					}
 				}
@@ -200,12 +230,20 @@ func isImpossibleWithGetsTypes(file *ast.File) bool {
 											isImpossible = true
 										case "Array":
 											isImpossible = true
+										case "References":
+											isImpossible = true
 										}
 									}
 								}
 							}
 						}
 					}
+				}
+			}
+		} else if selExpr, ok := n.(*ast.SelectorExpr); ok {
+			if XIdent, ok := selExpr.X.(*ast.Ident); ok {
+				if XIdent.Name == "d" && selExpr.Sel.Name == "References" {
+					isImpossible = true
 				}
 			}
 		}
@@ -274,7 +312,7 @@ func doMigration(fset *token.FileSet, file *ast.File, referenceFile *usage.Refer
 		return nil, nil, err
 	}
 
-	replaceDUs(resourceFile)
+	replaceDUs(resourceCamelName, resourceFile)
 	addSchemaToResource(resourceCamelName, resourceFile)
 	migrateImports(file, resourceFile)
 	addProviderFunc(resourceCamelName, dsList, usList, file)
@@ -347,9 +385,37 @@ func getDsList(file *ast.File) map[string]duStruct {
 							if identExpr.Name == "d" {
 								if argLit, ok := callExpr2.Args[0].(*ast.BasicLit); ok {
 									if argLit.Kind == token.STRING {
-										result[strings.Replace(argLit.Value, "\"", "", -1)] = duStruct{
+										keyName := strings.Replace(argLit.Value, "\"", "", -1)
+										if val, ok := result[keyName]; ok {
+											if val.fieldType != "Exists" {
+												return true
+											}
+										}
+										result[keyName] = duStruct{
 											fieldType: selExpr.Sel.Name,
 										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} else if pSelExpr, ok := n.(*ast.SelectorExpr); ok && pSelExpr.Sel.Name == "Type" {
+			if callExpr, ok := pSelExpr.X.(*ast.CallExpr); ok {
+				if selExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+					if identExpr, ok := selExpr.X.(*ast.Ident); ok {
+						if identExpr.Name == "d" {
+							if argLit, ok := callExpr.Args[0].(*ast.BasicLit); ok {
+								if argLit.Kind == token.STRING {
+									keyName := strings.Replace(argLit.Value, "\"", "", -1)
+									if val, ok := result[keyName]; ok {
+										if val.fieldType != "Exists" {
+											return true
+										}
+									}
+									result[keyName] = duStruct{
+										fieldType: "Exists",
 									}
 								}
 							}
@@ -384,6 +450,28 @@ func getUsList(file *ast.File) map[string]duStruct {
 										result[keyName] = duStruct{
 											fieldType: selExpr.Sel.Name,
 										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} else if pSelExpr, ok := n.(*ast.SelectorExpr); ok && pSelExpr.Sel.Name == "Type" {
+			if callExpr, ok := pSelExpr.X.(*ast.CallExpr); ok {
+				if selExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+					if identExpr, ok := selExpr.X.(*ast.Ident); ok {
+						if identExpr.Name == "u" {
+							if argLit, ok := callExpr.Args[0].(*ast.BasicLit); ok {
+								if argLit.Kind == token.STRING {
+									keyName := strings.Replace(argLit.Value, "\"", "", -1)
+									if val, ok := result[keyName]; ok {
+										if val.fieldType != "Exists" {
+											return true
+										}
+									}
+									result[keyName] = duStruct{
+										fieldType: "Exists",
 									}
 								}
 							}
@@ -640,7 +728,7 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 	return nil
 }
 
-func replaceDUs(resourceFile *ast.File) {
+func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 	// Replace Gets
 	astutil.Apply(resourceFile, nil, func(c *astutil.Cursor) bool {
 		n := c.Node()
@@ -695,9 +783,45 @@ func replaceDUs(resourceFile *ast.File) {
 					}
 				}
 			}
+		} else if binExpr, ok := n.(*ast.BinaryExpr); ok && binExpr.Op == token.NEQ {
+			if pSelExpr, ok := binExpr.X.(*ast.SelectorExpr); ok && pSelExpr.Sel.Name == "Type" {
+				if callExpr, ok := pSelExpr.X.(*ast.CallExpr); ok {
+					if selExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+						if identExpr, ok := selExpr.X.(*ast.Ident); ok {
+							if identExpr.Name == "u" || identExpr.Name == "d" {
+								if argLit, ok := callExpr.Args[0].(*ast.BasicLit); ok {
+									if argLit.Kind == token.STRING {
+										keyName := strings.Replace(argLit.Value, "\"", "", -1)
+										var replacementNode ast.Node
+										replacementNode = &ast.BinaryExpr{
+											Op: token.NEQ,
+											Y:  &ast.Ident{Name: "nil"},
+											X: &ast.SelectorExpr{
+												X: &ast.Ident{
+													Name: "resP",
+													Obj: &ast.Object{
+														Kind: ast.Var,
+														Name: "resP",
+													},
+												},
+												Sel: &ast.Ident{
+													Name: strcase.ToCamel(keyName),
+												},
+											},
+										}
+										c.Replace(replacementNode)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 		return true
 	})
+
+	// Replace d.X like d.Address
 	astutil.Apply(resourceFile, nil, func(c *astutil.Cursor) bool {
 		n := c.Node()
 		if selExpr, ok := n.(*ast.SelectorExpr); ok {
@@ -725,6 +849,65 @@ func replaceDUs(resourceFile *ast.File) {
 		}
 		return true
 	})
+
+	// Replace d, u method calls
+	astutil.Apply(resourceFile, nil, func(c *astutil.Cursor) bool {
+		n := c.Node()
+		if callExpr, ok := n.(*ast.CallExpr); ok {
+			if len(callExpr.Args) == 1 {
+				identExpr1, ok1 := callExpr.Args[0].(*ast.Ident)
+				if ok1 && (identExpr1.Name == "u" || identExpr1.Name == "d") {
+					callExpr.Args = []ast.Expr{
+						&ast.Ident{Name: "resP"},
+					}
+				}
+			}
+			if len(callExpr.Args) == 2 {
+				identExpr1, ok1 := callExpr.Args[0].(*ast.Ident)
+				identExpr2, ok2 := callExpr.Args[1].(*ast.Ident)
+				if (ok1 && ok2) && ((identExpr1.Name == "u" && identExpr2.Name == "d") || (identExpr1.Name == "d" && identExpr2.Name == "u")) {
+					callExpr.Args = []ast.Expr{
+						&ast.Ident{Name: "resP"},
+					}
+				}
+			}
+		}
+		return true
+	})
+
+	// Replace d, u func defs
+	astutil.Apply(resourceFile, nil, func(c *astutil.Cursor) bool {
+		n := c.Node()
+		if funcDecl, ok := n.(*ast.FuncDecl); ok {
+			if funcDecl.Name.Name == "PopulateUsage" {
+				return true
+			}
+			if len(funcDecl.Type.Params.List) == 1 {
+				name := funcDecl.Type.Params.List[0].Names[0].Name
+				if name == "u" || name == "d" {
+					funcDecl.Type.Params.List = []*ast.Field{{
+						Names: []*ast.Ident{{Name: "resP"}},
+						Type: &ast.StarExpr{
+							X: &ast.Ident{Name: resourceCamelName},
+						},
+					}}
+				}
+			} else if len(funcDecl.Type.Params.List) == 2 {
+				name1 := funcDecl.Type.Params.List[0].Names[0].Name
+				name2 := funcDecl.Type.Params.List[1].Names[0].Name
+				if (name1 == "u" && name2 == "d") || (name1 == "d" && name2 == "u") {
+					funcDecl.Type.Params.List = []*ast.Field{{
+						Names: []*ast.Ident{{Name: "resP"}},
+						Type: &ast.StarExpr{
+							X: &ast.Ident{Name: resourceCamelName},
+						},
+					}}
+				}
+			}
+		}
+		return true
+	})
+
 }
 
 func addSchemaToResource(resourceCamelName string, resourceFile *ast.File) {
@@ -768,7 +951,9 @@ func migrateImports(file, resourceFile *ast.File) {
 				n2 := c2.Node()
 				if impSpec, ok := n2.(*ast.ImportSpec); ok {
 					impPath := strings.Replace(impSpec.Path.Value, "\"", "", -1)
-					if !isImportNeededForProvider(impPath) {
+					if shouldRemoveImport(impPath) {
+						c2.Delete()
+					} else if !isImportNeededForProvider(impPath) {
 						resourceFileImports.Specs = append(resourceFileImports.Specs, impSpec)
 						c2.Delete()
 					}
@@ -926,6 +1111,15 @@ func fixRFuncName(resourceCamelName string, file *ast.File) {
 		}
 		return true
 	})
+}
+
+func shouldRemoveImport(importPath string) bool {
+	switch importPath {
+	case "github.com/tidwall/gjson":
+		return true
+	default:
+		return false
+	}
 }
 
 func isImportNeededForProvider(importPath string) bool {
