@@ -82,7 +82,7 @@ func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 		EstimateUsage:  instanceResource.EstimateUsage,
 	}
 
-	qty := int64(0)
+	qty := int64(1)
 	if a.InstanceCount != nil {
 		qty = *a.InstanceCount
 	}

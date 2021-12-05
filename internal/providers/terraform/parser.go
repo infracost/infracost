@@ -686,6 +686,18 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 			Attribute:        "launch_template",
 			ModuleSource:     "terraform-aws-modules/eks/aws",
 		},
+		{
+			SourceAddrSuffix: "aws_autoscaling_group.this",
+			DestAddrSuffix:   "aws_launch_template.this",
+			Attribute:        "launch_template",
+			ModuleSource:     "terraform-aws-modules/autoscaling/aws",
+		},
+		{
+			SourceAddrSuffix: "aws_autoscaling_group.this",
+			DestAddrSuffix:   "aws_launch_configuration.this",
+			Attribute:        "launch_configuration",
+			ModuleSource:     "terraform-aws-modules/autoscaling/aws",
+		},
 	}
 
 	for _, d := range resData {
