@@ -22,7 +22,7 @@ func NewS3BucketResource(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		"INTELLIGENT_TIERING": "intelligent_tiering",
 		"STANDARD_IA":         "standard_infrequent_access",
 		"ONEZONE_IA":          "one_zone_infrequent_access",
-		"GLACIER":             "glacier",
+		"GLACIER":             "glacier_flexible_retrieval",
 		"DEEP_ARCHIVE":        "glacier_deep_archive",
 	}
 

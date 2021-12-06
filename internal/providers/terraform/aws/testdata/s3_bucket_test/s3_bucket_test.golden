@@ -37,7 +37,7 @@
  │  ├─ Retrievals                           Monthly cost depends on usage: $0.01 per GB             
  │  ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
  │  └─ Select data returned                 Monthly cost depends on usage: $0.01 per GB             
- ├─ Glacier                                                                                         
+ ├─ Glacier flexible retrieval                                                                      
  │  ├─ Storage                              Monthly cost depends on usage: $0.0036 per GB           
  │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.03 per 1k requests    
  │  ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.0004 per 1k requests  
@@ -100,7 +100,7 @@
  │  ├─ Retrievals                                      40,000  GB                           $400.00 
  │  ├─ Select data scanned                             40,000  GB                            $80.00 
  │  └─ Select data returned                            40,000  GB                           $400.00 
- ├─ Glacier                                                                                         
+ ├─ Glacier flexible retrieval                                                                      
  │  ├─ Storage                                         50,000  GB                           $180.00 
  │  ├─ PUT, COPY, POST, LIST requests                      50  1k requests                    $1.50 
  │  ├─ GET, SELECT, and all other requests                 50  1k requests                    $0.02 

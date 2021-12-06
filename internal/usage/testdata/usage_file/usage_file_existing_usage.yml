@@ -14,7 +14,7 @@ resource_usage:
     reserved_instance_payment_option: all_upfront
   aws_s3_bucket.with_usage:
     object_tags: 10000000 # This comment shouldn't be overwritten
-    glacier:
+    glacier_flexible_retrieval:
       storage_gb: 50000
   aws_cloudfront_distribution.with_usage:
     custom_ssl_certificates: 3

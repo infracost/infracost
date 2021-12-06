@@ -155,7 +155,7 @@ func TestS3Bucket(t *testing.T) {
 		"one_zone_infrequent_access": map[string]interface{}{
 			"storage_gb": 2.7,
 		},
-		"glacier": map[string]interface{}{
+		"glacier_flexible_retrieval": map[string]interface{}{
 			"storage_gb": 2.8,
 		},
 	}, estimates.usage)
