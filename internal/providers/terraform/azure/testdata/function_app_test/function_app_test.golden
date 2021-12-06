@@ -38,11 +38,14 @@
  └─ Executions                                                                     0.1  1M requests                      $0.02 
                                                                                                                                
  azurerm_storage_account.example                                                                                               
- ├─ Capacity                                                        Monthly cost depends on usage: $0.0208 per GB              
- ├─ Write operations                                                Monthly cost depends on usage: $0.05 per 10k operations    
- ├─ Read operations                                                 Monthly cost depends on usage: $0.004 per 10k operations   
+ ├─ Capacity                                                        Monthly cost depends on usage: $0.0152 per GB              
+ ├─ Write operations                                                Monthly cost depends on usage: $0.10 per 10k operations    
+ ├─ List and create container operations                            Monthly cost depends on usage: $0.05 per 10k operations    
+ ├─ Read operations                                                 Monthly cost depends on usage: $0.01 per 10k operations    
  ├─ All other operations                                            Monthly cost depends on usage: $0.004 per 10k operations   
- └─ Blob index                                                      Monthly cost depends on usage: $0.03 per 10k tags          
+ ├─ Data retrieval                                                  Monthly cost depends on usage: $0.01 per GB                
+ ├─ Blob index                                                      Monthly cost depends on usage: $0.03 per 10k tags          
+ └─ Early deletion                                                  Monthly cost depends on usage: $0.0152 per GB              
                                                                                                                                
  OVERALL TOTAL                                                                                                       $1,134.69 
 ──────────────────────────────────
