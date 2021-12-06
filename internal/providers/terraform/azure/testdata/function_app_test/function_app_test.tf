@@ -55,6 +55,7 @@ resource "azurerm_storage_account" "example" {
   location                 = azurerm_resource_group.example1.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  access_tier              = "Cool"
 }
 
 resource "azurerm_function_app" "elasticFunction" {

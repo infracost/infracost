@@ -7,11 +7,14 @@
  └─ Zookeeper node (Standard_G2)                       2,190  hours                        $3,232.44 
                                                                                                      
  azurerm_storage_account.example                                                                     
- ├─ Capacity                              Monthly cost depends on usage: $0.0196 per GB              
- ├─ Write operations                      Monthly cost depends on usage: $0.054 per 10k operations   
- ├─ Read operations                       Monthly cost depends on usage: $0.0043 per 10k operations  
+ ├─ Capacity                              Monthly cost depends on usage: $0.01 per GB                
+ ├─ Write operations                      Monthly cost depends on usage: $0.10 per 10k operations    
+ ├─ List and create container operations  Monthly cost depends on usage: $0.054 per 10k operations   
+ ├─ Read operations                       Monthly cost depends on usage: $0.01 per 10k operations    
  ├─ All other operations                  Monthly cost depends on usage: $0.0043 per 10k operations  
- └─ Blob index                            Monthly cost depends on usage: $0.039 per 10k tags         
+ ├─ Data retrieval                        Monthly cost depends on usage: $0.01 per GB                
+ ├─ Blob index                            Monthly cost depends on usage: $0.039 per 10k tags         
+ └─ Early deletion                        Monthly cost depends on usage: $0.01 per GB                
                                                                                                      
  OVERALL TOTAL                                                                             $8,619.84 
 ──────────────────────────────────
