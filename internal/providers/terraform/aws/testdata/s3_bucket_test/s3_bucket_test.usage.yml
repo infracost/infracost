@@ -52,10 +52,8 @@ resource_usage:
       monthly_expedited_select_data_scanned_gb:  50000
       monthly_expedited_select_data_returned_gb: 50000
       monthly_standard_data_retrieval_requests:  50000
-      monthly_bulk_data_retrieval_requests:      50000
       monthly_expedited_data_retrieval_requests: 50000
       monthly_standard_data_retrieval_gb:        50000
-      monthly_bulk_data_retrieval_gb:            50000
       monthly_expedited_data_retrieval_gb:       50000
       early_delete_gb:                           50000
 

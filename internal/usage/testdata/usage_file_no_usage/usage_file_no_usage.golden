@@ -112,10 +112,8 @@ version: 0.1
       # monthly_expedited_select_data_scanned_gb: 0.0 # Monthly data scanned by S3 Select in GB (for expedited level of S3 Glacier)
       # monthly_expedited_select_data_returned_gb: 0.0 # Monthly data returned by S3 Select in GB (for expedited level of S3 Glacier)
       # monthly_standard_data_retrieval_requests: 0 # Monthly data Retrieval requests (for standard level of S3 Glacier).
-      # monthly_bulk_data_retrieval_requests: 0 # Monthly data Retrieval requests (for bulk level of S3 Glacier).
       # monthly_expedited_data_retrieval_requests: 0 # Monthly data Retrieval requests (for expedited level of S3 Glacier).
       # monthly_standard_data_retrieval_gb: 0.0 # Monthly data retrievals in GB (for standard level of S3 Glacier).
-      # monthly_bulk_data_retrieval_gb: 0.0 # Monthly data retrievals in GB (for bulk level of S3 Glacier).
       # monthly_expedited_data_retrieval_gb: 0.0 # Monthly data retrievals in GB (for expedited level of S3 Glacier).
       # early_delete_gb: 0.0 # If an archive is deleted within 3 months of being uploaded, you will be charged an early deletion fee per GB.
     # glacier_deep_archive:

@@ -22,8 +22,6 @@ type S3GlacierStorageClass struct {
 	MonthlyExpeditedDataRetrievalGB       *float64 `infracost_usage:"monthly_expedited_data_retrieval_gb"`
 	MonthlyExpeditedSelectDataScannedGB   *float64 `infracost_usage:"monthly_expedited_select_data_scanned_gb"`
 	MonthlyExpeditedSelectDataReturnedGB  *float64 `infracost_usage:"monthly_expedited_select_data_returned_gb"`
-	MonthlyBulkDataRetrievalRequests      *int64   `infracost_usage:"monthly_bulk_data_retrieval_requests"`
-	MonthlyBulkDataRetrievalGB            *float64 `infracost_usage:"monthly_bulk_data_retrieval_gb"`
 	MonthlyBulkSelectDataScannedGB        *float64 `infracost_usage:"monthly_bulk_select_data_scanned_gb"`
 	MonthlyBulkSelectDataReturnedGB       *float64 `infracost_usage:"monthly_bulk_select_data_returned_gb"`
 	EarlyDeleteGB                         *float64 `infracost_usage:"early_delete_gb"`
@@ -42,8 +40,6 @@ var S3GlacierStorageClassUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_expedited_data_retrieval_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monthly_expedited_select_data_scanned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monthly_expedited_select_data_returned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
-	{Key: "monthly_bulk_data_retrieval_requests", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_bulk_data_retrieval_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monthly_bulk_select_data_scanned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monthly_bulk_select_data_returned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "early_delete_gb", DefaultValue: 0.0, ValueType: schema.Float64},
@@ -74,8 +70,6 @@ func (a *S3GlacierStorageClass) BuildResource() *schema.Resource {
 			s3DataCostComponent("Retrievals (expedited)", "AmazonGlacier", a.Region, "Expedited-Retrieval-Bytes", a.MonthlyExpeditedDataRetrievalGB),
 			s3DataCostComponent("Select data scanned (expedited)", "AmazonGlacier", a.Region, "Exp-Select-Scanned-Bytes", a.MonthlyExpeditedSelectDataScannedGB),
 			s3DataCostComponent("Select data returned (expedited)", "AmazonGlacier", a.Region, "Exp-Select-Returned-Bytes", a.MonthlyExpeditedSelectDataReturnedGB),
-			s3ApiCostComponent("Retrieval requests (bulk)", "AmazonGlacier", a.Region, "Requests-Tier2", a.MonthlyBulkDataRetrievalRequests),
-			s3DataCostComponent("Retrievals (bulk)", "AmazonGlacier", a.Region, "Bulk-Retrieval-Bytes", a.MonthlyBulkDataRetrievalGB),
 			s3DataCostComponent("Select data scanned (bulk)", "AmazonGlacier", a.Region, "Bulk-Select-Scanned-Bytes", a.MonthlyBulkSelectDataScannedGB),
 			s3DataCostComponent("Select data returned (bulk)", "AmazonGlacier", a.Region, "Bulk-Select-Returned-Bytes", a.MonthlyBulkSelectDataReturnedGB),
 			s3DataCostComponent("Early delete (within 90 days)", "AmazonGlacier", a.Region, "EarlyDelete-ByteHrs", a.EarlyDeleteGB),

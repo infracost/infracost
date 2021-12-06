@@ -12,7 +12,7 @@
  ├─ Intelligent tiering                                                                             
  │  ├─ Storage (frequent access)            Monthly cost depends on usage: $0.023 per GB            
  │  ├─ Storage (infrequent access)          Monthly cost depends on usage: $0.0125 per GB           
- │  ├─ Storage (archive access)             Monthly cost depends on usage: $0.004 per GB            
+ │  ├─ Storage (archive access)             Monthly cost depends on usage: $0.0036 per GB           
  │  ├─ Storage (deep archive access)        Monthly cost depends on usage: $0.00099 per GB          
  │  ├─ Monitoring and automation            Monthly cost depends on usage: $0.0025 per 1k objects   
  │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.005 per 1k requests   
@@ -38,7 +38,7 @@
  │  ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
  │  └─ Select data returned                 Monthly cost depends on usage: $0.01 per GB             
  ├─ Glacier                                                                                         
- │  ├─ Storage                              Monthly cost depends on usage: $0.004 per GB            
+ │  ├─ Storage                              Monthly cost depends on usage: $0.0036 per GB           
  │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.03 per 1k requests    
  │  ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.0004 per 1k requests  
  │  ├─ Lifecycle transition                 Monthly cost depends on usage: $0.03 per 1k requests    
@@ -50,11 +50,9 @@
  │  ├─ Retrievals (expedited)               Monthly cost depends on usage: $0.03 per GB             
  │  ├─ Select data scanned (expedited)      Monthly cost depends on usage: $0.02 per GB             
  │  ├─ Select data returned (expedited)     Monthly cost depends on usage: $0.03 per GB             
- │  ├─ Retrieval requests (bulk)            Monthly cost depends on usage: $0.025 per 1k requests   
- │  ├─ Retrievals (bulk)                    Monthly cost depends on usage: $0.0025 per GB           
  │  ├─ Select data scanned (bulk)           Monthly cost depends on usage: $0.001 per GB            
  │  ├─ Select data returned (bulk)          Monthly cost depends on usage: $0.0025 per GB           
- │  └─ Early delete (within 90 days)        Monthly cost depends on usage: $0.004 per GB            
+ │  └─ Early delete (within 90 days)        Monthly cost depends on usage: $0.0036 per GB           
  └─ Glacier deep archive                                                                            
     ├─ Storage                              Monthly cost depends on usage: $0.00099 per GB          
     ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.05 per 1k requests    
@@ -77,7 +75,7 @@
  ├─ Intelligent tiering                                                                             
  │  ├─ Storage (frequent access)                       20,000  GB                           $460.00 
  │  ├─ Storage (infrequent access)                     20,000  GB                           $250.00 
- │  ├─ Storage (archive access)                        20,000  GB                            $80.00 
+ │  ├─ Storage (archive access)                        20,000  GB                            $72.00 
  │  ├─ Storage (deep archive access)                   20,000  GB                            $19.80 
  │  ├─ Monitoring and automation                           20  1k objects                     $0.05 
  │  ├─ PUT, COPY, POST, LIST requests                      20  1k requests                    $0.10 
@@ -103,7 +101,7 @@
  │  ├─ Select data scanned                             40,000  GB                            $80.00 
  │  └─ Select data returned                            40,000  GB                           $400.00 
  ├─ Glacier                                                                                         
- │  ├─ Storage                                         50,000  GB                           $200.00 
+ │  ├─ Storage                                         50,000  GB                           $180.00 
  │  ├─ PUT, COPY, POST, LIST requests                      50  1k requests                    $1.50 
  │  ├─ GET, SELECT, and all other requests                 50  1k requests                    $0.02 
  │  ├─ Lifecycle transition                                50  1k requests                    $1.50 
@@ -115,11 +113,9 @@
  │  ├─ Retrievals (expedited)                          50,000  GB                         $1,500.00 
  │  ├─ Select data scanned (expedited)                 50,000  GB                         $1,000.00 
  │  ├─ Select data returned (expedited)                50,000  GB                         $1,500.00 
- │  ├─ Retrieval requests (bulk)                           50  1k requests                    $1.25 
- │  ├─ Retrievals (bulk)                               50,000  GB                           $125.00 
  │  ├─ Select data scanned (bulk)                      50,000  GB                            $50.00 
  │  ├─ Select data returned (bulk)                     50,000  GB                           $125.00 
- │  └─ Early delete (within 90 days)                   50,000  GB                           $200.00 
+ │  └─ Early delete (within 90 days)                   50,000  GB                           $180.00 
  └─ Glacier deep archive                                                                            
     ├─ Storage                                         60,000  GB                            $59.40 
     ├─ PUT, COPY, POST, LIST requests                      60  1k requests                    $3.00 
@@ -131,7 +127,7 @@
     ├─ Retrievals (bulk)                               60,000  GB                           $150.00 
     └─ Early delete (within 180 days)                  60,000  GB                            $59.40 
                                                                                                     
- OVERALL TOTAL                                                                           $11,985.78 
+ OVERALL TOTAL                                                                           $11,811.53 
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
