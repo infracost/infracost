@@ -10,7 +10,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var validConfigureKeys = []string{"api_key", "pricing_api_endpoint", "currency"}
+var validConfigureKeys = []string{
+	"api_key",
+	"pricing_api_endpoint",
+	"tls_insecure_skip_verify",
+	"tls_ca_cert_file",
+	"currency",
+}
 
 func configureCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
@@ -21,6 +27,8 @@ func configureCmd(ctx *config.RunContext) *cobra.Command {
 Supported settings:
   - api_key: Infracost API key
   - pricing_api_endpoint: endpoint of the Cloud Pricing API
+  - tls_insecure_skip_verify: skip TLS certificate checks for a self-hosted Cloud Pricing API
+  - tls_ca_cert_file: verify certificate of a self-hosted Cloud Pricing API using this CA certificate
   - currency: convert output from USD to your preferred currency
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -43,6 +51,8 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 Supported settings:
   - api_key: Infracost API key
   - pricing_api_endpoint: endpoint of the Cloud Pricing API
+  - tls_insecure_skip_verify: skip TLS certificate checks for a self-hosted Cloud Pricing API
+  - tls_ca_cert_file: verify certificate of a self-hosted Cloud Pricing API using this CA certificate
   - currency: convert output from USD to your preferred currency
 `,
 		Example: `  Set your Infracost API key:
@@ -75,27 +85,43 @@ Supported settings:
 			key := args[0]
 			value := args[1]
 
-			if key == "pricing_api_endpoint" {
+			saveCredentials := false
+			saveConfiguration := false
+
+			switch key {
+			case "pricing_api_endpoint":
 				ctx.Config.Credentials.PricingAPIEndpoint = value
-
-				err := ctx.Config.Credentials.Save()
-				if err != nil {
-					return err
-				}
-			}
-
-			if key == "api_key" {
+				saveCredentials = true
+			case "api_key":
 				ctx.Config.Credentials.APIKey = value
+				saveCredentials = true
+			case "tls_insecure_skip_verify":
+				var b bool
+				if value == "true" {
+					b = true
+				} else if value == "false" {
+					b = false
+				} else {
+					return errors.New("Invalid value, must be true or false")
+				}
+				ctx.Config.Configuration.TLSInsecureSkipVerify = &b
+				saveConfiguration = true
+			case "tls_ca_cert_file":
+				ctx.Config.Configuration.TLSCACertFile = value
+				saveConfiguration = true
+			case "currency":
+				ctx.Config.Configuration.Currency = value
+				saveConfiguration = true
+			}
 
+			if saveCredentials {
 				err := ctx.Config.Credentials.Save()
 				if err != nil {
 					return err
 				}
 			}
 
-			if key == "currency" {
-				ctx.Config.Configuration.Currency = value
-
+			if saveConfiguration {
 				err := ctx.Config.Configuration.Save()
 				if err != nil {
 					return err
@@ -118,6 +144,8 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 Supported settings:
   - api_key: Infracost API key
   - pricing_api_endpoint: endpoint of the Cloud Pricing API
+  - tls_insecure_skip_verify: skip TLS certificate checks for a self-hosted Cloud Pricing API
+  - tls_ca_cert_file: verify certificate of a self-hosted Cloud Pricing API using this CA certificate
   - currency: convert output from USD to your preferred currency
 `,
 		Example: `  Get your saved Infracost API key:
@@ -171,12 +199,36 @@ Supported settings:
 					)
 					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
+			} else if key == "tls_insecure_skip_verify" {
+				if ctx.Config.Configuration.TLSInsecureSkipVerify == nil {
+					value = ""
+				} else {
+					value = fmt.Sprintf("%t", *ctx.Config.Configuration.TLSInsecureSkipVerify)
+				}
+
+				if value == "" {
+					msg := fmt.Sprintf("Skipping TLS verification is not set in your saved config (%s).\nSet it using %s.",
+						config.ConfigurationFilePath(),
+						ui.PrimaryString("infracost configure set tls_insecure_skip_verify true"),
+					)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
+				}
+			} else if key == "tls_ca_cert_file" {
+				value = ctx.Config.Configuration.TLSCACertFile
+
+				if value == "" {
+					msg := fmt.Sprintf("No CA cert file in your saved config (%s).\nSet a CA certificate using %s.",
+						config.ConfigurationFilePath(),
+						ui.PrimaryString("infracost configure set tls_ca_cert_file /path/to/ca.crt"),
+					)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
+				}
 			} else if key == "currency" {
 				value = ctx.Config.Configuration.Currency
 
 				if value == "" {
 					msg := fmt.Sprintf("No currency in your saved config (%s), defaulting to USD.\nSet a currency using %s.",
-						config.CredentialsFilePath(),
+						config.ConfigurationFilePath(),
 						ui.PrimaryString("infracost configure set currency CURRENCY"),
 					)
 					ui.PrintWarning(cmd.ErrOrStderr(), msg)

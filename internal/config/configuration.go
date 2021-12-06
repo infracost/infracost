@@ -13,8 +13,10 @@ import (
 var configurationVersion = "0.1"
 
 type Configuration struct {
-	Version  string `yaml:"version"`
-	Currency string `yaml:"currency,omitempty"`
+	Version               string `yaml:"version"`
+	Currency              string `yaml:"currency,omitempty"`
+	TLSInsecureSkipVerify *bool  `yaml:"tls_insecure_skip_verify"`
+	TLSCACertFile         string `yaml:"tls_ca_cert_file,omitempty"`
 }
 
 func loadConfiguration(cfg *Config) error {
@@ -36,6 +38,14 @@ func loadConfiguration(cfg *Config) error {
 	}
 	if cfg.Currency == "" {
 		cfg.Currency = "USD"
+	}
+
+	if cfg.Configuration.TLSInsecureSkipVerify != nil {
+		cfg.TLSInsecureSkipVerify = *cfg.Configuration.TLSInsecureSkipVerify
+	}
+
+	if cfg.TLSCACertFile == "" {
+		cfg.TLSCACertFile = cfg.Configuration.TLSCACertFile
 	}
 
 	return nil
