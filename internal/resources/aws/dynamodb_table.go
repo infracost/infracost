@@ -307,7 +307,7 @@ func (a *DynamoDBTable) dataStorageCostComponent(region string, storageGB *int64
 			Service:       strPtr("AmazonDynamoDB"),
 			ProductFamily: strPtr("Database Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/TimedStorage-ByteHrs/")},
+				{Key: "usagetype", ValueRegex: regexPtr("^TimedStorage-ByteHrs$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

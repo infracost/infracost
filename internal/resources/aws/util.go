@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"fmt"
 	"math"
 	"reflect"
 	"regexp"
@@ -80,6 +81,10 @@ func stringInSlice(slice []string, s string) bool {
 		}
 	}
 	return false
+}
+
+func regexPtr(regex string) *string {
+	return strPtr(fmt.Sprintf("/%s/i", regex))
 }
 
 // RegionMapping is a helpful conversion map that changes
