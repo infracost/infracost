@@ -2,13 +2,16 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/Rhymond/go-money"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
@@ -40,234 +43,79 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().Bool("sync-usage-file", false, "Sync usage-file with missing resources, needs usage-file too (experimental)")
 
+	cmd.Flags().Int("parallelism", 0, "Limit the number of projects processed in parallel, defaults to 4×CPU count (max 16)")
+
 	_ = cmd.MarkFlagFilename("path", "json", "tf")
 	_ = cmd.MarkFlagFilename("config-file", "yml")
 	_ = cmd.MarkFlagFilename("usage-file", "yml")
 }
 
-func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg *config.Project, provider schema.Provider) error {
-	if projectCfg.UsageFile == "" {
-		// This should not happen as we check earlier in the code that usage-file is not empty when sync-usage-file flag is on.
-		return fmt.Errorf("Error generating usage: no usage file given")
-	}
-
-	var usageFile *usage.UsageFile
-
-	usageFilePath := projectCfg.UsageFile
-	err := usage.CreateUsageFile(usageFilePath)
-	if err != nil {
-		return errors.Wrap(err, "Error creating  usage file")
-	}
-
-	usageFile, err = usage.LoadUsageFile(usageFilePath)
-	if err != nil {
-		return errors.Wrap(err, "Error loading usage file")
-	}
-
-	usageData := usageFile.ToUsageDataMap()
-	providerProjects, err := provider.LoadResources(usageData)
-	if err != nil {
-		return errors.Wrap(err, "Error loading resources")
-	}
-
-	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: runCtx.Config.IsLogging(),
-		NoColor:       runCtx.Config.NoColor,
-		Indent:        "  ",
-	}
-
-	spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
-	syncResult, err := usage.SyncUsageData(usageFile, providerProjects)
-	if err != nil {
-		spinner.Fail()
-		return errors.Wrap(err, "Error synchronizing usage data")
-	}
-
-	runCtx.SetProjectContextFrom(syncResult)
-	if err != nil {
-		spinner.Fail()
-		return errors.Wrap(err, "Error summarizing usage")
-	}
-
-	err = usageFile.WriteToPath(projectCfg.UsageFile)
-	if err != nil {
-		spinner.Fail()
-		return errors.Wrap(err, "Error writing usage file")
-	}
-
-	if syncResult == nil {
-		spinner.Fail()
-	} else {
-		resources := syncResult.ResourceCount
-		attempts := syncResult.EstimationCount
-		errors := len(syncResult.EstimationErrors)
-		successes := attempts - errors
-
-		pluralized := ""
-		if resources > 1 {
-			pluralized = "s"
-		}
-
-		spinner.Success()
-		cmd.PrintErrln(fmt.Sprintf("    %s Synced %d of %d resource%s",
-			ui.FaintString("└─"),
-			successes,
-			resources,
-			pluralized))
-	}
-	return nil
-}
-
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
-	projects := make([]*schema.Project, 0)
-	projectContexts := make([]*config.ProjectContext, 0)
+	parallelism, err := getParallelism(cmd)
+	if err != nil {
+		return err
+	}
+	runCtx.SetContextValue("parallelism", parallelism)
 
-	for _, projectCfg := range runCtx.Config.Projects {
-		ctx := config.NewProjectContext(runCtx, projectCfg)
-		runCtx.SetCurrentProjectContext(ctx)
+	numJobs := len(runCtx.Config.Projects)
+	jobs := make(chan *config.Project, numJobs)
 
-		for k, v := range projectCfg.Env {
-			os.Setenv(k, v)
-		}
+	projectResultChan := make(chan []*schema.Project, numJobs)
+	projectContextChan := make(chan *config.ProjectContext, numJobs)
+	errGroup, _ := errgroup.WithContext(context.Background())
 
-		provider, err := providers.Detect(ctx)
+	if parallelism > 1 && numJobs > 1 && !runCtx.Config.IsLogging() {
+		cmd.PrintErrln("Running multiple projects in parallel, so log-level=info is enabled by default.")
+		cmd.PrintErrln("Run with --parallelism=1 to disable parallelism to help debugging.")
+		cmd.PrintErrln()
+
+		runCtx.Config.LogLevel = "info"
+		err := runCtx.Config.ConfigureLogger()
 		if err != nil {
-			m := fmt.Sprintf("%s\n\n", err)
-			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
+			return err
+		}
+	}
 
-			if cmd.Name() != "diff" {
-				m += "\n - Terraform state JSON file"
+	for i := 0; i < parallelism; i++ {
+		errGroup.Go(func() error {
+
+			for projectCfg := range jobs {
+				ctx := config.NewProjectContext(runCtx, projectCfg)
+				projectContextChan <- ctx
+
+				configProjects, err := runProjectConfig(cmd, runCtx, ctx, projectCfg)
+				if err != nil {
+					return err
+				}
+
+				projectResultChan <- configProjects
 			}
 
-			return clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
-		}
-		ctx.SetContextValue("projectType", provider.Type())
+			return nil
+		})
+	}
+
+	for _, p := range runCtx.Config.Projects {
+		jobs <- p
+	}
+	close(jobs)
+
+	err = errGroup.Wait()
+	if err != nil {
+		return err
+	}
+
+	close(projectContextChan)
+	projectContexts := make([]*config.ProjectContext, 0, len(runCtx.Config.Projects))
+	for ctx := range projectContextChan {
 		projectContexts = append(projectContexts, ctx)
-
-		if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
-			m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
-			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
-			return clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
-		}
-
-		m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
-		if runCtx.Config.IsLogging() {
-			log.Info(m)
-		} else {
-			fmt.Fprintln(os.Stderr, m)
-		}
-
-		// Generate usage file
-		if runCtx.Config.SyncUsageFile {
-			err := generateUsageFile(cmd, runCtx, projectCfg, provider)
-			if err != nil {
-				return errors.Wrap(err, "Error generating usage file")
-			}
-		}
-
-		// Load usage data
-		usageData := make(map[string]*schema.UsageData)
-		var usageFile *usage.UsageFile
-
-		if projectCfg.UsageFile != "" {
-			var err error
-			usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile)
-			if err != nil {
-				return err
-			}
-
-			invalidKeys, err := usageFile.InvalidKeys()
-			if err != nil {
-				log.Errorf("Error checking usage file keys: %v", err)
-			} else if len(invalidKeys) > 0 {
-				ui.PrintWarningf(cmd.ErrOrStderr(),
-					"The following usage file parameters are invalid and will be ignored: %s\n",
-					strings.Join(invalidKeys, ", "),
-				)
-			}
-		} else {
-			usageFile = usage.NewBlankUsageFile()
-		}
-
-		if len(usageData) > 0 {
-			ctx.SetContextValue("hasUsageFile", true)
-		}
-
-		// Merge wildcard usages into individual usage
-		wildCardUsage := make(map[string]*usage.ResourceUsage)
-		for _, us := range usageFile.ResourceUsages {
-			if strings.HasSuffix(us.Name, "[*]") {
-				lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
-				prefixName := us.Name[:lastIndexOfOpenBracket]
-				wildCardUsage[prefixName] = us
-			}
-		}
-
-		for _, us := range usageFile.ResourceUsages {
-			if strings.HasSuffix(us.Name, "[*]") {
-				continue
-			}
-
-			if !strings.HasSuffix(us.Name, "]") {
-				continue
-			}
-			lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
-			prefixName := us.Name[:lastIndexOfOpenBracket]
-
-			us.MergeResourceUsage(wildCardUsage[prefixName])
-		}
-
-		usageData = usageFile.ToUsageDataMap()
-
-		providerProjects, err := provider.LoadResources(usageData)
-		if err != nil {
-			return err
-		}
-
-		projects = append(projects, providerProjects...)
 	}
 
-	if !runCtx.Config.IsLogging() {
-		fmt.Fprintln(os.Stderr, "")
+	close(projectResultChan)
+	projects := make([]*schema.Project, 0)
+	for projectResults := range projectResultChan {
+		projects = append(projects, projectResults...)
 	}
-
-	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: runCtx.Config.IsLogging(),
-		NoColor:       runCtx.Config.NoColor,
-	}
-	spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
-
-	for _, project := range projects {
-		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
-			spinner.Fail()
-			fmt.Fprintln(os.Stderr, "")
-
-			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
-				return fmt.Errorf("%v\n%s %s %s %s %s\n%s",
-					e.Error(),
-					"Please check your",
-					ui.PrimaryString(config.CredentialsFilePath()),
-					"file or",
-					ui.PrimaryString("INFRACOST_API_KEY"),
-					"environment variable.",
-					"If you continue having issues please email hello@infracost.io",
-				)
-			}
-
-			if e, ok := err.(*apiclient.APIError); ok {
-				return fmt.Errorf("%v\n%s", e.Error(), "We have been notified of this issue.")
-			}
-
-			return err
-		}
-
-		schema.CalculateCosts(project)
-		project.CalculateDiff()
-	}
-
-	spinner.Success()
 
 	r, err := output.ToOutputFormat(projects)
 	if err != nil {
@@ -312,15 +160,14 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	env := buildRunEnv(runCtx, projectContexts, r)
-
 	pricingClient := apiclient.NewPricingAPIClient(runCtx.Config)
 	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
 		log.Errorf("Error reporting event: %s", err)
 	}
 
-	// Print a new line to separate the spinners from the output
-	if !runCtx.Config.IsLogging() {
+	// Print a new line to separate the logs from the output
+	if runCtx.Config.IsLogging() {
 		cmd.PrintErrln()
 	}
 
@@ -334,6 +181,254 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	return nil
+}
+
+func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config.ProjectContext, projectCfg *config.Project) ([]*schema.Project, error) {
+	for k, v := range projectCfg.Env {
+		os.Setenv(k, v)
+	}
+
+	provider, err := providers.Detect(ctx)
+	if err != nil {
+		m := fmt.Sprintf("%s\n\n", err)
+		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
+		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
+
+		if cmd.Name() != "diff" {
+			m += "\n - Terraform state JSON file"
+		}
+
+		return []*schema.Project{}, clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
+	}
+	ctx.SetContextValue("projectType", provider.Type())
+
+	if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
+		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
+		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
+		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
+		return []*schema.Project{}, clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
+	}
+
+	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
+	if runCtx.Config.IsLogging() {
+		log.Info(m)
+	} else {
+		fmt.Fprintln(os.Stderr, m)
+	}
+
+	// Generate usage file
+	if runCtx.Config.SyncUsageFile {
+		err := generateUsageFile(cmd, runCtx, ctx, projectCfg, provider)
+		if err != nil {
+			return []*schema.Project{}, errors.Wrap(err, "Error generating usage file")
+		}
+	}
+
+	// Load usage data
+	usageData := make(map[string]*schema.UsageData)
+	var usageFile *usage.UsageFile
+
+	if projectCfg.UsageFile != "" {
+		var err error
+		usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile)
+		if err != nil {
+			return []*schema.Project{}, err
+		}
+
+		invalidKeys, err := usageFile.InvalidKeys()
+		if err != nil {
+			log.Errorf("Error checking usage file keys: %v", err)
+		} else if len(invalidKeys) > 0 {
+			ui.PrintWarningf(cmd.ErrOrStderr(),
+				"The following usage file parameters are invalid and will be ignored: %s\n",
+				strings.Join(invalidKeys, ", "),
+			)
+		}
+	} else {
+		usageFile = usage.NewBlankUsageFile()
+	}
+
+	if len(usageData) > 0 {
+		ctx.SetContextValue("hasUsageFile", true)
+	}
+
+	// Merge wildcard usages into individual usage
+	wildCardUsage := make(map[string]*usage.ResourceUsage)
+	for _, us := range usageFile.ResourceUsages {
+		if strings.HasSuffix(us.Name, "[*]") {
+			lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
+			prefixName := us.Name[:lastIndexOfOpenBracket]
+			wildCardUsage[prefixName] = us
+		}
+	}
+
+	for _, us := range usageFile.ResourceUsages {
+		if strings.HasSuffix(us.Name, "[*]") {
+			continue
+		}
+
+		if !strings.HasSuffix(us.Name, "]") {
+			continue
+		}
+		lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
+		prefixName := us.Name[:lastIndexOfOpenBracket]
+
+		us.MergeResourceUsage(wildCardUsage[prefixName])
+	}
+
+	usageData = usageFile.ToUsageDataMap()
+
+	projects, err := provider.LoadResources(usageData)
+	if err != nil {
+		return projects, err
+	}
+
+	spinnerOpts := ui.SpinnerOptions{
+		EnableLogging: runCtx.Config.IsLogging(),
+		NoColor:       runCtx.Config.NoColor,
+	}
+	spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
+
+	for _, project := range projects {
+		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
+			spinner.Fail()
+			fmt.Fprintln(os.Stderr, "")
+
+			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
+				return projects, fmt.Errorf("%v\n%s %s %s %s %s\n%s",
+					e.Error(),
+					"Please check your",
+					ui.PrimaryString(config.CredentialsFilePath()),
+					"file or",
+					ui.PrimaryString("INFRACOST_API_KEY"),
+					"environment variable.",
+					"If you continue having issues please email hello@infracost.io",
+				)
+			}
+
+			if e, ok := err.(*apiclient.APIError); ok {
+				return projects, fmt.Errorf("%v\n%s", e.Error(), "We have been notified of this issue.")
+			}
+
+			return projects, err
+		}
+
+		schema.CalculateCosts(project)
+		project.CalculateDiff()
+	}
+
+	spinner.Success()
+
+	if !runCtx.Config.IsLogging() {
+		cmd.PrintErrln()
+	}
+
+	return projects, nil
+}
+
+func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx *config.ProjectContext, projectCfg *config.Project, provider schema.Provider) error {
+	if projectCfg.UsageFile == "" {
+		// This should not happen as we check earlier in the code that usage-file is not empty when sync-usage-file flag is on.
+		return fmt.Errorf("Error generating usage: no usage file given")
+	}
+
+	var usageFile *usage.UsageFile
+
+	usageFilePath := projectCfg.UsageFile
+	err := usage.CreateUsageFile(usageFilePath)
+	if err != nil {
+		return errors.Wrap(err, "Error creating  usage file")
+	}
+
+	usageFile, err = usage.LoadUsageFile(usageFilePath)
+	if err != nil {
+		return errors.Wrap(err, "Error loading usage file")
+	}
+
+	usageData := usageFile.ToUsageDataMap()
+	providerProjects, err := provider.LoadResources(usageData)
+	if err != nil {
+		return errors.Wrap(err, "Error loading resources")
+	}
+
+	spinnerOpts := ui.SpinnerOptions{
+		EnableLogging: runCtx.Config.IsLogging(),
+		NoColor:       runCtx.Config.NoColor,
+		Indent:        "  ",
+	}
+
+	spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
+	syncResult, err := usage.SyncUsageData(usageFile, providerProjects)
+	if err != nil {
+		spinner.Fail()
+		return errors.Wrap(err, "Error synchronizing usage data")
+	}
+
+	projectCtx.SetFrom(syncResult)
+	if err != nil {
+		spinner.Fail()
+		return errors.Wrap(err, "Error summarizing usage")
+	}
+
+	err = usageFile.WriteToPath(projectCfg.UsageFile)
+	if err != nil {
+		spinner.Fail()
+		return errors.Wrap(err, "Error writing usage file")
+	}
+
+	if syncResult == nil {
+		spinner.Fail()
+	} else {
+		resources := syncResult.ResourceCount
+		attempts := syncResult.EstimationCount
+		errors := len(syncResult.EstimationErrors)
+		successes := attempts - errors
+
+		pluralized := ""
+		if resources > 1 {
+			pluralized = "s"
+		}
+
+		spinner.Success()
+		cmd.PrintErrln(fmt.Sprintf("    %s Synced %d of %d resource%s",
+			ui.FaintString("└─"),
+			successes,
+			resources,
+			pluralized))
+	}
+	return nil
+}
+
+func getParallelism(cmd *cobra.Command) (int, error) {
+	var parallelism int
+
+	if cmd.Flags().Changed("parallelism") {
+		parallelism, _ = cmd.Flags().GetInt("parallelism")
+
+		if parallelism < 0 {
+			return parallelism, fmt.Errorf("parallelism must be a positive value")
+		}
+
+		if parallelism > 16 {
+			return parallelism, fmt.Errorf("parallelism must be less than 16")
+		}
+	} else {
+		parallelism = 4
+		numCPU := runtime.NumCPU()
+		if numCPU*4 > parallelism {
+			parallelism = numCPU * 4
+		}
+	}
+
+	if parallelism < 1 {
+		parallelism = 1
+	}
+
+	if parallelism > 16 {
+		parallelism = 16
+	}
+
+	return parallelism, nil
 }
 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
