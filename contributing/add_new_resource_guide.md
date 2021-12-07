@@ -22,6 +22,10 @@ The steps below describe adding an AWS resource using Terraform IaC provider, bu
   - [Cost component structure](#cost-component-structure)
   - [Price search](#price-search)
   - [Resource attributes mapping](#resource-attributes-mapping)
+  - [Add usage-based cost components](#add-usage-based-cost-components)
+- [Add free resources](#add-free-resources)
+- [Update Infracost docs](#update-infracost-docs)
+- [Prepare a Pull Request for review](#prepare-a-pull-request-for-review)
 
 ## Prerequisites
 
@@ -998,7 +1002,7 @@ We are at the finish line! We'll run `make fmt` and `make lint` commands to veri
 
 Congratulations! We've added all the required cost components! Let's wrap things up and prepare a pull request!
 
-### Add free resources
+## Add free resources
 
 If a GitHub issue mentions free resources related to the one with price (or you notice them yourself), we need to add them to a free resources list. This way, if CLI detects them, it won't mark them as "not supported," which reduces output noise.
 
