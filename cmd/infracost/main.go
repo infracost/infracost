@@ -67,7 +67,7 @@ func NewRootCommand(ctx *config.RunContext) *cobra.Command {
 		Example: `  Generate a cost diff from Terraform directory with any required Terraform flags:
 
       infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
-	
+
   Generate a full cost breakdown from Terraform directory with any required Terraform flags:
 
       infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"`,
