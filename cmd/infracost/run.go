@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
@@ -120,7 +122,6 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg
 }
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
-	projects := make([]*schema.Project, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
 
 	numWorkers := 4
@@ -134,177 +135,44 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	numJobs := len(runCtx.Config.Projects)
 
 	jobs := make(chan *config.Project, numJobs)
-	resultErrors := make(chan error, numJobs)
+
+	projectResultChan := make(chan []*schema.Project, numJobs)
+	errGroup, _ := errgroup.WithContext(context.Background())
 
 	for i := 0; i < numWorkers; i++ {
-		go func(jobs <-chan *config.Project, resultErrors chan<- error) {
+		errGroup.Go(func() error {
+
 			for projectCfg := range jobs {
-				ctx := config.NewProjectContext(runCtx, projectCfg)
-				runCtx.SetCurrentProjectContext(ctx)
-
-				for k, v := range projectCfg.Env {
-					os.Setenv(k, v)
-				}
-
-				provider, err := providers.Detect(ctx)
+				configProjects, err := runProjectConfig(cmd, runCtx, projectCfg)
 				if err != nil {
-					m := fmt.Sprintf("%s\n\n", err)
-					m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-					m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
-
-					if cmd.Name() != "diff" {
-						m += "\n - Terraform state JSON file"
-					}
-
-					resultErrors <- clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
-					continue
-				}
-				ctx.SetContextValue("projectType", provider.Type())
-				projectContexts = append(projectContexts, ctx)
-
-				if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
-					m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
-					m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-					m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
-					resultErrors <- clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
-					continue
+					return err
 				}
 
-				m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
-				if runCtx.Config.IsLogging() {
-					log.Info(m)
-				} else {
-					fmt.Fprintln(os.Stderr, m)
-				}
-
-				// Generate usage file
-				if runCtx.Config.SyncUsageFile {
-					err := generateUsageFile(cmd, runCtx, projectCfg, provider)
-					if err != nil {
-						resultErrors <- errors.Wrap(err, "Error generating usage file")
-						continue
-					}
-				}
-
-				// Load usage data
-				usageData := make(map[string]*schema.UsageData)
-				var usageFile *usage.UsageFile
-
-				if projectCfg.UsageFile != "" {
-					var err error
-					usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile)
-					if err != nil {
-						resultErrors <- err
-					}
-
-					invalidKeys, err := usageFile.InvalidKeys()
-					if err != nil {
-						log.Errorf("Error checking usage file keys: %v", err)
-					} else if len(invalidKeys) > 0 {
-						ui.PrintWarningf(cmd.ErrOrStderr(),
-							"The following usage file parameters are invalid and will be ignored: %s\n",
-							strings.Join(invalidKeys, ", "),
-						)
-					}
-				} else {
-					usageFile = usage.NewBlankUsageFile()
-				}
-
-				if len(usageData) > 0 {
-					ctx.SetContextValue("hasUsageFile", true)
-				}
-
-				// Merge wildcard usages into individual usage
-				wildCardUsage := make(map[string]*usage.ResourceUsage)
-				for _, us := range usageFile.ResourceUsages {
-					if strings.HasSuffix(us.Name, "[*]") {
-						lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
-						prefixName := us.Name[:lastIndexOfOpenBracket]
-						wildCardUsage[prefixName] = us
-					}
-				}
-
-				for _, us := range usageFile.ResourceUsages {
-					if strings.HasSuffix(us.Name, "[*]") {
-						continue
-					}
-
-					if !strings.HasSuffix(us.Name, "]") {
-						continue
-					}
-					lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
-					prefixName := us.Name[:lastIndexOfOpenBracket]
-
-					us.MergeResourceUsage(wildCardUsage[prefixName])
-				}
-
-				usageData = usageFile.ToUsageDataMap()
-
-				providerProjects, err := provider.LoadResources(usageData)
-				if err != nil {
-					resultErrors <- err
-					continue
-				}
-
-				projects = append(projects, providerProjects...)
-
-				resultErrors <- nil
+				projectResultChan <- configProjects
 			}
-		}(jobs, resultErrors)
+
+			return nil
+		})
 	}
 
 	// Feed the workers the jobs of getting prices
 	for _, p := range runCtx.Config.Projects {
 		jobs <- p
 	}
+	close(jobs)
 
-	// Get the result of the jobs
-	for i := 0; i < numJobs; i++ {
-		err := <-resultErrors
-		if err != nil {
-			return err
-		}
+	err := errGroup.Wait()
+	if err != nil {
+		return err
 	}
 
-	if !runCtx.Config.IsLogging() {
-		fmt.Fprintln(os.Stderr, "")
+	close(projectResultChan)
+	projects := make([]*schema.Project, 0)
+	for projectResults := range projectResultChan {
+		projects = append(projects, projectResults...)
 	}
 
-	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: runCtx.Config.IsLogging(),
-		NoColor:       runCtx.Config.NoColor,
-	}
-	spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
-
-	for _, project := range projects {
-		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
-			spinner.Fail()
-			fmt.Fprintln(os.Stderr, "")
-
-			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
-				return fmt.Errorf("%v\n%s %s %s %s %s\n%s",
-					e.Error(),
-					"Please check your",
-					ui.PrimaryString(config.CredentialsFilePath()),
-					"file or",
-					ui.PrimaryString("INFRACOST_API_KEY"),
-					"environment variable.",
-					"If you continue having issues please email hello@infracost.io",
-				)
-			}
-
-			if e, ok := err.(*apiclient.APIError); ok {
-				return fmt.Errorf("%v\n%s", e.Error(), "We have been notified of this issue.")
-			}
-
-			return err
-		}
-
-		schema.CalculateCosts(project)
-		project.CalculateDiff()
-	}
-
-	spinner.Success()
+	// spinner.Success()
 
 	r, err := output.ToOutputFormat(projects)
 	if err != nil {
@@ -313,11 +181,12 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	r.Currency = runCtx.Config.Currency
 
-	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
-	r.RunID, err = dashboardClient.AddRun(runCtx, projectContexts, r)
-	if err != nil {
-		log.Errorf("Error reporting run: %s", err)
-	}
+	// TODO
+	// dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
+	// r.RunID, err = dashboardClient.AddRun(runCtx, projectContexts, r)
+	// if err != nil {
+	// 	log.Errorf("Error reporting run: %s", err)
+	// }
 
 	opts := output.Options{
 		DashboardEnabled: runCtx.Config.EnableDashboard,
@@ -350,6 +219,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	env := buildRunEnv(runCtx, projectContexts, r)
 
+	// TODO
 	pricingClient := apiclient.NewPricingAPIClient(runCtx.Config)
 	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
@@ -371,6 +241,140 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	return nil
+}
+
+func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, projectCfg *config.Project) ([]*schema.Project, error) {
+	ctx := config.NewProjectContext(runCtx, projectCfg)
+	// runCtx.SetCurrentProjectContext(ctx) TODO
+
+	for k, v := range projectCfg.Env {
+		os.Setenv(k, v)
+	}
+
+	provider, err := providers.Detect(ctx)
+	if err != nil {
+		m := fmt.Sprintf("%s\n\n", err)
+		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
+		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
+
+		if cmd.Name() != "diff" {
+			m += "\n - Terraform state JSON file"
+		}
+
+		return []*schema.Project{}, clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
+	}
+	ctx.SetContextValue("projectType", provider.Type())
+
+	if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
+		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
+		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
+		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
+		return []*schema.Project{}, clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
+	}
+
+	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
+	if runCtx.Config.IsLogging() {
+		log.Info(m)
+	} else {
+		fmt.Fprintln(os.Stderr, m)
+	}
+
+	// Generate usage file
+	if runCtx.Config.SyncUsageFile {
+		err := generateUsageFile(cmd, runCtx, projectCfg, provider)
+		if err != nil {
+			return []*schema.Project{}, errors.Wrap(err, "Error generating usage file")
+		}
+	}
+
+	// Load usage data
+	usageData := make(map[string]*schema.UsageData)
+	var usageFile *usage.UsageFile
+
+	if projectCfg.UsageFile != "" {
+		var err error
+		usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile)
+		if err != nil {
+			return []*schema.Project{}, err
+		}
+
+		invalidKeys, err := usageFile.InvalidKeys()
+		if err != nil {
+			log.Errorf("Error checking usage file keys: %v", err)
+		} else if len(invalidKeys) > 0 {
+			ui.PrintWarningf(cmd.ErrOrStderr(),
+				"The following usage file parameters are invalid and will be ignored: %s\n",
+				strings.Join(invalidKeys, ", "),
+			)
+		}
+	} else {
+		usageFile = usage.NewBlankUsageFile()
+	}
+
+	if len(usageData) > 0 {
+		ctx.SetContextValue("hasUsageFile", true)
+	}
+
+	// Merge wildcard usages into individual usage
+	wildCardUsage := make(map[string]*usage.ResourceUsage)
+	for _, us := range usageFile.ResourceUsages {
+		if strings.HasSuffix(us.Name, "[*]") {
+			lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
+			prefixName := us.Name[:lastIndexOfOpenBracket]
+			wildCardUsage[prefixName] = us
+		}
+	}
+
+	for _, us := range usageFile.ResourceUsages {
+		if strings.HasSuffix(us.Name, "[*]") {
+			continue
+		}
+
+		if !strings.HasSuffix(us.Name, "]") {
+			continue
+		}
+		lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
+		prefixName := us.Name[:lastIndexOfOpenBracket]
+
+		us.MergeResourceUsage(wildCardUsage[prefixName])
+	}
+
+	usageData = usageFile.ToUsageDataMap()
+
+	projects, err := provider.LoadResources(usageData)
+	if err != nil {
+		return projects, err
+	}
+
+	for _, project := range projects {
+		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
+			spinner.Fail()
+			fmt.Fprintln(os.Stderr, "")
+
+			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
+				return projects, fmt.Errorf("%v\n%s %s %s %s %s\n%s",
+					e.Error(),
+					"Please check your",
+					ui.PrimaryString(config.CredentialsFilePath()),
+					"file or",
+					ui.PrimaryString("INFRACOST_API_KEY"),
+					"environment variable.",
+					"If you continue having issues please email hello@infracost.io",
+				)
+			}
+
+			if e, ok := err.(*apiclient.APIError); ok {
+				return projects, fmt.Errorf("%v\n%s", e.Error(), "We have been notified of this issue.")
+			}
+
+			return projects, err
+		}
+
+		schema.CalculateCosts(project)
+		project.CalculateDiff()
+	}
+
+	return projects, nil
 }
 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
