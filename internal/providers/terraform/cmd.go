@@ -21,6 +21,7 @@ type CmdOptions struct {
 	TerraformWorkspace  string
 	TerraformConfigFile string
 	Env                 map[string]string
+	Flags               []string
 }
 
 type CmdError struct {
@@ -38,7 +39,7 @@ func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 		exe = defaultTerraformBinary
 	}
 
-	cmd := exec.Command(exe, args...)
+	cmd := exec.Command(exe, append(args, opts.Flags...)...)
 	log.Infof("Running command: %s", cmd.String())
 	cmd.Dir = opts.Dir
 	cmd.Env = os.Environ()

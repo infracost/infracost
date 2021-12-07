@@ -32,6 +32,8 @@ type Project struct {
 	// TerraformCloudToken sets the Team API Token or User API Token so infracost can use it to access the plan.
 	// Only applicable for terraform cloud/enterprise users.
 	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_TOKEN"`
+	// TerragruntFlags set additional flags that should be passed to terragrunt.
+	TerragruntFlags string `envconfig:"INFRACOST_TERRAGRUNT_FLAGS"`
 	// UsageFile is the full path to usage file that specifies values for usage-based resources
 	UsageFile string `yaml:"usage_file,omitempty" ignored:"true"`
 	// TerraformUseState sets if the users wants to use the terraform state for infracost ops.

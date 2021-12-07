@@ -3,6 +3,7 @@ package terraform
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/kballard/go-shellquote"
 	"os"
 	"path/filepath"
 	"sort"
@@ -18,8 +19,9 @@ var defaultTerragruntBinary = "terragrunt"
 var minTerragruntVer = "v0.28.1"
 
 type TerragruntProvider struct {
-	ctx  *config.ProjectContext
-	Path string
+	ctx             *config.ProjectContext
+	Path            string
+	TerragruntFlags string
 	*DirProvider
 }
 
@@ -45,9 +47,10 @@ func NewTerragruntProvider(ctx *config.ProjectContext) schema.Provider {
 	dirProvider.IsTerragrunt = true
 
 	return &TerragruntProvider{
-		ctx:         ctx,
-		DirProvider: dirProvider,
-		Path:        ctx.ProjectConfig.Path,
+		ctx:             ctx,
+		DirProvider:     dirProvider,
+		Path:            ctx.ProjectConfig.Path,
+		TerragruntFlags: ctx.ProjectConfig.TerragruntFlags,
 	}
 }
 
@@ -115,9 +118,15 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 	spinner := ui.NewSpinner("Running terragrunt run-all terragrunt-info", p.spinnerOpts)
 
+	terragruntFlags, err := shellquote.Split(p.TerragruntFlags)
+	if err != nil {
+		return []terragruntProjectDirs{}, errors.Wrap(err, "Error parsing terragrunt flags")
+	}
+
 	opts := &CmdOptions{
 		TerraformBinary: p.TerraformBinary,
 		Dir:             p.Path,
+		Flags:           terragruntFlags,
 	}
 	out, err := Cmd(opts, "run-all", "--terragrunt-ignore-external-dependencies", "terragrunt-info")
 	if err != nil {
@@ -127,9 +136,12 @@ func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 		return []terragruntProjectDirs{}, err
 	}
 
-	jsons := bytes.SplitAfter(out, []byte{'}', '\n'})
-	if len(jsons) > 1 {
-		jsons = jsons[:len(jsons)-1]
+	var jsons [][]byte
+	if len(out) > 0 {
+		jsons = bytes.SplitAfter(out, []byte{'}', '\n'})
+		if len(jsons) > 1 {
+			jsons = jsons[:len(jsons)-1]
+		}
 	}
 
 	dirs := make([]terragruntProjectDirs, 0, len(jsons))
@@ -177,6 +189,13 @@ func (p *TerragruntProvider) generateStateJSONs(projectDirs []terragruntProjectD
 		if err != nil {
 			return [][]byte{}, err
 		}
+
+		terragruntFlags, err := shellquote.Split(p.TerragruntFlags)
+		if err != nil {
+			return [][]byte{}, errors.Wrap(err, "Error parsing terragrunt flags")
+		}
+		opts.Flags = terragruntFlags
+
 		if opts.TerraformConfigFile != "" {
 			defer os.Remove(opts.TerraformConfigFile)
 		}
@@ -191,7 +210,7 @@ func (p *TerragruntProvider) generateStateJSONs(projectDirs []terragruntProjectD
 	return outs, nil
 }
 
-func (p *DirProvider) generatePlanJSONs(projectDirs []terragruntProjectDirs) ([][]byte, error) {
+func (p *TerragruntProvider) generatePlanJSONs(projectDirs []terragruntProjectDirs) ([][]byte, error) {
 	err := p.checks()
 	if err != nil {
 		return [][]byte{}, err
@@ -201,6 +220,13 @@ func (p *DirProvider) generatePlanJSONs(projectDirs []terragruntProjectDirs) ([]
 	if err != nil {
 		return [][]byte{}, err
 	}
+
+	terragruntFlags, err := shellquote.Split(p.TerragruntFlags)
+	if err != nil {
+		return [][]byte{}, errors.Wrap(err, "Error parsing terragrunt flags")
+	}
+	opts.Flags = terragruntFlags
+
 	if opts.TerraformConfigFile != "" {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
