@@ -34,7 +34,7 @@ func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
 	}
 
 	if s.opts.EnableLogging {
-		log.Infof("starting: %s", msg)
+		log.Infof("Starting: %s", msg)
 	} else {
 		s.spinner.Prefix = opts.Indent
 		s.spinner.Suffix = fmt.Sprintf(" %s", msg)
@@ -57,7 +57,7 @@ func (s *Spinner) Fail() {
 	}
 	s.Stop()
 	if s.opts.EnableLogging {
-		log.Errorf("failed: %s", s.msg)
+		log.Errorf("Failed: %s", s.msg)
 	} else {
 		fmt.Fprintf(os.Stderr, "%s%s %s\n",
 			s.opts.Indent,
@@ -78,7 +78,7 @@ func (s *Spinner) Success() {
 	}
 	s.Stop()
 	if s.opts.EnableLogging {
-		log.Infof("completed: %s", s.msg)
+		log.Infof("Completed: %s", s.msg)
 	} else {
 		fmt.Fprintf(os.Stderr, "%s%s %s\n",
 			s.opts.Indent,

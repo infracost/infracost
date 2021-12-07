@@ -40,7 +40,7 @@ func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	}
 
 	cmd := exec.Command(exe, append(args, opts.Flags...)...)
-	log.Infof("Running command: %s", cmd.String())
+	log.Debugf("Running command: %s", cmd.String())
 	cmd.Dir = opts.Dir
 	cmd.Env = os.Environ()
 

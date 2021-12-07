@@ -11,6 +11,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type ProjectContexter interface {
+	ProjectContext() map[string]interface{}
+}
+
 type ProjectContext struct {
 	RunContext    *RunContext
 	ProjectConfig *Project
@@ -42,6 +46,13 @@ func (c *ProjectContext) SetContextValue(key string, value interface{}) {
 
 func (c *ProjectContext) ContextValues() map[string]interface{} {
 	return c.contextVals
+}
+
+func (c *ProjectContext) SetFrom(d ProjectContexter) {
+	m := d.ProjectContext()
+	for k, v := range m {
+		c.SetContextValue(k, v)
+	}
 }
 
 func DetectProjectMetadata(path string) *schema.ProjectMetadata {

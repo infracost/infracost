@@ -13,12 +13,11 @@ import (
 )
 
 type RunContext struct {
-	ctx               context.Context
-	Config            *Config
-	State             *State
-	contextVals       map[string]interface{}
-	currentProjectCtx *ProjectContext
-	StartTime         int64
+	ctx         context.Context
+	Config      *Config
+	State       *State
+	contextVals map[string]interface{}
+	StartTime   int64
 }
 
 func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
@@ -60,19 +59,8 @@ func (c *RunContext) ContextValues() map[string]interface{} {
 	return c.contextVals
 }
 
-func (c *RunContext) ContextValuesWithCurrentProject() map[string]interface{} {
-	m := c.contextVals
-	if c.currentProjectCtx != nil {
-		for k, v := range c.currentProjectCtx.contextVals {
-			m[k] = v
-		}
-	}
-
-	return m
-}
-
 func (c *RunContext) EventEnv() map[string]interface{} {
-	return c.EventEnvWithProjectContexts([]*ProjectContext{c.currentProjectCtx})
+	return c.EventEnvWithProjectContexts([]*ProjectContext{})
 }
 
 func (c *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectContext) map[string]interface{} {
@@ -95,15 +83,6 @@ func (c *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectConte
 	return env
 }
 
-func (c *RunContext) SetCurrentProjectContext(ctx *ProjectContext) {
-	c.currentProjectCtx = ctx
-}
-
-// setProjectContextValue Set context value into currentProjectContext
-func (c *RunContext) setProjectContextValue(key string, value interface{}) {
-	c.currentProjectCtx.SetContextValue(key, value)
-}
-
 func (c *RunContext) loadInitialContextValues() {
 	c.SetContextValue("version", baseVersion(version.Version))
 	c.SetContextValue("fullVersion", version.Version)
@@ -118,17 +97,6 @@ func (c *RunContext) loadInitialContextValues() {
 
 func (c *RunContext) IsCIRun() bool {
 	return c.ContextValues()["ciPlatform"] != ""
-}
-
-type ProjectContexter interface {
-	ProjectContext() map[string]interface{}
-}
-
-func (c *RunContext) SetProjectContextFrom(d ProjectContexter) {
-	m := d.ProjectContext()
-	for k, v := range m {
-		c.setProjectContextValue(k, v)
-	}
 }
 
 func baseVersion(v string) string {
