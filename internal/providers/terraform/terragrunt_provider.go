@@ -137,7 +137,11 @@ func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 	}
 
 	var jsons [][]byte
-	if len(out) > 0 {
+
+	jsonStart := bytes.IndexByte(out, '{') // ignore anything that comes before the json (e.g. unexpected logging to stdout by tgenv)
+	if jsonStart >= 0 {
+		out = out[jsonStart:]
+
 		jsons = bytes.SplitAfter(out, []byte{'}', '\n'})
 		if len(jsons) > 1 {
 			jsons = jsons[:len(jsons)-1]
@@ -204,6 +208,13 @@ func (p *TerragruntProvider) generateStateJSONs(projectDirs []terragruntProjectD
 		if err != nil {
 			return outs, err
 		}
+
+		// ignore anything that comes before the json (e.g. unexpected logging to stdout by tgenv)
+		jsonStart := bytes.IndexByte(out, '{')
+		if jsonStart >= 0 {
+			out = out[jsonStart:]
+		}
+
 		outs = append(outs, out)
 	}
 
@@ -268,6 +279,13 @@ func (p *TerragruntProvider) generatePlanJSONs(projectDirs []terragruntProjectDi
 		if err != nil {
 			return outs, err
 		}
+
+		// ignore anything that comes before the json (e.g. unexpected logging to stdout by tgenv)
+		jsonStart := bytes.IndexByte(out, '{')
+		if jsonStart >= 0 {
+			out = out[jsonStart:]
+		}
+
 		outs = append(outs, out)
 	}
 
