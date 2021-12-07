@@ -21,7 +21,7 @@ func newTransferServer(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 			protocols = append(protocols, data.String())
 		}
 	} else {
-		defaultProtocol := "FTPS"
+		defaultProtocol := "SFTP"
 		protocols = append(protocols, defaultProtocol)
 	}
 
