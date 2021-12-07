@@ -35,100 +35,87 @@ var TransferServerUsageSchema = []*schema.UsageItem{
 
 // PopulateUsage parses the u schema.UsageData into the TransferServer.
 // It uses the `infracost_usage` struct tags to populate data into the TransferServer.
-func (t *TransferServer) PopulateUsage(u *schema.UsageData) {
-	resources.PopulateArgsWithUsage(t, u)
+func (r *TransferServer) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(r, u)
 }
 
 // BuildResource builds a schema.Resource from a valid TransferServer struct.
 // This method is called after the resource is initialised by an IaC provider.
-func (t *TransferServer) BuildResource() *schema.Resource {
+func (r *TransferServer) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
-	for _, protocol := range t.Protocols {
-		costComponents = append(costComponents,
-			t.newProtocolCostComponent(
-				protocol,
-				"[A-Z0-9]*-ProtocolHours",
-			),
-		)
+	for _, protocol := range r.Protocols {
+		costComponents = append(costComponents, r.protocolEnabledCostComponent(protocol))
 	}
 
-	costComponents = append(costComponents,
-		t.newDataTransferCostComponent(
-			"Data downloaded",
-			t.MonthlyDataDownloadedGB,
-			"[A-Z0-9]*-DownloadBytes",
-		),
-		t.newDataTransferCostComponent(
-			"Data uploaded",
-			t.MonthlyDataUploadedGB,
-			"[A-Z0-9]*-UploadBytes",
-		),
-	)
+	costComponents = append(costComponents, r.dataDownloadedCostComponent())
+	costComponents = append(costComponents, r.dataUploadedCostComponent())
 
 	return &schema.Resource{
-		Name:           t.Address,
+		Name:           r.Address,
 		UsageSchema:    TransferServerUsageSchema,
 		CostComponents: costComponents,
 	}
 }
 
-func (t *TransferServer) newProtocolCostComponent(protocol string, usageType string) *schema.CostComponent {
+func (r *TransferServer) protocolEnabledCostComponent(protocol string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("%s protocol enabled", protocol),
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("aws"),
-			Region:           strPtr(t.Region),
-			Service:          strPtr(t.serviceName()),
-			ProductFamily:    strPtr(t.productFamilyName()),
-			AttributeFilters: t.getAttributeFilters(protocol, usageType),
-		},
+		ProductFilter:  r.buildProductFilter(protocol, "^[A-Z0-9]*-ProtocolHours$"),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
 	}
 }
 
-func (t *TransferServer) newDataTransferCostComponent(name string, quantity *float64, usageType string) *schema.CostComponent {
+func (r *TransferServer) dataDownloadedCostComponent() *schema.CostComponent {
 	// The pricing is identical for all protocols and the traffic is combined
 	transferProtocol := "FTP"
 
 	return &schema.CostComponent{
-		Name:            name,
+		Name:            "Data downloaded",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: floatPtrToDecimalPtr(quantity),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("aws"),
-			Region:           strPtr(t.Region),
-			Service:          strPtr(t.serviceName()),
-			ProductFamily:    strPtr(t.productFamilyName()),
-			AttributeFilters: t.getAttributeFilters(transferProtocol, usageType),
-		},
+		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyDataDownloadedGB),
+		ProductFilter:   r.buildProductFilter(transferProtocol, "^[A-Z0-9]*-DownloadBytes$"),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
 	}
 }
 
-func (t *TransferServer) serviceName() string {
-	return "AWSTransfer"
+func (r *TransferServer) dataUploadedCostComponent() *schema.CostComponent {
+	// The pricing is identical for all protocols and the traffic is combined
+	transferProtocol := "FTP"
+
+	return &schema.CostComponent{
+		Name:            "Data uploaded",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyDataUploadedGB),
+		ProductFilter:   r.buildProductFilter(transferProtocol, "^[A-Z0-9]*-UploadBytes$"),
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
 }
 
-func (t *TransferServer) productFamilyName() string {
-	return "AWS Transfer Family"
-}
-
-func (t *TransferServer) getAttributeFilters(protocol string, usageType string) []*schema.AttributeFilter {
+func (r *TransferServer) buildProductFilter(protocol, usageType string) *schema.ProductFilter {
 	// The pricing for all storage types is identical, but for some protocols
 	// EFS prices are missing in the pricing API.
 	storageType := "S3"
 
-	return []*schema.AttributeFilter{
-		{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", usageType))},
-		{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/^%s:%s$/i", protocol, storageType))},
+	return &schema.ProductFilter{
+		VendorName:    strPtr("aws"),
+		Region:        strPtr(r.Region),
+		Service:       strPtr("AWSTransfer"),
+		ProductFamily: strPtr("AWS Transfer Family"),
+		AttributeFilters: []*schema.AttributeFilter{
+			{Key: "usagetype", ValueRegex: regexPtr(usageType)},
+			{Key: "operation", ValueRegex: regexPtr(fmt.Sprintf("^%s:%s$", protocol, storageType))},
+		},
 	}
 }
