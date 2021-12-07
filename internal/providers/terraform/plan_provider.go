@@ -104,8 +104,8 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
-	j, err := p.runShow(opts, spinner, planPath)
+	p.spinner.SetMessage("running terraform show")
+	j, err := p.runShow(opts, planPath)
 	if err == nil {
 		p.cachedPlanJSON = j
 	}

@@ -9,7 +9,6 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -113,7 +112,7 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 }
 
 func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
-	spinner := ui.NewSpinner("Running terragrunt run-all terragrunt-info", p.spinnerOpts)
+	p.spinner.SetMessage("running terragrunt run-all terragrunt-info")
 
 	opts := &CmdOptions{
 		TerraformBinary: p.TerraformBinary,
@@ -121,10 +120,7 @@ func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 	}
 	out, err := Cmd(opts, "run-all", "--terragrunt-ignore-external-dependencies", "terragrunt-info")
 	if err != nil {
-		spinner.Fail()
-		p.printTerraformErr(err)
-
-		return []terragruntProjectDirs{}, err
+		return []terragruntProjectDirs{}, errors.New(p.buildTerraformErr(err))
 	}
 
 	jsons := bytes.SplitAfter(out, []byte{'}', '\n'})
@@ -138,7 +134,6 @@ func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 		var info TerragruntInfo
 		err = json.Unmarshal(j, &info)
 		if err != nil {
-			spinner.Fail()
 			return dirs, err
 		}
 
@@ -152,8 +147,6 @@ func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 	sort.Slice(dirs, func(i, j int) bool {
 		return dirs[i].ConfigDir < dirs[j].ConfigDir
 	})
-
-	spinner.Success()
 
 	return dirs, nil
 }
@@ -170,7 +163,7 @@ func (p *TerragruntProvider) generateStateJSONs(projectDirs []terragruntProjectD
 	if len(projectDirs) > 1 {
 		spinnerMsg += " for each project"
 	}
-	spinner := ui.NewSpinner(spinnerMsg, p.spinnerOpts)
+	p.spinner.SetMessage(spinnerMsg)
 
 	for _, projectDir := range projectDirs {
 		opts, err := p.buildCommandOpts(projectDir.ConfigDir)
@@ -181,7 +174,7 @@ func (p *TerragruntProvider) generateStateJSONs(projectDirs []terragruntProjectD
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, spinner, "")
+		out, err := p.runShow(opts, "")
 		if err != nil {
 			return outs, err
 		}
@@ -205,8 +198,8 @@ func (p *DirProvider) generatePlanJSONs(projectDirs []terragruntProjectDirs) ([]
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	spinner := ui.NewSpinner("Running terragrunt run-all plan", p.spinnerOpts)
-	planFile, planJSON, err := p.runPlan(opts, spinner, true)
+	p.spinner.SetMessage("running terragrunt run-all plan")
+	planFile, planJSON, err := p.runPlan(opts, true)
 	defer func() {
 		err := cleanupPlanFiles(projectDirs, planFile)
 		if err != nil {
@@ -227,7 +220,7 @@ func (p *DirProvider) generatePlanJSONs(projectDirs []terragruntProjectDirs) ([]
 	if len(projectDirs) > 1 {
 		spinnerMsg += " for each project"
 	}
-	spinner = ui.NewSpinner(spinnerMsg, p.spinnerOpts)
+	p.spinner.SetMessage(spinnerMsg)
 
 	for _, projectDir := range projectDirs {
 		opts, err := p.buildCommandOpts(projectDir.ConfigDir)
@@ -238,7 +231,7 @@ func (p *DirProvider) generatePlanJSONs(projectDirs []terragruntProjectDirs) ([]
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, spinner, filepath.Join(projectDir.WorkingDir, planFile))
+		out, err := p.runShow(opts, filepath.Join(projectDir.WorkingDir, planFile))
 		if err != nil {
 			return outs, err
 		}

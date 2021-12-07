@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
+	glint "github.com/mitchellh/go-glint"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/infracost/infracost/internal/apiclient"
@@ -48,7 +49,7 @@ func addRunFlags(cmd *cobra.Command) {
 	_ = cmd.MarkFlagFilename("usage-file", "yml")
 }
 
-func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg *config.Project, provider schema.Provider) error {
+func generateUsageFile(cmd *cobra.Command, spinner *ui.SpinnerComponent, runCtx *config.RunContext, projectCfg *config.Project, provider schema.Provider) error {
 	if projectCfg.UsageFile == "" {
 		// This should not happen as we check earlier in the code that usage-file is not empty when sync-usage-file flag is on.
 		return fmt.Errorf("Error generating usage: no usage file given")
@@ -73,34 +74,23 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg
 		return errors.Wrap(err, "Error loading resources")
 	}
 
-	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: runCtx.Config.IsLogging(),
-		NoColor:       runCtx.Config.NoColor,
-		Indent:        "  ",
-	}
-
-	spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
+	spinner.SetMessage("syncing usage data from cloud")
 	syncResult, err := usage.SyncUsageData(usageFile, providerProjects)
 	if err != nil {
-		spinner.Fail()
 		return errors.Wrap(err, "Error synchronizing usage data")
 	}
 
 	runCtx.SetProjectContextFrom(syncResult)
 	if err != nil {
-		spinner.Fail()
 		return errors.Wrap(err, "Error summarizing usage")
 	}
 
 	err = usageFile.WriteToPath(projectCfg.UsageFile)
 	if err != nil {
-		spinner.Fail()
 		return errors.Wrap(err, "Error writing usage file")
 	}
 
-	if syncResult == nil {
-		spinner.Fail()
-	} else {
+	if syncResult != nil {
 		resources := syncResult.ResourceCount
 		attempts := syncResult.EstimationCount
 		errors := len(syncResult.EstimationErrors)
@@ -111,7 +101,7 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCfg
 			pluralized = "s"
 		}
 
-		spinner.Success()
+		// TODO
 		cmd.PrintErrln(fmt.Sprintf("    %s Synced %d of %d resource%s",
 			ui.FaintString("└─"),
 			successes,
@@ -139,15 +129,39 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projectResultChan := make(chan []*schema.Project, numJobs)
 	errGroup, _ := errgroup.WithContext(context.Background())
 
+	d := glint.New()
+	
 	for i := 0; i < numWorkers; i++ {
 		errGroup.Go(func() error {
 
 			for projectCfg := range jobs {
-				configProjects, err := runProjectConfig(cmd, runCtx, projectCfg)
+				spinner := ui.Spinner()
+				
+				f := glint.Fragment(
+					glint.Layout(
+						spinner,
+					).MarginLeft(1).Row(),
+					glint.Layout(
+						glint.Text(""),
+					),
+				)
+				
+				d.Append(
+					glint.TextFunc(func(rows, cols uint) string {
+						return fmt.Sprintf("Path: %s", projectCfg.Path)
+					}),
+					f,
+				)
+				
+				configProjects, err := runProjectConfig(cmd, spinner, runCtx, projectCfg)
 				if err != nil {
+					spinner.Fail()
 					return err
 				}
 
+				spinner.Success()
+				spinner.SetMessage("done")
+				
 				projectResultChan <- configProjects
 			}
 
@@ -160,8 +174,14 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		jobs <- p
 	}
 	close(jobs)
+	
+	go func() {
+		d.Render(context.Background())
+	}()
 
 	err := errGroup.Wait()
+	d.Close()
+
 	if err != nil {
 		return err
 	}
@@ -171,8 +191,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	for projectResults := range projectResultChan {
 		projects = append(projects, projectResults...)
 	}
-
-	// spinner.Success()
 
 	r, err := output.ToOutputFormat(projects)
 	if err != nil {
@@ -243,8 +261,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	return nil
 }
 
-func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, projectCfg *config.Project) ([]*schema.Project, error) {
+func runProjectConfig(cmd *cobra.Command, spinner *ui.SpinnerComponent, runCtx *config.RunContext, projectCfg *config.Project) ([]*schema.Project, error) {
 	ctx := config.NewProjectContext(runCtx, projectCfg)
+	ctx.Spinner = spinner
+
 	// runCtx.SetCurrentProjectContext(ctx) TODO
 
 	for k, v := range projectCfg.Env {
@@ -276,12 +296,12 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, projectCfg 
 	if runCtx.Config.IsLogging() {
 		log.Info(m)
 	} else {
-		fmt.Fprintln(os.Stderr, m)
+		// TODO
 	}
 
 	// Generate usage file
 	if runCtx.Config.SyncUsageFile {
-		err := generateUsageFile(cmd, runCtx, projectCfg, provider)
+		err := generateUsageFile(cmd, spinner, runCtx, projectCfg, provider)
 		if err != nil {
 			return []*schema.Project{}, errors.Wrap(err, "Error generating usage file")
 		}

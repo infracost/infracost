@@ -20,8 +20,6 @@ import (
 	"github.com/fatih/color"
 )
 
-var spinner *ui.Spinner
-
 func main() {
 	var appErr error
 	updateMessageChan := make(chan *update.Info)
@@ -158,10 +156,7 @@ func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) erro
 }
 
 func handleCLIError(ctx *config.RunContext, cliErr error) {
-	if spinner != nil {
-		spinner.Fail()
-		fmt.Fprintln(os.Stderr, "")
-	}
+	// TODO check this
 
 	if cliErr.Error() != "" {
 		ui.PrintError(os.Stderr, cliErr.Error())
@@ -174,10 +169,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 }
 
 func handleUnexpectedErr(ctx *config.RunContext, unexpectedErr interface{}) {
-	if spinner != nil {
-		spinner.Fail()
-		fmt.Fprintln(os.Stderr, "")
-	}
+	// TODO check this
 
 	stack := string(debug.Stack())
 

@@ -1,89 +1,67 @@
 package ui
 
 import (
-	"fmt"
-	"os"
-	"runtime"
+	"context"
 	"time"
 
-	spinnerpkg "github.com/briandowns/spinner"
-	log "github.com/sirupsen/logrus"
+	"github.com/mitchellh/go-glint"
+	"github.com/tj/go-spin"
 )
 
-type SpinnerOptions struct {
-	EnableLogging bool
-	NoColor       bool
-	Indent        string
+// Spinner creates a new spinner. The created spinner should NOT be started
+// or data races will occur that can result in a panic.
+func Spinner() *SpinnerComponent {
+	// Create our spinner and setup our default frames
+	s := spin.New()
+	s.Set(spin.Default)
+
+	return &SpinnerComponent{
+		s: s,
+		msg: "",
+		isSuccess: false,
+		isFail: false,
+	}
 }
 
-type Spinner struct {
-	spinner *spinnerpkg.Spinner
-	msg     string
-	opts    SpinnerOptions
+type SpinnerComponent struct {
+	s    *spin.Spinner
+	msg string
+	last time.Time
+	isSuccess bool
+	isFail bool
 }
 
-func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
-	spinnerCharNumb := 14
-	if runtime.GOOS == "windows" {
-		spinnerCharNumb = 9
-	}
-	s := &Spinner{
-		spinner: spinnerpkg.New(spinnerpkg.CharSets[spinnerCharNumb], 100*time.Millisecond, spinnerpkg.WithWriter(os.Stderr)),
-		msg:     msg,
-		opts:    opts,
-	}
-
-	if s.opts.EnableLogging {
-		log.Infof("starting: %s", msg)
+func (c *SpinnerComponent) Body(context.Context) glint.Component {
+	var icon string
+	
+	if (c.isSuccess) {
+		icon = "✔"
+	} else if (c.isFail) {
+		icon = "✖"
 	} else {
-		s.spinner.Prefix = opts.Indent
-		s.spinner.Suffix = fmt.Sprintf(" %s", msg)
-		if !s.opts.NoColor {
-			_ = s.spinner.Color("fgHiCyan", "bold")
+		current := time.Now()
+		if c.last.IsZero() || current.Sub(c.last) > 150*time.Millisecond {
+			c.last = current
+			c.s.Next()
 		}
-		s.spinner.Start()
+		
+		icon = c.s.Current()
 	}
 
-	return s
+	return glint.Layout(
+		glint.Style(glint.Text(icon), glint.Color("cyan")),
+		glint.Layout(glint.Text(c.msg)).MarginLeft(1),
+	).Row()
 }
 
-func (s *Spinner) Stop() {
-	s.spinner.Stop()
+func (c *SpinnerComponent) SetMessage(msg string) {
+	c.msg = msg
 }
 
-func (s *Spinner) Fail() {
-	if s.spinner == nil || !s.spinner.Active() {
-		return
-	}
-	s.Stop()
-	if s.opts.EnableLogging {
-		log.Errorf("failed: %s", s.msg)
-	} else {
-		fmt.Fprintf(os.Stderr, "%s%s %s\n",
-			s.opts.Indent,
-			ErrorString("✖"),
-			s.msg,
-		)
-	}
+func (c *SpinnerComponent) Success() {
+	c.isSuccess = true
 }
 
-func (s *Spinner) SuccessWithMessage(newMsg string) {
-	s.msg = newMsg
-	s.Success()
-}
-
-func (s *Spinner) Success() {
-	if !s.spinner.Active() {
-		return
-	}
-	s.Stop()
-	if s.opts.EnableLogging {
-		log.Infof("completed: %s", s.msg)
-	} else {
-		fmt.Fprintf(os.Stderr, "%s%s %s\n",
-			s.opts.Indent,
-			PrimaryString("✔"),
-			s.msg,
-		)
-	}
+func (c *SpinnerComponent) Fail() {
+	c.isFail = true
 }

@@ -7,3 +7,7 @@ version: 0.1
 projects:
   - path: examples/terraform
     usage_file: infracost-usage-example.yml # Define resource usage estimates, see https://infracost.io/usage-file
+  - path: examples/terraform
+    usage_file: infracost-usage-example.yml # Define resource usage estimates, see https://infracost.io/usage-file
+  - path: examples/terragrunt
+    usage_file: infracost-usage-example.yml # Define resource usage estimates, see https://infracost.io/usage-file

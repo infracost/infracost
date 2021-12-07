@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/ui"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -16,6 +17,7 @@ type ProjectContext struct {
 	ProjectConfig *Project
 	contextVals   map[string]interface{}
 
+	Spinner *ui.SpinnerComponent
 	UsingCache bool
 	CacheErr   string
 }

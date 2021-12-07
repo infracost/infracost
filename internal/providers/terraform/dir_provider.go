@@ -28,7 +28,7 @@ var minTerraformVer = "v0.12"
 type DirProvider struct {
 	ctx                 *config.ProjectContext
 	Path                string
-	spinnerOpts         ui.SpinnerOptions
+	spinner         *ui.SpinnerComponent
 	IsTerragrunt        bool
 	PlanFlags           string
 	Workspace           string
@@ -54,11 +54,7 @@ func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
 	return &DirProvider{
 		ctx:  ctx,
 		Path: ctx.ProjectConfig.Path,
-		spinnerOpts: ui.SpinnerOptions{
-			EnableLogging: ctx.RunContext.Config.IsLogging(),
-			NoColor:       ctx.RunContext.Config.NoColor,
-			Indent:        "  ",
-		},
+		spinner: ctx.Spinner,
 		PlanFlags:           ctx.ProjectConfig.TerraformPlanFlags,
 		Workspace:           ctx.ProjectConfig.TerraformWorkspace,
 		UseState:            ctx.ProjectConfig.TerraformUseState,
@@ -175,13 +171,10 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 	}
 
 	if UsePlanCache(p) {
-		spinner := ui.NewSpinner("Checking for cached plan...", p.spinnerOpts)
+		p.spinner.SetMessage("checking for cached plan")
 		cached, err := ReadPlanCache(p)
-		if err != nil {
-			spinner.SuccessWithMessage(fmt.Sprintf("Checking for cached plan... %v", err.Error()))
-		} else {
+		if err == nil {
 			p.cachedPlanJSON = cached
-			spinner.SuccessWithMessage("Checking for cached plan... found")
 			return p.cachedPlanJSON, nil
 		}
 	}
@@ -199,8 +192,8 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	spinner := ui.NewSpinner("Running terraform plan", p.spinnerOpts)
-	planFile, planJSON, err := p.runPlan(opts, spinner, true)
+	p.spinner.SetMessage("running terraform plan")
+	planFile, planJSON, err := p.runPlan(opts, true)
 	defer os.Remove(planFile)
 
 	if err != nil {
@@ -211,8 +204,8 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		return planJSON, nil
 	}
 
-	spinner = ui.NewSpinner("Running terraform show", p.spinnerOpts)
-	j, err := p.runShow(opts, spinner, planFile)
+	p.spinner.SetMessage("running terraform show")
+	j, err := p.runShow(opts, planFile)
 	if err == nil {
 		p.cachedPlanJSON = j
 		if UsePlanCache(p) {
@@ -241,8 +234,8 @@ func (p *DirProvider) generateStateJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
-	j, err := p.runShow(opts, spinner, "")
+	p.spinner.SetMessage("running terraform show")
+	j, err := p.runShow(opts, "")
 	if err == nil {
 		p.cachedStateJSON = j
 	}
@@ -267,7 +260,7 @@ func (p *DirProvider) buildCommandOpts(path string) (*CmdOptions, error) {
 	return opts, nil
 }
 
-func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail bool) (string, []byte, error) {
+func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte, error) {
 	var planJSON []byte
 
 	fileName := ".tfplan-" + uuid.New().String()
@@ -304,40 +297,37 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 			strings.Contains(extractedErr, "Error: Backend initialization required") ||
 			strings.Contains(extractedErr, "Error: Provider requirements cannot be satisfied by locked dependencies") ||
 			strings.Contains(extractedErr, "Error: Module not installed")) {
-			spinner.Stop()
-			err = p.runInit(opts, ui.NewSpinner("Running terraform init", p.spinnerOpts))
+			p.spinner.SetMessage("running terraform init")
+			err = p.runInit(opts)
 			if err != nil {
 				return "", planJSON, err
 			}
-			return p.runPlan(opts, spinner, false)
+			return p.runPlan(opts, false)
 		}
 	}
 
 	if err != nil {
-		spinner.Fail()
-
+		var msg string
 		if errors.Is(err, ErrMissingCloudToken) {
-			msg := "Please set your TERRAFORM_CLOUD_TOKEN environment variable.\n"
+			msg = "Please set your TERRAFORM_CLOUD_TOKEN environment variable.\n"
 			msg += "It seems like Terraform Cloud's Remote Execution Mode is being used.\n"
 			msg += "Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable."
 			fmt.Fprintln(os.Stderr, msg)
 		} else if errors.Is(err, ErrInvalidCloudToken) {
-			msg := "Please set your TERRAFORM_CLOUD_TOKEN environment variable.\n"
+			msg = "Please set your TERRAFORM_CLOUD_TOKEN environment variable.\n"
 			msg += "It seems like Terraform Cloud's Remote Execution Mode is being used.\n"
 			msg += "Create a Team or User API Token in the Terraform Cloud dashboard and set this environment variable."
 			fmt.Fprintln(os.Stderr, msg)
 		} else {
-			p.printTerraformErr(err)
+			msg = p.buildTerraformErr(err)
 		}
-		return "", planJSON, errors.Wrap(err, "Error running terraform plan")
+		return "", planJSON, errors.Wrap(err, fmt.Sprintf("Error running terraform plan:\n%s", msg))
 	}
-
-	spinner.Success()
 
 	return fileName, planJSON, nil
 }
 
-func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
+func (p *DirProvider) runInit(opts *CmdOptions) error {
 	args := []string{}
 	if p.IsTerragrunt {
 		args = append(args, "run-all", "--terragrunt-ignore-external-dependencies")
@@ -346,12 +336,9 @@ func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
 
 	_, err := Cmd(opts, args...)
 	if err != nil {
-		spinner.Fail()
-		p.printTerraformErr(err)
-		return errors.Wrap(err, "Error running terraform init")
+		return errors.Wrap(err, fmt.Sprintf("Error running terraform init\n%s", p.buildTerraformErr(err)))
 	}
 
-	spinner.Success()
 	return nil
 }
 
@@ -408,18 +395,15 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 	return cloudAPI(host, jsonPath, token)
 }
 
-func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile string) ([]byte, error) {
+func (p *DirProvider) runShow(opts *CmdOptions, planFile string) ([]byte, error) {
 	args := []string{"show", "-no-color", "-json"}
 	if planFile != "" {
 		args = append(args, planFile)
 	}
 	out, err := Cmd(opts, args...)
 	if err != nil {
-		spinner.Fail()
-		p.printTerraformErr(err)
-		return []byte{}, errors.Wrap(err, "Error running terraform show")
+		return []byte{}, errors.Wrap(err, fmt.Sprintf("Error running terraform show", p.buildTerraformErr(err)))
 	}
-	spinner.Success()
 
 	return out, nil
 }
@@ -456,10 +440,10 @@ func checkTerraformVersion(v string, fullV string) error {
 	return nil
 }
 
-func (p *DirProvider) printTerraformErr(err error) {
+func (p *DirProvider) buildTerraformErr(err error) string {
 	stderr := extractStderr(err)
 	if stderr == "" {
-		return
+		return ""
 	}
 
 	binName := "Terraform"
@@ -488,7 +472,7 @@ func (p *DirProvider) printTerraformErr(err error) {
 		msg += "For more details, see https://registry.terraform.io/providers/hashicorp/aws\n"
 	}
 
-	fmt.Fprintln(os.Stderr, msg)
+	return msg
 }
 
 func extractStderr(err error) string {

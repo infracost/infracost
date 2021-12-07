@@ -80,7 +80,7 @@ require (
 	github.com/mattn/go-colorable v0.1.9 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
+	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b // indirect
@@ -97,7 +97,19 @@ require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/mitchellh/go-glint v0.0.0-20210722152315-6515ceb4a127
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+)
+
+require (
+	github.com/VividCortex/ewma v1.1.1 // indirect
+	github.com/cheggaaa/pb/v3 v3.0.5 // indirect
+	github.com/containerd/console v1.0.1 // indirect
+	github.com/gookit/color v1.3.1 // indirect
+	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
+	github.com/morikuni/aec v1.0.0 // indirect
+	github.com/tj/go-spin v1.1.0 // indirect
+	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 // indirect
 )
 
 replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e
