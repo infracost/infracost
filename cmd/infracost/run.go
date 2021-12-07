@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -122,111 +123,147 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projects := make([]*schema.Project, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
 
-	for _, projectCfg := range runCtx.Config.Projects {
-		ctx := config.NewProjectContext(runCtx, projectCfg)
-		runCtx.SetCurrentProjectContext(ctx)
+	numWorkers := 4
+	numCPU := runtime.NumCPU()
+	if numCPU*4 > numWorkers {
+		numWorkers = numCPU * 4
+	}
+	if numWorkers > 16 {
+		numWorkers = 16
+	}
+	numJobs := len(runCtx.Config.Projects)
 
-		for k, v := range projectCfg.Env {
-			os.Setenv(k, v)
-		}
+	jobs := make(chan *config.Project, numJobs)
+	resultErrors := make(chan error, numJobs)
 
-		provider, err := providers.Detect(ctx)
-		if err != nil {
-			m := fmt.Sprintf("%s\n\n", err)
-			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
+	for i := 0; i < numWorkers; i++ {
+		go func(jobs <-chan *config.Project, resultErrors chan<- error) {
+			for projectCfg := range jobs {
+				ctx := config.NewProjectContext(runCtx, projectCfg)
+				runCtx.SetCurrentProjectContext(ctx)
 
-			if cmd.Name() != "diff" {
-				m += "\n - Terraform state JSON file"
+				for k, v := range projectCfg.Env {
+					os.Setenv(k, v)
+				}
+
+				provider, err := providers.Detect(ctx)
+				if err != nil {
+					m := fmt.Sprintf("%s\n\n", err)
+					m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
+					m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
+
+					if cmd.Name() != "diff" {
+						m += "\n - Terraform state JSON file"
+					}
+
+					resultErrors <- clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
+					continue
+				}
+				ctx.SetContextValue("projectType", provider.Type())
+				projectContexts = append(projectContexts, ctx)
+
+				if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
+					m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
+					m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
+					m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
+					resultErrors <- clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
+					continue
+				}
+
+				m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
+				if runCtx.Config.IsLogging() {
+					log.Info(m)
+				} else {
+					fmt.Fprintln(os.Stderr, m)
+				}
+
+				// Generate usage file
+				if runCtx.Config.SyncUsageFile {
+					err := generateUsageFile(cmd, runCtx, projectCfg, provider)
+					if err != nil {
+						resultErrors <- errors.Wrap(err, "Error generating usage file")
+						continue
+					}
+				}
+
+				// Load usage data
+				usageData := make(map[string]*schema.UsageData)
+				var usageFile *usage.UsageFile
+
+				if projectCfg.UsageFile != "" {
+					var err error
+					usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile)
+					if err != nil {
+						resultErrors <- err
+					}
+
+					invalidKeys, err := usageFile.InvalidKeys()
+					if err != nil {
+						log.Errorf("Error checking usage file keys: %v", err)
+					} else if len(invalidKeys) > 0 {
+						ui.PrintWarningf(cmd.ErrOrStderr(),
+							"The following usage file parameters are invalid and will be ignored: %s\n",
+							strings.Join(invalidKeys, ", "),
+						)
+					}
+				} else {
+					usageFile = usage.NewBlankUsageFile()
+				}
+
+				if len(usageData) > 0 {
+					ctx.SetContextValue("hasUsageFile", true)
+				}
+
+				// Merge wildcard usages into individual usage
+				wildCardUsage := make(map[string]*usage.ResourceUsage)
+				for _, us := range usageFile.ResourceUsages {
+					if strings.HasSuffix(us.Name, "[*]") {
+						lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
+						prefixName := us.Name[:lastIndexOfOpenBracket]
+						wildCardUsage[prefixName] = us
+					}
+				}
+
+				for _, us := range usageFile.ResourceUsages {
+					if strings.HasSuffix(us.Name, "[*]") {
+						continue
+					}
+
+					if !strings.HasSuffix(us.Name, "]") {
+						continue
+					}
+					lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
+					prefixName := us.Name[:lastIndexOfOpenBracket]
+
+					us.MergeResourceUsage(wildCardUsage[prefixName])
+				}
+
+				usageData = usageFile.ToUsageDataMap()
+
+				providerProjects, err := provider.LoadResources(usageData)
+				if err != nil {
+					resultErrors <- err
+					continue
+				}
+
+				projects = append(projects, providerProjects...)
+
+				resultErrors <- nil
 			}
+		}(jobs, resultErrors)
+	}
 
-			return clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
-		}
-		ctx.SetContextValue("projectType", provider.Type())
-		projectContexts = append(projectContexts, ctx)
+	// Feed the workers the jobs of getting prices
+	for _, p := range runCtx.Config.Projects {
+		jobs <- p
+	}
 
-		if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
-			m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
-			m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-			m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
-			return clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
-		}
-
-		m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
-		if runCtx.Config.IsLogging() {
-			log.Info(m)
-		} else {
-			fmt.Fprintln(os.Stderr, m)
-		}
-
-		// Generate usage file
-		if runCtx.Config.SyncUsageFile {
-			err := generateUsageFile(cmd, runCtx, projectCfg, provider)
-			if err != nil {
-				return errors.Wrap(err, "Error generating usage file")
-			}
-		}
-
-		// Load usage data
-		usageData := make(map[string]*schema.UsageData)
-		var usageFile *usage.UsageFile
-
-		if projectCfg.UsageFile != "" {
-			var err error
-			usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile)
-			if err != nil {
-				return err
-			}
-
-			invalidKeys, err := usageFile.InvalidKeys()
-			if err != nil {
-				log.Errorf("Error checking usage file keys: %v", err)
-			} else if len(invalidKeys) > 0 {
-				ui.PrintWarningf(cmd.ErrOrStderr(),
-					"The following usage file parameters are invalid and will be ignored: %s\n",
-					strings.Join(invalidKeys, ", "),
-				)
-			}
-		} else {
-			usageFile = usage.NewBlankUsageFile()
-		}
-
-		if len(usageData) > 0 {
-			ctx.SetContextValue("hasUsageFile", true)
-		}
-
-		// Merge wildcard usages into individual usage
-		wildCardUsage := make(map[string]*usage.ResourceUsage)
-		for _, us := range usageFile.ResourceUsages {
-			if strings.HasSuffix(us.Name, "[*]") {
-				lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
-				prefixName := us.Name[:lastIndexOfOpenBracket]
-				wildCardUsage[prefixName] = us
-			}
-		}
-
-		for _, us := range usageFile.ResourceUsages {
-			if strings.HasSuffix(us.Name, "[*]") {
-				continue
-			}
-
-			if !strings.HasSuffix(us.Name, "]") {
-				continue
-			}
-			lastIndexOfOpenBracket := strings.LastIndex(us.Name, "[")
-			prefixName := us.Name[:lastIndexOfOpenBracket]
-
-			us.MergeResourceUsage(wildCardUsage[prefixName])
-		}
-
-		usageData = usageFile.ToUsageDataMap()
-
-		providerProjects, err := provider.LoadResources(usageData)
+	// Get the result of the jobs
+	for i := 0; i < numJobs; i++ {
+		err := <-resultErrors
 		if err != nil {
 			return err
 		}
-
-		projects = append(projects, providerProjects...)
 	}
 
 	if !runCtx.Config.IsLogging() {
