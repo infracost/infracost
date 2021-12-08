@@ -50,6 +50,10 @@ func addRunFlags(cmd *cobra.Command) {
 }
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
+	if runCtx.Config.IsSelfHosted() && runCtx.Config.EnableDashboard {
+		ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+	}
+
 	parallelism, err := getParallelism(cmd, runCtx)
 	if err != nil {
 		return err
