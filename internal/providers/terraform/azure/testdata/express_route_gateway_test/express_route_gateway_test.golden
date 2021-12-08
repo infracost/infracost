@@ -1,0 +1,14 @@
+
+ Name                                         Monthly Qty  Unit         Monthly Cost 
+                                                                                     
+ azurerm_express_route_gateway.express_route                                         
+ └─ ER scale units (2 Gbps)                             4  scale units     $1,226.40 
+                                                                                     
+ OVERALL TOTAL                                                             $1,226.40 
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 1 was estimated
+∙ 3 were free:
+  ∙ 1 x azurerm_resource_group
+  ∙ 1 x azurerm_virtual_hub
+  ∙ 1 x azurerm_virtual_wan

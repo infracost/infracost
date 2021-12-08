@@ -21,17 +21,47 @@ resource "azurerm_virtual_hub" "virtual_hub" {
   virtual_wan_id = azurerm_virtual_wan.virtual_wan.id
 }
 
-resource "azurerm_vpn_gateway" "default_vpn" {
+resource "azurerm_vpn_server_configuration" "server_config" {
+  name = "example-config"
+  resource_group_name = azurerm_resource_group.resource_group.name
+  location = azurerm_resource_group.resource_group.location
+  vpn_authentication_types = [
+    "Certificate"]
+}
+
+
+resource "azurerm_point_to_site_vpn_gateway" "point_to_site_vpn" {
   name = "example-vpn"
   location = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
   virtual_hub_id = azurerm_virtual_hub.virtual_hub.id
+  scale_unit = 5
+  vpn_server_configuration_id = azurerm_vpn_server_configuration.server_config.id
+  connection_configuration {
+    name = "example-gateway-config"
+
+    vpn_client_address_pool {
+      address_prefixes = [
+        "10.0.2.0/24"
+      ]
+    }
+  }
 }
 
-resource "azurerm_vpn_gateway" "vpn_with_scale_units" {
-  name = "example-vpn-scale"
+resource "azurerm_point_to_site_vpn_gateway" "point_to_site_vpn_with_usage" {
+  name = "example-vpn"
   location = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
   virtual_hub_id = azurerm_virtual_hub.virtual_hub.id
-  scale_unit = 3
+  scale_unit = 5
+  vpn_server_configuration_id = azurerm_vpn_server_configuration.server_config.id
+  connection_configuration {
+    name = "example-gateway-config"
+
+    vpn_client_address_pool {
+      address_prefixes = [
+        "10.0.2.0/24"
+      ]
+    }
+  }
 }

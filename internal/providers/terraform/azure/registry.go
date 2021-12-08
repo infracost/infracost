@@ -47,6 +47,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMDNSPrivateZoneRegistryItem(),
 	GetAzureRMDNSZoneRegistryItem(),
 	GetAzureRMEventHubsNamespaceRegistryItem(),
+	getAzureRMExpressRouteConnectionRegistryItem(),
+	getAzureRMExpressRouteGatewayRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
 	getAzureRMFrontdoorFirewallPolicyRegistryItem(),
 	getAzureRMFrontdoorRegistryItem(),
@@ -70,6 +72,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMMSSQLDatabaseRegistryItem(),
 	GetAzureRMMySQLServerRegistryItem(),
 	GetAzureRMNotificationHubNamespaceRegistryItem(),
+	getAzureRMPointToSiteVpnGatewayRegistryItem(),
 	GetAzureRMPostgreSQLFlexibleServerRegistryItem(),
 	GetAzureRMPostgreSQLServerRegistryItem(),
 	GetAzureRMPrivateDNSaRecordRegistryItem(),
@@ -88,12 +91,15 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMSynapseSparkPoolRegistryItem(),
 	GetAzureRMSynapseSQLPoolRegistryItem(),
 	GetAzureRMSynapseWorkspacRegistryItem(),
+	getAzureRMVirtualHubRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
-	GetAzureRMVpnGatewayConnectionRegistryItem(),
-	GetAzureRMVpnGatewayRegistryItem(),
+	GetAzureRMVirtualNetworkGatewayConnectionRegistryItem(),
+	GetAzureRMVirtualNetworkGatewayRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
+	getAzureRMVPNGatewayRegistryItem(),
+	getAzureRMVPNGatewayConnectionRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -318,6 +324,9 @@ var FreeResources = []string{
 	"azurerm_proximity_placement_group",
 	"azurerm_ssh_public_key",
 	"azurerm_marketplace_agreement",
+
+	// Azure WAN
+	"azurerm_virtual_wan",
 }
 
 var UsageOnlyResources = []string{}

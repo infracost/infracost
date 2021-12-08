@@ -1,0 +1,18 @@
+
+ Name                                        Monthly Qty  Unit   Monthly Cost 
+                                                                              
+ azurerm_virtual_hub.virtual_hub                                              
+ └─ Deployment                                       730  hours       $182.50 
+                                                                              
+ azurerm_virtual_hub.virtual_hub_with_usage                                   
+ ├─ Deployment                                       730  hours       $182.50 
+ └─ Data processed                                    90  GB            $1.80 
+                                                                              
+ OVERALL TOTAL                                                        $366.80 
+──────────────────────────────────
+6 cloud resources were detected:
+∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
+∙ 4 were free:
+  ∙ 2 x azurerm_virtual_hub
+  ∙ 1 x azurerm_resource_group
+  ∙ 1 x azurerm_virtual_wan

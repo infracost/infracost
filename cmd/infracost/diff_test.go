@@ -5,8 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/infracost/infracost/internal/testutil"
 	"github.com/stretchr/testify/require"
+
+	"github.com/infracost/infracost/internal/testutil"
 )
 
 func TestDiffHelp(t *testing.T) {
@@ -22,7 +23,7 @@ func TestDiffTerraformDirectory(t *testing.T) {
 }
 
 func TestDiffTerraformShowSkipped(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/azure_firewall_plan.json", "--show-skipped"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/express_route_gateway_plan.json", "--show-skipped"}, nil)
 }
 
 func TestDiffTerraformOutFile(t *testing.T) {
