@@ -15,3 +15,6 @@ Project: infracost/infracost/cmd/infracost/testdata/instance_with_attachment_aft
 4 cloud resources were detected, rerun with --show-skipped to see details:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free
+
+Err:
+
