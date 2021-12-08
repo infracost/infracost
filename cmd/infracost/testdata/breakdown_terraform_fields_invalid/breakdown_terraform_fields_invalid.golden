@@ -29,3 +29,4 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
 
 Err:
 Warning: Invalid field 'invalid' specified, valid fields are: [price monthlyQuantity unit hourlyCost monthlyCost] or 'all' to include all fields
+

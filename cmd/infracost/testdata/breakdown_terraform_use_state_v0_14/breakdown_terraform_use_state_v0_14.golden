@@ -43,3 +43,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_state.json
 ∙ 7 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost
 ∙ 6 were free
+
+Err:
+
