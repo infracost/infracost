@@ -35,3 +35,4 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_sync_usa
 
 Err:
     └─ Synced 0 of 6 resources
+

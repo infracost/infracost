@@ -15,3 +15,6 @@ Key: ~ changed, + added, - removed
 
 1 cloud resource was detected, rerun with --show-skipped to see details:
 ∙ 1 was estimated, 1 includes usage-based costs, see https://infracost.io/usage-file
+
+Err:
+

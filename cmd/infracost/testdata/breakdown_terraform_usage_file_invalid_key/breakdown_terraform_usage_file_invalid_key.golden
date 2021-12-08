@@ -42,3 +42,4 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
 Err:
 Warning: The following usage file parameters are invalid and will be ignored: dup_invalid_key, invalid_key_1, invalid_key_2, invalid_key_3
 
+
