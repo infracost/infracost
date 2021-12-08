@@ -3,10 +3,11 @@ package terraform
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/kballard/go-shellquote"
 	"os"
 	"path/filepath"
 	"sort"
+
+	"github.com/kballard/go-shellquote"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
@@ -93,7 +94,7 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 		metadata := config.DetectProjectMetadata(projectDir.ConfigDir)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+		name := schema.GenerateProjectName(metadata, p.ctx.Config.EnableDashboard)
 
 		project := schema.NewProject(name, metadata)
 

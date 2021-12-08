@@ -1,40 +1,28 @@
 package config
 
-import (
-	"os"
-	"os/exec"
-	"path/filepath"
-	"regexp"
-	"strings"
-
-	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
-)
-
 type ProjectContexter interface {
 	ProjectContext() map[string]interface{}
 }
 
 type ProjectContext struct {
-	RunContext    *RunContext
+	Config        *Config
 	ProjectConfig *Project
+	runCtx        *RunContext
 	contextVals   map[string]interface{}
-
-	UsingCache bool
-	CacheErr   string
 }
 
-func NewProjectContext(runCtx *RunContext, projectCfg *Project) *ProjectContext {
+func NewProjectContext(ctx *RunContext, projectCfg *Project) *ProjectContext {
 	return &ProjectContext{
-		RunContext:    runCtx,
+		Config:        ctx.Config,
 		ProjectConfig: projectCfg,
+		runCtx:        ctx,
 		contextVals:   map[string]interface{}{},
 	}
 }
 
 func EmptyProjectContext() *ProjectContext {
 	return &ProjectContext{
-		RunContext:    EmptyRunContext(),
+		Config:        &Config{},
 		ProjectConfig: &Project{},
 		contextVals:   map[string]interface{}{},
 	}
@@ -53,90 +41,4 @@ func (c *ProjectContext) SetFrom(d ProjectContexter) {
 	for k, v := range m {
 		c.SetContextValue(k, v)
 	}
-}
-
-func DetectProjectMetadata(path string) *schema.ProjectMetadata {
-	vcsRepoURL := os.Getenv("INFRACOST_VCS_REPOSITORY_URL")
-	vcsSubPath := os.Getenv("INFRACOST_VCS_SUB_PATH")
-	vcsPullRequestURL := os.Getenv("INFRACOST_VCS_PULL_REQUEST_URL")
-	terraformWorkspace := os.Getenv("INFRACOST_TERRAFORM_WORKSPACE")
-
-	if vcsRepoURL == "" {
-		vcsRepoURL = gitRepo(path)
-	}
-
-	if vcsRepoURL != "" && vcsSubPath == "" {
-		vcsSubPath = gitSubPath(path)
-	}
-
-	vcsRepoURL = stripVCSRepoPassword(vcsRepoURL)
-
-	return &schema.ProjectMetadata{
-		Path:               path,
-		VCSRepoURL:         vcsRepoURL,
-		VCSSubPath:         vcsSubPath,
-		VCSPullRequestURL:  vcsPullRequestURL,
-		TerraformWorkspace: terraformWorkspace,
-	}
-}
-
-func gitRepo(path string) string {
-	log.Debugf("Checking if %s is a git repo", path)
-	cmd := exec.Command("git", "ls-remote", "--get-url")
-
-	if isDir(path) {
-		cmd.Dir = path
-	} else {
-		cmd.Dir = filepath.Dir(path)
-	}
-
-	out, err := cmd.Output()
-	if err != nil {
-		log.Debugf("Could not detect a git repo at %s", path)
-		return ""
-	}
-	return strings.Split(string(out), "\n")[0]
-}
-
-func gitSubPath(path string) string {
-	topLevel, err := gitToplevel(path)
-	if err != nil {
-		log.Debugf("Could not get git top level directory for %s", path)
-		return ""
-	}
-
-	absPath, err := filepath.Abs(path)
-	if err != nil {
-		log.Debugf("Could not get absolute path for %s", path)
-		return ""
-	}
-
-	subPath, err := filepath.Rel(topLevel, absPath)
-	if err != nil {
-		log.Debugf("Could not get relative path for %s from %s", absPath, topLevel)
-		return ""
-	}
-
-	return subPath
-}
-
-func gitToplevel(path string) (string, error) {
-	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
-
-	if isDir(path) {
-		cmd.Dir = path
-	} else {
-		cmd.Dir = filepath.Dir(path)
-	}
-
-	out, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
-	return strings.Split(string(out), "\n")[0], nil
-}
-
-func stripVCSRepoPassword(repoURL string) string {
-	r := regexp.MustCompile(`.*:([^@]*)@`)
-	return r.ReplaceAllString(repoURL, "")
 }

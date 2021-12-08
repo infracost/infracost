@@ -26,19 +26,20 @@ import (
 var minTerraformVer = "v0.12"
 
 type DirProvider struct {
-	ctx                 *config.ProjectContext
-	Path                string
-	spinnerOpts         ui.SpinnerOptions
-	IsTerragrunt        bool
-	PlanFlags           string
-	Workspace           string
-	UseState            bool
-	TerraformBinary     string
-	TerraformCloudHost  string
-	TerraformCloudToken string
-	Env                 map[string]string
-	cachedStateJSON     []byte
-	cachedPlanJSON      []byte
+	ctx                                   *config.ProjectContext
+	Path                                  string
+	spinnerOpts                           ui.SpinnerOptions
+	IsTerragrunt                          bool
+	IsTerraformRemoteExecutionModeEnabled bool
+	PlanFlags                             string
+	Workspace                             string
+	UseState                              bool
+	TerraformBinary                       string
+	TerraformCloudHost                    string
+	TerraformCloudToken                   string
+	Env                                   map[string]string
+	cachedStateJSON                       []byte
+	cachedPlanJSON                        []byte
 }
 
 type RunShowOptions struct {
@@ -55,8 +56,8 @@ func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
 		ctx:  ctx,
 		Path: ctx.ProjectConfig.Path,
 		spinnerOpts: ui.SpinnerOptions{
-			EnableLogging: ctx.RunContext.Config.IsLogging(),
-			NoColor:       ctx.RunContext.Config.NoColor,
+			EnableLogging: ctx.Config.IsLogging(),
+			NoColor:       ctx.Config.NoColor,
 			Indent:        "  ",
 		},
 		PlanFlags:           ctx.ProjectConfig.TerraformPlanFlags,
@@ -147,7 +148,7 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 		metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+		name := schema.GenerateProjectName(metadata, p.ctx.Config.EnableDashboard)
 
 		project := schema.NewProject(name, metadata)
 
@@ -297,6 +298,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 		// If the plan returns this error then Terraform is configured with remote execution mode
 		if strings.HasPrefix(extractedErr, "Error: Saving a generated plan is currently not supported") {
 			log.Info("Continuing with Terraform Remote Execution Mode")
+			p.IsTerraformRemoteExecutionModeEnabled = true
 			p.ctx.SetContextValue("terraformRemoteExecutionModeEnabled", true)
 			planJSON, err = p.runRemotePlan(opts, args)
 		} else if initOnFail && (strings.Contains(extractedErr, "Error: Could not load plugin") ||

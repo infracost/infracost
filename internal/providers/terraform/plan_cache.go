@@ -3,13 +3,15 @@ package terraform
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/hashicorp/terraform-config-inspect/tfconfig"
+	"github.com/infracost/infracost/internal/config"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -116,7 +118,7 @@ type cacheFile struct {
 }
 
 func UsePlanCache(p *DirProvider) bool {
-	if p.ctx.RunContext.Config.NoCache {
+	if p.ctx.Config.NoCache {
 		// cache was turned off with --no-cache
 		return false
 	}
@@ -126,11 +128,11 @@ func UsePlanCache(p *DirProvider) bool {
 		return false
 	}
 
-	if p.ctx.RunContext.IsCIRun() {
+	if config.CIPlatform() != "" {
 		return false
 	}
 
-	if _, ok := p.ctx.ContextValues()["terraformRemoteExecutionModeEnabled"]; ok {
+	if p.IsTerraformRemoteExecutionModeEnabled {
 		// remote execution is enabled
 		return false
 	}
@@ -144,20 +146,17 @@ func ReadPlanCache(p *DirProvider) ([]byte, error) {
 	info, err := os.Stat(cache)
 	if err != nil {
 		log.Debugf("Skipping plan cache: Cache file does not exist")
-		p.ctx.CacheErr = "not found"
 		return nil, fmt.Errorf("not found")
 	}
 
 	if time.Now().Unix()-info.ModTime().Unix() > cacheMaxAgeSecs {
 		log.Debugf("Skipping plan cache: Cache file is too old")
-		p.ctx.CacheErr = "expired"
 		return nil, fmt.Errorf("expired")
 	}
 
 	data, err := os.ReadFile(cache)
 	if err != nil {
 		log.Debugf("Skipping plan cache: Error reading cache file: %v", err)
-		p.ctx.CacheErr = "unreadable"
 		return nil, fmt.Errorf("unreadable")
 	}
 
@@ -165,19 +164,16 @@ func ReadPlanCache(p *DirProvider) ([]byte, error) {
 	err = json.Unmarshal(data, &cf)
 	if err != nil {
 		log.Debugf("Skipping plan cache: Error unmarshalling cache file: %v", err)
-		p.ctx.CacheErr = "bad format"
 		return nil, fmt.Errorf("bad format")
 	}
 
 	state := calcConfigState(p)
 	if _, err := cf.ConfigState.equivalent(&state); err != nil {
 		log.Debugf("Skipping plan cache: Config state has changed")
-		p.ctx.CacheErr = err.Error()
 		return nil, fmt.Errorf("change detected")
 	}
 
 	log.Debugf("Read plan JSON from %v", cacheFileName)
-	p.ctx.UsingCache = true
 	return cf.Plan, nil
 }
 

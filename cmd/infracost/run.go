@@ -83,7 +83,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 				ctx := config.NewProjectContext(runCtx, projectCfg)
 				projectContextChan <- ctx
 
-				configProjects, err := runProjectConfig(cmd, runCtx, ctx, projectCfg)
+				configProjects, err := runProjectConfig(cmd, ctx, projectCfg)
 				if err != nil {
 					return err
 				}
@@ -183,7 +183,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	return nil
 }
 
-func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config.ProjectContext, projectCfg *config.Project) ([]*schema.Project, error) {
+func runProjectConfig(cmd *cobra.Command, ctx *config.ProjectContext, projectCfg *config.Project) ([]*schema.Project, error) {
 	for k, v := range projectCfg.Env {
 		os.Setenv(k, v)
 	}
@@ -210,15 +210,15 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	}
 
 	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
-	if runCtx.Config.IsLogging() {
+	if ctx.Config.IsLogging() {
 		log.Info(m)
 	} else {
 		fmt.Fprintln(os.Stderr, m)
 	}
 
 	// Generate usage file
-	if runCtx.Config.SyncUsageFile {
-		err := generateUsageFile(cmd, runCtx, ctx, projectCfg, provider)
+	if ctx.Config.SyncUsageFile {
+		err := generateUsageFile(cmd, ctx, projectCfg, provider)
 		if err != nil {
 			return []*schema.Project{}, errors.Wrap(err, "Error generating usage file")
 		}
@@ -284,13 +284,13 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: runCtx.Config.IsLogging(),
-		NoColor:       runCtx.Config.NoColor,
+		EnableLogging: ctx.Config.IsLogging(),
+		NoColor:       ctx.Config.NoColor,
 	}
 	spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 
 	for _, project := range projects {
-		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
+		if err := prices.PopulatePrices(ctx.Config, project); err != nil {
 			spinner.Fail()
 			fmt.Fprintln(os.Stderr, "")
 
@@ -319,14 +319,14 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 
 	spinner.Success()
 
-	if !runCtx.Config.IsLogging() {
+	if !ctx.Config.IsLogging() {
 		cmd.PrintErrln()
 	}
 
 	return projects, nil
 }
 
-func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx *config.ProjectContext, projectCfg *config.Project, provider schema.Provider) error {
+func generateUsageFile(cmd *cobra.Command, ctx *config.ProjectContext, projectCfg *config.Project, provider schema.Provider) error {
 	if projectCfg.UsageFile == "" {
 		// This should not happen as we check earlier in the code that usage-file is not empty when sync-usage-file flag is on.
 		return fmt.Errorf("Error generating usage: no usage file given")
@@ -352,8 +352,8 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: runCtx.Config.IsLogging(),
-		NoColor:       runCtx.Config.NoColor,
+		EnableLogging: ctx.Config.IsLogging(),
+		NoColor:       ctx.Config.NoColor,
 		Indent:        "  ",
 	}
 
@@ -364,7 +364,7 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx
 		return errors.Wrap(err, "Error synchronizing usage data")
 	}
 
-	projectCtx.SetFrom(syncResult)
+	ctx.SetFrom(syncResult)
 	if err != nil {
 		spinner.Fail()
 		return errors.Wrap(err, "Error summarizing usage")
@@ -547,15 +547,6 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["projectCount"] = len(projectContexts)
 	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
 	env["currency"] = runCtx.Config.Currency
-
-	usingCache := make([]bool, 0, len(projectContexts))
-	cacheErrors := make([]string, 0, len(projectContexts))
-	for _, pCtx := range projectContexts {
-		usingCache = append(usingCache, pCtx.UsingCache)
-		cacheErrors = append(cacheErrors, pCtx.CacheErr)
-	}
-	env["usingCache"] = usingCache
-	env["cacheErrors"] = cacheErrors
 
 	summary := r.FullSummary
 	env["supportedResourceCounts"] = summary.SupportedResourceCounts
