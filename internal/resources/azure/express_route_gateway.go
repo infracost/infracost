@@ -39,9 +39,9 @@ func (e *ExpressRouteGateway) BuildResource() *schema.Resource {
 		Name: e.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           "ER scale units",
-				Unit:           "hours",
-				UnitMultiplier: decimal.NewFromInt(1),
+				Name:           "ER scale units (2 Gbps)",
+				Unit:           "scale units",
+				UnitMultiplier: schema.HourToMonthUnitMultiplier,
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(e.ScaleUnits)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("azure"),

@@ -82,9 +82,9 @@ func (v *VPNGateway) buildP2SResource() *schema.Resource {
 
 func (v *VPNGateway) scaleUnitComponent() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("%s scale units", v.Type),
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
+		Name:           fmt.Sprintf("%s scale units (500 Mbps)", v.Type),
+		Unit:           "scale units",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(v.ScaleUnits)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
