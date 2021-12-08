@@ -108,10 +108,10 @@ func (v *VPNGateway) connectionUnitComponent() *schema.CostComponent {
 	}
 
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("%s connections", v.Type),
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromFloat(connections)),
+		Name:            fmt.Sprintf("%s connections", v.Type),
+		Unit:            "hours",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(connections)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(v.Region),

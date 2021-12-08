@@ -1,14 +1,14 @@
 
- Name                                                            Monthly Qty  Unit   Monthly Cost 
-                                                                                                  
- azurerm_point_to_site_vpn_gateway.point_to_site_vpn                                              
- └─ P2S scale units                                                    3,650  hours     $1,317.65 
-                                                                                                  
- azurerm_point_to_site_vpn_gateway.point_to_site_vpn_with_usage                                   
- ├─ P2S scale units                                                    3,650  hours     $1,317.65 
- └─ P2S connections                                                    6,570  hours        $82.13 
-                                                                                                  
- OVERALL TOTAL                                                                          $2,717.43 
+ Name                                                            Monthly Qty  Unit         Monthly Cost 
+                                                                                                        
+ azurerm_point_to_site_vpn_gateway.point_to_site_vpn                                                    
+ └─ P2S scale units (500 Mbps)                                             5  scale units     $1,317.65 
+                                                                                                        
+ azurerm_point_to_site_vpn_gateway.point_to_site_vpn_with_usage                                         
+ ├─ P2S scale units (500 Mbps)                                             5  scale units     $1,317.65 
+ └─ P2S connections                                                        9  hours               $0.11 
+                                                                                                        
+ OVERALL TOTAL                                                                                $2,635.41 
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
