@@ -2,6 +2,7 @@ package apiclient
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,9 +16,10 @@ import (
 )
 
 type APIClient struct {
-	endpoint string
-	apiKey   string
-	runID    string
+	endpoint  string
+	apiKey    string
+	tlsConfig *tls.Config
+	runID     string
 }
 
 type GraphQLQuery struct {
@@ -63,7 +65,8 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 
 	c.AddAuthHeaders(req)
 
-	client := &http.Client{}
+	transport := &http.Transport{TLSClientConfig: c.tlsConfig}
+	client := &http.Client{Transport: transport}
 	resp, err := client.Do(req)
 	if err != nil {
 		return []byte{}, errors.Wrap(err, "Error sending API request")
