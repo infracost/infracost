@@ -1,12 +1,14 @@
 # Adding a new resource to Infracost
 
+This guide will help you master the art of adding cloud resources to Infracost. It might seem long but it's pretty easy to follow, we've even built tooling to auto-generate the required scaffolding and there are integration tests too!
+
+Adding new resources is hugely valuable to the community as once a mapping has been coded, everyone can get a quick cost estimate for it. Every new resource mapping gets users closer to loving their cloud bill! 💰📉
+
 ## Overview
 
-This guide explains how Infracost manages cloud resources and helps with adding support for new resources.
+We're going to explain how Infracost manages cloud resources as that helps with adding support for new resources.
 
-It assumes a GitHub issue exists with a detailed description of the resource's cost components. TODO: Read [this guide](#) if you'd like to learn how to prepare such details and rationale behind the choice of names/units/etc.
-
-You can also watch [this YouTube video](https://www.youtube.com/watch?v=z0L76v3rWUg) that shows how to add [AWS MWAA Environment](internal/resources/aws/mwaa_environment.go) resources.
+This guide assumes that a GitHub issue exists with a detailed description of the resource's cost components and units that should be added. Read [this guide](resource_mapping_guide.md) if you'd like to learn how to prepare such details and rationale behind the choice of names/units/etc.
 
 The steps below describe adding an AWS resource using Terraform IaC provider, but they are similar for Google and Azure resources. You can follow along, replacing the example values with your resource's information.
 
@@ -26,18 +28,23 @@ The steps below describe adding an AWS resource using Terraform IaC provider, bu
 - [Add free resources](#add-free-resources)
 - [Update Infracost docs](#update-infracost-docs)
 - [Prepare a Pull Request for review](#prepare-a-pull-request-for-review)
+- [Appendix](#appendix)
+  - [Resource edge cases](#resource-edge-cases)
+  - [References to other resources](#references-to-other-resources)
+  - [Google zone mappings](#google-zone-mappings)
+  - [Azure zone mappings](#azure-zone-mappings)
 
 ## Prerequisites
 
 To follow this guide, you will need:
 
-- A working development environment. You can set it up using [this guide](CONTRIBUTING.md#setting-up-the-development-environment).
-- Access to price database via PostgreSQL server or GraphQL API. TODO: See [this guide](#) to set it up.
+- A working development environment for the Infracost CLI. You can set it up using [this guide](/CONTRIBUTING.md#setting-up-the-development-environment).
+- Access to the Cloud Pricing API database via PostgreSQL. See [this guide](https://github.com/infracost/cloud-pricing-api/blob/master/CONTRIBUTING.md) to set it up locally.
 
 ## Glossary
 
 * **Resource** (or Generic resource) - A resource for a cloud service that maps one-to-one to an IaC provider resource (e.g., Terraform).
-* **Cost component** - A line-item for a resource representing a cost calculated from a price and some usage quantity. For example, the [AWS NAT Gateway](internal/resources/aws/nat_gateway.go) resource has two cost components: one to model the hourly cost, and another to model the cost for data processed.
+* **Cost component** - A line-item for a resource representing a cost calculated from a price and some usage quantity. For example, the [AWS NAT Gateway](/internal/resources/aws/nat_gateway.go) resource has two cost components: one to model the hourly cost, and another to model the cost for data processed.
 
 ## GitHub issue
 
@@ -119,7 +126,7 @@ We are going to edit the files marked with the asterisk.
 
 ## Run tests
 
-Infracost CLI has a test suite to ensure its correct work. Each resource also has tests. We will run them to ensure that the code we're adding is working correctly.
+Infracost CLI has a test suite. Each resource also has tests. We will run them to ensure that the code we're adding is working correctly.
 
 As the resourcegen command's output suggests, we can run our newly generated tests and see what happens. Most likely, they will fail as cloud resources require specific attributes, and Terraform will throw an error if they are missing. The IaC provider's resource page may help find an example with such details. For `aws_transfer_server`, we can use an example resource here [Basic usage](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/transfer_server#basic).
 
@@ -195,12 +202,12 @@ With tests in place, we can add our first cost component now!
 
 The first cost component is usually the hardest, but an important one as it requires most research work: we need to understand _how_ to add it to the resource and _how_ to find its pricing in Pricing API.
 
-> Note: The GitHub issue should already include information about cost components names, units, and maybe even some pricing details. However, sometimes some details may be missing or incomplete. If this happens, we encourage you to leave a comment on the issue with clarifications.
+> Note: The GitHub issue should already include information about cost components names, units, and maybe even some pricing details. However, sometimes some details may be missing or incomplete. If this happens, we encourage you to ask for clarifications in the issue comments.
 
 We can divide the process of adding a cost component into the following steps:
 
 1. Define a new cost component in the resource's file.
-1. Find the product records and prices in the Pricing API database.
+1. Find the product records and prices in the Cloud Pricing API database.
 1. If the resource relies on Terraform's attributes, add their mapping to the provider resource file.
 1. If a cost component is usage-based, define the resource's usage schema and attributes.
 
@@ -295,7 +302,7 @@ Here are the main parts of the cost component:
 `UnitMultiplier` is used to calculate the cost of component quantity correctly. For example, if a price is `$0.02 per 1k requests`, and assuming the amount is 10,000, its cost will be calculated as `quantity/unitMultiplier * price`.
 - `HourlyQuantity` or `MonthlyQuantity` attributes specify the quantity of the resource. If the measurement unit is `GB`, it will be the number of gigabytes. If the unit is `hours`, it can be `1` as "1 hour".
 `ProductFilter` is a struct that helps uniquely identify components' "product" in the Pricing API database. It uses the information we find from our [price search](#price-search) step.
-- `PriceFilter` helps identify the exact price of the "product." Usually, it's only one, but if there are pricing tiers, its filters can pick the correct value. TODO: Add a reference to usage examples.
+- `PriceFilter` helps identify the exact price of the "product." Usually, it's only one, but if there are pricing tiers, its filters can pick the correct value.
 
 We already can populate some placeholders like names and units from the GitHub issue.
 
@@ -342,7 +349,7 @@ Let's find out how to find the component representation in the Pricing API datab
 
 ### Price search
 
-We'll use PostgreSQL database and `psql` tool to find the prices for cost components. TODO: Add a link to the setup guide for PostgreSQL/GraphQL.
+We'll use the PostgreSQL database and `psql` tool to find the prices for cost components. See [this guide](https://github.com/infracost/cloud-pricing-api/blob/master/CONTRIBUTING.md) to set it up locally.
 
 Connect to `cloud_pricing` database that holds all the prices:
 
@@ -671,8 +678,6 @@ Let's see what we do here:
 - If it's missing, we add a default protocol, `SFTP`, per Terraform documentation.
 - If the array is not empty, we extract its value and convert it to Go's array `d.Get("protocols").Array()` and then iterate over it to add its items to our `protocols` array. We also convert each item to Go's string type (`data.String()`).
 - We add the resulting array to the new struct as `Protocols: protocols`.
-
-> Note: TODO: Add a link to examples of how to access and extract different types of values.
 
 Let's head back to resource file `internal/resources/aws/transfer_server.go` and
 make use of our new attribute:
@@ -1062,4 +1067,98 @@ None
 
 Mark all the checkboxes you've done and wait for somebody from the Infracost team to review your changes.
 
-Congratulations! You've added your first Infracost resource. Great job, thank you! ❤️ Every new resource makes Infracost more functional and helps its users track and reduce their cloud costs better.
+🎉  Congratulations! You've added your first Infracost resource. Great job, thank you! Every new resource makes Infracost more useful and gets users closer to loving their cloud bill! 💰📉
+
+<p align="center">
+  <img src="https://infracost-public-dumps.s3.amazonaws.com/images/congratulations.gif" alt="Congratulations!" />
+</p>
+
+---
+
+## Appendix
+
+### Resource edge cases
+
+The following edge cases can be handled in the resource files:
+
+- free resources: if there are certain conditions that can be checked inside a resource Go file, which means there are no cost components for the resource, return a `NoPrice: true` and `IsSkipped: true` response as shown below.
+
+  ```go
+	// Gateway endpoints don't have a cost associated with them
+	if vpcEndpointType == "Gateway" {
+		return &schema.Resource{
+			Name:      d.Address,
+			NoPrice:   true,
+			IsSkipped: true,
+		}
+	}
+  ```
+
+- unsupported resources: if there are certain conditions that can be checked inside a resource Go file, which means that the resource is not yet supported, log a warning to explain what is not supported and return a `nil` response as shown below.
+
+  ```go
+	if d.Get("placement_tenancy").String() == "host" {
+		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
+		return nil
+	}
+  ```
+
+- use `IgnoreIfMissingPrice: true` if you need to lookup a price in the Cloud Pricing API and NOT add it if there is no price. We use it for EBS Optimized instances since we don't know if they should have that cost component without looking it up.
+
+### References to other resources
+
+If you need access to other resources referenced by the resource you're adding, you can specify `ReferenceAttributes`. The following example uses this because the price for `aws_ebs_snapshot` depends on the size of the referenced volume. You should always check the array length returned by `d.References` to avoid panics. You can also do nested lookups, e.g. `ReferenceAttributes: []string{"alias.0.name"}` to lookup the name of the first alias.
+
+  ```go
+	func GetEBSSnapshotRegistryItem() *schema.RegistryItem {
+		return &schema.RegistryItem{
+			Name:                "aws_ebs_snapshot",
+			RFunc:               NewEBSSnapshot,
+			ReferenceAttributes: []string{"volume_id"}, // Load the reference
+		}
+	}
+
+	func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+		volumeRefs := d.References("volume_id") // Get the reference
+
+		// Always check the array length to avoid panics as `d.References` might not find the reference, e.g. it might point to another module via a data resource.
+		if len(volumeRefs) > 0 {
+			gbVal = decimal.NewFromFloat(volumeRefs[0].Get("size").Float())
+		}
+		// ...
+	}
+  ```
+
+### Google zone mappings 
+
+If the resource has a `zone` key, if they have a zone key, use this logic to get the region:
+
+  ```go
+	region := d.Get("region").String()
+	zone := d.Get("zone").String()
+	if zone != "" {
+		region = zoneToRegion(zone)
+	}
+  ```
+
+### Azure zone mappings
+
+Unless the resource has global or zone-based pricing, the first line of the resource function should be `region := lookupRegion(d, []string{})` where the second parameter is an optional list of parent resources where the region can be found. See the following examples of how this method is used in other Azure resources.
+
+  ```go
+	func GetAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
+		return &schema.RegistryItem{
+			Name:  "azurerm_app_service_certificate_binding",
+			RFunc: NewAzureRMAppServiceCertificateBinding,
+			ReferenceAttributes: []string{
+				"certificate_id",
+				"resource_group_name",
+			},
+		}
+	}
+
+	func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+		region := lookupRegion(d, []string{"certificate_id", "resource_group_name"})
+		...
+	}
+  ```
