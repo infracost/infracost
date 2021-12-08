@@ -448,7 +448,7 @@ func checkTerraformVersion(v string, fullV string) error {
 		return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
 	}
 
-	if strings.HasPrefix(fullV, "terragrunt") && semver.Compare(v, minTerragruntVer) < 0 {
+	if strings.HasPrefix(fullV, "terragrunt") && semver.Compare("v"+v, minTerragruntVer) < 0 {
 		return errors.Errorf("Terragrunt %s is not supported. Please use Terragrunt version >= %s.", v, minTerragruntVer)
 	}
 
