@@ -91,6 +91,7 @@ func DefaultConfig() *Config {
 		DefaultPricingAPIEndpoint: "https://pricing.api.infracost.io",
 		PricingAPIEndpoint:        "",
 		DashboardAPIEndpoint:      "https://dashboard.api.infracost.io",
+		EnableDashboard:           false,
 
 		Projects: []*Project{{}},
 
@@ -197,6 +198,10 @@ func (c *Config) ConfigureLogger() error {
 
 func (c *Config) IsLogging() bool {
 	return c.LogLevel != ""
+}
+
+func (c *Config) IsSelfHosted() bool {
+	return c.PricingAPIEndpoint != "" && c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
 }
 
 func IsTest() bool {
