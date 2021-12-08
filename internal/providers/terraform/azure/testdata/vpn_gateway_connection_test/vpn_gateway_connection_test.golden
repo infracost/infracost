@@ -1,13 +1,13 @@
 
- Name                                                   Monthly Qty  Unit   Monthly Cost 
-                                                                                         
- azurerm_vpn_gateway.vpn_gateway                                                         
- └─ S2S scale units                                             730  hours       $263.53 
-                                                                                         
- azurerm_vpn_gateway_connection.vpn_gateway_connection                                   
- └─ S2S Connections                                             730  hours        $36.50 
-                                                                                         
- OVERALL TOTAL                                                                   $300.03 
+ Name                                                   Monthly Qty  Unit         Monthly Cost 
+                                                                                               
+ azurerm_vpn_gateway.vpn_gateway                                                               
+ └─ S2S scale units (500 Mbps)                                    1  scale units       $263.53 
+                                                                                               
+ azurerm_vpn_gateway_connection.vpn_gateway_connection                                         
+ └─ S2S Connections                                             730  hours              $36.50 
+                                                                                               
+ OVERALL TOTAL                                                                         $300.03 
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 2 were estimated

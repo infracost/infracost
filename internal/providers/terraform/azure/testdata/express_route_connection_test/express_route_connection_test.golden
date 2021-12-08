@@ -1,13 +1,13 @@
 
- Name                                                 Monthly Qty  Unit   Monthly Cost 
-                                                                                       
- azurerm_express_route_connection.express_route_conn                                   
- └─ ER Connections                                            730  hours        $36.50 
-                                                                                       
- azurerm_express_route_gateway.express_route                                           
- └─ ER scale units                                            730  hours       $306.60 
-                                                                                       
- OVERALL TOTAL                                                                 $343.10 
+ Name                                                 Monthly Qty  Unit         Monthly Cost 
+                                                                                             
+ azurerm_express_route_connection.express_route_conn                                         
+ └─ ER Connections                                            730  hours              $36.50 
+                                                                                             
+ azurerm_express_route_gateway.express_route                                                 
+ └─ ER scale units (2 Gbps)                                     1  scale units       $306.60 
+                                                                                             
+ OVERALL TOTAL                                                                       $343.10 
 ──────────────────────────────────
 8 cloud resources were detected:
 ∙ 2 were estimated

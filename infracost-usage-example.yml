@@ -823,7 +823,7 @@ resource_usage:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
   azurerm_point_to_site_vpn_gateway.my_point_to_site_gateway:
-    monthly_p2s_connections_hrs: 2000 # Monthly number of connection hours to the point to site gateway
+    monthly_p2s_connections_hrs: 2000 # Monthly connection hours to the point to site gateway
 
   azurerm_postgresql_flexible_server.my_flexible_server:
     additional_backup_storage_gb: 5000 # Additional consumption of backup storage in GB.
