@@ -5,8 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/infracost/infracost/internal/testutil"
 	"github.com/stretchr/testify/require"
+
+	"github.com/infracost/infracost/internal/testutil"
 )
 
 func TestBreakdownHelp(t *testing.T) {
@@ -50,7 +51,7 @@ func TestBreakdownTerraformFieldsInvalid(t *testing.T) {
 }
 
 func TestBreakdownTerraformShowSkipped(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/azure_firewall_plan.json", "--show-skipped"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/express_route_gateway_plan.json", "--show-skipped"}, nil)
 }
 
 func TestBreakdownTerraformOutFileHTML(t *testing.T) {
