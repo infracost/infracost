@@ -49,6 +49,7 @@ type Config struct {
 	LogLevel        string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
 	NoColor         bool   `yaml:"no_color,omitempty" envconfig:"INFRACOST_NO_COLOR"`
 	SkipUpdateCheck bool   `yaml:"skip_update_check,omitempty" envconfig:"INFRACOST_SKIP_UPDATE_CHECK"`
+	Parallelism     *int   `envconfig:"INFRACOST_PARALLELISM"`
 
 	APIKey                    string `envconfig:"INFRACOST_API_KEY"`
 	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
