@@ -24,7 +24,6 @@ FLAGS
   -h, --help                          help for breakdown
       --no-cache                      Don't attempt to cache Terraform plans
       --out-file string               Save output to a file, helpful with format flag
-      --parallelism int               Limit the number of projects processed in parallel, defaults to 4×CPU count (max 16)
   -p, --path string                   Path to the Terraform directory or JSON/plan file
       --show-skipped                  Show unsupported resources
       --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)

@@ -43,15 +43,13 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().Bool("sync-usage-file", false, "Sync usage-file with missing resources, needs usage-file too (experimental)")
 
-	cmd.Flags().Int("parallelism", 0, "Limit the number of projects processed in parallel, defaults to 4×CPU count (max 16)")
-
 	_ = cmd.MarkFlagFilename("path", "json", "tf")
 	_ = cmd.MarkFlagFilename("config-file", "yml")
 	_ = cmd.MarkFlagFilename("usage-file", "yml")
 }
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
-	parallelism, err := getParallelism(cmd)
+	parallelism, err := getParallelism(cmd, runCtx)
 	if err != nil {
 		return err
 	}
@@ -66,7 +64,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	if parallelism > 1 && numJobs > 1 && !runCtx.Config.IsLogging() {
 		cmd.PrintErrln("Running multiple projects in parallel, so log-level=info is enabled by default.")
-		cmd.PrintErrln("Run with --parallelism=1 to disable parallelism to help debugging.")
+		cmd.PrintErrln("Run with INFRACOST_PARALLELISM=1 to disable parallelism to help debugging.")
 		cmd.PrintErrln()
 
 		runCtx.Config.LogLevel = "info"
@@ -399,33 +397,28 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx
 	return nil
 }
 
-func getParallelism(cmd *cobra.Command) (int, error) {
+func getParallelism(cmd *cobra.Command, runCtx *config.RunContext) (int, error) {
 	var parallelism int
 
-	if cmd.Flags().Changed("parallelism") {
-		parallelism, _ = cmd.Flags().GetInt("parallelism")
-
-		if parallelism < 0 {
-			return parallelism, fmt.Errorf("parallelism must be a positive value")
-		}
-
-		if parallelism > 16 {
-			return parallelism, fmt.Errorf("parallelism must be less than 16")
-		}
-	} else {
+	if runCtx.Config.Parallelism == nil {
 		parallelism = 4
 		numCPU := runtime.NumCPU()
 		if numCPU*4 > parallelism {
 			parallelism = numCPU * 4
 		}
-	}
+		if parallelism > 16 {
+			parallelism = 16
+		}
+	} else {
+		parallelism = *runCtx.Config.Parallelism
 
-	if parallelism < 1 {
-		parallelism = 1
-	}
+		if parallelism < 0 {
+			return parallelism, fmt.Errorf("parallelism must be a positive number")
+		}
 
-	if parallelism > 16 {
-		parallelism = 16
+		if parallelism > 16 {
+			return parallelism, fmt.Errorf("parallelism must be less than 16")
+		}
 	}
 
 	return parallelism, nil
