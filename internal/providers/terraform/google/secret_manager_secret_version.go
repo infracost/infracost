@@ -1,17 +1,18 @@
 package google
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
 )
 
 func getSecretManagerSecretVersionRegistryItem() *schema.RegistryItem {
-	rfunc := func(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	rfunc := func(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 		r := newSecretManagerSecretVersion(d)
 		r.PopulateUsage(u)
 
-		return r.BuildResource()
+		return r.BuildResource(ctx)
 	}
 
 	return &schema.RegistryItem{

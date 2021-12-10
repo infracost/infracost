@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
 )
@@ -16,7 +17,7 @@ func GetAzureRMCosmosdbCassandraTableRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMCosmosdbCassandraTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCosmosdbCassandraTable(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if len(d.References("cassandra_keyspace_id")) > 0 {
 		keyspace := d.References("cassandra_keyspace_id")[0]
 		if len(keyspace.References("account_name")) > 0 {

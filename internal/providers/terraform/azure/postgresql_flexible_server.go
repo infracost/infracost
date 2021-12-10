@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -19,7 +20,7 @@ func GetAzureRMPostgreSQLFlexibleServerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMPostrgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMPostrgreSQLFlexibleServer(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
 
 	region := d.Get("location").String()

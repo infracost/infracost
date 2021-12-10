@@ -6,6 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -16,7 +17,7 @@ func GetAzureRMVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMVirtualMachineScaleSet(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	costComponents := []*schema.CostComponent{}

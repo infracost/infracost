@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage/aws"
@@ -54,7 +55,7 @@ func (a *Instance) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *Instance) BuildResource() *schema.Resource {
+func (a *Instance) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	if strings.ToLower(a.Tenancy) == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances", a.Address)
 		return nil
@@ -80,11 +81,11 @@ func (a *Instance) BuildResource() *schema.Resource {
 	subResources := make([]*schema.Resource, 0)
 
 	if a.RootBlockDevice != nil {
-		subResources = append(subResources, a.RootBlockDevice.BuildResource())
+		subResources = append(subResources, a.RootBlockDevice.BuildResource(ctx))
 	}
 
 	for _, ebs := range a.EBSBlockDevices {
-		subResources = append(subResources, ebs.BuildResource())
+		subResources = append(subResources, ebs.BuildResource(ctx))
 	}
 
 	costComponents = append(costComponents, a.computeCostComponent())

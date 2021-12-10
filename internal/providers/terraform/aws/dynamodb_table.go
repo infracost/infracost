@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -16,7 +17,7 @@ func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDynamoDBTableResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDynamoDBTableResource(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	replicaRegions := []string{}
 	if d.Get("replica").Exists() {
 		for _, data := range d.Get("replica").Array() {
@@ -35,5 +36,5 @@ func NewDynamoDBTableResource(d *schema.ResourceData, u *schema.UsageData) *sche
 	}
 	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a.BuildResource(ctx)
 }

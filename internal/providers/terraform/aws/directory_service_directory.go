@@ -6,6 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -19,7 +20,7 @@ func getDirectoryServiceDirectory() *schema.RegistryItem {
 	}
 }
 
-func newDirectoryServiceDirectory(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newDirectoryServiceDirectory(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	regionName, ok := aws.RegionMapping[region]
 	if !ok {
@@ -36,7 +37,7 @@ func newDirectoryServiceDirectory(d *schema.ResourceData, u *schema.UsageData) *
 	}
 	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a.BuildResource(ctx)
 }
 
 // getType returns the terraform directory type with AD spaced, e.g:

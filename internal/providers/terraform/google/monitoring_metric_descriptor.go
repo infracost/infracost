@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/dustin/go-humanize"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
@@ -16,7 +17,7 @@ func GetMonitoringItem() *schema.RegistryItem {
 	}
 }
 
-func NewMonitoring(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMonitoring(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
 	var monitData *decimal.Decimal

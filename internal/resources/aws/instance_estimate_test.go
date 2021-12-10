@@ -57,7 +57,7 @@ func TestInstanceOS(t *testing.T) {
 		stubEC2DescribeImages(stub, ami, op)
 
 		args := resources.Instance{AMI: ami}
-		resource := args.BuildResource()
+		resource := args.BuildResource(ctx)
 		estimates := newEstimates(stub.ctx, t, resource)
 		assert.Equal(t, os, estimates.usage["operating_system"])
 	}

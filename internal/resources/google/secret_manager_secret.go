@@ -3,6 +3,7 @@ package google
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -43,7 +44,7 @@ func (r *SecretManagerSecret) PopulateUsage(u *schema.UsageData) {
 // BuildResource builds a schema.Resource from a valid SecretManagerSecret.
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
-func (r *SecretManagerSecret) BuildResource() *schema.Resource {
+func (r *SecretManagerSecret) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
 	costComponents = append(costComponents, r.activeSecretVersionsCostComponents()...)

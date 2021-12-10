@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -12,7 +13,7 @@ func GetELBRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewELB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewELB(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	productFamily := "Load Balancer"
 	costComponentName := "Classic load balancer"
 

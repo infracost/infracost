@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
@@ -18,7 +19,7 @@ func GetKMSCryptoKeyRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKMSCryptoKey(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	algorithm := "GOOGLE_SYMMETRIC_ENCRYPTION"

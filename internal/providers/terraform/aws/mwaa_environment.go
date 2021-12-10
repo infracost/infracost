@@ -1,10 +1,12 @@
 package aws
 
 import (
+	"strings"
+
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 func GetMWAAEnvironmentRegistryItem() *schema.RegistryItem {
@@ -14,7 +16,7 @@ func GetMWAAEnvironmentRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewMWAAEnvironment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMWAAEnvironment(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	size := "mw1.small"
@@ -33,5 +35,5 @@ func NewMWAAEnvironment(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	}
 	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a.BuildResource(ctx)
 }

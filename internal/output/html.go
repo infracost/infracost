@@ -7,15 +7,14 @@ import (
 	"html/template"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/shopspring/decimal"
 
 	"github.com/Masterminds/sprig"
-
-	log "github.com/sirupsen/logrus"
 )
 
-func ToHTML(out Root, opts Options) ([]byte, error) {
+func ToHTML(ctx *config.RunContext, out Root, opts Options) ([]byte, error) {
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -37,7 +36,7 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 				return true
 			}
 
-			log.Info(fmt.Sprintf("Hiding resource with no usage: %s", resourceName))
+			ctx.Logger.Info().Str("resource", resourceName).Msg("Hiding resource with no usage")
 			return false
 		},
 		"filterZeroValComponents": filterZeroValComponents,

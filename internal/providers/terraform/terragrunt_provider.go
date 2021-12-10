@@ -67,7 +67,7 @@ func (p *TerragruntProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	// no op
 }
 
-func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *TerragruntProvider) LoadResources(ctx *config.ProjectContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	// We want to run Terragrunt commands from the config dirs
 	// Terragrunt internally runs Terraform in the working dirs, so we need to be aware of these
 	// so we can handle reading and cleaning up the generated plan files.
@@ -91,7 +91,7 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	projects := make([]*schema.Project, 0, len(projectDirs))
 
 	for i, projectDir := range projectDirs {
-		metadata := config.DetectProjectMetadata(projectDir.ConfigDir)
+		metadata := schema.DetectProjectMetadata(projectDir.ConfigDir)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
 		name := schema.GenerateProjectName(metadata, p.ctx.Config.EnableDashboard)
@@ -99,7 +99,7 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 		project := schema.NewProject(name, metadata)
 
 		parser := NewParser(p.ctx)
-		pastResources, resources, err := parser.parseJSON(outs[i], usage)
+		pastResources, resources, err := parser.parseJSON(ctx, outs[i], usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
 		}

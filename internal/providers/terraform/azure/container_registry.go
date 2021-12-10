@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -16,7 +17,7 @@ func GetAzureRMContainerRegistryRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMContainerRegistry(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	var nambersOflocations int

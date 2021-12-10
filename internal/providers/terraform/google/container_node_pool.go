@@ -1,6 +1,7 @@
 package google
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -22,7 +23,7 @@ func GetContainerNodePoolRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewContainerNodePool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewContainerNodePool(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var cluster *schema.ResourceData
 	if len(d.References("cluster")) > 0 {
 		cluster = d.References("cluster")[0]

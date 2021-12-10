@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -13,7 +14,7 @@ func GetRoute53ZoneRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRoute53Zone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRoute53Zone(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{

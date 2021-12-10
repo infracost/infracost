@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -14,7 +15,7 @@ func GetEC2TransitGatewayPeeringAttachmentRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewEC2TransitGatewayPeeringAttachment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEC2TransitGatewayPeeringAttachment(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	transitGatewayRefs := d.References("transit_gateway_id")
 	if len(transitGatewayRefs) > 0 {

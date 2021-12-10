@@ -132,7 +132,7 @@ func TestS3Bucket(t *testing.T) {
 	args := resources.S3Bucket{
 		Name: "test-bucket",
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 
 	assert.Equal(t, map[string]interface{}{
@@ -186,7 +186,7 @@ func TestS3BucketNoFilter(t *testing.T) {
 	args := resources.S3Bucket{
 		Name: "test-bucket",
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 
 	assert.Equal(t, map[string]interface{}{
@@ -241,7 +241,7 @@ func TestS3BucketNoStandard(t *testing.T) {
 	args := resources.S3Bucket{
 		Name: "test-bucket",
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 
 	assert.Equal(t, map[string]interface{}{

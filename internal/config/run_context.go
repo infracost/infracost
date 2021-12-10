@@ -8,10 +8,12 @@ import (
 	"time"
 
 	"github.com/infracost/infracost/internal/version"
+	"github.com/rs/zerolog"
 )
 
 type RunContext struct {
 	ctx         context.Context
+	Logger      zerolog.Logger
 	Config      *Config
 	State       *State
 	StartTime   int64
@@ -29,6 +31,7 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 
 	c := &RunContext{
 		ctx:         rootCtx,
+		Logger:      configureLogger(),
 		Config:      cfg,
 		State:       state,
 		contextVals: map[string]interface{}{},
@@ -42,6 +45,8 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 
 func EmptyRunContext() *RunContext {
 	return &RunContext{
+		ctx: 			 context.Background(),
+		Logger: configureLogger(),
 		Config:      &Config{},
 		State:       &State{},
 		contextVals: map[string]interface{}{},
@@ -93,6 +98,11 @@ func (c *RunContext) loadInitialContextValues() {
 	c.SetContextValue("ciScript", ciScript())
 	c.SetContextValue("ciPostCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
 	c.SetContextValue("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
+}
+
+func configureLogger() zerolog.Logger {
+	output := zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}
+	return zerolog.New(output).With().Timestamp().Logger()
 }
 
 func baseVersion(v string) string {

@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
@@ -14,7 +15,7 @@ func GetLambdaFunctionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewLambdaFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLambdaFunction(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	name := d.Get("function_name").String()
 	memorySize := int64(128)
@@ -30,5 +31,5 @@ func NewLambdaFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 	}
 	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a.BuildResource(ctx)
 }

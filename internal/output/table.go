@@ -7,12 +7,11 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
-
-	log "github.com/sirupsen/logrus"
 )
 
-func ToTable(out Root, opts Options) ([]byte, error) {
+func ToTable(ctx *config.RunContext, out Root, opts Options) ([]byte, error) {
 	var tableLen int
 
 	s := ""
@@ -35,7 +34,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 			project.Label(opts.DashboardEnabled),
 		)
 
-		tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
+		tableOut := tableForBreakdown(ctx, out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
 
 		// Get the last table length so we can align the overall total with it
 		if i == len(out.Projects)-1 {
@@ -72,7 +71,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 	return []byte(s), nil
 }
 
-func tableForBreakdown(currency string, breakdown Breakdown, fields []string, includeTotal bool) string {
+func tableForBreakdown(ctx *config.RunContext, currency string, breakdown Breakdown, fields []string, includeTotal bool) string {
 	t := table.NewWriter()
 	t.Style().Options.DrawBorder = false
 	t.Style().Options.SeparateColumns = false
@@ -147,17 +146,17 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 	t.AppendHeader(headers)
 
 	for _, r := range breakdown.Resources {
-		filteredComponents := filterZeroValComponents(r.CostComponents, r.Name)
-		filteredSubResources := filterZeroValResources(r.SubResources, r.Name)
+		filteredComponents := filterZeroValComponents(ctx, r.CostComponents, r.Name)
+		filteredSubResources := filterZeroValResources(ctx, r.SubResources, r.Name)
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			log.Info(fmt.Sprintf("Hiding resource with no usage: %s", r.Name))
+			ctx.Logger.Info().Str("resource", r.Name).Msg("Hiding resource with no usage")
 			continue
 		}
 
 		t.AppendRow(table.Row{ui.BoldString(r.Name)})
 
 		buildCostComponentRows(t, currency, filteredComponents, "", len(r.SubResources) > 0, fields)
-		buildSubResourceRows(t, currency, filteredSubResources, "", fields)
+		buildSubResourceRows(ctx, t, currency, filteredSubResources, "", fields)
 
 		t.AppendRow(table.Row{""})
 	}
@@ -176,10 +175,10 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 	return t.Render()
 }
 
-func buildSubResourceRows(t table.Writer, currency string, subresources []Resource, prefix string, fields []string) {
+func buildSubResourceRows(ctx *config.RunContext, t table.Writer, currency string, subresources []Resource, prefix string, fields []string) {
 	for i, r := range subresources {
-		filteredComponents := filterZeroValComponents(r.CostComponents, r.Name)
-		filteredSubResources := filterZeroValResources(r.SubResources, r.Name)
+		filteredComponents := filterZeroValComponents(ctx, r.CostComponents, r.Name)
+		filteredSubResources := filterZeroValResources(ctx, r.SubResources, r.Name)
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
 			continue
 		}
@@ -194,7 +193,7 @@ func buildSubResourceRows(t table.Writer, currency string, subresources []Resour
 		t.AppendRow(table.Row{fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), r.Name)})
 
 		buildCostComponentRows(t, currency, filteredComponents, nextPrefix, len(r.SubResources) > 0, fields)
-		buildSubResourceRows(t, currency, filteredSubResources, nextPrefix, fields)
+		buildSubResourceRows(ctx, t, currency, filteredSubResources, nextPrefix, fields)
 	}
 }
 
@@ -245,11 +244,11 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 	}
 }
 
-func filterZeroValComponents(costComponents []CostComponent, resourceName string) []CostComponent {
+func filterZeroValComponents(ctx *config.RunContext, costComponents []CostComponent, resourceName string) []CostComponent {
 	var filteredComponents []CostComponent
 	for _, c := range costComponents {
 		if c.MonthlyQuantity != nil && c.MonthlyQuantity.IsZero() {
-			log.Info(fmt.Sprintf("Hiding cost with no usage: %s '%s'", resourceName, c.Name))
+			ctx.Logger.Info().Str("resource", resourceName).Str("cost_component", c.Name).Msg("Hiding cost with no usage")
 			continue
 		}
 
@@ -258,13 +257,13 @@ func filterZeroValComponents(costComponents []CostComponent, resourceName string
 	return filteredComponents
 }
 
-func filterZeroValResources(resources []Resource, resourceName string) []Resource {
+func filterZeroValResources(ctx *config.RunContext, resources []Resource, resourceName string) []Resource {
 	var filteredResources []Resource
 	for _, r := range resources {
-		filteredComponents := filterZeroValComponents(r.CostComponents, fmt.Sprintf("%s.%s", resourceName, r.Name))
-		filteredSubResources := filterZeroValResources(r.SubResources, fmt.Sprintf("%s.%s", resourceName, r.Name))
+		filteredComponents := filterZeroValComponents(ctx, r.CostComponents, fmt.Sprintf("%s.%s", resourceName, r.Name))
+		filteredSubResources := filterZeroValResources(ctx, r.SubResources, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			log.Info(fmt.Sprintf("Hiding resource with no usage: %s.%s", resourceName, r.Name))
+			ctx.Logger.Info().Str("resource", r.Name).Msg("Hiding resource with no usage")
 			continue
 		}
 

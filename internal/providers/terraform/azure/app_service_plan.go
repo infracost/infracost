@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -15,7 +16,7 @@ func GetAzureRMAppServicePlanRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAppServicePlan(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	sku := d.Get("sku.0.size").String()

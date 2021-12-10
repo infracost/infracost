@@ -3,6 +3,7 @@ package google
 import (
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -23,7 +24,7 @@ func GetComputeGlobalAddressRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeAddress(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeAddress(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	addressType := d.Get("address_type").String()

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -34,7 +35,7 @@ func (a *EBSVolume) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *EBSVolume) BuildResource() *schema.Resource {
+func (a *EBSVolume) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	if a.Type == "" {
 		a.Type = "gp2"
 	}

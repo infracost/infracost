@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -22,7 +23,7 @@ func GetAzureRMMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMMSSQLDatabase(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"server_id"})
 
 	var costComponents []*schema.CostComponent

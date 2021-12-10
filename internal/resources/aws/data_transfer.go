@@ -6,6 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -42,7 +43,7 @@ func (r *DataTransfer) PopulateUsage(u *schema.UsageData) {
 // BuildResource builds a schema.Resource from a valid DataTransfer.
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
-func (r *DataTransfer) BuildResource() *schema.Resource {
+func (r *DataTransfer) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	_, ok := RegionMapping[r.Region]
 
 	if !ok {

@@ -3,6 +3,7 @@ package aws
 import (
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -14,7 +15,7 @@ func GetCodebuildProjectRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCodebuildProject(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCodebuildProject(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	computeType := d.Get("environment.0.compute_type").String()

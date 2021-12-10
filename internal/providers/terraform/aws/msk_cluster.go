@@ -3,6 +3,7 @@ package aws
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -14,7 +15,7 @@ func GetMSKClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewMskCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMskCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	brokerNodes := decimal.NewFromInt(d.Get("number_of_broker_nodes").Int())

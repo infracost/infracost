@@ -3,6 +3,7 @@ package azure
 import (
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -18,7 +19,7 @@ func GetAzureRMDNSZoneRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMDNSZone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMDNSZone(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {

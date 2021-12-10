@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -26,7 +27,7 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAutoscalingGroup(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	a := &aws.AutoscalingGroup{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
@@ -76,7 +77,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 
 	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a.BuildResource(ctx)
 }
 
 func newLaunchConfiguration(d *schema.ResourceData, u *schema.UsageData, region string, instanceCount int64) *aws.LaunchConfiguration {

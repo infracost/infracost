@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -12,7 +13,7 @@ func GetNewKMSKeyRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewKMSKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKMSKey(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	region := d.Get("region").String()
 	spec := d.Get("customer_master_key_spec").String()

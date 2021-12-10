@@ -1,4 +1,4 @@
-package config
+package schema
 
 import (
 	"os"
@@ -7,11 +7,20 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/config"
 	log "github.com/sirupsen/logrus"
 )
 
-func DetectProjectMetadata(path string) *schema.ProjectMetadata {
+type ProjectMetadata struct {
+	Path               string `json:"path"`
+	Type               string `json:"type"`
+	VCSRepoURL         string `json:"vcsRepoUrl,omitempty"`
+	VCSSubPath         string `json:"vcsSubPath,omitempty"`
+	VCSPullRequestURL  string `json:"vcsPullRequestUrl,omitempty"`
+	TerraformWorkspace string `json:"terraformWorkspace,omitempty"`
+}
+
+func DetectProjectMetadata(path string) *ProjectMetadata {
 	vcsRepoURL := os.Getenv("INFRACOST_VCS_REPOSITORY_URL")
 	vcsSubPath := os.Getenv("INFRACOST_VCS_SUB_PATH")
 	vcsPullRequestURL := os.Getenv("INFRACOST_VCS_PULL_REQUEST_URL")
@@ -27,7 +36,7 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 
 	vcsRepoURL = stripVCSRepoPassword(vcsRepoURL)
 
-	return &schema.ProjectMetadata{
+	return &ProjectMetadata{
 		Path:               path,
 		VCSRepoURL:         vcsRepoURL,
 		VCSSubPath:         vcsSubPath,
@@ -40,7 +49,7 @@ func gitRepo(path string) string {
 	log.Debugf("Checking if %s is a git repo", path)
 	cmd := exec.Command("git", "ls-remote", "--get-url")
 
-	if isDir(path) {
+	if config.IsDir(path) {
 		cmd.Dir = path
 	} else {
 		cmd.Dir = filepath.Dir(path)
@@ -79,7 +88,7 @@ func gitSubPath(path string) string {
 func gitToplevel(path string) (string, error) {
 	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
 
-	if isDir(path) {
+	if config.IsDir(path) {
 		cmd.Dir = path
 	} else {
 		cmd.Dir = filepath.Dir(path)

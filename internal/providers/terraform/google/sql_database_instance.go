@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -27,7 +28,7 @@ func GetSQLInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSQLInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSQLInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var resource *schema.Resource
 
 	replica := false

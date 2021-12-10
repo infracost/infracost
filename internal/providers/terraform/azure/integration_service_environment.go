@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -16,7 +17,7 @@ func GetAzureRMAppIntegrationServiceEnvironmentRegistryItem() *schema.RegistryIt
 	}
 }
 
-func NewAzureRMIntegrationServiceEnvironment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMIntegrationServiceEnvironment(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	productName := "Logic Apps Integration Service Environment"

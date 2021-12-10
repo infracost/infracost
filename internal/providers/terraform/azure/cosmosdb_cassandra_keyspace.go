@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -29,7 +30,7 @@ const (
 	Serverless
 )
 
-func NewAzureRMCosmosdb(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCosmosdb(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if len(d.References("account_name")) > 0 {
 		account := d.References("account_name")[0]
 		return &schema.Resource{

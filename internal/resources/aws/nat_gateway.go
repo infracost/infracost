@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -21,7 +22,7 @@ func (a *NATGateway) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *NATGateway) BuildResource() *schema.Resource {
+func (a *NATGateway) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	var gbDataProcessed *decimal.Decimal
 	if a.MonthlyDataProcessedGB != nil {
 		gbDataProcessed = decimalPtr(decimal.NewFromFloat(*a.MonthlyDataProcessedGB))

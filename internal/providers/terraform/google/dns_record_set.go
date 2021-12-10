@@ -1,6 +1,7 @@
 package google
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -12,7 +13,7 @@ func GetDNSRecordSetRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDNSRecordSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDNSRecordSet(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyQueries *decimal.Decimal
 
 	if u != nil && u.Get("monthly_queries").Exists() {

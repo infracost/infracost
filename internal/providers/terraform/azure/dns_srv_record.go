@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -14,7 +15,7 @@ func GetAzureRMDNSsrvRecordRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMDNSsrvRecord(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMDNSsrvRecord(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: dnsQueriesCostComponent(d, u),

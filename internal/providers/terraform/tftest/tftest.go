@@ -238,7 +238,7 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 		Fields:      runCtx.Config.Fields,
 	}
 
-	actual, err := output.ToTable(r, opts)
+	actual, err := output.ToTable(runCtx, r, opts)
 	require.NoError(t, err)
 
 	// strip the first line of output since it contains the temporary project path
@@ -260,14 +260,14 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 
-func RunCostCalculations(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
-	projects, err := loadResources(t, runCtx, tfProject, usage)
+func RunCostCalculations(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) ([]*schema.Project, error) {	
+	projectCtx, projects, err := loadResources(t, runCtx, tfProject, usage)
 	if err != nil {
 		return projects, err
 	}
 
 	for _, project := range projects {
-		err = prices.PopulatePrices(runCtx.Config, project)
+		err = prices.PopulatePrices(projectCtx, project)
 		if err != nil {
 			return projects, err
 		}
@@ -302,7 +302,7 @@ func GoldenFileUsageSyncTest(t *testing.T, testName string) {
 
 func RunSyncUsage(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usageFilePath string) ([]byte, error) {
 	tmpDir := t.TempDir()
-	projects, err := loadResources(t, runCtx, tfProject, map[string]*schema.UsageData{})
+	_, projects, err := loadResources(t, runCtx, tfProject, map[string]*schema.UsageData{})
 	if err != nil {
 		return nil, err
 	}
@@ -330,13 +330,13 @@ func CreateTerraformProject(tmpDir string, tfProject TerraformProject) (string, 
 	return writeToTmpDir(tmpDir, tfProject)
 }
 
-func loadResources(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func loadResources(t *testing.T, runCtx *config.RunContext, tfProject TerraformProject, usage map[string]*schema.UsageData) (*config.ProjectContext, []*schema.Project, error) {
 	tmpDir := t.TempDir()
 
 	_, err := os.ReadDir(initCache)
 	if err == nil {
 		if err := copyInitCacheToPath(initCache, tmpDir); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	} else {
 		t.Log(fmt.Sprintf("Couldn't copy terraform init cache from %s", initCache))
@@ -344,17 +344,21 @@ func loadResources(t *testing.T, runCtx *config.RunContext, tfProject TerraformP
 
 	tfdir, err := CreateTerraformProject(tmpDir, tfProject)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	provider := terraform.NewDirProvider(config.NewProjectContext(
+	projectCtx := config.NewProjectContext(
 		runCtx,
 		&config.Project{
 			Path: tfdir,
 		},
-	))
+	)
+	
+	provider := terraform.NewDirProvider(projectCtx)
 
-	return provider.LoadResources(usage)
+	projects, err := provider.LoadResources(projectCtx, usage)
+	
+	return projectCtx, projects, err
 }
 
 func copyInitCacheToPath(source, destination string) error {

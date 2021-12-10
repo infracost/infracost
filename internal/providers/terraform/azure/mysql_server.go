@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
 
@@ -17,7 +18,7 @@ func GetAzureRMMySQLServerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMMySQLServer(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	serviceName := "Azure Database for MySQL"

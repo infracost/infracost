@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 
@@ -20,7 +21,7 @@ func GetAzureRMAppIsolatedServicePlanRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAppIsolatedServicePlan(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAppIsolatedServicePlan(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	tier := "I1"

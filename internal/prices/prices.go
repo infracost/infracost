@@ -8,16 +8,15 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
-func PopulatePrices(cfg *config.Config, project *schema.Project) error {
+func PopulatePrices(ctx *config.ProjectContext, project *schema.Project) error {
 	resources := project.AllResources()
 
-	c := apiclient.NewPricingAPIClient(cfg)
+	c := apiclient.NewPricingAPIClient(ctx.Config)
 
-	err := GetPricesConcurrent(c, resources)
+	err := GetPricesConcurrent(ctx, c, resources)
 	if err != nil {
 		return err
 	}
@@ -27,7 +26,7 @@ func PopulatePrices(cfg *config.Config, project *schema.Project) error {
 // GetPricesConcurrent gets the prices of all resources concurrently.
 // Concurrency level is calculated using the following formula:
 // max(min(4, numCPU * 4), 16)
-func GetPricesConcurrent(c *apiclient.PricingAPIClient, resources []*schema.Resource) error {
+func GetPricesConcurrent(ctx *config.ProjectContext, c *apiclient.PricingAPIClient, resources []*schema.Resource) error {
 	// Set the number of workers
 	numWorkers := 4
 	numCPU := runtime.NumCPU()
@@ -45,7 +44,7 @@ func GetPricesConcurrent(c *apiclient.PricingAPIClient, resources []*schema.Reso
 	for i := 0; i < numWorkers; i++ {
 		go func(jobs <-chan *schema.Resource, resultErrors chan<- error) {
 			for r := range jobs {
-				err := GetPrices(c, r)
+				err := GetPrices(ctx, c, r)
 				resultErrors <- err
 			}
 		}(jobs, resultErrors)
@@ -66,7 +65,7 @@ func GetPricesConcurrent(c *apiclient.PricingAPIClient, resources []*schema.Reso
 	return nil
 }
 
-func GetPrices(c *apiclient.PricingAPIClient, r *schema.Resource) error {
+func GetPrices(ctx *config.ProjectContext, c *apiclient.PricingAPIClient, r *schema.Resource) error {
 	if r.IsSkipped {
 		return nil
 	}
@@ -77,51 +76,53 @@ func GetPrices(c *apiclient.PricingAPIClient, r *schema.Resource) error {
 	}
 
 	for _, r := range results {
-		setCostComponentPrice(c.Currency, r.Resource, r.CostComponent, r.Result)
+		setCostComponentPrice(ctx, c.Currency, r.Resource, r.CostComponent, r.Result)
 	}
 
 	return nil
 }
 
-func setCostComponentPrice(currency string, r *schema.Resource, c *schema.CostComponent, res gjson.Result) {
+func setCostComponentPrice(ctx *config.ProjectContext, currency string, r *schema.Resource, c *schema.CostComponent, res gjson.Result) {
 	var p decimal.Decimal
+	
+	logger := ctx.Logger.With().Str("resource", r.Name).Str("cost_component", c.Name).Logger()
 
 	products := res.Get("data.products").Array()
 	if len(products) == 0 {
 		if c.IgnoreIfMissingPrice {
-			log.Debugf("No products found for %s %s, ignoring since IgnoreIfMissingPrice is set.", r.Name, c.Name)
+			logger.Debug().Msg("No products found, ignoring since IgnoreIfMissingPrice is set.")
 			r.RemoveCostComponent(c)
 			return
 		}
 
-		log.Warnf("No products found for %s %s, using 0.00", r.Name, c.Name)
+		logger.Warn().Msg("No products found, using 0.00")
 		c.SetPrice(decimal.Zero)
 		return
 	}
 	if len(products) > 1 {
-		log.Warnf("Multiple products found for %s %s, using the first product", r.Name, c.Name)
+		logger.Warn().Msg("Multiple products found, using first product")
 	}
 
 	prices := products[0].Get("prices").Array()
 	if len(prices) == 0 {
 		if c.IgnoreIfMissingPrice {
-			log.Debugf("No prices found for %s %s, ignoring since IgnoreIfMissingPrice is set.", r.Name, c.Name)
+			logger.Debug().Msg("No prices found, ignoring since IgnoreIfMissingPrice is set.")
 			r.RemoveCostComponent(c)
 			return
 		}
 
-		log.Warnf("No prices found for %s %s, using 0.00", r.Name, c.Name)
+		logger.Warn().Msg("No prices found, using 0.00")
 		c.SetPrice(decimal.Zero)
 		return
 	}
 	if len(prices) > 1 {
-		log.Warnf("Multiple prices found for %s %s, using the first price", r.Name, c.Name)
+		logger.Warn().Msg("Multiple prices found, using the first price")
 	}
 
 	var err error
 	p, err = decimal.NewFromString(prices[0].Get(currency).String())
 	if err != nil {
-		log.Warnf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, prices[0].Get(currency).String(), err.Error())
+		logger.Warn().Err(err).Msgf("Error converting price from %v to %v (using 0.00)", prices[0].Get(currency).String(), currency)
 		c.SetPrice(decimal.Zero)
 		return
 	}

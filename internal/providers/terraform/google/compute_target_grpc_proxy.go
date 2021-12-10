@@ -1,6 +1,7 @@
 package google
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -56,7 +57,7 @@ func GetComputeRegionTargetHTTPSProxyRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeTargetProxy(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeTargetProxy(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyProxyInstances, monthlyDataProcessedGb *decimal.Decimal
 	region := d.Get("region").String()
 	costComponents := make([]*schema.CostComponent, 0)

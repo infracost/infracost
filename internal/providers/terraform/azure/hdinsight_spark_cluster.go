@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 )
@@ -12,7 +13,7 @@ func GetAzureRMHDInsightSparkClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMHDInsightSparkCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMHDInsightSparkCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	costComponents := []*schema.CostComponent{}

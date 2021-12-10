@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -12,7 +13,7 @@ func GetCloudwatchEventBusItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudwatchEventBus(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var monthlyCustomEvents *decimal.Decimal

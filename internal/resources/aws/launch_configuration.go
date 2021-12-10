@@ -3,6 +3,7 @@ package aws
 import (
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -43,7 +44,7 @@ func (a *LaunchConfiguration) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *LaunchConfiguration) BuildResource() *schema.Resource {
+func (a *LaunchConfiguration) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	if strings.ToLower(a.Tenancy) == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", a.Address)
 		return nil
@@ -72,7 +73,7 @@ func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 		MonthlyCPUCreditHours:           a.MonthlyCPUCreditHours,
 		VCPUCount:                       a.VCPUCount,
 	}
-	instanceResource := instance.BuildResource()
+	instanceResource := instance.BuildResource(ctx)
 
 	r := &schema.Resource{
 		Name:           a.Address,

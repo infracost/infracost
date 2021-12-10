@@ -3,6 +3,7 @@ package azure
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -18,7 +19,7 @@ func GetAzureRMAutomationJobScheduleRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAutomationJobSchedule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAutomationJobSchedule(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyJobRunMins *decimal.Decimal
 	location := lookupRegion(d, []string{"resource_group_name"})
 

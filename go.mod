@@ -100,4 +100,11 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
+require (
+	github.com/rs/zerolog v1.26.0 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
+	go.uber.org/multierr v1.7.0 // indirect
+	go.uber.org/zap v1.19.1 // indirect
+)
+
 replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -72,7 +73,7 @@ func (r *StorageAccount) PopulateUsage(u *schema.UsageData) {
 
 // BuildResource builds a schema.Resource from valid StorageAccount data.
 // This method is called after the resource is initialised by an IaC provider.
-func (r *StorageAccount) BuildResource() *schema.Resource {
+func (r *StorageAccount) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	if !r.isBlockBlobStorage() && !r.isFileStorage() && !r.isStorageV2() {
 		log.Warnf("Skipping resource %s. Infracost only supports StorageV2, BlockBlobStorage and FileStorage account kinds", r.Address)
 		return nil

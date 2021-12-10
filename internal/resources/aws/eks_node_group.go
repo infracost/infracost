@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage/aws"
@@ -68,7 +69,7 @@ func (a *EKSNodeGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.UsageI
 	return usageSchema
 }
 
-func (a *EKSNodeGroup) BuildResource() *schema.Resource {
+func (a *EKSNodeGroup) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	r := &schema.Resource{
 		Name:        a.Address,
 		UsageSchema: a.getUsageSchemaWithDefaultInstanceCount(),
@@ -80,7 +81,7 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 	// If it has a reference to a Launch Template we create generic resources for that and add add it as a subresource
 	// of the EKS Node Group resource.
 	if a.LaunchTemplate != nil {
-		lt := a.LaunchTemplate.BuildResource()
+		lt := a.LaunchTemplate.BuildResource(ctx)
 		// If the Launch Template returns nil it is not supported so the Autoscaling Group should also return nil
 		if lt == nil {
 			return nil
@@ -108,7 +109,7 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 			Size:    intPtr(a.DiskSize),
 		}
 
-		instanceResource := instance.BuildResource()
+		instanceResource := instance.BuildResource(ctx)
 		r.CostComponents = append(r.CostComponents, instanceResource.CostComponents...)
 
 		// For EKS Node Groups we show the root block device cost component into the top level of the resource

@@ -1,8 +1,10 @@
 package aws
 
 import (
-	"github.com/infracost/infracost/internal/schema"
 	"strings"
+
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
 )
@@ -18,7 +20,7 @@ func GetEC2TransitGatewayVpcAttachmentRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewEC2TransitGatewayVpcAttachment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEC2TransitGatewayVpcAttachment(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	// Try to get the region from the VPC

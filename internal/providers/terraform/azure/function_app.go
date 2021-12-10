@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -20,7 +21,7 @@ func GetAzureRMAppFunctionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAppFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAppFunction(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	var memorySize, executionTime, executions, gbSeconds *decimal.Decimal

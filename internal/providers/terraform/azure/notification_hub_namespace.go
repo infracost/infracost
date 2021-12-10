@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
@@ -17,7 +18,7 @@ func GetAzureRMNotificationHubNamespaceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMNotificationHubNamespace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMNotificationHubNamespace(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	var monthlyAdditionalPushes *decimal.Decimal

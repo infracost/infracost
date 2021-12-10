@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage/aws"
@@ -46,7 +47,7 @@ func (a *DynamoDBTable) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *DynamoDBTable) BuildResource() *schema.Resource {
+func (a *DynamoDBTable) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)

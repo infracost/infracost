@@ -27,7 +27,7 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 		return cloudformation.NewTemplateProvider(ctx), nil
 	}
 
-	if isTerraformPlanJSON(path) {
+	if isTerraformPlanJSON(ctx, path) {
 		return terraform.NewPlanJSONProvider(ctx), nil
 	}
 
@@ -54,7 +54,7 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 	return nil, fmt.Errorf("Could not detect path type for %s", path)
 }
 
-func isTerraformPlanJSON(path string) bool {
+func isTerraformPlanJSON(ctx *config.ProjectContext, path string) bool {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return false
@@ -67,7 +67,7 @@ func isTerraformPlanJSON(path string) bool {
 
 	b, hasWrapper := terraform.StripSetupTerraformWrapper(b)
 	if hasWrapper {
-		log.Infof("Stripped wrapper output from %s (to make it a valid JSON file) since setup-terraform GitHub Action was used without terraform_wrapper: false", path)
+		ctx.Logger.Info().Msgf("Stripped wrapper output from %s (to make it a valid JSON file) since setup-terraform GitHub Action was used without terraform_wrapper: false", path)
 	}
 
 	err = json.Unmarshal(b, &jsonFormat)

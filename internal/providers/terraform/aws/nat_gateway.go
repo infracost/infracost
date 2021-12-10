@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -12,7 +13,7 @@ func GetNATGatewayRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewNATGateway(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	a := &aws.NATGateway{
@@ -21,5 +22,5 @@ func NewNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	}
 	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a.BuildResource(ctx)
 }

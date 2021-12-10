@@ -1,8 +1,10 @@
 package aws
 
 import (
-	"github.com/infracost/infracost/internal/schema"
 	"strings"
+
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
 )
@@ -20,7 +22,7 @@ func GetALBRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewLB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLB(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var maxLCU *decimal.Decimal
 
 	var newConnectionsLCU *decimal.Decimal

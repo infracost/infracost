@@ -9,6 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -22,7 +23,7 @@ func GetDXConnectionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDXConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDXConnection(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	virtualInterfaceType := "private"

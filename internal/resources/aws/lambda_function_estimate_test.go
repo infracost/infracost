@@ -47,7 +47,7 @@ func TestLambda(t *testing.T) {
 	`)
 
 	args := &resources.LambdaFunction{}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 	assert.Equal(t, int64(1234), estimates.usage["monthly_requests"])
 	assert.Equal(t, int64(5679), estimates.usage["request_duration_ms"])

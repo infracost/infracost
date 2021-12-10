@@ -56,7 +56,7 @@ func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
 		ctx:  ctx,
 		Path: ctx.ProjectConfig.Path,
 		spinnerOpts: ui.SpinnerOptions{
-			EnableLogging: ctx.Config.IsLogging(),
+			Logger: ctx.Logger,
 			NoColor:       ctx.Config.NoColor,
 			Indent:        "  ",
 		},
@@ -122,7 +122,7 @@ func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.TerraformWorkspace = terraformWorkspace
 }
 
-func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *DirProvider) LoadResources(ctx *config.ProjectContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	projects := make([]*schema.Project, 0)
 	var out []byte
 	var err error
@@ -145,7 +145,7 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 	}
 
 	for _, j := range jsons {
-		metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+		metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
 		name := schema.GenerateProjectName(metadata, p.ctx.Config.EnableDashboard)
@@ -153,7 +153,7 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 		project := schema.NewProject(name, metadata)
 
 		parser := NewParser(p.ctx)
-		pastResources, resources, err := parser.parseJSON(j, usage)
+		pastResources, resources, err := parser.parseJSON(ctx, j, usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
 		}
@@ -297,7 +297,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 
 		// If the plan returns this error then Terraform is configured with remote execution mode
 		if strings.HasPrefix(extractedErr, "Error: Saving a generated plan is currently not supported") {
-			log.Info("Continuing with Terraform Remote Execution Mode")
+			p.ctx.Logger.Info().Msg("Continuing with Terraform Remote Execution Mode")
 			p.IsTerraformRemoteExecutionModeEnabled = true
 			p.ctx.SetContextValue("terraformRemoteExecutionModeEnabled", true)
 			planJSON, err = p.runRemotePlan(opts, args)

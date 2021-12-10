@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 
@@ -14,7 +15,7 @@ func GetACMPCACertificateAuthorityRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewACMPCACertificateAuthority(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewACMPCACertificateAuthority(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	costComponents := []*schema.CostComponent{

@@ -3,6 +3,7 @@ package google
 import (
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -15,7 +16,7 @@ func GetComputeDiskRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeDisk(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeDisk(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	zone := d.Get("zone").String()

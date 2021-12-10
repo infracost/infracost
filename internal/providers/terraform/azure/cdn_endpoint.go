@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
@@ -21,7 +22,7 @@ func GetAzureRMCDNEndpointRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCDNEndpoint(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := regionToZone(lookupRegion(d, []string{}))
 
 	var costComponents []*schema.CostComponent

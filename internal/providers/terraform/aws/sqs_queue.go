@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -13,7 +14,7 @@ func GetSQSQueueRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSqsQueue(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSqsQueue(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var queueType string

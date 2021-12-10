@@ -2,10 +2,12 @@ package aws
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
-	"strings"
 )
 
 func GetAPIGatewayv2ApiRegistryItem() *schema.RegistryItem {
@@ -15,7 +17,7 @@ func GetAPIGatewayv2ApiRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAPIGatewayv2Api(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAPIGatewayv2Api(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
 
 	protocolType := d.Get("protocol_type").String()

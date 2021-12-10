@@ -6,6 +6,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -94,7 +95,7 @@ func (d *DirectoryServiceDirectory) PopulateUsage(u *schema.UsageData) {
 }
 
 // BuildResource builds a schema.Resource from a valid DirectoryServiceDirectory.
-func (d *DirectoryServiceDirectory) BuildResource() *schema.Resource {
+func (d *DirectoryServiceDirectory) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	// set the size based on the type of resource.
 	// MicrosoftAD uses edition in product filters under the directorySize attribute.
 	size := d.Size

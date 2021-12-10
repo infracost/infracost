@@ -2,9 +2,11 @@ package aws
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	"strings"
 )
 
 func GetRDSClusterInstanceRegistryItem() *schema.RegistryItem {
@@ -14,7 +16,7 @@ func GetRDSClusterInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRDSClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRDSClusterInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	instanceType := d.Get("instance_class").String()

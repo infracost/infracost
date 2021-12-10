@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -13,7 +14,7 @@ func GetECRRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewECRRepository(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewECRRepository(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var storageSize *decimal.Decimal

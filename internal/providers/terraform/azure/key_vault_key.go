@@ -3,6 +3,7 @@ package azure
 import (
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
@@ -20,7 +21,7 @@ func GetAzureRMKeyVaultKeyRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMKeyVaultKey(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"key_vault_id"})
 
 	var skuName, keyType, keySize, meterName string

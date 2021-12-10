@@ -34,7 +34,7 @@ func TestDynamoDBStorage(t *testing.T) {
 	stubDynamoDBDescribeTable(stub)
 
 	args := resources.DynamoDBTable{}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 
 	assert.Equal(t, int64(10), estimates.usage["storage_gb"])
@@ -74,7 +74,7 @@ func TestDynamoDBPayPerRequest(t *testing.T) {
 	args := resources.DynamoDBTable{
 		BillingMode: "PAY_PER_REQUEST",
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 
 	assert.Equal(t, int64(123), estimates.usage["monthly_read_request_units"])
@@ -89,7 +89,7 @@ func TestDynamoDBProvisioned(t *testing.T) {
 	args := resources.DynamoDBTable{
 		BillingMode: "PROVISIONED",
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 
 	assert.Equal(t, nil, estimates.usage["monthly_read_request_units"])

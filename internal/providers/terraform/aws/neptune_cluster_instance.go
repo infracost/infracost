@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -16,7 +17,7 @@ func GetNeptuneClusterInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewNeptuneClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewNeptuneClusterInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyCPUCreditHrs *decimal.Decimal
 	region := d.Get("region").String()
 	instanceClass := d.Get("instance_class").String()

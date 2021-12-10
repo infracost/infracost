@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -16,7 +17,7 @@ func GetRoute53HealthCheck() *schema.RegistryItem {
 	}
 }
 
-func NewRoute53HealthCheck(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRoute53HealthCheck(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 
 	endpointType := "aws"

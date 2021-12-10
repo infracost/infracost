@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -32,7 +33,7 @@ type S3Bucket struct {
 type S3StorageClass interface {
 	UsageKey() string
 	PopulateUsage(u *schema.UsageData)
-	BuildResource() *schema.Resource
+	BuildResource(ctx *config.ProjectContext) *schema.Resource
 }
 
 var S3BucketUsageSchema = []*schema.UsageItem{
@@ -79,7 +80,7 @@ func (a *S3Bucket) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3Bucket) BuildResource() *schema.Resource {
+func (a *S3Bucket) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	if a.ObjectTagsEnabled {
 		costComponents = append(costComponents, a.objectTagsCostComponent())
@@ -87,7 +88,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 
 	subResources := make([]*schema.Resource, 0, len(a.storageClasses))
 	for _, storageClass := range a.storageClasses {
-		subResources = append(subResources, storageClass.BuildResource())
+		subResources = append(subResources, storageClass.BuildResource(ctx))
 	}
 
 	estimate := func(ctx context.Context, u map[string]interface{}) error {

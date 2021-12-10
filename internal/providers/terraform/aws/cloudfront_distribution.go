@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -78,7 +79,7 @@ func GetCloudfrontDistributionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudfrontDistribution(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var components []*schema.CostComponent
 
 	if v := encryptionRequests(d, u); v != nil {

@@ -65,7 +65,7 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 			}
 		}
 
-		res := registryItem.RFunc(d, u)
+		res := registryItem.RFunc(p.ctx, d, u)
 		if res != nil {
 			res.ResourceType = d.Type
 			res.Tags = d.Tags
@@ -128,7 +128,7 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 	return resources
 }
 
-func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+func (p *Parser) parseJSON(ctx *config.ProjectContext, j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	j, _ = StripSetupTerraformWrapper(j)

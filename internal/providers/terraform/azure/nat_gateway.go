@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -16,7 +17,7 @@ func GetAzureRMAppNATGatewayRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMNATGateway(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 	region = convertRegion(region)
 

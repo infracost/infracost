@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -37,7 +38,7 @@ func (a *S3OneZoneInfrequentAccessStorageClass) PopulateUsage(u *schema.UsageDat
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3OneZoneInfrequentAccessStorageClass) BuildResource() *schema.Resource {
+func (a *S3OneZoneInfrequentAccessStorageClass) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	return &schema.Resource{
 		Name:        "One zone - infrequent access",
 		UsageSchema: S3OneZoneInfrequentAccessStorageClassUsageSchema,

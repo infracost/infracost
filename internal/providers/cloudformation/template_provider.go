@@ -31,20 +31,20 @@ func (p *TemplateProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	// no op
 }
 
-func (p *TemplateProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *TemplateProvider) LoadResources(ctx *config.ProjectContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	template, err := goformation.Open(p.Path)
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Cloudformation template file")
 	}
 
-	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	name := schema.GenerateProjectName(metadata, p.ctx.Config.EnableDashboard)
 
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx)
-	pastResources, resources, err := parser.parseTemplate(template, usage)
+	pastResources, resources, err := parser.parseTemplate(ctx, template, usage)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Cloudformation template file")
 	}

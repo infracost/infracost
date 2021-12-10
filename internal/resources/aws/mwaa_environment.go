@@ -3,6 +3,7 @@ package aws
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -32,7 +33,7 @@ func (a *MWAAEnvironment) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *MWAAEnvironment) BuildResource() *schema.Resource {
+func (a *MWAAEnvironment) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	var workerQuantity, schedulerQuantity, metaDatabaseGB *decimal.Decimal
 	if a.AdditionalWorkers != nil {
 		workerQuantity = decimalPtr(decimal.NewFromFloat(*a.AdditionalWorkers))

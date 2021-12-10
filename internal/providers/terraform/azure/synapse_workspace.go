@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -20,7 +21,7 @@ func GetAzureRMSynapseWorkspacRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMSynapseWorkspace(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	costComponents := make([]*schema.CostComponent, 0)

@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/awslabs/goformation/v4/cloudformation/dynamodb"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
@@ -17,7 +18,7 @@ func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDynamoDBTable(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	cfr, ok := d.CFResource.(*dynamodb.Table)
 	if !ok {
 		log.Warnf("Skipping resource %s as it did not have the expected type (got %T)", d.Address, d.CFResource)
@@ -45,7 +46,7 @@ func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 	}
 	a.PopulateUsage(u)
 
-	resource := a.BuildResource()
+	resource := a.BuildResource(ctx)
 	resource.Tags = mapTags(cfr.Tags)
 
 	return resource

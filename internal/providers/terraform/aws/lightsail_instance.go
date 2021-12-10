@@ -3,6 +3,7 @@ package aws
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
 
@@ -18,7 +19,7 @@ func GetLightsailInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewLightsailInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLightsailInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	type bundleSpecs struct {

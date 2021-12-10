@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -53,7 +54,7 @@ func (a *S3GlacierFlexibleRetrievalStorageClass) PopulateUsage(u *schema.UsageDa
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3GlacierFlexibleRetrievalStorageClass) BuildResource() *schema.Resource {
+func (a *S3GlacierFlexibleRetrievalStorageClass) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	return &schema.Resource{
 		Name:        "Glacier flexible retrieval",
 		UsageSchema: S3GlacierFlexibleRetrievalStorageClassUsageSchema,

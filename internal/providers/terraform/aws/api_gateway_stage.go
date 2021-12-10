@@ -3,6 +3,7 @@ package aws
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -14,7 +15,7 @@ func GetAPIGatewayStageRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAPIGatewayStage(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAPIGatewayStage(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	cacheMemorySize := decimal.Zero

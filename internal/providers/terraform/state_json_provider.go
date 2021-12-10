@@ -32,13 +32,13 @@ func (p *StateJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	// no op
 }
 
-func (p *StateJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *StateJSONProvider) LoadResources(ctx *config.ProjectContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	j, err := os.ReadFile(p.Path)
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Terraform state JSON file")
 	}
 
-	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	name := schema.GenerateProjectName(metadata, p.ctx.Config.EnableDashboard)
@@ -46,7 +46,7 @@ func (p *StateJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx)
 
-	pastResources, resources, err := parser.parseJSON(j, usage)
+	pastResources, resources, err := parser.parseJSON(ctx, j, usage)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Terraform state JSON file")
 	}

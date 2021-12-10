@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 )
@@ -12,7 +13,7 @@ func GetCloudFormationStackSetRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudFormationStackSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudFormationStackSet(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	if d.Get("template_body").Type != gjson.Null && (checkAWS(d) || checkAlexa(d) || checkCustom(d)) {
 		return &schema.Resource{

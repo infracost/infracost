@@ -13,15 +13,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type ProjectMetadata struct {
-	Path               string `json:"path"`
-	Type               string `json:"type"`
-	VCSRepoURL         string `json:"vcsRepoUrl,omitempty"`
-	VCSSubPath         string `json:"vcsSubPath,omitempty"`
-	VCSPullRequestURL  string `json:"vcsPullRequestUrl,omitempty"`
-	TerraformWorkspace string `json:"terraformWorkspace,omitempty"`
-}
-
 // Project contains the existing, planned state of
 // resources and the diff between them.
 type Project struct {

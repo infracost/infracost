@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -16,7 +17,7 @@ func GetS3BucketRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewS3BucketResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewS3BucketResource(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	storageClassNames := map[string]string{
 		"STANDARD":            "standard",
 		"INTELLIGENT_TIERING": "intelligent_tiering",
@@ -74,5 +75,5 @@ func NewS3BucketResource(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a.BuildResource(ctx)
 }

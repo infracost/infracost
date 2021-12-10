@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -13,7 +14,7 @@ func GetAzureRMWindowsVirtualMachineScaleSetRegistryItem() *schema.RegistryItem 
 	}
 }
 
-func NewAzureRMWindowsVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMWindowsVirtualMachineScaleSet(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	instanceType := d.Get("sku").String()
@@ -27,7 +28,7 @@ func NewAzureRMWindowsVirtualMachineScaleSet(d *schema.ResourceData, u *schema.U
 
 	subResources := make([]*schema.Resource, 0)
 
-	osDisk := osDiskSubResource(region, d, u)
+	osDisk := osDiskSubResource(ctx, region, d, u)
 	if osDisk != nil {
 		subResources = append(subResources, osDisk)
 	}

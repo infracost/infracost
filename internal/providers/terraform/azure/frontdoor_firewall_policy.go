@@ -3,6 +3,7 @@ package azure
 import (
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -21,7 +22,7 @@ func getAzureRMFrontdoorFirewallPolicyRegistryItem() *schema.RegistryItem {
 
 // newFrontdoorFirewallPolicy parses Terraform's data and uses it to build
 // a new resource
-func newFrontdoorFirewallPolicy(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newFrontdoorFirewallPolicy(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
@@ -48,5 +49,5 @@ func newFrontdoorFirewallPolicy(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 	r.PopulateUsage(u)
 
-	return r.BuildResource()
+	return r.BuildResource(ctx)
 }

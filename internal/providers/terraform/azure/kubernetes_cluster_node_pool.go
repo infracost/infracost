@@ -1,11 +1,13 @@
 package azure
 
 import (
+	"strings"
+
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 func GetAzureRMKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
@@ -18,7 +20,7 @@ func GetAzureRMKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMKubernetesClusterNodePool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMKubernetesClusterNodePool(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"kubernetes_cluster_id"})
 
 	nodeCount := decimal.NewFromInt(1)

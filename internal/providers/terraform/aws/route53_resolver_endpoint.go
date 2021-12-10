@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 
@@ -14,7 +15,7 @@ func GetRoute53ResolverEndpointRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRoute53ResolverEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRoute53ResolverEndpoint(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	resolverEndpointCount := int64(len(d.Get("ip_address").Array()))

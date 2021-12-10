@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -16,7 +17,7 @@ func GetAzureRMRedisCacheRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMRedisCache(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	skuName := d.Get("sku_name").String()

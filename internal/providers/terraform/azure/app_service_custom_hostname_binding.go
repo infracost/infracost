@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -19,7 +20,7 @@ func GetAzureRMAppServiceCustomHostnameBindingRegistryItem() *schema.RegistryIte
 	}
 }
 
-func NewAzureRMAppServiceCustomHostnameBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAppServiceCustomHostnameBinding(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var sslType, sslState string
 	region := "Global"
 	group := d.References("resource_group_name")

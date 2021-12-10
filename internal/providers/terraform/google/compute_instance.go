@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 
@@ -23,7 +24,7 @@ func GetComputeInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	machineType := d.Get("machine_type").String()
 	if strings.HasPrefix(machineType, "custom-") {
 		return nil

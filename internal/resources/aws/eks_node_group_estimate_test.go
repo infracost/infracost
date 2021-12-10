@@ -33,7 +33,7 @@ func TestEKSNodeGroupOS(t *testing.T) {
 	defer stub.Close()
 
 	args := resources.EKSNodeGroup{}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 	assert.Equal(t, "linux", estimates.usage["operating_system"])
 }
@@ -48,7 +48,7 @@ func TestEKSNodeGroupOSWithLaunchTemplate(t *testing.T) {
 	args := resources.EKSNodeGroup{
 		LaunchTemplate: &resources.LaunchTemplate{AMI: "ami-0227c65b90645ae0c"},
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 	assert.Equal(t, "windows", estimates.usage["operating_system"])
 }
@@ -66,7 +66,7 @@ func TestEKSNodeGroupInstancesWithCloudWatch(t *testing.T) {
 		Name:        "eks-node-group-name",
 		ClusterName: "eks-cluster-name",
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 	assert.Equal(t, int64(6), estimates.usage["instances"])
 }
@@ -86,7 +86,7 @@ func TestEKSNodeGroupInstancesWithoutCloudWatch(t *testing.T) {
 		Name:        "eks-node-group-name",
 		ClusterName: "eks-cluster-name",
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 	assert.Equal(t, int64(5), estimates.usage["instances"])
 }

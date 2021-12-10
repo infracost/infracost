@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -16,7 +17,7 @@ func GetCloudFormationStackRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudFormationStack(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudFormationStack(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if d.Get("template_body").Type != gjson.Null && (checkAWS(d) || checkAlexa(d) || checkCustom(d)) {
 		return &schema.Resource{
 			Name:      d.Address,

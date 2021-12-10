@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -16,7 +17,7 @@ func GetNeptuneClusterSnapshotRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewNeptuneClusterSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewNeptuneClusterSnapshot(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var resourceData *schema.ResourceData
 	dbClusterIdentifier := d.References("db_cluster_identifier")
 	var retentionPeriod *decimal.Decimal

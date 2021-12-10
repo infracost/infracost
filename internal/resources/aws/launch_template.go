@@ -3,6 +3,7 @@ package aws
 import (
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -44,7 +45,7 @@ func (a *LaunchTemplate) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *LaunchTemplate) BuildResource() *schema.Resource {
+func (a *LaunchTemplate) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	if strings.ToLower(a.Tenancy) == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Templates", a.Address)
 		return nil
@@ -74,7 +75,7 @@ func (a *LaunchTemplate) BuildResource() *schema.Resource {
 		MonthlyCPUCreditHours:           a.MonthlyCPUCreditHours,
 		VCPUCount:                       a.VCPUCount,
 	}
-	instanceResource := instance.BuildResource()
+	instanceResource := instance.BuildResource(ctx)
 
 	// Skip the Instance usage cost component since we will prepend these later with the correct purchase options and counts
 	for _, costComponent := range instanceResource.CostComponents {

@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -13,7 +14,7 @@ func GetVPNConnectionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewVPNConnection(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewVPNConnection(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var gbDataProcessed *decimal.Decimal

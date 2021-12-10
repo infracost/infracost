@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -45,7 +46,7 @@ func (a *S3IntelligentTieringStorageClass) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3IntelligentTieringStorageClass) BuildResource() *schema.Resource {
+func (a *S3IntelligentTieringStorageClass) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	return &schema.Resource{
 		Name:        "Intelligent tiering",
 		UsageSchema: S3IntelligentTieringStorageClassUsageSchema,

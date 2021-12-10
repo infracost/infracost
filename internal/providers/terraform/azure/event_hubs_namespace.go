@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -17,7 +18,7 @@ func GetAzureRMEventHubsNamespaceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMEventHubs(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var events, unknown *decimal.Decimal
 	sku := "Basic"
 	meterName := "Throughput Unit"

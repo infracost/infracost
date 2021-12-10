@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -11,7 +12,7 @@ func GetNewKMSExternalKeyRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewKMSExternalKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKMSExternalKey(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	region := d.Get("region").String()
 

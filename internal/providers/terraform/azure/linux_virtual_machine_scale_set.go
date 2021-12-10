@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -13,7 +14,7 @@ func GetAzureRMLinuxVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMLinuxVirtualMachineScaleSet(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	instanceType := d.Get("sku").String()
@@ -25,7 +26,7 @@ func NewAzureRMLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.Usa
 		costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
 	}
 
-	osDisk := osDiskSubResource(region, d, u)
+	osDisk := osDiskSubResource(ctx, region, d, u)
 	if osDisk != nil {
 		subResources = append(subResources, osDisk)
 	}

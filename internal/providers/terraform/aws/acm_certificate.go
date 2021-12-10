@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -12,7 +13,7 @@ func GetACMCertificate() *schema.RegistryItem {
 	}
 }
 
-func NewACMCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewACMCertificate(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	if d.Get("certificate_authority_arn").Exists() {

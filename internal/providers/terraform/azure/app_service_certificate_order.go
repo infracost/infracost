@@ -2,10 +2,12 @@ package azure
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 func GetAzureRMAppServiceCertificateOrderRegistryItem() *schema.RegistryItem {
@@ -15,7 +17,7 @@ func GetAzureRMAppServiceCertificateOrderRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAppServiceCertificateOrder(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAppServiceCertificateOrder(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := "Global"
 	// There's no China pricing for this resource yet
 	if strings.HasPrefix(region, "usgov") {

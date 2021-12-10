@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -15,7 +16,7 @@ func GetAzureRMLoadBalancerOutboundRuleRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMLoadBalancerOutboundRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMLoadBalancerOutboundRule(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"loadbalancer_id", "resource_group_name"})
 	region = convertRegion(region)
 

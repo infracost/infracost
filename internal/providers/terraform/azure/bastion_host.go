@@ -3,6 +3,7 @@ package azure
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
@@ -15,7 +16,7 @@ func GetAzureRMBastionHostRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMBastionHost(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMBastionHost(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	productType := "Basic"
 	region := lookupRegion(d, []string{})
 

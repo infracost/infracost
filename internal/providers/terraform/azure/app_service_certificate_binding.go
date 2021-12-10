@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -18,7 +19,7 @@ func GetAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAppServiceCertificateBinding(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"certificate_id"})
 
 	var sslType string

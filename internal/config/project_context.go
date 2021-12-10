@@ -1,10 +1,15 @@
 package config
 
+import (
+	"github.com/rs/zerolog"
+)
+
 type ProjectContexter interface {
 	ProjectContext() map[string]interface{}
 }
 
 type ProjectContext struct {
+	Logger      zerolog.Logger
 	Config        *Config
 	ProjectConfig *Project
 	runCtx        *RunContext
@@ -12,7 +17,10 @@ type ProjectContext struct {
 }
 
 func NewProjectContext(ctx *RunContext, projectCfg *Project) *ProjectContext {
+	logger := ctx.Logger.With().Str("path", projectCfg.Path).Logger()
+
 	return &ProjectContext{
+		Logger: logger,
 		Config:        ctx.Config,
 		ProjectConfig: projectCfg,
 		runCtx:        ctx,

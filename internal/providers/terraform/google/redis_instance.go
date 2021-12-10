@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -15,7 +16,7 @@ func GetRedisInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRedisInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRedisInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	serviceTier := "Basic"
 

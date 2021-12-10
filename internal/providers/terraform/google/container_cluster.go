@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 
@@ -22,7 +23,7 @@ func GetContainerClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewContainerCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	description := "Regional Kubernetes Clusters"
 	region := d.Get("location").String()
 	if isZone(region) {

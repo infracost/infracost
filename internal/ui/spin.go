@@ -7,11 +7,11 @@ import (
 	"time"
 
 	spinnerpkg "github.com/briandowns/spinner"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 type SpinnerOptions struct {
-	EnableLogging bool
+	Logger zerolog.Logger
 	NoColor       bool
 	Indent        string
 }
@@ -20,6 +20,7 @@ type Spinner struct {
 	spinner *spinnerpkg.Spinner
 	msg     string
 	opts    SpinnerOptions
+	logger zerolog.Logger
 }
 
 func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
@@ -31,10 +32,11 @@ func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
 		spinner: spinnerpkg.New(spinnerpkg.CharSets[spinnerCharNumb], 100*time.Millisecond, spinnerpkg.WithWriter(os.Stderr)),
 		msg:     msg,
 		opts:    opts,
+		logger: opts.Logger,
 	}
 
-	if s.opts.EnableLogging {
-		log.Infof("Starting: %s", msg)
+	if s.logger.Info().Enabled() {
+		s.logger.Info().Msgf("Starting: %s", msg)
 	} else {
 		s.spinner.Prefix = opts.Indent
 		s.spinner.Suffix = fmt.Sprintf(" %s", msg)
@@ -56,8 +58,8 @@ func (s *Spinner) Fail() {
 		return
 	}
 	s.Stop()
-	if s.opts.EnableLogging {
-		log.Errorf("Failed: %s", s.msg)
+	if s.logger.Info().Enabled() {
+		s.logger.Error().Msgf("Failed: %s", s.msg)
 	} else {
 		fmt.Fprintf(os.Stderr, "%s%s %s\n",
 			s.opts.Indent,
@@ -77,8 +79,8 @@ func (s *Spinner) Success() {
 		return
 	}
 	s.Stop()
-	if s.opts.EnableLogging {
-		log.Infof("Completed: %s", s.msg)
+	if s.logger.Info().Enabled() {
+		s.logger.Info().Msgf("Completed: %s", s.msg)
 	} else {
 		fmt.Fprintf(os.Stderr, "%s%s %s\n",
 			s.opts.Indent,

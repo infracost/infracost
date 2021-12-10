@@ -3,6 +3,7 @@ package aws
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -23,7 +24,7 @@ func GetInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	purchaseOption := "on_demand"
@@ -80,6 +81,6 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a.BuildResource(ctx)
 
 }

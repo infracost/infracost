@@ -209,11 +209,10 @@ func runProjectConfig(cmd *cobra.Command, ctx *config.ProjectContext, projectCfg
 		return []*schema.Project{}, clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 	}
 
-	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
 	if ctx.Config.IsLogging() {
-		log.Info(m)
+		ctx.Logger.Info().Msgf("Detected %s", provider.DisplayType())
 	} else {
-		fmt.Fprintln(os.Stderr, m)
+		fmt.Fprintf(os.Stderr, "Detected %s at %s\n", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
 	}
 
 	// Generate usage file
@@ -284,13 +283,13 @@ func runProjectConfig(cmd *cobra.Command, ctx *config.ProjectContext, projectCfg
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: ctx.Config.IsLogging(),
+		Logger: ctx.Logger,
 		NoColor:       ctx.Config.NoColor,
 	}
 	spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 
 	for _, project := range projects {
-		if err := prices.PopulatePrices(ctx.Config, project); err != nil {
+		if err := prices.PopulatePrices(ctx, project); err != nil {
 			spinner.Fail()
 			fmt.Fprintln(os.Stderr, "")
 
@@ -352,7 +351,7 @@ func generateUsageFile(cmd *cobra.Command, ctx *config.ProjectContext, projectCf
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: ctx.Config.IsLogging(),
+		Logger: ctx.Logger,
 		NoColor:       ctx.Config.NoColor,
 		Indent:        "  ",
 	}

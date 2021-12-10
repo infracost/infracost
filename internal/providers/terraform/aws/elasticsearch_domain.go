@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -16,7 +17,7 @@ func GetElasticsearchDomainRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewElasticsearchDomain(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	defaultInstanceType := "m4.large.elasticsearch"

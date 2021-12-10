@@ -2,11 +2,13 @@ package aws
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
 func GetRedshiftClusterRegistryItem() *schema.RegistryItem {
@@ -16,7 +18,7 @@ func GetRedshiftClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRedshiftCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	nodeType := d.Get("node_type").String()

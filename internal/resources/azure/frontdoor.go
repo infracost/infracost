@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -66,7 +67,7 @@ func (r *Frontdoor) PopulateUsage(u *schema.UsageData) {
 
 // BuildResource builds a schema.Resource from valid Frontdoor data.
 // This method is called after the resource is initialised by an IaC provider.
-func (r *Frontdoor) BuildResource() *schema.Resource {
+func (r *Frontdoor) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
 	costComponents = append(costComponents, r.routingRulesCostComponents()...)

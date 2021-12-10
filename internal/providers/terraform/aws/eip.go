@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -12,7 +13,7 @@ func GetEIPRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewEIP(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEIP(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	// The IP address is probably used if it has an instance or network_interface, the instance might
 	// be stopped but that's probably less likely
 	if (d.Get("customer_owned_ipv4_pool").Exists() && d.Get("customer_owned_ipv4_pool").String() != "") ||

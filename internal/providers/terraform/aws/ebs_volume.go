@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
@@ -13,7 +14,7 @@ func GetEBSVolumeRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEBSVolume(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var size *int64
 	if d.Get("size").Type != gjson.Null {
 		size = intPtr(d.Get("size").Int())
@@ -30,5 +31,5 @@ func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 
 	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a.BuildResource(ctx)
 }

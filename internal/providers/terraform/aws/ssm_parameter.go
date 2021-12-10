@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
 
@@ -17,7 +18,7 @@ func GetSSMParameterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSSMParameter(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSSMParameter(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	storage := parameterStorageCostComponent(d, u)
 	if storage != nil {

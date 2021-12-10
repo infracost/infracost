@@ -3,6 +3,7 @@ package aws
 import (
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -14,7 +15,7 @@ func getDataTransferRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func newDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newDataTransfer(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := strings.ToLower(u.Get("region").String())
 
 	r := &aws.DataTransfer{
@@ -23,5 +24,5 @@ func newDataTransfer(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	}
 	r.PopulateUsage(u)
 
-	return r.BuildResource()
+	return r.BuildResource(ctx)
 }

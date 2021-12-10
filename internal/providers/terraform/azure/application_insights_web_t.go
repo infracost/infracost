@@ -3,6 +3,7 @@ package azure
 import (
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -15,7 +16,7 @@ func GetAzureRMApplicationInsightsWebRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMApplicationInsightsWeb(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMApplicationInsightsWeb(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 	costComponents := []*schema.CostComponent{}
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -17,7 +18,7 @@ func GetElastiCacheClusterItem() *schema.RegistryItem {
 	}
 }
 
-func NewElastiCacheCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewElastiCacheCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var nodeType, cacheEngine string
 	var cacheNodes decimal.Decimal
 

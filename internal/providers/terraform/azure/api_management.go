@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -19,7 +20,7 @@ func GetAzureRMApiManagementRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMApiManagement(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMApiManagement(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	costComponents := []*schema.CostComponent{}

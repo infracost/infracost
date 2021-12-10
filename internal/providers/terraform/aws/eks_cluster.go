@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -12,7 +13,7 @@ func GetNewEKSClusterItem() *schema.RegistryItem {
 	}
 }
 
-func NewEKSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEKSCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	costComponents := make([]*schema.CostComponent, 0)

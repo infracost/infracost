@@ -76,7 +76,7 @@ func TestAutoscalingGroupOSWithLaunchConfiguration(t *testing.T) {
 	args := resources.AutoscalingGroup{
 		LaunchConfiguration: &resources.LaunchConfiguration{AMI: "ami-0227c65b90645ae0c"},
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 	assert.Equal(t, "windows", estimates.usage["operating_system"])
 }
@@ -92,7 +92,7 @@ func TestAutoscalingGroupOSWithLaunchTemplate(t *testing.T) {
 	args := resources.AutoscalingGroup{
 		LaunchTemplate: &resources.LaunchTemplate{AMI: "ami-0227c65b90645ae0c"},
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 	assert.Equal(t, "windows", estimates.usage["operating_system"])
 }
@@ -107,7 +107,7 @@ func TestAutoscalingGroupInstancesWithCloudWatch(t *testing.T) {
 	args := resources.AutoscalingGroup{
 		Name: "deadbeef",
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 	assert.Equal(t, int64(3), estimates.usage["instances"])
 }
@@ -123,7 +123,7 @@ func TestAutoscalingGroupInstancesWithoutCloudWatch(t *testing.T) {
 	args := resources.AutoscalingGroup{
 		Name: "deadbeef",
 	}
-	resource := args.BuildResource()
+	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
 	assert.Equal(t, int64(5), estimates.usage["instances"])
 }

@@ -3,6 +3,7 @@ package azure
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
@@ -15,7 +16,7 @@ func GetAzureRMAutomationAccountRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAutomationAccount(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAutomationAccount(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyJobRunMins, nonAzureConfigNodeCount, monthlyWatcherHours *decimal.Decimal
 	location := lookupRegion(d, []string{})
 	costComponents := make([]*schema.CostComponent, 0)

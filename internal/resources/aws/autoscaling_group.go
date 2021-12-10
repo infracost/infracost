@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage/aws"
@@ -64,13 +65,13 @@ func (a *AutoscalingGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.Us
 	return usageSchema
 }
 
-func (a *AutoscalingGroup) BuildResource() *schema.Resource {
+func (a *AutoscalingGroup) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
 	var estimateInstanceQualities schema.EstimateFunc
 
 	if a.LaunchConfiguration != nil {
-		lc := a.LaunchConfiguration.BuildResource()
+		lc := a.LaunchConfiguration.BuildResource(ctx)
 		// If the Launch Configuration returns nil it is not supported so the Autoscaling Group should also return nil
 		if lc == nil {
 			return nil
@@ -78,7 +79,7 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 		subResources = append(subResources, lc)
 		estimateInstanceQualities = lc.EstimateUsage
 	} else if a.LaunchTemplate != nil {
-		lt := a.LaunchTemplate.BuildResource()
+		lt := a.LaunchTemplate.BuildResource(ctx)
 		// If the Launch Template returns nil it is not supported so the Autoscaling Group should also return nil
 		if lt == nil {
 			return nil

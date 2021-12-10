@@ -19,7 +19,7 @@ func NewParser(ctx *config.ProjectContext) *Parser {
 	return &Parser{ctx}
 }
 
-func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func (p *Parser) createResource(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	registryMap := GetResourceRegistryMap()
 
 	if isAwsChina(d) {
@@ -38,7 +38,7 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 			}
 		}
 
-		res := registryItem.RFunc(d, u)
+		res := registryItem.RFunc(ctx, d, u)
 		if res != nil {
 			res.ResourceType = d.Type
 			// TODO: Figure out how to set tags.  For now, have the RFunc set them.
@@ -59,8 +59,8 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func (p *Parser) parseTemplate(t *cloudformation.Template, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
-	baseResources := p.loadUsageFileResources(usage)
+func (p *Parser) parseTemplate(ctx *config.ProjectContext, t *cloudformation.Template, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+	baseResources := p.loadUsageFileResources(ctx, usage)
 
 	var resources []*schema.Resource
 	resources = append(resources, baseResources...)
@@ -80,7 +80,7 @@ func (p *Parser) parseTemplate(t *cloudformation.Template, usage map[string]*sch
 		}
 		resourceData := schema.NewCFResourceData(d.AWSCloudFormationType(), "aws", name, tags, d)
 
-		if r := p.createResource(resourceData, usageData); r != nil {
+		if r := p.createResource(ctx, resourceData, usageData); r != nil {
 			resources = append(resources, r)
 		}
 	}
@@ -88,14 +88,14 @@ func (p *Parser) parseTemplate(t *cloudformation.Template, usage map[string]*sch
 	return resources, resources, nil
 }
 
-func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {
+func (p *Parser) loadUsageFileResources(ctx *config.ProjectContext, u map[string]*schema.UsageData) []*schema.Resource {
 	resources := make([]*schema.Resource, 0)
 
 	for k, v := range u {
 		for _, t := range GetUsageOnlyResources() {
 			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
 				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})
-				if r := p.createResource(d, v); r != nil {
+				if r := p.createResource(ctx, d, v); r != nil {
 					resources = append(resources, r)
 				}
 			}

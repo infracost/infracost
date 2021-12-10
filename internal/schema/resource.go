@@ -3,13 +3,14 @@ package schema
 import (
 	"sort"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 )
 
 var HourToMonthUnitMultiplier = decimal.NewFromInt(730)
 
-type ResourceFunc func(*ResourceData, *UsageData) *Resource
+type ResourceFunc func(*config.ProjectContext, *ResourceData, *UsageData) *Resource
 
 type Resource struct {
 	Name              string

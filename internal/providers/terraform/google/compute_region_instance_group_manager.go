@@ -1,6 +1,7 @@
 package google
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -14,7 +15,7 @@ func GetComputeRegionInstanceGroupManagerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeRegionInstanceGroupManager(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeRegionInstanceGroupManager(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	machineType := getMachineType(d)
 	purchaseOption := getPurchaseOption(d)

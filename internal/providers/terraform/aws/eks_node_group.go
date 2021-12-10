@@ -5,6 +5,7 @@ import (
 
 	"github.com/tidwall/gjson"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -20,7 +21,7 @@ func GetNewEKSNodeGroupItem() *schema.RegistryItem {
 	}
 }
 
-func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEKSNodeGroup(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	instanceCount := d.Get("scaling_config.0.desired_size").Int()
@@ -73,5 +74,5 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 
 	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a.BuildResource(ctx)
 }

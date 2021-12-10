@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -33,7 +34,7 @@ func (a *S3StandardStorageClass) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3StandardStorageClass) BuildResource() *schema.Resource {
+func (a *S3StandardStorageClass) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	return &schema.Resource{
 		Name:        "Standard",
 		UsageSchema: S3StandardStorageClassUsageSchema,

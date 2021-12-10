@@ -3,6 +3,7 @@ package google
 import (
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -15,7 +16,7 @@ func GetComputeSnapshotRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeSnapshot(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	description := "Storage PD Snapshot"
 

@@ -1,6 +1,7 @@
 package google
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -12,7 +13,7 @@ func GetCloudFunctionsRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudFunctions(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudFunctions(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	memorySize := decimal.NewFromInt(256)

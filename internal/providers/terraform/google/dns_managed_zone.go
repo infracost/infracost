@@ -1,6 +1,7 @@
 package google
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -12,7 +13,7 @@ func GetDNSManagedZoneRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDNSManagedZone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDNSManagedZone(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{

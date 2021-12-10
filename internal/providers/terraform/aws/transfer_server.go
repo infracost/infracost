@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -12,7 +13,7 @@ func getTransferServerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func newTransferServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newTransferServer(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	protocols := []string{}
 
@@ -32,5 +33,5 @@ func newTransferServer(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 	}
 	t.PopulateUsage(u)
 
-	return t.BuildResource()
+	return t.BuildResource(ctx)
 }

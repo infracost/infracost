@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage/aws"
@@ -30,7 +31,7 @@ func (a *LambdaFunction) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *LambdaFunction) BuildResource() *schema.Resource {
+func (a *LambdaFunction) BuildResource(ctx *config.ProjectContext) *schema.Resource {
 	memorySize := decimal.NewFromInt(a.MemorySize)
 
 	averageRequestDuration := decimal.NewFromInt(1)
