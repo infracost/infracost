@@ -10,7 +10,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/config"
@@ -49,9 +48,9 @@ type APIErrorResponse struct {
 
 var ErrInvalidAPIKey = errors.New("Invalid API key")
 
-func (c *APIClient) doQueries(queries []GraphQLQuery) ([]gjson.Result, error) {
+func (c *APIClient) doQueries(ctx *config.RunContext, queries []GraphQLQuery) ([]gjson.Result, error) {
 	if len(queries) == 0 {
-		log.Debug("Skipping GraphQL request as no queries have been specified")
+		ctx.Logger().Debug().Msg("Skipping GraphQL request as no queries have been specified")
 		return []gjson.Result{}, nil
 	}
 

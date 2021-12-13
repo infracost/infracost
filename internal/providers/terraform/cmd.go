@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/infracost/infracost/internal/config"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -33,7 +34,7 @@ func (e *CmdError) Error() string {
 	return e.err.Error()
 }
 
-func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
+func Cmd(ctx *config.RunContext, opts *CmdOptions, args ...string) ([]byte, error) {
 	exe := opts.TerraformBinary
 	if exe == "" {
 		exe = defaultTerraformBinary

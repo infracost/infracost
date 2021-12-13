@@ -9,7 +9,6 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -43,14 +42,14 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 	if ctx.Config().TLSCACertFile != "" {
 		caCerts, err := ioutil.ReadFile(ctx.Config().TLSCACertFile)
 		if err != nil {
-			log.Errorf("Error reading CA cert file %s: %v", ctx.Config().TLSCACertFile, err)
+			ctx.Logger().Error().Err(err).Msgf("Error reading CA cert file %s", ctx.Config().TLSCACertFile)
 		} else {
 			ok := rootCAs.AppendCertsFromPEM(caCerts)
 
 			if !ok {
-				log.Warningf("No CA certs appended, only using system certs")
+				ctx.Logger().Warn().Msg("No CA certs appended, only using system certs")
 			} else {
-				log.Debugf("Loaded CA certs from %s", ctx.Config().TLSCACertFile)
+				ctx.Logger().Debug().Msgf("Loaded CA certs from %s", ctx.Config().TLSCACertFile)
 			}
 		}
 	}
@@ -85,17 +84,17 @@ func (c *PricingAPIClient) AddEvent(name string, env map[string]interface{}) err
 	return err
 }
 
-func (c *PricingAPIClient) RunQueries(r *schema.Resource) ([]PriceQueryResult, error) {
+func (c *PricingAPIClient) RunQueries(ctx *config.RunContext, r *schema.Resource) ([]PriceQueryResult, error) {
 	keys, queries := c.batchQueries(r)
 
 	if len(queries) == 0 {
-		log.Debugf("Skipping getting pricing details for %s since there are no queries to run", r.Name)
+		ctx.Logger().Debug().Str("resource", r.Name).Msg("Skipping getting pricing details since there are no queries to run")
 		return []PriceQueryResult{}, nil
 	}
 
-	log.Debugf("Getting pricing details from %s for %s", c.endpoint, r.Name)
+	ctx.Logger().Debug().Str("resource", r.Name).Msg("Getting pricing details")
 
-	results, err := c.doQueries(queries)
+	results, err := c.doQueries(ctx, queries)
 	if err != nil {
 		return []PriceQueryResult{}, err
 	}

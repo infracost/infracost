@@ -9,7 +9,6 @@ import (
 
 	"github.com/awslabs/goformation/v4"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -31,7 +30,7 @@ func Detect(ctx *config.RunContext, projectCfg *config.Project) (schema.Provider
 		return terraform.NewPlanJSONProvider(ctx, projectCfg), nil
 	}
 
-	if isTerraformStateJSON(path) {
+	if isTerraformStateJSON(ctx, path) {
 		return terraform.NewStateJSONProvider(ctx, projectCfg), nil
 	}
 
@@ -78,7 +77,7 @@ func isTerraformPlanJSON(ctx *config.RunContext, path string) bool {
 	return jsonFormat.FormatVersion != "" && jsonFormat.PlannedValues != nil
 }
 
-func isTerraformStateJSON(path string) bool {
+func isTerraformStateJSON(ctx *config.RunContext, path string) bool {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return false
@@ -91,7 +90,7 @@ func isTerraformStateJSON(path string) bool {
 
 	b, hasWrapper := terraform.StripSetupTerraformWrapper(b)
 	if hasWrapper {
-		log.Debugf("Stripped setup-terraform wrapper output from %s", path)
+		ctx.Logger().Debug().Msg("Stripped setup-terraform wrapper output")
 	}
 
 	err = json.Unmarshal(b, &jsonFormat)

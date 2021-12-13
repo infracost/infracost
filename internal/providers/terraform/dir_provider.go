@@ -381,13 +381,13 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 
 	token := p.TerraformCloudToken
 	if token == "" {
-		token = findCloudToken(host)
+		token = findCloudToken(p.ctx, host)
 	}
 	if token == "" {
 		return []byte{}, ErrMissingCloudToken
 	}
 
-	body, err := cloudAPI(host, fmt.Sprintf("/api/v2/runs/%s/plan", runID), token)
+	body, err := cloudAPI(p.ctx, host, fmt.Sprintf("/api/v2/runs/%s/plan", runID), token)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -405,7 +405,7 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 	if !ok || jsonPath == "" {
 		return []byte{}, errors.New("Could not parse path to plan JSON from remote")
 	}
-	return cloudAPI(host, jsonPath, token)
+	return cloudAPI(p.ctx, host, jsonPath, token)
 }
 
 func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile string) ([]byte, error) {

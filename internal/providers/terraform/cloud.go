@@ -12,19 +12,19 @@ import (
 
 	"github.com/hashicorp/hcl2/gohcl"
 	"github.com/hashicorp/hcl2/hclparse"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 var ErrMissingCloudToken = errors.New("No Terraform Cloud Token is set")
 var ErrInvalidCloudToken = errors.New("Invalid Terraform Cloud Token")
 
-func cloudAPI(host string, path string, token string) ([]byte, error) {
+func cloudAPI(ctx *config.RunContext, host string, path string, token string) ([]byte, error) {
 	client := &http.Client{}
 
 	url := fmt.Sprintf("https://%s%s", host, path)
-	log.Debugf("Calling Terraform Cloud API: %s", url)
+	ctx.Logger().Debug().Msgf("Calling Terraform Cloud API: %s", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return []byte{}, err
@@ -46,12 +46,12 @@ func cloudAPI(host string, path string, token string) ([]byte, error) {
 	return io.ReadAll(resp.Body)
 }
 
-func findCloudToken(host string) string {
+func findCloudToken(ctx *config.RunContext, host string) string {
 	if os.Getenv("TF_CLI_CONFIG_FILE") != "" {
-		log.Debugf("TF_CLI_CONFIG_FILE is set, checking %s for Terraform Cloud credentials", os.Getenv("TF_CLI_CONFIG_FILE"))
+		ctx.Logger().Debug().Msgf("TF_CLI_CONFIG_FILE is set, checking %s for Terraform Cloud credentials", os.Getenv("TF_CLI_CONFIG_FILE"))
 		token, err := credFromHCL(os.Getenv("TF_CLI_CONFIG_FILE"), host)
 		if err != nil {
-			log.Debugf("Error reading Terraform config file %s: %v", os.Getenv("TF_CLI_CONFIG_FILE"), err)
+			ctx.Logger().Debug().Err(err).Msgf("Error reading Terraform config file %s", os.Getenv("TF_CLI_CONFIG_FILE"))
 		}
 		if token != "" {
 			return token
@@ -60,10 +60,10 @@ func findCloudToken(host string) string {
 
 	credFile := defaultCredFile()
 	if _, err := os.Stat(credFile); err == nil {
-		log.Debugf("Checking %s for Terraform Cloud credentials", credFile)
+		ctx.Logger().Debug().Msgf("Checking %s for Terraform Cloud credentials", credFile)
 		token, err := credFromJSON(credFile, host)
 		if err != nil {
-			log.Debugf("Error reading Terraform credentials file %s: %v", credFile, err)
+			ctx.Logger().Debug().Err(err).Msgf("Error reading Terraform credentials file %s", credFile)
 		}
 		if token != "" {
 			return token
@@ -72,10 +72,10 @@ func findCloudToken(host string) string {
 
 	confFile := defaultConfFile()
 	if _, err := os.Stat(confFile); err == nil {
-		log.Debugf("Checking %s for Terraform Cloud credentials", confFile)
+		ctx.Logger().Debug().Msgf("Checking %s for Terraform Cloud credentials", confFile)
 		token, err := credFromHCL(confFile, host)
 		if err != nil {
-			log.Debugf("Error reading Terraform config file %s: %v", confFile, err)
+			ctx.Logger().Debug().Err(err).Msgf("Error reading Terraform config file %s", confFile)
 		}
 		if token != "" {
 			return token

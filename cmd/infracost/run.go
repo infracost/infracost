@@ -562,7 +562,7 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.RunContext
 	if startTime, ok := env["startTime"]; ok {
 		env["runSeconds"] = time.Now().Unix() - startTime.(int64)
 	}
-	
+
 	env["projectCount"] = len(projectContexts)
 	env["currency"] = runCtx.Config().Currency
 

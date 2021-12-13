@@ -70,7 +70,7 @@ func GetPrices(ctx *config.RunContext, c *apiclient.PricingAPIClient, r *schema.
 		return nil
 	}
 
-	results, err := c.RunQueries(r)
+	results, err := c.RunQueries(ctx, r)
 	if err != nil {
 		return err
 	}

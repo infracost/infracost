@@ -96,7 +96,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 			}
 		}
 	`
-	results, err := c.doQueries([]GraphQLQuery{{q, v}})
+	results, err := c.doQueries(ctx, []GraphQLQuery{{q, v}})
 	if err != nil {
 		return "", err
 	}
