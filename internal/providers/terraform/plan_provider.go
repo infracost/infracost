@@ -19,12 +19,12 @@ type PlanProvider struct {
 	cachedPlanJSON []byte
 }
 
-func NewPlanProvider(ctx *config.ProjectContext) schema.Provider {
-	dirProvider := NewDirProvider(ctx).(*DirProvider)
+func NewPlanProvider(ctx *config.RunContext, projectCfg *config.Project) schema.Provider {
+	dirProvider := NewDirProvider(ctx, projectCfg).(*DirProvider)
 
 	return &PlanProvider{
 		DirProvider: dirProvider,
-		Path:        ctx.ProjectConfig.Path,
+		Path:        projectCfg.Path,
 	}
 }
 
@@ -36,16 +36,16 @@ func (p *PlanProvider) DisplayType() string {
 	return "Terraform plan file"
 }
 
-func (p *PlanProvider) LoadResources(ctx *config.ProjectContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *PlanProvider) LoadResources(ctx *config.RunContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	j, err := p.generatePlanJSON()
 	if err != nil {
 		return []*schema.Project{}, err
 	}
 
-	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata := schema.DetectProjectMetadata(p.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.Config.EnableDashboard)
+	name := schema.GenerateProjectName(metadata, p.ctx.Config().EnableDashboard)
 
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx)

@@ -17,7 +17,7 @@ func GetKinesisFirehoseDeliveryStreamRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewKinesisFirehoseDeliveryStream(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKinesisFirehoseDeliveryStream(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	costComponents := make([]*schema.CostComponent, 0)
 	var monthlyDataIngestedGb *decimal.Decimal

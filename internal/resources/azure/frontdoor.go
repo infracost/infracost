@@ -67,7 +67,7 @@ func (r *Frontdoor) PopulateUsage(u *schema.UsageData) {
 
 // BuildResource builds a schema.Resource from valid Frontdoor data.
 // This method is called after the resource is initialised by an IaC provider.
-func (r *Frontdoor) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (r *Frontdoor) BuildResource(ctx *config.RunContext) *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
 	costComponents = append(costComponents, r.routingRulesCostComponents()...)

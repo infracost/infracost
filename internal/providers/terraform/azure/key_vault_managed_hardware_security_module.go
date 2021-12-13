@@ -13,7 +13,7 @@ func GetAzureRMKeyVaultManagedHSMRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMKeyVaultManagedHSM(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMKeyVaultManagedHSM(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	var costComponents []*schema.CostComponent

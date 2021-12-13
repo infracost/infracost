@@ -23,7 +23,7 @@ func GetContainerClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewContainerCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewContainerCluster(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	description := "Regional Kubernetes Clusters"
 	region := d.Get("location").String()
 	if isZone(region) {

@@ -15,7 +15,7 @@ func GetRoute53RecordRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRoute53Record(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRoute53Record(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if len(d.References("alias.0.name")) > 0 && d.References("alias.0.name")[0].Type != "aws_route53_record" {
 		return &schema.Resource{
 			Name:      d.Address,

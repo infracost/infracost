@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/infracost/infracost/internal/config"
 	resources "github.com/infracost/infracost/internal/resources/aws"
 	"github.com/stretchr/testify/assert"
 )
@@ -129,6 +130,7 @@ func TestS3Bucket(t *testing.T) {
 		stubDataBytes(stub, metric, bytes)
 	}
 
+	ctx := config.EmptyRunContext()
 	args := resources.S3Bucket{
 		Name: "test-bucket",
 	}
@@ -183,6 +185,7 @@ func TestS3BucketNoFilter(t *testing.T) {
 		stubStorageClassBytes(stub, storageClass, bytes)
 	}
 
+	ctx := config.EmptyRunContext()
 	args := resources.S3Bucket{
 		Name: "test-bucket",
 	}
@@ -238,6 +241,7 @@ func TestS3BucketNoStandard(t *testing.T) {
 		stubDataBytes(stub, metric, bytes)
 	}
 
+	ctx := config.EmptyRunContext()
 	args := resources.S3Bucket{
 		Name: "test-bucket",
 	}

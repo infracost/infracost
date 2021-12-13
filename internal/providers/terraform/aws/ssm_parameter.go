@@ -18,7 +18,7 @@ func GetSSMParameterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSSMParameter(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSSMParameter(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	storage := parameterStorageCostComponent(d, u)
 	if storage != nil {

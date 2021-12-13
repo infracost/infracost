@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/infracost/infracost/internal/config"
 	resources "github.com/infracost/infracost/internal/resources/aws"
 	"github.com/stretchr/testify/assert"
 )
@@ -56,6 +57,7 @@ func TestInstanceOS(t *testing.T) {
 		ami, op, os := test[0], test[1], test[2]
 		stubEC2DescribeImages(stub, ami, op)
 
+		ctx := config.EmptyRunContext()
 		args := resources.Instance{AMI: ami}
 		resource := args.BuildResource(ctx)
 		estimates := newEstimates(stub.ctx, t, resource)

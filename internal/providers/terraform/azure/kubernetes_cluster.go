@@ -17,7 +17,7 @@ func GetAzureRMKubernetesClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMKubernetesCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMKubernetesCluster(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 	var costComponents []*schema.CostComponent
 	var subResources []*schema.Resource

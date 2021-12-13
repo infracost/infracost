@@ -16,7 +16,7 @@ func GetAzureRMApplicationInsightsWebRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMApplicationInsightsWeb(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMApplicationInsightsWeb(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 	costComponents := []*schema.CostComponent{}
 

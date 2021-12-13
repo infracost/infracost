@@ -21,7 +21,7 @@ func GetAzureRMVpnGatewayConnectionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMVpnGatewayConnection(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMVpnGatewayConnection(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	sku := "Basic"
 

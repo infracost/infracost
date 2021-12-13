@@ -19,7 +19,7 @@ func GetECSServiceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewECSService(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewECSService(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	launchType := d.Get("launch_type").String()
 	if launchType != "FARGATE" {
 		return &schema.Resource{

@@ -30,7 +30,7 @@ const (
 	Serverless
 )
 
-func NewAzureRMCosmosdb(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCosmosdb(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if len(d.References("account_name")) > 0 {
 		account := d.References("account_name")[0]
 		return &schema.Resource{

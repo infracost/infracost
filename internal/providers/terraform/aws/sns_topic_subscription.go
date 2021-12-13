@@ -19,7 +19,7 @@ func GetSNSTopicSubscriptionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSnsTopicSubscription(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSnsTopicSubscription(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var endpointType string

@@ -20,7 +20,7 @@ func GetAzureRMAppServiceCustomHostnameBindingRegistryItem() *schema.RegistryIte
 	}
 }
 
-func NewAzureRMAppServiceCustomHostnameBinding(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAppServiceCustomHostnameBinding(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var sslType, sslState string
 	region := "Global"
 	group := d.References("resource_group_name")

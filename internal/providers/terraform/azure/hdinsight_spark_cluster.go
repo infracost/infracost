@@ -13,7 +13,7 @@ func GetAzureRMHDInsightSparkClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMHDInsightSparkCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMHDInsightSparkCluster(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	costComponents := []*schema.CostComponent{}

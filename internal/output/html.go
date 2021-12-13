@@ -36,7 +36,7 @@ func ToHTML(ctx *config.RunContext, out Root, opts Options) ([]byte, error) {
 				return true
 			}
 
-			ctx.Logger.Info().Str("resource", resourceName).Msg("Hiding resource with no usage")
+			ctx.Logger().Info().Str("resource", resourceName).Msg("Hiding resource with no usage")
 			return false
 		},
 		"filterZeroValComponents": filterZeroValComponents,

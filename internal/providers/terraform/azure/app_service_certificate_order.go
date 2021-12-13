@@ -17,7 +17,7 @@ func GetAzureRMAppServiceCertificateOrderRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAppServiceCertificateOrder(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAppServiceCertificateOrder(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := "Global"
 	// There's no China pricing for this resource yet
 	if strings.HasPrefix(region, "usgov") {

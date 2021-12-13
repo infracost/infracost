@@ -34,7 +34,7 @@ func (a *S3StandardStorageClass) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3StandardStorageClass) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *S3StandardStorageClass) BuildResource(ctx *config.RunContext) *schema.Resource {
 	return &schema.Resource{
 		Name:        "Standard",
 		UsageSchema: S3StandardStorageClassUsageSchema,

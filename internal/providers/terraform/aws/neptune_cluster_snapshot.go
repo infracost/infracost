@@ -17,7 +17,7 @@ func GetNeptuneClusterSnapshotRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewNeptuneClusterSnapshot(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewNeptuneClusterSnapshot(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var resourceData *schema.ResourceData
 	dbClusterIdentifier := d.References("db_cluster_identifier")
 	var retentionPeriod *decimal.Decimal

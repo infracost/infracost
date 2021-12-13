@@ -17,7 +17,7 @@ func GetAzureRMVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMVirtualMachineScaleSet(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMVirtualMachineScaleSet(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	costComponents := []*schema.CostComponent{}

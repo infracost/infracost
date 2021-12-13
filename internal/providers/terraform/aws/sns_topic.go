@@ -14,7 +14,7 @@ func GetSNSTopicRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSnsTopic(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSnsTopic(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	requestSize := decimal.NewFromInt(64)

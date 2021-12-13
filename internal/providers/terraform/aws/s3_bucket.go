@@ -17,7 +17,7 @@ func GetS3BucketRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewS3BucketResource(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewS3BucketResource(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	storageClassNames := map[string]string{
 		"STANDARD":            "standard",
 		"INTELLIGENT_TIERING": "intelligent_tiering",

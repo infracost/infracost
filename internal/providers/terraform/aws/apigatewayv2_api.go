@@ -17,7 +17,7 @@ func GetAPIGatewayv2ApiRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAPIGatewayv2Api(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAPIGatewayv2Api(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
 
 	protocolType := d.Get("protocol_type").String()

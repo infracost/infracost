@@ -13,7 +13,7 @@ func GetPubSubSubscriptionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewPubSubSubscription(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewPubSubSubscription(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var messageDataTB, storageGB, snapshotStorageGB *decimal.Decimal
 
 	if u != nil {

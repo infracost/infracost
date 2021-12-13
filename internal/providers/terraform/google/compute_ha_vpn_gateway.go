@@ -12,7 +12,7 @@ func GetComputeHAVPNGatewayRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeHAVPNGateway(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeHAVPNGateway(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	return &schema.Resource{
 		Name: d.Address,

@@ -17,7 +17,7 @@ func GetNeptuneClusterInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewNeptuneClusterInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewNeptuneClusterInstance(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyCPUCreditHrs *decimal.Decimal
 	region := d.Get("region").String()
 	instanceClass := d.Get("instance_class").String()

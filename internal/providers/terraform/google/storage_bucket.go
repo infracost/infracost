@@ -18,7 +18,7 @@ func GetStorageBucketRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewStorageBucket(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewStorageBucket(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	components := []*schema.CostComponent{
 		dataStorage(d, u),

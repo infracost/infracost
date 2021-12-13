@@ -47,7 +47,7 @@ func (a *DynamoDBTable) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *DynamoDBTable) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *DynamoDBTable) BuildResource(ctx *config.RunContext) *schema.Resource {
 
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)

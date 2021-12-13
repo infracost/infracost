@@ -21,7 +21,7 @@ func getAzureRMFrontdoorRegistryItem() *schema.RegistryItem {
 }
 
 // newFrontdoor parses Terraform's data and uses it to build a new resource
-func newFrontdoor(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newFrontdoor(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {

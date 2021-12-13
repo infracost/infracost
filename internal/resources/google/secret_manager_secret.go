@@ -44,7 +44,7 @@ func (r *SecretManagerSecret) PopulateUsage(u *schema.UsageData) {
 // BuildResource builds a schema.Resource from a valid SecretManagerSecret.
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
-func (r *SecretManagerSecret) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (r *SecretManagerSecret) BuildResource(ctx *config.RunContext) *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
 	costComponents = append(costComponents, r.activeSecretVersionsCostComponents()...)

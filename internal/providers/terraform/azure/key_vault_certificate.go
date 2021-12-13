@@ -19,7 +19,7 @@ func GetAzureRMKeyVaultCertificateRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMKeyVaultCertificate(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMKeyVaultCertificate(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"key_vault_id"})
 
 	var costComponents []*schema.CostComponent

@@ -15,7 +15,7 @@ func getDataTransferRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func newDataTransfer(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newDataTransfer(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := strings.ToLower(u.Get("region").String())
 
 	r := &aws.DataTransfer{

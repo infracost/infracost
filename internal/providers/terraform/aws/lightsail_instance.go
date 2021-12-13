@@ -19,7 +19,7 @@ func GetLightsailInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewLightsailInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLightsailInstance(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	type bundleSpecs struct {

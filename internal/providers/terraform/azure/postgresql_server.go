@@ -18,7 +18,7 @@ func GetAzureRMPostgreSQLServerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMPostrgreSQLServer(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMPostrgreSQLServer(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	var costComponents []*schema.CostComponent

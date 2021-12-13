@@ -18,7 +18,7 @@ func GetAzureRMVpnGatewayRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMVpnGateway(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMVpnGateway(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var connection, dataTransfers *decimal.Decimal
 	sku := "Basic"
 	region := lookupRegion(d, []string{})

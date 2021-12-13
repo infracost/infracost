@@ -33,7 +33,7 @@ func (a *MWAAEnvironment) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *MWAAEnvironment) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *MWAAEnvironment) BuildResource(ctx *config.RunContext) *schema.Resource {
 	var workerQuantity, schedulerQuantity, metaDatabaseGB *decimal.Decimal
 	if a.AdditionalWorkers != nil {
 		workerQuantity = decimalPtr(decimal.NewFromFloat(*a.AdditionalWorkers))

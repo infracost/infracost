@@ -15,7 +15,7 @@ func GetCodebuildProjectRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCodebuildProject(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCodebuildProject(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	computeType := d.Get("environment.0.compute_type").String()

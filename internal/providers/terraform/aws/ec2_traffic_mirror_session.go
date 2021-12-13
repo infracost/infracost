@@ -14,7 +14,7 @@ func GetEC2TrafficMirroSessionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewEC2TrafficMirrorSession(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEC2TrafficMirrorSession(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	return &schema.Resource{

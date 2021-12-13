@@ -17,7 +17,7 @@ func GetFSXWindowsFSRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewFSXWindowsFS(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewFSXWindowsFS(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	isMultiAZ := strings.Contains(d.Get("deployment_type").String(), "MULTI_AZ")
 	isHDD := strings.ToLower(d.Get("storage_type").String()) == "hdd"

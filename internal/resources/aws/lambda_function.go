@@ -31,7 +31,7 @@ func (a *LambdaFunction) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *LambdaFunction) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *LambdaFunction) BuildResource(ctx *config.RunContext) *schema.Resource {
 	memorySize := decimal.NewFromInt(a.MemorySize)
 
 	averageRequestDuration := decimal.NewFromInt(1)

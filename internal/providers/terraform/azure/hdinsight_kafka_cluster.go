@@ -16,7 +16,7 @@ func GetAzureRMHDInsightKafkaClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMHDInsightKafkaCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMHDInsightKafkaCluster(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	costComponents := []*schema.CostComponent{}

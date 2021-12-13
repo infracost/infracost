@@ -6,6 +6,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/shopspring/decimal"
 )
@@ -16,7 +17,7 @@ const (
 	REMOVED
 )
 
-func ToDiff(out Root, opts Options) ([]byte, error) {
+func ToDiff(ctx *config.RunContext, out Root, opts Options) ([]byte, error) {
 	s := ""
 
 	noDiffProjects := make([]string, 0)

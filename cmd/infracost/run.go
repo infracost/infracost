@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"context"
+	gocontext "context"
 	"fmt"
 	"io"
 	"os"
@@ -55,22 +55,22 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	if err != nil {
 		return err
 	}
-	runCtx.SetContextValue("parallelism", parallelism)
+	runCtx.SetMetadata("parallelism", parallelism)
 
-	numJobs := len(runCtx.Config.Projects)
+	numJobs := len(runCtx.Config().Projects)
 	jobs := make(chan *config.Project, numJobs)
 
 	projectResultChan := make(chan []*schema.Project, numJobs)
-	projectContextChan := make(chan *config.ProjectContext, numJobs)
-	errGroup, _ := errgroup.WithContext(context.Background())
+	projectContextChan := make(chan *config.RunContext, numJobs)
+	errGroup, _ := errgroup.WithContext(gocontext.Background())
 
-	if parallelism > 1 && numJobs > 1 && !runCtx.Config.IsLogging() {
+	if parallelism > 1 && numJobs > 1 && !runCtx.Config().IsLogging() {
 		cmd.PrintErrln("Running multiple projects in parallel, so log-level=info is enabled by default.")
 		cmd.PrintErrln("Run with --parallelism=1 to disable parallelism to help debugging.")
 		cmd.PrintErrln()
 
-		runCtx.Config.LogLevel = "info"
-		err := runCtx.Config.ConfigureLogger()
+		runCtx.Config().LogLevel = "info"
+		err := runCtx.Config().ConfigureLogger()
 		if err != nil {
 			return err
 		}
@@ -80,7 +80,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		errGroup.Go(func() error {
 
 			for projectCfg := range jobs {
-				ctx := config.NewProjectContext(runCtx, projectCfg)
+				logger := runCtx.Logger().With().Str("path", projectCfg.Path).Logger()
+				ctx := runCtx.WithLogger(&logger)
 				projectContextChan <- ctx
 
 				configProjects, err := runProjectConfig(cmd, ctx, projectCfg)
@@ -95,7 +96,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		})
 	}
 
-	for _, p := range runCtx.Config.Projects {
+	for _, p := range runCtx.Config().Projects {
 		jobs <- p
 	}
 	close(jobs)
@@ -106,7 +107,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	close(projectContextChan)
-	projectContexts := make([]*config.ProjectContext, 0, len(runCtx.Config.Projects))
+	projectContexts := make([]*config.RunContext, 0, len(runCtx.Config().Projects))
 	for ctx := range projectContextChan {
 		projectContexts = append(projectContexts, ctx)
 	}
@@ -122,7 +123,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		return err
 	}
 
-	r.Currency = runCtx.Config.Currency
+	r.Currency = runCtx.Config().Currency
 
 	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
 	r.RunID, err = dashboardClient.AddRun(runCtx, projectContexts, r)
@@ -131,43 +132,43 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	opts := output.Options{
-		DashboardEnabled: runCtx.Config.EnableDashboard,
-		ShowSkipped:      runCtx.Config.ShowSkipped,
-		NoColor:          runCtx.Config.NoColor,
-		Fields:           runCtx.Config.Fields,
+		DashboardEnabled: runCtx.Config().EnableDashboard,
+		ShowSkipped:      runCtx.Config().ShowSkipped,
+		NoColor:          runCtx.Config().NoColor,
+		Fields:           runCtx.Config().Fields,
 	}
 
 	var b []byte
 
-	switch strings.ToLower(runCtx.Config.Format) {
+	switch strings.ToLower(runCtx.Config().Format) {
 	case "json":
-		b, err = output.ToJSON(r, opts)
+		b, err = output.ToJSON(runCtx, r, opts)
 	case "html":
-		b, err = output.ToHTML(r, opts)
+		b, err = output.ToHTML(runCtx, r, opts)
 	case "diff":
-		b, err = output.ToDiff(r, opts)
+		b, err = output.ToDiff(runCtx, r, opts)
 	default:
-		b, err = output.ToTable(r, opts)
+		b, err = output.ToTable(runCtx, r, opts)
 	}
 
 	if err != nil {
 		return errors.Wrap(err, "Error generating output")
 	}
 
-	if runCtx.Config.Format == "diff" || runCtx.Config.Format == "table" {
+	if runCtx.Config().Format == "diff" || runCtx.Config().Format == "table" {
 		lines := bytes.Count(b, []byte("\n")) + 1
-		runCtx.SetContextValue("lineCount", lines)
+		runCtx.SetMetadata("lineCount", lines)
 	}
 
 	env := buildRunEnv(runCtx, projectContexts, r)
-	pricingClient := apiclient.NewPricingAPIClient(runCtx.Config)
+	pricingClient := apiclient.NewPricingAPIClient(runCtx)
 	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
 		log.Errorf("Error reporting event: %s", err)
 	}
 
 	// Print a new line to separate the logs from the output
-	if runCtx.Config.IsLogging() {
+	if runCtx.Config().IsLogging() {
 		cmd.PrintErrln()
 	}
 
@@ -183,12 +184,12 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	return nil
 }
 
-func runProjectConfig(cmd *cobra.Command, ctx *config.ProjectContext, projectCfg *config.Project) ([]*schema.Project, error) {
+func runProjectConfig(cmd *cobra.Command, ctx *config.RunContext, projectCfg *config.Project) ([]*schema.Project, error) {
 	for k, v := range projectCfg.Env {
 		os.Setenv(k, v)
 	}
 
-	provider, err := providers.Detect(ctx)
+	provider, err := providers.Detect(ctx, projectCfg)
 	if err != nil {
 		m := fmt.Sprintf("%s\n\n", err)
 		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
@@ -200,7 +201,7 @@ func runProjectConfig(cmd *cobra.Command, ctx *config.ProjectContext, projectCfg
 
 		return []*schema.Project{}, clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
 	}
-	ctx.SetContextValue("projectType", provider.Type())
+	ctx.SetMetadata("projectType", provider.Type())
 
 	if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
@@ -209,14 +210,14 @@ func runProjectConfig(cmd *cobra.Command, ctx *config.ProjectContext, projectCfg
 		return []*schema.Project{}, clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 	}
 
-	if ctx.Config.IsLogging() {
-		ctx.Logger.Info().Msgf("Detected %s", provider.DisplayType())
+	if ctx.Config().IsLogging() {
+		ctx.Logger().Info().Msgf("Detected %s", provider.DisplayType())
 	} else {
 		fmt.Fprintf(os.Stderr, "Detected %s at %s\n", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
 	}
 
 	// Generate usage file
-	if ctx.Config.SyncUsageFile {
+	if ctx.Config().SyncUsageFile {
 		err := generateUsageFile(cmd, ctx, projectCfg, provider)
 		if err != nil {
 			return []*schema.Project{}, errors.Wrap(err, "Error generating usage file")
@@ -248,7 +249,7 @@ func runProjectConfig(cmd *cobra.Command, ctx *config.ProjectContext, projectCfg
 	}
 
 	if len(usageData) > 0 {
-		ctx.SetContextValue("hasUsageFile", true)
+		ctx.SetMetadata("hasUsageFile", true)
 	}
 
 	// Merge wildcard usages into individual usage
@@ -277,14 +278,14 @@ func runProjectConfig(cmd *cobra.Command, ctx *config.ProjectContext, projectCfg
 
 	usageData = usageFile.ToUsageDataMap()
 
-	projects, err := provider.LoadResources(usageData)
+	projects, err := provider.LoadResources(ctx, usageData)
 	if err != nil {
 		return projects, err
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
-		Logger: ctx.Logger,
-		NoColor:       ctx.Config.NoColor,
+		Logger:  ctx.Logger(),
+		NoColor: ctx.Config().NoColor,
 	}
 	spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 
@@ -318,14 +319,14 @@ func runProjectConfig(cmd *cobra.Command, ctx *config.ProjectContext, projectCfg
 
 	spinner.Success()
 
-	if !ctx.Config.IsLogging() {
+	if !ctx.Config().IsLogging() {
 		cmd.PrintErrln()
 	}
 
 	return projects, nil
 }
 
-func generateUsageFile(cmd *cobra.Command, ctx *config.ProjectContext, projectCfg *config.Project, provider schema.Provider) error {
+func generateUsageFile(cmd *cobra.Command, ctx *config.RunContext, projectCfg *config.Project, provider schema.Provider) error {
 	if projectCfg.UsageFile == "" {
 		// This should not happen as we check earlier in the code that usage-file is not empty when sync-usage-file flag is on.
 		return fmt.Errorf("Error generating usage: no usage file given")
@@ -345,15 +346,15 @@ func generateUsageFile(cmd *cobra.Command, ctx *config.ProjectContext, projectCf
 	}
 
 	usageData := usageFile.ToUsageDataMap()
-	providerProjects, err := provider.LoadResources(usageData)
+	providerProjects, err := provider.LoadResources(ctx, usageData)
 	if err != nil {
 		return errors.Wrap(err, "Error loading resources")
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
-		Logger: ctx.Logger,
-		NoColor:       ctx.Config.NoColor,
-		Indent:        "  ",
+		Logger:  ctx.Logger(),
+		NoColor: ctx.Config().NoColor,
+		Indent:  "  ",
 	}
 
 	spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
@@ -363,7 +364,8 @@ func generateUsageFile(cmd *cobra.Command, ctx *config.ProjectContext, projectCf
 		return errors.Wrap(err, "Error synchronizing usage data")
 	}
 
-	ctx.SetFrom(syncResult)
+	// TODO
+	// ctx.SetFrom(syncResult)
 	if err != nil {
 		spinner.Fail()
 		return errors.Wrap(err, "Error summarizing usage")
@@ -541,11 +543,28 @@ func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 	return nil
 }
 
-func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root) map[string]interface{} {
-	env := runCtx.EventEnvWithProjectContexts(projectContexts)
+func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.RunContext, r output.Root) map[string]interface{} {
+	env := runCtx.Metadata()
+
+	for _, projectContext := range projectContexts {
+		if projectContext == nil {
+			continue
+		}
+
+		for k, v := range projectContext.Metadata() {
+			if _, ok := env[k]; !ok {
+				env[k] = make([]interface{}, 0)
+			}
+			env[k] = append(env[k].([]interface{}), v)
+		}
+	}
+
+	if startTime, ok := env["startTime"]; ok {
+		env["runSeconds"] = time.Now().Unix() - startTime.(int64)
+	}
+	
 	env["projectCount"] = len(projectContexts)
-	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
-	env["currency"] = runCtx.Config.Currency
+	env["currency"] = runCtx.Config().Currency
 
 	summary := r.FullSummary
 	env["supportedResourceCounts"] = summary.SupportedResourceCounts

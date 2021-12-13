@@ -11,10 +11,10 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func PopulatePrices(ctx *config.ProjectContext, project *schema.Project) error {
+func PopulatePrices(ctx *config.RunContext, project *schema.Project) error {
 	resources := project.AllResources()
 
-	c := apiclient.NewPricingAPIClient(ctx.Config)
+	c := apiclient.NewPricingAPIClient(ctx)
 
 	err := GetPricesConcurrent(ctx, c, resources)
 	if err != nil {
@@ -26,7 +26,7 @@ func PopulatePrices(ctx *config.ProjectContext, project *schema.Project) error {
 // GetPricesConcurrent gets the prices of all resources concurrently.
 // Concurrency level is calculated using the following formula:
 // max(min(4, numCPU * 4), 16)
-func GetPricesConcurrent(ctx *config.ProjectContext, c *apiclient.PricingAPIClient, resources []*schema.Resource) error {
+func GetPricesConcurrent(ctx *config.RunContext, c *apiclient.PricingAPIClient, resources []*schema.Resource) error {
 	// Set the number of workers
 	numWorkers := 4
 	numCPU := runtime.NumCPU()
@@ -65,7 +65,7 @@ func GetPricesConcurrent(ctx *config.ProjectContext, c *apiclient.PricingAPIClie
 	return nil
 }
 
-func GetPrices(ctx *config.ProjectContext, c *apiclient.PricingAPIClient, r *schema.Resource) error {
+func GetPrices(ctx *config.RunContext, c *apiclient.PricingAPIClient, r *schema.Resource) error {
 	if r.IsSkipped {
 		return nil
 	}
@@ -82,10 +82,10 @@ func GetPrices(ctx *config.ProjectContext, c *apiclient.PricingAPIClient, r *sch
 	return nil
 }
 
-func setCostComponentPrice(ctx *config.ProjectContext, currency string, r *schema.Resource, c *schema.CostComponent, res gjson.Result) {
+func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Resource, c *schema.CostComponent, res gjson.Result) {
 	var p decimal.Decimal
-	
-	logger := ctx.Logger.With().Str("resource", r.Name).Str("cost_component", c.Name).Logger()
+
+	logger := ctx.Logger().With().Str("resource", r.Name).Str("cost_component", c.Name).Logger()
 
 	products := res.Get("data.products").Array()
 	if len(products) == 0 {

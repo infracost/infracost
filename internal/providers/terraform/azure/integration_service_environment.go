@@ -17,7 +17,7 @@ func GetAzureRMAppIntegrationServiceEnvironmentRegistryItem() *schema.RegistryIt
 	}
 }
 
-func NewAzureRMIntegrationServiceEnvironment(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMIntegrationServiceEnvironment(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	productName := "Logic Apps Integration Service Environment"

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/infracost/infracost/internal/config"
 	resources "github.com/infracost/infracost/internal/resources/aws"
 	"github.com/stretchr/testify/assert"
 )
@@ -73,6 +74,7 @@ func TestAutoscalingGroupOSWithLaunchConfiguration(t *testing.T) {
 	stubEC2DescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002")
 	stubCloudWatchASGQuery(stub, "deadbeef", 1) // don't care
 
+	ctx := config.EmptyRunContext()
 	args := resources.AutoscalingGroup{
 		LaunchConfiguration: &resources.LaunchConfiguration{AMI: "ami-0227c65b90645ae0c"},
 	}
@@ -89,6 +91,7 @@ func TestAutoscalingGroupOSWithLaunchTemplate(t *testing.T) {
 	stubEC2DescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002")
 	stubCloudWatchASGQuery(stub, "deadbeef", 1) // don't care
 
+	ctx := config.EmptyRunContext()
 	args := resources.AutoscalingGroup{
 		LaunchTemplate: &resources.LaunchTemplate{AMI: "ami-0227c65b90645ae0c"},
 	}
@@ -104,6 +107,7 @@ func TestAutoscalingGroupInstancesWithCloudWatch(t *testing.T) {
 	stubEC2DescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002") // don't care
 	stubCloudWatchASGQuery(stub, "deadbeef", 3.14159)
 
+	ctx := config.EmptyRunContext()
 	args := resources.AutoscalingGroup{
 		Name: "deadbeef",
 	}
@@ -120,6 +124,7 @@ func TestAutoscalingGroupInstancesWithoutCloudWatch(t *testing.T) {
 	stubCloudWatchASGQuery(stub, "deadbeef", 0)                               // no results
 	stubEC2DescribeAutoscalingGroups(stub, "deadbeef", 5)
 
+	ctx := config.EmptyRunContext()
 	args := resources.AutoscalingGroup{
 		Name: "deadbeef",
 	}

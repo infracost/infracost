@@ -14,9 +14,9 @@ func ReportCLIError(ctx *config.RunContext, cliErr error) error {
 		errMsg = ui.StripColor(sanitizedErr.SanitizedError())
 	}
 
-	d := ctx.EventEnv()
+	d := ctx.Metadata()
 	d["error"] = errMsg
 
-	c := NewPricingAPIClient(ctx.Config)
+	c := NewPricingAPIClient(ctx)
 	return c.AddEvent("infracost-error", d)
 }

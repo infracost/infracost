@@ -16,7 +16,7 @@ func GetRedisInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRedisInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRedisInstance(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	serviceTier := "Basic"
 

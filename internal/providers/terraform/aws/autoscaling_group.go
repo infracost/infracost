@@ -7,7 +7,6 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -27,7 +26,7 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAutoscalingGroup(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAutoscalingGroup(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	a := &aws.AutoscalingGroup{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
@@ -41,7 +40,7 @@ func NewAutoscalingGroup(ctx *config.ProjectContext, d *schema.ResourceData, u *
 	} else {
 		instanceCount = d.Get("min_size").Int()
 		if instanceCount == 0 {
-			log.Debugf("Using instance count 1 for %s since no desired_capacity or non-zero min_size is set. To override this set the instance_count attribute for this resource in the Infracost usage file.", a.Address)
+			ctx.Logger().Debug().Str("resource", a.Name).Msg("Using instance count 1 since no desired_capacity or non-zero min_size is set. To override this set the instance_count attribute for this resource in the Infracost usage file.")
 			instanceCount = 1
 		}
 	}

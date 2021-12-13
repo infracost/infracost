@@ -13,7 +13,7 @@ func GetELBRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewELB(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewELB(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	productFamily := "Load Balancer"
 	costComponentName := "Classic load balancer"
 

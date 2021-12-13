@@ -18,7 +18,7 @@ func GetElastiCacheClusterItem() *schema.RegistryItem {
 	}
 }
 
-func NewElastiCacheCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewElastiCacheCluster(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var nodeType, cacheEngine string
 	var cacheNodes decimal.Decimal
 

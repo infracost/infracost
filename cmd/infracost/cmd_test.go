@@ -46,9 +46,9 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 	errBuf := bytes.NewBuffer([]byte{})
 	outBuf := bytes.NewBuffer([]byte{})
 
-	runCtx.Config.EventsDisabled = true
-	runCtx.Config.Currency = options.Currency
-	runCtx.Config.NoColor = true
+	runCtx.Config().EventsDisabled = true
+	runCtx.Config().Currency = options.Currency
+	runCtx.Config().NoColor = true
 
 	rootCmd := main.NewRootCommand(runCtx)
 	rootCmd.SetErr(errBuf)

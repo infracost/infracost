@@ -13,7 +13,7 @@ func GetLoggingFolderSinkRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewLoggingFolderSink(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLoggingFolderSink(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var loggingData *decimal.Decimal
 	if u != nil && u.Get("monthly_logging_data_gb").Exists() {
 		loggingData = decimalPtr(decimal.NewFromInt(u.Get("monthly_logging_data_gb").Int()))

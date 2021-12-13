@@ -16,7 +16,7 @@ func GetAzureRMActiveDirectoryDomainServiceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMActiveDirectoryDomainService(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMActiveDirectoryDomainService(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 	costComponents := activeDirectoryDomainServiceCostComponents("Active directory domain service", region, d)
 

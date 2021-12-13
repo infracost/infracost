@@ -14,7 +14,7 @@ func GetDocDBClusterSnapshotRegistryItem() *schema.RegistryItem {
 
 }
 
-func NewDocDBClusterSnapshot(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDocDBClusterSnapshot(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	costComponents := []*schema.CostComponent{}

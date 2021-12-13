@@ -21,7 +21,7 @@ func GetAzureRMAppFunctionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAppFunction(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAppFunction(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	var memorySize, executionTime, executions, gbSeconds *decimal.Decimal

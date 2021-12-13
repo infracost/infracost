@@ -18,7 +18,7 @@ func GetAzureRMEventHubsNamespaceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMEventHubs(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMEventHubs(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var events, unknown *decimal.Decimal
 	sku := "Basic"
 	meterName := "Throughput Unit"

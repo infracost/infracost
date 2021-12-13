@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/config"
 	resources "github.com/infracost/infracost/internal/resources/aws"
 	"github.com/stretchr/testify/assert"
 )
@@ -46,6 +47,7 @@ func TestLambda(t *testing.T) {
 		</GetMetricStatisticsResponse>
 	`)
 
+	ctx := config.EmptyRunContext()
 	args := &resources.LambdaFunction{}
 	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)

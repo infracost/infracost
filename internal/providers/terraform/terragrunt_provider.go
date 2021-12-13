@@ -20,7 +20,7 @@ var defaultTerragruntBinary = "terragrunt"
 var minTerragruntVer = "v0.28.1"
 
 type TerragruntProvider struct {
-	ctx             *config.ProjectContext
+	ctx             *config.RunContext
 	Path            string
 	TerragruntFlags string
 	*DirProvider
@@ -36,10 +36,10 @@ type terragruntProjectDirs struct {
 	WorkingDir string
 }
 
-func NewTerragruntProvider(ctx *config.ProjectContext) schema.Provider {
-	dirProvider := NewDirProvider(ctx).(*DirProvider)
+func NewTerragruntProvider(ctx *config.RunContext, projectCfg *config.Project) schema.Provider {
+	dirProvider := NewDirProvider(ctx, projectCfg).(*DirProvider)
 
-	terragruntBinary := ctx.ProjectConfig.TerraformBinary
+	terragruntBinary := projectCfg.TerraformBinary
 	if terragruntBinary == "" {
 		terragruntBinary = defaultTerragruntBinary
 	}
@@ -50,8 +50,8 @@ func NewTerragruntProvider(ctx *config.ProjectContext) schema.Provider {
 	return &TerragruntProvider{
 		ctx:             ctx,
 		DirProvider:     dirProvider,
-		Path:            ctx.ProjectConfig.Path,
-		TerragruntFlags: ctx.ProjectConfig.TerragruntFlags,
+		Path:            projectCfg.Path,
+		TerragruntFlags: projectCfg.TerragruntFlags,
 	}
 }
 
@@ -67,7 +67,7 @@ func (p *TerragruntProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	// no op
 }
 
-func (p *TerragruntProvider) LoadResources(ctx *config.ProjectContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *TerragruntProvider) LoadResources(ctx *config.RunContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	// We want to run Terragrunt commands from the config dirs
 	// Terragrunt internally runs Terraform in the working dirs, so we need to be aware of these
 	// so we can handle reading and cleaning up the generated plan files.
@@ -94,7 +94,7 @@ func (p *TerragruntProvider) LoadResources(ctx *config.ProjectContext, usage map
 		metadata := schema.DetectProjectMetadata(projectDir.ConfigDir)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.Config.EnableDashboard)
+		name := schema.GenerateProjectName(metadata, p.ctx.Config().EnableDashboard)
 
 		project := schema.NewProject(name, metadata)
 

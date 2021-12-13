@@ -42,7 +42,7 @@ func (r *TransferServer) PopulateUsage(u *schema.UsageData) {
 
 // BuildResource builds a schema.Resource from a valid TransferServer struct.
 // This method is called after the resource is initialised by an IaC provider.
-func (r *TransferServer) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (r *TransferServer) BuildResource(ctx *config.RunContext) *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
 	for _, protocol := range r.Protocols {

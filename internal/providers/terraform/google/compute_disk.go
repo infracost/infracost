@@ -16,7 +16,7 @@ func GetComputeDiskRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeDisk(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeDisk(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	zone := d.Get("zone").String()

@@ -43,7 +43,7 @@ func (r *DataTransfer) PopulateUsage(u *schema.UsageData) {
 // BuildResource builds a schema.Resource from a valid DataTransfer.
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
-func (r *DataTransfer) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (r *DataTransfer) BuildResource(ctx *config.RunContext) *schema.Resource {
 	_, ok := RegionMapping[r.Region]
 
 	if !ok {

@@ -172,7 +172,7 @@ func (a *MyResource) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *MyResource) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *MyResource) BuildResource(ctx *config.RunContext) *schema.Resource {
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           fmt.Sprintf("Instance (on-demand, %s)", "my_instance_type"),
@@ -241,7 +241,7 @@ func GetMyResourceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewMyResource(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMyResource(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	sku := d.Get("sku_name").String()
 	instanceTypeFromSku := strings.Split(sku, "_")[0];
@@ -521,7 +521,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 		}
 	}
 
-	func NewEBSSnapshot(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	func NewEBSSnapshot(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		volumeRefs := d.References("volume_id") // Get the reference
 
 		// Always check the array length to avoid panics as `d.References` might not find the reference, e.g. it might point to another module via a data resource.
@@ -635,7 +635,7 @@ The following notes are general guidelines, please leave a comment in your pull 
 		}
 	}
 
-	func NewAzureRMAppServiceCertificateBinding(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	func NewAzureRMAppServiceCertificateBinding(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		region := lookupRegion(d, []string{"certificate_id", "resource_group_name"})
 		...
 	}

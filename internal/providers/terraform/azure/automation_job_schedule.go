@@ -19,7 +19,7 @@ func GetAzureRMAutomationJobScheduleRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAutomationJobSchedule(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAutomationJobSchedule(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyJobRunMins *decimal.Decimal
 	location := lookupRegion(d, []string{"resource_group_name"})
 

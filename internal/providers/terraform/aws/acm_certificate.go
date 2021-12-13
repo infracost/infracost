@@ -13,7 +13,7 @@ func GetACMCertificate() *schema.RegistryItem {
 	}
 }
 
-func NewACMCertificate(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewACMCertificate(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	if d.Get("certificate_authority_arn").Exists() {

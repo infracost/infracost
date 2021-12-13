@@ -18,7 +18,7 @@ func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDynamoDBTable(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDynamoDBTable(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	cfr, ok := d.CFResource.(*dynamodb.Table)
 	if !ok {
 		log.Warnf("Skipping resource %s as it did not have the expected type (got %T)", d.Address, d.CFResource)

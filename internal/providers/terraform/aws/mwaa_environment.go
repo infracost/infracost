@@ -16,7 +16,7 @@ func GetMWAAEnvironmentRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewMWAAEnvironment(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMWAAEnvironment(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	size := "mw1.small"

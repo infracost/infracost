@@ -23,7 +23,7 @@ func GetDXConnectionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDXConnection(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDXConnection(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	virtualInterfaceType := "private"

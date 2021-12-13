@@ -23,28 +23,28 @@ func diffCmd(ctx *config.RunContext) *cobra.Command {
       infracost diff --path plan.json`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := checkAPIKey(ctx.Config.APIKey, ctx.Config.PricingAPIEndpoint, ctx.Config.DefaultPricingAPIEndpoint); err != nil {
+			if err := checkAPIKey(ctx.Config().APIKey, ctx.Config().PricingAPIEndpoint, ctx.Config().DefaultPricingAPIEndpoint); err != nil {
 				return err
 			}
 
-			err := loadRunFlags(ctx.Config, cmd)
+			err := loadRunFlags(ctx.Config(), cmd)
 			if err != nil {
 				return err
 			}
 
-			err = checkRunConfig(cmd.ErrOrStderr(), ctx.Config)
-			if err != nil {
-				ui.PrintUsage(cmd)
-				return err
-			}
-
-			err = checkDiffConfig(ctx.Config)
+			err = checkRunConfig(cmd.ErrOrStderr(), ctx.Config())
 			if err != nil {
 				ui.PrintUsage(cmd)
 				return err
 			}
 
-			ctx.Config.Format = "diff"
+			err = checkDiffConfig(ctx.Config())
+			if err != nil {
+				ui.PrintUsage(cmd)
+				return err
+			}
+
+			ctx.Config().Format = "diff"
 
 			return runMain(cmd, ctx)
 		},

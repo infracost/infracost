@@ -33,7 +33,7 @@ type S3Bucket struct {
 type S3StorageClass interface {
 	UsageKey() string
 	PopulateUsage(u *schema.UsageData)
-	BuildResource(ctx *config.ProjectContext) *schema.Resource
+	BuildResource(ctx *config.RunContext) *schema.Resource
 }
 
 var S3BucketUsageSchema = []*schema.UsageItem{
@@ -80,7 +80,7 @@ func (a *S3Bucket) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3Bucket) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *S3Bucket) BuildResource(ctx *config.RunContext) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	if a.ObjectTagsEnabled {
 		costComponents = append(costComponents, a.objectTagsCostComponent())

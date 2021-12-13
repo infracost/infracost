@@ -22,7 +22,7 @@ func (a *NATGateway) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *NATGateway) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *NATGateway) BuildResource(ctx *config.RunContext) *schema.Resource {
 	var gbDataProcessed *decimal.Decimal
 	if a.MonthlyDataProcessedGB != nil {
 		gbDataProcessed = decimalPtr(decimal.NewFromFloat(*a.MonthlyDataProcessedGB))

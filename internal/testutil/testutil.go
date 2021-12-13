@@ -15,10 +15,9 @@ import (
 	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/require"
 
-	"github.com/infracost/infracost/internal/config"
-
 	"github.com/stretchr/testify/assert"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/shopspring/decimal"
@@ -206,20 +205,20 @@ func (e ErrorOnAnyWriter) Write(data []byte) (n int, err error) {
 }
 
 func ConfigureTestToFailOnLogs(t *testing.T, runCtx *config.RunContext) {
-	runCtx.Config.LogLevel = "warn"
-	runCtx.Config.LogDisableTimestamps = true
-	runCtx.Config.LogWriter = io.MultiWriter(os.Stderr, ErrorOnAnyWriter{t})
-	err := runCtx.Config.ConfigureLogger()
+	runCtx.Config().LogLevel = "warn"
+	runCtx.Config().LogDisableTimestamps = true
+	runCtx.Config().LogWriter = io.MultiWriter(os.Stderr, ErrorOnAnyWriter{t})
+	err := runCtx.Config().ConfigureLogger()
 	require.Nil(t, err)
 }
 
 func ConfigureTestToCaptureLogs(t *testing.T, runCtx *config.RunContext) *bytes.Buffer {
 	logBuf := bytes.NewBuffer([]byte{})
-	runCtx.Config.LogLevel = "warn"
-	runCtx.Config.LogDisableTimestamps = true
-	runCtx.Config.LogWriter = io.MultiWriter(os.Stderr, logBuf)
+	runCtx.Config().LogLevel = "warn"
+	runCtx.Config().LogDisableTimestamps = true
+	runCtx.Config().LogWriter = io.MultiWriter(os.Stderr, logBuf)
 
-	err := runCtx.Config.ConfigureLogger()
+	err := runCtx.Config().ConfigureLogger()
 	require.Nil(t, err)
 	return logBuf
 }

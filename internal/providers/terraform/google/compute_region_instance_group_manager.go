@@ -15,7 +15,7 @@ func GetComputeRegionInstanceGroupManagerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeRegionInstanceGroupManager(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeRegionInstanceGroupManager(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	machineType := getMachineType(d)
 	purchaseOption := getPurchaseOption(d)

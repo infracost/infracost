@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func ciScript() string {
+func CIScript() string {
 	if IsEnvPresent("INFRACOST_GITHUB_ACTION") {
 		return "infracost-github-action"
 	} else if IsEnvPresent("INFRACOST_CI_DIFF") {

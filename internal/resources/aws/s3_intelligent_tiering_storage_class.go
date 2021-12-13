@@ -46,7 +46,7 @@ func (a *S3IntelligentTieringStorageClass) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3IntelligentTieringStorageClass) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *S3IntelligentTieringStorageClass) BuildResource(ctx *config.RunContext) *schema.Resource {
 	return &schema.Resource{
 		Name:        "Intelligent tiering",
 		UsageSchema: S3IntelligentTieringStorageClassUsageSchema,

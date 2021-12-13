@@ -3,6 +3,7 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/infracost/infracost/internal/config"
 	resources "github.com/infracost/infracost/internal/resources/aws"
 	"github.com/stretchr/testify/assert"
 )
@@ -33,6 +34,7 @@ func TestDynamoDBStorage(t *testing.T) {
 	defer stub.Close()
 	stubDynamoDBDescribeTable(stub)
 
+	ctx := config.EmptyRunContext()
 	args := resources.DynamoDBTable{}
 	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
@@ -71,6 +73,7 @@ func TestDynamoDBPayPerRequest(t *testing.T) {
 	  </GetMetricStatisticsResult>
 	</GetMetricStatisticsResponse>`)
 
+	ctx := config.EmptyRunContext()
 	args := resources.DynamoDBTable{
 		BillingMode: "PAY_PER_REQUEST",
 	}
@@ -86,6 +89,7 @@ func TestDynamoDBProvisioned(t *testing.T) {
 	defer stub.Close()
 	stubDynamoDBDescribeTable(stub)
 
+	ctx := config.EmptyRunContext()
 	args := resources.DynamoDBTable{
 		BillingMode: "PROVISIONED",
 	}

@@ -38,7 +38,7 @@ func (a *S3StandardInfrequentAccessStorageClass) PopulateUsage(u *schema.UsageDa
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3StandardInfrequentAccessStorageClass) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *S3StandardInfrequentAccessStorageClass) BuildResource(ctx *config.RunContext) *schema.Resource {
 	return &schema.Resource{
 		Name:        "Standard - infrequent access",
 		UsageSchema: S3StandardInfrequentAccessStorageClassUsageSchema,

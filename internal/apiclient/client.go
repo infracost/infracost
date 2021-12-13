@@ -9,11 +9,18 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/version"
 )
+
+type APIContext interface {
+	Logger() *zerolog.Logger
+	Config() *config.Config
+}
 
 type APIClient struct {
 	endpoint  string

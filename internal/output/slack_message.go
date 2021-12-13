@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -62,8 +63,8 @@ func slackAllProjectsSummaryBlock(out Root, currency string) []*slack.TextBlockO
 	return slackSummaryBlock("All projects", currency, out.TotalMonthlyCost, out.PastTotalMonthlyCost, out.DiffTotalMonthlyCost)
 }
 
-func ToSlackMessage(out Root, opts Options) ([]byte, error) {
-	diff, err := ToDiff(out, opts)
+func ToSlackMessage(ctx *config.RunContext, out Root, opts Options) ([]byte, error) {
+	diff, err := ToDiff(ctx, out, opts)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to generate diff")
 	}

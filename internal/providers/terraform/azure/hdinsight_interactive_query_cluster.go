@@ -13,7 +13,7 @@ func GetAzureRMHDInsightInteractiveQueryClusterRegistryItem() *schema.RegistryIt
 	}
 }
 
-func NewAzureRMHDInsightInteractiveQueryCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMHDInsightInteractiveQueryCluster(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	costComponents := []*schema.CostComponent{}

@@ -20,7 +20,7 @@ func GetWafWebACLRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewWafWebACL(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewWafWebACL(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var costComponents []*schema.CostComponent

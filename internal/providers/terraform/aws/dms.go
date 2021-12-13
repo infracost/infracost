@@ -96,7 +96,7 @@ func storageCostComponent(d *schema.ResourceData) *schema.CostComponent {
 	}
 }
 
-func NewDMSReplicationInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDMSReplicationInstance(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	costComponents = append(costComponents, instanceCostComponent(d))
 	costComponents = append(costComponents, storageCostComponent(d))

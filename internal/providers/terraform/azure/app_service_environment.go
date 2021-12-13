@@ -21,7 +21,7 @@ func GetAzureRMAppIsolatedServicePlanRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAppIsolatedServicePlan(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAppIsolatedServicePlan(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	tier := "I1"

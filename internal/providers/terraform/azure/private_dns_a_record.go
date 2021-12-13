@@ -15,7 +15,7 @@ func GetAzureRMPrivateDNSaRecordRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMPrivateDNSaRecord(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMPrivateDNSaRecord(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: dnsQueriesCostComponent(d, u),

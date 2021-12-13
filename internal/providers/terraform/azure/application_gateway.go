@@ -18,7 +18,7 @@ func GetAzureRMApplicationGatewayRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMApplicationGateway(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMApplicationGateway(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 	var monthlyDataProcessedGb, monthlyCapacityUnits *decimal.Decimal
 	skuName := d.Get("sku.0.name").String()

@@ -14,7 +14,7 @@ func GetRoute53ZoneRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRoute53Zone(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRoute53Zone(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{

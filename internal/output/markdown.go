@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"text/template"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -56,8 +57,8 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal) 
 	return "monthly cost will increase by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " 📈"
 }
 
-func ToMarkdown(out Root, opts Options) ([]byte, error) {
-	diff, err := ToDiff(out, opts)
+func ToMarkdown(ctx *config.RunContext, out Root, opts Options) ([]byte, error) {
+	diff, err := ToDiff(ctx, out, opts)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to generate diff")
 	}

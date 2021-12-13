@@ -28,7 +28,7 @@ func GetSQLInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSQLInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSQLInstance(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var resource *schema.Resource
 
 	replica := false

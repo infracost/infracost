@@ -21,7 +21,7 @@ func GetNewEKSNodeGroupItem() *schema.RegistryItem {
 	}
 }
 
-func NewEKSNodeGroup(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEKSNodeGroup(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	instanceCount := d.Get("scaling_config.0.desired_size").Int()

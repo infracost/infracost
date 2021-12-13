@@ -13,7 +13,7 @@ func GetContainerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewContainerRegistry(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewContainerRegistry(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	components := []*schema.CostComponent{
 		dataStorage(d, u),

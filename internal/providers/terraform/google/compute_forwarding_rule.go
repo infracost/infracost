@@ -23,7 +23,7 @@ func GetComputeGlobalForwardingRuleRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeForwarding(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeForwarding(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyIngressDataGb *decimal.Decimal
 	region := d.Get("region").String()
 	costComponents := make([]*schema.CostComponent, 0)

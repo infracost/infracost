@@ -12,7 +12,7 @@ func GetNewKMSExternalKeyRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewKMSExternalKey(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKMSExternalKey(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	region := d.Get("region").String()
 

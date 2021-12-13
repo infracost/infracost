@@ -24,7 +24,7 @@ func GetInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewInstance(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	purchaseOption := "on_demand"

@@ -81,7 +81,7 @@ func GetAzureRMManagedDiskRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMManagedDisk(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMManagedDisk(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 	diskType := d.Get("storage_account_type").String()
 

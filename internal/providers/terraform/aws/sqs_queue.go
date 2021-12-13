@@ -14,7 +14,7 @@ func GetSQSQueueRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSqsQueue(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSqsQueue(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var queueType string

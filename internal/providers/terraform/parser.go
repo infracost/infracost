@@ -38,11 +38,11 @@ var arnAttributeMap = map[string]string{
 }
 
 type Parser struct {
-	ctx              *config.ProjectContext
+	ctx              *config.RunContext
 	terraformVersion string
 }
 
-func NewParser(ctx *config.ProjectContext) *Parser {
+func NewParser(ctx *config.RunContext) *Parser {
 	return &Parser{ctx, ""}
 }
 
@@ -50,7 +50,7 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	registryMap := GetResourceRegistryMap()
 
 	if isAwsChina(d) {
-		p.ctx.SetContextValue("isAWSChina", true)
+		p.ctx.SetMetadata("isAWSChina", true)
 	}
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
@@ -128,7 +128,7 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 	return resources
 }
 
-func (p *Parser) parseJSON(ctx *config.ProjectContext, j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+func (p *Parser) parseJSON(ctx *config.RunContext, j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	j, _ = StripSetupTerraformWrapper(j)
@@ -373,7 +373,7 @@ func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, 
 
 	for _, d := range resData {
 		if isInfracostResource(d) {
-			p.ctx.SetContextValue("terraformInfracostProviderEnabled", true)
+			p.ctx.SetMetadata("terraformInfracostProviderEnabled", true)
 
 			for _, ref := range d.References("resources") {
 				if _, ok := u[ref.Address]; !ok {

@@ -69,7 +69,7 @@ func (a *EKSNodeGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.UsageI
 	return usageSchema
 }
 
-func (a *EKSNodeGroup) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *EKSNodeGroup) BuildResource(ctx *config.RunContext) *schema.Resource {
 	r := &schema.Resource{
 		Name:        a.Address,
 		UsageSchema: a.getUsageSchemaWithDefaultInstanceCount(),

@@ -13,7 +13,7 @@ func GetCloudFunctionsRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudFunctions(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudFunctions(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	memorySize := decimal.NewFromInt(256)

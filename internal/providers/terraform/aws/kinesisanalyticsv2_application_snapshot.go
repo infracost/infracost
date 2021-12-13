@@ -14,7 +14,7 @@ func GetKinesisDataAnalyticsSnapshotRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewKinesisDataAnalyticsSnapshot(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKinesisDataAnalyticsSnapshot(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	costComponents := make([]*schema.CostComponent, 0)
 	var durableApplicationBackupGb *decimal.Decimal

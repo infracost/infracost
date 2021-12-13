@@ -21,7 +21,7 @@ func GetAzureRMSynapseWorkspacRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMSynapseWorkspace(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMSynapseWorkspace(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	costComponents := make([]*schema.CostComponent, 0)

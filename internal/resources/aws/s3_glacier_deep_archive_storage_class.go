@@ -42,7 +42,7 @@ func (a *S3GlacierDeepArchiveStorageClass) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3GlacierDeepArchiveStorageClass) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *S3GlacierDeepArchiveStorageClass) BuildResource(ctx *config.RunContext) *schema.Resource {
 	return &schema.Resource{
 		Name:        "Glacier deep archive",
 		UsageSchema: S3GlacierDeepArchiveStorageClassUsageSchema,

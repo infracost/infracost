@@ -9,7 +9,7 @@ import (
 )
 
 func getSecretManagerSecretRegistryItem() *schema.RegistryItem {
-	rfunc := func(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	rfunc := func(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 		r := newSecretManagerSecret(d)
 		r.PopulateUsage(u)

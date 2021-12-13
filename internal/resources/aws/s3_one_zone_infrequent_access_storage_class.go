@@ -38,7 +38,7 @@ func (a *S3OneZoneInfrequentAccessStorageClass) PopulateUsage(u *schema.UsageDat
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3OneZoneInfrequentAccessStorageClass) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *S3OneZoneInfrequentAccessStorageClass) BuildResource(ctx *config.RunContext) *schema.Resource {
 	return &schema.Resource{
 		Name:        "One zone - infrequent access",
 		UsageSchema: S3OneZoneInfrequentAccessStorageClassUsageSchema,

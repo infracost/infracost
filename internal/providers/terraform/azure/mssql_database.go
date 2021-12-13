@@ -23,7 +23,7 @@ func GetAzureRMMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMMSSQLDatabase(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMMSSQLDatabase(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"server_id"})
 
 	var costComponents []*schema.CostComponent

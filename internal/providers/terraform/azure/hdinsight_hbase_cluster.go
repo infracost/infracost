@@ -13,7 +13,7 @@ func GetAzureRMHDInsightHBaseClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMHDInsightHBaseCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMHDInsightHBaseCluster(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	costComponents := []*schema.CostComponent{}

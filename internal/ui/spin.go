@@ -11,16 +11,16 @@ import (
 )
 
 type SpinnerOptions struct {
-	Logger zerolog.Logger
-	NoColor       bool
-	Indent        string
+	Logger  *zerolog.Logger
+	NoColor bool
+	Indent  string
 }
 
 type Spinner struct {
 	spinner *spinnerpkg.Spinner
 	msg     string
 	opts    SpinnerOptions
-	logger zerolog.Logger
+	logger  *zerolog.Logger
 }
 
 func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
@@ -32,7 +32,7 @@ func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
 		spinner: spinnerpkg.New(spinnerpkg.CharSets[spinnerCharNumb], 100*time.Millisecond, spinnerpkg.WithWriter(os.Stderr)),
 		msg:     msg,
 		opts:    opts,
-		logger: opts.Logger,
+		logger:  opts.Logger,
 	}
 
 	if s.logger.Info().Enabled() {

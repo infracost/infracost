@@ -20,7 +20,7 @@ func GetAzureRMPostgreSQLFlexibleServerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMPostrgreSQLFlexibleServer(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMPostrgreSQLFlexibleServer(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var costComponents []*schema.CostComponent
 
 	region := d.Get("location").String()

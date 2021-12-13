@@ -7,7 +7,7 @@ import (
 )
 
 func getSecretManagerSecretVersionRegistryItem() *schema.RegistryItem {
-	rfunc := func(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	rfunc := func(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 		r := newSecretManagerSecretVersion(d)
 		r.PopulateUsage(u)

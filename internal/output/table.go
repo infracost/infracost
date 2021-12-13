@@ -149,7 +149,7 @@ func tableForBreakdown(ctx *config.RunContext, currency string, breakdown Breakd
 		filteredComponents := filterZeroValComponents(ctx, r.CostComponents, r.Name)
 		filteredSubResources := filterZeroValResources(ctx, r.SubResources, r.Name)
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			ctx.Logger.Info().Str("resource", r.Name).Msg("Hiding resource with no usage")
+			ctx.Logger().Info().Str("resource", r.Name).Msg("Hiding resource with no usage")
 			continue
 		}
 
@@ -248,7 +248,7 @@ func filterZeroValComponents(ctx *config.RunContext, costComponents []CostCompon
 	var filteredComponents []CostComponent
 	for _, c := range costComponents {
 		if c.MonthlyQuantity != nil && c.MonthlyQuantity.IsZero() {
-			ctx.Logger.Info().Str("resource", resourceName).Str("cost_component", c.Name).Msg("Hiding cost with no usage")
+			ctx.Logger().Info().Str("resource", resourceName).Str("cost_component", c.Name).Msg("Hiding cost with no usage")
 			continue
 		}
 
@@ -263,7 +263,7 @@ func filterZeroValResources(ctx *config.RunContext, resources []Resource, resour
 		filteredComponents := filterZeroValComponents(ctx, r.CostComponents, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		filteredSubResources := filterZeroValResources(ctx, r.SubResources, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			ctx.Logger.Info().Str("resource", r.Name).Msg("Hiding resource with no usage")
+			ctx.Logger().Info().Str("resource", r.Name).Msg("Hiding resource with no usage")
 			continue
 		}
 

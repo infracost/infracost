@@ -17,7 +17,7 @@ func GetMonitoringItem() *schema.RegistryItem {
 	}
 }
 
-func NewMonitoring(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMonitoring(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
 	var monitData *decimal.Decimal

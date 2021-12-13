@@ -13,7 +13,7 @@ func GetCloudwatchLogGroupItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudwatchLogGroup(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudwatchLogGroup(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var gbDataIngestion *decimal.Decimal

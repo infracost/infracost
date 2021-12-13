@@ -12,18 +12,18 @@ import (
 )
 
 type Parser struct {
-	ctx *config.ProjectContext
+	ctx *config.RunContext
 }
 
-func NewParser(ctx *config.ProjectContext) *Parser {
+func NewParser(ctx *config.RunContext) *Parser {
 	return &Parser{ctx}
 }
 
-func (p *Parser) createResource(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func (p *Parser) createResource(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	registryMap := GetResourceRegistryMap()
 
 	if isAwsChina(d) {
-		p.ctx.SetContextValue("isAWSChina", true)
+		p.ctx.SetMetadata("isAWSChina", true)
 	}
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
@@ -59,7 +59,7 @@ func (p *Parser) createResource(ctx *config.ProjectContext, d *schema.ResourceDa
 	}
 }
 
-func (p *Parser) parseTemplate(ctx *config.ProjectContext, t *cloudformation.Template, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+func (p *Parser) parseTemplate(ctx *config.RunContext, t *cloudformation.Template, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
 	baseResources := p.loadUsageFileResources(ctx, usage)
 
 	var resources []*schema.Resource
@@ -88,7 +88,7 @@ func (p *Parser) parseTemplate(ctx *config.ProjectContext, t *cloudformation.Tem
 	return resources, resources, nil
 }
 
-func (p *Parser) loadUsageFileResources(ctx *config.ProjectContext, u map[string]*schema.UsageData) []*schema.Resource {
+func (p *Parser) loadUsageFileResources(ctx *config.RunContext, u map[string]*schema.UsageData) []*schema.Resource {
 	resources := make([]*schema.Resource, 0)
 
 	for k, v := range u {

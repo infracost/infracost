@@ -15,7 +15,7 @@ func getAzureRMStorageAccountRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func newAzureRMStorageAccount(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newAzureRMStorageAccount(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	accountKind := "StorageV2"

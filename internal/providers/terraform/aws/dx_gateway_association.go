@@ -15,7 +15,7 @@ func GetDXGatewayAssociationRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDXGatewayAssociation(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDXGatewayAssociation(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	// Try to get the region from the associated gateway

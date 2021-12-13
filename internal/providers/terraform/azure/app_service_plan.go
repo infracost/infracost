@@ -16,7 +16,7 @@ func GetAzureRMAppServicePlanRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAppServicePlan(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAppServicePlan(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	sku := d.Get("sku.0.size").String()

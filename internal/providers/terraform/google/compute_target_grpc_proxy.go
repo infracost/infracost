@@ -57,7 +57,7 @@ func GetComputeRegionTargetHTTPSProxyRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeTargetProxy(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeTargetProxy(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyProxyInstances, monthlyDataProcessedGb *decimal.Decimal
 	region := d.Get("region").String()
 	costComponents := make([]*schema.CostComponent, 0)

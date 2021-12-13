@@ -13,7 +13,7 @@ func GetPubSubTopicRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewPubSubTopic(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewPubSubTopic(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var messageDataTB *decimal.Decimal
 
 	if u != nil && u.Get("monthly_message_data_tb").Exists() {

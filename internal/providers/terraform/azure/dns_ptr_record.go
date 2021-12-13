@@ -15,7 +15,7 @@ func GetAzureRMDNSptrRecordRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMDNSptrRecord(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMDNSptrRecord(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: dnsQueriesCostComponent(d, u),

@@ -13,7 +13,7 @@ func GetS3BucketInventoryRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewS3BucketInventory(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewS3BucketInventory(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var listedObj *decimal.Decimal

@@ -12,7 +12,7 @@ func GetComputeVPNGatewayRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeVPNGateway(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeVPNGateway(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	return &schema.Resource{
 		Name: d.Address,

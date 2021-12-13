@@ -78,7 +78,7 @@ func ({{ .ResourceLetter }} *{{ .ResourceName }}) PopulateUsage(u *schema.UsageD
 // BuildResource builds a schema.Resource from a valid {{ .ResourceName }}.
 // This method is called after the resource is initialised by an iac provider.
 // See providers folder for more information.
-func ({{ .ResourceLetter }}  *{{.ResourceName}}) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func ({{ .ResourceLetter }}  *{{.ResourceName}}) BuildResource(ctx *config.RunContext) *schema.Resource {
 	{{- if .WithHelp }}
 	// Resource schema.CostComponent are how Infracost builds price outputs.
 	// Below are a few examples based on the dummy parameters we highlighted earlier.

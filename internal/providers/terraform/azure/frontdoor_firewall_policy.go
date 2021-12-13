@@ -22,7 +22,7 @@ func getAzureRMFrontdoorFirewallPolicyRegistryItem() *schema.RegistryItem {
 
 // newFrontdoorFirewallPolicy parses Terraform's data and uses it to build
 // a new resource
-func newFrontdoorFirewallPolicy(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newFrontdoorFirewallPolicy(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {

@@ -21,7 +21,7 @@ func GetAzureRMKeyVaultKeyRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMKeyVaultKey(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMKeyVaultKey(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"key_vault_id"})
 
 	var skuName, keyType, keySize, meterName string

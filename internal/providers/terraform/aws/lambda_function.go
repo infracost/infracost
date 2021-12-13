@@ -15,7 +15,7 @@ func GetLambdaFunctionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewLambdaFunction(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLambdaFunction(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	name := d.Get("function_name").String()
 	memorySize := int64(128)

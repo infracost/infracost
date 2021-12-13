@@ -15,7 +15,7 @@ func GetComputeInstanceGroupManagerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeInstanceGroupManager(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeInstanceGroupManager(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var region string
 	zone := d.Get("zone").String()
 	if zone != "" {

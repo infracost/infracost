@@ -15,7 +15,7 @@ func GetAzureRMActiveDirectoryDomainServiceReplicaSetRegistryItem() *schema.Regi
 	}
 }
 
-func NewAzureRMActiveDirectoryDomainServiceReplicaSet(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMActiveDirectoryDomainServiceReplicaSet(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 	var domainService *schema.ResourceData
 	if len(d.References("domain_service_id")) > 0 {

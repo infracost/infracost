@@ -16,7 +16,7 @@ func GetComputeSnapshotRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeSnapshot(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeSnapshot(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	description := "Storage PD Snapshot"
 

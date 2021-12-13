@@ -65,7 +65,7 @@ func (a *AutoscalingGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.Us
 	return usageSchema
 }
 
-func (a *AutoscalingGroup) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *AutoscalingGroup) BuildResource(ctx *config.RunContext) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 	subResources := make([]*schema.Resource, 0)
 	var estimateInstanceQualities schema.EstimateFunc

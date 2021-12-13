@@ -39,7 +39,7 @@ func (r *FrontdoorFirewallPolicy) PopulateUsage(u *schema.UsageData) {
 
 // BuildResource builds a schema.Resource from a valid FrontdoorFirewallPolicy.
 // This method is called after the resource is initialised by an IaC provider.
-func (r *FrontdoorFirewallPolicy) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (r *FrontdoorFirewallPolicy) BuildResource(ctx *config.RunContext) *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
 	costComponents = append(costComponents, r.policyCostComponents()...)

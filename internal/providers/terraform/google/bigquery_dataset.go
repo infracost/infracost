@@ -16,7 +16,7 @@ func GetBigqueryDatasetRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewBigqueryDataset(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewBigqueryDataset(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var queriesTB *decimal.Decimal

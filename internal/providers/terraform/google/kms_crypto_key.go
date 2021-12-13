@@ -19,7 +19,7 @@ func GetKMSCryptoKeyRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewKMSCryptoKey(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKMSCryptoKey(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	algorithm := "GOOGLE_SYMMETRIC_ENCRYPTION"

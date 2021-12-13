@@ -18,7 +18,7 @@ func GetAzureRMMySQLServerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMMySQLServer(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMMySQLServer(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	serviceName := "Azure Database for MySQL"

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/infracost/infracost/internal/config"
 	resources "github.com/infracost/infracost/internal/resources/aws"
 	"github.com/stretchr/testify/assert"
 )
@@ -32,6 +33,7 @@ func TestEKSNodeGroupOS(t *testing.T) {
 	stub := stubAWS(t)
 	defer stub.Close()
 
+	ctx := config.EmptyRunContext()
 	args := resources.EKSNodeGroup{}
 	resource := args.BuildResource(ctx)
 	estimates := newEstimates(stub.ctx, t, resource)
@@ -45,6 +47,7 @@ func TestEKSNodeGroupOSWithLaunchTemplate(t *testing.T) {
 
 	stubEC2DescribeImages(stub, "ami-0227c65b90645ae0c", "RunInstances:0002")
 
+	ctx := config.EmptyRunContext()
 	args := resources.EKSNodeGroup{
 		LaunchTemplate: &resources.LaunchTemplate{AMI: "ami-0227c65b90645ae0c"},
 	}
@@ -62,6 +65,7 @@ func TestEKSNodeGroupInstancesWithCloudWatch(t *testing.T) {
 	stubCloudWatchASGQuery(stub, "asg-1", 3.14159)
 	stubCloudWatchASGQuery(stub, "asg-2", 2.71828)
 
+	ctx := config.EmptyRunContext()
 	args := resources.EKSNodeGroup{
 		Name:        "eks-node-group-name",
 		ClusterName: "eks-cluster-name",
@@ -82,6 +86,7 @@ func TestEKSNodeGroupInstancesWithoutCloudWatch(t *testing.T) {
 	stubEC2DescribeAutoscalingGroups(stub, "asg-1", 2)
 	stubEC2DescribeAutoscalingGroups(stub, "asg-2", 3)
 
+	ctx := config.EmptyRunContext()
 	args := resources.EKSNodeGroup{
 		Name:        "eks-node-group-name",
 		ClusterName: "eks-cluster-name",

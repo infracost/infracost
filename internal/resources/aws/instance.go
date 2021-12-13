@@ -55,7 +55,7 @@ func (a *Instance) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *Instance) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *Instance) BuildResource(ctx *config.RunContext) *schema.Resource {
 	if strings.ToLower(a.Tenancy) == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances", a.Address)
 		return nil

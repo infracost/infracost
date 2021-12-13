@@ -35,7 +35,7 @@ func (a *EBSVolume) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *EBSVolume) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *EBSVolume) BuildResource(ctx *config.RunContext) *schema.Resource {
 	if a.Type == "" {
 		a.Type = "gp2"
 	}

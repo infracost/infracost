@@ -17,7 +17,7 @@ func GetMQBrokerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewMQBroker(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMQBroker(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	engine := d.Get("engine_type").String()
 	instanceType := d.Get("host_instance_type").String()

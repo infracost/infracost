@@ -9,14 +9,14 @@ import (
 )
 
 type PlanJSONProvider struct {
-	ctx  *config.ProjectContext
+	ctx  *config.RunContext
 	Path string
 }
 
-func NewPlanJSONProvider(ctx *config.ProjectContext) schema.Provider {
+func NewPlanJSONProvider(ctx *config.RunContext, projectCfg *config.Project) schema.Provider {
 	return &PlanJSONProvider{
 		ctx:  ctx,
-		Path: ctx.ProjectConfig.Path,
+		Path: projectCfg.Path,
 	}
 }
 
@@ -32,16 +32,16 @@ func (p *PlanJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	// no op
 }
 
-func (p *PlanJSONProvider) LoadResources(ctx *config.ProjectContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *PlanJSONProvider) LoadResources(ctx *config.RunContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	j, err := os.ReadFile(p.Path)
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Terraform plan JSON file")
 	}
 
-	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata := schema.DetectProjectMetadata(p.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.Config.EnableDashboard)
+	name := schema.GenerateProjectName(metadata, p.ctx.Config().EnableDashboard)
 
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx)

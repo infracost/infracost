@@ -12,15 +12,14 @@ import (
 )
 
 type RunContext struct {
-	ctx         context.Context
-	Logger      zerolog.Logger
-	Config      *Config
-	State       *State
-	StartTime   int64
-	contextVals map[string]interface{}
+	ctx      context.Context
+	logger   *zerolog.Logger
+	config   *Config
+	state    *State
+	metadata map[string]interface{}
 }
 
-func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
+func NewRunContextFromEnv(ctx context.Context) (*RunContext, error) {
 	cfg := DefaultConfig()
 	err := cfg.LoadFromEnv()
 	if err != nil {
@@ -30,12 +29,11 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 	state, _ := LoadState()
 
 	c := &RunContext{
-		ctx:         rootCtx,
-		Logger:      configureLogger(),
-		Config:      cfg,
-		State:       state,
-		contextVals: map[string]interface{}{},
-		StartTime:   time.Now().Unix(),
+		ctx:      ctx,
+		logger:   configureLogger(),
+		config:   cfg,
+		state:    state,
+		metadata: map[string]interface{}{},
 	}
 
 	c.loadInitialContextValues()
@@ -45,64 +43,62 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 
 func EmptyRunContext() *RunContext {
 	return &RunContext{
-		ctx: 			 context.Background(),
-		Logger: configureLogger(),
-		Config:      &Config{},
-		State:       &State{},
-		contextVals: map[string]interface{}{},
-		StartTime:   time.Now().Unix(),
+		ctx:      context.Background(),
+		logger:   configureLogger(),
+		config:   &Config{},
+		state:    &State{},
+		metadata: map[string]interface{}{},
 	}
 }
 
-func (c *RunContext) SetContextValue(key string, value interface{}) {
-	c.contextVals[key] = value
-}
-
-func (c *RunContext) ContextValues() map[string]interface{} {
-	return c.contextVals
-}
-
-func (c *RunContext) EventEnv() map[string]interface{} {
-	env := c.contextVals
-	env["installId"] = c.State.InstallID
-	return env
-}
-
-func (c *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectContext) map[string]interface{} {
-	env := c.contextVals
-	env["installId"] = c.State.InstallID
-
-	for _, projectContext := range projectContexts {
-		if projectContext == nil {
-			continue
-		}
-
-		for k, v := range projectContext.ContextValues() {
-			if _, ok := env[k]; !ok {
-				env[k] = make([]interface{}, 0)
-			}
-			env[k] = append(env[k].([]interface{}), v)
-		}
+func (c *RunContext) WithLogger(logger *zerolog.Logger) *RunContext {
+	return &RunContext{
+		ctx:      c.ctx,
+		logger:   logger,
+		config:   c.config,
+		state:    c.state,
+		metadata: map[string]interface{}{},
 	}
+}
 
-	return env
+func (c *RunContext) Logger() *zerolog.Logger {
+	return c.logger
+}
+
+func (c *RunContext) Config() *Config {
+	return c.config
+}
+
+func (c *RunContext) State() *State {
+	return c.state
+}
+
+func (c *RunContext) Metadata() map[string]interface{} {
+	return c.metadata
+}
+
+func (c *RunContext) SetMetadata(key string, value interface{}) {
+	c.metadata[key] = value
 }
 
 func (c *RunContext) loadInitialContextValues() {
-	c.SetContextValue("version", baseVersion(version.Version))
-	c.SetContextValue("fullVersion", version.Version)
-	c.SetContextValue("isTest", IsTest())
-	c.SetContextValue("isDev", IsDev())
-	c.SetContextValue("os", runtime.GOOS)
-	c.SetContextValue("ciPlatform", CIPlatform())
-	c.SetContextValue("ciScript", ciScript())
-	c.SetContextValue("ciPostCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
-	c.SetContextValue("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
+	c.SetMetadata("installId", c.State().InstallID)
+	c.SetMetadata("startTime", time.Now().Unix())
+	c.SetMetadata("version", baseVersion(version.Version))
+	c.SetMetadata("fullVersion", version.Version)
+	c.SetMetadata("isTest", IsTest())
+	c.SetMetadata("isDev", IsDev())
+	c.SetMetadata("os", runtime.GOOS)
+	c.SetMetadata("ciPlatform", CIPlatform())
+	c.SetMetadata("ciScript", CIScript())
+	c.SetMetadata("ciPostCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
+	c.SetMetadata("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
 }
 
-func configureLogger() zerolog.Logger {
+func configureLogger() *zerolog.Logger {
 	output := zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}
-	return zerolog.New(output).With().Timestamp().Logger()
+	logger := zerolog.New(output).With().Timestamp().Logger()
+	return &logger
 }
 
 func baseVersion(v string) string {

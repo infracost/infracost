@@ -15,7 +15,7 @@ func GetMSKClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewMskCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMskCluster(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	brokerNodes := decimal.NewFromInt(d.Get("number_of_broker_nodes").Int())

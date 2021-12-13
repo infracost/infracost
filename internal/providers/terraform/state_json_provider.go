@@ -9,14 +9,14 @@ import (
 )
 
 type StateJSONProvider struct {
-	ctx  *config.ProjectContext
+	ctx  *config.RunContext
 	Path string
 }
 
-func NewStateJSONProvider(ctx *config.ProjectContext) schema.Provider {
+func NewStateJSONProvider(ctx *config.RunContext, projectCfg *config.Project) schema.Provider {
 	return &StateJSONProvider{
 		ctx:  ctx,
-		Path: ctx.ProjectConfig.Path,
+		Path: projectCfg.Path,
 	}
 }
 
@@ -32,16 +32,16 @@ func (p *StateJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	// no op
 }
 
-func (p *StateJSONProvider) LoadResources(ctx *config.ProjectContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *StateJSONProvider) LoadResources(ctx *config.RunContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	j, err := os.ReadFile(p.Path)
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Terraform state JSON file")
 	}
 
-	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata := schema.DetectProjectMetadata(p.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.Config.EnableDashboard)
+	name := schema.GenerateProjectName(metadata, p.ctx.Config().EnableDashboard)
 
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx)

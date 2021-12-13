@@ -14,7 +14,7 @@ func GetVPNConnectionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewVPNConnection(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewVPNConnection(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var gbDataProcessed *decimal.Decimal

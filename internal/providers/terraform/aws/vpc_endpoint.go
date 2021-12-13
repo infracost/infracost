@@ -17,7 +17,7 @@ func GetVpcEndpointRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewVpcEndpoint(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewVpcEndpoint(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	costComponents := []*schema.CostComponent{}
 	vpcEndpointType := "Gateway"

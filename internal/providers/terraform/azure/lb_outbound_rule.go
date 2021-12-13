@@ -16,7 +16,7 @@ func GetAzureRMLoadBalancerOutboundRuleRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMLoadBalancerOutboundRule(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMLoadBalancerOutboundRule(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"loadbalancer_id", "resource_group_name"})
 	region = convertRegion(region)
 

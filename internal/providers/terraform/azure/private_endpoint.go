@@ -19,7 +19,7 @@ func GetAzureRMPrivateEndpointRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMPrivateEndpoint(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMPrivateEndpoint(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 	region = convertRegion(region)
 

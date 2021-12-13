@@ -13,7 +13,7 @@ func GetSecretsManagerSecret() *schema.RegistryItem {
 	}
 }
 
-func NewSecretsManagerSecret(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSecretsManagerSecret(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var monthlyRequests *decimal.Decimal

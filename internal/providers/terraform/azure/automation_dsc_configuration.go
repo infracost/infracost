@@ -19,7 +19,7 @@ func GetAzureRMAutomationDscConfigurationRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAutomationDscConfiguration(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAutomationDscConfiguration(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: nodesCostComponent(d, u),

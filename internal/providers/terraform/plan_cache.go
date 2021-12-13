@@ -118,7 +118,7 @@ type cacheFile struct {
 }
 
 func UsePlanCache(p *DirProvider) bool {
-	if p.ctx.Config.NoCache {
+	if p.ctx.Config().NoCache {
 		// cache was turned off with --no-cache
 		return false
 	}

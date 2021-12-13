@@ -14,7 +14,7 @@ func GetAzureRMWindowsVirtualMachineScaleSetRegistryItem() *schema.RegistryItem 
 	}
 }
 
-func NewAzureRMWindowsVirtualMachineScaleSet(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMWindowsVirtualMachineScaleSet(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	instanceType := d.Get("sku").String()

@@ -15,7 +15,7 @@ func GetACMPCACertificateAuthorityRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewACMPCACertificateAuthority(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewACMPCACertificateAuthority(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	costComponents := []*schema.CostComponent{

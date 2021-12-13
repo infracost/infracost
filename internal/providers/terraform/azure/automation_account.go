@@ -16,7 +16,7 @@ func GetAzureRMAutomationAccountRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMAutomationAccount(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMAutomationAccount(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyJobRunMins, nonAzureConfigNodeCount, monthlyWatcherHours *decimal.Decimal
 	location := lookupRegion(d, []string{})
 	costComponents := make([]*schema.CostComponent, 0)

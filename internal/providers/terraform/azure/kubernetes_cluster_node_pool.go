@@ -20,7 +20,7 @@ func GetAzureRMKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMKubernetesClusterNodePool(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMKubernetesClusterNodePool(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"kubernetes_cluster_id"})
 
 	nodeCount := decimal.NewFromInt(1)

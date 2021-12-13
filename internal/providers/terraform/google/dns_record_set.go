@@ -13,7 +13,7 @@ func GetDNSRecordSetRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDNSRecordSet(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDNSRecordSet(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var monthlyQueries *decimal.Decimal
 
 	if u != nil && u.Get("monthly_queries").Exists() {

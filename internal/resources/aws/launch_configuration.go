@@ -44,7 +44,7 @@ func (a *LaunchConfiguration) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *LaunchConfiguration) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *LaunchConfiguration) BuildResource(ctx *config.RunContext) *schema.Resource {
 	if strings.ToLower(a.Tenancy) == "host" {
 		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", a.Address)
 		return nil

@@ -92,7 +92,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			format, _ := cmd.Flags().GetString("format")
-			ctx.SetContextValue("outputFormat", format)
+			ctx.SetMetadata("outputFormat", format)
 
 			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
@@ -118,8 +118,8 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			opts := output.Options{
-				DashboardEnabled: ctx.Config.EnableDashboard,
-				NoColor:          ctx.Config.NoColor,
+				DashboardEnabled: ctx.Config().EnableDashboard,
+				NoColor:          ctx.Config().NoColor,
 				GroupKey:         "filename",
 				GroupLabel:       "File",
 				Fields:           fields,
@@ -140,25 +140,25 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 			switch strings.ToLower(format) {
 			case "json":
-				b, err = output.ToJSON(combined, opts)
+				b, err = output.ToJSON(ctx, combined, opts)
 			case "html":
-				b, err = output.ToHTML(combined, opts)
+				b, err = output.ToHTML(ctx, combined, opts)
 			case "diff":
-				b, err = output.ToDiff(combined, opts)
+				b, err = output.ToDiff(ctx, combined, opts)
 			case "github-comment":
 				opts.IncludeHTML = true
-				b, err = output.ToMarkdown(combined, opts)
+				b, err = output.ToMarkdown(ctx, combined, opts)
 			case "slack-message":
-				b, err = output.ToSlackMessage(combined, opts)
+				b, err = output.ToSlackMessage(ctx, combined, opts)
 			default:
-				b, err = output.ToTable(combined, opts)
+				b, err = output.ToTable(ctx, combined, opts)
 			}
 			if err != nil {
 				return err
 			}
 
-			pricingClient := apiclient.NewPricingAPIClient(ctx.Config)
-			err = pricingClient.AddEvent("infracost-output", ctx.EventEnv())
+			pricingClient := apiclient.NewPricingAPIClient(ctx)
+			err = pricingClient.AddEvent("infracost-output", ctx.Metadata())
 			if err != nil {
 				log.Errorf("Error reporting event: %s", err)
 			}

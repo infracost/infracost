@@ -8,7 +8,6 @@ import (
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 type DashboardAPIClient struct {
@@ -40,10 +39,10 @@ type projectResultInput struct {
 func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 	return &DashboardAPIClient{
 		APIClient: APIClient{
-			endpoint: ctx.Config.DashboardAPIEndpoint,
-			apiKey:   ctx.Config.APIKey,
+			endpoint: ctx.Config().DashboardAPIEndpoint,
+			apiKey:   ctx.Config().APIKey,
 		},
-		dashboardEnabled: ctx.Config.EnableDashboard,
+		dashboardEnabled: ctx.Config().EnableDashboard,
 	}
 }
 
@@ -63,9 +62,9 @@ func (c *DashboardAPIClient) CreateAPIKey(name string, email string) (CreateAPIK
 	return r, nil
 }
 
-func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*config.ProjectContext, out output.Root) (string, error) {
+func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*config.RunContext, out output.Root) (string, error) {
 	if !c.dashboardEnabled {
-		log.Debug("Skipping reporting project results since dashboard is not enabled")
+		ctx.Logger().Debug().Msg("Skipping reporting project results since dashboard is not enabled")
 		return "", nil
 	}
 
@@ -78,7 +77,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 			Breakdown:       project.Breakdown,
 			Diff:            project.Diff,
 			Summary:         project.Summary,
-			Metadata:        projectContexts[i].ContextValues(),
+			Metadata:        projectContexts[i].Metadata(),
 		}
 	}
 
@@ -86,7 +85,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 		"run": runInput{
 			ProjectResults: projectResultInputs,
 			TimeGenerated:  out.TimeGenerated,
-			Metadata:       ctx.ContextValues(),
+			Metadata:       ctx.Metadata(),
 		},
 	}
 

@@ -24,7 +24,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 			var msg string
 			var isRegenerate bool
 
-			if ctx.Config.Credentials.APIKey != "" {
+			if ctx.Config().Credentials.APIKey != "" {
 
 				isRegenerate = true
 				fmt.Printf("You already have an Infracost API key saved in %s\n", config.CredentialsFilePath())
@@ -92,10 +92,10 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				}
 			}
 
-			ctx.Config.Credentials.APIKey = r.APIKey
-			ctx.Config.Credentials.PricingAPIEndpoint = ctx.Config.PricingAPIEndpoint
+			ctx.Config().Credentials.APIKey = r.APIKey
+			ctx.Config().Credentials.PricingAPIEndpoint = ctx.Config().PricingAPIEndpoint
 
-			err = ctx.Config.Credentials.Save()
+			err = ctx.Config().Credentials.Save()
 			if err != nil {
 				return err
 			}

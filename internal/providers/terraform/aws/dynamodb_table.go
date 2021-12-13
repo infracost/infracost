@@ -17,7 +17,7 @@ func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDynamoDBTableResource(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDynamoDBTableResource(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	replicaRegions := []string{}
 	if d.Get("replica").Exists() {
 		for _, data := range d.Get("replica").Array() {

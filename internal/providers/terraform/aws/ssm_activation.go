@@ -15,7 +15,7 @@ func GetSSMActivationRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSSMActivation(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSSMActivation(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var instanceCount *decimal.Decimal

@@ -13,7 +13,7 @@ func GetAzureRMPublicIPPrefixRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMPublicIPPrefix(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMPublicIPPrefix(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	costComponents := make([]*schema.CostComponent, 0)

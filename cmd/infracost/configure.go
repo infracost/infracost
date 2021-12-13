@@ -90,10 +90,10 @@ Supported settings:
 
 			switch key {
 			case "pricing_api_endpoint":
-				ctx.Config.Credentials.PricingAPIEndpoint = value
+				ctx.Config().Credentials.PricingAPIEndpoint = value
 				saveCredentials = true
 			case "api_key":
-				ctx.Config.Credentials.APIKey = value
+				ctx.Config().Credentials.APIKey = value
 				saveCredentials = true
 			case "tls_insecure_skip_verify":
 				var b bool
@@ -104,25 +104,25 @@ Supported settings:
 				} else {
 					return errors.New("Invalid value, must be true or false")
 				}
-				ctx.Config.Configuration.TLSInsecureSkipVerify = &b
+				ctx.Config().Configuration.TLSInsecureSkipVerify = &b
 				saveConfiguration = true
 			case "tls_ca_cert_file":
-				ctx.Config.Configuration.TLSCACertFile = value
+				ctx.Config().Configuration.TLSCACertFile = value
 				saveConfiguration = true
 			case "currency":
-				ctx.Config.Configuration.Currency = value
+				ctx.Config().Configuration.Currency = value
 				saveConfiguration = true
 			}
 
 			if saveCredentials {
-				err := ctx.Config.Credentials.Save()
+				err := ctx.Config().Credentials.Save()
 				if err != nil {
 					return err
 				}
 			}
 
 			if saveConfiguration {
-				err := ctx.Config.Configuration.Save()
+				err := ctx.Config().Configuration.Save()
 				if err != nil {
 					return err
 				}
@@ -179,7 +179,7 @@ Supported settings:
 			var value string
 
 			if key == "pricing_api_endpoint" {
-				value = ctx.Config.Credentials.PricingAPIEndpoint
+				value = ctx.Config().Credentials.PricingAPIEndpoint
 
 				if value == "" {
 					msg := fmt.Sprintf("No Cloud Pricing API endpoint in your saved config (%s).\nSet an API key using %s.",
@@ -190,7 +190,7 @@ Supported settings:
 
 				}
 			} else if key == "api_key" {
-				value = ctx.Config.Credentials.APIKey
+				value = ctx.Config().Credentials.APIKey
 
 				if value == "" {
 					msg := fmt.Sprintf("No API key in your saved config (%s).\nSet an API key using %s.",
@@ -200,10 +200,10 @@ Supported settings:
 					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
 			} else if key == "tls_insecure_skip_verify" {
-				if ctx.Config.Configuration.TLSInsecureSkipVerify == nil {
+				if ctx.Config().Configuration.TLSInsecureSkipVerify == nil {
 					value = ""
 				} else {
-					value = fmt.Sprintf("%t", *ctx.Config.Configuration.TLSInsecureSkipVerify)
+					value = fmt.Sprintf("%t", *ctx.Config().Configuration.TLSInsecureSkipVerify)
 				}
 
 				if value == "" {
@@ -214,7 +214,7 @@ Supported settings:
 					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
 			} else if key == "tls_ca_cert_file" {
-				value = ctx.Config.Configuration.TLSCACertFile
+				value = ctx.Config().Configuration.TLSCACertFile
 
 				if value == "" {
 					msg := fmt.Sprintf("No CA cert file in your saved config (%s).\nSet a CA certificate using %s.",
@@ -224,7 +224,7 @@ Supported settings:
 					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
 			} else if key == "currency" {
-				value = ctx.Config.Configuration.Currency
+				value = ctx.Config().Configuration.Currency
 
 				if value == "" {
 					msg := fmt.Sprintf("No currency in your saved config (%s), defaulting to USD.\nSet a currency using %s.",

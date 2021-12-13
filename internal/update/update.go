@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/mod/semver"
 
 	"github.com/infracost/infracost/internal/config"
@@ -34,7 +33,7 @@ func CheckForUpdate(ctx *config.RunContext) (*Info, error) {
 	// Check cache for the latest version
 	cachedLatestVersion, err := checkCachedLatestVersion(ctx)
 	if err != nil {
-		log.Debugf("error getting cached latest version: %v", err)
+		ctx.Logger().Debug().Err(err).Msg("error getting cached latest version")
 	}
 
 	// Nothing to do if the current version is the latest cached version
@@ -45,7 +44,7 @@ func CheckForUpdate(ctx *config.RunContext) (*Info, error) {
 	isBrew, err := isBrewInstall()
 	if err != nil {
 		// don't fail if we can't detect brew, just fallback to other update method
-		log.Debugf("error checking if executable was installed via brew: %v", err)
+		ctx.Logger().Debug().Err(err).Msg("error checking if executable was installed via brew")
 	}
 
 	var cmd string
@@ -75,7 +74,7 @@ func CheckForUpdate(ctx *config.RunContext) (*Info, error) {
 	if latestVersion != cachedLatestVersion {
 		err := setCachedLatestVersion(ctx, latestVersion)
 		if err != nil {
-			log.Debugf("error saving cached latest version: %v", err)
+			ctx.Logger().Debug().Err(err).Msg("error saving cached latest version")
 		}
 	}
 
@@ -90,7 +89,7 @@ func CheckForUpdate(ctx *config.RunContext) (*Info, error) {
 }
 
 func skipUpdateCheck(ctx *config.RunContext) bool {
-	return ctx.Config.SkipUpdateCheck || config.IsTest() || config.IsDev()
+	return ctx.Config().SkipUpdateCheck || config.IsTest() || config.IsDev()
 }
 
 func isBrewInstall() (bool, error) {
@@ -191,11 +190,11 @@ func getLatestGitHubVersion() (string, error) {
 }
 
 func checkCachedLatestVersion(ctx *config.RunContext) (string, error) {
-	if ctx.State.LatestReleaseCheckedAt == "" {
+	if ctx.State().LatestReleaseCheckedAt == "" {
 		return "", nil
 	}
 
-	checkedAt, err := time.Parse(time.RFC3339, ctx.State.LatestReleaseCheckedAt)
+	checkedAt, err := time.Parse(time.RFC3339, ctx.State().LatestReleaseCheckedAt)
 	if err != nil {
 		return "", err
 	}
@@ -204,12 +203,12 @@ func checkCachedLatestVersion(ctx *config.RunContext) (string, error) {
 		return "", nil
 	}
 
-	return ctx.State.LatestReleaseVersion, nil
+	return ctx.State().LatestReleaseVersion, nil
 }
 
 func setCachedLatestVersion(ctx *config.RunContext, latestVersion string) error {
-	ctx.State.LatestReleaseVersion = latestVersion
-	ctx.State.LatestReleaseCheckedAt = time.Now().Format(time.RFC3339)
+	ctx.State().LatestReleaseVersion = latestVersion
+	ctx.State().LatestReleaseCheckedAt = time.Now().Format(time.RFC3339)
 
-	return ctx.State.Save()
+	return ctx.State().Save()
 }

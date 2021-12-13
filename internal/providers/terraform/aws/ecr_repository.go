@@ -14,7 +14,7 @@ func GetECRRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewECRRepository(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewECRRepository(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	var storageSize *decimal.Decimal

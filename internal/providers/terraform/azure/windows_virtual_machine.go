@@ -19,7 +19,7 @@ func GetAzureRMWindowsVirtualMachineRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMWindowsVirtualMachine(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMWindowsVirtualMachine(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	instanceType := d.Get("size").String()

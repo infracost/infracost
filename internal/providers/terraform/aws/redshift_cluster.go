@@ -18,7 +18,7 @@ func GetRedshiftClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRedshiftCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRedshiftCluster(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	nodeType := d.Get("node_type").String()

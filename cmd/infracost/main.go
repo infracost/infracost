@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	gocontext "context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -13,7 +13,6 @@ import (
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -26,7 +25,7 @@ func main() {
 	var appErr error
 	updateMessageChan := make(chan *update.Info)
 
-	ctx, err := config.NewRunContextFromEnv(context.Background())
+	ctx, err := config.NewRunContextFromEnv(gocontext.Background())
 	if err != nil {
 		if err.Error() != "" {
 			ui.PrintError(os.Stderr, err.Error())
@@ -76,7 +75,7 @@ func NewRootCommand(ctx *config.RunContext) *cobra.Command {
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true
-			ctx.SetContextValue("command", cmd.Name())
+			ctx.SetMetadata("command", cmd.Name())
 
 			return loadGlobalFlags(ctx, cmd)
 		},
@@ -139,7 +138,7 @@ func startUpdateCheck(ctx *config.RunContext, c chan *update.Info) {
 	go func() {
 		updateInfo, err := update.CheckForUpdate(ctx)
 		if err != nil {
-			log.Debugf("error checking for update: %v", err)
+			ctx.Logger().Debug().Err(err).Msg("error checking for update")
 		}
 		c <- updateInfo
 		close(c)
@@ -169,7 +168,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 
 	err := apiclient.ReportCLIError(ctx, cliErr)
 	if err != nil {
-		log.Warnf("Error reporting CLI error: %s", err)
+		ctx.Logger().Warn().Err(err).Msg("Error reporting CLI error")
 	}
 }
 
@@ -185,7 +184,7 @@ func handleUnexpectedErr(ctx *config.RunContext, unexpectedErr interface{}) {
 
 	err := apiclient.ReportCLIError(ctx, fmt.Errorf("%s\n%s", unexpectedErr, stack))
 	if err != nil {
-		log.Warnf("Error reporting unexpected error: %s", err)
+		ctx.Logger().Warn().Err(err).Msg("Error reporting unexpected error")
 	}
 }
 
@@ -205,19 +204,19 @@ func handleUpdateMessage(updateMessageChan chan *update.Info) {
 
 func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 	if cmd.Flags().Changed("no-color") {
-		ctx.Config.NoColor, _ = cmd.Flags().GetBool("no-color")
+		ctx.Config().NoColor, _ = cmd.Flags().GetBool("no-color")
 	}
-	color.NoColor = ctx.Config.NoColor
+	color.NoColor = ctx.Config().NoColor
 
 	if cmd.Flags().Changed("log-level") {
-		ctx.Config.LogLevel, _ = cmd.Flags().GetString("log-level")
-		err := ctx.Config.ConfigureLogger()
+		ctx.Config().LogLevel, _ = cmd.Flags().GetString("log-level")
+		err := ctx.Config().ConfigureLogger()
 		if err != nil {
 			return err
 		}
 	}
 
-	ctx.SetContextValue("isDefaultPricingAPIEndpoint", ctx.Config.PricingAPIEndpoint == ctx.Config.DefaultPricingAPIEndpoint)
+	ctx.SetMetadata("isDefaultPricingAPIEndpoint", ctx.Config().PricingAPIEndpoint == ctx.Config().DefaultPricingAPIEndpoint)
 
 	flagNames := make([]string, 0)
 
@@ -225,7 +224,7 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 		flagNames = append(flagNames, f.Name)
 	})
 
-	ctx.SetContextValue("flags", flagNames)
+	ctx.SetMetadata("flags", flagNames)
 
 	return nil
 }

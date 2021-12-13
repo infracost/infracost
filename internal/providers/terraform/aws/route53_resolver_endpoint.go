@@ -15,7 +15,7 @@ func GetRoute53ResolverEndpointRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRoute53ResolverEndpoint(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRoute53ResolverEndpoint(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	resolverEndpointCount := int64(len(d.Get("ip_address").Array()))

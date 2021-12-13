@@ -13,7 +13,7 @@ func GetComputeMachineImageRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewComputeMachineImage(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeMachineImage(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	description := "Storage Machine Image"
 

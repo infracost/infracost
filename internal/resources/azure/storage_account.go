@@ -73,7 +73,7 @@ func (r *StorageAccount) PopulateUsage(u *schema.UsageData) {
 
 // BuildResource builds a schema.Resource from valid StorageAccount data.
 // This method is called after the resource is initialised by an IaC provider.
-func (r *StorageAccount) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (r *StorageAccount) BuildResource(ctx *config.RunContext) *schema.Resource {
 	if !r.isBlockBlobStorage() && !r.isFileStorage() && !r.isStorageV2() {
 		log.Warnf("Skipping resource %s. Infracost only supports StorageV2, BlockBlobStorage and FileStorage account kinds", r.Address)
 		return nil

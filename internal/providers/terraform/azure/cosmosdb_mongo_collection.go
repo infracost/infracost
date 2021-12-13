@@ -18,7 +18,7 @@ func GetAzureRMCosmosdbMongoCollectionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMCosmosdbMongoCollection(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCosmosdbMongoCollection(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if len(d.References("database_name")) > 0 {
 		mongoDB := d.References("database_name")[0]
 		if len(mongoDB.References("account_name")) > 0 {

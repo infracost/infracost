@@ -16,45 +16,45 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
-	path := ctx.ProjectConfig.Path
+func Detect(ctx *config.RunContext, projectCfg *config.Project) (schema.Provider, error) {
+	path := projectCfg.Path
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return nil, fmt.Errorf("No such file or directory %s", path)
 	}
 
 	if isCloudFormationTemplate(path) {
-		return cloudformation.NewTemplateProvider(ctx), nil
+		return cloudformation.NewTemplateProvider(ctx, projectCfg), nil
 	}
 
 	if isTerraformPlanJSON(ctx, path) {
-		return terraform.NewPlanJSONProvider(ctx), nil
+		return terraform.NewPlanJSONProvider(ctx, projectCfg), nil
 	}
 
 	if isTerraformStateJSON(path) {
-		return terraform.NewStateJSONProvider(ctx), nil
+		return terraform.NewStateJSONProvider(ctx, projectCfg), nil
 	}
 
 	if isTerraformPlan(path) {
-		return terraform.NewPlanProvider(ctx), nil
+		return terraform.NewPlanProvider(ctx, projectCfg), nil
 	}
 
 	if isTerragruntDir(path) {
-		return terraform.NewTerragruntProvider(ctx), nil
+		return terraform.NewTerragruntProvider(ctx, projectCfg), nil
 	}
 
 	if isTerraformDir(path) {
-		return terraform.NewDirProvider(ctx), nil
+		return terraform.NewDirProvider(ctx, projectCfg), nil
 	}
 
 	if isTerragruntNestedDir(path, 5) {
-		return terraform.NewTerragruntProvider(ctx), nil
+		return terraform.NewTerragruntProvider(ctx, projectCfg), nil
 	}
 
 	return nil, fmt.Errorf("Could not detect path type for %s", path)
 }
 
-func isTerraformPlanJSON(ctx *config.ProjectContext, path string) bool {
+func isTerraformPlanJSON(ctx *config.RunContext, path string) bool {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return false
@@ -67,7 +67,7 @@ func isTerraformPlanJSON(ctx *config.ProjectContext, path string) bool {
 
 	b, hasWrapper := terraform.StripSetupTerraformWrapper(b)
 	if hasWrapper {
-		ctx.Logger.Info().Msgf("Stripped wrapper output from %s (to make it a valid JSON file) since setup-terraform GitHub Action was used without terraform_wrapper: false", path)
+		ctx.Logger().Info().Msgf("Stripped wrapper output from %s (to make it a valid JSON file) since setup-terraform GitHub Action was used without terraform_wrapper: false", path)
 	}
 
 	err = json.Unmarshal(b, &jsonFormat)

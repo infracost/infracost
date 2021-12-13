@@ -23,7 +23,7 @@ func GetContainerNodePoolRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewContainerNodePool(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewContainerNodePool(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var cluster *schema.ResourceData
 	if len(d.References("cluster")) > 0 {
 		cluster = d.References("cluster")[0]

@@ -15,7 +15,7 @@ func GetAPIGatewayStageRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAPIGatewayStage(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAPIGatewayStage(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	cacheMemorySize := decimal.Zero

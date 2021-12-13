@@ -79,7 +79,7 @@ func GetCloudfrontDistributionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudfrontDistribution(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudfrontDistribution(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var components []*schema.CostComponent
 
 	if v := encryptionRequests(d, u); v != nil {

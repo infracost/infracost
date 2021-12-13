@@ -17,7 +17,7 @@ func GetAzureRMVirtualMachineRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMVirtualMachine(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMVirtualMachine(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	costComponents := []*schema.CostComponent{}
@@ -109,7 +109,7 @@ func legacyOSDiskSubResource(region string, diskData gjson.Result, monthlyDiskOp
 	}
 }
 
-func osDiskSubResource(ctx *config.ProjectContext, region string,  d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func osDiskSubResource(ctx *config.RunContext, region string, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if len(d.Get("os_disk").Array()) == 0 {
 		return nil
 	}

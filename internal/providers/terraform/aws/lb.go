@@ -22,7 +22,7 @@ func GetALBRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewLB(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLB(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var maxLCU *decimal.Decimal
 
 	var newConnectionsLCU *decimal.Decimal

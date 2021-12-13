@@ -22,7 +22,7 @@ func GetAzureRMCDNEndpointRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMCDNEndpoint(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCDNEndpoint(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := regionToZone(lookupRegion(d, []string{}))
 
 	var costComponents []*schema.CostComponent

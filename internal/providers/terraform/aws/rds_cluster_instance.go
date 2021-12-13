@@ -16,7 +16,7 @@ func GetRDSClusterInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewRDSClusterInstance(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRDSClusterInstance(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	instanceType := d.Get("instance_class").String()

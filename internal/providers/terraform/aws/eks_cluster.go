@@ -13,7 +13,7 @@ func GetNewEKSClusterItem() *schema.RegistryItem {
 	}
 }
 
-func NewEKSCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEKSCluster(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 
 	costComponents := make([]*schema.CostComponent, 0)

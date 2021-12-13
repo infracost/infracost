@@ -13,7 +13,7 @@ func GetCloudFormationStackSetRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewCloudFormationStackSet(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudFormationStackSet(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	if d.Get("template_body").Type != gjson.Null && (checkAWS(d) || checkAlexa(d) || checkCustom(d)) {
 		return &schema.Resource{

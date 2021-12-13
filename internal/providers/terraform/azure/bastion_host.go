@@ -16,7 +16,7 @@ func GetAzureRMBastionHostRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMBastionHost(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMBastionHost(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	productType := "Basic"
 	region := lookupRegion(d, []string{})
 

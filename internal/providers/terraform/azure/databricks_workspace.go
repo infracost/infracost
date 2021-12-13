@@ -16,7 +16,7 @@ func GetAzureRMDatabricksWorkspaceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMDatabricksWorkspace(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMDatabricksWorkspace(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	var costComponents []*schema.CostComponent

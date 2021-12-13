@@ -19,14 +19,12 @@ import (
 	"github.com/kballard/go-shellquote"
 	"github.com/pkg/errors"
 	"golang.org/x/mod/semver"
-
-	log "github.com/sirupsen/logrus"
 )
 
 var minTerraformVer = "v0.12"
 
 type DirProvider struct {
-	ctx                                   *config.ProjectContext
+	ctx                                   *config.RunContext
 	Path                                  string
 	spinnerOpts                           ui.SpinnerOptions
 	IsTerragrunt                          bool
@@ -46,27 +44,27 @@ type RunShowOptions struct {
 	CmdOptions *CmdOptions
 }
 
-func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
-	terraformBinary := ctx.ProjectConfig.TerraformBinary
+func NewDirProvider(ctx *config.RunContext, projectCfg *config.Project) schema.Provider {
+	terraformBinary := projectCfg.TerraformBinary
 	if terraformBinary == "" {
 		terraformBinary = defaultTerraformBinary
 	}
 
 	return &DirProvider{
 		ctx:  ctx,
-		Path: ctx.ProjectConfig.Path,
+		Path: projectCfg.Path,
 		spinnerOpts: ui.SpinnerOptions{
-			Logger: ctx.Logger,
-			NoColor:       ctx.Config.NoColor,
-			Indent:        "  ",
+			Logger:  ctx.Logger(),
+			NoColor: ctx.Config().NoColor,
+			Indent:  "  ",
 		},
-		PlanFlags:           ctx.ProjectConfig.TerraformPlanFlags,
-		Workspace:           ctx.ProjectConfig.TerraformWorkspace,
-		UseState:            ctx.ProjectConfig.TerraformUseState,
+		PlanFlags:           projectCfg.TerraformPlanFlags,
+		Workspace:           projectCfg.TerraformWorkspace,
+		UseState:            projectCfg.TerraformUseState,
 		TerraformBinary:     terraformBinary,
-		TerraformCloudHost:  ctx.ProjectConfig.TerraformCloudHost,
-		TerraformCloudToken: ctx.ProjectConfig.TerraformCloudToken,
-		Env:                 ctx.ProjectConfig.Env,
+		TerraformCloudHost:  projectCfg.TerraformCloudHost,
+		TerraformCloudToken: projectCfg.TerraformCloudToken,
+		Env:                 projectCfg.Env,
 	}
 }
 
@@ -81,7 +79,7 @@ func (p *DirProvider) DisplayType() string {
 func (p *DirProvider) checks() error {
 	binary := p.TerraformBinary
 
-	p.ctx.SetContextValue("terraformBinary", binary)
+	p.ctx.SetMetadata("terraformBinary", binary)
 
 	_, err := exec.LookPath(binary)
 	if err != nil {
@@ -98,8 +96,8 @@ func (p *DirProvider) checks() error {
 	fullVersion := strings.SplitN(string(out), "\n", 2)[0]
 	version := shortTerraformVersion(fullVersion)
 
-	p.ctx.SetContextValue("terraformFullVersion", fullVersion)
-	p.ctx.SetContextValue("terraformVersion", version)
+	p.ctx.SetMetadata("terraformFullVersion", fullVersion)
+	p.ctx.SetMetadata("terraformVersion", version)
 
 	return checkTerraformVersion(version, fullVersion)
 }
@@ -114,7 +112,7 @@ func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 		out, err := cmd.Output()
 		if err != nil {
-			log.Debugf("Could not detect Terraform workspace for %s", p.Path)
+			p.ctx.Logger().Debug().Msg("Could not detect Terraform workspace")
 		}
 		terraformWorkspace = strings.Split(string(out), "\n")[0]
 	}
@@ -122,7 +120,7 @@ func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.TerraformWorkspace = terraformWorkspace
 }
 
-func (p *DirProvider) LoadResources(ctx *config.ProjectContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *DirProvider) LoadResources(ctx *config.RunContext, usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	projects := make([]*schema.Project, 0)
 	var out []byte
 	var err error
@@ -145,14 +143,14 @@ func (p *DirProvider) LoadResources(ctx *config.ProjectContext, usage map[string
 	}
 
 	for _, j := range jsons {
-		metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+		metadata := schema.DetectProjectMetadata(p.Path)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.Config.EnableDashboard)
+		name := schema.GenerateProjectName(metadata, ctx.Config().EnableDashboard)
 
 		project := schema.NewProject(name, metadata)
 
-		parser := NewParser(p.ctx)
+		parser := NewParser(ctx)
 		pastResources, resources, err := parser.parseJSON(ctx, j, usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
@@ -297,9 +295,9 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 
 		// If the plan returns this error then Terraform is configured with remote execution mode
 		if strings.HasPrefix(extractedErr, "Error: Saving a generated plan is currently not supported") {
-			p.ctx.Logger.Info().Msg("Continuing with Terraform Remote Execution Mode")
+			p.ctx.Logger().Info().Msg("Continuing with Terraform Remote Execution Mode")
 			p.IsTerraformRemoteExecutionModeEnabled = true
-			p.ctx.SetContextValue("terraformRemoteExecutionModeEnabled", true)
+			p.ctx.SetMetadata("terraformRemoteExecutionModeEnabled", true)
 			planJSON, err = p.runRemotePlan(opts, args)
 		} else if initOnFail && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
 			strings.Contains(extractedErr, "Error: Initialization required") ||

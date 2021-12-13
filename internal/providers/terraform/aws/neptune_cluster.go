@@ -16,7 +16,7 @@ func GetNeptuneClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewNeptuneCluster(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewNeptuneCluster(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var storageGb, monthlyIoRequests *decimal.Decimal
 	region := d.Get("region").String()
 	costComponents := make([]*schema.CostComponent, 0)

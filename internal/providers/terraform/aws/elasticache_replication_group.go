@@ -14,7 +14,7 @@ func GetElastiCacheReplicationGroupItem() *schema.RegistryItem {
 	}
 }
 
-func NewElastiCacheReplicationGroup(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewElastiCacheReplicationGroup(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	nodeType := d.Get("node_type").String()
 	var cacheNodes decimal.Decimal
 	cacheEngine := "redis"

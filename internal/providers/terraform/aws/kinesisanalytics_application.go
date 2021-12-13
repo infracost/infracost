@@ -13,7 +13,7 @@ func GetKinesisAnalyticsApplicationRegistryItem() *schema.RegistryItem {
 		RFunc: NewKinesisAnalyticsApplication,
 	}
 }
-func NewKinesisAnalyticsApplication(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKinesisAnalyticsApplication(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	costComponents := make([]*schema.CostComponent, 0)
 	var kinesisProcessingUnits *decimal.Decimal

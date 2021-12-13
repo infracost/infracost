@@ -54,7 +54,7 @@ func (a *S3GlacierFlexibleRetrievalStorageClass) PopulateUsage(u *schema.UsageDa
 	resources.PopulateArgsWithUsage(a, u)
 }
 
-func (a *S3GlacierFlexibleRetrievalStorageClass) BuildResource(ctx *config.ProjectContext) *schema.Resource {
+func (a *S3GlacierFlexibleRetrievalStorageClass) BuildResource(ctx *config.RunContext) *schema.Resource {
 	return &schema.Resource{
 		Name:        "Glacier flexible retrieval",
 		UsageSchema: S3GlacierFlexibleRetrievalStorageClassUsageSchema,

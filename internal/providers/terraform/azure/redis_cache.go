@@ -17,7 +17,7 @@ func GetAzureRMRedisCacheRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMRedisCache(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMRedisCache(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	skuName := d.Get("sku_name").String()

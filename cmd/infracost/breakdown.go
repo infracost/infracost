@@ -22,18 +22,18 @@ func breakdownCmd(ctx *config.RunContext) *cobra.Command {
       infracost breakdown --path plan.json`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := checkAPIKey(ctx.Config.APIKey, ctx.Config.PricingAPIEndpoint, ctx.Config.DefaultPricingAPIEndpoint); err != nil {
+			if err := checkAPIKey(ctx.Config().APIKey, ctx.Config().PricingAPIEndpoint, ctx.Config().DefaultPricingAPIEndpoint); err != nil {
 				return err
 			}
 
-			err := loadRunFlags(ctx.Config, cmd)
+			err := loadRunFlags(ctx.Config(), cmd)
 			if err != nil {
 				return err
 			}
 
-			ctx.SetContextValue("outputFormat", ctx.Config.Format)
+			ctx.SetMetadata("outputFormat", ctx.Config().Format)
 
-			err = checkRunConfig(cmd.ErrOrStderr(), ctx.Config)
+			err = checkRunConfig(cmd.ErrOrStderr(), ctx.Config())
 			if err != nil {
 				ui.PrintUsage(cmd)
 				return err

@@ -17,7 +17,7 @@ func GetRoute53HealthCheck() *schema.RegistryItem {
 	}
 }
 
-func NewRoute53HealthCheck(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRoute53HealthCheck(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 
 	endpointType := "aws"

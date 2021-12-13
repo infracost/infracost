@@ -21,7 +21,7 @@ func GetAzureRMSynapseSparkPoolRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMSynapseSparkPool(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMSynapseSparkPool(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"synapse_workspace_id"})
 	costComponents := make([]*schema.CostComponent, 0)
 

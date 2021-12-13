@@ -17,7 +17,7 @@ func GetAzureRMPublicIPRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMPublicIP(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMPublicIP(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	var meterName string

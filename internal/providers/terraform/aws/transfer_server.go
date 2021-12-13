@@ -13,7 +13,7 @@ func getTransferServerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func newTransferServer(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newTransferServer(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	protocols := []string{}
 

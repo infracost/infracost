@@ -17,7 +17,7 @@ func GetAzureRMCosmosdbCassandraTableRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAzureRMCosmosdbCassandraTable(ctx *config.ProjectContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureRMCosmosdbCassandraTable(ctx *config.RunContext, d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if len(d.References("cassandra_keyspace_id")) > 0 {
 		keyspace := d.References("cassandra_keyspace_id")[0]
 		if len(keyspace.References("account_name")) > 0 {
