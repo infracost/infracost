@@ -39,7 +39,11 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
   Create markdown report to post in a GitHub comment:
 
-      infracost output --format github-comment --path "out*.json" # glob needs quotes`,
+      infracost output --format github-comment --path "out*.json" # glob needs quotes
+
+  Create markdown report to post in a GitLab comment:
+
+      infracost output --format gitlab-comment --path "out*.json" # glob needs quotes`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFiles := []string{}
@@ -145,7 +149,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				b, err = output.ToHTML(combined, opts)
 			case "diff":
 				b, err = output.ToDiff(combined, opts)
-			case "github-comment":
+			case "github-comment", "gitlab-comment":
 				opts.IncludeHTML = true
 				b, err = output.ToMarkdown(combined, opts)
 			case "slack-message":
@@ -179,7 +183,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
 
-	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, slack-message")
+	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, slack-message")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
 
