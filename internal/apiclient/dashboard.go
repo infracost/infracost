@@ -21,6 +21,11 @@ type CreateAPIKeyResponse struct {
 	Error  string `json:"error"`
 }
 
+type AddRunResponse struct {
+	RunID  string `json:"id"`
+	RunURL string `json:"shareUrl"`
+}
+
 type runInput struct {
 	ProjectResults []projectResultInput   `json:"projectResults"`
 	TimeGenerated  time.Time              `json:"timeGenerated"`
@@ -63,10 +68,12 @@ func (c *DashboardAPIClient) CreateAPIKey(name string, email string) (CreateAPIK
 	return r, nil
 }
 
-func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*config.ProjectContext, out output.Root) (string, error) {
+func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*config.ProjectContext, out output.Root) (AddRunResponse, error) {
+	response := AddRunResponse{}
+
 	if !c.dashboardEnabled {
 		log.Debug("Skipping reporting project results since dashboard is not enabled")
-		return "", nil
+		return response, nil
 	}
 
 	projectResultInputs := make([]projectResultInput, len(out.Projects))
@@ -94,22 +101,23 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 	mutation($run: RunInput!) {
 			addRun(run: $run) {
 				id
+				shareUrl
 			}
 		}
 	`
 	results, err := c.doQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
-		return "", err
+		return response, err
 	}
 
-	runID := ""
 	if len(results) > 0 {
 
 		if results[0].Get("errors").Exists() {
-			return runID, errors.New(results[0].Get("errors").String())
+			return response, errors.New(results[0].Get("errors").String())
 		}
 
-		runID = results[0].Get("data.addRun.id").String()
+		response.RunID = results[0].Get("data.addRun.id").String()
+		response.RunURL = results[0].Get("data.addRun.shareUrl").String()
 	}
-	return runID, nil
+	return response, nil
 }
