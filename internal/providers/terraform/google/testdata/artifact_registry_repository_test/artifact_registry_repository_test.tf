@@ -3,6 +3,11 @@ provider "google" {
   region      = "us-central1"
 }
 
+provider "google-beta" {
+  credentials = "{\"type\":\"service_account\"}"
+  region      = "us-central1"
+}
+
 resource "google_artifact_registry_repository" "us_east1" {
   provider = google-beta
 
