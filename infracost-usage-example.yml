@@ -422,10 +422,16 @@ resource_usage:
     rule_group_rules: 5          # Total number of Rule Group rules used by the Web ACL.
     managed_rule_group_rules: 10 # Total number of Managed Rule Group rules used by the Web ACL.  
     monthly_requests: 1000000 # Monthly number of web requests received.
-    
+
   #
   # Terraform GCP resources
   #
+  google_artifact_registry_repository.my_artifact_registry:
+    storage_gb: 150 # Total data stored in the repository in GB
+    monthly_egress_data_transfer_gb: # Monthly data delivered from the artifact registry repository in GB. You can specify any number of Google Cloud regions below, replacing - for _ e.g.:
+      europe_north1: 100 # 100 GB of data delivered from the artifact registry to europe-north1.
+      australia_southeast1: 200 # 200 GB of data delivered from the artifact registry to australia-southeast1.
+
   google_bigquery_dataset.my_dataset:
     monthly_queries_tb: 100 # Monthly number of bytes processed (also referred to as bytes read) in TB.
 

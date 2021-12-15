@@ -1,0 +1,32 @@
+
+ Name                                                              Monthly Qty  Unit            Monthly Cost 
+                                                                                                             
+ google_artifact_registry_repository.asia_east1_usage                                                        
+ ├─ Storage usage                                                          150  GB                    $15.00 
+ └─ Data egress AsiaPacific to AsiaPacific                                 100  GB                     $5.00 
+                                                                                                             
+ google_artifact_registry_repository.australia_southeast1_usage                                              
+ ├─ Storage usage                                                          150  GB                    $15.00 
+ └─ Data egress from/to Oceania                                            100  GB                     $8.00 
+                                                                                                             
+ google_artifact_registry_repository.europe_north1_usage                                                     
+ ├─ Storage usage                                                          150  GB                    $15.00 
+ ├─ Data egress from/to Oceania                                            100  GB                    $15.00 
+ ├─ Data egress Europe to Europe                                           200  GB                     $4.00 
+ └─ Data egress Europe to South America                                    100  GB                     $8.00 
+                                                                                                             
+ google_artifact_registry_repository.multiregion_europe_usage                                                
+ └─ Storage usage                                                          150  GB                    $15.00 
+                                                                                                             
+ google_artifact_registry_repository.us_east1                                                                
+ └─ Storage usage                                                Monthly cost depends on usage: $0.10 per GB 
+                                                                                                             
+ google_artifact_registry_repository.us_east1_usage                                                          
+ ├─ Storage usage                                                          150  GB                    $15.00 
+ ├─ Data egress from/to Oceania                                            100  GB                    $15.00 
+ └─ Data egress North America to North America                             100  GB                     $1.00 
+                                                                                                             
+ OVERALL TOTAL                                                                                       $131.00 
+──────────────────────────────────
+6 cloud resources were detected:
+∙ 6 were estimated

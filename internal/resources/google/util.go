@@ -6,6 +6,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+var (
+	vendorName = strPtr("gcp")
+)
+
 func strPtr(s string) *string {
 	return &s
 }
