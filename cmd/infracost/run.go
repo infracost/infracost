@@ -8,6 +8,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Rhymond/go-money"
@@ -74,14 +75,24 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		}
 	}
 
+	// Create a mutex for each path, so we can synchronize the runs of any
+	// projects that have the same path. This is necessary because Terraform
+	// can't run multiple operations in parallel on the same path.
+	pathMuxs := map[string]*sync.Mutex{}
+	for _, projectCfg := range runCtx.Config.Projects {
+		pathMuxs[projectCfg.Path] = &sync.Mutex{}
+	}
+
 	for i := 0; i < parallelism; i++ {
 		errGroup.Go(func() error {
 
 			for projectCfg := range jobs {
+				mux := pathMuxs[projectCfg.Path]
+
 				ctx := config.NewProjectContext(runCtx, projectCfg)
 				projectContextChan <- ctx
 
-				configProjects, err := runProjectConfig(cmd, runCtx, ctx, projectCfg)
+				configProjects, err := runProjectConfig(cmd, runCtx, ctx, projectCfg, mux)
 				if err != nil {
 					return err
 				}
@@ -181,7 +192,12 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	return nil
 }
 
-func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config.ProjectContext, projectCfg *config.Project) ([]*schema.Project, error) {
+func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config.ProjectContext, projectCfg *config.Project, mux *sync.Mutex) ([]*schema.Project, error) {
+	if mux != nil {
+		mux.Lock()
+		defer mux.Unlock()
+	}
+
 	for k, v := range projectCfg.Env {
 		os.Setenv(k, v)
 	}
