@@ -301,7 +301,8 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 		EnableLogging: runCtx.Config.IsLogging(),
 		NoColor:       runCtx.Config.NoColor,
 	}
-	spinner = ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
+	spinner := ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
+	defer spinner.Fail()
 
 	for _, project := range projects {
 		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
@@ -371,8 +372,11 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx
 		Indent:        "  ",
 	}
 
-	spinner = ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
+	spinner := ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
+	defer spinner.Fail()
+
 	syncResult, err := usage.SyncUsageData(usageFile, providerProjects)
+
 	if err != nil {
 		spinner.Fail()
 		return errors.Wrap(err, "Error synchronizing usage data")
