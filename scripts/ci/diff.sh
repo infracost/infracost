@@ -51,7 +51,7 @@ process_args () {
   GITHUB_API_URL=${GITHUB_API_URL:-https://api.github.com}
 
   # Export as it's used by infracost, not this script
-  export INFRACOST_PARALLELISM=1 # TODO: remove this once we have fixed race conditions https://github.com/infracost/infracost/issues/1202
+  export INFRACOST_PARALLELISM=1 # TODO: remove this once we have fixed race conditions, https://github.com/infracost/infracost/issues/1202
   export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
   export INFRACOST_CI_DIFF=true
   export INFRACOST_CI_POST_CONDITION=$post_condition
