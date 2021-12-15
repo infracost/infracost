@@ -182,7 +182,7 @@
  ├─ Capacity (first 50TB)                                     51,200  GB                           $1,064.96 
  ├─ Capacity (next 450TB)                                    512,000  GB                          $10,223.62 
  ├─ Capacity (over 500TB)                                    436,800  GB                           $8,358.60 
- ├─ List and create container operations                         100  10k operations                   $5.50 
+ ├─ Write operations                                             100  10k operations                   $5.50 
  ├─ Read operations                                               10  10k operations                   $0.04 
  ├─ All other operations                                         100  10k operations                   $0.44 
  └─ Blob index                                                    10  10k tags                         $0.39 
