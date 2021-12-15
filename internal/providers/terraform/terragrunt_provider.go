@@ -3,10 +3,11 @@ package terraform
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/kballard/go-shellquote"
 	"os"
 	"path/filepath"
 	"sort"
+
+	"github.com/kballard/go-shellquote"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
@@ -117,6 +118,7 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 
 func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 	spinner := ui.NewSpinner("Running terragrunt run-all terragrunt-info", p.spinnerOpts)
+	defer spinner.Fail()
 
 	terragruntFlags, err := shellquote.Split(p.TerragruntFlags)
 	if err != nil {
@@ -187,6 +189,7 @@ func (p *TerragruntProvider) generateStateJSONs(projectDirs []terragruntProjectD
 		spinnerMsg += " for each project"
 	}
 	spinner := ui.NewSpinner(spinnerMsg, p.spinnerOpts)
+	defer spinner.Fail()
 
 	for _, projectDir := range projectDirs {
 		opts, err := p.buildCommandOpts(projectDir.ConfigDir)
@@ -243,6 +246,8 @@ func (p *TerragruntProvider) generatePlanJSONs(projectDirs []terragruntProjectDi
 	}
 
 	spinner := ui.NewSpinner("Running terragrunt run-all plan", p.spinnerOpts)
+	defer spinner.Fail()
+
 	planFile, planJSON, err := p.runPlan(opts, spinner, true)
 	defer func() {
 		err := cleanupPlanFiles(projectDirs, planFile)
