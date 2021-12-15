@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/awslabs/goformation/v4"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
@@ -155,7 +156,14 @@ func isTerraformDir(path string) bool {
 	return terraform.IsTerraformDir(path)
 }
 
+// goformation lib is not threadsafe, so we run this check synchronously
+// See: https://github.com/awslabs/goformation/issues/363
+var cfMux = &sync.Mutex{}
+
 func isCloudFormationTemplate(path string) bool {
+	cfMux.Lock()
+	defer cfMux.Unlock()
+
 	template, err := goformation.Open(path)
 	if err != nil {
 		return false
