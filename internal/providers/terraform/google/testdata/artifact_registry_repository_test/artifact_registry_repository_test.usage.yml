@@ -1,0 +1,30 @@
+version: 0.1
+resource_usage:
+  google_artifact_registry_repository.us_east1_usage:
+    storage_gb: 150
+    monthly_egress_data_transfer_gb:
+      us_east1: 100
+      us_west1: 100
+      australia_southeast1: 100
+      europe_north1: 100
+      southamerica_east1: 100
+  google_artifact_registry_repository.europe_north1_usage:
+    storage_gb: 150
+    monthly_egress_data_transfer_gb:
+      europe_north1: 100
+      europe_west1: 100
+      europe_west4: 100
+      southamerica_east1: 100
+      australia_southeast1: 100
+  google_artifact_registry_repository.asia_east1_usage:
+    storage_gb: 150
+    monthly_egress_data_transfer_gb:
+      asia_northeast1: 100
+  google_artifact_registry_repository.australia_southeast1_usage:
+    storage_gb: 150
+    monthly_egress_data_transfer_gb:
+      europe_west1: 100
+  google_artifact_registry_repository.multiregion_europe_usage:
+    storage_gb: 150
+    monthly_egress_data_transfer_gb:
+      europe_west1: 100
