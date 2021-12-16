@@ -2,12 +2,17 @@ package google
 
 import (
 	"fmt"
+	"reflect"
+	"regexp"
 
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 var (
 	vendorName = strPtr("gcp")
+	underscore = regexp.MustCompile(`_`)
 )
 
 func strPtr(s string) *string {
@@ -36,4 +41,115 @@ func floatPtrToDecimalPtr(f *float64) *decimal.Decimal {
 		return nil
 	}
 	return decimalPtr(decimal.NewFromFloat(*f))
+}
+
+// RegionsUsage is a reusable type that represents a usage cost map.
+// This can be used in resources that define a usage parameter that's changed on a per-region basis, e.g:
+//
+// monthly_data_processed_gb:
+//   asia_northeast1: 188
+//   asia_east2: 78
+//
+// can be handled by adding a usage cost property to your resource like so:
+//
+// type MyResource struct {
+//    ...
+//    MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_processed_gb"`
+// }
+type RegionsUsage struct {
+	AsiaEast1              *float64 `infracost_usage:"asia_east1"`
+	AsiaEast2              *float64 `infracost_usage:"asia_east2"`
+	AsiaNortheast1         *float64 `infracost_usage:"asia_northeast1"`
+	AsiaNortheast2         *float64 `infracost_usage:"asia_northeast2"`
+	AsiaNortheast3         *float64 `infracost_usage:"asia_northeast3"`
+	AsiaSouth1             *float64 `infracost_usage:"asia_south1"`
+	AsiaSouth2             *float64 `infracost_usage:"asia_south2"`
+	AsiaSoutheast1         *float64 `infracost_usage:"asia_southeast1"`
+	AsiaSoutheast2         *float64 `infracost_usage:"asia_southeast2"`
+	AustraliaSoutheast1    *float64 `infracost_usage:"australia_southeast1"`
+	AustraliaSoutheast2    *float64 `infracost_usage:"australia_southeast2"`
+	EuropeCentral2         *float64 `infracost_usage:"europe_central2"`
+	EuropeNorth1           *float64 `infracost_usage:"europe_north1"`
+	EuropeWest1            *float64 `infracost_usage:"europe_west1"`
+	EuropeWest2            *float64 `infracost_usage:"europe_west2"`
+	EuropeWest3            *float64 `infracost_usage:"europe_west3"`
+	EuropeWest4            *float64 `infracost_usage:"europe_west4"`
+	EuropeWest6            *float64 `infracost_usage:"europe_west6"`
+	NorthAmericaNortheast1 *float64 `infracost_usage:"northamerica_northeast1"`
+	NorthAmericaNortheast2 *float64 `infracost_usage:"northamerica_northeast2"`
+	SouthAmericaEast1      *float64 `infracost_usage:"southamerica_east1"`
+	SouthAmericaWest1      *float64 `infracost_usage:"southamerica_west1"`
+	USCentral1             *float64 `infracost_usage:"us_central1"`
+	USEast1                *float64 `infracost_usage:"us_east1"`
+	USEast4                *float64 `infracost_usage:"us_east4"`
+	USWest1                *float64 `infracost_usage:"us_west1"`
+	USWest2                *float64 `infracost_usage:"us_west2"`
+	USWest3                *float64 `infracost_usage:"us_west3"`
+	USWest4                *float64 `infracost_usage:"us_west4"`
+}
+
+// RegionUsageSchema is the schema representation of the RegionsUsage type.
+// This can be used as a schema.SubResourceUsage to define a structure that's
+// commonly used with resources that vary on a per region basis.
+var RegionUsageSchema = []*schema.UsageItem{
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_east1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_east2"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_northeast1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_northeast2"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_northeast3"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_south1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_south2"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_southeast1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_southeast2"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"australia_southeast1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"australia_southeast2"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_central2"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_north1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_west1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_west2"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_west3"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_west4"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_west6"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"northamerica_northeast1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"northamerica_northeast2"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"southamerica_east1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"southamerica_west1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_central1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_east1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_east4"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_west1"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_west2"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_west3"`},
+	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_west4"`},
+}
+
+// RegionUsage defines a hard definition in the regions map.
+type RegionUsage struct {
+	Key   string
+	Value float64
+}
+
+// Values returns RegionUsage as a slice which can be iterated over
+// to create cost components. The keys of the regions returned have
+// their underscores replaced with hypens so they can be used in
+// product filters and cost lookups.
+func (r RegionsUsage) Values() []RegionUsage {
+	s := reflect.ValueOf(r)
+	t := reflect.TypeOf(r)
+
+	var regions []RegionUsage
+	for i := 0; i < s.NumField(); i++ {
+		f := s.Field(i)
+
+		if f.IsNil() {
+			continue
+		}
+
+		regions = append(regions, RegionUsage{
+			Key:   underscore.ReplaceAllString(t.Field(i).Tag.Get("infracost_usage"), "-"),
+			Value: *f.Interface().(*float64),
+		})
+	}
+
+	return regions
 }

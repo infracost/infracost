@@ -2,13 +2,13 @@ package google
 
 import (
 	"fmt"
+	"regexp"
+
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
-	"reflect"
-	"regexp"
-	"strings"
 )
 
 var (
@@ -52,73 +52,7 @@ type ArtifactRegistryRepository struct {
 	StorageGB *float64 `infracost_usage:"storage_gb"`
 	// MonthlyEgressDataTransferGB represents a complex usage cost that defines data transfer to different regions in the
 	// google cloud infra. This does not include outbound internet egress (e.g. downloading artifact data to a local machine).
-	MonthlyEgressDataTransferGB *artifactRegistryRegionDataTransfer `infracost_usage:"monthly_egress_data_transfer_gb"`
-}
-
-// artifactRegistryRegionDataTransfer represents a usage map that allows the users to specify which regions the artifact registry
-// has data egress to/from.
-type artifactRegistryRegionDataTransfer struct {
-	AsiaEast1              *float64 `infracost_usage:"asia_east1"`
-	AsiaEast2              *float64 `infracost_usage:"asia_east2"`
-	AsiaNortheast1         *float64 `infracost_usage:"asia_northeast1"`
-	AsiaNortheast2         *float64 `infracost_usage:"asia_northeast2"`
-	AsiaNortheast3         *float64 `infracost_usage:"asia_northeast3"`
-	AsiaSouth1             *float64 `infracost_usage:"asia_south1"`
-	AsiaSouth2             *float64 `infracost_usage:"asia_south2"`
-	AsiaSoutheast1         *float64 `infracost_usage:"asia_southeast1"`
-	AsiaSoutheast2         *float64 `infracost_usage:"asia_southeast2"`
-	AustraliaSoutheast1    *float64 `infracost_usage:"australia_southeast1"`
-	AustraliaSoutheast2    *float64 `infracost_usage:"australia_southeast2"`
-	EuropeCentral2         *float64 `infracost_usage:"europe_central2"`
-	EuropeNorth1           *float64 `infracost_usage:"europe_north1"`
-	EuropeWest1            *float64 `infracost_usage:"europe_west1"`
-	EuropeWest2            *float64 `infracost_usage:"europe_west2"`
-	EuropeWest3            *float64 `infracost_usage:"europe_west3"`
-	EuropeWest4            *float64 `infracost_usage:"europe_west4"`
-	EuropeWest6            *float64 `infracost_usage:"europe_west6"`
-	NorthAmericaNortheast1 *float64 `infracost_usage:"northamerica_northeast1"`
-	NorthAmericaNortheast2 *float64 `infracost_usage:"northamerica_northeast2"`
-	SouthAmericaEast1      *float64 `infracost_usage:"southamerica_east1"`
-	SouthAmericaWest1      *float64 `infracost_usage:"southamerica_west1"`
-	USCentral1             *float64 `infracost_usage:"us_central1"`
-	USEast1                *float64 `infracost_usage:"us_east1"`
-	USEast4                *float64 `infracost_usage:"us_east4"`
-	USWest1                *float64 `infracost_usage:"us_west1"`
-	USWest2                *float64 `infracost_usage:"us_west2"`
-	USWest3                *float64 `infracost_usage:"us_west3"`
-	USWest4                *float64 `infracost_usage:"us_west4"`
-}
-
-var artifactRegistryRegionDataTransferUsage = []*schema.UsageItem{
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_east1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_east2"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_northeast1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_northeast2"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_northeast3"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_south1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_south2"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_southeast1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_southeast2"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"australia_southeast1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"australia_southeast2"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_central2"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_north1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_west1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_west2"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_west3"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_west4"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"europe_west6"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"northamerica_northeast1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"northamerica_northeast2"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"southamerica_east1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"southamerica_west1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_central1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_east1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_east4"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_west1"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_west2"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_west3"`},
-	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"us_west4"`},
+	MonthlyEgressDataTransferGB *RegionsUsage `infracost_usage:"monthly_egress_data_transfer_gb"`
 }
 
 // artifactRegistryRepositoryUsageSchema defines a list which represents the usage schema of ArtifactRegistryRepository.
@@ -128,7 +62,7 @@ var artifactRegistryRepositoryUsageSchema = []*schema.UsageItem{
 		Key: "monthly_egress_data_transfer_gb",
 		DefaultValue: &usage.ResourceUsage{
 			Name:  "monthly_egress_data_transfer_gb",
-			Items: artifactRegistryRegionDataTransferUsage,
+			Items: RegionUsageSchema,
 		},
 		ValueType: schema.SubResourceUsage,
 	},
@@ -247,24 +181,22 @@ func (r *ArtifactRegistryRepository) toEgressFilters() []artifactRegistryEgressF
 		return nil
 	}
 
-	var data []artifactRegistryEgressFilters
-	v := reflect.ValueOf(*r.MonthlyEgressDataTransferGB)
-	t := reflect.TypeOf(*r.MonthlyEgressDataTransferGB)
+	values := r.MonthlyEgressDataTransferGB.Values()
 
+	var data []artifactRegistryEgressFilters
 	transferMap := make(map[string]int)
 
-	for i := 0; i < v.NumField(); i++ {
-		if v.Field(i).IsNil() {
+	for _, region := range values {
+		if region.Value == 0 {
 			continue
 		}
 
-		region := strings.ReplaceAll(t.Field(i).Tag.Get("infracost_usage"), "_", "-")
-		if r.isEgressFree(region) {
+		if r.isEgressFree(region.Key) {
 			continue
 		}
 
-		continent := continentName(region)
-		value := decimal.NewFromFloat(*v.Field(i).Interface().(*float64))
+		continent := continentName(region.Key)
+		value := decimal.NewFromFloat(region.Value)
 
 		// check if the user has specified multiple regions that are based in the same continent.
 		// We want to bunch these cost components into a single value output.
