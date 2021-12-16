@@ -52,12 +52,12 @@ type ArtifactRegistryRepository struct {
 	StorageGB *float64 `infracost_usage:"storage_gb"`
 	// MonthlyEgressDataTransferGB represents a complex usage cost that defines data transfer to different regions in the
 	// google cloud infra. This does not include outbound internet egress (e.g. downloading artifact data to a local machine).
-	MonthlyEgressDataTransferGB *locationDataTransfer `infracost_usage:"monthly_egress_data_transfer_gb"`
+	MonthlyEgressDataTransferGB *artifactRegistryRegionDataTransfer `infracost_usage:"monthly_egress_data_transfer_gb"`
 }
 
-// locationDataTransfer represents a usage map that allows the users to specify which regions the artifact registry
+// artifactRegistryRegionDataTransfer represents a usage map that allows the users to specify which regions the artifact registry
 // has data egress to/from.
-type locationDataTransfer struct {
+type artifactRegistryRegionDataTransfer struct {
 	AsiaEast1              *float64 `infracost_usage:"asia_east1"`
 	AsiaEast2              *float64 `infracost_usage:"asia_east2"`
 	AsiaNortheast1         *float64 `infracost_usage:"asia_northeast1"`
@@ -89,7 +89,7 @@ type locationDataTransfer struct {
 	USWest4                *float64 `infracost_usage:"us_west4"`
 }
 
-var locationDataTransferUsage = []*schema.UsageItem{
+var artifactRegistryRegionDataTransferUsage = []*schema.UsageItem{
 	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_east1"`},
 	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_east2"`},
 	{ValueType: schema.Float64, DefaultValue: 0, Key: `infracost_usage:"asia_northeast1"`},
@@ -128,7 +128,7 @@ var artifactRegistryRepositoryUsageSchema = []*schema.UsageItem{
 		Key: "monthly_egress_data_transfer_gb",
 		DefaultValue: &usage.ResourceUsage{
 			Name:  "monthly_egress_data_transfer_gb",
-			Items: locationDataTransferUsage,
+			Items: artifactRegistryRegionDataTransferUsage,
 		},
 		ValueType: schema.SubResourceUsage,
 	},
@@ -233,6 +233,15 @@ type artifactRegistryEgressFilters struct {
 	value  *decimal.Decimal
 }
 
+// toEgressFilters returns ArtifactRegistryRepository.MonthlyEgressDataTransferGB as a slice of filters to be used to build
+// a set of cost components. One artifactRegistryEgressFilters is used by one schema.CostComponent.
+//
+// It uses reflection to loop over the ArtifactRegistryRepository.MonthlyEgressDataTransferGB, checking if a value has been
+// given at the given region. If it has we also make sure that the region usage isn't free. See isEgressFree method for more
+// details. toEgressFilters also bunches costs into continent to continent filters, as this is how they are displayed on
+// the pricing page. This means that if the user specifies egress to two regions in the same continent, e.g. europe-west1 & europe-west2
+// from europe-north1. Then these will be aggregated under a "Europe to Europe" artifactRegistryEgressFilters and in turn
+// a schema.CostComponent.
 func (r *ArtifactRegistryRepository) toEgressFilters() []artifactRegistryEgressFilters {
 	if r.MonthlyEgressDataTransferGB == nil {
 		return nil
