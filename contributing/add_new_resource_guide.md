@@ -33,6 +33,7 @@ The steps below describe adding an AWS resource using Terraform IaC provider, bu
   - [References to other resources](#references-to-other-resources)
   - [Google zone mappings](#google-zone-mappings)
   - [Azure zone mappings](#azure-zone-mappings)
+  - [Region usage](#region-usage)
 
 ## Prerequisites
 
@@ -1162,3 +1163,63 @@ Unless the resource has global or zone-based pricing, the first line of the reso
 		...
 	}
   ```
+
+### Region usage
+
+A number of resources have usage costs which vary on a per-region basis. This means that developers often have to define
+a usage file with a complex map key with all the cloud provider regions. E.g. `google_artifact_registry_repository` can have 
+any number of google regions under the `monthly_egress_data_transfer_gb` usage param:
+
+```yaml
+  google_artifact_registry_repository.artifact_registry:
+    storage_gb: 150
+    monthly_egress_data_transfer_gb:
+      us_east1: 100
+      us_west1: 100
+      australia_southeast1: 100
+      europe_north1: 100
+      southamerica_east1: 100
+```
+
+If you have a resource like this, rather than defining your own usage field, it is advisable you use one of the shared `RegionsUsage`
+structs that handle this structure for you. These structs can be found in both [the google](../internal/resources/google/util.go) & [aws](../internal/resources/aws/util.go) resource util files.
+
+These can simply be embedded into a struct field like so:
+
+```go
+type MyResource struct {
+    ...
+    MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_processed_gb"`
+}
+```
+
+And then after `PopulateUsage` is called it can be accessed to retrieve set values. `RegionsUsage` helper struct also comes with 
+a `Values` method that returns the set values as a `slice` with key/value pairs that is helpful to iterate over to create cost components, e.g with a usage like so:
+
+```yaml
+  my_resource.resource:
+    monthly_processed_gb:
+      europe_north1: 100
+      southamerica_east1: 200
+```
+
+running:
+
+```go
+func (r *MyResource) BuildResource() *schema.Resource {
+    values := r.MonthlyDataProcessedGB.Values()
+
+    for _, v := range values {
+        fmt.Println("%s => %2.f", v.Key, v.Value)
+    }
+    ...
+}
+```
+
+would print:
+
+
+```bash
+europe-north1 => 100.00
+southamerica-east1 => 200.00
+```
