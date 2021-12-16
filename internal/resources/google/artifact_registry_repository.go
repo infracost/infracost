@@ -76,17 +76,17 @@ type locationDataTransfer struct {
 	EuropeWest3            *float64 `infracost_usage:"europe_west3"`
 	EuropeWest4            *float64 `infracost_usage:"europe_west4"`
 	EuropeWest6            *float64 `infracost_usage:"europe_west6"`
-	NorthamericaNortheast1 *float64 `infracost_usage:"northamerica_northeast1"`
-	NorthamericaNortheast2 *float64 `infracost_usage:"northamerica_northeast2"`
-	SouthamericaEast1      *float64 `infracost_usage:"southamerica_east1"`
-	SouthamericaWest1      *float64 `infracost_usage:"southamerica_west1"`
-	UsCentral1             *float64 `infracost_usage:"us_central1"`
-	UsEast1                *float64 `infracost_usage:"us_east1"`
-	UsEast4                *float64 `infracost_usage:"us_east4"`
-	UsWest1                *float64 `infracost_usage:"us_west1"`
-	UsWest2                *float64 `infracost_usage:"us_west2"`
-	UsWest3                *float64 `infracost_usage:"us_west3"`
-	UsWest4                *float64 `infracost_usage:"us_west4"`
+	NorthAmericaNortheast1 *float64 `infracost_usage:"northamerica_northeast1"`
+	NorthAmericaNortheast2 *float64 `infracost_usage:"northamerica_northeast2"`
+	SouthAmericaEast1      *float64 `infracost_usage:"southamerica_east1"`
+	SouthAmericaWest1      *float64 `infracost_usage:"southamerica_west1"`
+	USCentral1             *float64 `infracost_usage:"us_central1"`
+	USEast1                *float64 `infracost_usage:"us_east1"`
+	USEast4                *float64 `infracost_usage:"us_east4"`
+	USWest1                *float64 `infracost_usage:"us_west1"`
+	USWest2                *float64 `infracost_usage:"us_west2"`
+	USWest3                *float64 `infracost_usage:"us_west3"`
+	USWest4                *float64 `infracost_usage:"us_west4"`
 }
 
 var locationDataTransferUsage = []*schema.UsageItem{
