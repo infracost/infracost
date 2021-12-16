@@ -205,7 +205,7 @@ func (r *ArtifactRegistryRepository) internalEgressComponents() []*schema.CostCo
 
 func (r *ArtifactRegistryRepository) storageCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Storage usage",
+		Name:            "Storage",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: floatPtrToDecimalPtr(r.StorageGB),
@@ -327,6 +327,10 @@ func (r *ArtifactRegistryRepository) egressComponentName(continent string) strin
 		return "Data egress from/to Oceania"
 	}
 
+	if r.Continent == continentSouthAmerica || continent == continentSouthAmerica {
+		return "Intercontinental (Excl Oceania)"
+	}
+
 	// replace the gcp continent naming with the correctly spelled continent
 	// for the cli output.
 	from := r.Continent
@@ -339,7 +343,11 @@ func (r *ArtifactRegistryRepository) egressComponentName(continent string) strin
 		to = "AsiaPacific"
 	}
 
-	return fmt.Sprintf("Data egress %s to %s", from, to)
+	if continent == r.Continent {
+		return fmt.Sprintf("Data egress %s to %s", from, to)
+	}
+
+	return "Intercontinental (Excl Oceania)"
 }
 
 func (r *ArtifactRegistryRepository) egressRegionFilter(continent string) *string {
@@ -348,6 +356,10 @@ func (r *ArtifactRegistryRepository) egressRegionFilter(continent string) *strin
 	}
 
 	if _, ok := artifactGlobalEgressContinents[continent]; ok {
+		return strPtr("global")
+	}
+
+	if r.Continent != continent {
 		return strPtr("global")
 	}
 
