@@ -1191,8 +1191,7 @@ type MyResource struct {
 }
 ```
 
-And then after `PopulateUsage` is called it can be accessed to retrieve set values. `RegionsUsage` helper struct also comes with 
-a `Values` method that returns the set values as a `slice` with key/value pairs that is helpful to iterate over to create cost components, e.g with a usage like so:
+And then after `PopulateUsage` is called it can be accessed to retrieve set values. `RegionsUsage` helper struct also comes with a `Values` method that returns the set values as a `slice` with key/value pairs that is helpful to iterate over to create cost components, e.g with a usage like so:
 
 ```yaml
   my_resource.resource:
