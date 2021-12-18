@@ -1166,9 +1166,7 @@ Unless the resource has global or zone-based pricing, the first line of the reso
 
 ### Region usage
 
-A number of resources have usage costs which vary on a per-region basis. This means that developers often have to define
-a usage file with a complex map key with all the cloud provider regions. E.g. `google_artifact_registry_repository` can have 
-any number of google regions under the `monthly_egress_data_transfer_gb` usage param:
+A number of resources have usage costs which vary on a per-region basis. This means that you often have to define a usage file with a complex map key with all the cloud provider regions. For example, `google_artifact_registry_repository` can have any number of Google regions under the `monthly_egress_data_transfer_gb` usage parameter:
 
 ```yaml
   google_artifact_registry_repository.artifact_registry:
