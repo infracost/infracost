@@ -1179,8 +1179,7 @@ A number of resources have usage costs which vary on a per-region basis. This me
       southamerica_east1: 100
 ```
 
-If you have a resource like this, rather than defining your own usage field, it is advisable you use one of the shared `RegionsUsage`
-structs that handle this structure for you. These structs can be found in both [the google](../internal/resources/google/util.go) & [aws](../internal/resources/aws/util.go) resource util files.
+If you have a resource like this, rather than defining your own usage field, you should use one of the shared `RegionsUsage` structs that handle this structure for you. These structs can be found in both [the `google`](../internal/resources/google/util.go) & [`aws`](../internal/resources/aws/util.go) resource util files.
 
 These can simply be embedded into a struct field like so:
 
