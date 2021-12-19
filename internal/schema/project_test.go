@@ -17,8 +17,8 @@ func TestNameFromRepoURL(t *testing.T) {
 		{"https://gitlab.com/org/repo.git", "org/repo"},
 		{"git@bitbucket.org:org/repo.git", "org/repo"},
 		{"https://user@bitbucket.org/org/repo.git", "org/repo"},
-		{"https://user@dev.azure.com/org/base/_git/repo", "org/repo"},
-		{"git@ssh.dev.azure.com:v3/org/base/repo", "org/repo"},
+		{"https://user@dev.azure.com/org/project/_git/repo", "org/project/repo"},
+		{"git@ssh.dev.azure.com:v3/org/project/repo", "org/project/repo"},
 	}
 
 	for _, test := range tests {
