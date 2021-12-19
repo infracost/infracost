@@ -62,11 +62,19 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 	terraformWorkspace := os.Getenv("INFRACOST_TERRAFORM_WORKSPACE")
 
 	if vcsRepoURL == "" {
+		vcsRepoURL = ciVCSRepo()
+	}
+
+	if vcsRepoURL == "" {
 		vcsRepoURL = gitRepo(path)
 	}
 
 	if vcsRepoURL != "" && vcsSubPath == "" {
 		vcsSubPath = gitSubPath(path)
+	}
+
+	if vcsPullRequestURL == "" {
+		vcsPullRequestURL = ciVCSPullRequestURL()
 	}
 
 	vcsRepoURL = stripVCSRepoPassword(vcsRepoURL)

@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"runtime"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/infracost/infracost/internal/version"
+	log "github.com/sirupsen/logrus"
 )
 
 type RunContext struct {
@@ -159,5 +161,50 @@ func ciPlatform() string {
 		}
 	}
 
+	return ""
+}
+
+func ciVCSRepo() string {
+	if IsEnvPresent("GITHUB_REPOSITORY") {
+		serverURL := os.Getenv("GITHUB_SERVER_URL")
+		if serverURL == "" {
+			serverURL = "https://github.com"
+		}
+		return fmt.Sprintf("%s/%s", serverURL, os.Getenv("GITHUB_REPOSITORY"))
+	} else if IsEnvPresent("CI_PROJECT_URL") {
+		return os.Getenv("CI_PROJECT_URL")
+	} else if IsEnvPresent("BUILD_REPOSITORY_URI") {
+		return os.Getenv("BUILD_REPOSITORY_URI")
+	} else if IsEnvPresent("BITBUCKET_GIT_HTTP_ORIGIN") {
+		return os.Getenv("BITBUCKET_GIT_HTTP_ORIGIN")
+	} else if IsEnvPresent("CIRCLE_REPOSITORY_URL") {
+		return os.Getenv("CIRCLE_REPOSITORY_URL")
+	}
+
+	return ""
+}
+
+func ciVCSPullRequestURL() string {
+	if IsEnvPresent("GITHUB_EVENT_PATH") && os.Getenv("GITHUB_EVENT_NAME") == "pull_request" {
+		b, err := os.ReadFile(os.Getenv("GITHUB_EVENT_PATH"))
+		if err != nil {
+			log.Debugf("Error reading GITHUB_EVENT_PATH file: %v", err)
+		}
+
+		var event struct {
+			PullRequest struct {
+				HTMLURL string `json:"html_url"`
+			} `json:"pull_request"`
+		}
+
+		err = json.Unmarshal(b, &event)
+		if err != nil {
+			log.Debugf("Error reading GITHUB_EVENT_PATH JSON: %v", err)
+		}
+
+		return event.PullRequest.HTMLURL
+	} else if IsEnvPresent("CI_PROJECT_URL") && IsEnvPresent("CI_MERGE_REQUEST_IID") {
+		return fmt.Sprintf("%s/merge_requests/%s", os.Getenv("CI_PROJECT_URL"), os.Getenv("CI_MERGE_REQUEST_IID"))
+	}
 	return ""
 }
