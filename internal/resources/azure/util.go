@@ -4,6 +4,18 @@ import (
 	"fmt"
 
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/schema"
+)
+
+const (
+	vendorName = "azure"
+)
+
+var (
+	priceFilterConsumption = &schema.PriceFilter{
+		PurchaseOption: strPtr("Consumption"),
+	}
 )
 
 func strPtr(s string) *string {

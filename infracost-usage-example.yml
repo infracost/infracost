@@ -886,6 +886,11 @@ resource_usage:
     monthly_data_write_gb: 1000                           # Monthly number of data write in GB.
     blob_index_tags: 100000                               # Total number of Blob indexes.
 
+  azurerm_sql_database.my_database:
+    monthly_vcore_hours: 600             # Monthly number of used vCore-hours for serverless compute.
+    long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
+    extra_data_storage_gb: 250           # Override number of GBs used by extra data storage.
+
   azurerm_synapse_spark_pool.my_spark_pool:
     monthly_hours: 730 # Monthly number of hours used by each instance in the pool.
 
