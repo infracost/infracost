@@ -178,15 +178,6 @@
  ├─ Read operations                                               10  10k operations                   $0.04 
  └─ All other operations                                         100  10k operations                   $0.44 
                                                                                                              
- azurerm_storage_account.v2_hot_lrs                                                                          
- ├─ Capacity (first 50TB)                                     51,200  GB                           $1,064.96 
- ├─ Capacity (next 450TB)                                    512,000  GB                          $10,223.62 
- ├─ Capacity (over 500TB)                                    436,800  GB                           $8,358.60 
- ├─ List and create container operations                         100  10k operations                   $5.50 
- ├─ Read operations                                               10  10k operations                   $0.04 
- ├─ All other operations                                         100  10k operations                   $0.44 
- └─ Blob index                                                    10  10k tags                         $0.39 
-                                                                                                             
  azurerm_storage_account.v2_hot_lrs_nfsv3                                                                    
  ├─ Capacity (first 50TB)                                     51,200  GB                           $1,075.20 
  ├─ Capacity (next 450TB)                                    512,000  GB                          $10,240.00 
@@ -223,10 +214,10 @@
  ├─ Read operations                               Monthly cost depends on usage: $0.006 per 10k operations   
  └─ All other operations                          Monthly cost depends on usage: $0.006 per 10k operations   
                                                                                                              
- OVERALL TOTAL                                                                                 $2,241,800.82 
+ OVERALL TOTAL                                                                                 $2,222,147.27 
 ──────────────────────────────────
-34 cloud resources were detected:
-∙ 27 were estimated, 27 include usage-based costs, see https://infracost.io/usage-file
+33 cloud resources were detected:
+∙ 26 were estimated, 26 include usage-based costs, see https://infracost.io/usage-file
 ∙ 6 weren't estimated, report them in https://github.com/infracost/infracost:
   ∙ 6 x azurerm_storage_account
 ∙ 1 was free:

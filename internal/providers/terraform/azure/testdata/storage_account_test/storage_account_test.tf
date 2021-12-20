@@ -239,15 +239,17 @@ resource "azurerm_storage_account" "v2_cool_lrs_nfsv3" {
   nfsv3_enabled            = true
 }
 
-resource "azurerm_storage_account" "v2_hot_lrs" {
-  name                     = "storageaccountname"
-  resource_group_name      = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  account_kind             = "StorageV2"
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  access_tier              = "Hot"
-}
+# Temporarily disabled due to duplication issue in Azure StorageV2 pricing
+# records (same productHash for different cost components).
+# resource "azurerm_storage_account" "v2_hot_lrs" {
+#   name                     = "storageaccountname"
+#   resource_group_name      = azurerm_resource_group.example.name
+#   location                 = azurerm_resource_group.example.location
+#   account_kind             = "StorageV2"
+#   account_tier             = "Standard"
+#   account_replication_type = "LRS"
+#   access_tier              = "Hot"
+# }
 
 resource "azurerm_storage_account" "v2_hot_lrs_nfsv3" {
   name                     = "storageaccountname"
