@@ -52,9 +52,9 @@ resource_usage:
     monthly_duration_secs: 0 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.  
 
   aws_cloudtrail.my_cloudtrail:
-    monthly_additional_management_events: 1000 # Monthly additional copies of read and write management events. The first copy of management events per region is free, so this should only be non-zero if there are multiple trails recording management events in this region.
-    monthly_data_events: 2000 # Monthly data events delivered to S3, Lambda or DynamoDB
-    monthly_insight_events: 4000 # Monthly CloudTrail Insight events
+    monthly_additional_management_events: 100000 # Monthly additional copies of read and write management events. The first copy of management events per region is free, so this should only be non-zero if there are multiple trails recording management events in this region.
+    monthly_data_events: 200000 # Monthly data events delivered to S3, Lambda or DynamoDB
+    monthly_insight_events: 400000 # Monthly CloudTrail Insight events
 
   aws_cloudwatch_event_bus.my_events:
     monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.

@@ -117,15 +117,11 @@ func (r *Cloudtrail) eventCostComponent(name string, quantity *decimal.Decimal) 
 		productFamily = "Management Tools - AWS CloudTrail Insights Events"
 	}
 
-	var monthlyQuantity *decimal.Decimal
-	if quantity != nil {
-		monthlyQuantity = decimalPtr(quantity.Mul(cloudTrailBillingMultiplier))
-	}
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "100k events",
 		UnitMultiplier:  cloudTrailBillingMultiplier,
-		MonthlyQuantity: monthlyQuantity,
+		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    vendorName,
 			Region:        strPtr(r.Region),
