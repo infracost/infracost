@@ -1,0 +1,24 @@
+
+ Name                                                      Monthly Qty  Unit                  Monthly Cost 
+                                                                                                           
+ aws_cloudtrail.cloudtrail_with_defaults                                                                   
+ ├─ Management events (additional copies)             Monthly cost depends on usage: $2.00 per 100k events 
+ └─ Data events                                       Monthly cost depends on usage: $0.10 per 100k events 
+                                                                                                           
+ aws_cloudtrail.cloudtrail_with_insight_selector                                                           
+ ├─ Management events (additional copies)             Monthly cost depends on usage: $2.00 per 100k events 
+ ├─ Data events                                       Monthly cost depends on usage: $0.10 per 100k events 
+ └─ Insight events                                    Monthly cost depends on usage: $0.35 per 100k events 
+                                                                                                           
+ aws_cloudtrail.cloudtrail_with_usage                                                                      
+ ├─ Management events (additional copies)                            1  100k events                  $2.00 
+ ├─ Data events                                                      2  100k events                  $0.20 
+ └─ Insight events                                                   3  100k events                  $1.05 
+                                                                                                           
+ aws_cloudtrail.cloudtrail_without_management_events                                                       
+ └─ Data events                                       Monthly cost depends on usage: $0.10 per 100k events 
+                                                                                                           
+ OVERALL TOTAL                                                                                       $3.25 
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file

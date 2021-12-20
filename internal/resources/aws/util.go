@@ -13,6 +13,7 @@ import (
 
 var (
 	underscore = regexp.MustCompile(`_`)
+	vendorName = strPtr("aws")
 )
 
 func strPtr(s string) *string {

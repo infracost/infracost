@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  aws_cloudtrail.cloudtrail_with_usage:
+    monthly_additional_management_events: 100000
+    monthly_data_events: 200000
+    monthly_insight_events: 300000
