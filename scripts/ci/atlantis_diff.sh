@@ -37,7 +37,6 @@ process_args () {
   INFRACOST_BINARY=${INFRACOST_BINARY:-infracost}
 
   # Export as it's used by infracost, not this script
-  export INFRACOST_PARALLELISM=1 # TODO: remove this once we have fixed race conditions, https://github.com/infracost/infracost/issues/1202
   export INFRACOST_LOG_LEVEL=${INFRACOST_LOG_LEVEL:-info}
   export INFRACOST_CI_ATLANTIS_DIFF=true
 }
