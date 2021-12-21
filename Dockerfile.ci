@@ -29,6 +29,7 @@ WORKDIR /root/
 COPY scripts/comment.sh scripts/comment
 COPY --from=builder /app/build/infracost /usr/bin/
 
+ENV INFRACOST_CI_IMAGE=true
 ENV INFRACOST_SKIP_UPDATE_CHECK='true'
 ENV INFRACOST_LOG_LEVEL=info
 

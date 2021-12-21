@@ -106,7 +106,9 @@ func baseVersion(v string) string {
 }
 
 func ciScript() string {
-	if IsEnvPresent("INFRACOST_GITHUB_ACTION") {
+	if IsEnvPresent("INFRACOST_CI_IMAGE") {
+		return "ci-image"
+	} else if IsEnvPresent("INFRACOST_GITHUB_ACTION") {
 		return "infracost-github-action"
 	} else if IsEnvPresent("INFRACOST_CI_DIFF") {
 		return "ci-diff"
