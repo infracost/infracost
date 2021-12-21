@@ -26,7 +26,7 @@ RUN npm install -g @infracost/compost
 WORKDIR /root/
 
 # Scripts are used by CI integrations and other use-cases
-COPY scripts/infracost-comment.sh /usr/bin/infracost-comment
+COPY scripts/comment.sh scripts/comment
 COPY --from=builder /app/build/infracost /usr/bin/
 
 ENV INFRACOST_SKIP_UPDATE_CHECK='true'

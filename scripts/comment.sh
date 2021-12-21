@@ -6,10 +6,10 @@ set -e
 # compost (https://github.com/infracost/compost) to post the comment.
 # 
 # Usage:
-#  ./infracost-comment.sh --platform <PLATFORM> --format <FORMAT> --behavior <BEHAVIOR> --target-type=<TARGET_TYPE> <INFRACOST_JSON_PATHS>
+#  ./comment.sh --platform <PLATFORM> --format <FORMAT> --behavior <BEHAVIOR> --target-type=<TARGET_TYPE> <INFRACOST_JSON_PATHS>
 #
 # Example:
-#   ./infracost-comment.sh --platform gitlab --format gitlab-comment --behavior update --target-type=merge-request my_infracost_breakdown.json
+#   ./comment.sh --platform gitlab --format gitlab-comment --behavior update --target-type=merge-request my_infracost_breakdown.json
 
 # Parse the flags
 parsed=$(getopt --options= --longoptions=platform:,format:,behavior:,target-type:,dry-run,skip-compost --name="$0" -- "$@")
