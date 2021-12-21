@@ -14,6 +14,8 @@ import (
 	"github.com/Rhymond/go-money"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/pkg/errors"
+
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -23,7 +25,6 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -169,7 +170,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	env := buildRunEnv(runCtx, projectContexts, r)
-	pricingClient := apiclient.NewPricingAPIClient(runCtx.Config)
+	pricingClient := apiclient.NewPricingAPIClient(runCtx)
 	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
 		log.Errorf("Error reporting event: %s", err)
@@ -305,7 +306,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	defer spinner.Fail()
 
 	for _, project := range projects {
-		if err := prices.PopulatePrices(runCtx.Config, project); err != nil {
+		if err := prices.PopulatePrices(runCtx, project); err != nil {
 			spinner.Fail()
 			fmt.Fprintln(os.Stderr, "")
 

@@ -10,12 +10,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/infracost/infracost/internal/version"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/infracost/infracost/internal/version"
 )
 
 type RunContext struct {
 	ctx         context.Context
+	uuid        uuid.UUID
 	Config      *Config
 	State       *State
 	contextVals map[string]interface{}
@@ -33,6 +36,7 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 
 	c := &RunContext{
 		ctx:         rootCtx,
+		uuid:        uuid.New(),
 		Config:      cfg,
 		State:       state,
 		contextVals: map[string]interface{}{},
@@ -53,21 +57,26 @@ func EmptyRunContext() *RunContext {
 	}
 }
 
-func (c *RunContext) SetContextValue(key string, value interface{}) {
-	c.contextVals[key] = value
+// UUID returns the underlying run uuid. This can be used to globally identify the run context.
+func (r *RunContext) UUID() uuid.UUID {
+	return r.uuid
 }
 
-func (c *RunContext) ContextValues() map[string]interface{} {
-	return c.contextVals
+func (r *RunContext) SetContextValue(key string, value interface{}) {
+	r.contextVals[key] = value
 }
 
-func (c *RunContext) EventEnv() map[string]interface{} {
-	return c.EventEnvWithProjectContexts([]*ProjectContext{})
+func (r *RunContext) ContextValues() map[string]interface{} {
+	return r.contextVals
 }
 
-func (c *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectContext) map[string]interface{} {
-	env := c.contextVals
-	env["installId"] = c.State.InstallID
+func (r *RunContext) EventEnv() map[string]interface{} {
+	return r.EventEnvWithProjectContexts([]*ProjectContext{})
+}
+
+func (r *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectContext) map[string]interface{} {
+	env := r.contextVals
+	env["installId"] = r.State.InstallID
 
 	for _, projectContext := range projectContexts {
 		if projectContext == nil {
@@ -85,20 +94,20 @@ func (c *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectConte
 	return env
 }
 
-func (c *RunContext) loadInitialContextValues() {
-	c.SetContextValue("version", baseVersion(version.Version))
-	c.SetContextValue("fullVersion", version.Version)
-	c.SetContextValue("isTest", IsTest())
-	c.SetContextValue("isDev", IsDev())
-	c.SetContextValue("os", runtime.GOOS)
-	c.SetContextValue("ciPlatform", ciPlatform())
-	c.SetContextValue("ciScript", ciScript())
-	c.SetContextValue("ciPostCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
-	c.SetContextValue("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
+func (r *RunContext) loadInitialContextValues() {
+	r.SetContextValue("version", baseVersion(version.Version))
+	r.SetContextValue("fullVersion", version.Version)
+	r.SetContextValue("isTest", IsTest())
+	r.SetContextValue("isDev", IsDev())
+	r.SetContextValue("os", runtime.GOOS)
+	r.SetContextValue("ciPlatform", ciPlatform())
+	r.SetContextValue("ciScript", ciScript())
+	r.SetContextValue("ciPostCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
+	r.SetContextValue("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
 }
 
-func (c *RunContext) IsCIRun() bool {
-	return c.ContextValues()["ciPlatform"] != ""
+func (r *RunContext) IsCIRun() bool {
+	return r.ContextValues()["ciPlatform"] != ""
 }
 
 func baseVersion(v string) string {

@@ -267,7 +267,7 @@ func RunCostCalculations(t *testing.T, runCtx *config.RunContext, tfProject Terr
 	}
 
 	for _, project := range projects {
-		err = prices.PopulatePrices(runCtx.Config, project)
+		err = prices.PopulatePrices(runCtx, project)
 		if err != nil {
 			return projects, err
 		}
