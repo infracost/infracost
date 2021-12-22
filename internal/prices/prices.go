@@ -12,7 +12,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func PopulatePrices(cfg *config.RunContext, project *schema.Project) error {
+func PopulatePrices(ctx *config.RunContext, project *schema.Project) error {
 	resources := project.AllResources()
 
 	c := apiclient.NewPricingAPIClient(cfg)
