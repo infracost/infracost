@@ -50,7 +50,7 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 			apiKey:   ctx.Config.APIKey,
 			uuid:     ctx.UUID(),
 		},
-		dashboardEnabled: ctx.Config.EnableDashboard,
+		dashboardEnabled: ctx.Config.EnableDashboard && !ctx.Config.IsSelfHosted(),
 	}
 }
 
