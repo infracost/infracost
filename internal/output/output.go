@@ -17,6 +17,7 @@ var outputVersion = "0.2"
 type Root struct {
 	Version              string           `json:"version"`
 	RunID                string           `json:"runId,omitempty"`
+	RunURL               string           `json:"runURL,omitempty"`
 	Currency             string           `json:"currency"`
 	Projects             []Project        `json:"projects"`
 	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`
@@ -338,6 +339,10 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 			msg += ":"
 			msg += formatCounts(r.Summary.NoPriceResourceCounts)
 		}
+	}
+
+	if r.RunURL != "" {
+		msg += fmt.Sprintf("\n\nShare the results: %s", ui.LinkString(r.RunURL))
 	}
 
 	return msg

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/infracost/infracost/internal/config"
@@ -10,27 +11,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var validConfigureKeys = []string{
-	"api_key",
-	"pricing_api_endpoint",
-	"tls_insecure_skip_verify",
-	"tls_ca_cert_file",
-	"currency",
+var supportedConfigureKeys = map[string]struct{}{
+	"api_key":                  {},
+	"currency":                 {},
+	"pricing_api_endpoint":     {},
+	"enable_dashboard":         {},
+	"tls_insecure_skip_verify": {},
+	"tls_ca_cert_file":         {},
 }
 
 func configureCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "configure",
 		Short: "Display or change global configuration",
-		Long: `Display or change global configuration.
-
-Supported settings:
-  - api_key: Infracost API key
-  - pricing_api_endpoint: endpoint of the Cloud Pricing API
-  - tls_insecure_skip_verify: skip TLS certificate checks for a self-hosted Cloud Pricing API
-  - tls_ca_cert_file: verify certificate of a self-hosted Cloud Pricing API using this CA certificate
-  - currency: convert output from USD to your preferred currency
-`,
+		Long:  supportedConfigureSettingsOutput("Display or change global configuration"),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Show the help
 			return cmd.Help()
@@ -46,15 +40,7 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set <key> <value>",
 		Short: "Set global configuration",
-		Long: `Set global configuration.
-
-Supported settings:
-  - api_key: Infracost API key
-  - pricing_api_endpoint: endpoint of the Cloud Pricing API
-  - tls_insecure_skip_verify: skip TLS certificate checks for a self-hosted Cloud Pricing API
-  - tls_ca_cert_file: verify certificate of a self-hosted Cloud Pricing API using this CA certificate
-  - currency: convert output from USD to your preferred currency
-`,
+		Long:  supportedConfigureSettingsOutput("Set global configuration"),
 		Example: `  Set your Infracost API key:
 
       infracost configure set api_key MY_API_KEY
@@ -65,7 +51,11 @@ Supported settings:
 
   Set your preferred currency code (ISO 4217):
 
-      infracost	configure set currency EUR`,
+      infracost	configure set currency EUR
+
+  Set Infracost dashboard support option:
+
+      infracost	configure set enable_dashboard true`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 2 {
 				return errors.New("Too many arguments")
@@ -76,7 +66,7 @@ Supported settings:
 			}
 
 			if !isValidConfigureKey(args[0]) {
-				return fmt.Errorf("Invalid key, valid keys are: %s", strings.Join(validConfigureKeys, ", "))
+				return fmt.Errorf("Invalid key, valid keys are: %s", strings.Join(validConfigureKeys(), ", "))
 			}
 
 			return nil
@@ -96,14 +86,12 @@ Supported settings:
 				ctx.Config.Credentials.APIKey = value
 				saveCredentials = true
 			case "tls_insecure_skip_verify":
-				var b bool
-				if value == "true" {
-					b = true
-				} else if value == "false" {
-					b = false
-				} else {
+				b, err := strconv.ParseBool(value)
+
+				if err != nil {
 					return errors.New("Invalid value, must be true or false")
 				}
+
 				ctx.Config.Configuration.TLSInsecureSkipVerify = &b
 				saveConfiguration = true
 			case "tls_ca_cert_file":
@@ -111,6 +99,19 @@ Supported settings:
 				saveConfiguration = true
 			case "currency":
 				ctx.Config.Configuration.Currency = value
+				saveConfiguration = true
+			case "enable_dashboard":
+				b, err := strconv.ParseBool(value)
+
+				if err != nil {
+					return errors.New("Invalid value, must be true or false")
+				}
+
+				if b && ctx.Config.IsSelfHosted() {
+					return errors.New("The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help")
+				}
+
+				ctx.Config.Configuration.EnableDashboard = &b
 				saveConfiguration = true
 			}
 
@@ -139,15 +140,7 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get <key>",
 		Short: "Get global configuration",
-		Long: `Get global configuration.
-
-Supported settings:
-  - api_key: Infracost API key
-  - pricing_api_endpoint: endpoint of the Cloud Pricing API
-  - tls_insecure_skip_verify: skip TLS certificate checks for a self-hosted Cloud Pricing API
-  - tls_ca_cert_file: verify certificate of a self-hosted Cloud Pricing API using this CA certificate
-  - currency: convert output from USD to your preferred currency
-`,
+		Long:  supportedConfigureSettingsOutput("Get global configuration"),
 		Example: `  Get your saved Infracost API key:
 
       infracost configure get api_key
@@ -158,7 +151,11 @@ Supported settings:
 
   Get your preferred currency:
 
-      infracost	configure get currency`,
+      infracost	configure get currency
+
+  Get Infracost dashboard support option:
+
+      infracost	configure get enable_dashboard`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 1 {
 				return errors.New("Too many arguments")
@@ -169,7 +166,7 @@ Supported settings:
 			}
 
 			if !isValidConfigureKey(args[0]) {
-				return fmt.Errorf("Invalid key, valid keys are: %s", strings.Join(validConfigureKeys, ", "))
+				return fmt.Errorf("Invalid key, valid keys are: %s", strings.Join(validConfigureKeys(), ", "))
 			}
 
 			return nil
@@ -178,7 +175,8 @@ Supported settings:
 			key := args[0]
 			var value string
 
-			if key == "pricing_api_endpoint" {
+			switch key {
+			case "pricing_api_endpoint":
 				value = ctx.Config.Credentials.PricingAPIEndpoint
 
 				if value == "" {
@@ -187,9 +185,8 @@ Supported settings:
 						ui.PrimaryString("infracost configure set pricing_api_endpoint https://cloud-pricing-api"),
 					)
 					ui.PrintWarning(cmd.ErrOrStderr(), msg)
-
 				}
-			} else if key == "api_key" {
+			case "api_key":
 				value = ctx.Config.Credentials.APIKey
 
 				if value == "" {
@@ -199,7 +196,17 @@ Supported settings:
 					)
 					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
-			} else if key == "tls_insecure_skip_verify" {
+			case "currency":
+				value = ctx.Config.Configuration.Currency
+
+				if value == "" {
+					msg := fmt.Sprintf("No currency in your saved config (%s), defaulting to USD.\nSet a currency using %s.",
+						config.ConfigurationFilePath(),
+						ui.PrimaryString("infracost configure set currency CURRENCY"),
+					)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
+				}
+			case "tls_insecure_skip_verify":
 				if ctx.Config.Configuration.TLSInsecureSkipVerify == nil {
 					value = ""
 				} else {
@@ -213,7 +220,7 @@ Supported settings:
 					)
 					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
-			} else if key == "tls_ca_cert_file" {
+			case "tls_ca_cert_file":
 				value = ctx.Config.Configuration.TLSCACertFile
 
 				if value == "" {
@@ -223,15 +230,11 @@ Supported settings:
 					)
 					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
-			} else if key == "currency" {
-				value = ctx.Config.Configuration.Currency
-
-				if value == "" {
-					msg := fmt.Sprintf("No currency in your saved config (%s), defaulting to USD.\nSet a currency using %s.",
-						config.ConfigurationFilePath(),
-						ui.PrimaryString("infracost configure set currency CURRENCY"),
-					)
-					ui.PrintWarning(cmd.ErrOrStderr(), msg)
+			case "enable_dashboard":
+				if ctx.Config.Configuration.EnableDashboard == nil {
+					value = ""
+				} else {
+					value = strconv.FormatBool(*ctx.Config.Configuration.EnableDashboard)
 				}
 			}
 
@@ -247,11 +250,33 @@ Supported settings:
 }
 
 func isValidConfigureKey(key string) bool {
-	for _, validKey := range validConfigureKeys {
-		if key == validKey {
-			return true
-		}
+	_, ok := supportedConfigureKeys[key]
+
+	return ok
+}
+
+func supportedConfigureSettingsOutput(description string) string {
+	settings := `
+Supported settings:
+  - api_key: Infracost API key
+  - pricing_api_endpoint: endpoint of the Cloud Pricing API
+  - currency: convert output from USD to your preferred currency
+  - enable_dashboard: enable Infracost dashboard support
+  - tls_insecure_skip_verify: skip TLS certificate checks for a self-hosted Cloud Pricing API
+  - tls_ca_cert_file: verify certificate of a self-hosted Cloud Pricing API using this CA certificate
+`
+
+	return fmt.Sprintf("%s.\n%s", description, settings)
+}
+
+func validConfigureKeys() []string {
+	keys := make([]string, len(supportedConfigureKeys))
+
+	i := 0
+	for k := range supportedConfigureKeys {
+		keys[i] = k
+		i++
 	}
 
-	return false
+	return keys
 }
