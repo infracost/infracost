@@ -196,6 +196,9 @@
         "runId": {
           "type": "string"
         },
+        "runURL": {
+          "type": "string"
+        },
         "currency": {
           "type": "string"
         },
