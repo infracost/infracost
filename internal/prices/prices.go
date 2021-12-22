@@ -15,7 +15,7 @@ import (
 func PopulatePrices(ctx *config.RunContext, project *schema.Project) error {
 	resources := project.AllResources()
 
-	c := apiclient.NewPricingAPIClient(cfg)
+	c := apiclient.NewPricingAPIClient(ctx)
 
 	err := GetPricesConcurrent(c, resources)
 	if err != nil {
