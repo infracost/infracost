@@ -100,4 +100,9 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
+require (
+	github.com/alecthomas/jsonschema v0.0.0-20211209230136-e2b41affa5c1 // indirect
+	github.com/iancoleman/orderedmap v0.2.0 // indirect
+)
+
 replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e
