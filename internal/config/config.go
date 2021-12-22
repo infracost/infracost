@@ -15,7 +15,7 @@ import (
 // Project defines a specific terraform project config. This can be used
 // specify per folder/project configurations so that users don't have
 // to provide flags every run. Fields are documented below. More info
-// is outlined here: https://www.infracost.io/docs/multi_project/config_file/
+// is outlined here: https://www.infracost.io/config-file
 type Project struct {
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
