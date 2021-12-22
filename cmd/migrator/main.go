@@ -20,7 +20,8 @@ import (
 var PROVIDER string = "aws"
 
 type duStruct struct {
-	fieldType string // Bool, String, Int, Float, Exists
+	fieldType     string // Bool, String, Int, Float, Exists
+	hasExistCheck bool
 }
 
 /*
@@ -57,19 +58,23 @@ func main() {
 		}
 		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
 
-		allCount += 1
-		fmt.Printf(" %d  %s\n", allCount, filePath)
 		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
 		// isMigrated, err := migrateFile("internal/providers/terraform/aws/db_instance.go", referenceFile, "internal/providers/terraform/aws/", "db_instance.go")
 		// break
+
+		if err != nil && err.Error() == "manually migrated" {
+			continue
+		}
+		allCount += 1
 		if isMigrated {
 			migratedCount += 1
 		} else {
 			problemFiles = append(problemFiles, filePath)
 		}
 		if isMigrated && err == nil {
-			fmt.Printf("\t %t\n", isMigrated)
+			// fmt.Printf("\t %t\n", isMigrated)
 		} else {
+			fmt.Printf("%s\n", filePath)
 			fmt.Printf("\t %t  :: %s \n", isMigrated, err)
 		}
 	}
@@ -79,6 +84,7 @@ func main() {
 
 func migrateFile(filePath string, referenceFile *usage.ReferenceFile, basePath, fileName string) (bool, error) {
 	resFilePath := fmt.Sprintf("internal/resources/%s/%s", PROVIDER, fileName)
+	providerFilePath := fmt.Sprintf("internal/providers/terraform/%s/%s", PROVIDER, fileName)
 	if _, err := os.Stat(resFilePath); err == nil {
 		return true, errors.New("manually migrated")
 	}
@@ -91,22 +97,25 @@ func migrateFile(filePath string, referenceFile *usage.ReferenceFile, basePath, 
 	if isImpossibleWithGets(file) {
 		return false, errors.New("bad d/u gets")
 	}
-	if isImpossibleWithDotGets(file) {
-		return false, errors.New("dotted d/u gets")
-	}
 	if isImpossibleWithResourceDefsCount(file) {
 		return false, errors.New("multiple resource defs")
 	}
 	if isImpossibleWithGetsTypes(file) {
 		return false, errors.New("unknown d/u gets types")
 	}
+	if isImpossibleWithDotGets(file) {
+		return false, errors.New("dotted d/u gets")
+	}
 
-	_, resourceFile, err := doMigration(fset, file, referenceFile)
+	providerFile, resourceFile, err := doMigration(fset, file, referenceFile)
 	if err != nil {
 		return false, err
 	}
 
-	// saveFile(fset, pFile)
+	err = saveFile(fset, providerFile, providerFilePath)
+	if err != nil {
+		return false, err
+	}
 
 	err = saveFile(fset, resourceFile, resFilePath)
 	if err != nil {
@@ -314,7 +323,7 @@ func doMigration(fset *token.FileSet, file *ast.File, referenceFile *usage.Refer
 
 	replaceDUs(resourceCamelName, resourceFile)
 	addSchemaToResource(resourceCamelName, resourceFile)
-	migrateImports(file, resourceFile)
+	migrateImports(file, resourceFile, dsList)
 	addProviderFunc(resourceCamelName, dsList, usList, file)
 	fixRFuncName(resourceCamelName, file)
 
@@ -386,13 +395,17 @@ func getDsList(file *ast.File) map[string]duStruct {
 								if argLit, ok := callExpr2.Args[0].(*ast.BasicLit); ok {
 									if argLit.Kind == token.STRING {
 										keyName := strings.Replace(argLit.Value, "\"", "", -1)
+										oldExistCheck := false
 										if val, ok := result[keyName]; ok {
-											if val.fieldType != "Exists" {
+											oldExistCheck = val.hasExistCheck
+											if selExpr.Sel.Name == "Exists" {
+												val.hasExistCheck = true
 												return true
 											}
 										}
 										result[keyName] = duStruct{
-											fieldType: selExpr.Sel.Name,
+											fieldType:     selExpr.Sel.Name,
+											hasExistCheck: oldExistCheck || selExpr.Sel.Name == "Exists",
 										}
 									}
 								}
@@ -410,12 +423,12 @@ func getDsList(file *ast.File) map[string]duStruct {
 								if argLit.Kind == token.STRING {
 									keyName := strings.Replace(argLit.Value, "\"", "", -1)
 									if val, ok := result[keyName]; ok {
-										if val.fieldType != "Exists" {
-											return true
-										}
+										val.hasExistCheck = true
+										return true
 									}
 									result[keyName] = duStruct{
-										fieldType: "Exists",
+										fieldType:     "Exists",
+										hasExistCheck: true,
 									}
 								}
 							}
@@ -441,14 +454,18 @@ func getUsList(file *ast.File) map[string]duStruct {
 							if identExpr.Name == "u" {
 								if argLit, ok := callExpr2.Args[0].(*ast.BasicLit); ok {
 									if argLit.Kind == token.STRING {
+										oldExistCheck := false
 										keyName := strings.Replace(argLit.Value, "\"", "", -1)
 										if val, ok := result[keyName]; ok {
-											if val.fieldType != "Exists" {
+											oldExistCheck = val.hasExistCheck
+											if selExpr.Sel.Name == "Exists" {
+												val.hasExistCheck = true
 												return true
 											}
 										}
 										result[keyName] = duStruct{
-											fieldType: selExpr.Sel.Name,
+											fieldType:     selExpr.Sel.Name,
+											hasExistCheck: oldExistCheck || selExpr.Sel.Name == "Exists",
 										}
 									}
 								}
@@ -466,12 +483,12 @@ func getUsList(file *ast.File) map[string]duStruct {
 								if argLit.Kind == token.STRING {
 									keyName := strings.Replace(argLit.Value, "\"", "", -1)
 									if val, ok := result[keyName]; ok {
-										if val.fieldType != "Exists" {
-											return true
-										}
+										val.hasExistCheck = true
+										return true
 									}
 									result[keyName] = duStruct{
-										fieldType: "Exists",
+										fieldType:     "Exists",
+										hasExistCheck: true,
 									}
 								}
 							}
@@ -854,23 +871,28 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 	astutil.Apply(resourceFile, nil, func(c *astutil.Cursor) bool {
 		n := c.Node()
 		if callExpr, ok := n.(*ast.CallExpr); ok {
-			if len(callExpr.Args) == 1 {
-				identExpr1, ok1 := callExpr.Args[0].(*ast.Ident)
-				if ok1 && (identExpr1.Name == "u" || identExpr1.Name == "d") {
-					callExpr.Args = []ast.Expr{
-						&ast.Ident{Name: "resP"},
-					}
+			if selExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+				if selExpr.Sel.Name == "PopulateArgsWithUsage" {
+					return true
 				}
 			}
-			if len(callExpr.Args) == 2 {
-				identExpr1, ok1 := callExpr.Args[0].(*ast.Ident)
-				identExpr2, ok2 := callExpr.Args[1].(*ast.Ident)
-				if (ok1 && ok2) && ((identExpr1.Name == "u" && identExpr2.Name == "d") || (identExpr1.Name == "d" && identExpr2.Name == "u")) {
-					callExpr.Args = []ast.Expr{
-						&ast.Ident{Name: "resP"},
+			alreadyMigrated := false
+			newArgs := make([]ast.Expr, 0)
+			for _, callArg := range callExpr.Args {
+				if identExpr, ok := callArg.(*ast.Ident); ok {
+					if identExpr.Name == "u" || identExpr.Name == "d" {
+						if !alreadyMigrated {
+							alreadyMigrated = true
+							newArgs = append(newArgs, &ast.Ident{Name: "resP"})
+						}
+					} else {
+						newArgs = append(newArgs, callArg)
 					}
+				} else {
+					newArgs = append(newArgs, callArg)
 				}
 			}
+			callExpr.Args = newArgs
 		}
 		return true
 	})
@@ -882,28 +904,25 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 			if funcDecl.Name.Name == "PopulateUsage" {
 				return true
 			}
-			if len(funcDecl.Type.Params.List) == 1 {
-				name := funcDecl.Type.Params.List[0].Names[0].Name
-				if name == "u" || name == "d" {
-					funcDecl.Type.Params.List = []*ast.Field{{
-						Names: []*ast.Ident{{Name: "resP"}},
-						Type: &ast.StarExpr{
-							X: &ast.Ident{Name: resourceCamelName},
-						},
-					}}
-				}
-			} else if len(funcDecl.Type.Params.List) == 2 {
-				name1 := funcDecl.Type.Params.List[0].Names[0].Name
-				name2 := funcDecl.Type.Params.List[1].Names[0].Name
-				if (name1 == "u" && name2 == "d") || (name1 == "d" && name2 == "u") {
-					funcDecl.Type.Params.List = []*ast.Field{{
-						Names: []*ast.Ident{{Name: "resP"}},
-						Type: &ast.StarExpr{
-							X: &ast.Ident{Name: resourceCamelName},
-						},
-					}}
+
+			newParamsList := make([]*ast.Field, 0)
+			alreadyMigrated := false
+			for _, param := range funcDecl.Type.Params.List {
+				if param.Names[0].Name == "u" || param.Names[0].Name == "d" {
+					if !alreadyMigrated {
+						alreadyMigrated = true
+						newParamsList = append(newParamsList, &ast.Field{
+							Names: []*ast.Ident{{Name: "resP"}},
+							Type: &ast.StarExpr{
+								X: &ast.Ident{Name: resourceCamelName},
+							},
+						})
+					}
+				} else {
+					newParamsList = append(newParamsList, param)
 				}
 			}
+			funcDecl.Type.Params.List = newParamsList
 		}
 		return true
 	})
@@ -935,7 +954,7 @@ func addSchemaToResource(resourceCamelName string, resourceFile *ast.File) {
 	})
 }
 
-func migrateImports(file, resourceFile *ast.File) {
+func migrateImports(file, resourceFile *ast.File, dsList map[string]duStruct) {
 	resourceFileImports := resourceFile.Decls[0].(*ast.GenDecl)
 	resourceFileImports.Specs = append(resourceFileImports.Specs, &ast.ImportSpec{
 		Path: &ast.BasicLit{Kind: token.STRING, Value: "\"github.com/infracost/infracost/internal/resources\""},
@@ -967,6 +986,18 @@ func migrateImports(file, resourceFile *ast.File) {
 	file.Decls[0].(*ast.GenDecl).Specs = append(file.Decls[0].(*ast.GenDecl).Specs, &ast.ImportSpec{
 		Path: &ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"github.com/infracost/infracost/internal/resources/%s\"", PROVIDER)},
 	})
+	addGjson := false
+	for _, val := range dsList {
+		if val.hasExistCheck {
+			addGjson = true
+			break
+		}
+	}
+	if addGjson {
+		file.Decls[0].(*ast.GenDecl).Specs = append(file.Decls[0].(*ast.GenDecl).Specs, &ast.ImportSpec{
+			Path: &ast.BasicLit{Kind: token.STRING, Value: "\"github.com/tidwall/gjson\""},
+		})
+	}
 }
 
 func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruct, file *ast.File) {
@@ -988,6 +1019,9 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 	}
 
 	for key, val := range dsList {
+		if val.hasExistCheck {
+			continue
+		}
 		resourceELTs = append(resourceELTs, &ast.KeyValueExpr{
 			Key: &ast.Ident{Name: strcase.ToCamel(key)},
 			Value: &ast.CallExpr{
@@ -1030,6 +1064,78 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 			},
 		},
 	})
+
+	for key, val := range dsList {
+		if !val.hasExistCheck {
+			continue
+		}
+		funcBodyList = append(funcBodyList, &ast.IfStmt{
+			Cond: &ast.BinaryExpr{
+				Op: token.LAND,
+				X: &ast.CallExpr{
+					Fun: &ast.SelectorExpr{
+						X: &ast.CallExpr{
+							Fun: &ast.SelectorExpr{
+								X:   &ast.Ident{Name: "d"},
+								Sel: &ast.Ident{Name: "Get"},
+							},
+							Args: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"%s\"", key)}},
+						},
+						Sel: &ast.Ident{Name: "Exists"},
+					},
+				},
+				Y: &ast.BinaryExpr{
+					Op: token.NEQ,
+					X: &ast.SelectorExpr{
+						X: &ast.CallExpr{
+							Fun: &ast.SelectorExpr{
+								X:   &ast.Ident{Name: "d"},
+								Sel: &ast.Ident{Name: "Get"},
+							},
+							Args: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"%s\"", key)}},
+						},
+						Sel: &ast.Ident{Name: "Type"},
+					},
+					Y: &ast.SelectorExpr{
+						X:   &ast.Ident{Name: "gjson"},
+						Sel: &ast.Ident{Name: "Null"},
+					},
+				},
+			},
+			Body: &ast.BlockStmt{
+				List: []ast.Stmt{&ast.AssignStmt{
+					Tok: token.ASSIGN,
+					Lhs: []ast.Expr{
+						&ast.SelectorExpr{
+							X:   &ast.Ident{Name: "resP"},
+							Sel: &ast.Ident{Name: strcase.ToCamel(key)},
+						},
+					},
+					Rhs: []ast.Expr{
+						&ast.CallExpr{
+							Fun: &ast.Ident{Name: duTypeToPtrCall(val.fieldType)},
+							Args: []ast.Expr{
+								&ast.CallExpr{
+									Fun: &ast.SelectorExpr{
+										Sel: &ast.Ident{Name: duTypeToResCall(val.fieldType)},
+										X: &ast.CallExpr{
+											Fun: &ast.SelectorExpr{
+												Sel: &ast.Ident{Name: "Get"},
+												X:   &ast.Ident{Name: "d"},
+											},
+											Args: []ast.Expr{
+												&ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"%s\"", key)},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				}},
+			},
+		})
+	}
 
 	funcBodyList = append(funcBodyList, &ast.ExprStmt{
 		X: &ast.CallExpr{
@@ -1211,6 +1317,7 @@ func duTypeToPtrCall(duType string) string {
 }
 
 func saveFile(fset *token.FileSet, file *ast.File, filePath string) error {
+	// return nil
 	f, err := os.Create(filePath)
 	defer f.Close()
 
