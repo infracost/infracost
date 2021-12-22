@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-var exampleFile = "../../examples/jsonschema/outputschema.json"
+var schemaFile = "../../schema/infracost.schema.json"
 
 func TestVerifyExample(t *testing.T) {
 	generatedBytes, err := generateJSONSchema()
@@ -15,7 +15,7 @@ func TestVerifyExample(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	exampleBytes, err := os.ReadFile(exampleFile)
+	exampleBytes, err := os.ReadFile(schemaFile)
 	if err != nil {
 		t.Fatal(err)
 	}
