@@ -65,9 +65,9 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 		sku = d.Get("sku_name").String()
 	}
 
-	var maxSize *int64
+	var maxSize *float64
 	if d.Get("max_size_gb").Type != gjson.Null {
-		val := d.Get("max_size_gb").Int()
+		val := d.Get("max_size_gb").Float()
 		maxSize = &val
 	}
 

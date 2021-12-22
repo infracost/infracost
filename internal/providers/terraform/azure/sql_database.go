@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	gbInBytes int64 = 1073741824
+	gbInBytes float64 = 1073741824
 )
 
 var (
@@ -84,8 +84,8 @@ func newSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		}
 	}
 
-	var maxSizeGB *int64
-	maxBytes := d.Get("max_size_bytes").Int()
+	var maxSizeGB *float64
+	maxBytes := d.Get("max_size_bytes").Float()
 	if maxBytes > 0 {
 		val := maxBytes / gbInBytes
 		maxSizeGB = &val

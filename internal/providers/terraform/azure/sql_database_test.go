@@ -6,7 +6,7 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
 
-func TestSqlDatatbaseGoldenFile(t *testing.T) {
+func TestSQLDatabaseGoldenFile(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}

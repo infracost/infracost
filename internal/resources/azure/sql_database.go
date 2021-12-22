@@ -38,7 +38,7 @@ type SQLDatabase struct {
 	Tier             string
 	Family           string
 	Cores            *int64
-	MaxSizeGB        *int64
+	MaxSizeGB        *float64
 	ReadReplicaCount *int64
 	ZoneRedundant    bool
 
@@ -138,7 +138,7 @@ func (r *SQLDatabase) extraDataStorageCostComponent() *schema.CostComponent {
 
 	var storageGB *decimal.Decimal
 	if r.MaxSizeGB != nil {
-		storageGB = decimalPtr(decimal.NewFromInt(*r.MaxSizeGB))
+		storageGB = decimalPtr(decimal.NewFromFloat(*r.MaxSizeGB))
 
 		if strings.ToLower(sn) == "premium" {
 			storageGB = decimalPtr(storageGB.Sub(decimal.NewFromInt(500)))
@@ -298,7 +298,7 @@ func (r *SQLDatabase) sqlLicenseCostComponent() *schema.CostComponent {
 func (r *SQLDatabase) mssqlStorageComponent() *schema.CostComponent {
 	storageGB := decimalPtr(decimal.NewFromInt(5))
 	if r.MaxSizeGB != nil {
-		storageGB = decimalPtr(decimal.NewFromInt(*r.MaxSizeGB))
+		storageGB = decimalPtr(decimal.NewFromFloat(*r.MaxSizeGB))
 	}
 
 	storageTier := r.Tier
