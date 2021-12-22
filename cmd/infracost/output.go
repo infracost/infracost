@@ -6,15 +6,16 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/infracost/infracost/internal/apiclient"
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/output"
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/mod/semver"
+
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 var minOutputVersion = "0.2"
@@ -161,7 +162,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			pricingClient := apiclient.NewPricingAPIClient(ctx.Config)
+			pricingClient := apiclient.NewPricingAPIClient(ctx)
 			err = pricingClient.AddEvent("infracost-output", ctx.EventEnv())
 			if err != nil {
 				log.Errorf("Error reporting event: %s", err)

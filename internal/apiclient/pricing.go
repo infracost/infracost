@@ -29,8 +29,8 @@ type PriceQueryResult struct {
 	Result gjson.Result
 }
 
-func NewPricingAPIClient(cfg *config.Config) *PricingAPIClient {
-	currency := cfg.Currency
+func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
+	currency := ctx.Config.Currency
 	if currency == "" {
 		currency = "USD"
 	}
@@ -40,34 +40,35 @@ func NewPricingAPIClient(cfg *config.Config) *PricingAPIClient {
 		rootCAs = x509.NewCertPool()
 	}
 
-	if cfg.TLSCACertFile != "" {
-		caCerts, err := ioutil.ReadFile(cfg.TLSCACertFile)
+	if ctx.Config.TLSCACertFile != "" {
+		caCerts, err := ioutil.ReadFile(ctx.Config.TLSCACertFile)
 		if err != nil {
-			log.Errorf("Error reading CA cert file %s: %v", cfg.TLSCACertFile, err)
+			log.Errorf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
 		} else {
 			ok := rootCAs.AppendCertsFromPEM(caCerts)
 
 			if !ok {
 				log.Warningf("No CA certs appended, only using system certs")
 			} else {
-				log.Debugf("Loaded CA certs from %s", cfg.TLSCACertFile)
+				log.Debugf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
 			}
 		}
 	}
 
 	tlsConfig := &tls.Config{
-		InsecureSkipVerify: cfg.TLSInsecureSkipVerify, // nolint: gosec
+		InsecureSkipVerify: ctx.Config.TLSInsecureSkipVerify, // nolint: gosec
 		RootCAs:            rootCAs,
 	}
 
 	return &PricingAPIClient{
 		APIClient: APIClient{
-			endpoint:  cfg.PricingAPIEndpoint,
-			apiKey:    cfg.APIKey,
+			endpoint:  ctx.Config.PricingAPIEndpoint,
+			apiKey:    ctx.Config.APIKey,
 			tlsConfig: tlsConfig,
+			uuid:      ctx.UUID(),
 		},
 		Currency:       currency,
-		EventsDisabled: cfg.EventsDisabled,
+		EventsDisabled: ctx.Config.EventsDisabled,
 	}
 }
 

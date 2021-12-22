@@ -1,10 +1,11 @@
 package apiclient
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
-	"github.com/pkg/errors"
 )
 
 func ReportCLIError(ctx *config.RunContext, cliErr error) error {
@@ -17,6 +18,6 @@ func ReportCLIError(ctx *config.RunContext, cliErr error) error {
 	d := ctx.EventEnv()
 	d["error"] = errMsg
 
-	c := NewPricingAPIClient(ctx.Config)
+	c := NewPricingAPIClient(ctx)
 	return c.AddEvent("infracost-error", d)
 }

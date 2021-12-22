@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 type DashboardAPIClient struct {
@@ -47,6 +48,7 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 		APIClient: APIClient{
 			endpoint: ctx.Config.DashboardAPIEndpoint,
 			apiKey:   ctx.Config.APIKey,
+			uuid:     ctx.UUID(),
 		},
 		dashboardEnabled: ctx.Config.EnableDashboard,
 	}
