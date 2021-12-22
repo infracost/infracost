@@ -18,6 +18,9 @@ deps:
 run:
 	env INFRACOST_ENV=$(DEV_ENV) go run $(LD_FLAGS) $(PKG) $(ARGS)
 
+jsonschema:
+	go run ./cmd/jsonschema/main.go --out-file ./examples/jsonschema/outputschema.json
+
 build:
 	CGO_ENABLED=0 go build $(BUILD_FLAGS) -o build/$(BINARY) $(PKG)
 
