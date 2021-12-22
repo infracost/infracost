@@ -1,10 +1,12 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
+	"strings"
+
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
-	"strings"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func strPtr(s string) *string {
@@ -100,4 +102,8 @@ func locationNameMapping(l string) string {
 	}[l]
 
 	return name
+}
+
+func intPtr(i int64) *int64 {
+	return &i
 }
