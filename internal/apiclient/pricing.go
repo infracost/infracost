@@ -29,7 +29,7 @@ type PriceQueryResult struct {
 	Result gjson.Result
 }
 
-func NewPricingAPIClient(cfg *config.RunContext) *PricingAPIClient {
+func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 	currency := cfg.Config.Currency
 	if currency == "" {
 		currency = "USD"
