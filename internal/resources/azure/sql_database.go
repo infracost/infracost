@@ -119,6 +119,7 @@ func (r *SQLDatabase) dtuPurchaseCostComponents() []*schema.CostComponent {
 			ProductFilter: r.productFilter([]*schema.AttributeFilter{
 				{Key: "productName", ValueRegex: strPtr("/^SQL Database Single/i")},
 				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", skuName))},
+				{Key: "meterName", ValueRegex: strPtr("/DTUs$/i")},
 			}),
 			PriceFilter: priceFilterConsumption,
 		},

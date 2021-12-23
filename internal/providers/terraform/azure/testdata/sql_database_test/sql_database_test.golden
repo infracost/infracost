@@ -42,7 +42,7 @@
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
  azurerm_sql_database.sql_database_with_edition_standard                                                    
- ├─ Compute (S0)                                                         30  days                     $0.00 
+ ├─ Compute (S0)                                                         30  days                    $14.52 
  ├─ Extra data storage                                       Monthly cost depends on usage: $0.17 per GB    
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
@@ -56,7 +56,7 @@
  ├─ Storage                                                               5  GB                       $1.25 
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
- OVERALL TOTAL                                                                                    $6,854.15 
+ OVERALL TOTAL                                                                                    $6,868.66 
 ──────────────────────────────────
 13 cloud resources were detected:
 ∙ 11 were estimated, 11 include usage-based costs, see https://infracost.io/usage-file
@@ -76,6 +76,5 @@ level=warning msg="Multiple products found for azurerm_sql_database.LTR Compute 
 level=warning msg="Multiple products found for azurerm_sql_database.default_sql_database Compute (provisioned, GP_Gen5_2), using the first product"
 level=warning msg="Multiple products found for azurerm_sql_database.sql_database_with_edition_critical Compute (provisioned, BC_Gen5_2), using the first product"
 level=warning msg="Multiple products found for azurerm_sql_database.sql_database_with_edition_gen Compute (provisioned, GP_Gen5_2), using the first product"
-level=warning msg="Multiple products found for azurerm_sql_database.sql_database_with_edition_standard Compute (S0), using the first product"
 level=warning msg="Multiple products found for azurerm_sql_database.sql_database_with_max_size Compute (provisioned, GP_Gen5_2), using the first product"
 level=warning msg="Multiple products found for azurerm_sql_database.sql_database_with_service_object_name Compute (provisioned, BC_Gen5_2), using the first product"
