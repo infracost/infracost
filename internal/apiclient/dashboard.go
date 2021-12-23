@@ -23,8 +23,8 @@ type CreateAPIKeyResponse struct {
 }
 
 type AddRunResponse struct {
-	RunID  string `json:"id"`
-	RunURL string `json:"shareUrl"`
+	RunID    string `json:"id"`
+	ShareURL string `json:"shareUrl"`
 }
 
 type runInput struct {
@@ -119,7 +119,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 		}
 
 		response.RunID = results[0].Get("data.addRun.id").String()
-		response.RunURL = results[0].Get("data.addRun.shareUrl").String()
+		response.ShareURL = results[0].Get("data.addRun.shareUrl").String()
 	}
 	return response, nil
 }

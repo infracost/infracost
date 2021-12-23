@@ -144,7 +144,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		log.Errorf("Error reporting run: %s", err)
 	}
 
-	r.RunID, r.RunURL = result.RunID, result.RunURL
+	r.RunID, r.ShareURL = result.RunID, result.ShareURL
 
 	opts := output.Options{
 		DashboardEnabled: runCtx.Config.EnableDashboard,
