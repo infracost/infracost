@@ -34,7 +34,7 @@ func NewElastiCacheReplicationGroup(d *schema.ResourceData, u *schema.UsageData)
 	// as both the new and the old resource have cluster_mode with 1 1 set. In order to circumvent this problem we
 	// need to explicitly check that cluster_enabled attribute (output attribute) is set to false in the terraform state.
 	// This will only be present in a state/diff run and won't be available in breakdown or output runs.
-	clusterDisabled := d.Get("cluster_enabled").Type != gjson.Null && d.Get("cluster_enabled").Bool()
+	clusterDisabled := d.Get("cluster_enabled").Type != gjson.Null && !d.Get("cluster_enabled").Bool()
 	if d.Get("cluster_mode").Exists() && !clusterDisabled {
 		nodeGroups := decimal.NewFromInt(d.Get("cluster_mode.0.num_node_groups").Int())
 		shards := decimal.NewFromInt(d.Get("cluster_mode.0.replicas_per_node_group").Int())
