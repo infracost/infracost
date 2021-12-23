@@ -261,7 +261,7 @@ Supported settings:
   - api_key: Infracost API key
   - pricing_api_endpoint: endpoint of the Cloud Pricing API
   - currency: convert output from USD to your preferred currency
-  - enable_dashboard: enable Infracost dashboard support
+  - enable_dashboard: enable the Infracost dashboard
   - tls_insecure_skip_verify: skip TLS certificate checks for a self-hosted Cloud Pricing API
   - tls_ca_cert_file: verify certificate of a self-hosted Cloud Pricing API using this CA certificate
 `
