@@ -196,7 +196,7 @@
         "runId": {
           "type": "string"
         },
-        "runURL": {
+        "shareUrl": {
           "type": "string"
         },
         "currency": {
