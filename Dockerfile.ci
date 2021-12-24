@@ -18,7 +18,7 @@ RUN chmod +x /app/build/infracost
 # Application
 FROM alpine:3.15 as app
 # Tools needed for running diffs in CI integrations
-RUN apk --no-cache add bash git jq nodejs npm
+RUN apk --no-cache add bash curl git jq nodejs npm
 
 # Install the latest compost version
 RUN npm install -g @infracost/compost
