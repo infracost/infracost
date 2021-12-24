@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"runtime"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -29,6 +30,16 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
+
+type projectJob = struct {
+	index      int
+	projectCfg *config.Project
+}
+
+type projectResult = struct {
+	index    int
+	projects []*schema.Project
+}
 
 func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
@@ -62,9 +73,9 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	runCtx.SetContextValue("parallelism", parallelism)
 
 	numJobs := len(runCtx.Config.Projects)
-	jobs := make(chan *config.Project, numJobs)
+	jobs := make(chan projectJob, numJobs)
 
-	projectResultChan := make(chan []*schema.Project, numJobs)
+	projectResultChan := make(chan projectResult, numJobs)
 	projectContextChan := make(chan *config.ProjectContext, numJobs)
 	errGroup, _ := errgroup.WithContext(context.Background())
 
@@ -91,26 +102,29 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	for i := 0; i < parallelism; i++ {
 		errGroup.Go(func() error {
 
-			for projectCfg := range jobs {
-				mux := pathMuxs[projectCfg.Path]
+			for job := range jobs {
+				mux := pathMuxs[job.projectCfg.Path]
 
-				ctx := config.NewProjectContext(runCtx, projectCfg)
+				ctx := config.NewProjectContext(runCtx, job.projectCfg)
 				projectContextChan <- ctx
 
-				configProjects, err := runProjectConfig(cmd, runCtx, ctx, projectCfg, mux)
+				configProjects, err := runProjectConfig(cmd, runCtx, ctx, job.projectCfg, mux)
 				if err != nil {
 					return err
 				}
 
-				projectResultChan <- configProjects
+				projectResultChan <- projectResult{
+					index:    job.index,
+					projects: configProjects,
+				}
 			}
 
 			return nil
 		})
 	}
 
-	for _, p := range runCtx.Config.Projects {
-		jobs <- p
+	for i, p := range runCtx.Config.Projects {
+		jobs <- projectJob{index: i, projectCfg: p}
 	}
 	close(jobs)
 
@@ -126,9 +140,17 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	close(projectResultChan)
+	projectResults := make([]projectResult, 0, len(runCtx.Config.Projects))
+	for result := range projectResultChan {
+		projectResults = append(projectResults, result)
+	}
+	sort.Slice(projectResults, func(i, j int) bool {
+		return projectResults[i].index < projectResults[j].index
+	})
+
 	projects := make([]*schema.Project, 0)
-	for projectResults := range projectResultChan {
-		projects = append(projects, projectResults...)
+	for _, projectResults := range projectResults {
+		projects = append(projects, projectResults.projects...)
 	}
 
 	r, err := output.ToOutputFormat(projects)
