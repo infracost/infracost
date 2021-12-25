@@ -34,7 +34,7 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		capacity = decimal.NewFromInt(d.Get("capacity").Int())
 	}
 
-	if d.Get("dedicated_cluster_id").Type != gjson.Null {
+	if d.Get("dedicated_cluster_id").Type != gjson.Null && len(d.Get("dedicated_cluster_id").String()) > 0 {
 		sku = "Dedicated"
 		meterName = "Capacity Unit"
 	}
@@ -56,7 +56,6 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 
 	costComponents = append(costComponents, eventHubsThroughPutCostComponent(region, sku, meterName, capacity))
-
 	if strings.ToLower(sku) == "dedicated" {
 		if u != nil && u.Get("retention_storage_gb").Type != gjson.Null {
 			retention := decimalPtr(decimal.NewFromInt(u.Get("retention_storage_gb").Int()))
@@ -68,7 +67,6 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		} else {
 			costComponents = append(costComponents, eventHubsExtensionRetentionCostComponent(region, sku, unknown))
 		}
-
 	}
 
 	return &schema.Resource{

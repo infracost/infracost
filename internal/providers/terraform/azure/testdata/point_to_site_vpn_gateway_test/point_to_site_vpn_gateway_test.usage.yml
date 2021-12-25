@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_point_to_site_vpn_gateway.point_to_site_vpn_with_usage:
+    monthly_p2s_connections_hrs: 9

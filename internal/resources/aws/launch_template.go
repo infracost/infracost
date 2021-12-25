@@ -91,7 +91,7 @@ func (a *LaunchTemplate) BuildResource() *schema.Resource {
 		EstimateUsage:  instanceResource.EstimateUsage,
 	}
 
-	instanceCount := int64(0)
+	instanceCount := int64(1)
 	if a.InstanceCount != nil {
 		instanceCount = *a.InstanceCount
 	}
@@ -118,7 +118,7 @@ func (a *LaunchTemplate) BuildResource() *schema.Resource {
 }
 
 func (a *LaunchTemplate) calculateOnDemandAndSpotInstanceCounts() (int64, int64) {
-	instanceCount := int64(0)
+	instanceCount := int64(1)
 	if a.InstanceCount != nil {
 		instanceCount = *a.InstanceCount
 	}

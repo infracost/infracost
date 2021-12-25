@@ -1,0 +1,20 @@
+Project: infracost/infracost/cmd/infracost/testdata/instance_with_attachment_after_deploy.json
+
+ Name                                                Monthly Qty  Unit   Monthly Cost 
+                                                                                      
+ aws_ebs_volume.storage                                                               
+ └─ Storage (general purpose SSD, gp2)                       128  GB           $12.80 
+                                                                                      
+ aws_instance.ec2                                                                     
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.nano)          730  hours         $4.23 
+ └─ root_block_device                                                                 
+    └─ Storage (general purpose SSD, gp2)                      8  GB            $0.80 
+                                                                                      
+ OVERALL TOTAL                                                                 $17.83 
+──────────────────────────────────
+4 cloud resources were detected, rerun with --show-skipped to see details:
+∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were free
+
+Err:
+

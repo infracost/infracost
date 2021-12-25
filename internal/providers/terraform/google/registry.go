@@ -3,6 +3,7 @@ package google
 import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
+	getArtifactRegistryRepositoryRegistryItem(),
 	GetBigqueryDatasetRegistryItem(),
 	GetBigqueryTableRegistryItem(),
 	GetCloudFunctionsRegistryItem(),
@@ -47,6 +48,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetPubSubSubscriptionRegistryItem(),
 	GetPubSubTopicRegistryItem(),
 	GetRedisInstanceRegistryItem(),
+	getSecretManagerSecretRegistryItem(),
+	getSecretManagerSecretVersionRegistryItem(),
 	GetSQLInstanceRegistryItem(),
 	GetStorageBucketRegistryItem(),
 }
@@ -164,6 +167,9 @@ var FreeResources = []string{
 	"google_pubsub_topic_iam_binding",
 	"google_pubsub_topic_iam_member",
 	"google_pubsub_topic_iam_policy",
+	"google_secret_manager_secret_iam_binding",
+	"google_secret_manager_secret_iam_member",
+	"google_secret_manager_secret_iam_policy",
 	"google_service_account",
 	"google_service_account_iam_binding",
 	"google_service_account_iam_member",

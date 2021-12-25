@@ -5,8 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/infracost/infracost/internal/testutil"
 	"github.com/stretchr/testify/require"
+
+	"github.com/infracost/infracost/internal/testutil"
 )
 
 func TestBreakdownHelp(t *testing.T) {
@@ -50,7 +51,7 @@ func TestBreakdownTerraformFieldsInvalid(t *testing.T) {
 }
 
 func TestBreakdownTerraformShowSkipped(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/azure_firewall_plan.json", "--show-skipped"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/express_route_gateway_plan.json", "--show-skipped"}, nil)
 }
 
 func TestBreakdownTerraformOutFileHTML(t *testing.T) {
@@ -123,6 +124,22 @@ func TestBreakdownTerragrunt(t *testing.T) {
 
 func TestBreakdownTerragruntNested(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples"}, nil)
+}
+
+func TestInstanceWithAttachmentBeforeDeploy(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/instance_with_attachment_before_deploy.json"}, nil)
+}
+
+func TestInstanceWithAttachmentAfterDeploy(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/instance_with_attachment_after_deploy.json"}, nil)
+}
+
+func TestBreakdownTerraformWrapper(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/plan_with_terraform_wrapper.json"}, nil)
+}
+
+func TestBreakdownWithTarget(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/plan_with_target.json"}, nil)
 }
 
 func TestBreakdownTerraform_v0_12(t *testing.T) {

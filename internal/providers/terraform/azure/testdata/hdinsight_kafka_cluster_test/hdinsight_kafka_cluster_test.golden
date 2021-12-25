@@ -22,15 +22,21 @@
  ├─ Managed OS disks                                          4  months                           $163.84 
  └─ Disk operations                                          40  100K operations                    $0.01 
                                                                                                           
+ azurerm_storage_account.example                                                                          
+ ├─ Capacity                                Monthly cost depends on usage: $0.01 per GB                   
+ ├─ Write operations                        Monthly cost depends on usage: $0.10 per 10k operations       
+ ├─ List and create container operations    Monthly cost depends on usage: $0.054 per 10k operations      
+ ├─ Read operations                         Monthly cost depends on usage: $0.01 per 10k operations       
+ ├─ All other operations                    Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ Data retrieval                          Monthly cost depends on usage: $0.01 per GB                   
+ ├─ Blob index                              Monthly cost depends on usage: $0.039 per 10k tags            
+ └─ Early deletion                          Monthly cost depends on usage: $0.01 per GB                   
+                                                                                                          
  OVERALL TOTAL                                                                                 $27,535.31 
 ──────────────────────────────────
 6 cloud resources were detected:
-∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
-∙ 2 weren't estimated, report them in https://github.com/infracost/infracost:
-  ∙ 1 x azurerm_storage_account
+∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
+∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost:
   ∙ 1 x azurerm_storage_container
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
-Logs:
-
-level=warning msg="Skipping resource azurerm_storage_account.example. Infracost only supports BlockBlobStorage and FileStorage account kinds"

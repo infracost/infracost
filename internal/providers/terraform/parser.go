@@ -131,6 +131,8 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
+	j, _ = StripSetupTerraformWrapper(j)
+
 	if !gjson.ValidBytes(j) {
 		return baseResources, baseResources, errors.New("invalid JSON")
 	}
@@ -145,7 +147,24 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 	pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
 	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
 
+	resourceChanges := parsed.Get("resource_changes").Array()
+	pastResources = stripNonTargetResources(pastResources, resources, resourceChanges)
+
 	return pastResources, resources, nil
+}
+
+// StripTerraformWrapper removes any output added from the setup-terraform
+// GitHub action terraform wrapper, so we can parse the output of this as
+// valid JSON. It returns the stripped out JSON and a boolean that is true
+// if the wrapper output was found and removed.
+func StripSetupTerraformWrapper(b []byte) ([]byte, bool) {
+	headerLine := regexp.MustCompile(`(?m)^\[command\].*\n`)
+	outputLine := regexp.MustCompile(`(?m)^::.*\n`)
+
+	stripped := headerLine.ReplaceAll(b, []byte{})
+	stripped = outputLine.ReplaceAll(stripped, []byte{})
+
+	return stripped, len(stripped) != len(b)
 }
 
 func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {
@@ -163,6 +182,33 @@ func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schem
 	}
 
 	return resources
+}
+
+// stripNonTargetResources removes any past resources that don't exist in the
+// current resources or resource_changes in the Terraform plan. When Terraform
+// is run with `-target` then all resources still appear in prior_state but not
+// in planned_values. This makes sure we remove any non-target resources from
+// the past resources so that we only show resources matching the target.
+func stripNonTargetResources(pastResources []*schema.Resource, resources []*schema.Resource, resourceChanges []gjson.Result) []*schema.Resource {
+	resourceAddrMap := make(map[string]bool, len(resources))
+	for _, resource := range resources {
+		resourceAddrMap[resource.Name] = true
+	}
+
+	diffAddrMap := make(map[string]bool, len(resourceChanges))
+	for _, change := range resourceChanges {
+		diffAddrMap[change.Get("address").String()] = true
+	}
+
+	var filteredResources []*schema.Resource
+	for _, resource := range pastResources {
+		_, rOk := resourceAddrMap[resource.Name]
+		_, dOk := diffAddrMap[resource.Name]
+		if dOk || rOk {
+			filteredResources = append(filteredResources, resource)
+		}
+	}
+	return filteredResources
 }
 
 func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Result, conf gjson.Result, vars gjson.Result) map[string]*schema.ResourceData {
@@ -639,6 +685,18 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 			DestAddrSuffix:   "aws_launch_template.workers_launch_template",
 			Attribute:        "launch_template",
 			ModuleSource:     "terraform-aws-modules/eks/aws",
+		},
+		{
+			SourceAddrSuffix: "aws_autoscaling_group.this",
+			DestAddrSuffix:   "aws_launch_template.this",
+			Attribute:        "launch_template",
+			ModuleSource:     "terraform-aws-modules/autoscaling/aws",
+		},
+		{
+			SourceAddrSuffix: "aws_autoscaling_group.this",
+			DestAddrSuffix:   "aws_launch_configuration.this",
+			Attribute:        "launch_configuration",
+			ModuleSource:     "terraform-aws-modules/autoscaling/aws",
 		},
 	}
 

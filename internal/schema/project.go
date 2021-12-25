@@ -117,18 +117,18 @@ func nameFromRepoURL(url string) string {
 }
 
 func parseAzureDevOpsRepoPath(path string) string {
-	r := regexp.MustCompile(`(?:(.+)(?:\/base\/_git\/)(.+))`)
+	r := regexp.MustCompile(`(?:(.+)(?:\/(.+)\/_git\/)(.+))`)
 	m := r.FindStringSubmatch(path)
 
-	if len(m) > 2 {
-		return m[1] + "/" + m[2]
+	if len(m) > 3 {
+		return fmt.Sprintf("%s/%s/%s", m[1], m[2], m[3])
 	}
 
-	r = regexp.MustCompile(`(?:(?:v3\/)(.+)(?:\/base\/)(.+))`)
+	r = regexp.MustCompile(`(?:(?:v3\/)(.+)(?:\/(.+)\/)(.+))`)
 	m = r.FindStringSubmatch(path)
 
-	if len(m) > 2 {
-		return m[1] + "/" + m[2]
+	if len(m) > 3 {
+		return fmt.Sprintf("%s/%s/%s", m[1], m[2], m[3])
 	}
 
 	return path

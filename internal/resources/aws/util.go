@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"fmt"
 	"math"
 	"reflect"
 	"regexp"
@@ -12,6 +13,7 @@ import (
 
 var (
 	underscore = regexp.MustCompile(`_`)
+	vendorName = strPtr("aws")
 )
 
 func strPtr(s string) *string {
@@ -23,6 +25,11 @@ func strVal(s *string) string {
 		return ""
 	}
 	return *s
+}
+
+// nolint:deadcode,unused
+func regexPtr(regex string) *string {
+	return strPtr(fmt.Sprintf("/%s/i", regex))
 }
 
 func intPtr(i int64) *int64 {
@@ -111,6 +118,12 @@ var RegionMapping = map[string]string{
 	"me-south-1":      "Middle East (Bahrain)",
 	"sa-east-1":       "South America (Sao Paulo)",
 	"af-south-1":      "Africa (Cape Town)",
+}
+
+// RegionCodeMapping helps to find region's abbreviated code for a more granular
+// filtering when resources may have multiple products for the same region.
+var RegionCodeMapping = map[string]string{
+	"ap-southeast-1": "APS1",
 }
 
 // RegionsUsage is a reusable type that represents a usage cost map.

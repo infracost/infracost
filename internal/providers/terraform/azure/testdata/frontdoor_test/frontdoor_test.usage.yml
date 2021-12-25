@@ -1,0 +1,11 @@
+version: 0.1
+resource_usage:
+  azurerm_frontdoor.frontdoor_with_usage:
+    monthly_outbound_data_transfer_gb: # Monthly outbound data transfer from the following, in GB:
+      us_gov: 190000                       # US Gov
+      north_america_europe_africa: 200000  # North America, Europe and Africa
+      asia_pacific: 220000                 # Asia Pacific (including Japan)
+      south_america: 10000                 # South America
+      australia: 50000                     # Australia
+      india: 387000                        # India
+    monthly_inbound_data_transfer_gb: 1000 # Monthly inbound data transfer in GB

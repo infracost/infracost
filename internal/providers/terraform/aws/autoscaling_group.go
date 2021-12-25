@@ -6,6 +6,7 @@ import (
 
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -31,7 +32,18 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		Region:  d.Get("region").String(),
 		Name:    d.Get("name").String(),
 	}
-	instanceCount := d.Get("desired_capacity").Int()
+
+	var instanceCount int64
+
+	if !d.IsEmpty("desired_capacity") {
+		instanceCount = d.Get("desired_capacity").Int()
+	} else {
+		instanceCount = d.Get("min_size").Int()
+		if instanceCount == 0 {
+			log.Debugf("Using instance count 1 for %s since no desired_capacity or non-zero min_size is set. To override this set the instance_count attribute for this resource in the Infracost usage file.", a.Address)
+			instanceCount = 1
+		}
+	}
 
 	// The Autoscaling Group resource has either a Launch Configuration or Launch Template sub-resource.
 	// So we create generic resources for these and add them as a subresource of the Autoscaling Group resource.

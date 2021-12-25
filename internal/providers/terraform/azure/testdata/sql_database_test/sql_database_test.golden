@@ -1,0 +1,80 @@
+
+ Name                                                           Monthly Qty  Unit              Monthly Cost 
+                                                                                                            
+ azurerm_sql_database.LTR                                                                                   
+ ├─ Compute (provisioned, GP_Gen5_4)                                    730  hours                  $444.47 
+ ├─ Storage                                                               5  GB                       $0.58 
+ └─ Long-term retention                                               1,000  GB                      $50.00 
+                                                                                                            
+ azurerm_sql_database.default_sql_database                                                                  
+ ├─ Compute (provisioned, GP_Gen5_2)                                    730  hours                  $222.24 
+ ├─ Storage                                                               5  GB                       $0.58 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_sql_database.premium6                                                                              
+ ├─ Compute (P6)                                                         30  days                 $3,600.00 
+ ├─ Extra data storage                                                  500  GB                     $170.00 
+ └─ Long-term retention                                               1,000  GB                      $50.00 
+                                                                                                            
+ azurerm_sql_database.serverless                                                                            
+ ├─ Compute (serverless, GP_S_Gen5_4)                                   500  vCore-hours            $260.88 
+ ├─ Storage                                                               5  GB                       $0.58 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_sql_database.sql_database_with_edition_critical                                                    
+ ├─ Compute (provisioned, BC_Gen5_2)                                    730  hours                  $444.48 
+ ├─ Storage                                                               5  GB                       $1.25 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_sql_database.sql_database_with_edition_gen                                                         
+ ├─ Compute (provisioned, GP_Gen5_2)                                    730  hours                  $222.24 
+ ├─ Storage                                                               5  GB                       $0.58 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_sql_database.sql_database_with_edition_hyper                                                       
+ ├─ Compute (provisioned, HS_Gen5_2)                                    730  hours                  $266.68 
+ ├─ Read replicas                                            Monthly cost depends on usage: $0.37 per hours 
+ └─ Storage                                                               5  GB                       $0.50 
+                                                                                                            
+ azurerm_sql_database.sql_database_with_edition_premium                                                     
+ ├─ Compute (P1)                                                         30  days                   $450.00 
+ ├─ Extra data storage                                       Monthly cost depends on usage: $0.34 per GB    
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_sql_database.sql_database_with_edition_standard                                                    
+ ├─ Compute (S0)                                                         30  days                    $14.52 
+ ├─ Extra data storage                                       Monthly cost depends on usage: $0.17 per GB    
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_sql_database.sql_database_with_max_size                                                            
+ ├─ Compute (provisioned, GP_Gen5_2)                                    730  hours                  $222.24 
+ ├─ Storage                                                              10  GB                       $1.15 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ azurerm_sql_database.sql_database_with_service_object_name                                                 
+ ├─ Compute (provisioned, BC_Gen5_2)                                    730  hours                  $444.48 
+ ├─ Storage                                                               5  GB                       $1.25 
+ └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
+                                                                                                            
+ OVERALL TOTAL                                                                                    $6,868.66 
+──────────────────────────────────
+13 cloud resources were detected:
+∙ 11 were estimated, 11 include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were free:
+  ∙ 1 x azurerm_resource_group
+  ∙ 1 x azurerm_sql_server
+Logs:
+
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, BC_Gen5_2)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, BC_Gen5_2)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_2)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_2)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_2)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, HS_Gen5_2)' due to limitations in the Azure API."
+level=warning msg="Multiple products found for azurerm_sql_database.LTR Compute (provisioned, GP_Gen5_4), using the first product"
+level=warning msg="Multiple products found for azurerm_sql_database.default_sql_database Compute (provisioned, GP_Gen5_2), using the first product"
+level=warning msg="Multiple products found for azurerm_sql_database.sql_database_with_edition_critical Compute (provisioned, BC_Gen5_2), using the first product"
+level=warning msg="Multiple products found for azurerm_sql_database.sql_database_with_edition_gen Compute (provisioned, GP_Gen5_2), using the first product"
+level=warning msg="Multiple products found for azurerm_sql_database.sql_database_with_max_size Compute (provisioned, GP_Gen5_2), using the first product"
+level=warning msg="Multiple products found for azurerm_sql_database.sql_database_with_service_object_name Compute (provisioned, BC_Gen5_2), using the first product"

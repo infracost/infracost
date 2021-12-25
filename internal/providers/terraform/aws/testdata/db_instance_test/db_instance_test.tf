@@ -15,9 +15,10 @@ resource "aws_db_instance" "mysql-default" {
 }
 
 resource "aws_db_instance" "mysql-allocated-storage" {
-  engine            = "mysql"
-  instance_class    = "db.t3.large"
-  allocated_storage = 20
+  engine                  = "mysql"
+  instance_class          = "db.t3.large"
+  allocated_storage       = 20
+  backup_retention_period = 10
 }
 
 resource "aws_db_instance" "mysql-multi-az" {
@@ -62,12 +63,14 @@ resource "aws_db_instance" "aurora" {
   instance_class = "db.t3.small"
 }
 resource "aws_db_instance" "aurora-mysql" {
-  engine         = "aurora-mysql"
-  instance_class = "db.t3.small"
+  engine                  = "aurora-mysql"
+  instance_class          = "db.t3.small"
+  backup_retention_period = 10
 }
 resource "aws_db_instance" "aurora-postgresql" {
-  engine         = "aurora-postgresql"
-  instance_class = "db.t3.large"
+  engine                  = "aurora-postgresql"
+  instance_class          = "db.t3.large"
+  backup_retention_period = 10
 }
 resource "aws_db_instance" "mariadb" {
   engine         = "mariadb"

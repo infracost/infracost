@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 type DashboardAPIClient struct {
@@ -19,6 +20,11 @@ type DashboardAPIClient struct {
 type CreateAPIKeyResponse struct {
 	APIKey string `json:"apiKey"`
 	Error  string `json:"error"`
+}
+
+type AddRunResponse struct {
+	RunID    string `json:"id"`
+	ShareURL string `json:"shareUrl"`
 }
 
 type runInput struct {
@@ -42,8 +48,9 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 		APIClient: APIClient{
 			endpoint: ctx.Config.DashboardAPIEndpoint,
 			apiKey:   ctx.Config.APIKey,
+			uuid:     ctx.UUID(),
 		},
-		dashboardEnabled: ctx.Config.EnableDashboard,
+		dashboardEnabled: ctx.Config.EnableDashboard && !ctx.Config.IsSelfHosted(),
 	}
 }
 
@@ -63,10 +70,12 @@ func (c *DashboardAPIClient) CreateAPIKey(name string, email string) (CreateAPIK
 	return r, nil
 }
 
-func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*config.ProjectContext, out output.Root) (string, error) {
+func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*config.ProjectContext, out output.Root) (AddRunResponse, error) {
+	response := AddRunResponse{}
+
 	if !c.dashboardEnabled {
 		log.Debug("Skipping reporting project results since dashboard is not enabled")
-		return "", nil
+		return response, nil
 	}
 
 	projectResultInputs := make([]projectResultInput, len(out.Projects))
@@ -94,22 +103,23 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 	mutation($run: RunInput!) {
 			addRun(run: $run) {
 				id
+				shareUrl
 			}
 		}
 	`
 	results, err := c.doQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
-		return "", err
+		return response, err
 	}
 
-	runID := ""
 	if len(results) > 0 {
 
 		if results[0].Get("errors").Exists() {
-			return runID, errors.New(results[0].Get("errors").String())
+			return response, errors.New(results[0].Get("errors").String())
 		}
 
-		runID = results[0].Get("data.addRun.id").String()
+		response.RunID = results[0].Get("data.addRun.id").String()
+		response.ShareURL = results[0].Get("data.addRun.shareUrl").String()
 	}
-	return runID, nil
+	return response, nil
 }

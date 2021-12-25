@@ -2,10 +2,11 @@ package output
 
 import (
 	"fmt"
+	"math"
+
 	"github.com/Rhymond/go-money"
 	"github.com/dustin/go-humanize"
 	"github.com/shopspring/decimal"
-	"math"
 )
 
 var roundCostsAbove = 100
@@ -109,4 +110,28 @@ func formatTitleWithCurrency(title, currency string) string {
 		return title
 	}
 	return fmt.Sprintf("%s (%s)", title, currency)
+}
+
+func truncateMiddle(s string, maxLen int, fill string) string {
+	r := []rune(s)
+
+	if len(r) <= maxLen {
+		return s
+	}
+
+	fillR := []rune(fill)
+	fillLen := len(fillR)
+	if fillLen > maxLen {
+		return fill[0:maxLen]
+	}
+
+	startLen := int64(math.Ceil(0.5 * float64(maxLen-fillLen)))
+	endLen := int64(math.Floor(0.5 * float64(maxLen-fillLen)))
+
+	truncated := make([]rune, 0, maxLen)
+	truncated = append(truncated, r[0:startLen]...)
+	truncated = append(truncated, fillR...)
+	truncated = append(truncated, r[int64(len(r))-endLen:]...)
+
+	return string(truncated)
 }

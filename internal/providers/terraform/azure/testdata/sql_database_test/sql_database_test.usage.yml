@@ -1,0 +1,9 @@
+version: 0.1
+resource_usage:
+  azurerm_sql_database.serverless:
+    monthly_vcore_hours: 500
+  azurerm_sql_database.LTR:
+    long_term_retention_storage_gb: 1000
+  azurerm_sql_database.premium6:
+    long_term_retention_storage_gb: 1000
+    extra_data_storage_gb: 500

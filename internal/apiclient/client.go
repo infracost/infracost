@@ -2,11 +2,13 @@ package apiclient
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -15,9 +17,10 @@ import (
 )
 
 type APIClient struct {
-	endpoint string
-	apiKey   string
-	runID    string
+	endpoint  string
+	apiKey    string
+	tlsConfig *tls.Config
+	uuid      uuid.UUID
 }
 
 type GraphQLQuery struct {
@@ -63,7 +66,8 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 
 	c.AddAuthHeaders(req)
 
-	client := &http.Client{}
+	transport := &http.Transport{TLSClientConfig: c.tlsConfig}
+	client := &http.Client{Transport: transport}
 	resp, err := client.Do(req)
 	if err != nil {
 		return []byte{}, errors.Wrap(err, "Error sending API request")
@@ -80,13 +84,13 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 
 		err = json.Unmarshal(respBody, &r)
 		if err != nil {
-			return []byte{}, &APIError{err, "Invalid API response"}
+			return []byte{}, &APIError{fmt.Errorf(resp.Status), "Invalid API response"}
 		}
 
 		if r.Error == "Invalid API key" {
 			return []byte{}, ErrInvalidAPIKey
 		}
-		return []byte{}, &APIError{errors.New(r.Error), "Received error from API"}
+		return []byte{}, &APIError{fmt.Errorf("%v %v", resp.Status, r.Error), "Received error from API"}
 	}
 
 	return respBody, nil
@@ -100,7 +104,9 @@ func (c *APIClient) AddDefaultHeaders(req *http.Request) {
 func (c *APIClient) AddAuthHeaders(req *http.Request) {
 	c.AddDefaultHeaders(req)
 	req.Header.Set("X-Api-Key", c.apiKey)
-	req.Header.Set("X-Trace-Id", c.runID)
+	if c.uuid != uuid.Nil {
+		req.Header.Set("X-Infracost-Trace-Id", fmt.Sprintf("cli=%s", c.uuid.String()))
+	}
 }
 
 func userAgent() string {

@@ -1,69 +1,19 @@
 
- Name                                                     Monthly Qty  Unit                Monthly Cost 
-                                                                                                        
- azurerm_public_ip.example                                                                              
- └─ IP address (dynamic)                                          730  hours                      $2.92 
-                                                                                                        
- azurerm_virtual_network_gateway.Basic                                                                  
- ├─ VPN gateway (Basic)                                           730  hours                     $26.28 
- ├─ VPN gateway P2S tunnels (over 128)                Monthly cost depends on usage: $7.30 per tunnel   
- └─ VPN gateway data tranfer                          Monthly cost depends on usage: $0.035 per GB      
-                                                                                                        
- azurerm_virtual_network_gateway.VpnGw1                                                                 
- ├─ VPN gateway (VpnGw1)                                          730  hours                    $138.70 
- ├─ VPN gateway P2S tunnels (over 128)                Monthly cost depends on usage: $7.30 per tunnel   
- └─ VPN gateway data tranfer                          Monthly cost depends on usage: $0.035 per GB      
-                                                                                                        
- azurerm_virtual_network_gateway.VpnGw1AZ                                                               
- ├─ VPN gateway (VpnGw1AZ)                                        730  hours                    $263.53 
- ├─ VPN gateway P2S tunnels (over 128)                Monthly cost depends on usage: $7.30 per tunnel   
- └─ VPN gateway data tranfer                          Monthly cost depends on usage: $0.035 per GB      
-                                                                                                        
- azurerm_virtual_network_gateway.VpnGw2                                                                 
- ├─ VPN gateway (VpnGw2)                                          730  hours                    $357.70 
- ├─ VPN gateway P2S tunnels (over 128)                Monthly cost depends on usage: $7.30 per tunnel   
- └─ VPN gateway data tranfer                          Monthly cost depends on usage: $0.035 per GB      
-                                                                                                        
- azurerm_virtual_network_gateway.VpnGw3                                                                 
- ├─ VPN gateway (VpnGw3)                                          730  hours                    $912.50 
- ├─ VPN gateway P2S tunnels (over 128)                Monthly cost depends on usage: $7.30 per tunnel   
- └─ VPN gateway data tranfer                          Monthly cost depends on usage: $0.035 per GB      
-                                                                                                        
- azurerm_virtual_network_gateway.VpnGw4                                                                 
- ├─ VPN gateway (VpnGw4)                                          730  hours                  $1,533.00 
- ├─ VPN gateway P2S tunnels (over 128)                Monthly cost depends on usage: $7.30 per tunnel   
- └─ VPN gateway data tranfer                          Monthly cost depends on usage: $0.035 per GB      
-                                                                                                        
- azurerm_virtual_network_gateway.VpnGw5                                                                 
- ├─ VPN gateway (VpnGw5)                                          730  hours                  $2,664.50 
- ├─ VPN gateway P2S tunnels (over 128)                Monthly cost depends on usage: $7.30 per tunnel   
- └─ VPN gateway data tranfer                          Monthly cost depends on usage: $0.035 per GB      
-                                                                                                        
- azurerm_virtual_network_gateway_connection.VpnGw1                                                      
- └─ VPN gateway (VpnGw1)                                          730  hours                     $10.95 
-                                                                                                        
- azurerm_virtual_network_gateway_connection.VpnGw1AZ                                                    
- └─ VPN gateway (VpnGw1AZ)                                        730  hours                     $10.95 
-                                                                                                        
- azurerm_virtual_network_gateway_connection.VpnGw2                                                      
- └─ VPN gateway (VpnGw2)                                          730  hours                     $10.95 
-                                                                                                        
- azurerm_virtual_network_gateway_connection.VpnGw3                                                      
- └─ VPN gateway (VpnGw3)                                          730  hours                     $10.95 
-                                                                                                        
- azurerm_virtual_network_gateway_connection.VpnGw4                                                      
- └─ VPN gateway (VpnGw4)                                          730  hours                     $10.95 
-                                                                                                        
- azurerm_virtual_network_gateway_connection.VpnGw5                                                      
- └─ VPN gateway (VpnGw5)                                          730  hours                     $10.95 
-                                                                                                        
- OVERALL TOTAL                                                                                $5,964.83 
+ Name                                                   Monthly Qty  Unit         Monthly Cost 
+                                                                                               
+ azurerm_vpn_gateway.vpn_gateway                                                               
+ └─ S2S scale units (500 Mbps)                                    1  scale units       $263.53 
+                                                                                               
+ azurerm_vpn_gateway_connection.vpn_gateway_connection                                         
+ └─ S2S Connections                                             730  hours              $36.50 
+                                                                                               
+ OVERALL TOTAL                                                                         $300.03 
 ──────────────────────────────────
-25 cloud resources were detected:
-∙ 14 were estimated, 7 include usage-based costs, see https://infracost.io/usage-file
-∙ 11 were free:
-  ∙ 7 x azurerm_local_network_gateway
+6 cloud resources were detected:
+∙ 2 were estimated
+∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost:
+  ∙ 1 x azurerm_vpn_site
+∙ 3 were free:
   ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_subnet
-  ∙ 1 x azurerm_virtual_network
-  ∙ 1 x azurerm_virtual_network_gateway_connection
+  ∙ 1 x azurerm_virtual_hub
+  ∙ 1 x azurerm_virtual_wan

@@ -20,8 +20,6 @@ import (
 	"github.com/fatih/color"
 )
 
-var spinner *ui.Spinner
-
 func main() {
 	var appErr error
 	updateMessageChan := make(chan *update.Info)
@@ -69,7 +67,7 @@ func NewRootCommand(ctx *config.RunContext) *cobra.Command {
 		Example: `  Generate a cost diff from Terraform directory with any required Terraform flags:
 
       infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
-	
+
   Generate a full cost breakdown from Terraform directory with any required Terraform flags:
 
       infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"`,
@@ -158,11 +156,6 @@ func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) erro
 }
 
 func handleCLIError(ctx *config.RunContext, cliErr error) {
-	if spinner != nil {
-		spinner.Fail()
-		fmt.Fprintln(os.Stderr, "")
-	}
-
 	if cliErr.Error() != "" {
 		ui.PrintError(os.Stderr, cliErr.Error())
 	}
@@ -174,11 +167,6 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 }
 
 func handleUnexpectedErr(ctx *config.RunContext, unexpectedErr interface{}) {
-	if spinner != nil {
-		spinner.Fail()
-		fmt.Fprintln(os.Stderr, "")
-	}
-
 	stack := string(debug.Stack())
 
 	ui.PrintUnexpectedError(unexpectedErr, stack)

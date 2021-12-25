@@ -105,6 +105,8 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 	}
 
 	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
+	defer spinner.Fail()
+
 	j, err := p.runShow(opts, spinner, planPath)
 	if err == nil {
 		p.cachedPlanJSON = j

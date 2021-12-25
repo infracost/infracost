@@ -1,0 +1,340 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/Root",
+  "definitions": {
+    "Breakdown": {
+      "required": [
+        "resources",
+        "totalHourlyCost",
+        "totalMonthlyCost"
+      ],
+      "properties": {
+        "resources": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/Resource"
+          },
+          "type": "array"
+        },
+        "totalHourlyCost": {
+          "type": ["string", "null"]
+        },
+        "totalMonthlyCost": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "CostComponent": {
+      "required": [
+        "name",
+        "unit",
+        "hourlyQuantity",
+        "monthlyQuantity",
+        "price",
+        "hourlyCost",
+        "monthlyCost"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "hourlyQuantity": {
+          "type": ["string", "null"]
+        },
+        "monthlyQuantity": {
+          "type": ["string", "null"]
+        },
+        "price": {
+          "type": ["string", "null"]
+        },
+        "hourlyCost": {
+          "type": ["string", "null"]
+        },
+        "monthlyCost": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Project": {
+      "required": [
+        "name",
+        "metadata",
+        "pastBreakdown",
+        "breakdown",
+        "diff",
+        "summary"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "metadata": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/ProjectMetadata"
+        },
+        "pastBreakdown": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/Breakdown"
+        },
+        "breakdown": {
+          "$ref": "#/definitions/Breakdown"
+        },
+        "diff": {
+          "$ref": "#/definitions/Breakdown"
+        },
+        "summary": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/Summary"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ProjectMetadata": {
+      "required": [
+        "path",
+        "type"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "vcsRepoUrl": {
+          "type": "string"
+        },
+        "vcsSubPath": {
+          "type": "string"
+        },
+        "vcsPullRequestUrl": {
+          "type": "string"
+        },
+        "terraformWorkspace": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Resource": {
+      "required": [
+        "name",
+        "metadata",
+        "hourlyCost",
+        "monthlyCost"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "tags": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "metadata": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "hourlyCost": {
+          "type": ["string", "null"]
+        },
+        "monthlyCost": {
+          "type": ["string", "null"]
+        },
+        "costComponents": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/CostComponent"
+          },
+          "type": "array"
+        },
+        "subresources": {
+          "items": {
+            "$ref": "#/definitions/Subresource"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Root": {
+      "required": [
+        "version",
+        "currency",
+        "projects",
+        "totalHourlyCost",
+        "totalMonthlyCost",
+        "pastTotalHourlyCost",
+        "pastTotalMonthlyCost",
+        "diffTotalHourlyCost",
+        "diffTotalMonthlyCost",
+        "timeGenerated",
+        "summary"
+      ],
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "runId": {
+          "type": "string"
+        },
+        "shareUrl": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "projects": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/Project"
+          },
+          "type": "array"
+        },
+        "totalHourlyCost": {
+          "type": ["string", "null"]
+        },
+        "totalMonthlyCost": {
+          "type": ["string", "null"]
+        },
+        "pastTotalHourlyCost": {
+          "type": ["string", "null"]
+        },
+        "pastTotalMonthlyCost": {
+          "type": ["string", "null"]
+        },
+        "diffTotalHourlyCost": {
+          "type": ["string", "null"]
+        },
+        "diffTotalMonthlyCost": {
+          "type": ["string", "null"]
+        },
+        "timeGenerated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "summary": {
+          "$ref": "#/definitions/Summary"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Subresource": {
+      "required": [
+        "name",
+        "metadata",
+        "hourlyCost",
+        "monthlyCost"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "tags": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "metadata": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "hourlyCost": {
+          "type": ["string", "null"]
+        },
+        "monthlyCost": {
+          "type": ["string", "null"]
+        },
+        "costComponents": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/CostComponent"
+          },
+          "type": "array"
+        },
+        "subresources": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Summary": {
+      "properties": {
+        "totalResources": {
+          "type": "integer"
+        },
+        "totalDetectedResources": {
+          "type": "integer"
+        },
+        "totalSupportedResources": {
+          "type": "integer"
+        },
+        "totalUnsupportedResources": {
+          "type": "integer"
+        },
+        "totalUsageBasedResources": {
+          "type": "integer"
+        },
+        "totalNoPriceResources": {
+          "type": "integer"
+        },
+        "supportedResourceCounts": {
+          "patternProperties": {
+            ".*": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "unsupportedResourceCounts": {
+          "patternProperties": {
+            ".*": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "noPriceResourceCounts": {
+          "patternProperties": {
+            ".*": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

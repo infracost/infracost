@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"sort"
+
+	"github.com/kballard/go-shellquote"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
@@ -17,13 +20,19 @@ var defaultTerragruntBinary = "terragrunt"
 var minTerragruntVer = "v0.28.1"
 
 type TerragruntProvider struct {
-	ctx  *config.ProjectContext
-	Path string
+	ctx             *config.ProjectContext
+	Path            string
+	TerragruntFlags string
 	*DirProvider
 }
 
 type TerragruntInfo struct {
 	ConfigPath string
+	WorkingDir string
+}
+
+type terragruntProjectDirs struct {
+	ConfigDir  string
 	WorkingDir string
 }
 
@@ -39,9 +48,10 @@ func NewTerragruntProvider(ctx *config.ProjectContext) schema.Provider {
 	dirProvider.IsTerragrunt = true
 
 	return &TerragruntProvider{
-		ctx:         ctx,
-		DirProvider: dirProvider,
-		Path:        ctx.ProjectConfig.Path,
+		ctx:             ctx,
+		DirProvider:     dirProvider,
+		Path:            ctx.ProjectConfig.Path,
+		TerragruntFlags: ctx.ProjectConfig.TerragruntFlags,
 	}
 }
 
@@ -61,7 +71,7 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	// We want to run Terragrunt commands from the config dirs
 	// Terragrunt internally runs Terraform in the working dirs, so we need to be aware of these
 	// so we can handle reading and cleaning up the generated plan files.
-	configDirs, workingDirs, err := p.getProjectDirs()
+	projectDirs, err := p.getProjectDirs()
 
 	if err != nil {
 		return []*schema.Project{}, err
@@ -70,18 +80,18 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	var outs [][]byte
 
 	if p.UseState {
-		outs, err = p.generateStateJSONs(configDirs)
+		outs, err = p.generateStateJSONs(projectDirs)
 	} else {
-		outs, err = p.generatePlanJSONs(configDirs, workingDirs)
+		outs, err = p.generatePlanJSONs(projectDirs)
 	}
 	if err != nil {
 		return []*schema.Project{}, err
 	}
 
-	projects := make([]*schema.Project, 0, len(configDirs))
+	projects := make([]*schema.Project, 0, len(projectDirs))
 
-	for i, path := range configDirs {
-		metadata := config.DetectProjectMetadata(path)
+	for i, projectDir := range projectDirs {
+		metadata := config.DetectProjectMetadata(projectDir.ConfigDir)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
 		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
@@ -106,65 +116,93 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	return projects, nil
 }
 
-func (p *TerragruntProvider) getProjectDirs() ([]string, []string, error) {
+func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 	spinner := ui.NewSpinner("Running terragrunt run-all terragrunt-info", p.spinnerOpts)
+	defer spinner.Fail()
+
+	terragruntFlags, err := shellquote.Split(p.TerragruntFlags)
+	if err != nil {
+		return []terragruntProjectDirs{}, errors.Wrap(err, "Error parsing terragrunt flags")
+	}
 
 	opts := &CmdOptions{
 		TerraformBinary: p.TerraformBinary,
 		Dir:             p.Path,
+		Flags:           terragruntFlags,
 	}
 	out, err := Cmd(opts, "run-all", "--terragrunt-ignore-external-dependencies", "terragrunt-info")
 	if err != nil {
 		spinner.Fail()
 		p.printTerraformErr(err)
 
-		return []string{}, []string{}, err
+		return []terragruntProjectDirs{}, err
 	}
 
-	jsons := bytes.SplitAfter(out, []byte{'}', '\n'})
-	if len(jsons) > 1 {
-		jsons = jsons[:len(jsons)-1]
+	var jsons [][]byte
+
+	jsonStart := bytes.IndexByte(out, '{') // ignore anything that comes before the json (e.g. unexpected logging to stdout by tgenv)
+	if jsonStart >= 0 {
+		out = out[jsonStart:]
+
+		jsons = bytes.SplitAfter(out, []byte{'}', '\n'})
+		if len(jsons) > 1 {
+			jsons = jsons[:len(jsons)-1]
+		}
 	}
 
-	configDirs := make([]string, 0, len(jsons))
-	workingDirs := make([]string, 0, len(jsons))
+	dirs := make([]terragruntProjectDirs, 0, len(jsons))
 
 	for _, j := range jsons {
 		var info TerragruntInfo
 		err = json.Unmarshal(j, &info)
 		if err != nil {
 			spinner.Fail()
-			return configDirs, workingDirs, err
+			return dirs, err
 		}
 
-		configDirs = append(configDirs, filepath.Dir(info.ConfigPath))
-		workingDirs = append(workingDirs, info.WorkingDir)
+		dirs = append(dirs, terragruntProjectDirs{
+			ConfigDir:  filepath.Dir(info.ConfigPath),
+			WorkingDir: info.WorkingDir,
+		})
 	}
+
+	// Sort the dirs so they are consistent in the output
+	sort.Slice(dirs, func(i, j int) bool {
+		return dirs[i].ConfigDir < dirs[j].ConfigDir
+	})
 
 	spinner.Success()
 
-	return configDirs, workingDirs, nil
+	return dirs, nil
 }
 
-func (p *TerragruntProvider) generateStateJSONs(configDirs []string) ([][]byte, error) {
+func (p *TerragruntProvider) generateStateJSONs(projectDirs []terragruntProjectDirs) ([][]byte, error) {
 	err := p.checks()
 	if err != nil {
 		return [][]byte{}, err
 	}
 
-	outs := make([][]byte, 0, len(configDirs))
+	outs := make([][]byte, 0, len(projectDirs))
 
 	spinnerMsg := "Running terragrunt show"
-	if len(configDirs) > 1 {
+	if len(projectDirs) > 1 {
 		spinnerMsg += " for each project"
 	}
 	spinner := ui.NewSpinner(spinnerMsg, p.spinnerOpts)
+	defer spinner.Fail()
 
-	for _, path := range configDirs {
-		opts, err := p.buildCommandOpts(path)
+	for _, projectDir := range projectDirs {
+		opts, err := p.buildCommandOpts(projectDir.ConfigDir)
 		if err != nil {
 			return [][]byte{}, err
 		}
+
+		terragruntFlags, err := shellquote.Split(p.TerragruntFlags)
+		if err != nil {
+			return [][]byte{}, errors.Wrap(err, "Error parsing terragrunt flags")
+		}
+		opts.Flags = terragruntFlags
+
 		if opts.TerraformConfigFile != "" {
 			defer os.Remove(opts.TerraformConfigFile)
 		}
@@ -173,13 +211,20 @@ func (p *TerragruntProvider) generateStateJSONs(configDirs []string) ([][]byte, 
 		if err != nil {
 			return outs, err
 		}
+
+		// ignore anything that comes before the json (e.g. unexpected logging to stdout by tgenv)
+		jsonStart := bytes.IndexByte(out, '{')
+		if jsonStart >= 0 {
+			out = out[jsonStart:]
+		}
+
 		outs = append(outs, out)
 	}
 
 	return outs, nil
 }
 
-func (p *DirProvider) generatePlanJSONs(configDirs []string, workingDirs []string) ([][]byte, error) {
+func (p *TerragruntProvider) generatePlanJSONs(projectDirs []terragruntProjectDirs) ([][]byte, error) {
 	err := p.checks()
 	if err != nil {
 		return [][]byte{}, err
@@ -189,14 +234,23 @@ func (p *DirProvider) generatePlanJSONs(configDirs []string, workingDirs []strin
 	if err != nil {
 		return [][]byte{}, err
 	}
+
+	terragruntFlags, err := shellquote.Split(p.TerragruntFlags)
+	if err != nil {
+		return [][]byte{}, errors.Wrap(err, "Error parsing terragrunt flags")
+	}
+	opts.Flags = terragruntFlags
+
 	if opts.TerraformConfigFile != "" {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
 	spinner := ui.NewSpinner("Running terragrunt run-all plan", p.spinnerOpts)
+	defer spinner.Fail()
+
 	planFile, planJSON, err := p.runPlan(opts, spinner, true)
 	defer func() {
-		err := cleanupPlanFiles(workingDirs, planFile)
+		err := cleanupPlanFiles(projectDirs, planFile)
 		if err != nil {
 			log.Warnf("Error cleaning up plan files: %v", err)
 		}
@@ -210,15 +264,15 @@ func (p *DirProvider) generatePlanJSONs(configDirs []string, workingDirs []strin
 		return [][]byte{planJSON}, nil
 	}
 
-	outs := make([][]byte, 0, len(configDirs))
+	outs := make([][]byte, 0, len(projectDirs))
 	spinnerMsg := "Running terragrunt show"
-	if len(configDirs) > 1 {
+	if len(projectDirs) > 1 {
 		spinnerMsg += " for each project"
 	}
 	spinner = ui.NewSpinner(spinnerMsg, p.spinnerOpts)
 
-	for i, path := range configDirs {
-		opts, err := p.buildCommandOpts(path)
+	for _, projectDir := range projectDirs {
+		opts, err := p.buildCommandOpts(projectDir.ConfigDir)
 		if err != nil {
 			return [][]byte{}, err
 		}
@@ -226,23 +280,30 @@ func (p *DirProvider) generatePlanJSONs(configDirs []string, workingDirs []strin
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, spinner, filepath.Join(workingDirs[i], planFile))
+		out, err := p.runShow(opts, spinner, filepath.Join(projectDir.WorkingDir, planFile))
 		if err != nil {
 			return outs, err
 		}
+
+		// ignore anything that comes before the json (e.g. unexpected logging to stdout by tgenv)
+		jsonStart := bytes.IndexByte(out, '{')
+		if jsonStart >= 0 {
+			out = out[jsonStart:]
+		}
+
 		outs = append(outs, out)
 	}
 
 	return outs, nil
 }
 
-func cleanupPlanFiles(paths []string, planFile string) error {
+func cleanupPlanFiles(projectDirs []terragruntProjectDirs, planFile string) error {
 	if planFile == "" {
 		return nil
 	}
 
-	for _, path := range paths {
-		err := os.Remove(filepath.Join(path, planFile))
+	for _, projectDir := range projectDirs {
+		err := os.Remove(filepath.Join(projectDir.WorkingDir, planFile))
 		if err != nil {
 			return err
 		}

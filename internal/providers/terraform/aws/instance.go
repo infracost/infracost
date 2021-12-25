@@ -18,7 +18,8 @@ func GetInstanceRegistryItem() *schema.RegistryItem {
 			"EC2 detailed monitoring assumes the standard 7 metrics and the lowest tier of prices for CloudWatch.",
 			"If a root volume is not specified then an 8Gi gp2 volume is assumed.",
 		},
-		RFunc: NewInstance,
+		RFunc:               NewInstance,
+		ReferenceAttributes: []string{"ebs_block_device.#.volume_id"},
 	}
 }
 
@@ -53,7 +54,16 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		a.RootBlockDevice.Size = intPtr(d.Get("root_block_device.0.volume_size").Int())
 	}
 
+	ebsBlockDeviceRef := d.References("ebs_block_device.#.volume_id")
+
 	for i, data := range d.Get("ebs_block_device").Array() {
+		// Check if there's a reference for this EBS volume
+		// If there is then we shouldn't add as a subresource since
+		// the cost will be added against the volume resource.
+		if len(ebsBlockDeviceRef) > i && ebsBlockDeviceRef[i].Get("id").String() == data.Get("volume_id").String() {
+			continue
+		}
+
 		ebsBlockDevice := &aws.EBSVolume{
 			Address: fmt.Sprintf("ebs_block_device[%d]", i),
 			Region:  region,

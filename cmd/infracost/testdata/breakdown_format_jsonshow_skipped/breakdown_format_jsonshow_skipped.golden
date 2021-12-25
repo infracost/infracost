@@ -7,8 +7,9 @@
       "metadata": {
         "path": "./testdata/example_plan.json",
         "type": "terraform_plan_json",
-        "vcsRepoUrl": "https://github.com/infracost/infracost.git",
-        "vcsSubPath": "cmd/infracost/testdata/example_plan.json"
+        "vcsRepoUrl": "https://github.com/infracost/infracost",
+        "vcsSubPath": "cmd/infracost/testdata/example_plan.json",
+        "vcsPullRequestUrl": "NOT_APPLICABLE"
       },
       "pastBreakdown": {
         "resources": [],
@@ -532,4 +533,5 @@
 
 Err:
 Warning: show-skipped is not needed with JSON output format as that always includes them.
+
 

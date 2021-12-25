@@ -47,7 +47,11 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMDNSPrivateZoneRegistryItem(),
 	GetAzureRMDNSZoneRegistryItem(),
 	GetAzureRMEventHubsNamespaceRegistryItem(),
+	getAzureRMExpressRouteConnectionRegistryItem(),
+	getAzureRMExpressRouteGatewayRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
+	getAzureRMFrontdoorFirewallPolicyRegistryItem(),
+	getAzureRMFrontdoorRegistryItem(),
 	GetAzureRMHDInsightHadoopClusterRegistryItem(),
 	GetAzureRMHDInsightHBaseClusterRegistryItem(),
 	GetAzureRMHDInsightInteractiveQueryClusterRegistryItem(),
@@ -65,9 +69,10 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
 	GetAzureRMMariaDBServerRegistryItem(),
-	GetAzureRMMSSQLDatabaseRegistryItem(),
+	getAzureRMMSSQLDatabaseRegistryItem(),
 	GetAzureRMMySQLServerRegistryItem(),
 	GetAzureRMNotificationHubNamespaceRegistryItem(),
+	getAzureRMPointToSiteVpnGatewayRegistryItem(),
 	GetAzureRMPostgreSQLFlexibleServerRegistryItem(),
 	GetAzureRMPostgreSQLServerRegistryItem(),
 	GetAzureRMPrivateDNSaRecordRegistryItem(),
@@ -82,16 +87,20 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMPublicIPPrefixRegistryItem(),
 	GetAzureRMSearchServiceRegistryItem(),
 	GetAzureRMRedisCacheRegistryItem(),
-	GetAzureRMStorageAccountRegistryItem(),
+	getAzureRMStorageAccountRegistryItem(),
+	getAzureRMSQLDatabaseRegistryItem(),
 	GetAzureRMSynapseSparkPoolRegistryItem(),
 	GetAzureRMSynapseSQLPoolRegistryItem(),
 	GetAzureRMSynapseWorkspacRegistryItem(),
+	getAzureRMVirtualHubRegistryItem(),
 	GetAzureRMVirtualMachineScaleSetRegistryItem(),
 	GetAzureRMVirtualMachineRegistryItem(),
-	GetAzureRMVpnGatewayConnectionRegistryItem(),
-	GetAzureRMVpnGatewayRegistryItem(),
+	GetAzureRMVirtualNetworkGatewayConnectionRegistryItem(),
+	GetAzureRMVirtualNetworkGatewayRegistryItem(),
 	GetAzureRMWindowsVirtualMachineRegistryItem(),
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
+	getAzureRMVPNGatewayRegistryItem(),
+	getAzureRMVPNGatewayConnectionRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -214,6 +223,10 @@ var FreeResources = []string{
 	"azurerm_firewall_policy",
 	"azurerm_firewall_policy_rule_collection_group",
 
+	// Azure Front Door
+	"azurerm_frontdoor_custom_https_configuration",
+	"azurerm_frontdoor_rules_engine",
+
 	// Azure Key Vault
 	"azurerm_key_vault",
 	"azurerm_key_vault_access_policy",
@@ -244,17 +257,18 @@ var FreeResources = []string{
 
 	// Azure Networking
 	"azurerm_application_security_group",
+	"azurerm_local_network_gateway",
+	"azurerm_nat_gateway_public_ip_association",
+	"azurerm_nat_gateway_public_ip_prefix_association",
 	"azurerm_network_interface",
 	"azurerm_network_interface_security_group_association",
 	"azurerm_network_security_group",
 	"azurerm_network_security_rule",
 	"azurerm_private_link_service",
+	"azurerm_storage_account_network_rules",
 	"azurerm_subnet",
 	"azurerm_subnet_network_security_group_association",
 	"azurerm_virtual_network",
-	"azurerm_local_network_gateway",
-	"azurerm_nat_gateway_public_ip_association",
-	"azurerm_nat_gateway_public_ip_prefix_association",
 
 	// Azure Notification Hub
 	"azurerm_notification_hub",
@@ -311,6 +325,9 @@ var FreeResources = []string{
 	"azurerm_proximity_placement_group",
 	"azurerm_ssh_public_key",
 	"azurerm_marketplace_agreement",
+
+	// Azure WAN
+	"azurerm_virtual_wan",
 }
 
 var UsageOnlyResources = []string{}

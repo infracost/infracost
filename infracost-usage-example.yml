@@ -51,6 +51,11 @@ resource_usage:
     monthly_handler_operations: 10000 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
     monthly_duration_secs: 0 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.  
 
+  aws_cloudtrail.my_cloudtrail:
+    monthly_additional_management_events: 100000 # Monthly additional copies of read and write management events. The first copy of management events per region is free, so this should only be non-zero if there are multiple trails recording management events in this region.
+    monthly_data_events: 200000 # Monthly data events delivered to S3, Lambda or DynamoDB
+    monthly_insight_events: 400000 # Monthly CloudTrail Insight events
+
   aws_cloudwatch_event_bus.my_events:
     monthly_custom_events: 1000000            # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.
     monthly_third_party_events: 2000000       # Monthly third-party and cross-account events published. Each 64 KB chunk of payload is billed as 1 event.
@@ -86,8 +91,9 @@ resource_usage:
     monthly_outbound_other_regions_gb: 750      # Monthly data transferred to other AWS regions.
     monthly_outbound_internet_gb: 5000          # Monthly data transferred to the Internet.
 
-  aws_db_instance.my_instance:
-    monthly_standard_io_requests: 100
+  aws_db_instance.my_db:
+    additional_backup_storage_gb: 1000  # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
+    monthly_standard_io_requests: 10000 # Monthly number of input/output requests for database.
 
   aws_directory_service_directory.my_directory:
     additional_domain_controllers: 3 # The number of domain controllers in the directory service provisioned in addition to the minimum 2 controllers
@@ -295,7 +301,7 @@ resource_usage:
       monthly_data_retrieval_gb: 40000 # Monthly data retrievals in GB
       monthly_select_data_scanned_gb: 40000 # Monthly data scanned by S3 Select in GB.
       monthly_select_data_returned_gb: 4000 # Monthly data returned by S3 Select in GB.
-    glacier: # Usages of S3 Glacier:
+    glacier_flexible_retrieval: # Usages of S3 Glacier Flexible Retrieval:
       storage_gb: 50000 # Total storage in GB.
       monthly_tier_1_requests: 5000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
       monthly_tier_2_requests: 500000 # Monthly GET, SELECT, and all other requests (Tier 2).
@@ -307,10 +313,8 @@ resource_usage:
       monthly_expedited_select_data_scanned_gb: 500000 # Monthly data scanned by S3 Select in GB (for expedited level of S3 Glacier)
       monthly_expedited_select_data_returned_gb: 500000 # Monthly data returned by S3 Select in GB (for expedited level of S3 Glacier)
       monthly_standard_data_retrieval_requests: 500000 # Monthly data Retrieval requests (for standard level of S3 Glacier).
-      monthly_bulk_data_retrieval_requests: 500000 # Monthly data Retrieval requests (for bulk level of S3 Glacier).
       monthly_expedited_data_retrieval_requests: 500000 # Monthly data Retrieval requests (for expedited level of S3 Glacier).
       monthly_standard_data_retrieval_gb: 5000 # Monthly data retrievals in GB (for standard level of S3 Glacier).
-      monthly_bulk_data_retrieval_gb: 5000 # Monthly data retrievals in GB (for bulk level of S3 Glacier).
       monthly_expedited_data_retrieval_gb: 5000 # Monthly data retrievals in GB (for expedited level of S3 Glacier).
       early_delete_gb: 500000 # If an archive is deleted within 3 months of being uploaded, you will be charged an early deletion fee per GB.
     glacier_deep_archive: # Usages of S3 Glacier Deep Archive:
@@ -423,10 +427,16 @@ resource_usage:
     rule_group_rules: 5          # Total number of Rule Group rules used by the Web ACL.
     managed_rule_group_rules: 10 # Total number of Managed Rule Group rules used by the Web ACL.  
     monthly_requests: 1000000 # Monthly number of web requests received.
-    
+
   #
   # Terraform GCP resources
   #
+  google_artifact_registry_repository.my_artifact_registry:
+    storage_gb: 150 # Total data stored in the repository in GB
+    monthly_egress_data_transfer_gb: # Monthly data delivered from the artifact registry repository in GB. You can specify any number of Google Cloud regions below, replacing - for _ e.g.:
+      europe_north1: 100 # GB of data delivered from the artifact registry to europe-north1.
+      australia_southeast1: 200 # GB of data delivered from the artifact registry to australia-southeast1.
+
   google_bigquery_dataset.my_dataset:
     monthly_queries_tb: 100 # Monthly number of bytes processed (also referred to as bytes read) in TB.
 
@@ -577,6 +587,14 @@ resource_usage:
 
   google_pubsub_topic.my_topic:
     monthly_message_data_tb: 7.416 # Monthly amount of message data published to the topic in TB.
+
+  google_secret_manager_secret.my_secret:
+    active_secret_versions: 10000       # Number of active secret versions in each month. NOTE: this is used only when secret versions are not defined.
+    monthly_access_operations: 20000    # Monthly number of access operations
+    monthly_rotation_notifications: 100 # Monthly number of rotation notifications
+
+  google_secret_manager_secret_version.my_secret_version:
+    monthly_access_operations: 25000 # Monthly number of access operations
 
   google_sql_database_instance.my_instance:
     backup_storage_gb: 1000 # Amount of backup storage in GB.
@@ -742,6 +760,20 @@ resource_usage:
     throughput_or_capacity_units: 10  # Number of Throughput Units (for Basic and Standard) and Capacity units (for Dedicated) namespaces.
     capture_enabled: false            # Defines if capture is enabled for the Event Hub Standard namespaces, can be: true, false.
 
+  azurerm_frontdoor.my_frontdoor:
+    monthly_outbound_data_transfer_gb: # Monthly outbound data transfer from the following, in GB:
+      us_gov: 190000                       # US Gov
+      north_america_europe_africa: 200000  # North America, Europe and Africa
+      asia_pacific: 220000                 # Asia Pacific (including Japan)
+      south_america: 10000                 # South America
+      australia: 50000                     # Australia
+      india: 387000                        # India
+    monthly_inbound_data_transfer_gb: 1000 # Monthly inbound data transfer in GB
+
+  azurerm_frontdoor_firewall_policy.my_frontdoor_firewall_policy:
+    monthly_custom_rule_requests: 11000     # Monthly number of custom rule requests
+    monthly_managed_ruleset_requests: 10000 # Monthly number of managed ruleset requests
+
   azurerm_kubernetes_cluster.my_cluster:
     load_balancer:
       monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
@@ -801,6 +833,9 @@ resource_usage:
   azurerm_nat_gateway.my_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
+  azurerm_point_to_site_vpn_gateway.my_point_to_site_gateway:
+    monthly_p2s_connections_hrs: 2000 # Monthly connection hours to the point to site gateway
+
   azurerm_postgresql_flexible_server.my_flexible_server:
     additional_backup_storage_gb: 5000 # Additional consumption of backup storage in GB.
 
@@ -836,18 +871,25 @@ resource_usage:
     monthly_images_extracted: 1000000 # Monthly number of extracted images
 
   azurerm_storage_account.my_account:
-    data_at_rest_storage_gb: 10000
-    early_deletion_gb: 1000
-    snapshots_storage_gb: 10000
-    metadata_at_rest_storage_gb: 10000
-    storage_gb: 1000000 # Total size of storage in GB.
-    monthly_write_operations: 1000000 # Monthly number of Write operations.
-    monthly_list_and_create_container_operations: 1000000 # Monthly number of List and Create Container operations. 
-    monthly_read_operations: 100000 # Monthly number of Read operations.
-    monthly_other_operations: 1000000 # Monthly number of  All other operations. 
-    monthly_data_retrieval_gb: 1000 # Monthly number of data retrieval in GB.
-    monthly_data_write_gb: 1000 # Monthly number of data write in GB.
-    blob_index_tags: 100000 # Total number of Blob indexes.
+    data_at_rest_storage_gb: 10000                        # Total size of Data at Rest in GB (File storage).
+    early_deletion_gb: 1000                               # Total size of Early deletion data in GB.
+    snapshots_storage_gb: 10000                           # Total size of Snapshots in GB (File storage).
+    metadata_at_rest_storage_gb: 10000                    # Total size of Metadata in GB (File storage).
+    storage_gb: 1000000                                   # Total size of storage in GB.
+    monthly_iterative_write_operations: 170000            # Monthly number of Iterative write operations (GPv2).
+    monthly_write_operations: 1000000                     # Monthly number of Write operations.
+    monthly_list_and_create_container_operations: 1000000 # Monthly number of List and Create Container operations.
+    monthly_iterative_read_operations: 150000             # Monthly number of Iterative read operations (GPv2).
+    monthly_read_operations: 100000                       # Monthly number of Read operations.
+    monthly_other_operations: 1000000                     # Monthly number of All other operations.
+    monthly_data_retrieval_gb: 1000                       # Monthly number of data retrieval in GB.
+    monthly_data_write_gb: 1000                           # Monthly number of data write in GB.
+    blob_index_tags: 100000                               # Total number of Blob indexes.
+
+  azurerm_sql_database.my_database:
+    monthly_vcore_hours: 600             # Monthly number of used vCore-hours for serverless compute.
+    long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
+    extra_data_storage_gb: 250           # Override number of GBs used by extra data storage.
 
   azurerm_synapse_spark_pool.my_spark_pool:
     monthly_hours: 730 # Monthly number of hours used by each instance in the pool.
@@ -873,6 +915,9 @@ resource_usage:
     dataflow_standard_instances: 1 # Number of Data Flow standard instances.
     dataflow_standard_vcores: 12 # Number of Data Flow standard vCores.
     monthly_dataflow_standard_hours: 1 # Monthly number of Data Flow standard hours (this is multiplied by the number of instances and vCores).
+
+  azurerm_virtual_hub.my_virtual_hub:
+    monthly_data_processed_gb: 10 # Monthly data processed by the Virtual WAN Hub in GB
 
   azurerm_virtual_machine_scale_set.my_scale_set:
     storage_profile_os_disk:

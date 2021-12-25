@@ -41,7 +41,7 @@ var S3BucketUsageSchema = []*schema.UsageItem{
 	{Key: "intelligent_tiering", DefaultValue: &usage.ResourceUsage{Name: "intelligent_tiering", Items: S3IntelligentTieringStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
 	{Key: "standard_infrequent_access", DefaultValue: &usage.ResourceUsage{Name: "standard_infrequent_access", Items: S3StandardInfrequentAccessStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
 	{Key: "one_zone_infrequent_access", DefaultValue: &usage.ResourceUsage{Name: "one_zone_infrequent_access", Items: S3OneZoneInfrequentAccessStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
-	{Key: "glacier", DefaultValue: &usage.ResourceUsage{Name: "glacier", Items: S3GlacierStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+	{Key: "glacier_flexible_retrieval", DefaultValue: &usage.ResourceUsage{Name: "glacier_flexible_retrieval", Items: S3GlacierFlexibleRetrievalStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
 	{Key: "glacier_deep_archive", DefaultValue: &usage.ResourceUsage{Name: "glacier_deep_archive", Items: S3GlacierDeepArchiveStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
 }
 
@@ -52,7 +52,7 @@ func (a *S3Bucket) AllStorageClasses() []S3StorageClass {
 			&S3IntelligentTieringStorageClass{Region: a.Region},
 			&S3StandardInfrequentAccessStorageClass{Region: a.Region},
 			&S3OneZoneInfrequentAccessStorageClass{Region: a.Region},
-			&S3GlacierStorageClass{Region: a.Region},
+			&S3GlacierFlexibleRetrievalStorageClass{Region: a.Region},
 			&S3GlacierDeepArchiveStorageClass{Region: a.Region},
 		}
 	}
@@ -109,7 +109,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 			"one_zone_infrequent_access": {
 				"storage_gb": "OneZoneIAStorage",
 			},
-			"glacier": {
+			"glacier_flexible_retrieval": {
 				"storage_gb": "GlacierStorage",
 			},
 			"glacier_deep_archive": {

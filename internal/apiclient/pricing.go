@@ -1,7 +1,11 @@
 package apiclient
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -25,19 +29,46 @@ type PriceQueryResult struct {
 	Result gjson.Result
 }
 
-func NewPricingAPIClient(cfg *config.Config) *PricingAPIClient {
-	currency := cfg.Currency
+func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
+	currency := ctx.Config.Currency
 	if currency == "" {
 		currency = "USD"
 	}
 
+	rootCAs, _ := x509.SystemCertPool()
+	if rootCAs == nil {
+		rootCAs = x509.NewCertPool()
+	}
+
+	if ctx.Config.TLSCACertFile != "" {
+		caCerts, err := ioutil.ReadFile(ctx.Config.TLSCACertFile)
+		if err != nil {
+			log.Errorf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
+		} else {
+			ok := rootCAs.AppendCertsFromPEM(caCerts)
+
+			if !ok {
+				log.Warningf("No CA certs appended, only using system certs")
+			} else {
+				log.Debugf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
+			}
+		}
+	}
+
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: ctx.Config.TLSInsecureSkipVerify, // nolint: gosec
+		RootCAs:            rootCAs,
+	}
+
 	return &PricingAPIClient{
 		APIClient: APIClient{
-			endpoint: cfg.PricingAPIEndpoint,
-			apiKey:   cfg.APIKey,
+			endpoint:  ctx.Config.PricingAPIEndpoint,
+			apiKey:    ctx.Config.APIKey,
+			tlsConfig: tlsConfig,
+			uuid:      ctx.UUID(),
 		},
 		Currency:       currency,
-		EventsDisabled: cfg.EventsDisabled,
+		EventsDisabled: ctx.Config.EventsDisabled,
 	}
 }
 

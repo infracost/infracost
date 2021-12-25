@@ -176,6 +176,8 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 
 	if UsePlanCache(p) {
 		spinner := ui.NewSpinner("Checking for cached plan...", p.spinnerOpts)
+		defer spinner.Fail()
+
 		cached, err := ReadPlanCache(p)
 		if err != nil {
 			spinner.SuccessWithMessage(fmt.Sprintf("Checking for cached plan... %v", err.Error()))
@@ -200,6 +202,8 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 	}
 
 	spinner := ui.NewSpinner("Running terraform plan", p.spinnerOpts)
+	defer spinner.Fail()
+
 	planFile, planJSON, err := p.runPlan(opts, spinner, true)
 	defer os.Remove(planFile)
 
@@ -242,6 +246,8 @@ func (p *DirProvider) generateStateJSON() ([]byte, error) {
 	}
 
 	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
+	defer spinner.Fail()
+
 	j, err := p.runShow(opts, spinner, "")
 	if err == nil {
 		p.cachedStateJSON = j
@@ -303,6 +309,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 			strings.Contains(extractedErr, "Error: Initialization required") ||
 			strings.Contains(extractedErr, "Error: Backend initialization required") ||
 			strings.Contains(extractedErr, "Error: Provider requirements cannot be satisfied by locked dependencies") ||
+			strings.Contains(extractedErr, "Error: Inconsistent dependency lock file") ||
 			strings.Contains(extractedErr, "Error: Module not installed")) {
 			spinner.Stop()
 			err = p.runInit(opts, ui.NewSpinner("Running terraform init", p.spinnerOpts))

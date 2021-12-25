@@ -15,7 +15,7 @@ import (
 // Project defines a specific terraform project config. This can be used
 // specify per folder/project configurations so that users don't have
 // to provide flags every run. Fields are documented below. More info
-// is outlined here: https://www.infracost.io/docs/multi_project/config_file/
+// is outlined here: https://www.infracost.io/config-file
 type Project struct {
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
@@ -32,6 +32,8 @@ type Project struct {
 	// TerraformCloudToken sets the Team API Token or User API Token so infracost can use it to access the plan.
 	// Only applicable for terraform cloud/enterprise users.
 	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"INFRACOST_TERRAFORM_CLOUD_TOKEN"`
+	// TerragruntFlags set additional flags that should be passed to terragrunt.
+	TerragruntFlags string `envconfig:"INFRACOST_TERRAGRUNT_FLAGS"`
 	// UsageFile is the full path to usage file that specifies values for usage-based resources
 	UsageFile string `yaml:"usage_file,omitempty" ignored:"true"`
 	// TerraformUseState sets if the users wants to use the terraform state for infracost ops.
@@ -47,12 +49,16 @@ type Config struct {
 	LogLevel        string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
 	NoColor         bool   `yaml:"no_color,omitempty" envconfig:"INFRACOST_NO_COLOR"`
 	SkipUpdateCheck bool   `yaml:"skip_update_check,omitempty" envconfig:"INFRACOST_SKIP_UPDATE_CHECK"`
+	Parallelism     *int   `envconfig:"INFRACOST_PARALLELISM"`
 
 	APIKey                    string `envconfig:"INFRACOST_API_KEY"`
 	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
+
+	TLSInsecureSkipVerify bool   `envconfig:"INFRACOST_TLS_INSECURE_SKIP_VERIFY"`
+	TLSCACertFile         string `envconfig:"INFRACOST_TLS_CA_CERT_FILE"`
 
 	Currency string `envconfig:"INFRACOST_CURRENCY"`
 
@@ -85,6 +91,7 @@ func DefaultConfig() *Config {
 		DefaultPricingAPIEndpoint: "https://pricing.api.infracost.io",
 		PricingAPIEndpoint:        "",
 		DashboardAPIEndpoint:      "https://dashboard.api.infracost.io",
+		EnableDashboard:           false,
 
 		Projects: []*Project{{}},
 
@@ -191,6 +198,10 @@ func (c *Config) ConfigureLogger() error {
 
 func (c *Config) IsLogging() bool {
 	return c.LogLevel != ""
+}
+
+func (c *Config) IsSelfHosted() bool {
+	return c.PricingAPIEndpoint != "" && c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
 }
 
 func IsTest() bool {

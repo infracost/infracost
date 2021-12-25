@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"runtime"
@@ -9,16 +10,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/version"
 )
 
 type RunContext struct {
-	ctx               context.Context
-	Config            *Config
-	State             *State
-	contextVals       map[string]interface{}
-	currentProjectCtx *ProjectContext
-	StartTime         int64
+	ctx         context.Context
+	uuid        uuid.UUID
+	Config      *Config
+	State       *State
+	contextVals map[string]interface{}
+	StartTime   int64
 }
 
 func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
@@ -32,6 +36,7 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 
 	c := &RunContext{
 		ctx:         rootCtx,
+		uuid:        uuid.New(),
 		Config:      cfg,
 		State:       state,
 		contextVals: map[string]interface{}{},
@@ -52,32 +57,26 @@ func EmptyRunContext() *RunContext {
 	}
 }
 
-func (c *RunContext) SetContextValue(key string, value interface{}) {
-	c.contextVals[key] = value
+// UUID returns the underlying run uuid. This can be used to globally identify the run context.
+func (r *RunContext) UUID() uuid.UUID {
+	return r.uuid
 }
 
-func (c *RunContext) ContextValues() map[string]interface{} {
-	return c.contextVals
+func (r *RunContext) SetContextValue(key string, value interface{}) {
+	r.contextVals[key] = value
 }
 
-func (c *RunContext) ContextValuesWithCurrentProject() map[string]interface{} {
-	m := c.contextVals
-	if c.currentProjectCtx != nil {
-		for k, v := range c.currentProjectCtx.contextVals {
-			m[k] = v
-		}
-	}
-
-	return m
+func (r *RunContext) ContextValues() map[string]interface{} {
+	return r.contextVals
 }
 
-func (c *RunContext) EventEnv() map[string]interface{} {
-	return c.EventEnvWithProjectContexts([]*ProjectContext{c.currentProjectCtx})
+func (r *RunContext) EventEnv() map[string]interface{} {
+	return r.EventEnvWithProjectContexts([]*ProjectContext{})
 }
 
-func (c *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectContext) map[string]interface{} {
-	env := c.contextVals
-	env["installId"] = c.State.InstallID
+func (r *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectContext) map[string]interface{} {
+	env := r.contextVals
+	env["installId"] = r.State.InstallID
 
 	for _, projectContext := range projectContexts {
 		if projectContext == nil {
@@ -95,40 +94,20 @@ func (c *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectConte
 	return env
 }
 
-func (c *RunContext) SetCurrentProjectContext(ctx *ProjectContext) {
-	c.currentProjectCtx = ctx
+func (r *RunContext) loadInitialContextValues() {
+	r.SetContextValue("version", baseVersion(version.Version))
+	r.SetContextValue("fullVersion", version.Version)
+	r.SetContextValue("isTest", IsTest())
+	r.SetContextValue("isDev", IsDev())
+	r.SetContextValue("os", runtime.GOOS)
+	r.SetContextValue("ciPlatform", ciPlatform())
+	r.SetContextValue("ciScript", ciScript())
+	r.SetContextValue("ciPostCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
+	r.SetContextValue("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
 }
 
-// setProjectContextValue Set context value into currentProjectContext
-func (c *RunContext) setProjectContextValue(key string, value interface{}) {
-	c.currentProjectCtx.SetContextValue(key, value)
-}
-
-func (c *RunContext) loadInitialContextValues() {
-	c.SetContextValue("version", baseVersion(version.Version))
-	c.SetContextValue("fullVersion", version.Version)
-	c.SetContextValue("isTest", IsTest())
-	c.SetContextValue("isDev", IsDev())
-	c.SetContextValue("os", runtime.GOOS)
-	c.SetContextValue("ciPlatform", ciPlatform())
-	c.SetContextValue("ciScript", ciScript())
-	c.SetContextValue("ciPostCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
-	c.SetContextValue("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
-}
-
-func (c *RunContext) IsCIRun() bool {
-	return c.ContextValues()["ciPlatform"] != ""
-}
-
-type ProjectContexter interface {
-	ProjectContext() map[string]interface{}
-}
-
-func (c *RunContext) SetProjectContextFrom(d ProjectContexter) {
-	m := d.ProjectContext()
-	for k, v := range m {
-		c.setProjectContextValue(k, v)
-	}
+func (r *RunContext) IsCIRun() bool {
+	return r.ContextValues()["ciPlatform"] != ""
 }
 
 func baseVersion(v string) string {
@@ -136,7 +115,11 @@ func baseVersion(v string) string {
 }
 
 func ciScript() string {
-	if IsEnvPresent("INFRACOST_CI_DIFF") {
+	if IsEnvPresent("INFRACOST_CI_IMAGE") {
+		return "ci-image"
+	} else if IsEnvPresent("INFRACOST_GITHUB_ACTION") {
+		return "infracost-github-action"
+	} else if IsEnvPresent("INFRACOST_CI_DIFF") {
 		return "ci-diff"
 	} else if IsEnvPresent("INFRACOST_CI_ATLANTIS_DIFF") {
 		return "ci-atlantis-diff"
@@ -166,6 +149,8 @@ func ciPlatform() string {
 		return "env0"
 	} else if IsEnvPresent("SCALR_RUN_ID") {
 		return "scalr"
+	} else if IsEnvPresent("CF_BUILD_ID") {
+		return "codefresh"
 	} else {
 		envKeys := os.Environ()
 		sort.Strings(envKeys)
@@ -187,5 +172,50 @@ func ciPlatform() string {
 		}
 	}
 
+	return ""
+}
+
+func ciVCSRepo() string {
+	if IsEnvPresent("GITHUB_REPOSITORY") {
+		serverURL := os.Getenv("GITHUB_SERVER_URL")
+		if serverURL == "" {
+			serverURL = "https://github.com"
+		}
+		return fmt.Sprintf("%s/%s", serverURL, os.Getenv("GITHUB_REPOSITORY"))
+	} else if IsEnvPresent("CI_PROJECT_URL") {
+		return os.Getenv("CI_PROJECT_URL")
+	} else if IsEnvPresent("BUILD_REPOSITORY_URI") {
+		return os.Getenv("BUILD_REPOSITORY_URI")
+	} else if IsEnvPresent("BITBUCKET_GIT_HTTP_ORIGIN") {
+		return os.Getenv("BITBUCKET_GIT_HTTP_ORIGIN")
+	} else if IsEnvPresent("CIRCLE_REPOSITORY_URL") {
+		return os.Getenv("CIRCLE_REPOSITORY_URL")
+	}
+
+	return ""
+}
+
+func ciVCSPullRequestURL() string {
+	if IsEnvPresent("GITHUB_EVENT_PATH") && os.Getenv("GITHUB_EVENT_NAME") == "pull_request" {
+		b, err := os.ReadFile(os.Getenv("GITHUB_EVENT_PATH"))
+		if err != nil {
+			log.Debugf("Error reading GITHUB_EVENT_PATH file: %v", err)
+		}
+
+		var event struct {
+			PullRequest struct {
+				HTMLURL string `json:"html_url"`
+			} `json:"pull_request"`
+		}
+
+		err = json.Unmarshal(b, &event)
+		if err != nil {
+			log.Debugf("Error reading GITHUB_EVENT_PATH JSON: %v", err)
+		}
+
+		return event.PullRequest.HTMLURL
+	} else if IsEnvPresent("CI_PROJECT_URL") && IsEnvPresent("CI_MERGE_REQUEST_IID") {
+		return fmt.Sprintf("%s/merge_requests/%s", os.Getenv("CI_PROJECT_URL"), os.Getenv("CI_MERGE_REQUEST_IID"))
+	}
 	return ""
 }

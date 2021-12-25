@@ -6,15 +6,16 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/infracost/infracost/internal/apiclient"
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/output"
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/mod/semver"
+
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 var minOutputVersion = "0.2"
@@ -31,15 +32,19 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
   Create HTML report from multiple Infracost JSON files:
 
-      infracost output --format html --path "out*.json" > output.html
+      infracost output --format html --path "out*.json" --out-file output.html # glob needs quotes
 
   Merge multiple Infracost JSON files:
 
-      infracost output --format json --path "out*.json"
+      infracost output --format json --path "out*.json" # glob needs quotes
 
-  Create markdown report suitable for posting in a GitHub comment:
+  Create markdown report to post in a GitHub comment:
 
-      infracost output --format github-comment --path "out*.json"`,
+      infracost output --format github-comment --path "out*.json" # glob needs quotes
+
+  Create markdown report to post in a GitLab comment:
+
+      infracost output --format gitlab-comment --path "out*.json" # glob needs quotes`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inputFiles := []string{}
@@ -145,9 +150,11 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				b, err = output.ToHTML(combined, opts)
 			case "diff":
 				b, err = output.ToDiff(combined, opts)
-			case "github-comment":
+			case "github-comment", "gitlab-comment":
 				opts.IncludeHTML = true
 				b, err = output.ToMarkdown(combined, opts)
+			case "slack-message":
+				b, err = output.ToSlackMessage(combined, opts)
 			default:
 				b, err = output.ToTable(combined, opts)
 			}
@@ -155,7 +162,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			pricingClient := apiclient.NewPricingAPIClient(ctx.Config)
+			pricingClient := apiclient.NewPricingAPIClient(ctx)
 			err = pricingClient.AddEvent("infracost-output", ctx.EventEnv())
 			if err != nil {
 				log.Errorf("Error reporting event: %s", err)
@@ -174,11 +181,11 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files")
+	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
 
-	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment")
-	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources, some of which might be free")
+	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, slack-message")
+	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
 
 	_ = cmd.MarkFlagRequired("path")

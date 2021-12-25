@@ -11,14 +11,14 @@ EXAMPLES
   Generate a cost diff from Terraform directory with any required Terraform flags:
 
       infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
-	
+
   Generate a full cost breakdown from Terraform directory with any required Terraform flags:
 
       infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
 
 AVAILABLE COMMANDS
   breakdown   Show full breakdown of costs
-  completion  Generate completion script
+  completion  Generate shell completion script
   configure   Display or change global configuration
   diff        Show diff of monthly costs between current and planned state
   help        Help about any command
