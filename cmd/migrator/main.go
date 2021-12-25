@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
-	"go/printer"
 	"go/token"
 	"io/ioutil"
 	"log"
@@ -59,7 +59,7 @@ func main() {
 		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
 
 		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
-		// isMigrated, err := migrateFile("internal/providers/terraform/aws/db_instance.go", referenceFile, "internal/providers/terraform/aws/", "db_instance.go")
+		// isMigrated, err := migrateFile("internal/providers/terraform/aws/mq_broker.go", referenceFile, "internal/providers/terraform/aws/", "mq_broker.go")
 		// break
 
 		if err != nil && err.Error() == "manually migrated" {
@@ -74,7 +74,7 @@ func main() {
 		if isMigrated && err == nil {
 			// fmt.Printf("\t %t\n", isMigrated)
 		} else {
-			fmt.Printf("%s\n", filePath)
+			fmt.Printf("%d %s\n", allCount, filePath)
 			fmt.Printf("\t %t  :: %s \n", isMigrated, err)
 		}
 	}
@@ -521,8 +521,8 @@ func extractResourceFile(registryFuncName, resourceFuncName, resourceCamelName s
 						{
 							Names: []*ast.Ident{
 								{
-									Name: "resP",
-									Obj:  &ast.Object{Kind: ast.Var, Name: "resP"},
+									Name: "r",
+									Obj:  &ast.Object{Kind: ast.Var, Name: "r"},
 								},
 							},
 							Type: &ast.StarExpr{
@@ -703,7 +703,7 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 		Name: &ast.Ident{Name: "PopulateUsage"},
 		Recv: &ast.FieldList{
 			List: []*ast.Field{{
-				Names: []*ast.Ident{{Name: "resP"}},
+				Names: []*ast.Ident{{Name: "r"}},
 				Type:  &ast.StarExpr{X: &ast.Ident{Name: resourceCamelName}},
 			}},
 		},
@@ -732,7 +732,7 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 							Sel: &ast.Ident{Name: "PopulateArgsWithUsage"},
 						},
 						Args: []ast.Expr{
-							&ast.Ident{Name: "resP", Obj: &ast.Object{Kind: ast.Var, Name: "resP"}},
+							&ast.Ident{Name: "r", Obj: &ast.Object{Kind: ast.Var, Name: "r"}},
 							&ast.Ident{Name: "u", Obj: &ast.Object{Kind: ast.Var, Name: "u"}},
 						},
 					},
@@ -765,10 +765,10 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 												Y:  &ast.Ident{Name: "nil"},
 												X: &ast.SelectorExpr{
 													X: &ast.Ident{
-														Name: "resP",
+														Name: "r",
 														Obj: &ast.Object{
 															Kind: ast.Var,
-															Name: "resP",
+															Name: "r",
 														},
 													},
 													Sel: &ast.Ident{
@@ -780,10 +780,10 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 											replacementNode = &ast.StarExpr{
 												X: &ast.SelectorExpr{
 													X: &ast.Ident{
-														Name: "resP",
+														Name: "r",
 														Obj: &ast.Object{
 															Kind: ast.Var,
-															Name: "resP",
+															Name: "r",
 														},
 													},
 													Sel: &ast.Ident{
@@ -815,10 +815,10 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 											Y:  &ast.Ident{Name: "nil"},
 											X: &ast.SelectorExpr{
 												X: &ast.Ident{
-													Name: "resP",
+													Name: "r",
 													Obj: &ast.Object{
 														Kind: ast.Var,
-														Name: "resP",
+														Name: "r",
 													},
 												},
 												Sel: &ast.Ident{
@@ -844,7 +844,7 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 		if selExpr, ok := n.(*ast.SelectorExpr); ok {
 			if XIdent, ok := selExpr.X.(*ast.Ident); ok {
 				if XIdent.Name == "d" {
-					XIdent.Name = "resP"
+					XIdent.Name = "r"
 					c.Replace(&ast.StarExpr{X: selExpr})
 				}
 			}
@@ -859,7 +859,7 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 			if binX, ok := binExpr.X.(*ast.Ident); ok {
 				if binY, ok := binExpr.Y.(*ast.Ident); ok {
 					if binY.Name == "nil" && binX.Name == "u" {
-						binX.Name = "resP"
+						binX.Name = "r"
 					}
 				}
 			}
@@ -883,7 +883,7 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 					if identExpr.Name == "u" || identExpr.Name == "d" {
 						if !alreadyMigrated {
 							alreadyMigrated = true
-							newArgs = append(newArgs, &ast.Ident{Name: "resP"})
+							newArgs = append(newArgs, &ast.Ident{Name: "r"})
 						}
 					} else {
 						newArgs = append(newArgs, callArg)
@@ -912,7 +912,7 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 					if !alreadyMigrated {
 						alreadyMigrated = true
 						newParamsList = append(newParamsList, &ast.Field{
-							Names: []*ast.Ident{{Name: "resP"}},
+							Names: []*ast.Ident{{Name: "r"}},
 							Type: &ast.StarExpr{
 								X: &ast.Ident{Name: resourceCamelName},
 							},
@@ -1049,7 +1049,7 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 	funcBodyList = append(funcBodyList, &ast.AssignStmt{
 		Tok: token.DEFINE,
 		Lhs: []ast.Expr{
-			&ast.Ident{Name: "resP"},
+			&ast.Ident{Name: "r"},
 		},
 		Rhs: []ast.Expr{
 			&ast.UnaryExpr{
@@ -1107,7 +1107,7 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 					Tok: token.ASSIGN,
 					Lhs: []ast.Expr{
 						&ast.SelectorExpr{
-							X:   &ast.Ident{Name: "resP"},
+							X:   &ast.Ident{Name: "r"},
 							Sel: &ast.Ident{Name: strcase.ToCamel(key)},
 						},
 					},
@@ -1140,7 +1140,7 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 	funcBodyList = append(funcBodyList, &ast.ExprStmt{
 		X: &ast.CallExpr{
 			Fun: &ast.SelectorExpr{
-				X:   &ast.Ident{Name: "resP"},
+				X:   &ast.Ident{Name: "r"},
 				Sel: &ast.Ident{Name: "PopulateUsage"},
 			},
 			Args: []ast.Expr{
@@ -1153,7 +1153,7 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 		Results: []ast.Expr{
 			&ast.CallExpr{
 				Fun: &ast.SelectorExpr{
-					X:   &ast.Ident{Name: "resP"},
+					X:   &ast.Ident{Name: "r"},
 					Sel: &ast.Ident{Name: "BuildResource"},
 				},
 			},
@@ -1325,7 +1325,8 @@ func saveFile(fset *token.FileSet, file *ast.File, filePath string) error {
 		return err
 	}
 
-	printer.Fprint(f, fset, file)
+	format.Node(f, fset, file)
+	// printer.Fprint(f, fset, file)
 	return nil
 
 	// fmt.Println("#################################")
