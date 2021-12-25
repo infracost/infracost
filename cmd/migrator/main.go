@@ -58,9 +58,9 @@ func main() {
 		}
 		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
 
-		// isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
-		isMigrated, err := migrateFile("internal/providers/terraform/aws/db_instance.go", referenceFile, "internal/providers/terraform/aws/", "db_instance.go")
-		break
+		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
+		// isMigrated, err := migrateFile("internal/providers/terraform/aws/db_instance.go", referenceFile, "internal/providers/terraform/aws/", "db_instance.go")
+		// break
 
 		if err != nil && err.Error() == "manually migrated" {
 			continue
