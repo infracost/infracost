@@ -58,9 +58,9 @@ func main() {
 		}
 		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
 
-		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
-		// isMigrated, err := migrateFile("internal/providers/terraform/aws/mq_broker.go", referenceFile, "internal/providers/terraform/aws/", "mq_broker.go")
-		// break
+		// isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
+		isMigrated, err := migrateFile("internal/providers/terraform/aws/db_instance.go", referenceFile, "internal/providers/terraform/aws/", "db_instance.go")
+		break
 
 		if err != nil && err.Error() == "manually migrated" {
 			continue
@@ -412,6 +412,24 @@ func getDsList(file *ast.File) map[string]duStruct {
 							}
 						}
 					}
+				} else if selExpr.Sel.Name == "IsEmpty" {
+					if identExpr, ok := selExpr.X.(*ast.Ident); ok {
+						if identExpr.Name == "d" {
+							if argLit, ok := callExpr.Args[0].(*ast.BasicLit); ok {
+								if argLit.Kind == token.STRING {
+									keyName := strings.Replace(argLit.Value, "\"", "", -1)
+									if val, ok := result[keyName]; ok {
+										val.hasExistCheck = true
+										return true
+									}
+									result[keyName] = duStruct{
+										fieldType:     "Exists",
+										hasExistCheck: true,
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		} else if pSelExpr, ok := n.(*ast.SelectorExpr); ok && pSelExpr.Sel.Name == "Type" {
@@ -467,6 +485,24 @@ func getUsList(file *ast.File) map[string]duStruct {
 											fieldType:     selExpr.Sel.Name,
 											hasExistCheck: oldExistCheck || selExpr.Sel.Name == "Exists",
 										}
+									}
+								}
+							}
+						}
+					}
+				} else if selExpr.Sel.Name == "IsEmpty" {
+					if identExpr, ok := selExpr.X.(*ast.Ident); ok {
+						if identExpr.Name == "u" {
+							if argLit, ok := callExpr.Args[0].(*ast.BasicLit); ok {
+								if argLit.Kind == token.STRING {
+									keyName := strings.Replace(argLit.Value, "\"", "", -1)
+									if val, ok := result[keyName]; ok {
+										val.hasExistCheck = true
+										return true
+									}
+									result[keyName] = duStruct{
+										fieldType:     "Exists",
+										hasExistCheck: true,
 									}
 								}
 							}
@@ -746,7 +782,7 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 }
 
 func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
-	// Replace Gets
+	// Replace Gets & IsEmpty
 	astutil.Apply(resourceFile, nil, func(c *astutil.Cursor) bool {
 		n := c.Node()
 		if callExpr, ok := n.(*ast.CallExpr); ok {
@@ -794,6 +830,51 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 										}
 										c.Replace(replacementNode)
 									}
+								}
+							}
+						}
+					}
+				} else if selExpr.Sel.Name == "IsEmpty" {
+					if identExpr, ok := selExpr.X.(*ast.Ident); ok {
+						if identExpr.Name == "u" || identExpr.Name == "d" {
+							if argLit, ok := callExpr.Args[0].(*ast.BasicLit); ok {
+								if argLit.Kind == token.STRING {
+									keyName := strings.Replace(argLit.Value, "\"", "", -1)
+									var replacementNode ast.Node
+									if selExpr.Sel.Name == "IsEmpty" {
+										replacementNode = &ast.BinaryExpr{
+											Op: token.EQL,
+											Y:  &ast.Ident{Name: "nil"},
+											X: &ast.SelectorExpr{
+												X: &ast.Ident{
+													Name: "r",
+													Obj: &ast.Object{
+														Kind: ast.Var,
+														Name: "r",
+													},
+												},
+												Sel: &ast.Ident{
+													Name: strcase.ToCamel(keyName),
+												},
+											},
+										}
+									} else {
+										replacementNode = &ast.StarExpr{
+											X: &ast.SelectorExpr{
+												X: &ast.Ident{
+													Name: "r",
+													Obj: &ast.Object{
+														Kind: ast.Var,
+														Name: "r",
+													},
+												},
+												Sel: &ast.Ident{
+													Name: strcase.ToCamel(keyName),
+												},
+											},
+										}
+									}
+									c.Replace(replacementNode)
 								}
 							}
 						}
