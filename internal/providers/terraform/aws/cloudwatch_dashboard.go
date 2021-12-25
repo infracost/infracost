@@ -1,8 +1,8 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 func GetCloudwatchDashboardRegistryItem() *schema.RegistryItem {
@@ -11,25 +11,8 @@ func GetCloudwatchDashboardRegistryItem() *schema.RegistryItem {
 		RFunc: NewCloudwatchDashboard,
 	}
 }
-
 func NewCloudwatchDashboard(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	return &schema.Resource{
-		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:            "Dashboard",
-				Unit:            "months",
-				UnitMultiplier:  decimal.NewFromInt(1),
-				MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Service:       strPtr("AmazonCloudWatch"),
-					ProductFamily: strPtr("Dashboard"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", Value: strPtr("DashboardsUsageHour")},
-					},
-				},
-			},
-		},
-	}
+	r := &aws.CloudwatchDashboard{Address: strPtr(d.Address)}
+	r.PopulateUsage(u)
+	return r.BuildResource()
 }

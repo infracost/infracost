@@ -1,8 +1,9 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
 )
 
 func GetDocDBClusterRegistryItem() *schema.RegistryItem {
@@ -12,51 +13,11 @@ func GetDocDBClusterRegistryItem() *schema.RegistryItem {
 	}
 
 }
-
 func NewDocDBCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
-
-	costComponents := []*schema.CostComponent{}
-
-	var retentionPeriod *decimal.Decimal
-	if d.Get("backup_retention_period").Exists() {
-		retentionPeriod = decimalPtr(decimal.NewFromInt(d.Get("backup_retention_period").Int()))
-		if retentionPeriod.GreaterThan(decimal.NewFromInt(1)) {
-			var backupStorage *decimal.Decimal
-			if u != nil && u.Get("backup_storage_gb").Exists() {
-				backupStorage = decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
-			}
-			costComponents = append(costComponents, docDBCluster(region, backupStorage))
-		}
-
-	} else {
-
-		var unknown *decimal.Decimal
-
-		costComponents = append(costComponents, docDBCluster(region, unknown))
-
+	r := &aws.DocDBCluster{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	if d.Get("backup_retention_period").Exists() && d.Get("backup_retention_period").Type != gjson.Null {
+		r.BackupRetentionPeriod = intPtr(d.Get("backup_retention_period").Int())
 	}
-
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
-	}
-}
-
-func docDBCluster(region string, backupStorage *decimal.Decimal) *schema.CostComponent {
-	return &schema.CostComponent{
-		Name:            "Backup storage",
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: backupStorage,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr("AmazonDocDB"),
-			ProductFamily: strPtr("Storage Snapshot"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("BackupUsage")},
-			},
-		},
-	}
+	r.PopulateUsage(u)
+	return r.BuildResource()
 }

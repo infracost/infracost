@@ -1,9 +1,8 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
-
-	"github.com/shopspring/decimal"
 )
 
 func GetEC2ClientVPNNetworkAssociationRegistryItem() *schema.RegistryItem {
@@ -12,27 +11,8 @@ func GetEC2ClientVPNNetworkAssociationRegistryItem() *schema.RegistryItem {
 		RFunc: NewEC2ClientVPNNetworkAssociation,
 	}
 }
-
 func NewEC2ClientVPNNetworkAssociation(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
-
-	return &schema.Resource{
-		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:           "Endpoint association",
-				Unit:           "hours",
-				UnitMultiplier: decimal.NewFromInt(1),
-				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-				ProductFilter: &schema.ProductFilter{
-					VendorName: strPtr("aws"),
-					Region:     strPtr(region),
-					Service:    strPtr("AmazonVPC"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr("/ClientVPN-EndpointHours/")},
-					},
-				},
-			},
-		},
-	}
+	r := &aws.EC2ClientVPNNetworkAssociation{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	r.PopulateUsage(u)
+	return r.BuildResource()
 }
