@@ -24,14 +24,6 @@ type duStruct struct {
 	hasExistCheck bool
 }
 
-/*
-	This scripts tries to migrate resources from the old structure to the new one located
-	at "internal/resources".
-	The script iterates over resource files and does the following stages:
-		1. Find all occurrences of d.Get and u.Get methods and extract their key and store them.
-			1.1. If the methods are not called with string literals, the script will fail for such resource.
-		2. If more than one resource is defined in the file, then the script will fail.
-*/
 func main() {
 	basePath := fmt.Sprintf("internal/providers/terraform/%s/", PROVIDER)
 	files, err := ioutil.ReadDir(basePath)
@@ -58,9 +50,9 @@ func main() {
 		}
 		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
 
-		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
-		// isMigrated, err := migrateFile("internal/providers/terraform/aws/db_instance.go", referenceFile, "internal/providers/terraform/aws/", "db_instance.go")
-		// break
+		// isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
+		isMigrated, err := migrateFile("internal/providers/terraform/aws/db_instance.go", referenceFile, "internal/providers/terraform/aws/", "db_instance.go")
+		break
 
 		if err != nil && err.Error() == "manually migrated" {
 			continue
@@ -326,6 +318,7 @@ func doMigration(fset *token.FileSet, file *ast.File, referenceFile *usage.Refer
 	migrateImports(file, resourceFile, dsList)
 	addProviderFunc(resourceCamelName, dsList, usList, file)
 	fixRFuncName(resourceCamelName, file)
+	fixRedundantNilConditions(resourceFile)
 
 	return file, resourceFile, nil
 }
@@ -1293,6 +1286,24 @@ func fixRFuncName(resourceCamelName string, file *ast.File) {
 			if keyIdent, ok := keyValExpr.Key.(*ast.Ident); ok {
 				if keyIdent.Name == "RFunc" {
 					keyValExpr.Value.(*ast.Ident).Name = fmt.Sprintf("New%s", resourceCamelName)
+				}
+			}
+		}
+		return true
+	})
+}
+
+func fixRedundantNilConditions(resourceFile *ast.File) {
+	astutil.Apply(resourceFile, nil, func(c *astutil.Cursor) bool {
+		n := c.Node()
+		if ifStmt, ok := n.(*ast.IfStmt); ok {
+			if binExpr, ok := ifStmt.Cond.(*ast.BinaryExpr); ok && binExpr.Op == token.LAND {
+				if XBinExpr, ok := binExpr.X.(*ast.BinaryExpr); ok && XBinExpr.Op == token.NEQ {
+					if XIdent, ok := XBinExpr.X.(*ast.Ident); ok && XIdent.Name == "r" {
+						if YIdent, ok := XBinExpr.Y.(*ast.Ident); ok && YIdent.Name == "nil" {
+							ifStmt.Cond = binExpr.Y
+						}
+					}
 				}
 			}
 		}
