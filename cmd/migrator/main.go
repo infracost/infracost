@@ -74,6 +74,14 @@ func main() {
 	fmt.Printf("%d of %d resources can be migrated! The impossible files are: \n%s\n", migratedCount, allCount, strings.Join(problemFiles, "\n"))
 }
 
+func strCamelCaseHelper(str string) string {
+	res := strcase.ToCamel(str)
+	res = strings.Replace(res, "Cpu", "CPU", -1)
+	res = strings.Replace(res, "Api", "API", -1)
+	res = strings.Replace(res, "Id", "ID", -1)
+	return res
+}
+
 func migrateFile(filePath string, referenceFile *usage.ReferenceFile, basePath, fileName string) (bool, error) {
 	resFilePath := fmt.Sprintf("internal/resources/%s/%s", PROVIDER, fileName)
 	providerFilePath := fmt.Sprintf("internal/providers/terraform/%s/%s", PROVIDER, fileName)
@@ -622,10 +630,10 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 		fieldsList.List = append(fieldsList.List, &ast.Field{
 			Type: &ast.StarExpr{X: &ast.Ident{Name: duTypeToASTType(val.fieldType)}},
 			Names: []*ast.Ident{{
-				Name: strcase.ToCamel(key),
+				Name: strCamelCaseHelper(key),
 				Obj: &ast.Object{
 					Kind: ast.Var,
-					Name: strcase.ToCamel(key),
+					Name: strCamelCaseHelper(key),
 				},
 			}},
 		})
@@ -636,10 +644,10 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 		fieldsList.List = append(fieldsList.List, &ast.Field{
 			Type: &ast.StarExpr{X: &ast.Ident{Name: duTypeToASTType(val.fieldType)}},
 			Names: []*ast.Ident{{
-				Name: strcase.ToCamel(key),
+				Name: strCamelCaseHelper(key),
 				Obj: &ast.Object{
 					Kind: ast.Var,
-					Name: strcase.ToCamel(key),
+					Name: strCamelCaseHelper(key),
 				},
 			}},
 			Tag: &ast.BasicLit{
@@ -801,7 +809,7 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 														},
 													},
 													Sel: &ast.Ident{
-														Name: strcase.ToCamel(keyName),
+														Name: strCamelCaseHelper(keyName),
 													},
 												},
 											}
@@ -816,7 +824,7 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 														},
 													},
 													Sel: &ast.Ident{
-														Name: strcase.ToCamel(keyName),
+														Name: strCamelCaseHelper(keyName),
 													},
 												},
 											}
@@ -847,7 +855,7 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 													},
 												},
 												Sel: &ast.Ident{
-													Name: strcase.ToCamel(keyName),
+													Name: strCamelCaseHelper(keyName),
 												},
 											},
 										}
@@ -862,7 +870,7 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 													},
 												},
 												Sel: &ast.Ident{
-													Name: strcase.ToCamel(keyName),
+													Name: strCamelCaseHelper(keyName),
 												},
 											},
 										}
@@ -896,7 +904,7 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 													},
 												},
 												Sel: &ast.Ident{
-													Name: strcase.ToCamel(keyName),
+													Name: strCamelCaseHelper(keyName),
 												},
 											},
 										}
@@ -1090,7 +1098,7 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 			continue
 		}
 		resourceELTs = append(resourceELTs, &ast.KeyValueExpr{
-			Key: &ast.Ident{Name: strcase.ToCamel(key)},
+			Key: &ast.Ident{Name: strCamelCaseHelper(key)},
 			Value: &ast.CallExpr{
 				Fun: &ast.Ident{Name: duTypeToPtrCall(val.fieldType)},
 				Args: []ast.Expr{
@@ -1153,7 +1161,7 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 					Lhs: []ast.Expr{
 						&ast.SelectorExpr{
 							X:   &ast.Ident{Name: "r"},
-							Sel: &ast.Ident{Name: strcase.ToCamel(key)},
+							Sel: &ast.Ident{Name: strCamelCaseHelper(key)},
 						},
 					},
 					Rhs: []ast.Expr{
