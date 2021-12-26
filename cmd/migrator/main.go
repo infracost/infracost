@@ -1060,18 +1060,6 @@ func migrateImports(file, resourceFile *ast.File, dsList map[string]duStruct) {
 	file.Decls[0].(*ast.GenDecl).Specs = append(file.Decls[0].(*ast.GenDecl).Specs, &ast.ImportSpec{
 		Path: &ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"github.com/infracost/infracost/internal/resources/%s\"", PROVIDER)},
 	})
-	addGjson := false
-	for _, val := range dsList {
-		if val.hasExistCheck {
-			addGjson = true
-			break
-		}
-	}
-	if addGjson {
-		file.Decls[0].(*ast.GenDecl).Specs = append(file.Decls[0].(*ast.GenDecl).Specs, &ast.ImportSpec{
-			Path: &ast.BasicLit{Kind: token.STRING, Value: "\"github.com/tidwall/gjson\""},
-		})
-	}
 }
 
 func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruct, file *ast.File) {
@@ -1144,36 +1132,14 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 			continue
 		}
 		funcBodyList = append(funcBodyList, &ast.IfStmt{
-			Cond: &ast.BinaryExpr{
-				Op: token.LAND,
+			Cond: &ast.UnaryExpr{
+				Op: token.NOT,
 				X: &ast.CallExpr{
 					Fun: &ast.SelectorExpr{
-						X: &ast.CallExpr{
-							Fun: &ast.SelectorExpr{
-								X:   &ast.Ident{Name: "d"},
-								Sel: &ast.Ident{Name: "Get"},
-							},
-							Args: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"%s\"", key)}},
-						},
-						Sel: &ast.Ident{Name: "Exists"},
+						X:   &ast.Ident{Name: "d"},
+						Sel: &ast.Ident{Name: "IsEmpty"},
 					},
-				},
-				Y: &ast.BinaryExpr{
-					Op: token.NEQ,
-					X: &ast.SelectorExpr{
-						X: &ast.CallExpr{
-							Fun: &ast.SelectorExpr{
-								X:   &ast.Ident{Name: "d"},
-								Sel: &ast.Ident{Name: "Get"},
-							},
-							Args: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"%s\"", key)}},
-						},
-						Sel: &ast.Ident{Name: "Type"},
-					},
-					Y: &ast.SelectorExpr{
-						X:   &ast.Ident{Name: "gjson"},
-						Sel: &ast.Ident{Name: "Null"},
-					},
+					Args: []ast.Expr{&ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"%s\"", key)}},
 				},
 			},
 			Body: &ast.BlockStmt{
