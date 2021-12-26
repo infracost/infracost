@@ -51,7 +51,7 @@ func main() {
 		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
 
 		// isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
-		isMigrated, err := migrateFile("internal/providers/terraform/aws/db_instance.go", referenceFile, "internal/providers/terraform/aws/", "db_instance.go")
+		isMigrated, err := migrateFile("internal/providers/terraform/aws/apigatewayv2_api.go", referenceFile, "internal/providers/terraform/aws/", "apigatewayv2_api.go")
 		break
 
 		if err != nil && err.Error() == "manually migrated" {
@@ -988,7 +988,10 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 						newParamsList = append(newParamsList, &ast.Field{
 							Names: []*ast.Ident{{Name: "r"}},
 							Type: &ast.StarExpr{
-								X: &ast.Ident{Name: resourceCamelName},
+								X: &ast.Ident{
+									Name: resourceCamelName,
+									Obj:  &ast.Object{Kind: ast.Typ, Name: resourceCamelName},
+								},
 							},
 						})
 					}
@@ -996,7 +999,9 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 					newParamsList = append(newParamsList, param)
 				}
 			}
-			funcDecl.Type.Params.List = newParamsList
+			funcDecl.Type.Params = &ast.FieldList{
+				List: newParamsList,
+			}
 		}
 		return true
 	})
