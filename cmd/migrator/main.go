@@ -50,9 +50,9 @@ func main() {
 		}
 		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
 
-		// isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
-		isMigrated, err := migrateFile("internal/providers/terraform/aws/apigatewayv2_api.go", referenceFile, "internal/providers/terraform/aws/", "apigatewayv2_api.go")
-		break
+		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
+		// isMigrated, err := migrateFile("internal/providers/terraform/aws/apigatewayv2_api.go", referenceFile, "internal/providers/terraform/aws/", "apigatewayv2_api.go")
+		// break
 
 		if err != nil && err.Error() == "manually migrated" {
 			continue
