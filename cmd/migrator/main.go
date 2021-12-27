@@ -51,7 +51,7 @@ func main() {
 		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
 
 		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
-		// isMigrated, err := migrateFile("internal/providers/terraform/aws/apigatewayv2_api.go", referenceFile, "internal/providers/terraform/aws/", "apigatewayv2_api.go")
+		// isMigrated, err := migrateFile("internal/providers/terraform/aws/db_instance.go", referenceFile, "internal/providers/terraform/aws/", "db_instance.go")
 		// break
 
 		if err != nil && err.Error() == "manually migrated" {
@@ -321,7 +321,7 @@ func doMigration(fset *token.FileSet, file *ast.File, referenceFile *usage.Refer
 		return nil, nil, err
 	}
 
-	replaceDUs(resourceCamelName, resourceFile)
+	replaceDUs(resourceCamelName, resourceFile, usList, dsList)
 	addSchemaToResource(resourceCamelName, resourceFile)
 	migrateImports(file, resourceFile, dsList)
 	addProviderFunc(resourceCamelName, dsList, usList, file)
@@ -404,9 +404,13 @@ func getDsList(file *ast.File) map[string]duStruct {
 												return true
 											}
 										}
+										selName := selExpr.Sel.Name
+										if selName == "Int" && strings.Contains(keyName, "_gb") {
+											selName = "Float"
+										}
 										result[keyName] = duStruct{
-											fieldType:     selExpr.Sel.Name,
-											hasExistCheck: oldExistCheck || selExpr.Sel.Name == "Exists",
+											fieldType:     selName,
+											hasExistCheck: oldExistCheck || selName == "Exists",
 										}
 									}
 								}
@@ -482,9 +486,13 @@ func getUsList(file *ast.File) map[string]duStruct {
 												return true
 											}
 										}
+										selName := selExpr.Sel.Name
+										if selName == "Int" && strings.Contains(keyName, "_gb") {
+											selName = "Float"
+										}
 										result[keyName] = duStruct{
-											fieldType:     selExpr.Sel.Name,
-											hasExistCheck: oldExistCheck || selExpr.Sel.Name == "Exists",
+											fieldType:     selName,
+											hasExistCheck: oldExistCheck || selName == "Exists",
 										}
 									}
 								}
@@ -782,7 +790,7 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 	return nil
 }
 
-func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
+func replaceDUs(resourceCamelName string, resourceFile *ast.File, usList, dsList map[string]duStruct) {
 	// Replace Gets & IsEmpty
 	astutil.Apply(resourceFile, nil, func(c *astutil.Cursor) bool {
 		n := c.Node()
@@ -830,6 +838,24 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File) {
 											}
 										}
 										c.Replace(replacementNode)
+										parent := c.Parent()
+										if parentCallExpr, ok := parent.(*ast.CallExpr); ok {
+											if parentSelExpr, ok := parentCallExpr.Fun.(*ast.SelectorExpr); ok {
+												if identExpr.Name == "u" {
+													if val, ok := usList[keyName]; ok {
+														if val.fieldType == "Float" && parentSelExpr.Sel.Name == "NewFromInt" {
+															parentSelExpr.Sel.Name = "NewFromFloat"
+														}
+													}
+												} else if identExpr.Name == "d" {
+													if val, ok := dsList[keyName]; ok {
+														if val.fieldType == "Float" && parentSelExpr.Sel.Name == "NewFromInt" {
+															parentSelExpr.Sel.Name = "NewFromFloat"
+														}
+													}
+												}
+											}
+										}
 									}
 								}
 							}
