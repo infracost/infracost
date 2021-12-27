@@ -143,6 +143,33 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			if cmd.Flags().Changed("fields") && !contains(validFieldsFormats, format) {
 				ui.PrintWarning(cmd.ErrOrStderr(), "fields is only supported for table and html output formats")
 			}
+
+			if ctx.Config.EnableDashboard {
+				if ctx.Config.IsSelfHosted() {
+					ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+				}
+
+				projectContexts := make([]*config.ProjectContext, len(combined.Projects))
+				for i := range combined.Projects {
+					projectContexts[i] = config.EmptyProjectContext()
+				}
+				combinedRunIds := []string{}
+				for _, input := range inputs {
+					if id := input.Root.RunID; id != "" {
+						combinedRunIds = append(combinedRunIds, id)
+					}
+				}
+				ctx.SetContextValue("runIds", combinedRunIds)
+
+				dashboardClient := apiclient.NewDashboardAPIClient(ctx)
+				result, err := dashboardClient.AddRun(ctx, projectContexts, combined)
+				if err != nil {
+					log.Errorf("Error reporting run: %s", err)
+				}
+
+				combined.RunID, combined.ShareURL = result.RunID, result.ShareURL
+			}
+
 			switch strings.ToLower(format) {
 			case "json":
 				b, err = output.ToJSON(combined, opts)
