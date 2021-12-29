@@ -149,25 +149,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 					ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 				}
 
-				projectContexts := make([]*config.ProjectContext, len(combined.Projects))
-				for i := range combined.Projects {
-					projectContexts[i] = config.EmptyProjectContext()
-				}
-				combinedRunIds := []string{}
-				for _, input := range inputs {
-					if id := input.Root.RunID; id != "" {
-						combinedRunIds = append(combinedRunIds, id)
-					}
-				}
-				ctx.SetContextValue("runIds", combinedRunIds)
-
-				dashboardClient := apiclient.NewDashboardAPIClient(ctx)
-				result, err := dashboardClient.AddRun(ctx, projectContexts, combined)
-				if err != nil {
-					log.Errorf("Error reporting run: %s", err)
-				}
-
-				combined.RunID, combined.ShareURL = result.RunID, result.ShareURL
+				combined.RunID, combined.ShareURL = shareRun(ctx, combined, inputs)
 			}
 
 			switch strings.ToLower(format) {
@@ -223,6 +205,34 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	})
 
 	return cmd
+}
+
+func shareRun(ctx *config.RunContext, combined output.Root, inputs []output.ReportInput) (string, string) {
+	if len(inputs) == 1 && inputs[0].Root.RunID != "" {
+		result := inputs[0].Root
+		return result.RunID, result.ShareURL
+	}
+
+	projectContexts := make([]*config.ProjectContext, len(combined.Projects))
+	for i := range combined.Projects {
+		projectContexts[i] = config.EmptyProjectContext()
+	}
+
+	combinedRunIds := []string{}
+	for _, input := range inputs {
+		if id := input.Root.RunID; id != "" {
+			combinedRunIds = append(combinedRunIds, id)
+		}
+	}
+	ctx.SetContextValue("runIds", combinedRunIds)
+
+	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
+	result, err := dashboardClient.AddRun(ctx, projectContexts, combined)
+	if err != nil {
+		log.Errorf("Error reporting run: %s", err)
+	}
+
+	return result.RunID, result.ShareURL
 }
 
 func checkCurrency(inputCurrency, fileCurrency string) (string, error) {
