@@ -205,6 +205,7 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 		}
 	}
 
+	ctx.SetContextValue("dashboardEnabled", ctx.Config.EnableDashboard)
 	ctx.SetContextValue("isDefaultPricingAPIEndpoint", ctx.Config.PricingAPIEndpoint == ctx.Config.DefaultPricingAPIEndpoint)
 
 	flagNames := make([]string, 0)
