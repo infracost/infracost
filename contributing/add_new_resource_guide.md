@@ -1219,3 +1219,65 @@ would print:
 europe-north1 => 100.00
 southamerica-east1 => 200.00
 ```
+
+#### Adding new regions
+
+Every so often cloud providers add locations/regions to their cloud infrastructure. When this happens we need to update shared provider variables so that the new regions are available in usage files.
+
+#### AWS
+
+Common usage structs are defined in the [`internal/resources/aws/util.go`](../internal/resources/aws/util.go) file. You'll need to update: 
+
+```go
+var RegionMapping = map[string]string{
+  "us-gov-west-1":   "AWS GovCloud (US-West)",
+  // Add the new region here with the aws code mapping to the region name
+  // as defined here: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
+}
+```
+
+```go
+type RegionsUsage struct {
+  USGovWest1   *float64 `infracost_usage:"us_gov_west_1"`
+  // Add your new region here with the infracost_usage struct tag
+  // representing an underscored version of the aws region code
+  // e.g: eu-west-1 => eu_west_1.
+  //
+  // The struct field type must be *float
+}
+```
+
+```go
+var RegionUsageSchema = []*schema.UsageItem{
+  {Key: "us_gov_west_1", DefaultValue: 0, ValueType: schema.Float64},
+  // Finally, add your new region to the usage schema.
+  // Set the Key as the underscored code of the region (as outlined
+  // in the prior RegionsUsage struct). Then set DefaultValue as 0
+  // and the ValueType to schema.Float64.
+}
+```
+#### Google
+
+Common usage structs are defined in the [`internal/resources/google/util.go`](../internal/resources/google/util.go) file. You'll need to update: 
+
+
+```go
+type RegionsUsage struct {
+  AsiaEast1              *float64 `infracost_usage:"asia_east1"`
+  // Add your new region here with the infracost_usage struct tag
+  // representing an underscored version of the google location code
+  // e.g: eu-west-1 => eu_west_1.
+  //
+  // The struct field type must be *float
+}
+```
+
+```go
+var RegionUsageSchema = []*schema.UsageItem{
+  {ValueType: schema.Float64, DefaultValue: 0, Key: "asia_east1"},
+  // Finally, add your new region to the usage schema.
+  // Set the Key as the underscored code of the location (as outlined
+  // in the prior RegionsUsage struct). Then set DefaultValue as 0
+  // and the ValueType to schema.Float64.
+}
+```
