@@ -114,6 +114,7 @@ var RegionMapping = map[string]string{
 	"ap-northeast-3":  "Asia Pacific (Osaka)",
 	"ap-southeast-1":  "Asia Pacific (Singapore)",
 	"ap-southeast-2":  "Asia Pacific (Sydney)",
+	"ap-southeast-3":  "Asia Pacific (Jakarta)",
 	"ap-south-1":      "Asia Pacific (Mumbai)",
 	"me-south-1":      "Middle East (Bahrain)",
 	"sa-east-1":       "South America (Sao Paulo)",
@@ -163,6 +164,7 @@ type RegionsUsage struct {
 	APNortheast3 *float64 `infracost_usage:"ap_northeast_3"`
 	APSoutheast1 *float64 `infracost_usage:"ap_southeast_1"`
 	APSoutheast2 *float64 `infracost_usage:"ap_southeast_2"`
+	APSoutheast3 *float64 `infracost_usage:"ap_southeast_3"`
 	APSouth1     *float64 `infracost_usage:"ap_south_1"`
 	MESouth1     *float64 `infracost_usage:"me_south_1"`
 	SAEast1      *float64 `infracost_usage:"sa_east_1"`
@@ -232,6 +234,7 @@ var RegionUsageSchema = []*schema.UsageItem{
 	{Key: "ap_northeast_3", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ap_southeast_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ap_southeast_2", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_southeast_3", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ap_south_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "me_south_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "sa_east_1", DefaultValue: 0, ValueType: schema.Float64},
