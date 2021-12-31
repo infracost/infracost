@@ -46,7 +46,7 @@ func loadConfiguration(cfg *Config) error {
 	}
 
 	if cfg.Configuration.TLSInsecureSkipVerify != nil {
-		cfg.TLSInsecureSkipVerify = *cfg.Configuration.TLSInsecureSkipVerify
+		cfg.TLSInsecureSkipVerify = cfg.Configuration.TLSInsecureSkipVerify
 	}
 
 	if cfg.TLSCACertFile == "" {

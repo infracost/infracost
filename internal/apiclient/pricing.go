@@ -55,8 +55,17 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		}
 	}
 
+	skipVerify := false
+	if ctx.Config.TLSInsecureSkipVerify != nil {
+		skipVerify = *ctx.Config.TLSInsecureSkipVerify
+	} else if len(rootCAs.Subjects()) == 0 && ctx.Config.TLSCACertFile == "" {
+		// Skip verify hasn't been explicitly set, there's no cert file, and there are no root CAs (i.e. this is
+		// windows).  Default to skipping the verify.
+		skipVerify = true
+	}
+
 	tlsConfig := &tls.Config{
-		InsecureSkipVerify: ctx.Config.TLSInsecureSkipVerify, // nolint: gosec
+		InsecureSkipVerify: skipVerify, // nolint: gosec
 		RootCAs:            rootCAs,
 	}
 
