@@ -81,6 +81,13 @@ func strCamelCaseHelper(str string) string {
 	res = strings.Replace(res, "Id", "ID", -1)
 	return res
 }
+func strLowerCamelCaseHelper(str string) string {
+	res := strcase.ToLowerCamel(str)
+	res = strings.Replace(res, "Cpu", "CPU", -1)
+	res = strings.Replace(res, "Api", "API", -1)
+	res = strings.Replace(res, "Id", "ID", -1)
+	return res
+}
 
 func migrateFile(filePath string, referenceFile *usage.ReferenceFile, basePath, fileName string) (bool, error) {
 	resFilePath := fmt.Sprintf("internal/resources/%s/%s", PROVIDER, fileName)
@@ -296,7 +303,7 @@ func doMigration(fset *token.FileSet, file *ast.File, referenceFile *usage.Refer
 	}
 	// resourceCamelName := strings.Replace(registryFuncName, "Get", "", 1)
 	// resourceCamelName = strings.Replace(resourceCamelName, "RegistryItem", "", 1)
-	resourceCamelName := strcase.ToCamel(resourceName)
+	resourceCamelName := strCamelCaseHelper(resourceName)
 
 	dsList := getDsList(file)
 	usList := getUsList(file)
@@ -1323,7 +1330,7 @@ func lowerRegistryFunc(file *ast.File, registryFuncName string) {
 		n := c.Node()
 		if declExpr, ok := n.(*ast.FuncDecl); ok {
 			if declExpr.Name.Name == registryFuncName {
-				declExpr.Name = &ast.Ident{Name: strcase.ToLowerCamel(declExpr.Name.Name)}
+				declExpr.Name = &ast.Ident{Name: strLowerCamelCaseHelper(declExpr.Name.Name)}
 			}
 		}
 		return true
