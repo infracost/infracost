@@ -51,7 +51,7 @@ func main() {
 		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
 
 		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
-		// isMigrated, err := migrateFile("internal/providers/terraform/aws/db_instance.go", referenceFile, "internal/providers/terraform/aws/", "db_instance.go")
+		// isMigrated, err := migrateFile("internal/providers/terraform/aws/cloudwatch_log_group.go", referenceFile, "internal/providers/terraform/aws/", "cloudwatch_log_group.go")
 		// break
 
 		if err != nil && err.Error() == "manually migrated" {
@@ -294,8 +294,9 @@ func doMigration(fset *token.FileSet, file *ast.File, referenceFile *usage.Refer
 	if registryFuncName == "" || resourceFuncName == "" {
 		return nil, nil, errors.New("invalid registry/resource func names")
 	}
-	resourceCamelName := strings.Replace(registryFuncName, "Get", "", 1)
-	resourceCamelName = strings.Replace(resourceCamelName, "RegistryItem", "", 1)
+	// resourceCamelName := strings.Replace(registryFuncName, "Get", "", 1)
+	// resourceCamelName = strings.Replace(resourceCamelName, "RegistryItem", "", 1)
+	resourceCamelName := strcase.ToCamel(resourceName)
 
 	dsList := getDsList(file)
 	usList := getUsList(file)
@@ -327,6 +328,7 @@ func doMigration(fset *token.FileSet, file *ast.File, referenceFile *usage.Refer
 	addProviderFunc(resourceCamelName, dsList, usList, file)
 	fixRFuncName(resourceCamelName, file)
 	fixRedundantNilConditions(resourceFile)
+	lowerRegistryFunc(file, registryFuncName)
 
 	return file, resourceFile, nil
 }
@@ -1310,6 +1312,18 @@ func fixRedundantNilConditions(resourceFile *ast.File) {
 						}
 					}
 				}
+			}
+		}
+		return true
+	})
+}
+
+func lowerRegistryFunc(file *ast.File, registryFuncName string) {
+	astutil.Apply(file, nil, func(c *astutil.Cursor) bool {
+		n := c.Node()
+		if declExpr, ok := n.(*ast.FuncDecl); ok {
+			if declExpr.Name.Name == registryFuncName {
+				declExpr.Name = &ast.Ident{Name: strcase.ToLowerCamel(declExpr.Name.Name)}
 			}
 		}
 		return true
