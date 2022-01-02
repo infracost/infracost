@@ -1,52 +1,27 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
-func GetEIPRegistryItem() *schema.RegistryItem {
+func getEIPRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_eip",
-		RFunc: NewEIP,
+		RFunc: NewEip,
 	}
 }
-
-func NewEIP(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	// The IP address is probably used if it has an instance or network_interface, the instance might
-	// be stopped but that's probably less likely
-	if (d.Get("customer_owned_ipv4_pool").Exists() && d.Get("customer_owned_ipv4_pool").String() != "") ||
-		d.Get("instance").Exists() || d.Get("network_interface").Exists() {
-		return &schema.Resource{
-			Name:      d.Address,
-			NoPrice:   true,
-			IsSkipped: true,
-		}
+func NewEip(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.Eip{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	if !d.IsEmpty("network_interface") {
+		r.NetworkInterface = strPtr(d.Get("network_interface").String())
 	}
-
-	region := d.Get("region").String()
-
-	return &schema.Resource{
-		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:           "IP address (if unused)",
-				Unit:           "hours",
-				UnitMultiplier: decimal.NewFromInt(1),
-				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AmazonEC2"),
-					ProductFamily: strPtr("IP Address"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr("/ElasticIP:IdleAddress/")},
-					},
-				},
-				PriceFilter: &schema.PriceFilter{
-					StartUsageAmount: strPtr("1"),
-				},
-			},
-		},
+	if !d.IsEmpty("customer_owned_ipv4_pool") {
+		r.CustomerOwnedIpv4Pool = strPtr(d.Get("customer_owned_ipv4_pool").String())
 	}
+	if !d.IsEmpty("instance") {
+		r.Instance = strPtr(d.Get("instance").String())
+	}
+	r.PopulateUsage(u)
+	return r.BuildResource()
 }
