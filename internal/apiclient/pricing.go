@@ -35,12 +35,14 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		currency = "USD"
 	}
 
-	rootCAs, _ := x509.SystemCertPool()
-	if rootCAs == nil {
-		rootCAs = x509.NewCertPool()
-	}
+	tlsConfig := tls.Config{}
 
 	if ctx.Config.TLSCACertFile != "" {
+		rootCAs, _ := x509.SystemCertPool()
+		if rootCAs == nil {
+			rootCAs = x509.NewCertPool()
+		}
+
 		caCerts, err := ioutil.ReadFile(ctx.Config.TLSCACertFile)
 		if err != nil {
 			log.Errorf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
@@ -53,27 +55,19 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 				log.Debugf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
 			}
 		}
+
+		tlsConfig.RootCAs = rootCAs
 	}
 
-	skipVerify := false
 	if ctx.Config.TLSInsecureSkipVerify != nil {
-		skipVerify = *ctx.Config.TLSInsecureSkipVerify
-	} else if len(rootCAs.Subjects()) == 0 && ctx.Config.TLSCACertFile == "" {
-		// Skip verify hasn't been explicitly set, there's no cert file, and there are no root CAs (i.e. this is
-		// windows).  Default to skipping the verify.
-		skipVerify = true
-	}
-
-	tlsConfig := &tls.Config{
-		InsecureSkipVerify: skipVerify, // nolint: gosec
-		RootCAs:            rootCAs,
+		tlsConfig.InsecureSkipVerify = *ctx.Config.TLSInsecureSkipVerify
 	}
 
 	return &PricingAPIClient{
 		APIClient: APIClient{
 			endpoint:  ctx.Config.PricingAPIEndpoint,
 			apiKey:    ctx.Config.APIKey,
-			tlsConfig: tlsConfig,
+			tlsConfig: &tlsConfig,
 			uuid:      ctx.UUID(),
 		},
 		Currency:       currency,
