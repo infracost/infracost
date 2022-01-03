@@ -35,7 +35,7 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		currency = "USD"
 	}
 
-	tlsConfig := tls.Config{}
+	tlsConfig := tls.Config{} // nolint: gosec
 
 	if ctx.Config.TLSCACertFile != "" {
 		rootCAs, _ := x509.SystemCertPool()
