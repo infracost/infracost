@@ -329,6 +329,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	spinnerOpts := ui.SpinnerOptions{
 		EnableLogging: runCtx.Config.IsLogging(),
 		NoColor:       runCtx.Config.NoColor,
+		Indent:        "  ",
 	}
 	spinner := ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 	defer spinner.Fail()
