@@ -453,6 +453,11 @@ func shortTerraformVersion(full string) string {
 }
 
 func checkTerraformVersion(v string, fullV string) error {
+	if len(v) > 0 && v[0] != 'v' {
+		// The semver package requires a 'v' prefix to do a proper Compare.
+		v = "v" + v
+	}
+
 	if strings.HasPrefix(fullV, "Terraform ") && semver.Compare(v, minTerraformVer) < 0 {
 		return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
 	}
