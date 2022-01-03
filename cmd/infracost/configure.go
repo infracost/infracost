@@ -86,13 +86,17 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 				ctx.Config.Credentials.APIKey = value
 				saveCredentials = true
 			case "tls_insecure_skip_verify":
-				b, err := strconv.ParseBool(value)
+				if value == "" {
+					ctx.Config.Configuration.TLSInsecureSkipVerify = nil
+				} else {
+					b, err := strconv.ParseBool(value)
 
-				if err != nil {
-					return errors.New("Invalid value, must be true or false")
+					if err != nil {
+						return errors.New("Invalid value, must be true or false")
+					}
+
+					ctx.Config.Configuration.TLSInsecureSkipVerify = &b
 				}
-
-				ctx.Config.Configuration.TLSInsecureSkipVerify = &b
 				saveConfiguration = true
 			case "tls_ca_cert_file":
 				ctx.Config.Configuration.TLSCACertFile = value
