@@ -1,0 +1,33 @@
+
+💰 Infracost estimate: **monthly cost will not change**
+<table>
+  <thead>
+    <td>Project</td>
+    <td>Previous</td>
+    <td>New</td>
+    <td>Diff</td>
+  </thead>
+  <tbody>
+    <tr>
+      <td>infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json</td>
+      <td align="right">$40.56</td>
+      <td align="right">$40.56</td>
+      <td>$0</td>
+    </tr>
+  </tbody>
+</table>
+
+<details>
+<summary><strong>Infracost output</strong></summary>
+
+```
+──────────────────────────────────
+
+The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json
+Run infracost breakdown to see their full breakdown.
+
+──────────────────────────────────
+
+```
+</details>
+

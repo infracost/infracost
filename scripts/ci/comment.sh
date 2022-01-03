@@ -8,7 +8,7 @@ set -e
 # The script uses the following environment variables:
 #   - COMMENT_FORMAT: The format of the comment as supported by `infracost output`.
 #       Default: github-comment
-#       Options: github-comment, gitlab-comment
+#       Options: github-comment, gitlab-comment, azure-repos-comment
 #   - COMMENT_BEHAVIOR: The behavior of the comment as supported by `compost`.
 #       Default: update
 #       Options:
