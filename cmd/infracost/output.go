@@ -21,6 +21,8 @@ import (
 var minOutputVersion = "0.2"
 var maxOutputVersion = "0.2"
 
+var validOutputFormats = []string{"table", "diff", "json", "html", "github-comment", "gitlab-comment", "azure-repos-comment", "slack-message"}
+
 func outputCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "output",
@@ -51,6 +53,14 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
       infracost output --format azure-repos-comment --path "out*.json" # glob needs quotes`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			format, _ := cmd.Flags().GetString("format")
+			ctx.SetContextValue("outputFormat", format)
+
+			if format != "" && !contains(validOutputFormats, format) {
+				ui.PrintUsage(cmd)
+				return fmt.Errorf("--format only supports %s", strings.Join(validOutputFormats, ", "))
+			}
+
 			inputFiles := []string{}
 
 			paths, _ := cmd.Flags().GetStringArray("path")
@@ -99,9 +109,6 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 					Root: j,
 				})
 			}
-
-			format, _ := cmd.Flags().GetString("format")
-			ctx.SetContextValue("outputFormat", format)
 
 			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
@@ -205,7 +212,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	_ = cmd.MarkFlagFilename("path", "json")
 
 	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"table", "json", "html"}, cobra.ShellCompDirectiveDefault
+		return validOutputFormats, cobra.ShellCompDirectiveDefault
 	})
 
 	return cmd
