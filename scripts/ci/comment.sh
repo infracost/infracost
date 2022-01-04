@@ -47,6 +47,11 @@ dry_run=${COMMENT_DRY_RUN:-false}
 skip_compost=${COMMENT_SKIP_COMPOST:-false}
 
 # Build flags for Infracost to handle multiple paths
+if [ "$#" -eq 0 ]; then
+  echo "Expecting at least one Infracost JSON file as argument"
+  exit 1
+fi
+
 input_path_flags=""
 for input_path in "$@"; do
   input_path_flags="$input_path_flags --path $input_path"
