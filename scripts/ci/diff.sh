@@ -6,6 +6,9 @@
 # For Bitbucket: BITBUCKET_TOKEN must be set to "myusername:my_app_password", the password needs to have Read scope
 #   on "Repositories" and "Pull Requests" so it can post comments. Using a Bitbucket App password
 #   (https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) is recommended.
+# For Bitbucket Server: BITBUCKET_SERVER_HOSTNAME must be set, e.g. "mycompany.com". BITBUCKET_TOKEN must be set to "mytoken", the token
+#   needs to have PROJECT READ and REPOSITORY READ on "Repositories" and "Pull Requests" so it can post comments. See here for my details:
+#   https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html
 
 process_args () {
   # Set variables based on the order for GitHub Actions, or the env value for other CIs
@@ -158,7 +161,7 @@ build_msg () {
     msg+="  </tbody>\n"
     msg+="</table>\n"
     msg+="\n"
-    
+
     if [ -n "$skipped_projects" ]; then
       msg+="The following projects have no cost estimate changes: $skipped_projects\n\n"
     fi
@@ -186,7 +189,7 @@ build_msg () {
     msg+="  Is this comment useful? <a href=\"https://www.infracost.io/feedback/submit/?value=yes\" rel=\"noopener noreferrer\" target=\"_blank\">Yes</a>, <a href=\"https://www.infracost.io/feedback/submit/?value=no\" rel=\"noopener noreferrer\" target=\"_blank\">No</a>\n"
     msg+="</sub>\n"
   fi
-  
+
   printf "$msg"
 }
 
@@ -206,7 +209,7 @@ build_project_row () {
   name=$(jq -r '.projects['"$i"'].name' infracost_breakdown.json)
   # Truncate the middle of the name if it's too long
   name=$(echo $name | awk -v l="$max_name_length" '{if (length($0) > l) {print substr($0, 0, l-(l/2)-1)"..."substr($0, length($0)-(l/2)+3, length($0))} else print $0}')
-  
+
   past_monthly_cost=$(jq -r '.projects['"$i"'].pastBreakdown.totalMonthlyCost' infracost_breakdown.json)
   monthly_cost=$(jq -r '.projects['"$i"'].breakdown.totalMonthlyCost' infracost_breakdown.json)
   diff_monthly_cost=$(jq -r '.projects['"$i"'].diff.totalMonthlyCost' infracost_breakdown.json)
@@ -222,7 +225,7 @@ build_project_row () {
   row+="      <td align=\"right\">$(format_cost "$monthly_cost")</td>\n"
   row+="      <td>$(format_cost "$diff_monthly_cost" true)$percent_display</td>\n"
   row+="    </tr>\n"
-  
+
   printf "%s" "$row"
 }
 
@@ -439,6 +442,30 @@ post_bitbucket_comment () {
     "https://api.bitbucket.org/2.0/repositories/$1"
 }
 
+get_bitbucket_server_url () {
+  BITBUCKET_GIT_URL="$(git config --get remote.origin.url)"
+  BITBUCKET_PROJECT="$(cut -d '/' -f4 <<<$BITBUCKET_GIT_URL)"
+  BITBUCKET_REPO="$(basename $BITBUCKET_GIT_URL .git)"
+  printf "https://$BITBUCKET_SERVER_HOSTNAME/rest/api/1.0/projects/$BITBUCKET_PROJECT/repos/$BITBUCKET_REPO/pull-requests"
+}
+
+get_bitbucket_server_pr_id () {
+  BITBUCKET_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+  curl -sS \
+    -H "Authorization: Bearer $BITBUCKET_TOKEN" \
+    "$1?at=refs/heads/$BITBUCKET_BRANCH&direction=OUTGOING" \
+    | jq -r '.["values"][0].id'
+}
+
+post_bitbucket_server_comment () {
+  msg="$(build_msg false)"
+  echo "Posting comment to $1"
+  jq -Mnc --arg msg "$msg" '{"text": "\($msg)"}' | curl -sSL -o /dev/null -X POST -d @- \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $BITBUCKET_TOKEN" \
+    "$1"
+}
+
 post_to_circle_ci () {
   if echo "$CIRCLE_REPOSITORY_URL" | grep -Eiq github; then
     GITHUB_REPOSITORY="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
@@ -476,6 +503,16 @@ post_to_bitbucket () {
   fi
 }
 
+post_to_bitbucket_server () {
+  if [ -z "$BITBUCKET_TOKEN" ]; then
+    echo "Error: BITBUCKET_TOKEN is required to post comment to Bitbucket Server"
+  else
+    BITBUCKET_SERVER_URL="$(get_bitbucket_server_url)"
+    BITBUCKET_SERVER_PR_ID="$(get_bitbucket_server_pr_id $BITBUCKET_SERVER_URL)"
+    post_bitbucket_server_comment "$BITBUCKET_SERVER_URL/$BITBUCKET_SERVER_PR_ID/comments"
+  fi
+}
+
 post_to_azure_devops () {
   if [ "$BUILD_REASON" = "PullRequest" ]; then
     if [ "$BUILD_REPOSITORY_PROVIDER" = "GitHub" ]; then
@@ -493,7 +530,7 @@ post_to_azure_devops () {
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $SYSTEM_ACCESSTOKEN" \
         "$SYSTEM_COLLECTIONURI$SYSTEM_TEAMPROJECT/_apis/git/repositories/$BUILD_REPOSITORY_ID/pullRequests/$SYSTEM_PULLREQUEST_PULLREQUESTID/threads?api-version=6.0"
-    else 
+    else
       echo "Posting comments to Azure DevOps $BUILD_REPOSITORY_PROVIDER is not supported, email hello@infracost.io for help"
     fi
   else
@@ -531,7 +568,7 @@ load_github_env () {
 
 load_gitlab_env () {
   export VCS_REPO_URL=$CI_REPOSITORY_URL
-  
+
   first_mr=$(echo "$CI_OPEN_MERGE_REQUESTS" | cut -d',' -f1)
   repo=$(echo "$first_mr" | cut -d'!' -f1)
   mr_number=$(echo "$first_mr" | cut -d'!' -f2)
@@ -575,7 +612,7 @@ echo "$breakdown_output" > infracost_breakdown.json
 
 infracost_output_cmd=$(build_output_cmd "infracost_breakdown.json")
 echo "$infracost_output_cmd" > infracost_output_cmd
-  
+
 echo "Running infracost output using:"
 echo "  $ $(cat infracost_output_cmd)"
 diff_output=$(cat infracost_output_cmd | sh)
@@ -636,6 +673,8 @@ elif [ -n "$CIRCLECI" ]; then
   post_to_circle_ci
 elif [ -n "$BITBUCKET_PIPELINES" ]; then
   post_to_bitbucket
+elif [ -n "$BITBUCKET_SERVER_HOSTNAME" ]; then
+  post_to_bitbucket_server
 elif [ -n "$SYSTEM_COLLECTIONURI" ]; then
   post_to_azure_devops
 fi
