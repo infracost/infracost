@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.17.0
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.12.0
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.11.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.24.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.26.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.22.0
 	github.com/awslabs/goformation/v4 v4.19.5
 	github.com/briandowns/spinner v1.15.0

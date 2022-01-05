@@ -64,8 +64,8 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.12.0 h1:RRVuE4/AByh329BlTIsJV
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.12.0/go.mod h1:pubT7GJCxBwkJLtWIsw6zHJg4zf8XWM+Guv4V+FkGW0=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.11.0 h1:te+nIFwPf5Bi/cZvd9g/+EF0gkJT3c0J/5+NMx0NBZg=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.11.0/go.mod h1:ELltfl9ri0n4sZ/VjPZBgemNMd9mYIpCAuZhc7NP7l4=
-github.com/aws/aws-sdk-go-v2/service/ec2 v1.24.0 h1:nWIMIJdgSsYCH6SrX9RYNHaxc5ermN4F7PDS2iMbgkY=
-github.com/aws/aws-sdk-go-v2/service/ec2 v1.24.0/go.mod h1:Xv0jfvBUvJMRnYA5sX+VisekFtkWzD68qTW1VkvcrIo=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.26.0 h1:Q++veaxis1Dg7is9yi+aEPsIBRAgdkUxoIvyud7jOyo=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.26.0/go.mod h1:cIbz+b70nxJafXf9lT07Xj03pef6CsVdYTCCR0DQEQc=
 github.com/aws/aws-sdk-go-v2/service/eks v1.16.0 h1:D8gm9wfCmTxkvbeVz9yhi7TOZm8mfoTP49cAA9NQrvA=
 github.com/aws/aws-sdk-go-v2/service/eks v1.16.0/go.mod h1:xbz8pEpGLX0sMb5xCCWNSmp2mWNWQMZsOj6fFuCskjw=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.5.0 h1:lPLbw4Gn59uoKqvOfSnkJr54XWk5Ak1NK20ZEiSWb3U=
