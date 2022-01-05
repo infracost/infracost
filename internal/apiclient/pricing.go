@@ -35,12 +35,14 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		currency = "USD"
 	}
 
-	rootCAs, _ := x509.SystemCertPool()
-	if rootCAs == nil {
-		rootCAs = x509.NewCertPool()
-	}
+	tlsConfig := tls.Config{} // nolint: gosec
 
 	if ctx.Config.TLSCACertFile != "" {
+		rootCAs, _ := x509.SystemCertPool()
+		if rootCAs == nil {
+			rootCAs = x509.NewCertPool()
+		}
+
 		caCerts, err := ioutil.ReadFile(ctx.Config.TLSCACertFile)
 		if err != nil {
 			log.Errorf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
@@ -53,18 +55,19 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 				log.Debugf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
 			}
 		}
+
+		tlsConfig.RootCAs = rootCAs
 	}
 
-	tlsConfig := &tls.Config{
-		InsecureSkipVerify: ctx.Config.TLSInsecureSkipVerify, // nolint: gosec
-		RootCAs:            rootCAs,
+	if ctx.Config.TLSInsecureSkipVerify != nil {
+		tlsConfig.InsecureSkipVerify = *ctx.Config.TLSInsecureSkipVerify
 	}
 
 	return &PricingAPIClient{
 		APIClient: APIClient{
 			endpoint:  ctx.Config.PricingAPIEndpoint,
 			apiKey:    ctx.Config.APIKey,
-			tlsConfig: tlsConfig,
+			tlsConfig: &tlsConfig,
 			uuid:      ctx.UUID(),
 		},
 		Currency:       currency,

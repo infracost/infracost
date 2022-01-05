@@ -68,9 +68,11 @@ jobs:
         with:
           images: |
             ${{ secrets.DOCKER_ORG }}/${{ secrets.DOCKER_REPOSITORY }}
+          flavor: |
+            prefix=ci-,onlatest=true
           tags: |
-            type=semver,pattern=ci-{{version}}
-            type=semver,pattern=ci-{{major}}.{{minor}}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
 
       - name: Build and push Docker images (CI)
         uses: docker/build-push-action@v2

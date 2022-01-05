@@ -12,6 +12,14 @@ func strPtr(s string) *string {
 	return &s
 }
 
+func floatPtr(f float64) *float64 {
+	return &f
+}
+
+func boolPtr(b bool) *bool {
+	return &b
+}
+
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
