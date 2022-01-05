@@ -82,6 +82,11 @@ build_breakdown_cmd () {
   if [ -n "$terraform_workspace" ]; then
     breakdown_cmd="$breakdown_cmd --terraform-workspace $terraform_workspace"
   fi
+
+  if [ -n "$terraform_json_plan" ]; then
+    breakdown_cmd="$breakdown_cmd --format json --path $terraform_json_plan"
+  fi
+
   if [ -n "$usage_file" ]; then
     if [ "$sync_usage_file" = "true" ] || [ "$sync_usage_file" = "True" ] || [ "$sync_usage_file" = "TRUE" ]; then
       breakdown_cmd="$breakdown_cmd --sync-usage-file --usage-file $usage_file"
@@ -551,6 +556,12 @@ cleanup () {
 }
 
 # MAIN
+[[ "$0" != "$BASH_SOURCE" ]] && sourced=1 || sourced=0
+if [[ $sourced -eq 1 ]]; then
+    ret=return
+else
+    ret=exit
+fi
 
 process_args "$@"
 
@@ -606,14 +617,14 @@ elif [ "$(echo "$post_condition" | jq '.update')" = "true" ]; then
   if [ "$diff_resources" = "null" ]; then
     echo "Not posting comment as post_condition is set to update but there is no diff"
     cleanup
-    exit 0
+    $ret 0
   else
     echo "Posting comment as post_condition is set to update and there is a diff"
   fi
 elif [ "$(echo "$post_condition" | jq '.has_diff')" = "true" ] && [ "$diff_resources" = "null" ]; then
   echo "Not posting comment as post_condition is set to has_diff but there is no diff"
   cleanup
-  exit 0
+  $ret 0
 elif [ "$(echo "$post_condition" | jq '.has_diff')" = "true" ] && [ -n "$diff_resources" ]; then
   echo "Posting comment as post_condition is set to has_diff and there is a diff"
 elif [ -z "$percent" ]; then
@@ -623,7 +634,7 @@ elif [ "$(echo "$absolute_percent > $percentage_threshold" | bc -l)" = 1 ]; then
 else
   echo "Not posting comment as percentage diff ($absolute_percent%) is less than or equal to percentage threshold ($percentage_threshold%)."
   cleanup
-  exit 0
+  $ret 0
 fi
 
 if [ -n "$GITHUB_ACTIONS" ]; then
