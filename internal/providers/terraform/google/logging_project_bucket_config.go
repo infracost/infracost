@@ -8,7 +8,7 @@ import (
 func GetLoggingBucketConfigRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_logging_project_bucket_config",
-		RFunc: NewLoggingOrganizationBucket,
+		RFunc: NewLoggingProjectBucket,
 	}
 }
 
