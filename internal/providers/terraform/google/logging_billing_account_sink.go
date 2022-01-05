@@ -8,7 +8,7 @@ import (
 func GetLoggingBillingAccountSinkRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_logging_billing_account_sink",
-		RFunc: NewLoggingBillingAccountBucket,
+		RFunc: NewLoggingBillingAccountSink,
 	}
 }
 
