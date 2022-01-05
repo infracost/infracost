@@ -1,66 +1,18 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
-
-	"github.com/shopspring/decimal"
 )
 
-func GetSQSQueueRegistryItem() *schema.RegistryItem {
+func getSQSQueueRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_sqs_queue",
 		RFunc: NewSqsQueue,
 	}
 }
-
 func NewSqsQueue(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
-
-	var queueType string
-
-	if d.Get("fifo_queue").Bool() {
-		queueType = "FIFO (first-in, first-out)"
-	} else {
-		queueType = "Standard"
-	}
-
-	requestSize := decimal.NewFromInt(64)
-	if u != nil && u.Get("request_size_kb").Exists() {
-		requestSize = decimal.NewFromInt(u.Get("request_size_kb").Int())
-	}
-
-	var requests *decimal.Decimal
-
-	if u != nil && u.Get("monthly_requests").Exists() {
-		monthlyRequests := decimal.NewFromFloat(u.Get("monthly_requests").Float())
-		requests = decimalPtr(calculateRequests(requestSize, monthlyRequests))
-	}
-
-	return &schema.Resource{
-		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:            "Requests",
-				Unit:            "1M requests",
-				UnitMultiplier:  decimal.NewFromInt(1000000),
-				MonthlyQuantity: requests,
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AWSQueueService"),
-					ProductFamily: strPtr("API Request"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "queueType", Value: strPtr(queueType)},
-					},
-				},
-				PriceFilter: &schema.PriceFilter{
-					StartUsageAmount: strPtr("0"),
-				},
-			},
-		},
-	}
-}
-
-func calculateRequests(requestSize decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
-	return requestSize.Div(decimal.NewFromInt(64)).Ceil().Mul(monthlyRequests)
+	r := &aws.SqsQueue{Address: strPtr(d.Address), FifoQueue: boolPtr(d.Get("fifo_queue").Bool()), Region: strPtr(d.Get("region").String())}
+	r.PopulateUsage(u)
+	return r.BuildResource()
 }

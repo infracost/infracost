@@ -1,0 +1,24 @@
+on:
+  schedule:
+    - cron: "0 8 * * *" # every day at 8am
+
+jobs:
+  check:
+    name: Check resources
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2 # region doesn't matter for the cmd, just needs to be set
+      - name: Run
+        run: go run cmd/resourcecheck/main.go
+        env:
+          SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}

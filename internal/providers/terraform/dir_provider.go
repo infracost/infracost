@@ -310,7 +310,9 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 			strings.Contains(extractedErr, "Error: Backend initialization required") ||
 			strings.Contains(extractedErr, "Error: Provider requirements cannot be satisfied by locked dependencies") ||
 			strings.Contains(extractedErr, "Error: Inconsistent dependency lock file") ||
-			strings.Contains(extractedErr, "Error: Module not installed")) {
+			strings.Contains(extractedErr, "Error: Module not installed") ||
+			strings.Contains(extractedErr, "Error: Terraform Cloud initialization required") ||
+			strings.Contains(extractedErr, "please run \"terraform init\"")) {
 			spinner.Stop()
 			err = p.runInit(opts, ui.NewSpinner("Running terraform init", p.spinnerOpts))
 			if err != nil {
@@ -451,6 +453,11 @@ func shortTerraformVersion(full string) string {
 }
 
 func checkTerraformVersion(v string, fullV string) error {
+	if len(v) > 0 && v[0] != 'v' {
+		// The semver package requires a 'v' prefix to do a proper Compare.
+		v = "v" + v
+	}
+
 	if strings.HasPrefix(fullV, "Terraform ") && semver.Compare(v, minTerraformVer) < 0 {
 		return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
 	}

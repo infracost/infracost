@@ -41,6 +41,8 @@ type projectResult = struct {
 	projects []*schema.Project
 }
 
+var validRunFormats = []string{"json", "table", "html"}
+
 func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
 
@@ -329,6 +331,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	spinnerOpts := ui.SpinnerOptions{
 		EnableLogging: runCtx.Config.IsLogging(),
 		NoColor:       runCtx.Config.NoColor,
+		Indent:        "  ",
 	}
 	spinner := ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
 	defer spinner.Fail()
@@ -524,6 +527,12 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	cfg.NoCache, _ = cmd.Flags().GetBool("no-cache")
 
 	cfg.Format, _ = cmd.Flags().GetString("format")
+
+	if cfg.Format != "" && !contains(validRunFormats, cfg.Format) {
+		ui.PrintUsage(cmd)
+		return fmt.Errorf("--format only supports %s", strings.Join(validRunFormats, ", "))
+	}
+
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
 

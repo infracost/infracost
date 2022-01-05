@@ -21,6 +21,8 @@ import (
 var minOutputVersion = "0.2"
 var maxOutputVersion = "0.2"
 
+var validOutputFormats = []string{"table", "diff", "json", "html", "github-comment", "gitlab-comment", "azure-repos-comment", "slack-message"}
+
 func outputCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "output",
@@ -44,9 +46,21 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
   Create markdown report to post in a GitLab comment:
 
-      infracost output --format gitlab-comment --path "out*.json" # glob needs quotes`,
+      infracost output --format gitlab-comment --path "out*.json" # glob needs quotes
+
+  Create markdown report to post in a Azure DevOps Repos comment:
+
+      infracost output --format azure-repos-comment --path "out*.json" # glob needs quotes`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			format, _ := cmd.Flags().GetString("format")
+			ctx.SetContextValue("outputFormat", format)
+
+			if format != "" && !contains(validOutputFormats, format) {
+				ui.PrintUsage(cmd)
+				return fmt.Errorf("--format only supports %s", strings.Join(validOutputFormats, ", "))
+			}
+
 			inputFiles := []string{}
 
 			paths, _ := cmd.Flags().GetStringArray("path")
@@ -96,9 +110,6 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				})
 			}
 
-			format, _ := cmd.Flags().GetString("format")
-			ctx.SetContextValue("outputFormat", format)
-
 			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
 
@@ -143,6 +154,15 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			if cmd.Flags().Changed("fields") && !contains(validFieldsFormats, format) {
 				ui.PrintWarning(cmd.ErrOrStderr(), "fields is only supported for table and html output formats")
 			}
+
+			if ctx.Config.EnableDashboard {
+				if ctx.Config.IsSelfHosted() {
+					ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+				}
+
+				combined.RunID, combined.ShareURL = shareRun(ctx, combined, inputs)
+			}
+
 			switch strings.ToLower(format) {
 			case "json":
 				b, err = output.ToJSON(combined, opts)
@@ -150,7 +170,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				b, err = output.ToHTML(combined, opts)
 			case "diff":
 				b, err = output.ToDiff(combined, opts)
-			case "github-comment", "gitlab-comment":
+			case "github-comment", "gitlab-comment", "azure-repos-comment":
 				opts.IncludeHTML = true
 				b, err = output.ToMarkdown(combined, opts)
 			case "slack-message":
@@ -184,7 +204,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
 
-	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, slack-message")
+	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, slack-message")
 	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
 
@@ -192,10 +212,38 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	_ = cmd.MarkFlagFilename("path", "json")
 
 	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"table", "json", "html"}, cobra.ShellCompDirectiveDefault
+		return validOutputFormats, cobra.ShellCompDirectiveDefault
 	})
 
 	return cmd
+}
+
+func shareRun(ctx *config.RunContext, combined output.Root, inputs []output.ReportInput) (string, string) {
+	if len(inputs) == 1 && inputs[0].Root.RunID != "" {
+		result := inputs[0].Root
+		return result.RunID, result.ShareURL
+	}
+
+	projectContexts := make([]*config.ProjectContext, len(combined.Projects))
+	for i := range combined.Projects {
+		projectContexts[i] = config.EmptyProjectContext()
+	}
+
+	combinedRunIds := []string{}
+	for _, input := range inputs {
+		if id := input.Root.RunID; id != "" {
+			combinedRunIds = append(combinedRunIds, id)
+		}
+	}
+	ctx.SetContextValue("runIds", combinedRunIds)
+
+	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
+	result, err := dashboardClient.AddRun(ctx, projectContexts, combined)
+	if err != nil {
+		log.Errorf("Error reporting run: %s", err)
+	}
+
+	return result.RunID, result.ShareURL
 }
 
 func checkCurrency(inputCurrency, fileCurrency string) (string, error) {

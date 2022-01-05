@@ -29,6 +29,7 @@ type AddRunResponse struct {
 
 type runInput struct {
 	ProjectResults []projectResultInput   `json:"projectResults"`
+	Currency       string                 `json:"currency"`
 	TimeGenerated  time.Time              `json:"timeGenerated"`
 	Metadata       map[string]interface{} `json:"metadata"`
 }
@@ -94,6 +95,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 	v := map[string]interface{}{
 		"run": runInput{
 			ProjectResults: projectResultInputs,
+			Currency:       out.Currency,
 			TimeGenerated:  out.TimeGenerated,
 			Metadata:       ctx.ContextValues(),
 		},

@@ -8,7 +8,7 @@ import (
 func GetLoggingProjectSinkRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_logging_project_sink",
-		RFunc: NewLoggingOrganizationSink,
+		RFunc: NewLoggingProjectSink,
 	}
 }
 

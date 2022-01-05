@@ -57,7 +57,7 @@ type Config struct {
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
 
-	TLSInsecureSkipVerify bool   `envconfig:"INFRACOST_TLS_INSECURE_SKIP_VERIFY"`
+	TLSInsecureSkipVerify *bool  `envconfig:"INFRACOST_TLS_INSECURE_SKIP_VERIFY"`
 	TLSCACertFile         string `envconfig:"INFRACOST_TLS_CA_CERT_FILE"`
 
 	Currency string `envconfig:"INFRACOST_CURRENCY"`

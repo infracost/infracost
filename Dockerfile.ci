@@ -26,7 +26,8 @@ RUN npm install -g @infracost/compost
 WORKDIR /root/
 
 # Scripts are used by CI integrations and other use-cases
-COPY scripts/comment.sh /scripts/comment
+COPY scripts/ci/comment.sh /scripts/ci/
+
 COPY --from=builder /app/build/infracost /usr/bin/
 
 ENV INFRACOST_CI_IMAGE=true

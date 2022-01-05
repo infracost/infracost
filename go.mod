@@ -7,13 +7,13 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/Rhymond/go-money v1.0.3
-	github.com/aws/aws-sdk-go-v2 v1.11.1
+	github.com/aws/aws-sdk-go-v2 v1.11.2
 	github.com/aws/aws-sdk-go-v2/config v1.10.3
-	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.16.0
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.12.0
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.9.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.24.0
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.20.0
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.17.0
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.13.0
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.11.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.26.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.22.0
 	github.com/awslabs/goformation/v4 v4.19.5
 	github.com/briandowns/spinner v1.15.0
 	github.com/dave/dst v0.26.2
@@ -50,7 +50,7 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2/service/eks v1.15.0
+	github.com/aws/aws-sdk-go-v2/service/eks v1.16.0
 	github.com/hashicorp/terraform-config-inspect v0.0.0-20210625153042-09f34846faab
 	golang.org/x/sys v0.0.0-20210923061019-b8560ed6a9b7 // indirect
 )
@@ -61,12 +61,12 @@ require (
 	github.com/apparentlymart/go-textseg/v12 v12.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.6.3 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.8.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.1 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.2 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.5.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.3.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.5.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.9.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.3.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.5.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.9.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.6.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.11.0 // indirect
 	github.com/aws/smithy-go v1.9.0 // indirect
@@ -96,14 +96,13 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.0.0 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.1 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.2 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
-require (
-	github.com/alecthomas/jsonschema v0.0.0-20211209230136-e2b41affa5c1 // indirect
-	github.com/iancoleman/orderedmap v0.2.0 // indirect
-)
+require github.com/alecthomas/jsonschema v0.0.0-20211209230136-e2b41affa5c1
+
+require github.com/iancoleman/orderedmap v0.2.0 // indirect
 
 replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e

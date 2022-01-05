@@ -16,7 +16,7 @@ type Configuration struct {
 	Version               string `yaml:"version"`
 	Currency              string `yaml:"currency,omitempty"`
 	EnableDashboard       *bool  `yaml:"enable_dashboard,omitempty"`
-	TLSInsecureSkipVerify *bool  `yaml:"tls_insecure_skip_verify"`
+	TLSInsecureSkipVerify *bool  `yaml:"tls_insecure_skip_verify,omitempty"`
 	TLSCACertFile         string `yaml:"tls_ca_cert_file,omitempty"`
 }
 
@@ -46,7 +46,7 @@ func loadConfiguration(cfg *Config) error {
 	}
 
 	if cfg.Configuration.TLSInsecureSkipVerify != nil {
-		cfg.TLSInsecureSkipVerify = *cfg.Configuration.TLSInsecureSkipVerify
+		cfg.TLSInsecureSkipVerify = cfg.Configuration.TLSInsecureSkipVerify
 	}
 
 	if cfg.TLSCACertFile == "" {
