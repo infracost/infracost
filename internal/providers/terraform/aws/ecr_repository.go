@@ -1,42 +1,18 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
-
-	"github.com/shopspring/decimal"
 )
 
-func GetECRRegistryItem() *schema.RegistryItem {
+func getECRRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_ecr_repository",
-		RFunc: NewECRRepository,
+		RFunc: NewEcrRepository,
 	}
 }
-
-func NewECRRepository(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
-
-	var storageSize *decimal.Decimal
-
-	if u != nil && u.Get("storage_gb").Exists() {
-		storageSize = decimalPtr(decimal.NewFromFloat(u.Get("storage_gb").Float()))
-	}
-
-	return &schema.Resource{
-		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:            "Storage",
-				Unit:            "GB",
-				UnitMultiplier:  decimal.NewFromInt(1),
-				MonthlyQuantity: storageSize,
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
-					Service:       strPtr("AmazonECR"),
-					ProductFamily: strPtr("EC2 Container Registry"),
-				},
-			},
-		},
-	}
+func NewEcrRepository(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.EcrRepository{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	r.PopulateUsage(u)
+	return r.BuildResource()
 }

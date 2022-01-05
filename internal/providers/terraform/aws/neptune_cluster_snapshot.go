@@ -41,3 +41,36 @@ func NewNeptuneClusterSnapshot(d *schema.ResourceData, u *schema.UsageData) *sch
 		CostComponents: []*schema.CostComponent{backupCostComponent(u, region)},
 	}
 }
+
+// Delete after migration
+func backupCostComponent(u *schema.UsageData, region string) *schema.CostComponent {
+
+	var backupStorage *decimal.Decimal
+	if u != nil && u.Get("backup_storage_gb").Type != gjson.Null {
+		backupStorage = decimalPtr(decimal.NewFromInt(u.Get("backup_storage_gb").Int()))
+	}
+
+	return neptuneClusterBackupCostComponent(region, backupStorage)
+}
+
+// Delete after migration
+func neptuneClusterBackupCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+
+		Name:            "Backup storage",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Region:     strPtr(region),
+			Service:    strPtr("AmazonNeptune"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/BackupUsage$/i")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
