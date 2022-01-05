@@ -17,7 +17,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-var PROVIDER string = "aws"
+var PROVIDER string = "google"
 
 type duStruct struct {
 	fieldType     string // Bool, String, Int, Float, Exists
