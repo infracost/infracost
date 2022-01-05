@@ -7,7 +7,7 @@
 
 <a href="https://www.infracost.io/docs/"><img alt="Getting started" src="https://img.shields.io/badge/get%20started-blue?style=for-the-badge&logo=read-the-docs&label=docs"/></a> 
 
-Infracost shows cloud cost estimates for infrastructure-as-code projects such as Terraform. It helps DevOps, SRE and developers to quickly see a cost breakdown and compare different options upfront.
+Infracost shows cloud cost estimates for Terraform projects. It enables DevOps, SRE and engineers to quickly see a cost breakdown and compare different options upfront, either in their terminal or pull requests.
 
 #### Show full breakdown of costs
 
@@ -65,7 +65,7 @@ As mentioned in our [FAQ](https://www.infracost.io/docs/faq), no cloud credentia
 
 ## CI/CD integrations
 
-Infracost's [CI/CD integrations](https://www.infracost.io/docs/integrations/cicd) can be used to automatically add a pull request comment showing the diff of monthly costs between the current and planned state. We have integrations for GitHub Actions, GitLab CI, Atlantis, Azure DevOps, CircleCI, Bitbucket Pipelines and Jenkins.
+Infracost's CI/CD integrations can be used to automatically add a pull request comment showing the diff of monthly costs between the current and planned state. We have integrations for [GitHub Actions](https://www.infracost.io/docs/integrations/github_actions/), [GitLab CI](https://www.infracost.io/docs/integrations/gitlab_ci/), [Atlantis](https://www.infracost.io/docs/integrations/atlantis/), [Terraform Cloud Run Tasks](https://www.infracost.io/docs/integrations/terraform_cloud_enterprise/), [Azure DevOps](https://www.infracost.io/docs/integrations/cicd/#azure-devops), [CircleCI](https://www.infracost.io/docs/integrations/cicd/#circleci), [Bitbucket Pipelines](https://www.infracost.io/docs/integrations/cicd/#bitbucket-pipelines), and [Jenkins](https://www.infracost.io/docs/integrations/cicd/#jenkins).
 
 If you run into any issues with CI/CD integrations, please join our [community Slack channel](https://www.infracost.io/community-chat), we'd be happy to guide you through it.
 
