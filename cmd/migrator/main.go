@@ -79,6 +79,7 @@ func strCamelCaseHelper(str string) string {
 	res = strings.Replace(res, "Cpu", "CPU", -1)
 	res = strings.Replace(res, "Api", "API", -1)
 	res = strings.Replace(res, "Id", "ID", -1)
+	res = strings.Replace(res, "Dns", "DNS", -1)
 	return res
 }
 func strLowerCamelCaseHelper(str string) string {
@@ -86,6 +87,7 @@ func strLowerCamelCaseHelper(str string) string {
 	res = strings.Replace(res, "Cpu", "CPU", -1)
 	res = strings.Replace(res, "Api", "API", -1)
 	res = strings.Replace(res, "Id", "ID", -1)
+	res = strings.Replace(res, "Dns", "DNS", -1)
 	return res
 }
 
