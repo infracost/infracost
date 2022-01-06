@@ -17,7 +17,8 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-var PROVIDER string = "google"
+var PROVIDER string = "azure"
+var PROVIDER_TF string = "azurerm"
 
 type duStruct struct {
 	fieldType     string // Bool, String, Int, Float, Exists
@@ -379,7 +380,7 @@ func getResourceFuncName(registryFuncName string, file *ast.File) (string, strin
 								}
 							} else if keyIdent.Name == "Name" {
 								if valueLit, ok := keyValExpr.Value.(*ast.BasicLit); ok {
-									resourceName = strings.Replace(valueLit.Value, fmt.Sprintf("%s_", PROVIDER), "", -1)
+									resourceName = strings.Replace(valueLit.Value, fmt.Sprintf("%s_", PROVIDER_TF), "", -1)
 									resourceName = strings.Replace(resourceName, "\"", "", -1)
 								}
 							}
@@ -675,7 +676,7 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 			},
 		})
 		var defaultValue string
-		usageDefaultValues := referenceFile.FindMatchingResourceUsage(fmt.Sprintf("%s_%s.foo", PROVIDER, resourceName))
+		usageDefaultValues := referenceFile.FindMatchingResourceUsage(fmt.Sprintf("%s_%s.foo", PROVIDER_TF, resourceName))
 		if usageDefaultValues == nil {
 			log.Fatalf("nil usageData for: %s", resourceName)
 		}
