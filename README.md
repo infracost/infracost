@@ -1,13 +1,79 @@
 [![Infracost logo](.github/assets/logo.svg)](https://www.infracost.io)
 
+
+<a href="https://www.infracost.io/docs/"><img alt="Docs" src="https://img.shields.io/badge/docs-Get%20started-brightgreen"/></a>
 <a href="https://www.infracost.io/community-chat"><img alt="Community Slack channel" src="https://img.shields.io/badge/chat-Slack-%234a154b"/></a>
 <a href="https://github.com/infracost/infracost/actions?query=workflow%3AGo+branch%3Amaster"><img alt="Build Status" src="https://img.shields.io/github/workflow/status/infracost/infracost/Go/master"/></a>
-<a href="https://hub.docker.com/r/infracost/infracost/tags"><img alt="Docker Image" src="https://img.shields.io/docker/cloud/build/infracost/infracost"/></a>
-<a href="https://twitter.com/intent/tweet?text=Get%20cost%20estimates%20for%20cloud%20infrastructure%20in%20pull%20requests!&url=https://www.infracost.io&hashtags=cloud,cost,aws,IaC,terraform"><img alt="Tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
+<a href="https://www.infracost.io/docs/integrations/cicd/#docker-images"><img alt="Docker Image" src="https://img.shields.io/docker/cloud/build/infracost/infracost"/></a>
+<a href="https://twitter.com/intent/tweet?text=Get%20cost%20estimates%20for%20Terraform%20in%20pull%20requests!&url=https://www.infracost.io&hashtags=cloud,cost,terraform"><img alt="Tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
 
-<a href="https://www.infracost.io/docs/"><img alt="Getting started" src="https://img.shields.io/badge/get%20started-blue?style=for-the-badge&logo=read-the-docs&label=docs"/></a> 
+Infracost shows cloud cost estimates for Terraform. It enables DevOps, SRE and engineers to see a cost breakdown and understand costs **before making changes**, either in the terminal or pull requests. This provides your team with a safety net as people can discuss costs as part of the workflow.
 
-Infracost shows cloud cost estimates for Terraform projects. It enables DevOps, SRE and engineers to quickly see a cost breakdown and compare different options upfront, either in their terminal or pull requests.
+<img src="https://raw.githubusercontent.com/infracost/actions/master/.github/assets/screenshot.png" alt="Infracost in GitHub Actions" width=800 />
+
+## Quick start
+
+### 1. Install Infracost
+
+Assuming [Terraform](https://www.terraform.io/downloads.html) is already installed, get the latest Infracost release:
+
+macOS Homebrew:
+```sh
+brew install infracost
+```
+
+Linux/macOS manual download:
+```sh
+# Downloads the CLI based on your OS/arch and puts it in /usr/local/bin
+curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
+```
+
+Docker and Windows users see [here](https://www.infracost.io/docs/#quick-start).
+
+### 2. Get API key
+
+Register for a free API key, which is used by the CLI to query our Cloud Pricing API, e.g. get prices for instance types. No cloud credentials or secrets are [sent](https://www.infracost.io/docs/faq/#what-data-is-sent-to-the-cloud-pricing-api) to the API and you can also self-host it. 
+
+```sh
+infracost register
+```
+
+The key can be retrieved with `infracost configure get api_key`.
+
+### 3. Run it
+
+Infracost does not make any changes to your Terraform state or cloud resources. Run Infracost using our example Terraform project to see how it works:
+
+```sh
+git clone https://github.com/infracost/example-terraform.git
+cd example-terraform/sample1
+
+# Play with main.tf and re-run to compare costs
+infracost breakdown --path .
+
+# Show diff of monthly costs, edit the yml file and re-run to compare costs
+infracost diff --path . --sync-usage-file --usage-file infracost-usage.yml
+```
+
+Screenshots of example outputs are [shown below](#cli-commands).
+
+### 4. Add to CI/CD
+
+Use our CI/CD integrations to add cost estimates to pull requests. This provides your team with a safety net as people can understand cloud costs upfront, and discuss them as part of your workflow.
+- [GitHub Actions](https://www.infracost.io/docs/integrations/github_actions/)
+- [GitLab CI](https://www.infracost.io/docs/integrations/gitlab_ci/)
+- [Atlantis](https://www.infracost.io/docs/integrations/atlantis/)
+- [Terraform Cloud/Enterprise](https://www.infracost.io/docs/integrations/terraform_cloud_enterprise/)
+- [Azure DevOps](https://www.infracost.io/docs/integrations/cicd/#azure-devops)
+- [Jenkins](https://www.infracost.io/docs/integrations/cicd/#jenkins)
+- [Bitbucket Pipelines](https://www.infracost.io/docs/integrations/cicd/#bitbucket-pipelines)
+- [CircleCI](https://www.infracost.io/docs/integrations/cicd/#circleci)
+
+Other CI/CD systems can be supported using [our Docker images](/docs/integrations/cicd/#docker-images). If you run into any issues, please join our [community Slack channel](https://www.infracost.io/community-chat), we'd be happy to help!
+
+## CLI commands
+
+The `infracost` CLI has the following main commands, see [our docs](https://www.infracost.io/docs/features/cli_commands/) for the other commands:
 
 #### Show full breakdown of costs
 
@@ -17,65 +83,9 @@ Infracost shows cloud cost estimates for Terraform projects. It enables DevOps, 
 
 <img src=".github/assets/diff_screenshot.png" alt="Infracost diff command" width=600 />
 
-## Quick start
-
-1. Assuming [Terraform](https://www.terraform.io/downloads.html) is already installed, get the latest Infracost release:
-
-    macOS Homebrew:
-    ```sh
-    brew install infracost
-    ```
-
-    Linux/macOS manual download:
-    ```sh
-    # Downloads the CLI based on your OS/arch and puts it in /usr/local/bin
-    curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
-    ```
-
-    Docker and Windows users see [here](https://www.infracost.io/docs/#quick-start).
-
-2.	Register for a free API key:
-    ```sh
-    infracost register
-    ```
-
-    The key is saved in `~/.config/infracost/credentials.yml`.
-
-3.  Run Infracost using our example Terraform project to see how it works:
-    ```sh
-    git clone https://github.com/infracost/example-terraform.git
-    cd example-terraform/sample1
-
-    # Play with main.tf and re-run to compare costs
-    infracost breakdown --path .
-
-    # Show diff of monthly costs, edit the yml file and re-run to compare costs
-    infracost diff --path . --sync-usage-file --usage-file infracost-usage.yml
-    ```
-
-Please **watch/star** this repo as we add new cloud resources every week or so.
-
-## Usage
-
-The `infracost` CLI has the following main commands, their usage is described in our short [**getting started**](https://www.infracost.io/docs/#usage) page:
-- `breakdown`: show full breakdown of costs
-- `diff`: show diff of monthly costs between current and planned state
-
-As mentioned in our [FAQ](https://www.infracost.io/docs/faq), no cloud credentials or secrets are sent to the Cloud Pricing API. Infracost does not make any changes to your Terraform state or cloud resources.
-
-## CI/CD integrations
-
-Infracost's CI/CD integrations can be used to automatically add a pull request comment showing the diff of monthly costs between the current and planned state. We have integrations for [GitHub Actions](https://www.infracost.io/docs/integrations/github_actions/), [GitLab CI](https://www.infracost.io/docs/integrations/gitlab_ci/), [Atlantis](https://www.infracost.io/docs/integrations/atlantis/), [Terraform Cloud Run Tasks](https://www.infracost.io/docs/integrations/terraform_cloud_enterprise/), [Azure DevOps](https://www.infracost.io/docs/integrations/cicd/#azure-devops), [CircleCI](https://www.infracost.io/docs/integrations/cicd/#circleci), [Bitbucket Pipelines](https://www.infracost.io/docs/integrations/cicd/#bitbucket-pipelines), and [Jenkins](https://www.infracost.io/docs/integrations/cicd/#jenkins).
-
-If you run into any issues with CI/CD integrations, please join our [community Slack channel](https://www.infracost.io/community-chat), we'd be happy to guide you through it.
-
-<img src="https://raw.githubusercontent.com/infracost/actions/master/.github/assets/screenshot.png" alt="Infracost in GitHub Actions" />
-
 ## Supported clouds and resources
 
 Infracost supports over **200** Terraform resources across [AWS](https://www.infracost.io/docs/supported_resources/aws), [Azure](https://www.infracost.io/docs/supported_resources/azure) and [Google](https://www.infracost.io/docs/supported_resources/google). Other IaC tools, such as [Pulumi](https://github.com/infracost/infracost/issues/187), [AWS CloudFormation/CDK](https://github.com/infracost/infracost/issues/190) and [Azure ARM/Bicep](https://github.com/infracost/infracost/issues/812) are on our roadmap.
-
-We regularly add support for new resources so we recommend watching this repo for releases: click on the Watch button > selecting Custom > Releases and click on Apply.
 
 See [this page](https://www.infracost.io/docs/usage_based_resources) for details on cost estimation of usage-based resources such as AWS Lambda or Google Cloud Storage.
 
