@@ -32,7 +32,7 @@ func S3FindMetricsFilter(ctx context.Context, region string, bucket string) (str
 	if err != nil {
 		return "", err
 	}
-	log.Debugf("Querying AWS EKS API: DescribeNodegroup(region: %s, Bucket: %s)", region, bucket)
+	log.Debugf("Querying AWS S3 API: ListBucketMetricsConfigurations(region: %s, Bucket: %s)", region, bucket)
 	result, err := client.ListBucketMetricsConfigurations(ctx, &s3.ListBucketMetricsConfigurationsInput{
 		Bucket: strPtr(bucket),
 	})
