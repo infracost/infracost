@@ -22,7 +22,7 @@ var PROVIDER_TF string = "aws"
 
 var STRICT_MODE = false
 var SINGLE_MODE = true
-var SINGLE_RESOURCE_NAME = "cloudformation_stack.go"
+var SINGLE_RESOURCE_NAME = "cloudformation_stack_set.go"
 
 type duStruct struct {
 	fieldType     string // Bool, String, Int, Float, Exists
