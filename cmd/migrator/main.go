@@ -17,8 +17,12 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-var PROVIDER string = "azure"
-var PROVIDER_TF string = "azurerm"
+var PROVIDER string = "aws"
+var PROVIDER_TF string = "aws"
+
+var STRICT_MODE = false
+var SINGLE_MODE = true
+var SINGLE_RESOURCE_NAME = "cloudformation_stack.go"
 
 type duStruct struct {
 	fieldType     string // Bool, String, Int, Float, Exists
@@ -42,19 +46,25 @@ func main() {
 	allCount := 0
 	migratedCount := 0
 	problemFiles := make([]string, 0)
-	for _, file := range files {
-		if file.IsDir() {
-			continue
+	fileNames := make([]string, 0)
+	if SINGLE_MODE {
+		fileNames = append(fileNames, SINGLE_RESOURCE_NAME)
+	} else {
+		for _, file := range files {
+			if file.IsDir() {
+				continue
+			}
+			if strings.Contains(file.Name(), "test") {
+				continue
+			}
+			fileNames = append(fileNames, file.Name())
 		}
-		if strings.Contains(file.Name(), "test") {
-			continue
-		}
-		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
+	}
+	for _, fileName := range fileNames {
+		filePath := fmt.Sprintf("%s%s", basePath, fileName)
 		fmt.Println(filePath)
 
-		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
-		// isMigrated, err := migrateFile("internal/providers/terraform/azure/event_hubs_namespace.go", referenceFile, "internal/providers/terraform/azure/", "event_hubs_namespace.go")
-		// break
+		isMigrated, err := migrateFile(filePath, referenceFile, basePath, fileName)
 
 		if err != nil && err.Error() == "manually migrated" {
 			continue
