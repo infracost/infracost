@@ -50,9 +50,10 @@ func main() {
 			continue
 		}
 		filePath := fmt.Sprintf("%s%s", basePath, file.Name())
+		fmt.Println(filePath)
 
 		isMigrated, err := migrateFile(filePath, referenceFile, basePath, file.Name())
-		// isMigrated, err := migrateFile("internal/providers/terraform/aws/cloudwatch_log_group.go", referenceFile, "internal/providers/terraform/aws/", "cloudwatch_log_group.go")
+		// isMigrated, err := migrateFile("internal/providers/terraform/azure/event_hubs_namespace.go", referenceFile, "internal/providers/terraform/azure/", "event_hubs_namespace.go")
 		// break
 
 		if err != nil && err.Error() == "manually migrated" {
@@ -693,11 +694,27 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 					} else {
 						defaultValue = fmt.Sprintf("%d", usageItem.DefaultValue.(int))
 					}
+				case "Bool":
+					defaultValue = fmt.Sprintf("%t", usageItem.DefaultValue.(bool))
 				}
+
 			}
 		}
 		if defaultValue == "" {
-			log.Fatal("Empty default value")
+			log.Fatal(fmt.Sprintf("Empty default value for %s", key))
+		}
+		dfValExpr := &ast.KeyValueExpr{
+			Key: &ast.Ident{Name: "DefaultValue"},
+		}
+		if duTypeToToken(val.fieldType) != token.NOT {
+			dfValExpr.Value = &ast.BasicLit{
+				Kind:  duTypeToToken(val.fieldType),
+				Value: defaultValue,
+			}
+		} else {
+			dfValExpr.Value = &ast.Ident{
+				Name: defaultValue,
+			}
 		}
 		usageElts = append(usageElts, &ast.CompositeLit{
 			Elts: []ast.Expr{
@@ -712,13 +729,7 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 						Sel: &ast.Ident{Name: duTypeToSchemaType(val.fieldType)},
 					},
 				},
-				&ast.KeyValueExpr{
-					Key: &ast.Ident{Name: "DefaultValue"},
-					Value: &ast.BasicLit{
-						Kind:  duTypeToToken(val.fieldType),
-						Value: defaultValue,
-					},
-				},
+				dfValExpr,
 			},
 		})
 	}
@@ -1368,6 +1379,8 @@ func duTypeToSchemaType(duType string) string {
 		return "Int64"
 	case "Float":
 		return "Float64"
+	case "Bool":
+		return "Bool"
 	default:
 		panic(fmt.Sprintf("Unsupported duTypeToSchemaType type %s", duType))
 	}
@@ -1381,6 +1394,8 @@ func duTypeToToken(duType string) token.Token {
 		return token.INT
 	case "Float":
 		return token.FLOAT
+	case "Bool":
+		return token.NOT
 	default:
 		panic(fmt.Sprintf("Unsupported duTypeToToken type %s", duType))
 	}
