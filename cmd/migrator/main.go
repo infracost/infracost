@@ -20,10 +20,10 @@ import (
 var PROVIDER string = "aws"
 var PROVIDER_TF string = "aws"
 
-var DRY_MODE = false
+var DRY_MODE = true
 var STRICT_MODE = false
-var SINGLE_MODE = true
-var SINGLE_RESOURCE_NAME = "codebuild_project.go"
+var SINGLE_MODE = false
+var SINGLE_RESOURCE_NAME = "elb.go"
 
 var FLEXIBLE_MODE_SKIP_DOTS = true
 
@@ -68,7 +68,7 @@ func main() {
 	}
 	for _, fileName := range fileNames {
 		filePath := fmt.Sprintf("%s%s", basePath, fileName)
-		fmt.Println(filePath)
+		// fmt.Println(filePath)
 
 		isMigrated, err := migrateFile(filePath, referenceFile, basePath, fileName)
 
@@ -98,6 +98,7 @@ func strCamelCaseHelper(str string) string {
 	res = strings.Replace(res, "Api", "API", -1)
 	res = strings.Replace(res, "Id", "ID", -1)
 	res = strings.Replace(res, "Dns", "DNS", -1)
+	res = strings.Replace(res, "Lb", "LB", -1)
 	res = strings.Replace(res, ".", "_", -1)
 	return res
 }
@@ -107,6 +108,7 @@ func strLowerCamelCaseHelper(str string) string {
 	res = strings.Replace(res, "Api", "API", -1)
 	res = strings.Replace(res, "Id", "ID", -1)
 	res = strings.Replace(res, "Dns", "DNS", -1)
+	res = strings.Replace(res, "Lb", "LB", -1)
 	res = strings.Replace(res, ".", "_", -1)
 	return res
 }
