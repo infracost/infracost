@@ -66,7 +66,11 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 
 	c.AddAuthHeaders(req)
 
-	transport := &http.Transport{TLSClientConfig: c.tlsConfig}
+	// Use the DefaultTransport since this handles the HTTP/HTTPS proxy and other defaults
+	// and add the TLS config that was passed into the client
+	transport := http.DefaultTransport.(*http.Transport)
+	transport.TLSClientConfig = c.tlsConfig
+
 	client := &http.Client{Transport: transport}
 	resp, err := client.Do(req)
 	if err != nil {
