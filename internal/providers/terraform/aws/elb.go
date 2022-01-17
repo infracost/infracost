@@ -12,7 +12,7 @@ func getELBRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewElb(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.Elb{Address: strPtr(d.Address)}
+	r := &aws.Elb{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }
