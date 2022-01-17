@@ -12,6 +12,7 @@ provider "aws" {
 resource "aws_vpn_connection" "vpn_connection" {
   customer_gateway_id = "dummy-customer-gateway-id"
   type                = "ipsec.1"
+  vpn_gateway_id      = "vpn-gateway-id"
 }
 
 resource "aws_vpn_connection" "transit" {
@@ -23,6 +24,7 @@ resource "aws_vpn_connection" "transit" {
 resource "aws_vpn_connection" "vpn_connection_withUsage" {
   customer_gateway_id = "dummy-customer-gateway-id2"
   type                = "ipsec.1"
+  vpn_gateway_id      = "vpn-gateway-id"
 }
 
 resource "aws_vpn_connection" "transit_withUsage" {
