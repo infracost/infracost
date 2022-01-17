@@ -20,9 +20,12 @@ import (
 var PROVIDER string = "aws"
 var PROVIDER_TF string = "aws"
 
+var DRY_MODE = false
 var STRICT_MODE = false
 var SINGLE_MODE = true
-var SINGLE_RESOURCE_NAME = "cloudformation_stack_set.go"
+var SINGLE_RESOURCE_NAME = "codebuild_project.go"
+
+var FLEXIBLE_MODE_SKIP_DOTS = true
 
 type duStruct struct {
 	fieldType     string // Bool, String, Int, Float, Exists
@@ -52,6 +55,9 @@ func main() {
 	} else {
 		for _, file := range files {
 			if file.IsDir() {
+				continue
+			}
+			if file.Name() == "registry.go" {
 				continue
 			}
 			if strings.Contains(file.Name(), "test") {
@@ -92,6 +98,7 @@ func strCamelCaseHelper(str string) string {
 	res = strings.Replace(res, "Api", "API", -1)
 	res = strings.Replace(res, "Id", "ID", -1)
 	res = strings.Replace(res, "Dns", "DNS", -1)
+	res = strings.Replace(res, ".", "_", -1)
 	return res
 }
 func strLowerCamelCaseHelper(str string) string {
@@ -100,6 +107,7 @@ func strLowerCamelCaseHelper(str string) string {
 	res = strings.Replace(res, "Api", "API", -1)
 	res = strings.Replace(res, "Id", "ID", -1)
 	res = strings.Replace(res, "Dns", "DNS", -1)
+	res = strings.Replace(res, ".", "_", -1)
 	return res
 }
 
@@ -124,7 +132,7 @@ func migrateFile(filePath string, referenceFile *usage.ReferenceFile, basePath, 
 	if isImpossibleWithGetsTypes(file) {
 		return false, errors.New("unknown d/u gets types")
 	}
-	if isImpossibleWithDotGets(file) {
+	if isImpossibleWithDotGets(file) && (STRICT_MODE || (!STRICT_MODE && !FLEXIBLE_MODE_SKIP_DOTS)) {
 		return false, errors.New("dotted d/u gets")
 	}
 
@@ -1463,7 +1471,9 @@ func duTypeToPtrCall(duType string) string {
 }
 
 func saveFile(fset *token.FileSet, file *ast.File, filePath string) error {
-	// return nil
+	if DRY_MODE {
+		return nil
+	}
 	f, err := os.Create(filePath)
 	defer f.Close()
 
