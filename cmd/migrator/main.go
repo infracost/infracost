@@ -20,12 +20,13 @@ import (
 var PROVIDER string = "aws"
 var PROVIDER_TF string = "aws"
 
-var DRY_MODE = true
+var DRY_MODE = false
 var STRICT_MODE = false
 var SINGLE_MODE = false
-var SINGLE_RESOURCE_NAME = "elb.go"
+var SINGLE_RESOURCE_NAME = "cloudwatch_metric_alarm.go"
 
 var FLEXIBLE_MODE_SKIP_DOTS = true
+var FLEXIBLE_MODE_SKIP_TYPES = true
 
 type duStruct struct {
 	fieldType     string // Bool, String, Int, Float, Exists
@@ -131,7 +132,7 @@ func migrateFile(filePath string, referenceFile *usage.ReferenceFile, basePath, 
 	if isImpossibleWithResourceDefsCount(file) {
 		return false, errors.New("multiple resource defs")
 	}
-	if isImpossibleWithGetsTypes(file) {
+	if isImpossibleWithGetsTypes(file) && (STRICT_MODE || (!STRICT_MODE && !FLEXIBLE_MODE_SKIP_TYPES)) {
 		return false, errors.New("unknown d/u gets types")
 	}
 	if isImpossibleWithDotGets(file) && (STRICT_MODE || (!STRICT_MODE && !FLEXIBLE_MODE_SKIP_DOTS)) {
@@ -721,7 +722,11 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 			}
 		}
 		if defaultValue == "" {
-			log.Fatal(fmt.Sprintf("Empty default value for %s", key))
+			if STRICT_MODE {
+				log.Fatal(fmt.Sprintf("Empty default value for %s", key))
+			} else {
+				defaultValue = "UNKNOWN"
+			}
 		}
 		dfValExpr := &ast.KeyValueExpr{
 			Key: &ast.Ident{Name: "DefaultValue"},
@@ -730,6 +735,10 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 			dfValExpr.Value = &ast.BasicLit{
 				Kind:  duTypeToToken(val.fieldType),
 				Value: defaultValue,
+			}
+		} else if duTypeToToken(val.fieldType) == token.BREAK {
+			dfValExpr.Value = &ast.Ident{
+				Name: "UNKNOWN",
 			}
 		} else {
 			dfValExpr.Value = &ast.Ident{
@@ -1402,7 +1411,11 @@ func duTypeToSchemaType(duType string) string {
 	case "Bool":
 		return "Bool"
 	default:
-		panic(fmt.Sprintf("Unsupported duTypeToSchemaType type %s", duType))
+		if !STRICT_MODE && FLEXIBLE_MODE_SKIP_TYPES {
+			return "UNKNOWN"
+		} else {
+			panic(fmt.Sprintf("Unsupported duTypeToSchemaType type %s", duType))
+		}
 	}
 }
 
@@ -1417,7 +1430,11 @@ func duTypeToToken(duType string) token.Token {
 	case "Bool":
 		return token.NOT
 	default:
-		panic(fmt.Sprintf("Unsupported duTypeToToken type %s", duType))
+		if !STRICT_MODE && FLEXIBLE_MODE_SKIP_TYPES {
+			return token.BREAK
+		} else {
+			panic(fmt.Sprintf("Unsupported duTypeToToken type %s", duType))
+		}
 	}
 }
 
@@ -1434,7 +1451,11 @@ func duTypeToASTType(duType string) string {
 	case "Exists":
 		return "string"
 	default:
-		panic(fmt.Sprintf("Unsupported duTypeToASTType type %s", duType))
+		if !STRICT_MODE && FLEXIBLE_MODE_SKIP_TYPES {
+			return "UNKNOWN"
+		} else {
+			panic(fmt.Sprintf("Unsupported duTypeToASTType type %s", duType))
+		}
 	}
 }
 
@@ -1451,7 +1472,11 @@ func duTypeToResCall(duType string) string {
 	case "Exists":
 		return "String"
 	default:
-		panic(fmt.Sprintf("Unsupported duTypeToResCall type %s", duType))
+		if !STRICT_MODE && FLEXIBLE_MODE_SKIP_TYPES {
+			return "UNKNOWN"
+		} else {
+			panic(fmt.Sprintf("Unsupported duTypeToResCall type %s", duType))
+		}
 	}
 }
 
@@ -1468,7 +1493,11 @@ func duTypeToPtrCall(duType string) string {
 	case "Exists":
 		return "strPtr"
 	default:
-		panic(fmt.Sprintf("Unsupported duTypeToPtrCall type %s", duType))
+		if !STRICT_MODE && FLEXIBLE_MODE_SKIP_TYPES {
+			return "UNKNOWN"
+		} else {
+			panic(fmt.Sprintf("Unsupported duTypeToPtrCall type %s", duType))
+		}
 	}
 }
 
