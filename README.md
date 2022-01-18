@@ -32,7 +32,7 @@ Docker and Windows users see [here](https://www.infracost.io/docs/#quick-start).
 
 ### 2. Get API key
 
-Register for a free API key, which is used by the CLI to query our Cloud Pricing API, e.g. get prices for instance types. No cloud credentials or secrets are [sent](https://www.infracost.io/docs/faq/#what-data-is-sent-to-the-cloud-pricing-api) to the API and you can also self-host it. 
+Register for a free API key, which is used by the CLI to query our Cloud Pricing API, e.g. get prices for instance types. No cloud credentials or secrets are [sent](https://www.infracost.io/docs/faq/#what-data-is-sent-to-the-cloud-pricing-api) to the API and you can also [self-host](https://www.infracost.io/docs/cloud_pricing_api/self_hosted/) it.
 
 ```sh
 infracost register
@@ -42,7 +42,7 @@ The key can be retrieved with `infracost configure get api_key`.
 
 ### 3. Run it
 
-Infracost does not make any changes to your Terraform state or cloud resources. Run Infracost using our example Terraform project to see how it works:
+Infracost does not make any changes to your Terraform state or cloud resources. Run Infracost using our example Terraform project to see how it works. The [CLI commands](https://www.infracost.io/docs/features/cli_commands/) page describes the options for `--path`, which can point to a Terraform directory or plan JSON file.
 
 ```sh
 git clone https://github.com/infracost/example-terraform.git

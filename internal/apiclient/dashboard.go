@@ -75,7 +75,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 	response := AddRunResponse{}
 
 	if !c.dashboardEnabled {
-		log.Debug("Skipping reporting project results since dashboard is not enabled")
+		log.Debug("Skipping sending project results to your dashboard since it is not enabled. Run 'infracost configure set enable_dashboard true' to enable it.")
 		return response, nil
 	}
 
