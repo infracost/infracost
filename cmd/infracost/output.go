@@ -2,24 +2,16 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 
-	"github.com/mitchellh/go-homedir"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"golang.org/x/mod/semver"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
 )
-
-var minOutputVersion = "0.2"
-var maxOutputVersion = "0.2"
 
 var validOutputFormats = []string{"table", "diff", "json", "html", "github-comment", "gitlab-comment", "azure-repos-comment", "slack-message"}
 
@@ -53,6 +45,8 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
       infracost output --format azure-repos-comment --path "out*.json" # glob needs quotes`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			var err error
+
 			format, _ := cmd.Flags().GetString("format")
 			ctx.SetContextValue("outputFormat", format)
 
@@ -61,53 +55,16 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				return fmt.Errorf("--format only supports %s", strings.Join(validOutputFormats, ", "))
 			}
 
-			inputFiles := []string{}
-
 			paths, _ := cmd.Flags().GetStringArray("path")
 
-			for _, path := range paths {
-				expanded, err := homedir.Expand(path)
-				if err != nil {
-					return errors.Wrap(err, "Failed to expand path")
-				}
-
-				matches, _ := filepath.Glob(expanded)
-				if len(matches) > 0 {
-					inputFiles = append(inputFiles, matches...)
-				} else {
-					inputFiles = append(inputFiles, path)
-				}
+			inputs, err := output.LoadPaths(paths)
+			if err != nil {
+				return err
 			}
 
-			inputs := make([]output.ReportInput, 0, len(inputFiles))
-			currency := ""
-
-			for _, f := range inputFiles {
-				data, err := os.ReadFile(f)
-				if err != nil {
-					return errors.Wrap(err, "Error reading JSON file")
-				}
-
-				j, err := output.Load(data)
-				if err != nil {
-					return errors.Wrap(err, "Error parsing JSON file")
-				}
-
-				if !checkOutputVersion(j.Version) {
-					return fmt.Errorf("Invalid Infracost JSON file version. Supported versions are %s ≤ x ≤ %s", minOutputVersion, maxOutputVersion)
-				}
-
-				currency, err = checkCurrency(currency, j.Currency)
-				if err != nil {
-					return err
-				}
-
-				inputs = append(inputs, output.ReportInput{
-					Metadata: map[string]string{
-						"filename": f,
-					},
-					Root: j,
-				})
+			combined, err := output.Combine(inputs)
+			if err != nil {
+				return err
 			}
 
 			includeAllFields := "all"
@@ -142,13 +99,6 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
-			combined := output.Combine(currency, inputs, opts)
-
-			var (
-				b   []byte
-				err error
-			)
-
 			validFieldsFormats := []string{"table", "html"}
 
 			if cmd.Flags().Changed("fields") && !contains(validFieldsFormats, format) {
@@ -162,6 +112,8 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
 				combined.RunID, combined.ShareURL = shareRun(ctx, combined, inputs)
 			}
+
+			var b []byte
 
 			switch strings.ToLower(format) {
 			case "json":
@@ -244,30 +196,6 @@ func shareRun(ctx *config.RunContext, combined output.Root, inputs []output.Repo
 	}
 
 	return result.RunID, result.ShareURL
-}
-
-func checkCurrency(inputCurrency, fileCurrency string) (string, error) {
-	if fileCurrency == "" {
-		fileCurrency = "USD" // default to USD
-	}
-
-	if inputCurrency == "" {
-		// this must be the first file, save the input currency
-		inputCurrency = fileCurrency
-	}
-
-	if inputCurrency != fileCurrency {
-		return "", fmt.Errorf("Invalid Infracost JSON file currency mismatch.  Can't combine %s and %s", inputCurrency, fileCurrency)
-	}
-
-	return inputCurrency, nil
-}
-
-func checkOutputVersion(v string) bool {
-	if !strings.HasPrefix(v, "v") {
-		v = "v" + v
-	}
-	return semver.Compare(v, "v"+minOutputVersion) >= 0 && semver.Compare(v, "v"+maxOutputVersion) <= 0
 }
 
 func contains(arr []string, e string) bool {
