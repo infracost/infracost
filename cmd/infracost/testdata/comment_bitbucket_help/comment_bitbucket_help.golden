@@ -23,6 +23,7 @@ FLAGS
       --dry-run                       Generate comment without actually posting to Bitbucket
   -h, --help                          help for bitbucket
   -p, --path stringArray              Path to Infracost JSON files, glob patterns need quotes
+      --policy-path stringArray       Paths to any Infracost cost policies (experimental)
       --pull-request int              Pull request number to post comment on
       --repo string                   Repository in format workspace/repo
       --tag string                    Customize special text used to detect comments posted by Infracost (placed at the bottom of a comment)

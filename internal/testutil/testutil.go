@@ -13,15 +13,12 @@ import (
 	"unicode"
 
 	"github.com/pmezard/go-difflib/difflib"
+	"github.com/shopspring/decimal"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/infracost/infracost/internal/config"
-
-	"github.com/stretchr/testify/assert"
-
 	"github.com/infracost/infracost/internal/schema"
-
-	"github.com/shopspring/decimal"
 )
 
 var update = flag.Bool("update", false, "update .golden files")
