@@ -124,8 +124,8 @@ func TestBreakdownTerragrunt(t *testing.T) {
 }
 
 func TestBreakdownTerragruntWithDashboardEnabled(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil, func(c *config.Config) {
-		c.EnableDashboard = true
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil, func(c *config.RunContext) {
+		c.Config.EnableDashboard = true
 	})
 }
 

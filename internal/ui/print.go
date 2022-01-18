@@ -3,10 +3,10 @@ package ui
 import (
 	"fmt"
 	"io"
-	"os"
+
+	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/version"
-	"github.com/spf13/cobra"
 )
 
 func PrintSuccess(w io.Writer, msg string) {
@@ -39,16 +39,39 @@ func PrintUsage(cmd *cobra.Command) {
 	cmd.Println("")
 }
 
-func PrintUnexpectedError(err interface{}, stack string) {
+var (
+	githubIssuesLink = LinkString("https://github.com/infracost/infracost/issues/new")
+
+	unexpectedErrorMsg = "An unexpected error occurred. We have been notified of this issue and will look into is ASAP. If you would like to follow-up, you can create a GitHub issue at"
+	stackErrorMsg      = "We have been notified of this issue and will look into is ASAP. Please copy the above output and create a new issue at:"
+)
+
+// PrintUnexpectedError prints a friendly user message to stdError.
+// This should be used only in case of fatal/unexpected errors.
+func PrintUnexpectedError(out io.Writer) {
+	msg := fmt.Sprintf("\nEnvironment:\n%s\n\n%s %s\n",
+		fmt.Sprintf("Infracost %s", version.Version),
+		unexpectedErrorMsg,
+		githubIssuesLink,
+	)
+
+	fmt.Fprint(out, msg)
+}
+
+// PrintUnexpectedErrorStack prints a full stack trace of a fatal error.
+//
+// In most cases PrintUnexpectedError function is suitable.
+// This function should be called if the log level is debug and users wish to get additional info.
+func PrintUnexpectedErrorStack(out io.Writer, err interface{}, stack string) {
 	msg := fmt.Sprintf("\n%s %s\n\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
 		ErrorString("Error:"),
 		"An unexpected error occurred",
 		err,
 		stack,
 		fmt.Sprintf("Infracost %s", version.Version),
-		"Please copy the above output and create a new issue at",
-		LinkString("https://github.com/infracost/infracost/issues/new"),
+		stackErrorMsg,
+		githubIssuesLink,
 	)
 
-	fmt.Fprint(os.Stderr, msg)
+	fmt.Fprint(out, msg)
 }
