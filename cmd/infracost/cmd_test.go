@@ -9,14 +9,19 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	main "github.com/infracost/infracost/cmd/infracost"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/testutil"
-	"github.com/stretchr/testify/require"
 )
 
-var timestampRegex = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)
-var outputPathRegex = regexp.MustCompile(`Output saved to .*`)
+var (
+	timestampRegex   = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)
+	outputPathRegex  = regexp.MustCompile(`Output saved to .*`)
+	urlRegex         = regexp.MustCompile(`https://dashboard.infracost.io/share/.*`)
+	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/infracost/examples/.*\)`)
+)
 
 type GoldenFileOptions = struct {
 	Currency    string
@@ -32,9 +37,9 @@ func DefaultOptions() *GoldenFileOptions {
 	}
 }
 
-func GoldenFileCommandTest(t *testing.T, testName string, args []string, options *GoldenFileOptions) {
-	if options == nil {
-		options = DefaultOptions()
+func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, configOptions ...func(*config.Config)) {
+	if testOptions == nil {
+		testOptions = DefaultOptions()
 	}
 
 	// Fix the VCS repo URL so the golden files don't fail on forks
@@ -48,8 +53,12 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 	outBuf := bytes.NewBuffer([]byte{})
 
 	runCtx.Config.EventsDisabled = true
-	runCtx.Config.Currency = options.Currency
+	runCtx.Config.Currency = testOptions.Currency
 	runCtx.Config.NoColor = true
+
+	for _, f := range configOptions {
+		f(runCtx.Config)
+	}
 
 	rootCmd := main.NewRootCommand(runCtx)
 	rootCmd.SetErr(errBuf)
@@ -57,7 +66,7 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 	rootCmd.SetArgs(args)
 
 	var logBuf *bytes.Buffer
-	if options.CaptureLogs {
+	if testOptions.CaptureLogs {
 		logBuf = testutil.ConfigureTestToCaptureLogs(t, runCtx)
 	} else {
 		testutil.ConfigureTestToFailOnLogs(t, runCtx)
@@ -68,7 +77,7 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 
 	cmdErr = rootCmd.Execute()
 
-	if options.IsJSON {
+	if testOptions.IsJSON {
 		prettyBuf := bytes.NewBuffer([]byte{})
 		err = json.Indent(prettyBuf, outBuf.Bytes(), "", "  ")
 		require.Nil(t, err)
@@ -109,6 +118,8 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 func stripDynamicValues(actual []byte) []byte {
 	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
 	actual = outputPathRegex.ReplaceAll(actual, []byte("Output saved to REPLACED_OUTPUT_PATH"))
+	actual = urlRegex.ReplaceAll(actual, []byte("https://dashboard.infracost.io/share/REPLACED_SHARE_CODE"))
+	actual = projectPathRegex.ReplaceAll(actual, []byte("$1 REPLACED_PROJECT_PATH"))
 
 	return actual
 }
