@@ -101,8 +101,6 @@ type Options struct {
 	DashboardEnabled bool
 	NoColor          bool
 	ShowSkipped      bool
-	GroupLabel       string
-	GroupKey         string
 	Fields           []string
 	IncludeHTML      bool
 }
