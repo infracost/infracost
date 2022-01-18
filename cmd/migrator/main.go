@@ -22,8 +22,8 @@ var PROVIDER_TF string = "aws"
 
 var DRY_MODE = false
 var STRICT_MODE = false
-var SINGLE_MODE = false
-var SINGLE_RESOURCE_NAME = "cloudwatch_metric_alarm.go"
+var SINGLE_MODE = true
+var SINGLE_RESOURCE_NAME = "waf_web_acl.go"
 
 var FLEXIBLE_MODE_SKIP_DOTS = true
 var FLEXIBLE_MODE_SKIP_TYPES = true
