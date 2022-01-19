@@ -52,7 +52,7 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 		return terraform.NewTerragruntProvider(ctx), nil
 	}
 
-	return nil, fmt.Errorf("Could not detect path type for %s", path)
+	return nil, fmt.Errorf("Could not detect path type for '%s'", path)
 }
 
 func isTerraformPlanJSON(path string) bool {

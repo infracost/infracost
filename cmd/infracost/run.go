@@ -233,12 +233,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	provider, err := providers.Detect(ctx)
 	if err != nil {
 		m := fmt.Sprintf("%s\n\n", err)
-		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
-
-		if cmd.Name() != "diff" {
-			m += "\n - Terraform state JSON file"
-		}
+		m += fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
 
 		return []*schema.Project{}, clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
 	}
@@ -322,6 +317,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 
 	projects, err := provider.LoadResources(usageData)
 	if err != nil {
+		cmd.PrintErrln()
 		return projects, err
 	}
 
@@ -336,7 +332,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	for _, project := range projects {
 		if err := prices.PopulatePrices(runCtx, project); err != nil {
 			spinner.Fail()
-			fmt.Fprintln(os.Stderr, "")
+			cmd.PrintErrln()
 
 			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
 				return projects, fmt.Errorf("%v\n%s %s %s %s %s\n%s",
@@ -381,7 +377,7 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx
 	usageFilePath := projectCfg.UsageFile
 	err := usage.CreateUsageFile(usageFilePath)
 	if err != nil {
-		return errors.Wrap(err, "Error creating  usage file")
+		return errors.Wrap(err, "Error creating usage file")
 	}
 
 	usageFile, err = usage.LoadUsageFile(usageFilePath)
