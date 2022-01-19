@@ -7,7 +7,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type Wafv2WebAcl struct {
+type Wafv2WebACL struct {
 	Address                                          *string
 	Region                                           *string
 	Rule0ActionLen                                   *int64
@@ -19,20 +19,20 @@ type Wafv2WebAcl struct {
 	RuleGroupRules                                   *int64 `infracost_usage:"rule_group_rules"`
 }
 
-var Wafv2WebAclUsageSchema = []*schema.UsageItem{{Key: "managed_rule_group_rules", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "rule_group_rules", ValueType: schema.Int64, DefaultValue: 0}}
+var Wafv2WebACLUsageSchema = []*schema.UsageItem{{Key: "managed_rule_group_rules", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "rule_group_rules", ValueType: schema.Int64, DefaultValue: 0}}
 
-func (r *Wafv2WebAcl) PopulateUsage(u *schema.UsageData) {
+func (r *Wafv2WebACL) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *Wafv2WebAcl) BuildResource() *schema.Resource {
+func (r *Wafv2WebACL) BuildResource() *schema.Resource {
 	region := *r.Region
 
 	var costComponents []*schema.CostComponent
 	var ruleGroupRules, managedRuleGroupRules, monthlyRequests, rule *decimal.Decimal
 	var sumForRules decimal.Decimal
 
-	costComponents = append(costComponents, wafWebACLUsageCostComponent(
+	costComponents = append(costComponents, WafWebACLUsageCostComponent(
 		region,
 		"Web ACL usage",
 		"months",
@@ -53,7 +53,7 @@ func (r *Wafv2WebAcl) BuildResource() *schema.Resource {
 	}
 
 	if sumForRules.IsPositive() {
-		costComponents = append(costComponents, wafWebACLUsageCostComponent(
+		costComponents = append(costComponents, WafWebACLUsageCostComponent(
 			region,
 			"Rules",
 			"rules",
@@ -67,7 +67,7 @@ func (r *Wafv2WebAcl) BuildResource() *schema.Resource {
 		counter := *r.RuleGroupReferenceStatementsCount
 
 		if counter > 0 {
-			costComponents = append(costComponents, wafWebACLUsageCostComponent(
+			costComponents = append(costComponents, WafWebACLUsageCostComponent(
 				region,
 				"Rule groups",
 				"groups",
@@ -79,7 +79,7 @@ func (r *Wafv2WebAcl) BuildResource() *schema.Resource {
 	}
 
 	if *r.Rule0Statement0ManagedRuleGroupStatement0NameLen > 0 {
-		costComponents = append(costComponents, wafWebACLUsageCostComponent(
+		costComponents = append(costComponents, WafWebACLUsageCostComponent(
 			region,
 			"Managed rule groups",
 			"groups",
@@ -93,7 +93,7 @@ func (r *Wafv2WebAcl) BuildResource() *schema.Resource {
 		monthlyRequests = decimalPtr(decimal.NewFromInt(*r.MonthlyRequests))
 	}
 
-	costComponents = append(costComponents, wafWebACLUsageCostComponent(
+	costComponents = append(costComponents, WafWebACLUsageCostComponent(
 		region,
 		"Requests",
 		"1M requests",
@@ -104,6 +104,6 @@ func (r *Wafv2WebAcl) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: Wafv2WebAclUsageSchema,
+		CostComponents: costComponents, UsageSchema: Wafv2WebACLUsageSchema,
 	}
 }
