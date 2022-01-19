@@ -15,19 +15,19 @@ resource_usage:
   aws_nat_gateway.example_each["assets"]:
     monthly_data_processed_gb: 4.0 # Monthly data processed by the NAT Gateway in GB.
   aws_cloudwatch_log_group.production_logs[*]:
-    storage_gb: 1000 # Total data stored by CloudWatch logs in GB.
-    # monthly_data_ingested_gb: 0 # Monthly data ingested by CloudWatch logs in GB.
-    # monthly_data_scanned_gb: 0 # Monthly data scanned by CloudWatch logs insights in GB.
+    storage_gb: 1000.0 # Total data stored by CloudWatch logs in GB.
+    # monthly_data_ingested_gb: 0.0 # Monthly data ingested by CloudWatch logs in GB.
+    # monthly_data_scanned_gb: 0.0 # Monthly data scanned by CloudWatch logs insights in GB.
   ##
   ## The following usage values are all commented-out, you can uncomment resources and customize as needed.
   ##
   # aws_nat_gateway.example_each["media"]:
     # monthly_data_processed_gb: 0.0 # Monthly data processed by the NAT Gateway in GB.
   aws_cloudwatch_log_group.production_logs["assets"]:
-    # storage_gb: 0 # Total data stored by CloudWatch logs in GB.
-    monthly_data_ingested_gb: 100 # Monthly data ingested by CloudWatch logs in GB.
-    # monthly_data_scanned_gb: 0 # Monthly data scanned by CloudWatch logs insights in GB.
+    # storage_gb: 0.0 # Total data stored by CloudWatch logs in GB.
+    monthly_data_ingested_gb: 100.0 # Monthly data ingested by CloudWatch logs in GB.
+    # monthly_data_scanned_gb: 0.0 # Monthly data scanned by CloudWatch logs insights in GB.
   # aws_cloudwatch_log_group.production_logs["media"]:
-    # storage_gb: 0 # Total data stored by CloudWatch logs in GB.
-    # monthly_data_ingested_gb: 0 # Monthly data ingested by CloudWatch logs in GB.
-    # monthly_data_scanned_gb: 0 # Monthly data scanned by CloudWatch logs insights in GB.
+    # storage_gb: 0.0 # Total data stored by CloudWatch logs in GB.
+    # monthly_data_ingested_gb: 0.0 # Monthly data ingested by CloudWatch logs in GB.
+    # monthly_data_scanned_gb: 0.0 # Monthly data scanned by CloudWatch logs insights in GB.

@@ -19,7 +19,7 @@ var (
 	timestampRegex   = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)
 	outputPathRegex  = regexp.MustCompile(`Output saved to .*`)
 	urlRegex         = regexp.MustCompile(`https://dashboard.infracost.io/share/.*`)
-	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/infracost/examples/.*\)`)
+	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/examples/.*\)`)
 	versionRegex     = regexp.MustCompile(`Infracost v.*`)
 	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s]*)Environment`)
 )
