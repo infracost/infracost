@@ -8,14 +8,14 @@ import (
 func getWafWebACLRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_waf_web_acl",
-		RFunc: NewWafWebAcl,
+		RFunc: NewWafWebACL,
 		Notes: []string{
 			"Seller fees for Managed Rule Groups from AWS Marketplace are not included. Bot Control is not supported by Terraform.",
 		},
 	}
 }
-func NewWafWebAcl(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.WafWebAcl{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.WafWebACL{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
 	if !d.IsEmpty("rules") {
 		rulesTypes := make([]string, 0)
 		rules := d.Get("rules").Array()

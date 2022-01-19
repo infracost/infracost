@@ -10,7 +10,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type WafWebAcl struct {
+type WafWebACL struct {
 	Address         *string
 	Region          *string
 	RulesTypes      *[]string
@@ -18,19 +18,19 @@ type WafWebAcl struct {
 	MonthlyRequests *int64 `infracost_usage:"monthly_requests"`
 }
 
-var WafWebAclUsageSchema = []*schema.UsageItem{{Key: "rule_group_rules", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0}}
+var WafWebACLUsageSchema = []*schema.UsageItem{{Key: "rule_group_rules", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0}}
 
-func (r *WafWebAcl) PopulateUsage(u *schema.UsageData) {
+func (r *WafWebACL) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *WafWebAcl) BuildResource() *schema.Resource {
+func (r *WafWebACL) BuildResource() *schema.Resource {
 	region := *r.Region
 
 	var costComponents []*schema.CostComponent
 	var ruleGroupRules, monthlyRequests, rule *decimal.Decimal
 
-	costComponents = append(costComponents, wafWebACLUsageCostComponent(
+	costComponents = append(costComponents, WafWebACLUsageCostComponent(
 		region,
 		"Web ACL usage",
 		"months",
@@ -54,7 +54,7 @@ func (r *WafWebAcl) BuildResource() *schema.Resource {
 		rule = decimalPtr(ruleGroupRules.Add(*rule))
 	}
 
-	costComponents = append(costComponents, wafWebACLUsageCostComponent(
+	costComponents = append(costComponents, WafWebACLUsageCostComponent(
 		region,
 		"Rules",
 		"rules",
@@ -74,7 +74,7 @@ func (r *WafWebAcl) BuildResource() *schema.Resource {
 	}
 
 	if count > 0 {
-		costComponents = append(costComponents, wafWebACLUsageCostComponent(
+		costComponents = append(costComponents, WafWebACLUsageCostComponent(
 			region,
 			"Rule groups",
 			"groups",
@@ -88,7 +88,7 @@ func (r *WafWebAcl) BuildResource() *schema.Resource {
 		monthlyRequests = decimalPtr(decimal.NewFromInt(*r.MonthlyRequests))
 	}
 
-	costComponents = append(costComponents, wafWebACLUsageCostComponent(
+	costComponents = append(costComponents, WafWebACLUsageCostComponent(
 		region,
 		"Requests",
 		"1M requests",
@@ -99,11 +99,11 @@ func (r *WafWebAcl) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: WafWebAclUsageSchema,
+		CostComponents: costComponents, UsageSchema: WafWebACLUsageSchema,
 	}
 }
 
-func wafWebACLUsageCostComponent(region, displayName, unit, usagetype string, unitMultiplier int, quantity *decimal.Decimal) *schema.CostComponent {
+func WafWebACLUsageCostComponent(region, displayName, unit, usagetype string, unitMultiplier int, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            unit,
