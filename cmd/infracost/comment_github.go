@@ -79,13 +79,13 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 				log.Errorf("Error reporting event: %s", err)
 			}
 
+			cmd.Println("Comment posted to GitHub")
+
 			if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
-				err = saveOutFile(cmd, outFile, body)
+				err = saveOutFileWithMsg(cmd, outFile, fmt.Sprintf("Comment body saved to %s\n", outFile), body)
 				if err != nil {
 					return err
 				}
-			} else {
-				cmd.Println(string(body))
 			}
 
 			return nil
