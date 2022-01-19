@@ -92,6 +92,7 @@ func NewRootCommand(ctx *config.RunContext) *cobra.Command {
 	rootCmd.AddCommand(diffCmd(ctx))
 	rootCmd.AddCommand(breakdownCmd(ctx))
 	rootCmd.AddCommand(outputCmd(ctx))
+	rootCmd.AddCommand(commentCmd(ctx))
 	rootCmd.AddCommand(completionCmd())
 
 	rootCmd.SetUsageTemplate(fmt.Sprintf(`%s{{if .Runnable}}
