@@ -1,0 +1,5 @@
+
+Err:
+Error: No such file or directory invalid
+
+Try setting --path to a Terraform plan JSON file. See https://infracost.io/troubleshoot for how to generate this.
