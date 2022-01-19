@@ -29,7 +29,7 @@ func (r *VpcEndpoint) BuildResource() *schema.Resource {
 	region := *r.Region
 	costComponents := []*schema.CostComponent{}
 	vpcEndpointType := "Gateway"
-	vpcEndpointInterfaces := int64(1)
+	vpcEndpointInterfaceCount := int64(1)
 	var endpointHours, endpointBytes string
 	var gbDataProcessed *decimal.Decimal
 
@@ -38,7 +38,7 @@ func (r *VpcEndpoint) BuildResource() *schema.Resource {
 	}
 
 	if r.VpcEndpointInterfaces != nil {
-		vpcEndpointInterfaces = *r.VpcEndpointInterfaces
+		vpcEndpointInterfaceCount = *r.VpcEndpointInterfaces
 	}
 
 	if strings.ToLower(vpcEndpointType) == "gateway" {
@@ -96,7 +96,7 @@ func (r *VpcEndpoint) BuildResource() *schema.Resource {
 		Name:           fmt.Sprintf("Endpoint (%s)", vpcEndpointType),
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(vpcEndpointInterfaces))),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(vpcEndpointInterfaceCount))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(region),

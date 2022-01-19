@@ -67,7 +67,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getRedshiftClusterRegistryItem(),
 	getRoute53HealthCheck(),
 	getRoute53ResolverEndpointRegistryItem(),
-	GetRoute53RecordRegistryItem(),
+	getRoute53RecordRegistryItem(),
 	getRoute53ZoneRegistryItem(),
 	GetS3BucketRegistryItem(),
 	getS3BucketAnalyticsConfigurationRegistryItem(),

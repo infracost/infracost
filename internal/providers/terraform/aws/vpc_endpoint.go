@@ -14,12 +14,12 @@ func getVpcEndpointRegistryItem() *schema.RegistryItem {
 func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	subnetIds := d.Get("subnet_ids").Array()
 
-	vpcEndpointInterfaces := int64(1)
+	vpcEndpointInterfaceCount := int64(1)
 	if len(subnetIds) > 0 {
-		vpcEndpointInterfaces = int64(len(subnetIds))
+		vpcEndpointInterfaceCount = int64(len(subnetIds))
 	}
 
-	r := &aws.VpcEndpoint{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String()), VpcEndpointInterfaces: intPtr(vpcEndpointInterfaces)}
+	r := &aws.VpcEndpoint{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String()), VpcEndpointInterfaces: intPtr(vpcEndpointInterfaceCount)}
 	if !d.IsEmpty("vpc_endpoint_type") {
 		r.VpcEndpointType = strPtr(d.Get("vpc_endpoint_type").String())
 	}

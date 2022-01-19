@@ -25,9 +25,9 @@ func (r *Route53ResolverEndpoint) PopulateUsage(u *schema.UsageData) {
 func (r *Route53ResolverEndpoint) BuildResource() *schema.Resource {
 	region := *r.Region
 
-	resolverEndpoints := int64(0)
+	resolverEndpointCount := int64(0)
 	if r.ResolverEndpoints != nil {
-		resolverEndpoints = *r.ResolverEndpoints
+		resolverEndpointCount = *r.ResolverEndpoints
 	}
 
 	costComponents := []*schema.CostComponent{
@@ -35,7 +35,7 @@ func (r *Route53ResolverEndpoint) BuildResource() *schema.Resource {
 			Name:           "Resolver endpoints",
 			Unit:           "hours",
 			UnitMultiplier: decimal.NewFromInt(1),
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(resolverEndpoints)),
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(resolverEndpointCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(region),
