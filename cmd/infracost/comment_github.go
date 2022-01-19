@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/comment"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"strconv"
 )
@@ -69,6 +71,12 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 			err = commentHandler.CommentWithBehavior(ctx.Context(), behavior, string(body))
 			if err != nil {
 				return err
+			}
+
+			pricingClient := apiclient.NewPricingAPIClient(ctx)
+			err = pricingClient.AddEvent("infracost-comment", ctx.EventEnv())
+			if err != nil {
+				log.Errorf("Error reporting event: %s", err)
 			}
 
 			if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
