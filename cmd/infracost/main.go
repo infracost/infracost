@@ -7,30 +7,43 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/infracost/infracost/internal/apiclient"
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/ui"
-	"github.com/infracost/infracost/internal/update"
-	"github.com/infracost/infracost/internal/version"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/ui"
+	"github.com/infracost/infracost/internal/update"
+	"github.com/infracost/infracost/internal/version"
+
 	"github.com/fatih/color"
 )
 
 func main() {
-	var appErr error
-	updateMessageChan := make(chan *update.Info)
+	Run(nil, nil)
+}
 
+// Run starts the Infracost application with the configured cobra cmds.
+// Cmd args and flags are parsed from the cli, but can also be directly injected
+// using the modifyCtx and args parameters.
+func Run(modifyCtx func(*config.RunContext), args *[]string) {
 	ctx, err := config.NewRunContextFromEnv(context.Background())
 	if err != nil {
 		if err.Error() != "" {
-			ui.PrintError(os.Stderr, err.Error())
+			ui.PrintError(ctx.ErrWriter, err.Error())
 		}
-		os.Exit(1)
+
+		ctx.Exit(1)
 	}
+
+	if modifyCtx != nil {
+		modifyCtx(ctx)
+	}
+
+	var appErr error
+	updateMessageChan := make(chan *update.Info)
 
 	defer func() {
 		if appErr != nil {
@@ -45,17 +58,21 @@ func main() {
 		handleUpdateMessage(updateMessageChan)
 
 		if appErr != nil || unexpectedErr != nil {
-			os.Exit(1)
+			ctx.Exit(1)
 		}
 	}()
 
 	startUpdateCheck(ctx, updateMessageChan)
 
-	rootCmd := NewRootCommand(ctx)
+	rootCmd := newRootCmd(ctx)
+	if args != nil {
+		rootCmd.SetArgs(*args)
+	}
+
 	appErr = rootCmd.Execute()
 }
 
-func NewRootCommand(ctx *config.RunContext) *cobra.Command {
+func newRootCmd(ctx *config.RunContext) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:     "infracost",
 		Version: version.Version,
@@ -128,7 +145,8 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	))
 
 	rootCmd.SetVersionTemplate("Infracost {{.Version}}\n")
-	rootCmd.SetOut(os.Stdout)
+	rootCmd.SetOut(ctx.OutWriter)
+	rootCmd.SetErr(ctx.ErrWriter)
 
 	return rootCmd
 }
@@ -157,7 +175,7 @@ func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) erro
 
 func handleCLIError(ctx *config.RunContext, cliErr error) {
 	if cliErr.Error() != "" {
-		ui.PrintError(os.Stderr, cliErr.Error())
+		ui.PrintError(ctx.ErrWriter, cliErr.Error())
 	}
 
 	err := apiclient.ReportCLIError(ctx, cliErr)
@@ -169,7 +187,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 func handleUnexpectedErr(ctx *config.RunContext, unexpectedErr interface{}) {
 	stack := string(debug.Stack())
 
-	ui.PrintUnexpectedError(unexpectedErr, stack)
+	ui.PrintUnexpectedErrorStack(ctx.ErrWriter, unexpectedErr, stack)
 
 	err := apiclient.ReportCLIError(ctx, fmt.Errorf("%s\n%s", unexpectedErr, stack))
 	if err != nil {

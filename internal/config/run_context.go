@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"runtime"
 	"sort"
@@ -23,6 +24,10 @@ type RunContext struct {
 	State       *State
 	contextVals map[string]interface{}
 	StartTime   int64
+
+	OutWriter io.Writer
+	ErrWriter io.Writer
+	Exit      func(code int)
 }
 
 func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
@@ -36,6 +41,9 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 
 	c := &RunContext{
 		ctx:         rootCtx,
+		OutWriter:   os.Stdout,
+		ErrWriter:   os.Stderr,
+		Exit:        os.Exit,
 		uuid:        uuid.New(),
 		Config:      cfg,
 		State:       state,
@@ -54,6 +62,9 @@ func EmptyRunContext() *RunContext {
 		State:       &State{},
 		contextVals: map[string]interface{}{},
 		StartTime:   time.Now().Unix(),
+		OutWriter:   os.Stdout,
+		ErrWriter:   os.Stderr,
+		Exit:        os.Exit,
 	}
 }
 

@@ -2,7 +2,6 @@ package main_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -21,6 +20,8 @@ var (
 	outputPathRegex  = regexp.MustCompile(`Output saved to .*`)
 	urlRegex         = regexp.MustCompile(`https://dashboard.infracost.io/share/.*`)
 	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/infracost/examples/.*\)`)
+	versionRegex     = regexp.MustCompile(`Infracost v.*`)
+	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s]*)Environment`)
 )
 
 type GoldenFileOptions = struct {
@@ -37,50 +38,43 @@ func DefaultOptions() *GoldenFileOptions {
 	}
 }
 
-func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, configOptions ...func(*config.Config)) {
+func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
 	if testOptions == nil {
 		testOptions = DefaultOptions()
 	}
-
 	// Fix the VCS repo URL so the golden files don't fail on forks
 	os.Setenv("INFRACOST_VCS_REPOSITORY_URL", "https://github.com/infracost/infracost")
 	os.Setenv("INFRACOST_VCS_PULL_REQUEST_URL", "NOT_APPLICABLE")
 
-	runCtx, err := config.NewRunContextFromEnv(context.Background())
-	require.Nil(t, err)
-
 	errBuf := bytes.NewBuffer([]byte{})
 	outBuf := bytes.NewBuffer([]byte{})
 
-	runCtx.Config.EventsDisabled = true
-	runCtx.Config.Currency = testOptions.Currency
-	runCtx.Config.NoColor = true
-
-	for _, f := range configOptions {
-		f(runCtx.Config)
-	}
-
-	rootCmd := main.NewRootCommand(runCtx)
-	rootCmd.SetErr(errBuf)
-	rootCmd.SetOut(outBuf)
-	rootCmd.SetArgs(args)
-
-	var logBuf *bytes.Buffer
-	if testOptions.CaptureLogs {
-		logBuf = testutil.ConfigureTestToCaptureLogs(t, runCtx)
-	} else {
-		testutil.ConfigureTestToFailOnLogs(t, runCtx)
-	}
-
-	var cmdErr error
 	var actual []byte
+	var logBuf *bytes.Buffer
 
-	cmdErr = rootCmd.Execute()
+	main.Run(func(c *config.RunContext) {
+		c.Config.EventsDisabled = true
+		c.Config.Currency = testOptions.Currency
+		c.Config.NoColor = true
+		c.ErrWriter = errBuf
+		c.OutWriter = outBuf
+		c.Exit = func(code int) {}
+
+		if testOptions.CaptureLogs {
+			logBuf = testutil.ConfigureTestToCaptureLogs(t, c)
+		} else {
+			testutil.ConfigureTestToFailOnLogs(t, c)
+		}
+
+		for _, option := range ctxOptions {
+			option(c)
+		}
+	}, &args)
 
 	if testOptions.IsJSON {
 		prettyBuf := bytes.NewBuffer([]byte{})
-		err = json.Indent(prettyBuf, outBuf.Bytes(), "", "  ")
-		require.Nil(t, err)
+		err := json.Indent(prettyBuf, outBuf.Bytes(), "", "  ")
+		require.NoError(t, err)
 		actual = prettyBuf.Bytes()
 	} else {
 		actual = outBuf.Bytes()
@@ -90,11 +84,6 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 
 	if errBuf != nil && errBuf.Len() > 0 {
 		errBytes = append(errBytes, errBuf.Bytes()...)
-	}
-
-	if cmdErr != nil {
-		errBytes = append(errBytes, []byte("Error: ")...)
-		errBytes = append(errBytes, cmdErr.Error()...)
 	}
 
 	if len(errBytes) > 0 {
@@ -120,6 +109,8 @@ func stripDynamicValues(actual []byte) []byte {
 	actual = outputPathRegex.ReplaceAll(actual, []byte("Output saved to REPLACED_OUTPUT_PATH"))
 	actual = urlRegex.ReplaceAll(actual, []byte("https://dashboard.infracost.io/share/REPLACED_SHARE_CODE"))
 	actual = projectPathRegex.ReplaceAll(actual, []byte("$1 REPLACED_PROJECT_PATH"))
+	actual = versionRegex.ReplaceAll(actual, []byte("Infracost vREPLACED_VERSION"))
+	actual = panicRegex.ReplaceAll(actual, []byte("runtime error: REPLACED ERROR\nEnvironment"))
 
 	return actual
 }

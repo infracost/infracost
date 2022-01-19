@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/testutil"
 )
 
@@ -39,4 +40,11 @@ func TestConfigFileInvalidPathErrors(t *testing.T) {
 func TestFlagErrorsTerraformWorkspaceFlagAndEnv(t *testing.T) {
 	os.Setenv("INFRACOST_TERRAFORM_WORKSPACE", "dev")
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform", "--terraform-workspace", "prod"}, nil)
+}
+
+func TestCatchesRuntimeError(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform", "--terraform-workspace", "prod"}, &GoldenFileOptions{CaptureLogs: true}, func(c *config.RunContext) {
+		// this should blow up the application
+		c.Config.Projects = []*config.Project{nil, nil}
+	})
 }
