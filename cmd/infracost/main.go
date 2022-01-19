@@ -187,11 +187,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 func handleUnexpectedErr(ctx *config.RunContext, unexpectedErr interface{}) {
 	stack := string(debug.Stack())
 
-	if ctx.Config.LogLevel == "debug" {
-		ui.PrintUnexpectedErrorStack(ctx.ErrWriter, unexpectedErr, stack)
-	} else {
-		ui.PrintUnexpectedError(ctx.ErrWriter)
-	}
+	ui.PrintUnexpectedErrorStack(ctx.ErrWriter, unexpectedErr, stack)
 
 	err := apiclient.ReportCLIError(ctx, fmt.Errorf("%s\n%s", unexpectedErr, stack))
 	if err != nil {

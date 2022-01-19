@@ -48,11 +48,3 @@ func TestCatchesRuntimeError(t *testing.T) {
 		c.Config.Projects = []*config.Project{nil, nil}
 	})
 }
-
-func TestCatchesRuntimeErrorWithDebug(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform", "--terraform-workspace", "prod"}, &GoldenFileOptions{CaptureLogs: true}, func(c *config.RunContext) {
-		// this should blow up the application
-		c.Config.Projects = []*config.Project{nil, nil}
-		c.Config.LogLevel = "debug"
-	})
-}
