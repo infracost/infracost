@@ -87,7 +87,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getNewKMSKeyRegistryItem(),
 	getNewKMSExternalKeyRegistryItem(),
 	GetVPNConnectionRegistryItem(),
-	GetVpcEndpointRegistryItem(),
+	getVpcEndpointRegistryItem(),
 	getWafv2WebACLRegistryItem(),
 	getWafWebACLRegistryItem(),
 	getStepFunctionRegistryItem(),
