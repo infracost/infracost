@@ -38,6 +38,7 @@ type projectJob = struct {
 
 type projectResult = struct {
 	index    int
+	ctx      *config.ProjectContext
 	projects []*schema.Project
 }
 
@@ -78,7 +79,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	jobs := make(chan projectJob, numJobs)
 
 	projectResultChan := make(chan projectResult, numJobs)
-	projectContextChan := make(chan *config.ProjectContext, numJobs)
 	errGroup, _ := errgroup.WithContext(context.Background())
 
 	if parallelism > 1 && numJobs > 1 && !runCtx.Config.IsLogging() {
@@ -108,8 +108,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 				mux := pathMuxs[job.projectCfg.Path]
 
 				ctx := config.NewProjectContext(runCtx, job.projectCfg)
-				projectContextChan <- ctx
-
 				configProjects, err := runProjectConfig(cmd, runCtx, ctx, job.projectCfg, mux)
 				if err != nil {
 					return err
@@ -117,6 +115,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 				projectResultChan <- projectResult{
 					index:    job.index,
+					ctx:      ctx,
 					projects: configProjects,
 				}
 			}
@@ -135,12 +134,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		return err
 	}
 
-	close(projectContextChan)
-	projectContexts := make([]*config.ProjectContext, 0, len(runCtx.Config.Projects))
-	for ctx := range projectContextChan {
-		projectContexts = append(projectContexts, ctx)
-	}
-
 	close(projectResultChan)
 	projectResults := make([]projectResult, 0, len(runCtx.Config.Projects))
 	for result := range projectResultChan {
@@ -151,8 +144,12 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	})
 
 	projects := make([]*schema.Project, 0)
-	for _, projectResults := range projectResults {
-		projects = append(projects, projectResults.projects...)
+	projectContexts := make([]*config.ProjectContext, 0)
+	for _, projectResult := range projectResults {
+		for _, project := range projectResult.projects {
+			projectContexts = append(projectContexts, projectResult.ctx)
+			projects = append(projects, project)
+		}
 	}
 
 	r, err := output.ToOutputFormat(projects)

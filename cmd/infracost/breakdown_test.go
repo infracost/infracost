@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/testutil"
 )
 
@@ -120,6 +121,12 @@ func TestBreakdownTerraformUsageFileInvalidKey(t *testing.T) {
 
 func TestBreakdownTerragrunt(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil)
+}
+
+func TestBreakdownTerragruntWithDashboardEnabled(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil, func(c *config.Config) {
+		c.EnableDashboard = true
+	})
 }
 
 func TestBreakdownTerragruntNested(t *testing.T) {
