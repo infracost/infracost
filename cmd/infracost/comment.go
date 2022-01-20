@@ -20,11 +20,7 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 
   Post a new comment to a GitLab commit:
 
-      infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior new --gitlab-token $GITLAB_TOKEN
-
-  Get the latest matching comment on an Azure DevOps pull request:
-
-      infracost comment azure-devops --repo-url https://dev.azure.com/my-org/my-project/_git/my-azure-devops-repo pull-request 3 --behavior latest --azure-devops-token $AZURE_DEVOPS_TOKEN`,
+      infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior new --gitlab-token $GITLAB_TOKEN`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
