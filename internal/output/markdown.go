@@ -56,7 +56,7 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal) 
 	return "monthly cost will increase by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " 📈"
 }
 
-func ToMarkdown(out Root, opts Options) ([]byte, error) {
+func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, error) {
 	diff, err := ToDiff(out, opts)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to generate diff")
@@ -105,14 +105,14 @@ func ToMarkdown(out Root, opts Options) ([]byte, error) {
 		Root                Root
 		SkippedProjectCount int
 		DiffOutput          string
-		WillUpdate          bool
 		Options             Options
+		MarkdownOptions     MarkdownOptions
 	}{
 		out,
 		skippedProjectCount,
 		ui.StripColor(string(diff)),
-		true,
-		opts})
+		opts,
+		markdownOpts})
 	if err != nil {
 		return []byte{}, err
 	}

@@ -122,7 +122,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				b, err = output.ToDiff(combined, opts)
 			case "github-comment", "gitlab-comment", "azure-repos-comment":
 				opts.IncludeHTML = true
-				b, err = output.ToMarkdown(combined, opts)
+				b, err = output.ToMarkdown(combined, opts, output.MarkdownOptions{})
 			case "slack-message":
 				b, err = output.ToSlackMessage(combined, opts)
 			default:

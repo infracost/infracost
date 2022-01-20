@@ -47,7 +47,7 @@ func getBehaviorFlag(cmd *cobra.Command) (string, error) {
 	return behavior, nil
 }
 
-func buildCommentBody(ctx *config.RunContext, paths []string) ([]byte, error) {
+func buildCommentBody(ctx *config.RunContext, paths []string, mdOpts output.MarkdownOptions) ([]byte, error) {
 	inputs, err := output.LoadPaths(paths)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func buildCommentBody(ctx *config.RunContext, paths []string) ([]byte, error) {
 		ShowSkipped:      true,
 	}
 
-	b, err := output.ToMarkdown(combined, opts)
+	b, err := output.ToMarkdown(combined, opts, mdOpts)
 	if err != nil {
 		return nil, err
 	}

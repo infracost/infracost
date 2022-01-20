@@ -105,6 +105,12 @@ type Options struct {
 	IncludeHTML      bool
 }
 
+type MarkdownOptions struct {
+	WillUpdate          bool
+	WillReplace         bool
+	IncludeFeedbackLink bool
+}
+
 func outputBreakdown(resources []*schema.Resource) *Breakdown {
 	arr := make([]Resource, 0, len(resources))
 

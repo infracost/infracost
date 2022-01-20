@@ -64,7 +64,7 @@ type GitHubExtra struct {
 	APIURL string
 	// Token is the GitHub API token.
 	Token string
-	// Tag of the
+	// Tag used to identify the Infracost comment
 	Tag string
 }
 

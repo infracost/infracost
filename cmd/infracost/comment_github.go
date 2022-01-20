@@ -5,6 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/comment"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -63,7 +64,11 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 
-			body, err := buildCommentBody(ctx, paths)
+			body, err := buildCommentBody(ctx, paths, output.MarkdownOptions{
+				WillUpdate:          prNumber != 0 && behavior == "update",
+				WillReplace:         prNumber != 0 && behavior == "delete-and-new",
+				IncludeFeedbackLink: true,
+			})
 			if err != nil {
 				return err
 			}
