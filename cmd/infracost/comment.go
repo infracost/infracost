@@ -25,6 +25,7 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 	}
 
 	cmd.AddCommand(commentGitHubCmd(ctx))
+	cmd.AddCommand(commentGitLabCmd(ctx))
 
 	return cmd
 }

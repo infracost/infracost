@@ -15,6 +15,7 @@ EXAMPLES
 
 AVAILABLE COMMANDS
   github      Post an Infracost comment to GitHub
+  gitlab      Post an Infracost comment to GitLab
 
 FLAGS
   -h, --help   help for comment
