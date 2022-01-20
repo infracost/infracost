@@ -1,12 +1,12 @@
 
  Name                                                   Monthly Qty  Unit                  Monthly Cost 
                                                                                                         
- aws_neptune_cluster.fiveDaysRetenPeriod                                                                
+ aws_neptune_cluster.fiveDaysRetentionPeriod                                                            
  ├─ Storage                                        Monthly cost depends on usage: $0.12 per GB          
  ├─ I/O requests                                   Monthly cost depends on usage: $0.23 per 1M request  
  └─ Backup storage                                 Monthly cost depends on usage: $0.022 per GB         
                                                                                                         
- aws_neptune_cluster.oneDayRetenPeriod                                                                  
+ aws_neptune_cluster.oneDayRetentionPeriod                                                              
  ├─ Storage                                        Monthly cost depends on usage: $0.12 per GB          
  └─ I/O requests                                   Monthly cost depends on usage: $0.23 per 1M request  
                                                                                                         

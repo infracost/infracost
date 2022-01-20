@@ -80,7 +80,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSQSQueueRegistryItem(),
 	getNeptuneClusterRegistryItem(),
 	getNeptuneClusterInstanceRegistryItem(),
-	GetNeptuneClusterSnapshotRegistryItem(),
+	getNeptuneClusterSnapshotRegistryItem(),
 	GetNewEKSNodeGroupItem(),
 	getNewEKSFargateProfileItem(),
 	getNewEKSClusterItem(),
