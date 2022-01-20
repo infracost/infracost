@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 func commentCmd(ctx *config.RunContext) *cobra.Command {
@@ -30,17 +27,6 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.AddCommand(commentGitHubCmd(ctx))
 
 	return cmd
-}
-
-var validCommentBehaviors = []string{"update", "new", "hide-and-new", "delete-and-new"}
-
-func getBehaviorFlag(cmd *cobra.Command) (string, error) {
-	behavior, _ := cmd.Flags().GetString("behavior")
-	if behavior != "" && !contains(validCommentBehaviors, behavior) {
-		ui.PrintUsage(cmd)
-		return "", fmt.Errorf("--behavior only supports %s", strings.Join(validCommentBehaviors, ", "))
-	}
-	return behavior, nil
 }
 
 func buildCommentBody(ctx *config.RunContext, paths []string, mdOpts output.MarkdownOptions) ([]byte, error) {

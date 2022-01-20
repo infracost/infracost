@@ -10,7 +10,10 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"strconv"
+	"strings"
 )
+
+var validCommentGitHubBehaviors = []string{"update", "new", "hide-and-new", "delete-and-new"}
 
 func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
@@ -57,9 +60,10 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 				return fmt.Errorf("either --commit or --pull-request is required")
 			}
 
-			behavior, err := getBehaviorFlag(cmd)
-			if err != nil {
-				return err
+			behavior, _ := cmd.Flags().GetString("behavior")
+			if behavior != "" && !contains(validCommentGitHubBehaviors, behavior) {
+				ui.PrintUsage(cmd)
+				return fmt.Errorf("--behavior only supports %s", strings.Join(validCommentGitHubBehaviors, ", "))
 			}
 
 			paths, _ := cmd.Flags().GetStringArray("path")
@@ -109,7 +113,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
   hide-and-new      Hide previous matching comments and create a new comment
   delete-and-new    Delete previous matching comments and create a new comment`)
 	_ = cmd.RegisterFlagCompletionFunc("behavior", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return validCommentBehaviors, cobra.ShellCompDirectiveDefault
+		return validCommentGitHubBehaviors, cobra.ShellCompDirectiveDefault
 	})
 	cmd.Flags().String("commit", "", "Commit SHA to post/get the comment, mutually exclusive with pull-request")
 	cmd.Flags().String("github-api-url", "https://api.github.com", "GitHub API URL, defaults to https://api.github.com")
