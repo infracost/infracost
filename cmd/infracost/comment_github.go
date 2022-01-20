@@ -73,18 +73,24 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			err = commentHandler.CommentWithBehavior(ctx.Context(), behavior, string(body))
-			if err != nil {
-				return err
-			}
+			dryRun, _ := cmd.Flags().GetBool("dry-run")
+			if !dryRun {
+				err = commentHandler.CommentWithBehavior(ctx.Context(), behavior, string(body))
+				if err != nil {
+					return err
+				}
 
-			pricingClient := apiclient.NewPricingAPIClient(ctx)
-			err = pricingClient.AddEvent("infracost-comment", ctx.EventEnv())
-			if err != nil {
-				log.Errorf("Error reporting event: %s", err)
-			}
+				pricingClient := apiclient.NewPricingAPIClient(ctx)
+				err = pricingClient.AddEvent("infracost-comment", ctx.EventEnv())
+				if err != nil {
+					log.Errorf("Error reporting event: %s", err)
+				}
 
-			cmd.Println("Comment posted to GitHub")
+				cmd.Println("Comment posted to GitHub")
+			} else {
+				cmd.Println(string(body))
+				cmd.Println("Comment not posted to GitHub (--dry-run was specified)")
+			}
 
 			if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
 				err = saveOutFileWithMsg(cmd, outFile, fmt.Sprintf("Comment body saved to %s\n", outFile), body)
@@ -117,6 +123,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("repo", "", "Repository in the format owner/repo")
 	_ = cmd.MarkFlagRequired("repo")
 	cmd.Flags().String("tag", "", "Customize the embedded tag that is used for detecting comments posted by Infracost")
+	cmd.Flags().Bool("dry-run", false, "Generate the comment without actually posting to GitHub.")
 
 	return cmd
 }
