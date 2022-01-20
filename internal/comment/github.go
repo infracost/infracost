@@ -302,7 +302,7 @@ func (h *githubPRHandler) CallHideComment(ctx context.Context, comment Comment) 
 
 // githubCommitHandler is a PlatformHandler for GitHub commits. It
 // implements the PlatformHandler interface and contains the functions
-// for finding, creating, updating, deleting comments on GitHub commits.
+// for finding, creating, updating, deleting and hiding comments on GitHub commits.
 type githubCommitHandler struct {
 	v4client  *githubv4.Client
 	v3client  *github.Client
