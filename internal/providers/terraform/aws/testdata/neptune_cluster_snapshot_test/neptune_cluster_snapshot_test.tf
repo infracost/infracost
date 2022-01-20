@@ -10,7 +10,7 @@ provider "aws" {
 }
 
 
-resource "aws_neptune_cluster" "fiveDaysRetenPeriod" {
+resource "aws_neptune_cluster" "fiveDaysRetentionPeriod" {
   cluster_identifier                  = "neptune-cluster-demo"
   engine                              = "neptune"
   backup_retention_period             = 5
@@ -21,12 +21,12 @@ resource "aws_neptune_cluster" "fiveDaysRetenPeriod" {
 }
 
 resource "aws_neptune_cluster_snapshot" "fiveDaysRetenPeriod" {
-  db_cluster_identifier          = aws_neptune_cluster.fiveDaysRetenPeriod.id
+  db_cluster_identifier          = aws_neptune_cluster.fiveDaysRetentionPeriod.id
   db_cluster_snapshot_identifier = "resourcetestsnapshot1234"
 }
 
 
-resource "aws_neptune_cluster" "oneDayRetenPeriod" {
+resource "aws_neptune_cluster" "oneDayRetentionPeriod" {
   cluster_identifier                  = "neptune-cluster-demo"
   engine                              = "neptune"
   preferred_backup_window             = "07:00-09:00"
@@ -35,8 +35,8 @@ resource "aws_neptune_cluster" "oneDayRetenPeriod" {
   apply_immediately                   = true
 }
 
-resource "aws_neptune_cluster_snapshot" "oneDayRetenPeriod" {
-  db_cluster_identifier          = aws_neptune_cluster.oneDayRetenPeriod.id
+resource "aws_neptune_cluster_snapshot" "oneDayRetentionPeriod" {
+  db_cluster_identifier          = aws_neptune_cluster.oneDayRetentionPeriod.id
   db_cluster_snapshot_identifier = "resourcetestsnapshot1234"
 }
 
