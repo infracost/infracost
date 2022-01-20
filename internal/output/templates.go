@@ -358,7 +358,7 @@ This comment will be updated when the cost estimate changes.
 
 This comment will be replaced when the cost estimate changes
 {{- end}}
-{{- if .MarkdownOptions.WillReplace }}
+{{- if .MarkdownOptions.IncludeFeedbackLink }}
 
 <sub>
   Is this comment useful? <a href=\"https://www.infracost.io/feedback/submit/?value=yes\" rel=\"noopener noreferrer\" target=\"_blank\">Yes</a>, <a href=\"https://www.infracost.io/feedback/submit/?value=no\" rel=\"noopener noreferrer\" target=\"_blank\">No</a>
