@@ -29,11 +29,8 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
       infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior delete-and-new --gitlab-token $GITLAB_TOKEN`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// pricingClient := apiclient.NewPricingAPIClient(ctx)
-			// err = pricingClient.AddEvent("infracost-comment", ctx.EventEnv())
-			// if err != nil {
-			// 	log.Errorf("Error reporting event: %s", err)
-			// }
+			ctx.SetContextValue("platform", "gitlab")
+			
 			var err error
 
 			serverURL, _ := cmd.Flags().GetString("gitlab-server-url")
@@ -51,11 +48,15 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 
 			var commentHandler *comment.CommentHandler
 			if mrNumber != 0 {
+				ctx.SetContextValue("targetType", "merge-request")
+
 				commentHandler, err = comment.NewGitLabPRHandler(ctx.Context(), repo, strconv.Itoa(mrNumber), extra)
 				if err != nil {
 					return err
 				}
 			} else if commit != "" {
+				ctx.SetContextValue("targetType", "commit")
+
 				commentHandler, err = comment.NewGitLabCommitHandler(ctx.Context(), repo, commit, extra)
 				if err != nil {
 					return err
@@ -70,6 +71,7 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 				ui.PrintUsage(cmd)
 				return fmt.Errorf("--behavior only supports %s", strings.Join(validCommentGitLabBehaviors, ", "))
 			}
+			ctx.SetContextValue("behavior", behavior)
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 
