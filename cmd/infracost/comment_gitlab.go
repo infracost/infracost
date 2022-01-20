@@ -30,7 +30,7 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx.SetContextValue("platform", "gitlab")
-			
+
 			var err error
 
 			serverURL, _ := cmd.Flags().GetString("gitlab-server-url")
