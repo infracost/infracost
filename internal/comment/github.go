@@ -60,7 +60,7 @@ func (c *githubComment) IsHidden() bool {
 // GitHubExtra contains any extra inputs that can be passed to the GitHub comment handlers.
 type GitHubExtra struct {
 	// APIURL is the URL of the GitHub API. This can be set to a custom URL if
-	// using GitHub enterprise. If not set, the default GitHub API URL will be used.
+	// using GitHub Enterprise. If not set, the default GitHub API URL will be used.
 	APIURL string
 	// Token is the GitHub API token.
 	Token string
