@@ -9,23 +9,27 @@ import (
 )
 
 type Route53Record struct {
-	Address                    *string
-	AliasType                  *string
+	Address                    string
+	IsAlias                    bool
 	MonthlyLatencyBasedQueries *int64 `infracost_usage:"monthly_latency_based_queries"`
 	MonthlyGeoQueries          *int64 `infracost_usage:"monthly_geo_queries"`
 	MonthlyStandardQueries     *int64 `infracost_usage:"monthly_standard_queries"`
 }
 
-var Route53RecordUsageSchema = []*schema.UsageItem{{Key: "monthly_latency_based_queries", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_geo_queries", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_standard_queries", ValueType: schema.Int64, DefaultValue: 0}}
+var Route53RecordUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_latency_based_queries", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_geo_queries", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_standard_queries", ValueType: schema.Int64, DefaultValue: 0},
+}
 
 func (r *Route53Record) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
 func (r *Route53Record) BuildResource() *schema.Resource {
-	if r.AliasType != nil && strVal(r.AliasType) != "" && strVal(r.AliasType) != "aws_route53_record" {
+	if r.IsAlias {
 		return &schema.Resource{
-			Name:        *r.Address,
+			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
 			UsageSchema: Route53RecordUsageSchema,
@@ -90,8 +94,9 @@ func (r *Route53Record) BuildResource() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: Route53RecordUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    Route53RecordUsageSchema,
 	}
 }
 

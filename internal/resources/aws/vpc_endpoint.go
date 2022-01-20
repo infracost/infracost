@@ -11,66 +11,69 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type VpcEndpoint struct {
-	Address                *string
-	Region                 *string
-	VpcEndpointType        *string
-	VpcEndpointInterfaces  *int64
+type VPCEndpoint struct {
+	Address                string
+	Region                 string
+	Type                   string
+	Interfaces             *int64
 	MonthlyDataProcessedGb *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var VpcEndpointUsageSchema = []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var VPCEndpointUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0},
+}
 
-func (r *VpcEndpoint) PopulateUsage(u *schema.UsageData) {
+func (r *VPCEndpoint) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *VpcEndpoint) BuildResource() *schema.Resource {
-	region := *r.Region
+func (r *VPCEndpoint) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
-	vpcEndpointType := "Gateway"
-	vpcEndpointInterfaceCount := int64(1)
-	var endpointHours, endpointBytes string
-	var gbDataProcessed *decimal.Decimal
 
-	if r.VpcEndpointType != nil {
-		vpcEndpointType = *r.VpcEndpointType
+	vpcEndpointType := r.Type
+	if vpcEndpointType == "" {
+		vpcEndpointType = "Gateway"
 	}
 
-	if r.VpcEndpointInterfaces != nil {
-		vpcEndpointInterfaceCount = *r.VpcEndpointInterfaces
+	vpcEndpointInterfaceCount := int64(1)
+	if r.Interfaces != nil {
+		vpcEndpointInterfaceCount = *r.Interfaces
 	}
 
 	if strings.ToLower(vpcEndpointType) == "gateway" {
 		return &schema.Resource{
-			Name:      *r.Address,
-			NoPrice:   true,
-			IsSkipped: true, UsageSchema: VpcEndpointUsageSchema,
+			Name:        r.Address,
+			NoPrice:     true,
+			IsSkipped:   true,
+			UsageSchema: VPCEndpointUsageSchema,
 		}
 	}
 
+	var dataProcessedGB *decimal.Decimal
 	if r.MonthlyDataProcessedGb != nil {
-		gbDataProcessed = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataProcessedGb))
+		dataProcessedGB = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataProcessedGb))
 	}
+
+	var endpointHours, endpointBytes string
 
 	if strings.ToLower(vpcEndpointType) == "interface" {
 		endpointHours = "VpcEndpoint-Hours"
 		endpointBytes = "VpcEndpoint-Bytes"
-		if gbDataProcessed != nil {
+		if dataProcessedGB != nil {
 			gbLimits := []int{1000, 4000}
-			tiers := usage.CalculateTierBuckets(*gbDataProcessed, gbLimits)
+			tiers := usage.CalculateTierBuckets(*dataProcessedGB, gbLimits)
 
 			if tiers[0].GreaterThan(decimal.NewFromInt(0)) {
-				costComponents = append(costComponents, vpcEndpointDataProcessedCostComponent(region, endpointBytes, "Data processed (first 1PB)", "0", &tiers[0]))
+				costComponents = append(costComponents, r.dataProcessedCostComponent(endpointBytes, "Data processed (first 1PB)", "0", &tiers[0]))
 			}
 			if tiers[1].GreaterThan(decimal.NewFromInt(0)) {
-				costComponents = append(costComponents, vpcEndpointDataProcessedCostComponent(region, endpointBytes, "Data processed (next 4PB)", "1048576", &tiers[1]))
+				costComponents = append(costComponents, r.dataProcessedCostComponent(endpointBytes, "Data processed (next 4PB)", "1048576", &tiers[1]))
 			}
 			if tiers[2].GreaterThan(decimal.NewFromInt(0)) {
-				costComponents = append(costComponents, vpcEndpointDataProcessedCostComponent(region, endpointBytes, "Data processed (over 5PB)", "5242880", &tiers[2]))
+				costComponents = append(costComponents, r.dataProcessedCostComponent(endpointBytes, "Data processed (over 5PB)", "5242880", &tiers[2]))
 			}
 		} else {
-			costComponents = append(costComponents, vpcEndpointDataProcessedCostComponent(region, endpointBytes, "Data processed (first 1PB)", "0", gbDataProcessed))
+			costComponents = append(costComponents, r.dataProcessedCostComponent(endpointBytes, "Data processed (first 1PB)", "0", dataProcessedGB))
 		}
 	} else if strings.ToLower(vpcEndpointType) == "gatewayloadbalancer" {
 		endpointHours = "VpcEndpoint-GWLBE-Hours"
@@ -79,10 +82,10 @@ func (r *VpcEndpoint) BuildResource() *schema.Resource {
 			Name:            "Data processed",
 			Unit:            "GB",
 			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyQuantity: gbDataProcessed,
+			MonthlyQuantity: dataProcessedGB,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
+				Region:        strPtr(r.Region),
 				Service:       strPtr("AmazonVPC"),
 				ProductFamily: strPtr("VpcEndpoint"),
 				AttributeFilters: []*schema.AttributeFilter{
@@ -99,7 +102,7 @@ func (r *VpcEndpoint) BuildResource() *schema.Resource {
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(vpcEndpointInterfaceCount))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonVPC"),
 			ProductFamily: strPtr("VpcEndpoint"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -109,20 +112,20 @@ func (r *VpcEndpoint) BuildResource() *schema.Resource {
 	})
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: VpcEndpointUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents, UsageSchema: VPCEndpointUsageSchema,
 	}
 }
 
-func vpcEndpointDataProcessedCostComponent(region string, endpointBytes string, displayName string, usageTier string, gbDataProcessed *decimal.Decimal) *schema.CostComponent {
+func (r *VPCEndpoint) dataProcessedCostComponent(endpointBytes string, displayName string, usageTier string, dataProcessedGB *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: gbDataProcessed,
+		MonthlyQuantity: dataProcessedGB,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonVPC"),
 			ProductFamily: strPtr("VpcEndpoint"),
 			AttributeFilters: []*schema.AttributeFilter{

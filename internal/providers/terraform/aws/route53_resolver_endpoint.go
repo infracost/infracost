@@ -11,10 +11,14 @@ func getRoute53ResolverEndpointRegistryItem() *schema.RegistryItem {
 		RFunc: NewRoute53ResolverEndpoint,
 	}
 }
-func NewRoute53ResolverEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	resolverEndpointCount := int64(len(d.Get("ip_address").Array()))
 
-	r := &aws.Route53ResolverEndpoint{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String()), ResolverEndpoints: intPtr(resolverEndpointCount)}
+func NewRoute53ResolverEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.Route53ResolverEndpoint{
+		Address:           d.Address,
+		Region:            d.Get("region").String(),
+		ResolverEndpoints: int64(len(d.Get("ip_address").Array())),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

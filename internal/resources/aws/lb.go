@@ -10,16 +10,21 @@ import (
 )
 
 type LB struct {
-	Address           *string
-	LoadBalancerType  *string
-	Region            *string
+	Address           string
+	LoadBalancerType  string
+	Region            string
 	RuleEvaluations   *int64   `infracost_usage:"rule_evaluations"`
 	NewConnections    *int64   `infracost_usage:"new_connections"`
 	ActiveConnections *int64   `infracost_usage:"active_connections"`
-	ProcessedBytesGb  *float64 `infracost_usage:"processed_bytes_gb"`
+	ProcessedBytesGB  *float64 `infracost_usage:"processed_bytes_gb"`
 }
 
-var LBUsageSchema = []*schema.UsageItem{{Key: "rule_evaluations", ValueType: schema.Int64, DefaultValue: 0}, {Key: "new_connections", ValueType: schema.Int64, DefaultValue: 0}, {Key: "active_connections", ValueType: schema.Int64, DefaultValue: 0}, {Key: "processed_bytes_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var LBUsageSchema = []*schema.UsageItem{
+	{Key: "rule_evaluations", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "new_connections", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "active_connections", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "processed_bytes_gb", ValueType: schema.Float64, DefaultValue: 0},
+}
 
 func (r *LB) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -43,93 +48,97 @@ func (r *LB) BuildResource() *schema.Resource {
 	}
 
 	var processedBytesLCU *decimal.Decimal
-	if r.ProcessedBytesGb != nil {
-		processedBytes := decimal.NewFromFloat(*r.ProcessedBytesGb)
+	if r.ProcessedBytesGB != nil {
+		processedBytes := decimal.NewFromFloat(*r.ProcessedBytesGB)
 		processedBytesLCU = decimalPtr(processedBytes.Div(decimal.NewFromInt(1)))
 		maxLCU = decimalPtr(decimal.Max(*maxLCU, *processedBytesLCU))
 	}
 
-	if strings.ToLower(*r.LoadBalancerType) == "application" {
-		costComponentName := "Application load balancer"
-		productFamily := "Load Balancer-Application"
+	var costComponents []*schema.CostComponent
 
-		var ruleEvaluationsLCU *decimal.Decimal
-		if r.RuleEvaluations != nil {
+	if strings.ToLower(r.LoadBalancerType) == "application" {
+		var ruleEvaluationsLCU decimal.Decimal
+		if r.RuleEvaluations != nil && maxLCU != nil {
 			ruleEvaluations := decimal.NewFromInt(*r.RuleEvaluations)
-			ruleEvaluationsLCU = decimalPtr(ruleEvaluations.Div(decimal.NewFromInt(1000)))
-			maxLCU = decimalPtr(decimal.Max(*maxLCU, *ruleEvaluationsLCU))
+			ruleEvaluationsLCU = ruleEvaluations.Div(decimal.NewFromInt(1000))
+			maxLCU = decimalPtr(decimal.Max(*maxLCU, ruleEvaluationsLCU))
 		}
 
-		return newLBResource(r.Region, r.Address, productFamily, costComponentName, &decimal.Zero, maxLCU)
+		costComponents = r.applicationLBCostComponents(maxLCU)
+	} else {
+		costComponents = r.networkLBCostComponents(maxLCU)
 	}
 
-	costComponentName := "Network load balancer"
-	productFamily := "Load Balancer-Network"
-
-	return newLBResource(r.Region, r.Address, productFamily, costComponentName, &decimal.Zero, maxLCU)
+	return &schema.Resource{
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    LBUsageSchema,
+	}
 }
 
-func newLBResource(rRegion, rAddress *string, productFamily string, costComponentName string, dataProcessed *decimal.Decimal, maxLCU *decimal.Decimal) *schema.Resource {
-	region := *rRegion
+func (r *LB) applicationLBCostComponents(maxLCU *decimal.Decimal) []*schema.CostComponent {
+	productFamily := "Load Balancer-Application"
 
-	costComponents := []*schema.CostComponent{
+	return []*schema.CostComponent{
 		{
-			Name:           costComponentName,
+			Name:           "Application load balancer",
 			Unit:           "hours",
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			UnitMultiplier: decimal.NewFromInt(1),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
+				Region:        strPtr(r.Region),
 				Service:       strPtr("AWSELB"),
-				ProductFamily: strPtr(productFamily),
+				ProductFamily: strPtr("Load Balancer-Application"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "locationType", Value: strPtr("AWS Region")},
 					{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
 				},
 			},
 		},
+		r.capacityUnitsCostComponent(productFamily, maxLCU),
 	}
+}
 
-	if strings.ToLower(productFamily) == "load balancer" {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Data processed",
-			Unit:            "GB",
-			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyQuantity: dataProcessed,
+func (r *LB) networkLBCostComponents(maxLCU *decimal.Decimal) []*schema.CostComponent {
+	productFamily := "Load Balancer-Network"
+
+	return []*schema.CostComponent{
+		{
+			Name:           "Network load balancer",
+			Unit:           "hours",
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			UnitMultiplier: decimal.NewFromInt(1),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
+				Region:        strPtr(r.Region),
 				Service:       strPtr("AWSELB"),
-				ProductFamily: strPtr(productFamily),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/DataProcessing-Bytes/")},
-				},
-			},
-		})
-	}
-
-	if strings.ToLower(productFamily) == "load balancer-application" || strings.ToLower(productFamily) == "load balancer-network" {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Load balancer capacity units",
-			Unit:            "LCU",
-			UnitMultiplier:  schema.HourToMonthUnitMultiplier,
-			MonthlyQuantity: maxLCU,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AWSELB"),
-				ProductFamily: strPtr(productFamily),
+				ProductFamily: strPtr("Load Balancer-Network"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "locationType", Value: strPtr("AWS Region")},
-					{Key: "usagetype", ValueRegex: strPtr("/LCUUsage/")},
+					{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
 				},
 			},
-		})
+		},
+		r.capacityUnitsCostComponent(productFamily, maxLCU),
 	}
+}
 
-	return &schema.Resource{
-		Name:           *rAddress,
-		CostComponents: costComponents,
+func (r *LB) capacityUnitsCostComponent(productFamily string, maxLCU *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Load balancer capacity units",
+		Unit:            "LCU",
+		UnitMultiplier:  schema.HourToMonthUnitMultiplier,
+		MonthlyQuantity: maxLCU,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AWSELB"),
+			ProductFamily: strPtr(productFamily),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "locationType", Value: strPtr("AWS Region")},
+				{Key: "usagetype", ValueRegex: strPtr("/LCUUsage/")},
+			},
+		},
 	}
 }

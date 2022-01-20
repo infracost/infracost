@@ -8,12 +8,16 @@ import (
 func getDocDBClusterSnapshotRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_docdb_cluster_snapshot",
-		RFunc: NewDocdbClusterSnapshot,
+		RFunc: NewDocDBClusterSnapshot,
 	}
 
 }
-func NewDocdbClusterSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.DocdbClusterSnapshot{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+func NewDocDBClusterSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.DocDBClusterSnapshot{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

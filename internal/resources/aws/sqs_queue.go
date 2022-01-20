@@ -7,45 +7,44 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type SqsQueue struct {
-	Address         *string
-	Region          *string
-	FifoQueue       *bool
+type SQSQueue struct {
+	Address         string
+	Region          string
+	FifoQueue       bool
 	MonthlyRequests *float64 `infracost_usage:"monthly_requests"`
-	RequestSizeKb   *int64   `infracost_usage:"request_size_kb"`
+	RequestSizeKB   *int64   `infracost_usage:"request_size_kb"`
 }
 
-var SqsQueueUsageSchema = []*schema.UsageItem{{Key: "monthly_requests", ValueType: schema.Float64, DefaultValue: 0}, {Key: "request_size_kb", ValueType: schema.Int64, DefaultValue: 0}}
+var SQSQueueUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_requests", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "request_size_kb", ValueType: schema.Int64, DefaultValue: 0},
+}
 
-func (r *SqsQueue) PopulateUsage(u *schema.UsageData) {
+func (r *SQSQueue) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *SqsQueue) BuildResource() *schema.Resource {
-	region := *r.Region
-
+func (r *SQSQueue) BuildResource() *schema.Resource {
 	var queueType string
-
-	if *r.FifoQueue {
+	if r.FifoQueue {
 		queueType = "FIFO (first-in, first-out)"
 	} else {
 		queueType = "Standard"
 	}
 
-	requestSize := decimal.NewFromInt(64)
-	if r.RequestSizeKb != nil {
-		requestSize = decimal.NewFromInt(*r.RequestSizeKb)
-	}
-
 	var requests *decimal.Decimal
 
+	requestSize := decimal.NewFromInt(64)
+	if r.RequestSizeKB != nil {
+		requestSize = decimal.NewFromInt(*r.RequestSizeKB)
+	}
+
 	if r.MonthlyRequests != nil {
-		monthlyRequests := decimal.NewFromFloat(*r.MonthlyRequests)
-		requests = decimalPtr(calculateRequests(requestSize, monthlyRequests))
+		requests = decimalPtr(r.calculateRequests(requestSize, decimal.NewFromFloat(*r.MonthlyRequests)))
 	}
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Requests",
@@ -54,7 +53,7 @@ func (r *SqsQueue) BuildResource() *schema.Resource {
 				MonthlyQuantity: requests,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AWSQueueService"),
 					ProductFamily: strPtr("API Request"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -65,10 +64,11 @@ func (r *SqsQueue) BuildResource() *schema.Resource {
 					StartUsageAmount: strPtr("0"),
 				},
 			},
-		}, UsageSchema: SqsQueueUsageSchema,
+		},
+		UsageSchema: SQSQueueUsageSchema,
 	}
 }
 
-func calculateRequests(requestSize decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
+func (r *SQSQueue) calculateRequests(requestSize decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
 	return requestSize.Div(decimal.NewFromInt(64)).Ceil().Mul(monthlyRequests)
 }

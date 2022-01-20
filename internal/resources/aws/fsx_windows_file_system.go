@@ -10,84 +10,63 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type FsxWindowsFileSystem struct {
-	Address            *string
-	StorageType        *string
-	ThroughputCapacity *int64
-	StorageCapacity    *int64
-	Region             *string
-	DeploymentType     *string
-	BackupStorageGb    *float64 `infracost_usage:"backup_storage_gb"`
+type FSxWindowsFileSystem struct {
+	Address            string
+	StorageType        string
+	ThroughputCapacity int64
+	StorageCapacityGB  int64
+	Region             string
+	DeploymentType     string
+	BackupStorageGB    *float64 `infracost_usage:"backup_storage_gb"`
 }
 
-var FsxWindowsFileSystemUsageSchema = []*schema.UsageItem{{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var FSxWindowsFileSystemUsageSchema = []*schema.UsageItem{
+	{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+}
 
-func (r *FsxWindowsFileSystem) PopulateUsage(u *schema.UsageData) {
+func (r *FSxWindowsFileSystem) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *FsxWindowsFileSystem) BuildResource() *schema.Resource {
-	region := *r.Region
-	isMultiAZ := strings.Contains(*r.DeploymentType, "MULTI_AZ")
-	isHDD := strings.ToLower(*r.StorageType) == "hdd"
-	throughput := decimalPtr(decimal.NewFromInt(*r.ThroughputCapacity))
-	storageSize := decimalPtr(decimal.NewFromInt(*r.StorageCapacity))
-
-	var backupStorage *decimal.Decimal
-	if r.BackupStorageGb != nil {
-		backupStorage = decimalPtr(decimal.NewFromFloat(*r.BackupStorageGb))
-	}
-
+func (r *FSxWindowsFileSystem) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
-			throughputCapacity(region, isMultiAZ, throughput),
-			storageCapacity(region, isMultiAZ, isHDD, storageSize),
-			backupStorageCapacity(region, isMultiAZ, backupStorage),
-		}, UsageSchema: FsxWindowsFileSystemUsageSchema,
-	}
-}
-
-func storageCapacity(region string, isMultiAZ, isHDD bool, storageSize *decimal.Decimal) *schema.CostComponent {
-	deploymentOption := "Single-AZ"
-	if isMultiAZ {
-		deploymentOption = "Multi-AZ"
-	}
-	storageType := "SDD"
-	if isHDD {
-		storageType = "HDD"
-	}
-	return &schema.CostComponent{
-		Name:            fmt.Sprintf("%v storage", storageType),
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: storageSize,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
-			Service:       strPtr("AmazonFSx"),
-			ProductFamily: strPtr("Storage"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "deploymentOption", Value: strPtr(deploymentOption)},
-				{Key: "storageType", Value: strPtr(storageType)},
-			},
+			r.throughputCapacityCostComponent(),
+			r.storageCapacityCostComponent(),
+			r.backupGBCostComponent(),
 		},
+		UsageSchema: FSxWindowsFileSystemUsageSchema,
 	}
 }
 
-func throughputCapacity(region string, isMultiAZ bool, throughput *decimal.Decimal) *schema.CostComponent {
-	deploymentOption := "Single-AZ"
-	if isMultiAZ {
-		deploymentOption = "Multi-AZ"
+func (r *FSxWindowsFileSystem) deploymentOptionValue() string {
+	if strings.Contains(strings.ToLower(r.DeploymentType), "multi_az") {
+		return "Multi-AZ"
 	}
+
+	return "Single-AZ"
+}
+
+func (r *FSxWindowsFileSystem) storageTypeValue() string {
+	if strings.ToLower(r.StorageType) == "hdd" {
+		return "HDD"
+	}
+
+	return "SDD"
+}
+
+func (r *FSxWindowsFileSystem) throughputCapacityCostComponent() *schema.CostComponent {
+	deploymentOption := r.deploymentOptionValue()
+
 	return &schema.CostComponent{
 		Name:            "Throughput capacity",
 		Unit:            "MBps",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: throughput,
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(r.ThroughputCapacity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonFSx"),
 			ProductFamily: strPtr("Provisioned Throughput"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -98,11 +77,36 @@ func throughputCapacity(region string, isMultiAZ bool, throughput *decimal.Decim
 	}
 }
 
-func backupStorageCapacity(region string, isMultiAZ bool, backupStorage *decimal.Decimal) *schema.CostComponent {
-	deploymentOption := "Single-AZ"
-	if isMultiAZ {
-		deploymentOption = "Multi-AZ"
+func (r *FSxWindowsFileSystem) storageCapacityCostComponent() *schema.CostComponent {
+	deploymentOption := r.deploymentOptionValue()
+	storageType := r.storageTypeValue()
+
+	return &schema.CostComponent{
+		Name:            fmt.Sprintf("%v storage", storageType),
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(r.StorageCapacityGB)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonFSx"),
+			ProductFamily: strPtr("Storage"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+				{Key: "storageType", Value: strPtr(storageType)},
+			},
+		},
 	}
+}
+
+func (r *FSxWindowsFileSystem) backupGBCostComponent() *schema.CostComponent {
+	deploymentOption := r.deploymentOptionValue()
+
+	var backupStorage *decimal.Decimal
+	if r.BackupStorageGB != nil {
+		backupStorage = decimalPtr(decimal.NewFromFloat(*r.BackupStorageGB))
+	}
+
 	return &schema.CostComponent{
 		Name:            "Backup storage",
 		Unit:            "GB",
@@ -110,7 +114,7 @@ func backupStorageCapacity(region string, isMultiAZ bool, backupStorage *decimal
 		MonthlyQuantity: backupStorage,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonFSx"),
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{

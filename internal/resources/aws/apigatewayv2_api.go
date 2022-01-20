@@ -6,49 +6,54 @@ import (
 
 	"fmt"
 
+	"strings"
+
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
-	"strings"
 )
 
-type APIgatewayv2API struct {
-	Address               *string
-	ProtocolType          *string
-	Region                *string
-	MessageSizeKb         *int64 `infracost_usage:"message_size_kb"`
+type APIGatewayV2API struct {
+	Address               string
+	Region                string
+	ProtocolType          string
+	MessageSizeKB         *int64 `infracost_usage:"message_size_kb"`
 	MonthlyConnectionMins *int64 `infracost_usage:"monthly_connection_mins"`
 	MonthlyRequests       *int64 `infracost_usage:"monthly_requests"`
-	RequestSizeKb         *int64 `infracost_usage:"request_size_kb"`
+	RequestSizeKB         *int64 `infracost_usage:"request_size_kb"`
 	MonthlyMessages       *int64 `infracost_usage:"monthly_messages"`
 }
 
-var APIgatewayv2APIUsageSchema = []*schema.UsageItem{{Key: "message_size_kb", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_connection_mins", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "request_size_kb", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_messages", ValueType: schema.Int64, DefaultValue: 0}}
+var APIGatewayV2APIUsageSchema = []*schema.UsageItem{
+	{Key: "message_size_kb", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_connection_mins", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "request_size_kb", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_messages", ValueType: schema.Int64, DefaultValue: 0},
+}
 
-func (r *APIgatewayv2API) PopulateUsage(u *schema.UsageData) {
+func (r *APIGatewayV2API) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *APIgatewayv2API) BuildResource() *schema.Resource {
+func (r *APIGatewayV2API) BuildResource() *schema.Resource {
 	var costComponents []*schema.CostComponent
 
-	protocolType := *r.ProtocolType
-
-	if strings.ToLower(protocolType) == "websocket" {
-		costComponents = websocketAPICostComponent(r)
+	if strings.ToLower(r.ProtocolType) == "websocket" {
+		costComponents = r.websocketAPICostComponent()
 	}
 
-	if strings.ToLower(protocolType) == "http" {
-		costComponents = httpAPICostComponent(r)
+	if strings.ToLower(r.ProtocolType) == "http" {
+		costComponents = r.httpAPICostComponent()
 	}
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: APIgatewayv2APIUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    APIGatewayV2APIUsageSchema,
 	}
 }
 
-func httpAPICostComponent(r *APIgatewayv2API) []*schema.CostComponent {
-	region := *r.Region
+func (r *APIGatewayV2API) httpAPICostComponent() []*schema.CostComponent {
 	var monthlyRequests *decimal.Decimal
 	requestSize := decimal.NewFromInt(512)
 
@@ -61,8 +66,8 @@ func httpAPICostComponent(r *APIgatewayv2API) []*schema.CostComponent {
 	if r.MonthlyRequests != nil {
 		monthlyRequests = decimalPtr(decimal.NewFromInt(*r.MonthlyRequests))
 
-		if r.RequestSizeKb != nil {
-			requestSize = decimal.NewFromInt(*r.RequestSizeKb)
+		if r.RequestSizeKB != nil {
+			requestSize = decimal.NewFromInt(*r.RequestSizeKB)
 		}
 
 		if requestSize.GreaterThan(billableRequestSize) {
@@ -71,22 +76,19 @@ func httpAPICostComponent(r *APIgatewayv2API) []*schema.CostComponent {
 
 		apiRequestQuantities := usage.CalculateTierBuckets(*monthlyRequests, httpAPITiers)
 
-		costComponents = append(costComponents, httpCostComponent(region, "Requests (first 300M)", "0", &apiRequestQuantities[0]))
+		costComponents = append(costComponents, r.httpCostComponent("Requests (first 300M)", "0", &apiRequestQuantities[0]))
 
 		if apiRequestQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, httpCostComponent(region, "Requests (over 300M)", "300000000", &apiRequestQuantities[1]))
+			costComponents = append(costComponents, r.httpCostComponent("Requests (over 300M)", "300000000", &apiRequestQuantities[1]))
 		}
 	} else {
-		var unknown *decimal.Decimal
-
-		costComponents = append(costComponents, httpCostComponent(region, "Requests (first 300M)", "0", unknown))
+		costComponents = append(costComponents, r.httpCostComponent("Requests (first 300M)", "0", nil))
 	}
 
 	return costComponents
 }
 
-func websocketAPICostComponent(r *APIgatewayv2API) []*schema.CostComponent {
-	region := *r.Region
+func (r *APIGatewayV2API) websocketAPICostComponent() []*schema.CostComponent {
 	var monthlyMessages *decimal.Decimal
 	var monthlyConnectionMinutes *decimal.Decimal
 
@@ -101,8 +103,8 @@ func websocketAPICostComponent(r *APIgatewayv2API) []*schema.CostComponent {
 	if r.MonthlyMessages != nil {
 		monthlyMessages = decimalPtr(decimal.NewFromInt(*r.MonthlyMessages))
 
-		if r.MessageSizeKb != nil {
-			messageSize = decimal.NewFromInt(*r.MessageSizeKb)
+		if r.MessageSizeKB != nil {
+			messageSize = decimal.NewFromInt(*r.MessageSizeKB)
 		}
 
 		if messageSize.GreaterThan(billableRequestSize) {
@@ -111,21 +113,19 @@ func websocketAPICostComponent(r *APIgatewayv2API) []*schema.CostComponent {
 
 		apiRequestQuantities := usage.CalculateTierBuckets(*monthlyMessages, websocketAPITiers)
 
-		costComponents = append(costComponents, websocketCostComponent(region, "messages", "ApiGatewayMessage", "Messages (first 1B)", "0", &apiRequestQuantities[0]))
+		costComponents = append(costComponents, r.websocketCostComponent("messages", "ApiGatewayMessage", "Messages (first 1B)", "0", &apiRequestQuantities[0]))
 
 		if apiRequestQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, websocketCostComponent(region, "messages", "ApiGatewayMessage", "Messages (over 1B)", "1000000000", &apiRequestQuantities[1]))
+			costComponents = append(costComponents, r.websocketCostComponent("messages", "ApiGatewayMessage", "Messages (over 1B)", "1000000000", &apiRequestQuantities[1]))
 		}
 	} else {
-		var unknown *decimal.Decimal
-
-		costComponents = append(costComponents, websocketCostComponent(region, "messages", "ApiGatewayMessage", "Messages (first 1B)", "0", unknown))
+		costComponents = append(costComponents, r.websocketCostComponent("messages", "ApiGatewayMessage", "Messages (first 1B)", "0", nil))
 	}
 
 	if r.MonthlyConnectionMins != nil {
 		monthlyConnectionMinutes = decimalPtr(decimal.NewFromInt(*r.MonthlyConnectionMins))
 	}
-	costComponents = append(costComponents, websocketCostComponent(region, "minutes", "ApiGatewayMinute", "Connection duration", "0", monthlyConnectionMinutes))
+	costComponents = append(costComponents, r.websocketCostComponent("minutes", "ApiGatewayMinute", "Connection duration", "0", monthlyConnectionMinutes))
 
 	return costComponents
 }
@@ -134,7 +134,7 @@ func calculateBillableRequests(requestSize *decimal.Decimal, billableRequestSize
 	return decimalPtr(requests.Mul(requestSize.Div(*billableRequestSize).Ceil()))
 }
 
-func httpCostComponent(region string, displayName string, usageTier string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
+func (r *APIGatewayV2API) httpCostComponent(displayName string, usageTier string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "1M requests",
@@ -142,7 +142,7 @@ func httpCostComponent(region string, displayName string, usageTier string, mont
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonApiGateway"),
 			ProductFamily: strPtr("API Calls"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -155,7 +155,7 @@ func httpCostComponent(region string, displayName string, usageTier string, mont
 	}
 }
 
-func websocketCostComponent(region string, unit string, usageType string, displayName string, usageTier string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
+func (r *APIGatewayV2API) websocketCostComponent(unit string, usageType string, displayName string, usageTier string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "1M " + unit,
@@ -163,7 +163,7 @@ func websocketCostComponent(region string, unit string, usageType string, displa
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonApiGateway"),
 			ProductFamily: strPtr("WebSocket"),
 			AttributeFilters: []*schema.AttributeFilter{

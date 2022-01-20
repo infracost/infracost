@@ -8,11 +8,15 @@ import (
 func getELBRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_elb",
-		RFunc: NewElb,
+		RFunc: NewELB,
 	}
 }
-func NewElb(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.Elb{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+func NewELB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.ELB{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

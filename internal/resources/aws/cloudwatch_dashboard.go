@@ -8,7 +8,7 @@ import (
 )
 
 type CloudwatchDashboard struct {
-	Address *string
+	Address string
 }
 
 var CloudwatchDashboardUsageSchema = []*schema.UsageItem{}
@@ -19,7 +19,7 @@ func (r *CloudwatchDashboard) PopulateUsage(u *schema.UsageData) {
 
 func (r *CloudwatchDashboard) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Dashboard",
@@ -35,6 +35,7 @@ func (r *CloudwatchDashboard) BuildResource() *schema.Resource {
 					},
 				},
 			},
-		}, UsageSchema: CloudwatchDashboardUsageSchema,
+		},
+		UsageSchema: CloudwatchDashboardUsageSchema,
 	}
 }

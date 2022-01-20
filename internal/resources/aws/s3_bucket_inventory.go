@@ -8,8 +8,8 @@ import (
 )
 
 type S3BucketInventory struct {
-	Address              *string
-	Region               *string
+	Address              string
+	Region               string
 	MonthlyListedObjects *int64 `infracost_usage:"monthly_listed_objects"`
 }
 
@@ -20,15 +20,13 @@ func (r *S3BucketInventory) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *S3BucketInventory) BuildResource() *schema.Resource {
-	region := *r.Region
-
 	var listedObj *decimal.Decimal
 	if r.MonthlyListedObjects != nil {
 		listedObj = decimalPtr(decimal.NewFromInt(*r.MonthlyListedObjects))
 	}
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Objects listed",
@@ -37,13 +35,14 @@ func (r *S3BucketInventory) BuildResource() *schema.Resource {
 				MonthlyQuantity: listedObj,
 				ProductFilter: &schema.ProductFilter{
 					VendorName: strPtr("aws"),
-					Region:     strPtr(region),
+					Region:     strPtr(r.Region),
 					Service:    strPtr("AmazonS3"),
 					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "usagetype", ValueRegex: strPtr("/Inventory-ObjectsListed/")},
 					},
 				},
 			},
-		}, UsageSchema: S3BucketInventoryUsageSchema,
+		},
+		UsageSchema: S3BucketInventoryUsageSchema,
 	}
 }

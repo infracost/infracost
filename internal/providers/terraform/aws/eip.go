@@ -8,20 +8,18 @@ import (
 func getEIPRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_eip",
-		RFunc: NewEip,
+		RFunc: NewEIP,
 	}
 }
-func NewEip(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.Eip{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
-	if !d.IsEmpty("network_interface") {
-		r.NetworkInterface = strPtr(d.Get("network_interface").String())
+func NewEIP(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.EIP{
+		Address:               d.Address,
+		Region:                d.Get("region").String(),
+		CustomerOwnedIPv4Pool: d.Get("customer_owned_ipv4_pool").String(),
+		NetworkInterface:      d.Get("network_interface").String(),
+		Instance:              d.Get("instance").String(),
 	}
-	if !d.IsEmpty("customer_owned_ipv4_pool") {
-		r.CustomerOwnedIpv4Pool = strPtr(d.Get("customer_owned_ipv4_pool").String())
-	}
-	if !d.IsEmpty("instance") {
-		r.Instance = strPtr(d.Get("instance").String())
-	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

@@ -8,7 +8,7 @@ import (
 )
 
 type Route53Zone struct {
-	Address *string
+	Address string
 }
 
 var Route53ZoneUsageSchema = []*schema.UsageItem{}
@@ -19,7 +19,7 @@ func (r *Route53Zone) PopulateUsage(u *schema.UsageData) {
 
 func (r *Route53Zone) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Hosted zone",
@@ -38,6 +38,7 @@ func (r *Route53Zone) BuildResource() *schema.Resource {
 					StartUsageAmount: strPtr("0"),
 				},
 			},
-		}, UsageSchema: Route53ZoneUsageSchema,
+		},
+		UsageSchema: Route53ZoneUsageSchema,
 	}
 }

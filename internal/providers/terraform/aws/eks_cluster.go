@@ -8,11 +8,15 @@ import (
 func getNewEKSClusterItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_eks_cluster",
-		RFunc: NewEksCluster,
+		RFunc: NewEKSCluster,
 	}
 }
-func NewEksCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.EksCluster{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+func NewEKSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.EKSCluster{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

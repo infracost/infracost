@@ -11,11 +11,18 @@ func getRedshiftClusterRegistryItem() *schema.RegistryItem {
 		RFunc: NewRedshiftCluster,
 	}
 }
+
 func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.RedshiftCluster{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String()), NodeType: strPtr(d.Get("node_type").String())}
-	if !d.IsEmpty("number_of_nodes") {
-		r.NumberOfNodes = intPtr(d.Get("number_of_nodes").Int())
+	r := &aws.RedshiftCluster{
+		Address:  d.Address,
+		Region:   d.Get("region").String(),
+		NodeType: d.Get("node_type").String(),
 	}
+
+	if !d.IsEmpty("number_of_nodes") {
+		r.Nodes = intPtr(d.Get("number_of_nodes").Int())
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

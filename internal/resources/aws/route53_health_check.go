@@ -11,14 +11,16 @@ import (
 )
 
 type Route53HealthCheck struct {
-	Address         *string
-	RequestInterval *string
-	MeasureLatency  *bool
-	Type            *string
+	Address         string
+	RequestInterval string
+	MeasureLatency  bool
+	Type            string
 	EndpointType    *string `infracost_usage:"endpoint_type"`
 }
 
-var Route53HealthCheckUsageSchema = []*schema.UsageItem{{Key: "endpoint_type", ValueType: schema.String, DefaultValue: "aws"}}
+var Route53HealthCheckUsageSchema = []*schema.UsageItem{
+	{Key: "endpoint_type", ValueType: schema.String, DefaultValue: "aws"},
+}
 
 func (r *Route53HealthCheck) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -54,18 +56,18 @@ func (r *Route53HealthCheck) BuildResource() *schema.Resource {
 		},
 	})
 
-	healthCheckType := *r.Type
+	healthCheckType := r.Type
 	optionalHealthCheckCount := decimal.Zero
 
 	if strings.HasPrefix(healthCheckType, "HTTPS") {
 		optionalHealthCheckCount = optionalHealthCheckCount.Add(decimal.NewFromInt(1))
 	}
 
-	if *r.RequestInterval == "10" {
+	if r.RequestInterval == "10" {
 		optionalHealthCheckCount = optionalHealthCheckCount.Add(decimal.NewFromInt(1))
 	}
 
-	if *r.MeasureLatency {
+	if r.MeasureLatency {
 		optionalHealthCheckCount = optionalHealthCheckCount.Add(decimal.NewFromInt(1))
 	}
 
@@ -94,7 +96,8 @@ func (r *Route53HealthCheck) BuildResource() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: Route53HealthCheckUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    Route53HealthCheckUsageSchema,
 	}
 }

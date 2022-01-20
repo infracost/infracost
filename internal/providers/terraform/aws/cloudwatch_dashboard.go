@@ -12,7 +12,10 @@ func getCloudwatchDashboardRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewCloudwatchDashboard(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.CloudwatchDashboard{Address: strPtr(d.Address)}
+	r := &aws.CloudwatchDashboard{
+		Address: d.Address,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

@@ -7,22 +7,20 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type Ec2ClientVpnEndpoint struct {
-	Address *string
-	Region  *string
+type EC2ClientVPNEndpoint struct {
+	Address string
+	Region  string
 }
 
-var Ec2ClientVpnEndpointUsageSchema = []*schema.UsageItem{}
+var EC2ClientVPNEndpointUsageSchema = []*schema.UsageItem{}
 
-func (r *Ec2ClientVpnEndpoint) PopulateUsage(u *schema.UsageData) {
+func (r *EC2ClientVPNEndpoint) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *Ec2ClientVpnEndpoint) BuildResource() *schema.Resource {
-	region := *r.Region
-
+func (r *EC2ClientVPNEndpoint) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           "Connection",
@@ -31,13 +29,14 @@ func (r *Ec2ClientVpnEndpoint) BuildResource() *schema.Resource {
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName: strPtr("aws"),
-					Region:     strPtr(region),
+					Region:     strPtr(r.Region),
 					Service:    strPtr("AmazonVPC"),
 					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "usagetype", ValueRegex: strPtr("/ClientVPN-ConnectionHours/")},
 					},
 				},
 			},
-		}, UsageSchema: Ec2ClientVpnEndpointUsageSchema,
+		},
+		UsageSchema: EC2ClientVPNEndpointUsageSchema,
 	}
 }

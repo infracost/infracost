@@ -7,29 +7,28 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type EcrRepository struct {
-	Address   *string
-	Region    *string
-	StorageGb *float64 `infracost_usage:"storage_gb"`
+type ECRRepository struct {
+	Address   string
+	Region    string
+	StorageGB *float64 `infracost_usage:"storage_gb"`
 }
 
-var EcrRepositoryUsageSchema = []*schema.UsageItem{{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var ECRRepositoryUsageSchema = []*schema.UsageItem{
+	{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+}
 
-func (r *EcrRepository) PopulateUsage(u *schema.UsageData) {
+func (r *ECRRepository) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *EcrRepository) BuildResource() *schema.Resource {
-	region := *r.Region
-
+func (r *ECRRepository) BuildResource() *schema.Resource {
 	var storageSize *decimal.Decimal
-
-	if r.StorageGb != nil {
-		storageSize = decimalPtr(decimal.NewFromFloat(*r.StorageGb))
+	if r.StorageGB != nil {
+		storageSize = decimalPtr(decimal.NewFromFloat(*r.StorageGB))
 	}
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Storage",
@@ -38,11 +37,12 @@ func (r *EcrRepository) BuildResource() *schema.Resource {
 				MonthlyQuantity: storageSize,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonECR"),
 					ProductFamily: strPtr("EC2 Container Registry"),
 				},
 			},
-		}, UsageSchema: EcrRepositoryUsageSchema,
+		},
+		UsageSchema: ECRRepositoryUsageSchema,
 	}
 }

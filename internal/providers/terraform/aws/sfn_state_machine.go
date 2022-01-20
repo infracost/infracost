@@ -8,14 +8,17 @@ import (
 func getStepFunctionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_sfn_state_machine",
-		RFunc: NewSfnStateMachine,
+		RFunc: NewSFnStateMachine,
 	}
 }
-func NewSfnStateMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.SfnStateMachine{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
-	if !d.IsEmpty("type") {
-		r.Type = strPtr(d.Get("type").String())
+
+func NewSFnStateMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.SFnStateMachine{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+		Type:    d.Get("type").String(),
 	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }
