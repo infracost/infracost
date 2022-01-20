@@ -124,7 +124,7 @@ func (h *CommentHandler) LatestMatchingComment(ctx context.Context) (Comment, er
 		return nil, nil
 	}
 
-	return matchingComments[len(matchingComments) - 1], nil
+	return matchingComments[len(matchingComments)-1], nil
 }
 
 // UpdateComment updates the comment with the given body.

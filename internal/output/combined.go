@@ -32,16 +32,27 @@ func LoadPaths(paths []string) ([]ReportInput, error) {
 	inputFiles := []string{}
 
 	for _, path := range paths {
-		expanded, err := homedir.Expand(path)
+		// To make things easier in GitHub actions and other CI environments, we allow path to be a json array, e.g.:
+		// --path='["/path/one", "/path/two"]'
+		var nestedPaths []string
+		err := json.Unmarshal([]byte(path), &nestedPaths)
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed to expand path")
+			// This is not a json string so there must be no nested paths
+			nestedPaths = []string{path}
 		}
 
-		matches, _ := filepath.Glob(expanded)
-		if len(matches) > 0 {
-			inputFiles = append(inputFiles, matches...)
-		} else {
-			inputFiles = append(inputFiles, path)
+		for _, p := range nestedPaths {
+			expanded, err := homedir.Expand(p)
+			if err != nil {
+				return nil, errors.Wrap(err, "Failed to expand path")
+			}
+
+			matches, _ := filepath.Glob(expanded)
+			if len(matches) > 0 {
+				inputFiles = append(inputFiles, matches...)
+			} else {
+				inputFiles = append(inputFiles, p)
+			}
 		}
 	}
 
