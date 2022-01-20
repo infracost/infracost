@@ -1,0 +1,26 @@
+Post an Infracost comment to GitHub, GitLab or Azure DevOps
+
+USAGE
+  infracost comment [flags]
+  infracost comment [command]
+
+EXAMPLES
+  Update a comment on a GitHub pull request:
+
+      infracost comment github --repo my-org/my-github-repo --pull-request 3 --path infracost.json --github-token $GITHUB_TOKEN
+
+  Post a new comment to a GitLab commit:
+
+      infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior new --gitlab-token $GITLAB_TOKEN
+
+AVAILABLE COMMANDS
+  github      Post an Infracost comment to GitHub
+
+FLAGS
+  -h, --help   help for comment
+
+GLOBAL FLAGS
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output
+
+Use "infracost comment [command] --help" for more information about a command.
