@@ -12,7 +12,11 @@ func getConfigurationRecorderItem() *schema.RegistryItem {
 	}
 }
 func NewConfigConfigurationRecorder(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.ConfigConfigurationRecorder{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	r := &aws.ConfigConfigurationRecorder{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

@@ -12,7 +12,11 @@ func getCloudwatchEventBusItem() *schema.RegistryItem {
 	}
 }
 func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.CloudwatchEventBus{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	r := &aws.CloudwatchEventBus{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

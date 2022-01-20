@@ -20,7 +20,12 @@ func GetALBRegistryItem() *schema.RegistryItem {
 }
 
 func NewLB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.LB{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String()), LoadBalancerType: strPtr(d.Get("load_balancer_type").String())}
+	r := &aws.LB{
+		Address:          d.Address,
+		Region:           d.Get("region").String(),
+		LoadBalancerType: d.Get("load_balancer_type").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

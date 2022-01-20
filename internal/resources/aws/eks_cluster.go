@@ -7,31 +7,26 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type EksCluster struct {
-	Address *string
-	Region  *string
+type EKSCluster struct {
+	Address string
+	Region  string
 }
 
-var EksClusterUsageSchema = []*schema.UsageItem{}
+var EKSClusterUsageSchema = []*schema.UsageItem{}
 
-func (r *EksCluster) PopulateUsage(u *schema.UsageData) {
+func (r *EKSCluster) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *EksCluster) BuildResource() *schema.Resource {
-	region := *r.Region
-
-	costComponents := make([]*schema.CostComponent, 0)
-
-	costComponents = append(costComponents, clusterHoursCostComponent(r, region))
-
+func (r *EKSCluster) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: EksClusterUsageSchema,
+		Name:           r.Address,
+		CostComponents: []*schema.CostComponent{r.clusterHoursCostComponent()},
+		UsageSchema:    EKSClusterUsageSchema,
 	}
 }
 
-func clusterHoursCostComponent(r *EksCluster, region string) *schema.CostComponent {
+func (r *EKSCluster) clusterHoursCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "EKS cluster",
 		Unit:           "hours",
@@ -39,7 +34,7 @@ func clusterHoursCostComponent(r *EksCluster, region string) *schema.CostCompone
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonEKS"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{

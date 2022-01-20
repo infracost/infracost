@@ -11,11 +11,18 @@ func getNeptuneClusterInstanceRegistryItem() *schema.RegistryItem {
 		RFunc: NewNeptuneClusterInstance,
 	}
 }
+
 func NewNeptuneClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.NeptuneClusterInstance{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String()), InstanceClass: strPtr(d.Get("instance_class").String())}
+	r := &aws.NeptuneClusterInstance{
+		Address:       d.Address,
+		Region:        d.Get("region").String(),
+		InstanceClass: d.Get("instance_class").String(),
+	}
+
 	if !d.IsEmpty("count") {
 		r.Count = intPtr(d.Get("count").Int())
 	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

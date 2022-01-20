@@ -9,42 +9,38 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type MskCluster struct {
-	Address                           *string
-	Region                            *string
-	NumberOfBrokerNodes               *int64
-	BrokerNodeGroupInfo0InstanceType  *string
-	BrokerNodeGroupInfo0EbsVolumeSize *int64
+type MSKCluster struct {
+	Address                 string
+	Region                  string
+	BrokerNodes             int64
+	BrokerNodeInstanceType  string
+	BrokerNodeEBSVolumeSize int64
 }
 
-var MskClusterUsageSchema = []*schema.UsageItem{}
+var MSKClusterUsageSchema = []*schema.UsageItem{}
 
-func (r *MskCluster) PopulateUsage(u *schema.UsageData) {
+func (r *MSKCluster) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *MskCluster) BuildResource() *schema.Resource {
-	region := *r.Region
-
-	brokerNodes := decimal.NewFromInt(*r.NumberOfBrokerNodes)
-	instanceType := *r.BrokerNodeGroupInfo0InstanceType
-	ebsVolumeSize := decimal.NewFromInt(*r.BrokerNodeGroupInfo0EbsVolumeSize).Mul(brokerNodes)
+func (r *MSKCluster) BuildResource() *schema.Resource {
+	ebsVolumeSize := r.BrokerNodeEBSVolumeSize * r.BrokerNodes
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           fmt.Sprintf("Instance (%s)", instanceType),
+				Name:           fmt.Sprintf("Instance (%s)", r.BrokerNodeInstanceType),
 				Unit:           "hours",
 				UnitMultiplier: decimal.NewFromInt(1),
-				HourlyQuantity: &brokerNodes,
+				HourlyQuantity: decimalPtr(decimal.NewFromInt(r.BrokerNodes)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonMSK"),
 					ProductFamily: strPtr("Managed Streaming for Apache Kafka (MSK)"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", instanceType))},
+						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", r.BrokerNodeInstanceType))},
 						{Key: "locationType", Value: strPtr("AWS Region")},
 					},
 				},
@@ -53,10 +49,10 @@ func (r *MskCluster) BuildResource() *schema.Resource {
 				Name:            "Storage",
 				Unit:            "GB",
 				UnitMultiplier:  decimal.NewFromInt(1),
-				MonthlyQuantity: decimalPtr(ebsVolumeSize),
+				MonthlyQuantity: decimalPtr(decimal.NewFromInt(ebsVolumeSize)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonMSK"),
 					ProductFamily: strPtr("Managed Streaming for Apache Kafka (MSK)"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -64,6 +60,7 @@ func (r *MskCluster) BuildResource() *schema.Resource {
 					},
 				},
 			},
-		}, UsageSchema: MskClusterUsageSchema,
+		},
+		UsageSchema: MSKClusterUsageSchema,
 	}
 }

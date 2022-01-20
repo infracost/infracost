@@ -11,8 +11,12 @@ func getRoute53ZoneRegistryItem() *schema.RegistryItem {
 		RFunc: NewRoute53Zone,
 	}
 }
+
 func NewRoute53Zone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.Route53Zone{Address: strPtr(d.Address)}
+	r := &aws.Route53Zone{
+		Address: d.Address,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

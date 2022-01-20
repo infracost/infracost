@@ -6,11 +6,11 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
 
-func TestAwsStepFunctionGoldenFile(t *testing.T) {
+func TestSFnStateMachineGoldenFile(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "step_function_test")
+	tftest.GoldenFileResourceTests(t, "sfn_state_machine_test")
 }

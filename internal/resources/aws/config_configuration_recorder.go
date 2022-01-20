@@ -8,21 +8,22 @@ import (
 )
 
 type ConfigConfigurationRecorder struct {
-	Address                  *string
-	Region                   *string
+	Address                  string
+	Region                   string
 	MonthlyConfigItems       *int64 `infracost_usage:"monthly_config_items"`
 	MonthlyCustomConfigItems *int64 `infracost_usage:"monthly_custom_config_items"`
 }
 
-var ConfigConfigurationRecorderUsageSchema = []*schema.UsageItem{{Key: "monthly_config_items", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_custom_config_items", ValueType: schema.Int64, DefaultValue: 0}}
+var ConfigConfigurationRecorderUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_config_items", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_custom_config_items", ValueType: schema.Int64, DefaultValue: 0},
+}
 
 func (r *ConfigConfigurationRecorder) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
 func (r *ConfigConfigurationRecorder) BuildResource() *schema.Resource {
-	region := *r.Region
-
 	var monthlyConfigItems *decimal.Decimal
 	if r.MonthlyConfigItems != nil {
 		monthlyConfigItems = decimalPtr(decimal.NewFromInt(*r.MonthlyConfigItems))
@@ -42,7 +43,7 @@ func (r *ConfigConfigurationRecorder) BuildResource() *schema.Resource {
 		MonthlyQuantity: monthlyConfigItems,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AWSConfig"),
 			ProductFamily: strPtr("Management Tools - AWS Config"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -58,7 +59,7 @@ func (r *ConfigConfigurationRecorder) BuildResource() *schema.Resource {
 		MonthlyQuantity: monthlyCustomConfigItems,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AWSConfig"),
 			ProductFamily: strPtr("Management Tools - AWS Config"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -68,7 +69,8 @@ func (r *ConfigConfigurationRecorder) BuildResource() *schema.Resource {
 	})
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: ConfigConfigurationRecorderUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    ConfigConfigurationRecorderUsageSchema,
 	}
 }

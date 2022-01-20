@@ -7,31 +7,30 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type EksFargateProfile struct {
-	Address *string
-	Region  *string
+type EKSFargateProfile struct {
+	Address string
+	Region  string
 }
 
-var EksFargateProfileUsageSchema = []*schema.UsageItem{}
+var EKSFargateProfileUsageSchema = []*schema.UsageItem{}
 
-func (r *EksFargateProfile) PopulateUsage(u *schema.UsageData) {
+func (r *EKSFargateProfile) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *EksFargateProfile) BuildResource() *schema.Resource {
-	region := *r.Region
+func (r *EKSFargateProfile) BuildResource() *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
-
-	costComponents = append(costComponents, memoryCostComponent(r, region))
-	costComponents = append(costComponents, vcpuCostComponent(r, region))
+	costComponents = append(costComponents, r.memoryCostComponent())
+	costComponents = append(costComponents, r.vcpuCostComponent())
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: EksFargateProfileUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    EKSFargateProfileUsageSchema,
 	}
 }
 
-func memoryCostComponent(r *EksFargateProfile, region string) *schema.CostComponent {
+func (r *EKSFargateProfile) memoryCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "Per GB per hour",
 		Unit:           "GB",
@@ -39,7 +38,7 @@ func memoryCostComponent(r *EksFargateProfile, region string) *schema.CostCompon
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonEKS"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -52,7 +51,7 @@ func memoryCostComponent(r *EksFargateProfile, region string) *schema.CostCompon
 	}
 }
 
-func vcpuCostComponent(r *EksFargateProfile, region string) *schema.CostComponent {
+func (r *EKSFargateProfile) vcpuCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "Per vCPU per hour",
 		Unit:           "CPU",
@@ -60,7 +59,7 @@ func vcpuCostComponent(r *EksFargateProfile, region string) *schema.CostComponen
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonEKS"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{

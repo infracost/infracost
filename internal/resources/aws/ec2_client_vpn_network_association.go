@@ -7,22 +7,20 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type Ec2ClientVpnNetworkAssociation struct {
-	Address *string
-	Region  *string
+type EC2ClientVPNNetworkAssociation struct {
+	Address string
+	Region  string
 }
 
-var Ec2ClientVpnNetworkAssociationUsageSchema = []*schema.UsageItem{}
+var EC2ClientVPNNetworkAssociationUsageSchema = []*schema.UsageItem{}
 
-func (r *Ec2ClientVpnNetworkAssociation) PopulateUsage(u *schema.UsageData) {
+func (r *EC2ClientVPNNetworkAssociation) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *Ec2ClientVpnNetworkAssociation) BuildResource() *schema.Resource {
-	region := *r.Region
-
+func (r *EC2ClientVPNNetworkAssociation) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           "Endpoint association",
@@ -31,13 +29,14 @@ func (r *Ec2ClientVpnNetworkAssociation) BuildResource() *schema.Resource {
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName: strPtr("aws"),
-					Region:     strPtr(region),
+					Region:     strPtr(r.Region),
 					Service:    strPtr("AmazonVPC"),
 					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "usagetype", ValueRegex: strPtr("/ClientVPN-EndpointHours/")},
 					},
 				},
 			},
-		}, UsageSchema: Ec2ClientVpnNetworkAssociationUsageSchema,
+		},
+		UsageSchema: EC2ClientVPNNetworkAssociationUsageSchema,
 	}
 }

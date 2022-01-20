@@ -5,14 +5,19 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getKinesisDataAnalyticsSnapshotRegistryItem() *schema.RegistryItem {
+func getKinesisAnalyticsV2ApplicationSnapshotRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_kinesisanalyticsv2_application_snapshot",
-		RFunc: NewKinesisanalyticsv2ApplicationSnapshot,
+		RFunc: NewKinesisAnalyticsV2ApplicationSnapshot,
 	}
 }
-func NewKinesisanalyticsv2ApplicationSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.Kinesisanalyticsv2ApplicationSnapshot{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+
+func NewKinesisAnalyticsV2ApplicationSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.KinesisAnalyticsV2ApplicationSnapshot{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

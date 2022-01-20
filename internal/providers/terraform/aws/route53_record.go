@@ -13,13 +13,18 @@ func getRoute53RecordRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewRoute53Record(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var aliasType *string
+	isAlias := false
 
-	if len(d.References("alias.0.name")) > 0 && d.References("alias.0.name")[0].Type != "aws_route53_record" {
-		aliasType = strPtr("aws_route53_record")
+	aliasRefs := d.References("alias.0.name")
+	if len(aliasRefs) > 0 && aliasRefs[0].Type != "aws_route53_record" {
+		isAlias = true
 	}
 
-	r := &aws.Route53Record{Address: strPtr(d.Address), AliasType: aliasType}
+	r := &aws.Route53Record{
+		Address: d.Address,
+		IsAlias: isAlias,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

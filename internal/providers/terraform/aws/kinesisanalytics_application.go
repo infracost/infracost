@@ -11,8 +11,13 @@ func getKinesisAnalyticsApplicationRegistryItem() *schema.RegistryItem {
 		RFunc: NewKinesisAnalyticsApplication,
 	}
 }
+
 func NewKinesisAnalyticsApplication(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.KinesisAnalyticsApplication{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	r := &aws.KinesisAnalyticsApplication{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

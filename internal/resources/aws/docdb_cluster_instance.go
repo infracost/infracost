@@ -10,34 +10,34 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type DocdbClusterInstance struct {
-	Address             *string
-	Region              *string
-	InstanceClass       *string
-	DataStorageGb       *float64 `infracost_usage:"data_storage_gb"`
-	MonthlyIoRequests   *int64   `infracost_usage:"monthly_io_requests"`
+type DocDBClusterInstance struct {
+	Address             string
+	Region              string
+	InstanceClass       string
+	DataStorageGB       *float64 `infracost_usage:"data_storage_gb"`
+	MonthlyIORequests   *int64   `infracost_usage:"monthly_io_requests"`
 	MonthlyCPUCreditHrs *int64   `infracost_usage:"monthly_cpu_credit_hrs"`
 }
 
-var DocdbClusterInstanceUsageSchema = []*schema.UsageItem{{Key: "data_storage_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_io_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0}}
+var DocDBClusterInstanceUsageSchema = []*schema.UsageItem{
+	{Key: "data_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_io_requests", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
+}
 
-func (r *DocdbClusterInstance) PopulateUsage(u *schema.UsageData) {
+func (r *DocDBClusterInstance) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *DocdbClusterInstance) BuildResource() *schema.Resource {
-	region := *r.Region
-
-	instanceType := *r.InstanceClass
-
+func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 	var storageRate *decimal.Decimal
-	if r.DataStorageGb != nil {
-		storageRate = decimalPtr(decimal.NewFromFloat(*r.DataStorageGb))
+	if r.DataStorageGB != nil {
+		storageRate = decimalPtr(decimal.NewFromFloat(*r.DataStorageGB))
 	}
 
 	var ioRequests *decimal.Decimal
-	if r.MonthlyIoRequests != nil {
-		ioRequests = decimalPtr(decimal.NewFromInt(*r.MonthlyIoRequests))
+	if r.MonthlyIORequests != nil {
+		ioRequests = decimalPtr(decimal.NewFromInt(*r.MonthlyIORequests))
 	}
 
 	var cpuCreditsT3 *decimal.Decimal
@@ -47,17 +47,17 @@ func (r *DocdbClusterInstance) BuildResource() *schema.Resource {
 
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Database instance (%s, %s)", "on-demand", instanceType),
+			Name:           fmt.Sprintf("Database instance (%s, %s)", "on-demand", r.InstanceClass),
 			Unit:           "hours",
 			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
+				Region:        strPtr(r.Region),
 				Service:       strPtr("AmazonDocDB"),
 				ProductFamily: strPtr("Database Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "instanceType", Value: strPtr(instanceType)},
+					{Key: "instanceType", Value: strPtr(r.InstanceClass)},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -71,7 +71,7 @@ func (r *DocdbClusterInstance) BuildResource() *schema.Resource {
 			MonthlyQuantity: storageRate,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
+				Region:        strPtr(r.Region),
 				Service:       strPtr("AmazonDocDB"),
 				ProductFamily: strPtr("Database Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
@@ -89,7 +89,7 @@ func (r *DocdbClusterInstance) BuildResource() *schema.Resource {
 			MonthlyQuantity: ioRequests,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
+				Region:        strPtr(r.Region),
 				Service:       strPtr("AmazonDocDB"),
 				ProductFamily: strPtr("System Operation"),
 				AttributeFilters: []*schema.AttributeFilter{
@@ -99,7 +99,7 @@ func (r *DocdbClusterInstance) BuildResource() *schema.Resource {
 		},
 	}
 
-	if strings.HasPrefix(instanceType, "db.t3.") {
+	if strings.HasPrefix(r.InstanceClass, "db.t3.") {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "CPU credits",
 			Unit:            "vCPU-hours",
@@ -107,7 +107,7 @@ func (r *DocdbClusterInstance) BuildResource() *schema.Resource {
 			MonthlyQuantity: cpuCreditsT3,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
+				Region:        strPtr(r.Region),
 				Service:       strPtr("AmazonDocDB"),
 				ProductFamily: strPtr("CPU Credits"),
 				AttributeFilters: []*schema.AttributeFilter{
@@ -118,7 +118,8 @@ func (r *DocdbClusterInstance) BuildResource() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: DocdbClusterInstanceUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    DocDBClusterInstanceUsageSchema,
 	}
 }

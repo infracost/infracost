@@ -12,7 +12,11 @@ func getCloudwatchLogGroupItem() *schema.RegistryItem {
 	}
 }
 func NewCloudwatchLogGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.CloudwatchLogGroup{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	r := &aws.CloudwatchLogGroup{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

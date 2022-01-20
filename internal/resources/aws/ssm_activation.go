@@ -9,41 +9,39 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type SsmActivation struct {
-	Address           *string
-	Region            *string
-	RegistrationLimit *int64
+type SSMActivation struct {
+	Address           string
+	Region            string
+	RegistrationLimit int64
 	InstanceTier      *string `infracost_usage:"instance_tier"`
 	Instances         *int64  `infracost_usage:"instances"`
 }
 
-var SsmActivationUsageSchema = []*schema.UsageItem{{Key: "instance_tier", ValueType: schema.String, DefaultValue: "standard"}, {Key: "instances", ValueType: schema.Int64, DefaultValue: 0}}
+var SSMActivationUsageSchema = []*schema.UsageItem{
+	{Key: "instance_tier", ValueType: schema.String, DefaultValue: "standard"},
+	{Key: "instances", ValueType: schema.Int64, DefaultValue: 0},
+}
 
-func (r *SsmActivation) PopulateUsage(u *schema.UsageData) {
+func (r *SSMActivation) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *SsmActivation) BuildResource() *schema.Resource {
-	region := *r.Region
-
-	var instanceCount *decimal.Decimal
+func (r *SSMActivation) BuildResource() *schema.Resource {
 	var instanceTier string
-
 	if r.InstanceTier != nil {
 		instanceTier = *r.InstanceTier
-	} else if r.RegistrationLimit != nil {
-		if *r.RegistrationLimit > 1000 {
-			instanceTier = "Advanced"
-		}
+	} else if r.RegistrationLimit > 1000 {
+		instanceTier = "Advanced"
 	}
 
+	var instanceCount *decimal.Decimal
 	if r.Instances != nil {
 		instanceCount = decimalPtr(decimal.NewFromInt(*r.Instances))
 	}
 
 	if strings.ToLower(instanceTier) == "advanced" {
 		return &schema.Resource{
-			Name: *r.Address,
+			Name: r.Address,
 			CostComponents: []*schema.CostComponent{
 				{
 					Name:           "On-prem managed instances (advanced)",
@@ -52,7 +50,7 @@ func (r *SsmActivation) BuildResource() *schema.Resource {
 					HourlyQuantity: instanceCount,
 					ProductFilter: &schema.ProductFilter{
 						VendorName:    strPtr("aws"),
-						Region:        strPtr(region),
+						Region:        strPtr(r.Region),
 						Service:       strPtr("AWSSystemsManager"),
 						ProductFamily: strPtr("AWS Systems Manager"),
 						AttributeFilters: []*schema.AttributeFilter{
@@ -60,13 +58,14 @@ func (r *SsmActivation) BuildResource() *schema.Resource {
 						},
 					},
 				},
-			}, UsageSchema: SsmActivationUsageSchema,
+			}, UsageSchema: SSMActivationUsageSchema,
 		}
 	}
 
 	return &schema.Resource{
-		Name:      *r.Address,
-		NoPrice:   true,
-		IsSkipped: true, UsageSchema: SsmActivationUsageSchema,
+		Name:        r.Address,
+		NoPrice:     true,
+		IsSkipped:   true,
+		UsageSchema: SSMActivationUsageSchema,
 	}
 }

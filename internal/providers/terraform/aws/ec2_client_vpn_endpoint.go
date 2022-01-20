@@ -12,7 +12,11 @@ func getEC2ClientVPNEndpointRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewEc2ClientVpnEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.Ec2ClientVpnEndpoint{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	r := &aws.EC2ClientVPNEndpoint{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

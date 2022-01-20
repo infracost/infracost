@@ -7,36 +7,33 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type KmsKey struct {
-	Address               *string
-	Region                *string
-	CustomerMasterKeySpec *string
+type KMSKey struct {
+	Address               string
+	Region                string
+	CustomerMasterKeySpec string
 }
 
-var KmsKeyUsageSchema = []*schema.UsageItem{}
+var KMSKeyUsageSchema = []*schema.UsageItem{}
 
-func (r *KmsKey) PopulateUsage(u *schema.UsageData) {
+func (r *KMSKey) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *KmsKey) BuildResource() *schema.Resource {
-
-	region := *r.Region
-	spec := *r.CustomerMasterKeySpec
-
+func (r *KMSKey) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
-		CustomerMasterKeyCostComponent(region),
+		r.customerMasterKeyCostComponent(),
 	}
 
-	costComponents = appendRequestComponentsForSpec(costComponents, spec, region)
+	costComponents = append(costComponents, r.requestsCostComponents()...)
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: KmsKeyUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    KMSKeyUsageSchema,
 	}
 }
 
-func CustomerMasterKeyCostComponent(region string) *schema.CostComponent {
+func (r *KMSKey) customerMasterKeyCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Customer master key",
 		Unit:            "months",
@@ -44,7 +41,7 @@ func CustomerMasterKeyCostComponent(region string) *schema.CostComponent {
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("awskms"),
 			ProductFamily: strPtr("Encryption Key"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -54,12 +51,12 @@ func CustomerMasterKeyCostComponent(region string) *schema.CostComponent {
 	}
 }
 
-func appendRequestComponentsForSpec(costComponents []*schema.CostComponent, spec string, region string) []*schema.CostComponent {
-
-	switch spec {
+func (r *KMSKey) requestsCostComponents() []*schema.CostComponent {
+	switch r.CustomerMasterKeySpec {
 	case "RSA_2048":
-		costComponents = append(costComponents, requestPriceComponent("Requests (RSA 2048)", region, "/KMS-Requests-Asymmetric-RSA_2048/"))
-		return costComponents
+		return []*schema.CostComponent{
+			r.requestsCostComponent("Requests (RSA 2048)", "/KMS-Requests-Asymmetric-RSA_2048/"),
+		}
 	case
 		"RSA_3072",
 		"RSA_4096",
@@ -67,24 +64,26 @@ func appendRequestComponentsForSpec(costComponents []*schema.CostComponent, spec
 		"ECC_NIST_P384",
 		"ECC_NIST_P521",
 		"ECC_SECG_P256K1":
-		costComponents = append(costComponents, requestPriceComponent("Requests (asymmetric)", region, "/KMS-Requests-Asymmetric$/"))
-		return costComponents
+		return []*schema.CostComponent{
+			r.requestsCostComponent("Requests (asymmetric)", "/KMS-Requests-Asymmetric$/"),
+		}
 	}
 
-	costComponents = append(costComponents, requestPriceComponent("Requests", region, "/KMS-Requests$/"))
-	costComponents = append(costComponents, requestPriceComponent("ECC GenerateDataKeyPair requests", region, "/KMS-Requests-GenerateDatakeyPair-ECC/"))
-	costComponents = append(costComponents, requestPriceComponent("RSA GenerateDataKeyPair requests", region, "/KMS-Requests-GenerateDatakeyPair-ECC/"))
-	return costComponents
+	return []*schema.CostComponent{
+		r.requestsCostComponent("Requests", "/KMS-Requests$/"),
+		r.requestsCostComponent("ECC GenerateDataKeyPair requests", "/KMS-Requests-GenerateDatakeyPair-ECC/"),
+		r.requestsCostComponent("RSA GenerateDataKeyPair requests", "/KMS-Requests-GenerateDatakeyPair-ECC/"),
+	}
 }
 
-func requestPriceComponent(name string, region string, usagetype string) *schema.CostComponent {
+func (r *KMSKey) requestsCostComponent(name string, usagetype string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "10k requests",
 		UnitMultiplier: decimal.NewFromInt(10000),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
-			Region:     strPtr(region),
+			Region:     strPtr(r.Region),
 			Service:    strPtr("awskms"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "usagetype", ValueRegex: strPtr(usagetype)},

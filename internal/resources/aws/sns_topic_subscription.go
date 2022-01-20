@@ -9,38 +9,27 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type SnsTopicSubscription struct {
-	Address         *string
-	Protocol        *string
-	Region          *string
-	RequestSizeKb   *float64 `infracost_usage:"request_size_kb"`
+type SNSTopicSubscription struct {
+	Address         string
+	Protocol        string
+	Region          string
+	RequestSizeKB   *float64 `infracost_usage:"request_size_kb"`
 	MonthlyRequests *int64   `infracost_usage:"monthly_requests"`
 }
 
-var SnsTopicSubscriptionUsageSchema = []*schema.UsageItem{{Key: "request_size_kb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0}}
+var SNSTopicSubscriptionUsageSchema = []*schema.UsageItem{
+	{Key: "request_size_kb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+}
 
-func (r *SnsTopicSubscription) PopulateUsage(u *schema.UsageData) {
+func (r *SNSTopicSubscription) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *SnsTopicSubscription) BuildResource() *schema.Resource {
-	region := *r.Region
-
+func (r *SNSTopicSubscription) BuildResource() *schema.Resource {
 	var endpointType string
 	var freeTier string
-
-	requestSize := decimal.NewFromInt(64)
-	if r.RequestSizeKb != nil {
-		requestSize = decimal.NewFromFloat(*r.RequestSizeKb)
-	}
-
-	var requests *decimal.Decimal
-	if r.MonthlyRequests != nil {
-		monthlyRequests := decimal.NewFromInt(*r.MonthlyRequests)
-		requests = decimalPtr(calculateRequests(requestSize, monthlyRequests))
-	}
-
-	switch *r.Protocol {
+	switch r.Protocol {
 	case "http", "https":
 		endpointType = "HTTP"
 		freeTier = "100000"
@@ -48,8 +37,19 @@ func (r *SnsTopicSubscription) BuildResource() *schema.Resource {
 		return nil
 	}
 
+	var requests *decimal.Decimal
+
+	requestSize := decimal.NewFromInt(64)
+	if r.RequestSizeKB != nil {
+		requestSize = decimal.NewFromFloat(*r.RequestSizeKB)
+	}
+
+	if r.MonthlyRequests != nil {
+		requests = decimalPtr(r.calculateRequests(requestSize, decimal.NewFromInt(*r.MonthlyRequests)))
+	}
+
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            fmt.Sprintf("%s notifications", endpointType),
@@ -58,7 +58,7 @@ func (r *SnsTopicSubscription) BuildResource() *schema.Resource {
 				MonthlyQuantity: requests,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonSNS"),
 					ProductFamily: strPtr("Message Delivery"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -69,6 +69,11 @@ func (r *SnsTopicSubscription) BuildResource() *schema.Resource {
 					StartUsageAmount: strPtr(freeTier),
 				},
 			},
-		}, UsageSchema: SnsTopicSubscriptionUsageSchema,
+		},
+		UsageSchema: SNSTopicSubscriptionUsageSchema,
 	}
+}
+
+func (r *SNSTopicSubscription) calculateRequests(requestSize decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
+	return requestSize.Div(decimal.NewFromInt(64)).Ceil().Mul(monthlyRequests)
 }
