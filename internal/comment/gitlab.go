@@ -292,7 +292,7 @@ func (h *gitlabPRHandler) CallHideComment(ctx context.Context, comment Comment) 
 	return errors.New("Not implemented")
 }
 
-// githubCommitHandler is a PlatformHandler for GitLab commits. It
+// gitlabCommitHandler is a PlatformHandler for GitLab commits. It
 // implements the PlatformHandler interface and contains the functions
 // for finding, creating, updating, deleting comments on GitLab commits.
 type gitlabCommitHandler struct {
