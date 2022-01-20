@@ -10,7 +10,7 @@ EXAMPLES
 
   Post a new comment to a commit:
 
-      infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior hide-and-new --gitlab-token $GITLAB_TOKEN
+      infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior delete-and-new --gitlab-token $GITLAB_TOKEN
 
 FLAGS
       --behavior string            Behavior when posting the comment, one of:
