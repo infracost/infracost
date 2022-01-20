@@ -125,7 +125,7 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("gitlab-server-url", "https://gitlab.com", "GitLab Server URL, defaults to https://gitlab.com")
 	cmd.Flags().String("gitlab-token", "", "GitLab token")
 	_ = cmd.MarkFlagRequired("gitlab-token")
-	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
+	cmd.Flags().StringP("out-file", "o", "", "Save the posted comment output to a file")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
