@@ -126,7 +126,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("github-api-url", "https://api.github.com", "GitHub API URL, defaults to https://api.github.com")
 	cmd.Flags().String("github-token", "", "GitHub token")
 	_ = cmd.MarkFlagRequired("github-token")
-	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
+	cmd.Flags().StringP("out-file", "o", "", "Save output to a file")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
