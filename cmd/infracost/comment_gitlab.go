@@ -26,7 +26,7 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 
   Post a new comment to a commit:
 
-      infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior hide-and-new --gitlab-token $GITLAB_TOKEN`,
+      infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior delete-and-new --gitlab-token $GITLAB_TOKEN`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// pricingClient := apiclient.NewPricingAPIClient(ctx)
