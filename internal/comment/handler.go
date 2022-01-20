@@ -206,7 +206,7 @@ func (h *CommentHandler) hideComments(ctx context.Context, comments []Comment) e
 	hiddenCommentCount := len(comments) - len(visibleComments)
 
 	if hiddenCommentCount == 1 {
-		log.Info("1 comments is already hidden")
+		log.Info("1 comment is already hidden")
 	} else if hiddenCommentCount > 0 {
 		log.Infof("%d comments are already hidden", hiddenCommentCount)
 	}
