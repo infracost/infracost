@@ -23,7 +23,7 @@ FLAGS
       --github-api-url string   GitHub API URL, defaults to https://api.github.com (default "https://api.github.com")
       --github-token string     GitHub token
   -h, --help                    help for github
-  -o, --out-file string         Save output to a file, helpful with format flag
+  -o, --out-file string         Save the posted comment output to a file
   -p, --path stringArray        Path to Infracost JSON files, glob patterns need quotes
       --pull-request int        Pull request number to post the comment on, mutually exclusive with commit
       --repo string             Repository in the format owner/repo
