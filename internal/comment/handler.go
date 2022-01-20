@@ -8,7 +8,7 @@ import (
 	"sort"
 )
 
-var defaultTag = "compost-comment"
+var defaultTag = "infracost-comment"
 
 // Comment is an interface that represents a comment on any platform. It wraps
 // the platform specific comment structures and is used to abstract the
@@ -124,7 +124,7 @@ func (h *CommentHandler) LatestMatchingComment(ctx context.Context) (Comment, er
 		return nil, nil
 	}
 
-	return matchingComments[0], nil
+	return matchingComments[len(matchingComments) - 1], nil
 }
 
 // UpdateComment updates the comment with the given body.
@@ -164,7 +164,7 @@ func (h *CommentHandler) UpdateComment(ctx context.Context, body string) error {
 
 // NewComment creates a new comment with the given body.
 func (h *CommentHandler) NewComment(ctx context.Context, body string) error {
-	bodyWithTag := body
+	bodyWithTag := addMarkdownTag(body, h.Tag)
 
 	log.Info("Creating new comment")
 
