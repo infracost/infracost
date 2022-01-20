@@ -228,7 +228,7 @@ func (h *CommentHandler) hideComments(ctx context.Context, comments []Comment) e
 	return nil
 }
 
-// DeleteAndNewComment deletes all existing matching comment and creates a new one with the given body.
+// DeleteAndNewComment deletes all existing matching comments and creates a new one with the given body.
 func (h *CommentHandler) DeleteAndNewComment(ctx context.Context, body string) error {
 	matchingComments, err := h.matchingComments(ctx)
 	if err != nil {
