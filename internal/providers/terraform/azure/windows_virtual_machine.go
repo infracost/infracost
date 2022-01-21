@@ -51,6 +51,8 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 	productNameRe := "/Virtual Machines .* Series Windows$/"
 	if strings.HasPrefix(instanceType, "Basic_") {
 		productNameRe = "/Virtual Machines .* Series Basic Windows$/"
+	} else if !strings.HasPrefix(instanceType, "Standard_") {
+		instanceType = fmt.Sprintf("Standard_%s", instanceType)
 	}
 
 	// Handle Azure Hybrid Benefit
