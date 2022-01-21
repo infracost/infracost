@@ -103,13 +103,6 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 				cmd.Println("Comment not posted to GitLab (--dry-run was specified)")
 			}
 
-			if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
-				err = saveOutFileWithMsg(cmd, outFile, fmt.Sprintf("Comment body saved to %s\n", outFile), body)
-				if err != nil {
-					return err
-				}
-			}
-
 			return nil
 		},
 	}
@@ -125,7 +118,6 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("gitlab-server-url", "https://gitlab.com", "GitLab Server URL, defaults to https://gitlab.com")
 	cmd.Flags().String("gitlab-token", "", "GitLab token")
 	_ = cmd.MarkFlagRequired("gitlab-token")
-	cmd.Flags().StringP("out-file", "o", "", "Save the posted comment output to a file")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")

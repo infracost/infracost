@@ -103,13 +103,6 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 				cmd.Println("Comment not posted to GitHub (--dry-run was specified)")
 			}
 
-			if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
-				err = saveOutFileWithMsg(cmd, outFile, fmt.Sprintf("Comment body saved to %s\n", outFile), body)
-				if err != nil {
-					return err
-				}
-			}
-
 			return nil
 		},
 	}
@@ -126,7 +119,6 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("github-api-url", "https://api.github.com", "GitHub API URL, defaults to https://api.github.com")
 	cmd.Flags().String("github-token", "", "GitHub token")
 	_ = cmd.MarkFlagRequired("github-token")
-	cmd.Flags().StringP("out-file", "o", "", "Save the posted comment output to a file")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
