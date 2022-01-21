@@ -330,7 +330,9 @@ func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, r
 		if region == "" {
 			region = defaultProviderRegions[providerPrefix]
 
-			if region != "" {
+			// Don't show this log for azurerm users since they have a different method of looking up the region.
+			// A lot of Azure resources get their region from their referenced azurerm_resource_group resource
+			if region != "" && providerPrefix != "azurerm" {
 				log.Debugf("Falling back to default region (%s) for %s", region, addr)
 			}
 		}
