@@ -1,0 +1,33 @@
+Post an Infracost comment to GitHub
+
+USAGE
+  infracost comment github [flags]
+
+EXAMPLES
+  Update a comment on a pull request:
+
+      infracost comment github --repo my-org/my-github-repo --pull-request 3 --path infracost.json --github-token $GITHUB_TOKEN
+
+  Post a new comment to a commit:
+
+      infracost comment github --repo my-org/my-github-repo --commit 2ca7182 --path infracost.json --behavior hide-and-new --github-token $GITHUB_TOKEN
+
+FLAGS
+      --behavior string         Behavior when posting the comment, one of:
+                                  update (default)  Update the latest comment
+                                  new               Create a new comment
+                                  hide-and-new      Hide previous matching comments and create a new comment
+                                  delete-and-new    Delete previous matching comments and create a new comment (default "update")
+      --commit string           Commit SHA to post/get the comment, mutually exclusive with pull-request
+      --dry-run                 Generate the comment without actually posting to GitHub.
+      --github-api-url string   GitHub API URL, defaults to https://api.github.com (default "https://api.github.com")
+      --github-token string     GitHub token
+  -h, --help                    help for github
+  -p, --path stringArray        Path to Infracost JSON files, glob patterns need quotes
+      --pull-request int        Pull request number to post the comment on, mutually exclusive with commit
+      --repo string             Repository in the format owner/repo
+      --tag string              Customize the embedded tag that is used for detecting comments posted by Infracost
+
+GLOBAL FLAGS
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output

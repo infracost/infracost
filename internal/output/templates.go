@@ -350,4 +350,18 @@ New monthly cost: {{ formatCost .Root.TotalMonthlyCost }}
 {{- if .Options.IncludeHTML }}
 </details>
 {{- end}}
+{{- if .MarkdownOptions.WillUpdate }}
+
+This comment will be updated when the cost estimate changes.
+{{- end}}
+{{- if .MarkdownOptions.WillReplace }}
+
+This comment will be replaced when the cost estimate changes
+{{- end}}
+{{- if .MarkdownOptions.IncludeFeedbackLink }}
+
+<sub>
+  Is this comment useful? <a href=\"https://www.infracost.io/feedback/submit/?value=yes\" rel=\"noopener noreferrer\" target=\"_blank\">Yes</a>, <a href=\"https://www.infracost.io/feedback/submit/?value=no\" rel=\"noopener noreferrer\" target=\"_blank\">No</a>
+</sub>
+{{- end}}
 `

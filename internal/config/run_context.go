@@ -68,6 +68,11 @@ func EmptyRunContext() *RunContext {
 	}
 }
 
+// Context returns the underlying context.
+func (r *RunContext) Context() context.Context {
+	return r.ctx
+}
+
 // UUID returns the underlying run uuid. This can be used to globally identify the run context.
 func (r *RunContext) UUID() uuid.UUID {
 	return r.uuid
