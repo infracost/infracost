@@ -1,77 +1,76 @@
 Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.12_plan.json
 
- Name                                                                 Monthly Qty  Unit              Monthly Cost 
-                                                                                                                  
- aws_instance.instance_1                                                                                          
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- aws_instance.instance_2                                                                                          
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- aws_instance.instance_counted[0]                                                                                 
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- aws_instance.instance_counted[1]                                                                                 
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- aws_instance.instance_named["test.1"]                                                                            
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- aws_instance.instance_named["test.2"]                                                                            
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- module.db.module.db_1.module.db_instance.aws_db_instance.this[0]                                                 
- ├─ Database instance (on-demand, Single-AZ, db.t3.micro)                     730  hours                   $12.41 
- ├─ Storage (general purpose SSD, gp2)                                          5  GB                       $0.58 
- └─ Additional backup storage                                      Monthly cost depends on usage: $0.095 per GB   
-                                                                                                                  
- module.db.module.db_2.module.db_instance.aws_db_instance.this[0]                                                 
- ├─ Database instance (on-demand, Single-AZ, db.t3.micro)                     730  hours                   $12.41 
- └─ Storage (general purpose SSD, gp2)                                          5  GB                       $0.58 
-                                                                                                                  
- module.instances.aws_instance.module_instance_1                                                                  
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- module.instances.aws_instance.module_instance_2                                                                  
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- module.instances.aws_instance.module_instance_counted[0]                                                         
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- module.instances.aws_instance.module_instance_counted[1]                                                         
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- module.instances.aws_instance.module_instance_named["test.1"]                                                    
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- module.instances.aws_instance.module_instance_named["test.2"]                                                    
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                           730  hours                    $3.80 
- └─ root_block_device                                                                                             
-    └─ Storage (general purpose SSD, gp2)                                       8  GB                       $0.80 
-                                                                                                                  
- OVERALL TOTAL                                                                                             $81.12 
+ Name                                                              Monthly Qty  Unit   Monthly Cost 
+                                                                                                    
+ aws_instance.instance_1                                                                            
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ aws_instance.instance_2                                                                            
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ aws_instance.instance_counted[0]                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ aws_instance.instance_counted[1]                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ aws_instance.instance_named["test.1"]                                                              
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ aws_instance.instance_named["test.2"]                                                              
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ module.db.module.db_1.module.db_instance.aws_db_instance.this[0]                                   
+ ├─ Database instance (on-demand, Single-AZ, db.t3.micro)                  730  hours        $12.41 
+ └─ Storage (general purpose SSD, gp2)                                       5  GB            $0.58 
+                                                                                                    
+ module.db.module.db_2.module.db_instance.aws_db_instance.this[0]                                   
+ ├─ Database instance (on-demand, Single-AZ, db.t3.micro)                  730  hours        $12.41 
+ └─ Storage (general purpose SSD, gp2)                                       5  GB            $0.58 
+                                                                                                    
+ module.instances.aws_instance.module_instance_1                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ module.instances.aws_instance.module_instance_2                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ module.instances.aws_instance.module_instance_counted[0]                                           
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ module.instances.aws_instance.module_instance_counted[1]                                           
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ module.instances.aws_instance.module_instance_named["test.1"]                                      
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ module.instances.aws_instance.module_instance_named["test.2"]                                      
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
+ └─ root_block_device                                                                               
+    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
+                                                                                                    
+ OVERALL TOTAL                                                                               $81.12 
 ──────────────────────────────────
 26 cloud resources were detected, rerun with --show-skipped to see details:
 ∙ 14 were estimated, 10 include usage-based costs, see https://infracost.io/usage-file
