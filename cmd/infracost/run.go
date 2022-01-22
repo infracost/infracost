@@ -60,6 +60,9 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().Bool("sync-usage-file", false, "Sync usage-file with missing resources, needs usage-file too (experimental)")
 
+	cmd.Flags().Bool("hcl-only", false, "Run infracost without terraform, parsing hcl files at the given path. This option does not need credentials and is much quicker to run.")
+	cmd.Flags().StringSlice("tfvar-files", nil, "Path to .tfvars file, can be used multiple times and evaluated in order of specification")
+
 	_ = cmd.MarkFlagFilename("path", "json", "tf")
 	_ = cmd.MarkFlagFilename("config-file", "yml")
 	_ = cmd.MarkFlagFilename("usage-file", "yml")
@@ -521,6 +524,8 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasProjectFlags {
 		projectCfg.Path, _ = cmd.Flags().GetString("path")
+		projectCfg.HCLOnly, _ = cmd.Flags().GetBool("hcl-only")
+		projectCfg.TFVarFiles, _ = cmd.Flags().GetStringSlice("tfvar-files")
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
