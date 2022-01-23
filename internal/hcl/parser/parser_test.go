@@ -230,7 +230,7 @@ func createTestFile(filename, contents string) string {
 		panic(err)
 	}
 	path := filepath.Join(dir, filename)
-	if err := ioutil.WriteFile(path, []byte(contents), 0755); err != nil {
+	if err := os.WriteFile(path, []byte(contents), os.ModePerm); err != nil {
 		panic(err)
 	}
 	return path
@@ -258,11 +258,11 @@ func createTestFileWithModule(contents string, moduleContents string, moduleName
 		}
 	}
 
-	if err := ioutil.WriteFile(filepath.Join(rootPath, "main.tf"), []byte(contents), 0755); err != nil {
+	if err := os.WriteFile(filepath.Join(rootPath, "main.tf"), []byte(contents), os.ModePerm); err != nil {
 		panic(err)
 	}
 
-	if err := ioutil.WriteFile(filepath.Join(modulePath, "main.tf"), []byte(moduleContents), 0755); err != nil {
+	if err := os.WriteFile(filepath.Join(modulePath, "main.tf"), []byte(moduleContents), os.ModePerm); err != nil {
 		panic(err)
 	}
 

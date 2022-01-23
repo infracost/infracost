@@ -72,7 +72,7 @@ func regexMatches(criteriaValue interface{}, testValue interface{}) bool {
 		patternVal = fmt.Sprintf("%v", criteriaValue)
 	case cty.Value:
 		if err := gocty.FromCtyValue(t, &patternVal); err != nil {
-			log.Debug("An error occurred determining the regex value: %s", err.Error())
+			log.Debugf("An error occurred determining the regex value: %s", err.Error())
 			return false
 		}
 	default:
@@ -81,7 +81,7 @@ func regexMatches(criteriaValue interface{}, testValue interface{}) bool {
 
 	re, err := regexp.Compile(patternVal)
 	if err != nil {
-		log.Debug("An error occurred creating a regexp: %s", err.Error())
+		log.Debugf("An error occurred creating a regexp: %s", err.Error())
 		return false
 	}
 

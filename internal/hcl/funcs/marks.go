@@ -24,13 +24,18 @@ func Has(val cty.Value, mark valueMark) bool {
 // the given mark.
 func Contains(val cty.Value, mark valueMark) bool {
 	ret := false
-	cty.Walk(val, func(_ cty.Path, v cty.Value) (bool, error) {
+	err := cty.Walk(val, func(_ cty.Path, v cty.Value) (bool, error) {
 		if v.HasMark(mark) {
 			ret = true
 			return false, nil
 		}
 		return true, nil
 	})
+
+	if err != nil {
+		return false
+	}
+
 	return ret
 }
 

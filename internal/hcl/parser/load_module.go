@@ -95,7 +95,7 @@ func (e *Evaluator) loadModule(b block.Block, stopOnHCLError bool) (*ModuleDefin
 	if err != nil {
 		return nil, err
 	}
-	log.Debug("Loaded module '%s' (requested at %s)", modulePath, b.Range())
+	log.Debugf("Loaded module '%s' (requested at %s)", modulePath, b.Range())
 
 	return &ModuleDefinition{
 		Name:       b.Label(),
@@ -122,7 +122,7 @@ func getModuleBlocks(b block.Block, modulePath string, blocks *block.Blocks, sto
 			continue
 		}
 		if len(fileBlocks) > 0 {
-			log.Debug("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
+			log.Debugf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
 		}
 		for _, fileBlock := range fileBlocks {
 			*blocks = append(*blocks, block.NewHCLBlock(fileBlock, moduleCtx, b))

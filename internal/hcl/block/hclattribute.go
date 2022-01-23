@@ -353,7 +353,7 @@ func (attr *HCLAttribute) Equals(checkValue interface{}, equalityOptions ...Equa
 	if attr.Value().Type() == cty.Number {
 		checkNumber, err := gocty.ToCtyValue(checkValue, cty.Number)
 		if err != nil {
-			log.Debug("Error converting number for equality check. %s", err)
+			log.Debugf("Error converting number for equality check. %s", err)
 			return false
 		}
 		return attr.Value().RawEquals(checkNumber)
@@ -373,7 +373,7 @@ func (attr *HCLAttribute) RegexMatches(pattern interface{}) bool {
 	patternVal := fmt.Sprintf("%v", pattern)
 	re, err := regexp.Compile(patternVal)
 	if err != nil {
-		log.Debug("an error occurred while compiling the regex: %s", err)
+		log.Debugf("an error occurred while compiling the regex: %s", err)
 		return false
 	}
 	if attr.Value().Type() == cty.String {
@@ -403,7 +403,7 @@ func (attr *HCLAttribute) IsAny(options ...interface{}) bool {
 		for _, option := range options {
 			checkValue, err := gocty.ToCtyValue(option, cty.Number)
 			if err != nil {
-				log.Debug("Error converting number for equality check. %s", err)
+				log.Debugf("Error converting number for equality check. %s", err)
 				return false
 			}
 			if attr.Value().RawEquals(checkValue) {
@@ -439,7 +439,7 @@ func (attr *HCLAttribute) IsNone(options ...interface{}) bool {
 		for _, option := range options {
 			checkValue, err := gocty.ToCtyValue(option, cty.Number)
 			if err != nil {
-				log.Debug("Error converting number for equality check. %s", err)
+				log.Debugf("Error converting number for equality check. %s", err)
 				return false
 			}
 			if attr.Value().RawEquals(checkValue) {
@@ -559,7 +559,7 @@ func (attr *HCLAttribute) LessThan(checkValue interface{}) bool {
 	if attr.Value().Type() == cty.Number {
 		checkNumber, err := gocty.ToCtyValue(checkValue, cty.Number)
 		if err != nil {
-			log.Debug("Error converting number for equality check. %s", err)
+			log.Debugf("Error converting number for equality check. %s", err)
 			return false
 		}
 
@@ -575,7 +575,7 @@ func (attr *HCLAttribute) LessThanOrEqualTo(checkValue interface{}) bool {
 	if attr.Value().Type() == cty.Number {
 		checkNumber, err := gocty.ToCtyValue(checkValue, cty.Number)
 		if err != nil {
-			log.Debug("Error converting number for equality check. %s", err)
+			log.Debugf("Error converting number for equality check. %s", err)
 			return false
 		}
 
@@ -591,7 +591,7 @@ func (attr *HCLAttribute) GreaterThan(checkValue interface{}) bool {
 	if attr.Value().Type() == cty.Number {
 		checkNumber, err := gocty.ToCtyValue(checkValue, cty.Number)
 		if err != nil {
-			log.Debug("Error converting number for equality check. %s", err)
+			log.Debugf("Error converting number for equality check. %s", err)
 			return false
 		}
 
@@ -607,7 +607,7 @@ func (attr *HCLAttribute) GreaterThanOrEqualTo(checkValue interface{}) bool {
 	if attr.Value().Type() == cty.Number {
 		checkNumber, err := gocty.ToCtyValue(checkValue, cty.Number)
 		if err != nil {
-			log.Debug("Error converting number for equality check. %s", err)
+			log.Debugf("Error converting number for equality check. %s", err)
 			return false
 		}
 
@@ -620,11 +620,12 @@ func (attr *HCLAttribute) IsDataBlockReference() bool {
 	if attr == nil {
 		return false
 	}
-	switch t := attr.hclAttribute.Expr.(type) {
-	case *hclsyntax.ScopeTraversalExpr:
+
+	if t, ok := attr.hclAttribute.Expr.(*hclsyntax.ScopeTraversalExpr); ok {
 		split := t.Traversal.SimpleSplit()
 		return split.Abs.RootName() == "data"
 	}
+
 	return false
 }
 
@@ -735,8 +736,7 @@ func (attr *HCLAttribute) referencesInConditional() []*Reference {
 		return nil
 	}
 	var refs []*Reference
-	switch t := attr.hclAttribute.Expr.(type) {
-	case *hclsyntax.ConditionalExpr:
+	if t, ok := attr.hclAttribute.Expr.(*hclsyntax.ConditionalExpr); ok {
 		if ref, err := createDotReferenceFromTraversal(t.TrueResult.Variables()...); err == nil {
 			refs = append(refs, ref)
 		}
@@ -754,8 +754,7 @@ func (attr *HCLAttribute) IsResourceBlockReference(resourceType string) bool {
 	if attr == nil {
 		return false
 	}
-	switch t := attr.hclAttribute.Expr.(type) {
-	case *hclsyntax.ScopeTraversalExpr:
+	if t, ok := attr.hclAttribute.Expr.(*hclsyntax.ScopeTraversalExpr); ok {
 		split := t.Traversal.SimpleSplit()
 		return split.Abs.RootName() == resourceType
 	}

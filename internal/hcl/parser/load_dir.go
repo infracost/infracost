@@ -27,13 +27,16 @@ func LoadDirectory(fullPath string, stopOnHCLError bool) ([]*hcl.File, error) {
 		}
 
 		var parseFunc func(filename string) (*hcl.File, hcl.Diagnostics)
-
-		switch true {
-		case strings.HasSuffix(info.Name(), ".tf"):
+		if strings.HasSuffix(info.Name(), ".tf") {
 			parseFunc = hclParser.ParseHCLFile
-		case strings.HasSuffix(info.Name(), ".tf.json"):
+		}
+
+		if strings.HasSuffix(info.Name(), ".tf.json") {
 			parseFunc = hclParser.ParseJSONFile
-		default:
+		}
+
+		// this is not a file we can parse:
+		if parseFunc == nil {
 			continue
 		}
 

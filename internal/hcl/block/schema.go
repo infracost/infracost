@@ -1,8 +1,8 @@
-package schema
+package block
 
 import "github.com/hashicorp/hcl/v2"
 
-var TerraformSchema_0_12 = &hcl.BodySchema{
+var TerraformSchema012 = &hcl.BodySchema{
 	Blocks: []hcl.BlockHeaderSchema{
 		{
 			Type: "terraform",
