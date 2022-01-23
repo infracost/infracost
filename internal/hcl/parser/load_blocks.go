@@ -5,11 +5,11 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 
-	"github.com/infracost/infracost/internal/hcl/schema"
+	hcl2 "github.com/infracost/infracost/internal/hcl/block"
 )
 
 func LoadBlocksFromFile(file *hcl.File) (hcl.Blocks, error) {
-	contents, diagnostics := file.Body.Content(schema.TerraformSchema_0_12)
+	contents, diagnostics := file.Body.Content(hcl2.TerraformSchema012)
 	if diagnostics != nil && diagnostics.HasErrors() {
 		return nil, diagnostics
 	}

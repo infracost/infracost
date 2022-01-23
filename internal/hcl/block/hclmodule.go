@@ -66,7 +66,7 @@ func (c *HCLModule) GetProviderBlocksByProvider(providerName string, alias strin
 	for _, block := range c.blocks {
 		if block.Type() == "provider" && len(block.Labels()) > 0 && block.TypeLabel() == providerName {
 			if alias != "" {
-				if block.HasChild("alias") && block.GetAttribute("alias").Equals(strings.Replace(alias, fmt.Sprintf("%s.", providerName), "", -1)) {
+				if block.HasChild("alias") && block.GetAttribute("alias").Equals(strings.ReplaceAll(alias, fmt.Sprintf("%s.", providerName), "")) {
 					results = append(results, block)
 
 				}

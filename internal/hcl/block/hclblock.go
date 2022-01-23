@@ -9,8 +9,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
-
-	"github.com/infracost/infracost/internal/hcl/schema"
 )
 
 type Block interface {
@@ -86,7 +84,7 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock Block) Block {
 			children = append(children, NewHCLBlock(b.AsHCLBlock(), ctx, moduleBlock))
 		}
 	default:
-		content, _, diag := hclBlock.Body.PartialContent(schema.TerraformSchema_0_12)
+		content, _, diag := hclBlock.Body.PartialContent(TerraformSchema012)
 		if diag == nil {
 			for _, hb := range content.Blocks {
 				children = append(children, NewHCLBlock(hb, ctx, moduleBlock))
@@ -143,7 +141,7 @@ func (b *HCLBlock) Clone(index cty.Value) Block {
 			case cty.String:
 				labels[position] = fmt.Sprintf("%s[%q]", clone.hclBlock.Labels[position], index.AsString())
 			default:
-				log.Debug("Invalid key type in iterable: %#v", index.Type())
+				log.Debugf("Invalid key type in iterable: %#v", index.Type())
 				labels[position] = fmt.Sprintf("%s[%#v]", clone.hclBlock.Labels[position], index)
 			}
 		} else {
@@ -230,7 +228,7 @@ func (b *HCLBlock) getHCLAttributes() hcl.Attributes {
 		}
 		return attributes
 	default:
-		_, body, diag := b.hclBlock.Body.PartialContent(schema.TerraformSchema_0_12)
+		_, body, diag := b.hclBlock.Body.PartialContent(TerraformSchema012)
 		if diag != nil {
 			return nil
 		}
@@ -280,9 +278,7 @@ func (b *HCLBlock) GetAttributes() []Attribute {
 	if b == nil || b.hclBlock == nil {
 		return nil
 	}
-	if b.cachedAttributes != nil {
-		//return b.cachedAttributes
-	}
+
 	for _, attr := range b.getHCLAttributes() {
 		results = append(results, NewHCLAttribute(attr, b.context))
 	}
@@ -312,11 +308,12 @@ func (b *HCLBlock) GetNestedAttribute(name string) Attribute {
 
 	var working Block = b
 	for _, subBlock := range blocks {
-		if checkBlock := working.GetBlock(subBlock); checkBlock == nil {
+		checkBlock := working.GetBlock(subBlock)
+		if checkBlock == nil {
 			return returnAttr
-		} else {
-			working = checkBlock
 		}
+
+		working = checkBlock
 	}
 
 	if working != nil {
@@ -403,11 +400,12 @@ func (b *HCLBlock) MissingNestedChild(name string) bool {
 
 	var working Block = b
 	for _, subBlock := range blocks {
-		if checkBlock := working.GetBlock(subBlock); checkBlock == nil {
+		checkBlock := working.GetBlock(subBlock)
+		if checkBlock == nil {
 			return true
-		} else {
-			working = checkBlock
 		}
+
+		working = checkBlock
 	}
 	return !working.HasChild(last)
 

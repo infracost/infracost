@@ -73,7 +73,7 @@ func NewEvaluator(
 }
 
 func (e *Evaluator) evaluateStep(i int) {
-	log.Debug("Starting iteration %d of context evaluation...", i+1)
+	log.Debugf("Starting iteration %d of context evaluation...", i+1)
 
 	e.ctx.Set(e.getValuesByBlockType("variable"), "var")
 	e.ctx.Set(e.getValuesByBlockType("locals"), "local")
@@ -95,7 +95,7 @@ func (e *Evaluator) evaluateModules() {
 		if visited := func(module *ModuleDefinition) bool {
 			for _, v := range e.visitedModules {
 				if v.name == module.Name && v.path == module.Path && module.Definition.Reference().String() == v.definitionReference {
-					log.Debug("Module [%s:%s:%s] has already been seen", v.name, v.path, v.definitionReference)
+					log.Debugf("Module [%s:%s:%s] has already been seen", v.name, v.path, v.definitionReference)
 					return true
 				}
 			}
@@ -130,7 +130,6 @@ func (e *Evaluator) ExportOutputs() cty.Value {
 func (e *Evaluator) EvaluateAll() ([]block.Module, error) {
 	var lastContext hcl.EvalContext
 	for i := 0; i < maxContextIterations; i++ {
-
 		e.evaluateStep(i)
 
 		// if ctx matches the last evaluation, we can bail, nothing left to resolve
@@ -226,7 +225,7 @@ func (e *Evaluator) expandBlockForEaches(blocks block.Blocks) block.Blocks {
 				ctx.Set(key, block.TypeLabel(), "key")
 				ctx.Set(val, block.TypeLabel(), "value")
 
-				log.Debug("Added %s from for_each", clone.Reference())
+				log.Debugf("Added %s from for_each", clone.Reference())
 				forEachFiltered = append(forEachFiltered, clone)
 			})
 		}
@@ -255,7 +254,7 @@ func (e *Evaluator) expandBlockCounts(blocks block.Blocks) block.Blocks {
 			c, _ := gocty.ToCtyValue(i, cty.Number)
 			clone := block.Clone(c)
 			block.TypeLabel()
-			log.Debug("Added %s from count var", clone.Reference())
+			log.Debugf("Added %s from count var", clone.Reference())
 			countFiltered = append(countFiltered, clone)
 		}
 	}
@@ -284,7 +283,7 @@ func (e *Evaluator) copyVariables(from, to block.Block) {
 
 	srcValue := e.ctx.Root().Get(fromBase, fromRel)
 	if srcValue == cty.NilVal {
-		log.Debug("error trying to copyVariable from the source of '%s.%s'", fromBase, fromRel)
+		log.Debugf("error trying to copyVariable from the source of '%s.%s'", fromBase, fromRel)
 		return
 	}
 	e.ctx.Root().Set(srcValue, fromBase, toRel)

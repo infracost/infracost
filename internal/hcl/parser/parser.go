@@ -52,7 +52,7 @@ func (parser *Parser) parseDirectoryFiles(files []*hcl.File) (block.Blocks, erro
 			continue
 		}
 		if len(fileBlocks) > 0 {
-			log.Debug("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
+			log.Debugf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
 		}
 		for _, fileBlock := range fileBlocks {
 			blocks = append(blocks, block.NewHCLBlock(fileBlock, nil, nil))
@@ -73,7 +73,7 @@ func (parser *Parser) ParseDirectory() ([]block.Module, error) {
 	var blocks block.Blocks
 
 	for _, dir := range subdirectories {
-		log.Debug("Beginning parse for directory '%s'...", dir)
+		log.Debugf("Beginning parse for directory '%s'...", dir)
 		files, err := LoadDirectory(dir, parser.stopOnHCLError)
 		if err != nil {
 			return nil, err
@@ -94,7 +94,7 @@ func (parser *Parser) ParseDirectory() ([]block.Module, error) {
 	tfPath := parser.initialPath
 	if len(subdirectories) > 0 && parser.stopOnFirstTf {
 		tfPath = subdirectories[0]
-		log.Debug("Project root set to '%s'...", tfPath)
+		log.Debugf("Project root set to '%s'...", tfPath)
 	}
 
 	log.Debug("Loading TFVars...")
@@ -130,7 +130,7 @@ func (parser *Parser) getSubdirectories(path string) ([]string, error) {
 	for _, entry := range entries {
 
 		if !entry.IsDir() && (filepath.Ext(entry.Name()) == ".tf" || strings.HasSuffix(entry.Name(), ".tf.json")) {
-			log.Debug("Found qualifying subdirectory containing .tf files: %s", path)
+			log.Debugf("Found qualifying subdirectory containing .tf files: %s", path)
 			results = append(results, path)
 			if parser.stopOnFirstTf {
 				return results, nil
@@ -167,7 +167,7 @@ func (parser *Parser) RemoveExcluded(path string, entries []fs.FileInfo) (valid 
 		if !remove {
 			valid = append(valid, entry)
 		} else {
-			log.Debug("Excluding path %s", fullPath)
+			log.Debugf("Excluding path %s", fullPath)
 		}
 	}
 	return valid
