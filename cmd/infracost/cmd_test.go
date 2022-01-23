@@ -2,21 +2,27 @@ package main_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"os"
 	"path/filepath"
 	"regexp"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	main "github.com/infracost/infracost/cmd/infracost"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/testutil"
-	"github.com/stretchr/testify/require"
 )
 
-var timestampRegex = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)
-var outputPathRegex = regexp.MustCompile(`Output saved to .*`)
+var (
+	timestampRegex   = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)
+	outputPathRegex  = regexp.MustCompile(`Output saved to .*`)
+	urlRegex         = regexp.MustCompile(`https://dashboard.infracost.io/share/.*`)
+	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/examples/.*\)`)
+	versionRegex     = regexp.MustCompile(`Infracost v.*`)
+	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s]*)Environment`)
+)
 
 type GoldenFileOptions = struct {
 	Currency    string
@@ -32,46 +38,43 @@ func DefaultOptions() *GoldenFileOptions {
 	}
 }
 
-func GoldenFileCommandTest(t *testing.T, testName string, args []string, options *GoldenFileOptions) {
-	if options == nil {
-		options = DefaultOptions()
+func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
+	if testOptions == nil {
+		testOptions = DefaultOptions()
 	}
-
 	// Fix the VCS repo URL so the golden files don't fail on forks
 	os.Setenv("INFRACOST_VCS_REPOSITORY_URL", "https://github.com/infracost/infracost")
 	os.Setenv("INFRACOST_VCS_PULL_REQUEST_URL", "NOT_APPLICABLE")
 
-	runCtx, err := config.NewRunContextFromEnv(context.Background())
-	require.Nil(t, err)
-
 	errBuf := bytes.NewBuffer([]byte{})
 	outBuf := bytes.NewBuffer([]byte{})
 
-	runCtx.Config.EventsDisabled = true
-	runCtx.Config.Currency = options.Currency
-	runCtx.Config.NoColor = true
-
-	rootCmd := main.NewRootCommand(runCtx)
-	rootCmd.SetErr(errBuf)
-	rootCmd.SetOut(outBuf)
-	rootCmd.SetArgs(args)
-
-	var logBuf *bytes.Buffer
-	if options.CaptureLogs {
-		logBuf = testutil.ConfigureTestToCaptureLogs(t, runCtx)
-	} else {
-		testutil.ConfigureTestToFailOnLogs(t, runCtx)
-	}
-
-	var cmdErr error
 	var actual []byte
+	var logBuf *bytes.Buffer
 
-	cmdErr = rootCmd.Execute()
+	main.Run(func(c *config.RunContext) {
+		c.Config.EventsDisabled = true
+		c.Config.Currency = testOptions.Currency
+		c.Config.NoColor = true
+		c.ErrWriter = errBuf
+		c.OutWriter = outBuf
+		c.Exit = func(code int) {}
 
-	if options.IsJSON {
+		if testOptions.CaptureLogs {
+			logBuf = testutil.ConfigureTestToCaptureLogs(t, c)
+		} else {
+			testutil.ConfigureTestToFailOnLogs(t, c)
+		}
+
+		for _, option := range ctxOptions {
+			option(c)
+		}
+	}, &args)
+
+	if testOptions.IsJSON {
 		prettyBuf := bytes.NewBuffer([]byte{})
-		err = json.Indent(prettyBuf, outBuf.Bytes(), "", "  ")
-		require.Nil(t, err)
+		err := json.Indent(prettyBuf, outBuf.Bytes(), "", "  ")
+		require.NoError(t, err)
 		actual = prettyBuf.Bytes()
 	} else {
 		actual = outBuf.Bytes()
@@ -81,11 +84,6 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 
 	if errBuf != nil && errBuf.Len() > 0 {
 		errBytes = append(errBytes, errBuf.Bytes()...)
-	}
-
-	if cmdErr != nil {
-		errBytes = append(errBytes, []byte("Error: ")...)
-		errBytes = append(errBytes, cmdErr.Error()...)
 	}
 
 	if len(errBytes) > 0 {
@@ -109,6 +107,10 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, options
 func stripDynamicValues(actual []byte) []byte {
 	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
 	actual = outputPathRegex.ReplaceAll(actual, []byte("Output saved to REPLACED_OUTPUT_PATH"))
+	actual = urlRegex.ReplaceAll(actual, []byte("https://dashboard.infracost.io/share/REPLACED_SHARE_CODE"))
+	actual = projectPathRegex.ReplaceAll(actual, []byte("$1 REPLACED_PROJECT_PATH"))
+	actual = versionRegex.ReplaceAll(actual, []byte("Infracost vREPLACED_VERSION"))
+	actual = panicRegex.ReplaceAll(actual, []byte("runtime error: REPLACED ERROR\nEnvironment"))
 
 	return actual
 }

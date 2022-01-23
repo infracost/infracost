@@ -1,0 +1,32 @@
+Post an Infracost comment to GitLab
+
+USAGE
+  infracost comment gitlab [flags]
+
+EXAMPLES
+  Update a comment on a merge request:
+
+      infracost comment gitlab --repo my-org/my-gitlab-repo --merge-request 3 --path infracost.json --gitlab-token $GITLAB_TOKEN
+
+  Post a new comment to a commit:
+
+      infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior delete-and-new --gitlab-token $GITLAB_TOKEN
+
+FLAGS
+      --behavior string            Behavior when posting the comment, one of:
+                                     update (default)  Update the latest comment
+                                     new               Create a new comment
+                                     delete-and-new    Delete previous matching comments and create a new comment (default "update")
+      --commit string              Commit SHA to post/get the comment, mutually exclusive with merge-request
+      --dry-run                    Generate the comment without actually posting to GitLab.
+      --gitlab-server-url string   GitLab Server URL, defaults to https://gitlab.com (default "https://gitlab.com")
+      --gitlab-token string        GitLab token
+  -h, --help                       help for gitlab
+      --merge-request int          Merge request number to post the comment on, mutually exclusive with commit
+  -p, --path stringArray           Path to Infracost JSON files, glob patterns need quotes
+      --repo string                Repository in the format owner/repo
+      --tag string                 Customize the embedded tag that is used for detecting comments posted by Infracost
+
+GLOBAL FLAGS
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output

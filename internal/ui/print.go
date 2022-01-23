@@ -3,10 +3,10 @@ package ui
 import (
 	"fmt"
 	"io"
-	"os"
+
+	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/version"
-	"github.com/spf13/cobra"
 )
 
 func PrintSuccess(w io.Writer, msg string) {
@@ -39,16 +39,23 @@ func PrintUsage(cmd *cobra.Command) {
 	cmd.Println("")
 }
 
-func PrintUnexpectedError(err interface{}, stack string) {
+var (
+	githubIssuesLink = LinkString("https://github.com/infracost/infracost/issues/new")
+
+	stackErrorMsg = "An unexpected error occurred. We've been notified of it and will investigate it soon. If you would like to follow-up, please copy the above output and create an issue at:"
+)
+
+// PrintUnexpectedErrorStack prints a full stack trace of a fatal error.
+func PrintUnexpectedErrorStack(out io.Writer, err interface{}, stack string) {
 	msg := fmt.Sprintf("\n%s %s\n\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
 		ErrorString("Error:"),
 		"An unexpected error occurred",
 		err,
 		stack,
 		fmt.Sprintf("Infracost %s", version.Version),
-		"Please copy the above output and create a new issue at",
-		LinkString("https://github.com/infracost/infracost/issues/new"),
+		stackErrorMsg,
+		githubIssuesLink,
 	)
 
-	fmt.Fprint(os.Stderr, msg)
+	fmt.Fprint(out, msg)
 }

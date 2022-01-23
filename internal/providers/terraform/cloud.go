@@ -17,8 +17,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var ErrMissingCloudToken = errors.New("No Terraform Cloud Token is set")
-var ErrInvalidCloudToken = errors.New("Invalid Terraform Cloud Token")
+var ErrMissingCloudToken = errors.New("no Terraform Cloud token is set")
+var ErrInvalidCloudToken = errors.New("invalid Terraform Cloud Token")
 
 func cloudAPI(host string, path string, token string) ([]byte, error) {
 	client := &http.Client{}

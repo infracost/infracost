@@ -101,10 +101,14 @@ type Options struct {
 	DashboardEnabled bool
 	NoColor          bool
 	ShowSkipped      bool
-	GroupLabel       string
-	GroupKey         string
 	Fields           []string
 	IncludeHTML      bool
+}
+
+type MarkdownOptions struct {
+	WillUpdate          bool
+	WillReplace         bool
+	IncludeFeedbackLink bool
 }
 
 func outputBreakdown(resources []*schema.Resource) *Breakdown {

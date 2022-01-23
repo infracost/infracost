@@ -121,3 +121,7 @@ func TestOutputTerraformOutFileTable(t *testing.T) {
 
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
+
+func TestOutputJSONArrayPath(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--path", "[\"./testdata/example_out.json\", \"./testdata/terraform_v0.14*breakdown.json\"]"}, nil)
+}

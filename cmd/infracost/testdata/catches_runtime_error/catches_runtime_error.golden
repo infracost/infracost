@@ -1,0 +1,10 @@
+
+Err:
+
+Error: An unexpected error occurred
+
+runtime error: REPLACED ERROR
+Environment:
+Infracost vREPLACED_VERSION
+
+An unexpected error occurred. We've been notified of it and will investigate it soon. If you would like to follow-up, please copy the above output and create an issue at: https://github.com/infracost/infracost/issues/new
