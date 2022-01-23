@@ -33,7 +33,7 @@ func loadTFVars(filename string) (map[string]cty.Value, error) {
 		return inputVars, nil
 	}
 
-	log.Debug("loading tfvars-file [%s]", filename)
+	log.Debugf("loading tfvars-file [%s]", filename)
 	src, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func loadTFVars(filename string) (map[string]cty.Value, error) {
 	attrs, _ := variableFile.Body.JustAttributes()
 
 	for _, attr := range attrs {
-		log.Debug("Setting '%s' from tfvars file at %s", attr.Name, filename)
+		log.Debugf("Setting '%s' from tfvars file at %s", attr.Name, filename)
 		inputVars[attr.Name], _ = attr.Expr.Value(&hcl.EvalContext{})
 	}
 

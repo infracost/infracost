@@ -35,15 +35,13 @@ func newReference(parts []string) (*Reference, error) {
 		if len(parts) > 1 {
 			ref.nameLabel = parts[1]
 		}
-	} else {
-		if len(parts) > 1 {
-			ref.typeLabel = parts[1]
-			if len(parts) > 2 {
-				ref.nameLabel = parts[2]
-			} else {
-				ref.nameLabel = ref.typeLabel
-				ref.typeLabel = ""
-			}
+	} else if len(parts) > 1 {
+		ref.typeLabel = parts[1]
+		if len(parts) > 2 {
+			ref.nameLabel = parts[2]
+		} else {
+			ref.nameLabel = ref.typeLabel
+			ref.typeLabel = ""
 		}
 	}
 
