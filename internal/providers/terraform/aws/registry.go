@@ -17,7 +17,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getCloudwatchDashboardRegistryItem(),
 	getCloudwatchEventBusItem(),
 	getCloudwatchLogGroupItem(),
-	GetCloudwatchMetricAlarmRegistryItem(),
+	getCloudwatchMetricAlarmRegistryItem(),
 	getCodeBuildProjectRegistryItem(),
 	getConfigRuleItem(),
 	getConfigurationRecorderItem(),
