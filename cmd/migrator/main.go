@@ -100,6 +100,8 @@ func strCamelCaseHelper(str string) string {
 	res = strings.Replace(res, "Id", "ID", -1)
 	res = strings.Replace(res, "Dns", "DNS", -1)
 	res = strings.Replace(res, "Lb", "LB", -1)
+	res = strings.Replace(res, "Acm", "ACM", -1)
+	res = strings.Replace(res, "Gb", "GB", -1)
 	res = strings.Replace(res, ".", "_", -1)
 	return res
 }
@@ -110,6 +112,8 @@ func strLowerCamelCaseHelper(str string) string {
 	res = strings.Replace(res, "Id", "ID", -1)
 	res = strings.Replace(res, "Dns", "DNS", -1)
 	res = strings.Replace(res, "Lb", "LB", -1)
+	res = strings.Replace(res, "Acm", "ACM", -1)
+	res = strings.Replace(res, "Gb", "GB", -1)
 	res = strings.Replace(res, ".", "_", -1)
 	return res
 }
