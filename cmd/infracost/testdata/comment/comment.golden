@@ -1,4 +1,4 @@
-Post an Infracost comment to GitHub, GitLab or Azure DevOps
+Post an Infracost comment to GitHub, GitLab or Azure Repos
 
 USAGE
   infracost comment [flags]
@@ -13,7 +13,12 @@ EXAMPLES
 
       infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior new --gitlab-token $GITLAB_TOKEN
 
+  Post a new comment to an Azure Repos pull request:
+
+      infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-azure-repo --pull-request 3 --path infracost.json --azure-access-token $AZURE_ACCESS_TOKEN
+
 AVAILABLE COMMANDS
+  azure-repos Post an Infracost comment to Azure Repos
   github      Post an Infracost comment to GitHub
   gitlab      Post an Infracost comment to GitLab
 
