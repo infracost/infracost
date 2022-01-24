@@ -1,20 +1,25 @@
 
- Name                                 Monthly Qty  Unit                  Monthly Cost 
-                                                                                      
- aws_wafv2_web_acl.my_waf2                                                            
- ├─ Web ACL usage                               1  months                       $5.00 
- ├─ Rules                                      16  rules                       $16.00 
- ├─ Rule groups                                 1  groups                       $1.00 
- ├─ Managed rule groups                         1  groups                       $1.00 
- └─ Requests                                    1  1M requests                  $0.60 
-                                                                                      
- aws_wafv2_web_acl.withoutUsage                                                       
- ├─ Web ACL usage                               1  months                       $5.00 
- ├─ Rule groups                                 1  groups                       $1.00 
- ├─ Managed rule groups                         1  groups                       $1.00 
- └─ Requests                     Monthly cost depends on usage: $0.60 per 1M requests 
-                                                                                      
- OVERALL TOTAL                                                                 $30.60 
+ Name                                    Monthly Qty  Unit                  Monthly Cost 
+                                                                                         
+ aws_wafv2_web_acl.my_waf                                                                
+ ├─ Web ACL usage                                  1  months                       $5.00 
+ ├─ Rules                                         16  rules                       $16.00 
+ ├─ Rule groups                                    1  groups                       $1.00 
+ ├─ Managed rule groups                            1  groups                       $1.00 
+ └─ Requests                                       1  1M requests                  $0.60 
+                                                                                         
+ aws_wafv2_web_acl.my_waf_no_usage                                                       
+ ├─ Web ACL usage                                  1  months                       $5.00 
+ ├─ Rules                                          1  rules                        $1.00 
+ ├─ Rule groups                                    1  groups                       $1.00 
+ ├─ Managed rule groups                            1  groups                       $1.00 
+ └─ Requests                        Monthly cost depends on usage: $0.60 per 1M requests 
+                                                                                         
+ OVERALL TOTAL                                                                    $31.60 
 ──────────────────────────────────
-2 cloud resources were detected:
+5 cloud resources were detected:
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
+∙ 3 were free:
+  ∙ 1 x aws_wafv2_ip_set
+  ∙ 1 x aws_wafv2_regex_pattern_set
+  ∙ 1 x aws_wafv2_rule_group
