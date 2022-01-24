@@ -92,15 +92,7 @@ func (e *Evaluator) evaluateStep(i int) {
 
 func (e *Evaluator) evaluateModules() {
 	for _, module := range e.moduleDefinitions {
-		if visited := func(module *ModuleDefinition) bool {
-			for _, v := range e.visitedModules {
-				if v.name == module.Name && v.path == module.Path && module.Definition.Reference().String() == v.definitionReference {
-					log.Debugf("Module [%s:%s:%s] has already been seen", v.name, v.path, v.definitionReference)
-					return true
-				}
-			}
-			return false
-		}(module); visited {
+		if e.hasBeenVisited(module) {
 			continue
 		}
 
@@ -109,9 +101,20 @@ func (e *Evaluator) evaluateModules() {
 		vars := module.Definition.Values().AsValueMap()
 		moduleEvaluator := NewEvaluator(e.projectRootPath, module.Path, e.workingDir, module.Modules[0].GetBlocks(), vars, e.moduleMetadata, e.visitedModules, e.stopOnHCLError, e.workspace)
 		module.Modules, _ = moduleEvaluator.EvaluateAll()
-		// export module outputs
+
 		e.ctx.Set(moduleEvaluator.ExportOutputs(), "module", module.Name)
 	}
+}
+
+func (e *Evaluator) hasBeenVisited(module *ModuleDefinition) bool {
+	for _, v := range e.visitedModules {
+		if v.name == module.Name && v.path == module.Path && module.Definition.Reference().String() == v.definitionReference {
+			log.Debugf("Module [%s:%s:%s] has already been seen", v.name, v.path, v.definitionReference)
+			return true
+		}
+	}
+
+	return false
 }
 
 // export module outputs to a parent
@@ -322,12 +325,10 @@ func (e *Evaluator) evaluateOutput(b block.Block) (cty.Value, error) {
 
 // returns true if all evaluations were successful
 func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
-
 	blocksOfType := e.blocks.OfType(blockType)
 	values := make(map[string]cty.Value)
 
 	for _, b := range blocksOfType {
-
 		switch b.Type() {
 		case "variable": // variables are special in that their value comes from the "default" attribute
 			val, err := e.evaluateVariable(b)
@@ -351,7 +352,6 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 			}
 			values[b.Label()] = b.Values()
 		case "resource", "data":
-
 			if len(b.Labels()) < 2 {
 				continue
 			}

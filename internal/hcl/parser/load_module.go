@@ -78,6 +78,7 @@ func (e *Evaluator) loadModule(b block.Block, stopOnHCLError bool) (*ModuleDefin
 			}
 		}
 	}
+
 	if modulePath == "" {
 		// if we have no metadata, we can only support modules available on the local filesystem
 		// users wanting this feature should run a `terraform init` before running infracost to cache all modules locally
