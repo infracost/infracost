@@ -3,19 +3,18 @@ package aws
 import (
 	"testing"
 
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConvertResourceString(t *testing.T) {
+func TestParseVCPUMemoryString(t *testing.T) {
 	t.Parallel()
-	half := decimal.NewFromFloat(0.5)
-	one := decimal.NewFromInt(1)
-	two := decimal.NewFromInt(2)
+	half := float64(0.5)
+	one := float64(1)
+	two := float64(2)
 
 	tests := []struct {
 		inputStr string
-		expected decimal.Decimal
+		expected float64
 	}{
 		{"1GB", one},
 		{"1gb", one},
@@ -32,7 +31,7 @@ func TestConvertResourceString(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual := convertResourceString(test.inputStr)
-		assert.Equal(t, test.expected.String(), actual.String())
+		actual := parseVCPUMemoryString(test.inputStr)
+		assert.Equal(t, test.expected, actual)
 	}
 }

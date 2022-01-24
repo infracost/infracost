@@ -41,7 +41,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetEC2TransitGatewayPeeringAttachmentRegistryItem(),
 	GetEC2TransitGatewayVpcAttachmentRegistryItem(),
 	getECRRegistryItem(),
-	GetECSServiceRegistryItem(),
+	getECSServiceRegistryItem(),
 	getEFSFileSystemRegistryItem(),
 	getEIPRegistryItem(),
 	getElastiCacheClusterItem(),
