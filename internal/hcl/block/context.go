@@ -113,11 +113,13 @@ func mergeObjects(a cty.Value, b cty.Value) cty.Value {
 	}
 	for key, val := range b.AsValueMap() {
 		old, exists := output[key]
+
 		if exists && val.IsKnown() && val.Type().IsObjectType() && !val.IsNull() && val.LengthInt() > 0 && old.IsKnown() && old.Type().IsObjectType() && !old.IsNull() && old.LengthInt() > 0 {
 			output[key] = mergeObjects(val, old)
-		} else {
-			output[key] = val
+			continue
 		}
+
+		output[key] = val
 	}
 	return cty.ObjectVal(output)
 }

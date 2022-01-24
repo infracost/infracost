@@ -12,8 +12,22 @@ import (
 )
 
 type DirProvider struct {
-	Ctx      *config.ProjectContext
+	Parser   *parser.Parser
 	Provider *terraform.PlanJSONProvider
+}
+
+func NewDirProvider(ctx *config.ProjectContext, provider *terraform.PlanJSONProvider) (DirProvider, error) {
+	option, err := parser.TfVarsToOption(ctx.ProjectConfig.TFVarFiles...)
+	if err != nil {
+		return DirProvider{}, err
+	}
+
+	p := parser.New(ctx.ProjectConfig.Path, option)
+
+	return DirProvider{
+		Parser:   p,
+		Provider: provider,
+	}, err
 }
 
 func (p DirProvider) Type() string {
@@ -28,12 +42,7 @@ func (p DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 func (p DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
-	option, err := parser.TfVarsToOption(p.Ctx.ProjectConfig.TFVarFiles...)
-	if err != nil {
-		return nil, err
-	}
-
-	modules, err := parser.New(p.Ctx.ProjectConfig.Path, option).ParseDirectory()
+	modules, err := p.Parser.ParseDirectory()
 	if err != nil {
 		return nil, err
 	}
