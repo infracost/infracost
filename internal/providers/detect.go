@@ -27,7 +27,7 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 	}
 
 	if ctx.ProjectConfig.HCLOnly {
-		return hcl.DirProvider{Ctx: ctx, Provider: terraform.NewPlanJSONProvider(ctx)}, nil
+		return hcl.NewDirProvider(ctx, terraform.NewPlanJSONProvider(ctx))
 	}
 
 	if isCloudFormationTemplate(path) {

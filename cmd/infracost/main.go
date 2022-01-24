@@ -7,6 +7,7 @@ import (
 	"os"
 	"runtime/debug"
 
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -17,8 +18,6 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
-
-	"github.com/fatih/color"
 )
 
 func main() {
