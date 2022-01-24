@@ -1,9 +1,6 @@
 version: 0.1
 resource_usage:
-  aws_wafv2_web_acl.my_waf2:
-    rule_group_rules: 5          # Total number of Rule Group rules used by the Web ACL.
-    managed_rule_group_rules: 10 # Total number of Managed Rule Group rules used by the Web ACL.  
+  aws_wafv2_web_acl.my_waf:
+    rule_group_rules: 5           # Total number of Rule Group rules used by the Web ACL.
+    managed_rule_group_rules: 10  # Total number of Managed Rule Group rules used by the Web ACL.
     monthly_requests: 1000000
-
-
-    
