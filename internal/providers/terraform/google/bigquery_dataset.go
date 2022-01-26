@@ -5,14 +5,19 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getBigqueryDatasetRegistryItem() *schema.RegistryItem {
+func getBigQueryDatasetRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_bigquery_dataset",
-		RFunc: NewBigqueryDataset,
+		RFunc: NewBigQueryDataset,
 	}
 }
-func NewBigqueryDataset(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.BigqueryDataset{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+
+func NewBigQueryDataset(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &google.BigQueryDataset{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

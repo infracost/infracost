@@ -11,11 +11,15 @@ func getRedisInstanceRegistryItem() *schema.RegistryItem {
 		RFunc: NewRedisInstance,
 	}
 }
+
 func NewRedisInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.RedisInstance{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String()), MemorySizeGb: floatPtr(d.Get("memory_size_gb").Float())}
-	if !d.IsEmpty("tier") {
-		r.Tier = strPtr(d.Get("tier").String())
+	r := &google.RedisInstance{
+		Address:      d.Address,
+		Region:       d.Get("region").String(),
+		MemorySizeGB: d.Get("memory_size_gb").Float(),
+		Tier:         d.Get("tier").String(),
 	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

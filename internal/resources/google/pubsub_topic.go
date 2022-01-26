@@ -7,26 +7,28 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type PubsubTopic struct {
-	Address              *string
-	MonthlyMessageDataTb *float64 `infracost_usage:"monthly_message_data_tb"`
+type PubSubTopic struct {
+	Address              string
+	MonthlyMessageDataTB *float64 `infracost_usage:"monthly_message_data_tb"`
 }
 
-var PubsubTopicUsageSchema = []*schema.UsageItem{{Key: "monthly_message_data_tb", ValueType: schema.Float64, DefaultValue: 0.000000}}
+var PubSubTopicUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_message_data_tb", ValueType: schema.Float64, DefaultValue: 0.0},
+}
 
-func (r *PubsubTopic) PopulateUsage(u *schema.UsageData) {
+func (r *PubSubTopic) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *PubsubTopic) BuildResource() *schema.Resource {
+func (r *PubSubTopic) BuildResource() *schema.Resource {
 	var messageDataTB *decimal.Decimal
 
-	if r.MonthlyMessageDataTb != nil {
-		messageDataTB = decimalPtr(decimal.NewFromFloat(*r.MonthlyMessageDataTb))
+	if r.MonthlyMessageDataTB != nil {
+		messageDataTB = decimalPtr(decimal.NewFromFloat(*r.MonthlyMessageDataTB))
 	}
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Message ingestion data",
@@ -46,6 +48,7 @@ func (r *PubsubTopic) BuildResource() *schema.Resource {
 					EndUsageAmount: strPtr(""),
 				},
 			},
-		}, UsageSchema: PubsubTopicUsageSchema,
+		},
+		UsageSchema: PubSubTopicUsageSchema,
 	}
 }

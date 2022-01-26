@@ -7,37 +7,38 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type ComputeRouterNat struct {
-	Address                *string
-	Region                 *string
-	AssignedVms            *int64   `infracost_usage:"assigned_vms"`
-	MonthlyDataProcessedGb *float64 `infracost_usage:"monthly_data_processed_gb"`
+type ComputeRouterNAT struct {
+	Address                string
+	Region                 string
+	AssignedVMs            *int64   `infracost_usage:"assigned_vms"`
+	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var ComputeRouterNatUsageSchema = []*schema.UsageItem{{Key: "assigned_vms", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var ComputeRouterNATUsageSchema = []*schema.UsageItem{
+	{Key: "assigned_vms", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0},
+}
 
-func (r *ComputeRouterNat) PopulateUsage(u *schema.UsageData) {
+func (r *ComputeRouterNAT) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *ComputeRouterNat) BuildResource() *schema.Resource {
-	region := *r.Region
-
+func (r *ComputeRouterNAT) BuildResource() *schema.Resource {
 	var assignedVMs int64
-	if r.AssignedVms != nil {
-		assignedVMs = *r.AssignedVms
+	if r.AssignedVMs != nil {
+		assignedVMs = *r.AssignedVMs
 		if assignedVMs > 32 {
 			assignedVMs = 32
 		}
 	}
 
 	var dataProcessedGB *decimal.Decimal
-	if r.MonthlyDataProcessedGb != nil {
-		dataProcessedGB = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataProcessedGb))
+	if r.MonthlyDataProcessedGB != nil {
+		dataProcessedGB = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataProcessedGB))
 	}
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           "Assigned VMs (first 32)",
@@ -46,7 +47,7 @@ func (r *ComputeRouterNat) BuildResource() *schema.Resource {
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(assignedVMs)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("Compute Engine"),
 					ProductFamily: strPtr("Network"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -61,7 +62,7 @@ func (r *ComputeRouterNat) BuildResource() *schema.Resource {
 				MonthlyQuantity: dataProcessedGB,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("Compute Engine"),
 					ProductFamily: strPtr("Network"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -69,6 +70,7 @@ func (r *ComputeRouterNat) BuildResource() *schema.Resource {
 					},
 				},
 			},
-		}, UsageSchema: ComputeRouterNatUsageSchema,
+		},
+		UsageSchema: ComputeRouterNATUsageSchema,
 	}
 }

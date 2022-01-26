@@ -4,8 +4,8 @@ import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getArtifactRegistryRepositoryRegistryItem(),
-	getBigqueryDatasetRegistryItem(),
-	getBigqueryTableRegistryItem(),
+	getBigQueryDatasetRegistryItem(),
+	getBigQueryTableRegistryItem(),
 	getCloudFunctionsRegistryItem(),
 	GetComputeAddressRegistryItem(),
 	GetComputeDiskRegistryItem(),

@@ -8,11 +8,16 @@ import (
 func getComputeRouterNATRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_compute_router_nat",
-		RFunc: NewComputeRouterNat,
+		RFunc: NewComputeRouterNAT,
 	}
 }
-func NewComputeRouterNat(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.ComputeRouterNat{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+
+func NewComputeRouterNAT(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &google.ComputeRouterNAT{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

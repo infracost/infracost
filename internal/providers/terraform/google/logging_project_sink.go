@@ -11,8 +11,12 @@ func getLoggingProjectSinkRegistryItem() *schema.RegistryItem {
 		RFunc: NewLoggingProjectSink,
 	}
 }
+
 func NewLoggingProjectSink(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.LoggingProjectSink{Address: strPtr(d.Address)}
+	r := &google.Logging{
+		Address: d.Address,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

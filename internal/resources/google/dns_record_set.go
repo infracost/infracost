@@ -8,11 +8,13 @@ import (
 )
 
 type DNSRecordSet struct {
-	Address        *string
+	Address        string
 	MonthlyQueries *int64 `infracost_usage:"monthly_queries"`
 }
 
-var DNSRecordSetUsageSchema = []*schema.UsageItem{{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0}}
+var DNSRecordSetUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0},
+}
 
 func (r *DNSRecordSet) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -26,7 +28,7 @@ func (r *DNSRecordSet) BuildResource() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Queries",
@@ -46,6 +48,7 @@ func (r *DNSRecordSet) BuildResource() *schema.Resource {
 					StartUsageAmount: strPtr("0"),
 				},
 			},
-		}, UsageSchema: DNSRecordSetUsageSchema,
+		},
+		UsageSchema: DNSRecordSetUsageSchema,
 	}
 }

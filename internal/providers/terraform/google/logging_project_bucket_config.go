@@ -11,8 +11,12 @@ func getLoggingBucketConfigRegistryItem() *schema.RegistryItem {
 		RFunc: NewLoggingProjectBucketConfig,
 	}
 }
+
 func NewLoggingProjectBucketConfig(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.LoggingProjectBucketConfig{Address: strPtr(d.Address)}
+	r := &google.Logging{
+		Address: d.Address,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

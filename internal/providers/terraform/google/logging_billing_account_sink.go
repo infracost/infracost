@@ -11,8 +11,12 @@ func getLoggingBillingAccountSinkRegistryItem() *schema.RegistryItem {
 		RFunc: NewLoggingBillingAccountSink,
 	}
 }
+
 func NewLoggingBillingAccountSink(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.LoggingBillingAccountSink{Address: strPtr(d.Address)}
+	r := &google.Logging{
+		Address: d.Address,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

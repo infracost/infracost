@@ -5,14 +5,19 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getBigqueryTableRegistryItem() *schema.RegistryItem {
+func getBigQueryTableRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_bigquery_table",
-		RFunc: NewBigqueryTable,
+		RFunc: NewBigQueryTable,
 	}
 }
-func NewBigqueryTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.BigqueryTable{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+
+func NewBigQueryTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &google.BigQueryTable{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

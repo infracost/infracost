@@ -7,28 +7,27 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type ComputeVpnTunnel struct {
-	Address *string
-	Region  *string
+type ComputeVPNTunnel struct {
+	Address string
+	Region  string
 }
 
-var ComputeVpnTunnelUsageSchema = []*schema.UsageItem{}
+var ComputeVPNTunnelUsageSchema = []*schema.UsageItem{}
 
-func (r *ComputeVpnTunnel) PopulateUsage(u *schema.UsageData) {
+func (r *ComputeVPNTunnel) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *ComputeVpnTunnel) BuildResource() *schema.Resource {
-	region := *r.Region
+func (r *ComputeVPNTunnel) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
-			VPNTunnelInstance(region),
-		}, UsageSchema: ComputeVpnTunnelUsageSchema,
+			r.vpnTunnelCostComponent(),
+		}, UsageSchema: ComputeVPNTunnelUsageSchema,
 	}
 }
 
-func VPNTunnelInstance(region string) *schema.CostComponent {
+func (r *ComputeVPNTunnel) vpnTunnelCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "VPN Tunnel",
 		Unit:           "hours",
@@ -36,7 +35,7 @@ func VPNTunnelInstance(region string) *schema.CostComponent {
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{
