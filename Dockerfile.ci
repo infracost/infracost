@@ -20,8 +20,9 @@ FROM alpine:3.15 as app
 # Tools needed for running diffs in CI integrations
 RUN apk --no-cache add bash curl git jq nodejs npm
 
-# Install the latest compost version
-RUN npm install -g @infracost/compost
+# Install test compost version
+RUN git clone -b test/gitlab-403 https://github.com/infracost/compost
+RUN cd compost && npm ci && npm run build && npm link
 
 WORKDIR /root/
 
