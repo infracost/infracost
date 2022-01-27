@@ -1,3 +1,4 @@
+// nolint
 package main
 
 import (
@@ -23,7 +24,7 @@ var PROVIDER_TF string = "aws"
 var DRY_MODE = false
 var STRICT_MODE = false
 var SINGLE_MODE = true
-var SINGLE_RESOURCE_NAME = "waf_web_acl.go"
+var SINGLE_RESOURCE_NAME = "ec2_transit_gateway_peering_attachment.go"
 
 var FLEXIBLE_MODE_SKIP_DOTS = true
 var FLEXIBLE_MODE_SKIP_TYPES = true
