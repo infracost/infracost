@@ -17,12 +17,12 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-var PROVIDER string = "azure"
-var PROVIDER_TF string = "azurem"
+var PROVIDER string = "aws"
+var PROVIDER_TF string = "aws"
 
 var DRY_MODE = false
-var STRICT_MODE = true
-var SINGLE_MODE = false
+var STRICT_MODE = false
+var SINGLE_MODE = true
 var SINGLE_RESOURCE_NAME = "waf_web_acl.go"
 
 var FLEXIBLE_MODE_SKIP_DOTS = true
