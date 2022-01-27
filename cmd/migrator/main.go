@@ -17,12 +17,12 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-var PROVIDER string = "aws"
-var PROVIDER_TF string = "aws"
+var PROVIDER string = "azure"
+var PROVIDER_TF string = "azurem"
 
 var DRY_MODE = false
-var STRICT_MODE = false
-var SINGLE_MODE = true
+var STRICT_MODE = true
+var SINGLE_MODE = false
 var SINGLE_RESOURCE_NAME = "waf_web_acl.go"
 
 var FLEXIBLE_MODE_SKIP_DOTS = true
@@ -663,7 +663,7 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 		List: make([]*ast.Field, 0),
 	}
 	fieldsList.List = append(fieldsList.List, &ast.Field{
-		Type: &ast.StarExpr{X: &ast.Ident{Name: "string"}},
+		Type: &ast.Ident{Name: "string"},
 		Names: []*ast.Ident{{
 			Name: "Address",
 			Obj: &ast.Object{
@@ -674,7 +674,7 @@ func addResourceSchemaAndFuncs(resourceCamelName, resourceName string, resourceF
 	})
 	for key, val := range dsList {
 		fieldsList.List = append(fieldsList.List, &ast.Field{
-			Type: &ast.StarExpr{X: &ast.Ident{Name: duTypeToASTType(val.fieldType)}},
+			Type: &ast.Ident{Name: duTypeToASTType(val.fieldType)},
 			Names: []*ast.Ident{{
 				Name: strCamelCaseHelper(key),
 				Obj: &ast.Object{
@@ -878,8 +878,8 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File, usList, dsList
 												},
 											}
 										} else {
-											replacementNode = &ast.StarExpr{
-												X: &ast.SelectorExpr{
+											if identExpr.Name == "d" {
+												replacementNode = &ast.SelectorExpr{
 													X: &ast.Ident{
 														Name: "r",
 														Obj: &ast.Object{
@@ -890,7 +890,22 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File, usList, dsList
 													Sel: &ast.Ident{
 														Name: strCamelCaseHelper(keyName),
 													},
-												},
+												}
+											} else {
+												replacementNode = &ast.StarExpr{
+													X: &ast.SelectorExpr{
+														X: &ast.Ident{
+															Name: "r",
+															Obj: &ast.Object{
+																Kind: ast.Var,
+																Name: "r",
+															},
+														},
+														Sel: &ast.Ident{
+															Name: strCamelCaseHelper(keyName),
+														},
+													},
+												}
 											}
 										}
 										c.Replace(replacementNode)
@@ -942,8 +957,8 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File, usList, dsList
 											},
 										}
 									} else {
-										replacementNode = &ast.StarExpr{
-											X: &ast.SelectorExpr{
+										if identExpr.Name == "d" {
+											replacementNode = &ast.SelectorExpr{
 												X: &ast.Ident{
 													Name: "r",
 													Obj: &ast.Object{
@@ -954,7 +969,22 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File, usList, dsList
 												Sel: &ast.Ident{
 													Name: strCamelCaseHelper(keyName),
 												},
-											},
+											}
+										} else {
+											replacementNode = &ast.StarExpr{
+												X: &ast.SelectorExpr{
+													X: &ast.Ident{
+														Name: "r",
+														Obj: &ast.Object{
+															Kind: ast.Var,
+															Name: "r",
+														},
+													},
+													Sel: &ast.Ident{
+														Name: strCamelCaseHelper(keyName),
+													},
+												},
+											}
 										}
 									}
 									c.Replace(replacementNode)
@@ -1009,7 +1039,7 @@ func replaceDUs(resourceCamelName string, resourceFile *ast.File, usList, dsList
 			if XIdent, ok := selExpr.X.(*ast.Ident); ok {
 				if XIdent.Name == "d" {
 					XIdent.Name = "r"
-					c.Replace(&ast.StarExpr{X: selExpr})
+					c.Replace(selExpr)
 				}
 			}
 		}
@@ -1163,14 +1193,9 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 	resourceELTs := []ast.Expr{
 		&ast.KeyValueExpr{
 			Key: &ast.Ident{Name: "Address"},
-			Value: &ast.CallExpr{
-				Fun: &ast.Ident{Name: "strPtr"},
-				Args: []ast.Expr{
-					&ast.SelectorExpr{
-						X:   &ast.Ident{Name: "d"},
-						Sel: &ast.Ident{Name: "Address"},
-					},
-				},
+			Value: &ast.SelectorExpr{
+				X:   &ast.Ident{Name: "d"},
+				Sel: &ast.Ident{Name: "Address"},
 			},
 		},
 	}
@@ -1182,20 +1207,15 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 		resourceELTs = append(resourceELTs, &ast.KeyValueExpr{
 			Key: &ast.Ident{Name: strCamelCaseHelper(key)},
 			Value: &ast.CallExpr{
-				Fun: &ast.Ident{Name: duTypeToPtrCall(val.fieldType)},
-				Args: []ast.Expr{
-					&ast.CallExpr{
+				Fun: &ast.SelectorExpr{
+					Sel: &ast.Ident{Name: duTypeToResCall(val.fieldType)},
+					X: &ast.CallExpr{
 						Fun: &ast.SelectorExpr{
-							Sel: &ast.Ident{Name: duTypeToResCall(val.fieldType)},
-							X: &ast.CallExpr{
-								Fun: &ast.SelectorExpr{
-									Sel: &ast.Ident{Name: "Get"},
-									X:   &ast.Ident{Name: "d"},
-								},
-								Args: []ast.Expr{
-									&ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"%s\"", key)},
-								},
-							},
+							Sel: &ast.Ident{Name: "Get"},
+							X:   &ast.Ident{Name: "d"},
+						},
+						Args: []ast.Expr{
+							&ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"%s\"", key)},
 						},
 					},
 				},
@@ -1248,20 +1268,15 @@ func addProviderFunc(resourceCamelName string, dsList, usList map[string]duStruc
 					},
 					Rhs: []ast.Expr{
 						&ast.CallExpr{
-							Fun: &ast.Ident{Name: duTypeToPtrCall(val.fieldType)},
-							Args: []ast.Expr{
-								&ast.CallExpr{
+							Fun: &ast.SelectorExpr{
+								Sel: &ast.Ident{Name: duTypeToResCall(val.fieldType)},
+								X: &ast.CallExpr{
 									Fun: &ast.SelectorExpr{
-										Sel: &ast.Ident{Name: duTypeToResCall(val.fieldType)},
-										X: &ast.CallExpr{
-											Fun: &ast.SelectorExpr{
-												Sel: &ast.Ident{Name: "Get"},
-												X:   &ast.Ident{Name: "d"},
-											},
-											Args: []ast.Expr{
-												&ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"%s\"", key)},
-											},
-										},
+										Sel: &ast.Ident{Name: "Get"},
+										X:   &ast.Ident{Name: "d"},
+									},
+									Args: []ast.Expr{
+										&ast.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("\"%s\"", key)},
 									},
 								},
 							},
