@@ -8,7 +8,7 @@ import (
 )
 
 type DNSManagedZone struct {
-	Address *string
+	Address string
 }
 
 var DNSManagedZoneUsageSchema = []*schema.UsageItem{}
@@ -19,7 +19,7 @@ func (r *DNSManagedZone) PopulateUsage(u *schema.UsageData) {
 
 func (r *DNSManagedZone) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Managed zone",
@@ -39,6 +39,7 @@ func (r *DNSManagedZone) BuildResource() *schema.Resource {
 					StartUsageAmount: strPtr("0"),
 				},
 			},
-		}, UsageSchema: DNSManagedZoneUsageSchema,
+		},
+		UsageSchema: DNSManagedZoneUsageSchema,
 	}
 }

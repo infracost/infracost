@@ -16,6 +16,7 @@ func strPtr(s string) *string {
 	return &s
 }
 
+// nolint:deadcode,unused
 func floatPtr(f float64) *float64 {
 	return &f
 }

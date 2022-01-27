@@ -89,8 +89,8 @@ resource "aws_wafv2_rule_group" "example" {
 
 
 resource "aws_wafv2_web_acl" "my_waf" {
-  name        = "my_waf"
-  scope       = "REGIONAL"
+  name  = "my_waf"
+  scope = "REGIONAL"
 
   default_action {
     allow {}
@@ -197,8 +197,8 @@ resource "aws_wafv2_web_acl" "my_waf" {
 }
 
 resource "aws_wafv2_web_acl" "my_waf_no_usage" {
-  name        = "my_waf_no_usage"
-  scope       = "REGIONAL"
+  name  = "my_waf_no_usage"
+  scope = "REGIONAL"
 
   default_action {
     allow {}

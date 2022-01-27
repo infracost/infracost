@@ -8,11 +8,16 @@ import (
 func getComputeVPNTunnelRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_compute_vpn_tunnel",
-		RFunc: NewComputeVpnTunnel,
+		RFunc: NewComputeVPNTunnel,
 	}
 }
-func NewComputeVpnTunnel(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.ComputeVpnTunnel{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+
+func NewComputeVPNTunnel(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &google.ComputeVPNTunnel{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

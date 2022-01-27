@@ -11,8 +11,12 @@ func getDNSManagedZoneRegistryItem() *schema.RegistryItem {
 		RFunc: NewDNSManagedZone,
 	}
 }
+
 func NewDNSManagedZone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.DNSManagedZone{Address: strPtr(d.Address)}
+	r := &google.DNSManagedZone{
+		Address: d.Address,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

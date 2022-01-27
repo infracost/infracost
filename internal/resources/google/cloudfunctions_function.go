@@ -7,27 +7,29 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type CloudfunctionsFunction struct {
-	Address                    *string
-	Region                     *string
-	AvailableMemoryMb          *int64
+type CloudFunctionsFunction struct {
+	Address                    string
+	Region                     string
+	AvailableMemoryMB          *int64
 	RequestDurationMs          *int64   `infracost_usage:"request_duration_ms"`
 	MonthlyFunctionInvocations *int64   `infracost_usage:"monthly_function_invocations"`
-	MonthlyOutboundDataGb      *float64 `infracost_usage:"monthly_outbound_data_gb"`
+	MonthlyOutboundDataGB      *float64 `infracost_usage:"monthly_outbound_data_gb"`
 }
 
-var CloudfunctionsFunctionUsageSchema = []*schema.UsageItem{{Key: "request_duration_ms", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_function_invocations", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_outbound_data_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var CloudFunctionsFunctionUsageSchema = []*schema.UsageItem{
+	{Key: "request_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_function_invocations", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_outbound_data_gb", ValueType: schema.Float64, DefaultValue: 0},
+}
 
-func (r *CloudfunctionsFunction) PopulateUsage(u *schema.UsageData) {
+func (r *CloudFunctionsFunction) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *CloudfunctionsFunction) BuildResource() *schema.Resource {
-	region := *r.Region
-
+func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 	memorySize := decimal.NewFromInt(256)
-	if r.AvailableMemoryMb != nil {
-		memorySize = decimal.NewFromInt(*r.AvailableMemoryMb)
+	if r.AvailableMemoryMB != nil {
+		memorySize = decimal.NewFromInt(*r.AvailableMemoryMB)
 	}
 
 	var cpuMapping = map[int]decimal.Decimal{
@@ -50,17 +52,17 @@ func (r *CloudfunctionsFunction) BuildResource() *schema.Resource {
 	var invocations, monthlyCPUUsage, monthlyMemoryUsage *decimal.Decimal
 	if r.MonthlyFunctionInvocations != nil {
 		invocations = decimalPtr(decimal.NewFromInt(*r.MonthlyFunctionInvocations))
-		monthlyCPUUsage = decimalPtr(calculateGHzSeconds(cpuSize, requestDuration, *invocations))
-		monthlyMemoryUsage = decimalPtr(calculateGBSeconds(memorySize, requestDuration, *invocations))
+		monthlyCPUUsage = decimalPtr(r.calculateGHzSeconds(cpuSize, requestDuration, *invocations))
+		monthlyMemoryUsage = decimalPtr(r.calculateGBSeconds(memorySize, requestDuration, *invocations))
 	}
 
-	var networkEgrees *decimal.Decimal
-	if r.MonthlyOutboundDataGb != nil {
-		networkEgrees = decimalPtr(decimal.NewFromFloat(*r.MonthlyOutboundDataGb))
+	var networkEgress *decimal.Decimal
+	if r.MonthlyOutboundDataGB != nil {
+		networkEgress = decimalPtr(decimal.NewFromFloat(*r.MonthlyOutboundDataGB))
 	}
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "CPU",
@@ -69,7 +71,7 @@ func (r *CloudfunctionsFunction) BuildResource() *schema.Resource {
 				MonthlyQuantity: monthlyCPUUsage,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("Cloud Functions"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -84,7 +86,7 @@ func (r *CloudfunctionsFunction) BuildResource() *schema.Resource {
 				MonthlyQuantity: monthlyMemoryUsage,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("Cloud Functions"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -114,10 +116,10 @@ func (r *CloudfunctionsFunction) BuildResource() *schema.Resource {
 				Name:            "Outbound data transfer",
 				Unit:            "GB",
 				UnitMultiplier:  decimal.NewFromInt(1),
-				MonthlyQuantity: networkEgrees,
+				MonthlyQuantity: networkEgress,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("Cloud Functions"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -128,17 +130,18 @@ func (r *CloudfunctionsFunction) BuildResource() *schema.Resource {
 					StartUsageAmount: strPtr("5"),
 				},
 			},
-		}, UsageSchema: CloudfunctionsFunctionUsageSchema,
+		},
+		UsageSchema: CloudFunctionsFunctionUsageSchema,
 	}
 }
 
-func calculateGBSeconds(memorySize decimal.Decimal, averageRequestDuration decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
+func (r *CloudFunctionsFunction) calculateGBSeconds(memorySize decimal.Decimal, averageRequestDuration decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
 	gb := memorySize.Div(decimal.NewFromInt(1024))
 	seconds := averageRequestDuration.Div(decimal.NewFromInt(1000))
 	return monthlyRequests.Mul(gb).Mul(seconds)
 }
 
-func calculateGHzSeconds(memorySize decimal.Decimal, averageRequestDuration decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
+func (r *CloudFunctionsFunction) calculateGHzSeconds(memorySize decimal.Decimal, averageRequestDuration decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
 	gb := memorySize.Div(decimal.NewFromInt(1000))
 	seconds := averageRequestDuration.Div(decimal.NewFromInt(1000))
 	return monthlyRequests.Mul(gb).Mul(seconds)

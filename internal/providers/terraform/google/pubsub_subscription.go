@@ -8,11 +8,15 @@ import (
 func getPubSubSubscriptionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_pubsub_subscription",
-		RFunc: NewPubsubSubscription,
+		RFunc: NewPubSubSubscription,
 	}
 }
-func NewPubsubSubscription(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.PubsubSubscription{Address: strPtr(d.Address)}
+
+func NewPubSubSubscription(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &google.PubSubSubscription{
+		Address: d.Address,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

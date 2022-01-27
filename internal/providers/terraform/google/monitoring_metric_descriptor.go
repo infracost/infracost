@@ -11,8 +11,12 @@ func getMonitoringItem() *schema.RegistryItem {
 		RFunc: NewMonitoringMetricDescriptor,
 	}
 }
+
 func NewMonitoringMetricDescriptor(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.MonitoringMetricDescriptor{Address: strPtr(d.Address)}
+	r := &google.MonitoringMetricDescriptor{
+		Address: d.Address,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }
