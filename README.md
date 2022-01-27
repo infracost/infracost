@@ -69,7 +69,9 @@ Use our CI/CD integrations to add cost estimates to pull requests. This provides
 - [Bitbucket Pipelines](https://www.infracost.io/docs/integrations/cicd/#bitbucket-pipelines)
 - [CircleCI](https://www.infracost.io/docs/integrations/cicd/#circleci)
 
-Other CI/CD systems can be supported using [our Docker images](https://www.infracost.io/docs/integrations/cicd/#docker-images). If you run into any issues, please join our [community Slack channel](https://www.infracost.io/community-chat), we'll help you very quickly 😄
+Other CI/CD systems can be supported using [our Docker images](https://www.infracost.io/docs/integrations/cicd/#docker-images). You can also setup [cost policies](https://www.infracost.io/docs/features/cost_policies/).
+
+If you run into any issues, please join our [community Slack channel](https://www.infracost.io/community-chat), we'll help you very quickly 😄
 
 ## CLI commands
 
@@ -92,6 +94,12 @@ See [this page](https://www.infracost.io/docs/usage_based_resources) for details
 ## Contributing
 
 Issues and pull requests are welcome! For development details, see the [contributing](CONTRIBUTING.md) guide. For major changes, including CLI interface changes, please open an issue first to discuss what you would like to change. [Join our community Slack channel](https://www.infracost.io/community-chat), we are a friendly bunch and happy to help you get started :)
+
+Thanks to all the people who have contributed, including bug reports, code, feedback and suggestions!
+
+<a href="https://github.com/infracost/infracost/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=infracost/infracost" />
+</a>
 
 ## License
 

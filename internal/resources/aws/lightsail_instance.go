@@ -14,9 +14,9 @@ import (
 )
 
 type LightsailInstance struct {
-	Address  *string
-	Region   *string
-	BundleID *string
+	Address  string
+	Region   string
+	BundleID string
 }
 
 var LightsailInstanceUsageSchema = []*schema.UsageItem{}
@@ -26,8 +26,6 @@ func (r *LightsailInstance) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *LightsailInstance) BuildResource() *schema.Resource {
-	region := *r.Region
-
 	type bundleSpecs struct {
 		vcpu   string
 		memory string
@@ -46,21 +44,21 @@ func (r *LightsailInstance) BuildResource() *schema.Resource {
 	operatingSystem := "Linux"
 	operatingSystemLabel := "Linux/UNIX"
 
-	if strings.Contains(strings.ToLower(*r.BundleID), "_win_") {
+	if strings.Contains(strings.ToLower(r.BundleID), "_win_") {
 		operatingSystem = "Windows"
 		operatingSystemLabel = "Windows"
 	}
 
-	bundlePrefix := strings.Split(strings.ToLower(*r.BundleID), "_")[0]
+	bundlePrefix := strings.Split(strings.ToLower(r.BundleID), "_")[0]
 
 	specs, ok := bundlePrefixMappings[bundlePrefix]
 	if !ok {
-		log.Warnf("Skipping resource %s. Unrecognised bundle_id %s", *r.Address, *r.BundleID)
+		log.Warnf("Skipping resource %s. Unrecognized bundle_id %s", r.Address, r.BundleID)
 		return nil
 	}
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           fmt.Sprintf("Virtual server (%s)", operatingSystemLabel),
@@ -69,7 +67,7 @@ func (r *LightsailInstance) BuildResource() *schema.Resource {
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonLightsail"),
 					ProductFamily: strPtr("Lightsail Instance"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -82,6 +80,7 @@ func (r *LightsailInstance) BuildResource() *schema.Resource {
 					EndUsageAmount: strPtr("Inf"),
 				},
 			},
-		}, UsageSchema: LightsailInstanceUsageSchema,
+		},
+		UsageSchema: LightsailInstanceUsageSchema,
 	}
 }

@@ -52,6 +52,8 @@ func linuxVirtualMachineCostComponent(region string, instanceType string) *schem
 	productNameRe := "/Virtual Machines .* Series$/"
 	if strings.HasPrefix(instanceType, "Basic_") {
 		productNameRe = "/Virtual Machines .* Series Basic$/"
+	} else if !strings.HasPrefix(instanceType, "Standard_") {
+		instanceType = fmt.Sprintf("Standard_%s", instanceType)
 	}
 
 	return &schema.CostComponent{

@@ -12,57 +12,72 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type SsmParameter struct {
-	Address                *string
-	Tier                   *string
-	Region                 *string
+type SSMParameter struct {
+	Address                string
+	Tier                   string
+	Region                 string
 	ParameterStorageHrs    *int64  `infracost_usage:"parameter_storage_hrs"`
 	APIThroughputLimit     *string `infracost_usage:"api_throughput_limit"`
 	MonthlyAPIInteractions *int64  `infracost_usage:"monthly_api_interactions"`
 }
 
-var SsmParameterUsageSchema = []*schema.UsageItem{{Key: "parameter_storage_hrs", ValueType: schema.Int64, DefaultValue: 0}, {Key: "api_throughput_limit", ValueType: schema.String, DefaultValue: "standard"}, {Key: "monthly_api_interactions", ValueType: schema.Int64, DefaultValue: 0}}
+var SSMParameterUsageSchema = []*schema.UsageItem{
+	{Key: "parameter_storage_hrs", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "api_throughput_limit", ValueType: schema.String, DefaultValue: "standard"},
+	{Key: "monthly_api_interactions", ValueType: schema.Int64, DefaultValue: 0},
+}
 
-func (r *SsmParameter) PopulateUsage(u *schema.UsageData) {
+func (r *SSMParameter) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *SsmParameter) BuildResource() *schema.Resource {
+func (r *SSMParameter) BuildResource() *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
-	storage := parameterStorageCostComponent(r)
-	if storage != nil {
-		costComponents = append(costComponents, storage)
+
+	throughputLimit := ""
+
+	if r.APIThroughputLimit != nil {
+		throughputLimit = strings.ToLower(*r.APIThroughputLimit)
+
+		if throughputLimit != "standard" && throughputLimit != "advanced" && throughputLimit != "higher" {
+			log.Warnf("Skipping resource %s. Unrecognized api_throughput_limit %s, expecting standard, advanced or higher", r.Address, *r.APIThroughputLimit)
+			return nil
+		}
 	}
-	apiThroughput := apiThroughputCostComponent(r)
-	if apiThroughput != nil {
-		costComponents = append(costComponents, apiThroughput)
+
+	if throughputLimit == "" {
+		throughputLimit = r.tierValue()
 	}
+
+	if r.tierValue() != "standard" {
+		costComponents = append(costComponents, r.parameterStorageCostComponent())
+		costComponents = append(costComponents, r.apiThroughputCostComponent(throughputLimit))
+	}
+
 	if len(costComponents) == 0 {
 		return &schema.Resource{
-			Name:      *r.Address,
+			Name:      r.Address,
 			NoPrice:   true,
-			IsSkipped: true, UsageSchema: SsmParameterUsageSchema,
+			IsSkipped: true, UsageSchema: SSMParameterUsageSchema,
 		}
 	}
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: SsmParameterUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    SSMParameterUsageSchema,
 	}
 }
 
-func parameterStorageCostComponent(r *SsmParameter) *schema.CostComponent {
-	region := *r.Region
-
-	tier := "Standard"
-	if r.Tier != nil {
-		tier = *r.Tier
-	}
-	if strings.ToLower(tier) == "standard" {
-
-		return nil
+func (r *SSMParameter) tierValue() string {
+	if r.Tier == "" {
+		return "standard"
 	}
 
+	return strings.ToLower(r.Tier)
+}
+
+func (r *SSMParameter) parameterStorageCostComponent() *schema.CostComponent {
 	parameterStorageHours := decimal.NewFromInt(730)
 	if r.ParameterStorageHrs != nil {
 		parameterStorageHours = decimal.NewFromInt(*r.ParameterStorageHrs)
@@ -75,7 +90,7 @@ func parameterStorageCostComponent(r *SsmParameter) *schema.CostComponent {
 		MonthlyQuantity: &parameterStorageHours,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AWSSystemsManager"),
 			ProductFamily: strPtr("AWS Systems Manager"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -85,39 +100,20 @@ func parameterStorageCostComponent(r *SsmParameter) *schema.CostComponent {
 	}
 }
 
-func apiThroughputCostComponent(r *SsmParameter) *schema.CostComponent {
-	region := *r.Region
-
-	tier := "standard"
-	if r.Tier != nil {
-		tier = *r.Tier
-	}
-	if r.APIThroughputLimit != nil {
-		tier = *r.APIThroughputLimit
-	}
-	tier = strings.ToLower(tier)
-
-	if tier == "standard" {
-
-		return nil
-	}
-	if !(tier == "advanced" || tier == "higher") {
-		log.Errorf("api_throughput_limit in %s must be one of: advanced, higher", *r.Address)
-	}
-
+func (r *SSMParameter) apiThroughputCostComponent(throughputLimit string) *schema.CostComponent {
 	var monthlyAPIInteractions *decimal.Decimal
 	if r.MonthlyAPIInteractions != nil {
 		monthlyAPIInteractions = decimalPtr(decimal.NewFromInt(*r.MonthlyAPIInteractions))
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("API interactions (%s)", tier),
+		Name:            fmt.Sprintf("API interactions (%s)", throughputLimit),
 		Unit:            "10k interactions",
 		UnitMultiplier:  decimal.NewFromInt(10000),
 		MonthlyQuantity: monthlyAPIInteractions,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AWSSystemsManager"),
 			ProductFamily: strPtr("API Request"),
 			AttributeFilters: []*schema.AttributeFilter{

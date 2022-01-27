@@ -8,11 +8,17 @@ import (
 func getSQSQueueRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_sqs_queue",
-		RFunc: NewSqsQueue,
+		RFunc: NewSQSQueue,
 	}
 }
-func NewSqsQueue(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.SqsQueue{Address: strPtr(d.Address), FifoQueue: boolPtr(d.Get("fifo_queue").Bool()), Region: strPtr(d.Get("region").String())}
+
+func NewSQSQueue(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.SQSQueue{
+		Address:   d.Address,
+		Region:    d.Get("region").String(),
+		FifoQueue: d.Get("fifo_queue").Bool(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

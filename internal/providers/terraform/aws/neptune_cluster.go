@@ -11,11 +11,14 @@ func getNeptuneClusterRegistryItem() *schema.RegistryItem {
 		RFunc: NewNeptuneCluster,
 	}
 }
+
 func NewNeptuneCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.NeptuneCluster{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
-	if !d.IsEmpty("backup_retention_period") {
-		r.BackupRetentionPeriod = intPtr(d.Get("backup_retention_period").Int())
+	r := &aws.NeptuneCluster{
+		Address:               d.Address,
+		Region:                d.Get("region").String(),
+		BackupRetentionPeriod: d.Get("backup_retention_period").Int(),
 	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

@@ -8,40 +8,42 @@ import (
 )
 
 type CloudwatchLogGroup struct {
-	Address               *string
-	Region                *string
-	MonthlyDataIngestedGb *float64 `infracost_usage:"monthly_data_ingested_gb"`
-	StorageGb             *float64 `infracost_usage:"storage_gb"`
-	MonthlyDataScannedGb  *float64 `infracost_usage:"monthly_data_scanned_gb"`
+	Address               string
+	Region                string
+	MonthlyDataIngestedGB *float64 `infracost_usage:"monthly_data_ingested_gb"`
+	StorageGB             *float64 `infracost_usage:"storage_gb"`
+	MonthlyDataScannedGB  *float64 `infracost_usage:"monthly_data_scanned_gb"`
 }
 
-var CloudwatchLogGroupUsageSchema = []*schema.UsageItem{{Key: "monthly_data_ingested_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_data_scanned_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var CloudwatchLogGroupUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_data_ingested_gb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_data_scanned_gb", ValueType: schema.Float64, DefaultValue: 0},
+}
 
 func (r *CloudwatchLogGroup) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
 func (r *CloudwatchLogGroup) BuildResource() *schema.Resource {
-	region := *r.Region
-
 	var gbDataIngestion *decimal.Decimal
 	var gbDataStorage *decimal.Decimal
 	var gbDataScanned *decimal.Decimal
 
-	if r.MonthlyDataIngestedGb != nil {
-		gbDataIngestion = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataIngestedGb))
+	if r.MonthlyDataIngestedGB != nil {
+		gbDataIngestion = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataIngestedGB))
 	}
 
-	if r.StorageGb != nil {
-		gbDataStorage = decimalPtr(decimal.NewFromFloat(*r.StorageGb))
+	if r.StorageGB != nil {
+		gbDataStorage = decimalPtr(decimal.NewFromFloat(*r.StorageGB))
 	}
 
-	if r.MonthlyDataScannedGb != nil {
-		gbDataScanned = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataScannedGb))
+	if r.MonthlyDataScannedGB != nil {
+		gbDataScanned = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataScannedGB))
 	}
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Data ingested",
@@ -50,7 +52,7 @@ func (r *CloudwatchLogGroup) BuildResource() *schema.Resource {
 				MonthlyQuantity: gbDataIngestion,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonCloudWatch"),
 					ProductFamily: strPtr("Data Payload"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -65,7 +67,7 @@ func (r *CloudwatchLogGroup) BuildResource() *schema.Resource {
 				MonthlyQuantity: gbDataStorage,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonCloudWatch"),
 					ProductFamily: strPtr("Storage Snapshot"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -80,7 +82,7 @@ func (r *CloudwatchLogGroup) BuildResource() *schema.Resource {
 				MonthlyQuantity: gbDataScanned,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonCloudWatch"),
 					ProductFamily: strPtr("Data Payload"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -88,6 +90,7 @@ func (r *CloudwatchLogGroup) BuildResource() *schema.Resource {
 					},
 				},
 			},
-		}, UsageSchema: CloudwatchLogGroupUsageSchema,
+		},
+		UsageSchema: CloudwatchLogGroupUsageSchema,
 	}
 }

@@ -7,36 +7,36 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type SnsTopic struct {
-	Address         *string
-	Region          *string
-	RequestSizeKb   *float64 `infracost_usage:"request_size_kb"`
+type SNSTopic struct {
+	Address         string
+	Region          string
+	RequestSizeKB   *float64 `infracost_usage:"request_size_kb"`
 	MonthlyRequests *int64   `infracost_usage:"monthly_requests"`
 }
 
-var SnsTopicUsageSchema = []*schema.UsageItem{{Key: "request_size_kb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0}}
+var SNSTopicUsageSchema = []*schema.UsageItem{
+	{Key: "request_size_kb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+}
 
-func (r *SnsTopic) PopulateUsage(u *schema.UsageData) {
+func (r *SNSTopic) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *SnsTopic) BuildResource() *schema.Resource {
-	region := *r.Region
-
-	requestSize := decimal.NewFromInt(64)
-	if r.RequestSizeKb != nil {
-		requestSize = decimal.NewFromFloat(*r.RequestSizeKb)
-	}
-
+func (r *SNSTopic) BuildResource() *schema.Resource {
 	var requests *decimal.Decimal
 
+	requestSize := decimal.NewFromInt(64)
+	if r.RequestSizeKB != nil {
+		requestSize = decimal.NewFromFloat(*r.RequestSizeKB)
+	}
+
 	if r.MonthlyRequests != nil {
-		monthlyRequests := decimal.NewFromInt(*r.MonthlyRequests)
-		requests = decimalPtr(calculateRequests(requestSize, monthlyRequests))
+		requests = decimalPtr(r.calculateRequests(requestSize, decimal.NewFromInt(*r.MonthlyRequests)))
 	}
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Requests",
@@ -45,7 +45,7 @@ func (r *SnsTopic) BuildResource() *schema.Resource {
 				MonthlyQuantity: requests,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonSNS"),
 					ProductFamily: strPtr("API Request"),
 				},
@@ -53,6 +53,10 @@ func (r *SnsTopic) BuildResource() *schema.Resource {
 					StartUsageAmount: strPtr("1000000"),
 				},
 			},
-		}, UsageSchema: SnsTopicUsageSchema,
+		}, UsageSchema: SNSTopicUsageSchema,
 	}
+}
+
+func (r *SNSTopic) calculateRequests(requestSize decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
+	return requestSize.Div(decimal.NewFromInt(64)).Ceil().Mul(monthlyRequests)
 }

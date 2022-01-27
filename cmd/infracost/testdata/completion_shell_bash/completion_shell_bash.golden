@@ -430,6 +430,70 @@ _infracost_breakdown()
     noun_aliases=()
 }
 
+_infracost_comment_azure-repos()
+{
+    last_command="infracost_comment_azure-repos"
+
+    command_aliases=()
+
+    commands=()
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--azure-access-token=")
+    two_word_flags+=("--azure-access-token")
+    local_nonpersistent_flags+=("--azure-access-token")
+    local_nonpersistent_flags+=("--azure-access-token=")
+    flags+=("--behavior=")
+    two_word_flags+=("--behavior")
+    flags_with_completion+=("--behavior")
+    flags_completion+=("__infracost_handle_go_custom_completion")
+    local_nonpersistent_flags+=("--behavior")
+    local_nonpersistent_flags+=("--behavior=")
+    flags+=("--dry-run")
+    local_nonpersistent_flags+=("--dry-run")
+    flags+=("--path=")
+    two_word_flags+=("--path")
+    flags_with_completion+=("--path")
+    flags_completion+=("__infracost_handle_filename_extension_flag json")
+    two_word_flags+=("-p")
+    flags_with_completion+=("-p")
+    flags_completion+=("__infracost_handle_filename_extension_flag json")
+    local_nonpersistent_flags+=("--path")
+    local_nonpersistent_flags+=("--path=")
+    local_nonpersistent_flags+=("-p")
+    flags+=("--pull-request=")
+    two_word_flags+=("--pull-request")
+    local_nonpersistent_flags+=("--pull-request")
+    local_nonpersistent_flags+=("--pull-request=")
+    flags+=("--repo-url=")
+    two_word_flags+=("--repo-url")
+    local_nonpersistent_flags+=("--repo-url")
+    local_nonpersistent_flags+=("--repo-url=")
+    flags+=("--tag=")
+    two_word_flags+=("--tag")
+    local_nonpersistent_flags+=("--tag")
+    local_nonpersistent_flags+=("--tag=")
+    flags+=("--log-level=")
+    two_word_flags+=("--log-level")
+    flags+=("--no-color")
+
+    must_have_one_flag=()
+    must_have_one_flag+=("--azure-access-token=")
+    must_have_one_flag+=("--path=")
+    must_have_one_flag+=("-p")
+    must_have_one_flag+=("--pull-request=")
+    must_have_one_flag+=("--repo-url=")
+    must_have_one_noun=()
+    must_have_one_noun+=("-")
+    must_have_one_noun+=("--")
+    noun_aliases=()
+}
+
 _infracost_comment_github()
 {
     last_command="infracost_comment_github"
@@ -579,6 +643,7 @@ _infracost_comment()
     command_aliases=()
 
     commands=()
+    commands+=("azure-repos")
     commands+=("github")
     commands+=("gitlab")
 

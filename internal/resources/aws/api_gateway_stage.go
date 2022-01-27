@@ -10,9 +10,9 @@ import (
 )
 
 type APIGatewayStage struct {
-	Address          *string
-	Region           *string
-	CacheClusterSize *float64
+	Address          string
+	Region           string
+	CacheClusterSize float64
 }
 
 var APIGatewayStageUsageSchema = []*schema.UsageItem{}
@@ -22,19 +22,13 @@ func (r *APIGatewayStage) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *APIGatewayStage) BuildResource() *schema.Resource {
-	region := *r.Region
-
-	cacheMemorySize := decimal.Zero
-
-	if r.CacheClusterSize != nil {
-		cacheMemorySize = decimal.NewFromFloat(*r.CacheClusterSize)
-	}
+	region := r.Region
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           fmt.Sprintf("Cache memory (%s GB)", cacheMemorySize),
+				Name:           fmt.Sprintf("Cache memory (%s GB)", decimal.NewFromFloat(r.CacheClusterSize)),
 				Unit:           "hours",
 				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -44,10 +38,11 @@ func (r *APIGatewayStage) BuildResource() *schema.Resource {
 					Service:       strPtr("AmazonApiGateway"),
 					ProductFamily: strPtr("Amazon API Gateway Cache"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "cacheMemorySizeGb", ValueRegex: strPtr(fmt.Sprintf("/%s/i", cacheMemorySize.String()))},
+						{Key: "cacheMemorySizeGb", ValueRegex: strPtr(fmt.Sprintf("/%s/", decimal.NewFromFloat(r.CacheClusterSize)))},
 					},
 				},
 			},
-		}, UsageSchema: APIGatewayStageUsageSchema,
+		},
+		UsageSchema: APIGatewayStageUsageSchema,
 	}
 }

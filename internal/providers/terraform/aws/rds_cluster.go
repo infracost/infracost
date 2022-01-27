@@ -8,14 +8,19 @@ import (
 func getRDSClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_rds_cluster",
-		RFunc: NewRdsCluster,
+		RFunc: NewRDSCluster,
 	}
 }
-func NewRdsCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.RdsCluster{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String()), Engine: strPtr(d.Get("engine").String()), BackupRetentionPeriod: intPtr(d.Get("backup_retention_period").Int())}
-	if !d.IsEmpty("engine_mode") {
-		r.EngineMode = strPtr(d.Get("engine_mode").String())
+
+func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.RDSCluster{
+		Address:               d.Address,
+		Region:                d.Get("region").String(),
+		Engine:                d.Get("engine").String(),
+		BackupRetentionPeriod: d.Get("backup_retention_period").Int(),
+		EngineMode:            d.Get("engine_mode").String(),
 	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

@@ -8,11 +8,18 @@ import (
 func getRDSClusterInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_rds_cluster_instance",
-		RFunc: NewRdsClusterInstance,
+		RFunc: NewRDSClusterInstance,
 	}
 }
-func NewRdsClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.RdsClusterInstance{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String()), InstanceClass: strPtr(d.Get("instance_class").String()), Engine: strPtr(d.Get("engine").String())}
+
+func NewRDSClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.RDSClusterInstance{
+		Address:       d.Address,
+		Region:        d.Get("region").String(),
+		InstanceClass: d.Get("instance_class").String(),
+		Engine:        d.Get("engine").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

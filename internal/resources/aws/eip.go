@@ -7,34 +7,33 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type Eip struct {
-	Address               *string
-	CustomerOwnedIpv4Pool *string
-	Instance              *string
-	NetworkInterface      *string
-	Region                *string
+type EIP struct {
+	Address               string
+	Region                string
+	CustomerOwnedIPv4Pool string
+	Instance              string
+	NetworkInterface      string
 }
 
-var EipUsageSchema = []*schema.UsageItem{}
+var EIPUsageSchema = []*schema.UsageItem{}
 
-func (r *Eip) PopulateUsage(u *schema.UsageData) {
+func (r *EIP) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *Eip) BuildResource() *schema.Resource {
+func (r *EIP) BuildResource() *schema.Resource {
 
-	if (r.CustomerOwnedIpv4Pool != nil && *r.CustomerOwnedIpv4Pool != "") || r.Instance != nil || r.NetworkInterface != nil {
+	if r.CustomerOwnedIPv4Pool != "" || r.Instance != "" || r.NetworkInterface != "" {
 		return &schema.Resource{
-			Name:      *r.Address,
-			NoPrice:   true,
-			IsSkipped: true, UsageSchema: EipUsageSchema,
+			Name:        r.Address,
+			NoPrice:     true,
+			IsSkipped:   true,
+			UsageSchema: EIPUsageSchema,
 		}
 	}
 
-	region := *r.Region
-
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           "IP address (if unused)",
@@ -43,7 +42,7 @@ func (r *Eip) BuildResource() *schema.Resource {
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonEC2"),
 					ProductFamily: strPtr("IP Address"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -54,6 +53,6 @@ func (r *Eip) BuildResource() *schema.Resource {
 					StartUsageAmount: strPtr("1"),
 				},
 			},
-		}, UsageSchema: EipUsageSchema,
+		}, UsageSchema: EIPUsageSchema,
 	}
 }

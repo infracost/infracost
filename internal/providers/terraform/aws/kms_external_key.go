@@ -8,11 +8,16 @@ import (
 func getNewKMSExternalKeyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_kms_external_key",
-		RFunc: NewKmsExternalKey,
+		RFunc: NewKMSExternalKey,
 	}
 }
-func NewKmsExternalKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.KmsExternalKey{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+
+func NewKMSExternalKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.KMSExternalKey{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

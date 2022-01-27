@@ -10,115 +10,106 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type MqBroker struct {
-	Address          *string
-	StorageType      *string
-	DeploymentMode   *string
-	Region           *string
-	EngineType       *string
-	HostInstanceType *string
+type MQBroker struct {
+	Address          string
+	StorageType      string
+	DeploymentMode   string
+	Region           string
+	EngineType       string
+	HostInstanceType string
 	StorageSizeGb    *float64 `infracost_usage:"storage_size_gb"`
 }
 
-var MqBrokerUsageSchema = []*schema.UsageItem{{Key: "storage_size_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var MQBrokerUsageSchema = []*schema.UsageItem{{Key: "storage_size_gb", ValueType: schema.Float64, DefaultValue: 0}}
 
-func (r *MqBroker) PopulateUsage(u *schema.UsageData) {
+func (r *MQBroker) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *MqBroker) BuildResource() *schema.Resource {
-	region := *r.Region
-	engine := *r.EngineType
-	instanceType := *r.HostInstanceType
-
-	storageType := "efs"
-	if strings.ToLower(engine) == "rabbitmq" {
-		storageType = "ebs"
-	}
-	if r.StorageType != nil {
-		storageType = strings.ToLower(*r.StorageType)
-	}
-
-	deploymentMode := "single_instance"
-	if r.DeploymentMode != nil {
-		deploymentMode = strings.ToLower(*r.DeploymentMode)
-	}
-
-	isMultiAZ := false
-	if strings.ToLower(deploymentMode) == "active_standby_multi_az" || strings.ToLower(deploymentMode) == "cluster_multi_az" {
-		isMultiAZ = true
-	}
-
-	var storageSizeGB *decimal.Decimal
-	if r.StorageSizeGb != nil {
-		storageSizeGB = decimalPtr(decimal.NewFromFloat(*r.StorageSizeGb))
-	}
-
+func (r *MQBroker) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
-			instance(region, engine, instanceType, deploymentMode, isMultiAZ),
-			storage(region, engine, storageType, isMultiAZ, storageSizeGB),
-		}, UsageSchema: MqBrokerUsageSchema,
+			r.instanceUsageCostComponent(),
+			r.storageCostComponent(),
+		},
+		UsageSchema: MQBrokerUsageSchema,
 	}
 }
 
-func instance(region, engine, instanceType, deploymentMode string, isMultiAZ bool) *schema.CostComponent {
+func (r *MQBroker) isMultiAZ() bool {
+	if strings.ToLower(r.DeploymentMode) == "active_standby_multi_az" || strings.ToLower(r.DeploymentMode) == "cluster_multi_az" {
+		return true
+	}
+
+	return false
+}
+
+func (r *MQBroker) instanceUsageCostComponent() *schema.CostComponent {
 	deploymentOption := "Single-AZ"
-	if isMultiAZ {
+	if r.isMultiAZ() {
 		deploymentOption = "Multi-AZ"
 	}
+
+	deploymentMode := strings.ToLower(r.DeploymentMode)
+	if deploymentMode == "" {
+		deploymentMode = "single_instance"
+	}
+
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", engine, instanceType, strings.ToLower(deploymentMode)),
+		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", r.EngineType, r.HostInstanceType, strings.ToLower(deploymentMode)),
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonMQ"),
 			ProductFamily: strPtr("Broker Instances"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", instanceType))},
-				{Key: "brokerEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", engine))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", r.HostInstanceType))},
+				{Key: "brokerEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", r.EngineType))},
 				{Key: "deploymentOption", ValueRegex: strPtr(fmt.Sprintf("/%s/i", deploymentOption))},
 			},
 		},
 	}
 }
 
-func storage(region, engine, storageType string, isMultiAZ bool, storageSizeGB *decimal.Decimal) *schema.CostComponent {
-	instancesCount := decimalPtr(decimal.NewFromInt(1))
-	usageType := ""
+func (r *MQBroker) storageCostComponent() *schema.CostComponent {
+	instanceCount := int64(1)
+	if strings.ToLower(r.EngineType) == "rabbitmq" && r.isMultiAZ() {
+		instanceCount = int64(3)
+	}
 
-	if strings.ToLower(engine) == "rabbitmq" {
-		usageType = "TimedStorage-RabbitMQ-ByteHrs"
-		if isMultiAZ {
-			instancesCount = decimalPtr(decimal.NewFromInt(3))
-		}
-	} else {
-
-		if strings.ToLower(storageType) == "ebs" {
-			usageType = "TimedStorage-EBS-ByteHrs"
+	storageType := strings.ToLower(r.StorageType)
+	if storageType == "" {
+		if strings.ToLower(r.EngineType) == "rabbitmq" {
+			storageType = "ebs"
 		} else {
-
-			usageType = "TimedStorage-ByteHrs"
+			storageType = "efs"
 		}
 	}
 
-	var summedStorageSizeGB *decimal.Decimal
-	if storageSizeGB != nil {
-		summedStorageSizeGB = decimalPtr(storageSizeGB.Mul(*instancesCount))
+	usageType := "TimedStorage-ByteHrs"
+	if strings.ToLower(r.EngineType) == "rabbitmq" {
+		usageType = "TimedStorage-RabbitMQ-ByteHrs"
+	} else if strings.ToLower(storageType) == "ebs" {
+		usageType = "TimedStorage-EBS-ByteHrs"
+	}
+
+	var storageSizeGB *decimal.Decimal
+	if r.StorageSizeGb != nil {
+		storageSizeGB = decimalPtr(decimal.NewFromFloat(*r.StorageSizeGb).Mul(decimal.NewFromInt(instanceCount)))
 	}
 
 	costComponent := &schema.CostComponent{
-		Name:            fmt.Sprintf("Storage (%s, %s)", engine, strings.ToUpper(storageType)),
+		Name:            fmt.Sprintf("Storage (%s, %s)", r.EngineType, strings.ToUpper(storageType)),
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: summedStorageSizeGB,
+		MonthlyQuantity: storageSizeGB,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonMQ"),
 			ProductFamily: strPtr("Broker Storage"),
 			AttributeFilters: []*schema.AttributeFilter{

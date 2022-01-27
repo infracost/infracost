@@ -5,27 +5,25 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-type KmsExternalKey struct {
-	Address *string
-	Region  *string
+type KMSExternalKey struct {
+	Address string
+	Region  string
 }
 
-var KmsExternalKeyUsageSchema = []*schema.UsageItem{}
+var KMSExternalKeyUsageSchema = []*schema.UsageItem{}
 
-func (r *KmsExternalKey) PopulateUsage(u *schema.UsageData) {
+func (r *KMSExternalKey) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *KmsExternalKey) BuildResource() *schema.Resource {
-
-	region := *r.Region
-
-	costComponents := []*schema.CostComponent{
-		CustomerMasterKeyCostComponent(region),
+func (r *KMSExternalKey) BuildResource() *schema.Resource {
+	kmsKey := &KMSKey{
+		Region: r.Region,
 	}
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: KmsExternalKeyUsageSchema,
+		Name:           r.Address,
+		CostComponents: []*schema.CostComponent{kmsKey.customerMasterKeyCostComponent()},
+		UsageSchema:    KMSExternalKeyUsageSchema,
 	}
 }

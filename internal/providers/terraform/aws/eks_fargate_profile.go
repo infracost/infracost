@@ -8,11 +8,15 @@ import (
 func getNewEKSFargateProfileItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_eks_fargate_profile",
-		RFunc: NewEksFargateProfile,
+		RFunc: NewEKSFargateProfile,
 	}
 }
-func NewEksFargateProfile(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.EksFargateProfile{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+func NewEKSFargateProfile(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.EKSFargateProfile{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

@@ -10,35 +10,30 @@ import (
 )
 
 type Route53ResolverEndpoint struct {
-	Address           *string
-	Region            *string
-	ResolverEndpoints *int64
+	Address           string
+	Region            string
+	ResolverEndpoints int64
 	MonthlyQueries    *int64 `infracost_usage:"monthly_queries"`
 }
 
-var Route53ResolverEndpointUsageSchema = []*schema.UsageItem{{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0}}
+var Route53ResolverEndpointUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0},
+}
 
 func (r *Route53ResolverEndpoint) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
 func (r *Route53ResolverEndpoint) BuildResource() *schema.Resource {
-	region := *r.Region
-
-	resolverEndpointCount := int64(0)
-	if r.ResolverEndpoints != nil {
-		resolverEndpointCount = *r.ResolverEndpoints
-	}
-
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           "Resolver endpoints",
 			Unit:           "hours",
 			UnitMultiplier: decimal.NewFromInt(1),
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(resolverEndpointCount)),
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(r.ResolverEndpoints)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
+				Region:        strPtr(r.Region),
 				Service:       strPtr("AmazonRoute53"),
 				ProductFamily: strPtr("DNS Query"),
 				AttributeFilters: []*schema.AttributeFilter{
@@ -57,25 +52,26 @@ func (r *Route53ResolverEndpoint) BuildResource() *schema.Resource {
 		tierTwo := dnsQueriesTier[1]
 
 		if tierOne.GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, dnsQueriesCostComponent(region, "DNS queries (first 1B)", "0", &tierOne))
+			costComponents = append(costComponents, r.queriesCostComponent("DNS queries (first 1B)", "0", &tierOne))
 		}
 
 		if tierTwo.GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, dnsQueriesCostComponent(region, "DNS queries (over 1B)", "1000000000", &tierTwo))
+			costComponents = append(costComponents, r.queriesCostComponent("DNS queries (over 1B)", "1000000000", &tierTwo))
 		}
 
 	} else {
 		var unknown *decimal.Decimal
-		costComponents = append(costComponents, dnsQueriesCostComponent(region, "DNS queries (first 1B)", "0", unknown))
+		costComponents = append(costComponents, r.queriesCostComponent("DNS queries (first 1B)", "0", unknown))
 	}
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: Route53ResolverEndpointUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    Route53ResolverEndpointUsageSchema,
 	}
 }
 
-func dnsQueriesCostComponent(region string, displayName string, usageTier string, monthlyQueries *decimal.Decimal) *schema.CostComponent {
+func (r *Route53ResolverEndpoint) queriesCostComponent(displayName string, usageTier string, monthlyQueries *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "1M queries",
@@ -83,7 +79,7 @@ func dnsQueriesCostComponent(region string, displayName string, usageTier string
 		MonthlyQuantity: monthlyQueries,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonRoute53"),
 			ProductFamily: strPtr("DNS Query"),
 			AttributeFilters: []*schema.AttributeFilter{

@@ -8,24 +8,28 @@ import (
 )
 
 type CloudwatchEventBus struct {
-	Address                      *string
-	Region                       *string
+	Address                      string
+	Region                       string
 	MonthlySchemaDiscoveryEvents *int64   `infracost_usage:"monthly_schema_discovery_events"`
 	MonthlyCustomEvents          *int64   `infracost_usage:"monthly_custom_events"`
 	MonthlyThirdPartyEvents      *int64   `infracost_usage:"monthly_third_party_events"`
-	MonthlyArchiveProcessingGb   *float64 `infracost_usage:"monthly_archive_processing_gb"`
-	ArchiveStorageGb             *float64 `infracost_usage:"archive_storage_gb"`
+	MonthlyArchiveProcessingGB   *float64 `infracost_usage:"monthly_archive_processing_gb"`
+	ArchiveStorageGB             *float64 `infracost_usage:"archive_storage_gb"`
 }
 
-var CloudwatchEventBusUsageSchema = []*schema.UsageItem{{Key: "monthly_schema_discovery_events", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_custom_events", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_third_party_events", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_archive_processing_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "archive_storage_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var CloudwatchEventBusUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_schema_discovery_events", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_custom_events", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_third_party_events", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_archive_processing_gb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "archive_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+}
 
 func (r *CloudwatchEventBus) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
 func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
-	region := *r.Region
-
 	var monthlyCustomEvents *decimal.Decimal
 	if r.MonthlyCustomEvents != nil {
 		monthlyCustomEvents = decimalPtr(decimal.NewFromInt(*r.MonthlyCustomEvents))
@@ -35,12 +39,12 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 		monthlyPartnerEvents = decimalPtr(decimal.NewFromInt(*r.MonthlyThirdPartyEvents))
 	}
 	var monthlyArchiveProcessing *decimal.Decimal
-	if r.MonthlyArchiveProcessingGb != nil {
-		monthlyArchiveProcessing = decimalPtr(decimal.NewFromFloat(*r.MonthlyArchiveProcessingGb))
+	if r.MonthlyArchiveProcessingGB != nil {
+		monthlyArchiveProcessing = decimalPtr(decimal.NewFromFloat(*r.MonthlyArchiveProcessingGB))
 	}
 	var monthlyArchivedEvents *decimal.Decimal
-	if r.ArchiveStorageGb != nil {
-		monthlyArchivedEvents = decimalPtr(decimal.NewFromFloat(*r.ArchiveStorageGb))
+	if r.ArchiveStorageGB != nil {
+		monthlyArchivedEvents = decimalPtr(decimal.NewFromFloat(*r.ArchiveStorageGB))
 	}
 	var monthlyIngestedEvents *decimal.Decimal
 	if r.MonthlySchemaDiscoveryEvents != nil {
@@ -48,7 +52,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Custom events published",
@@ -57,7 +61,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 				MonthlyQuantity: monthlyCustomEvents,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AWSEvents"),
 					ProductFamily: strPtr("EventBridge"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -73,7 +77,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 				MonthlyQuantity: monthlyPartnerEvents,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AWSEvents"),
 					ProductFamily: strPtr("EventBridge"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -89,7 +93,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 				MonthlyQuantity: monthlyArchiveProcessing,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AWSEvents"),
 					ProductFamily: strPtr("CloudWatch Events"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -104,7 +108,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 				MonthlyQuantity: monthlyArchivedEvents,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AWSEvents"),
 					ProductFamily: strPtr("CloudWatch Events"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -119,7 +123,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 				MonthlyQuantity: monthlyIngestedEvents,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AWSEvents"),
 					ProductFamily: strPtr("EventBridge"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -128,6 +132,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 					},
 				},
 			},
-		}, UsageSchema: CloudwatchEventBusUsageSchema,
+		},
+		UsageSchema: CloudwatchEventBusUsageSchema,
 	}
 }

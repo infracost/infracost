@@ -8,11 +8,16 @@ import (
 func getSNSTopicRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_sns_topic",
-		RFunc: NewSnsTopic,
+		RFunc: NewSNSTopic,
 	}
 }
-func NewSnsTopic(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.SnsTopic{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+
+func NewSNSTopic(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.SNSTopic{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

@@ -1,0 +1,26 @@
+Post an Infracost comment to Azure Repos
+
+USAGE
+  infracost comment azure-repos [flags]
+
+EXAMPLES
+  Update a comment on a pull request:
+
+      infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-azure-repo --pull-request 3 --path infracost.json --azure-access-token $AZURE_ACCESS_TOKEN
+
+FLAGS
+      --azure-access-token string   Azure DevOps access token
+      --behavior string             Behavior when posting the comment, one of:
+                                      update (default)  Update the latest comment
+                                      new               Create a new comment
+                                      delete-and-new    Delete previous matching comments and create a new comment (default "update")
+      --dry-run                     Generate the comment without actually posting to Azure Repos.
+  -h, --help                        help for azure-repos
+  -p, --path stringArray            Path to Infracost JSON files, glob patterns need quotes
+      --pull-request int            pull request number to post the comment on
+      --repo-url string             Repository URL, e.g. https://dev.azure.com/my-org/my-project/_git/my-azure-repo
+      --tag string                  Customize the embedded tag that is used for detecting comments posted by Infracost
+
+GLOBAL FLAGS
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output

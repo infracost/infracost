@@ -8,11 +8,15 @@ import (
 func getACMPCACertificateAuthorityRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_acmpca_certificate_authority",
-		RFunc: NewAcmpcaCertificateAuthority,
+		RFunc: NewACMPCACertificateAuthority,
 	}
 }
-func NewAcmpcaCertificateAuthority(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.AcmpcaCertificateAuthority{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+func NewACMPCACertificateAuthority(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.ACMPCACertificateAuthority{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

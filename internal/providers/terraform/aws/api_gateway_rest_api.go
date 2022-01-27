@@ -12,7 +12,11 @@ func getAPIGatewayRestAPIRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.APIGatewayRestAPI{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	r := &aws.APIGatewayRestAPI{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

@@ -1,29 +1,43 @@
 package aws
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getWafWebACLRegistryItem() *schema.RegistryItem {
+func getWAFWebACLRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_waf_web_acl",
-		RFunc: NewWafWebACL,
+		RFunc: NewWAFWebACL,
 		Notes: []string{
 			"Seller fees for Managed Rule Groups from AWS Marketplace are not included. Bot Control is not supported by Terraform.",
 		},
 	}
 }
-func NewWafWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.WafWebACL{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
-	if !d.IsEmpty("rules") {
-		rulesTypes := make([]string, 0)
-		rules := d.Get("rules").Array()
-		for _, val := range rules {
-			rulesTypes = append(rulesTypes, val.Get("type").String())
+
+func NewWAFWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	rules := int64(0)
+	ruleGroups := int64(0)
+
+	for _, rule := range d.Get("rules").Array() {
+		ruleType := rule.Get("type").String()
+
+		if strings.ToLower(ruleType) == "regular" || strings.ToLower(ruleType) == "rate_based" {
+			rules++
+		} else if strings.ToLower(ruleType) == "group" {
+			ruleGroups++
 		}
-		r.RulesTypes = &rulesTypes
 	}
+
+	r := &aws.WAFWebACL{
+		Address:    d.Address,
+		Region:     d.Get("region").String(),
+		Rules:      rules,
+		RuleGroups: ruleGroups,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

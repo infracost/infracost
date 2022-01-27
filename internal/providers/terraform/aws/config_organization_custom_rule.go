@@ -12,7 +12,11 @@ func getConfigOrganizationCustomRuleItem() *schema.RegistryItem {
 	}
 }
 func NewConfigOrganizationCustomRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.ConfigOrganizationCustomRule{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	r := &aws.ConfigConfigRule{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

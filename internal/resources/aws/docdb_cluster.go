@@ -7,50 +7,42 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type DocdbCluster struct {
-	Address               *string
-	Region                *string
-	BackupRetentionPeriod *int64
-	BackupStorageGb       *float64 `infracost_usage:"backup_storage_gb"`
+type DocDBCluster struct {
+	Address               string
+	Region                string
+	BackupRetentionPeriod int64
+	BackupStorageGB       *float64 `infracost_usage:"backup_storage_gb"`
 }
 
-var DocdbClusterUsageSchema = []*schema.UsageItem{{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var DocDBClusterUsageSchema = []*schema.UsageItem{
+	{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+}
 
-func (r *DocdbCluster) PopulateUsage(u *schema.UsageData) {
+func (r *DocDBCluster) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *DocdbCluster) BuildResource() *schema.Resource {
-	region := *r.Region
-
+func (r *DocDBCluster) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
-	var retentionPeriod *decimal.Decimal
-	if r.BackupRetentionPeriod != nil {
-		retentionPeriod = decimalPtr(decimal.NewFromInt(*r.BackupRetentionPeriod))
-		if retentionPeriod.GreaterThan(decimal.NewFromInt(1)) {
-			var backupStorage *decimal.Decimal
-			if r.BackupStorageGb != nil {
-				backupStorage = decimalPtr(decimal.NewFromFloat(*r.BackupStorageGb))
-			}
-			costComponents = append(costComponents, docDBCluster(region, backupStorage))
+	if r.BackupRetentionPeriod > 1 {
+		var backupStorage *decimal.Decimal
+		if r.BackupStorageGB != nil {
+			backupStorage = decimalPtr(decimal.NewFromFloat(*r.BackupStorageGB))
 		}
-
+		costComponents = append(costComponents, r.backupStorageCostComponent(backupStorage))
 	} else {
-
-		var unknown *decimal.Decimal
-
-		costComponents = append(costComponents, docDBCluster(region, unknown))
-
+		costComponents = append(costComponents, r.backupStorageCostComponent(nil))
 	}
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: DocdbClusterUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    DocDBClusterUsageSchema,
 	}
 }
 
-func docDBCluster(region string, backupStorage *decimal.Decimal) *schema.CostComponent {
+func (r *DocDBCluster) backupStorageCostComponent(backupStorage *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Backup storage",
 		Unit:            "GB",
@@ -58,7 +50,7 @@ func docDBCluster(region string, backupStorage *decimal.Decimal) *schema.CostCom
 		MonthlyQuantity: backupStorage,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonDocDB"),
 			ProductFamily: strPtr("Storage Snapshot"),
 			AttributeFilters: []*schema.AttributeFilter{

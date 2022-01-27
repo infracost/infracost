@@ -7,103 +7,144 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type Wafv2WebACL struct {
-	Address                                          *string
-	Region                                           *string
-	Rule0ActionLen                                   *int64
-	Rule0Statement0RuleGroupReferenceStatement       *string
-	RuleGroupReferenceStatementsCount                *int64
-	Rule0Statement0ManagedRuleGroupStatement0NameLen *int64
-	ManagedRuleGroupRules                            *int64 `infracost_usage:"managed_rule_group_rules"`
-	MonthlyRequests                                  *int64 `infracost_usage:"monthly_requests"`
-	RuleGroupRules                                   *int64 `infracost_usage:"rule_group_rules"`
+type WAFv2WebACL struct {
+	Address               string
+	Region                string
+	Rules                 int64
+	RuleGroups            int64
+	ManagedRuleGroups     int64
+	RuleGroupRules        *int64 `infracost_usage:"rule_group_rules"`
+	ManagedRuleGroupRules *int64 `infracost_usage:"managed_rule_group_rules"`
+	MonthlyRequests       *int64 `infracost_usage:"monthly_requests"`
 }
 
-var Wafv2WebACLUsageSchema = []*schema.UsageItem{{Key: "managed_rule_group_rules", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "rule_group_rules", ValueType: schema.Int64, DefaultValue: 0}}
+var WAFv2WebACLUsageSchema = []*schema.UsageItem{
+	{Key: "managed_rule_group_rules", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "rule_group_rules", ValueType: schema.Int64, DefaultValue: 0},
+}
 
-func (r *Wafv2WebACL) PopulateUsage(u *schema.UsageData) {
+func (r *WAFv2WebACL) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *Wafv2WebACL) BuildResource() *schema.Resource {
-	region := *r.Region
+func (r *WAFv2WebACL) BuildResource() *schema.Resource {
+	costComponents := []*schema.CostComponent{r.webACLUsageCostComponent()}
 
-	var costComponents []*schema.CostComponent
-	var ruleGroupRules, managedRuleGroupRules, monthlyRequests, rule *decimal.Decimal
-	var sumForRules decimal.Decimal
-
-	costComponents = append(costComponents, WafWebACLUsageCostComponent(
-		region,
-		"Web ACL usage",
-		"months",
-		"[A-Z0-9]*-(?!ShieldProtected-)WebACLV2",
-		1,
-		decimalPtr(decimal.NewFromInt(1)),
-	))
-	if r.Rule0ActionLen != nil {
-		rule = decimalPtr(decimal.NewFromInt(*r.Rule0ActionLen))
+	rules := r.Rules
+	if r.RuleGroupRules != nil {
+		rules += *r.RuleGroupRules
 	}
-	if r != nil && r.RuleGroupRules != nil && r.ManagedRuleGroupRules != nil {
-		ruleGroupRules = decimalPtr(decimal.NewFromInt(*r.RuleGroupRules))
-		managedRuleGroupRules = decimalPtr(decimal.NewFromInt(*r.ManagedRuleGroupRules))
-		sumForRules = ruleGroupRules.Add(*managedRuleGroupRules)
-		if rule.IsPositive() {
-			sumForRules = sumForRules.Add(*rule)
-		}
+	if r.ManagedRuleGroupRules != nil {
+		rules += *r.ManagedRuleGroupRules
 	}
 
-	if sumForRules.IsPositive() {
-		costComponents = append(costComponents, WafWebACLUsageCostComponent(
-			region,
-			"Rules",
-			"rules",
-			"[A-Z0-9]*-(?!ShieldProtected-)RuleV2",
-			1,
-			&sumForRules,
-		))
+	if rules > 0 {
+		costComponents = append(costComponents, r.rulesCostComponent(rules))
 	}
 
-	if r.Rule0Statement0RuleGroupReferenceStatement != nil {
-		counter := *r.RuleGroupReferenceStatementsCount
-
-		if counter > 0 {
-			costComponents = append(costComponents, WafWebACLUsageCostComponent(
-				region,
-				"Rule groups",
-				"groups",
-				"[A-Z0-9]*-(?!ShieldProtected-)RuleV2",
-				1,
-				decimalPtr(decimal.NewFromInt(int64(counter))),
-			))
-		}
+	if r.RuleGroups > 0 {
+		costComponents = append(costComponents, r.ruleGroupsCostComponent("Rule groups", r.RuleGroups))
 	}
 
-	if *r.Rule0Statement0ManagedRuleGroupStatement0NameLen > 0 {
-		costComponents = append(costComponents, WafWebACLUsageCostComponent(
-			region,
-			"Managed rule groups",
-			"groups",
-			"[A-Z0-9]*-(?!ShieldProtected-)RuleV2",
-			1,
-			decimalPtr(decimal.NewFromInt(*r.Rule0Statement0ManagedRuleGroupStatement0NameLen)),
-		))
+	if r.ManagedRuleGroups > 0 {
+		costComponents = append(costComponents, r.ruleGroupsCostComponent("Managed rule groups", r.RuleGroups))
 	}
 
-	if r.MonthlyRequests != nil {
-		monthlyRequests = decimalPtr(decimal.NewFromInt(*r.MonthlyRequests))
-	}
-
-	costComponents = append(costComponents, WafWebACLUsageCostComponent(
-		region,
-		"Requests",
-		"1M requests",
-		"[A-Z0-9]*-(?!ShieldProtected-)RequestV2-Tier1",
-		1000000,
-		monthlyRequests,
-	))
+	costComponents = append(costComponents, r.requestsCostComponent())
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: Wafv2WebACLUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    WAFv2WebACLUsageSchema,
+	}
+}
+
+func (r *WAFv2WebACL) webACLUsageCostComponent() *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Web ACL usage",
+		Unit:            "months",
+		UnitMultiplier:  decimal.NewFromInt(int64(1)),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("awswaf"),
+			ProductFamily: strPtr("Web Application Firewall"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/^[A-Z0-9]*-(?!ShieldProtected-)WebACLV2$/i")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func (r *WAFv2WebACL) rulesCostComponent(rules int64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Rules",
+		Unit:            "rules",
+		UnitMultiplier:  decimal.NewFromInt(int64(1)),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(rules)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("awswaf"),
+			ProductFamily: strPtr("Web Application Firewall"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/^[A-Z0-9]*-(?!ShieldProtected-)RuleV2$/i")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func (r *WAFv2WebACL) ruleGroupsCostComponent(name string, ruleGroups int64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "groups",
+		UnitMultiplier:  decimal.NewFromInt(int64(1)),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(ruleGroups)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("awswaf"),
+			ProductFamily: strPtr("Web Application Firewall"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/^[A-Z0-9]*-(?!ShieldProtected-)RuleV2$/i")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func (r *WAFv2WebACL) requestsCostComponent() *schema.CostComponent {
+	var requests *decimal.Decimal
+	if r.MonthlyRequests != nil {
+		requests = decimalPtr(decimal.NewFromInt(*r.MonthlyRequests))
+	}
+
+	return &schema.CostComponent{
+		Name:            "Requests",
+		Unit:            "1M requests",
+		UnitMultiplier:  decimal.NewFromInt(int64(1000000)),
+		MonthlyQuantity: requests,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("awswaf"),
+			ProductFamily: strPtr("Web Application Firewall"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr("/^[A-Z0-9]*-(?!ShieldProtected-)RequestV2-Tier1$/i")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
 	}
 }

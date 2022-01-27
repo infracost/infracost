@@ -11,20 +11,23 @@ import (
 )
 
 type ElasticsearchDomain struct {
-	Address                              *string
-	Region                               *string
-	ClusterConfig0InstanceType           *string
-	ClusterConfig0InstanceCount          *int64
-	ClusterConfig0WarmType               *string
-	ClusterConfig0DedicatedMasterEnabled *bool
-	ClusterConfig0WarmEnabled            *bool
-	EbsOptions0EbsEnabled                *bool
-	EbsOptions0VolumeSize                *float64
-	EbsOptions0VolumeType                *string
-	EbsOptions0Iops                      *float64
-	ClusterConfig0DedicatedMasterType    *string
-	ClusterConfig0DedicatedMasterCount   *int64
-	ClusterConfig0WarmCount              *int64
+	Address              string
+	Region               string
+	ClusterInstanceType  string
+	ClusterInstanceCount *int64 // If this is nil it will default to 1
+
+	EBSEnabled    bool
+	EBSVolumeType string
+	EBSVolumeSize *float64 // if this is nil it will default to 8
+	EBSIOPS       *float64 // if this is nil it will default to 1
+
+	ClusterDedicatedMasterEnabled bool
+	ClusterDedicatedMasterType    string
+	ClusterDedicatedMasterCount   *int64 // if this is nil it will default to 3
+
+	ClusterWarmEnabled bool
+	ClusterWarmType    string
+	ClusterWarmCount   *int64
 }
 
 var ElasticsearchDomainUsageSchema = []*schema.UsageItem{}
@@ -34,34 +37,16 @@ func (r *ElasticsearchDomain) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
-	region := *r.Region
+	defaultClusterInstanceType := "m4.large.elasticsearch"
 
-	defaultInstanceType := "m4.large.elasticsearch"
+	instanceType := defaultClusterInstanceType
+	if r.ClusterInstanceType != "" {
+		instanceType = r.ClusterInstanceType
+	}
 
-	instanceType := defaultInstanceType
 	instanceCount := int64(1)
-	dedicatedMasterEnabled := false
-	ultrawarmEnabled := false
-	ebsEnabled := false
-
-	if r.ClusterConfig0InstanceType != nil {
-		instanceType = *r.ClusterConfig0InstanceType
-	}
-
-	if r.ClusterConfig0InstanceCount != nil {
-		instanceCount = *r.ClusterConfig0InstanceCount
-	}
-
-	if r.ClusterConfig0DedicatedMasterEnabled != nil {
-		dedicatedMasterEnabled = *r.ClusterConfig0DedicatedMasterEnabled
-	}
-
-	if r.ClusterConfig0WarmEnabled != nil {
-		ultrawarmEnabled = *r.ClusterConfig0WarmEnabled
-	}
-
-	if r.EbsOptions0EbsEnabled != nil {
-		ebsEnabled = *r.EbsOptions0EbsEnabled
+	if r.ClusterInstanceCount != nil {
+		instanceCount = *r.ClusterInstanceCount
 	}
 
 	costComponents := []*schema.CostComponent{
@@ -72,12 +57,12 @@ func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
+				Region:        strPtr(r.Region),
 				Service:       strPtr("AmazonES"),
 				ProductFamily: strPtr("Amazon OpenSearch Service Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
-					{Key: "instanceType", Value: opensearchifyInstanceType(instanceType)},
+					{Key: "instanceType", Value: r.opensearchifyClusterInstanceType(instanceType)},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -86,15 +71,15 @@ func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
 		},
 	}
 
-	if ebsEnabled {
+	if r.EBSEnabled {
 		gbVal := decimal.NewFromInt(int64(defaultVolumeSize))
-		if r.EbsOptions0VolumeSize != nil {
-			gbVal = decimal.NewFromFloat(*r.EbsOptions0VolumeSize)
+		if r.EBSVolumeSize != nil {
+			gbVal = decimal.NewFromFloat(*r.EBSVolumeSize)
 		}
 
 		ebsType := "gp2"
-		if r.EbsOptions0VolumeType != nil {
-			ebsType = *r.EbsOptions0VolumeType
+		if r.EBSVolumeType != "" {
+			ebsType = r.EBSVolumeType
 		}
 
 		ebsTypeMap := map[string]string{
@@ -115,7 +100,7 @@ func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
 			MonthlyQuantity: &gbVal,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
+				Region:        strPtr(r.Region),
 				Service:       strPtr("AmazonES"),
 				ProductFamily: strPtr("Amazon OpenSearch Service Volume"),
 				AttributeFilters: []*schema.AttributeFilter{
@@ -130,8 +115,8 @@ func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
 
 		if strings.ToLower(ebsType) == "io1" {
 			iopsVal := decimal.NewFromInt(1)
-			if r.EbsOptions0Iops != nil {
-				iopsVal = decimal.NewFromFloat(*r.EbsOptions0Iops)
+			if r.EBSIOPS != nil {
+				iopsVal = decimal.NewFromFloat(*r.EBSIOPS)
 
 				if iopsVal.LessThan(decimal.NewFromInt(1)) {
 					iopsVal = decimal.NewFromInt(1)
@@ -145,7 +130,7 @@ func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
 				MonthlyQuantity: &iopsVal,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonES"),
 					ProductFamily: strPtr("Amazon OpenSearch Service Volume"),
 					AttributeFilters: []*schema.AttributeFilter{
@@ -160,16 +145,15 @@ func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
 		}
 	}
 
-	if dedicatedMasterEnabled {
-		dedicatedMasterType := defaultInstanceType
-		dedicatedMasterCount := int64(3)
-
-		if r.ClusterConfig0DedicatedMasterType != nil {
-			dedicatedMasterType = *r.ClusterConfig0DedicatedMasterType
+	if r.ClusterDedicatedMasterEnabled {
+		dedicatedMasterType := defaultClusterInstanceType
+		if r.ClusterDedicatedMasterType != "" {
+			dedicatedMasterType = r.ClusterDedicatedMasterType
 		}
 
-		if r.ClusterConfig0DedicatedMasterCount != nil {
-			dedicatedMasterCount = *r.ClusterConfig0DedicatedMasterCount
+		dedicatedMasterCount := int64(3)
+		if r.ClusterDedicatedMasterCount != nil {
+			dedicatedMasterCount = *r.ClusterDedicatedMasterCount
 		}
 
 		costComponents = append(costComponents, &schema.CostComponent{
@@ -179,12 +163,12 @@ func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(dedicatedMasterCount)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
+				Region:        strPtr(r.Region),
 				Service:       strPtr("AmazonES"),
 				ProductFamily: strPtr("Amazon OpenSearch Service Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
-					{Key: "instanceType", Value: opensearchifyInstanceType(dedicatedMasterType)},
+					{Key: "instanceType", Value: r.opensearchifyClusterInstanceType(dedicatedMasterType)},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -193,38 +177,43 @@ func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
 		})
 	}
 
-	ultrawarmType := *r.ClusterConfig0WarmType
-	ultrawarmCount := *r.ClusterConfig0WarmCount
+	if r.ClusterWarmEnabled && r.ClusterWarmType != "" {
+		clusterWarmCount := int64(0)
+		if r.ClusterWarmCount != nil {
+			clusterWarmCount = *r.ClusterWarmCount
+		}
 
-	if ultrawarmEnabled && ultrawarmType != "" && ultrawarmCount > 0 {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:           fmt.Sprintf("UltraWarm instance (on-demand, %s)", ultrawarmType),
-			Unit:           "hours",
-			UnitMultiplier: decimal.NewFromInt(1),
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(ultrawarmCount)),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(region),
-				Service:       strPtr("AmazonES"),
-				ProductFamily: strPtr("Amazon OpenSearch Service Instance"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
-					{Key: "instanceType", Value: opensearchifyInstanceType(ultrawarmType)},
+		if clusterWarmCount > 0 {
+			costComponents = append(costComponents, &schema.CostComponent{
+				Name:           fmt.Sprintf("UltraWarm instance (on-demand, %s)", r.ClusterWarmType),
+				Unit:           "hours",
+				UnitMultiplier: decimal.NewFromInt(1),
+				HourlyQuantity: decimalPtr(decimal.NewFromInt(clusterWarmCount)),
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("aws"),
+					Region:        strPtr(r.Region),
+					Service:       strPtr("AmazonES"),
+					ProductFamily: strPtr("Amazon OpenSearch Service Instance"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "usagetype", ValueRegex: strPtr("/ESInstance/")},
+						{Key: "instanceType", Value: r.opensearchifyClusterInstanceType(r.ClusterWarmType)},
+					},
 				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr("on_demand"),
-			},
-		})
+				PriceFilter: &schema.PriceFilter{
+					PurchaseOption: strPtr("on_demand"),
+				},
+			})
+		}
 	}
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: ElasticsearchDomainUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    ElasticsearchDomainUsageSchema,
 	}
 }
 
-func opensearchifyInstanceType(instanceType string) *string {
+func (r *ElasticsearchDomain) opensearchifyClusterInstanceType(instanceType string) *string {
 	s := strings.Replace(instanceType, ".elasticsearch", ".search", 1)
 	return &s
 }

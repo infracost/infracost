@@ -8,11 +8,16 @@ import (
 func getSecretsManagerSecret() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_secretsmanager_secret",
-		RFunc: NewSecretsmanagerSecret,
+		RFunc: NewSecretsManagerSecret,
 	}
 }
-func NewSecretsmanagerSecret(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.SecretsmanagerSecret{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+
+func NewSecretsManagerSecret(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.SecretsManagerSecret{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

@@ -11,8 +11,13 @@ func getS3BucketAnalyticsConfigurationRegistryItem() *schema.RegistryItem {
 		RFunc: NewS3BucketAnalyticsConfiguration,
 	}
 }
+
 func NewS3BucketAnalyticsConfiguration(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.S3BucketAnalyticsConfiguration{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+	r := &aws.S3BucketAnalyticsConfiguration{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

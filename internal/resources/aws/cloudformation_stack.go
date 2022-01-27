@@ -10,54 +10,59 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type CloudformationStack struct {
-	Address                  *string
-	TemplateBody             *string
-	Region                   *string
+type CloudFormationStack struct {
+	Address                  string
+	Region                   string
+	TemplateBody             string
 	MonthlyHandlerOperations *int64 `infracost_usage:"monthly_handler_operations"`
 	MonthlyDurationSecs      *int64 `infracost_usage:"monthly_duration_secs"`
 }
 
-var CloudformationStackUsageSchema = []*schema.UsageItem{{Key: "monthly_handler_operations", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_duration_secs", ValueType: schema.Int64, DefaultValue: 0}}
+var CloudFormationStackUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_handler_operations", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_duration_secs", ValueType: schema.Int64, DefaultValue: 0},
+}
 
-func (r *CloudformationStack) PopulateUsage(u *schema.UsageData) {
+func (r *CloudFormationStack) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *CloudformationStack) BuildResource() *schema.Resource {
-	if r.TemplateBody != nil && (checkAWS(r.TemplateBody) || checkAlexa(r.TemplateBody) || checkCustom(r.TemplateBody)) {
+func (r *CloudFormationStack) BuildResource() *schema.Resource {
+	if r.checkAWS() || r.checkAlexa() || r.checkCustom() {
 		return &schema.Resource{
-			Name:      *r.Address,
-			NoPrice:   true,
-			IsSkipped: true, UsageSchema: CloudformationStackUsageSchema,
+			Name:        r.Address,
+			NoPrice:     true,
+			IsSkipped:   true,
+			UsageSchema: CloudFormationStackUsageSchema,
 		}
 	}
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: cloudFormationCostComponents(r.Region, r.MonthlyHandlerOperations, r.MonthlyDurationSecs), UsageSchema: CloudformationStackUsageSchema,
+		Name:           r.Address,
+		CostComponents: r.costComponents(),
+		UsageSchema:    CloudFormationStackUsageSchema,
 	}
 }
 
-func cloudFormationCostComponents(region *string, rMonthlyHandlerOperations, rMonthlyDurationSecs *int64) []*schema.CostComponent {
+func (r *CloudFormationStack) costComponents() []*schema.CostComponent {
 	var monthlyHandlerOperations, monthlyDurationSecs *decimal.Decimal
 
-	if rMonthlyHandlerOperations != nil {
-		monthlyHandlerOperations = decimalPtr(decimal.NewFromInt(*rMonthlyHandlerOperations))
+	if r.MonthlyHandlerOperations != nil {
+		monthlyHandlerOperations = decimalPtr(decimal.NewFromInt(*r.MonthlyHandlerOperations))
 	}
-	if rMonthlyDurationSecs != nil {
-		monthlyDurationSecs = decimalPtr(decimal.NewFromInt(*rMonthlyDurationSecs))
+	if r.MonthlyDurationSecs != nil {
+		monthlyDurationSecs = decimalPtr(decimal.NewFromInt(*r.MonthlyDurationSecs))
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, cloudFormationCostComponent("Handler operations", *region, "operations", "Resource-Invocation-Count", monthlyHandlerOperations))
-	costComponents = append(costComponents, cloudFormationCostComponent("Durations above 30s", *region, "seconds", "Resource-Processing-Time", monthlyDurationSecs))
+	costComponents = append(costComponents, r.cloudFormationCostComponent("Handler operations", "operations", "Resource-Invocation-Count", monthlyHandlerOperations))
+	costComponents = append(costComponents, r.cloudFormationCostComponent("Durations above 30s", "seconds", "Resource-Processing-Time", monthlyDurationSecs))
 
 	return costComponents
 }
 
-func cloudFormationCostComponent(name, region, unit, usagetype string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
+func (r *CloudFormationStack) cloudFormationCostComponent(name, unit, usagetype string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            name,
@@ -66,7 +71,7 @@ func cloudFormationCostComponent(name, region, unit, usagetype string, monthlyQu
 		MonthlyQuantity: monthlyQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
-			Region:     strPtr(region),
+			Region:     strPtr(r.Region),
 			Service:    strPtr("AWSCloudFormation"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s$/i", usagetype))},
@@ -77,12 +82,15 @@ func cloudFormationCostComponent(name, region, unit, usagetype string, monthlyQu
 		},
 	}
 }
-func checkAWS(templateBody *string) bool {
-	return strings.Contains(strings.ToLower(*templateBody), "aws::")
+
+func (r *CloudFormationStack) checkAWS() bool {
+	return strings.Contains(strings.ToLower(r.TemplateBody), "aws::")
 }
-func checkAlexa(templateBody *string) bool {
-	return strings.Contains(strings.ToLower(*templateBody), "alexa::")
+
+func (r *CloudFormationStack) checkAlexa() bool {
+	return strings.Contains(strings.ToLower(r.TemplateBody), "alexa::")
 }
-func checkCustom(templateBody *string) bool {
-	return strings.Contains(strings.ToLower(*templateBody), "custom::")
+
+func (r *CloudFormationStack) checkCustom() bool {
+	return strings.Contains(strings.ToLower(r.TemplateBody), "custom::")
 }

@@ -8,11 +8,15 @@ import (
 func getECRRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_ecr_repository",
-		RFunc: NewEcrRepository,
+		RFunc: NewECRRepository,
 	}
 }
-func NewEcrRepository(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.EcrRepository{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String())}
+func NewECRRepository(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.ECRRepository{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

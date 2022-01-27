@@ -10,74 +10,80 @@ import (
 	"strings"
 )
 
-type SfnStateMachine struct {
-	Address            *string
-	Region             *string
-	Type               *string
+type SFnStateMachine struct {
+	Address            string
+	Region             string
+	Type               string
 	MonthlyRequests    *int64 `infracost_usage:"monthly_requests"`
 	WorkflowDurationMs *int64 `infracost_usage:"workflow_duration_ms"`
-	MemoryMb           *int64 `infracost_usage:"memory_mb"`
+	MemoryMB           *int64 `infracost_usage:"memory_mb"`
 	MonthlyTransitions *int64 `infracost_usage:"monthly_transitions"`
 }
 
-var SfnStateMachineUsageSchema = []*schema.UsageItem{{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "workflow_duration_ms", ValueType: schema.Int64, DefaultValue: 0}, {Key: "memory_mb", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_transitions", ValueType: schema.Int64, DefaultValue: 0}}
+var SFnStateMachineUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "workflow_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "memory_mb", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_transitions", ValueType: schema.Int64, DefaultValue: 0},
+}
 
-func (r *SfnStateMachine) PopulateUsage(u *schema.UsageData) {
+func (r *SFnStateMachine) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *SfnStateMachine) BuildResource() *schema.Resource {
-	region := *r.Region
+func (r *SFnStateMachine) BuildResource() *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 
-	var duration, memoryRequest, requests, transitions, gbSeconds *decimal.Decimal
-
-	tier := "STANDARD"
-	if r.Type != nil {
-		tier = *r.Type
+	tier := r.Type
+	if tier == "" {
+		tier = "STANDARD"
 	}
 
 	if strings.ToLower(tier) == "standard" {
+		var transitions *decimal.Decimal
 		if r.MonthlyTransitions != nil {
 			transitions = decimalPtr(decimal.NewFromInt(*r.MonthlyTransitions))
 		}
-		costComponents = append(costComponents, stepFunctionStandardCostComponent(region, transitions))
+		costComponents = append(costComponents, r.transistionsCostComponent(transitions))
 	}
 
 	if strings.ToLower(tier) == "express" {
+		var requests *decimal.Decimal
 		if r.MonthlyRequests != nil {
 			requests = decimalPtr(decimal.NewFromInt(*r.MonthlyRequests))
 		}
-		costComponents = append(costComponents, stepFunctionExpressRequestCostComponent(region, requests))
+		costComponents = append(costComponents, r.requestsCostComponent(requests))
 
-		if r != nil && r.WorkflowDurationMs != nil && r.MonthlyRequests != nil && r.MemoryMb != nil {
+		if r.WorkflowDurationMs != nil && r.MonthlyRequests != nil && r.MemoryMB != nil {
 
-			memoryRequest = decimalPtr(decimal.NewFromInt(*r.MemoryMb))
-			duration = decimalPtr(decimal.NewFromInt(*r.WorkflowDurationMs))
-			gbSeconds = decimalPtr(calculateStepFunctionGBSeconds(*memoryRequest, *duration, *requests))
+			memoryRequest := decimalPtr(decimal.NewFromInt(*r.MemoryMB))
+			duration := decimalPtr(decimal.NewFromInt(*r.WorkflowDurationMs))
+			gbSeconds := decimalPtr(r.calculateGBSeconds(*memoryRequest, *duration, *requests))
 
 			pushLimits := []int{3600000, 14400000}
 			pushQuantities := usage.CalculateTierBuckets(*gbSeconds, pushLimits)
 
-			costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (first 1K)", region, "0", &pushQuantities[0]))
+			costComponents = append(costComponents, r.durationCostComponent("Duration (first 1K)", "0", &pushQuantities[0]))
 			if pushQuantities[1].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (next 4K)", region, "3600000", &pushQuantities[1]))
+				costComponents = append(costComponents, r.durationCostComponent("Duration (next 4K)", "3600000", &pushQuantities[1]))
 			}
 			if pushQuantities[2].GreaterThan(decimal.Zero) {
-				costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (over 5K)", region, "18000000", &pushQuantities[2]))
+				costComponents = append(costComponents, r.durationCostComponent("Duration (over 5K)", "18000000", &pushQuantities[2]))
 			}
 		} else {
 			var unknown *decimal.Decimal
-			costComponents = append(costComponents, stepFunctionExpressDurationCostComponent("Duration (first 1K)", region, "0", unknown))
+			costComponents = append(costComponents, r.durationCostComponent("Duration (first 1K)", "0", unknown))
 		}
 	}
+
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: SfnStateMachineUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    SFnStateMachineUsageSchema,
 	}
 }
 
-func stepFunctionStandardCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
+func (r *SFnStateMachine) transistionsCostComponent(quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Transitions",
 		Unit:            "1K transitions",
@@ -85,7 +91,7 @@ func stepFunctionStandardCostComponent(region string, quantity *decimal.Decimal)
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonStates"),
 			ProductFamily: strPtr("AWS Step Functions"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -95,7 +101,7 @@ func stepFunctionStandardCostComponent(region string, quantity *decimal.Decimal)
 	}
 }
 
-func stepFunctionExpressRequestCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
+func (r *SFnStateMachine) requestsCostComponent(quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Requests",
 		Unit:            "1M requests",
@@ -103,7 +109,7 @@ func stepFunctionExpressRequestCostComponent(region string, quantity *decimal.De
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonStates"),
 			ProductFamily: strPtr("AWS Step Functions"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -113,7 +119,7 @@ func stepFunctionExpressRequestCostComponent(region string, quantity *decimal.De
 	}
 }
 
-func stepFunctionExpressDurationCostComponent(name string, region string, startUsageAmt string, gbSeconds *decimal.Decimal) *schema.CostComponent {
+func (r *SFnStateMachine) durationCostComponent(name string, startUsageAmt string, gbSeconds *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB-hours",
@@ -121,7 +127,7 @@ func stepFunctionExpressDurationCostComponent(name string, region string, startU
 		MonthlyQuantity: gbSeconds,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
-			Region:     strPtr(region),
+			Region:     strPtr(r.Region),
 			Service:    strPtr("AmazonStates"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "usagetype", ValueRegex: strPtr("/StepFunctions-GB-Second/")},
@@ -133,7 +139,7 @@ func stepFunctionExpressDurationCostComponent(name string, region string, startU
 	}
 }
 
-func calculateStepFunctionGBSeconds(memorySize decimal.Decimal, averageRequestDuration decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
+func (r *SFnStateMachine) calculateGBSeconds(memorySize decimal.Decimal, averageRequestDuration decimal.Decimal, monthlyRequests decimal.Decimal) decimal.Decimal {
 
 	if memorySize.LessThan(decimal.NewFromInt(64)) {
 		memorySize = decimal.NewFromInt(64)

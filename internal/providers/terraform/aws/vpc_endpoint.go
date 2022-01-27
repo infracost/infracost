@@ -5,24 +5,28 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getVpcEndpointRegistryItem() *schema.RegistryItem {
+func getVPCEndpointRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_vpc_endpoint",
-		RFunc: NewVpcEndpoint,
+		RFunc: NewVPCEndpoint,
 	}
 }
-func NewVpcEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	subnetIds := d.Get("subnet_ids").Array()
 
-	vpcEndpointInterfaceCount := int64(1)
-	if len(subnetIds) > 0 {
-		vpcEndpointInterfaceCount = int64(len(subnetIds))
+func NewVPCEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	subnetIDs := d.Get("subnet_ids").Array()
+
+	interfaces := int64(1)
+	if len(subnetIDs) > 0 {
+		interfaces = int64(len(subnetIDs))
 	}
 
-	r := &aws.VpcEndpoint{Address: strPtr(d.Address), Region: strPtr(d.Get("region").String()), VpcEndpointInterfaces: intPtr(vpcEndpointInterfaceCount)}
-	if !d.IsEmpty("vpc_endpoint_type") {
-		r.VpcEndpointType = strPtr(d.Get("vpc_endpoint_type").String())
+	r := &aws.VPCEndpoint{
+		Address:    d.Address,
+		Region:     d.Get("region").String(),
+		Interfaces: intPtr(interfaces),
+		Type:       d.Get("vpc_endpoint_type").String(),
 	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

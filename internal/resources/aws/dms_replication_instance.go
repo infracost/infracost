@@ -10,46 +10,46 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type DmsReplicationInstance struct {
-	Address                  *string
-	AllocatedStorage         *int64
-	ReplicationInstanceClass *string
-	Region                   *string
-	MultiAz                  *bool
+type DMSReplicationInstance struct {
+	Address                  string
+	Region                   string
+	AllocatedStorageGB       int64
+	ReplicationInstanceClass string
+	MultiAZ                  bool
 }
 
-var DmsReplicationInstanceUsageSchema = []*schema.UsageItem{}
+var DMSReplicationInstanceUsageSchema = []*schema.UsageItem{}
 
-func (r *DmsReplicationInstance) PopulateUsage(u *schema.UsageData) {
+func (r *DMSReplicationInstance) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *DmsReplicationInstance) BuildResource() *schema.Resource {
+func (r *DMSReplicationInstance) BuildResource() *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
-	costComponents = append(costComponents, instanceCostComponent(r))
-	costComponents = append(costComponents, storageCostComponent(r))
+	costComponents = append(costComponents, r.instanceCostComponent())
+	costComponents = append(costComponents, r.storageCostComponent())
 
 	return &schema.Resource{
-		Name:           *r.Address,
-		CostComponents: costComponents, UsageSchema: DmsReplicationInstanceUsageSchema,
+		Name:           r.Address,
+		CostComponents: costComponents,
+		UsageSchema:    DMSReplicationInstanceUsageSchema,
 	}
 }
-func getInstanceType(r *DmsReplicationInstance) string {
-	rawInstanceType := strings.Split(*r.ReplicationInstanceClass, ".")
+func (r *DMSReplicationInstance) getInstanceType() string {
+	rawInstanceType := strings.Split(r.ReplicationInstanceClass, ".")
 	instanceType := strings.Join(rawInstanceType[1:], ".")
 	return instanceType
 }
 
-func getInstanceFamily(r *DmsReplicationInstance) string {
-	rawInstanceType := strings.Split(*r.ReplicationInstanceClass, ".")
+func (r *DMSReplicationInstance) getInstanceFamily() string {
+	rawInstanceType := strings.Split(r.ReplicationInstanceClass, ".")
 	return rawInstanceType[1]
 }
 
-func instanceCostComponent(r *DmsReplicationInstance) *schema.CostComponent {
-	region := *r.Region
-	instanceType := getInstanceType(r)
+func (r *DMSReplicationInstance) instanceCostComponent() *schema.CostComponent {
+	instanceType := r.getInstanceType()
 	availabilityZone := "Single"
-	if *r.MultiAz {
+	if r.MultiAZ {
 		availabilityZone = "Multiple"
 	}
 
@@ -60,7 +60,7 @@ func instanceCostComponent(r *DmsReplicationInstance) *schema.CostComponent {
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
-			Region:     strPtr(region),
+			Region:     strPtr(r.Region),
 			Service:    strPtr("AWSDatabaseMigrationSvc"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "instanceType", Value: strPtr(instanceType)},
@@ -70,15 +70,14 @@ func instanceCostComponent(r *DmsReplicationInstance) *schema.CostComponent {
 	}
 }
 
-func storageCostComponent(r *DmsReplicationInstance) *schema.CostComponent {
-	region := *r.Region
-	instanceFamily := getInstanceFamily(r)
+func (r *DMSReplicationInstance) storageCostComponent() *schema.CostComponent {
+	instanceFamily := r.getInstanceFamily()
 	availabilityZone := "Single"
-	if *r.MultiAz {
+	if r.MultiAZ {
 		availabilityZone = "Multiple"
 	}
 
-	baseStorageSize := *r.AllocatedStorage
+	baseStorageSize := r.AllocatedStorageGB
 	var freeStorageSize int64
 	switch instanceFamily {
 	case "c4":
@@ -104,7 +103,7 @@ func storageCostComponent(r *DmsReplicationInstance) *schema.CostComponent {
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(storageSize)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
-			Region:     strPtr(region),
+			Region:     strPtr(r.Region),
 			Service:    strPtr("AWSDatabaseMigrationSvc"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "storageMedia", Value: strPtr("SSD")},
