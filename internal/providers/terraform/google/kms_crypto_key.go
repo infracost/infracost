@@ -7,7 +7,7 @@ import (
 
 func getKMSCryptoKeyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_KMS_crypto_key",
+		Name:  "google_kms_crypto_key",
 		RFunc: NewKMSCryptoKey,
 	}
 }
