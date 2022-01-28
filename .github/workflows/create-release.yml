@@ -87,3 +87,14 @@ jobs:
         with:
           token: ${{secrets.HOMEBREW_RELEASE_TOKEN}}
           formula: infracost
+
+  update-download-redirects:
+    name: Upload Download Redirects
+    needs: build
+    uses: ./.github/workflows/update-download-redirects.yml
+    with:
+      version: ${{ github.ref_name }}
+    secrets:
+      AMPLIFY_APP_ID: ${{ secrets.AMPLIFY_APP_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
