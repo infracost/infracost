@@ -7,25 +7,25 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type EbsSnapshotCopy struct {
-	Address       string
-	Region        string
-	VolumeRefSize float64
+type EBSSnapshotCopy struct {
+	Address string
+	Region  string
+	SizeGB  *float64
 }
 
-var EbsSnapshotCopyUsageSchema = []*schema.UsageItem{}
+var EBSSnapshotCopyUsageSchema = []*schema.UsageItem{}
 
-func (r *EbsSnapshotCopy) PopulateUsage(u *schema.UsageData) {
+func (r *EBSSnapshotCopy) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *EbsSnapshotCopy) BuildResource() *schema.Resource {
+func (r *EBSSnapshotCopy) BuildResource() *schema.Resource {
 	region := r.Region
 
 	gbVal := decimal.NewFromInt(int64(defaultVolumeSize))
 
-	if r.VolumeRefSize != 0 {
-		gbVal = decimal.NewFromFloat(r.VolumeRefSize)
+	if r.SizeGB != nil {
+		gbVal = decimal.NewFromFloat(*r.SizeGB)
 	}
 
 	costComponents := []*schema.CostComponent{
@@ -34,6 +34,6 @@ func (r *EbsSnapshotCopy) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: EbsSnapshotCopyUsageSchema,
+		CostComponents: costComponents, UsageSchema: EBSSnapshotCopyUsageSchema,
 	}
 }

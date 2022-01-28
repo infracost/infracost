@@ -7,29 +7,29 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type EbsSnapshot struct {
+type EBSSnapshot struct {
 	Address                  string
 	Region                   string
-	VolumeRefSize            float64
+	SizeGB                   *float64
 	MonthlyListBlockRequests *int64 `infracost_usage:"monthly_list_block_requests"`
 	MonthlyGetBlockRequests  *int64 `infracost_usage:"monthly_get_block_requests"`
 	MonthlyPutBlockRequests  *int64 `infracost_usage:"monthly_put_block_requests"`
 	FastSnapshotRestoreHours *int64 `infracost_usage:"fast_snapshot_restore_hours"`
 }
 
-var EbsSnapshotUsageSchema = []*schema.UsageItem{{Key: "monthly_list_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_get_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_put_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "fast_snapshot_restore_hours", ValueType: schema.Int64, DefaultValue: 0}}
+var EBSSnapshotUsageSchema = []*schema.UsageItem{{Key: "monthly_list_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_get_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_put_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "fast_snapshot_restore_hours", ValueType: schema.Int64, DefaultValue: 0}}
 
-func (r *EbsSnapshot) PopulateUsage(u *schema.UsageData) {
+func (r *EBSSnapshot) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *EbsSnapshot) BuildResource() *schema.Resource {
+func (r *EBSSnapshot) BuildResource() *schema.Resource {
 	region := r.Region
 
-	gbVal := decimal.NewFromInt(int64(defaultVolumeSize))
+	gbVal := decimal.NewFromFloat(float64(defaultVolumeSize))
 
-	if r.VolumeRefSize != 0 {
-		gbVal = decimal.NewFromFloat(r.VolumeRefSize)
+	if r.SizeGB != nil {
+		gbVal = decimal.NewFromFloat(*r.SizeGB)
 	}
 
 	var listBlockRequests *decimal.Decimal
@@ -117,7 +117,7 @@ func (r *EbsSnapshot) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: EbsSnapshotUsageSchema,
+		CostComponents: costComponents, UsageSchema: EBSSnapshotUsageSchema,
 	}
 }
 
