@@ -1,0 +1,99 @@
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    secrets:
+      AMPLIFY_APP_ID:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        type: string
+    secrets:
+      AMPLIFY_APP_ID:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+jobs:
+  update:
+    name: Update Download Redirects
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - run: npm install semver
+      - uses: actions/github-script@v5
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-2'
+        with:
+          script: |
+            const semver = require('semver');
+
+            const version = "${{ github.event.inputs.version }}" || "${{ inputs.version }}";
+            if (!semver.valid(version)) {
+              throw new Error(`Error version ${version} is not valid semver`);
+            }
+
+            const parsedVersion = semver.parse(version)
+            const rewriteSource = `/downloads/v${parsedVersion.major}.${parsedVersion.minor}/<*>`;
+            const rewriteTarget = `https://github.com/infracost/infracost/releases/download/${version}/<*>`;
+
+            let output = '';
+            let returnCode = await exec.exec(`aws amplify get-app --app-id ${{ secrets.AMPLIFY_APP_ID }}`, [], {
+              silent: true,
+              listeners: { stdout: (data) => { output += data.toString() } }
+            } )
+            if (returnCode !== 0) {
+              throw new Error(
+                `Error running aws amplify get-app: ${returnCode}`
+              );
+            }
+
+            const customRules = JSON.parse(output).app.customRules;
+
+            const i = customRules.findIndex((rule) => ( rule.source === rewriteSource ))
+            if (i >= 0) {
+              const m = customRules[i].target.match(/\/([^/]+)\/<\*>$/);
+              const existingVersion = m && m[1];
+              if (semver.valid(existingVersion)) {
+                if (semver.gt(version, existingVersion)) {
+                  core.info(`Updating redirect ${rewriteSource} from ${customRules[i].target} to ${rewriteTarget}`);
+                  customRules[i].target = rewriteTarget;
+                } else {
+                  if (version === existingVersion) {
+                    core.info(`Redirect ${rewriteSource} already targets ${rewriteTarget}`);
+                  } else {
+                    core.warning(`Not updating redirect ${rewriteSource} from ${customRules[i].target} to earlier version ${rewriteTarget}`);
+                  }
+                  return;
+                }
+              } else {
+                core.warning(`Not updating redirect ${rewriteSource}, existing target ${customRules[i].target} has no valid version`);
+                return;
+              }
+            } else {
+              core.info(`Adding redirect ${rewriteSource} with target ${rewriteTarget}`);
+              customRules.push({ source: rewriteSource, target: rewriteTarget, status: "302"});
+            }
+
+            returnCode = await exec.exec('aws amplify update-app', ['--app-id', '${{ secrets.AMPLIFY_APP_ID }}', '--custom-rules', JSON.stringify(customRules)], { silent: true });
+            if (returnCode !== 0) {
+              throw new Error(
+                `Error running aws amplify get-app: ${returnCode}`
+              );
+            }
+
+
+
