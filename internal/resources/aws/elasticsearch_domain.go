@@ -72,7 +72,7 @@ func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
 	}
 
 	if r.EBSEnabled {
-		gbVal := decimal.NewFromInt(int64(defaultVolumeSize))
+		gbVal := decimal.NewFromFloat(float64(defaultVolumeSize))
 		if r.EBSVolumeSize != nil {
 			gbVal = decimal.NewFromFloat(*r.EBSVolumeSize)
 		}

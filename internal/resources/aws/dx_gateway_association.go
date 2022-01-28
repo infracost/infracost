@@ -7,20 +7,20 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type DxGatewayAssociation struct {
+type DXGatewayAssociation struct {
 	Address                 string
 	Region                  string
 	AssociatedGatewayRegion string
 	MonthlyDataProcessedGB  *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var DxGatewayAssociationUsageSchema = []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var DXGatewayAssociationUsageSchema = []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
 
-func (r *DxGatewayAssociation) PopulateUsage(u *schema.UsageData) {
+func (r *DXGatewayAssociation) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *DxGatewayAssociation) BuildResource() *schema.Resource {
+func (r *DXGatewayAssociation) BuildResource() *schema.Resource {
 	region := r.Region
 
 	if r.AssociatedGatewayRegion != "" {
@@ -38,6 +38,6 @@ func (r *DxGatewayAssociation) BuildResource() *schema.Resource {
 		CostComponents: []*schema.CostComponent{
 			transitGatewayDataProcessingCostComponent(region, "TransitGatewayDirectConnect", gbDataProcessed),
 			transitGatewayAttachmentCostComponent(region, "TransitGatewayDirectConnect"),
-		}, UsageSchema: DxGatewayAssociationUsageSchema,
+		}, UsageSchema: DXGatewayAssociationUsageSchema,
 	}
 }

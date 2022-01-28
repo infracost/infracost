@@ -7,20 +7,20 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type VpnConnection struct {
+type VPNConnection struct {
 	Address                string
 	Region                 string
 	TransitGatewayID       string
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var VpnConnectionUsageSchema = []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var VPNConnectionUsageSchema = []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
 
-func (r *VpnConnection) PopulateUsage(u *schema.UsageData) {
+func (r *VPNConnection) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *VpnConnection) BuildResource() *schema.Resource {
+func (r *VPNConnection) BuildResource() *schema.Resource {
 	region := r.Region
 
 	var gbDataProcessed *decimal.Decimal
@@ -52,6 +52,6 @@ func (r *VpnConnection) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: VpnConnectionUsageSchema,
+		CostComponents: costComponents, UsageSchema: VPNConnectionUsageSchema,
 	}
 }

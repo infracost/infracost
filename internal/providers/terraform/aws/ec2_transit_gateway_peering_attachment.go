@@ -8,14 +8,14 @@ import (
 func getEC2TransitGatewayPeeringAttachmentRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_ec2_transit_gateway_peering_attachment",
-		RFunc: NewEc2TransitGatewayPeeringAttachment,
+		RFunc: NewEC2TransitGatewayPeeringAttachment,
 		ReferenceAttributes: []string{
 			"transit_gateway_id",
 		},
 	}
 }
-func NewEc2TransitGatewayPeeringAttachment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.Ec2TransitGatewayPeeringAttachment{Address: d.Address, Region: d.Get("region").String()}
+func NewEC2TransitGatewayPeeringAttachment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.EC2TransitGatewayPeeringAttachment{Address: d.Address, Region: d.Get("region").String()}
 
 	transitGatewayRefs := d.References("transit_gateway_id")
 	if len(transitGatewayRefs) > 0 {
