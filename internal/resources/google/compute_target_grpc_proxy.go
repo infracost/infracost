@@ -7,20 +7,20 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type ComputeTargetGrpcProxy struct {
+type ComputeTargetGRPCProxy struct {
 	Address                string
 	Region                 string
 	MonthlyProxyInstances  *float64 `infracost_usage:"monthly_proxy_instances"`
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var ComputeTargetGrpcProxyUsageSchema = []*schema.UsageItem{{Key: "monthly_proxy_instances", ValueType: schema.Float64, DefaultValue: 0.000000}, {Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+var ComputeTargetGRPCProxyUsageSchema = []*schema.UsageItem{{Key: "monthly_proxy_instances", ValueType: schema.Float64, DefaultValue: 0.000000}, {Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
 
-func (r *ComputeTargetGrpcProxy) PopulateUsage(u *schema.UsageData) {
+func (r *ComputeTargetGRPCProxy) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *ComputeTargetGrpcProxy) BuildResource() *schema.Resource {
+func (r *ComputeTargetGRPCProxy) BuildResource() *schema.Resource {
 	var monthlyProxyInstances, monthlyDataProcessedGb *decimal.Decimal
 	region := r.Region
 	costComponents := make([]*schema.CostComponent, 0)
@@ -39,7 +39,7 @@ func (r *ComputeTargetGrpcProxy) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: ComputeTargetGrpcProxyUsageSchema,
+		CostComponents: costComponents, UsageSchema: ComputeTargetGRPCProxyUsageSchema,
 	}
 }
 

@@ -23,7 +23,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getComputeRegionTargetHTTPSProxyRegistryItem(),
 	getComputeRouterNATRegistryItem(),
 	GetComputeSnapshotRegistryItem(),
-	getComputeTargetGrpcProxyRegistryItem(),
+	getComputeTargetGRPCProxyRegistryItem(),
 	getComputeTargetHTTPProxyRegistryItem(),
 	getComputeTargetHTTPSProxyRegistryItem(),
 	getComputeTargetSslProxyRegistryItem(),
