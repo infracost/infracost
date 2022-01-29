@@ -12,7 +12,7 @@ func getLBRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func GetALBRegistryItem() *schema.RegistryItem {
+func getALBRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_alb",
 		RFunc: NewLB,

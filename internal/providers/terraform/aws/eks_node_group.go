@@ -9,7 +9,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func GetNewEKSNodeGroupItem() *schema.RegistryItem {
+func getNewEKSNodeGroupItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_eks_node_group",
 		RFunc: NewEKSNodeGroup,

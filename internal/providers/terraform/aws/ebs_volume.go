@@ -6,7 +6,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetEBSVolumeRegistryItem() *schema.RegistryItem {
+func getEBSVolumeRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_ebs_volume",
 		RFunc: NewEBSVolume,
