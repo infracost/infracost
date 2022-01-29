@@ -35,7 +35,7 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		Name:          d.Get("node_group_name").String(),
 		ClusterName:   d.Get("cluster_name").String(),
 		InstanceCount: intPtr(instanceCount),
-		DiskSize:      diskSize,
+		DiskSize:      float64(diskSize),
 	}
 
 	launchTemplateRefID := d.References("launch_template.0.id")

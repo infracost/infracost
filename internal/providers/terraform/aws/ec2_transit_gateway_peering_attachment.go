@@ -1,10 +1,11 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func GetEC2TransitGatewayPeeringAttachmentRegistryItem() *schema.RegistryItem {
+func getEC2TransitGatewayPeeringAttachmentRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_ec2_transit_gateway_peering_attachment",
 		RFunc: NewEC2TransitGatewayPeeringAttachment,
@@ -13,18 +14,14 @@ func GetEC2TransitGatewayPeeringAttachmentRegistryItem() *schema.RegistryItem {
 		},
 	}
 }
-
 func NewEC2TransitGatewayPeeringAttachment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
+	r := &aws.EC2TransitGatewayPeeringAttachment{Address: d.Address, Region: d.Get("region").String()}
+
 	transitGatewayRefs := d.References("transit_gateway_id")
 	if len(transitGatewayRefs) > 0 {
-		region = transitGatewayRefs[0].Get("region").String()
+		r.TransitGatewayRegion = transitGatewayRefs[0].Get("region").String()
 	}
 
-	return &schema.Resource{
-		Name: d.Address,
-		CostComponents: []*schema.CostComponent{
-			transitGatewayAttachmentCostComponent(region, "TransitGatewayPeering"),
-		},
-	}
+	r.PopulateUsage(u)
+	return r.BuildResource()
 }

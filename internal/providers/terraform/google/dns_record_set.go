@@ -11,8 +11,12 @@ func getDNSRecordSetRegistryItem() *schema.RegistryItem {
 		RFunc: NewDNSRecordSet,
 	}
 }
+
 func NewDNSRecordSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.DNSRecordSet{Address: strPtr(d.Address)}
+	r := &google.DNSRecordSet{
+		Address: d.Address,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

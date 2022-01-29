@@ -11,10 +11,10 @@ import (
 )
 
 type RedisInstance struct {
-	Address      *string
-	Region       *string
-	Tier         *string
-	MemorySizeGb *float64
+	Address      string
+	Region       string
+	Tier         string
+	MemorySizeGB float64
 }
 
 var RedisInstanceUsageSchema = []*schema.UsageItem{}
@@ -24,7 +24,6 @@ func (r *RedisInstance) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *RedisInstance) BuildResource() *schema.Resource {
-	region := *r.Region
 	serviceTier := "Basic"
 
 	var tierMapping = map[string]string{
@@ -32,11 +31,11 @@ func (r *RedisInstance) BuildResource() *schema.Resource {
 		"STANDARD_HA": "Standard",
 	}
 
-	if r.Tier != nil {
-		serviceTier = tierMapping[*r.Tier]
+	if r.Tier != "" {
+		serviceTier = tierMapping[r.Tier]
 	}
 
-	var memorySize = *r.MemorySizeGb
+	var memorySize = r.MemorySizeGB
 	var capacityTier string
 
 	if memorySize >= 1 && memorySize <= 4 {
@@ -55,7 +54,7 @@ func (r *RedisInstance) BuildResource() *schema.Resource {
 	name := fmt.Sprintf("Redis instance (%s, %s)", strings.ToLower(serviceTier), capacityTier)
 
 	return &schema.Resource{
-		Name: *r.Address,
+		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            name,
@@ -64,7 +63,7 @@ func (r *RedisInstance) BuildResource() *schema.Resource {
 				MonthlyQuantity: decimalPtr(decimal.NewFromFloat(memorySize)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
-					Region:        strPtr(region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("Cloud Memorystore for Redis"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{

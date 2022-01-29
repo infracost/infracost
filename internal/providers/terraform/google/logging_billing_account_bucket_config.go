@@ -11,8 +11,12 @@ func getLoggingBillingAccountBucketConfigRegistryItem() *schema.RegistryItem {
 		RFunc: NewLoggingBillingAccountBucketConfig,
 	}
 }
+
 func NewLoggingBillingAccountBucketConfig(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.LoggingBillingAccountBucketConfig{Address: strPtr(d.Address)}
+	r := &google.Logging{
+		Address: d.Address,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

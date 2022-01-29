@@ -19,7 +19,7 @@ type EKSNodeGroup struct {
 
 	InstanceType   string
 	PurchaseOption string
-	DiskSize       int64
+	DiskSize       float64
 
 	// "optional" args, that may be empty depending on the resource config
 	RootBlockDevice *EBSVolume
@@ -105,7 +105,7 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 			Address: "root_block_device",
 			Region:  a.Region,
 			Type:    "gp2",
-			Size:    intPtr(a.DiskSize),
+			Size:    intPtr(int64(a.DiskSize)),
 		}
 
 		instanceResource := instance.BuildResource()

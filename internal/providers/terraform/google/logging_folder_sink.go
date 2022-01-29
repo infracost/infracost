@@ -11,8 +11,12 @@ func getLoggingFolderSinkRegistryItem() *schema.RegistryItem {
 		RFunc: NewLoggingFolderSink,
 	}
 }
+
 func NewLoggingFolderSink(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.LoggingFolderSink{Address: strPtr(d.Address)}
+	r := &google.Logging{
+		Address: d.Address,
+	}
+
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }
