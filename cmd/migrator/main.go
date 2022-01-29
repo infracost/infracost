@@ -24,10 +24,11 @@ var PROVIDER_TF string = "aws"
 var DRY_MODE = false
 var STRICT_MODE = false
 var SINGLE_MODE = true
-var SINGLE_RESOURCE_NAME = "ec2_transit_gateway_peering_attachment.go"
+var SINGLE_RESOURCE_NAME = "backup_vault.go"
 
 var FLEXIBLE_MODE_SKIP_DOTS = true
 var FLEXIBLE_MODE_SKIP_TYPES = true
+var FLEXIBLE_MODE_SKIP_BAD_DUS = true
 
 type duStruct struct {
 	fieldType     string // Bool, String, Int, Float, Exists
@@ -131,7 +132,7 @@ func migrateFile(filePath string, referenceFile *usage.ReferenceFile, basePath, 
 	if err != nil {
 		return false, err
 	}
-	if isImpossibleWithGets(file) {
+	if isImpossibleWithGets(file) && (STRICT_MODE || (!STRICT_MODE && !FLEXIBLE_MODE_SKIP_BAD_DUS)) {
 		return false, errors.New("bad d/u gets")
 	}
 	if isImpossibleWithResourceDefsCount(file) {
