@@ -29,7 +29,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getDocDBClusterInstanceRegistryItem(),
 	getDocDBClusterRegistryItem(),
 	getDocDBClusterSnapshotRegistryItem(),
-	GetDXConnectionRegistryItem(),
+	getDXConnectionRegistryItem(),
 	getDXGatewayAssociationRegistryItem(),
 	GetDynamoDBTableRegistryItem(),
 	getEBSSnapshotCopyRegistryItem(),
