@@ -122,7 +122,7 @@ func (r *RunContext) loadInitialContextValues() {
 }
 
 func (r *RunContext) IsCIRun() bool {
-	return r.ContextValues()["ciPlatform"] != ""
+	return r.contextVals["ciPlatform"] != "" && !IsTest()
 }
 
 func baseVersion(v string) string {
