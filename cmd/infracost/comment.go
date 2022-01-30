@@ -11,17 +11,17 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		Use:   "comment",
 		Short: "Post an Infracost comment to GitHub, GitLab or Azure Repos",
 		Long:  "Post an Infracost comment to GitHub, GitLab or Azure Repos",
-		Example: `  Update a comment on a GitHub pull request:
+		Example: `  Update the Infracost comment on a GitHub pull request:
 
-      infracost comment github --repo my-org/my-github-repo --pull-request 3 --path infracost.json --github-token $GITHUB_TOKEN
+      infracost comment github --repo my-org/my-repo --pull-request 3 --path infracost.json --behavior update --github-token $GITHUB_TOKEN
 
-  Post a new comment to a GitLab commit:
+  Delete old Infracost comments and post a new comment to a GitLab commit:
 
-      infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior new --gitlab-token $GITLAB_TOKEN
+      infracost comment gitlab --repo my-org/my-repo --commit 2ca7182 --path infracost.json --behavior delete-and-new --gitlab-token $GITLAB_TOKEN
 
   Post a new comment to an Azure Repos pull request:
 
-      infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-azure-repo --pull-request 3 --path infracost.json --azure-access-token $AZURE_ACCESS_TOKEN`,
+      infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-repo --pull-request 3 --path infracost.json --behavior new --azure-access-token $AZURE_ACCESS_TOKEN`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()

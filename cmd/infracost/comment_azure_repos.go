@@ -20,9 +20,9 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 		Use:   "azure-repos",
 		Short: "Post an Infracost comment to Azure Repos",
 		Long:  "Post an Infracost comment to Azure Repos",
-		Example: `  Update a comment on a pull request:
+		Example: `  Update comment on a pull request:
 
-      infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-azure-repo --pull-request 3 --path infracost.json --azure-access-token $AZURE_ACCESS_TOKEN`,
+      infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-repo --pull-request 3 --path infracost.json --azure-access-token $AZURE_ACCESS_TOKEN`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx.SetContextValue("platform", "azure-repos")
@@ -93,8 +93,8 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String("behavior", "update", `Behavior when posting the comment, one of:
-  update (default)  Update the latest comment
+	cmd.Flags().String("behavior", "update", `Behavior when posting comment, one of:
+  update (default)  Update latest comment
   new               Create a new comment
   delete-and-new    Delete previous matching comments and create a new comment`)
 	_ = cmd.RegisterFlagCompletionFunc("behavior", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -105,12 +105,12 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
-	cmd.Flags().Int("pull-request", 0, "pull request number to post the comment on")
+	cmd.Flags().Int("pull-request", 0, "pull request number to post comment on")
 	_ = cmd.MarkFlagRequired("pull-request")
-	cmd.Flags().String("repo-url", "", "Repository URL, e.g. https://dev.azure.com/my-org/my-project/_git/my-azure-repo")
+	cmd.Flags().String("repo-url", "", "Repository URL, e.g. https://dev.azure.com/my-org/my-project/_git/my-repo")
 	_ = cmd.MarkFlagRequired("repo-url")
-	cmd.Flags().String("tag", "", "Customize the embedded tag that is used for detecting comments posted by Infracost")
-	cmd.Flags().Bool("dry-run", false, "Generate the comment without actually posting to Azure Repos.")
+	cmd.Flags().String("tag", "", "Customize hidden markdown tag used to detect comments posted by Infracost")
+	cmd.Flags().Bool("dry-run", false, "Generate comment without actually posting to Azure Repos")
 
 	return cmd
 }
