@@ -23,3 +23,5 @@
 ∙ 2 were free:
   ∙ 1 x azurerm_databricks_workspace
   ∙ 1 x azurerm_resource_group
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

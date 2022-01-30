@@ -133,6 +133,8 @@
 ∙ 22 were estimated, 22 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost:
   ∙ 1 x aws_instance
+
+Add cost estimates to your pull requests: https://infracost.io/cicd
 Logs:
 
 level=warning msg="Skipping resource aws_instance.instance1_hostTenancy. Infracost currently does not support host tenancy for AWS EC2 instances"
