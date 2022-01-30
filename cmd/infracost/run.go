@@ -327,7 +327,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 		NoColor:       runCtx.Config.NoColor,
 		Indent:        "  ",
 	}
-	spinner := ui.NewSpinner("Extracting only cost-related params from terraform plan\nRetrieving cloud prices to calculate costs", spinnerOpts)
+	spinner := ui.NewSpinner("Retrieving cloud prices to calculate costs", spinnerOpts)
 	defer spinner.Fail()
 
 	for _, project := range projects {

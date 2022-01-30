@@ -5,12 +5,13 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 type PlanProvider struct {
@@ -42,6 +43,13 @@ func (p *PlanProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sch
 		return []*schema.Project{}, err
 	}
 
+	spinner := ui.NewSpinner("Extracting only cost-related params from terraform plan", ui.SpinnerOptions{
+		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
+		NoColor:       p.ctx.RunContext.Config.NoColor,
+		Indent:        "  ",
+	})
+	defer spinner.Fail()
+
 	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
@@ -58,6 +66,7 @@ func (p *PlanProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sch
 	project.PastResources = pastResources
 	project.Resources = resources
 
+	spinner.Success()
 	return []*schema.Project{project}, nil
 }
 
