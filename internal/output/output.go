@@ -314,18 +314,18 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 
 		if r.Summary.TotalUsageBasedResources != nil && *r.Summary.TotalUsageBasedResources > 0 {
 			if *r.Summary.TotalUsageBasedResources == 1 {
-				msg += fmt.Sprintf(", 1 includes usage-based costs, see %s", ui.LinkString("https://infracost.io/usage-file"))
+				msg += fmt.Sprintf(", 1 includes usage-based costs, see %s", "https://infracost.io/usage-file")
 			} else {
-				msg += fmt.Sprintf(", %d include usage-based costs, see %s", *r.Summary.TotalUsageBasedResources, ui.LinkString("https://infracost.io/usage-file"))
+				msg += fmt.Sprintf(", %d include usage-based costs, see %s", *r.Summary.TotalUsageBasedResources, "https://infracost.io/usage-file")
 			}
 		}
 	}
 
 	if r.Summary.TotalUnsupportedResources != nil && *r.Summary.TotalUnsupportedResources > 0 {
 		if *r.Summary.TotalUnsupportedResources == 1 {
-			msg += fmt.Sprintf("\n∙ 1 wasn't estimated, report it in %s", ui.LinkString("https://github.com/infracost/infracost"))
+			msg += fmt.Sprintf("\n∙ 1 wasn't estimated, report it in %s", "https://github.com/infracost/infracost")
 		} else {
-			msg += fmt.Sprintf("\n∙ %d weren't estimated, report them in %s", *r.Summary.TotalUnsupportedResources, ui.LinkString("https://github.com/infracost/infracost"))
+			msg += fmt.Sprintf("\n∙ %d weren't estimated, report them in %s", *r.Summary.TotalUnsupportedResources, "https://github.com/infracost/infracost")
 		}
 
 		if showSkipped {
