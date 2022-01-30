@@ -348,7 +348,7 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 	}
 
 	if r.ShareURL != "" {
-		msg += fmt.Sprintf("\n\nShare the results: %s", ui.LinkString(r.ShareURL))
+		msg += fmt.Sprintf("\n\nShare this cost estimate: %s", ui.LinkString(r.ShareURL))
 	}
 
 	if !r.IsCIRun {

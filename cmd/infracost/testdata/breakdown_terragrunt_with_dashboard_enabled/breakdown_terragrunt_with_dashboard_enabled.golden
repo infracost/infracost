@@ -40,7 +40,7 @@ Project: infracost/infracost/examples/terragrunt/prod REPLACED_PROJECT_PATH
 4 cloud resources were detected, rerun with --show-skipped to see details:
 ∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
 
-Share the results: https://dashboard.infracost.io/share/REPLACED_SHARE_CODE
+Share this cost estimate: https://dashboard.infracost.io/share/REPLACED_SHARE_CODE
 
 Add cost estimates to your pull requests: https://infracost.io/cicd
 

@@ -43,7 +43,7 @@ func (p *PlanProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sch
 		return []*schema.Project{}, err
 	}
 
-	spinner := ui.NewSpinner("Extracting only cost-related params from terraform plan", ui.SpinnerOptions{
+	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
 		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
 		NoColor:       p.ctx.RunContext.Config.NoColor,
 		Indent:        "  ",

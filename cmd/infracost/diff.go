@@ -12,7 +12,7 @@ func diffCmd(ctx *config.RunContext) *cobra.Command {
 		Use:   "diff",
 		Short: "Show diff of monthly costs between current and planned state",
 		Long:  "Show diff of monthly costs between current and planned state",
-		Example: `  Use Terraform directory with any required Terraform flags:
+		Example: `  Use Terraform directory with any required flags:
 
       infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
 

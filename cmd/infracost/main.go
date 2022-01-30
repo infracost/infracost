@@ -82,11 +82,11 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 %s
   Quick start: https://infracost.io/docs
   Add cost estimates to your pull requests: https://infracost.io/cicd`, ui.BoldString("DOCS")),
-		Example: `  Generate a cost diff from Terraform directory with any required Terraform flags:
+		Example: `  Show cost diff from Terraform directory, using any required flags:
 
       infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
 
-  Generate a full cost breakdown from Terraform directory with any required Terraform flags:
+  Show full cost breakdown from Terraform directory, using any required flags:
 
       infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"`,
 		SilenceErrors: true,
