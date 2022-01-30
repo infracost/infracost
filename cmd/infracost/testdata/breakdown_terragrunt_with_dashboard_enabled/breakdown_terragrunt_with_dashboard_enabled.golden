@@ -42,5 +42,7 @@ Project: infracost/infracost/examples/terragrunt/prod REPLACED_PROJECT_PATH
 
 Share the results: https://dashboard.infracost.io/share/REPLACED_SHARE_CODE
 
+Add cost estimates to your pull requests: https://infracost.io/cicd
+
 Err:
 

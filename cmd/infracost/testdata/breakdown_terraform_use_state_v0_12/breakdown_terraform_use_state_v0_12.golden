@@ -43,5 +43,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.12_state.json
 ∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost
 ∙ 6 were free
 
+Add cost estimates to your pull requests: https://infracost.io/cicd
+
 Err:
 

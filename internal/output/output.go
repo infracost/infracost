@@ -5,11 +5,12 @@ import (
 	"sort"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
 )
 
 var outputVersion = "0.2"
@@ -29,6 +30,7 @@ type Root struct {
 	TimeGenerated        time.Time        `json:"timeGenerated"`
 	Summary              *Summary         `json:"summary"`
 	FullSummary          *Summary         `json:"-"`
+	IsCIRun              bool             `json:"-"`
 }
 
 type Project struct {
@@ -347,6 +349,10 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 
 	if r.ShareURL != "" {
 		msg += fmt.Sprintf("\n\nShare the results: %s", ui.LinkString(r.ShareURL))
+	}
+
+	if !r.IsCIRun {
+		msg += fmt.Sprintf("\n\nAdd cost estimates to your pull requests: %s", ui.LinkString("https://infracost.io/cicd"))
 	}
 
 	return msg
