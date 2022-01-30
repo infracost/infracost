@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"runtime"
-	"sort"
 	"strings"
 	"time"
 
@@ -146,46 +145,68 @@ func ciScript() string {
 	return ""
 }
 
+// ciEnvMap contains information to detect what ci system the current process is running in.
+type ciEnvMap struct {
+	// vars is a list of OS env var names mapping to know ci system. If the key of this map is
+	// present in OS env then it is assumed we are running in that CI system.
+	vars map[string]string
+	// prefixes contains a list of OS env var name prefixes. If the key of this map is
+	// matches the prefix of any OS env then it is assumed we are running in that CI system.
+	prefixes map[string]string
+}
+
+var ciMap = ciEnvMap{
+	vars: map[string]string{
+		"GITHUB_ACTIONS":       "github_actions",
+		"GITLAB_CI":            "gitlab_ci",
+		"CIRCLECI":             "circleci",
+		"JENKINS_HOME":         "jenkins",
+		"BUILDKITE":            "buildkite",
+		"SYSTEM_COLLECTIONURI": fmt.Sprintf("azure_devops_%s", os.Getenv("BUILD_REPOSITORY_PROVIDER")),
+		"TFC_RUN_ID":           "tfc",
+		"ENV0_ENVIRONMENT_ID":  "env0",
+		"SCALR_RUN_ID":         "scalr",
+		"CF_BUILD_ID":          "codefresh",
+		"TRAVIS":               "travis",
+		"CODEBUILD_CI":         "codebuild",
+		"TEAMCITY_VERSION":     "teamcity",
+		"BUDDYBUILD_BRANCH":    "buddybuild",
+		"BITRISE_IO":           "bitrise",
+		"SEMAPHORE":            "semaphoreci",
+		"APPVEYOR":             "appveyor",
+		"WERCKER_GIT_BRANCH":   "wercker",
+		"MAGNUM":               "magnumci",
+		"SHIPPABLE":            "shippable",
+		"TDDIUM":               "tddium",
+		"GREENHOUSE":           "greenhouse",
+		"CIRRUS_CI":            "cirrusci",
+	},
+	prefixes: map[string]string{
+		"ATLANTIS_":  "atlantis",
+		"BITBUCKET_": "bitbucket",
+		"CONCOURSE_": "concourse",
+		"SPACELIFT_": "spacelift",
+		"HARNESS_":   "harness",
+	},
+}
+
 func ciPlatform() string {
-	if IsEnvPresent("GITHUB_ACTIONS") {
-		return "github_actions"
-	} else if IsEnvPresent("GITLAB_CI") {
-		return "gitlab_ci"
-	} else if IsEnvPresent("CIRCLECI") {
-		return "circleci"
-	} else if IsEnvPresent("JENKINS_HOME") {
-		return "jenkins"
-	} else if IsEnvPresent("BUILDKITE") {
-		return "buildkite"
-	} else if IsEnvPresent("SYSTEM_COLLECTIONURI") {
-		return fmt.Sprintf("azure_devops_%s", os.Getenv("BUILD_REPOSITORY_PROVIDER"))
-	} else if IsEnvPresent("TFC_RUN_ID") {
-		return "tfc"
-	} else if IsEnvPresent("ENV0_ENVIRONMENT_ID") {
-		return "env0"
-	} else if IsEnvPresent("SCALR_RUN_ID") {
-		return "scalr"
-	} else if IsEnvPresent("CF_BUILD_ID") {
-		return "codefresh"
-	} else {
-		envKeys := os.Environ()
-		sort.Strings(envKeys)
-		for _, k := range envKeys {
-			if strings.HasPrefix(k, "ATLANTIS_") {
-				return "atlantis"
-			} else if strings.HasPrefix(k, "BITBUCKET_") {
-				return "bitbucket"
-			} else if strings.HasPrefix(k, "CONCOURSE_") {
-				return "concourse"
-			} else if strings.HasPrefix(k, "SPACELIFT_") {
-				return "spacelift"
-			} else if strings.HasPrefix(k, "HARNESS_") {
-				return "harness"
+	for env, name := range ciMap.vars {
+		if IsEnvPresent(env) {
+			return name
+		}
+	}
+
+	for _, k := range os.Environ() {
+		for prefix, name := range ciMap.prefixes {
+			if strings.HasPrefix(k, prefix) {
+				return name
 			}
 		}
-		if IsEnvPresent("CI") {
-			return "ci"
-		}
+	}
+
+	if IsEnvPresent("CI") {
+		return "ci"
 	}
 
 	return ""
