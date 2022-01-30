@@ -80,7 +80,8 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 		Long: fmt.Sprintf(`Infracost - cloud cost estimates for Terraform
 
 %s
-  https://infracost.io/docs`, ui.BoldString("DOCS")),
+  Quick start: https://infracost.io/docs
+  Add cost estimates to your pull requests: https://infracost.io/cicd`, ui.BoldString("DOCS")),
 		Example: `  Generate a cost diff from Terraform directory with any required Terraform flags:
 
       infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"

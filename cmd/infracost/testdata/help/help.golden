@@ -1,7 +1,8 @@
 Infracost - cloud cost estimates for Terraform
 
 DOCS
-  https://infracost.io/docs
+  Quick start: https://infracost.io/docs
+  Add cost estimates to your pull requests: https://infracost.io/cicd
 
 USAGE
   infracost [flags]
