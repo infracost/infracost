@@ -99,6 +99,8 @@
 ∙ 4 were free:
   ∙ 3 x azurerm_cosmosdb_account
   ∙ 1 x azurerm_resource_group
+
+Add cost estimates to your pull requests: https://infracost.io/cicd
 Logs:
 
 level=warning msg="Skipping resource azurerm_cosmosdb_cassandra_keyspace.no_account as its 'account_name' property could not be found."

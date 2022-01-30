@@ -9,11 +9,12 @@ import (
 
 	"github.com/kballard/go-shellquote"
 
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 var defaultTerragruntBinary = "terragrunt"
@@ -90,6 +91,12 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 
 	projects := make([]*schema.Project, 0, len(projectDirs))
 
+	spinner := ui.NewSpinner("Extracting only cost-related params from terragrunt plan", ui.SpinnerOptions{
+		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
+		NoColor:       p.ctx.RunContext.Config.NoColor,
+		Indent:        "  ",
+	})
+	defer spinner.Fail()
 	for i, projectDir := range projectDirs {
 		metadata := config.DetectProjectMetadata(projectDir.ConfigDir)
 		metadata.Type = p.Type()
@@ -113,6 +120,7 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 		projects = append(projects, project)
 	}
 
+	spinner.Success()
 	return projects, nil
 }
 

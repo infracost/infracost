@@ -21,5 +21,7 @@ Project: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.j
   ∙ 1 x azurerm_virtual_hub
   ∙ 1 x azurerm_virtual_wan
 
+Add cost estimates to your pull requests: https://infracost.io/cicd
+
 Err:
 

@@ -67,3 +67,5 @@
   ∙ 1 x azurerm_subnet
   ∙ 1 x azurerm_virtual_network
   ∙ 1 x azurerm_virtual_network_gateway_connection
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

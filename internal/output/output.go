@@ -5,11 +5,12 @@ import (
 	"sort"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
 )
 
 var outputVersion = "0.2"
@@ -29,6 +30,7 @@ type Root struct {
 	TimeGenerated        time.Time        `json:"timeGenerated"`
 	Summary              *Summary         `json:"summary"`
 	FullSummary          *Summary         `json:"-"`
+	IsCIRun              bool             `json:"-"`
 }
 
 type Project struct {
@@ -312,18 +314,18 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 
 		if r.Summary.TotalUsageBasedResources != nil && *r.Summary.TotalUsageBasedResources > 0 {
 			if *r.Summary.TotalUsageBasedResources == 1 {
-				msg += fmt.Sprintf(", 1 includes usage-based costs, see %s", ui.LinkString("https://infracost.io/usage-file"))
+				msg += fmt.Sprintf(", 1 includes usage-based costs, see %s", "https://infracost.io/usage-file")
 			} else {
-				msg += fmt.Sprintf(", %d include usage-based costs, see %s", *r.Summary.TotalUsageBasedResources, ui.LinkString("https://infracost.io/usage-file"))
+				msg += fmt.Sprintf(", %d include usage-based costs, see %s", *r.Summary.TotalUsageBasedResources, "https://infracost.io/usage-file")
 			}
 		}
 	}
 
 	if r.Summary.TotalUnsupportedResources != nil && *r.Summary.TotalUnsupportedResources > 0 {
 		if *r.Summary.TotalUnsupportedResources == 1 {
-			msg += fmt.Sprintf("\n∙ 1 wasn't estimated, report it in %s", ui.LinkString("https://github.com/infracost/infracost"))
+			msg += fmt.Sprintf("\n∙ 1 wasn't estimated, report it in %s", "https://github.com/infracost/infracost")
 		} else {
-			msg += fmt.Sprintf("\n∙ %d weren't estimated, report them in %s", *r.Summary.TotalUnsupportedResources, ui.LinkString("https://github.com/infracost/infracost"))
+			msg += fmt.Sprintf("\n∙ %d weren't estimated, report them in %s", *r.Summary.TotalUnsupportedResources, "https://github.com/infracost/infracost")
 		}
 
 		if showSkipped {
@@ -346,7 +348,11 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 	}
 
 	if r.ShareURL != "" {
-		msg += fmt.Sprintf("\n\nShare the results: %s", ui.LinkString(r.ShareURL))
+		msg += fmt.Sprintf("\n\nShare this cost estimate: %s", ui.LinkString(r.ShareURL))
+	}
+
+	if !r.IsCIRun {
+		msg += fmt.Sprintf("\n\nAdd cost estimates to your pull requests: %s", ui.LinkString("https://infracost.io/cicd"))
 	}
 
 	return msg

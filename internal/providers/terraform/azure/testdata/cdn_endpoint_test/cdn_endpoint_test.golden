@@ -45,3 +45,5 @@
 ∙ 5 were free:
   ∙ 4 x azurerm_cdn_profile
   ∙ 1 x azurerm_resource_group
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

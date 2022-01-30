@@ -157,6 +157,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		return err
 	}
 
+	r.IsCIRun = runCtx.IsCIRun()
 	r.Currency = runCtx.Config.Currency
 
 	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
@@ -326,7 +327,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 		NoColor:       runCtx.Config.NoColor,
 		Indent:        "  ",
 	}
-	spinner := ui.NewSpinner("Calculating monthly cost estimate", spinnerOpts)
+	spinner := ui.NewSpinner("Retrieving cloud prices to calculate costs", spinnerOpts)
 	defer spinner.Fail()
 
 	for _, project := range projects {

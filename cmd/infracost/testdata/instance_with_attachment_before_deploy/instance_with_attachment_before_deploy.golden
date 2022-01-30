@@ -16,5 +16,7 @@ Project: infracost/infracost/cmd/infracost/testdata/instance_with_attachment_bef
 ∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free
 
+Add cost estimates to your pull requests: https://infracost.io/cicd
+
 Err:
 
