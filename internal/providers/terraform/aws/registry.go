@@ -12,7 +12,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetBackupVaultRegistryItem(),
 	getCloudFormationStackRegistryItem(),
 	getCloudFormationStackSetRegistryItem(),
-	GetCloudfrontDistributionRegistryItem(),
+	getCloudfrontDistributionRegistryItem(),
 	getCloudtrailRegistryItem(),
 	getCloudwatchDashboardRegistryItem(),
 	getCloudwatchEventBusItem(),
