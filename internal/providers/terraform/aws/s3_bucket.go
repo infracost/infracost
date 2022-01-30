@@ -6,7 +6,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func GetS3BucketRegistryItem() *schema.RegistryItem {
+func getS3BucketRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name: "aws_s3_bucket",
 		Notes: []string{

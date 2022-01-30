@@ -6,7 +6,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
+func getDynamoDBTableRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name: "aws_dynamodb_table",
 		Notes: []string{

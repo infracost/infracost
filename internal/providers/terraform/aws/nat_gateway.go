@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func GetNATGatewayRegistryItem() *schema.RegistryItem {
+func getNATGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_nat_gateway",
 		RFunc: NewNATGateway,
