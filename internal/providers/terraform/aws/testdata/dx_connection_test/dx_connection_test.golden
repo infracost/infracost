@@ -19,6 +19,3 @@
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
 
 Add cost estimates to your pull requests: https://infracost.io/cicd
-Logs:
-
-level=warning msg="Skipping resource aws_dx_connection.my_dx_connection_usage usage cost: Outbound data transfer. Could not find mapping for region does_not_exist"
