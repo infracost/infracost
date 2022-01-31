@@ -130,7 +130,7 @@ func (e *Evaluator) ExportOutputs() cty.Value {
 	return cty.ObjectVal(data)
 }
 
-func (e *Evaluator) EvaluateAll() ([]block.Module, error) {
+func (e *Evaluator) EvaluateAll() ([]*block.Module, error) {
 	var lastContext hcl.EvalContext
 	for i := 0; i < maxContextIterations; i++ {
 		e.evaluateStep(i)
@@ -170,7 +170,7 @@ func (e *Evaluator) EvaluateAll() ([]block.Module, error) {
 		}
 	}
 
-	var modules []block.Module
+	var modules []*block.Module
 	modules = append(modules, block.NewHCLModule(e.projectRootPath, e.modulePath, e.blocks))
 	for _, definition := range e.moduleDefinitions {
 		modules = append(modules, definition.Modules...)
@@ -183,20 +183,20 @@ func (e *Evaluator) expandBlocks(blocks block.Blocks) block.Blocks {
 	return e.expandDynamicBlocks(e.expandBlockForEaches(e.expandBlockCounts(blocks))...)
 }
 
-func (e *Evaluator) expandDynamicBlocks(blocks ...block.Block) block.Blocks {
+func (e *Evaluator) expandDynamicBlocks(blocks ...*block.Block) block.Blocks {
 	for _, b := range blocks {
 		e.expandDynamicBlock(b)
 	}
 	return blocks
 }
 
-func (e *Evaluator) expandDynamicBlock(b block.Block) {
+func (e *Evaluator) expandDynamicBlock(b *block.Block) {
 	for _, sub := range b.AllBlocks() {
 		e.expandDynamicBlock(sub)
 	}
 	for _, sub := range b.AllBlocks().OfType("dynamic") {
 		blockName := sub.TypeLabel()
-		expanded := e.expandBlockForEaches([]block.Block{sub})
+		expanded := e.expandBlockForEaches([]*block.Block{sub})
 		for _, ex := range expanded {
 			if content := ex.GetBlock("content"); content.IsNotNil() {
 				_ = e.expandDynamicBlocks(content)
@@ -265,7 +265,7 @@ func (e *Evaluator) expandBlockCounts(blocks block.Blocks) block.Blocks {
 	return countFiltered
 }
 
-func (e *Evaluator) copyVariables(from, to block.Block) {
+func (e *Evaluator) copyVariables(from, to *block.Block) {
 
 	var fromBase string
 	var fromRel string
@@ -292,7 +292,7 @@ func (e *Evaluator) copyVariables(from, to block.Block) {
 	e.ctx.Root().Set(srcValue, fromBase, toRel)
 }
 
-func (e *Evaluator) evaluateVariable(b block.Block) (cty.Value, error) {
+func (e *Evaluator) evaluateVariable(b *block.Block) (cty.Value, error) {
 	if b.Label() == "" {
 		return cty.NilVal, fmt.Errorf("empty label - cannot resolve")
 	}
@@ -311,7 +311,7 @@ func (e *Evaluator) evaluateVariable(b block.Block) (cty.Value, error) {
 	return cty.NilVal, fmt.Errorf("no value found")
 }
 
-func (e *Evaluator) evaluateOutput(b block.Block) (cty.Value, error) {
+func (e *Evaluator) evaluateOutput(b *block.Block) (cty.Value, error) {
 	if b.Label() == "" {
 		return cty.NilVal, fmt.Errorf("empty label - cannot resolve")
 	}

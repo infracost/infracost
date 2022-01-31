@@ -43,6 +43,10 @@ func TestBreakdownTerraformDirectory(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform"}, nil)
 }
 
+func TestBreakdownTerraformDirectoryWithModules(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraformwithmodules"}, nil)
+}
+
 func TestBreakdownTerraformFieldsAll(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--fields", "all"}, nil)
 }

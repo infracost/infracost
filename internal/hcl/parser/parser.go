@@ -63,7 +63,7 @@ func (parser *Parser) parseDirectoryFiles(files []*hcl.File) (block.Blocks, erro
 }
 
 // ParseDirectory parses all terraform files within a given directory
-func (parser *Parser) ParseDirectory() ([]block.Module, error) {
+func (parser *Parser) ParseDirectory() ([]*block.Module, error) {
 	log.Debug("Finding Terraform subdirectories...")
 	subdirectories, err := parser.getSubdirectories(parser.initialPath)
 	if err != nil {
