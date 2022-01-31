@@ -29,7 +29,7 @@ func (r *ComputeTargetGRPCProxy) BuildResource() *schema.Resource {
 		monthlyProxyInstances = decimalPtr(decimal.NewFromFloat(*r.MonthlyProxyInstances))
 	}
 
-	costComponents = append(costComponents, proxyInstanceCostComponent(region, monthlyProxyInstances))
+	costComponents = append(costComponents, r.proxyInstanceCostComponent(monthlyProxyInstances))
 
 	if r.MonthlyDataProcessedGB != nil {
 		monthlyDataProcessedGb = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataProcessedGB))
@@ -43,7 +43,7 @@ func (r *ComputeTargetGRPCProxy) BuildResource() *schema.Resource {
 	}
 }
 
-func proxyInstanceCostComponent(region string, quantity *decimal.Decimal) *schema.CostComponent {
+func (r *ComputeTargetGRPCProxy) proxyInstanceCostComponent(quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Proxy instance",
 		Unit:            "hours",
@@ -51,7 +51,7 @@ func proxyInstanceCostComponent(region string, quantity *decimal.Decimal) *schem
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{

@@ -22,8 +22,6 @@ func (r *ComputeAddress) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *ComputeAddress) BuildResource() *schema.Resource {
-	region := r.Region
-
 	addressType := r.AddressType
 	if strings.ToLower(addressType) == "internal" {
 		return &schema.Resource{
@@ -36,14 +34,14 @@ func (r *ComputeAddress) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
-			standardVMComputeAddress(),
-			preemptibleVMComputeAddress(),
-			unusedVMComputeAddress(region),
+			r.standardVMComputeAddress(),
+			r.preemptibleVMComputeAddress(),
+			r.unusedVMComputeAddress(),
 		}, UsageSchema: ComputeAddressUsageSchema,
 	}
 }
 
-func standardVMComputeAddress() *schema.CostComponent {
+func (r *ComputeAddress) standardVMComputeAddress() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "IP address (if used by standard VM)",
 		Unit:           "hours",
@@ -64,7 +62,7 @@ func standardVMComputeAddress() *schema.CostComponent {
 	}
 }
 
-func preemptibleVMComputeAddress() *schema.CostComponent {
+func (r *ComputeAddress) preemptibleVMComputeAddress() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "IP address (if used by preemptible VM)",
 		Unit:           "hours",
@@ -85,7 +83,7 @@ func preemptibleVMComputeAddress() *schema.CostComponent {
 	}
 }
 
-func unusedVMComputeAddress(region string) *schema.CostComponent {
+func (r *ComputeAddress) unusedVMComputeAddress() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "IP address (if unused)",
 		Unit:           "hours",
@@ -93,7 +91,7 @@ func unusedVMComputeAddress(region string) *schema.CostComponent {
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{

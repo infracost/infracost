@@ -12,13 +12,7 @@ func getKMSCryptoKeyRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewKMSCryptoKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.KMSCryptoKey{Address: d.Address, Region: d.Get("region").String(), VersionTemplate0Algorithm: d.Get("version_template.0.algorithm").String(), VersionTemplate0ProtectionLevel: d.Get("version_template.0.protection_level").String()}
-	if !d.IsEmpty("rotation_period") {
-		r.RotationPeriod = d.Get("rotation_period").String()
-	}
-	if !d.IsEmpty("version_template") {
-		r.VersionTemplate = d.Get("version_template").String()
-	}
+	r := &google.KMSCryptoKey{Address: d.Address, Region: d.Get("region").String(), Algorithm: d.Get("version_template.0.algorithm").String(), ProtectionLevel: d.Get("version_template.0.protection_level").String(), RotationPeriod: d.Get("rotation_period").String(), VersionTemplate: d.Get("version_template").String()}
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

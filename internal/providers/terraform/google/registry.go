@@ -26,7 +26,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getComputeTargetGRPCProxyRegistryItem(),
 	getComputeTargetHTTPProxyRegistryItem(),
 	getComputeTargetHTTPSProxyRegistryItem(),
-	getComputeTargetSslProxyRegistryItem(),
+	getComputeTargetSSLProxyRegistryItem(),
 	getComputeTargetTCPProxyRegistryItem(),
 	GetComputeVPNGatewayRegistryItem(),
 	getComputeVPNTunnelRegistryItem(),

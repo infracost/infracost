@@ -26,7 +26,7 @@ func getComputeTargetHTTPSProxyRegistryItem() *schema.RegistryItem {
 		Notes: []string{"Price for additional forwarding rule is used"},
 	}
 }
-func getComputeTargetSslProxyRegistryItem() *schema.RegistryItem {
+func getComputeTargetSSLProxyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_compute_target_ssl_proxy",
 		RFunc: NewComputeTargetGRPCProxy,

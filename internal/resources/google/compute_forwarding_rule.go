@@ -24,7 +24,7 @@ func (r *ComputeForwardingRule) BuildResource() *schema.Resource {
 	region := r.Region
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, computeForwardingCostComponent(region))
+	costComponents = append(costComponents, r.computeForwardingCostComponent())
 
 	if r.MonthlyIngressDataGB != nil {
 		monthlyIngressDataGb = decimalPtr(decimal.NewFromFloat(*r.MonthlyIngressDataGB))
@@ -38,7 +38,7 @@ func (r *ComputeForwardingRule) BuildResource() *schema.Resource {
 	}
 }
 
-func computeForwardingCostComponent(region string) *schema.CostComponent {
+func (r *ComputeForwardingRule) computeForwardingCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "Forwarding rules",
 		Unit:           "hours",
@@ -46,7 +46,7 @@ func computeForwardingCostComponent(region string) *schema.CostComponent {
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{

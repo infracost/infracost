@@ -13,14 +13,14 @@ import (
 )
 
 type KMSCryptoKey struct {
-	Address                         string
-	Region                          string
-	VersionTemplate                 string
-	VersionTemplate0Algorithm       string
-	VersionTemplate0ProtectionLevel string
-	RotationPeriod                  string
-	KeyVersions                     *int64 `infracost_usage:"key_versions"`
-	MonthlyKeyOperations            *int64 `infracost_usage:"monthly_key_operations"`
+	Address              string
+	Region               string
+	VersionTemplate      string
+	Algorithm            string
+	ProtectionLevel      string
+	RotationPeriod       string
+	KeyVersions          *int64 `infracost_usage:"key_versions"`
+	MonthlyKeyOperations *int64 `infracost_usage:"monthly_key_operations"`
 }
 
 var KMSCryptoKeyUsageSchema = []*schema.UsageItem{{Key: "key_versions", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_key_operations", ValueType: schema.Int64, DefaultValue: 0}}
@@ -36,16 +36,15 @@ func (r *KMSCryptoKey) BuildResource() *schema.Resource {
 	protectionLevel := "SOFTWARE"
 
 	if r.VersionTemplate != "" {
-		algorithm = r.VersionTemplate0Algorithm
-		protectionLevel = r.VersionTemplate0ProtectionLevel
+		algorithm = r.Algorithm
+		protectionLevel = r.ProtectionLevel
 	}
 
 	var monthlyKeys *decimal.Decimal
 	if r.KeyVersions != nil {
 		monthlyKeys = decimalPtr(decimal.NewFromInt(*r.KeyVersions))
 	} else if r.RotationPeriod != "" {
-		rotationPeriod := (r.RotationPeriod)
-		rotation, err := strconv.ParseFloat(strings.Split(rotationPeriod, "s")[0], 64)
+		rotation, err := strconv.ParseFloat(strings.Split(r.RotationPeriod, "s")[0], 64)
 
 		if err == nil {
 			monthlyKeys = decimalPtr(decimal.NewFromFloat(2592000.0 / rotation))
@@ -57,7 +56,7 @@ func (r *KMSCryptoKey) BuildResource() *schema.Resource {
 		monthlyKeyOperations = decimalPtr(decimal.NewFromInt(*r.MonthlyKeyOperations))
 	}
 
-	var keyDescript = cryptoKeyDescription(algorithm, protectionLevel)
+	var keyDescript = r.cryptoKeyDescription(algorithm, protectionLevel)
 	var operationDesctipt = keyOperationsDescription(algorithm, protectionLevel)
 
 	costComponents := []*schema.CostComponent{}
@@ -90,7 +89,7 @@ func (r *KMSCryptoKey) BuildResource() *schema.Resource {
 			},
 		})
 
-		if tiers != nil && tiers[1].GreaterThan(decimal.NewFromInt(0)) {
+		if len(tiers) > 1 && tiers[1].GreaterThan(decimal.NewFromInt(0)) {
 
 			costComponents = append(costComponents, &schema.CostComponent{
 				Name:            "Key versions (over 2K)",
@@ -151,7 +150,7 @@ func (r *KMSCryptoKey) BuildResource() *schema.Resource {
 	}
 }
 
-func cryptoKeyDescription(algorithm string, protectionLevel string) string {
+func (r *KMSCryptoKey) cryptoKeyDescription(algorithm string, protectionLevel string) string {
 	protectionLevel = strings.ToLower(protectionLevel)
 	switch protectionLevel {
 	case "software":
