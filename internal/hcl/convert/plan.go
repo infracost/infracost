@@ -9,7 +9,7 @@ import (
 	"github.com/infracost/infracost/internal/hcl/block"
 )
 
-func ModulesToPlanJSON(modules []block.Module) PlanSchema {
+func ModulesToPlanJSON(modules []*block.Module) PlanSchema {
 	sch := PlanSchema{
 		FormatVersion:    "1.0",
 		TerraformVersion: "1.1.0",

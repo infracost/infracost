@@ -12,94 +12,51 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 )
 
-type Attribute interface {
-	IsLiteral() bool
-	Type() cty.Type
-	Value() cty.Value
-	Range() Range
-	Name() string
-	Contains(checkValue interface{}, equalityOptions ...EqualityOption) bool
-	NotContains(checkValue interface{}, equalityOptions ...EqualityOption) bool
-	HasIntersect(checkValues ...interface{}) bool
-	StartsWith(prefix interface{}) bool
-	EndsWith(suffix interface{}) bool
-	Equals(checkValue interface{}, equalityOptions ...EqualityOption) bool
-	NotEqual(checkValue interface{}, equalityOptions ...EqualityOption) bool
-	RegexMatches(pattern interface{}) bool
-	IsAny(options ...interface{}) bool
-	IsNotAny(options ...interface{}) bool
-	IsNone(options ...interface{}) bool
-	IsTrue() bool
-	IsFalse() bool
-	IsEmpty() bool
-	IsNotEmpty() bool
-	IsNil() bool
-	IsNotNil() bool
-	MapValue(mapKey string) cty.Value
-	LessThan(checkValue interface{}) bool
-	LessThanOrEqualTo(checkValue interface{}) bool
-	GreaterThan(checkValue interface{}) bool
-	GreaterThanOrEqualTo(checkValue interface{}) bool
-	IsDataBlockReference() bool
-	Reference() (*Reference, error)
-	AllReferences() []*Reference
-	IsResourceBlockReference(resourceType string) bool
-	ReferencesBlock(b Block) bool
-	IsResolvable() bool
-	IsNotResolvable() bool
-	IsString() bool
-	IsNumber() bool
-	IsBool() bool
-	ValueAsStrings() []string
-	IsIterable() bool
-	Each(f func(key cty.Value, val cty.Value))
-}
-
-type HCLAttribute struct {
+type Attribute struct {
 	hclAttribute *hcl.Attribute
 	ctx          *Context
 }
 
-func NewHCLAttribute(attr *hcl.Attribute, ctx *Context) *HCLAttribute {
-	return &HCLAttribute{
+func NewHCLAttribute(attr *hcl.Attribute, ctx *Context) *Attribute {
+	return &Attribute{
 		hclAttribute: attr,
 		ctx:          ctx,
 	}
 }
 
-func (attr *HCLAttribute) IsLiteral() bool {
+func (attr *Attribute) IsLiteral() bool {
 	if attr == nil {
 		return false
 	}
 	return len(attr.hclAttribute.Expr.Variables()) == 0
 }
 
-func (attr *HCLAttribute) IsResolvable() bool {
+func (attr *Attribute) IsResolvable() bool {
 	if attr == nil {
 		return false
 	}
 	return attr.Value() != cty.NilVal && attr.Value().IsKnown()
 }
 
-func (attr *HCLAttribute) IsNotResolvable() bool {
+func (attr *Attribute) IsNotResolvable() bool {
 	return !attr.IsResolvable()
 }
 
-func (attr *HCLAttribute) Type() cty.Type {
+func (attr *Attribute) Type() cty.Type {
 	if attr == nil {
 		return cty.NilType
 	}
 	return attr.Value().Type()
 }
 
-func (attr *HCLAttribute) IsIterable() bool {
+func (attr *Attribute) IsIterable() bool {
 	if attr == nil {
 		return false
 	}
 	return attr.Value().Type().IsCollectionType() || attr.Value().Type().IsObjectType() || attr.Value().Type().IsMapType() || attr.Value().Type().IsListType() || attr.Value().Type().IsSetType() || attr.Value().Type().IsTupleType()
 }
 
-func (attr *HCLAttribute) Each(f func(key cty.Value, val cty.Value)) {
+func (attr *Attribute) Each(f func(key cty.Value, val cty.Value)) {
 	if attr == nil {
 		return
 	}
@@ -110,28 +67,28 @@ func (attr *HCLAttribute) Each(f func(key cty.Value, val cty.Value)) {
 	})
 }
 
-func (attr *HCLAttribute) IsString() bool {
+func (attr *Attribute) IsString() bool {
 	if attr == nil {
 		return false
 	}
 	return !attr.Value().IsNull() && attr.Value().IsKnown() && attr.Value().Type() == cty.String
 }
 
-func (attr *HCLAttribute) IsNumber() bool {
+func (attr *Attribute) IsNumber() bool {
 	if attr == nil {
 		return false
 	}
 	return !attr.Value().IsNull() && attr.Value().IsKnown() && attr.Value().Type() == cty.Number
 }
 
-func (attr *HCLAttribute) IsBool() bool {
+func (attr *Attribute) IsBool() bool {
 	if attr == nil {
 		return false
 	}
 	return !attr.Value().IsNull() && attr.Value().IsKnown() && attr.Value().Type() == cty.Bool
 }
 
-func (attr *HCLAttribute) Value() (ctyVal cty.Value) {
+func (attr *Attribute) Value() (ctyVal cty.Value) {
 	if attr == nil {
 		return cty.NilVal
 	}
@@ -147,7 +104,7 @@ func (attr *HCLAttribute) Value() (ctyVal cty.Value) {
 	return ctyVal
 }
 
-func (attr *HCLAttribute) Range() Range {
+func (attr *Attribute) Range() Range {
 	if attr == nil {
 		return Range{}
 	}
@@ -158,14 +115,14 @@ func (attr *HCLAttribute) Range() Range {
 	}
 }
 
-func (attr *HCLAttribute) Name() string {
+func (attr *Attribute) Name() string {
 	if attr == nil {
 		return ""
 	}
 	return attr.hclAttribute.Name
 }
 
-func (attr *HCLAttribute) ValueAsStrings() (strings []string) {
+func (attr *Attribute) ValueAsStrings() (strings []string) {
 	if attr == nil {
 		return strings
 	}
@@ -204,7 +161,7 @@ func getStrings(expr hcl.Expression, ctx *hcl.EvalContext) []string {
 	return results
 }
 
-func (attr *HCLAttribute) listContains(val cty.Value, stringToLookFor string, ignoreCase bool) bool {
+func (attr *Attribute) listContains(val cty.Value, stringToLookFor string, ignoreCase bool) bool {
 	if attr == nil {
 		return false
 	}
@@ -232,7 +189,7 @@ func (attr *HCLAttribute) listContains(val cty.Value, stringToLookFor string, ig
 	return false
 }
 
-func (attr *HCLAttribute) mapContains(checkValue interface{}, val cty.Value) bool {
+func (attr *Attribute) mapContains(checkValue interface{}, val cty.Value) bool {
 	if attr == nil {
 		return false
 	}
@@ -268,11 +225,11 @@ func (attr *HCLAttribute) mapContains(checkValue interface{}, val cty.Value) boo
 	}
 }
 
-func (attr *HCLAttribute) NotContains(checkValue interface{}, equalityOptions ...EqualityOption) bool {
+func (attr *Attribute) NotContains(checkValue interface{}, equalityOptions ...EqualityOption) bool {
 	return !attr.Contains(checkValue, equalityOptions...)
 }
 
-func (attr *HCLAttribute) Contains(checkValue interface{}, equalityOptions ...EqualityOption) bool {
+func (attr *Attribute) Contains(checkValue interface{}, equalityOptions ...EqualityOption) bool {
 	if attr == nil {
 		return false
 	}
@@ -308,7 +265,7 @@ func containsIgnoreCase(left, substring string) bool {
 	return strings.Contains(strings.ToLower(left), strings.ToLower(substring))
 }
 
-func (attr *HCLAttribute) StartsWith(prefix interface{}) bool {
+func (attr *Attribute) StartsWith(prefix interface{}) bool {
 	if attr == nil {
 		return false
 	}
@@ -318,7 +275,7 @@ func (attr *HCLAttribute) StartsWith(prefix interface{}) bool {
 	return false
 }
 
-func (attr *HCLAttribute) EndsWith(suffix interface{}) bool {
+func (attr *Attribute) EndsWith(suffix interface{}) bool {
 	if attr == nil {
 		return false
 	}
@@ -334,7 +291,7 @@ const (
 	IgnoreCase EqualityOption = iota
 )
 
-func (attr *HCLAttribute) Equals(checkValue interface{}, equalityOptions ...EqualityOption) bool {
+func (attr *Attribute) Equals(checkValue interface{}, equalityOptions ...EqualityOption) bool {
 	if attr == nil {
 		return false
 	}
@@ -362,11 +319,11 @@ func (attr *HCLAttribute) Equals(checkValue interface{}, equalityOptions ...Equa
 	return false
 }
 
-func (attr *HCLAttribute) NotEqual(checkValue interface{}, equalityOptions ...EqualityOption) bool {
+func (attr *Attribute) NotEqual(checkValue interface{}, equalityOptions ...EqualityOption) bool {
 	return !attr.Equals(checkValue, equalityOptions...)
 }
 
-func (attr *HCLAttribute) RegexMatches(pattern interface{}) bool {
+func (attr *Attribute) RegexMatches(pattern interface{}) bool {
 	if attr == nil {
 		return false
 	}
@@ -383,11 +340,11 @@ func (attr *HCLAttribute) RegexMatches(pattern interface{}) bool {
 	return false
 }
 
-func (attr *HCLAttribute) IsNotAny(options ...interface{}) bool {
+func (attr *Attribute) IsNotAny(options ...interface{}) bool {
 	return !attr.IsAny(options...)
 }
 
-func (attr *HCLAttribute) IsAny(options ...interface{}) bool {
+func (attr *Attribute) IsAny(options ...interface{}) bool {
 	if attr == nil {
 		return false
 	}
@@ -424,7 +381,7 @@ func (attr *HCLAttribute) IsAny(options ...interface{}) bool {
 	return false
 }
 
-func (attr *HCLAttribute) IsNone(options ...interface{}) bool {
+func (attr *Attribute) IsNone(options ...interface{}) bool {
 	if attr == nil {
 		return false
 	}
@@ -452,7 +409,7 @@ func (attr *HCLAttribute) IsNone(options ...interface{}) bool {
 	return true
 }
 
-func (attr *HCLAttribute) IsTrue() bool {
+func (attr *Attribute) IsTrue() bool {
 	if attr == nil {
 		return false
 	}
@@ -471,7 +428,7 @@ func (attr *HCLAttribute) IsTrue() bool {
 	return false
 }
 
-func (attr *HCLAttribute) IsFalse() bool {
+func (attr *Attribute) IsFalse() bool {
 	if attr == nil {
 		return false
 	}
@@ -486,7 +443,7 @@ func (attr *HCLAttribute) IsFalse() bool {
 	return false
 }
 
-func (attr *HCLAttribute) IsEmpty() bool {
+func (attr *Attribute) IsEmpty() bool {
 	if attr == nil {
 		return false
 	}
@@ -509,11 +466,11 @@ func (attr *HCLAttribute) IsEmpty() bool {
 	return true
 }
 
-func (attr *HCLAttribute) IsNotEmpty() bool {
+func (attr *Attribute) IsNotEmpty() bool {
 	return !attr.IsEmpty()
 }
 
-func (attr *HCLAttribute) isNullAttributeEmpty() bool {
+func (attr *Attribute) isNullAttributeEmpty() bool {
 	if attr == nil {
 		return false
 	}
@@ -537,7 +494,7 @@ func (attr *HCLAttribute) isNullAttributeEmpty() bool {
 	return true
 }
 
-func (attr *HCLAttribute) MapValue(mapKey string) cty.Value {
+func (attr *Attribute) MapValue(mapKey string) cty.Value {
 	if attr == nil {
 		return cty.NilVal
 	}
@@ -552,7 +509,7 @@ func (attr *HCLAttribute) MapValue(mapKey string) cty.Value {
 	return cty.NilVal
 }
 
-func (attr *HCLAttribute) LessThan(checkValue interface{}) bool {
+func (attr *Attribute) LessThan(checkValue interface{}) bool {
 	if attr == nil {
 		return false
 	}
@@ -568,7 +525,7 @@ func (attr *HCLAttribute) LessThan(checkValue interface{}) bool {
 	return false
 }
 
-func (attr *HCLAttribute) LessThanOrEqualTo(checkValue interface{}) bool {
+func (attr *Attribute) LessThanOrEqualTo(checkValue interface{}) bool {
 	if attr == nil {
 		return false
 	}
@@ -584,7 +541,7 @@ func (attr *HCLAttribute) LessThanOrEqualTo(checkValue interface{}) bool {
 	return false
 }
 
-func (attr *HCLAttribute) GreaterThan(checkValue interface{}) bool {
+func (attr *Attribute) GreaterThan(checkValue interface{}) bool {
 	if attr == nil {
 		return false
 	}
@@ -600,7 +557,7 @@ func (attr *HCLAttribute) GreaterThan(checkValue interface{}) bool {
 	return false
 }
 
-func (attr *HCLAttribute) GreaterThanOrEqualTo(checkValue interface{}) bool {
+func (attr *Attribute) GreaterThanOrEqualTo(checkValue interface{}) bool {
 	if attr == nil {
 		return false
 	}
@@ -616,7 +573,7 @@ func (attr *HCLAttribute) GreaterThanOrEqualTo(checkValue interface{}) bool {
 	return false
 }
 
-func (attr *HCLAttribute) IsDataBlockReference() bool {
+func (attr *Attribute) IsDataBlockReference() bool {
 	if attr == nil {
 		return false
 	}
@@ -663,7 +620,7 @@ func getIndexValue(part hcl.TraverseIndex) string {
 	}
 }
 
-func (attr *HCLAttribute) Reference() (*Reference, error) {
+func (attr *Attribute) Reference() (*Reference, error) {
 	if attr == nil {
 		return nil, fmt.Errorf("attribute is nil")
 	}
@@ -694,7 +651,7 @@ func (attr *HCLAttribute) Reference() (*Reference, error) {
 	}
 }
 
-func (attr *HCLAttribute) AllReferences() []*Reference {
+func (attr *Attribute) AllReferences() []*Reference {
 	if attr == nil {
 		return nil
 	}
@@ -708,7 +665,7 @@ func (attr *HCLAttribute) AllReferences() []*Reference {
 	return refs
 }
 
-func (attr *HCLAttribute) referencesInTemplate() []*Reference {
+func (attr *Attribute) referencesInTemplate() []*Reference {
 	if attr == nil {
 		return nil
 	}
@@ -731,7 +688,7 @@ func (attr *HCLAttribute) referencesInTemplate() []*Reference {
 	return refs
 }
 
-func (attr *HCLAttribute) referencesInConditional() []*Reference {
+func (attr *Attribute) referencesInConditional() []*Reference {
 	if attr == nil {
 		return nil
 	}
@@ -750,7 +707,7 @@ func (attr *HCLAttribute) referencesInConditional() []*Reference {
 	return refs
 }
 
-func (attr *HCLAttribute) IsResourceBlockReference(resourceType string) bool {
+func (attr *Attribute) IsResourceBlockReference(resourceType string) bool {
 	if attr == nil {
 		return false
 	}
@@ -761,7 +718,7 @@ func (attr *HCLAttribute) IsResourceBlockReference(resourceType string) bool {
 	return false
 }
 
-func (attr *HCLAttribute) ReferencesBlock(b Block) bool {
+func (attr *Attribute) ReferencesBlock(b *Block) bool {
 	if attr == nil {
 		return false
 	}
@@ -788,15 +745,15 @@ func getRawValue(value cty.Value) interface{} {
 	return value
 }
 
-func (attr *HCLAttribute) IsNil() bool {
+func (attr *Attribute) IsNil() bool {
 	return attr == nil
 }
 
-func (attr *HCLAttribute) IsNotNil() bool {
+func (attr *Attribute) IsNotNil() bool {
 	return !attr.IsNil()
 }
 
-func (attr *HCLAttribute) HasIntersect(checkValues ...interface{}) bool {
+func (attr *Attribute) HasIntersect(checkValues ...interface{}) bool {
 	if !attr.Type().IsListType() && !attr.Type().IsTupleType() {
 		return false
 	}

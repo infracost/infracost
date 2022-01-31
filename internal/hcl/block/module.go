@@ -5,35 +5,25 @@ import (
 	"strings"
 )
 
-type Module interface {
-	GetBlocks() Blocks
-	GetResourcesByType(label string) Blocks
-	GetDatasByType(label string) Blocks
-	GetProviderBlocksByProvider(providerName string, alias string) Blocks
-	GetReferencedBlock(referringAttr Attribute) (Block, error)
-	GetReferencingResources(originalBlock Block, referencingLabel string, referencingAttributeName string) (Blocks, error)
-	GetsModulesBySource(moduleSource string) (Blocks, error)
-}
-
-type HCLModule struct {
+type Module struct {
 	blocks     Blocks
 	rootPath   string
 	modulePath string
 }
 
-func NewHCLModule(rootPath string, modulePath string, blocks Blocks) *HCLModule {
-	return &HCLModule{
+func NewHCLModule(rootPath string, modulePath string, blocks Blocks) *Module {
+	return &Module{
 		blocks:     blocks,
 		rootPath:   rootPath,
 		modulePath: modulePath,
 	}
 }
 
-func (c *HCLModule) GetBlocks() Blocks {
+func (c *Module) GetBlocks() Blocks {
 	return c.blocks
 }
 
-func (c *HCLModule) getBlocksByType(blockType string, label string) Blocks {
+func (c *Module) getBlocksByType(blockType string, label string) Blocks {
 	var results Blocks
 	for _, block := range c.blocks {
 		if block.Type() == blockType && len(block.Labels()) > 0 && block.TypeLabel() == label {
@@ -43,7 +33,7 @@ func (c *HCLModule) getBlocksByType(blockType string, label string) Blocks {
 	return results
 }
 
-func (c *HCLModule) getModuleBlocks() Blocks {
+func (c *Module) getModuleBlocks() Blocks {
 	var results Blocks
 	for _, block := range c.blocks {
 		if block.Type() == "module" {
@@ -53,15 +43,15 @@ func (c *HCLModule) getModuleBlocks() Blocks {
 	return results
 }
 
-func (c *HCLModule) GetResourcesByType(label string) Blocks {
+func (c *Module) GetResourcesByType(label string) Blocks {
 	return c.getBlocksByType("resource", label)
 }
 
-func (c *HCLModule) GetDatasByType(label string) Blocks {
+func (c *Module) GetDatasByType(label string) Blocks {
 	return c.getBlocksByType("data", label)
 }
 
-func (c *HCLModule) GetProviderBlocksByProvider(providerName string, alias string) Blocks {
+func (c *Module) GetProviderBlocksByProvider(providerName string, alias string) Blocks {
 	var results Blocks
 	for _, block := range c.blocks {
 		if block.Type() == "provider" && len(block.Labels()) > 0 && block.TypeLabel() == providerName {
@@ -78,7 +68,7 @@ func (c *HCLModule) GetProviderBlocksByProvider(providerName string, alias strin
 	return results
 }
 
-func (c *HCLModule) GetReferencedBlock(referringAttr Attribute) (Block, error) {
+func (c *Module) GetReferencedBlock(referringAttr *Attribute) (*Block, error) {
 	for _, ref := range referringAttr.AllReferences() {
 		for _, block := range c.blocks {
 			if ref.RefersTo(block) {
@@ -89,11 +79,11 @@ func (c *HCLModule) GetReferencedBlock(referringAttr Attribute) (Block, error) {
 	return nil, fmt.Errorf("no referenced block found in '%s'", referringAttr.Name())
 }
 
-func (c *HCLModule) GetReferencingResources(originalBlock Block, referencingLabel string, referencingAttributeName string) (Blocks, error) {
+func (c *Module) GetReferencingResources(originalBlock *Block, referencingLabel string, referencingAttributeName string) (Blocks, error) {
 	return c.getReferencingBlocks(originalBlock, "resource", referencingLabel, referencingAttributeName)
 }
 
-func (c *HCLModule) GetsModulesBySource(moduleSource string) (Blocks, error) {
+func (c *Module) GetsModulesBySource(moduleSource string) (Blocks, error) {
 	var results Blocks
 
 	modules := c.getModuleBlocks()
@@ -105,7 +95,7 @@ func (c *HCLModule) GetsModulesBySource(moduleSource string) (Blocks, error) {
 	return results, nil
 }
 
-func (c *HCLModule) getReferencingBlocks(originalBlock Block, referencingType string, referencingLabel string, referencingAttributeName string) (Blocks, error) {
+func (c *Module) getReferencingBlocks(originalBlock *Block, referencingType string, referencingLabel string, referencingAttributeName string) (Blocks, error) {
 	blocks := c.getBlocksByType(referencingType, referencingLabel)
 	var results Blocks
 	for _, block := range blocks {

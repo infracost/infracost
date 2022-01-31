@@ -16,13 +16,12 @@ import (
 type ModuleDefinition struct {
 	Name       string
 	Path       string
-	Definition block.Block
-	Modules    []block.Module
+	Definition *block.Block
+	Modules    []*block.Module
 }
 
 // LoadModules reads all module blocks and loads the underlying modules, adding blocks to e.moduleBlocks
 func (e *Evaluator) loadModules(stopOnHCLError bool) []*ModuleDefinition {
-
 	blocks := e.blocks
 
 	var moduleDefinitions []*ModuleDefinition
@@ -45,7 +44,7 @@ func (e *Evaluator) loadModules(stopOnHCLError bool) []*ModuleDefinition {
 }
 
 // takes in a module "x" {} block and loads resources etc. into e.moduleBlocks - additionally returns variables to add to ["module.x.*"] variables
-func (e *Evaluator) loadModule(b block.Block, stopOnHCLError bool) (*ModuleDefinition, error) {
+func (e *Evaluator) loadModule(b *block.Block, stopOnHCLError bool) (*ModuleDefinition, error) {
 
 	if b.Label() == "" {
 		return nil, fmt.Errorf("module without label at %s", b.Range())
@@ -102,11 +101,11 @@ func (e *Evaluator) loadModule(b block.Block, stopOnHCLError bool) (*ModuleDefin
 		Name:       b.Label(),
 		Path:       modulePath,
 		Definition: b,
-		Modules:    []block.Module{block.NewHCLModule(e.projectRootPath, modulePath, blocks)},
+		Modules:    []*block.Module{block.NewHCLModule(e.projectRootPath, modulePath, blocks)},
 	}, nil
 }
 
-func getModuleBlocks(b block.Block, modulePath string, blocks *block.Blocks, stopOnHCLError bool) error {
+func getModuleBlocks(b *block.Block, modulePath string, blocks *block.Blocks, stopOnHCLError bool) error {
 	moduleFiles, err := LoadDirectory(modulePath, stopOnHCLError)
 	if err != nil {
 		return fmt.Errorf("failed to load module %s: %w", b.Label(), err)
