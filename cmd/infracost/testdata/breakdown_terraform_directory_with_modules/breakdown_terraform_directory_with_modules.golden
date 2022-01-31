@@ -1,0 +1,52 @@
+Project: infracost/infracost/examples/terraformwithmodules
+
+ Name                                                           Monthly Qty  Unit                        Monthly Cost 
+                                                                                                                      
+ aws_instance.web_app                                                                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64 
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                                50  GB                                 $5.00 
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00 
+    └─ Provisioned IOPS                                                 800  IOPS                              $52.00 
+                                                                                                                      
+ aws_lambda_function.hello_world                                                                                      
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
+ └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+                                                                                                                      
+ module.big_app.aws_instance.web_app                                                                                  
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.8xlarge)                  730  hours                          $1,121.28 
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                                50  GB                                 $5.00 
+ └─ ebs_block_device[0]                                                                                               
+    └─ Storage (general purpose SSD, gp2)                             1,000  GB                               $100.00 
+                                                                                                                      
+ module.big_app_gp2.aws_instance.web_app                                                                              
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.8xlarge)                  730  hours                          $1,121.28 
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                                50  GB                                 $5.00 
+ └─ ebs_block_device[0]                                                                                               
+    └─ Storage (general purpose SSD, gp2)                             1,000  GB                               $100.00 
+                                                                                                                      
+ module.small_app.aws_instance.web_app                                                                                
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64 
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                                50  GB                                 $5.00 
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00 
+    └─ Provisioned IOPS                                                 800  IOPS                              $52.00 
+                                                                                                                      
+ module.small_app_gp2.aws_instance.web_app                                                                            
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64 
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                                50  GB                                 $5.00 
+ └─ ebs_block_device[0]                                                                                               
+    └─ Storage (general purpose SSD, gp2)                             1,000  GB                               $100.00 
+                                                                                                                      
+ OVERALL TOTAL                                                                                              $4,603.48 
+──────────────────────────────────
+6 cloud resources were detected, rerun with --show-skipped to see details:
+∙ 6 were estimated, 6 include usage-based costs, see https://infracost.io/usage-file
+
+Err:
+

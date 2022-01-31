@@ -95,7 +95,7 @@ func (r *Reference) String() string {
 	return base
 }
 
-func (r *Reference) RefersTo(b Block) bool {
+func (r *Reference) RefersTo(b *Block) bool {
 	if r.BlockType() != b.Reference().BlockType() {
 		return false
 	}
