@@ -16,3 +16,5 @@
 ∙ 3 were free:
   ∙ 2 x azurerm_app_service_custom_hostname_binding
   ∙ 1 x azurerm_resource_group
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

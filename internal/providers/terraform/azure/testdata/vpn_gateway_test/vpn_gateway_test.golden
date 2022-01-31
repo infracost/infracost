@@ -15,3 +15,5 @@
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_virtual_hub
   ∙ 1 x azurerm_virtual_wan
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

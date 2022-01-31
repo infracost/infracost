@@ -26,3 +26,5 @@
 ∙ 2 were free:
   ∙ 1 x aws_waf_ipset
   ∙ 1 x aws_waf_rule
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

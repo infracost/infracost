@@ -20,13 +20,13 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 		Use:   "github",
 		Short: "Post an Infracost comment to GitHub",
 		Long:  "Post an Infracost comment to GitHub",
-		Example: `  Update a comment on a pull request:
+		Example: `  Update comment on a pull request:
 
-      infracost comment github --repo my-org/my-github-repo --pull-request 3 --path infracost.json --github-token $GITHUB_TOKEN
+      infracost comment github --repo my-org/my-repo --pull-request 3 --path infracost.json --github-token $GITHUB_TOKEN
 
   Post a new comment to a commit:
 
-      infracost comment github --repo my-org/my-github-repo --commit 2ca7182 --path infracost.json --behavior hide-and-new --github-token $GITHUB_TOKEN`,
+      infracost comment github --repo my-org/my-repo --commit 2ca7182 --path infracost.json --behavior hide-and-new --github-token $GITHUB_TOKEN`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx.SetContextValue("platform", "github")
@@ -107,26 +107,26 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String("behavior", "update", `Behavior when posting the comment, one of:
-  update (default)  Update the latest comment
+	cmd.Flags().String("behavior", "update", `Behavior when posting comment, one of:
+  update (default)  Update latest comment
   new               Create a new comment
   hide-and-new      Hide previous matching comments and create a new comment
   delete-and-new    Delete previous matching comments and create a new comment`)
 	_ = cmd.RegisterFlagCompletionFunc("behavior", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return validCommentGitHubBehaviors, cobra.ShellCompDirectiveDefault
 	})
-	cmd.Flags().String("commit", "", "Commit SHA to post/get the comment, mutually exclusive with pull-request")
-	cmd.Flags().String("github-api-url", "https://api.github.com", "GitHub API URL, defaults to https://api.github.com")
+	cmd.Flags().String("commit", "", "Commit SHA to post comment on, mutually exclusive with pull-request")
+	cmd.Flags().String("github-api-url", "https://api.github.com", "GitHub API URL")
 	cmd.Flags().String("github-token", "", "GitHub token")
 	_ = cmd.MarkFlagRequired("github-token")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
-	cmd.Flags().Int("pull-request", 0, "Pull request number to post the comment on, mutually exclusive with commit")
-	cmd.Flags().String("repo", "", "Repository in the format owner/repo")
+	cmd.Flags().Int("pull-request", 0, "Pull request number to post comment on, mutually exclusive with commit")
+	cmd.Flags().String("repo", "", "Repository in format owner/repo")
 	_ = cmd.MarkFlagRequired("repo")
-	cmd.Flags().String("tag", "", "Customize the embedded tag that is used for detecting comments posted by Infracost")
-	cmd.Flags().Bool("dry-run", false, "Generate the comment without actually posting to GitHub.")
+	cmd.Flags().String("tag", "", "Customize hidden markdown tag used to detect comments posted by Infracost")
+	cmd.Flags().Bool("dry-run", false, "Generate comment without actually posting to GitHub")
 
 	return cmd
 }

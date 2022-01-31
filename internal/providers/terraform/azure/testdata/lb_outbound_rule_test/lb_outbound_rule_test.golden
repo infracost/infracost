@@ -15,3 +15,5 @@
   ∙ 1 x azurerm_lb
   ∙ 1 x azurerm_lb_backend_address_pool
   ∙ 1 x azurerm_resource_group
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

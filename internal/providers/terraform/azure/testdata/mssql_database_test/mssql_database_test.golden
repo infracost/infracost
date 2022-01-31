@@ -75,6 +75,8 @@
 ∙ 2 were free:
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_sql_server
+
+Add cost estimates to your pull requests: https://infracost.io/cicd
 Logs:
 
 level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, BC_Gen5_8)' due to limitations in the Azure API."

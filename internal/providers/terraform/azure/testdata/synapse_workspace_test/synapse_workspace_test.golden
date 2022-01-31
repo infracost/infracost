@@ -70,3 +70,5 @@
 ∙ 2 were free:
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_storage_data_lake_gen2_filesystem
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

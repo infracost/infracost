@@ -28,3 +28,5 @@
 ∙ 3 were free:
   ∙ 2 x aws_mq_configuration
   ∙ 1 x aws_security_group
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

@@ -222,6 +222,8 @@
   ∙ 6 x azurerm_storage_account
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
+
+Add cost estimates to your pull requests: https://infracost.io/cicd
 Logs:
 
 level=warning msg="Skipping resource azurerm_storage_account.bb_Premium_unsupported_access_tier. BlockBlobStorage Premium doesn't support RA-GZRS redundancy"

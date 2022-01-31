@@ -38,3 +38,5 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
 ──────────────────────────────────
 5 cloud resources were detected, rerun with --show-skipped to see details:
 ∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

@@ -14,3 +14,5 @@
   ∙ 3 x aws_ecs_cluster
   ∙ 1 x aws_ecs_service
   ∙ 1 x aws_ecs_task_definition
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

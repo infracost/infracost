@@ -778,7 +778,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     </table>
 
     <div class="warnings">
-      <p>5 cloud resources were detected, rerun with --show-skipped to see details:<br />∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file</p>
+      <p>5 cloud resources were detected, rerun with --show-skipped to see details:<br />∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file<br /><br />Add cost estimates to your pull requests: https://infracost.io/cicd</p>
     </div>
   </body>
 </html>

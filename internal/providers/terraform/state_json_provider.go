@@ -5,6 +5,8 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/ui"
+
 	"github.com/pkg/errors"
 )
 
@@ -33,6 +35,13 @@ func (p *StateJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 func (p *StateJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
+		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
+		NoColor:       p.ctx.RunContext.Config.NoColor,
+		Indent:        "  ",
+	})
+	defer spinner.Fail()
+
 	j, err := os.ReadFile(p.Path)
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Terraform state JSON file")
@@ -54,5 +63,6 @@ func (p *StateJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([
 	project.PastResources = pastResources
 	project.Resources = resources
 
+	spinner.Success()
 	return []*schema.Project{project}, nil
 }

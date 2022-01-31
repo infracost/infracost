@@ -12,13 +12,14 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/kballard/go-shellquote"
+	"github.com/pkg/errors"
+	"golang.org/x/mod/semver"
+
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
-	"github.com/kballard/go-shellquote"
-	"github.com/pkg/errors"
-	"golang.org/x/mod/semver"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -137,6 +138,13 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 		return projects, err
 	}
 
+	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
+		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
+		NoColor:       p.ctx.RunContext.Config.NoColor,
+		Indent:        "  ",
+	})
+	defer spinner.Fail()
+
 	jsons := [][]byte{out}
 	if p.IsTerragrunt {
 		jsons = bytes.Split(out, []byte{'\n'})
@@ -168,6 +176,7 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 		projects = append(projects, project)
 	}
 
+	spinner.Success()
 	return projects, nil
 }
 
