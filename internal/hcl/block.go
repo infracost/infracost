@@ -193,25 +193,6 @@ func (b *Block) Labels() []string {
 	return b.hclBlock.Labels
 }
 
-func (b *Block) Range() Range {
-	if b == nil || b.hclBlock == nil {
-		return Range{}
-	}
-	var r hcl.Range
-	switch body := b.hclBlock.Body.(type) {
-	case *hclsyntax.Body:
-		r = body.SrcRange
-	default:
-		r = b.hclBlock.DefRange
-		r.End = b.hclBlock.Body.MissingItemRange().End
-	}
-	return Range{
-		Filename:  r.Filename,
-		StartLine: r.Start.Line,
-		EndLine:   r.End.Line,
-	}
-}
-
 func (b *Block) getHCLAttributes() hcl.Attributes {
 	switch body := b.hclBlock.Body.(type) {
 	case *hclsyntax.Body:
