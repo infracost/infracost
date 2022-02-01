@@ -1,6 +1,7 @@
 package hcl
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -15,12 +16,6 @@ import (
 )
 
 type Option func(p *Parser)
-
-func OptionDoNotSearchTfFiles() Option {
-	return func(p *Parser) {
-		p.stopOnFirstTf = false
-	}
-}
 
 func OptionWithTFVarsPaths(paths []string) Option {
 	return func(p *Parser) {
@@ -56,7 +51,6 @@ func TfVarsToOption(varsPaths ...string) (Option, error) {
 type Parser struct {
 	initialPath    string
 	tfvarsPaths    []string
-	stopOnFirstTf  bool
 	stopOnHCLError bool
 	workspaceName  string
 }
@@ -65,7 +59,6 @@ type Parser struct {
 func New(initialPath string, options ...Option) *Parser {
 	p := &Parser{
 		initialPath:   initialPath,
-		stopOnFirstTf: true,
 		workspaceName: "default",
 	}
 
@@ -80,19 +73,25 @@ func (parser *Parser) parseDirectoryFiles(files []*hcl.File) (Blocks, error) {
 	var blocks Blocks
 
 	for _, file := range files {
-		fileBlocks, err := LoadBlocksFromFile(file)
+		fileBlocks, err := loadBlocksFromFile(file)
 		if err != nil {
 			if parser.stopOnHCLError {
 				return nil, err
 			}
-			_, _ = fmt.Fprintf(os.Stderr, "WARNING: HCL error: %s\n", err)
+
+			log.Warnf("skipping file could not load blocks err: %s", err)
 			continue
 		}
+
 		if len(fileBlocks) > 0 {
 			log.Debugf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
 		}
+
 		for _, fileBlock := range fileBlocks {
-			blocks = append(blocks, NewHCLBlock(fileBlock, nil, nil))
+			blocks = append(
+				blocks,
+				NewHCLBlock(fileBlock, nil, nil),
+			)
 		}
 	}
 
@@ -101,33 +100,33 @@ func (parser *Parser) parseDirectoryFiles(files []*hcl.File) (Blocks, error) {
 
 // ParseDirectory parses all terraform files within a given directory
 func (parser *Parser) ParseDirectory() ([]*Module, error) {
-	var blocks Blocks
-
 	log.Debugf("Beginning parse for directory '%s'...", parser.initialPath)
-	files, err := LoadDirectory(parser.initialPath, parser.stopOnHCLError)
+	// load the initial root directory into a list of hcl files
+	// at this point these files have no schema associated with them.
+	files, err := loadDirectory(parser.initialPath, parser.stopOnHCLError)
 	if err != nil {
 		return nil, err
 	}
 
-	parsedBlocks, err := parser.parseDirectoryFiles(files)
+	// load the files into given hcl block types. These are then wrapped with *Block structs.
+	blocks, err := parser.parseDirectoryFiles(files)
 	if err != nil {
 		return nil, err
 	}
 
-	blocks = append(blocks, parsedBlocks...)
-	if len(blocks) == 0 && parser.stopOnFirstTf {
-		return nil, nil
+	if len(blocks) == 0 {
+		return nil, errors.New("Error no valid tf files found in given path")
 	}
 
 	log.Debug("Loading TFVars...")
-
 	inputVars, err := loadVars(parser.tfvarsPaths)
 	if err != nil {
 		return nil, err
 	}
 
-	var modulesMetadata *ModulesMetadata
-	modulesMetadata, err = loadModuleMetadata(parser.initialPath)
+	// load the module metadata. This is required to understand remote module referenced in code
+	// relate to the local file system.
+	modulesMetadata, err := loadModuleMetadata(parser.initialPath)
 	if err != nil {
 		return nil, fmt.Errorf("Error loading module metadata this is required for Infracost to function, %w", err)
 	}
@@ -138,7 +137,18 @@ func (parser *Parser) ParseDirectory() ([]*Module, error) {
 		return nil, fmt.Errorf("Error could not evaluate current working directory %w", err)
 	}
 
-	evaluator := NewEvaluator(parser.initialPath, parser.initialPath, workingDir, blocks, inputVars, modulesMetadata, nil, parser.stopOnHCLError, parser.workspaceName)
+	evaluator := NewEvaluator(
+		parser.initialPath,
+		parser.initialPath,
+		workingDir,
+		blocks,
+		inputVars,
+		modulesMetadata,
+		nil,
+		parser.stopOnHCLError,
+		parser.workspaceName,
+	)
+
 	modules, err := evaluator.EvaluateAll()
 	if err != nil {
 		return nil, err
@@ -147,9 +157,7 @@ func (parser *Parser) ParseDirectory() ([]*Module, error) {
 	return modules, nil
 }
 
-var knownFiles = make(map[string]struct{})
-
-func LoadDirectory(fullPath string, stopOnHCLError bool) ([]*hcl.File, error) {
+func loadDirectory(fullPath string, stopOnHCLError bool) ([]*hcl.File, error) {
 	hclParser := hclparse.NewParser()
 
 	fileInfos, err := ioutil.ReadDir(fullPath)
@@ -182,14 +190,13 @@ func LoadDirectory(fullPath string, stopOnHCLError bool) ([]*hcl.File, error) {
 			if stopOnHCLError {
 				return nil, diag
 			}
-			_, _ = fmt.Fprintf(os.Stderr, "WARNING: HCL error: %s\n", diag)
+
+			log.Warnf("skipping file: %s hcl parsing err: %s", path, diag.Error())
 			continue
 		}
-
-		knownFiles[path] = struct{}{}
 	}
 
-	var files []*hcl.File
+	files := make([]*hcl.File, 0, len(hclParser.Files()))
 	for _, file := range hclParser.Files() {
 		files = append(files, file)
 	}
@@ -201,10 +208,11 @@ func loadVars(filenames []string) (map[string]cty.Value, error) {
 	combinedVars := make(map[string]cty.Value)
 
 	for _, filename := range filenames {
-		vars, err := loadTFVars(filename)
+		vars, err := loadVarFile(filename)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load the tfvars. %s", err.Error())
 		}
+
 		for k, v := range vars {
 			combinedVars[k] = v
 		}
@@ -213,7 +221,7 @@ func loadVars(filenames []string) (map[string]cty.Value, error) {
 	return combinedVars, nil
 }
 
-func loadTFVars(filename string) (map[string]cty.Value, error) {
+func loadVarFile(filename string) (map[string]cty.Value, error) {
 	inputVars := make(map[string]cty.Value)
 
 	if filename == "" {
@@ -221,9 +229,9 @@ func loadTFVars(filename string) (map[string]cty.Value, error) {
 	}
 
 	log.Debugf("loading tfvars-file [%s]", filename)
-	src, err := ioutil.ReadFile(filename)
+	src, err := os.ReadFile(filename)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not read file %s %w", filename, err)
 	}
 
 	variableFile, _ := hclsyntax.ParseConfig(src, filename, hcl.Pos{Line: 1, Column: 1})
