@@ -51,7 +51,7 @@ data "cats_cat" "the-cats-mother" {
 		t.Fatal(err)
 	}
 
-	blocks := modules[0].GetBlocks()
+	blocks := modules[0].Blocks
 
 	// variable
 	variables := blocks.OfType("variable")
@@ -137,7 +137,7 @@ output "mod_result" {
 	rootModule := modules[0]
 	childModule := modules[1]
 
-	moduleBlocks := rootModule.GetBlocks().OfType("module")
+	moduleBlocks := rootModule.Blocks.OfType("module")
 	require.Len(t, moduleBlocks, 1)
 
 	assert.Equal(t, "module", moduleBlocks[0].Type())
@@ -147,7 +147,7 @@ output "mod_result" {
 	require.Equal(t, cty.String, inputAttr.Value().Type())
 	assert.Equal(t, "ok", inputAttr.Value().AsString())
 
-	rootOutputs := rootModule.GetBlocks().OfType("output")
+	rootOutputs := rootModule.Blocks.OfType("output")
 	require.Len(t, rootOutputs, 1)
 	assert.Equal(t, "output.result", rootOutputs[0].FullName())
 	valAttr := rootOutputs[0].GetAttribute("value")
@@ -155,7 +155,7 @@ output "mod_result" {
 	require.Equal(t, cty.String, valAttr.Type())
 	assert.Equal(t, "ok", valAttr.Value().AsString())
 
-	childOutputs := childModule.GetBlocks().OfType("output")
+	childOutputs := childModule.Blocks.OfType("output")
 	require.Len(t, childOutputs, 1)
 	assert.Equal(t, "module.my-mod:output.mod_result", childOutputs[0].FullName())
 	childValAttr := childOutputs[0].GetAttribute("value")
@@ -197,7 +197,7 @@ output "mod_result" {
 	rootModule := modules[0]
 	childModule := modules[1]
 
-	moduleBlocks := rootModule.GetBlocks().OfType("module")
+	moduleBlocks := rootModule.Blocks.OfType("module")
 	require.Len(t, moduleBlocks, 1)
 
 	assert.Equal(t, "module", moduleBlocks[0].Type())
@@ -207,7 +207,7 @@ output "mod_result" {
 	require.Equal(t, cty.String, inputAttr.Value().Type())
 	assert.Equal(t, "ok", inputAttr.Value().AsString())
 
-	rootOutputs := rootModule.GetBlocks().OfType("output")
+	rootOutputs := rootModule.Blocks.OfType("output")
 	require.Len(t, rootOutputs, 1)
 	assert.Equal(t, "output.result", rootOutputs[0].FullName())
 	valAttr := rootOutputs[0].GetAttribute("value")
@@ -215,7 +215,7 @@ output "mod_result" {
 	require.Equal(t, cty.String, valAttr.Type())
 	assert.Equal(t, "ok", valAttr.Value().AsString())
 
-	childOutputs := childModule.GetBlocks().OfType("output")
+	childOutputs := childModule.Blocks.OfType("output")
 	require.Len(t, childOutputs, 1)
 	assert.Equal(t, "module.my-mod:output.mod_result", childOutputs[0].FullName())
 	childValAttr := childOutputs[0].GetAttribute("value")

@@ -16,6 +16,7 @@ func NewContext(ctx *hcl.EvalContext, parent *Context) *Context {
 	if ctx.Variables == nil {
 		ctx.Variables = make(map[string]cty.Value)
 	}
+
 	return &Context{
 		ctx:    ctx,
 		parent: parent,

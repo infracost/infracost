@@ -2,12 +2,21 @@ package hcl
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"reflect"
+	"strings"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/ext/tryfunc"
 	log "github.com/sirupsen/logrus"
+	yaml "github.com/zclconf/go-cty-yaml"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/function"
+	"github.com/zclconf/go-cty/cty/function/stdlib"
 	"github.com/zclconf/go-cty/cty/gocty"
+
+	"github.com/infracost/infracost/internal/hcl/funcs"
 )
 
 const maxContextIterations = 32
@@ -22,7 +31,7 @@ type Evaluator struct {
 	ctx               *Context
 	blocks            Blocks
 	moduleDefinitions []*ModuleDefinition
-	visitedModules    []*visitedModule
+	visitedModules    map[string]struct{}
 	inputVars         map[string]cty.Value
 	moduleMetadata    *ModulesMetadata
 	projectRootPath   string // root of the current scan
@@ -39,14 +48,19 @@ func NewEvaluator(
 	blocks Blocks,
 	inputVars map[string]cty.Value,
 	moduleMetadata *ModulesMetadata,
-	visitedModules []*visitedModule,
+	visitedModules map[string]struct{},
 	stopOnHCLError bool,
 	workspace string,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
-		Functions: Functions(modulePath),
+		Functions: expFunctions(modulePath),
 	}, nil)
 
+	if visitedModules == nil {
+		visitedModules = make(map[string]struct{})
+	}
+
+	// set the global evaluation parameters.
 	ctx.SetByDot(cty.StringVal(workspace), "terraform.workspace")
 	ctx.SetByDot(cty.StringVal(projectRootPath), "path.root")
 	ctx.SetByDot(cty.StringVal(modulePath), "path.module")
@@ -70,6 +84,18 @@ func NewEvaluator(
 	}
 }
 
+func (e *Evaluator) EvaluateAll() ([]*Module, error) {
+	var lastContext hcl.EvalContext
+	e.evaluate(lastContext)
+	e.moduleDefinitions = e.loadModules(true)
+
+	// expand out resources and modules via count
+	e.blocks = e.expandBlocks(e.blocks)
+	e.evaluate(lastContext)
+
+	return e.collectModules(), nil
+}
+
 func (e *Evaluator) evaluateStep(i int) {
 	log.Debugf("Starting iteration %d of context evaluation...", i+1)
 
@@ -90,18 +116,18 @@ func (e *Evaluator) evaluateStep(i int) {
 
 func (e *Evaluator) evaluateModules() {
 	for _, module := range e.moduleDefinitions {
-		if e.hasBeenVisited(module) {
+		if _, ok := e.visitedModules[module.Definition.FullName()]; ok {
 			continue
 		}
 
-		e.visitedModules = append(e.visitedModules, &visitedModule{module.Name, module.Path, module.Definition.Reference().String()})
+		e.visitedModules[module.Definition.FullName()] = struct{}{}
 
 		vars := module.Definition.Values().AsValueMap()
 		moduleEvaluator := NewEvaluator(
 			e.projectRootPath,
 			module.Path,
 			e.workingDir,
-			module.Modules[0].GetBlocks(),
+			module.Modules[0].Blocks,
 			vars,
 			e.moduleMetadata,
 			e.visitedModules,
@@ -110,24 +136,14 @@ func (e *Evaluator) evaluateModules() {
 		)
 		module.Modules, _ = moduleEvaluator.EvaluateAll()
 
-		e.ctx.Set(moduleEvaluator.ExportOutputs(), "module", module.Name)
+		e.ctx.Set(moduleEvaluator.exportOutputs(), "module", module.Name)
 	}
-}
-
-func (e *Evaluator) hasBeenVisited(module *ModuleDefinition) bool {
-	for _, v := range e.visitedModules {
-		if v.name == module.Name && v.path == module.Path && module.Definition.Reference().String() == v.definitionReference {
-			log.Debugf("Module [%s:%s:%s] has already been seen", v.name, v.path, v.definitionReference)
-			return true
-		}
-	}
-
-	return false
 }
 
 // export module outputs to a parent
-func (e *Evaluator) ExportOutputs() cty.Value {
+func (e *Evaluator) exportOutputs() cty.Value {
 	data := make(map[string]cty.Value)
+
 	for _, block := range e.blocks.OfType("output") {
 		attr := block.GetAttribute("value")
 		if attr.IsNil() {
@@ -135,57 +151,37 @@ func (e *Evaluator) ExportOutputs() cty.Value {
 		}
 		data[block.Label()] = attr.Value()
 	}
+
 	return cty.ObjectVal(data)
 }
 
-func (e *Evaluator) EvaluateAll() ([]*Module, error) {
-	var lastContext hcl.EvalContext
-	for i := 0; i < maxContextIterations; i++ {
-		e.evaluateStep(i)
+func (e *Evaluator) collectModules() []*Module {
+	rootModule := &Module{Blocks: e.blocks, RootPath: e.projectRootPath, ModulePath: e.modulePath}
+	modules := []*Module{rootModule}
 
-		// if ctx matches the last evaluation, we can bail, nothing left to resolve
-		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
-			break
-		}
-
-		if len(e.ctx.Inner().Variables) != len(lastContext.Variables) {
-			lastContext.Variables = make(map[string]cty.Value, len(e.ctx.Inner().Variables))
-		}
-
-		for k, v := range e.ctx.Inner().Variables {
-			lastContext.Variables[k] = v
-		}
-	}
-
-	log.Debug("Loading modules...")
-	e.moduleDefinitions = e.loadModules(true)
-
-	// expand out resources and modules via count
-	e.blocks = e.expandBlocks(e.blocks)
-
-	for i := 0; i < maxContextIterations; i++ {
-		e.evaluateStep(i)
-
-		// if ctx matches the last evaluation, we can bail, nothing left to resolve
-		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
-			break
-		}
-
-		if len(e.ctx.Inner().Variables) != len(lastContext.Variables) {
-			lastContext.Variables = make(map[string]cty.Value, len(e.ctx.Inner().Variables))
-		}
-		for k, v := range e.ctx.Inner().Variables {
-			lastContext.Variables[k] = v
-		}
-	}
-
-	var modules []*Module
-	modules = append(modules, NewHCLModule(e.projectRootPath, e.modulePath, e.blocks))
 	for _, definition := range e.moduleDefinitions {
 		modules = append(modules, definition.Modules...)
 	}
 
-	return modules, nil
+	return modules
+}
+
+func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
+	for i := 0; i < maxContextIterations; i++ {
+		e.evaluateStep(i)
+
+		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
+			break
+		}
+
+		if len(e.ctx.Inner().Variables) != len(lastContext.Variables) {
+			lastContext.Variables = make(map[string]cty.Value, len(e.ctx.Inner().Variables))
+		}
+
+		for k, v := range e.ctx.Inner().Variables {
+			lastContext.Variables[k] = v
+		}
+	}
 }
 
 func (e *Evaluator) expandBlocks(blocks Blocks) Blocks {
@@ -256,6 +252,7 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 			countFiltered = append(countFiltered, block)
 			continue
 		}
+
 		count := 1
 		if !countAttr.Value().IsNull() && countAttr.Value().IsKnown() {
 			if countAttr.Value().Type() == cty.Number {
@@ -386,4 +383,176 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 	}
 
 	return cty.ObjectVal(values)
+}
+
+// takes in a module "x" {} block and loads resources etc. into e.moduleBlocks - additionally returns variables to add to ["module.x.*"] variables
+func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition, error) {
+	if b.Label() == "" {
+		return nil, fmt.Errorf("module without label at %s", b.Range())
+	}
+
+	var source string
+	attrs := b.Attributes()
+	for _, attr := range attrs {
+		if attr.Name() == "source" {
+			sourceVal := attr.Value()
+			if sourceVal.Type() == cty.String {
+				source = sourceVal.AsString()
+			}
+		}
+	}
+
+	if source == "" {
+		return nil, fmt.Errorf("could not read module source attribute at %s", b.Range().String())
+	}
+
+	var modulePath string
+
+	if e.moduleMetadata != nil {
+		// if we have module metadata we can parse all the modules as they'll be cached locally!
+		for _, module := range e.moduleMetadata.Modules {
+			reg := "registry.terraform.io/" + source
+			if module.Source == source || module.Source == reg {
+				modulePath = filepath.Clean(filepath.Join(e.projectRootPath, module.Dir))
+				break
+			}
+		}
+	}
+
+	if modulePath == "" {
+		// if we have no metadata, we can only support modules available on the local filesystem
+		// users wanting this feature should run a `terraform init` before running infracost to cache all modules locally
+		if !strings.HasPrefix(source, fmt.Sprintf(".%c", os.PathSeparator)) && !strings.HasPrefix(source, fmt.Sprintf("..%c", os.PathSeparator)) {
+			reg := "registry.terraform.io/" + source
+			return nil, fmt.Errorf("missing module with source '%s %s' -  try to 'terraform init' first", reg, source)
+		}
+
+		// combine the current calling module with relative source of the module
+		modulePath = filepath.Join(e.modulePath, source)
+	}
+
+	var blocks Blocks
+	err := getModuleBlocks(b, modulePath, &blocks, stopOnHCLError)
+	if err != nil {
+		return nil, err
+	}
+	log.Debugf("Loaded module '%s' (requested at %s)", modulePath, b.Range())
+
+	return &ModuleDefinition{
+		Name:       b.Label(),
+		Path:       modulePath,
+		Definition: b,
+		Modules:    []*Module{&Module{RootPath: e.projectRootPath, ModulePath: modulePath, Blocks: blocks}},
+	}, nil
+}
+
+// expFunctions returns the set of functions that should be used to when evaluating
+// expressions in the receiving scope.
+func expFunctions(baseDir string) map[string]function.Function {
+	return map[string]function.Function{
+		"abs":              stdlib.AbsoluteFunc,
+		"abspath":          funcs.AbsPathFunc,
+		"basename":         funcs.BasenameFunc,
+		"base64decode":     funcs.Base64DecodeFunc,
+		"base64encode":     funcs.Base64EncodeFunc,
+		"base64gzip":       funcs.Base64GzipFunc,
+		"base64sha256":     funcs.Base64Sha256Func,
+		"base64sha512":     funcs.Base64Sha512Func,
+		"bcrypt":           funcs.BcryptFunc,
+		"can":              tryfunc.CanFunc,
+		"ceil":             stdlib.CeilFunc,
+		"chomp":            stdlib.ChompFunc,
+		"cidrhost":         funcs.CidrHostFunc,
+		"cidrnetmask":      funcs.CidrNetmaskFunc,
+		"cidrsubnet":       funcs.CidrSubnetFunc,
+		"cidrsubnets":      funcs.CidrSubnetsFunc,
+		"coalesce":         funcs.CoalesceFunc,
+		"coalescelist":     stdlib.CoalesceListFunc,
+		"compact":          stdlib.CompactFunc,
+		"concat":           stdlib.ConcatFunc,
+		"contains":         stdlib.ContainsFunc,
+		"csvdecode":        stdlib.CSVDecodeFunc,
+		"dirname":          funcs.DirnameFunc,
+		"distinct":         stdlib.DistinctFunc,
+		"element":          stdlib.ElementFunc,
+		"chunklist":        stdlib.ChunklistFunc,
+		"file":             funcs.MakeFileFunc(baseDir, false),
+		"fileexists":       funcs.MakeFileExistsFunc(baseDir),
+		"fileset":          funcs.MakeFileSetFunc(baseDir),
+		"filebase64":       funcs.MakeFileFunc(baseDir, true),
+		"filebase64sha256": funcs.MakeFileBase64Sha256Func(baseDir),
+		"filebase64sha512": funcs.MakeFileBase64Sha512Func(baseDir),
+		"filemd5":          funcs.MakeFileMd5Func(baseDir),
+		"filesha1":         funcs.MakeFileSha1Func(baseDir),
+		"filesha256":       funcs.MakeFileSha256Func(baseDir),
+		"filesha512":       funcs.MakeFileSha512Func(baseDir),
+		"flatten":          stdlib.FlattenFunc,
+		"floor":            stdlib.FloorFunc,
+		"format":           stdlib.FormatFunc,
+		"formatdate":       stdlib.FormatDateFunc,
+		"formatlist":       stdlib.FormatListFunc,
+		"indent":           stdlib.IndentFunc,
+		"index":            funcs.IndexFunc, // stdlib.IndexFunc is not compatible
+		"join":             stdlib.JoinFunc,
+		"jsondecode":       stdlib.JSONDecodeFunc,
+		"jsonencode":       stdlib.JSONEncodeFunc,
+		"keys":             stdlib.KeysFunc,
+		"length":           funcs.LengthFunc,
+		"list":             funcs.ListFunc,
+		"log":              stdlib.LogFunc,
+		"lookup":           funcs.LookupFunc,
+		"lower":            stdlib.LowerFunc,
+		"map":              funcs.MapFunc,
+		"matchkeys":        funcs.MatchkeysFunc,
+		"max":              stdlib.MaxFunc,
+		"md5":              funcs.Md5Func,
+		"merge":            stdlib.MergeFunc,
+		"min":              stdlib.MinFunc,
+		"parseint":         stdlib.ParseIntFunc,
+		"pathexpand":       funcs.PathExpandFunc,
+		"pow":              stdlib.PowFunc,
+		"range":            stdlib.RangeFunc,
+		"regex":            stdlib.RegexFunc,
+		"regexall":         stdlib.RegexAllFunc,
+		"replace":          funcs.ReplaceFunc,
+		"reverse":          stdlib.ReverseListFunc,
+		"rsadecrypt":       funcs.RsaDecryptFunc,
+		"setintersection":  stdlib.SetIntersectionFunc,
+		"setproduct":       stdlib.SetProductFunc,
+		"setsubtract":      stdlib.SetSubtractFunc,
+		"setunion":         stdlib.SetUnionFunc,
+		"sha1":             funcs.Sha1Func,
+		"sha256":           funcs.Sha256Func,
+		"sha512":           funcs.Sha512Func,
+		"signum":           stdlib.SignumFunc,
+		"slice":            stdlib.SliceFunc,
+		"sort":             stdlib.SortFunc,
+		"split":            stdlib.SplitFunc,
+		"strrev":           stdlib.ReverseFunc,
+		"substr":           stdlib.SubstrFunc,
+		"timestamp":        funcs.TimestampFunc,
+		"timeadd":          stdlib.TimeAddFunc,
+		"title":            stdlib.TitleFunc,
+		"tostring":         funcs.MakeToFunc(cty.String),
+		"tonumber":         funcs.MakeToFunc(cty.Number),
+		"tobool":           funcs.MakeToFunc(cty.Bool),
+		"toset":            funcs.MakeToFunc(cty.Set(cty.DynamicPseudoType)),
+		"tolist":           funcs.MakeToFunc(cty.List(cty.DynamicPseudoType)),
+		"tomap":            funcs.MakeToFunc(cty.Map(cty.DynamicPseudoType)),
+		"transpose":        funcs.TransposeFunc,
+		"trim":             stdlib.TrimFunc,
+		"trimprefix":       stdlib.TrimPrefixFunc,
+		"trimspace":        stdlib.TrimSpaceFunc,
+		"trimsuffix":       stdlib.TrimSuffixFunc,
+		"try":              tryfunc.TryFunc,
+		"upper":            stdlib.UpperFunc,
+		"urlencode":        funcs.URLEncodeFunc,
+		"uuid":             funcs.UUIDFunc,
+		"uuidv5":           funcs.UUIDV5Func,
+		"values":           stdlib.ValuesFunc,
+		"yamldecode":       yaml.YAMLDecodeFunc,
+		"yamlencode":       yaml.YAMLEncodeFunc,
+		"zipmap":           stdlib.ZipmapFunc,
+	}
+
 }

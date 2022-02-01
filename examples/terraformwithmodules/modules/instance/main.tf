@@ -1,9 +1,14 @@
 variable "instance_type" {
-  default = ""
 }
 
 variable "volume_type" {
-  default = ""
+}
+
+variable "child_instance_type" {
+}
+
+output "parent_instance_type" {
+  value = aws_instance.web_app.instance_type
 }
 
 resource "aws_instance" "web_app" {
@@ -16,8 +21,14 @@ resource "aws_instance" "web_app" {
 
   ebs_block_device {
     device_name = "my_data"
-    volume_type = var.volume_type  # <<<<< Try changing this to gp2 to compare costs
+    volume_type = var.volume_type
     volume_size = 1000
     iops        = 800
   }
+}
+
+module "child_instance" {
+  source = "./modules/childinstance"
+
+  instance_type = var.child_instance_type
 }

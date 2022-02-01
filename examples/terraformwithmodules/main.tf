@@ -7,27 +7,38 @@ provider "aws" {
 }
 
 module "small_app" {
-  source        = "./modules/instance"
-  instance_type = "m5.4xlarge"
-  volume_type   = "io1"
+  source              = "./modules/instance"
+  instance_type       = "m5.4xlarge"
+  volume_type         = "io1"
+  child_instance_type = "m5.8xlarge"
 }
 
 module "small_app_gp2" {
-  source        = "./modules/instance"
-  instance_type = "m5.4xlarge"
-  volume_type   = "gp2"
+  source              = "./modules/instance"
+  instance_type       = "m5.4xlarge"
+  volume_type         = "gp2"
+  child_instance_type = "m5.8xlarge"
 }
 
 module "big_app" {
-  source        = "./modules/instance"
-  instance_type = "m5.8xlarge"
-  volume_type   = "gp2"
+  source              = "./modules/instance"
+  instance_type       = "m5.8xlarge"
+  volume_type         = "gp2"
+  child_instance_type = "m5.4xlarge"
 }
 
 module "big_app_gp2" {
-  source        = "./modules/instance"
-  instance_type = "m5.8xlarge"
-  volume_type   = "gp2"
+  source              = "./modules/instance"
+  instance_type       = "m5.8xlarge"
+  volume_type         = "gp2"
+  child_instance_type = "m5.4xlarge"
+}
+
+module "big_app_with_output" {
+  source              = "./modules/instance"
+  instance_type       = module.big_app_gp2.parent_instance_type
+  volume_type         = "gp2"
+  child_instance_type = "m5.4xlarge"
 }
 
 resource "aws_lambda_function" "hello_world" {
