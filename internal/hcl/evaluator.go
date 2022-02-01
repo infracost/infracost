@@ -1,4 +1,4 @@
-package parser
+package hcl
 
 import (
 	"fmt"
@@ -8,8 +8,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
-
-	"github.com/infracost/infracost/internal/hcl/block"
 )
 
 const maxContextIterations = 32
@@ -21,8 +19,8 @@ type visitedModule struct {
 }
 
 type Evaluator struct {
-	ctx               *block.Context
-	blocks            block.Blocks
+	ctx               *Context
+	blocks            Blocks
 	moduleDefinitions []*ModuleDefinition
 	visitedModules    []*visitedModule
 	inputVars         map[string]cty.Value
@@ -38,14 +36,14 @@ func NewEvaluator(
 	projectRootPath string,
 	modulePath string,
 	workingDir string,
-	blocks block.Blocks,
+	blocks Blocks,
 	inputVars map[string]cty.Value,
 	moduleMetadata *ModulesMetadata,
 	visitedModules []*visitedModule,
 	stopOnHCLError bool,
 	workspace string,
 ) *Evaluator {
-	ctx := block.NewContext(&hcl.EvalContext{
+	ctx := NewContext(&hcl.EvalContext{
 		Functions: Functions(modulePath),
 	}, nil)
 
@@ -99,7 +97,17 @@ func (e *Evaluator) evaluateModules() {
 		e.visitedModules = append(e.visitedModules, &visitedModule{module.Name, module.Path, module.Definition.Reference().String()})
 
 		vars := module.Definition.Values().AsValueMap()
-		moduleEvaluator := NewEvaluator(e.projectRootPath, module.Path, e.workingDir, module.Modules[0].GetBlocks(), vars, e.moduleMetadata, e.visitedModules, e.stopOnHCLError, e.workspace)
+		moduleEvaluator := NewEvaluator(
+			e.projectRootPath,
+			module.Path,
+			e.workingDir,
+			module.Modules[0].GetBlocks(),
+			vars,
+			e.moduleMetadata,
+			e.visitedModules,
+			e.stopOnHCLError,
+			e.workspace,
+		)
 		module.Modules, _ = moduleEvaluator.EvaluateAll()
 
 		e.ctx.Set(moduleEvaluator.ExportOutputs(), "module", module.Name)
@@ -130,7 +138,7 @@ func (e *Evaluator) ExportOutputs() cty.Value {
 	return cty.ObjectVal(data)
 }
 
-func (e *Evaluator) EvaluateAll() ([]*block.Module, error) {
+func (e *Evaluator) EvaluateAll() ([]*Module, error) {
 	var lastContext hcl.EvalContext
 	for i := 0; i < maxContextIterations; i++ {
 		e.evaluateStep(i)
@@ -143,6 +151,7 @@ func (e *Evaluator) EvaluateAll() ([]*block.Module, error) {
 		if len(e.ctx.Inner().Variables) != len(lastContext.Variables) {
 			lastContext.Variables = make(map[string]cty.Value, len(e.ctx.Inner().Variables))
 		}
+
 		for k, v := range e.ctx.Inner().Variables {
 			lastContext.Variables[k] = v
 		}
@@ -170,8 +179,8 @@ func (e *Evaluator) EvaluateAll() ([]*block.Module, error) {
 		}
 	}
 
-	var modules []*block.Module
-	modules = append(modules, block.NewHCLModule(e.projectRootPath, e.modulePath, e.blocks))
+	var modules []*Module
+	modules = append(modules, NewHCLModule(e.projectRootPath, e.modulePath, e.blocks))
 	for _, definition := range e.moduleDefinitions {
 		modules = append(modules, definition.Modules...)
 	}
@@ -179,24 +188,25 @@ func (e *Evaluator) EvaluateAll() ([]*block.Module, error) {
 	return modules, nil
 }
 
-func (e *Evaluator) expandBlocks(blocks block.Blocks) block.Blocks {
+func (e *Evaluator) expandBlocks(blocks Blocks) Blocks {
 	return e.expandDynamicBlocks(e.expandBlockForEaches(e.expandBlockCounts(blocks))...)
 }
 
-func (e *Evaluator) expandDynamicBlocks(blocks ...*block.Block) block.Blocks {
+func (e *Evaluator) expandDynamicBlocks(blocks ...*Block) Blocks {
 	for _, b := range blocks {
 		e.expandDynamicBlock(b)
 	}
 	return blocks
 }
 
-func (e *Evaluator) expandDynamicBlock(b *block.Block) {
+func (e *Evaluator) expandDynamicBlock(b *Block) {
 	for _, sub := range b.AllBlocks() {
 		e.expandDynamicBlock(sub)
 	}
+
 	for _, sub := range b.AllBlocks().OfType("dynamic") {
 		blockName := sub.TypeLabel()
-		expanded := e.expandBlockForEaches([]*block.Block{sub})
+		expanded := e.expandBlockForEaches([]*Block{sub})
 		for _, ex := range expanded {
 			if content := ex.GetBlock("content"); content.IsNotNil() {
 				_ = e.expandDynamicBlocks(content)
@@ -206,14 +216,15 @@ func (e *Evaluator) expandDynamicBlock(b *block.Block) {
 	}
 }
 
-func (e *Evaluator) expandBlockForEaches(blocks block.Blocks) block.Blocks {
-	var forEachFiltered block.Blocks
+func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
+	var forEachFiltered Blocks
 	for _, block := range blocks {
 		forEachAttr := block.GetAttribute("for_each")
 		if forEachAttr.IsNil() || block.IsCountExpanded() || (block.Type() != "resource" && block.Type() != "module" && block.Type() != "dynamic") {
 			forEachFiltered = append(forEachFiltered, block)
 			continue
 		}
+
 		if !forEachAttr.Value().IsNull() && forEachAttr.Value().IsKnown() && forEachAttr.IsIterable() {
 			forEachAttr.Each(func(key cty.Value, val cty.Value) {
 				clone := block.Clone(key)
@@ -237,8 +248,8 @@ func (e *Evaluator) expandBlockForEaches(blocks block.Blocks) block.Blocks {
 	return forEachFiltered
 }
 
-func (e *Evaluator) expandBlockCounts(blocks block.Blocks) block.Blocks {
-	var countFiltered block.Blocks
+func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
+	var countFiltered Blocks
 	for _, block := range blocks {
 		countAttr := block.GetAttribute("count")
 		if countAttr.IsNil() || block.IsCountExpanded() || (block.Type() != "resource" && block.Type() != "module") {
@@ -265,8 +276,7 @@ func (e *Evaluator) expandBlockCounts(blocks block.Blocks) block.Blocks {
 	return countFiltered
 }
 
-func (e *Evaluator) copyVariables(from, to *block.Block) {
-
+func (e *Evaluator) copyVariables(from, to *Block) {
 	var fromBase string
 	var fromRel string
 	var toRel string
@@ -292,7 +302,7 @@ func (e *Evaluator) copyVariables(from, to *block.Block) {
 	e.ctx.Root().Set(srcValue, fromBase, toRel)
 }
 
-func (e *Evaluator) evaluateVariable(b *block.Block) (cty.Value, error) {
+func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 	if b.Label() == "" {
 		return cty.NilVal, fmt.Errorf("empty label - cannot resolve")
 	}
@@ -304,14 +314,16 @@ func (e *Evaluator) evaluateVariable(b *block.Block) (cty.Value, error) {
 
 	if override, exists := e.inputVars[b.Label()]; exists {
 		return override, nil
-	} else if def, exists := attributes["default"]; exists {
+	}
+
+	if def, exists := attributes["default"]; exists {
 		return def.Value(), nil
 	}
 
 	return cty.NilVal, fmt.Errorf("no value found")
 }
 
-func (e *Evaluator) evaluateOutput(b *block.Block) (cty.Value, error) {
+func (e *Evaluator) evaluateOutput(b *Block) (cty.Value, error) {
 	if b.Label() == "" {
 		return cty.NilVal, fmt.Errorf("empty label - cannot resolve")
 	}
@@ -374,5 +386,4 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 	}
 
 	return cty.ObjectVal(values)
-
 }

@@ -1,15 +1,63 @@
-package convert
+package terraform
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/zclconf/go-cty/cty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/infracost/infracost/internal/hcl/block"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/hcl"
+	"github.com/infracost/infracost/internal/schema"
 )
 
-func ModulesToPlanJSON(modules []*block.Module) PlanSchema {
+type HCLProvider struct {
+	Parser   *hcl.Parser
+	Provider *PlanJSONProvider
+}
+
+func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider) (HCLProvider, error) {
+	option, err := hcl.TfVarsToOption(ctx.ProjectConfig.TFVarFiles...)
+	if err != nil {
+		return HCLProvider{}, err
+	}
+
+	p := hcl.New(ctx.ProjectConfig.Path, option)
+
+	return HCLProvider{
+		Parser:   p,
+		Provider: provider,
+	}, err
+}
+
+func (p HCLProvider) Type() string {
+	return "hcl_provider"
+}
+
+func (p HCLProvider) DisplayType() string {
+	return "HCL Provider"
+}
+
+func (p HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+}
+
+func (p HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+	modules, err := p.Parser.ParseDirectory()
+	if err != nil {
+		return nil, err
+	}
+
+	sch := p.modulesToPlanJSON(modules)
+	b, err := json.Marshal(sch)
+	if err != nil {
+		return nil, fmt.Errorf("error handling built plan json from hcl %w", err)
+	}
+
+	return p.Provider.LoadResourcesFromSrc(usage, b)
+}
+
+func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 	sch := PlanSchema{
 		FormatVersion:    "1.0",
 		TerraformVersion: "1.1.0",

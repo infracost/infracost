@@ -1,4 +1,4 @@
-package block
+package hcl
 
 import (
 	"fmt"
@@ -10,6 +10,41 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
+
+var terraformSchemaV012 = &hcl.BodySchema{
+	Blocks: []hcl.BlockHeaderSchema{
+		{
+			Type: "terraform",
+		},
+		{
+			Type:       "provider",
+			LabelNames: []string{"name"},
+		},
+		{
+			Type:       "variable",
+			LabelNames: []string{"name"},
+		},
+		{
+			Type: "locals",
+		},
+		{
+			Type:       "output",
+			LabelNames: []string{"name"},
+		},
+		{
+			Type:       "module",
+			LabelNames: []string{"name"},
+		},
+		{
+			Type:       "resource",
+			LabelNames: []string{"type", "name"},
+		},
+		{
+			Type:       "data",
+			LabelNames: []string{"type", "name"},
+		},
+	},
+}
 
 type Blocks []*Block
 
@@ -47,7 +82,7 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 			children = append(children, NewHCLBlock(b.AsHCLBlock(), ctx, moduleBlock))
 		}
 	default:
-		content, _, diag := hclBlock.Body.PartialContent(TerraformSchema012)
+		content, _, diag := hclBlock.Body.PartialContent(terraformSchemaV012)
 		if diag == nil {
 			for _, hb := range content.Blocks {
 				children = append(children, NewHCLBlock(hb, ctx, moduleBlock))
@@ -192,7 +227,7 @@ func (b *Block) getHCLAttributes() hcl.Attributes {
 		}
 		return attributes
 	default:
-		_, body, diag := b.hclBlock.Body.PartialContent(TerraformSchema012)
+		_, body, diag := b.hclBlock.Body.PartialContent(terraformSchemaV012)
 		if diag != nil {
 			return nil
 		}
@@ -414,4 +449,17 @@ func (b *Block) IsNil() bool {
 
 func (b *Block) IsNotNil() bool {
 	return !b.IsNil()
+}
+
+func LoadBlocksFromFile(file *hcl.File) (hcl.Blocks, error) {
+	contents, diagnostics := file.Body.Content(terraformSchemaV012)
+	if diagnostics != nil && diagnostics.HasErrors() {
+		return nil, diagnostics
+	}
+
+	if contents == nil {
+		return nil, fmt.Errorf("file contents is empty")
+	}
+
+	return contents.Blocks, nil
 }

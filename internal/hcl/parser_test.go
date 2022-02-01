@@ -1,4 +1,4 @@
-package parser
+package hcl
 
 import (
 	"io/ioutil"
