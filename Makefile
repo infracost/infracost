@@ -26,6 +26,7 @@ build:
 
 windows:
 	env GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build $(BUILD_FLAGS) -o build/$(BINARY).exe $(PKG)
+	env GOOS=windows GOARCH=arm64 CGO_ENABLED=0 go build $(BUILD_FLAGS) -o build/$(BINARY)-arm64.exe $(PKG)
 
 linux:
 	env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(BUILD_FLAGS) -o build/$(BINARY)-linux-amd64 $(PKG)
@@ -42,7 +43,9 @@ install:
 
 release: build_all
 	cd build; tar -czf $(BINARY)-windows-amd64.tar.gz $(BINARY).exe
+	cd build; tar -czf $(BINARY)-windows-arm64.tar.gz $(BINARY)-arm64.exe
 	cd build; tar -czf $(BINARY)-linux-amd64.tar.gz $(BINARY)-linux-amd64
+	cd build; tar -czf $(BINARY)-linux-arm64.tar.gz $(BINARY)-linux-arm64
 	cd build; tar -czf $(BINARY)-darwin-amd64.tar.gz $(BINARY)-darwin-amd64
 	cd build; tar -czf $(BINARY)-darwin-arm64.tar.gz $(BINARY)-darwin-arm64
 
