@@ -1,4 +1,4 @@
-package block
+package hcl
 
 import (
 	"fmt"
@@ -16,7 +16,6 @@ type Reference struct {
 }
 
 func newReference(parts []string) (*Reference, error) {
-
 	var ref Reference
 
 	if len(parts) == 0 {
@@ -71,7 +70,6 @@ func (r *Reference) NameLabel() string {
 }
 
 func (r *Reference) String() string {
-
 	base := fmt.Sprintf("%s.%s", r.typeLabel, r.nameLabel)
 
 	if !r.blockType.removeTypeInReference {
@@ -99,15 +97,19 @@ func (r *Reference) RefersTo(b *Block) bool {
 	if r.BlockType() != b.Reference().BlockType() {
 		return false
 	}
+
 	if r.TypeLabel() != b.Reference().TypeLabel() {
 		return false
 	}
+
 	if r.NameLabel() != b.Reference().NameLabel() {
 		return false
 	}
+
 	if r.Key() != "" && r.Key() != b.Reference().Key() {
 		return false
 	}
+
 	return true
 }
 

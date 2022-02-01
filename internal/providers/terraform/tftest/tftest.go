@@ -14,7 +14,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/usage"
 
@@ -361,7 +360,7 @@ func loadResources(t *testing.T, runCtx *config.RunContext, tfProject TerraformP
 		},
 	)
 
-	provider, err := hcl.NewDirProvider(projectCtx, terraform.NewPlanJSONProvider(projectCtx))
+	provider, err := terraform.NewHCLProvider(projectCtx, terraform.NewPlanJSONProvider(projectCtx))
 	if err != nil {
 		return nil, err
 	}
