@@ -290,8 +290,9 @@ func (b *Block) GetAttributes() []*Attribute {
 	}
 
 	for _, attr := range b.getHCLAttributes() {
-		results = append(results, NewHCLAttribute(attr, b.context))
+		results = append(results, &Attribute{HCLAttr: attr, Ctx: b.context})
 	}
+
 	b.cachedAttributes = results
 	return results
 }

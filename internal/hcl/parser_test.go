@@ -152,7 +152,7 @@ output "mod_result" {
 	assert.Equal(t, "output.result", rootOutputs[0].FullName())
 	valAttr := rootOutputs[0].GetAttribute("value")
 	require.NotNil(t, valAttr)
-	require.Equal(t, cty.String, valAttr.Type())
+	require.Equal(t, cty.String, valAttr.Value().Type())
 	assert.Equal(t, "ok", valAttr.Value().AsString())
 
 	childOutputs := childModule.Blocks.OfType("output")
@@ -160,7 +160,7 @@ output "mod_result" {
 	assert.Equal(t, "module.my-mod:output.mod_result", childOutputs[0].FullName())
 	childValAttr := childOutputs[0].GetAttribute("value")
 	require.NotNil(t, childValAttr)
-	require.Equal(t, cty.String, childValAttr.Type())
+	require.Equal(t, cty.String, childValAttr.Value().Type())
 	assert.Equal(t, "ok", childValAttr.Value().AsString())
 
 }
@@ -212,7 +212,7 @@ output "mod_result" {
 	assert.Equal(t, "output.result", rootOutputs[0].FullName())
 	valAttr := rootOutputs[0].GetAttribute("value")
 	require.NotNil(t, valAttr)
-	require.Equal(t, cty.String, valAttr.Type())
+	require.Equal(t, cty.String, valAttr.Value().Type())
 	assert.Equal(t, "ok", valAttr.Value().AsString())
 
 	childOutputs := childModule.Blocks.OfType("output")
@@ -220,7 +220,7 @@ output "mod_result" {
 	assert.Equal(t, "module.my-mod:output.mod_result", childOutputs[0].FullName())
 	childValAttr := childOutputs[0].GetAttribute("value")
 	require.NotNil(t, childValAttr)
-	require.Equal(t, cty.String, childValAttr.Type())
+	require.Equal(t, cty.String, childValAttr.Value().Type())
 	assert.Equal(t, "ok", childValAttr.Value().AsString())
 }
 
