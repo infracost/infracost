@@ -209,7 +209,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 		blockName := sub.TypeLabel()
 		expanded := e.expandBlockForEaches([]*Block{sub})
 		for _, ex := range expanded {
-			if content := ex.GetBlock("content"); content.IsNotNil() {
+			if content := ex.GetBlock("content"); content != nil {
 				_ = e.expandDynamicBlocks(content)
 				b.InjectBlock(content, blockName)
 			}

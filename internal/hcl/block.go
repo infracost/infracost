@@ -122,10 +122,6 @@ func (b *Block) InjectBlock(block *Block, name string) {
 	b.childBlocks = append(b.childBlocks, block)
 }
 
-func (b *Block) markCountExpanded() {
-	b.expanded = true
-}
-
 func (b *Block) IsCountExpanded() bool {
 	return b.expanded
 }
@@ -165,7 +161,7 @@ func (b *Block) Clone(index cty.Value) *Block {
 	}
 	indexVal, _ := gocty.ToCtyValue(index, cty.Number)
 	clone.context.SetByDot(indexVal, "count.index")
-	clone.markCountExpanded()
+	clone.expanded = true
 	b.cloneIndex++
 
 	return clone
@@ -187,13 +183,6 @@ func (b *Block) HasModuleBlock() bool {
 		return false
 	}
 	return b.moduleBlock != nil
-}
-
-func (b *Block) GetModuleBlock() (*Block, error) {
-	if b.HasModuleBlock() {
-		return b.moduleBlock, nil
-	}
-	return nil, fmt.Errorf("the block does not have an associated module block")
 }
 
 func (b *Block) Type() string {
@@ -221,17 +210,6 @@ func (b *Block) Range() Range {
 		StartLine: r.Start.Line,
 		EndLine:   r.End.Line,
 	}
-}
-
-func (b *Block) GetFirstMatchingBlock(names ...string) *Block {
-	var returnBlock *Block
-	for _, name := range names {
-		childBlock := b.GetBlock(name)
-		if childBlock.IsNotNil() {
-			return childBlock
-		}
-	}
-	return returnBlock
 }
 
 func (b *Block) getHCLAttributes() hcl.Attributes {
@@ -275,14 +253,6 @@ func (b *Block) AllBlocks() Blocks {
 	return b.childBlocks
 }
 
-func (b *Block) GetBlocks(name string) Blocks {
-	if b == nil || b.hclBlock == nil {
-		return nil
-	}
-
-	return b.childBlocks.OfType(name)
-}
-
 func (b *Block) GetAttributes() []*Attribute {
 	var results []*Attribute
 	if b == nil || b.hclBlock == nil {
@@ -310,29 +280,6 @@ func (b *Block) GetAttribute(name string) *Attribute {
 	return attr
 }
 
-func (b *Block) GetNestedAttribute(name string) *Attribute {
-	var returnAttr *Attribute
-	parts := strings.Split(name, ".")
-	blocks := parts[:len(parts)-1]
-	attrName := parts[len(parts)-1]
-
-	var working = b
-	for _, subBlock := range blocks {
-		checkBlock := working.GetBlock(subBlock)
-		if checkBlock == nil {
-			return returnAttr
-		}
-
-		working = checkBlock
-	}
-
-	if working != nil {
-		return working.GetAttribute(attrName)
-	}
-
-	return returnAttr
-}
-
 func (b *Block) Reference() *Reference {
 	var parts []string
 	if b.Type() != "resource" {
@@ -342,10 +289,6 @@ func (b *Block) Reference() *Reference {
 	parts = append(parts, b.Labels()...)
 	ref, _ := newReference(parts)
 	return ref
-}
-
-func (b *Block) ReadLines() (lines []string, comments []string, err error) {
-	return b.Range().ReadLines(false)
 }
 
 // LocalName is the name relative to the current module
@@ -365,13 +308,6 @@ func (b *Block) FullName() string {
 	return b.LocalName()
 }
 
-func (b *Block) UniqueName() string {
-	if b.moduleBlock != nil {
-		return fmt.Sprintf("%s:%s:%s", b.FullName(), b.Range().Filename, b.moduleBlock.UniqueName())
-	}
-	return fmt.Sprintf("%s:%s", b.FullName(), b.Range().Filename)
-}
-
 func (b *Block) TypeLabel() string {
 	if len(b.Labels()) > 0 {
 		return b.Labels()[0]
@@ -387,84 +323,31 @@ func (b *Block) NameLabel() string {
 }
 
 func (b *Block) HasChild(childElement string) bool {
-	return b.GetAttribute(childElement).IsNotNil() || b.GetBlock(childElement).IsNotNil()
-}
-
-func (b *Block) MissingChild(childElement string) bool {
-	if b == nil {
-		return true
-	}
-
-	return !b.HasChild(childElement)
-}
-
-func (b *Block) MissingNestedChild(name string) bool {
-	if b == nil {
-		return true
-	}
-
-	parts := strings.Split(name, ".")
-	blocks := parts[:len(parts)-1]
-	last := parts[len(parts)-1]
-
-	var working = b
-	for _, subBlock := range blocks {
-		checkBlock := working.GetBlock(subBlock)
-		if checkBlock == nil {
-			return true
-		}
-
-		working = checkBlock
-	}
-	return !working.HasChild(last)
-
-}
-
-func (b *Block) InModule() bool {
-	if b == nil {
-		return false
-	}
-	return b.moduleBlock != nil
+	return b.GetAttribute(childElement).IsNotNil() || b.GetBlock(childElement) != nil
 }
 
 func (b *Block) Label() string {
 	return strings.Join(b.hclBlock.Labels, ".")
 }
 
-func (b *Block) HasBlock(childElement string) bool {
-	return b.GetBlock(childElement).IsNil()
-}
-
-func (b *Block) IsResourceType(resourceType string) bool {
-	return b.TypeLabel() == resourceType
-}
-
-func (b *Block) IsEmpty() bool {
-	return len(b.AllBlocks()) == 0 && len(b.GetAttributes()) == 0
-}
-
 func (b *Block) Attributes() map[string]*Attribute {
 	attributes := make(map[string]*Attribute)
+
 	for _, attr := range b.GetAttributes() {
 		attributes[attr.Name()] = attr
 	}
+
 	return attributes
 }
 
 func (b *Block) Values() cty.Value {
 	values := make(map[string]cty.Value)
+
 	for _, attribute := range b.GetAttributes() {
 		values[attribute.Name()] = attribute.Value()
 	}
+
 	return cty.ObjectVal(values)
-}
-
-func (b *Block) IsNil() bool {
-	return b == nil
-}
-
-func (b *Block) IsNotNil() bool {
-	return !b.IsNil()
 }
 
 func loadBlocksFromFile(file *hcl.File) (hcl.Blocks, error) {
