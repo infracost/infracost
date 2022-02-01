@@ -11,7 +11,6 @@ import (
 	"github.com/awslabs/goformation/v4"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
 
 	"github.com/infracost/infracost/internal/config"
@@ -27,7 +26,7 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 	}
 
 	if ctx.ProjectConfig.HCLOnly {
-		return hcl.NewDirProvider(ctx, terraform.NewPlanJSONProvider(ctx))
+		return terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx))
 	}
 
 	if isCloudFormationTemplate(path) {
