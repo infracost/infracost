@@ -140,9 +140,10 @@ func (e *Evaluator) exportOutputs() cty.Value {
 
 	for _, block := range e.blocks.OfType("output") {
 		attr := block.GetAttribute("value")
-		if attr.IsNil() {
+		if attr == nil {
 			continue
 		}
+
 		data[block.Label()] = attr.Value()
 	}
 
@@ -215,7 +216,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 	var forEachFiltered Blocks
 	for _, block := range blocks {
 		forEachAttr := block.GetAttribute("for_each")
-		if forEachAttr.IsNil() || block.IsCountExpanded() || (block.Type() != "resource" && block.Type() != "module" && block.Type() != "dynamic") {
+		if forEachAttr == nil || block.IsCountExpanded() || (block.Type() != "resource" && block.Type() != "module" && block.Type() != "dynamic") {
 			forEachFiltered = append(forEachFiltered, block)
 			continue
 		}
@@ -249,7 +250,7 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 	var countFiltered Blocks
 	for _, block := range blocks {
 		countAttr := block.GetAttribute("count")
-		if countAttr.IsNil() || block.IsCountExpanded() || (block.Type() != "resource" && block.Type() != "module") {
+		if countAttr == nil || block.IsCountExpanded() || (block.Type() != "resource" && block.Type() != "module") {
 			countFiltered = append(countFiltered, block)
 			continue
 		}
@@ -327,7 +328,7 @@ func (e *Evaluator) evaluateOutput(b *Block) (cty.Value, error) {
 	}
 
 	attribute := b.GetAttribute("value")
-	if attribute.IsNil() {
+	if attribute == nil {
 		return cty.NilVal, fmt.Errorf("cannot resolve variable with no attributes")
 	}
 	return attribute.Value(), nil
