@@ -21,12 +21,6 @@ import (
 
 const maxContextIterations = 32
 
-type visitedModule struct {
-	name                string
-	path                string
-	definitionReference string
-}
-
 type Evaluator struct {
 	ctx               *Context
 	blocks            Blocks
@@ -451,6 +445,30 @@ func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition
 		Definition: b,
 		Modules:    []*Module{&Module{RootPath: e.projectRootPath, ModulePath: modulePath, Blocks: blocks}},
 	}, nil
+}
+
+// LoadModules reads all module blocks and loads the underlying modules, adding blocks to e.moduleBlocks
+func (e *Evaluator) loadModules(stopOnHCLError bool) []*ModuleDefinition {
+	blocks := e.blocks
+	var moduleDefinitions []*ModuleDefinition
+
+	expanded := e.expandBlocks(blocks.OfType("module"))
+
+	for _, moduleBlock := range expanded {
+		if moduleBlock.Label() == "" {
+			continue
+		}
+
+		moduleDefinition, err := e.loadModule(moduleBlock, stopOnHCLError)
+		if err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "WARNING: Failed to load module: %s\n", err)
+			continue
+		}
+
+		moduleDefinitions = append(moduleDefinitions, moduleDefinition)
+	}
+
+	return moduleDefinitions
 }
 
 // expFunctions returns the set of functions that should be used to when evaluating

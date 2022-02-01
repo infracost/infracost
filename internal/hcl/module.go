@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	log "github.com/sirupsen/logrus"
@@ -17,144 +16,11 @@ type Module struct {
 	ModulePath string
 }
 
-func (c *Module) getBlocksByType(blockType string, label string) Blocks {
-	var results Blocks
-
-	for _, block := range c.Blocks {
-		if block.Type() == blockType && len(block.Labels()) > 0 && block.TypeLabel() == label {
-			results = append(results, block)
-		}
-	}
-
-	return results
-}
-
-func (c *Module) getModuleBlocks() Blocks {
-	var results Blocks
-
-	for _, block := range c.Blocks {
-		if block.Type() == "module" {
-			results = append(results, block)
-		}
-	}
-
-	return results
-}
-
-func (c *Module) GetResourcesByType(label string) Blocks {
-	return c.getBlocksByType("resource", label)
-}
-
-func (c *Module) GetDatasByType(label string) Blocks {
-	return c.getBlocksByType("data", label)
-}
-
-func (c *Module) GetProviderBlocksByProvider(providerName string, alias string) Blocks {
-	var results Blocks
-
-	for _, block := range c.Blocks {
-		if block.Type() == "provider" && len(block.Labels()) > 0 && block.TypeLabel() == providerName {
-			if alias != "" {
-				name := strings.ReplaceAll(alias, providerName+".", "")
-				if block.HasChild("alias") && block.GetAttribute("alias").Equals(name) {
-					results = append(results, block)
-				}
-			} else if !block.HasChild("alias") {
-				results = append(results, block)
-			}
-		}
-	}
-
-	return results
-}
-
-func (c *Module) GetReferencedBlock(referringAttr *Attribute) (*Block, error) {
-	for _, ref := range referringAttr.AllReferences() {
-		for _, block := range c.Blocks {
-			if ref.RefersTo(block) {
-				return block, nil
-			}
-		}
-	}
-
-	return nil, fmt.Errorf("no referenced block found in '%s'", referringAttr.Name())
-}
-
-func (c *Module) GetReferencingResources(originalBlock *Block, referencingLabel string, referencingAttributeName string) (Blocks, error) {
-	return c.getReferencingBlocks(originalBlock, "resource", referencingLabel, referencingAttributeName)
-}
-
-func (c *Module) GetsModulesBySource(moduleSource string) (Blocks, error) {
-	var results Blocks
-
-	modules := c.getModuleBlocks()
-	for _, module := range modules {
-		if module.HasChild("source") && module.GetAttribute("source").Equals(moduleSource) {
-			results = append(results, module)
-		}
-	}
-
-	return results, nil
-}
-
-func (c *Module) getReferencingBlocks(originalBlock *Block, referencingType string, referencingLabel string, referencingAttributeName string) (Blocks, error) {
-	blocks := c.getBlocksByType(referencingType, referencingLabel)
-	var results Blocks
-
-	for _, block := range blocks {
-		attr := block.GetAttribute(referencingAttributeName)
-		if attr == nil {
-			continue
-		}
-
-		if attr.ReferencesBlock(originalBlock) {
-			results = append(results, block)
-			continue
-		}
-
-		for _, ref := range attr.AllReferences() {
-			if ref.TypeLabel() == "each" {
-				fe := block.GetAttribute("for_each")
-				if fe.ReferencesBlock(originalBlock) {
-					results = append(results, block)
-				}
-			}
-		}
-	}
-
-	return results, nil
-}
-
 type ModuleDefinition struct {
 	Name       string
 	Path       string
 	Definition *Block
 	Modules    []*Module
-}
-
-// LoadModules reads all module blocks and loads the underlying modules, adding blocks to e.moduleBlocks
-func (e *Evaluator) loadModules(stopOnHCLError bool) []*ModuleDefinition {
-	blocks := e.blocks
-
-	var moduleDefinitions []*ModuleDefinition
-
-	expanded := e.expandBlocks(blocks.OfType("module"))
-
-	for _, moduleBlock := range expanded {
-		if moduleBlock.Label() == "" {
-			continue
-		}
-
-		moduleDefinition, err := e.loadModule(moduleBlock, stopOnHCLError)
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "WARNING: Failed to load module: %s\n", err)
-			continue
-		}
-
-		moduleDefinitions = append(moduleDefinitions, moduleDefinition)
-	}
-
-	return moduleDefinitions
 }
 
 func getModuleBlocks(b *Block, modulePath string, blocks *Blocks, stopOnHCLError bool) error {
