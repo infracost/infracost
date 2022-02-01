@@ -167,6 +167,11 @@ func (e *Evaluator) collectModules() []*Module {
 }
 
 func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
+	// TODO: we need to work out why the evaluation step takes place in a loop. I have been unable to decipher
+	// why we need to evaluate the context at least twice. No tests that we've seen can replicated the scenario
+	// where lastContext.Variables change after the first `evaluateStep`. We should reach out to tfsec guys and
+	// work out why this loop was put in there. If they can't come up with a good reason we can nuke it and
+	// make the evaluate method much easier to understand.
 	for i := 0; i < maxContextIterations; i++ {
 		e.evaluateStep(i)
 
@@ -222,7 +227,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 		}
 
 		if !forEachAttr.Value().IsNull() && forEachAttr.Value().IsKnown() && forEachAttr.IsIterable() {
-			forEachAttr.Each(func(key cty.Value, val cty.Value) {
+			forEachAttr.Value().ForEachElement(func(key cty.Value, val cty.Value) bool {
 				clone := block.Clone(key)
 
 				ctx := clone.Context()
@@ -237,6 +242,8 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 
 				log.Debugf("Added %s from for_each", clone.Reference())
 				forEachFiltered = append(forEachFiltered, clone)
+
+				return false
 			})
 		}
 	}
