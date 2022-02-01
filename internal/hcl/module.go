@@ -59,7 +59,7 @@ func (c *Module) GetProviderBlocksByProvider(providerName string, alias string) 
 				if block.HasChild("alias") && block.GetAttribute("alias").Equals(name) {
 					results = append(results, block)
 				}
-			} else if block.MissingChild("alias") {
+			} else if !block.HasChild("alias") {
 				results = append(results, block)
 			}
 		}
