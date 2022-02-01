@@ -3,8 +3,6 @@ package hcl
 import (
 	"fmt"
 	"strings"
-
-	"github.com/zclconf/go-cty/cty"
 )
 
 type Reference struct {
@@ -57,18 +55,6 @@ func newReference(parts []string) (*Reference, error) {
 	return &ref, nil
 }
 
-func (r *Reference) BlockType() Type {
-	return r.blockType
-}
-
-func (r *Reference) TypeLabel() string {
-	return r.typeLabel
-}
-
-func (r *Reference) NameLabel() string {
-	return r.nameLabel
-}
-
 func (r *Reference) String() string {
 	base := fmt.Sprintf("%s.%s", r.typeLabel, r.nameLabel)
 
@@ -91,39 +77,4 @@ func (r *Reference) String() string {
 	}
 
 	return base
-}
-
-func (r *Reference) RefersTo(b *Block) bool {
-	if r.BlockType() != b.Reference().BlockType() {
-		return false
-	}
-
-	if r.TypeLabel() != b.Reference().TypeLabel() {
-		return false
-	}
-
-	if r.NameLabel() != b.Reference().NameLabel() {
-		return false
-	}
-
-	if r.Key() != "" && r.Key() != b.Reference().Key() {
-		return false
-	}
-
-	return true
-}
-
-func (r *Reference) SetKey(key cty.Value) {
-	switch key.Type() {
-	case cty.Number:
-		f := key.AsBigFloat()
-		f64, _ := f.Float64()
-		r.key = fmt.Sprintf("[%d]", int(f64))
-	case cty.String:
-		r.key = fmt.Sprintf("[%q]", key.AsString())
-	}
-}
-
-func (r *Reference) Key() string {
-	return r.key
 }

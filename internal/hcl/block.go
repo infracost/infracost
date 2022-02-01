@@ -253,11 +253,13 @@ func (b *Block) GetAttribute(name string) *Attribute {
 	if b == nil || b.hclBlock == nil {
 		return attr
 	}
+
 	for _, attr := range b.GetAttributes() {
 		if attr.Name() == name {
 			return attr
 		}
 	}
+
 	return attr
 }
 
@@ -304,7 +306,7 @@ func (b *Block) NameLabel() string {
 }
 
 func (b *Block) HasChild(childElement string) bool {
-	return b.GetAttribute(childElement).IsNotNil() || b.GetBlock(childElement) != nil
+	return b.GetAttribute(childElement) != nil || b.GetBlock(childElement) != nil
 }
 
 func (b *Block) Label() string {
