@@ -50,6 +50,7 @@ func (c *Context) Get(parts ...string) cty.Value {
 	if len(parts) == 0 {
 		return cty.NilVal
 	}
+
 	src := c.ctx.Variables
 	for i, part := range parts {
 		if i == len(parts)-1 {
@@ -61,11 +62,8 @@ func (c *Context) Get(parts ...string) cty.Value {
 		}
 		src = nextPart.AsValueMap()
 	}
-	return cty.NilVal
-}
 
-func (c *Context) GetByDot(path string) cty.Value {
-	return c.Get(strings.Split(path, ".")...)
+	return cty.NilVal
 }
 
 func (c *Context) SetByDot(val cty.Value, path string) {
