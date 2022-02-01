@@ -389,7 +389,7 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 // takes in a module "x" {} block and loads resources etc. into e.moduleBlocks - additionally returns variables to add to ["module.x.*"] variables
 func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition, error) {
 	if b.Label() == "" {
-		return nil, fmt.Errorf("module without label at %s", b.Range())
+		return nil, fmt.Errorf("module without label: %s", b.FullName())
 	}
 
 	var source string
@@ -404,7 +404,7 @@ func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition
 	}
 
 	if source == "" {
-		return nil, fmt.Errorf("could not read module source attribute at %s", b.Range().String())
+		return nil, fmt.Errorf("could not read module source attribute at %s", b.FullName())
 	}
 
 	var modulePath string
@@ -437,7 +437,7 @@ func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition
 	if err != nil {
 		return nil, err
 	}
-	log.Debugf("Loaded module '%s' (requested at %s)", modulePath, b.Range())
+	log.Debugf("Loaded module '%s' (requested at %s)", modulePath, b.FullName())
 
 	return &ModuleDefinition{
 		Name:       b.Label(),
