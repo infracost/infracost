@@ -81,7 +81,7 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 	}
 
 	for _, module := range modules {
-		for _, block := range module.GetBlocks() {
+		for _, block := range module.Blocks {
 			if block.Type() == "resource" {
 				r := ResourceJSON{
 					Address:       block.FullName(),
@@ -107,7 +107,10 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 					},
 				}
 
-				jsonValues := marshalAttributeValues(block.Values())
+				vals := block.Values()
+				jsonValues := marshalAttributeValues(vals)
+				//name := block.FullName()
+				//log.Printf("%s: %+v\n\n", name, vals.AsValueMap())
 
 				for _, b := range block.AllBlocks() {
 					childValues := marshalAttributeValues(b.Values())

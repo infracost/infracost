@@ -76,19 +76,35 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 	}
 
 	var children Blocks
-	switch body := hclBlock.Body.(type) {
-	case *hclsyntax.Body:
+	if body, ok := hclBlock.Body.(*hclsyntax.Body); ok {
 		for _, b := range body.Blocks {
 			children = append(children, NewHCLBlock(b.AsHCLBlock(), ctx, moduleBlock))
 		}
-	default:
-		content, _, diag := hclBlock.Body.PartialContent(terraformSchemaV012)
-		if diag == nil {
-			for _, hb := range content.Blocks {
-				children = append(children, NewHCLBlock(hb, ctx, moduleBlock))
-			}
+
+		return &Block{
+			context:     ctx,
+			hclBlock:    hclBlock,
+			moduleBlock: moduleBlock,
+			childBlocks: children,
 		}
 	}
+
+	content, _, diag := hclBlock.Body.PartialContent(terraformSchemaV012)
+	if diag != nil && diag.HasErrors() {
+		log.Debugf("error loading partial content from hcl file %s", diag.Error())
+
+		return &Block{
+			context:     ctx,
+			hclBlock:    hclBlock,
+			moduleBlock: moduleBlock,
+			childBlocks: children,
+		}
+	}
+
+	for _, hb := range content.Blocks {
+		children = append(children, NewHCLBlock(hb, ctx, moduleBlock))
+	}
+
 	return &Block{
 		context:     ctx,
 		hclBlock:    hclBlock,
@@ -337,7 +353,6 @@ func (b *Block) LocalName() string {
 }
 
 func (b *Block) FullName() string {
-
 	if b.moduleBlock != nil {
 		return fmt.Sprintf(
 			"%s.%s",
@@ -451,10 +466,10 @@ func (b *Block) IsNotNil() bool {
 	return !b.IsNil()
 }
 
-func LoadBlocksFromFile(file *hcl.File) (hcl.Blocks, error) {
-	contents, diagnostics := file.Body.Content(terraformSchemaV012)
-	if diagnostics != nil && diagnostics.HasErrors() {
-		return nil, diagnostics
+func loadBlocksFromFile(file *hcl.File) (hcl.Blocks, error) {
+	contents, diags := file.Body.Content(terraformSchemaV012)
+	if diags != nil && diags.HasErrors() {
+		return nil, diags
 	}
 
 	if contents == nil {
