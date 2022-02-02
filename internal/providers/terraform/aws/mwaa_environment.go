@@ -1,13 +1,14 @@
 package aws
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
-	"strings"
 )
 
-func GetMWAAEnvironmentRegistryItem() *schema.RegistryItem {
+func getMWAAEnvironmentRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_mwaa_environment",
 		RFunc: NewMWAAEnvironment,

@@ -33,6 +33,8 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_sync_usa
 6 cloud resources were detected, rerun with --show-skipped to see details:
 ∙ 6 were estimated, 6 include usage-based costs, see https://infracost.io/usage-file
 
+Add cost estimates to your pull requests: https://infracost.io/cicd
+
 Err:
     └─ Synced 0 of 6 resources
 

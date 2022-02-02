@@ -20,13 +20,13 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 		Use:   "gitlab",
 		Short: "Post an Infracost comment to GitLab",
 		Long:  "Post an Infracost comment to GitLab",
-		Example: `  Update a comment on a merge request:
+		Example: `  Update comment on a merge request:
 
-      infracost comment gitlab --repo my-org/my-gitlab-repo --merge-request 3 --path infracost.json --gitlab-token $GITLAB_TOKEN
+      infracost comment gitlab --repo my-org/my-repo --merge-request 3 --path infracost.json --gitlab-token $GITLAB_TOKEN
 
   Post a new comment to a commit:
 
-      infracost comment gitlab --repo my-org/my-gitlab-repo --commit 2ca7182 --path infracost.json --behavior delete-and-new --gitlab-token $GITLAB_TOKEN`,
+      infracost comment gitlab --repo my-org/my-repo --commit 2ca7182 --path infracost.json --behavior delete-and-new --gitlab-token $GITLAB_TOKEN`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx.SetContextValue("platform", "gitlab")
@@ -107,25 +107,25 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String("behavior", "update", `Behavior when posting the comment, one of:
-  update (default)  Update the latest comment
+	cmd.Flags().String("behavior", "update", `Behavior when posting comment, one of:
+  update (default)  Update latest comment
   new               Create a new comment
   delete-and-new    Delete previous matching comments and create a new comment`)
 	_ = cmd.RegisterFlagCompletionFunc("behavior", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return validCommentGitLabBehaviors, cobra.ShellCompDirectiveDefault
 	})
-	cmd.Flags().String("commit", "", "Commit SHA to post/get the comment, mutually exclusive with merge-request")
-	cmd.Flags().String("gitlab-server-url", "https://gitlab.com", "GitLab Server URL, defaults to https://gitlab.com")
+	cmd.Flags().String("commit", "", "Commit SHA to post comment on, mutually exclusive with merge-request")
+	cmd.Flags().String("gitlab-server-url", "https://gitlab.com", "GitLab Server URL")
 	cmd.Flags().String("gitlab-token", "", "GitLab token")
 	_ = cmd.MarkFlagRequired("gitlab-token")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
-	cmd.Flags().Int("merge-request", 0, "Merge request number to post the comment on, mutually exclusive with commit")
-	cmd.Flags().String("repo", "", "Repository in the format owner/repo")
+	cmd.Flags().Int("merge-request", 0, "Merge request number to post comment on, mutually exclusive with commit")
+	cmd.Flags().String("repo", "", "Repository in format owner/repo")
 	_ = cmd.MarkFlagRequired("repo")
-	cmd.Flags().String("tag", "", "Customize the embedded tag that is used for detecting comments posted by Infracost")
-	cmd.Flags().Bool("dry-run", false, "Generate the comment without actually posting to GitLab.")
+	cmd.Flags().String("tag", "", "Customize hidden markdown tag used to detect comments posted by Infracost")
+	cmd.Flags().Bool("dry-run", false, "Generate comment without actually posting to GitLab")
 
 	return cmd
 }

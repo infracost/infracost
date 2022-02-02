@@ -9,7 +9,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetInstanceRegistryItem() *schema.RegistryItem {
+func getInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name: "aws_instance",
 		Notes: []string{

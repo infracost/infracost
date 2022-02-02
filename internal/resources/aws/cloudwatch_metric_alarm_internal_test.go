@@ -1,8 +1,9 @@
-package aws
+package aws_test
 
 import (
 	"testing"
 
+	resources "github.com/infracost/infracost/internal/resources/aws"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,8 +20,10 @@ func TestCloudwatchMetricResolution(t *testing.T) {
 		{decimal.NewFromInt(10), false},
 	}
 
+	resource := resources.CloudwatchMetricAlarm{}
+
 	for _, test := range tests {
-		actual := calcMetricResolution(test.inputValue)
+		actual := resource.CalcMetricResolution(test.inputValue)
 		assert.Equal(t, test.expected, actual)
 	}
 }

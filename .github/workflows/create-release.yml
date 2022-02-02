@@ -31,7 +31,9 @@ jobs:
         with:
           args: |
             ./build/infracost-linux-amd64.tar.gz
+            ./build/infracost-linux-arm64.tar.gz
             ./build/infracost-windows-amd64.tar.gz
+            ./build/infracost-windows-arm64.tar.gz
             ./build/infracost-darwin-amd64.tar.gz
             ./build/infracost-darwin-arm64.tar.gz
             ./docs/generated/docs.tar.gz
@@ -59,6 +61,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           push: true
 
@@ -79,6 +82,7 @@ jobs:
         with:
           context: .
           file: Dockerfile.ci
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta-ci.outputs.tags }}
           push: true
 

@@ -4,7 +4,7 @@ USAGE
   infracost diff [flags]
 
 EXAMPLES
-  Use Terraform directory with any required Terraform flags:
+  Use Terraform directory with any required flags:
 
       infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
 

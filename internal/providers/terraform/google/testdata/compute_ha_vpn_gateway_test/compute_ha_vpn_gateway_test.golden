@@ -17,3 +17,5 @@
 ∙ 1 was estimated, 1 includes usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x google_compute_network
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

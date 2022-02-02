@@ -35,3 +35,5 @@
 ──────────────────────────────────
 10 cloud resources were detected:
 ∙ 10 were estimated
+
+Add cost estimates to your pull requests: https://infracost.io/cicd
