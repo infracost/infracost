@@ -39,6 +39,23 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
+	t.Run("HCL", func(t *testing.T) {
+		hclArgs := make([]string, len(args)+2)
+		copy(hclArgs, args)
+		hclArgs[len(args)] = "--hcl-only"
+		hclArgs[len(args)+1] = "true"
+
+		goldenFileCommandTest(t, testName, hclArgs, testOptions, ctxOptions)
+	})
+
+	t.Run("Terraform CLI", func(t *testing.T) {
+		goldenFileCommandTest(t, testName, args, testOptions, ctxOptions)
+	})
+}
+
+func goldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions []func(ctx *config.RunContext)) {
+	t.Helper()
+
 	if testOptions == nil {
 		testOptions = DefaultOptions()
 	}
