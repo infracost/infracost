@@ -63,21 +63,21 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 		TerraformVersion: "1.1.0",
 		Variables:        nil,
 		PlannedValues: struct {
-			RootModule struct {
-				Resources    []ResourceJSON `json:"resources"`
-				ChildModules []ChildModule  `json:"child_modules"`
-			} `json:"root_module"`
+			RootModule PlanRootModule `json:"root_module"`
 		}{
-			RootModule: struct {
-				Resources    []ResourceJSON `json:"resources"`
-				ChildModules []ChildModule  `json:"child_modules"`
-			}{
+			RootModule: PlanRootModule{
 				Resources:    []ResourceJSON{},
 				ChildModules: []ChildModule{{}},
 			},
 		},
 		ResourceChanges: []ResourceChangesJSON{},
-		Configuration:   nil,
+		Configuration: Configuration{
+			RootModule: struct {
+				Resources []ResourceData `json:"resources"`
+			}{
+				Resources: []ResourceData{},
+			},
+		},
 	}
 
 	for _, module := range modules {
@@ -113,6 +113,14 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 				c.Change.After = jsonValues
 				r.Values = jsonValues
 
+				sch.Configuration.RootModule.Resources = append(sch.Configuration.RootModule.Resources, ResourceData{
+					Address:     block.FullName(),
+					Mode:        "managed",
+					Type:        block.TypeLabel(),
+					Name:        block.LocalName(),
+					Expressions: blockToReferences(block),
+				})
+
 				sch.ResourceChanges = append(sch.ResourceChanges, c)
 				if !block.HasModuleBlock() {
 					sch.PlannedValues.RootModule.Resources = append(sch.PlannedValues.RootModule.Resources, r)
@@ -125,6 +133,40 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 	}
 
 	return sch
+}
+
+func blockToReferences(block *hcl.Block) map[string]interface{} {
+	expressionValues := make(map[string]interface{})
+
+	for _, attribute := range block.GetAttributes() {
+		references := attribute.AllReferences()
+		if len(references) > 0 {
+			r := refs{}
+			for _, ref := range references {
+				r.References = append(r.References, ref.String())
+			}
+
+			expressionValues[attribute.Name()] = r
+		}
+
+		childExpressions := make(map[string][]interface{})
+		for _, child := range block.Children() {
+			vals := childExpressions[child.Type()]
+			childReferences := blockToReferences(child)
+
+			if len(childReferences) > 0 {
+				childExpressions[child.Type()] = append(vals, childReferences)
+			}
+		}
+
+		if len(childExpressions) > 0 {
+			for name, v := range childExpressions {
+				expressionValues[name] = v
+			}
+		}
+	}
+
+	return expressionValues
 }
 
 func marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
@@ -187,15 +229,35 @@ type PlanSchema struct {
 	TerraformVersion string      `json:"terraform_version"`
 	Variables        interface{} `json:"variables"`
 	PlannedValues    struct {
-		RootModule struct {
-			Resources    []ResourceJSON `json:"resources"`
-			ChildModules []ChildModule  `json:"child_modules"`
-		} `json:"root_module"`
+		RootModule PlanRootModule `json:"root_module"`
 	} `json:"planned_values"`
 	ResourceChanges []ResourceChangesJSON `json:"resource_changes"`
-	Configuration   interface{}           `json:"configuration"`
+	Configuration   Configuration         `json:"configuration"`
+}
+
+type PlanRootModule struct {
+	Resources    []ResourceJSON `json:"resources"`
+	ChildModules []ChildModule  `json:"child_modules"`
+}
+
+type Configuration struct {
+	RootModule struct {
+		Resources []ResourceData `json:"resources"`
+	} `json:"root_module"`
+}
+
+type ResourceData struct {
+	Address     string                 `json:"address"`
+	Mode        string                 `json:"mode"`
+	Type        string                 `json:"type"`
+	Name        string                 `json:"name"`
+	Expressions map[string]interface{} `json:"expressions"`
 }
 
 type ChildModule struct {
 	Resources []ResourceJSON `json:"resources"`
+}
+
+type refs struct {
+	References []string `json:"references"`
 }
