@@ -107,19 +107,8 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 					},
 				}
 
-				vals := block.Values()
-				jsonValues := marshalAttributeValues(vals)
-
-				for _, b := range block.Children() {
-					childValues := marshalAttributeValues(b.Values())
-
-					if v, ok := jsonValues[b.Type()]; ok {
-						jsonValues[b.Type()] = append(v.([]interface{}), childValues)
-						continue
-					}
-
-					jsonValues[b.Type()] = []interface{}{childValues}
-				}
+				jsonValues := marshalAttributeValues(block.Values())
+				marshalBlock(block, jsonValues)
 
 				c.Change.After = jsonValues
 				r.Values = jsonValues
@@ -136,6 +125,22 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 	}
 
 	return sch
+}
+
+func marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
+	for _, b := range block.Children() {
+		childValues := marshalAttributeValues(b.Values())
+		if len(b.Children()) > 0 {
+			marshalBlock(b, childValues)
+		}
+
+		if v, ok := jsonValues[b.Type()]; ok {
+			jsonValues[b.Type()] = append(v.([]interface{}), childValues)
+			continue
+		}
+
+		jsonValues[b.Type()] = []interface{}{childValues}
+	}
 }
 
 func marshalAttributeValues(value cty.Value) map[string]interface{} {
