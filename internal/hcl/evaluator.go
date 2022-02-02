@@ -21,20 +21,41 @@ import (
 
 const maxContextIterations = 32
 
+// Evaluator provides a set of given Blocks with contextual information.
+// Evaluator is an important step in retrieving Block values that can be used in the
+// schema.Resource cost retrieval. Without Evaluator the Blocks provided only have shallow information
+// within attributes and won't contain any evaluated variables or references.
 type Evaluator struct {
-	ctx               *Context
-	blocks            Blocks
-	moduleDefinitions []*ModuleDefinition
-	visitedModules    map[string]struct{}
-	inputVars         map[string]cty.Value
-	moduleMetadata    *ModulesMetadata
-	projectRootPath   string // root of the current scan
-	stopOnHCLError    bool
-	modulePath        string
-	workingDir        string
-	workspace         string
+	// ctx is the master Context for evaluating the current set of Blocks. This is extremely important
+	// and gets slowly built up as the Evaluator runs across the list of Blocks.
+	ctx *Context
+	// blocks is the list of Blocks that the Evaluator will evaluate over.
+	blocks Blocks
+	// inputVars are the given input variables for this Evaluator run. At the root module level these are variables
+	// provided by the user as tfvars. Further down the config tree these input vars are module variables provided in
+	// HCL attributes.
+	inputVars map[string]cty.Value
+	// moduleCalls are the modules that the list of Blocks call to. This is built at runtime.
+	moduleCalls []*ModuleDefinition
+	// moduleMetadata is a lookup map of where modules exist on the local filesystem. This is built as part of a
+	// Terraform or Infracost init.
+	moduleMetadata *ModulesMetadata
+	// visitedModules is a lookup map to hold information by the Evaluator of modules that it has already evaluated.
+	visitedModules map[string]struct{}
+	// projectRootPath is the path to the root module for this project.
+	projectRootPath string
+	// modulePath is the path to the local representation of the module as defined in ModulesMetadata.
+	modulePath string
+	// workingDir is the current directory the evaluator is running within. This is used to set Context information on
+	// child modules that the evaluator visits.
+	workingDir string
+	// workspace is the Terraform workspace that the Evaluator is running within.
+	workspace string
 }
 
+// NewEvaluator returns an Evaluator with Context initialised with top level variables.
+// This Context is then passed to all Blocks as child Context so that variables built in Evaluation
+// are propagated to the Block Attributes.
 func NewEvaluator(
 	projectRootPath string,
 	modulePath string,
@@ -43,7 +64,6 @@ func NewEvaluator(
 	inputVars map[string]cty.Value,
 	moduleMetadata *ModulesMetadata,
 	visitedModules map[string]struct{},
-	stopOnHCLError bool,
 	workspace string,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
@@ -61,100 +81,47 @@ func NewEvaluator(
 	ctx.SetByDot(cty.StringVal(workingDir), "path.cwd")
 
 	for _, b := range blocks {
-		b.OverrideContext(ctx.NewChild())
+		b.SetContext(ctx.NewChild())
 	}
 
 	return &Evaluator{
 		modulePath:      modulePath,
 		projectRootPath: projectRootPath,
-		workingDir:      workingDir,
 		ctx:             ctx,
 		blocks:          blocks,
 		inputVars:       inputVars,
 		moduleMetadata:  moduleMetadata,
 		visitedModules:  visitedModules,
-		stopOnHCLError:  stopOnHCLError,
 		workspace:       workspace,
 	}
 }
 
-func (e *Evaluator) EvaluateAll() ([]*Module, error) {
+// Run builds the Evaluator Context using all the provided Blocks. It will build up the Context to hold
+// variable and reference information so that this can be used by Attribute evaluation. Run will also
+// parse and build up and child modules that are referenced in the Blocks and runs child Evaluator on
+// these Modules.
+func (e *Evaluator) Run() ([]*Module, error) {
 	var lastContext hcl.EvalContext
+	// first we need to evaluate the top level Context - so this can be passed to any child modules that are found.
 	e.evaluate(lastContext)
-	e.moduleDefinitions = e.loadModules(true)
 
-	// expand out resources and modules via count
+	// let's load the modules now we have our top level context.
+	e.moduleCalls = e.loadModules(true)
+
+	// expand out resources and modules via count and evaluate again so that we can include
+	// any module outputs and or count references.
 	e.blocks = e.expandBlocks(e.blocks)
 	e.evaluate(lastContext)
 
+	// returns all the evaluated Blocks under their given Modules.
 	return e.collectModules(), nil
-}
-
-func (e *Evaluator) evaluateStep(i int) {
-	log.Debugf("Starting iteration %d of context evaluation...", i+1)
-
-	e.ctx.Set(e.getValuesByBlockType("variable"), "var")
-	e.ctx.Set(e.getValuesByBlockType("locals"), "local")
-	e.ctx.Set(e.getValuesByBlockType("provider"), "provider")
-
-	resources := e.getValuesByBlockType("resource")
-	for key, resource := range resources.AsValueMap() {
-		e.ctx.Set(resource, key)
-	}
-
-	e.ctx.Set(e.getValuesByBlockType("data"), "data")
-	e.ctx.Set(e.getValuesByBlockType("output"), "output")
-
-	e.evaluateModules()
-}
-
-func (e *Evaluator) evaluateModules() {
-	for _, module := range e.moduleDefinitions {
-		if _, ok := e.visitedModules[module.Definition.FullName()]; ok {
-			continue
-		}
-
-		e.visitedModules[module.Definition.FullName()] = struct{}{}
-
-		vars := module.Definition.Values().AsValueMap()
-		moduleEvaluator := NewEvaluator(
-			e.projectRootPath,
-			module.Path,
-			e.workingDir,
-			module.Modules[0].Blocks,
-			vars,
-			e.moduleMetadata,
-			e.visitedModules,
-			e.stopOnHCLError,
-			e.workspace,
-		)
-		module.Modules, _ = moduleEvaluator.EvaluateAll()
-
-		e.ctx.Set(moduleEvaluator.exportOutputs(), "module", module.Name)
-	}
-}
-
-// export module outputs to a parent
-func (e *Evaluator) exportOutputs() cty.Value {
-	data := make(map[string]cty.Value)
-
-	for _, block := range e.blocks.OfType("output") {
-		attr := block.GetAttribute("value")
-		if attr == nil {
-			continue
-		}
-
-		data[block.Label()] = attr.Value()
-	}
-
-	return cty.ObjectVal(data)
 }
 
 func (e *Evaluator) collectModules() []*Module {
 	rootModule := &Module{Blocks: e.blocks, RootPath: e.projectRootPath, ModulePath: e.modulePath}
 	modules := []*Module{rootModule}
 
-	for _, definition := range e.moduleDefinitions {
+	for _, definition := range e.moduleCalls {
 		modules = append(modules, definition.Modules...)
 	}
 
@@ -182,6 +149,69 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 			lastContext.Variables[k] = v
 		}
 	}
+}
+
+// evaluateStep gets the values for all the Block types in the current Module that affect Context.
+// It then sets these values on the Context so that they can be used in Block Attribute evaluation.
+func (e *Evaluator) evaluateStep(i int) {
+	log.Debugf("Starting iteration %d of context evaluation...", i+1)
+
+	e.ctx.Set(e.getValuesByBlockType("variable"), "var")
+	e.ctx.Set(e.getValuesByBlockType("locals"), "local")
+	e.ctx.Set(e.getValuesByBlockType("provider"), "provider")
+
+	resources := e.getValuesByBlockType("resource")
+	for key, resource := range resources.AsValueMap() {
+		e.ctx.Set(resource, key)
+	}
+
+	e.ctx.Set(e.getValuesByBlockType("data"), "data")
+	e.ctx.Set(e.getValuesByBlockType("output"), "output")
+
+	e.evaluateModules()
+}
+
+// evaluateModules loops over each of the moduleCalls in this Module and set a child Evaluator
+// to run on the child Module Blocks. It passes the Evaluator the top level module Attributes as input variables.
+func (e *Evaluator) evaluateModules() {
+	for _, module := range e.moduleCalls {
+		if _, ok := e.visitedModules[module.Definition.FullName()]; ok {
+			continue
+		}
+
+		e.visitedModules[module.Definition.FullName()] = struct{}{}
+
+		vars := module.Definition.Values().AsValueMap()
+		moduleEvaluator := NewEvaluator(
+			e.projectRootPath,
+			module.Path,
+			e.workingDir,
+			module.Modules[0].Blocks,
+			vars,
+			e.moduleMetadata,
+			e.visitedModules,
+			e.workspace,
+		)
+		module.Modules, _ = moduleEvaluator.Run()
+
+		e.ctx.Set(moduleEvaluator.exportOutputs(), "module", module.Name)
+	}
+}
+
+// exportOutputs exports module outputs so that it can be used in Context evaluation.
+func (e *Evaluator) exportOutputs() cty.Value {
+	data := make(map[string]cty.Value)
+
+	for _, block := range e.blocks.OfType("output") {
+		attr := block.GetAttribute("value")
+		if attr == nil {
+			continue
+		}
+
+		data[block.Label()] = attr.Value()
+	}
+
+	return cty.ObjectVal(data)
 }
 
 func (e *Evaluator) expandBlocks(blocks Blocks) Blocks {
@@ -334,7 +364,6 @@ func (e *Evaluator) evaluateOutput(b *Block) (cty.Value, error) {
 	return attribute.Value(), nil
 }
 
-// returns true if all evaluations were successful
 func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 	blocksOfType := e.blocks.OfType(blockType)
 	values := make(map[string]cty.Value)
@@ -387,7 +416,8 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 	return cty.ObjectVal(values)
 }
 
-// takes in a module "x" {} block and loads resources etc. into e.moduleBlocks - additionally returns variables to add to ["module.x.*"] variables
+// loadModule takes in a module "x" {} block and loads resources etc. into e.moduleBlocks.
+// Additionally, it returns variables to add to ["module.x.*"] variables
 func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition, error) {
 	if b.Label() == "" {
 		return nil, fmt.Errorf("module without label: %s", b.FullName())
@@ -422,8 +452,6 @@ func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition
 	}
 
 	if modulePath == "" {
-		// if we have no metadata, we can only support modules available on the local filesystem
-		// users wanting this feature should run a `terraform init` before running infracost to cache all modules locally
 		if !strings.HasPrefix(source, fmt.Sprintf(".%c", os.PathSeparator)) && !strings.HasPrefix(source, fmt.Sprintf("..%c", os.PathSeparator)) {
 			reg := "registry.terraform.io/" + source
 			return nil, fmt.Errorf("missing module with source '%s %s' -  try to 'terraform init' first", reg, source)
@@ -448,7 +476,7 @@ func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition
 	}, nil
 }
 
-// LoadModules reads all module blocks and loads the underlying modules, adding blocks to e.moduleBlocks
+// loadModules reads all module blocks and loads the underlying modules, adding blocks to e.moduleBlocks
 func (e *Evaluator) loadModules(stopOnHCLError bool) []*ModuleDefinition {
 	blocks := e.blocks
 	var moduleDefinitions []*ModuleDefinition
@@ -462,7 +490,7 @@ func (e *Evaluator) loadModules(stopOnHCLError bool) []*ModuleDefinition {
 
 		moduleDefinition, err := e.loadModule(moduleBlock, stopOnHCLError)
 		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "WARNING: Failed to load module: %s\n", err)
+			log.Warnf("Failed to load module %s: err: %s", moduleDefinition.Name, err)
 			continue
 		}
 

@@ -217,12 +217,12 @@ func (b *Block) Clone(index cty.Value) *Block {
 	return clone
 }
 
-// OverrideContext sets the Block.context to the provided ctx. This ctx is also set on the child Blocks as
+// SetContext sets the Block.context to the provided ctx. This ctx is also set on the child Blocks as
 // a child Context. Meaning that it can be used in traversal evaluation when looking up Context variables.
-func (b *Block) OverrideContext(ctx *Context) {
+func (b *Block) SetContext(ctx *Context) {
 	b.context = ctx
 	for _, block := range b.childBlocks {
-		block.OverrideContext(ctx.NewChild())
+		block.SetContext(ctx.NewChild())
 	}
 }
 
