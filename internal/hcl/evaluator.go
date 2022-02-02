@@ -491,7 +491,7 @@ func (e *Evaluator) loadModules() []*ModuleCall {
 
 		moduleCall, err := e.loadModule(moduleBlock)
 		if err != nil {
-			log.Warnf("Failed to load module %s: err: %s", moduleCall.Name, err)
+			log.Warnf("Failed to load module err: %s", err)
 			continue
 		}
 
