@@ -45,6 +45,7 @@ func buildCommentBody(ctx *config.RunContext, paths []string, mdOpts output.Mark
 	if err != nil {
 		return nil, err
 	}
+	combined.IsCIRun = ctx.IsCIRun()
 
 	opts := output.Options{
 		DashboardEnabled: ctx.Config.EnableDashboard,
