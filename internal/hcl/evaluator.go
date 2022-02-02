@@ -196,15 +196,15 @@ func (e *Evaluator) expandDynamicBlocks(blocks ...*Block) Blocks {
 }
 
 func (e *Evaluator) expandDynamicBlock(b *Block) {
-	for _, sub := range b.AllBlocks() {
+	for _, sub := range b.Children() {
 		e.expandDynamicBlock(sub)
 	}
 
-	for _, sub := range b.AllBlocks().OfType("dynamic") {
+	for _, sub := range b.Children().OfType("dynamic") {
 		blockName := sub.TypeLabel()
 		expanded := e.expandBlockForEaches([]*Block{sub})
 		for _, ex := range expanded {
-			if content := ex.GetBlock("content"); content != nil {
+			if content := ex.GetChildBlock("content"); content != nil {
 				_ = e.expandDynamicBlocks(content)
 				b.InjectBlock(content, blockName)
 			}
@@ -306,7 +306,7 @@ func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 		return cty.NilVal, fmt.Errorf("empty label - cannot resolve")
 	}
 
-	attributes := b.Attributes()
+	attributes := b.AttributesAsMap()
 	if attributes == nil {
 		return cty.NilVal, fmt.Errorf("cannot resolve variable with no attributes")
 	}
@@ -394,7 +394,7 @@ func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition
 	}
 
 	var source string
-	attrs := b.Attributes()
+	attrs := b.AttributesAsMap()
 	for _, attr := range attrs {
 		if attr.Name() == "source" {
 			sourceVal := attr.Value()
