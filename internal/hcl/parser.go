@@ -149,11 +149,10 @@ func (parser *Parser) ParseDirectory() ([]*Module, error) {
 		inputVars,
 		modulesMetadata,
 		nil,
-		parser.stopOnHCLError,
 		parser.workspaceName,
 	)
 
-	modules, err := evaluator.EvaluateAll()
+	modules, err := evaluator.Run()
 	if err != nil {
 		return nil, err
 	}
