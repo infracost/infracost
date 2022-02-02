@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
-
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
@@ -48,10 +46,10 @@ func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 		return []*schema.Project{}, fmt.Errorf("Error reading Terraform plan JSON file %w", err)
 	}
 
-	return p.LoadResourcesFromSrc(usage, j)
+	return p.LoadResourcesFromSrc(usage, j, spinner)
 }
 
-func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageData, j []byte) ([]*schema.Project, error) {
+func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageData, j []byte, spinner *ui.Spinner) ([]*schema.Project, error) {
 	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
@@ -68,6 +66,8 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageDa
 	project.PastResources = pastResources
 	project.Resources = resources
 
-	spinner.Success()
+	if spinner != nil {
+		spinner.Success()
+	}
 	return []*schema.Project{project}, nil
 }
