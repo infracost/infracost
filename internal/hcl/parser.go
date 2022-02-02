@@ -49,7 +49,7 @@ func TfVarsToOption(varsPaths ...string) (Option, error) {
 	return OptionWithTFVarsPaths(varsPaths), nil
 }
 
-// Parser is a tool for parsing terraform templates at a given file system location
+// Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
 	initialPath    string
 	tfvarsPaths    []string
@@ -57,7 +57,8 @@ type Parser struct {
 	workspaceName  string
 }
 
-// New creates a new Parser
+// New creates a new Parser with the provided options, it inits the workspace as under the default name
+// this can be changed using Option.
 func New(initialPath string, options ...Option) *Parser {
 	p := &Parser{
 		initialPath:   initialPath,
@@ -71,38 +72,14 @@ func New(initialPath string, options ...Option) *Parser {
 	return p
 }
 
-func (parser *Parser) parseDirectoryFiles(files []*hcl.File) (Blocks, error) {
-	var blocks Blocks
-
-	for _, file := range files {
-		fileBlocks, err := loadBlocksFromFile(file)
-		if err != nil {
-			if parser.stopOnHCLError {
-				return nil, err
-			}
-
-			log.Warnf("skipping file could not load blocks err: %s", err)
-			continue
-		}
-
-		if len(fileBlocks) > 0 {
-			log.Debugf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
-		}
-
-		for _, fileBlock := range fileBlocks {
-			blocks = append(
-				blocks,
-				NewHCLBlock(fileBlock, nil, nil),
-			)
-		}
-	}
-
-	return blocks, nil
-}
-
-// ParseDirectory parses all terraform files within a given directory
+// ParseDirectory parses all the terraform files in the initalPath into Blocks and then passes them to an Evaluator
+// to fill these Blocks with additional Context information. Parser does not parse any blocks outside the root Module.
+// It instead leaves Evaluator to fetch these Modules on demand. See Evaluator.loadModules for more information.
+//
+// ParseDirectory returns a list of Module that represent the Terraform Config tree.
 func (parser *Parser) ParseDirectory() ([]*Module, error) {
 	log.Debugf("Beginning parse for directory '%s'...", parser.initialPath)
+
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
 	files, err := loadDirectory(parser.initialPath, parser.stopOnHCLError)
@@ -141,6 +118,7 @@ func (parser *Parser) ParseDirectory() ([]*Module, error) {
 		return nil, fmt.Errorf("Error could not evaluate current working directory %w", err)
 	}
 
+	// load an Evaluator with the top level Blocks to begin Context propagation.
 	evaluator := NewEvaluator(
 		parser.initialPath,
 		parser.initialPath,
@@ -158,6 +136,35 @@ func (parser *Parser) ParseDirectory() ([]*Module, error) {
 	}
 
 	return modules, nil
+}
+
+func (parser *Parser) parseDirectoryFiles(files []*hcl.File) (Blocks, error) {
+	var blocks Blocks
+
+	for _, file := range files {
+		fileBlocks, err := loadBlocksFromFile(file)
+		if err != nil {
+			if parser.stopOnHCLError {
+				return nil, err
+			}
+
+			log.Warnf("skipping file could not load blocks err: %s", err)
+			continue
+		}
+
+		if len(fileBlocks) > 0 {
+			log.Debugf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
+		}
+
+		for _, fileBlock := range fileBlocks {
+			blocks = append(
+				blocks,
+				NewHCLBlock(fileBlock, nil, nil),
+			)
+		}
+	}
+
+	return blocks, nil
 }
 
 func loadDirectory(fullPath string, stopOnHCLError bool) ([]*hcl.File, error) {
