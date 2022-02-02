@@ -9,7 +9,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAutoscalingGroupRegistryItem(),
 	getACMCertificate(),
 	getACMPCACertificateAuthorityRegistryItem(),
-	GetBackupVaultRegistryItem(),
+	getBackupVaultRegistryItem(),
 	getCloudFormationStackRegistryItem(),
 	getCloudFormationStackSetRegistryItem(),
 	getCloudfrontDistributionRegistryItem(),
