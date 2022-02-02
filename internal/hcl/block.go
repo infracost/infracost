@@ -123,8 +123,13 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 
 		// add commonly used identifiers to the block so that if it's referenced by other
 		// blocks in context evaluation.
-		body.Attributes["id"] = newUniqueAttribute("id")
-		body.Attributes["arn"] = newUniqueAttribute("arn")
+		if _, ok := body.Attributes["id"]; !ok {
+			body.Attributes["id"] = newUniqueAttribute("id")
+		}
+
+		if _, ok := body.Attributes["arn"]; !ok {
+			body.Attributes["arn"] = newUniqueAttribute("arn")
+		}
 
 		return &Block{
 			context:     ctx,
