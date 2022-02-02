@@ -66,6 +66,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			combined.IsCIRun = ctx.IsCIRun()
 
 			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
