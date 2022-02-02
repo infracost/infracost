@@ -72,6 +72,7 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 		},
 		ResourceChanges: []ResourceChangesJSON{},
 		Configuration: Configuration{
+			ProviderConfig: make(map[string]ProviderConfig),
 			RootModule: struct {
 				Resources []ResourceData `json:"resources"`
 			}{
@@ -81,6 +82,31 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 	}
 
 	for _, module := range modules {
+		var providerKey string
+
+		for _, block := range module.Blocks {
+			if block.Type() == "provider" {
+				name := block.TypeLabel()
+				if a := block.GetAttribute("alias"); a != nil {
+					name = a.Value().AsString()
+				}
+
+				// set the default provider key
+				if providerKey == "" {
+					providerKey = name
+				}
+
+				sch.Configuration.ProviderConfig[name] = ProviderConfig{
+					Name: name,
+					Expressions: map[string]interface{}{
+						"region": map[string]interface{}{
+							"constant_value": block.GetAttribute("region").Value().AsString(),
+						},
+					},
+				}
+			}
+		}
+
 		for _, block := range module.Blocks {
 			if block.Type() == "resource" {
 				r := ResourceJSON{
@@ -113,12 +139,19 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 				c.Change.After = jsonValues
 				r.Values = jsonValues
 
+				providerConfigKey := providerKey
+				providerAttr := block.GetAttribute("provider")
+				if providerAttr != nil {
+					providerConfigKey = providerAttr.Value().AsString()
+				}
+
 				sch.Configuration.RootModule.Resources = append(sch.Configuration.RootModule.Resources, ResourceData{
-					Address:     block.FullName(),
-					Mode:        "managed",
-					Type:        block.TypeLabel(),
-					Name:        block.LocalName(),
-					Expressions: blockToReferences(block),
+					Address:           block.FullName(),
+					Mode:              "managed",
+					Type:              block.TypeLabel(),
+					Name:              block.LocalName(),
+					ProviderConfigKey: providerConfigKey,
+					Expressions:       blockToReferences(block),
 				})
 
 				sch.ResourceChanges = append(sch.ResourceChanges, c)
@@ -241,17 +274,24 @@ type PlanRootModule struct {
 }
 
 type Configuration struct {
-	RootModule struct {
+	ProviderConfig map[string]ProviderConfig `json:"provider_config"`
+	RootModule     struct {
 		Resources []ResourceData `json:"resources"`
 	} `json:"root_module"`
 }
 
-type ResourceData struct {
-	Address     string                 `json:"address"`
-	Mode        string                 `json:"mode"`
-	Type        string                 `json:"type"`
+type ProviderConfig struct {
 	Name        string                 `json:"name"`
 	Expressions map[string]interface{} `json:"expressions"`
+}
+
+type ResourceData struct {
+	Address           string                 `json:"address"`
+	Mode              string                 `json:"mode"`
+	Type              string                 `json:"type"`
+	Name              string                 `json:"name"`
+	ProviderConfigKey string                 `json:"provider_config_key"`
+	Expressions       map[string]interface{} `json:"expressions"`
 }
 
 type ChildModule struct {
