@@ -121,14 +121,16 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 			children = append(children, NewHCLBlock(b.AsHCLBlock(), ctx, moduleBlock))
 		}
 
-		// add commonly used identifiers to the block so that if it's referenced by other
-		// blocks in context evaluation.
-		if _, ok := body.Attributes["id"]; !ok {
-			body.Attributes["id"] = newUniqueAttribute("id")
-		}
+		if hclBlock.Type == "resource" || hclBlock.Type == "data" {
+			// add commonly used identifiers to the block so that if it's referenced by other
+			// blocks in context evaluation.
+			if _, ok := body.Attributes["id"]; !ok {
+				body.Attributes["id"] = newUniqueAttribute("id")
+			}
 
-		if _, ok := body.Attributes["arn"]; !ok {
-			body.Attributes["arn"] = newUniqueAttribute("arn")
+			if _, ok := body.Attributes["arn"]; !ok {
+				body.Attributes["arn"] = newUniqueAttribute("arn")
+			}
 		}
 
 		return &Block{
