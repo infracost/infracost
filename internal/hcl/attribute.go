@@ -12,6 +12,20 @@ import (
 
 // Attribute provides a wrapper struct around hcl.Attribute it provides
 // helper methods and functionality for common interactions with hcl.Attribute.
+//
+// Attributes are key/value pairs that are part of a Block. For example take the following Block:
+//
+//		resource "aws_instance" "t3_standard" {
+//		  	ami           = "fake_ami"
+//  		instance_type = "t3.medium"
+//
+//  		credit_specification {
+//    			cpu_credits = "standard"
+//  		}
+//		}
+//
+// "ami" & "instance_type" are the Attributes of this Block, "credit_specification" is a child Block
+// see Block.Children for more info.
 type Attribute struct {
 	// HCLAttr is the underlying hcl.Attribute that the Attribute references.
 	HCLAttr *hcl.Attribute
