@@ -228,7 +228,14 @@ func marshalAttributeValues(value cty.Value) map[string]interface{} {
 	for it.Next() {
 		k, v := it.Element()
 		vJSON, _ := ctyJson.Marshal(v, v.Type())
-		ret[k.AsString()] = json.RawMessage(vJSON)
+		key := k.AsString()
+
+		// ignore count values
+		if key == "count" {
+			continue
+		}
+
+		ret[key] = json.RawMessage(vJSON)
 	}
 	return ret
 }
