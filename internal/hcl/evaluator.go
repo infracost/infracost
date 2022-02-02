@@ -396,7 +396,7 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 				continue
 			}
 
-			blockMap, ok := values[b.Label()]
+			blockMap, ok := values[b.Labels()[0]]
 			if !ok {
 				values[b.Labels()[0]] = cty.ObjectVal(make(map[string]cty.Value))
 				blockMap = values[b.Labels()[0]]
