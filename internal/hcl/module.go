@@ -36,6 +36,7 @@ func getModuleBlocks(b *Block, modulePath string, blocks *Blocks, stopOnHCLError
 			if stopOnHCLError {
 				return err
 			}
+
 			log.Warnf("hcl error loading blocks %s", err)
 			continue
 		}
