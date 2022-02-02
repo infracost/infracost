@@ -444,7 +444,7 @@ func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition
 		Name:       b.Label(),
 		Path:       modulePath,
 		Definition: b,
-		Modules:    []*Module{&Module{RootPath: e.projectRootPath, ModulePath: modulePath, Blocks: blocks}},
+		Modules:    []*Module{{RootPath: e.projectRootPath, ModulePath: modulePath, Blocks: blocks}},
 	}, nil
 }
 
