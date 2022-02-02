@@ -54,7 +54,7 @@ func (p HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schem
 		return nil, fmt.Errorf("error handling built plan json from hcl %w", err)
 	}
 
-	return p.Provider.LoadResourcesFromSrc(usage, b)
+	return p.Provider.LoadResourcesFromSrc(usage, b, nil)
 }
 
 func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
