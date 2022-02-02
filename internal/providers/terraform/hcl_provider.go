@@ -109,8 +109,6 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 
 				vals := block.Values()
 				jsonValues := marshalAttributeValues(vals)
-				//name := block.FullName()
-				//log.Printf("%s: %+v\n\n", name, vals.AsValueMap())
 
 				for _, b := range block.AllBlocks() {
 					childValues := marshalAttributeValues(b.Values())

@@ -13,6 +13,8 @@ import (
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/config"
 )
 
 type Option func(p *Parser)
@@ -128,7 +130,9 @@ func (parser *Parser) ParseDirectory() ([]*Module, error) {
 	// relate to the local file system.
 	modulesMetadata, err := loadModuleMetadata(parser.initialPath)
 	if err != nil {
-		return nil, fmt.Errorf("Error loading module metadata this is required for Infracost to function, %w", err)
+		if !config.IsTest() {
+			log.Warnf("Error loading module metadata this is required for Infracost to get accurate results, %s", err)
+		}
 	}
 
 	log.Debug("Evaluating expressions...")
