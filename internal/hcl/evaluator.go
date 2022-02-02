@@ -36,7 +36,7 @@ type Evaluator struct {
 	// HCL attributes.
 	inputVars map[string]cty.Value
 	// moduleCalls are the modules that the list of Blocks call to. This is built at runtime.
-	moduleCalls []*ModuleDefinition
+	moduleCalls []*ModuleCall
 	// moduleMetadata is a lookup map of where modules exist on the local filesystem. This is built as part of a
 	// Terraform or Infracost init.
 	moduleMetadata *ModulesMetadata
@@ -106,7 +106,7 @@ func (e *Evaluator) Run() ([]*Module, error) {
 	e.evaluate(lastContext)
 
 	// let's load the modules now we have our top level context.
-	e.moduleCalls = e.loadModules(true)
+	e.moduleCalls = e.loadModules()
 
 	// expand out resources and modules via count and evaluate again so that we can include
 	// any module outputs and or count references.
@@ -418,7 +418,7 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 
 // loadModule takes in a module "x" {} block and loads resources etc. into e.moduleBlocks.
 // Additionally, it returns variables to add to ["module.x.*"] variables
-func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition, error) {
+func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 	if b.Label() == "" {
 		return nil, fmt.Errorf("module without label: %s", b.FullName())
 	}
@@ -461,25 +461,26 @@ func (e *Evaluator) loadModule(b *Block, stopOnHCLError bool) (*ModuleDefinition
 		modulePath = filepath.Join(e.modulePath, source)
 	}
 
-	var blocks Blocks
-	err := getModuleBlocks(b, modulePath, &blocks, stopOnHCLError)
+	blocks, err := b.getModuleBlocks(modulePath)
 	if err != nil {
 		return nil, err
 	}
 	log.Debugf("Loaded module '%s' (requested at %s)", modulePath, b.FullName())
 
-	return &ModuleDefinition{
+	return &ModuleCall{
 		Name:       b.Label(),
 		Path:       modulePath,
 		Definition: b,
-		Modules:    []*Module{{RootPath: e.projectRootPath, ModulePath: modulePath, Blocks: blocks}},
+		Modules: []*Module{
+			{RootPath: e.projectRootPath, ModulePath: modulePath, Blocks: blocks},
+		},
 	}, nil
 }
 
-// loadModules reads all module blocks and loads the underlying modules, adding blocks to e.moduleBlocks
-func (e *Evaluator) loadModules(stopOnHCLError bool) []*ModuleDefinition {
+// loadModules reads all module blocks and loads the underlying modules, adding blocks to moduleCalls.
+func (e *Evaluator) loadModules() []*ModuleCall {
 	blocks := e.blocks
-	var moduleDefinitions []*ModuleDefinition
+	var moduleDefinitions []*ModuleCall
 
 	expanded := e.expandBlocks(blocks.OfType("module"))
 
@@ -488,13 +489,13 @@ func (e *Evaluator) loadModules(stopOnHCLError bool) []*ModuleDefinition {
 			continue
 		}
 
-		moduleDefinition, err := e.loadModule(moduleBlock, stopOnHCLError)
+		moduleCall, err := e.loadModule(moduleBlock)
 		if err != nil {
-			log.Warnf("Failed to load module %s: err: %s", moduleDefinition.Name, err)
+			log.Warnf("Failed to load module %s: err: %s", moduleCall.Name, err)
 			continue
 		}
 
-		moduleDefinitions = append(moduleDefinitions, moduleDefinition)
+		moduleDefinitions = append(moduleDefinitions, moduleCall)
 	}
 
 	return moduleDefinitions
