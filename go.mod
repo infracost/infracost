@@ -109,17 +109,39 @@ require (
 )
 
 require (
+	cloud.google.com/go v0.46.3 // indirect
+	cloud.google.com/go/storage v1.0.0 // indirect
+	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/aws/aws-sdk-go v1.15.78 // indirect
+	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
+	github.com/hashicorp/go-getter v1.5.11 // indirect
+	github.com/hashicorp/go-safetemp v1.0.0 // indirect
 	github.com/hashicorp/go-uuid v1.0.2 // indirect
+	github.com/hashicorp/go-version v1.1.0 // indirect
+	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/iancoleman/orderedmap v0.2.0 // indirect
+	github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024 // indirect
+	github.com/klauspost/compress v1.11.2 // indirect
+	github.com/mitchellh/go-testing-interface v1.0.0 // indirect
+	github.com/ulikunitz/xz v0.5.8 // indirect
 	github.com/zclconf/go-cty-yaml v1.0.2 // indirect
+	go.opencensus.io v0.22.0 // indirect
+	golang.org/x/exp v0.0.0-20191030013958-a1ab85dbe136 // indirect
+	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
+	google.golang.org/api v0.13.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/genproto v0.0.0-20191108220845-16a3f7862a1a // indirect
+	google.golang.org/grpc v1.21.1 // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
+	honnef.co/go/tools v0.0.1-2019.2.3 // indirect
 )
 
 replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e
