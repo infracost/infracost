@@ -16,7 +16,7 @@
  └─ All other operations                                         200  10k operations                   $0.48 
                                                                                                              
  azurerm_storage_account.bb_Standard_GRS_Cool                                                                
- ├─ Capacity                                               3,000,000  GB                         $100,200.00 
+ ├─ Capacity                                               3,000,000  GB                          $69,000.00 
  ├─ Write operations                                             300  10k operations                  $60.00 
  ├─ List and create container operations                         300  10k operations                  $33.00 
  ├─ Read operations                                               30  10k operations                   $0.30 
@@ -36,7 +36,7 @@
  └─ Blob index                                                    40  10k tags                         $2.76 
                                                                                                              
  azurerm_storage_account.bb_Standard_LRS_Cool                                                                
- ├─ Capacity                                               5,000,000  GB                          $76,000.00 
+ ├─ Capacity                                               5,000,000  GB                          $57,500.00 
  ├─ Write operations                                             500  10k operations                  $50.00 
  ├─ List and create container operations                          50  10k operations                   $2.75 
  ├─ Read operations                                               50  10k operations                   $0.50 
@@ -56,7 +56,7 @@
  └─ Blob index                                                    60  10k tags                         $2.34 
                                                                                                              
  azurerm_storage_account.bb_Standard_RAGRS_Cool                                                              
- ├─ Capacity                                               7,000,000  GB                         $245,000.00 
+ ├─ Capacity                                               7,000,000  GB                         $201,600.00 
  ├─ Write operations                                             700  10k operations                 $140.00 
  ├─ List and create container operations                         700  10k operations                  $77.00 
  ├─ Read operations                                               70  10k operations                   $0.70 
@@ -76,7 +76,7 @@
  └─ Blob index                                                    80  10k tags                         $5.52 
                                                                                                              
  azurerm_storage_account.bb_without_usage_file                                                               
- ├─ Capacity                                      Monthly cost depends on usage: $0.035 per GB               
+ ├─ Capacity                                      Monthly cost depends on usage: $0.0288 per GB              
  ├─ Write operations                              Monthly cost depends on usage: $0.20 per 10k operations    
  ├─ List and create container operations          Monthly cost depends on usage: $0.11 per 10k operations    
  ├─ Read operations                               Monthly cost depends on usage: $0.01 per 10k operations    
@@ -150,7 +150,7 @@
  └─ Data retrieval                                             1,000  GB                              $10.00 
                                                                                                              
  azurerm_storage_account.v2_cool_lrs                                                                         
- ├─ Capacity                                               1,000,000  GB                          $15,200.00 
+ ├─ Capacity                                               1,000,000  GB                          $11,500.00 
  ├─ Write operations                                             100  10k operations                  $10.00 
  ├─ List and create container operations                         100  10k operations                   $5.50 
  ├─ Read operations                                               10  10k operations                   $0.10 
@@ -160,7 +160,7 @@
  └─ Early deletion                                             1,000  GB                              $15.20 
                                                                                                              
  azurerm_storage_account.v2_cool_lrs_nfsv3                                                                   
- ├─ Capacity                                               1,000,000  GB                          $15,000.00 
+ ├─ Capacity                                               1,000,000  GB                          $11,500.00 
  ├─ Iterative write operations                                 1,700  100 operations                 $221.00 
  ├─ Write operations                                             100  10k operations                  $13.00 
  ├─ Iterative read operations                                     15  10k operations                   $1.08 
@@ -214,7 +214,7 @@
  ├─ Read operations                               Monthly cost depends on usage: $0.006 per 10k operations   
  └─ All other operations                          Monthly cost depends on usage: $0.006 per 10k operations   
                                                                                                              
- OVERALL TOTAL                                                                                 $2,222,147.27 
+ OVERALL TOTAL                                                                                 $2,121,847.27 
 ──────────────────────────────────
 33 cloud resources were detected:
 ∙ 26 were estimated, 26 include usage-based costs, see https://infracost.io/usage-file
