@@ -3,6 +3,8 @@ package hcl
 import (
 	"fmt"
 	"strings"
+
+	"github.com/zclconf/go-cty/cty"
 )
 
 type Reference struct {
@@ -53,6 +55,17 @@ func newReference(parts []string) (*Reference, error) {
 	}
 
 	return &ref, nil
+}
+
+func (r *Reference) SetKey(key cty.Value) {
+	switch key.Type() {
+	case cty.Number:
+		f := key.AsBigFloat()
+		f64, _ := f.Float64()
+		r.key = fmt.Sprintf("[%d]", int(f64))
+	case cty.String:
+		r.key = fmt.Sprintf("[%q]", key.AsString())
+	}
 }
 
 func (r *Reference) String() string {
