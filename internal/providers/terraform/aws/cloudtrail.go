@@ -17,7 +17,7 @@ func newCloudtrail(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	r := &aws.Cloudtrail{
 		Address:                 d.Address,
 		Region:                  region,
-		IncludeManagementEvents: d.Get("include_global_service_events").Bool(),
+		IncludeManagementEvents: d.GetBoolOrDefault("include_global_service_events", true),
 		IncludeInsightEvents:    len(d.Get("insight_selector").Array()) > 0,
 	}
 	r.PopulateUsage(u)
