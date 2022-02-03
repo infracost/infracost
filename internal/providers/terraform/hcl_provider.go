@@ -96,11 +96,17 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 					providerKey = name
 				}
 
+				region := ""
+				value := block.GetAttribute("region").Value()
+				if value != cty.NilVal {
+					region = value.AsString()
+				}
+
 				sch.Configuration.ProviderConfig[name] = ProviderConfig{
 					Name: name,
 					Expressions: map[string]interface{}{
 						"region": map[string]interface{}{
-							"constant_value": block.GetAttribute("region").Value().AsString(),
+							"constant_value": region,
 						},
 					},
 				}
