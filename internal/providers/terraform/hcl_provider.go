@@ -139,7 +139,7 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 					},
 				}
 
-				jsonValues := marshalAttributeValues(block.Values())
+				jsonValues := marshalAttributeValues(block.Type(), block.Values())
 				marshalBlock(block, jsonValues)
 
 				c.Change.After = jsonValues
@@ -213,7 +213,7 @@ func blockToReferences(block *hcl.Block) map[string]interface{} {
 
 func marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
 	for _, b := range block.Children() {
-		childValues := marshalAttributeValues(b.Values())
+		childValues := marshalAttributeValues(b.Type(), b.Values())
 		if len(b.Children()) > 0 {
 			marshalBlock(b, childValues)
 		}
@@ -227,7 +227,7 @@ func marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
 	}
 }
 
-func marshalAttributeValues(value cty.Value) map[string]interface{} {
+func marshalAttributeValues(blockType string, value cty.Value) map[string]interface{} {
 	if value == cty.NilVal || value.IsNull() {
 		return nil
 	}
@@ -239,8 +239,7 @@ func marshalAttributeValues(value cty.Value) map[string]interface{} {
 		vJSON, _ := ctyJson.Marshal(v, v.Type())
 		key := k.AsString()
 
-		// ignore count values
-		if key == "count" {
+		if (blockType == "resource" || blockType == "module") && key == "count" {
 			continue
 		}
 
