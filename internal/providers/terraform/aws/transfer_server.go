@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"sort"
+
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -20,6 +22,8 @@ func newTransferServer(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		for _, data := range d.Get("protocols").Array() {
 			protocols = append(protocols, data.String())
 		}
+	
+		sort.Strings(protocols)
 	} else {
 		defaultProtocol := "SFTP"
 		protocols = append(protocols, defaultProtocol)
