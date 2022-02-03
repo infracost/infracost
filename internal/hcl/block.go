@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	log "github.com/sirupsen/logrus"
@@ -120,6 +121,18 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 			children = append(children, NewHCLBlock(b.AsHCLBlock(), ctx, moduleBlock))
 		}
 
+		if hclBlock.Type == "resource" || hclBlock.Type == "data" {
+			// add commonly used identifiers to the block so that if it's referenced by other
+			// blocks in context evaluation.
+			if _, ok := body.Attributes["id"]; !ok {
+				body.Attributes["id"] = newUniqueAttribute("id")
+			}
+
+			if _, ok := body.Attributes["arn"]; !ok {
+				body.Attributes["arn"] = newUniqueAttribute("arn")
+			}
+		}
+
 		return &Block{
 			context:     ctx,
 			hclBlock:    hclBlock,
@@ -151,6 +164,15 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 		hclBlock:    hclBlock,
 		moduleBlock: moduleBlock,
 		childBlocks: children,
+	}
+}
+
+func newUniqueAttribute(name string) *hclsyntax.Attribute {
+	return &hclsyntax.Attribute{
+		Name: name,
+		Expr: &hclsyntax.LiteralValueExpr{
+			Val: cty.StringVal(uuid.NewString()),
+		},
 	}
 }
 
