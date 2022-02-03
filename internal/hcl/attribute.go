@@ -135,18 +135,18 @@ func (attr *Attribute) Reference() (*Reference, error) {
 	}
 	switch t := attr.HCLAttr.Expr.(type) {
 	case *hclsyntax.RelativeTraversalExpr:
-		switch s := t.Source.(type) {
-		case *hclsyntax.IndexExpr:
+		if s, ok := t.Source.(*hclsyntax.IndexExpr); ok {
 			collectionRef, err := createDotReferenceFromTraversal(s.Collection.Variables()...)
 			if err != nil {
 				return nil, err
 			}
 			key, _ := s.Key.Value(attr.Ctx.Inner())
 			collectionRef.SetKey(key)
+
 			return collectionRef, nil
-		default:
-			return createDotReferenceFromTraversal(t.Source.Variables()...)
 		}
+
+		return createDotReferenceFromTraversal(t.Source.Variables()...)
 	case *hclsyntax.ScopeTraversalExpr:
 		return createDotReferenceFromTraversal(t.Traversal)
 	case *hclsyntax.TemplateExpr:
@@ -202,8 +202,8 @@ func (attr *Attribute) referencesInConditional() []*Reference {
 		return nil
 	}
 	var refs []*Reference
-	switch t := attr.HCLAttr.Expr.(type) {
-	case *hclsyntax.ConditionalExpr:
+
+	if t, ok := attr.HCLAttr.Expr.(*hclsyntax.ConditionalExpr); ok {
 		if ref, err := createDotReferenceFromTraversal(t.TrueResult.Variables()...); err == nil {
 			refs = append(refs, ref)
 		}
@@ -214,5 +214,6 @@ func (attr *Attribute) referencesInConditional() []*Reference {
 			refs = append(refs, ref)
 		}
 	}
+
 	return refs
 }
