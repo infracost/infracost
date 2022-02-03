@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMFirewallRegistryItem() *schema.RegistryItem {
@@ -26,10 +27,7 @@ func NewAzureRMFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		skuTier = d.Get("sku_tier").String()
 	}
 
-	// Compare d.Get() with empty array because by default an empty array of virtual hub block: "virtual_hub":[] exists,
-	// and it means that d.Get("virtual_hub").Type will never return gjson.Null
-
-	if v := d.Get("virtual_hub").String(); v != "[]" {
+	if len(d.Get("virtual_hub").Array()) > 0 {
 		if strings.ToLower(skuTier) == "standard" {
 			skuTier = "Secured Virtual Hub"
 		} else {
