@@ -148,7 +148,10 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 				providerConfigKey := providerKey
 				providerAttr := block.GetAttribute("provider")
 				if providerAttr != nil {
-					providerConfigKey = providerAttr.Value().AsString()
+					value := providerAttr.Value()
+					if value.Type() == cty.String {
+						providerConfigKey = value.AsString()
+					}
 				}
 
 				sch.Configuration.RootModule.Resources = append(sch.Configuration.RootModule.Resources, ResourceData{
