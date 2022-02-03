@@ -129,6 +129,32 @@ func getIndexValue(part hcl.TraverseIndex) string {
 	}
 }
 
+// Reference returns the pointer to a Reference struct that holds information about the Attributes
+// referenced block. Reference achieves this by traversing the Attribute Expression in order to find the
+// parent block. E.g. with the following HCL
+//
+// 		resource "aws_launch_template" "foo2" {
+// 			name = "foo2"
+// 		}
+//
+//		resource "some_resource" "example_with_launch_template_3" {
+//			...
+//			name    = aws_launch_template.foo2.name
+//		}
+//
+// The Attribute some_resource.name would have a reference of
+//
+//		Reference {
+//			blockType: Type{
+//				name:                  "resource",
+//				removeTypeInReference: true,
+//			}
+//			typeLabel: "aws_launch_template"
+//			nameLabel: "foo2"
+//		}
+//
+// Reference is used to build up a Terraform JSON configuration file that holds information about the expressions
+// and their parents. Infracost uses these references in resource evaluation to lookup connecting resource information.
 func (attr *Attribute) Reference() (*Reference, error) {
 	if attr == nil {
 		return nil, fmt.Errorf("attribute is nil")
@@ -160,6 +186,9 @@ func (attr *Attribute) Reference() (*Reference, error) {
 	}
 }
 
+// AllReferences returns a list of References for the given Attribute. This can include the
+// main Value Reference (see Reference method) and also a list of references used in conditional
+// evaluation and templating.
 func (attr *Attribute) AllReferences() []*Reference {
 	if attr == nil {
 		return nil
