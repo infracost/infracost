@@ -72,6 +72,7 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 		},
 		ResourceChanges: []ResourceChangesJSON{},
 		Configuration: Configuration{
+			ProviderConfig: make(map[string]ProviderConfig),
 			RootModule: struct {
 				Resources []ResourceData `json:"resources"`
 			}{
@@ -81,6 +82,37 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 	}
 
 	for _, module := range modules {
+		var providerKey string
+
+		for _, block := range module.Blocks {
+			if block.Type() == "provider" {
+				name := block.TypeLabel()
+				if a := block.GetAttribute("alias"); a != nil {
+					name = a.Value().AsString()
+				}
+
+				// set the default provider key
+				if providerKey == "" {
+					providerKey = name
+				}
+
+				region := ""
+				value := block.GetAttribute("region").Value()
+				if value != cty.NilVal {
+					region = value.AsString()
+				}
+
+				sch.Configuration.ProviderConfig[name] = ProviderConfig{
+					Name: name,
+					Expressions: map[string]interface{}{
+						"region": map[string]interface{}{
+							"constant_value": region,
+						},
+					},
+				}
+			}
+		}
+
 		for _, block := range module.Blocks {
 			if block.Type() == "resource" {
 				r := ResourceJSON{
@@ -107,18 +139,28 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 					},
 				}
 
-				jsonValues := marshalAttributeValues(block.Values())
+				jsonValues := marshalAttributeValues(block.Type(), block.Values())
 				marshalBlock(block, jsonValues)
 
 				c.Change.After = jsonValues
 				r.Values = jsonValues
 
+				providerConfigKey := providerKey
+				providerAttr := block.GetAttribute("provider")
+				if providerAttr != nil {
+					value := providerAttr.Value()
+					if value.Type() == cty.String {
+						providerConfigKey = value.AsString()
+					}
+				}
+
 				sch.Configuration.RootModule.Resources = append(sch.Configuration.RootModule.Resources, ResourceData{
-					Address:     block.FullName(),
-					Mode:        "managed",
-					Type:        block.TypeLabel(),
-					Name:        block.LocalName(),
-					Expressions: blockToReferences(block),
+					Address:           block.FullName(),
+					Mode:              "managed",
+					Type:              block.TypeLabel(),
+					Name:              block.LocalName(),
+					ProviderConfigKey: providerConfigKey,
+					Expressions:       blockToReferences(block),
 				})
 
 				sch.ResourceChanges = append(sch.ResourceChanges, c)
@@ -171,7 +213,7 @@ func blockToReferences(block *hcl.Block) map[string]interface{} {
 
 func marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
 	for _, b := range block.Children() {
-		childValues := marshalAttributeValues(b.Values())
+		childValues := marshalAttributeValues(b.Type(), b.Values())
 		if len(b.Children()) > 0 {
 			marshalBlock(b, childValues)
 		}
@@ -185,7 +227,7 @@ func marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
 	}
 }
 
-func marshalAttributeValues(value cty.Value) map[string]interface{} {
+func marshalAttributeValues(blockType string, value cty.Value) map[string]interface{} {
 	if value == cty.NilVal || value.IsNull() {
 		return nil
 	}
@@ -195,7 +237,13 @@ func marshalAttributeValues(value cty.Value) map[string]interface{} {
 	for it.Next() {
 		k, v := it.Element()
 		vJSON, _ := ctyJson.Marshal(v, v.Type())
-		ret[k.AsString()] = json.RawMessage(vJSON)
+		key := k.AsString()
+
+		if (blockType == "resource" || blockType == "module") && key == "count" {
+			continue
+		}
+
+		ret[key] = json.RawMessage(vJSON)
 	}
 	return ret
 }
@@ -241,17 +289,24 @@ type PlanRootModule struct {
 }
 
 type Configuration struct {
-	RootModule struct {
+	ProviderConfig map[string]ProviderConfig `json:"provider_config"`
+	RootModule     struct {
 		Resources []ResourceData `json:"resources"`
 	} `json:"root_module"`
 }
 
-type ResourceData struct {
-	Address     string                 `json:"address"`
-	Mode        string                 `json:"mode"`
-	Type        string                 `json:"type"`
+type ProviderConfig struct {
 	Name        string                 `json:"name"`
 	Expressions map[string]interface{} `json:"expressions"`
+}
+
+type ResourceData struct {
+	Address           string                 `json:"address"`
+	Mode              string                 `json:"mode"`
+	Type              string                 `json:"type"`
+	Name              string                 `json:"name"`
+	ProviderConfigKey string                 `json:"provider_config_key"`
+	Expressions       map[string]interface{} `json:"expressions"`
 }
 
 type ChildModule struct {

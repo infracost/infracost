@@ -16,7 +16,7 @@ func newVPNGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	v := &azure.VPNGateway{
 		Address:    d.Address,
 		Region:     d.Get("region").String(),
-		ScaleUnits: d.Get("scale_unit").Int(),
+		ScaleUnits: d.GetInt64OrDefault("scale_unit", 1),
 		Type:       "S2S",
 	}
 	v.PopulateUsage(u)

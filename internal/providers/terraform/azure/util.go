@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -17,10 +18,16 @@ func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
 
+var sReg = regexp.MustCompile(`\s+`)
+
+func toAzureCLIName(location string) string {
+	return strings.ToLower(sReg.ReplaceAllString(location, ""))
+}
+
 func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
 	// First check for a location set directly on a resource
 	if d.Get("location").String() != "" {
-		return d.Get("location").String()
+		return toAzureCLIName(d.Get("location").String())
 	}
 
 	// Then check for any parent resources with a location
@@ -28,13 +35,13 @@ func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
 		parents := d.References(k)
 		for _, p := range parents {
 			if p.Get("location").String() != "" {
-				return p.Get("location").String()
+				return toAzureCLIName(p.Get("location").String())
 			}
 		}
 	}
 
 	// When all else fails use the default region
-	defaultRegion := d.Get("region").String()
+	defaultRegion := toAzureCLIName(d.Get("region").String())
 	log.Warnf("Using %s for resource %s as its 'location' property could not be found.", defaultRegion, d.Address)
 	return defaultRegion
 }
