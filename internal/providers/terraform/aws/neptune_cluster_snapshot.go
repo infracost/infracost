@@ -3,7 +3,6 @@ package aws
 import (
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 func getNeptuneClusterSnapshotRegistryItem() *schema.RegistryItem {
@@ -22,9 +21,7 @@ func NewNeptuneClusterSnapshot(d *schema.ResourceData, u *schema.UsageData) *sch
 	dbClusterIdentifiers := d.References("db_cluster_identifier")
 	if len(dbClusterIdentifiers) > 0 {
 		cluster := dbClusterIdentifiers[0]
-		if cluster.Get("backup_retention_period").Type != gjson.Null {
-			backupRetentionPeriod = intPtr(cluster.Get("backup_retention_period").Int())
-		}
+		backupRetentionPeriod = intPtr(cluster.GetInt64OrDefault("backup_retention_period", 1))
 	}
 
 	r := &aws.NeptuneClusterSnapshot{
