@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
-	"path"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -13,16 +15,24 @@ import (
 	goversion "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
-var infracostDir = ".infracost"
-var modulesCacheDir = path.Join(infracostDir, "modules")
+var modulesCacheDir = ".infracost/terraform_modules"
+var moduleManifestFile = ".infracost/terraform_modules/manifest.json"
+
+var validRegistryName = regexp.MustCompile("^[0-9A-Za-z-_]+$")
 
 type ModuleMetadata struct {
 	Key     string `json:"Key"`
 	Source  string `json:"Source"`
 	Version string `json:"Version"`
 	Dir     string `json:"Dir"`
+}
+
+// ModulesMetadata is a struct that represents the JSON found in the manifest.json file in the .infracost dir
+type ModulesManifest struct {
+	Modules []ModuleMetadata `json:"Modules"`
 }
 
 type RegistryModuleCheckResult struct {
@@ -34,44 +44,137 @@ type ModuleLoader struct {
 	path string
 }
 
-var validRegistryName = regexp.MustCompile("^[0-9A-Za-z-_]+$")
+func (m *ModuleLoader) cacheDir() string {
+	return filepath.Join(m.path, modulesCacheDir)
+}
 
-func (m *ModuleLoader) Load() ([]ModuleMetadata, error) {
+func (m *ModuleLoader) manifestFilePath() string {
+	return filepath.Join(m.path, moduleManifestFile)
+}
+
+func (m *ModuleLoader) Load() (*ModulesManifest, error) {
+	var manifest *ModulesManifest
+
+	_, err := os.Stat(m.manifestFilePath())
+	if errors.Is(err, os.ErrNotExist) {
+		log.Debugf("No existing module manifest file found")
+	} else if err != nil {
+		log.Debugf("Error checking for existing module manifest: %s", err)
+	} else {
+		manifest, err = m.readManifest()
+		if err != nil {
+			log.Debugf("Error reading module manifest: %s", err)
+		}
+	}
+
+	if manifest == nil {
+		manifest = &ModulesManifest{}
+	}
+
+	// Create a cache of modules so we don't have to download them again
+	moduleCache := map[string]ModuleMetadata{}
+	for _, module := range manifest.Modules {
+		moduleCache[module.Key] = module
+	}
+
+	metadatas, err := m.loadModules(m.path, moduleCache)
+	if err != nil {
+		return manifest, nil
+	}
+
+	manifest.Modules = metadatas
+
+	err = m.writeManifest(manifest)
+	if err != nil {
+		log.Debugf("Error writing module manifest: %s", err)
+	}
+
+	return manifest, nil
+}
+
+func (m *ModuleLoader) loadModules(path string, moduleCache map[string]ModuleMetadata) ([]ModuleMetadata, error) {
 	metadatas := make([]ModuleMetadata, 0)
 
-	module, diags := tfconfig.LoadModule(m.path)
+	module, diags := tfconfig.LoadModule(path)
 	if diags.HasErrors() {
 		return metadatas, diags.Err()
 	}
 
 	for _, moduleCall := range module.ModuleCalls {
-		metadata, err := m.loadModule(moduleCall)
+		metadata, err := m.loadModuleFromCache(moduleCall, moduleCache)
+		if err == nil {
+			log.Debugf("Module %s already loaded", moduleCall.Name)
+		} else {
+			log.Debugf("Module %s needs loaded: %s", moduleCall.Name, err.Error())
+
+			metadata, err = m.loadModule(moduleCall, path)
+			if err != nil {
+				return metadatas, err
+			}
+
+			moduleCache[moduleCall.Name] = metadata
+		}
+
+		metadatas = append(metadatas, metadata)
+
+		nestedMetadatas, err := m.loadModules(filepath.Join(m.path, metadata.Dir), moduleCache)
 		if err != nil {
 			return metadatas, err
 		}
 
-		metadatas = append(metadatas, metadata)
+		metadatas = append(metadatas, nestedMetadatas...)
 	}
 
 	return metadatas, nil
 }
 
-func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall) (ModuleMetadata, error) {
+func (m *ModuleLoader) loadModuleFromCache(moduleCall *tfconfig.ModuleCall, moduleCache map[string]ModuleMetadata) (ModuleMetadata, error) {
+	metadata, ok := moduleCache[moduleCall.Name]
+
+	if !ok {
+		return metadata, errors.New("not in cache")
+	}
+
+	if metadata.Source != moduleCall.Source {
+		return metadata, errors.New("source has changed")
+	}
+
+	if moduleCall.Version != "" && metadata.Version != "" {
+		constraints, err := goversion.NewConstraint(moduleCall.Version)
+		if err != nil {
+			return metadata, errors.Wrap(err, "invalid version constraint")
+		}
+
+		version, err := goversion.NewVersion(metadata.Version)
+		if err != nil {
+			return metadata, errors.Wrap(err, "invalid version")
+		}
+
+		if !constraints.Check(version) {
+			return metadata, errors.New("version constraint doesn't match")
+		}
+	}
+
+	return metadata, nil
+}
+
+func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath string) (ModuleMetadata, error) {
 	metadata := ModuleMetadata{
 		Key:    moduleCall.Name,
 		Source: moduleCall.Source,
 	}
 
 	if m.isLocalModule(moduleCall) {
-		metadata.Dir = moduleCall.Source
-		return metadata, nil
+		var err error
+		metadata.Dir, err = filepath.Rel(m.path, filepath.Join(parentPath, moduleCall.Source))
+		return metadata, err
 	}
 
 	if checkResult, err := m.checkRegistryModule(moduleCall); err == nil {
 		// TODO: figure out a better path for this to support:
 		// - nested modules with the same name
 		// - modules with the same source not needing downloaded twice
-		dir := path.Join(modulesCacheDir, moduleCall.Name)
+		dir := filepath.Join(m.cacheDir(), moduleCall.Name)
 
 		err := m.downloadRegistryModule(checkResult.DownloadURL, dir)
 		if err != nil {
@@ -79,22 +182,22 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall) (ModuleMetada
 		}
 
 		metadata.Version = checkResult.Version
-		metadata.Dir = dir
-		return metadata, nil
+		metadata.Dir, err = filepath.Rel(m.path, dir)
+		return metadata, err
 	}
 
 	// TODO: figure out a better path for this to support:
 	// - nested modules with the same name
 	// - modules with the same source not needing downloaded twice
-	dir := path.Join(modulesCacheDir, moduleCall.Name)
+	dir := filepath.Join(m.cacheDir(), moduleCall.Name)
 
 	err := m.downloadRemoteModule(moduleCall.Source, dir)
 	if err != nil {
 		return metadata, err
 	}
 
-	metadata.Dir = dir
-	return metadata, nil
+	metadata.Dir, err = filepath.Rel(m.path, dir)
+	return metadata, err
 }
 
 func (m *ModuleLoader) isLocalModule(moduleCall *tfconfig.ModuleCall) bool {
@@ -220,6 +323,7 @@ func (m *ModuleLoader) downloadRegistryModule(downloadURL string, dest string) e
 	if err != nil {
 		return errors.Wrap(err, "Failed to download registry module")
 	}
+	defer resp.Body.Close()
 
 	source := resp.Header.Get("X-Terraform-Get")
 	if source == "" {
@@ -232,12 +336,47 @@ func (m *ModuleLoader) downloadRegistryModule(downloadURL string, dest string) e
 func (m *ModuleLoader) downloadRemoteModule(source string, dest string) error {
 	client := getter.Client{
 		Src:  source,
-		Dst:  path.Join(m.path, dest),
-		Pwd:  path.Join(m.path, dest),
+		Dst:  dest,
+		Pwd:  dest,
 		Mode: getter.ClientModeDir,
 		// TODO: check these:
 		// https://github.com/hashicorp/terraform/blob/affe2c329561f40f13c0e94f4570321977527a77/internal/getmodules/getter.go#L57
 	}
 
 	return client.Get()
+}
+
+func (m *ModuleLoader) readManifest() (*ModulesManifest, error) {
+	var manifest ModulesManifest
+
+	data, err := os.ReadFile(m.manifestFilePath())
+	if err != nil {
+		return &manifest, errors.Wrap(err, "Failed to read module manifest")
+	}
+
+	err = json.Unmarshal(data, &manifest)
+	if err != nil {
+		return &manifest, errors.Wrap(err, "Failed to unmarshal module manifest")
+	}
+
+	return &manifest, err
+}
+
+func (m *ModuleLoader) writeManifest(manifest *ModulesManifest) error {
+	b, err := json.MarshalIndent(manifest, "", "  ")
+	if err != nil {
+		return errors.Wrap(err, "Failed to marshal manifest")
+	}
+
+	err = os.MkdirAll(filepath.Dir(m.manifestFilePath()), os.ModePerm)
+	if err != nil {
+		return errors.Wrap(err, "Failed to create directories for manifest")
+	}
+
+	err = ioutil.WriteFile(m.manifestFilePath(), b, 0644) // nolint:gosec
+	if err != nil {
+		return errors.Wrap(err, "Failed to write manifest")
+	}
+
+	return nil
 }

@@ -55,22 +55,10 @@ func (b *Block) getModuleBlocks(modulePath string) (Blocks, error) {
 	return blocks, err
 }
 
-// ModulesMetadata is a struct that represents the JSON found in the modules.json file int the .terraform dir.
-type ModulesMetadata struct {
-	Modules []ModuleMetadata `json:"Modules"`
-}
-
-func loadModuleMetadata(fullPath string) (*ModulesMetadata, error) {
+func loadModuleMetadata(fullPath string) (*ModulesManifest, error) {
 	moduleLoader := &ModuleLoader{
 		path: fullPath,
 	}
 
-	modules, err := moduleLoader.Load()
-	if err != nil {
-		return nil, err
-	}
-
-	return &ModulesMetadata{
-		Modules: modules,
-	}, nil
+	return moduleLoader.Load()
 }
