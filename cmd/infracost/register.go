@@ -6,12 +6,13 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/infracost/infracost/internal/apiclient"
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 func registerCmd(ctx *config.RunContext) *cobra.Command {
@@ -35,6 +36,16 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				}
 
 				if !status {
+					ciInterest, err := promptForCIDocs(false)
+					if err != nil {
+						// user cancelled
+						return nil
+					}
+
+					if ciInterest {
+						fmt.Println("Add cost estimates to your pull requests: " + ui.LinkString("https://infracost.io/cicd"))
+					}
+
 					return nil
 				}
 
@@ -56,9 +67,15 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				return nil
 			}
 
+			ciInterest, err := promptForCIDocs(isRegenerate)
+			if err != nil {
+				// user cancelled
+				return nil
+			}
+
 			d := apiclient.NewDashboardAPIClient(ctx)
 
-			r, err := d.CreateAPIKey(name, email)
+			r, err := d.CreateAPIKey(name, email, ciInterest)
 			if err != nil {
 				return err
 			}
@@ -100,10 +117,12 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			msg = fmt.Sprintf("%s\nYou can now run %s and point to your Terraform directory or JSON/plan file.",
-				fmt.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
-				ui.PrimaryString("infracost breakdown --path=..."),
-			)
+			msg = fmt.Sprintf("Your API key has been saved to %s\n\n", config.CredentialsFilePath())
+			if ciInterest {
+				msg += fmt.Sprintf("You can now add cost estimates to your pull requests: %s", ui.LinkStringf("https://infracost.io/cicd"))
+			} else {
+				msg += fmt.Sprintf("You can now run %s and point to your Terraform directory or JSON/plan file.", ui.PrimaryString("infracost breakdown --path=..."))
+			}
 
 			fmt.Println("")
 			ui.PrintSuccess(cmd.ErrOrStderr(), msg)
@@ -128,6 +147,27 @@ func promptForName() (string, error) {
 	name = strings.TrimSpace(name)
 
 	return name, err
+}
+
+func promptForCIDocs(isRegenerate bool) (bool, error) {
+	label := "Would you like to see our CI/CD integration docs?"
+	if isRegenerate {
+		label = "Do you plan to use this API key in CI?"
+	}
+	p := promptui.Prompt{
+		Label:     label,
+		IsConfirm: true,
+	}
+
+	_, err := p.Run()
+	if err != nil {
+		if errors.Is(err, promptui.ErrAbort) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return true, nil
 }
 
 func promptForEmail() (string, error) {
