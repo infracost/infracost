@@ -6,23 +6,32 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Cache is a cache of modules that can be used to lookup modules to check
-// if they've already been loaded
+// Cache is a cache of modules that can be used to lookup modules to check if they've already been loaded.
+//
+// This only works with modules that have the same identifier. It doesn't cache modules that are used
+// multiple times with different identifiers. That is done separately by the PackageFetcher and only
+// caches per-run of Infracost, so if you add the same module to your Terraform code it will redownload that module.
+// We could optimize it by moving the package fetching cache logic into here, but it would be inconsistent
+// with how terraform init works.
 type Cache struct {
 	keyMap map[string]*ManifestModule
 }
 
 // NewCacheFromManifest creates a new cache from a module manifest
-func NewCacheFromManifest(manifest *Manifest) *Cache {
-	cache := &Cache{
+func NewCache() *Cache {
+	return &Cache{
 		keyMap: make(map[string]*ManifestModule),
+	}
+}
+
+func (c *Cache) loadFromManifest(manifest *Manifest) {
+	if manifest == nil {
+		return
 	}
 
 	for _, module := range manifest.Modules {
-		cache.keyMap[module.Key] = module
+		c.keyMap[module.Key] = module
 	}
-
-	return cache
 }
 
 // lookupModule looks up a module in the cache by its key and checks that the

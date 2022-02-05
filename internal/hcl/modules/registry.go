@@ -28,12 +28,16 @@ type RegistryLookupResult struct {
 
 // RegistryLoader is a loader that can lookup modules from a Terraform Registry and download them to the given destination
 type RegistryLoader struct {
-	dest string
+	packageFetcher *PackageFetcher
+	dest           string
 }
 
 // NewRegistryLoader constructs a registry loader
-func NewRegistryLoader(dest string) *RegistryLoader {
-	return &RegistryLoader{dest: dest}
+func NewRegistryLoader(packageFetcher *PackageFetcher, dest string) *RegistryLoader {
+	return &RegistryLoader{
+		packageFetcher: packageFetcher,
+		dest:           dest,
+	}
 }
 
 // lookupModule checks if the given module is a valid registry module and lookups the matching version and download URL for the module.
@@ -158,7 +162,7 @@ func (r *RegistryLoader) downloadModule(downloadURL string) error {
 		return errors.New("download URL has no X-Terraform-Get header")
 	}
 
-	return downloadRemoteModule(source, r.dest)
+	return r.packageFetcher.fetch(source, r.dest)
 }
 
 // findLatestMatchingVersion returns the latest version from a list of versions that matches the given constraint.

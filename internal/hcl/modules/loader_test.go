@@ -9,23 +9,34 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func testLoaderExpectedModules(t *testing.T, path string, expectedModules []*ManifestModule) {
+	err := os.RemoveAll(filepath.Join(path, ".infracost"))
+	assert.NoError(t, err)
+
+	moduleLoader := NewModuleLoader(path)
+
+	manifest, err := moduleLoader.Load()
+	assert.NoError(t, err)
+
+	sort.Slice(expectedModules, func(i, j int) bool {
+		return expectedModules[i].Key < expectedModules[j].Key
+	})
+
+	actualModules := manifest.Modules
+
+	sort.Slice(actualModules, func(i, j int) bool {
+		return actualModules[i].Key < actualModules[j].Key
+	})
+
+	assert.Equal(t, expectedModules, actualModules)
+}
+
 func TestNestedModules(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping test in short mode")
 	}
 
-	path := "./testdata/nested_modules"
-	err := os.RemoveAll(filepath.Join(path, ".infracost"))
-	assert.NoError(t, err)
-
-	moduleLoader := &ModuleLoader{
-		Path: path,
-	}
-
-	manifest, err := moduleLoader.Load()
-	assert.NoError(t, err)
-
-	expectedModules := []*ManifestModule{
+	testLoaderExpectedModules(t, "./testdata/nested_modules", []*ManifestModule{
 		{
 			Key:    "local-module",
 			Source: "./modules/local-module",
@@ -58,19 +69,7 @@ func TestNestedModules(t *testing.T) {
 			Source: "git::https://github.com/terraform-aws-modules/terraform-aws-sns.git",
 			Dir:    ".infracost/terraform_modules/local-module.nested-git-module",
 		},
-	}
-
-	sort.Slice(expectedModules, func(i, j int) bool {
-		return expectedModules[i].Key < expectedModules[j].Key
 	})
-
-	actualModules := manifest.Modules
-
-	sort.Slice(actualModules, func(i, j int) bool {
-		return actualModules[i].Key < actualModules[j].Key
-	})
-
-	assert.Equal(t, expectedModules, actualModules)
 }
 
 func TestSubmodules(t *testing.T) {
@@ -78,18 +77,7 @@ func TestSubmodules(t *testing.T) {
 		t.Skip("Skipping test in short mode")
 	}
 
-	path := "./testdata/submodules"
-	err := os.RemoveAll(filepath.Join(path, ".infracost"))
-	assert.NoError(t, err)
-
-	moduleLoader := &ModuleLoader{
-		Path: path,
-	}
-
-	manifest, err := moduleLoader.Load()
-	assert.NoError(t, err)
-
-	expectedModules := []*ManifestModule{
+	testLoaderExpectedModules(t, "./testdata/submodules", []*ManifestModule{
 		{
 			Key:     "registry-submodule",
 			Source:  "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
@@ -101,17 +89,26 @@ func TestSubmodules(t *testing.T) {
 			Source: "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones",
 			Dir:    ".infracost/terraform_modules/git-submodule/modules/zones",
 		},
+	})
+}
+
+func TestModuleMultipleUses(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode")
 	}
 
-	sort.Slice(expectedModules, func(i, j int) bool {
-		return expectedModules[i].Key < expectedModules[j].Key
+	testLoaderExpectedModules(t, "./testdata/module_multiple_uses", []*ManifestModule{
+		{
+			Key:     "registry-module-1",
+			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version: "3.4.0",
+			Dir:     ".infracost/terraform_modules/registry-module-1",
+		},
+		{
+			Key:     "registry-module-2",
+			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version: "3.4.0",
+			Dir:     ".infracost/terraform_modules/registry-module-2",
+		},
 	})
-
-	actualModules := manifest.Modules
-
-	sort.Slice(actualModules, func(i, j int) bool {
-		return actualModules[i].Key < actualModules[j].Key
-	})
-
-	assert.Equal(t, expectedModules, actualModules)
 }

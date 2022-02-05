@@ -21,8 +21,17 @@ var manifestPath = ".infracost/terraform_modules/manifest.json"
 
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.
 type ModuleLoader struct {
-	Path  string
-	cache *Cache
+	Path           string
+	cache          *Cache
+	packageFetcher *PackageFetcher
+}
+
+func NewModuleLoader(path string) *ModuleLoader {
+	return &ModuleLoader{
+		Path:           path,
+		cache:          NewCache(),
+		packageFetcher: NewPackageFetcher(),
+	}
 }
 
 // downloadDir returns the path to the directory where remote modules are downloaded relative to the current working directory
@@ -57,11 +66,11 @@ func (m *ModuleLoader) Load() (*Manifest, error) {
 		manifest = &Manifest{}
 	}
 
-	m.cache = NewCacheFromManifest(manifest)
+	m.cache.loadFromManifest(manifest)
 
 	metadatas, err := m.loadModules(m.Path, "")
 	if err != nil {
-		return manifest, nil
+		return nil, err
 	}
 
 	manifest.Modules = metadatas
@@ -152,7 +161,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 	manifestModule.Dir = path.Clean(moduleDownloadDir)
 
-	registryLoader := NewRegistryLoader(dest)
+	registryLoader := NewRegistryLoader(m.packageFetcher, dest)
 	lookupResult, err := registryLoader.lookupModule(moduleAddr, moduleCall.Version)
 	if err != nil {
 		log.Debugf("Module %s not recognized as registry module, treating as remote module: %s", key, err.Error())
@@ -175,8 +184,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	}
 
 	log.Debugf("Downloading module %s from remote %s", key, moduleCall.Source)
-	remoteLoader := NewRemoteLoader(dest)
-	err = remoteLoader.downloadModule(moduleAddr)
+	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
 		return nil, err
 	}

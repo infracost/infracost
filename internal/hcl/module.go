@@ -57,9 +57,7 @@ func (b *Block) getModuleBlocks(modulePath string) (Blocks, error) {
 }
 
 func loadModules(fullPath string) (*modules.Manifest, error) {
-	moduleLoader := &modules.ModuleLoader{
-		Path: fullPath,
-	}
+	moduleLoader := modules.NewModuleLoader(fullPath)
 
 	return moduleLoader.Load()
 }

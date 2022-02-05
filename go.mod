@@ -130,6 +130,7 @@ require (
 	github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024 // indirect
 	github.com/klauspost/compress v1.11.2 // indirect
 	github.com/mitchellh/go-testing-interface v1.0.0 // indirect
+	github.com/otiai10/copy v1.7.0
 	github.com/ulikunitz/xz v0.5.8 // indirect
 	github.com/zclconf/go-cty-yaml v1.0.2 // indirect
 	go.opencensus.io v0.22.0 // indirect
