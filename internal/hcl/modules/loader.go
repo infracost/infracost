@@ -1,10 +1,13 @@
 package modules
 
 import (
+	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
+	getter "github.com/hashicorp/go-getter"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -128,19 +131,29 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		}
 
 		log.Debugf("Loading local module %s from %s", key, dir)
-		manifestModule.Dir = dir
+		manifestModule.Dir = path.Clean(dir)
 		return manifestModule, nil
 	}
 
 	dest := filepath.Join(m.downloadDir(), key)
-	dir, err := filepath.Rel(m.Path, dest)
+	moduleDownloadDir, err := filepath.Rel(m.Path, dest)
 	if err != nil {
 		return nil, err
 	}
-	manifestModule.Dir = dir
+
+	moduleAddr, submodulePath := getter.SourceDirSubdir(moduleCall.Source)
+	if strings.HasPrefix(submodulePath, "../") {
+		return nil, fmt.Errorf("Invalid submodule path '%s'", submodulePath)
+	}
+
+	if submodulePath != "" {
+		moduleDownloadDir = filepath.Join(moduleDownloadDir, submodulePath)
+	}
+
+	manifestModule.Dir = path.Clean(moduleDownloadDir)
 
 	registryLoader := NewRegistryLoader(dest)
-	lookupResult, err := registryLoader.lookupModule(moduleCall)
+	lookupResult, err := registryLoader.lookupModule(moduleAddr, moduleCall.Version)
 	if err != nil {
 		log.Debugf("Module %s not recognized as registry module, treating as remote module: %s", key, err.Error())
 	} else {
@@ -153,13 +166,17 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		// The moduleCall.Source might not have the registry hostname if it is using the default registry
 		// so we set the source here to the lookup result's source which always includes the registry hostname.
 		manifestModule.Source = lookupResult.Source
+		if submodulePath != "" {
+			manifestModule.Source = fmt.Sprintf("%s//%s", manifestModule.Source, submodulePath)
+		}
+
 		manifestModule.Version = lookupResult.Version
 		return manifestModule, nil
 	}
 
 	log.Debugf("Downloading module %s from remote %s", key, moduleCall.Source)
 	remoteLoader := NewRemoteLoader(dest)
-	err = remoteLoader.downloadModule(moduleCall)
+	err = remoteLoader.downloadModule(moduleAddr)
 	if err != nil {
 		return nil, err
 	}

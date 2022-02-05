@@ -14,7 +14,9 @@ type Cache struct {
 
 // NewCacheFromManifest creates a new cache from a module manifest
 func NewCacheFromManifest(manifest *Manifest) *Cache {
-	cache := &Cache{}
+	cache := &Cache{
+		keyMap: make(map[string]*ManifestModule),
+	}
 
 	for _, module := range manifest.Modules {
 		cache.keyMap[module.Key] = module

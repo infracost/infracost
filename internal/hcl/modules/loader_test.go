@@ -72,3 +72,46 @@ func TestNestedModules(t *testing.T) {
 
 	assert.Equal(t, expectedModules, actualModules)
 }
+
+func TestSubmodules(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode")
+	}
+
+	path := "./testdata/submodules"
+	err := os.RemoveAll(filepath.Join(path, ".infracost"))
+	assert.NoError(t, err)
+
+	moduleLoader := &ModuleLoader{
+		Path: path,
+	}
+
+	manifest, err := moduleLoader.Load()
+	assert.NoError(t, err)
+
+	expectedModules := []*ManifestModule{
+		{
+			Key:     "registry-submodule",
+			Source:  "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+			Version: "2.5.0",
+			Dir:     ".infracost/terraform_modules/registry-submodule/modules/zones",
+		},
+		{
+			Key:    "git-submodule",
+			Source: "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones",
+			Dir:    ".infracost/terraform_modules/git-submodule/modules/zones",
+		},
+	}
+
+	sort.Slice(expectedModules, func(i, j int) bool {
+		return expectedModules[i].Key < expectedModules[j].Key
+	})
+
+	actualModules := manifest.Modules
+
+	sort.Slice(actualModules, func(i, j int) bool {
+		return actualModules[i].Key < actualModules[j].Key
+	})
+
+	assert.Equal(t, expectedModules, actualModules)
+}

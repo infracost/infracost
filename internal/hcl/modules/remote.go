@@ -2,7 +2,6 @@ package modules
 
 import (
 	getter "github.com/hashicorp/go-getter"
-	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 )
 
 // RemoteLoader is a loader that downloads modules from a remote source to the given destination
@@ -17,8 +16,8 @@ func NewRemoteLoader(dest string) *RemoteLoader {
 }
 
 // downloadModule downloads the remote module
-func (r *RemoteLoader) downloadModule(moduleCall *tfconfig.ModuleCall) error {
-	return downloadRemoteModule(moduleCall.Source, r.dest)
+func (r *RemoteLoader) downloadModule(moduleAddr string) error {
+	return downloadRemoteModule(moduleAddr, r.dest)
 }
 
 // downloadRemoteModule downloads the remote module using the go-getter library
@@ -34,10 +33,10 @@ func downloadRemoteModule(source string, dest string) error {
 	decompressors["tar.tbz2"] = new(getter.TarBzip2Decompressor)
 
 	client := getter.Client{
-		Src:  source,
-		Dst:  dest,
-		Pwd:  dest,
-		Mode: getter.ClientModeDir,
+		Src:           source,
+		Dst:           dest,
+		Pwd:           dest,
+		Mode:          getter.ClientModeDir,
 		Decompressors: decompressors,
 		// We don't need to specify any of the Getters, since Terraform uses the same as the default Getter values,
 		// but if we do need to at some point we can specify them here:

@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	goversion "github.com/hashicorp/go-version"
-	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"github.com/pkg/errors"
 )
 
@@ -41,10 +40,10 @@ func NewRegistryLoader(dest string) *RegistryLoader {
 // It first checks the format of the module source matches is the expected format of a registry module.
 // But this does not necessarily mean the module is a registry module, it could still be a remote module.
 // So it then calls the registry versions endpoint and tries to find a matching version.
-func (r *RegistryLoader) lookupModule(moduleCall *tfconfig.ModuleCall) (*RegistryLookupResult, error) {
+func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints string) (*RegistryLookupResult, error) {
 	// Modules are in the format (registry)/namspace/module/target
 	// So we expect them to only have 3 or 4 parts depending on if they explicitly specify the registry
-	parts := strings.Split(moduleCall.Source, "/")
+	parts := strings.Split(moduleAddr, "/")
 	if len(parts) != 3 && len(parts) != 4 {
 		return nil, errors.New("Registry module source is not in the correct format")
 	}
@@ -88,7 +87,7 @@ func (r *RegistryLoader) lookupModule(moduleCall *tfconfig.ModuleCall) (*Registr
 		return nil, errors.New("No versions found for registry module")
 	}
 
-	matchingVersion, err := findLatestMatchingVersion(versions, moduleCall.Version)
+	matchingVersion, err := findLatestMatchingVersion(versions, versionConstraints)
 	if err != nil {
 		return nil, err
 	}
