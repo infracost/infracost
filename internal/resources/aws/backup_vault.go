@@ -18,8 +18,8 @@ type BackupVault struct {
 	MonthlyAuroraSnapshotGB       *float64 `infracost_usage:"monthly_aurora_snapshot_gb"`
 	MonthlyDynamodbBackupGB       *float64 `infracost_usage:"monthly_dynamodb_backup_gb"`
 	MonthlyDynamodbRestoreGB      *float64 `infracost_usage:"monthly_dynamodb_restore_gb"`
-	MonthlyFSXWindowsBackupGB     *float64 `infracost_usage:"monthly_fsx_windows_backup_gb"`
-	MonthlyFSXLustreBackupGB      *float64 `infracost_usage:"monthly_fsx_lustre_backup_gb"`
+	MonthlyFSxWindowsBackupGB     *float64 `infracost_usage:"monthly_fsx_windows_backup_gb"`
+	MonthlyFSxLustreBackupGB      *float64 `infracost_usage:"monthly_fsx_lustre_backup_gb"`
 	MonthlyEFSColdBackupGB        *float64 `infracost_usage:"monthly_efs_cold_backup_gb"`
 	MonthlyEFSWarmRestoreGB       *float64 `infracost_usage:"monthly_efs_warm_restore_gb"`
 	MonthlyEFSItemRestoreRequests *int64   `infracost_usage:"monthly_efs_item_restore_requests"`
@@ -95,15 +95,15 @@ func (r *BackupVault) BuildResource() *schema.Resource {
 	}
 	costComponents = append(costComponents, r.additionalBackupVaultCostComponent(bd))
 
-	bd = backupData{ref: "monthly_fsx_windows_backup_gb", name: "FSx for windows backup", unit: "GB", usageType: "BackupUsage", service: "AmazonFSx", family: "Storage", key: "fileSystemType", value: "Lustre"}
-	if r.MonthlyFSXWindowsBackupGB != nil {
-		bd.qty = decimalPtr(decimal.NewFromFloat(*r.MonthlyFSXWindowsBackupGB))
+	bd = backupData{ref: "monthly_fsx_windows_backup_gb", name: "FSx for Windows backup", unit: "GB", usageType: "BackupUsage", service: "AmazonFSx", family: "Storage", key: "fileSystemType", value: "Lustre"}
+	if r.MonthlyFSxWindowsBackupGB != nil {
+		bd.qty = decimalPtr(decimal.NewFromFloat(*r.MonthlyFSxWindowsBackupGB))
 	}
 	costComponents = append(costComponents, r.additionalBackupVaultCostComponent(bd))
 
-	bd = backupData{ref: "monthly_fsx_lustre_backup_gb", name: "FSx for lustre backup", unit: "GB", usageType: "BackupUsage", service: "AmazonFSx", family: "Storage", key: "fileSystemType", value: "Lustre"}
-	if r.MonthlyFSXLustreBackupGB != nil {
-		bd.qty = decimalPtr(decimal.NewFromFloat(*r.MonthlyFSXLustreBackupGB))
+	bd = backupData{ref: "monthly_fsx_lustre_backup_gb", name: "FSx for Lustre backup", unit: "GB", usageType: "BackupUsage", service: "AmazonFSx", family: "Storage", key: "fileSystemType", value: "Lustre"}
+	if r.MonthlyFSxLustreBackupGB != nil {
+		bd.qty = decimalPtr(decimal.NewFromFloat(*r.MonthlyFSxLustreBackupGB))
 	}
 	costComponents = append(costComponents, r.additionalBackupVaultCostComponent(bd))
 
