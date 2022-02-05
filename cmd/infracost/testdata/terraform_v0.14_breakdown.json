@@ -1257,8 +1257,20 @@
         "totalMonthlyCost": "40.561"
       },
       "summary": {
+        "totalDetectedResources": 26,
+        "totalSupportedResources": 14,
+        "totalUnsupportedResources": 2,
+        "totalUsageBasedResources": 10,
+        "totalNoPriceResources": 10,
         "unsupportedResourceCounts": {
           "aws_db_option_group": 2
+        },
+        "noPriceResourceCounts": {
+          "aws_db_parameter_group": 2,
+          "aws_db_subnet_group": 2,
+          "aws_default_vpc": 2,
+          "aws_iam_role": 2,
+          "aws_iam_role_policy_attachment": 2
         }
       }
     }
@@ -1269,10 +1281,22 @@
   "pastTotalMonthlyCost": "40.561",
   "diffTotalHourlyCost": "0.055563013698630118",
   "diffTotalMonthlyCost": "40.561",
-  "timeGenerated": "2021-11-09T09:44:58.52563-05:00",
+  "timeGenerated": "2022-02-02T11:10:57.362039+01:00",
   "summary": {
+    "totalDetectedResources": 26,
+    "totalSupportedResources": 14,
+    "totalUnsupportedResources": 2,
+    "totalUsageBasedResources": 10,
+    "totalNoPriceResources": 10,
     "unsupportedResourceCounts": {
       "aws_db_option_group": 2
+    },
+    "noPriceResourceCounts": {
+      "aws_db_parameter_group": 2,
+      "aws_db_subnet_group": 2,
+      "aws_default_vpc": 2,
+      "aws_iam_role": 2,
+      "aws_iam_role_policy_attachment": 2
     }
   }
 }

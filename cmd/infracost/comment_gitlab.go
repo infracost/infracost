@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/comment"
 	"github.com/infracost/infracost/internal/config"
@@ -9,8 +12,6 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"strconv"
-	"strings"
 )
 
 var validCommentGitLabBehaviors = []string{"update", "new", "delete-and-new"}
@@ -75,7 +76,7 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 
-			body, err := buildCommentBody(ctx, paths, output.MarkdownOptions{
+			body, err := buildCommentBody(cmd, ctx, paths, output.MarkdownOptions{
 				WillUpdate:          mrNumber != 0 && behavior == "update",
 				WillReplace:         mrNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: true,

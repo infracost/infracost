@@ -66,6 +66,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			combined.IsCIRun = ctx.IsCIRun()
 
 			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
@@ -108,7 +109,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 					ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 				}
 
-				combined.RunID, combined.ShareURL = shareRun(ctx, combined, inputs)
+				combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 			}
 
 			var b []byte
@@ -168,7 +169,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	return cmd
 }
 
-func shareRun(ctx *config.RunContext, combined output.Root, inputs []output.ReportInput) (string, string) {
+func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []output.ReportInput) (string, string) {
 	if len(inputs) == 1 && inputs[0].Root.RunID != "" {
 		result := inputs[0].Root
 		return result.RunID, result.ShareURL

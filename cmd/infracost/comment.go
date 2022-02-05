@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -35,7 +36,7 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 	return cmd
 }
 
-func buildCommentBody(ctx *config.RunContext, paths []string, mdOpts output.MarkdownOptions) ([]byte, error) {
+func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string, mdOpts output.MarkdownOptions) ([]byte, error) {
 	inputs, err := output.LoadPaths(paths)
 	if err != nil {
 		return nil, err
@@ -44,6 +45,16 @@ func buildCommentBody(ctx *config.RunContext, paths []string, mdOpts output.Mark
 	combined, err := output.Combine(inputs)
 	if err != nil {
 		return nil, err
+	}
+	combined.IsCIRun = ctx.IsCIRun()
+
+	dryRun, _ := cmd.Flags().GetBool("dry-run")
+	if ctx.Config.EnableDashboard && !dryRun {
+		if ctx.Config.IsSelfHosted() {
+			ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+		}
+
+		combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 	}
 
 	opts := output.Options{

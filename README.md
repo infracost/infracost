@@ -32,7 +32,7 @@ Docker and Windows users see [here](https://www.infracost.io/docs/#quick-start).
 
 ### 2. Get API key
 
-Register for a free API key, which is used by the CLI to query our Cloud Pricing API, e.g. get prices for instance types. No cloud credentials or secrets are [sent](https://www.infracost.io/docs/faq/#what-data-is-sent-to-the-cloud-pricing-api) to the API and you can also [self-host](https://www.infracost.io/docs/cloud_pricing_api/self_hosted/) it.
+Register for a free API key, which is used by the CLI to retrieve prices from our Cloud Pricing API, e.g. get prices for instance types. No cloud credentials or secrets are [sent](https://www.infracost.io/docs/faq/#what-data-is-sent-to-the-cloud-pricing-api) to the API and you can also [self-host](https://www.infracost.io/docs/cloud_pricing_api/self_hosted/) it.
 
 ```sh
 infracost register
@@ -63,8 +63,8 @@ Use our CI/CD integrations to add cost estimates to pull requests. This provides
 - [GitHub Actions](https://www.infracost.io/docs/integrations/github_actions/)
 - [GitLab CI](https://www.infracost.io/docs/integrations/gitlab_ci/)
 - [Atlantis](https://www.infracost.io/docs/integrations/atlantis/)
-- [Terraform Cloud/Enterprise](https://www.infracost.io/docs/integrations/terraform_cloud_enterprise/)
 - [Azure DevOps](https://www.infracost.io/docs/integrations/cicd/#azure-devops)
+- [Terraform Cloud/Enterprise](https://www.infracost.io/docs/integrations/terraform_cloud_enterprise/)
 - [Jenkins](https://www.infracost.io/docs/integrations/cicd/#jenkins)
 - [Bitbucket Pipelines](https://www.infracost.io/docs/integrations/cicd/#bitbucket-pipelines)
 - [CircleCI](https://www.infracost.io/docs/integrations/cicd/#circleci)
