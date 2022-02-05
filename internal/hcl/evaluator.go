@@ -17,6 +17,7 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/hcl/funcs"
+	"github.com/infracost/infracost/internal/hcl/modules"
 )
 
 const maxContextIterations = 32
@@ -39,7 +40,7 @@ type Evaluator struct {
 	moduleCalls []*ModuleCall
 	// moduleMetadata is a lookup map of where modules exist on the local filesystem. This is built as part of a
 	// Terraform or Infracost init.
-	moduleMetadata *ModulesManifest
+	moduleMetadata *modules.Manifest
 	// visitedModules is a lookup map to hold information by the Evaluator of modules that it has already evaluated.
 	visitedModules map[string]struct{}
 	// projectRootPath is the path to the root module for this project.
@@ -62,7 +63,7 @@ func NewEvaluator(
 	workingDir string,
 	blocks Blocks,
 	inputVars map[string]cty.Value,
-	moduleMetadata *ModulesManifest,
+	moduleMetadata *modules.Manifest,
 	visitedModules map[string]struct{},
 	workspace string,
 ) *Evaluator {

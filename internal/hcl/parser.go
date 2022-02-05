@@ -103,12 +103,11 @@ func (parser *Parser) ParseDirectory() ([]*Module, error) {
 		return nil, err
 	}
 
-	// load the module metadata. This is required to understand remote module referenced in code
-	// relate to the local file system.
-	modulesManifest, err := loadModuleMetadata(parser.initialPath)
+	// load the modules. This downloads any remote modules to the local file system
+	modulesManifest, err := loadModules(parser.initialPath)
 	if err != nil {
 		if !config.IsTest() {
-			log.Warnf("Error loading module metadata this is required for Infracost to get accurate results, %s", err)
+			log.Warnf("Error loading modules. This is required for Infracost to get accurate results: %s", err)
 		}
 	}
 

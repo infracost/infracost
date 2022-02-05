@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/infracost/infracost/internal/hcl/modules"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -55,9 +56,9 @@ func (b *Block) getModuleBlocks(modulePath string) (Blocks, error) {
 	return blocks, err
 }
 
-func loadModuleMetadata(fullPath string) (*ModulesManifest, error) {
-	moduleLoader := &ModuleLoader{
-		path: fullPath,
+func loadModules(fullPath string) (*modules.Manifest, error) {
+	moduleLoader := &modules.ModuleLoader{
+		Path: fullPath,
 	}
 
 	return moduleLoader.Load()
