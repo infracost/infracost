@@ -12,8 +12,8 @@
  ├─ DynamoDB backup           Monthly cost depends on usage: $0.11 per GB       
  ├─ DynamoDB restore          Monthly cost depends on usage: $0.17 per GB       
  ├─ Aurora snapshot           Monthly cost depends on usage: $0.024 per GB      
- ├─ FSx for windows backup    Monthly cost depends on usage: $0.055 per GB      
- └─ FSx for lustre backup     Monthly cost depends on usage: $0.055 per GB      
+ ├─ FSx for Windows backup    Monthly cost depends on usage: $0.055 per GB      
+ └─ FSx for Lustre backup     Monthly cost depends on usage: $0.055 per GB      
                                                                                 
  aws_backup_vault.usage                                                         
  ├─ EFS backup (warm)                  10,000  GB                       $600.00 
@@ -26,8 +26,8 @@
  ├─ DynamoDB backup                    10,000  GB                     $1,120.00 
  ├─ DynamoDB restore                   10,000  GB                     $1,680.00 
  ├─ Aurora snapshot                    10,000  GB                       $240.00 
- ├─ FSx for windows backup             10,000  GB                       $550.00 
- └─ FSx for lustre backup              10,000  GB                       $550.00 
+ ├─ FSx for Windows backup             10,000  GB                       $550.00 
+ └─ FSx for Lustre backup              10,000  GB                       $550.00 
                                                                                 
  OVERALL TOTAL                                                       $12,960.00 
 ──────────────────────────────────
