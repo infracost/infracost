@@ -258,6 +258,44 @@ func (b *Block) HasModuleBlock() bool {
 	return b.moduleBlock != nil
 }
 
+// ModuleName returns the address of the module associated with this Block or "" if it is part of the root Module
+func (b *Block) ModuleAddress() string {
+	if b == nil || !b.HasModuleBlock() {
+		return ""
+	}
+
+	return b.moduleBlock.FullName()
+}
+
+// ModuleName returns the name of the module associated with this Block or "" if it is part of the root Module
+func (b *Block) ModuleName() string {
+	if b == nil || !b.HasModuleBlock() {
+		return ""
+	}
+
+	return b.moduleBlock.TypeLabel()
+}
+
+// ModuleSource returns the "source" attribute from the associated Module or "" if it is part of the root Module
+func (b *Block) ModuleSource() string {
+	if b == nil || !b.HasModuleBlock() {
+		return ""
+	}
+
+	attr := b.moduleBlock.GetAttribute("source")
+	if attr == nil {
+		return ""
+	}
+
+	value := attr.Value()
+
+	if value.Type() != cty.String {
+		return ""
+	}
+
+	return value.AsString()
+}
+
 // GetChildBlock returns the first child Block that has the name provided. e.g:
 // If the current Block looks like such:
 //
