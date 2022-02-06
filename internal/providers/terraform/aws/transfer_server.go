@@ -22,7 +22,7 @@ func newTransferServer(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		for _, data := range d.Get("protocols").Array() {
 			protocols = append(protocols, data.String())
 		}
-	
+
 		sort.Strings(protocols)
 	} else {
 		defaultProtocol := "SFTP"
