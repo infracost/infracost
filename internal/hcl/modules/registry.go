@@ -33,19 +33,23 @@ type RegistryLoader struct {
 }
 
 // NewRegistryLoader constructs a registry loader
-func NewRegistryLoader(packageFetcher *PackageFetcher, dest string) *RegistryLoader {
+func NewRegistryLoader(packageFetcher *PackageFetcher) *RegistryLoader {
 	return &RegistryLoader{
 		packageFetcher: packageFetcher,
-		dest:           dest,
 	}
 }
 
 // lookupModule lookups the matching version and download URL for the module.
 // It calls the registry versions endpoint and tries to find a matching version.
 func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints string) (*RegistryLookupResult, error) {
+	registrySource, err := normalizeRegistrySource(moduleAddr)
+	if err != nil {
+		return nil, err
+	}
+
 	// Modules are in the format (registry)/namspace/module/target
 	// So we expect them to only have 3 or 4 parts depending on if they explicitly specify the registry
-	parts := strings.Split(moduleAddr, "/")
+	parts := strings.Split(registrySource, "/")
 	if len(parts) != 4 {
 		return nil, errors.New("Registry module source is not in the correct format")
 	}
@@ -123,7 +127,7 @@ func (r *RegistryLoader) fetchModuleVersions(moduleURL string) ([]string, error)
 
 // downloadModule downloads the module to the loader's destination
 // It first calls the download URL to get the X-Terraform-Get header which contains a source we can use with go-getter to download the module
-func (r *RegistryLoader) downloadModule(downloadURL string) error {
+func (r *RegistryLoader) downloadModule(downloadURL string, dest string) error {
 	httpClient := &http.Client{}
 	resp, err := httpClient.Get(downloadURL)
 	if err != nil {
@@ -136,7 +140,7 @@ func (r *RegistryLoader) downloadModule(downloadURL string) error {
 		return errors.New("download URL has no X-Terraform-Get header")
 	}
 
-	return r.packageFetcher.fetch(source, r.dest)
+	return r.packageFetcher.fetch(source, dest)
 }
 
 // findLatestMatchingVersion returns the latest version from a list of versions that matches the given constraint.

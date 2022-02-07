@@ -24,13 +24,17 @@ type ModuleLoader struct {
 	Path           string
 	cache          *Cache
 	packageFetcher *PackageFetcher
+	registryLoader *RegistryLoader
 }
 
 func NewModuleLoader(path string) *ModuleLoader {
+	fetcher := NewPackageFetcher()
+
 	return &ModuleLoader{
 		Path:           path,
 		cache:          NewCache(),
-		packageFetcher: NewPackageFetcher(),
+		packageFetcher: fetcher,
+		registryLoader: NewRegistryLoader(fetcher),
 	}
 }
 
@@ -170,18 +174,10 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 	manifestModule.Dir = path.Clean(moduleDownloadDir)
 
-	registryLoader := NewRegistryLoader(m.packageFetcher, dest)
-
-	var lookupResult *RegistryLookupResult
-	var registryErr error
-	registrySource, registryErr := normalizeRegistrySource(moduleAddr)
-	if registryErr == nil {
-		lookupResult, registryErr = registryLoader.lookupModule(registrySource, moduleCall.Version)
-	}
-
-	if registryErr == nil {
+	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, moduleCall.Version)
+	if err == nil {
 		log.Debugf("Downloading module %s from registry URL %s", key, lookupResult.DownloadURL)
-		err = registryLoader.downloadModule(lookupResult.DownloadURL)
+		err = m.registryLoader.downloadModule(lookupResult.DownloadURL, dest)
 		if err != nil {
 			return nil, err
 		}
@@ -197,7 +193,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		return manifestModule, nil
 	}
 
-	log.Debugf("Module %s not recognized as registry module, treating as remote module: %s", key, registryErr.Error())
+	log.Debugf("Module %s not recognized as registry module, treating as remote module: %s", key, err.Error())
 	log.Debugf("Downloading module %s from remote %s", key, moduleCall.Source)
 	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
