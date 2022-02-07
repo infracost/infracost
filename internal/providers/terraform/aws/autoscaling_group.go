@@ -94,7 +94,7 @@ func newLaunchConfiguration(d *schema.ResourceData, u *schema.UsageData, region 
 		PurchaseOption:   purchaseOption,
 		InstanceType:     d.Get("instance_type").String(),
 		EBSOptimized:     d.Get("ebs_optimized").Bool(),
-		EnableMonitoring: d.Get("enable_monitoring").Bool(),
+		EnableMonitoring: d.GetBoolOrDefault("enable_monitoring", true),
 		CPUCredits:       d.Get("credit_specification.0.cpu_credits").String(),
 	}
 
