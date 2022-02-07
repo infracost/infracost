@@ -300,7 +300,11 @@ func (b *Block) ModuleSource() string {
 // the first word in the snake_case name of the type is returned.  E.g. the type 'aws_instance' would
 // return provider 'aws'
 func (b *Block) Provider() string {
-	attr := b.moduleBlock.GetAttribute("provider")
+	if b == nil {
+		return ""
+	}
+
+	attr := b.GetAttribute("provider")
 	if attr != nil {
 		value := attr.Value()
 		if value.Type() == cty.String {
