@@ -1,4 +1,3 @@
-
 variable "instance_type" {
 }
 
