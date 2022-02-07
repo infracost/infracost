@@ -296,6 +296,27 @@ func (b *Block) ModuleSource() string {
 	return value.AsString()
 }
 
+// Provider returns the provider by first checking if it is explicitly set as an attribute, if it is not
+// the first word in the snake_case name of the type is returned.  E.g. the type 'aws_instance' would
+// return provider 'aws'
+func (b *Block) Provider() string {
+	attr := b.moduleBlock.GetAttribute("provider")
+	if attr != nil {
+		value := attr.Value()
+		if value.Type() == cty.String {
+			// An explicit provider is provided so use that
+			return value.AsString()
+		}
+	}
+
+	// there's no explicit provider so get the provider implied as the prefix from the type
+	parts := strings.Split(b.TypeLabel(), "_")
+	if len(parts) > 0 {
+		return parts[0]
+	}
+	return ""
+}
+
 // GetChildBlock returns the first child Block that has the name provided. e.g:
 // If the current Block looks like such:
 //

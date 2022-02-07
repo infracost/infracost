@@ -181,7 +181,7 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 						Mode:              "managed",
 						Type:              block.TypeLabel(),
 						Name:              block.NameLabel(),
-						ProviderConfigKey: "",                       // TODO
+						ProviderConfigKey: block.ModuleName() + ":" + block.Provider(),
 						Expressions:       blockToReferences(block), // TODO
 					})
 					sch.Configuration.RootModule.ModuleCalls[block.ModuleName()] = modCall
