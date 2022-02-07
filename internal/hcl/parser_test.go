@@ -157,7 +157,7 @@ output "mod_result" {
 
 	childOutputs := childModule.Blocks.OfType("output")
 	require.Len(t, childOutputs, 1)
-	assert.Equal(t, "module.my-mod:output.mod_result", childOutputs[0].FullName())
+	assert.Equal(t, "module.my-mod.output.mod_result", childOutputs[0].FullName())
 	childValAttr := childOutputs[0].GetAttribute("value")
 	require.NotNil(t, childValAttr)
 	require.Equal(t, cty.String, childValAttr.Value().Type())
@@ -217,7 +217,7 @@ output "mod_result" {
 
 	childOutputs := childModule.Blocks.OfType("output")
 	require.Len(t, childOutputs, 1)
-	assert.Equal(t, "module.my-mod:output.mod_result", childOutputs[0].FullName())
+	assert.Equal(t, "module.my-mod.output.mod_result", childOutputs[0].FullName())
 	childValAttr := childOutputs[0].GetAttribute("value")
 	require.NotNil(t, childValAttr)
 	require.Equal(t, cty.String, childValAttr.Value().Type())
