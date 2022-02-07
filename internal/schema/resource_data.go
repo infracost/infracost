@@ -47,16 +47,15 @@ func (d *ResourceData) Get(key string) gjson.Result {
 }
 
 func (d *ResourceData) GetStringOrDefault(key, def string) string {
-	v := d.RawValues.Get(key).String()
-	if v != "" {
-		return v
+	if !d.IsEmpty(key) {
+		return d.RawValues.Get(key).String()
 	}
 
 	return def
 }
 
 func (d *ResourceData) GetInt64OrDefault(key string, def int64) int64 {
-	if d.RawValues.Get(key).Exists() {
+	if !d.IsEmpty(key) {
 		return d.RawValues.Get(key).Int()
 	}
 
@@ -64,7 +63,7 @@ func (d *ResourceData) GetInt64OrDefault(key string, def int64) int64 {
 }
 
 func (d *ResourceData) GetBoolOrDefault(key string, def bool) bool {
-	if d.RawValues.Get(key).Exists() {
+	if !d.IsEmpty(key) {
 		return d.RawValues.Get(key).Bool()
 	}
 
