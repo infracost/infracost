@@ -134,7 +134,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 			return manifestModule, err
 		}
 	} else {
-		log.Debugf("Module %s needs loaded: %s", key, err.Error())
+		log.Debugf("Module %s needs loading: %s", key, err.Error())
 	}
 
 	manifestModule = &ManifestModule{
