@@ -258,6 +258,69 @@ func (b *Block) HasModuleBlock() bool {
 	return b.moduleBlock != nil
 }
 
+// ModuleAddress returns the address of the module associated with this Block or "" if it is part of the root Module
+func (b *Block) ModuleAddress() string {
+	if b == nil || !b.HasModuleBlock() {
+		return ""
+	}
+
+	return b.moduleBlock.FullName()
+}
+
+// ModuleName returns the name of the module associated with this Block or "" if it is part of the root Module
+func (b *Block) ModuleName() string {
+	if b == nil || !b.HasModuleBlock() {
+		return ""
+	}
+
+	return b.moduleBlock.TypeLabel()
+}
+
+// ModuleSource returns the "source" attribute from the associated Module or "" if it is part of the root Module
+func (b *Block) ModuleSource() string {
+	if b == nil || !b.HasModuleBlock() {
+		return ""
+	}
+
+	attr := b.moduleBlock.GetAttribute("source")
+	if attr == nil {
+		return ""
+	}
+
+	value := attr.Value()
+
+	if value.Type() != cty.String {
+		return ""
+	}
+
+	return value.AsString()
+}
+
+// Provider returns the provider by first checking if it is explicitly set as an attribute, if it is not
+// the first word in the snake_case name of the type is returned.  E.g. the type 'aws_instance' would
+// return provider 'aws'
+func (b *Block) Provider() string {
+	if b == nil {
+		return ""
+	}
+
+	attr := b.GetAttribute("provider")
+	if attr != nil {
+		value := attr.Value()
+		if value.Type() == cty.String {
+			// An explicit provider is provided so use that
+			return value.AsString()
+		}
+	}
+
+	// there's no explicit provider so get the provider implied as the prefix from the type
+	parts := strings.Split(b.TypeLabel(), "_")
+	if len(parts) > 0 {
+		return parts[0]
+	}
+	return ""
+}
+
 // GetChildBlock returns the first child Block that has the name provided. e.g:
 // If the current Block looks like such:
 //

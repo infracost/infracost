@@ -43,6 +43,15 @@ func (p HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 func (p HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+	b, err := p.LoadPlanJSON()
+	if err != nil {
+		return nil, err
+	}
+
+	return p.Provider.LoadResourcesFromSrc(usage, b, nil)
+}
+
+func (p HCLProvider) LoadPlanJSON() ([]byte, error) {
 	modules, err := p.Parser.ParseDirectory()
 	if err != nil {
 		return nil, err
@@ -53,8 +62,7 @@ func (p HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schem
 	if err != nil {
 		return nil, fmt.Errorf("error handling built plan json from hcl %w", err)
 	}
-
-	return p.Provider.LoadResourcesFromSrc(usage, b, nil)
+	return b, nil
 }
 
 func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
@@ -74,9 +82,11 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 		Configuration: Configuration{
 			ProviderConfig: make(map[string]ProviderConfig),
 			RootModule: struct {
-				Resources []ResourceData `json:"resources"`
+				Resources   []ResourceData        `json:"resources,omitempty"`
+				ModuleCalls map[string]ModuleCall `json:"module_calls"`
 			}{
-				Resources: []ResourceData{},
+				Resources:   []ResourceData{},
+				ModuleCalls: map[string]ModuleCall{},
 			},
 		},
 	}
@@ -119,17 +129,18 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 					Address:       block.FullName(),
 					Mode:          "managed",
 					Type:          block.TypeLabel(),
-					Name:          block.LocalName(),
+					Name:          block.NameLabel(),
 					ProviderName:  "registry.terraform.io/hashicorp/aws",
 					SchemaVersion: 1,
 				}
 
 				c := ResourceChangesJSON{
-					Address:      block.FullName(),
-					Mode:         "managed",
-					Type:         block.TypeLabel(),
-					Name:         block.LocalName(),
-					ProviderName: "registry.terraform.io/hashicorp/aws",
+					Address:       block.FullName(),
+					ModuleAddress: block.ModuleAddress(),
+					Mode:          "managed",
+					Type:          block.TypeLabel(),
+					Name:          block.NameLabel(),
+					ProviderName:  "registry.terraform.io/hashicorp/aws",
 					Change: struct {
 						Actions []string               `json:"actions"`
 						Before  interface{}            `json:"before"`
@@ -154,22 +165,42 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 					}
 				}
 
-				sch.Configuration.RootModule.Resources = append(sch.Configuration.RootModule.Resources, ResourceData{
-					Address:           block.FullName(),
-					Mode:              "managed",
-					Type:              block.TypeLabel(),
-					Name:              block.LocalName(),
-					ProviderConfigKey: providerConfigKey,
-					Expressions:       blockToReferences(block),
-				})
+				if block.HasModuleBlock() {
+					modCall, ok := sch.Configuration.RootModule.ModuleCalls[block.ModuleName()]
+					if !ok {
+						modCall = ModuleCall{
+							Source: block.ModuleSource(),
+							Module: ModuleCallModule{
+								Resources: []ResourceData{},
+							},
+						}
+					}
 
-				sch.ResourceChanges = append(sch.ResourceChanges, c)
-				if !block.HasModuleBlock() {
+					modCall.Module.Resources = append(modCall.Module.Resources, ResourceData{
+						Address:           block.LocalName(),
+						Mode:              "managed",
+						Type:              block.TypeLabel(),
+						Name:              block.NameLabel(),
+						ProviderConfigKey: block.ModuleName() + ":" + block.Provider(),
+						Expressions:       blockToReferences(block), // This doesn't seem to work for module calls, but it is not clear that it is needed.
+					})
+					sch.Configuration.RootModule.ModuleCalls[block.ModuleName()] = modCall
+
+					sch.PlannedValues.RootModule.ChildModules[0].Resources = append(sch.PlannedValues.RootModule.ChildModules[0].Resources, r)
+				} else {
+					sch.Configuration.RootModule.Resources = append(sch.Configuration.RootModule.Resources, ResourceData{
+						Address:           block.FullName(),
+						Mode:              "managed",
+						Type:              block.TypeLabel(),
+						Name:              block.LocalName(),
+						ProviderConfigKey: providerConfigKey,
+						Expressions:       blockToReferences(block),
+					})
+
 					sch.PlannedValues.RootModule.Resources = append(sch.PlannedValues.RootModule.Resources, r)
-					continue
 				}
 
-				sch.PlannedValues.RootModule.ChildModules[0].Resources = append(sch.PlannedValues.RootModule.ChildModules[0].Resources, r)
+				sch.ResourceChanges = append(sch.ResourceChanges, c)
 			}
 		}
 	}
@@ -275,7 +306,7 @@ type ResourceChangesJSON struct {
 type PlanSchema struct {
 	FormatVersion    string      `json:"format_version"`
 	TerraformVersion string      `json:"terraform_version"`
-	Variables        interface{} `json:"variables"`
+	Variables        interface{} `json:"variables,omitempty"`
 	PlannedValues    struct {
 		RootModule PlanRootModule `json:"root_module"`
 	} `json:"planned_values"`
@@ -284,14 +315,15 @@ type PlanSchema struct {
 }
 
 type PlanRootModule struct {
-	Resources    []ResourceJSON `json:"resources"`
+	Resources    []ResourceJSON `json:"resources,omitempty"`
 	ChildModules []ChildModule  `json:"child_modules"`
 }
 
 type Configuration struct {
 	ProviderConfig map[string]ProviderConfig `json:"provider_config"`
 	RootModule     struct {
-		Resources []ResourceData `json:"resources"`
+		Resources   []ResourceData        `json:"resources,omitempty"`
+		ModuleCalls map[string]ModuleCall `json:"module_calls"`
 	} `json:"root_module"`
 }
 
@@ -307,6 +339,15 @@ type ResourceData struct {
 	Name              string                 `json:"name"`
 	ProviderConfigKey string                 `json:"provider_config_key"`
 	Expressions       map[string]interface{} `json:"expressions"`
+}
+
+type ModuleCall struct {
+	Source string           `json:"source"`
+	Module ModuleCallModule `json:"module"`
+}
+
+type ModuleCallModule struct {
+	Resources []ResourceData `json:"resources"`
 }
 
 type ChildModule struct {
