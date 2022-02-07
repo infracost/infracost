@@ -3,12 +3,12 @@ package output
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mitchellh/go-homedir"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
@@ -144,14 +144,14 @@ func Combine(inputs []ReportInput) (Root, error) {
 
 			diffTotalMonthlyCost = decimalPtr(diffTotalMonthlyCost.Add(*input.Root.DiffTotalMonthlyCost))
 		}
-		if input.Root.DiffTotalMonthlyCost != nil {
-			if diffTotalMonthlyCost == nil {
-				diffTotalMonthlyCost = decimalPtr(decimal.Zero)
+
+		if input.Root.DiffTotalHourlyCost != nil {
+			if diffTotalHourlyCost == nil {
+				diffTotalHourlyCost = decimalPtr(decimal.Zero)
 			}
 
-			diffTotalMonthlyCost = decimalPtr(diffTotalMonthlyCost.Add(*input.Root.DiffTotalMonthlyCost))
+			diffTotalHourlyCost = decimalPtr(diffTotalHourlyCost.Add(*input.Root.DiffTotalHourlyCost))
 		}
-
 	}
 
 	combined.Version = outputVersion
