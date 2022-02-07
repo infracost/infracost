@@ -198,6 +198,11 @@ var FreeResources = []string{
 	// AWS Elastic Container Service
 	"aws_ecs_capacity_provider",
 
+	// AWS Elastic File System
+	"aws_efs_access_point",
+	"aws_efs_file_system_policy",
+	"aws_efs_mount_target",
+
 	// AWS Elastic Load Balancing
 	"aws_alb_listener",
 	"aws_alb_listener_certificate",
