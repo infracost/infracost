@@ -16,6 +16,7 @@ EXAMPLES
 
 FLAGS
       --config-file string            Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags
+      --hcl-only                      Run infracost without terraform, parsing hcl files at the given path. This option does not need credentials and is much quicker to run.
   -h, --help                          help for diff
       --no-cache                      Don't attempt to cache Terraform plans
       --out-file string               Save output to a file
@@ -24,6 +25,7 @@ FLAGS
       --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)
       --terraform-plan-flags string   Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory
       --terraform-workspace string    Terraform workspace to use. Applicable when path is a Terraform directory
+      --tfvar-files strings           Path to .tfvars file, can be used multiple times and evaluated in order of specification
       --usage-file string             Path to Infracost usage file that specifies values for usage-based resources
 
 GLOBAL FLAGS
