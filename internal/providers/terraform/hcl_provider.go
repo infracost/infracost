@@ -182,7 +182,7 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 						Type:              block.TypeLabel(),
 						Name:              block.NameLabel(),
 						ProviderConfigKey: block.ModuleName() + ":" + block.Provider(),
-						Expressions:       blockToReferences(block), // TODO
+						Expressions:       blockToReferences(block), // This doesn't seem to work for module calls, but it is not clear that it is needed.
 					})
 					sch.Configuration.RootModule.ModuleCalls[block.ModuleName()] = modCall
 
