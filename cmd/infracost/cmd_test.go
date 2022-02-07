@@ -28,6 +28,7 @@ type GoldenFileOptions = struct {
 	Currency    string
 	CaptureLogs bool
 	IsJSON      bool
+	RunHCL      bool
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -39,14 +40,16 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
-	t.Run("HCL", func(t *testing.T) {
-		hclArgs := make([]string, len(args)+2)
-		copy(hclArgs, args)
-		hclArgs[len(args)] = "--hcl-only"
-		hclArgs[len(args)+1] = "true"
+	if testOptions != nil && testOptions.RunHCL {
+		t.Run("HCL", func(t *testing.T) {
+			hclArgs := make([]string, len(args)+2)
+			copy(hclArgs, args)
+			hclArgs[len(args)] = "--hcl-only"
+			hclArgs[len(args)+1] = "true"
 
-		goldenFileCommandTest(t, testName, hclArgs, testOptions, ctxOptions)
-	})
+			goldenFileCommandTest(t, testName, hclArgs, testOptions, ctxOptions)
+		})
+	}
 
 	t.Run("Terraform CLI", func(t *testing.T) {
 		goldenFileCommandTest(t, testName, args, testOptions, ctxOptions)
@@ -69,9 +72,14 @@ func goldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 	var actual []byte
 	var logBuf *bytes.Buffer
 
+	currency := testOptions.Currency
+	if currency == "" {
+		currency = "USD"
+	}
+
 	main.Run(func(c *config.RunContext) {
 		c.Config.EventsDisabled = true
-		c.Config.Currency = testOptions.Currency
+		c.Config.Currency = currency
 		c.Config.NoColor = true
 		c.ErrWriter = errBuf
 		c.OutWriter = outBuf
