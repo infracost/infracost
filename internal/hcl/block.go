@@ -258,7 +258,7 @@ func (b *Block) HasModuleBlock() bool {
 	return b.moduleBlock != nil
 }
 
-// ModuleName returns the address of the module associated with this Block or "" if it is part of the root Module
+// ModuleAddress returns the address of the module associated with this Block or "" if it is part of the root Module
 func (b *Block) ModuleAddress() string {
 	if b == nil || !b.HasModuleBlock() {
 		return ""
