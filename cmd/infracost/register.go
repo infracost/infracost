@@ -22,6 +22,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 		Long:  "Register for a free Infracost API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var isRegenerate bool
+			var ciInterest bool
 
 			if ctx.Config.Credentials.APIKey != "" {
 
@@ -47,6 +48,12 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 					return nil
 				}
 
+				ciInterest, err = promptForCIDocs(isRegenerate)
+				if err != nil {
+					// user cancelled
+					return nil
+				}
+
 				fmt.Println()
 			}
 
@@ -65,10 +72,13 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				return nil
 			}
 
-			ciInterest, err := promptForCIDocs(isRegenerate)
-			if err != nil {
-				// user cancelled
-				return nil
+			// prompt for the ci docs after user email,name only if not regenerating
+			if !isRegenerate {
+				ciInterest, err = promptForCIDocs(isRegenerate)
+				if err != nil {
+					// user cancelled
+					return nil
+				}
 			}
 
 			d := apiclient.NewDashboardAPIClient(ctx)
@@ -84,7 +94,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				return nil
 			}
 
-			fmt.Printf("\nThank you %s! Your API key is: %s\n", name, r.APIKey)
+			fmt.Printf("\nThanks %s! Your API key is: %s\n", name, r.APIKey)
 
 			if isRegenerate {
 				fmt.Println()
