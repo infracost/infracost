@@ -29,7 +29,6 @@ type RegistryLookupResult struct {
 // RegistryLoader is a loader that can lookup modules from a Terraform Registry and download them to the given destination
 type RegistryLoader struct {
 	packageFetcher *PackageFetcher
-	dest           string
 }
 
 // NewRegistryLoader constructs a registry loader

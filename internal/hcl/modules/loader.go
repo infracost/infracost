@@ -20,6 +20,11 @@ var downloadDir = ".infracost/terraform_modules"
 var manifestPath = ".infracost/terraform_modules/manifest.json"
 
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.
+//
+// The path should be the root directory of the Terraform project. We use a distinct module loader per Terraform project,
+// because at the moment the cache is per project. The cache reads the manifest.json file from the path's
+// .infracost/terraform_modules directory. We could implement a global cache in the future, but for now have decided
+// to go with the same approach as Terraform.
 type ModuleLoader struct {
 	Path           string
 	cache          *Cache
@@ -27,6 +32,7 @@ type ModuleLoader struct {
 	registryLoader *RegistryLoader
 }
 
+// NewModuleLoader constructs a new module loader
 func NewModuleLoader(path string) *ModuleLoader {
 	fetcher := NewPackageFetcher()
 
@@ -133,9 +139,9 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		// so the existing manifest.json is out-of-date.
 		_, diags := tfconfig.LoadModule(path.Join(m.Path, manifestModule.Dir))
 		if !diags.HasErrors() {
-		        return manifestModule, err
+			return manifestModule, err
 		}
-		
+
 		log.Debugf("Module %s cannot be loaded, re-loading: %s", key, diags.Err())
 	} else {
 		log.Debugf("Module %s needs loading: %s", key, err.Error())
