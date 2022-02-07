@@ -43,7 +43,7 @@ func readManifest(path string) (*Manifest, error) {
 
 // writeManifest writes the manifest file to the given path
 func writeManifest(manifest *Manifest, path string) error {
-	b, err := json.MarshalIndent(manifest, "", "  ")
+	b, err := json.Marshal(manifest)
 	if err != nil {
 		return errors.Wrap(err, "Failed to marshal manifest")
 	}

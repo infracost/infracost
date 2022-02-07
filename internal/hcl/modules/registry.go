@@ -40,43 +40,17 @@ func NewRegistryLoader(packageFetcher *PackageFetcher, dest string) *RegistryLoa
 	}
 }
 
-// lookupModule checks if the given module is a valid registry module and lookups the matching version and download URL for the module.
-// It first checks the format of the module source matches is the expected format of a registry module.
-// But this does not necessarily mean the module is a registry module, it could still be a remote module.
-// So it then calls the registry versions endpoint and tries to find a matching version.
+// lookupModule lookups the matching version and download URL for the module.
+// It calls the registry versions endpoint and tries to find a matching version.
 func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints string) (*RegistryLookupResult, error) {
 	// Modules are in the format (registry)/namspace/module/target
 	// So we expect them to only have 3 or 4 parts depending on if they explicitly specify the registry
 	parts := strings.Split(moduleAddr, "/")
-	if len(parts) != 3 && len(parts) != 4 {
+	if len(parts) != 4 {
 		return nil, errors.New("Registry module source is not in the correct format")
 	}
 
-	// If the registry is not specified, we assume the default registry
-	var host string
-	var err error
-
-	if len(parts) == 4 {
-		host, err = normalizeHost(parts[0])
-		if err != nil {
-			return nil, err
-		}
-
-		parts = parts[1:]
-	} else {
-		host = defaultRegistryHost
-	}
-
-	// GitHub and BitBucket hosts aren't supported as registries
-	if host == "github.com" || host == "bitbucket.org" {
-		return nil, errors.New("Registry module source can not be from a GitHub or BitBucket host")
-	}
-
-	// Check that the other parts of the module source are using only the characters we expect
-	namespace, moduleName, target := parts[0], parts[1], parts[2]
-	if !validRegistryName.MatchString(namespace) || !validRegistryName.MatchString(moduleName) || !validRegistryName.MatchString(target) {
-		return nil, errors.New("Registry module source contains invalid characters")
-	}
+	host, namespace, moduleName, target := parts[0], parts[1], parts[2], parts[3]
 
 	// By this stage we are more confident that the module source is a valid registry module
 	// We now need to check the registry to see if the module exists and if it has a version
@@ -207,6 +181,46 @@ func findLatestMatchingVersion(versions []string, constraints string) (string, e
 	}
 
 	return matchingVersion.String(), nil
+}
+
+// normalizeRegistrySource validates a module source address and normalizes it into the host/namespace/module/target format
+// This does not mean that the module address is a registry module, it could still be a remote module.
+// To work that out we need to try looking up the module using the `lookupModule` function
+func normalizeRegistrySource(moduleAddr string) (string, error) {
+	// Modules are in the format (registry)/namspace/module/target
+	// So we expect them to only have 3 or 4 parts depending on if they explicitly specify the registry
+	parts := strings.Split(moduleAddr, "/")
+	if len(parts) != 3 && len(parts) != 4 {
+		return "", errors.New("Registry module source is not in the correct format")
+	}
+
+	// If the registry is not specified, we assume the default registry
+	var host string
+	var err error
+
+	if len(parts) == 4 {
+		host, err = normalizeHost(parts[0])
+		if err != nil {
+			return "", err
+		}
+
+		parts = parts[1:]
+	} else {
+		host = defaultRegistryHost
+	}
+
+	// GitHub and BitBucket hosts aren't supported as registries
+	if host == "github.com" || host == "bitbucket.org" {
+		return "", errors.New("Registry module source can not be from a GitHub or BitBucket host")
+	}
+
+	// Check that the other parts of the module source are using only the characters we expect
+	namespace, moduleName, target := parts[0], parts[1], parts[2]
+	if !validRegistryName.MatchString(namespace) || !validRegistryName.MatchString(moduleName) || !validRegistryName.MatchString(target) {
+		return "", errors.New("Registry module source contains invalid characters")
+	}
+
+	return fmt.Sprintf("%s/%s/%s/%s", host, namespace, moduleName, target), nil
 }
 
 // normalizeHost extracts the hostname from the URL and normalizes it by:

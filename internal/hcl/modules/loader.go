@@ -123,10 +123,19 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	manifestModule, err := m.cache.lookupModule(key, moduleCall)
 	if err == nil {
 		log.Debugf("Module %s already loaded", key)
-		return manifestModule, err
-	}
 
-	log.Debugf("Module %s needs loaded: %s", key, err.Error())
+		// Test if we can actually load the module. If not, then we should try re-loading it.
+		// This can happen if the directory the module was downloaded to has been deleted and moved
+		// so the existing manifest.json is out-of-date.
+		_, diags := tfconfig.LoadModule(path.Join(m.Path, manifestModule.Dir))
+		if diags.HasErrors() {
+			log.Debugf("Module %s cannot be loaded, re-loading: %s", key, diags.Err())
+		} else {
+			return manifestModule, err
+		}
+	} else {
+		log.Debugf("Module %s needs loaded: %s", key, err.Error())
+	}
 
 	manifestModule = &ManifestModule{
 		Key:    key,
@@ -162,10 +171,15 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	manifestModule.Dir = path.Clean(moduleDownloadDir)
 
 	registryLoader := NewRegistryLoader(m.packageFetcher, dest)
-	lookupResult, err := registryLoader.lookupModule(moduleAddr, moduleCall.Version)
-	if err != nil {
-		log.Debugf("Module %s not recognized as registry module, treating as remote module: %s", key, err.Error())
-	} else {
+
+	var lookupResult *RegistryLookupResult
+	var registryErr error
+	registrySource, registryErr := normalizeRegistrySource(moduleAddr)
+	if registryErr == nil {
+		lookupResult, registryErr = registryLoader.lookupModule(registrySource, moduleCall.Version)
+	}
+
+	if registryErr == nil {
 		log.Debugf("Downloading module %s from registry URL %s", key, lookupResult.DownloadURL)
 		err = registryLoader.downloadModule(lookupResult.DownloadURL)
 		if err != nil {
@@ -183,6 +197,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		return manifestModule, nil
 	}
 
+	log.Debugf("Module %s not recognized as registry module, treating as remote module: %s", key, registryErr.Error())
 	log.Debugf("Downloading module %s from remote %s", key, moduleCall.Source)
 	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
