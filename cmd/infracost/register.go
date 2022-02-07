@@ -21,8 +21,6 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 		Short: "Register for a free Infracost API key",
 		Long:  "Register for a free Infracost API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			var msg string
 			var isRegenerate bool
 
 			if ctx.Config.Credentials.APIKey != "" {
@@ -86,7 +84,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				return nil
 			}
 
-			fmt.Printf("\nThank you %s!\nYour API key is: %s\n", name, r.APIKey)
+			fmt.Printf("\nThank you %s! Your API key is: %s\n", name, r.APIKey)
 
 			if isRegenerate {
 				fmt.Println()
@@ -96,15 +94,13 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				}
 
 				if !confirm {
-					msg = fmt.Sprintf("%s\n%s %s %s",
+					fmt.Printf("%s\n%s %s %s",
 						"Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml.",
 						"You can now run",
 						ui.PrimaryString("infracost breakdown --path=..."),
-						"and point to your Terraform directory or JSON/plan file.",
+						"and point to your Terraform directory or JSON plan file.\n",
 					)
 
-					fmt.Println("")
-					ui.PrintSuccess(cmd.ErrOrStderr(), msg)
 					return nil
 				}
 			}
@@ -117,16 +113,18 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			msg = fmt.Sprintf("Your API key has been saved to %s\n\n", config.CredentialsFilePath())
+			fmt.Printf("This was saved to %s\n\n", config.CredentialsFilePath())
 			if ciInterest {
-				msg += fmt.Sprintf("You can now add cost estimates to your pull requests: %s", ui.LinkStringf("https://infracost.io/cicd"))
-			} else {
-				msg += fmt.Sprintf("You can now run %s and point to your Terraform directory or JSON/plan file.", ui.PrimaryString("infracost breakdown --path=..."))
+				fmt.Printf("You can now add cost estimates to your pull requests: %s\n", ui.LinkStringf("https://infracost.io/cicd"))
+				return nil
 			}
 
-			fmt.Println("")
-			ui.PrintSuccess(cmd.ErrOrStderr(), msg)
+			if isRegenerate {
+				fmt.Printf("You can now run %s and point to your Terraform directory or JSON plan file.\n", ui.PrimaryString("infracost breakdown --path=..."))
+				return nil
+			}
 
+			fmt.Printf("You can now run %s to see how to use the CLI\n", ui.PrimaryString("infracost breakdown --help"))
 			return nil
 		},
 	}
