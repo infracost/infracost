@@ -1,13 +1,13 @@
 package modules
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	getter "github.com/hashicorp/go-getter"
 	"github.com/otiai10/copy"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -32,7 +32,7 @@ func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
 
 		err := os.Mkdir(dest, os.ModePerm)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to create directory '%s'", dest)
+			return fmt.Errorf("Failed to create directory '%s': %w", dest, err)
 		}
 
 		// Skip dotfiles and create new symlinks
@@ -47,7 +47,7 @@ func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
 
 		err = copy.Copy(prevDest, dest, opt)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to copy module from '%s' to '%s'", prevDest, dest)
+			return fmt.Errorf("Failed to copy module from '%s' to '%s': %w", prevDest, dest, err)
 		}
 
 		return nil

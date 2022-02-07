@@ -1,9 +1,11 @@
 package modules
 
 import (
+	"errors"
+	"fmt"
+
 	goversion "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
-	"github.com/pkg/errors"
 )
 
 // Cache is a cache of modules that can be used to lookup modules to check if they've already been loaded.
@@ -54,12 +56,12 @@ func (c *Cache) lookupModule(key string, moduleCall *tfconfig.ModuleCall) (*Mani
 	if moduleCall.Version != "" && manifestModule.Version != "" {
 		constraints, err := goversion.NewConstraint(moduleCall.Version)
 		if err != nil {
-			return nil, errors.Wrap(err, "invalid version constraint")
+			return nil, fmt.Errorf("invalid version constraint: %w", err)
 		}
 
 		version, err := goversion.NewVersion(manifestModule.Version)
 		if err != nil {
-			return nil, errors.Wrap(err, "invalid version")
+			return nil, fmt.Errorf("invalid version: %w", err)
 		}
 
 		if !constraints.Check(version) {

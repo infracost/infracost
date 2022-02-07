@@ -2,6 +2,7 @@ package modules
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,7 +11,6 @@ import (
 	"strings"
 
 	goversion "github.com/hashicorp/go-version"
-	"github.com/pkg/errors"
 )
 
 var defaultRegistryHost = "registry.terraform.io"
@@ -82,7 +82,7 @@ func (r *RegistryLoader) fetchModuleVersions(moduleURL string) ([]string, error)
 	httpClient := &http.Client{}
 	resp, err := httpClient.Get(moduleURL + "/versions")
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to fetch registry module versions")
+		return nil, fmt.Errorf("Failed to fetch registry module versions: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -100,12 +100,12 @@ func (r *RegistryLoader) fetchModuleVersions(moduleURL string) ([]string, error)
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to read module versions response")
+		return nil, fmt.Errorf("Failed to read module versions response: %w", err)
 	}
 
 	err = json.Unmarshal(respBody, &versionsResp)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to unmarshal module versions response")
+		return nil, fmt.Errorf("Failed to unmarshal module versions response: %w", err)
 	}
 
 	if len(versionsResp.Modules) == 0 {
@@ -127,7 +127,7 @@ func (r *RegistryLoader) downloadModule(downloadURL string) error {
 	httpClient := &http.Client{}
 	resp, err := httpClient.Get(downloadURL)
 	if err != nil {
-		return errors.Wrap(err, "Failed to download registry module")
+		return fmt.Errorf("Failed to download registry module: %w", err)
 	}
 	defer resp.Body.Close()
 

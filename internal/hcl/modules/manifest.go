@@ -2,11 +2,10 @@ package modules
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 )
 
 // Manifest is a struct that represents the JSON found in the manifest.json file in the .infracost dir
@@ -30,12 +29,12 @@ func readManifest(path string) (*Manifest, error) {
 
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return &manifest, errors.Wrap(err, "Failed to read module manifest")
+		return &manifest, fmt.Errorf("Failed to read module manifest: %w", err)
 	}
 
 	err = json.Unmarshal(data, &manifest)
 	if err != nil {
-		return &manifest, errors.Wrap(err, "Failed to unmarshal module manifest")
+		return &manifest, fmt.Errorf("Failed to unmarshal module manifest: %w", err)
 	}
 
 	return &manifest, err
@@ -45,17 +44,17 @@ func readManifest(path string) (*Manifest, error) {
 func writeManifest(manifest *Manifest, path string) error {
 	b, err := json.Marshal(manifest)
 	if err != nil {
-		return errors.Wrap(err, "Failed to marshal manifest")
+		return fmt.Errorf("Failed to marshal manifest: %w", err)
 	}
 
 	err = os.MkdirAll(filepath.Dir(path), os.ModePerm)
 	if err != nil {
-		return errors.Wrap(err, "Failed to create directories for manifest")
+		return fmt.Errorf("Failed to create directories for manifest: %w", err)
 	}
 
 	err = ioutil.WriteFile(path, b, 0644) // nolint:gosec
 	if err != nil {
-		return errors.Wrap(err, "Failed to write manifest")
+		return fmt.Errorf("Failed to write manifest: %w", err)
 	}
 
 	return nil

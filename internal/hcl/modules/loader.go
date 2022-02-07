@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -9,7 +10,6 @@ import (
 
 	getter "github.com/hashicorp/go-getter"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
