@@ -132,11 +132,11 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		// This can happen if the directory the module was downloaded to has been deleted and moved
 		// so the existing manifest.json is out-of-date.
 		_, diags := tfconfig.LoadModule(path.Join(m.Path, manifestModule.Dir))
-		if diags.HasErrors() {
-			log.Debugf("Module %s cannot be loaded, re-loading: %s", key, diags.Err())
-		} else {
-			return manifestModule, err
+		if !diags.HasErrors() {
+		        return manifestModule, err
 		}
+		
+		log.Debugf("Module %s cannot be loaded, re-loading: %s", key, diags.Err())
 	} else {
 		log.Debugf("Module %s needs loading: %s", key, err.Error())
 	}
