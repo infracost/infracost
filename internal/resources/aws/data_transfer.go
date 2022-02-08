@@ -264,14 +264,14 @@ func (r *DataTransfer) buildProductFilter(transferType string, toRegion *string,
 	if regionCode, ok := RegionCodeMapping[r.Region]; ok {
 		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
 			Key:        "usagetype",
-			ValueRegex: strPtr(fmt.Sprintf("/^%s-/i", regionCode)),
+			ValueRegex: regexPtr(fmt.Sprintf("^%s-", regionCode)),
 		})
 	}
 
 	if usageTypeSuffix != "" {
 		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
 			Key:        "usagetype",
-			ValueRegex: strPtr(fmt.Sprintf("/%s$/i", usageTypeSuffix)),
+			ValueRegex: regexPtr(fmt.Sprintf("%s$", usageTypeSuffix)),
 		})
 	}
 
