@@ -43,8 +43,10 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 
 					if ciInterest {
 						fmt.Println("Add cost estimates to your pull requests: " + ui.LinkString("https://infracost.io/cicd"))
+						return nil
 					}
 
+					fmt.Printf("You can now run %s and point to your Terraform directory or JSON plan file.\n", ui.PrimaryString("infracost breakdown --path=..."))
 					return nil
 				}
 
