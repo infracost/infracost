@@ -30,12 +30,8 @@ jobs:
           RELEASE_NAME_PREFIX: "Release "
         with:
           args: |
-            ./build/infracost-linux-amd64.tar.gz
-            ./build/infracost-linux-arm64.tar.gz
-            ./build/infracost-windows-amd64.tar.gz
-            ./build/infracost-windows-arm64.tar.gz
-            ./build/infracost-darwin-amd64.tar.gz
-            ./build/infracost-darwin-arm64.tar.gz
+            ./build/*.tar.gz
+            ./build/*.sha256
             ./docs/generated/docs.tar.gz
 
       - name: Set up Docker Buildx
