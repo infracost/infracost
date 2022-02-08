@@ -268,9 +268,13 @@ var FreeResources = []string{
 	"aws_kms_grant",
 
 	// AWS Lambda
-	"aws_lambda_permission",
-	"aws_lambda_function_event_invoke_config",
 	"aws_lambda_alias",
+	"aws_lambda_code_signing_config",
+	"aws_lambda_event_source_mapping",
+	"aws_lambda_function_event_invoke_config",
+	"aws_lambda_layer_version",
+	"aws_lambda_layer_version_permission",
+	"aws_lambda_permission",
 
 	// AWS Neptune
 	"aws_neptune_cluster_parameter_group",
