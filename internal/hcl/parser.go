@@ -15,6 +15,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/hcl/modules"
 )
 
 type Option func(p *Parser)
@@ -55,6 +56,7 @@ type Parser struct {
 	tfvarsPaths    []string
 	stopOnHCLError bool
 	workspaceName  string
+	moduleLoader   *modules.ModuleLoader
 }
 
 // New creates a new Parser with the provided options, it inits the workspace as under the default name
@@ -63,6 +65,7 @@ func New(initialPath string, options ...Option) *Parser {
 	p := &Parser{
 		initialPath:   initialPath,
 		workspaceName: "default",
+		moduleLoader:  modules.NewModuleLoader(initialPath),
 	}
 
 	for _, option := range options {
@@ -74,7 +77,7 @@ func New(initialPath string, options ...Option) *Parser {
 
 // ParseDirectory parses all the terraform files in the initalPath into Blocks and then passes them to an Evaluator
 // to fill these Blocks with additional Context information. Parser does not parse any blocks outside the root Module.
-// It instead leaves Evaluator to fetch these Modules on demand. See Evaluator.loadModules for more information.
+// It instead leaves ModuleLoader to fetch these Modules on demand. See ModuleLoader.Load for more information.
 //
 // ParseDirectory returns a list of Module that represent the Terraform Config tree.
 func (parser *Parser) ParseDirectory() ([]*Module, error) {
@@ -103,12 +106,11 @@ func (parser *Parser) ParseDirectory() ([]*Module, error) {
 		return nil, err
 	}
 
-	// load the module metadata. This is required to understand remote module referenced in code
-	// relate to the local file system.
-	modulesMetadata, err := loadModuleMetadata(parser.initialPath)
+	// load the modules. This downloads any remote modules to the local file system
+	modulesManifest, err := parser.moduleLoader.Load()
 	if err != nil {
 		if !config.IsTest() {
-			log.Warnf("Error loading module metadata this is required for Infracost to get accurate results, %s", err)
+			log.Warnf("Error loading modules. This is required for Infracost to get accurate results: %s", err)
 		}
 	}
 
@@ -125,7 +127,7 @@ func (parser *Parser) ParseDirectory() ([]*Module, error) {
 		workingDir,
 		blocks,
 		inputVars,
-		modulesMetadata,
+		modulesManifest,
 		nil,
 		parser.workspaceName,
 	)

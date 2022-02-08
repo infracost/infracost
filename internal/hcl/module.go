@@ -1,10 +1,7 @@
 package hcl
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/hashicorp/hcl/v2"
 	log "github.com/sirupsen/logrus"
@@ -56,36 +53,4 @@ func (b *Block) getModuleBlocks(modulePath string) (Blocks, error) {
 	}
 
 	return blocks, err
-}
-
-// ModulesMetadata is a struct that represents the JSON found in the modules.json file int the .terraform dir.
-type ModulesMetadata struct {
-	Modules []ModuleMetadata `json:"Modules"`
-}
-
-type ModuleMetadata struct {
-	Key     string `json:"Key"`
-	Source  string `json:"Source"`
-	Version string `json:"Version"`
-	Dir     string `json:"Dir"`
-}
-
-func loadModuleMetadata(fullPath string) (*ModulesMetadata, error) {
-	metadataPath := filepath.Join(fullPath, ".terraform/modules/modules.json")
-	if _, err := os.Stat(metadataPath); err != nil {
-		return nil, fmt.Errorf("metadata file does not exist %w", err)
-	}
-
-	f, err := os.Open(metadataPath)
-	if err != nil {
-		return nil, fmt.Errorf("could not read metadata file %w", err)
-	}
-	defer func() { _ = f.Close() }()
-
-	var metadata ModulesMetadata
-	if err := json.NewDecoder(f).Decode(&metadata); err != nil {
-		return nil, fmt.Errorf("could not decode metadata file %w", err)
-	}
-
-	return &metadata, nil
 }
