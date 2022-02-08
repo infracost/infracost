@@ -198,6 +198,11 @@ var FreeResources = []string{
 	// AWS Elastic Container Service
 	"aws_ecs_capacity_provider",
 
+	// AWS Elastic File System
+	"aws_efs_access_point",
+	"aws_efs_file_system_policy",
+	"aws_efs_mount_target",
+
 	// AWS Elastic Load Balancing
 	"aws_alb_listener",
 	"aws_alb_listener_certificate",
@@ -263,9 +268,13 @@ var FreeResources = []string{
 	"aws_kms_grant",
 
 	// AWS Lambda
-	"aws_lambda_permission",
-	"aws_lambda_function_event_invoke_config",
 	"aws_lambda_alias",
+	"aws_lambda_code_signing_config",
+	"aws_lambda_event_source_mapping",
+	"aws_lambda_function_event_invoke_config",
+	"aws_lambda_layer_version",
+	"aws_lambda_layer_version_permission",
+	"aws_lambda_permission",
 
 	// AWS Neptune
 	"aws_neptune_cluster_parameter_group",
