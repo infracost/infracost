@@ -110,7 +110,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 						"Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml.",
 						"You can now run",
 						ui.PrimaryString("infracost breakdown --path=..."),
-						"and point to your Terraform directory or JSON plan file.\n",
+						"and point to your Terraform directory or plan JSON file.\n",
 					)
 
 					return nil
@@ -127,7 +127,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 
 			fmt.Printf("This was saved to %s\n\n", config.CredentialsFilePath())
 			if ciInterest {
-				fmt.Printf("You can now add cost estimates to your pull requests: %s\n", ui.LinkStringf("https://infracost.io/cicd"))
+				fmt.Printf("You can now add cost estimates to your pull requests: %s\n", ui.LinkString("https://infracost.io/cicd"))
 				return nil
 			}
 
