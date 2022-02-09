@@ -10,8 +10,8 @@ import (
 func commentCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "comment",
-		Short: "Post an Infracost comment to GitHub, GitLab or Azure Repos",
-		Long:  "Post an Infracost comment to GitHub, GitLab or Azure Repos",
+		Short: "Post an Infracost comment to GitHub, GitLab, Azure Repos or Bitbucket",
+		Long:  "Post an Infracost comment to GitHub, GitLab, Azure Repos or Bitbucket",
 		Example: `  Update the Infracost comment on a GitHub pull request:
 
       infracost comment github --repo my-org/my-repo --pull-request 3 --path infracost.json --behavior update --github-token $GITHUB_TOKEN
@@ -32,6 +32,7 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.AddCommand(commentGitHubCmd(ctx))
 	cmd.AddCommand(commentGitLabCmd(ctx))
 	cmd.AddCommand(commentAzureReposCmd(ctx))
+	cmd.AddCommand(commentBitbucketCmd(ctx))
 
 	return cmd
 }
@@ -60,7 +61,6 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	opts := output.Options{
 		DashboardEnabled: ctx.Config.EnableDashboard,
 		NoColor:          ctx.Config.NoColor,
-		IncludeHTML:      true,
 		ShowSkipped:      true,
 	}
 

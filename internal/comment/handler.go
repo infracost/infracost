@@ -50,6 +50,9 @@ type PlatformHandler interface {
 	// This functionality is not supported by all platforms, in which case this
 	// will throw a NotImplemented error.
 	CallHideComment(ctx context.Context, comment Comment) error
+
+	// AddMarkdownTag adds a tag to the given string.
+	AddMarkdownTag(s string, tag string) string
 }
 
 // CommentHandler contains the logic for finding, creating, updating and deleting comments
@@ -129,7 +132,7 @@ func (h *CommentHandler) LatestMatchingComment(ctx context.Context) (Comment, er
 
 // UpdateComment updates the comment with the given body.
 func (h *CommentHandler) UpdateComment(ctx context.Context, body string) error {
-	bodyWithTag := addMarkdownTag(body, h.Tag)
+	bodyWithTag := h.PlatformHandler.AddMarkdownTag(body, h.Tag)
 
 	latestMatchingComment, err := h.LatestMatchingComment(ctx)
 	if err != nil {
@@ -164,7 +167,7 @@ func (h *CommentHandler) UpdateComment(ctx context.Context, body string) error {
 
 // NewComment creates a new comment with the given body.
 func (h *CommentHandler) NewComment(ctx context.Context, body string) error {
-	bodyWithTag := addMarkdownTag(body, h.Tag)
+	bodyWithTag := h.PlatformHandler.AddMarkdownTag(body, h.Tag)
 
 	log.Info("Creating new comment")
 

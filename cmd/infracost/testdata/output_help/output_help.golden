@@ -28,10 +28,14 @@ EXAMPLES
 
       infracost output --format azure-repos-comment --path "out*.json" # glob needs quotes
 
+  Create markdown report to post in a Bitbucket comment:
+
+      infracost output --format bitbucket-comment --path "out*.json" # glob needs quotes
+
 FLAGS
       --fields strings     Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.
                            Supported by table and html output formats (default [monthlyQuantity,unit,monthlyCost])
-      --format string      Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, slack-message (default "table")
+      --format string      Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, bitbucket-comment, slack-message (default "table")
   -h, --help               help for output
   -o, --out-file string    Save output to a file, helpful with format flag
   -p, --path stringArray   Path to Infracost JSON files, glob patterns need quotes

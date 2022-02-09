@@ -19,7 +19,7 @@ EXAMPLES
 
 AVAILABLE COMMANDS
   breakdown   Show full breakdown of costs
-  comment     Post an Infracost comment to GitHub, GitLab or Azure Repos
+  comment     Post an Infracost comment to GitHub, GitLab, Azure Repos or Bitbucket
   completion  Generate shell completion script
   configure   Display or change global configuration
   diff        Show diff of monthly costs between current and planned state

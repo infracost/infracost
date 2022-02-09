@@ -160,7 +160,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
   
   <p class="project-name">Project: infracost/infracost/cmd/infracost/testdata</p>
   <table class="breakdown">
-    <thead>      
+    <thead>
       
   <th class="name">Name</th>
   
@@ -620,7 +620,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
   </table>
 
     
-    
+
     <table class="overall-total">
       <tbody>
         <tr class="total">

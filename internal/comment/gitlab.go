@@ -292,6 +292,11 @@ func (h *gitlabPRHandler) CallHideComment(ctx context.Context, comment Comment) 
 	return errors.New("Not implemented")
 }
 
+// AddMarkdownTag prepends a tag as a markdown comment to the given string.
+func (h *gitlabPRHandler) AddMarkdownTag(s string, tag string) string {
+	return addMarkdownTag(s, tag)
+}
+
 // gitlabCommitHandler is a PlatformHandler for GitLab commits. It
 // implements the PlatformHandler interface and contains the functions
 // for finding, creating, updating, deleting comments on GitLab commits.
@@ -534,4 +539,9 @@ func (h *gitlabCommitHandler) CallDeleteComment(ctx context.Context, comment Com
 // CallHideComment calls the GitLab API to minimize the commit comment.
 func (h *gitlabCommitHandler) CallHideComment(ctx context.Context, comment Comment) error {
 	return errors.New("Not implemented")
+}
+
+// AddMarkdownTag prepends a tag as a markdown comment to the given string.
+func (h *gitlabCommitHandler) AddMarkdownTag(s string, tag string) string {
+	return addMarkdownTag(s, tag)
 }
