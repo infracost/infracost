@@ -104,13 +104,13 @@ type Options struct {
 	NoColor          bool
 	ShowSkipped      bool
 	Fields           []string
-	IncludeHTML      bool
 }
 
 type MarkdownOptions struct {
 	WillUpdate          bool
 	WillReplace         bool
 	IncludeFeedbackLink bool
+	BasicSyntax         bool
 }
 
 func outputBreakdown(resources []*schema.Resource) *Breakdown {

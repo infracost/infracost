@@ -89,7 +89,12 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		},
 		"truncateMiddle": truncateMiddle,
 	})
-	tmpl, err = tmpl.Parse(CommentMarkdownTemplate)
+
+	t := CommentMarkdownWithHTMLTemplate
+	if markdownOpts.BasicSyntax {
+		t = CommentMarkdownTemplate
+	}
+	tmpl, err = tmpl.Parse(t)
 	if err != nil {
 		return []byte{}, err
 	}

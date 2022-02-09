@@ -227,7 +227,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
   {{$fields := .Options.Fields}}
   <p class="project-name">Project: {{.Project | projectLabel}}</p>
   <table class="breakdown">
-    <thead>      
+    <thead>
       {{template "tableHeaders" dict "Fields" $fields}}
     </thead>
     <tbody>
@@ -272,7 +272,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       {{$resources := .Breakdown.Resources}}
       {{template "projectBlock" dict "Project" . "Options" $options "Resources" $resources "Indent" 0}}
     {{end}}
-    
+
     <table class="overall-total">
       <tbody>
         <tr class="total">
@@ -288,7 +288,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
   </body>
 </html>`
 
-var CommentMarkdownTemplate = `
+var CommentMarkdownWithHTMLTemplate = `
 {{- define "summaryRow"}}
     <tr>
       <td>{{ truncateMiddle .Name 64 "..." }}</td>
@@ -298,26 +298,24 @@ var CommentMarkdownTemplate = `
     </tr>
 {{- end}}
 💰 Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }}**
-
-{{- if .Options.IncludeHTML }}
 <table>
   <thead>
     <td>Project</td>
     <td>Previous</td>
     <td>New</td>
     <td>Diff</td>
-  </thead> 
+  </thead>
 {{- if gt (len .Root.Projects) 1  }}
   <tbody>
   {{- range .Root.Projects }}
-  	{{- if hasDiff . }}
-    	{{- template "summaryRow" dict "Name" .Name "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
-	{{- end }}
+    {{- if hasDiff . }}
+      {{- template "summaryRow" dict "Name" .Name "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+    {{- end }}
   {{- end }}
   {{- template "summaryRow" dict "Name" "All projects" "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
   </tbody>
 </table>
-    
+
   {{- if eq .SkippedProjectCount 1 }}
 
 1 project has no cost estimate changes.
@@ -336,20 +334,11 @@ var CommentMarkdownTemplate = `
 
 <details>
 <summary><strong>Infracost output</strong></summary>
-{{- else }}
-Previous monthly cost: {{ formatCost .Root.PastTotalMonthlyCost }}
-New monthly cost: {{ formatCost .Root.TotalMonthlyCost }}
-
-**Infracost output:**
-{{- end }}
 
 ` + "```" /* can't escape backticks */ + `
 {{ .DiffOutput }}
 ` + "```" /* can't escape backticks */ + `
-
-{{- if .Options.IncludeHTML }}
 </details>
-{{- end}}
 {{- if .MarkdownOptions.WillUpdate }}
 
 This comment will be updated when the cost estimate changes.
@@ -364,4 +353,57 @@ This comment will be replaced when the cost estimate changes
   Is this comment useful? <a href="https://www.infracost.io/feedback/submit/?value=yes" rel="noopener noreferrer" target="_blank">Yes</a>, <a href="https://www.infracost.io/feedback/submit/?value=no" rel="noopener noreferrer" target="_blank">No</a>
 </sub>
 {{- end}}
+`
+
+var CommentMarkdownTemplate = `
+{{- define "summaryRow"}}
+| {{ truncateMiddle .Name 64 "..." }} | {{ formatCost .PastCost }} | {{ formatCost .Cost }} | {{ formatCostChange .PastCost .Cost }} |
+{{- end }}
+{{- define "totalRow"}}
+| **{{ truncateMiddle .Name 64 "..." }}** | **{{ formatCost .PastCost }}** | **{{ formatCost .Cost }}** | **{{ formatCostChange .PastCost .Cost }}** |
+{{- end }}
+## 💰 Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }}**
+
+| **Project** | **Previous** | **New** | **Diff** |
+| ----------- | -----------: | ------: | -------- |
+
+{{- if gt (len .Root.Projects) 1  }}
+  {{- range .Root.Projects }}
+    {{- if hasDiff . }}
+      {{- template "summaryRow" dict "Name" .Name "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+    {{- end }}
+  {{- end }}
+  {{- template "totalRow" dict "Name" "All projects" "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
+
+  {{- if eq .SkippedProjectCount 1 }}
+
+1 project has no cost estimate changes.
+  {{- else if gt .SkippedProjectCount 0 }}
+
+{{ .SkippedProjectCount }} projects have no cost estimate changes.
+  {{- end }}
+{{- else }}
+  {{- range .Root.Projects }}
+    {{- template "summaryRow" dict "Name" .Name "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+  {{- end }}
+{{- end }}
+
+**Infracost output:**
+
+` + "```" /* can't escape backticks */ + `
+{{ .DiffOutput }}
+` + "```" /* can't escape backticks */ + `
+
+{{- if .MarkdownOptions.WillUpdate }}
+
+This comment will be updated when the cost estimate changes.
+{{- end }}
+{{- if .MarkdownOptions.WillReplace }}
+
+This comment will be replaced when the cost estimate changes
+{{- end }}
+{{- if .MarkdownOptions.IncludeFeedbackLink }}
+
+Is this comment useful? [Yes](https://www.infracost.io/feedback/submit/?value=yes), [No](https://www.infracost.io/feedback/submit/?value=no)
+{{- end }}
 `

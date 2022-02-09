@@ -1,4 +1,4 @@
-Post an Infracost comment to GitHub, GitLab or Azure Repos
+Post an Infracost comment to GitHub, GitLab, Azure Repos or Bitbucket
 
 USAGE
   infracost comment [flags]
@@ -19,6 +19,7 @@ EXAMPLES
 
 AVAILABLE COMMANDS
   azure-repos Post an Infracost comment to Azure Repos
+  bitbucket   Post an Infracost comment to Bitbucket
   github      Post an Infracost comment to GitHub
   gitlab      Post an Infracost comment to GitLab
 
