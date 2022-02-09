@@ -19,8 +19,9 @@ func GetAzureRMEventHubsNamespaceRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var events, unknown *decimal.Decimal
+	var includedRetention decimal.Decimal
 	sku := "Basic"
-	meterName := "Throughput Unit"
+	meterName := ""
 	region := lookupRegion(d, []string{})
 
 	if d.Get("sku").Type != gjson.Null {
@@ -36,8 +37,15 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 
 	if d.Get("dedicated_cluster_id").Type != gjson.Null && len(d.Get("dedicated_cluster_id").String()) > 0 {
 		sku = "Dedicated"
-		meterName = "Capacity Unit"
+		meterName = "Dedicated Capacity Unit"
+		includedRetention = capacity.Mul(decimal.NewFromInt(10000))
 	}
+
+	if strings.ToLower(sku) == "premium" {
+		meterName = "Processing Unit"
+		includedRetention = capacity.Mul(decimal.NewFromInt(1000))
+	}
+
 	costComponents := make([]*schema.CostComponent, 0)
 
 	if u != nil && u.Get("monthly_ingress_events").Type != gjson.Null {
@@ -45,10 +53,12 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 
 	if strings.ToLower(sku) == "basic" {
+		meterName = "Basic Throughput Unit"
 		costComponents = append(costComponents, eventHubsIngressCostComponent(region, sku, events))
 	}
 
 	if strings.ToLower(sku) == "standard" {
+		meterName = "Standard Throughput Unit"
 		costComponents = append(costComponents, eventHubsIngressCostComponent(region, sku, events))
 		if u != nil && u.Get("capture_enabled").Type != gjson.Null && strings.ToLower(u.Get("capture_enabled").String()) == "true" {
 			costComponents = append(costComponents, eventHubsCaptureCostComponent(region, sku, capacity))
@@ -56,11 +66,11 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	}
 
 	costComponents = append(costComponents, eventHubsThroughPutCostComponent(region, sku, meterName, capacity))
-	if strings.ToLower(sku) == "dedicated" {
+	if strings.ToLower(sku) == "dedicated" || strings.ToLower(sku) == "premium" {
 		if u != nil && u.Get("retention_storage_gb").Type != gjson.Null {
 			retention := decimalPtr(decimal.NewFromInt(u.Get("retention_storage_gb").Int()))
 			// Subtract the 10 TB per capacity unit that's included in the dedicated namespace tier
-			extendedRetention := retention.Sub(capacity.Mul(decimal.NewFromInt(10000)))
+			extendedRetention := retention.Sub(includedRetention)
 			if extendedRetention.GreaterThan(decimal.NewFromInt(0)) {
 				costComponents = append(costComponents, eventHubsExtensionRetentionCostComponent(region, sku, &extendedRetention))
 			}
@@ -99,10 +109,11 @@ func eventHubsIngressCostComponent(region, sku string, quantity *decimal.Decimal
 }
 
 func eventHubsThroughPutCostComponent(region, sku, meterName string, capacity decimal.Decimal) *schema.CostComponent {
-	meterName = fmt.Sprintf("%s %s", sku, meterName)
+	unitName := strings.TrimPrefix(strings.ToLower(meterName), strings.ToLower(sku+" ")) + "s"
+
 	return &schema.CostComponent{
-		Name:           "Throughput",
-		Unit:           "units",
+		Name:           fmt.Sprintf("Capacity (%s)", sku),
+		Unit:           unitName,
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(capacity),
 		ProductFilter: &schema.ProductFilter{
@@ -152,7 +163,7 @@ func eventHubsExtensionRetentionCostComponent(region, sku string, retention *dec
 			Region:     strPtr(region),
 			Service:    strPtr("Event Hubs"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", Value: strPtr("Dedicated")},
+				{Key: "skuName", Value: strPtr(sku)},
 				{Key: "meterName", Value: strPtr("Extended Retention")},
 			},
 		},
