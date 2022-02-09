@@ -109,14 +109,11 @@ func eventHubsIngressCostComponent(region, sku string, quantity *decimal.Decimal
 }
 
 func eventHubsThroughPutCostComponent(region, sku, meterName string, capacity decimal.Decimal) *schema.CostComponent {
-	unitName := meterName
-	if !strings.HasPrefix(meterName, sku) {
-		unitName = sku + " " + meterName
-	}
+	unitName := strings.TrimPrefix(strings.ToLower(meterName), strings.ToLower(sku+" ")) + "s"
 
 	return &schema.CostComponent{
-		Name:           "Capacity",
-		Unit:           strings.ToLower(unitName) + "s",
+		Name:           fmt.Sprintf("Capacity (%s)", sku),
+		Unit:           unitName,
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(capacity),
 		ProductFilter: &schema.ProductFilter{
