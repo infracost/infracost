@@ -17,8 +17,9 @@ FLAGS
                                         update (default)  Update latest comment
                                         new               Create a new comment
                                         delete-and-new    Delete previous matching comments and create a new comment (default "update")
+      --bitbucket-server-url string   Bitbucket Server URL (default "https://bitbucket.org")
       --bitbucket-token string        Bitbucket access token. Use 'username:app-password' for Bitbucket Cloud and HTTP access token for Bitbucket Server
-      --commit string                 Commit SHA to post comment on, mutually exclusive with pull-request
+      --commit string                 Commit SHA to post comment on, mutually exclusive with pull-request. Not available when bitbucket-server-url is set
       --dry-run                       Generate comment without actually posting to Bitbucket
   -h, --help                          help for bitbucket
   -p, --path stringArray              Path to Infracost JSON files, glob patterns need quotes

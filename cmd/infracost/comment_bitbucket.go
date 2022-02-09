@@ -116,9 +116,10 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 	_ = cmd.RegisterFlagCompletionFunc("behavior", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return validCommentBitbucketBehaviors, cobra.ShellCompDirectiveDefault
 	})
+	cmd.Flags().String("bitbucket-server-url", "https://bitbucket.org", "Bitbucket Server URL")
 	cmd.Flags().String("bitbucket-token", "", "Bitbucket access token. Use 'username:app-password' for Bitbucket Cloud and HTTP access token for Bitbucket Server")
 	_ = cmd.MarkFlagRequired("bitbucket-token")
-	cmd.Flags().String("commit", "", "Commit SHA to post comment on, mutually exclusive with pull-request")
+	cmd.Flags().String("commit", "", "Commit SHA to post comment on, mutually exclusive with pull-request. Not available when bitbucket-server-url is set")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
