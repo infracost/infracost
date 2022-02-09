@@ -1,35 +1,43 @@
 
- Name                                                   Monthly Qty  Unit                  Monthly Cost 
-                                                                                                        
- azurerm_eventhub_namespace.basic                                                                       
- ├─ Ingress event (Basic)                                        10  1M events                    $0.28 
- └─ Throughput                                                    1  units                       $10.95 
-                                                                                                        
- azurerm_eventhub_namespace.basicWithoutUsage                                                           
- ├─ Ingress event (Basic)                          Monthly cost depends on usage: $0.028 per 1M events  
- └─ Throughput                                                    1  units                       $10.95 
-                                                                                                        
- azurerm_eventhub_namespace.dedicated                                                                   
- ├─ Throughput                                                    2  units                    $9,999.54 
- └─ Extended retention                                          100  GB                          $10.00 
-                                                                                                        
- azurerm_eventhub_namespace.dedicatedWithoutUsage                                                       
- ├─ Throughput                                                    1  units                    $4,999.77 
- └─ Extended retention                             Monthly cost depends on usage: $0.10 per GB          
-                                                                                                        
- azurerm_eventhub_namespace.standard                                                                    
- ├─ Ingress event (Standard)                                    100  1M events                    $2.80 
- ├─ Capture                                                      20  units                    $1,460.00 
- └─ Throughput                                                   20  units                      $438.00 
-                                                                                                        
- azurerm_eventhub_namespace.standardWithoutUsage                                                        
- ├─ Ingress event (Standard)                       Monthly cost depends on usage: $0.028 per 1M events  
- └─ Throughput                                                    1  units                       $21.90 
-                                                                                                        
- OVERALL TOTAL                                                                               $16,954.19 
+ Name                                                   Monthly Qty  Unit                           Monthly Cost 
+                                                                                                                 
+ azurerm_eventhub_namespace.basic                                                                                
+ ├─ Ingress event (Basic)                                        10  1M events                             $0.28 
+ └─ Capacity                                                      1  basic throughput units               $10.95 
+                                                                                                                 
+ azurerm_eventhub_namespace.basicWithoutUsage                                                                    
+ ├─ Ingress event (Basic)                          Monthly cost depends on usage: $0.028 per 1M events           
+ └─ Capacity                                                      1  basic throughput units               $10.95 
+                                                                                                                 
+ azurerm_eventhub_namespace.dedicated                                                                            
+ ├─ Capacity                                                      2  dedicated capacity units          $9,999.54 
+ └─ Extended retention                                          100  GB                                   $10.00 
+                                                                                                                 
+ azurerm_eventhub_namespace.dedicatedWithoutUsage                                                                
+ ├─ Capacity                                                      1  dedicated capacity units          $4,999.77 
+ └─ Extended retention                             Monthly cost depends on usage: $0.10 per GB                   
+                                                                                                                 
+ azurerm_eventhub_namespace.premium                                                                              
+ ├─ Capacity                                                      8  premium processing units          $5,997.68 
+ └─ Extended retention                                       12,100  GB                                $1,210.00 
+                                                                                                                 
+ azurerm_eventhub_namespace.premiumWithoutUsage                                                                  
+ ├─ Capacity                                                      1  premium processing units            $749.71 
+ └─ Extended retention                             Monthly cost depends on usage: $0.10 per GB                   
+                                                                                                                 
+ azurerm_eventhub_namespace.standard                                                                             
+ ├─ Ingress event (Standard)                                    100  1M events                             $2.80 
+ ├─ Capture                                                      20  units                             $1,460.00 
+ └─ Capacity                                                     20  standard throughput units           $438.00 
+                                                                                                                 
+ azurerm_eventhub_namespace.standardWithoutUsage                                                                 
+ ├─ Ingress event (Standard)                       Monthly cost depends on usage: $0.028 per 1M events           
+ └─ Capacity                                                      1  standard throughput units            $21.90 
+                                                                                                                 
+ OVERALL TOTAL                                                                                        $24,911.58 
 ──────────────────────────────────
-7 cloud resources were detected:
-∙ 6 were estimated, 6 include usage-based costs, see https://infracost.io/usage-file
+9 cloud resources were detected:
+∙ 8 were estimated, 8 include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
 

@@ -38,6 +38,23 @@ resource "azurerm_eventhub_namespace" "standardWithoutUsage" {
   sku                 = "Standard"
 }
 
+resource "azurerm_eventhub_namespace" "premium" {
+  name                = "acceptanceTestEventHubNamespace"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "Premium"
+  zone_redundant      = true
+  capacity            = 8
+}
+
+resource "azurerm_eventhub_namespace" "premiumWithoutUsage" {
+  name                = "acceptanceTestEventHubNamespace"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "Premium"
+  zone_redundant      = true
+}
+
 resource "azurerm_eventhub_namespace" "dedicated" {
   name                 = "acceptanceTestEventHubNamespace"
   location             = azurerm_resource_group.example.location

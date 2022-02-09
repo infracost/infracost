@@ -7,6 +7,9 @@ resource_usage:
     monthly_ingress_events: 100000000 # Monthly number of ingress events.
     capture_enabled: true
 
+  azurerm_eventhub_namespace.premium:
+    retention_storage_gb: 20100 # Total data stored for retention in GB.
+
   azurerm_eventhub_namespace.dedicated:
     retention_storage_gb: 20100 # Total data stored for retention in GB.
     throughput_or_capacity_units: 2 # Number of Throughput Units (for Basic and Standard) and Capacity units (for Dedicated) namespaces.
