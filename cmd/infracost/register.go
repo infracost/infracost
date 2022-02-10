@@ -27,7 +27,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 			if ctx.Config.Credentials.APIKey != "" {
 
 				isRegenerate = true
-				fmt.Printf("You already have an Infracost API key saved in %s\n", config.CredentialsFilePath())
+				fmt.Printf("You already have an Infracost API key saved in %s. We recommend using your same API key in all environments.\n", config.CredentialsFilePath())
 
 				status, err := promptGenerateNewKey()
 				if err != nil {
