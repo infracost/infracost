@@ -40,3 +40,23 @@ resource "aws_rds_cluster_instance" "cluster_instance_t3" {
   engine             = aws_rds_cluster.default.engine
   engine_version     = aws_rds_cluster.default.engine_version
 }
+
+resource "aws_rds_cluster_instance" "cluster_instance_performance_insights" {
+  identifier         = "aurora-cluster-demo"
+  cluster_identifier = aws_rds_cluster.default.id
+  instance_class     = "db.r4.8xlarge"
+  engine             = aws_rds_cluster.default.engine
+  engine_version     = aws_rds_cluster.default.engine_version
+  performance_insights_enabled = true
+  performance_insights_retention_period = 731
+}
+
+resource "aws_rds_cluster_instance" "cluster_instance_performance_insights_with_usage" {
+  identifier         = "aurora-cluster-demo"
+  cluster_identifier = aws_rds_cluster.default.id
+  instance_class     = "db.t3.large"
+  engine             = aws_rds_cluster.default.engine
+  engine_version     = aws_rds_cluster.default.engine_version
+  performance_insights_enabled = true
+  performance_insights_retention_period = 731
+}

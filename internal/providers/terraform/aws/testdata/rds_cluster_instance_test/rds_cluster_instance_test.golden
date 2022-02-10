@@ -1,28 +1,39 @@
 
- Name                                                    Monthly Qty  Unit                        Monthly Cost 
-                                                                                                               
- aws_rds_cluster.default                                                                                       
- ├─ Storage                                      Monthly cost depends on usage: $0.10 per GB                   
- ├─ I/O requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Backtrack                                    Monthly cost depends on usage: $0.012 per 1M change-records   
- └─ Snapshot export                              Monthly cost depends on usage: $0.01 per GB                   
-                                                                                                               
- aws_rds_cluster.default_t3                                                                                    
- ├─ Storage                                      Monthly cost depends on usage: $0.10 per GB                   
- ├─ I/O requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Backtrack                                    Monthly cost depends on usage: $0.012 per 1M change-records   
- └─ Snapshot export                              Monthly cost depends on usage: $0.01 per GB                   
-                                                                                                               
- aws_rds_cluster_instance.cluster_instance                                                                     
- └─ Database instance (on-demand, db.r4.large)                   730  hours                            $211.70 
-                                                                                                               
- aws_rds_cluster_instance.cluster_instance_t3                                                                  
- ├─ Database instance (on-demand, db.t3.medium)                  730  hours                             $59.86 
- └─ CPU credits                                                   48  vCPU-hours                         $4.32 
-                                                                                                               
- OVERALL TOTAL                                                                                         $275.88 
+ Name                                                                               Monthly Qty  Unit                        Monthly Cost 
+                                                                                                                                          
+ aws_rds_cluster.default                                                                                                                  
+ ├─ Storage                                                                 Monthly cost depends on usage: $0.10 per GB                   
+ ├─ I/O requests                                                            Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Backtrack                                                               Monthly cost depends on usage: $0.012 per 1M change-records   
+ └─ Snapshot export                                                         Monthly cost depends on usage: $0.01 per GB                   
+                                                                                                                                          
+ aws_rds_cluster.default_t3                                                                                                               
+ ├─ Storage                                                                 Monthly cost depends on usage: $0.10 per GB                   
+ ├─ I/O requests                                                            Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Backtrack                                                               Monthly cost depends on usage: $0.012 per 1M change-records   
+ └─ Snapshot export                                                         Monthly cost depends on usage: $0.01 per GB                   
+                                                                                                                                          
+ aws_rds_cluster_instance.cluster_instance                                                                                                
+ └─ Database instance (on-demand, db.r4.large)                                              730  hours                            $211.70 
+                                                                                                                                          
+ aws_rds_cluster_instance.cluster_instance_performance_insights                                                                           
+ ├─ Database instance (on-demand, db.r4.8xlarge)                                            730  hours                          $3,387.20 
+ ├─ Performance Insights Long Term Retention (db.r4.8xlarge)                                 32  vCPU-month                       $165.89 
+ └─ Performance Insights API                                                Monthly cost depends on usage: $0.01 per 1000 requests        
+                                                                                                                                          
+ aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage                                                                
+ ├─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+ ├─ CPU credits                                                                              60  vCPU-hours                         $5.40 
+ ├─ Performance Insights Long Term Retention (db.t3.large)                                    2  vCPU-month                         $5.90 
+ └─ Performance Insights API                                                             12.345  1000 requests                      $0.12 
+                                                                                                                                          
+ aws_rds_cluster_instance.cluster_instance_t3                                                                                             
+ ├─ Database instance (on-demand, db.t3.medium)                                             730  hours                             $59.86 
+ └─ CPU credits                                                                              48  vCPU-hours                         $4.32 
+                                                                                                                                          
+ OVERALL TOTAL                                                                                                                  $3,960.12 
 ──────────────────────────────────
-4 cloud resources were detected:
-∙ 4 were estimated, 4 include usage-based costs, see https://infracost.io/usage-file
+6 cloud resources were detected:
+∙ 6 were estimated, 6 include usage-based costs, see https://infracost.io/usage-file
 
 Add cost estimates to your pull requests: https://infracost.io/cicd

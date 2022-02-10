@@ -1,26 +1,29 @@
 package aws
 
 import (
+	"fmt"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-
-	"fmt"
-
 	"github.com/shopspring/decimal"
+	"strings"
 )
 
 type RDSClusterInstance struct {
-	Address             string
-	Region              string
-	InstanceClass       string
-	Engine              string
-	MonthlyCPUCreditHrs *int64 `infracost_usage:"monthly_cpu_credit_hrs"`
-	VCPUCount           *int64 `infracost_usage:"vcpu_count"`
+	Address                                      string
+	Region                                       string
+	InstanceClass                                string
+	Engine                                       string
+	PerformanceInsightsEnabled                   bool
+	PerformanceInsightsLongTermRetention         bool
+	MonthlyCPUCreditHrs                          *int64 `infracost_usage:"monthly_cpu_credit_hrs"`
+	VCPUCount                                    *int64 `infracost_usage:"vcpu_count"`
+	MonthlyAdditionalPerformanceInsightsRequests *int64 `infracost_usage:"monthly_additional_performance_insights_requests"`
 }
 
 var RDSClusterInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
 	{Key: "vcpu_count", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_additional_performance_insights_requests", ValueType: schema.Int64, DefaultValue: 0},
 }
 
 func (r *RDSClusterInstance) PopulateUsage(u *schema.UsageData) {
@@ -60,12 +63,26 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 
 		instanceVCPUCount := decimal.Zero
 		if r.VCPUCount != nil {
+			// VCPU count has been set explicitly
 			instanceVCPUCount = decimal.NewFromInt(*r.VCPUCount)
+		} else if count, ok := InstanceTypeToVCPU[strings.TrimPrefix(r.InstanceClass, "db.")]; ok {
+			// We were able to lookup thing VCPU count
+			instanceVCPUCount = decimal.NewFromInt(count)
 		}
 
 		if instanceCPUCreditHours.GreaterThan(decimal.NewFromInt(0)) {
 			cpuCreditQuantity := instanceVCPUCount.Mul(instanceCPUCreditHours)
 			costComponents = append(costComponents, r.cpuCreditsCostComponent(databaseEngine, instanceFamily, cpuCreditQuantity))
+		}
+	}
+	if r.PerformanceInsightsEnabled {
+		if r.PerformanceInsightsLongTermRetention {
+			costComponents = append(costComponents, PerformanceInsightsLongTermRetentionCostComponent(r.Region, r.InstanceClass))
+		}
+
+		if r.MonthlyAdditionalPerformanceInsightsRequests == nil || *r.MonthlyAdditionalPerformanceInsightsRequests > 0 {
+			costComponents = append(costComponents,
+				PerformanceInsightsAPIRequestCostComponent(r.Region, r.MonthlyAdditionalPerformanceInsightsRequests))
 		}
 	}
 

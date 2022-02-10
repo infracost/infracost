@@ -11,23 +11,27 @@ import (
 )
 
 type DBInstance struct {
-	Address                   string
-	Region                    string
-	LicenseModel              string
-	StorageType               string
-	BackupRetentionPeriod     int64
-	MultiAZ                   bool
-	InstanceClass             string
-	Engine                    string
-	IOPS                      float64
-	AllocatedStorageGB        *float64
-	MonthlyStandardIORequests *int64   `infracost_usage:"monthly_standard_io_requests"`
-	AdditionalBackupStorageGB *float64 `infracost_usage:"additional_backup_storage_gb"`
+	Address                                      string
+	Region                                       string
+	LicenseModel                                 string
+	StorageType                                  string
+	BackupRetentionPeriod                        int64
+	PerformanceInsightsEnabled                   bool
+	PerformanceInsightsLongTermRetention         bool
+	MultiAZ                                      bool
+	InstanceClass                                string
+	Engine                                       string
+	IOPS                                         float64
+	AllocatedStorageGB                           *float64
+	MonthlyStandardIORequests                    *int64   `infracost_usage:"monthly_standard_io_requests"`
+	AdditionalBackupStorageGB                    *float64 `infracost_usage:"additional_backup_storage_gb"`
+	MonthlyAdditionalPerformanceInsightsRequests *int64   `infracost_usage:"monthly_additional_performance_insights_requests"`
 }
 
 var DBInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_standard_io_requests", ValueType: schema.Int64, DefaultValue: 0},
 	{Key: "additional_backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_additional_performance_insights_requests", ValueType: schema.Int64, DefaultValue: 0},
 }
 
 func (r *DBInstance) PopulateUsage(u *schema.UsageData) {
@@ -231,9 +235,70 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		})
 	}
 
+	if r.PerformanceInsightsEnabled {
+		if r.PerformanceInsightsLongTermRetention {
+			costComponents = append(costComponents, PerformanceInsightsLongTermRetentionCostComponent(r.Region, r.InstanceClass))
+		}
+
+		if r.MonthlyAdditionalPerformanceInsightsRequests == nil || *r.MonthlyAdditionalPerformanceInsightsRequests > 0 {
+			costComponents = append(costComponents,
+				PerformanceInsightsAPIRequestCostComponent(r.Region, r.MonthlyAdditionalPerformanceInsightsRequests))
+		}
+	}
+
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
 		UsageSchema:    DBInstanceUsageSchema,
+	}
+}
+
+func PerformanceInsightsLongTermRetentionCostComponent(region, instanceClass string) *schema.CostComponent {
+	instanceType := strings.TrimPrefix(instanceClass, "db.")
+
+	vCPUCount := decimal.Zero
+	if count, ok := InstanceTypeToVCPU[instanceType]; ok {
+		// We were able to lookup thing VCPU count
+		vCPUCount = decimal.NewFromInt(count)
+	}
+
+	var instanceFamily string
+	split := strings.SplitN(instanceType, ".", 2)
+	if len(split) > 0 {
+		instanceFamily = split[0]
+	}
+
+	return &schema.CostComponent{
+		Name:            fmt.Sprintf("Performance Insights Long Term Retention (%s)", strings.ToLower(instanceClass)),
+		Unit:            "vCPU-month",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: &vCPUCount,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonRDS"),
+			ProductFamily: strPtr("Performance Insights"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: regexPtr("PI_LTR:" + strings.ToUpper(instanceFamily) + "$")},
+			},
+		},
+	}
+}
+
+func PerformanceInsightsAPIRequestCostComponent(region string, additionalRequests *int64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Performance Insights API",
+		Unit:            "1000 requests",
+		UnitMultiplier:  decimal.NewFromInt(1000),
+		MonthlyQuantity: intPtrToDecimalPtr(additionalRequests),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonRDS"),
+			ProductFamily: strPtr("Performance Insights"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: regexPtr("PI_API$")},
+			},
+		},
 	}
 }
