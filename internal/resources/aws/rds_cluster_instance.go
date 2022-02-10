@@ -6,8 +6,6 @@ import (
 
 	"fmt"
 
-	"strings"
-
 	"github.com/shopspring/decimal"
 )
 
@@ -54,7 +52,7 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 		},
 	}
 
-	if strings.HasPrefix(r.InstanceClass, "db.t3") {
+	if instanceFamily := getBurstableInstanceFamily([]string{"db.t3", "db.t4g"}, r.InstanceClass); instanceFamily != "" {
 		instanceCPUCreditHours := decimal.Zero
 		if r.MonthlyCPUCreditHrs != nil {
 			instanceCPUCreditHours = decimal.NewFromInt(*r.MonthlyCPUCreditHrs)
@@ -67,7 +65,7 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 
 		if instanceCPUCreditHours.GreaterThan(decimal.NewFromInt(0)) {
 			cpuCreditQuantity := instanceVCPUCount.Mul(instanceCPUCreditHours)
-			costComponents = append(costComponents, r.cpuCreditsCostComponent(databaseEngine, cpuCreditQuantity))
+			costComponents = append(costComponents, r.cpuCreditsCostComponent(databaseEngine, instanceFamily, cpuCreditQuantity))
 		}
 	}
 
@@ -89,7 +87,7 @@ func (r *RDSClusterInstance) databaseEngineValue() string {
 	return ""
 }
 
-func (r *RDSClusterInstance) cpuCreditsCostComponent(databaseEngine string, vCPUCount decimal.Decimal) *schema.CostComponent {
+func (r *RDSClusterInstance) cpuCreditsCostComponent(databaseEngine, instanceFamily string, vCPUCount decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "CPU credits",
 		Unit:            "vCPU-hours",
@@ -102,6 +100,7 @@ func (r *RDSClusterInstance) cpuCreditsCostComponent(databaseEngine string, vCPU
 			ProductFamily: strPtr("CPU Credits"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "databaseEngine", Value: strPtr(databaseEngine)},
+				{Key: "usagetype", ValueRegex: regexPtr("CPUCredits:" + instanceFamily + "$")},
 			},
 		},
 	}

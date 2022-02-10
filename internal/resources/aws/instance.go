@@ -13,7 +13,7 @@ import (
 )
 
 var defaultEC2InstanceMetricCount = 7
-var burstableInstanceTypePrefixes = []string{"t2.", "t3.", "t4."}
+var burstableInstanceTypePrefixes = []string{"t2", "t3", "t3a", "t4g"}
 
 type Instance struct {
 	// "required" args that can't really be missing.
@@ -101,8 +101,10 @@ func (a *Instance) BuildResource() *schema.Resource {
 		costComponents = append(costComponents, a.elasticInferenceAcceleratorCostComponent())
 	}
 
-	if a.isBurstable() && a.CPUCredits == "unlimited" {
-		costComponents = append(costComponents, a.cpuCreditCostComponent())
+	if a.CPUCredits == "unlimited" {
+		if instanceFamily := getBurstableInstanceFamily(burstableInstanceTypePrefixes, a.InstanceType); instanceFamily != "" {
+			costComponents = append(costComponents, a.cpuCreditCostComponent(instanceFamily))
+		}
 	}
 
 	estimate := func(ctx context.Context, values map[string]interface{}) error {
@@ -303,18 +305,7 @@ func (a *Instance) elasticInferenceAcceleratorCostComponent() *schema.CostCompon
 	}
 }
 
-func (a *Instance) isBurstable() bool {
-	for _, prefix := range burstableInstanceTypePrefixes {
-		if strings.HasPrefix(a.InstanceType, prefix) {
-			return true
-		}
-	}
-	return false
-}
-
-func (a *Instance) cpuCreditCostComponent() *schema.CostComponent {
-	prefix := strings.SplitN(a.InstanceType, ".", 2)[0]
-
+func (a *Instance) cpuCreditCostComponent(instanceFamily string) *schema.CostComponent {
 	qty := decimal.Zero
 	if a.MonthlyCPUCreditHours != nil && a.VCPUCount != nil {
 		qty = decimal.NewFromInt(*a.MonthlyCPUCreditHours).Mul(decimal.NewFromInt(*a.VCPUCount))
@@ -332,7 +323,7 @@ func (a *Instance) cpuCreditCostComponent() *schema.CostComponent {
 			ProductFamily: strPtr("CPU Credits"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "operatingSystem", Value: strPtr("Linux")},
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/CPUCredits:%s$/", prefix))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/CPUCredits:%s$/", instanceFamily))},
 			},
 		},
 	}
