@@ -25,7 +25,7 @@ func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *sche
 	productName := "Standard Plan"
 
 	// These are used by azurerm_function_app, their costs are calculated there as they don't have prices in the azurerm_app_service_plan resource
-	if strings.ToLower(sku[:2]) == "ep" {
+	if len(sku) < 2 || strings.ToLower(sku[:2]) == "ep" {
 		return &schema.Resource{
 			Name:      d.Address,
 			IsSkipped: true,
