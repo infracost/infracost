@@ -2,11 +2,11 @@ package aws
 
 import (
 	"fmt"
+	"github.com/shopspring/decimal"
 	"math"
 	"reflect"
 	"regexp"
-
-	"github.com/shopspring/decimal"
+	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -239,4 +239,14 @@ var RegionUsageSchema = []*schema.UsageItem{
 	{Key: "me_south_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "sa_east_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "af_south_1", DefaultValue: 0, ValueType: schema.Float64},
+}
+
+func getBurstableInstanceFamily(matchPrefixes []string, instanceType string) string {
+	for _, prefix := range matchPrefixes {
+		if strings.HasPrefix(instanceType, prefix) {
+			return prefix
+		}
+	}
+
+	return ""
 }

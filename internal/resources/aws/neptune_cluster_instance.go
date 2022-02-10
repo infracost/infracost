@@ -1,12 +1,9 @@
 package aws
 
 import (
+	"fmt"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-
-	"fmt"
-	"strings"
-
 	"github.com/shopspring/decimal"
 )
 
@@ -41,8 +38,8 @@ func (r *NeptuneClusterInstance) BuildResource() *schema.Resource {
 		r.dbInstanceCostComponent(hourlyQuantity),
 	}
 
-	if strings.HasPrefix(strings.ToLower(r.InstanceClass), "db.t3.") {
-		costComponents = append(costComponents, r.cpuCreditsCostComponent(monthlyCPUCreditHrs))
+	if instanceFamily := getBurstableInstanceFamily([]string{"db.t3", "db.t4g"}, r.InstanceClass); instanceFamily != "" {
+		costComponents = append(costComponents, r.cpuCreditsCostComponent(monthlyCPUCreditHrs, instanceFamily))
 	}
 
 	return &schema.Resource{
@@ -72,7 +69,7 @@ func (r *NeptuneClusterInstance) dbInstanceCostComponent(quantity int) *schema.C
 	}
 }
 
-func (r *NeptuneClusterInstance) cpuCreditsCostComponent(quantity *decimal.Decimal) *schema.CostComponent {
+func (r *NeptuneClusterInstance) cpuCreditsCostComponent(quantity *decimal.Decimal, instanceFamily string) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:           "CPU credits",
@@ -81,9 +78,10 @@ func (r *NeptuneClusterInstance) cpuCreditsCostComponent(quantity *decimal.Decim
 		HourlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
+			Region:     strPtr(r.Region),
 			Service:    strPtr("AmazonNeptune"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("APE1-CPUCredits:db.t3")},
+				{Key: "usagetype", ValueRegex: regexPtr("CPUCredits:" + instanceFamily + "$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

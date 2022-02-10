@@ -1,12 +1,9 @@
 package aws
 
 import (
+	"fmt"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-
-	"fmt"
-	"strings"
-
 	"github.com/shopspring/decimal"
 )
 
@@ -40,9 +37,9 @@ func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 		ioRequests = decimalPtr(decimal.NewFromInt(*r.MonthlyIORequests))
 	}
 
-	var cpuCreditsT3 *decimal.Decimal
+	var cpuCredits *decimal.Decimal
 	if r.MonthlyCPUCreditHrs != nil {
-		cpuCreditsT3 = decimalPtr(decimal.NewFromInt(*r.MonthlyCPUCreditHrs))
+		cpuCredits = decimalPtr(decimal.NewFromInt(*r.MonthlyCPUCreditHrs))
 	}
 
 	costComponents := []*schema.CostComponent{
@@ -99,19 +96,19 @@ func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 		},
 	}
 
-	if strings.HasPrefix(r.InstanceClass, "db.t3.") {
+	if instanceFamily := getBurstableInstanceFamily([]string{"db.t3", "db.t4g"}, r.InstanceClass); instanceFamily != "" {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "CPU credits",
 			Unit:            "vCPU-hours",
 			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyQuantity: cpuCreditsT3,
+			MonthlyQuantity: cpuCredits,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(r.Region),
 				Service:       strPtr("AmazonDocDB"),
 				ProductFamily: strPtr("CPU Credits"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", Value: strPtr("CPUCredits:db.t3")},
+					{Key: "usagetype", ValueRegex: regexPtr("CPUCredits:" + instanceFamily + "$")},
 				},
 			},
 		})
