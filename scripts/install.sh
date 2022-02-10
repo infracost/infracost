@@ -26,23 +26,29 @@ curl -sL "$url/$tar" -o "/tmp/$tar"
 echo
 
 code=$(curl -s -L -o /dev/null -w "%{http_code}" "$url/$tar.sha256")
-if [ "$code" != "404" ]; then
+if [ "$code" = "404" ]; then
+    echo "Skipping checksum validation as the sha for the release could not be found, no action needed."
+else
   if [ -x "$(command -v shasum)" ]; then
     echo "Validating checksum for infracost-$os-$arch..."
     curl -sL "$url/$tar.sha256" -o "/tmp/$tar.sha256"
 
     if ! check_sha "$tar.sha256"; then
       echo
-      echo "Installation checksum failed! This could be a security issue so please email hello@infracost.io for help."
-      exit 1
+      read -r -p "Installation checksum failed. This could be a security issue. Would you like to continue? (y/n) " answer
+      if [ "$answer" != "y" ]; then
+        echo
+        echo "Exiting, please email hello@infracost.io for help."
+        exit 1
+      fi
     fi
 
     rm "/tmp/$tar.sha256"
   else
     echo "Skipping checksum validation as the shasum command could not be found, no action needed."
   fi
-  echo
 fi
+echo
 
 tar xzf "/tmp/$tar" -C /tmp
 rm "/tmp/$tar"
