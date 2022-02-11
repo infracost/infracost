@@ -24,3 +24,6 @@ resource_usage:
     additional_backup_storage_gb: 1000
   aws_db_instance.sqlserver-web:
     additional_backup_storage_gb: 1000
+  aws_db_instance.mysql-performance-insights-usage:
+    monthly_cpu_credit_hrs: 30
+    monthly_additional_performance_insights_requests: 12345
