@@ -46,12 +46,11 @@ var (
 )
 
 // PrintUnexpectedErrorStack prints a full stack trace of a fatal error.
-func PrintUnexpectedErrorStack(out io.Writer, err interface{}, stack string) {
-	msg := fmt.Sprintf("\n%s %s\n\n%s\n%s\nEnvironment:\n%s\n\n%s %s\n",
+func PrintUnexpectedErrorStack(out io.Writer, err error) {
+	msg := fmt.Sprintf("\n%s %s\n\n%s\nEnvironment:\n%s\n\n%s %s\n",
 		ErrorString("Error:"),
 		"An unexpected error occurred",
 		err,
-		stack,
 		fmt.Sprintf("Infracost %s", version.Version),
 		stackErrorMsg,
 		githubIssuesLink,
