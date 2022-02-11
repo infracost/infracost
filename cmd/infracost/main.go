@@ -47,12 +47,17 @@ func Run(modifyCtx func(*config.RunContext), args *[]string) {
 
 	defer func() {
 		if appErr != nil {
-			handleCLIError(ctx, appErr)
+			if v, ok := appErr.(*panicError); ok {
+				handleUnexpectedErr(ctx, v)
+			} else {
+				handleCLIError(ctx, appErr)
+			}
 		}
 
 		unexpectedErr := recover()
 		if unexpectedErr != nil {
-			handleUnexpectedErr(ctx, unexpectedErr)
+			withStack := fmt.Errorf("%s\n%s", unexpectedErr, debug.Stack())
+			handleUnexpectedErr(ctx, withStack)
 		}
 
 		handleUpdateMessage(updateMessageChan)
@@ -186,12 +191,10 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 	}
 }
 
-func handleUnexpectedErr(ctx *config.RunContext, unexpectedErr interface{}) {
-	stack := string(debug.Stack())
+func handleUnexpectedErr(ctx *config.RunContext, err error) {
+	ui.PrintUnexpectedErrorStack(ctx.ErrWriter, err)
 
-	ui.PrintUnexpectedErrorStack(ctx.ErrWriter, unexpectedErr, stack)
-
-	err := apiclient.ReportCLIError(ctx, fmt.Errorf("%s\n%s", unexpectedErr, stack))
+	err = apiclient.ReportCLIError(ctx, err)
 	if err != nil {
 		log.Warnf("Error reporting unexpected error: %s", err)
 	}
