@@ -50,6 +50,10 @@ resource "aws_kinesis_firehose_delivery_stream" "withAllTags" {
 }
 resource "aws_s3_bucket" "bucket" {
   bucket = "tf-test-bucket"
+}
+
+resource "aws_s3_bucket_acl" "bucket_acl" {
+  bucket = aws_s3_bucket.bucket.id
   acl    = "private"
 }
 
