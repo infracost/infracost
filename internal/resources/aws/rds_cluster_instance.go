@@ -77,12 +77,12 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 	}
 	if r.PerformanceInsightsEnabled {
 		if r.PerformanceInsightsLongTermRetention {
-			costComponents = append(costComponents, PerformanceInsightsLongTermRetentionCostComponent(r.Region, r.InstanceClass))
+			costComponents = append(costComponents, performanceInsightsLongTermRetentionCostComponent(r.Region, r.InstanceClass))
 		}
 
 		if r.MonthlyAdditionalPerformanceInsightsRequests == nil || *r.MonthlyAdditionalPerformanceInsightsRequests > 0 {
 			costComponents = append(costComponents,
-				PerformanceInsightsAPIRequestCostComponent(r.Region, r.MonthlyAdditionalPerformanceInsightsRequests))
+				performanceInsightsAPIRequestCostComponent(r.Region, r.MonthlyAdditionalPerformanceInsightsRequests))
 		}
 	}
 

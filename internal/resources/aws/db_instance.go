@@ -237,12 +237,12 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 
 	if r.PerformanceInsightsEnabled {
 		if r.PerformanceInsightsLongTermRetention {
-			costComponents = append(costComponents, PerformanceInsightsLongTermRetentionCostComponent(r.Region, r.InstanceClass))
+			costComponents = append(costComponents, performanceInsightsLongTermRetentionCostComponent(r.Region, r.InstanceClass))
 		}
 
 		if r.MonthlyAdditionalPerformanceInsightsRequests == nil || *r.MonthlyAdditionalPerformanceInsightsRequests > 0 {
 			costComponents = append(costComponents,
-				PerformanceInsightsAPIRequestCostComponent(r.Region, r.MonthlyAdditionalPerformanceInsightsRequests))
+				performanceInsightsAPIRequestCostComponent(r.Region, r.MonthlyAdditionalPerformanceInsightsRequests))
 		}
 	}
 
@@ -253,7 +253,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 	}
 }
 
-func PerformanceInsightsLongTermRetentionCostComponent(region, instanceClass string) *schema.CostComponent {
+func performanceInsightsLongTermRetentionCostComponent(region, instanceClass string) *schema.CostComponent {
 	instanceType := strings.TrimPrefix(instanceClass, "db.")
 
 	vCPUCount := decimal.Zero
@@ -285,7 +285,7 @@ func PerformanceInsightsLongTermRetentionCostComponent(region, instanceClass str
 	}
 }
 
-func PerformanceInsightsAPIRequestCostComponent(region string, additionalRequests *int64) *schema.CostComponent {
+func performanceInsightsAPIRequestCostComponent(region string, additionalRequests *int64) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Performance Insights API",
 		Unit:            "1000 requests",
