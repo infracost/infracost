@@ -327,6 +327,7 @@ var FreeResources = []string{
 	// AWS S3
 	"aws_s3_access_point",
 	"aws_s3_account_public_access_block",
+	"aws_s3_bucket_acl",
 	"aws_s3_bucket_metric",
 	"aws_s3_bucket_notification",
 	"aws_s3_bucket_object", // Costs are shown at the bucket level
