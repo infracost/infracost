@@ -94,6 +94,7 @@ resource_usage:
   aws_db_instance.my_db:
     additional_backup_storage_gb: 1000  # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
     monthly_standard_io_requests: 10000 # Monthly number of input/output requests for database.
+    monthly_additional_performance_insights_requests: 10000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
 
   aws_directory_service_directory.my_directory:
     additional_domain_controllers: 3 # The number of domain controllers in the directory service provisioned in addition to the minimum 2 controllers
@@ -245,7 +246,8 @@ resource_usage:
 
   aws_rds_cluster_instance.my_cluster:
     monthly_cpu_credit_hrs: 24   # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
-    vcpu_count: 2 # Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
+    vcpu_count: 2 # # (DEPRECATED this is now calculated automatically) Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
+    monthly_additional_performance_insights_requests: 10000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
 
   aws_redshift_cluster.with_usage:
     managed_storage_gb: 10000

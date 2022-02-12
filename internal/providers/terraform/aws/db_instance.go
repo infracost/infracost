@@ -13,16 +13,21 @@ func getDBInstanceRegistryItem() *schema.RegistryItem {
 }
 
 func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	piEnabled := d.Get("performance_insights_enabled").Bool()
+	piLongTerm := piEnabled && d.Get("performance_insights_retention_period").Int() > 7
+
 	r := &aws.DBInstance{
-		Address:               d.Address,
-		Region:                d.Get("region").String(),
-		InstanceClass:         d.Get("instance_class").String(),
-		Engine:                d.Get("engine").String(),
-		MultiAZ:               d.Get("multi_az").Bool(),
-		LicenseModel:          d.Get("license_model").String(),
-		BackupRetentionPeriod: d.Get("backup_retention_period").Int(),
-		IOPS:                  d.Get("iops").Float(),
-		StorageType:           d.Get("storage_type").String(),
+		Address:                              d.Address,
+		Region:                               d.Get("region").String(),
+		InstanceClass:                        d.Get("instance_class").String(),
+		Engine:                               d.Get("engine").String(),
+		MultiAZ:                              d.Get("multi_az").Bool(),
+		LicenseModel:                         d.Get("license_model").String(),
+		BackupRetentionPeriod:                d.Get("backup_retention_period").Int(),
+		IOPS:                                 d.Get("iops").Float(),
+		StorageType:                          d.Get("storage_type").String(),
+		PerformanceInsightsEnabled:           piEnabled,
+		PerformanceInsightsLongTermRetention: piLongTerm,
 	}
 
 	if !d.IsEmpty("allocated_storage") {

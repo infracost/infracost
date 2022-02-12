@@ -55,8 +55,8 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 	}
 }
 
-func (c *DashboardAPIClient) CreateAPIKey(name string, email string) (CreateAPIKeyResponse, error) {
-	d := map[string]string{"name": name, "email": email}
+func (c *DashboardAPIClient) CreateAPIKey(name string, email string, ciInterest bool) (CreateAPIKeyResponse, error) {
+	d := map[string]interface{}{"name": name, "email": email, "ci": ciInterest}
 	respBody, err := c.doRequest("POST", "/apiKeys?source=cli-register", d)
 	if err != nil {
 		return CreateAPIKeyResponse{}, err

@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -147,12 +148,12 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 		}
 
 		filter, err := aws.S3FindMetricsFilter(ctx, a.Region, a.Name)
-		if err != nil {
-			return err
-		}
-
-		if filter == "" {
-			log.Debugf("Unable to find matching metrics filter for S3 bucket, so unable to sync additional metrics")
+		if err != nil || filter == "" {
+			msg := "Unable to find matching metrics filter for S3 bucket, so unable to sync additional metrics"
+			if err != nil {
+				msg = fmt.Sprintf("%s: %s", msg, err)
+			}
+			log.Debugf(msg)
 		} else {
 			standardStorageClassUsage := u["standard"].(map[string]interface{})
 

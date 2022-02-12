@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"runtime"
+	"runtime/debug"
 	"sort"
 	"strings"
 	"sync"
@@ -64,6 +65,16 @@ func addRunFlags(cmd *cobra.Command) {
 	_ = cmd.MarkFlagFilename("usage-file", "yml")
 }
 
+// panicError is used to collect goroutine panics into an error interface so
+// that we can do type assertion on err checking.
+type panicError struct {
+	msg string
+}
+
+func (p *panicError) Error() string {
+	return p.msg
+}
+
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	if runCtx.Config.IsSelfHosted() && runCtx.Config.EnableDashboard {
 		ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
@@ -102,7 +113,17 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	for i := 0; i < parallelism; i++ {
-		errGroup.Go(func() error {
+		errGroup.Go(func() (err error) {
+			// defer a function to recover from any panics spawned by child goroutines.
+			// This is done as recover works only in the same goroutine that it is called.
+			// We need to catch any child goroutine panics and hand them up to the main caller
+			// so that it can be caught and displayed correctly to the user.
+			defer func() {
+				e := recover()
+				if e != nil {
+					err = &panicError{msg: fmt.Sprintf("%s\n%s", e, debug.Stack())}
+				}
+			}()
 
 			for job := range jobs {
 				mux := pathMuxs[job.projectCfg.Path]

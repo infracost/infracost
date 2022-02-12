@@ -80,7 +80,7 @@ func (r *DataTransfer) intraRegionCostComponents() []*schema.CostComponent {
 			Unit:            "GB",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(intraRegionGb.Mul(decimal.NewFromInt(2))),
-			ProductFilter:   r.buildProductFilter("IntraRegion", nil),
+			ProductFilter:   r.buildProductFilter("IntraRegion", nil, "DataTransfer-Regional-Bytes"),
 		})
 	}
 
@@ -177,7 +177,7 @@ func (r *DataTransfer) buildOutboundInternetCostComponent(name string, networkUs
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(networkUsage),
-		ProductFilter:   r.buildProductFilter("AWS Outbound", nil),
+		ProductFilter:   r.buildProductFilter("AWS Outbound", nil, ""),
 		PriceFilter: &schema.PriceFilter{
 			EndUsageAmount: strPtr(endUsageAmount),
 		},
@@ -204,7 +204,7 @@ func (r *DataTransfer) outboundUsEastCostComponents() []*schema.CostComponent {
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyOutboundUsEastToUsEastGB)),
-		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion),
+		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion, ""),
 	})
 
 	return costComponents
@@ -237,7 +237,7 @@ func (r *DataTransfer) outboundOtherRegionsCostComponents() []*schema.CostCompon
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyOutboundOtherRegionsGB)),
-		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion),
+		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion, ""),
 	})
 
 	return costComponents
@@ -245,7 +245,7 @@ func (r *DataTransfer) outboundOtherRegionsCostComponents() []*schema.CostCompon
 
 // buildProductFilter returns a filter for data transfer products. Desctination
 // region is optional.
-func (r *DataTransfer) buildProductFilter(transferType string, toRegion *string) *schema.ProductFilter {
+func (r *DataTransfer) buildProductFilter(transferType string, toRegion *string, usageTypeSuffix string) *schema.ProductFilter {
 	fromLocation := RegionMapping[r.Region]
 
 	attributeFilters := []*schema.AttributeFilter{
@@ -264,7 +264,14 @@ func (r *DataTransfer) buildProductFilter(transferType string, toRegion *string)
 	if regionCode, ok := RegionCodeMapping[r.Region]; ok {
 		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
 			Key:        "usagetype",
-			ValueRegex: strPtr(fmt.Sprintf("/^%s-/i", regionCode)),
+			ValueRegex: regexPtr(fmt.Sprintf("^%s-", regionCode)),
+		})
+	}
+
+	if usageTypeSuffix != "" {
+		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
+			Key:        "usagetype",
+			ValueRegex: regexPtr(fmt.Sprintf("%s$", usageTypeSuffix)),
 		})
 	}
 

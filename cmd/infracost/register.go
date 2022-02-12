@@ -6,12 +6,13 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/infracost/infracost/internal/apiclient"
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 func registerCmd(ctx *config.RunContext) *cobra.Command {
@@ -20,14 +21,13 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 		Short: "Register for a free Infracost API key",
 		Long:  "Register for a free Infracost API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			var msg string
 			var isRegenerate bool
+			var ciInterest bool
 
 			if ctx.Config.Credentials.APIKey != "" {
 
 				isRegenerate = true
-				fmt.Printf("You already have an Infracost API key saved in %s\n", config.CredentialsFilePath())
+				fmt.Printf("You already have an Infracost API key saved in %s. We recommend using your same API key in all environments.\n", config.CredentialsFilePath())
 
 				status, err := promptGenerateNewKey()
 				if err != nil {
@@ -35,6 +35,24 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				}
 
 				if !status {
+					ciInterest, err := promptForCIDocs(false)
+					if err != nil {
+						// user cancelled
+						return nil
+					}
+
+					if ciInterest {
+						fmt.Println("Add cost estimates to your pull requests: " + ui.LinkString("https://infracost.io/cicd"))
+						return nil
+					}
+
+					fmt.Printf("You can now run %s and point to your Terraform directory or JSON plan file.\n", ui.PrimaryString("infracost breakdown --path=..."))
+					return nil
+				}
+
+				ciInterest, err = promptForCIDocs(isRegenerate)
+				if err != nil {
+					// user cancelled
 					return nil
 				}
 
@@ -56,9 +74,18 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				return nil
 			}
 
+			// prompt for the ci docs after user email,name only if not regenerating
+			if !isRegenerate {
+				ciInterest, err = promptForCIDocs(isRegenerate)
+				if err != nil {
+					// user cancelled
+					return nil
+				}
+			}
+
 			d := apiclient.NewDashboardAPIClient(ctx)
 
-			r, err := d.CreateAPIKey(name, email)
+			r, err := d.CreateAPIKey(name, email, ciInterest)
 			if err != nil {
 				return err
 			}
@@ -69,7 +96,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				return nil
 			}
 
-			fmt.Printf("\nThank you %s!\nYour API key is: %s\n", name, r.APIKey)
+			fmt.Printf("\nThanks %s! Your API key is: %s\n", name, r.APIKey)
 
 			if isRegenerate {
 				fmt.Println()
@@ -79,15 +106,13 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				}
 
 				if !confirm {
-					msg = fmt.Sprintf("%s\n%s %s %s",
+					fmt.Printf("%s\n%s %s %s",
 						"Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml.",
 						"You can now run",
 						ui.PrimaryString("infracost breakdown --path=..."),
-						"and point to your Terraform directory or JSON/plan file.",
+						"and point to your Terraform directory or plan JSON file.\n",
 					)
 
-					fmt.Println("")
-					ui.PrintSuccess(cmd.ErrOrStderr(), msg)
 					return nil
 				}
 			}
@@ -100,14 +125,18 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			msg = fmt.Sprintf("%s\nYou can now run %s and point to your Terraform directory or JSON/plan file.",
-				fmt.Sprintf("Your API key has been saved to %s", config.CredentialsFilePath()),
-				ui.PrimaryString("infracost breakdown --path=..."),
-			)
+			fmt.Printf("This was saved to %s\n\n", config.CredentialsFilePath())
+			if ciInterest {
+				fmt.Printf("You can now add cost estimates to your pull requests: %s\n", ui.LinkString("https://infracost.io/cicd"))
+				return nil
+			}
 
-			fmt.Println("")
-			ui.PrintSuccess(cmd.ErrOrStderr(), msg)
+			if isRegenerate {
+				fmt.Printf("You can now run %s and point to your Terraform directory or JSON plan file.\n", ui.PrimaryString("infracost breakdown --path=..."))
+				return nil
+			}
 
+			fmt.Printf("You can now run %s to see how to use the CLI\n", ui.PrimaryString("infracost breakdown --help"))
 			return nil
 		},
 	}
@@ -128,6 +157,27 @@ func promptForName() (string, error) {
 	name = strings.TrimSpace(name)
 
 	return name, err
+}
+
+func promptForCIDocs(isRegenerate bool) (bool, error) {
+	label := "Would you like to see our CI/CD integration docs?"
+	if isRegenerate {
+		label = "Do you plan to use this API key in CI?"
+	}
+	p := promptui.Prompt{
+		Label:     label,
+		IsConfirm: true,
+	}
+
+	_, err := p.Run()
+	if err != nil {
+		if errors.Is(err, promptui.ErrAbort) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return true, nil
 }
 
 func promptForEmail() (string, error) {
