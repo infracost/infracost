@@ -25,14 +25,19 @@
  ├─ Log data retention                                                                        30  GB                        $3.90 
  └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB    
                                                                                                                                   
+ azurerm_log_analytics_workspace.log_data_retention_without_usage                                                                 
+ ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB    
+ ├─ Log data retention                                                             Monthly cost depends on usage: $0.13 per GB    
+ └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB    
+                                                                                                                                  
  azurerm_log_analytics_workspace.per_gb_data_ingestion                                                                            
  ├─ Log data ingestion                                                                        20  GB                       $59.80 
  └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB    
                                                                                                                                   
  OVERALL TOTAL                                                                                                         $15,239.30 
 ──────────────────────────────────
-13 cloud resources were detected:
-∙ 7 were estimated, 7 include usage-based costs, see https://infracost.io/usage-file
+14 cloud resources were detected:
+∙ 8 were estimated, 8 include usage-based costs, see https://infracost.io/usage-file
 ∙ 4 weren't estimated, report them in https://github.com/infracost/infracost:
   ∙ 4 x azurerm_log_analytics_workspace
 ∙ 2 were free:

@@ -186,11 +186,16 @@ func (r *LogAnalyticsWorkspace) logDataIngestion() *schema.CostComponent {
 }
 
 func (r *LogAnalyticsWorkspace) logDataRetention() *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if r.MonthlyAdditionalLogDataRetentionGB != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyAdditionalLogDataRetentionGB))
+	}
+
 	return &schema.CostComponent{
 		Name:            "Log data retention",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyAdditionalLogDataRetentionGB)),
+		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),

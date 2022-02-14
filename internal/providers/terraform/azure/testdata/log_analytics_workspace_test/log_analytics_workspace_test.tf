@@ -62,6 +62,13 @@ resource "azurerm_log_analytics_workspace" "log_data_retention_with_usage" {
   retention_in_days   = 33
 }
 
+resource "azurerm_log_analytics_workspace" "log_data_retention_without_usage" {
+  name                = "acctest-08"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 33
+}
 
 resource "azurerm_log_analytics_workspace" "log_data_export" {
   name                = "acctest-06"
