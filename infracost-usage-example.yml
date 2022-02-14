@@ -779,9 +779,9 @@ resource_usage:
     monthly_inbound_data_transfer_gb: 1000 # Monthly inbound data transfer in GB
 
   azurerm_log_analytics_workspace.my_workspace:
-    monthly_log_data_ingestion_gb: 20 # Monthly log data ingested by the workspace in GB (only used for Pay-as-you-go workspaces).
-    monthly_additional_log_data_retention_gb: 30 # Monthly additional days of data retention that the workspace uses over the free allowance.
-    monthly_log_data_export_gb: 40 # Monthly data in GB exported from the workspace.
+    monthly_log_data_ingestion_gb: 20            # Monthly log data ingested by the workspace in GB (only used for Pay-as-you-go workspaces).
+    monthly_additional_log_data_retention_gb: 30 # Monthly additional GB of data retained past the free allowance.
+    monthly_log_data_export_gb: 40               # Monthly data in GB exported from the workspace.
 
   azurerm_frontdoor_firewall_policy.my_frontdoor_firewall_policy:
     monthly_custom_rule_requests: 11000     # Monthly number of custom rule requests

@@ -53,8 +53,8 @@ type LogAnalyticsWorkspace struct {
 	RetentionInDays               int64
 
 	MonthlyLogDataIngestionGB           *float64 `infracost_usage:"monthly_log_data_ingestion_gb"`
-	MonthlyAdditionalLogDataRetentionDB *float64 `infracost_usage:"monthly_additional_log_data_retention_gb"`
-	MonthlyLogDataExportDB              *float64 `infracost_usage:"monthly_log_data_export_gb"`
+	MonthlyAdditionalLogDataRetentionGB *float64 `infracost_usage:"monthly_additional_log_data_retention_gb"`
+	MonthlyLogDataExportGB              *float64 `infracost_usage:"monthly_log_data_export_gb"`
 }
 
 // LogAnalyticsWorkspaceUsageSchema defines a list which represents the usage schema of LogAnalyticsWorkspace.
@@ -88,8 +88,8 @@ func (r *LogAnalyticsWorkspace) PopulateUsage(u *schema.UsageData) {
 //		1. Log data ingestion, which can be either:
 //			a) Pay-as-you-go, which is only valid for a sku of PerGB2018 and uses a usage param
 //			b) Billed per commitment tiers, which is only valid for a sku of CapacityReservation
-//		2. Log retention, which is free up to 31 days and then is billed for each additional day after. Additional
-//		   days come from the usage param.
+//		2. Log retention, which is free up to 31 days and then is billed per GB of data retained after the free limit.
+//		   Additional GB used comes from the usage param.
 //		3. Data export, which is billed per monthly GB exported and is defined from a usage param.
 //
 // Outside the above rules - if the workspace has sku of Free we return as a free resource & if the workspace sku
@@ -128,7 +128,7 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 		costComponents = append(costComponents, r.logDataRetention())
 	}
 
-	if r.MonthlyLogDataExportDB != nil {
+	if r.MonthlyLogDataExportGB != nil {
 		costComponents = append(costComponents, r.logDataExport())
 	}
 
@@ -187,7 +187,7 @@ func (r *LogAnalyticsWorkspace) logDataRetention() *schema.CostComponent {
 		Name:            "Log data retention",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyAdditionalLogDataRetentionDB)),
+		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyAdditionalLogDataRetentionGB)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),
@@ -207,7 +207,7 @@ func (r *LogAnalyticsWorkspace) logDataExport() *schema.CostComponent {
 		Name:            "Log data export",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyLogDataExportDB)),
+		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyLogDataExportGB)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),
