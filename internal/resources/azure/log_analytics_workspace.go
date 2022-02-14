@@ -128,9 +128,7 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 		costComponents = append(costComponents, r.logDataRetention())
 	}
 
-	if r.MonthlyLogDataExportGB != nil {
-		costComponents = append(costComponents, r.logDataExport())
-	}
+	costComponents = append(costComponents, r.logDataExport())
 
 	return &schema.Resource{
 		Name:           r.Address,
@@ -208,11 +206,16 @@ func (r *LogAnalyticsWorkspace) logDataRetention() *schema.CostComponent {
 }
 
 func (r *LogAnalyticsWorkspace) logDataExport() *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if r.MonthlyLogDataExportGB != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyLogDataExportGB))
+	}
+
 	return &schema.CostComponent{
 		Name:            "Log data export",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyLogDataExportGB)),
+		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),
