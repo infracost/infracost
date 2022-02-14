@@ -171,7 +171,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestionFromCapacityReservation() *schem
 		for i, tier := range commitmentTiers {
 			// if the current tier is the final valid commitment tier then
 			// set selectedTier as it can't be any other tier.
-			if len(commitmentTiers)-1 == i+1 {
+			if len(commitmentTiers)-1 == i {
 				selectedTier = tier
 				break
 			}
