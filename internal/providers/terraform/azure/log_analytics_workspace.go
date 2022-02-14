@@ -22,11 +22,11 @@ func newLogAnalyticsWorkspace(d *schema.ResourceData, u *schema.UsageData) *sche
 		sku = d.Get("sku").String()
 	}
 
+	capacity := d.Get("reservation_capacity_in_gb_per_day").Int()
 	// this attribute typo was fixed in https://github.com/hashicorp/terraform-provider-azurerm/pull/14910
 	// but we need to support the typo for backwards compatibility
-	capacity := d.Get("reservation_capcity_in_gb_per_day").Int()
-	if !d.IsEmpty("reservation_capacity_in_gb_per_day") {
-		capacity = d.Get("reservation_capacity_in_gb_per_day").Int()
+	if !d.IsEmpty("reservation_capcity_in_gb_per_day") {
+		capacity = d.Get("reservation_capcity_in_gb_per_day").Int()
 	}
 
 	r := &azure.LogAnalyticsWorkspace{
