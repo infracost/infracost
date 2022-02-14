@@ -39,6 +39,16 @@ resource "azurerm_log_analytics_workspace" "capacity_typo_gb_data_ingestion" {
   reservation_capcity_in_gb_per_day = 100
 }
 
+resource "azurerm_log_analytics_workspace" "capacity_gb_data_above_commitment_tiers" {
+  name                              = "acctest-09"
+  location                          = azurerm_resource_group.example.location
+  resource_group_name               = azurerm_resource_group.example.name
+  sku                               = "CapacityReservation"
+  # this reservation capacity doesn't actually exist in the azure pricing page. It should appear in the golden file as
+  # 1000 gb a day commitment tier.
+  reservation_capacity_in_gb_per_day = 1200
+}
+
 resource "azurerm_log_analytics_workspace" "capacity_gb_data_ingestion_without_specification" {
   name                = "acctest-03"
   location            = azurerm_resource_group.example.location

@@ -33,6 +33,31 @@ var (
 		"premium":   {},
 		"pernode":   {},
 	}
+
+	// validCommitmentTiers is a lookup map of valid data ingestion tiers.
+	validCommitmentTiers = map[int64]struct{}{
+		100:  {},
+		200:  {},
+		300:  {},
+		400:  {},
+		500:  {},
+		1000: {},
+		2000: {},
+		5000: {},
+	}
+
+	// commitmentTiers list of valid data ingestion tiers, this can be used
+	// to transform invalid tier into a billable unit.
+	commitmentTiers = []int64{
+		100,
+		200,
+		300,
+		400,
+		500,
+		1000,
+		2000,
+		5000,
+	}
 )
 
 // LogAnalyticsWorkspace struct represents an Azure Monitor log workspace. A workspace consolidates data
@@ -138,9 +163,30 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 }
 
 func (r *LogAnalyticsWorkspace) logDataIngestionFromCapacityReservation() *schema.CostComponent {
+	selectedTier := r.ReservationCapacityInGBPerDay
+
+	// if the user has set a reservation capacity tier that doesn't exist (or is a legacy tier) we need
+	// to convert this to a valid billable tier.
+	if _, ok := validCommitmentTiers[r.ReservationCapacityInGBPerDay]; !ok {
+		for i, tier := range commitmentTiers {
+			// if the current tier is the final valid commitment tier then
+			// set selected tier as this element as it can't be any other tier.
+			if len(commitmentTiers)-1 == i+1 {
+				selectedTier = tier
+				break
+			}
+
+			// if the selectedTier is between two valid tiers, set it as the lower of the two tiers.
+			if selectedTier > tier && selectedTier < commitmentTiers[i+1] {
+				selectedTier = tier
+				break
+			}
+		}
+	}
+
 	return &schema.CostComponent{
 		Name:            "Log data ingestion",
-		Unit:            fmt.Sprintf("%d GB (per day)", r.ReservationCapacityInGBPerDay),
+		Unit:            fmt.Sprintf("%d GB (per day)", selectedTier),
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(30)),
 		ProductFilter: &schema.ProductFilter{
@@ -149,8 +195,8 @@ func (r *LogAnalyticsWorkspace) logDataIngestionFromCapacityReservation() *schem
 			Service:       strPtr(azureMonitorServiceName),
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d GB Commitment Tier", r.ReservationCapacityInGBPerDay))},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("%d GB Commitment Tier", r.ReservationCapacityInGBPerDay))},
+				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d GB Commitment Tier", selectedTier))},
+				{Key: "meterName", Value: strPtr(fmt.Sprintf("%d GB Commitment Tier", selectedTier))},
 			},
 		},
 		PriceFilter: priceFilterConsumption,
