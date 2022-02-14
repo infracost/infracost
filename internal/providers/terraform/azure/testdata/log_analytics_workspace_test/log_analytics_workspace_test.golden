@@ -1,22 +1,27 @@
 
- Name                                                             Monthly Qty  Unit              Monthly Cost 
-                                                                                                              
- azurerm_log_analytics_workspace.capacity_gb_data_ingestion                                                   
- └─ Log data ingestion                                                     30  100 GB (per day)     $7,585.20 
-                                                                                                              
- azurerm_log_analytics_workspace.capacity_typo_gb_data_ingestion                                              
- └─ Log data ingestion                                                     30  100 GB (per day)     $7,585.20 
-                                                                                                              
- azurerm_log_analytics_workspace.log_data_export                                                              
- └─ Log data export                                                        40  GB                       $5.20 
-                                                                                                              
- azurerm_log_analytics_workspace.log_data_retention_with_usage                                                
- └─ Log data retention                                                     30  GB                       $3.90 
-                                                                                                              
- azurerm_log_analytics_workspace.per_gb_data_ingestion                                                        
- └─ Log data ingestion                                                     20  GB                      $59.80 
-                                                                                                              
- OVERALL TOTAL                                                                                     $15,239.30 
+ Name                                                               Monthly Qty  Unit               Monthly Cost 
+                                                                                                                 
+ azurerm_log_analytics_workspace.capacity_gb_data_ingestion                                                      
+ └─ Log data ingestion                                                       30  100 GB (per day)      $7,585.20 
+                                                                                                                 
+ azurerm_log_analytics_workspace.capacity_typo_gb_data_ingestion                                                 
+ └─ Log data ingestion                                                       30  100 GB (per day)      $7,585.20 
+                                                                                                                 
+ azurerm_log_analytics_workspace.log_data_export                                                                 
+ ├─ Log data ingestion                                            Monthly cost depends on usage: $2.99 per GB    
+ └─ Log data export                                                          40  GB                        $5.20 
+                                                                                                                 
+ azurerm_log_analytics_workspace.log_data_retention_free                                                         
+ └─ Log data ingestion                                            Monthly cost depends on usage: $2.99 per GB    
+                                                                                                                 
+ azurerm_log_analytics_workspace.log_data_retention_with_usage                                                   
+ ├─ Log data ingestion                                            Monthly cost depends on usage: $2.99 per GB    
+ └─ Log data retention                                                       30  GB                        $3.90 
+                                                                                                                 
+ azurerm_log_analytics_workspace.per_gb_data_ingestion                                                           
+ └─ Log data ingestion                                                       20  GB                       $59.80 
+                                                                                                                 
+ OVERALL TOTAL                                                                                        $15,239.30 
 ──────────────────────────────────
 13 cloud resources were detected:
 ∙ 7 were estimated, 7 include usage-based costs, see https://infracost.io/usage-file

@@ -116,7 +116,7 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 
 	var costComponents []*schema.CostComponent
 
-	if r.SKU == skuPerGB2018 && r.MonthlyLogDataIngestionGB != nil {
+	if r.SKU == skuPerGB2018 {
 		costComponents = append(costComponents, r.logDataIngestion())
 	}
 
@@ -160,11 +160,16 @@ func (r *LogAnalyticsWorkspace) logDataIngestionFromCapacityReservation() *schem
 }
 
 func (r *LogAnalyticsWorkspace) logDataIngestion() *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if r.MonthlyLogDataIngestionGB != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyLogDataIngestionGB))
+	}
+
 	return &schema.CostComponent{
 		Name:            "Log data ingestion",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyLogDataIngestionGB)),
+		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),
