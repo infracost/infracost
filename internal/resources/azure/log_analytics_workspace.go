@@ -113,8 +113,8 @@ func (r *LogAnalyticsWorkspace) PopulateUsage(u *schema.UsageData) {
 //		1. Log data ingestion, which can be either:
 //			a) Pay-as-you-go, which is only valid for a sku of PerGB2018 and uses a usage param
 //			b) Billed per commitment tiers, which is only valid for a sku of CapacityReservation
-//		2. Log retention, which is free up to 31 days and then is billed per GB of data retained after the free limit.
-//		   Additional GB used comes from the usage param.
+//		2. Log retention, which is free up to 31 days. Data retained beyond these no-charge periods
+//		   will be charged for each GB of data retained for a month (pro-rated daily).
 //		3. Data export, which is billed per monthly GB exported and is defined from a usage param.
 //
 // Outside the above rules - if the workspace has sku of Free we return as a free resource & if the workspace sku
@@ -170,7 +170,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestionFromCapacityReservation() *schem
 	if _, ok := validCommitmentTiers[r.ReservationCapacityInGBPerDay]; !ok {
 		for i, tier := range commitmentTiers {
 			// if the current tier is the final valid commitment tier then
-			// set selected tier as this element as it can't be any other tier.
+			// set selectedTier as it can't be any other tier.
 			if len(commitmentTiers)-1 == i+1 {
 				selectedTier = tier
 				break
