@@ -24,6 +24,8 @@ type Project struct {
 	HCLOnly bool `yaml:"hcl_only,omitempty"`
 	// TFVarFiles is the number of var files that are needed to run an HCLOnly run
 	TFVarFiles []string `yaml:"tf_var_files"`
+	// TFVars is a slice of input vars that is used to run an HCLOnly run
+	TFVars []string `json:"tf_vars"`
 	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
 	TerraformPlanFlags string `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
 	// TerraformBinary is an optional field used to change the path to the terraform or terragrunt binary

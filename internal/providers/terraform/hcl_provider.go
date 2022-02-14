@@ -2,7 +2,9 @@ package terraform
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
+	"regexp"
 
 	"github.com/zclconf/go-cty/cty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
@@ -17,13 +19,63 @@ type HCLProvider struct {
 	Provider *PlanJSONProvider
 }
 
-func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider) (HCLProvider, error) {
-	option, err := hcl.TfVarsToOption(ctx.ProjectConfig.TFVarFiles...)
+type flagStringSlice []string
+
+func (v *flagStringSlice) String() string { return "" }
+func (v *flagStringSlice) Set(raw string) error {
+	*v = append(*v, raw)
+	return nil
+}
+
+type vars struct {
+	files []string
+	vars  []string
+}
+
+var spaceReg = regexp.MustCompile(`\s+`)
+
+func varsFromPlanFlags(planFlags string) (vars, error) {
+	f := flag.NewFlagSet("", flag.ContinueOnError)
+
+	var fs flagStringSlice
+	var vs flagStringSlice
+
+	f.Var(&vs, "var", "")
+	f.Var(&fs, "var-file", "")
+	err := f.Parse(spaceReg.Split(planFlags, -1))
 	if err != nil {
-		return HCLProvider{}, err
+		return vars{}, err
 	}
 
-	p := hcl.New(ctx.ProjectConfig.Path, option)
+	return vars{
+		files: fs,
+		vars:  vs,
+	}, nil
+}
+
+// NewHCLProvider returns a HCLProvider with a hcl.Parser initialised using the config.ProjectContext.
+// It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
+// set input vars and files on the underlying hcl.Parser.
+func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider) (HCLProvider, error) {
+	v, err := varsFromPlanFlags(ctx.ProjectConfig.TerraformPlanFlags)
+	if err != nil {
+		return HCLProvider{}, fmt.Errorf("could not parse vars from plan flags %w", err)
+	}
+
+	var options []hcl.Option
+	v.files = append(v.files, ctx.ProjectConfig.TFVarFiles...)
+	if len(v.files) > 0 {
+		withFiles := hcl.OptionWithTFVarsPaths(v.files)
+		options = append(options, withFiles)
+	}
+
+	v.vars = append(v.vars, ctx.ProjectConfig.TFVars...)
+	if len(v.vars) > 0 {
+		withVars := hcl.OptionWithInputVars(v.vars)
+		options = append(options, withVars)
+	}
+
+	p := hcl.New(ctx.ProjectConfig.Path, options...)
 
 	return HCLProvider{
 		Parser:   p,
@@ -31,19 +83,15 @@ func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider) (HCL
 	}, err
 }
 
-func (p HCLProvider) Type() string {
-	return "hcl_provider"
-}
+func (p HCLProvider) Type() string                                 { return "hcl_provider" }
+func (p HCLProvider) DisplayType() string                          { return "HCL Provider" }
+func (p HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {}
 
-func (p HCLProvider) DisplayType() string {
-	return "HCL Provider"
-}
-
-func (p HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-}
-
+// LoadResources calls a hcl.Parser to parse the directory config files into hcl.Blocks. It then builds a shallow
+// representation of the terraform plan JSON files from these Blocks, this is passed to the PlanJSONProvider.
+// The PlanJSONProvider uses this shallow representation to actually load Infracost resources.
 func (p HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
-	b, err := p.LoadPlanJSON()
+	b, err := p.loadPlanJSON()
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +99,7 @@ func (p HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schem
 	return p.Provider.LoadResourcesFromSrc(usage, b, nil)
 }
 
-func (p HCLProvider) LoadPlanJSON() ([]byte, error) {
+func (p HCLProvider) loadPlanJSON() ([]byte, error) {
 	modules, err := p.Parser.ParseDirectory()
 	if err != nil {
 		return nil, err
@@ -130,7 +178,6 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 					Mode:          "managed",
 					Type:          block.TypeLabel(),
 					Name:          block.NameLabel(),
-					ProviderName:  "registry.terraform.io/hashicorp/aws",
 					SchemaVersion: 1,
 				}
 
@@ -140,12 +187,7 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 					Mode:          "managed",
 					Type:          block.TypeLabel(),
 					Name:          block.NameLabel(),
-					ProviderName:  "registry.terraform.io/hashicorp/aws",
-					Change: struct {
-						Actions []string               `json:"actions"`
-						Before  interface{}            `json:"before"`
-						After   map[string]interface{} `json:"after"`
-					}{
+					Change: ResourceChange{
 						Actions: []string{"create"},
 					},
 				}
@@ -284,23 +326,23 @@ type ResourceJSON struct {
 	Mode          string                 `json:"mode"`
 	Type          string                 `json:"type"`
 	Name          string                 `json:"name"`
-	ProviderName  string                 `json:"provider_name"`
 	SchemaVersion int                    `json:"schema_version"`
 	Values        map[string]interface{} `json:"values"`
 }
 
 type ResourceChangesJSON struct {
-	Address       string `json:"address"`
-	ModuleAddress string `json:"module_address"`
-	Mode          string `json:"mode"`
-	Type          string `json:"type"`
-	Name          string `json:"name"`
-	ProviderName  string `json:"provider_name"`
-	Change        struct {
-		Actions []string               `json:"actions"`
-		Before  interface{}            `json:"before"`
-		After   map[string]interface{} `json:"after"`
-	} `json:"change"`
+	Address       string         `json:"address"`
+	ModuleAddress string         `json:"module_address"`
+	Mode          string         `json:"mode"`
+	Type          string         `json:"type"`
+	Name          string         `json:"name"`
+	Change        ResourceChange `json:"change"`
+}
+
+type ResourceChange struct {
+	Actions []string               `json:"actions"`
+	Before  interface{}            `json:"before"`
+	After   map[string]interface{} `json:"after"`
 }
 
 type PlanSchema struct {
