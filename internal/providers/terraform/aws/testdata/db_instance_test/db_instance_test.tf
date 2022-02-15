@@ -124,15 +124,15 @@ resource "aws_db_instance" "oracle-se1-byol" {
 }
 
 resource "aws_db_instance" "mysql-performance-insights" {
-  engine         = "mysql"
-  instance_class = "db.m5.large"
-  performance_insights_enabled = true
+  engine                                = "mysql"
+  instance_class                        = "db.m5.large"
+  performance_insights_enabled          = true
   performance_insights_retention_period = 731
 }
 
 resource "aws_db_instance" "mysql-performance-insights-usage" {
-  engine         = "mysql"
-  instance_class = "db.t3.large"
-  performance_insights_enabled = true
+  engine                                = "mysql"
+  instance_class                        = "db.t3.large"
+  performance_insights_enabled          = true
   performance_insights_retention_period = 731
 }
