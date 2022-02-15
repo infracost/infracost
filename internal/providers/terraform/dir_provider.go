@@ -354,7 +354,12 @@ func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
 	if p.IsTerragrunt {
 		args = append(args, "run-all", "--terragrunt-ignore-external-dependencies")
 	}
+
 	args = append(args, "init", "-input=false", "-no-color")
+
+	if config.IsTest() {
+		args = append(args, "-upgrade")
+	}
 
 	_, err := Cmd(opts, args...)
 	if err != nil {

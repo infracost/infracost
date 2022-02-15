@@ -205,7 +205,7 @@ resource_usage:
     # monthly_cpu_credit_hrs: 0 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
     # vcpu_count: 0 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
   # aws_s3_bucket.no_usage:
-    # object_tags: 0 # Total object tags.
+    # object_tags: 0 # Total object tags. Only for AWS provider V3.
     # standard:
       # storage_gb: 0.0 # Total storage in GB.
       # monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).

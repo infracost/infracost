@@ -12,37 +12,19 @@ provider "aws" {
 resource "aws_s3_bucket" "bucket1" {
   bucket = "bucket1"
 
-  lifecycle_rule {
-    enabled = true
-    tags = {
-      Key = "value"
-    }
-
-    transition {
-      storage_class = "INTELLIGENT_TIERING"
-    }
-    transition {
-      storage_class = "ONEZONE_IA"
-    }
-    transition {
-      storage_class = "STANDARD_IA"
-    }
-    transition {
-      storage_class = "GLACIER"
-    }
-    transition {
-      storage_class = "DEEP_ARCHIVE"
-    }
+  lifecycle {
+    ignore_changes = [
+      lifecycle_rule
+    ]
   }
 }
 
 resource "aws_s3_bucket" "bucket_withUsage" {
   bucket = "bucket_withUsage"
 
-  lifecycle_rule {
-    enabled = true
-    tags = {
-      Key = "value"
-    }
+  lifecycle {
+    ignore_changes = [
+      lifecycle_rule
+    ]
   }
 }

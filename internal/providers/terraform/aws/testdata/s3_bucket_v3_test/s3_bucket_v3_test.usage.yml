@@ -1,6 +1,7 @@
 version: 0.1
 resource_usage:
   aws_s3_bucket.bucket_withUsage:
+    object_tags: 1000
     standard:
       storage_gb:                      10000
       monthly_tier_1_requests:         10000

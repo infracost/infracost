@@ -2,14 +2,70 @@
  Name                                             Monthly Qty  Unit                    Monthly Cost 
                                                                                                     
  aws_s3_bucket.bucket1                                                                              
- └─ Standard                                                                                        
-    ├─ Storage                              Monthly cost depends on usage: $0.023 per GB            
-    ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.005 per 1k requests   
+ ├─ Object tagging                          Monthly cost depends on usage: $0.01 per 10k tags       
+ ├─ Standard                                                                                        
+ │  ├─ Storage                              Monthly cost depends on usage: $0.023 per GB            
+ │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.005 per 1k requests   
+ │  ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.0004 per 1k requests  
+ │  ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
+ │  └─ Select data returned                 Monthly cost depends on usage: $0.0007 per GB           
+ ├─ Intelligent tiering                                                                             
+ │  ├─ Storage (frequent access)            Monthly cost depends on usage: $0.023 per GB            
+ │  ├─ Storage (infrequent access)          Monthly cost depends on usage: $0.0125 per GB           
+ │  ├─ Storage (archive access)             Monthly cost depends on usage: $0.0036 per GB           
+ │  ├─ Storage (deep archive access)        Monthly cost depends on usage: $0.00099 per GB          
+ │  ├─ Monitoring and automation            Monthly cost depends on usage: $0.0025 per 1k objects   
+ │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.005 per 1k requests   
+ │  ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.0004 per 1k requests  
+ │  ├─ Lifecycle transition                 Monthly cost depends on usage: $0.01 per 1k requests    
+ │  ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
+ │  ├─ Select data returned                 Monthly cost depends on usage: $0.0007 per GB           
+ │  └─ Early delete (within 30 days)        Monthly cost depends on usage: $0.023 per GB            
+ ├─ Standard - infrequent access                                                                    
+ │  ├─ Storage                              Monthly cost depends on usage: $0.0125 per GB           
+ │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.01 per 1k requests    
+ │  ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.001 per 1k requests   
+ │  ├─ Lifecycle transition                 Monthly cost depends on usage: $0.01 per 1k requests    
+ │  ├─ Retrievals                           Monthly cost depends on usage: $0.01 per GB             
+ │  ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
+ │  └─ Select data returned                 Monthly cost depends on usage: $0.01 per GB             
+ ├─ One zone - infrequent access                                                                    
+ │  ├─ Storage                              Monthly cost depends on usage: $0.01 per GB             
+ │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.01 per 1k requests    
+ │  ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.001 per 1k requests   
+ │  ├─ Lifecycle transition                 Monthly cost depends on usage: $0.01 per 1k requests    
+ │  ├─ Retrievals                           Monthly cost depends on usage: $0.01 per GB             
+ │  ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
+ │  └─ Select data returned                 Monthly cost depends on usage: $0.01 per GB             
+ ├─ Glacier flexible retrieval                                                                      
+ │  ├─ Storage                              Monthly cost depends on usage: $0.0036 per GB           
+ │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.03 per 1k requests    
+ │  ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.0004 per 1k requests  
+ │  ├─ Lifecycle transition                 Monthly cost depends on usage: $0.03 per 1k requests    
+ │  ├─ Retrieval requests (standard)        Monthly cost depends on usage: $0.03 per 1k requests    
+ │  ├─ Retrievals (standard)                Monthly cost depends on usage: $0.01 per GB             
+ │  ├─ Select data scanned (standard)       Monthly cost depends on usage: $0.008 per GB            
+ │  ├─ Select data returned (standard)      Monthly cost depends on usage: $0.01 per GB             
+ │  ├─ Retrieval requests (expedited)       Monthly cost depends on usage: $10.00 per 1k requests   
+ │  ├─ Retrievals (expedited)               Monthly cost depends on usage: $0.03 per GB             
+ │  ├─ Select data scanned (expedited)      Monthly cost depends on usage: $0.02 per GB             
+ │  ├─ Select data returned (expedited)     Monthly cost depends on usage: $0.03 per GB             
+ │  ├─ Select data scanned (bulk)           Monthly cost depends on usage: $0.001 per GB            
+ │  ├─ Select data returned (bulk)          Monthly cost depends on usage: $0.0025 per GB           
+ │  └─ Early delete (within 90 days)        Monthly cost depends on usage: $0.0036 per GB           
+ └─ Glacier deep archive                                                                            
+    ├─ Storage                              Monthly cost depends on usage: $0.00099 per GB          
+    ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.05 per 1k requests    
     ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.0004 per 1k requests  
-    ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
-    └─ Select data returned                 Monthly cost depends on usage: $0.0007 per GB           
+    ├─ Lifecycle transition                 Monthly cost depends on usage: $0.05 per 1k requests    
+    ├─ Retrieval requests (standard)        Monthly cost depends on usage: $0.10 per 1k requests    
+    ├─ Retrievals (standard)                Monthly cost depends on usage: $0.02 per GB             
+    ├─ Retrieval requests (bulk)            Monthly cost depends on usage: $0.025 per 1k requests   
+    ├─ Retrievals (bulk)                    Monthly cost depends on usage: $0.0025 per GB           
+    └─ Early delete (within 180 days)       Monthly cost depends on usage: $0.00099 per GB          
                                                                                                     
  aws_s3_bucket.bucket_withUsage                                                                     
+ ├─ Object tagging                                        0.1  10k tags                       $0.00 
  ├─ Standard                                                                                        
  │  ├─ Storage                                         10,000  GB                           $230.00 
  │  ├─ PUT, COPY, POST, LIST requests                      10  1k requests                    $0.05 
