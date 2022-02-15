@@ -3,9 +3,10 @@ package azure
 import (
 	"fmt"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMApplicationInsightsRegistryItem() *schema.RegistryItem {
