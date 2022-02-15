@@ -28,7 +28,10 @@ type GoldenFileOptions = struct {
 	Currency    string
 	CaptureLogs bool
 	IsJSON      bool
-	RunHCL      bool
+	// RunHCL sets the cmd test to also run the cmd with --hcl-only set
+	RunHCL bool
+	// OnlyRunHCL sets the cmd test to only run cmd with --hcl-only set and ignore the Terraform binary.
+	OnlyRunHCL bool
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -40,7 +43,7 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
-	if testOptions != nil && testOptions.RunHCL {
+	if testOptions != nil && (testOptions.RunHCL || testOptions.OnlyRunHCL) {
 		t.Run("HCL", func(t *testing.T) {
 			hclArgs := make([]string, len(args)+2)
 			copy(hclArgs, args)
@@ -51,9 +54,11 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 		})
 	}
 
-	t.Run("Terraform CLI", func(t *testing.T) {
-		goldenFileCommandTest(t, testName, args, testOptions, ctxOptions)
-	})
+	if testOptions != nil && !testOptions.OnlyRunHCL {
+		t.Run("Terraform CLI", func(t *testing.T) {
+			goldenFileCommandTest(t, testName, args, testOptions, ctxOptions)
+		})
+	}
 }
 
 func goldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions []func(ctx *config.RunContext)) {

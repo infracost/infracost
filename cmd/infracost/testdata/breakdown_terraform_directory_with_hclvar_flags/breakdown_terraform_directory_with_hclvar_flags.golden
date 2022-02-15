@@ -1,0 +1,24 @@
+Project: infracost/infracost/examples/terraformwithvars
+
+ Name                                                   Monthly Qty  Unit   Monthly Cost 
+                                                                                         
+ aws_instance.web_app                                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.2xlarge)          730  hours       $280.32 
+ ├─ root_block_device                                                                    
+ │  └─ Storage (general purpose SSD, gp2)                        50  GB            $5.00 
+ ├─ ebs_block_device[0]                                                                  
+ │  ├─ Storage (provisioned IOPS SSD, io1)                    1,000  GB          $125.00 
+ │  └─ Provisioned IOPS                                       1,000  IOPS         $65.00 
+ └─ ebs_block_device[1]                                                                  
+    ├─ Storage (provisioned IOPS SSD, io1)                    2,000  GB          $250.00 
+    └─ Provisioned IOPS                                         500  IOPS         $32.50 
+                                                                                         
+ OVERALL TOTAL                                                                   $757.82 
+──────────────────────────────────
+1 cloud resource was detected, rerun with --show-skipped to see details:
+∙ 1 was estimated, 1 includes usage-based costs, see https://infracost.io/usage-file
+
+Add cost estimates to your pull requests: https://infracost.io/cicd
+
+Err:
+
