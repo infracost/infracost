@@ -30,7 +30,7 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 	}
 
 	os := "Linux"
-	if d.Get("os_profile_windows_config").Type != gjson.Null {
+	if !d.IsEmpty("os_profile_windows_config") {
 		os = "Windows"
 	}
 	if d.Get("storage_profile_os_disk.0.os_type").Type != gjson.Null {
