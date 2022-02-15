@@ -8,11 +8,18 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/hashicorp/go-getter"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/gocty"
+
+	"github.com/gruntwork-io/terragrunt/cli/tfsource"
+	tgcodegen "github.com/gruntwork-io/terragrunt/codegen"
+	tgconfig "github.com/gruntwork-io/terragrunt/config"
+	tgoptions "github.com/gruntwork-io/terragrunt/options"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl/modules"
@@ -81,6 +88,15 @@ func New(initialPath string, options ...Option) *Parser {
 //
 // ParseDirectory returns a list of Module that represent the Terraform Config tree.
 func (parser *Parser) ParseDirectory() ([]*Module, error) {
+	terragruntWorkingDir, terragruntVars, err := parser.handleTerragrunt()
+	if err != nil {
+		return nil, err
+	}
+
+	if terragruntWorkingDir != "" {
+		parser.initialPath = terragruntWorkingDir
+	}
+
 	log.Debugf("Beginning parse for directory '%s'...", parser.initialPath)
 
 	// load the initial root directory into a list of hcl files
@@ -105,6 +121,22 @@ func (parser *Parser) ParseDirectory() ([]*Module, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// TODO: check precendence. This should probably not overwrite anything loaded from the files/flags.
+	for k, v := range terragruntVars {
+		ty, err := gocty.ImpliedType(v)
+		if err != nil {
+			return nil, err
+		}
+
+		ctyVal, err := gocty.ToCtyValue(v, ty)
+		if err != nil {
+			return nil, err
+		}
+
+		inputVars[k] = ctyVal
+	}
+
 
 	// load the modules. This downloads any remote modules to the local file system
 	modulesManifest, err := parser.moduleLoader.Load()
@@ -138,6 +170,71 @@ func (parser *Parser) ParseDirectory() ([]*Module, error) {
 	}
 
 	return modules, nil
+}
+
+func (parser *Parser) handleTerragrunt() (string, map[string]interface{}, error) {
+	terragruntConfigPath := tgconfig.GetDefaultConfigPath(parser.initialPath)
+
+	terragruntWorkingDir := filepath.Join(parser.initialPath, ".infracost/terragrunt")
+	err := os.MkdirAll(terragruntWorkingDir, os.ModePerm)
+	if err != nil {
+		return "", nil, fmt.Errorf("Failed to create directories for terragrunt working directory: %w", err)
+	}
+
+	terragruntOptions := &tgoptions.TerragruntOptions{
+		TerragruntConfigPath: terragruntConfigPath,
+		Logger: log.WithField("library", "terragrunt"),
+		MaxFoldersToCheck: tgoptions.DEFAULT_MAX_FOLDERS_TO_CHECK,
+		WorkingDir: terragruntWorkingDir,
+		DownloadDir: terragruntWorkingDir,
+	}
+
+	terragruntConfig, err := tgconfig.ReadTerragruntConfig(terragruntOptions)
+	if err != nil {
+		return "", nil, err
+	}
+
+	err = os.MkdirAll(filepath.Dir(".infracost/terragrunt"), os.ModePerm)
+	if err != nil {
+		return "", nil, fmt.Errorf("Failed to create directories for manifest: %w", err)
+	}
+
+	sourceUrl, err := tgconfig.GetTerraformSourceUrl(terragruntOptions, terragruntConfig)
+	if err != nil {
+		return "", nil, err
+	}
+
+	workingDir := parser.initialPath
+
+	if sourceUrl != "" {
+		// TODO: Terragrunt has a bit more logic when downloading the source, so we should check this:
+		// https://github.com/gruntwork-io/terragrunt/blob/f6b5661906b71dfe2f261a029ae3809f233d06a7/cli/cli_app.go#L446
+		// We probably want to cache/cleanup the downloaded files, etc
+		terraformSource, err := tfsource.NewTerraformSource(sourceUrl, terragruntOptions.DownloadDir, terragruntOptions.WorkingDir, terragruntOptions.Logger)
+		if err != nil {
+			return "", nil, err
+		}
+
+		workingDir = terraformSource.WorkingDir
+
+		err = getter.GetAny(terraformSource.DownloadDir, terraformSource.CanonicalSourceURL.String())
+		if err != nil {
+			return "", nil, err
+		}
+	}
+
+	for _, config := range terragruntConfig.GenerateConfigs {
+		if err := tgcodegen.WriteToFile(terragruntOptions, terragruntOptions.WorkingDir, config); err != nil {
+			return "", nil, err
+		}
+	}
+	if terragruntConfig.RemoteState != nil && terragruntConfig.RemoteState.Generate != nil {
+		if err := terragruntConfig.RemoteState.GenerateTerraformCode(terragruntOptions); err != nil {
+			return "", nil, err
+		}
+	}
+
+	return workingDir, terragruntConfig.Inputs, nil
 }
 
 func (parser *Parser) parseDirectoryFiles(files []*hcl.File) (Blocks, error) {
