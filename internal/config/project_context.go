@@ -6,9 +6,11 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 )
 
 type ProjectContexter interface {
@@ -19,6 +21,7 @@ type ProjectContext struct {
 	RunContext    *RunContext
 	ProjectConfig *Project
 	contextVals   map[string]interface{}
+	mu            *sync.Mutex
 
 	UsingCache bool
 	CacheErr   string
@@ -29,6 +32,7 @@ func NewProjectContext(runCtx *RunContext, projectCfg *Project) *ProjectContext 
 		RunContext:    runCtx,
 		ProjectConfig: projectCfg,
 		contextVals:   map[string]interface{}{},
+		mu:            &sync.Mutex{},
 	}
 }
 
@@ -41,6 +45,8 @@ func EmptyProjectContext() *ProjectContext {
 }
 
 func (c *ProjectContext) SetContextValue(key string, value interface{}) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.contextVals[key] = value
 }
 
