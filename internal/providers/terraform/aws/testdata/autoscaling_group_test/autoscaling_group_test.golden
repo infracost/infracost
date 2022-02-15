@@ -152,28 +152,21 @@
  └─ aws_launch_template.lt_mixed_instance_dynamic                                                  
     └─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23 
                                                                                                    
- module.asg-lc.aws_autoscaling_group.this[0]                                                       
- └─ module.asg-lc.aws_launch_configuration.this[0]                                                 
-    ├─ Instance usage (Linux/UNIX, on-demand, t3.micro)              730  hours              $7.59 
-    ├─ EC2 detailed monitoring                                         7  metrics            $2.10 
-    └─ root_block_device                                                                           
-       └─ Storage (general purpose SSD, gp2)                           8  GB                 $0.80 
-                                                                                                   
  module.asg-lt.aws_autoscaling_group.this[0]                                                       
  └─ module.asg-lt.aws_launch_template.this[0]                                                      
     ├─ Instance usage (Linux/UNIX, on-demand, t3.micro)              730  hours              $7.59 
     └─ block_device_mapping[0]                                                                     
        └─ Storage (general purpose SSD, gp2)                          10  GB                 $1.00 
                                                                                                    
- OVERALL TOTAL                                                                           $3,419.53 
+ OVERALL TOTAL                                                                           $3,409.04 
 ──────────────────────────────────
-50 cloud resources were detected:
-∙ 26 were estimated, 26 include usage-based costs, see https://infracost.io/usage-file
+48 cloud resources were detected:
+∙ 25 were estimated, 25 include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 weren't estimated, report them in https://github.com/infracost/infracost:
   ∙ 2 x aws_autoscaling_group
-∙ 22 were free:
+∙ 21 were free:
   ∙ 12 x aws_launch_template
-  ∙ 10 x aws_launch_configuration
+  ∙ 9 x aws_launch_configuration
 
 Add cost estimates to your pull requests: https://infracost.io/cicd
 Logs:
