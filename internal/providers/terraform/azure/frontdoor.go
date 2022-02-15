@@ -3,9 +3,10 @@ package azure
 import (
 	"strings"
 
+	"github.com/tidwall/gjson"
+
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 // getAzureRMFrontdoorRegistryItem returns a registry item for the resource
@@ -32,7 +33,10 @@ func newFrontdoor(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 	rulesCounter := 0
 	rules := d.Get("routing_rule").Array()
 	for _, rule := range rules {
-		if rule.Get("enabled").Type == gjson.True {
+		enabled := rule.Get("enabled").Type
+		// if enabled is null this means the user has specified it and this resource is coming
+		// from a hcl parsing. The default option is true, so increment the rulesCounter.
+		if enabled == gjson.True || enabled == gjson.Null {
 			rulesCounter++
 		}
 	}
