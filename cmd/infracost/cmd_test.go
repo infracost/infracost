@@ -54,7 +54,7 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 		})
 	}
 
-	if testOptions != nil && !testOptions.OnlyRunHCL {
+	if testOptions == nil || !testOptions.OnlyRunHCL {
 		t.Run("Terraform CLI", func(t *testing.T) {
 			goldenFileCommandTest(t, testName, args, testOptions, ctxOptions)
 		})
