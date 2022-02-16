@@ -86,11 +86,13 @@ jobs:
           tags: ${{ steps.meta-ci.outputs.tags }}
           push: true
 
-      - name: Update Homebrew formula
-        uses: dawidd6/action-homebrew-bump-formula@v3
-        with:
-          token: ${{secrets.HOMEBREW_RELEASE_TOKEN}}
-          formula: infracost
+  update-homebrew-formula:
+    name: Update Homebrew formula
+    needs: build
+    uses: dawidd6/action-homebrew-bump-formula@v3
+    with:
+      token: ${{secrets.HOMEBREW_RELEASE_TOKEN}}
+      formula: infracost
 
   update-download-redirects:
     name: Upload Download Redirects
