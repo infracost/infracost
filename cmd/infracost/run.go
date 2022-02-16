@@ -261,7 +261,14 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 }
 
 func formatHCLProjects(wg *sync.WaitGroup, hclProjects []*schema.Project, hclR *output.Root) {
-	defer wg.Done()
+	defer func() {
+		err := recover()
+		if err != nil {
+			log.Debugf("runtime error from formating hcl projects %s", err)
+		}
+
+		wg.Done()
+	}()
 
 	rr, err := output.ToOutputFormat(hclProjects)
 	if err != nil {
