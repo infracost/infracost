@@ -88,11 +88,11 @@ var ComputeExternalVPNGatewayNetworkEgressUsageSchema = []*schema.UsageItem{
 }
 
 type egressRegionData struct {
-	gRegion             string
+	gRegion             string // gRegion is the name used in pricing pages that is more human friendly.
 	apiDescription      string
 	apiDescriptionRegex string
 	usageKey            string
-	fixedRegion         string
+	fixedRegion         string // fixedRegion is the region used in pricing API.
 }
 
 type egressRegionUsageFilterData struct {
