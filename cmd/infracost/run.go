@@ -440,7 +440,6 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 }
 
 func runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *usage.UsageFile, runCtx *config.RunContext, out *projectOutput) {
-	t1 := time.Now()
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -449,6 +448,11 @@ func runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *u
 
 		wg.Done()
 	}()
+	if runCtx.Config.DisableHCL {
+		return
+	}
+
+	t1 := time.Now()
 
 	hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx))
 	if err != nil {

@@ -16,6 +16,7 @@ type Configuration struct {
 	Version               string `yaml:"version"`
 	Currency              string `yaml:"currency,omitempty"`
 	EnableDashboard       *bool  `yaml:"enable_dashboard,omitempty"`
+	DisableHCL            *bool  `yaml:"disable_hcl,omitempty"`
 	TLSInsecureSkipVerify *bool  `yaml:"tls_insecure_skip_verify,omitempty"`
 	TLSCACertFile         string `yaml:"tls_ca_cert_file,omitempty"`
 }
@@ -43,6 +44,10 @@ func loadConfiguration(cfg *Config) error {
 
 	if cfg.Configuration.EnableDashboard != nil {
 		cfg.EnableDashboard = *cfg.Configuration.EnableDashboard
+	}
+
+	if cfg.Configuration.DisableHCL != nil {
+		cfg.DisableHCL = *cfg.Configuration.DisableHCL
 	}
 
 	if cfg.Configuration.TLSInsecureSkipVerify != nil {
