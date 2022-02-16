@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
+	"github.com/shopspring/decimal"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/pkg/errors"
@@ -743,25 +744,33 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
 
 	if hclR != nil {
-		var hclTotal string
-		if hclR.TotalMonthlyCost != nil {
-			hclTotal = hclR.TotalMonthlyCost.StringFixed(2)
-		}
-
-		var tfTotal string
-		if r.TotalMonthlyCost != nil {
-			tfTotal = r.TotalMonthlyCost.StringFixed(2)
-		}
-
-		env["hclTotalMonthly"] = hclTotal
-		env["tfTotalMonthly"] = tfTotal
-
-		if hclTotal != tfTotal {
-			env["totalMismatch"] = true
-		}
+		AddHCLEnvVars(r, *hclR, env)
 	}
 
 	return env
+}
+
+// AddHCLEnvVars adds HCL reporting metrics to the Infracost run so that we can assess the accuracy of
+// the HCL approach.
+func AddHCLEnvVars(r output.Root, hclR output.Root, env map[string]interface{}) {
+	var initialTotal decimal.Decimal
+	if r.TotalMonthlyCost != nil {
+		initialTotal = *r.TotalMonthlyCost
+	}
+
+	var hclTotal decimal.Decimal
+	if hclR.TotalMonthlyCost != nil {
+		hclTotal = *hclR.TotalMonthlyCost
+	}
+
+	percentChange := "0.00"
+	if !initialTotal.IsZero() {
+		percentChange = hclTotal.Sub(initialTotal).Abs().Div(initialTotal).Mul(decimal.NewFromInt(100)).StringFixed(2)
+	}
+
+	env["hclTotalMonthly"] = hclTotal.StringFixed(2)
+	env["tfTotalMonthly"] = initialTotal.StringFixed(2)
+	env["hclPercentChange"] = percentChange
 }
 
 func unwrapped(err error) error {
