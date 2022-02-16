@@ -6,31 +6,34 @@ import (
 	"github.com/infracost/infracost/internal/usage"
 )
 
-type ComputeExternalVpnGateway struct {
+type ComputeExternalVPNGateway struct {
 	Address string
 	Region  string
 
-	MonthlyEgressDataTransferGB *NetworkEgressUsage `infracost_usage:"monthly_egress_data_transfer_gb"`
+	MonthlyEgressDataTransferGB *ComputeExternalVPNGatewayNetworkEgressUsage `infracost_usage:"monthly_egress_data_transfer_gb"`
 }
 
-var ComputeExternalVpnGatewayUsageSchema = []*schema.UsageItem{
+var ComputeExternalVPNGatewayUsageSchema = []*schema.UsageItem{
 	{
 		Key:          "monthly_egress_data_transfer_gb",
 		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_egress_data_transfer_gb", Items: NetworkEgressUsageSchema},
+		DefaultValue: &usage.ResourceUsage{Name: "monthly_egress_data_transfer_gb", Items: ComputeExternalVPNGatewayNetworkEgressUsageSchema},
 	},
 }
 
-func (r *ComputeExternalVpnGateway) PopulateUsage(u *schema.UsageData) {
+func (r *ComputeExternalVPNGateway) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *ComputeExternalVpnGateway) BuildResource() *schema.Resource {
+func (r *ComputeExternalVPNGateway) BuildResource() *schema.Resource {
 	region := r.Region
+	r.MonthlyEgressDataTransferGB.Region = region
+	r.MonthlyEgressDataTransferGB.Address = "Network egress"
+	r.MonthlyEgressDataTransferGB.PrefixName = "IPSec traffic"
 	return &schema.Resource{
 		Name: r.Address,
 		SubResources: []*schema.Resource{
-			r.MonthlyEgressDataTransferGB.networkEgress(region, "Network egress", "IPSec traffic", ComputeExternalVPNGateway),
-		}, UsageSchema: ComputeExternalVpnGatewayUsageSchema,
+			r.MonthlyEgressDataTransferGB.BuildResource(),
+		}, UsageSchema: ComputeExternalVPNGatewayUsageSchema,
 	}
 }
