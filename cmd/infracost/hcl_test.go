@@ -12,3 +12,9 @@ func TestHCLMultiProjectInfra(t *testing.T) {
 		[]string{"breakdown", "--config-file", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName(), "infracost.config.yml")},
 		&GoldenFileOptions{RunHCL: true})
 }
+
+func TestHCLMultiWorkspace(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"breakdown", "--config-file", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName(), "infracost.config.yml")},
+		&GoldenFileOptions{RunHCL: true})
+}
