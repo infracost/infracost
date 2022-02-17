@@ -650,6 +650,12 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		if err != nil {
 			return err
 		}
+
+		if hclOnly, _ := cmd.Flags().GetBool("hcl-only"); hclOnly {
+			for _, p := range cfg.Projects {
+				p.HCLOnly = true
+			}
+		}
 	}
 
 	cfg.NoCache, _ = cmd.Flags().GetBool("no-cache")
