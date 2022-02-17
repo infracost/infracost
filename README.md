@@ -59,17 +59,7 @@ Screenshots of example outputs are [shown below](#cli-commands).
 
 ### 4. Add to CI/CD
 
-Use our CI/CD integrations to add cost estimates to pull requests. This provides your team with a safety net as people can understand cloud costs upfront, and discuss them as part of your workflow.
-- [GitHub Actions](https://www.infracost.io/docs/integrations/github_actions/)
-- [GitLab CI](https://www.infracost.io/docs/integrations/gitlab_ci/)
-- [Atlantis](https://www.infracost.io/docs/integrations/atlantis/)
-- [Azure DevOps](https://www.infracost.io/docs/integrations/cicd/#azure-devops)
-- [Terraform Cloud/Enterprise](https://www.infracost.io/docs/integrations/terraform_cloud_enterprise/)
-- [Jenkins](https://www.infracost.io/docs/integrations/cicd/#jenkins)
-- [Bitbucket Pipelines](https://www.infracost.io/docs/integrations/cicd/#bitbucket-pipelines)
-- [CircleCI](https://www.infracost.io/docs/integrations/cicd/#circleci)
-
-Other CI/CD systems can be supported using [our Docker images](https://www.infracost.io/docs/integrations/cicd/#docker-images). You can also setup [cost policies](https://www.infracost.io/docs/features/cost_policies/).
+[Use our CI/CD integrations](https://www.infracost.io/docs/integrations/cicd/) to add cost estimates to pull requests, it only takes 15 minutes. This provides your team with a safety net as people can understand cloud costs upfront, and discuss them as part of your workflow.
 
 If you run into any issues, please join our [community Slack channel](https://www.infracost.io/community-chat), we'll help you very quickly 😄
 
