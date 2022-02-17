@@ -136,7 +136,9 @@ func TestBreakdownInvalidPath(t *testing.T) {
 }
 
 func TestBreakdownPlanError(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../..//examples/terraform", "--terraform-plan-flags", "-var-file=invalid"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../..//examples/terraform", "--terraform-plan-flags", "-var-file=invalid"}, nil, func(ctx *config.RunContext) {
+		ctx.Config.DisableHCL = true
+	})
 }
 
 func TestBreakdownTerragrunt(t *testing.T) {

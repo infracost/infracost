@@ -62,6 +62,7 @@ type Config struct {
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
+	DisableHCL                bool   `yaml:"disable_hcl,omitempty" envconfig:"INFRACOST_DISABLE_HCL"`
 
 	TLSInsecureSkipVerify *bool  `envconfig:"INFRACOST_TLS_INSECURE_SKIP_VERIFY"`
 	TLSCACertFile         string `envconfig:"INFRACOST_TLS_CA_CERT_FILE"`
