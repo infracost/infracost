@@ -155,7 +155,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
-				err = saveOutFile(cmd, outFile, b)
+				err = saveOutFile(ctx, cmd, outFile, b)
 				if err != nil {
 					return err
 				}

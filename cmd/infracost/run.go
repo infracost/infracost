@@ -225,17 +225,16 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		log.Errorf("Error reporting event: %s", err)
 	}
 
-	// Print a new line to separate the logs from the output
-	if runCtx.Config.IsLogging() {
-		cmd.PrintErrln()
-	}
-
 	if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
-		err = saveOutFile(cmd, outFile, b)
+		err = saveOutFile(runCtx, cmd, outFile, b)
 		if err != nil {
 			return err
 		}
 	} else {
+		// Print a new line to separate the logs from the output
+		if runCtx.Config.IsLogging() {
+			cmd.PrintErrln()
+		}
 		cmd.Println(string(b))
 	}
 

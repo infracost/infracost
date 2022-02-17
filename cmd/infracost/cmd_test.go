@@ -17,7 +17,6 @@ import (
 
 var (
 	timestampRegex   = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)
-	outputPathRegex  = regexp.MustCompile(`Output saved to .*`)
 	urlRegex         = regexp.MustCompile(`https://dashboard.infracost.io/share/.*`)
 	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/examples/.*\)`)
 	versionRegex     = regexp.MustCompile(`Infracost v.*`)
@@ -106,7 +105,6 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 // including timestamps and temp file paths
 func stripDynamicValues(actual []byte) []byte {
 	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
-	actual = outputPathRegex.ReplaceAll(actual, []byte("Output saved to REPLACED_OUTPUT_PATH"))
 	actual = urlRegex.ReplaceAll(actual, []byte("https://dashboard.infracost.io/share/REPLACED_SHARE_CODE"))
 	actual = projectPathRegex.ReplaceAll(actual, []byte("$1 REPLACED_PROJECT_PATH"))
 	actual = versionRegex.ReplaceAll(actual, []byte("Infracost vREPLACED_VERSION"))
