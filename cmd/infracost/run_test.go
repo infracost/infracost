@@ -75,9 +75,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 				env:  map[string]interface{}{},
 			},
 			want: map[string]interface{}{
-				"hclTotalMonthly":  "0.00",
-				"tfTotalMonthly":   "1.99",
-				"hclPercentChange": "100.00",
+				"hclPercentChange":    "-100.00",
+				"absHclPercentChange": "100.00",
 			},
 		},
 		{
@@ -88,9 +87,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 				env:  map[string]interface{}{},
 			},
 			want: map[string]interface{}{
-				"hclTotalMonthly":  "0.00",
-				"tfTotalMonthly":   "0.00",
-				"hclPercentChange": "0.00",
+				"hclPercentChange":    "0.00",
+				"absHclPercentChange": "0.00",
 			},
 		},
 		{
@@ -105,9 +103,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 				env: map[string]interface{}{},
 			},
 			want: map[string]interface{}{
-				"hclTotalMonthly":  "8.00",
-				"tfTotalMonthly":   "10.00",
-				"hclPercentChange": "20.00",
+				"hclPercentChange":    "-20.00",
+				"absHclPercentChange": "20.00",
 			},
 		},
 		{
@@ -122,9 +119,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 				env: map[string]interface{}{},
 			},
 			want: map[string]interface{}{
-				"hclTotalMonthly":  "7.00",
-				"tfTotalMonthly":   "11.00",
-				"hclPercentChange": "36.36",
+				"hclPercentChange":    "-36.36",
+				"absHclPercentChange": "36.36",
 			},
 		},
 	}

@@ -770,14 +770,23 @@ func AddHCLEnvVars(r output.Root, hclR output.Root, env map[string]interface{}) 
 		hclTotal = *hclR.TotalMonthlyCost
 	}
 
-	percentChange := "0.00"
-	if !initialTotal.IsZero() {
-		percentChange = hclTotal.Sub(initialTotal).Abs().Div(initialTotal).Mul(decimal.NewFromInt(100)).StringFixed(2)
+	env["hclPercentChange"] = "0.00"
+	env["absHclPercentChange"] = "0.00"
+	change := percentChange(hclTotal, initialTotal)
+	abs := change.Abs()
+
+	if abs.GreaterThan(decimal.NewFromInt(0)) {
+		env["hclPercentChange"] = change.StringFixed(2)
+		env["absHclPercentChange"] = abs.StringFixed(2)
+	}
+}
+
+func percentChange(newTotal decimal.Decimal, initialTotal decimal.Decimal) decimal.Decimal {
+	if initialTotal.IsZero() {
+		return decimal.NewFromInt(0)
 	}
 
-	env["hclTotalMonthly"] = hclTotal.StringFixed(2)
-	env["tfTotalMonthly"] = initialTotal.StringFixed(2)
-	env["hclPercentChange"] = percentChange
+	return newTotal.Sub(initialTotal).Div(initialTotal).Mul(decimal.NewFromInt(100))
 }
 
 func unwrapped(err error) error {
