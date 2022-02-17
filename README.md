@@ -55,8 +55,6 @@ infracost breakdown --path .
 infracost diff --path . --sync-usage-file --usage-file infracost-usage.yml
 ```
 
-Screenshots of example outputs are [shown below](#cli-commands).
-
 ### 4. Add to CI/CD
 
 [Use our CI/CD integrations](https://www.infracost.io/docs/integrations/cicd/) to add cost estimates to pull requests, it only takes 15 minutes. This provides your team with a safety net as people can understand cloud costs upfront, and discuss them as part of your workflow.
