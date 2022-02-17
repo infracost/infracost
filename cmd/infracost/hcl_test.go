@@ -21,7 +21,7 @@ func TestHCLMultiWorkspace(t *testing.T) {
 
 func TestHCLMultiVarFiles(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
-		[]string{ "breakdown",
+		[]string{"breakdown",
 			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 			"--var-file", "var1.tfvars",
 			"--var-file", "var2.tfvars",
