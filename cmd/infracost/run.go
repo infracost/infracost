@@ -188,7 +188,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	if len(hclProjects) > 0 {
 		wg.Add(1)
 		hclR = new(output.Root)
-		go formatHCLProjects(wg, hclProjects, hclR)
+		go formatHCLProjects(wg, runCtx, hclProjects, hclR)
 	}
 
 	r, err := output.ToOutputFormat(projects)
@@ -261,14 +261,17 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	return nil
 }
 
-func formatHCLProjects(wg *sync.WaitGroup, hclProjects []*schema.Project, hclR *output.Root) {
+func formatHCLProjects(wg *sync.WaitGroup, ctx *config.RunContext, hclProjects []*schema.Project, hclR *output.Root) {
 	defer func() {
 		err := recover()
-		if err != nil {
-			log.Debugf("runtime error from formating hcl projects %s", err)
-		}
-
 		wg.Done()
+
+		if err != nil {
+			err = apiclient.ReportCLIError(ctx, fmt.Errorf("hcl-runtime-error: formating hcl projects %s\n%s", err, debug.Stack()))
+			if err != nil {
+				log.Debugf("error reporting unexpected hcl runtime error: %s", err)
+			}
+		}
 	}()
 
 	rr, err := output.ToOutputFormat(hclProjects)
@@ -450,11 +453,15 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 func runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *usage.UsageFile, runCtx *config.RunContext, out *projectOutput) {
 	defer func() {
 		err := recover()
+		wg.Done()
+
 		if err != nil {
 			log.Debugf("recovered from hcl provider panic %s", err)
+			err = apiclient.ReportCLIError(runCtx, fmt.Errorf("hcl-runtime-error: loading resources %s\n%s", err, debug.Stack()))
+			if err != nil {
+				log.Debugf("error reporting unexpected hcl runtime error: %s", err)
+			}
 		}
-
-		wg.Done()
 	}()
 	if runCtx.Config.DisableHCL {
 		return
