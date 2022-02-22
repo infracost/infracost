@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/manifoldco/promptui"
@@ -143,88 +144,73 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 }
 
 func promptForName() (string, error) {
-	p := promptui.Prompt{
-		Label: "Name",
-		Validate: func(input string) error {
-			input = strings.TrimSpace(input)
-			if input == "" {
-				return errors.New("Please enter a name")
-			}
-			return nil
-		},
-	}
-	name, err := p.Run()
-	name = strings.TrimSpace(name)
+	name, err := stringPrompt("Name", func(input string) error {
+		input = strings.TrimSpace(input)
+		if input == "" {
+			return errors.New("Please enter a name")
+		}
+		return nil
+	})
 
 	return name, err
 }
 
 func promptForCIDocs(isRegenerate bool) (bool, error) {
-	label := "Would you like to see our CI/CD integration docs?"
+	label := "Would you like to see our CI/CD integration docs"
 	if isRegenerate {
-		label = "Do you plan to use this API key in CI?"
-	}
-	p := promptui.Prompt{
-		Label:     label,
-		IsConfirm: true,
+		label = "Do you plan to use this API key in CI"
 	}
 
-	_, err := p.Run()
-	if err != nil {
-		if errors.Is(err, promptui.ErrAbort) {
-			return false, nil
-		}
-		return false, err
-	}
-
-	return true, nil
+	return yesNoPrompt(label)
 }
 
 func promptForEmail() (string, error) {
-	p := promptui.Prompt{
-		Label: "Email",
-		Validate: func(input string) error {
-			input = strings.TrimSpace(input)
-			if input == "" {
-				return errors.New("Please enter an email")
-			}
-			match, err := regexp.MatchString(".+@.+", input)
-			if err != nil {
-				return errors.New("Unable to validate email")
-			}
-			if !match {
-				return errors.New("Please enter a valid email")
-			}
-			return nil
-		},
-	}
-	email, err := p.Run()
-	email = strings.TrimSpace(email)
+	email, err := stringPrompt("Email", func(input string) error {
+		if input == "" {
+			return errors.New("Please enter an email")
+		}
+		match, err := regexp.MatchString(".+@.+", input)
+		if err != nil {
+			return errors.New("Unable to validate email")
+		}
+		if !match {
+			return errors.New("Please enter a valid email")
+		}
+		return nil
+	})
 
 	return email, err
 }
 
 func promptOverwriteAPIKey() (bool, error) {
-	p := promptui.Prompt{
-		Label:     "Would you like to overwrite your existing saved API key",
-		IsConfirm: true,
-	}
-
-	_, err := p.Run()
-	if err != nil {
-		if errors.Is(err, promptui.ErrAbort) {
-			return false, nil
-		}
-
-		return false, err
-	}
-
-	return true, nil
+	return yesNoPrompt("Would you like to overwrite your existing saved API key")
 }
 
 func promptGenerateNewKey() (bool, error) {
+	return yesNoPrompt("Would you like to generate a new API key")
+}
+
+func stringPrompt(label string, validate ui.ValidateFn) (string, error) {
+	if runtime.GOOS == "windows" {
+		return ui.StringPrompt(label, validate), nil
+	}
+
 	p := promptui.Prompt{
-		Label:     "Would you like to generate a new API key",
+		Label:    label,
+		Validate: promptui.ValidateFunc(validate),
+	}
+	name, err := p.Run()
+	name = strings.TrimSpace(name)
+	return name, err
+}
+
+func yesNoPrompt(label string) (bool, error) {
+	if runtime.GOOS == "windows" {
+		return ui.YesNoPrompt(label + "?"), nil
+	}
+
+	p := promptui.Prompt{
+		Label:     label,
 		IsConfirm: true,
 	}
 
