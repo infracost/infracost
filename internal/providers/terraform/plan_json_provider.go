@@ -30,7 +30,9 @@ func (p *PlanJSONProvider) DisplayType() string {
 }
 
 func (p *PlanJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	// no op
+	// TerraformWorkspace isn't used to load resources but we still pass it
+	// on so it appears in the project name of the output
+	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
 }
 
 func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
