@@ -459,7 +459,7 @@ func runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *u
 			}
 		}
 	}()
-	if runCtx.Config.DisableHCL {
+	if runCtx.Config.DisableHCLParsing {
 		return
 	}
 

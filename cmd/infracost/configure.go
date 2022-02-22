@@ -112,7 +112,7 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 					return errors.New("Invalid value, must be true or false")
 				}
 
-				ctx.Config.Configuration.DisableHCL = &b
+				ctx.Config.Configuration.DisableHCLParsing = &b
 				saveConfiguration = true
 			case "enable_dashboard":
 				b, err := strconv.ParseBool(value)
