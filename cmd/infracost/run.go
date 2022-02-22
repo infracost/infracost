@@ -62,10 +62,6 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().Bool("sync-usage-file", false, "Sync usage-file with missing resources, needs usage-file too (experimental)")
 
-	cmd.Flags().Bool("hcl-only", false, "Run infracost without terraform, parsing hcl files at the given path. This option does not need credentials and is much quicker to run. (experimental)")
-	cmd.Flags().StringSlice("var-file", nil, "Can only be used with --hcl-only. Load variable values from the given file, in addition\nto the default files terraform.tfvars and *.auto.tfvars. Use this option more than once to\ninclude more than one variables file. (experimental)")
-	cmd.Flags().StringSlice("var", nil, "Can only be used with --hcl-only. Set a value for one of the input variables in the root module\nof the terraform configuration. Use this option more than once to set more than one variable. (experimental)")
-
 	_ = cmd.MarkFlagFilename("path", "json", "tf")
 	_ = cmd.MarkFlagFilename("config-file", "yml")
 	_ = cmd.MarkFlagFilename("usage-file", "yml")
@@ -631,9 +627,9 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasProjectFlags {
 		projectCfg.Path, _ = cmd.Flags().GetString("path")
-		projectCfg.HCLOnly, _ = cmd.Flags().GetBool("hcl-only")
-		projectCfg.TFVarFiles, _ = cmd.Flags().GetStringSlice("var-file")
-		projectCfg.TFVars, _ = cmd.Flags().GetStringSlice("var")
+		projectCfg.TerraformParseHCL, _ = cmd.Flags().GetBool("terraform-parse-hcl")
+		projectCfg.TerraformVarFiles, _ = cmd.Flags().GetStringSlice("terraform-var-file")
+		projectCfg.TerraformVars, _ = cmd.Flags().GetStringSlice("terraform-var")
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")

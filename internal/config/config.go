@@ -20,12 +20,12 @@ type Project struct {
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
 	Path string `yaml:"path,omitempty" ignored:"true"`
-	// HCLOnly will run a project by parsing hcl files the given Path rather than using a plan.json or terraform binary.
-	HCLOnly bool `yaml:"hcl_only,omitempty"`
-	// TFVarFiles is the number of var files that are needed to run an HCLOnly run
-	TFVarFiles []string `yaml:"tf_var_files"`
-	// TFVars is a slice of input vars that is used to run an HCLOnly run
-	TFVars []string `json:"tf_vars"`
+	// TerraformParseHCL will run a project by parsing hcl files the given Path rather than using a plan.json or terraform binary.
+	TerraformParseHCL bool `yaml:"hcl_only,omitempty"`
+	// TerraformVarFiles is the number of var files that are needed to run an TerraformParseHCL run
+	TerraformVarFiles []string `yaml:"terraform_var_files"`
+	// TerraformVars is a slice of input vars that is used to run an TerraformParseHCL run
+	TerraformVars []string `json:"terraform_vars"`
 	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
 	TerraformPlanFlags string `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
 	// TerraformBinary is an optional field used to change the path to the terraform or terragrunt binary
