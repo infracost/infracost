@@ -25,7 +25,7 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 		return nil, fmt.Errorf("No such file or directory %s", path)
 	}
 
-	if ctx.ProjectConfig.HCLOnly {
+	if ctx.ProjectConfig.TerraformParseHCL {
 		return terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx))
 	}
 

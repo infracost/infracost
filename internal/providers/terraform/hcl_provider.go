@@ -63,13 +63,13 @@ func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider) (HCL
 	}
 
 	var options []hcl.Option
-	v.files = append(v.files, ctx.ProjectConfig.TFVarFiles...)
+	v.files = append(v.files, ctx.ProjectConfig.TerraformVarFiles...)
 	if len(v.files) > 0 {
 		withFiles := hcl.OptionWithTFVarsPaths(v.files)
 		options = append(options, withFiles)
 	}
 
-	v.vars = append(v.vars, ctx.ProjectConfig.TFVars...)
+	v.vars = append(v.vars, ctx.ProjectConfig.TerraformVars...)
 	if len(v.vars) > 0 {
 		withVars := hcl.OptionWithInputVars(v.vars)
 		options = append(options, withVars)
@@ -83,8 +83,8 @@ func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider) (HCL
 	}, err
 }
 
-func (p HCLProvider) Type() string                                 { return "hcl_provider" }
-func (p HCLProvider) DisplayType() string                          { return "HCL Provider" }
+func (p HCLProvider) Type() string                                 { return "terraform_hcl" }
+func (p HCLProvider) DisplayType() string                          { return "Terraform directory (HCL)" }
 func (p HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {}
 
 // LoadResources calls a hcl.Parser to parse the directory config files into hcl.Blocks. It then builds a shallow
