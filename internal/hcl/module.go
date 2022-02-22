@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/hcl/v2"
-	log "github.com/sirupsen/logrus"
 )
 
 // ModuleCall represents a call to a defined Module by a parent Module.
