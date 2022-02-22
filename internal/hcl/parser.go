@@ -12,12 +12,15 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl/modules"
 )
+
+// This sets a global logger for this package, which is a bit of a hack. In the future we should use a context for this.
+var log = logrus.StandardLogger().WithField("parser", "terraform_hcl")
 
 type Option func(p *Parser)
 
