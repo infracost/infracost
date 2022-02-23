@@ -86,7 +86,7 @@ func computeCostComponent(region, machineType string, purchaseOption string, ins
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Compute Instance"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "machineType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", machineType))},
+				{Key: "machineType", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", machineType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
