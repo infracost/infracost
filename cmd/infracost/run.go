@@ -647,9 +647,9 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 			return err
 		}
 
-		if hclOnly, _ := cmd.Flags().GetBool("hcl-only"); hclOnly {
+		if parseHCL, _ := cmd.Flags().GetBool("terraform-parse-hcl"); parseHCL {
 			for _, p := range cfg.Projects {
-				p.HCLOnly = true
+				p.TerraformParseHCL = true
 			}
 		}
 	}
