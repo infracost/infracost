@@ -48,7 +48,7 @@ func TestBreakdownTerraformDirectoryWithVars(t *testing.T) {
 }
 
 func TestBreakdownTerraformDirectoryWithHCLVarFlags(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraformwithvars", "--var-file", "input.tfvars", "--var", "block2_ebs_volume_size=2000", "--var", "block2_volume_type=io1"}, &GoldenFileOptions{OnlyRunHCL: true})
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraformwithvars", "--terraform-var-file", "input.tfvars", "--terraform-var", "block2_ebs_volume_size=2000", "--terraform-var", "block2_volume_type=io1"}, &GoldenFileOptions{OnlyRunHCL: true})
 }
 
 func TestBreakdownTerraformDirectoryWithModules(t *testing.T) {

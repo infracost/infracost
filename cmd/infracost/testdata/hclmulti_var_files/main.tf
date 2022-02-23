@@ -1,17 +1,17 @@
 variable "instance_type" {
-  type        = string
+  type = string
 }
 
 variable "root_vol_size" {
-  type        = number
+  type = number
 }
 
 variable "ebs_vol_size" {
-  type        = number
+  type = number
 }
 
 variable "iops" {
-  type        = number
+  type = number
 }
 
 provider "aws" {

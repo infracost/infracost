@@ -23,8 +23,8 @@ func TestHCLMultiVarFiles(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{"breakdown",
 			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
-			"--var-file", "var1.tfvars",
-			"--var-file", "var2.tfvars",
+			"--terraform-var-file", "var1.tfvars",
+			"--terraform-var-file", "var2.tfvars",
 			"--terraform-plan-flags=-var-file=./var1.tfvars -var-file=./var2.tfvars",
 		},
 		&GoldenFileOptions{RunHCL: true})
