@@ -420,6 +420,16 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 
 		idMap[id] = append(idMap[id], d)
 
+		// check for any "custom" ids specified by the resource and add them.
+		if f := registryMap.GetCustomRefIDFunc(d.Type); f != nil {
+			for _, customID := range f(d) {
+				if _, ok := idMap[customID]; !ok {
+					idMap[customID] = []*schema.ResourceData{}
+				}
+				idMap[customID] = append(idMap[customID], d)
+			}
+		}
+
 		arnAttr, ok := arnAttributeMap[d.Type]
 		if !ok {
 			arnAttr = "arn"

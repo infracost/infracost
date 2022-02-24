@@ -130,3 +130,30 @@ resource "aws_appautoscaling_target" "autoscale_dynamodb_table_read_target_usage
   scalable_dimension = "dynamodb:table:ReadCapacityUnits"
   service_namespace  = "dynamodb"
 }
+
+resource "aws_dynamodb_table" "autoscale_dynamodb_table_literal_ref" {
+  name           = "LiteralTableRef"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 30
+  write_capacity = 20
+  hash_key       = "UserId"
+  range_key      = "GameTitle"
+
+  attribute {
+    name = "UserId"
+    type = "S"
+  }
+
+  attribute {
+    name = "GameTitle"
+    type = "S"
+  }
+}
+
+resource "aws_appautoscaling_target" "autoscale_dynamodb_table_literal_ref" {
+  max_capacity       = 72
+  min_capacity       = 56
+  resource_id        = "table/LiteralTableRef"
+  scalable_dimension = "dynamodb:table:ReadCapacityUnits"
+  service_namespace  = "dynamodb"
+}
