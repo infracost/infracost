@@ -60,3 +60,73 @@ resource "aws_dynamodb_table" "my_dynamodb_table" {
     region_name = "us-west-1"
   }
 }
+
+resource "aws_dynamodb_table" "autoscale_dynamodb_table" {
+  name           = "GameScores"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 30
+  write_capacity = 20
+  hash_key       = "UserId"
+  range_key      = "GameTitle"
+
+  attribute {
+    name = "UserId"
+    type = "S"
+  }
+
+  attribute {
+    name = "GameTitle"
+    type = "S"
+  }
+}
+
+resource "aws_appautoscaling_target" "autoscale_dynamodb_table_write_target" {
+  max_capacity       = 99
+  min_capacity       = 6
+  resource_id        = "table/${aws_dynamodb_table.autoscale_dynamodb_table.name}"
+  scalable_dimension = "dynamodb:table:WriteCapacityUnits"
+  service_namespace  = "dynamodb"
+}
+
+resource "aws_appautoscaling_target" "autoscale_dynamodb_table_read_target" {
+  max_capacity       = 100
+  min_capacity       = 5
+  resource_id        = "table/${aws_dynamodb_table.autoscale_dynamodb_table.name}"
+  scalable_dimension = "dynamodb:table:ReadCapacityUnits"
+  service_namespace  = "dynamodb"
+}
+
+resource "aws_dynamodb_table" "autoscale_dynamodb_table_usage" {
+  name           = "GameScores"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 30
+  write_capacity = 20
+  hash_key       = "UserId"
+  range_key      = "GameTitle"
+
+  attribute {
+    name = "UserId"
+    type = "S"
+  }
+
+  attribute {
+    name = "GameTitle"
+    type = "S"
+  }
+}
+
+resource "aws_appautoscaling_target" "autoscale_dynamodb_table_write_target_usage" {
+  max_capacity       = 98
+  min_capacity       = 7
+  resource_id        = "table/${aws_dynamodb_table.autoscale_dynamodb_table_usage.name}"
+  scalable_dimension = "dynamodb:table:WriteCapacityUnits"
+  service_namespace  = "dynamodb"
+}
+
+resource "aws_appautoscaling_target" "autoscale_dynamodb_table_read_target_usage" {
+  max_capacity       = 97
+  min_capacity       = 8
+  resource_id        = "table/${aws_dynamodb_table.autoscale_dynamodb_table_usage.name}"
+  scalable_dimension = "dynamodb:table:ReadCapacityUnits"
+  service_namespace  = "dynamodb"
+}

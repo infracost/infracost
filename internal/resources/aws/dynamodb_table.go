@@ -22,6 +22,8 @@ type DynamoDBTable struct {
 	WriteCapacity *int64
 	ReadCapacity  *int64
 
+	AppAutoscalingTarget []*AppAutoscalingTarget
+
 	// "usage" args
 	MonthlyWriteRequestUnits       *int64 `infracost_usage:"monthly_write_request_units"`
 	MonthlyReadRequestUnits        *int64 `infracost_usage:"monthly_read_request_units"`
@@ -52,10 +54,32 @@ func (a *DynamoDBTable) BuildResource() *schema.Resource {
 	subResources := make([]*schema.Resource, 0)
 
 	if a.BillingMode == "PROVISIONED" {
+		var wcuAutoscaling, rcuAutoscaling bool
+		wcu := a.WriteCapacity
+		rcu := a.ReadCapacity
+
+		for _, target := range a.AppAutoscalingTarget {
+			switch target.ScalableDimension {
+			case "dynamodb:table:WriteCapacityUnits":
+				wcuAutoscaling = true
+				if target.Capacity != nil {
+					wcu = target.Capacity
+				} else {
+					wcu = &target.MinCapacity
+				}
+			case "dynamodb:table:ReadCapacityUnits":
+				rcuAutoscaling = true
+				if target.Capacity != nil {
+					rcu = target.Capacity
+				} else {
+					rcu = &target.MinCapacity
+				}
+			}
+		}
 		// Write capacity units (WCU)
-		costComponents = append(costComponents, a.wcuCostComponent(a.Region, a.WriteCapacity))
+		costComponents = append(costComponents, a.wcuCostComponent(a.Region, wcu, wcuAutoscaling))
 		// Read capacity units (RCU)
-		costComponents = append(costComponents, a.rcuCostComponent(a.Region, a.ReadCapacity))
+		costComponents = append(costComponents, a.rcuCostComponent(a.Region, rcu, rcuAutoscaling))
 	}
 
 	// Infracost usage data
@@ -113,13 +137,18 @@ func (a *DynamoDBTable) BuildResource() *schema.Resource {
 	}
 }
 
-func (a *DynamoDBTable) wcuCostComponent(region string, provisionedWCU *int64) *schema.CostComponent {
+func (a *DynamoDBTable) wcuCostComponent(region string, provisionedWCU *int64, autoscaling bool) *schema.CostComponent {
+	name := "Write capacity unit (WCU)"
+	if autoscaling {
+		name = "Write capacity unit (WCU, autoscaling)"
+	}
+
 	var quantity *decimal.Decimal
 	if provisionedWCU != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*provisionedWCU))
 	}
 	return &schema.CostComponent{
-		Name:           "Write capacity unit (WCU)",
+		Name:           name,
 		Unit:           "WCU",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: quantity,
@@ -139,13 +168,18 @@ func (a *DynamoDBTable) wcuCostComponent(region string, provisionedWCU *int64) *
 	}
 }
 
-func (a *DynamoDBTable) rcuCostComponent(region string, provisionedRCU *int64) *schema.CostComponent {
+func (a *DynamoDBTable) rcuCostComponent(region string, provisionedRCU *int64, autoscaling bool) *schema.CostComponent {
+	name := "Read capacity unit (RCU)"
+	if autoscaling {
+		name = "Read capacity unit (RCU, autoscaling)"
+	}
+
 	var quantity *decimal.Decimal
 	if provisionedRCU != nil {
 		quantity = decimalPtr(decimal.NewFromInt(*provisionedRCU))
 	}
 	return &schema.CostComponent{
-		Name:           "Read capacity unit (RCU)",
+		Name:           name,
 		Unit:           "RCU",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: quantity,

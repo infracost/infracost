@@ -12,7 +12,8 @@ func getDynamoDBTableRegistryItem() *schema.RegistryItem {
 		Notes: []string{
 			"DAX is not yet supported.",
 		},
-		RFunc: NewDynamoDBTableResource,
+		ReferenceAttributes: []string{"aws_appautoscaling_target.resource_id"},
+		RFunc:               NewDynamoDBTableResource,
 	}
 }
 
@@ -24,14 +25,20 @@ func NewDynamoDBTableResource(d *schema.ResourceData, u *schema.UsageData) *sche
 		}
 	}
 
+	targets := []*aws.AppAutoscalingTarget{}
+	for _, ref := range d.References("aws_appautoscaling_target.resource_id") {
+		targets = append(targets, newAppAutoscalingTarget(ref, ref.UsageData))
+	}
+
 	a := &aws.DynamoDBTable{
-		Address:        d.Address,
-		Region:         d.Get("region").String(),
-		Name:           d.Get("name").String(),
-		BillingMode:    d.Get("billing_mode").String(),
-		WriteCapacity:  intPtr(d.Get("write_capacity").Int()),
-		ReadCapacity:   intPtr(d.Get("read_capacity").Int()),
-		ReplicaRegions: replicaRegions,
+		Address:              d.Address,
+		Region:               d.Get("region").String(),
+		Name:                 d.Get("name").String(),
+		BillingMode:          d.Get("billing_mode").String(),
+		WriteCapacity:        intPtr(d.Get("write_capacity").Int()),
+		ReadCapacity:         intPtr(d.Get("read_capacity").Int()),
+		ReplicaRegions:       replicaRegions,
+		AppAutoscalingTarget: targets,
 	}
 	a.PopulateUsage(u)
 
