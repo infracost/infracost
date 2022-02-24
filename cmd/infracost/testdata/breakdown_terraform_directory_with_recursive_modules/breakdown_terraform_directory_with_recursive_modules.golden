@@ -1,4 +1,4 @@
-Project: infracost/infracost/examples/terraformwithmodules
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_directory_with_recursive_modules
 
  Name                                                                           Monthly Qty  Unit                        Monthly Cost 
                                                                                                                                       
