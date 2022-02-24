@@ -16,6 +16,7 @@ type ResourceData struct {
 	RawValues     gjson.Result
 	referencesMap map[string][]*ResourceData
 	CFResource    cloudformation.Resource
+	UsageData     *UsageData
 }
 
 func NewResourceData(resourceType string, providerName string, address string, tags map[string]string, rawValues gjson.Result) *ResourceData {
@@ -57,11 +58,22 @@ func (d *ResourceData) References(key string) []*ResourceData {
 	return d.referencesMap[key]
 }
 
-func (d *ResourceData) AddReference(key string, reference *ResourceData) {
+func (d *ResourceData) AddReference(key string, reference *ResourceData, reverseRefAttrs []string) {
 	if _, ok := d.referencesMap[key]; !ok {
 		d.referencesMap[key] = make([]*ResourceData, 0)
 	}
 	d.referencesMap[key] = append(d.referencesMap[key], reference)
+
+	// add any back references
+	backRefKey := d.Type + "." + key
+	for _, attr := range reverseRefAttrs {
+		if attr == backRefKey {
+			if _, ok := reference.referencesMap[backRefKey]; !ok {
+				reference.referencesMap[backRefKey] = make([]*ResourceData, 0)
+			}
+			reference.referencesMap[backRefKey] = append(reference.referencesMap[backRefKey], d)
+		}
+	}
 }
 
 func (d *ResourceData) Set(key string, value interface{}) {

@@ -48,6 +48,15 @@ func GetResourceRegistryMap() *ResourceRegistryMap {
 	return &resourceRegistryMap
 }
 
+func (r *ResourceRegistryMap) GetReferenceAttributes(resourceDataType string) []string {
+	var refAttrs []string
+	item, ok := (*r)[resourceDataType]
+	if ok {
+		refAttrs = item.ReferenceAttributes
+	}
+	return refAttrs
+}
+
 func GetUsageOnlyResources() []string {
 	r := []string{}
 	r = append(r, aws.UsageOnlyResources...)
