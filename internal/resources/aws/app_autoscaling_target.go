@@ -31,6 +31,5 @@ func (r *AppAutoscalingTarget) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:        r.Address,
 		UsageSchema: AppAutoscalingTargetUsageSchema,
-		NoPrice:     true,
 	}
 }
