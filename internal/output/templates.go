@@ -362,7 +362,7 @@ var CommentMarkdownTemplate = `
 {{- define "totalRow"}}
 | **{{ truncateMiddle .Name 64 "..." }}** | **{{ formatCost .PastCost }}** | **{{ formatCost .Cost }}** | **{{ formatCostChange .PastCost .Cost }}** |
 {{- end }}
-## 💰 Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }}**
+## Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }}**
 
 | **Project** | **Previous** | **New** | **Diff** |
 | ----------- | -----------: | ------: | -------- |
