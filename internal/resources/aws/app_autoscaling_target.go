@@ -28,10 +28,9 @@ func (r *AppAutoscalingTarget) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *AppAutoscalingTarget) BuildResource() *schema.Resource {
-
 	return &schema.Resource{
-		Name:           r.Address,
-		CostComponents: []*schema.CostComponent{},
-		UsageSchema:    AppAutoscalingTargetUsageSchema,
+		Name:        r.Address,
+		UsageSchema: AppAutoscalingTargetUsageSchema,
+		NoPrice:     true,
 	}
 }

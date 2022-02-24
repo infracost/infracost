@@ -64,14 +64,14 @@ func (d *ResourceData) AddReference(key string, reference *ResourceData, reverse
 	}
 	d.referencesMap[key] = append(d.referencesMap[key], reference)
 
-	// add any back references
-	backRefKey := d.Type + "." + key
+	// add any reverse references
+	reverseRefKey := d.Type + "." + key
 	for _, attr := range reverseRefAttrs {
-		if attr == backRefKey {
-			if _, ok := reference.referencesMap[backRefKey]; !ok {
-				reference.referencesMap[backRefKey] = make([]*ResourceData, 0)
+		if attr == reverseRefKey {
+			if _, ok := reference.referencesMap[reverseRefKey]; !ok {
+				reference.referencesMap[reverseRefKey] = make([]*ResourceData, 0)
 			}
-			reference.referencesMap[backRefKey] = append(reference.referencesMap[backRefKey], d)
+			reference.referencesMap[reverseRefKey] = append(reference.referencesMap[reverseRefKey], d)
 		}
 	}
 }

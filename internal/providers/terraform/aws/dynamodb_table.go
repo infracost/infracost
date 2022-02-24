@@ -12,6 +12,8 @@ func getDynamoDBTableRegistryItem() *schema.RegistryItem {
 		Notes: []string{
 			"DAX is not yet supported.",
 		},
+		// this is a reverse reference, it depends on the aws_appautoscaling_target RegistryItem
+		// defining "resource_id" as a ReferenceAttribute
 		ReferenceAttributes: []string{"aws_appautoscaling_target.resource_id"},
 		RFunc:               NewDynamoDBTableResource,
 		CustomRefIDFunc:     customRefIDs,
