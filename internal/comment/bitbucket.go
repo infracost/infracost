@@ -168,7 +168,11 @@ func NewBitbucketPRHandler(ctx context.Context, repo string, targetRef string, e
 // CallFindMatchingComments calls the Bitbucket API to find the pull request
 // comments that match the given tag, which has been embedded in the comment.
 func (h *bitbucketPRHandler) CallFindMatchingComments(ctx context.Context, tag string) ([]Comment, error) {
-	url := fmt.Sprintf("%spullrequests/%d/comments", h.apiURL, h.prNumber)
+	if strings.Contains(h.apiURL, "api/1.0") {
+		url := fmt.Sprintf("%spull-requests/%d/comments", h.apiURL, h.prNumber)
+	} else {
+		url := fmt.Sprintf("%spullrequests/%d/comments", h.apiURL, h.prNumber)
+	}
 
 	matchingComments := []Comment{}
 
@@ -236,7 +240,11 @@ func (h *bitbucketPRHandler) CallCreateComment(ctx context.Context, body string)
 		return nil, errors.Wrap(err, "Error marshaling comment body")
 	}
 
-	url := fmt.Sprintf("%spullrequests/%d/comments", h.apiURL, h.prNumber)
+	if strings.Contains(h.apiURL, "api/1.0") {
+		url := fmt.Sprintf("%spull-requests/%d/comments", h.apiURL, h.prNumber)
+	} else {
+		url := fmt.Sprintf("%spullrequests/%d/comments", h.apiURL, h.prNumber)
+	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqData))
 	if err != nil {
