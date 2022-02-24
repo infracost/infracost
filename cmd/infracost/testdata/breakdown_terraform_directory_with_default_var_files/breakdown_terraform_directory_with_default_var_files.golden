@@ -1,4 +1,4 @@
-Project: infracost/infracost/examples/terraformwithvars
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_directory_with_default_var_files
 
  Name                                                   Monthly Qty  Unit   Monthly Cost 
                                                                                          

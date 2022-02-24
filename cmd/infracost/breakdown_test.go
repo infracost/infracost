@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"io/ioutil"
+	"path"
 	"path/filepath"
 	"testing"
 
@@ -43,16 +44,41 @@ func TestBreakdownTerraformDirectory(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform"}, &GoldenFileOptions{RunHCL: true})
 }
 
-func TestBreakdownTerraformDirectoryWithVars(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraformwithvars", "--terraform-plan-flags", "-var-file=input.tfvars -var=block2_ebs_volume_size=2000 -var block2_volume_type=io1"}, &GoldenFileOptions{RunHCL: true})
+func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	t.Run("with terraform plan flags", func(t *testing.T) {
+		GoldenFileCommandTest(
+			t,
+			testName,
+			[]string{
+				"breakdown",
+				"--path", dir,
+				"--terraform-plan-flags", "-var-file=input.tfvars -var=block2_ebs_volume_size=2000 -var block2_volume_type=io1",
+			},
+			&GoldenFileOptions{RunHCL: true},
+		)
+	})
+
+	t.Run("with hcl var flags", func(t *testing.T) {
+		GoldenFileCommandTest(
+			t,
+			testName,
+			[]string{
+				"breakdown",
+				"--path", dir,
+				"--terraform-var-file", "input.tfvars",
+				"--terraform-var", "block2_ebs_volume_size=2000",
+				"--terraform-var", "block2_volume_type=io1",
+			},
+			&GoldenFileOptions{OnlyRunHCL: true},
+		)
+	})
 }
 
-func TestBreakdownTerraformDirectoryWithHCLVarFlags(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraformwithvars", "--terraform-var-file", "input.tfvars", "--terraform-var", "block2_ebs_volume_size=2000", "--terraform-var", "block2_volume_type=io1"}, &GoldenFileOptions{OnlyRunHCL: true})
-}
-
-func TestBreakdownTerraformDirectoryWithModules(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraformwithmodules"}, &GoldenFileOptions{RunHCL: true})
+func TestBreakdownTerraformDirectoryWithRecursiveModules(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", dir}, &GoldenFileOptions{RunHCL: true})
 }
 
 func TestBreakdownTerraformFieldsAll(t *testing.T) {
