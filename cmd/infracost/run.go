@@ -781,6 +781,14 @@ func AddHCLEnvVars(r output.Root, hclR output.Root, env map[string]interface{}) 
 		env["hclPercentChange"] = change.StringFixed(2)
 		env["absHclPercentChange"] = abs.StringFixed(2)
 	}
+
+	for _, k := range os.Environ() {
+		if strings.HasPrefix(k, "TF_VAR") {
+			env["tfVarPresent"] = true
+			break
+		}
+	}
+
 }
 
 func percentChange(newTotal decimal.Decimal, initialTotal decimal.Decimal) decimal.Decimal {
