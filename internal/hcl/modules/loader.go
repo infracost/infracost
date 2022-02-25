@@ -13,11 +13,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// downloadDir is name of the directory where remote modules are download
-var downloadDir = ".infracost/terraform_modules"
-
-// manifestPath is the name of the module manifest file which stores the metadata of the modules
-var manifestPath = ".infracost/terraform_modules/manifest.json"
+var (
+	// downloadDir is name of the directory where remote modules are download
+	downloadDir = ".infracost/terraform_modules"
+	// manifestPath is the name of the module manifest file which stores the metadata of the modules
+	manifestPath = ".infracost/terraform_modules/manifest.json"
+	// tfManifestPath is the name of the terraform module manifest file which stores the metadata of the modules
+	tfManifestPath = ".terraform/modules/modules.json"
+)
 
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.
 //
@@ -54,15 +57,30 @@ func (m *ModuleLoader) manifestFilePath() string {
 	return filepath.Join(m.Path, manifestPath)
 }
 
+// tfManifestFilePath is the path to the terraform module manifest file relative to the current working directory.
+func (m *ModuleLoader) tfManifestFilePath() string {
+	return filepath.Join(m.Path, tfManifestPath)
+}
+
 // Load loads the modules from the given path.
 // For each module it checks if the module has already been downloaded, by checking if iut exists in the manifest
 // If not then it downloads the module from the registry or from a remote source and updates the module manifest with the latest metadata.
 func (m *ModuleLoader) Load() (*Manifest, error) {
-	var manifest *Manifest
+	manifest := &Manifest{}
 
 	_, err := os.Stat(m.manifestFilePath())
 	if errors.Is(err, os.ErrNotExist) {
 		log.Debugf("No existing module manifest file found")
+
+		_, err = os.Stat(m.tfManifestFilePath())
+		if err == nil {
+			manifest, err = readManifest(m.tfManifestFilePath())
+			if err == nil {
+				return manifest, nil
+			}
+
+			log.Debugf("Error reading terraform module manifest: %s", err)
+		}
 	} else if err != nil {
 		log.Debugf("Error checking for existing module manifest: %s", err)
 	} else {
@@ -70,10 +88,6 @@ func (m *ModuleLoader) Load() (*Manifest, error) {
 		if err != nil {
 			log.Debugf("Error reading module manifest: %s", err)
 		}
-	}
-
-	if manifest == nil {
-		manifest = &Manifest{}
 	}
 
 	m.cache.loadFromManifest(manifest)
