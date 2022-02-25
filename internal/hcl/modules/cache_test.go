@@ -20,6 +20,17 @@ func TestLookupModule(t *testing.T) {
 			Source: "git::https://github.com/namespace/module-b.git?v=0.5.0",
 			Dir:    ".infracost/module-b",
 		},
+		"submodule-a": {
+			Key:     "submodule-a",
+			Source:  "registry.terraform.io/namespace/module-a/aws//submodule/path",
+			Version: "1.0.0",
+			Dir:     ".infracost/module-a/submodule/path",
+		},
+		"submodule-b": {
+			Key:    "submodule-a",
+			Source: "git::https://github.com/namespace/module-b.git//submodule/path?v=0.5.0",
+			Dir:    ".infracost/module-b/submodule/path",
+		},
 	}
 	cache := &Cache{
 		keyMap: keyMap,
@@ -38,6 +49,12 @@ func TestLookupModule(t *testing.T) {
 		{"module-b", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-b.git?v=0.5.0"}, keyMap["module-b"], ""},
 		{"module-b", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-b.git?v=0.6.0"}, nil, "source has changed"},
 		{"module-c", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-c.git?v=0.6.0"}, nil, "not in cache"},
+		{"submodule-a", &tfconfig.ModuleCall{Source: "registry.terraform.io/namespace/module-a/aws//submodule/path", Version: ">=1.0"}, keyMap["submodule-a"], ""},
+		{"submodule-a", &tfconfig.ModuleCall{Source: "namespace/module-a/aws//submodule/path", Version: ">=1.0"}, keyMap["submodule-a"], ""},
+		{"submodule-a", &tfconfig.ModuleCall{Source: "registry.terraform.io/namespace/module-a/aws//submodule/path", Version: ">=2.0"}, nil, "version constraint doesn't match"},
+		{"submodule-a", &tfconfig.ModuleCall{Source: "registry.terraform.io/different-namespace/module-a-/aws//submodule/path", Version: "1.0.0"}, nil, "source has changed"},
+		{"submodule-b", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-b.git//submodule/path?v=0.5.0"}, keyMap["submodule-b"], ""},
+		{"submodule-b", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-b.git//submodule/path?v=0.6.0"}, nil, "source has changed"},
 	}
 
 	for _, test := range tests {
