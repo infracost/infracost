@@ -16,17 +16,15 @@ func getDynamoDBTableRegistryItem() *schema.RegistryItem {
 		// defining "resource_id" as a ReferenceAttribute
 		ReferenceAttributes: []string{"aws_appautoscaling_target.resource_id"},
 		RFunc:               NewDynamoDBTableResource,
-		CustomRefIDFunc:     customRefIDs,
+		CustomRefIDFunc: func(d *schema.ResourceData) []string {
+			// returns a table name that will match the custom format used by aws_appautoscaling_target.resource_id
+			name := d.Get("name").String()
+			if name != "" {
+				return []string{"table/" + name}
+			}
+			return nil
+		},
 	}
-}
-
-// customRefIDs returns a table name that will match the custom format used by aws_appautoscaling_target.resource_id
-func customRefIDs(d *schema.ResourceData) []string {
-	name := d.Get("name").String()
-	if name != "" {
-		return []string{"table/" + name}
-	}
-	return nil
 }
 
 func NewDynamoDBTableResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
