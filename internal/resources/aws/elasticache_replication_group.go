@@ -13,8 +13,6 @@ type ElastiCacheReplicationGroup struct {
 	NodeType                    string
 	Engine                      string
 	CacheClusters               int64
-	ClusterDisabled             bool
-	ClusterMode                 string
 	ClusterNodeGroups           int64
 	ClusterReplicasPerNodeGroup int64
 	SnapshotRetentionLimit      int64
@@ -36,8 +34,8 @@ func (r *ElastiCacheReplicationGroup) BuildResource() *schema.Resource {
 	}
 
 	cacheNodes := r.CacheClusters
-
-	if r.ClusterMode != "" && !r.ClusterDisabled {
+	if r.ClusterNodeGroups > 0 {
+		// CacheClusters is mutually exclusive with ClusterNodeGroups/ClusterReplicasPerNodeGroup
 		cacheNodes = (r.ClusterNodeGroups * r.ClusterReplicasPerNodeGroup) + r.ClusterNodeGroups
 	}
 

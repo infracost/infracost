@@ -17,10 +17,8 @@ resource "aws_elasticache_replication_group" "cluster" {
 
   engine = "redis"
 
-  cluster_mode {
-    num_node_groups         = 4
-    replicas_per_node_group = 3
-  }
+  num_node_groups         = 4
+  replicas_per_node_group = 3
 }
 
 resource "aws_elasticache_replication_group" "non-cluster" {
@@ -40,6 +38,30 @@ resource "aws_elasticache_replication_group" "non-cluster-snapshot" {
 
   engine = "redis"
 
-  node_type             = "cache.m6g.12xlarge"
+  node_type          = "cache.m6g.12xlarge"
+  num_cache_clusters = 3
+}
+
+resource "aws_elasticache_replication_group" "cluster-deprecated-attribs" {
+  replication_group_description = "This Replication Group"
+  replication_group_id          = "tf-rep-group-4"
+  automatic_failover_enabled    = true
+  node_type                     = "cache.m4.large"
+
+  engine = "redis"
+
+  cluster_mode {
+    num_node_groups         = 4
+    replicas_per_node_group = 3
+  }
+}
+
+resource "aws_elasticache_replication_group" "non-cluster-deprecated-attribs" {
+  replication_group_description = "This Replication Group"
+  replication_group_id          = "tf-rep-group-5"
+
+  engine = "redis"
+
+  node_type             = "cache.r5.4xlarge"
   number_cache_clusters = 3
 }
