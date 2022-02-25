@@ -32,6 +32,8 @@ type Attribute struct {
 	// Ctx is the context that the Attribute should be evaluated against. This propagates
 	// any references from variables into the attribute.
 	Ctx *Context
+	// Verbose defines if the attribute should log verbose diagnostics messages to debug.
+	Verbose bool
 }
 
 // IsIterable returns if the attribute can be ranged over.
@@ -56,7 +58,9 @@ func (attr *Attribute) Value() (ctyVal cty.Value) {
 	var diag hcl.Diagnostics
 	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
 	if diag.HasErrors() {
-		log.Debugf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
+		if attr.Verbose {
+			log.Debugf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
+		}
 	}
 
 	if !ctyVal.IsKnown() {

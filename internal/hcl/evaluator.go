@@ -154,7 +154,7 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 // evaluateStep gets the values for all the Block types in the current Module that affect Context.
 // It then sets these values on the Context so that they can be used in Block Attribute evaluation.
 func (e *Evaluator) evaluateStep(i int) {
-	log.Debugf("Starting iteration %d of context evaluation...", i+1)
+	log.Debugf("Starting context evaluation for module %s iteration %d", e.modulePath, i+1)
 
 	e.ctx.Set(e.getValuesByBlockType("variable"), "var")
 	e.ctx.Set(e.getValuesByBlockType("locals"), "local")

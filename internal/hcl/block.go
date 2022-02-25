@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/google/uuid"
@@ -106,6 +107,8 @@ type Block struct {
 	// childBlocks holds information about any child Blocks that the Block may have. This can be empty.
 	// See Block docs for more information about child Blocks.
 	childBlocks Blocks
+	// verbose determines whether the block uses verbose debug logging.
+	verbose bool
 }
 
 // NewHCLBlock returns a Block with Context and child Blocks initialised.
@@ -114,6 +117,7 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 		ctx = NewContext(&hcl.EvalContext{}, nil)
 	}
 
+	isLoggingVerbose := strings.TrimSpace(os.Getenv("INFRACOST_HCL_DEBUG_VERBOSE")) == "true"
 	var children Blocks
 	if body, ok := hclBlock.Body.(*hclsyntax.Body); ok {
 		for _, b := range body.Blocks {
@@ -137,6 +141,7 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
 			childBlocks: children,
+			verbose:     isLoggingVerbose,
 		}
 	}
 
@@ -151,6 +156,7 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
 			childBlocks: children,
+			verbose:     isLoggingVerbose,
 		}
 	}
 
@@ -163,6 +169,7 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 		hclBlock:    hclBlock,
 		moduleBlock: moduleBlock,
 		childBlocks: children,
+		verbose:     isLoggingVerbose,
 	}
 }
 
@@ -384,7 +391,7 @@ func (b *Block) GetAttributes() []*Attribute {
 	}
 
 	for _, attr := range b.getHCLAttributes() {
-		results = append(results, &Attribute{HCLAttr: attr, Ctx: b.context})
+		results = append(results, &Attribute{HCLAttr: attr, Ctx: b.context, Verbose: b.verbose})
 	}
 
 	return results
