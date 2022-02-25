@@ -183,16 +183,12 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		return nil, err
 	}
 
-	moduleAddr, submodulePath := getter.SourceDirSubdir(moduleCall.Source)
-	if strings.HasPrefix(submodulePath, "../") {
-		return nil, fmt.Errorf("Invalid submodule path '%s'", submodulePath)
+	moduleAddr, submodulePath, err := splitModuleSubDir(moduleCall.Source)
+	if err != nil {
+		return nil, err
 	}
 
-	if submodulePath != "" {
-		moduleDownloadDir = filepath.Join(moduleDownloadDir, submodulePath)
-	}
-
-	manifestModule.Dir = path.Clean(moduleDownloadDir)
+	manifestModule.Dir = path.Clean(filepath.Join(moduleDownloadDir, submodulePath))
 
 	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, moduleCall.Version)
 	if err == nil {
@@ -204,10 +200,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 		// The moduleCall.Source might not have the registry hostname if it is using the default registry
 		// so we set the source here to the lookup result's source which always includes the registry hostname.
-		manifestModule.Source = lookupResult.Source
-		if submodulePath != "" {
-			manifestModule.Source = fmt.Sprintf("%s//%s", manifestModule.Source, submodulePath)
-		}
+		manifestModule.Source = joinModuleSubDir(lookupResult.Source, submodulePath)
 
 		manifestModule.Version = lookupResult.Version
 		return manifestModule, nil
@@ -230,4 +223,21 @@ func (m *ModuleLoader) isLocalModule(moduleCall *tfconfig.ModuleCall) bool {
 		strings.HasPrefix(moduleCall.Source, "../") ||
 		strings.HasPrefix(moduleCall.Source, ".\\") ||
 		strings.HasPrefix(moduleCall.Source, "..\\"))
+}
+
+func splitModuleSubDir(moduleSource string) (string, string, error) {
+	moduleAddr, submodulePath := getter.SourceDirSubdir(moduleSource)
+	if strings.HasPrefix(submodulePath, "../") {
+		return "", "", fmt.Errorf("Invalid submodule path '%s'", submodulePath)
+	}
+
+	return moduleAddr, submodulePath, nil
+}
+
+func joinModuleSubDir(moduleAddr string, submodulePath string) string {
+	if submodulePath != "" {
+		return fmt.Sprintf("%s//%s", moduleAddr, submodulePath)
+	}
+
+	return moduleAddr
 }
