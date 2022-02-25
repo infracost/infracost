@@ -1130,6 +1130,65 @@ If you need access to other resources referenced by the resource you're adding, 
 	}
   ```
 
+#### Reverse references
+
+Sometimes you need access to a resource that refers to the resource you're adding. In this case you can add `ReferenceAttributes` to both resources. The resource with the reference field should be added as normal (`reference_field`) and resource that is the target of the reference should add a type qualified reference to the same field (`referring_type.reference_field`). For example, if an `aws_ebs_volume` needed the list of snapshots that reference it, the `aws_ebs_snapshot` would be the same as above and the volume would be:
+
+```go
+	func GetEBSVolumeRegistryItem() *schema.RegistryItem {
+		return &schema.RegistryItem{
+			Name:                "aws_ebs_volume",
+			RFunc:               NewEBSSnapshot,
+            // This only works if aws_ebs_snapshot has defined "volume_id" as a ReferenceAttribute
+			ReferenceAttributes: []string{"aws_ebs_snapshot.volume_id"}, 
+		}
+	}
+
+	func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+		snapshotReverseRefs := d.References("aws_ebs_snapshot.volume_id") // Get the reference
+		// ...
+	}
+  ```
+
+#### Custom reference ids
+
+By default, references are matched using an AWS ARN or the id field (`d.Get("id")`). Sometimes cloud providers use name or another field for references. In this case you can provide a 'custom reference id function' that generates additional ids used to match references. In this example, a custom id is needed because `aws_appautoscaling_target.resource_id` contains a `table/<name>` string when referencing an `aws_dynamodb_table`.
+
+```go
+    func getAppAutoscalingTargetRegistryItem() *schema.RegistryItem {
+	    return &schema.RegistryItem{
+		    Name:                "aws_appautoscaling_target",
+		    RFunc:               NewAppAutoscalingTargetResource,
+    		ReferenceAttributes: []string{"resource_id"},
+	    }
+    }
+
+    func NewAppAutoscalingTargetResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+        ...
+    }
+  ```
+
+```go
+    func getDynamoDBTableRegistryItem() *schema.RegistryItem {
+        return &schema.RegistryItem{
+            Name:            "aws_dynamodb_table",
+            RFunc:           NewDynamoDBTableResource,
+            CustomRefIDFunc: func (d *schema.ResourceData) []string {
+                // returns an id that will match the custom format used by aws_appautoscaling_target.resource_id
+                name := d.Get("name").String()
+                if name != "" {
+                    return []string{"table/" + name}
+                }
+                return nil
+            },
+        }
+    }
+
+    func NewAppAutoscalingTargetResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+        ...
+    }
+```
+
 ### Google zone mappings 
 
 If the resource has a `zone` key, if they have a zone key, use this logic to get the region:

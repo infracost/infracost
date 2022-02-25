@@ -6,6 +6,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getAPIGatewayRestAPIRegistryItem(),
 	getAPIGatewayStageRegistryItem(),
 	getAPIGatewayV2APIRegistryItem(),
+	getAppAutoscalingTargetRegistryItem(),
 	GetAutoscalingGroupRegistryItem(),
 	getACMCertificate(),
 	getACMPCACertificateAuthorityRegistryItem(),
