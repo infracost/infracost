@@ -1,17 +1,25 @@
 
- Name                             Monthly Qty  Unit   Monthly Cost 
-                                                                   
- aws_msk_cluster.cluster-2-nodes                                   
- ├─ Instance (kafka.t3.small)           1,460  hours        $66.58 
- └─ Storage                             1,000  GB          $100.00 
-                                                                   
- aws_msk_cluster.cluster-4-nodes                                   
- ├─ Instance (kafka.m5.24xlarge)        2,920  hours    $29,433.60 
- └─ Storage                             4,000  GB          $400.00 
-                                                                   
- OVERALL TOTAL                                          $30,000.18 
+ Name                                       Monthly Qty  Unit   Monthly Cost 
+                                                                             
+ aws_msk_cluster.cluster-2-nodes                                             
+ ├─ Instance (kafka.t3.small)                     1,460  hours        $66.58 
+ └─ Storage                                       1,000  GB          $100.00 
+                                                                             
+ aws_msk_cluster.cluster-4-nodes                                             
+ ├─ Instance (kafka.m5.24xlarge)                  2,920  hours    $29,433.60 
+ └─ Storage                                       4,000  GB          $400.00 
+                                                                             
+ aws_msk_cluster.cluster-autoscaling                                         
+ ├─ Instance (kafka.t3.small)                     1,460  hours        $66.58 
+ └─ Storage (autoscaling)                           246  GB           $24.60 
+                                                                             
+ aws_msk_cluster.cluster-autoscaling-usage                                   
+ ├─ Instance (kafka.t3.small)                     1,460  hours        $66.58 
+ └─ Storage (autoscaling)                         3,110  GB          $311.00 
+                                                                             
+ OVERALL TOTAL                                                    $30,468.93 
 ──────────────────────────────────
-2 cloud resources were detected:
-∙ 2 were estimated
+6 cloud resources were detected:
+∙ 6 were estimated
 
 Add cost estimates to your pull requests: https://infracost.io/cicd
