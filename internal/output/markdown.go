@@ -45,15 +45,23 @@ func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, 
 	return plusMinus + formatCost(currency, cost) + percentChange
 }
 
-func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal) string {
+func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal, useEmoji bool) string {
+	up := "📈"
+	down := "📉"
+
+	if !useEmoji {
+		up = "↑"
+		down = "↓"
+	}
+
 	if pastCost != nil {
 		if pastCost.Equals(*cost) {
 			return "monthly cost will not change"
 		} else if pastCost.GreaterThan(*cost) {
-			return "monthly cost will decrease by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " 📉"
+			return "monthly cost will decrease by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " " + down
 		}
 	}
-	return "monthly cost will increase by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " 📈"
+	return "monthly cost will increase by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " " + up
 }
 
 func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, error) {

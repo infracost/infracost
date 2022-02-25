@@ -297,7 +297,7 @@ var CommentMarkdownWithHTMLTemplate = `
       <td>{{ formatCostChange .PastCost .Cost }}</td>
     </tr>
 {{- end}}
-💰 Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }}**
+💰 Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost true }}**
 <table>
   <thead>
     <td>Project</td>
@@ -362,7 +362,7 @@ var CommentMarkdownTemplate = `
 {{- define "totalRow"}}
 | **{{ truncateMiddle .Name 64 "..." }}** | **{{ formatCost .PastCost }}** | **{{ formatCost .Cost }}** | **{{ formatCostChange .PastCost .Cost }}** |
 {{- end }}
-## 💰 Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost }}**
+## Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }}**
 
 | **Project** | **Previous** | **New** | **Diff** |
 | ----------- | -----------: | ------: | -------- |
