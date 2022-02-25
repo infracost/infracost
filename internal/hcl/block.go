@@ -132,7 +132,7 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 			}
 
 			if _, ok := body.Attributes["arn"]; !ok {
-				body.Attributes["arn"] = newUniqueAttribute("arn")
+				body.Attributes["arn"] = newArnAttribute("arn")
 			}
 		}
 
@@ -178,6 +178,20 @@ func newUniqueAttribute(name string) *hclsyntax.Attribute {
 		Name: name,
 		Expr: &hclsyntax.LiteralValueExpr{
 			Val: cty.StringVal(uuid.NewString()),
+		},
+	}
+}
+
+func newArnAttribute(name string) *hclsyntax.Attribute {
+	// fakeARN replicates an aws arn string it deliberately leaves the
+	// region section (in between the 3rd and 4th semicolon) blank as
+	// Infracost will try and parse this region later down the line.
+	// Keeping it blank will defer the region to what the provider has defined.
+	fakeARN := fmt.Sprintf("arn:aws:hcl::%s", uuid.NewString())
+	return &hclsyntax.Attribute{
+		Name: name,
+		Expr: &hclsyntax.LiteralValueExpr{
+			Val: cty.StringVal(fakeARN),
 		},
 	}
 }
