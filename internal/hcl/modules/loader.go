@@ -178,9 +178,12 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	}
 
 	dest := filepath.Join(m.downloadDir(), key)
-	moduleDownloadDir, err := filepath.Rel(m.Path, dest)
-	if err != nil {
-		return nil, err
+
+	// Since we're downloading the module, make sure any old installation of it is removed
+	// since this can cause issues with go-getter
+	err = os.RemoveAll(dest)
+	if err != nil && !os.IsNotExist(err) {
+		return nil, fmt.Errorf("error cleaning up existing module from '%s': %w", dest, err)
 	}
 
 	moduleAddr, submodulePath, err := splitModuleSubDir(moduleCall.Source)
@@ -188,6 +191,10 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		return nil, err
 	}
 
+	moduleDownloadDir, err := filepath.Rel(m.Path, dest)
+	if err != nil {
+		return nil, err
+	}
 	manifestModule.Dir = path.Clean(filepath.Join(moduleDownloadDir, submodulePath))
 
 	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, moduleCall.Version)

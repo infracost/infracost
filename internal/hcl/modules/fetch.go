@@ -35,7 +35,7 @@ func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
 			return fmt.Errorf("Failed to create directory '%s': %w", dest, err)
 		}
 
-		// Skip dotfiles and create new symlinks
+		// Skip dotfiles and create new symlinks to be consistent with what Terraform init does
 		opt := copy.Options{
 			Skip: func(src string) (bool, error) {
 				return strings.HasPrefix(filepath.Base(src), "."), nil

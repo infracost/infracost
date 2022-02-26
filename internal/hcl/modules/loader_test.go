@@ -117,6 +117,39 @@ func TestModuleMultipleUses(t *testing.T) {
 	}, true)
 }
 
+func TestModuleMultipleUsesMissingManifest(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode")
+	}
+
+	expectedModules := []*ManifestModule{
+		{
+			Key:     "registry-module-1",
+			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version: "3.4.0",
+			Dir:     ".infracost/terraform_modules/registry-module-1",
+		},
+		{
+			Key:     "registry-module-2",
+			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version: "3.4.0",
+			Dir:     ".infracost/terraform_modules/registry-module-2",
+		},
+	}
+
+	// Run first time to download modules
+	testLoaderE2E(t, "./testdata/module_multiple_uses", expectedModules, true)
+
+	// Remove the manifest file to test we can still work with broken manifests
+	err := os.Remove("./testdata/module_multiple_uses/.infracost/terraform_modules/manifest.json")
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	// Re-run without cleaning up the modules directory
+	testLoaderE2E(t, "./testdata/module_multiple_uses", expectedModules, false)
+}
+
 func TestWithCachedModules(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping test in short mode")
