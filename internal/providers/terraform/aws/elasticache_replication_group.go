@@ -7,8 +7,17 @@ import (
 
 func getElastiCacheReplicationGroupItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_elasticache_replication_group",
-		RFunc: NewElastiCacheReplicationGroup,
+		Name:                "aws_elasticache_replication_group",
+		RFunc:               NewElastiCacheReplicationGroup,
+		ReferenceAttributes: []string{"aws_appautoscaling_target.resource_id"},
+		CustomRefIDFunc: func(d *schema.ResourceData) []string {
+			// returns a table name that will match the custom format used by aws_appautoscaling_target.resource_id
+			name := d.Get("replication_group_id").String()
+			if name != "" {
+				return []string{"replication-group/" + name}
+			}
+			return nil
+		},
 	}
 }
 func NewElastiCacheReplicationGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
@@ -30,6 +39,11 @@ func NewElastiCacheReplicationGroup(d *schema.ResourceData, u *schema.UsageData)
 		clusterReplicasPerNodeGroup = d.Get("cluster_mode.0.replicas_per_node_group").Int()
 	}
 
+	targets := []*aws.AppAutoscalingTarget{}
+	for _, ref := range d.References("aws_appautoscaling_target.resource_id") {
+		targets = append(targets, newAppAutoscalingTarget(ref, ref.UsageData))
+	}
+
 	r := &aws.ElastiCacheReplicationGroup{
 		Address:                     d.Address,
 		Region:                      d.Get("region").String(),
@@ -39,6 +53,7 @@ func NewElastiCacheReplicationGroup(d *schema.ResourceData, u *schema.UsageData)
 		ClusterNodeGroups:           clusterNodeGroups,
 		ClusterReplicasPerNodeGroup: clusterReplicasPerNodeGroup,
 		SnapshotRetentionLimit:      d.Get("snapshot_retention_limit").Int(),
+		AppAutoscalingTarget:        targets,
 	}
 
 	r.PopulateUsage(u)

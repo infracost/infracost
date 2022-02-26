@@ -4,6 +4,12 @@
  aws_elasticache_replication_group.cluster                                                                        
  └─ ElastiCache (on-demand, cache.m4.large)                                11,680  hours                $1,822.08 
                                                                                                                   
+ aws_elasticache_replication_group.cluster-autoscale                                                              
+ └─ ElastiCache (on-demand, cache.m4.large, autoscaling)                   35,040  hours                $5,466.24 
+                                                                                                                  
+ aws_elasticache_replication_group.cluster-autoscale-usage                                                        
+ └─ ElastiCache (on-demand, cache.m4.large, autoscaling)                   29,200  hours                $4,555.20 
+                                                                                                                  
  aws_elasticache_replication_group.cluster-deprecated-attribs                                                     
  └─ ElastiCache (on-demand, cache.m4.large)                                11,680  hours                $1,822.08 
                                                                                                                   
@@ -17,9 +23,9 @@
  ├─ ElastiCache (on-demand, cache.m6g.12xlarge)                             2,190  hours                $7,789.83 
  └─ Backup storage                                                 Monthly cost depends on usage: $0.085 per GB   
                                                                                                                   
- OVERALL TOTAL                                                                                         $18,985.11 
+ OVERALL TOTAL                                                                                         $29,006.55 
 ──────────────────────────────────
-5 cloud resources were detected:
-∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
+10 cloud resources were detected:
+∙ 10 were estimated, 7 include usage-based costs, see https://infracost.io/usage-file
 
 Add cost estimates to your pull requests: https://infracost.io/cicd
