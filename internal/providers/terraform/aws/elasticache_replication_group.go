@@ -11,7 +11,7 @@ func getElastiCacheReplicationGroupItem() *schema.RegistryItem {
 		RFunc:               NewElastiCacheReplicationGroup,
 		ReferenceAttributes: []string{"aws_appautoscaling_target.resource_id"},
 		CustomRefIDFunc: func(d *schema.ResourceData) []string {
-			// returns a table name that will match the custom format used by aws_appautoscaling_target.resource_id
+			// returns a name that will match the custom format used by aws_appautoscaling_target.resource_id
 			name := d.Get("replication_group_id").String()
 			if name != "" {
 				return []string{"replication-group/" + name}
