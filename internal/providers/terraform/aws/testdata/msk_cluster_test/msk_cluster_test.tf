@@ -55,7 +55,7 @@ resource "aws_msk_cluster" "cluster-autoscaling" {
 
 resource "aws_appautoscaling_target" "autoscale_msk_cluster_target_usage" {
   max_capacity       = 2222
-  min_capacity       = 1555
+  min_capacity       = 1000
   resource_id        = aws_msk_cluster.cluster-autoscaling-usage.arn
   scalable_dimension = "kafka:broker-storage:VolumeSize"
   service_namespace  = "kafka"

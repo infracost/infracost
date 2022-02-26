@@ -15,9 +15,9 @@
                                                                              
  aws_msk_cluster.cluster-autoscaling-usage                                   
  ├─ Instance (kafka.t3.small)                     1,460  hours        $66.58 
- └─ Storage (autoscaling)                         3,110  GB          $311.00 
+ └─ Storage (autoscaling)                         2,468  GB          $246.80 
                                                                              
- OVERALL TOTAL                                                    $30,468.93 
+ OVERALL TOTAL                                                    $30,404.73 
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 6 were estimated

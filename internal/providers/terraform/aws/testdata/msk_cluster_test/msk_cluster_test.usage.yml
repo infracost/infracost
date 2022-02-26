@@ -1,4 +1,4 @@
 version: 0.1
 resource_usage:
-  aws_msk_cluster.cluster-autoscaling-usage:
-    capacity: 1789
+  aws_appautoscaling_target.autoscale_msk_cluster_target_usage:
+    capacity: 1234
