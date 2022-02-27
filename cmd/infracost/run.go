@@ -467,20 +467,20 @@ func runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *u
 
 	hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx))
 	if err != nil {
-		log.Debugf("could not init hcl provider %s", err)
+		log.Debugf("Could not init HCL provider: %s", err)
 		return
 	}
 
 	projects, err := hclProvider.LoadResources(usageFile.ToUsageDataMap())
 	if err != nil {
-		log.Debugf("error loading projects from hcl provider %s", err)
+		log.Debugf("Error loading projects from HCL provider: %s", err)
 		return
 	}
 
 	for _, project := range projects {
 		err := prices.PopulatePrices(runCtx, project)
 		if err != nil {
-			log.Debugf("error populating prices for hcl project %s", err)
+			log.Debugf("Error populating prices for HCL project: %s", err)
 			return
 		}
 
