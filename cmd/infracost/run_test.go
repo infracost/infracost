@@ -56,9 +56,10 @@ func TestCatchesRuntimeError(t *testing.T) {
 
 func TestAddHCLEnvVars(t *testing.T) {
 	type args struct {
-		r    output.Root
-		hclR output.Root
-		env  map[string]interface{}
+		r      output.Root
+		hclR   output.Root
+		osVars map[string]string
+		env    map[string]interface{}
 	}
 	tests := []struct {
 		name string
@@ -123,9 +124,37 @@ func TestAddHCLEnvVars(t *testing.T) {
 				"absHclPercentChange": "36.36",
 			},
 		},
+		{
+			name: "test sets tf_var marker",
+			args: args{
+				r:    output.Root{},
+				hclR: output.Root{},
+				osVars: map[string]string{
+					"TF_VAR_TEST": "testing",
+				},
+				env: map[string]interface{}{},
+			},
+			want: map[string]interface{}{
+				"hclPercentChange":    "0.00",
+				"absHclPercentChange": "0.00",
+				"tfVarPresent":        true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.osVars != nil {
+				for k, v := range tt.args.osVars {
+					os.Setenv(k, v)
+				}
+
+				defer func() {
+					for k, _ := range tt.args.osVars {
+						os.Unsetenv(k)
+					}
+				}()
+			}
+
 			main.AddHCLEnvVars(tt.args.r, tt.args.hclR, tt.args.env)
 			assert.Equal(t, tt.want, tt.args.env)
 		})
