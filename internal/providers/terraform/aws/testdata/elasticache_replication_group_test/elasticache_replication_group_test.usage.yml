@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_appautoscaling_target.autoscale_node_groups_usage:
+    capacity: 10
