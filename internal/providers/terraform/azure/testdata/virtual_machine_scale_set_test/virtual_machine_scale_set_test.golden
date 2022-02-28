@@ -2,7 +2,7 @@
  Name                                                    Monthly Qty  Unit                      Monthly Cost 
                                                                                                              
  azurerm_virtual_machine_scale_set.linux                                                                     
- ├─ Instance usage (hybrid benefit, Standard_F2)               1,460  hours                          $166.44 
+ ├─ Instance usage (pay as you go, Standard_F2)                1,460  hours                          $166.44 
  ├─ storage_os_disk                                                                                          
  │  ├─ Storage (S4)                                                1  months                           $1.54 
  │  └─ Disk operations                            Monthly cost depends on usage: $0.0005 per 10k operations  

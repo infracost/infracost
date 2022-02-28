@@ -1,0 +1,6 @@
+version: 0.1
+projects:
+  - path: "./testdata/hclmulti_workspace/"
+    terraform_workspace: blue
+  - path: "./testdata/hclmulti_workspace/"
+    terraform_workspace: yellow

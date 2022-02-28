@@ -47,6 +47,30 @@ func (d *ResourceData) Get(key string) gjson.Result {
 	return d.RawValues.Get(key)
 }
 
+func (d *ResourceData) GetStringOrDefault(key, def string) string {
+	if !d.IsEmpty(key) {
+		return d.RawValues.Get(key).String()
+	}
+
+	return def
+}
+
+func (d *ResourceData) GetInt64OrDefault(key string, def int64) int64 {
+	if !d.IsEmpty(key) {
+		return d.RawValues.Get(key).Int()
+	}
+
+	return def
+}
+
+func (d *ResourceData) GetBoolOrDefault(key string, def bool) bool {
+	if !d.IsEmpty(key) {
+		return d.RawValues.Get(key).Bool()
+	}
+
+	return def
+}
+
 // Return true if the key doesn't exist, is null, or is an empty string.
 // Needed because gjson.Exists returns true as long as a key exists, even if it's empty or null.
 func (d *ResourceData) IsEmpty(key string) bool {

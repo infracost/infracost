@@ -5,10 +5,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 var supportedConfigureKeys = map[string]struct{}{
@@ -16,6 +17,7 @@ var supportedConfigureKeys = map[string]struct{}{
 	"currency":                 {},
 	"pricing_api_endpoint":     {},
 	"enable_dashboard":         {},
+	"disable_hcl":              {},
 	"tls_insecure_skip_verify": {},
 	"tls_ca_cert_file":         {},
 }
@@ -103,6 +105,14 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 				saveConfiguration = true
 			case "currency":
 				ctx.Config.Configuration.Currency = value
+				saveConfiguration = true
+			case "disable_hcl":
+				b, err := strconv.ParseBool(value)
+				if err != nil {
+					return errors.New("Invalid value, must be true or false")
+				}
+
+				ctx.Config.Configuration.DisableHCLParsing = &b
 				saveConfiguration = true
 			case "enable_dashboard":
 				b, err := strconv.ParseBool(value)

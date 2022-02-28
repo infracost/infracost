@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
+	"github.com/shopspring/decimal"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/pkg/errors"
@@ -24,6 +25,7 @@ import (
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/providers"
+	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
@@ -32,15 +34,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type projectJob = struct {
+type projectJob struct {
 	index      int
 	projectCfg *config.Project
 }
 
-type projectResult = struct {
-	index    int
-	ctx      *config.ProjectContext
-	projects []*schema.Project
+type projectResult struct {
+	index      int
+	ctx        *config.ProjectContext
+	projectOut *projectOutput
 }
 
 var validRunFormats = []string{"json", "table", "html"}
@@ -135,9 +137,9 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 				}
 
 				projectResultChan <- projectResult{
-					index:    job.index,
-					ctx:      ctx,
-					projects: configProjects,
+					index:      job.index,
+					ctx:        ctx,
+					projectOut: configProjects,
 				}
 			}
 
@@ -166,11 +168,23 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	projects := make([]*schema.Project, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
+
+	hclProjects := make([]*schema.Project, 0)
 	for _, projectResult := range projectResults {
-		for _, project := range projectResult.projects {
+		for _, project := range projectResult.projectOut.projects {
 			projectContexts = append(projectContexts, projectResult.ctx)
 			projects = append(projects, project)
 		}
+
+		hclProjects = append(hclProjects, projectResult.projectOut.hclProjects...)
+	}
+
+	wg := &sync.WaitGroup{}
+	var hclR *output.Root
+	if len(hclProjects) > 0 {
+		wg.Add(1)
+		hclR = new(output.Root)
+		go formatHCLProjects(wg, runCtx, hclProjects, hclR)
 	}
 
 	r, err := output.ToOutputFormat(projects)
@@ -178,6 +192,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		return err
 	}
 
+	wg.Wait()
 	r.IsCIRun = runCtx.IsCIRun()
 	r.Currency = runCtx.Config.Currency
 
@@ -218,7 +233,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		runCtx.SetContextValue("lineCount", lines)
 	}
 
-	env := buildRunEnv(runCtx, projectContexts, r)
+	env := buildRunEnv(runCtx, projectContexts, r, hclR)
 	pricingClient := apiclient.NewPricingAPIClient(runCtx)
 	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
@@ -241,7 +256,33 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	return nil
 }
 
-func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config.ProjectContext, projectCfg *config.Project, mux *sync.Mutex) ([]*schema.Project, error) {
+func formatHCLProjects(wg *sync.WaitGroup, ctx *config.RunContext, hclProjects []*schema.Project, hclR *output.Root) {
+	defer func() {
+		err := recover()
+		wg.Done()
+
+		if err != nil {
+			err = apiclient.ReportCLIError(ctx, fmt.Errorf("hcl-runtime-error: formatting hcl projects %s\n%s", err, debug.Stack()))
+			if err != nil {
+				log.Debugf("error reporting unexpected hcl runtime error: %s", err)
+			}
+		}
+	}()
+
+	rr, err := output.ToOutputFormat(hclProjects)
+	if err != nil {
+		log.Debugf("could not format hcl project to root output")
+	}
+
+	*hclR = rr
+}
+
+type projectOutput struct {
+	projects    []*schema.Project
+	hclProjects []*schema.Project
+}
+
+func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config.ProjectContext, projectCfg *config.Project, mux *sync.Mutex) (*projectOutput, error) {
 	if mux != nil {
 		mux.Lock()
 		defer mux.Unlock()
@@ -256,7 +297,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 		m := fmt.Sprintf("%s\n\n", err)
 		m += fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
 
-		return []*schema.Project{}, clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
+		return nil, clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
 	}
 	ctx.SetContextValue("projectType", provider.Type())
 
@@ -264,7 +305,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
-		return []*schema.Project{}, clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
+		return nil, clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 	}
 
 	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
@@ -278,7 +319,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	if runCtx.Config.SyncUsageFile {
 		err := generateUsageFile(cmd, runCtx, ctx, projectCfg, provider)
 		if err != nil {
-			return []*schema.Project{}, errors.Wrap(err, "Error generating usage file")
+			return nil, errors.Wrap(err, "Error generating usage file")
 		}
 	}
 
@@ -290,7 +331,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 		var err error
 		usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile)
 		if err != nil {
-			return []*schema.Project{}, err
+			return nil, err
 		}
 
 		invalidKeys, err := usageFile.InvalidKeys()
@@ -335,11 +376,20 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	}
 
 	usageData = usageFile.ToUsageDataMap()
+	out := &projectOutput{}
+	wg := &sync.WaitGroup{}
 
+	// if the provider is the dir provider let's run the hcl provider at the same time to get reporting metrics.
+	if _, ok := provider.(*terraform.DirProvider); ok {
+		wg.Add(1)
+		go runHCLProvider(wg, ctx, usageFile, runCtx, out)
+	}
+
+	t1 := time.Now()
 	projects, err := provider.LoadResources(usageData)
 	if err != nil {
 		cmd.PrintErrln()
-		return projects, err
+		return nil, err
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
@@ -356,7 +406,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 			cmd.PrintErrln()
 
 			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
-				return projects, fmt.Errorf("%v\n%s %s %s %s %s\n%s",
+				return nil, fmt.Errorf("%v\n%s %s %s %s %s\n%s",
 					e.Error(),
 					"Please check your",
 					ui.PrimaryString(config.CredentialsFilePath()),
@@ -368,23 +418,79 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 			}
 
 			if e, ok := err.(*apiclient.APIError); ok {
-				return projects, fmt.Errorf("%v\n%s", e.Error(), "We have been notified of this issue.")
+				return nil, fmt.Errorf("%v\n%s", e.Error(), "We have been notified of this issue.")
 			}
 
-			return projects, err
+			return nil, err
 		}
 
 		schema.CalculateCosts(project)
 		project.CalculateDiff()
 	}
 
+	t2 := time.Now()
+	taken := t2.Sub(t1).Milliseconds()
+	ctx.SetContextValue("tfRunTimeMs", taken)
+
+	// wait for the hcl provider to finish if it hasn't already
+	wg.Wait()
+
 	spinner.Success()
+	out.projects = projects
 
 	if !runCtx.Config.IsLogging() {
 		cmd.PrintErrln()
 	}
 
-	return projects, nil
+	return out, nil
+}
+
+func runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *usage.UsageFile, runCtx *config.RunContext, out *projectOutput) {
+	defer func() {
+		err := recover()
+		wg.Done()
+
+		if err != nil {
+			log.Debugf("recovered from hcl provider panic %s", err)
+			err = apiclient.ReportCLIError(runCtx, fmt.Errorf("hcl-runtime-error: loading resources %s\n%s", err, debug.Stack()))
+			if err != nil {
+				log.Debugf("error reporting unexpected hcl runtime error: %s", err)
+			}
+		}
+	}()
+	if runCtx.Config.DisableHCLParsing {
+		return
+	}
+
+	t1 := time.Now()
+
+	hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx))
+	if err != nil {
+		log.Debugf("Could not init HCL provider: %s", err)
+		return
+	}
+
+	projects, err := hclProvider.LoadResources(usageFile.ToUsageDataMap())
+	if err != nil {
+		log.Debugf("Error loading projects from HCL provider: %s", err)
+		return
+	}
+
+	for _, project := range projects {
+		err := prices.PopulatePrices(runCtx, project)
+		if err != nil {
+			log.Debugf("Error populating prices for HCL project: %s", err)
+			return
+		}
+
+		schema.CalculateCosts(project)
+		project.CalculateDiff()
+	}
+
+	out.hclProjects = projects
+	t2 := time.Now()
+	taken := t2.Sub(t1).Milliseconds()
+	ctx.SetContextValue("hclRunTimeMs", taken)
 }
 
 func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx *config.ProjectContext, projectCfg *config.Project, provider schema.Provider) error {
@@ -520,6 +626,9 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasProjectFlags {
 		projectCfg.Path, _ = cmd.Flags().GetString("path")
+		projectCfg.TerraformParseHCL, _ = cmd.Flags().GetBool("terraform-parse-hcl")
+		projectCfg.TerraformVarFiles, _ = cmd.Flags().GetStringSlice("terraform-var-file")
+		projectCfg.TerraformVars, _ = cmd.Flags().GetStringSlice("terraform-var")
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
@@ -535,6 +644,12 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 		if err != nil {
 			return err
+		}
+
+		if parseHCL, _ := cmd.Flags().GetBool("terraform-parse-hcl"); parseHCL {
+			for _, p := range cfg.Projects {
+				p.TerraformParseHCL = true
+			}
 		}
 	}
 
@@ -607,7 +722,7 @@ func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 	return nil
 }
 
-func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root) map[string]interface{} {
+func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root, hclR *output.Root) map[string]interface{} {
 	env := runCtx.EventEnvWithProjectContexts(projectContexts)
 	env["projectCount"] = len(projectContexts)
 	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
@@ -636,7 +751,51 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["totalEstimatedUsages"] = summary.TotalEstimatedUsages
 	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
 
+	if hclR != nil {
+		AddHCLEnvVars(r, *hclR, env)
+	}
+
 	return env
+}
+
+// AddHCLEnvVars adds HCL reporting metrics to the Infracost run so that we can assess the accuracy of
+// the HCL approach.
+func AddHCLEnvVars(r output.Root, hclR output.Root, env map[string]interface{}) {
+	var initialTotal decimal.Decimal
+	if r.TotalMonthlyCost != nil {
+		initialTotal = *r.TotalMonthlyCost
+	}
+
+	var hclTotal decimal.Decimal
+	if hclR.TotalMonthlyCost != nil {
+		hclTotal = *hclR.TotalMonthlyCost
+	}
+
+	env["hclPercentChange"] = "0.00"
+	env["absHclPercentChange"] = "0.00"
+	change := percentChange(hclTotal, initialTotal)
+	abs := change.Abs()
+
+	if abs.GreaterThan(decimal.NewFromInt(0)) {
+		env["hclPercentChange"] = change.StringFixed(2)
+		env["absHclPercentChange"] = abs.StringFixed(2)
+	}
+
+	for _, k := range os.Environ() {
+		if strings.HasPrefix(k, "TF_VAR") {
+			env["tfVarPresent"] = true
+			break
+		}
+	}
+
+}
+
+func percentChange(newTotal decimal.Decimal, initialTotal decimal.Decimal) decimal.Decimal {
+	if initialTotal.IsZero() {
+		return decimal.NewFromInt(0)
+	}
+
+	return newTotal.Sub(initialTotal).Div(initialTotal).Mul(decimal.NewFromInt(100))
 }
 
 func unwrapped(err error) error {
