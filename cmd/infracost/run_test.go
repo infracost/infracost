@@ -149,7 +149,7 @@ func TestAddHCLEnvVars(t *testing.T) {
 				}
 
 				defer func() {
-					for k, _ := range tt.args.osVars {
+					for k := range tt.args.osVars {
 						os.Unsetenv(k)
 					}
 				}()
