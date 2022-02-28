@@ -21,8 +21,8 @@ func getElastiCacheReplicationGroupItem() *schema.RegistryItem {
 	}
 }
 func NewElastiCacheReplicationGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	cacheClusters := d.Get("num_cache_clusters").Int()
-	if d.IsEmpty("num_cache_clusters") {
+	cacheClusters := d.GetInt64OrDefault("num_cache_clusters", 1)
+	if d.IsEmpty("num_cache_clusters") && !d.IsEmpty("number_cache_clusters") {
 		// check for deprecated attribute
 		cacheClusters = d.Get("number_cache_clusters").Int()
 	}
