@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  aws_elastic_beanstalk_environment.my_eb_environment_with_usage:
+    monthly_data_ingested_gb: 250
+    monthly_data_scanned_gb: 100
+    storage_gb: 500

@@ -1,0 +1,22 @@
+
+ Name                                                            Monthly Qty  Unit   Monthly Cost 
+                                                                                                  
+ aws_elastic_beanstalk_environment.my_eb_environment                                              
+ ├─ Instance usage (Linux/UNIX, on_demand, t3.small)                   1,460  hours        $35.48 
+ └─ Network load balancer                                                730  hours        $18.40 
+                                                                                                  
+ aws_elastic_beanstalk_environment.my_eb_environment_with_usage                                   
+ ├─ Instance usage (Linux/UNIX, on_demand, c4.large)                   1,460  hours       $181.04 
+ ├─ Application load balancer                                            730  hours        $18.40 
+ ├─ Cloudwatch Data ingested                                             250  GB          $142.50 
+ ├─ Cloudwatch Archival Storage                                          500  GB           $15.00 
+ └─ Cloudwatch Insights queries data scanned                             100  GB            $0.57 
+                                                                                                  
+ OVERALL TOTAL                                                                            $411.38 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated
+∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost:
+  ∙ 1 x aws_elastic_beanstalk_application
+
+Add cost estimates to your pull requests: https://infracost.io/cicd

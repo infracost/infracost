@@ -161,6 +161,11 @@ resource_usage:
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
     vcpu_count: 2 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
 
+  aws_elastic_beanstalk_environment.my_eb_environment:
+    monthly_data_ingested_gb: 50  # Cloudwatch log stream ingest in GB
+    monthly_data_scanned_gb: 50   # Cloudwatch data scanned in GB
+    storage_gb: 100               # Cloudwatch storage used in GB
+
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
 
