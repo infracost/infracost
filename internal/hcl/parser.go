@@ -15,7 +15,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl/modules"
 )
 
@@ -158,9 +157,7 @@ func (p *Parser) ParseDirectory() ([]*Module, error) {
 	// load the modules. This downloads any remote modules to the local file system
 	modulesManifest, err := p.moduleLoader.Load()
 	if err != nil {
-		if !config.IsTest() {
-			log.Warnf("Error loading modules. This is required for Infracost to get accurate results: %s", err)
-		}
+		return nil, fmt.Errorf("Error loading Terraform modules: %s", err)
 	}
 
 	log.Debug("Evaluating expressions...")

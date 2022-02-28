@@ -45,10 +45,18 @@ func (c *Cache) lookupModule(key string, moduleCall *tfconfig.ModuleCall) (*Mani
 		return nil, errors.New("not in cache")
 	}
 
-	// Also check against the normalized registry source
-	// since we convert to this format before storing in the manifest
-	// We don't care about the error here since we only want to check against the registry source if the address is a valid registry address
-	registrySource, _ := normalizeRegistrySource(moduleCall.Source)
+	// If the module could be a valid registry module, we should generate the normalized registry source and check against that
+	// so we can check the cache against that since we convert to this format before storing in the manifest
+	// We don't care about errors here since we only want to check against the registry source if the address is a valid registry address
+	var registrySource = ""
+	moduleAddr, submodulePath, err := splitModuleSubDir(moduleCall.Source)
+	if err == nil {
+		registryModuleAddr, err := normalizeRegistrySource(moduleAddr)
+		if err == nil {
+			registrySource = joinModuleSubDir(registryModuleAddr, submodulePath)
+		}
+	}
+
 	if manifestModule.Source != moduleCall.Source && (registrySource == "" || manifestModule.Source != registrySource) {
 		return nil, errors.New("source has changed")
 	}
