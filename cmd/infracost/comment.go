@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/infracost/infracost/internal/config"
@@ -82,7 +83,7 @@ func (p *PRNumber) Set(value string) error {
 		return nil
 	}
 
-	v, err := strconv.ParseInt(value, 0, 64)
+	v, err := strconv.Atoi(value)
 	*p = PRNumber(v)
 
 	if err != nil {
@@ -93,7 +94,7 @@ func (p *PRNumber) Set(value string) error {
 }
 
 func (p *PRNumber) String() string {
-	return strconv.Itoa(int(*p))
+	return fmt.Sprintf("%d", *p)
 }
 
 func (p *PRNumber) Type() string {
