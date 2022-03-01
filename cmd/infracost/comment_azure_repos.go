@@ -106,7 +106,8 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
-	cmd.Flags().Int("pull-request", 0, "Pull request number to post comment on")
+	var prNumber PRNumber
+	cmd.Flags().Var(&prNumber, "pull-request", "Pull request number to post comment on")
 	_ = cmd.MarkFlagRequired("pull-request")
 	cmd.Flags().String("repo-url", "", "Repository URL, e.g. https://dev.azure.com/my-org/my-project/_git/my-repo")
 	_ = cmd.MarkFlagRequired("repo-url")

@@ -123,7 +123,8 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
-	cmd.Flags().Int("pull-request", 0, "Pull request number to post comment on")
+	var prNumber PRNumber
+	cmd.Flags().Var(&prNumber, "pull-request", "Pull request number to post comment on")
 	cmd.Flags().String("repo", "", "Repository in format workspace/repo")
 	_ = cmd.MarkFlagRequired("repo")
 	cmd.Flags().String("tag", "", "Customize special text used to detect comments posted by Infracost (placed at the bottom of a comment)")
