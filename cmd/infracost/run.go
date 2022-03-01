@@ -430,7 +430,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 
 	t2 := time.Now()
 	taken := t2.Sub(t1).Milliseconds()
-	ctx.SetContextValue("tfRunTimeMs", taken)
+	ctx.SetContextValue("tfProjectRunTimeMs", taken)
 
 	// wait for the hcl provider to finish if it hasn't already
 	wg.Wait()
@@ -490,7 +490,7 @@ func runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *u
 	out.hclProjects = projects
 	t2 := time.Now()
 	taken := t2.Sub(t1).Milliseconds()
-	ctx.SetContextValue("hclRunTimeMs", taken)
+	ctx.SetContextValue("hclProjectRunTimeMs", taken)
 }
 
 func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx *config.ProjectContext, projectCfg *config.Project, provider schema.Provider) error {
@@ -752,7 +752,8 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
 
 	if hclR != nil {
-		AddHCLEnvVars(r, *hclR, env)
+		AddHCLEnvVars(projectContexts, r, *hclR, env)
+
 	}
 
 	return env
@@ -760,7 +761,7 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 
 // AddHCLEnvVars adds HCL reporting metrics to the Infracost run so that we can assess the accuracy of
 // the HCL approach.
-func AddHCLEnvVars(r output.Root, hclR output.Root, env map[string]interface{}) {
+func AddHCLEnvVars(projectContexts []*config.ProjectContext, r output.Root, hclR output.Root, env map[string]interface{}) {
 	var initialTotal decimal.Decimal
 	if r.TotalMonthlyCost != nil {
 		initialTotal = *r.TotalMonthlyCost
@@ -787,6 +788,21 @@ func AddHCLEnvVars(r output.Root, hclR output.Root, env map[string]interface{}) 
 			break
 		}
 	}
+
+	var tfTimeTaken int64
+	var hclTimeTaken int64
+	for _, pCtx := range projectContexts {
+		if v, ok := pCtx.ContextValues()["tfProjectRunTimeMs"]; ok {
+			tfTimeTaken += v.(int64)
+		}
+
+		if v, ok := pCtx.ContextValues()["hclProjectRunTimeMs"]; ok {
+			hclTimeTaken += v.(int64)
+		}
+	}
+
+	env["tfRunTimeMs"] = tfTimeTaken
+	env["hclRunTimeMs"] = hclTimeTaken
 
 }
 

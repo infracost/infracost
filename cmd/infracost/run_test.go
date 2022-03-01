@@ -60,6 +60,7 @@ func TestAddHCLEnvVars(t *testing.T) {
 		hclR   output.Root
 		osVars map[string]string
 		env    map[string]interface{}
+		pctx   []*config.ProjectContext
 	}
 	tests := []struct {
 		name string
@@ -78,6 +79,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 			want: map[string]interface{}{
 				"hclPercentChange":    "-100.00",
 				"absHclPercentChange": "100.00",
+				"hclRunTimeMs":        int64(0),
+				"tfRunTimeMs":         int64(0),
 			},
 		},
 		{
@@ -90,6 +93,32 @@ func TestAddHCLEnvVars(t *testing.T) {
 			want: map[string]interface{}{
 				"hclPercentChange":    "0.00",
 				"absHclPercentChange": "0.00",
+				"hclRunTimeMs":        int64(0),
+				"tfRunTimeMs":         int64(0),
+			},
+		},
+		{
+			name: "test sums time ms for projects",
+			args: args{
+				pctx: []*config.ProjectContext{
+					newProjectContextWithCtx(map[string]interface{}{
+						"hclProjectRunTimeMs": int64(10),
+						"tfProjectRunTimeMs":  int64(20),
+					}),
+					newProjectContextWithCtx(map[string]interface{}{
+						"hclProjectRunTimeMs": int64(50),
+						"tfProjectRunTimeMs":  int64(70),
+					}),
+				},
+				r:    output.Root{},
+				hclR: output.Root{},
+				env:  map[string]interface{}{},
+			},
+			want: map[string]interface{}{
+				"hclPercentChange":    "0.00",
+				"absHclPercentChange": "0.00",
+				"hclRunTimeMs":        int64(60),
+				"tfRunTimeMs":         int64(90),
 			},
 		},
 		{
@@ -106,6 +135,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 			want: map[string]interface{}{
 				"hclPercentChange":    "-20.00",
 				"absHclPercentChange": "20.00",
+				"hclRunTimeMs":        int64(0),
+				"tfRunTimeMs":         int64(0),
 			},
 		},
 		{
@@ -122,6 +153,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 			want: map[string]interface{}{
 				"hclPercentChange":    "-36.36",
 				"absHclPercentChange": "36.36",
+				"hclRunTimeMs":        int64(0),
+				"tfRunTimeMs":         int64(0),
 			},
 		},
 		{
@@ -138,6 +171,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 				"hclPercentChange":    "0.00",
 				"absHclPercentChange": "0.00",
 				"tfVarPresent":        true,
+				"hclRunTimeMs":        int64(0),
+				"tfRunTimeMs":         int64(0),
 			},
 		},
 	}
@@ -155,10 +190,20 @@ func TestAddHCLEnvVars(t *testing.T) {
 				}()
 			}
 
-			main.AddHCLEnvVars(tt.args.r, tt.args.hclR, tt.args.env)
+			main.AddHCLEnvVars(tt.args.pctx, tt.args.r, tt.args.hclR, tt.args.env)
 			assert.Equal(t, tt.want, tt.args.env)
 		})
 	}
+}
+
+func newProjectContextWithCtx(m map[string]interface{}) *config.ProjectContext {
+	ctx := config.NewProjectContext(nil, nil)
+
+	for k, v := range m {
+		ctx.SetContextValue(k, v)
+	}
+
+	return ctx
 }
 
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
