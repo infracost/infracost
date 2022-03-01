@@ -122,7 +122,8 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
-	cmd.Flags().Int("merge-request", 0, "Merge request number to post comment on, mutually exclusive with commit")
+	var mrNumber PRNumber
+	cmd.Flags().Var(&mrNumber, "merge-request", "Merge request number to post comment on, mutually exclusive with commit")
 	cmd.Flags().String("repo", "", "Repository in format owner/repo")
 	_ = cmd.MarkFlagRequired("repo")
 	cmd.Flags().String("tag", "", "Customize hidden markdown tag used to detect comments posted by Infracost")

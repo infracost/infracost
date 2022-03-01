@@ -1,9 +1,12 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -70,4 +73,29 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	}
 
 	return b, nil
+}
+
+type PRNumber int
+
+func (p *PRNumber) Set(value string) error {
+	if value == "" {
+		return nil
+	}
+
+	v, err := strconv.ParseInt(value, 0, 64)
+	*p = PRNumber(v)
+
+	if err != nil {
+		return errors.New("must be integer")
+	}
+
+	return nil
+}
+
+func (p *PRNumber) String() string {
+	return strconv.Itoa(int(*p))
+}
+
+func (p *PRNumber) Type() string {
+	return "int"
 }
