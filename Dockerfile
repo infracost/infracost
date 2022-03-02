@@ -49,7 +49,7 @@ FROM alpine:3.15 as app
 # Tools needed for running diffs in CI integrations
 RUN apk --no-cache add ca-certificates openssl openssh-client curl git bash
 
-# The jq package provided by alpine:3.13 (jq 1.6-rc1) is flagged as a
+# The jq package provided by alpine:3.15 (jq 1.6-rc1) is flagged as a
 # high severity vulnerability, so we install the latest release ourselves
 # Reference: https://nvd.nist.gov/vuln/detail/CVE-2016-4074 (this is present on jq-1.6-rc1 as well)
 RUN \
