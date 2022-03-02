@@ -125,7 +125,7 @@ require (
 	github.com/hashicorp/go-getter v1.5.11
 	github.com/hashicorp/go-safetemp v1.0.0 // indirect
 	github.com/hashicorp/go-uuid v1.0.2
-	github.com/hashicorp/go-version v1.1.0
+	github.com/hashicorp/go-version v1.4.0
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/iancoleman/orderedmap v0.2.0 // indirect
 	github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024 // indirect
