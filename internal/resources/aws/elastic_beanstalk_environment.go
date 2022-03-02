@@ -78,8 +78,7 @@ func (r *ElasticBeanstalkEnvironment) PopulateUsage(u *schema.UsageData) {
 // costs for the node group to be $0.  This can be removed when --sync-usage-file creates the usage file with usgage keys
 // commented out by default.
 func (r *ElasticBeanstalkEnvironment) getUsageSchemaWithDefaultInstanceCount() []*schema.UsageItem {
-	var instanceCount *int64
-	instanceCount = &r.instanceCount
+	var instanceCount = &r.instanceCount
 
 	if instanceCount == nil || *instanceCount == 0 {
 		return AutoscalingGroupUsageSchema
@@ -99,52 +98,50 @@ func (r *ElasticBeanstalkEnvironment) getUsageSchemaWithDefaultInstanceCount() [
 // BuildResource builds a schema.Resource from a valid ElasticBeanstalkEnvironment struct.
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
-func (a *ElasticBeanstalkEnvironment) BuildResource() *schema.Resource {
+func (r *ElasticBeanstalkEnvironment) BuildResource() *schema.Resource {
 
 	subResources := make([]*schema.Resource, 0)
 
 	rootBlockDevice := &EBSVolume{
 		Address: "aws_ebs_volume",
-		Region:  a.Region,
-		Type:    a.RootVolumeType,
-		Size:    a.RootVolumeSize,
-		IOPS:    a.RootVolumeIOPS,
+		Region:  r.Region,
+		Type:    r.RootVolumeType,
+		Size:    r.RootVolumeSize,
+		IOPS:    r.RootVolumeIOPS,
 	}
 
 	launchConfiguration := &LaunchConfiguration{
 		Address:         "aws_launch_configuration",
-		Region:          a.Region,
-		InstanceType:    a.InstanceType,
-		InstanceCount:   &a.InstanceCount,
+		Region:          r.Region,
+		InstanceType:    r.InstanceType,
+		InstanceCount:   &r.InstanceCount,
 		RootBlockDevice: rootBlockDevice,
 	}
 
 	autoScalingGroup := &AutoscalingGroup{
 		Address:             "aws_autoscaling_group",
-		Region:              a.Region,
-		Name:                a.Name,
+		Region:              r.Region,
+		Name:                r.Name,
 		LaunchConfiguration: launchConfiguration,
 	}
 
 	autoScalingGroupResource := autoScalingGroup.BuildResource()
 
-	var estimateInstanceQualities schema.EstimateFunc
-
-	estimateInstanceQualities = autoScalingGroupResource.EstimateUsage
+	var estimateInstanceQualities = autoScalingGroupResource.EstimateUsage
 
 	subResources = append(subResources, autoScalingGroupResource.SubResources...)
-	if a.LoadBalancerType == "classic" {
-		subResources = append(subResources, a.ElasticLoadBalancer.BuildResource())
+	if r.LoadBalancerType == "classic" {
+		subResources = append(subResources, r.ElasticLoadBalancer.BuildResource())
 	} else {
-		subResources = append(subResources, a.LoadBalancer.BuildResource())
+		subResources = append(subResources, r.LoadBalancer.BuildResource())
 	}
 
-	if a.StreamLogs {
-		subResources = append(subResources, a.CloudwatchLogGroup.BuildResource())
+	if r.StreamLogs {
+		subResources = append(subResources, r.CloudwatchLogGroup.BuildResource())
 	}
 
-	if a.RDSIncluded {
-		subResources = append(subResources, a.DBInstance.BuildResource())
+	if r.RDSIncluded {
+		subResources = append(subResources, r.DBInstance.BuildResource())
 	}
 
 	estimate := func(ctx context.Context, u map[string]interface{}) error {
@@ -154,8 +151,8 @@ func (a *ElasticBeanstalkEnvironment) BuildResource() *schema.Resource {
 				return err
 			}
 		}
-		if a.Name != "" {
-			count, err := aws.AutoscalingGetInstanceCount(ctx, a.Region, a.Name)
+		if r.Name != "" {
+			count, err := aws.AutoscalingGetInstanceCount(ctx, r.Region, r.Name)
 			if err != nil {
 				return err
 			}
@@ -166,8 +163,8 @@ func (a *ElasticBeanstalkEnvironment) BuildResource() *schema.Resource {
 		return nil
 	}
 	return &schema.Resource{
-		Name:           a.Address,
-		UsageSchema:    a.getUsageSchemaWithDefaultInstanceCount(),
+		Name:           r.Address,
+		UsageSchema:    r.getUsageSchemaWithDefaultInstanceCount(),
 		CostComponents: autoScalingGroupResource.CostComponents,
 		SubResources:   subResources,
 		EstimateUsage:  estimate,
