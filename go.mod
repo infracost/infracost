@@ -40,7 +40,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.14.0
-	github.com/zclconf/go-cty v1.8.0
+	github.com/zclconf/go-cty v1.10.0
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
 	golang.org/x/mod v0.5.1
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
