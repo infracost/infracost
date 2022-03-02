@@ -99,6 +99,10 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 // FreeResources grouped alphabetically
 var FreeResources = []string{
+	// AWS Application Auto Scaling
+	"aws_appautoscaling_policy",
+	"aws_appautoscaling_scheduled_action",
+
 	// AWS Certificate Manager
 	"aws_acm_certificate_validation",
 
