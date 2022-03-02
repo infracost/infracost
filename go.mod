@@ -15,7 +15,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.30.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.25.0
 	github.com/awslabs/goformation/v4 v4.19.5
-	github.com/briandowns/spinner v1.15.0
+	github.com/briandowns/spinner v1.18.1
 	github.com/dave/dst v0.26.2
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fatih/color v1.13.0
