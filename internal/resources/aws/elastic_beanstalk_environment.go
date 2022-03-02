@@ -1,13 +1,12 @@
 package aws
 
 import (
-	"fmt"
-	"strings"
+	"context"
+	"math"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-
-	"github.com/shopspring/decimal"
+	"github.com/infracost/infracost/internal/usage/aws"
 )
 
 // ElasticBeanstalkEnvironment struct represents <TODO: cloud service short description>.
@@ -18,206 +17,160 @@ import (
 // Resource information: https://aws.amazon.com/elasticbeanstalk/
 // Pricing information: https://aws.amazon.com/elasticbeanstalk/pricing/
 type ElasticBeanstalkEnvironment struct {
-	Address               string
-	Region                string
-	InstanceType          string
-	LoadBalancerType      string
-	Nodes                 int64
-	PurchaseOption        string
+	Address string
+	Region  string
+	Name    string
+
+	InstanceCount  int64
+	InstanceType   string
+	RootVolumeIOPS int64
+	RootVolumeSize *int64
+	RootVolumeType string
+
+	RDSIncluded bool
+
+	LoadBalancerType string
+	AutoScalingGroup *AutoscalingGroup
+
 	StreamLogs            bool
+	instanceCount         int64
 	MonthlyDataIngestedGB *float64 `infracost_usage:"monthly_data_ingested_gb"`
 	StorageGB             *float64 `infracost_usage:"storage_gb"`
 	MonthlyDataScannedGB  *float64 `infracost_usage:"monthly_data_scanned_gb"`
+	CloudwatchLogGroup    *CloudwatchLogGroup
+	LoadBalancer          *LB
+	ElasticLoadBalancer   *ELB
+	DBInstance            *DBInstance
 }
 
 // ElasticBeanstalkEnvironmentUsageSchema defines a list which represents the usage schema of ElasticBeanstalkEnvironment.
-var ElasticBeanstalkEnvironmentUsageSchema = []*schema.UsageItem{
+var ElasticBeanstalkEnvironmentUsageSchema = append([]*schema.UsageItem{
+	{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "new_connections", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "active_connections", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "rule_evaluations", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "processed_bytes_gb", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "monthly_data_ingested_gb", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "monthly_data_scanned_gb", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Float64},
-}
+	{Key: "instances", DefaultValue: 0, ValueType: schema.Int64},
+}, InstanceUsageSchema...)
 
 // PopulateUsage parses the u schema.UsageData into the ElasticBeanstalkEnvironment.
 // It uses the `infracost_usage` struct tags to populate data into the ElasticBeanstalkEnvironment.
 func (r *ElasticBeanstalkEnvironment) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
+	if r.LoadBalancerType == "classic" {
+		resources.PopulateArgsWithUsage(r.ElasticLoadBalancer, u)
+	} else {
+		resources.PopulateArgsWithUsage(r.LoadBalancer, u)
+	}
+	if r.StreamLogs {
+		resources.PopulateArgsWithUsage(r.CloudwatchLogGroup, u)
+	}
+	if r.RDSIncluded {
+		resources.PopulateArgsWithUsage(r.DBInstance, u)
+	}
+}
+
+// getUsageSchemaWithDefaultInstanceCount is a temporary hack to make --sync-usage-file use the group's "desired_size"
+// as the default value for the "instances" usage param.  Without this, --sync-usage-file sets instances=0 causing the
+// costs for the node group to be $0.  This can be removed when --sync-usage-file creates the usage file with usgage keys
+// commented out by default.
+func (r *ElasticBeanstalkEnvironment) getUsageSchemaWithDefaultInstanceCount() []*schema.UsageItem {
+	var instanceCount *int64
+	instanceCount = &r.instanceCount
+
+	if instanceCount == nil || *instanceCount == 0 {
+		return AutoscalingGroupUsageSchema
+	}
+
+	usageSchema := make([]*schema.UsageItem, 0, len(AutoscalingGroupUsageSchema))
+	for _, u := range AutoscalingGroupUsageSchema {
+		if u.Key == "instances" {
+			usageSchema = append(usageSchema, &schema.UsageItem{Key: "instances", DefaultValue: intVal(instanceCount), ValueType: schema.Int64})
+		} else {
+			usageSchema = append(usageSchema, u)
+		}
+	}
+	return usageSchema
 }
 
 // BuildResource builds a schema.Resource from a valid ElasticBeanstalkEnvironment struct.
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
-func (r *ElasticBeanstalkEnvironment) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+func (a *ElasticBeanstalkEnvironment) BuildResource() *schema.Resource {
 
-	costComponents = append(costComponents, r.instanceCostComponent())
+	subResources := make([]*schema.Resource, 0)
 
-	// Load balancer definition type
-	if strings.ToLower(r.LoadBalancerType) == "application" {
-		costComponents = append(costComponents, r.applicationLBCostComponents())
-	} else if strings.ToLower(r.LoadBalancerType) == "network" {
-		costComponents = append(costComponents, r.networkLBCostComponents())
+	rootBlockDevice := &EBSVolume{
+		Address: "aws_ebs_volume",
+		Region:  a.Region,
+		Type:    a.RootVolumeType,
+		Size:    a.RootVolumeSize,
+		IOPS:    a.RootVolumeIOPS,
+	}
+
+	launchConfiguration := &LaunchConfiguration{
+		Address:         "aws_launch_configuration",
+		Region:          a.Region,
+		InstanceType:    a.InstanceType,
+		InstanceCount:   &a.InstanceCount,
+		RootBlockDevice: rootBlockDevice,
+	}
+
+	autoScalingGroup := &AutoscalingGroup{
+		Address:             "aws_autoscaling_group",
+		Region:              a.Region,
+		Name:                a.Name,
+		LaunchConfiguration: launchConfiguration,
+	}
+
+	autoScalingGroupResource := autoScalingGroup.BuildResource()
+
+	var estimateInstanceQualities schema.EstimateFunc
+
+	estimateInstanceQualities = autoScalingGroupResource.EstimateUsage
+
+	subResources = append(subResources, autoScalingGroupResource.SubResources...)
+	if a.LoadBalancerType == "classic" {
+		subResources = append(subResources, a.ElasticLoadBalancer.BuildResource())
 	} else {
-		costComponents = append(costComponents, r.classicLBCostComponents())
+		subResources = append(subResources, a.LoadBalancer.BuildResource())
 	}
 
-	// Log streaming to cloudwatch
-	if r.StreamLogs {
-		costComponents = append(
-			costComponents,
-			r.cloudwatchDataIngestionCostComponents(),
-			r.cloudwatchArchivalStorageCostComponents(),
-			r.cloudwatchInsightsCostComponents(),
-		)
+	if a.StreamLogs {
+		subResources = append(subResources, a.CloudwatchLogGroup.BuildResource())
 	}
 
+	if a.RDSIncluded {
+		subResources = append(subResources, a.DBInstance.BuildResource())
+	}
+
+	estimate := func(ctx context.Context, u map[string]interface{}) error {
+		if estimateInstanceQualities != nil {
+			err := estimateInstanceQualities(ctx, u)
+			if err != nil {
+				return err
+			}
+		}
+		if a.Name != "" {
+			count, err := aws.AutoscalingGetInstanceCount(ctx, a.Region, a.Name)
+			if err != nil {
+				return err
+			}
+			if count > 0 {
+				u["instances"] = int64(math.Round(count))
+			}
+		}
+		return nil
+	}
 	return &schema.Resource{
-		Name:           r.Address,
-		UsageSchema:    ElasticBeanstalkEnvironmentUsageSchema,
-		CostComponents: costComponents,
+		Name:           a.Address,
+		UsageSchema:    a.getUsageSchemaWithDefaultInstanceCount(),
+		CostComponents: autoScalingGroupResource.CostComponents,
+		SubResources:   subResources,
+		EstimateUsage:  estimate,
 	}
-}
 
-func (r *ElasticBeanstalkEnvironment) instanceCostComponent() *schema.CostComponent {
-
-	osLabel := "Linux/UNIX"
-
-	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, r.PurchaseOption, r.InstanceType),
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.Nodes)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("AmazonEC2"),
-			ProductFamily: strPtr("Compute Instance"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "instanceType", Value: strPtr(r.InstanceType)},
-				{Key: "tenancy", Value: strPtr("Dedicated")},
-				{Key: "preInstalledSw", Value: strPtr("NA")},
-				{Key: "capacitystatus", Value: strPtr("Used")},
-				{Key: "operatingSystem", Value: strPtr("Linux")},
-			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr(r.PurchaseOption),
-		},
-	}
-}
-
-func (r *ElasticBeanstalkEnvironment) applicationLBCostComponents() *schema.CostComponent {
-
-	return &schema.CostComponent{
-		Name:           "Application load balancer",
-		Unit:           "hours",
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		UnitMultiplier: decimal.NewFromInt(1),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("AWSELB"),
-			ProductFamily: strPtr("Load Balancer-Application"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "locationType", Value: strPtr("AWS Region")},
-				{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
-			},
-		},
-	}
-}
-
-func (r *ElasticBeanstalkEnvironment) networkLBCostComponents() *schema.CostComponent {
-
-	return &schema.CostComponent{
-		Name:           "Network load balancer",
-		Unit:           "hours",
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		UnitMultiplier: decimal.NewFromInt(1),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("AWSELB"),
-			ProductFamily: strPtr("Load Balancer-Network"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "locationType", Value: strPtr("AWS Region")},
-				{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
-			},
-		},
-	}
-}
-
-func (r *ElasticBeanstalkEnvironment) classicLBCostComponents() *schema.CostComponent {
-
-	return &schema.CostComponent{
-		Name:           "Classic load balancer",
-		Unit:           "hours",
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		UnitMultiplier: decimal.NewFromInt(1),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("AWSELB"),
-			ProductFamily: strPtr("Load Balancer"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "locationType", Value: strPtr("AWS Region")},
-				{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
-			},
-		},
-	}
-}
-
-func (r *ElasticBeanstalkEnvironment) cloudwatchDataIngestionCostComponents() *schema.CostComponent {
-
-	return &schema.CostComponent{
-		Name:            "Cloudwatch Data ingested",
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyDataIngestedGB),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("AmazonCloudWatch"),
-			ProductFamily: strPtr("Data Payload"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/-DataProcessing-Bytes/")},
-			},
-		},
-	}
-}
-
-func (r *ElasticBeanstalkEnvironment) cloudwatchArchivalStorageCostComponents() *schema.CostComponent {
-
-	return &schema.CostComponent{
-		Name:            "Cloudwatch Archival Storage",
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: floatPtrToDecimalPtr(r.StorageGB),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("AmazonCloudWatch"),
-			ProductFamily: strPtr("Storage Snapshot"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/-TimedStorage-ByteHrs/")},
-			},
-		},
-	}
-}
-
-func (r *ElasticBeanstalkEnvironment) cloudwatchInsightsCostComponents() *schema.CostComponent {
-
-	return &schema.CostComponent{
-		Name:            "Cloudwatch Insights queries data scanned",
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyDataScannedGB),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("AmazonCloudWatch"),
-			ProductFamily: strPtr("Data Payload"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/-DataScanned-Bytes/")},
-			},
-		},
-	}
 }

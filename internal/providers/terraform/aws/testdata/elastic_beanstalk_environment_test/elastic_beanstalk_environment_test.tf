@@ -30,13 +30,13 @@ resource "aws_elastic_beanstalk_environment" "my_eb_environment_with_usage" {
   setting {
     namespace = "aws:autoscaling:asg"
     name      = "MinSize"
-    value     = 2
+    value     = 4
   }
 
   setting {
     namespace = "aws:autoscaling:asg"
     name      = "MaxSize"
-    value     = 4
+    value     = 6
   }
 
   setting {
@@ -51,10 +51,53 @@ resource "aws_elastic_beanstalk_environment" "my_eb_environment_with_usage" {
     value     = true
   }
 
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "RootVolumeType"
+    value     = "io1"
+  }
+
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "RootVolumeIOPS"
+    value     = 300
+  }
+
 }
 
 resource "aws_elastic_beanstalk_environment" "my_eb_environment" {
   name                = "eb_environment"
+  application         = aws_elastic_beanstalk_application.my_eb_application.name
+  solution_stack_name = "64bit Amazon Linux 2 v3.4.11 running Docker"
+
+  setting {
+    namespace = "aws:ec2:instances"
+    name      = "InstanceTypes"
+    value     = "t3.small"
+  }
+
+  setting {
+    namespace = "aws:autoscaling:asg"
+    name      = "MinSize"
+    value     = 1
+  }
+
+  setting {
+    namespace = "aws:autoscaling:asg"
+    name      = "MaxSize"
+    value     = 4
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "LoadBalancerType"
+    value     = "network"
+  }
+
+}
+
+resource "aws_elastic_beanstalk_environment" "my_eb_environment_with_rds" {
+  name                = "eb_environment_with_rds"
   application         = aws_elastic_beanstalk_application.my_eb_application.name
   solution_stack_name = "64bit Amazon Linux 2 v3.4.11 running Docker"
 
@@ -80,6 +123,36 @@ resource "aws_elastic_beanstalk_environment" "my_eb_environment" {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "LoadBalancerType"
     value     = "network"
+  }
+
+  setting {
+    namespace = "aws:rds:dbinstance"
+    name      = "DBInstanceClass"
+    value     = "db.m6g.xlarge"
+  }
+
+  setting {
+    namespace = "aws:rds:dbinstance"
+    name      = "DBEngine"
+    value     = "postgres"
+  }
+
+  setting {
+    namespace = "aws:rds:dbinstance"
+    name      = "MultiAZDatabase"
+    value     = true
+  }
+
+  setting {
+    namespace = "aws:rds:dbinstance"
+    name      = "DBAllocatedStorage"
+    value     = 100
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "StreamLogs"
+    value     = true
   }
 
 }

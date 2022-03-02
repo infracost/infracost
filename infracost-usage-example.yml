@@ -165,6 +165,10 @@ resource_usage:
     monthly_data_ingested_gb: 50  # Cloudwatch log stream ingest in GB
     monthly_data_scanned_gb: 50   # Cloudwatch data scanned in GB
     storage_gb: 100               # Cloudwatch storage used in GB
+    new_connections: 500000    # Loadbalancer newly established connections per second on average.
+    active_connections: 100000 # Loadbalancer active connections per minute on average.
+    processed_bytes_gb: 25000  # The number of bytes processed by the load balancer for HTTP(S) requests and responses in GB.
+    rule_evaluations: 10000 # Loadbalancer rule evaulations
 
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
