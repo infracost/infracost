@@ -14,136 +14,76 @@ func getElasticBeanstalkEnvironmentRegistryItem() *schema.RegistryItem {
 
 func newElasticBeanstalkEnvironment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
-	var loadBalancerType = ""
-	var instanceType = ""
-	var instanceCount int64
-	var streamLogs bool
-	var rdsIncluded bool
-	var rootVolumeSize int64
-	var rootVolumeType = "gp2"
-	var rootVolumeIOPS int64
-
-	autoscalingGroup := &schema.ResourceData{}
-	data := autoscalingGroup
-
-	for _, setting := range d.Get("setting").Array() {
-		if setting.Get("name").String() == "InstanceTypes" {
-			instanceType = setting.Get("value").String()
-		}
-		if setting.Get("name").String() == "MinSize" {
-			instanceCount = setting.Get("value").Int()
-		}
-		if setting.Get("name").String() == "RootVolumeSize" {
-			rootVolumeSize = setting.Get("value").Int()
-		}
-		if setting.Get("name").String() == "RootVolumeIOPS" {
-			rootVolumeIOPS = setting.Get("value").Int()
-		}
-		if setting.Get("name").String() == "RootVolumeType" {
-			rootVolumeType = setting.Get("value").String()
-		}
-		if setting.Get("name").String() == "LoadBalancerType" {
-			data.Set("load_balancer_type", setting.Get("value").String())
-			loadBalancerType = setting.Get("value").String()
-		}
-		if setting.Get("name").String() == "StreamLogs" {
-			streamLogs = true
-		}
-		if setting.Get("name").String() == "DBInstanceClass" {
-			rdsIncluded = true
-			data.Set("db_instance_class", setting.Get("value").String())
-		}
-		if setting.Get("name").String() == "MultiAZDatabase" {
-			data.Set("multi_az", true)
-		}
-		if setting.Get("name").String() == "DBEngine" {
-			data.Set("engine", setting.Get("value").String())
-		}
-		if setting.Get("name").String() == "DBAllocatedStorage" {
-			data.Set("allocated_storage", setting.Get("value").Float())
-		}
-	}
-	data.Set("region", d.Get("region").String())
-	data.Set("name", d.Get("name").String())
+	var region = d.Get("region").String()
 
 	r := &aws.ElasticBeanstalkEnvironment{
-		Address:          d.Address,
-		Region:           d.Get("region").String(),
-		Name:             d.Get("name").String(),
-		InstanceType:     instanceType,
-		InstanceCount:    instanceCount,
-		LoadBalancerType: loadBalancerType,
-		StreamLogs:       streamLogs,
-		RDSIncluded:      rdsIncluded,
-		RootVolumeSize:   &rootVolumeSize,
-		RootVolumeType:   rootVolumeType,
-		RootVolumeIOPS:   rootVolumeIOPS,
+		Address: d.Address,
+		Region:  region,
+		Name:    d.Get("name").String(),
 	}
 
-	if loadBalancerType == "classic" {
-		r.ElasticLoadBalancer = newELB(data, u)
-	} else {
-		r.LoadBalancer = newLB(data, u)
+	lc := &aws.LaunchConfiguration{
+		Address: "aws_launch_configuration",
+		Region:  region,
+		Tenancy: "dedicated",
+	}
+	volume := &aws.EBSVolume{
+		Address: "aws_ebs_volume",
+		Region:  region,
+	}
+	db := &aws.DBInstance{
+		Address: "aws_db_instance",
+		Region:  region,
+	}
+	cwlg := &aws.CloudwatchLogGroup{
+		Address: "aws_cloudwatch_log_group",
+		Region:  region,
+	}
+	elb := &aws.ELB{
+		Address: "aws_elb",
+		Region:  region,
+	}
+	lb := &aws.LB{
+		Address: "aws_loadbalancer",
+		Region:  region,
 	}
 
-	if streamLogs {
-		r.CloudwatchLogGroup = newCloudwatchLogGroup(data, u)
+	for _, setting := range d.Get("setting").Array() {
+		switch setting.Get("name").String() {
+		case "InstanceTypes":
+			lc.InstanceType = setting.Get("value").String()
+		case "MinSize":
+			lc.InstanceCount = intPtr(setting.Get("value").Int())
+		case "RootVolumeSize":
+			volume.Size = intPtr(setting.Get("value").Int())
+		case "RootVolumeIOPS":
+			volume.IOPS = setting.Get("value").Int()
+		case "RootVolumeType":
+			volume.Type = setting.Get("value").String()
+		case "LoadBalancerType":
+			r.LoadBalancerType = setting.Get("value").String()
+		case "StreamLogs":
+			r.StreamLogs = true
+		case "DBInstanceClass":
+			r.RDSIncluded = true
+			db.InstanceClass = setting.Get("value").String()
+		case "MultiAZDatabase":
+			db.MultiAZ = true
+		case "DBEngine":
+			db.Engine = setting.Get("value").String()
+		case "DBAllocatedStorage":
+			db.AllocatedStorageGB = floatPtr(setting.Get("value").Float())
+		}
 	}
-
-	if rdsIncluded {
-		r.DBInstance = newDBInstance(data, u)
-	}
+	r.LaunchConfiguration = lc
+	r.LaunchConfiguration.RootBlockDevice = volume
+	r.DBInstance = db
+	r.CloudwatchLogGroup = cwlg
+	r.ElasticLoadBalancer = elb
+	r.LoadBalancer = lb
+	r.CloudwatchLogGroup.PopulateUsage(u)
 
 	r.PopulateUsage(u)
 
 	return r.BuildResource()
-}
-
-func newLB(d *schema.ResourceData, u *schema.UsageData) *aws.LB {
-	loadBalancerType := d.Get("load_balancer_type").String()
-
-	r := &aws.LB{
-		Address:          "aws_load_balancer",
-		Region:           d.Get("region").String(),
-		LoadBalancerType: loadBalancerType,
-	}
-	r.PopulateUsage(u)
-	return r
-}
-
-func newELB(d *schema.ResourceData, u *schema.UsageData) *aws.ELB {
-	r := &aws.ELB{
-		Address: "aws_elb",
-		Region:  d.Get("region").String(),
-	}
-	r.PopulateUsage(u)
-	return r
-}
-
-func newCloudwatchLogGroup(d *schema.ResourceData, u *schema.UsageData) *aws.CloudwatchLogGroup {
-	r := &aws.CloudwatchLogGroup{
-		Address: "aws_cloudwatch_log_group",
-		Region:  d.Get("region").String(),
-	}
-
-	r.PopulateUsage(u)
-	return r
-}
-
-func newDBInstance(d *schema.ResourceData, u *schema.UsageData) *aws.DBInstance {
-
-	r := &aws.DBInstance{
-		Address:       "aws_db_instance",
-		Region:        d.Get("region").String(),
-		InstanceClass: d.Get("db_instance_class").String(),
-		Engine:        d.Get("engine").String(),
-		MultiAZ:       d.Get("multi_az").Bool(),
-	}
-
-	if !d.IsEmpty("allocated_storage") {
-		r.AllocatedStorageGB = floatPtr(d.Get("allocated_storage").Float())
-	}
-
-	r.PopulateUsage(u)
-	return r
 }

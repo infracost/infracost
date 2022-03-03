@@ -149,10 +149,4 @@ resource "aws_elastic_beanstalk_environment" "my_eb_environment_with_rds" {
     value     = 100
   }
 
-  setting {
-    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
-    name      = "StreamLogs"
-    value     = true
-  }
-
 }

@@ -1,11 +1,11 @@
 version: 0.1
 resource_usage:
   aws_elastic_beanstalk_environment.my_eb_environment_with_usage:
-    monthly_data_ingested_gb: 250
-    monthly_data_scanned_gb: 100
-    storage_gb: 500
+    cloudwatch_monthly_data_ingested_gb: 250
+    cloudwatch_monthly_data_scanned_gb: 100
+    cloudwatch_storage_gb: 500
     monthly_data_processed_gb: 10000
-    new_connections: 500000    # Number of newly established connections per second on average.
-    active_connections: 100000 # Number of active connections per minute on average.
-    processed_bytes_gb: 25000  # The number of bytes processed by the load balancer for HTTP(S) requests and responses in GB.
-    rule_evaluations: 10000
+    lb_new_connections: 500000    # Number of newly established connections per second on average.
+    lb_active_connections: 100000 # Number of active connections per minute on average.
+    lb_processed_bytes_gb: 25000  # The number of bytes processed by the load balancer for HTTP(S) requests and responses in GB.
+    lb_rule_evaluations: 10000
