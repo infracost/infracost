@@ -78,6 +78,9 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 		if err != nil {
 			return nil, err
 		}
+
+		ctx.SetContextValue("passedPolicyCount", len(policyChecks.Passed))
+		ctx.SetContextValue("failedPolicyCount", len(policyChecks.Failures))
 	}
 
 	opts := output.Options{
