@@ -3,6 +3,7 @@ package terraform
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -12,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
@@ -143,7 +145,8 @@ func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 		spinner.Fail()
 		err = p.buildTerraformErr(err)
 
-		return []terragruntProjectDirs{}, err
+		msg := "terragrunt run-all terragrunt-info failed"
+		return []terragruntProjectDirs{}, clierror.NewSanitizedError(fmt.Errorf("%s: %s", msg, err), msg)
 	}
 
 	var jsons [][]byte
