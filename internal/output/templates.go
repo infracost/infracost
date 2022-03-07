@@ -411,6 +411,23 @@ var CommentMarkdownTemplate = `
 {{ .DiffOutput }}
 ` + "```" /* can't escape backticks */ + `
 
+{{- if .Options.PolicyChecks.Enabled }}
+	{{- if gt (len .Options.PolicyChecks.Failures) 0 }}
+**Policy checks failed:**
+` + "```" /* can't escape backticks */ + `
+				{{ range $v, $f := .Options.PolicyChecks.Failures}}
+> {{ $f }}
+				{{- end}}
+` + "```" /* can't escape backticks */ + `
+	{{ else }}
+**Policy checks passed:**
+` + "```" /* can't escape backticks */ + `
+			{{ range $v, $f := .Options.PolicyChecks.Passed}}
+> {{ $f }}
+			{{- end}}
+` + "```" /* can't escape backticks */ + `
+	{{- end }}
+{{- end }}
 {{- if .MarkdownOptions.WillUpdate }}
 
 This comment will be updated when the cost estimate changes.
