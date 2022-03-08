@@ -45,7 +45,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 	}
 
 	var monthlyIORequests *decimal.Decimal
-	if !(r.MonthlyStandardIORequests == nil) {
+	if r.MonthlyStandardIORequests != nil {
 		monthlyIORequests = decimalPtr(decimal.NewFromInt(*r.MonthlyStandardIORequests))
 	}
 
