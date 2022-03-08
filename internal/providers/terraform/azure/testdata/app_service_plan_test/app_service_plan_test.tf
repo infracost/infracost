@@ -114,7 +114,7 @@ resource "azurerm_app_service_plan" "default_capacity" {
   reserved            = false
 
   sku {
-    tier     = "Basic"
-    size     = "B2"
+    tier = "Basic"
+    size = "B2"
   }
 }
