@@ -45,6 +45,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getECSServiceRegistryItem(),
 	getEFSFileSystemRegistryItem(),
 	getEIPRegistryItem(),
+	getElasticBeanstalkEnvironmentRegistryItem(),
 	getElastiCacheClusterItem(),
 	getElastiCacheReplicationGroupItem(),
 	getElasticsearchDomainRegistryItem(),
@@ -95,7 +96,6 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getStepFunctionRegistryItem(),
 	getDirectoryServiceDirectory(),
 	getTransferServerRegistryItem(),
-	getElasticBeanstalkEnvironmentRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

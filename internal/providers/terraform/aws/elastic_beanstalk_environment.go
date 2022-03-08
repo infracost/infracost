@@ -13,10 +13,9 @@ func getElasticBeanstalkEnvironmentRegistryItem() *schema.RegistryItem {
 }
 
 func newElasticBeanstalkEnvironment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-
 	var region = d.Get("region").String()
-	var StreamLogs = false
-	var DBIncluded = false
+	var streamLogs = false
+	var dBIncluded = false
 
 	r := &aws.ElasticBeanstalkEnvironment{
 		Address: d.Address,
@@ -29,22 +28,27 @@ func newElasticBeanstalkEnvironment(d *schema.ResourceData, u *schema.UsageData)
 		Region:  region,
 		Tenancy: "dedicated",
 	}
+
 	volume := &aws.EBSVolume{
 		Address: "aws_ebs_volume",
 		Region:  region,
 	}
+
 	db := &aws.DBInstance{
 		Address: "aws_db_instance",
 		Region:  region,
 	}
+
 	cwlg := &aws.CloudwatchLogGroup{
 		Address: "aws_cloudwatch_log_group",
 		Region:  region,
 	}
+
 	elb := &aws.ELB{
 		Address: "aws_elb",
 		Region:  region,
 	}
+
 	lb := &aws.LB{
 		Address: "aws_loadbalancer",
 		Region:  region,
@@ -65,9 +69,9 @@ func newElasticBeanstalkEnvironment(d *schema.ResourceData, u *schema.UsageData)
 		case "LoadBalancerType":
 			r.LoadBalancerType = setting.Get("value").String()
 		case "StreamLogs":
-			StreamLogs = true
+			streamLogs = true
 		case "DBInstanceClass":
-			DBIncluded = true
+			dBIncluded = true
 			db.InstanceClass = setting.Get("value").String()
 		case "MultiAZDatabase":
 			db.MultiAZ = true
@@ -79,12 +83,15 @@ func newElasticBeanstalkEnvironment(d *schema.ResourceData, u *schema.UsageData)
 	}
 	r.LaunchConfiguration = lc
 	r.LaunchConfiguration.RootBlockDevice = volume
-	if DBIncluded {
+
+	if dBIncluded {
 		r.DBInstance = db
 	}
-	if StreamLogs {
+
+	if streamLogs {
 		r.CloudwatchLogGroup = cwlg
 	}
+
 	if r.LoadBalancerType == "classic" {
 		r.ElasticLoadBalancer = elb
 	} else {

@@ -30,14 +30,14 @@
  │     ├─ Storage (provisioned IOPS SSD, io1)                                32  GB                       $4.42 
  │     └─ Provisioned IOPS                                                1,200  IOPS                    $86.40 
  ├─ aws_cloudwatch_log_group                                                                                    
- │  ├─ Data ingested                                                        250  GB                     $142.50 
- │  ├─ Archival Storage                                                     500  GB                      $15.00 
- │  └─ Insights queries data scanned                                        100  GB                       $0.57 
+ │  ├─ Data ingested                                                      1,000  GB                     $570.00 
+ │  ├─ Archival Storage                                                   1,000  GB                      $30.00 
+ │  └─ Insights queries data scanned                                        200  GB                       $1.14 
  └─ aws_elb                                                                                                     
     ├─ Classic load balancer                                                730  hours                   $20.44 
     └─ Data processed                                                    10,000  GB                      $80.00 
                                                                                                                 
- OVERALL TOTAL                                                                                        $1,588.28 
+ OVERALL TOTAL                                                                                        $2,031.35 
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
