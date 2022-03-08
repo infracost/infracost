@@ -45,6 +45,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getECSServiceRegistryItem(),
 	getEFSFileSystemRegistryItem(),
 	getEIPRegistryItem(),
+	getElasticBeanstalkEnvironmentRegistryItem(),
 	getElastiCacheClusterItem(),
 	getElastiCacheReplicationGroupItem(),
 	getElasticsearchDomainRegistryItem(),
@@ -200,6 +201,9 @@ var FreeResources = []string{
 	// AWS ECR
 	"aws_ecr_lifecycle_policy",
 	"aws_ecr_repository_policy",
+
+	// AWS Elastic Beanstalk
+	"aws_elastic_beanstalk_application",
 
 	// AWS Elastic Container Service
 	"aws_ecs_capacity_provider",
