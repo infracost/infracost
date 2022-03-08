@@ -14,6 +14,11 @@ resource "aws_db_instance" "mysql-default" {
   instance_class = "db.t3.large"
 }
 
+resource "aws_db_instance" "mysql-replica" {
+  replicate_source_db = aws_db_instance.mysql-default.id
+  instance_class      = "db.t3.large"
+}
+
 resource "aws_db_instance" "mysql-allocated-storage" {
   engine                  = "mysql"
   instance_class          = "db.t3.large"
