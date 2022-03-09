@@ -9,7 +9,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getCloudFunctionsRegistryItem(),
 	getComputeAddressRegistryItem(),
 	GetComputeDiskRegistryItem(),
-	GetComputeExternalVPNGatewayRegistryItem(),
+	getComputeExternalVPNGatewayRegistryItem(),
 	getComputeForwardingRuleRegistryItem(),
 	GetComputeGlobalAddressRegistryItem(),
 	GetComputeGlobalForwardingRuleRegistryItem(),
