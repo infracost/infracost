@@ -20,20 +20,9 @@ jobs:
           make release
 
       - name: Release
-        uses: docker://antonyurchenko/git-release:latest
+        run: go run tools/release/main.go
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DRAFT_RELEASE: "true"
-          PRE_RELEASE: "false"
-          CHANGELOG_FILE: "none"
-          ALLOW_EMPTY_CHANGELOG: "true"
-          RELEASE_NAME_PREFIX: "Release "
-        with:
-          args: |
-            ./build/*.tar.gz
-            ./build/*.zip
-            ./build/*.sha256
-            ./docs/generated/docs.tar.gz
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
