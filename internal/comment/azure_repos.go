@@ -169,12 +169,16 @@ func (h *azureReposPRHandler) CallFindMatchingComments(ctx context.Context, tag 
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return []Comment{}, errors.Wrap(err, "Error retrieving comments")
+		return []Comment{}, errors.Wrap(err, "Error getting comments")
 	}
 
 	res, err := h.httpClient.Do(req)
 	if err != nil {
-		return []Comment{}, errors.Wrap(err, "Error retrieving comments")
+		return []Comment{}, errors.Wrap(err, "Error getting comments")
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return []Comment{}, errors.Errorf("Error getting comments: %s", res.Status)
 	}
 
 	if res.Body != nil {
