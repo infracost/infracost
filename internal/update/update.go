@@ -142,6 +142,10 @@ func getLatestBrewVersion() (string, error) {
 		return "", err
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		return "", errors.Errorf("Error getting latest version: %s", resp.Status)
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
