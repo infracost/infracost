@@ -33,7 +33,7 @@ Register-ArgumentCompleter -CommandName 'infracost' -ScriptBlock {
     if ($Command.Length -gt $CursorPosition) {
         $Command=$Command.Substring(0,$CursorPosition)
     }
-	__infracost_debug "Truncated command: $Command"
+    __infracost_debug "Truncated command: $Command"
 
     $ShellCompDirectiveError=1
     $ShellCompDirectiveNoSpace=2
@@ -41,7 +41,7 @@ Register-ArgumentCompleter -CommandName 'infracost' -ScriptBlock {
     $ShellCompDirectiveFilterFileExt=8
     $ShellCompDirectiveFilterDirs=16
 
-	# Prepare the command to request completions for the program.
+    # Prepare the command to request completions for the program.
     # Split the command at the first space to separate the program and arguments.
     $Program,$Arguments = $Command.Split(" ",2)
     $RequestComp="$Program __complete $Arguments"
@@ -69,7 +69,7 @@ Register-ArgumentCompleter -CommandName 'infracost' -ScriptBlock {
         # We add an extra empty parameter so we can indicate this to the go method.
         __infracost_debug "Adding extra empty parameter"
         # We need to use `"`" to pass an empty argument a "" or '' does not work!!!
-        $RequestComp="$RequestComp" + ' `"`"' 
+        $RequestComp="$RequestComp" + ' `"`"'
     }
 
     __infracost_debug "Calling $RequestComp"
@@ -123,6 +123,25 @@ Register-ArgumentCompleter -CommandName 'infracost' -ScriptBlock {
         $Space = ""
     }
 
+    if ((($Directive -band $ShellCompDirectiveFilterFileExt) -ne 0 ) -or
+       (($Directive -band $ShellCompDirectiveFilterDirs) -ne 0 ))  {
+        __infracost_debug "ShellCompDirectiveFilterFileExt ShellCompDirectiveFilterDirs are not supported"
+
+        # return here to prevent the completion of the extensions
+        return
+    }
+
+    $Values = $Values | Where-Object {
+        # filter the result
+        $_.Name -like "$WordToComplete*"
+
+        # Join the flag back if we have an equal sign flag
+        if ( $IsEqualFlag ) {
+            __infracost_debug "Join the equal sign flag back to the completion value"
+            $_.Name = $Flag + "=" + $_.Name
+        }
+    }
+
     if (($Directive -band $ShellCompDirectiveNoFileComp) -ne 0 ) {
         __infracost_debug "ShellCompDirectiveNoFileComp is called"
 
@@ -136,32 +155,13 @@ Register-ArgumentCompleter -CommandName 'infracost' -ScriptBlock {
         }
     }
 
-    if ((($Directive -band $ShellCompDirectiveFilterFileExt) -ne 0 ) -or
-       (($Directive -band $ShellCompDirectiveFilterDirs) -ne 0 ))  {
-        __infracost_debug "ShellCompDirectiveFilterFileExt ShellCompDirectiveFilterDirs are not supported"
-
-        # return here to prevent the completion of the extensions
-        return
-    }
-
-    $Values = $Values | Where-Object {
-        # filter the result
-        $_.Name -like "$WordToComplete*"
-
-        # Join the flag back if we have a equal sign flag
-        if ( $IsEqualFlag ) {
-            __infracost_debug "Join the equal sign flag back to the completion value"
-            $_.Name = $Flag + "=" + $_.Name
-        }
-    }
-
     # Get the current mode
     $Mode = (Get-PSReadLineKeyHandler | Where-Object {$_.Key -eq "Tab" }).Function
     __infracost_debug "Mode: $Mode"
 
     $Values | ForEach-Object {
 
-        # store temporay because switch will overwrite $_
+        # store temporary because switch will overwrite $_
         $comp = $_
 
         # PowerShell supports three different completion modes
@@ -216,7 +216,7 @@ Register-ArgumentCompleter -CommandName 'infracost' -ScriptBlock {
             Default {
                 # Like MenuComplete but we don't want to add a space here because
                 # the user need to press space anyway to get the completion.
-                # Description will not be shown because thats not possible with TabCompleteNext
+                # Description will not be shown because that's not possible with TabCompleteNext
                 [System.Management.Automation.CompletionResult]::new($($comp.Name | __infracost_escapeStringWithSpecialChars), "$($comp.Name)", 'ParameterValue', "$($comp.Description)")
             }
         }

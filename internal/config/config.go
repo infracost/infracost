@@ -77,6 +77,8 @@ type Config struct {
 
 	NoCache bool `yaml:"fields,omitempty" ignored:"true"`
 
+	SkipErrLine bool
+
 	// for testing
 	EventsDisabled       bool
 	LogWriter            io.Writer
