@@ -8,7 +8,6 @@ import (
 
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/pkg/errors"
@@ -134,7 +133,7 @@ func queryPolicy(policyPaths []string, input output.Root) (output.PolicyCheck, e
 
 	inputValue, err := ast.InterfaceToValue(input)
 	if err != nil {
-		return checks, fmt.Errorf("Unable to process infracost output into rego input: %s", err.Error())
+		return checks, fmt.Errorf("Unable to process Infracost output into rego input: %s", err.Error())
 	}
 
 	ctx := context.Background()
@@ -172,18 +171,18 @@ func queryPolicy(policyPaths []string, input output.Root) (output.PolicyCheck, e
 }
 
 func readPolicyOut(v map[string]interface{}, checks *output.PolicyCheck) {
-	if _, ok := v["failed"]; !ok {
-		log.Debugf("skipping policy output as did not contain [failed] property in output object")
-		return
-	}
-
 	if _, ok := v["msg"]; !ok {
-		log.Debugf("skipping policy output as did not contain [msg] property in output object")
+		checks.Failures = append(checks.Failures, "Policy rule invalid as it did not contain {msg: string} property in output object. Please edit rule output object.")
+		return
+	}
+	msg := v["msg"].(string)
+
+	if _, ok := v["failed"]; !ok {
+		checks.Failures = append(checks.Failures, fmt.Sprintf("Policy rule: [%s] did not contain {failed: bool} output property. Please edit rule output object.", msg))
 		return
 	}
 
-	failed := v["failed"].(bool)
-	msg := v["msg"].(string)
+	failed, _ := v["failed"].(bool)
 
 	if failed {
 		checks.Failures = append(checks.Failures, msg)
