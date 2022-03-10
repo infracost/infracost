@@ -54,6 +54,7 @@ type Config struct {
 	Version         string `yaml:"version,omitempty" ignored:"true"`
 	LogLevel        string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
 	NoColor         bool   `yaml:"no_color,omitempty" envconfig:"INFRACOST_NO_COLOR"`
+	NoSpinner       bool   `yaml:"no_spinner,omitempty" envconfig:"INFRACOST_NO_SPINNER"`
 	SkipUpdateCheck bool   `yaml:"skip_update_check,omitempty" envconfig:"INFRACOST_SKIP_UPDATE_CHECK"`
 	Parallelism     *int   `envconfig:"INFRACOST_PARALLELISM"`
 
@@ -94,8 +95,9 @@ func init() {
 
 func DefaultConfig() *Config {
 	return &Config{
-		LogLevel: "",
-		NoColor:  false,
+		LogLevel:  "",
+		NoColor:   false,
+		NoSpinner: false,
 
 		DefaultPricingAPIEndpoint: "https://pricing.api.infracost.io",
 		PricingAPIEndpoint:        "",
@@ -207,6 +209,10 @@ func (c *Config) ConfigureLogger() error {
 
 func (c *Config) IsLogging() bool {
 	return c.LogLevel != ""
+}
+
+func (c *Config) EnabledSpinner() bool {
+	return !c.NoSpinner
 }
 
 func (c *Config) IsSelfHosted() bool {

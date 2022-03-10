@@ -56,6 +56,7 @@ func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
 		ctx:  ctx,
 		Path: ctx.ProjectConfig.Path,
 		spinnerOpts: ui.SpinnerOptions{
+			Enabled:       ctx.RunContext.Config.EnabledSpinner(),
 			EnableLogging: ctx.RunContext.Config.IsLogging(),
 			NoColor:       ctx.RunContext.Config.NoColor,
 			Indent:        "  ",
@@ -139,6 +140,7 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 	}
 
 	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
+		Enabled:       p.ctx.RunContext.Config.EnabledSpinner(),
 		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
 		NoColor:       p.ctx.RunContext.Config.NoColor,
 		Indent:        "  ",

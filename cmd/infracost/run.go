@@ -391,6 +391,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
+		Enabled:       runCtx.Config.EnabledSpinner(),
 		EnableLogging: runCtx.Config.IsLogging(),
 		NoColor:       runCtx.Config.NoColor,
 		Indent:        "  ",
@@ -517,6 +518,7 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
+		Enabled:       runCtx.Config.EnabledSpinner(),
 		EnableLogging: runCtx.Config.IsLogging(),
 		NoColor:       runCtx.Config.NoColor,
 		Indent:        "  ",

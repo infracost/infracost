@@ -37,6 +37,7 @@ func (p *PlanJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
+		Enabled:       p.ctx.RunContext.Config.EnabledSpinner(),
 		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
 		NoColor:       p.ctx.RunContext.Config.NoColor,
 		Indent:        "  ",

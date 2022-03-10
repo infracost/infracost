@@ -94,6 +94,7 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	projects := make([]*schema.Project, 0, len(projectDirs))
 
 	spinner := ui.NewSpinner("Extracting only cost-related params from terragrunt plan", ui.SpinnerOptions{
+		Enabled:       p.ctx.RunContext.Config.EnabledSpinner(),
 		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
 		NoColor:       p.ctx.RunContext.Config.NoColor,
 		Indent:        "  ",

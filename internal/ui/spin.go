@@ -11,6 +11,7 @@ import (
 )
 
 type SpinnerOptions struct {
+	Enabled       bool
 	EnableLogging bool
 	NoColor       bool
 	Indent        string
@@ -33,6 +34,10 @@ func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
 		opts:    opts,
 	}
 
+	if !opts.Enabled {
+		return s
+	}
+
 	if s.opts.EnableLogging {
 		log.Infof("Starting: %s", msg)
 	} else {
@@ -48,11 +53,14 @@ func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
 }
 
 func (s *Spinner) Stop() {
+	if !s.opts.Enabled {
+		return
+	}
 	s.spinner.Stop()
 }
 
 func (s *Spinner) Fail() {
-	if s.spinner == nil || !s.spinner.Active() {
+	if s.spinner == nil || !s.spinner.Active() || !s.opts.Enabled {
 		return
 	}
 	s.Stop()
@@ -68,12 +76,15 @@ func (s *Spinner) Fail() {
 }
 
 func (s *Spinner) SuccessWithMessage(newMsg string) {
+	if !s.opts.Enabled {
+		return
+	}
 	s.msg = newMsg
 	s.Success()
 }
 
 func (s *Spinner) Success() {
-	if !s.spinner.Active() {
+	if !s.spinner.Active() || !s.opts.Enabled {
 		return
 	}
 	s.Stop()
