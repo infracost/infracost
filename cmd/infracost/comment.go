@@ -41,7 +41,7 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 
 	cmds := []*cobra.Command{commentGitHubCmd(ctx), commentGitLabCmd(ctx), commentAzureReposCmd(ctx), commentBitbucketCmd(ctx)}
 	for _, subCmd := range cmds {
-		subCmd.Flags().StringArray("policy-path", nil, "Paths to any Infracost cost policies (experimental)")
+		subCmd.Flags().StringArray("policy-path", nil, "Path to Infracost policy files, glob patterns need quotes (experimental)")
 	}
 
 	cmd.AddCommand(cmds...)
