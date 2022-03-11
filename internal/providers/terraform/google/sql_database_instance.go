@@ -31,7 +31,7 @@ func NewSQLInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	var resource *schema.Resource
 
 	replica := false
-	if d.Get("replica_configuration").Exists() {
+	if !d.IsEmpty("replica_configuration") {
 		replica = true
 	}
 
@@ -91,7 +91,7 @@ func sqlDatabaseInstanceCostComponents(d *schema.ResourceData, u *schema.UsageDa
 		}
 		costComponents = append(costComponents, backupCostComponent(region, backupGB))
 
-		if d.Get("settings.0").Get("ip_configuration.0").Get("ipv4_enabled").Exists() {
+		if !d.Get("settings.0").Get("ip_configuration.0").Get("ipv4_enabled").Exists() || d.Get("settings.0").Get("ip_configuration.0").Get("ipv4_enabled").Bool() {
 			costComponents = append(costComponents, ipv4CostComponent())
 		}
 	}
