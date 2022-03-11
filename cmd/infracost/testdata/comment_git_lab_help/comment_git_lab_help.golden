@@ -24,7 +24,7 @@ FLAGS
   -h, --help                       help for gitlab
       --merge-request int          Merge request number to post comment on, mutually exclusive with commit
   -p, --path stringArray           Path to Infracost JSON files, glob patterns need quotes
-      --policy-path stringArray    Paths to any Infracost cost policies (experimental)
+      --policy-path stringArray    Path to Infracost policy files, glob patterns need quotes (experimental)
       --repo string                Repository in format owner/repo
       --tag string                 Customize hidden markdown tag used to detect comments posted by Infracost
 

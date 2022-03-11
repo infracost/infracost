@@ -46,14 +46,17 @@ Infracost does not make any changes to your Terraform state or cloud resources. 
 
 ```sh
 git clone https://github.com/infracost/example-terraform.git
+
 cd example-terraform/sample1
 
 # Play with main.tf and re-run to compare costs
 infracost breakdown --path .
 
-# Show diff of monthly costs, edit the yml file and re-run to compare costs
-infracost diff --path . --sync-usage-file --usage-file infracost-usage.yml
+# Show diff of monthly costs between current and planned state
+infracost diff --path .
 ```
+
+Infracost can also estimate [usage-based resources](https://www.infracost.io/docs/features/usage_based_resources/) such as AWS S3 or Lambda.
 
 ### 4. Add to CI/CD
 
