@@ -133,7 +133,7 @@ func queryPolicy(policyPaths []string, input output.Root) (output.PolicyCheck, e
 
 	inputValue, err := ast.InterfaceToValue(input)
 	if err != nil {
-		return checks, fmt.Errorf("Unable to process Infracost output into rego input: %s", err.Error())
+		return checks, fmt.Errorf("Unable to process Infracost output into Rego input: %s", err.Error())
 	}
 
 	ctx := context.Background()
@@ -146,12 +146,16 @@ func queryPolicy(policyPaths []string, input output.Root) (output.PolicyCheck, e
 	)
 	pq, err := r.PrepareForEval(ctx)
 	if err != nil {
-		return checks, fmt.Errorf("Unable to query cost policy: %s", err.Error())
+		return checks, fmt.Errorf("Unable to query provided policies: %s", err.Error())
 	}
 
 	res, err := pq.Eval(ctx)
 	if err != nil {
 		return checks, err
+	}
+
+	if len(res) == 0 {
+		return checks, fmt.Errorf("The provided polices returned no valid data.infracost.deny rules. Please check that the policies are formatted correctly.")
 	}
 
 	for _, e := range res[0].Expressions {
