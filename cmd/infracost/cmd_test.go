@@ -17,7 +17,6 @@ import (
 
 var (
 	timestampRegex   = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)
-	outputPathRegex  = regexp.MustCompile(`Output saved to .*`)
 	urlRegex         = regexp.MustCompile(`https://dashboard.infracost.io/share/.*`)
 	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/examples/.*\)`)
 	versionRegex     = regexp.MustCompile(`Infracost v.*`)
@@ -28,6 +27,10 @@ type GoldenFileOptions = struct {
 	Currency    string
 	CaptureLogs bool
 	IsJSON      bool
+	// RunHCL sets the cmd test to also run the cmd with --terraform-parse-hcl set
+	RunHCL bool
+	// OnlyRunHCL sets the cmd test to only run cmd with --terraform-parse-hcl set and ignore the Terraform binary.
+	OnlyRunHCL bool
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -39,6 +42,27 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
+	if testOptions != nil && (testOptions.RunHCL || testOptions.OnlyRunHCL) {
+		t.Run("HCL", func(t *testing.T) {
+			hclArgs := make([]string, len(args)+2)
+			copy(hclArgs, args)
+			hclArgs[len(args)] = "--terraform-parse-hcl"
+			hclArgs[len(args)+1] = "true"
+
+			goldenFileCommandTest(t, testName, hclArgs, testOptions, ctxOptions)
+		})
+	}
+
+	if testOptions == nil || !testOptions.OnlyRunHCL {
+		t.Run("Terraform CLI", func(t *testing.T) {
+			goldenFileCommandTest(t, testName, args, testOptions, ctxOptions)
+		})
+	}
+}
+
+func goldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions []func(ctx *config.RunContext)) {
+	t.Helper()
+
 	if testOptions == nil {
 		testOptions = DefaultOptions()
 	}
@@ -52,9 +76,14 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 	var actual []byte
 	var logBuf *bytes.Buffer
 
+	currency := testOptions.Currency
+	if currency == "" {
+		currency = "USD"
+	}
+
 	main.Run(func(c *config.RunContext) {
 		c.Config.EventsDisabled = true
-		c.Config.Currency = testOptions.Currency
+		c.Config.Currency = currency
 		c.Config.NoColor = true
 		c.ErrWriter = errBuf
 		c.OutWriter = outBuf
@@ -106,7 +135,6 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 // including timestamps and temp file paths
 func stripDynamicValues(actual []byte) []byte {
 	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
-	actual = outputPathRegex.ReplaceAll(actual, []byte("Output saved to REPLACED_OUTPUT_PATH"))
 	actual = urlRegex.ReplaceAll(actual, []byte("https://dashboard.infracost.io/share/REPLACED_SHARE_CODE"))
 	actual = projectPathRegex.ReplaceAll(actual, []byte("$1 REPLACED_PROJECT_PATH"))
 	actual = versionRegex.ReplaceAll(actual, []byte("Infracost vREPLACED_VERSION"))

@@ -107,25 +107,31 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 	p.parseReferences(resData, conf)
 	p.loadInfracostProviderUsageData(usage, resData)
 	p.stripDataResources(resData)
+	p.populateUsageData(resData, usage)
 
 	for _, d := range resData {
-		var usageData *schema.UsageData
-
-		if ud := usage[d.Address]; ud != nil {
-			usageData = ud
-		} else if strings.HasSuffix(d.Address, "]") {
-			lastIndexOfOpenBracket := strings.LastIndex(d.Address, "[")
-
-			if arrayUsageData := usage[fmt.Sprintf("%s[*]", d.Address[:lastIndexOfOpenBracket])]; arrayUsageData != nil {
-				usageData = arrayUsageData
-			}
-		}
-		if r := p.createResource(d, usageData); r != nil {
+		if r := p.createResource(d, d.UsageData); r != nil {
 			resources = append(resources, r)
 		}
 	}
 
 	return resources
+}
+
+// populateUsageData finds the UsageData for each ResourceData and sets the ResourceData.UsageData field
+// in case it is needed when processing a reference attribute
+func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usage map[string]*schema.UsageData) {
+	for _, d := range resData {
+		if ud := usage[d.Address]; ud != nil {
+			d.UsageData = ud
+		} else if strings.HasSuffix(d.Address, "]") {
+			lastIndexOfOpenBracket := strings.LastIndex(d.Address, "[")
+
+			if arrayUsageData := usage[fmt.Sprintf("%s[*]", d.Address[:lastIndexOfOpenBracket])]; arrayUsageData != nil {
+				d.UsageData = arrayUsageData
+			}
+		}
+	}
 }
 
 func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
@@ -174,6 +180,9 @@ func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schem
 		for _, t := range GetUsageOnlyResources() {
 			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
 				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})
+				// set the usage data as a field on the resource data in case it is needed when
+				// processing reference attributes.
+				d.UsageData = v
 				if r := p.createResource(d, v); r != nil {
 					resources = append(resources, r)
 				}
@@ -411,6 +420,16 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 
 		idMap[id] = append(idMap[id], d)
 
+		// check for any "custom" ids specified by the resource and add them.
+		if f := registryMap.GetCustomRefIDFunc(d.Type); f != nil {
+			for _, customID := range f(d) {
+				if _, ok := idMap[customID]; !ok {
+					idMap[customID] = []*schema.ResourceData{}
+				}
+				idMap[customID] = append(idMap[customID], d)
+			}
+		}
+
 		arnAttr, ok := arnAttributeMap[d.Type]
 		if !ok {
 			arnAttr = "arn"
@@ -432,14 +451,11 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 		if isInfracostResource(d) {
 			refAttrs = []string{"resources"}
 		} else {
-			item, ok := (*registryMap)[d.Type]
-			if ok {
-				refAttrs = item.ReferenceAttributes
-			}
+			refAttrs = registryMap.GetReferenceAttributes(d.Type)
 		}
 
 		for _, attr := range refAttrs {
-			found := p.parseConfReferences(resData, conf, d, attr)
+			found := p.parseConfReferences(resData, conf, d, attr, registryMap)
 
 			if found {
 				continue
@@ -454,8 +470,10 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 				// Check ID map
 				idRefs, ok := idMap[refVal.String()]
 				if ok {
+
 					for _, ref := range idRefs {
-						d.AddReference(attr, ref)
+						reverseRefAttrs := registryMap.GetReferenceAttributes(ref.Type)
+						d.AddReference(attr, ref, reverseRefAttrs)
 					}
 				}
 
@@ -463,7 +481,8 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 				arnRefs, ok := arnMap[refVal.String()]
 				if ok {
 					for _, ref := range arnRefs {
-						d.AddReference(attr, ref)
+						reverseRefAttrs := registryMap.GetReferenceAttributes(ref.Type)
+						d.AddReference(attr, ref, reverseRefAttrs)
 					}
 				}
 			}
@@ -471,7 +490,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 	}
 }
 
-func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string) bool {
+func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap) bool {
 	// Check if there's a reference in the conf
 	resConf := getConfJSON(conf, d.Address)
 	refResults := resConf.Get("expressions").Get(attr).Get("references").Array()
@@ -518,8 +537,8 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 
 		if ok {
 			found = true
-
-			d.AddReference(attr, refData)
+			reverseRefAttrs := registryMap.GetReferenceAttributes(refData.Type)
+			d.AddReference(attr, refData, reverseRefAttrs)
 		}
 	}
 
@@ -714,7 +733,7 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 				for _, destD := range resData {
 					suffix := fmt.Sprintf("%s[%d]", knownRef.DestAddrSuffix, countIndex)
 					if cmp.Equal(getModuleNames(destD.Address), modNames) && strings.HasSuffix(destD.Address, suffix) {
-						d.AddReference(knownRef.Attribute, destD)
+						d.AddReference(knownRef.Attribute, destD, []string{})
 					}
 				}
 			}

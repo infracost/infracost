@@ -1,10 +1,11 @@
 package google
 
 import (
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetContainerNodePoolRegistryItem() *schema.RegistryItem {

@@ -2,7 +2,7 @@
 
 __infracost_debug()
 {
-    if [[ -n ${BASH_COMP_DEBUG_FILE} ]]; then
+    if [[ -n ${BASH_COMP_DEBUG_FILE:-} ]]; then
         echo "$*" >> "${BASH_COMP_DEBUG_FILE}"
     fi
 }
@@ -112,7 +112,7 @@ __infracost_handle_go_custom_completion()
         $filteringCmd
     elif [ $((directive & shellCompDirectiveFilterDirs)) -ne 0 ]; then
         # File completion for directories only
-        local subDir
+        local subdir
         # Use printf to strip any trailing newline
         subdir=$(printf "%s" "${out[0]}")
         if [ -n "$subdir" ]; then
@@ -165,13 +165,19 @@ __infracost_handle_reply()
                     PREFIX=""
                     cur="${cur#*=}"
                     ${flags_completion[${index}]}
-                    if [ -n "${ZSH_VERSION}" ]; then
+                    if [ -n "${ZSH_VERSION:-}" ]; then
                         # zsh completion needs --flag= prefix
                         eval "COMPREPLY=( \"\${COMPREPLY[@]/#/${flag}=}\" )"
                     fi
                 fi
             fi
-            return 0;
+
+            if [[ -z "${flag_parsing_disabled}" ]]; then
+                # If flag parsing is enabled, we have completed the flags and can return.
+                # If flag parsing is disabled, we may not know all (or any) of the flags, so we fallthrough
+                # to possibly call handle_go_custom_completion.
+                return 0;
+            fi
             ;;
     esac
 
@@ -210,13 +216,13 @@ __infracost_handle_reply()
     fi
 
     if [[ ${#COMPREPLY[@]} -eq 0 ]]; then
-		if declare -F __infracost_custom_func >/dev/null; then
-			# try command name qualified custom func
-			__infracost_custom_func
-		else
-			# otherwise fall back to unqualified for compatibility
-			declare -F __custom_func >/dev/null && __custom_func
-		fi
+        if declare -F __infracost_custom_func >/dev/null; then
+            # try command name qualified custom func
+            __infracost_custom_func
+        else
+            # otherwise fall back to unqualified for compatibility
+            declare -F __custom_func >/dev/null && __custom_func
+        fi
     fi
 
     # available in bash-completion >= 2, not always present on macOS
@@ -250,7 +256,7 @@ __infracost_handle_flag()
 
     # if a command required a flag, and we found it, unset must_have_one_flag()
     local flagname=${words[c]}
-    local flagvalue
+    local flagvalue=""
     # if the word contained an =
     if [[ ${words[c]} == *"="* ]]; then
         flagvalue=${flagname#*=} # take in as flagvalue after the =
@@ -269,7 +275,7 @@ __infracost_handle_flag()
 
     # keep flag value with flagname as flaghash
     # flaghash variable is an associative array which is only supported in bash > 3.
-    if [[ -z "${BASH_VERSION}" || "${BASH_VERSINFO[0]}" -gt 3 ]]; then
+    if [[ -z "${BASH_VERSION:-}" || "${BASH_VERSINFO[0]:-}" -gt 3 ]]; then
         if [ -n "${flagvalue}" ] ; then
             flaghash[${flagname}]=${flagvalue}
         elif [ -n "${words[ $((c+1)) ]}" ] ; then
@@ -281,7 +287,7 @@ __infracost_handle_flag()
 
     # skip the argument to a two word flag
     if [[ ${words[c]} != *"="* ]] && __infracost_contains_word "${words[c]}" "${two_word_flags[@]}"; then
-			  __infracost_debug "${FUNCNAME[0]}: found a flag ${words[c]}, skip the next argument"
+        __infracost_debug "${FUNCNAME[0]}: found a flag ${words[c]}, skip the next argument"
         c=$((c+1))
         # if we are looking for a flags value, don't show commands
         if [[ $c -eq $cword ]]; then
@@ -341,7 +347,7 @@ __infracost_handle_word()
         __infracost_handle_command
     elif __infracost_contains_word "${words[c]}" "${command_aliases[@]}"; then
         # aliashash variable is an associative array which is only supported in bash > 3.
-        if [[ -z "${BASH_VERSION}" || "${BASH_VERSINFO[0]}" -gt 3 ]]; then
+        if [[ -z "${BASH_VERSION:-}" || "${BASH_VERSINFO[0]:-}" -gt 3 ]]; then
             words[c]=${aliashash[${words[c]}]}
             __infracost_handle_command
         else
@@ -466,6 +472,10 @@ _infracost_comment_azure-repos()
     local_nonpersistent_flags+=("--path")
     local_nonpersistent_flags+=("--path=")
     local_nonpersistent_flags+=("-p")
+    flags+=("--policy-path=")
+    two_word_flags+=("--policy-path")
+    local_nonpersistent_flags+=("--policy-path")
+    local_nonpersistent_flags+=("--policy-path=")
     flags+=("--pull-request=")
     two_word_flags+=("--pull-request")
     local_nonpersistent_flags+=("--pull-request")
@@ -488,6 +498,81 @@ _infracost_comment_azure-repos()
     must_have_one_flag+=("-p")
     must_have_one_flag+=("--pull-request=")
     must_have_one_flag+=("--repo-url=")
+    must_have_one_noun=()
+    must_have_one_noun+=("-")
+    must_have_one_noun+=("--")
+    noun_aliases=()
+}
+
+_infracost_comment_bitbucket()
+{
+    last_command="infracost_comment_bitbucket"
+
+    command_aliases=()
+
+    commands=()
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--behavior=")
+    two_word_flags+=("--behavior")
+    flags_with_completion+=("--behavior")
+    flags_completion+=("__infracost_handle_go_custom_completion")
+    local_nonpersistent_flags+=("--behavior")
+    local_nonpersistent_flags+=("--behavior=")
+    flags+=("--bitbucket-server-url=")
+    two_word_flags+=("--bitbucket-server-url")
+    local_nonpersistent_flags+=("--bitbucket-server-url")
+    local_nonpersistent_flags+=("--bitbucket-server-url=")
+    flags+=("--bitbucket-token=")
+    two_word_flags+=("--bitbucket-token")
+    local_nonpersistent_flags+=("--bitbucket-token")
+    local_nonpersistent_flags+=("--bitbucket-token=")
+    flags+=("--commit=")
+    two_word_flags+=("--commit")
+    local_nonpersistent_flags+=("--commit")
+    local_nonpersistent_flags+=("--commit=")
+    flags+=("--dry-run")
+    local_nonpersistent_flags+=("--dry-run")
+    flags+=("--path=")
+    two_word_flags+=("--path")
+    flags_with_completion+=("--path")
+    flags_completion+=("__infracost_handle_filename_extension_flag json")
+    two_word_flags+=("-p")
+    flags_with_completion+=("-p")
+    flags_completion+=("__infracost_handle_filename_extension_flag json")
+    local_nonpersistent_flags+=("--path")
+    local_nonpersistent_flags+=("--path=")
+    local_nonpersistent_flags+=("-p")
+    flags+=("--policy-path=")
+    two_word_flags+=("--policy-path")
+    local_nonpersistent_flags+=("--policy-path")
+    local_nonpersistent_flags+=("--policy-path=")
+    flags+=("--pull-request=")
+    two_word_flags+=("--pull-request")
+    local_nonpersistent_flags+=("--pull-request")
+    local_nonpersistent_flags+=("--pull-request=")
+    flags+=("--repo=")
+    two_word_flags+=("--repo")
+    local_nonpersistent_flags+=("--repo")
+    local_nonpersistent_flags+=("--repo=")
+    flags+=("--tag=")
+    two_word_flags+=("--tag")
+    local_nonpersistent_flags+=("--tag")
+    local_nonpersistent_flags+=("--tag=")
+    flags+=("--log-level=")
+    two_word_flags+=("--log-level")
+    flags+=("--no-color")
+
+    must_have_one_flag=()
+    must_have_one_flag+=("--bitbucket-token=")
+    must_have_one_flag+=("--path=")
+    must_have_one_flag+=("-p")
+    must_have_one_flag+=("--repo=")
     must_have_one_noun=()
     must_have_one_noun+=("-")
     must_have_one_noun+=("--")
@@ -538,6 +623,10 @@ _infracost_comment_github()
     local_nonpersistent_flags+=("--path")
     local_nonpersistent_flags+=("--path=")
     local_nonpersistent_flags+=("-p")
+    flags+=("--policy-path=")
+    two_word_flags+=("--policy-path")
+    local_nonpersistent_flags+=("--policy-path")
+    local_nonpersistent_flags+=("--policy-path=")
     flags+=("--pull-request=")
     two_word_flags+=("--pull-request")
     local_nonpersistent_flags+=("--pull-request")
@@ -613,6 +702,10 @@ _infracost_comment_gitlab()
     local_nonpersistent_flags+=("--path")
     local_nonpersistent_flags+=("--path=")
     local_nonpersistent_flags+=("-p")
+    flags+=("--policy-path=")
+    two_word_flags+=("--policy-path")
+    local_nonpersistent_flags+=("--policy-path")
+    local_nonpersistent_flags+=("--policy-path=")
     flags+=("--repo=")
     two_word_flags+=("--repo")
     local_nonpersistent_flags+=("--repo")
@@ -644,6 +737,7 @@ _infracost_comment()
 
     commands=()
     commands+=("azure-repos")
+    commands+=("bitbucket")
     commands+=("github")
     commands+=("gitlab")
 
@@ -969,7 +1063,7 @@ _infracost_root_command()
 
 __start_infracost()
 {
-    local cur prev words cword
+    local cur prev words cword split
     declare -A flaghash 2>/dev/null || :
     declare -A aliashash 2>/dev/null || :
     if declare -F _init_completion >/dev/null 2>&1; then
@@ -979,17 +1073,20 @@ __start_infracost()
     fi
 
     local c=0
+    local flag_parsing_disabled=
     local flags=()
     local two_word_flags=()
     local local_nonpersistent_flags=()
     local flags_with_completion=()
     local flags_completion=()
     local commands=("infracost")
+    local command_aliases=()
     local must_have_one_flag=()
     local must_have_one_noun=()
-    local has_completion_function
-    local last_command
+    local has_completion_function=""
+    local last_command=""
     local nouns=()
+    local noun_aliases=()
 
     __infracost_handle_word
 }

@@ -341,7 +341,8 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 		if p.IsTerragrunt {
 			cmdName = "terragrunt run-all plan"
 		}
-		return "", planJSON, errors.Wrap(err, fmt.Sprintf("%s failed", cmdName))
+		msg := fmt.Sprintf("%s failed", cmdName)
+		return "", planJSON, clierror.NewSanitizedError(fmt.Errorf("%s: %s", msg, err), msg)
 	}
 
 	spinner.Success()
@@ -354,7 +355,12 @@ func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
 	if p.IsTerragrunt {
 		args = append(args, "run-all", "--terragrunt-ignore-external-dependencies")
 	}
+
 	args = append(args, "init", "-input=false", "-no-color")
+
+	if config.IsTest() {
+		args = append(args, "-upgrade")
+	}
 
 	_, err := Cmd(opts, args...)
 	if err != nil {
@@ -365,7 +371,8 @@ func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
 		if p.IsTerragrunt {
 			cmdName = "terragrunt run-all init"
 		}
-		return errors.Wrap(err, fmt.Sprintf("%s failed", cmdName))
+		msg := fmt.Sprintf("%s failed", cmdName)
+		return clierror.NewSanitizedError(fmt.Errorf("%s: %s", msg, err), msg)
 	}
 
 	spinner.Success()
@@ -439,7 +446,8 @@ func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile st
 		if p.IsTerragrunt {
 			cmdName = "terragrunt show"
 		}
-		return []byte{}, errors.Wrap(err, fmt.Sprintf("%s failed", cmdName))
+		msg := fmt.Sprintf("%s failed", cmdName)
+		return []byte{}, clierror.NewSanitizedError(fmt.Errorf("%s: %s", msg, err), msg)
 	}
 	spinner.Success()
 
@@ -472,11 +480,11 @@ func checkTerraformVersion(v string, fullV string) error {
 	}
 
 	if strings.HasPrefix(fullV, "Terraform ") && semver.Compare(v, minTerraformVer) < 0 {
-		return errors.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer)
+		return fmt.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer) //nolint
 	}
 
 	if strings.HasPrefix(fullV, "terragrunt") && semver.Compare(v, minTerragruntVer) < 0 {
-		return errors.Errorf("Terragrunt %s is not supported. Please use Terragrunt version >= %s.", v, minTerragruntVer)
+		return fmt.Errorf("Terragrunt %s is not supported. Please use Terragrunt version >= %s.", v, minTerragruntVer) //nolint
 	}
 
 	// Allow any non-terraform and non-terragrunt binaries

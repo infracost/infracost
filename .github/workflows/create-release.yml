@@ -20,23 +20,9 @@ jobs:
           make release
 
       - name: Release
-        uses: docker://antonyurchenko/git-release:latest
+        run: go run tools/release/main.go
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DRAFT_RELEASE: "true"
-          PRE_RELEASE: "false"
-          CHANGELOG_FILE: "none"
-          ALLOW_EMPTY_CHANGELOG: "true"
-          RELEASE_NAME_PREFIX: "Release "
-        with:
-          args: |
-            ./build/infracost-linux-amd64.tar.gz
-            ./build/infracost-linux-arm64.tar.gz
-            ./build/infracost-windows-amd64.tar.gz
-            ./build/infracost-windows-arm64.tar.gz
-            ./build/infracost-darwin-amd64.tar.gz
-            ./build/infracost-darwin-arm64.tar.gz
-            ./docs/generated/docs.tar.gz
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -61,7 +47,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           push: true
 
@@ -82,12 +68,16 @@ jobs:
         with:
           context: .
           file: Dockerfile.ci
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: ${{ steps.meta-ci.outputs.tags }}
           push: true
 
-      - name: Update Homebrew formula
-        uses: dawidd6/action-homebrew-bump-formula@v3
+  update-homebrew-formula:
+    name: Update Homebrew formula
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dawidd6/action-homebrew-bump-formula@v3
         with:
           token: ${{secrets.HOMEBREW_RELEASE_TOKEN}}
           formula: infracost
@@ -102,3 +92,15 @@ jobs:
       AMPLIFY_APP_ID: ${{ secrets.AMPLIFY_APP_ID }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  update-choco-version:
+    name: Update chocolatey version
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            https://api.github.com/repos/infracost/chocolatey-packages/dispatches \
+            -d '{"event_type":"infracost_choco"}'

@@ -13,12 +13,12 @@ type ElastiCacheReplicationGroup struct {
 	NodeType                    string
 	Engine                      string
 	CacheClusters               int64
-	ClusterDisabled             bool
-	ClusterMode                 string
 	ClusterNodeGroups           int64
 	ClusterReplicasPerNodeGroup int64
 	SnapshotRetentionLimit      int64
 	SnapshotStorageSizeGB       *float64 `infracost_usage:"snapshot_storage_size_gb"`
+
+	AppAutoscalingTarget []*AppAutoscalingTarget
 }
 
 var ElastiCacheReplicationGroupUsageSchema = []*schema.UsageItem{
@@ -35,10 +35,32 @@ func (r *ElastiCacheReplicationGroup) BuildResource() *schema.Resource {
 		engine = "redis"
 	}
 
-	cacheNodes := r.CacheClusters
+	var autoscaling bool
+	nodeGroups := r.ClusterNodeGroups
+	replicasPerNodeGroup := r.ClusterReplicasPerNodeGroup
+	for _, target := range r.AppAutoscalingTarget {
+		switch target.ScalableDimension {
+		case "elasticache:replication-group:NodeGroups":
+			autoscaling = true
+			if target.Capacity != nil {
+				nodeGroups = *target.Capacity
+			} else {
+				nodeGroups = target.MinCapacity
+			}
+		case "elasticache:replication-group:Replicas":
+			autoscaling = true
+			if target.Capacity != nil {
+				replicasPerNodeGroup = *target.Capacity
+			} else {
+				replicasPerNodeGroup = target.MinCapacity
+			}
+		}
+	}
 
-	if r.ClusterMode != "" && !r.ClusterDisabled {
-		cacheNodes = (r.ClusterNodeGroups * r.ClusterReplicasPerNodeGroup) + r.ClusterNodeGroups
+	cacheNodes := r.CacheClusters
+	if nodeGroups > 0 {
+		// CacheClusters is mutually exclusive with ClusterNodeGroups/ClusterReplicasPerNodeGroup
+		cacheNodes = (nodeGroups * replicasPerNodeGroup) + nodeGroups
 	}
 
 	cluster := &ElastiCacheCluster{
@@ -51,7 +73,7 @@ func (r *ElastiCacheReplicationGroup) BuildResource() *schema.Resource {
 	}
 
 	costComponents := []*schema.CostComponent{
-		cluster.elastiCacheCostComponent(),
+		cluster.elastiCacheCostComponent(autoscaling),
 	}
 
 	if strings.ToLower(engine) == "redis" && r.SnapshotRetentionLimit > 1 {

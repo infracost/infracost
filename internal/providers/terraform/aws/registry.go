@@ -6,6 +6,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getAPIGatewayRestAPIRegistryItem(),
 	getAPIGatewayStageRegistryItem(),
 	getAPIGatewayV2APIRegistryItem(),
+	getAppAutoscalingTargetRegistryItem(),
 	GetAutoscalingGroupRegistryItem(),
 	getACMCertificate(),
 	getACMPCACertificateAuthorityRegistryItem(),
@@ -44,6 +45,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getECSServiceRegistryItem(),
 	getEFSFileSystemRegistryItem(),
 	getEIPRegistryItem(),
+	getElasticBeanstalkEnvironmentRegistryItem(),
 	getElastiCacheClusterItem(),
 	getElastiCacheReplicationGroupItem(),
 	getElasticsearchDomainRegistryItem(),
@@ -69,9 +71,10 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getRoute53ResolverEndpointRegistryItem(),
 	getRoute53RecordRegistryItem(),
 	getRoute53ZoneRegistryItem(),
-	getS3BucketRegistryItem(),
 	getS3BucketAnalyticsConfigurationRegistryItem(),
 	getS3BucketInventoryRegistryItem(),
+	getS3BucketLifecycleConfigurationRegistryItem(),
+	getS3BucketRegistryItem(),
 	getSecretsManagerSecret(),
 	getSSMActivationRegistryItem(),
 	getSSMParameterRegistryItem(),
@@ -97,6 +100,10 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 // FreeResources grouped alphabetically
 var FreeResources = []string{
+	// AWS Application Auto Scaling
+	"aws_appautoscaling_policy",
+	"aws_appautoscaling_scheduled_action",
+
 	// AWS Certificate Manager
 	"aws_acm_certificate_validation",
 
@@ -194,6 +201,9 @@ var FreeResources = []string{
 	// AWS ECR
 	"aws_ecr_lifecycle_policy",
 	"aws_ecr_repository_policy",
+
+	// AWS Elastic Beanstalk
+	"aws_elastic_beanstalk_application",
 
 	// AWS Elastic Container Service
 	"aws_ecs_capacity_provider",
@@ -327,6 +337,7 @@ var FreeResources = []string{
 	// AWS S3
 	"aws_s3_access_point",
 	"aws_s3_account_public_access_block",
+	"aws_s3_bucket_acl",
 	"aws_s3_bucket_metric",
 	"aws_s3_bucket_notification",
 	"aws_s3_bucket_object", // Costs are shown at the bucket level

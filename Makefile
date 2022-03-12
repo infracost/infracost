@@ -42,12 +42,14 @@ install:
 	CGO_ENABLED=0 go install $(BUILD_FLAGS) $(PKG)
 
 release: build_all
-	cd build; tar -czf $(BINARY)-windows-amd64.tar.gz $(BINARY).exe
-	cd build; tar -czf $(BINARY)-windows-arm64.tar.gz $(BINARY)-arm64.exe
-	cd build; tar -czf $(BINARY)-linux-amd64.tar.gz $(BINARY)-linux-amd64
-	cd build; tar -czf $(BINARY)-linux-arm64.tar.gz $(BINARY)-linux-arm64
-	cd build; tar -czf $(BINARY)-darwin-amd64.tar.gz $(BINARY)-darwin-amd64
-	cd build; tar -czf $(BINARY)-darwin-arm64.tar.gz $(BINARY)-darwin-arm64
+	cd build; tar -czf $(BINARY)-windows-amd64.tar.gz $(BINARY).exe; shasum -a 256 $(BINARY)-windows-amd64.tar.gz > $(BINARY)-windows-amd64.tar.gz.sha256
+	cd build; zip -r $(BINARY)-windows-amd64.zip $(BINARY).exe; shasum -a 256 $(BINARY)-windows-amd64.zip > $(BINARY)-windows-amd64.zip.sha256
+	cd build; tar -czf $(BINARY)-windows-arm64.tar.gz $(BINARY)-arm64.exe; shasum -a 256 $(BINARY)-windows-arm64.tar.gz > $(BINARY)-windows-arm64.tar.gz.sha256
+	cd build; mv $(BINARY)-arm64.exe $(BINARY).exe; zip -r $(BINARY)-windows-arm64.zip $(BINARY).exe; shasum -a 256 $(BINARY)-windows-arm64.zip > $(BINARY)-windows-arm64.zip.sha256
+	cd build; tar -czf $(BINARY)-linux-amd64.tar.gz $(BINARY)-linux-amd64; shasum -a 256 $(BINARY)-linux-amd64.tar.gz > $(BINARY)-linux-amd64.tar.gz.sha256
+	cd build; tar -czf $(BINARY)-linux-arm64.tar.gz $(BINARY)-linux-arm64; shasum -a 256 $(BINARY)-linux-arm64.tar.gz > $(BINARY)-linux-arm64.tar.gz.sha256
+	cd build; tar -czf $(BINARY)-darwin-amd64.tar.gz $(BINARY)-darwin-amd64; shasum -a 256 $(BINARY)-darwin-amd64.tar.gz > $(BINARY)-darwin-amd64.tar.gz.sha256
+	cd build; tar -czf $(BINARY)-darwin-arm64.tar.gz $(BINARY)-darwin-arm64; shasum -a 256 $(BINARY)-darwin-arm64.tar.gz > $(BINARY)-darwin-arm64.tar.gz.sha256
 
 clean:
 	go clean

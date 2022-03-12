@@ -6,18 +6,20 @@ import (
 	"github.com/fatih/color"
 )
 
+var primary = color.New(color.FgHiCyan)
+
 var yellow = color.New(color.FgYellow)
 var red = color.New(color.FgHiRed)
 var green = color.New(color.FgHiGreen)
-var blue = color.New(color.FgHiBlue)
-var magenta = color.New(color.FgHiCyan)
 
 var bold = color.New(color.Bold)
 var faint = color.New(color.Faint)
 var underline = color.New(color.Underline)
 
+var primaryLink = color.New(color.Underline).Add(color.Bold)
+
 func PrimaryString(msg string) string {
-	return magenta.Sprint(msg)
+	return primary.Sprint(msg)
 }
 
 func PrimaryStringf(msg string, a ...interface{}) string {
@@ -49,11 +51,19 @@ func WarningStringf(msg string, a ...interface{}) string {
 }
 
 func LinkString(msg string) string {
-	return blue.Sprint(msg)
+	return primaryLink.Sprint(msg)
 }
 
 func LinkStringf(msg string, a ...interface{}) string {
 	return LinkString(fmt.Sprintf(msg, a...))
+}
+
+func SecondaryLinkString(msg string) string {
+	return underline.Sprint(msg)
+}
+
+func SecondaryLinkStringf(msg string, a ...interface{}) string {
+	return SecondaryLinkString(fmt.Sprintf(msg, a...))
 }
 
 func BoldString(msg string) string {

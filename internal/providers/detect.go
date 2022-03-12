@@ -9,8 +9,9 @@ import (
 	"sync"
 
 	"github.com/awslabs/goformation/v4"
-	"github.com/infracost/infracost/internal/providers/cloudformation"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/infracost/infracost/internal/providers/cloudformation"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -22,6 +23,10 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return nil, fmt.Errorf("No such file or directory %s", path)
+	}
+
+	if ctx.ProjectConfig.TerraformParseHCL {
+		return terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx))
 	}
 
 	if isCloudFormationTemplate(path) {

@@ -5,13 +5,14 @@ import (
 	"strconv"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/comment"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 )
 
 var validCommentAzureReposBehaviors = []string{"update", "new", "delete-and-new"}
@@ -67,8 +68,13 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 				WillReplace:         prNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: true,
 			})
+			var policyFailure output.PolicyCheckFailures
 			if err != nil {
-				return err
+				if v, ok := err.(output.PolicyCheckFailures); ok {
+					policyFailure = v
+				} else {
+					return err
+				}
 			}
 
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -90,6 +96,10 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 				cmd.Println("Comment not posted to Azure Repos (--dry-run was specified)")
 			}
 
+			if policyFailure != nil {
+				return policyFailure
+			}
+
 			return nil
 		},
 	}
@@ -106,7 +116,8 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
-	cmd.Flags().Int("pull-request", 0, "Pull request number to post comment on")
+	var prNumber PRNumber
+	cmd.Flags().Var(&prNumber, "pull-request", "Pull request number to post comment on")
 	_ = cmd.MarkFlagRequired("pull-request")
 	cmd.Flags().String("repo-url", "", "Repository URL, e.g. https://dev.azure.com/my-org/my-project/_git/my-repo")
 	_ = cmd.MarkFlagRequired("repo-url")

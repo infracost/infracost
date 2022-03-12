@@ -1,0 +1,129 @@
+
+## Infracost estimate: **monthly cost will increase by $40.56 (+100%) ↑**
+
+| **Project** | **Previous** | **New** | **Diff** |
+| ----------- | -----------: | ------: | -------- |
+| infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json | $40.56 | $81.12 | +$40.56 (+100%) |
+
+**Infracost output:**
+
+```
+Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
+
++ aws_instance.instance_2
+  +$4.60
+
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
+
+    + CPU credits
+      $0.00
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
+
++ aws_instance.instance_counted[1]
+  +$4.60
+
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
+
+    + CPU credits
+      $0.00
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
+
++ aws_instance.instance_named["test.2"]
+  +$4.60
+
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
+
+    + CPU credits
+      $0.00
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
+
++ module.db.module.db_2.module.db_instance.aws_db_instance.this[0]
+  +$12.99
+
+    + Database instance (on-demand, Single-AZ, db.t3.micro)
+      +$12.41
+
+    + Storage (general purpose SSD, gp2)
+      +$0.58
+
++ module.instances.aws_instance.module_instance_2
+  +$4.60
+
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
+
+    + CPU credits
+      $0.00
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
+
++ module.instances.aws_instance.module_instance_counted[1]
+  +$4.60
+
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
+
+    + CPU credits
+      $0.00
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
+
++ module.instances.aws_instance.module_instance_named["test.2"]
+  +$4.60
+
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      +$3.80
+
+    + CPU credits
+      $0.00
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$0.80
+
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
+Amount:  +$40.56 ($40.56 → $81.12)
+Percent: +100%
+
+──────────────────────────────────
+Key: ~ changed, + added, - removed
+
+26 cloud resources were detected:
+∙ 14 were estimated, 10 include usage-based costs, see https://infracost.io/usage-file
+∙ 2 weren't estimated, report them in https://github.com/infracost/infracost:
+  ∙ 2 x aws_db_option_group
+∙ 10 were free:
+  ∙ 2 x aws_db_parameter_group
+  ∙ 2 x aws_db_subnet_group
+  ∙ 2 x aws_default_vpc
+  ∙ 2 x aws_iam_role
+  ∙ 2 x aws_iam_role_policy_attachment
+
+Add cost estimates to your pull requests: https://infracost.io/cicd
+```
+
+Is this comment useful? [Yes](https://www.infracost.io/feedback/submit/?value=yes), [No](https://www.infracost.io/feedback/submit/?value=no)
+
+Comment not posted to Bitbucket (--dry-run was specified)

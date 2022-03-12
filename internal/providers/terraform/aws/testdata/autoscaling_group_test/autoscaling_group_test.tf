@@ -421,32 +421,17 @@ resource "aws_autoscaling_group" "asg_mixed_instance_dynamic" {
   }
 }
 
-module "asg-lc" {
-  source           = "terraform-aws-modules/autoscaling/aws"
-  version          = "~> 4"
-  name             = "asg"
-  use_lc           = true
-  create_lc        = true
-  lc_name          = "lc"
-  image_id         = "ami-0ff8a91507f77f867"
-  instance_type    = "t3.micro"
-  min_size         = 0
-  max_size         = 2
-  desired_capacity = 1
-}
-
 module "asg-lt" {
-  source           = "terraform-aws-modules/autoscaling/aws"
-  version          = "~> 4"
-  name             = "asg"
-  use_lt           = true
-  create_lt        = true
-  lt_name          = "lt"
-  image_id         = "ami-0ff8a91507f77f867"
-  instance_type    = "t3.micro"
-  min_size         = 0
-  max_size         = 2
-  desired_capacity = 1
+  source                 = "terraform-aws-modules/autoscaling/aws"
+  version                = "~> 5"
+  name                   = "asg"
+  create_launch_template = true
+  launch_template_name   = "lt"
+  image_id               = "ami-0ff8a91507f77f867"
+  instance_type          = "t3.micro"
+  min_size               = 0
+  max_size               = 2
+  desired_capacity       = 1
   block_device_mappings = [
     {
       device_name = "/dev/xvdf"

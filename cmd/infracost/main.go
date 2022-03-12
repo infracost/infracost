@@ -7,6 +7,7 @@ import (
 	"os"
 	"runtime/debug"
 
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -17,8 +18,6 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
-
-	"github.com/fatih/color"
 )
 
 func main() {
@@ -243,18 +242,22 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 }
 
 // saveOutFile saves the output of the command to the file path past in the `--out-file` flag
-func saveOutFile(cmd *cobra.Command, outFile string, b []byte) error {
-	return saveOutFileWithMsg(cmd, outFile, fmt.Sprintf("Output saved to %s\n", outFile), b)
+func saveOutFile(ctx *config.RunContext, cmd *cobra.Command, outFile string, b []byte) error {
+	return saveOutFileWithMsg(ctx, cmd, outFile, fmt.Sprintf("Output saved to %s", outFile), b)
 }
 
 // saveOutFile saves the output of the command to the file path past in the `--out-file` flag
-func saveOutFileWithMsg(cmd *cobra.Command, outFile, successMsg string, b []byte) error {
+func saveOutFileWithMsg(ctx *config.RunContext, cmd *cobra.Command, outFile, successMsg string, b []byte) error {
 	err := ioutil.WriteFile(outFile, b, 0644) // nolint:gosec
 	if err != nil {
 		return errors.Wrap(err, "Unable to save output")
 	}
 
-	cmd.PrintErr(successMsg)
+	if ctx.Config.IsLogging() {
+		log.Info(successMsg)
+	} else {
+		cmd.PrintErrf("%s\n", successMsg)
+	}
 
 	return nil
 }

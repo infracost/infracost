@@ -15,6 +15,9 @@ type MSKCluster struct {
 	BrokerNodes             int64
 	BrokerNodeInstanceType  string
 	BrokerNodeEBSVolumeSize int64
+
+	// "optional" args, that may be empty depending on the resource config
+	AppAutoscalingTarget []*AppAutoscalingTarget
 }
 
 var MSKClusterUsageSchema = []*schema.UsageItem{}
@@ -24,7 +27,19 @@ func (r *MSKCluster) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *MSKCluster) BuildResource() *schema.Resource {
-	ebsVolumeSize := r.BrokerNodeEBSVolumeSize * r.BrokerNodes
+	ebsVolumeSize := r.BrokerNodeEBSVolumeSize
+	ebsAutoscaleSuffix := ""
+
+	for _, target := range r.AppAutoscalingTarget {
+		if target.ScalableDimension == "kafka:broker-storage:VolumeSize" {
+			ebsAutoscaleSuffix = " (autoscaling)"
+			if target.Capacity != nil {
+				ebsVolumeSize = *target.Capacity
+			} else {
+				ebsVolumeSize = target.MinCapacity
+			}
+		}
+	}
 
 	return &schema.Resource{
 		Name: r.Address,
@@ -46,10 +61,10 @@ func (r *MSKCluster) BuildResource() *schema.Resource {
 				},
 			},
 			{
-				Name:            "Storage",
+				Name:            "Storage" + ebsAutoscaleSuffix,
 				Unit:            "GB",
 				UnitMultiplier:  decimal.NewFromInt(1),
-				MonthlyQuantity: decimalPtr(decimal.NewFromInt(ebsVolumeSize)),
+				MonthlyQuantity: decimalPtr(decimal.NewFromInt(ebsVolumeSize * r.BrokerNodes)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("aws"),
 					Region:        strPtr(r.Region),

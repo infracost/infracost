@@ -1,0 +1,33 @@
+Post an Infracost comment to Bitbucket
+
+USAGE
+  infracost comment bitbucket [flags]
+
+EXAMPLES
+  Update comment on a pull request:
+
+      infracost comment bitbucket --repo my-org/my-repo --pull-request 3 --path infracost.json --bitbucket-token $BITBUCKET_TOKEN
+
+  Post a new comment to a commit:
+
+      infracost comment bitbucket --repo my-org/my-repo --commit 2ca7182 --path infracost.json --behavior delete-and-new --bitbucket-token $BITBUCKET_TOKEN
+
+FLAGS
+      --behavior string               Behavior when posting comment, one of:
+                                        update (default)  Update latest comment
+                                        new               Create a new comment
+                                        delete-and-new    Delete previous matching comments and create a new comment (default "update")
+      --bitbucket-server-url string   Bitbucket Server URL (default "https://bitbucket.org")
+      --bitbucket-token string        Bitbucket access token. Use 'username:app-password' for Bitbucket Cloud and HTTP access token for Bitbucket Server
+      --commit string                 Commit SHA to post comment on, mutually exclusive with pull-request. Not available when bitbucket-server-url is set
+      --dry-run                       Generate comment without actually posting to Bitbucket
+  -h, --help                          help for bitbucket
+  -p, --path stringArray              Path to Infracost JSON files, glob patterns need quotes
+      --policy-path stringArray       Path to Infracost policy files, glob patterns need quotes (experimental)
+      --pull-request int              Pull request number to post comment on
+      --repo string                   Repository in format workspace/repo
+      --tag string                    Customize special text used to detect comments posted by Infracost (placed at the bottom of a comment)
+
+GLOBAL FLAGS
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output

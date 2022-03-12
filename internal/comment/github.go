@@ -300,6 +300,11 @@ func (h *githubPRHandler) CallHideComment(ctx context.Context, comment Comment) 
 	return h.v4client.Mutate(ctx, &m, input, nil)
 }
 
+// AddMarkdownTag prepends a tag as a markdown comment to the given string.
+func (h *githubPRHandler) AddMarkdownTag(s string, tag string) string {
+	return addMarkdownTag(s, tag)
+}
+
 // githubCommitHandler is a PlatformHandler for GitHub commits. It
 // implements the PlatformHandler interface and contains the functions
 // for finding, creating, updating, deleting and hiding comments on GitHub commits.
@@ -477,4 +482,9 @@ func (h *githubCommitHandler) CallHideComment(ctx context.Context, comment Comme
 	}
 
 	return h.v4client.Mutate(ctx, &m, input, nil)
+}
+
+// AddMarkdownTag prepends a tag as a markdown comment to the given string.
+func (h *githubCommitHandler) AddMarkdownTag(s string, tag string) string {
+	return addMarkdownTag(s, tag)
 }

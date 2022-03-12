@@ -91,7 +91,7 @@ func ToSlackMessage(out Root, opts Options) ([]byte, error) {
 		slack.NewSectionBlock(
 			&slack.TextBlockObject{
 				Type: slack.MarkdownType,
-				Text: fmt.Sprintf("💰 Infracost estimate: *%s*", formatCostChangeSentence(out.Currency, out.PastTotalMonthlyCost, out.TotalMonthlyCost)),
+				Text: fmt.Sprintf("💰 Infracost estimate: *%s*", formatCostChangeSentence(out.Currency, out.PastTotalMonthlyCost, out.TotalMonthlyCost, true)),
 			},
 			[]*slack.TextBlockObject{}, nil,
 		),

@@ -1,0 +1,21 @@
+version: 0.1
+resource_usage:
+  aws_elastic_beanstalk_environment.my_eb_environment_with_usage:
+    cloudwatch:
+      storage_gb: 1000               # Total data stored by CloudWatch logs in GB.
+      monthly_data_ingested_gb: 1000 # Monthly data ingested by CloudWatch logs in GB.
+      monthly_data_scanned_gb: 200   # Monthly data scanned by CloudWatch logs insights in GB.
+    elb:
+      monthly_data_processed_gb: 10000 # Classic lb data processed in GB
+  aws_elastic_beanstalk_environment.my_eb_environment_with_rds:
+    lb:
+      new_connections: 500000    # Number of newly established connections per second on average.
+      active_connections: 100000 # Number of active connections per minute on average.
+      processed_bytes_gb: 25000  # The number of bytes processed by the load balancer for HTTP(S) requests and responses in GB.
+      rule_evaluations: 10000    # Number of rule evaluations on application/network load balancers
+    db:
+      additional_backup_storage_gb: 1000  # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
+      monthly_standard_io_requests: 10000 # Monthly number of input/output requests for database.
+      monthly_additional_performance_insights_requests: 10000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
+    ec2:
+      monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.

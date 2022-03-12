@@ -161,6 +161,25 @@ resource_usage:
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
     vcpu_count: 2 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
 
+  aws_elastic_beanstalk_environment.my_eb_environment:
+    db:
+      additional_backup_storage_gb: 1000  # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
+      monthly_standard_io_requests: 10000 # Monthly number of input/output requests for database.
+      monthly_additional_performance_insights_requests: 10000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
+    ec2:
+      monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    cloudwatch:
+      storage_gb: 1000               # Total data stored by CloudWatch logs in GB.
+      monthly_data_ingested_gb: 1000 # Monthly data ingested by CloudWatch logs in GB.
+      monthly_data_scanned_gb: 200   # Monthly data scanned by CloudWatch logs insights in GB.
+    lb:
+      new_connections: 500000    # Number of newly established connections per second on average.
+      active_connections: 100000 # Number of active connections per minute on average.
+      processed_bytes_gb: 25000  # The number of bytes processed by the load balancer for HTTP(S) requests and responses in GB.
+      rule_evaluations: 10000    # Number of rule evaluations on application/network load balancers
+    elb:
+      monthly_data_processed_gb: 10000 # Monthly data processed on classic loadbalaner
+    
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
 
@@ -272,8 +291,69 @@ resource_usage:
   aws_s3_bucket_inventory.my_inventory:
     monthly_listed_objects: 100000000 # Monthly number of listed objects.
 
-  aws_s3_bucket.my_bucket:
+  aws_s3_bucket_lifecycle_configuration.my_bucket_lifecycle_config:
     object_tags: 10000000 # Total object tags.
+    standard: # Usages of S3 Standard:
+      storage_gb: 10000                     # Total storage in GB.
+      monthly_tier_1_requests: 1000000      # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 100000       # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_select_data_scanned_gb: 10000 # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 1000 # Monthly data returned by S3 Select in GB.
+    intelligent_tiering: # Usages of S3 Intelligent - Tiering:
+      frequent_access_storage_gb: 20000             # Total storage for Frequent Access Tier in GB.
+      infrequent_access_storage_gb: 20000           # Total storage for Infrequent Access Tier in GB.
+      monitored_objects: 2000                       # Total objects monitored by the Intelligent Tiering.
+      monthly_tier_1_requests: 2000000              # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 200000               # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 200000 # Monthly Lifecycle Transition requests.
+      monthly_select_data_scanned_gb: 20000         # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 2000         # Monthly data returned by S3 Select in GB.
+      early_delete_gb: 200000                       # If an archive is deleted within 1 months of being uploaded, you will be charged an early deletion fee per GB.
+    standard_infrequent_access: # Usages of S3 Standard - Infrequent Access:
+      storage_gb: 30000                             # Total storage in GB.
+      monthly_tier_1_requests: 3000000              # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 300000               # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 300000 # Monthly Lifecycle Transition requests.
+      monthly_data_retrieval_gb: 30000              # Monthly data retrievals in GB
+      monthly_select_data_scanned_gb: 30000         # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 3000         # Monthly data returned by S3 Select in GB.
+    one_zone_infrequent_access: # Usages of S3 One Zone - Infrequent Access:
+      storage_gb: 40000                             # Total storage in GB.
+      monthly_tier_1_requests: 4000000              # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 400000               # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 400000 # Monthly Lifecycle Transition requests.
+      monthly_data_retrieval_gb: 40000              # Monthly data retrievals in GB
+      monthly_select_data_scanned_gb: 40000         # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 4000         # Monthly data returned by S3 Select in GB.
+    glacier_flexible_retrieval: # Usages of S3 Glacier Flexible Retrieval:
+      storage_gb: 50000                                 # Total storage in GB.
+      monthly_tier_1_requests: 5000000                  # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 500000                   # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 500000     # Monthly Lifecycle Transition requests.
+      monthly_standard_select_data_scanned_gb: 500000   # Monthly data scanned by S3 Select in GB (for standard level of S3 Glacier).
+      monthly_standard_select_data_returned_gb: 500000  # Monthly data returned by S3 Select in GB (for standard level of S3 Glacier).
+      monthly_bulk_select_data_scanned_gb: 500000       # Monthly data scanned by S3 Select in GB (for bulk level of S3 Glacier)
+      monthly_bulk_select_data_returned_gb: 500000      # Monthly data returned by S3 Select in GB (for bulk level of S3 Glacier)
+      monthly_expedited_select_data_scanned_gb: 500000  # Monthly data scanned by S3 Select in GB (for expedited level of S3 Glacier)
+      monthly_expedited_select_data_returned_gb: 500000 # Monthly data returned by S3 Select in GB (for expedited level of S3 Glacier)
+      monthly_standard_data_retrieval_requests: 500000  # Monthly data Retrieval requests (for standard level of S3 Glacier).
+      monthly_expedited_data_retrieval_requests: 500000 # Monthly data Retrieval requests (for expedited level of S3 Glacier).
+      monthly_standard_data_retrieval_gb: 5000          # Monthly data retrievals in GB (for standard level of S3 Glacier).
+      monthly_expedited_data_retrieval_gb: 5000         # Monthly data retrievals in GB (for expedited level of S3 Glacier).
+      early_delete_gb: 500000                           # If an archive is deleted within 3 months of being uploaded, you will be charged an early deletion fee per GB.
+    glacier_deep_archive: # Usages of S3 Glacier Deep Archive:
+      storage_gb: 60000                                # Total storage in GB.
+      monthly_tier_1_requests: 6000000                 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 600000                  # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 600000    # Monthly Lifecycle Transition requests.
+      monthly_standard_data_retrieval_requests: 600000 # Monthly data Retrieval requests (for standard level of S3 Glacier).
+      monthly_bulk_data_retrieval_requests: 600000     # Monthly data Retrieval requests (for bulk level of S3 Glacier).
+      monthly_standard_data_retrieval_gb: 6000         # Monthly data retrievals in GB (for standard level of S3 Glacier).
+      monthly_bulk_data_retrieval_gb: 6000             # Monthly data retrievals in GB (for bulk level of S3 Glacier).
+      early_delete_gb: 600000                          # If an archive is deleted within 6 months of being uploaded, you will be charged an early deletion fee per GB.
+
+  aws_s3_bucket.my_bucket:
+    object_tags: 10000000 # Total object tags. Only for AWS provider V3.
     standard: # Usages of S3 Standard:
       storage_gb: 10000 # Total storage in GB.
       monthly_tier_1_requests: 1000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
@@ -779,6 +859,11 @@ resource_usage:
       australia: 50000                     # Australia
       india: 387000                        # India
     monthly_inbound_data_transfer_gb: 1000 # Monthly inbound data transfer in GB
+
+  azurerm_log_analytics_workspace.my_workspace:
+    monthly_log_data_ingestion_gb: 20            # Monthly log data ingested by the workspace in GB (only used for Pay-as-you-go workspaces).
+    monthly_additional_log_data_retention_gb: 30 # Monthly additional GB of data retained past the free allowance.
+    monthly_log_data_export_gb: 40               # Monthly data in GB exported from the workspace.
 
   azurerm_frontdoor_firewall_policy.my_frontdoor_firewall_policy:
     monthly_custom_rule_requests: 11000     # Monthly number of custom rule requests

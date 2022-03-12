@@ -1,9 +1,8 @@
 package terraform
 
 import (
+	"fmt"
 	"os"
-
-	"github.com/pkg/errors"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
@@ -15,7 +14,7 @@ type PlanJSONProvider struct {
 	Path string
 }
 
-func NewPlanJSONProvider(ctx *config.ProjectContext) schema.Provider {
+func NewPlanJSONProvider(ctx *config.ProjectContext) *PlanJSONProvider {
 	return &PlanJSONProvider{
 		ctx:  ctx,
 		Path: ctx.ProjectConfig.Path,
@@ -31,7 +30,9 @@ func (p *PlanJSONProvider) DisplayType() string {
 }
 
 func (p *PlanJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	// no op
+	// TerraformWorkspace isn't used to load resources but we still pass it
+	// on so it appears in the project name of the output
+	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
 }
 
 func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
@@ -44,9 +45,13 @@ func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 
 	j, err := os.ReadFile(p.Path)
 	if err != nil {
-		return []*schema.Project{}, errors.Wrap(err, "Error reading Terraform plan JSON file")
+		return []*schema.Project{}, fmt.Errorf("Error reading Terraform plan JSON file %w", err)
 	}
 
+	return p.LoadResourcesFromSrc(usage, j, spinner)
+}
+
+func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageData, j []byte, spinner *ui.Spinner) ([]*schema.Project, error) {
 	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
@@ -57,12 +62,14 @@ func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 
 	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {
-		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Terraform plan JSON file")
+		return []*schema.Project{project}, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
 
 	project.PastResources = pastResources
 	project.Resources = resources
 
-	spinner.Success()
+	if spinner != nil {
+		spinner.Success()
+	}
 	return []*schema.Project{project}, nil
 }

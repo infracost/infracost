@@ -20,6 +20,12 @@ type Project struct {
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
 	Path string `yaml:"path,omitempty" ignored:"true"`
+	// TerraformParseHCL will run a project by parsing hcl files the given Path rather than using a plan.json or terraform binary.
+	TerraformParseHCL bool `yaml:"hcl_only,omitempty"`
+	// TerraformVarFiles is the number of var files that are needed to run an TerraformParseHCL run
+	TerraformVarFiles []string `yaml:"terraform_var_files"`
+	// TerraformVars is a slice of input vars that is used to run an TerraformParseHCL run
+	TerraformVars []string `json:"terraform_vars"`
 	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
 	TerraformPlanFlags string `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
 	// TerraformBinary is an optional field used to change the path to the terraform or terragrunt binary
@@ -56,6 +62,7 @@ type Config struct {
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
+	DisableHCLParsing         bool   `yaml:"disable_hcl_parsing,omitempty" envconfig:"INFRACOST_DISABLE_HCL_PARSING"`
 
 	TLSInsecureSkipVerify *bool  `envconfig:"INFRACOST_TLS_INSECURE_SKIP_VERIFY"`
 	TLSCACertFile         string `envconfig:"INFRACOST_TLS_CA_CERT_FILE"`
@@ -69,6 +76,8 @@ type Config struct {
 	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
 
 	NoCache bool `yaml:"fields,omitempty" ignored:"true"`
+
+	SkipErrLine bool
 
 	// for testing
 	EventsDisabled       bool

@@ -8,3 +8,7 @@ resource_usage:
     on_demand_backup_storage_gb: 460
     monthly_data_restored_gb: 230
     monthly_streams_read_request_units: 2000000
+  aws_appautoscaling_target.autoscale_dynamodb_table_write_target_usage:
+    capacity: 77
+  aws_appautoscaling_target.autoscale_dynamodb_table_read_target_usage:
+    capacity: 76

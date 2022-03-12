@@ -46,30 +46,21 @@ Infracost does not make any changes to your Terraform state or cloud resources. 
 
 ```sh
 git clone https://github.com/infracost/example-terraform.git
+
 cd example-terraform/sample1
 
 # Play with main.tf and re-run to compare costs
 infracost breakdown --path .
 
-# Show diff of monthly costs, edit the yml file and re-run to compare costs
-infracost diff --path . --sync-usage-file --usage-file infracost-usage.yml
+# Show diff of monthly costs between current and planned state
+infracost diff --path .
 ```
 
-Screenshots of example outputs are [shown below](#cli-commands).
+Infracost can also estimate [usage-based resources](https://www.infracost.io/docs/features/usage_based_resources/) such as AWS S3 or Lambda.
 
 ### 4. Add to CI/CD
 
-Use our CI/CD integrations to add cost estimates to pull requests. This provides your team with a safety net as people can understand cloud costs upfront, and discuss them as part of your workflow.
-- [GitHub Actions](https://www.infracost.io/docs/integrations/github_actions/)
-- [GitLab CI](https://www.infracost.io/docs/integrations/gitlab_ci/)
-- [Atlantis](https://www.infracost.io/docs/integrations/atlantis/)
-- [Azure DevOps](https://www.infracost.io/docs/integrations/cicd/#azure-devops)
-- [Terraform Cloud/Enterprise](https://www.infracost.io/docs/integrations/terraform_cloud_enterprise/)
-- [Jenkins](https://www.infracost.io/docs/integrations/cicd/#jenkins)
-- [Bitbucket Pipelines](https://www.infracost.io/docs/integrations/cicd/#bitbucket-pipelines)
-- [CircleCI](https://www.infracost.io/docs/integrations/cicd/#circleci)
-
-Other CI/CD systems can be supported using [our Docker images](https://www.infracost.io/docs/integrations/cicd/#docker-images). You can also setup [cost policies](https://www.infracost.io/docs/features/cost_policies/).
+[Use our CI/CD integrations](https://www.infracost.io/docs/integrations/cicd/) to add cost estimates to pull requests, it only takes 15 minutes. This provides your team with a safety net as people can understand cloud costs upfront, and discuss them as part of your workflow.
 
 If you run into any issues, please join our [community Slack channel](https://www.infracost.io/community-chat), we'll help you very quickly 😄
 
@@ -87,7 +78,7 @@ The `infracost` CLI has the following main commands, see [our docs](https://www.
 
 ## Supported clouds and resources
 
-Infracost supports over **200** Terraform resources across [AWS](https://www.infracost.io/docs/supported_resources/aws), [Azure](https://www.infracost.io/docs/supported_resources/azure) and [Google](https://www.infracost.io/docs/supported_resources/google). Other IaC tools, such as [Pulumi](https://github.com/infracost/infracost/issues/187), [AWS CloudFormation/CDK](https://github.com/infracost/infracost/issues/190) and [Azure ARM/Bicep](https://github.com/infracost/infracost/issues/812) are on our roadmap.
+Infracost supports over **230** Terraform resources across [AWS](https://www.infracost.io/docs/supported_resources/aws), [Azure](https://www.infracost.io/docs/supported_resources/azure) and [Google](https://www.infracost.io/docs/supported_resources/google). Other IaC tools, such as [Pulumi](https://github.com/infracost/infracost/issues/187), [AWS CloudFormation/CDK](https://github.com/infracost/infracost/issues/190) and [Azure ARM/Bicep](https://github.com/infracost/infracost/issues/812) are on our roadmap.
 
 See [this page](https://www.infracost.io/docs/usage_based_resources) for details on cost estimation of usage-based resources such as AWS Lambda or Google Cloud Storage.
 

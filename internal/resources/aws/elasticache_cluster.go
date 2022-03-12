@@ -40,7 +40,7 @@ func (r *ElastiCacheCluster) BuildResource() *schema.Resource {
 	}
 
 	costComponents := []*schema.CostComponent{
-		r.elastiCacheCostComponent(),
+		r.elastiCacheCostComponent(false),
 	}
 
 	if strings.ToLower(r.Engine) == "redis" && r.SnapshotRetentionLimit > 1 {
@@ -53,9 +53,14 @@ func (r *ElastiCacheCluster) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *ElastiCacheCluster) elastiCacheCostComponent() *schema.CostComponent {
+func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.CostComponent {
+	nameParams := []string{"on-demand", r.NodeType}
+	if autoscaling {
+		nameParams = append(nameParams, "autoscaling")
+	}
+
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("ElastiCache (on-demand, %s)", r.NodeType),
+		Name:           fmt.Sprintf("ElastiCache (%s)", strings.Join(nameParams, ", ")),
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.CacheNodes)),

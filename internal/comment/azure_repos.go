@@ -103,7 +103,7 @@ func newAzureReposAPIClient(ctx context.Context, token string) (*http.Client, er
 }
 
 // buildAPIURL converts repo URL to repo's API URL.
-func buildAPIURL(repoURL string) (string, error) {
+func buildAzureAPIURL(repoURL string) (string, error) {
 	urlParts := strings.Split(repoURL, "_git/")
 
 	if len(urlParts) != 2 {
@@ -147,7 +147,7 @@ func NewAzureReposPRHandler(ctx context.Context, repoURL string, targetRef strin
 		return nil, err
 	}
 
-	apiURL, err := buildAPIURL(repoURL)
+	apiURL, err := buildAzureAPIURL(repoURL)
 	if err != nil {
 		return nil, err
 	}
@@ -169,12 +169,16 @@ func (h *azureReposPRHandler) CallFindMatchingComments(ctx context.Context, tag 
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return []Comment{}, errors.Wrap(err, "Error retrieving comments")
+		return []Comment{}, errors.Wrap(err, "Error getting comments")
 	}
 
 	res, err := h.httpClient.Do(req)
 	if err != nil {
-		return []Comment{}, errors.Wrap(err, "Error retrieving comments")
+		return []Comment{}, errors.Wrap(err, "Error getting comments")
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return []Comment{}, errors.Errorf("Error getting comments: %s", res.Status)
 	}
 
 	if res.Body != nil {
@@ -341,4 +345,9 @@ func (h *azureReposPRHandler) CallDeleteComment(ctx context.Context, comment Com
 // CallHideComment calls the Azure Repos API to minimize the pull request comment.
 func (h *azureReposPRHandler) CallHideComment(ctx context.Context, comment Comment) error {
 	return errors.New("Not implemented")
+}
+
+// AddMarkdownTag prepends a tag as a markdown comment to the given string.
+func (h *azureReposPRHandler) AddMarkdownTag(s string, tag string) string {
+	return addMarkdownTag(s, tag)
 }

@@ -1,17 +1,27 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"os"
+	"strconv"
+
+	"github.com/open-policy-agent/opa/ast"
+	"github.com/open-policy-agent/opa/rego"
+	"github.com/spf13/cobra"
+
+	"github.com/pkg/errors"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
-	"github.com/spf13/cobra"
 )
 
 func commentCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "comment",
-		Short: "Post an Infracost comment to GitHub, GitLab or Azure Repos",
-		Long:  "Post an Infracost comment to GitHub, GitLab or Azure Repos",
+		Short: "Post an Infracost comment to GitHub, GitLab, Azure Repos or Bitbucket",
+		Long:  "Post an Infracost comment to GitHub, GitLab, Azure Repos or Bitbucket",
 		Example: `  Update the Infracost comment on a GitHub pull request:
 
       infracost comment github --repo my-org/my-repo --pull-request 3 --path infracost.json --behavior update --github-token $GITHUB_TOKEN
@@ -29,9 +39,12 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		},
 	}
 
-	cmd.AddCommand(commentGitHubCmd(ctx))
-	cmd.AddCommand(commentGitLabCmd(ctx))
-	cmd.AddCommand(commentAzureReposCmd(ctx))
+	cmds := []*cobra.Command{commentGitHubCmd(ctx), commentGitLabCmd(ctx), commentAzureReposCmd(ctx), commentBitbucketCmd(ctx)}
+	for _, subCmd := range cmds {
+		subCmd.Flags().StringArray("policy-path", nil, "Path to Infracost policy files, glob patterns need quotes (experimental)")
+	}
+
+	cmd.AddCommand(cmds...)
 
 	return cmd
 }
@@ -57,11 +70,23 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 		combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 	}
 
+	var policyChecks output.PolicyCheck
+	policyPaths, _ := cmd.Flags().GetStringArray("policy-path")
+	if len(policyPaths) > 0 {
+		policyChecks, err = queryPolicy(policyPaths, combined)
+		if err != nil {
+			return nil, err
+		}
+
+		ctx.SetContextValue("passedPolicyCount", len(policyChecks.Passed))
+		ctx.SetContextValue("failedPolicyCount", len(policyChecks.Failures))
+	}
+
 	opts := output.Options{
 		DashboardEnabled: ctx.Config.EnableDashboard,
 		NoColor:          ctx.Config.NoColor,
-		IncludeHTML:      true,
 		ShowSkipped:      true,
+		PolicyChecks:     policyChecks,
 	}
 
 	b, err := output.ToMarkdown(combined, opts, mdOpts)
@@ -69,5 +94,104 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 		return nil, err
 	}
 
+	if policyChecks.HasFailed() {
+		return b, policyChecks.Failures
+	}
+
 	return b, nil
+}
+
+type PRNumber int
+
+func (p *PRNumber) Set(value string) error {
+	if value == "" {
+		return nil
+	}
+
+	v, err := strconv.Atoi(value)
+	*p = PRNumber(v)
+
+	if err != nil {
+		return errors.New("must be integer")
+	}
+
+	return nil
+}
+
+func (p *PRNumber) String() string {
+	return fmt.Sprintf("%d", *p)
+}
+
+func (p *PRNumber) Type() string {
+	return "int"
+}
+
+func queryPolicy(policyPaths []string, input output.Root) (output.PolicyCheck, error) {
+	checks := output.PolicyCheck{
+		Enabled: true,
+	}
+
+	inputValue, err := ast.InterfaceToValue(input)
+	if err != nil {
+		return checks, fmt.Errorf("Unable to process Infracost output into Rego input: %s", err.Error())
+	}
+
+	ctx := context.Background()
+	r := rego.New(
+		rego.Query("data.infracost.deny"),
+		rego.ParsedInput(inputValue),
+		rego.Load(policyPaths, func(abspath string, info os.FileInfo, depth int) bool {
+			return false
+		}),
+	)
+	pq, err := r.PrepareForEval(ctx)
+	if err != nil {
+		return checks, fmt.Errorf("Unable to query provided policies: %s", err.Error())
+	}
+
+	res, err := pq.Eval(ctx)
+	if err != nil {
+		return checks, err
+	}
+
+	if len(res) == 0 {
+		return checks, fmt.Errorf("The provided polices returned no valid data.infracost.deny rules. Please check that the policies are formatted correctly.")
+	}
+
+	for _, e := range res[0].Expressions {
+		switch v := e.Value.(type) {
+		case map[string]interface{}:
+			readPolicyOut(v, &checks)
+		case []interface{}:
+			for _, ii := range v {
+				if m, ok := ii.(map[string]interface{}); ok {
+					readPolicyOut(m, &checks)
+				}
+			}
+		}
+	}
+
+	return checks, nil
+}
+
+func readPolicyOut(v map[string]interface{}, checks *output.PolicyCheck) {
+	if _, ok := v["msg"]; !ok {
+		checks.Failures = append(checks.Failures, "Policy rule invalid as it did not contain {msg: string} property in output object. Please edit rule output object.")
+		return
+	}
+	msg := v["msg"].(string)
+
+	if _, ok := v["failed"]; !ok {
+		checks.Failures = append(checks.Failures, fmt.Sprintf("Policy rule: [%s] did not contain {failed: bool} output property. Please edit rule output object.", msg))
+		return
+	}
+
+	failed, _ := v["failed"].(bool)
+
+	if failed {
+		checks.Failures = append(checks.Failures, msg)
+		return
+	}
+
+	checks.Passed = append(checks.Passed, msg)
 }

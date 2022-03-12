@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strings"
 
 	"github.com/shopspring/decimal"
 
@@ -152,4 +153,21 @@ func (r RegionsUsage) Values() []RegionUsage {
 	}
 
 	return regions
+}
+
+func GetFloatFieldValueByUsageTag(tagValue string, s interface{}) float64 {
+	rt := reflect.TypeOf(s)
+	if rt.Kind() != reflect.Struct {
+		return 0
+	}
+	for i := 0; i < rt.NumField(); i++ {
+		f := rt.Field(i)
+		v := strings.Split(f.Tag.Get("infracost_usage"), ",")[0] // use split to ignore tag "options" like omitempty, etc.
+		if v == tagValue {
+			r := reflect.ValueOf(s)
+			field := reflect.Indirect(r).FieldByName(f.Name)
+			return field.Elem().Float()
+		}
+	}
+	return 0
 }

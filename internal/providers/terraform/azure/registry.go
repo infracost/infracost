@@ -67,6 +67,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMLoadBalancerOutboundRuleRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
+	getAzureRMLogAnalyticsWorkspaceRegistryItem(),
 	GetAzureRMManagedDiskRegistryItem(),
 	GetAzureRMMariaDBServerRegistryItem(),
 	getAzureRMMSSQLDatabaseRegistryItem(),
@@ -244,6 +245,17 @@ var FreeResources = []string{
 	"azurerm_lb_nat_pool",
 	"azurerm_lb_nat_rule",
 	"azurerm_lb_probe",
+
+	// Azure Log Analytics
+	"azurerm_log_analytics_cluster_customer_managed_key",
+	"azurerm_log_analytics_data_export_rule",
+	"azurerm_log_analytics_datasource_windows_event",
+	"azurerm_log_analytics_datasource_windows_performance_counter",
+	"azurerm_log_analytics_linked_service",
+	"azurerm_log_analytics_linked_storage_account",
+	"azurerm_log_analytics_saved_search",
+	"azurerm_log_analytics_solution",
+	"azurerm_log_analytics_storage_insights",
 
 	// Azure Management
 	"azurerm_management_group",

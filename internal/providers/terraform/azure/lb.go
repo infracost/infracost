@@ -3,9 +3,10 @@ package azure
 import (
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMLoadBalancerRegistryItem() *schema.RegistryItem {
@@ -23,7 +24,7 @@ func NewAzureRMLoadBalancer(d *schema.ResourceData, u *schema.UsageData) *schema
 	region = convertRegion(region)
 
 	var costComponents []*schema.CostComponent
-	var sku string
+	sku := "Basic" // this is the default - we specify it as if it's not provided this value will not be parsed by hcl
 	var monthlyDataProcessedGb *decimal.Decimal
 
 	if u != nil && u.Get("monthly_data_processed_gb").Type != gjson.Null {
