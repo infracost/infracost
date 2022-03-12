@@ -71,8 +71,8 @@ require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hashicorp/hcl/v2 v2.0.0 // indirect
-	github.com/iancoleman/strcase v0.2.0 // indirect
+	github.com/hashicorp/hcl/v2 v2.11.1
+	github.com/iancoleman/strcase v0.2.0
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -88,7 +88,7 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	golang.org/x/text v0.3.7
-	golang.org/x/tools v0.1.7 // indirect
+	golang.org/x/tools v0.1.7
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )
 
