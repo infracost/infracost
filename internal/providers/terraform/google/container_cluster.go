@@ -2,18 +2,16 @@ package google
 
 import (
 	"fmt"
-	"regexp"
 
+	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
-
-	"github.com/shopspring/decimal"
 )
 
-func GetContainerClusterRegistryItem() *schema.RegistryItem {
+func getContainerClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_container_cluster",
-		RFunc: NewContainerCluster,
+		RFunc: newContainerCluster,
 		Notes: []string{
 			"Sustained use discounts are applied to monthly costs, but not to hourly costs.",
 			"Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.",
@@ -22,87 +20,103 @@ func GetContainerClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	description := "Regional Kubernetes Clusters"
+func newContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("location").String()
-	if isZone(region) {
+	isZone := isZone(region)
+
+	if isZone {
 		region = zoneToRegion(region)
-		description = "Zonal Kubernetes Clusters"
 	}
 
-	subResources := make([]*schema.Resource, 0)
+	var defaultNodePool *google.ContainerNodePool
+	nodePools := make([]*google.ContainerNodePool, 0)
 
 	if !d.Get("remove_default_node_pool").Bool() {
 		zones := int64(zoneCount(d.RawValues, ""))
 
 		countPerZone := int64(3)
 
-		if d.Get("initial_node_count").Type != gjson.Null {
+		if !d.IsEmpty("initial_node_count") {
 			countPerZone = d.Get("initial_node_count").Int()
 		}
 
-		if u != nil && u.Get("nodes").Exists() {
-			countPerZone = u.Get("nodes").Int()
+		defaultNodePool = &google.ContainerNodePool{
+			Address:      "default_pool",
+			Region:       region,
+			Zones:        zones,
+			CountPerZone: countPerZone,
+			NodeConfig:   newContainerNodeConfig(d.Get("node_config.0")),
 		}
-
-		nodeCount := decimal.NewFromInt(zones * countPerZone)
-
-		defaultPool := &schema.Resource{
-			Name:           "default_pool",
-			CostComponents: nodePoolCostComponents(region, d.Get("node_config.0")),
-		}
-
-		schema.MultiplyQuantities(defaultPool, nodeCount)
-
-		subResources = append(subResources, defaultPool)
 	}
 
 	for i, values := range d.Get("node_pool").Array() {
-		var countPerZoneOverride *int64
-		k := fmt.Sprintf("node_pool[%d].nodes", i)
-		if u != nil && u.Get(k).Exists() {
-			c := u.Get(k).Int()
-			countPerZoneOverride = &c
-		}
-
-		nodePool := newNodePool(fmt.Sprintf("node_pool[%d]", i), values, countPerZoneOverride, d)
+		nodePool := newNodePool(fmt.Sprintf("node_pool[%d]", i), values, d)
 		if nodePool != nil {
-			subResources = append(subResources, nodePool)
+			nodePools = append(nodePools, nodePool)
 		}
 	}
 
-	costComponents := []*schema.CostComponent{
-		{
-			Name:           "Cluster management fee",
-			Unit:           "hours",
-			UnitMultiplier: decimal.NewFromInt(1),
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("gcp"),
-				Region:        strPtr("global"),
-				Service:       strPtr("Kubernetes Engine"),
-				ProductFamily: strPtr("Compute"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr(description)},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				StartUsageAmount: strPtr("0"),
-				EndUsageAmount:   strPtr(""),
-			},
-		},
+	r := &google.ContainerCluster{
+		Address:         d.Address,
+		Region:          region,
+		IsZone:          isZone,
+		DefaultNodePool: defaultNodePool,
+		NodePools:       nodePools,
 	}
+	r.PopulateUsage(u)
 
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
-		SubResources:   subResources,
-	}
+	return r.BuildResource()
 }
 
-func isZone(location string) bool {
-	if matched, _ := regexp.MatchString(`^\w+-\w+-\w+$`, location); matched {
-		return true
+func zoneCount(d gjson.Result, location string) int {
+	if location == "" {
+		location = d.Get("location").String()
 	}
-	return false
+
+	c := 3
+
+	if isZone(location) {
+		c = 1
+	}
+
+	if len(d.Get("node_locations").Array()) > 0 {
+		c = len(d.Get("node_locations").Array())
+	}
+
+	return c
+}
+
+func newContainerNodeConfig(d gjson.Result) *google.ContainerNodeConfig {
+	machineType := "e2-medium"
+	if d.Get("machine_type").Exists() {
+		machineType = d.Get("machine_type").String()
+	}
+
+	purchaseOption := "on_demand"
+	if d.Get("preemptible").Bool() {
+		purchaseOption = "preemptible"
+	}
+
+	diskType := "pd-standard"
+	if d.Get("disk_type").Exists() {
+		diskType = d.Get("disk_type").String()
+	}
+
+	diskSize := int64(100)
+	if d.Get("disk_size_gb").Exists() {
+		diskSize = d.Get("disk_size_gb").Int()
+	}
+
+	localSSDCount := d.Get("local_ssd_count").Int()
+
+	guestAccelerators := collectComputeGuestAccelerators(d.Get("guest_accelerator"))
+
+	return &google.ContainerNodeConfig{
+		MachineType:       machineType,
+		PurchaseOption:    purchaseOption,
+		DiskType:          diskType,
+		DiskSize:          float64(diskSize),
+		LocalSSDCount:     localSSDCount,
+		GuestAccelerators: guestAccelerators,
+	}
 }
