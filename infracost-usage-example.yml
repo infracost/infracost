@@ -542,9 +542,12 @@ resource_usage:
     monthly_data_processed_gb: 1000 # Monthly data processed (ingress and egress) by the NAT gateway in GB
 
   google_container_cluster.my_cluster:
-    nodes: 4    # Node count per zone for the default node pool
+    autopilot_vcpu_count: 10            # Number of vCPUs used by Autopilot pods. Only relevant for Autopilot mode.
+    autopilot_memory_gb: 50             # Total memory used by Autopilot pods. Only relevant for Autopilot mode.
+    autopilot_ephemeral_storage_gb: 100 # Total ephemeral storage used by Autopilot pods. Only relevant for Autopilot mode.
+    nodes: 4                            # Node count per zone for the default node pool. Only relevant for Standard mode.
     node_pool[0]:
-      nodes: 2  # Node count per zone for the first node pool
+      nodes: 2  # Node count per zone for the first node pool. Only relevant for Standard mode.
 
   google_container_node_pool.my_node_pool:
     nodes: 4 # Node count per zone for the node pool

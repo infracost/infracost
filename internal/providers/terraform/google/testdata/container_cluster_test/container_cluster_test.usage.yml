@@ -26,3 +26,8 @@ resource_usage:
       nodes: 4
     node_pool[1]:
       nodes: 4
+
+  google_container_cluster.autopilot_with_usage:
+    autopilot_vcpu_count: 10
+    autopilot_memory_gb: 50
+    autopilot_ephemeral_storage_gb: 100
