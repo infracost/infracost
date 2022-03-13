@@ -23,6 +23,9 @@ var ComputeExternalVPNGatewayUsageSchema = []*schema.UsageItem{
 
 func (r *ComputeExternalVPNGateway) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
+	if r.MonthlyEgressDataTransferGB == nil {
+		r.MonthlyEgressDataTransferGB = &ComputeExternalVPNGatewayNetworkEgressUsage{}
+	}
 }
 
 func (r *ComputeExternalVPNGateway) BuildResource() *schema.Resource {
