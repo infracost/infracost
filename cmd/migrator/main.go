@@ -18,13 +18,13 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-var PROVIDER string = "aws"
-var PROVIDER_TF string = "aws"
+var PROVIDER string = "google"
+var PROVIDER_TF string = "google"
 
 var DRY_MODE = false
-var STRICT_MODE = false
+var STRICT_MODE = true
 var SINGLE_MODE = true
-var SINGLE_RESOURCE_NAME = "backup_vault.go"
+var SINGLE_RESOURCE_NAME = "container_registry.go"
 
 var FLEXIBLE_MODE_SKIP_DOTS = true
 var FLEXIBLE_MODE_SKIP_TYPES = true
