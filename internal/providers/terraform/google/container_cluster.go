@@ -28,10 +28,12 @@ func newContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		region = zoneToRegion(region)
 	}
 
+	autopilotEnabled := d.Get("enable_autopilot").Bool()
+
 	var defaultNodePool *google.ContainerNodePool
 	nodePools := make([]*google.ContainerNodePool, 0)
 
-	if !d.Get("remove_default_node_pool").Bool() {
+	if !d.Get("remove_default_node_pool").Bool() && !autopilotEnabled {
 		zones := int64(zoneCount(d.RawValues, ""))
 
 		countPerZone := int64(3)
@@ -49,19 +51,22 @@ func newContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		}
 	}
 
-	for i, values := range d.Get("node_pool").Array() {
-		nodePool := newNodePool(fmt.Sprintf("node_pool[%d]", i), values, d)
-		if nodePool != nil {
-			nodePools = append(nodePools, nodePool)
+	if !autopilotEnabled {
+		for i, values := range d.Get("node_pool").Array() {
+			nodePool := newNodePool(fmt.Sprintf("node_pool[%d]", i), values, d)
+			if nodePool != nil {
+				nodePools = append(nodePools, nodePool)
+			}
 		}
 	}
 
 	r := &google.ContainerCluster{
-		Address:         d.Address,
-		Region:          region,
-		IsZone:          isZone,
-		DefaultNodePool: defaultNodePool,
-		NodePools:       nodePools,
+		Address:          d.Address,
+		Region:           region,
+		AutopilotEnabled: autopilotEnabled,
+		IsZone:           isZone,
+		DefaultNodePool:  defaultNodePool,
+		NodePools:        nodePools,
 	}
 	r.PopulateUsage(u)
 
