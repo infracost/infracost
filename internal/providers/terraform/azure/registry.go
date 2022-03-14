@@ -102,6 +102,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
 	getAzureRMVPNGatewayRegistryItem(),
 	getAzureRMVPNGatewayConnectionRegistryItem(),
+	getAzureSQLManagedInstanceRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
