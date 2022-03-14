@@ -166,6 +166,9 @@ func GetFloatFieldValueByUsageTag(tagValue string, s interface{}) float64 {
 		if v == tagValue {
 			r := reflect.ValueOf(s)
 			field := reflect.Indirect(r).FieldByName(f.Name)
+			if !field.Elem().IsValid() {
+				return 0
+			}
 			return field.Elem().Float()
 		}
 	}
