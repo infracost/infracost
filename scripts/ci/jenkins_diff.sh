@@ -1,8 +1,17 @@
 #!/bin/sh -le
 
-# This is a Jenkins-specific script that runs infracost. The output is saved in a file 
-# infracost_diff.html, which can be published using the Jenkins publishHTML plugin.
-# Usage docs: https://www.infracost.io/docs/integrations/cicd
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# This script is DEPRECATED and is no longer maintained.
+#
+# Please migrate to our new Jenkins integration: https://github.com/infracost/infracost-jenkins
+#
+# This script will be removed September 2022.
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "Warning: this script is deprecated and will be soon removed."
+echo "Please visit https://github.com/infracost/infracost/blob/master/scripts/ci/README.md for instructions on how to upgrade."
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 fix_env_vars () {
   # Jenkins has problems with envs case sensivity

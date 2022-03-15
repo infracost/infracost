@@ -1,14 +1,18 @@
 #!/bin/bash -le
 
-# This script is used in infracost CI/CD integrations. It posts pull-request comments showing cost estimate diffs.
-# Usage docs: https://www.infracost.io/docs/integrations/cicd
-# It supports: GitHub Actions, GitLab CI, CircleCI with GitHub and Bitbucket, Bitbucket Pipelines, Azure DevOps with TfsGit repos and GitHub
-# For Bitbucket: BITBUCKET_TOKEN must be set to "myusername:my_app_password", the password needs to have Read scope
-#   on "Repositories" and "Pull Requests" so it can post comments. Using a Bitbucket App password
-#   (https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) is recommended.
-# For Bitbucket Server: BITBUCKET_SERVER_HOSTNAME must be set, e.g. "mycompany.com". BITBUCKET_TOKEN must be set to "mytoken", the token
-#   needs to have PROJECT READ and REPOSITORY READ on "Repositories" and "Pull Requests" so it can post comments. See here for my details:
-#   https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# This script is DEPRECATED and is no longer maintained.
+#
+# Please visit : https://www.infracost.io/docs/integrations/cicd/ to migrate to
+# to one of our new CI/CD integrations.
+#
+# This script will be removed September 2022.
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "Warning: this script is deprecated and will be soon removed."
+echo "Please visit https://github.com/infracost/infracost/blob/master/scripts/ci/README.md for instructions on how to upgrade."
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 process_args () {
   # Set variables based on the order for GitHub Actions, or the env value for other CIs
