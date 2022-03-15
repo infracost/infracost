@@ -5,6 +5,7 @@ import (
 
 	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -12,6 +13,9 @@ func getContainerClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_container_cluster",
 		RFunc: newContainerCluster,
+		// this is a reverse reference, it depends on the container_node_pool RegistryItem
+		// defining "cluster" as a ReferenceAttribute
+		ReferenceAttributes: []string{"google_container_node_pool.cluster"},
 		Notes: []string{
 			"Sustained use discounts are applied to monthly costs, but not to hourly costs.",
 			"Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.",
@@ -33,29 +37,52 @@ func newContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	var defaultNodePool *google.ContainerNodePool
 	nodePools := make([]*google.ContainerNodePool, 0)
 
-	if !d.Get("remove_default_node_pool").Bool() && !autopilotEnabled {
-		zones := int64(zoneCount(d.RawValues, ""))
-
-		countPerZone := int64(3)
-
-		if !d.IsEmpty("initial_node_count") {
-			countPerZone = d.Get("initial_node_count").Int()
-		}
-
-		defaultNodePool = &google.ContainerNodePool{
-			Address:      "default_pool",
-			Region:       region,
-			Zones:        zones,
-			CountPerZone: countPerZone,
-			NodeConfig:   newContainerNodeConfig(d.Get("node_config.0")),
-		}
+	// Build a list of node pools that are defined in other `google_container_node_pool` resources
+	// If we find these in the `node_pool` field, we want to skip them for this resource
+	// since we will show the cost for these against their `google_container_node_pool` resource
+	definedNodePoolNames := []string{}
+	for _, ref := range d.References("google_container_node_pool.cluster") {
+		definedNodePoolNames = append(definedNodePoolNames, ref.Get("name").String())
 	}
 
 	if !autopilotEnabled {
-		for i, values := range d.Get("node_pool").Array() {
-			nodePool := newNodePool(fmt.Sprintf("node_pool[%d]", i), values, d)
+		nameIndex := 0
+		for _, values := range d.Get("node_pool").Array() {
+			if contains(definedNodePoolNames, values.Get("name").String()) {
+				log.Debugf("Skipping node pool with name %s since it is defined in another resource", values.Get("name").String())
+				continue
+			}
+
+			if values.Get("name").String() == "default-pool" {
+				defaultNodePool = newNodePool("default_pool", values, d)
+				continue
+			}
+
+			name := fmt.Sprintf("node_pool[%d]", nameIndex)
+			nameIndex++
+
+			nodePool := newNodePool(name, values, d)
 			if nodePool != nil {
 				nodePools = append(nodePools, nodePool)
+			}
+		}
+
+		// Create the default pool if it isn't specified in the existing `node_pools` - this happens if the Terraform resources have not been applied.
+		if defaultNodePool == nil && !d.Get("remove_default_node_pool").Bool() {
+			zones := int64(zoneCount(d.RawValues, ""))
+
+			countPerZone := int64(3)
+
+			if !d.IsEmpty("initial_node_count") {
+				countPerZone = d.Get("initial_node_count").Int()
+			}
+
+			defaultNodePool = &google.ContainerNodePool{
+				Address:      "default_pool",
+				Region:       region,
+				Zones:        zones,
+				CountPerZone: countPerZone,
+				NodeConfig:   newContainerNodeConfig(d.Get("node_config.0")),
 			}
 		}
 	}

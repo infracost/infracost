@@ -1,8 +1,6 @@
 package google
 
 import (
-	"fmt"
-
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -48,9 +46,9 @@ func (r *ContainerCluster) PopulateUsage(u *schema.UsageData) {
 		r.DefaultNodePool.PopulateUsage(u)
 	}
 
-	for i, nodePool := range r.NodePools {
+	for _, nodePool := range r.NodePools {
 		nodePool.PopulateUsage(&schema.UsageData{
-			Attributes: u.Get(fmt.Sprintf("node_pool[%d]", i)).Map(),
+			Attributes: u.Get(nodePool.Address).Map(),
 		})
 	}
 }
@@ -72,12 +70,10 @@ func (r *ContainerCluster) BuildResource() *schema.Resource {
 	subresources := []*schema.Resource{}
 
 	if r.DefaultNodePool != nil {
-		r.DefaultNodePool.Address = "default_pool"
 		subresources = append(subresources, r.DefaultNodePool.BuildResource())
 	}
 
-	for i, nodePool := range r.NodePools {
-		nodePool.Address = fmt.Sprintf("node_pool[%d]", i)
+	for _, nodePool := range r.NodePools {
 		subresources = append(subresources, nodePool.BuildResource())
 	}
 
