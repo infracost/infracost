@@ -3,6 +3,7 @@ package output
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
@@ -68,7 +69,17 @@ func ToSlackMessage(out Root, opts Options) ([]byte, error) {
 		return nil, errors.Wrap(err, "Failed to generate diff")
 	}
 
-	projectBlocks := make([]*slack.TextBlockObject, 0, len(out.Projects))
+	projectBlocks := []*slack.TextBlockObject{
+		{
+			Type: slack.PlainTextType,
+			Text: "Project",
+		},
+		{
+			Type: slack.PlainTextType,
+			Text: "Diff",
+		},
+	}
+
 	for _, project := range out.Projects {
 		if len(out.Projects) != 1 && (project.Diff == nil || len(project.Diff.Resources) == 0) {
 			continue
@@ -78,6 +89,15 @@ func ToSlackMessage(out Root, opts Options) ([]byte, error) {
 
 	if len(out.Projects) > 1 {
 		projectBlocks = append(projectBlocks, slackAllProjectsSummaryBlock(out, out.Currency)...)
+	}
+
+	// Slack limits to 10 fields per section block, so we should chunk by these to create a new section for each
+	chunkSize := 10
+	projectSections := make([]*slack.SectionBlock, 0, int64(math.Ceil(float64(len(projectBlocks))/float64(chunkSize))))
+
+	for i := 0; i < len(projectBlocks); i += chunkSize {
+		fieldBlocks := projectBlocks[i:int64(math.Min(float64(i+chunkSize), float64(len(projectBlocks))))]
+		projectSections = append(projectSections, slack.NewSectionBlock(nil, fieldBlocks, nil))
 	}
 
 	skippedProjectCount := 0
@@ -96,19 +116,10 @@ func ToSlackMessage(out Root, opts Options) ([]byte, error) {
 			[]*slack.TextBlockObject{}, nil,
 		),
 		slack.NewDividerBlock(),
-		slack.NewSectionBlock(
-			nil,
-			append([]*slack.TextBlockObject{
-				{
-					Type: slack.PlainTextType,
-					Text: "Project",
-				},
-				{
-					Type: slack.PlainTextType,
-					Text: "Diff",
-				},
-			}, projectBlocks...), nil,
-		),
+	}
+
+	for _, section := range projectSections {
+		blocks = append(blocks, section)
 	}
 
 	skippedProjectMessage := ""
