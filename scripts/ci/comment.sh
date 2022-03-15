@@ -4,15 +4,15 @@ set -e
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # This script is DEPRECATED and is no longer maintained.
 #
-# Please follow our guide: https://www.infracost.io/docs/guides/actions_migration/ to migrate
-# to our new GitHub Actions integration: https://github.com/infracost/actions/
+# Please follow our guide: https://www.infracost.io/docs/guides/gitlab_ci_migration/ to migrate
+# to our new GitHub Actions integration: https://gitlab.com/infracost/infracost-gitlab-ci/
 #
 # This script will be removed September 2022.
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-echo "Warning: this script is deprecated and will be soon removed."
-echo "Please visit https://github.com/infracost/infracost/blob/master/scripts/ci/README.md for instructions on how to upgrade."
+echo "Warning: this script is deprecated and will be removed in Sep 2022."
+echo "Please visit https://www.infracost.io/docs/guides/gitlab_ci_migration/ for instructions on how to upgrade."
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 format=${COMMENT_FORMAT:-github-comment}

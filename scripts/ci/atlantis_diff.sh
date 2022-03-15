@@ -10,8 +10,8 @@
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-echo "Warning: this script is deprecated and will be soon removed."
-echo "Please visit https://github.com/infracost/infracost/blob/master/scripts/ci/README.md for instructions on how to upgrade."
+echo "Warning: this script is deprecated and will be removed in Sep 2022."
+echo "Please visit https://www.infracost.io/docs/guides/atlantis_migration/ for instructions on how to upgrade."
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 if [ "$atlantis_debug" = "true" ] || [ "$atlantis_debug" = "True" ] || [ "$atlantis_debug" = "TRUE" ]; then
