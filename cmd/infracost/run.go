@@ -231,7 +231,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		runCtx.SetContextValue("lineCount", lines)
 	}
 
-	env := buildRunEnv(runCtx, projectContexts, r, hclR)
+	env := buildRunEnv(runCtx, projectContexts, r, projects, hclR, hclProjects)
+
 	pricingClient := apiclient.NewPricingAPIClient(runCtx)
 	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
@@ -720,7 +721,7 @@ func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 	return nil
 }
 
-func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root, hclR *output.Root) map[string]interface{} {
+func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root, projects []*schema.Project, hclR *output.Root, hclProjects []*schema.Project) map[string]interface{} {
 	env := runCtx.EventEnvWithProjectContexts(projectContexts)
 	env["projectCount"] = len(projectContexts)
 	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
@@ -750,7 +751,7 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
 
 	if hclR != nil {
-		AddHCLEnvVars(projectContexts, r, *hclR, env)
+		AddHCLEnvVars(projectContexts, r, projects, *hclR, hclProjects, env)
 
 	}
 
@@ -759,7 +760,7 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 
 // AddHCLEnvVars adds HCL reporting metrics to the Infracost run so that we can assess the accuracy of
 // the HCL approach.
-func AddHCLEnvVars(projectContexts []*config.ProjectContext, r output.Root, hclR output.Root, env map[string]interface{}) {
+func AddHCLEnvVars(projectContexts []*config.ProjectContext, r output.Root, projects []*schema.Project, hclR output.Root, hclProjects []*schema.Project, env map[string]interface{}) {
 	var initialTotal decimal.Decimal
 	if r.TotalMonthlyCost != nil {
 		initialTotal = *r.TotalMonthlyCost
@@ -802,14 +803,116 @@ func AddHCLEnvVars(projectContexts []*config.ProjectContext, r output.Root, hclR
 	env["tfRunTimeMs"] = tfTimeTaken
 	env["hclRunTimeMs"] = hclTimeTaken
 
+	env["hclMissingResources"] = hclMissingResources(projects, hclProjects)
+	env["hclResourceDiff"] = hclResourceDiff(projects, hclProjects)
 }
 
-func percentChange(newTotal decimal.Decimal, initialTotal decimal.Decimal) decimal.Decimal {
-	if initialTotal.IsZero() {
+func hclMissingResources(projects, hclProjects []*schema.Project) []string {
+	missingResources := map[string]bool{}
+
+	hclProjectsMapping := map[string]*schema.Project{}
+	for _, project := range hclProjects {
+		hclProjectsMapping[project.Name] = project
+	}
+
+	for _, project := range projects {
+		hclProject := hclProjectsMapping[project.Name]
+
+		if hclProject == nil {
+			log.Debugf("could not find a matching HCL project for '%s' on missing resources search", project.Name)
+			continue
+		}
+
+		hclResourceNames := map[string]bool{}
+		for _, resource := range hclProject.Resources {
+			hclResourceNames[resource.Name] = true
+		}
+
+		for _, resource := range project.Resources {
+			if _, ok := hclResourceNames[resource.Name]; !ok {
+				missingResources[resource.ResourceType] = true
+			}
+		}
+	}
+
+	missingList := make([]string, 0, len(missingResources))
+	for key := range missingResources {
+		missingList = append(missingList, key)
+	}
+
+	return missingList
+}
+
+func hclResourceDiff(projects, hclProjects []*schema.Project) map[string][]string {
+	diff := map[string][]string{}
+
+	hclProjectsMapping := map[string]*schema.Project{}
+	for _, project := range hclProjects {
+		hclProjectsMapping[project.Name] = project
+	}
+
+	for _, project := range projects {
+		hclProject := hclProjectsMapping[project.Name]
+
+		if hclProject == nil {
+			log.Debugf("could not find a matching HCL project for '%s' on resources diff", project.Name)
+			continue
+		}
+
+		acc := map[string]*decimal.Decimal{}
+
+		for _, resource := range project.Resources {
+			acc[resource.Name] = resource.MonthlyCost
+		}
+
+		for _, hclResource := range hclProject.Resources {
+			resourceCost, ok := acc[hclResource.Name]
+			if !ok {
+				continue
+			}
+
+			if resourceCost == nil && hclResource.MonthlyCost == nil {
+				continue
+			}
+
+			hclCost := decimal.NewFromInt(0)
+			if hclResource.MonthlyCost != nil {
+				hclCost = *hclResource.MonthlyCost
+			}
+
+			var cost decimal.Decimal
+			var change decimal.Decimal
+			var abs decimal.Decimal
+
+			if resourceCost != nil {
+				cost = *resourceCost
+
+				change = percentChange(hclCost, cost)
+				abs = change.Abs()
+			} else {
+				change = decimal.NewFromInt(100)
+				abs = decimal.NewFromInt(100)
+			}
+
+			if abs.GreaterThan(decimal.NewFromInt(0)) {
+				if diff[hclResource.ResourceType] == nil {
+					diff[hclResource.ResourceType] = []string{}
+				}
+
+				diff[hclResource.ResourceType] = append(diff[hclResource.ResourceType], change.StringFixed(2))
+			}
+		}
+	}
+
+	return diff
+}
+
+func percentChange(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+	if b.IsZero() {
 		return decimal.NewFromInt(0)
 	}
 
-	return newTotal.Sub(initialTotal).Div(initialTotal).Mul(decimal.NewFromInt(100))
+	return a.Sub(b).Div(b).Mul(decimal.NewFromInt(100))
 }
 
 func unwrapped(err error) error {
