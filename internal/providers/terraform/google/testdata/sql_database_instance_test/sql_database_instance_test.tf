@@ -89,6 +89,21 @@ resource "google_sql_database_instance" "mysql_highmem" {
   }
 }
 
+resource "google_sql_database_instance" "mysql_standard_no_public_ip" {
+  name             = "master-instance"
+  database_version = "SQLSERVER_2017_ENTERPRISE"
+
+  settings {
+    tier              = "db-custom-16-61440"
+    availability_type = "ZONAL"
+
+    ip_configuration {
+      ipv4_enabled = false
+    }
+  }
+}
+
+
 resource "google_sql_database_instance" "with_replica" {
   name             = "master-instance"
   database_version = "POSTGRES_11"
