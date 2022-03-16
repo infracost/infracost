@@ -43,6 +43,11 @@ type projectResult struct {
 	projectOut *projectOutput
 }
 
+type hclRunDiff struct {
+	resourceDiffs    map[string][]string
+	missingResources []string
+}
+
 var validRunFormats = []string{"json", "table", "html"}
 
 func addRunFlags(cmd *cobra.Command) {
@@ -803,11 +808,13 @@ func AddHCLEnvVars(projectContexts []*config.ProjectContext, r output.Root, proj
 	env["tfRunTimeMs"] = tfTimeTaken
 	env["hclRunTimeMs"] = hclTimeTaken
 
-	env["hclMissingResources"] = hclMissingResources(projects, hclProjects)
-	env["hclResourceDiff"] = hclResourceDiff(projects, hclProjects)
+	diff := collectHCLRunDiff(projects, hclProjects)
+	env["hclMissingResources"] = diff.missingResources
+	env["hclResourceDiff"] = diff.resourceDiffs
 }
 
-func hclMissingResources(projects, hclProjects []*schema.Project) []string {
+func collectHCLRunDiff(projects, hclProjects []*schema.Project) hclRunDiff {
+	diff := map[string][]string{}
 	missingResources := map[string]bool{}
 
 	hclProjectsMapping := map[string]*schema.Project{}
@@ -819,18 +826,49 @@ func hclMissingResources(projects, hclProjects []*schema.Project) []string {
 		hclProject := hclProjectsMapping[project.Name]
 
 		if hclProject == nil {
-			log.Debugf("could not find a matching HCL project for '%s' on missing resources search", project.Name)
+			log.Debugf("could not find a matching HCL project '%s' for HCL run diff", project.Name)
 			continue
 		}
 
-		hclResourceNames := map[string]bool{}
-		for _, resource := range hclProject.Resources {
-			hclResourceNames[resource.Name] = true
+		hclResourcesMapping := map[string]*decimal.Decimal{}
+
+		for _, hclResource := range hclProject.Resources {
+			hclResourcesMapping[hclResource.Name] = hclResource.MonthlyCost
 		}
 
 		for _, resource := range project.Resources {
-			if _, ok := hclResourceNames[resource.Name]; !ok {
+			hclResourceCost, ok := hclResourcesMapping[resource.Name]
+			if !ok {
 				missingResources[resource.ResourceType] = true
+				continue
+			}
+
+			if resource.MonthlyCost == nil && hclResourceCost == nil {
+				continue
+			}
+
+			hclCost := decimal.NewFromInt(0)
+			if hclResourceCost != nil {
+				hclCost = *hclResourceCost
+			}
+
+			var cost decimal.Decimal
+			change := decimal.NewFromInt(100)
+			abs := decimal.NewFromInt(100)
+
+			if resource.MonthlyCost != nil {
+				cost = *resource.MonthlyCost
+
+				change = percentChange(hclCost, cost)
+				abs = change.Abs()
+			}
+
+			if abs.GreaterThan(decimal.NewFromInt(0)) {
+				if diff[resource.ResourceType] == nil {
+					diff[resource.ResourceType] = []string{}
+				}
+
+				diff[resource.ResourceType] = append(diff[resource.ResourceType], change.StringFixed(2))
 			}
 		}
 	}
@@ -840,71 +878,12 @@ func hclMissingResources(projects, hclProjects []*schema.Project) []string {
 		missingList = append(missingList, key)
 	}
 
-	return missingList
-}
-
-func hclResourceDiff(projects, hclProjects []*schema.Project) map[string][]string {
-	diff := map[string][]string{}
-
-	hclProjectsMapping := map[string]*schema.Project{}
-	for _, project := range hclProjects {
-		hclProjectsMapping[project.Name] = project
+	runDiff := hclRunDiff{
+		missingResources: missingList,
+		resourceDiffs:    diff,
 	}
 
-	for _, project := range projects {
-		hclProject := hclProjectsMapping[project.Name]
-
-		if hclProject == nil {
-			log.Debugf("could not find a matching HCL project for '%s' on resources diff", project.Name)
-			continue
-		}
-
-		acc := map[string]*decimal.Decimal{}
-
-		for _, resource := range project.Resources {
-			acc[resource.Name] = resource.MonthlyCost
-		}
-
-		for _, hclResource := range hclProject.Resources {
-			resourceCost, ok := acc[hclResource.Name]
-			if !ok {
-				continue
-			}
-
-			if resourceCost == nil && hclResource.MonthlyCost == nil {
-				continue
-			}
-
-			hclCost := decimal.NewFromInt(0)
-			if hclResource.MonthlyCost != nil {
-				hclCost = *hclResource.MonthlyCost
-			}
-
-			var cost decimal.Decimal
-			var change decimal.Decimal
-			var abs decimal.Decimal
-
-			if resourceCost != nil {
-				cost = *resourceCost
-
-				change = percentChange(hclCost, cost)
-				abs = change.Abs()
-			} else {
-				change = decimal.NewFromInt(100)
-				abs = decimal.NewFromInt(100)
-			}
-
-			if abs.GreaterThan(decimal.NewFromInt(0)) {
-				if diff[hclResource.ResourceType] == nil {
-					diff[hclResource.ResourceType] = []string{}
-				}
-
-				diff[hclResource.ResourceType] = append(diff[hclResource.ResourceType], change.StringFixed(2))
-			}
-		}
-	}
-
-	return diff
+	return runDiff
 }
 
 func percentChange(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
