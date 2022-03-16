@@ -26,6 +26,7 @@ FLAGS
       --show-skipped                  Show unsupported resources
       --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)
       --terraform-parse-hcl           Parse the HCL directly instead of generating a Terraform plan. This option does not need credentials and is faster (experimental)
+      --terraform-init-flags string   Flags to pass to 'terraform init'. Applicable when path is a Terraform directory
       --terraform-plan-flags string   Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory
       --terraform-use-state           Use Terraform state instead of generating a plan. Applicable when path is a Terraform directory
       --terraform-var strings         Set a value for one of the input variables, similar to Terraform's -var flag. Only supported with --terraform-parse-hcl (experimental)

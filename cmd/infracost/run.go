@@ -57,6 +57,7 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
 
 	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory")
+	cmd.Flags().String("terraform-init-flags", "", "Flags to pass to 'terraform init'. Applicable when path is a Terraform directory")
 	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
 
 	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
@@ -616,6 +617,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasProjectFlags := (hasPathFlag ||
 		cmd.Flags().Changed("usage-file") ||
 		cmd.Flags().Changed("terraform-plan-flags") ||
+		cmd.Flags().Changed("terraform-init-flags") ||
 		cmd.Flags().Changed("terraform-workspace") ||
 		cmd.Flags().Changed("terraform-use-state"))
 
@@ -635,6 +637,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		projectCfg.TerraformVars, _ = cmd.Flags().GetStringSlice("terraform-var")
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
+		projectCfg.TerraformInitFlags, _ = cmd.Flags().GetString("terraform-init-flags")
 		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
 
 		if cmd.Flags().Changed("terraform-workspace") {

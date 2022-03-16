@@ -32,6 +32,7 @@ type DirProvider struct {
 	spinnerOpts         ui.SpinnerOptions
 	IsTerragrunt        bool
 	PlanFlags           string
+	InitFlags           string
 	Workspace           string
 	UseState            bool
 	TerraformBinary     string
@@ -61,6 +62,7 @@ func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
 			Indent:        "  ",
 		},
 		PlanFlags:           ctx.ProjectConfig.TerraformPlanFlags,
+		InitFlags:           ctx.ProjectConfig.TerraformInitFlags,
 		Workspace:           ctx.ProjectConfig.TerraformWorkspace,
 		UseState:            ctx.ProjectConfig.TerraformUseState,
 		TerraformBinary:     terraformBinary,
@@ -356,13 +358,20 @@ func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
 		args = append(args, "run-all", "--terragrunt-ignore-external-dependencies")
 	}
 
+	flags, err := shellquote.Split(p.InitFlags)
+	if err != nil {
+		msg := "parsing terraform-init-flags failed"
+		return clierror.NewSanitizedError(fmt.Errorf("%s: %s", msg, err), msg)
+	}
+
 	args = append(args, "init", "-input=false", "-no-color")
+	args = append(args, flags...)
 
 	if config.IsTest() {
 		args = append(args, "-upgrade")
 	}
 
-	_, err := Cmd(opts, args...)
+	_, err = Cmd(opts, args...)
 	if err != nil {
 		spinner.Fail()
 		err = p.buildTerraformErr(err)
