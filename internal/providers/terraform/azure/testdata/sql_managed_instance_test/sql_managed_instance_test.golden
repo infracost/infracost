@@ -1,39 +1,29 @@
 
- Name                                      Monthly Qty  Unit          Monthly Cost 
-                                                                                   
- azurerm_sql_managed_instance.example                                              
- ├─ Compute (GP_GEN5 4 Cores)                      730  hours              $488.92 
- ├─ Storage 64 Gb (first 32 Gb include)             32  Unit of 32Gb         $4.38 
- ├─ Backup Cost for 100 Gb LRS                     100  Gb                  $11.90 
- ├─ SQL license                                  2,920  vCore-hours        $291.90 
- ├─ Weekly Backup (7 Backups with 5 Gb)             35  Gb/Month             $1.04 
- ├─ Monthly Backup (12 Backups with 5 Gb)           60  Gb/Month             $1.79 
- └─ Yearly Backup (3 Backups with 5 Gb)             60  Gb/Month             $1.79 
-                                                                                   
- azurerm_sql_managed_instance.example2                                             
- └─ Compute (GP_GEN5 16 Cores)                     730  hours            $1,955.69 
-                                                                                   
- azurerm_sql_managed_instance.example3                                             
- ├─ Compute (BC_GEN5 40 Cores)                     730  hours            $9,778.47 
- ├─ Storage 64 Gb (first 32 Gb include)             32  Unit of 32Gb         $4.38 
- ├─ Backup Cost for 100 Gb ZRS                     100  Gb                  $14.90 
- ├─ Weekly Backup (7 Backups with 5 Gb)             35  Gb/Month             $1.30 
- ├─ Monthly Backup (12 Backups with 5 Gb)           60  Gb/Month             $2.23 
- └─ Yearly Backup (3 Backups with 5 Gb)             60  Gb/Month             $2.23 
-                                                                                   
- OVERALL TOTAL                                                          $12,560.92 
+ Name                                                       Monthly Qty  Unit          Monthly Cost 
+                                                                                                    
+ azurerm_sql_managed_instance.example                                                               
+ ├─ Compute (GP_GEN5 4 Cores)                                       730  hours              $488.92 
+ ├─ Storage 64 Gb (first 32 Gb include)                              32  Unit of 32Gb         $4.38 
+ ├─ Backup Cost for 100 Gb (type LRS)                               100  Gb                  $11.90 
+ ├─ SQL license                                                       4  vCore-hours        $291.90 
+ └─ Long Term Retention Storage Backup (5 Gb (type LRS))              5  Gb/Month             $0.15 
+                                                                                                    
+ azurerm_sql_managed_instance.example2                                                              
+ └─ Compute (GP_GEN5 16 Cores)                                      730  hours            $1,955.69 
+                                                                                                    
+ azurerm_sql_managed_instance.example3                                                              
+ ├─ Compute (BC_GEN5 40 Cores)                                      730  hours            $9,778.47 
+ ├─ Storage 64 Gb (first 32 Gb include)                              32  Unit of 32Gb         $4.38 
+ ├─ Backup Cost for 100 Gb (type ZRS)                               100  Gb                  $14.90 
+ └─ Long Term Retention Storage Backup (100 Gb (type ZRS))          100  Gb/Month             $3.72 
+                                                                                                    
+ OVERALL TOTAL                                                                           $12,554.40 
 ──────────────────────────────────
-18 cloud resources were detected:
-∙ 3 were estimated
-∙ 2 weren't estimated, report them in https://github.com/infracost/infracost:
-  ∙ 1 x azurerm_route_table
-  ∙ 1 x azurerm_subnet_route_table_association
-∙ 13 were free:
-  ∙ 8 x azurerm_network_security_rule
-  ∙ 1 x azurerm_network_security_group
+6 cloud resources were detected:
+∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
+∙ 3 were free:
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_subnet
-  ∙ 1 x azurerm_subnet_network_security_group_association
   ∙ 1 x azurerm_virtual_network
 
 Add cost estimates to your pull requests: https://infracost.io/cicd

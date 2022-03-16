@@ -15,13 +15,15 @@ const (
 	sqlMIProductFamily = "Databases"
 )
 
-// SQLManagedInstance struct represents <TODO: cloud service short description>.
+// SQLManagedInstance struct represents an azure Sql Managed Instance.
 //
-// <TODO: Add any important information about the resource and links to the
-// pricing pages or documentation that might be useful to developers in the future, e.g:>
+// The azurerm_sql_managed_instance resource is deprecated in version 3.0 of the AzureRM provider and will be removed in version 4.0.
+// Please use the azurerm_mssql_managed_instance resource instead when available in infracost
 //
-// Resource information: https://azure.microsoft.com/<PATH/TO/RESOURCE>/
-// Pricing information: https://azure.microsoft.com/<PATH/TO/PRICING>/
+// Only support for Gen5 is available on that resource
+//
+// More resource information here: https://azure.microsoft.com/en-gb/products/azure-sql/managed-instance/
+// Pricing information here: https://azure.microsoft.com/en-gb/pricing/details/azure-sql-managed-instance/single/
 type SQLManagedInstance struct {
 	Address            string
 	Region             string
@@ -30,14 +32,11 @@ type SQLManagedInstance struct {
 	Cores              *int64
 	StorageSizeInGb    *int64
 	StorageAccountType string
-	AverageBackupSize  *int64 `infracost_usage:"average_backup_size_gb"`
-	WeeklyBackup       *int64 `infracost_usage:"weekly_backup"`
-	MonthlyBackup      *int64 `infracost_usage:"monthly_backup"`
-	YearlyBackup       *int64 `infracost_usage:"yearly_backup"`
-	BackupStorageGb    *int64 `infracost_usage:"backup_storage_gb"`
+	// LongTermRetentionStorageGB defines a usage param that allows users to define how many gb of cold storage the database uses.
+	// This is storage that can be kept for up to 10 years.
+	LongTermRetentionStorageGB *int64 `infracost_usage:"long_term_retention_storage_gb"`
+	BackupStorageGb            *int64 `infracost_usage:"backup_storage_gb"`
 }
-
-// SQLManagedInstanceUsageSchema defines a list which represents the usage schema of SQLManagedInstance.
 
 // PopulateUsage parses the u schema.UsageData into the SQLManagedInstance.
 // It uses the `infracost_usage` struct tags to populate data into the SQLManagedInstance.
@@ -55,10 +54,7 @@ func (r *SQLManagedInstance) BuildResource() *schema.Resource {
 		Name: r.Address,
 		UsageSchema: []*schema.UsageItem{
 			{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-			{Key: "average_backup_size_gb", DefaultValue: 0, ValueType: schema.Int64},
-			{Key: "weekly_backup", DefaultValue: 0, ValueType: schema.Int64},
-			{Key: "monthly_backup", DefaultValue: 0, ValueType: schema.Int64},
-			{Key: "yearly_backup", DefaultValue: 0, ValueType: schema.Int64},
+			{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
 		},
 		CostComponents: costComponents,
 	}
@@ -87,24 +83,14 @@ func (r *SQLManagedInstance) costComponents() []*schema.CostComponent {
 	}
 
 	if r.BackupStorageGb != nil {
-		costComponents = append(costComponents, r.storageCost(), r.backupCost())
+		costComponents = append(costComponents, r.sqlMIStorageCostComponent(), r.sqlMIBackupCostComponent())
 	}
 
 	if r.LicenceType == "LicenseIncluded" {
 		costComponents = append(costComponents, r.sqlMILicenseCostComponent())
 	}
-	if r.AverageBackupSize != nil {
-		if r.WeeklyBackup != nil && *r.WeeklyBackup > 0 {
-			costComponents = append(costComponents, r.sqlMIWeeklyBackupCostComponent())
-		}
-
-		if r.MonthlyBackup != nil && *r.MonthlyBackup > 0 {
-			costComponents = append(costComponents, r.sqlMIMonthlyBackupCostComponent())
-		}
-
-		if r.YearlyBackup != nil && *r.YearlyBackup > 0 {
-			costComponents = append(costComponents, r.sqlMIYearlyBackupCostComponent())
-		}
+	if r.LongTermRetentionStorageGB != nil {
+		costComponents = append(costComponents, r.sqlMILongTermRetentionStorageGBCostComponent())
 	}
 	return costComponents
 }
@@ -129,31 +115,30 @@ func (r *SQLManagedInstance) meteredName() *string {
 	return strPtr(meterName)
 }
 
-func (r *SQLManagedInstance) storageCost() *schema.CostComponent {
+func (r *SQLManagedInstance) sqlMIStorageCostComponent() *schema.CostComponent {
 
-	storageComponent := schema.CostComponent{}
-	storageComponent.Name = fmt.Sprintf("Storage %s Gb (first 32 Gb include)", strings.ToTitle(strconv.FormatInt(*r.StorageSizeInGb, 10)))
-	storageComponent.Unit = "Unit of 32Gb"
-	storageComponent.UnitMultiplier = decimal.NewFromInt(1)
-	storageComponent.MonthlyQuantity = decimalPtr(decimal.NewFromInt(*r.StorageSizeInGb - 32))
-	storageComponent.ProductFilter = &schema.ProductFilter{
-		VendorName:    strPtr(vendorName),
-		Region:        strPtr(r.Region),
-		Service:       strPtr(sqlMIServiceName),
-		ProductFamily: strPtr(sqlMIProductFamily),
-		AttributeFilters: ([]*schema.AttributeFilter{
-			{Key: "productName", Value: strPtr("SQL Managed Instance General Purpose - Storage")},
-			{Key: "meterName", Value: strPtr("Data Stored")},
-		}),
+	return &schema.CostComponent{
+		Name:            fmt.Sprintf("Storage %s Gb (first 32 Gb include)", strings.ToTitle(strconv.FormatInt(*r.StorageSizeInGb, 10))),
+		Unit:            "Unit of 32Gb",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.StorageSizeInGb - 32)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr(vendorName),
+			Region:        strPtr(r.Region),
+			Service:       strPtr(sqlMIServiceName),
+			ProductFamily: strPtr(sqlMIProductFamily),
+			AttributeFilters: ([]*schema.AttributeFilter{
+				{Key: "productName", Value: strPtr("SQL Managed Instance General Purpose - Storage")},
+				{Key: "meterName", Value: strPtr("Data Stored")},
+			}),
+		},
+		PriceFilter: priceFilterConsumption,
 	}
-
-	storageComponent.PriceFilter = priceFilterConsumption
-	return &storageComponent
 }
 
-func (r *SQLManagedInstance) backupCost() *schema.CostComponent {
+func (r *SQLManagedInstance) sqlMIBackupCostComponent() *schema.CostComponent {
 	backupCostComponent := schema.CostComponent{}
-	backupCostComponent.Name = fmt.Sprintf("Backup Cost for %s Gb %s", strconv.FormatInt(*r.BackupStorageGb, 10), r.StorageAccountType)
+	backupCostComponent.Name = fmt.Sprintf("Backup Cost for %s Gb (type %s)", strconv.FormatInt(*r.BackupStorageGb, 10), r.StorageAccountType)
 	backupCostComponent.Unit = "Gb"
 	backupCostComponent.UnitMultiplier = decimal.NewFromInt(1)
 	backupCostComponent.MonthlyQuantity = decimalPtr(decimal.NewFromInt(*r.BackupStorageGb))
@@ -175,7 +160,7 @@ func (r *SQLManagedInstance) sqlMILicenseCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "SQL license",
 		Unit:           "vCore-hours",
-		UnitMultiplier: decimal.NewFromInt(1),
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(*r.Cores)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
@@ -190,52 +175,12 @@ func (r *SQLManagedInstance) sqlMILicenseCostComponent() *schema.CostComponent {
 	}
 }
 
-func (r *SQLManagedInstance) sqlMIWeeklyBackupCostComponent() *schema.CostComponent {
+func (r *SQLManagedInstance) sqlMILongTermRetentionStorageGBCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Weekly Backup (%s Backups with %s Gb)", strconv.FormatInt(*r.WeeklyBackup, 10), strconv.FormatInt(*r.AverageBackupSize, 10)),
+		Name:            fmt.Sprintf("Long Term Retention Storage Backup (%s Gb (type %s))", strconv.FormatInt(*r.LongTermRetentionStorageGB, 10), r.StorageAccountType),
 		Unit:            "Gb/Month",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.AverageBackupSize * *r.WeeklyBackup)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr(vendorName),
-			Region:        strPtr(r.Region),
-			Service:       strPtr(sqlMIServiceName),
-			ProductFamily: strPtr(sqlMIProductFamily),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("SQL Managed Instance - LTR Backup Storage")},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("Backup %s Data Stored", r.StorageAccountType))},
-			},
-		},
-		PriceFilter: priceFilterConsumption,
-	}
-}
-
-func (r *SQLManagedInstance) sqlMIMonthlyBackupCostComponent() *schema.CostComponent {
-	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Monthly Backup (%s Backups with %s Gb)", strconv.FormatInt(*r.MonthlyBackup, 10), strconv.FormatInt(*r.AverageBackupSize, 10)),
-		Unit:            "Gb/Month",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.AverageBackupSize * *r.MonthlyBackup)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr(vendorName),
-			Region:        strPtr(r.Region),
-			Service:       strPtr(sqlMIServiceName),
-			ProductFamily: strPtr(sqlMIProductFamily),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("SQL Managed Instance - LTR Backup Storage")},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("Backup %s Data Stored", r.StorageAccountType))},
-			},
-		},
-		PriceFilter: priceFilterConsumption,
-	}
-}
-
-func (r *SQLManagedInstance) sqlMIYearlyBackupCostComponent() *schema.CostComponent {
-	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Yearly Backup (%s Backups with %s Gb)", strconv.FormatInt(*r.YearlyBackup, 10), strconv.FormatInt(*r.AverageBackupSize, 10)),
-		Unit:            "Gb/Month",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.AverageBackupSize * *r.MonthlyBackup)),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.LongTermRetentionStorageGB)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),
