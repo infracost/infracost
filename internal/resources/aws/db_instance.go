@@ -212,8 +212,20 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 
 	if r.BackupRetentionPeriod > 0 || (backupStorageGB != nil && backupStorageGB.GreaterThan(decimal.Zero)) {
 		backupStorageDBEngine := "Any"
+		attrFilters := []*schema.AttributeFilter{
+			{Key: "databaseEngine", Value: strPtr(backupStorageDBEngine)},
+			{Key: "usagetype", ValueRegex: strPtr("/BackupUsage/i")},
+			{Key: "engineCode", ValueRegex: strPtr("/[0-9]+/")},
+			{Key: "operation", Value: strPtr("")},
+		}
+
 		if strings.HasPrefix(databaseEngine, "Aurora") {
 			backupStorageDBEngine = databaseEngine
+			attrFilters = []*schema.AttributeFilter{
+				{Key: "databaseEngine", Value: strPtr(backupStorageDBEngine)},
+				{Key: "usagetype", ValueRegex: strPtr("/BackupUsage/i")},
+				{Key: "engineCode", ValueRegex: strPtr("/[0-9]+/")},
+			}
 		}
 
 		costComponents = append(costComponents, &schema.CostComponent{
@@ -222,15 +234,11 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: backupStorageGB,
 			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(r.Region),
-				Service:       strPtr("AmazonRDS"),
-				ProductFamily: strPtr("Storage Snapshot"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "databaseEngine", Value: strPtr(backupStorageDBEngine)},
-					{Key: "usagetype", ValueRegex: strPtr("/BackupUsage/i")},
-					{Key: "engineCode", ValueRegex: strPtr("/[0-9]+/")},
-				},
+				VendorName:       strPtr("aws"),
+				Region:           strPtr(r.Region),
+				Service:          strPtr("AmazonRDS"),
+				ProductFamily:    strPtr("Storage Snapshot"),
+				AttributeFilters: attrFilters,
 			},
 		})
 	}
