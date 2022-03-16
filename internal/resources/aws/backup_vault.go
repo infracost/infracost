@@ -126,19 +126,25 @@ type backupData struct {
 }
 
 func (r *BackupVault) backupVaultCostComponent(bd backupData) *schema.CostComponent {
+	filters := []*schema.AttributeFilter{
+		{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", bd.usageType))},
+	}
+
+	if bd.name == "RDS snapshot" {
+		filters = append(filters, &schema.AttributeFilter{Key: "operation", Value: strPtr("")})
+	}
+
 	return &schema.CostComponent{
 		Name:            bd.name,
 		Unit:            bd.unit,
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: bd.qty,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr(bd.service),
-			ProductFamily: strPtr(bd.family),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", bd.usageType))},
-			},
+			VendorName:       strPtr("aws"),
+			Region:           strPtr(r.Region),
+			Service:          strPtr(bd.service),
+			ProductFamily:    strPtr(bd.family),
+			AttributeFilters: filters,
 		},
 	}
 }
