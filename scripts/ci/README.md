@@ -1,19 +1,11 @@
-# Infracost CI scripts
+# These scripts are DEPRECATED
 
-For GitHub, see the [Infracost GitHub Actions](https://github.com/infracost/actions/), which does not use these CI scripts.
+This folder contains legacy CI scripts that are **no longer maintained** by the Infracost team. These script have been replaced by dedicated integrations with most CI/CD platforms, which we recommend you upgrade to:
+* [GitHub Actions](https://www.infracost.io/docs/guides/actions_migration/)
+* [GitLab CI](https://www.infracost.io/docs/guides/gitlab_ci_migration/)
+* [Atlantis](https://www.infracost.io/docs/guides/atlantis_migration/)
+* [Azure DevOps](https://www.infracost.io/docs/guides/azure_devops_migration/)
 
-For GitLab, see the [Infracost GitLab CI](https://gitlab.com/infracost/infracost-gitlab-ci) examples, which uses comment.sh.
+Please visit [Infracost.io/cicd](https://www.infracost.io/cicd/) for other CI/CD integrations and more information.
 
-## Older scripts that will be deprecated at some point
-
-### diff.sh
-This folder holds the `diff.sh` file that is included in the infracost/infracost Docker image and used in the following CI integrations:
-- CircleCI: [infracost-orb](https://github.com/infracost/infracost-orb), demos are at [circleci-github-demo](https://github.com/infracost/circleci-github-demo) and [circleci-bitbucket-demo](https://bitbucket.org/infracost/circleci-bitbucket-demo).
-- Bitbucket Pipelines: [infracost-bitbucket-pipeline](https://bitbucket.org/infracost/infracost-bitbucket-pipeline), demo is at [bitbucket-pipelines-demo](https://bitbucket.org/infracost/bitbucket-pipelines-demo).
-- Azure DevOps Pipelines: [infracost-azure-devops](https://github.com/infracost/infracost-azure-devops), demos are at [azure-devops-repo-demo](https://dev.azure.com/infracost/base/_git/azure-devops-repo-demo) and [azure-devops-github-demo](https://github.com/infracost/azure-devops-github-demo).
-
-### atlantis_diff.sh
-The `atlantis_diff.sh` file that is used by the [infracost-atlantis](https://github.com/infracost/infracost-atlantis/) integration, demo is at [atlantis-demo](https://github.com/infracost/atlantis-demo).
-
-### jenkins_diff.sh
-The `jenkins_diff.sh` file that is used by the [infracost-jenkins](https://github.com/infracost/infracost-jenkins/) integration, demo is at [jenkins-demo](https://github.com/infracost/jenkins-demo).
+These scripts will be removed **September 2022**. If you are pulling them directly from this repository and cannot upgrade before then, we recommend you keep a copy in your own repositories.
