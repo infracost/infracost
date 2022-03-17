@@ -1,0 +1,39 @@
+package google
+
+import (
+	"github.com/infracost/infracost/internal/resources"
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
+)
+
+type ComputeVpnGateway struct {
+	Address string
+	Region  string
+
+	MonthlyEgressDataTransferGB *ComputeVPNGatewayNetworkEgressUsage `infracost_usage:"monthly_egress_data_transfer_gb"`
+}
+
+var ComputeVPNGatewayUsageSchema = []*schema.UsageItem{
+	{
+		Key:          "monthly_egress_data_transfer_gb",
+		ValueType:    schema.SubResourceUsage,
+		DefaultValue: &usage.ResourceUsage{Name: "monthly_egress_data_transfer_gb", Items: ComputeVPNGatewayNetworkEgressUsageSchema},
+	},
+}
+
+func (r *ComputeVpnGateway) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(r, u)
+}
+
+func (r *ComputeVpnGateway) BuildResource() *schema.Resource {
+	region := r.Region
+	r.MonthlyEgressDataTransferGB.Region = region
+	r.MonthlyEgressDataTransferGB.Address = "Network egress"
+	r.MonthlyEgressDataTransferGB.PrefixName = "IPSec traffic"
+	return &schema.Resource{
+		Name: r.Address,
+		SubResources: []*schema.Resource{
+			r.MonthlyEgressDataTransferGB.BuildResource(),
+		}, UsageSchema: ComputeVPNGatewayUsageSchema,
+	}
+}
