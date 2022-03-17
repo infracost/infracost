@@ -31,6 +31,9 @@ var ContainerRegistryUsageSchema = []*schema.UsageItem{
 
 func (r *ContainerRegistry) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
+	if r.MonthlyEgressDataTransferGB == nil {
+		r.MonthlyEgressDataTransferGB = &ContainerRegistryNetworkEgressUsage{}
+	}
 }
 
 func (r *ContainerRegistry) BuildResource() *schema.Resource {
