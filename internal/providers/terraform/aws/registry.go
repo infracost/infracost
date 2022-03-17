@@ -96,6 +96,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getStepFunctionRegistryItem(),
 	getDirectoryServiceDirectory(),
 	getTransferServerRegistryItem(),
+	getNetworkfirewallFirewallRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -291,6 +292,11 @@ var FreeResources = []string{
 	"aws_neptune_event_subscription",
 	"aws_neptune_parameter_group",
 	"aws_neptune_subnet_group",
+
+	// AWS Network Firewall
+	"aws_networkfirewall_rule_group",
+	"aws_networkfirewall_firewall_policy",
+	"aws_networkfirewall_logging_configuration",
 
 	// AWS Others
 	"aws_db_instance_role_association",

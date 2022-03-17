@@ -244,6 +244,9 @@ resource_usage:
   aws_neptune_cluster_snapshot.my_cluster_snapshot:
     backup_storage_gb: 1000        # Total storage used for backup snapshots in GB.
 
+  aws_networkfirewall_firewall.my_firewall:
+    monthly_data_processed_gb: 100 # Monthly data processed by the Network Firewall in GB.
+
   aws_mq_broker.my_aws_mq_broker:
     storage_size_gb: 12 # Data storage per instance in GB.
 
