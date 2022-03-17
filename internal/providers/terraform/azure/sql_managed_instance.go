@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureSQLManagedInstanceRegistryItem() *schema.RegistryItem {
+func getAzureRMSQLManagedInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_sql_managed_instance",
 		RFunc: newSQLManagedInstance,
@@ -23,7 +23,7 @@ func newSQLManagedInstance(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 
 	r.SKU = d.Get("sku_name").String()
-	r.Cores = intPtr(d.Get("vcores").Int())
+	r.Cores = d.Get("vcores").Int()
 	r.LicenceType = d.Get("license_type").String()
 	r.StorageAccountType = d.Get("storage_account_type").String()
 	if r.StorageAccountType == "" {
@@ -32,7 +32,7 @@ func newSQLManagedInstance(d *schema.ResourceData, u *schema.UsageData) *schema.
 	if r.StorageAccountType == "GRS" {
 		r.StorageAccountType = "RA-GRS"
 	}
-	r.StorageSizeInGb = intPtr(d.Get("storage_size_in_gb").Int())
+	r.StorageSizeInGb = d.Get("storage_size_in_gb").Int()
 
 	r.PopulateUsage(u)
 

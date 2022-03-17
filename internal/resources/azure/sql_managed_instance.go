@@ -2,7 +2,6 @@ package azure
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/infracost/infracost/internal/resources"
@@ -29,8 +28,8 @@ type SQLManagedInstance struct {
 	Region             string
 	SKU                string
 	LicenceType        string
-	Cores              *int64
-	StorageSizeInGb    *int64
+	Cores              int64
+	StorageSizeInGb    int64
 	StorageAccountType string
 	// LongTermRetentionStorageGB defines a usage param that allows users to define how many gb of cold storage the database uses.
 	// This is storage that can be kept for up to 10 years.
@@ -49,7 +48,6 @@ func (r *SQLManagedInstance) PopulateUsage(u *schema.UsageData) {
 // See providers folder for more information.
 func (r *SQLManagedInstance) BuildResource() *schema.Resource {
 	costComponents := r.costComponents()
-
 	return &schema.Resource{
 		Name: r.Address,
 		UsageSchema: []*schema.UsageItem{
@@ -61,10 +59,9 @@ func (r *SQLManagedInstance) BuildResource() *schema.Resource {
 }
 
 func (r *SQLManagedInstance) costComponents() []*schema.CostComponent {
-
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Compute (%s %s Cores)", strings.ToTitle(r.SKU), strconv.FormatInt(*r.Cores, 10)),
+			Name:           fmt.Sprintf("Compute (%s %d Cores)", strings.ToTitle(r.SKU), r.Cores),
 			Unit:           "hours",
 			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -81,7 +78,6 @@ func (r *SQLManagedInstance) costComponents() []*schema.CostComponent {
 			PriceFilter: priceFilterConsumption,
 		},
 	}
-
 	if r.BackupStorageGb != nil {
 		costComponents = append(costComponents, r.sqlMIStorageCostComponent(), r.sqlMIBackupCostComponent())
 	}
@@ -96,7 +92,6 @@ func (r *SQLManagedInstance) costComponents() []*schema.CostComponent {
 }
 
 func (r *SQLManagedInstance) productDescription() *string {
-
 	productDescription := ""
 	if strings.Contains(r.SKU, "GP") {
 		productDescription = "SQL Managed Instance General Purpose"
@@ -111,17 +106,16 @@ func (r *SQLManagedInstance) productDescription() *string {
 }
 
 func (r *SQLManagedInstance) meteredName() *string {
-	meterName := fmt.Sprintf("%s %s", strconv.FormatInt(*r.Cores, 10), "vCore")
+	meterName := fmt.Sprintf("%d %s", r.Cores, "vCore")
 	return strPtr(meterName)
 }
 
 func (r *SQLManagedInstance) sqlMIStorageCostComponent() *schema.CostComponent {
-
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Storage %s Gb (first 32 Gb include)", strings.ToTitle(strconv.FormatInt(*r.StorageSizeInGb, 10))),
-		Unit:            "Unit of 32Gb",
+		Name:            "Storage",
+		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.StorageSizeInGb - 32)),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(r.StorageSizeInGb - 32)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),
@@ -137,23 +131,23 @@ func (r *SQLManagedInstance) sqlMIStorageCostComponent() *schema.CostComponent {
 }
 
 func (r *SQLManagedInstance) sqlMIBackupCostComponent() *schema.CostComponent {
-	backupCostComponent := schema.CostComponent{}
-	backupCostComponent.Name = fmt.Sprintf("Backup Cost for %s Gb (type %s)", strconv.FormatInt(*r.BackupStorageGb, 10), r.StorageAccountType)
-	backupCostComponent.Unit = "Gb"
-	backupCostComponent.UnitMultiplier = decimal.NewFromInt(1)
-	backupCostComponent.MonthlyQuantity = decimalPtr(decimal.NewFromInt(*r.BackupStorageGb))
-	backupCostComponent.ProductFilter = &schema.ProductFilter{
-		VendorName:    strPtr(vendorName),
-		Region:        strPtr(r.Region),
-		Service:       strPtr(sqlMIServiceName),
-		ProductFamily: strPtr(sqlMIProductFamily),
-		AttributeFilters: ([]*schema.AttributeFilter{
-			{Key: "productName", Value: strPtr("SQL Managed Instance PITR Backup Storage")},
-			{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Data Stored", r.StorageAccountType))},
-		}),
+	return &schema.CostComponent{
+		Name:            fmt.Sprintf("PITR Backup storage (%s)", r.StorageAccountType),
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.BackupStorageGb)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr(vendorName),
+			Region:        strPtr(r.Region),
+			Service:       strPtr(sqlMIServiceName),
+			ProductFamily: strPtr(sqlMIProductFamily),
+			AttributeFilters: ([]*schema.AttributeFilter{
+				{Key: "productName", Value: strPtr("SQL Managed Instance PITR Backup Storage")},
+				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Data Stored", r.StorageAccountType))},
+			}),
+		},
+		PriceFilter: priceFilterConsumption,
 	}
-	backupCostComponent.PriceFilter = priceFilterConsumption
-	return &backupCostComponent
 }
 
 func (r *SQLManagedInstance) sqlMILicenseCostComponent() *schema.CostComponent {
@@ -161,7 +155,7 @@ func (r *SQLManagedInstance) sqlMILicenseCostComponent() *schema.CostComponent {
 		Name:           "SQL license",
 		Unit:           "vCore-hours",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(*r.Cores)),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.Cores)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr("Global"),
@@ -176,11 +170,17 @@ func (r *SQLManagedInstance) sqlMILicenseCostComponent() *schema.CostComponent {
 }
 
 func (r *SQLManagedInstance) sqlMILongTermRetentionStorageGBCostComponent() *schema.CostComponent {
+
+	var retention *decimal.Decimal
+	if r.LongTermRetentionStorageGB != nil {
+		retention = decimalPtr(decimal.NewFromInt(*r.LongTermRetentionStorageGB))
+	}
+
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Long Term Retention Storage Backup (%s Gb (type %s))", strconv.FormatInt(*r.LongTermRetentionStorageGB, 10), r.StorageAccountType),
-		Unit:            "Gb/Month",
+		Name:            fmt.Sprintf("LTR Backup Storage (%s)", r.StorageAccountType),
+		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.LongTermRetentionStorageGB)),
+		MonthlyQuantity: retention,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),
