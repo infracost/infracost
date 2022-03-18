@@ -97,10 +97,13 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projectResultChan := make(chan projectResult, numJobs)
 	errGroup, _ := errgroup.WithContext(context.Background())
 
-	if parallelism > 1 && numJobs > 1 && !runCtx.Config.IsLogging() {
-		cmd.PrintErrln("Running multiple projects in parallel, so log-level=info is enabled by default.")
-		cmd.PrintErrln("Run with INFRACOST_PARALLELISM=1 to disable parallelism to help debugging.")
-		cmd.PrintErrln()
+	runInParallel := parallelism > 1 && numJobs > 1
+	if (runInParallel || runCtx.IsCIRun()) && !runCtx.Config.IsLogging() {
+		if runInParallel {
+			cmd.PrintErrln("Running multiple projects in parallel, so log-level=info is enabled by default.")
+			cmd.PrintErrln("Run with INFRACOST_PARALLELISM=1 to disable parallelism to help debugging.")
+			cmd.PrintErrln()
+		}
 
 		runCtx.Config.LogLevel = "info"
 		err := runCtx.Config.ConfigureLogger()
