@@ -3,7 +3,7 @@
                                                                                        
  google_compute_instance_group_manager.default                                         
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)        2,920  hours        $15.53 
- ├─ SSD provisioned storage (pd-ssd)                        1,500  GiB         $255.00 
+ ├─ SSD provisioned storage (pd-ssd)                        1,500  GB          $255.00 
  └─ NVIDIA Tesla K80 (on-demand)                            5,840  hours     $1,839.60 
                                                                                        
  OVERALL TOTAL                                                               $2,110.13 

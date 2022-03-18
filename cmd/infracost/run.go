@@ -43,6 +43,11 @@ type projectResult struct {
 	projectOut *projectOutput
 }
 
+type hclRunDiff struct {
+	resourceDiffs    map[string][]string
+	missingResources []string
+}
+
 var validRunFormats = []string{"json", "table", "html"}
 
 func addRunFlags(cmd *cobra.Command) {
@@ -231,7 +236,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		runCtx.SetContextValue("lineCount", lines)
 	}
 
-	env := buildRunEnv(runCtx, projectContexts, r, hclR)
+	env := buildRunEnv(runCtx, projectContexts, r, projects, hclR, hclProjects)
+
 	pricingClient := apiclient.NewPricingAPIClient(runCtx)
 	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
@@ -720,7 +726,7 @@ func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 	return nil
 }
 
-func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root, hclR *output.Root) map[string]interface{} {
+func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root, projects []*schema.Project, hclR *output.Root, hclProjects []*schema.Project) map[string]interface{} {
 	env := runCtx.EventEnvWithProjectContexts(projectContexts)
 	env["projectCount"] = len(projectContexts)
 	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
@@ -750,7 +756,7 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
 
 	if hclR != nil {
-		AddHCLEnvVars(projectContexts, r, *hclR, env)
+		AddHCLEnvVars(projectContexts, r, projects, *hclR, hclProjects, env)
 
 	}
 
@@ -759,7 +765,7 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 
 // AddHCLEnvVars adds HCL reporting metrics to the Infracost run so that we can assess the accuracy of
 // the HCL approach.
-func AddHCLEnvVars(projectContexts []*config.ProjectContext, r output.Root, hclR output.Root, env map[string]interface{}) {
+func AddHCLEnvVars(projectContexts []*config.ProjectContext, r output.Root, projects []*schema.Project, hclR output.Root, hclProjects []*schema.Project, env map[string]interface{}) {
 	var initialTotal decimal.Decimal
 	if r.TotalMonthlyCost != nil {
 		initialTotal = *r.TotalMonthlyCost
@@ -802,14 +808,90 @@ func AddHCLEnvVars(projectContexts []*config.ProjectContext, r output.Root, hclR
 	env["tfRunTimeMs"] = tfTimeTaken
 	env["hclRunTimeMs"] = hclTimeTaken
 
+	diff := collectHCLRunDiff(projects, hclProjects)
+	env["hclMissingResources"] = diff.missingResources
+	env["hclResourceDiff"] = diff.resourceDiffs
 }
 
-func percentChange(newTotal decimal.Decimal, initialTotal decimal.Decimal) decimal.Decimal {
-	if initialTotal.IsZero() {
+func collectHCLRunDiff(projects, hclProjects []*schema.Project) hclRunDiff {
+	diff := map[string][]string{}
+	missingResources := map[string]bool{}
+
+	hclProjectsMapping := map[string]*schema.Project{}
+	for _, project := range hclProjects {
+		hclProjectsMapping[project.Name] = project
+	}
+
+	for _, project := range projects {
+		hclProject := hclProjectsMapping[project.Name]
+
+		if hclProject == nil {
+			log.Debugf("could not find a matching HCL project '%s' for HCL run diff", project.Name)
+			continue
+		}
+
+		hclResourcesMapping := map[string]*decimal.Decimal{}
+
+		for _, hclResource := range hclProject.Resources {
+			hclResourcesMapping[hclResource.Name] = hclResource.MonthlyCost
+		}
+
+		for _, resource := range project.Resources {
+			hclResourceCost, ok := hclResourcesMapping[resource.Name]
+			if !ok {
+				missingResources[resource.ResourceType] = true
+				continue
+			}
+
+			if resource.MonthlyCost == nil && hclResourceCost == nil {
+				continue
+			}
+
+			hclCost := decimal.NewFromInt(0)
+			if hclResourceCost != nil {
+				hclCost = *hclResourceCost
+			}
+
+			var cost decimal.Decimal
+			change := decimal.NewFromInt(100)
+			abs := decimal.NewFromInt(100)
+
+			if resource.MonthlyCost != nil {
+				cost = *resource.MonthlyCost
+
+				change = percentChange(hclCost, cost)
+				abs = change.Abs()
+			}
+
+			if abs.GreaterThan(decimal.NewFromInt(0)) {
+				if diff[resource.ResourceType] == nil {
+					diff[resource.ResourceType] = []string{}
+				}
+
+				diff[resource.ResourceType] = append(diff[resource.ResourceType], change.StringFixed(2))
+			}
+		}
+	}
+
+	missingList := make([]string, 0, len(missingResources))
+	for key := range missingResources {
+		missingList = append(missingList, key)
+	}
+
+	runDiff := hclRunDiff{
+		missingResources: missingList,
+		resourceDiffs:    diff,
+	}
+
+	return runDiff
+}
+
+func percentChange(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
+	if b.IsZero() {
 		return decimal.NewFromInt(0)
 	}
 
-	return newTotal.Sub(initialTotal).Div(initialTotal).Mul(decimal.NewFromInt(100))
+	return a.Sub(b).Div(b).Mul(decimal.NewFromInt(100))
 }
 
 func unwrapped(err error) error {

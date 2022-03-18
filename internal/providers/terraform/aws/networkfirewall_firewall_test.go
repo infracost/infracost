@@ -1,4 +1,4 @@
-package google_test
+package aws_test
 
 import (
 	"testing"
@@ -6,11 +6,11 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
 
-func TestComputeInstanceGroupManagerGoldenFile(t *testing.T) {
+func TestNetworkfirewallFirewallGoldenFile(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "compute_instance_group_manager_test")
+	tftest.GoldenFileResourceTests(t, "networkfirewall_firewall_test")
 }

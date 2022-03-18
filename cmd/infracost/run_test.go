@@ -10,6 +10,7 @@ import (
 	main "github.com/infracost/infracost/cmd/infracost"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 )
 
@@ -56,11 +57,13 @@ func TestCatchesRuntimeError(t *testing.T) {
 
 func TestAddHCLEnvVars(t *testing.T) {
 	type args struct {
-		r      output.Root
-		hclR   output.Root
-		osVars map[string]string
-		env    map[string]interface{}
-		pctx   []*config.ProjectContext
+		r           output.Root
+		hclR        output.Root
+		osVars      map[string]string
+		env         map[string]interface{}
+		pctx        []*config.ProjectContext
+		projects    []*schema.Project
+		hclProjects []*schema.Project
 	}
 	tests := []struct {
 		name string
@@ -81,6 +84,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 				"absHclPercentChange": "100.00",
 				"hclRunTimeMs":        int64(0),
 				"tfRunTimeMs":         int64(0),
+				"hclMissingResources": []string{},
+				"hclResourceDiff":     map[string][]string{},
 			},
 		},
 		{
@@ -95,6 +100,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 				"absHclPercentChange": "0.00",
 				"hclRunTimeMs":        int64(0),
 				"tfRunTimeMs":         int64(0),
+				"hclMissingResources": []string{},
+				"hclResourceDiff":     map[string][]string{},
 			},
 		},
 		{
@@ -119,6 +126,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 				"absHclPercentChange": "0.00",
 				"hclRunTimeMs":        int64(60),
 				"tfRunTimeMs":         int64(90),
+				"hclMissingResources": []string{},
+				"hclResourceDiff":     map[string][]string{},
 			},
 		},
 		{
@@ -137,6 +146,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 				"absHclPercentChange": "20.00",
 				"hclRunTimeMs":        int64(0),
 				"tfRunTimeMs":         int64(0),
+				"hclMissingResources": []string{},
+				"hclResourceDiff":     map[string][]string{},
 			},
 		},
 		{
@@ -155,6 +166,8 @@ func TestAddHCLEnvVars(t *testing.T) {
 				"absHclPercentChange": "36.36",
 				"hclRunTimeMs":        int64(0),
 				"tfRunTimeMs":         int64(0),
+				"hclMissingResources": []string{},
+				"hclResourceDiff":     map[string][]string{},
 			},
 		},
 		{
@@ -173,6 +186,182 @@ func TestAddHCLEnvVars(t *testing.T) {
 				"tfVarPresent":        true,
 				"hclRunTimeMs":        int64(0),
 				"tfRunTimeMs":         int64(0),
+				"hclMissingResources": []string{},
+				"hclResourceDiff":     map[string][]string{},
+			},
+		},
+		{
+			name: "test collects missing HCL resources",
+			args: args{
+				r:    output.Root{},
+				hclR: output.Root{},
+				env:  map[string]interface{}{},
+				projects: []*schema.Project{
+					{
+						Name: "test-project",
+						Resources: []*schema.Resource{
+							{
+								Name:         "aws_instance.my_app",
+								ResourceType: "aws_instance",
+								MonthlyCost:  decimalPtr(decimal.NewFromInt(100)),
+							},
+							{
+								Name:         "module.vpc.aws_subnet.public[0]",
+								ResourceType: "aws_subnet",
+								MonthlyCost:  nil,
+							},
+							{
+								Name:         "module.vpc.aws_subnet.public[1]",
+								ResourceType: "aws_subnet",
+								MonthlyCost:  nil,
+							},
+						},
+					},
+				},
+				hclProjects: []*schema.Project{
+					{
+						Name: "test-project",
+						Resources: []*schema.Resource{
+							{
+								Name:         "aws_instance.my_app",
+								ResourceType: "aws_instance",
+								MonthlyCost:  decimalPtr(decimal.NewFromInt(100)),
+							},
+						},
+					},
+				},
+			},
+			want: map[string]interface{}{
+				"hclPercentChange":    "0.00",
+				"absHclPercentChange": "0.00",
+				"hclRunTimeMs":        int64(0),
+				"tfRunTimeMs":         int64(0),
+				"hclMissingResources": []string{"aws_subnet"},
+				"hclResourceDiff":     map[string][]string{},
+			},
+		},
+		{
+			name: "test collects HCL resources' cost discrepancies",
+			args: args{
+				r:    output.Root{},
+				hclR: output.Root{},
+				env:  map[string]interface{}{},
+				projects: []*schema.Project{
+					{
+						Name: "test-project",
+						Resources: []*schema.Resource{
+							{
+								Name:         "module.vpc.aws_subnet.public",
+								ResourceType: "aws_subnet",
+								MonthlyCost:  decimalPtr(decimal.NewFromInt(10)),
+							},
+							{
+								Name:         "aws_instance.my_app",
+								ResourceType: "aws_instance",
+								MonthlyCost:  decimalPtr(decimal.NewFromInt(100)),
+							},
+							{
+								Name:         "aws_instance.another_app",
+								ResourceType: "aws_instance",
+								MonthlyCost:  decimalPtr(decimal.NewFromFloat(80)),
+							},
+							{
+								Name:         "eks.aws_eks_cluster.this",
+								ResourceType: "aws_eks_cluster",
+								MonthlyCost:  decimalPtr(decimal.NewFromInt(10)),
+							},
+							{
+								Name:         "aws_db_instance.test_db",
+								ResourceType: "aws_db_instance",
+								MonthlyCost:  nil,
+							},
+						},
+					},
+				},
+				hclProjects: []*schema.Project{
+					{
+						Name: "test-project",
+						Resources: []*schema.Resource{
+							{
+								Name:         "module.vpc.aws_subnet.public",
+								ResourceType: "aws_subnet",
+								MonthlyCost:  decimalPtr(decimal.NewFromInt(10)),
+							},
+							{
+								Name:         "aws_instance.my_app",
+								ResourceType: "aws_instance",
+								MonthlyCost:  decimalPtr(decimal.NewFromInt(50)),
+							},
+							{
+								Name:         "aws_instance.another_app",
+								ResourceType: "aws_instance",
+								MonthlyCost:  decimalPtr(decimal.NewFromInt(150)),
+							},
+							{
+								Name:         "eks.aws_eks_cluster.this",
+								ResourceType: "aws_eks_cluster",
+								MonthlyCost:  nil,
+							},
+							{
+								Name:         "aws_db_instance.test_db",
+								ResourceType: "aws_db_instance",
+								MonthlyCost:  decimalPtr(decimal.NewFromInt(10)),
+							},
+						},
+					},
+				},
+			},
+			want: map[string]interface{}{
+				"hclPercentChange":    "0.00",
+				"absHclPercentChange": "0.00",
+				"hclRunTimeMs":        int64(0),
+				"tfRunTimeMs":         int64(0),
+				"hclMissingResources": []string{},
+				"hclResourceDiff": map[string][]string{
+					"aws_instance":    {"-50.00", "87.50"},
+					"aws_eks_cluster": {"-100.00"},
+					"aws_db_instance": {"100.00"},
+				},
+			},
+		},
+		{
+			name: "test skips project when names mismatch",
+			args: args{
+				r:    output.Root{},
+				hclR: output.Root{},
+				env:  map[string]interface{}{},
+				projects: []*schema.Project{
+					{
+						Name: "test-project",
+						Resources: []*schema.Resource{
+							{
+								Name:         "aws_instance.my_app",
+								ResourceType: "aws_instance",
+								MonthlyCost:  decimalPtr(decimal.NewFromInt(100)),
+							},
+						},
+					},
+				},
+				hclProjects: []*schema.Project{
+					{
+						Name: "hcl-test-project",
+						Resources: []*schema.Resource{
+							{
+								Name:         "aws_instance.my_app",
+								ResourceType: "aws_instance",
+								MonthlyCost:  decimalPtr(decimal.NewFromInt(50)),
+							},
+						},
+					},
+				},
+			},
+			want: map[string]interface{}{
+				"hclPercentChange":    "0.00",
+				"absHclPercentChange": "0.00",
+				"hclRunTimeMs":        int64(0),
+				"tfRunTimeMs":         int64(0),
+				"hclMissingResources": []string{},
+				"hclResourceDiff":     map[string][]string{},
 			},
 		},
 	}
@@ -190,7 +379,7 @@ func TestAddHCLEnvVars(t *testing.T) {
 				}()
 			}
 
-			main.AddHCLEnvVars(tt.args.pctx, tt.args.r, tt.args.hclR, tt.args.env)
+			main.AddHCLEnvVars(tt.args.pctx, tt.args.r, tt.args.projects, tt.args.hclR, tt.args.hclProjects, tt.args.env)
 			assert.Equal(t, tt.want, tt.args.env)
 		})
 	}

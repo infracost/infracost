@@ -399,7 +399,7 @@ func egressStepPricingHelper(usage float64, usageFiltersData []*egressRegionUsag
 		var apiRegion *string
 		if regData.fixedRegion != "" {
 			apiRegion = strPtr(regData.fixedRegion)
-		} else {
+		} else if defaultAPIRegionName != "" {
 			apiRegion = strPtr(defaultAPIRegionName)
 		}
 		var name string

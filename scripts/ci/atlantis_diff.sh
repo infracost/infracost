@@ -1,11 +1,22 @@
 #!/bin/sh -le
 
-# This is an Atlantis-specific script that runs infracost. The output is displayed at the bottom of
-# the comments that Atlantis posts on pull requests.
-# Usage docs: https://www.infracost.io/docs/integrations/cicd
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# This script is DEPRECATED and is no longer maintained.
+#
+# Please follow our guide: https://www.infracost.io/docs/guides/atlantis_migration/ to migrate
+# to our new Atlantis integration: https://github.com/infracost/infracost-atlantis
+#
+# This script will be removed September 2022.
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 if [ "$atlantis_debug" = "true" ] || [ "$atlantis_debug" = "True" ] || [ "$atlantis_debug" = "TRUE" ]; then
   atlantis_debug=true
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "Warning: this script is deprecated and will be removed in Sep 2022."
+  echo "Please visit https://www.infracost.io/docs/guides/atlantis_migration/ for instructions on how to upgrade."
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo
+
   echo "#####"
   echo "Running Infracost atlantis_diff.sh in debug mode, remove atlantis_debug=true from Atlantis configs to disable debug outputs."
   echo
