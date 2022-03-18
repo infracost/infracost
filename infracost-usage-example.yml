@@ -968,7 +968,7 @@ resource_usage:
     extra_data_storage_gb: 250           # Override number of GBs used by extra data storage.
   
   azurerm_sql_managed_instance.my_database:
-    backup_storage_gb: 100 			      # Backup storage size dedicated for Point In Time Restoration
+    backup_storage_gb: 100            # Backup storage size dedicated for Point In Time Restoration
     long_term_retention_storage_gb: 5 # Number of GBs used by long-term retention backup storage.
 
   azurerm_synapse_spark_pool.my_spark_pool:

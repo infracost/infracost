@@ -48,6 +48,7 @@ func (r *SQLManagedInstance) PopulateUsage(u *schema.UsageData) {
 // See providers folder for more information.
 func (r *SQLManagedInstance) BuildResource() *schema.Resource {
 	costComponents := r.costComponents()
+
 	return &schema.Resource{
 		Name: r.Address,
 		UsageSchema: []*schema.UsageItem{
@@ -78,21 +79,21 @@ func (r *SQLManagedInstance) costComponents() []*schema.CostComponent {
 			PriceFilter: priceFilterConsumption,
 		},
 	}
-	if r.BackupStorageGb != nil {
-		costComponents = append(costComponents, r.sqlMIStorageCostComponent(), r.sqlMIBackupCostComponent())
-	}
+
+	costComponents = append(costComponents, r.sqlMIStorageCostComponent(), r.sqlMIBackupCostComponent())
 
 	if r.LicenceType == "LicenseIncluded" {
 		costComponents = append(costComponents, r.sqlMILicenseCostComponent())
 	}
-	if r.LongTermRetentionStorageGB != nil {
-		costComponents = append(costComponents, r.sqlMILongTermRetentionStorageGBCostComponent())
-	}
+
+	costComponents = append(costComponents, r.sqlMILongTermRetentionStorageGBCostComponent())
+
 	return costComponents
 }
 
 func (r *SQLManagedInstance) productDescription() *string {
 	productDescription := ""
+
 	if strings.Contains(r.SKU, "GP") {
 		productDescription = "SQL Managed Instance General Purpose"
 	} else if strings.Contains(r.SKU, "BC") {
@@ -102,11 +103,13 @@ func (r *SQLManagedInstance) productDescription() *string {
 	if strings.Contains(r.SKU, "Gen5") {
 		productDescription = fmt.Sprintf("%s - %s", productDescription, "Compute Gen5")
 	}
+
 	return strPtr(productDescription)
 }
 
 func (r *SQLManagedInstance) meteredName() *string {
 	meterName := fmt.Sprintf("%d %s", r.Cores, "vCore")
+
 	return strPtr(meterName)
 }
 
@@ -131,11 +134,17 @@ func (r *SQLManagedInstance) sqlMIStorageCostComponent() *schema.CostComponent {
 }
 
 func (r *SQLManagedInstance) sqlMIBackupCostComponent() *schema.CostComponent {
+	var backup *decimal.Decimal
+
+	if r.BackupStorageGb != nil {
+		backup = decimalPtr(decimal.NewFromInt(*r.BackupStorageGb))
+	}
+
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("PITR Backup storage (%s)", r.StorageAccountType),
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.BackupStorageGb)),
+		MonthlyQuantity: backup,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),
@@ -154,7 +163,7 @@ func (r *SQLManagedInstance) sqlMILicenseCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "SQL license",
 		Unit:           "vCore-hours",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.Cores)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
@@ -170,8 +179,8 @@ func (r *SQLManagedInstance) sqlMILicenseCostComponent() *schema.CostComponent {
 }
 
 func (r *SQLManagedInstance) sqlMILongTermRetentionStorageGBCostComponent() *schema.CostComponent {
-
 	var retention *decimal.Decimal
+
 	if r.LongTermRetentionStorageGB != nil {
 		retention = decimalPtr(decimal.NewFromInt(*r.LongTermRetentionStorageGB))
 	}
