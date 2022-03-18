@@ -143,7 +143,7 @@ func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 	out, err := Cmd(opts, "run-all", "--terragrunt-ignore-external-dependencies", "terragrunt-info")
 	if err != nil {
 		spinner.Fail()
-		err = p.buildTerraformErr(err)
+		err = p.buildTerraformErr(err, false)
 
 		msg := "terragrunt run-all terragrunt-info failed"
 		return []terragruntProjectDirs{}, clierror.NewSanitizedError(fmt.Errorf("%s: %s", msg, err), msg)
