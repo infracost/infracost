@@ -2,14 +2,17 @@
  Name                                           Monthly Qty  Unit  Monthly Cost 
                                                                                 
  google_compute_disk.default                                                    
- └─ Standard provisioned storage (pd-standard)          100  GiB          $4.00 
+ └─ Standard provisioned storage (pd-standard)          100  GB           $4.00 
                                                                                 
  google_compute_snapshot.snapshot                                               
  └─ Storage                                             100  GB           $2.60 
                                                                                 
- OVERALL TOTAL                                                            $6.60 
+ google_compute_snapshot.usage                                                  
+ └─ Storage                                           1,000  GB          $26.00 
+                                                                                
+ OVERALL TOTAL                                                           $32.60 
 ──────────────────────────────────
-2 cloud resources were detected:
-∙ 2 were estimated, 1 includes usage-based costs, see https://infracost.io/usage-file
+3 cloud resources were detected:
+∙ 3 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
 
 Add cost estimates to your pull requests: https://infracost.io/cicd
