@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  google_compute_snapshot.usage:
+    storage_gb: 1000

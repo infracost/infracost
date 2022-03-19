@@ -2,7 +2,7 @@
  Name                                             Monthly Qty  Unit            Monthly Cost 
                                                                                             
  google_compute_disk.disk                                                                   
- └─ Standard provisioned storage (pd-standard)          1,000  GiB                   $40.00 
+ └─ Standard provisioned storage (pd-standard)          1,000  GB                    $40.00 
                                                                                             
  google_compute_image.empty                                                                 
  └─ Storage                                     Monthly cost depends on usage: $0.05 per GB 
