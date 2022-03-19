@@ -57,7 +57,12 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		}
 
 		if data.Get("instance_type").Type == gjson.Null {
-			data.Set("instance_type", d.Get("instance_types").Array()[0].String())
+			instanceType := "t3.medium"
+			types := d.Get("instance_types").Array()
+			if len(types) > 0 {
+				instanceType = types[0].String()
+			}
+			data.Set("instance_type", instanceType)
 		}
 
 		a.LaunchTemplate = newLaunchTemplate(data, u, region, instanceCount, int64(0), onDemandPercentageAboveBaseCount)
