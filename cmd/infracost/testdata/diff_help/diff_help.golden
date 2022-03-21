@@ -20,7 +20,7 @@ FLAGS
       --no-cache                      Don't attempt to cache Terraform plans
       --out-file string               Save output to a file
   -p, --path string                   Path to the Terraform directory or JSON/plan file
-      --show-skipped                  Show unsupported resources
+      --show-skipped                  List unsupported and free resources
       --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)
       --terraform-init-flags string   Flags to pass to 'terraform init'. Applicable when path is a Terraform directory
       --terraform-plan-flags string   Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory

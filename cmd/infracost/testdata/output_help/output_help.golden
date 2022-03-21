@@ -39,7 +39,7 @@ FLAGS
   -h, --help               help for output
   -o, --out-file string    Save output to a file, helpful with format flag
   -p, --path stringArray   Path to Infracost JSON files, glob patterns need quotes
-      --show-skipped       Show unsupported resources
+      --show-skipped       List unsupported and free resources
 
 GLOBAL FLAGS
       --log-level string   Log level (trace, debug, info, warn, error, fatal)

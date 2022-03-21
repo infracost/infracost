@@ -1259,13 +1259,12 @@
       "summary": {
         "totalDetectedResources": 26,
         "totalSupportedResources": 14,
-        "totalUnsupportedResources": 2,
+        "totalUnsupportedResources": 0,
         "totalUsageBasedResources": 10,
-        "totalNoPriceResources": 10,
-        "unsupportedResourceCounts": {
-          "aws_db_option_group": 2
-        },
+        "totalNoPriceResources": 12,
+        "unsupportedResourceCounts": {},
         "noPriceResourceCounts": {
+          "aws_db_option_group": 2,
           "aws_db_parameter_group": 2,
           "aws_db_subnet_group": 2,
           "aws_default_vpc": 2,
@@ -1281,17 +1280,16 @@
   "pastTotalMonthlyCost": "40.561",
   "diffTotalHourlyCost": "0.055563013698630118",
   "diffTotalMonthlyCost": "40.561",
-  "timeGenerated": "2022-02-02T11:10:57.362039+01:00",
+  "timeGenerated": "2022-03-22T23:00:45.414564+01:00",
   "summary": {
     "totalDetectedResources": 26,
     "totalSupportedResources": 14,
-    "totalUnsupportedResources": 2,
+    "totalUnsupportedResources": 0,
     "totalUsageBasedResources": 10,
-    "totalNoPriceResources": 10,
-    "unsupportedResourceCounts": {
-      "aws_db_option_group": 2
-    },
+    "totalNoPriceResources": 12,
+    "unsupportedResourceCounts": {},
     "noPriceResourceCounts": {
+      "aws_db_option_group": 2,
       "aws_db_parameter_group": 2,
       "aws_db_subnet_group": 2,
       "aws_default_vpc": 2,

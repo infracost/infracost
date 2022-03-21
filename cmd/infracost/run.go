@@ -62,7 +62,7 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
 
-	cmd.Flags().Bool("show-skipped", false, "Show unsupported resources")
+	cmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")
 
 	cmd.Flags().Bool("sync-usage-file", false, "Sync usage-file with missing resources, needs usage-file too (experimental)")
 

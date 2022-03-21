@@ -41,14 +41,12 @@
  OVERALL TOTAL                                                                                                          $81,029.30 
 ──────────────────────────────────
 15 cloud resources were detected:
-∙ 9 were estimated, 9 include usage-based costs, see https://infracost.io/usage-file
-∙ 4 weren't estimated, report them in https://github.com/infracost/infracost:
-  ∙ 4 x azurerm_log_analytics_workspace
+∙ 9 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 1 x azurerm_log_analytics_workspace
   ∙ 1 x azurerm_resource_group
-
-Add cost estimates to your pull requests: https://infracost.io/cicd
+∙ 4 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 4 x azurerm_log_analytics_workspace
 Logs:
 
 level=warning msg="skipping azurerm_log_analytics_workspace.unsupported_legacy_workspace[\"PerNode\"] as it uses legacy pricing options"
