@@ -4,6 +4,7 @@
 <a href="https://www.infracost.io/docs/"><img alt="Docs" src="https://img.shields.io/badge/docs-Get%20started-brightgreen"/></a>
 <a href="https://www.infracost.io/community-chat"><img alt="Community Slack channel" src="https://img.shields.io/badge/chat-Slack-%234a154b"/></a>
 <a href="https://github.com/infracost/infracost/actions?query=workflow%3AGo+branch%3Amaster"><img alt="Build Status" src="https://img.shields.io/github/workflow/status/infracost/infracost/Go/master"/></a>
+<img alt="CodeQL status" src="https://img.shields.io/github/workflow/status/infracost/infracost/Scan%20code%20for%20vulnerabilities/master?label=codeql">
 <a href="https://www.infracost.io/docs/integrations/cicd/#docker-images"><img alt="Docker Image" src="https://img.shields.io/docker/cloud/build/infracost/infracost"/></a>
 <a href="https://twitter.com/intent/tweet?text=Get%20cost%20estimates%20for%20Terraform%20in%20pull%20requests!&url=https://www.infracost.io&hashtags=cloud,cost,terraform"><img alt="Tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
 
