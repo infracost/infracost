@@ -8,4 +8,3 @@ resource_usage:
 
   google_container_node_pool.node_locations_usage:
     nodes: 4
-    

@@ -5,13 +5,14 @@ import (
 	"strconv"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/comment"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 )
 
 var validCommentGitLabBehaviors = []string{"update", "new", "delete-and-new"}
@@ -81,8 +82,13 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 				WillReplace:         mrNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: true,
 			})
+			var policyFailure output.PolicyCheckFailures
 			if err != nil {
-				return err
+				if v, ok := err.(output.PolicyCheckFailures); ok {
+					policyFailure = v
+				} else {
+					return err
+				}
 			}
 
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -102,6 +108,10 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 			} else {
 				cmd.Println(string(body))
 				cmd.Println("Comment not posted to GitLab (--dry-run was specified)")
+			}
+
+			if policyFailure != nil {
+				return policyFailure
 			}
 
 			return nil

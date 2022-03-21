@@ -105,3 +105,16 @@ resource "azurerm_app_service_plan" "pc3" {
     capacity = 15
   }
 }
+
+resource "azurerm_app_service_plan" "default_capacity" {
+  name                = "api-appserviceplan-pro"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  kind                = "Linux"
+  reserved            = false
+
+  sku {
+    tier = "Basic"
+    size = "B2"
+  }
+}

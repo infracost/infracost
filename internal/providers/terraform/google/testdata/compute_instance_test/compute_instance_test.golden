@@ -3,35 +3,35 @@
                                                                                                
  google_compute_instance.gpu                                                                   
  ├─ Instance usage (Linux/UNIX, on-demand, n1-standard-16)            730  hours       $388.36 
- ├─ Standard provisioned storage (pd-standard)                         10  GiB           $0.40 
+ ├─ Standard provisioned storage (pd-standard)                         10  GB            $0.40 
  └─ NVIDIA Tesla K80 (on-demand)                                    2,920  hours       $919.80 
                                                                                                
  google_compute_instance.local_ssd                                                             
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                  730  hours         $3.88 
- ├─ Standard provisioned storage (pd-standard)                         10  GiB           $0.40 
- └─ Local SSD provisioned storage                                     750  GiB          $60.00 
+ ├─ Standard provisioned storage (pd-standard)                         10  GB            $0.40 
+ └─ Local SSD provisioned storage                                     750  GB           $60.00 
                                                                                                
  google_compute_instance.preemptible                                                           
  ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)                730  hours         $2.56 
- └─ Standard provisioned storage (pd-standard)                         10  GiB           $0.40 
+ └─ Standard provisioned storage (pd-standard)                         10  GB            $0.40 
                                                                                                
  google_compute_instance.preemptible_gpu                                                       
  ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)          730  hours       $116.80 
- ├─ Standard provisioned storage (pd-standard)                         10  GiB           $0.40 
+ ├─ Standard provisioned storage (pd-standard)                         10  GB            $0.40 
  └─ NVIDIA Tesla K80 (preemptible)                                  2,920  hours       $109.50 
                                                                                                
  google_compute_instance.preemptible_local_ssd                                                 
  ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)                730  hours         $2.56 
- ├─ Standard provisioned storage (pd-standard)                         10  GiB           $0.40 
- └─ Local SSD provisioned storage                                     375  GiB          $18.00 
+ ├─ Standard provisioned storage (pd-standard)                         10  GB            $0.40 
+ └─ Local SSD provisioned storage                                     375  GB           $18.00 
                                                                                                
  google_compute_instance.ssd                                                                   
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                  730  hours         $3.88 
- └─ SSD provisioned storage (pd-ssd)                                   40  GiB           $6.80 
+ └─ SSD provisioned storage (pd-ssd)                                   40  GB            $6.80 
                                                                                                
  google_compute_instance.standard                                                              
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                  730  hours         $3.88 
- └─ Standard provisioned storage (pd-standard)                         10  GiB           $0.40 
+ └─ Standard provisioned storage (pd-standard)                         10  GB            $0.40 
                                                                                                
  OVERALL TOTAL                                                                       $1,638.42 
 ──────────────────────────────────

@@ -1,6 +1,7 @@
 package output
 
 import (
+	"bytes"
 	"fmt"
 	"sort"
 	"time"
@@ -104,6 +105,39 @@ type Options struct {
 	NoColor          bool
 	ShowSkipped      bool
 	Fields           []string
+	IncludeHTML      bool
+	PolicyChecks     PolicyCheck
+}
+
+// PolicyCheck holds information if a given run has any policy checks enabled.
+// This struct is used in templates to create useful cost policy outputs.
+type PolicyCheck struct {
+	Enabled  bool
+	Failures PolicyCheckFailures
+	Passed   []string
+}
+
+// HasFailed returns if the PolicyCheck has any cost policy failures
+func (p PolicyCheck) HasFailed() bool {
+	return len(p.Failures) > 0
+}
+
+// PolicyCheckFailures defines a list of policy check failures that can be collected from a policy evaluation.
+type PolicyCheckFailures []string
+
+// Error implements the Error interface returning the failures as a single message that can be used in stderr.
+func (p PolicyCheckFailures) Error() string {
+	if len(p) == 0 {
+		return ""
+	}
+
+	out := bytes.NewBuffer([]byte("Policy check failed:\n\n"))
+
+	for _, e := range p {
+		out.WriteString(e + "\n")
+	}
+
+	return out.String()
 }
 
 type MarkdownOptions struct {

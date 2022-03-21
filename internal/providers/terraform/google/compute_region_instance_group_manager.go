@@ -1,39 +1,67 @@
 package google
 
 import (
+	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
-func GetComputeRegionInstanceGroupManagerRegistryItem() *schema.RegistryItem {
+func getComputeRegionInstanceGroupManagerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "google_compute_region_instance_group_manager",
-		RFunc:               NewComputeRegionInstanceGroupManager,
+		RFunc:               newComputeRegionInstanceGroupManager,
 		Notes:               []string{"Multiple versions are not supported."},
 		ReferenceAttributes: []string{"version.0.instance_template"},
 	}
 }
 
-func NewComputeRegionInstanceGroupManager(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newComputeRegionInstanceGroupManager(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
-	machineType := getMachineType(d)
-	purchaseOption := getPurchaseOption(d)
 
-	targetSize := decimal.NewFromInt(1)
+	targetSize := int64(1)
 	if d.Get("target_size").Exists() {
-		targetSize = decimal.NewFromInt(d.Get("target_size").Int())
+		targetSize = d.Get("target_size").Int()
 	}
 
-	costComponents := []*schema.CostComponent{computeCostComponent(region, machineType, purchaseOption, targetSize)}
+	var machineType string
+	purchaseOption := "on_demand"
+	disks := []*google.ComputeDisk{}
+	guestAccelerators := []*google.ComputeGuestAccelerator{}
 
-	diskCostComponents := getDisksFromTemplate(d, region, targetSize)
-	costComponents = append(costComponents, diskCostComponents...)
+	if len(d.References("version.0.instance_template")) > 0 {
+		instanceTemplate := d.References("version.0.instance_template")[0]
 
-	guestAcceleratorComponents := getAcceleratorsFromTemplate(d, region, purchaseOption, targetSize)
-	costComponents = append(costComponents, guestAcceleratorComponents...)
+		machineType = instanceTemplate.Get("machine_type").String()
 
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
+		if instanceTemplate.Get("scheduling.0.preemptible").Bool() {
+			purchaseOption = "preemptible"
+		}
+
+		for _, disk := range instanceTemplate.Get("disk").Array() {
+			diskSize := int64(100)
+			if size := disk.Get("disk_size_gb"); size.Exists() {
+				diskSize = size.Int()
+			}
+			diskType := disk.Get("disk_type").String()
+
+			disks = append(disks, &google.ComputeDisk{
+				Type: diskType,
+				Size: float64(diskSize),
+			})
+		}
+
+		guestAccelerators = collectComputeGuestAccelerators(instanceTemplate.Get("guest_accelerator"))
 	}
+
+	r := &google.ComputeRegionInstanceGroupManager{
+		Address:           d.Address,
+		Region:            region,
+		MachineType:       machineType,
+		PurchaseOption:    purchaseOption,
+		TargetSize:        targetSize,
+		Disks:             disks,
+		GuestAccelerators: guestAccelerators,
+	}
+	r.PopulateUsage(u)
+
+	return r.BuildResource()
 }

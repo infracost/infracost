@@ -341,7 +341,8 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 		if p.IsTerragrunt {
 			cmdName = "terragrunt run-all plan"
 		}
-		return "", planJSON, errors.Wrap(err, fmt.Sprintf("%s failed", cmdName))
+		msg := fmt.Sprintf("%s failed", cmdName)
+		return "", planJSON, clierror.NewSanitizedError(fmt.Errorf("%s: %s", msg, err), msg)
 	}
 
 	spinner.Success()
@@ -370,7 +371,8 @@ func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
 		if p.IsTerragrunt {
 			cmdName = "terragrunt run-all init"
 		}
-		return errors.Wrap(err, fmt.Sprintf("%s failed", cmdName))
+		msg := fmt.Sprintf("%s failed", cmdName)
+		return clierror.NewSanitizedError(fmt.Errorf("%s: %s", msg, err), msg)
 	}
 
 	spinner.Success()
@@ -444,7 +446,8 @@ func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile st
 		if p.IsTerragrunt {
 			cmdName = "terragrunt show"
 		}
-		return []byte{}, errors.Wrap(err, fmt.Sprintf("%s failed", cmdName))
+		msg := fmt.Sprintf("%s failed", cmdName)
+		return []byte{}, clierror.NewSanitizedError(fmt.Errorf("%s: %s", msg, err), msg)
 	}
 	spinner.Success()
 

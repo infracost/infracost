@@ -72,6 +72,10 @@ func TestOutputFormatSlackMessageNoChange(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "slack-message", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
 }
 
+func TestOutputFormatSlackMessageMoreProjects(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "slack-message", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json"}, nil)
+}
+
 func TestOutputFormatTable(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "table", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json"}, nil)
 }

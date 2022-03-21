@@ -74,6 +74,10 @@
  ├─ Performance Insights Long Term Retention (db.t3.large)                  2  vCPU-month                     $5.90 
  └─ Performance Insights API                                           12.345  1000 requests                  $0.12 
                                                                                                                     
+ aws_db_instance.mysql-replica                                                                                      
+ ├─ Database instance (on-demand, Single-AZ, db.t3.large)                 730  hours                         $99.28 
+ └─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
+                                                                                                                    
  aws_db_instance.oracle-ee                                                                                          
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                 730  hours                         $99.28 
  └─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
@@ -120,9 +124,9 @@
  ├─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
  └─ Additional backup storage                                           1,000  GB                            $95.00 
                                                                                                                     
- OVERALL TOTAL                                                                                            $6,601.76 
+ OVERALL TOTAL                                                                                            $6,703.34 
 ──────────────────────────────────
-24 cloud resources were detected:
-∙ 24 were estimated, 24 include usage-based costs, see https://infracost.io/usage-file
+25 cloud resources were detected:
+∙ 25 were estimated, 25 include usage-based costs, see https://infracost.io/usage-file
 
 Add cost estimates to your pull requests: https://infracost.io/cicd

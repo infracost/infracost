@@ -21,7 +21,7 @@ func NewAzureRMAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *sche
 	sku := d.Get("sku.0.size").String()
 	skuRefactor := ""
 	os := "windows"
-	capacity := d.Get("sku.0.capacity").Int()
+	capacity := d.GetInt64OrDefault("sku.0.capacity", 1)
 	productName := "Standard Plan"
 
 	// These are used by azurerm_function_app, their costs are calculated there as they don't have prices in the azurerm_app_service_plan resource

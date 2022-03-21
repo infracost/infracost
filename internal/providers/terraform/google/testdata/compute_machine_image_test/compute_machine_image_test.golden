@@ -3,7 +3,7 @@
                                                                                                    
  google_compute_instance.vm                                                                        
  ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)            730  hours                 $24.46 
- └─ Standard provisioned storage (pd-standard)                    10  GiB                    $0.40 
+ └─ Standard provisioned storage (pd-standard)                    10  GB                     $0.40 
                                                                                                    
  google_compute_machine_image.image                                                                
  └─ Storage                                            Monthly cost depends on usage: $0.05 per GB 

@@ -161,6 +161,25 @@ resource_usage:
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
     vcpu_count: 2 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
 
+  aws_elastic_beanstalk_environment.my_eb_environment:
+    db:
+      additional_backup_storage_gb: 1000  # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
+      monthly_standard_io_requests: 10000 # Monthly number of input/output requests for database.
+      monthly_additional_performance_insights_requests: 10000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
+    ec2:
+      monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    cloudwatch:
+      storage_gb: 1000               # Total data stored by CloudWatch logs in GB.
+      monthly_data_ingested_gb: 1000 # Monthly data ingested by CloudWatch logs in GB.
+      monthly_data_scanned_gb: 200   # Monthly data scanned by CloudWatch logs insights in GB.
+    lb:
+      new_connections: 500000    # Number of newly established connections per second on average.
+      active_connections: 100000 # Number of active connections per minute on average.
+      processed_bytes_gb: 25000  # The number of bytes processed by the load balancer for HTTP(S) requests and responses in GB.
+      rule_evaluations: 10000    # Number of rule evaluations on application/network load balancers
+    elb:
+      monthly_data_processed_gb: 10000 # Monthly data processed on classic loadbalaner
+    
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
 
@@ -224,6 +243,9 @@ resource_usage:
 
   aws_neptune_cluster_snapshot.my_cluster_snapshot:
     backup_storage_gb: 1000        # Total storage used for backup snapshots in GB.
+
+  aws_networkfirewall_firewall.my_firewall:
+    monthly_data_processed_gb: 100 # Monthly data processed by the Network Firewall in GB.
 
   aws_mq_broker.my_aws_mq_broker:
     storage_size_gb: 12 # Data storage per instance in GB.
@@ -523,9 +545,12 @@ resource_usage:
     monthly_data_processed_gb: 1000 # Monthly data processed (ingress and egress) by the NAT gateway in GB
 
   google_container_cluster.my_cluster:
-    nodes: 4    # Node count per zone for the default node pool
+    autopilot_vcpu_count: 10            # Number of vCPUs used by Autopilot pods. Only relevant for Autopilot mode.
+    autopilot_memory_gb: 50             # Total memory used by Autopilot pods. Only relevant for Autopilot mode.
+    autopilot_ephemeral_storage_gb: 100 # Total ephemeral storage used by Autopilot pods. Only relevant for Autopilot mode.
+    nodes: 4                            # Node count per zone for the default node pool. Only relevant for Standard mode.
     node_pool[0]:
-      nodes: 2  # Node count per zone for the first node pool
+      nodes: 2  # Node count per zone for the first node pool. Only relevant for Standard mode.
 
   google_container_node_pool.my_node_pool:
     nodes: 4 # Node count per zone for the node pool

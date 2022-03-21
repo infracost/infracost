@@ -213,3 +213,17 @@ resource "google_container_cluster" "with_node_pools_node_locations_withUsage" {
     }
   }
 }
+
+resource "google_container_cluster" "autopilot" {
+  name     = "autopilot"
+  location = "us-central1"
+
+  enable_autopilot = true
+}
+
+resource "google_container_cluster" "autopilot_with_usage" {
+  name     = "autopilot-with-usage"
+  location = "us-central1"
+
+  enable_autopilot = true
+}

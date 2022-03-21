@@ -1,6 +1,7 @@
 package google
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -25,7 +26,23 @@ func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
 
+func isZone(location string) bool {
+	if matched, _ := regexp.MatchString(`^\w+-\w+-\w+$`, location); matched {
+		return true
+	}
+	return false
+}
+
 func zoneToRegion(zone string) string {
 	s := strings.Split(zone, "-")
 	return strings.Join(s[:len(s)-1], "-")
+}
+
+func contains(a []string, x string) bool {
+	for _, n := range a {
+		if x == n {
+			return true
+		}
+	}
+	return false
 }
