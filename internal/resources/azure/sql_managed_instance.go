@@ -1,3 +1,4 @@
+//nolint:deprecatedComment
 package azure
 
 import (
