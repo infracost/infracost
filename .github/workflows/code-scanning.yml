@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: [ master ]
   schedule:
-    # run 00:00 every Monday
-    - cron: '00 00 * * 1'
+    # run 05:00 every Monday
+    - cron: '00 05 * * 1'
 
 jobs:
   analyze:
