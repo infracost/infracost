@@ -301,9 +301,9 @@ var FreeResources = []string{
 
 	// AWS Others
 	"aws_db_instance_role_association",
+	"aws_db_option_group",
 	"aws_db_parameter_group",
 	"aws_db_subnet_group",
-	"aws_db_option_group",
 	"aws_dms_replication_subnet_group",
 	"aws_dms_replication_task",
 	"aws_docdb_cluster_parameter_group",
