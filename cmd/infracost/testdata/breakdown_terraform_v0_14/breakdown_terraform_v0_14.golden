@@ -74,8 +74,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 ──────────────────────────────────
 26 cloud resources were detected, rerun with --show-skipped to see details:
 ∙ 14 were estimated, 10 include usage-based costs, see https://infracost.io/usage-file
-∙ 2 weren't estimated, report them in https://github.com/infracost/infracost
-∙ 10 were free
+∙ 12 were free
 
 Add cost estimates to your pull requests: https://infracost.io/cicd
 
