@@ -89,6 +89,7 @@ jobs:
     with:
       version: ${{ github.ref_name }}
     secrets:
+      SOME_VAR: test
       AMPLIFY_APP_ID: ${{ secrets.AMPLIFY_APP_ID }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
