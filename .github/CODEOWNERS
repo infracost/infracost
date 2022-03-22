@@ -1,0 +1,4 @@
+/.github/workflows/create-release.yml @infracost/security
+/.github/workflows/update-download-redirects.yml @infracost/security
+/tools/release/*.go @infracost/security
+
