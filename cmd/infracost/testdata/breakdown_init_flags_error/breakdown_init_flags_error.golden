@@ -1,0 +1,11 @@
+
+Err:
+
+Error: terraform init failed: exit status 1
+
+  Terraform command failed with:
+    Error: Failed to query available provider packages
+    Could not retrieve the list of available versions for provider hashicorp/aws:
+    cannot search does/not/exist: lstat does/not/exist: no such file or directory
+
+Try using --terraform-init-flags to pass any required Terraform init flags, or skip Terraform init entirely and set the --path to a Terraform plan JSON file. See https://infracost.io/troubleshoot for how to generate this.

@@ -27,6 +27,7 @@ FLAGS
   -p, --path string                   Path to the Terraform directory or JSON/plan file
       --show-skipped                  Show unsupported resources
       --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)
+      --terraform-init-flags string   Flags to pass to 'terraform init'. Applicable when path is a Terraform directory
       --terraform-parse-hcl           Parse the HCL directly instead of generating a Terraform plan. This option does not need credentials and is faster (experimental)
       --terraform-plan-flags string   Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory
       --terraform-use-state           Use Terraform state instead of generating a plan. Applicable when path is a Terraform directory
