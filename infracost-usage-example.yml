@@ -11,7 +11,7 @@ resource_usage:
     monthly_requests: 20000 # Monthly private certificate requests.
 
   aws_api_gateway_rest_api.my_rest_api:
-    monthly_requests:  100000000 # Monthly requests to the Rest API Gateway.
+    monthly_requests: 100000000 # Monthly requests to the Rest API Gateway.
 
   aws_apigatewayv2_api.my_v2_api:
     monthly_requests: 100000000       # Monthly requests to the HTTP API Gateway.
@@ -179,7 +179,7 @@ resource_usage:
       rule_evaluations: 10000    # Number of rule evaluations on application/network load balancers
     elb:
       monthly_data_processed_gb: 10000 # Monthly data processed on classic loadbalaner
-    
+
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
 
@@ -188,6 +188,9 @@ resource_usage:
 
   aws_elb.my_elb:
     monthly_data_processed_gb: 10000 # Monthly data processed by a Classic Load Balancer in GB.
+
+  aws_glue_job.my_job:
+    monthly_job_hours: 60 # Monthly number of hours the Glue Job ran for.
 
   aws_instance.my_instance:
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
@@ -560,7 +563,7 @@ resource_usage:
     monthly_class_a_operations: 40000 # Monthly number of class A operations (object adds, bucket/object list).
     monthly_class_b_operations: 20000 # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
     monthly_data_retrieval_gb: 500    # Monthly amount of data retrieved in GB.
-    monthly_egress_data_transfer_gb:  # Monthly data transfer from Cloud Storage to the following, in GB:
+    monthly_egress_data_transfer_gb: # Monthly data transfer from Cloud Storage to the following, in GB:
       same_continent: 550  # Same continent.
       worldwide: 12500     # Worldwide excluding Asia, Australia.
       asia: 1500           # Asia excluding China, but including Hong Kong.
@@ -568,13 +571,13 @@ resource_usage:
       australia: 250       # Australia.
 
   google_compute_external_vpn_gateway.my_compute_external_vpn_gateway:
-    monthly_egress_data_transfer_gb:  # Monthly data transfer from VPN gateway to the following, in GB:
+    monthly_egress_data_transfer_gb: # Monthly data transfer from VPN gateway to the following, in GB:
       worldwide: 12500                # Worldwide excluding China, Australia but including Hong Kong.
       china: 8500                     # China excluding Hong Kong.
       australia: 250                  # Australia.
 
   google_compute_vpn_gateway.my_compute_vpn_gateway:
-    monthly_egress_data_transfer_gb:  # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+    monthly_egress_data_transfer_gb: # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
       same_region: 250                # VMs in the same Google Cloud region.
       us_or_canada: 100               # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
       europe: 70                      # Between Google Cloud regions within Europe.
@@ -584,7 +587,7 @@ resource_usage:
       worldwide: 200                  # to a Google Cloud region on another continent.
 
   google_compute_ha_vpn_gateway.my_compute_ha_vpn_gateway:
-    monthly_egress_data_transfer_gb:  # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+    monthly_egress_data_transfer_gb: # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
       same_region: 250                # VMs in the same Google Cloud region.
       us_or_canada: 100               # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
       europe: 70                      # Between Google Cloud regions within Europe.
@@ -637,7 +640,7 @@ resource_usage:
     monthly_data_processed_gb: 100
 
   google_dns_record_set.my_record_set:
-    monthly_queries:  1000000 # Monthly DNS queries.
+    monthly_queries: 1000000 # Monthly DNS queries.
 
   google_kms_crypto_key.my_keys:
     key_versions: 10000             # Number of key versions.
@@ -705,7 +708,7 @@ resource_usage:
     monthly_class_a_operations: 40000 # Monthly number of class A operations (object adds, bucket/object list).
     monthly_class_b_operations: 20000 # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
     monthly_data_retrieval_gb: 500    # Monthly amount of data retrieved in GB.
-    monthly_egress_data_transfer_gb:  # Monthly data transfer from Cloud Storage to the following, in GB:
+    monthly_egress_data_transfer_gb: # Monthly data transfer from Cloud Storage to the following, in GB:
       same_continent: 550  # Same continent.
       worldwide: 12500     # Worldwide excluding Asia, Australia.
       asia: 1500           # Asia excluding China, but including Hong Kong.
@@ -720,7 +723,7 @@ resource_usage:
     self_hosted_gateway_count: 5 # Number of self-hosted gateways (only for premium tier).
 
   azurerm_app_service_environment.my_service:
-     operating_system: linux # Override the operating system of the instance, can be: linux, windows.
+    operating_system: linux # Override the operating system of the instance, can be: linux, windows.
 
   azurerm_application_insights.my_insights:
     monthly_data_ingested_gb: 1000 # Monthly amount of data ingested in GB.
