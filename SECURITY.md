@@ -1,6 +1,6 @@
-# Security Policy
+# Security policy
 
-## Reporting a Vulnerability
+## Reporting a vulnerability
 
 If you believe you have found a security vulnerability within Infracost, please let us know right away. We'll try and fix the problem as soon as possible.
 
@@ -8,7 +8,7 @@ If you believe you have found a security vulnerability within Infracost, please 
 
 Once we've received your email we'll keep you updated as we fix the vulnerability.
 
-## Supported Versions
+## Supported versions
 
 We release patches for security vulnerabilities as soon as they are found and fixed. Please refer to the below table to understand which CLI versions are eligible for security patches. 
 
