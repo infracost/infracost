@@ -1,4 +1,3 @@
-//nolint:deprecatedComment
 package azure
 
 import (
@@ -17,10 +16,7 @@ const (
 
 // SQLManagedInstance struct represents an azure Sql Managed Instance.
 //
-// The azurerm_sql_managed_instance resource is deprecated in version 3.0 of the AzureRM provider and will be removed in version 4.0.
-// Please use the azurerm_mssql_managed_instance resource instead when available in infracost
-//
-// Only support for Gen5 is available on that resource
+// SQLManagedInstance currently only Gen5 database instance
 //
 // More resource information here: https://azure.microsoft.com/en-gb/products/azure-sql/managed-instance/
 // Pricing information here: https://azure.microsoft.com/en-gb/pricing/details/azure-sql-managed-instance/single/
