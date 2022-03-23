@@ -323,6 +323,8 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 		return msg
 	}
 
+	seeDetailsMessage := ", rerun with --show-skipped to see details"
+
 	if *r.Summary.TotalDetectedResources == 0 {
 		msg += "No cloud resources were detected"
 		return msg
@@ -330,10 +332,6 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 		msg += "1 cloud resource was detected"
 	} else {
 		msg += fmt.Sprintf("%d cloud resources were detected", *r.Summary.TotalDetectedResources)
-	}
-
-	if !showSkipped {
-		msg += ", rerun with --show-skipped to see details"
 	}
 
 	msg += ":"
@@ -346,27 +344,22 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 			msg += fmt.Sprintf("\n∙ %d were estimated", *r.Summary.TotalSupportedResources)
 		}
 
+		allUsageBased := *r.Summary.TotalUsageBasedResources == *r.Summary.TotalSupportedResources
+
 		if r.Summary.TotalUsageBasedResources != nil && *r.Summary.TotalUsageBasedResources > 0 {
-			usageLink := ui.SecondaryLinkString("https://infracost.io/usage-file")
-			if *r.Summary.TotalUsageBasedResources == 1 {
-				msg += fmt.Sprintf(", 1 includes usage-based costs, see %s", usageLink)
-			} else {
-				msg += fmt.Sprintf(", %d include usage-based costs, see %s", *r.Summary.TotalUsageBasedResources, usageLink)
+			usageBasedCount := "1 of which"
+			if allUsageBased {
+				usageBasedCount = "it includes"
 			}
-		}
-	}
 
-	if r.Summary.TotalUnsupportedResources != nil && *r.Summary.TotalUnsupportedResources > 0 {
-		reportLink := ui.SecondaryLinkString("https://github.com/infracost/infracost")
-		if *r.Summary.TotalUnsupportedResources == 1 {
-			msg += fmt.Sprintf("\n∙ 1 wasn't estimated, report it in %s", reportLink)
-		} else {
-			msg += fmt.Sprintf("\n∙ %d weren't estimated, report them in %s", *r.Summary.TotalUnsupportedResources, reportLink)
-		}
+			if *r.Summary.TotalUsageBasedResources > 1 {
+				usageBasedCount = fmt.Sprintf("%d of which include", *r.Summary.TotalUsageBasedResources)
+				if allUsageBased {
+					usageBasedCount = "all of which include"
+				}
+			}
 
-		if showSkipped {
-			msg += ":"
-			msg += formatCounts(r.Summary.UnsupportedResourceCounts)
+			msg += fmt.Sprintf(", %s usage-based costs, see %s", usageBasedCount, ui.SecondaryLinkString("https://infracost.io/usage-file"))
 		}
 	}
 
@@ -380,15 +373,28 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 		if showSkipped {
 			msg += ":"
 			msg += formatCounts(r.Summary.NoPriceResourceCounts)
+		} else {
+			msg += seeDetailsMessage
+		}
+	}
+
+	if r.Summary.TotalUnsupportedResources != nil && *r.Summary.TotalUnsupportedResources > 0 {
+		count := "1 is"
+		if *r.Summary.TotalUnsupportedResources > 1 {
+			count = fmt.Sprintf("%d are", *r.Summary.TotalUnsupportedResources)
+		}
+		msg += fmt.Sprintf("\n∙ %s not supported yet", count)
+
+		if showSkipped {
+			msg += fmt.Sprintf(", see %s:", ui.SecondaryLinkString("https://infracost.io/requested-resources"))
+			msg += formatCounts(r.Summary.UnsupportedResourceCounts)
+		} else {
+			msg += seeDetailsMessage
 		}
 	}
 
 	if r.ShareURL != "" {
 		msg += fmt.Sprintf("\n\nShare this cost estimate: %s", ui.LinkString(r.ShareURL))
-	}
-
-	if !r.IsCIRun {
-		msg += fmt.Sprintf("\n\nAdd cost estimates to your pull requests: %s", ui.LinkString("https://infracost.io/cicd"))
 	}
 
 	return msg

@@ -11,8 +11,6 @@
  OVERALL TOTAL                                                                                $9.00 
 ──────────────────────────────────
 3 cloud resources were detected:
-∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x aws_cloudformation_stack
-
-Add cost estimates to your pull requests: https://infracost.io/cicd

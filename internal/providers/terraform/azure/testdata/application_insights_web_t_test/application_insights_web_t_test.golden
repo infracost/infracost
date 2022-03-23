@@ -10,9 +10,7 @@
  OVERALL TOTAL                                                                        $10.00 
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 2 were estimated, 1 includes usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 1 x azurerm_application_insights_web_test
   ∙ 1 x azurerm_resource_group
-
-Add cost estimates to your pull requests: https://infracost.io/cicd

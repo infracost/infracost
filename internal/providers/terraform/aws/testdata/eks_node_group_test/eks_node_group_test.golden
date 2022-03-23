@@ -67,8 +67,6 @@
  OVERALL TOTAL                                                                                       $2,972.61 
 ──────────────────────────────────
 16 cloud resources were detected:
-∙ 11 were estimated, 11 include usage-based costs, see https://infracost.io/usage-file
+∙ 11 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 5 were free:
   ∙ 5 x aws_launch_template
-
-Add cost estimates to your pull requests: https://infracost.io/cicd

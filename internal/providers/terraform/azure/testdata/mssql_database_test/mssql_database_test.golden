@@ -71,12 +71,10 @@
  OVERALL TOTAL                                                                                   $28,382.88 
 ──────────────────────────────────
 14 cloud resources were detected:
-∙ 12 were estimated, 12 include usage-based costs, see https://infracost.io/usage-file
+∙ 12 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_sql_server
-
-Add cost estimates to your pull requests: https://infracost.io/cicd
 Logs:
 
 level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, BC_Gen5_8)' due to limitations in the Azure API."

@@ -15,10 +15,8 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_director
                                                                                          
  OVERALL TOTAL                                                                   $757.82 
 ──────────────────────────────────
-1 cloud resource was detected, rerun with --show-skipped to see details:
-∙ 1 was estimated, 1 includes usage-based costs, see https://infracost.io/usage-file
-
-Add cost estimates to your pull requests: https://infracost.io/cicd
+1 cloud resource was detected:
+∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
 
 Err:
 
