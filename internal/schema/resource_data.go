@@ -63,6 +63,14 @@ func (d *ResourceData) GetInt64OrDefault(key string, def int64) int64 {
 	return def
 }
 
+func (d *ResourceData) GetFloat64OrDefault(key string, def float64) float64 {
+	if !d.IsEmpty(key) {
+		return d.RawValues.Get(key).Float()
+	}
+
+	return def
+}
+
 func (d *ResourceData) GetBoolOrDefault(key string, def bool) bool {
 	if !d.IsEmpty(key) {
 		return d.RawValues.Get(key).Bool()
