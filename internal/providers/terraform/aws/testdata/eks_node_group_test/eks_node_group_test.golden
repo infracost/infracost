@@ -31,7 +31,7 @@
                                                                                                                
  aws_eks_node_group.example_with_launch_template_3                                                             
  └─ aws_launch_template.foo3                                                                                   
-    ├─ Instance usage (Linux/UNIX, on-demand, m5.xlarge)                       2,190  hours            $420.48 
+    ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                        2,190  hours            $210.24 
     ├─ EBS-optimized usage                                                     2,190  hours              $0.00 
     ├─ Inference accelerator (eia1.medium)                                     2,190  hours            $284.70 
     └─ block_device_mapping[0]                                                                                 
@@ -64,7 +64,7 @@
  ├─ CPU credits                                                                  200  vCPU-hours        $10.00 
  └─ Storage (general purpose SSD, gp2)                                            20  GB                 $2.00 
                                                                                                                
- OVERALL TOTAL                                                                                       $2,972.61 
+ OVERALL TOTAL                                                                                       $2,762.37 
 ──────────────────────────────────
 16 cloud resources were detected:
 ∙ 11 were estimated, 11 include usage-based costs, see https://infracost.io/usage-file

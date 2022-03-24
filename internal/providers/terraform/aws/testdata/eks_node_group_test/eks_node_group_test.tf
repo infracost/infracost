@@ -328,6 +328,8 @@ resource "aws_eks_node_group" "example_with_launch_template_3" {
   node_role_arn   = "node_role_arn"
   subnet_ids      = ["subnet_id"]
 
+  instance_types = ["m5.large"]
+
   scaling_config {
     desired_size = 3
     max_size     = 1
