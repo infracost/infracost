@@ -3,6 +3,7 @@ package output
 import (
 	"bytes"
 	"fmt"
+	"regexp"
 	"sort"
 	"time"
 
@@ -42,6 +43,22 @@ type Project struct {
 	Diff          *Breakdown              `json:"diff"`
 	Summary       *Summary                `json:"summary"`
 	fullSummary   *Summary
+}
+
+var exampleProjectsRegex = regexp.MustCompile(`^infracost\/(infracost\/examples|example-terraform)\/`)
+
+func (r *Root) ExampleProjectName() string {
+	if len(r.Projects) == 0 {
+		return ""
+	}
+
+	for _, p := range r.Projects {
+		if !exampleProjectsRegex.MatchString(p.Name) {
+			return ""
+		}
+	}
+
+	return r.Projects[0].Name
 }
 
 func (p *Project) Label(dashboardEnabled bool) string {
