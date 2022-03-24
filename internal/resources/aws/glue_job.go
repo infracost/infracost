@@ -22,7 +22,7 @@ type GlueJob struct {
 	Region  string
 	DPUs    float64
 
-	MonthlyJobHours *float64 `infracost_usage:"monthly_job_hours"`
+	MonthlyHours *float64 `infracost_usage:"monthly_hours"`
 }
 
 // PopulateUsage parses the u schema.UsageData into the GlueJob.
@@ -40,8 +40,8 @@ func (r *GlueJob) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider. See providers folder for more information.
 func (r *GlueJob) BuildResource() *schema.Resource {
 	var quantity *decimal.Decimal
-	if r.MonthlyJobHours != nil {
-		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyJobHours * r.DPUs))
+	if r.MonthlyHours != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyHours * r.DPUs))
 	}
 
 	unit := fmt.Sprintf("Hours (%d DPUs)", int(r.DPUs))
@@ -53,7 +53,7 @@ func (r *GlueJob) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name: r.Address,
 		UsageSchema: []*schema.UsageItem{
-			{Key: "monthly_job_hours", DefaultValue: 0, ValueType: schema.Float64},
+			{Key: "monthly_hours", DefaultValue: 0, ValueType: schema.Float64},
 		},
 		CostComponents: []*schema.CostComponent{
 			{
