@@ -51,6 +51,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getElasticsearchDomainRegistryItem(),
 	getELBRegistryItem(),
 	getFSxWindowsFSRegistryItem(),
+	getGlueJobRegistryItem(),
+	getGlueCrawlerRegistryItem(),
+	getGlueCatalogDatabaseRegistryItem(),
 	getInstanceRegistryItem(),
 	getKinesisAnalyticsApplicationRegistryItem(),
 	getKinesisAnalyticsV2ApplicationRegistryItem(),
@@ -97,9 +100,6 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getDirectoryServiceDirectory(),
 	getTransferServerRegistryItem(),
 	getNetworkfirewallFirewallRegistryItem(),
-	getGlueJobRegistryItem(),
-	getGlueCrawlerRegistryItem(),
-	getGlueCatalogDatabaseRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -241,6 +241,21 @@ var FreeResources = []string{
 	"aws_elasticache_parameter_group",
 	"aws_elasticache_security_group",
 	"aws_elasticache_subnet_group",
+
+	// AWS Glue
+	"aws_glue_catalog_table",
+	"aws_glue_classifier",
+	"aws_glue_connection",
+	"aws_glue_data_catalog_encryption_settings",
+	"aws_glue_partition",
+	"aws_glue_partition_index",
+	"aws_glue_registry",
+	"aws_glue_resource_policy",
+	"aws_glue_schema",
+	"aws_glue_security_configuration",
+	"aws_glue_trigger",
+	"aws_glue_user_defined_function",
+	"aws_glue_workflow",
 
 	// AWS IAM aws_iam_* resources
 	"aws_iam_access_key",
