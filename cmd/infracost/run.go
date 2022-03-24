@@ -766,6 +766,10 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 
 	}
 
+	if n := r.ExampleProjectName(); n != "" {
+		env["exampleProjectName"] = n
+	}
+
 	return env
 }
 
