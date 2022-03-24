@@ -1,0 +1,19 @@
+
+ Name                                               Monthly Qty  Unit                      Monthly Cost 
+                                                                                                        
+ aws_glue_catalog_database.with_usage                                                                   
+ ├─ Storage                                                   2  100,000 objects                  $2.00 
+ └─ Requests                                                300  1M requests                    $300.00 
+                                                                                                        
+ aws_glue_catalog_database.with_usage_below                                                             
+ ├─ Storage                                                   1  100,000 objects                  $1.00 
+ └─ Requests                                                  1  1M requests                      $1.00 
+                                                                                                        
+ aws_glue_catalog_database.without_usage                                                                
+ ├─ Storage                                  Monthly cost depends on usage: $1.00 per 100,000 objects   
+ └─ Requests                                 Monthly cost depends on usage: $1.00 per 1M requests       
+                                                                                                        
+ OVERALL TOTAL                                                                                  $304.00 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

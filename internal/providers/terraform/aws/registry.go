@@ -99,6 +99,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getNetworkfirewallFirewallRegistryItem(),
 	getGlueJobRegistryItem(),
 	getGlueCrawlerRegistryItem(),
+	getGlueCatalogDatabaseRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
