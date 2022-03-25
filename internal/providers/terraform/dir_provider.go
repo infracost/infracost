@@ -489,11 +489,11 @@ func checkTerraformVersion(v string, fullV string) error {
 	}
 
 	if strings.HasPrefix(fullV, "Terraform ") && semver.Compare(v, minTerraformVer) < 0 {
-		return fmt.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer) //nolint
+		return fmt.Errorf("Terraform %s is not supported. Please use Terraform version >= %s. Update it or set the environment variable INFRACOST_TERRAFORM_BINARY.", v, minTerraformVer) //nolint
 	}
 
 	if strings.HasPrefix(fullV, "terragrunt") && semver.Compare(v, minTerragruntVer) < 0 {
-		return fmt.Errorf("Terragrunt %s is not supported. Please use Terragrunt version >= %s.", v, minTerragruntVer) //nolint
+		return fmt.Errorf("Terragrunt %s is not supported. Please use Terragrunt version >= %s. Update it or set the environment variable INFRACOST_TERRAFORM_BINARY.", v, minTerragruntVer) //nolint
 	}
 
 	// Allow any non-terraform and non-terragrunt binaries
@@ -538,6 +538,8 @@ func (p *DirProvider) buildTerraformErr(err error, isInit bool) error {
 		msg += fmt.Sprintf("\n\nSee %s for how to generate multiple Terraform plan JSON files for your Terragrunt project, and use them with Infracost.", ui.LinkString("https://infracost.io/troubleshoot"))
 	} else if isInit {
 		msg += fmt.Sprintf("\n\nTry using --terraform-init-flags to pass any required Terraform init flags, or skip Terraform init entirely and set the --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
+	} else if strings.HasPrefix(stderr, "Error: Unsupported Terraform Core version") {
+		msg += "\n\nUpdate Terraform to the required version or set a custom Terraform binary using the environment variable INFRACOST_TERRAFORM_BINARY."
 	} else {
 		msg += fmt.Sprintf("\n\nTry setting the --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
 	}
