@@ -1,0 +1,30 @@
+
+ Name                                                        Monthly Qty  Unit            Monthly Cost 
+                                                                                                       
+ google_service_networking_connection.my_connection                                                    
+ └─ Network egress                                                                                     
+    ├─ Traffic within the same region                      Monthly cost depends on usage: $0.01 per GB 
+    ├─ Traffic within the US or Canada                     Monthly cost depends on usage: $0.01 per GB 
+    ├─ Traffic within Europe                               Monthly cost depends on usage: $0.02 per GB 
+    ├─ Traffic within Asia                                 Monthly cost depends on usage: $0.05 per GB 
+    ├─ Traffic within South America                        Monthly cost depends on usage: $0.08 per GB 
+    ├─ Traffic to/from Indonesia and Oceania               Monthly cost depends on usage: $0.15 per GB 
+    └─ Traffic between continents (excludes Oceania)       Monthly cost depends on usage: $0.08 per GB 
+                                                                                                       
+ google_service_networking_connection.my_usage_connection                                              
+ └─ Network egress                                                                                     
+    ├─ Traffic within the same region                                250  GB                     $2.50 
+    ├─ Traffic within the US or Canada                               100  GB                     $1.00 
+    ├─ Traffic within Europe                                          70  GB                     $1.40 
+    ├─ Traffic within Asia                                            50  GB                     $2.50 
+    ├─ Traffic within South America                                  100  GB                     $8.00 
+    ├─ Traffic to/from Indonesia and Oceania                          50  GB                     $7.50 
+    └─ Traffic between continents (excludes Oceania)                 200  GB                    $16.00 
+                                                                                                       
+ OVERALL TOTAL                                                                                  $38.90 
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were free:
+  ∙ 1 x google_compute_global_address
+  ∙ 1 x google_compute_network

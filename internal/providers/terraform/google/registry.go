@@ -50,6 +50,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getRedisInstanceRegistryItem(),
 	getSecretManagerSecretRegistryItem(),
 	getSecretManagerSecretVersionRegistryItem(),
+	getServiceNetworkingConnectionRegistryItem(),
 	GetSQLInstanceRegistryItem(),
 	GetStorageBucketRegistryItem(),
 }
