@@ -3,11 +3,11 @@ package aws
 import (
 	"strings"
 
-	"github.com/tidwall/gjson"
-
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
+
+var defaultEKSInstanceType = "t3.medium"
 
 func getNewEKSNodeGroupItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
@@ -48,6 +48,9 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		launchTemplateRef = launchTemplateRefName
 	}
 
+	// The instance types in the eks_node_group resource overrides any in the launch template
+	instanceType := strings.ToLower(d.Get("instance_types.0").String())
+
 	if len(launchTemplateRef) > 0 {
 		data := launchTemplateRef[0]
 
@@ -56,20 +59,18 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			onDemandPercentageAboveBaseCount = int64(0)
 		}
 
-		if data.Get("instance_type").Type == gjson.Null {
-			instanceType := "t3.medium"
-			types := d.Get("instance_types").Array()
-			if len(types) > 0 {
-				instanceType = types[0].String()
-			}
+		if instanceType != "" {
 			data.Set("instance_type", instanceType)
+		}
+
+		if data.IsEmpty("instance_type") {
+			data.Set("instance_type", defaultEKSInstanceType)
 		}
 
 		a.LaunchTemplate = newLaunchTemplate(data, u, region, instanceCount, int64(0), onDemandPercentageAboveBaseCount)
 	} else {
-		instanceType := strings.ToLower(d.Get("instance_types.0").String())
 		if instanceType == "" {
-			instanceType = "t3.medium"
+			instanceType = defaultEKSInstanceType
 		}
 
 		a.InstanceType = instanceType
