@@ -6,7 +6,7 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
 
-func TestServiceNetworkingConnection(t *testing.T) {
+func TestServiceNetworkingConnectionGoldenFile(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
