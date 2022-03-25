@@ -29,8 +29,6 @@ resource "azurerm_nat_gateway" "my_gateway" {
   name                    = "nat-Gateway"
   location                = azurerm_resource_group.example.location
   resource_group_name     = azurerm_resource_group.example.name
-  public_ip_address_ids   = [azurerm_public_ip.example.id]
-  public_ip_prefix_ids    = [azurerm_public_ip_prefix.example.id]
   sku_name                = "Standard"
   idle_timeout_in_minutes = 10
   zones                   = ["1"]
@@ -39,9 +37,27 @@ resource "azurerm_nat_gateway" "my_gateway2" {
   name                    = "nat-Gateway"
   location                = azurerm_resource_group.example.location
   resource_group_name     = azurerm_resource_group.example.name
-  public_ip_address_ids   = [azurerm_public_ip.example.id]
-  public_ip_prefix_ids    = [azurerm_public_ip_prefix.example.id]
   sku_name                = "Standard"
   idle_timeout_in_minutes = 10
   zones                   = ["1"]
+}
+
+resource "azurerm_nat_gateway_public_ip_prefix_association" "my_gateway" {
+  nat_gateway_id      = azurerm_nat_gateway.my_gateway.id
+  public_ip_prefix_id = azurerm_public_ip_prefix.example.id
+}
+
+resource "azurerm_nat_gateway_public_ip_association" "my_gateway" {
+  nat_gateway_id       = azurerm_nat_gateway.my_gateway.id
+  public_ip_address_id = azurerm_public_ip.example.id
+}
+
+resource "azurerm_nat_gateway_public_ip_prefix_association" "my_gateway2" {
+  nat_gateway_id      = azurerm_nat_gateway.my_gateway2.id
+  public_ip_prefix_id = azurerm_public_ip_prefix.example.id
+}
+
+resource "azurerm_nat_gateway_public_ip_association" "my_gateway2" {
+  nat_gateway_id       = azurerm_nat_gateway.my_gateway2.id
+  public_ip_address_id = azurerm_public_ip.example.id
 }

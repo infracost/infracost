@@ -67,8 +67,8 @@ resource "azurerm_application_gateway" "waf" {
   location            = azurerm_resource_group.example.location
 
   sku {
-    name     = "Waf_Medium"
-    tier     = "Waf"
+    name     = "WAF_Medium"
+    tier     = "WAF"
     capacity = 2
   }
 

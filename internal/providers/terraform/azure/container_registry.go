@@ -2,7 +2,6 @@ package azure
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -19,7 +18,7 @@ func GetAzureRMContainerRegistryRegistryItem() *schema.RegistryItem {
 func NewAzureRMContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
-	var nambersOflocations int
+	var locationsCount int
 	var storageGb, includedStorage, monthlyBuildVcpu *decimal.Decimal
 	var overStorage decimal.Decimal
 
@@ -40,22 +39,20 @@ func NewAzureRMContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *s
 		includedStorage = decimalPtr(decimal.NewFromFloat(500))
 	}
 
+	locationsCount = len(d.Get("georeplications").Array())
+	// Deprecated and removed in v3
 	if d.Get("georeplication_locations").Type != gjson.Null {
-		nambersOflocations = len(d.Get("georeplication_locations").Array())
-	}
-	if d.Get("georeplications").Type != gjson.Null {
-		nambersOflocations = len(d.Get("georeplications.0.location").Array())
+		locationsCount = len(d.Get("georeplication_locations").Array())
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	if d.Get("georeplication_locations").Type != gjson.Null || d.Get("georeplications").Type != gjson.Null {
-		if nambersOflocations == 1 {
-			costComponents = append(costComponents, ContainerRegistryGeolocationCostComponent(fmt.Sprintf("Geo replication (%s location)", strconv.Itoa(nambersOflocations)), region, sku, nambersOflocations))
+	if locationsCount > 0 {
+		suffix := fmt.Sprintf("%d locations", locationsCount)
+		if locationsCount == 1 {
+			suffix = fmt.Sprintf("%d location", locationsCount)
 		}
-		if nambersOflocations > 1 {
-			costComponents = append(costComponents, ContainerRegistryGeolocationCostComponent(fmt.Sprintf("Geo replication (%s locations)", strconv.Itoa(nambersOflocations)), region, sku, nambersOflocations))
-		}
+		costComponents = append(costComponents, ContainerRegistryGeolocationCostComponent(fmt.Sprintf("Geo replication (%s)", suffix), region, sku, locationsCount))
 	}
 
 	costComponents = append(costComponents, ContainerRegistryCostComponent(fmt.Sprintf("Registry usage (%s)", sku), region, sku))
@@ -107,12 +104,12 @@ func ContainerRegistryCostComponent(name, region, sku string) *schema.CostCompon
 		},
 	}
 }
-func ContainerRegistryGeolocationCostComponent(name, region, sku string, nambersOflocations int) *schema.CostComponent {
+func ContainerRegistryGeolocationCostComponent(name, region, sku string, locationsCount int) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "days",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(30 * int64(nambersOflocations))),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(30 * int64(locationsCount))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),
