@@ -11,7 +11,6 @@ resource "azurerm_resource_group" "example" {
 resource "azurerm_frontdoor" "frontdoor_without_usage" {
   name                                         = "exampleFrontdoor"
   resource_group_name                          = azurerm_resource_group.example.name
-  enforce_backend_pools_certificate_name_check = false
 
   routing_rule {
     name               = "exampleRoutingRule1"
@@ -67,7 +66,6 @@ resource "azurerm_frontdoor" "frontdoor_without_usage" {
 resource "azurerm_frontdoor" "frontdoor_with_usage" {
   name                                         = "exampleFrontdoorWithUsage"
   resource_group_name                          = azurerm_resource_group.example.name
-  enforce_backend_pools_certificate_name_check = false
 
   routing_rule {
     name               = "exampleRoutingRule1"

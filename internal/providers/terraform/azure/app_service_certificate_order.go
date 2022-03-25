@@ -26,6 +26,7 @@ func NewAzureRMAppServiceCertificateOrder(d *schema.ResourceData, u *schema.Usag
 	if d.Get("product_type").Type != gjson.Null {
 		productType = d.Get("product_type").String()
 	}
+	productType = strings.ToLower(productType)
 
 	costComponents := []*schema.CostComponent{
 		{

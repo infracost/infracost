@@ -77,24 +77,28 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 			subResources = append(subResources, &lbResource)
 		}
 	}
-	if d.Get("addon_profile.0.http_application_routing").Type != gjson.Null {
-		if strings.ToLower(d.Get("addon_profile.0.http_application_routing.0.enabled").String()) == "true" {
-			if strings.HasPrefix(strings.ToLower(region), "usgov") {
-				region = "US Gov Zone 1"
-			} else if strings.HasPrefix(strings.ToLower(region), "germany") {
-				region = "DE Zone 1"
-			} else if strings.HasPrefix(strings.ToLower(region), "china") {
-				region = "Zone 1 (China)"
-			} else {
-				region = "Zone 1"
-			}
 
-			dnsResource := schema.Resource{
-				Name:           "DNS",
-				CostComponents: []*schema.CostComponent{hostedPublicZoneCostComponent(region)},
-			}
-			subResources = append(subResources, &dnsResource)
+	routingEnabled := d.Get("http_application_routing_enabled").Bool()
+	// Deprecated and removed in v3
+	if d.Get("addon_profile.0.http_application_routing").Type != gjson.Null {
+		routingEnabled = d.Get("addon_profile.0.http_application_routing.0.enabled").Bool()
+	}
+	if routingEnabled {
+		if strings.HasPrefix(strings.ToLower(region), "usgov") {
+			region = "US Gov Zone 1"
+		} else if strings.HasPrefix(strings.ToLower(region), "germany") {
+			region = "DE Zone 1"
+		} else if strings.HasPrefix(strings.ToLower(region), "china") {
+			region = "Zone 1 (China)"
+		} else {
+			region = "Zone 1"
 		}
+
+		dnsResource := schema.Resource{
+			Name:           "DNS",
+			CostComponents: []*schema.CostComponent{hostedPublicZoneCostComponent(region)},
+		}
+		subResources = append(subResources, &dnsResource)
 	}
 
 	return &schema.Resource{
