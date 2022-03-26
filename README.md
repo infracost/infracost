@@ -1,5 +1,5 @@
 <p align="center">
-<a href="https://www.infracost.io"><img src=".github/assets/logo.svg" alt="Infracost breakdown command" /></a>
+<a href="https://www.infracost.io"><img src=".github/assets/logo.svg" alt="Infracost breakdown command" width="300" /></a>
 
 <p align="center">Infracost shows cloud cost estimates for Terraform. It lets DevOps, SRE and engineers see a cost breakdown and understand costs <b>before making changes</b>, either in the terminal or pull requests.</p>
 </p>
