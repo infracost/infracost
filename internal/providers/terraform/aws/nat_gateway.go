@@ -7,7 +7,10 @@ import (
 
 func getNATGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_nat_gateway",
+		Name: "aws_nat_gateway",
+		ReferenceAttributes: []string{
+			"allocation_id",
+		},
 		RFunc: NewNATGateway,
 	}
 }

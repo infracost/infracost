@@ -7,12 +7,12 @@ import (
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 // These show differently in the plan JSON for Terraform 0.12 and 0.13.
@@ -493,10 +493,24 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap) bool {
 	// Check if there's a reference in the conf
 	resConf := getConfJSON(conf, d.Address)
-	refResults := resConf.Get("expressions").Get(attr).Get("references").Array()
+	exps := resConf.Get("expressions").Get(attr)
+	lookupStr := "references"
+	if exps.IsArray() {
+		lookupStr = "#.references"
+	}
+
+	refResults := exps.Get(lookupStr).Array()
 	refs := make([]string, 0, len(refResults))
 
 	for _, refR := range refResults {
+		if refR.Type == gjson.JSON {
+			arr := refR.Array()
+			for _, r := range arr {
+				refs = append(refs, r.String())
+			}
+			continue
+		}
+
 		refs = append(refs, refR.String())
 	}
 
