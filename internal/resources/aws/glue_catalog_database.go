@@ -50,7 +50,7 @@ func (r *GlueCatalogDatabase) BuildResource() *schema.Resource {
 	}
 }
 
-func (r GlueCatalogDatabase) storageObjectsCostComponent() *schema.CostComponent {
+func (r *GlueCatalogDatabase) storageObjectsCostComponent() *schema.CostComponent {
 	var quantity *decimal.Decimal
 	var limit float64 = 100000
 
@@ -58,7 +58,7 @@ func (r GlueCatalogDatabase) storageObjectsCostComponent() *schema.CostComponent
 		objects := *r.MonthlyObjects
 
 		if objects < limit {
-			objects = limit
+			objects = 0
 		}
 
 		quantity = decimalPtr(decimal.NewFromFloat(objects))
@@ -66,7 +66,7 @@ func (r GlueCatalogDatabase) storageObjectsCostComponent() *schema.CostComponent
 
 	return &schema.CostComponent{
 		Name:            "Storage",
-		Unit:            "100,000 objects",
+		Unit:            "100k objects",
 		UnitMultiplier:  decimal.NewFromFloat(limit),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
@@ -75,7 +75,7 @@ func (r GlueCatalogDatabase) storageObjectsCostComponent() *schema.CostComponent
 			Service:       strPtr("AWSGlue"),
 			ProductFamily: strPtr("AWS Glue"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "group", Value: strPtr("Data catalog storage")},
+				{Key: "group", ValueRegex: strPtr("/^data catalog storage$/i")},
 			},
 		},
 	}
@@ -88,7 +88,7 @@ func (r *GlueCatalogDatabase) requestsCostComponent() *schema.CostComponent {
 		requests := *r.MonthlyRequests
 
 		if requests < limit {
-			requests = limit
+			requests = 0
 		}
 
 		quantity = decimalPtr(decimal.NewFromFloat(requests))
@@ -105,7 +105,7 @@ func (r *GlueCatalogDatabase) requestsCostComponent() *schema.CostComponent {
 			Service:       strPtr("AWSGlue"),
 			ProductFamily: strPtr("AWS Glue"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "group", Value: strPtr("Data catalog requests")},
+				{Key: "group", ValueRegex: strPtr("/^data catalog requests$/i")},
 			},
 		},
 	}

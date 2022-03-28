@@ -44,10 +44,15 @@ func (r *GlueJob) BuildResource() *schema.Resource {
 		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyHours * r.DPUs))
 	}
 
-	unit := fmt.Sprintf("Hours (%d DPUs)", int(r.DPUs))
+	suffix := "DPUs"
+	if r.DPUs <= 1 {
+		suffix = "DPU"
+	}
+
+	unit := fmt.Sprintf("hours (%d %s)", int(r.DPUs), suffix)
 
 	if r.DPUs < 1 {
-		unit = fmt.Sprintf("Hours (%.4f DPUs)", r.DPUs)
+		unit = fmt.Sprintf("hours (%.4f %s)", r.DPUs, suffix)
 	}
 
 	return &schema.Resource{
@@ -67,7 +72,7 @@ func (r *GlueJob) BuildResource() *schema.Resource {
 					Service:       strPtr("AWSGlue"),
 					ProductFamily: strPtr("AWS Glue"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "operation", Value: strPtr("Jobrun")},
+						{Key: "operation", ValueRegex: strPtr("/^jobrun$/i")},
 					},
 				},
 			},

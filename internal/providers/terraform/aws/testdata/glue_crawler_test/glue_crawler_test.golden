@@ -2,10 +2,10 @@
  Name                            Monthly Qty  Unit              Monthly Cost 
                                                                              
  aws_glue_crawler.no_usage                                                   
- └─ Duration                  Monthly cost depends on usage: $0.44 per Hours 
+ └─ Duration                  Monthly cost depends on usage: $0.44 per hours 
                                                                              
  aws_glue_crawler.with_usage                                                 
- └─ Duration                              60  Hours                   $26.40 
+ └─ Duration                              60  hours                   $26.40 
                                                                              
  OVERALL TOTAL                                                        $26.40 
 ──────────────────────────────────

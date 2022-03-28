@@ -190,10 +190,10 @@ resource_usage:
     monthly_data_processed_gb: 10000 # Monthly data processed by a Classic Load Balancer in GB.
 
   aws_glue_catalog_database.my_db:
-    monthly_objects: 100000  # Monthly number of objects stored above 1MB beyond the free one million object storage limit.
+    monthly_objects: 100000  # Monthly number of objects stored above the free one million object storage limit.
     monthly_requests: 100000 # Monthly number of requests to the db beyond the free one million requests limit.
 
-  aws_glue_crawler.my_cralwer:
+  aws_glue_crawler.my_crawler:
     monthly_hours: 60 # Monthly number of hours the Glue crawler ran for.
 
   aws_glue_job.my_job:
