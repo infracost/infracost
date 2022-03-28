@@ -48,7 +48,7 @@ func (r *GlueCrawler) BuildResource() *schema.Resource {
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Duration",
-				Unit:            "Hours",
+				Unit:            "hours",
 				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: quantity,
 				ProductFilter: &schema.ProductFilter{
@@ -57,7 +57,7 @@ func (r *GlueCrawler) BuildResource() *schema.Resource {
 					Service:       strPtr("AWSGlue"),
 					ProductFamily: strPtr("AWS Glue"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "operation", Value: strPtr("CrawlerRun")},
+						{Key: "operation", ValueRegex: strPtr("/^crawlerrun$/i")},
 					},
 				},
 			},
