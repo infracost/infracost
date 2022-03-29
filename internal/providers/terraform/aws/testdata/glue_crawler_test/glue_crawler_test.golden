@@ -1,0 +1,13 @@
+
+ Name                            Monthly Qty  Unit              Monthly Cost 
+                                                                             
+ aws_glue_crawler.no_usage                                                   
+ └─ Duration                  Monthly cost depends on usage: $0.44 per hours 
+                                                                             
+ aws_glue_crawler.with_usage                                                 
+ └─ Duration                              60  hours                   $26.40 
+                                                                             
+ OVERALL TOTAL                                                        $26.40 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

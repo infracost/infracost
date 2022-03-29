@@ -47,6 +47,8 @@ func (d *ResourceData) Get(key string) gjson.Result {
 	return d.RawValues.Get(key)
 }
 
+// GetStringOrDefault returns the value of key within ResourceData as a string.
+// If the retrieved value is not set GetStringOrDefault will return def.
 func (d *ResourceData) GetStringOrDefault(key, def string) string {
 	if !d.IsEmpty(key) {
 		return d.RawValues.Get(key).String()
@@ -55,9 +57,21 @@ func (d *ResourceData) GetStringOrDefault(key, def string) string {
 	return def
 }
 
+// GetInt64OrDefault returns the value of key within ResourceData as an int64.
+// If the retrieved value is not set GetInt64OrDefault will return def.
 func (d *ResourceData) GetInt64OrDefault(key string, def int64) int64 {
 	if !d.IsEmpty(key) {
 		return d.RawValues.Get(key).Int()
+	}
+
+	return def
+}
+
+// GetFloat64OrDefault returns the value of key within ResourceData as a float64.
+// If the retrieved value is not set GetFloat64OrDefault will return def.
+func (d *ResourceData) GetFloat64OrDefault(key string, def float64) float64 {
+	if !d.IsEmpty(key) {
+		return d.RawValues.Get(key).Float()
 	}
 
 	return def

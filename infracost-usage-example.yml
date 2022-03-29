@@ -189,6 +189,16 @@ resource_usage:
   aws_elb.my_elb:
     monthly_data_processed_gb: 10000 # Monthly data processed by a Classic Load Balancer in GB.
 
+  aws_glue_catalog_database.my_db:
+    monthly_objects: 100000  # Monthly number of objects stored above the free one million object storage limit.
+    monthly_requests: 100000 # Monthly number of requests to the db beyond the free one million requests limit.
+
+  aws_glue_crawler.my_crawler:
+    monthly_hours: 60 # Monthly number of hours the Glue crawler ran for.
+
+  aws_glue_job.my_job:
+    monthly_hours: 60 # Monthly number of hours the Glue job ran for.
+
   aws_instance.my_instance:
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
     reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.

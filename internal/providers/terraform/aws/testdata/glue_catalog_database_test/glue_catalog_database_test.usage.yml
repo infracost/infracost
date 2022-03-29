@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  aws_glue_catalog_database.with_usage:
+    monthly_objects: 200000
+    monthly_requests: 300000000
+  aws_glue_catalog_database.with_usage_below:
+    monthly_objects: 50000
+    monthly_requests: 1000
