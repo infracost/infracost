@@ -26,6 +26,9 @@ func (r *ComputeVpnGateway) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *ComputeVpnGateway) BuildResource() *schema.Resource {
+	if r.MonthlyEgressDataTransferGB == nil {
+		r.MonthlyEgressDataTransferGB = &ComputeVPNGatewayNetworkEgressUsage{}
+	}
 	region := r.Region
 	r.MonthlyEgressDataTransferGB.Region = region
 	r.MonthlyEgressDataTransferGB.Address = "Network egress"

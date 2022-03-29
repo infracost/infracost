@@ -37,21 +37,21 @@ var StorageBucketUsageSchema = []*schema.UsageItem{
 
 func (r *StorageBucket) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
-	if r.MonthlyEgressDataTransferGB == nil {
-		r.MonthlyEgressDataTransferGB = &StorageBucketNetworkEgressUsage{}
-	}
 }
 
 func (r *StorageBucket) BuildResource() *schema.Resource {
+	if r.MonthlyEgressDataTransferGB == nil {
+		r.MonthlyEgressDataTransferGB = &StorageBucketNetworkEgressUsage{}
+	}
 	region := r.Region
 	components := []*schema.CostComponent{
-		dataStorage(r.Location, r.StorageClass, r.StorageGB),
+		dataStorageCostComponent(r.Location, r.StorageClass, r.StorageGB),
 	}
-	data := dataRetrieval(r)
+	data := dataRetrievalCostComponent(r)
 	if data != nil {
 		components = append(components, data)
 	}
-	components = append(components, operations(r.StorageClass, r.MonthlyClassAOperations, r.MonthlyClassBOperations)...)
+	components = append(components, operationsCostComponents(r.StorageClass, r.MonthlyClassAOperations, r.MonthlyClassBOperations)...)
 
 	r.MonthlyEgressDataTransferGB.Region = region
 	r.MonthlyEgressDataTransferGB.Address = "Network egress"
@@ -100,7 +100,7 @@ func getDSRegionResourceGroup(location, storageClass string) (string, string) {
 	return region, resourceGroup
 }
 
-func dataStorage(location, storageClass string, storageGB *float64) *schema.CostComponent {
+func dataStorageCostComponent(location, storageClass string, storageGB *float64) *schema.CostComponent {
 	if location == "" {
 		location = "US"
 	}
@@ -134,7 +134,7 @@ func dataStorage(location, storageClass string, storageGB *float64) *schema.Cost
 	}
 }
 
-func operations(storageClass string, monthlyClassAOperations, monthlyClassBOperations *int64) []*schema.CostComponent {
+func operationsCostComponents(storageClass string, monthlyClassAOperations, monthlyClassBOperations *int64) []*schema.CostComponent {
 	var classAQuantity *decimal.Decimal
 	if monthlyClassAOperations != nil {
 		classAQuantity = decimalPtr(decimal.NewFromInt(*monthlyClassAOperations))
@@ -194,7 +194,7 @@ func operations(storageClass string, monthlyClassAOperations, monthlyClassBOpera
 	}
 }
 
-func dataRetrieval(r *StorageBucket) *schema.CostComponent {
+func dataRetrievalCostComponent(r *StorageBucket) *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if r.MonthlyDataRetrievalGB != nil {
 		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataRetrievalGB))

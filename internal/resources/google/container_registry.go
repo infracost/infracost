@@ -31,18 +31,18 @@ var ContainerRegistryUsageSchema = []*schema.UsageItem{
 
 func (r *ContainerRegistry) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
-	if r.MonthlyEgressDataTransferGB == nil {
-		r.MonthlyEgressDataTransferGB = &ContainerRegistryNetworkEgressUsage{}
-	}
 }
 
 func (r *ContainerRegistry) BuildResource() *schema.Resource {
+	if r.MonthlyEgressDataTransferGB == nil {
+		r.MonthlyEgressDataTransferGB = &ContainerRegistryNetworkEgressUsage{}
+	}
 	region := r.Region
 	components := []*schema.CostComponent{
-		dataStorage(r.Location, r.StorageClass, r.StorageGB),
+		dataStorageCostComponent(r.Location, r.StorageClass, r.StorageGB),
 	}
 
-	components = append(components, operations(r.StorageClass, r.MonthlyClassAOperations, r.MonthlyClassBOperations)...)
+	components = append(components, operationsCostComponents(r.StorageClass, r.MonthlyClassAOperations, r.MonthlyClassBOperations)...)
 
 	r.MonthlyEgressDataTransferGB.Region = region
 	r.MonthlyEgressDataTransferGB.Address = "Network egress"

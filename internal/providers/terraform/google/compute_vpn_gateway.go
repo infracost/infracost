@@ -8,10 +8,10 @@ import (
 func getComputeVPNGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_compute_vpn_gateway",
-		RFunc: NewComputeVpnGateway,
+		RFunc: NewComputeVPNGateway,
 	}
 }
-func NewComputeVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeVPNGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &google.ComputeVpnGateway{Address: d.Address, Region: d.Get("region").String()}
 	r.PopulateUsage(u)
 	return r.BuildResource()
