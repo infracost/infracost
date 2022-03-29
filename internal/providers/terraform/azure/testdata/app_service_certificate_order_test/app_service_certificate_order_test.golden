@@ -2,7 +2,7 @@
  Name                                                 Monthly Qty  Unit   Monthly Cost 
                                                                                        
  azurerm_app_service_certificate_order.standard_cert                                   
- └─ SSL certificate (Standard)                             0.0833  years         $5.83 
+ └─ SSL certificate (standard)                             0.0833  years         $5.83 
                                                                                        
  azurerm_app_service_certificate_order.wildcard_cert                                   
  └─ SSL certificate (wildcard)                             0.0833  years        $25.00 
@@ -11,5 +11,3 @@
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
-
-Add cost estimates to your pull requests: https://infracost.io/cicd

@@ -23,6 +23,7 @@ func newLogAnalyticsWorkspace(d *schema.ResourceData, u *schema.UsageData) *sche
 	}
 
 	capacity := d.Get("reservation_capacity_in_gb_per_day").Int()
+	// Deprecated and removed in v3
 	// this attribute typo was fixed in https://github.com/hashicorp/terraform-provider-azurerm/pull/14910
 	// but we need to support the typo for backwards compatibility
 	if !d.IsEmpty("reservation_capcity_in_gb_per_day") {

@@ -18,7 +18,7 @@ EXAMPLES
       infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
 
 AVAILABLE COMMANDS
-  breakdown        Show full breakdown of costs
+  breakdown        Show breakdown of costs
   comment          Post an Infracost comment to GitHub, GitLab, Azure Repos or Bitbucket
   completion       Generate shell completion script
   configure        Display or change global configuration

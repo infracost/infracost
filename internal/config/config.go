@@ -28,6 +28,8 @@ type Project struct {
 	TerraformVars []string `json:"terraform_vars"`
 	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
 	TerraformPlanFlags string `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
+	// TerraformInitFlags are flags to pass to terraform init
+	TerraformInitFlags string `yaml:"terraform_init_flags,omitempty" ignored:"true"`
 	// TerraformBinary is an optional field used to change the path to the terraform or terragrunt binary
 	TerraformBinary string `yaml:"terraform_binary,omitempty" envconfig:"INFRACOST_TERRAFORM_BINARY"`
 	// TerraformWorkspace is an optional field used to set the Terraform workspace

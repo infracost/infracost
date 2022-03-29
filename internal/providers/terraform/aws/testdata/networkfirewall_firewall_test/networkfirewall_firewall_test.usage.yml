@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_networkfirewall_firewall.networkfirewall_firewall_with_usage:
+    monthly_data_processed_gb: 100

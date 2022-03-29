@@ -11,13 +11,12 @@ func GetAzureRMLoadBalancerRuleRegistryItem() *schema.RegistryItem {
 		RFunc: NewAzureRMLoadBalancerRule,
 		ReferenceAttributes: []string{
 			"loadbalancer_id",
-			"resource_group_name",
 		},
 	}
 }
 
 func NewAzureRMLoadBalancerRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"loadbalancer_id", "resource_group_name"})
+	region := lookupRegion(d, []string{"loadbalancer_id"})
 	region = convertRegion(region)
 
 	var costComponents []*schema.CostComponent

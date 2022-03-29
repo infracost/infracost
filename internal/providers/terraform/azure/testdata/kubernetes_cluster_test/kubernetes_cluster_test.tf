@@ -64,19 +64,16 @@ resource "azurerm_kubernetes_cluster" "paid_5nc_32gb" {
 }
 
 resource "azurerm_kubernetes_cluster" "usage_ephemeral" {
-  name                = "example-aks1"
-  location            = "eastus"
-  resource_group_name = azurerm_resource_group.example.name
-  dns_prefix          = "exampleaks1"
-  sku_tier            = "Paid"
+  name                             = "example-aks1"
+  location                         = "eastus"
+  resource_group_name              = azurerm_resource_group.example.name
+  dns_prefix                       = "exampleaks1"
+  sku_tier                         = "Paid"
+  http_application_routing_enabled = true
+
   network_profile {
     network_plugin    = "azure"
-    load_balancer_sku = "Standard"
-  }
-  addon_profile {
-    http_application_routing {
-      enabled = true
-    }
+    load_balancer_sku = "standard"
   }
   default_node_pool {
     name         = "default"

@@ -30,15 +30,6 @@ resource "azurerm_log_analytics_workspace" "capacity_gb_data_ingestion" {
   reservation_capacity_in_gb_per_day = 100
 }
 
-resource "azurerm_log_analytics_workspace" "capacity_typo_gb_data_ingestion" {
-  name                = "acctest-03"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  sku                 = "CapacityReservation"
-  # this typo is deliberate see: https://github.com/hashicorp/terraform-provider-azurerm/pull/14910 for more info
-  reservation_capcity_in_gb_per_day = 100
-}
-
 resource "azurerm_log_analytics_workspace" "capacity_gb_data_above_commitment_tiers" {
   name                = "acctest-09"
   location            = azurerm_resource_group.example.location

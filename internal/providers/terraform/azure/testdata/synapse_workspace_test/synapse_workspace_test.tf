@@ -39,6 +39,10 @@ resource "azurerm_synapse_workspace" "general" {
     tenant_id = "00000000-0000-0000-0000-000000000000"
   }
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   tags = {
     Env = "production"
   }
@@ -57,6 +61,10 @@ resource "azurerm_synapse_workspace" "vnet" {
     login     = "AzureAD Admin"
     object_id = "00000000-0000-0000-0000-000000000000"
     tenant_id = "00000000-0000-0000-0000-000000000000"
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 
   tags = {
@@ -79,6 +87,10 @@ resource "azurerm_synapse_workspace" "datapipelines" {
     tenant_id = "00000000-0000-0000-0000-000000000000"
   }
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   tags = {
     Env = "production"
   }
@@ -97,6 +109,10 @@ resource "azurerm_synapse_workspace" "dataflows" {
     login     = "AzureAD Admin"
     object_id = "00000000-0000-0000-0000-000000000000"
     tenant_id = "00000000-0000-0000-0000-000000000000"
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 
   tags = {

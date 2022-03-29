@@ -35,7 +35,6 @@ resource "azurerm_hdinsight_spark_cluster" "example" {
   }
 
   gateway {
-    enabled  = true
     username = "acctestusrgw"
     password = "TerrAform123!"
   }

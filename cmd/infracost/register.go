@@ -86,7 +86,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 
 			d := apiclient.NewDashboardAPIClient(ctx)
 
-			r, err := d.CreateAPIKey(name, email, ciInterest)
+			r, err := d.CreateAPIKey(name, email, ciInterest, ctx.ContextValues())
 			if err != nil {
 				return err
 			}
