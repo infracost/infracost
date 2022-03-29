@@ -92,8 +92,14 @@ func (d *ResourceData) IsEmpty(key string) bool {
 	return g.Type == gjson.Null || len(g.Raw) == 0 || g.Raw == "\"\"" || emptyObjectOrArray(g)
 }
 
-func (d *ResourceData) References(key string) []*ResourceData {
-	return d.referencesMap[key]
+func (d *ResourceData) References(keys ...string) []*ResourceData {
+	var data []*ResourceData
+
+	for _, key := range keys {
+		data = append(data, d.referencesMap[key]...)
+	}
+
+	return data
 }
 
 func (d *ResourceData) AddReference(key string, reference *ResourceData, reverseRefAttrs []string) {

@@ -8,11 +8,9 @@ import (
 )
 
 type EIP struct {
-	Address               string
-	Region                string
-	CustomerOwnedIPv4Pool string
-	Instance              string
-	NetworkInterface      string
+	Address   string
+	Region    string
+	Allocated bool
 }
 
 var EIPUsageSchema = []*schema.UsageItem{}
@@ -22,8 +20,9 @@ func (r *EIP) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *EIP) BuildResource() *schema.Resource {
-
-	if r.CustomerOwnedIPv4Pool != "" || r.Instance != "" || r.NetworkInterface != "" {
+	// The EIP is free if allocated. AWS does this to encourage efficient use of Elastic IPs
+	// and discourage users from leaving unused EIPs lying around in their AWS account.
+	if r.Allocated {
 		return &schema.Resource{
 			Name:        r.Address,
 			NoPrice:     true,
