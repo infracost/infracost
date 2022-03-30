@@ -9,5 +9,7 @@
                                                                  
  OVERALL TOTAL                                         $2,788.60 
 ──────────────────────────────────
-2 cloud resources were detected:
+4 cloud resources were detected:
 ∙ 2 were estimated
+∙ 2 were free:
+  ∙ 2 x aws_api_gateway_stage

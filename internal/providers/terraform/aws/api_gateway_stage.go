@@ -16,6 +16,7 @@ func NewAPIGatewayStage(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		Address:          d.Address,
 		Region:           d.Get("region").String(),
 		CacheClusterSize: d.Get("cache_cluster_size").Float(),
+		CacheEnabled:     d.GetBoolOrDefault("cache_cluster_enabled", false),
 	}
 
 	r.PopulateUsage(u)
