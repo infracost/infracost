@@ -23,7 +23,15 @@
  ├─ Data processed (first 1PB)            Monthly cost depends on usage: $0.01 per GB    
  └─ Endpoint (Interface)                           1,460  hours                   $14.60 
                                                                                          
- OVERALL TOTAL                                                                    $95.80 
+ aws_vpc_endpoint.with_dynamic_subnet                                                    
+ ├─ Data processed (first 1PB)            Monthly cost depends on usage: $0.01 per GB    
+ └─ Endpoint (Interface)                           1,460  hours                   $14.60 
+                                                                                         
+ OVERALL TOTAL                                                                   $110.40 
 ──────────────────────────────────
-5 cloud resources were detected:
-∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+10 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 4 were free:
+  ∙ 2 x aws_subnet
+  ∙ 1 x aws_vpc
+  ∙ 1 x aws_vpc_endpoint
