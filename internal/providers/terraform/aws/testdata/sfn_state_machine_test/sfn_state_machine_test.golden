@@ -21,10 +21,10 @@
  └─ Duration (first 1K)                      Monthly cost depends on usage: $0.060012 per GB-hours      
                                                                                                         
  aws_sfn_state_machine.standard                                                                         
- └─ Transitions                                           5,000  1K transitions                   $0.25 
+ └─ Transitions                                              10  1K transitions                   $0.25 
                                                                                                         
  aws_sfn_state_machine.standardWithoutUsage                                                             
- └─ Transitions                              Monthly cost depends on usage: $0.00005 per 1K transitions 
+ └─ Transitions                              Monthly cost depends on usage: $0.025 per 1K transitions   
                                                                                                         
  OVERALL TOTAL                                                                                  $758.95 
 ──────────────────────────────────
