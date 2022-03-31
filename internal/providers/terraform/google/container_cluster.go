@@ -3,10 +3,11 @@ package google
 import (
 	"fmt"
 
-	"github.com/infracost/infracost/internal/resources/google"
-	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/resources/google"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func getContainerClusterRegistryItem() *schema.RegistryItem {
@@ -16,6 +17,14 @@ func getContainerClusterRegistryItem() *schema.RegistryItem {
 		// this is a reverse reference, it depends on the container_node_pool RegistryItem
 		// defining "cluster" as a ReferenceAttribute
 		ReferenceAttributes: []string{"google_container_node_pool.cluster"},
+		CustomRefIDFunc: func(d *schema.ResourceData) []string {
+			name := d.Get("name").String()
+			if name != "" {
+				return []string{name}
+			}
+
+			return nil
+		},
 		Notes: []string{
 			"Sustained use discounts are applied to monthly costs, but not to hourly costs.",
 			"Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.",
