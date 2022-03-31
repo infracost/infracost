@@ -87,7 +87,7 @@ func (r *SFnStateMachine) transistionsCostComponent(quantity *decimal.Decimal) *
 	return &schema.CostComponent{
 		Name:            "Transitions",
 		Unit:            "1K transitions",
-		UnitMultiplier:  decimal.NewFromInt(2),
+		UnitMultiplier:  decimal.NewFromInt(1000),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
