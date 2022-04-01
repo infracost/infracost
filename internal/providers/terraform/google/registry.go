@@ -13,7 +13,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getComputeForwardingRuleRegistryItem(),
 	GetComputeGlobalAddressRegistryItem(),
 	GetComputeGlobalForwardingRuleRegistryItem(),
-	GetComputeHAVPNGatewayRegistryItem(),
+	getComputeHAVPNGatewayRegistryItem(),
 	getComputeImageRegistryItem(),
 	getComputeInstanceGroupManagerRegistryItem(),
 	getComputeInstanceRegistryItem(),
