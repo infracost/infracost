@@ -85,6 +85,17 @@ func (r *RunContext) ContextValues() map[string]interface{} {
 	return r.contextVals
 }
 
+func (r *RunContext) GetResourceWarnings() map[string]map[string]int {
+	if warnings := r.contextVals["resourceWarnings"]; warnings != nil {
+		return warnings.(map[string]map[string]int)
+	}
+	return nil
+}
+
+func (r *RunContext) SetResourceWarnings(resourceWarnings map[string]map[string]int) {
+	r.contextVals["resourceWarnings"] = resourceWarnings
+}
+
 func (r *RunContext) EventEnv() map[string]interface{} {
 	return r.EventEnvWithProjectContexts([]*ProjectContext{})
 }

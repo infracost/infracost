@@ -766,6 +766,10 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 
 	}
 
+	if warnings := runCtx.GetResourceWarnings(); warnings != nil {
+		env["resourceWarnings"] = warnings
+	}
+
 	if n := r.ExampleProjectName(); n != "" {
 		env["exampleProjectName"] = n
 	}
