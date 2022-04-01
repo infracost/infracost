@@ -6,7 +6,7 @@ import (
 	"github.com/infracost/infracost/internal/usage"
 )
 
-type ComputeVpnGateway struct {
+type ComputeVPNGateway struct {
 	Address string
 	Region  string
 
@@ -21,11 +21,11 @@ var ComputeVPNGatewayUsageSchema = []*schema.UsageItem{
 	},
 }
 
-func (r *ComputeVpnGateway) PopulateUsage(u *schema.UsageData) {
+func (r *ComputeVPNGateway) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *ComputeVpnGateway) BuildResource() *schema.Resource {
+func (r *ComputeVPNGateway) BuildResource() *schema.Resource {
 	if r.MonthlyEgressDataTransferGB == nil {
 		r.MonthlyEgressDataTransferGB = &ComputeVPNGatewayNetworkEgressUsage{}
 	}

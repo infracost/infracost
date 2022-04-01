@@ -12,7 +12,7 @@ func getComputeHAVPNGatewayRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewComputeHAVPNGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &google.ComputeVpnGateway{Address: d.Address, Region: d.Get("region").String()}
+	r := &google.ComputeVPNGateway{Address: d.Address, Region: d.Get("region").String()}
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }
