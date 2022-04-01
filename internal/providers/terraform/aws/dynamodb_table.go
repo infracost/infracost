@@ -44,7 +44,7 @@ func NewDynamoDBTableResource(d *schema.ResourceData, u *schema.UsageData) *sche
 		Address:              d.Address,
 		Region:               d.Get("region").String(),
 		Name:                 d.Get("name").String(),
-		BillingMode:          d.Get("billing_mode").String(),
+		BillingMode:          d.GetStringOrDefault("billing_mode", "PROVISIONED"),
 		WriteCapacity:        intPtr(d.Get("write_capacity").Int()),
 		ReadCapacity:         intPtr(d.Get("read_capacity").Int()),
 		ReplicaRegions:       replicaRegions,

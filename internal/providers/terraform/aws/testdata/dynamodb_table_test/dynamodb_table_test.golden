@@ -1,60 +1,73 @@
 
- Name                                                          Monthly Qty  Unit                  Monthly Cost 
-                                                                                                               
- aws_dynamodb_table.autoscale_dynamodb_table                                                                   
- ├─ Write capacity unit (WCU, autoscaling)                               6  WCU                          $2.85 
- ├─ Read capacity unit (RCU, autoscaling)                                5  RCU                          $0.47 
- ├─ Data storage                                          Monthly cost depends on usage: $0.25 per GB          
- ├─ Point-In-Time Recovery (PITR) backup storage          Monthly cost depends on usage: $0.20 per GB          
- ├─ On-demand backup storage                              Monthly cost depends on usage: $0.10 per GB          
- ├─ Table data restored                                   Monthly cost depends on usage: $0.15 per GB          
- └─ Streams read request unit (sRRU)                      Monthly cost depends on usage: $0.0000002 per sRRUs  
-                                                                                                               
- aws_dynamodb_table.autoscale_dynamodb_table_literal_ref                                                       
- ├─ Write capacity unit (WCU)                                           20  WCU                          $9.49 
- ├─ Read capacity unit (RCU, autoscaling)                               56  RCU                          $5.31 
- ├─ Data storage                                          Monthly cost depends on usage: $0.25 per GB          
- ├─ Point-In-Time Recovery (PITR) backup storage          Monthly cost depends on usage: $0.20 per GB          
- ├─ On-demand backup storage                              Monthly cost depends on usage: $0.10 per GB          
- ├─ Table data restored                                   Monthly cost depends on usage: $0.15 per GB          
- └─ Streams read request unit (sRRU)                      Monthly cost depends on usage: $0.0000002 per sRRUs  
-                                                                                                               
- aws_dynamodb_table.autoscale_dynamodb_table_usage                                                             
- ├─ Write capacity unit (WCU, autoscaling)                              77  WCU                         $36.54 
- ├─ Read capacity unit (RCU, autoscaling)                               76  RCU                          $7.21 
- ├─ Data storage                                          Monthly cost depends on usage: $0.25 per GB          
- ├─ Point-In-Time Recovery (PITR) backup storage          Monthly cost depends on usage: $0.20 per GB          
- ├─ On-demand backup storage                              Monthly cost depends on usage: $0.10 per GB          
- ├─ Table data restored                                   Monthly cost depends on usage: $0.15 per GB          
- └─ Streams read request unit (sRRU)                      Monthly cost depends on usage: $0.0000002 per sRRUs  
-                                                                                                               
- aws_dynamodb_table.my_dynamodb_table                                                                          
- ├─ Write capacity unit (WCU)                                           20  WCU                          $9.49 
- ├─ Read capacity unit (RCU)                                            30  RCU                          $2.85 
- ├─ Data storage                                          Monthly cost depends on usage: $0.25 per GB          
- ├─ Point-In-Time Recovery (PITR) backup storage          Monthly cost depends on usage: $0.20 per GB          
- ├─ On-demand backup storage                              Monthly cost depends on usage: $0.10 per GB          
- ├─ Table data restored                                   Monthly cost depends on usage: $0.15 per GB          
- ├─ Streams read request unit (sRRU)                      Monthly cost depends on usage: $0.0000002 per sRRUs  
- ├─ Global table (us-east-2)                                                                                   
- │  └─ Replicated write capacity unit (rWCU)                            20  rWCU                        $14.24 
- └─ Global table (us-west-1)                                                                                   
-    └─ Replicated write capacity unit (rWCU)                            20  rWCU                        $15.88 
-                                                                                                               
- aws_dynamodb_table.my_dynamodb_table_usage                                                                    
- ├─ Write request unit (WRU)                                     3,000,000  WRUs                         $3.75 
- ├─ Read request unit (RRU)                                      8,000,000  RRUs                         $2.00 
- ├─ Data storage                                                       230  GB                          $57.50 
- ├─ Point-In-Time Recovery (PITR) backup storage                     2,300  GB                         $460.00 
- ├─ On-demand backup storage                                           460  GB                          $46.00 
- ├─ Table data restored                                                230  GB                          $34.50 
- ├─ Streams read request unit (sRRU)                             2,000,000  sRRUs                        $0.40 
- ├─ Global table (us-east-2)                                                                                   
- │  └─ Replicated write request unit (rWRU)                     4,109.5890  rWRU                         $5.63 
- └─ Global table (us-west-1)                                                                                   
-    └─ Replicated write request unit (rWRU)                     4,109.5890  rWRU                         $6.27 
-                                                                                                               
- OVERALL TOTAL                                                                                         $720.37 
+ Name                                                            Monthly Qty  Unit                  Monthly Cost 
+                                                                                                                 
+ aws_dynamodb_table.autoscale_dynamodb_table                                                                     
+ ├─ Write capacity unit (WCU, autoscaling)                                 6  WCU                          $2.85 
+ ├─ Read capacity unit (RCU, autoscaling)                                  5  RCU                          $0.47 
+ ├─ Data storage                                            Monthly cost depends on usage: $0.25 per GB          
+ ├─ Point-In-Time Recovery (PITR) backup storage            Monthly cost depends on usage: $0.20 per GB          
+ ├─ On-demand backup storage                                Monthly cost depends on usage: $0.10 per GB          
+ ├─ Table data restored                                     Monthly cost depends on usage: $0.15 per GB          
+ └─ Streams read request unit (sRRU)                        Monthly cost depends on usage: $0.0000002 per sRRUs  
+                                                                                                                 
+ aws_dynamodb_table.autoscale_dynamodb_table_literal_ref                                                         
+ ├─ Write capacity unit (WCU)                                             20  WCU                          $9.49 
+ ├─ Read capacity unit (RCU, autoscaling)                                 56  RCU                          $5.31 
+ ├─ Data storage                                            Monthly cost depends on usage: $0.25 per GB          
+ ├─ Point-In-Time Recovery (PITR) backup storage            Monthly cost depends on usage: $0.20 per GB          
+ ├─ On-demand backup storage                                Monthly cost depends on usage: $0.10 per GB          
+ ├─ Table data restored                                     Monthly cost depends on usage: $0.15 per GB          
+ └─ Streams read request unit (sRRU)                        Monthly cost depends on usage: $0.0000002 per sRRUs  
+                                                                                                                 
+ aws_dynamodb_table.autoscale_dynamodb_table_usage                                                               
+ ├─ Write capacity unit (WCU, autoscaling)                                77  WCU                         $36.54 
+ ├─ Read capacity unit (RCU, autoscaling)                                 76  RCU                          $7.21 
+ ├─ Data storage                                            Monthly cost depends on usage: $0.25 per GB          
+ ├─ Point-In-Time Recovery (PITR) backup storage            Monthly cost depends on usage: $0.20 per GB          
+ ├─ On-demand backup storage                                Monthly cost depends on usage: $0.10 per GB          
+ ├─ Table data restored                                     Monthly cost depends on usage: $0.15 per GB          
+ └─ Streams read request unit (sRRU)                        Monthly cost depends on usage: $0.0000002 per sRRUs  
+                                                                                                                 
+ aws_dynamodb_table.my_dynamodb_table                                                                            
+ ├─ Write capacity unit (WCU)                                             20  WCU                          $9.49 
+ ├─ Read capacity unit (RCU)                                              30  RCU                          $2.85 
+ ├─ Data storage                                            Monthly cost depends on usage: $0.25 per GB          
+ ├─ Point-In-Time Recovery (PITR) backup storage            Monthly cost depends on usage: $0.20 per GB          
+ ├─ On-demand backup storage                                Monthly cost depends on usage: $0.10 per GB          
+ ├─ Table data restored                                     Monthly cost depends on usage: $0.15 per GB          
+ ├─ Streams read request unit (sRRU)                        Monthly cost depends on usage: $0.0000002 per sRRUs  
+ ├─ Global table (us-east-2)                                                                                     
+ │  └─ Replicated write capacity unit (rWCU)                              20  rWCU                        $14.24 
+ └─ Global table (us-west-1)                                                                                     
+    └─ Replicated write capacity unit (rWCU)                              20  rWCU                        $15.88 
+                                                                                                                 
+ aws_dynamodb_table.my_dynamodb_table_usage                                                                      
+ ├─ Write request unit (WRU)                                       3,000,000  WRUs                         $3.75 
+ ├─ Read request unit (RRU)                                        8,000,000  RRUs                         $2.00 
+ ├─ Data storage                                                         230  GB                          $57.50 
+ ├─ Point-In-Time Recovery (PITR) backup storage                       2,300  GB                         $460.00 
+ ├─ On-demand backup storage                                             460  GB                          $46.00 
+ ├─ Table data restored                                                  230  GB                          $34.50 
+ ├─ Streams read request unit (sRRU)                               2,000,000  sRRUs                        $0.40 
+ ├─ Global table (us-east-2)                                                                                     
+ │  └─ Replicated write request unit (rWRU)                       4,109.5890  rWRU                         $5.63 
+ └─ Global table (us-west-1)                                                                                     
+    └─ Replicated write request unit (rWRU)                       4,109.5890  rWRU                         $6.27 
+                                                                                                                 
+ aws_dynamodb_table.my_dynamodb_table_with_no_billing_mode                                                       
+ ├─ Write capacity unit (WCU)                                             20  WCU                          $9.49 
+ ├─ Read capacity unit (RCU)                                              30  RCU                          $2.85 
+ ├─ Data storage                                            Monthly cost depends on usage: $0.25 per GB          
+ ├─ Point-In-Time Recovery (PITR) backup storage            Monthly cost depends on usage: $0.20 per GB          
+ ├─ On-demand backup storage                                Monthly cost depends on usage: $0.10 per GB          
+ ├─ Table data restored                                     Monthly cost depends on usage: $0.15 per GB          
+ ├─ Streams read request unit (sRRU)                        Monthly cost depends on usage: $0.0000002 per sRRUs  
+ ├─ Global table (us-east-2)                                                                                     
+ │  └─ Replicated write capacity unit (rWCU)                              20  rWCU                        $14.24 
+ └─ Global table (us-west-1)                                                                                     
+    └─ Replicated write capacity unit (rWCU)                              20  rWCU                        $15.88 
+                                                                                                                 
+ OVERALL TOTAL                                                                                           $762.82 
 ──────────────────────────────────
-10 cloud resources were detected:
-∙ 10 were estimated, 5 of which include usage-based costs, see https://infracost.io/usage-file
+11 cloud resources were detected:
+∙ 11 were estimated, 6 of which include usage-based costs, see https://infracost.io/usage-file
