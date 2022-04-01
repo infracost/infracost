@@ -13,7 +13,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getComputeForwardingRuleRegistryItem(),
 	GetComputeGlobalAddressRegistryItem(),
 	GetComputeGlobalForwardingRuleRegistryItem(),
-	GetComputeHAVPNGatewayRegistryItem(),
+	getComputeHAVPNGatewayRegistryItem(),
 	getComputeImageRegistryItem(),
 	getComputeInstanceGroupManagerRegistryItem(),
 	getComputeInstanceRegistryItem(),
@@ -28,11 +28,11 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getComputeTargetHTTPSProxyRegistryItem(),
 	getComputeTargetSSLProxyRegistryItem(),
 	getComputeTargetTCPProxyRegistryItem(),
-	GetComputeVPNGatewayRegistryItem(),
+	getComputeVPNGatewayRegistryItem(),
 	getComputeVPNTunnelRegistryItem(),
 	getContainerClusterRegistryItem(),
 	getContainerNodePoolRegistryItem(),
-	GetContainerRegistryItem(),
+	getContainerRegistryItem(),
 	getDNSManagedZoneRegistryItem(),
 	getDNSRecordSetRegistryItem(),
 	getKMSCryptoKeyRegistryItem(),
@@ -52,7 +52,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSecretManagerSecretVersionRegistryItem(),
 	getServiceNetworkingConnectionRegistryItem(),
 	GetSQLInstanceRegistryItem(),
-	GetStorageBucketRegistryItem(),
+	getStorageBucketRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
