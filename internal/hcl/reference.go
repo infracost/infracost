@@ -58,6 +58,10 @@ func newReference(parts []string) (*Reference, error) {
 }
 
 func (r *Reference) SetKey(key cty.Value) {
+	if !key.IsKnown() {
+		return
+	}
+
 	switch key.Type() {
 	case cty.Number:
 		f := key.AsBigFloat()

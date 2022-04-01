@@ -244,6 +244,9 @@ resource_usage:
   aws_neptune_cluster_snapshot.my_cluster_snapshot:
     backup_storage_gb: 1000        # Total storage used for backup snapshots in GB.
 
+  aws_networkfirewall_firewall.my_firewall:
+    monthly_data_processed_gb: 100 # Monthly data processed by the Network Firewall in GB.
+
   aws_mq_broker.my_aws_mq_broker:
     storage_size_gb: 12 # Data storage per instance in GB.
 
@@ -684,6 +687,16 @@ resource_usage:
   google_secret_manager_secret_version.my_secret_version:
     monthly_access_operations: 25000 # Monthly number of access operations
 
+  google_service_networking_connection.my_connection:
+    monthly_egress_data_transfer_gb: # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 250                # VMs in the same Google Cloud region.
+      us_or_canada: 100               # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 70                      # Between Google Cloud regions within Europe.
+      asia: 50                        # Between Google Cloud regions within Asia.
+      south_america: 100              # Between Google Cloud regions within South America.
+      oceania: 50                     # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 200                  # to a Google Cloud region on another continent.
+
   google_sql_database_instance.my_instance:
     backup_storage_gb: 1000 # Amount of backup storage in GB.
 
@@ -988,6 +1001,10 @@ resource_usage:
     monthly_vcore_hours: 600             # Monthly number of used vCore-hours for serverless compute.
     long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
     extra_data_storage_gb: 250           # Override number of GBs used by extra data storage.
+  
+  azurerm_sql_managed_instance.my_database:
+    backup_storage_gb: 100            # Backup storage size dedicated for Point In Time Restoration
+    long_term_retention_storage_gb: 5 # Number of GBs used by long-term retention backup storage.
 
   azurerm_synapse_spark_pool.my_spark_pool:
     monthly_hours: 730 # Monthly number of hours used by each instance in the pool.

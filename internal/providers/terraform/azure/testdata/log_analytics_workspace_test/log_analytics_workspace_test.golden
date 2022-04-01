@@ -12,10 +12,6 @@
  azurerm_log_analytics_workspace.capacity_gb_data_ingestion_without_specification                                                  
  └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB     
                                                                                                                                    
- azurerm_log_analytics_workspace.capacity_typo_gb_data_ingestion                                                                   
- ├─ Log data ingestion                                                                        30  100 GB (per day)       $7,585.20 
- └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB     
-                                                                                                                                   
  azurerm_log_analytics_workspace.log_data_export                                                                                   
  ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB     
  └─ Log data export                                                                           40  GB                         $5.20 
@@ -38,17 +34,15 @@
  ├─ Log data ingestion                                                                        20  GB                        $59.80 
  └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB     
                                                                                                                                    
- OVERALL TOTAL                                                                                                          $81,029.30 
+ OVERALL TOTAL                                                                                                          $73,444.10 
 ──────────────────────────────────
-15 cloud resources were detected:
-∙ 9 were estimated, 9 include usage-based costs, see https://infracost.io/usage-file
-∙ 4 weren't estimated, report them in https://github.com/infracost/infracost:
-  ∙ 4 x azurerm_log_analytics_workspace
+14 cloud resources were detected:
+∙ 8 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 1 x azurerm_log_analytics_workspace
   ∙ 1 x azurerm_resource_group
-
-Add cost estimates to your pull requests: https://infracost.io/cicd
+∙ 4 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 4 x azurerm_log_analytics_workspace
 Logs:
 
 level=warning msg="skipping azurerm_log_analytics_workspace.unsupported_legacy_workspace[\"PerNode\"] as it uses legacy pricing options"

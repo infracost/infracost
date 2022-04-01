@@ -90,6 +90,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMRedisCacheRegistryItem(),
 	getAzureRMStorageAccountRegistryItem(),
 	getAzureRMSQLDatabaseRegistryItem(),
+	getAzureRMSQLManagedInstanceRegistryItem(),
 	GetAzureRMSynapseSparkPoolRegistryItem(),
 	GetAzureRMSynapseSQLPoolRegistryItem(),
 	GetAzureRMSynapseWorkspacRegistryItem(),
@@ -316,9 +317,10 @@ var FreeResources = []string{
 	"azurerm_mssql_firewall_rule",
 
 	// Azure Storage
-	"azurerm_storage_table_entity",
-	"azurerm_storage_management_policy",
 	"azurerm_storage_blob_inventory_policy",
+	"azurerm_storage_container",
+	"azurerm_storage_management_policy",
+	"azurerm_storage_table_entity",
 
 	// Azure Virtual Desktop
 	"azurerm_virtual_desktop_application",

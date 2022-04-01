@@ -24,6 +24,4 @@
  OVERALL TOTAL                                                            $96.13 
 ──────────────────────────────────
 5 cloud resources were detected:
-∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
-
-Add cost estimates to your pull requests: https://infracost.io/cicd
+∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

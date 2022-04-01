@@ -217,13 +217,11 @@
  OVERALL TOTAL                                                                                 $2,121,847.27 
 ──────────────────────────────────
 33 cloud resources were detected:
-∙ 26 were estimated, 26 include usage-based costs, see https://infracost.io/usage-file
-∙ 6 weren't estimated, report them in https://github.com/infracost/infracost:
-  ∙ 6 x azurerm_storage_account
+∙ 26 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
-
-Add cost estimates to your pull requests: https://infracost.io/cicd
+∙ 6 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 6 x azurerm_storage_account
 Logs:
 
 level=warning msg="Skipping resource azurerm_storage_account.bb_Premium_unsupported_access_tier. BlockBlobStorage Premium doesn't support RA-GZRS redundancy"

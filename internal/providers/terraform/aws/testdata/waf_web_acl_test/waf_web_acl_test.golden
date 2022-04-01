@@ -22,9 +22,7 @@
  OVERALL TOTAL                                                               $38.20 
 ──────────────────────────────────
 5 cloud resources were detected:
-∙ 3 were estimated, 3 include usage-based costs, see https://infracost.io/usage-file
+∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 1 x aws_waf_ipset
   ∙ 1 x aws_waf_rule
-
-Add cost estimates to your pull requests: https://infracost.io/cicd

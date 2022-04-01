@@ -15,5 +15,5 @@ resource "azurerm_app_service_certificate_order" "wildcard_cert" {
   resource_group_name = "fake"
   location            = "global"
   distinguished_name  = "CN=example.com"
-  product_type        = "wildcard"
+  product_type        = "WildCard"
 }

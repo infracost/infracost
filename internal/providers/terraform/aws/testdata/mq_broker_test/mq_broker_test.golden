@@ -24,9 +24,7 @@
  OVERALL TOTAL                                                                                         $2,149.20 
 ──────────────────────────────────
 8 cloud resources were detected:
-∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
+∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 3 were free:
   ∙ 2 x aws_mq_configuration
   ∙ 1 x aws_security_group
-
-Add cost estimates to your pull requests: https://infracost.io/cicd

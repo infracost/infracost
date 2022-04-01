@@ -1,0 +1,11 @@
+version: 0.1
+resource_usage:
+  google_service_networking_connection.my_usage_connection:
+    monthly_egress_data_transfer_gb:
+      same_region: 250
+      us_or_canada: 100
+      europe: 70
+      asia: 50
+      south_america: 100
+      oceania: 50
+      worldwide: 200

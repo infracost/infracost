@@ -48,6 +48,8 @@ resource "azurerm_firewall" "standard" {
   name                = "testfirewall"
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
+  sku_name            = "AZFW_Hub"
+  sku_tier            = "Standard"
 
   ip_configuration {
     name                 = "configuration"
@@ -60,6 +62,7 @@ resource "azurerm_firewall" "premium" {
   name                = "testfirewall"
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
+  sku_name            = "AZFW_Hub"
   sku_tier            = "Premium"
 
   ip_configuration {
@@ -73,6 +76,7 @@ resource "azurerm_firewall" "premium_virtual_hub" {
   name                = "testfirewall"
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
+  sku_name            = "AZFW_Hub"
   sku_tier            = "Premium"
 
   virtual_hub {
@@ -90,6 +94,7 @@ resource "azurerm_firewall" "standard_virtual_hub" {
   name                = "testfirewall"
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
+  sku_name            = "AZFW_Hub"
   sku_tier            = "Standard"
 
   virtual_hub {
@@ -107,6 +112,8 @@ resource "azurerm_firewall" "non_usage" {
   name                = "testfirewall"
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
+  sku_name            = "AZFW_Hub"
+  sku_tier            = "Standard"
 
   ip_configuration {
     name                 = "configuration"

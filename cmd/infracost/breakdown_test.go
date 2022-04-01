@@ -212,3 +212,21 @@ func TestBreakdownTerraform_v0_14(t *testing.T) {
 func TestBreakdownTerraformUseState_v0_14(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/terraform_v0.14_state.json", "--terraform-use-state"}, nil)
 }
+
+func TestBreakdownInitFlagsError(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+			"--terraform-init-flags",
+			"-plugin-dir=does/not/exist",
+		},
+		nil,
+		func(ctx *config.RunContext) {
+			ctx.Config.DisableHCLParsing = true
+		},
+	)
+}

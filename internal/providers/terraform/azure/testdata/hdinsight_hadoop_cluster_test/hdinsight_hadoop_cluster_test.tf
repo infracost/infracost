@@ -35,7 +35,6 @@ resource "azurerm_hdinsight_hadoop_cluster" "with_edge" {
   }
 
   gateway {
-    enabled  = true
     username = "acctestusrgw"
     password = "TerrAform123!"
   }
@@ -89,7 +88,6 @@ resource "azurerm_hdinsight_hadoop_cluster" "without_edge" {
   }
 
   gateway {
-    enabled  = true
     username = "acctestusrgw"
     password = "TerrAform123!"
   }

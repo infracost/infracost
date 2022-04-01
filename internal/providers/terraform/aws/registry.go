@@ -96,6 +96,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getStepFunctionRegistryItem(),
 	getDirectoryServiceDirectory(),
 	getTransferServerRegistryItem(),
+	getNetworkfirewallFirewallRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -206,6 +207,7 @@ var FreeResources = []string{
 	"aws_elastic_beanstalk_application",
 
 	// AWS Elastic Container Service
+	"aws_ecs_account_setting_default",
 	"aws_ecs_capacity_provider",
 
 	// AWS Elastic File System
@@ -292,8 +294,14 @@ var FreeResources = []string{
 	"aws_neptune_parameter_group",
 	"aws_neptune_subnet_group",
 
+	// AWS Network Firewall
+	"aws_networkfirewall_rule_group",
+	"aws_networkfirewall_firewall_policy",
+	"aws_networkfirewall_logging_configuration",
+
 	// AWS Others
 	"aws_db_instance_role_association",
+	"aws_db_option_group",
 	"aws_db_parameter_group",
 	"aws_db_subnet_group",
 	"aws_dms_replication_subnet_group",
@@ -352,6 +360,10 @@ var FreeResources = []string{
 
 	// AWS Service Discovery Service
 	"aws_service_discovery_service",
+
+	// AWS SES
+	"aws_ses_domain_dkim",
+	"aws_ses_domain_identity",
 
 	// AWS SNS
 	"aws_sns_platform_application",

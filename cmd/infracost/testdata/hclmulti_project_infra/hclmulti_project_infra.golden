@@ -111,11 +111,9 @@ Project: infracost/infracost/cmd/infracost/testdata/hclmulti_project_infra/prod
 
  OVERALL TOTAL                                                                                             $271.53 
 ──────────────────────────────────
-46 cloud resources were detected, rerun with --show-skipped to see details:
-∙ 16 were estimated, 14 include usage-based costs, see https://infracost.io/usage-file
-∙ 30 were free
-
-Add cost estimates to your pull requests: https://infracost.io/cicd
+46 cloud resources were detected:
+∙ 16 were estimated, 14 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 30 were free, rerun with --show-skipped to see details
 
 Err:
 

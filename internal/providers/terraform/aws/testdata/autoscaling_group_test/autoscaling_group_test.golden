@@ -161,14 +161,12 @@
  OVERALL TOTAL                                                                           $3,409.04 
 ──────────────────────────────────
 48 cloud resources were detected:
-∙ 25 were estimated, 25 include usage-based costs, see https://infracost.io/usage-file
-∙ 2 weren't estimated, report them in https://github.com/infracost/infracost:
-  ∙ 2 x aws_autoscaling_group
+∙ 25 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 21 were free:
   ∙ 12 x aws_launch_template
   ∙ 9 x aws_launch_configuration
-
-Add cost estimates to your pull requests: https://infracost.io/cicd
+∙ 2 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 2 x aws_autoscaling_group
 Logs:
 
 level=warning msg="Skipping resource aws_launch_configuration.lc_tenancy_host. Infracost currently does not support host tenancy for AWS Launch Configurations"
