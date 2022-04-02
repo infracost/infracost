@@ -76,10 +76,12 @@ type LogAnalyticsWorkspace struct {
 
 	ReservationCapacityInGBPerDay int64
 	RetentionInDays               int64
+	SentinelEnabled               bool
 
 	MonthlyLogDataIngestionGB           *float64 `infracost_usage:"monthly_log_data_ingestion_gb"`
 	MonthlyAdditionalLogDataRetentionGB *float64 `infracost_usage:"monthly_additional_log_data_retention_gb"`
 	MonthlyLogDataExportGB              *float64 `infracost_usage:"monthly_log_data_export_gb"`
+	MonthlySentinelDataIngestionGB      *float64 `infracost_usage:"monthly_sentinel_data_ingestion_gb"`
 }
 
 // LogAnalyticsWorkspaceUsageSchema defines a list which represents the usage schema of LogAnalyticsWorkspace.
@@ -96,6 +98,11 @@ var LogAnalyticsWorkspaceUsageSchema = []*schema.UsageItem{
 	},
 	{
 		Key:          "monthly_log_data_export_gb",
+		DefaultValue: 0,
+		ValueType:    schema.Float64,
+	},
+	{
+		Key:          "monthly_sentinel_data_ingestion_gb",
 		DefaultValue: 0,
 		ValueType:    schema.Float64,
 	},
@@ -116,6 +123,7 @@ func (r *LogAnalyticsWorkspace) PopulateUsage(u *schema.UsageData) {
 //		2. Log retention, which is free up to 31 days. Data retained beyond these no-charge periods
 //		   will be charged for each GB of data retained for a month (pro-rated daily).
 //		3. Data export, which is billed per monthly GB exported and is defined from a usage param.
+//		4. Sentinel data ingestion
 //
 // Outside the above rules - if the workspace has sku of Free we return as a free resource & if the workspace sku
 // is in a list of unsupported skus then we mark as skipped with a warning.
@@ -143,10 +151,18 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 
 	if r.SKU == skuPerGB2018 {
 		costComponents = append(costComponents, r.logDataIngestion())
+
+		if r.SentinelEnabled {
+			costComponents = append(costComponents, r.sentinelDataIngestion())
+		}
 	}
 
 	if r.SKU == skuCapacityReservation && r.ReservationCapacityInGBPerDay > 0 {
 		costComponents = append(costComponents, r.logDataIngestionFromCapacityReservation())
+
+		if r.SentinelEnabled {
+			costComponents = append(costComponents, r.sentinelDataIngestionFromCapacityReservation())
+		}
 	}
 
 	if r.RetentionInDays > logRetentionFreeTierLimit {
@@ -278,5 +294,74 @@ func (r *LogAnalyticsWorkspace) logDataExport() *schema.CostComponent {
 			},
 		},
 		PriceFilter: priceFilterConsumption,
+	}
+}
+
+func (r *LogAnalyticsWorkspace) sentinelDataIngestionFromCapacityReservation() *schema.CostComponent {
+	selectedTier := r.ReservationCapacityInGBPerDay
+
+	// if the user has set a reservation capacity tier that doesn't exist (or is a legacy tier) we need
+	// to convert this to a valid billable tier.
+	if _, ok := validCommitmentTiers[r.ReservationCapacityInGBPerDay]; !ok {
+		for i, tier := range commitmentTiers {
+			// if the current tier is the final valid commitment tier then
+			// set selectedTier as it can't be any other tier.
+			if len(commitmentTiers)-1 == i {
+				selectedTier = tier
+				break
+			}
+
+			// if the selectedTier is between two valid tiers, set it as the lower of the two tiers.
+			if selectedTier > tier && selectedTier < commitmentTiers[i+1] {
+				selectedTier = tier
+				break
+			}
+		}
+	}
+
+	return &schema.CostComponent{
+		Name:            "Sentinel data ingestion",
+		Unit:            fmt.Sprintf("%d GB (per day)", selectedTier),
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(30)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr(vendorName),
+			Region:        strPtr(r.Region),
+			Service:       strPtr(azureMonitorServiceName),
+			ProductFamily: strPtr(governanceProductFamily),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d GB Commitment Tier", selectedTier))},
+				{Key: "meterName", Value: strPtr(fmt.Sprintf("%d GB Commitment Tier", selectedTier))},
+			},
+		},
+		PriceFilter: priceFilterConsumption,
+	}
+}
+
+func (r *LogAnalyticsWorkspace) sentinelDataIngestion() *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if r.MonthlySentinelDataIngestionGB != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlySentinelDataIngestionGB))
+	}
+
+	return &schema.CostComponent{
+		Name:            "Sentinel data ingestion",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr(vendorName),
+			Region:        strPtr(r.Region),
+			Service:       strPtr(logAnalyticsServiceName),
+			ProductFamily: strPtr(governanceProductFamily),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr(skuFilterPAYG)},
+				{Key: "meterName", Value: strPtr("Data Ingestion")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption:   strPtr("Consumption"),
+			StartUsageAmount: strPtr("5"),
+		},
 	}
 }

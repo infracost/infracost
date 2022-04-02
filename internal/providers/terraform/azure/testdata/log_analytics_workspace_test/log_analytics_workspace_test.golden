@@ -34,10 +34,14 @@
  ├─ Log data ingestion                                                                        20  GB                        $59.80 
  └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB     
                                                                                                                                    
+ azurerm_log_analytics_workspace.sentinel_data_ingestion                                                                           
+ ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB     
+ └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB     
+                                                                                                                                   
  OVERALL TOTAL                                                                                                          $73,444.10 
 ──────────────────────────────────
-14 cloud resources were detected:
-∙ 8 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+15 cloud resources were detected:
+∙ 9 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 1 x azurerm_log_analytics_workspace
   ∙ 1 x azurerm_resource_group

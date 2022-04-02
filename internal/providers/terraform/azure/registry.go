@@ -109,6 +109,14 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getDataFactoryIntegrationRuntimeManagedRegistryItem(),
 	getDataFactoryIntegrationRuntimeSelfHostedRegistryItem(),
 	getMySQLFlexibleServerRegistryItem(),
+	getSentinelDataConnectorAwsCloudTrailRegistryItem(),
+	getSentinelDataConnectorAzureActiveDirectoryRegistryItem(),
+	getSentinelDataConnectorAzureAdvancedThreatProtectionRegistryItem(),
+	getSentinelDataConnectorAzureSecurityCenterRegistryItem(),
+	getSentinelDataConnectorMicrosoftCloudAppSecurityRegistryItem(),
+	getSentinelDataConnectorMicrosoftDefenderAdvancedThreatProtectionRegistryItem(),
+	getSentinelSentinelDataConnectorOffice365RegistryItem(),
+	getSentinelSentinelDataConnectorThreatIntelligenceRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
