@@ -7,7 +7,10 @@ import (
 
 func getLBRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_lb",
+		Name: "aws_lb",
+		ReferenceAttributes: []string{
+			"subnet_mapping.#.allocation_id",
+		},
 		RFunc: NewLB,
 	}
 }

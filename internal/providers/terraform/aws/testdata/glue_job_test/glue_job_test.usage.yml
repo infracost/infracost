@@ -1,0 +1,10 @@
+version: 0.1
+resource_usage:
+  aws_glue_job.workers_default:
+    monthly_hours: 60
+  aws_glue_job.workers_g1x:
+    monthly_hours: 60
+  aws_glue_job.workers_g2x:
+    monthly_hours: 60
+  aws_glue_job.cap_10:
+    monthly_hours: 60

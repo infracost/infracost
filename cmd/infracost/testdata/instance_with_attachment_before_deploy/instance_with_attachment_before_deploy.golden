@@ -12,11 +12,9 @@ Project: infracost/infracost/cmd/infracost/testdata/instance_with_attachment_bef
                                                                                       
  OVERALL TOTAL                                                                 $17.83 
 ──────────────────────────────────
-4 cloud resources were detected, rerun with --show-skipped to see details:
-∙ 2 were estimated, 2 include usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free
-
-Add cost estimates to your pull requests: https://infracost.io/cicd
+4 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were free, rerun with --show-skipped to see details
 
 Err:
 

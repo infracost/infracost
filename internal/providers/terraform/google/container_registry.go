@@ -1,29 +1,24 @@
 package google
 
 import (
+	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func GetContainerRegistryItem() *schema.RegistryItem {
+func getContainerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "google_container_registry",
 		RFunc:               NewContainerRegistry,
 		ReferenceAttributes: []string{},
 	}
 }
-
 func NewContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
-	components := []*schema.CostComponent{
-		dataStorage(d, u),
+	r := &google.ContainerRegistry{
+		Address:      d.Address,
+		Region:       d.Get("region").String(),
+		Location:     d.Get("location").String(),
+		StorageClass: d.Get("storage_class").String(),
 	}
-
-	components = append(components, operations(d, u)...)
-	return &schema.Resource{
-		Name:           d.Address,
-		CostComponents: components,
-		SubResources: []*schema.Resource{
-			networkEgress(region, u, "Network egress", "Data transfer", ContainerRegistryEgress),
-		},
-	}
+	r.PopulateUsage(u)
+	return r.BuildResource()
 }

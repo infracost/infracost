@@ -91,7 +91,5 @@ Amount:  +$1,485 ($0.00 → $1,485)
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
 
-5 cloud resources were detected, rerun with --show-skipped to see details:
-∙ 5 were estimated, 5 include usage-based costs, see https://infracost.io/usage-file
-
-Add cost estimates to your pull requests: https://infracost.io/cicd
+5 cloud resources were detected:
+∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

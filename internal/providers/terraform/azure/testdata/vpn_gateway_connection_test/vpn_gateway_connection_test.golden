@@ -11,11 +11,9 @@
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 2 were estimated
-∙ 1 wasn't estimated, report it in https://github.com/infracost/infracost:
-  ∙ 1 x azurerm_vpn_site
 ∙ 3 were free:
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_virtual_hub
   ∙ 1 x azurerm_virtual_wan
-
-Add cost estimates to your pull requests: https://infracost.io/cicd
+∙ 1 is not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x azurerm_vpn_site

@@ -20,7 +20,7 @@ var (
 	urlRegex         = regexp.MustCompile(`https://dashboard.infracost.io/share/.*`)
 	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/examples/.*\)`)
 	versionRegex     = regexp.MustCompile(`Infracost v.*`)
-	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s]*)Environment`)
+	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s\?]*)Environment`)
 )
 
 type GoldenFileOptions = struct {
@@ -49,18 +49,18 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 			hclArgs[len(args)] = "--terraform-parse-hcl"
 			hclArgs[len(args)+1] = "true"
 
-			goldenFileCommandTest(t, testName, hclArgs, testOptions, ctxOptions)
+			goldenFileCommandTest(t, testName, hclArgs, testOptions, true, ctxOptions...)
 		})
 	}
 
 	if testOptions == nil || !testOptions.OnlyRunHCL {
 		t.Run("Terraform CLI", func(t *testing.T) {
-			goldenFileCommandTest(t, testName, args, testOptions, ctxOptions)
+			goldenFileCommandTest(t, testName, args, testOptions, false, ctxOptions...)
 		})
 	}
 }
 
-func goldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions []func(ctx *config.RunContext)) {
+func goldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, hcl bool, ctxOptions ...func(ctx *config.RunContext)) {
 	t.Helper()
 
 	if testOptions == nil {
@@ -128,6 +128,15 @@ func goldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 	actual = stripDynamicValues(actual)
 
 	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
+	if hcl {
+		hclFilePath := filepath.Join("testdata", testName, testName+".hcl.golden")
+		_, err := os.Stat(hclFilePath)
+		if err == nil {
+			testutil.AssertGoldenFile(t, hclFilePath, actual)
+		}
+		return
+	}
+
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 

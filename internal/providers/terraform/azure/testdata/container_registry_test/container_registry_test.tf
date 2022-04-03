@@ -14,7 +14,10 @@ resource "azurerm_container_registry" "my_registry" {
   location                 = azurerm_resource_group.rg.location
   sku                      = "Premium"
   admin_enabled            = false
-  georeplication_locations = ["East US"]
+
+  georeplications {
+    location = "East US"
+  }
 }
 
 resource "azurerm_container_registry" "twoLocations" {
@@ -23,7 +26,14 @@ resource "azurerm_container_registry" "twoLocations" {
   location                 = azurerm_resource_group.rg.location
   sku                      = "Premium"
   admin_enabled            = false
-  georeplication_locations = ["East US", "West Europe"]
+
+  georeplications {
+    location = "East US"
+  }
+
+  georeplications {
+    location = "North Europe"
+  }
 }
 
 resource "azurerm_container_registry" "withoutLocations" {

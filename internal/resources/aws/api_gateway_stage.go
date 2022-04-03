@@ -13,6 +13,7 @@ type APIGatewayStage struct {
 	Address          string
 	Region           string
 	CacheClusterSize float64
+	CacheEnabled     bool
 }
 
 var APIGatewayStageUsageSchema = []*schema.UsageItem{}
@@ -22,6 +23,15 @@ func (r *APIGatewayStage) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *APIGatewayStage) BuildResource() *schema.Resource {
+	if !r.CacheEnabled {
+		return &schema.Resource{
+			Name:        r.Address,
+			NoPrice:     true,
+			IsSkipped:   true,
+			UsageSchema: APIGatewayStageUsageSchema,
+		}
+	}
+
 	region := r.Region
 
 	return &schema.Resource{

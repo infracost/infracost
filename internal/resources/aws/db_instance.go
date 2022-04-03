@@ -164,6 +164,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "volumeType", Value: strPtr(volumeType)},
 					{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+					{Key: "databaseEngine", Value: strPtr("Any")},
 				},
 			},
 		},
@@ -200,6 +201,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 				ProductFamily: strPtr("Provisioned IOPS"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+					{Key: "databaseEngine", Value: strPtr("Any")},
 				},
 			},
 		})

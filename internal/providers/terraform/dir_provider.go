@@ -32,6 +32,7 @@ type DirProvider struct {
 	spinnerOpts         ui.SpinnerOptions
 	IsTerragrunt        bool
 	PlanFlags           string
+	InitFlags           string
 	Workspace           string
 	UseState            bool
 	TerraformBinary     string
@@ -61,6 +62,7 @@ func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
 			Indent:        "  ",
 		},
 		PlanFlags:           ctx.ProjectConfig.TerraformPlanFlags,
+		InitFlags:           ctx.ProjectConfig.TerraformInitFlags,
 		Workspace:           ctx.ProjectConfig.TerraformWorkspace,
 		UseState:            ctx.ProjectConfig.TerraformUseState,
 		TerraformBinary:     terraformBinary,
@@ -335,7 +337,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 
 	if err != nil {
 		spinner.Fail()
-		err = p.buildTerraformErr(err)
+		err = p.buildTerraformErr(err, false)
 
 		cmdName := "terraform plan"
 		if p.IsTerragrunt {
@@ -356,16 +358,23 @@ func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
 		args = append(args, "run-all", "--terragrunt-ignore-external-dependencies")
 	}
 
+	flags, err := shellquote.Split(p.InitFlags)
+	if err != nil {
+		msg := "parsing terraform-init-flags failed"
+		return clierror.NewSanitizedError(fmt.Errorf("%s: %s", msg, err), msg)
+	}
+
 	args = append(args, "init", "-input=false", "-no-color")
+	args = append(args, flags...)
 
 	if config.IsTest() {
 		args = append(args, "-upgrade")
 	}
 
-	_, err := Cmd(opts, args...)
+	_, err = Cmd(opts, args...)
 	if err != nil {
 		spinner.Fail()
-		err = p.buildTerraformErr(err)
+		err = p.buildTerraformErr(err, true)
 
 		cmdName := "terraform init"
 		if p.IsTerragrunt {
@@ -440,7 +449,7 @@ func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile st
 	out, err := Cmd(opts, args...)
 	if err != nil {
 		spinner.Fail()
-		err = p.buildTerraformErr(err)
+		err = p.buildTerraformErr(err, false)
 
 		cmdName := "terraform show"
 		if p.IsTerragrunt {
@@ -480,18 +489,18 @@ func checkTerraformVersion(v string, fullV string) error {
 	}
 
 	if strings.HasPrefix(fullV, "Terraform ") && semver.Compare(v, minTerraformVer) < 0 {
-		return fmt.Errorf("Terraform %s is not supported. Please use Terraform version >= %s.", v, minTerraformVer) //nolint
+		return fmt.Errorf("Terraform %s is not supported. Please use Terraform version >= %s. Update it or set the environment variable INFRACOST_TERRAFORM_BINARY.", v, minTerraformVer) //nolint
 	}
 
 	if strings.HasPrefix(fullV, "terragrunt") && semver.Compare(v, minTerragruntVer) < 0 {
-		return fmt.Errorf("Terragrunt %s is not supported. Please use Terragrunt version >= %s.", v, minTerragruntVer) //nolint
+		return fmt.Errorf("Terragrunt %s is not supported. Please use Terragrunt version >= %s. Update it or set the environment variable INFRACOST_TERRAFORM_BINARY.", v, minTerragruntVer) //nolint
 	}
 
 	// Allow any non-terraform and non-terragrunt binaries
 	return nil
 }
 
-func (p *DirProvider) buildTerraformErr(err error) error {
+func (p *DirProvider) buildTerraformErr(err error, isInit bool) error {
 	stderr := extractStderr(err)
 
 	binName := "Terraform"
@@ -527,9 +536,12 @@ func (p *DirProvider) buildTerraformErr(err error) error {
 		msg += fmt.Sprintf("2. Set --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
 	} else if p.IsTerragrunt {
 		msg += fmt.Sprintf("\n\nSee %s for how to generate multiple Terraform plan JSON files for your Terragrunt project, and use them with Infracost.", ui.LinkString("https://infracost.io/troubleshoot"))
+	} else if isInit {
+		msg += fmt.Sprintf("\n\nTry using --terraform-init-flags to pass any required Terraform init flags, or skip Terraform init entirely and set the --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
+	} else if strings.HasPrefix(stderr, "Error: Unsupported Terraform Core version") {
+		msg += "\n\nUpdate Terraform to the required version or set a custom Terraform binary using the environment variable INFRACOST_TERRAFORM_BINARY."
 	} else {
 		msg += fmt.Sprintf("\n\nTry setting the --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
-
 	}
 
 	return fmt.Errorf("%v%s", err, msg)

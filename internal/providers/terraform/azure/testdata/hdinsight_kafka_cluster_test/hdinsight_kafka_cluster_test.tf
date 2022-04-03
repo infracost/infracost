@@ -35,7 +35,6 @@ resource "azurerm_hdinsight_kafka_cluster" "standard" {
   }
 
   gateway {
-    enabled  = true
     username = "acctestusrgw"
     password = "TerrAform123!"
   }
@@ -81,7 +80,6 @@ resource "azurerm_hdinsight_kafka_cluster" "premium" {
   }
 
   gateway {
-    enabled  = true
     username = "acctestusrgw"
     password = "TerrAform123!"
   }
@@ -127,7 +125,6 @@ resource "azurerm_hdinsight_kafka_cluster" "non_usage" {
   }
 
   gateway {
-    enabled  = true
     username = "acctestusrgw"
     password = "TerrAform123!"
   }

@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_glue_crawler.with_usage:
+    monthly_hours: 60

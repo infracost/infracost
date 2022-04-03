@@ -45,12 +45,16 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getECSServiceRegistryItem(),
 	getEFSFileSystemRegistryItem(),
 	getEIPRegistryItem(),
+	getEIPAssociationRegistryItem(),
 	getElasticBeanstalkEnvironmentRegistryItem(),
 	getElastiCacheClusterItem(),
 	getElastiCacheReplicationGroupItem(),
 	getElasticsearchDomainRegistryItem(),
 	getELBRegistryItem(),
 	getFSxWindowsFSRegistryItem(),
+	getGlueCatalogDatabaseRegistryItem(),
+	getGlueCrawlerRegistryItem(),
+	getGlueJobRegistryItem(),
 	getInstanceRegistryItem(),
 	getKinesisAnalyticsApplicationRegistryItem(),
 	getKinesisAnalyticsV2ApplicationRegistryItem(),
@@ -207,6 +211,7 @@ var FreeResources = []string{
 	"aws_elastic_beanstalk_application",
 
 	// AWS Elastic Container Service
+	"aws_ecs_account_setting_default",
 	"aws_ecs_capacity_provider",
 
 	// AWS Elastic File System
@@ -237,6 +242,21 @@ var FreeResources = []string{
 	"aws_elasticache_parameter_group",
 	"aws_elasticache_security_group",
 	"aws_elasticache_subnet_group",
+
+	// AWS Glue
+	"aws_glue_catalog_table",
+	"aws_glue_classifier",
+	"aws_glue_connection",
+	"aws_glue_data_catalog_encryption_settings",
+	"aws_glue_partition",
+	"aws_glue_partition_index",
+	"aws_glue_registry",
+	"aws_glue_resource_policy",
+	"aws_glue_schema",
+	"aws_glue_security_configuration",
+	"aws_glue_trigger",
+	"aws_glue_user_defined_function",
+	"aws_glue_workflow",
 
 	// AWS IAM aws_iam_* resources
 	"aws_iam_access_key",
@@ -300,6 +320,7 @@ var FreeResources = []string{
 
 	// AWS Others
 	"aws_db_instance_role_association",
+	"aws_db_option_group",
 	"aws_db_parameter_group",
 	"aws_db_subnet_group",
 	"aws_dms_replication_subnet_group",
@@ -311,7 +332,6 @@ var FreeResources = []string{
 	"aws_ebs_default_kms_key",
 	"aws_ecs_cluster",
 	"aws_ecs_task_definition",
-	"aws_eip_association",
 	"aws_elasticsearch_domain_policy",
 	"aws_key_pair",
 	"aws_launch_configuration",
@@ -358,6 +378,10 @@ var FreeResources = []string{
 
 	// AWS Service Discovery Service
 	"aws_service_discovery_service",
+
+	// AWS SES
+	"aws_ses_domain_dkim",
+	"aws_ses_domain_identity",
 
 	// AWS SNS
 	"aws_sns_platform_application",

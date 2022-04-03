@@ -14,12 +14,6 @@ type ComputeGuestAccelerator struct {
 	Count int64
 }
 
-// ComputeGuestAccelerator defines Disk setup for Compute resources.
-type ComputeDisk struct {
-	Type string
-	Size float64
-}
-
 // ContainerNodeConfig defines Node configuration for Container resources.
 type ContainerNodeConfig struct {
 	MachineType       string
@@ -199,4 +193,22 @@ func purchaseOptionLabel(purchaseOption string) string {
 		"on_demand":   "on-demand",
 		"preemptible": "preemptible",
 	}[purchaseOption]
+}
+
+func storageImageCostComponent(region string, description string, storageSize *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Storage",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: storageSize,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("gcp"),
+			Region:        strPtr(region),
+			Service:       strPtr("Compute Engine"),
+			ProductFamily: strPtr("Storage"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "description", ValueRegex: regexPtr(description)},
+			},
+		},
+	}
 }

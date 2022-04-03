@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  azurerm_sql_managed_instance.example:
+    backup_storage_gb: 100
+    long_term_retention_storage_gb: 5
+  azurerm_sql_managed_instance.example3:
+    backup_storage_gb: 100
+    long_term_retention_storage_gb: 100

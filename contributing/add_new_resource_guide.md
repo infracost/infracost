@@ -1138,13 +1138,13 @@ Sometimes you need access to a resource that refers to the resource you're addin
 	func GetEBSVolumeRegistryItem() *schema.RegistryItem {
 		return &schema.RegistryItem{
 			Name:                "aws_ebs_volume",
-			RFunc:               NewEBSSnapshot,
-            // This only works if aws_ebs_snapshot has defined "volume_id" as a ReferenceAttribute
+			RFunc:               NewEBSVolume,
+			// This only works if aws_ebs_snapshot has defined "volume_id" as a ReferenceAttribute
 			ReferenceAttributes: []string{"aws_ebs_snapshot.volume_id"}, 
 		}
 	}
 
-	func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		snapshotReverseRefs := d.References("aws_ebs_snapshot.volume_id") // Get the reference
 		// ...
 	}
@@ -1155,38 +1155,38 @@ Sometimes you need access to a resource that refers to the resource you're addin
 By default, references are matched using an AWS ARN or the id field (`d.Get("id")`). Sometimes cloud providers use name or another field for references. In this case you can provide a 'custom reference id function' that generates additional ids used to match references. In this example, a custom id is needed because `aws_appautoscaling_target.resource_id` contains a `table/<name>` string when referencing an `aws_dynamodb_table`.
 
 ```go
-    func getAppAutoscalingTargetRegistryItem() *schema.RegistryItem {
-	    return &schema.RegistryItem{
-		    Name:                "aws_appautoscaling_target",
-		    RFunc:               NewAppAutoscalingTargetResource,
-    		ReferenceAttributes: []string{"resource_id"},
-	    }
-    }
+	func getAppAutoscalingTargetRegistryItem() *schema.RegistryItem {
+		return &schema.RegistryItem{
+			Name:                "aws_appautoscaling_target",
+			RFunc:               NewAppAutoscalingTargetResource,
+			ReferenceAttributes: []string{"resource_id"},
+		}
+	}
 
-    func NewAppAutoscalingTargetResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-        ...
-    }
+	func NewAppAutoscalingTargetResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+		// ...
+	}
   ```
 
 ```go
-    func getDynamoDBTableRegistryItem() *schema.RegistryItem {
-        return &schema.RegistryItem{
-            Name:            "aws_dynamodb_table",
-            RFunc:           NewDynamoDBTableResource,
-            CustomRefIDFunc: func (d *schema.ResourceData) []string {
-                // returns an id that will match the custom format used by aws_appautoscaling_target.resource_id
-                name := d.Get("name").String()
-                if name != "" {
-                    return []string{"table/" + name}
-                }
-                return nil
-            },
-        }
-    }
+	func getDynamoDBTableRegistryItem() *schema.RegistryItem {
+		return &schema.RegistryItem{
+			Name:            "aws_dynamodb_table",
+			RFunc:           NewDynamoDBTableResource,
+			CustomRefIDFunc: func (d *schema.ResourceData) []string {
+				// returns an id that will match the custom format used by aws_appautoscaling_target.resource_id
+				name := d.Get("name").String()
+				if name != "" {
+					return []string{"table/" + name}
+				}
+				return nil
+			},
+		}
+	}
 
-    func NewAppAutoscalingTargetResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-        ...
-    }
+	func NewAppAutoscalingTargetResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+		// ...
+	}
 ```
 
 ### Google zone mappings 
@@ -1219,7 +1219,7 @@ Unless the resource has global or zone-based pricing, the first line of the reso
 
 	func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		region := lookupRegion(d, []string{"certificate_id", "resource_group_name"})
-		...
+		// ...
 	}
   ```
 
@@ -1244,8 +1244,8 @@ These can simply be embedded into a struct field like so:
 
 ```go
 type MyResource struct {
-    ...
-    MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_processed_gb"`
+	// ...
+	MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_processed_gb"`
 }
 ```
 
@@ -1262,12 +1262,13 @@ running:
 
 ```go
 func (r *MyResource) BuildResource() *schema.Resource {
-    values := r.MonthlyDataProcessedGB.Values()
+	values := r.MonthlyDataProcessedGB.Values()
 
-    for _, v := range values {
-        fmt.Println("%s => %2.f", v.Key, v.Value)
-    }
-    ...
+	for _, v := range values {
+		fmt.Println("%s => %2.f", v.Key, v.Value)
+	}
+
+	// ...
 }
 ```
 
@@ -1289,54 +1290,54 @@ Common usage structs are defined in the [`internal/resources/aws/util.go`](../in
 
 ```go
 var RegionMapping = map[string]string{
-  "us-gov-west-1":   "AWS GovCloud (US-West)",
-  // Add the new region here with the aws code mapping to the region name
-  // as defined here: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
+	"us-gov-west-1":   "AWS GovCloud (US-West)",
+	// Add the new region here with the aws code mapping to the region name
+	// as defined here: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
 }
 ```
 
 ```go
 type RegionsUsage struct {
-  USGovWest1   *float64 `infracost_usage:"us_gov_west_1"`
-  // Add your new region here with the infracost_usage struct tag
-  // representing an underscored version of the aws region code
-  // e.g: eu-west-1 => eu_west_1.
-  //
-  // The struct field type must be *float
+	USGovWest1   *float64 `infracost_usage:"us_gov_west_1"`
+	// Add your new region here with the infracost_usage struct tag
+	// representing an underscored version of the aws region code
+	// e.g: eu-west-1 => eu_west_1.
+	//
+	// The struct field type must be *float
 }
 ```
 
 ```go
 var RegionUsageSchema = []*schema.UsageItem{
-  {Key: "us_gov_west_1", DefaultValue: 0, ValueType: schema.Float64},
-  // Finally, add your new region to the usage schema.
-  // Set the Key as the underscored code of the region (as outlined
-  // in the prior RegionsUsage struct). Then set DefaultValue as 0
-  // and the ValueType to schema.Float64.
+	{Key: "us_gov_west_1", DefaultValue: 0, ValueType: schema.Float64},
+	// Finally, add your new region to the usage schema.
+	// Set the Key as the underscored code of the region (as outlined
+	// in the prior RegionsUsage struct). Then set DefaultValue as 0
+	// and the ValueType to schema.Float64.
 }
 ```
+
 #### Google
 
 Common usage structs are defined in the [`internal/resources/google/util.go`](../internal/resources/google/util.go) file. You'll need to update: 
 
-
 ```go
 type RegionsUsage struct {
-  AsiaEast1              *float64 `infracost_usage:"asia_east1"`
-  // Add your new region here with the infracost_usage struct tag
-  // representing an underscored version of the google location code
-  // e.g: eu-west-1 => eu_west_1.
-  //
-  // The struct field type must be *float
+	AsiaEast1              *float64 `infracost_usage:"asia_east1"`
+	// Add your new region here with the infracost_usage struct tag
+	// representing an underscored version of the google location code
+	// e.g: eu-west-1 => eu_west_1.
+	//
+	// The struct field type must be *float
 }
 ```
 
 ```go
 var RegionUsageSchema = []*schema.UsageItem{
-  {ValueType: schema.Float64, DefaultValue: 0, Key: "asia_east1"},
-  // Finally, add your new region to the usage schema.
-  // Set the Key as the underscored code of the location (as outlined
-  // in the prior RegionsUsage struct). Then set DefaultValue as 0
-  // and the ValueType to schema.Float64.
+	{ValueType: schema.Float64, DefaultValue: 0, Key: "asia_east1"},
+	// Finally, add your new region to the usage schema.
+	// Set the Key as the underscored code of the location (as outlined
+	// in the prior RegionsUsage struct). Then set DefaultValue as 0
+	// and the ValueType to schema.Float64.
 }
 ```

@@ -61,6 +61,32 @@ resource "aws_dynamodb_table" "my_dynamodb_table" {
   }
 }
 
+resource "aws_dynamodb_table" "my_dynamodb_table_with_no_billing_mode" {
+  name           = "GameScores"
+  read_capacity  = 30
+  write_capacity = 20
+  hash_key       = "UserId"
+  range_key      = "GameTitle"
+
+  attribute {
+    name = "UserId"
+    type = "S"
+  }
+
+  attribute {
+    name = "GameTitle"
+    type = "S"
+  }
+
+  replica {
+    region_name = "us-east-2"
+  }
+
+  replica {
+    region_name = "us-west-1"
+  }
+}
+
 resource "aws_dynamodb_table" "autoscale_dynamodb_table" {
   name           = "GameScores"
   billing_mode   = "PROVISIONED"
