@@ -18,13 +18,13 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-var PROVIDER string = "google"
-var PROVIDER_TF string = "google"
+var PROVIDER string = "azure"
+var PROVIDER_TF string = "azurerm"
 
 var DRY_MODE = false
 var STRICT_MODE = true
 var SINGLE_MODE = true
-var SINGLE_RESOURCE_NAME = "container_registry.go"
+var SINGLE_RESOURCE_NAME = "api_management.go"
 
 var FLEXIBLE_MODE_SKIP_DOTS = true
 var FLEXIBLE_MODE_SKIP_TYPES = true
@@ -425,6 +425,12 @@ func getResourceFuncName(registryFuncName string, file *ast.File) (string, strin
 
 func getDsList(file *ast.File) map[string]duStruct {
 	result := make(map[string]duStruct, 0)
+	if PROVIDER == "azure" {
+		result["region"] = duStruct{
+			fieldType:     "String",
+			hasExistCheck: false,
+		}
+	}
 	astutil.Apply(file, nil, func(c *astutil.Cursor) bool {
 		n := c.Node()
 		if callExpr, ok := n.(*ast.CallExpr); ok {
