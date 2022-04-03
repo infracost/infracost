@@ -12,7 +12,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getComputeExternalVPNGatewayRegistryItem(),
 	getComputeForwardingRuleRegistryItem(),
 	getComputeGlobalAddressRegistryItem(),
-	GetComputeGlobalForwardingRuleRegistryItem(),
+	getComputeGlobalForwardingRuleRegistryItem(),
 	getComputeHAVPNGatewayRegistryItem(),
 	getComputeImageRegistryItem(),
 	getComputeInstanceGroupManagerRegistryItem(),
@@ -51,7 +51,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSecretManagerSecretRegistryItem(),
 	getSecretManagerSecretVersionRegistryItem(),
 	getServiceNetworkingConnectionRegistryItem(),
-	GetSQLInstanceRegistryItem(),
+	getSQLInstanceRegistryItem(),
 	getStorageBucketRegistryItem(),
 }
 
