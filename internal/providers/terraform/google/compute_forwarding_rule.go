@@ -12,7 +12,7 @@ func getComputeForwardingRuleRegistryItem() *schema.RegistryItem {
 		Notes: []string{"Price for additional forwarding rule is used"},
 	}
 }
-func GetComputeGlobalForwardingRuleRegistryItem() *schema.RegistryItem {
+func getComputeGlobalForwardingRuleRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_compute_global_forwarding_rule",
 		RFunc: NewComputeForwardingRule,
