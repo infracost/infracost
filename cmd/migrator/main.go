@@ -71,7 +71,9 @@ func main() {
 	}
 	for _, fileName := range fileNames {
 		filePath := fmt.Sprintf("%s%s", basePath, fileName)
-		// fmt.Println(filePath)
+		if filePath == "internal/providers/terraform/azure/event_hubs_namespace.go" {
+			continue
+		}
 
 		isMigrated, err := migrateFile(filePath, referenceFile, basePath, fileName)
 
