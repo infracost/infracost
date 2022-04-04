@@ -155,10 +155,11 @@
  module.asg-lt.aws_autoscaling_group.this[0]                                                       
  └─ module.asg-lt.aws_launch_template.this[0]                                                      
     ├─ Instance usage (Linux/UNIX, on-demand, t3.micro)              730  hours              $7.59 
+    ├─ EC2 detailed monitoring                                         7  metrics            $2.10 
     └─ block_device_mapping[0]                                                                     
        └─ Storage (general purpose SSD, gp2)                          10  GB                 $1.00 
                                                                                                    
- OVERALL TOTAL                                                                           $3,409.04 
+ OVERALL TOTAL                                                                           $3,411.14 
 ──────────────────────────────────
 48 cloud resources were detected:
 ∙ 25 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
