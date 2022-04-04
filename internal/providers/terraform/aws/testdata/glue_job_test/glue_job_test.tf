@@ -19,12 +19,12 @@ resource "aws_glue_job" "job_no_usage" {
 }
 
 resource "aws_glue_job" "python_shell" {
-  name     = "example job no usage"
-  role_arn = "arn:aws:glue:us-east-1:123456789012:resource-id"
+  name         = "example job no usage"
+  role_arn     = "arn:aws:glue:us-east-1:123456789012:resource-id"
   max_capacity = "0.0625"
 
   command {
-    name = "pythonshell"
+    name            = "pythonshell"
     script_location = "s3://bucket.test/example.script"
   }
 }

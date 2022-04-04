@@ -26,8 +26,8 @@ resource "azurerm_lb" "example" {
 }
 
 resource "azurerm_lb_backend_address_pool" "example" {
-  loadbalancer_id     = azurerm_lb.example.id
-  name                = "be-%d"
+  loadbalancer_id = azurerm_lb.example.id
+  name            = "be-%d"
 }
 
 resource "azurerm_lb_outbound_rule" "rules" {
