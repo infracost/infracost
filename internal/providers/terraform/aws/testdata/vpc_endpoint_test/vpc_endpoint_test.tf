@@ -42,7 +42,7 @@ resource "aws_vpc_endpoint" "multiple_interfaces" {
   service_name      = "com.amazonaws.region.ec2"
   vpc_id            = "vpc-123456"
   vpc_endpoint_type = "Interface"
-  subnet_ids        = [
+  subnet_ids = [
     "subnet-123456",
     "subnet-654321"
   ]
@@ -67,7 +67,7 @@ resource "aws_vpc_endpoint" "with_dynamic_subnet" {
   service_name      = "com.amazonaws.region.ec2"
   vpc_id            = aws_vpc.main.id
   vpc_endpoint_type = "Interface"
-  subnet_ids        = [
+  subnet_ids = [
     aws_subnet.test.id,
     aws_subnet.test2.id
   ]
