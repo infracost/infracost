@@ -114,3 +114,12 @@ func locationNameMapping(l string) string {
 func intPtr(i int64) *int64 {
 	return &i
 }
+
+func contains(arr []string, e string) bool {
+	for _, a := range arr {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}

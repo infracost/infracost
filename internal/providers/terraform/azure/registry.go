@@ -74,7 +74,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMMySQLServerRegistryItem(),
 	GetAzureRMNotificationHubNamespaceRegistryItem(),
 	getAzureRMPointToSiteVpnGatewayRegistryItem(),
-	GetAzureRMPostgreSQLFlexibleServerRegistryItem(),
+	getAzureRMPostgreSQLFlexibleServerRegistryItem(),
 	GetAzureRMPostgreSQLServerRegistryItem(),
 	GetAzureRMPrivateDNSaRecordRegistryItem(),
 	GetAzureRMPrivateDNSaaaaRecordRegistryItem(),
@@ -203,6 +203,8 @@ var FreeResources = []string{
 	"azurerm_mysql_virtual_network_rule",
 	"azurerm_postgresql_configuration",
 	"azurerm_postgresql_firewall_rule",
+	"azurerm_postgresql_flexible_server_configuration",
+	"azurerm_postgresql_flexible_server_database",
 	"azurerm_postgresql_flexible_server_firewall_rule",
 	"azurerm_postgresql_virtual_network_rule",
 
