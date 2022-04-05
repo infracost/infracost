@@ -45,3 +45,12 @@ func contains(a []string, x string) bool {
 func regexPtr(regex string) *string {
 	return strPtr(fmt.Sprintf("/%s/i", regex))
 }
+
+func doesStrSliceContains(a []string, x string) bool {
+	for _, n := range a {
+		if x == n {
+			return true
+		}
+	}
+	return false
+}

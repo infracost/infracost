@@ -114,3 +114,12 @@ func locationNameMapping(l string) string {
 func intPtr(i int64) *int64 {
 	return &i
 }
+
+func doesStrSliceContains(a []string, x string) bool {
+	for _, n := range a {
+		if x == n {
+			return true
+		}
+	}
+	return false
+}
