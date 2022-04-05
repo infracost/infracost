@@ -112,8 +112,8 @@ github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.3 h1:9stUQR/u2KXU6HkFJYl
 github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.3/go.mod h1:ssOhaLpRlh88H3UmEcsBoVKq309quMvm3Ds8e9d4eJM=
 github.com/aws/aws-sdk-go-v2/internal/ini v1.3.1 h1:fdQSN/ieDwbxdj7ptvFKjS2cS2a91l/WdjacCt5GgTE=
 github.com/aws/aws-sdk-go-v2/internal/ini v1.3.1/go.mod h1:5eEM4wZ6I2GaeOaVXsiJexIH4P1sFnK5Yp2Tlw9Ah3c=
-github.com/aws/aws-sdk-go-v2/service/autoscaling v1.21.0 h1:S7FsIuYQP9bP9fZ71Oq+GXYTjvaoc/001plSQY10j5k=
-github.com/aws/aws-sdk-go-v2/service/autoscaling v1.21.0/go.mod h1:WlHBXCrs0pVvCBlMwqqtRFVF5lHwjdVmFXwsIS3ED+I=
+github.com/aws/aws-sdk-go-v2/service/autoscaling v1.22.4 h1:5idZ9wTGvXKApIm7MtcJoMRM8/016tLWLmuXz2chYqc=
+github.com/aws/aws-sdk-go-v2/service/autoscaling v1.22.4/go.mod h1:mXzRCMCqLSHkUbw6vW4xHFSbSPFvD28OpeRQsNohImo=
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.16.0 h1:QQ1IlHJzYjlcALSwairRRtefgzUdgi2YgB9I71Lo/d4=
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.16.0/go.mod h1:gqmf9WXxx+UnIncgvSjp9P+z1O7x9FI856Gb5dFqhas=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.3 h1:b5+OInu1LyoF4uhFT453MOhbXXaM0YmQsqkxMjFl1dc=
