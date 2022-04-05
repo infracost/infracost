@@ -1,0 +1,20 @@
+Project: infracost/infracost/cmd/infracost/testdata/hclprovider_alias
+
+ Name                         Monthly Qty  Unit              Monthly Cost 
+                                                                          
+ aws_nat_gateway.example                                                  
+ ├─ NAT gateway                       730  hours                   $32.85 
+ └─ Data processed         Monthly cost depends on usage: $0.045 per GB   
+                                                                          
+ aws_nat_gateway.example2                                                 
+ ├─ NAT gateway                       730  hours                   $67.89 
+ └─ Data processed         Monthly cost depends on usage: $0.093 per GB   
+                                                                          
+ OVERALL TOTAL                                                    $100.74 
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were free, rerun with --show-skipped to see details
+
+Err:
+

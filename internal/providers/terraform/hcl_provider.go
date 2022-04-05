@@ -146,7 +146,7 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 			if block.Type() == "provider" {
 				name := block.TypeLabel()
 				if a := block.GetAttribute("alias"); a != nil {
-					name = a.Value().AsString()
+					name = name + "." + a.Value().AsString()
 				}
 
 				// set the default provider key
@@ -202,7 +202,12 @@ func (p HCLProvider) modulesToPlanJSON(modules []*hcl.Module) PlanSchema {
 				providerAttr := block.GetAttribute("provider")
 				if providerAttr != nil {
 					value := providerAttr.Value()
-					if value.Type() == cty.String {
+					r, err := providerAttr.Reference()
+					if err == nil {
+						providerConfigKey = r.String()
+					}
+
+					if err != nil && value.Type() == cty.String {
 						providerConfigKey = value.AsString()
 					}
 				}
