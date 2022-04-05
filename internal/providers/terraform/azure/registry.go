@@ -103,6 +103,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
 	getAzureRMVPNGatewayRegistryItem(),
 	getAzureRMVPNGatewayConnectionRegistryItem(),
+	getMySQLFlexibleServerRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -200,6 +201,9 @@ var FreeResources = []string{
 	"azurerm_mariadb_firewall_rule",
 	"azurerm_mariadb_virtual_network_rule",
 	"azurerm_mysql_firewall_rule",
+	"azurerm_mysql_flexible_database",
+	"azurerm_mysql_flexible_server_configuration",
+	"azurerm_mysql_flexible_server_firewall_rule",
 	"azurerm_mysql_virtual_network_rule",
 	"azurerm_postgresql_configuration",
 	"azurerm_postgresql_firewall_rule",

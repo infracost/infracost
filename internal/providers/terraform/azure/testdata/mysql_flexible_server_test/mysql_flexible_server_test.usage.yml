@@ -1,0 +1,10 @@
+version: 0.1
+resource_usage:
+  azurerm_mysql_flexible_server.burstable:
+    additional_backup_storage_gb: 1000
+
+  azurerm_mysql_flexible_server.gp:
+    additional_backup_storage_gb: 2000
+
+  azurerm_mysql_flexible_server.mo:
+    additional_backup_storage_gb: 3000
