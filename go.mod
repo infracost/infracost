@@ -49,7 +49,7 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2/service/eks v1.19.0
+	github.com/aws/aws-sdk-go-v2/service/eks v1.20.4
 	github.com/hashicorp/terraform-config-inspect v0.0.0-20210625153042-09f34846faab
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
 )
