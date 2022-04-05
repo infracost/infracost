@@ -9,12 +9,7 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-resource "aws_ecs_cluster" "ecs1" {
-  name               = "ecs1"
-  capacity_providers = ["FARGATE"]
-}
-
-resource "aws_ecs_task_definition" "ecs_task1" {
+resource "aws_ecs_task_definition" "ecs_task" {
   requires_compatibilities = ["FARGATE"]
   family                   = "ecs_task1"
   memory                   = "2 GB"
@@ -37,38 +32,122 @@ resource "aws_ecs_task_definition" "ecs_task1" {
 			TASK_DEFINITION
 }
 
-resource "aws_ecs_service" "ecs_fargate1" {
-  name            = "ecs_fargate1"
+resource "aws_ecs_service" "ecs_fargate_no_cluster_1" {
+  name            = "ecs_fargate_no_cluster_1"
   launch_type     = "FARGATE"
-  cluster         = aws_ecs_cluster.ecs1.id
-  task_definition = aws_ecs_task_definition.ecs_task1.arn
+  task_definition = aws_ecs_task_definition.ecs_task.arn
+  desired_count   = 1
+}
+
+resource "aws_ecs_service" "ecs_fargate_no_cluster_2" {
+  name = "ecs_fargate_no_cluster_2"
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE"
+    weight            = 1
+    base              = 0
+  }
+  task_definition = aws_ecs_task_definition.ecs_task.arn
   desired_count   = 2
 }
 
-resource "aws_ecs_cluster" "ecs2" {
-  name               = "ecs2"
+resource "aws_ecs_cluster" "ecs1" {
+  name               = "ecs1"
   capacity_providers = ["FARGATE"]
 }
 
-resource "aws_ecs_service" "ecs_fargate2" {
-  name        = "ecs_fargate2"
-  launch_type = "FARGATE"
-  cluster     = aws_ecs_cluster.ecs2.id
+resource "aws_ecs_service" "ecs_fargate1" {
+  name            = "ecs_fargate1"
+  cluster         = aws_ecs_cluster.ecs1.id
+  task_definition = aws_ecs_task_definition.ecs_task.arn
+  desired_count   = 1
+}
 
-  deployment_controller {
-    type = "EXTERNAL"
+resource "aws_ecs_cluster" "ecs2" {
+  name = "ecs2"
+  default_capacity_provider_strategy {
+    capacity_provider = "FARGATE"
+    weight            = 0
+    base              = 1
   }
+}
+
+resource "aws_ecs_service" "ecs_fargate2" {
+  name            = "ecs_fargate2"
+  cluster         = "ecs2"
+  task_definition = aws_ecs_task_definition.ecs_task.arn
+  desired_count   = 2
 }
 
 resource "aws_ecs_cluster" "ecs3" {
-  name = "ecs1"
+  name = "ecs3"
+}
+
+resource "aws_ecs_cluster_capacity_providers" "cappro3" {
+  cluster_name = aws_ecs_cluster.ecs3.name
+
+  capacity_providers = ["FARGATE"]
 }
 
 resource "aws_ecs_service" "ecs_fargate3" {
-  name    = "ecs_fargate3"
-  cluster = aws_ecs_cluster.ecs3.id
+  name            = "ecs_fargate3"
+  cluster         = aws_ecs_cluster.ecs3.id
+  task_definition = aws_ecs_task_definition.ecs_task.arn
+  desired_count   = 3
+}
 
-  deployment_controller {
-    type = "EXTERNAL"
+resource "aws_ecs_cluster" "ecs4" {
+  name = "ecs4"
+}
+
+resource "aws_ecs_cluster_capacity_providers" "cappro4" {
+  cluster_name = aws_ecs_cluster.ecs4.name
+
+  capacity_providers = ["FARGATE"]
+}
+
+resource "aws_ecs_service" "ecs_fargate4" {
+  name            = "ecs_fargate4"
+  cluster         = aws_ecs_cluster.ecs4.id
+  task_definition = aws_ecs_task_definition.ecs_task.arn
+  desired_count   = 4
+}
+
+resource "aws_ecs_cluster" "ecs5" {
+  name = "ecs4"
+}
+
+resource "aws_ecs_cluster_capacity_providers" "cappro5" {
+  cluster_name = aws_ecs_cluster.ecs5.name
+
+  capacity_providers = ["FARGATE"]
+
+  default_capacity_provider_strategy {
+    base              = 1
+    weight            = 100
+    capacity_provider = "FARGATE"
   }
+}
+
+resource "aws_ecs_service" "ecs_fargate5" {
+  name            = "ecs_fargate5"
+  cluster         = aws_ecs_cluster.ecs5.id
+  task_definition = aws_ecs_task_definition.ecs_task.arn
+  desired_count   = 5
+}
+
+resource "aws_ecs_service" "ecs_no_fargate_1" {
+  name            = "ecs_no_fargate_1"
+  task_definition = aws_ecs_task_definition.ecs_task.arn
+  desired_count   = 1
+}
+
+resource "aws_ecs_cluster" "ecs_no_fargate_cluster_2" {
+  name = "ecs_no_fargate_cluster_2"
+}
+
+resource "aws_ecs_service" "ecs_no_fargate_2" {
+  name            = "ecs_no_fargate_2"
+  cluster         = aws_ecs_cluster.ecs_no_fargate_cluster_2.id
+  task_definition = aws_ecs_task_definition.ecs_task.arn
+  desired_count   = 2
 }
