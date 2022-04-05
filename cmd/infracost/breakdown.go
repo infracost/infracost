@@ -51,9 +51,9 @@ func breakdownCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("format", "table", "Output format: json, table, html")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
 
-	cmd.Flags().Bool("terraform-parse-hcl", false, "Parse the HCL directly instead of generating a Terraform plan. This option does not need credentials and is faster (experimental)")
-	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files from the given file, similar to Terraform's -var-file flag. Only supported with --terraform-parse-hcl (experimental)")
-	cmd.Flags().StringSlice("terraform-var", nil, "Set a value for one of the input variables, similar to Terraform's -var flag. Only supported with --terraform-parse-hcl (experimental)")
+	cmd.Flags().Bool("terraform-parse-hcl", false, "Parse HCL code instead of generating a Terraform plan. This does not need credentials and is faster (experimental)")
+	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform’s -var-file flag. Applicable with --terraform-parse-hcl (experimental)")
+	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform’s -var flag. Applicable with --terraform-parse-hcl (experimental)")
 
 	_ = cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return validRunFormats, cobra.ShellCompDirectiveDefault
