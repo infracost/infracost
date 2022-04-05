@@ -56,28 +56,7 @@ func (r *PostgreSQLFlexibleServer) BuildResource() *schema.Resource {
 
 // computeCostComponent returns a cost component for server compute requirements.
 func (r *PostgreSQLFlexibleServer) computeCostComponent() *schema.CostComponent {
-	var skuName, meterName, series string
-
-	tierName := map[string]string{
-		"b":  "Burstable",
-		"gp": "General Purpose",
-		"mo": "Memory Optimized",
-	}[r.Tier]
-
-	if r.Tier == "b" {
-		meterName = r.InstanceType
-		skuName = r.InstanceType
-		series = "BS"
-	} else {
-		meterName = "vCore"
-
-		coreRegex := regexp.MustCompile(`(\d+)`)
-		match := coreRegex.FindStringSubmatch(r.InstanceType)
-		cores := match[1]
-		skuName = fmt.Sprintf("%s vCore", cores)
-
-		series = coreRegex.ReplaceAllString(r.InstanceType, "") + r.InstanceVersion
-	}
+	attrs := getFlexibleServerFilterAttributes(r.Tier, r.InstanceType, r.InstanceVersion)
 
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Compute (%s)", r.SKU),
@@ -90,9 +69,9 @@ func (r *PostgreSQLFlexibleServer) computeCostComponent() *schema.CostComponent 
 			Service:       strPtr("Azure Database for PostgreSQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^Azure Database for PostgreSQL Flexible Server %s %s/i", tierName, series))},
-				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", skuName))},
-				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", meterName))},
+				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^Azure Database for PostgreSQL Flexible Server %s %s/i", attrs.TierName, attrs.Series))},
+				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", attrs.SKUName))},
+				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", attrs.MeterName))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -149,5 +128,48 @@ func (r *PostgreSQLFlexibleServer) backupCostComponent() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Backup Storage Data Stored")},
 			},
 		},
+	}
+}
+
+// flexibleServerFilterAttributes defines CPAPI filter attributes for compute
+// cost component derived from IaC provider's SKU.
+type flexibleServerFilterAttributes struct {
+	SKUName   string
+	TierName  string
+	MeterName string
+	Series    string
+}
+
+// getFlexibleServerFilterAttributes returns a struct with CPAPI filter
+// attributes based on values extracted from IaC provider's SKU.
+func getFlexibleServerFilterAttributes(tier, instanceType, instanceVersion string) flexibleServerFilterAttributes {
+	var skuName, meterName, series string
+
+	tierName := map[string]string{
+		"b":  "Burstable",
+		"gp": "General Purpose",
+		"mo": "Memory Optimized",
+	}[tier]
+
+	if tier == "b" {
+		meterName = instanceType
+		skuName = instanceType
+		series = "BS"
+	} else {
+		meterName = "vCore"
+
+		coreRegex := regexp.MustCompile(`(\d+)`)
+		match := coreRegex.FindStringSubmatch(instanceType)
+		cores := match[1]
+		skuName = fmt.Sprintf("%s vCore", cores)
+
+		series = coreRegex.ReplaceAllString(instanceType, "") + instanceVersion
+	}
+
+	return flexibleServerFilterAttributes{
+		SKUName:   skuName,
+		TierName:  tierName,
+		MeterName: meterName,
+		Series:    series,
 	}
 }
