@@ -107,6 +107,7 @@ func (e *Evaluator) Run() ([]*Module, error) {
 
 	// let's load the modules now we have our top level context.
 	e.moduleCalls = e.loadModules()
+	e.evaluate(lastContext)
 
 	// expand out resources and modules via count and evaluate again so that we can include
 	// any module outputs and or count references.
