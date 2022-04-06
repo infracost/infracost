@@ -19,6 +19,33 @@ var SNSTopicUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
 }
 
+// This is an experiment to see if using an explicit structure to define the cost components
+// can enable anything interesting (e.g. list what cost components could apply to a resource
+// without having any IaAC)
+func (r *SNSTopic) CostComponents() []*schema.CostComponent {
+	return []*schema.CostComponent{
+		r.APIRequestsCostComponent(nil),
+	}
+}
+
+func (r *SNSTopic) APIRequestsCostComponent(requests *decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Requests",
+		Unit:            "1M requests",
+		UnitMultiplier:  decimal.NewFromInt(1000000),
+		MonthlyQuantity: requests,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonSNS"),
+			ProductFamily: strPtr("API Request"),
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("1000000"),
+		},
+	}
+}
+
 func (r *SNSTopic) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
@@ -36,24 +63,9 @@ func (r *SNSTopic) BuildResource() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name: r.Address,
-		CostComponents: []*schema.CostComponent{
-			{
-				Name:            "Requests",
-				Unit:            "1M requests",
-				UnitMultiplier:  decimal.NewFromInt(1000000),
-				MonthlyQuantity: requests,
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("aws"),
-					Region:        strPtr(r.Region),
-					Service:       strPtr("AmazonSNS"),
-					ProductFamily: strPtr("API Request"),
-				},
-				PriceFilter: &schema.PriceFilter{
-					StartUsageAmount: strPtr("1000000"),
-				},
-			},
-		}, UsageSchema: SNSTopicUsageSchema,
+		Name:           r.Address,
+		CostComponents: []*schema.CostComponent{r.APIRequestsCostComponent(requests)},
+		UsageSchema:    SNSTopicUsageSchema,
 	}
 }
 
