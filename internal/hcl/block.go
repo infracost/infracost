@@ -125,14 +125,15 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 		}
 
 		if hclBlock.Type == "resource" || hclBlock.Type == "data" {
+			_, withCount := body.Attributes["count"]
 			// add commonly used identifiers to the block so that if it's referenced by other
 			// blocks in context evaluation.
 			if _, ok := body.Attributes["id"]; !ok {
-				body.Attributes["id"] = newUniqueAttribute("id")
+				body.Attributes["id"] = newUniqueAttribute("id", withCount)
 			}
 
 			if _, ok := body.Attributes["arn"]; !ok {
-				body.Attributes["arn"] = newArnAttribute("arn")
+				body.Attributes["arn"] = newArnAttribute("arn", withCount)
 			}
 		}
 
@@ -173,26 +174,44 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 	}
 }
 
-func newUniqueAttribute(name string) *hclsyntax.Attribute {
+func newUniqueAttribute(name string, withCount bool) *hclsyntax.Attribute {
+	var exp hclsyntax.Expression = &hclsyntax.LiteralValueExpr{
+		Val: cty.StringVal(uuid.NewString()),
+	}
+
+	if withCount {
+		e, diags := hclsyntax.ParseExpression([]byte(`"`+uuid.NewString()+`-${count.index}"`), name, hcl.Pos{})
+		if !diags.HasErrors() {
+			exp = e
+		}
+	}
+
 	return &hclsyntax.Attribute{
 		Name: name,
-		Expr: &hclsyntax.LiteralValueExpr{
-			Val: cty.StringVal(uuid.NewString()),
-		},
+		Expr: exp,
 	}
 }
 
-func newArnAttribute(name string) *hclsyntax.Attribute {
+func newArnAttribute(name string, withCount bool) *hclsyntax.Attribute {
 	// fakeARN replicates an aws arn string it deliberately leaves the
 	// region section (in between the 3rd and 4th semicolon) blank as
 	// Infracost will try and parse this region later down the line.
 	// Keeping it blank will defer the region to what the provider has defined.
 	fakeARN := fmt.Sprintf("arn:aws:hcl::%s", uuid.NewString())
+	var exp hclsyntax.Expression = &hclsyntax.LiteralValueExpr{
+		Val: cty.StringVal(fakeARN),
+	}
+
+	if withCount {
+		e, diags := hclsyntax.ParseExpression([]byte(`"`+fakeARN+`-${count.index}"`), name, hcl.Pos{})
+		if !diags.HasErrors() {
+			exp = e
+		}
+	}
+
 	return &hclsyntax.Attribute{
 		Name: name,
-		Expr: &hclsyntax.LiteralValueExpr{
-			Val: cty.StringVal(fakeARN),
-		},
+		Expr: exp,
 	}
 }
 
