@@ -291,17 +291,22 @@ func blockToReferences(block *hcl.Block) map[string]interface{} {
 
 func marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
 	for _, b := range block.Children() {
-		childValues := marshalAttributeValues(b.Type(), b.Values())
+		key := b.Type()
+		if key == "dynamic" || key == "depends_on" {
+			continue
+		}
+
+		childValues := marshalAttributeValues(key, b.Values())
 		if len(b.Children()) > 0 {
 			marshalBlock(b, childValues)
 		}
 
-		if v, ok := jsonValues[b.Type()]; ok {
-			jsonValues[b.Type()] = append(v.([]interface{}), childValues)
+		if v, ok := jsonValues[key]; ok {
+			jsonValues[key] = append(v.([]interface{}), childValues)
 			continue
 		}
 
-		jsonValues[b.Type()] = []interface{}{childValues}
+		jsonValues[key] = []interface{}{childValues}
 	}
 }
 

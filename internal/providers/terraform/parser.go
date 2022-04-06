@@ -159,7 +159,7 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 	return pastResources, resources, nil
 }
 
-// StripTerraformWrapper removes any output added from the setup-terraform
+// StripSetupTerraformWrapper removes any output added from the setup-terraform
 // GitHub action terraform wrapper, so we can parse the output of this as
 // valid JSON. It returns the stripped out JSON and a boolean that is true
 // if the wrapper output was found and removed.

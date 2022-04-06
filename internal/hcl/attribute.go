@@ -162,31 +162,12 @@ func (attr *Attribute) Reference() (*Reference, error) {
 	if attr == nil {
 		return nil, fmt.Errorf("attribute is nil")
 	}
-	switch t := attr.HCLAttr.Expr.(type) {
-	case *hclsyntax.RelativeTraversalExpr:
-		if s, ok := t.Source.(*hclsyntax.IndexExpr); ok {
-			collectionRef, err := createDotReferenceFromTraversal(s.Collection.Variables()...)
-			if err != nil {
-				return nil, err
-			}
-			key, _ := s.Key.Value(attr.Ctx.Inner())
-			collectionRef.SetKey(key)
-
-			return collectionRef, nil
-		}
-
-		return createDotReferenceFromTraversal(t.Source.Variables()...)
-	case *hclsyntax.ScopeTraversalExpr:
-		return createDotReferenceFromTraversal(t.Traversal)
-	case *hclsyntax.TemplateExpr:
-		refs := attr.referencesInTemplate()
-		if len(refs) == 0 {
-			return nil, fmt.Errorf("no references in template")
-		}
-		return refs[0], nil
-	default:
-		return nil, fmt.Errorf("not a reference: no scope traversal")
+	refs := attr.AllReferences()
+	if len(refs) == 0 {
+		return nil, fmt.Errorf("no references for attribute")
 	}
+
+	return refs[0], nil
 }
 
 // AllReferences returns a list of References for the given Attribute. This can include the
@@ -196,22 +177,32 @@ func (attr *Attribute) AllReferences() []*Reference {
 	if attr == nil {
 		return nil
 	}
-	var refs []*Reference
-	refs = append(refs, attr.referencesInTemplate()...)
-	refs = append(refs, attr.referencesInConditional()...)
-	ref, err := attr.Reference()
-	if err == nil {
-		refs = append(refs, ref)
-	}
-	return refs
+
+	return attr.referencesFromExpression(attr.HCLAttr.Expr)
 }
 
-func (attr *Attribute) referencesInTemplate() []*Reference {
+func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Reference {
 	if attr == nil {
 		return nil
 	}
 	var refs []*Reference
-	switch t := attr.HCLAttr.Expr.(type) {
+	switch t := expression.(type) {
+	case *hclsyntax.ConditionalExpr:
+		if ref, err := createDotReferenceFromTraversal(t.TrueResult.Variables()...); err == nil {
+			refs = append(refs, ref)
+		}
+		if ref, err := createDotReferenceFromTraversal(t.FalseResult.Variables()...); err == nil {
+			refs = append(refs, ref)
+		}
+		if ref, err := createDotReferenceFromTraversal(t.Condition.Variables()...); err == nil {
+			refs = append(refs, ref)
+		}
+	case *hclsyntax.ScopeTraversalExpr:
+		if ref, err := createDotReferenceFromTraversal(t.Variables()...); err == nil {
+			refs = append(refs, ref)
+		}
+	case *hclsyntax.TemplateWrapExpr:
+		refs = attr.referencesFromExpression(t.Wrapped)
 	case *hclsyntax.TemplateExpr:
 		for _, part := range t.Parts {
 			ref, err := createDotReferenceFromTraversal(part.Variables()...)
@@ -225,27 +216,25 @@ func (attr *Attribute) referencesInTemplate() []*Reference {
 		if err == nil {
 			refs = append(refs, ref)
 		}
-	}
-	return refs
-}
-
-func (attr *Attribute) referencesInConditional() []*Reference {
-	if attr == nil {
-		return nil
-	}
-	var refs []*Reference
-
-	if t, ok := attr.HCLAttr.Expr.(*hclsyntax.ConditionalExpr); ok {
-		if ref, err := createDotReferenceFromTraversal(t.TrueResult.Variables()...); err == nil {
-			refs = append(refs, ref)
+	case *hclsyntax.RelativeTraversalExpr:
+		switch s := t.Source.(type) {
+		case *hclsyntax.IndexExpr:
+			if collectionRef, err := createDotReferenceFromTraversal(s.Collection.Variables()...); err == nil {
+				key, _ := s.Key.Value(attr.Ctx.Inner())
+				collectionRef.SetKey(key)
+				refs = append(refs, collectionRef)
+			}
+		default:
+			if ref, err := createDotReferenceFromTraversal(t.Source.Variables()...); err == nil {
+				refs = append(refs, ref)
+			}
 		}
-		if ref, err := createDotReferenceFromTraversal(t.FalseResult.Variables()...); err == nil {
-			refs = append(refs, ref)
-		}
-		if ref, err := createDotReferenceFromTraversal(t.Condition.Variables()...); err == nil {
-			refs = append(refs, ref)
+	case *hclsyntax.IndexExpr:
+		if collectionRef, err := createDotReferenceFromTraversal(t.Collection.Variables()...); err == nil {
+			key, _ := t.Key.Value(attr.Ctx.Inner())
+			collectionRef.SetKey(key)
+			refs = append(refs, collectionRef)
 		}
 	}
-
 	return refs
 }

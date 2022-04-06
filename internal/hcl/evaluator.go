@@ -293,13 +293,17 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 			}
 		}
 
+		vals := make([]cty.Value, count)
 		for i := 0; i < count; i++ {
 			c, _ := gocty.ToCtyValue(i, cty.Number)
 			clone := block.Clone(c)
-			block.TypeLabel()
+
 			log.Debugf("Added %s from count var", clone.Reference())
 			countFiltered = append(countFiltered, clone)
+			vals[i] = clone.Values()
 		}
+
+		e.ctx.SetByDot(cty.TupleVal(vals), block.Reference().String())
 	}
 
 	return countFiltered
