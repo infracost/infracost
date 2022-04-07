@@ -185,8 +185,15 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 	if attr == nil {
 		return nil
 	}
+
+	countRef, _ := newReference([]string{"count", "index"})
+
 	var refs []*Reference
 	switch t := expression.(type) {
+	case *hclsyntax.FunctionCallExpr:
+		for _, arg := range t.Args {
+			refs = append(refs, attr.referencesFromExpression(arg)...)
+		}
 	case *hclsyntax.ConditionalExpr:
 		if ref, err := createDotReferenceFromTraversal(t.TrueResult.Variables()...); err == nil {
 			refs = append(refs, ref)
@@ -222,7 +229,7 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 			if collectionRef, err := createDotReferenceFromTraversal(s.Collection.Variables()...); err == nil {
 				key, _ := s.Key.Value(attr.Ctx.Inner())
 				collectionRef.SetKey(key)
-				refs = append(refs, collectionRef)
+				refs = append(refs, collectionRef, countRef)
 			}
 		default:
 			if ref, err := createDotReferenceFromTraversal(t.Source.Variables()...); err == nil {
@@ -233,7 +240,7 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 		if collectionRef, err := createDotReferenceFromTraversal(t.Collection.Variables()...); err == nil {
 			key, _ := t.Key.Value(attr.Ctx.Inner())
 			collectionRef.SetKey(key)
-			refs = append(refs, collectionRef)
+			refs = append(refs, collectionRef, countRef)
 		}
 	}
 	return refs

@@ -1,0 +1,312 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.1.0",
+  "planned_values": {
+    "root_module": {
+      "child_modules": [
+        {
+          "resources": [
+            {
+              "address": "module.module1.aws_ecs_task_definition.ecs_task[0]",
+              "mode": "managed",
+              "type": "aws_ecs_task_definition",
+              "name": "ecs_task",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "arn": "task-1-arn",
+                "container_definitions": "\t\t\t[\n\t\t\t\t{\n\t\t\t\t\t\t\"command\": [\"sleep\", \"10\"],\n\t\t\t\t\t\t\"entryPoint\": [\"/\"],\n\t\t\t\t\t\t\"essential\": true,\n\t\t\t\t\t\t\"image\": \"alpine\",\n\t\t\t\t\t\t\"name\": \"alpine\",\n\t\t\t\t\t\t\"network_mode\": \"none\"\n\t\t\t\t}\n\t\t\t]\n",
+                "cpu": "1 vCPU",
+                "family": "ecs_task_module_1",
+                "id": "task-1",
+                "inference_accelerator": [
+                  {
+                    "device_name": "device1",
+                    "device_type": "eia2.medium"
+                  }
+                ],
+                "memory": "2 GB",
+                "requires_compatibilities": [
+                  "FARGATE"
+                ]
+              }
+            },
+            {
+              "address": "module.module1.aws_ecs_service.ecs_service[0]",
+              "mode": "managed",
+              "type": "aws_ecs_service",
+              "name": "ecs_service",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "arn": "svc-1-arn",
+                "desired_count": 1,
+                "id": "svc-1",
+                "launch_type": "FARGATE",
+                "name": "ecs_service_module_1",
+                "task_definition": null
+              }
+            }
+          ],
+          "address": "module.module1",
+          "child_modules": [
+            {
+              "resources": [
+                {
+                  "address": "module.module1.module.module2.aws_ecs_task_definition.ecs_task[0]",
+                  "mode": "managed",
+                  "type": "aws_ecs_task_definition",
+                  "name": "ecs_task",
+                  "index": 0,
+                  "schema_version": 0,
+                  "values": {
+                    "arn": "task-2-arn",
+                    "container_definitions": "\t\t\t[\n\t\t\t\t{\n\t\t\t\t\t\t\"command\": [\"sleep\", \"10\"],\n\t\t\t\t\t\t\"entryPoint\": [\"/\"],\n\t\t\t\t\t\t\"essential\": true,\n\t\t\t\t\t\t\"image\": \"alpine\",\n\t\t\t\t\t\t\"name\": \"alpine\",\n\t\t\t\t\t\t\"network_mode\": \"none\"\n\t\t\t\t}\n\t\t\t]\n",
+                    "cpu": "1 vCPU",
+                    "family": "ecs_task_module_2",
+                    "id": "task-2",
+                    "inference_accelerator": [
+                      {
+                        "device_name": "device1",
+                        "device_type": "eia2.medium"
+                      }
+                    ],
+                    "memory": "2 GB",
+                    "requires_compatibilities": [
+                      "FARGATE"
+                    ]
+                  }
+                },
+                {
+                  "address": "module.module1.module.module2.aws_ecs_service.ecs_service[0]",
+                  "mode": "managed",
+                  "type": "aws_ecs_service",
+                  "name": "ecs_service",
+                  "index": 0,
+                  "schema_version": 0,
+                  "values": {
+                    "arn": "svc-2-arn",
+                    "desired_count": 1,
+                    "id": "svc-2",
+                    "launch_type": "FARGATE",
+                    "name": "ecs_service_module_2",
+                    "task_definition": null
+                  }
+                }
+              ],
+              "address": "module.module1.module.module2"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "module.module1.aws_ecs_task_definition.ecs_task[0]",
+      "module_address": "module.module1",
+      "mode": "managed",
+      "type": "aws_ecs_task_definition",
+      "name": "ecs_task",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "task-1-arn",
+          "container_definitions": "\t\t\t[\n\t\t\t\t{\n\t\t\t\t\t\t\"command\": [\"sleep\", \"10\"],\n\t\t\t\t\t\t\"entryPoint\": [\"/\"],\n\t\t\t\t\t\t\"essential\": true,\n\t\t\t\t\t\t\"image\": \"alpine\",\n\t\t\t\t\t\t\"name\": \"alpine\",\n\t\t\t\t\t\t\"network_mode\": \"none\"\n\t\t\t\t}\n\t\t\t]\n",
+          "cpu": "1 vCPU",
+          "family": "ecs_task_module_1",
+          "id": "task-1",
+          "inference_accelerator": [
+            {
+              "device_name": "device1",
+              "device_type": "eia2.medium"
+            }
+          ],
+          "memory": "2 GB",
+          "requires_compatibilities": [
+            "FARGATE"
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.module1.aws_ecs_service.ecs_service[0]",
+      "module_address": "module.module1",
+      "mode": "managed",
+      "type": "aws_ecs_service",
+      "name": "ecs_service",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "svc-1-arn",
+          "desired_count": 1,
+          "id": "svc-1",
+          "launch_type": "FARGATE",
+          "name": "ecs_service_module_1",
+          "task_definition": null
+        }
+      }
+    },
+    {
+      "address": "module.module1.module.module2.aws_ecs_task_definition.ecs_task[0]",
+      "module_address": "module.module1.module.module2",
+      "mode": "managed",
+      "type": "aws_ecs_task_definition",
+      "name": "ecs_task",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "task-2-arn",
+          "container_definitions": "\t\t\t[\n\t\t\t\t{\n\t\t\t\t\t\t\"command\": [\"sleep\", \"10\"],\n\t\t\t\t\t\t\"entryPoint\": [\"/\"],\n\t\t\t\t\t\t\"essential\": true,\n\t\t\t\t\t\t\"image\": \"alpine\",\n\t\t\t\t\t\t\"name\": \"alpine\",\n\t\t\t\t\t\t\"network_mode\": \"none\"\n\t\t\t\t}\n\t\t\t]\n",
+          "cpu": "1 vCPU",
+          "family": "ecs_task_module_2",
+          "id": "task-2",
+          "inference_accelerator": [
+            {
+              "device_name": "device1",
+              "device_type": "eia2.medium"
+            }
+          ],
+          "memory": "2 GB",
+          "requires_compatibilities": [
+            "FARGATE"
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.module1.module.module2.aws_ecs_service.ecs_service[0]",
+      "module_address": "module.module1.module.module2",
+      "mode": "managed",
+      "type": "aws_ecs_service",
+      "name": "ecs_service",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "svc-2-arn",
+          "desired_count": 1,
+          "id": "svc-2",
+          "launch_type": "FARGATE",
+          "name": "ecs_service_module_2",
+          "task_definition": null
+        }
+      }
+    }
+  ],
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": {
+          "region": {
+            "constant_value": "us-east-1"
+          }
+        }
+      }
+    },
+    "root_module": {
+      "module_calls": {
+        "module1": {
+          "source": "./modules/module1",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_ecs_task_definition.ecs_task",
+                "mode": "managed",
+                "type": "aws_ecs_task_definition",
+                "name": "ecs_task",
+                "provider_config_key": "module1:aws",
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "var.enabled"
+                  ]
+                }
+              },
+              {
+                "address": "aws_ecs_service.ecs_service",
+                "mode": "managed",
+                "type": "aws_ecs_service",
+                "name": "ecs_service",
+                "provider_config_key": "module1:aws",
+                "expressions": {
+                  "task_definition": {
+                    "references": [
+                      "aws_ecs_task_definition.ecs_task",
+                      "aws_ecs_task_definition.ecs_task"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "var.enabled"
+                  ]
+                }
+              }
+            ],
+            "module_calls": {
+              "module2": {
+                "source": "./modules/module2",
+                "module": {
+                  "resources": [
+                    {
+                      "address": "aws_ecs_task_definition.ecs_task",
+                      "mode": "managed",
+                      "type": "aws_ecs_task_definition",
+                      "name": "ecs_task",
+                      "provider_config_key": "module2:aws",
+                      "schema_version": 0,
+                      "count_expression": {
+                        "references": [
+                          "var.enabled"
+                        ]
+                      }
+                    },
+                    {
+                      "address": "aws_ecs_service.ecs_service",
+                      "mode": "managed",
+                      "type": "aws_ecs_service",
+                      "name": "ecs_service",
+                      "provider_config_key": "module2:aws",
+                      "expressions": {
+                        "task_definition": {
+                          "references": [
+                            "aws_ecs_task_definition.ecs_task",
+                            "aws_ecs_task_definition.ecs_task"
+                          ]
+                        }
+                      },
+                      "schema_version": 0,
+                      "count_expression": {
+                        "references": [
+                          "var.enabled"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -72,6 +72,28 @@ func (r *Reference) SetKey(key cty.Value) {
 	}
 }
 
+// JSONString returns the reference so that it's possible to use in the plan JSON file.
+// This strips any count keys from the reference.
+func (r *Reference) JSONString() string {
+	base := fmt.Sprintf("%s.%s", r.typeLabel, r.nameLabel)
+
+	if !r.blockType.removeTypeInReference {
+		base = r.blockType.Name()
+		if r.blockType.Name() == "variable" {
+			base = "var"
+		}
+
+		if r.typeLabel != "" {
+			base += "." + r.typeLabel
+		}
+		if r.nameLabel != "" {
+			base += "." + r.nameLabel
+		}
+	}
+
+	return base
+}
+
 func (r *Reference) String() string {
 	base := fmt.Sprintf("%s.%s", r.typeLabel, r.nameLabel)
 

@@ -29,8 +29,6 @@ type Evaluator struct {
 	// ctx is the master Context for evaluating the current set of Blocks. This is extremely important
 	// and gets slowly built up as the Evaluator runs across the list of Blocks.
 	ctx *Context
-	// blocks is the list of Blocks that the Evaluator will evaluate over.
-	blocks Blocks
 	// inputVars are the given input variables for this Evaluator run. At the root module level these are variables
 	// provided by the user as tfvars. Further down the config tree these input vars are module variables provided in
 	// HCL attributes.
@@ -42,32 +40,31 @@ type Evaluator struct {
 	moduleMetadata *modules.Manifest
 	// visitedModules is a lookup map to hold information by the Evaluator of modules that it has already evaluated.
 	visitedModules map[string]struct{}
-	// projectRootPath is the path to the root module for this project.
-	projectRootPath string
-	// modulePath is the path to the local representation of the module as defined in ModulesManifest.
-	modulePath string
+	// module defines the input and module path for the Evaluator. It is the root module of the config.
+	module Module
 	// workingDir is the current directory the evaluator is running within. This is used to set Context information on
 	// child modules that the evaluator visits.
 	workingDir string
 	// workspace is the Terraform workspace that the Evaluator is running within.
 	workspace string
+	// blockBuilder handles generating blocks in the evaluation step.
+	blockBuilder BlockBuilder
 }
 
 // NewEvaluator returns an Evaluator with Context initialised with top level variables.
 // This Context is then passed to all Blocks as child Context so that variables built in Evaluation
 // are propagated to the Block Attributes.
 func NewEvaluator(
-	projectRootPath string,
-	modulePath string,
+	module Module,
 	workingDir string,
-	blocks Blocks,
 	inputVars map[string]cty.Value,
 	moduleMetadata *modules.Manifest,
 	visitedModules map[string]struct{},
 	workspace string,
+	blockBuilder BlockBuilder,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
-		Functions: expFunctions(modulePath),
+		Functions: expFunctions(module.ModulePath),
 	}, nil)
 
 	if visitedModules == nil {
@@ -76,31 +73,30 @@ func NewEvaluator(
 
 	// set the global evaluation parameters.
 	ctx.SetByDot(cty.StringVal(workspace), "terraform.workspace")
-	ctx.SetByDot(cty.StringVal(projectRootPath), "path.root")
-	ctx.SetByDot(cty.StringVal(modulePath), "path.module")
+	ctx.SetByDot(cty.StringVal(module.RootPath), "path.root")
+	ctx.SetByDot(cty.StringVal(module.ModulePath), "path.module")
 	ctx.SetByDot(cty.StringVal(workingDir), "path.cwd")
 
-	for _, b := range blocks {
+	for _, b := range module.Blocks {
 		b.SetContext(ctx.NewChild())
 	}
 
 	return &Evaluator{
-		modulePath:      modulePath,
-		projectRootPath: projectRootPath,
-		ctx:             ctx,
-		blocks:          blocks,
-		inputVars:       inputVars,
-		moduleMetadata:  moduleMetadata,
-		visitedModules:  visitedModules,
-		workspace:       workspace,
+		module:         module,
+		ctx:            ctx,
+		inputVars:      inputVars,
+		moduleMetadata: moduleMetadata,
+		visitedModules: visitedModules,
+		workspace:      workspace,
+		blockBuilder:   blockBuilder,
 	}
 }
 
 // Run builds the Evaluator Context using all the provided Blocks. It will build up the Context to hold
 // variable and reference information so that this can be used by Attribute evaluation. Run will also
 // parse and build up and child modules that are referenced in the Blocks and runs child Evaluator on
-// these Modules.
-func (e *Evaluator) Run() ([]*Module, error) {
+// this Module.
+func (e *Evaluator) Run() (*Module, error) {
 	var lastContext hcl.EvalContext
 	// first we need to evaluate the top level Context - so this can be passed to any child modules that are found.
 	e.evaluate(lastContext)
@@ -111,22 +107,19 @@ func (e *Evaluator) Run() ([]*Module, error) {
 
 	// expand out resources and modules via count and evaluate again so that we can include
 	// any module outputs and or count references.
-	e.blocks = e.expandBlocks(e.blocks)
+	e.module.Blocks = e.expandBlocks(e.module.Blocks)
 	e.evaluate(lastContext)
 
-	// returns all the evaluated Blocks under their given Modules.
+	// returns all the evaluated Blocks under their given Module.
 	return e.collectModules(), nil
 }
 
-func (e *Evaluator) collectModules() []*Module {
-	rootModule := &Module{Blocks: e.blocks, RootPath: e.projectRootPath, ModulePath: e.modulePath}
-	modules := []*Module{rootModule}
-
+func (e *Evaluator) collectModules() *Module {
 	for _, definition := range e.moduleCalls {
-		modules = append(modules, definition.Modules...)
+		e.module.Modules = append(e.module.Modules, definition.Module)
 	}
 
-	return modules
+	return &e.module
 }
 
 func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
@@ -155,7 +148,7 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 // evaluateStep gets the values for all the Block types in the current Module that affect Context.
 // It then sets these values on the Context so that they can be used in Block Attribute evaluation.
 func (e *Evaluator) evaluateStep(i int) {
-	log.Debugf("Starting context evaluation for module %s iteration %d", e.modulePath, i+1)
+	log.Debugf("Starting context evaluation for module %s iteration %d", e.module.ModulePath, i+1)
 
 	e.ctx.Set(e.getValuesByBlockType("variable"), "var")
 	e.ctx.Set(e.getValuesByBlockType("locals"), "local")
@@ -175,27 +168,34 @@ func (e *Evaluator) evaluateStep(i int) {
 // evaluateModules loops over each of the moduleCalls in this Module and set a child Evaluator
 // to run on the child Module Blocks. It passes the Evaluator the top level module Attributes as input variables.
 func (e *Evaluator) evaluateModules() {
-	for _, module := range e.moduleCalls {
-		if _, ok := e.visitedModules[module.Definition.FullName()]; ok {
+	for _, moduleCall := range e.moduleCalls {
+		if _, ok := e.visitedModules[moduleCall.Definition.FullName()]; ok {
 			continue
 		}
 
-		e.visitedModules[module.Definition.FullName()] = struct{}{}
+		e.visitedModules[moduleCall.Definition.FullName()] = struct{}{}
 
-		vars := module.Definition.Values().AsValueMap()
+		vars := moduleCall.Definition.Values().AsValueMap()
 		moduleEvaluator := NewEvaluator(
-			e.projectRootPath,
-			module.Path,
+			Module{
+				Name:       moduleCall.Definition.FullName(),
+				Source:     moduleCall.Module.Source,
+				Blocks:     moduleCall.Module.Blocks,
+				RootPath:   e.module.RootPath,
+				ModulePath: moduleCall.Path,
+				Modules:    nil,
+				Parent:     &e.module,
+			},
 			e.workingDir,
-			module.Modules[0].Blocks,
 			vars,
 			e.moduleMetadata,
 			e.visitedModules,
 			e.workspace,
+			e.blockBuilder,
 		)
-		module.Modules, _ = moduleEvaluator.Run()
 
-		e.ctx.Set(moduleEvaluator.exportOutputs(), "module", module.Name)
+		moduleCall.Module, _ = moduleEvaluator.Run()
+		e.ctx.Set(moduleEvaluator.exportOutputs(), "module", moduleCall.Name)
 	}
 }
 
@@ -203,7 +203,7 @@ func (e *Evaluator) evaluateModules() {
 func (e *Evaluator) exportOutputs() cty.Value {
 	data := make(map[string]cty.Value)
 
-	for _, block := range e.blocks.OfType("output") {
+	for _, block := range e.module.Blocks.OfType("output") {
 		attr := block.GetAttribute("value")
 		if attr == nil {
 			continue
@@ -254,7 +254,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 
 		if !forEachAttr.Value().IsNull() && forEachAttr.Value().IsKnown() && forEachAttr.IsIterable() {
 			forEachAttr.Value().ForEachElement(func(key cty.Value, val cty.Value) bool {
-				clone := block.Clone(key)
+				clone := e.blockBuilder.CloneBlock(block, key)
 
 				ctx := clone.Context()
 
@@ -297,7 +297,7 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 		vals := make([]cty.Value, count)
 		for i := 0; i < count; i++ {
 			c, _ := gocty.ToCtyValue(i, cty.Number)
-			clone := block.Clone(c)
+			clone := e.blockBuilder.CloneBlock(block, c)
 
 			log.Debugf("Added %s from count var", clone.Reference())
 			countFiltered = append(countFiltered, clone)
@@ -370,7 +370,7 @@ func (e *Evaluator) evaluateOutput(b *Block) (cty.Value, error) {
 }
 
 func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
-	blocksOfType := e.blocks.OfType(blockType)
+	blocksOfType := e.module.Blocks.OfType(blockType)
 	values := make(map[string]cty.Value)
 
 	for _, b := range blocksOfType {
@@ -450,7 +450,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		for _, module := range e.moduleMetadata.Modules {
 			reg := "registry.terraform.io/" + source
 			if module.Source == source || module.Source == reg {
-				modulePath = filepath.Clean(filepath.Join(e.projectRootPath, module.Dir))
+				modulePath = filepath.Clean(filepath.Join(e.module.RootPath, module.Dir))
 				break
 			}
 		}
@@ -463,10 +463,10 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		}
 
 		// combine the current calling module with relative source of the module
-		modulePath = filepath.Join(e.modulePath, source)
+		modulePath = filepath.Join(e.module.ModulePath, source)
 	}
 
-	blocks, err := b.getModuleBlocks(modulePath)
+	blocks, err := e.blockBuilder.BuildModuleBlocks(b, modulePath)
 	if err != nil {
 		return nil, err
 	}
@@ -476,18 +476,22 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		Name:       b.Label(),
 		Path:       modulePath,
 		Definition: b,
-		Modules: []*Module{
-			{RootPath: e.projectRootPath, ModulePath: modulePath, Blocks: blocks},
+		Module: &Module{
+			Name:       b.TypeLabel(),
+			Source:     source,
+			Blocks:     blocks,
+			RootPath:   e.module.RootPath,
+			ModulePath: modulePath,
+			Parent:     &e.module,
 		},
 	}, nil
 }
 
 // loadModules reads all module blocks and loads the underlying modules, adding blocks to moduleCalls.
 func (e *Evaluator) loadModules() []*ModuleCall {
-	blocks := e.blocks
 	var moduleDefinitions []*ModuleCall
 
-	expanded := e.expandBlocks(blocks.OfType("module"))
+	expanded := e.expandBlocks(e.module.Blocks.OfType("module"))
 
 	for _, moduleBlock := range expanded {
 		if moduleBlock.Label() == "" {

@@ -3,6 +3,8 @@ package hcl
 import (
 	"fmt"
 	"os"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -111,8 +113,13 @@ type Block struct {
 	verbose bool
 }
 
-// NewHCLBlock returns a Block with Context and child Blocks initialised.
-func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
+// BlockBuilder handles generating new Blocks as part of the parsing and evaluation process.
+type BlockBuilder struct {
+	SetAttributes []SetAttributesFunc
+}
+
+// NewBlock returns a Block with Context and child Blocks initialised.
+func (b BlockBuilder) NewBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 	if ctx == nil {
 		ctx = NewContext(&hcl.EvalContext{}, nil)
 	}
@@ -120,21 +127,12 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 	isLoggingVerbose := strings.TrimSpace(os.Getenv("INFRACOST_HCL_DEBUG_VERBOSE")) == "true"
 	var children Blocks
 	if body, ok := hclBlock.Body.(*hclsyntax.Body); ok {
-		for _, b := range body.Blocks {
-			children = append(children, NewHCLBlock(b.AsHCLBlock(), ctx, moduleBlock))
+		for _, bb := range body.Blocks {
+			children = append(children, b.NewBlock(bb.AsHCLBlock(), ctx, moduleBlock))
 		}
 
-		if hclBlock.Type == "resource" || hclBlock.Type == "data" {
-			_, withCount := body.Attributes["count"]
-			// add commonly used identifiers to the block so that if it's referenced by other
-			// blocks in context evaluation.
-			if _, ok := body.Attributes["id"]; !ok {
-				body.Attributes["id"] = newUniqueAttribute("id", withCount)
-			}
-
-			if _, ok := body.Attributes["arn"]; !ok {
-				body.Attributes["arn"] = newArnAttribute("arn", withCount)
-			}
+		for _, f := range b.SetAttributes {
+			f(moduleBlock, hclBlock)
 		}
 
 		return &Block{
@@ -162,7 +160,7 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 	}
 
 	for _, hb := range content.Blocks {
-		children = append(children, NewHCLBlock(hb, ctx, moduleBlock))
+		children = append(children, b.NewBlock(hb, ctx, moduleBlock))
 	}
 
 	return &Block{
@@ -171,6 +169,100 @@ func NewHCLBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 		moduleBlock: moduleBlock,
 		childBlocks: children,
 		verbose:     isLoggingVerbose,
+	}
+}
+
+// CloneBlock creates a duplicate of the block and sets the returned Block's Context to include the
+// index provided. This is primarily used when Blocks are expanded as part of a count evaluation.
+func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
+	var childCtx *Context
+	if block.context != nil {
+		childCtx = block.context.NewChild()
+	} else {
+		childCtx = NewContext(&hcl.EvalContext{}, nil)
+	}
+
+	cloneHCL := *block.hclBlock
+
+	clone := b.NewBlock(&cloneHCL, childCtx, block.moduleBlock)
+	if len(clone.hclBlock.Labels) > 0 {
+		position := len(clone.hclBlock.Labels) - 1
+		labels := make([]string, len(clone.hclBlock.Labels))
+		for i := 0; i < len(labels); i++ {
+			labels[i] = clone.hclBlock.Labels[i]
+		}
+		if index.IsKnown() && !index.IsNull() {
+			switch index.Type() {
+			case cty.Number:
+				f, _ := index.AsBigFloat().Float64()
+				labels[position] = fmt.Sprintf("%s[%d]", clone.hclBlock.Labels[position], int(f))
+			case cty.String:
+				labels[position] = fmt.Sprintf("%s[%q]", clone.hclBlock.Labels[position], index.AsString())
+			default:
+				log.Debugf("Invalid key type in iterable: %#v", index.Type())
+				labels[position] = fmt.Sprintf("%s[%#v]", clone.hclBlock.Labels[position], index)
+			}
+		} else {
+			labels[position] = fmt.Sprintf("%s[%d]", clone.hclBlock.Labels[position], block.cloneIndex)
+		}
+		clone.hclBlock.Labels = labels
+	}
+
+	indexVal, _ := gocty.ToCtyValue(index, cty.Number)
+	clone.context.SetByDot(indexVal, "count.index")
+	clone.expanded = true
+	block.cloneIndex++
+
+	return clone
+}
+
+// BuildModuleBlocks loads all the Blocks for the module at the given path
+func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string) (Blocks, error) {
+	var blocks Blocks
+	moduleFiles, err := loadDirectory(modulePath, true)
+	if err != nil {
+		return blocks, fmt.Errorf("failed to load module %s: %w", block.Label(), err)
+	}
+
+	moduleCtx := NewContext(&hcl.EvalContext{}, nil)
+	for _, file := range moduleFiles {
+		fileBlocks, err := loadBlocksFromFile(file)
+		if err != nil {
+			return blocks, err
+		}
+
+		if len(fileBlocks) > 0 {
+			log.Debugf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
+		}
+
+		for _, fileBlock := range fileBlocks {
+			blocks = append(blocks, b.NewBlock(fileBlock, moduleCtx, block))
+		}
+	}
+
+	return blocks, err
+}
+
+// SetAttributesFunc defines a function that sets required attributes on a hcl.Block.
+// This is done so that identifiers that are normally propagated from a Terraform state/apply
+// are set on the Block. This means they can be used properly in references and outputs.
+type SetAttributesFunc func(moduleBlock *Block, block *hcl.Block)
+
+// SetUUIDAttributes adds commonly used identifiers to the block so that it can be referenced by other
+// blocks in context evaluation. The identifiers are only set if they don't already exist as attributes
+// on the block.
+func SetUUIDAttributes(moduleBlock *Block, block *hcl.Block) {
+	if body, ok := block.Body.(*hclsyntax.Body); ok {
+		if block.Type == "resource" || block.Type == "data" {
+			_, withCount := body.Attributes["count"]
+			if _, ok := body.Attributes["id"]; !ok {
+				body.Attributes["id"] = newUniqueAttribute("id", withCount)
+			}
+
+			if _, ok := body.Attributes["arn"]; !ok {
+				body.Attributes["arn"] = newArnAttribute("arn", withCount)
+			}
+		}
 	}
 }
 
@@ -232,50 +324,6 @@ func (b *Block) InjectBlock(block *Block, name string) {
 // IsCountExpanded returns if the Block has been expanded as part of a for_each or count evaluation.
 func (b *Block) IsCountExpanded() bool {
 	return b.expanded
-}
-
-// Clone creates a duplicate of the block and sets the returned Block's Context to include the
-// index provided. This is primarily used when Blocks are expanded as part of a count evaluation.
-func (b *Block) Clone(index cty.Value) *Block {
-	var childCtx *Context
-	if b.context != nil {
-		childCtx = b.context.NewChild()
-	} else {
-		childCtx = NewContext(&hcl.EvalContext{}, nil)
-	}
-
-	cloneHCL := *b.hclBlock
-
-	clone := NewHCLBlock(&cloneHCL, childCtx, b.moduleBlock)
-	if len(clone.hclBlock.Labels) > 0 {
-		position := len(clone.hclBlock.Labels) - 1
-		labels := make([]string, len(clone.hclBlock.Labels))
-		for i := 0; i < len(labels); i++ {
-			labels[i] = clone.hclBlock.Labels[i]
-		}
-		if index.IsKnown() && !index.IsNull() {
-			switch index.Type() {
-			case cty.Number:
-				f, _ := index.AsBigFloat().Float64()
-				labels[position] = fmt.Sprintf("%s[%d]", clone.hclBlock.Labels[position], int(f))
-			case cty.String:
-				labels[position] = fmt.Sprintf("%s[%q]", clone.hclBlock.Labels[position], index.AsString())
-			default:
-				log.Debugf("Invalid key type in iterable: %#v", index.Type())
-				labels[position] = fmt.Sprintf("%s[%#v]", clone.hclBlock.Labels[position], index)
-			}
-		} else {
-			labels[position] = fmt.Sprintf("%s[%d]", clone.hclBlock.Labels[position], b.cloneIndex)
-		}
-		clone.hclBlock.Labels = labels
-	}
-
-	indexVal, _ := gocty.ToCtyValue(index, cty.Number)
-	clone.context.SetByDot(indexVal, "count.index")
-	clone.expanded = true
-	b.cloneIndex++
-
-	return clone
 }
 
 // SetContext sets the Block.context to the provided ctx. This ctx is also set on the child Blocks as
@@ -346,6 +394,12 @@ func (b *Block) Provider() string {
 	attr := b.GetAttribute("provider")
 	if attr != nil {
 		value := attr.Value()
+		r, err := attr.Reference()
+		if err == nil {
+			// An explicit provider is provided so use that
+			return r.String()
+		}
+
 		if value.Type() == cty.String {
 			// An explicit provider is provided so use that
 			return value.AsString()
@@ -545,6 +599,10 @@ func (b *Block) LocalName() string {
 // Would have its FullName as module.web_app.aws_instance.t3_standard
 // FullName is what Terraform uses in its JSON output file.
 func (b *Block) FullName() string {
+	if b == nil {
+		return ""
+	}
+
 	if b.moduleBlock != nil {
 		return fmt.Sprintf(
 			"%s.%s",
@@ -580,6 +638,22 @@ func (b *Block) NameLabel() string {
 		return b.Labels()[1]
 	}
 	return ""
+}
+
+var countRegex = regexp.MustCompile(`\[(\d+)\]$`)
+
+// Index returns the count index of the block using the name label.
+// Index returns nil if the block has no count.
+func (b *Block) Index() *int64 {
+	m := countRegex.FindStringSubmatch(b.NameLabel())
+
+	if len(m) > 0 {
+		i, _ := strconv.ParseInt(m[1], 10, 64)
+
+		return &i
+	}
+
+	return nil
 }
 
 func (b *Block) Label() string {

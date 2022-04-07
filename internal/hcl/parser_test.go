@@ -13,7 +13,6 @@ import (
 )
 
 func Test_BasicParsing(t *testing.T) {
-
 	path := createTestFile("test.tf", `
 
 locals {
@@ -46,13 +45,12 @@ data "cats_cat" "the-cats-mother" {
 `)
 
 	parser := New(filepath.Dir(path), OptionStopOnHCLError())
-	modules, err := parser.ParseDirectory()
+	module, err := parser.ParseDirectory()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	blocks := modules[0].Blocks
-
+	blocks := module.Blocks
 	// variable
 	variables := blocks.OfType("variable")
 	require.Len(t, variables, 1)
@@ -130,12 +128,11 @@ output "mod_result" {
 	)
 
 	parser := New(path, OptionStopOnHCLError())
-	modules, err := parser.ParseDirectory()
+	rootModule, err := parser.ParseDirectory()
 	if err != nil {
 		t.Fatal(err)
 	}
-	rootModule := modules[0]
-	childModule := modules[1]
+	childModule := rootModule.Modules[0]
 
 	moduleBlocks := rootModule.Blocks.OfType("module")
 	require.Len(t, moduleBlocks, 1)
@@ -190,12 +187,11 @@ output "mod_result" {
 	)
 
 	parser := New(path, OptionStopOnHCLError())
-	modules, err := parser.ParseDirectory()
+	rootModule, err := parser.ParseDirectory()
 	if err != nil {
 		t.Fatal(err)
 	}
-	rootModule := modules[0]
-	childModule := modules[1]
+	childModule := rootModule.Modules[0]
 
 	moduleBlocks := rootModule.Blocks.OfType("module")
 	require.Len(t, moduleBlocks, 1)
