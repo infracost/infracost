@@ -228,3 +228,158 @@ func (r *SNSTopic) notificationsCostComponent(name, unit string, multiplier int6
 		},
 	}
 }
+
+type SNSFIFOTopic struct {
+	Address         string
+	Region          string
+	Subscriptions   int64
+	RequestSizeKB   *float64 `infracost_usage:"request_size_kb"`
+	MonthlyRequests *int64   `infracost_usage:"monthly_requests"`
+}
+
+var SNSFIFOTopicUsageSchema = []*schema.UsageItem{
+	{Key: "request_size_kb", ValueType: schema.Float64, DefaultValue: 1},
+	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+}
+
+// This is an experiment to see if using an explicit structure to define the cost components
+// can enable anything interesting (e.g. list what cost components could apply to a resource
+// without having any IaAC)
+func (r *SNSFIFOTopic) CostComponents() []*schema.CostComponent {
+	return []*schema.CostComponent{
+		r.PublishAPIRequestsCostComponent(nil),
+		r.PublishAPIPayloadCostComponent(nil, nil),
+		r.NotificationsCostComponent(0, nil),
+		r.NotificationPayloadCostComponent(0, nil, nil),
+	}
+}
+
+func (r *SNSFIFOTopic) PublishAPIRequestsCostComponent(requests *int64) *schema.CostComponent {
+	var q *decimal.Decimal
+	if requests != nil {
+		q = decimalPtr(decimal.NewFromInt(*requests))
+	}
+
+	return &schema.CostComponent{
+		Name:            "FIFO Publish API requests",
+		Unit:            "1M requests",
+		UnitMultiplier:  decimal.NewFromInt(1000000),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonSNS"),
+			ProductFamily: strPtr(""),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("F-Request-Tier1")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("0"),
+		},
+	}
+}
+
+func (r *SNSFIFOTopic) PublishAPIPayloadCostComponent(requests *int64, requestSizeGB *float64) *schema.CostComponent {
+	var q *decimal.Decimal
+	if requests != nil && requestSizeGB != nil {
+		q = decimalPtr(decimal.NewFromFloat(float64(*requests) * *requestSizeGB))
+	}
+
+	return &schema.CostComponent{
+		Name:            "FIFO Publish API payload",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonSNS"),
+			ProductFamily: strPtr(""),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("F-Ingress-Tier1")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("0"),
+		},
+	}
+}
+func (r *SNSFIFOTopic) NotificationsCostComponent(subscriptions int64, requests *int64) *schema.CostComponent {
+	var q *decimal.Decimal
+	if subscriptions == 0 {
+		q = &decimal.Zero
+	} else if requests != nil {
+		q = decimalPtr(decimal.NewFromInt(subscriptions * *requests))
+	}
+
+	return &schema.CostComponent{
+		Name:            "FIFO notifications",
+		Unit:            "1M notifications",
+		UnitMultiplier:  decimal.NewFromInt(1000000),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonSNS"),
+			ProductFamily: strPtr(""),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("F-DA-SQS")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("0"),
+		},
+	}
+}
+func (r *SNSFIFOTopic) NotificationPayloadCostComponent(subscriptions int64, requests *int64, requestSizeGB *float64) *schema.CostComponent {
+	var q *decimal.Decimal
+	if subscriptions == 0 {
+		q = &decimal.Zero
+	} else if requests != nil && requestSizeGB != nil {
+		q = decimalPtr(decimal.NewFromFloat(float64(subscriptions**requests) * *requestSizeGB))
+	}
+
+	return &schema.CostComponent{
+		Name:            "FIFO notification payload",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonSNS"),
+			ProductFamily: strPtr(""),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("F-Egress-SQS")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("0"),
+		},
+	}
+}
+
+func (r *SNSFIFOTopic) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(r, u)
+}
+
+func (r *SNSFIFOTopic) BuildResource() *schema.Resource {
+	var requestSizeGB *float64
+	if r.RequestSizeKB != nil {
+		requestSizeGB = floatPtr(*r.RequestSizeKB / 1000000.0)
+	}
+
+	components := []*schema.CostComponent{
+		r.PublishAPIRequestsCostComponent(r.MonthlyRequests),
+		r.PublishAPIPayloadCostComponent(r.MonthlyRequests, requestSizeGB),
+		r.NotificationsCostComponent(r.Subscriptions, r.MonthlyRequests),
+		r.NotificationPayloadCostComponent(r.Subscriptions, r.MonthlyRequests, requestSizeGB),
+	}
+
+	return &schema.Resource{
+		Name:           r.Address,
+		CostComponents: components,
+		UsageSchema:    SNSTopicUsageSchema,
+	}
+}

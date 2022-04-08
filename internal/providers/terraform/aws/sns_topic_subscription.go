@@ -12,6 +12,7 @@ func getSNSTopicSubscriptionRegistryItem() *schema.RegistryItem {
 		Notes: []string{
 			"DEPRECATED.  Set subscription usage on aws_sns_topic instead.",
 		},
+		ReferenceAttributes: []string{"topic_arn"},
 	}
 }
 
