@@ -10,6 +10,9 @@
  ├─ MacOS notifications                          Monthly cost depends on usage: $0.50 per 1M notifications     
  └─ SMS notifications (over 100)                 Monthly cost depends on usage: $0.75 per 100 notifications    
                                                                                                                
+ aws_sns_topic.sns_topic_customSmsPrice                                                                        
+ └─ SMS notifications (over 100)                                   9  100 notifications                  $8.88 
+                                                                                                               
  aws_sns_topic.sns_topic_withChargedSubscribers                                                                
  ├─ HTTP/HTTPS notifications (over 100k)                           1  100k notifications                 $0.06 
  ├─ Email/Email-JSON notifications (over 1k)                    2.99  100k notifications                 $5.98 
@@ -25,9 +28,9 @@
  ├─ Kinesis Firehose notifications               Monthly cost depends on usage: $0.19 per 1M notifications     
  ├─ Mobile Push notifications                    Monthly cost depends on usage: $0.50 per 1M notifications     
  ├─ MacOS notifications                          Monthly cost depends on usage: $0.50 per 1M notifications     
- └─ SMS notifications (over 100)                 Monthly cost depends on usage: $0.75 per 100 notifications    
+ └─ SMS notifications (over 100)                 Monthly cost depends on usage: $0.99 per 100 notifications    
                                                                                                                
- OVERALL TOTAL                                                                                          $19.55 
+ OVERALL TOTAL                                                                                          $28.43 
 ──────────────────────────────────
-5 cloud resources were detected:
-∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+6 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

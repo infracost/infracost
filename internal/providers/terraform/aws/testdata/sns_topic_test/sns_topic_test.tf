@@ -28,3 +28,7 @@ resource "aws_sns_topic" "sns_topic_withChargedSubscribers" {
 resource "aws_sns_topic" "sns_topic_withZeroRequests" {
   name = "my-standard-queue"
 }
+
+resource "aws_sns_topic" "sns_topic_customSmsPrice" {
+  name = "my-standard-queue"
+}

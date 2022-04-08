@@ -20,6 +20,7 @@ type SNSTopic struct {
 	MobilePushSubscriptions *int64   `infracost_usage:"mobile_push_subscriptions"`
 	MacOSSubscriptions      *int64   `infracost_usage:"macos_subscriptions"`
 	SMSSubscriptions        *int64   `infracost_usage:"sms_subscriptions"`
+	SMSNotificationPrice    *float64 `infracost_usage:"sms_notification_price"`
 }
 
 var SNSTopicUsageSchema = []*schema.UsageItem{
@@ -31,6 +32,7 @@ var SNSTopicUsageSchema = []*schema.UsageItem{
 	{Key: "mobile_push_subscriptions", ValueType: schema.Int64, DefaultValue: 0},
 	{Key: "macos_subscriptions", ValueType: schema.Int64, DefaultValue: 0},
 	{Key: "sms_subscriptions", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "sms_notification_price", ValueType: schema.Float64, DefaultValue: 0.0075},
 }
 
 // This is an experiment to see if using an explicit structure to define the cost components
@@ -128,8 +130,8 @@ func (r *SNSTopic) MacOSNotificationsCostComponent(subscriptions, requests *int6
 	)
 }
 
-func (r *SNSTopic) SMSNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
-	return r.notificationsCostComponent(
+func (r *SNSTopic) SMSNotificationsCostComponent(subscriptions, requests *int64, customPrice *float64) *schema.CostComponent {
+	c := r.notificationsCostComponent(
 		"SMS notifications (over 100)",
 		"100 notifications",
 		100,
@@ -138,6 +140,12 @@ func (r *SNSTopic) SMSNotificationsCostComponent(subscriptions, requests *int64)
 		subscriptions,
 		requests,
 	)
+
+	if customPrice != nil {
+		c.SetCustomPrice(decimalPtr(decimal.NewFromFloat(*customPrice)))
+	}
+
+	return c
 }
 
 func (r *SNSTopic) PopulateUsage(u *schema.UsageData) {
@@ -163,7 +171,7 @@ func (r *SNSTopic) BuildResource() *schema.Resource {
 		r.KinesisNotificationsCostComponent(r.KinesisSubscriptions, requests),
 		r.MobilePushNotificationsCostComponent(r.MobilePushSubscriptions, requests),
 		r.MacOSNotificationsCostComponent(r.MacOSSubscriptions, requests),
-		r.SMSNotificationsCostComponent(r.SMSSubscriptions, requests),
+		r.SMSNotificationsCostComponent(r.SMSSubscriptions, requests, r.SMSNotificationPrice),
 	}
 
 	return &schema.Resource{
