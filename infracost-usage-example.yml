@@ -441,8 +441,8 @@ resource_usage:
     sms_notification_price: 0.008 # Average price for each SMS notification
 
   aws_sns_topic_subscription.my_topic_subscription:
-    monthly_requests: 1000000 # Monthly requests to SNS.
-    request_size_kb: 64       # Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
+    monthly_requests: 1000000 # (DEPRECATED use aws_sns_topic.monthly_requests instead) Monthly requests to SNS.
+    request_size_kb: 64       # (DEPRECATED use aws_sns_topic.request_size_kb instead) Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
 
   aws_sqs_queue.my_queue:
     monthly_requests: 1000000 # Monthly requests to SQS.
