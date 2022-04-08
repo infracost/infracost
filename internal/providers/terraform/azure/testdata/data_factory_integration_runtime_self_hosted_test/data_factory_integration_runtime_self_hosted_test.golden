@@ -1,0 +1,25 @@
+
+ Name                                                                   Monthly Qty  Unit                    Monthly Cost 
+                                                                                                                          
+ azurerm_data_factory.example                                                                                             
+ ├─ Read/Write operations                                         Monthly cost depends on usage: $0.50 per 50k entities   
+ └─ Monitoring operations                                         Monthly cost depends on usage: $0.25 per 50k entities   
+                                                                                                                          
+ azurerm_data_factory_integration_runtime_self_hosted.example                                                             
+ ├─ Orchestration                                                 Monthly cost depends on usage: $1.50 per 1k runs        
+ ├─ Data movement activity                                                      730  hours                         $73.00 
+ ├─ Pipeline activity                                                           730  hours                          $1.46 
+ └─ External pipeline activity                                                  730  hours                          $0.07 
+                                                                                                                          
+ azurerm_data_factory_integration_runtime_self_hosted.with_usage                                                          
+ ├─ Orchestration                                                                10  1k runs                       $15.00 
+ ├─ Data movement activity                                                      730  hours                         $73.00 
+ ├─ Pipeline activity                                                           730  hours                          $1.46 
+ └─ External pipeline activity                                                  730  hours                          $0.07 
+                                                                                                                          
+ OVERALL TOTAL                                                                                                    $164.07 
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group

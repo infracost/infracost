@@ -1,0 +1,17 @@
+
+ Name                                   Monthly Qty  Unit                    Monthly Cost 
+                                                                                          
+ azurerm_data_factory.example                                                             
+ ├─ Read/Write operations         Monthly cost depends on usage: $0.50 per 50k entities   
+ └─ Monitoring operations         Monthly cost depends on usage: $0.25 per 50k entities   
+                                                                                          
+ azurerm_data_factory.with_usage                                                          
+ ├─ Read/Write operations                         2  50k entities                   $1.00 
+ └─ Monitoring operations                       0.5  50k entities                   $0.13 
+                                                                                          
+ OVERALL TOTAL                                                                      $1.13 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
