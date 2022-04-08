@@ -41,6 +41,12 @@ var SNSTopicUsageSchema = []*schema.UsageItem{
 func (r *SNSTopic) CostComponents() []*schema.CostComponent {
 	return []*schema.CostComponent{
 		r.APIRequestsCostComponent(nil),
+		r.HTTPNotificationsCostComponent(nil, nil),
+		r.EmailNotificationsCostComponent(nil, nil),
+		r.KinesisNotificationsCostComponent(nil, nil),
+		r.MobilePushNotificationsCostComponent(nil, nil),
+		r.MacOSNotificationsCostComponent(nil, nil),
+		r.SMSNotificationsCostComponent(nil, nil, nil),
 	}
 }
 
