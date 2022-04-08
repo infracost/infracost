@@ -16,3 +16,15 @@ resource "aws_sns_topic" "sns_topic" {
 resource "aws_sns_topic" "sns_topic_withUsage" {
   name = "my-standard-queue"
 }
+
+resource "aws_sns_topic" "sns_topic_withFreeNotifications" {
+  name = "my-standard-queue"
+}
+
+resource "aws_sns_topic" "sns_topic_withChargedSubscribers" {
+  name = "my-standard-queue"
+}
+
+resource "aws_sns_topic" "sns_topic_withZeroRequests" {
+  name = "my-standard-queue"
+}

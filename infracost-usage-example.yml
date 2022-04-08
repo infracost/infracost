@@ -431,7 +431,13 @@ resource_usage:
 
   aws_sns_topic.my_sns_topic:
     monthly_requests: 1000000 # Monthly requests to SNS.
-    request_size_kb: 64       # Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
+    request_size_kb: 64 # Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
+    http_subscriptions: 100 # Number of HTTP/HTTPS subscriptions
+    email_subscriptions: 100 # Number of Email/Email-JSON subscriptions
+    kinesis_subscriptions: 0 # Number of Kinesis Firehose subscriptions
+    mobile_push_subscriptions: 0 # Number of Mobile Push subscriptions
+    macos_subscriptions: 0 # Number of MacOS subscriptions
+    sms_subscriptions: 1 # Number of SMS subscriptions
 
   aws_sns_topic_subscription.my_topic_subscription:
     monthly_requests: 1000000 # Monthly requests to SNS.
