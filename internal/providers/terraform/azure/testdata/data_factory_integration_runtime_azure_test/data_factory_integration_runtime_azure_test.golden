@@ -1,0 +1,41 @@
+
+ Name                                                                     Monthly Qty  Unit                    Monthly Cost 
+                                                                                                                            
+ azurerm_data_factory.example                                                                                               
+ ├─ Read/Write operations                                           Monthly cost depends on usage: $0.50 per 50k entities   
+ └─ Monitoring operations                                           Monthly cost depends on usage: $0.25 per 50k entities   
+                                                                                                                            
+ azurerm_data_factory_integration_runtime_azure.co                                                                          
+ ├─ Compute (Compute Optimized, 16 vCores)                                        730  hours                      $2,318.48 
+ ├─ Orchestration                                                   Monthly cost depends on usage: $1.00 per 1k runs        
+ ├─ Data movement activity                                                        730  hours                        $182.50 
+ ├─ Pipeline activity                                                             730  hours                          $3.65 
+ └─ External pipeline activity                                                    730  hours                          $0.18 
+                                                                                                                            
+ azurerm_data_factory_integration_runtime_azure.default_with_usage                                                          
+ ├─ Compute (General Purpose, 8 vCores)                                           730  hours                      $1,565.12 
+ ├─ Orchestration                                                                  10  1k runs                       $10.00 
+ ├─ Data movement activity                                                        730  hours                        $182.50 
+ ├─ Pipeline activity                                                             730  hours                          $3.65 
+ └─ External pipeline activity                                                    730  hours                          $0.18 
+                                                                                                                            
+ azurerm_data_factory_integration_runtime_azure.gp                                                                          
+ ├─ Compute (General Purpose, 8 vCores)                                           730  hours                      $1,565.12 
+ ├─ Orchestration                                                   Monthly cost depends on usage: $1.00 per 1k runs        
+ ├─ Data movement activity                                                        730  hours                        $182.50 
+ ├─ Pipeline activity                                                             730  hours                          $3.65 
+ └─ External pipeline activity                                                    730  hours                          $0.18 
+                                                                                                                            
+ azurerm_data_factory_integration_runtime_azure.mo                                                                          
+ ├─ Compute (Memory Optimized, 272 vCores)                                        730  hours                     $68,453.56 
+ ├─ Orchestration                                                   Monthly cost depends on usage: $1.00 per 1k runs        
+ ├─ Data movement activity                                                        730  hours                        $182.50 
+ ├─ Pipeline activity                                                             730  hours                          $3.65 
+ └─ External pipeline activity                                                    730  hours                          $0.18 
+                                                                                                                            
+ OVERALL TOTAL                                                                                                   $74,657.61 
+──────────────────────────────────
+6 cloud resources were detected:
+∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group

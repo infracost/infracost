@@ -850,6 +850,19 @@ resource_usage:
     monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
     max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
 
+  azurerm_data_factory.my_data_factory:
+    monthly_read_write_operation_entities: 100000 # Monthly entities for Read/Write operations.
+    monthly_monitoring_operation_entities: 25000  # Monthly entities for Monitoring operations.
+
+  azurerm_data_factory_integration_runtime_azure.my_runtime:
+    monthly_orchestration_runs: 10000 # Monthly Orchestration runs for runtime.
+
+  azurerm_data_factory_integration_runtime_managed.my_runtime:
+    monthly_orchestration_runs: 10000 # Monthly Orchestration runs for runtime.
+
+  azurerm_data_factory_integration_runtime_self_hosted.my_runtime:
+    monthly_orchestration_runs: 10000 # Monthly Orchestration runs for runtime.
+
   azurerm_dns_a_record.my_a_record:
     monthly_queries: 1500000000  # Monthly number of DNS queries
 

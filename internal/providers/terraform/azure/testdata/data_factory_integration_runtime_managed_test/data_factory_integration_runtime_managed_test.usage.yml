@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_data_factory_integration_runtime_managed.default_with_usage:
+    monthly_orchestration_runs: 10000
