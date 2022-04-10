@@ -105,13 +105,24 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 		c.SetPrice(decimal.Zero)
 		return
 	}
+
 	if len(products) > 1 {
-		log.Warnf("Multiple products found for %s %s, using the first product", r.Name, c.Name)
-		setResourceWarningEvent(ctx, r, "Multiple products found")
+		log.Warnf("Multiple products found for %s %s, filtering those with prices", r.Name, c.Name)
 	}
 
-	prices := products[0].Get("prices").Array()
-	if len(prices) == 0 {
+	// Some resources may have identical records in CPAPI for the same product
+	// filters, several products are always returned and they can only be
+	// distinguished by their prices. However if we pick the first product it may not
+	// have the price due to price filter and the lookup fails. Filtering the
+	// products with prices helps to solve that.
+	productsWithPrices := []gjson.Result{}
+	for _, product := range products {
+		if len(product.Get("prices").Array()) > 0 {
+			productsWithPrices = append(productsWithPrices, product)
+		}
+	}
+
+	if len(productsWithPrices) == 0 {
 		if c.IgnoreIfMissingPrice {
 			log.Debugf("No prices found for %s %s, ignoring since IgnoreIfMissingPrice is set.", r.Name, c.Name)
 			r.RemoveCostComponent(c)
@@ -123,6 +134,13 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 		c.SetPrice(decimal.Zero)
 		return
 	}
+
+	if len(productsWithPrices) > 1 {
+		log.Warnf("Multiple products with prices found for %s %s, using the first product", r.Name, c.Name)
+		setResourceWarningEvent(ctx, r, "Multiple products found")
+	}
+
+	prices := productsWithPrices[0].Get("prices").Array()
 	if len(prices) > 1 {
 		log.Warnf("Multiple prices found for %s %s, using the first price", r.Name, c.Name)
 		setResourceWarningEvent(ctx, r, "Multiple prices found")
