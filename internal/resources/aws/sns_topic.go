@@ -245,14 +245,14 @@ var SNSFIFOTopicUsageSchema = []*schema.UsageItem{
 // This is an experiment to see if using an explicit structure to define the cost components
 // can enable anything interesting (e.g. list what cost components could apply to a resource
 // without having any IaAC)
-func (r *SNSFIFOTopic) CostComponents() []*schema.CostComponent {
-	return []*schema.CostComponent{
-		r.PublishAPIRequestsCostComponent(nil),
-		r.PublishAPIPayloadCostComponent(nil, nil),
-		r.NotificationsCostComponent(0, nil),
-		r.NotificationPayloadCostComponent(0, nil, nil),
-	}
-}
+// func (r *SNSFIFOTopic) CostComponents() []*schema.CostComponent {
+//	return []*schema.CostComponent{
+//		r.PublishAPIRequestsCostComponent(nil),
+//		r.PublishAPIPayloadCostComponent(nil, nil),
+//		r.NotificationsCostComponent(0, nil),
+//		r.NotificationPayloadCostComponent(0, nil, nil),
+//	}
+// }
 
 func (r *SNSFIFOTopic) PublishAPIRequestsCostComponent(requests *int64) *schema.CostComponent {
 	var q *decimal.Decimal
