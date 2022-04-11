@@ -60,7 +60,7 @@ func varsFromPlanFlags(planFlags string) (vars, error) {
 // NewHCLProvider returns a HCLProvider with a hcl.Parser initialised using the config.ProjectContext.
 // It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
 // set input vars and files on the underlying hcl.Parser.
-func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider) (*HCLProvider, error) {
+func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider, opts ...hcl.Option) (*HCLProvider, error) {
 	v, err := varsFromPlanFlags(ctx.ProjectConfig.TerraformPlanFlags)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse vars from plan flags %w", err)
@@ -79,6 +79,7 @@ func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider) (*HC
 		options = append(options, withVars)
 	}
 
+	options = append(options, opts...)
 	p := hcl.New(ctx.ProjectConfig.Path, options...)
 
 	return &HCLProvider{

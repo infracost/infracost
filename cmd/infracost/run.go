@@ -301,6 +301,10 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	}
 
 	provider, err := providers.Detect(ctx)
+	if _, ok := err.(*providers.ValidationError); ok {
+		return nil, err
+	}
+
 	if err != nil {
 		m := fmt.Sprintf("%s\n\n", err)
 		m += fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))

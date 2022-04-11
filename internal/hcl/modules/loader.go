@@ -11,6 +11,8 @@ import (
 	getter "github.com/hashicorp/go-getter"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/infracost/infracost/internal/ui"
 )
 
 var (
@@ -33,18 +35,35 @@ type ModuleLoader struct {
 	cache          *Cache
 	packageFetcher *PackageFetcher
 	registryLoader *RegistryLoader
+	newSpinner     ui.SpinnerFunc
+}
+
+// LoaderOption defines a function that can set properties on an ModuleLoader.
+type LoaderOption func(l *ModuleLoader)
+
+// LoaderWithSpinner enables the ModuleLoader to use an ui.Spinner to show the progress of loading the modules.
+func LoaderWithSpinner(f ui.SpinnerFunc) LoaderOption {
+	return func(l *ModuleLoader) {
+		l.newSpinner = f
+	}
 }
 
 // NewModuleLoader constructs a new module loader
-func NewModuleLoader(path string) *ModuleLoader {
+func NewModuleLoader(path string, opts ...LoaderOption) *ModuleLoader {
 	fetcher := NewPackageFetcher()
 
-	return &ModuleLoader{
+	m := &ModuleLoader{
 		Path:           path,
 		cache:          NewCache(),
 		packageFetcher: fetcher,
 		registryLoader: NewRegistryLoader(fetcher),
 	}
+
+	for _, opt := range opts {
+		opt(m)
+	}
+
+	return m
 }
 
 // downloadDir returns the path to the directory where remote modules are downloaded relative to the current working directory
@@ -66,6 +85,11 @@ func (m *ModuleLoader) tfManifestFilePath() string {
 // For each module it checks if the module has already been downloaded, by checking if iut exists in the manifest
 // If not then it downloads the module from the registry or from a remote source and updates the module manifest with the latest metadata.
 func (m *ModuleLoader) Load() (*Manifest, error) {
+	if m.newSpinner != nil {
+		spin := m.newSpinner("Loading Terraform modules, if this is your first time running Infracost (HCL) in this directory this could take a while")
+		defer spin.Success()
+	}
+
 	manifest := &Manifest{}
 
 	_, err := os.Stat(m.manifestFilePath())

@@ -16,6 +16,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 // This sets a global logger for this package, which is a bit of a hack. In the future we should use a context for this.
@@ -80,6 +81,12 @@ func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 	}
 }
 
+func OptionWithSpinner(f ui.SpinnerFunc) Option {
+	return func(p *Parser) {
+		p.newSpinner = f
+	}
+}
+
 // Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
 	initialPath     string
@@ -90,6 +97,7 @@ type Parser struct {
 	workspaceName   string
 	moduleLoader    *modules.ModuleLoader
 	blockBuilder    BlockBuilder
+	newSpinner      ui.SpinnerFunc
 }
 
 // New creates a new Parser with the provided options, it inits the workspace as under the default name
@@ -98,7 +106,6 @@ func New(initialPath string, options ...Option) *Parser {
 	p := &Parser{
 		initialPath:   initialPath,
 		workspaceName: "default",
-		moduleLoader:  modules.NewModuleLoader(initialPath),
 		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}},
 	}
 
@@ -128,6 +135,12 @@ func New(initialPath string, options ...Option) *Parser {
 		option(p)
 	}
 
+	var loaderOpts []modules.LoaderOption
+	if p.newSpinner != nil {
+		loaderOpts = append(loaderOpts, modules.LoaderWithSpinner(p.newSpinner))
+	}
+
+	p.moduleLoader = modules.NewModuleLoader(initialPath, loaderOpts...)
 	return p
 }
 
@@ -189,7 +202,16 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 		nil,
 		p.workspaceName,
 		p.blockBuilder,
+		p.newSpinner,
 	)
+
+	if v := evaluator.MissingVars(); len(v) > 0 {
+		log.Warnf(
+			"Input values were not provided for the following Terraform variables: %s",
+			strings.TrimRight(strings.Join(v, ", "), ", "),
+		)
+		log.Warnf("Try using --terraform-var-file or --terraform-var to specify input vars")
+	}
 
 	root, err := evaluator.Run()
 	if err != nil {

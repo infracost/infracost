@@ -1,6 +1,7 @@
 package hcl
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -17,6 +18,11 @@ import (
 
 	"github.com/infracost/infracost/internal/hcl/funcs"
 	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/ui"
+)
+
+var (
+	errorNoVarValue = errors.New("no value found")
 )
 
 const maxContextIterations = 32
@@ -49,6 +55,7 @@ type Evaluator struct {
 	workspace string
 	// blockBuilder handles generating blocks in the evaluation step.
 	blockBuilder BlockBuilder
+	newSpinner   ui.SpinnerFunc
 }
 
 // NewEvaluator returns an Evaluator with Context initialised with top level variables.
@@ -62,6 +69,7 @@ func NewEvaluator(
 	visitedModules map[string]struct{},
 	workspace string,
 	blockBuilder BlockBuilder,
+	spinFunc ui.SpinnerFunc,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
 		Functions: expFunctions(module.ModulePath),
@@ -89,7 +97,23 @@ func NewEvaluator(
 		visitedModules: visitedModules,
 		workspace:      workspace,
 		blockBuilder:   blockBuilder,
+		newSpinner:     spinFunc,
 	}
+}
+
+// MissingVars returns a list of names of the variable blocks with missing input values.
+func (e *Evaluator) MissingVars() []string {
+	var missing []string
+
+	blocks := e.module.Blocks.OfType("variable")
+	for _, block := range blocks {
+		_, v := e.evaluateVariable(block)
+		if v == errorNoVarValue {
+			missing = append(missing, fmt.Sprintf("'variable.%s'", block.Label()))
+		}
+	}
+
+	return missing
 }
 
 // Run builds the Evaluator Context using all the provided Blocks. It will build up the Context to hold
@@ -97,6 +121,11 @@ func NewEvaluator(
 // parse and build up and child modules that are referenced in the Blocks and runs child Evaluator on
 // this Module.
 func (e *Evaluator) Run() (*Module, error) {
+	if e.newSpinner != nil {
+		spin := e.newSpinner("Evaluating Terraform directory")
+		defer spin.Success()
+	}
+
 	var lastContext hcl.EvalContext
 	// first we need to evaluate the top level Context - so this can be passed to any child modules that are found.
 	e.evaluate(lastContext)
@@ -192,6 +221,7 @@ func (e *Evaluator) evaluateModules() {
 			e.visitedModules,
 			e.workspace,
 			e.blockBuilder,
+			nil,
 		)
 
 		moduleCall.Module, _ = moduleEvaluator.Run()
@@ -354,7 +384,7 @@ func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 		return def.Value(), nil
 	}
 
-	return cty.NilVal, fmt.Errorf("no value found")
+	return cty.NilVal, errorNoVarValue
 }
 
 func (e *Evaluator) evaluateOutput(b *Block) (cty.Value, error) {

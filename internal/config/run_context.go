@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/version"
 )
 
@@ -65,6 +66,15 @@ func EmptyRunContext() *RunContext {
 		ErrWriter:   os.Stderr,
 		Exit:        os.Exit,
 	}
+}
+
+// NewSpinner returns an ui.Spinner built from the RunContext.
+func (r *RunContext) NewSpinner(msg string) *ui.Spinner {
+	return ui.NewSpinner(msg, ui.SpinnerOptions{
+		EnableLogging: r.Config.IsLogging(),
+		NoColor:       r.Config.NoColor,
+		Indent:        "  ",
+	})
 }
 
 // Context returns the underlying context.
