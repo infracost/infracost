@@ -247,14 +247,14 @@ var SNSFIFOTopicUsageSchema = []*schema.UsageItem{
 // without having any IaAC)
 // func (r *SNSFIFOTopic) CostComponents() []*schema.CostComponent {
 //	return []*schema.CostComponent{
-//		r.PublishAPIRequestsCostComponent(nil),
-//		r.PublishAPIPayloadCostComponent(nil, nil),
-//		r.NotificationsCostComponent(0, nil),
-//		r.NotificationPayloadCostComponent(0, nil, nil),
+//		r.publishAPIRequestsCostComponent(nil),
+//		r.publishAPIPayloadCostComponent(nil, nil),
+//		r.notificationsCostComponent(0, nil),
+//		r.notificationPayloadCostComponent(0, nil, nil),
 //	}
 // }
 
-func (r *SNSFIFOTopic) PublishAPIRequestsCostComponent(requests *int64) *schema.CostComponent {
+func (r *SNSFIFOTopic) publishAPIRequestsCostComponent(requests *int64) *schema.CostComponent {
 	var q *decimal.Decimal
 	if requests != nil {
 		q = decimalPtr(decimal.NewFromInt(*requests))
@@ -280,7 +280,7 @@ func (r *SNSFIFOTopic) PublishAPIRequestsCostComponent(requests *int64) *schema.
 	}
 }
 
-func (r *SNSFIFOTopic) PublishAPIPayloadCostComponent(requests *int64, requestSizeGB *float64) *schema.CostComponent {
+func (r *SNSFIFOTopic) publishAPIPayloadCostComponent(requests *int64, requestSizeGB *float64) *schema.CostComponent {
 	var q *decimal.Decimal
 	if requests != nil && requestSizeGB != nil {
 		q = decimalPtr(decimal.NewFromFloat(float64(*requests) * *requestSizeGB))
@@ -305,7 +305,7 @@ func (r *SNSFIFOTopic) PublishAPIPayloadCostComponent(requests *int64, requestSi
 		},
 	}
 }
-func (r *SNSFIFOTopic) NotificationsCostComponent(subscriptions int64, requests *int64) *schema.CostComponent {
+func (r *SNSFIFOTopic) notificationsCostComponent(subscriptions int64, requests *int64) *schema.CostComponent {
 	var q *decimal.Decimal
 	if subscriptions == 0 {
 		q = &decimal.Zero
@@ -332,7 +332,7 @@ func (r *SNSFIFOTopic) NotificationsCostComponent(subscriptions int64, requests 
 		},
 	}
 }
-func (r *SNSFIFOTopic) NotificationPayloadCostComponent(subscriptions int64, requests *int64, requestSizeGB *float64) *schema.CostComponent {
+func (r *SNSFIFOTopic) notificationPayloadCostComponent(subscriptions int64, requests *int64, requestSizeGB *float64) *schema.CostComponent {
 	var q *decimal.Decimal
 	if subscriptions == 0 {
 		q = &decimal.Zero
@@ -371,10 +371,10 @@ func (r *SNSFIFOTopic) BuildResource() *schema.Resource {
 	}
 
 	components := []*schema.CostComponent{
-		r.PublishAPIRequestsCostComponent(r.MonthlyRequests),
-		r.PublishAPIPayloadCostComponent(r.MonthlyRequests, requestSizeGB),
-		r.NotificationsCostComponent(r.Subscriptions, r.MonthlyRequests),
-		r.NotificationPayloadCostComponent(r.Subscriptions, r.MonthlyRequests, requestSizeGB),
+		r.publishAPIRequestsCostComponent(r.MonthlyRequests),
+		r.publishAPIPayloadCostComponent(r.MonthlyRequests, requestSizeGB),
+		r.notificationsCostComponent(r.Subscriptions, r.MonthlyRequests),
+		r.notificationPayloadCostComponent(r.Subscriptions, r.MonthlyRequests, requestSizeGB),
 	}
 
 	return &schema.Resource{
