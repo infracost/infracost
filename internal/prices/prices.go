@@ -86,6 +86,12 @@ func GetPrices(ctx *config.RunContext, c *apiclient.PricingAPIClient, r *schema.
 func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Resource, c *schema.CostComponent, res gjson.Result) {
 	var p decimal.Decimal
 
+	if c.CustomPrice() != nil {
+		log.Debugf("Using user-defined custom price %v for %s %s.", *c.CustomPrice(), r.Name, c.Name)
+		c.SetPrice(*c.CustomPrice())
+		return
+	}
+
 	products := res.Get("data.products").Array()
 	if len(products) == 0 {
 		if c.IgnoreIfMissingPrice {
