@@ -40,17 +40,17 @@ var SNSTopicUsageSchema = []*schema.UsageItem{
 // without having any IaAC)
 func (r *SNSTopic) CostComponents() []*schema.CostComponent {
 	return []*schema.CostComponent{
-		r.APIRequestsCostComponent(nil),
-		r.HTTPNotificationsCostComponent(nil, nil),
-		r.EmailNotificationsCostComponent(nil, nil),
-		r.KinesisNotificationsCostComponent(nil, nil),
-		r.MobilePushNotificationsCostComponent(nil, nil),
-		r.MacOSNotificationsCostComponent(nil, nil),
-		r.SMSNotificationsCostComponent(nil, nil, nil),
+		r.apiRequestsCostComponent(nil),
+		r.httpNotificationsCostComponent(nil, nil),
+		r.emailNotificationsCostComponent(nil, nil),
+		r.kinesisNotificationsCostComponent(nil, nil),
+		r.mobilePushNotificationsCostComponent(nil, nil),
+		r.macOSNotificationsCostComponent(nil, nil),
+		r.smsNotificationsCostComponent(nil, nil, nil),
 	}
 }
 
-func (r *SNSTopic) APIRequestsCostComponent(requests *int64) *schema.CostComponent {
+func (r *SNSTopic) apiRequestsCostComponent(requests *int64) *schema.CostComponent {
 	var q *decimal.Decimal
 	if requests != nil {
 		if *requests > 1000000 {
@@ -76,7 +76,7 @@ func (r *SNSTopic) APIRequestsCostComponent(requests *int64) *schema.CostCompone
 	}
 }
 
-func (r *SNSTopic) HTTPNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
+func (r *SNSTopic) httpNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
 	return r.notificationsCostComponent(
 		"HTTP/HTTPS notifications (over 100k)",
 		"100k notifications",
@@ -88,7 +88,7 @@ func (r *SNSTopic) HTTPNotificationsCostComponent(subscriptions, requests *int64
 	)
 }
 
-func (r *SNSTopic) EmailNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
+func (r *SNSTopic) emailNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
 	return r.notificationsCostComponent(
 		"Email/Email-JSON notifications (over 1k)",
 		"100k notifications",
@@ -100,7 +100,7 @@ func (r *SNSTopic) EmailNotificationsCostComponent(subscriptions, requests *int6
 	)
 }
 
-func (r *SNSTopic) KinesisNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
+func (r *SNSTopic) kinesisNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
 	return r.notificationsCostComponent(
 		"Kinesis Firehose notifications",
 		"1M notifications",
@@ -112,7 +112,7 @@ func (r *SNSTopic) KinesisNotificationsCostComponent(subscriptions, requests *in
 	)
 }
 
-func (r *SNSTopic) MobilePushNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
+func (r *SNSTopic) mobilePushNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
 	return r.notificationsCostComponent(
 		"Mobile Push notifications",
 		"1M notifications",
@@ -124,7 +124,7 @@ func (r *SNSTopic) MobilePushNotificationsCostComponent(subscriptions, requests 
 	)
 }
 
-func (r *SNSTopic) MacOSNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
+func (r *SNSTopic) macOSNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
 	return r.notificationsCostComponent(
 		"MacOS notifications",
 		"1M notifications",
@@ -136,7 +136,7 @@ func (r *SNSTopic) MacOSNotificationsCostComponent(subscriptions, requests *int6
 	)
 }
 
-func (r *SNSTopic) SMSNotificationsCostComponent(subscriptions, requests *int64, customPrice *float64) *schema.CostComponent {
+func (r *SNSTopic) smsNotificationsCostComponent(subscriptions, requests *int64, customPrice *float64) *schema.CostComponent {
 	c := r.notificationsCostComponent(
 		"SMS notifications (over 100)",
 		"100 notifications",
@@ -171,13 +171,13 @@ func (r *SNSTopic) BuildResource() *schema.Resource {
 	}
 
 	components := []*schema.CostComponent{
-		r.APIRequestsCostComponent(requests),
-		r.HTTPNotificationsCostComponent(r.HTTPSubscriptions, requests),
-		r.EmailNotificationsCostComponent(r.EmailSubscriptions, requests),
-		r.KinesisNotificationsCostComponent(r.KinesisSubscriptions, requests),
-		r.MobilePushNotificationsCostComponent(r.MobilePushSubscriptions, requests),
-		r.MacOSNotificationsCostComponent(r.MacOSSubscriptions, requests),
-		r.SMSNotificationsCostComponent(r.SMSSubscriptions, requests, r.SMSNotificationPrice),
+		r.apiRequestsCostComponent(requests),
+		r.httpNotificationsCostComponent(r.HTTPSubscriptions, requests),
+		r.emailNotificationsCostComponent(r.EmailSubscriptions, requests),
+		r.kinesisNotificationsCostComponent(r.KinesisSubscriptions, requests),
+		r.mobilePushNotificationsCostComponent(r.MobilePushSubscriptions, requests),
+		r.macOSNotificationsCostComponent(r.MacOSSubscriptions, requests),
+		r.smsNotificationsCostComponent(r.SMSSubscriptions, requests, r.SMSNotificationPrice),
 	}
 
 	return &schema.Resource{
