@@ -54,5 +54,5 @@
 ──────────────────────────────────
 16 cloud resources were detected:
 ∙ 11 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 5 are not supported yet, see https://infracost.io/requested-resources:
+∙ 5 were free:
   ∙ 5 x aws_sns_topic_subscription
