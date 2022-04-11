@@ -38,7 +38,7 @@ var SNSTopicUsageSchema = []*schema.UsageItem{
 // This is an experiment to see if using an explicit structure to define the cost components
 // can enable anything interesting (e.g. list what cost components could apply to a resource
 // without having any IaAC)
-//func (r *SNSTopic) CostComponents() []*schema.CostComponent {
+// func (r *SNSTopic) CostComponents() []*schema.CostComponent {
 //	return []*schema.CostComponent{
 //		r.apiRequestsCostComponent(nil),
 //		r.httpNotificationsCostComponent(nil, nil),
@@ -48,7 +48,7 @@ var SNSTopicUsageSchema = []*schema.UsageItem{
 //		r.macOSNotificationsCostComponent(nil, nil),
 //		r.smsNotificationsCostComponent(nil, nil, nil),
 //	}
-//}
+// }
 
 func (r *SNSTopic) apiRequestsCostComponent(requests *int64) *schema.CostComponent {
 	var q *decimal.Decimal
