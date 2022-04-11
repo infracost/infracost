@@ -10,7 +10,7 @@ func getSNSTopicSubscriptionRegistryItem() *schema.RegistryItem {
 		Name:  "aws_sns_topic_subscription",
 		RFunc: NewSNSTopicSubscription,
 		Notes: []string{
-			"SMS and mobile push not yet supported.",
+			"DEPRECATED.  Set subscription usage on aws_sns_topic instead.",
 		},
 	}
 }
