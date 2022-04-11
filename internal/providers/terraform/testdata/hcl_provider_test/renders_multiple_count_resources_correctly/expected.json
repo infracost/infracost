@@ -1,0 +1,371 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.1.0",
+  "planned_values": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_eip.test[0]",
+          "mode": "managed",
+          "type": "aws_eip",
+          "name": "test",
+          "index": 0,
+          "schema_version": 0,
+          "values": {
+            "arn": "eip-arn",
+            "id": "eip"
+          }
+        },
+        {
+          "address": "aws_eip.test[1]",
+          "mode": "managed",
+          "type": "aws_eip",
+          "name": "test",
+          "index": 1,
+          "schema_version": 0,
+          "values": {
+            "arn": "eip-1-arn",
+            "id": "eip-1"
+          }
+        }
+      ],
+      "child_modules": [
+        {
+          "resources": [
+            {
+              "address": "module.autos.aws_autoscaling_group.test[0]",
+              "mode": "managed",
+              "type": "aws_autoscaling_group",
+              "name": "test",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "arn": "auto-arn",
+                "desired_capacity": 2,
+                "id": "auto",
+                "launch_configuration": "lc",
+                "max_size": 3,
+                "min_size": 1
+              }
+            },
+            {
+              "address": "module.autos.aws_autoscaling_group.test[1]",
+              "mode": "managed",
+              "type": "aws_autoscaling_group",
+              "name": "test",
+              "index": 1,
+              "schema_version": 0,
+              "values": {
+                "arn": "auto-1-arn",
+                "desired_capacity": 2,
+                "id": "auto-1",
+                "launch_configuration": "lc-1",
+                "max_size": 3,
+                "min_size": 1
+              }
+            },
+            {
+              "address": "module.autos.aws_autoscaling_group.test[2]",
+              "mode": "managed",
+              "type": "aws_autoscaling_group",
+              "name": "test",
+              "index": 2,
+              "schema_version": 0,
+              "values": {
+                "arn": "auto-2-arn",
+                "desired_capacity": 2,
+                "id": "auto-2",
+                "launch_configuration": "lc-2",
+                "max_size": 3,
+                "min_size": 1
+              }
+            },
+            {
+              "address": "module.autos.aws_launch_configuration.test[0]",
+              "mode": "managed",
+              "type": "aws_launch_configuration",
+              "name": "test",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "arn": "lc-arn",
+                "id": "lc",
+                "image_id": "fake_ami",
+                "instance_type": "t2.micro"
+              }
+            },
+            {
+              "address": "module.autos.aws_launch_configuration.test[1]",
+              "mode": "managed",
+              "type": "aws_launch_configuration",
+              "name": "test",
+              "index": 1,
+              "schema_version": 0,
+              "values": {
+                "arn": "lc-1-arn",
+                "id": "lc-1",
+                "image_id": "fake_ami",
+                "instance_type": "t2.medium"
+              }
+            },
+            {
+              "address": "module.autos.aws_launch_configuration.test[2]",
+              "mode": "managed",
+              "type": "aws_launch_configuration",
+              "name": "test",
+              "index": 2,
+              "schema_version": 0,
+              "values": {
+                "arn": "lc-2-arn",
+                "id": "lc-2",
+                "image_id": "fake_ami",
+                "instance_type": "t2.large"
+              }
+            }
+          ],
+          "address": "module.autos"
+        }
+      ]
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "aws_eip.test[0]",
+      "mode": "managed",
+      "type": "aws_eip",
+      "name": "test",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "eip-arn",
+          "id": "eip"
+        }
+      }
+    },
+    {
+      "address": "aws_eip.test[1]",
+      "mode": "managed",
+      "type": "aws_eip",
+      "name": "test",
+      "index": 1,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "eip-1-arn",
+          "id": "eip-1"
+        }
+      }
+    },
+    {
+      "address": "module.autos.aws_autoscaling_group.test[0]",
+      "module_address": "module.autos",
+      "mode": "managed",
+      "type": "aws_autoscaling_group",
+      "name": "test",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "auto-arn",
+          "desired_capacity": 2,
+          "id": "auto",
+          "launch_configuration": "lc",
+          "max_size": 3,
+          "min_size": 1
+        }
+      }
+    },
+    {
+      "address": "module.autos.aws_autoscaling_group.test[1]",
+      "module_address": "module.autos",
+      "mode": "managed",
+      "type": "aws_autoscaling_group",
+      "name": "test",
+      "index": 1,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "auto-1-arn",
+          "desired_capacity": 2,
+          "id": "auto-1",
+          "launch_configuration": "lc-1",
+          "max_size": 3,
+          "min_size": 1
+        }
+      }
+    },
+    {
+      "address": "module.autos.aws_autoscaling_group.test[2]",
+      "module_address": "module.autos",
+      "mode": "managed",
+      "type": "aws_autoscaling_group",
+      "name": "test",
+      "index": 2,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "auto-2-arn",
+          "desired_capacity": 2,
+          "id": "auto-2",
+          "launch_configuration": "lc-2",
+          "max_size": 3,
+          "min_size": 1
+        }
+      }
+    },
+    {
+      "address": "module.autos.aws_launch_configuration.test[0]",
+      "module_address": "module.autos",
+      "mode": "managed",
+      "type": "aws_launch_configuration",
+      "name": "test",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "lc-arn",
+          "id": "lc",
+          "image_id": "fake_ami",
+          "instance_type": "t2.micro"
+        }
+      }
+    },
+    {
+      "address": "module.autos.aws_launch_configuration.test[1]",
+      "module_address": "module.autos",
+      "mode": "managed",
+      "type": "aws_launch_configuration",
+      "name": "test",
+      "index": 1,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "lc-1-arn",
+          "id": "lc-1",
+          "image_id": "fake_ami",
+          "instance_type": "t2.medium"
+        }
+      }
+    },
+    {
+      "address": "module.autos.aws_launch_configuration.test[2]",
+      "module_address": "module.autos",
+      "mode": "managed",
+      "type": "aws_launch_configuration",
+      "name": "test",
+      "index": 2,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "lc-2-arn",
+          "id": "lc-2",
+          "image_id": "fake_ami",
+          "instance_type": "t2.large"
+        }
+      }
+    }
+  ],
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": {
+          "region": {
+            "constant_value": "us-east-1"
+          }
+        }
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_eip.test",
+          "mode": "managed",
+          "type": "aws_eip",
+          "name": "test",
+          "provider_config_key": "aws",
+          "schema_version": 0,
+          "count_expression": {
+            "constant_value": 2
+          }
+        }
+      ],
+      "module_calls": {
+        "autos": {
+          "source": "./modules/autoscaling",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_autoscaling_group.test",
+                "mode": "managed",
+                "type": "aws_autoscaling_group",
+                "name": "test",
+                "provider_config_key": "autos:aws",
+                "expressions": {
+                  "launch_configuration": {
+                    "references": [
+                      "aws_launch_configuration.test",
+                      "count.index"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "var.amount"
+                  ]
+                }
+              },
+              {
+                "address": "aws_launch_configuration.test",
+                "mode": "managed",
+                "type": "aws_launch_configuration",
+                "name": "test",
+                "provider_config_key": "autos:aws",
+                "expressions": {
+                  "instance_type": {
+                    "references": [
+                      "var.types",
+                      "count.index"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "var.amount"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -380,7 +380,7 @@ func CreateTerraformProject(tmpDir string, tfProject TerraformProject) (string, 
 	return writeToTmpDir(tmpDir, tfProject)
 }
 
-func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) terraform.HCLProvider {
+func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) *terraform.HCLProvider {
 	t.Helper()
 
 	projectCtx := config.NewProjectContext(
