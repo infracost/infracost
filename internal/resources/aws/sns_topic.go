@@ -9,6 +9,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// SNSTopic struct represents an AWS SNS Topic operating in "Standard" mode.
+//
+// Resource information: https://docs.aws.amazon.com/sns/latest/dg/sns-create-topic.html
+// Pricing information: https://aws.amazon.com/sns/pricing/#Standard_topics
 type SNSTopic struct {
 	Address                 string
 	Region                  string
@@ -229,6 +233,10 @@ func (r *SNSTopic) notificationsCostComponent(name, unit string, multiplier int6
 	}
 }
 
+// SNSFIFOTopic struct represents an AWS SNS Topic operating in "FIFO" mode.
+//
+// Resource information: https://docs.aws.amazon.com/sns/latest/dg/fifo-example-use-case.html
+// Pricing information: https://aws.amazon.com/sns/pricing/#FIFO_topics
 type SNSFIFOTopic struct {
 	Address         string
 	Region          string
