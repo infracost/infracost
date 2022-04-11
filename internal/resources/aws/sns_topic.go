@@ -27,6 +27,7 @@ type SNSTopic struct {
 	SMSNotificationPrice    *float64 `infracost_usage:"sms_notification_price"`
 }
 
+// SNSTopicUsageSchema defines a list which represents the usage schema of SNSTopic.
 var SNSTopicUsageSchema = []*schema.UsageItem{
 	{Key: "request_size_kb", ValueType: schema.Float64, DefaultValue: 0},
 	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
@@ -54,6 +55,7 @@ var SNSTopicUsageSchema = []*schema.UsageItem{
 //	}
 // }
 
+// apiRequestsCostComponent returns a cost component for API request costs.
 func (r *SNSTopic) apiRequestsCostComponent(requests *int64) *schema.CostComponent {
 	var q *decimal.Decimal
 	if requests != nil {
@@ -80,6 +82,7 @@ func (r *SNSTopic) apiRequestsCostComponent(requests *int64) *schema.CostCompone
 	}
 }
 
+// httpNotificationsCostComponent returns a cost component for HTTP notification costs.
 func (r *SNSTopic) httpNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
 	return r.notificationsCostComponent(
 		"HTTP/HTTPS notifications (over 100k)",
@@ -92,6 +95,7 @@ func (r *SNSTopic) httpNotificationsCostComponent(subscriptions, requests *int64
 	)
 }
 
+// emailNotificationsCostComponent returns a cost component for Email notification costs.
 func (r *SNSTopic) emailNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
 	return r.notificationsCostComponent(
 		"Email/Email-JSON notifications (over 1k)",
@@ -104,6 +108,7 @@ func (r *SNSTopic) emailNotificationsCostComponent(subscriptions, requests *int6
 	)
 }
 
+// kinesisNotificationsCostComponent returns a cost component for Kinesis notification costs.
 func (r *SNSTopic) kinesisNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
 	return r.notificationsCostComponent(
 		"Kinesis Firehose notifications",
@@ -116,6 +121,7 @@ func (r *SNSTopic) kinesisNotificationsCostComponent(subscriptions, requests *in
 	)
 }
 
+// mobilePushNotificationsCostComponent returns a cost component for Mobile Push notification costs.
 func (r *SNSTopic) mobilePushNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
 	return r.notificationsCostComponent(
 		"Mobile Push notifications",
@@ -128,6 +134,7 @@ func (r *SNSTopic) mobilePushNotificationsCostComponent(subscriptions, requests 
 	)
 }
 
+// macOSNotificationsCostComponent returns a cost component for MacOS notification costs.
 func (r *SNSTopic) macOSNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
 	return r.notificationsCostComponent(
 		"MacOS notifications",
@@ -140,6 +147,7 @@ func (r *SNSTopic) macOSNotificationsCostComponent(subscriptions, requests *int6
 	)
 }
 
+// smsNotificationsCostComponent returns a cost component for SMS notification costs.
 func (r *SNSTopic) smsNotificationsCostComponent(subscriptions, requests *int64, customPrice *float64) *schema.CostComponent {
 	c := r.notificationsCostComponent(
 		"SMS notifications (over 100)",
@@ -158,10 +166,15 @@ func (r *SNSTopic) smsNotificationsCostComponent(subscriptions, requests *int64,
 	return c
 }
 
+// PopulateUsage parses the u schema.UsageData into the SNSTopic.
+// It uses the `infracost_usage` struct tags to populate data into the SNSTopic.
 func (r *SNSTopic) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
+// BuildResource builds a schema.Resource from a valid SNSTopic struct.
+// This method is called after the resource is initialised by an IaC provider.
+// See providers folder for more information.
 func (r *SNSTopic) BuildResource() *schema.Resource {
 	var requests *int64
 
@@ -196,6 +209,7 @@ func (r *SNSTopic) calculateRequests(requestSize float64, monthlyRequests int64)
 	return &i
 }
 
+// notificationsCostComponent returns a cost component corresponding to the supplied parameters.
 func (r *SNSTopic) notificationsCostComponent(name, unit string, multiplier int64, usageType string, startUsageAmount int64, subscribers, requests *int64) *schema.CostComponent {
 	// Decide on whether quantity is >0, 0, or nil.
 	// If both subscribers and requests are set, multiply them to get the total number of notifications.
@@ -245,6 +259,7 @@ type SNSFIFOTopic struct {
 	MonthlyRequests *int64   `infracost_usage:"monthly_requests"`
 }
 
+// SNSFIFOTopicUsageSchema defines a list which represents the usage schema of SNSFIFOTopic.
 var SNSFIFOTopicUsageSchema = []*schema.UsageItem{
 	{Key: "request_size_kb", ValueType: schema.Float64, DefaultValue: 1},
 	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
@@ -262,6 +277,7 @@ var SNSFIFOTopicUsageSchema = []*schema.UsageItem{
 //	}
 // }
 
+// publishAPIRequestCostComponent returns a cost component for Publish API request costs.
 func (r *SNSFIFOTopic) publishAPIRequestsCostComponent(requests *int64) *schema.CostComponent {
 	var q *decimal.Decimal
 	if requests != nil {
@@ -288,6 +304,7 @@ func (r *SNSFIFOTopic) publishAPIRequestsCostComponent(requests *int64) *schema.
 	}
 }
 
+// publishAPIPayloadCostComponent returns a cost component for Publish API payload costs.
 func (r *SNSFIFOTopic) publishAPIPayloadCostComponent(requests *int64, requestSizeGB *float64) *schema.CostComponent {
 	var q *decimal.Decimal
 	if requests != nil && requestSizeGB != nil {
@@ -313,6 +330,8 @@ func (r *SNSFIFOTopic) publishAPIPayloadCostComponent(requests *int64, requestSi
 		},
 	}
 }
+
+// notificationsCostComponent returns a cost component for notification costs.
 func (r *SNSFIFOTopic) notificationsCostComponent(subscriptions int64, requests *int64) *schema.CostComponent {
 	var q *decimal.Decimal
 	if subscriptions == 0 {
@@ -340,6 +359,8 @@ func (r *SNSFIFOTopic) notificationsCostComponent(subscriptions int64, requests 
 		},
 	}
 }
+
+// notificationPayloadCostComponent returns a cost component for notification payload costs.
 func (r *SNSFIFOTopic) notificationPayloadCostComponent(subscriptions int64, requests *int64, requestSizeGB *float64) *schema.CostComponent {
 	var q *decimal.Decimal
 	if subscriptions == 0 {
@@ -368,10 +389,15 @@ func (r *SNSFIFOTopic) notificationPayloadCostComponent(subscriptions int64, req
 	}
 }
 
+// PopulateUsage parses the u schema.UsageData into the SNSFIFOTopic.
+// It uses the `infracost_usage` struct tags to populate data into the SNSFIFOTopic.
 func (r *SNSFIFOTopic) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
+// BuildResource builds a schema.Resource from a valid SNSFIFOTopic struct.
+// This method is called after the resource is initialised by an IaC provider.
+// See providers folder for more information.
 func (r *SNSFIFOTopic) BuildResource() *schema.Resource {
 	var requestSizeGB *float64
 	if r.RequestSizeKB != nil {
