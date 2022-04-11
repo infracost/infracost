@@ -23,12 +23,12 @@ func NewSNSTopic(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 		r.PopulateUsage(u)
 		return r.BuildResource()
-	} else {
-		r := &aws.SNSTopic{
-			Address: d.Address,
-			Region:  d.Get("region").String(),
-		}
-		r.PopulateUsage(u)
-		return r.BuildResource()
 	}
+
+	r := &aws.SNSTopic{
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+	}
+	r.PopulateUsage(u)
+	return r.BuildResource()
 }
