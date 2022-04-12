@@ -86,7 +86,7 @@ func (m *ModuleLoader) tfManifestFilePath() string {
 // If not then it downloads the module from the registry or from a remote source and updates the module manifest with the latest metadata.
 func (m *ModuleLoader) Load() (*Manifest, error) {
 	if m.newSpinner != nil {
-		spin := m.newSpinner("Loading Terraform modules, if this is your first time running Infracost (HCL) in this directory this could take a while")
+		spin := m.newSpinner("Downloading Terraform modules")
 		defer spin.Success()
 	}
 

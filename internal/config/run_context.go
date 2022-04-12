@@ -68,12 +68,24 @@ func EmptyRunContext() *RunContext {
 	}
 }
 
+var (
+	outputIndent = "  "
+)
+
+// NewWarningWriter returns a function that can be used to write a message to the RunContext.ErrWriter.
+// This can be useful to pass to functions or structs that don't use a full RunContext.
+func (r *RunContext) NewWarningWriter() ui.WriteWarningFunc {
+	return func(msg string) {
+		fmt.Fprintf(r.ErrWriter, "%s%s %s\n", outputIndent, ui.WarningString("Warning:"), msg)
+	}
+}
+
 // NewSpinner returns an ui.Spinner built from the RunContext.
 func (r *RunContext) NewSpinner(msg string) *ui.Spinner {
 	return ui.NewSpinner(msg, ui.SpinnerOptions{
 		EnableLogging: r.Config.IsLogging(),
 		NoColor:       r.Config.NoColor,
-		Indent:        "  ",
+		Indent:        outputIndent,
 	})
 }
 

@@ -81,9 +81,21 @@ func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 	}
 }
 
+// OptionWithSpinner sets a SpinnerFunc onto the Parser. With this option enabled
+// the Parser will send progress to the Spinner. This is disabled by default as
+// we run the Parser concurrently underneath DirProvider and don't want to mess with it's output.
 func OptionWithSpinner(f ui.SpinnerFunc) Option {
 	return func(p *Parser) {
 		p.newSpinner = f
+	}
+}
+
+// OptionWithWarningFunc will set the Parser writeWarning to the provided f.
+// This is disabled by default as we run the Parser concurrently underneath a
+// DirProvider and don't want to mess with it's output.
+func OptionWithWarningFunc(f ui.WriteWarningFunc) Option {
+	return func(p *Parser) {
+		p.writeWarning = f
 	}
 }
 
@@ -98,6 +110,7 @@ type Parser struct {
 	moduleLoader    *modules.ModuleLoader
 	blockBuilder    BlockBuilder
 	newSpinner      ui.SpinnerFunc
+	writeWarning    ui.WriteWarningFunc
 }
 
 // New creates a new Parser with the provided options, it inits the workspace as under the default name
@@ -206,11 +219,15 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 	)
 
 	if v := evaluator.MissingVars(); len(v) > 0 {
-		log.Warnf(
-			"Input values were not provided for the following Terraform variables: %s",
-			strings.TrimRight(strings.Join(v, ", "), ", "),
-		)
-		log.Warnf("Try using --terraform-var-file or --terraform-var to specify input vars")
+		if p.writeWarning != nil {
+			p.writeWarning(
+				fmt.Sprintf(
+					"Input values were not provided for the following Terraform variables: %s. %s",
+					strings.TrimRight(strings.Join(v, ", "), ", "),
+					"Use --terraform-var-file or --terraform-var to specify input vars.",
+				),
+			)
+		}
 	}
 
 	root, err := evaluator.Run()

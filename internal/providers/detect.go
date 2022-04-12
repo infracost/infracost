@@ -22,12 +22,25 @@ import (
 // ValidationError represents an error that is raised because provider conditions are not met.
 // This error is commonly used to show requirements to as user running an Infracost command.
 type ValidationError struct {
-	Msg string
+	err  string
+	warn string
+}
+
+// Warn returns the ValidationError warning message. A warning highlights a potential issue with runtime
+// configuration but a condition that the Provider can proceed with.
+//
+// Warn can return nil if the there are no validation warnings.
+func (e ValidationError) Warn() *string {
+	if e.warn == "" {
+		return nil
+	}
+
+	return &e.warn
 }
 
 // Error returns ValidationError as a string, implementing the error interface.
 func (e *ValidationError) Error() string {
-	return e.Msg
+	return e.err
 }
 
 func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
@@ -38,11 +51,22 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 	}
 
 	if ctx.ProjectConfig.TerraformParseHCL {
-		if err := validateProjectForHCL(ctx, path); err != nil {
-			return nil, err
+		h, providerErr := terraform.NewHCLProvider(
+			ctx,
+			terraform.NewPlanJSONProvider(ctx),
+			hcl.OptionWithSpinner(ctx.RunContext.NewSpinner),
+			hcl.OptionWithWarningFunc(ctx.RunContext.NewWarningWriter()),
+		)
+
+		if providerErr != nil {
+			return nil, providerErr
 		}
 
-		return terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx), hcl.OptionWithSpinner(ctx.RunContext.NewSpinner))
+		if err := validateProjectForHCL(ctx, path); err != nil {
+			return h, err
+		}
+
+		return h, nil
 	}
 
 	if isCloudFormationTemplate(path) {
@@ -79,38 +103,39 @@ func Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 func validateProjectForHCL(ctx *config.ProjectContext, path string) error {
 	if isTerragruntDir(path) || isTerragruntNestedDir(path, 5) {
 		return &ValidationError{
-			Msg: "Terragrunt projects are currently not supported by Infracost HCL",
+			err: "Terragrunt projects are not yet supported by the parse HCL option.",
 		}
 	}
 
 	if isCloudFormationTemplate(path) {
 		return &ValidationError{
-			Msg: "Cloudformation projects are currently not supported by Infracost HCL",
+			err: "CloudFormation projects are not yet supported by the parse HCL option.",
 		}
 	}
 
 	if isTerraformPlanJSON(path) {
 		return &ValidationError{
-			Msg: "Path type cannot be a Plan JSON file when using Infracost HCL\n\nTry setting --path to a Terraform directory.",
+			err: "Path type cannot be a Terraform plan JSON file when using the parse HCL option\n\nSet --path to a Terraform directory.",
 		}
 	}
 
 	if isTerraformStateJSON(path) {
 		return &ValidationError{
-			Msg: "Path type cannot be a Terraform state file when using Infracost HCL\n\nTry setting --path to a Terraform directory.",
+			err: "Path type cannot be a Terraform state file when using the parse HCL option\n\nSet --path to a Terraform directory.",
 		}
 	}
 
 	if ctx.ProjectConfig.TerraformUseState {
 		return &ValidationError{
-			Msg: "Flags terraform-use-state and terraform-parse-hcl are incompatible\n\nTry running again without --terraform-use-state",
+			err: "Flags terraform-use-state and terraform-parse-hcl are incompatible\n\nRun again without --terraform-use-state.",
 		}
 	}
 
 	for _, k := range os.Environ() {
 		if strings.HasPrefix(k, "TF_VAR") {
-			log.Warnf("Infracost HCL provider does not support use of TF_VARS through env variables, use --terraform-var-file or --terraform-var instead")
-			break
+			return &ValidationError{
+				warn: "The parse HCL option does not support use of TF_VARS through environment variables, use --terraform-var-file or --terraform-var instead.",
+			}
 		}
 	}
 
