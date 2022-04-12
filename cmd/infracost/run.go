@@ -301,12 +301,20 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	}
 
 	provider, err := providers.Detect(ctx)
-	if err != nil {
+	var warn *string
+	if v, ok := err.(*providers.ValidationError); ok {
+		if v.Warn() == nil {
+			return nil, err
+		}
+
+		warn = v.Warn()
+	} else if err != nil {
 		m := fmt.Sprintf("%s\n\n", err)
 		m += fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
 
 		return nil, clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
 	}
+
 	ctx.SetContextValue("projectType", provider.Type())
 
 	if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
@@ -321,6 +329,10 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 		log.Info(m)
 	} else {
 		fmt.Fprintln(os.Stderr, m)
+	}
+
+	if warn != nil {
+		ui.PrintWarning(runCtx.ErrWriter, *warn)
 	}
 
 	// Generate usage file

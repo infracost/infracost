@@ -16,6 +16,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 // This sets a global logger for this package, which is a bit of a hack. In the future we should use a context for this.
@@ -80,6 +81,24 @@ func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 	}
 }
 
+// OptionWithSpinner sets a SpinnerFunc onto the Parser. With this option enabled
+// the Parser will send progress to the Spinner. This is disabled by default as
+// we run the Parser concurrently underneath DirProvider and don't want to mess with its output.
+func OptionWithSpinner(f ui.SpinnerFunc) Option {
+	return func(p *Parser) {
+		p.newSpinner = f
+	}
+}
+
+// OptionWithWarningFunc will set the Parser writeWarning to the provided f.
+// This is disabled by default as we run the Parser concurrently underneath a
+// DirProvider and don't want to mess with its output.
+func OptionWithWarningFunc(f ui.WriteWarningFunc) Option {
+	return func(p *Parser) {
+		p.writeWarning = f
+	}
+}
+
 // Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
 	initialPath     string
@@ -90,6 +109,8 @@ type Parser struct {
 	workspaceName   string
 	moduleLoader    *modules.ModuleLoader
 	blockBuilder    BlockBuilder
+	newSpinner      ui.SpinnerFunc
+	writeWarning    ui.WriteWarningFunc
 }
 
 // New creates a new Parser with the provided options, it inits the workspace as under the default name
@@ -98,7 +119,6 @@ func New(initialPath string, options ...Option) *Parser {
 	p := &Parser{
 		initialPath:   initialPath,
 		workspaceName: "default",
-		moduleLoader:  modules.NewModuleLoader(initialPath),
 		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}},
 	}
 
@@ -128,6 +148,12 @@ func New(initialPath string, options ...Option) *Parser {
 		option(p)
 	}
 
+	var loaderOpts []modules.LoaderOption
+	if p.newSpinner != nil {
+		loaderOpts = append(loaderOpts, modules.LoaderWithSpinner(p.newSpinner))
+	}
+
+	p.moduleLoader = modules.NewModuleLoader(initialPath, loaderOpts...)
 	return p
 }
 
@@ -189,7 +215,20 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 		nil,
 		p.workspaceName,
 		p.blockBuilder,
+		p.newSpinner,
 	)
+
+	if v := evaluator.MissingVars(); len(v) > 0 {
+		if p.writeWarning != nil {
+			p.writeWarning(
+				fmt.Sprintf(
+					"Input values were not provided for following Terraform variables: %s. %s",
+					strings.TrimRight(strings.Join(v, ", "), ", "),
+					"Use --terraform-var-file or --terraform-var to specify them.",
+				),
+			)
+		}
+	}
 
 	root, err := evaluator.Run()
 	if err != nil {
