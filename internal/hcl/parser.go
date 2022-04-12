@@ -222,9 +222,9 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 		if p.writeWarning != nil {
 			p.writeWarning(
 				fmt.Sprintf(
-					"Input values were not provided for the following Terraform variables: %s. %s",
+					"Input values were not provided for following Terraform variables: %s. %s",
 					strings.TrimRight(strings.Join(v, ", "), ", "),
-					"Use --terraform-var-file or --terraform-var to specify input vars.",
+					"Use --terraform-var-file or --terraform-var to specify them.",
 				),
 			)
 		}
