@@ -83,7 +83,7 @@ func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 
 // OptionWithSpinner sets a SpinnerFunc onto the Parser. With this option enabled
 // the Parser will send progress to the Spinner. This is disabled by default as
-// we run the Parser concurrently underneath DirProvider and don't want to mess with it's output.
+// we run the Parser concurrently underneath DirProvider and don't want to mess with its output.
 func OptionWithSpinner(f ui.SpinnerFunc) Option {
 	return func(p *Parser) {
 		p.newSpinner = f
@@ -92,7 +92,7 @@ func OptionWithSpinner(f ui.SpinnerFunc) Option {
 
 // OptionWithWarningFunc will set the Parser writeWarning to the provided f.
 // This is disabled by default as we run the Parser concurrently underneath a
-// DirProvider and don't want to mess with it's output.
+// DirProvider and don't want to mess with its output.
 func OptionWithWarningFunc(f ui.WriteWarningFunc) Option {
 	return func(p *Parser) {
 		p.writeWarning = f

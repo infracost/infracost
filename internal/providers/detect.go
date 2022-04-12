@@ -20,7 +20,7 @@ import (
 )
 
 // ValidationError represents an error that is raised because provider conditions are not met.
-// This error is commonly used to show requirements to as user running an Infracost command.
+// This error is commonly used to show requirements to a user running an Infracost command.
 type ValidationError struct {
 	err  string
 	warn string
@@ -29,7 +29,7 @@ type ValidationError struct {
 // Warn returns the ValidationError warning message. A warning highlights a potential issue with runtime
 // configuration but a condition that the Provider can proceed with.
 //
-// Warn can return nil if the there are no validation warnings.
+// Warn can return nil if there are no validation warnings.
 func (e ValidationError) Warn() *string {
 	if e.warn == "" {
 		return nil
