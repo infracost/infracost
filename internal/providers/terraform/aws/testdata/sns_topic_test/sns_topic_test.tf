@@ -32,3 +32,58 @@ resource "aws_sns_topic" "sns_topic_withZeroRequests" {
 resource "aws_sns_topic" "sns_topic_customSmsPrice" {
   name = "my-standard-queue"
 }
+
+resource "aws_sns_topic" "sns_fifo_topic" {
+  name       = "my-fifo-queue.fifo"
+  fifo_topic = true
+}
+
+resource "aws_sns_topic" "sns_fifo_topic_withUsage" {
+  name       = "my-fifo-queue.fifo"
+  fifo_topic = true
+}
+
+resource "aws_sns_topic" "sns_fifo_topic_withZeroRequests" {
+  name       = "my-fifo-queue.fifo"
+  fifo_topic = true
+}
+
+resource "aws_sns_topic" "sns_fifo_topic_withSubscriptions" {
+  name       = "my-fifo-queue.fifo"
+  fifo_topic = true
+}
+
+resource "aws_sns_topic_subscription" "sns_fifo_topic_subscription1" {
+  endpoint  = "some-dummy-endpoint"
+  protocol  = "sqs"
+  topic_arn = aws_sns_topic.sns_fifo_topic_withSubscriptions.arn
+}
+
+resource "aws_sns_topic_subscription" "sns_fifo_topic_subscription2" {
+  endpoint  = "some-dummy-endpoint"
+  protocol  = "sqs"
+  topic_arn = aws_sns_topic.sns_fifo_topic_withSubscriptions.arn
+}
+
+resource "aws_sns_topic" "sns_fifo_topic_withUsageAndSubscriptions" {
+  name       = "my-fifo-queue.fifo"
+  fifo_topic = true
+}
+
+resource "aws_sns_topic_subscription" "sns_fifo_topic_subscription3" {
+  endpoint  = "some-dummy-endpoint"
+  protocol  = "sqs"
+  topic_arn = aws_sns_topic.sns_fifo_topic_withUsageAndSubscriptions.arn
+}
+
+resource "aws_sns_topic_subscription" "sns_fifo_topic_subscription4" {
+  endpoint  = "some-dummy-endpoint"
+  protocol  = "sqs"
+  topic_arn = aws_sns_topic.sns_fifo_topic_withUsageAndSubscriptions.arn
+}
+
+resource "aws_sns_topic_subscription" "sns_fifo_topic_subscription5" {
+  endpoint  = "some-dummy-endpoint"
+  protocol  = "sqs"
+  topic_arn = aws_sns_topic.sns_fifo_topic_withUsageAndSubscriptions.arn
+}
