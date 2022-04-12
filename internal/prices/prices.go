@@ -107,7 +107,7 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 	}
 
 	if len(products) > 1 {
-		log.Warnf("Multiple products found for %s %s, filtering those with prices", r.Name, c.Name)
+		log.Debugf("Multiple products found for %s %s, filtering those with prices", r.Name, c.Name)
 	}
 
 	// Some resources may have identical records in CPAPI for the same product

@@ -432,10 +432,10 @@ module "asg-lt" {
   min_size               = 0
   max_size               = 2
   desired_capacity       = 1
-  block_device_mappings  = [
+  block_device_mappings = [
     {
       device_name = "/dev/xvdf"
-      ebs         = {
+      ebs = {
         volume_size = 10
       }
     }
