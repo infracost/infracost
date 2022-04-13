@@ -92,15 +92,3 @@ jobs:
       AMPLIFY_APP_ID: ${{ secrets.AMPLIFY_APP_ID }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-  update-choco-version:
-    name: Update chocolatey version
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            https://api.github.com/repos/infracost/chocolatey-packages/dispatches \
-            -d '{"event_type":"infracost_choco"}'
