@@ -18,8 +18,12 @@ func getInstanceRegistryItem() *schema.RegistryItem {
 			"EC2 detailed monitoring assumes the standard 7 metrics and the lowest tier of prices for CloudWatch.",
 			"If a root volume is not specified then an 8Gi gp2 volume is assumed.",
 		},
-		RFunc:               NewInstance,
-		ReferenceAttributes: []string{"ebs_block_device.#.volume_id"},
+		RFunc: NewInstance,
+		ReferenceAttributes: []string{
+			"ebs_block_device.#.volume_id",
+			"launch_template.#.id",
+			"launch_template.#.name",
+		},
 	}
 }
 
@@ -31,16 +35,42 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		purchaseOption = "spot"
 	}
 
+	var instanceType, ami, cpuCredits, tenancy string
+	var ebsOptimized, monitoring bool
+
+	launchTemplateRefs := d.References("launch_template.#.id")
+	if len(launchTemplateRefs) == 0 {
+		launchTemplateRefs = d.References("launch_template.#.name")
+	}
+
+	if len(launchTemplateRefs) > 0 {
+		ref := launchTemplateRefs[0]
+
+		instanceType = ref.Get("instance_type").String()
+		ami = ref.Get("image_id").String()
+		ebsOptimized = ref.Get("ebs_optimized").Bool()
+		monitoring = ref.Get("monitoring.0.enabled").Bool()
+		cpuCredits = ref.Get("credit_specification.0.cpu_credits").String()
+		tenancy = ref.Get("placement.0.tenancy").String()
+	}
+
+	instanceType = d.GetStringOrDefault("instance_type", instanceType)
+	ami = d.GetStringOrDefault("ami", ami)
+	ebsOptimized = d.GetBoolOrDefault("ebs_optimized", ebsOptimized)
+	monitoring = d.GetBoolOrDefault("monitoring", monitoring)
+	cpuCredits = d.GetStringOrDefault("credit_specification.0.cpu_credits", cpuCredits)
+	tenancy = d.GetStringOrDefault("tenancy", tenancy)
+
 	a := &aws.Instance{
 		Address:          d.Address,
 		Region:           region,
-		Tenancy:          d.Get("tenancy").String(),
+		Tenancy:          tenancy,
 		PurchaseOption:   purchaseOption,
-		AMI:              d.Get("ami").String(),
-		InstanceType:     d.Get("instance_type").String(),
-		EBSOptimized:     d.Get("ebs_optimized").Bool(),
-		EnableMonitoring: d.Get("monitoring").Bool(),
-		CPUCredits:       d.Get("credit_specification.0.cpu_credits").String(),
+		AMI:              ami,
+		InstanceType:     instanceType,
+		EBSOptimized:     ebsOptimized,
+		EnableMonitoring: monitoring,
+		CPUCredits:       cpuCredits,
 	}
 
 	a.RootBlockDevice = &aws.EBSVolume{

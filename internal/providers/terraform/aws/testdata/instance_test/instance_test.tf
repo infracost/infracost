@@ -164,3 +164,52 @@ resource "aws_instance" "cnvr_3yr_all_upfront" {
   ami           = "fake_ami"
   instance_type = "t3.medium"
 }
+
+resource "aws_launch_template" "example" {
+  name = "example-lt"
+
+  image_id      = "fake_ami"
+  instance_type = "t3.medium"
+  ebs_optimized = true
+
+  monitoring {
+    enabled = true
+  }
+
+  credit_specification {
+    cpu_credits = "unlimited"
+  }
+
+  placement {
+    tenancy = "dedicated"
+  }
+}
+
+resource "aws_instance" "instance_withLaunchTemplateById" {
+  launch_template {
+    id = aws_launch_template.example.id
+  }
+}
+
+resource "aws_instance" "instance_withLaunchTemplateByName" {
+  launch_template {
+    name = aws_launch_template.example.name
+  }
+}
+
+resource "aws_instance" "instance_withLaunchTemplateOverride" {
+  ami           = "overriden-fake_ami"
+  instance_type = "t3.large"
+  ebs_optimized = false
+
+  monitoring = false
+  tenancy    = "default"
+
+  credit_specification {
+    cpu_credits = "standard"
+  }
+
+  launch_template {
+    id = aws_launch_template.example.id
+  }
+}
