@@ -76,6 +76,7 @@ type Config struct {
 	ShowSkipped   bool       `yaml:"show_skipped,omitempty" ignored:"true"`
 	SyncUsageFile bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
 	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
+	CompareTo     string
 
 	NoCache bool `yaml:"fields,omitempty" ignored:"true"`
 

@@ -10,18 +10,27 @@ import (
 )
 
 type PlanJSONProvider struct {
-	ctx  *config.ProjectContext
-	Path string
+	ctx          *config.ProjectContext
+	Path         string
+	providerType string
+	parser       singleProjectParser
 }
 
-func NewPlanJSONProvider(ctx *config.ProjectContext) *PlanJSONProvider {
-	return &PlanJSONProvider{
+func NewPlanJSONProvider(ctx *config.ProjectContext, priorMap map[string]*schema.Project) *PlanJSONProvider {
+	p := &PlanJSONProvider{
 		ctx:  ctx,
 		Path: ctx.ProjectConfig.Path,
 	}
+
+	p.parser = newSingleProjectParser(ctx.ProjectConfig.Path, ctx, priorMap, addProviderTypeMetadata(p))
+	return p
 }
 
 func (p *PlanJSONProvider) Type() string {
+	if p.providerType != "" {
+		return p.providerType
+	}
+
 	return "terraform_plan_json"
 }
 
@@ -52,24 +61,14 @@ func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 }
 
 func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageData, j []byte, spinner *ui.Spinner) ([]*schema.Project, error) {
-	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
-	metadata.Type = p.Type()
-	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
-
-	project := schema.NewProject(name, metadata)
-	parser := NewParser(p.ctx)
-
-	pastResources, resources, err := parser.parseJSON(j, usage)
+	project, err := p.parser.parseJSON(j, usage)
 	if err != nil {
 		return []*schema.Project{project}, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
 
-	project.PastResources = pastResources
-	project.Resources = resources
-
 	if spinner != nil {
 		spinner.Success()
 	}
+
 	return []*schema.Project{project}, nil
 }

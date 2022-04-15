@@ -2,20 +2,23 @@ package cloudformation
 
 import (
 	"github.com/awslabs/goformation/v4"
+	"github.com/pkg/errors"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/pkg/errors"
 )
 
 type TemplateProvider struct {
-	ctx  *config.ProjectContext
-	Path string
+	ctx           *config.ProjectContext
+	Path          string
+	priorProjects map[string]*schema.Project
 }
 
-func NewTemplateProvider(ctx *config.ProjectContext) schema.Provider {
+func NewTemplateProvider(ctx *config.ProjectContext, prior map[string]*schema.Project) schema.Provider {
 	return &TemplateProvider{
-		ctx:  ctx,
-		Path: ctx.ProjectConfig.Path,
+		ctx:           ctx,
+		Path:          ctx.ProjectConfig.Path,
+		priorProjects: prior,
 	}
 }
 

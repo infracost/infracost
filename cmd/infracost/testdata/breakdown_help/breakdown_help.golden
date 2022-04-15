@@ -15,6 +15,7 @@ EXAMPLES
       infracost breakdown --path plan.json
 
 FLAGS
+      --compare-to string             Path to Infracost output JSON file to compare against
       --config-file string            Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags
       --fields strings                Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.
                                       Supported by table and html output formats (default [monthlyQuantity,unit,monthlyCost])

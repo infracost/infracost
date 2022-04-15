@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"io/ioutil"
+	"path"
 	"path/filepath"
 	"testing"
 
@@ -45,6 +46,22 @@ func TestDiffTerraformOutFile(t *testing.T) {
 // 	testdataName := testutil.CalcGoldenFileTestdataDirName()
 // 	GoldenFileCommandTest(t, testdataName, []string{"diff", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--sync-usage-file"}, nil)
 // }
+
+func TestDiffWithCompareTo(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			dir,
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+		}, &GoldenFileOptions{
+			RunHCL: true,
+		})
+}
 
 func TestDiffTerraformUsageFile(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)

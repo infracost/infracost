@@ -67,7 +67,7 @@ func GetPricesConcurrent(ctx *config.RunContext, c *apiclient.PricingAPIClient, 
 }
 
 func GetPrices(ctx *config.RunContext, c *apiclient.PricingAPIClient, r *schema.Resource) error {
-	if r.IsSkipped {
+	if r.IsSkipped || r.SkipFetchingPrice {
 		return nil
 	}
 

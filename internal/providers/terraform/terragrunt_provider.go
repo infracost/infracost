@@ -27,6 +27,7 @@ type TerragruntProvider struct {
 	Path            string
 	TerragruntFlags string
 	*DirProvider
+	priorProjects map[string]*schema.Project
 }
 
 type TerragruntInfo struct {
@@ -39,8 +40,8 @@ type terragruntProjectDirs struct {
 	WorkingDir string
 }
 
-func NewTerragruntProvider(ctx *config.ProjectContext) schema.Provider {
-	dirProvider := NewDirProvider(ctx).(*DirProvider)
+func NewTerragruntProvider(ctx *config.ProjectContext, priorProjects map[string]*schema.Project) schema.Provider {
+	dirProvider := NewDirProvider(ctx, nil).(*DirProvider)
 
 	terragruntBinary := ctx.ProjectConfig.TerraformBinary
 	if terragruntBinary == "" {
@@ -55,6 +56,7 @@ func NewTerragruntProvider(ctx *config.ProjectContext) schema.Provider {
 		DirProvider:     dirProvider,
 		Path:            ctx.ProjectConfig.Path,
 		TerragruntFlags: ctx.ProjectConfig.TerragruntFlags,
+		priorProjects:   priorProjects,
 	}
 }
 
@@ -100,24 +102,11 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	})
 	defer spinner.Fail()
 	for i, projectDir := range projectDirs {
-		metadata := config.DetectProjectMetadata(projectDir.ConfigDir)
-		metadata.Type = p.Type()
-		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
-
-		project := schema.NewProject(name, metadata)
-
-		parser := NewParser(p.ctx)
-		pastResources, resources, err := parser.parseJSON(outs[i], usage)
+		parser := newSingleProjectParser(projectDir.ConfigDir, p.ctx, p.priorProjects, addProviderTypeMetadata(p))
+		project, err := parser.parseJSON(outs[i], usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
 		}
-
-		project.HasDiff = !p.UseState
-		if project.HasDiff {
-			project.PastResources = pastResources
-		}
-		project.Resources = resources
 
 		projects = append(projects, project)
 	}

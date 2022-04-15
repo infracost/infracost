@@ -41,13 +41,14 @@ type DirProvider struct {
 	Env                 map[string]string
 	cachedStateJSON     []byte
 	cachedPlanJSON      []byte
+	priorProjects       map[string]*schema.Project
 }
 
 type RunShowOptions struct {
 	CmdOptions *CmdOptions
 }
 
-func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
+func NewDirProvider(ctx *config.ProjectContext, priorProjects map[string]*schema.Project) schema.Provider {
 	terraformBinary := ctx.ProjectConfig.TerraformBinary
 	if terraformBinary == "" {
 		terraformBinary = defaultTerraformBinary
@@ -69,6 +70,7 @@ func NewDirProvider(ctx *config.ProjectContext) schema.Provider {
 		TerraformCloudHost:  ctx.ProjectConfig.TerraformCloudHost,
 		TerraformCloudToken: ctx.ProjectConfig.TerraformCloudToken,
 		Env:                 ctx.ProjectConfig.Env,
+		priorProjects:       priorProjects,
 	}
 }
 
@@ -156,24 +158,11 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 	}
 
 	for _, j := range jsons {
-		metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
-		metadata.Type = p.Type()
-		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
-
-		project := schema.NewProject(name, metadata)
-
-		parser := NewParser(p.ctx)
-		pastResources, resources, err := parser.parseJSON(j, usage)
+		parser := newSingleProjectParser(p.ctx.ProjectConfig.Path, p.ctx, p.priorProjects, addProviderTypeMetadata(p))
+		project, err := parser.parseJSON(j, usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
 		}
-
-		project.HasDiff = !p.UseState
-		if project.HasDiff {
-			project.PastResources = pastResources
-		}
-		project.Resources = resources
 
 		projects = append(projects, project)
 	}

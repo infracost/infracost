@@ -12,12 +12,16 @@ var HourToMonthUnitMultiplier = decimal.NewFromInt(730)
 type ResourceFunc func(*ResourceData, *UsageData) *Resource
 
 type Resource struct {
-	Name              string
-	CostComponents    []*CostComponent
-	SubResources      []*Resource
-	HourlyCost        *decimal.Decimal
-	MonthlyCost       *decimal.Decimal
-	IsSkipped         bool
+	Name           string
+	CostComponents []*CostComponent
+	SubResources   []*Resource
+	HourlyCost     *decimal.Decimal
+	MonthlyCost    *decimal.Decimal
+	IsSkipped      bool
+	// SkipFetchingPrice removes this resource from requests to the cloud pricing api.
+	// This is only reserved for Resources that already have their prices calculated.
+	// For example resources coming from an Infracost cost snapshot.
+	SkipFetchingPrice bool
 	NoPrice           bool
 	SkipMessage       string
 	ResourceType      string

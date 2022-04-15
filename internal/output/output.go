@@ -22,7 +22,7 @@ type Root struct {
 	RunID                string           `json:"runId,omitempty"`
 	ShareURL             string           `json:"shareUrl,omitempty"`
 	Currency             string           `json:"currency"`
-	Projects             []Project        `json:"projects"`
+	Projects             Projects         `json:"projects"`
 	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost     *decimal.Decimal `json:"totalMonthlyCost"`
 	PastTotalHourlyCost  *decimal.Decimal `json:"pastTotalHourlyCost"`
@@ -43,6 +43,72 @@ type Project struct {
 	Diff          *Breakdown              `json:"diff"`
 	Summary       *Summary                `json:"summary"`
 	fullSummary   *Summary
+}
+
+// ToSchemaProject generates a schema.Project from a Project. The created schema.Project is not suitable to be
+// used outside simple schema.Project to schema.Project comparisons. It contains missing information
+// that cannot be inferred from a Project.
+func (p Project) ToSchemaProject() *schema.Project {
+	pastResources := convertOutputResources(p.PastBreakdown.Resources)
+	resources := convertOutputResources(p.Breakdown.Resources)
+
+	return &schema.Project{
+		Name:          p.Name,
+		Metadata:      p.Metadata,
+		PastResources: pastResources,
+		Resources:     resources,
+	}
+}
+
+func convertOutputResources(outResources []Resource) []*schema.Resource {
+	resources := make([]*schema.Resource, len(outResources))
+
+	for i, resource := range outResources {
+		resources[i] = &schema.Resource{
+			Name:              resource.Name,
+			CostComponents:    convertCostComponents(resource.CostComponents),
+			SubResources:      convertOutputResources(resource.SubResources),
+			HourlyCost:        resource.HourlyCost,
+			SkipFetchingPrice: true,
+			MonthlyCost:       resource.MonthlyCost,
+		}
+	}
+
+	return resources
+}
+
+func convertCostComponents(outComponents []CostComponent) []*schema.CostComponent {
+	components := make([]*schema.CostComponent, len(outComponents))
+
+	for i, c := range outComponents {
+		sc := &schema.CostComponent{
+			Name:            c.Name,
+			Unit:            c.Unit,
+			UnitMultiplier:  decimal.NewFromInt(1),
+			HourlyCost:      c.HourlyCost,
+			MonthlyCost:     c.MonthlyCost,
+			HourlyQuantity:  c.HourlyQuantity,
+			MonthlyQuantity: c.MonthlyQuantity,
+		}
+		sc.SetPrice(c.Price)
+
+		components[i] = sc
+	}
+
+	return components
+}
+
+type Projects []Project
+
+// ToMap returns the project list as a lookup map, which can be used to find the same project across multiple runs.
+func (projects Projects) ToMap() map[string]Project {
+	m := make(map[string]Project)
+
+	for _, p := range projects {
+		m[p.Name] = p
+	}
+
+	return m
 }
 
 var exampleProjectsRegex = regexp.MustCompile(`^infracost\/(infracost\/examples|example-terraform)\/`)
@@ -188,7 +254,6 @@ func outputBreakdown(resources []*schema.Resource) *Breakdown {
 func outputResource(r *schema.Resource) Resource {
 	comps := make([]CostComponent, 0, len(r.CostComponents))
 	for _, c := range r.CostComponents {
-
 		comps = append(comps, CostComponent{
 			Name:            c.Name,
 			Unit:            c.Unit,
