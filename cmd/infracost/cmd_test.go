@@ -133,8 +133,8 @@ func goldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 		_, err := os.Stat(hclFilePath)
 		if err == nil {
 			testutil.AssertGoldenFile(t, hclFilePath, actual)
+			return
 		}
-		return
 	}
 
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)

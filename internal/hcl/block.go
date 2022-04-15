@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -47,6 +48,59 @@ var terraformSchemaV012 = &hcl.BodySchema{
 			LabelNames: []string{"type", "name"},
 		},
 	},
+}
+
+// referencedBlocks is a helper in interface adheres to the sort.Interface interface.
+// This enables us to sort the blocks by their references to provide a list order
+// safe for context evaluation.
+type referencedBlocks []*Block
+
+func (b referencedBlocks) Len() int      { return len(b) }
+func (b referencedBlocks) Swap(i, j int) { b[i], b[j] = b[j], b[i] }
+
+// Less reports whether the Block with index i must sort before the Block with index j.
+// If the i's name is referenced by Block j then i should start before j. This is
+// because we need to evaluate the output of Block i before we can continue to j.
+func (b referencedBlocks) Less(i, j int) bool {
+	moduleName := b[i].Reference().nameLabel
+
+	attrs := b[j].GetAttributes()
+	for _, attr := range attrs {
+		refs := attr.AllReferences()
+		for _, ref := range refs {
+			if ref.typeLabel == moduleName {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// ModuleBlocks returns all the Blocks of type module. The returned Blocks
+// are sorted in order of reference. Blocks that are referenced by others are
+// the first in this list.
+//
+// So if we start with a list of [A,B,C] and A references B the returned list will
+// be [B,A,C].
+//
+// This makes the list returned safe for context evaluation, as we evaluate modules that have
+// outputs that other modules rely on first.
+func (blocks Blocks) ModuleBlocks() Blocks {
+	justModules := blocks.OfType("module")
+	toSort := make(referencedBlocks, len(justModules))
+
+	for i, block := range justModules {
+		toSort[i] = block
+	}
+
+	sort.Sort(toSort)
+
+	for i, block := range toSort {
+		justModules[i] = block
+	}
+
+	return justModules
 }
 
 // Blocks is a helper type around a slice of blocks to provide easy access

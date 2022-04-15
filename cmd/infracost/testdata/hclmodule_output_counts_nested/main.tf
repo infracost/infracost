@@ -6,12 +6,9 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-resource "aws_eip" "t" {
-  count = module.this.enabled ? 1 : 0
-
-  tags = {
-    "test" : module.this.enabled
-  }
+module "sub" {
+  source = "./modules/sub"
+  enabled = module.this.enabled
 }
 
 module "this" {
