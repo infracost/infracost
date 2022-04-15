@@ -521,7 +521,8 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 func (e *Evaluator) loadModules() []*ModuleCall {
 	var moduleDefinitions []*ModuleCall
 
-	expanded := e.expandBlocks(e.module.Blocks.OfType("module"))
+	// @todo if a module uses a count that depends on a module output, then the block expansion might be incorrect.
+	expanded := e.expandBlocks(e.module.Blocks.ModuleBlocks())
 
 	for _, moduleBlock := range expanded {
 		if moduleBlock.Label() == "" {

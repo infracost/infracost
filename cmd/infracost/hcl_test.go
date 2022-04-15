@@ -53,3 +53,15 @@ func TestHCLModuleOutputCounts(t *testing.T) {
 		&GoldenFileOptions{RunHCL: true},
 	)
 }
+
+func TestHCLModuleOutputCountsNested(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		&GoldenFileOptions{OnlyRunHCL: true},
+	)
+}
