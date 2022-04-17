@@ -25,6 +25,7 @@ type RDSCluster struct {
 	SnapshotExportSizeGB      *float64 `infracost_usage:"snapshot_export_size_gb"`
 	CapacityUnitsPerHr        *int64   `infracost_usage:"capacity_units_per_hr"`
 	BackupSnapshotSizeGB      *float64 `infracost_usage:"backup_snapshot_size_gb"`
+	MonthlyReplicatedWrite    *int64   `infracost_usage:"monthly_replicated_write"`
 }
 
 var RDSClusterUsageSchema = []*schema.UsageItem{
