@@ -38,6 +38,7 @@ var RDSClusterUsageSchema = []*schema.UsageItem{
 	{Key: "snapshot_export_size_gb", ValueType: schema.Float64, DefaultValue: 0},
 	{Key: "capacity_units_per_hr", ValueType: schema.Int64, DefaultValue: 0},
 	{Key: "backup_snapshot_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_replicated_write", ValueType: schema.Int64, DefaultValue: 0},
 }
 
 func (r *RDSCluster) PopulateUsage(u *schema.UsageData) {
