@@ -14,11 +14,11 @@ type TemplateProvider struct {
 	priorProjects map[string]*schema.Project
 }
 
-func NewTemplateProvider(ctx *config.ProjectContext, prior map[string]*schema.Project) schema.Provider {
+func NewTemplateProvider(ctx *config.ProjectContext, priorProjects map[string]*schema.Project) schema.Provider {
 	return &TemplateProvider{
 		ctx:           ctx,
 		Path:          ctx.ProjectConfig.Path,
-		priorProjects: prior,
+		priorProjects: priorProjects,
 	}
 }
 
@@ -54,6 +54,13 @@ func (p *TemplateProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 
 	project.PastResources = pastResources
 	project.Resources = resources
+
+	if p.priorProjects != nil {
+		project.PastResources = nil
+		if v, ok := p.priorProjects[name]; ok {
+			project.PastResources = v.Resources
+		}
+	}
 
 	return []*schema.Project{project}, nil
 }
