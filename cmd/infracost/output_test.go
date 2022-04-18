@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"io/ioutil"
+	"path"
 	"path/filepath"
 	"testing"
 
@@ -128,4 +129,20 @@ func TestOutputTerraformOutFileTable(t *testing.T) {
 
 func TestOutputJSONArrayPath(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--path", "[\"./testdata/example_out.json\", \"./testdata/terraform_v0.14*breakdown.json\"]"}, nil)
+}
+
+func TestOutputWithCompareTo(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"output",
+			"--path",
+			path.Join(dir, "current.json"),
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+			"--format",
+			"diff",
+		}, nil)
 }

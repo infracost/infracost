@@ -7,7 +7,6 @@ import (
 	"encoding/base32"
 	"fmt"
 	"path/filepath"
-	"reflect"
 	"regexp"
 	"strings"
 
@@ -21,12 +20,6 @@ type ProjectMetadata struct {
 	VCSSubPath         string `json:"vcsSubPath,omitempty"`
 	VCSPullRequestURL  string `json:"vcsPullRequestUrl,omitempty"`
 	TerraformWorkspace string `json:"terraformWorkspace,omitempty"`
-}
-
-// Equal compares the current ProjectMetadata with p2. This is commonly used
-// to find a matching project for a compare-to run.
-func (p ProjectMetadata) Equal(p2 ProjectMetadata) bool {
-	return reflect.DeepEqual(p, p2)
 }
 
 // Project contains the existing, planned state of
@@ -59,7 +52,7 @@ func (p *Project) AllResources() []*Resource {
 // CalculateDiff calculates the diff of past and current resources
 func (p *Project) CalculateDiff() {
 	if p.HasDiff {
-		p.Diff = calculateDiff(p.PastResources, p.Resources)
+		p.Diff = CalculateDiff(p.PastResources, p.Resources)
 	}
 }
 

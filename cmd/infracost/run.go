@@ -266,26 +266,34 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 }
 
 func buildPriorProjects(snapshot string) (map[string]*schema.Project, error) {
-	_, err := os.Stat(snapshot)
+	priorProjects := make(map[string]*schema.Project)
+	prior, err := loadInfracostJSONSnapshot(snapshot)
 	if err != nil {
-		return nil, fmt.Errorf("%s used by --compare-to flag does not exist", snapshot)
+		return nil, err
 	}
 
-	b, _ := os.ReadFile(snapshot)
-	var priorProjects map[string]*schema.Project
-
-	var prior output.Root
-	err = json.Unmarshal(b, &prior)
-	if err != nil {
-		return nil, fmt.Errorf("Could not decode file provided by compare-to flag, please ensure it is a valid Infracost JSON")
-	}
-
-	priorProjects = make(map[string]*schema.Project)
 	for _, p := range prior.Projects {
 		priorProjects[p.Name] = p.ToSchemaProject()
 	}
 
 	return priorProjects, nil
+}
+
+func loadInfracostJSONSnapshot(snapshot string) (output.Root, error) {
+	_, err := os.Stat(snapshot)
+	if err != nil {
+		return output.Root{}, fmt.Errorf("%s used by --compare-to flag does not exist", snapshot)
+	}
+
+	b, _ := os.ReadFile(snapshot)
+
+	var prior output.Root
+	err = json.Unmarshal(b, &prior)
+	if err != nil {
+		return output.Root{}, fmt.Errorf("Could not decode file provided by compare-to flag, please ensure it is a valid Infracost JSON")
+	}
+
+	return prior, nil
 }
 
 func formatHCLProjects(wg *sync.WaitGroup, ctx *config.RunContext, hclProjects []*schema.Project, hclR *output.Root) {

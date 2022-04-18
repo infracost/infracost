@@ -13,7 +13,7 @@ import (
 var nameBracketReg = regexp.MustCompile(`(.*?)\s*\((.*?)\)`)
 
 // CalculateDiff calculates the diff of past and current resources
-func calculateDiff(past []*Resource, current []*Resource) []*Resource {
+func CalculateDiff(past []*Resource, current []*Resource) []*Resource {
 	// There are many ways to calculate a diff between two sets of
 	// nested objects. The method used here is to create a nested
 	// hashmap of each set of states for fast lookup so the structure
