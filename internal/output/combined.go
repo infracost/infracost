@@ -93,6 +93,10 @@ func LoadPaths(paths []string) ([]ReportInput, error) {
 func CompareTo(current, prior Root) (Root, error) {
 	priorProjects := make(map[string]*schema.Project)
 	for _, p := range prior.Projects {
+		if _, ok := priorProjects[p.Name]; ok {
+			return Root{}, fmt.Errorf("Invalid --compare-to Infracost JSON, found duplicate project name %s", p.Name)
+		}
+
 		priorProjects[p.Name] = p.ToSchemaProject()
 	}
 
