@@ -477,7 +477,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		}
 	} else if _, ok := provider.(*terraform.TerragruntProvider); ok {
 		wg.Add(1)
-		go r.runHCLProvider(wg, ctx, terraform.NewTerragruntHCLProvider(ctx), usageFile, out)
+		go r.runHCLProvider(wg, ctx, terraform.NewTerragruntHCLProvider(ctx, r.prior == nil), usageFile, out)
 	}
 
 	t1 := time.Now()

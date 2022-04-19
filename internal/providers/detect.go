@@ -52,7 +52,7 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 
 	if ctx.ProjectConfig.TerraformParseHCL {
 		if isTerragruntNestedDir(path, 5) {
-			return terraform.NewTerragruntHCLProvider(ctx), nil
+			return terraform.NewTerragruntHCLProvider(ctx, includePastResources), nil
 		}
 
 		h, providerErr := terraform.NewHCLProvider(

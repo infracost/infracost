@@ -25,16 +25,18 @@ import (
 )
 
 type TerragruntHCLProvider struct {
-	ctx  *config.ProjectContext
-	Path string
+	ctx                  *config.ProjectContext
+	Path                 string
+	includePastResources bool
 }
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
 // root directory).
-func NewTerragruntHCLProvider(ctx *config.ProjectContext) schema.Provider {
+func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
 	return &TerragruntHCLProvider{
-		ctx:  ctx,
-		Path: ctx.ProjectConfig.Path,
+		ctx:                  ctx,
+		Path:                 ctx.ProjectConfig.Path,
+		includePastResources: includePastResources,
 	}
 }
 
@@ -78,7 +80,7 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 		pctx := config.NewProjectContext(p.ctx.RunContext, &pconfig)
 		h, err := NewHCLProvider(
 			pctx,
-			NewPlanJSONProvider(pctx),
+			NewPlanJSONProvider(pctx, p.includePastResources),
 			hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
 			hcl.OptionWithWarningFunc(p.ctx.RunContext.NewWarningWriter()),
 		)
