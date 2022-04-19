@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -65,12 +66,12 @@ func convertOutputResources(outResources []Resource) []*schema.Resource {
 
 	for i, resource := range outResources {
 		resources[i] = &schema.Resource{
-			Name:              resource.Name,
-			CostComponents:    convertCostComponents(resource.CostComponents),
-			SubResources:      convertOutputResources(resource.SubResources),
-			HourlyCost:        resource.HourlyCost,
-			SkipFetchingPrice: true,
-			MonthlyCost:       resource.MonthlyCost,
+			Name:           resource.Name,
+			CostComponents: convertCostComponents(resource.CostComponents),
+			SubResources:   convertOutputResources(resource.SubResources),
+			HourlyCost:     resource.HourlyCost,
+			MonthlyCost:    resource.MonthlyCost,
+			ResourceType:   resource.ResourceType(),
 		}
 	}
 
@@ -158,6 +159,16 @@ type Resource struct {
 	MonthlyCost    *decimal.Decimal  `json:"monthlyCost"`
 	CostComponents []CostComponent   `json:"costComponents,omitempty"`
 	SubResources   []Resource        `json:"subresources,omitempty"`
+}
+
+func (r Resource) ResourceType() string {
+	pieces := strings.Split(r.Name, ".")
+
+	if len(pieces) >= 2 {
+		return pieces[len(pieces)-2]
+	}
+
+	return r.Name
 }
 
 type Summary struct {

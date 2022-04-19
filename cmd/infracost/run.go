@@ -200,6 +200,13 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		return err
 	}
 
+	if pr.prior != nil {
+		r, err = output.CompareTo(r, *pr.prior)
+		if err != nil {
+			return err
+		}
+	}
+
 	wg.Wait()
 	r.IsCIRun = runCtx.IsCIRun()
 	r.Currency = runCtx.Config.Currency
@@ -265,32 +272,25 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	return nil
 }
 
-func buildPriorProjects(snapshot string) (map[string]*schema.Project, error) {
-	priorProjects := make(map[string]*schema.Project)
-	prior, err := loadInfracostJSONSnapshot(snapshot)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, p := range prior.Projects {
-		priorProjects[p.Name] = p.ToSchemaProject()
-	}
-
-	return priorProjects, nil
-}
-
 func loadInfracostJSONSnapshot(snapshot string) (output.Root, error) {
 	_, err := os.Stat(snapshot)
-	if err != nil {
+	if errors.Is(err, os.ErrNotExist) {
 		return output.Root{}, fmt.Errorf("%s used by --compare-to flag does not exist", snapshot)
 	}
 
-	b, _ := os.ReadFile(snapshot)
+	if err != nil {
+		return output.Root{}, fmt.Errorf("Cmould not load %s used by --compare-to flag, err: %s", snapshot, err)
+	}
+
+	b, err := os.ReadFile(snapshot)
+	if err != nil {
+		return output.Root{}, fmt.Errorf("Cmould not read %s used by --compare-to flag, err: %s", snapshot, err)
+	}
 
 	var prior output.Root
 	err = json.Unmarshal(b, &prior)
 	if err != nil {
-		return output.Root{}, fmt.Errorf("Could not decode file provided by compare-to flag, please ensure it is a valid Infracost JSON")
+		return output.Root{}, fmt.Errorf("Could not decode file %s used by compare-to flag, please ensure it is a valid Infracost JSON", snapshot)
 	}
 
 	return prior, nil
@@ -323,10 +323,10 @@ type projectOutput struct {
 }
 
 type parallelRunner struct {
-	cmd           *cobra.Command
-	runCtx        *config.RunContext
-	pathMuxs      map[string]*sync.Mutex
-	priorProjects map[string]*schema.Project
+	cmd      *cobra.Command
+	runCtx   *config.RunContext
+	pathMuxs map[string]*sync.Mutex
+	prior    *output.Root
 }
 
 func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallelRunner, error) {
@@ -338,21 +338,21 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 		pathMuxs[projectCfg.Path] = &sync.Mutex{}
 	}
 
-	var priorProjects map[string]*schema.Project
-	var err error
-
+	var prior *output.Root
 	if runCtx.Config.CompareTo != "" {
-		priorProjects, err = buildPriorProjects(runCtx.Config.CompareTo)
+		snapshot, err := loadInfracostJSONSnapshot(runCtx.Config.CompareTo)
 		if err != nil {
 			return nil, err
 		}
+
+		prior = &snapshot
 	}
 
 	return &parallelRunner{
-		runCtx:        runCtx,
-		cmd:           cmd,
-		pathMuxs:      pathMuxs,
-		priorProjects: priorProjects,
+		runCtx:   runCtx,
+		cmd:      cmd,
+		pathMuxs: pathMuxs,
+		prior:    prior,
 	}, nil
 }
 
@@ -367,7 +367,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		os.Setenv(k, v)
 	}
 
-	provider, err := providers.Detect(ctx, r.priorProjects)
+	provider, err := providers.Detect(ctx, r.prior != nil)
 	var warn *string
 	if v, ok := err.(*providers.ValidationError); ok {
 		if v.Warn() == nil {
@@ -552,7 +552,7 @@ func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectC
 
 	t1 := time.Now()
 
-	hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx, r.priorProjects))
+	hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx, r.prior != nil))
 	if err != nil {
 		log.Debugf("Could not init HCL provider: %s", err)
 		return

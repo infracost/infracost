@@ -13,16 +13,16 @@ import (
 type StateJSONProvider struct {
 	ctx    *config.ProjectContext
 	Path   string
-	parser singleProjectParser
+	parser *singleProjectParser
 }
 
-func NewStateJSONProvider(ctx *config.ProjectContext, priorMap map[string]*schema.Project) schema.Provider {
+func NewStateJSONProvider(ctx *config.ProjectContext, snapshot bool) schema.Provider {
 	p := &StateJSONProvider{
 		ctx:  ctx,
 		Path: ctx.ProjectConfig.Path,
 	}
 
-	p.parser = newSingleProjectParser(ctx.ProjectConfig.Path, ctx, priorMap, addProviderTypeMetadata(p))
+	p.parser = newSingleProjectParser(ctx.ProjectConfig.Path, ctx, addProviderTypeMetadata(p), useSnapshot(snapshot))
 	return p
 }
 

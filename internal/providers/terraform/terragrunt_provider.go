@@ -23,11 +23,12 @@ var defaultTerragruntBinary = "terragrunt"
 var minTerragruntVer = "v0.28.1"
 
 type TerragruntProvider struct {
+	*DirProvider
+
 	ctx             *config.ProjectContext
 	Path            string
 	TerragruntFlags string
-	*DirProvider
-	priorProjects map[string]*schema.Project
+	snapshot        bool
 }
 
 type TerragruntInfo struct {
@@ -40,8 +41,8 @@ type terragruntProjectDirs struct {
 	WorkingDir string
 }
 
-func NewTerragruntProvider(ctx *config.ProjectContext, priorProjects map[string]*schema.Project) schema.Provider {
-	dirProvider := NewDirProvider(ctx, nil).(*DirProvider)
+func NewTerragruntProvider(ctx *config.ProjectContext, snapshot bool) schema.Provider {
+	dirProvider := NewDirProvider(ctx, snapshot).(*DirProvider)
 
 	terragruntBinary := ctx.ProjectConfig.TerraformBinary
 	if terragruntBinary == "" {
@@ -56,7 +57,7 @@ func NewTerragruntProvider(ctx *config.ProjectContext, priorProjects map[string]
 		DirProvider:     dirProvider,
 		Path:            ctx.ProjectConfig.Path,
 		TerragruntFlags: ctx.ProjectConfig.TerragruntFlags,
-		priorProjects:   priorProjects,
+		snapshot:        snapshot,
 	}
 }
 
@@ -102,7 +103,7 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	})
 	defer spinner.Fail()
 	for i, projectDir := range projectDirs {
-		parser := newSingleProjectParser(projectDir.ConfigDir, p.ctx, p.priorProjects, addProviderTypeMetadata(p))
+		parser := newSingleProjectParser(projectDir.ConfigDir, p.ctx, addProviderTypeMetadata(p), useSnapshot(p.snapshot))
 		project, err := parser.parseJSON(outs[i], usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")

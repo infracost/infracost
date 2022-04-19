@@ -40,14 +40,18 @@ var arnAttributeMap = map[string]string{
 type Parser struct {
 	ctx              *config.ProjectContext
 	terraformVersion string
-	prior            *schema.Project
+	loadPriorState   bool
 }
 
-func NewParser(ctx *config.ProjectContext, prior *schema.Project) *Parser {
+func NewParser(ctx *config.ProjectContext, loadPriorState bool) *Parser {
 	return &Parser{
-		ctx:   ctx,
-		prior: prior,
+		ctx:            ctx,
+		loadPriorState: loadPriorState,
 	}
+}
+
+func (p *Parser) usePriorState(t bool) {
+	p.loadPriorState = t
 }
 
 func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
@@ -155,8 +159,8 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 	vars := parsed.Get("variables")
 
 	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
-	if p.prior != nil {
-		return p.prior.Resources, resources, nil
+	if p.loadPriorState {
+		return nil, resources, nil
 	}
 
 	pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
@@ -762,46 +766,51 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 	}
 }
 
-type metadataOption func(metadata *schema.ProjectMetadata)
+type projectParserOption func(metadata *singleProjectParser)
 
-func addProviderTypeMetadata(p schema.Provider) metadataOption {
-	return func(metadata *schema.ProjectMetadata) {
-		metadata.Type = p.Type()
-		p.AddMetadata(metadata)
+func addProviderTypeMetadata(p schema.Provider) projectParserOption {
+	return func(s *singleProjectParser) {
+		s.metadata.Type = p.Type()
+		p.AddMetadata(s.metadata)
+	}
+}
+
+func useSnapshot(t bool) projectParserOption {
+	return func(s *singleProjectParser) {
+		s.usesSnapshot = t
+		s.parser.usePriorState(t)
 	}
 }
 
 type singleProjectParser struct {
-	ctx      *config.ProjectContext
-	prior    *schema.Project
-	parser   *Parser
-	name     string
-	metadata *schema.ProjectMetadata
+	ctx          *config.ProjectContext
+	usesSnapshot bool
+	parser       *Parser
+	metadata     *schema.ProjectMetadata
 }
 
-func newSingleProjectParser(path string, ctx *config.ProjectContext, priorMap map[string]*schema.Project, metadataOpts ...metadataOption) singleProjectParser {
-	metadata := config.DetectProjectMetadata(path)
-	for _, f := range metadataOpts {
-		f(metadata)
-	}
-
-	name := schema.GenerateProjectName(metadata, ctx.RunContext.Config.EnableDashboard)
-	var prior *schema.Project
-	if priorMap != nil {
-		prior = priorMap[name]
-	}
-
-	return singleProjectParser{
+func newSingleProjectParser(path string, ctx *config.ProjectContext, parserOptions ...projectParserOption) *singleProjectParser {
+	p := &singleProjectParser{
 		ctx:      ctx,
-		prior:    prior,
-		parser:   NewParser(ctx, prior),
-		name:     name,
-		metadata: metadata,
+		parser:   NewParser(ctx, false),
+		metadata: config.DetectProjectMetadata(path),
 	}
+
+	for _, f := range parserOptions {
+		f(p)
+	}
+
+	return p
 }
 
-func (s singleProjectParser) parseJSON(j []byte, usage map[string]*schema.UsageData) (*schema.Project, error) {
-	project := schema.NewProject(s.name, s.metadata)
+func (s *singleProjectParser) newProject() *schema.Project {
+	name := schema.GenerateProjectName(s.metadata, s.ctx.RunContext.Config.EnableDashboard)
+
+	return schema.NewProject(name, s.metadata)
+}
+
+func (s *singleProjectParser) parseJSON(j []byte, usage map[string]*schema.UsageData) (*schema.Project, error) {
+	project := s.newProject()
 
 	pastResources, resources, err := s.parser.parseJSON(j, usage)
 	if err != nil {
@@ -810,7 +819,7 @@ func (s singleProjectParser) parseJSON(j []byte, usage map[string]*schema.UsageD
 
 	project.Resources = resources
 
-	project.HasDiff = !s.ctx.ProjectConfig.TerraformUseState || s.prior != nil
+	project.HasDiff = !s.ctx.ProjectConfig.TerraformUseState || s.usesSnapshot
 	if project.HasDiff {
 		project.PastResources = pastResources
 	}

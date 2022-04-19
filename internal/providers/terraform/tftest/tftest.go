@@ -301,7 +301,7 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 			&config.Project{
 				Path: tfdir,
 			},
-		), nil)
+		), false)
 	}
 
 	projects, err := provider.LoadResources(usageData)
@@ -390,7 +390,7 @@ func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) *terr
 		},
 	)
 
-	provider, err := terraform.NewHCLProvider(projectCtx, terraform.NewPlanJSONProvider(projectCtx, nil))
+	provider, err := terraform.NewHCLProvider(projectCtx, terraform.NewPlanJSONProvider(projectCtx, false))
 	require.NoError(t, err)
 
 	return provider

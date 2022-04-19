@@ -41,14 +41,14 @@ type DirProvider struct {
 	Env                 map[string]string
 	cachedStateJSON     []byte
 	cachedPlanJSON      []byte
-	priorProjects       map[string]*schema.Project
+	useSnapshot         bool
 }
 
 type RunShowOptions struct {
 	CmdOptions *CmdOptions
 }
 
-func NewDirProvider(ctx *config.ProjectContext, priorProjects map[string]*schema.Project) schema.Provider {
+func NewDirProvider(ctx *config.ProjectContext, snapshot bool) schema.Provider {
 	terraformBinary := ctx.ProjectConfig.TerraformBinary
 	if terraformBinary == "" {
 		terraformBinary = defaultTerraformBinary
@@ -70,7 +70,7 @@ func NewDirProvider(ctx *config.ProjectContext, priorProjects map[string]*schema
 		TerraformCloudHost:  ctx.ProjectConfig.TerraformCloudHost,
 		TerraformCloudToken: ctx.ProjectConfig.TerraformCloudToken,
 		Env:                 ctx.ProjectConfig.Env,
-		priorProjects:       priorProjects,
+		useSnapshot:         snapshot,
 	}
 }
 
@@ -158,7 +158,7 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 	}
 
 	for _, j := range jsons {
-		parser := newSingleProjectParser(p.ctx.ProjectConfig.Path, p.ctx, p.priorProjects, addProviderTypeMetadata(p))
+		parser := newSingleProjectParser(p.ctx.ProjectConfig.Path, p.ctx, addProviderTypeMetadata(p), useSnapshot(p.useSnapshot))
 		project, err := parser.parseJSON(j, usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")

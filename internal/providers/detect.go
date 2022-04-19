@@ -43,7 +43,7 @@ func (e *ValidationError) Error() string {
 	return e.err
 }
 
-func Detect(ctx *config.ProjectContext, priorProjects map[string]*schema.Project) (schema.Provider, error) {
+func Detect(ctx *config.ProjectContext, snapshot bool) (schema.Provider, error) {
 	path := ctx.ProjectConfig.Path
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -53,7 +53,7 @@ func Detect(ctx *config.ProjectContext, priorProjects map[string]*schema.Project
 	if ctx.ProjectConfig.TerraformParseHCL {
 		h, providerErr := terraform.NewHCLProvider(
 			ctx,
-			terraform.NewPlanJSONProvider(ctx, priorProjects),
+			terraform.NewPlanJSONProvider(ctx, snapshot),
 			hcl.OptionWithSpinner(ctx.RunContext.NewSpinner),
 			hcl.OptionWithWarningFunc(ctx.RunContext.NewWarningWriter()),
 		)
@@ -70,31 +70,31 @@ func Detect(ctx *config.ProjectContext, priorProjects map[string]*schema.Project
 	}
 
 	if isCloudFormationTemplate(path) {
-		return cloudformation.NewTemplateProvider(ctx, priorProjects), nil
+		return cloudformation.NewTemplateProvider(ctx, snapshot), nil
 	}
 
 	if isTerraformPlanJSON(path) {
-		return terraform.NewPlanJSONProvider(ctx, priorProjects), nil
+		return terraform.NewPlanJSONProvider(ctx, snapshot), nil
 	}
 
 	if isTerraformStateJSON(path) {
-		return terraform.NewStateJSONProvider(ctx, priorProjects), nil
+		return terraform.NewStateJSONProvider(ctx, snapshot), nil
 	}
 
 	if isTerraformPlan(path) {
-		return terraform.NewPlanProvider(ctx, priorProjects), nil
+		return terraform.NewPlanProvider(ctx, snapshot), nil
 	}
 
 	if isTerragruntDir(path) {
-		return terraform.NewTerragruntProvider(ctx, priorProjects), nil
+		return terraform.NewTerragruntProvider(ctx, snapshot), nil
 	}
 
 	if isTerraformDir(path) {
-		return terraform.NewDirProvider(ctx, priorProjects), nil
+		return terraform.NewDirProvider(ctx, snapshot), nil
 	}
 
 	if isTerragruntNestedDir(path, 5) {
-		return terraform.NewTerragruntProvider(ctx, priorProjects), nil
+		return terraform.NewTerragruntProvider(ctx, snapshot), nil
 	}
 
 	return nil, fmt.Errorf("Could not detect path type for '%s'", path)

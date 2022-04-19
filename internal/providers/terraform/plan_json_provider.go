@@ -13,16 +13,16 @@ type PlanJSONProvider struct {
 	ctx          *config.ProjectContext
 	Path         string
 	providerType string
-	parser       singleProjectParser
+	parser       *singleProjectParser
 }
 
-func NewPlanJSONProvider(ctx *config.ProjectContext, priorMap map[string]*schema.Project) *PlanJSONProvider {
+func NewPlanJSONProvider(ctx *config.ProjectContext, snapshot bool) *PlanJSONProvider {
 	p := &PlanJSONProvider{
 		ctx:  ctx,
 		Path: ctx.ProjectConfig.Path,
 	}
 
-	p.parser = newSingleProjectParser(ctx.ProjectConfig.Path, ctx, priorMap, addProviderTypeMetadata(p))
+	p.parser = newSingleProjectParser(ctx.ProjectConfig.Path, ctx, addProviderTypeMetadata(p), useSnapshot(snapshot))
 	return p
 }
 

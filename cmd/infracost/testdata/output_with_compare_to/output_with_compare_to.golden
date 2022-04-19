@@ -32,4 +32,5 @@ Percent: -36%
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
 
-No cloud resources were detected
+1 cloud resource was detected:
+∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file

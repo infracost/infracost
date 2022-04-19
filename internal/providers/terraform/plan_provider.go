@@ -18,18 +18,18 @@ type PlanProvider struct {
 	*DirProvider
 	Path           string
 	cachedPlanJSON []byte
-	parser         singleProjectParser
+	parser         *singleProjectParser
 }
 
-func NewPlanProvider(ctx *config.ProjectContext, priorProjects map[string]*schema.Project) schema.Provider {
-	dirProvider := NewDirProvider(ctx, nil).(*DirProvider)
+func NewPlanProvider(ctx *config.ProjectContext, snapshot bool) schema.Provider {
+	dirProvider := NewDirProvider(ctx, snapshot).(*DirProvider)
 
 	p := &PlanProvider{
 		DirProvider: dirProvider,
 		Path:        ctx.ProjectConfig.Path,
 	}
 
-	p.parser = newSingleProjectParser(ctx.ProjectConfig.Path, ctx, priorProjects, addProviderTypeMetadata(p))
+	p.parser = newSingleProjectParser(ctx.ProjectConfig.Path, ctx, addProviderTypeMetadata(p), useSnapshot(snapshot))
 
 	return p
 }
