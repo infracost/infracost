@@ -584,6 +584,9 @@ resource_usage:
       china: 50            # China excluding Hong Kong.
       australia: 250       # Australia.
 
+  google_compute_address.my_address:
+    address_type: standard_vm # IP address being used, can be: standard_vm, preemptible_vm, unused.
+
   google_compute_external_vpn_gateway.my_compute_external_vpn_gateway:
     monthly_egress_data_transfer_gb:  # Monthly data transfer from VPN gateway to the following, in GB:
       worldwide: 12500                # Worldwide excluding China, Australia but including Hong Kong.
@@ -612,6 +615,9 @@ resource_usage:
 
   google_compute_forwarding_rule.my_forwarding:
     monthly_ingress_data_gb: 100
+
+  google_compute_global_address.my_address:
+    address_type: standard_vm # IP address being used, can be: standard_vm, preemptible_vm, unused.
 
   google_compute_global_forwarding_rule.my_global_forwarding:
     monthly_ingress_data_gb: 100
