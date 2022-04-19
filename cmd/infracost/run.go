@@ -279,12 +279,12 @@ func loadInfracostJSONSnapshot(snapshot string) (output.Root, error) {
 	}
 
 	if err != nil {
-		return output.Root{}, fmt.Errorf("Cmould not load %s used by --compare-to flag, err: %s", snapshot, err)
+		return output.Root{}, fmt.Errorf("Could not load %s used by --compare-to flag, err: %s", snapshot, err)
 	}
 
 	b, err := os.ReadFile(snapshot)
 	if err != nil {
-		return output.Root{}, fmt.Errorf("Cmould not read %s used by --compare-to flag, err: %s", snapshot, err)
+		return output.Root{}, fmt.Errorf("Could not read %s used by --compare-to flag, err: %s", snapshot, err)
 	}
 
 	var prior output.Root
@@ -367,7 +367,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		os.Setenv(k, v)
 	}
 
-	provider, err := providers.Detect(ctx, r.prior != nil)
+	provider, err := providers.Detect(ctx, r.prior == nil)
 	var warn *string
 	if v, ok := err.(*providers.ValidationError); ok {
 		if v.Warn() == nil {
@@ -552,7 +552,7 @@ func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectC
 
 	t1 := time.Now()
 
-	hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx, r.prior != nil))
+	hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx, r.prior == nil))
 	if err != nil {
 		log.Debugf("Could not init HCL provider: %s", err)
 		return

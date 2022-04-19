@@ -82,7 +82,6 @@ func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider, opts
 	options = append(options, opts...)
 	p := hcl.New(ctx.ProjectConfig.Path, options...)
 
-	provider.providerType = "terraform_hcl"
 	return &HCLProvider{
 		Parser:   p,
 		Provider: provider,

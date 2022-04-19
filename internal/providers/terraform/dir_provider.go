@@ -27,28 +27,28 @@ import (
 var minTerraformVer = "v0.12"
 
 type DirProvider struct {
-	ctx                 *config.ProjectContext
-	Path                string
-	spinnerOpts         ui.SpinnerOptions
-	IsTerragrunt        bool
-	PlanFlags           string
-	InitFlags           string
-	Workspace           string
-	UseState            bool
-	TerraformBinary     string
-	TerraformCloudHost  string
-	TerraformCloudToken string
-	Env                 map[string]string
-	cachedStateJSON     []byte
-	cachedPlanJSON      []byte
-	useSnapshot         bool
+	ctx                  *config.ProjectContext
+	Path                 string
+	spinnerOpts          ui.SpinnerOptions
+	IsTerragrunt         bool
+	PlanFlags            string
+	InitFlags            string
+	Workspace            string
+	UseState             bool
+	TerraformBinary      string
+	TerraformCloudHost   string
+	TerraformCloudToken  string
+	Env                  map[string]string
+	cachedStateJSON      []byte
+	cachedPlanJSON       []byte
+	includePastResources bool
 }
 
 type RunShowOptions struct {
 	CmdOptions *CmdOptions
 }
 
-func NewDirProvider(ctx *config.ProjectContext, snapshot bool) schema.Provider {
+func NewDirProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
 	terraformBinary := ctx.ProjectConfig.TerraformBinary
 	if terraformBinary == "" {
 		terraformBinary = defaultTerraformBinary
@@ -62,15 +62,15 @@ func NewDirProvider(ctx *config.ProjectContext, snapshot bool) schema.Provider {
 			NoColor:       ctx.RunContext.Config.NoColor,
 			Indent:        "  ",
 		},
-		PlanFlags:           ctx.ProjectConfig.TerraformPlanFlags,
-		InitFlags:           ctx.ProjectConfig.TerraformInitFlags,
-		Workspace:           ctx.ProjectConfig.TerraformWorkspace,
-		UseState:            ctx.ProjectConfig.TerraformUseState,
-		TerraformBinary:     terraformBinary,
-		TerraformCloudHost:  ctx.ProjectConfig.TerraformCloudHost,
-		TerraformCloudToken: ctx.ProjectConfig.TerraformCloudToken,
-		Env:                 ctx.ProjectConfig.Env,
-		useSnapshot:         snapshot,
+		PlanFlags:            ctx.ProjectConfig.TerraformPlanFlags,
+		InitFlags:            ctx.ProjectConfig.TerraformInitFlags,
+		Workspace:            ctx.ProjectConfig.TerraformWorkspace,
+		UseState:             ctx.ProjectConfig.TerraformUseState,
+		TerraformBinary:      terraformBinary,
+		TerraformCloudHost:   ctx.ProjectConfig.TerraformCloudHost,
+		TerraformCloudToken:  ctx.ProjectConfig.TerraformCloudToken,
+		Env:                  ctx.ProjectConfig.Env,
+		includePastResources: includePastResources,
 	}
 }
 
@@ -158,11 +158,24 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 	}
 
 	for _, j := range jsons {
-		parser := newSingleProjectParser(p.ctx.ProjectConfig.Path, p.ctx, addProviderTypeMetadata(p), useSnapshot(p.useSnapshot))
-		project, err := parser.parseJSON(j, usage)
+		metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+		metadata.Type = p.Type()
+		p.AddMetadata(metadata)
+		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+
+		project := schema.NewProject(name, metadata)
+
+		parser := NewParser(p.ctx, p.includePastResources)
+		pastResources, resources, err := parser.parseJSON(j, usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
 		}
+
+		project.HasDiff = !p.UseState
+		if project.HasDiff {
+			project.PastResources = pastResources
+		}
+		project.Resources = resources
 
 		projects = append(projects, project)
 	}

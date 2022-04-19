@@ -10,27 +10,20 @@ import (
 )
 
 type PlanJSONProvider struct {
-	ctx          *config.ProjectContext
-	Path         string
-	providerType string
-	parser       *singleProjectParser
+	ctx                  *config.ProjectContext
+	Path                 string
+	includePastResources bool
 }
 
-func NewPlanJSONProvider(ctx *config.ProjectContext, snapshot bool) *PlanJSONProvider {
-	p := &PlanJSONProvider{
-		ctx:  ctx,
-		Path: ctx.ProjectConfig.Path,
+func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) *PlanJSONProvider {
+	return &PlanJSONProvider{
+		ctx:                  ctx,
+		Path:                 ctx.ProjectConfig.Path,
+		includePastResources: includePastResources,
 	}
-
-	p.parser = newSingleProjectParser(ctx.ProjectConfig.Path, ctx, addProviderTypeMetadata(p), useSnapshot(snapshot))
-	return p
 }
 
 func (p *PlanJSONProvider) Type() string {
-	if p.providerType != "" {
-		return p.providerType
-	}
-
 	return "terraform_plan_json"
 }
 
@@ -61,14 +54,24 @@ func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 }
 
 func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageData, j []byte, spinner *ui.Spinner) ([]*schema.Project, error) {
-	project, err := p.parser.parseJSON(j, usage)
+	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata.Type = p.Type()
+	p.AddMetadata(metadata)
+	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+
+	project := schema.NewProject(name, metadata)
+	parser := NewParser(p.ctx, p.includePastResources)
+
+	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return []*schema.Project{project}, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
 
+	project.PastResources = pastResources
+	project.Resources = resources
+
 	if spinner != nil {
 		spinner.Success()
 	}
-
 	return []*schema.Project{project}, nil
 }

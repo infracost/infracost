@@ -43,7 +43,7 @@ func (e *ValidationError) Error() string {
 	return e.err
 }
 
-func Detect(ctx *config.ProjectContext, snapshot bool) (schema.Provider, error) {
+func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provider, error) {
 	path := ctx.ProjectConfig.Path
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -53,7 +53,7 @@ func Detect(ctx *config.ProjectContext, snapshot bool) (schema.Provider, error) 
 	if ctx.ProjectConfig.TerraformParseHCL {
 		h, providerErr := terraform.NewHCLProvider(
 			ctx,
-			terraform.NewPlanJSONProvider(ctx, snapshot),
+			terraform.NewPlanJSONProvider(ctx, includePastResources),
 			hcl.OptionWithSpinner(ctx.RunContext.NewSpinner),
 			hcl.OptionWithWarningFunc(ctx.RunContext.NewWarningWriter()),
 		)
@@ -70,31 +70,31 @@ func Detect(ctx *config.ProjectContext, snapshot bool) (schema.Provider, error) 
 	}
 
 	if isCloudFormationTemplate(path) {
-		return cloudformation.NewTemplateProvider(ctx, snapshot), nil
+		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
 	}
 
 	if isTerraformPlanJSON(path) {
-		return terraform.NewPlanJSONProvider(ctx, snapshot), nil
+		return terraform.NewPlanJSONProvider(ctx, includePastResources), nil
 	}
 
 	if isTerraformStateJSON(path) {
-		return terraform.NewStateJSONProvider(ctx, snapshot), nil
+		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
 	}
 
 	if isTerraformPlan(path) {
-		return terraform.NewPlanProvider(ctx, snapshot), nil
+		return terraform.NewPlanProvider(ctx, includePastResources), nil
 	}
 
 	if isTerragruntDir(path) {
-		return terraform.NewTerragruntProvider(ctx, snapshot), nil
+		return terraform.NewTerragruntProvider(ctx, includePastResources), nil
 	}
 
 	if isTerraformDir(path) {
-		return terraform.NewDirProvider(ctx, snapshot), nil
+		return terraform.NewDirProvider(ctx, includePastResources), nil
 	}
 
 	if isTerragruntNestedDir(path, 5) {
-		return terraform.NewTerragruntProvider(ctx, snapshot), nil
+		return terraform.NewTerragruntProvider(ctx, includePastResources), nil
 	}
 
 	return nil, fmt.Errorf("Could not detect path type for '%s'", path)

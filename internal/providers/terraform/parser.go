@@ -38,20 +38,16 @@ var arnAttributeMap = map[string]string{
 }
 
 type Parser struct {
-	ctx              *config.ProjectContext
-	terraformVersion string
-	loadPriorState   bool
+	ctx                  *config.ProjectContext
+	terraformVersion     string
+	includePastResources bool
 }
 
-func NewParser(ctx *config.ProjectContext, loadPriorState bool) *Parser {
+func NewParser(ctx *config.ProjectContext, includePastResources bool) *Parser {
 	return &Parser{
-		ctx:            ctx,
-		loadPriorState: loadPriorState,
+		ctx:                  ctx,
+		includePastResources: includePastResources,
 	}
-}
-
-func (p *Parser) usePriorState(t bool) {
-	p.loadPriorState = t
 }
 
 func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
@@ -159,7 +155,7 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 	vars := parsed.Get("variables")
 
 	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
-	if p.loadPriorState {
+	if !p.includePastResources {
 		return nil, resources, nil
 	}
 
@@ -764,65 +760,4 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 			}
 		}
 	}
-}
-
-type projectParserOption func(metadata *singleProjectParser)
-
-func addProviderTypeMetadata(p schema.Provider) projectParserOption {
-	return func(s *singleProjectParser) {
-		s.metadata.Type = p.Type()
-		p.AddMetadata(s.metadata)
-	}
-}
-
-func useSnapshot(t bool) projectParserOption {
-	return func(s *singleProjectParser) {
-		s.usesSnapshot = t
-		s.parser.usePriorState(t)
-	}
-}
-
-type singleProjectParser struct {
-	ctx          *config.ProjectContext
-	usesSnapshot bool
-	parser       *Parser
-	metadata     *schema.ProjectMetadata
-}
-
-func newSingleProjectParser(path string, ctx *config.ProjectContext, parserOptions ...projectParserOption) *singleProjectParser {
-	p := &singleProjectParser{
-		ctx:      ctx,
-		parser:   NewParser(ctx, false),
-		metadata: config.DetectProjectMetadata(path),
-	}
-
-	for _, f := range parserOptions {
-		f(p)
-	}
-
-	return p
-}
-
-func (s *singleProjectParser) newProject() *schema.Project {
-	name := schema.GenerateProjectName(s.metadata, s.ctx.RunContext.Config.EnableDashboard)
-
-	return schema.NewProject(name, s.metadata)
-}
-
-func (s *singleProjectParser) parseJSON(j []byte, usage map[string]*schema.UsageData) (*schema.Project, error) {
-	project := s.newProject()
-
-	pastResources, resources, err := s.parser.parseJSON(j, usage)
-	if err != nil {
-		return nil, fmt.Errorf("could not parse resources from provided JSON structure %w", err)
-	}
-
-	project.Resources = resources
-
-	project.HasDiff = !s.ctx.ProjectConfig.TerraformUseState || s.usesSnapshot
-	if project.HasDiff {
-		project.PastResources = pastResources
-	}
-
-	return project, nil
 }

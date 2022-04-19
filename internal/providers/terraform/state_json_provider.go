@@ -11,19 +11,17 @@ import (
 )
 
 type StateJSONProvider struct {
-	ctx    *config.ProjectContext
-	Path   string
-	parser *singleProjectParser
+	ctx                  *config.ProjectContext
+	Path                 string
+	includePastResources bool
 }
 
-func NewStateJSONProvider(ctx *config.ProjectContext, snapshot bool) schema.Provider {
-	p := &StateJSONProvider{
-		ctx:  ctx,
-		Path: ctx.ProjectConfig.Path,
+func NewStateJSONProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
+	return &StateJSONProvider{
+		ctx:                  ctx,
+		Path:                 ctx.ProjectConfig.Path,
+		includePastResources: includePastResources,
 	}
-
-	p.parser = newSingleProjectParser(ctx.ProjectConfig.Path, ctx, addProviderTypeMetadata(p), useSnapshot(snapshot))
-	return p
 }
 
 func (p *StateJSONProvider) Type() string {
@@ -51,10 +49,21 @@ func (p *StateJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Terraform state JSON file")
 	}
 
-	project, err := p.parser.parseJSON(j, usage)
+	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata.Type = p.Type()
+	p.AddMetadata(metadata)
+	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+
+	project := schema.NewProject(name, metadata)
+	parser := NewParser(p.ctx, p.includePastResources)
+
+	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Terraform state JSON file")
 	}
+
+	project.PastResources = pastResources
+	project.Resources = resources
 
 	spinner.Success()
 	return []*schema.Project{project}, nil

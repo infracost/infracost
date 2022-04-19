@@ -16,22 +16,19 @@ import (
 
 type PlanProvider struct {
 	*DirProvider
-	Path           string
-	cachedPlanJSON []byte
-	parser         *singleProjectParser
+	Path                 string
+	cachedPlanJSON       []byte
+	includePastResources bool
 }
 
-func NewPlanProvider(ctx *config.ProjectContext, snapshot bool) schema.Provider {
-	dirProvider := NewDirProvider(ctx, snapshot).(*DirProvider)
+func NewPlanProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
+	dirProvider := NewDirProvider(ctx, includePastResources).(*DirProvider)
 
-	p := &PlanProvider{
-		DirProvider: dirProvider,
-		Path:        ctx.ProjectConfig.Path,
+	return &PlanProvider{
+		DirProvider:          dirProvider,
+		Path:                 ctx.ProjectConfig.Path,
+		includePastResources: includePastResources,
 	}
-
-	p.parser = newSingleProjectParser(ctx.ProjectConfig.Path, ctx, addProviderTypeMetadata(p), useSnapshot(snapshot))
-
-	return p
 }
 
 func (p *PlanProvider) Type() string {
@@ -55,10 +52,21 @@ func (p *PlanProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sch
 	})
 	defer spinner.Fail()
 
-	project, err := p.parser.parseJSON(j, usage)
+	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata.Type = p.Type()
+	p.AddMetadata(metadata)
+	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+
+	project := schema.NewProject(name, metadata)
+	parser := NewParser(p.ctx, p.includePastResources)
+
+	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Terraform JSON")
 	}
+
+	project.PastResources = pastResources
+	project.Resources = resources
 
 	spinner.Success()
 	return []*schema.Project{project}, nil

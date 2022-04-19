@@ -390,7 +390,7 @@ func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) *terr
 		},
 	)
 
-	provider, err := terraform.NewHCLProvider(projectCtx, terraform.NewPlanJSONProvider(projectCtx, false))
+	provider, err := terraform.NewHCLProvider(projectCtx, terraform.NewPlanJSONProvider(projectCtx, true))
 	require.NoError(t, err)
 
 	return provider

@@ -23,12 +23,11 @@ var defaultTerragruntBinary = "terragrunt"
 var minTerragruntVer = "v0.28.1"
 
 type TerragruntProvider struct {
-	*DirProvider
-
 	ctx             *config.ProjectContext
 	Path            string
 	TerragruntFlags string
-	snapshot        bool
+	*DirProvider
+	includePastResources bool
 }
 
 type TerragruntInfo struct {
@@ -41,8 +40,8 @@ type terragruntProjectDirs struct {
 	WorkingDir string
 }
 
-func NewTerragruntProvider(ctx *config.ProjectContext, snapshot bool) schema.Provider {
-	dirProvider := NewDirProvider(ctx, snapshot).(*DirProvider)
+func NewTerragruntProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
+	dirProvider := NewDirProvider(ctx, includePastResources).(*DirProvider)
 
 	terragruntBinary := ctx.ProjectConfig.TerraformBinary
 	if terragruntBinary == "" {
@@ -53,11 +52,11 @@ func NewTerragruntProvider(ctx *config.ProjectContext, snapshot bool) schema.Pro
 	dirProvider.IsTerragrunt = true
 
 	return &TerragruntProvider{
-		ctx:             ctx,
-		DirProvider:     dirProvider,
-		Path:            ctx.ProjectConfig.Path,
-		TerragruntFlags: ctx.ProjectConfig.TerragruntFlags,
-		snapshot:        snapshot,
+		ctx:                  ctx,
+		DirProvider:          dirProvider,
+		Path:                 ctx.ProjectConfig.Path,
+		TerragruntFlags:      ctx.ProjectConfig.TerragruntFlags,
+		includePastResources: includePastResources,
 	}
 }
 
@@ -103,11 +102,24 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	})
 	defer spinner.Fail()
 	for i, projectDir := range projectDirs {
-		parser := newSingleProjectParser(projectDir.ConfigDir, p.ctx, addProviderTypeMetadata(p), useSnapshot(p.snapshot))
-		project, err := parser.parseJSON(outs[i], usage)
+		metadata := config.DetectProjectMetadata(projectDir.ConfigDir)
+		metadata.Type = p.Type()
+		p.AddMetadata(metadata)
+		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+
+		project := schema.NewProject(name, metadata)
+
+		parser := NewParser(p.ctx, p.includePastResources)
+		pastResources, resources, err := parser.parseJSON(outs[i], usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
 		}
+
+		project.HasDiff = !p.UseState
+		if project.HasDiff {
+			project.PastResources = pastResources
+		}
+		project.Resources = resources
 
 		projects = append(projects, project)
 	}
