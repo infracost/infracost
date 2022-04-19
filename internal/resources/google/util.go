@@ -44,6 +44,15 @@ func floatPtrToDecimalPtr(f *float64) *decimal.Decimal {
 	return decimalPtr(decimal.NewFromFloat(*f))
 }
 
+func contains(a []string, x string) bool {
+	for _, n := range a {
+		if x == n {
+			return true
+		}
+	}
+	return false
+}
+
 // RegionsUsage is a reusable type that represents a usage cost map.
 // This can be used in resources that define a usage parameter that's changed on a per-region basis, e.g:
 //

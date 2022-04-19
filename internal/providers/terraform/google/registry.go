@@ -11,7 +11,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getComputeDiskRegistryItem(),
 	getComputeExternalVPNGatewayRegistryItem(),
 	getComputeForwardingRuleRegistryItem(),
-	GetComputeGlobalAddressRegistryItem(),
+	getComputeGlobalAddressRegistryItem(),
 	GetComputeGlobalForwardingRuleRegistryItem(),
 	getComputeHAVPNGatewayRegistryItem(),
 	getComputeImageRegistryItem(),

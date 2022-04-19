@@ -1,0 +1,12 @@
+version: 0.1
+resource_usage:
+  google_compute_address.standard_with_usage:
+    address_type: standard_vm
+  google_compute_address.preemptible_with_usage:
+    address_type: preemptible_vm
+  google_compute_address.unused_with_usage:
+    address_type: unused
+  google_compute_address.invalid_usage:
+    address_type: invalid
+  google_compute_global_address.standard_with_usage:
+    address_type: standard_vm
