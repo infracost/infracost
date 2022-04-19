@@ -6,8 +6,9 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/ui"
 )
 
 const (

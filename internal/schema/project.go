@@ -52,7 +52,7 @@ func (p *Project) AllResources() []*Resource {
 // CalculateDiff calculates the diff of past and current resources
 func (p *Project) CalculateDiff() {
 	if p.HasDiff {
-		p.Diff = calculateDiff(p.PastResources, p.Resources)
+		p.Diff = CalculateDiff(p.PastResources, p.Resources)
 	}
 }
 

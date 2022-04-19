@@ -12,6 +12,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 var minOutputVersion = "0.2"
@@ -82,6 +84,44 @@ func LoadPaths(paths []string) ([]ReportInput, error) {
 	}
 
 	return inputs, nil
+}
+
+// CompareTo generates an output Root using another Root as the base snapshot.
+// Each project in current Root will have all past resources overwritten with the matching projects
+// in the prior Root. If we can't find a matching project then we assume that the project
+// has been newly created and will show a 100% increase in the output Root.
+func CompareTo(current, prior Root) (Root, error) {
+	priorProjects := make(map[string]*schema.Project)
+	for _, p := range prior.Projects {
+		if _, ok := priorProjects[p.Name]; ok {
+			return Root{}, fmt.Errorf("Invalid --compare-to Infracost JSON, found duplicate project name %s", p.Name)
+		}
+
+		priorProjects[p.Name] = p.ToSchemaProject()
+	}
+
+	schemaProjects := make([]*schema.Project, len(current.Projects))
+	for i, p := range current.Projects {
+		scp := p.ToSchemaProject()
+		scp.Diff = scp.Resources
+		scp.PastResources = nil
+		scp.HasDiff = true
+
+		if v, ok := priorProjects[p.Name]; ok {
+			scp.PastResources = v.Resources
+			scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
+		}
+
+		schemaProjects[i] = scp
+	}
+
+	out, err := ToOutputFormat(schemaProjects)
+	if err != nil {
+		return out, err
+	}
+
+	out.Currency = current.Currency
+	return out, nil
 }
 
 func Combine(inputs []ReportInput) (Root, error) {

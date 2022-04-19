@@ -27,6 +27,7 @@ type TerragruntProvider struct {
 	Path            string
 	TerragruntFlags string
 	*DirProvider
+	includePastResources bool
 }
 
 type TerragruntInfo struct {
@@ -39,8 +40,8 @@ type terragruntProjectDirs struct {
 	WorkingDir string
 }
 
-func NewTerragruntProvider(ctx *config.ProjectContext) schema.Provider {
-	dirProvider := NewDirProvider(ctx).(*DirProvider)
+func NewTerragruntProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
+	dirProvider := NewDirProvider(ctx, includePastResources).(*DirProvider)
 
 	terragruntBinary := ctx.ProjectConfig.TerraformBinary
 	if terragruntBinary == "" {
@@ -51,10 +52,11 @@ func NewTerragruntProvider(ctx *config.ProjectContext) schema.Provider {
 	dirProvider.IsTerragrunt = true
 
 	return &TerragruntProvider{
-		ctx:             ctx,
-		DirProvider:     dirProvider,
-		Path:            ctx.ProjectConfig.Path,
-		TerragruntFlags: ctx.ProjectConfig.TerragruntFlags,
+		ctx:                  ctx,
+		DirProvider:          dirProvider,
+		Path:                 ctx.ProjectConfig.Path,
+		TerragruntFlags:      ctx.ProjectConfig.TerragruntFlags,
+		includePastResources: includePastResources,
 	}
 }
 
@@ -107,7 +109,7 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 
 		project := schema.NewProject(name, metadata)
 
-		parser := NewParser(p.ctx)
+		parser := NewParser(p.ctx, p.includePastResources)
 		pastResources, resources, err := parser.parseJSON(outs[i], usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")

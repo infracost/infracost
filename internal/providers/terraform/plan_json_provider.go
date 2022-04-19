@@ -10,14 +10,16 @@ import (
 )
 
 type PlanJSONProvider struct {
-	ctx  *config.ProjectContext
-	Path string
+	ctx                  *config.ProjectContext
+	Path                 string
+	includePastResources bool
 }
 
-func NewPlanJSONProvider(ctx *config.ProjectContext) *PlanJSONProvider {
+func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) *PlanJSONProvider {
 	return &PlanJSONProvider{
-		ctx:  ctx,
-		Path: ctx.ProjectConfig.Path,
+		ctx:                  ctx,
+		Path:                 ctx.ProjectConfig.Path,
+		includePastResources: includePastResources,
 	}
 }
 
@@ -58,7 +60,7 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageDa
 	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
 
 	project := schema.NewProject(name, metadata)
-	parser := NewParser(p.ctx)
+	parser := NewParser(p.ctx, p.includePastResources)
 
 	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {

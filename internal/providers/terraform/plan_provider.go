@@ -16,16 +16,18 @@ import (
 
 type PlanProvider struct {
 	*DirProvider
-	Path           string
-	cachedPlanJSON []byte
+	Path                 string
+	cachedPlanJSON       []byte
+	includePastResources bool
 }
 
-func NewPlanProvider(ctx *config.ProjectContext) schema.Provider {
-	dirProvider := NewDirProvider(ctx).(*DirProvider)
+func NewPlanProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
+	dirProvider := NewDirProvider(ctx, includePastResources).(*DirProvider)
 
 	return &PlanProvider{
-		DirProvider: dirProvider,
-		Path:        ctx.ProjectConfig.Path,
+		DirProvider:          dirProvider,
+		Path:                 ctx.ProjectConfig.Path,
+		includePastResources: includePastResources,
 	}
 }
 
@@ -56,7 +58,7 @@ func (p *PlanProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sch
 	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
 
 	project := schema.NewProject(name, metadata)
-	parser := NewParser(p.ctx)
+	parser := NewParser(p.ctx, p.includePastResources)
 
 	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {

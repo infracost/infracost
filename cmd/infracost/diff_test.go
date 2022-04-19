@@ -1,7 +1,10 @@
 package main_test
 
 import (
+	"fmt"
 	"io/ioutil"
+	"os"
+	"path"
 	"path/filepath"
 	"testing"
 
@@ -45,6 +48,51 @@ func TestDiffTerraformOutFile(t *testing.T) {
 // 	testdataName := testutil.CalcGoldenFileTestdataDirName()
 // 	GoldenFileCommandTest(t, testdataName, []string{"diff", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--sync-usage-file"}, nil)
 // }
+
+func TestDiffWithCompareTo(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			dir,
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+		}, &GoldenFileOptions{
+			RunHCL: true,
+		})
+}
+
+func TestDiffWithConfigFileCompareTo(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	configFile := fmt.Sprintf(`version: 0.1
+
+projects:
+  - path: %s
+  - path: %s`,
+		path.Join(dir, "dev"),
+		path.Join(dir, "prod"))
+
+	configFilePath := path.Join(dir, "infracost.yml")
+	err := os.WriteFile(configFilePath, []byte(configFile), os.ModePerm)
+	require.NoError(t, err)
+
+	defer os.Remove(configFilePath)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--config-file",
+			configFilePath,
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+		}, &GoldenFileOptions{
+			RunHCL: true,
+		})
+}
 
 func TestDiffTerraformUsageFile(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)

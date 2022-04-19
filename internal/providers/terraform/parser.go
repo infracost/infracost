@@ -38,12 +38,16 @@ var arnAttributeMap = map[string]string{
 }
 
 type Parser struct {
-	ctx              *config.ProjectContext
-	terraformVersion string
+	ctx                  *config.ProjectContext
+	terraformVersion     string
+	includePastResources bool
 }
 
-func NewParser(ctx *config.ProjectContext) *Parser {
-	return &Parser{ctx, ""}
+func NewParser(ctx *config.ProjectContext, includePastResources bool) *Parser {
+	return &Parser{
+		ctx:                  ctx,
+		includePastResources: includePastResources,
+	}
 }
 
 func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
@@ -150,9 +154,12 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 	conf := parsed.Get("configuration.root_module")
 	vars := parsed.Get("variables")
 
-	pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
 	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
+	if !p.includePastResources {
+		return nil, resources, nil
+	}
 
+	pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
 	resourceChanges := parsed.Get("resource_changes").Array()
 	pastResources = stripNonTargetResources(pastResources, resources, resourceChanges)
 
