@@ -468,8 +468,16 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 	// if the provider is the dir provider let's run the hcl provider at the same time to get reporting metrics.
 	if _, ok := provider.(*terraform.DirProvider); ok {
+		hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx, r.prior == nil))
+		if err != nil {
+			log.Debugf("Could not init HCL provider: %s", err)
+		} else {
+			wg.Add(1)
+			go r.runHCLProvider(wg, ctx, hclProvider, usageFile, out)
+		}
+	} else if _, ok := provider.(*terraform.TerragruntProvider); ok {
 		wg.Add(1)
-		go r.runHCLProvider(wg, ctx, usageFile, out)
+		go r.runHCLProvider(wg, ctx, terraform.NewTerragruntHCLProvider(ctx), usageFile, out)
 	}
 
 	t1 := time.Now()
@@ -533,7 +541,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	return out, nil
 }
 
-func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *usage.UsageFile, out *projectOutput) {
+func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, provider schema.Provider, usageFile *usage.UsageFile, out *projectOutput) {
 	defer func() {
 		err := recover()
 		wg.Done()
@@ -552,13 +560,7 @@ func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectC
 
 	t1 := time.Now()
 
-	hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx, r.prior == nil))
-	if err != nil {
-		log.Debugf("Could not init HCL provider: %s", err)
-		return
-	}
-
-	projects, err := hclProvider.LoadResources(usageFile.ToUsageDataMap())
+	projects, err := provider.LoadResources(usageFile.ToUsageDataMap())
 	if err != nil {
 		log.Debugf("Error loading projects from HCL provider: %s", err)
 		return

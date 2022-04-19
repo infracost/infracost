@@ -25,16 +25,16 @@ import (
 )
 
 type TerragruntHCLProvider struct {
-	ctx             *config.ProjectContext
-	Path            string
+	ctx  *config.ProjectContext
+	Path string
 }
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
 // root directory).
 func NewTerragruntHCLProvider(ctx *config.ProjectContext) schema.Provider {
 	return &TerragruntHCLProvider{
-		ctx:             ctx,
-		Path:            ctx.ProjectConfig.Path,
+		ctx:  ctx,
+		Path: ctx.ProjectConfig.Path,
 	}
 }
 
