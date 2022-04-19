@@ -9,16 +9,16 @@ import (
 )
 
 type TemplateProvider struct {
-	ctx      *config.ProjectContext
-	Path     string
-	snapshot bool
+	ctx                  *config.ProjectContext
+	Path                 string
+	includePastResources bool
 }
 
-func NewTemplateProvider(ctx *config.ProjectContext, snapshot bool) schema.Provider {
+func NewTemplateProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
 	return &TemplateProvider{
-		ctx:      ctx,
-		Path:     ctx.ProjectConfig.Path,
-		snapshot: snapshot,
+		ctx:                  ctx,
+		Path:                 ctx.ProjectConfig.Path,
+		includePastResources: includePastResources,
 	}
 }
 
@@ -55,7 +55,7 @@ func (p *TemplateProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 	project.PastResources = pastResources
 	project.Resources = resources
 
-	if p.snapshot {
+	if !p.includePastResources {
 		project.PastResources = nil
 	}
 
