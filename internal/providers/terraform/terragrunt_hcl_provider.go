@@ -95,7 +95,10 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 		}
 
 		for _, project := range projects {
-			project.Name = di.ConfigDir
+			metadata := config.DetectProjectMetadata(di.ConfigDir)
+			metadata.Type = p.Type()
+			p.AddMetadata(metadata)
+			project.Name = schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
 			allProjects = append(allProjects, project)
 		}
 	}
