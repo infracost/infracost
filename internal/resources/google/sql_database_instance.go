@@ -38,9 +38,9 @@ func (r *SQLDatabaseInstance) BuildResource() *schema.Resource {
 		replica = true
 	}
 
-	resource = sqlDatabaseInstanceCostComponents(r, false, r.Address)
+	resource = r.sqlDatabaseInstanceCostComponents(false, r.Address)
 	if replica {
-		resource.SubResources = append(resource.SubResources, sqlDatabaseInstanceCostComponents(r, true, "Replica"))
+		resource.SubResources = append(resource.SubResources, r.sqlDatabaseInstanceCostComponents(true, "Replica"))
 	}
 
 	return resource
@@ -54,7 +54,7 @@ const (
 	SQLServer
 )
 
-func sqlDatabaseInstanceCostComponents(r *SQLDatabaseInstance, replica bool, name string) *schema.Resource {
+func (r *SQLDatabaseInstance) sqlDatabaseInstanceCostComponents(replica bool, name string) *schema.Resource {
 	var costComponents []*schema.CostComponent
 	tier := r.Tier
 
@@ -88,7 +88,7 @@ func sqlDatabaseInstanceCostComponents(r *SQLDatabaseInstance, replica bool, nam
 		ram, _ := strconv.ParseInt(strings.Split(tier, "-")[3], 10, 32)
 		memory := decimalPtr(decimal.NewFromInt32(int32(ram)).Div(decimal.NewFromInt(1024)))
 
-		costComponents = append(costComponents, memoryCostComponent(region, tier, availabilityType, dbType, memory))
+		costComponents = append(costComponents, r.memoryCostComponent(availabilityType, dbType, memory))
 	} else if strings.Contains(tier, "db-n1-") && dbType == MySQL {
 		costComponents = append(costComponents, sharedSQLInstance(tier, availabilityType, dbType, region))
 	}
@@ -113,7 +113,7 @@ func sqlDatabaseInstanceCostComponents(r *SQLDatabaseInstance, replica bool, nam
 	}
 }
 
-func memoryCostComponent(region string, tier string, availabilityType string, dbType SQLInstanceDBType, memory *decimal.Decimal) *schema.CostComponent {
+func (r *SQLDatabaseInstance) memoryCostComponent(availabilityType string, dbType SQLInstanceDBType, memory *decimal.Decimal) *schema.CostComponent {
 	availabilityType = availabilityTypeDescName(availabilityType)
 	dbTypeName := sqlInstanceTypeToDescriptionName(dbType)
 	description := fmt.Sprintf("/%s: %s - RAM/", dbTypeName, availabilityType)
@@ -125,7 +125,7 @@ func memoryCostComponent(region string, tier string, availabilityType string, db
 		HourlyQuantity: memory,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("Cloud SQL"),
 			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
