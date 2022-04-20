@@ -365,7 +365,7 @@ func (p *TerragruntHCLProvider) updateGetters(terragruntConfig *tgconfig.Terragr
 		}
 
 		// Load in custom getters that are only supported in Terragrunt
-		// client.Getters["tfr"] = &tfr.TerraformRegistryGetter{}
+		client.Getters["tfr"] = &TerraformRegistryGetter{}
 
 		return nil
 	}
