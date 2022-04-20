@@ -11,6 +11,7 @@ import (
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	"github.com/gruntwork-io/terragrunt/util"
 	"github.com/infracost/infracost/internal/hcl"
+	"sort"
 	"strings"
 
 	"github.com/hashicorp/go-getter"
@@ -67,6 +68,11 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 	}
 
 	var allProjects []*schema.Project
+
+	// Sort the dirs so they are consistent in the output
+	sort.Slice(workingDirInfos, func(i, j int) bool {
+		return workingDirInfos[i].ConfigDir < workingDirInfos[j].ConfigDir
+	})
 
 	for _, di := range workingDirInfos {
 		log.Debugf("Found terragrunt HCL working dir: %v", di.WorkingDir)
