@@ -26,9 +26,8 @@ func (r *AppServiceCertificateBinding) BuildResource() *schema.Resource {
 	region := r.Region
 
 	var sslType string
-	sslState := r.SSLState
 
-	sslState = strings.ToUpper(sslState)
+	sslState := strings.ToUpper(r.SSLState)
 
 	if strings.HasPrefix(sslState, "IP") {
 		sslType = "IP"

@@ -30,7 +30,7 @@ func (r *AutomationJobSchedule) BuildResource() *schema.Resource {
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
-	costComponents = append(costComponents, runTimeCostComponent(location, "500", "Basic Runtime", "Basic", monthlyJobRunMins))
+	costComponents = append(costComponents, automationRunTimeCostComponent(location, "500", "Basic Runtime", "Basic", monthlyJobRunMins))
 
 	return &schema.Resource{
 		Name:           r.Address,
@@ -38,7 +38,7 @@ func (r *AutomationJobSchedule) BuildResource() *schema.Resource {
 	}
 }
 
-func runTimeCostComponent(location, startUsage, meterName, skuName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
+func automationRunTimeCostComponent(location, startUsage, meterName, skuName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            "Job run time",

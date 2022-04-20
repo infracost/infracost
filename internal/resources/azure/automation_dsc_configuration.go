@@ -24,11 +24,11 @@ func (r *AutomationDSCConfiguration) PopulateUsage(u *schema.UsageData) {
 func (r *AutomationDSCConfiguration) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: nodesCostComponent(&r.Region, r.NonAzureConfigNodeCount), UsageSchema: AutomationDSCConfigurationUsageSchema,
+		CostComponents: automationDSCNodesCostComponent(&r.Region, r.NonAzureConfigNodeCount), UsageSchema: AutomationDSCConfigurationUsageSchema,
 	}
 }
 
-func nodesCostComponent(location *string, nonAzureConfigNodeCount *int64) []*schema.CostComponent {
+func automationDSCNodesCostComponent(location *string, nonAzureConfigNodeCount *int64) []*schema.CostComponent {
 	var nonAzureConfigNodeCountDec *decimal.Decimal
 
 	if nonAzureConfigNodeCount != nil {
@@ -36,12 +36,12 @@ func nodesCostComponent(location *string, nonAzureConfigNodeCount *int64) []*sch
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
-	costComponents = append(costComponents, nonNodesCostComponent(*location, "5", "Non-Azure Node", "Non-Azure", nonAzureConfigNodeCountDec))
+	costComponents = append(costComponents, nonautomationDSCNodesCostComponent(*location, "5", "Non-Azure Node", "Non-Azure", nonAzureConfigNodeCountDec))
 
 	return costComponents
 }
 
-func nonNodesCostComponent(location, startUsage, meterName, skuName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
+func nonautomationDSCNodesCostComponent(location, startUsage, meterName, skuName string, monthlyQuantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            "Non-azure config nodes",

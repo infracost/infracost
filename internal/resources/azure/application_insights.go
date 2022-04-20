@@ -23,14 +23,28 @@ func (r *ApplicationInsights) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *ApplicationInsights) BuildResource() *schema.Resource {
-	region := r.Region
 	costComponents := []*schema.CostComponent{}
 
 	var dataIngested *decimal.Decimal
 	if r.MonthlyDataIngestedGB != nil {
 		dataIngested = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataIngestedGB))
 	}
-	costComponents = append(costComponents, appInsightCostComponents(region, "Data ingested", "GB", "Enterprise Overage Data", "Enterprise", dataIngested))
+	costComponents = append(costComponents, &schema.CostComponent{
+		Name:            "Data ingested",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: dataIngested,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("Application Insights"),
+			ProductFamily: strPtr("Management and Governance"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", "Enterprise Overage Data"))},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", "Enterprise"))},
+			},
+		},
+	})
 
 	var dataRetentionDays *decimal.Decimal
 	if r.RetentionInDays != 0 {
@@ -39,39 +53,27 @@ func (r *ApplicationInsights) BuildResource() *schema.Resource {
 		if dataRetentionDays.GreaterThan(decimal.NewFromInt(90)) && dataIngested != nil {
 			days := dataRetentionDays.Sub(decimal.NewFromInt(90)).Div(decimal.NewFromInt(30))
 			qty := decimalPtr(dataIngested.Mul(days))
-
-			costComponents = append(costComponents, appInsightCostComponents(
-				region,
-				fmt.Sprintf("Data retention (%s days)", dataRetentionDays.String()),
-				"GB",
-				"Data Retention",
-				"Enterprise",
-				qty,
-			))
+			costComponents = append(costComponents, &schema.CostComponent{
+				Name:            fmt.Sprintf("Data retention (%s days)", dataRetentionDays.String()),
+				Unit:            "GB",
+				UnitMultiplier:  decimal.NewFromInt(1),
+				MonthlyQuantity: qty,
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("azure"),
+					Region:        strPtr(r.Region),
+					Service:       strPtr("Application Insights"),
+					ProductFamily: strPtr("Management and Governance"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", "Data Retention"))},
+						{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", "Enterprise"))},
+					},
+				},
+			})
 		}
 	}
 
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents, UsageSchema: ApplicationInsightsUsageSchema,
-	}
-}
-
-func appInsightCostComponents(region, name, unit, meterName, skuName string, qty *decimal.Decimal) *schema.CostComponent {
-	return &schema.CostComponent{
-		Name:            name,
-		Unit:            unit,
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: qty,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
-			Service:       strPtr("Application Insights"),
-			ProductFamily: strPtr("Management and Governance"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", meterName))},
-				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", skuName))},
-			},
-		},
 	}
 }

@@ -25,8 +25,6 @@ func (r *APIManagement) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *APIManagement) BuildResource() *schema.Resource {
-	region := r.Region
-
 	costComponents := []*schema.CostComponent{}
 	skuName := r.SKUName
 	var tier string
@@ -37,10 +35,9 @@ func (r *APIManagement) BuildResource() *schema.Resource {
 	}
 
 	if tier != "consumption" {
-		costComponents = append(costComponents, apiManagementCostComponent(
+		costComponents = append(costComponents, r.apiManagementCostComponent(
 			fmt.Sprintf("API management (%s)", tier),
 			"units",
-			region,
 			tier,
 			&capacity))
 
@@ -52,9 +49,9 @@ func (r *APIManagement) BuildResource() *schema.Resource {
 
 		if apiCalls != nil {
 			apiCalls = decimalPtr(apiCalls.Div(decimal.NewFromInt(10000)))
-			costComponents = append(costComponents, consumptionAPICostComponent(region, tier, apiCalls))
+			costComponents = append(costComponents, r.consumptionAPICostComponent(tier, apiCalls))
 		} else {
-			costComponents = append(costComponents, consumptionAPICostComponent(region, tier, apiCalls))
+			costComponents = append(costComponents, r.consumptionAPICostComponent(tier, apiCalls))
 		}
 	}
 
@@ -63,10 +60,9 @@ func (r *APIManagement) BuildResource() *schema.Resource {
 		if r.SelfHostedGatewayCount != nil {
 			selfHostedGateways = decimalPtr(decimal.NewFromInt(*r.SelfHostedGatewayCount))
 		}
-		costComponents = append(costComponents, apiManagementCostComponent(
+		costComponents = append(costComponents, r.apiManagementCostComponent(
 			"Self hosted gateway",
 			"gateways",
-			region,
 			"Gateway",
 			selfHostedGateways,
 		))
@@ -78,7 +74,7 @@ func (r *APIManagement) BuildResource() *schema.Resource {
 	}
 }
 
-func apiManagementCostComponent(name, unit, region, tier string, quantity *decimal.Decimal) *schema.CostComponent {
+func (r *APIManagement) apiManagementCostComponent(name, unit, tier string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           unit,
@@ -86,7 +82,7 @@ func apiManagementCostComponent(name, unit, region, tier string, quantity *decim
 		HourlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("API Management"),
 			ProductFamily: strPtr("Developer Tools"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -99,7 +95,7 @@ func apiManagementCostComponent(name, unit, region, tier string, quantity *decim
 	}
 }
 
-func consumptionAPICostComponent(region, tier string, quantity *decimal.Decimal) *schema.CostComponent {
+func (r *APIManagement) consumptionAPICostComponent(tier string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "API management (consumption)",
 		Unit:            "1M calls",
@@ -107,7 +103,7 @@ func consumptionAPICostComponent(region, tier string, quantity *decimal.Decimal)
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("API Management"),
 			ProductFamily: strPtr("Developer Tools"),
 			AttributeFilters: []*schema.AttributeFilter{

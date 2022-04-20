@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
+func getAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_app_service_certificate_binding",
 		RFunc: NewAppServiceCertificateBinding,
@@ -15,7 +15,7 @@ func getAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewAppServiceCertificateBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &azure.AppServiceCertificateBinding{Address: d.Address, Region: d.Get("region").String(), SSLState: lookupRegion(d, []string{"certificate_id"})}
+	r := &azure.AppServiceCertificateBinding{Address: d.Address, Region: lookupRegion(d, []string{"certificate_id"}), SSLState: d.Get("ssl_state").String()}
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }

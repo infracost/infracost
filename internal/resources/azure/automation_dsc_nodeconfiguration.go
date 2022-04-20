@@ -21,7 +21,7 @@ func (r *AutomationDSCNodeConfiguration) PopulateUsage(u *schema.UsageData) {
 func (r *AutomationDSCNodeConfiguration) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: nodesCostComponent(&r.Region, r.NonAzureConfigNodeCount),
+		CostComponents: automationDSCNodesCostComponent(&r.Region, r.NonAzureConfigNodeCount),
 		UsageSchema:    AutomationDSCNodeConfigurationUsageSchema,
 	}
 }

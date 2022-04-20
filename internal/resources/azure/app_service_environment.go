@@ -24,8 +24,6 @@ func (r *AppServiceEnvironment) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *AppServiceEnvironment) BuildResource() *schema.Resource {
-	region := r.Region
-
 	tier := "I1"
 	if r.PricingTier != "" {
 		tier = r.PricingTier
@@ -42,16 +40,16 @@ func (r *AppServiceEnvironment) BuildResource() *schema.Resource {
 		productName += " - Linux"
 	}
 	if doesStrSliceContains(stampFeeTiers, tier) == bool(true) {
-		costComponents = append(costComponents, AppIsolatedServicePlanCostComponentStampFee(region, productName))
+		costComponents = append(costComponents, r.appIsolatedServicePlanCostComponentStampFee(productName))
 	}
-	costComponents = append(costComponents, AppIsolatedServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", tier), region, productName, tier))
+	costComponents = append(costComponents, r.appIsolatedServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", tier), productName, tier))
 
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents, UsageSchema: AppServiceEnvironmentUsageSchema,
 	}
 }
-func AppIsolatedServicePlanCostComponentStampFee(region, productName string) *schema.CostComponent {
+func (r *AppServiceEnvironment) appIsolatedServicePlanCostComponentStampFee(productName string) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:           "Stamp fee",
@@ -60,7 +58,7 @@ func AppIsolatedServicePlanCostComponentStampFee(region, productName string) *sc
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("Azure App Service"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -73,7 +71,7 @@ func AppIsolatedServicePlanCostComponentStampFee(region, productName string) *sc
 		},
 	}
 }
-func AppIsolatedServicePlanCostComponent(name, region, productName, tier string) *schema.CostComponent {
+func (r *AppServiceEnvironment) appIsolatedServicePlanCostComponent(name, productName, tier string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
@@ -81,7 +79,7 @@ func AppIsolatedServicePlanCostComponent(name, region, productName, tier string)
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("Azure App Service"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{

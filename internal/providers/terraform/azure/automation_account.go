@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureRMAutomationAccountRegistryItem() *schema.RegistryItem {
+func getAutomationAccountRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_automation_account",
 		RFunc: NewAutomationAccount,

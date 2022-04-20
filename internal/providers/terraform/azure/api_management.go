@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureRMAPIManagementRegistryItem() *schema.RegistryItem {
+func getAPIManagementRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_api_management",
 		RFunc: NewAPIManagement,

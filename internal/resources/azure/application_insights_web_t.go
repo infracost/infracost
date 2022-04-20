@@ -1,6 +1,8 @@
 package azure
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -23,18 +25,26 @@ func (r *ApplicationInsightsWebTest) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *ApplicationInsightsWebTest) BuildResource() *schema.Resource {
-	region := r.Region
 	costComponents := []*schema.CostComponent{}
 
 	if r.Kind != "" {
 		if strings.ToLower(r.Kind) == "multistep" && r.Enabled {
-			costComponents = append(costComponents, appInsightCostComponents(
-				region,
-				"Multi-step web test",
-				"test",
-				"Multi-step Web Test",
-				"Enterprise",
-				decimalPtr(decimal.NewFromInt(1))))
+			costComponents = append(costComponents, &schema.CostComponent{
+				Name:            "Multi-step web test",
+				Unit:            "test",
+				UnitMultiplier:  decimal.NewFromInt(1),
+				MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("azure"),
+					Region:        strPtr(r.Region),
+					Service:       strPtr("Application Insights"),
+					ProductFamily: strPtr("Management and Governance"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", "Multi-step Web Test"))},
+						{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", "Enterprise"))},
+					},
+				},
+			})
 		}
 	}
 

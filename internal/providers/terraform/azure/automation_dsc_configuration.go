@@ -5,16 +5,16 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureRMAutomationDscConfigurationRegistryItem() *schema.RegistryItem {
+func getAutomationDSCConfigurationRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_automation_dsc_configuration",
-		RFunc: NewAutomationDscConfiguration,
+		RFunc: NewAutomationDSCConfiguration,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
 	}
 }
-func NewAutomationDscConfiguration(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAutomationDSCConfiguration(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &azure.AutomationDSCConfiguration{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
 	r.PopulateUsage(u)
 	return r.BuildResource()
