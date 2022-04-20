@@ -51,7 +51,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSecretManagerSecretRegistryItem(),
 	getSecretManagerSecretVersionRegistryItem(),
 	getServiceNetworkingConnectionRegistryItem(),
-	getSQLInstanceRegistryItem(),
+	getSQLDatabaseInstanceRegistryItem(),
 	getStorageBucketRegistryItem(),
 }
 
