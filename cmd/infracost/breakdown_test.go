@@ -185,6 +185,10 @@ func TestBreakdownTerragruntHCLMulti(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt", "--terraform-parse-hcl"}, nil)
 }
 
+func TestBreakdownTerragruntHCLMultiNoSource(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/breakdown_terragrunt_hclmulti_no_source/example", "--terraform-parse-hcl"}, nil)
+}
+
 func TestBreakdownTerragruntNested(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples"}, nil)
 }

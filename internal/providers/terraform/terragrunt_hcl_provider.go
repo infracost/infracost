@@ -124,7 +124,6 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		WorkingDir:           p.Path,
 		DownloadDir:          terragruntDownloadDir,
 		TerraformCliArgs:     []string{tgcli.CMD_TERRAGRUNT_INFO},
-		//RunTerragrunt: tgcli.RunTerragrunt,
 		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) error {
 			workingDirInfo, err := p.runTerragrunt(terragruntOptions)
 			if workingDirInfo != nil {
@@ -209,12 +208,12 @@ func (p *TerragruntHCLProvider) runTerragrunt(terragruntOptions *tgoptions.Terra
 		terragruntOptions.RetrySleepIntervalSec = time.Duration(*terragruntConfig.RetrySleepIntervalSec) * time.Second
 	}
 
-	sourceUrl, err := tgconfig.GetTerraformSourceUrl(terragruntOptions, terragruntConfig)
+	sourceURL, err := tgconfig.GetTerraformSourceUrl(terragruntOptions, terragruntConfig)
 	if err != nil {
 		return nil, err
 	}
-	if sourceUrl != "" {
-		updatedTerragruntOptions, err := p.downloadTerraformSource(sourceUrl, terragruntOptions, terragruntConfig)
+	if sourceURL != "" {
+		updatedTerragruntOptions, err := p.downloadTerraformSource(sourceURL, terragruntOptions, terragruntConfig)
 		if err != nil {
 			return nil, err
 		}
@@ -223,7 +222,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(terragruntOptions *tgoptions.Terra
 		}
 	}
 
-	return nil, nil
+	return &terragruntWorkingDirInfo{ConfigDir: terragruntOptions.WorkingDir, WorkingDir: terragruntOptions.WorkingDir, Inputs: terragruntConfig.Inputs}, nil
 }
 
 // 1. Download the given source URL, which should use Terraform's module source syntax, into a temporary folder
