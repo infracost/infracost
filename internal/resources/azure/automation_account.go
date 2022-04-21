@@ -14,7 +14,7 @@ type AutomationAccount struct {
 	Region                  string
 	MonthlyJobRunMins       *int64 `infracost_usage:"monthly_job_run_mins"`
 	NonAzureConfigNodeCount *int64 `infracost_usage:"non_azure_config_node_count"`
-	MonthlyWatcherHours     *int64 `infracost_usage:"monthly_watcher_hrs"`
+	MonthlyWatcherHrs       *int64 `infracost_usage:"monthly_watcher_hrs"`
 }
 
 var AutomationAccountUsageSchema = []*schema.UsageItem{{Key: "monthly_job_run_mins", ValueType: schema.Int64, DefaultValue: 0}, {Key: "non_azure_config_node_count", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_watcher_hrs", ValueType: schema.Int64, DefaultValue: 0}}
@@ -56,8 +56,8 @@ func (r *AutomationAccount) BuildResource() *schema.Resource {
 
 func (r *AutomationAccount) watchersCostComponent(startUsage, meterName, skuName string) *schema.CostComponent {
 	var monthlyQuantity *decimal.Decimal
-	if r.MonthlyWatcherHours != nil {
-		monthlyQuantity = decimalPtr(decimal.NewFromInt(*r.MonthlyWatcherHours))
+	if r.MonthlyWatcherHrs != nil {
+		monthlyQuantity = decimalPtr(decimal.NewFromInt(*r.MonthlyWatcherHrs))
 	}
 
 	return &schema.CostComponent{

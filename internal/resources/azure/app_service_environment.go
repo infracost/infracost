@@ -39,7 +39,7 @@ func (r *AppServiceEnvironment) BuildResource() *schema.Resource {
 	if os == "linux" {
 		productName += " - Linux"
 	}
-	if doesStrSliceContains(stampFeeTiers, tier) == bool(true) {
+	if contains(stampFeeTiers, tier) == bool(true) {
 		costComponents = append(costComponents, r.appIsolatedServicePlanCostComponentStampFee(productName))
 	}
 	costComponents = append(costComponents, r.appIsolatedServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", tier), productName, tier))
