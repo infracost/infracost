@@ -115,9 +115,9 @@ func intPtr(i int64) *int64 {
 	return &i
 }
 
-func contains(a []string, x string) bool {
-	for _, n := range a {
-		if x == n {
+func contains(arr []string, e string) bool {
+	for _, a := range arr {
+		if a == e {
 			return true
 		}
 	}

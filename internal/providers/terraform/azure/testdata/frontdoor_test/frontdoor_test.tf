@@ -9,8 +9,8 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_frontdoor" "frontdoor_without_usage" {
-  name                                         = "exampleFrontdoor"
-  resource_group_name                          = azurerm_resource_group.example.name
+  name                = "exampleFrontdoor"
+  resource_group_name = azurerm_resource_group.example.name
 
   routing_rule {
     name               = "exampleRoutingRule1"
@@ -64,8 +64,8 @@ resource "azurerm_frontdoor" "frontdoor_without_usage" {
 }
 
 resource "azurerm_frontdoor" "frontdoor_with_usage" {
-  name                                         = "exampleFrontdoorWithUsage"
-  resource_group_name                          = azurerm_resource_group.example.name
+  name                = "exampleFrontdoorWithUsage"
+  resource_group_name = azurerm_resource_group.example.name
 
   routing_rule {
     name               = "exampleRoutingRule1"

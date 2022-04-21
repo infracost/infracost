@@ -152,19 +152,34 @@
  └─ aws_launch_template.lt_mixed_instance_dynamic                                                  
     └─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23 
                                                                                                    
+ aws_autoscaling_group.test_count[0]                                                               
+ └─ aws_launch_configuration.test_count[0]                                                         
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)            1,460  hours             $16.94 
+    ├─ EC2 detailed monitoring                                        14  metrics            $4.20 
+    └─ root_block_device                                                                           
+       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60 
+                                                                                                   
+ aws_autoscaling_group.test_count[1]                                                               
+ └─ aws_launch_configuration.test_count[1]                                                         
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74 
+    ├─ EC2 detailed monitoring                                        14  metrics            $4.20 
+    └─ root_block_device                                                                           
+       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60 
+                                                                                                   
  module.asg-lt.aws_autoscaling_group.this[0]                                                       
  └─ module.asg-lt.aws_launch_template.this[0]                                                      
     ├─ Instance usage (Linux/UNIX, on-demand, t3.micro)              730  hours              $7.59 
+    ├─ EC2 detailed monitoring                                         7  metrics            $2.10 
     └─ block_device_mapping[0]                                                                     
        └─ Storage (general purpose SSD, gp2)                          10  GB                 $1.00 
                                                                                                    
- OVERALL TOTAL                                                                           $3,409.04 
+ OVERALL TOTAL                                                                           $3,507.42 
 ──────────────────────────────────
-48 cloud resources were detected:
-∙ 25 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 21 were free:
+52 cloud resources were detected:
+∙ 27 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 23 were free:
   ∙ 12 x aws_launch_template
-  ∙ 9 x aws_launch_configuration
+  ∙ 11 x aws_launch_configuration
 ∙ 2 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 2 x aws_autoscaling_group
 Logs:

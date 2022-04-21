@@ -5,7 +5,7 @@
  └─ default_node_pool                                                                     
     ├─ Instance usage (pay as you go, Standard_D2_v2)           730  hours        $106.58 
     └─ os_disk                                                                            
-       └─ Storage (P1)                                            1  months         $0.60 
+       └─ Storage (P10)                                           1  months        $19.71 
                                                                                           
  azurerm_kubernetes_cluster.paid_5nc_32gb                                                 
  ├─ Uptime SLA                                                  730  hours         $73.00 
@@ -30,7 +30,7 @@
  └─ DNS                                                                                   
     └─ Hosted zone                                                1  months         $0.50 
                                                                                           
- OVERALL TOTAL                                                                  $1,478.51 
+ OVERALL TOTAL                                                                  $1,497.62 
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

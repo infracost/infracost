@@ -9,11 +9,11 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_container_registry" "my_registry" {
-  name                     = "containerRegistry1"
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  sku                      = "Premium"
-  admin_enabled            = false
+  name                = "containerRegistry1"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "Premium"
+  admin_enabled       = false
 
   georeplications {
     location = "East US"
@@ -21,11 +21,11 @@ resource "azurerm_container_registry" "my_registry" {
 }
 
 resource "azurerm_container_registry" "twoLocations" {
-  name                     = "containerRegistry1"
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  sku                      = "Premium"
-  admin_enabled            = false
+  name                = "containerRegistry1"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "Premium"
+  admin_enabled       = false
 
   georeplications {
     location = "East US"

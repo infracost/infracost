@@ -9,6 +9,10 @@ import (
 	"github.com/infracost/infracost/internal/version"
 )
 
+// WriteWarningFunc defines an interface that writes the provided msg as a warning
+// to an underlying writer.
+type WriteWarningFunc func(msg string)
+
 func PrintSuccess(w io.Writer, msg string) {
 	fmt.Fprintf(w, "%s %s\n", SuccessString("Success:"), msg)
 }

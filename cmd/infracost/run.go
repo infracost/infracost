@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -51,7 +52,12 @@ type hclRunDiff struct {
 var validRunFormats = []string{"json", "table", "html"}
 
 func addRunFlags(cmd *cobra.Command) {
+	cmd.Flags().Bool("terraform-parse-hcl", false, "Parse HCL code instead of generating a Terraform plan. This does not need credentials and is faster (experimental)")
+	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform’s -var-file flag. Applicable with --terraform-parse-hcl (experimental)")
+	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform’s -var flag. Applicable with --terraform-parse-hcl (experimental)")
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
+
+	cmd.Flags().String("compare-to", "", "Path to Infracost output JSON file to compare against")
 
 	cmd.Flags().String("config-file", "", "Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
@@ -113,12 +119,9 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		}
 	}
 
-	// Create a mutex for each path, so we can synchronize the runs of any
-	// projects that have the same path. This is necessary because Terraform
-	// can't run multiple operations in parallel on the same path.
-	pathMuxs := map[string]*sync.Mutex{}
-	for _, projectCfg := range runCtx.Config.Projects {
-		pathMuxs[projectCfg.Path] = &sync.Mutex{}
+	pr, err := newParallelRunner(cmd, runCtx)
+	if err != nil {
+		return err
 	}
 
 	for i := 0; i < parallelism; i++ {
@@ -135,10 +138,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			}()
 
 			for job := range jobs {
-				mux := pathMuxs[job.projectCfg.Path]
-
 				ctx := config.NewProjectContext(runCtx, job.projectCfg)
-				configProjects, err := runProjectConfig(cmd, runCtx, ctx, job.projectCfg, mux)
+				configProjects, err := pr.runProjectConfig(ctx)
 				if err != nil {
 					return err
 				}
@@ -197,6 +198,13 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	r, err := output.ToOutputFormat(projects)
 	if err != nil {
 		return err
+	}
+
+	if pr.prior != nil {
+		r, err = output.CompareTo(r, *pr.prior)
+		if err != nil {
+			return err
+		}
 	}
 
 	wg.Wait()
@@ -264,6 +272,30 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	return nil
 }
 
+func loadInfracostJSONSnapshot(snapshot string) (output.Root, error) {
+	_, err := os.Stat(snapshot)
+	if errors.Is(err, os.ErrNotExist) {
+		return output.Root{}, fmt.Errorf("%s used by --compare-to flag does not exist", snapshot)
+	}
+
+	if err != nil {
+		return output.Root{}, fmt.Errorf("Could not load %s used by --compare-to flag, err: %s", snapshot, err)
+	}
+
+	b, err := os.ReadFile(snapshot)
+	if err != nil {
+		return output.Root{}, fmt.Errorf("Could not read %s used by --compare-to flag, err: %s", snapshot, err)
+	}
+
+	var prior output.Root
+	err = json.Unmarshal(b, &prior)
+	if err != nil {
+		return output.Root{}, fmt.Errorf("Could not decode file %s used by compare-to flag, please ensure it is a valid Infracost JSON", snapshot)
+	}
+
+	return prior, nil
+}
+
 func formatHCLProjects(wg *sync.WaitGroup, ctx *config.RunContext, hclProjects []*schema.Project, hclR *output.Root) {
 	defer func() {
 		err := recover()
@@ -290,42 +322,89 @@ type projectOutput struct {
 	hclProjects []*schema.Project
 }
 
-func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config.ProjectContext, projectCfg *config.Project, mux *sync.Mutex) (*projectOutput, error) {
+type parallelRunner struct {
+	cmd      *cobra.Command
+	runCtx   *config.RunContext
+	pathMuxs map[string]*sync.Mutex
+	prior    *output.Root
+}
+
+func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallelRunner, error) {
+	// Create a mutex for each path, so we can synchronize the runs of any
+	// projects that have the same path. This is necessary because Terraform
+	// can't run multiple operations in parallel on the same path.
+	pathMuxs := map[string]*sync.Mutex{}
+	for _, projectCfg := range runCtx.Config.Projects {
+		pathMuxs[projectCfg.Path] = &sync.Mutex{}
+	}
+
+	var prior *output.Root
+	if runCtx.Config.CompareTo != "" {
+		snapshot, err := loadInfracostJSONSnapshot(runCtx.Config.CompareTo)
+		if err != nil {
+			return nil, err
+		}
+
+		prior = &snapshot
+	}
+
+	return &parallelRunner{
+		runCtx:   runCtx,
+		cmd:      cmd,
+		pathMuxs: pathMuxs,
+		prior:    prior,
+	}, nil
+}
+
+func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectOutput, error) {
+	mux := r.pathMuxs[ctx.ProjectConfig.Path]
 	if mux != nil {
 		mux.Lock()
 		defer mux.Unlock()
 	}
 
-	for k, v := range projectCfg.Env {
+	for k, v := range ctx.ProjectConfig.Env {
 		os.Setenv(k, v)
 	}
 
-	provider, err := providers.Detect(ctx)
-	if err != nil {
+	provider, err := providers.Detect(ctx, r.prior == nil)
+	var warn *string
+	if v, ok := err.(*providers.ValidationError); ok {
+		if v.Warn() == nil {
+			return nil, err
+		}
+
+		warn = v.Warn()
+	} else if err != nil {
 		m := fmt.Sprintf("%s\n\n", err)
 		m += fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
 
 		return nil, clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
 	}
+
 	ctx.SetContextValue("projectType", provider.Type())
 
-	if cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
+	if r.cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
 		return nil, clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 	}
 
-	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(projectCfg.Path))
-	if runCtx.Config.IsLogging() {
+	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(ctx.ProjectConfig.Path))
+	if r.runCtx.Config.IsLogging() {
 		log.Info(m)
 	} else {
 		fmt.Fprintln(os.Stderr, m)
 	}
 
+	if warn != nil {
+		ui.PrintWarning(r.runCtx.ErrWriter, *warn)
+	}
+
 	// Generate usage file
-	if runCtx.Config.SyncUsageFile {
-		err := generateUsageFile(cmd, runCtx, ctx, projectCfg, provider)
+	if r.runCtx.Config.SyncUsageFile {
+		err := r.generateUsageFile(ctx, provider)
 		if err != nil {
 			return nil, errors.Wrap(err, "Error generating usage file")
 		}
@@ -335,9 +414,9 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	usageData := make(map[string]*schema.UsageData)
 	var usageFile *usage.UsageFile
 
-	if projectCfg.UsageFile != "" {
+	if ctx.ProjectConfig.UsageFile != "" {
 		var err error
-		usageFile, err = usage.LoadUsageFile(projectCfg.UsageFile)
+		usageFile, err = usage.LoadUsageFile(ctx.ProjectConfig.UsageFile)
 		if err != nil {
 			return nil, err
 		}
@@ -346,7 +425,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 		if err != nil {
 			log.Errorf("Error checking usage file keys: %v", err)
 		} else if len(invalidKeys) > 0 {
-			ui.PrintWarningf(cmd.ErrOrStderr(),
+			ui.PrintWarningf(r.cmd.ErrOrStderr(),
 				"The following usage file parameters are invalid and will be ignored: %s\n",
 				strings.Join(invalidKeys, ", "),
 			)
@@ -390,28 +469,28 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	// if the provider is the dir provider let's run the hcl provider at the same time to get reporting metrics.
 	if _, ok := provider.(*terraform.DirProvider); ok {
 		wg.Add(1)
-		go runHCLProvider(wg, ctx, usageFile, runCtx, out)
+		go r.runHCLProvider(wg, ctx, usageFile, out)
 	}
 
 	t1 := time.Now()
 	projects, err := provider.LoadResources(usageData)
 	if err != nil {
-		cmd.PrintErrln()
+		r.cmd.PrintErrln()
 		return nil, err
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: runCtx.Config.IsLogging(),
-		NoColor:       runCtx.Config.NoColor,
+		EnableLogging: r.runCtx.Config.IsLogging(),
+		NoColor:       r.runCtx.Config.NoColor,
 		Indent:        "  ",
 	}
 	spinner := ui.NewSpinner("Retrieving cloud prices to calculate costs", spinnerOpts)
 	defer spinner.Fail()
 
 	for _, project := range projects {
-		if err := prices.PopulatePrices(runCtx, project); err != nil {
+		if err := prices.PopulatePrices(r.runCtx, project); err != nil {
 			spinner.Fail()
-			cmd.PrintErrln()
+			r.cmd.PrintErrln()
 
 			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
 				return nil, fmt.Errorf("%v\n%s %s %s %s %s\n%s",
@@ -433,6 +512,7 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 		}
 
 		schema.CalculateCosts(project)
+
 		project.CalculateDiff()
 	}
 
@@ -446,33 +526,33 @@ func runProjectConfig(cmd *cobra.Command, runCtx *config.RunContext, ctx *config
 	spinner.Success()
 	out.projects = projects
 
-	if !runCtx.Config.IsLogging() && !runCtx.Config.SkipErrLine {
-		cmd.PrintErrln()
+	if !r.runCtx.Config.IsLogging() && !r.runCtx.Config.SkipErrLine {
+		r.cmd.PrintErrln()
 	}
 
 	return out, nil
 }
 
-func runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *usage.UsageFile, runCtx *config.RunContext, out *projectOutput) {
+func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *usage.UsageFile, out *projectOutput) {
 	defer func() {
 		err := recover()
 		wg.Done()
 
 		if err != nil {
 			log.Debugf("recovered from hcl provider panic %s", err)
-			err = apiclient.ReportCLIError(runCtx, fmt.Errorf("hcl-runtime-error: loading resources %s\n%s", err, debug.Stack()))
+			err = apiclient.ReportCLIError(r.runCtx, fmt.Errorf("hcl-runtime-error: loading resources %s\n%s", err, debug.Stack()))
 			if err != nil {
 				log.Debugf("error reporting unexpected hcl runtime error: %s", err)
 			}
 		}
 	}()
-	if runCtx.Config.DisableHCLParsing {
+	if r.runCtx.Config.DisableHCLParsing {
 		return
 	}
 
 	t1 := time.Now()
 
-	hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx))
+	hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx, r.prior == nil))
 	if err != nil {
 		log.Debugf("Could not init HCL provider: %s", err)
 		return
@@ -485,7 +565,7 @@ func runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *u
 	}
 
 	for _, project := range projects {
-		err := prices.PopulatePrices(runCtx, project)
+		err := prices.PopulatePrices(r.runCtx, project)
 		if err != nil {
 			log.Debugf("Error populating prices for HCL project: %s", err)
 			return
@@ -501,15 +581,15 @@ func runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *u
 	ctx.SetContextValue("hclProjectRunTimeMs", taken)
 }
 
-func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx *config.ProjectContext, projectCfg *config.Project, provider schema.Provider) error {
-	if projectCfg.UsageFile == "" {
+func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider schema.Provider) error {
+	if ctx.ProjectConfig.UsageFile == "" {
 		// This should not happen as we check earlier in the code that usage-file is not empty when sync-usage-file flag is on.
 		return fmt.Errorf("Error generating usage: no usage file given")
 	}
 
 	var usageFile *usage.UsageFile
 
-	usageFilePath := projectCfg.UsageFile
+	usageFilePath := ctx.ProjectConfig.UsageFile
 	err := usage.CreateUsageFile(usageFilePath)
 	if err != nil {
 		return errors.Wrap(err, "Error creating usage file")
@@ -527,8 +607,8 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: runCtx.Config.IsLogging(),
-		NoColor:       runCtx.Config.NoColor,
+		EnableLogging: r.runCtx.Config.IsLogging(),
+		NoColor:       r.runCtx.Config.NoColor,
 		Indent:        "  ",
 	}
 
@@ -542,13 +622,13 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx
 		return errors.Wrap(err, "Error synchronizing usage data")
 	}
 
-	projectCtx.SetFrom(syncResult)
+	ctx.SetFrom(syncResult)
 	if err != nil {
 		spinner.Fail()
 		return errors.Wrap(err, "Error summarizing usage")
 	}
 
-	err = usageFile.WriteToPath(projectCfg.UsageFile)
+	err = usageFile.WriteToPath(ctx.ProjectConfig.UsageFile)
 	if err != nil {
 		spinner.Fail()
 		return errors.Wrap(err, "Error writing usage file")
@@ -568,7 +648,7 @@ func generateUsageFile(cmd *cobra.Command, runCtx *config.RunContext, projectCtx
 		}
 
 		spinner.Success()
-		cmd.PrintErrln(fmt.Sprintf("    %s Synced %d of %d resource%s",
+		r.cmd.PrintErrln(fmt.Sprintf("    %s Synced %d of %d resource%s",
 			ui.FaintString("└─"),
 			successes,
 			resources,
@@ -607,6 +687,8 @@ func getParallelism(cmd *cobra.Command, runCtx *config.RunContext) (int, error) 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasPathFlag := cmd.Flags().Changed("path")
 	hasConfigFile := cmd.Flags().Changed("config-file")
+
+	cfg.CompareTo, _ = cmd.Flags().GetString("compare-to")
 
 	if cmd.Name() != "infracost" && !hasPathFlag && !hasConfigFile {
 		m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
@@ -764,6 +846,10 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	if hclR != nil {
 		AddHCLEnvVars(projectContexts, r, projects, *hclR, hclProjects, env)
 
+	}
+
+	if warnings := runCtx.GetResourceWarnings(); warnings != nil {
+		env["resourceWarnings"] = warnings
 	}
 
 	if n := r.ExampleProjectName(); n != "" {

@@ -2,20 +2,23 @@ package cloudformation
 
 import (
 	"github.com/awslabs/goformation/v4"
+	"github.com/pkg/errors"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/pkg/errors"
 )
 
 type TemplateProvider struct {
-	ctx  *config.ProjectContext
-	Path string
+	ctx                  *config.ProjectContext
+	Path                 string
+	includePastResources bool
 }
 
-func NewTemplateProvider(ctx *config.ProjectContext) schema.Provider {
+func NewTemplateProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
 	return &TemplateProvider{
-		ctx:  ctx,
-		Path: ctx.ProjectConfig.Path,
+		ctx:                  ctx,
+		Path:                 ctx.ProjectConfig.Path,
+		includePastResources: includePastResources,
 	}
 }
 
@@ -51,6 +54,10 @@ func (p *TemplateProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 
 	project.PastResources = pastResources
 	project.Resources = resources
+
+	if !p.includePastResources {
+		project.PastResources = nil
+	}
 
 	return []*schema.Project{project}, nil
 }

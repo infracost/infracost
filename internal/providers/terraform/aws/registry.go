@@ -42,6 +42,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getEC2TransitGatewayPeeringAttachmentRegistryItem(),
 	getEC2TransitGatewayVpcAttachmentRegistryItem(),
 	getECRRegistryItem(),
+	getECSClusterCapacityProvidersRegistryItem(),
+	getECSClusterRegistryItem(),
 	getECSServiceRegistryItem(),
 	getEFSFileSystemRegistryItem(),
 	getEIPRegistryItem(),
@@ -212,7 +214,6 @@ var FreeResources = []string{
 
 	// AWS Elastic Container Service
 	"aws_ecs_account_setting_default",
-	"aws_ecs_capacity_provider",
 
 	// AWS Elastic File System
 	"aws_efs_access_point",
@@ -330,7 +331,6 @@ var FreeResources = []string{
 	"aws_dynamodb_table_item",
 	"aws_ebs_encryption_by_default",
 	"aws_ebs_default_kms_key",
-	"aws_ecs_cluster",
 	"aws_ecs_task_definition",
 	"aws_elasticsearch_domain_policy",
 	"aws_key_pair",

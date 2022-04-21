@@ -3,3 +3,40 @@ resource_usage:
   aws_sns_topic.sns_topic_withUsage:
     monthly_requests: 1000000 # Monthly requests to SNS.
     request_size_kb: 128       # Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
+    sms_notification_price: 0.00987
+  aws_sns_topic.sns_topic_withFreeNotifications:
+    monthly_requests: 10 # Monthly requests to SNS.
+    http_subscriptions: 100
+    email_subscriptions: 100
+    kinesis_subscriptions: 0
+    mobile_push_subscriptions: 0
+    macos_subscriptions: 0
+    sms_subscriptions: 1
+  aws_sns_topic.sns_topic_withChargedSubscribers:
+    monthly_requests: 1000 # Monthly requests to SNS.
+    http_subscriptions: 200
+    email_subscriptions: 300
+    kinesis_subscriptions: 4000
+    mobile_push_subscriptions: 5000
+    macos_subscriptions: 6000
+    sms_subscriptions: 1
+  aws_sns_topic.sns_topic_withZeroRequests:
+    monthly_requests: 0 # Monthly requests to SNS.
+  aws_sns_topic.sns_topic_customSmsPrice:
+    monthly_requests: 10 # Monthly requests to SNS.
+    http_subscriptions: 0
+    email_subscriptions: 0
+    kinesis_subscriptions: 0
+    mobile_push_subscriptions: 0
+    macos_subscriptions: 0
+    sms_subscriptions: 100
+    sms_notification_price: 0.00987
+  aws_sns_topic.sns_fifo_topic_withUsage:
+    monthly_requests: 1000000 # Monthly requests to SNS.
+    request_size_kb: 128
+  aws_sns_topic.sns_fifo_topic_withZeroRequests:
+    monthly_requests: 0 # Monthly requests to SNS.
+    request_size_kb: 128
+  aws_sns_topic.sns_fifo_topic_withUsageAndSubscriptions:
+    monthly_requests: 2000000 # Monthly requests to SNS.
+    request_size_kb: 64

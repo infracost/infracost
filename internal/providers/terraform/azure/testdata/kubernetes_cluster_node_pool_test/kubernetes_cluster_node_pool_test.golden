@@ -5,7 +5,7 @@
  └─ default_node_pool                                                                    
     ├─ Instance usage (pay as you go, Standard_D2_v2)          730  hours        $106.58 
     └─ os_disk                                                                           
-       └─ Storage (P1)                                           1  months         $0.60 
+       └─ Storage (P10)                                          1  months        $19.71 
                                                                                          
  azurerm_kubernetes_cluster_node_pool.Standard_DS2_v2                                    
  └─ Instance usage (pay as you go, Standard_DS2_v2)          1,460  hours        $213.16 
@@ -13,19 +13,19 @@
  azurerm_kubernetes_cluster_node_pool.basic_A2                                           
  ├─ Instance usage (pay as you go, Basic_A2)                   730  hours         $57.67 
  └─ os_disk                                                                              
-    └─ Storage (P1)                                              1  months         $0.60 
+    └─ Storage (P10)                                             1  months        $19.71 
                                                                                          
  azurerm_kubernetes_cluster_node_pool.example                                            
  ├─ Instance usage (pay as you go, Standard_DS2_v2)            730  hours        $106.58 
  └─ os_disk                                                                              
-    └─ Storage (P1)                                              1  months         $0.60 
+    └─ Storage (P10)                                             1  months        $19.71 
                                                                                          
  azurerm_kubernetes_cluster_node_pool.usage_basic_A2                                     
  ├─ Instance usage (pay as you go, Basic_A2)                 1,460  hours        $115.34 
  └─ os_disk                                                                              
-    └─ Storage (P1)                                              2  months         $1.20 
+    └─ Storage (P10)                                             2  months        $39.42 
                                                                                          
- OVERALL TOTAL                                                                   $602.33 
+ OVERALL TOTAL                                                                   $697.88 
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

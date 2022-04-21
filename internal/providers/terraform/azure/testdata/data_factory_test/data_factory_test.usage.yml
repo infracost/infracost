@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  azurerm_data_factory.with_usage:
+    monthly_read_write_operation_entities: 100000
+    monthly_monitoring_operation_entities: 25000

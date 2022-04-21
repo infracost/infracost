@@ -22,6 +22,10 @@ type Spinner struct {
 	opts    SpinnerOptions
 }
 
+// SpinnerFunc defines a function that returns a Spinner which can be used
+// to report the progress of a certain action.
+type SpinnerFunc func(msg string) *Spinner
+
 func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
 	spinnerCharNumb := 14
 	if runtime.GOOS == "windows" {

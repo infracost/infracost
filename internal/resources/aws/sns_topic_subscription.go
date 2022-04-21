@@ -34,7 +34,11 @@ func (r *SNSTopicSubscription) BuildResource() *schema.Resource {
 		endpointType = "HTTP"
 		freeTier = "100000"
 	default:
-		return nil
+		return &schema.Resource{
+			Name:      r.Address,
+			NoPrice:   true,
+			IsSkipped: true,
+		}
 	}
 
 	var requests *decimal.Decimal

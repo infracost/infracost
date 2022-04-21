@@ -29,3 +29,39 @@ func TestHCLMultiVarFiles(t *testing.T) {
 		},
 		&GoldenFileOptions{RunHCL: true})
 }
+
+func TestHCLProviderAlias(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		&GoldenFileOptions{RunHCL: true},
+	)
+}
+
+func TestHCLModuleOutputCounts(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		&GoldenFileOptions{RunHCL: true},
+	)
+}
+
+func TestHCLModuleOutputCountsNested(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		&GoldenFileOptions{OnlyRunHCL: true},
+	)
+}

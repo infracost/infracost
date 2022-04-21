@@ -1,0 +1,180 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.1.0",
+  "planned_values": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_vpn_connection.example",
+          "mode": "managed",
+          "type": "aws_vpn_connection",
+          "name": "example",
+          "schema_version": 0,
+          "values": {
+            "arn": "vpn-arn",
+            "customer_gateway_id": "c-gw-id",
+            "id": "vpn-id",
+            "transit_gateway_id": "t-gw-id",
+            "type": "ipsec.1"
+          }
+        }
+      ],
+      "child_modules": [
+        {
+          "resources": [
+            {
+              "address": "module.gateway.aws_ec2_transit_gateway.example",
+              "mode": "managed",
+              "type": "aws_ec2_transit_gateway",
+              "name": "example",
+              "schema_version": 0,
+              "values": {
+                "arn": "t-gw-arn",
+                "id": "t-gw-id"
+              }
+            },
+            {
+              "address": "module.gateway.aws_customer_gateway.example",
+              "mode": "managed",
+              "type": "aws_customer_gateway",
+              "name": "example",
+              "schema_version": 0,
+              "values": {
+                "arn": "c-gw-arn",
+                "bgp_asn": 65000,
+                "id": "c-gw-id",
+                "ip_address": "172.0.0.1",
+                "type": "ipsec.1"
+              }
+            }
+          ],
+          "address": "module.gateway"
+        }
+      ]
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "aws_vpn_connection.example",
+      "mode": "managed",
+      "type": "aws_vpn_connection",
+      "name": "example",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "vpn-arn",
+          "customer_gateway_id": "c-gw-id",
+          "id": "vpn-id",
+          "transit_gateway_id": "t-gw-id",
+          "type": "ipsec.1"
+        }
+      }
+    },
+    {
+      "address": "module.gateway.aws_ec2_transit_gateway.example",
+      "module_address": "module.gateway",
+      "mode": "managed",
+      "type": "aws_ec2_transit_gateway",
+      "name": "example",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "t-gw-arn",
+          "id": "t-gw-id"
+        }
+      }
+    },
+    {
+      "address": "module.gateway.aws_customer_gateway.example",
+      "module_address": "module.gateway",
+      "mode": "managed",
+      "type": "aws_customer_gateway",
+      "name": "example",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "c-gw-arn",
+          "bgp_asn": 65000,
+          "id": "c-gw-id",
+          "ip_address": "172.0.0.1",
+          "type": "ipsec.1"
+        }
+      }
+    }
+  ],
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": {
+          "region": {
+            "constant_value": "us-east-1"
+          }
+        }
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_vpn_connection.example",
+          "mode": "managed",
+          "type": "aws_vpn_connection",
+          "name": "example",
+          "provider_config_key": "aws",
+          "expressions": {
+            "customer_gateway_id": {
+              "references": [
+                "module.gateway.aws_customer_gateway_id"
+              ]
+            },
+            "transit_gateway_id": {
+              "references": [
+                "module.gateway.aws_ec2_transit_gateway_id"
+              ]
+            },
+            "type": {
+              "references": [
+                "module.gateway.aws_customer_gateway_type"
+              ]
+            }
+          },
+          "schema_version": 0
+        }
+      ],
+      "module_calls": {
+        "gateway": {
+          "source": "./module/gateway",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_ec2_transit_gateway.example",
+                "mode": "managed",
+                "type": "aws_ec2_transit_gateway",
+                "name": "example",
+                "provider_config_key": "gateway:aws",
+                "schema_version": 0
+              },
+              {
+                "address": "aws_customer_gateway.example",
+                "mode": "managed",
+                "type": "aws_customer_gateway",
+                "name": "example",
+                "provider_config_key": "gateway:aws",
+                "schema_version": 0
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

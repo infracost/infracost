@@ -1,0 +1,30 @@
+
+ Name                                           Monthly Qty  Unit              Monthly Cost 
+                                                                                            
+ azurerm_mysql_flexible_server.burstable                                                    
+ ├─ Compute (B_Standard_B1ms)                           730  hours                   $16.06 
+ ├─ Storage                                              30  GB                       $4.14 
+ └─ Additional backup storage                         1,000  GB                      $95.00 
+                                                                                            
+ azurerm_mysql_flexible_server.gp                                                           
+ ├─ Compute (GP_Standard_D4ds_v4)                       730  hours                  $284.70 
+ ├─ Storage                                              20  GB                       $2.76 
+ └─ Additional backup storage                         2,000  GB                     $190.00 
+                                                                                            
+ azurerm_mysql_flexible_server.mo                                                           
+ ├─ Compute (MO_Standard_E4ds_v4)                       730  hours                  $382.52 
+ ├─ Storage                                              20  GB                       $2.76 
+ ├─ Additional IOPS                                     140  IOPS                     $8.40 
+ └─ Additional backup storage                         3,000  GB                     $285.00 
+                                                                                            
+ azurerm_mysql_flexible_server.non_usage_gp                                                 
+ ├─ Compute (GP_Standard_D16ds_v4)                      730  hours                $1,138.80 
+ ├─ Storage                                              20  GB                       $2.76 
+ └─ Additional backup storage                Monthly cost depends on usage: $0.095 per GB   
+                                                                                            
+ OVERALL TOTAL                                                                    $2,412.90 
+──────────────────────────────────
+5 cloud resources were detected:
+∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group

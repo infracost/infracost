@@ -15,6 +15,7 @@ type CostComponent struct {
 	MonthlyQuantity      *decimal.Decimal
 	MonthlyDiscountPerc  float64
 	price                decimal.Decimal
+	customPrice          *decimal.Decimal
 	priceHash            string
 	HourlyCost           *decimal.Decimal
 	MonthlyCost          *decimal.Decimal
@@ -53,6 +54,14 @@ func (c *CostComponent) SetPriceHash(priceHash string) {
 
 func (c *CostComponent) PriceHash() string {
 	return c.priceHash
+}
+
+func (c *CostComponent) SetCustomPrice(price *decimal.Decimal) {
+	c.customPrice = price
+}
+
+func (c *CostComponent) CustomPrice() *decimal.Decimal {
+	return c.customPrice
 }
 
 func (c *CostComponent) UnitMultiplierPrice() decimal.Decimal {

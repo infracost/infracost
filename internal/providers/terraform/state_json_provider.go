@@ -11,14 +11,16 @@ import (
 )
 
 type StateJSONProvider struct {
-	ctx  *config.ProjectContext
-	Path string
+	ctx                  *config.ProjectContext
+	Path                 string
+	includePastResources bool
 }
 
-func NewStateJSONProvider(ctx *config.ProjectContext) schema.Provider {
+func NewStateJSONProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
 	return &StateJSONProvider{
-		ctx:  ctx,
-		Path: ctx.ProjectConfig.Path,
+		ctx:                  ctx,
+		Path:                 ctx.ProjectConfig.Path,
+		includePastResources: includePastResources,
 	}
 }
 
@@ -53,7 +55,7 @@ func (p *StateJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([
 	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
 
 	project := schema.NewProject(name, metadata)
-	parser := NewParser(p.ctx)
+	parser := NewParser(p.ctx, p.includePastResources)
 
 	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {

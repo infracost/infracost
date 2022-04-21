@@ -441,3 +441,22 @@ module "asg-lt" {
     }
   ]
 }
+
+
+locals {
+  instance_types = ["t2.micro", "t2.medium"]
+}
+
+resource "aws_autoscaling_group" "test_count" {
+  count                = 2
+  desired_capacity     = 2
+  max_size             = 3
+  min_size             = 1
+  launch_configuration = aws_launch_configuration.test_count.*.id[count.index]
+}
+
+resource "aws_launch_configuration" "test_count" {
+  count         = 2
+  image_id      = "fake_ami"
+  instance_type = local.instance_types[count.index]
+}

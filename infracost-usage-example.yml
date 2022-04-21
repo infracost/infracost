@@ -431,11 +431,18 @@ resource_usage:
 
   aws_sns_topic.my_sns_topic:
     monthly_requests: 1000000 # Monthly requests to SNS.
-    request_size_kb: 64       # Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
+    request_size_kb: 64 # Size of requests to SNS
+    http_subscriptions: 100 # Number of HTTP/HTTPS subscriptions
+    email_subscriptions: 100 # Number of Email/Email-JSON subscriptions
+    kinesis_subscriptions: 0 # Number of Kinesis Firehose subscriptions
+    mobile_push_subscriptions: 0 # Number of Mobile Push subscriptions
+    macos_subscriptions: 0 # Number of MacOS subscriptions
+    sms_subscriptions: 1 # Number of SMS subscriptions
+    sms_notification_price: 0.008 # Average price for each SMS notification
 
   aws_sns_topic_subscription.my_topic_subscription:
-    monthly_requests: 1000000 # Monthly requests to SNS.
-    request_size_kb: 64       # Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
+    monthly_requests: 1000000 # (DEPRECATED use aws_sns_topic.monthly_requests instead) Monthly requests to SNS.
+    request_size_kb: 64       # (DEPRECATED use aws_sns_topic.request_size_kb instead) Size of requests to SNS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
 
   aws_sqs_queue.my_queue:
     monthly_requests: 1000000 # Monthly requests to SQS.
@@ -577,6 +584,9 @@ resource_usage:
       china: 50            # China excluding Hong Kong.
       australia: 250       # Australia.
 
+  google_compute_address.my_address:
+    address_type: standard_vm # IP address being used, can be: standard_vm, preemptible_vm, unused.
+
   google_compute_external_vpn_gateway.my_compute_external_vpn_gateway:
     monthly_egress_data_transfer_gb:  # Monthly data transfer from VPN gateway to the following, in GB:
       worldwide: 12500                # Worldwide excluding China, Australia but including Hong Kong.
@@ -605,6 +615,9 @@ resource_usage:
 
   google_compute_forwarding_rule.my_forwarding:
     monthly_ingress_data_gb: 100
+
+  google_compute_global_address.my_address:
+    address_type: standard_vm # IP address being used, can be: standard_vm, preemptible_vm, unused.
 
   google_compute_global_forwarding_rule.my_global_forwarding:
     monthly_ingress_data_gb: 100
@@ -843,6 +856,19 @@ resource_usage:
     monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
     max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
 
+  azurerm_data_factory.my_data_factory:
+    monthly_read_write_operation_entities: 100000 # Monthly entities for Read/Write operations.
+    monthly_monitoring_operation_entities: 25000  # Monthly entities for Monitoring operations.
+
+  azurerm_data_factory_integration_runtime_azure.my_runtime:
+    monthly_orchestration_runs: 10000 # Monthly Orchestration runs for runtime.
+
+  azurerm_data_factory_integration_runtime_managed.my_runtime:
+    monthly_orchestration_runs: 10000 # Monthly Orchestration runs for runtime.
+
+  azurerm_data_factory_integration_runtime_self_hosted.my_runtime:
+    monthly_orchestration_runs: 10000 # Monthly Orchestration runs for runtime.
+
   azurerm_dns_a_record.my_a_record:
     monthly_queries: 1500000000  # Monthly number of DNS queries
 
@@ -948,6 +974,9 @@ resource_usage:
     long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
     extra_data_storage_gb: 250           # Override number of GBs used by extra data storage.
 
+  azurerm_mysql_flexible_server.my_flexible_server:
+    additional_backup_storage_gb: 5000 # Additional backup storage in GB. If geo-redundancy is enabled, you should set this to twice the required storage capacity.
+
   azurerm_mysql_server.my_server:
     additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB.
 
@@ -958,7 +987,7 @@ resource_usage:
     monthly_p2s_connections_hrs: 2000 # Monthly connection hours to the point to site gateway
 
   azurerm_postgresql_flexible_server.my_flexible_server:
-    additional_backup_storage_gb: 5000 # Additional consumption of backup storage in GB.
+    additional_backup_storage_gb: 5000 # Additional backup storage in GB. If geo-redundancy is enabled, you should set this to twice the required storage capacity.
 
   azurerm_postgresql_server.my_server:
     additional_backup_storage_gb: 3000 # Additional consumption of backup storage in GB.

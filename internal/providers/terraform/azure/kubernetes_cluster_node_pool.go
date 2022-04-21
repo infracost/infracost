@@ -1,11 +1,13 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
+	"strings"
+
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
-	"strings"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
@@ -49,7 +51,7 @@ func aksClusterNodePool(name, region string, n gjson.Result, nodeCount decimal.D
 		osDiskType = n.Get("os_disk_type").String()
 	}
 	if strings.ToLower(osDiskType) == "managed" {
-		var diskSize int
+		diskSize := 128
 		if n.Get("os_disk_size_gb").Type != gjson.Null {
 			diskSize = int(n.Get("os_disk_size_gb").Int())
 		}

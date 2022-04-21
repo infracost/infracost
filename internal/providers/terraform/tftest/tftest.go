@@ -301,7 +301,7 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 			&config.Project{
 				Path: tfdir,
 			},
-		))
+		), false)
 	}
 
 	projects, err := provider.LoadResources(usageData)
@@ -380,7 +380,7 @@ func CreateTerraformProject(tmpDir string, tfProject TerraformProject) (string, 
 	return writeToTmpDir(tmpDir, tfProject)
 }
 
-func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) terraform.HCLProvider {
+func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) *terraform.HCLProvider {
 	t.Helper()
 
 	projectCtx := config.NewProjectContext(
@@ -390,7 +390,7 @@ func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) terra
 		},
 	)
 
-	provider, err := terraform.NewHCLProvider(projectCtx, terraform.NewPlanJSONProvider(projectCtx))
+	provider, err := terraform.NewHCLProvider(projectCtx, terraform.NewPlanJSONProvider(projectCtx, true))
 	require.NoError(t, err)
 
 	return provider

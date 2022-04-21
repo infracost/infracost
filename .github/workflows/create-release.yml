@@ -8,6 +8,8 @@ jobs:
   build:
     name: Upload Release Asset
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v2
       - name: Set up Go 1.x
@@ -93,14 +95,24 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-  update-choco-version:
-    name: Update chocolatey version
-    needs: build
+  update-fig-autocomplete-spec:
+    name: Update Fig autocomplete spec
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            https://api.github.com/repos/infracost/chocolatey-packages/dispatches \
-            -d '{"event_type":"infracost_choco"}'
+      - uses: actions/checkout@v3
+      - name: Get the new version
+        id: version
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: Generate the spec
+        run: |
+          make build
+          ./build/infracost fig-autocomplete > fig-spec.ts
+      - name: Create Autocomplete PR
+        uses: withfig/publish-to-fig-autocomplete@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          autocomplete-spec-name: infracost
+          spec-path: fig-spec.ts
+          diff-based-versioning: true
+          new-spec-version: ${{ steps.version.outputs.tag }}
+          use-minor-base: true

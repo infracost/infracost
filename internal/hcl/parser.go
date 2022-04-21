@@ -16,6 +16,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 // This sets a global logger for this package, which is a bit of a hack. In the future we should use a context for this.
@@ -74,6 +75,30 @@ func OptionWithWorkspaceName(workspaceName string) Option {
 	}
 }
 
+func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
+	return func(p *Parser) {
+		p.blockBuilder = blockBuilder
+	}
+}
+
+// OptionWithSpinner sets a SpinnerFunc onto the Parser. With this option enabled
+// the Parser will send progress to the Spinner. This is disabled by default as
+// we run the Parser concurrently underneath DirProvider and don't want to mess with its output.
+func OptionWithSpinner(f ui.SpinnerFunc) Option {
+	return func(p *Parser) {
+		p.newSpinner = f
+	}
+}
+
+// OptionWithWarningFunc will set the Parser writeWarning to the provided f.
+// This is disabled by default as we run the Parser concurrently underneath a
+// DirProvider and don't want to mess with its output.
+func OptionWithWarningFunc(f ui.WriteWarningFunc) Option {
+	return func(p *Parser) {
+		p.writeWarning = f
+	}
+}
+
 // Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
 	initialPath     string
@@ -83,6 +108,9 @@ type Parser struct {
 	stopOnHCLError  bool
 	workspaceName   string
 	moduleLoader    *modules.ModuleLoader
+	blockBuilder    BlockBuilder
+	newSpinner      ui.SpinnerFunc
+	writeWarning    ui.WriteWarningFunc
 }
 
 // New creates a new Parser with the provided options, it inits the workspace as under the default name
@@ -91,7 +119,7 @@ func New(initialPath string, options ...Option) *Parser {
 	p := &Parser{
 		initialPath:   initialPath,
 		workspaceName: "default",
-		moduleLoader:  modules.NewModuleLoader(initialPath),
+		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}},
 	}
 
 	var defaultVarFiles []string
@@ -120,6 +148,12 @@ func New(initialPath string, options ...Option) *Parser {
 		option(p)
 	}
 
+	var loaderOpts []modules.LoaderOption
+	if p.newSpinner != nil {
+		loaderOpts = append(loaderOpts, modules.LoaderWithSpinner(p.newSpinner))
+	}
+
+	p.moduleLoader = modules.NewModuleLoader(initialPath, loaderOpts...)
 	return p
 }
 
@@ -127,8 +161,8 @@ func New(initialPath string, options ...Option) *Parser {
 // to fill these Blocks with additional Context information. Parser does not parse any blocks outside the root Module.
 // It instead leaves ModuleLoader to fetch these Modules on demand. See ModuleLoader.Load for more information.
 //
-// ParseDirectory returns a list of Module that represent the Terraform Config tree.
-func (p *Parser) ParseDirectory() ([]*Module, error) {
+// ParseDirectory returns the root Module that represents the top of the Terraform Config tree.
+func (p *Parser) ParseDirectory() (*Module, error) {
 	log.Debugf("Beginning parse for directory '%s'...", p.initialPath)
 
 	// load the initial root directory into a list of hcl files
@@ -168,22 +202,40 @@ func (p *Parser) ParseDirectory() ([]*Module, error) {
 
 	// load an Evaluator with the top level Blocks to begin Context propagation.
 	evaluator := NewEvaluator(
-		p.initialPath,
-		p.initialPath,
+		Module{
+			Name:       "",
+			Source:     "",
+			Blocks:     blocks,
+			RootPath:   p.initialPath,
+			ModulePath: p.initialPath,
+		},
 		workingDir,
-		blocks,
 		inputVars,
 		modulesManifest,
 		nil,
 		p.workspaceName,
+		p.blockBuilder,
+		p.newSpinner,
 	)
 
-	modules, err := evaluator.Run()
+	if v := evaluator.MissingVars(); len(v) > 0 {
+		if p.writeWarning != nil {
+			p.writeWarning(
+				fmt.Sprintf(
+					"Input values were not provided for following Terraform variables: %s. %s",
+					strings.TrimRight(strings.Join(v, ", "), ", "),
+					"Use --terraform-var-file or --terraform-var to specify them.",
+				),
+			)
+		}
+	}
+
+	root, err := evaluator.Run()
 	if err != nil {
 		return nil, err
 	}
 
-	return modules, nil
+	return root, nil
 }
 
 func (p *Parser) parseDirectoryFiles(files []*hcl.File) (Blocks, error) {
@@ -207,7 +259,7 @@ func (p *Parser) parseDirectoryFiles(files []*hcl.File) (Blocks, error) {
 		for _, fileBlock := range fileBlocks {
 			blocks = append(
 				blocks,
-				NewHCLBlock(fileBlock, nil, nil),
+				p.blockBuilder.NewBlock(fileBlock, nil, nil),
 			)
 		}
 	}

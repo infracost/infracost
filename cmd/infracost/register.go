@@ -42,12 +42,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 						return nil
 					}
 
-					if ciInterest {
-						fmt.Println("Add cost estimates to your pull requests: " + ui.LinkString("https://infracost.io/cicd"))
-						return nil
-					}
-
-					fmt.Printf("You can now run %s and point to your Terraform directory or JSON plan file.\n", ui.PrimaryString("infracost breakdown --path=..."))
+					showDocs(ciInterest)
 					return nil
 				}
 
@@ -107,13 +102,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				}
 
 				if !confirm {
-					fmt.Printf("%s\n%s %s %s",
-						"Setting the INFRACOST_API_KEY environment variable overrides the key from credentials.yml.",
-						"You can now run",
-						ui.PrimaryString("infracost breakdown --path=..."),
-						"and point to your Terraform directory or plan JSON file.\n",
-					)
-
+					showDocs(ciInterest)
 					return nil
 				}
 			}
@@ -127,19 +116,17 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			fmt.Printf("This was saved to %s\n\n", config.CredentialsFilePath())
-			if ciInterest {
-				fmt.Printf("You can now add cost estimates to your pull requests: %s\n", ui.LinkString("https://infracost.io/cicd"))
-				return nil
-			}
-
-			if isRegenerate {
-				fmt.Printf("You can now run %s and point to your Terraform directory or JSON plan file.\n", ui.PrimaryString("infracost breakdown --path=..."))
-				return nil
-			}
-
-			fmt.Printf("You can now run %s to see how to use the CLI\n", ui.PrimaryString("infracost breakdown --help"))
+			showDocs(ciInterest)
 			return nil
 		},
+	}
+}
+
+func showDocs(ciInterest bool) {
+	if ciInterest {
+		fmt.Printf("Follow %s to add cost estimates to your pull requests.\n", ui.LinkString("https://infracost.io/cicd"))
+	} else {
+		fmt.Printf("Follow %s to use Infracost.\n", ui.LinkString("https://infracost.io/docs"))
 	}
 }
 

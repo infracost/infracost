@@ -129,7 +129,7 @@ func TestCalculateDiff(t *testing.T) {
 		},
 	}
 
-	diff := calculateDiff(pastResources, currentResources)
+	diff := CalculateDiff(pastResources, currentResources)
 	assert.Equal(t, expectedDiff, diff)
 }
 

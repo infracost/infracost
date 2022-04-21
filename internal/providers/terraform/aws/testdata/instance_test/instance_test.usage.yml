@@ -71,3 +71,11 @@ resource_usage:
     reserved_instance_type: convertible
     reserved_instance_term: 3_year
     reserved_instance_payment_option: all_upfront
+
+  aws_instance.instance_withLaunchTemplateById:
+    monthly_cpu_credit_hrs: 730
+    vcpu_count: 2
+
+  aws_instance.instance_withLaunchTemplateOverride:
+    monthly_cpu_credit_hrs: 730
+    vcpu_count: 2
