@@ -104,7 +104,6 @@ require (
 	github.com/gruntwork-io/terragrunt v0.36.6
 	github.com/shurcooL/githubv4 v0.0.0-20220115235240-a14260e6f8a2
 	github.com/shurcooL/graphql v0.0.0-20200928012149-18c5c3165e3a
-	github.com/withfig/autocomplete-tools/packages/cobra v1.1.3
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 )
 
