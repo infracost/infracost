@@ -69,19 +69,31 @@
  ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)               730  hours                       $32.19 
  ├─ EC2 detailed monitoring                                           7  metrics                      $2.10 
  ├─ CPU credits                                                   1,460  vCPU-hours                  $73.00 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
+ ├─ root_block_device                                                                                       
+ │  └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
+ ├─ ebs_block_device[0]                                                                                     
+ │  ├─ Storage (provisioned IOPS SSD, io1)                           20  GB                           $2.50 
+ │  └─ Provisioned IOPS                                             200  IOPS                        $13.00 
+ └─ ebs_block_device[1]                                                                                     
+    ├─ Storage (provisioned IOPS SSD, io1)                           10  GB                           $1.25 
+    └─ Provisioned IOPS                                             100  IOPS                         $6.50 
                                                                                                             
  aws_instance.instance_withLaunchTemplateByName                                                             
  ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)               730  hours                       $32.19 
  ├─ EC2 detailed monitoring                                           7  metrics                      $2.10 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
+ ├─ root_block_device                                                                                       
+ │  └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
+ └─ ebs_block_device[0]                                                                                     
+    ├─ Storage (provisioned IOPS SSD, io1)                           10  GB                           $1.25 
+    └─ Provisioned IOPS                                             100  IOPS                         $6.50 
                                                                                                             
  aws_instance.instance_withLaunchTemplateOverride                                                           
  ├─ Instance usage (Linux/UNIX, on-demand, t3.large)                730  hours                       $60.74 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
+ ├─ root_block_device                                                                                       
+ │  └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
+ └─ ebs_block_device[0]                                                                                     
+    ├─ Storage (provisioned IOPS SSD, io1)                           20  GB                           $2.50 
+    └─ Provisioned IOPS                                             100  IOPS                         $6.50 
                                                                                                             
  aws_instance.std_1yr_all_upfront                                                                           
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                        $0.00 
@@ -145,7 +157,7 @@
  └─ root_block_device                                                                                       
     └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
                                                                                                             
- OVERALL TOTAL                                                                                    $1,196.86 
+ OVERALL TOTAL                                                                                    $1,236.86 
 ──────────────────────────────────
 27 cloud resources were detected:
 ∙ 25 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

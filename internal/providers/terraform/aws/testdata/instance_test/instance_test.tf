@@ -183,11 +183,28 @@ resource "aws_launch_template" "example" {
   placement {
     tenancy = "dedicated"
   }
+
+  block_device_mappings {
+    device_name = "xvdc"
+
+    ebs {
+      volume_type = "io1"
+      volume_size = 10
+      iops        = 100
+    }
+  }
 }
 
 resource "aws_instance" "instance_withLaunchTemplateById" {
   launch_template {
     id = aws_launch_template.example.id
+  }
+
+  ebs_block_device {
+    device_name = "xvdb"
+    volume_type = "io1"
+    volume_size = 20
+    iops        = 200
   }
 }
 
@@ -211,5 +228,11 @@ resource "aws_instance" "instance_withLaunchTemplateOverride" {
 
   launch_template {
     id = aws_launch_template.example.id
+  }
+
+  ebs_block_device {
+    device_name = "xvdc"
+
+    volume_size = 20
   }
 }
