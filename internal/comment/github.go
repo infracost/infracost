@@ -222,7 +222,7 @@ func (h *githubPRHandler) CallFindMatchingComments(ctx context.Context, tag stri
 
 	var matchingComments []Comment
 	for _, comment := range allComments {
-		if strings.Contains(comment.Body(), tag) {
+		if strings.Contains(comment.Body(), markdownTag(tag)) {
 			matchingComments = append(matchingComments, comment)
 		}
 	}
@@ -404,7 +404,7 @@ func (h *githubCommitHandler) CallFindMatchingComments(ctx context.Context, tag 
 
 	var matchingComments []Comment
 	for _, comment := range allComments {
-		if strings.Contains(comment.Body(), tag) {
+		if strings.Contains(comment.Body(), markdownTag(tag)) {
 			matchingComments = append(matchingComments, comment)
 		}
 	}

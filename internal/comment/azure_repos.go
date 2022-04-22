@@ -212,7 +212,7 @@ func (h *azureReposPRHandler) CallFindMatchingComments(ctx context.Context, tag 
 		}
 
 		for _, comment := range thread.Comments {
-			if comment.IsDeleted || !strings.Contains(comment.Content, tag) {
+			if comment.IsDeleted || !strings.Contains(comment.Content, markdownTag(tag)) {
 				continue
 			}
 
