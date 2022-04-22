@@ -37,6 +37,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	var instanceType, ami, cpuCredits, tenancy string
 	var ebsOptimized, monitoring bool
+	ltEBSBlockDevices := map[string]*aws.EBSVolume{}
 
 	launchTemplateRefs := d.References("launch_template.#.id")
 	if len(launchTemplateRefs) == 0 {
@@ -52,6 +53,21 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		monitoring = ref.Get("monitoring.0.enabled").Bool()
 		cpuCredits = ref.Get("credit_specification.0.cpu_credits").String()
 		tenancy = ref.Get("placement.0.tenancy").String()
+
+		for _, data := range ref.Get("block_device_mappings").Array() {
+			deviceName := data.Get("device_name").String()
+			ebsBlockDevice := &aws.EBSVolume{
+				Region: region,
+				Type:   data.Get("ebs.0.volume_type").String(),
+				IOPS:   data.Get("ebs.0.iops").Int(),
+			}
+
+			if v := data.Get("ebs.0.volume_size"); v.Exists() {
+				ebsBlockDevice.Size = intPtr(v.Int())
+			}
+
+			ltEBSBlockDevices[deviceName] = ebsBlockDevice
+		}
 	}
 
 	instanceType = d.GetStringOrDefault("instance_type", instanceType)
@@ -87,25 +103,58 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	ebsBlockDeviceRef := d.References("ebs_block_device.#.volume_id")
 
 	for i, data := range d.Get("ebs_block_device").Array() {
+		deviceName := data.Get("device_name").String()
+
+		ltDevice := ltEBSBlockDevices[deviceName]
+		if ltDevice == nil {
+			ltDevice = &aws.EBSVolume{}
+		}
+
 		// Check if there's a reference for this EBS volume
 		// If there is then we shouldn't add as a subresource since
 		// the cost will be added against the volume resource.
 		if len(ebsBlockDeviceRef) > i && ebsBlockDeviceRef[i].Get("id").String() == data.Get("volume_id").String() {
+			delete(ltEBSBlockDevices, deviceName)
+
 			continue
+		}
+
+		// Instance can override individual Launch Template's values based on device
+		// name.
+		volumeType := ltDevice.Type
+		if v := data.Get("volume_type"); v.Exists() {
+			volumeType = v.String()
+		}
+
+		volumeSize := ltDevice.Size
+		if v := data.Get("volume_size"); v.Exists() {
+			volumeSize = intPtr(v.Int())
+		}
+
+		iops := ltDevice.IOPS
+		if v := data.Get("iops"); v.Exists() {
+			iops = v.Int()
 		}
 
 		ebsBlockDevice := &aws.EBSVolume{
 			Address: fmt.Sprintf("ebs_block_device[%d]", i),
 			Region:  region,
-			Type:    data.Get("volume_type").String(),
-			IOPS:    data.Get("iops").Int(),
+			Type:    volumeType,
+			Size:    volumeSize,
+			IOPS:    iops,
 		}
 
-		if data.Get("volume_size").Type != gjson.Null {
-			ebsBlockDevice.Size = intPtr(data.Get("volume_size").Int())
-		}
+		delete(ltEBSBlockDevices, deviceName)
 
 		a.EBSBlockDevices = append(a.EBSBlockDevices, ebsBlockDevice)
+	}
+
+	// Add remaining EBS block devices from Launch Template.
+	blockDevicesCount := len(a.EBSBlockDevices)
+	for _, device := range ltEBSBlockDevices {
+		device.Address = fmt.Sprintf("ebs_block_device[%d]", blockDevicesCount)
+		a.EBSBlockDevices = append(a.EBSBlockDevices, device)
+		blockDevicesCount++
 	}
 
 	a.PopulateUsage(u)
