@@ -1,5 +1,5 @@
 variable "enabled" {
-  type = bool
+  type    = bool
   default = false
 }
 
