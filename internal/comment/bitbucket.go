@@ -798,4 +798,3 @@ func (h *bitbucketServerPRHandler) fetchServerComment(commentURL string) (*bitbu
 func bitbucketMarkdownTag(tag string) string {
 	return fmt.Sprintf("\n\n*(%s)*", tag)
 }
-
