@@ -13,6 +13,6 @@ resource "aws_eip" "test" {
 module "autos" {
   source = "./modules/autoscaling"
 
-  types = ["t2.micro", "t2.medium", "t2.large"]
+  types  = ["t2.micro", "t2.medium", "t2.large"]
   amount = 3
 }

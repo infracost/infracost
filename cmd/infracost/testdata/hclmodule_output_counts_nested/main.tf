@@ -7,7 +7,7 @@ provider "aws" {
 }
 
 module "sub" {
-  source = "./modules/sub"
+  source  = "./modules/sub"
   enabled = module.this.enabled
 }
 
