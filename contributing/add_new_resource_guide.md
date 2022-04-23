@@ -1206,7 +1206,7 @@ If the resource has a `zone` key, if they have a zone key, use this logic to get
 Unless the resource has global or zone-based pricing, the first line of the resource function should be `region := lookupRegion(d, []string{})` where the second parameter is an optional list of parent resources where the region can be found. See the following examples of how this method is used in other Azure resources.
 
   ```go
-	func GetAzureRMAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
+	func getAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
 		return &schema.RegistryItem{
 			Name:  "azurerm_app_service_certificate_binding",
 			RFunc: NewAzureRMAppServiceCertificateBinding,
