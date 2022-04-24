@@ -199,3 +199,5 @@ require (
 )
 
 replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e
+
+replace github.com/withfig/autocomplete-tools/packages/cobra => github.com/withfig/autocomplete-tools/packages/cobra v1.1.3
