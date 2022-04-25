@@ -331,7 +331,7 @@ func (h *bitbucketPRHandler) CallHideComment(ctx context.Context, comment Commen
 // AddMarkdownTag appends a tag to the end of the given string. Bitbucket
 // doesn't support markdown comments.
 func (h *bitbucketPRHandler) AddMarkdownTag(s string, tag string) string {
-	return fmt.Sprintf("%s\n\n*(%s)*", s, tag)
+	return fmt.Sprintf("%s%s", s, bitbucketMarkdownTag(tag))
 }
 
 // bitbucketCommitHandler is a PlatformHandler for Bitbucket commits. It
@@ -412,7 +412,7 @@ func (h *bitbucketCommitHandler) CallFindMatchingComments(ctx context.Context, t
 		}
 
 		for _, c := range resData.Comments {
-			if c.IsDeleted || !strings.Contains(c.Content.Raw, tag) {
+			if c.IsDeleted || !strings.Contains(c.Content.Raw, bitbucketMarkdownTag(tag)) {
 				continue
 			}
 
@@ -536,7 +536,7 @@ func (h *bitbucketCommitHandler) CallHideComment(ctx context.Context, comment Co
 // AddMarkdownTag appends a tag to the end of the given string. Bitbucket
 // doesn't support markdown comments.
 func (h *bitbucketCommitHandler) AddMarkdownTag(s string, tag string) string {
-	return fmt.Sprintf("%s\n\n*(%s)*", s, tag)
+	return fmt.Sprintf("%s%s", s, bitbucketMarkdownTag(tag))
 }
 
 // bitbucketServerAPIComment represents Bitbucket Server API comment.
@@ -566,7 +566,7 @@ func (a *bitbucketServerAPIActivity) Match(tag string) bool {
 	return a.Action == "COMMENTED" &&
 		a.CommentAction == "ADDED" &&
 		a.CommentAnchor == nil &&
-		strings.Contains(a.Comment.Text, tag)
+		strings.Contains(a.Comment.Text, bitbucketMarkdownTag(tag))
 }
 
 // bitbucketServerPRHandler is a PlatformHandler for Bitbucket Server pull requests.
@@ -758,7 +758,7 @@ func (h *bitbucketServerPRHandler) CallHideComment(ctx context.Context, comment 
 // AddMarkdownTag appends a tag to the end of the given string. Bitbucket
 // doesn't support markdown comments.
 func (h *bitbucketServerPRHandler) AddMarkdownTag(s string, tag string) string {
-	return fmt.Sprintf("%s\n\n*(%s)*", s, tag)
+	return fmt.Sprintf("%s%s", s, bitbucketMarkdownTag(tag))
 }
 
 // fetchComment calls the Bitbucket Server API to retrieve a single comment.
@@ -793,4 +793,8 @@ func (h *bitbucketServerPRHandler) fetchServerComment(commentURL string) (*bitbu
 	}
 
 	return &resData, nil
+}
+
+func bitbucketMarkdownTag(tag string) string {
+	return fmt.Sprintf("\n\n*(%s)*", tag)
 }
