@@ -94,6 +94,33 @@ projects:
 		})
 }
 
+func TestDiffWithConfigFileCompareToDeletedProject(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	configFile := fmt.Sprintf(`version: 0.1
+
+projects:
+  - path: %s`,
+		path.Join(dir, "prod"))
+
+	configFilePath := path.Join(dir, "infracost.yml")
+	err := os.WriteFile(configFilePath, []byte(configFile), os.ModePerm)
+	require.NoError(t, err)
+
+	defer os.Remove(configFilePath)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--config-file",
+			configFilePath,
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+		}, &GoldenFileOptions{
+			RunHCL: true,
+		})
+}
+
 func TestDiffTerraformUsageFile(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
 }

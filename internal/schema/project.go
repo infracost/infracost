@@ -22,6 +22,13 @@ type ProjectMetadata struct {
 	TerraformWorkspace string `json:"terraformWorkspace,omitempty"`
 }
 
+// Projects is a slice of Project that is ordered alphabetically by project name.
+type Projects []*Project
+
+func (p Projects) Len() int           { return len(p) }
+func (p Projects) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p Projects) Less(i, j int) bool { return p[i].Name < p[j].Name }
+
 // Project contains the existing, planned state of
 // resources and the diff between them.
 type Project struct {
