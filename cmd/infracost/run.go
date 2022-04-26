@@ -57,7 +57,7 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform’s -var flag. Applicable with --terraform-parse-hcl (experimental)")
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
 
-	cmd.Flags().String("compare-to", "", "Path to Infracost output JSON file to compare against")
+	cmd.Flags().String("compare-to", "", "Path to Infracost JSON file to compare against")
 
 	cmd.Flags().String("config-file", "", "Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
@@ -228,7 +228,12 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	var b []byte
 
-	switch strings.ToLower(runCtx.Config.Format) {
+	format := strings.ToLower(runCtx.Config.Format)
+	if runCtx.Config.CompareTo != "" && !validCompareToFormats[format] {
+		return errors.New("The --compare-to option cannot be used with table and HTML formats as those formats output breakdowns, use `--format diff`.")
+	}
+
+	switch format {
 	case "json":
 		b, err = output.ToJSON(r, opts)
 	case "html":

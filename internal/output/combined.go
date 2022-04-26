@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -100,8 +101,8 @@ func CompareTo(current, prior Root) (Root, error) {
 		priorProjects[p.Name] = p.ToSchemaProject()
 	}
 
-	schemaProjects := make([]*schema.Project, len(current.Projects))
-	for i, p := range current.Projects {
+	var schemaProjects schema.Projects
+	for _, p := range current.Projects {
 		scp := p.ToSchemaProject()
 		scp.Diff = scp.Resources
 		scp.PastResources = nil
@@ -110,10 +111,22 @@ func CompareTo(current, prior Root) (Root, error) {
 		if v, ok := priorProjects[p.Name]; ok {
 			scp.PastResources = v.Resources
 			scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
+			delete(priorProjects, p.Name)
 		}
 
-		schemaProjects[i] = scp
+		schemaProjects = append(schemaProjects, scp)
 	}
+
+	for _, scp := range priorProjects {
+		scp.PastResources = scp.Resources
+		scp.Resources = nil
+		scp.HasDiff = true
+		scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
+
+		schemaProjects = append(schemaProjects, scp)
+	}
+
+	sort.Sort(schemaProjects)
 
 	out, err := ToOutputFormat(schemaProjects)
 	if err != nil {

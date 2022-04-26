@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -13,17 +14,29 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 )
 
-var validOutputFormats = []string{
-	"table",
-	"diff",
-	"json",
-	"html",
-	"github-comment",
-	"gitlab-comment",
-	"azure-repos-comment",
-	"bitbucket-comment",
-	"slack-message",
-}
+var (
+	validOutputFormats = []string{
+		"table",
+		"diff",
+		"json",
+		"html",
+		"github-comment",
+		"gitlab-comment",
+		"azure-repos-comment",
+		"bitbucket-comment",
+		"slack-message",
+	}
+
+	validCompareToFormats = map[string]bool{
+		"diff":                true,
+		"json":                true,
+		"github-comment":      true,
+		"gitlab-comment":      true,
+		"azure-repos-comment": true,
+		"bitbucket-comment":   true,
+		"slack-message":       true,
+	}
+)
 
 func outputCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
@@ -141,7 +154,12 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
 			var b []byte
 
-			switch strings.ToLower(format) {
+			format = strings.ToLower(format)
+			if snapshot != "" && !validCompareToFormats[format] {
+				return errors.New("The --compare-to option cannot currently be used with table and HTML formats as they output breakdowns, use `--format diff` or one of the comment formats.")
+			}
+
+			switch format {
 			case "json":
 				b, err = output.ToJSON(combined, opts)
 			case "html":
@@ -183,7 +201,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
 
-	cmd.Flags().String("compare-to", "", "Path to Infracost output JSON file to compare against")
+	cmd.Flags().String("compare-to", "", "Path to Infracost JSON file to compare against")
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, bitbucket-comment, slack-message")
 	cmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")

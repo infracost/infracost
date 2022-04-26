@@ -1,0 +1,45 @@
+Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/dev
+
+- aws_instance.web_app
+  -$462
+
+    - Instance usage (Linux/UNIX, on-demand, m5.2xlarge)
+      -$280
+
+    - root_block_device
+    
+        - Storage (general purpose SSD, gp2)
+          -$5.00
+
+    - ebs_block_device[0]
+    
+        - Storage (provisioned IOPS SSD, io1)
+          -$125
+    
+        - Provisioned IOPS
+          -$52.00
+
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/dev
+Amount:  -$462 ($462 → $0.00)
+
+──────────────────────────────────
+Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/prod
+
+~ aws_instance.web_app
+  +$561 ($743 → $1,303)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.8xlarge)
+      +$561 ($561 → $1,121)
+
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/prod
+Amount:  +$561 ($743 → $1,303)
+Percent: +75%
+
+──────────────────────────────────
+Key: ~ changed, + added, - removed
+
+1 cloud resource was detected:
+∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
+
+Err:
+

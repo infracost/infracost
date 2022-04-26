@@ -50,8 +50,15 @@ type Project struct {
 // used outside simple schema.Project to schema.Project comparisons. It contains missing information
 // that cannot be inferred from a Project.
 func (p Project) ToSchemaProject() *schema.Project {
-	pastResources := convertOutputResources(p.PastBreakdown.Resources)
-	resources := convertOutputResources(p.Breakdown.Resources)
+	var pastResources []*schema.Resource
+	if p.PastBreakdown != nil {
+		pastResources = convertOutputResources(p.PastBreakdown.Resources)
+	}
+
+	var resources []*schema.Resource
+	if p.Breakdown != nil {
+		resources = convertOutputResources(p.Breakdown.Resources)
+	}
 
 	return &schema.Project{
 		Name:          p.Name,
