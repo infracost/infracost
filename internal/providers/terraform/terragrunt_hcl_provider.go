@@ -2,6 +2,9 @@ package terraform
 
 import (
 	"fmt"
+	"sort"
+	"strings"
+
 	"github.com/gruntwork-io/terragrunt/aws_helper"
 	tgcli "github.com/gruntwork-io/terragrunt/cli"
 	"github.com/gruntwork-io/terragrunt/cli/tfsource"
@@ -11,13 +14,12 @@ import (
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	"github.com/gruntwork-io/terragrunt/util"
 	"github.com/infracost/infracost/internal/hcl"
-	"sort"
-	"strings"
 
-	"github.com/hashicorp/go-getter"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/hashicorp/go-getter"
 
 	log "github.com/sirupsen/logrus"
 
