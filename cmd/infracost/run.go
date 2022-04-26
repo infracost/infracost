@@ -228,7 +228,12 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	var b []byte
 
-	switch strings.ToLower(runCtx.Config.Format) {
+	format := strings.ToLower(runCtx.Config.Format)
+	if runCtx.Config.CompareTo != "" && !validCompareToFormats[format] {
+		return errors.New("The --compare-to option cannot be used with table and HTML formats as those formats output breakdowns, use `--format diff`.")
+	}
+
+	switch format {
 	case "json":
 		b, err = output.ToJSON(r, opts)
 	case "html":
