@@ -15,7 +15,7 @@ func getAutomationDSCNodeConfigurationRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewAutomationDSCNodeConfiguration(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &azure.AutomationDSCNodeConfiguration{Address: d.Address, Region: lookupRegion(d, []string{})}
+	r := &azure.AutomationDSCNodeConfiguration{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
 	r.PopulateUsage(u)
 	return r.BuildResource()
 }
