@@ -201,7 +201,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
 
-	cmd.Flags().String("compare-to", "", "Path to Infracost output JSON file to compare against")
+	cmd.Flags().String("compare-to", "", "Path to Infracost JSON file to compare against")
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, bitbucket-comment, slack-message")
 	cmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")
