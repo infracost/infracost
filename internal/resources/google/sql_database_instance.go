@@ -241,7 +241,7 @@ func (r *SQLDatabaseInstance) sqlInstanceAvDBTypeToDescription() string {
 }
 
 func (r *SQLDatabaseInstance) sqlInstanceStorage() *schema.CostComponent {
-	var diskType string
+	diskType := r.DiskType
 	diskTypeHumanReadableNames := map[string]string{
 		"PD_SSD": "SSD",
 		"PD_HDD": "HDD",
