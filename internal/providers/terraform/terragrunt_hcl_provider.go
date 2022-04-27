@@ -155,6 +155,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 
 // Downloads terraform source if necessary, then runs terraform with the given options and CLI args.
 // This will forward all the args and extra_arguments directly to Terraform.
+// Mostly copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) runTerragrunt(terragruntOptions *tgoptions.TerragruntOptions) (*terragruntWorkingDirInfo, error) {
 	terragruntConfig, err := tgconfig.ReadTerragruntConfig(terragruntOptions)
 	if err != nil {
@@ -238,6 +239,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(terragruntOptions *tgoptions.Terra
 //
 // See the NewTerraformSource method for how we determine the temporary folder so we can reuse it across multiple
 // runs of Terragrunt to avoid downloading everything from scratch every time.
+// Copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) downloadTerraformSource(source string, terragruntOptions *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) (*tgoptions.TerragruntOptions, error) {
 	terraformSource, err := tfsource.NewTerraformSource(source, terragruntOptions.DownloadDir, terragruntOptions.WorkingDir, terragruntOptions.Logger)
 	if err != nil {
@@ -266,6 +268,7 @@ func (p *TerragruntHCLProvider) downloadTerraformSource(source string, terragrun
 }
 
 // Download the specified TerraformSource if the latest code hasn't already been downloaded.
+// Copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) downloadTerraformSourceIfNecessary(terraformSource *tfsource.TerraformSource, terragruntOptions *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) error {
 	if terragruntOptions.SourceUpdate {
 		terragruntOptions.Logger.Debugf("The --%s flag is set, so deleting the temporary folder %s before downloading source.", "terragrunt-source-update", terraformSource.DownloadDir)
@@ -335,6 +338,7 @@ func (p *TerragruntHCLProvider) downloadTerraformSourceIfNecessary(terraformSour
 }
 
 // Download the code from the Canonical Source URL into the Download Folder using the go-getter library
+// Copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) downloadSource(terraformSource *tfsource.TerraformSource, terragruntOptions *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) error {
 	terragruntOptions.Logger.Debugf("Downloading Terraform configurations from %s into %s", terraformSource.CanonicalSourceURL, terraformSource.DownloadDir)
 
@@ -351,6 +355,7 @@ func (p *TerragruntHCLProvider) downloadSource(terraformSource *tfsource.Terrafo
 // - Include the customized getter for fetching sources from the Terraform Registry.
 // This creates a closure that returns a function so that we have access to the terragrunt configuration, which is
 // necessary for customizing the behavior of the file getter.
+// Copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) updateGetters(terragruntConfig *tgconfig.TerragruntConfig) func(*getter.Client) error {
 	return func(client *getter.Client) error {
 		// We copy all the default getters from the go-getter library, but replace the "file" getter. We shallow clone the
@@ -378,6 +383,7 @@ func (p *TerragruntHCLProvider) updateGetters(terragruntConfig *tgconfig.Terragr
 }
 
 // Check if working terraformSource.WorkingDir exists and is directory
+// Copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) validateWorkingDir(terraformSource *tfsource.TerraformSource) error {
 	workingLocalDir := strings.ReplaceAll(terraformSource.WorkingDir, terraformSource.DownloadDir+filepath.FromSlash("/"), "")
 	if util.IsFile(terraformSource.WorkingDir) {
@@ -394,6 +400,7 @@ func (p *TerragruntHCLProvider) validateWorkingDir(terraformSource *tfsource.Ter
 // DownloadFolder. This helps avoid downloading the same code multiple times. Note that if the TerraformSource points
 // to a local file path, we assume the user is doing local development and always return false to ensure the latest
 // code is downloaded (or rather, copied) every single time. See the ProcessTerraformSource method for more info.
+// Copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) alreadyHaveLatestCode(terraformSource *tfsource.TerraformSource, terragruntOptions *tgoptions.TerragruntOptions) (bool, error) {
 	if tfsource.IsLocalSource(terraformSource.CanonicalSourceURL) ||
 		!util.FileExists(terraformSource.DownloadDir) ||
@@ -426,6 +433,7 @@ func (p *TerragruntHCLProvider) alreadyHaveLatestCode(terraformSource *tfsource.
 // Return the version number stored in the DownloadDir. This version number can be used to check if the Terraform code
 // that has already been downloaded is the same as the version the user is currently requesting. The version number is
 // calculated using the encodeSourceVersion method.
+// Copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) readVersionFile(terraformSource *tfsource.TerraformSource) (string, error) {
 	return util.ReadFileAsString(terraformSource.VersionFile)
 }
