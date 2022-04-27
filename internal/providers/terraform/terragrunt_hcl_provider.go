@@ -124,12 +124,13 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	var workingDirsToEstimate []*terragruntWorkingDirInfo
 
 	terragruntOptions := &tgoptions.TerragruntOptions{
-		TerragruntConfigPath: terragruntConfigPath,
-		Logger:               log.WithField("library", "terragrunt"),
-		MaxFoldersToCheck:    tgoptions.DEFAULT_MAX_FOLDERS_TO_CHECK,
-		WorkingDir:           p.Path,
-		DownloadDir:          terragruntDownloadDir,
-		TerraformCliArgs:     []string{tgcli.CMD_TERRAGRUNT_INFO},
+		TerragruntConfigPath:       terragruntConfigPath,
+		Logger:                     log.WithField("library", "terragrunt"),
+		MaxFoldersToCheck:          tgoptions.DEFAULT_MAX_FOLDERS_TO_CHECK,
+		WorkingDir:                 p.Path,
+		DownloadDir:                terragruntDownloadDir,
+		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
+		IgnoreExternalDependencies: true,
 		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) error {
 			workingDirInfo, err := p.runTerragrunt(terragruntOptions)
 			if workingDirInfo != nil {
