@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMPublicIPRegistryItem() *schema.RegistryItem {
@@ -31,7 +32,7 @@ func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	case "Basic":
 		meterName = allocationMethod + " Public IP"
 	case "Standard":
-		meterName = "Standard " + allocationMethod + " Public IP"
+		meterName = "Standard IPv4 " + allocationMethod + " Public IP"
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
