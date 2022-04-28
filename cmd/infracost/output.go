@@ -156,7 +156,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
 			format = strings.ToLower(format)
 			if snapshot != "" && !validCompareToFormats[format] {
-				return errors.New("The --compare-to option cannot currently be used with table and HTML formats as they output breakdowns, use `--format diff` or one of the comment formats.")
+				return errors.New("The --compare-to option cannot be used with table and html formats as they output breakdowns, use `--format diff` or one of the comment formats.")
 			}
 
 			switch format {
