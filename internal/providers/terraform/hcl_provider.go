@@ -61,12 +61,14 @@ func varsFromPlanFlags(planFlags string) (vars, error) {
 // It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
 // set input vars and files on the underlying hcl.Parser.
 func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider, opts ...hcl.Option) (*HCLProvider, error) {
-	options := []hcl.Option{hcl.OptionWithTFEnvVars(ctx.ProjectConfig.Env)}
-
 	v, err := varsFromPlanFlags(ctx.ProjectConfig.TerraformPlanFlags)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse vars from plan flags %w", err)
-	} else if len(v.vars) > 0 {
+	}
+
+	options := []hcl.Option{hcl.OptionWithTFEnvVars(ctx.ProjectConfig.Env)}
+
+	if len(v.vars) > 0 {
 		withPlanFlagVars := hcl.OptionWithPlanFlagVars(v.vars)
 		options = append(options, withPlanFlagVars)
 	}
