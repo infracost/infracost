@@ -70,7 +70,9 @@ func goldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 
 	for k, v := range testOptions.Env {
 		os.Setenv(k, v)
+		defer os.Unsetenv(k)
 	}
+
 	// Fix the VCS repo URL so the golden files don't fail on forks
 	os.Setenv("INFRACOST_VCS_REPOSITORY_URL", "https://github.com/infracost/infracost")
 	os.Setenv("INFRACOST_VCS_PULL_REQUEST_URL", "NOT_APPLICABLE")
