@@ -49,17 +49,25 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 		return nil, fmt.Errorf("No such file or directory %s", path)
 	}
 
-	if ctx.ProjectConfig.TerraformParseHCL {
-		if isTerragruntNestedDir(path, 5) {
-			return terraform.NewTerragruntHCLProvider(ctx, includePastResources), nil
-		}
+	if ctx.ProjectConfig.ProjectType == "" {
+		ctx.ProjectConfig.ProjectType = autoDetectProjectType(path)
+	}
 
-		h, providerErr := terraform.NewHCLProvider(
-			ctx,
-			terraform.NewPlanJSONProvider(ctx, includePastResources),
-			hcl.OptionWithSpinner(ctx.RunContext.NewSpinner),
-			hcl.OptionWithWarningFunc(ctx.RunContext.NewWarningWriter()),
-		)
+	switch ctx.ProjectConfig.ProjectType {
+	case "terraform_hcl":
+		var h schema.Provider
+		var providerErr error
+
+		if isTerragruntNestedDir(path, 5) {
+			h, providerErr = terraform.NewTerragruntHCLProvider(ctx, includePastResources), nil
+		} else {
+			h, providerErr = terraform.NewHCLProvider(
+				ctx,
+				terraform.NewPlanJSONProvider(ctx, includePastResources),
+				hcl.OptionWithSpinner(ctx.RunContext.NewSpinner),
+				hcl.OptionWithWarningFunc(ctx.RunContext.NewWarningWriter()),
+			)
+		}
 
 		if providerErr != nil {
 			return nil, providerErr
@@ -70,67 +78,67 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 		}
 
 		return h, nil
-	}
-
-	if isCloudFormationTemplate(path) {
-		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
-	}
-
-	if isTerraformPlanJSON(path) {
+	case "terraform_plan_json":
 		return terraform.NewPlanJSONProvider(ctx, includePastResources), nil
-	}
-
-	if isTerraformStateJSON(path) {
-		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
-	}
-
-	if isTerraformPlan(path) {
+	case "terraform_plan":
 		return terraform.NewPlanProvider(ctx, includePastResources), nil
-	}
-
-	if isTerragruntDir(path) {
-		return terraform.NewTerragruntProvider(ctx, includePastResources), nil
-	}
-
-	if isTerraformDir(path) {
+	case "terraform_dir":
 		return terraform.NewDirProvider(ctx, includePastResources), nil
-	}
-
-	if isTerragruntNestedDir(path, 5) {
+	case "terragrunt_dir":
 		return terraform.NewTerragruntProvider(ctx, includePastResources), nil
+	case "terraform_state_json":
+		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
+	case "cloudformation":
+		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
 	}
 
 	return nil, fmt.Errorf("Could not detect path type for '%s'", path)
 }
 
-func validateProjectForHCL(ctx *config.ProjectContext, path string) error {
-	if isTerragruntDir(path) || isTerragruntNestedDir(path, 5) {
-		return &ValidationError{
-			err: "Terragrunt projects are not yet supported by the parse HCL option.",
-		}
-	}
-
+func autoDetectProjectType(path string) string {
 	if isCloudFormationTemplate(path) {
-		return &ValidationError{
-			err: "CloudFormation projects are not yet supported by the parse HCL option.",
-		}
+		return "cloudformation"
 	}
 
 	if isTerraformPlanJSON(path) {
-		return &ValidationError{
-			err: "Path type cannot be a Terraform plan JSON file when using the parse HCL option\n\nSet --path to a Terraform directory.",
-		}
+		return "terraform_plan_json"
 	}
 
 	if isTerraformStateJSON(path) {
+		return "terraform_state_json"
+	}
+
+	if isTerraformPlan(path) {
+		return "terraform_plan"
+	}
+
+	if isTerragruntNestedDir(path, 5) {
+		return "terraform_hcl"
+	}
+
+	if isTerraformDir(path) {
+		return "terraform_hcl"
+	}
+
+	return ""
+}
+
+func validateProjectForHCL(ctx *config.ProjectContext, path string) error {
+	if ctx.ProjectConfig.TerraformPlanFlags != "" {
 		return &ValidationError{
-			err: "Path type cannot be a Terraform state file when using the parse HCL option\n\nSet --path to a Terraform directory.",
+			warn: "terraform-plan-flags is deprecated with Terraform HCL parsing, use --terraform-var or --terraform-var-file instead.",
+		}
+	}
+
+	if ctx.ProjectConfig.TerraformInitFlags != "" {
+		return &ValidationError{
+			warn: "terraform-init-flags is deprecated with Terraform HCL parsing.",
 		}
 	}
 
 	if ctx.ProjectConfig.TerraformUseState {
 		return &ValidationError{
-			err: "Flags terraform-use-state and terraform-parse-hcl are incompatible\n\nRun again without --terraform-use-state.",
+			err: "terraform-use-state is incompatible with Terraform HCL parsing\n\nRun again with--project-type=terraform_dir.",
 		}
 	}
 

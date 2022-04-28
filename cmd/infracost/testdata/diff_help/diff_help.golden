@@ -21,14 +21,14 @@ FLAGS
       --no-cache                      Don't attempt to cache Terraform plans
       --out-file string               Save output to a file
   -p, --path string                   Path to the Terraform directory or JSON/plan file
+      --project-type string           Override the project type: terraform_hcl, terraform_plan_json, terraform_plan, terraform_dir, terragrunt_dir, terraform_state_json
       --show-skipped                  List unsupported and free resources
       --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)
-      --terraform-init-flags string   Flags to pass to 'terraform init'. Applicable when path is a Terraform directory
-      --terraform-parse-hcl           Parse HCL code instead of generating a Terraform plan. This does not need credentials and is faster (experimental)
-      --terraform-plan-flags string   Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory
-      --terraform-var strings         Set value for an input variable, similar to Terraform’s -var flag. Applicable with --terraform-parse-hcl (experimental)
-      --terraform-var-file strings    Load variable files, similar to Terraform’s -var-file flag. Applicable with --terraform-parse-hcl (experimental)
-      --terraform-workspace string    Terraform workspace to use. Applicable when path is a Terraform directory
+      --terraform-init-flags string   Flags to pass to 'terraform init'. Applicable with terraform_dir project type
+      --terraform-plan-flags string   Flags to pass to 'terraform plan'. Applicable with terraform_dir project type
+      --terraform-var strings         Set value for an input variable, similar to Terraform’s -var flag. Applicable with terraform_hcl project type
+      --terraform-var-file strings    Load variable files, similar to Terraform’s -var-file flag. Applicable with terraform_hcl project type
+      --terraform-workspace string    Terraform workspace to use. Applicable with terraform_dir project type
       --usage-file string             Path to Infracost usage file that specifies values for usage-based resources
 
 GLOBAL FLAGS

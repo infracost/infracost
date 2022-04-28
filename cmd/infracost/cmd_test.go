@@ -28,10 +28,10 @@ type GoldenFileOptions = struct {
 	CaptureLogs bool
 	IsJSON      bool
 	Env         map[string]string
-	// RunHCL sets the cmd test to also run the cmd with --terraform-parse-hcl set
-	RunHCL bool
-	// OnlyRunHCL sets the cmd test to only run cmd with --terraform-parse-hcl set and ignore the Terraform binary.
-	OnlyRunHCL bool
+	// RunTerraformCLI sets the cmd test to also run the cmd with --project-type=terraform_cli set
+	RunTerraformCLI bool
+	// OnlyRunTerraformCLI sets the cmd test to only run cmd with --project-type=terraform_cli set and not with HCL parsing
+	OnlyRunTerraformCLI bool
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -43,20 +43,19 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
-	if testOptions != nil && (testOptions.RunHCL || testOptions.OnlyRunHCL) {
+	if testOptions == nil || !testOptions.OnlyRunTerraformDir {
 		t.Run("HCL", func(t *testing.T) {
-			hclArgs := make([]string, len(args)+2)
-			copy(hclArgs, args)
-			hclArgs[len(args)] = "--terraform-parse-hcl"
-			hclArgs[len(args)+1] = "true"
-
-			goldenFileCommandTest(t, testName, hclArgs, testOptions, true, ctxOptions...)
+			goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
 		})
 	}
 
-	if testOptions == nil || !testOptions.OnlyRunHCL {
-		t.Run("Terraform CLI", func(t *testing.T) {
-			goldenFileCommandTest(t, testName, args, testOptions, false, ctxOptions...)
+	if testOptions != nil && (testOptions.RunTerraformDir || testOptions.OnlyRunTerraformDir) {
+		t.Run("Terraform Dir", func(t *testing.T) {
+			tfDirArgs := make([]string, len(args)+2)
+			copy(tfDirArgs, args)
+			tfDirArgs[len(args)] = "--project-type"
+			tfDirArgs[len(args)+1] = "terraform_dir"
+			goldenFileCommandTest(t, testName, tfDirArgs, testOptions, false, ctxOptions...)
 		})
 	}
 }
