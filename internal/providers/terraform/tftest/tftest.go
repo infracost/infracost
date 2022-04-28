@@ -348,22 +348,27 @@ func goldenFileSyncTest(t *testing.T, pName, testName string) {
 		},
 	}
 
+	projectCtx := config.NewProjectContext(
+		runCtx,
+		&config.Project{},
+	)
+
 	usageFilePath := filepath.Join("testdata", testName, testName+"_existing_usage.yml")
 	projects := loadResources(t, pName, tfProject, runCtx, map[string]*schema.UsageData{})
 
-	actual := RunSyncUsage(t, projects, usageFilePath)
+	actual := RunSyncUsage(t, projectCtx, projects, usageFilePath)
 	require.NoError(t, err)
 
 	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 
-func RunSyncUsage(t *testing.T, projects []*schema.Project, usageFilePath string) []byte {
+func RunSyncUsage(t *testing.T, projectCtx *config.ProjectContext, projects []*schema.Project, usageFilePath string) []byte {
 	t.Helper()
 	usageFile, err := usage.LoadUsageFile(usageFilePath)
 	require.NoError(t, err)
 
-	_, err = usage.SyncUsageData(usageFile, projects)
+	_, err = usage.SyncUsageData(projectCtx, usageFile, projects)
 	require.NoError(t, err)
 
 	out := filepath.Join(t.TempDir(), "actual_usage.yml")
