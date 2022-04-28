@@ -707,6 +707,8 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasProjectFlags := (hasPathFlag ||
 		cmd.Flags().Changed("usage-file") ||
 		cmd.Flags().Changed("terraform-plan-flags") ||
+		cmd.Flags().Changed("terraform-var-file") ||
+		cmd.Flags().Changed("terraform-var") ||
 		cmd.Flags().Changed("terraform-init-flags") ||
 		cmd.Flags().Changed("terraform-workspace") ||
 		cmd.Flags().Changed("terraform-use-state"))
