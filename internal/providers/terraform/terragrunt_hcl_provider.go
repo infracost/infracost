@@ -2,6 +2,9 @@ package terraform
 
 import (
 	"fmt"
+	"sort"
+	"strings"
+
 	"github.com/gruntwork-io/terragrunt/aws_helper"
 	tgcli "github.com/gruntwork-io/terragrunt/cli"
 	"github.com/gruntwork-io/terragrunt/cli/tfsource"
@@ -11,13 +14,12 @@ import (
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	"github.com/gruntwork-io/terragrunt/util"
 	"github.com/infracost/infracost/internal/hcl"
-	"sort"
-	"strings"
 
-	"github.com/hashicorp/go-getter"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/hashicorp/go-getter"
 
 	log "github.com/sirupsen/logrus"
 
@@ -42,11 +44,11 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 }
 
 func (p *TerragruntHCLProvider) Type() string {
-	return "terragrunt_hcl"
+	return "terragrunt_dir"
 }
 
 func (p *TerragruntHCLProvider) DisplayType() string {
-	return "Terragrunt directory (HCL)"
+	return "Terragrunt directory"
 }
 
 func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
@@ -99,10 +101,10 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 		}
 
 		for _, project := range projects {
-			metadata := config.DetectProjectMetadata(di.ConfigDir)
-			metadata.Type = p.Type()
-			p.AddMetadata(metadata)
-			project.Name = schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+			project.Metadata = config.DetectProjectMetadata(di.ConfigDir)
+			project.Metadata.Type = p.Type()
+			p.AddMetadata(project.Metadata)
+			project.Name = schema.GenerateProjectName(project.Metadata, p.ctx.RunContext.Config.EnableDashboard)
 			allProjects = append(allProjects, project)
 		}
 	}
@@ -246,7 +248,6 @@ func (p *TerragruntHCLProvider) runTerragrunt(terragruntOptions *tgoptions.Terra
 			return &terragruntWorkingDirInfo{ConfigDir: terragruntOptions.WorkingDir, WorkingDir: updatedTerragruntOptions.WorkingDir, Inputs: terragruntConfig.Inputs}, nil
 		}
 	}
-
 	return &terragruntWorkingDirInfo{ConfigDir: terragruntOptions.WorkingDir, WorkingDir: terragruntOptions.WorkingDir, Inputs: terragruntConfig.Inputs}, nil
 }
 

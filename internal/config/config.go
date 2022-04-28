@@ -20,8 +20,9 @@ type Project struct {
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
 	Path string `yaml:"path,omitempty" ignored:"true"`
-	// TerraformParseHCL will run a project by parsing hcl files the given Path rather than using a plan.json or terraform binary.
-	TerraformParseHCL bool `yaml:"hcl_only,omitempty"`
+	// ProjectType is used to explicitly specify the type of the project to detect. It can be terragrunt_dir, terraform_plan_json,
+	// terraform_plan, terraform_dir, terragrunt_dir, or terraform_state_json.
+	ProjectType string `yaml:"project_type,omitempty"`
 	// TerraformVarFiles is the number of var files that are needed to run an TerraformParseHCL run
 	TerraformVarFiles []string `yaml:"terraform_var_files"`
 	// TerraformVars is a slice of input vars that is used to run an TerraformParseHCL run

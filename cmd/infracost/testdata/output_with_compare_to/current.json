@@ -6,7 +6,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata/output_with_compare_to",
       "metadata": {
         "path": "cmd/infracost/testdata/output_with_compare_to",
-        "type": "terraform_dir",
+        "type": "terraform_cli",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "cmd/infracost/testdata/output_with_compare_to",
         "terraformWorkspace": "default"
