@@ -28,7 +28,7 @@ func (p *PlanJSONProvider) Type() string {
 }
 
 func (p *PlanJSONProvider) DisplayType() string {
-	return "Terraform plan JSON file"
+	return "Terraform plan JSON"
 }
 
 func (p *PlanJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {

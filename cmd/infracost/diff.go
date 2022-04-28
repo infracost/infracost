@@ -64,8 +64,8 @@ func checkDiffConfig(cfg *config.Config) error {
 			return errors.New("terraform_use_state cannot be used with `infracost diff` as the Terraform state only contains the current state")
 		}
 
-		if projectConfig.TerraformParseHCL && cfg.CompareTo == "" {
-			return errors.New("Use `infracost diff --path /code --terraform-parse-hcl --compare-to infracost-previous-run.json` to generate a diff")
+		if projectConfig.ProjectType == "terragrunt_dir" && cfg.CompareTo == "" {
+			return errors.New("Use `infracost diff --path /code --compare-to infracost-previous-run.json` to generate a diff")
 		}
 	}
 

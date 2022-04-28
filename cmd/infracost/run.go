@@ -49,18 +49,29 @@ type hclRunDiff struct {
 	missingResources []string
 }
 
+var validProjectTypes = []string{
+	"terraform_dir",
+	"terragrunt_dir",
+	"terraform_plan_json",
+	"terraform_plan_binary",
+	"terraform_cli",
+	"terragrunt_cli",
+	"terraform_state_json",
+	"cloudformation",
+}
+
 func addRunFlags(cmd *cobra.Command) {
-	cmd.Flags().Bool("terraform-parse-hcl", false, "Parse HCL code instead of generating a Terraform plan. This does not need credentials and is faster (experimental)")
-	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform’s -var-file flag. Applicable with --terraform-parse-hcl (experimental)")
-	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform’s -var flag. Applicable with --terraform-parse-hcl (experimental)")
+	cmd.Flags().String("project-type", "", "Override the project type: terraform_dir, terragrunt_dir, terraform_plan_json, terraform_plan_binary, terraform_cli, terragrunt_cli, terraform_state_json")
+	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform's -var-file flag. Applicable with terragrunt_dir project type")
+	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform's -var flag. Applicable with terragrunt_dir project type")
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
 
 	cmd.Flags().String("config-file", "", "Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
 
-	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory")
-	cmd.Flags().String("terraform-init-flags", "", "Flags to pass to 'terraform init'. Applicable when path is a Terraform directory")
-	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
+	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable with terraform_cli project type")
+	cmd.Flags().String("terraform-init-flags", "", "Flags to pass to 'terraform init'. Applicable with terraform_cli project type")
+	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable with terraform_cli project type")
 
 	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
 
@@ -697,6 +708,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	}
 
 	hasProjectFlags := (hasPathFlag ||
+		cmd.Flags().Changed("project-type") ||
 		cmd.Flags().Changed("usage-file") ||
 		cmd.Flags().Changed("terraform-plan-flags") ||
 		cmd.Flags().Changed("terraform-var-file") ||
@@ -707,7 +719,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasConfigFile && hasProjectFlags {
 		m := "--config-file flag cannot be used with the following flags: "
-		m += "--path, --terraform-*, --usage-file"
+		m += "--path, --project-type, --terraform-*, --usage-file"
 		ui.PrintUsage(cmd)
 		return errors.New(m)
 	}
@@ -716,7 +728,13 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasProjectFlags {
 		projectCfg.Path, _ = cmd.Flags().GetString("path")
-		projectCfg.TerraformParseHCL, _ = cmd.Flags().GetBool("terraform-parse-hcl")
+
+		projectCfg.ProjectType, _ = cmd.Flags().GetString("project-type")
+		if projectCfg.ProjectType != "" && !contains(validProjectTypes, projectCfg.ProjectType) {
+			ui.PrintUsage(cmd)
+			return fmt.Errorf("--project-type only supports %s", strings.Join(validProjectTypes, ", "))
+		}
+
 		projectCfg.TerraformVarFiles, _ = cmd.Flags().GetStringSlice("terraform-var-file")
 		tfVars, _ := cmd.Flags().GetStringSlice("terraform-var")
 		projectCfg.TerraformVars = tfVarsToMap(tfVars)
@@ -736,12 +754,6 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 		if err != nil {
 			return err
-		}
-
-		if parseHCL, _ := cmd.Flags().GetBool("terraform-parse-hcl"); parseHCL {
-			for _, p := range cfg.Projects {
-				p.TerraformParseHCL = true
-			}
 		}
 	}
 

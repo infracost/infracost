@@ -21,7 +21,7 @@ import (
 )
 
 // This sets a global logger for this package, which is a bit of a hack. In the future we should use a context for this.
-var log = logrus.StandardLogger().WithField("parser", "terraform_hcl")
+var log = logrus.StandardLogger().WithField("parser", "terragrunt_dir")
 
 type Option func(p *Parser)
 
