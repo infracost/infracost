@@ -368,10 +368,6 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		defer mux.Unlock()
 	}
 
-	for k, v := range ctx.ProjectConfig.Env {
-		os.Setenv(k, v)
-	}
-
 	provider, err := providers.Detect(ctx, r.prior == nil)
 	var warn *string
 	if v, ok := err.(*providers.ValidationError); ok {
@@ -620,7 +616,7 @@ func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider 
 	spinner := ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
 	defer spinner.Fail()
 
-	syncResult, err := usage.SyncUsageData(usageFile, providerProjects)
+	syncResult, err := usage.SyncUsageData(ctx, usageFile, providerProjects)
 
 	if err != nil {
 		spinner.Fail()
