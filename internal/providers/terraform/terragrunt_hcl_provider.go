@@ -141,6 +141,14 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
 		IgnoreExternalDependencies: true,
 		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) error {
+			if terragruntOptions.Writer != nil {
+				// RunTerragrunt must have been invoked as part of a dependency block to get the outputs.
+				// Since we're parsing HCL, outputs are not available anyway.  We return some fake outputs
+				// here so Terragrunt does error with a "No outputs detected error.
+				// See getTerragruntOutputIfAppliedElseConfiguredDefault in terragrunt dependency.go
+				_, _ = terragruntOptions.Writer.Write([]byte(`{ "infracost_mock_output": { "type": "string", "value": "" } }`))
+				return nil
+			}
 			workingDirInfo, err := p.runTerragrunt(terragruntOptions)
 			if workingDirInfo != nil {
 				workingDirsToEstimate = append(workingDirsToEstimate, workingDirInfo)
