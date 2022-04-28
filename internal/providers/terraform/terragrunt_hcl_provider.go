@@ -2,8 +2,11 @@ package terraform
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/gruntwork-io/terragrunt/aws_helper"
 	tgcli "github.com/gruntwork-io/terragrunt/cli"
@@ -13,18 +16,13 @@ import (
 	tgerrors "github.com/gruntwork-io/terragrunt/errors"
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	"github.com/gruntwork-io/terragrunt/util"
+	"github.com/hashicorp/go-getter"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/ui"
-	"github.com/pkg/errors"
-
-	"os"
-	"path/filepath"
-	"time"
-
-	"github.com/hashicorp/go-getter"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
@@ -47,11 +45,11 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 }
 
 func (p *TerragruntHCLProvider) Type() string {
-	return "terragrunt_hcl"
+	return "terragrunt_dir"
 }
 
 func (p *TerragruntHCLProvider) DisplayType() string {
-	return "Terragrunt directory (HCL)"
+	return "Terragrunt directory"
 }
 
 func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
@@ -104,10 +102,10 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 		}
 
 		for _, project := range projects {
-			metadata := config.DetectProjectMetadata(di.ConfigDir)
-			metadata.Type = p.Type()
-			p.AddMetadata(metadata)
-			project.Name = schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+			project.Metadata = config.DetectProjectMetadata(di.ConfigDir)
+			project.Metadata.Type = p.Type()
+			p.AddMetadata(project.Metadata)
+			project.Name = schema.GenerateProjectName(project.Metadata, p.ctx.RunContext.Config.EnableDashboard)
 			allProjects = append(allProjects, project)
 		}
 	}
@@ -263,7 +261,6 @@ func (p *TerragruntHCLProvider) runTerragrunt(terragruntOptions *tgoptions.Terra
 			return &terragruntWorkingDirInfo{ConfigDir: terragruntOptions.WorkingDir, WorkingDir: updatedTerragruntOptions.WorkingDir, Inputs: terragruntConfig.Inputs}, nil
 		}
 	}
-
 	return &terragruntWorkingDirInfo{ConfigDir: terragruntOptions.WorkingDir, WorkingDir: terragruntOptions.WorkingDir, Inputs: terragruntConfig.Inputs}, nil
 }
 

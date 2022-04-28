@@ -29,7 +29,7 @@ func (p *StateJSONProvider) Type() string {
 }
 
 func (p *StateJSONProvider) DisplayType() string {
-	return "Terraform state JSON file"
+	return "Terraform state JSON"
 }
 
 func (p *StateJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {

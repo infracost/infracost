@@ -75,11 +75,11 @@ func NewDirProvider(ctx *config.ProjectContext, includePastResources bool) schem
 }
 
 func (p *DirProvider) Type() string {
-	return "terraform_dir"
+	return "terraform_cli"
 }
 
 func (p *DirProvider) DisplayType() string {
-	return "Terraform directory"
+	return "Terraform CLI"
 }
 
 func (p *DirProvider) checks() error {
