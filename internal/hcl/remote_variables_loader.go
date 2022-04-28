@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/infracost/infracost/internal/extclient"
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/extclient"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 // RemoteVariablesLoader handles loading remote variables from Terraform Cloud.
 type RemoteVariablesLoader struct {
-	client         extclient.AuthedAPIClient
+	client         *extclient.AuthedAPIClient
 	localWorkspace string
 	newSpinner     ui.SpinnerFunc
 }
@@ -81,7 +82,7 @@ func RemoteVariablesLoaderWithSpinner(f ui.SpinnerFunc) RemoteVariablesLoaderOpt
 
 // NewRemoteVariablesLoaderLoader constructs a new loader for fetching remote
 // variables.
-func NewRemoteVariablesLoader(client extclient.AuthedAPIClient, localWorkspace string, opts ...RemoteVariablesLoaderOption) *RemoteVariablesLoader {
+func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace string, opts ...RemoteVariablesLoaderOption) *RemoteVariablesLoader {
 	r := &RemoteVariablesLoader{
 		client:         client,
 		localWorkspace: localWorkspace,
@@ -100,11 +101,10 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 	spinnerMsg := "Downloading Terraform remote variables"
 	vars := map[string]cty.Value{}
 
-	var organization, workspace string
-
-	organization, workspace, err := r.getCloudOrganizationWorkspace(blocks)
-	if err != nil {
-		organization, workspace, err = r.getBackendOrganizationWorkspace(blocks)
+	var err error
+	config := r.getCloudOrganizationWorkspace(blocks)
+	if !config.valid() {
+		config, err = r.getBackendOrganizationWorkspace(blocks)
 
 		if err != nil {
 			var spinner *ui.Spinner
@@ -118,7 +118,7 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 			return vars, err
 		}
 
-		if organization == "" && workspace == "" {
+		if !config.valid() {
 			return vars, nil
 		}
 	}
@@ -129,13 +129,17 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 		defer spinner.Success()
 	}
 
-	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", organization, workspace)
+	if config.host != "" {
+		r.client.SetHost(config.host)
+	}
+
+	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", config.organization, config.workspace)
 	body, err := r.client.Get(endpoint)
 	if err != nil {
 		if spinner != nil {
 			spinner.Fail()
 		}
-		return vars, err
+		return vars, errors.New("unable to fetch workspace data from Terraform Cloud")
 	}
 
 	var workspaceResponse tfcWorkspaceResponse
@@ -246,24 +250,36 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 	return vars, nil
 }
 
-func (r *RemoteVariablesLoader) getCloudOrganizationWorkspace(blocks Blocks) (string, string, error) {
-	organization := ""
+type remoteConfig struct {
+	organization string
+	workspace    string
+	host         string
+}
+
+func (c remoteConfig) valid() bool {
+	return c.organization != "" && c.workspace != ""
+}
+
+func (r *RemoteVariablesLoader) getCloudOrganizationWorkspace(blocks Blocks) remoteConfig {
+	var conf remoteConfig
 
 	for _, block := range blocks.OfType("terraform") {
 		for _, c := range block.childBlocks.OfType("cloud") {
-			organization = getAttribute(c, "organization")
+			conf.organization = getAttribute(c, "organization")
+			conf.host = getAttribute(c, "hostname")
 
 			for _, cc := range c.childBlocks.OfType("workspaces") {
-				return organization, getAttribute(cc, "name"), nil
+				conf.workspace = getAttribute(cc, "name")
+				return conf
 			}
 		}
 	}
 
-	return "", "", errors.Errorf("unable to detect organization or workspace")
+	return conf
 }
 
-func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (string, string, error) {
-	organization := ""
+func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (remoteConfig, error) {
+	var conf remoteConfig
 
 	for _, block := range blocks.OfType("terraform") {
 		for _, c := range block.childBlocks.OfType("backend") {
@@ -271,29 +287,32 @@ func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (
 				continue
 			}
 
-			organization = getAttribute(c, "organization")
+			conf.organization = getAttribute(c, "organization")
+			conf.host = getAttribute(c, "hostname")
 
 			for _, cc := range c.childBlocks.OfType("workspaces") {
 				name := getAttribute(cc, "name")
 
 				if name != "" {
-					return organization, name, nil
+					conf.workspace = name
+					return conf, nil
 				}
 
 				namePrefix := getAttribute(cc, "prefix")
 
 				if namePrefix != "" {
 					if r.localWorkspace == "" {
-						return "", "", errors.Errorf("--terraform-workspace is not specified. Unable to detect organization or workspace.")
+						return conf, errors.Errorf("--terraform-workspace is not specified. Unable to detect organization or workspace.")
 					}
 
-					return organization, namePrefix + r.localWorkspace, nil
+					conf.workspace = namePrefix + r.localWorkspace
+					return conf, nil
 				}
 			}
 		}
 	}
 
-	return "", "", nil
+	return conf, nil
 }
 
 func getAttribute(block *Block, name string) string {

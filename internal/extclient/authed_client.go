@@ -18,16 +18,21 @@ type AuthedAPIClient struct {
 }
 
 // NewAuthedAPIClient returns a new API client.
-func NewAuthedAPIClient(host, token string) AuthedAPIClient {
-	return AuthedAPIClient{
+func NewAuthedAPIClient(host, token string) *AuthedAPIClient {
+	return &AuthedAPIClient{
 		host:   host,
 		token:  token,
 		client: &http.Client{Timeout: time.Second * 5},
 	}
 }
 
+// SetHost sets the host for base host for the authed API client.
+func (a *AuthedAPIClient) SetHost(host string) {
+	a.host = host
+}
+
 // Get performs a GET request to provided endpoint.
-func (a AuthedAPIClient) Get(path string) ([]byte, error) {
+func (a *AuthedAPIClient) Get(path string) ([]byte, error) {
 	url := fmt.Sprintf("https://%s%s", a.host, path)
 	log.Debugf("Calling Terraform Cloud API: %s", url)
 	req, err := http.NewRequest("GET", url, nil)
