@@ -223,7 +223,7 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 	}
 
 	if len(blocks) == 0 {
-		return nil, errors.New("Error no valid tf files found in given path")
+		return nil, errors.New("No valid terraform files found given path, try a different directory")
 	}
 
 	log.Debug("Loading TFVars...")
