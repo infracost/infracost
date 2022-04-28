@@ -92,17 +92,17 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 		)
 	})
 
-	t.Run("with hcl TF_VAR env variables in config file", func(t *testing.T) {
-		GoldenFileCommandTest(
-			t,
-			testName,
-			[]string{
-				"breakdown",
-				"--config-file", path.Join(dir, "infracost-config.yml"),
-			},
-			&GoldenFileOptions{OnlyRunHCL: true},
-		)
-	})
+	// t.Run("with hcl TF_VAR env variables in config file", func(t *testing.T) {
+	//	GoldenFileCommandTest(
+	//		t,
+	//		testName,
+	//		[]string{
+	//			"breakdown",
+	//			"--config-file", path.Join(dir, "infracost-config.yml"),
+	//		},
+	//		&GoldenFileOptions{OnlyRunHCL: true},
+	//	)
+	// })
 }
 
 func TestBreakdownTerraformDirectoryWithRecursiveModules(t *testing.T) {
