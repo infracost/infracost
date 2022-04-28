@@ -45,31 +45,31 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 		Long:  "Combine and output Infracost JSON files in different formats",
 		Example: `  Show a breakdown from multiple Infracost JSON files:
 
-      infracost output --path out1.json --path out2.json --path out3.json
+      infracost output --path=out1.json --path=out2.json --path=out3.json
 
   Create HTML report from multiple Infracost JSON files:
 
-      infracost output --format html --path "out*.json" --out-file output.html # glob needs quotes
+      infracost output --format=html --path="out*.json" --out-file=output.html # glob needs quotes
 
   Merge multiple Infracost JSON files:
 
-      infracost output --format json --path "out*.json" # glob needs quotes
+      infracost output --format=json --path="out*.json" # glob needs quotes
 
   Create markdown report to post in a GitHub comment:
 
-      infracost output --format github-comment --path "out*.json" # glob needs quotes
+      infracost output --format=github-comment --path="out*.json" # glob needs quotes
 
   Create markdown report to post in a GitLab comment:
 
-      infracost output --format gitlab-comment --path "out*.json" # glob needs quotes
+      infracost output --format=gitlab-comment --path="out*.json" # glob needs quotes
 
   Create markdown report to post in a Azure DevOps Repos comment:
 
-      infracost output --format azure-repos-comment --path "out*.json" # glob needs quotes
+      infracost output --format=azure-repos-comment --path="out*.json" # glob needs quotes
 
   Create markdown report to post in a Bitbucket comment:
 
-      infracost output --format bitbucket-comment --path "out*.json" # glob needs quotes`,
+      infracost output --format=bitbucket-comment --path="out*.json" # glob needs quotes`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var err error

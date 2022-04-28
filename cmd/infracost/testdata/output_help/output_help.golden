@@ -6,31 +6,31 @@ USAGE
 EXAMPLES
   Show a breakdown from multiple Infracost JSON files:
 
-      infracost output --path out1.json --path out2.json --path out3.json
+      infracost output --path=out1.json --path=out2.json --path=out3.json
 
   Create HTML report from multiple Infracost JSON files:
 
-      infracost output --format html --path "out*.json" --out-file output.html # glob needs quotes
+      infracost output --format=html --path="out*.json" --out-file=output.html # glob needs quotes
 
   Merge multiple Infracost JSON files:
 
-      infracost output --format json --path "out*.json" # glob needs quotes
+      infracost output --format=json --path="out*.json" # glob needs quotes
 
   Create markdown report to post in a GitHub comment:
 
-      infracost output --format github-comment --path "out*.json" # glob needs quotes
+      infracost output --format=github-comment --path="out*.json" # glob needs quotes
 
   Create markdown report to post in a GitLab comment:
 
-      infracost output --format gitlab-comment --path "out*.json" # glob needs quotes
+      infracost output --format=gitlab-comment --path="out*.json" # glob needs quotes
 
   Create markdown report to post in a Azure DevOps Repos comment:
 
-      infracost output --format azure-repos-comment --path "out*.json" # glob needs quotes
+      infracost output --format=azure-repos-comment --path="out*.json" # glob needs quotes
 
   Create markdown report to post in a Bitbucket comment:
 
-      infracost output --format bitbucket-comment --path "out*.json" # glob needs quotes
+      infracost output --format=bitbucket-comment --path="out*.json" # glob needs quotes
 
 FLAGS
       --compare-to string   Path to Infracost JSON file to compare against

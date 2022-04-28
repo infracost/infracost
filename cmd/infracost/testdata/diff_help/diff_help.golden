@@ -6,13 +6,15 @@ USAGE
 EXAMPLES
   Use Terraform directory with any required flags:
 
-      infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
+      infracost breakdown --path=/code --format=json --out-file=infracost-run.json
+      # Make some changes to your Terraform project
+      infracost diff --path=/code --terraform-var-file=my.tfvars --compare-to=infracost-run.json
 
   Use Terraform plan JSON:
 
       terraform plan -out tfplan.binary
       terraform show -json tfplan.binary > plan.json
-      infracost diff --path plan.json
+      infracost diff --path=plan.json
 
 FLAGS
       --compare-to string             Path to Infracost JSON file to compare against, cannot be used with table and html formats
