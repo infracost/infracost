@@ -57,6 +57,28 @@ func varsFromPlanFlags(planFlags string) (vars, error) {
 	}, nil
 }
 
+func findRemoteHostAndToken(ctx *config.ProjectContext) (string, string, error) {
+	token := ctx.ProjectConfig.TerraformCloudToken
+
+	if token == "" && !checkCloudConfigSet() {
+		return "", "", ErrMissingCloudToken
+	}
+
+	host := ctx.ProjectConfig.TerraformCloudHost
+	if host == "" {
+		host = "app.terraform.io"
+	}
+
+	if token == "" {
+		token = findCloudToken(host)
+	}
+	if token == "" {
+		return "", "", ErrMissingCloudToken
+	}
+
+	return host, token, nil
+}
+
 // NewHCLProvider returns a HCLProvider with a hcl.Parser initialised using the config.ProjectContext.
 // It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
 // set input vars and files on the underlying hcl.Parser.
@@ -85,6 +107,13 @@ func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider, opts
 	}
 
 	options = append(options, opts...)
+
+	host, token, remErr := findRemoteHostAndToken(ctx)
+	localWorkspace := ctx.ProjectConfig.TerraformWorkspace
+	if remErr == nil {
+		options = append(options, hcl.OptionWithRemoteVarLoader(host, token, localWorkspace))
+	}
+
 	p := hcl.New(ctx.ProjectConfig.Path, options...)
 
 	return &HCLProvider{

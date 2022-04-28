@@ -15,6 +15,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
+	"github.com/infracost/infracost/internal/extclient"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -112,6 +113,24 @@ func OptionWithInputVars(vars map[string]string) Option {
 	}
 }
 
+// OptionWithRemoteVarLoader accepts Terraform Cloud/Enterprise host and token
+// values to load remote execution variables.
+func OptionWithRemoteVarLoader(host, token, localWorkspace string) Option {
+	return func(p *Parser) {
+		if host == "" || token == "" {
+			return
+		}
+
+		var loaderOpts []RemoteVariablesLoaderOption
+		if p.newSpinner != nil {
+			loaderOpts = append(loaderOpts, RemoteVariablesLoaderWithSpinner(p.newSpinner))
+		}
+
+		client := extclient.NewAuthedAPIClient(host, token)
+		p.remoteVariablesLoader = NewRemoteVariablesLoader(client, localWorkspace, loaderOpts...)
+	}
+}
+
 func OptionWithWorkspaceName(workspaceName string) Option {
 	return func(p *Parser) {
 		p.workspaceName = workspaceName
@@ -144,17 +163,18 @@ func OptionWithWarningFunc(f ui.WriteWarningFunc) Option {
 
 // Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
-	initialPath     string
-	tfEnvVars       map[string]cty.Value
-	defaultVarFiles []string
-	tfvarsPaths     []string
-	inputVars       map[string]cty.Value
-	stopOnHCLError  bool
-	workspaceName   string
-	moduleLoader    *modules.ModuleLoader
-	blockBuilder    BlockBuilder
-	newSpinner      ui.SpinnerFunc
-	writeWarning    ui.WriteWarningFunc
+	initialPath           string
+	tfEnvVars             map[string]cty.Value
+	defaultVarFiles       []string
+	tfvarsPaths           []string
+	inputVars             map[string]cty.Value
+	stopOnHCLError        bool
+	workspaceName         string
+	moduleLoader          *modules.ModuleLoader
+	blockBuilder          BlockBuilder
+	newSpinner            ui.SpinnerFunc
+	writeWarning          ui.WriteWarningFunc
+	remoteVariablesLoader *RemoteVariablesLoader
 }
 
 // New creates a new Parser with the provided options, it inits the workspace as under the default name
@@ -227,7 +247,7 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 	}
 
 	log.Debug("Loading TFVars...")
-	inputVars, err := p.loadVars(p.tfvarsPaths)
+	inputVars, err := p.loadVars(blocks, p.tfvarsPaths)
 	if err != nil {
 		return nil, err
 	}
@@ -311,10 +331,23 @@ func (p *Parser) parseDirectoryFiles(files []*hcl.File) (Blocks, error) {
 	return blocks, nil
 }
 
-func (p *Parser) loadVars(filenames []string) (map[string]cty.Value, error) {
+func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Value, error) {
 	combinedVars := p.tfEnvVars
 	if combinedVars == nil {
 		combinedVars = make(map[string]cty.Value)
+	}
+
+	if p.remoteVariablesLoader != nil {
+		remoteVars, err := p.remoteVariablesLoader.Load(blocks)
+
+		if err != nil {
+			log.Warnf("could not load vars from Terraform Cloud: %s", err)
+			return combinedVars, err
+		}
+
+		for k, v := range remoteVars {
+			combinedVars[k] = v
+		}
 	}
 
 	for _, name := range p.defaultVarFiles {
