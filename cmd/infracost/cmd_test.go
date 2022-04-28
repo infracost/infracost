@@ -27,6 +27,7 @@ type GoldenFileOptions = struct {
 	Currency    string
 	CaptureLogs bool
 	IsJSON      bool
+	Env         map[string]string
 	// RunHCL sets the cmd test to also run the cmd with --terraform-parse-hcl set
 	RunHCL bool
 	// OnlyRunHCL sets the cmd test to only run cmd with --terraform-parse-hcl set and ignore the Terraform binary.
@@ -65,6 +66,10 @@ func goldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 
 	if testOptions == nil {
 		testOptions = DefaultOptions()
+	}
+
+	for k, v := range testOptions.Env {
+		os.Setenv(k, v)
 	}
 	// Fix the VCS repo URL so the golden files don't fail on forks
 	os.Setenv("INFRACOST_VCS_REPOSITORY_URL", "https://github.com/infracost/infracost")

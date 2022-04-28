@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 
 	"github.com/awslabs/goformation/v4"
@@ -132,14 +131,6 @@ func validateProjectForHCL(ctx *config.ProjectContext, path string) error {
 	if ctx.ProjectConfig.TerraformUseState {
 		return &ValidationError{
 			err: "Flags terraform-use-state and terraform-parse-hcl are incompatible\n\nRun again without --terraform-use-state.",
-		}
-	}
-
-	for _, k := range os.Environ() {
-		if strings.HasPrefix(k, "TF_VAR") {
-			return &ValidationError{
-				warn: "The parse HCL option does not support use of TF_VARS through environment variables, use --terraform-var-file or --terraform-var instead.",
-			}
 		}
 	}
 
