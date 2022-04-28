@@ -51,21 +51,64 @@ func OptionStopOnHCLError() Option {
 	}
 }
 
-// OptionWithInputVars takes a cmd line var input values and converts them to cty.Value
-// It then sets these as the Parser starting inputVars which be used at the root module evaluation.
-func OptionWithInputVars(vs []string) Option {
+// OptionWithTFEnvVars takes any TF_ENV_xxx=yyy from the environment and converts them to cty.Value
+// It then sets these as the Parser starting tfEnvVars which are used at the root module evaluation.
+func OptionWithTFEnvVars(projectEnv map[string]string) Option {
 	return func(p *Parser) {
 		ctyVars := make(map[string]cty.Value)
+
+		// First load any TF_VARs set in the environment
+		for _, v := range os.Environ() {
+			if strings.HasPrefix(v, "TF_VAR_") {
+				pieces := strings.Split(v[len("TF_VAR_"):], "=")
+				if len(pieces) != 2 {
+					continue
+				}
+
+				ctyVars[pieces[0]] = cty.StringVal(pieces[1])
+			}
+		}
+
+		// Then load any TF_VARs set in the project config "env:" block
+		for k, v := range projectEnv {
+			if strings.HasPrefix(k, "TF_VAR_") {
+				ctyVars[k[len("TF_VAR_"):]] = cty.StringVal(v)
+			}
+		}
+
+		p.tfEnvVars = ctyVars
+	}
+}
+
+// OptionWithPlanFlagVars takes TF var inputs specified in a command line string and converts them to cty.Value
+// It sets these as the Parser starting inputVars which are used at the root module evaluation.
+func OptionWithPlanFlagVars(vs []string) Option {
+	return func(p *Parser) {
+		if p.inputVars == nil {
+			p.inputVars = make(map[string]cty.Value)
+		}
 		for _, v := range vs {
 			pieces := strings.Split(v, "=")
 			if len(pieces) != 2 {
 				continue
 			}
 
-			ctyVars[pieces[0]] = cty.StringVal(pieces[1])
+			p.inputVars[pieces[0]] = cty.StringVal(pieces[1])
+		}
+	}
+}
+
+// OptionWithInputVars takes cmd line var input values and converts them to cty.Value
+// It sets these as the Parser starting inputVars which are used at the root module evaluation.
+func OptionWithInputVars(vars map[string]string) Option {
+	return func(p *Parser) {
+		if p.inputVars == nil {
+			p.inputVars = make(map[string]cty.Value, len(vars))
 		}
 
-		p.inputVars = ctyVars
+		for k, v := range vars {
+			p.inputVars[k] = cty.StringVal(v)
+		}
 	}
 }
 
@@ -102,6 +145,7 @@ func OptionWithWarningFunc(f ui.WriteWarningFunc) Option {
 // Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
 	initialPath     string
+	tfEnvVars       map[string]cty.Value
 	defaultVarFiles []string
 	tfvarsPaths     []string
 	inputVars       map[string]cty.Value
@@ -268,7 +312,10 @@ func (p *Parser) parseDirectoryFiles(files []*hcl.File) (Blocks, error) {
 }
 
 func (p *Parser) loadVars(filenames []string) (map[string]cty.Value, error) {
-	combinedVars := make(map[string]cty.Value)
+	combinedVars := p.tfEnvVars
+	if combinedVars == nil {
+		combinedVars = make(map[string]cty.Value)
+	}
 
 	for _, name := range p.defaultVarFiles {
 		err := loadAndCombineVars(name, combinedVars)

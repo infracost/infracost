@@ -25,7 +25,7 @@ type Project struct {
 	// TerraformVarFiles is the number of var files that are needed to run an TerraformParseHCL run
 	TerraformVarFiles []string `yaml:"terraform_var_files"`
 	// TerraformVars is a slice of input vars that is used to run an TerraformParseHCL run
-	TerraformVars []string `json:"terraform_vars"`
+	TerraformVars map[string]string `yaml:"terraform_vars"`
 	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
 	TerraformPlanFlags string `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
 	// TerraformInitFlags are flags to pass to terraform init
