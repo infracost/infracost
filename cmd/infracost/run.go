@@ -726,7 +726,8 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		projectCfg.Path, _ = cmd.Flags().GetString("path")
 		projectCfg.TerraformParseHCL, _ = cmd.Flags().GetBool("terraform-parse-hcl")
 		projectCfg.TerraformVarFiles, _ = cmd.Flags().GetStringSlice("terraform-var-file")
-		projectCfg.TerraformVars, _ = cmd.Flags().GetStringSlice("terraform-var")
+		tfVars, _ := cmd.Flags().GetStringSlice("terraform-var")
+		projectCfg.TerraformVars = tfVarsToMap(tfVars)
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 		projectCfg.TerraformInitFlags, _ = cmd.Flags().GetString("terraform-init-flags")
@@ -790,6 +791,24 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	}
 
 	return nil
+}
+
+func tfVarsToMap(vars []string) map[string]string {
+	if len(vars) == 0 {
+		return nil
+	}
+
+	m := make(map[string]string, len(vars))
+	for _, v := range vars {
+		pieces := strings.Split(v, "=")
+		if len(pieces) != 2 {
+			continue
+		}
+
+		m[pieces[0]] = pieces[1]
+	}
+
+	return m
 }
 
 func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {

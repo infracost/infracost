@@ -79,9 +79,7 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 
 		pconfig := *p.ctx.ProjectConfig // clone the projectConfig
 		pconfig.Path = di.WorkingDir
-		for k, v := range di.Inputs {
-			pconfig.TerraformVars = append(pconfig.TerraformVars, fmt.Sprintf("%s=%v", k, v))
-		}
+		pconfig.TerraformVars = p.initTerraformVars(pconfig.TerraformVars, di.Inputs)
 
 		pctx := config.NewProjectContext(p.ctx.RunContext, &pconfig)
 		h, err := NewHCLProvider(
@@ -110,6 +108,17 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 	}
 
 	return allProjects, nil
+}
+
+func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]string, inputs map[string]interface{}) map[string]string {
+	m := make(map[string]string, len(tfVars)+len(inputs))
+	for k, v := range tfVars {
+		m[k] = v
+	}
+	for k, v := range inputs {
+		m[k] = fmt.Sprintf("%v", v)
+	}
+	return m
 }
 
 func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, error) {

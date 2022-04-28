@@ -80,21 +80,35 @@ func OptionWithTFEnvVars(projectEnv map[string]string) Option {
 	}
 }
 
-// OptionWithInputVars takes a cmd line var input values and converts them to cty.Value
-// It then sets these as the Parser starting inputVars which are used at the root module evaluation.
-func OptionWithInputVars(vs []string) Option {
+// OptionWithPlanFlagVars takes TF var inputs specified in a command line string and converts them to cty.Value
+// It sets these as the Parser starting inputVars which are used at the root module evaluation.
+func OptionWithPlanFlagVars(vs []string) Option {
 	return func(p *Parser) {
-		ctyVars := make(map[string]cty.Value)
+		if p.inputVars == nil {
+			p.inputVars = make(map[string]cty.Value)
+		}
 		for _, v := range vs {
 			pieces := strings.Split(v, "=")
 			if len(pieces) != 2 {
 				continue
 			}
 
-			ctyVars[pieces[0]] = cty.StringVal(pieces[1])
+			p.inputVars[pieces[0]] = cty.StringVal(pieces[1])
+		}
+	}
+}
+
+// OptionWithInputVars takes cmd line var input values and converts them to cty.Value
+// It sets these as the Parser starting inputVars which are used at the root module evaluation.
+func OptionWithInputVars(vars map[string]string) Option {
+	return func(p *Parser) {
+		if p.inputVars == nil {
+			p.inputVars = make(map[string]cty.Value, len(vars))
 		}
 
-		p.inputVars = ctyVars
+		for k, v := range vars {
+			p.inputVars[k] = cty.StringVal(v)
+		}
 	}
 }
 

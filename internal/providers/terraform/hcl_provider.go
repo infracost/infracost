@@ -61,12 +61,15 @@ func varsFromPlanFlags(planFlags string) (vars, error) {
 // It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
 // set input vars and files on the underlying hcl.Parser.
 func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider, opts ...hcl.Option) (*HCLProvider, error) {
+	options := []hcl.Option{hcl.OptionWithTFEnvVars(ctx.ProjectConfig.Env)}
+
 	v, err := varsFromPlanFlags(ctx.ProjectConfig.TerraformPlanFlags)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse vars from plan flags %w", err)
+	} else if len(v.vars) > 0 {
+		withPlanFlagVars := hcl.OptionWithPlanFlagVars(v.vars)
+		options = append(options, withPlanFlagVars)
 	}
-
-	options := []hcl.Option{hcl.OptionWithTFEnvVars(ctx.ProjectConfig.Env)}
 
 	v.files = append(v.files, ctx.ProjectConfig.TerraformVarFiles...)
 	if len(v.files) > 0 {
@@ -74,10 +77,9 @@ func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider, opts
 		options = append(options, withFiles)
 	}
 
-	v.vars = append(v.vars, ctx.ProjectConfig.TerraformVars...)
-	if len(v.vars) > 0 {
-		withVars := hcl.OptionWithInputVars(v.vars)
-		options = append(options, withVars)
+	if len(ctx.ProjectConfig.TerraformVars) > 0 {
+		withInputVars := hcl.OptionWithInputVars(ctx.ProjectConfig.TerraformVars)
+		options = append(options, withInputVars)
 	}
 
 	options = append(options, opts...)
