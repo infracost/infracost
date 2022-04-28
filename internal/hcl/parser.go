@@ -53,9 +53,11 @@ func OptionStopOnHCLError() Option {
 
 // OptionWithTFEnvVars takes any TF_ENV_xxx=yyy from the environment and converts them to cty.Value
 // It then sets these as the Parser starting tfEnvVars which are used at the root module evaluation.
-func OptionWithTFEnvVars() Option {
+func OptionWithTFEnvVars(projectEnv map[string]string) Option {
 	return func(p *Parser) {
 		ctyVars := make(map[string]cty.Value)
+
+		// First load any TF_VARs set in the environment
 		for _, v := range os.Environ() {
 			if strings.HasPrefix(v, "TF_VAR_") {
 				pieces := strings.Split(v[len("TF_VAR_"):], "=")
@@ -64,6 +66,13 @@ func OptionWithTFEnvVars() Option {
 				}
 
 				ctyVars[pieces[0]] = cty.StringVal(pieces[1])
+			}
+		}
+
+		// Then load any TF_VARs set in the project config "env:" block
+		for k, v := range projectEnv {
+			if strings.HasPrefix(k, "TF_VAR_") {
+				ctyVars[k[len("TF_VAR_"):]] = cty.StringVal(v)
 			}
 		}
 

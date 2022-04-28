@@ -66,7 +66,7 @@ func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider, opts
 		return nil, fmt.Errorf("could not parse vars from plan flags %w", err)
 	}
 
-	options := []hcl.Option{hcl.OptionWithTFEnvVars()}
+	options := []hcl.Option{hcl.OptionWithTFEnvVars(ctx.ProjectConfig.Env)}
 
 	v.files = append(v.files, ctx.ProjectConfig.TerraformVarFiles...)
 	if len(v.files) > 0 {
