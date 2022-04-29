@@ -95,24 +95,24 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-  update-fig-autocomplete-spec:
-    name: Update Fig autocomplete spec
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Get the new version
-        id: version
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-      - name: Generate the spec
-        run: |
-          make build
-          ./build/infracost fig-autocomplete > fig-spec.ts
-      - name: Create Autocomplete PR
-        uses: withfig/publish-to-fig-autocomplete@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          autocomplete-spec-name: infracost
-          spec-path: fig-spec.ts
-          diff-based-versioning: true
-          new-spec-version: ${{ steps.version.outputs.tag }}
-          use-minor-base: true
+#  update-fig-autocomplete-spec:
+#    name: Update Fig autocomplete spec
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Get the new version
+#        id: version
+#        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+#      - name: Generate the spec
+#        run: |
+#          make build
+#          ./build/infracost fig-autocomplete > fig-spec.ts
+#      - name: Create Autocomplete PR
+#        uses: withfig/publish-to-fig-autocomplete@v1
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          autocomplete-spec-name: infracost
+#          spec-path: fig-spec.ts
+#          diff-based-versioning: true
+#          new-spec-version: ${{ steps.version.outputs.tag }}
+#          use-minor-base: true
