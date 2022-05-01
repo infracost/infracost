@@ -7,12 +7,12 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/Rhymond/go-money v1.0.5
-	github.com/aws/aws-sdk-go-v2 v1.16.2
+	github.com/aws/aws-sdk-go-v2 v1.16.3
 	github.com/aws/aws-sdk-go-v2/config v1.15.3
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.22.4
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.17.3
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.3
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.34.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.37.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.3
 	github.com/awslabs/goformation/v4 v4.19.5
 	github.com/briandowns/spinner v1.15.0
@@ -59,11 +59,11 @@ require (
 	github.com/apparentlymart/go-textseg v1.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.11.2 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.3 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.9 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.10 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.10 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.11.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.3 // indirect
@@ -93,7 +93,7 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.3 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.4 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
@@ -199,4 +199,5 @@ require (
 )
 
 replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e
+
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
