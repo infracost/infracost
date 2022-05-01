@@ -39,7 +39,7 @@ require (
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.1
-	github.com/tidwall/gjson v1.14.0
+	github.com/tidwall/gjson v1.14.1
 	github.com/zclconf/go-cty v1.10.0
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
 	golang.org/x/mod v0.5.1
@@ -199,4 +199,5 @@ require (
 )
 
 replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e
+
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
