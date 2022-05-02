@@ -101,7 +101,7 @@ require (
 require (
 	github.com/alecthomas/jsonschema v0.0.0-20211209230136-e2b41affa5c1
 	github.com/google/go-github/v41 v41.0.0
-	github.com/gruntwork-io/terragrunt v0.36.6
+	github.com/gruntwork-io/terragrunt v0.36.9
 	github.com/shurcooL/githubv4 v0.0.0-20220115235240-a14260e6f8a2
 	github.com/shurcooL/graphql v0.0.0-20200928012149-18c5c3165e3a
 	github.com/withfig/autocomplete-tools/packages/cobra v1.1.3
@@ -152,7 +152,7 @@ require (
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/urfave/cli v1.22.3 // indirect
 	go.mozilla.org/gopgagent v0.0.0-20170926210634-4d7ea76ff71a // indirect
-	go.mozilla.org/sops/v3 v3.7.0 // indirect
+	go.mozilla.org/sops/v3 v3.7.2 // indirect
 	golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	gopkg.in/ini.v1 v1.44.0 // indirect
