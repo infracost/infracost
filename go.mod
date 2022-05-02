@@ -13,7 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.17.3
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.3
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.37.0
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.3
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.7
 	github.com/awslabs/goformation/v4 v4.19.5
 	github.com/briandowns/spinner v1.15.0
 	github.com/dave/dst v0.26.2
@@ -64,7 +64,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.11.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.4 // indirect
 	github.com/aws/smithy-go v1.11.2 // indirect
@@ -121,7 +121,8 @@ require (
 	github.com/Azure/go-autorest/autorest/validation v0.3.1 // indirect
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.3 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.5 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/creack/pty v1.1.11 // indirect
