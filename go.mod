@@ -49,7 +49,7 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2/service/eks v1.20.4
+	github.com/aws/aws-sdk-go-v2/service/eks v1.20.6
 	github.com/hashicorp/terraform-config-inspect v0.0.0-20210625153042-09f34846faab
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
 )
@@ -71,7 +71,7 @@ require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault // indirect
-	github.com/hashicorp/hcl/v2 v2.11.1
+	github.com/hashicorp/hcl/v2 v2.12.0
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
