@@ -49,15 +49,11 @@ type hclRunDiff struct {
 	missingResources []string
 }
 
-var validRunFormats = []string{"json", "table", "html"}
-
 func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool("terraform-parse-hcl", false, "Parse HCL code instead of generating a Terraform plan. This does not need credentials and is faster (experimental)")
 	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform’s -var-file flag. Applicable with --terraform-parse-hcl (experimental)")
 	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform’s -var flag. Applicable with --terraform-parse-hcl (experimental)")
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
-
-	cmd.Flags().String("compare-to", "", "Path to Infracost JSON file to compare against, cannot be used with table and html formats")
 
 	cmd.Flags().String("config-file", "", "Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
@@ -750,14 +746,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	}
 
 	cfg.NoCache, _ = cmd.Flags().GetBool("no-cache")
-
 	cfg.Format, _ = cmd.Flags().GetString("format")
-
-	if cfg.Format != "" && !contains(validRunFormats, cfg.Format) {
-		ui.PrintUsage(cmd)
-		return fmt.Errorf("--format only supports %s", strings.Join(validRunFormats, ", "))
-	}
-
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
 

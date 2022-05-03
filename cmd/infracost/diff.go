@@ -45,14 +45,14 @@ func diffCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			ctx.Config.Format = "diff"
-
 			return runMain(cmd, ctx)
 		},
 	}
 
 	addRunFlags(cmd)
 
+	cmd.Flags().String("compare-to", "", "Path to Infracost JSON file to compare against, cannot be used with table and html formats")
+	newEnumFlag(cmd, "format", "diff", "Output format", []string{"json", "diff"})
 	cmd.Flags().String("out-file", "", "Save output to a file")
 
 	return cmd

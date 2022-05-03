@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -95,19 +94,6 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 			combined.IsCIRun = ctx.IsCIRun()
 
-			snapshot, _ := cmd.Flags().GetString("compare-to")
-			if snapshot != "" {
-				prior, err := loadInfracostJSONSnapshot(snapshot)
-				if err != nil {
-					return err
-				}
-
-				combined, err = output.CompareTo(combined, prior)
-				if err != nil {
-					return err
-				}
-			}
-
 			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
 
@@ -155,9 +141,6 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			var b []byte
 
 			format = strings.ToLower(format)
-			if snapshot != "" && !validCompareToFormats[format] {
-				return errors.New("The --compare-to option cannot be used with table and html formats as they output breakdowns, use `--format diff` or one of the comment formats.")
-			}
 
 			switch format {
 			case "json":
@@ -200,8 +183,6 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
-
-	cmd.Flags().String("compare-to", "", "Path to Infracost JSON file to compare against")
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, bitbucket-comment, slack-message")
 	cmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")
