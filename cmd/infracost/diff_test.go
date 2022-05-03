@@ -65,6 +65,24 @@ func TestDiffWithCompareTo(t *testing.T) {
 		})
 }
 
+func TestDiffWithCompareToFormatJSON(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			dir,
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+			"--format",
+			"json",
+		}, &GoldenFileOptions{
+			RunHCL: true,
+		})
+}
+
 func TestDiffWithConfigFileCompareTo(t *testing.T) {
 	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
 	configFile := fmt.Sprintf(`version: 0.1
