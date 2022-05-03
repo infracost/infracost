@@ -6,3 +6,5 @@ resource_usage:
     monthly_additional_log_data_retention_gb: 30
   azurerm_log_analytics_workspace.log_data_export:
     monthly_log_data_export_gb: 40
+  azurerm_log_analytics_workspace.per_gb_sentinel_data_ingestion_with_usage:
+    monthly_sentinel_data_ingestion_gb: 40

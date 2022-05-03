@@ -108,7 +108,16 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getDataFactoryIntegrationRuntimeAzureSSISRegistryItem(),
 	getDataFactoryIntegrationRuntimeManagedRegistryItem(),
 	getDataFactoryIntegrationRuntimeSelfHostedRegistryItem(),
+	getLogAnalyticsSolutionRegistryItem(),
 	getMySQLFlexibleServerRegistryItem(),
+	getSentinelDataConnectorAwsCloudTrailRegistryItem(),
+	getSentinelDataConnectorAzureActiveDirectoryRegistryItem(),
+	getSentinelDataConnectorAzureAdvancedThreatProtectionRegistryItem(),
+	getSentinelDataConnectorAzureSecurityCenterRegistryItem(),
+	getSentinelDataConnectorMicrosoftCloudAppSecurityRegistryItem(),
+	getSentinelDataConnectorMicrosoftDefenderAdvancedThreatProtectionRegistryItem(),
+	getSentinelDataConnectorOffice365RegistryItem(),
+	getSentinelDataConnectorThreatIntelligenceRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -309,7 +318,6 @@ var FreeResources = []string{
 	"azurerm_log_analytics_linked_service",
 	"azurerm_log_analytics_linked_storage_account",
 	"azurerm_log_analytics_saved_search",
-	"azurerm_log_analytics_solution",
 	"azurerm_log_analytics_storage_insights",
 
 	// Azure Management

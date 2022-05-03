@@ -87,3 +87,53 @@ resource "azurerm_log_analytics_workspace" "unsupported_legacy_workspace" {
   sku                 = each.value
 }
 
+resource "azurerm_log_analytics_workspace" "per_gb_sentinel_data_ingestion" {
+  name                = "acctest-10"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "PerGB2018"
+}
+
+resource "azurerm_log_analytics_solution" "per_gb_sentinel_solution" {
+  solution_name         = "SecurityInsights"
+  location              = azurerm_resource_group.example.location
+  resource_group_name   = azurerm_resource_group.example.name
+  workspace_resource_id = azurerm_log_analytics_workspace.per_gb_sentinel_data_ingestion.id
+  workspace_name        = azurerm_log_analytics_workspace.per_gb_sentinel_data_ingestion.name
+
+  plan {
+    publisher = "Microsoft"
+    product   = "OMSGallery/SecurityInsights"
+  }
+}
+
+resource "azurerm_sentinel_data_connector_aws_cloud_trail" "sentinel_data_connector_aws_cloud_trail" {
+  name                       = "example"
+  log_analytics_workspace_id = azurerm_log_analytics_solution.per_gb_sentinel_solution.workspace_resource_id
+  aws_role_arn               = "arn:aws:iam::000000000000:role/role1"
+}
+
+resource "azurerm_log_analytics_workspace" "per_gb_sentinel_data_ingestion_with_usage" {
+  name                = "acctest-10"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "PerGB2018"
+}
+
+resource "azurerm_sentinel_data_connector_azure_advanced_threat_protection" "example" {
+  name                       = "example"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.per_gb_sentinel_data_ingestion_with_usage.id
+}
+
+resource "azurerm_log_analytics_workspace" "capacity_sentinel_data_ingestion" {
+  name                               = "acctest-10"
+  location                           = azurerm_resource_group.example.location
+  resource_group_name                = azurerm_resource_group.example.name
+  sku                                = "CapacityReservation"
+  reservation_capacity_in_gb_per_day = 100
+}
+
+resource "azurerm_sentinel_data_connector_azure_active_directory" "example" {
+  name                       = "example"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.capacity_sentinel_data_ingestion.id
+}

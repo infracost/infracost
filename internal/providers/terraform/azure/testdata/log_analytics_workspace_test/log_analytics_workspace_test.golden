@@ -12,6 +12,11 @@
  azurerm_log_analytics_workspace.capacity_gb_data_ingestion_without_specification                                                  
  └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB     
                                                                                                                                    
+ azurerm_log_analytics_workspace.capacity_sentinel_data_ingestion                                                                  
+ ├─ Log data ingestion                                                                        30  100 GB (per day)       $7,585.20 
+ ├─ Sentinel data ingestion                                                                   30  100 GB (per day)       $7,585.20 
+ └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB     
+                                                                                                                                   
  azurerm_log_analytics_workspace.log_data_export                                                                                   
  ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB     
  └─ Log data export                                                                           40  GB                         $5.20 
@@ -34,13 +39,27 @@
  ├─ Log data ingestion                                                                        20  GB                        $59.80 
  └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB     
                                                                                                                                    
- OVERALL TOTAL                                                                                                          $73,444.10 
+ azurerm_log_analytics_workspace.per_gb_sentinel_data_ingestion                                                                    
+ ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB     
+ ├─ Sentinel data ingestion                                                        Monthly cost depends on usage: $2.99 per GB     
+ └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB     
+                                                                                                                                   
+ azurerm_log_analytics_workspace.per_gb_sentinel_data_ingestion_with_usage                                                         
+ ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB     
+ ├─ Sentinel data ingestion                                                                   40  GB                       $119.60 
+ └─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB     
+                                                                                                                                   
+ OVERALL TOTAL                                                                                                          $88,734.10 
 ──────────────────────────────────
-14 cloud resources were detected:
-∙ 8 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free:
+21 cloud resources were detected:
+∙ 11 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 6 were free:
+  ∙ 1 x azurerm_log_analytics_solution
   ∙ 1 x azurerm_log_analytics_workspace
   ∙ 1 x azurerm_resource_group
+  ∙ 1 x azurerm_sentinel_data_connector_aws_cloud_trail
+  ∙ 1 x azurerm_sentinel_data_connector_azure_active_directory
+  ∙ 1 x azurerm_sentinel_data_connector_azure_advanced_threat_protection
 ∙ 4 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 4 x azurerm_log_analytics_workspace
 Logs:
