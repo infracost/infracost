@@ -375,7 +375,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		defer mux.Unlock()
 	}
 
-	provider, err := providers.Detect(ctx, r.prior == nil)
+	provider, err := providers.DetectProvider(ctx, r.prior == nil)
 	var warn *string
 	if v, ok := err.(*providers.ValidationError); ok {
 		if v.Warn() == nil {

@@ -32,6 +32,10 @@ type GoldenFileOptions = struct {
 	RunTerraformCLI bool
 	// OnlyRunTerraformCLI sets the cmd test to only run cmd with --project-type=terraform_cli set and not with HCL parsing
 	OnlyRunTerraformCLI bool
+	// RunTerragruntCLI sets the cmd test to also run the cmd with --project-type=terragrunt_cli set
+	RunTerragruntCLI bool
+	// OnlyRunTerragruntCLI sets the cmd test to only run cmd with --project-type=terragrunt_cli set and not with HCL parsing
+	OnlyRunTerragruntCLI bool
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -43,7 +47,7 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
-	if testOptions == nil || !testOptions.OnlyRunTerraformCLI {
+	if testOptions == nil || (!testOptions.OnlyRunTerraformCLI && !testOptions.OnlyRunTerragruntCLI) {
 		t.Run("Terraform HCL", func(t *testing.T) {
 			goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
 		})
@@ -56,6 +60,16 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 			tfCLI[len(args)] = "--project-type"
 			tfCLI[len(args)+1] = "terraform_cli"
 			goldenFileCommandTest(t, testName, tfCLI, testOptions, false, ctxOptions...)
+		})
+	}
+
+	if testOptions != nil && (testOptions.RunTerragruntCLI || testOptions.OnlyRunTerragruntCLI) {
+		t.Run("Terraform CLI", func(t *testing.T) {
+			tgCLI := make([]string, len(args)+2)
+			copy(tgCLI, args)
+			tgCLI[len(args)] = "--project-type"
+			tgCLI[len(args)+1] = "terragrunt_cli"
+			goldenFileCommandTest(t, testName, tgCLI, testOptions, false, ctxOptions...)
 		})
 	}
 }
