@@ -48,7 +48,7 @@ func DefaultOptions() *GoldenFileOptions {
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
 	if testOptions == nil || (!testOptions.OnlyRunTerraformCLI && !testOptions.OnlyRunTerragruntCLI) {
-		t.Run("Terraform HCL", func(t *testing.T) {
+		t.Run("HCL", func(t *testing.T) {
 			goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
 		})
 	}
@@ -64,7 +64,7 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 	}
 
 	if testOptions != nil && (testOptions.RunTerragruntCLI || testOptions.OnlyRunTerragruntCLI) {
-		t.Run("Terraform CLI", func(t *testing.T) {
+		t.Run("Terragrunt CLI", func(t *testing.T) {
 			tgCLI := make([]string, len(args)+2)
 			copy(tgCLI, args)
 			tgCLI[len(args)] = "--project-type"
