@@ -42,7 +42,7 @@ func (e *ValidationError) Error() string {
 	return e.err
 }
 
-func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provider, error) {
+func DetectProvider(ctx *config.ProjectContext, includePastResources bool) (schema.Provider, error) {
 	path := ctx.ProjectConfig.Path
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -50,7 +50,7 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 	}
 
 	if ctx.ProjectConfig.ProjectType == "" {
-		ctx.ProjectConfig.ProjectType = autoDetectProjectType(path)
+		ctx.ProjectConfig.ProjectType = DetectProjectType(path)
 	}
 
 	switch ctx.ProjectConfig.ProjectType {
@@ -95,7 +95,7 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 	return nil, fmt.Errorf("Could not detect path type for '%s'", path)
 }
 
-func autoDetectProjectType(path string) string {
+func DetectProjectType(path string) string {
 	if isCloudFormationTemplate(path) {
 		return "cloudformation"
 	}
@@ -132,7 +132,7 @@ func validateProjectForHCL(ctx *config.ProjectContext, path string) error {
 
 	if ctx.ProjectConfig.TerraformInitFlags != "" {
 		return &ValidationError{
-			warn: "terraform-init-flags is deprecated with Terraform HCL parsing.",
+			warn: "terraform-init-flags is not supported with Terraform HCL parsing.",
 		}
 	}
 

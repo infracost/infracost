@@ -262,14 +262,9 @@ func TestBreakdownInitFlagsError(t *testing.T) {
 			"breakdown",
 			"--path",
 			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
-			"--project-type",
-			"terraform_cli",
 			"--terraform-init-flags",
 			"-plugin-dir=does/not/exist",
 		},
 		nil,
-		func(ctx *config.RunContext) {
-			ctx.Config.DisableHCLParsing = true
-		},
 	)
 }
