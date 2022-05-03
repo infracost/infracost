@@ -15,7 +15,7 @@ EXAMPLES
       infracost diff --path plan.json
 
 FLAGS
-      --compare-to string             Path to Infracost JSON file to compare against, cannot be used with table and html formats
+      --compare-to string             Path to Infracost JSON file to compare against
       --config-file string            Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags
       --format string                 Output format: json, diff (default "diff")
   -h, --help                          help for diff
