@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "example" {
   location = "West Europe"
 }
 
-resource "azurerm_log_analytics_workspace" "sentinel_data_connector_microsoft_defender_advanced_threat_protection_with_solution" {
+resource "azurerm_log_analytics_workspace" "sentinel_data_connector_threat_intelligence_with_solution" {
   name                = "example-workspace"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -19,8 +19,8 @@ resource "azurerm_log_analytics_solution" "example" {
   solution_name         = "exampleinsights"
   location              = azurerm_resource_group.example.location
   resource_group_name   = azurerm_resource_group.example.name
-  workspace_resource_id = azurerm_log_analytics_workspace.sentinel_data_connector_microsoft_defender_advanced_threat_protection_with_solution.id
-  workspace_name        = azurerm_log_analytics_workspace.sentinel_data_connector_microsoft_defender_advanced_threat_protection_with_solution.name
+  workspace_resource_id = azurerm_log_analytics_workspace.sentinel_data_connector_threat_intelligence_with_solution.id
+  workspace_name        = azurerm_log_analytics_workspace.sentinel_data_connector_threat_intelligence_with_solution.name
 
   plan {
     publisher = "Microsoft"
@@ -28,19 +28,19 @@ resource "azurerm_log_analytics_solution" "example" {
   }
 }
 
-resource "azurerm_sentinel_data_connector_microsoft_defender_advanced_threat_protection" "example" {
+resource "azurerm_sentinel_data_connector_threat_intelligence" "example" {
   name                       = "example"
   log_analytics_workspace_id = azurerm_log_analytics_solution.example.workspace_resource_id
 }
 
-resource "azurerm_log_analytics_workspace" "sentinel_data_connector_microsoft_defender_advanced_threat_protection" {
+resource "azurerm_log_analytics_workspace" "sentinel_data_connector_threat_intelligence" {
   name                = "example-workspace"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
 }
 
-resource "azurerm_sentinel_data_connector_microsoft_defender_advanced_threat_protection" "example2" {
+resource "azurerm_sentinel_data_connector_threat_intelligence" "example2" {
   name                       = "example"
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.sentinel_data_connector_microsoft_defender_advanced_threat_protection.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.sentinel_data_connector_threat_intelligence.id
 }

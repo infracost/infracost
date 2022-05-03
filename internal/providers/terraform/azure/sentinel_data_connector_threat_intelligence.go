@@ -4,17 +4,17 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getSentinelSentinelDataConnectorOffice365RegistryItem() *schema.RegistryItem {
+func getSentinelDataConnectorThreatIntelligenceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_sentinel_sentinel_data_connector_office_365",
-		RFunc: newSentinelSentinelDataConnectorOffice365,
+		Name:  "azurerm_sentinel_data_connector_threat_intelligence",
+		RFunc: newSentinelDataConnectorThreatIntelligence,
 		ReferenceAttributes: []string{
 			"log_analytics_workspace_id",
 		},
 	}
 }
 
-func newSentinelSentinelDataConnectorOffice365(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newSentinelDataConnectorThreatIntelligence(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	return &schema.Resource{
 		Name:        d.Address,
 		IsSkipped:   true,
