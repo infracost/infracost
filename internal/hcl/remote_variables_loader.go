@@ -123,12 +123,6 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 		}
 	}
 
-	var spinner *ui.Spinner
-	if r.newSpinner != nil {
-		spinner = r.newSpinner(spinnerMsg)
-		defer spinner.Success()
-	}
-
 	if config.host != "" {
 		r.client.SetHost(config.host)
 	}
@@ -136,25 +130,25 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", config.organization, config.workspace)
 	body, err := r.client.Get(endpoint)
 	if err != nil {
-		if spinner != nil {
-			spinner.Fail()
-		}
-		return vars, errors.New("unable to fetch workspace data from Terraform Cloud")
+		log.Warnf("could not request Terraform workspace: %s for organization: %s error: %s", config.workspace, config.organization, err)
+		return vars, nil
 	}
 
 	var workspaceResponse tfcWorkspaceResponse
 	if json.Unmarshal(body, &workspaceResponse) != nil {
-		if spinner != nil {
-			spinner.Fail()
-		}
-		return vars, errors.New("unable to parse Workspace response")
+		log.Warnf("malformed Terraform API response using workspace: %s organization: %s error: %s", config.workspace, config.organization, err)
+		return vars, nil
 	}
 
 	if workspaceResponse.Data.Attributes.ExecutionMode != "remote" {
-		if spinner != nil {
-			spinner.Fail()
-		}
+		log.Debugf("Terraform workspace %s does not use remote execution continuing with local execution", config.workspace)
 		return vars, nil
+	}
+
+	var spinner *ui.Spinner
+	if r.newSpinner != nil {
+		spinner = r.newSpinner(spinnerMsg)
+		defer spinner.Success()
 	}
 
 	workspaceID := workspaceResponse.Data.ID
