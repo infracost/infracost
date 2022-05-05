@@ -25,7 +25,7 @@ FLAGS
       --no-cache                      Don't attempt to cache Terraform plans
       --out-file string               Save output to a file, helpful with format flag
   -p, --path string                   Path to the Terraform directory or JSON/plan file
-      --project-type string           Override the project type: terraform_dir, terragrunt_dir, terraform_plan_json, terraform_plan_binary, terraform_cli, terragrunt_cli, terraform_state_json
+      --project-type string           Override the project type: terraform_dir, terragrunt_dir, terraform_plan_json, terraform_plan_binary, terraform_cli, terragrunt_cli, terraform_state_json, cloudformation
       --show-skipped                  List unsupported and free resources
       --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)
       --terraform-init-flags string   Flags to pass to 'terraform init'. Applicable with terraform_cli project type
