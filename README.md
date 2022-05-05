@@ -20,13 +20,13 @@ Infracost also has many CI/CD integrations so you can easily post cost estimates
 
 <img src=".github/assets/github_actions_screenshot.png" alt="Infracost in GitHub Actions" width=700 />
 
-#### Show `diff` of monthly costs between current and planned state in CLI
-
-<img src=".github/assets/diff_screenshot.png" alt="Infracost diff command" width=600 />
-
-#### Show `breakdown` of costs in CLI
+#### Output of `infracost breakdown`
 
 <img src=".github/assets/breakdown_screenshot.png" alt="Infracost breakdown command" width=600 />
+
+#### `infracost diff` shows diff of monthly costs between current and planned state
+
+<img src=".github/assets/diff_screenshot.png" alt="Infracost diff command" width=600 />
 
 ## Supported clouds and resources
 
