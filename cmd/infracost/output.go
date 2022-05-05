@@ -139,7 +139,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 			}
 
-			b, err := output.MarshalOutput(format, combined, opts)
+			b, err := output.FormatOutput(format, combined, opts)
 			if err != nil {
 				return err
 			}

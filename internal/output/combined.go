@@ -259,8 +259,8 @@ func checkOutputVersion(v string) bool {
 	return semver.Compare(v, "v"+minOutputVersion) >= 0 && semver.Compare(v, "v"+maxOutputVersion) <= 0
 }
 
-// MarshalOutput returns Root r as the format specified. The default format is a table output.
-func MarshalOutput(format string, r Root, opts Options) ([]byte, error) {
+// FormatOutput returns Root r as the format specified. The default format is a table output.
+func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 	var b []byte
 	var err error
 

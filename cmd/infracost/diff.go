@@ -97,7 +97,7 @@ func runCompare(cmd *cobra.Command, ctx *config.RunContext, current output.Root)
 	}
 
 	format, _ := cmd.Flags().GetString("format")
-	b, err := output.MarshalOutput(strings.ToLower(format), combined, output.Options{
+	b, err := output.FormatOutput(strings.ToLower(format), combined, output.Options{
 		DashboardEnabled: ctx.Config.EnableDashboard,
 		ShowSkipped:      ctx.Config.ShowSkipped,
 		NoColor:          ctx.Config.NoColor,
