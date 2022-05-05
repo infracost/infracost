@@ -19,13 +19,14 @@ EXAMPLES
       infracost diff --path plan.json
 
 FLAGS
-      --compare-to string             Path to Infracost JSON file to compare against, cannot be used with table and html formats
+      --compare-to string             Path to Infracost JSON file to compare against
       --config-file string            Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags
+      --format string                 Output format: json, diff (default "diff")
   -h, --help                          help for diff
       --no-cache                      Don't attempt to cache Terraform plans
       --out-file string               Save output to a file
   -p, --path string                   Path to the Terraform directory or JSON/plan file
-      --project-type string           Override the project type: terraform_dir, terragrunt_dir, terraform_plan_json, terraform_plan_binary, terraform_cli, terragrunt_cli, terraform_state_json
+      --project-type string           Override the project type: terraform_dir, terragrunt_dir, terraform_plan_json, terraform_plan_binary, terraform_cli, terragrunt_cli, terraform_state_json, cloudformation
       --show-skipped                  List unsupported and free resources
       --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)
       --terraform-init-flags string   Flags to pass to 'terraform init'. Applicable with terraform_cli project type

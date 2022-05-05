@@ -1,0 +1,36 @@
+Project: infracost/infracost/cmd/infracost/testdata/diff_with_infracost_json
+
+~ aws_instance.web_app
+  +$561 ($743 → $1,303)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.8xlarge)
+      +$561 ($561 → $1,121)
+
+- aws_instance.web_app2
+  -$1,303
+
+    - Instance usage (Linux/UNIX, on-demand, m5.8xlarge)
+      -$1,121
+
+    - root_block_device
+    
+        - Storage (general purpose SSD, gp2)
+          -$5.00
+
+    - ebs_block_device[0]
+    
+        - Storage (provisioned IOPS SSD, io1)
+          -$125
+    
+        - Provisioned IOPS
+          -$52.00
+
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_infracost_json
+Amount:  -$743 ($2,046 → $1,303)
+Percent: -36%
+
+──────────────────────────────────
+Key: ~ changed, + added, - removed
+
+1 cloud resource was detected:
+∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file

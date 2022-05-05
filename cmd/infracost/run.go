@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -61,7 +60,7 @@ var validProjectTypes = []string{
 }
 
 func addRunFlags(cmd *cobra.Command) {
-	cmd.Flags().String("project-type", "", "Override the project type: terraform_dir, terragrunt_dir, terraform_plan_json, terraform_plan_binary, terraform_cli, terragrunt_cli, terraform_state_json")
+	newEnumFlag(cmd, "project-type", "", "Override the project type", validProjectTypes)
 	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform's -var-file flag. Applicable with terragrunt_dir project type")
 	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform's -var flag. Applicable with terragrunt_dir project type")
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
@@ -99,87 +98,15 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 	}
 
-	parallelism, err := getParallelism(cmd, runCtx)
-	if err != nil {
-		return err
-	}
-	runCtx.SetContextValue("parallelism", parallelism)
-
-	numJobs := len(runCtx.Config.Projects)
-	jobs := make(chan projectJob, numJobs)
-
-	projectResultChan := make(chan projectResult, numJobs)
-	errGroup, _ := errgroup.WithContext(context.Background())
-
-	runInParallel := parallelism > 1 && numJobs > 1
-	if (runInParallel || runCtx.IsCIRun()) && !runCtx.Config.IsLogging() {
-		if runInParallel {
-			cmd.PrintErrln("Running multiple projects in parallel, so log-level=info is enabled by default.")
-			cmd.PrintErrln("Run with INFRACOST_PARALLELISM=1 to disable parallelism to help debugging.")
-			cmd.PrintErrln()
-		}
-
-		runCtx.Config.LogLevel = "info"
-		err := runCtx.Config.ConfigureLogger()
-		if err != nil {
-			return err
-		}
-	}
-
 	pr, err := newParallelRunner(cmd, runCtx)
 	if err != nil {
 		return err
 	}
 
-	for i := 0; i < parallelism; i++ {
-		errGroup.Go(func() (err error) {
-			// defer a function to recover from any panics spawned by child goroutines.
-			// This is done as recover works only in the same goroutine that it is called.
-			// We need to catch any child goroutine panics and hand them up to the main caller
-			// so that it can be caught and displayed correctly to the user.
-			defer func() {
-				e := recover()
-				if e != nil {
-					err = &panicError{msg: fmt.Sprintf("%s\n%s", e, debug.Stack())}
-				}
-			}()
-
-			for job := range jobs {
-				ctx := config.NewProjectContext(runCtx, job.projectCfg)
-				configProjects, err := pr.runProjectConfig(ctx)
-				if err != nil {
-					return err
-				}
-
-				projectResultChan <- projectResult{
-					index:      job.index,
-					ctx:        ctx,
-					projectOut: configProjects,
-				}
-			}
-
-			return nil
-		})
-	}
-
-	for i, p := range runCtx.Config.Projects {
-		jobs <- projectJob{index: i, projectCfg: p}
-	}
-	close(jobs)
-
-	err = errGroup.Wait()
+	projectResults, err := pr.run()
 	if err != nil {
 		return err
 	}
-
-	close(projectResultChan)
-	projectResults := make([]projectResult, 0, len(runCtx.Config.Projects))
-	for result := range projectResultChan {
-		projectResults = append(projectResults, result)
-	}
-	sort.Slice(projectResults, func(i, j int) bool {
-		return projectResults[i].index < projectResults[j].index
-	})
 
 	projects := make([]*schema.Project, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
@@ -226,36 +153,23 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	r.RunID, r.ShareURL = result.RunID, result.ShareURL
 
-	opts := output.Options{
+	format := strings.ToLower(runCtx.Config.Format)
+	isCompareRun := runCtx.Config.CompareTo != ""
+	if isCompareRun && !validCompareToFormats[format] {
+		return errors.New("The --compare-to option cannot be used with table and html formats as they output breakdowns, specify a different --format.")
+	}
+
+	b, err := output.MarshalOutput(format, r, output.Options{
 		DashboardEnabled: runCtx.Config.EnableDashboard,
 		ShowSkipped:      runCtx.Config.ShowSkipped,
 		NoColor:          runCtx.Config.NoColor,
 		Fields:           runCtx.Config.Fields,
-	}
-
-	var b []byte
-
-	format := strings.ToLower(runCtx.Config.Format)
-	if runCtx.Config.CompareTo != "" && !validCompareToFormats[format] {
-		return errors.New("The --compare-to option cannot be used with table and html formats as they output breakdowns, specify a different --format.")
-	}
-
-	switch format {
-	case "json":
-		b, err = output.ToJSON(r, opts)
-	case "html":
-		b, err = output.ToHTML(r, opts)
-	case "diff":
-		b, err = output.ToDiff(r, opts)
-	default:
-		b, err = output.ToTable(r, opts)
-	}
-
+	})
 	if err != nil {
-		return errors.Wrap(err, "Error generating output")
+		return err
 	}
 
-	if runCtx.Config.Format == "diff" || runCtx.Config.Format == "table" {
+	if format == "diff" || format == "table" {
 		lines := bytes.Count(b, []byte("\n")) + 1
 		runCtx.SetContextValue("lineCount", lines)
 	}
@@ -282,30 +196,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	return nil
-}
-
-func loadInfracostJSONSnapshot(snapshot string) (output.Root, error) {
-	_, err := os.Stat(snapshot)
-	if errors.Is(err, os.ErrNotExist) {
-		return output.Root{}, fmt.Errorf("%s used by --compare-to flag does not exist", snapshot)
-	}
-
-	if err != nil {
-		return output.Root{}, fmt.Errorf("Could not load %s used by --compare-to flag, err: %s", snapshot, err)
-	}
-
-	b, err := os.ReadFile(snapshot)
-	if err != nil {
-		return output.Root{}, fmt.Errorf("Could not read %s used by --compare-to flag, err: %s", snapshot, err)
-	}
-
-	var prior output.Root
-	err = json.Unmarshal(b, &prior)
-	if err != nil {
-		return output.Root{}, fmt.Errorf("Could not decode file %s used by compare-to flag, please ensure it is a valid Infracost JSON", snapshot)
-	}
-
-	return prior, nil
 }
 
 func formatHCLProjects(wg *sync.WaitGroup, ctx *config.RunContext, hclProjects []*schema.Project, hclR *output.Root) {
@@ -335,10 +225,12 @@ type projectOutput struct {
 }
 
 type parallelRunner struct {
-	cmd      *cobra.Command
-	runCtx   *config.RunContext
-	pathMuxs map[string]*sync.Mutex
-	prior    *output.Root
+	cmd         *cobra.Command
+	runCtx      *config.RunContext
+	pathMuxs    map[string]*sync.Mutex
+	prior       *output.Root
+	parallelism int
+	numJobs     int
 }
 
 func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallelRunner, error) {
@@ -352,20 +244,105 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 
 	var prior *output.Root
 	if runCtx.Config.CompareTo != "" {
-		snapshot, err := loadInfracostJSONSnapshot(runCtx.Config.CompareTo)
+		snapshot, err := output.Load(runCtx.Config.CompareTo)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Error loading %s used by --compare-to flag. %s", runCtx.Config.CompareTo, err)
 		}
 
 		prior = &snapshot
 	}
 
+	parallelism, err := getParallelism(cmd, runCtx)
+	if err != nil {
+		return nil, err
+	}
+	runCtx.SetContextValue("parallelism", parallelism)
+
+	numJobs := len(runCtx.Config.Projects)
+
+	runInParallel := parallelism > 1 && numJobs > 1
+	if (runInParallel || runCtx.IsCIRun()) && !runCtx.Config.IsLogging() {
+		if runInParallel {
+			cmd.PrintErrln("Running multiple projects in parallel, so log-level=info is enabled by default.")
+			cmd.PrintErrln("Run with INFRACOST_PARALLELISM=1 to disable parallelism to help debugging.")
+			cmd.PrintErrln()
+		}
+
+		runCtx.Config.LogLevel = "info"
+		err := runCtx.Config.ConfigureLogger()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &parallelRunner{
-		runCtx:   runCtx,
-		cmd:      cmd,
-		pathMuxs: pathMuxs,
-		prior:    prior,
+		parallelism: parallelism,
+		numJobs:     numJobs,
+		runCtx:      runCtx,
+		cmd:         cmd,
+		pathMuxs:    pathMuxs,
+		prior:       prior,
 	}, nil
+}
+
+func (r *parallelRunner) run() ([]projectResult, error) {
+	projectResultChan := make(chan projectResult, r.numJobs)
+	jobs := make(chan projectJob, r.numJobs)
+
+	errGroup, _ := errgroup.WithContext(context.Background())
+	for i := 0; i < r.parallelism; i++ {
+		errGroup.Go(func() (err error) {
+			// defer a function to recover from any panics spawned by child goroutines.
+			// This is done as recover works only in the same goroutine that it is called.
+			// We need to catch any child goroutine panics and hand them up to the main caller
+			// so that it can be caught and displayed correctly to the user.
+			defer func() {
+				e := recover()
+				if e != nil {
+					err = &panicError{msg: fmt.Sprintf("%s\n%s", e, debug.Stack())}
+				}
+			}()
+
+			for job := range jobs {
+				ctx := config.NewProjectContext(r.runCtx, job.projectCfg)
+				configProjects, err := r.runProjectConfig(ctx)
+				if err != nil {
+					return err
+				}
+
+				projectResultChan <- projectResult{
+					index:      job.index,
+					ctx:        ctx,
+					projectOut: configProjects,
+				}
+			}
+
+			return nil
+		})
+	}
+
+	for i, p := range r.runCtx.Config.Projects {
+		jobs <- projectJob{index: i, projectCfg: p}
+	}
+	close(jobs)
+
+	err := errGroup.Wait()
+	if err != nil {
+		return nil, err
+	}
+
+	close(projectResultChan)
+
+	projectResults := make([]projectResult, 0, len(r.runCtx.Config.Projects))
+	for result := range projectResultChan {
+		projectResults = append(projectResults, result)
+	}
+
+	sort.Slice(projectResults, func(i, j int) bool {
+		return projectResults[i].index < projectResults[j].index
+	})
+
+	return projectResults, nil
 }
 
 func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectOutput, error) {
