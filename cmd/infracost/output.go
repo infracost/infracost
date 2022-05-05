@@ -74,6 +74,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			var err error
 
 			format, _ := cmd.Flags().GetString("format")
+			format = strings.ToLower(format)
 			ctx.SetContextValue("outputFormat", format)
 
 			if format != "" && !contains(validOutputFormats, format) {
@@ -138,26 +139,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 			}
 
-			var b []byte
-
-			format = strings.ToLower(format)
-
-			switch format {
-			case "json":
-				b, err = output.ToJSON(combined, opts)
-			case "html":
-				b, err = output.ToHTML(combined, opts)
-			case "diff":
-				b, err = output.ToDiff(combined, opts)
-			case "github-comment", "gitlab-comment", "azure-repos-comment":
-				b, err = output.ToMarkdown(combined, opts, output.MarkdownOptions{})
-			case "bitbucket-comment":
-				b, err = output.ToMarkdown(combined, opts, output.MarkdownOptions{BasicSyntax: true})
-			case "slack-message":
-				b, err = output.ToSlackMessage(combined, opts)
-			default:
-				b, err = output.ToTable(combined, opts)
-			}
+			b, err := output.MarshalOutput(format, combined, opts)
 			if err != nil {
 				return err
 			}

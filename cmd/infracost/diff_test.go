@@ -78,8 +78,22 @@ func TestDiffWithCompareToFormatJSON(t *testing.T) {
 			path.Join(dir, "prior.json"),
 			"--format",
 			"json",
+		}, nil)
+}
+
+func TestDiffWithInfracostJSON(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			path.Join(dir, "current.json"),
+			"--compare-to",
+			path.Join(dir, "prior.json"),
 		}, &GoldenFileOptions{
-			RunHCL: true,
+			RunTerraformCLI: true,
 		})
 }
 

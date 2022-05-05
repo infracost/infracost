@@ -1,10 +1,16 @@
 package main
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
+	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/providers"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -48,7 +54,7 @@ func diffCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			return runMain(cmd, ctx)
+			return runDiff(cmd, ctx)
 		},
 	}
 
@@ -59,6 +65,60 @@ func diffCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("out-file", "", "Save output to a file")
 
 	return cmd
+}
+
+func runDiff(cmd *cobra.Command, ctx *config.RunContext) error {
+	if len(ctx.Config.Projects) > 0 {
+		path := ctx.Config.Projects[0].Path
+
+		// if the path provided is an Infracost JSON we need to run a compare run
+		current, err := output.Load(path)
+		if err == nil {
+			if ctx.Config.CompareTo == "" {
+				return errors.New("Passing an Infracost JSON as a --path argument is only valid using the --compare-to flag")
+			}
+
+			return runCompare(cmd, ctx, current)
+		}
+	}
+
+	return runMain(cmd, ctx)
+}
+
+func runCompare(cmd *cobra.Command, ctx *config.RunContext, current output.Root) error {
+	prior, err := output.Load(ctx.Config.CompareTo)
+	if err != nil {
+		return fmt.Errorf("Error loading %s used by --compare-to flag. %s", ctx.Config.CompareTo, err)
+	}
+
+	combined, err := output.CompareTo(current, prior)
+	if err != nil {
+		return err
+	}
+
+	format, _ := cmd.Flags().GetString("format")
+	b, err := output.MarshalOutput(strings.ToLower(format), combined, output.Options{
+		DashboardEnabled: ctx.Config.EnableDashboard,
+		ShowSkipped:      ctx.Config.ShowSkipped,
+		NoColor:          ctx.Config.NoColor,
+		Fields:           ctx.Config.Fields,
+	})
+	if err != nil {
+		return err
+	}
+
+	pricingClient := apiclient.NewPricingAPIClient(ctx)
+	err = pricingClient.AddEvent("infracost-run", ctx.EventEnv())
+	if err != nil {
+		log.Errorf("Error reporting event: %s", err)
+	}
+
+	if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
+		return saveOutFile(ctx, cmd, outFile, b)
+	}
+
+	cmd.Println(string(b))
+	return nil
 }
 
 func checkDiffConfig(cfg *config.Config) error {
