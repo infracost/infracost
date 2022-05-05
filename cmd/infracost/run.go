@@ -159,7 +159,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		return errors.New("The --compare-to option cannot be used with table and html formats as they output breakdowns, specify a different --format.")
 	}
 
-	b, err := output.MarshalOutput(format, r, output.Options{
+	b, err := output.FormatOutput(format, r, output.Options{
 		DashboardEnabled: runCtx.Config.EnableDashboard,
 		ShowSkipped:      runCtx.Config.ShowSkipped,
 		NoColor:          runCtx.Config.NoColor,
