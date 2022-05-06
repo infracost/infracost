@@ -215,6 +215,9 @@ func handleUpdateMessage(updateMessageChan chan *update.Info) {
 }
 
 func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
+	if ctx.IsCIRun() {
+		ctx.Config.NoColor = true
+	}
 	if cmd.Flags().Changed("no-color") {
 		ctx.Config.NoColor, _ = cmd.Flags().GetBool("no-color")
 	}
