@@ -23,11 +23,11 @@ func NewTemplateProvider(ctx *config.ProjectContext, includePastResources bool) 
 }
 
 func (p *TemplateProvider) Type() string {
-	return "cloudformation_state_json"
+	return "cloudformation"
 }
 
 func (p *TemplateProvider) DisplayType() string {
-	return "Cloudformation state JSON file"
+	return "CloudFormation"
 }
 
 func (p *TemplateProvider) AddMetadata(metadata *schema.ProjectMetadata) {
@@ -37,7 +37,7 @@ func (p *TemplateProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 func (p *TemplateProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	template, err := goformation.Open(p.Path)
 	if err != nil {
-		return []*schema.Project{}, errors.Wrap(err, "Error reading Cloudformation template file")
+		return []*schema.Project{}, errors.Wrap(err, "Error reading CloudFormation template file")
 	}
 
 	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
@@ -49,7 +49,7 @@ func (p *TemplateProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 	parser := NewParser(p.ctx)
 	pastResources, resources, err := parser.parseTemplate(template, usage)
 	if err != nil {
-		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Cloudformation template file")
+		return []*schema.Project{project}, errors.Wrap(err, "Error parsing CloudFormation template file")
 	}
 
 	project.PastResources = pastResources
