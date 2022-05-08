@@ -86,7 +86,7 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 		pctx := config.NewProjectContext(p.ctx.RunContext, &pconfig)
 		h, err := NewHCLProvider(
 			pctx,
-			NewPlanJSONProvider(pctx, p.includePastResources),
+			false,
 			hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
 			hcl.OptionWithWarningFunc(p.ctx.RunContext.NewWarningWriter()),
 		)

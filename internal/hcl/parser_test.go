@@ -44,11 +44,10 @@ data "cats_cat" "the-cats-mother" {
 
 `)
 
-	parser := New(filepath.Dir(path), OptionStopOnHCLError())
-	module, err := parser.ParseDirectory()
-	if err != nil {
-		t.Fatal(err)
-	}
+	parsers, err := LoadParsers(filepath.Dir(path), OptionStopOnHCLError())
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
 
 	blocks := module.Blocks
 	// variable
@@ -127,11 +126,10 @@ output "mod_result" {
 		"module",
 	)
 
-	parser := New(path, OptionStopOnHCLError())
-	rootModule, err := parser.ParseDirectory()
-	if err != nil {
-		t.Fatal(err)
-	}
+	parsers, err := LoadParsers(path, OptionStopOnHCLError())
+	require.NoError(t, err)
+	rootModule, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
 	childModule := rootModule.Modules[0]
 
 	moduleBlocks := rootModule.Blocks.OfType("module")
@@ -186,11 +184,10 @@ output "mod_result" {
 		"",
 	)
 
-	parser := New(path, OptionStopOnHCLError())
-	rootModule, err := parser.ParseDirectory()
-	if err != nil {
-		t.Fatal(err)
-	}
+	parsers, err := LoadParsers(path, OptionStopOnHCLError())
+	require.NoError(t, err)
+	rootModule, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
 	childModule := rootModule.Modules[0]
 
 	moduleBlocks := rootModule.Blocks.OfType("module")
