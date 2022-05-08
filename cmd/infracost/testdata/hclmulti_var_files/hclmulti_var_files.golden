@@ -20,5 +20,4 @@ Project: infracost/infracost/cmd/infracost/testdata/hclmulti_var_files
 ∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
 Err:
-Warning: terraform-plan-flags is deprecated with Terraform HCL parsing, use --terraform-var or --terraform-var-file instead.
 

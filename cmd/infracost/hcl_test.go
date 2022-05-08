@@ -8,14 +8,15 @@ import (
 )
 
 func TestHCLMultiProjectInfra(t *testing.T) {
-	testName := testutil.CalcGoldenFileTestdataDirName()
-	GoldenFileCommandTest(t, testName,
-		[]string{"breakdown", "--log-level", "info", "--config-file", path.Join("./testdata", testName, "infracost.config.yml")}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"breakdown", "--config-file", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName(), "infracost.config.yml")},
+		&GoldenFileOptions{RunHCL: true})
 }
 
 func TestHCLMultiWorkspace(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
-		[]string{"breakdown", "--config-file", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName(), "infracost.config.yml")}, nil)
+		[]string{"breakdown", "--config-file", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName(), "infracost.config.yml")},
+		&GoldenFileOptions{RunHCL: true})
 }
 
 func TestHCLMultiVarFiles(t *testing.T) {
@@ -26,8 +27,7 @@ func TestHCLMultiVarFiles(t *testing.T) {
 			"--terraform-var-file", "var2.tfvars",
 			"--terraform-plan-flags=-var-file=./var1.tfvars -var-file=./var2.tfvars",
 		},
-		nil,
-	)
+		&GoldenFileOptions{RunHCL: true})
 }
 
 func TestHCLProviderAlias(t *testing.T) {
@@ -38,7 +38,7 @@ func TestHCLProviderAlias(t *testing.T) {
 			"breakdown",
 			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 		},
-		&GoldenFileOptions{RunTerraformCLI: true},
+		&GoldenFileOptions{RunHCL: true},
 	)
 }
 
@@ -50,7 +50,7 @@ func TestHCLModuleOutputCounts(t *testing.T) {
 			"breakdown",
 			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 		},
-		&GoldenFileOptions{RunTerraformCLI: true},
+		&GoldenFileOptions{RunHCL: true},
 	)
 }
 
@@ -62,6 +62,6 @@ func TestHCLModuleOutputCountsNested(t *testing.T) {
 			"breakdown",
 			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 		},
-		nil,
+		&GoldenFileOptions{OnlyRunHCL: true},
 	)
 }

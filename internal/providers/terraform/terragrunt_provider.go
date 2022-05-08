@@ -61,11 +61,11 @@ func NewTerragruntProvider(ctx *config.ProjectContext, includePastResources bool
 }
 
 func (p *TerragruntProvider) Type() string {
-	return "terragrunt_cli"
+	return "terragrunt"
 }
 
 func (p *TerragruntProvider) DisplayType() string {
-	return "Terragrunt CLI"
+	return "Terragrunt directory"
 }
 
 func (p *TerragruntProvider) AddMetadata(metadata *schema.ProjectMetadata) {
