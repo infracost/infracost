@@ -12,6 +12,9 @@
               "type": "aws_ecs_task_definition",
               "name": "ecs_task",
               "index": 0,
+              "infracost_metadata": {
+                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
+              },
               "schema_version": 0,
               "values": {
                 "arn": "task-1-arn",
@@ -37,6 +40,9 @@
               "type": "aws_ecs_service",
               "name": "ecs_service",
               "index": 0,
+              "infracost_metadata": {
+                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
+              },
               "schema_version": 0,
               "values": {
                 "arn": "svc-1-arn",
@@ -58,6 +64,9 @@
                   "type": "aws_ecs_task_definition",
                   "name": "ecs_task",
                   "index": 0,
+                  "infracost_metadata": {
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
+                  },
                   "schema_version": 0,
                   "values": {
                     "arn": "task-2-arn",
@@ -83,6 +92,9 @@
                   "type": "aws_ecs_service",
                   "name": "ecs_service",
                   "index": 0,
+                  "infracost_metadata": {
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
+                  },
                   "schema_version": 0,
                   "values": {
                     "arn": "svc-2-arn",

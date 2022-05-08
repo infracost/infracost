@@ -157,15 +157,18 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			pathName := strings.ReplaceAll(strings.ToLower(tt.name), " ", "_")
 			testPath := path.Join("testdata/hcl_provider_test", pathName)
 
-			p := HCLProvider{
-				Parser: hcl.New(
-					testPath,
-					hcl.OptionWithBlockBuilder(
-						hcl.BlockBuilder{SetAttributes: []hcl.SetAttributesFunc{setMockAttributes(tt.attrs)}},
-					),
+			parsers, err := hcl.LoadParsers(
+				testPath,
+				hcl.OptionWithBlockBuilder(
+					hcl.BlockBuilder{SetAttributes: []hcl.SetAttributesFunc{setMockAttributes(tt.attrs)}},
 				),
+			)
+			require.NoError(t, err)
+
+			p := HCLProvider{
+				Parsers: parsers,
 			}
-			got, err := p.LoadPlanJSON()
+			got, err := p.LoadPlanJSONs()
 			require.NoError(t, err)
 
 			tmpl, err := template.ParseFiles(path.Join(testPath, "expected.json"))
@@ -176,7 +179,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			require.NoError(t, err)
 
 			expected := exp.String()
-			actual := string(got)
+			actual := string(got[0].json)
 			assert.JSONEq(t, expected, actual)
 		})
 	}

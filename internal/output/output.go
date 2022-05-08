@@ -288,9 +288,16 @@ func outputResource(r *schema.Resource) Resource {
 		subresources = append(subresources, outputResource(s))
 	}
 
+	metadata := make(map[string]string)
+	if r.InfracostMetadata != nil {
+		for k, v := range r.InfracostMetadata {
+			metadata["infracost_"+k] = v.String()
+		}
+	}
+
 	return Resource{
 		Name:           r.Name,
-		Metadata:       map[string]string{},
+		Metadata:       metadata,
 		Tags:           r.Tags,
 		HourlyCost:     r.HourlyCost,
 		MonthlyCost:    r.MonthlyCost,

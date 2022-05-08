@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
@@ -13,14 +14,17 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 type HCLProvider struct {
-	Parser   *hcl.Parser
-	Provider *PlanJSONProvider
+	Parsers        []*hcl.Parser
+	PlanJSONParser *Parser
 
-	schema      *PlanSchema
-	providerKey string
+	schema          *PlanSchema
+	providerKey     string
+	ctx             *config.ProjectContext
+	suppressLogging bool
 }
 
 type flagStringSlice []string
@@ -82,7 +86,7 @@ func findRemoteHostAndToken(ctx *config.ProjectContext) (string, string, error) 
 // NewHCLProvider returns a HCLProvider with a hcl.Parser initialised using the config.ProjectContext.
 // It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
 // set input vars and files on the underlying hcl.Parser.
-func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider, opts ...hcl.Option) (*HCLProvider, error) {
+func NewHCLProvider(ctx *config.ProjectContext, suppressLogging bool, opts ...hcl.Option) (*HCLProvider, error) {
 	v, err := varsFromPlanFlags(ctx.ProjectConfig.TerraformPlanFlags)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse vars from plan flags %w", err)
@@ -114,38 +118,94 @@ func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider, opts
 		options = append(options, hcl.OptionWithRemoteVarLoader(host, token, localWorkspace))
 	}
 
-	p := hcl.New(ctx.ProjectConfig.Path, options...)
+	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, options...)
+	if err != nil {
+		return nil, err
+	}
 
 	return &HCLProvider{
-		Parser:   p,
-		Provider: provider,
+		Parsers:         parsers,
+		PlanJSONParser:  NewParser(ctx, false),
+		ctx:             ctx,
+		suppressLogging: suppressLogging,
 	}, err
 }
 
-func (p *HCLProvider) Type() string                                 { return "terraform_dir" }
-func (p *HCLProvider) DisplayType() string                          { return "Terraform directory" }
-func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {}
+func (p *HCLProvider) Type() string        { return "terraform_dir" }
+func (p *HCLProvider) DisplayType() string { return "Terraform directory" }
+func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
+}
 
 // LoadResources calls a hcl.Parser to parse the directory config files into hcl.Blocks. It then builds a shallow
 // representation of the terraform plan JSON files from these Blocks, this is passed to the PlanJSONProvider.
 // The PlanJSONProvider uses this shallow representation to actually load Infracost resources.
 func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
-	b, err := p.LoadPlanJSON()
+	jsons, err := p.LoadPlanJSONs()
 	if err != nil {
 		return nil, err
 	}
 
-	return p.Provider.LoadResourcesFromSrc(usage, b, nil)
+	var projects = make([]*schema.Project, len(jsons))
+	for i, j := range jsons {
+		project, err := p.parseResources(j.path, j.json, usage)
+		if err != nil {
+			return nil, err
+		}
+
+		projects[i] = project
+	}
+
+	return projects, nil
 }
 
-// LoadPlanJSON parses the provided directory and returns it as a Terraform Plan JSON.
-func (p *HCLProvider) LoadPlanJSON() ([]byte, error) {
-	rootModule, err := p.Parser.ParseDirectory()
+func (p *HCLProvider) parseResources(path string, j []byte, usage map[string]*schema.UsageData) (*schema.Project, error) {
+	metadata := config.DetectProjectMetadata(path)
+	metadata.Type = p.Type()
+	p.AddMetadata(metadata)
+	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+
+	project := schema.NewProject(name, metadata)
+
+	pastResources, resources, err := p.PlanJSONParser.parseJSON(j, usage)
 	if err != nil {
-		return nil, err
+		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
 
-	return p.modulesToPlanJSON(rootModule)
+	project.PastResources = pastResources
+	project.Resources = resources
+
+	return project, nil
+}
+
+type hclProject struct {
+	path string
+	json []byte
+}
+
+// LoadPlanJSONs parses the provided directory and returns it as a Terraform Plan JSON.
+func (p *HCLProvider) LoadPlanJSONs() ([]hclProject, error) {
+	var jsons = make([]hclProject, len(p.Parsers))
+
+	for i, parser := range p.Parsers {
+		if len(p.Parsers) > 1 && !p.suppressLogging {
+			fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
+		}
+
+		module, err := parser.ParseDirectory()
+		if err != nil {
+			return nil, err
+		}
+
+		b, err := p.modulesToPlanJSON(module)
+		if err != nil {
+			return nil, err
+		}
+
+		jsons[i] = hclProject{json: b, path: module.RootPath}
+	}
+
+	return jsons, nil
 }
 
 func (p *HCLProvider) newPlanSchema() {
@@ -248,6 +308,9 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 		Name:          stripCount(block.NameLabel()),
 		Index:         block.Index(),
 		SchemaVersion: 0,
+		InfracostMetadata: map[string]interface{}{
+			"filename": block.Filename,
+		},
 	}
 
 	changes := ResourceChangesJSON{
@@ -461,13 +524,14 @@ type ResourceOutput struct {
 }
 
 type ResourceJSON struct {
-	Address       string                 `json:"address"`
-	Mode          string                 `json:"mode"`
-	Type          string                 `json:"type"`
-	Name          string                 `json:"name"`
-	Index         *int64                 `json:"index,omitempty"`
-	SchemaVersion int                    `json:"schema_version"`
-	Values        map[string]interface{} `json:"values"`
+	Address           string                 `json:"address"`
+	Mode              string                 `json:"mode"`
+	Type              string                 `json:"type"`
+	Name              string                 `json:"name"`
+	Index             *int64                 `json:"index,omitempty"`
+	SchemaVersion     int                    `json:"schema_version"`
+	Values            map[string]interface{} `json:"values"`
+	InfracostMetadata map[string]interface{} `json:"infracost_metadata"`
 }
 
 type ResourceChangesJSON struct {

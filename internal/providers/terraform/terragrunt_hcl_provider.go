@@ -2,8 +2,11 @@ package terraform
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/gruntwork-io/terragrunt/aws_helper"
 	tgcli "github.com/gruntwork-io/terragrunt/cli"
@@ -13,11 +16,8 @@ import (
 	tgerrors "github.com/gruntwork-io/terragrunt/errors"
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	"github.com/gruntwork-io/terragrunt/util"
-	"github.com/infracost/infracost/internal/hcl"
 
-	"os"
-	"path/filepath"
-	"time"
+	"github.com/infracost/infracost/internal/hcl"
 
 	"github.com/hashicorp/go-getter"
 
@@ -86,7 +86,7 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 		pctx := config.NewProjectContext(p.ctx.RunContext, &pconfig)
 		h, err := NewHCLProvider(
 			pctx,
-			NewPlanJSONProvider(pctx, p.includePastResources),
+			false,
 			hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
 			hcl.OptionWithWarningFunc(p.ctx.RunContext.NewWarningWriter()),
 		)
