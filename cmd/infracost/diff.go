@@ -11,6 +11,7 @@ import (
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/providers"
 	"github.com/infracost/infracost/internal/ui"
 )
 
@@ -126,8 +127,9 @@ func checkDiffConfig(cfg *config.Config) error {
 			return errors.New("terraform_use_state cannot be used with `infracost diff` as the Terraform state only contains the current state")
 		}
 
-		if projectConfig.TerraformParseHCL && cfg.CompareTo == "" {
-			return errors.New("Use `infracost diff --path /code --terraform-parse-hcl --compare-to infracost-previous-run.json` to generate a diff")
+		projectType := providers.DetectProjectType(projectConfig.Path, projectConfig.TerraformForceCLI)
+		if (projectType == "terraform_dir" || projectType == "terragrunt_dir") && cfg.CompareTo == "" {
+			return errors.New("Use `infracost diff --path /code --compare-to infracost-previous-run.json` to generate a diff")
 		}
 	}
 
