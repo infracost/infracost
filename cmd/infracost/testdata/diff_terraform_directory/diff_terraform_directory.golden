@@ -1,43 +1,43 @@
+Project: infracost/infracost/examples/terraform
+
++ aws_instance.web_app
+  +$743
+
+    + Instance usage (Linux/UNIX, on-demand, m5.4xlarge)
+      +$561
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$5.00
+
+    + ebs_block_device[0]
+    
+        + Storage (provisioned IOPS SSD, io1)
+          +$125
+    
+        + Provisioned IOPS
+          +$52.00
+
++ aws_lambda_function.hello_world
+  Monthly cost depends on usage
+
+    + Requests
+      Monthly cost depends on usage
+        +$0.20 per 1M requests
+
+    + Duration
+      Monthly cost depends on usage
+        +$0.0000166667 per GB-seconds
+
+Monthly cost change for infracost/infracost/examples/terraform
+Amount:  +$743 ($0.00 → $743)
+
+──────────────────────────────────
+Key: ~ changed, + added, - removed
+
+2 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
 Err:
-Show diff of monthly costs between current and planned state
 
-USAGE
-  infracost diff [flags]
-
-EXAMPLES
-  Use Terraform directory with any required flags:
-
-      infracost breakdown --path /code --format json --out-file infracost-run.json
-      # Make some changes to your Terraform project
-      infracost diff --path /code --terraform-var-file my.tfvars --compare-to infracost-run.json
-
-  Use Terraform plan JSON:
-
-      terraform plan -out tfplan.binary
-      terraform show -json tfplan.binary > plan.json
-      infracost diff --path plan.json
-
-FLAGS
-      --compare-to string             Path to Infracost JSON file to compare against
-      --config-file string            Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags
-      --format string                 Output format: json, diff (default "diff")
-  -h, --help                          help for diff
-      --no-cache                      Don't attempt to cache Terraform plans
-      --out-file string               Save output to a file
-  -p, --path string                   Path to the Terraform directory or JSON/plan file
-      --project-type string           Override the project type: terraform_dir, terragrunt_dir, terraform_plan_json, terraform_plan_binary, terraform_cli, terragrunt_cli, terraform_state_json, cloudformation
-      --show-skipped                  List unsupported and free resources
-      --sync-usage-file               Sync usage-file with missing resources, needs usage-file too (experimental)
-      --terraform-init-flags string   Flags to pass to 'terraform init'. Applicable with terraform_cli project type
-      --terraform-plan-flags string   Flags to pass to 'terraform plan'. Applicable with terraform_cli project type
-      --terraform-var strings         Set value for an input variable, similar to Terraform's -var flag. Applicable with terragrunt_dir project type
-      --terraform-var-file strings    Load variable files, similar to Terraform's -var-file flag. Applicable with terragrunt_dir project type
-      --terraform-workspace string    Terraform workspace to use. Applicable with terraform_cli project type
-      --usage-file string             Path to Infracost usage file that specifies values for usage-based resources
-
-GLOBAL FLAGS
-      --log-level string   Log level (trace, debug, info, warn, error, fatal)
-      --no-color           Turn off colored output
-
-Error: Use `infracost diff --path /code --compare-to infracost-previous-run.json` to generate a diff
