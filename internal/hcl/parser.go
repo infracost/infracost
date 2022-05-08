@@ -3,7 +3,6 @@ package hcl
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -177,9 +176,24 @@ type Parser struct {
 	remoteVariablesLoader *RemoteVariablesLoader
 }
 
-// New creates a new Parser with the provided options, it inits the workspace as under the default name
-// this can be changed using Option.
-func New(initialPath string, options ...Option) *Parser {
+// LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
+// in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
+// the initialPath contains Terraform files at the top level Parsers will be len 1.
+func LoadParsers(initialPath string, options ...Option) ([]*Parser, error) {
+	rootPaths := findRootModules(initialPath, 0)
+	if len(rootPaths) == 0 {
+		return nil, errors.New("No valid Terraform files found given path, try a different directory")
+	}
+
+	var parsers = make([]*Parser, len(rootPaths))
+	for i, rootPath := range rootPaths {
+		parsers[i] = newParser(rootPath, options)
+	}
+
+	return parsers, nil
+}
+
+func newParser(initialPath string, options []Option) *Parser {
 	p := &Parser{
 		initialPath:   initialPath,
 		workspaceName: "default",
@@ -218,6 +232,7 @@ func New(initialPath string, options ...Option) *Parser {
 	}
 
 	p.moduleLoader = modules.NewModuleLoader(initialPath, loaderOpts...)
+
 	return p
 }
 
@@ -228,6 +243,11 @@ func New(initialPath string, options ...Option) *Parser {
 // ParseDirectory returns the root Module that represents the top of the Terraform Config tree.
 func (p *Parser) ParseDirectory() (*Module, error) {
 	log.Debugf("Beginning parse for directory '%s'...", p.initialPath)
+
+	rootPaths := findRootModules(p.initialPath, 0)
+	if len(rootPaths) == 0 {
+		return nil, errors.New("No valid terraform files found given path, try a different directory")
+	}
 
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
@@ -302,11 +322,16 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 	return root, nil
 }
 
-func (p *Parser) parseDirectoryFiles(files []*hcl.File) (Blocks, error) {
+// Path returns the full path that the parser runs within.
+func (p *Parser) Path() string {
+	return p.initialPath
+}
+
+func (p *Parser) parseDirectoryFiles(files []file) (Blocks, error) {
 	var blocks Blocks
 
 	for _, file := range files {
-		fileBlocks, err := loadBlocksFromFile(file)
+		fileBlocks, err := loadBlocksFromFile(file, nil)
 		if err != nil {
 			if p.stopOnHCLError {
 				return nil, err
@@ -323,7 +348,7 @@ func (p *Parser) parseDirectoryFiles(files []*hcl.File) (Blocks, error) {
 		for _, fileBlock := range fileBlocks {
 			blocks = append(
 				blocks,
-				p.blockBuilder.NewBlock(fileBlock, nil, nil),
+				p.blockBuilder.NewBlock(file.path, fileBlock, nil, nil),
 			)
 		}
 	}
@@ -409,10 +434,15 @@ func loadVarFile(filename string) (map[string]cty.Value, error) {
 	return inputVars, nil
 }
 
-func loadDirectory(fullPath string, stopOnHCLError bool) ([]*hcl.File, error) {
+type file struct {
+	path    string
+	hclFile *hcl.File
+}
+
+func loadDirectory(fullPath string, stopOnHCLError bool) ([]file, error) {
 	hclParser := hclparse.NewParser()
 
-	fileInfos, err := ioutil.ReadDir(fullPath)
+	fileInfos, err := os.ReadDir(fullPath)
 	if err != nil {
 		return nil, err
 	}
@@ -448,10 +478,85 @@ func loadDirectory(fullPath string, stopOnHCLError bool) ([]*hcl.File, error) {
 		}
 	}
 
-	files := make([]*hcl.File, 0, len(hclParser.Files()))
-	for _, file := range hclParser.Files() {
-		files = append(files, file)
+	files := make([]file, 0, len(hclParser.Files()))
+	for filename, f := range hclParser.Files() {
+		files = append(files, file{hclFile: f, path: filename})
 	}
 
 	return files, nil
+}
+
+var maxSearchLevel = 2
+
+func findRootModules(fullPath string, level int) []string {
+	if level >= maxSearchLevel {
+		return nil
+	}
+
+	hclParser := hclparse.NewParser()
+
+	fileInfos, err := os.ReadDir(fullPath)
+	if err != nil {
+		return nil
+	}
+
+	var dirs []string
+	for _, info := range fileInfos {
+		if info.IsDir() {
+			continue
+		}
+
+		var parseFunc func(filename string) (*hcl.File, hcl.Diagnostics)
+		if strings.HasSuffix(info.Name(), ".tf") {
+			parseFunc = hclParser.ParseHCLFile
+		}
+
+		if strings.HasSuffix(info.Name(), ".tf.json") {
+			parseFunc = hclParser.ParseJSONFile
+		}
+
+		if parseFunc == nil {
+			continue
+		}
+
+		path := filepath.Join(fullPath, info.Name())
+		_, diag := parseFunc(path)
+		if diag != nil && diag.HasErrors() {
+			log.Warnf("skipping file: %s hcl parsing err: %s", path, diag.Error())
+			continue
+		}
+	}
+
+	files := hclParser.Files()
+
+	// if there are Terraform files at the top level then use this as the root module, no need to search for provider blocks.
+	if level == 0 && len(files) > 0 {
+		return []string{fullPath}
+	}
+
+	for _, file := range files {
+		body, _, diags := file.Body.PartialContent(justProviderBlocks)
+		if diags != nil && diags.HasErrors() {
+			continue
+		}
+
+		if len(body.Blocks) > 0 {
+			return []string{fullPath}
+		}
+	}
+
+	for _, info := range fileInfos {
+		if info.IsDir() {
+			if strings.HasPrefix(info.Name(), ".") {
+				continue
+			}
+
+			childDirs := findRootModules(filepath.Join(fullPath, info.Name()), level+1)
+			if len(childDirs) > 0 {
+				dirs = append(dirs, childDirs...)
+			}
+		}
+	}
+
+	return dirs
 }

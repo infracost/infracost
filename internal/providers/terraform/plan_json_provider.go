@@ -50,10 +50,15 @@ func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 		return []*schema.Project{}, fmt.Errorf("Error reading Terraform plan JSON file %w", err)
 	}
 
-	return p.LoadResourcesFromSrc(usage, j, spinner)
+	project, err := p.LoadResourcesFromSrc(usage, j, spinner)
+	if err != nil {
+		return nil, err
+	}
+
+	return []*schema.Project{project}, nil
 }
 
-func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageData, j []byte, spinner *ui.Spinner) ([]*schema.Project, error) {
+func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageData, j []byte, spinner *ui.Spinner) (*schema.Project, error) {
 	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
@@ -64,7 +69,7 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageDa
 
 	pastResources, resources, err := parser.parseJSON(j, usage)
 	if err != nil {
-		return []*schema.Project{project}, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
+		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
 
 	project.PastResources = pastResources
@@ -73,5 +78,5 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageDa
 	if spinner != nil {
 		spinner.Success()
 	}
-	return []*schema.Project{project}, nil
+	return project, nil
 }

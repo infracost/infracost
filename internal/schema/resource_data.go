@@ -17,6 +17,7 @@ type ResourceData struct {
 	referencesMap map[string][]*ResourceData
 	CFResource    cloudformation.Resource
 	UsageData     *UsageData
+	Metadata      map[string]gjson.Result
 }
 
 func NewResourceData(resourceType string, providerName string, address string, tags map[string]string, rawValues gjson.Result) *ResourceData {

@@ -44,6 +44,19 @@ func TestBreakdownTerraformDirectory(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform"}, &GoldenFileOptions{RunTerraformCLI: true})
 }
 
+func TestBreakdownMultiProjectAutodetect(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, nil,
+	)
+}
+
 func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)

@@ -9,6 +9,9 @@
           "mode": "managed",
           "type": "aws_vpn_connection",
           "name": "example",
+          "infracost_metadata": {
+            "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf"
+          },
           "schema_version": 0,
           "values": {
             "arn": "vpn-arn",
@@ -27,6 +30,9 @@
               "mode": "managed",
               "type": "aws_ec2_transit_gateway",
               "name": "example",
+              "infracost_metadata": {
+                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+              },
               "schema_version": 0,
               "values": {
                 "arn": "t-gw-arn",
@@ -38,6 +44,9 @@
               "mode": "managed",
               "type": "aws_customer_gateway",
               "name": "example",
+              "infracost_metadata": {
+                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+              },
               "schema_version": 0,
               "values": {
                 "arn": "c-gw-arn",

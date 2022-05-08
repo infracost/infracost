@@ -56,7 +56,7 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 	case "terraform_dir":
 		h, providerErr := terraform.NewHCLProvider(
 			ctx,
-			terraform.NewPlanJSONProvider(ctx, includePastResources),
+			false,
 			hcl.OptionWithSpinner(ctx.RunContext.NewSpinner),
 			hcl.OptionWithWarningFunc(ctx.RunContext.NewWarningWriter()),
 		)
@@ -140,14 +140,11 @@ func DetectProjectType(path string, forceCLI bool) string {
 		return "terragrunt_dir"
 	}
 
-	if isTerraformDir(path) {
-		if forceCLI {
-			return "terraform_cli"
-		}
-		return "terraform_dir"
+	if forceCLI {
+		return "terraform_cli"
 	}
 
-	return ""
+	return "terraform_dir"
 }
 
 func isTerraformPlanJSON(path string) bool {

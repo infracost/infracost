@@ -371,6 +371,10 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	}
 
 	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(ctx.ProjectConfig.Path))
+	if provider.Type() == "terraform_dir" {
+		m = fmt.Sprintf("Evaluting %s at %s", provider.DisplayType(), ui.DisplayPath(ctx.ProjectConfig.Path))
+	}
+
 	if r.runCtx.Config.IsLogging() {
 		log.Info(m)
 	} else {
@@ -531,7 +535,7 @@ func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectC
 
 	t1 := time.Now()
 
-	hclProvider, err := terraform.NewHCLProvider(ctx, terraform.NewPlanJSONProvider(ctx, r.prior == nil))
+	hclProvider, err := terraform.NewHCLProvider(ctx, true)
 	if err != nil {
 		log.Debugf("Could not init HCL provider: %s", err)
 		return

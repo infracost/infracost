@@ -60,12 +60,13 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
 		if registryItem.NoPrice {
 			return &schema.Resource{
-				Name:         d.Address,
-				ResourceType: d.Type,
-				Tags:         d.Tags,
-				IsSkipped:    true,
-				NoPrice:      true,
-				SkipMessage:  "Free resource.",
+				Name:              d.Address,
+				ResourceType:      d.Type,
+				Tags:              d.Tags,
+				IsSkipped:         true,
+				NoPrice:           true,
+				SkipMessage:       "Free resource.",
+				InfracostMetadata: d.Metadata,
 			}
 		}
 
@@ -73,6 +74,8 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 		if res != nil {
 			res.ResourceType = d.Type
 			res.Tags = d.Tags
+			res.InfracostMetadata = d.Metadata
+
 			if u != nil {
 				res.EstimationSummary = u.CalcEstimationSummary()
 			}
@@ -81,11 +84,12 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 
 	return &schema.Resource{
-		Name:         d.Address,
-		ResourceType: d.Type,
-		Tags:         d.Tags,
-		IsSkipped:    true,
-		SkipMessage:  "This resource is not currently supported",
+		Name:              d.Address,
+		ResourceType:      d.Type,
+		Tags:              d.Tags,
+		IsSkipped:         true,
+		SkipMessage:       "This resource is not currently supported",
+		InfracostMetadata: d.Metadata,
 	}
 }
 
@@ -268,7 +272,9 @@ func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Re
 
 		tags := parseTags(t, v)
 
-		resources[addr] = schema.NewResourceData(t, provider, addr, tags, v)
+		data := schema.NewResourceData(t, provider, addr, tags, v)
+		data.Metadata = r.Get("infracost_metadata").Map()
+		resources[addr] = data
 	}
 
 	// Recursively add any resources for child modules
