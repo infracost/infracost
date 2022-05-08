@@ -32,11 +32,11 @@ func NewPlanProvider(ctx *config.ProjectContext, includePastResources bool) sche
 }
 
 func (p *PlanProvider) Type() string {
-	return "terraform_plan_binary"
+	return "terraform_plan"
 }
 
 func (p *PlanProvider) DisplayType() string {
-	return "Terraform plan binary file"
+	return "Terraform plan file"
 }
 
 func (p *PlanProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {

@@ -122,8 +122,8 @@ func NewHCLProvider(ctx *config.ProjectContext, provider *PlanJSONProvider, opts
 	}, err
 }
 
-func (p *HCLProvider) Type() string                                 { return "terraform_dir" }
-func (p *HCLProvider) DisplayType() string                          { return "Terraform directory" }
+func (p *HCLProvider) Type() string                                 { return "terraform_hcl" }
+func (p *HCLProvider) DisplayType() string                          { return "Terraform directory (HCL)" }
 func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {}
 
 // LoadResources calls a hcl.Parser to parse the directory config files into hcl.Blocks. It then builds a shallow

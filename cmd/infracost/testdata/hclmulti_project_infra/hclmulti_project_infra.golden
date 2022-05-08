@@ -1,0 +1,119 @@
+Project: infracost/infracost/cmd/infracost/testdata/hclmulti_project_infra/dev
+
+ Name                                                            Monthly Qty  Unit                    Monthly Cost 
+                                                                                                                   
+ module.back_api.aws_db_instance.back_api_db                                                                       
+ ├─ Database instance (on-demand, Single-AZ, db.t3.micro)                730  hours                         $12.41 
+ ├─ Storage (general purpose SSD, gp2)                                    20  GB                             $2.30 
+ └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB            
+                                                                                                                   
+ module.back_api.aws_s3_bucket.back_api_db_data                                                                    
+ └─ Standard                                                                                                       
+    ├─ Storage                                             Monthly cost depends on usage: $0.023 per GB            
+    ├─ PUT, COPY, POST, LIST requests                      Monthly cost depends on usage: $0.005 per 1k requests   
+    ├─ GET, SELECT, and all other requests                 Monthly cost depends on usage: $0.0004 per 1k requests  
+    ├─ Select data scanned                                 Monthly cost depends on usage: $0.002 per GB            
+    └─ Select data returned                                Monthly cost depends on usage: $0.0007 per GB           
+                                                                                                                   
+ module.base.module.vpc.aws_eip.nat[0]                                                                             
+ └─ IP address (if unused)                                               730  hours                          $3.65 
+                                                                                                                   
+ module.base.module.vpc.aws_nat_gateway.this[0]                                                                    
+ ├─ NAT gateway                                                          730  hours                         $32.85 
+ └─ Data processed                                         Monthly cost depends on usage: $0.045 per GB            
+                                                                                                                   
+ module.front.aws_cloudfront_distribution.front_web                                                                
+ ├─ Invalidation requests (first 1k)                       Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                             
+    ├─ Data transfer out to internet (first 10TB)          Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                         Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                       Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                      Monthly cost depends on usage: $0.01 per 10k requests   
+                                                                                                                   
+ module.front.aws_db_instance.front                                                                                
+ ├─ Database instance (on-demand, Single-AZ, db.t3.small)                730  hours                         $24.82 
+ └─ Storage (general purpose SSD, gp2)                                   100  GB                            $11.50 
+                                                                                                                   
+ module.front.aws_dynamodb_table.sessions                                                                          
+ ├─ Write capacity unit (WCU)                                             50  WCU                           $23.73 
+ ├─ Read capacity unit (RCU)                                              50  RCU                            $4.75 
+ ├─ Data storage                                           Monthly cost depends on usage: $0.25 per GB             
+ ├─ Point-In-Time Recovery (PITR) backup storage           Monthly cost depends on usage: $0.20 per GB             
+ ├─ On-demand backup storage                               Monthly cost depends on usage: $0.10 per GB             
+ ├─ Table data restored                                    Monthly cost depends on usage: $0.15 per GB             
+ └─ Streams read request unit (sRRU)                       Monthly cost depends on usage: $0.0000002 per sRRUs     
+                                                                                                                   
+ module.front.aws_s3_bucket.front_web                                                                              
+ └─ Standard                                                                                                       
+    ├─ Storage                                             Monthly cost depends on usage: $0.023 per GB            
+    ├─ PUT, COPY, POST, LIST requests                      Monthly cost depends on usage: $0.005 per 1k requests   
+    ├─ GET, SELECT, and all other requests                 Monthly cost depends on usage: $0.0004 per 1k requests  
+    ├─ Select data scanned                                 Monthly cost depends on usage: $0.002 per GB            
+    └─ Select data returned                                Monthly cost depends on usage: $0.0007 per GB           
+                                                                                                                   
+ Project total                                                                                             $116.00 
+
+──────────────────────────────────
+Project: infracost/infracost/cmd/infracost/testdata/hclmulti_project_infra/prod
+
+ Name                                                            Monthly Qty  Unit                    Monthly Cost 
+                                                                                                                   
+ module.back_api.aws_db_instance.back_api_db                                                                       
+ ├─ Database instance (on-demand, Multi-AZ, db.t3.small)                 730  hours                         $49.64 
+ ├─ Storage (general purpose SSD, gp2)                                    20  GB                             $4.60 
+ └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB            
+                                                                                                                   
+ module.back_api.aws_s3_bucket.back_api_db_data                                                                    
+ └─ Standard                                                                                                       
+    ├─ Storage                                             Monthly cost depends on usage: $0.023 per GB            
+    ├─ PUT, COPY, POST, LIST requests                      Monthly cost depends on usage: $0.005 per 1k requests   
+    ├─ GET, SELECT, and all other requests                 Monthly cost depends on usage: $0.0004 per 1k requests  
+    ├─ Select data scanned                                 Monthly cost depends on usage: $0.002 per GB            
+    └─ Select data returned                                Monthly cost depends on usage: $0.0007 per GB           
+                                                                                                                   
+ module.base.module.vpc.aws_eip.nat[0]                                                                             
+ └─ IP address (if unused)                                               730  hours                          $3.65 
+                                                                                                                   
+ module.base.module.vpc.aws_nat_gateway.this[0]                                                                    
+ ├─ NAT gateway                                                          730  hours                         $32.85 
+ └─ Data processed                                         Monthly cost depends on usage: $0.045 per GB            
+                                                                                                                   
+ module.front.aws_cloudfront_distribution.front_web                                                                
+ ├─ Invalidation requests (first 1k)                       Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                             
+    ├─ Data transfer out to internet (first 10TB)          Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                         Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                       Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                      Monthly cost depends on usage: $0.01 per 10k requests   
+                                                                                                                   
+ module.front.aws_db_instance.front                                                                                
+ ├─ Database instance (on-demand, Single-AZ, db.t3.small)                730  hours                         $24.82 
+ └─ Storage (general purpose SSD, gp2)                                   100  GB                            $11.50 
+                                                                                                                   
+ module.front.aws_dynamodb_table.sessions                                                                          
+ ├─ Write capacity unit (WCU)                                             50  WCU                           $23.73 
+ ├─ Read capacity unit (RCU)                                              50  RCU                            $4.75 
+ ├─ Data storage                                           Monthly cost depends on usage: $0.25 per GB             
+ ├─ Point-In-Time Recovery (PITR) backup storage           Monthly cost depends on usage: $0.20 per GB             
+ ├─ On-demand backup storage                               Monthly cost depends on usage: $0.10 per GB             
+ ├─ Table data restored                                    Monthly cost depends on usage: $0.15 per GB             
+ └─ Streams read request unit (sRRU)                       Monthly cost depends on usage: $0.0000002 per sRRUs     
+                                                                                                                   
+ module.front.aws_s3_bucket.front_web                                                                              
+ └─ Standard                                                                                                       
+    ├─ Storage                                             Monthly cost depends on usage: $0.023 per GB            
+    ├─ PUT, COPY, POST, LIST requests                      Monthly cost depends on usage: $0.005 per 1k requests   
+    ├─ GET, SELECT, and all other requests                 Monthly cost depends on usage: $0.0004 per 1k requests  
+    ├─ Select data scanned                                 Monthly cost depends on usage: $0.002 per GB            
+    └─ Select data returned                                Monthly cost depends on usage: $0.0007 per GB           
+                                                                                                                   
+ Project total                                                                                             $155.53 
+
+ OVERALL TOTAL                                                                                             $271.53 
+──────────────────────────────────
+46 cloud resources were detected:
+∙ 16 were estimated, 14 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 30 were free, rerun with --show-skipped to see details
+
+Err:
+

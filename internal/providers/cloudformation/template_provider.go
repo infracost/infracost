@@ -23,11 +23,11 @@ func NewTemplateProvider(ctx *config.ProjectContext, includePastResources bool) 
 }
 
 func (p *TemplateProvider) Type() string {
-	return "cloudformation"
+	return "cloudformation_state_json"
 }
 
 func (p *TemplateProvider) DisplayType() string {
-	return "Cloudformation"
+	return "Cloudformation state JSON file"
 }
 
 func (p *TemplateProvider) AddMetadata(metadata *schema.ProjectMetadata) {

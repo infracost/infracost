@@ -21,11 +21,10 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/clierror"
-	"github.com/infracost/infracost/internal/hcl"
-	"github.com/infracost/infracost/internal/ui"
-
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 type TerragruntHCLProvider struct {
@@ -45,11 +44,11 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 }
 
 func (p *TerragruntHCLProvider) Type() string {
-	return "terragrunt_dir"
+	return "terragrunt_hcl"
 }
 
 func (p *TerragruntHCLProvider) DisplayType() string {
-	return "Terragrunt directory"
+	return "Terragrunt directory (HCL)"
 }
 
 func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
@@ -102,10 +101,10 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 		}
 
 		for _, project := range projects {
-			project.Metadata = config.DetectProjectMetadata(di.ConfigDir)
-			project.Metadata.Type = p.Type()
-			p.AddMetadata(project.Metadata)
-			project.Name = schema.GenerateProjectName(project.Metadata, p.ctx.RunContext.Config.EnableDashboard)
+			metadata := config.DetectProjectMetadata(di.ConfigDir)
+			metadata.Type = p.Type()
+			p.AddMetadata(metadata)
+			project.Name = schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
 			allProjects = append(allProjects, project)
 		}
 	}
@@ -261,6 +260,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(terragruntOptions *tgoptions.Terra
 			return &terragruntWorkingDirInfo{ConfigDir: terragruntOptions.WorkingDir, WorkingDir: updatedTerragruntOptions.WorkingDir, Inputs: terragruntConfig.Inputs}, nil
 		}
 	}
+
 	return &terragruntWorkingDirInfo{ConfigDir: terragruntOptions.WorkingDir, WorkingDir: terragruntOptions.WorkingDir, Inputs: terragruntConfig.Inputs}, nil
 }
 
