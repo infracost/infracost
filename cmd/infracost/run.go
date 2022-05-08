@@ -49,16 +49,16 @@ type hclRunDiff struct {
 }
 
 func addRunFlags(cmd *cobra.Command) {
-	cmd.Flags().Bool("terraform-parse-hcl", false, "Parse HCL code instead of generating a Terraform plan. This does not need credentials and is faster (experimental)")
-	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform’s -var-file flag. Applicable with --terraform-parse-hcl (experimental)")
-	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform’s -var flag. Applicable with --terraform-parse-hcl (experimental)")
+	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform's -var-file flag.")
+	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform's -var flag.")
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
 
 	cmd.Flags().String("config-file", "", "Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
 
-	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable when path is a Terraform directory")
-	cmd.Flags().String("terraform-init-flags", "", "Flags to pass to 'terraform init'. Applicable when path is a Terraform directory")
+	cmd.Flags().Bool("terraform-force-cli", false, "Generate the Terraform plan JSON using the Terraform CLI. This may require cloud credentials.")
+	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable with --terraform-force-cli")
+	cmd.Flags().String("terraform-init-flags", "", "Flags to pass to 'terraform init'. Applicable with --terraform-force-cli")
 	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
 
 	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
@@ -70,6 +70,11 @@ func addRunFlags(cmd *cobra.Command) {
 	_ = cmd.MarkFlagFilename("path", "json", "tf")
 	_ = cmd.MarkFlagFilename("config-file", "yml")
 	_ = cmd.MarkFlagFilename("usage-file", "yml")
+
+	_ = cmd.Flags().MarkHidden("terraform-force-cli")
+	// These are deprecated and will show a warning if used without --terraform-force-cli
+	_ = cmd.Flags().MarkHidden("terraform-plan-flags")
+	_ = cmd.Flags().MarkHidden("terraform-init-flags")
 }
 
 // panicError is used to collect goroutine panics into an error interface so
@@ -693,11 +698,11 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasProjectFlags {
 		projectCfg.Path, _ = cmd.Flags().GetString("path")
-		projectCfg.TerraformParseHCL, _ = cmd.Flags().GetBool("terraform-parse-hcl")
 		projectCfg.TerraformVarFiles, _ = cmd.Flags().GetStringSlice("terraform-var-file")
 		tfVars, _ := cmd.Flags().GetStringSlice("terraform-var")
 		projectCfg.TerraformVars = tfVarsToMap(tfVars)
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
+		projectCfg.TerraformForceCLI, _ = cmd.Flags().GetBool("terraform-force-cli")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 		projectCfg.TerraformInitFlags, _ = cmd.Flags().GetString("terraform-init-flags")
 		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
@@ -715,9 +720,9 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 			return err
 		}
 
-		if parseHCL, _ := cmd.Flags().GetBool("terraform-parse-hcl"); parseHCL {
+		if forceCLI, _ := cmd.Flags().GetBool("terraform-force-cli"); forceCLI {
 			for _, p := range cfg.Projects {
-				p.TerraformParseHCL = true
+				p.TerraformForceCLI = true
 			}
 		}
 	}

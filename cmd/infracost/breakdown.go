@@ -47,9 +47,12 @@ func breakdownCmd(ctx *config.RunContext) *cobra.Command {
 	addRunFlags(cmd)
 
 	cmd.Flags().String("out-file", "", "Save output to a file, helpful with format flag")
-	cmd.Flags().Bool("terraform-use-state", false, "Use Terraform state instead of generating a plan. Applicable when path is a Terraform directory")
+	cmd.Flags().Bool("terraform-use-state", false, "Use Terraform state instead of generating a plan. Applicable with --terraform-force-cli")
 	newEnumFlag(cmd, "format", "table", "Output format", []string{"json", "table", "html"})
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
+
+	// This is deprecated and will show a warning if used without --terraform-force-cli
+	_ = cmd.Flags().MarkHidden("terraform-use-state")
 
 	return cmd
 }

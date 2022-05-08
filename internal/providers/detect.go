@@ -49,11 +49,11 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 		return nil, fmt.Errorf("No such file or directory %s", path)
 	}
 
-	if ctx.ProjectConfig.TerraformParseHCL {
-		if isTerragruntNestedDir(path, 5) {
-			return terraform.NewTerragruntHCLProvider(ctx, includePastResources), nil
-		}
+	forceCLI := ctx.ProjectConfig.TerraformForceCLI
+	projectType := DetectProjectType(path, forceCLI)
 
+	switch projectType {
+	case "terraform_dir":
 		h, providerErr := terraform.NewHCLProvider(
 			ctx,
 			terraform.NewPlanJSONProvider(ctx, includePastResources),
@@ -70,71 +70,84 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 		}
 
 		return h, nil
-	}
+	case "terragrunt_dir":
+		h := terraform.NewTerragruntHCLProvider(ctx, includePastResources)
+		if err := validateProjectForHCL(ctx, path); err != nil {
+			return h, err
+		}
 
-	if isCloudFormationTemplate(path) {
-		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
-	}
-
-	if isTerraformPlanJSON(path) {
+		return h, nil
+	case "terraform_plan_json":
 		return terraform.NewPlanJSONProvider(ctx, includePastResources), nil
-	}
-
-	if isTerraformStateJSON(path) {
-		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
-	}
-
-	if isTerraformPlan(path) {
+	case "terraform_plan_binary":
 		return terraform.NewPlanProvider(ctx, includePastResources), nil
-	}
-
-	if isTerragruntDir(path) {
-		return terraform.NewTerragruntProvider(ctx, includePastResources), nil
-	}
-
-	if isTerraformDir(path) {
+	case "terraform_cli":
 		return terraform.NewDirProvider(ctx, includePastResources), nil
-	}
-
-	if isTerragruntNestedDir(path, 5) {
+	case "terragrunt_cli":
 		return terraform.NewTerragruntProvider(ctx, includePastResources), nil
+	case "terraform_state_json":
+		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
+	case "cloudformation":
+		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
 	}
 
 	return nil, fmt.Errorf("Could not detect path type for '%s'", path)
 }
 
 func validateProjectForHCL(ctx *config.ProjectContext, path string) error {
-	if isTerragruntDir(path) || isTerragruntNestedDir(path, 5) {
+	if ctx.ProjectConfig.TerraformInitFlags != "" {
 		return &ValidationError{
-			err: "Terragrunt projects are not yet supported by the parse HCL option.",
+			err: "Flag terraform-init-flags is deprecated and only compatible with --terraform-force-cli.",
 		}
 	}
 
-	if isCloudFormationTemplate(path) {
+	if ctx.ProjectConfig.TerraformPlanFlags != "" {
 		return &ValidationError{
-			err: "CloudFormation projects are not yet supported by the parse HCL option.",
-		}
-	}
-
-	if isTerraformPlanJSON(path) {
-		return &ValidationError{
-			err: "Path type cannot be a Terraform plan JSON file when using the parse HCL option\n\nSet --path to a Terraform directory.",
-		}
-	}
-
-	if isTerraformStateJSON(path) {
-		return &ValidationError{
-			err: "Path type cannot be a Terraform state file when using the parse HCL option\n\nSet --path to a Terraform directory.",
+			err: "Flag terraform-plan-flags is deprecated and only compatible with --terraform-force-cli. If you want to pass Terraform variables use the --terraform-vars or --terraform-var-file flag.",
 		}
 	}
 
 	if ctx.ProjectConfig.TerraformUseState {
 		return &ValidationError{
-			err: "Flags terraform-use-state and terraform-parse-hcl are incompatible\n\nRun again without --terraform-use-state.",
+			err: "Flag terraform-use-state is deprecated and only compatible with --terraform-force-cli.",
 		}
 	}
 
 	return nil
+}
+
+func DetectProjectType(path string, forceCLI bool) string {
+	if isCloudFormationTemplate(path) {
+		return "cloudformation"
+	}
+
+	if isTerraformPlanJSON(path) {
+		return "terraform_plan_json"
+	}
+
+	if isTerraformStateJSON(path) {
+		return "terraform_state_json"
+	}
+
+	if isTerraformPlan(path) {
+		return "terraform_plan_binary"
+	}
+
+	if isTerragruntNestedDir(path, 5) {
+		if forceCLI {
+			return "terragrunt_cli"
+		}
+		return "terragrunt_dir"
+	}
+
+	if isTerraformDir(path) {
+		if forceCLI {
+			return "terraform_cli"
+		}
+		return "terraform_dir"
+	}
+
+	return ""
 }
 
 func isTerraformPlanJSON(path string) bool {
