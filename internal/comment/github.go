@@ -370,7 +370,7 @@ func (h *githubCommitHandler) CallFindMatchingComments(ctx context.Context, tag 
 	variables := map[string]interface{}{
 		"owner":     githubv4.String(h.owner),
 		"repo":      githubv4.String(h.repo),
-		"commitSha": githubv4.String(h.commitSHA),
+		"commitSha": githubv4.GitObjectID(h.commitSHA),
 		"after":     (*githubv4.String)(nil), // Null after argument to get first page.
 	}
 
