@@ -129,7 +129,19 @@ func checkDiffConfig(cfg *config.Config) error {
 
 		projectType := providers.DetectProjectType(projectConfig.Path, projectConfig.TerraformForceCLI)
 		if (projectType == "terraform_dir" || projectType == "terragrunt_dir") && cfg.CompareTo == "" {
-			return errors.New("Use `infracost diff --path /code --compare-to infracost-previous-run.json` to generate a diff")
+			examplePath := "/code"
+			if projectConfig.Path != "" {
+				examplePath = projectConfig.Path
+			}
+
+			msg := fmt.Sprintf(`To show a diff:
+  1. Generate a cost estimate baseline: %s
+  2. Make a Terraform code change
+  3. Generate a cost estimate diff: %s`,
+				fmt.Sprintf("`infracost breakdown --path %s --format json --out-file infracost-base.json`", examplePath),
+				fmt.Sprintf("`infracost diff --path %s --compare-to infracost-base.json`", examplePath),
+			)
+			return errors.New(msg)
 		}
 	}
 

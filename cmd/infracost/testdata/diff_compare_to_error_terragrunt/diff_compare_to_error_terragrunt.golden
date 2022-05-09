@@ -37,4 +37,7 @@ GLOBAL FLAGS
       --log-level string   Log level (trace, debug, info, warn, error, fatal)
       --no-color           Turn off colored output
 
-Error: Use `infracost diff --path /code --compare-to infracost-previous-run.json` to generate a diff
+Error: To show a diff:
+  1. Generate a cost estimate baseline: `infracost breakdown --path ../../examples/terragrunt --format json --out-file infracost-base.json`
+  2. Make a Terraform code change
+  3. Generate a cost estimate diff: `infracost diff --path ../../examples/terragrunt --compare-to infracost-base.json`
