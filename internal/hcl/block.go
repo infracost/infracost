@@ -58,6 +58,14 @@ var (
 			},
 		},
 	}
+	justModuleBlocks = &hcl.BodySchema{
+		Blocks: []hcl.BlockHeaderSchema{
+			{
+				Type:       "module",
+				LabelNames: []string{"name"},
+			},
+		},
+	}
 
 	errorNoHCLContents = fmt.Errorf("file contents is empty")
 )

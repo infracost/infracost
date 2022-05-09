@@ -184,7 +184,8 @@ type Parser struct {
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
 // the initialPath contains Terraform files at the top level Parsers will be len 1.
 func LoadParsers(initialPath string, options ...Option) ([]*Parser, error) {
-	rootPaths := findRootModules(initialPath, 0)
+	pl := &projectLocator{moduleCalls: make(map[string]struct{})}
+	rootPaths := pl.findRootModules(initialPath)
 	if len(rootPaths) == 0 {
 		return nil, errors.New("No valid Terraform files found given path, try a different directory")
 	}
@@ -247,11 +248,6 @@ func newParser(initialPath string, options []Option) *Parser {
 // ParseDirectory returns the root Module that represents the top of the Terraform Config tree.
 func (p *Parser) ParseDirectory() (*Module, error) {
 	log.Debugf("Beginning parse for directory '%s'...", p.initialPath)
-
-	rootPaths := findRootModules(p.initialPath, 0)
-	if len(rootPaths) == 0 {
-		return nil, errors.New("No valid terraform files found given path, try a different directory")
-	}
 
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
@@ -490,7 +486,24 @@ func loadDirectory(fullPath string, stopOnHCLError bool) ([]file, error) {
 	return files, nil
 }
 
-func findRootModules(fullPath string, level int) []string {
+type projectLocator struct {
+	moduleCalls map[string]struct{}
+}
+
+func (p *projectLocator) findRootModules(fullPath string) []string {
+	dirs := p.walkPaths(fullPath, 0)
+
+	var filtered []string
+	for _, dir := range dirs {
+		if _, ok := p.moduleCalls[dir]; !ok {
+			filtered = append(filtered, dir)
+		}
+	}
+
+	return filtered
+}
+
+func (p *projectLocator) walkPaths(fullPath string, level int) []string {
 	if level >= maxTfProjectSearchLevel {
 		return nil
 	}
@@ -537,12 +550,24 @@ func findRootModules(fullPath string, level int) []string {
 	}
 
 	for _, file := range files {
-		body, _, diags := file.Body.PartialContent(justProviderBlocks)
+		body, content, diags := file.Body.PartialContent(justProviderBlocks)
 		if diags != nil && diags.HasErrors() {
 			continue
 		}
 
 		if len(body.Blocks) > 0 {
+			moduleBody, _, _ := content.PartialContent(justModuleBlocks)
+			for _, module := range moduleBody.Blocks {
+				a, _ := module.Body.JustAttributes()
+				if src, ok := a["source"]; ok {
+					val, _ := src.Expr.Value(nil)
+					if val.Type() == cty.String {
+						realPath := filepath.Join(fullPath, val.AsString())
+						p.moduleCalls[realPath] = struct{}{}
+					}
+				}
+			}
+
 			return []string{fullPath}
 		}
 	}
@@ -553,7 +578,7 @@ func findRootModules(fullPath string, level int) []string {
 				continue
 			}
 
-			childDirs := findRootModules(filepath.Join(fullPath, info.Name()), level+1)
+			childDirs := p.walkPaths(filepath.Join(fullPath, info.Name()), level+1)
 			if len(childDirs) > 0 {
 				dirs = append(dirs, childDirs...)
 			}
