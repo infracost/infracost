@@ -372,7 +372,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(ctx.ProjectConfig.Path))
 	if provider.Type() == "terraform_dir" {
-		m = fmt.Sprintf("Evaluting %s at %s", provider.DisplayType(), ui.DisplayPath(ctx.ProjectConfig.Path))
+		m = fmt.Sprintf("Evaluating %s at %s", provider.DisplayType(), ui.DisplayPath(ctx.ProjectConfig.Path))
 	}
 
 	if r.runCtx.Config.IsLogging() {

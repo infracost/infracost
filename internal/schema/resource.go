@@ -26,7 +26,7 @@ type Resource struct {
 	UsageSchema       []*UsageItem
 	EstimateUsage     EstimateFunc
 	EstimationSummary map[string]bool
-	InfracostMetadata map[string]gjson.Result
+	Metadata          map[string]gjson.Result
 }
 
 func CalculateCosts(project *Project) {
