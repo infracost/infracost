@@ -20,6 +20,7 @@ EXAMPLES
       infracost breakdown --path /code --terraform-var-file my.tfvars
 
 AVAILABLE COMMANDS
+  auth             Authenticate with Infracost
   breakdown        Show breakdown of costs
   comment          Post an Infracost comment to GitHub, GitLab, Azure Repos or Bitbucket
   completion       Generate shell completion script
