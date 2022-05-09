@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/shopspring/decimal"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type SQLDatabaseInstance struct {
@@ -77,12 +79,25 @@ func (r *SQLDatabaseInstance) sqlDatabaseInstanceCostComponents(replica bool, na
 	if r.sqlInstanceTierToResourceGroup() != "" && r.dbType() != SQLServer {
 		costComponents = append(costComponents, r.sharedSQLInstance())
 	} else if r.sqlInstanceTierToResourceGroup() == "" && strings.Contains(tier, "db-custom-") {
-		cpu, _ := strconv.ParseInt(strings.Split(tier, "-")[2], 10, 32)
+		splittedTier := strings.Split(tier, "-")
+		cpu, err := strconv.ParseInt(splittedTier[2], 10, 32)
+		if err != nil {
+			log.Warnf("cpu of tier %s of %s is not parsable", tier, r.Address)
+			return nil
+		}
 		vCPU := decimalPtr(decimal.NewFromInt32(int32(cpu)))
 
 		costComponents = append(costComponents, r.cpuCostComponent(vCPU))
 
-		ram, _ := strconv.ParseInt(strings.Split(tier, "-")[3], 10, 32)
+		if len(splittedTier) < 4 {
+			log.Warnf("tier %s of %s has no ram data", tier, r.Address)
+			return nil
+		}
+		ram, err := strconv.ParseInt(splittedTier[3], 10, 32)
+		if err != nil {
+			log.Warnf("ram of tier %s of %s is not parsable", tier, r.Address)
+			return nil
+		}
 		memory := decimalPtr(decimal.NewFromInt32(int32(ram)).Div(decimal.NewFromInt(1024)))
 
 		costComponents = append(costComponents, r.memoryCostComponent(memory))
