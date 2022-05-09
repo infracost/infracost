@@ -289,9 +289,9 @@ func outputResource(r *schema.Resource) Resource {
 	}
 
 	metadata := make(map[string]string)
-	if r.InfracostMetadata != nil {
-		for k, v := range r.InfracostMetadata {
-			metadata["infracost_"+k] = v.String()
+	if r.Metadata != nil {
+		for k, v := range r.Metadata {
+			metadata[k] = v.String()
 		}
 	}
 
