@@ -6,6 +6,7 @@ name: Upload post-release assets
 
 jobs:
   update-choco-version:
+    if: ${{ !contains(github.ref, '-alpha') && !contains(github.ref, '-beta') }}
     name: Update Chocolatey version
     runs-on: ubuntu-latest
     steps:
@@ -17,6 +18,7 @@ jobs:
             -d '{"event_type":"infracost_choco"}'
 
   update-atlantis-versions:
+    if: ${{ !contains(github.ref, '-alpha') && !contains(github.ref, '-beta') }}
     name: Update Atlantis versions
     runs-on: ubuntu-latest
     steps:
