@@ -13,6 +13,8 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+type ContextEnv struct{}
+
 type SyncResult struct {
 	ResourceCount    int
 	EstimationCount  int
@@ -210,7 +212,7 @@ func syncResource(projectCtx *config.ProjectContext, resource *schema.Resource, 
 
 		resourceUsageMap := resourceUsage.Map()
 
-		ctx := context.WithValue(context.Background(), "env", projectCtx.ProjectConfig.Env)
+		ctx := context.WithValue(context.Background(), ContextEnv{}, projectCtx.ProjectConfig.Env)
 		err := resource.EstimateUsage(ctx, resourceUsageMap)
 		if err != nil {
 			syncResult.EstimationErrors[resource.Name] = err
