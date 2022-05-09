@@ -19,8 +19,12 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 )
 
-// This sets a global logger for this package, which is a bit of a hack. In the future we should use a context for this.
-var log = logrus.StandardLogger().WithField("parser", "terraform_hcl")
+var (
+	// This sets a global logger for this package, which is a bit of a hack. In the future we should use a context for this.
+	log = logrus.StandardLogger().WithField("parser", "terraform_hcl")
+
+	maxTfProjectSearchLevel = 5
+)
 
 type Option func(p *Parser)
 
@@ -486,10 +490,8 @@ func loadDirectory(fullPath string, stopOnHCLError bool) ([]file, error) {
 	return files, nil
 }
 
-var maxSearchLevel = 2
-
 func findRootModules(fullPath string, level int) []string {
-	if level >= maxSearchLevel {
+	if level >= maxTfProjectSearchLevel {
 		return nil
 	}
 
