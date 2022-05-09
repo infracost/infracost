@@ -3,6 +3,7 @@ package aws
 
 import (
 	"context"
+	"github.com/infracost/infracost/internal/usage"
 	"os"
 	"strings"
 	"sync"
@@ -35,7 +36,7 @@ func getConfig(ctx context.Context, region string) (aws.Config, error) {
 
 	var oldEnv []string
 
-	env, hasEnv := ctx.Value("env").(map[string]string)
+	env, hasEnv := ctx.Value(usage.ContextEnv{}).(map[string]string)
 	if hasEnv {
 		oldEnv = os.Environ()
 		for k, v := range env {
