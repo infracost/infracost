@@ -44,6 +44,7 @@ func floatPtrToDecimalPtr(f *float64) *decimal.Decimal {
 	return decimalPtr(decimal.NewFromFloat(*f))
 }
 
+// nolint:deadcode,unused
 func contains(a []string, x string) bool {
 	for _, n := range a {
 		if x == n {
