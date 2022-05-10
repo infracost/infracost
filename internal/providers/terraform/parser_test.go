@@ -47,6 +47,34 @@ func TestParseJSONResources(t *testing.T) {
 		},
 		{
 			expected: &schema.Resource{
+				Name:         "aws_cloudwatch_log_group.each_resource[\"0\"]",
+				ResourceType: "aws_cloudwatch_log_group",
+				IsSkipped:    false,
+				NoPrice:      false,
+				CostComponents: []*schema.CostComponent{
+					{
+						Name:            "Data ingested",
+						MonthlyQuantity: &decimal.Zero,
+					},
+				},
+			},
+		},
+		{
+			expected: &schema.Resource{
+				Name:         "aws_cloudwatch_log_group.each_resource[\"1\"]",
+				ResourceType: "aws_cloudwatch_log_group",
+				IsSkipped:    false,
+				NoPrice:      false,
+				CostComponents: []*schema.CostComponent{
+					{
+						Name:            "Data ingested",
+						MonthlyQuantity: &decimal.Zero,
+					},
+				},
+			},
+		},
+		{
+			expected: &schema.Resource{
 				Name:         "aws_cloudwatch_log_group.non_array_resource",
 				ResourceType: "aws_cloudwatch_log_group",
 				IsSkipped:    false,
@@ -95,6 +123,38 @@ func TestParseJSONResources(t *testing.T) {
 						"values": {
 							"kms_key_id":null,
 							"name":"log-group1",
+							"name_prefix":null,
+							"retention_in_days":0,
+							"tags":null
+						}
+					},
+					{
+						"address":"aws_cloudwatch_log_group.each_resource[\"0\"]",
+						"mode":"managed",
+						"type":"aws_cloudwatch_log_group",
+						"name":"each_resource",
+						"index":"0",
+						"provider_name":"registry.terraform.io/hashicorp/aws",
+						"schema_version":0,
+						"values": {
+							"kms_key_id":null,
+							"name":"log-group0",
+							"name_prefix":null,
+							"retention_in_days":0,
+							"tags":null
+						}
+					},
+					{
+						"address":"aws_cloudwatch_log_group.each_resource[\"1\"]",
+						"mode":"managed",
+						"type":"aws_cloudwatch_log_group",
+						"name":"each_resource",
+						"index":"1",
+						"provider_name":"registry.terraform.io/hashicorp/aws",
+						"schema_version":0,
+						"values": {
+							"kms_key_id":null,
+							"name":"log-group0",
 							"name_prefix":null,
 							"retention_in_days":0,
 							"tags":null
@@ -159,6 +219,56 @@ func TestParseJSONResources(t *testing.T) {
 					"after": {
 						"kms_key_id":null,
 						"name":"log-group1",
+						"name_prefix":null,
+						"retention_in_days":0,
+						"tags":null
+					},
+					"after_unknown": {
+						"arn":true,
+						"id":true
+					}
+				}
+			},
+			{
+				"address":"aws_cloudwatch_log_group.each_resource[\"0\"]",
+				"mode":"managed",
+				"type":"aws_cloudwatch_log_group",
+				"name":"each_resource",
+				"index":"0",
+				"provider_name":"registry.terraform.io/hashicorp/aws",
+				"change": {
+					"actions": [
+						"create"
+					],
+					"before":null,
+					"after": {
+						"kms_key_id":null,
+						"name":"log-group0",
+						"name_prefix":null,
+						"retention_in_days":0,
+						"tags":null
+					},
+					"after_unknown": {
+						"arn":true,
+						"id":true
+					}
+				}
+			},
+			{
+				"address":"aws_cloudwatch_log_group.each_resource[\"1\"]",
+				"mode":"managed",
+				"type":"aws_cloudwatch_log_group",
+				"name":"each_resource",
+				"index":"1",
+				"provider_name":"registry.terraform.io/hashicorp/aws",
+				"change": {
+					"actions": [
+						"create"
+					],
+					"before":null,
+					"after": {
+						"kms_key_id":null,
+						"name":"log-group0",
 						"name_prefix":null,
 						"retention_in_days":0,
 						"tags":null
@@ -247,6 +357,27 @@ func TestParseJSONResources(t *testing.T) {
 							}
 						},
 						{
+							"address":"aws_cloudwatch_log_group.each_resource",
+							"mode":"managed",
+							"type":"aws_cloudwatch_log_group",
+							"name":"each_resource",
+							"provider_config_key":"aws",
+							"expressions": {
+								"name": {
+									"references": [
+										"each.key"
+									]
+								}
+							},
+							"schema_version":0,
+							"for_each_expression": {
+								"references": [
+									"0",
+									"1"
+								]
+							}
+						},
+						{
 							"address":"aws_cloudwatch_log_group.non_array_resource",
 							"mode":"managed",
 							"type":"aws_cloudwatch_log_group",
@@ -269,6 +400,9 @@ func TestParseJSONResources(t *testing.T) {
 
 	usage := schema.NewUsageMap(map[string]interface{}{
 		"aws_cloudwatch_log_group.array_resource[*]": map[string]interface{}{
+			"monthly_data_ingested_gb": 0,
+		},
+		"aws_cloudwatch_log_group.each_resource[*]": map[string]interface{}{
 			"monthly_data_ingested_gb": 0,
 		},
 	})

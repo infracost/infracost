@@ -530,7 +530,7 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 	found := false
 
 	for _, ref := range refs {
-		if ref == "count.index" || strings.HasPrefix(ref, "var.") {
+		if ref == "count.index" || ref == "each.key" || strings.HasPrefix(ref, "var.") {
 			continue
 		}
 
@@ -543,12 +543,21 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 		refData, ok := resData[refAddr]
 
 		// if there's a count ref value then try with the array index of the count ref
-		if !ok && containsString(refs, "count.index") {
-			a := fmt.Sprintf("%s[%d]", refAddr, addressCountIndex(d.Address))
-			refData, ok = resData[a]
+		if !ok {
+			if containsString(refs, "count.index") {
+				a := fmt.Sprintf("%s[%d]", refAddr, addressCountIndex(d.Address))
+				refData, ok = resData[a]
 
-			if ok {
-				log.Debugf("reference specifies a count: using resource %s for %s.%s", a, d.Address, attr)
+				if ok {
+					log.Debugf("reference specifies a count: using resource %s for %s.%s", a, d.Address, attr)
+				}
+			} else if containsString(refs, "each.key") {
+				a := fmt.Sprintf("%s[\"%s\"]", refAddr, addressKey(d.Address))
+				refData, ok = resData[a]
+
+				if ok {
+					log.Debugf("reference specifies a key: using resource %s for %s.%s", a, d.Address, attr)
+				}
 			}
 		}
 
@@ -676,6 +685,17 @@ func addressCountIndex(addr string) int {
 	}
 
 	return -1
+}
+
+func addressKey(addr string) string {
+	r := regexp.MustCompile(`\["([^"]+)"\]`)
+	m := r.FindStringSubmatch(addr)
+
+	if len(m) > 0 {
+		return m[1]
+	}
+
+	return ""
 }
 
 func removeAddressArrayPart(addr string) string {
