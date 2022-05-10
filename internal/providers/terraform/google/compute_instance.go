@@ -12,6 +12,9 @@ func getComputeInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_compute_instance",
 		RFunc: newComputeInstance,
+		ReferenceAttributes: []string{
+			"network_interface.0.access_config.0.nat_ip", // google_compute_address
+		},
 		Notes: []string{
 			"Sustained use discounts are applied to monthly costs, but not to hourly costs.",
 			"Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.",

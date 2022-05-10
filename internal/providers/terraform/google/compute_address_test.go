@@ -11,8 +11,5 @@ func TestComputeAddress(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	opts := tftest.DefaultGoldenFileOptions()
-	opts.CaptureLogs = true
-
-	tftest.GoldenFileResourceTestsWithOpts(t, "compute_address_test", opts)
+	tftest.GoldenFileResourceTests(t, "compute_address_test")
 }

@@ -1,11 +1,8 @@
 package google
 
 import (
-	"fmt"
-
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 
 	"strings"
 
@@ -13,17 +10,14 @@ import (
 )
 
 type ComputeAddress struct {
-	Address     string
-	Region      string
-	AddressType string
-
-	// usage args
-	AddressUsageType *string `infracost_usage:"address_type"`
+	Address                string
+	Region                 string
+	AddressType            string
+	Purpose                string
+	InstancePurchaseOption string
 }
 
-var ComputeAddressUsageSchema = []*schema.UsageItem{
-	{Key: "address_type", ValueType: schema.String, DefaultValue: ""},
-}
+var ComputeAddressUsageSchema = []*schema.UsageItem{}
 
 func (r *ComputeAddress) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -31,34 +25,26 @@ func (r *ComputeAddress) PopulateUsage(u *schema.UsageData) {
 
 func (r *ComputeAddress) BuildResource() *schema.Resource {
 	addressType := r.AddressType
-	if strings.ToLower(addressType) == "internal" {
+	isFreePurpose := r.Purpose != "" && strings.ToLower(r.Purpose) != "gce_endpoint"
+
+	if strings.ToLower(addressType) == "internal" || isFreePurpose {
 		return &schema.Resource{
-			Name:      r.Address,
-			NoPrice:   true,
-			IsSkipped: true, UsageSchema: ComputeAddressUsageSchema,
+			Name:        r.Address,
+			NoPrice:     true,
+			IsSkipped:   true,
+			UsageSchema: ComputeAddressUsageSchema,
 		}
 	}
 
 	costComponents := []*schema.CostComponent{}
 
-	usageType, err := r.validateAddressUsageType()
-	if err != "" {
-		log.Warnf(err)
-	}
-
-	switch usageType {
-	case "standard_vm":
-		costComponents = append(costComponents, r.standardVMComputeAddress(true))
-	case "preemptible_vm":
-		costComponents = append(costComponents, r.preemptibleVMComputeAddress(true))
-	case "unused":
-		costComponents = append(costComponents, r.unusedVMComputeAddress(true))
+	switch r.InstancePurchaseOption {
+	case "on_demand":
+		costComponents = append(costComponents, r.standardVMComputeAddress())
+	case "preemptible":
+		costComponents = append(costComponents, r.preemptibleVMComputeAddress())
 	default:
-		costComponents = append(costComponents,
-			r.standardVMComputeAddress(false),
-			r.preemptibleVMComputeAddress(false),
-			r.unusedVMComputeAddress(false),
-		)
+		costComponents = append(costComponents, r.unusedVMComputeAddress())
 	}
 
 	return &schema.Resource{
@@ -68,14 +54,9 @@ func (r *ComputeAddress) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *ComputeAddress) standardVMComputeAddress(used bool) *schema.CostComponent {
-	usedBy := ""
-	if !used {
-		usedBy = "if used by "
-	}
-
+func (r *ComputeAddress) standardVMComputeAddress() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("IP address (%sstandard VM)", usedBy),
+		Name:           "IP address (standard VM)",
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -94,14 +75,9 @@ func (r *ComputeAddress) standardVMComputeAddress(used bool) *schema.CostCompone
 	}
 }
 
-func (r *ComputeAddress) preemptibleVMComputeAddress(used bool) *schema.CostComponent {
-	usedBy := ""
-	if !used {
-		usedBy = "if used by "
-	}
-
+func (r *ComputeAddress) preemptibleVMComputeAddress() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("IP address (%spreemptible VM)", usedBy),
+		Name:           "IP address (preemptible VM)",
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -120,14 +96,9 @@ func (r *ComputeAddress) preemptibleVMComputeAddress(used bool) *schema.CostComp
 	}
 }
 
-func (r *ComputeAddress) unusedVMComputeAddress(used bool) *schema.CostComponent {
-	usedBy := ""
-	if !used {
-		usedBy = "if "
-	}
-
+func (r *ComputeAddress) unusedVMComputeAddress() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("IP address (%sunused)", usedBy),
+		Name:           "IP address (unused)",
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -144,22 +115,4 @@ func (r *ComputeAddress) unusedVMComputeAddress(used bool) *schema.CostComponent
 			EndUsageAmount: strPtr(""),
 		},
 	}
-}
-
-func (r *ComputeAddress) validateAddressUsageType() (string, string) {
-	validTypes := []string{"standard_vm", "preemptible_vm", "unused"}
-
-	usageType := ""
-
-	if r.AddressUsageType == nil {
-		return usageType, ""
-	}
-
-	usageType = strings.ToLower(*r.AddressUsageType)
-
-	if !contains(validTypes, usageType) {
-		return "", fmt.Sprintf("Invalid address_type, ignoring. Expected: standard_vm, preemptible_vm, unused. Got: %s", *r.AddressUsageType)
-	}
-
-	return usageType, ""
 }
