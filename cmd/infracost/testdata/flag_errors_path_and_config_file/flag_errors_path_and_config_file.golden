@@ -6,7 +6,7 @@ USAGE
   infracost breakdown [flags]
 
 EXAMPLES
-  Use Terraform directory with any required flags:
+  Use Terraform directory:
 
       infracost breakdown --path /code --terraform-var-file my.tfvars
 
