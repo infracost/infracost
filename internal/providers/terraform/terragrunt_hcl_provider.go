@@ -16,12 +16,10 @@ import (
 	tgerrors "github.com/gruntwork-io/terragrunt/errors"
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	"github.com/gruntwork-io/terragrunt/util"
+	"github.com/hashicorp/go-getter"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/hcl"
-
-	"github.com/hashicorp/go-getter"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
@@ -134,9 +132,13 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 
 	var workingDirsToEstimate []*terragruntWorkingDirInfo
 
+	tgLog := log.StandardLogger().WithField("library", "terragrunt")
+
 	terragruntOptions := &tgoptions.TerragruntOptions{
 		TerragruntConfigPath:       terragruntConfigPath,
-		Logger:                     log.WithField("library", "terragrunt"),
+		Logger:                     tgLog,
+		LogLevel:                   log.DebugLevel,
+		ErrWriter:                  tgLog.WriterLevel(log.DebugLevel),
 		MaxFoldersToCheck:          tgoptions.DEFAULT_MAX_FOLDERS_TO_CHECK,
 		WorkingDir:                 p.Path,
 		DownloadDir:                terragruntDownloadDir,
