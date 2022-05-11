@@ -10,7 +10,10 @@ func getComputeInstanceGroupManagerRegistryItem() *schema.RegistryItem {
 		Name:                "google_compute_instance_group_manager",
 		RFunc:               newComputeInstanceGroupManager,
 		Notes:               []string{"Multiple versions are not supported."},
-		ReferenceAttributes: []string{"version.0.instance_template"},
+		ReferenceAttributes: []string{"version.0.instance_template", "google_compute_per_instance_config.instance_group_manager"},
+		CustomRefIDFunc: func(d *schema.ResourceData) []string {
+			return []string{d.Get("self_link").String(), d.Get("name").String()}
+		},
 	}
 }
 
@@ -24,6 +27,9 @@ func newComputeInstanceGroupManager(d *schema.ResourceData, u *schema.UsageData)
 	targetSize := int64(1)
 	if d.Get("target_size").Exists() {
 		targetSize = d.Get("target_size").Int()
+	}
+	if len(d.References("google_compute_per_instance_config.instance_group_manager")) > 0 {
+		targetSize += int64(len(d.References("google_compute_per_instance_config.instance_group_manager")))
 	}
 
 	var machineType string
