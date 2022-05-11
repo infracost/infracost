@@ -53,6 +53,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getServiceNetworkingConnectionRegistryItem(),
 	getSQLDatabaseInstanceRegistryItem(),
 	getStorageBucketRegistryItem(),
+	getComputePerInstanceConfigRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
