@@ -27,7 +27,7 @@ resource "aws_sns_topic" "sns_topic" {
 
 resource "aws_sns_topic" "sns_topic_another_region" {
   provider = aws.eu-west-1
-  name = "my-standard-queue"
+  name     = "my-standard-queue"
 }
 
 resource "aws_sns_topic" "sns_topic_withUsage" {
@@ -56,7 +56,7 @@ resource "aws_sns_topic" "sns_fifo_topic" {
 }
 
 resource "aws_sns_topic" "sns_fifo_topic_another_region" {
-  provider = aws.eu-west-1
+  provider   = aws.eu-west-1
   name       = "my-fifo-queue.fifo"
   fifo_topic = true
 }
