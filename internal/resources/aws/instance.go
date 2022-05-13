@@ -196,17 +196,7 @@ func (a *Instance) validateReserveInstanceParams() (bool, string) {
 		return false, fmt.Sprintf("Invalid reserved_instance_type, ignoring reserved options. Expected: convertible, standard. Got: %s", strVal(a.ReservedInstanceType))
 	}
 
-	validTerms := []string{"1_year", "3_year"}
-	if !stringInSlice(validTerms, strVal(a.ReservedInstanceTerm)) {
-		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: 1_year, 3_year. Got: %s", strVal(a.ReservedInstanceTerm))
-	}
-
-	validOptions := []string{"no_upfront", "partial_upfront", "all_upfront"}
-	if !stringInSlice(validOptions, strVal(a.ReservedInstancePaymentOption)) {
-		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: no_upfront, partial_upfront, all_upfront. Got: %s", strVal(a.ReservedInstancePaymentOption))
-	}
-
-	return true, ""
+	return validateReservedInstanceParams(strVal(a.ReservedInstanceTerm), strVal(a.ReservedInstancePaymentOption))
 }
 
 func (a *Instance) reservedInstanceCostComponent(osLabel, osFilterVal, purchaseOptionLabel string) *schema.CostComponent {

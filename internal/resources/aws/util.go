@@ -89,6 +89,14 @@ func stringInSlice(slice []string, s string) bool {
 	return false
 }
 
+func mapKeys[K comparable, V any](m map[K]V) []K {
+	keys := make([]K, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
 // RegionMapping is a helpful conversion map that changes
 // aws region name to the name commonly used in pricing filters.
 var RegionMapping = map[string]string{
@@ -661,4 +669,27 @@ var InstanceTypeToVCPU = map[string]int64{
 	"z1d.large":        2,
 	"z1d.metal":        48,
 	"z1d.xlarge":       4,
+}
+
+var reservedTermsMapping = map[string]string{
+	"1_year": "1yr",
+	"3_year": "3yr",
+}
+
+var reservedPaymentOptionMapping = map[string]string{
+	"no_upfront":      "No Upfront",
+	"partial_upfront": "Partial Upfront",
+	"all_upfront":     "All Upfront",
+}
+
+func validateReservedInstanceParams(reservedInstanceTerm, reservedInstancePaymentOption string) (bool, string) {
+	validTerms := mapKeys(reservedTermsMapping)
+	if !stringInSlice(validTerms, reservedInstanceTerm) {
+		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: 1_year, 3_year. Got: %s", reservedInstanceTerm)
+	}
+	validOptions := mapKeys(reservedPaymentOptionMapping)
+	if !stringInSlice(validOptions, reservedInstancePaymentOption) {
+		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: no_upfront, partial_upfront, all_upfront. Got: %s", reservedInstancePaymentOption)
+	}
+	return true, ""
 }

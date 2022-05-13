@@ -141,3 +141,58 @@ resource "aws_db_instance" "mysql-performance-insights-usage" {
   performance_insights_enabled          = true
   performance_insights_retention_period = 731
 }
+
+resource "aws_db_instance" "mysql-1yr-all-upfront-single-az" {
+  engine          = "mysql"
+  instance_class  = "db.t3.large"
+}
+
+resource "aws_db_instance" "mysql-1yr-no-upfront-single-az" {
+  engine          = "mysql"
+  instance_class  = "db.t3.large"
+}
+
+resource "aws_db_instance" "mysql-1yr-partial-upfront-single-az" {
+  engine          = "mysql"
+  instance_class  = "db.t3.large"
+}
+
+resource "aws_db_instance" "mysql-1yr-all-upfront-multi-az" {
+  engine          = "mysql"
+  instance_class  = "db.t3.large"
+  multi_az        = true
+}
+
+resource "aws_db_instance" "mysql-1yr-no-upfront-multi-az" {
+  engine          = "mysql"
+  instance_class  = "db.t3.large"
+  multi_az        = true
+}
+
+resource "aws_db_instance" "mysql-1yr-partial-upfront-multi-az" {
+  engine          = "mysql"
+  instance_class  = "db.t3.large"
+  multi_az        = true
+}
+
+resource "aws_db_instance" "postgres-3yr-all-upfront-single-az" {
+  engine          = "postgres"
+  instance_class  = "db.t3.large"
+}
+
+resource "aws_db_instance" "postgres-3yr-partial-upfront-single-az" {
+  engine          = "postgres"
+  instance_class  = "db.t3.large"
+}
+
+resource "aws_db_instance" "postgres-3yr-all-upfront-multi-az" {
+  engine          = "postgres"
+  instance_class  = "db.t3.large"
+  multi_az        = true
+}
+
+resource "aws_db_instance" "postgres-3yr-partial-upfront-multi-az" {
+  engine          = "postgres"
+  instance_class  = "db.t3.large"
+  multi_az        = true
+}
