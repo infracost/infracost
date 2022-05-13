@@ -89,7 +89,7 @@ func stringInSlice(slice []string, s string) bool {
 	return false
 }
 
-func mapKeys[K comparable, V any](m map[K]V) []K {
+func sliceOfKeysFromMap[K comparable, V any](m map[K]V) []K {
 	keys := make([]K, 0, len(m))
 	for k := range m {
 		keys = append(keys, k)
@@ -682,12 +682,12 @@ var reservedPaymentOptionMapping = map[string]string{
 	"all_upfront":     "All Upfront",
 }
 
-func validateReservedInstanceParams(reservedInstanceTerm, reservedInstancePaymentOption string) (bool, string) {
-	validTerms := mapKeys(reservedTermsMapping)
+func validatereservedinstanceparams(reservedInstanceTerm, reservedInstancePaymentOption string) (bool, string) {
+	validTerms := sliceOfKeysFromMap(reservedTermsMapping)
 	if !stringInSlice(validTerms, reservedInstanceTerm) {
 		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: 1_year, 3_year. Got: %s", reservedInstanceTerm)
 	}
-	validOptions := mapKeys(reservedPaymentOptionMapping)
+	validOptions := sliceOfKeysFromMap(reservedPaymentOptionMapping)
 	if !stringInSlice(validOptions, reservedInstancePaymentOption) {
 		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: no_upfront, partial_upfront, all_upfront. Got: %s", reservedInstancePaymentOption)
 	}
