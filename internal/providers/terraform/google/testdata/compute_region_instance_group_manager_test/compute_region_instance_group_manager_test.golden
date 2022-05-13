@@ -3,9 +3,10 @@
                                                                                              
  google_compute_region_instance_group_manager.appserver                                      
  ├─ Instance usage (Linux/UNIX, on-demand, n1-standard-16)        2,190  hours     $1,165.07 
- └─ Balanced provisioned storage (pd-balanced)                    1,200  GB          $120.00 
+ ├─ Balanced provisioned storage (pd-balanced)                    1,200  GB          $120.00 
+ └─ Local SSD provisioned storage                                 1,125  GB           $90.00 
                                                                                              
- OVERALL TOTAL                                                                     $1,285.07 
+ OVERALL TOTAL                                                                     $1,375.07 
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 1 was estimated
