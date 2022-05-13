@@ -15,6 +15,7 @@ type ComputeInstanceGroupManager struct {
 	PurchaseOption    string
 	TargetSize        int64
 	Disks             []*ComputeDisk
+	ScratchDisks      int
 	GuestAccelerators []*ComputeGuestAccelerator
 }
 
@@ -37,6 +38,10 @@ func (r *ComputeInstanceGroupManager) BuildResource() *schema.Resource {
 
 	for _, disk := range r.Disks {
 		costComponents = append(costComponents, computeDiskCostComponent(r.Region, disk.Type, disk.Size, r.TargetSize))
+	}
+
+	if r.ScratchDisks > 0 {
+		costComponents = append(costComponents, scratchDiskCostComponent(r.Region, r.PurchaseOption, r.ScratchDisks*int(r.TargetSize)))
 	}
 
 	for _, guestAccel := range r.GuestAccelerators {
