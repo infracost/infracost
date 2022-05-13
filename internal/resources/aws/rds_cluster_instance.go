@@ -5,6 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -15,9 +16,11 @@ type RDSClusterInstance struct {
 	Engine                                       string
 	PerformanceInsightsEnabled                   bool
 	PerformanceInsightsLongTermRetention         bool
-	MonthlyCPUCreditHrs                          *int64 `infracost_usage:"monthly_cpu_credit_hrs"`
-	VCPUCount                                    *int64 `infracost_usage:"vcpu_count"`
-	MonthlyAdditionalPerformanceInsightsRequests *int64 `infracost_usage:"monthly_additional_performance_insights_requests"`
+	MonthlyCPUCreditHrs                          *int64  `infracost_usage:"monthly_cpu_credit_hrs"`
+	VCPUCount                                    *int64  `infracost_usage:"vcpu_count"`
+	MonthlyAdditionalPerformanceInsightsRequests *int64  `infracost_usage:"monthly_additional_performance_insights_requests"`
+	ReservedInstanceTerm                         *string `infracost_usage:"reserved_instance_term"`
+	ReservedInstancePaymentOption                *string `infracost_usage:"reserved_instance_payment_option"`
 }
 
 var RDSClusterInstanceUsageSchema = []*schema.UsageItem{
@@ -33,9 +36,32 @@ func (r *RDSClusterInstance) PopulateUsage(u *schema.UsageData) {
 func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 	databaseEngine := r.databaseEngineValue()
 
+	purchaseOptionLabel := "on-demand"
+	priceFilter := &schema.PriceFilter{
+		PurchaseOption: strPtr("on_demand"),
+	}
+
+	if r.ReservedInstanceTerm != nil {
+		valid, err := validateReservedInstanceParams(strVal(r.ReservedInstanceTerm), strVal(r.ReservedInstancePaymentOption))
+		if err != "" {
+			log.Warnf(err)
+		}
+		if valid {
+			purchaseOptionLabel = "reserved"
+			reservedTermName := reservedTermsMapping[strVal(r.ReservedInstanceTerm)]
+			reservedPaymentOptionName := reservedPaymentOptionMapping[strVal(r.ReservedInstancePaymentOption)]
+			priceFilter = &schema.PriceFilter{
+				PurchaseOption:     strPtr("reserved"),
+				StartUsageAmount:   strPtr("0"),
+				TermLength:         strPtr(reservedTermName),
+				TermPurchaseOption: strPtr(reservedPaymentOptionName),
+			}
+		}
+	}
+
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Database instance (%s, %s)", "on-demand", r.InstanceClass),
+			Name:           fmt.Sprintf("Database instance (%s, %s)", purchaseOptionLabel, r.InstanceClass),
 			Unit:           "hours",
 			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -49,9 +75,7 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 					{Key: "databaseEngine", Value: strPtr(databaseEngine)},
 				},
 			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr("on_demand"),
-			},
+			PriceFilter: priceFilter,
 		},
 	}
 

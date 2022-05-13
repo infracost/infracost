@@ -60,3 +60,43 @@ resource "aws_rds_cluster_instance" "cluster_instance_performance_insights_with_
   performance_insights_enabled          = true
   performance_insights_retention_period = 731
 }
+
+resource "aws_rds_cluster_instance" "cluster_instance_1yr_no_upfront" {
+  identifier         = "aurora-cluster-demo"
+  cluster_identifier = aws_rds_cluster.default.id
+  instance_class     = "db.r4.large"
+  engine             = aws_rds_cluster.default.engine
+  engine_version     = aws_rds_cluster.default.engine_version
+}
+
+resource "aws_rds_cluster_instance" "cluster_instance_1yr_partial_upfront" {
+  identifier         = "aurora-cluster-demo"
+  cluster_identifier = aws_rds_cluster.default.id
+  instance_class     = "db.r4.large"
+  engine             = aws_rds_cluster.default.engine
+  engine_version     = aws_rds_cluster.default.engine_version
+}
+
+resource "aws_rds_cluster_instance" "cluster_instance_1yr_all_upfront" {
+  identifier         = "aurora-cluster-demo"
+  cluster_identifier = aws_rds_cluster.default.id
+  instance_class     = "db.r4.large"
+  engine             = aws_rds_cluster.default.engine
+  engine_version     = aws_rds_cluster.default.engine_version
+}
+
+resource "aws_rds_cluster_instance" "cluster_instance_3yr_partial_upfront" {
+  identifier         = "aurora-cluster-demo"
+  cluster_identifier = aws_rds_cluster.default.id
+  instance_class     = "db.r4.large"
+  engine             = aws_rds_cluster.default.engine
+  engine_version     = aws_rds_cluster.default.engine_version
+}
+
+resource "aws_rds_cluster_instance" "cluster_instance_3yr_all_upfront" {
+  identifier         = "aurora-cluster-demo"
+  cluster_identifier = aws_rds_cluster.default.id
+  instance_class     = "db.t3.medium"
+  engine             = aws_rds_cluster.default.engine
+  engine_version     = aws_rds_cluster.default.engine_version
+}
