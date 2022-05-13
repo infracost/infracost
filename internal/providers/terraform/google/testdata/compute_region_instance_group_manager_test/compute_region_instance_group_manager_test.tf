@@ -19,6 +19,13 @@ resource "google_compute_instance_template" "standard" {
     disk_type    = "pd-balanced"
     disk_size_gb = "400"
   }
+
+  disk {
+    interface    = "NVME"
+    type         = "SCRATCH"
+    disk_type    = "local-ssd"
+    disk_size_gb = "375"
+  }
 }
 
 resource "google_compute_region_instance_group_manager" "appserver" {

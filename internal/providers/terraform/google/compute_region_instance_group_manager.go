@@ -24,6 +24,7 @@ func newComputeRegionInstanceGroupManager(d *schema.ResourceData, u *schema.Usag
 
 	var machineType string
 	purchaseOption := "on_demand"
+	scratchDisks := 0
 	disks := []*google.ComputeDisk{}
 	guestAccelerators := []*google.ComputeGuestAccelerator{}
 
@@ -37,16 +38,22 @@ func newComputeRegionInstanceGroupManager(d *schema.ResourceData, u *schema.Usag
 		}
 
 		for _, disk := range instanceTemplate.Get("disk").Array() {
-			diskSize := int64(100)
-			if size := disk.Get("disk_size_gb"); size.Exists() {
-				diskSize = size.Int()
-			}
-			diskType := disk.Get("disk_type").String()
+			diskType := disk.Get("type").String()
+			switch diskType {
+			case "SCRATCH":
+				scratchDisks++
+			default:
+				diskSize := int64(100)
+				if size := disk.Get("disk_size_gb"); size.Exists() {
+					diskSize = size.Int()
+				}
+				diskType := disk.Get("disk_type").String()
 
-			disks = append(disks, &google.ComputeDisk{
-				Type: diskType,
-				Size: float64(diskSize),
-			})
+				disks = append(disks, &google.ComputeDisk{
+					Type: diskType,
+					Size: float64(diskSize),
+				})
+			}
 		}
 
 		guestAccelerators = collectComputeGuestAccelerators(instanceTemplate.Get("guest_accelerator"))
@@ -59,6 +66,7 @@ func newComputeRegionInstanceGroupManager(d *schema.ResourceData, u *schema.Usag
 		PurchaseOption:    purchaseOption,
 		TargetSize:        targetSize,
 		Disks:             disks,
+		ScratchDisks:      scratchDisks,
 		GuestAccelerators: guestAccelerators,
 	}
 	r.PopulateUsage(u)
