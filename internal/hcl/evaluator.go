@@ -151,12 +151,11 @@ func (e *Evaluator) collectModules() *Module {
 	return &e.module
 }
 
+// evaluate runs a context evaluation loop until the context values are unchanged. We run this in a loop
+// because variables can change because of outputs from other blocks in the context. Once all outputs have
+// been evaluated and the context variables should remain unchanged. In reality 90% of cases will require
+// 2 loops, however other complex modules will take > 2.
 func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
-	// TODO: we need to work out why the evaluation step takes place in a loop. I have been unable to decipher
-	// why we need to evaluate the context at least twice. No tests that we've seen can replicated the scenario
-	// where lastContext.Variables change after the first `evaluateStep`. We should reach out to tfsec guys and
-	// work out why this loop was put in there. If they can't come up with a good reason we can nuke it and
-	// make the evaluate method much easier to understand.
 	for i := 0; i < maxContextIterations; i++ {
 		e.evaluateStep(i)
 

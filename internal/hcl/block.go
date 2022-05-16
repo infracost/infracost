@@ -421,6 +421,39 @@ func (b *Block) HasModuleBlock() bool {
 	return b.moduleBlock != nil
 }
 
+type ModuleMetadata struct {
+	Filename  string `json:"filename"`
+	BlockName string `json:"blockName"`
+}
+
+// CallDetails returns the tree of module calls that were used to create this resource. Each step of the tree
+// contains a full file path and block name that were used to create the resource.
+//
+// CallDetails returns a list of ModuleMetadata that are ordered by appearance in the Terraform config tree.
+func (b *Block) CallDetails() []ModuleMetadata {
+	block := b
+	var meta []ModuleMetadata
+	for {
+		meta = append(meta, ModuleMetadata{
+			Filename:  block.Filename,
+			BlockName: stripCount(block.LocalName()),
+		})
+
+		if block.moduleBlock == nil {
+			break
+		}
+
+		block = block.moduleBlock
+	}
+
+	reversed := make([]ModuleMetadata, 0, len(meta))
+	for i := len(meta) - 1; i >= 0; i-- {
+		reversed = append(reversed, meta[i])
+	}
+
+	return reversed
+}
+
 // ModuleAddress returns the address of the module associated with this Block or "" if it is part of the root Module
 func (b *Block) ModuleAddress() string {
 	if b == nil || !b.HasModuleBlock() {
@@ -716,7 +749,10 @@ func (b *Block) NameLabel() string {
 	return ""
 }
 
-var countRegex = regexp.MustCompile(`\[(\d+)\]$`)
+var (
+	countRegex   = regexp.MustCompile(`\[(\d+)\]$`)
+	foreachRegex = regexp.MustCompile(`\["(\w+)"\]$`)
+)
 
 // Index returns the count index of the block using the name label.
 // Index returns nil if the block has no count.
@@ -751,4 +787,8 @@ func loadBlocksFromFile(file file, schema *hcl.BodySchema) (hcl.Blocks, error) {
 	}
 
 	return contents.Blocks, nil
+}
+
+func stripCount(s string) string {
+	return foreachRegex.ReplaceAllString(countRegex.ReplaceAllString(s, ""), "")
 }
