@@ -36,14 +36,14 @@ resource "google_compute_instance_group_manager" "default" {
 }
 
 resource "google_compute_per_instance_config" "default" {
-	name = "instance-1"
-	zone = google_compute_instance_group_manager.default.zone
+  name = "instance-1"
+  zone = google_compute_instance_group_manager.default.zone
 
-	instance_group_manager = google_compute_instance_group_manager.default.name
+  instance_group_manager = google_compute_instance_group_manager.default.name
 
-	preserved_state {
-	  metadata = {
-	    instance_template = google_compute_instance_template.appserver.id
-	  }
-	}
+  preserved_state {
+    metadata = {
+      instance_template = google_compute_instance_template.appserver.id
+    }
+  }
 }
