@@ -24,7 +24,7 @@
 ──────────────────────────────────
 
 The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json
-Run infracost breakdown to see their breakdown.
+Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
 
 ──────────────────────────────────
 
