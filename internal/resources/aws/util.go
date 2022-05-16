@@ -682,7 +682,7 @@ var reservedPaymentOptionMapping = map[string]string{
 	"all_upfront":     "All Upfront",
 }
 
-func validatereservedinstanceparams(reservedInstanceTerm, reservedInstancePaymentOption string) (bool, string) {
+func validateReservedInstanceParams(reservedInstanceTerm, reservedInstancePaymentOption string) (bool, string) {
 	validTerms := sliceOfKeysFromMap(reservedTermsMapping)
 	if !stringInSlice(validTerms, reservedInstanceTerm) {
 		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: 1_year, 3_year. Got: %s", reservedInstanceTerm)
