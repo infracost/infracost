@@ -25,22 +25,25 @@ func GetResourceRegistryMap() *ResourceRegistryMap {
 		// Merge all resource registries
 		for _, registryItem := range aws.ResourceRegistry {
 			resourceRegistryMap[registryItem.Name] = registryItem
+			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = aws.GetDefaultRefIDFunc
 		}
-		for _, registryItem := range createFreeResources(aws.FreeResources) {
+		for _, registryItem := range createFreeResources(aws.FreeResources, aws.GetDefaultRefIDFunc) {
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
 
 		for _, registryItem := range azure.ResourceRegistry {
 			resourceRegistryMap[registryItem.Name] = registryItem
+			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = azure.GetDefaultRefIDFunc
 		}
-		for _, registryItem := range createFreeResources(azure.FreeResources) {
+		for _, registryItem := range createFreeResources(azure.FreeResources, azure.GetDefaultRefIDFunc) {
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
 
 		for _, registryItem := range google.ResourceRegistry {
 			resourceRegistryMap[registryItem.Name] = registryItem
+			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = google.GetDefaultRefIDFunc
 		}
-		for _, registryItem := range createFreeResources(google.FreeResources) {
+		for _, registryItem := range createFreeResources(google.FreeResources, google.GetDefaultRefIDFunc) {
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
 	})
@@ -65,6 +68,14 @@ func (r *ResourceRegistryMap) GetCustomRefIDFunc(resourceDataType string) schema
 	return nil
 }
 
+func (r *ResourceRegistryMap) GetDefaultRefIDFunc(resourceDataType string) schema.ReferenceIDFunc {
+	item, ok := (*r)[resourceDataType]
+	if ok {
+		return item.DefaultRefIDFunc
+	}
+	return nil
+}
+
 func GetUsageOnlyResources() []string {
 	r := []string{}
 	r = append(r, aws.UsageOnlyResources...)
@@ -77,13 +88,14 @@ func HasSupportedProvider(rType string) bool {
 	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_")
 }
 
-func createFreeResources(l []string) []*schema.RegistryItem {
+func createFreeResources(l []string, defaultRefsFunc schema.ReferenceIDFunc) []*schema.RegistryItem {
 	freeResources := make([]*schema.RegistryItem, 0)
 	for _, resourceName := range l {
 		freeResources = append(freeResources, &schema.RegistryItem{
-			Name:    resourceName,
-			NoPrice: true,
-			Notes:   []string{"Free resource."},
+			Name:             resourceName,
+			NoPrice:          true,
+			Notes:            []string{"Free resource."},
+			DefaultRefIDFunc: defaultRefsFunc,
 		})
 	}
 	return freeResources
