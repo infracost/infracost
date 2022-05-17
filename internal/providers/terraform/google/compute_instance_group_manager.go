@@ -12,7 +12,7 @@ func getComputeInstanceGroupManagerRegistryItem() *schema.RegistryItem {
 		Notes:               []string{"Multiple versions are not supported."},
 		ReferenceAttributes: []string{"version.0.instance_template", "google_compute_per_instance_config.instance_group_manager"},
 		CustomRefIDFunc: func(d *schema.ResourceData) []string {
-			return []string{d.Get("self_link").String(), d.Get("name").String()}
+			return []string{d.Get("name").String()}
 		},
 	}
 }

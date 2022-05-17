@@ -9,5 +9,6 @@ type RegistryItem struct {
 	RFunc               ResourceFunc
 	ReferenceAttributes []string
 	CustomRefIDFunc     ReferenceIDFunc
+	DefaultRefIDFunc    ReferenceIDFunc
 	NoPrice             bool
 }
