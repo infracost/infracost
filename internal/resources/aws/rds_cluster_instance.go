@@ -2,11 +2,12 @@ package aws
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
-	"strings"
 )
 
 type RDSClusterInstance struct {
@@ -27,6 +28,8 @@ var RDSClusterInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
 	{Key: "vcpu_count", ValueType: schema.Int64, DefaultValue: 0},
 	{Key: "monthly_additional_performance_insights_requests", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
+	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
 }
 
 func (r *RDSClusterInstance) PopulateUsage(u *schema.UsageData) {
