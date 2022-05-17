@@ -14,6 +14,7 @@ import (
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	"github.com/gruntwork-io/terragrunt/util"
 	"github.com/infracost/infracost/internal/hcl"
+	"github.com/zclconf/go-cty/cty"
 
 	"os"
 	"path/filepath"
@@ -147,14 +148,6 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
 		IgnoreExternalDependencies: true,
 		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) error {
-			if terragruntOptions.Writer != nil {
-				// RunTerragrunt must have been invoked as part of a dependency block to get the outputs.
-				// Since we're parsing HCL, outputs are not available anyway.  We return some fake outputs
-				// here so Terragrunt does error with a "No outputs detected error.
-				// See getTerragruntOutputIfAppliedElseConfiguredDefault in terragrunt dependency.go
-				_, _ = terragruntOptions.Writer.Write([]byte(`{ "infracost_mock_output": { "type": "string", "value": "" } }`))
-				return nil
-			}
 			workingDirInfo, err := p.runTerragrunt(terragruntOptions)
 			if workingDirInfo != nil {
 				workingDirsToEstimate = append(workingDirsToEstimate, workingDirInfo)
@@ -181,7 +174,8 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 // This will forward all the args and extra_arguments directly to Terraform.
 // Mostly copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) runTerragrunt(terragruntOptions *tgoptions.TerragruntOptions) (*terragruntWorkingDirInfo, error) {
-	terragruntConfig, err := tgconfig.ReadTerragruntConfig(terragruntOptions)
+	// Pass in an empty non-nil cty.Value as the dependencyOutputs so that it skips loading any dependency outputs.
+	terragruntConfig, err := tgconfig.ParseConfigFile(terragruntOptions.TerragruntConfigPath, terragruntOptions, nil, &cty.Value{})
 	if err != nil {
 		return nil, err
 	}
