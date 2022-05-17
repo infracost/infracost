@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
@@ -60,27 +59,21 @@ func getAzureRMMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"server_id"})
 
-	var sku string
-	if d.Get("sku_name").Type != gjson.Null {
-		sku = d.Get("sku_name").String()
-	}
+	sku := d.GetStringOrDefault("sku_name", "")
 
 	var maxSize *float64
-	if d.Get("max_size_gb").Type != gjson.Null {
+	if !d.IsEmpty("max_size_gb") {
 		val := d.Get("max_size_gb").Float()
 		maxSize = &val
 	}
 
 	var replicaCount *int64
-	if d.Get("read_replica_count").Exists() {
+	if !d.IsEmpty("read_replica_count") {
 		val := d.Get("read_replica_count").Int()
 		replicaCount = &val
 	}
 
-	licenceType := "LicenseIncluded"
-	if d.Get("license_type").Exists() {
-		licenceType = d.Get("license_type").String()
-	}
+	licenceType := d.GetStringOrDefault("license_type", "LicenseIncluded")
 
 	r := &azure.SQLDatabase{
 		Address:          d.Address,
