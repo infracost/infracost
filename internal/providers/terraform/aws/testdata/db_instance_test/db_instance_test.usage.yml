@@ -48,18 +48,12 @@ resource_usage:
   aws_db_instance.postgres-3yr-all-upfront-single-az:
     reserved_instance_term: 3_year
     reserved_instance_payment_option: all_upfront
-  aws_db_instance.postgres-3yr-no-upfront-single-az:
-    reserved_instance_term: 3_year
-    reserved_instance_payment_option: no_upfront
   aws_db_instance.postgres-3yr-partial-upfront-single-az:
     reserved_instance_term: 3_year
     reserved_instance_payment_option: partial_upfront
   aws_db_instance.postgres-3yr-all-upfront-multi-az:
     reserved_instance_term: 3_year
     reserved_instance_payment_option: all_upfront
-  aws_db_instance.postgres-3yr-no-upfront-multi-az:
-    reserved_instance_term: 3_year
-    reserved_instance_payment_option: no_upfront
   aws_db_instance.postgres-3yr-partial-upfront-multi-az:
     reserved_instance_term: 3_year
     reserved_instance_payment_option: partial_upfront

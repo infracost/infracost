@@ -155,13 +155,17 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 	}
 
 	if a.ReservedInstanceType != nil {
-		valid, err := a.validateReserveInstanceParams()
+		resolver := reservedInstanceResolver{
+			term:          strVal(a.ReservedInstanceTerm),
+			paymentOption: strVal(a.ReservedInstancePaymentOption),
+		}
+		valid, err := a.validateReserveInstanceParams(resolver)
 		if err != "" {
 			log.Warnf(err)
 		}
 		if valid {
 			purchaseOptionLabel = "reserved"
-			return a.reservedInstanceCostComponent(osLabel, osFilterVal, purchaseOptionLabel)
+			return a.reservedInstanceCostComponent(osLabel, osFilterVal, purchaseOptionLabel, resolver)
 		}
 	}
 
@@ -190,26 +194,16 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 	}
 }
 
-func (a *Instance) validateReserveInstanceParams() (bool, string) {
+func (a *Instance) validateReserveInstanceParams(resolver reservedInstanceResolver) (bool, string) {
 	validTypes := []string{"convertible", "standard"}
 	if !stringInSlice(validTypes, strVal(a.ReservedInstanceType)) {
 		return false, fmt.Sprintf("Invalid reserved_instance_type, ignoring reserved options. Expected: convertible, standard. Got: %s", strVal(a.ReservedInstanceType))
 	}
 
-	return validateReservedInstanceParams(strVal(a.ReservedInstanceTerm), strVal(a.ReservedInstancePaymentOption))
+	return resolver.Validate()
 }
 
-func (a *Instance) reservedInstanceCostComponent(osLabel, osFilterVal, purchaseOptionLabel string) *schema.CostComponent {
-	reservedTermName := map[string]string{
-		"1_year": "1yr",
-		"3_year": "3yr",
-	}[strVal(a.ReservedInstanceTerm)]
-
-	reservedPaymentOptionName := map[string]string{
-		"no_upfront":      "No Upfront",
-		"partial_upfront": "Partial Upfront",
-		"all_upfront":     "All Upfront",
-	}[strVal(a.ReservedInstancePaymentOption)]
+func (a *Instance) reservedInstanceCostComponent(osLabel, osFilterVal, purchaseOptionLabel string, resolver reservedInstanceResolver) *schema.CostComponent {
 
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, a.InstanceType),
@@ -232,8 +226,8 @@ func (a *Instance) reservedInstanceCostComponent(osLabel, osFilterVal, purchaseO
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount:   strPtr("0"),
 			TermOfferingClass:  a.ReservedInstanceType,
-			TermLength:         strPtr(reservedTermName),
-			TermPurchaseOption: strPtr(reservedPaymentOptionName),
+			TermLength:         strPtr(resolver.Term()),
+			TermPurchaseOption: strPtr(resolver.PaymentOption()),
 		},
 	}
 }

@@ -682,14 +682,33 @@ var reservedPaymentOptionMapping = map[string]string{
 	"all_upfront":     "All Upfront",
 }
 
-func validateReservedInstanceParams(reservedInstanceTerm, reservedInstancePaymentOption string) (bool, string) {
+type reservedInstanceResolver struct {
+	term          string
+	paymentOption string
+	dbInstance    bool
+}
+
+func (r reservedInstanceResolver) Term() string {
+	return reservedTermsMapping[r.term]
+}
+
+func (r reservedInstanceResolver) PaymentOption() string {
+	return reservedPaymentOptionMapping[r.paymentOption]
+}
+
+func (r reservedInstanceResolver) Validate() (bool, string) {
 	validTerms := sliceOfKeysFromMap(reservedTermsMapping)
-	if !stringInSlice(validTerms, reservedInstanceTerm) {
-		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: 1_year, 3_year. Got: %s", reservedInstanceTerm)
+	if !stringInSlice(validTerms, r.term) {
+		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validTerms, ", "), r.term)
 	}
+
 	validOptions := sliceOfKeysFromMap(reservedPaymentOptionMapping)
-	if !stringInSlice(validOptions, reservedInstancePaymentOption) {
-		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: no_upfront, partial_upfront, all_upfront. Got: %s", reservedInstancePaymentOption)
+	if r.term == "3_year" && r.dbInstance {
+		validOptions = []string{"partial_upfront", "all_upfront"}
+	}
+
+	if !stringInSlice(validOptions, r.paymentOption) {
+		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
 	}
 	return true, ""
 }

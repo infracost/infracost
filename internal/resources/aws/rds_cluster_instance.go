@@ -45,19 +45,22 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 	}
 
 	if r.ReservedInstanceTerm != nil {
-		valid, err := validateReservedInstanceParams(strVal(r.ReservedInstanceTerm), strVal(r.ReservedInstancePaymentOption))
+		resolver := reservedInstanceResolver{
+			term:          strVal(r.ReservedInstanceTerm),
+			paymentOption: strVal(r.ReservedInstancePaymentOption),
+			dbInstance:    true,
+		}
+		valid, err := resolver.Validate()
 		if err != "" {
 			log.Warnf(err)
 		}
 		if valid {
 			purchaseOptionLabel = "reserved"
-			reservedTermName := reservedTermsMapping[strVal(r.ReservedInstanceTerm)]
-			reservedPaymentOptionName := reservedPaymentOptionMapping[strVal(r.ReservedInstancePaymentOption)]
 			priceFilter = &schema.PriceFilter{
 				PurchaseOption:     strPtr("reserved"),
 				StartUsageAmount:   strPtr("0"),
-				TermLength:         strPtr(reservedTermName),
-				TermPurchaseOption: strPtr(reservedPaymentOptionName),
+				TermLength:         strPtr(resolver.Term()),
+				TermPurchaseOption: strPtr(resolver.PaymentOption()),
 			}
 		}
 	}
