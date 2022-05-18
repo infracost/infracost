@@ -17,9 +17,12 @@ import (
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	"github.com/gruntwork-io/terragrunt/util"
 	"github.com/hashicorp/go-getter"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/hcl"
+	"github.com/infracost/infracost/internal/ui"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
@@ -169,7 +172,15 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 
 	err = s.Run(terragruntOptions)
 	if err != nil {
-		return nil, err
+		return nil, clierror.NewSanitizedError(
+			errors.Errorf(
+				"%s\n%v%s",
+				"Failed to parse the Terragrunt code using the Terragrunt library:",
+				err.Error(),
+				fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot")),
+			),
+			"Error parsing the Terragrunt code using the Terragrunt library",
+		)
 	}
 
 	return workingDirsToEstimate, nil
