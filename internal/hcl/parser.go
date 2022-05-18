@@ -30,18 +30,10 @@ type Option func(p *Parser)
 func OptionWithTFVarsPaths(paths []string) Option {
 	return func(p *Parser) {
 		var relative []string
-
 		for _, name := range paths {
 			tfvp := path.Join(p.initialPath, name)
-			_, err := os.Stat(tfvp)
-			if err != nil {
-				log.Warnf("passed tfvar file does not exist at %s", tfvp)
-				continue
-			}
-
 			relative = append(relative, tfvp)
 		}
-
 		p.tfvarsPaths = relative
 	}
 }
@@ -375,7 +367,7 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 func loadAndCombineVars(filename string, combinedVars map[string]cty.Value) error {
 	vars, err := loadVarFile(filename)
 	if err != nil {
-		return fmt.Errorf("failed to load the tfvars. %s", err.Error())
+		return err
 	}
 
 	for k, v := range vars {
@@ -392,10 +384,18 @@ func loadVarFile(filename string) (map[string]cty.Value, error) {
 		return inputVars, nil
 	}
 
+	_, err := os.Stat(filename)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, fmt.Errorf("Passed var file does not exist: %s", filename)
+		}
+		return nil, fmt.Errorf("Could not stat var file: %s", err)
+	}
+
 	log.Debugf("loading tfvars-file [%s]", filename)
 	src, err := os.ReadFile(filename)
 	if err != nil {
-		return nil, fmt.Errorf("could not read file %s %w", filename, err)
+		return nil, fmt.Errorf("Could not read var file file %s %w", filename, err)
 	}
 
 	variableFile, _ := hclsyntax.ParseConfig(src, filename, hcl.Pos{Line: 1, Column: 1})
