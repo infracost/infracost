@@ -16,6 +16,21 @@
  aws_rds_cluster_instance.cluster_instance                                                                                                
  └─ Database instance (on-demand, db.r4.large)                                              730  hours                            $211.70 
                                                                                                                                           
+ aws_rds_cluster_instance.cluster_instance_1yr_all_upfront                                                                                
+ └─ Database instance (reserved, db.r4.large)                                               730  hours                              $0.00 
+                                                                                                                                          
+ aws_rds_cluster_instance.cluster_instance_1yr_no_upfront                                                                                 
+ └─ Database instance (reserved, db.r4.large)                                               730  hours                            $138.70 
+                                                                                                                                          
+ aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront                                                                            
+ └─ Database instance (reserved, db.r4.large)                                               730  hours                             $65.70 
+                                                                                                                                          
+ aws_rds_cluster_instance.cluster_instance_3yr_all_upfront                                                                                
+ └─ Database instance (reserved, db.t3.medium)                                              730  hours                              $0.00 
+                                                                                                                                          
+ aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront                                                                            
+ └─ Database instance (reserved, db.r4.large)                                               730  hours                             $43.80 
+                                                                                                                                          
  aws_rds_cluster_instance.cluster_instance_performance_insights                                                                           
  ├─ Database instance (on-demand, db.r4.8xlarge)                                            730  hours                          $3,387.20 
  ├─ Performance Insights Long Term Retention (db.r4.8xlarge)                                 32  vCPU-month                       $165.89 
@@ -31,7 +46,7 @@
  ├─ Database instance (on-demand, db.t3.medium)                                             730  hours                             $59.86 
  └─ CPU credits                                                                              48  vCPU-hours                         $4.32 
                                                                                                                                           
- OVERALL TOTAL                                                                                                                  $3,960.12 
+ OVERALL TOTAL                                                                                                                  $4,208.32 
 ──────────────────────────────────
-6 cloud resources were detected:
-∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+11 cloud resources were detected:
+∙ 11 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

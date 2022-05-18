@@ -89,6 +89,14 @@ func stringInSlice(slice []string, s string) bool {
 	return false
 }
 
+func sliceOfKeysFromMap[K comparable, V any](m map[K]V) []K {
+	keys := make([]K, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
 // RegionMapping is a helpful conversion map that changes
 // aws region name to the name commonly used in pricing filters.
 var RegionMapping = map[string]string{
@@ -661,4 +669,46 @@ var InstanceTypeToVCPU = map[string]int64{
 	"z1d.large":        2,
 	"z1d.metal":        48,
 	"z1d.xlarge":       4,
+}
+
+var reservedTermsMapping = map[string]string{
+	"1_year": "1yr",
+	"3_year": "3yr",
+}
+
+var reservedPaymentOptionMapping = map[string]string{
+	"no_upfront":      "No Upfront",
+	"partial_upfront": "Partial Upfront",
+	"all_upfront":     "All Upfront",
+}
+
+type reservedInstanceResolver struct {
+	term          string
+	paymentOption string
+	dbInstance    bool
+}
+
+func (r reservedInstanceResolver) Term() string {
+	return reservedTermsMapping[r.term]
+}
+
+func (r reservedInstanceResolver) PaymentOption() string {
+	return reservedPaymentOptionMapping[r.paymentOption]
+}
+
+func (r reservedInstanceResolver) Validate() (bool, string) {
+	validTerms := sliceOfKeysFromMap(reservedTermsMapping)
+	if !stringInSlice(validTerms, r.term) {
+		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validTerms, ", "), r.term)
+	}
+
+	validOptions := sliceOfKeysFromMap(reservedPaymentOptionMapping)
+	if r.term == "3_year" && r.dbInstance {
+		validOptions = []string{"partial_upfront", "all_upfront"}
+	}
+
+	if !stringInSlice(validOptions, r.paymentOption) {
+		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
+	}
+	return true, ""
 }
