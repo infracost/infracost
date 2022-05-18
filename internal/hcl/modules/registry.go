@@ -11,6 +11,8 @@ import (
 	"strings"
 
 	goversion "github.com/hashicorp/go-version"
+	svchost "github.com/hashicorp/terraform-svchost"
+	"github.com/hashicorp/terraform-svchost/disco"
 )
 
 var defaultRegistryHost = "registry.terraform.io"
@@ -24,17 +26,20 @@ type RegistryLookupResult struct {
 	Source      string
 	Version     string
 	DownloadURL string
+	Token       string
 }
 
 // RegistryLoader is a loader that can lookup modules from a Terraform Registry and download them to the given destination
 type RegistryLoader struct {
-	packageFetcher *PackageFetcher
+	packageFetcher    *PackageFetcher
+	credentialsSource *CredentialsSource
 }
 
 // NewRegistryLoader constructs a registry loader
-func NewRegistryLoader(packageFetcher *PackageFetcher) *RegistryLoader {
+func NewRegistryLoader(packageFetcher *PackageFetcher, credentialsSource *CredentialsSource) *RegistryLoader {
 	return &RegistryLoader{
-		packageFetcher: packageFetcher,
+		packageFetcher:    packageFetcher,
+		credentialsSource: credentialsSource,
 	}
 }
 
@@ -55,11 +60,27 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 
 	host, namespace, moduleName, target := parts[0], parts[1], parts[2], parts[3]
 
+	services := disco.NewWithCredentialsSource(r.credentialsSource)
+	serviceURL, err := services.DiscoverServiceURL(svchost.Hostname(host), "modules.v1")
+	if err != nil {
+		return nil, errors.New("Unable to discover registry services")
+	}
+
+	creds, err := services.CredentialsForHost(svchost.Hostname(host))
+	if err != nil {
+		return nil, errors.New("Unable to retrieve credentials for registry")
+	}
+
+	token := ""
+	if creds != nil {
+		token = creds.Token()
+	}
+
 	// By this stage we are more confident that the module source is a valid registry module
 	// We now need to check the registry to see if the module exists and if it has a version
-	moduleURL := fmt.Sprintf("https://%s/v1/modules/%s/%s/%s", host, namespace, moduleName, target)
+	moduleURL := fmt.Sprintf("%s%s/%s/%s", serviceURL.String(), namespace, moduleName, target)
 
-	versions, err := r.fetchModuleVersions(moduleURL)
+	versions, err := r.fetchModuleVersions(moduleURL, token)
 	if err != nil {
 		return nil, err
 	}
@@ -74,16 +95,20 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 	}
 
 	return &RegistryLookupResult{
-		Source:      fmt.Sprintf("%s/%s/%s/%s", host, namespace, moduleName, target),
+		Source:      fmt.Sprintf("%s%s/%s/%s", serviceURL.String(), namespace, moduleName, target),
 		Version:     matchingVersion,
 		DownloadURL: fmt.Sprintf("%s/%s/download", moduleURL, matchingVersion),
+		Token:       token,
 	}, nil
 }
 
 // fetchModuleVersions fetches the list of versions from the registry endpoint for the given module URL
-func (r *RegistryLoader) fetchModuleVersions(moduleURL string) ([]string, error) {
+func (r *RegistryLoader) fetchModuleVersions(moduleURL string, token string) ([]string, error) {
 	httpClient := &http.Client{}
-	resp, err := httpClient.Get(moduleURL + "/versions")
+	req, _ := http.NewRequest("GET", moduleURL+"/versions", nil)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	resp, err := httpClient.Do(req)
+
 	if err != nil {
 		return nil, fmt.Errorf("Failed to fetch registry module versions: %w", err)
 	}
@@ -126,9 +151,12 @@ func (r *RegistryLoader) fetchModuleVersions(moduleURL string) ([]string, error)
 
 // downloadModule downloads the module to the loader's destination
 // It first calls the download URL to get the X-Terraform-Get header which contains a source we can use with go-getter to download the module
-func (r *RegistryLoader) downloadModule(downloadURL string, dest string) error {
+func (r *RegistryLoader) downloadModule(downloadURL string, dest string, token string) error {
 	httpClient := &http.Client{}
-	resp, err := httpClient.Get(downloadURL)
+	req, _ := http.NewRequest("GET", downloadURL, nil)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	resp, err := httpClient.Do(req)
+
 	if err != nil {
 		return fmt.Errorf("Failed to download registry module: %w", err)
 	}

@@ -27,13 +27,13 @@ func NewPackageFetcher() *PackageFetcher {
 // fetch downloads the remote module using the go-getter library
 // See: https://github.com/hashicorp/go-getter
 func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
+	err := os.MkdirAll(dest, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("Failed to create directory '%s': %w", dest, err)
+	}
+
 	if prevDest, ok := r.cache[moduleAddr]; ok {
 		log.Debugf("Module %s already downloaded, copying from '%s' to '%s'", moduleAddr, prevDest, dest)
-
-		err := os.Mkdir(dest, os.ModePerm)
-		if err != nil {
-			return fmt.Errorf("Failed to create directory '%s': %w", dest, err)
-		}
 
 		// Skip dotfiles and create new symlinks to be consistent with what Terraform init does
 		opt := copy.Options{

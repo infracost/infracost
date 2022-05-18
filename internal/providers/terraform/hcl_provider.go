@@ -10,8 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	// import as logg as golangci-lint is unhappy otherwise
-	logg "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
@@ -19,8 +18,6 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type HCLProvider struct {
@@ -133,6 +130,20 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	if remErr == nil {
 		options = append(options, hcl.OptionWithRemoteVarLoader(host, token, localWorkspace))
 	}
+
+	findTokenForHost := func(host string) (string, error) {
+		defaultHost, defaultToken, err := findRemoteHostAndToken(ctx)
+		if err != nil {
+			return "", err
+		}
+
+		if host == defaultHost {
+			return defaultToken, nil
+		}
+
+		return findCloudToken(host), nil
+	}
+	options = append(options, hcl.OptionWithCredentialsSource(findTokenForHost))
 
 	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.ExcludePaths, options...)
 	if err != nil {
@@ -494,7 +505,7 @@ func countReferences(block *hcl.Block) *countExpression {
 			s := v.AsString()
 			i, _ = strconv.ParseInt(s, 10, 64)
 		default:
-			logg.Debugf("unsupported go cty type %s expected either Number or String for count expression, using 0", ty)
+			log.Debugf("unsupported go cty type %s expected either Number or String for count expression, using 0", ty)
 		}
 
 		exp.ConstantValue = &i

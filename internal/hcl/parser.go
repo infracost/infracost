@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
@@ -151,6 +150,12 @@ func OptionWithRemoteVarLoader(host, token, localWorkspace string) Option {
 	}
 }
 
+func OptionWithCredentialsSource(findTokenForHost modules.FindTokenForHost) Option {
+	return func(p *Parser) {
+		p.credentialsSource = modules.NewCredentialsSource(findTokenForHost)
+	}
+}
+
 func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 	return func(p *Parser) {
 		p.blockBuilder = blockBuilder
@@ -189,6 +194,7 @@ type Parser struct {
 	newSpinner            ui.SpinnerFunc
 	writeWarning          ui.WriteWarningFunc
 	remoteVariablesLoader *RemoteVariablesLoader
+	credentialsSource     *modules.CredentialsSource
 }
 
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
@@ -246,6 +252,7 @@ func newParser(initialPath string, options ...Option) *Parser {
 	if p.newSpinner != nil {
 		loaderOpts = append(loaderOpts, modules.LoaderWithSpinner(p.newSpinner))
 	}
+	loaderOpts = append(loaderOpts, modules.LoaderWithCredentialsSource(p.credentialsSource))
 
 	p.moduleLoader = modules.NewModuleLoader(initialPath, loaderOpts...)
 

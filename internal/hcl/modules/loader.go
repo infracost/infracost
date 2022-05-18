@@ -31,11 +31,12 @@ var (
 // .infracost/terraform_modules directory. We could implement a global cache in the future, but for now have decided
 // to go with the same approach as Terraform.
 type ModuleLoader struct {
-	Path           string
-	cache          *Cache
-	packageFetcher *PackageFetcher
-	registryLoader *RegistryLoader
-	newSpinner     ui.SpinnerFunc
+	Path              string
+	cache             *Cache
+	packageFetcher    *PackageFetcher
+	credentialsSource *CredentialsSource
+	registryLoader    *RegistryLoader
+	newSpinner        ui.SpinnerFunc
 }
 
 // LoaderOption defines a function that can set properties on an ModuleLoader.
@@ -48,6 +49,12 @@ func LoaderWithSpinner(f ui.SpinnerFunc) LoaderOption {
 	}
 }
 
+func LoaderWithCredentialsSource(credentialsSource *CredentialsSource) LoaderOption {
+	return func(l *ModuleLoader) {
+		l.credentialsSource = credentialsSource
+	}
+}
+
 // NewModuleLoader constructs a new module loader
 func NewModuleLoader(path string, opts ...LoaderOption) *ModuleLoader {
 	fetcher := NewPackageFetcher()
@@ -56,12 +63,13 @@ func NewModuleLoader(path string, opts ...LoaderOption) *ModuleLoader {
 		Path:           path,
 		cache:          NewCache(),
 		packageFetcher: fetcher,
-		registryLoader: NewRegistryLoader(fetcher),
 	}
 
 	for _, opt := range opts {
 		opt(m)
 	}
+
+	m.registryLoader = NewRegistryLoader(fetcher, m.credentialsSource)
 
 	return m
 }
@@ -224,7 +232,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, moduleCall.Version)
 	if err == nil {
 		log.Debugf("Downloading module %s from registry URL %s", key, lookupResult.DownloadURL)
-		err = m.registryLoader.downloadModule(lookupResult.DownloadURL, dest)
+		err = m.registryLoader.downloadModule(lookupResult.DownloadURL, dest, lookupResult.Token)
 		if err != nil {
 			return nil, err
 		}
@@ -239,6 +247,10 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 	log.Debugf("Module %s not recognized as registry module, treating as remote module: %s", key, err.Error())
 	log.Debugf("Downloading module %s from remote %s", key, moduleCall.Source)
+
+	fmt.Println("DEBUG")
+	fmt.Println(m.Path)
+	fmt.Println(m.downloadDir())
 	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
 		return nil, err

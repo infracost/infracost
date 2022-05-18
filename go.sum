@@ -850,8 +850,6 @@ github.com/grpc-ecosystem/grpc-gateway v1.9.5/go.mod h1:vNeuVxBJEsws4ogUvrchl83t
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0/go.mod h1:hgWBS7lorOAVIJEQMi4ZsPv9hVvWI6+ch50m39Pf2Ks=
 github.com/gruntwork-io/gruntwork-cli v0.7.0/go.mod h1:jp6Z7NcLF2avpY8v71fBx6hds9eOFPELSuD/VPv7w00=
-github.com/gruntwork-io/terragrunt v0.36.9 h1:N5935Zog4DcnNctDFpabxCs+pEGhqdxqCDXN10btD+g=
-github.com/gruntwork-io/terragrunt v0.36.9/go.mod h1:rO4Y+T5tY0qZBpVpnq9JRcMubEMByMcZ9RTHPxUyx84=
 github.com/gruntwork-io/terratest v0.32.6 h1:OEA11ZqEwKRowEdxusDnAPnMUN0w/jzeNcziuQsqkYk=
 github.com/gruntwork-io/terratest v0.32.6/go.mod h1:0iy7d56CziX3R4ZUn570HMElr4WgBKoKNa8Hzex7bvo=
 github.com/hashicorp/aws-sdk-go-base v0.6.0/go.mod h1:2fRjWDv3jJBeN6mVWFHV6hFTNeFBx2gpDLQaZNxUVAY=
