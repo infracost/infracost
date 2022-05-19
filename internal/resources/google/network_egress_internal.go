@@ -90,7 +90,7 @@ func (r *StorageBucketNetworkEgressUsage) BuildResource() *schema.Resource {
 			Region:     strPtr("global"),
 			Service:    strPtr("Cloud Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr("Inter-region GCP Storage egress within EU")},
+				{Key: "description", Value: strPtr("Networking Traffic Egress GCP Inter Region within Europe")},
 			},
 		},
 	})
@@ -182,7 +182,7 @@ func (r *ContainerRegistryNetworkEgressUsage) BuildResource() *schema.Resource {
 			Region:     strPtr("global"),
 			Service:    strPtr("Cloud Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr("Inter-region GCP Storage egress within EU")},
+				{Key: "description", Value: strPtr("Networking Traffic Egress GCP Inter Region within Europe")},
 			},
 		},
 	})
