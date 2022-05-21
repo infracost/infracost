@@ -677,15 +677,30 @@ var reservedTermsMapping = map[string]string{
 }
 
 var reservedPaymentOptionMapping = map[string]string{
-	"no_upfront":      "No Upfront",
-	"partial_upfront": "Partial Upfront",
-	"all_upfront":     "All Upfront",
+	"no_upfront":         "No Upfront",
+	"partial_upfront":    "Partial Upfront",
+	"all_upfront":        "All Upfront",
+	"heavy_utilization":  "Heavy Utilization",  // Elasticache Legacy Offering
+	"medium_utilization": "Medium Utilization", // Elasticache Legacy Offering
+	"light_utilization":  "Light Utilization",  // Elasticache Legacy Offering
+}
+
+var elasticacheReservedNodeCacheLegacyOfferings = []string{"heavy_utilization", "medium_utilization", "light_utilization"}
+
+func isElasticacheReservedNodeLegacyOffering(paymentOption string) bool {
+	for _, v := range elasticacheReservedNodeCacheLegacyOfferings {
+		if v == paymentOption {
+			return true
+		}
+	}
+	return false
 }
 
 type reservedInstanceResolver struct {
-	term          string
-	paymentOption string
-	dbInstance    bool
+	term               string
+	paymentOption      string
+	dbInstance         bool
+	elasticacheCluster bool
 }
 
 func (r reservedInstanceResolver) Term() string {
@@ -707,8 +722,13 @@ func (r reservedInstanceResolver) Validate() (bool, string) {
 		validOptions = []string{"partial_upfront", "all_upfront"}
 	}
 
+	if r.elasticacheCluster {
+		validOptions = append(validOptions, "heavy_utilization", "medium_utilization", "light_utilization")
+	}
+
 	if !stringInSlice(validOptions, r.paymentOption) {
 		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
 	}
+
 	return true, ""
 }

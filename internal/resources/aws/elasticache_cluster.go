@@ -3,6 +3,7 @@ package aws
 import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	log "github.com/sirupsen/logrus"
 
 	"fmt"
 	"strings"
@@ -11,18 +12,22 @@ import (
 )
 
 type ElastiCacheCluster struct {
-	Address                string
-	Region                 string
-	HasReplicationGroup    bool
-	NodeType               string
-	Engine                 string
-	CacheNodes             int64
-	SnapshotRetentionLimit int64
-	SnapshotStorageSizeGB  *float64 `infracost_usage:"snapshot_storage_size_gb"`
+	Address                       string
+	Region                        string
+	HasReplicationGroup           bool
+	NodeType                      string
+	Engine                        string
+	CacheNodes                    int64
+	SnapshotRetentionLimit        int64
+	SnapshotStorageSizeGB         *float64 `infracost_usage:"snapshot_storage_size_gb"`
+	ReservedInstanceTerm          *string  `infracost_usage:"reserved_instance_term"`
+	ReservedInstancePaymentOption *string  `infracost_usage:"reserved_instance_payment_option"`
 }
 
 var ElastiCacheClusterUsageSchema = []*schema.UsageItem{
 	{Key: "snapshot_storage_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
+	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
 }
 
 func (r *ElastiCacheCluster) PopulateUsage(u *schema.UsageData) {
@@ -54,16 +59,43 @@ func (r *ElastiCacheCluster) BuildResource() *schema.Resource {
 }
 
 func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.CostComponent {
-	nameParams := []string{"on-demand", r.NodeType}
+	purchaseOptionLabel := "on-demand"
+	priceFilter := &schema.PriceFilter{
+		PurchaseOption: strPtr("on_demand"),
+	}
+
+	if r.ReservedInstanceTerm != nil {
+		resolver := reservedInstanceResolver{
+			term:          strVal(r.ReservedInstanceTerm),
+			paymentOption: strVal(r.ReservedInstancePaymentOption),
+		}
+		valid, err := resolver.Validate()
+		if err != "" {
+			log.Warnf(err)
+		}
+		if valid {
+			purchaseOptionLabel = "reserved"
+			priceFilter = &schema.PriceFilter{
+				PurchaseOption:     strPtr("reserved"),
+				StartUsageAmount:   strPtr("0"),
+				TermLength:         strPtr(resolver.Term()),
+				TermPurchaseOption: strPtr(resolver.PaymentOption()),
+			}
+		}
+	}
+
+	nameParams := []string{purchaseOptionLabel, r.NodeType}
 	if autoscaling {
 		nameParams = append(nameParams, "autoscaling")
 	}
+	ignoreIfMissingPrice := isElasticacheReservedNodeLegacyOffering(strVal(r.ReservedInstancePaymentOption))
 
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("ElastiCache (%s)", strings.Join(nameParams, ", ")),
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.CacheNodes)),
+		Name:                 fmt.Sprintf("ElastiCache (%s)", strings.Join(nameParams, ", ")),
+		Unit:                 "hours",
+		UnitMultiplier:       decimal.NewFromInt(1),
+		HourlyQuantity:       decimalPtr(decimal.NewFromInt(r.CacheNodes)),
+		IgnoreIfMissingPrice: ignoreIfMissingPrice,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(r.Region),
@@ -75,9 +107,7 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 				{Key: "cacheEngine", Value: strPtr(strings.Title(r.Engine))},
 			},
 		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("on_demand"),
-		},
+		PriceFilter: priceFilter,
 	}
 }
 

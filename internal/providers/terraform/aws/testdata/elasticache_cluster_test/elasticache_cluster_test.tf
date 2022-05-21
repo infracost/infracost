@@ -42,3 +42,43 @@ resource "aws_elasticache_cluster" "redis_snapshot_usage" {
   parameter_group_name     = "default.redis3.2"
   snapshot_retention_limit = 2
 }
+
+resource "aws_elasticache_cluster" "redis_reserved_1yr_heavy_utilization" {
+  cluster_id           = "cluster-example"
+  engine               = "redis"
+  node_type            = "cache.m3.large"
+  num_cache_nodes      = 1
+  parameter_group_name = "default.redis3.2"
+}
+
+resource "aws_elasticache_cluster" "redis_reserved_3yr_heavy_utilization" {
+  cluster_id           = "cluster-example"
+  engine               = "redis"
+  node_type            = "cache.m3.large"
+  num_cache_nodes      = 1
+  parameter_group_name = "default.redis3.2"
+}
+
+resource "aws_elasticache_cluster" "redis_reserved_1yr_no_upfront" {
+  cluster_id           = "cluster-example"
+  engine               = "redis"
+  node_type            = "cache.m6g.12xlarge"
+  num_cache_nodes      = 1
+  parameter_group_name = "default.redis3.2"
+}
+
+resource "aws_elasticache_cluster" "redis_reserved_1yr_partial_upfront" {
+  cluster_id           = "cluster-example"
+  engine               = "redis"
+  node_type            = "cache.m6g.12xlarge"
+  num_cache_nodes      = 1
+  parameter_group_name = "default.redis3.2"
+}
+
+resource "aws_elasticache_cluster" "redis_reserved_1yr_all_upfront" {
+  cluster_id           = "cluster-example"
+  engine               = "redis"
+  node_type            = "cache.m6g.12xlarge"
+  num_cache_nodes      = 1
+  parameter_group_name = "default.redis3.2"
+}
