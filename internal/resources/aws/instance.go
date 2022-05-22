@@ -155,11 +155,8 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 	}
 
 	if a.ReservedInstanceType != nil {
-		resolver := reservedInstanceResolver{
-			term:          strVal(a.ReservedInstanceTerm),
-			paymentOption: strVal(a.ReservedInstancePaymentOption),
-		}
-		valid, err := a.validateReserveInstanceParams(resolver)
+		resolver := newEc2ReservationResolver(strVal(a.ReservedInstanceTerm), strVal(a.ReservedInstancePaymentOption), strVal(a.ReservedInstanceType))
+		valid, err := resolver.Validate()
 		if err != "" {
 			log.Warnf(err)
 		}
@@ -194,7 +191,7 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 	}
 }
 
-func (a *Instance) validateReserveInstanceParams(resolver reservedInstanceResolver) (bool, string) {
+func (a *Instance) validateReserveInstanceParams(resolver reservationResolver) (bool, string) {
 	validTypes := []string{"convertible", "standard"}
 	if !stringInSlice(validTypes, strVal(a.ReservedInstanceType)) {
 		return false, fmt.Sprintf("Invalid reserved_instance_type, ignoring reserved options. Expected: convertible, standard. Got: %s", strVal(a.ReservedInstanceType))
@@ -203,7 +200,7 @@ func (a *Instance) validateReserveInstanceParams(resolver reservedInstanceResolv
 	return resolver.Validate()
 }
 
-func (a *Instance) reservedInstanceCostComponent(osLabel, osFilterVal, purchaseOptionLabel string, resolver reservedInstanceResolver) *schema.CostComponent {
+func (a *Instance) reservedInstanceCostComponent(osLabel, osFilterVal, purchaseOptionLabel string, resolver reservationResolver) *schema.CostComponent {
 
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, a.InstanceType),

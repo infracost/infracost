@@ -8,21 +8,25 @@ import (
 )
 
 type ElastiCacheReplicationGroup struct {
-	Address                     string
-	Region                      string
-	NodeType                    string
-	Engine                      string
-	CacheClusters               int64
-	ClusterNodeGroups           int64
-	ClusterReplicasPerNodeGroup int64
-	SnapshotRetentionLimit      int64
-	SnapshotStorageSizeGB       *float64 `infracost_usage:"snapshot_storage_size_gb"`
+	Address                       string
+	Region                        string
+	NodeType                      string
+	Engine                        string
+	CacheClusters                 int64
+	ClusterNodeGroups             int64
+	ClusterReplicasPerNodeGroup   int64
+	SnapshotRetentionLimit        int64
+	SnapshotStorageSizeGB         *float64 `infracost_usage:"snapshot_storage_size_gb"`
+	ReservedInstanceTerm          *string  `infracost_usage:"reserved_instance_term"`
+	ReservedInstancePaymentOption *string  `infracost_usage:"reserved_instance_payment_option"`
 
 	AppAutoscalingTarget []*AppAutoscalingTarget
 }
 
 var ElastiCacheReplicationGroupUsageSchema = []*schema.UsageItem{
 	{Key: "snapshot_storage_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
+	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
 }
 
 func (r *ElastiCacheReplicationGroup) PopulateUsage(u *schema.UsageData) {
@@ -64,12 +68,14 @@ func (r *ElastiCacheReplicationGroup) BuildResource() *schema.Resource {
 	}
 
 	cluster := &ElastiCacheCluster{
-		Region:                 r.Region,
-		NodeType:               r.NodeType,
-		Engine:                 engine,
-		CacheNodes:             cacheNodes,
-		SnapshotRetentionLimit: r.SnapshotRetentionLimit,
-		SnapshotStorageSizeGB:  r.SnapshotStorageSizeGB,
+		Region:                        r.Region,
+		NodeType:                      r.NodeType,
+		Engine:                        engine,
+		CacheNodes:                    cacheNodes,
+		SnapshotRetentionLimit:        r.SnapshotRetentionLimit,
+		SnapshotStorageSizeGB:         r.SnapshotStorageSizeGB,
+		ReservedInstanceTerm:          r.ReservedInstanceTerm,
+		ReservedInstancePaymentOption: r.ReservedInstancePaymentOption,
 	}
 
 	costComponents := []*schema.CostComponent{

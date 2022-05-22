@@ -65,10 +65,7 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 	}
 
 	if r.ReservedInstanceTerm != nil {
-		resolver := reservedInstanceResolver{
-			term:          strVal(r.ReservedInstanceTerm),
-			paymentOption: strVal(r.ReservedInstancePaymentOption),
-		}
+		resolver := newElasticacheReservationResolver(strVal(r.ReservedInstanceTerm), strVal(r.ReservedInstancePaymentOption))
 		valid, err := resolver.Validate()
 		if err != "" {
 			log.Warnf(err)
@@ -88,14 +85,13 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 	if autoscaling {
 		nameParams = append(nameParams, "autoscaling")
 	}
-	ignoreIfMissingPrice := isElasticacheReservedNodeLegacyOffering(strVal(r.ReservedInstancePaymentOption))
 
 	return &schema.CostComponent{
 		Name:                 fmt.Sprintf("ElastiCache (%s)", strings.Join(nameParams, ", ")),
 		Unit:                 "hours",
 		UnitMultiplier:       decimal.NewFromInt(1),
 		HourlyQuantity:       decimalPtr(decimal.NewFromInt(r.CacheNodes)),
-		IgnoreIfMissingPrice: ignoreIfMissingPrice,
+		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(r.Region),
