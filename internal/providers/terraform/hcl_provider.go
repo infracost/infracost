@@ -25,6 +25,7 @@ type HCLProvider struct {
 	providerKey     string
 	ctx             *config.ProjectContext
 	suppressLogging bool
+	cache           []*hcl.Module
 }
 
 type flagStringSlice []string
@@ -183,9 +184,35 @@ type hclProject struct {
 	json []byte
 }
 
-// LoadPlanJSONs parses the provided directory and returns it as a Terraform Plan JSON.
+// LoadPlanJSONs parses the found directories and return the blocks in Terraform plan JSON format.
 func (p *HCLProvider) LoadPlanJSONs() ([]hclProject, error) {
 	var jsons = make([]hclProject, len(p.Parsers))
+	modules, err := p.Modules()
+	if err != nil {
+		return nil, err
+	}
+
+	for i, module := range modules {
+		b, err := p.modulesToPlanJSON(module)
+		if err != nil {
+			return nil, err
+		}
+
+		jsons[i] = hclProject{json: b, path: module.RootPath}
+	}
+
+	return jsons, nil
+}
+
+// Modules parses the found directories into hcl modules representing a config tree of Terraform information.
+// Modules returns the raw hcl blocks associated with each found Terraform project. This can be used
+// to fetch raw information like outputs, vars, resources, e.t.c.
+func (p *HCLProvider) Modules() ([]*hcl.Module, error) {
+	if p.cache != nil {
+		return p.cache, nil
+	}
+
+	var modules = make([]*hcl.Module, len(p.Parsers))
 
 	for i, parser := range p.Parsers {
 		if len(p.Parsers) > 1 && !p.suppressLogging {
@@ -197,15 +224,18 @@ func (p *HCLProvider) LoadPlanJSONs() ([]hclProject, error) {
 			return nil, err
 		}
 
-		b, err := p.modulesToPlanJSON(module)
-		if err != nil {
-			return nil, err
-		}
-
-		jsons[i] = hclProject{json: b, path: module.RootPath}
+		modules[i] = module
 	}
 
-	return jsons, nil
+	p.cache = modules
+	return modules, nil
+}
+
+// InvalidateCache removes the module cache from the prior hcl parse.
+func (p *HCLProvider) InvalidateCache() *HCLProvider {
+	p.cache = nil
+
+	return p
 }
 
 func (p *HCLProvider) newPlanSchema() {

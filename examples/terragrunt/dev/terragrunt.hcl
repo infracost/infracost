@@ -2,12 +2,16 @@ include {
   path = find_in_parent_folders()
 }
 
+dependency "ter" {
+  config_path = "..//prod"
+}
+
 terraform {
   source = "..//modules/example"
 }
 
 inputs = {
-  instance_type = "t2.micro"
+  instance_type = dependency.ter.outputs.aws_instance_type
   root_block_device_volume_size = 50
   block_device_volume_size = 100
   block_device_iops = 400

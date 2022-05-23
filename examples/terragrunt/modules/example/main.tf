@@ -46,3 +46,7 @@ resource "aws_lambda_function" "hello_world" {
   runtime       = "nodejs12.x"
   memory_size   = var.hello_world_function_memory_size
 }
+
+output "aws_instance_type" {
+  value = aws_instance.web_app.instance_type
+}
