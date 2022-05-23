@@ -5,4 +5,4 @@ resource_usage:
   aws_elasticache_replication_group.cluster_reserved:
     capacity: 10
     reserved_instance_term: 3_year
-    reserved_instance_payment_option: heavy_utilization
+    reserved_instance_payment_option: all_upfront

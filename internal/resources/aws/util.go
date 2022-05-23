@@ -3,6 +3,7 @@ package aws
 import (
 	"fmt"
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"math"
 	"reflect"
 	"regexp"
@@ -689,12 +690,6 @@ var reservedPaymentOptionMapping = map[string]string{
 	"all_upfront":     "All Upfront",
 }
 
-var elasticacheReservedNodeCacheLegacyOfferings = map[string]string{
-	"heavy_utilization":  "Heavy Utilization",
-	"medium_utilization": "Medium Utilization",
-	"light_utilization":  "Light Utilization",
-}
-
 // EC2 implementation of reservationResolver
 type ec2ReservationResolver struct {
 	term              string
@@ -771,15 +766,25 @@ func (r rdsReservationResolver) Validate() (bool, string) {
 }
 
 // Elasticache implementation of reservationResolver
+var elasticacheReservedNodeCacheLegacyOfferings = map[string]string{
+	"heavy_utilization":  "Heavy Utilization",
+	"medium_utilization": "Medium Utilization",
+	"light_utilization":  "Light Utilization",
+}
+
+var elasticacheReservedNodeLegacyTypes = []string{"t2", "m3", "m4", "r3", "r4"}
+
 type elasticacheReservationResolver struct {
 	term          string
 	paymentOption string
+	cacheNodeType string
 }
 
-func newElasticacheReservationResolver(term, paymentOption string) *elasticacheReservationResolver {
+func newElasticacheReservationResolver(term, paymentOption, cacheNodeType string) *elasticacheReservationResolver {
 	return &elasticacheReservationResolver{
 		term:          term,
 		paymentOption: paymentOption,
+		cacheNodeType: cacheNodeType,
 	}
 }
 
@@ -812,6 +817,11 @@ func (r elasticacheReservationResolver) Validate() (bool, string) {
 
 	if !stringInSlice(validOptions, r.paymentOption) {
 		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
+	}
+
+	nodeType := strings.Split(r.cacheNodeType, ".")[1] // Get node type from cache node type. cache.m3.large -> m3
+	if stringInSlice(elasticacheReservedNodeLegacyTypes, nodeType) {
+		log.Warnf("No products found is possible for legacy nodes %s if provided payment option is not supported by the region.", strings.Join(elasticacheReservedNodeLegacyTypes, ", "))
 	}
 	return true, ""
 }

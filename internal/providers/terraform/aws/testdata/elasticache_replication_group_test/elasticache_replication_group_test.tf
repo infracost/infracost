@@ -120,6 +120,6 @@ resource "aws_elasticache_replication_group" "cluster_reserved" {
 
   engine = "redis"
 
-  node_type             = "cache.m3.medium"
+  node_type            = "cache.m6g.12xlarge"
   number_cache_clusters = 3
 }
