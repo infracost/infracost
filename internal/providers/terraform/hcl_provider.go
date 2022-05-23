@@ -18,13 +18,19 @@ import (
 )
 
 type HCLProvider struct {
-	Parsers        []*hcl.Parser
-	PlanJSONParser *Parser
+	parsers        []*hcl.Parser
+	planJSONParser *Parser
 
-	schema          *PlanSchema
-	providerKey     string
-	ctx             *config.ProjectContext
-	suppressLogging bool
+	schema      *PlanSchema
+	providerKey string
+	ctx         *config.ProjectContext
+	cache       []*hcl.Module
+	config      HCLProviderConfig
+}
+
+type HCLProviderConfig struct {
+	SuppressLogging     bool
+	CacheParsingModules bool
 }
 
 type flagStringSlice []string
@@ -86,7 +92,11 @@ func findRemoteHostAndToken(ctx *config.ProjectContext) (string, string, error) 
 // NewHCLProvider returns a HCLProvider with a hcl.Parser initialised using the config.ProjectContext.
 // It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
 // set input vars and files on the underlying hcl.Parser.
-func NewHCLProvider(ctx *config.ProjectContext, suppressLogging bool, opts ...hcl.Option) (*HCLProvider, error) {
+func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts ...hcl.Option) (*HCLProvider, error) {
+	if config == nil {
+		config = &HCLProviderConfig{}
+	}
+
 	v, err := varsFromPlanFlags(ctx.ProjectConfig.TerraformPlanFlags)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse vars from plan flags %w", err)
@@ -124,10 +134,10 @@ func NewHCLProvider(ctx *config.ProjectContext, suppressLogging bool, opts ...hc
 	}
 
 	return &HCLProvider{
-		Parsers:         parsers,
-		PlanJSONParser:  NewParser(ctx, false),
-		ctx:             ctx,
-		suppressLogging: suppressLogging,
+		parsers:        parsers,
+		planJSONParser: NewParser(ctx, false),
+		ctx:            ctx,
+		config:         *config,
 	}, err
 }
 
@@ -167,7 +177,7 @@ func (p *HCLProvider) parseResources(path string, j []byte, usage map[string]*sc
 
 	project := schema.NewProject(name, metadata)
 
-	pastResources, resources, err := p.PlanJSONParser.parseJSON(j, usage)
+	pastResources, resources, err := p.planJSONParser.parseJSON(j, usage)
 	if err != nil {
 		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
@@ -183,20 +193,15 @@ type hclProject struct {
 	json []byte
 }
 
-// LoadPlanJSONs parses the provided directory and returns it as a Terraform Plan JSON.
+// LoadPlanJSONs parses the found directories and return the blocks in Terraform plan JSON format.
 func (p *HCLProvider) LoadPlanJSONs() ([]hclProject, error) {
-	var jsons = make([]hclProject, len(p.Parsers))
+	var jsons = make([]hclProject, len(p.parsers))
+	modules, err := p.Modules()
+	if err != nil {
+		return nil, err
+	}
 
-	for i, parser := range p.Parsers {
-		if len(p.Parsers) > 1 && !p.suppressLogging {
-			fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
-		}
-
-		module, err := parser.ParseDirectory()
-		if err != nil {
-			return nil, err
-		}
-
+	for i, module := range modules {
 		b, err := p.modulesToPlanJSON(module)
 		if err != nil {
 			return nil, err
@@ -206,6 +211,43 @@ func (p *HCLProvider) LoadPlanJSONs() ([]hclProject, error) {
 	}
 
 	return jsons, nil
+}
+
+// Modules parses the found directories into hcl modules representing a config tree of Terraform information.
+// Modules returns the raw hcl blocks associated with each found Terraform project. This can be used
+// to fetch raw information like outputs, vars, resources, e.t.c.
+func (p *HCLProvider) Modules() ([]*hcl.Module, error) {
+	if p.cache != nil {
+		return p.cache, nil
+	}
+
+	var modules = make([]*hcl.Module, len(p.parsers))
+
+	for i, parser := range p.parsers {
+		if len(p.parsers) > 1 && !p.config.SuppressLogging {
+			fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
+		}
+
+		module, err := parser.ParseDirectory()
+		if err != nil {
+			return nil, err
+		}
+
+		modules[i] = module
+	}
+
+	if p.config.CacheParsingModules {
+		p.cache = modules
+	}
+
+	return modules, nil
+}
+
+// InvalidateCache removes the module cache from the prior hcl parse.
+func (p *HCLProvider) InvalidateCache() *HCLProvider {
+	p.cache = nil
+
+	return p
 }
 
 func (p *HCLProvider) newPlanSchema() {

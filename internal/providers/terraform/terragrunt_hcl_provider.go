@@ -16,14 +16,15 @@ import (
 	tgerrors "github.com/gruntwork-io/terragrunt/errors"
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	"github.com/gruntwork-io/terragrunt/util"
-
-	"github.com/infracost/infracost/internal/hcl"
-
 	"github.com/hashicorp/go-getter"
-
+	hcl2 "github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/gohcl"
+	"github.com/hashicorp/hcl/v2/hclparse"
 	log "github.com/sirupsen/logrus"
+	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -31,6 +32,8 @@ type TerragruntHCLProvider struct {
 	ctx                  *config.ProjectContext
 	Path                 string
 	includePastResources bool
+	outputs              map[string]cty.Value
+	stack                *tgconfigstack.Stack
 }
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
@@ -40,6 +43,7 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		ctx:                  ctx,
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
+		outputs:              map[string]cty.Value{},
 	}
 }
 
@@ -56,15 +60,15 @@ func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 type terragruntWorkingDirInfo struct {
-	ConfigDir  string
-	WorkingDir string
-	Inputs     map[string]interface{}
+	configDir  string
+	workingDir string
+	provider   *HCLProvider
 }
 
 // LoadResources finds any Terragrunt projects, prepares them by downloading any required source files, then
 // process each with an HCLProvider.
 func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
-	workingDirInfos, err := p.prepWorkingDirs()
+	dirs, err := p.prepWorkingDirs()
 	if err != nil {
 		return nil, err
 	}
@@ -72,36 +76,20 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 	var allProjects []*schema.Project
 
 	// Sort the dirs so they are consistent in the output
-	sort.Slice(workingDirInfos, func(i, j int) bool {
-		return workingDirInfos[i].ConfigDir < workingDirInfos[j].ConfigDir
+	sort.Slice(dirs, func(i, j int) bool {
+		return dirs[i].configDir < dirs[j].configDir
 	})
 
-	for _, di := range workingDirInfos {
-		log.Debugf("Found terragrunt HCL working dir: %v", di.WorkingDir)
+	for _, di := range dirs {
+		log.Debugf("Found terragrunt HCL working dir: %v", di.workingDir)
 
-		pconfig := *p.ctx.ProjectConfig // clone the projectConfig
-		pconfig.Path = di.WorkingDir
-		pconfig.TerraformVars = p.initTerraformVars(pconfig.TerraformVars, di.Inputs)
-
-		pctx := config.NewProjectContext(p.ctx.RunContext, &pconfig)
-		h, err := NewHCLProvider(
-			pctx,
-			false,
-			hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
-			hcl.OptionWithWarningFunc(p.ctx.RunContext.NewWarningWriter()),
-		)
-
-		if err != nil {
-			return nil, err
-		}
-
-		projects, err := h.LoadResources(usage)
+		projects, err := di.provider.LoadResources(usage)
 		if err != nil {
 			return nil, err
 		}
 
 		for _, project := range projects {
-			project.Metadata = config.DetectProjectMetadata(di.ConfigDir)
+			project.Metadata = config.DetectProjectMetadata(di.configDir)
 			project.Metadata.Type = p.Type()
 			p.AddMetadata(project.Metadata)
 			project.Name = schema.GenerateProjectName(project.Metadata, p.ctx.RunContext.Config.EnableDashboard)
@@ -143,14 +131,6 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
 		IgnoreExternalDependencies: true,
 		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) error {
-			if terragruntOptions.Writer != nil {
-				// RunTerragrunt must have been invoked as part of a dependency block to get the outputs.
-				// Since we're parsing HCL, outputs are not available anyway.  We return some fake outputs
-				// here so Terragrunt does error with a "No outputs detected error.
-				// See getTerragruntOutputIfAppliedElseConfiguredDefault in terragrunt dependency.go
-				_, _ = terragruntOptions.Writer.Write([]byte(`{ "infracost_mock_output": { "type": "string", "value": "" } }`))
-				return nil
-			}
 			workingDirInfo, err := p.runTerragrunt(terragruntOptions)
 			if workingDirInfo != nil {
 				workingDirsToEstimate = append(workingDirsToEstimate, workingDirInfo)
@@ -164,91 +144,165 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	if err != nil {
 		return nil, err
 	}
+	p.stack = s
 
 	err = s.Run(terragruntOptions)
 	if err != nil {
 		return nil, err
 	}
+	p.outputs = map[string]cty.Value{}
 
 	return workingDirsToEstimate, nil
 }
 
-// Downloads terraform source if necessary, then runs terraform with the given options and CLI args.
-// This will forward all the args and extra_arguments directly to Terraform.
-// Mostly copied from github.com/gruntwork-io/terragrunt
-func (p *TerragruntHCLProvider) runTerragrunt(terragruntOptions *tgoptions.TerragruntOptions) (*terragruntWorkingDirInfo, error) {
-	terragruntConfig, err := tgconfig.ReadTerragruntConfig(terragruntOptions)
+// runTerragrunt evaluates a Terragrunt directory with the given opts. This method is called from the
+// Terragrunt internal libs as part of the Terraform project evaluation. runTerragrunt is called with for all of the folders
+// in a Terragrunt project. Folders that have outputs that are used by other folders are evaluated first.
+//
+// runTerragrunt will
+//		1. build a valid Terraform run env from the opts provided.
+//		2. download source modules that are required for the project.
+// 		3. we then evaluate the Terraform project built by Terragrunt storing any outputs so that we can use
+//			these for further runTerragrunt calls that use the dependency outputs.
+func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (*terragruntWorkingDirInfo, error) {
+	outputs, err := p.fetchDependencyOutputs(opts)
 	if err != nil {
 		return nil, err
 	}
 
-	terragruntOptionsClone := terragruntOptions.Clone(terragruntOptions.TerragruntConfigPath)
+	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
+	if err != nil {
+		return nil, err
+	}
+
+	terragruntOptionsClone := opts.Clone(opts.TerragruntConfigPath)
 	terragruntOptionsClone.TerraformCommand = tgcli.CMD_TERRAGRUNT_READ_CONFIG
 
 	if terragruntConfig.Skip {
-		terragruntOptions.Logger.Infof(
+		opts.Logger.Infof(
 			"Skipping terragrunt module %s due to skip = true.",
-			terragruntOptions.TerragruntConfigPath,
+			opts.TerragruntConfigPath,
 		)
 		return nil, nil
 	}
 
 	// We merge the OriginalIAMRoleOptions into the one from the config, because the CLI passed IAMRoleOptions has
 	// precedence.
-	terragruntOptions.IAMRoleOptions = tgoptions.MergeIAMRoleOptions(
+	opts.IAMRoleOptions = tgoptions.MergeIAMRoleOptions(
 		terragruntConfig.GetIAMRoleOptions(),
-		terragruntOptions.OriginalIAMRoleOptions,
+		opts.OriginalIAMRoleOptions,
 	)
 
-	if err := aws_helper.AssumeRoleAndUpdateEnvIfNecessary(terragruntOptions); err != nil {
+	if err := aws_helper.AssumeRoleAndUpdateEnvIfNecessary(opts); err != nil {
 		return nil, err
 	}
 
 	// get the default download dir
-	_, defaultDownloadDir, err := tgoptions.DefaultWorkingAndDownloadDirs(terragruntOptions.TerragruntConfigPath)
+	_, defaultDownloadDir, err := tgoptions.DefaultWorkingAndDownloadDirs(opts.TerragruntConfigPath)
 	if err != nil {
 		return nil, err
 	}
 
 	// if the download dir hasn't been changed from default, and is set in the config,
 	// then use it
-	if terragruntOptions.DownloadDir == defaultDownloadDir && terragruntConfig.DownloadDir != "" {
-		terragruntOptions.DownloadDir = terragruntConfig.DownloadDir
+	if opts.DownloadDir == defaultDownloadDir && terragruntConfig.DownloadDir != "" {
+		opts.DownloadDir = terragruntConfig.DownloadDir
 	}
 
 	// Override the default value of retryable errors using the value set in the config file
 	if terragruntConfig.RetryableErrors != nil {
-		terragruntOptions.RetryableErrors = terragruntConfig.RetryableErrors
+		opts.RetryableErrors = terragruntConfig.RetryableErrors
 	}
 
 	if terragruntConfig.RetryMaxAttempts != nil {
 		if *terragruntConfig.RetryMaxAttempts < 1 {
 			return nil, fmt.Errorf("Cannot have less than 1 max retry, but you specified %d", *terragruntConfig.RetryMaxAttempts)
 		}
-		terragruntOptions.RetryMaxAttempts = *terragruntConfig.RetryMaxAttempts
+		opts.RetryMaxAttempts = *terragruntConfig.RetryMaxAttempts
 	}
 
 	if terragruntConfig.RetrySleepIntervalSec != nil {
 		if *terragruntConfig.RetrySleepIntervalSec < 0 {
 			return nil, fmt.Errorf("Cannot sleep for less than 0 seconds, but you specified %d", *terragruntConfig.RetrySleepIntervalSec)
 		}
-		terragruntOptions.RetrySleepIntervalSec = time.Duration(*terragruntConfig.RetrySleepIntervalSec) * time.Second
+		opts.RetrySleepIntervalSec = time.Duration(*terragruntConfig.RetrySleepIntervalSec) * time.Second
 	}
 
-	sourceURL, err := tgconfig.GetTerraformSourceUrl(terragruntOptions, terragruntConfig)
+	info := &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
+
+	sourceURL, err := tgconfig.GetTerraformSourceUrl(opts, terragruntConfig)
 	if err != nil {
 		return nil, err
 	}
 	if sourceURL != "" {
-		updatedTerragruntOptions, err := p.downloadTerraformSource(sourceURL, terragruntOptions, terragruntConfig)
+		updatedTerragruntOptions, err := p.downloadTerraformSource(sourceURL, opts, terragruntConfig)
 		if err != nil {
 			return nil, err
 		}
 		if updatedTerragruntOptions != nil && updatedTerragruntOptions.WorkingDir != "" {
-			return &terragruntWorkingDirInfo{ConfigDir: terragruntOptions.WorkingDir, WorkingDir: updatedTerragruntOptions.WorkingDir, Inputs: terragruntConfig.Inputs}, nil
+			info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: updatedTerragruntOptions.WorkingDir}
 		}
 	}
-	return &terragruntWorkingDirInfo{ConfigDir: terragruntOptions.WorkingDir, WorkingDir: terragruntOptions.WorkingDir, Inputs: terragruntConfig.Inputs}, nil
+
+	pconfig := *p.ctx.ProjectConfig // clone the projectConfig
+	pconfig.Path = info.workingDir
+	pconfig.TerraformVars = p.initTerraformVars(pconfig.TerraformVars, terragruntConfig.Inputs)
+
+	h, err := NewHCLProvider(
+		config.NewProjectContext(p.ctx.RunContext, &pconfig),
+		&HCLProviderConfig{CacheParsingModules: true},
+		hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
+		hcl.OptionWithWarningFunc(p.ctx.RunContext.NewWarningWriter()),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("could not create provider for Terragrunt generated dir %w", err)
+	}
+
+	mods, err := h.Modules()
+	if err != nil {
+		return nil, fmt.Errorf("could not parse generated Terraform dir from Terragrunt generated dir %w", err)
+	}
+
+	for _, mod := range mods {
+		p.outputs[opts.TerragruntConfigPath] = mod.Blocks.Outputs()
+	}
+
+	info.provider = h
+	return info, nil
+}
+
+// fetchDependencyOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.
+func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) (cty.Value, error) {
+	outputs := cty.MapVal(map[string]cty.Value{
+		"mock": cty.StringVal("val"),
+	})
+
+	if p.stack != nil {
+		var mod *tgconfigstack.TerraformModule
+		for _, module := range p.stack.Modules {
+			if module.TerragruntOptions.TerragruntConfigPath == opts.TerragruntConfigPath {
+				mod = module
+			}
+		}
+
+		if mod != nil && len(mod.Dependencies) > 0 {
+			blocks, err := decodeDependencyBlocks(mod.TerragruntOptions.TerragruntConfigPath, opts, nil)
+			if err != nil {
+				return cty.Value{}, fmt.Errorf("could not parse dependency blocks for Terragrunt file %s %w", mod.TerragruntOptions.TerragruntConfigPath, err)
+			}
+
+			out := map[string]cty.Value{}
+			for dir, dep := range blocks {
+				out[dep.Name] = cty.MapVal(map[string]cty.Value{
+					"outputs": p.outputs[dir],
+				})
+			}
+
+			outputs = cty.MapVal(out)
+		}
+	}
+
+	return outputs, nil
 }
 
 // 1. Download the given source URL, which should use Terraform's module source syntax, into a temporary folder
@@ -455,4 +509,56 @@ func (p *TerragruntHCLProvider) alreadyHaveLatestCode(terraformSource *tfsource.
 // Copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) readVersionFile(terraformSource *tfsource.TerraformSource) (string, error) {
 	return util.ReadFileAsString(terraformSource.VersionFile)
+}
+
+type terragruntDependency struct {
+	Dependencies []tgconfig.Dependency `hcl:"dependency,block"`
+	Remain       hcl2.Body             `hcl:",remain"`
+}
+
+// decodeDependencyBlocks parses the file at filename and returns a map containing all the hcl blocks with the "dependency" label.
+// The map is keyed by the full path of the config_path attribute specified in the dependency block.
+func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.TerragruntOptions, dependencyOutputs *cty.Value) (map[string]tgconfig.Dependency, error) {
+	parser := hclparse.NewParser()
+	file, _ := parser.ParseHCLFile(filename)
+	localsAsCty, trackInclude, err := tgconfig.DecodeBaseBlocks(terragruntOptions, parser, file, filename, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	contextExtensions := tgconfig.EvalContextExtensions{
+		Locals:              localsAsCty,
+		TrackInclude:        trackInclude,
+		DecodedDependencies: dependencyOutputs,
+	}
+
+	evalContext, err := tgconfig.CreateTerragruntEvalContext(filename, terragruntOptions, contextExtensions)
+	if err != nil {
+		return nil, err
+	}
+
+	var deps terragruntDependency
+	decodeDiagnostics := gohcl.DecodeBody(file.Body, evalContext, &deps)
+	if decodeDiagnostics != nil && decodeDiagnostics.HasErrors() {
+		return nil, decodeDiagnostics
+	}
+
+	depmap := make(map[string]tgconfig.Dependency)
+	for _, dep := range deps.Dependencies {
+		depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
+	}
+
+	return depmap, nil
+}
+
+func getCleanedTargetConfigPath(configPath string, workingPath string) string {
+	cwd := filepath.Dir(workingPath)
+	targetConfig := configPath
+	if !filepath.IsAbs(targetConfig) {
+		targetConfig = util.JoinPath(cwd, targetConfig)
+	}
+	if util.IsDir(targetConfig) {
+		targetConfig = tgconfig.GetDefaultConfigPath(targetConfig)
+	}
+	return util.CleanPath(targetConfig)
 }

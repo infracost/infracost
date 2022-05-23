@@ -140,6 +140,22 @@ func (blocks Blocks) OfType(t string) Blocks {
 	return results
 }
 
+// Outputs returns a map of all the evaluated outputs from the list of Blocks.
+func (blocks Blocks) Outputs() cty.Value {
+	data := make(map[string]cty.Value)
+
+	for _, block := range blocks.OfType("output") {
+		attr := block.GetAttribute("value")
+		if attr == nil {
+			continue
+		}
+
+		data[block.Label()] = attr.Value()
+	}
+
+	return cty.ObjectVal(data)
+}
+
 // Block wraps a hcl.Block type with additional methods and context.
 // A Block is a core piece of HCL schema and represents a set of data.
 // Most importantly a Block directly corresponds to a schema.Resource.

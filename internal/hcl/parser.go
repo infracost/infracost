@@ -182,7 +182,7 @@ type Parser struct {
 
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
-// the initialPath contains Terraform files at the top level Parsers will be len 1.
+// the initialPath contains Terraform files at the top level parsers will be len 1.
 func LoadParsers(initialPath string, options ...Option) ([]*Parser, error) {
 	pl := &projectLocator{moduleCalls: make(map[string]struct{})}
 	rootPaths := pl.findRootModules(initialPath)

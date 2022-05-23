@@ -166,7 +166,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			require.NoError(t, err)
 
 			p := HCLProvider{
-				Parsers: parsers,
+				parsers: parsers,
 			}
 			got, err := p.LoadPlanJSONs()
 			require.NoError(t, err)

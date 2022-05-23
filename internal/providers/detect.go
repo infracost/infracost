@@ -56,7 +56,7 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 	case "terraform_dir":
 		h, providerErr := terraform.NewHCLProvider(
 			ctx,
-			false,
+			nil,
 			hcl.OptionWithSpinner(ctx.RunContext.NewSpinner),
 			hcl.OptionWithWarningFunc(ctx.RunContext.NewWarningWriter()),
 		)

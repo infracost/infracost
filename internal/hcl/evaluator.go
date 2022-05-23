@@ -230,18 +230,7 @@ func (e *Evaluator) evaluateModules() {
 
 // exportOutputs exports module outputs so that it can be used in Context evaluation.
 func (e *Evaluator) exportOutputs() cty.Value {
-	data := make(map[string]cty.Value)
-
-	for _, block := range e.module.Blocks.OfType("output") {
-		attr := block.GetAttribute("value")
-		if attr == nil {
-			continue
-		}
-
-		data[block.Label()] = attr.Value()
-	}
-
-	return cty.ObjectVal(data)
+	return e.module.Blocks.Outputs()
 }
 
 func (e *Evaluator) expandBlocks(blocks Blocks) Blocks {
