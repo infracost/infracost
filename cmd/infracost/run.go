@@ -535,7 +535,7 @@ func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectC
 
 	t1 := time.Now()
 
-	hclProvider, err := terraform.NewHCLProvider(ctx, true)
+	hclProvider, err := terraform.NewHCLProvider(ctx, &terraform.HCLProviderConfig{SuppressLogging: true})
 	if err != nil {
 		log.Debugf("Could not init HCL provider: %s", err)
 		return
