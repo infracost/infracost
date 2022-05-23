@@ -3,6 +3,7 @@ package hcl
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -80,9 +81,12 @@ func RemoteVariablesLoaderWithSpinner(f ui.SpinnerFunc) RemoteVariablesLoaderOpt
 	}
 }
 
-// NewRemoteVariablesLoaderLoader constructs a new loader for fetching remote
-// variables.
+// NewRemoteVariablesLoader constructs a new loader for fetching remote variables.
 func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace string, opts ...RemoteVariablesLoaderOption) *RemoteVariablesLoader {
+	if localWorkspace == "" {
+		localWorkspace = os.Getenv("TF_WORKSPACE")
+	}
+
 	r := &RemoteVariablesLoader{
 		client:         client,
 		localWorkspace: localWorkspace,
