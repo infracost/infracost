@@ -800,7 +800,7 @@ func (r elasticacheReservationResolver) PaymentOption() string {
 }
 
 func (r elasticacheReservationResolver) IsElasticacheReservedNodeLegacyOffering() bool {
-	for k, _ := range elasticacheReservedNodeCacheLegacyOfferings {
+	for k := range elasticacheReservedNodeCacheLegacyOfferings {
 		if k == r.paymentOption {
 			return true
 		}

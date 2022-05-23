@@ -191,15 +191,6 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 	}
 }
 
-func (a *Instance) validateReserveInstanceParams(resolver reservationResolver) (bool, string) {
-	validTypes := []string{"convertible", "standard"}
-	if !stringInSlice(validTypes, strVal(a.ReservedInstanceType)) {
-		return false, fmt.Sprintf("Invalid reserved_instance_type, ignoring reserved options. Expected: convertible, standard. Got: %s", strVal(a.ReservedInstanceType))
-	}
-
-	return resolver.Validate()
-}
-
 func (a *Instance) reservedInstanceCostComponent(osLabel, osFilterVal, purchaseOptionLabel string, resolver reservationResolver) *schema.CostComponent {
 
 	return &schema.CostComponent{
