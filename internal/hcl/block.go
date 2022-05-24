@@ -150,7 +150,17 @@ func (blocks Blocks) Outputs() cty.Value {
 			continue
 		}
 
-		data[block.Label()] = attr.Value()
+		// resolve the attribute value. This will evaluate any expressions that
+		// the attribute uses and try and return the final value. If the end
+		// value can't be resolved we set it as a blank string. This is
+		// safe to use for callers and won't cause panics when marshalling
+		// the returned cty.Value.
+		value := attr.Value()
+		if value == cty.NilVal {
+			value = cty.StringVal("")
+		}
+
+		data[block.Label()] = value
 	}
 
 	return cty.ObjectVal(data)
