@@ -245,10 +245,6 @@ func isTerragruntNestedDir(path string, maxDepth int) bool {
 	return false
 }
 
-func isTerraformDir(path string) bool {
-	return terraform.IsTerraformDir(path)
-}
-
 // goformation lib is not threadsafe, so we run this check synchronously
 // See: https://github.com/awslabs/goformation/issues/363
 var cfMux = &sync.Mutex{}
