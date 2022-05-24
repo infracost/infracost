@@ -36,7 +36,7 @@ Infracost can also estimate [usage-based resources](https://www.infracost.io/doc
 
 ## Community and contributing
 
-Join our [community Slack channel](https://www.infracost.io/community-chat) to learn more about cost estimation, Infracost, and to connect with other users and contributors. Our next community call is in [May 2022](https://github.com/infracost/infracost/issues/1562).
+Join our [community Slack channel](https://www.infracost.io/community-chat) to learn more about cost estimation, Infracost, and to connect with other users and contributors. Checkout the [pinned issues](https://github.com/infracost/infracost/issues) for our next community call.
 
 We ❤️ contributions big or small. For development details, see the [contributing](CONTRIBUTING.md) guide. For major changes, including CLI interface changes, please open an issue first to discuss what you would like to change.
 
