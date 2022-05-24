@@ -9,13 +9,13 @@ USAGE
   infracost [command]
 
 EXAMPLES
-  Show cost diff from Terraform directory, using any required flags:
+  Show cost diff from Terraform directory:
 
       infracost breakdown --path /code --format json --out-file infracost-base.json
-      # Make some changes to your Terraform project
+      # Make Terraform code changes
       infracost diff --path /code --compare-to infracost-base.json
 
-  Show cost breakdown from Terraform directory, using any required flags:
+  Show cost breakdown from Terraform directory:
 
       infracost breakdown --path /code --terraform-var-file my.tfvars
 

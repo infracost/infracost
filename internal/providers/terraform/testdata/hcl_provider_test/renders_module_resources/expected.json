@@ -9,9 +9,6 @@
           "mode": "managed",
           "type": "aws_vpn_connection",
           "name": "example",
-          "infracost_metadata": {
-            "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf"
-          },
           "schema_version": 0,
           "values": {
             "arn": "vpn-arn",
@@ -19,6 +16,15 @@
             "id": "vpn-id",
             "transit_gateway_id": "t-gw-id",
             "type": "ipsec.1"
+          },
+          "infracost_metadata": {
+            "calls": [
+              {
+                "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+                "blockName": "aws_vpn_connection.example"
+              }
+            ],
+            "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf"
           }
         }
       ],
@@ -30,13 +36,23 @@
               "mode": "managed",
               "type": "aws_ec2_transit_gateway",
               "name": "example",
-              "infracost_metadata": {
-                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
-              },
               "schema_version": 0,
               "values": {
                 "arn": "t-gw-arn",
                 "id": "t-gw-id"
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+                    "blockName": "module.gateway"
+                  },
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                    "blockName": "aws_ec2_transit_gateway.example"
+                  }
+                ],
+                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
               }
             },
             {
@@ -44,9 +60,6 @@
               "mode": "managed",
               "type": "aws_customer_gateway",
               "name": "example",
-              "infracost_metadata": {
-                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
-              },
               "schema_version": 0,
               "values": {
                 "arn": "c-gw-arn",
@@ -54,6 +67,19 @@
                 "id": "c-gw-id",
                 "ip_address": "172.0.0.1",
                 "type": "ipsec.1"
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+                    "blockName": "module.gateway"
+                  },
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                    "blockName": "aws_customer_gateway.example"
+                  }
+                ],
+                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
               }
             }
           ],

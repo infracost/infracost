@@ -147,7 +147,7 @@
         "metadata": {
           "patternProperties": {
             ".*": {
-              "type": "string"
+              "additionalProperties": true
             }
           },
           "type": "object"
@@ -260,7 +260,7 @@
         "metadata": {
           "patternProperties": {
             ".*": {
-              "type": "string"
+              "additionalProperties": true
             }
           },
           "type": "object"

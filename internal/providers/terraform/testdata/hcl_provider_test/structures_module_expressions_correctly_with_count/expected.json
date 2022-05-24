@@ -12,9 +12,6 @@
               "type": "aws_ecs_task_definition",
               "name": "ecs_task",
               "index": 0,
-              "infracost_metadata": {
-                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
-              },
               "schema_version": 0,
               "values": {
                 "arn": "task-1-arn",
@@ -32,6 +29,19 @@
                 "requires_compatibilities": [
                   "FARGATE"
                 ]
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
+                    "blockName": "module.module1"
+                  },
+                  {
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                    "blockName": "aws_ecs_task_definition.ecs_task"
+                  }
+                ],
+                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
               }
             },
             {
@@ -40,9 +50,6 @@
               "type": "aws_ecs_service",
               "name": "ecs_service",
               "index": 0,
-              "infracost_metadata": {
-                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
-              },
               "schema_version": 0,
               "values": {
                 "arn": "svc-1-arn",
@@ -51,6 +58,19 @@
                 "launch_type": "FARGATE",
                 "name": "ecs_service_module_1",
                 "task_definition": null
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
+                    "blockName": "module.module1"
+                  },
+                  {
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                    "blockName": "aws_ecs_service.ecs_service"
+                  }
+                ],
+                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
               }
             }
           ],
@@ -64,9 +84,6 @@
                   "type": "aws_ecs_task_definition",
                   "name": "ecs_task",
                   "index": 0,
-                  "infracost_metadata": {
-                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
-                  },
                   "schema_version": 0,
                   "values": {
                     "arn": "task-2-arn",
@@ -84,6 +101,23 @@
                     "requires_compatibilities": [
                       "FARGATE"
                     ]
+                  },
+                  "infracost_metadata": {
+                    "calls": [
+                      {
+                        "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
+                        "blockName": "module.module1"
+                      },
+                      {
+                        "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                        "blockName": "module.module2"
+                      },
+                      {
+                        "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
+                        "blockName": "aws_ecs_task_definition.ecs_task"
+                      }
+                    ],
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
                   }
                 },
                 {
@@ -92,9 +126,6 @@
                   "type": "aws_ecs_service",
                   "name": "ecs_service",
                   "index": 0,
-                  "infracost_metadata": {
-                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
-                  },
                   "schema_version": 0,
                   "values": {
                     "arn": "svc-2-arn",
@@ -103,6 +134,23 @@
                     "launch_type": "FARGATE",
                     "name": "ecs_service_module_2",
                     "task_definition": null
+                  },
+                  "infracost_metadata": {
+                    "calls": [
+                      {
+                        "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
+                        "blockName": "module.module1"
+                      },
+                      {
+                        "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                        "blockName": "module.module2"
+                      },
+                      {
+                        "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
+                        "blockName": "aws_ecs_service.ecs_service"
+                      }
+                    ],
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
                   }
                 }
               ],

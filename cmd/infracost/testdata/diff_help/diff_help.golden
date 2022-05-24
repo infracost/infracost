@@ -7,7 +7,7 @@ EXAMPLES
   Use Terraform directory:
 
       infracost breakdown --path /code --format json --out-file infracost-base.json
-      # Make some changes to your Terraform project
+      # Make Terraform code changes
       infracost diff --path /code --compare-to infracost-base.json
 
   Use Terraform plan JSON:
