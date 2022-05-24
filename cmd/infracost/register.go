@@ -23,7 +23,6 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 		Long:  "Register for a free Infracost API key",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var isRegenerate bool
-			var ciInterest bool
 
 			if ctx.Config.Credentials.APIKey != "" {
 
@@ -36,19 +35,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				}
 
 				if !status {
-					ciInterest, err := promptForCIDocs(false)
-					if err != nil {
-						// user cancelled
-						return nil
-					}
-
-					showDocs(ciInterest)
-					return nil
-				}
-
-				ciInterest, err = promptForCIDocs(isRegenerate)
-				if err != nil {
-					// user cancelled
+					showDocs()
 					return nil
 				}
 
@@ -70,18 +57,9 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				return nil
 			}
 
-			// prompt for the ci docs after user email,name only if not regenerating
-			if !isRegenerate {
-				ciInterest, err = promptForCIDocs(isRegenerate)
-				if err != nil {
-					// user cancelled
-					return nil
-				}
-			}
-
 			d := apiclient.NewDashboardAPIClient(ctx)
 
-			r, err := d.CreateAPIKey(name, email, ciInterest, ctx.ContextValues())
+			r, err := d.CreateAPIKey(name, email, ctx.ContextValues())
 			if err != nil {
 				return err
 			}
@@ -102,7 +80,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 				}
 
 				if !confirm {
-					showDocs(ciInterest)
+					showDocs()
 					return nil
 				}
 			}
@@ -116,18 +94,14 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			fmt.Printf("This was saved to %s\n\n", config.CredentialsFilePath())
-			showDocs(ciInterest)
+			showDocs()
 			return nil
 		},
 	}
 }
 
-func showDocs(ciInterest bool) {
-	if ciInterest {
-		fmt.Printf("Follow %s to add cost estimates to your pull requests.\n", ui.LinkString("https://infracost.io/cicd"))
-	} else {
-		fmt.Printf("Follow %s to use Infracost.\n", ui.LinkString("https://infracost.io/docs"))
-	}
+func showDocs() {
+	fmt.Printf("Follow %s to use Infracost.\n", ui.LinkString("https://infracost.io/docs"))
 }
 
 func promptForName() (string, error) {
@@ -140,15 +114,6 @@ func promptForName() (string, error) {
 	})
 
 	return name, err
-}
-
-func promptForCIDocs(isRegenerate bool) (bool, error) {
-	label := "Would you like to see our CI/CD integration docs"
-	if isRegenerate {
-		label = "Do you plan to use this API key in CI"
-	}
-
-	return yesNoPrompt(label)
 }
 
 func promptForEmail() (string, error) {

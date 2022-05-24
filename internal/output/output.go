@@ -159,13 +159,13 @@ type CostComponent struct {
 }
 
 type Resource struct {
-	Name           string            `json:"name"`
-	Tags           map[string]string `json:"tags,omitempty"`
-	Metadata       map[string]string `json:"metadata"`
-	HourlyCost     *decimal.Decimal  `json:"hourlyCost"`
-	MonthlyCost    *decimal.Decimal  `json:"monthlyCost"`
-	CostComponents []CostComponent   `json:"costComponents,omitempty"`
-	SubResources   []Resource        `json:"subresources,omitempty"`
+	Name           string                 `json:"name"`
+	Tags           map[string]string      `json:"tags,omitempty"`
+	Metadata       map[string]interface{} `json:"metadata"`
+	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
+	MonthlyCost    *decimal.Decimal       `json:"monthlyCost"`
+	CostComponents []CostComponent        `json:"costComponents,omitempty"`
+	SubResources   []Resource             `json:"subresources,omitempty"`
 }
 
 func (r Resource) ResourceType() string {
@@ -288,9 +288,16 @@ func outputResource(r *schema.Resource) Resource {
 		subresources = append(subresources, outputResource(s))
 	}
 
+	metadata := make(map[string]interface{})
+	if r.Metadata != nil {
+		for k, v := range r.Metadata {
+			metadata[k] = v.Value()
+		}
+	}
+
 	return Resource{
 		Name:           r.Name,
-		Metadata:       map[string]string{},
+		Metadata:       metadata,
 		Tags:           r.Tags,
 		HourlyCost:     r.HourlyCost,
 		MonthlyCost:    r.MonthlyCost,
@@ -713,7 +720,7 @@ func sortResources(resources []Resource, groupKey string) {
 		}
 
 		// Sort by the group key
-		return resources[i].Metadata[groupKey] < resources[j].Metadata[groupKey]
+		return resources[i].Metadata[groupKey].(string) < resources[j].Metadata[groupKey].(string)
 	})
 }
 

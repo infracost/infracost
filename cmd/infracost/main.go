@@ -86,13 +86,15 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 %s
   Quick start: https://infracost.io/docs
   Add cost estimates to your pull requests: https://infracost.io/cicd`, ui.BoldString("DOCS")),
-		Example: `  Show cost diff from Terraform directory, using any required flags:
+		Example: `  Show cost diff from Terraform directory:
 
-      infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
+      infracost breakdown --path /code --format json --out-file infracost-base.json
+      # Make Terraform code changes
+      infracost diff --path /code --compare-to infracost-base.json
 
-  Show full cost breakdown from Terraform directory, using any required flags:
+  Show cost breakdown from Terraform directory:
 
-      infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"`,
+      infracost breakdown --path /code --terraform-var-file my.tfvars`,
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true

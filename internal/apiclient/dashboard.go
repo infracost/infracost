@@ -55,11 +55,10 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 	}
 }
 
-func (c *DashboardAPIClient) CreateAPIKey(name string, email string, ciInterest bool, contextVals map[string]interface{}) (CreateAPIKeyResponse, error) {
+func (c *DashboardAPIClient) CreateAPIKey(name string, email string, contextVals map[string]interface{}) (CreateAPIKeyResponse, error) {
 	d := map[string]interface{}{
 		"name":        name,
 		"email":       email,
-		"ci":          ciInterest,
 		"os":          contextVals["os"],
 		"version":     contextVals["version"],
 		"fullVersion": contextVals["fullVersion"],

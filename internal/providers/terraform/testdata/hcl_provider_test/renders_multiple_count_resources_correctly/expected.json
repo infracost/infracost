@@ -14,6 +14,15 @@
           "values": {
             "arn": "eip-arn",
             "id": "eip"
+          },
+          "infracost_metadata": {
+            "calls": [
+              {
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                "blockName": "aws_eip.test"
+              }
+            ],
+            "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
           }
         },
         {
@@ -26,6 +35,15 @@
           "values": {
             "arn": "eip-1-arn",
             "id": "eip-1"
+          },
+          "infracost_metadata": {
+            "calls": [
+              {
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                "blockName": "aws_eip.test"
+              }
+            ],
+            "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
           }
         }
       ],
@@ -46,6 +64,19 @@
                 "launch_configuration": "lc",
                 "max_size": 3,
                 "min_size": 1
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                    "blockName": "module.autos"
+                  },
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                    "blockName": "aws_autoscaling_group.test"
+                  }
+                ],
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
               }
             },
             {
@@ -62,6 +93,19 @@
                 "launch_configuration": "lc-1",
                 "max_size": 3,
                 "min_size": 1
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                    "blockName": "module.autos"
+                  },
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                    "blockName": "aws_autoscaling_group.test"
+                  }
+                ],
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
               }
             },
             {
@@ -78,6 +122,19 @@
                 "launch_configuration": "lc-2",
                 "max_size": 3,
                 "min_size": 1
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                    "blockName": "module.autos"
+                  },
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                    "blockName": "aws_autoscaling_group.test"
+                  }
+                ],
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
               }
             },
             {
@@ -92,6 +149,19 @@
                 "id": "lc",
                 "image_id": "fake_ami",
                 "instance_type": "t2.micro"
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                    "blockName": "module.autos"
+                  },
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                    "blockName": "aws_launch_configuration.test"
+                  }
+                ],
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
               }
             },
             {
@@ -106,6 +176,19 @@
                 "id": "lc-1",
                 "image_id": "fake_ami",
                 "instance_type": "t2.medium"
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                    "blockName": "module.autos"
+                  },
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                    "blockName": "aws_launch_configuration.test"
+                  }
+                ],
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
               }
             },
             {
@@ -120,6 +203,19 @@
                 "id": "lc-2",
                 "image_id": "fake_ami",
                 "instance_type": "t2.large"
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                    "blockName": "module.autos"
+                  },
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                    "blockName": "aws_launch_configuration.test"
+                  }
+                ],
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
               }
             }
           ],

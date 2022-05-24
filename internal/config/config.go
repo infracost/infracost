@@ -20,12 +20,12 @@ type Project struct {
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
 	Path string `yaml:"path,omitempty" ignored:"true"`
-	// TerraformParseHCL will run a project by parsing hcl files the given Path rather than using a plan.json or terraform binary.
-	TerraformParseHCL bool `yaml:"hcl_only,omitempty"`
-	// TerraformVarFiles is the number of var files that are needed to run an TerraformParseHCL run
+	// TerraformVarFiles is any var files that are to be used with the project.
 	TerraformVarFiles []string `yaml:"terraform_var_files"`
-	// TerraformVars is a slice of input vars that is used to run an TerraformParseHCL run
+	// TerraformVars is a slice of input vars that are to be used with the project.
 	TerraformVars map[string]string `yaml:"terraform_vars"`
+	// TerraformForceCLI will run a project by calling out to the terraform/terragrunt binary to generate a plan JSON file.
+	TerraformForceCLI bool `yaml:"terraform_force_cli,omitempty"`
 	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
 	TerraformPlanFlags string `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
 	// TerraformInitFlags are flags to pass to terraform init

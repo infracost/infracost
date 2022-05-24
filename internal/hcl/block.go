@@ -15,40 +15,60 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 )
 
-var terraformSchemaV012 = &hcl.BodySchema{
-	Blocks: []hcl.BlockHeaderSchema{
-		{
-			Type: "terraform",
+var (
+	terraformSchemaV012 = &hcl.BodySchema{
+		Blocks: []hcl.BlockHeaderSchema{
+			{
+				Type: "terraform",
+			},
+			{
+				Type:       "provider",
+				LabelNames: []string{"name"},
+			},
+			{
+				Type:       "variable",
+				LabelNames: []string{"name"},
+			},
+			{
+				Type: "locals",
+			},
+			{
+				Type:       "output",
+				LabelNames: []string{"name"},
+			},
+			{
+				Type:       "module",
+				LabelNames: []string{"name"},
+			},
+			{
+				Type:       "resource",
+				LabelNames: []string{"type", "name"},
+			},
+			{
+				Type:       "data",
+				LabelNames: []string{"type", "name"},
+			},
 		},
-		{
-			Type:       "provider",
-			LabelNames: []string{"name"},
+	}
+	justProviderBlocks = &hcl.BodySchema{
+		Blocks: []hcl.BlockHeaderSchema{
+			{
+				Type:       "provider",
+				LabelNames: []string{"name"},
+			},
 		},
-		{
-			Type:       "variable",
-			LabelNames: []string{"name"},
+	}
+	justModuleBlocks = &hcl.BodySchema{
+		Blocks: []hcl.BlockHeaderSchema{
+			{
+				Type:       "module",
+				LabelNames: []string{"name"},
+			},
 		},
-		{
-			Type: "locals",
-		},
-		{
-			Type:       "output",
-			LabelNames: []string{"name"},
-		},
-		{
-			Type:       "module",
-			LabelNames: []string{"name"},
-		},
-		{
-			Type:       "resource",
-			LabelNames: []string{"type", "name"},
-		},
-		{
-			Type:       "data",
-			LabelNames: []string{"type", "name"},
-		},
-	},
-}
+	}
+
+	errorNoHCLContents = fmt.Errorf("file contents is empty")
+)
 
 // referencedBlocks is a helper in interface adheres to the sort.Interface interface.
 // This enables us to sort the blocks by their references to provide a list order
@@ -120,6 +140,32 @@ func (blocks Blocks) OfType(t string) Blocks {
 	return results
 }
 
+// Outputs returns a map of all the evaluated outputs from the list of Blocks.
+func (blocks Blocks) Outputs() cty.Value {
+	data := make(map[string]cty.Value)
+
+	for _, block := range blocks.OfType("output") {
+		attr := block.GetAttribute("value")
+		if attr == nil {
+			continue
+		}
+
+		// resolve the attribute value. This will evaluate any expressions that
+		// the attribute uses and try and return the final value. If the end
+		// value can't be resolved we set it as a blank string. This is
+		// safe to use for callers and won't cause panics when marshalling
+		// the returned cty.Value.
+		value := attr.Value()
+		if value == cty.NilVal {
+			value = cty.StringVal("")
+		}
+
+		data[block.Label()] = value
+	}
+
+	return cty.ObjectVal(data)
+}
+
 // Block wraps a hcl.Block type with additional methods and context.
 // A Block is a core piece of HCL schema and represents a set of data.
 // Most importantly a Block directly corresponds to a schema.Resource.
@@ -164,7 +210,8 @@ type Block struct {
 	// See Block docs for more information about child Blocks.
 	childBlocks Blocks
 	// verbose determines whether the block uses verbose debug logging.
-	verbose bool
+	verbose  bool
+	Filename string
 }
 
 // BlockBuilder handles generating new Blocks as part of the parsing and evaluation process.
@@ -173,7 +220,7 @@ type BlockBuilder struct {
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.
-func (b BlockBuilder) NewBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
+func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 	if ctx == nil {
 		ctx = NewContext(&hcl.EvalContext{}, nil)
 	}
@@ -182,7 +229,7 @@ func (b BlockBuilder) NewBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *B
 	var children Blocks
 	if body, ok := hclBlock.Body.(*hclsyntax.Body); ok {
 		for _, bb := range body.Blocks {
-			children = append(children, b.NewBlock(bb.AsHCLBlock(), ctx, moduleBlock))
+			children = append(children, b.NewBlock(filename, bb.AsHCLBlock(), ctx, moduleBlock))
 		}
 
 		for _, f := range b.SetAttributes {
@@ -190,6 +237,7 @@ func (b BlockBuilder) NewBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *B
 		}
 
 		return &Block{
+			Filename:    filename,
 			context:     ctx,
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
@@ -214,7 +262,7 @@ func (b BlockBuilder) NewBlock(hclBlock *hcl.Block, ctx *Context, moduleBlock *B
 	}
 
 	for _, hb := range content.Blocks {
-		children = append(children, b.NewBlock(hb, ctx, moduleBlock))
+		children = append(children, b.NewBlock(filename, hb, ctx, moduleBlock))
 	}
 
 	return &Block{
@@ -238,7 +286,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 
 	cloneHCL := *block.hclBlock
 
-	clone := b.NewBlock(&cloneHCL, childCtx, block.moduleBlock)
+	clone := b.NewBlock(block.Filename, &cloneHCL, childCtx, block.moduleBlock)
 	if len(clone.hclBlock.Labels) > 0 {
 		position := len(clone.hclBlock.Labels) - 1
 		labels := make([]string, len(clone.hclBlock.Labels))
@@ -280,7 +328,7 @@ func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string) (Blocks
 
 	moduleCtx := NewContext(&hcl.EvalContext{}, nil)
 	for _, file := range moduleFiles {
-		fileBlocks, err := loadBlocksFromFile(file)
+		fileBlocks, err := loadBlocksFromFile(file, nil)
 		if err != nil {
 			return blocks, err
 		}
@@ -290,7 +338,7 @@ func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string) (Blocks
 		}
 
 		for _, fileBlock := range fileBlocks {
-			blocks = append(blocks, b.NewBlock(fileBlock, moduleCtx, block))
+			blocks = append(blocks, b.NewBlock(file.path, fileBlock, moduleCtx, block))
 		}
 	}
 
@@ -397,6 +445,39 @@ func (b *Block) HasModuleBlock() bool {
 	}
 
 	return b.moduleBlock != nil
+}
+
+type ModuleMetadata struct {
+	Filename  string `json:"filename"`
+	BlockName string `json:"blockName"`
+}
+
+// CallDetails returns the tree of module calls that were used to create this resource. Each step of the tree
+// contains a full file path and block name that were used to create the resource.
+//
+// CallDetails returns a list of ModuleMetadata that are ordered by appearance in the Terraform config tree.
+func (b *Block) CallDetails() []ModuleMetadata {
+	block := b
+	var meta []ModuleMetadata
+	for {
+		meta = append(meta, ModuleMetadata{
+			Filename:  block.Filename,
+			BlockName: stripCount(block.LocalName()),
+		})
+
+		if block.moduleBlock == nil {
+			break
+		}
+
+		block = block.moduleBlock
+	}
+
+	reversed := make([]ModuleMetadata, 0, len(meta))
+	for i := len(meta) - 1; i >= 0; i-- {
+		reversed = append(reversed, meta[i])
+	}
+
+	return reversed
 }
 
 // ModuleAddress returns the address of the module associated with this Block or "" if it is part of the root Module
@@ -694,7 +775,10 @@ func (b *Block) NameLabel() string {
 	return ""
 }
 
-var countRegex = regexp.MustCompile(`\[(\d+)\]$`)
+var (
+	countRegex   = regexp.MustCompile(`\[(\d+)\]$`)
+	foreachRegex = regexp.MustCompile(`\["(\w+)"\]$`)
+)
 
 // Index returns the count index of the block using the name label.
 // Index returns nil if the block has no count.
@@ -714,15 +798,23 @@ func (b *Block) Label() string {
 	return strings.Join(b.hclBlock.Labels, ".")
 }
 
-func loadBlocksFromFile(file *hcl.File) (hcl.Blocks, error) {
-	contents, diags := file.Body.Content(terraformSchemaV012)
+func loadBlocksFromFile(file file, schema *hcl.BodySchema) (hcl.Blocks, error) {
+	if schema == nil {
+		schema = terraformSchemaV012
+	}
+
+	contents, diags := file.hclFile.Body.Content(schema)
 	if diags != nil && diags.HasErrors() {
 		return nil, diags
 	}
 
 	if contents == nil {
-		return nil, fmt.Errorf("file contents is empty")
+		return nil, errorNoHCLContents
 	}
 
 	return contents.Blocks, nil
+}
+
+func stripCount(s string) string {
+	return foreachRegex.ReplaceAllString(countRegex.ReplaceAllString(s, ""), "")
 }

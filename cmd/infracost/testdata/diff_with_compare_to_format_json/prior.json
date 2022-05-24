@@ -3,12 +3,12 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_compare_to",
+      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_compare_to_format_json",
       "metadata": {
-        "path": ".",
+        "path": "testdata/diff_with_compare_to_format_json",
         "type": "terraform_dir",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to",
+        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_format_json",
         "terraformWorkspace": "default"
       },
       "pastBreakdown": {
