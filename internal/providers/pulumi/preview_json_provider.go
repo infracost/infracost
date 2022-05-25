@@ -1,7 +1,6 @@
 package pulumi
 
 import (
-	"github.com/awslabs/goformation/v4"
 	"github.com/pkg/errors"
 
 	"github.com/infracost/infracost/internal/config"

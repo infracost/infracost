@@ -7,15 +7,23 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/awslabs/goformation/v4"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
+	"github.com/infracost/infracost/internal/providers/pulumi"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/pulumi/pulumi/pkg/v3/engine"
+	"github.com/pulumi/pulumi/pkg/v3/resource/deploy"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/diag"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 )
 
 // ValidationError represents an error that is raised because provider conditions are not met.
@@ -89,6 +97,8 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
 	case "cloudformation":
 		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
+	case "pulumi":
+		return pulumi.NewPreviewJSONProvider(ctx, includePastResources), nil
 	}
 
 	return nil, fmt.Errorf("Could not detect path type for '%s'", path)
@@ -138,6 +148,10 @@ func DetectProjectType(path string, forceCLI bool) string {
 			return "terragrunt_cli"
 		}
 		return "terragrunt_dir"
+	}
+
+	if isPulumiPreviewJSON(path) {
+		return "pulumi"
 	}
 
 	if forceCLI {
@@ -245,6 +259,22 @@ func isTerragruntNestedDir(path string, maxDepth int) bool {
 	return false
 }
 
+func isPulumiPreviewJSON(path string) bool {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+
+	var jsonFormat previewDigest
+
+	err = json.Unmarshal(b, &jsonFormat)
+	if err != nil {
+		return false
+	}
+
+	return jsonFormat.ChangeSummary.HasChanges()
+}
+
 // goformation lib is not threadsafe, so we run this check synchronously
 // See: https://github.com/awslabs/goformation/issues/363
 var cfMux = &sync.Mutex{}
@@ -263,4 +293,59 @@ func isCloudFormationTemplate(path string) bool {
 	}
 
 	return false
+}
+
+// previewDigest is a JSON-serializable overview of a preview operation.
+type previewDigest struct {
+	// Config contains a map of configuration keys/values used during the preview. Any secrets will be blinded.
+	Config map[string]string `json:"config,omitempty"`
+
+	// Steps contains a detailed list of all resource step operations.
+	Steps []*previewStep `json:"steps,omitempty"`
+	// Diagnostics contains a record of all warnings/errors that took place during the preview. Note that
+	// ephemeral and debug messages are omitted from this list, as they are meant for display purposes only.
+	Diagnostics []previewDiagnostic `json:"diagnostics,omitempty"`
+
+	// Duration records the amount of time it took to perform the preview.
+	Duration time.Duration `json:"duration,omitempty"`
+	// ChangeSummary contains a map of count per operation (create, update, etc).
+	ChangeSummary engine.ResourceChanges `json:"changeSummary,omitempty"`
+	// MaybeCorrupt indicates whether one or more resources may be corrupt.
+	MaybeCorrupt bool `json:"maybeCorrupt,omitempty"`
+}
+
+// propertyDiff contains information about the difference in a single property value.
+type propertyDiff struct {
+	// Kind is the kind of difference.
+	Kind string `json:"kind"`
+	// InputDiff is true if this is a difference between old and new inputs instead of old state and new inputs.
+	InputDiff bool `json:"inputDiff"`
+}
+
+// previewStep is a detailed overview of a step the engine intends to take.
+type previewStep struct {
+	// Op is the kind of operation being performed.
+	Op deploy.StepOp `json:"op"`
+	// URN is the resource being affected by this operation.
+	URN resource.URN `json:"urn"`
+	// Provider is the provider that will perform this step.
+	Provider string `json:"provider,omitempty"`
+	// OldState is the old state for this resource, if appropriate given the operation type.
+	OldState *apitype.ResourceV3 `json:"oldState,omitempty"`
+	// NewState is the new state for this resource, if appropriate given the operation type.
+	NewState *apitype.ResourceV3 `json:"newState,omitempty"`
+	// DiffReasons is a list of keys that are causing a diff (for updating steps only).
+	DiffReasons []resource.PropertyKey `json:"diffReasons,omitempty"`
+	// ReplaceReasons is a list of keys that are causing replacement (for replacement steps only).
+	ReplaceReasons []resource.PropertyKey `json:"replaceReasons,omitempty"`
+	// DetailedDiff is a structured diff that indicates precise per-property differences.
+	DetailedDiff map[string]propertyDiff `json:"detailedDiff"`
+}
+
+// previewDiagnostic is a warning or error emitted during the execution of the preview.
+type previewDiagnostic struct {
+	URN      resource.URN  `json:"urn,omitempty"`
+	Prefix   string        `json:"prefix,omitempty"`
+	Message  string        `json:"message,omitempty"`
+	Severity diag.Severity `json:"severity,omitempty"`
 }

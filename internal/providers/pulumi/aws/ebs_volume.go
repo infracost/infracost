@@ -16,7 +16,7 @@ func getEBSVolumeRegistryItem() *schema.RegistryItem {
 func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var size *int64
 	if d.Get("size").Type != gjson.Null {
-		size = intPtr(d.Get("size").Int())
+		size = IntPtr(d.Get("size").Int())
 	}
 
 	a := &aws.EBSVolume{
