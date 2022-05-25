@@ -16,7 +16,7 @@ import (
 )
 
 // previewDigest is a JSON-serializable overview of a preview operation.
-type previewDigest struct {
+type PreviewDigest struct {
 	// Config contains a map of configuration keys/values used during the preview. Any secrets will be blinded.
 	Config map[string]string `json:"config,omitempty"`
 
@@ -114,14 +114,14 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func (p *Parser) parseTemplate(t *previewDigest, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+func (p *Parser) parsePreviewDigest(t *PreviewDigest, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	var resources []*schema.Resource
 	resources = append(resources, baseResources...)
 
-	for name, d := range t.Resources {
-		tags := map[string]string{} // TODO: Where do I get tags?
+	for i := range t.Steps {
+		// tags := map[string]string{} // TODO: Where do I get tags?
 		var usageData *schema.UsageData
 
 		if ud := usage[name]; ud != nil {

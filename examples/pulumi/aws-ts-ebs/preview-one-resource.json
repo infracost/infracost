@@ -1,0 +1,50 @@
+{
+    "config": {
+        "aws:region": "us-east-1"
+    },
+    "steps": [
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
+                "custom": false,
+                "type": "pulumi:pulumi:Stack",
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example",
+                "custom": true,
+                "type": "aws:ebs/volume:Volume",
+                "inputs": {
+                    "__defaults": [],
+                    "availabilityZone": "us-west-2a",
+                    "size": 40,
+                    "tags": {
+                        "Name": "HelloWorld",
+                        "__defaults": []
+                    }
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "availabilityZone": null,
+                    "size": null,
+                    "tags": null
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        }
+    ],
+    "duration": 17482990160,
+    "changeSummary": {
+        "create": 2
+    }
+}

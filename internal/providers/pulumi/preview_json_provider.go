@@ -1,9 +1,13 @@
 package pulumi
 
 import (
+	"encoding/json"
+	"os"
+
 	"github.com/pkg/errors"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/providers/pulumi"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -22,11 +26,11 @@ func NewPreviewJSONProvider(ctx *config.ProjectContext, includePastResources boo
 }
 
 func (p *PreviewJSONProvider) Type() string {
-	return "cloudformation"
+	return "pulumi"
 }
 
 func (p *PreviewJSONProvider) DisplayType() string {
-	return "CloudFormation"
+	return "Pulumi"
 }
 
 func (p *PreviewJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
@@ -34,7 +38,13 @@ func (p *PreviewJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 func (p *PreviewJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
-	template, err := goformation.Open(p.Path)
+	b, err := os.ReadFile(p.Path)
+	if err != nil {
+		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi Preview JSON file")
+	}
+	var jsonPreviewDigest pulumi.PreviewDigest
+	err = json.Unmarshal(b, &jsonPreviewDigest)
+
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi Preview JSON file")
 	}
@@ -46,9 +56,9 @@ func (p *PreviewJSONProvider) LoadResources(usage map[string]*schema.UsageData) 
 
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx)
-	pastResources, resources, err := parser.parseTemplate(template, usage)
+	pastResources, resources, err := parser.parsePreviewDigest(jsonPreviewDigest, usage)
 	if err != nil {
-		return []*schema.Project{project}, errors.Wrap(err, "Error parsing CloudFormation template file")
+		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Pulumi Preview JSON file")
 	}
 
 	project.PastResources = pastResources
