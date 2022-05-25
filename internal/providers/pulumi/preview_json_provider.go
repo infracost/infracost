@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/pulumi"
@@ -44,6 +45,7 @@ func (p *PreviewJSONProvider) LoadResources(usage map[string]*schema.UsageData) 
 	}
 	var jsonPreviewDigest pulumi.PreviewDigest
 	err = json.Unmarshal(b, &jsonPreviewDigest)
+	gjsonResult := gjson.ParseBytes(b)
 
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi Preview JSON file")
@@ -56,7 +58,7 @@ func (p *PreviewJSONProvider) LoadResources(usage map[string]*schema.UsageData) 
 
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx)
-	pastResources, resources, err := parser.parsePreviewDigest(jsonPreviewDigest, usage)
+	pastResources, resources, err := parser.parsePreviewDigest(jsonPreviewDigest, usage, gjsonResult)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Pulumi Preview JSON file")
 	}

@@ -114,33 +114,40 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func (p *Parser) parsePreviewDigest(t *PreviewDigest, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+func (p *Parser) parsePreviewDigest(t *PreviewDigest, usage map[string]*schema.UsageData, rawValues gjson.Result) ([]*schema.Resource, []*schema.Resource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	var resources []*schema.Resource
+	var pastResources []*schema.Resource
 	resources = append(resources, baseResources...)
 
 	for i := range t.Steps {
-		// tags := map[string]string{} // TODO: Where do I get tags?
+		var step = t.Steps[i]
+		if step.NewState.Type == "pulumi:pulumi:Stack" {
+			continue
+		}
+		var name = step.NewState.URN.Name().String()
+		var resourceType = step.NewState.Type.String()
+		var providerName = strings.Split(step.NewState.Type.String(), ":")[0]
+		tags := map[string]string{} // TODO: Where do I get tags?
 		var usageData *schema.UsageData
 
 		if ud := usage[name]; ud != nil {
 			usageData = ud
-		} else if strings.HasSuffix(name, "]") {
-			lastIndexOfOpenBracket := strings.LastIndex(name, "[")
-
-			if arrayUsageData := usage[fmt.Sprintf("%s[*]", name[:lastIndexOfOpenBracket])]; arrayUsageData != nil {
-				usageData = arrayUsageData
-			}
 		}
-		resourceData := schema.NewCFResourceData(d.AWSCloudFormationType(), "aws", name, tags, d)
+
+		resourceData := schema.NewResourceData(resourceType, providerName, name, tags, rawValues)
 
 		if r := p.createResource(resourceData, usageData); r != nil {
-			resources = append(resources, r)
+			if step.Op == "same" {
+				pastResources = append(resources, r)
+			} else if step.Op == "create" {
+				resources = append(resources, r)
+			}
 		}
 	}
 
-	return resources, resources, nil
+	return pastResources, resources, nil
 }
 
 func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {
