@@ -3,7 +3,6 @@ package aws
 import (
 	"fmt"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"math"
 	"reflect"
 	"regexp"
@@ -672,11 +671,9 @@ var InstanceTypeToVCPU = map[string]int64{
 	"z1d.xlarge":       4,
 }
 
-// ReservationResolver
+// ReservationResolver interface to get filtered price for reserved resources
 type reservationResolver interface {
-	Term() string
-	PaymentOption() string
-	Validate() (bool, string)
+	PriceFilter() (*schema.PriceFilter, error)
 }
 
 var reservedTermsMapping = map[string]string{
@@ -690,82 +687,6 @@ var reservedPaymentOptionMapping = map[string]string{
 	"all_upfront":     "All Upfront",
 }
 
-// EC2 implementation of reservationResolver
-type ec2ReservationResolver struct {
-	term              string
-	paymentOption     string
-	termOfferingClass string
-}
-
-func newEc2ReservationResolver(term, paymentOption, termOfferingClass string) *ec2ReservationResolver {
-	return &ec2ReservationResolver{
-		term:              term,
-		paymentOption:     paymentOption,
-		termOfferingClass: termOfferingClass,
-	}
-}
-
-func (r ec2ReservationResolver) Term() string {
-	return reservedTermsMapping[r.term]
-}
-
-func (r ec2ReservationResolver) PaymentOption() string {
-	return reservedPaymentOptionMapping[r.paymentOption]
-}
-
-func (r ec2ReservationResolver) Validate() (bool, string) {
-	validTypes := []string{"convertible", "standard"}
-	if !stringInSlice(validTypes, r.termOfferingClass) {
-		return false, fmt.Sprintf("Invalid reserved_instance_type, ignoring reserved options. Expected: convertible, standard. Got: %s", r.termOfferingClass)
-	}
-	validTerms := sliceOfKeysFromMap(reservedTermsMapping)
-	if !stringInSlice(validTerms, r.term) {
-		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validTerms, ", "), r.term)
-	}
-	validOptions := sliceOfKeysFromMap(reservedPaymentOptionMapping)
-	if !stringInSlice(validOptions, r.paymentOption) {
-		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
-	}
-	return true, ""
-}
-
-// RDS implementation of reservationResolver
-type rdsReservationResolver struct {
-	term          string
-	paymentOption string
-}
-
-func newRdsReservationResolver(term, paymentOption string) *rdsReservationResolver {
-	return &rdsReservationResolver{
-		term:          term,
-		paymentOption: paymentOption,
-	}
-}
-
-func (r rdsReservationResolver) Term() string {
-	return reservedTermsMapping[r.term]
-}
-
-func (r rdsReservationResolver) PaymentOption() string {
-	return reservedPaymentOptionMapping[r.paymentOption]
-}
-
-func (r rdsReservationResolver) Validate() (bool, string) {
-	validTerms := sliceOfKeysFromMap(reservedTermsMapping)
-	if !stringInSlice(validTerms, r.term) {
-		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validTerms, ", "), r.term)
-	}
-	validOptions := sliceOfKeysFromMap(reservedPaymentOptionMapping)
-	if r.term == "3_year" {
-		validOptions = []string{"partial_upfront", "all_upfront"}
-	}
-	if !stringInSlice(validOptions, r.paymentOption) {
-		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
-	}
-	return true, ""
-}
-
-// Elasticache implementation of reservationResolver
 var elasticacheReservedNodeCacheLegacyOfferings = map[string]string{
 	"heavy_utilization":  "Heavy Utilization",
 	"medium_utilization": "Medium Utilization",
@@ -774,54 +695,37 @@ var elasticacheReservedNodeCacheLegacyOfferings = map[string]string{
 
 var elasticacheReservedNodeLegacyTypes = []string{"t2", "m3", "m4", "r3", "r4"}
 
-type elasticacheReservationResolver struct {
+// RDS implementation of reservationResolver
+type rdsReservationResolver struct {
 	term          string
 	paymentOption string
-	cacheNodeType string
 }
 
-func newElasticacheReservationResolver(term, paymentOption, cacheNodeType string) *elasticacheReservationResolver {
-	return &elasticacheReservationResolver{
+func newRdsReservationResolver(term, paymentOption string) reservationResolver {
+	return &rdsReservationResolver{
 		term:          term,
 		paymentOption: paymentOption,
-		cacheNodeType: cacheNodeType,
 	}
 }
 
-func (r elasticacheReservationResolver) Term() string {
-	return reservedTermsMapping[r.term]
-}
-
-func (r elasticacheReservationResolver) PaymentOption() string {
-	if r.IsElasticacheReservedNodeLegacyOffering() {
-		return elasticacheReservedNodeCacheLegacyOfferings[r.paymentOption]
-	}
-	return reservedPaymentOptionMapping[r.paymentOption]
-}
-
-func (r elasticacheReservationResolver) IsElasticacheReservedNodeLegacyOffering() bool {
-	for k := range elasticacheReservedNodeCacheLegacyOfferings {
-		if k == r.paymentOption {
-			return true
-		}
-	}
-	return false
-}
-
-func (r elasticacheReservationResolver) Validate() (bool, string) {
+func (r rdsReservationResolver) PriceFilter() (*schema.PriceFilter, error) {
+	termLength := reservedTermsMapping[r.term]
+	purchaseOption := reservedPaymentOptionMapping[r.paymentOption]
 	validTerms := sliceOfKeysFromMap(reservedTermsMapping)
 	if !stringInSlice(validTerms, r.term) {
-		return false, fmt.Sprintf("Invalid reserved_instance_term, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validTerms, ", "), r.term)
+		return nil, fmt.Errorf("Invalid reserved_instance_term, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validTerms, ", "), r.term)
 	}
-	validOptions := append(sliceOfKeysFromMap(reservedPaymentOptionMapping), sliceOfKeysFromMap(elasticacheReservedNodeCacheLegacyOfferings)...)
-
+	validOptions := sliceOfKeysFromMap(reservedPaymentOptionMapping)
+	if r.term == "3_year" {
+		validOptions = []string{"partial_upfront", "all_upfront"}
+	}
 	if !stringInSlice(validOptions, r.paymentOption) {
-		return false, fmt.Sprintf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
+		return nil, fmt.Errorf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
 	}
-
-	nodeType := strings.Split(r.cacheNodeType, ".")[1] // Get node type from cache node type. cache.m3.large -> m3
-	if stringInSlice(elasticacheReservedNodeLegacyTypes, nodeType) {
-		log.Warnf("No products found is possible for legacy nodes %s if provided payment option is not supported by the region.", strings.Join(elasticacheReservedNodeLegacyTypes, ", "))
-	}
-	return true, ""
+	return &schema.PriceFilter{
+		PurchaseOption:     strPtr("reserved"),
+		StartUsageAmount:   strPtr("0"),
+		TermLength:         strPtr(termLength),
+		TermPurchaseOption: strPtr(purchaseOption),
+	}, nil
 }
