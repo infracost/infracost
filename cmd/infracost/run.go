@@ -198,7 +198,7 @@ func formatHCLProjects(wg *sync.WaitGroup, ctx *config.RunContext, hclProjects [
 		wg.Done()
 
 		if err != nil {
-			err = apiclient.ReportCLIError(ctx, fmt.Errorf("hcl-runtime-error: formatting hcl projects %s\n%s", err, debug.Stack()))
+			err = apiclient.ReportCLIError(ctx, fmt.Errorf("hcl-runtime-error: formatting hcl projects %s\n%s", err, debug.Stack()), false)
 			if err != nil {
 				log.Debugf("error reporting unexpected hcl runtime error: %s", err)
 			}
@@ -523,7 +523,7 @@ func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectC
 
 		if err != nil {
 			log.Debugf("recovered from hcl provider panic %s", err)
-			err = apiclient.ReportCLIError(r.runCtx, fmt.Errorf("hcl-runtime-error: loading resources %s\n%s", err, debug.Stack()))
+			err = apiclient.ReportCLIError(r.runCtx, fmt.Errorf("hcl-runtime-error: loading resources %s\n%s", err, debug.Stack()), false)
 			if err != nil {
 				log.Debugf("error reporting unexpected hcl runtime error: %s", err)
 			}
