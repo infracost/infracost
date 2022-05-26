@@ -4,14 +4,8 @@
     },
     "steps": [
         {
-            "op": "same",
+            "op": "create",
             "urn": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
-            "oldState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
-                "custom": false,
-                "type": "pulumi:pulumi:Stack",
-                "sequenceNumber": 1
-            },
             "newState": {
                 "urn": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
                 "custom": false,
@@ -21,56 +15,12 @@
             "detailedDiff": null
         },
         {
-            "op": "same",
+            "op": "create",
             "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::ab112360-6be4-41ca-a102-240db3d3d42f",
-            "oldState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example",
-                "custom": true,
-                "id": "vol-0a3813d7bc1352af8",
-                "type": "aws:ebs/volume:Volume",
-                "inputs": {
-                    "__defaults": [],
-                    "availabilityZone": "us-west-2a",
-                    "size": 40,
-                    "tags": {
-                        "Name": "HelloWorld",
-                        "__defaults": []
-                    }
-                },
-                "outputs": {
-                    "arn": "arn:aws:ec2:us-west-2:052848974346:volume/vol-0a3813d7bc1352af8",
-                    "availabilityZone": "us-west-2a",
-                    "encrypted": false,
-                    "id": "vol-0a3813d7bc1352af8",
-                    "iops": 120,
-                    "kmsKeyId": "",
-                    "multiAttachEnabled": false,
-                    "outpostArn": "",
-                    "size": 40,
-                    "snapshotId": "",
-                    "tags": {
-                        "Name": "HelloWorld"
-                    },
-                    "tagsAll": {
-                        "Name": "HelloWorld"
-                    },
-                    "throughput": 0,
-                    "type": "gp2"
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::ab112360-6be4-41ca-a102-240db3d3d42f",
-                "propertyDependencies": {
-                    "availabilityZone": null,
-                    "size": null,
-                    "tags": null
-                },
-                "sequenceNumber": 1
-            },
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
                 "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example",
                 "custom": true,
-                "id": "vol-0a3813d7bc1352af8",
                 "type": "aws:ebs/volume:Volume",
                 "inputs": {
                     "__defaults": [],
@@ -81,28 +31,8 @@
                         "__defaults": []
                     }
                 },
-                "outputs": {
-                    "arn": "arn:aws:ec2:us-west-2:052848974346:volume/vol-0a3813d7bc1352af8",
-                    "availabilityZone": "us-west-2a",
-                    "encrypted": false,
-                    "id": "vol-0a3813d7bc1352af8",
-                    "iops": 120,
-                    "kmsKeyId": "",
-                    "multiAttachEnabled": false,
-                    "outpostArn": "",
-                    "size": 40,
-                    "snapshotId": "",
-                    "tags": {
-                        "Name": "HelloWorld"
-                    },
-                    "tagsAll": {
-                        "Name": "HelloWorld"
-                    },
-                    "throughput": 0,
-                    "type": "gp2"
-                },
                 "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::ab112360-6be4-41ca-a102-240db3d3d42f",
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
                     "availabilityZone": null,
                     "size": null,
@@ -114,8 +44,32 @@
         },
         {
             "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:s3/bucket:Bucket::mybucket",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:s3/bucket:Bucket::mybucket",
+                "custom": true,
+                "type": "aws:s3/bucket:Bucket",
+                "inputs": {
+                    "__defaults": [
+                        "acl",
+                        "bucket",
+                        "forceDestroy"
+                    ],
+                    "acl": "private",
+                    "bucket": "mybucket-35adf26",
+                    "forceDestroy": false
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
             "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-1",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::ab112360-6be4-41ca-a102-240db3d3d42f",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
                 "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-1",
                 "custom": true,
@@ -130,7 +84,7 @@
                     }
                 },
                 "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::ab112360-6be4-41ca-a102-240db3d3d42f",
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
                     "availabilityZone": null,
                     "size": null,
@@ -141,9 +95,8 @@
             "detailedDiff": null
         }
     ],
-    "duration": 15929611923,
+    "duration": 63817674469,
     "changeSummary": {
-        "create": 1,
-        "same": 2
+        "create": 4
     }
 }
