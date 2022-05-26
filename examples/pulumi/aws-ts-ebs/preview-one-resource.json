@@ -24,7 +24,7 @@
                 "type": "aws:ebs/volume:Volume",
                 "inputs": {
                     "__defaults": [],
-                    "availabilityZone": "us-west-2a",
+                    "availabilityZone": "us-west-1a",
                     "size": 40,
                     "tags": {
                         "Name": "HelloWorld",

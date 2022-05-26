@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"os"
 
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/providers/pulumi/types"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
-
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/providers/pulumi"
-	"github.com/infracost/infracost/internal/schema"
 )
 
 type PreviewJSONProvider struct {
@@ -43,7 +42,7 @@ func (p *PreviewJSONProvider) LoadResources(usage map[string]*schema.UsageData) 
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi Preview JSON file")
 	}
-	var jsonPreviewDigest pulumi.PreviewDigest
+	var jsonPreviewDigest types.PreviewDigest
 	err = json.Unmarshal(b, &jsonPreviewDigest)
 	gjsonResult := gjson.ParseBytes(b)
 

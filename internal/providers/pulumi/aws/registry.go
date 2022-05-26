@@ -32,7 +32,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	// GetDynamoDBTableRegistryItem(),
 	// GetEBSSnapshotCopyRegistryItem(),
 	// GetEBSSnapshotRegistryItem(),
-	GetEBSVolumeRegistryItem(),
+	getEBSVolumeRegistryItem(),
 	// GetEC2ClientVPNEndpointRegistryItem(),
 	// GetEC2ClientVPNNetworkAssociationRegistryItem(),
 	// GetEC2TrafficMirroSessionRegistryItem(),
