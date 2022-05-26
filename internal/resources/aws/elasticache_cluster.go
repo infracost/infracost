@@ -65,7 +65,11 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 	}
 	var err error
 	if r.ReservedInstanceTerm != nil {
-		resolver := newElasticacheReservationResolver(strVal(r.ReservedInstanceTerm), strVal(r.ReservedInstancePaymentOption), r.NodeType)
+		resolver := &elasticacheReservationResolver{
+			term:          strVal(r.ReservedInstanceTerm),
+			paymentOption: strVal(r.ReservedInstancePaymentOption),
+			cacheNodeType: r.NodeType,
+		}
 		priceFilter, err = resolver.PriceFilter()
 		if err != nil {
 			log.Warnf(err.Error())
@@ -122,22 +126,13 @@ func (r *ElastiCacheCluster) backupStorageCostComponent() *schema.CostComponent 
 	}
 }
 
-// ElastiCache implementation of reservationResolver
 type elasticacheReservationResolver struct {
 	term          string
 	paymentOption string
 	cacheNodeType string
 }
 
-func newElasticacheReservationResolver(term, paymentOption, cacheNodeType string) reservationResolver {
-	return &elasticacheReservationResolver{
-		term:          term,
-		paymentOption: paymentOption,
-		cacheNodeType: cacheNodeType,
-	}
-}
-
-func (r elasticacheReservationResolver) IsElasticacheReservedNodeLegacyOffering() bool {
+func (r elasticacheReservationResolver) isElasticacheReservedNodeLegacyOffering() bool {
 	for k := range elasticacheReservedNodeCacheLegacyOfferings {
 		if k == r.paymentOption {
 			return true
@@ -146,10 +141,17 @@ func (r elasticacheReservationResolver) IsElasticacheReservedNodeLegacyOffering(
 	return false
 }
 
+// PriceFilter implementation for elasticacheReservationResolver
+// Allowed values for ReservedInstanceTerm: ["1_year", "3_year"]
+// Allowed values for ReservedInstancePaymentOption: ["all_upfront", "partial_upfront", "no_upfront"] for non legacy reservation nodes
+// Allowed values for ReservedInstancePaymentOption: ["heavy_utilization", "medium_utilization", "light_utilization"] for legacy reservation nodes
+// Legacy reservation nodes: "t2", "m3", "m4", "r3", "r4". (See elasticacheReservedNodeLegacyTypes in util.go)
+// Corner Case: In the case of legacy reservation cache nodes unfortunately, for a specified node type, the allowed ReservedInstancePaymentOption may differ in different regions.
+//				Because of this, in the case of a legacy reservation, a warning is raised to the user.
 func (r elasticacheReservationResolver) PriceFilter() (*schema.PriceFilter, error) {
 	termLength := reservedTermsMapping[r.term]
 	var purchaseOption string
-	if r.IsElasticacheReservedNodeLegacyOffering() {
+	if r.isElasticacheReservedNodeLegacyOffering() {
 		purchaseOption = elasticacheReservedNodeCacheLegacyOfferings[r.paymentOption]
 	} else {
 		purchaseOption = reservedPaymentOptionMapping[r.paymentOption]

@@ -160,7 +160,11 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 
 	var err error
 	if a.ReservedInstanceType != nil {
-		resolver := newEc2ReservationResolver(strVal(a.ReservedInstanceTerm), strVal(a.ReservedInstancePaymentOption), strVal(a.ReservedInstanceType))
+		resolver := &ec2ReservationResolver{
+			term:              strVal(a.ReservedInstanceTerm),
+			paymentOption:     strVal(a.ReservedInstancePaymentOption),
+			termOfferingClass: strVal(a.ReservedInstanceType),
+		}
 		priceFilter, err = resolver.PriceFilter()
 		if err != nil {
 			log.Warnf(err.Error())
@@ -272,21 +276,16 @@ func (a *Instance) cpuCreditCostComponent(instanceFamily string) *schema.CostCom
 	}
 }
 
-// EC2 implementation of reservationResolver
 type ec2ReservationResolver struct {
 	term              string
 	paymentOption     string
 	termOfferingClass string
 }
 
-func newEc2ReservationResolver(term, paymentOption, termOfferingClass string) reservationResolver {
-	return &ec2ReservationResolver{
-		term:              term,
-		paymentOption:     paymentOption,
-		termOfferingClass: termOfferingClass,
-	}
-}
-
+// PriceFilter implementation for ec2ReservationResolver
+// Allowed values for ReservedInstanceTerm: ["1_year", "3_year"]
+// Allowed values for ReservedInstancePaymentOption: ["all_upfront", "partial_upfront", "no_upfront"]
+// Allowed values for ReservedTermOfferingClass: ["standard", "convertible"]
 func (r ec2ReservationResolver) PriceFilter() (*schema.PriceFilter, error) {
 	termLength := reservedTermsMapping[r.term]
 	purchaseOption := reservedPaymentOptionMapping[r.paymentOption]

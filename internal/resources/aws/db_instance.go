@@ -146,7 +146,10 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 
 	var err error
 	if r.ReservedInstanceTerm != nil {
-		resolver := newRdsReservationResolver(strVal(r.ReservedInstanceTerm), strVal(r.ReservedInstancePaymentOption))
+		resolver := &rdsReservationResolver{
+			term:          strVal(r.ReservedInstanceTerm),
+			paymentOption: strVal(r.ReservedInstancePaymentOption),
+		}
 		priceFilter, err = resolver.PriceFilter()
 		if err != nil {
 			log.Warnf(err.Error())

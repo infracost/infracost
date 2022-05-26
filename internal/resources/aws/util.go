@@ -671,11 +671,6 @@ var InstanceTypeToVCPU = map[string]int64{
 	"z1d.xlarge":       4,
 }
 
-// ReservationResolver interface to get filtered price for reserved resources
-type reservationResolver interface {
-	PriceFilter() (*schema.PriceFilter, error)
-}
-
 var reservedTermsMapping = map[string]string{
 	"1_year": "1yr",
 	"3_year": "3yr",
@@ -695,19 +690,15 @@ var elasticacheReservedNodeCacheLegacyOfferings = map[string]string{
 
 var elasticacheReservedNodeLegacyTypes = []string{"t2", "m3", "m4", "r3", "r4"}
 
-// RDS implementation of reservationResolver
 type rdsReservationResolver struct {
 	term          string
 	paymentOption string
 }
 
-func newRdsReservationResolver(term, paymentOption string) reservationResolver {
-	return &rdsReservationResolver{
-		term:          term,
-		paymentOption: paymentOption,
-	}
-}
-
+// PriceFilter implementation for rdsReservationResolver
+// Allowed values for ReservedInstanceTerm: ["1_year", "3_year"]
+// Allowed values for ReservedInstancePaymentOption: ["all_upfront", "partial_upfront", "no_upfront"]
+// Corner case: When ReservedInstanceTerm is 3_year the only allowed ReservedInstancePaymentOption are ["all_upfront", "partial_upfront"]
 func (r rdsReservationResolver) PriceFilter() (*schema.PriceFilter, error) {
 	termLength := reservedTermsMapping[r.term]
 	purchaseOption := reservedPaymentOptionMapping[r.paymentOption]
