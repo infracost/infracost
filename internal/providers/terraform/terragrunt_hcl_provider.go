@@ -313,7 +313,9 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 				})
 			}
 
-			outputs = cty.MapVal(out)
+			if len(out) > 0 {
+				outputs = cty.MapVal(out)
+			}
 		}
 	}
 
