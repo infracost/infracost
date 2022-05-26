@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"sort"
 	"strings"
 	"time"
@@ -30,6 +31,14 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
+
+type panicError struct {
+	msg string
+}
+
+func (p panicError) Error() string {
+	return p.msg
+}
 
 type TerragruntHCLProvider struct {
 	ctx                  *config.ProjectContext
@@ -137,12 +146,20 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		DownloadDir:                terragruntDownloadDir,
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
 		IgnoreExternalDependencies: true,
-		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) error {
+		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) (err error) {
+			defer func() {
+				unexpectedErr := recover()
+				if unexpectedErr != nil {
+					err = panicError{msg: fmt.Sprintf("%s\n%s", unexpectedErr, debug.Stack())}
+				}
+			}()
+
 			workingDirInfo, err := p.runTerragrunt(terragruntOptions)
 			if workingDirInfo != nil {
 				workingDirsToEstimate = append(workingDirsToEstimate, workingDirInfo)
 			}
-			return err
+
+			return
 		},
 		Parallelism: 1,
 	}
@@ -155,6 +172,10 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 
 	err = s.Run(terragruntOptions)
 	if err != nil {
+		if errors.As(err, &panicError{}) {
+			panic(err)
+		}
+
 		return nil, clierror.NewSanitizedError(
 			errors.Errorf(
 				"%s\n%v%s",
