@@ -158,16 +158,17 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 		PurchaseOption: strPtr(a.PurchaseOption),
 	}
 
-	var err error
 	if a.ReservedInstanceType != nil {
 		resolver := &ec2ReservationResolver{
 			term:              strVal(a.ReservedInstanceTerm),
 			paymentOption:     strVal(a.ReservedInstancePaymentOption),
 			termOfferingClass: strVal(a.ReservedInstanceType),
 		}
-		priceFilter, err = resolver.PriceFilter()
+		reservedFilter, err := resolver.PriceFilter()
 		if err != nil {
 			log.Warnf(err.Error())
+		} else {
+			priceFilter = reservedFilter
 		}
 		purchaseOptionLabel = "reserved"
 	}

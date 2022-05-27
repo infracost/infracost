@@ -63,16 +63,17 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 	priceFilter := &schema.PriceFilter{
 		PurchaseOption: strPtr("on_demand"),
 	}
-	var err error
 	if r.ReservedInstanceTerm != nil {
 		resolver := &elasticacheReservationResolver{
 			term:          strVal(r.ReservedInstanceTerm),
 			paymentOption: strVal(r.ReservedInstancePaymentOption),
 			cacheNodeType: r.NodeType,
 		}
-		priceFilter, err = resolver.PriceFilter()
+		reservedFilter, err := resolver.PriceFilter()
 		if err != nil {
 			log.Warnf(err.Error())
+		} else {
+			priceFilter = reservedFilter
 		}
 		purchaseOptionLabel = "reserved"
 	}
@@ -149,6 +150,10 @@ func (r elasticacheReservationResolver) isElasticacheReservedNodeLegacyOffering(
 // Corner Case: In the case of legacy reservation cache nodes unfortunately, for a specified node type, the allowed ReservedInstancePaymentOption may differ in different regions.
 //				Because of this, in the case of a legacy reservation, a warning is raised to the user.
 func (r elasticacheReservationResolver) PriceFilter() (*schema.PriceFilter, error) {
+	purchaseOptionLabel := "reserved"
+	def := &schema.PriceFilter{
+		PurchaseOption: strPtr(purchaseOptionLabel),
+	}
 	termLength := reservedTermsMapping[r.term]
 	var purchaseOption string
 	if r.isElasticacheReservedNodeLegacyOffering() {
@@ -158,19 +163,19 @@ func (r elasticacheReservationResolver) PriceFilter() (*schema.PriceFilter, erro
 	}
 	validTerms := sliceOfKeysFromMap(reservedTermsMapping)
 	if !stringInSlice(validTerms, r.term) {
-		return nil, fmt.Errorf("Invalid reserved_instance_term, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validTerms, ", "), r.term)
+		return def, fmt.Errorf("Invalid reserved_instance_term, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validTerms, ", "), r.term)
 	}
 	validOptions := append(sliceOfKeysFromMap(reservedPaymentOptionMapping), sliceOfKeysFromMap(elasticacheReservedNodeCacheLegacyOfferings)...)
 
 	if !stringInSlice(validOptions, r.paymentOption) {
-		return nil, fmt.Errorf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
+		return def, fmt.Errorf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
 	}
 	nodeType := strings.Split(r.cacheNodeType, ".")[1] // Get node type from cache node type. cache.m3.large -> m3
 	if stringInSlice(elasticacheReservedNodeLegacyTypes, nodeType) {
 		log.Warnf("No products found is possible for legacy nodes %s if provided payment option is not supported by the region.", strings.Join(elasticacheReservedNodeLegacyTypes, ", "))
 	}
 	return &schema.PriceFilter{
-		PurchaseOption:     strPtr("reserved"),
+		PurchaseOption:     strPtr(purchaseOptionLabel),
 		StartUsageAmount:   strPtr("0"),
 		TermLength:         strPtr(termLength),
 		TermPurchaseOption: strPtr(purchaseOption),
