@@ -74,7 +74,7 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 		localInputs["config"] = t.Config
 		var inputs, _ = json.Marshal(localInputs)
 
-		tags := map[string]string{} // TODO: Where do I get tags?
+		tags := map[string]string{} // TODO: Where do I get tags? Day 2 Issue
 		var usageData *schema.UsageData
 
 		if ud := usage[name]; ud != nil {

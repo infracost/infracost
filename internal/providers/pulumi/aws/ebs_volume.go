@@ -15,13 +15,13 @@ func getEBSVolumeRegistryItem() *schema.RegistryItem {
 }
 
 func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	log.Infof("resources %s", d)
+	log.Debugf("resources %s", d)
 	var size *int64
 	if d.Get("size").Type != gjson.Null {
 		size = intPtr(d.Get("size").Int())
 	}
 	var region = d.Get("config.aws:region")
-	log.Infof("region %s", region)
+	log.Debugf("region %s", region)
 	a := &aws.EBSVolume{
 		Address:    d.Address,
 		Region:     region.String(),
