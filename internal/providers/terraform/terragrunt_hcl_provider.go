@@ -23,6 +23,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -314,12 +315,29 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 			}
 
 			if len(out) > 0 {
-				outputs = cty.MapVal(out)
+				encoded, err := gocty.ToCtyValue(out, generateTypeFromValuesMap(out))
+				if err == nil {
+					return encoded, nil
+				}
+
+				log.Warnf("could not transform output blocks to cty type err: %s, using dummy output type", err)
 			}
 		}
 	}
 
 	return outputs, nil
+}
+
+// generateTypeFromValuesMap takes a values map and returns an object type that has the same number of fields, but
+// bound to each type of the underlying evaluated expression. This is the only way the HCL decoder will be happy, as
+// object type is the only map type that allows different types for each attribute (cty.Map requires all attributes to
+// have the same type.
+func generateTypeFromValuesMap(valMap map[string]cty.Value) cty.Type {
+	outType := map[string]cty.Type{}
+	for k, v := range valMap {
+		outType[k] = v.Type()
+	}
+	return cty.Object(outType)
 }
 
 // 1. Download the given source URL, which should use Terraform's module source syntax, into a temporary folder
