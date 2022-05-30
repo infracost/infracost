@@ -594,7 +594,7 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 			strategy, _ := includeConfig.GetMergeStrategy()
 			if strategy != tgconfig.NoMerge {
 				rawPath := getCleanedTargetConfigPath(includeConfig.Path, filename)
-				incl, err := decodeDependencyBlocks(rawPath, terragruntOptions.Clone(rawPath), dependencyOutputs)
+				incl, err := decodeDependencyBlocks(rawPath, terragruntOptions, dependencyOutputs)
 				if err != nil {
 					return nil, fmt.Errorf("could not decode dependency blocks for included config '%s' path: %s %w", includeConfig.Name, includeConfig.Path, err)
 				}
