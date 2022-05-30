@@ -567,7 +567,11 @@ type terragruntDependency struct {
 // The map is keyed by the full path of the config_path attribute specified in the dependency block.
 func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.TerragruntOptions, dependencyOutputs *cty.Value) (map[string]tgconfig.Dependency, error) {
 	parser := hclparse.NewParser()
-	file, _ := parser.ParseHCLFile(filename)
+	file, diags := parser.ParseHCLFile(filename)
+	if diags != nil && diags.HasErrors() {
+		return nil, fmt.Errorf("coul not parse hcl file %s to decode dependency blocks %w", filename, diags)
+	}
+
 	localsAsCty, trackInclude, err := tgconfig.DecodeBaseBlocks(terragruntOptions, parser, file, filename, nil, nil)
 	if err != nil {
 		return nil, err
@@ -584,13 +588,30 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 		return nil, err
 	}
 
+	depmap := make(map[string]tgconfig.Dependency)
+	if trackInclude != nil {
+		for _, includeConfig := range trackInclude.CurrentList {
+			strategy, _ := includeConfig.GetMergeStrategy()
+			if strategy != tgconfig.NoMerge {
+				rawPath := getCleanedTargetConfigPath(includeConfig.Path, filename)
+				incl, err := decodeDependencyBlocks(rawPath, terragruntOptions.Clone(rawPath), dependencyOutputs)
+				if err != nil {
+					return nil, fmt.Errorf("could not decode dependency blocks for included config '%s' path: %s %w", includeConfig.Name, includeConfig.Path, err)
+				}
+
+				for _, dep := range incl {
+					depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
+				}
+			}
+		}
+	}
+
 	var deps terragruntDependency
 	decodeDiagnostics := gohcl.DecodeBody(file.Body, evalContext, &deps)
 	if decodeDiagnostics != nil && decodeDiagnostics.HasErrors() {
 		return nil, decodeDiagnostics
 	}
 
-	depmap := make(map[string]tgconfig.Dependency)
 	for _, dep := range deps.Dependencies {
 		depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
 	}
