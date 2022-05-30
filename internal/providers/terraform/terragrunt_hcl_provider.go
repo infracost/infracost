@@ -290,7 +290,9 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 // fetchDependencyOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.
 func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) (cty.Value, error) {
 	outputs := cty.MapVal(map[string]cty.Value{
-		"mock": cty.StringVal("val"),
+		"outputs": cty.ObjectVal(map[string]cty.Value{
+			"mock": cty.StringVal("val"),
+		}),
 	})
 
 	if p.stack != nil {
@@ -309,8 +311,18 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 
 			out := map[string]cty.Value{}
 			for dir, dep := range blocks {
+				value, evaluated := p.outputs[dir]
+				if !evaluated {
+					_, err := p.runTerragrunt(opts.Clone(dir))
+					if err != nil {
+						return outputs, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
+					}
+
+					value = p.outputs[dir]
+				}
+
 				out[dep.Name] = cty.MapVal(map[string]cty.Value{
-					"outputs": p.outputs[dir],
+					"outputs": value,
 				})
 			}
 
