@@ -50,7 +50,6 @@ func (r *GlobalAccelerator) fixedCostComponent() *schema.CostComponent {
 		Name:           "Global Accelerator",
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
-		MonthlyCost:    decimalPtr(decimal.NewFromFloat(18)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
 			Service:    strPtr("AWSGlobalAccelerator"),
@@ -58,7 +57,7 @@ func (r *GlobalAccelerator) fixedCostComponent() *schema.CostComponent {
 	}
 	// AWS Global Accelerator has a fixed fee of 0.025$ per hour.
 	// This price unfortunately is not mapped in AWS Pricing API
-	// More: AWS_DEFAULT_REGION=us-east-1 aws pricing describe-services | jq -r '.PriceList[] | fromjson | .product'
+	// More: AWS_DEFAULT_REGION=us-east-1 aws pricing get-products --service-code AWSGlobalAccelerator | jq -r '.PriceList[] | fromjson | .product'
 	c.SetCustomPrice(decimalPtr(decimal.NewFromFloat(0.025)))
 	return c
 }
