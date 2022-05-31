@@ -182,7 +182,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 				"%s\n%v%s",
 				"Failed to parse the Terragrunt code using the Terragrunt library:",
 				err.Error(),
-				fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot")),
+				fmt.Sprintf("For a list of known issues and workarounds, see: %s", ui.LinkString("https://infracost.io/docs/features/terragrunt/")),
 			),
 			"Error parsing the Terragrunt code using the Terragrunt library",
 		)
