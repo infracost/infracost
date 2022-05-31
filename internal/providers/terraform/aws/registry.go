@@ -103,6 +103,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getDirectoryServiceDirectory(),
 	getTransferServerRegistryItem(),
 	getNetworkfirewallFirewallRegistryItem(),
+	getGlobalAcceleratorRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

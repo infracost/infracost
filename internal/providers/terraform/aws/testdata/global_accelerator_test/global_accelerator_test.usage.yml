@@ -1,0 +1,13 @@
+version: 0.1
+resource_usage:
+# If GlobalAccelerator has any defined usage parameters uncomment the lines below.
+# Then add your configurations making sure to change the names of resource/usage params.
+#
+ aws_global_accelerator.global_accelerator:
+   monthly_data_processed_gb: 100000000
+#
+# Also add a usage example into the infracost-usage-example.yml with comments
+# describing each parameter (be aware that its resources are ordered alphabetically):
+#
+# aws_global_accelerator.my_global_accelerator:
+#   my_usage_parameter: 100000000 # Monthly requests to the resource
