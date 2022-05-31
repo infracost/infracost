@@ -24,6 +24,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -310,7 +311,9 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 // fetchDependencyOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.
 func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) (cty.Value, error) {
 	outputs := cty.MapVal(map[string]cty.Value{
-		"mock": cty.StringVal("val"),
+		"outputs": cty.ObjectVal(map[string]cty.Value{
+			"mock": cty.StringVal("val"),
+		}),
 	})
 
 	if p.stack != nil {
@@ -322,23 +325,52 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 		}
 
 		if mod != nil && len(mod.Dependencies) > 0 {
-			blocks, err := decodeDependencyBlocks(mod.TerragruntOptions.TerragruntConfigPath, opts, nil)
+			blocks, err := decodeDependencyBlocks(mod.TerragruntOptions.TerragruntConfigPath, opts, nil, nil)
 			if err != nil {
 				return cty.Value{}, fmt.Errorf("could not parse dependency blocks for Terragrunt file %s %w", mod.TerragruntOptions.TerragruntConfigPath, err)
 			}
 
 			out := map[string]cty.Value{}
 			for dir, dep := range blocks {
+				value, evaluated := p.outputs[dir]
+				if !evaluated {
+					_, err := p.runTerragrunt(opts.Clone(dir))
+					if err != nil {
+						return outputs, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
+					}
+
+					value = p.outputs[dir]
+				}
+
 				out[dep.Name] = cty.MapVal(map[string]cty.Value{
-					"outputs": p.outputs[dir],
+					"outputs": value,
 				})
 			}
 
-			outputs = cty.MapVal(out)
+			if len(out) > 0 {
+				encoded, err := gocty.ToCtyValue(out, generateTypeFromValuesMap(out))
+				if err == nil {
+					return encoded, nil
+				}
+
+				log.Warnf("could not transform output blocks to cty type err: %s, using dummy output type", err)
+			}
 		}
 	}
 
 	return outputs, nil
+}
+
+// generateTypeFromValuesMap takes a values map and returns an object type that has the same number of fields, but
+// bound to each type of the underlying evaluated expression. This is the only way the HCL decoder will be happy, as
+// object type is the only map type that allows different types for each attribute (cty.Map requires all attributes to
+// have the same type.
+func generateTypeFromValuesMap(valMap map[string]cty.Value) cty.Type {
+	outType := map[string]cty.Type{}
+	for k, v := range valMap {
+		outType[k] = v.Type()
+	}
+	return cty.Object(outType)
 }
 
 // 1. Download the given source URL, which should use Terraform's module source syntax, into a temporary folder
@@ -554,12 +586,16 @@ type terragruntDependency struct {
 
 // decodeDependencyBlocks parses the file at filename and returns a map containing all the hcl blocks with the "dependency" label.
 // The map is keyed by the full path of the config_path attribute specified in the dependency block.
-func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.TerragruntOptions, dependencyOutputs *cty.Value) (map[string]tgconfig.Dependency, error) {
+func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.TerragruntOptions, dependencyOutputs *cty.Value, include *tgconfig.IncludeConfig) (map[string]tgconfig.Dependency, error) {
 	parser := hclparse.NewParser()
-	file, _ := parser.ParseHCLFile(filename)
-	localsAsCty, trackInclude, err := tgconfig.DecodeBaseBlocks(terragruntOptions, parser, file, filename, nil, nil)
+	file, diags := parser.ParseHCLFile(filename)
+	if diags != nil && diags.HasErrors() {
+		return nil, fmt.Errorf("could not parse hcl file %s to decode dependency blocks %w", filename, diags)
+	}
+
+	localsAsCty, trackInclude, err := tgconfig.DecodeBaseBlocks(terragruntOptions, parser, file, filename, include, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not parse base hcl blocks %w", err)
 	}
 
 	contextExtensions := tgconfig.EvalContextExtensions{
@@ -573,13 +609,31 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 		return nil, err
 	}
 
+	depmap := make(map[string]tgconfig.Dependency)
+	if trackInclude != nil {
+		for _, includeConfig := range trackInclude.CurrentList {
+			includeConfig := includeConfig
+			strategy, _ := includeConfig.GetMergeStrategy()
+			if strategy != tgconfig.NoMerge {
+				rawPath := getCleanedTargetConfigPath(includeConfig.Path, filename)
+				incl, err := decodeDependencyBlocks(rawPath, terragruntOptions, dependencyOutputs, &includeConfig)
+				if err != nil {
+					return nil, fmt.Errorf("could not decode dependency blocks for included config '%s' path: %s %w", includeConfig.Name, includeConfig.Path, err)
+				}
+
+				for _, dep := range incl {
+					depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
+				}
+			}
+		}
+	}
+
 	var deps terragruntDependency
 	decodeDiagnostics := gohcl.DecodeBody(file.Body, evalContext, &deps)
 	if decodeDiagnostics != nil && decodeDiagnostics.HasErrors() {
 		return nil, decodeDiagnostics
 	}
 
-	depmap := make(map[string]tgconfig.Dependency)
 	for _, dep := range deps.Dependencies {
 		depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
 	}

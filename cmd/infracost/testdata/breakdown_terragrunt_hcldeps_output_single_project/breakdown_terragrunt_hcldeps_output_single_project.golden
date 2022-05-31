@@ -1,0 +1,23 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output_single_project/dev
+
+ Name                                                         Monthly Qty  Unit                        Monthly Cost 
+                                                                                                                    
+ aws_instance.web_app                                                                                               
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47 
+ ├─ root_block_device                                                                                               
+ │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00 
+ └─ ebs_block_device[0]                                                                                             
+    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50 
+    └─ Provisioned IOPS                                               600  IOPS                              $39.00 
+                                                                                                                    
+ aws_lambda_function.hello_world                                                                                    
+ ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests          
+ └─ Duration                                          Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+                                                                                                                    
+ OVERALL TOTAL                                                                                               $64.97 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+Err:
+
