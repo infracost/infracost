@@ -48,6 +48,11 @@ const web = new aws.ec2.Instance("ec2-instance", {
     creditSpecification: {
         cpuCredits: "unlimited",
     },
+    ebsBlockDevices: [
+        { deviceName: '/dev/xvde', volumeId: ebsVolume.id},
+        { deviceName: '/dev/xvdf', volumeId: ebsVolume1.id}
+    ]
+    
 });
 
 const eip = new aws.ec2.Eip("elastic-ip", {

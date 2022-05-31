@@ -67,11 +67,13 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 		if step.NewState.Type == "pulumi:pulumi:Stack" {
 			continue
 		}
-		var name = step.NewState.URN.Name().String()
+		var name = step.NewState.URN.URNName()
 		var resourceType = step.NewState.Type.String()
 		var providerName = strings.Split(step.NewState.Type.String(), ":")[0]
 		var localInputs = step.NewState.Inputs
 		localInputs["config"] = t.Config
+		localInputs["dependencies"] = step.NewState.Dependencies
+		localInputs["propertyDependencies"] = step.NewState.PropertyDependencies
 		var inputs, _ = json.Marshal(localInputs)
 
 		tags := map[string]string{} // TODO: Where do I get tags? Day 2 Issue

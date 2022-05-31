@@ -5,7 +5,7 @@ import (
 
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
-
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -29,7 +29,7 @@ func getInstanceRegistryItem() *schema.RegistryItem {
 
 func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var region = d.Get("config.aws:region")
-
+	log.Debugf("resources %s", d)
 	purchaseOption := "on_demand"
 	if d.Get("spot_price").String() != "" {
 		purchaseOption = "spot"
@@ -47,15 +47,15 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if len(launchTemplateRefs) > 0 {
 		ref := launchTemplateRefs[0]
 
-		instanceType = ref.Get("instance_type").String()
+		instanceType = ref.Get("instanceType").String()
 		ami = ref.Get("image_id").String()
 		ebsOptimized = ref.Get("ebs_optimized").Bool()
 		monitoring = ref.Get("monitoring.0.enabled").Bool()
 		cpuCredits = ref.Get("credit_specification.0.cpu_credits").String()
 		tenancy = ref.Get("placement.0.tenancy").String()
 
-		for _, data := range ref.Get("block_device_mappings").Array() {
-			deviceName := data.Get("device_name").String()
+		for _, data := range ref.Get("ebsBlockDevices").Array() {
+			deviceName := data.Get("deviceName").String()
 			ebsBlockDevice := &aws.EBSVolume{
 				Region: region.String(),
 				Type:   data.Get("ebs.0.volume_type").String(),
@@ -100,10 +100,10 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		a.RootBlockDevice.Size = intPtr(d.Get("rootBlockDevice.volumeSize").Int())
 	}
 
-	ebsBlockDeviceRef := d.References("ebs_block_device.#.volume_id")
+	ebsBlockDeviceRef := d.References("ebsBlockDevice.#.volumeId")
 
-	for i, data := range d.Get("ebs_block_device").Array() {
-		deviceName := data.Get("device_name").String()
+	for i, data := range d.Get("ebsBlockDevices").Array() {
+		deviceName := data.Get("deviceName").String()
 
 		ltDevice := ltEBSBlockDevices[deviceName]
 		if ltDevice == nil {
@@ -113,7 +113,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		// Check if there's a reference for this EBS volume
 		// If there is then we shouldn't add as a subresource since
 		// the cost will be added against the volume resource.
-		if len(ebsBlockDeviceRef) > i && ebsBlockDeviceRef[i].Get("id").String() == data.Get("volume_id").String() {
+		if len(ebsBlockDeviceRef) > i && ebsBlockDeviceRef[i].Get("id").String() == data.Get("volumeId").String() {
 			delete(ltEBSBlockDevices, deviceName)
 
 			continue

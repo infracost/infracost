@@ -29,11 +29,39 @@
                         "forceDestroy"
                     ],
                     "acl": "private",
-                    "bucket": "mybucket-5b99288",
+                    "bucket": "mybucket-b51d25a",
                     "forceDestroy": false
                 },
                 "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
                 "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example",
+                "custom": true,
+                "type": "aws:ebs/volume:Volume",
+                "inputs": {
+                    "__defaults": [],
+                    "availabilityZone": "us-west-2a",
+                    "size": 40,
+                    "tags": {
+                        "Name": "HelloWorld",
+                        "__defaults": []
+                    }
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "availabilityZone": null,
+                    "size": null,
+                    "tags": null
+                },
                 "sequenceNumber": 1
             },
             "detailedDiff": null
@@ -89,34 +117,6 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example",
-                "custom": true,
-                "type": "aws:ebs/volume:Volume",
-                "inputs": {
-                    "__defaults": [],
-                    "availabilityZone": "us-west-2a",
-                    "size": 40,
-                    "tags": {
-                        "Name": "HelloWorld",
-                        "__defaults": []
-                    }
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "availabilityZone": null,
-                    "size": null,
-                    "tags": null
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
             "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/instance:Instance::ec2-instance",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
@@ -134,6 +134,24 @@
                         "__defaults": [],
                         "cpuCredits": "unlimited"
                     },
+                    "ebsBlockDevices": [
+                        {
+                            "__defaults": [
+                                "deleteOnTermination"
+                            ],
+                            "deleteOnTermination": true,
+                            "deviceName": "/dev/xvde",
+                            "volumeId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                        },
+                        {
+                            "__defaults": [
+                                "deleteOnTermination"
+                            ],
+                            "deleteOnTermination": true,
+                            "deviceName": "/dev/xvdf",
+                            "volumeId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                        }
+                    ],
                     "getPasswordData": false,
                     "instanceType": "t3.micro",
                     "rootBlockDevice": {
@@ -152,10 +170,18 @@
                     "userDataReplaceOnChange": false
                 },
                 "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example",
+                    "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-1"
+                ],
                 "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
                     "ami": null,
                     "creditSpecification": null,
+                    "ebsBlockDevices": [
+                        "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example",
+                        "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-1"
+                    ],
                     "instanceType": null,
                     "rootBlockDevice": null,
                     "tags": null
@@ -165,7 +191,7 @@
             "detailedDiff": null
         }
     ],
-    "duration": 18762054840,
+    "duration": 17196460678,
     "changeSummary": {
         "create": 6
     }
