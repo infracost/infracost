@@ -50,6 +50,10 @@ func (attr *Attribute) IsIterable() bool {
 // the Attribute Context. This returns a cty.Value with the values filled from any variables or references
 // that the Context carries.
 func (attr *Attribute) Value() (ctyVal cty.Value) {
+	if attr == nil {
+		return cty.NilVal
+	}
+
 	defer func() {
 		if err := recover(); err != nil {
 			log.Debugf("could not evaluate value for attr: %s err: %s\n%s", attr.Name(), err, debug.Stack())
