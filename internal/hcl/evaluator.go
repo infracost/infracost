@@ -215,7 +215,8 @@ func (e *Evaluator) evaluateModules() {
 			Module{
 				Name:       fullName,
 				Source:     moduleCall.Module.Source,
-				Blocks:     moduleCall.Module.Blocks,
+				Blocks:     moduleCall.Module.RawBlocks,
+				RawBlocks:  moduleCall.Module.RawBlocks,
 				RootPath:   e.module.RootPath,
 				ModulePath: moduleCall.Path,
 				Modules:    nil,
@@ -547,6 +548,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 			Name:       b.TypeLabel(),
 			Source:     source,
 			Blocks:     blocks,
+			RawBlocks:  blocks,
 			RootPath:   e.module.RootPath,
 			ModulePath: modulePath,
 			Parent:     &e.module,
