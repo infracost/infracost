@@ -1,0 +1,11 @@
+
+ Name                       Monthly Qty  Unit                Monthly Cost 
+                                                                          
+ Example                                                                  
+ ├─ Global Accelerator  Monthly cost depends on usage: $0.057 per hours   
+ └─ Data processed      Monthly cost depends on usage: $0.00 per GB       
+                                                                          
+ OVERALL TOTAL                                                      $0.00 
+──────────────────────────────────
+1 cloud resource was detected:
+∙ 1 was estimated
