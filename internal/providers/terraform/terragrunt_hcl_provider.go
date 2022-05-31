@@ -304,7 +304,7 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 		}
 
 		if mod != nil && len(mod.Dependencies) > 0 {
-			blocks, err := decodeDependencyBlocks(mod.TerragruntOptions.TerragruntConfigPath, opts, nil)
+			blocks, err := decodeDependencyBlocks(mod.TerragruntOptions.TerragruntConfigPath, opts, nil, nil)
 			if err != nil {
 				return cty.Value{}, fmt.Errorf("could not parse dependency blocks for Terragrunt file %s %w", mod.TerragruntOptions.TerragruntConfigPath, err)
 			}
@@ -565,16 +565,16 @@ type terragruntDependency struct {
 
 // decodeDependencyBlocks parses the file at filename and returns a map containing all the hcl blocks with the "dependency" label.
 // The map is keyed by the full path of the config_path attribute specified in the dependency block.
-func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.TerragruntOptions, dependencyOutputs *cty.Value) (map[string]tgconfig.Dependency, error) {
+func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.TerragruntOptions, dependencyOutputs *cty.Value, include *tgconfig.IncludeConfig) (map[string]tgconfig.Dependency, error) {
 	parser := hclparse.NewParser()
 	file, diags := parser.ParseHCLFile(filename)
 	if diags != nil && diags.HasErrors() {
-		return nil, fmt.Errorf("coul not parse hcl file %s to decode dependency blocks %w", filename, diags)
+		return nil, fmt.Errorf("could not parse hcl file %s to decode dependency blocks %w", filename, diags)
 	}
 
-	localsAsCty, trackInclude, err := tgconfig.DecodeBaseBlocks(terragruntOptions, parser, file, filename, nil, nil)
+	localsAsCty, trackInclude, err := tgconfig.DecodeBaseBlocks(terragruntOptions, parser, file, filename, include, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not parse base hcl blocks %w", err)
 	}
 
 	contextExtensions := tgconfig.EvalContextExtensions{
@@ -591,10 +591,11 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 	depmap := make(map[string]tgconfig.Dependency)
 	if trackInclude != nil {
 		for _, includeConfig := range trackInclude.CurrentList {
+			includeConfig := includeConfig
 			strategy, _ := includeConfig.GetMergeStrategy()
 			if strategy != tgconfig.NoMerge {
 				rawPath := getCleanedTargetConfigPath(includeConfig.Path, filename)
-				incl, err := decodeDependencyBlocks(rawPath, terragruntOptions, dependencyOutputs)
+				incl, err := decodeDependencyBlocks(rawPath, terragruntOptions, dependencyOutputs, &includeConfig)
 				if err != nil {
 					return nil, fmt.Errorf("could not decode dependency blocks for included config '%s' path: %s %w", includeConfig.Name, includeConfig.Path, err)
 				}
