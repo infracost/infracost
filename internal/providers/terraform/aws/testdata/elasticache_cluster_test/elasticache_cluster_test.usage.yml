@@ -2,3 +2,18 @@ version: 0.1
 resource_usage:
   aws_elasticache_cluster.redis_snapshot_usage:
     snapshot_storage_size_gb: 10000
+  aws_elasticache_cluster.redis_reserved_1yr_heavy_utilization:
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: heavy_utilization
+  aws_elasticache_cluster.redis_reserved_3yr_heavy_utilization:
+    reserved_instance_term: 3_year
+    reserved_instance_payment_option: heavy_utilization
+  aws_elasticache_cluster.redis_reserved_1yr_no_upfront:
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: no_upfront
+  aws_elasticache_cluster.redis_reserved_1yr_partial_upfront:
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: partial_upfront
+  aws_elasticache_cluster.redis_reserved_1yr_all_upfront:
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: all_upfront
