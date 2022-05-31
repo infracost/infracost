@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"runtime/debug"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -51,6 +52,7 @@ func (attr *Attribute) IsIterable() bool {
 func (attr *Attribute) Value() (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
+			log.Debugf("could not evaluate value for attr: %s err: %s\n%s", attr.Name(), err, debug.Stack())
 			ctyVal = cty.NilVal
 		}
 	}()
