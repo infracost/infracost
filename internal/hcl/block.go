@@ -141,7 +141,7 @@ func (blocks Blocks) OfType(t string) Blocks {
 }
 
 // Outputs returns a map of all the evaluated outputs from the list of Blocks.
-func (blocks Blocks) Outputs() cty.Value {
+func (blocks Blocks) Outputs(suppressNil bool) cty.Value {
 	data := make(map[string]cty.Value)
 
 	for _, block := range blocks.OfType("output") {
@@ -150,14 +150,17 @@ func (blocks Blocks) Outputs() cty.Value {
 			continue
 		}
 
-		// resolve the attribute value. This will evaluate any expressions that
-		// the attribute uses and try and return the final value. If the end
-		// value can't be resolved we set it as a blank string. This is
-		// safe to use for callers and won't cause panics when marshalling
-		// the returned cty.Value.
 		value := attr.Value()
-		if value == cty.NilVal {
-			value = cty.StringVal("")
+
+		if suppressNil {
+			// resolve the attribute value. This will evaluate any expressions that
+			// the attribute uses and try and return the final value. If the end
+			// value can't be resolved we set it as a blank string. This is
+			// safe to use for callers and won't cause panics when marshalling
+			// the returned cty.Value.
+			if value == cty.NilVal {
+				value = cty.StringVal("")
+			}
 		}
 
 		data[block.Label()] = value

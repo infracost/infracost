@@ -282,6 +282,7 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 			Name:       "",
 			Source:     "",
 			Blocks:     blocks,
+			RawBlocks:  blocks,
 			RootPath:   p.initialPath,
 			ModulePath: p.initialPath,
 		},

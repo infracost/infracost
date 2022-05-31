@@ -300,7 +300,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	}
 
 	for _, mod := range mods {
-		p.outputs[opts.TerragruntConfigPath] = mod.Blocks.Outputs()
+		p.outputs[opts.TerragruntConfigPath] = mod.Blocks.Outputs(true)
 	}
 
 	info.provider = h
