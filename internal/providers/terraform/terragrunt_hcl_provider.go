@@ -47,6 +47,7 @@ type TerragruntHCLProvider struct {
 	includePastResources bool
 	outputs              map[string]cty.Value
 	stack                *tgconfigstack.Stack
+	skipPaths            []string
 }
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
@@ -57,6 +58,7 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
+		skipPaths:            ctx.ProjectConfig.SkipPaths,
 	}
 }
 
@@ -144,6 +146,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		ErrWriter:                  tgLog.WriterLevel(log.DebugLevel),
 		MaxFoldersToCheck:          tgoptions.DEFAULT_MAX_FOLDERS_TO_CHECK,
 		WorkingDir:                 p.Path,
+		ExcludeDirs:                p.skipPaths,
 		DownloadDir:                terragruntDownloadDir,
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
 		IgnoreExternalDependencies: true,

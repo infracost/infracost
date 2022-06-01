@@ -128,7 +128,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 		options = append(options, hcl.OptionWithRemoteVarLoader(host, token, localWorkspace))
 	}
 
-	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, options...)
+	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.SkipPaths, options...)
 	if err != nil {
 		return nil, err
 	}

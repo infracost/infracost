@@ -126,12 +126,6 @@ func OptionWithRemoteVarLoader(host, token, localWorkspace string) Option {
 	}
 }
 
-func OptionWithWorkspaceName(workspaceName string) Option {
-	return func(p *Parser) {
-		p.workspaceName = workspaceName
-	}
-}
-
 func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 	return func(p *Parser) {
 		p.blockBuilder = blockBuilder
@@ -175,8 +169,8 @@ type Parser struct {
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
 // the initialPath contains Terraform files at the top level parsers will be len 1.
-func LoadParsers(initialPath string, options ...Option) ([]*Parser, error) {
-	pl := &projectLocator{moduleCalls: make(map[string]struct{})}
+func LoadParsers(initialPath string, skipPaths []string, options ...Option) ([]*Parser, error) {
+	pl := newProjectLocator(skipPaths...)
 	rootPaths := pl.findRootModules(initialPath)
 	if len(rootPaths) == 0 {
 		return nil, errors.New("No valid Terraform files found given path, try a different directory")
@@ -488,7 +482,23 @@ func loadDirectory(fullPath string, stopOnHCLError bool) ([]file, error) {
 }
 
 type projectLocator struct {
-	moduleCalls map[string]struct{}
+	moduleCalls     map[string]struct{}
+	skippedPatterns []isSkippedFunc
+}
+
+type isSkippedFunc func(string) bool
+
+func newProjectLocator(skipPaths ...string) *projectLocator {
+	skippedPatterns := make([]isSkippedFunc, len(skipPaths))
+	for i, p := range skipPaths {
+		skippedPatterns[i] = func(s string) bool {
+			match, _ := filepath.Match(p, s)
+
+			return match
+		}
+	}
+
+	return &projectLocator{moduleCalls: make(map[string]struct{}), skippedPatterns: skippedPatterns}
 }
 
 func (p *projectLocator) findRootModules(fullPath string) []string {
@@ -575,6 +585,10 @@ func (p *projectLocator) walkPaths(fullPath string, level int) []string {
 
 	for _, info := range fileInfos {
 		if info.IsDir() {
+			if p.isSkipped(info) {
+				continue
+			}
+
 			if strings.HasPrefix(info.Name(), ".") {
 				continue
 			}
@@ -587,4 +601,15 @@ func (p *projectLocator) walkPaths(fullPath string, level int) []string {
 	}
 
 	return dirs
+}
+
+func (p *projectLocator) isSkipped(info os.DirEntry) bool {
+	for _, isSkipped := range p.skippedPatterns {
+		if isSkipped(info.Name()) {
+			log.Debugf("skipping directory %s as it is marked as exluded by --skip-path", info.Name())
+			return true
+		}
+	}
+
+	return false
 }
