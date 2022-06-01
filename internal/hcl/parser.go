@@ -169,8 +169,8 @@ type Parser struct {
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
 // the initialPath contains Terraform files at the top level parsers will be len 1.
-func LoadParsers(initialPath string, skipPaths []string, options ...Option) ([]*Parser, error) {
-	pl := newProjectLocator(skipPaths...)
+func LoadParsers(initialPath string, excludePaths []string, options ...Option) ([]*Parser, error) {
+	pl := newProjectLocator(excludePaths...)
 	rootPaths := pl.findRootModules(initialPath)
 	if len(rootPaths) == 0 {
 		return nil, errors.New("No valid Terraform files found given path, try a different directory")
@@ -482,15 +482,15 @@ func loadDirectory(fullPath string, stopOnHCLError bool) ([]file, error) {
 }
 
 type projectLocator struct {
-	moduleCalls     map[string]struct{}
-	skippedPatterns []isSkippedFunc
+	moduleCalls  map[string]struct{}
+	excludedDirs []isExcludedFunc
 }
 
-type isSkippedFunc func(string) bool
+type isExcludedFunc func(string) bool
 
-func newProjectLocator(skipPaths ...string) *projectLocator {
-	skippedPatterns := make([]isSkippedFunc, len(skipPaths))
-	for i, p := range skipPaths {
+func newProjectLocator(excludedPaths ...string) *projectLocator {
+	skippedPatterns := make([]isExcludedFunc, len(excludedPaths))
+	for i, p := range excludedPaths {
 		skippedPatterns[i] = func(s string) bool {
 			match, _ := filepath.Match(p, s)
 
@@ -498,7 +498,7 @@ func newProjectLocator(skipPaths ...string) *projectLocator {
 		}
 	}
 
-	return &projectLocator{moduleCalls: make(map[string]struct{}), skippedPatterns: skippedPatterns}
+	return &projectLocator{moduleCalls: make(map[string]struct{}), excludedDirs: skippedPatterns}
 }
 
 func (p *projectLocator) findRootModules(fullPath string) []string {
@@ -604,9 +604,9 @@ func (p *projectLocator) walkPaths(fullPath string, level int) []string {
 }
 
 func (p *projectLocator) isSkipped(info os.DirEntry) bool {
-	for _, isSkipped := range p.skippedPatterns {
+	for _, isSkipped := range p.excludedDirs {
 		if isSkipped(info.Name()) {
-			log.Debugf("skipping directory %s as it is marked as exluded by --skip-path", info.Name())
+			log.Debugf("skipping directory %s as it is marked as exluded by --exclude-path", info.Name())
 			return true
 		}
 	}

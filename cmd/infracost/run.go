@@ -61,7 +61,7 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().String("terraform-init-flags", "", "Flags to pass to 'terraform init'. Applicable with --terraform-force-cli")
 	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
 
-	cmd.Flags().StringSlice("skip-path", nil, "Paths of directories to skip, glob patterns need quotes")
+	cmd.Flags().StringSlice("exclude-path", nil, "Paths of directories to exclude, glob patterns need quotes")
 
 	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
 
@@ -712,7 +712,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 		projectCfg.TerraformInitFlags, _ = cmd.Flags().GetString("terraform-init-flags")
 		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
-		projectCfg.SkipPaths, _ = cmd.Flags().GetStringSlice("skip-path")
+		projectCfg.ExcludePaths, _ = cmd.Flags().GetStringSlice("exclude-path")
 
 		if cmd.Flags().Changed("terraform-workspace") {
 			projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")

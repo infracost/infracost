@@ -18,6 +18,7 @@ EXAMPLES
 
 FLAGS
       --config-file string           Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags
+      --exclude-path strings         Paths of directories to exclude, glob patterns need quotes
       --fields strings               Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.
                                      Supported by table and html output formats (default [monthlyQuantity,unit,monthlyCost])
       --format string                Output format: json, table, html (default "table")
@@ -26,7 +27,6 @@ FLAGS
       --out-file string              Save output to a file, helpful with format flag
   -p, --path string                  Path to the Terraform directory or JSON/plan file
       --show-skipped                 List unsupported and free resources
-      --skip-path strings            Paths of directories to skip, glob patterns need quotes
       --sync-usage-file              Sync usage-file with missing resources, needs usage-file too (experimental)
       --terraform-var strings        Set value for an input variable, similar to Terraform's -var flag.
       --terraform-var-file strings   Load variable files, similar to Terraform's -var-file flag.
