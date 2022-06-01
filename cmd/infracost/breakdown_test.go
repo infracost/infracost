@@ -57,6 +57,21 @@ func TestBreakdownMultiProjectAutodetect(t *testing.T) {
 	)
 }
 
+func TestBreakdownMultiProjectSkipPaths(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--exclude-path", "glob/*/ignored",
+			"--exclude-path", "ignored",
+		}, nil,
+	)
+}
+
 func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
@@ -229,6 +244,20 @@ func TestBreakdownTerragruntHCLMulti(t *testing.T) {
 
 func TestBreakdownTerragruntHCLDepsOutput(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
+func TestBreakdownTerragruntSkipPaths(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+			"--exclude-path", "glob/*/ignored",
+			"--exclude-path", "ignored",
+		},
+		nil,
+	)
 }
 
 func TestBreakdownTerragruntHCLDepsOutputInclude(t *testing.T) {

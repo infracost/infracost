@@ -20,6 +20,8 @@ type Project struct {
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
 	Path string `yaml:"path,omitempty" ignored:"true"`
+	// ExcludePaths defines a list of directories that the provider should ignore.
+	ExcludePaths []string `yaml:"exclude_paths,omitempty"`
 	// TerraformVarFiles is any var files that are to be used with the project.
 	TerraformVarFiles []string `yaml:"terraform_var_files"`
 	// TerraformVars is a slice of input vars that are to be used with the project.
