@@ -178,13 +178,13 @@ func LoadParsers(initialPath string, excludePaths []string, options ...Option) (
 
 	var parsers = make([]*Parser, len(rootPaths))
 	for i, rootPath := range rootPaths {
-		parsers[i] = newParser(rootPath, options)
+		parsers[i] = newParser(rootPath, options...)
 	}
 
 	return parsers, nil
 }
 
-func newParser(initialPath string, options []Option) *Parser {
+func newParser(initialPath string, options ...Option) *Parser {
 	p := &Parser{
 		initialPath:   initialPath,
 		workspaceName: "default",

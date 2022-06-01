@@ -136,6 +136,34 @@ func (blocks Blocks) OfType(t string) Blocks {
 	return results
 }
 
+// BlockMatcher defines a struct that can be used to filter a list of blocks to a single Block.
+type BlockMatcher struct {
+	Type  string
+	Label string
+}
+
+// Matching returns a single block filtered from the given pattern.
+// If more than one Block is filtered by the pattern, Matching returns the first Block found.
+func (blocks Blocks) Matching(pattern BlockMatcher) *Block {
+	search := blocks
+
+	if pattern.Type != "" {
+		search = blocks.OfType(pattern.Type)
+	}
+
+	for _, block := range search {
+		if pattern.Label == block.Label() {
+			return block
+		}
+	}
+
+	if len(search) > 0 {
+		return search[0]
+	}
+
+	return nil
+}
+
 // Outputs returns a map of all the evaluated outputs from the list of Blocks.
 func (blocks Blocks) Outputs(suppressNil bool) cty.Value {
 	data := make(map[string]cty.Value)

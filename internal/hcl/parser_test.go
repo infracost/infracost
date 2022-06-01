@@ -5,8 +5,10 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
@@ -100,6 +102,91 @@ data "cats_cat" "the-cats-mother" {
 	assert.Equal(t, "the-cats-mother", dataBlocks[0].NameLabel())
 
 	assert.Equal(t, "boots", dataBlocks[0].GetAttribute("name").Value().AsString())
+}
+
+func Test_UnsupportedAttributes(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+resource "with_unsupported_attr" "test" {
+	name = "mittens"
+	special = true
+	my_number = 4
+}
+
+resource "with_unsupported_attr" "test2" {
+	name = "mittens"
+	special = true
+}
+
+locals {
+	value = with_unsupported_attr.test.does_not_exist
+	value_nested = with_unsupported_attr.test.a_block.attr
+	names = ["test1", "test3"]
+}
+
+output "exp" {
+  value = {
+    for name in local.names :
+      name => with_unsupported_attr.test.does_not_exist
+  }
+}
+
+output "loadbalancer"  {
+    value = {
+		"${var.env_dnsname}:${var.app_dnsname}" : with_unsupported_attr.test.ip_address
+    }
+}
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	label := blocks.Matching(BlockMatcher{Type: "locals"})
+	require.NotNil(t, label)
+	mockedVal := label.GetAttribute("value").Value()
+	require.Equal(t, cty.String, mockedVal.Type())
+	assertUUID(t, mockedVal.AsString())
+
+	mockedVarObj := label.GetAttribute("value_nested").Value()
+	require.Equal(t, cty.String, mockedVarObj.Type())
+	assertUUID(t, mockedVarObj.AsString())
+
+	output := blocks.Matching(BlockMatcher{Label: "exp", Type: "output"})
+	require.NotNil(t, output)
+	mockedObj := output.GetAttribute("value").Value()
+	require.True(t, mockedObj.Type().IsObjectType())
+
+	vm := mockedObj.AsValueMap()
+	assert.Len(t, vm, 2)
+	assert.Equal(t, mockedVal, vm["test1"])
+	assert.Equal(t, mockedVal, vm["test3"])
+
+	output2 := blocks.Matching(BlockMatcher{Label: "loadbalancer", Type: "output"})
+	objectWithKeys := output2.GetAttribute("value").Value()
+	require.True(t, objectWithKeys.Type().IsObjectType())
+	keys := []string{}
+	for k, v := range objectWithKeys.AsValueMap() {
+		keys = append(keys, k)
+		pieces := strings.Split(k, ":")
+		require.Len(t, pieces, 2)
+
+		assertUUID(t, pieces[0])
+		assertUUID(t, pieces[1])
+		assertUUID(t, v.AsString())
+	}
+
+	require.Len(t, keys, 1)
+
+}
+
+func assertUUID(t *testing.T, val string) {
+	t.Helper()
+
+	_, err := uuid.Parse(val)
+	assert.NoError(t, err)
 }
 
 func Test_Modules(t *testing.T) {

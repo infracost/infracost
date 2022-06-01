@@ -5,10 +5,15 @@ import (
 	"runtime/debug"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+)
+
+var (
+	missingAttributeDiagnostic = "Unsupported attribute"
 )
 
 // Attribute provides a wrapper struct around hcl.Attribute it provides
@@ -49,11 +54,15 @@ func (attr *Attribute) IsIterable() bool {
 // Value returns the Attribute with the underlying hcl.Expression of the hcl.Attribute evaluated with
 // the Attribute Context. This returns a cty.Value with the values filled from any variables or references
 // that the Context carries.
-func (attr *Attribute) Value() (ctyVal cty.Value) {
+func (attr *Attribute) Value() cty.Value {
 	if attr == nil {
 		return cty.NilVal
 	}
 
+	return attr.value(0)
+}
+
+func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Debugf("could not evaluate value for attr: %s err: %s\n%s", attr.Name(), err, debug.Stack())
@@ -64,6 +73,29 @@ func (attr *Attribute) Value() (ctyVal cty.Value) {
 	var diag hcl.Diagnostics
 	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
 	if diag.HasErrors() {
+		if retry > 2 {
+			return cty.StringVal(uuid.NewString())
+		}
+
+		for _, d := range diag {
+			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
+			// this is likely from an Terraform attribute that is built from the provider. We then try and build
+			// a mocked attribute so that the module evaluation isn't harmed.
+			var unsupportedErrFound bool
+			if d.Summary == missingAttributeDiagnostic {
+				unsupportedErrFound = true
+				ctx := attr.Ctx.Inner()
+				for _, traversal := range d.Expression.Variables() {
+					traverseVarAndSetCtx(ctx, traversal)
+				}
+			}
+
+			// now that we've built a mocked attribute on the global context let's try and retrieve the value once again.
+			if unsupportedErrFound {
+				return attr.value(retry + 1)
+			}
+		}
+
 		if attr.Verbose {
 			log.Debugf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
 		}
@@ -74,6 +106,93 @@ func (attr *Attribute) Value() (ctyVal cty.Value) {
 	}
 
 	return ctyVal
+}
+
+// traverseVarAndSetCtx uses the hcl traversal to build a mocked attribute on the evaluation context.
+// hcl Traversals from missing are normally provided in the following manner:
+//
+// 1. The root traversal or TraverseRoot fetches the top level reference for the block. We use this traversal to
+//    determine which ctx we use. We loop through the list of EvaluationContext until we find an entry matching the
+//    reference. If there is none, we exit, this shouldn't happen and is likely an indicator of a bug.
+// 2. The remaining attribute traversals or TraverseAttr. These use the value fetched from the context by the TraverseRoot
+//    to find the value of the attribute the expression is trying to evaluate. In our case this is the attribute that
+//    we need to populate with a mocked value.
+//
+// Once we've found the missing attribute we set a mocked value and return. This value should now be available for
+// the entire context evaluation as ctx is share across all blocks.
+func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal) {
+	var rootName string
+	for _, traverser := range traversal {
+		if r, ok := traverser.(hcl.TraverseRoot); ok {
+			rootName = r.Name
+			break
+		}
+	}
+
+	if rootName == "" {
+		return
+	}
+
+	ctx = findCorrectCtx(ctx, rootName)
+	if ctx == nil {
+		return
+	}
+
+	ob := ctx.Variables[rootName].AsValueMap()
+	if ob == nil {
+		ob = make(map[string]cty.Value)
+	}
+
+	ob = buildObject(traversal, ob, 0)
+	ctx.Variables[rootName] = cty.ObjectVal(ob)
+}
+
+// buildObject builds an attribute map from the traversal. It fills any missing attributes that are
+// defined by the traversal.
+func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, i int) map[string]cty.Value {
+	if i > len(traversal)-1 {
+		return ob
+	}
+
+	traverser := traversal[i]
+	if v, ok := traverser.(hcl.TraverseAttr); ok {
+		if _, exists := ob[v.Name]; exists {
+			val := buildObject(traversal, ob[v.Name].AsValueMap(), i+1)
+			ob[v.Name] = cty.ObjectVal(val)
+			return ob
+		}
+
+		if len(traversal)-1 == i {
+			ob[v.Name] = cty.StringVal(uuid.NewString())
+			return ob
+		}
+
+		val := buildObject(traversal, make(map[string]cty.Value), i+1)
+		ob[v.Name] = cty.ObjectVal(val)
+		return ob
+	}
+
+	return buildObject(traversal, ob, i+1)
+}
+
+// findCorrectCtx uses name to find the correct context to target. findCorrectCtx returns the first
+// context that contains an instance of name. If no entries of name are found findCorrectCtx returns nil.
+func findCorrectCtx(ctx *hcl.EvalContext, name string) *hcl.EvalContext {
+	thisCtx := ctx
+	for thisCtx != nil {
+		if thisCtx.Variables == nil {
+			thisCtx = thisCtx.Parent()
+			continue
+		}
+		_, exists := thisCtx.Variables[name]
+		if exists {
+			return thisCtx
+		}
+
+		thisCtx = thisCtx.Parent()
+	}
+
+	return thisCtx
 }
 
 // Name is a helper method to return the underlying hcl.Attribute Name
