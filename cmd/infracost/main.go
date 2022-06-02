@@ -111,6 +111,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 	rootCmd.PersistentFlags().Bool("no-color", false, "Turn off colored output")
 	rootCmd.PersistentFlags().String("log-level", "", "Log level (trace, debug, info, warn, error, fatal)")
 
+	rootCmd.AddCommand(authCmd(ctx))
 	rootCmd.AddCommand(registerCmd(ctx))
 	rootCmd.AddCommand(configureCmd(ctx))
 	rootCmd.AddCommand(diffCmd(ctx))
