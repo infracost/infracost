@@ -66,8 +66,23 @@ func TestBreakdownMultiProjectSkipPaths(t *testing.T) {
 		[]string{
 			"breakdown",
 			"--path", dir,
-			"--exclude-path", "glob/*/ignored",
+			"--exclude-path", "glob/*/shown",
 			"--exclude-path", "ignored",
+		}, nil,
+	)
+}
+
+func TestBreakdownMultiProjectSkipPathsRootLevel(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--exclude-path", "dev",
+			"--exclude-path", "prod",
 		}, nil,
 	)
 }
