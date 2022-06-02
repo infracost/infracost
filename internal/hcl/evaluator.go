@@ -412,7 +412,7 @@ func convertType(val cty.Value, attribute *Attribute) cty.Value {
 
 func valueToType(val cty.Value, want cty.Type) cty.Value {
 	if val == cty.NilVal {
-		return cty.NullVal(want)
+		return val
 	}
 
 	newVal, err := convert.Convert(val, want)
