@@ -7,6 +7,7 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"reflect"
+	"regexp"
 )
 
 // GlobalAccelerator struct represents <TODO: cloud service short description>.
@@ -206,6 +207,27 @@ var GlobalAcceleratorUsageSchema = []*schema.UsageItem{
 	},
 }
 
+type dataTransferElement struct {
+	from             string
+	to               string
+	trafficDirection string
+}
+
+var (
+	regionToCodeMap = map[string]string{
+		"asia_pacific":  "AP",
+		"australia":     "AU",
+		"europe":        "EU",
+		"india":         "IN",
+		"south_korea":   "KR",
+		"middle_east":   "ME",
+		"north_america": "NA",
+		"south_america": "SA",
+		"south_africa":  "ZA",
+	}
+	fromToUsageRegex = regexp.MustCompile(`from_(?P<From>[a-z_]+)_to_(?P<To>[a-z_]+)`)
+)
+
 func (r *GlobalAccelerator) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
@@ -227,13 +249,15 @@ func (r *GlobalAccelerator) BuildResource() *schema.Resource {
 	}
 
 	if inboundDataTransferUsage > 0 || outboundDataTransferUsage > 0 {
+		direction := "In"
 		dominantDirectionUsage := r.MonthlyInboundDataTransferGB
 		// There is no info in the AWS docs about the very remote corner case inboundDataTransferUsage == outboundDataTransferUsage
 		if outboundDataTransferUsage > inboundDataTransferUsage {
+			direction = "Out"
 			dominantDirectionUsage = r.MonthlyOutboundDataTransferGB
 		}
 		log.Warn(calculateDataTransferUsage(dominantDirectionUsage))
-		for _, c := range r.dataTransferCostComponents(dominantDirectionUsage) {
+		for _, c := range r.dataTransferCostComponents(direction, dominantDirectionUsage) {
 			costComponents = append(costComponents, c)
 		}
 	}
@@ -262,7 +286,24 @@ func (r *GlobalAccelerator) fixedCostComponent() *schema.CostComponent {
 	return c
 }
 
-func (r *GlobalAccelerator) dataTransferCostComponents(usage *globalAcceleratorRegionDataTransferUsage) []*schema.CostComponent {
+func (r *GlobalAccelerator) dataTransferCostComponents(direction string, usage *globalAcceleratorRegionDataTransferUsage) []*schema.CostComponent {
+	f := reflect.TypeOf(*usage)
+	v := reflect.ValueOf(*usage)
+	dataTransferElements := []*dataTransferElement{}
+	for i := 0; i < f.NumField(); i++ {
+		value := reflect.Indirect(v.Field(i))
+		if value.Kind() == 0 {
+			continue
+		}
+		tag := f.Field(i).Tag.Get("infracost_usage")
+		regexRes := fromToUsageRegex.FindStringSubmatch(tag)
+		dataTransferElements = append(dataTransferElements, &dataTransferElement{
+			from:             regionToCodeMap[regexRes[1]],
+			to:               regionToCodeMap[regexRes[2]],
+			trafficDirection: direction,
+		})
+	}
+
 	return []*schema.CostComponent{}
 }
 
