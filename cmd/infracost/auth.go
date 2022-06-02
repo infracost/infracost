@@ -45,7 +45,7 @@ func authLoginCmd(ctx *config.RunContext) *cobra.Command {
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			cmd.Println("We're redirecting you to our login page, please complete that,\nand return here to continue using Infracost.")
 
-			auth := apiclient.AuthClient{Host: ctx.Config.DashboardAPIEndpoint}
+			auth := apiclient.AuthClient{Host: ctx.Config.DashboardEndpoint}
 			apiKey, err := auth.Login()
 			if err != nil {
 				cmd.Println(err)
