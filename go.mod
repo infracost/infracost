@@ -102,6 +102,7 @@ require (
 	github.com/alecthomas/jsonschema v0.0.0-20211209230136-e2b41affa5c1
 	github.com/google/go-github/v41 v41.0.0
 	github.com/gruntwork-io/terragrunt v0.36.9
+	github.com/pkg/browser v0.0.0-20201207095918-0426ae3fba23
 	github.com/shurcooL/githubv4 v0.0.0-20220115235240-a14260e6f8a2
 	github.com/shurcooL/graphql v0.0.0-20200928012149-18c5c3165e3a
 	github.com/withfig/autocomplete-tools/packages/cobra v1.1.3
