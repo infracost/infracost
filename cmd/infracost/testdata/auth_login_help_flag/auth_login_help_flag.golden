@@ -1,0 +1,16 @@
+Authenticate the CLI with your Infracost account
+
+USAGE
+  infracost auth login [flags]
+
+EXAMPLES
+  Login:
+
+      infracost auth login
+
+FLAGS
+  -h, --help   help for login
+
+GLOBAL FLAGS
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output
