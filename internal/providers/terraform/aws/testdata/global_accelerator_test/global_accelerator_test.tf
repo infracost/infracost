@@ -9,16 +9,20 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-# Add example resources for GlobalAccelerator below
-
-resource "aws_globalaccelerator_accelerator" "example" {
-  name            = "Example"
+resource "aws_globalaccelerator_accelerator" "fixed_fee" {
+  name            = "TestFixedFee"
   ip_address_type = "IPV4"
   enabled         = true
+}
 
-  #attributes {
-    #flow_logs_enabled   = true
-    #flow_logs_s3_bucket = "example-bucket"
-    #flow_logs_s3_prefix = "flow-logs/"
-  #}
+resource "aws_globalaccelerator_accelerator" "dt_premium_usage" {
+  name            = "TestUsage"
+  ip_address_type = "IPV4"
+  enabled         = true
+}
+
+resource "aws_globalaccelerator_accelerator" "disabled" {
+  name            = "TestDisabled"
+  ip_address_type = "IPV4"
+  enabled         = false
 }

@@ -234,9 +234,19 @@ func (r *GlobalAccelerator) PopulateUsage(u *schema.UsageData) {
 
 func (r *GlobalAccelerator) BuildResource() *schema.Resource {
 	var (
-		inboundDataTransferUsage  float64 = 0
-		outboundDataTransferUsage float64 = 0
+		inboundDataTransferUsage  float64          = 0
+		outboundDataTransferUsage float64          = 0
+		resource                  *schema.Resource = &schema.Resource{
+			Name:           r.Name,
+			UsageSchema:    GlobalAcceleratorUsageSchema,
+			CostComponents: nil,
+		}
 	)
+
+	if !r.Enabled {
+		return resource
+	}
+
 	if r.MonthlyInboundDataTransferGB != nil {
 		inboundDataTransferUsage = calculateDataTransferUsage(r.MonthlyInboundDataTransferGB)
 	}
@@ -260,17 +270,13 @@ func (r *GlobalAccelerator) BuildResource() *schema.Resource {
 			costComponents = append(costComponents, c)
 		}
 	}
-
-	return &schema.Resource{
-		Name:           r.Name,
-		UsageSchema:    GlobalAcceleratorUsageSchema,
-		CostComponents: costComponents,
-	}
+	resource.CostComponents = costComponents
+	return resource
 }
 
 func (r *GlobalAccelerator) fixedCostComponent() *schema.CostComponent {
 	c := &schema.CostComponent{
-		Name:           "Global Accelerator Fixed Fee",
+		Name:           fmt.Sprintf("AWS Global Accelerator %s Fixed Fee", r.Name),
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -307,7 +313,7 @@ func (r *GlobalAccelerator) dataTransferCostComponents(direction string, usage *
 		})
 	}
 	for _, d := range dataTransferElements {
-		name := fmt.Sprintf("Global Accelerator DT-Premium Usage %s from %s to %s", strings.ToUpper(d.trafficDirection), d.from, d.to)
+		name := fmt.Sprintf("AWS Global Accelerator %s DT-Premium Usage %s from %s to %s", r.Name, strings.ToUpper(d.trafficDirection), d.from, d.to)
 		// Even if there are multiple price record entries the price for -Bytes-Internet and -Bytes-AWS for the same regions are equal
 		// So one of these two can be fixed to avoid multiple prices found
 		usageType := fmt.Sprintf("%s-%s-%s-Bytes-Internet", strings.ToUpper(d.from), strings.ToUpper(d.to), strings.ToUpper(d.trafficDirection))
