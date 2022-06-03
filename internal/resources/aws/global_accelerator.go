@@ -11,13 +11,10 @@ import (
 	"strings"
 )
 
-// GlobalAccelerator struct represents <TODO: cloud service short description>.
+// GlobalAccelerator struct represents AWS Global Accelerator service
 //
-// <TODO: Add any important information about the resource and links to the
-// pricing pages or documentation that might be useful to developers in the future, e.g:>
-//
-// Resource information: https://aws.amazon.com/<PATH/TO/RESOURCE>/
-// Pricing information: https://aws.amazon.com/<PATH/TO/PRICING>/
+// Resource information: https://aws.amazon.com/global-accelerator
+// Pricing information: https://aws.amazon.com/global-accelerator/pricing/
 type GlobalAccelerator struct {
 	Name          string
 	IPAddressType string
@@ -266,9 +263,7 @@ func (r *GlobalAccelerator) BuildResource() *schema.Resource {
 			direction = "Out"
 			dominantDirectionUsage = r.MonthlyOutboundDataTransferGB
 		}
-		for _, c := range r.dataTransferCostComponents(direction, dominantDirectionUsage) {
-			costComponents = append(costComponents, c)
-		}
+		costComponents = append(costComponents, r.dataTransferCostComponents(direction, dominantDirectionUsage)...)
 	}
 	resource.CostComponents = costComponents
 	return resource
