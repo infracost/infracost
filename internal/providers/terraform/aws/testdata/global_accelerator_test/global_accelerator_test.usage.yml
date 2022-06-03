@@ -2,10 +2,11 @@ version: 0.1
 resource_usage:
   aws_globalaccelerator_accelerator.example:
     monthly_inbound_data_transfer_gb:
-      from_australia_to_australia: 500
-      from_australia_to_north_america: 1000
+      from_europe_to_north_america: 2000
+      from_asia_pacific_to_north_america: 2000
     monthly_outbound_data_transfer_gb:
-      from_australia_to_europe: 1000
+      from_north_america_to_europe: 5000
+      from_north_america_to_asia_pacific: 1000
 
 # TODO
 # Also add a usage example into the infracost-usage-example.yml with comments

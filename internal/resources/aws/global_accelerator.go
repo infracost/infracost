@@ -1,13 +1,14 @@
 package aws
 
 import (
+	"fmt"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"reflect"
 	"regexp"
+	"strings"
 )
 
 // GlobalAccelerator struct represents <TODO: cloud service short description>.
@@ -110,110 +111,109 @@ type globalAcceleratorRegionDataTransferUsage struct {
 	FromSouthAfricaToSouthAfrica   *float64 `infracost_usage:"from_south_africa_to_south_africa"`
 }
 
-var globalAcceleratorRegionDataTransferUsageSchema = []*schema.UsageItem{
-	{Key: "from_asia_pacific_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_asia_pacific_to_australia", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_asia_pacific_to_europe", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_asia_pacific_to_india", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_asia_pacific_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_asia_pacific_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_asia_pacific_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_asia_pacific_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_asia_pacific_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_australia_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_australia_to_australia", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_australia_to_europe", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_australia_to_india", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_australia_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_australia_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_australia_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_australia_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_europe_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_europe_to_australia", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_europe_to_europe", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_europe_to_india", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_europe_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_europe_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_europe_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_europe_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_europe_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_india_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_india_to_australia", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_india_to_europe", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_india_to_india", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_india_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_india_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_india_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_india_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_india_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_korea_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_korea_to_australia", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_korea_to_europe", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_korea_to_india", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_korea_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_korea_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_korea_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_korea_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_korea_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_middle_east_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_middle_east_to_australia", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_middle_east_to_europe", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_middle_east_to_india", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_middle_east_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_middle_east_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_middle_east_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_middle_east_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_middle_east_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_north_america_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_north_america_to_australia", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_north_america_to_europe", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_north_america_to_india", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_north_america_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_north_america_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_north_america_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_north_america_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_north_america_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_america_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_america_to_australia", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_america_to_europe", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_america_to_india", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_america_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_america_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_america_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_america_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_america_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_africa_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_africa_to_australia", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_africa_to_europe", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_africa_to_india", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_australia_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_africa_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_africa_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_africa_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_africa_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "from_south_africa_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
-}
-
-var GlobalAcceleratorUsageSchema = []*schema.UsageItem{
-	{
-		Key:          "monthly_inbound_data_transfer_gb",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_inbound_data_transfer_gb", Items: globalAcceleratorRegionDataTransferUsageSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "monthly_outbound_data_transfer_gb",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_outbound_data_transfer_gb", Items: globalAcceleratorRegionDataTransferUsageSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-}
-
 type dataTransferElement struct {
 	from             string
 	to               string
 	trafficDirection string
+	quantity         float64
 }
 
 var (
+	GlobalAcceleratorUsageSchema = []*schema.UsageItem{
+		{
+			Key:          "monthly_inbound_data_transfer_gb",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_inbound_data_transfer_gb", Items: globalAcceleratorRegionDataTransferUsageSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "monthly_outbound_data_transfer_gb",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_outbound_data_transfer_gb", Items: globalAcceleratorRegionDataTransferUsageSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+	}
+	globalAcceleratorRegionDataTransferUsageSchema = []*schema.UsageItem{
+		{Key: "from_asia_pacific_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_asia_pacific_to_australia", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_asia_pacific_to_europe", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_asia_pacific_to_india", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_asia_pacific_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_asia_pacific_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_asia_pacific_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_asia_pacific_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_asia_pacific_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_australia_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_australia_to_australia", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_australia_to_europe", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_australia_to_india", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_australia_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_australia_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_australia_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_australia_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_europe_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_europe_to_australia", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_europe_to_europe", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_europe_to_india", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_europe_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_europe_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_europe_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_europe_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_europe_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_india_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_india_to_australia", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_india_to_europe", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_india_to_india", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_india_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_india_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_india_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_india_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_india_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_korea_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_korea_to_australia", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_korea_to_europe", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_korea_to_india", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_korea_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_korea_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_korea_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_korea_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_korea_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_middle_east_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_middle_east_to_australia", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_middle_east_to_europe", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_middle_east_to_india", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_middle_east_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_middle_east_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_middle_east_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_middle_east_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_middle_east_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_north_america_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_north_america_to_australia", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_north_america_to_europe", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_north_america_to_india", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_north_america_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_north_america_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_north_america_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_north_america_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_north_america_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_america_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_america_to_australia", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_america_to_europe", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_america_to_india", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_america_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_america_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_america_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_america_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_america_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_africa_to_asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_africa_to_australia", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_africa_to_europe", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_africa_to_india", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_australia_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_africa_to_south_korea", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_africa_to_middle_east", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_africa_to_north_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_africa_to_south_america", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "from_south_africa_to_south_africa", DefaultValue: 0, ValueType: schema.Float64},
+	}
 	regionToCodeMap = map[string]string{
 		"asia_pacific":  "AP",
 		"australia":     "AU",
@@ -256,7 +256,6 @@ func (r *GlobalAccelerator) BuildResource() *schema.Resource {
 			direction = "Out"
 			dominantDirectionUsage = r.MonthlyOutboundDataTransferGB
 		}
-		log.Warn(calculateDataTransferUsage(dominantDirectionUsage))
 		for _, c := range r.dataTransferCostComponents(direction, dominantDirectionUsage) {
 			costComponents = append(costComponents, c)
 		}
@@ -271,9 +270,10 @@ func (r *GlobalAccelerator) BuildResource() *schema.Resource {
 
 func (r *GlobalAccelerator) fixedCostComponent() *schema.CostComponent {
 	c := &schema.CostComponent{
-		Name:           "Global Accelerator",
+		Name:           "Global Accelerator Fixed Fee",
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
 			Service:    strPtr("AWSGlobalAccelerator"),
@@ -290,21 +290,46 @@ func (r *GlobalAccelerator) dataTransferCostComponents(direction string, usage *
 	f := reflect.TypeOf(*usage)
 	v := reflect.ValueOf(*usage)
 	dataTransferElements := []*dataTransferElement{}
+	costComponents := []*schema.CostComponent{}
 	for i := 0; i < f.NumField(); i++ {
 		value := reflect.Indirect(v.Field(i))
 		if value.Kind() == 0 {
 			continue
 		}
+		quantity := reflect.Indirect(v.Field(i)).Float()
 		tag := f.Field(i).Tag.Get("infracost_usage")
 		regexRes := fromToUsageRegex.FindStringSubmatch(tag)
 		dataTransferElements = append(dataTransferElements, &dataTransferElement{
 			from:             regionToCodeMap[regexRes[1]],
 			to:               regionToCodeMap[regexRes[2]],
 			trafficDirection: direction,
+			quantity:         quantity,
 		})
 	}
-
-	return []*schema.CostComponent{}
+	for _, d := range dataTransferElements {
+		name := fmt.Sprintf("Global Accelerator DT-Premium Usage %s from %s to %s", strings.ToUpper(d.trafficDirection), d.from, d.to)
+		// Even if there are multiple price record entries the price for -Bytes-Internet and -Bytes-AWS for the same regions are equal
+		// So one of these two can be fixed to avoid multiple prices found
+		usageType := fmt.Sprintf("%s-%s-%s-Bytes-Internet", strings.ToUpper(d.from), strings.ToUpper(d.to), strings.ToUpper(d.trafficDirection))
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            name,
+			Unit:            "GB",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(decimal.NewFromFloat(d.quantity)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Service:    strPtr("AWSGlobalAccelerator"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "trafficDirection", Value: strPtr(d.trafficDirection)},
+					{Key: "fromLocation", Value: strPtr(d.from)},
+					{Key: "toLocation", Value: strPtr(d.to)},
+					{Key: "operation", Value: strPtr("Dominant")},
+					{Key: "usagetype", Value: strPtr(usageType)},
+				},
+			},
+		})
+	}
+	return costComponents
 }
 
 func calculateDataTransferUsage(usage *globalAcceleratorRegionDataTransferUsage) float64 {
