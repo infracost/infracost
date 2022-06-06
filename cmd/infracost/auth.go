@@ -12,13 +12,13 @@ import (
 func authCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "auth",
-		Short: "Authenticate with Infracost",
-		Long:  "Authenticate with Infracost",
-		Example: `  Login:
+		Short: "Get a free API key, or login to your existing account",
+		Long:  "Get a free API key, or login to your existing account",
+		Example: `  Get a free API key, or login to your existing account:
 
       infracost auth login
 
-  Manually set the API key that your CLI should use:
+  Manually set the API key that your CLI should use. The API key can be retrieved from your account:
 
       infracost configure set api_key MY_API_KEY`,
 		ValidArgs: []string{"--", "-"},
