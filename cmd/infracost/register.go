@@ -18,9 +18,10 @@ import (
 
 func registerCmd(ctx *config.RunContext) *cobra.Command {
 	return &cobra.Command{
-		Use:   "register",
-		Short: "Register for a free Infracost API key",
-		Long:  "Register for a free Infracost API key",
+		Use:    "register",
+		Short:  "Register for a free Infracost API key",
+		Long:   "Register for a free Infracost API key",
+		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var isRegenerate bool
 

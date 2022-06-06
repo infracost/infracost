@@ -1082,29 +1082,6 @@ _infracost_output()
     noun_aliases=()
 }
 
-_infracost_register()
-{
-    last_command="infracost_register"
-
-    command_aliases=()
-
-    commands=()
-
-    flags=()
-    two_word_flags=()
-    local_nonpersistent_flags=()
-    flags_with_completion=()
-    flags_completion=()
-
-    flags+=("--log-level=")
-    two_word_flags+=("--log-level")
-    flags+=("--no-color")
-
-    must_have_one_flag=()
-    must_have_one_noun=()
-    noun_aliases=()
-}
-
 _infracost_root_command()
 {
     last_command="infracost"
@@ -1120,7 +1097,6 @@ _infracost_root_command()
     commands+=("diff")
     commands+=("help")
     commands+=("output")
-    commands+=("register")
 
     flags=()
     two_word_flags=()
