@@ -28,7 +28,6 @@ AVAILABLE COMMANDS
   diff             Show diff of monthly costs between current and planned state
   help             Help about any command
   output           Combine and output Infracost JSON files in different formats
-  register         Register for a free Infracost API key
 
 FLAGS
   -h, --help               help for infracost
