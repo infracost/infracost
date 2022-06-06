@@ -22,6 +22,6 @@ module "out" {
 }
 
 module "test" {
-  source = "./modules/test"
+  source  = "./modules/test"
   enabled = local.enabled
 }
