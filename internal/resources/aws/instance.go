@@ -154,19 +154,23 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 		}
 	}
 
+	priceFilter := &schema.PriceFilter{
+		PurchaseOption: strPtr(a.PurchaseOption),
+	}
+
 	if a.ReservedInstanceType != nil {
-		resolver := reservedInstanceResolver{
-			term:          strVal(a.ReservedInstanceTerm),
-			paymentOption: strVal(a.ReservedInstancePaymentOption),
+		resolver := &ec2ReservationResolver{
+			term:              strVal(a.ReservedInstanceTerm),
+			paymentOption:     strVal(a.ReservedInstancePaymentOption),
+			termOfferingClass: strVal(a.ReservedInstanceType),
 		}
-		valid, err := a.validateReserveInstanceParams(resolver)
-		if err != "" {
-			log.Warnf(err)
+		reservedFilter, err := resolver.PriceFilter()
+		if err != nil {
+			log.Warnf(err.Error())
+		} else {
+			priceFilter = reservedFilter
 		}
-		if valid {
-			purchaseOptionLabel = "reserved"
-			return a.reservedInstanceCostComponent(osLabel, osFilterVal, purchaseOptionLabel, resolver)
-		}
+		purchaseOptionLabel = "reserved"
 	}
 
 	return &schema.CostComponent{
@@ -188,47 +192,7 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 				{Key: "capacitystatus", Value: strPtr("Used")},
 			},
 		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr(a.PurchaseOption),
-		},
-	}
-}
-
-func (a *Instance) validateReserveInstanceParams(resolver reservedInstanceResolver) (bool, string) {
-	validTypes := []string{"convertible", "standard"}
-	if !stringInSlice(validTypes, strVal(a.ReservedInstanceType)) {
-		return false, fmt.Sprintf("Invalid reserved_instance_type, ignoring reserved options. Expected: convertible, standard. Got: %s", strVal(a.ReservedInstanceType))
-	}
-
-	return resolver.Validate()
-}
-
-func (a *Instance) reservedInstanceCostComponent(osLabel, osFilterVal, purchaseOptionLabel string, resolver reservedInstanceResolver) *schema.CostComponent {
-
-	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, a.InstanceType),
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(a.Region),
-			Service:       strPtr("AmazonEC2"),
-			ProductFamily: strPtr("Compute Instance"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "instanceType", Value: strPtr(a.InstanceType)},
-				{Key: "tenancy", Value: strPtr(a.Tenancy)},
-				{Key: "operatingSystem", Value: strPtr(osFilterVal)},
-				{Key: "preInstalledSw", Value: strPtr("NA")},
-				{Key: "capacitystatus", Value: strPtr("Used")},
-			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			StartUsageAmount:   strPtr("0"),
-			TermOfferingClass:  a.ReservedInstanceType,
-			TermLength:         strPtr(resolver.Term()),
-			TermPurchaseOption: strPtr(resolver.PaymentOption()),
-		},
+		PriceFilter: priceFilter,
 	}
 }
 
@@ -311,4 +275,37 @@ func (a *Instance) cpuCreditCostComponent(instanceFamily string) *schema.CostCom
 			},
 		},
 	}
+}
+
+type ec2ReservationResolver struct {
+	term              string
+	paymentOption     string
+	termOfferingClass string
+}
+
+// PriceFilter implementation for ec2ReservationResolver
+// Allowed values for ReservedInstanceTerm: ["1_year", "3_year"]
+// Allowed values for ReservedInstancePaymentOption: ["all_upfront", "partial_upfront", "no_upfront"]
+// Allowed values for ReservedTermOfferingClass: ["standard", "convertible"]
+func (r ec2ReservationResolver) PriceFilter() (*schema.PriceFilter, error) {
+	termLength := reservedTermsMapping[r.term]
+	purchaseOption := reservedPaymentOptionMapping[r.paymentOption]
+	validTypes := []string{"convertible", "standard"}
+	if !stringInSlice(validTypes, r.termOfferingClass) {
+		return nil, fmt.Errorf("Invalid reserved_instance_type, ignoring reserved options. Expected: convertible, standard. Got: %s", r.termOfferingClass)
+	}
+	validTerms := sliceOfKeysFromMap(reservedTermsMapping)
+	if !stringInSlice(validTerms, r.term) {
+		return nil, fmt.Errorf("Invalid reserved_instance_term, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validTerms, ", "), r.term)
+	}
+	validOptions := sliceOfKeysFromMap(reservedPaymentOptionMapping)
+	if !stringInSlice(validOptions, r.paymentOption) {
+		return nil, fmt.Errorf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
+	}
+	return &schema.PriceFilter{
+		StartUsageAmount:   strPtr("0"),
+		TermOfferingClass:  strPtr(r.termOfferingClass),
+		TermLength:         strPtr(termLength),
+		TermPurchaseOption: strPtr(purchaseOption),
+	}, nil
 }

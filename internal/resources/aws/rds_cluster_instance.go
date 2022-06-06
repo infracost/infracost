@@ -44,25 +44,17 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 		PurchaseOption: strPtr("on_demand"),
 	}
 
+	var err error
 	if r.ReservedInstanceTerm != nil {
-		resolver := reservedInstanceResolver{
+		resolver := &rdsReservationResolver{
 			term:          strVal(r.ReservedInstanceTerm),
 			paymentOption: strVal(r.ReservedInstancePaymentOption),
-			dbInstance:    true,
 		}
-		valid, err := resolver.Validate()
-		if err != "" {
-			log.Warnf(err)
+		priceFilter, err = resolver.PriceFilter()
+		if err != nil {
+			log.Warnf(err.Error())
 		}
-		if valid {
-			purchaseOptionLabel = "reserved"
-			priceFilter = &schema.PriceFilter{
-				PurchaseOption:     strPtr("reserved"),
-				StartUsageAmount:   strPtr("0"),
-				TermLength:         strPtr(resolver.Term()),
-				TermPurchaseOption: strPtr(resolver.PaymentOption()),
-			}
-		}
+		purchaseOptionLabel = "reserved"
 	}
 
 	costComponents := []*schema.CostComponent{

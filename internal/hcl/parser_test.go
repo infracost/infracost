@@ -44,7 +44,7 @@ data "cats_cat" "the-cats-mother" {
 
 `)
 
-	parsers, err := LoadParsers(filepath.Dir(path), OptionStopOnHCLError())
+	parsers, err := LoadParsers(filepath.Dir(path), []string{}, OptionStopOnHCLError())
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -126,7 +126,7 @@ output "mod_result" {
 		"module",
 	)
 
-	parsers, err := LoadParsers(path, OptionStopOnHCLError())
+	parsers, err := LoadParsers(path, []string{}, OptionStopOnHCLError())
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -184,7 +184,7 @@ output "mod_result" {
 		"",
 	)
 
-	parsers, err := LoadParsers(path, OptionStopOnHCLError())
+	parsers, err := LoadParsers(path, []string{}, OptionStopOnHCLError())
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)

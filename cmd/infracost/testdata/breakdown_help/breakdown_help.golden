@@ -16,6 +16,7 @@ EXAMPLES
 
 FLAGS
       --config-file string           Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags
+      --exclude-path strings         Paths of directories to exclude, glob patterns need quotes
       --fields strings               Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.
                                      Supported by table and html output formats (default [monthlyQuantity,unit,monthlyCost])
       --format string                Output format: json, table, html (default "table")

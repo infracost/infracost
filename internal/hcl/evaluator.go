@@ -6,12 +6,15 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/tryfunc"
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	yaml "github.com/zclconf/go-cty-yaml"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/function"
 	"github.com/zclconf/go-cty/cty/function/stdlib"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -23,6 +26,7 @@ import (
 
 var (
 	errorNoVarValue = errors.New("no value found")
+	modReplace      = regexp.MustCompile(`module\.`)
 )
 
 const maxContextIterations = 32
@@ -45,7 +49,7 @@ type Evaluator struct {
 	// Terraform or Infracost init.
 	moduleMetadata *modules.Manifest
 	// visitedModules is a lookup map to hold information by the Evaluator of modules that it has already evaluated.
-	visitedModules map[string]struct{}
+	visitedModules map[string]map[string]cty.Value
 	// module defines the input and module path for the Evaluator. It is the root module of the config.
 	module Module
 	// workingDir is the current directory the evaluator is running within. This is used to set Context information on
@@ -66,7 +70,7 @@ func NewEvaluator(
 	workingDir string,
 	inputVars map[string]cty.Value,
 	moduleMetadata *modules.Manifest,
-	visitedModules map[string]struct{},
+	visitedModules map[string]map[string]cty.Value,
 	workspace string,
 	blockBuilder BlockBuilder,
 	spinFunc ui.SpinnerFunc,
@@ -76,7 +80,7 @@ func NewEvaluator(
 	}, nil)
 
 	if visitedModules == nil {
-		visitedModules = make(map[string]struct{})
+		visitedModules = make(map[string]map[string]cty.Value)
 	}
 
 	// set the global evaluation parameters.
@@ -197,18 +201,22 @@ func (e *Evaluator) evaluateStep(i int) {
 // to run on the child Module Blocks. It passes the Evaluator the top level module Attributes as input variables.
 func (e *Evaluator) evaluateModules() {
 	for _, moduleCall := range e.moduleCalls {
-		if _, ok := e.visitedModules[moduleCall.Definition.FullName()]; ok {
-			continue
+		fullName := moduleCall.Definition.FullName()
+		vars := moduleCall.Definition.Values().AsValueMap()
+		if oldVars, ok := e.visitedModules[fullName]; ok {
+			if reflect.DeepEqual(vars, oldVars) {
+				continue
+			}
 		}
 
-		e.visitedModules[moduleCall.Definition.FullName()] = struct{}{}
+		e.visitedModules[fullName] = vars
 
-		vars := moduleCall.Definition.Values().AsValueMap()
 		moduleEvaluator := NewEvaluator(
 			Module{
-				Name:       moduleCall.Definition.FullName(),
+				Name:       fullName,
 				Source:     moduleCall.Module.Source,
-				Blocks:     moduleCall.Module.Blocks,
+				Blocks:     moduleCall.Module.RawBlocks,
+				RawBlocks:  moduleCall.Module.RawBlocks,
 				RootPath:   e.module.RootPath,
 				ModulePath: moduleCall.Path,
 				Modules:    nil,
@@ -224,13 +232,14 @@ func (e *Evaluator) evaluateModules() {
 		)
 
 		moduleCall.Module, _ = moduleEvaluator.Run()
-		e.ctx.Set(moduleEvaluator.exportOutputs(), "module", moduleCall.Name)
+		outputs := moduleEvaluator.exportOutputs()
+		e.ctx.Set(outputs, "module", moduleCall.Name)
 	}
 }
 
 // exportOutputs exports module outputs so that it can be used in Context evaluation.
 func (e *Evaluator) exportOutputs() cty.Value {
-	return e.module.Blocks.Outputs()
+	return e.module.Blocks.Outputs(false)
 }
 
 func (e *Evaluator) expandBlocks(blocks Blocks) Blocks {
@@ -364,15 +373,54 @@ func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 		return cty.NilVal, fmt.Errorf("cannot resolve variable with no attributes")
 	}
 
+	attribute := attributes["type"]
 	if override, exists := e.inputVars[b.Label()]; exists {
-		return override, nil
+		return convertType(override, attribute), nil
 	}
 
 	if def, exists := attributes["default"]; exists {
 		return def.Value(), nil
 	}
 
-	return cty.NilVal, errorNoVarValue
+	return convertType(cty.NilVal, attribute), errorNoVarValue
+}
+
+func convertType(val cty.Value, attribute *Attribute) cty.Value {
+	if attribute == nil {
+		return val
+	}
+
+	var t string
+	switch v := attribute.HCLAttr.Expr.(type) {
+	case *hclsyntax.ScopeTraversalExpr:
+		t = v.Traversal.RootName()
+	case *hclsyntax.LiteralValueExpr:
+		t = attribute.Value().AsString()
+	}
+
+	switch t {
+	case "string":
+		return valueToType(val, cty.String)
+	case "number":
+		return valueToType(val, cty.Number)
+	case "bool":
+		return valueToType(val, cty.Bool)
+	}
+
+	return val
+}
+
+func valueToType(val cty.Value, want cty.Type) cty.Value {
+	if val == cty.NilVal {
+		return val
+	}
+
+	newVal, err := convert.Convert(val, want)
+	if err != nil {
+		return val
+	}
+
+	return newVal
 }
 
 func (e *Evaluator) evaluateOutput(b *Block) (cty.Value, error) {
@@ -453,6 +501,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 			sourceVal := attr.Value()
 			if sourceVal.Type() == cty.String {
 				source = sourceVal.AsString()
+				break
 			}
 		}
 	}
@@ -467,7 +516,8 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		// if we have module metadata we can parse all the modules as they'll be cached locally!
 		for _, module := range e.moduleMetadata.Modules {
 			reg := "registry.terraform.io/" + source
-			if module.Source == source || module.Source == reg {
+			key := modReplace.ReplaceAllString(b.FullName(), "")
+			if (module.Source == source && module.Key == key) || (module.Source == reg && module.Key == key) {
 				modulePath = filepath.Clean(filepath.Join(e.module.RootPath, module.Dir))
 				break
 			}
@@ -498,6 +548,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 			Name:       b.TypeLabel(),
 			Source:     source,
 			Blocks:     blocks,
+			RawBlocks:  blocks,
 			RootPath:   e.module.RootPath,
 			ModulePath: modulePath,
 			Parent:     &e.module,

@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 )
 
 func GetAzureRMApplicationGatewayRegistryItem() *schema.RegistryItem {
@@ -28,9 +29,10 @@ func NewAzureRMApplicationGateway(d *schema.ResourceData, u *schema.UsageData) *
 	capacity := d.Get("sku.0.capacity").Int()
 
 	skuNameParts := strings.Split(skuName, "_")
-	if len(skuNameParts[1]) != 0 {
+	if len(skuNameParts) > 1 {
 		sku = strings.ToLower(skuNameParts[1])
 	}
+
 	if sku != "v2" {
 		if strings.ToLower(skuNameParts[0]) == "standard" {
 			tier = "basic"

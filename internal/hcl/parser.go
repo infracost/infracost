@@ -126,12 +126,6 @@ func OptionWithRemoteVarLoader(host, token, localWorkspace string) Option {
 	}
 }
 
-func OptionWithWorkspaceName(workspaceName string) Option {
-	return func(p *Parser) {
-		p.workspaceName = workspaceName
-	}
-}
-
 func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 	return func(p *Parser) {
 		p.blockBuilder = blockBuilder
@@ -175,11 +169,11 @@ type Parser struct {
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
 // the initialPath contains Terraform files at the top level parsers will be len 1.
-func LoadParsers(initialPath string, options ...Option) ([]*Parser, error) {
-	pl := &projectLocator{moduleCalls: make(map[string]struct{})}
+func LoadParsers(initialPath string, excludePaths []string, options ...Option) ([]*Parser, error) {
+	pl := &projectLocator{moduleCalls: make(map[string]struct{}), excludedDirs: excludePaths}
 	rootPaths := pl.findRootModules(initialPath)
 	if len(rootPaths) == 0 {
-		return nil, errors.New("No valid Terraform files found given path, try a different directory")
+		return nil, errors.New("No valid Terraform files found at the given path, try a different directory")
 	}
 
 	var parsers = make([]*Parser, len(rootPaths))
@@ -282,6 +276,7 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 			Name:       "",
 			Source:     "",
 			Blocks:     blocks,
+			RawBlocks:  blocks,
 			RootPath:   p.initialPath,
 			ModulePath: p.initialPath,
 		},
@@ -487,14 +482,61 @@ func loadDirectory(fullPath string, stopOnHCLError bool) ([]file, error) {
 }
 
 type projectLocator struct {
-	moduleCalls map[string]struct{}
+	moduleCalls  map[string]struct{}
+	excludedDirs []string
+}
+
+func (p *projectLocator) buildMatches(fullPath string) func(string) bool {
+	var matches []string
+	globMatches := make(map[string]struct{})
+
+	for _, dir := range p.excludedDirs {
+		var absoluteDir string
+		if dir == filepath.Base(dir) {
+			matches = append(matches, dir)
+		}
+
+		if filepath.IsAbs(dir) {
+			absoluteDir = dir
+		} else {
+			absoluteDir = filepath.Join(fullPath, dir)
+		}
+
+		globs, err := filepath.Glob(absoluteDir)
+		if err == nil {
+			for _, m := range globs {
+				globMatches[m] = struct{}{}
+			}
+		}
+	}
+
+	return func(dir string) bool {
+		if _, ok := globMatches[dir]; ok {
+			return true
+		}
+
+		base := filepath.Base(dir)
+		for _, match := range matches {
+			if match == base {
+				return true
+			}
+		}
+
+		return false
+	}
 }
 
 func (p *projectLocator) findRootModules(fullPath string) []string {
+	isSkipped := p.buildMatches(fullPath)
 	dirs := p.walkPaths(fullPath, 0)
 
 	var filtered []string
 	for _, dir := range dirs {
+		if isSkipped(dir) {
+			log.Debugf("skipping directory %s as it is marked as exluded by --exclude-path", dir)
+			continue
+		}
+
 		if _, ok := p.moduleCalls[dir]; !ok {
 			filtered = append(filtered, dir)
 		}
