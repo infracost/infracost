@@ -7,9 +7,9 @@ import (
 
 var (
 	eipReferences = []string{
-		"aws_nat_gateway.allocation_id",
-		"aws_eip_association.allocation_id",
-		"aws_lb.subnet_mapping.#.allocation_id",
+		"awsNatGateway.allocation_id",
+		"awsEipAssociation.allocation_id",
+		"awsLb.subnetMapping.#.allocationId",
 	}
 )
 

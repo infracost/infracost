@@ -3,13 +3,20 @@ package pulumi
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/providers/pulumi/aws"
 	"github.com/infracost/infracost/internal/providers/pulumi/types"
 	"github.com/infracost/infracost/internal/schema"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
+
+// These show differently in the plan JSON for Terraform 0.12 and 0.13.
+var infracostProviderNames = []string{"infracost", "registry.terraform.io/infracost/infracost"}
 
 type Parser struct {
 	ctx *config.ProjectContext
@@ -61,22 +68,24 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 	var resources []*schema.Resource
 	var pastResources []*schema.Resource
 	resources = append(resources, baseResources...)
+	refResources := make(map[string]*schema.ResourceData)
 
 	for i := range t.Steps {
 		var step = t.Steps[i]
 		if step.NewState.Type == "pulumi:pulumi:Stack" {
 			continue
 		}
-		var name = step.NewState.URN.URNName()
+		var name = step.NewState.URN.Name().String()
 		var resourceType = step.NewState.Type.String()
 		var providerName = strings.Split(step.NewState.Type.String(), ":")[0]
 		var localInputs = step.NewState.Inputs
+		localInputs["urn"] = step.URN
 		localInputs["config"] = t.Config
 		localInputs["dependencies"] = step.NewState.Dependencies
 		localInputs["propertyDependencies"] = step.NewState.PropertyDependencies
 		var inputs, _ = json.Marshal(localInputs)
 
-		tags := map[string]string{} // TODO: Where do I get tags? Day 2 Issue
+		tags := parseTags(resourceType, gjson.Parse(string(inputs)))
 		var usageData *schema.UsageData
 
 		if ud := usage[name]; ud != nil {
@@ -84,6 +93,7 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 		}
 
 		resourceData := schema.NewResourceData(resourceType, providerName, name, tags, gjson.Parse(string(inputs)))
+		refResources[name] = resourceData
 		if r := p.createResource(resourceData, usageData); r != nil {
 			if step.Op == "same" {
 				pastResources = append(resources, r)
@@ -92,7 +102,8 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 			}
 		}
 	}
-
+	p.parseReferences(refResources, rawValues)
+	p.loadInfracostProviderUsageData(usage, refResources)
 	return pastResources, resources, nil
 }
 
@@ -115,4 +126,416 @@ func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schem
 
 func isAwsChina(d *schema.ResourceData) bool {
 	return strings.HasPrefix(d.Type, "aws_") && strings.HasPrefix(d.Get("region").String(), "cn-")
+}
+
+func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
+	providerPrefix := strings.Split(d.Type, ":")[0]
+
+	switch providerPrefix {
+	case "aws":
+		return aws.GetSpecialContext(d)
+	default:
+		log.Debugf("Unsupported provider %s", providerPrefix)
+		return map[string]interface{}{}
+	}
+}
+
+func parseTags(resourceType string, v gjson.Result) map[string]string {
+
+	providerPrefix := strings.Split(resourceType, ":")[0]
+
+	switch providerPrefix {
+	case "aws":
+		return aws.ParseTags(resourceType, v)
+	default:
+		log.Debugf("Unsupported provider %s", providerPrefix)
+		return map[string]string{}
+	}
+}
+
+func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
+	var region string
+
+	providerKey := parseProviderKey(resConf)
+	if providerKey != "" {
+		region = parseRegion(providerConf, vars, providerKey)
+		// Note: if the provider is passed to a module using a different alias
+		// then there's no way to detect this so we just have to fallback to
+		// the default provider
+	}
+
+	if region == "" {
+		// Try to get the provider key from the first part of the resource
+		providerPrefix := strings.Split(resourceType, "_")[0]
+		region = parseRegion(providerConf, vars, providerPrefix)
+
+		if region == "" {
+
+			switch providerPrefix {
+			case "aws":
+				region = aws.DefaultProviderRegion
+			}
+
+			// Don't show this log for azurerm users since they have a different method of looking up the region.
+			// A lot of Azure resources get their region from their referenced azurerm_resource_group resource
+			if region != "" && providerPrefix != "azurerm" {
+				log.Debugf("Falling back to default region (%s) for %s", region, addr)
+			}
+		}
+	}
+
+	return region
+}
+
+func parseProviderKey(resConf gjson.Result) string {
+	v := resConf.Get("provider_config_key").String()
+	p := strings.Split(v, ":")
+
+	return p[len(p)-1]
+}
+
+func parseRegion(providerConf gjson.Result, vars gjson.Result, providerKey string) string {
+	// Try to get constant value
+	region := providerConf.Get(fmt.Sprintf("%s.expressions.region.constant_value", gjsonEscape(providerKey))).String()
+	if region == "" {
+		// Try to get reference
+		refName := providerConf.Get(fmt.Sprintf("%s.expressions.region.references.0", gjsonEscape(providerKey))).String()
+		splitRef := strings.Split(refName, ".")
+
+		if splitRef[0] == "var" {
+			// Get the region from variables
+			varName := strings.Join(splitRef[1:], ".")
+			varContent := vars.Get(fmt.Sprintf("%s.value", varName))
+
+			if !varContent.IsObject() && !varContent.IsArray() {
+				region = varContent.String()
+			}
+		}
+	}
+
+	return region
+}
+
+func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, resData map[string]*schema.ResourceData) {
+	log.Debugf("Loading usage data from Infracost provider resources")
+
+	for _, d := range resData {
+		if isInfracostResource(d) {
+			p.ctx.SetContextValue("terraformInfracostProviderEnabled", true)
+
+			for _, ref := range d.References("resources") {
+				if _, ok := u[ref.Address]; !ok {
+					u[ref.Address] = schema.NewUsageData(ref.Address, convertToUsageAttributes(d.RawValues))
+				} else {
+					log.Debugf("Skipping loading usage for resource %s since it has already been defined", ref.Address)
+				}
+			}
+		}
+	}
+}
+
+func (p *Parser) stripDataResources(resData map[string]*schema.ResourceData) {
+	for addr, d := range resData {
+		if strings.HasPrefix(addressResourcePart(d.Address), "data.") {
+			delete(resData, addr)
+		}
+	}
+}
+
+func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {
+	registryMap := GetResourceRegistryMap()
+
+	// Create a map of id -> resource data so we can lookup references
+	idMap := make(map[string][]*schema.ResourceData)
+
+	for _, d := range resData {
+
+		// check for any "default" ids declared by the provider for this resource
+		if f := registryMap.GetDefaultRefIDFunc(d.Type); f != nil {
+			for _, defaultID := range f(d) {
+				if _, ok := idMap[defaultID]; !ok {
+					idMap[defaultID] = []*schema.ResourceData{}
+				}
+				idMap[defaultID] = append(idMap[defaultID], d)
+			}
+		}
+
+		// check for any "custom" ids specified by the resource and add them.
+		if f := registryMap.GetCustomRefIDFunc(d.Type); f != nil {
+			for _, customID := range f(d) {
+				if _, ok := idMap[customID]; !ok {
+					idMap[customID] = []*schema.ResourceData{}
+				}
+				idMap[customID] = append(idMap[customID], d)
+			}
+		}
+
+	}
+
+	//parseKnownModuleRefs(resData, conf)
+
+	for _, d := range resData {
+		var refAttrs []string
+
+		if isInfracostResource(d) {
+			refAttrs = []string{"resources"}
+		} else {
+			refAttrs = registryMap.GetReferenceAttributes(d.Type)
+		}
+
+		for _, attr := range refAttrs {
+			found := p.parseConfReferences(resData, conf, d, attr, registryMap)
+
+			if found {
+				continue
+			}
+
+			// Get any values for the fields and check if they map to IDs or ARNs of any resources
+			for _, refVal := range d.Get(attr).Array() {
+				if refVal.String() == "" {
+					continue
+				}
+
+				// Check ID map
+				idRefs, ok := idMap[refVal.String()]
+				if ok {
+
+					for _, ref := range idRefs {
+						reverseRefAttrs := registryMap.GetReferenceAttributes(ref.Type)
+						d.AddReference(attr, ref, reverseRefAttrs)
+					}
+				}
+			}
+		}
+	}
+}
+
+func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap) bool {
+	// Check if there's a reference in the conf
+	resConf := getConfJSON(conf, d.Address)
+	exps := resConf.Get("expressions").Get(attr)
+	lookupStr := "references"
+	if exps.IsArray() {
+		lookupStr = "#.references"
+	}
+
+	refResults := exps.Get(lookupStr).Array()
+	refs := make([]string, 0, len(refResults))
+
+	for _, refR := range refResults {
+		if refR.Type == gjson.JSON {
+			arr := refR.Array()
+			for _, r := range arr {
+				refs = append(refs, r.String())
+			}
+			continue
+		}
+
+		refs = append(refs, refR.String())
+	}
+
+	found := false
+
+	for _, ref := range refs {
+		if ref == "count.index" || ref == "each.key" || strings.HasPrefix(ref, "var.") {
+			continue
+		}
+
+		var refData *schema.ResourceData
+
+		m := addressModulePart(d.Address)
+		refAddr := fmt.Sprintf("%s%s", m, ref)
+
+		// see if there's a resource that's an exact match on the address
+		refData, ok := resData[refAddr]
+
+		// if there's a count ref value then try with the array index of the count ref
+		if !ok {
+			if containsString(refs, "count.index") {
+				a := fmt.Sprintf("%s[%d]", refAddr, addressCountIndex(d.Address))
+				refData, ok = resData[a]
+
+				if ok {
+					log.Debugf("reference specifies a count: using resource %s for %s.%s", a, d.Address, attr)
+				}
+			} else if containsString(refs, "each.key") {
+				a := fmt.Sprintf("%s[\"%s\"]", refAddr, addressKey(d.Address))
+				refData, ok = resData[a]
+
+				if ok {
+					log.Debugf("reference specifies a key: using resource %s for %s.%s", a, d.Address, attr)
+				}
+			}
+		}
+
+		// if still not found, see if there's a matching resource with an [0] array part
+		if !ok {
+			a := fmt.Sprintf("%s[0]", refAddr)
+			refData, ok = resData[a]
+
+			if ok {
+				log.Debugf("reference does not specify a count: using resource %s for for %s.%s", a, d.Address, attr)
+			}
+		}
+
+		if ok {
+			found = true
+			reverseRefAttrs := registryMap.GetReferenceAttributes(refData.Type)
+			d.AddReference(attr, refData, reverseRefAttrs)
+		}
+	}
+
+	return found
+}
+
+func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
+	a := make(map[string]gjson.Result)
+
+	for k, v := range j.Map() {
+		a[k] = v.Get("0.value")
+	}
+
+	return a
+}
+
+func getConfJSON(conf gjson.Result, addr string) gjson.Result {
+	return conf
+}
+
+func getModuleConfJSON(conf gjson.Result, names []string) gjson.Result {
+	return conf
+}
+
+func isInfracostResource(res *schema.ResourceData) bool {
+	for _, p := range infracostProviderNames {
+		if res.ProviderName == p {
+			return true
+		}
+	}
+
+	return false
+}
+
+// addressResourcePart parses a resource addr and returns resource suffix (without the module prefix).
+// For example: `module.name1.module.name2.resource` will return `name2.resource`.
+func addressResourcePart(addr string) string {
+	p := splitAddress(addr)
+
+	if len(p) >= 3 && p[len(p)-3] == "data" {
+		return strings.Join(p[len(p)-3:], ":")
+	}
+
+	return strings.Join(p[len(p)-2:], ":")
+}
+
+// addressModulePart parses a resource addr and returns module prefix.
+// For example: `module.name1.module.name2.resource` will return `module.name1.module.name2.`.
+func addressModulePart(addr string) string {
+	ap := splitAddress(addr)
+
+	var mp []string
+
+	if len(ap) >= 3 && ap[len(ap)-3] == "data" {
+		mp = ap[:len(ap)-3]
+	} else {
+		mp = ap[:len(ap)-2]
+	}
+
+	if len(mp) == 0 {
+		return ""
+	}
+
+	return fmt.Sprintf("%s.", strings.Join(mp, "."))
+}
+
+func addressCountIndex(addr string) int {
+	r := regexp.MustCompile(`\[(\d+)\]`)
+	m := r.FindStringSubmatch(addr)
+
+	if len(m) > 0 {
+		i, _ := strconv.Atoi(m[1]) // TODO: unhandled error
+
+		return i
+	}
+
+	return -1
+}
+
+func addressKey(addr string) string {
+	r := regexp.MustCompile(`\["([^"]+)"\]`)
+	m := r.FindStringSubmatch(addr)
+
+	if len(m) > 0 {
+		return m[1]
+	}
+
+	return ""
+}
+
+func removeAddressArrayPart(addr string) string {
+	r := regexp.MustCompile(`([^\[]+)`)
+	m := r.FindStringSubmatch(addressResourcePart(addr))
+
+	return m[1]
+}
+
+// splitAddress splits the address by `.`, but ignores any `.`s quoted in the array part of the address
+func splitAddress(addr string) []string {
+	quoted := false
+	return strings.FieldsFunc(addr, func(r rune) bool {
+		if r == '"' {
+			quoted = !quoted
+		}
+		return !quoted && r == '.'
+	})
+}
+
+func containsString(a []string, s string) bool {
+	for _, i := range a {
+		if i == s {
+			return true
+		}
+	}
+
+	return false
+}
+
+func gjsonEscape(s string) string {
+	s = strings.ReplaceAll(s, ".", `\.`)
+	s = strings.ReplaceAll(s, "*", `\*`)
+	s = strings.ReplaceAll(s, "?", `\?`)
+
+	return s
+}
+
+// Parses known modules to create references for specific resources in that module
+// This is useful if the module uses a `dynamic` block which means the references aren't defined in the plan JSON
+// See https://github.com/hashicorp/terraform/issues/28346 for more info
+func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Result) {
+	knownRefs := []struct {
+		SourceAddrSuffix string
+		DestAddrSuffix   string
+		Attribute        string
+		ModuleSource     string
+	}{
+		{
+			SourceAddrSuffix: "aws_autoscaling_group.workers_launch_template",
+			DestAddrSuffix:   "aws_launch_template.workers_launch_template",
+			Attribute:        "launch_template",
+			ModuleSource:     "terraform-aws-modules/eks/aws",
+		},
+		{
+			SourceAddrSuffix: "aws_autoscaling_group.this",
+			DestAddrSuffix:   "aws_launch_template.this",
+			Attribute:        "launch_template",
+			ModuleSource:     "terraform-aws-modules/autoscaling/aws",
+		},
+		{
+			SourceAddrSuffix: "aws_autoscaling_group.this",
+			DestAddrSuffix:   "aws_launch_configuration.this",
+			Attribute:        "launch_configuration",
+			ModuleSource:     "terraform-aws-modules/autoscaling/aws",
+		},
+	}
+	log.Debugf("known refs %s", knownRefs)
 }

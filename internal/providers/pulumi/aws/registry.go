@@ -82,6 +82,10 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 // FreeResources grouped alphabetically
 var FreeResources = []string{
+	// AWS Application Auto Scaling
+	"aws_appautoscaling_policy",
+	"aws_appautoscaling_scheduled_action",
+
 	// AWS Certificate Manager
 	"aws_acm_certificate_validation",
 
@@ -120,6 +124,14 @@ var FreeResources = []string{
 	"aws_apigatewayv2_stage",
 	"aws_apigatewayv2_vpc_link",
 
+	// AWS Backup
+	"aws_backup_global_settings",
+	"aws_backup_plan",
+	"aws_backup_region_settings",
+	"aws_backup_selection",
+	"aws_backup_vault_notifications",
+	"aws_backup_vault_policy",
+
 	// AWS DX Transit.
 	"aws_dx_bgp_peer",
 	"aws_dx_gateway",
@@ -134,6 +146,10 @@ var FreeResources = []string{
 	"aws_dx_private_virtual_interface",
 	"aws_dx_public_virtual_interface",
 	"aws_dx_transit_virtual_interface",
+
+	// AWS Cloudformation
+	"aws_cloudformation_stack_set_instance",
+	"aws_cloudformation_type",
 
 	// AWS Cloudfront
 	"aws_cloudfront_origin_access_identity",
@@ -168,8 +184,16 @@ var FreeResources = []string{
 	"aws_ecr_lifecycle_policy",
 	"aws_ecr_repository_policy",
 
+	// AWS Elastic Beanstalk
+	"aws_elastic_beanstalk_application",
+
 	// AWS Elastic Container Service
-	"aws_ecs_capacity_provider",
+	"aws_ecs_account_setting_default",
+
+	// AWS Elastic File System
+	"aws_efs_access_point",
+	"aws_efs_file_system_policy",
+	"aws_efs_mount_target",
 
 	// AWS Elastic Load Balancing
 	"aws_alb_listener",
@@ -194,6 +218,21 @@ var FreeResources = []string{
 	"aws_elasticache_parameter_group",
 	"aws_elasticache_security_group",
 	"aws_elasticache_subnet_group",
+
+	// AWS Glue
+	"aws_glue_catalog_table",
+	"aws_glue_classifier",
+	"aws_glue_connection",
+	"aws_glue_data_catalog_encryption_settings",
+	"aws_glue_partition",
+	"aws_glue_partition_index",
+	"aws_glue_registry",
+	"aws_glue_resource_policy",
+	"aws_glue_schema",
+	"aws_glue_security_configuration",
+	"aws_glue_trigger",
+	"aws_glue_user_defined_function",
+	"aws_glue_workflow",
 
 	// AWS IAM aws_iam_* resources
 	"aws_iam_access_key",
@@ -236,21 +275,38 @@ var FreeResources = []string{
 	"aws_kms_grant",
 
 	// AWS Lambda
-	"aws_lambda_permission",
-	"aws_lambda_function_event_invoke_config",
 	"aws_lambda_alias",
+	"aws_lambda_code_signing_config",
+	"aws_lambda_event_source_mapping",
+	"aws_lambda_function_event_invoke_config",
+	"aws_lambda_layer_version",
+	"aws_lambda_layer_version_permission",
+	"aws_lambda_permission",
+
+	// AWS Neptune
+	"aws_neptune_cluster_parameter_group",
+	"aws_neptune_event_subscription",
+	"aws_neptune_parameter_group",
+	"aws_neptune_subnet_group",
+
+	// AWS Network Firewall
+	"aws_networkfirewall_rule_group",
+	"aws_networkfirewall_firewall_policy",
+	"aws_networkfirewall_logging_configuration",
 
 	// AWS Others
 	"aws_db_instance_role_association",
+	"aws_db_option_group",
 	"aws_db_parameter_group",
 	"aws_db_subnet_group",
 	"aws_dms_replication_subnet_group",
 	"aws_dms_replication_task",
 	"aws_docdb_cluster_parameter_group",
 	"aws_docdb_subnet_group",
-	"aws_ecs_cluster",
+	"aws_dynamodb_table_item",
+	"aws_ebs_encryption_by_default",
+	"aws_ebs_default_kms_key",
 	"aws_ecs_task_definition",
-	"aws_eip_association",
 	"aws_elasticsearch_domain_policy",
 	"aws_key_pair",
 	"aws_launch_configuration",
@@ -282,6 +338,7 @@ var FreeResources = []string{
 	// AWS S3
 	"aws_s3_access_point",
 	"aws_s3_account_public_access_block",
+	"aws_s3_bucket_acl",
 	"aws_s3_bucket_metric",
 	"aws_s3_bucket_notification",
 	"aws_s3_bucket_object", // Costs are shown at the bucket level
@@ -297,6 +354,10 @@ var FreeResources = []string{
 	// AWS Service Discovery Service
 	"aws_service_discovery_service",
 
+	// AWS SES
+	"aws_ses_domain_dkim",
+	"aws_ses_domain_identity",
+
 	// AWS SNS
 	"aws_sns_platform_application",
 	"aws_sns_sms_preferences",
@@ -311,6 +372,11 @@ var FreeResources = []string{
 	"aws_ssm_patch_group",
 	"aws_ssm_resource_data_sync",
 
+	// AWS Transfer Family
+	"aws_transfer_access",
+	"aws_transfer_ssh_key",
+	"aws_transfer_user",
+
 	// AWS VPC
 	"aws_customer_gateway",
 	"aws_default_network_acl",
@@ -319,7 +385,6 @@ var FreeResources = []string{
 	"aws_default_subnet",
 	"aws_default_vpc",
 	"aws_default_vpc_dhcp_options",
-	"aws_ebs_encryption_by_default",
 	"aws_ec2_client_vpn_authorization_rule",
 	"aws_ec2_client_vpn_route",
 	"aws_ec2_tag",
@@ -383,6 +448,24 @@ var FreeResources = []string{
 	"time_rotating",
 	"time_sleep",
 	"time_static",
+
+	// WAF
+	"aws_wafv2_rule_group",
+	"aws_wafv2_ip_set",
+	"aws_wafv2_regex_pattern_set",
+	"aws_wafv2_web_acl_association",
+	"aws_wafv2_web_acl_logging_configuration",
+	"aws_waf_byte_match_set",
+	"aws_waf_geo_match_set",
+	"aws_waf_ipset",
+	"aws_waf_regex_match_set",
+	"aws_waf_regex_pattern_set",
+	"aws_waf_size_constraint_set",
+	"aws_waf_sql_injection_match_set",
+	"aws_waf_xss_match_set",
+	"aws_waf_rule",
+	"aws_waf_rate_based_rule",
+	"aws_waf_rule_group",
 }
 
 var UsageOnlyResources = []string{

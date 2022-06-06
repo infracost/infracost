@@ -35,6 +35,10 @@ const ubuntu = aws.ec2.getAmi({
     owners: ["099720109477"],
 });
 
+const eip = new aws.ec2.Eip("elastic-ip", {
+    vpc: true,
+});
+
 const web = new aws.ec2.Instance("ec2-instance", {
     ami: ubuntu.then(ubuntu => ubuntu.id),
     instanceType: "t3.micro",
@@ -52,9 +56,9 @@ const web = new aws.ec2.Instance("ec2-instance", {
         { deviceName: '/dev/xvde', volumeId: ebsVolume.id},
         { deviceName: '/dev/xvdf', volumeId: ebsVolume1.id}
     ]
-    
 });
 
-const eip = new aws.ec2.Eip("elastic-ip", {
-    vpc: true,
+const eipAssoc = new aws.ec2.EipAssociation("eipAssoc", {
+    instanceId: web.id,
+    allocationId: eip.id,
 });

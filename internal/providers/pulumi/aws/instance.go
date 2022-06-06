@@ -20,9 +20,9 @@ func getInstanceRegistryItem() *schema.RegistryItem {
 		},
 		RFunc: NewInstance,
 		ReferenceAttributes: []string{
-			"ebs_block_device.#.volume_id",
-			"launch_template.#.id",
-			"launch_template.#.name",
+			"ebsBlockDevice.#.volumeId",
+			"launchTemplate.#.id",
+			"launchTemplate.#.name",
 		},
 	}
 }
@@ -99,7 +99,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if d.Get("rootBlockDevice.volumeSize").Type != gjson.Null {
 		a.RootBlockDevice.Size = intPtr(d.Get("rootBlockDevice.volumeSize").Int())
 	}
-
+	// the # is a gjson directive meaning that its entering an array.
 	ebsBlockDeviceRef := d.References("ebsBlockDevice.#.volumeId")
 
 	for i, data := range d.Get("ebsBlockDevices").Array() {
