@@ -15,7 +15,7 @@ var (
 
 func getEIPRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:                "aws__eip",
+		Name:                "aws_eip",
 		ReferenceAttributes: eipReferences,
 		RFunc:               NewEIP,
 	}

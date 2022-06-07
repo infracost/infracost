@@ -504,10 +504,17 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 func deriveTfResourceTypes(resourceType string) string {
 	var resourceTypeArray = strings.Split(resourceType, ":")
 	var midTypeArray = strings.Split(resourceTypeArray[1], "/")
-	var _resourceType = resourceTypeArray[0] + "_" + midTypeArray[0] + "_" + midTypeArray[1]
-	tfResourceTypes := map[string]string{
-		"aws_ec2_eip": "aws_eip",
+	var _resourceType = strings.ToLower(resourceTypeArray[0] + "_" + midTypeArray[0] + "_" + midTypeArray[1])
+	providerPrefix := strings.ToLower(resourceTypeArray[0])
+	var tfResourceTypes map[string]string
+	switch providerPrefix {
+	case "aws":
+		tfResourceTypes = aws.GetAWSResourceTypes()
+	default:
+		log.Debugf("Unsupported provider %s", providerPrefix)
+		tfResourceTypes = map[string]string{}
 	}
+
 	knownResourceType := tfResourceTypes[_resourceType]
 	if knownResourceType == "" {
 		return _resourceType
